@@ -70,7 +70,6 @@ newWeaponSkillRecoveryBonuses =
 	[const.Skills.Blaster]	= {0, 0, 0, 0,},
 }
 -- weapon skill damage bonuses (by rank)
-
 oldWeaponSkillDamageBonuses =
 {
 	[const.Skills.Staff]	= {0, 0, 0, 1},
@@ -149,7 +148,7 @@ newArmorSkillResistanceBonuses =
 twoHandedWeaponDamageBonus = 3
 twoHandedWeaponDamageBonusByMastery = {[const.Novice] = twoHandedWeaponDamageBonus/3, [const.Expert] = twoHandedWeaponDamageBonus/3*2, [const.Master] = twoHandedWeaponDamageBonus, }
 
-classMeleeWeaponSkillDamageBonus ={[const.Class.Knight]=10,}
+classMeleeWeaponSkillDamageBonus ={}
 classRangedWeaponSkillAttackBonusMultiplier ={}
 classRangedWeaponSkillDamageBonus ={}
 
@@ -691,6 +690,177 @@ function events.CalcStatBonusByItems(t)
 			t.Result = t.Result + (newArmorSkillResistanceBonuses[armor.skill][armor.rank] * armor.level)
 		end
 		
+	end
+	
+end
+
+-- calculate new and old recovery difference
+local function getWeaponRecoveryCorrection(equipmentData1, equipmentData2, player)
+
+	local correction = 0
+	
+	-- single wield
+	if equipmentData2 == nil then
+	
+		-- calculate old and new recovery bonuses
+	
+		local oldRecoveryBonus = 0
+		local newRecoveryBonus = 0
+	
+		-- base bonuses
+		
+		oldRecoveryBonus = oldRecoveryBonus + oldWeaponBaseRecoveryBonuses[equipmentData1.skill]
+		newRecoveryBonus = newRecoveryBonus + newWeaponBaseRecoveryBonuses[equipmentData1.skill]
+		
+		-- skill bonuses
+		
+		if equipmentData1.rank >= const.Expert then
+			oldRecoveryBonus = oldRecoveryBonus + (oldWeaponSkillRecoveryBonuses[equipmentData1.skill][equipmentData1.rank] * equipmentData1.level)
+		end
+		newRecoveryBonus = newRecoveryBonus + (newWeaponSkillRecoveryBonuses[equipmentData1.skill][equipmentData1.rank] * equipmentData1.level)
+		
+		-- class bonus
+		
+		--if equipmentData1.skill == const.Skills.Bow or (blastersUseClassMultipliers and equipmentData1.skill == const.Skills.Blaster) then
+		--	local rangedWeaponSkillSpeedBonusMultiplier = classRangedWeaponSkillSpeedBonusMultiplier[player.Class]
+		--	if rangedWeaponSkillSpeedBonusMultiplier ~= nil then
+		--		newRecoveryBonus = newRecoveryBonus * rangedWeaponSkillSpeedBonusMultiplier
+		--	end
+		--end
+		
+		-- replace old with new bonus
+
+		correction = correction 
+			+ oldRecoveryBonus
+			- newRecoveryBonus
+		
+	-- dual wield
+	else
+	
+		-- calculate effective skill levels
+		
+		local meleeWeapon1EffectiveSkillLevel
+		local meleeWeapon2EffectiveSkillLevel
+		
+		if equipmentData1.skill == equipmentData2.skill then
+			meleeWeapon1EffectiveSkillLevel = equipmentData1.level
+			meleeWeapon2EffectiveSkillLevel = equipmentData2.level
+		else
+			-- effective skill level is not divided by sqrt(2) anymore
+			meleeWeapon1EffectiveSkillLevel = equipmentData1.level
+			meleeWeapon2EffectiveSkillLevel = equipmentData2.level
+		end
+	
+		-- calculate old and new recovery bonuses
+	
+		local oldRecoveryBonus1 = 0
+		local newRecoveryBonus1 = 0
+		local newRecoveryBonus2 = 0
+	
+		-- weapon 1
+		
+		-- base bonuses
+		
+		oldRecoveryBonus1 = oldRecoveryBonus1 + oldWeaponBaseRecoveryBonuses[equipmentData1.skill]
+		newRecoveryBonus1 = newRecoveryBonus1 + newWeaponBaseRecoveryBonuses[equipmentData1.skill]
+		newRecoveryBonus2 = newRecoveryBonus2 + newWeaponBaseRecoveryBonuses[equipmentData2.skill]
+		
+		-- swiftness
+		
+		if equipmentData1.item.Bonus2 == 59 then
+			oldRecoveryBonus1 = oldRecoveryBonus1 + 20
+			newRecoveryBonus1 = newRecoveryBonus1 + 20
+		end
+		if equipmentData2.item.Bonus2 == 59 then
+			newRecoveryBonus2 = newRecoveryBonus2 + 20
+		end
+		
+		-- skill bonuses
+		
+		if equipmentData1.rank >= const.Expert then
+			oldRecoveryBonus1 = oldRecoveryBonus1 + (oldWeaponSkillRecoveryBonuses[equipmentData1.skill][equipmentData1.rank] * equipmentData1.level)
+		end
+		newRecoveryBonus1 = (newRecoveryBonus1 + (newWeaponSkillRecoveryBonuses[equipmentData1.skill][equipmentData1.rank] * meleeWeapon1EffectiveSkillLevel))
+		newRecoveryBonus2 = (newRecoveryBonus2 + (newWeaponSkillRecoveryBonuses[equipmentData2.skill][equipmentData2.rank] * meleeWeapon2EffectiveSkillLevel))
+		
+		-- replace old with new bonus
+		
+		correction = correction
+			+ oldRecoveryBonus1
+			- (newRecoveryBonus1 + newRecoveryBonus2)
+		
+	end
+	
+	return correction
+	
+end
+
+
+
+
+
+
+meleeRecoveryCap=30
+
+
+-- corrects attack delay
+
+function events.GetAttackDelay(t)
+
+	local equipmentData = getPlayerEquipmentData(t.Player)
+	
+	-- weapon
+	
+	if t.Ranged then
+	
+		local bow = equipmentData.bow
+	
+		if bow.weapon then
+		
+			t.Result = t.Result + getWeaponRecoveryCorrection(bow, nil, t.Player)
+			
+		end
+		
+	else
+	
+		local main = equipmentData.main
+		local extra = equipmentData.extra
+		
+		if main.weapon then
+			
+			-- single wield
+			if not equipmentData.dualWield then
+				
+				t.Result = t.Result + getWeaponRecoveryCorrection(main, nil, t.Player)
+				
+			-- dual wield
+			else
+			
+				-- no axe and no sword in main hand and sword in extra hand = extra hand skill defines recovery
+				if main.skill ~= const.Skills.Axe and main.skill ~= const.Skills.Sword and extra.skill == const.Skills.Sword then
+					t.Result = t.Result + getWeaponRecoveryCorrection(extra, main, t.Player)
+				-- everything else = main hand skill defines recovery
+				else
+					t.Result = t.Result + getWeaponRecoveryCorrection(main, extra, t.Player)
+				end
+				
+			end
+			
+		end
+		
+	end
+	
+	-- turn recovery time into a multiplier rather than divisor
+	
+	local recoveryBonus = 100 - t.Result
+	local correctedRecoveryTime = math.floor(100 / (1 + recoveryBonus / 100))
+	
+	t.Result = correctedRecoveryTime
+	
+	-- cap melee recovery
+	
+	if not t.Ranged then
+		t.Result = math.max(meleeRecoveryCap, t.Result)
 	end
 	
 end
