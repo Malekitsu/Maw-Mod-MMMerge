@@ -667,7 +667,7 @@ function events.CalcStatBonusByItems(t)
 	
 		-- resistance bonus from weapon
 		
-		for playerIndex = 0,3 do
+		for playerIndex = 0,#Party do
 		
 			local weaponResistancePlayer = Party.Players[playerIndex]
 			local weaponResistancePlayerEquipmentData = getPlayerEquipmentData(weaponResistancePlayer)
@@ -864,3 +864,108 @@ function events.GetAttackDelay(t)
 	end
 	
 end
+
+
+
+local function navigateMissile(object)
+
+	-- exclude some special non targeting spells
+	if
+		-- Meteor Shower
+		object.SpellType == 9
+		or
+		-- Sparks
+		object.SpellType == 15
+		or
+		-- Starburst
+		object.SpellType == 22
+		or
+		-- Poison Spray
+		object.SpellType == 24
+		or
+		-- Ice Blast
+		object.SpellType == 32
+		or
+		-- Shrapmetal
+		object.SpellType == 93
+	then
+		return
+	end
+	--ignore if real time mode
+	if RealTimeHoming then
+		if Game.TurnBasedPhase==0 then
+			return
+		end
+	end
+	-- object parameters
+	local ownerKind = bit.band(object.Owner, 7)
+	local targetKind = bit.band(object.Target, 7)
+	local targetIndex = bit.rshift(object.Target, 3)
+	
+	if targetIndex > Map.Monsters.high then
+		return
+	end
+	
+	-- current position
+	local currentPosition = {["X"] = object.X, ["Y"] = object.Y, ["Z"] = object.Z, }
+	
+	-- process only missiles between party and monster
+	-- target position
+	local targetPosition
+	if ownerKind == const.ObjectRefKind.Party and targetKind == const.ObjectRefKind.Monster then
+		local mapMonster = Map.Monsters[targetIndex]
+		-- target only alive monster
+		if mapMonster.HitPoints > 0 then
+			targetPosition = {["X"] = mapMonster.X, ["Y"] = mapMonster.Y, ["Z"] = mapMonster.Z + mapMonster.BodyHeight * 0.75, }
+		else
+			return
+		end
+	-- assume all objects not owned by party and without target are targetting party
+	-- this creates issues with cosmetic projectiles like CI Obelisk Arena Paralyze and Gharik/Baa lava fireballs
+	elseif ownerKind ~= const.ObjectRefKind.Party and targetKind == const.ObjectRefKind.Nothing  then
+		targetPosition = {["X"] = Party.X, ["Y"] = Party.Y, ["Z"] = Party.Z + 120, }
+	else
+		-- ignore other missiles targetting
+		return
+	end
+	
+	-- speed
+	local speed = math.sqrt(object.VelocityX * object.VelocityX + object.VelocityY * object.VelocityY + object.VelocityZ * object.VelocityZ)
+	
+	-- process only objects with non zero speed
+	if speed == 0 then
+		return
+	end
+	
+	-- direction
+	local direction = {["X"] = targetPosition.X - currentPosition.X, ["Y"] = targetPosition.Y - currentPosition.Y, ["Z"] = targetPosition.Z - currentPosition.Z, }
+	-- directionLength
+	local directionLength = math.sqrt(direction.X * direction.X + direction.Y * direction.Y + direction.Z * direction.Z)
+	
+	-- normalization koefficient
+	local koefficient = speed / directionLength
+	
+	-- new velocity
+	local newVelocity = {["X"] = koefficient * direction.X, ["Y"] = koefficient * direction.Y, ["Z"] = koefficient * direction.Z, }
+	
+	-- set new velocity
+	object.VelocityX = newVelocity.X
+	object.VelocityY = newVelocity.Y
+	object.VelocityZ = newVelocity.Z
+	
+end
+
+-- game tick related functionality
+local homingProjectiles = true
+function events.Tick()
+
+	-- navigateMissiles
+	if homingProjectiles then
+		for objectIndex = 1,Map.Objects.high do
+			local object =  Map.Objects[objectIndex]
+			navigateMissile(object)
+		end
+	end
+end
+
+
