@@ -969,3 +969,21 @@ function events.Tick()
 end
 
 
+function events.CalcDamageToMonster(t)
+	local data = WhoHitMonster()	
+	--luck/accuracy bonus
+	if data and data.Player and data.Object and t.DamageKind==4 and data.Object.Spell==133 then
+		skill=data.Player.Skills[const.Skills.Bow]
+		s,m=SplitSkill(skill)
+		bonusDamage=s*newWeaponSkillDamageBonuses[const.Skills.Bow][m]
+		res=t.Monster.PhysResistance
+		if res>0 then
+			roll=0
+			while (math.random() < (1 - 30/(30 + res ))) and (roll <= 4) do
+			bonusDamage = bonusDamage / 2
+			roll = roll + 1
+			end
+		end
+		t.Result=t.Result+bonusDamage
+	end
+end
