@@ -1,0 +1,8 @@
+Following list will be orderer by importance:
+1) something to modify both generateitem and itemgenerated functions
+2) attribute breakpoints
+3) tooltip hook
+4) hook to modify HP 
+5) hook on right click in stat menu (might, endurance etc)
+
+If point 1 is not doable I will probably need to do a workaround that might result in suboptimal results.
