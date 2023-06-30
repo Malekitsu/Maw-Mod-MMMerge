@@ -50,11 +50,32 @@ function events.CalcSpellDamage(t)
 		end
 	end
 end
-
+--AC 
 function events.CalcDamageToPlayer(t)
 	if t.DamageKind==4 then 
 	AC=t.Player:GetArmorClass()
 	t.Result=t.Result/(math.max(AC^0.85/100+0.5,1))
+	end
+end
+--endurance
+fullHP={}
+for i =0,300 do
+fullHP[i]=0
+end
+
+
+function events.CalcStatBonusByItems(t)
+  if t.Stat == const.Stats.HP then
+	endurance=t.Player:GetEndurance()/500
+	i=t.Player:GetIndex()
+	t.Result=t.Result+fullHP[i]*endurance
+  end
+end
+
+
+function events.Tick()
+	for i=0,Party.High do
+		fullHP[i]=Game.Classes.HPFactor[Party[i].Class]*Party[i]:GetLevel()+Game.Classes.HPBase[Party[i].Class]
 	end
 end
 
