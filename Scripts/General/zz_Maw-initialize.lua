@@ -6,4 +6,3 @@ ItemRework=false
 --reworked stats, with % increase to damage etc.
 StatsRework=false
 ColouredStats=false
- 
