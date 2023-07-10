@@ -118,14 +118,14 @@ newWeaponSkillACBonuses =
 }
 newWeaponSkillResistanceBonuses =
 {
-	[const.Skills.Staff]	= {0, 1, 2, },
-	[const.Skills.Sword]	= {0, 0, 0, },
-	[const.Skills.Dagger]	= {0, 0, 0, },
-	[const.Skills.Axe]		= {0, 0, 0, },
-	[const.Skills.Spear]	= {0, 0, 0, },
-	[const.Skills.Bow]		= {0, 0, 0, },
-	[const.Skills.Mace]		= {0, 0, 0, },
-	[const.Skills.Blaster]	= {0, 0, 0, },
+	[const.Skills.Staff]	= {0, 1, 2, 2},
+	[const.Skills.Sword]	= {0, 0, 0, 0},
+	[const.Skills.Dagger]	= {0, 0, 0, 0},
+	[const.Skills.Axe]		= {0, 0, 0, 0},
+	[const.Skills.Spear]	= {0, 0, 0, 0},
+	[const.Skills.Bow]		= {0, 0, 0, 0},
+	[const.Skills.Mace]		= {0, 0, 0, 0},
+	[const.Skills.Blaster]	= {0, 0, 0, 0},
 }
 -- armor skill AC bonuses (by rank)
 
