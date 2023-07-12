@@ -19,7 +19,7 @@ function events.AfterLoadMap()
 		mapvars.boosted=true
 		--calculate average level for unique monsters
 		for i=0, Map.Monsters.High do
-			if (Map.Monsters[i].Name ~= Game.MonstersTxt[Map.Monsters[i].Id].Name) or (Map.Monsters[i].FullHitPoints ~= Game.MonstersTxt[Map.Monsters[i].Id].FullHitPoints) then
+			if ((Map.Monsters[i].Name ~= Game.MonstersTxt[Map.Monsters[i].Id].Name) or (Map.Monsters[i].FullHitPoints ~= Game.MonstersTxt[Map.Monsters[i].Id].FullHitPoints)) and Map.Monsters[i].Level>5 then
 				mon=Map.Monsters[i]
 				--HP
 				mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2),32500)
@@ -171,16 +171,14 @@ basetable[i].TreasureItemType=Game.MonstersTxt[i].TreasureItemType
 end
 end
 --MONSTER BOLSTERING
---store levels to center damage
+
 
 function events.LoadMap()
 	--calculate party experience
-	partyExperience = 0
-	for i = 0, Party.High do
-		partyExperience = partyExperience + Party.Players[i].Experience
-	end
-	averagePlayerExperience = partyExperience / 5
-	partyLevel = math.round((1 + (1 + (averagePlayerExperience / 500)))^0.5)
+	partyExperience=0
+	
+	partyExperience = Party.Players[0].Experience
+	partyLevel = math.round((1 + (1 + (partyExperience)))^0.5)
 	
 
 	for i=1, 651 do
@@ -203,7 +201,7 @@ function events.LoadMap()
 		--HP
 		mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2),32500)
 		if ItemRework and StatsRework then
-			mon.HP=math.min(math.round(mon.HP*(1+mon.Level/180)/10)*10,32500)
+			mon.HP=math.min(math.round(mon.HP*(1+mon.Level/180),32500))
 		end
 		mon.FullHP=mon.HP
 		--resistances
@@ -219,11 +217,26 @@ function events.LoadMap()
 		mon.TreasureDiceCount=math.min(mon.TreasureDiceCount*levelMultiplier,250)
 		mon.TreasureDiceSides=math.min(mon.TreasureDiceSides*(mon.Level/100)*levelMultiplier,250)
 	end
-	--CALCULATE DAMAGE
+	--CALCULATE DAMAGE AND HP
 	for i=1, 651 do
 		mon=Game.MonstersTxt[i]
 		base=basetable[i]		
 		LevelB=BLevel[i]
+		--ADJUST HP
+		hpMult=1
+		if i%3==1 then
+			lvl=Game.MonstersTxt[i+2].Level
+			if mon.Level*2<=lvl then
+				hpMult=hpMult+lvl/(mon.Level*5)
+			end
+		elseif i%3==2 then
+			lvl=Game.MonstersTxt[i+1].Level
+			if Game.MonstersTxt[i-1].Level*2<=lvl then
+				hpMult=hpMult+lvl/(mon.Level*5)
+			end
+		end
+		mon.HP=mon.HP*hpMult
+		mon.FullHP=mon.HP
 		--damage
 		if i%3==1 then
 			levelMult=Game.MonstersTxt[i+1].Level
