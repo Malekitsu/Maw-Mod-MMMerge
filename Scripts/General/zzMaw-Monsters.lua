@@ -19,7 +19,7 @@ function events.AfterLoadMap()
 		mapvars.boosted=true
 		--calculate average level for unique monsters
 		for i=0, Map.Monsters.High do
-			if ((Map.Monsters[i].Name ~= Game.MonstersTxt[Map.Monsters[i].Id].Name) or (Map.Monsters[i].FullHitPoints ~= Game.MonstersTxt[Map.Monsters[i].Id].FullHitPoints)) and Map.Monsters[i].Level>5 then
+			if  (Map.Monsters[i].FullHitPoints ~= Game.MonstersTxt[Map.Monsters[i].Id].FullHitPoints) and Map.Monsters[i].Level>5 then
 				mon=Map.Monsters[i]
 				--HP
 				mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2),32500)
@@ -28,14 +28,8 @@ function events.AfterLoadMap()
 				end
 				mon.FullHP=mon.HP
 				--damage
-				dmgMult=mon.Level/20+1.25	
-				if ItemRework==true  then
-					dmgMult=dmgMult*((mon.Level^1.15-1)/1000+1)
-				end
-				if StatsRework==true then
-					dmgMult=dmgMult*((mon.Level^1.25-1)/1000+1)
-				end
-					
+				dmgMult=(mon.Level/20+1.25)*((mon.Level^1.15-1)/1000+1)*((mon.Level^1.25-1)/1000+1)	
+	
 				-----------------------------------------------------------
 				--DAMAGE COMPUTATION DOWN HERE, FOR BALANCE MODIFY ABOVE^
 				--attack 1
@@ -132,43 +126,55 @@ end
 
 --CREATE OLD TABLE COPY
 function events.GameInitialized2()
-basetable={}
-basetable.Attack1={}
-basetable.Attack2={}
-basetable.Resistances={}
---COPY TABLE
-for i=1,651 do
-basetable[i]={}
-basetable[i].ArmorClass=Game.MonstersTxt[i].ArmorClass
-basetable[i].Attack1={}
-basetable[i].Attack1.DamageAdd=Game.MonstersTxt[i].Attack1.DamageAdd
-basetable[i].Attack1.DamageDiceCount=Game.MonstersTxt[i].Attack1.DamageDiceCount
-basetable[i].Attack1.DamageDiceSides=Game.MonstersTxt[i].Attack1.DamageDiceSides
-basetable[i].Attack1.Missile=Game.MonstersTxt[i].Attack1.Missile
-basetable[i].Attack1.Type=Game.MonstersTxt[i].Attack1.Type
-basetable[i].Attack2={}
-basetable[i].Attack2.DamageAdd=Game.MonstersTxt[i].Attack2.DamageAdd
-basetable[i].Attack2.DamageDiceCount=Game.MonstersTxt[i].Attack2.DamageDiceCount
-basetable[i].Attack2.DamageDiceSides=Game.MonstersTxt[i].Attack2.DamageDiceSides
-basetable[i].Attack2.Missile=Game.MonstersTxt[i].Attack2.Missile
-basetable[i].Attack2.Type=Game.MonstersTxt[i].Attack2.Type
-basetable[i].Exp=Game.MonstersTxt[i].Exp
-basetable[i].Experience=Game.MonstersTxt[i].Experience
-basetable[i].FullHP=Game.MonstersTxt[i].FullHP
-basetable[i].FullHitPoints=Game.MonstersTxt[i].FullHitPoints
-basetable[i].Level=Game.MonstersTxt[i].Level
-basetable[i].Resistances={}
-for v=1,10 do 
-	if i~=5 then
-		basetable[i].Resistances[v]=Game.MonstersTxt[i].Resistances[v]
+	basetable={}
+	basetable.Attack1={}
+	basetable.Attack2={}
+	basetable.Resistances={}
+	--COPY TABLE
+	for i=1,651 do
+		basetable[i]={}
+		basetable[i].ArmorClass=Game.MonstersTxt[i].ArmorClass
+		basetable[i].Attack1={}
+		basetable[i].Attack1.DamageAdd=Game.MonstersTxt[i].Attack1.DamageAdd
+		basetable[i].Attack1.DamageDiceCount=Game.MonstersTxt[i].Attack1.DamageDiceCount
+		basetable[i].Attack1.DamageDiceSides=Game.MonstersTxt[i].Attack1.DamageDiceSides
+		basetable[i].Attack1.Missile=Game.MonstersTxt[i].Attack1.Missile
+		basetable[i].Attack1.Type=Game.MonstersTxt[i].Attack1.Type
+		basetable[i].Attack2={}
+		basetable[i].Attack2.DamageAdd=Game.MonstersTxt[i].Attack2.DamageAdd
+		basetable[i].Attack2.DamageDiceCount=Game.MonstersTxt[i].Attack2.DamageDiceCount
+		basetable[i].Attack2.DamageDiceSides=Game.MonstersTxt[i].Attack2.DamageDiceSides
+		basetable[i].Attack2.Missile=Game.MonstersTxt[i].Attack2.Missile
+		basetable[i].Attack2.Type=Game.MonstersTxt[i].Attack2.Type
+		basetable[i].Exp=Game.MonstersTxt[i].Exp
+		basetable[i].Experience=Game.MonstersTxt[i].Experience
+		basetable[i].FullHP=Game.MonstersTxt[i].FullHP
+		basetable[i].FullHitPoints=Game.MonstersTxt[i].FullHitPoints
+		basetable[i].Level=Game.MonstersTxt[i].Level
+		basetable[i].FireResistance=Game.MonstersTxt[i].FireResistance
+		basetable[i].AirResistance=Game.MonstersTxt[i].AirResistance
+		basetable[i].WaterResistance=Game.MonstersTxt[i].WaterResistance
+		basetable[i].EarthResistance=Game.MonstersTxt[i].EarthResistance
+		basetable[i].MindResistance=Game.MonstersTxt[i].MindResistance
+		basetable[i].SpiritResistance=Game.MonstersTxt[i].SpiritResistance
+		basetable[i].BodyResistance=Game.MonstersTxt[i].BodyResistance
+		basetable[i].LightResistance=Game.MonstersTxt[i].LightResistance
+		basetable[i].DarkResistance=Game.MonstersTxt[i].DarkResistance
+		basetable[i].PhysResistance=Game.MonstersTxt[i].PhysResistance	
+		basetable[i].TreasureDiceCount=Game.MonstersTxt[i].TreasureDiceCount
+		basetable[i].TreasureDiceSides=Game.MonstersTxt[i].TreasureDiceSides
+		basetable[i].TreasureItemLevel=Game.MonstersTxt[i].TreasureItemLevel
+		basetable[i].TreasureItemPercent=Game.MonstersTxt[i].TreasureItemPercent
+		basetable[i].TreasureItemType=Game.MonstersTxt[i].TreasureItemType
+		basetable[i].Resistances={}
+		for v=0,10 do 
+			if v~=5 then
+				basetable[i].Resistances[v]=Game.MonstersTxt[i].Resistances[v]
+				else
+				basetable[i].Resistances[v]=0
+			end
+		end
 	end
-end
-basetable[i].TreasureDiceCount=Game.MonstersTxt[i].TreasureDiceCount
-basetable[i].TreasureDiceSides=Game.MonstersTxt[i].TreasureDiceSides
-basetable[i].TreasureItemLevel=Game.MonstersTxt[i].TreasureItemLevel
-basetable[i].TreasureItemPercent=Game.MonstersTxt[i].TreasureItemPercent
-basetable[i].TreasureItemType=Game.MonstersTxt[i].TreasureItemType
-end
 end
 --MONSTER BOLSTERING
 function events.BeforeNewGameAutosave()
@@ -218,21 +224,31 @@ function events.LoadMap()
 		--level increase centered on B type
 		level=math.round((1 + (totExp / 500))^0.5)
 		mon.Level=level+basetable[i].Level-LevelB
-		--AC
-		--mon.ArmorClass=base.ArmorClass*((mon.Level+2)/(base.Level+2))
-		mon.ArmorClass=mon.Level
+		
 		--HP
 		mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2),32500)
 		if ItemRework and StatsRework then
 			mon.HP=math.min(math.round(mon.HP*(1+mon.Level/180),32500))
 		end
 		mon.FullHP=mon.HP
-		--resistances
+		--[[resistances
+		Game.MonstersTxt[i].FireResistance=base.FireResistance+(math.round(mon.Level-base.Level)/18)*5
+		Game.MonstersTxt[i].AirResistance=base.AirResistance+(math.round(mon.Level-base.Level)/18)*5
+		Game.MonstersTxt[i].WaterResistance=base.WaterResistance+(math.round(mon.Level-base.Level)/18)*5
+		Game.MonstersTxt[i].EarthResistance=base.EarthResistance+(math.round(mon.Level-base.Level)/18)*5
+		Game.MonstersTxt[i].MindResistance=base.MindResistance+(math.round(mon.Level-base.Level)/18)*5
+		Game.MonstersTxt[i].SpiritResistance=base.SpiritResistance+(math.round(mon.Level-base.Level)/18)*5
+		Game.MonstersTxt[i].BodyResistance=base.BodyResistance+(math.round(mon.Level-base.Level)/18)*5
+		Game.MonstersTxt[i].LightResistance=base.LightResistance+(math.round(mon.Level-base.Level)/18)*5
+		Game.MonstersTxt[i].DarkResistance=base.DarkResistance+(math.round(mon.Level-base.Level)/18)*5
+		Game.MonstersTxt[i].PhysResistance=base.PhysResistance+(math.round(mon.Level-base.Level)/18)*5
+		--]]
 		for v=0,10 do
 			if v~=5 then
-				mon.Resistances[v]=math.min(math.round(mon.Level/18)*5+mon.Resistances[v],255)
+			mon.Resistances[v]=math.min(math.round((mon.Level-basetable[i].Level)/10)*5+basetable[i].Resistances[v],65000)	
 			end
 		end
+		
 		--experience
 		mon.Experience = math.round(mon.Level*(mon.Level+10))
 		--Gold
@@ -269,6 +285,8 @@ function events.LoadMap()
 			levelMult=Game.MonstersTxt[i].Level
 		end
 		
+		mon.ArmorClass=mon.ArmorClass*((levelMult+10)/(LevelB+10))
+		mon.ArmorClass=mon.Level
 		dmgMult=(levelMult/18+1.25)*((levelMult+2)/(2+LevelB))*((levelMult^1.25-1)/1000+1)*((levelMult^1.25-1)/1000+1)
 		-----------------------------------------------------------
 		--DAMAGE COMPUTATION DOWN HERE, FOR BALANCE MODIFY ABOVE^
@@ -284,6 +302,7 @@ function events.LoadMap()
 		b=basetable[i].Attack1.DamageDiceSides * dmgMult^0.5
 		if dmgMult<4 then
 			mon.Attack1.DamageDiceSides = basetable[i].Attack1.DamageDiceSides * dmgMult
+			mon.Attack1.DamageDiceCount = basetable[i].Attack1.DamageDiceCount
 		else
 			mon.Attack1.DamageDiceSides = basetable[i].Attack1.DamageDiceSides * dmgMult^0.5
 			mon.Attack1.DamageDiceCount = basetable[i].Attack1.DamageDiceCount * dmgMult^0.5
@@ -294,51 +313,7 @@ function events.LoadMap()
 		d=mon.Attack2.DamageDiceSides * dmgMult^0.5
 		mon.Attack2.DamageDiceSides = basetable[i].Attack2.DamageDiceSides * dmgMult^0.5
 		mon.Attack2.DamageDiceCount = basetable[i].Attack2.DamageDiceCount * dmgMult^0.5
-		--OVERFLOW FIX
-		--Attack 1 Overflow fix
-		--add damage fix
-		if (a > 250) then
-		Overflow = a - 250
-		mon.Attack1.DamageAdd = 250
-		b=b + (math.round(2*Overflow/mon.Attack1.DamageDiceCount))
-		mon.Attack1.DamageDiceSides = b 
-		end
-		--Dice Sides fix
-		if (b > 250) then
-		Overflow = b / 250
-		mon.Attack1.DamageDiceSides = 250
-		--checking for dice count overflow
-		e = mon.Attack1.DamageDiceCount * Overflow
-		mon.Attack1.DamageDiceCount = mon.Attack1.DamageDiceCount * Overflow
-		end
-		--Just in case Dice Count fix
-		if not (e == nil) then
-			if (e > 250) then
-			mon.Attack1.DamageDiceCount = 250
-			end
-		end
-		--Attack 2 Overflow fix, same formula
-		--add damage fix
-		if (c > 250) then
-		Overflow = c - 250
-		mon.Attack2.DamageAdd = 250
-		d=d + (math.round(2*Overflow/mon.Attack2.DamageDiceCount))
-		mon.Attack2.DamageDiceSides = d
-		end
-		--Dice Sides fix
-		if (d > 250) then
-		Overflow = d / 250
-		mon.Attack2.DamageDiceSides = 250
-		--checking for dice count overflow
-		f=mon.Attack2.DamageDiceCount * Overflow
-		mon.Attack2.DamageDiceCount = mon.Attack2.DamageDiceCount * Overflow
-		end
-		--Just in case Dice Count fix
-		if not (f ==nil) then
-			if (f > 250) then
-			mon.Attack2.DamageDiceCount = 250
-			end
-		end
+
 		-------------------------
 		--END DAMAGE CALCULATION
 		-------------------------
