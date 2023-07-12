@@ -3,11 +3,11 @@ function events.GenerateItem(t)
 	--get party average level
 	partyExperience = 0
 	Handled = false
-	for i = 0, 3 do
+	for i = 0, Party.High do
 		partyExperience = partyExperience + Party.Players[i].Experience
 	end
 	
-	averagePlayerExperience = partyExperience / 4
+	averagePlayerExperience = partyExperience / Party.High
 	
 	partyLevel = math.floor((1 + math.sqrt(1 + (4 * averagePlayerExperience / 500))) / 2)
 	
@@ -38,15 +38,15 @@ function events.GenerateItem(t)
 end
 
 function events.ItemGenerated(t)	
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then
 		--give bonus a chance to proc even if bonus2 is already in the item
-		if t.Bonus2~=0 then
+		if t.Item.Bonus2~=0 then
 		bonusprocChance=math.random(1,100)
 			if bonusprocChance<=40 and t.Strength~=1 or (t.Strength==6 and bonusprocChance<=75) then
-				t.Bonus = math.random(1,14)
+				t.Item.Bonus = math.random(1,14)
 				local bonuses = {{1, 5}, {3, 8}, {6, 12}, {10, 17}, {15, 25}}
 				local bonus = bonuses[t.Strength - 1]
-				t.BonusStrength = math.random(bonus[1], bonus[2])
+				t.Item.BonusStrength = math.random(bonus[1], bonus[2])
 			end
 		end
 		--extra bonus proc
@@ -56,54 +56,44 @@ function events.ItemGenerated(t)
 		ChargesProc=math.random(1,100)
 		if ChargesProc<=extraBonusChance[t.Strength] then
 			lowerLimit=t.Strength
-			t.Charges = math.random(14 * extraBonusPowerLow[t.Strength]-13, 14 * extraBonusPowerHigh[t.Strength])
+			t.Item.Charges = math.random(extraBonusPowerLow[t.Strength], extraBonusPowerHigh[t.Strength])+math.random(1,16)*1000
 			--make it standard bonus if no standard bonus
-			if t.Bonus==0 then
-				t.Bonus=t.Charges%14+1
-				t.BonusStrength=math.ceil(t.Charges/14)
-				t.Charges=0
+			if t.Item.Bonus==0 then
+				t.Item.Bonus=math.floor(t.Item.Charges/1000)
+				t.Item.BonusStrength=t.Item.Charges%1000
+				t.Item.Charges=0
 			end
 		end
 		
-		--of x spell proc chance
-		if t.Number>=120 and t.Number<=134 and t.Bonus2~=0 and t.Strength < 6 then
-			roll=math.random(1,100)
-			if roll<(t.Strength-1)*10 then
-				t.Bonus2=math.random(26,34)
-			end
-		end
 		
 		--chance for ancient item, only if bonus 2 is spawned
-		if t.Bonus2~=0 then 
+		if t.Item.Bonus2~=0 then 
 			ancient=math.random(1,50)
-			if ancient<=t.Strength-3 then
-				t.Charges=math.random(364,560)
-				t.Bonus=math.random(1,14)
-				t.BonusStrength=math.random(26,40)
-				if t.Number>=94 and t.Number<=99 then
-				t.ExtraData=3000+math.random(40,50)
-				end
+			if ancient<=t.Strength-4 then
+				t.Item.Charges=math.random(25,40)+math.random(1,16)*1000
+				t.Item.Bonus=math.random(1,16)
+				t.Item.BonusStrength=math.random(26,40)
 			end
 		end
 		
 		--primordial item
 		primordial=math.random(1,200)
 		if primordial<=t.Strength-4 then
-			t.Charges=math.random(547,560)
-			t.Bonus=math.random(1,14)
-			t.BonusStrength=40
-			if t.Number>60 then
-				t.Bonus2=math.random(1,2)
+			t.Item.Charges=40+math.random(1,16)*1000
+			t.Item.Bonus=math.random(1,16)
+			t.Item.BonusStrength=40
+			if t.Item.Number>60 then
+				t.Item.Bonus2=math.random(1,2)
 				else
-				t.Bonus2=41
+				t.Item.Bonus2=41
 			end
 		end	
 		--buff to hp and mana items
-		if t.Bonus==8 or t.Bonus==9 then
-			t.BonusStrength=t.BonusStrength*2
+		if t.Item.Bonus==8 or t.Item.Bonus==9 then
+			t.Item.BonusStrength=t.Item.BonusStrength*2
 		end
-		if t.Charges%14==7 or t.Charges%14==8 then
-			t.Charges=t.Charges+14*math.ceil(t.Charges/14)
+		if t.Item.Charges%1000==7 or t.Item.Charges%1000==8 then
+			t.Item.Charges=t.Item.Charges+t.Item.Charges%1000
 		end
 	end
 end
@@ -114,8 +104,8 @@ end
 function events.CalcStatBonusByItems(t)
 	for it in t.Player:EnumActiveItems() do
 		if it.Charges ~= nil then
-			stat=it.Charges%14
-			bonus=math.ceil(it.Charges/14)
+			stat=math.floor(it.Charges/1000)+1
+			bonus=it.Charges%1000
 			if t.Stat==stat then
 				t.Result = t.Result + bonus
 			end
@@ -130,36 +120,37 @@ function events.GameInitialized2()
 --Weapon upscaler 
 
 
-for i=1,65 do
-upTierDifference=0
-downTierDifference=0
-downDamage=0
---set goal damage for weapons (end game weapon damage)
-goalDamage=50
-if Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Axe" or Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Sword" then
-	goalDamage=goalDamage*2
-end
-currentDamage = (Game.ItemsTxt[i].Mod1DiceCount *Game.ItemsTxt[i]. Mod1DiceSides + 1)/2+Game.ItemsTxt[i].Mod2 
+for i=1,2200 do
+	if (i>=1 and i<=83) or (i>=803 and i<=865) or (i>=1603 and i<=1665) then
+		upTierDifference=0
+		downTierDifference=0
+		downDamage=0
+		--set goal damage for weapons (end game weapon damage)
+		goalDamage=50
+		if Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Axe" or Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Sword" then
+			goalDamage=goalDamage*2
+		end
+		currentDamage = (Game.ItemsTxt[i].Mod1DiceCount *Game.ItemsTxt[i]. Mod1DiceSides + 1)/2+Game.ItemsTxt[i].Mod2 
 
-	for v=1,4 do
-		if Game.ItemsTxt[i].NotIdentifiedName==Game.ItemsTxt[i+v].NotIdentifiedName then
-		upTierDifference=upTierDifference+1
-		end
-		if Game.ItemsTxt[i].NotIdentifiedName==Game.ItemsTxt[math.max(i-v,0)].NotIdentifiedName then
-		downTierDifference=downTierDifference+1
-		downDamage = (Game.ItemsTxt[i-v].Mod1DiceCount *Game.ItemsTxt[i-v]. Mod1DiceSides + 1)/2+Game.ItemsTxt[i-v].Mod2
-		elseif downTierDifference==0 then
-				downDamage = currentDamage
-		end
+			for v=1,4 do
+				if Game.ItemsTxt[i].NotIdentifiedName==Game.ItemsTxt[i+v].NotIdentifiedName then
+				upTierDifference=upTierDifference+1
+				end
+				if Game.ItemsTxt[i].NotIdentifiedName==Game.ItemsTxt[math.max(i-v,0)].NotIdentifiedName then
+				downTierDifference=downTierDifference+1
+				downDamage = (Game.ItemsTxt[i-v].Mod1DiceCount *Game.ItemsTxt[i-v]. Mod1DiceSides + 1)/2+Game.ItemsTxt[i-v].Mod2
+				elseif downTierDifference==0 then
+						downDamage = currentDamage
+				end
+			end
+
+		--calculate expected value
+		tierRange=upTierDifference+downTierDifference+1
+		damageRange=goalDamage-downDamage
+		expectedDamageIncrease=damageRange^(downTierDifference/(tierRange-1))
+		Game.ItemsTxt[i].Mod1DiceSides = Game.ItemsTxt[i].Mod1DiceSides + (expectedDamageIncrease / Game.ItemsTxt[i].Mod1DiceCount)
+		Game.ItemsTxt[i].Mod2=expectedDamageIncrease/2
 	end
-
---calculate expected value
-tierRange=upTierDifference+downTierDifference+1
-damageRange=goalDamage-downDamage
-expectedDamageIncrease=damageRange^(downTierDifference/(tierRange-1))
-Game.ItemsTxt[i].Mod1DiceSides = Game.ItemsTxt[i].Mod1DiceSides + (expectedDamageIncrease / Game.ItemsTxt[i].Mod1DiceCount)
-Game.ItemsTxt[i].Mod2=expectedDamageIncrease/2
-
 end 
 
 --do same for artifacts
@@ -365,7 +356,7 @@ end
 --multiple enchant tooltip
 ---------------------
 
-
+--[[
 mem.autohook(0x41C440, function(d)
 	local t = {Item = structs.Item:new(d.ecx)}
 	events.call("ShowItemTooltip", t)
@@ -374,9 +365,7 @@ end)
 mem.autohook(0x41CE00, function(d)
 	events.call("AfterShowItemTooltip")
 end)
-
-
-
+]]
 
 --change tooltip
 function events.GameInitialized2()
