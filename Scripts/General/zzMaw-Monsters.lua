@@ -171,16 +171,39 @@ basetable[i].TreasureItemType=Game.MonstersTxt[i].TreasureItemType
 end
 end
 --MONSTER BOLSTERING
+function events.BeforeNewGameAutosave()
+vars.MM6EXP=0
+vars.MM7EXP=0
+vars.MM8EXP=0
+vars.UNKNOWNEXP=0
+end
 
+function events.LeaveMap()
+currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+	if currentWorld==1 then
+		vars.MM8EXP=Party.Players[0].Experience-(vars.MM7EXP+vars.MM6EXP+vars.UNKNOWNEXP)
+	elseif currentWorld==2 then
+		vars.MM7EXP=Party.Players[0].Experience-(vars.MM8EXP+vars.MM6EXP+vars.UNKNOWNEXP)
+	elseif currentWorld==3 then
+		vars.MM6EXP=Party.Players[0].Experience-(vars.MM8EXP+vars.MM7EXP+vars.UNKNOWNEXP)
+	else
+		vars.UNKNOWNEXP=Party.Players[0].Experience-(vars.MM8EXP+vars.MM7EXP+vars.MM6EXP)
+	end
+end
 
 function events.LoadMap()
 	--calculate party experience
-	partyExperience=0
+	currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+	if currentWorld==1 then
+		partyExp=vars.MM7EXP+vars.MM6EXP+vars.UNKNOWNEXP
+	elseif currentWorld==2 then
+		partyExp=vars.MM8EXP+vars.MM6EXP+vars.UNKNOWNEXP
+	elseif currentWorld==3 then
+		partyExp=vars.MM8EXP+vars.MM7EXP+vars.UNKNOWNEXP
+	else
+		partyExp=vars.MM8EXP+vars.MM7EXP+vars.MM6EXP
+	end
 	
-	partyExperience = Party.Players[0].Experience
-	partyLevel = math.round((1 + (1 + (partyExperience)))^0.5)
-	
-
 	for i=1, 651 do
 		--calculate level scaling
 		mon=Game.MonstersTxt[i]
@@ -190,7 +213,7 @@ function events.LoadMap()
 		--exp difference
 		
 		monExp=(LevelB-1)*(LevelB)*1000/2
-		totExp=monExp+averagePlayerExperience
+		totExp=monExp+partyExp
 
 		--level increase centered on B type
 		level=math.round((1 + (totExp / 500))^0.5)
