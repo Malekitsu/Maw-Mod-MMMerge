@@ -17,15 +17,35 @@ end
 function events.AfterLoadMap()	
 	if mapvars.boosted==nil then
 		mapvars.boosted=true
+		--calculate party experience
+		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+		if currentWorld==1 then
+			partyExp=vars.MM7EXP+vars.MM6EXP+vars.UNKNOWNEXP
+		elseif currentWorld==2 then
+			partyExp=vars.MM8EXP+vars.MM6EXP+vars.UNKNOWNEXP
+		elseif currentWorld==3 then
+			partyExp=vars.MM8EXP+vars.MM7EXP+vars.UNKNOWNEXP
+		else
+			partyExp=vars.MM8EXP+vars.MM7EXP+vars.MM6EXP
+		end
+		
 		--calculate average level for unique monsters
 		for i=0, Map.Monsters.High do
 			if  (Map.Monsters[i].FullHitPoints ~= Game.MonstersTxt[Map.Monsters[i].Id].FullHitPoints) and Map.Monsters[i].Level>5 then
 				mon=Map.Monsters[i]
-				--HP
-				mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2),32500)
-				if ItemRework==true and StatsRework then
-					mon.HP=math.min(math.round(mon.HP*(1+mon.Level/180)))
-				end
+				--calculate level scaling		
+				--exp difference
+				
+				monExp=(mon.Level-1)*(Mon.Level)*1000/2
+				totExp=monExp+partyExp
+
+				--level increase 
+				oldLevel=mon.Level
+				mon.Level=math.round((1 + (totExp / 500))^0.5)
+				
+				--HP calculated based on previous HP rapported to the previous level
+				HPRateo=mon.HP/oldLevel*(oldLevel/10+3)
+				mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2*(1+mon.Level/180))*HPRateo,32500)
 				mon.FullHP=mon.HP
 				--damage
 				dmgMult=(mon.Level/20+1.25)*((mon.Level^1.15-1)/1000+1)*((mon.Level^1.25-1)/1000+1)	
@@ -151,6 +171,7 @@ function events.GameInitialized2()
 		basetable[i].FullHP=Game.MonstersTxt[i].FullHP
 		basetable[i].FullHitPoints=Game.MonstersTxt[i].FullHitPoints
 		basetable[i].Level=Game.MonstersTxt[i].Level
+		--[[
 		basetable[i].FireResistance=Game.MonstersTxt[i].FireResistance
 		basetable[i].AirResistance=Game.MonstersTxt[i].AirResistance
 		basetable[i].WaterResistance=Game.MonstersTxt[i].WaterResistance
@@ -161,6 +182,7 @@ function events.GameInitialized2()
 		basetable[i].LightResistance=Game.MonstersTxt[i].LightResistance
 		basetable[i].DarkResistance=Game.MonstersTxt[i].DarkResistance
 		basetable[i].PhysResistance=Game.MonstersTxt[i].PhysResistance	
+		]]
 		basetable[i].TreasureDiceCount=Game.MonstersTxt[i].TreasureDiceCount
 		basetable[i].TreasureDiceSides=Game.MonstersTxt[i].TreasureDiceSides
 		basetable[i].TreasureItemLevel=Game.MonstersTxt[i].TreasureItemLevel
