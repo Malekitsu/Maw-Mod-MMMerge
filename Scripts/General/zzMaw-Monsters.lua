@@ -176,6 +176,7 @@ function events.GameInitialized2()
 		end
 	end
 end
+
 --MONSTER BOLSTERING
 function events.BeforeNewGameAutosave()
 vars.MM6EXP=0
@@ -223,7 +224,16 @@ function events.LoadMap()
 
 		--level increase centered on B type
 		level=math.round((1 + (totExp / 500))^0.5)
+		level2=level+basetable[i].Level-LevelB
 		mon.Level=level+basetable[i].Level-LevelB
+		if basetable[i].Level>LevelB then
+			level2=math.max(level*1.1,level2)
+			mon.Level=level2
+		elseif basetable[i].Level<LevelB then
+			level2=math.min(level*0.9,level2)
+			mon.Level=level2
+		end
+		
 		
 		--HP
 		mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2),32500)
