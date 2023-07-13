@@ -245,16 +245,16 @@ function events.LoadMap()
 		--]]
 		for v=0,10 do
 			if v~=5 then
-			mon.Resistances[v]=math.min(math.round((mon.Level-basetable[i].Level)/10)*5+basetable[i].Resistances[v],65000)	
+			mon.Resistances[v]=math.min(math.round((mon.Level-basetable[i].Level)/18)*5+basetable[i].Resistances[v],65000)	
 			end
 		end
 		
 		--experience
 		mon.Experience = math.round(mon.Level*(mon.Level+10))
 		--Gold
-		levelMultiplier = (100+2) / (LevelB)
+		levelMultiplier = (mon.Level) / (LevelB)
 		mon.TreasureDiceCount=math.min(mon.TreasureDiceCount*levelMultiplier,250)
-		mon.TreasureDiceSides=math.min(mon.TreasureDiceSides*(mon.Level/100)*levelMultiplier,250)
+		mon.TreasureDiceSides=math.min(mon.TreasureDiceSides*levelMultiplier,250)
 	end
 	--CALCULATE DAMAGE AND HP
 	for i=1, 651 do
