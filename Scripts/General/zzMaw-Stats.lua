@@ -63,7 +63,6 @@ for i =0,300 do
 fullHP[i]=0
 end
 
-
 function events.CalcStatBonusByItems(t)
   if t.Stat == const.Stats.HP then
 	endurance=t.Player:GetEndurance()/500
@@ -72,13 +71,11 @@ function events.CalcStatBonusByItems(t)
   end
 end
 
-
 function events.Tick()
 	for i=0,Party.High do
 		fullHP[i]=Game.Classes.HPFactor[Party[i].Class]*Party[i]:GetLevel()+Game.Classes.HPBase[Party[i].Class]
 	end
 end
-
 
 function events.BuildStatInformationBox(t)
 	if t.Stat==0 then
@@ -103,10 +100,7 @@ function events.BuildStatInformationBox(t)
 	i=Game.CurrentPlayer
 	endurance=Party[i]:GetEndurance()
 	HPScaling=Game.Classes.HPFactor[Party[i].Class]
-	
-	
 	level=Party[i]:GetLevel()
-	
 	t.Text=string.format("%s\n\nHealth bonus from Endurance: %s%s\n\nFlat HP bonus from Endurance: %s",Game.StatsDescriptions[3],endurance/5,"%",math.floor(endurance/5)*HPScaling)
 	end
 	if t.Stat==4 then
@@ -125,25 +119,28 @@ function events.BuildStatInformationBox(t)
 	luck=Party[i]:GetLuck()
 	t.Text=string.format("%s\n\nCritical strike chance: %s%s",Game.StatsDescriptions[6],luck/10+5,"%")
 	end
-	
 	if t.Stat==7 then
 	i=Game.CurrentPlayer
 	endurance2=Party[i]:GetEndurance()
 	HPScaling=Game.Classes.HPFactor[Party[i].Class]
-	
-	m=math.ceil(Party[i].Skills[const.Skills.Bodybuilding]/64)
-	s=Party[i].Skills[const.Skills.Bodybuilding]%64
+	skill=Party[i].Skills[const.Skills.Bodybuilding]
+	s,m=SplitSkill(skill)
+	if m==4 then
+		m=5
+	end
 	BBHP=HPScaling*s*m
 	local fullHP=Party[i]:GetFullHP()
 	enduranceTotalBonus=math.floor(fullHP-fullHP/(1+endurance2/500))+math.floor(endurance2/5)*HPScaling
-	
 	level=Party[i]:GetLevel()
 	BASEHP=Game.Classes.HPBase[math.floor(Party[i].Class/3)]+level*HPScaling
-	t.Text=string.format("%s\n\nHP bonus from Endurance: %s\n\nHP bonus from Body building: %s\n\nHP bonus from items: %s\n\nBase HP: %s",Game.StatsDescriptionsRework[7],StrColor(0,255,0,enduranceTotalBonus), StrColor(0,255,0,BBHP),StrColor(0,255,0,math.round(fullHP-enduranceTotalBonus-BBHP-BASEHP)),StrColor(0,255,0,BASEHP))
+	t.Text=string.format("%s\n\nHP bonus from Endurance: %s\n\nHP bonus from Body building: %s\n\nHP bonus from items: %s\n\nBase HP: %s",t.Text,StrColor(0,255,0,enduranceTotalBonus), StrColor(0,255,0,BBHP),StrColor(0,255,0,math.round(fullHP-enduranceTotalBonus-BBHP-BASEHP)),StrColor(0,255,0,BASEHP))
 	end
 	if t.Stat==8 then
 	i=Game.CurrentPlayer
 	fullSP=Party[i]:GetFullSP()
+	skill=Party[i].Skills[const.Skills.Meditation]
+	s,m=SplitSkill(skill)
+	medRegen=math.floor(s/10)+m
 	SPregenItem=0
 	bonusregen=0
 	for it in Party[i]:EnumActiveItems() do
@@ -153,18 +150,16 @@ function events.BuildStatInformationBox(t)
 		end
 	end
 	SPregenItem=SPregenItem+bonusregen
-	regen=math.ceil(fullSP*SPregenItem*0.005)
+	regen=math.ceil(fullSP*SPregenItem*0.005)+medRegen
 	personality=Party[i]:GetPersonality()
 	t.Text=string.format("%s\n\nSpell point regen per 10 seconds: %s",t.Text,StrColor(40,100,255,regen))
 	end
-	
 	if t.Stat==9 then
 	i=Game.CurrentPlayer
 	ac=Party[i]:GetArmorClass()
 	acReduction=math.round(1000-1000/math.max(ac^0.85/100+0.5,1))/10
 	t.Text=string.format("%s\n\nPhysical damage reduction from AC: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%"))
 	end
-	
 	if t.Stat==19 then
 		i=Game.CurrentPlayer
 		res=Party[i]:GetResistance(10)
