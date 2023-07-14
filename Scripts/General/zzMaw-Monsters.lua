@@ -41,7 +41,7 @@ function events.AfterLoadMap()
 
 				--level increase 
 				oldLevel=mon.Level
-				mon.Level=math.round((1 + (totExp / 500))^0.5)
+				mon.Level=math.max(math.floor((500+(250000+2000*totExp)^0.5)/1000-1),0)
 				
 				--HP calculated based on previous HP rapported to the previous level
 				HPRateo=mon.HP/oldLevel*(oldLevel/10+3)
@@ -245,7 +245,7 @@ function events.LoadMap()
 		totExp=monExp+partyExp
 
 		--level increase centered on B type
-		level=math.round((1 + (totExp / 500))^0.5)
+		level=math.max(math.floor((500+(250000+2000*totExp)^0.5)/1000-1),0)
 		level2=level+basetable[i].Level-LevelB
 		mon.Level=level+basetable[i].Level-LevelB
 		if basetable[i].Level>LevelB then
