@@ -16,7 +16,7 @@ function events.Tick()
 	--Day of the Gods
 	if Party.SpellBuffs[2].Skill>=2 then
 		m=Party.SpellBuffs[2].Skill
-		Party.SpellBuffs[2].Power=Party.SpellBuffs[2].Power/(m+1)*(m/2)+5*m
+		Party.SpellBuffs[2].Power=(Party.SpellBuffs[2].Power-10)/(m+1)*(m/2)+5*m
 		Party.SpellBuffs[2].Skill=1
 	end
 end
@@ -33,8 +33,7 @@ function events.GameInitialized2()
 	Game.SpellsTxt[83].GM="All stats increased by 20+2 per skill"
 
 	--Day of the Gods
-	Game.SpellsTxt[85].Description
-	  "Simultaneously casts Protection from Fire, Air, Water, Earth, Mind, and Body, plus Feather Fall and Wizard Eye on all your characters at two times your skill in Light Magic."
+	Game.SpellsTxt[85].Description="Simultaneously casts Protection from Fire, Air, Water, Earth, Mind, and Body, plus Feather Fall and Wizard Eye on all your characters at two times your skill in Light Magic."
 	Game.SpellsTxt[85].Master="All spells cast at two times skill"
 	Game.SpellsTxt[85].GM="All spells cast at three times skill"
 end
