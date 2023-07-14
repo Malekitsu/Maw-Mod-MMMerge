@@ -1,14 +1,4 @@
 Following list will be orderer by importance:
-1) something to modify both generateitem and itemgenerated functions
-2) attribute breakpoints
-3) tooltip hook
-4) hook on right click in stat menu (might, endurance etc)
+1) attribute breakpoints
+2) tooltip hook
 
-If point 1 is not doable I will probably need to do a workaround that might result in suboptimal results.
-
-HP will be done with:
-function events.CalcStatBonusByItems(t)
-  if t.Stat == const.Stats.HP then
-    t.Result=t.Result+1000
-  end
-end
