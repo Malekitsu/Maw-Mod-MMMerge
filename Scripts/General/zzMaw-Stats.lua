@@ -206,3 +206,25 @@ end
 
 
 end
+
+
+
+
+function events.Regeneration(t)
+	--HP
+	totHP=Party[t.PlayerIndex]:GetFullHP()
+		for it in Party[t.PlayerIndex]:EnumActiveItems() do
+			if it.Bonus2 == 37 or it.Bonus2==44 or it.Bonus2==50 or it.Bonus2==54 then			
+				t.HP=t.HP+math.max(totHP*0.01-1,0)
+			end
+		end
+	t.HP=math.round(t.HP)
+	--SP
+	totSP=Party[t.PlayerIndex]:GetFullSP()
+		for it in Party[t.PlayerIndex]:EnumActiveItems() do
+			if it.Bonus2 == 38 or it.Bonus2==47 or it.Bonus2==55 then		
+				t.SP=t.SP+math.max(totSP*0.01-1,0)
+			end
+		end
+	t.SP=math.round(t.SP)
+end
