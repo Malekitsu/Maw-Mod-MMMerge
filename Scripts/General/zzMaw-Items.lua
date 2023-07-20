@@ -1,35 +1,26 @@
 if ItemRework==true then
 function events.GenerateItem(t)
 	--get party average level
-	partyExperience = 0
-	Handled = false
-	for i = 0, Party.High do
-		partyExperience = partyExperience + Party.Players[i].Experience
-	end
-	
-	averagePlayerExperience = partyExperience / Party.High
-	
-	partyLevel = math.floor((1 + math.sqrt(1 + (4 * averagePlayerExperience / 500))) / 2)
-	
-	--buff if item is weak
-	if t.Strength*20<partyLevel and t.Strength<6 then
-		roll=math.random(1,t.Strength*20)
-		if roll<(partyLevel-t.Strength*20) then
-			t.Strength=math.min(t.Strength+1,6)
+	Handled = true
+	--calculate party experience
+	if Map.MapStatsIndex==0 then return end
+		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+		if currentWorld==1 then
+			partyExp=vars.MM8EXP
+		elseif currentWorld==2 then
+			partyExp=vars.MM7EXP
+		elseif currentWorld==3 then
+			partyExp=vars.MM6EXP
+		else
+			partyExp=0
 		end
-		
-		if partyLevel>t.Strength*20+20 and t.Strength<6 then
-		roll=math.random(1,t.Strength*20+20)
-			if roll<(partyLevel-(t.Strength*20+20)) then
-				t.Strength=math.min(t.Strength+1,6)
-			end	
-		end
-	end
+	partyLevel = math.floor((500+(250000+2000*partyExp)^0.5)/1000)
+	
 	--nerf if item is strong
 	if partyLevel<(t.Strength-3)*20 and t.Strength<7 then
 		t.Strength=t.Strength-1
 	end
-	if (t.Strength-1)*20>partyLevel and t.Strength>2 and t.Strength<7 then
+	if (t.Strength-2)*20>partyLevel and t.Strength>2 and t.Strength<7 then
 		roll=math.random((t.Strength-3)*20,(t.Strength-2)*20)
 		if roll>partyLevel then
 			t.Strength=t.Strength-1
@@ -37,57 +28,164 @@ function events.GenerateItem(t)
 	end
 end
 
-function events.ItemGenerated(t)	
+--create tables to calculate special enchant
+function events.GameInitialized2()
+	--calculate totals by enchant type
+	totBonus2={}
+	for k=0,3 do
+		totBonus2[k]={}
+		for v=0, 11 do
+			totBonus2[k][v]=0
+			for i=0, Game.SpcItemsTxt.High do
+				lvl=Game.SpcItemsTxt[i].Lvl
+				if lvl==k then
+					totBonus2[k][v]=totBonus2[k][v]+Game.SpcItemsTxt[i].ChanceForSlot[v]
+				end
+			end
+		end
+	end
+	
+	--calculate total of each item level per item type
+	itemStrength={}	
+	itemStrength[3]={}
+	itemStrength[4]={}
+	itemStrength[5]={}
+	itemStrength[6]={}
+	for v=0, 11 do	
+		itemStrength[3][v]=totBonus2[0][v]+totBonus2[1][v]
+		itemStrength[4][v]=totBonus2[0][v]+totBonus2[1][v]+totBonus2[2][v]
+		itemStrength[5][v]=totBonus2[1][v]+totBonus2[2][v]+totBonus2[3][v]
+		itemStrength[6][v]=totBonus2[3][v]
+	end
+	--list of possible enchants per item level
+	enchants={}
+	enchants[3]={0,1}
+	enchants[4]={0,1,2}
+	enchants[5]={1,2,3}
+	enchants[6]={3}
+end
+--check if it's in the table
+function isInTable(table, value)
+    for _, v in ipairs(table) do
+        if v == value then
+            return true
+        end
+    end
+    return false
+end
+
+--create enchant table
+encStrDown={1,1,3,6,10,15,20,24,28,32,36,40,44,48,52,56,60,64,68,76}
+encStrUp={3,5,8,12,17,25,30,35,40,45,50,55,60,65,70,75,80,85,90,100}
+
+
+enc1Chance={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80}
+enc2Chance={20,30,35,40,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60}
+spcEncChance={0,0,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40}
+
+
+function events.ItemGenerated(t)
+if Map.MapStatsIndex==0 then 
+return end
+	if t.Strength==7 then 
+		return
+	end
 	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then
-		--give bonus a chance to proc even if bonus2 is already in the item
-		if t.Item.Bonus2~=0 then
-		bonusprocChance=math.random(1,100)
-			if bonusprocChance<=40 and t.Strength~=1 or (t.Strength==6 and bonusprocChance<=75) then
-				t.Item.Bonus = math.random(1,14)
-				local bonuses = {{1, 5}, {3, 8}, {6, 12}, {10, 17}, {15, 25}}
-				local bonus = bonuses[t.Strength - 1]
-				t.Item.BonusStrength = math.random(bonus[1], bonus[2])
+		t.Handled=true
+		--reset enchants
+		t.Item.Bonus=0
+		t.Item.Bonus2=0
+		t.Item.BonusStrength=0
+		Game.ShowStatusText("success")
+		--calculate party level
+		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+		if currentWorld==1 then
+			partyExp=vars.MM7EXP+vars.MM6EXP+vars.UNKNOWNEXP
+		elseif currentWorld==2 then
+			partyExp=vars.MM8EXP+vars.MM6EXP+vars.UNKNOWNEXP
+		elseif currentWorld==3 then
+			partyExp=vars.MM8EXP+vars.MM7EXP+vars.UNKNOWNEXP
+		else
+			partyExp=vars.MM8EXP+vars.MM7EXP+vars.MM6EXP
+		end
+		local partyLevel=math.floor((500+(250000+2000*partyExp)^0.5)/1000-1)
+		local partyLevel=math.min(math.floor(partyLevel/20),14)
+		--adjust loot Strength
+		pseudoStr=t.Strength+partyLevel
+		if pseudoStr==1 then 
+			return 
+		end
+		roll1=math.random(1,100)
+		roll2=math.random(1,100)
+		rollSpc=math.random(1,100)
+		
+		--apply enchant1
+		if enc1Chance[pseudoStr]>roll1 then
+			t.Item.Bonus=math.random(1,16)
+			t.Item.BonusStrength=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
+			if math.random(1,10)==10 then
+				t.Item.Bonus=math.random(17,24)
+				t.Item.BonusStrength=math.ceil(t.Item.BonusStrength^0.5)
 			end
 		end
-		--extra bonus proc
-		extraBonusChance={30,40,50,50,50,50}
-		extraBonusPowerLow={1,1,3,6,10,15}
-		extraBonusPowerHigh={3,5,8,12,17,25}
-		ChargesProc=math.random(1,100)
-		if ChargesProc<=extraBonusChance[t.Strength] then
-			lowerLimit=t.Strength
-			t.Item.Charges = math.random(extraBonusPowerLow[t.Strength], extraBonusPowerHigh[t.Strength])+math.random(1,16)*1000
-			--make it standard bonus if no standard bonus
-			if t.Item.Bonus==0 then
-				t.Item.Bonus=math.floor(t.Item.Charges/1000)
-				t.Item.BonusStrength=t.Item.Charges%1000
-				t.Item.Charges=0
+		--apply enchant2
+		if enc2Chance[pseudoStr]>roll2 then
+			t.Item.Charges=math.random(1,16)*1000
+			t.Item.Charges=t.Item.Charges+math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
+			if math.random(1,10)==10 then
+				t.Item.Charges=math.random(17,24)*1000
+				t.Item.Charges=t.Item.Charges+math.round(t.Item.BonusStrength^0.5)
 			end
 		end
+		--make it standard bonus if no standard bonus
+		if t.Item.Bonus==0 then
+					t.Item.Bonus=math.floor(t.Item.Charges/1000)
+					t.Item.BonusStrength=t.Item.Charges%1000
+					t.Item.Charges=0
+				end
+		--apply special enchant
+		if spcEncChance[pseudoStr]>rollSpc then
+			n=t.Item.Number
+			c=Game.ItemsTxt[n].EquipStat
+			if c<12 and t.Strength>=3 then
+				totB2=itemStrength[t.Strength][c]
+				roll=math.random(1,totB2)
+				tot=0
+				for i=0,Game.SpcItemsTxt.High do
+					if roll<=tot then
+						t.Item.Bonus2=i
+						goto continue
+					elseif isInTable(enchants[t.Strength], Game.SpcItemsTxt[i].Lvl) then
+						tot=tot+Game.SpcItemsTxt[i].ChanceForSlot[c]
+					end
+				end	
+			end	
+		end
+		::continue::
 		
-		
-		--chance for ancient item, only if bonus 2 is spawned
+		--ancient item
 		if t.Item.Bonus2~=0 then 
 			ancient=math.random(1,50)
 			if ancient<=t.Strength-4 then
-				t.Item.Charges=math.random(25,40)+math.random(1,16)*1000
+				t.Item.Charges=math.random(math.round(encStrUp[partyLevel+6]+1),math.round(encStrUp[partyLevel+6]*1.25))+math.random(1,16)*1000
 				t.Item.Bonus=math.random(1,16)
-				t.Item.BonusStrength=math.random(26,40)
+				t.Item.BonusStrength=math.random(math.round(encStrUp[partyLevel+6]+1),math.round(encStrUp[partyLevel+6]*1.25))
 			end
 		end
 		
 		--primordial item
 		primordial=math.random(1,200)
 		if primordial<=t.Strength-4 then
-			t.Item.Charges=40+math.random(1,16)*1000
+			t.Item.Charges=math.round(encStrUp[partyLevel+6]*1.25)+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=40
+			t.Item.BonusStrength=math.round(encStrUp[partyLevel+6]*1.25)
 			if t.Item.Number>60 then
 				t.Item.Bonus2=math.random(1,2)
 				else
 				t.Item.Bonus2=41
 			end
-		end	
+		end			
+		
 		--buff to hp and mana items
 		if t.Item.Bonus==8 or t.Item.Bonus==9 then
 			t.Item.BonusStrength=t.Item.BonusStrength*2
