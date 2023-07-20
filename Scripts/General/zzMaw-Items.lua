@@ -134,7 +134,7 @@ return end
 			t.Item.Charges=t.Item.Charges+math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
 			if math.random(1,10)==10 then
 				t.Item.Charges=math.random(17,24)*1000
-				t.Item.Charges=t.Item.Charges+math.round(t.Item.BonusStrength^0.5)
+				t.Item.Charges=t.Item.Charges+math.round(math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])^0.5)
 			end
 		end
 		--make it standard bonus if no standard bonus
@@ -143,6 +143,15 @@ return end
 					t.Item.BonusStrength=t.Item.Charges%1000
 					t.Item.Charges=0
 				end
+				
+		--ancient item
+		ancient=math.random(1,50)
+		if ancient<=t.Strength-4 then
+			t.Item.Charges=math.random(math.round(encStrUp[partyLevel+6]+1),math.round(encStrUp[partyLevel+6]*1.25))+math.random(1,16)*1000
+			t.Item.Bonus=math.random(1,16)
+			t.Item.BonusStrength=math.random(math.round(encStrUp[partyLevel+6]+1),math.round(encStrUp[partyLevel+6]*1.25))
+			rollSpc=0
+		end
 		--apply special enchant
 		if spcEncChance[pseudoStr]>rollSpc then
 			n=t.Item.Number
@@ -163,18 +172,10 @@ return end
 		end
 		::continue::
 		
-		--ancient item
-		if t.Item.Bonus2~=0 then 
-			ancient=math.random(1,50)
-			if ancient<=t.Strength-4 then
-				t.Item.Charges=math.random(math.round(encStrUp[partyLevel+6]+1),math.round(encStrUp[partyLevel+6]*1.25))+math.random(1,16)*1000
-				t.Item.Bonus=math.random(1,16)
-				t.Item.BonusStrength=math.random(math.round(encStrUp[partyLevel+6]+1),math.round(encStrUp[partyLevel+6]*1.25))
-			end
-		end
+		
 		
 		--primordial item
-		primordial=math.random(1,200)
+		primordial=math.random(1,100)
 		if primordial<=t.Strength-4 then
 			t.Item.Charges=math.round(encStrUp[partyLevel+6]*1.25)+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
@@ -193,6 +194,10 @@ return end
 		if t.Item.Charges%1000==7 or t.Item.Charges%1000==8 then
 			t.Item.Charges=t.Item.Charges+t.Item.Charges%1000
 		end
+		
+		--max charges to increase item base Strength
+		t.Item.MaxCharges=partyLevel
+		
 	end
 end
 
