@@ -1,7 +1,7 @@
 -- weapon base recovery bonuses
 
 oldWeaponBaseRecoveryBonuses =
-{
+{ 
 	[const.Skills.Bow] = 0,
 	[const.Skills.Blaster] = 70,
 	[const.Skills.Staff] = 0,
