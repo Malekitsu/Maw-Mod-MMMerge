@@ -33,9 +33,15 @@ function events.AfterLoadMap()
 		for i=0, Map.Monsters.High do
 			if  (Map.Monsters[i].FullHitPoints ~= Game.MonstersTxt[Map.Monsters[i].Id].FullHitPoints) and Map.Monsters[i].Level>5 then
 				mon=Map.Monsters[i]
+				--calculate level scaling		
+				--exp difference
+				
+				monExp=(mon.Level-1)*(Mon.Level)*1000/2
+				totExp=monExp+partyExp
 
 				--level increase 
-				mon.Level=math.min(mon.Level+math.max(math.floor((500+(250000+2000*partyExp)^0.5)/1000-1),0),255)
+				oldLevel=mon.Level
+				mon.Level=math.max(math.floor((500+(250000+2000*totExp)^0.5)/1000-1),0)
 				
 				--HP calculated based on previous HP rapported to the previous level
 				HPRateo=mon.HP/oldLevel*(oldLevel/10+3)
@@ -235,27 +241,26 @@ function events.LoadMap()
 		
 		--exp difference
 		
-		totExp=partyExp*0.9
+		monExp=(LevelB-1)*(LevelB)*1000/2
+		totExp=monExp+partyExp
 
 		--level increase centered on B type
-		level=math.max(math.floor((500+(250000+2000*totExp)^0.5)/1000-1),0)
-		--cap level to 168 (making monster lvl 100 to level 255)
-		level=math.min(level,168)
-		
-		mon.Level=level+basetable[i].Level
-		
-		scaledBLevel=level+LevelB
-		if i%3==1 then
-			mon.Level=math.min(scaledBLevel*0.9,mon.Level)
-		elseif i%3==0 then
-			mon.Level=math.max(scaledBLevel*1.1,mon.Level)
+		level=math.max(math.floor((500+(250000+2000*totExp)^0.5)/1000),0)
+		level2=level+basetable[i].Level-LevelB
+		mon.Level=level+basetable[i].Level-LevelB
+		if basetable[i].Level>LevelB then
+			level2=math.max(level*1.1,level2)
+			mon.Level=level2
+		elseif basetable[i].Level<LevelB then
+			level2=math.min(level*0.9,level2)
+			mon.Level=level2
 		end
 		
-		mon.Level=mon.Level-0.2*(basetable[i].Level/100)*level
+		
 		--HP
 		mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2),32500)
 		if ItemRework and StatsRework then
-			mon.HP=math.min(math.round(mon.HP*(1+mon.Level/180)),32500)
+			mon.HP=math.min(math.round(mon.HP*(1+mon.Level/180),32500))
 		end
 		mon.FullHP=mon.HP
 		--[[resistances
@@ -277,7 +282,7 @@ function events.LoadMap()
 		end
 		
 		--experience
-		mon.Experience = math.round(mon.Level^1.75+mon.Level*20)
+		mon.Experience = math.round(mon.Level*(mon.Level+10))
 		--Gold
 		levelMultiplier = (mon.Level) / (LevelB)
 		mon.TreasureDiceCount=math.min(mon.TreasureDiceCount*levelMultiplier,250)
