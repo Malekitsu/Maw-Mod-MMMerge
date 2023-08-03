@@ -1,4 +1,3 @@
-if StatsRework then
 function events.CalcDamageToMonster(t)
 	local data = WhoHitMonster()	
 	--luck/accuracy bonus
@@ -204,12 +203,6 @@ function events.BuildStatInformationBox(t)
 	end
 end
 
-
-end
-
-
-
-
 function events.Regeneration(t)
 	--HP
 	totHP=Party[t.PlayerIndex]:GetFullHP()
@@ -227,4 +220,192 @@ function events.Regeneration(t)
 			end
 		end
 	t.SP=math.round(t.SP)
+end
+
+--reduce damage by %
+function events.CalcDamageToPlayer(t)
+damage1=0
+	if t.DamageKind==0 or t.DamageKind==1 or t.DamageKind==2 or t.DamageKind==3 or t.DamageKind==7 or t.DamageKind==8 then
+	--get resistances
+		if t.DamageKind==0 then
+		res=t.Player:GetResistance(10)/4
+		end
+		if t.DamageKind==1 then
+		res=t.Player:GetResistance(11)/4
+		end
+		if t.DamageKind==2 then
+		res=t.Player:GetResistance(12)/4
+		res2=0
+		end
+		if t.DamageKind==3 then
+		res=t.Player:GetResistance(13)/4
+		end
+		if t.DamageKind==7 then
+		res=t.Player:GetResistance(14)/4
+		end
+		if t.DamageKind==8 then
+		res=t.Player:GetResistance(15)/4
+		end	
+		luck=t.Player:GetLuck()/20
+		--put here code to change max res
+		maxres=75
+		res=math.min(res,maxres)/100
+		--apply Damage
+		t.Result = t.Damage * (1-res)
+	end
+end
+
+
+--remove resistance rating
+function events.CalcStatBonusByItems(t)
+	for it in t.Player:EnumActiveItems() do
+		if t.Stat == const.Stats.FireResistance and it.Bonus==11 then
+			t.Result = t.Result+it.BonusStrength
+		end
+		if t.Stat == const.Stats.AirResistance and it.Bonus==12 then
+			t.Result = t.Result+it.BonusStrength
+		end
+		if t.Stat == const.Stats.WaterResistance and it.Bonus==13 then
+			t.Result = t.Result+it.BonusStrength
+		end
+		if t.Stat == const.Stats.EarthResistance and it.Bonus==14 then
+			t.Result = t.Result+it.BonusStrength
+		end
+		if t.Stat == const.Stats.MindResistance and it.Bonus==15 then
+			t.Result = t.Result+it.BonusStrength
+		end
+		if t.Stat == const.Stats.BodyResistance and it.Bonus==16 then
+			t.Result = t.Result+it.BonusStrength
+		end
+	end
+end
+
+
+
+
+
+
+
+
+--TOOLTIPS
+function events.Tick()
+	if Game.CurrentCharScreen==100 then
+	local i=Game.CurrentPlayer 
+	if i==-1 then return end --prevent bug message
+	fireRes=Party[i]:GetResistance(10)/4
+	airRes=Party[i]:GetResistance(11)/4
+	waterRes=Party[i]:GetResistance(12)/4
+	earthRes=Party[i]:GetResistance(13)/4
+	mindRes=Party[i]:GetResistance(14)/4
+	bodyRes=Party[i]:GetResistance(15)/4
+
+		--FIRE RESISTANCE
+		for it in Party[Game.CurrentPlayer]:EnumActiveItems() do
+			if it.Bonus==11 then
+				fireRes = fireRes+it.BonusStrength/4
+			end
+			if math.floor(it.Charges/1000+1)==11 then
+				fireRes = fireRes+it.Charges%1000/4
+			end
+		end
+		--AIR RESISTANCE
+		for it in Party[Game.CurrentPlayer]:EnumActiveItems() do
+			if it.Bonus==12 then
+				airRes = airRes+it.BonusStrength/4
+			end
+			if math.floor(it.Charges/1000+1)==12 then
+				airRes = airRes+it.Charges%1000/4
+			end
+		end
+		--WATER RESISTANCE
+		for it in Party[Game.CurrentPlayer]:EnumActiveItems() do
+			if it.Bonus==13 then
+				waterRes = waterRes+it.BonusStrength/4
+			end
+			if math.floor(it.Charges/1000+1)==13 then
+				waterRes = waterRes+it.Charges%1000/4
+			end
+		end
+		--EARTH RESISTANCE
+		for it in Party[Game.CurrentPlayer]:EnumActiveItems() do
+			if it.Bonus==14 then
+				earthRes = earthRes+it.BonusStrength/4
+			end
+			if math.floor(it.Charges/1000+1)==11 then
+				earthRes = earthRes+it.Charges%1000/4
+			end
+		end
+		--MIND RESISTANCE
+		for it in Party[Game.CurrentPlayer]:EnumActiveItems() do
+			if it.Bonus==15 then
+				mindRes = mindRes+it.BonusStrength/4
+			end
+			if math.floor(it.Charges/1000+1)==15 then
+				mindRes = mindRes+it.Charges%1000/4
+			end
+		end
+		--BODY RESISTANCE
+		for it in Party[Game.CurrentPlayer]:EnumActiveItems() do
+			if it.Bonus==16 then
+				bodyRes = bodyRes+it.BonusStrength/4
+			end
+			if math.floor(it.Charges/1000+1)==16 then
+				bodyRes = bodyRes+it.Charges%1000/4
+			end
+		end
+
+		--add bonus2
+		for it in Party[Game.CurrentPlayer]:EnumActiveItems() do
+			if it.Bonus2==1 then
+				fireRes=fireRes+10/2
+				airRes=airRes+10/2
+				waterRes=waterRes+10/2
+				earthRes=earthRes+10/2
+				mindRest=mindRes+10/2
+				bodyRes=bodyRes+10/2
+			end
+			if it.Bonus2==42 then
+				fireRes=fireRes+1/2
+				airRes=airRes+1/2
+				waterRes=waterRes+1/2
+				earthRes=earthRes+1/2
+				mindRest=mindRes+1/2
+				bodyRes=bodyRes+1/2
+			end
+			if it.Bonus2==50 then
+				fireRes=fireRes+30/2
+			end
+		end
+		if fireRes>=75 then
+			fireRes=StrColor(0,255,0,"Max")
+		end
+		if airRes>=75 then
+			airRes=StrColor(0,255,0,"Max")
+		end
+		if waterRes>=75 then
+			waterRes=StrColor(0,255,0,"Max")
+		end
+		if earthRes>=75 then
+			earthRes=StrColor(0,255,0,"Max")
+		end
+		if mindRes>=75 then
+			mindRes=StrColor(0,255,0,"Max")
+		end
+		if bodyRes>=75 then
+			bodyRes=StrColor(0,255,0,"Max")
+		end
+		Game.GlobalTxt[87]=string.format("Fire %s%s",fireRes,"%")
+		Game.GlobalTxt[6]=string.format("Air %s%s",airRes,"%")
+		Game.GlobalTxt[240]=string.format("Water %s%s",waterRes,"%")
+		Game.GlobalTxt[70]=string.format("Earth %s%s",earthRes,"%")
+		Game.GlobalTxt[142]=string.format("Mind %s%s",mindRes,"%")
+		Game.GlobalTxt[29]=string.format("Body %s%s",bodyRes,"%")
+	end
+	if Game.CurrentCharScreen==101 then
+		Game.GlobalTxt[87]="Fire"
+		Game.GlobalTxt[71]="Elec"
+		Game.GlobalTxt[43]="Cold"
+		Game.GlobalTxt[166]="Poison"
+		Game.GlobalTxt[138]="Magic"
+	end
 end
