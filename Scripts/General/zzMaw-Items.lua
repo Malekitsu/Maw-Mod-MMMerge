@@ -207,7 +207,7 @@ end
 function events.CalcStatBonusByItems(t)
 	for it in t.Player:EnumActiveItems() do
 		if it.Charges ~= nil then
-			stat=math.floor(it.Charges/1000)+1
+			stat=math.floor(it.Charges/1000)
 			bonus=it.Charges%1000
 			if t.Stat==stat then
 				t.Result = t.Result + bonus
@@ -229,7 +229,7 @@ for i=1,2200 do
 		downTierDifference=0
 		downDamage=0
 		--set goal damage for weapons (end game weapon damage)
-		goalDamage=50
+		goalDamage=35
 		if Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Axe" or Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Sword" then
 			goalDamage=goalDamage*2
 		end
@@ -253,8 +253,10 @@ for i=1,2200 do
 		expectedDamageIncrease=damageRange^(downTierDifference/(tierRange-1))
 		Game.ItemsTxt[i].Mod1DiceSides = Game.ItemsTxt[i].Mod1DiceSides + (expectedDamageIncrease / Game.ItemsTxt[i].Mod1DiceCount)
 		Game.ItemsTxt[i].Mod2=expectedDamageIncrease/2
+
+		end 
 	end
-end 
+
 
 --do same for artifacts
 for i=400,405 do
@@ -667,152 +669,29 @@ end
 ---IMMUNITY REWORK
 -----------------------------
 
---disease/curse
 function events.DoBadThingToPlayer(t)
-for it in t.Player:EnumActiveItems() do
-		if it.Bonus2 == 18 then
-			if t.Thing==9 or t.Thing==10 or t.Thing==11 or t.Thing==1 then
-			t.Allow=false
-				if t.Thing==9 or t.Thing==10 or t.Thing==11 then
-				Game.ShowStatusText(string.format("Enchantment protects %s from disease",t.Player.Name))
-				else 
-				Game.ShowStatusText(string.format("Enchantment protects %s from curse",t.Player.Name))
-				end
-			end
-		end
-	end
-end
---insanity/drainsp
-function events.DoBadThingToPlayer(t)
-for it in t.Player:EnumActiveItems() do
-		if it.Bonus2 == 19 then
-			if t.Thing==5 or t.Thing==22 then
-			t.Allow=false
-				if t.Thing==5 then
-				Game.ShowStatusText(string.format("Enchantment protects %s from insanity",t.Player.Name))
-				else 
-				Game.ShowStatusText(string.format("Enchantment protects %s from spell drain",t.Player.Name))
-				end
+    local protectionMessages = {
+        [18] = { [9] = "disease", [10] = "disease", [11] = "disease", [1] = "curse" },
+        [19] = { [5] = "insanity", [22] = "spell drain" },
+        [20] = { [12] = "paralysis", [23] = "fear" },
+        [21] = { [6] = "poison", [7] = "poison", [8] = "poison", [2] = "weakness" },
+        [22] = { [3] = "sleep", [13] = "unconscious" },
+        [23] = { [15] = "stone", [21] = "premature ageing" },
+        [25] = { [14] = "death", [16] = "eradication" },
+    }
 
-			end
-		end
-	end
+    for it in t.Player:EnumActiveItems() do
+        if protectionMessages[it.Bonus2] and protectionMessages[it.Bonus2][t.Thing] then
+            t.Allow = false
+            local protectionType = protectionMessages[it.Bonus2][t.Thing]
+            Game.ShowStatusText(string.format("Enchantment protects %s from %s", t.Player.Name, protectionType))
+        end
+    end
 end
---Paralysis/fear
-function events.DoBadThingToPlayer(t)
-for it in t.Player:EnumActiveItems() do
-		if it.Bonus2 == 20 then
-			if t.Thing==12 or t.Thing==23 then
-			t.Allow=false
-				if t.Thing==12 then
-				Game.ShowStatusText(string.format("Enchantment protects %s from paralysis",t.Player.Name))
-				else 
-				Game.ShowStatusText(string.format("Enchantment protects %s from fear",t.Player.Name))
-				end
-			end
-		end
-	end
-end
---poison/weak
-function events.DoBadThingToPlayer(t)
-for it in t.Player:EnumActiveItems() do
-		if it.Bonus2 == 21 then
-			if t.Thing==6 or t.Thing==7 or t.Thing==8 or t.Thing==2 then
-			t.Allow=false
-				if t.Thing==6 or t.Thing==7 or t.Thing==8 then
-				Game.ShowStatusText(string.format("Enchantment protects %s from poison",t.Player.Name))
-				else 
-				Game.ShowStatusText(string.format("Enchantment protects %s from weakness",t.Player.Name))
-				end
-			end
-		end
-	end
-end
---sleep/unconscious
-function events.DoBadThingToPlayer(t)
-for it in t.Player:EnumActiveItems() do
-		if it.Bonus2 == 22 then
-			if t.Thing==3 or t.Thing==13 then
-			t.Allow=false
-				if t.Thing==3 then
-				Game.ShowStatusText(string.format("Enchantment protects %s from sleep",t.Player.Name))
-				else 
-				Game.ShowStatusText(string.format("Enchantment protects %s from unconscious",t.Player.Name))
-				end
-			end
-		end
-	end
-end
---stone/age
-function events.DoBadThingToPlayer(t)
-for it in t.Player:EnumActiveItems() do
-		if it.Bonus2 == 23 then
-			if t.Thing==15 or t.Thing==21 then
-			t.Allow=false
-				if t.Thing==15 then
-				Game.ShowStatusText(string.format("Enchantment protects %s from stone",t.Player.Name))
-				else 
-				Game.ShowStatusText(string.format("Enchantment protects %s from premature ageing",t.Player.Name))
-				end
-			end
-		end
-	end
-end
-
---death/erad
-function events.DoBadThingToPlayer(t)
-for it in t.Player:EnumActiveItems() do
-		if it.Bonus2 == 25 then
-			if t.Thing==14 or t.Thing==16 then
-			t.Allow=false
-				if t.Thing==14 then
-				Game.ShowStatusText(string.format("Enchantment protects %s from death",t.Player.Name))
-				else 
-				Game.ShowStatusText(string.format("Enchantment protects %s from eradication",t.Player.Name))
-				end
-			end
-		end
-	end
-end
-
-
-
-
-
--- some spare code, just in case
---[[
-function AfterShowItemTooltip()
-  debug.Message(dump(t))
-end]]
---celestial amulet
-function events.DoBadThingToPlayer(t)
-for it in t.Player:EnumActiveItems() do
-		if it.Number == 579 then
-			if t.Thing==16 or t.Thing==14 then
-			t.Allow=false
-				if t.Thing==14 then
-				Game.ShowStatusText(string.format("Celestial Amulet protects %s from death",t.Player.Name))
-				else 
-				Game.ShowStatusText(string.format("Celestial Amulet protects %s from eradication",t.Player.Name))
-				end
-			end
-		end
-	end
-end
-function events.CalcStatBonusByItems(t)
-	if t.Stat >= const.Stats.Might and t.Stat <= const.Stats.Luck then
-		for it in t.Player:EnumActiveItems() do
-			if it.Number == 579 then
-				t.Result = t.Result + 50
-			end
-		end
-	end
-end
-
 
 
 --------------------
---STATUS REWORK (needs to stay after status immunity
+--STATUS REWORK (needs to stay after status immunity)
 --------------------
 if StatusRework==true then
 
@@ -929,3 +808,5 @@ function events.GameInitialized2()
 Game.SpcItemsTxt[2].BonusStat="Explosive Impact! (half damage)"
 end
 end
+
+
