@@ -1,4 +1,3 @@
-if ItemRework==true then
 function events.GenerateItem(t)
 	--get party average level
 	Handled = true
@@ -693,14 +692,12 @@ end
 --------------------
 --STATUS REWORK (needs to stay after status immunity)
 --------------------
-if StatusRework==true then
-
 
 function events.LoadMap(wasInGame)
 local function poisonTimer() 
 
 vars.poisonTime=vars.poisonTime or {}
-	for i = 0, 3 do
+	for i = 0, Party.High do
 		if Party[i].Poison3>0 then
 			if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
 			vars.poisonTime[i]=25
@@ -747,7 +744,6 @@ vars.poisonTime=vars.poisonTime or {}
 	end
 end
 Timer(poisonTimer, const.Minute) 
-end
 
 function events.DoBadThingToPlayer(t)
 		if (t.Thing==6 or t.Thing==7 or t.Thing==8) and t.Allow then
@@ -807,6 +803,4 @@ end
 function events.GameInitialized2()
 Game.SpcItemsTxt[2].BonusStat="Explosive Impact! (half damage)"
 end
-end
-
 
