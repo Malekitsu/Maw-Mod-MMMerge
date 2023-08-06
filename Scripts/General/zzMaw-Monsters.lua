@@ -20,29 +20,21 @@ function events.AfterLoadMap()
 		--calculate party experience
 		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
 		if currentWorld==1 then
-			partyExp=vars.MM7EXP+vars.MM6EXP+vars.UNKNOWNEXP
+			partyLvl=vars.MM7LVL+vars.MM6LVL
 		elseif currentWorld==2 then
-			partyExp=vars.MM8EXP+vars.MM6EXP+vars.UNKNOWNEXP
+			partyLvl=vars.MM8LVL+vars.MM6LVL
 		elseif currentWorld==3 then
-			partyExp=vars.MM8EXP+vars.MM7EXP+vars.UNKNOWNEXP
-		else
-			partyExp=vars.MM8EXP+vars.MM7EXP+vars.MM6EXP
+			partyLvl=vars.MM8LVL+vars.MM7LVL
 		end
 		
 		--calculate average level for unique monsters
 		for i=0, Map.Monsters.High do
 			if  (Map.Monsters[i].FullHitPoints ~= Game.MonstersTxt[Map.Monsters[i].Id].FullHitPoints) and Map.Monsters[i].Level>5 then
 				mon=Map.Monsters[i]
-				--calculate level scaling		
-				--exp difference
-				
-				monExp=(mon.Level-1)*(Mon.Level)*1000/2
-				totExp=monExp+partyExp
 
 				--level increase 
 				oldLevel=mon.Level
-				mon.Level=math.max(math.floor((500+(250000+2000*totExp)^0.5)/1000-1),0)
-				
+				mon.Level=mon.Level+partyLvl
 				--HP calculated based on previous HP rapported to the previous level
 				HPRateo=mon.HP/oldLevel*(oldLevel/10+3)
 				mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2*(1+mon.Level/180))*HPRateo,32500)
@@ -201,22 +193,25 @@ end
 
 --MONSTER BOLSTERING
 function events.BeforeNewGameAutosave()
-vars.MM6EXP=0
-vars.MM7EXP=0
-vars.MM8EXP=0
 vars.UNKNOWNEXP=0
+vars.MM6EXPBEFORE=0
+vars.MM7EXPBEFORE=0
+vars.MM8EXPBEFORE=0
+vars.MM6LVL=0
+vars.MM7LVL=0
+vars.MM8LVL=0
 end
 
 function events.LeaveMap()
 currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
 	if currentWorld==1 then
-		vars.MM8EXP=Party.Players[0].Experience-(vars.MM7EXP+vars.MM6EXP+vars.UNKNOWNEXP)
+		vars.MM8LVL=vars.MM8LVL+((500+(250000+2000*Party[0].Experience)^0.5)/1000)-((500+(250000+2000*vars.MM8EXPBEFORE)^0.5)/1000)
 	elseif currentWorld==2 then
-		vars.MM7EXP=Party.Players[0].Experience-(vars.MM8EXP+vars.MM6EXP+vars.UNKNOWNEXP)
+		vars.MM7LVL=vars.MM7LVL+((500+(250000+2000*Party[0].Experience)^0.5)/1000)-((500+(250000+2000*vars.MM7EXPBEFORE)^0.5)/1000)
 	elseif currentWorld==3 then
-		vars.MM6EXP=Party.Players[0].Experience-(vars.MM8EXP+vars.MM7EXP+vars.UNKNOWNEXP)
+		vars.MM6LVL=vars.MM6LVL+((500+(250000+2000*Party[0].Experience)^0.5)/1000)-((500+(250000+2000*vars.MM6EXPBEFORE)^0.5)/1000)
 	else
-		vars.UNKNOWNEXP=Party.Players[0].Experience-(vars.MM8EXP+vars.MM7EXP+vars.MM6EXP)
+		debug.Message("You are leaving an unknown world, report this bug in MAW discord")
 	end
 end
 
@@ -224,13 +219,13 @@ function events.LoadMap()
 	--calculate party experience
 	currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
 	if currentWorld==1 then
-		partyExp=vars.MM7EXP+vars.MM6EXP+vars.UNKNOWNEXP
+		bolsterLevel=vars.MM7LVL+vars.MM6LVL
 	elseif currentWorld==2 then
-		partyExp=vars.MM8EXP+vars.MM6EXP+vars.UNKNOWNEXP
+		bolsterLevel=vars.MM8LVL+vars.MM6LVL
 	elseif currentWorld==3 then
-		partyExp=vars.MM8EXP+vars.MM7EXP+vars.UNKNOWNEXP
+		bolsterLevel=vars.MM8LVL+vars.MM7LVL
 	else
-		partyExp=vars.MM8EXP+vars.MM7EXP+vars.MM6EXP
+		debug.Message("You are in an unknown world, report this bug in MAW discord")
 	end
 	
 	for i=1, 651 do
@@ -238,24 +233,9 @@ function events.LoadMap()
 		mon=Game.MonstersTxt[i]
 		base=basetable[i]		
 		LevelB=BLevel[i]
-		
-		--exp difference
-		
-		monExp=(LevelB-1)*(LevelB)*1000/2
-		totExp=monExp+partyExp
 
 		--level increase centered on B type
-		level=math.max(math.floor((500+(250000+2000*totExp)^0.5)/1000),0)
-		level2=level+basetable[i].Level-LevelB
-		mon.Level=level+basetable[i].Level-LevelB
-		if basetable[i].Level>LevelB then
-			level2=math.max(level*1.1,level2)
-			mon.Level=level2
-		elseif basetable[i].Level<LevelB then
-			level2=math.min(level*0.9,level2)
-			mon.Level=level2
-		end
-		
+		mon.Level=basetable[i].Level+bolsterLevel
 		
 		--HP
 		mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2),32500)
