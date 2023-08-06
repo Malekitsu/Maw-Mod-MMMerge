@@ -5,16 +5,13 @@ function events.GenerateItem(t)
 	if Map.MapStatsIndex==0 then return end
 		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
 		if currentWorld==1 then
-			partyExp=vars.MM8EXP
+			partyLevel=vars.MM8LVL
 		elseif currentWorld==2 then
-			partyExp=vars.MM7EXP
+			partyLevel=vars.MM7LVL
 		elseif currentWorld==3 then
-			partyExp=vars.MM6EXP
-		else
-			partyExp=0
+			partyLevel=vars.MM6LVL
 		end
-	partyLevel = math.floor((500+(250000+2000*partyExp)^0.5)/1000)
-	
+
 	--nerf if item is strong
 	if partyLevel<(t.Strength-3)*20 and t.Strength<7 then
 		t.Strength=t.Strength-1
@@ -99,15 +96,12 @@ return end
 		--calculate party level
 		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
 		if currentWorld==1 then
-			partyExp=vars.MM7EXP+vars.MM6EXP+vars.UNKNOWNEXP
+			partyLevel=vars.MM7LVL+vars.MM6LVL
 		elseif currentWorld==2 then
-			partyExp=vars.MM8EXP+vars.MM6EXP+vars.UNKNOWNEXP
+			partyLevel=vars.MM8LVL+vars.MM6LVL
 		elseif currentWorld==3 then
-			partyExp=vars.MM8EXP+vars.MM7EXP+vars.UNKNOWNEXP
-		else
-			partyExp=vars.MM8EXP+vars.MM7EXP+vars.MM6EXP
+			partyLevel=vars.MM8LVL+vars.MM7LVL
 		end
-		local partyLevel=math.floor((500+(250000+2000*partyExp)^0.5)/1000-1)
 		local partyLevel=math.min(math.floor(partyLevel/20),14)
 		--adjust loot Strength
 		pseudoStr=t.Strength+partyLevel
@@ -163,7 +157,7 @@ return end
 					if roll<=tot then
 						t.Item.Bonus2=i
 						goto continue
-					elseif isInTable(enchants[t.Strength], Game.SpcItemsTxt[i].Lvl) then
+					elseif table.find(enchants[t.Strength], Game.SpcItemsTxt[i].Lvl) then
 						tot=tot+Game.SpcItemsTxt[i].ChanceForSlot[c]
 					end
 				end	
