@@ -37,3 +37,57 @@ function events.GameInitialized2()
 	Game.SpellsTxt[85].Master="All spells cast at two times skill"
 	Game.SpellsTxt[85].GM="All spells cast at three times skill"
 end
+
+
+--MANA COST CHANGE 
+--spell cost increase dictionary
+function events.GameInitialized2()
+	spellCostNormal={}
+	spellCostExpert={}
+	spellCostMaster={}
+	spellCostGM={}
+	for i=1,99 do
+	spellCostNormal[i] = Game.Spells[i]["SpellPointsNormal"]
+	spellCostExpert[i] = Game.Spells[i]["SpellPointsExpert"]
+	spellCostMaster[i] = Game.Spells[i]["SpellPointsMaster"]
+	spellCostGM[i] = Game.Spells[i]["SpellPointsGM"]
+	end
+end
+
+--adjust mana cost
+--with race spells it gets up to 132
+--cost table
+ascendanceCost={30,35,40,45,50,60,70,80,100,120,150}
+--list of spell to chance
+spells={2,6,7,8,9,10,11,15,18,20,22,24,26,29,32,37,39,41,43,44,52,58,65,70,76,78,79,84,87,90,93,97,98,99}
+lastIndex=-1
+function events.Tick()
+	index=Game.CurrentPlayer
+	if index>=0 then
+		level=Party[index].LevelBase
+		if lastIndex~=index or lastLevel~=level then
+			lastIndex=index
+			lastLevel=level
+			for _, num in ipairs(spells) do 
+				--check for level
+				if num%11==0 then
+					num2=11
+				else
+					num2=num%11
+				end
+				check2=(num2+9)*10
+				if level>=check2 then
+					Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[num2]
+					Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[num2]
+					Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[num2]
+					Game.Spells[num]["SpellPointsGM"] = ascendanceCost[num2]
+				else
+					Game.Spells[num]["SpellPointsNormal"]=spellCostNormal[num]
+					Game.Spells[num]["SpellPointsExpert"]=spellCostExpert[num]
+					Game.Spells[num]["SpellPointsMaster"]=spellCostMaster[num] 
+					Game.Spells[num]["SpellPointsGM"]=spellCostGM[num]
+				end	
+			end
+		end
+	end
+end
