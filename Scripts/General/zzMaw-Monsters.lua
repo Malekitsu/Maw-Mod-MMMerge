@@ -1,6 +1,11 @@
 ----------------------------------------------------
 --Empower Monsters
 ----------------------------------------------------
+--function to calculate the level you are (float number) give x amount of experience
+local function calcLevel(x)
+	local level=((500+(250000+2000*x)^0.5)/1000)
+	return level
+end 
 
 function events.GameInitialized2()
 BLevel={}
@@ -208,15 +213,16 @@ vars.MMMLVL=0
 end
 
 function events.LeaveMap()
-currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
+	local exp=Party[0].Experience
 	if currentWorld==1 then
-		vars.MM8LVL=vars.MM8LVL+((500+(250000+2000*Party[0].Experience)^0.5)/1000)-((500+(250000+2000*vars.MM8EXPBEFORE)^0.5)/1000)
+		vars.MM8LVL=vars.MM8LVL+calcLevel(exp)-calcLevel(vars.MM8EXPBEFORE)
 	elseif currentWorld==2 then
-		vars.MM7LVL=vars.MM7LVL+((500+(250000+2000*Party[0].Experience)^0.5)/1000)-((500+(250000+2000*vars.MM7EXPBEFORE)^0.5)/1000)
+		vars.MM7LVL=vars.MM7LVL+calcLevel(exp)-calcLevel(vars.MM7EXPBEFORE)
 	elseif currentWorld==3 then
-		vars.MM6LVL=vars.MM6LVL+((500+(250000+2000*Party[0].Experience)^0.5)/1000)-((500+(250000+2000*vars.MM6EXPBEFORE)^0.5)/1000)
+		vars.MM6LVL=vars.MM6LVL+calcLevel(exp)-calcLevel(vars.MM6EXPBEFORE)
 	elseif currentWorld==4 then
-		vars.MMMLVL=vars.MMMLVL+((500+(250000+2000*Party[0].Experience)^0.5)/1000)-((500+(250000+2000*vars.MMMEXPBEFORE)^0.5)/1000)
+		vars.MMMLVL=vars.MMMLVL+calcLevel(exp)-calcLevel(vars.MMMEXPBEFORE)
 	end
 end
 
@@ -338,6 +344,5 @@ function events.LoadMap()
 		-------------------------
 		--END DAMAGE CALCULATION
 		-------------------------
-		::continue::
 	end
 end
