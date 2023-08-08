@@ -26,7 +26,9 @@ function events.AfterLoadMap()
 		elseif currentWorld==3 then
 			partyLvl=vars.MM8LVL+vars.MM7LVL
 		end
-		
+		if partyLvl>=120 then 
+			partyLvl=120+(partyLvl-120)/2
+		end
 		--calculate average level for unique monsters
 		for i=0, Map.Monsters.High do
 			if  (Map.Monsters[i].FullHitPoints ~= Game.MonstersTxt[Map.Monsters[i].Id].FullHitPoints) and Map.Monsters[i].Level>5 then
@@ -34,7 +36,7 @@ function events.AfterLoadMap()
 
 				--level increase 
 				oldLevel=mon.Level
-				mon.Level=mon.Level+partyLvl
+				mon.Level=math.min(mon.Level+partyLvl,255)
 				--HP calculated based on previous HP rapported to the previous level
 				HPRateo=mon.HP/oldLevel*(oldLevel/10+3)
 				mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2*(1+mon.Level/180))*HPRateo,32500)
@@ -227,7 +229,9 @@ function events.LoadMap()
 	else
 		debug.Message("You are in an unknown world, report this bug in MAW discord")
 	end
-	
+	if bolsterLevel>=120 then 
+		bolsterLevel=120+(bolsterLevel-120)/2
+	end
 	for i=1, 651 do
 		--calculate level scaling
 		mon=Game.MonstersTxt[i]
@@ -235,7 +239,7 @@ function events.LoadMap()
 		LevelB=BLevel[i]
 
 		--level increase centered on B type
-		mon.Level=basetable[i].Level+bolsterLevel
+		mon.Level=math.min(basetable[i].Level+bolsterLevel,255)
 		
 		--HP
 		mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2),32500)
