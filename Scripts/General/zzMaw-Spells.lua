@@ -48,6 +48,9 @@ function events.GameInitialized2()
 	spellCostGM={}
 	damageAdd={}
 	damageDiceSides={}
+	spellDamage={}
+	newSpellDamageDice={}
+	newSpellDamageAdd={}
 	for i=1,99 do
 	spellCostNormal[i] = Game.Spells[i]["SpellPointsNormal"]
 	spellCostExpert[i] = Game.Spells[i]["SpellPointsExpert"]
@@ -56,15 +59,23 @@ function events.GameInitialized2()
 	damageAdd[i] = Game.Spells[i].DamageAdd
 	damageDiceSides[i] = Game.Spells[i].DamageDiceSides 
 	end
+	ascendanceCost={30,35,40,45,50,60,70,80,100,120,150}
+	spells={2,6,7,8,9,10,11,15,18,20,22,24,26,29,32,37,39,41,43,44,52,58,65,70,76,78,79,84,87,90,93,97,98,99}
+	lastIndex=-1
+	--new damage calculation
+	for i=1,#spells do
+		if spells[i]%11==0 then
+			newManaCost=ascendanceCost[11]
+		else
+			newManaCost=ascendanceCost[spells[i]%11]
+		end
+		newSpellDamageDice[spells[i]]=math.round(newManaCost^0.7*2)
+		newSpellDamageAdd[spells[i]]=math.round(newManaCost/2)
+	end
 end
 
 --adjust mana cost
---with race spells it gets up to 132
---cost table
-ascendanceCost={30,35,40,45,50,60,70,80,100,120,150}
---list of spell to chance
-spells={2,6,7,8,9,10,11,15,18,20,22,24,26,29,32,37,39,41,43,44,52,58,65,70,76,78,79,84,87,90,93,97,98,99}
-lastIndex=-1
+	
 function events.Tick()
 	index=Game.CurrentPlayer
 	if index>=0 then
@@ -85,9 +96,9 @@ function events.Tick()
 					Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[num2]
 					Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[num2]
 					Game.Spells[num]["SpellPointsGM"] = ascendanceCost[num2]
-					Game.Spells[num].DamageDiceSides = math.round(ascendanceCost[num2]^0.7*2)
+					Game.Spells[num].DamageDiceSides = newSpellDamageDice[num]
 					if damageAdd[num]>0 then
-						Game.Spells[num].damageAdd=math.round(ascendanceCost[num2]/2)
+						Game.Spells[num].DamageAdd=newSpellDamageDice[num]
 					end						
 				else
 					Game.Spells[num]["SpellPointsNormal"]=spellCostNormal[num]
@@ -95,7 +106,7 @@ function events.Tick()
 					Game.Spells[num]["SpellPointsMaster"]=spellCostMaster[num] 
 					Game.Spells[num]["SpellPointsGM"]=spellCostGM[num]
 					Game.Spells[num].DamageDiceSides=damageDiceSides[num]
-					Game.Spells[num].damageAdd=damageAdd[num]
+					Game.Spells[num].DamageAdd=damageAdd[num]
 				end	
 			end
 		end
