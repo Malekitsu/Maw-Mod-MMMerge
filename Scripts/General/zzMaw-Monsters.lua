@@ -25,6 +25,8 @@ function events.AfterLoadMap()
 			partyLvl=vars.MM8LVL+vars.MM6LVL
 		elseif currentWorld==3 then
 			partyLvl=vars.MM8LVL+vars.MM7LVL
+		elseif currentWorld==4 then
+			partyLvl=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
 		end
 		if partyLvl>=120 then 
 			partyLvl=120+(partyLvl-120)/2
@@ -202,6 +204,7 @@ vars.MM8EXPBEFORE=0
 vars.MM6LVL=0
 vars.MM7LVL=0
 vars.MM8LVL=0
+vars.MMMLVL=0
 end
 
 function events.LeaveMap()
@@ -212,8 +215,8 @@ currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 		vars.MM7LVL=vars.MM7LVL+((500+(250000+2000*Party[0].Experience)^0.5)/1000)-((500+(250000+2000*vars.MM7EXPBEFORE)^0.5)/1000)
 	elseif currentWorld==3 then
 		vars.MM6LVL=vars.MM6LVL+((500+(250000+2000*Party[0].Experience)^0.5)/1000)-((500+(250000+2000*vars.MM6EXPBEFORE)^0.5)/1000)
-	else
-		debug.Message("You are leaving an unknown world, report this bug in MAW discord")
+	elseif currentWorld==4 then
+		vars.MMMLVL=vars.MMMLVL+((500+(250000+2000*Party[0].Experience)^0.5)/1000)-((500+(250000+2000*vars.MMMEXPBEFORE)^0.5)/1000)
 	end
 end
 
@@ -226,6 +229,8 @@ function events.LoadMap()
 		bolsterLevel=vars.MM8LVL+vars.MM6LVL
 	elseif currentWorld==3 then
 		bolsterLevel=vars.MM8LVL+vars.MM7LVL
+	elseif currentWorld==4 then
+		bolsterLevel=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
 	else
 		debug.Message("You are in an unknown world, report this bug in MAW discord")
 	end
