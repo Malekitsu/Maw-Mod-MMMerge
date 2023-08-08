@@ -143,6 +143,7 @@ newArmorSkillResistanceBonuses =
 	[const.Skills.Leather]	= {2, 4, 6, 9,},
 	[const.Skills.Chain]	= {2, 3, 4, 6,},
 	[const.Skills.Plate]	= {0, 1, 2, 3,},
+	[const.Skills.Shield]	= {0, 0, 0, 0,},
 }
 
 twoHandedWeaponDamageBonus = 3
@@ -986,4 +987,171 @@ function events.CalcDamageToMonster(t)
 		end
 		t.Result=t.Result+bonusDamage
 	end
+end
+
+function events.GameInitialized2()
+	for i=0,7 do
+		attack=false
+		recovery=false
+		damage=false
+		ac=false
+		res=false
+		baseString=string.format("%s\n------------------------------------------------------------\n         ",Game.SkillDescriptions[i])
+		for v=1,4 do
+			if newWeaponSkillAttackBonuses[i][v]~=0 then
+				attack=true
+			end
+			if newWeaponSkillRecoveryBonuses[i][v]~=0 then
+				recovery=true
+			end
+			if newWeaponSkillDamageBonuses[i][v]~=0 then
+				damage=true
+			end
+			if newWeaponSkillACBonuses[i][v]~=0 then
+				ac=true
+			end
+			if newWeaponSkillResistanceBonuses[i][v]~=0 then
+				res=true
+			end
+		end
+		
+		--Novice
+		normal=""
+		if attack then
+			baseString=string.format("%s Attack|",baseString)
+			normal=string.format("%s      %s|",normal,newWeaponSkillAttackBonuses[i][1])
+		end
+		if recovery then
+			normal=string.format("%s      %s|",normal,newWeaponSkillRecoveryBonuses[i][1])
+			baseString=string.format("%s Speed|",baseString)
+		end
+		if damage then
+			normal=string.format("%s         %s|",normal,newWeaponSkillDamageBonuses[i][1])
+			baseString=string.format("%s Damage|",baseString)
+		end
+		if ac then
+			normal=string.format("%s  %s|",normal,newWeaponSkillACBonuses[i][1])
+			baseString=string.format("%s AC|",baseString)
+		end
+		if res then
+			normal=string.format("%s    %s|",normal,newWeaponSkillResistanceBonuses[i][1])
+			baseString=string.format("%s Res|",baseString)
+		end
+		Game.SkillDesNormal[i]=normal
+		
+		--Expert
+		expert=""
+		if attack then
+			expert=string.format("%s      %s|",expert,newWeaponSkillAttackBonuses[i][2])
+		end
+		if recovery then
+			expert=string.format("%s      %s|",expert,newWeaponSkillRecoveryBonuses[i][2])
+		end
+		if damage then
+			expert=string.format("%s         %s|",expert,newWeaponSkillDamageBonuses[i][2])
+		end
+		if ac then
+			expert=string.format("%s  %s|",expert,newWeaponSkillACBonuses[i][2])
+		end
+		if res then
+			expert=string.format("%s    %s|",expert,newWeaponSkillResistanceBonuses[i][2])
+		end
+		Game.SkillDesExpert[i]=expert
+		--Master
+		master=""
+		if attack then
+			master=string.format("%s      %s|",master,newWeaponSkillAttackBonuses[i][3])
+		end
+		if recovery then
+			master=string.format("%s      %s|",master,newWeaponSkillRecoveryBonuses[i][3])
+		end
+		if damage then
+			master=string.format("%s         %s|",master,newWeaponSkillDamageBonuses[i][3])
+		end
+		if ac then
+			master=string.format("%s  %s|",master,newWeaponSkillACBonuses[i][3])
+		end
+		if res then
+			master=string.format("%s    %s|",master,newWeaponSkillResistanceBonuses[i][3])
+		end
+		Game.SkillDesMaster[i]=master
+		--GrandMaster
+		gm=""
+		if attack then
+			gm=string.format("%s      %s|",gm,newWeaponSkillAttackBonuses[i][4])
+		end
+		if recovery then
+			gm=string.format("%s      %s|",gm,newWeaponSkillRecoveryBonuses[i][4])
+		end
+		if damage then
+			gm=string.format("%s         %s|",gm,newWeaponSkillDamageBonuses[i][4])
+		end
+		if ac then
+			gm=string.format("%s  %s|",gm,newWeaponSkillACBonuses[i][4])
+		end
+		if res then
+			gm=string.format("%s    %s|",gm,newWeaponSkillResistanceBonuses[i][4])
+		end
+		Game.SkillDesGM[i]=gm
+		Game.SkillDescriptions[i]=string.format("%s",baseString)
+	end
+	
+
+--now do same for armors
+	for i=8,11 do
+		recoveryPen=false
+		ac=false
+		res=false
+		baseString=string.format("%s\n------------------------------------------------------------\n         ",Game.SkillDescriptions[i])
+		for v=1,4 do
+			if newArmorSkillACBonuses[i][v]~=0 then
+				ac=true
+			end
+			if newArmorSkillResistanceBonuses[i][v]~=0 then
+				res=true
+			end
+		end
+		
+		--Novice
+		normal=""
+		if ac then
+			normal=string.format("%s  %s|",normal,newArmorSkillACBonuses[i][1])
+			baseString=string.format("%s AC|",baseString)
+		end
+		if res then
+			normal=string.format("%s    %s|",normal,newArmorSkillResistanceBonuses[i][1])
+			baseString=string.format("%s Res|",baseString)
+		end
+		Game.SkillDesNormal[i]=normal
+		
+		--Expert
+		expert=""
+		if ac then
+			expert=string.format("%s  %s|",expert,newArmorSkillACBonuses[i][2])
+		end
+		if res then
+			expert=string.format("%s    %s|",expert,newArmorSkillResistanceBonuses[i][2])
+		end
+		Game.SkillDesExpert[i]=expert
+		--Master
+		master=""
+		if ac then
+			master=string.format("%s  %s|",master,newArmorSkillACBonuses[i][3])
+		end
+		if res then
+			master=string.format("%s    %s|",master,newArmorSkillResistanceBonuses[i][3])
+		end
+		Game.SkillDesMaster[i]=master
+		--GrandMaster
+		gm=""
+		if ac then
+			gm=string.format("%s  %s|",gm,newArmorSkillACBonuses[i][4])
+		end
+		if res then
+			gm=string.format("%s    %s|",gm,newArmorSkillResistanceBonuses[i][4])
+		end
+		Game.SkillDesGM[i]=gm
+		Game.SkillDescriptions[i]=string.format("%s",baseString)
+	end
+
 end
