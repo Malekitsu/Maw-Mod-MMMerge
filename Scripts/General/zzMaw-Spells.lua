@@ -46,11 +46,15 @@ function events.GameInitialized2()
 	spellCostExpert={}
 	spellCostMaster={}
 	spellCostGM={}
+	damageAdd={}
+	damageDiceSides={}
 	for i=1,99 do
 	spellCostNormal[i] = Game.Spells[i]["SpellPointsNormal"]
 	spellCostExpert[i] = Game.Spells[i]["SpellPointsExpert"]
 	spellCostMaster[i] = Game.Spells[i]["SpellPointsMaster"]
 	spellCostGM[i] = Game.Spells[i]["SpellPointsGM"]
+	damageAdd[i] = Game.Spells[i].DamageAdd
+	damageDiceSides[i] = Game.Spells[i].DamageDiceSides 
 	end
 end
 
@@ -81,11 +85,17 @@ function events.Tick()
 					Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[num2]
 					Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[num2]
 					Game.Spells[num]["SpellPointsGM"] = ascendanceCost[num2]
+					Game.Spells[num].DamageDiceSides = math.round(ascendanceCost[num2]^0.7*2)
+					if damageAdd[num]>0 then
+						Game.Spells[num].damageAdd=math.round(ascendanceCost[num2]/2)
+					end						
 				else
 					Game.Spells[num]["SpellPointsNormal"]=spellCostNormal[num]
 					Game.Spells[num]["SpellPointsExpert"]=spellCostExpert[num]
 					Game.Spells[num]["SpellPointsMaster"]=spellCostMaster[num] 
 					Game.Spells[num]["SpellPointsGM"]=spellCostGM[num]
+					Game.Spells[num].DamageDiceSides=damageDiceSides[num]
+					Game.Spells[num].damageAdd=damageAdd[num]
 				end	
 			end
 		end
