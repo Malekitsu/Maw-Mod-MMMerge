@@ -40,10 +40,10 @@ newWeaponSkillAttackBonuses =
 	[const.Skills.Sword]	= {1, 2, 2, 2,},
 	[const.Skills.Dagger]	= {1, 2, 2, 2,},
 	[const.Skills.Axe]		= {1, 2, 2, 2,},
-	[const.Skills.Spear]	= {1, 2, 3, 3,},
+	[const.Skills.Spear]	= {1, 2, 2, 3,},
 	[const.Skills.Bow]		= {3, 3, 3, 3,},
 	[const.Skills.Mace]		= {1, 2, 2, 2,},
-	[const.Skills.Blaster]	= {5, 10, 15, 25,},
+	[const.Skills.Blaster]	= {5, 10, 15, 20,},
 }
 -- weapon skill recovery bonuses (by rank)
 
@@ -61,11 +61,11 @@ oldWeaponSkillRecoveryBonuses =
 newWeaponSkillRecoveryBonuses =
 {
 	[const.Skills.Staff]	= {0, 0, 0, 0,},
-	[const.Skills.Sword]	= {0, 2, 2, 2,},
+	[const.Skills.Sword]	= {0, 2, 2, 3,},
 	[const.Skills.Dagger]	= {0, 0, 1, 1,},
-	[const.Skills.Axe]		= {0, 2, 2, 2,},
+	[const.Skills.Axe]		= {0, 1, 2, 2,},
 	[const.Skills.Spear]	= {0, 0, 0, 0,},
-	[const.Skills.Bow]		= {1, 2, 2, 2,},
+	[const.Skills.Bow]		= {1, 2, 2, 3,},
 	[const.Skills.Mace]		= {0, 0, 0, 0,},
 	[const.Skills.Blaster]	= {0, 0, 0, 0,},
 }
@@ -85,10 +85,10 @@ newWeaponSkillDamageBonuses =
 {
 	[const.Skills.Staff]	= {0, 0, 1, 1,},
 	[const.Skills.Sword]	= {0, 0, 1, 1,},
-	[const.Skills.Dagger]	= {0, 0, 0, 1,},
-	[const.Skills.Axe]		= {0, 1, 2, 2,},
+	[const.Skills.Dagger]	= {0, 0, 0, 0,},
+	[const.Skills.Axe]		= {1, 2, 3, 4,},
 	[const.Skills.Spear]	= {0, 1, 2, 2,},
-	[const.Skills.Bow]		= {1, 2, 2, 2,},
+	[const.Skills.Bow]		= {1, 2, 3, 3,},
 	[const.Skills.Mace]		= {0, 1, 2, 2,},
 	[const.Skills.Blaster]	= {0, 0, 0, 0,},
 }
@@ -107,11 +107,11 @@ oldWeaponSkillACBonuses =
 }
 newWeaponSkillACBonuses =
 {
-	[const.Skills.Staff]	= {2, 2, 2, 2,},
+	[const.Skills.Staff]	= {1, 2, 3, 4,},
 	[const.Skills.Sword]	= {0, 0, 0, 1,},
 	[const.Skills.Dagger]	= {0, 0, 0, 0,},
 	[const.Skills.Axe]		= {0, 0, 0, 0,},
-	[const.Skills.Spear]	= {0, 2, 4, 6,},
+	[const.Skills.Spear]	= {1, 2, 4, 6,},
 	[const.Skills.Bow]		= {0, 0, 0, 0,},
 	[const.Skills.Mace]		= {0, 0, 0, 0,},
 	[const.Skills.Blaster]	= {0, 0, 0, 0,},
@@ -146,8 +146,11 @@ newArmorSkillResistanceBonuses =
 	[const.Skills.Shield]	= {0, 0, 0, 0,},
 }
 
-twoHandedWeaponDamageBonus = 3
-twoHandedWeaponDamageBonusByMastery = {[const.Novice] = twoHandedWeaponDamageBonus/3, [const.Expert] = twoHandedWeaponDamageBonus/3*2, [const.Master] = twoHandedWeaponDamageBonus, }
+twoHandedWeaponDamageBonusByMastery = {
+	[const.Novice] = 1, 
+	[const.Expert] = 2, 
+	[const.Master] = 3, 
+	[const.GM] = 4 }
 
 classMeleeWeaponSkillDamageBonus ={}
 classRangedWeaponSkillAttackBonusMultiplier ={}
@@ -1153,5 +1156,5 @@ function events.GameInitialized2()
 		Game.SkillDesGM[i]=gm
 		Game.SkillDescriptions[i]=string.format("%s",baseString)
 	end
-
+	
 end
