@@ -280,8 +280,8 @@ function events.LoadMap()
 		mon.Experience = math.round(mon.Level*(mon.Level+10))
 		--Gold
 		levelMultiplier = (mon.Level) / (LevelB)
-		mon.TreasureDiceCount=math.min(mon.TreasureDiceCount*levelMultiplier,250)
-		mon.TreasureDiceSides=math.min(mon.TreasureDiceSides*levelMultiplier,250)
+		--mon.TreasureDiceCount=math.min(mon.TreasureDiceCount*levelMultiplier,250)
+		--mon.TreasureDiceSides=math.min(mon.TreasureDiceSides*levelMultiplier,250)
 	end
 	--CALCULATE DAMAGE AND HP
 	for i=1, 651 do
