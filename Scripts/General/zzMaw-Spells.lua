@@ -88,7 +88,7 @@ function events.GameInitialized2()
 	end	
 end	
 	--if you change diceMin or values that are 0 remember to update the tooltip manually 
-local spellPowers =
+spellPowers =
 	{
 		[2] = {dmgAdd = 0, diceMin = 1, diceMax = 3, },--fire bolt
 		[6] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--fireball
@@ -124,10 +124,59 @@ local spellPowers =
 		[97] = {dmgAdd = 0, diceMin = 1, diceMax = 25, },--dragon breath
 		[98] = {dmgAdd = 50, diceMin = 1, diceMax = 1, },--armageddon
 		[99] = {dmgAdd = 25, diceMin = 1, diceMax = 8, },--souldrinker
+		[103] = {dmgAdd = 17, diceMin = 1, diceMax = 17, },--darkfire bolt
+		[111] = {dmgAdd = 3, diceMin = 1, diceMax = 3, },--lifedrain scales with mastery, fixed in calcspelldamage
+		[123] = {dmgAdd = 10, diceMin = 1, diceMax = 10, },--flame blast scales with mastery, fixed in calcspelldamage
+				
+		
 	}
 
 
-
+--calculate spell Damage
+function events.CalcSpellDamage(t)
+	--exceptions here
+	
+	if t.Spell == 44 then  -- Mass Distorsion
+		t.Result = t.HP*0.15+t.HP*t.Skill*0.01
+		return
+	end
+	
+	--calculate
+	if t.Spell>1 and t.Spell<100 then
+		if spellPowers[t.Spell].diceMin~=spellPowers[t.Spell].diceMax then --roll dices
+			damage=0
+			for i=1,t.Skill do
+				damage=damage+math.random(spellPowers[t.Spell].diceMin,spellPowers[t.Spell].diceMax)
+			end
+			t.Result=spellPowers[t.Spell].dmgAdd+damage
+		else
+			t.Result=spellPowers[t.Spell].dmgAdd+spellPowers[t.Spell].diceMax*t.Skill
+		end
+	end
+	
+	--fix for mastery scaling spells
+	if t.Spell == 7 then  -- fire spike
+		if t.Mastery==3 then
+			t.Result=t.Result/6*8
+		elseif t.Mastery==4 then
+			t.Result=t.Result/6*10
+		end
+	end
+	if t.Spell == 111 then  -- lifedrain
+		if t.Mastery==3 then
+			t.Result=t.Result/3*5
+		elseif t.Mastery==4 then
+			t.Result=t.Result/3*7
+		end
+	end
+	if t.Spell == 123 then  -- flame blast
+		if t.Mastery==3 then
+			t.Result=t.Result/10*11
+		elseif t.Mastery==4 then
+			t.Result=t.Result/10*11
+		end
+	end
+end
 
 
 
@@ -165,9 +214,7 @@ function events.Tick()
 					Game.Spells[num].DamageDiceSides=damageDiceSides[num]
 					Game.Spells[num].DamageAdd=damageAdd[num]		
 				end	
-			end
-			
-			
+			end	
 		--change tooltips according to damage
 		Game.SpellsTxt[2].Description=string.format("Launches a burst of fire at a single target.  Damage is 1-%s points of damage per point of skill in Fire Magic.   Firebolt is safe, effective and has a low casting cost.",spellPowers[2].diceMax)
 		Game.SpellsTxt[6].Description=string.format("Fires a ball of fire at a single target. When it hits, the ball explodes damaging all those nearby, including your characters if they're too close.  Fireball does 1-%s points of damage per point of skill in Fire Magic.",spellPowers[6].diceMax)
