@@ -46,82 +46,60 @@ function events.GameInitialized2()
 	spellCostExpert={}
 	spellCostMaster={}
 	spellCostGM={}
-	damageAdd={}
-	damageDiceSides={}
-	spellDamage={}
-	newSpellDamageDice={}
-	newSpellDamageAdd={}
-	spellDesc={}
-	spellDescN={}
-	spellDescE={}
-	spellDescM={}
-	spellDescGM={}
 	for i=1,132 do
-	spellCostNormal[i] = Game.Spells[i]["SpellPointsNormal"]
-	spellCostExpert[i] = Game.Spells[i]["SpellPointsExpert"]
-	spellCostMaster[i] = Game.Spells[i]["SpellPointsMaster"]
-	spellCostGM[i] = Game.Spells[i]["SpellPointsGM"]
-	damageAdd[i] = Game.Spells[i].DamageAdd
-	damageDiceSides[i] = Game.Spells[i].DamageDiceSides 
+		spellCostNormal[i] = Game.Spells[i]["SpellPointsNormal"]
+		spellCostExpert[i] = Game.Spells[i]["SpellPointsExpert"]
+		spellCostMaster[i] = Game.Spells[i]["SpellPointsMaster"]
+		spellCostGM[i] = Game.Spells[i]["SpellPointsGM"]
 	end
 	ascendanceCost={30,35,40,45,50,60,70,80,100,120,150,[0]=150}
-	spells={2,6,7,8,9,10,11,15,18,20,22,24,26,29,32,37,39,41,43,44,52,59,65,70,76,78,79,84,87,90,93,97,98,99}
+	spells={2,6,7,8,9,10,11,15,18,20,22,24,26,29,32,37,39,41,43,44,52,59,65,70,76,78,79,84,87,90,93,97,98,99,103,111,123}
 	lastIndex=-1 --used later
-	--store base descriptions UNUSED SO FAR
-	for i=1,132 do
-		spellDesc=Game.SpellsTxt[i].Description
-		spellDescN=Game.SpellsTxt[i].Normal
-		spellDescE=Game.SpellsTxt[i].Expert
-		spellDescM=Game.SpellsTxt[i].Master
-		spellDescGM=Game.SpellsTxt[i].GM
-	end	
-	
+
 	--if you change diceMin or values that are 0 remember to update the tooltip manually 
-spellPowers =
-	{
-		[2] = {dmgAdd = 0, diceMin = 1, diceMax = 3, },--fire bolt
-		[6] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--fireball
-		[7] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--fire spike, the only spell with damage depending on mastery, fix in events.calcspelldamage
-		[8] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--immolation
-		[9] = {dmgAdd = 8, diceMin = 1, diceMax = 1, },--meteor shower
-		[10] = {dmgAdd = 12, diceMin = 2, diceMax = 2, },--inferno
-		[11] = {dmgAdd = 15, diceMin = 1, diceMax = 15, },--incinerate
-		[15] = {dmgAdd = 2, diceMin = 1, diceMax = 1, },--sparks
-		[18] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--lightning bolt
-		[20] = {dmgAdd = 10, diceMin = 1, diceMax = 10, },--implosion
-		[22] = {dmgAdd = 20, diceMin = 1, diceMax = 1, },--starburst
-		[24] = {dmgAdd = 2, diceMin = 1, diceMax = 2, },--poison spray
-		[26] = {dmgAdd = 0, diceMin = 1, diceMax = 4, },--ice bolt
-		[29] = {dmgAdd = 9, diceMin = 1, diceMax = 9, },--acid burst
-		[32] = {dmgAdd = 12, diceMin = 1, diceMax = 6, },--ice blast
-		[37] = {dmgAdd = 5, diceMin = 1, diceMax = 3, },--deadly swarm
-		[39] = {dmgAdd = 0, diceMin = 1, diceMax = 9, },--blades
-		[41] = {dmgAdd = 10, diceMin = 1, diceMax = 10, },--rock blast
-		[43] = {dmgAdd = 20, diceMin = 2, diceMax = 2, },--death blossom
-		[44] = {dmgAdd = 15, diceMin = 1, diceMax = 1, },--mass distorsion, nerfed
-		[52] = {dmgAdd = 10, diceMin = 2, diceMax = 8, },--spirit lash
-		[59] = {dmgAdd = 3, diceMin = 1, diceMax = 3, },--mind blast
-		[65] = {dmgAdd = 12, diceMin = 1, diceMax = 12, },--psychic shock
-		[70] = {dmgAdd = 8, diceMin = 1, diceMax = 2, },--harm
-		[76] = {dmgAdd = 20, diceMin = 1, diceMax = 10, },--flying fist
-		[78] = {dmgAdd = 0, diceMin = 1, diceMax = 4, },--light bolt
-		[79] = {dmgAdd = 16, diceMin = 1, diceMax = 16, },--destroy undead
-		[84] = {dmgAdd = 25, diceMin = 1, diceMax = 1, },--prismatic light
-		[87] = {dmgAdd = 20, diceMin = 1, diceMax = 20, },--sunray
-		[90] = {dmgAdd = 25, diceMin = 1, diceMax = 10, },--toxic cloud
-		[93] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--shrapmetal
-		[97] = {dmgAdd = 0, diceMin = 1, diceMax = 25, },--dragon breath
-		[98] = {dmgAdd = 50, diceMin = 1, diceMax = 1, },--armageddon
-		[99] = {dmgAdd = 25, diceMin = 1, diceMax = 8, },--souldrinker
-		[103] = {dmgAdd = 17, diceMin = 1, diceMax = 17, },--darkfire bolt
-		[111] = {dmgAdd = 3, diceMin = 1, diceMax = 3, },--lifedrain scales with mastery, fixed in calcspelldamage
-		[123] = {dmgAdd = 10, diceMin = 1, diceMax = 10, },--flame blast scales with mastery, fixed in calcspelldamage
-	}
+	spellPowers =
+		{
+			[2] = {dmgAdd = 0, diceMin = 1, diceMax = 3, },--fire bolt
+			[6] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--fireball
+			[7] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--fire spike, the only spell with damage depending on mastery, fix in events.calcspelldamage
+			[8] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--immolation
+			[9] = {dmgAdd = 8, diceMin = 1, diceMax = 1, },--meteor shower
+			[10] = {dmgAdd = 12, diceMin = 2, diceMax = 2, },--inferno
+			[11] = {dmgAdd = 15, diceMin = 1, diceMax = 15, },--incinerate
+			[15] = {dmgAdd = 2, diceMin = 1, diceMax = 1, },--sparks
+			[18] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--lightning bolt
+			[20] = {dmgAdd = 10, diceMin = 1, diceMax = 10, },--implosion
+			[22] = {dmgAdd = 20, diceMin = 1, diceMax = 1, },--starburst
+			[24] = {dmgAdd = 2, diceMin = 1, diceMax = 2, },--poison spray
+			[26] = {dmgAdd = 0, diceMin = 1, diceMax = 4, },--ice bolt
+			[29] = {dmgAdd = 9, diceMin = 1, diceMax = 9, },--acid burst
+			[32] = {dmgAdd = 12, diceMin = 1, diceMax = 6, },--ice blast
+			[37] = {dmgAdd = 5, diceMin = 1, diceMax = 3, },--deadly swarm
+			[39] = {dmgAdd = 0, diceMin = 1, diceMax = 9, },--blades
+			[41] = {dmgAdd = 10, diceMin = 1, diceMax = 10, },--rock blast
+			[43] = {dmgAdd = 20, diceMin = 2, diceMax = 2, },--death blossom
+			[44] = {dmgAdd = 15, diceMin = 1, diceMax = 1, },--mass distorsion, nerfed
+			[52] = {dmgAdd = 10, diceMin = 2, diceMax = 8, },--spirit lash
+			[59] = {dmgAdd = 3, diceMin = 1, diceMax = 3, },--mind blast
+			[65] = {dmgAdd = 12, diceMin = 1, diceMax = 12, },--psychic shock
+			[70] = {dmgAdd = 8, diceMin = 1, diceMax = 2, },--harm
+			[76] = {dmgAdd = 20, diceMin = 1, diceMax = 10, },--flying fist
+			[78] = {dmgAdd = 0, diceMin = 1, diceMax = 4, },--light bolt
+			[79] = {dmgAdd = 16, diceMin = 1, diceMax = 16, },--destroy undead
+			[84] = {dmgAdd = 25, diceMin = 1, diceMax = 1, },--prismatic light
+			[87] = {dmgAdd = 20, diceMin = 1, diceMax = 20, },--sunray
+			[90] = {dmgAdd = 25, diceMin = 1, diceMax = 10, },--toxic cloud
+			[93] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--shrapmetal
+			[97] = {dmgAdd = 0, diceMin = 1, diceMax = 25, },--dragon breath
+			[98] = {dmgAdd = 50, diceMin = 1, diceMax = 1, },--armageddon
+			[99] = {dmgAdd = 25, diceMin = 1, diceMax = 8, },--souldrinker
+			[103] = {dmgAdd = 17, diceMin = 1, diceMax = 17, },--darkfire bolt
+			[111] = {dmgAdd = 3, diceMin = 1, diceMax = 3, },--lifedrain scales with mastery, fixed in calcspelldamage
+			[123] = {dmgAdd = 10, diceMin = 1, diceMax = 10, },--flame blast scales with mastery, fixed in calcspelldamage
+		}
 
-
-
---calculate table for spells from level 100
-spellPowers100={}
+	--calculate table for spells from level 100
+	spellPowers100={}
 	for i =1,132 do
 		if spellPowers[i] then
 			--calculate damage assuming formula is manacost^0.7
@@ -130,10 +108,20 @@ spellPowers100={}
 			local diceMaxProportion=spellPowers[i].diceMax/theoreticalDamage
 			--get new mana cost and calculate theoretical Damage
 			local manaCost=ascendanceCost[i%11]
+			--exception for racial spells
+			if i==103 then 
+				manaCost=150
+			end
+			if i==111 then 
+				manaCost=50
+			end
+			if i==123 then 
+				manaCost=80
+			end
 			local theoreticalDamage100=manaCost^0.7
 			--scale new values according to original differences
-			local dmgAdd100=theoreticalDamage100*dmgAddProportion
-			local diceMax100=theoreticalDamage100*diceMaxProportion
+			local dmgAdd100=math.round(theoreticalDamage100*dmgAddProportion)
+			local diceMax100=math.round(theoreticalDamage100*diceMaxProportion)
 			spellPowers100[i]={dmgAdd = dmgAdd100, diceMin = 1, diceMax = diceMax100,}
 		end
 	end
@@ -141,8 +129,8 @@ end
 
 --calculate spell Damage
 function events.CalcSpellDamage(t)
-	--exceptions here
-	if t.Spell == 44 then  -- Mass Distorsion
+	--mass distorsion
+	if t.Spell == 44 then 
 		t.Result = t.HP*0.15+t.HP*t.Skill*0.01
 		return
 	end
@@ -152,9 +140,9 @@ function events.CalcSpellDamage(t)
 		spellTier=11
 	end
 	--take damage info
-	local diceMin=spellPowers[t.Spell].diceMin
-	local diceMax=spellPowers[t.Spell].diceMax
-	local damageAdd=spellPowers[t.Spell].dmgAdd
+	diceMin=spellPowers[t.Spell].diceMin
+	diceMax=spellPowers[t.Spell].diceMax
+	damageAdd=spellPowers[t.Spell].dmgAdd
 	local data=WhoHitMonster()
 	if data and data.Player then
 	--calculate if level is>treshold to check for lvl 100 spells
@@ -165,7 +153,7 @@ function events.CalcSpellDamage(t)
 		end
 	end
 	--calculate
-	if t.Spell>1 and t.Spell<100 then
+	if t.Spell>1 and t.Spell<132 then
 		if diceMin~=diceMax then --roll dices
 			damage=0
 			for i=1,t.Skill do
@@ -203,30 +191,88 @@ end
 
 
 --function for tooltips
-function dmgAddTooltip(level,spellIdex)
-	local index=spellIdex%11
+function dmgAddTooltip(level,spellIndex)
+	--exception for racials
+	if spellIndex==104 then 
+		if level>=200 then
+			local dmgAdd=spellPowers100[spellIndex].dmgAdd
+			return dmgAdd
+		else 
+			local dmgAdd=spellPowers[spellIndex].dmgAdd
+			return dmgAdd
+		end
+	end
+	if spellIndex==111 then 
+		if level>=140 then
+			local dmgAdd=spellPowers100[spellIndex].dmgAdd
+			return dmgAdd
+		else 
+			local dmgAdd=spellPowers[spellIndex].dmgAdd
+			return dmgAdd
+		end
+	end
+	if spellIndex==123 then 
+		if level>=170 then
+			local dmgAdd=spellPowers100[spellIndex].dmgAdd
+			return dmgAdd
+		else 
+			local dmgAdd=spellPowers[spellIndex].dmgAdd
+			return dmgAdd
+		end
+	end
+	--check for index to see if to show normal or ascended spells
+	local index=spellIndex%11
 	if index==0 then
 		index=11
 	end
 	if level>=index*10+90 then
-		local dmgAdd=math.round(spellPowers100[spellIdex].dmgAdd)
+		local dmgAdd=spellPowers100[spellIndex].dmgAdd
 		return dmgAdd
 	else 
-		local dmgAdd=spellPowers[spellIdex].dmgAdd
+		local dmgAdd=spellPowers[spellIndex].dmgAdd
 		return dmgAdd
 	end
 end
 
-function diceMaxTooltip(level,spellIdex)
-	local index=spellIdex%11
+function diceMaxTooltip(level,spellIndex)
+	--exception for racials
+	if spellIndex==104 then 
+		if level>=200 then
+			local diceMax=spellPowers100[spellIndex].diceMax
+			return diceMax
+		else 
+			local diceMax=spellPowers[spellIndex].diceMax
+			return diceMax
+		end
+	end
+	if spellIndex==111 then 
+		if level>=140 then
+			local diceMax=spellPowers100[spellIndex].diceMax
+			return diceMax
+		else 
+			local diceMax=spellPowers[spellIndex].diceMax
+			return diceMax
+		end
+	end
+	if spellIndex==123 then 
+		if level>=170 then
+			local diceMax=spellPowers100[spellIndex].diceMax
+			return diceMax
+		else 
+			local diceMax=spellPowers[spellIndex].diceMax
+			return diceMax
+		end
+	end
+	--check for index to see if to show normal or ascended spells
+	local index=spellIndex%11
 	if index==0 then
 		index=11
 	end
 	if level>=index*10+90 then
-		local diceMax=math.round(spellPowers100[spellIdex].diceMax)
+		local diceMax=spellPowers100[spellIndex].diceMax
 		return diceMax
 	else 
-		local diceMax=spellPowers[spellIdex].diceMax
+		local diceMax=spellPowers[spellIndex].diceMax
 		return diceMax
 	end
 end
@@ -258,8 +304,50 @@ function events.Tick()
 					Game.Spells[num]["SpellPointsMaster"]=spellCostMaster[num] 
 					Game.Spells[num]["SpellPointsGM"]=spellCostGM[num]	
 				end	
+				--cost exception for racials
+				if num==103 and level>=200 then
+					if level>=check2 then
+						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[11]
+						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[11]
+						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[11]
+						Game.Spells[num]["SpellPointsGM"] = ascendanceCost[11]
+					else
+						Game.Spells[num]["SpellPointsNormal"]=spellCostNormal[num]
+						Game.Spells[num]["SpellPointsExpert"]=spellCostExpert[num]
+						Game.Spells[num]["SpellPointsMaster"]=spellCostMaster[num] 
+						Game.Spells[num]["SpellPointsGM"]=spellCostGM[num]	
+					end	
+				end	
+				if num==111 and level>=140 then
+					if level>=check2 then
+						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[5]
+						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[5]
+						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[5]
+						Game.Spells[num]["SpellPointsGM"] = ascendanceCost[5]
+					else
+						Game.Spells[num]["SpellPointsNormal"]=spellCostNormal[num]
+						Game.Spells[num]["SpellPointsExpert"]=spellCostExpert[num]
+						Game.Spells[num]["SpellPointsMaster"]=spellCostMaster[num] 
+						Game.Spells[num]["SpellPointsGM"]=spellCostGM[num]	
+					end	
+				end
+				if num==123 and level>=170 then
+					if level>=check2 then
+						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[8]
+						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[8]
+						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[8]
+						Game.Spells[num]["SpellPointsGM"] = ascendanceCost[8]
+					else
+						Game.Spells[num]["SpellPointsNormal"]=spellCostNormal[num]
+						Game.Spells[num]["SpellPointsExpert"]=spellCostExpert[num]
+						Game.Spells[num]["SpellPointsMaster"]=spellCostMaster[num] 
+						Game.Spells[num]["SpellPointsGM"]=spellCostGM[num]	
+					end	
+				end		
 			end	
 			
+			
+				
 			--change tooltips according to ascended damage
 			Game.SpellsTxt[2].Description=string.format("Launches a burst of fire at a single target.  Damage is 1-%s points of damage per point of skill in Fire Magic.   Firebolt is safe, effective and has a low casting cost.",diceMaxTooltip(level,2))
 			Game.SpellsTxt[6].Description=string.format("Fires a ball of fire at a single target. When it hits, the ball explodes damaging all those nearby, including your characters if they're too close.  Fireball does 1-%s points of damage per point of skill in Fire Magic.",diceMaxTooltip(level,6))
@@ -300,6 +388,14 @@ function events.Tick()
 			Game.SpellsTxt[97].Description=string.format("Dragon Breath empowers the caster to exhale a cloud of toxic vapors that targets a single monster and damage all creatures nearby, doing 1-%s points of damage per point of skill in Dark Magic.",diceMaxTooltip(level,97))
 			Game.SpellsTxt[98].Description=string.format("This spell is the town killer. Armageddon inflicts %s points of damage plus %s point of damage for every point of Dark skill your character has to every creature on the map, including all your characters. It can only be cast three times per day and only outdoors.",dmgAddTooltip(level,98),diceMaxTooltip(level,98))
 			Game.SpellsTxt[99].Description=string.format("This horrible spell sucks the life from all creatures in sight, friend or enemy.  Souldrinker then transfers that life to your party in much the same fashion as Shared Life.  Damage (and healing) is %s + 1-%s per point of skill.",dmgAddTooltip(level,99),diceMaxTooltip(level,99))
+			
+			Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is 1-%s per point of skill.",diceMaxTooltip(level,103))
+			Game.SpellsTxt[111].Description=string.format("Lifedrain allows the vampire to damage his or her target and simultaneously heal based on the damage done in the Lifedrain.  This ability does %s points of damage plus 1-%s points of damage per skill.",dmgAddTooltip(level,111),diceMaxTooltip(level,111))
+			Game.SpellsTxt[111].Master=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(level,111)/3*5),math.round(diceMaxTooltip(level,111)/3*5))
+			Game.SpellsTxt[111].GM=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(level,111)/3*7),math.round(diceMaxTooltip(level,111)/3*7))
+			Game.SpellsTxt[123].Expert=string.format("Damage %s points plus 1-%s points per point of skill",dmgAddTooltip(level,123),diceMaxTooltip(level,123))
+			Game.SpellsTxt[123].Master=string.format("Damage %s points plus 1-%s points per point of skill",math.round(dmgAddTooltip(level,123)/10*11),math.round(diceMaxTooltip(level,123)/10*11))
+			Game.SpellsTxt[123].GM=string.format("Damage %s points plus 1-%s points per point of skill",math.round(dmgAddTooltip(level,123)/10*12),math.round(diceMaxTooltip(level,123)/10*12))
 		end
 	end
 end
