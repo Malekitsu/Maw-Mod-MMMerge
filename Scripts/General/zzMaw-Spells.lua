@@ -140,6 +140,7 @@ function events.CalcSpellDamage(t)
 		spellTier=11
 	end
 	--take damage info
+	if spellPowers[t.Spell]==nil then return end
 	diceMin=spellPowers[t.Spell].diceMin
 	diceMax=spellPowers[t.Spell].diceMax
 	damageAdd=spellPowers[t.Spell].dmgAdd
