@@ -896,7 +896,7 @@ local function navigateMissile(object)
 		return
 	end
 	--ignore if real time mode
-	if RealTimeHoming then
+	if RealTimeHoming==false then
 		if Game.TurnBasedPhase==0 then
 			return
 		end
