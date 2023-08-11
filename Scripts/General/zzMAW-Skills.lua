@@ -1158,3 +1158,65 @@ function events.GameInitialized2()
 	end
 	
 end
+
+--get distance function
+function getDistance(x,y,z)
+	distance=((Party.X-x)^2+(Party.Y-y)^2+(Party.Z-z)^2)^0.5
+	return distance
+end
+--charge skill (usable only in single player)
+
+
+function events.KeyDown(t)
+	if Party.High~=0 then return end --only in single player
+	if t.Key == const.Keys.E then
+		if vars.chargeCooldown==0 then
+			if Mouse:GetTarget().Kind==3 then
+				local index=Mouse:GetTarget().Index
+				chargeX=Map.Monsters[index].X
+				chargeY=Map.Monsters[index].Y
+				chargeZ=Map.Monsters[index].Z
+				dist=getDistance(chargeX,chargeY,chargeZ)
+				if dist<3000 and dist>500 then
+					charge=true
+					ticks=20
+					--get distance to cover
+					distanceX=Party.X-chargeX
+					distanceY=Party.Y-chargeY
+					distanceZ=Party.Z-chargeZ
+					vars.chargeCooldown=25
+					Game.ShowStatusText(string.format("%s casts Charge stunning the unfortunate enemy",Party[0].Name))
+				else
+					Game.ShowStatusText("Out of range")
+				end
+			end
+		else
+			Game.ShowStatusText(string.format("Charge has %s seconds of cooldown",vars.chargeCooldown))
+		end
+	end
+end
+
+--
+function events.LoadMap(wasInGame)
+	vars.chargeCooldown=vars.chargeCooldown or 25
+	charge=false
+	local function chargeTimer() 
+		if vars.chargeCooldown>0 then
+			vars.chargeCooldown=vars.chargeCooldown-1
+		end
+	end
+	Timer(chargeTimer, const.Minute/2) 
+end
+
+--movement
+function events.Tick()
+	if charge~=true then return end --return if charge event is off
+	--get closer to Monster
+	Party.X=Party.X-distanceX/22
+	Party.Y=Party.Y-distanceY/22
+	Party.Z=Party.Z-distanceZ/22
+	ticks=ticks-1
+	if ticks==0 then
+		charge=false
+	end
+end
