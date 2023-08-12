@@ -1170,28 +1170,41 @@ end
 function events.KeyDown(t)
 	if Party.High~=0 then return end --only in single player
 	if t.Key == const.Keys.E then
-		if vars.chargeCooldown==0 then
-			if Mouse:GetTarget().Kind==3 then
-				local index=Mouse:GetTarget().Index
-				chargeX=Map.Monsters[index].X
-				chargeY=Map.Monsters[index].Y
-				chargeZ=Map.Monsters[index].Z
-				dist=getDistance(chargeX,chargeY,chargeZ)
-				if dist<3000 and dist>500 then
-					charge=true
-					ticks=20
-					--get distance to cover
-					distanceX=Party.X-chargeX
-					distanceY=Party.Y-chargeY
-					distanceZ=Party.Z-chargeZ
-					vars.chargeCooldown=25
-					Game.ShowStatusText(string.format("%s casts Charge stunning the unfortunate enemy",Party[0].Name))
-				else
-					Game.ShowStatusText("Out of range")
+		local class=Party[0].Class
+		if class>=16 and class<=19 then
+			if vars.chargeCooldown==0 then
+				if Mouse:GetTarget().Kind==3 then
+					index=Mouse:GetTarget().Index
+					local mon=Map.Monsters[index]
+					local chargeX=mon.X
+					local chargeY=mon.Y
+					local chargeZ=mon.Z
+					local dist=getDistance(chargeX,chargeY,chargeZ)
+					if dist<3000 and dist>500 then
+						charge=true
+						ticks=20
+						--get distance to cover
+						distanceX=Party.X-chargeX
+						distanceY=Party.Y-chargeY
+						distanceZ=Party.Z-chargeZ
+						vars.chargeCooldown=25
+						Game.ShowStatusText(string.format("%s casts Charge stunning the enemy",Party[0].Name))
+						mon.SpellBuffs[6].Skill=4
+						if class==16 then
+							mon.SpellBuffs[6].ExpireTime=Game.Time+const.Minute*1.5
+						elseif class==17 then
+							mon.SpellBuffs[6].ExpireTime=Game.Time+const.Minute*2
+						else
+							mon.SpellBuffs[6].ExpireTime=Game.Time+const.Minute*2.5
+						end
+						mon.Active = false
+					else
+						Game.ShowStatusText("Out of range")
+					end
 				end
+			else
+				Game.ShowStatusText(string.format("Charge has %s seconds of cooldown",vars.chargeCooldown))
 			end
-		else
-			Game.ShowStatusText(string.format("Charge has %s seconds of cooldown",vars.chargeCooldown))
 		end
 	end
 end
