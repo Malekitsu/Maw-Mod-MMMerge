@@ -992,6 +992,24 @@ function events.CalcDamageToMonster(t)
 	end
 end
 
+----------------------
+--ARMSMASTER CODE, so far it's 2 damage at master and 4 at GM
+----------------------
+function events.CalcStatBonusBySkills(t)
+	if t.Stat == const.Stats.MeleeDamageBase then  -- t.Result ~= 0 is for speedup
+		local s, m = SplitSkill(t.Player.Skills[const.Skills.Armsmaster])
+		if m == 3 then
+			t.Result=t.Result+s
+		elseif m ==4 then
+			t.Result=t.Result+s*2
+		end
+	end
+end
+
+
+------------------------
+--AUTO GENERATING TOOLTIPS
+------------------------
 function events.GameInitialized2()
 	for i=0,7 do
 		attack=false
@@ -1237,3 +1255,4 @@ function events.Tick()
 		charge=false
 	end
 end
+
