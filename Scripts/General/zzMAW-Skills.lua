@@ -1186,8 +1186,9 @@ function getDistance(x,y,z)
 	distance=((Party.X-x)^2+(Party.Y-y)^2+(Party.Z-z)^2)^0.5
 	return distance
 end
+-------------------------------------------------
 --charge skill (usable only in single player)
-
+-------------------------------------------------
 function events.KeyDown(t)
 	if Party.High~=0 then return end --only in single player
 	if t.Key == const.Keys.E then
@@ -1256,3 +1257,81 @@ function events.Tick()
 	end
 end
 
+--------------------------------------
+--HEALTH potion drink hotkey only in SOLO
+--------------------------------------
+function events.KeyDown(t)
+	if Party.High~=0 then return end --only in single player
+	if t.Key == const.Keys.G then
+		if vars.healthPotionCooldown==0 then
+			local heal=false
+			local bonus=0
+			for i=1, Party[0].Items.High do
+				if Party[0].Items[i].Number==222 and Party[0].Items[i].Bonus>=bonus then
+					heal=true
+					index=i
+					bonus=Party[0].Items[i].Bonus
+				end
+			end
+			if heal then
+				Party[0].Items[index].Number=0
+				evt.Add("HP",20+bonus*2)
+				vars.healthPotionCooldown=15
+				Game.ShowStatusText(string.format("Health Potion heals for %s hit points",20+bonus*2))
+			end
+		else
+			Game.ShowStatusText(string.format("Health Potion has %s seconds of cooldown remaining",vars.healthPotionCooldown))
+		end
+	end
+end
+
+function events.LoadMap(wasInGame)
+	vars.healthPotionCooldown=vars.healthPotionCooldown or 15
+	charge=false
+	local function chargeTimer() 
+		if vars.healthPotionCooldown>0 then
+			vars.healthPotionCooldown=vars.healthPotionCooldown-1
+		end
+	end
+	Timer(chargeTimer, const.Minute/2) 
+end
+
+
+--------------------------------------
+--MANA potion drink hotkey only in SOLO
+--------------------------------------
+function events.KeyDown(t)
+	if Party.High~=0 then return end --only in single player
+	if t.Key == const.Keys.V then
+		if vars.manaPotionCooldown==0 then
+			local heal=false
+			local bonus=0
+			for i=1, Party[0].Items.High do
+				if Party[0].Items[i].Number==223 and Party[0].Items[i].Bonus>=bonus then
+					heal=true
+					index=i
+					bonus=Party[0].Items[i].Bonus
+				end
+			end
+			if heal then
+				Party[0].Items[index].Number=0
+				evt.Add("SP",20+bonus*2)
+				vars.manaPotionCooldown=15
+				Game.ShowStatusText(string.format("Mana Potion restores %s mana",20+bonus*2))
+			end
+		else
+			Game.ShowStatusText(string.format("Mana Potion has %s seconds of cooldown remaining",vars.manaPotionCooldown))
+		end
+	end
+end
+
+function events.LoadMap(wasInGame)
+	vars.manaPotionCooldown=vars.manaPotionCooldown or 15
+	charge=false
+	local function chargeTimer() 
+		if vars.manaPotionCooldown>0 then
+			vars.manaPotionCooldown=vars.manaPotionCooldown-1
+		end
+	end
+	Timer(chargeTimer, const.Minute/2) 
+end
