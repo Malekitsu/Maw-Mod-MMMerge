@@ -84,12 +84,12 @@ oldWeaponSkillDamageBonuses =
 newWeaponSkillDamageBonuses =
 {
 	[const.Skills.Staff]	= {0, 0, 1, 1,},
-	[const.Skills.Sword]	= {0, 0, 1, 1,},
-	[const.Skills.Dagger]	= {0, 0, 0, 0,},
+	[const.Skills.Sword]	= {0, 1, 2, 2,},
+	[const.Skills.Dagger]	= {0, 0, 1, 1,},
 	[const.Skills.Axe]		= {1, 2, 3, 4,},
-	[const.Skills.Spear]	= {0, 1, 2, 2,},
+	[const.Skills.Spear]	= {0, 1, 2, 3,},
 	[const.Skills.Bow]		= {1, 2, 3, 3,},
-	[const.Skills.Mace]		= {0, 1, 2, 2,},
+	[const.Skills.Mace]		= {1, 2, 3, 4,},
 	[const.Skills.Blaster]	= {0, 0, 0, 0,},
 }
 -- weapon skill AC bonuses (by rank)
