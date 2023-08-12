@@ -1191,7 +1191,7 @@ end
 -------------------------------------------------
 function events.KeyDown(t)
 	if Party.High~=0 then return end --only in single player
-	if t.Key == const.Keys.E then
+	if t.Key == chargeKey then
 		local class=Party[0].Class
 		if class>=16 and class<=19 then
 			if vars.chargeCooldown==0 then
@@ -1262,7 +1262,7 @@ end
 --------------------------------------
 function events.KeyDown(t)
 	if Party.High~=0 then return end --only in single player
-	if t.Key == const.Keys.G then
+	if t.Key == healthPotionKey then
 		if vars.healthPotionCooldown==0 then
 			local heal=false
 			local bonus=0
@@ -1302,7 +1302,7 @@ end
 --------------------------------------
 function events.KeyDown(t)
 	if Party.High~=0 then return end --only in single player
-	if t.Key == const.Keys.V then
+	if t.Key == manaPotionKey then
 		if vars.manaPotionCooldown==0 then
 			local heal=false
 			local bonus=0
