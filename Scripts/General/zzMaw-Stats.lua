@@ -135,13 +135,16 @@ function events.BuildStatInformationBox(t)
 	t.Text=string.format("%s\n\nHP bonus from Endurance: %s\n\nHP bonus from Body building: %s\n\nHP bonus from items: %s\n\nBase HP: %s",t.Text,StrColor(0,255,0,enduranceTotalBonus), StrColor(0,255,0,BBHP),StrColor(0,255,0,math.round(fullHP-enduranceTotalBonus-BBHP-BASEHP)),StrColor(0,255,0,BASEHP))
 	end
 	if t.Stat==8 then
-	i=Game.CurrentPlayer
-	fullSP=Party[i]:GetFullSP()
-	skill=Party[i].Skills[const.Skills.Meditation]
-	s,m=SplitSkill(skill)
-	medRegen=math.floor(s/10)+m
-	SPregenItem=0
-	bonusregen=0
+	local i=Game.CurrentPlayer
+	local fullSP=Party[i]:GetFullSP()
+	local skill=Party[i].Skills[const.Skills.Meditation]
+	local s,m=SplitSkill(skill)
+	if m==4 then
+		m=5
+	end
+	local medRegen = math.round(fullSP^0.5*s^0.7*((m+5)/50))
+	local SPregenItem=0
+	local bonusregen=0
 	for it in Party[i]:EnumActiveItems() do
 		if it.Bonus2 == 38 or it.Bonus2==47 or it.Bonus2==55 then		
 			SPregenItem=SPregenItem+1
@@ -150,7 +153,6 @@ function events.BuildStatInformationBox(t)
 	end
 	SPregenItem=SPregenItem+bonusregen
 	regen=math.ceil(fullSP*SPregenItem*0.005)+medRegen
-	personality=Party[i]:GetPersonality()
 	t.Text=string.format("%s\n\nSpell point regen per 10 seconds: %s",t.Text,StrColor(40,100,255,regen))
 	end
 	if t.Stat==9 then
