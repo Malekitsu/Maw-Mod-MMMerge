@@ -652,7 +652,7 @@
 				if RegM==4 then
 					RegM=5
 				end
-				local Add = FSP^0.5*RegS^0.5*((RegM+5)/50)
+				local Add = FSP^0.5*RegS^0.7*((RegM+5)/50)
 				Player.SP = math.min(FSP, Player.SP + Add)
 			end
 		end
