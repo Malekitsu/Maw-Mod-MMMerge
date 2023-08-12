@@ -1159,13 +1159,16 @@ function events.GameInitialized2()
 	
 end
 
+---------------------------------------
+-- MMMERGE ONLINE SOLO PLAYER SKILLS --
+---------------------------------------
+
 --get distance function
 function getDistance(x,y,z)
 	distance=((Party.X-x)^2+(Party.Y-y)^2+(Party.Z-z)^2)^0.5
 	return distance
 end
 --charge skill (usable only in single player)
-
 
 function events.KeyDown(t)
 	if Party.High~=0 then return end --only in single player
@@ -1188,6 +1191,7 @@ function events.KeyDown(t)
 						distanceY=Party.Y-chargeY
 						distanceZ=Party.Z-chargeZ
 						vars.chargeCooldown=25
+						evt.FaceExpression{Player = "All", Frame = 46}
 						Game.ShowStatusText(string.format("%s casts Charge stunning the enemy",Party[0].Name))
 						mon.SpellBuffs[6].Skill=4
 						if class==16 then
