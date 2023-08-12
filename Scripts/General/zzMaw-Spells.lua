@@ -352,10 +352,10 @@ function events.Tick()
 			--change tooltips according to ascended damage
 			Game.SpellsTxt[2].Description=string.format("Launches a burst of fire at a single target.  Damage is 1-%s points of damage per point of skill in Fire Magic.   Firebolt is safe, effective and has a low casting cost.",diceMaxTooltip(level,2))
 			Game.SpellsTxt[6].Description=string.format("Fires a ball of fire at a single target. When it hits, the ball explodes damaging all those nearby, including your characters if they're too close.  Fireball does 1-%s points of damage per point of skill in Fire Magic.",diceMaxTooltip(level,6))
-			--need to fix fire spikes, not sure how
+			--fire spikes fix
 			Game.SpellsTxt[7].Expert=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",diceMaxTooltip(level,7))
-			--Game.SpellsTxt[i].Master
-			--Game.SpellsTxt[i].GM
+			Game.SpellsTxt[7].Master=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",math.round(diceMaxTooltip(level,7)/6*8))
+			Game.SpellsTxt[7].GM=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",math.round(diceMaxTooltip(level,7)/6*10))
 			----------------------------------------
 			
 			Game.SpellsTxt[8].Description=string.format("Surrounds your characters with a very hot fire that is only harmful to others.  The spell will deliver 1-%s points of damage per point of skill to all nearby monsters for as long as they remain in the area of effect.",diceMaxTooltip(level,8))
