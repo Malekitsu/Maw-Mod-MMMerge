@@ -150,7 +150,7 @@ twoHandedWeaponDamageBonusByMastery = {
 	[const.Novice] = 1, 
 	[const.Expert] = 2, 
 	[const.Master] = 3, 
-	[const.GM] = 4 }
+	[const.GM] = 3 }
 
 classMeleeWeaponSkillDamageBonus ={}
 classRangedWeaponSkillAttackBonusMultiplier ={}
