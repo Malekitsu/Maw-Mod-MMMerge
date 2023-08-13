@@ -386,11 +386,9 @@ end
 
 function events.BeforeGotGold(t)	
 	if Game.CurrentScreen == 0 or Game.CurrentScreen == 20 then
-		if t.ObjectId==4 then
-			t.ObjectId=5
+		if t.ObjectId>Map.Objects.High then
+			t.ObjectId=Map.Objects.High+1
 		end
-		--for debug purpose
-		object=t.ObjectId
 		local Object = Map.Objects[t.ObjectId]
 		local Item = Object.Item
 		local Gold, Owner = Item.Bonus2, bit.And(Object.Owner, 7)
