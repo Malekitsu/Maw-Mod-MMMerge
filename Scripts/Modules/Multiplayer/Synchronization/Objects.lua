@@ -389,9 +389,11 @@ function events.BeforeGotGold(t)
 		if t.ObjectId==4 then
 			t.ObjectId=5
 		end
-		Object = Map.Objects[t.ObjectId]
-		Item = Object.Item
-		Gold, Owner = Item.Bonus2, bit.And(Object.Owner, 7)
+		--for debug purpose
+		object=t.ObjectId
+		local Object = Map.Objects[t.ObjectId]
+		local Item = Object.Item
+		local Gold, Owner = Item.Bonus2, bit.And(Object.Owner, 7)
 		if (Owner == REMOTE_PLAYER_REF or Owner == 4) and Item.Number >= 187 and Item.Number <= 189 then
 			t.Amount = Gold
 			NPCFollowers.LastGoldTaken = 0
