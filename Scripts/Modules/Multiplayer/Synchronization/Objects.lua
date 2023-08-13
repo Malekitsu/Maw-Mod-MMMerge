@@ -387,7 +387,7 @@ end
 function events.BeforeGotGold(t)	
 	if Game.CurrentScreen == 0 or Game.CurrentScreen == 20 then
 		if t.ObjectId>Map.Objects.High then
-			t.ObjectId=Map.Objects.High+1
+			t.ObjectId=Map.Objects.High
 		end
 		local Object = Map.Objects[t.ObjectId]
 		local Item = Object.Item
