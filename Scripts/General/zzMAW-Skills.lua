@@ -1214,13 +1214,20 @@ function events.KeyDown(t)
 						Game.ShowStatusText(string.format("%s casts Charge stunning the enemy",Party[0].Name))
 						mon.SpellBuffs[6].Skill=4
 						if class==16 then
-							mon.SpellBuffs[6].ExpireTime=Game.Time+const.Minute*1.5
+							duration=const.Minute*1.5
+							mon.SpellBuffs[6].ExpireTime=Game.Time+duration
 						elseif class==17 then
-							mon.SpellBuffs[6].ExpireTime=Game.Time+const.Minute*2
+							duration=const.Minute*2
+							mon.SpellBuffs[6].ExpireTime=Game.Time+duration
 						else
-							mon.SpellBuffs[6].ExpireTime=Game.Time+const.Minute*2.5
+							duration=const.Minute*2.5
+							mon.SpellBuffs[6].ExpireTime=Game.Time+duration
 						end
+						local vel=mon.Velocity
+						mon.Velocity=0
 						mon.Active = false
+						Sleep(duration)
+						mon.Velocity=vel
 					else
 						Game.ShowStatusText("Out of range")
 					end
