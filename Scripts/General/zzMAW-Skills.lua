@@ -1047,8 +1047,8 @@ function events.GameInitialized2()
 			baseString=string.format("%s Speed|",baseString)
 		end
 		if damage then
-			normal=string.format("%s         %s|",normal,newWeaponSkillDamageBonuses[i][1])
-			baseString=string.format("%s Damage|",baseString)
+			normal=string.format("%s     %s|",normal,newWeaponSkillDamageBonuses[i][1])
+			baseString=string.format("%s Dmg|",baseString)
 		end
 		if ac then
 			normal=string.format("%s  %s|",normal,newWeaponSkillACBonuses[i][1])
@@ -1069,7 +1069,7 @@ function events.GameInitialized2()
 			expert=string.format("%s      %s|",expert,newWeaponSkillRecoveryBonuses[i][2])
 		end
 		if damage then
-			expert=string.format("%s         %s|",expert,newWeaponSkillDamageBonuses[i][2])
+			expert=string.format("%s     %s|",expert,newWeaponSkillDamageBonuses[i][2])
 		end
 		if ac then
 			expert=string.format("%s  %s|",expert,newWeaponSkillACBonuses[i][2])
@@ -1087,7 +1087,7 @@ function events.GameInitialized2()
 			master=string.format("%s      %s|",master,newWeaponSkillRecoveryBonuses[i][3])
 		end
 		if damage then
-			master=string.format("%s         %s|",master,newWeaponSkillDamageBonuses[i][3])
+			master=string.format("%s     %s|",master,newWeaponSkillDamageBonuses[i][3])
 		end
 		if ac then
 			master=string.format("%s  %s|",master,newWeaponSkillACBonuses[i][3])
@@ -1105,7 +1105,7 @@ function events.GameInitialized2()
 			gm=string.format("%s      %s|",gm,newWeaponSkillRecoveryBonuses[i][4])
 		end
 		if damage then
-			gm=string.format("%s         %s|",gm,newWeaponSkillDamageBonuses[i][4])
+			gm=string.format("%s     %s|",gm,newWeaponSkillDamageBonuses[i][4])
 		end
 		if ac then
 			gm=string.format("%s  %s|",gm,newWeaponSkillACBonuses[i][4])
@@ -1175,6 +1175,23 @@ function events.GameInitialized2()
 		Game.SkillDescriptions[i]=string.format("%s",baseString)
 	end
 	
+	--adjust tooltips with special effects
+	Game.SkillDesGM[const.Skills.Axe]=string.format("%s 1%% to halve AC",Game.SkillDesGM[const.Skills.Axe])
+	Game.SkillDesMaster[const.Skills.Bow]=string.format("%s 2 arrows",Game.SkillDesMaster[const.Skills.Bow])
+	Game.SkillDesExpert[const.Skills.Dagger]=string.format("%s can dual wield",Game.SkillDesExpert[const.Skills.Dagger])
+	Game.SkillDesMaster[const.Skills.Mace]=string.format("%s 1%% to stun",Game.SkillDesMaster[const.Skills.Mace])
+	Game.SkillDesGM[const.Skills.Mace]=string.format("%s 1%% to paralyze",Game.SkillDesGM[const.Skills.Mace])
+	Game.SkillDesMaster[const.Skills.Spear]=string.format("%s can hold with 1 hand",Game.SkillDesMaster[const.Skills.Spear])
+	Game.SkillDesMaster[const.Skills.Staff]=string.format("%s 1%% to stun",Game.SkillDesMaster[const.Skills.Staff])
+	Game.SkillDesGM[const.Skills.Staff]=string.format("%s usable with Unarm.",Game.SkillDesGM[const.Skills.Staff])
+	Game.SkillDesMaster[const.Skills.Sword]=string.format("%s can dual wield",Game.SkillDesMaster[const.Skills.Sword])
+	Game.SkillDesExpert[const.Skills.Leather]=string.format("%s recovery penalty eliminated",Game.SkillDesExpert[const.Skills.Leather])
+	Game.SkillDesExpert[const.Skills.Chain]=string.format("%s recovery penalty halved",Game.SkillDesExpert[const.Skills.Chain])
+	Game.SkillDesMaster[const.Skills.Chain]=string.format("%s recovery penalty eliminated",Game.SkillDesMaster[const.Skills.Chain])
+	Game.SkillDesExpert[const.Skills.Plate]=string.format("%s recovery penalty halved",Game.SkillDesExpert[const.Skills.Plate])
+	Game.SkillDesGM[const.Skills.Plate]=string.format("%s recovery penalty eliminated",Game.SkillDesGM[const.Skills.Plate])
+	Game.SkillDesExpert[const.Skills.Shield]=string.format("%s recovery penalty eliminated",Game.SkillDesExpert[const.Skills.Shield])
+	Game.SkillDesMaster[const.Skills.Armsmaster]=string.format("Skills adds 2 damage to all melee weapons")
 end
 
 ---------------------------------------
@@ -1342,3 +1359,6 @@ function events.LoadMap(wasInGame)
 	end
 	Timer(chargeTimer, const.Minute/2) 
 end
+
+
+
