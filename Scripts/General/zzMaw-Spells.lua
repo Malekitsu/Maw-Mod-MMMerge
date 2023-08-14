@@ -38,8 +38,10 @@ function events.GameInitialized2()
 	Game.SpellsTxt[85].GM="All spells cast at three times skill"
 end
 
+------------------------------
+------MANA COST CHANGE--------
+------------------------------
 
---MANA COST CHANGE 
 --spell cost increase dictionary
 function events.GameInitialized2()
 	spellCostNormal={}
@@ -95,7 +97,7 @@ function events.GameInitialized2()
 			[98] = {dmgAdd = 50, diceMin = 1, diceMax = 1, },--armageddon
 			[99] = {dmgAdd = 25, diceMin = 1, diceMax = 8, },--souldrinker
 			[103] = {dmgAdd = 17, diceMin = 1, diceMax = 17, },--darkfire bolt
-			[111] = {dmgAdd = 3, diceMin = 1, diceMax = 3, },--lifedrain scales with mastery, fixed in calcspelldamage
+			[111] = {dmgAdd = 15, diceMin = 1, diceMax = 3, },--lifedrain scales with mastery, fixed in calcspelldamage
 			[123] = {dmgAdd = 10, diceMin = 1, diceMax = 10, },--flame blast scales with mastery, fixed in calcspelldamage
 		}
 
@@ -146,13 +148,13 @@ function events.GameInitialized2()
 			end
 			--exception for racial spells
 			if i==103 then 
-				manaCost=100
+				manaCost=200
 			end
 			if i==111 then 
-				manaCost=30
+				manaCost=60
 			end
 			if i==123 then 
-				manaCost=60
+				manaCost=120
 			end
 			local theoreticalDamage160=manaCost^0.7
 			--scale new values according to original differences
@@ -420,15 +422,15 @@ function events.Tick()
 					local check2=180
 					local check=100
 					if level>=check2 then
-						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost2[5]
-						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost2[5]
-						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost2[5]
-						Game.Spells[num]["SpellPointsGM"] = ascendanceCost2[5]
+						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost2[4]
+						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost2[4]
+						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost2[4]
+						Game.Spells[num]["SpellPointsGM"] = ascendanceCost2[4]
 					elseif level>=check then
-						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[5]
-						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[5]
-						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[5]
-						Game.Spells[num]["SpellPointsGM"] = ascendanceCost[5]
+						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[4]
+						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[4]
+						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[4]
+						Game.Spells[num]["SpellPointsGM"] = ascendanceCost[4]
 					else
 						Game.Spells[num]["SpellPointsNormal"]=spellCostNormal[num]
 						Game.Spells[num]["SpellPointsExpert"]=spellCostExpert[num]
@@ -511,3 +513,6 @@ function events.Tick()
 		end
 	end
 end
+---------------------------
+----END OF SPELL REWORK----
+---------------------------
