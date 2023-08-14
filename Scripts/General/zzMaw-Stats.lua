@@ -413,3 +413,9 @@ function events.Tick()
 		Game.GlobalTxt[138]="Magic"
 	end
 end
+
+function events.GetStatisticEffect(t)
+	if t.Value >=25 then
+		t.Result=math.floor(t.Value/5)
+	end
+end
