@@ -1199,17 +1199,19 @@ end
 
 function events.CalcDamageToPlayer(t)
 	if t.DamageKind==const.Damage.Phys then
-		local n=Party[0]:GetActiveItem(3).Number
-		if Game.ItemsTxt[n].Skill==const.Skills.Plate then
-			s,m=SplitSkill(t.Player.Skills[const.Skills.Plate])
-			if m>=3 then
-				t.Result=t.Result*2
+		if Party[0]:GetActiveItem(3) then
+			local n=Party[0]:GetActiveItem(3).Number
+			if Game.ItemsTxt[n].Skill==const.Skills.Plate then
+				s,m=SplitSkill(t.Player.Skills[const.Skills.Plate])
+				if m>=3 then
+					t.Result=t.Result*2
+				end
+			elseif Game.ItemsTxt[n].Skill==const.Skills.Chain then
+				s,m=SplitSkill(t.Player.Skills[const.Skills.Chain])
+				if m>=4 then
+					t.Result=t.Result/0.65
+				end		
 			end
-		elseif Game.ItemsTxt[n].Skill==const.Skills.Chain then
-			s,m=SplitSkill(t.Player.Skills[const.Skills.Chain])
-			if m>=4 then
-				t.Result=t.Result/0.65
-			end		
 		end
 	end
 end
