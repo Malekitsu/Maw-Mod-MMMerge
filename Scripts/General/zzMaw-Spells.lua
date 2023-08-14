@@ -53,7 +53,7 @@ function events.GameInitialized2()
 		spellCostGM[i] = Game.Spells[i]["SpellPointsGM"]
 	end
 	ascendanceCost={10,15,20,30,40,50,60,70,80,90,100,[0]=100}
-	ascendanceCost={20,30,40,60,80,100,120,140,160,180,200,[0]=200}
+	ascendanceCost2={20,30,40,60,80,100,120,140,160,180,200,[0]=200}
 	spells={2,6,7,8,9,10,11,15,18,20,22,24,26,29,32,37,39,41,43,44,52,59,65,70,76,78,79,84,87,90,93,97,98,99,103,111,123}
 	lastIndex=-1 --used later
 
@@ -100,7 +100,8 @@ function events.GameInitialized2()
 		}
 
 	--calculate table for spells from level 100
-	spellPowers100={}
+	spellPowers80={}
+	spellPowers160={}
 	for i =1,132 do
 		if spellPowers[i] then
 			--calculate damage assuming formula is manacost^0.7
@@ -111,7 +112,7 @@ function events.GameInitialized2()
 			else
 				diceMaxProportion=((spellPowers[i].diceMax+1)/2)/theoreticalDamage
 			end
-			--get new mana cost and calculate theoretical Damage
+			--get new mana cost and calculate theoretical Damage for level 80+
 			local manaCost=ascendanceCost[i%11]
 			if i>77 and i<100 then
 				manaCost=manaCost*1.5
@@ -126,15 +127,42 @@ function events.GameInitialized2()
 			if i==123 then 
 				manaCost=60
 			end
-			local theoreticalDamage100=manaCost^0.7
+			local theoreticalDamage80=manaCost^0.7
 			--scale new values according to original differences
-			local dmgAdd100=math.round(theoreticalDamage100*dmgAddProportion)
+			local dmgAdd80=math.round(theoreticalDamage80*dmgAddProportion)
 			if spellPowers[i].diceMax==spellPowers[i].diceMin then
-				diceMax100=math.round(theoreticalDamage100*diceMaxProportion)
+				diceMax80=math.round(theoreticalDamage80*diceMaxProportion)
 			else
-				diceMax100=math.round(theoreticalDamage100*(diceMaxProportion)*2)+1
+				diceMax80=math.round(theoreticalDamage80*(diceMaxProportion)*2)+1
 			end
-			spellPowers100[i]={dmgAdd = dmgAdd100, diceMin = 1, diceMax = diceMax100,}
+			spellPowers80[i]={dmgAdd = dmgAdd80, diceMin = 1, diceMax = diceMax80,}
+			----------
+			--do the same, but for level 160
+			----------
+			--get new mana cost and calculate theoretical Damage for level 80+
+			local manaCost=ascendanceCost2[i%11]
+			if i>77 and i<100 then
+				manaCost=manaCost*1.5
+			end
+			--exception for racial spells
+			if i==103 then 
+				manaCost=100
+			end
+			if i==111 then 
+				manaCost=30
+			end
+			if i==123 then 
+				manaCost=60
+			end
+			local theoreticalDamage160=manaCost^0.7
+			--scale new values according to original differences
+			local dmgAdd160=math.round(theoreticalDamage80*dmgAddProportion)
+			if spellPowers[i].diceMax==spellPowers[i].diceMin then
+				diceMax160=math.round(theoreticalDamage160*diceMaxProportion)
+			else
+				diceMax160=math.round(theoreticalDamage160*(diceMaxProportion)*2)+1
+			end
+			spellPowers160[i]={dmgAdd = dmgAdd160, diceMin = 1, diceMax = diceMax160,}
 		end
 	end
 end
@@ -159,11 +187,15 @@ function events.CalcSpellDamage(t)
 	local data=WhoHitMonster()
 	if data and data.Player then
 	--calculate if level is>treshold to check for lvl 100 spells
-		if data.Player.LevelBase>=spellTier*10+90 then
-			diceMin=spellPowers100[t.Spell].diceMin
-			diceMax=spellPowers100[t.Spell].diceMax
-			damageAdd=spellPowers100[t.Spell].dmgAdd
-		end
+		if data.Player.LevelBase>=spellTier*8+152 then
+			diceMin=spellPowers160[t.Spell].diceMin
+			diceMax=spellPowers160[t.Spell].diceMax
+			damageAdd=spellPowers160[t.Spell].dmgAdd
+		elseif data.Player.LevelBase>=spellTier*8+72 then
+			diceMin=spellPowers80[t.Spell].diceMin
+			diceMax=spellPowers80[t.Spell].diceMax
+			damageAdd=spellPowers80[t.Spell].dmgAdd
+		end	
 	end
 	--calculate
 	if t.Spell>1 and t.Spell<132 then
@@ -197,7 +229,7 @@ function events.CalcSpellDamage(t)
 		if t.Mastery==3 then
 			t.Result=t.Result/10*11
 		elseif t.Mastery==4 then
-			t.Result=t.Result/10*11
+			t.Result=t.Result/10*12
 		end
 	end
 end
@@ -207,8 +239,11 @@ end
 function dmgAddTooltip(level,spellIndex)
 	--exception for racials
 	if spellIndex==104 then 
-		if level>=200 then
-			local dmgAdd=spellPowers100[spellIndex].dmgAdd
+		if level>=240 then
+			local dmgAdd=spellPowers160[spellIndex].dmgAdd
+			return dmgAdd
+		elseif level>=160 then
+			local dmgAdd=spellPowers80[spellIndex].dmgAdd
 			return dmgAdd
 		else 
 			local dmgAdd=spellPowers[spellIndex].dmgAdd
@@ -216,8 +251,11 @@ function dmgAddTooltip(level,spellIndex)
 		end
 	end
 	if spellIndex==111 then 
-		if level>=140 then
-			local dmgAdd=spellPowers100[spellIndex].dmgAdd
+		if level>=180 then
+			local dmgAdd=spellPowers160[spellIndex].dmgAdd
+			return dmgAdd
+		elseif level>=100 then
+			local dmgAdd=spellPowers80[spellIndex].dmgAdd
 			return dmgAdd
 		else 
 			local dmgAdd=spellPowers[spellIndex].dmgAdd
@@ -225,8 +263,11 @@ function dmgAddTooltip(level,spellIndex)
 		end
 	end
 	if spellIndex==123 then 
-		if level>=170 then
-			local dmgAdd=spellPowers100[spellIndex].dmgAdd
+		if level>=200 then
+			local dmgAdd=spellPowers160[spellIndex].dmgAdd
+			return dmgAdd
+		elseif level>=120 then
+			local dmgAdd=spellPowers80[spellIndex].dmgAdd
 			return dmgAdd
 		else 
 			local dmgAdd=spellPowers[spellIndex].dmgAdd
@@ -238,8 +279,11 @@ function dmgAddTooltip(level,spellIndex)
 	if index==0 then
 		index=11
 	end
-	if level>=index*10+90 then
-		local dmgAdd=spellPowers100[spellIndex].dmgAdd
+	if level>=index*8+152 then
+		local dmgAdd=spellPowers160[spellIndex].dmgAdd
+		return dmgAdd
+	elseif level>=index*8+72 then
+		local dmgAdd=spellPowers80[spellIndex].dmgAdd
 		return dmgAdd
 	else 
 		local dmgAdd=spellPowers[spellIndex].dmgAdd
@@ -250,8 +294,11 @@ end
 function diceMaxTooltip(level,spellIndex)
 	--exception for racials
 	if spellIndex==104 then 
-		if level>=200 then
-			local diceMax=spellPowers100[spellIndex].diceMax
+		if level>=240 then
+			local diceMax=spellPowers160[spellIndex].diceMax
+			return diceMax
+		elseif level>=160 then
+			local diceMax=spellPowers80[spellIndex].diceMax
 			return diceMax
 		else 
 			local diceMax=spellPowers[spellIndex].diceMax
@@ -259,8 +306,11 @@ function diceMaxTooltip(level,spellIndex)
 		end
 	end
 	if spellIndex==111 then 
-		if level>=140 then
-			local diceMax=spellPowers100[spellIndex].diceMax
+		if level>=180 then
+			local diceMax=spellPowers160[spellIndex].diceMax
+			return diceMax
+		elseif level>=100 then
+			local diceMax=spellPowers80[spellIndex].diceMax
 			return diceMax
 		else 
 			local diceMax=spellPowers[spellIndex].diceMax
@@ -268,8 +318,11 @@ function diceMaxTooltip(level,spellIndex)
 		end
 	end
 	if spellIndex==123 then 
-		if level>=170 then
-			local diceMax=spellPowers100[spellIndex].diceMax
+		if level>=200 then
+			local diceMax=spellPowers160[spellIndex].diceMax
+			return diceMax
+		elseif level>=120 then
+			local diceMax=spellPowers80[spellIndex].diceMax
 			return diceMax
 		else 
 			local diceMax=spellPowers[spellIndex].diceMax
@@ -281,8 +334,11 @@ function diceMaxTooltip(level,spellIndex)
 	if index==0 then
 		index=11
 	end
-	if level>=index*10+90 then
-		local diceMax=spellPowers100[spellIndex].diceMax
+	if level>=index*8+152 then
+		local diceMax=spellPowers160[spellIndex].diceMax
+		return diceMax
+	elseif level>=index*8+72 then
+		local diceMax=spellPowers80[spellIndex].diceMax
 		return diceMax
 	else 
 		local diceMax=spellPowers[spellIndex].diceMax
@@ -305,21 +361,50 @@ function events.Tick()
 				else
 					num2=num%11
 				end
-				check2=(num2+9)*10
-				if level>=check2 then
-					Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[num2]
-					Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[num2]
-					Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[num2]
-					Game.Spells[num]["SpellPointsGM"] = ascendanceCost[num2]
-				else
-					Game.Spells[num]["SpellPointsNormal"]=spellCostNormal[num]
-					Game.Spells[num]["SpellPointsExpert"]=spellCostExpert[num]
-					Game.Spells[num]["SpellPointsMaster"]=spellCostMaster[num] 
-					Game.Spells[num]["SpellPointsGM"]=spellCostGM[num]	
-				end	
-				--cost exception for racials
-				if num==103 and level>=200 then
+				if num<100 then
+					local check2=(num2)*8+152
+					local check=(num2)*8+72
 					if level>=check2 then
+						if num>77 then --increase light and dark cost
+							Game.Spells[num]["SpellPointsNormal"] = ascendanceCost2[num2]*1.5
+							Game.Spells[num]["SpellPointsExpert"] = ascendanceCost2[num2]*1.5
+							Game.Spells[num]["SpellPointsMaster"] = ascendanceCost2[num2]*1.5
+							Game.Spells[num]["SpellPointsGM"] = ascendanceCost2[num2]*1.5
+						else
+							Game.Spells[num]["SpellPointsNormal"] = ascendanceCost2[num2]
+							Game.Spells[num]["SpellPointsExpert"] = ascendanceCost2[num2]
+							Game.Spells[num]["SpellPointsMaster"] = ascendanceCost2[num2]
+							Game.Spells[num]["SpellPointsGM"] = ascendanceCost2[num2]
+						end
+					elseif level>=check then
+						if num>77 then --increase light and dark cost
+							Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[num2]*1.5
+							Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[num2]*1.5
+							Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[num2]*1.5
+							Game.Spells[num]["SpellPointsGM"] = ascendanceCost[num2]*1.5
+						else
+							Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[num2]
+							Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[num2]
+							Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[num2]
+							Game.Spells[num]["SpellPointsGM"] = ascendanceCost[num2]
+						end
+					else
+						Game.Spells[num]["SpellPointsNormal"]=spellCostNormal[num]
+						Game.Spells[num]["SpellPointsExpert"]=spellCostExpert[num]
+						Game.Spells[num]["SpellPointsMaster"]=spellCostMaster[num] 
+						Game.Spells[num]["SpellPointsGM"]=spellCostGM[num]	
+					end	
+				end				
+				--cost exception for racials
+				if num==103 then
+					local check2=240
+					local check=160
+					if level>=check2 then
+						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost2[11]
+						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost2[11]
+						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost2[11]
+						Game.Spells[num]["SpellPointsGM"] = ascendanceCost2[11]
+					elseif level>=check then
 						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[11]
 						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[11]
 						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[11]
@@ -331,8 +416,15 @@ function events.Tick()
 						Game.Spells[num]["SpellPointsGM"]=spellCostGM[num]	
 					end	
 				end	
-				if num==111 and level>=140 then
+				if num==111 then
+					local check2=180
+					local check=100
 					if level>=check2 then
+						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost2[5]
+						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost2[5]
+						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost2[5]
+						Game.Spells[num]["SpellPointsGM"] = ascendanceCost2[5]
+					elseif level>=check then
 						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[5]
 						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[5]
 						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[5]
@@ -343,9 +435,16 @@ function events.Tick()
 						Game.Spells[num]["SpellPointsMaster"]=spellCostMaster[num] 
 						Game.Spells[num]["SpellPointsGM"]=spellCostGM[num]	
 					end	
-				end
-				if num==123 and level>=170 then
+				end	
+				if num==123 then
+					local check2=200
+					local check=120
 					if level>=check2 then
+						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost2[8]
+						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost2[8]
+						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost2[8]
+						Game.Spells[num]["SpellPointsGM"] = ascendanceCost2[8]
+					elseif level>=check then
 						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[8]
 						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[8]
 						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[8]
