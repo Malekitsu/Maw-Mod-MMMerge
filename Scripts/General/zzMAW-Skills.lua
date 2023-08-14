@@ -374,8 +374,13 @@ function events.CalcStatBonusBySkills(t)
 			local newBonus = 0
 			
 			-- add new bonus for ranged weapon
-			
-			t.Result = t.Result + newWeaponSkillDamageBonuses[bow.skill][bow.rank] * bow.level
+			local might=t.Player:GetMight()
+			if might<=21 then
+				mightBonus=(might-1)/2-6
+			else
+				mightBonus=math.floor(might/5)
+			end
+			t.Result = t.Result + newWeaponSkillDamageBonuses[bow.skill][bow.rank] * bow.level+mightBonus
 			
 			-- add class bonus for ranged weapon
 			
