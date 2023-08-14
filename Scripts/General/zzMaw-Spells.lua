@@ -52,7 +52,8 @@ function events.GameInitialized2()
 		spellCostMaster[i] = Game.Spells[i]["SpellPointsMaster"]
 		spellCostGM[i] = Game.Spells[i]["SpellPointsGM"]
 	end
-	ascendanceCost={30,35,40,45,50,60,70,80,100,120,150,[0]=150}
+	ascendanceCost={10,15,20,30,40,50,60,70,80,90,100,[0]=100}
+	ascendanceCost={20,30,40,60,80,100,120,140,160,180,200,[0]=200}
 	spells={2,6,7,8,9,10,11,15,18,20,22,24,26,29,32,37,39,41,43,44,52,59,65,70,76,78,79,84,87,90,93,97,98,99,103,111,123}
 	lastIndex=-1 --used later
 
@@ -68,7 +69,7 @@ function events.GameInitialized2()
 			[11] = {dmgAdd = 15, diceMin = 1, diceMax = 15, },--incinerate
 			[15] = {dmgAdd = 2, diceMin = 1, diceMax = 1, },--sparks
 			[18] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--lightning bolt
-			[20] = {dmgAdd = 10, diceMin = 1, diceMax = 10, },--implosion
+			[20] = {dmgAdd = 12, diceMin = 1, diceMax = 12, },--implosion
 			[22] = {dmgAdd = 20, diceMin = 1, diceMax = 1, },--starburst
 			[24] = {dmgAdd = 2, diceMin = 1, diceMax = 2, },--poison spray
 			[26] = {dmgAdd = 0, diceMin = 1, diceMax = 4, },--ice bolt
@@ -105,23 +106,34 @@ function events.GameInitialized2()
 			--calculate damage assuming formula is manacost^0.7
 			local theoreticalDamage=spellCostNormal[i]^0.7
 			local dmgAddProportion=spellPowers[i].dmgAdd/theoreticalDamage
-			local diceMaxProportion=spellPowers[i].diceMax/theoreticalDamage
+			if spellPowers[i].diceMax==spellPowers[i].diceMin then
+				diceMaxProportion=spellPowers[i].diceMax/theoreticalDamage
+			else
+				diceMaxProportion=((spellPowers[i].diceMax+1)/2)/theoreticalDamage
+			end
 			--get new mana cost and calculate theoretical Damage
 			local manaCost=ascendanceCost[i%11]
+			if i>77 and i<100 then
+				manaCost=manaCost*1.5
+			end
 			--exception for racial spells
 			if i==103 then 
-				manaCost=150
+				manaCost=100
 			end
 			if i==111 then 
-				manaCost=50
+				manaCost=30
 			end
 			if i==123 then 
-				manaCost=80
+				manaCost=60
 			end
 			local theoreticalDamage100=manaCost^0.7
 			--scale new values according to original differences
 			local dmgAdd100=math.round(theoreticalDamage100*dmgAddProportion)
-			local diceMax100=math.round(theoreticalDamage100*diceMaxProportion)
+			if spellPowers[i].diceMax==spellPowers[i].diceMin then
+				diceMax100=math.round(theoreticalDamage100*diceMaxProportion)
+			else
+				diceMax100=math.round(theoreticalDamage100*(diceMaxProportion)*2)+1
+			end
 			spellPowers100[i]={dmgAdd = dmgAdd100, diceMin = 1, diceMax = diceMax100,}
 		end
 	end
