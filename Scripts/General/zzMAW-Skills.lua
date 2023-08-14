@@ -895,12 +895,6 @@ local function navigateMissile(object)
 	then
 		return
 	end
-	--ignore if real time mode
-	if RealTimeHoming==false then
-		if Game.TurnBasedPhase==0 then
-			return
-		end
-	end
 	-- object parameters
 	local ownerKind = bit.band(object.Owner, 7)
 	local targetKind = bit.band(object.Target, 7)
@@ -926,8 +920,10 @@ local function navigateMissile(object)
 		end
 	-- assume all objects not owned by party and without target are targetting party
 	-- this creates issues with cosmetic projectiles like CI Obelisk Arena Paralyze and Gharik/Baa lava fireballs
-	elseif ownerKind ~= const.ObjectRefKind.Party and targetKind == const.ObjectRefKind.Nothing  then
-		targetPosition = {["X"] = Party.X, ["Y"] = Party.Y, ["Z"] = Party.Z + 120, }
+	elseif RealTimeHoming==true then 
+		if ownerKind ~= const.ObjectRefKind.Party and targetKind == const.ObjectRefKind.Nothing  then
+			targetPosition = {["X"] = Party.X, ["Y"] = Party.Y, ["Z"] = Party.Z + 120, }
+		end
 	else
 		-- ignore other missiles targetting
 		return
