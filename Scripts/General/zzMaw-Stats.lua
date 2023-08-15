@@ -260,7 +260,7 @@ damage1=0
 end
 
 
---remove resistance rating
+--double resistance from items rating
 function events.CalcStatBonusByItems(t)
 	for it in t.Player:EnumActiveItems() do
 		if t.Stat == const.Stats.FireResistance and it.Bonus==11 then
@@ -282,6 +282,16 @@ function events.CalcStatBonusByItems(t)
 			t.Result = t.Result+it.BonusStrength
 		end
 	end
+	--add luck to resistances
+	if t.Stat>=10 and t.Stat<=15 then
+		luck=t.Player:GetLuck()
+		if luck<=21 then
+			luck=(luck-1)/2-6
+		else
+			luck=math.floor(luck/5)
+		end
+		t.Result=t.Result+luck
+	end	
 end
 
 
@@ -397,7 +407,7 @@ function events.Tick()
 		end
 		if bodyRes>=75 then
 			bodyRes=StrColor(0,255,0,"Max")
-		end
+		end		
 		Game.GlobalTxt[87]=string.format("Fire %s%s",fireRes,"%")
 		Game.GlobalTxt[6]=string.format("Air %s%s",airRes,"%")
 		Game.GlobalTxt[240]=string.format("Water %s%s",waterRes,"%")
