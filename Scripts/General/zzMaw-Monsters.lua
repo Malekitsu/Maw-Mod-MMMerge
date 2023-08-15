@@ -2,7 +2,7 @@
 --Empower Monsters
 ----------------------------------------------------
 --function to calculate the level you are (float number) give x amount of experience
-local function calcLevel(x)
+function calcLevel(x)
 	local level=((500+(250000+2000*x)^0.5)/1000)
 	return level
 end 
@@ -206,28 +206,36 @@ end
 --MONSTER BOLSTERING
 function events.BeforeNewGameAutosave()
 vars.UNKNOWNEXP=0
-vars.MM6EXPBEFORE=0
-vars.MM7EXPBEFORE=0
-vars.MM8EXPBEFORE=0
+vars.LVLBEFORE=0
 vars.MM6LVL=0
 vars.MM7LVL=0
 vars.MM8LVL=0
 vars.MMMLVL=0
 end
 
+
 function events.LeaveMap()
 	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
-	local exp=Party[0].Experience
+	Exp=Party[0].Experience
 	if currentWorld==1 then
-		vars.MM8LVL=vars.MM8LVL+calcLevel(exp)-calcLevel(vars.MM8EXPBEFORE)
+		currentExp=calcLevel(Exp)
+		vars.MM8LVL=vars.MM8LVL+currentExp-vars.LVLBEFORE
+		vars.LVLBEFORE=currentExp
 	elseif currentWorld==2 then
-		vars.MM7LVL=vars.MM7LVL+calcLevel(exp)-calcLevel(vars.MM7EXPBEFORE)
+		currentExp=calcLevel(Exp)
+		vars.MM7LVL=vars.MM7LVL+currentExp-vars.LVLBEFORE
+		vars.LVLBEFORE=currentExp
 	elseif currentWorld==3 then
-		vars.MM6LVL=vars.MM6LVL+calcLevel(exp)-calcLevel(vars.MM6EXPBEFORE)
+		currentExp=calcLevel(Exp)
+		vars.MM6LVL=vars.MM6LVL+currentExp-vars.LVLBEFORE
+		vars.LVLBEFORE=currentExp
 	elseif currentWorld==4 then
-		vars.MMMLVL=vars.MMMLVL+calcLevel(exp)-calcLevel(vars.MMMEXPBEFORE)
+		currentExp=calcLevel(Exp)
+		vars.MMMLVL=vars.MMMLVL+currentExp-vars.LVLBEFORE
+		vars.LVLBEFORE=currentExp
 	end
 end
+
 
 function events.LoadMap()
 	--calculate party experience
@@ -351,3 +359,50 @@ function events.LoadMap()
 		-------------------------
 	end
 end
+
+-----------------------------
+-----MAP MONSTER CHANGES-----
+-----------------------------
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--[[
+> debug.Message(dump(Game.MapStats[1]))
+——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+Debug Message
+{
+	AlertDays = 0,
+	EaxEnvironments = 15,
+	EncounterChance = 10,
+	EncounterChanceM1 = 0,
+	EncounterChanceM2 = 100,
+	EncounterChanceM3 = 0,
+	FileName = "out01.odm",
+	FirstVisitDay = 0,
+	Lock = 0,
+	Mon1Dif = 1,
+	Mon1Hi = 5,
+	Mon1Low = 2,
+	Mon2Dif = 1,
+	Mon2Hi = 3,
+	Mon2Low = 1,
+	Mon3Dif = 1,
+	Mon3Hi = 3,
+	Mon3Low = 1,
+	Monster1Pic = "Lizardmen Warrior",
+	Monster2Pic = "Wimpy Pirate Warrior Male",
+	Monster3Pic = "Couatl (winged snake)",
+	Name = "Dagger Wound Island",
+	Per = 0,
+	RedbookTrack = 4,
+	RefillDays = 672,
+	ResetCount = 0,
+	StealPerm = 1,
+	Trap = 0,
+	Tres = 0
+}
+for i=1, 60 do
+	local map=Game.MapStats[i]
+	if map.
+	
+
+]]
