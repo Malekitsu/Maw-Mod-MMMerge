@@ -37,29 +37,29 @@ function events.AfterLoadMap()
 			elseif Map.Sprites[i].DecName=="flower01" then
 				Map.Sprites[i].DecName="6Flower01"
 			elseif Map.Sprites[i].DecName=="flower02" then
-				Map.Sprites[i].DecName="6Flower01"
+				Map.Sprites[i].DecName="6Flower02"
 			elseif Map.Sprites[i].DecName=="flower03" then
-				Map.Sprites[i].DecName="6Flower01"
+				Map.Sprites[i].DecName="6Flower03"
 			elseif Map.Sprites[i].DecName=="flower04" then
-				Map.Sprites[i].DecName="6Flower01"
+				Map.Sprites[i].DecName="6Flower04"
 			elseif Map.Sprites[i].DecName=="flower05" then
-				Map.Sprites[i].DecName="6Flower01"
+				Map.Sprites[i].DecName="6Flower05"
 			elseif Map.Sprites[i].DecName=="flower06" then
-				Map.Sprites[i].DecName="6Flower01"
+				Map.Sprites[i].DecName="6Flower06"
 			elseif Map.Sprites[i].DecName=="flower07" then
-				Map.Sprites[i].DecName="6Flower01"
+				Map.Sprites[i].DecName="6Flower07"
 			elseif Map.Sprites[i].DecName=="flower08" then
-				Map.Sprites[i].DecName="6Flower01"
+				Map.Sprites[i].DecName="6Flower08"
 			elseif Map.Sprites[i].DecName=="flower09" then
-				Map.Sprites[i].DecName="6Flower01"
+				Map.Sprites[i].DecName="6Flower09"
 			elseif Map.Sprites[i].DecName=="flower10" then
-				Map.Sprites[i].DecName="6Flower01"
+				Map.Sprites[i].DecName="6Flower10"
 			elseif Map.Sprites[i].DecName=="flower11" then
-				Map.Sprites[i].DecName="6Flower01"
+				Map.Sprites[i].DecName="6Flower11"
 			elseif Map.Sprites[i].DecName=="flower12" then
-				Map.Sprites[i].DecName="6Flower01"
+				Map.Sprites[i].DecName="6Flower12"
 			elseif Map.Sprites[i].DecName=="flower13" then
-				Map.Sprites[i].DecName="6Flower01"
+				Map.Sprites[i].DecName="6Flower13"
 			--CORPSES
 			elseif Map.Sprites[i].DecName=="Corpse" then
 				Map.Sprites[i].DecName="Corpse01"
