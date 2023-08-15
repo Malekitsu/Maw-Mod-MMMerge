@@ -38,9 +38,12 @@ function events.AfterLoadMap()
 		end
 		--calculate average level for unique monsters
 		for i=0, Map.Monsters.High do
-			if  (Map.Monsters[i].FullHitPoints ~= Game.MonstersTxt[Map.Monsters[i].Id].FullHitPoints) and Map.Monsters[i].Level>5 then
-				mon=Map.Monsters[i]
-
+			--VELOCITY/SPEED on hostile monsters only
+			local mon=Map.Monsters[i]
+			if mon.Hostile==true then
+				mon.Velocity = (mon.Velocity + (400 - mon.Velocity) / 2 + 50)
+			end
+			if  (mon.FullHitPoints ~= Game.MonstersTxt[Map.Monsters[i].Id].FullHitPoints) and mon.Level>5 then
 				--level increase 
 				oldLevel=mon.Level
 				mon.Level=math.min(mon.Level+partyLvl,255)
@@ -48,9 +51,9 @@ function events.AfterLoadMap()
 				HPRateo=mon.HP/oldLevel*(oldLevel/10+3)
 				mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2*(1+mon.Level/180))*HPRateo,32500)
 				mon.FullHP=mon.HP
+
 				--damage
 				dmgMult=(mon.Level/20+1.25)*((mon.Level^1.15-1)/1000+1)*((mon.Level^1.25-1)/1000+1)	
-	
 				-----------------------------------------------------------
 				--DAMAGE COMPUTATION DOWN HERE, FOR BALANCE MODIFY ABOVE^
 				--attack 1
@@ -243,12 +246,14 @@ function events.LoadMap()
 	if bolsterLevel>=120 then 
 		bolsterLevel=120+(bolsterLevel-120)/2
 	end
+				 
 	for i=1, 651 do
+		
 		--calculate level scaling
 		mon=Game.MonstersTxt[i]
 		base=basetable[i]		
 		LevelB=BLevel[i]
-
+		
 		--level increase centered on B type
 		mon.Level=math.min(basetable[i].Level+bolsterLevel,255)
 		
