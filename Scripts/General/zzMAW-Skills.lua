@@ -88,7 +88,7 @@ newWeaponSkillDamageBonuses =
 	[const.Skills.Dagger]	= {0, 0, 1, 1,},
 	[const.Skills.Axe]		= {1, 2, 3, 4,},
 	[const.Skills.Spear]	= {0, 1, 2, 3,},
-	[const.Skills.Bow]		= {1, 2, 3, 3,},
+	[const.Skills.Bow]		= {1, 2, 2, 3,},
 	[const.Skills.Mace]		= {1, 2, 3, 4,},
 	[const.Skills.Blaster]	= {0, 0, 0, 0,},
 }
@@ -809,7 +809,7 @@ end
 
 
 
-meleeRecoveryCap=30
+meleeRecoveryCap=0
 
 
 -- corrects attack delay
@@ -973,26 +973,20 @@ function events.Tick()
 	end
 end
 
-
-function events.CalcDamageToMonster(t)
-	local data = WhoHitMonster()	
-	--luck/accuracy bonus
-	if data and data.Player and data.Object and t.DamageKind==4 and data.Object.Spell==133 then
-		skill=data.Player.Skills[const.Skills.Bow]
-		s,m=SplitSkill(skill)
-		bonusDamage=s*newWeaponSkillDamageBonuses[const.Skills.Bow][m]
-		res=t.Monster.PhysResistance
-		if res>0 then
-			roll=0
-			while (math.random() < (1 - 30/(30 + res ))) and (roll <= 4) do
-			bonusDamage = bonusDamage / 2
-			roll = roll + 1
-			end
+--BOW DAMAGE SKILL BONUS
+function events.ModifyItemDamage(t)
+    local s, m = SplitSkill(t.Player.Skills[const.Skills.Bow])
+    if t.Item:T().EquipStat == const.ItemType.Missile - 1 then
+		local dmgBonus=newWeaponSkillDamageBonuses[const.Skills.Bow][m]
+		local might=t.Player:GetMight()
+		if might<=21 then
+			mightBonus=(might-1)/2-6
+		else
+			mightBonus=math.floor(might/5)
 		end
-		t.Result=t.Result+bonusDamage
-	end
+        t.Result = t.Result + mightBonus +s * dmgBonus
+    end
 end
-
 ----------------------
 --ARMSMASTER CODE, so far it's 2 damage at master and 4 at GM
 ----------------------
