@@ -48,7 +48,7 @@ function events.AfterLoadMap()
 				oldLevel=mon.Level
 				mon.Level=math.min(mon.Level+partyLvl,255)
 				--HP calculated based on previous HP rapported to the previous level
-				HPRateo=mon.HP/oldLevel*(oldLevel/10+3)
+				HPRateo=mon.HP/(oldLevel*(oldLevel/10+3))
 				mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2*(1+mon.Level/180))*HPRateo,32500)
 				mon.FullHP=mon.HP
 
