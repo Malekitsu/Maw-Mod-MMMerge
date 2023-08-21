@@ -342,17 +342,6 @@ end)
 -- test handlers, disable once you want to test your own
 
 function events.GetItemName(t)
-    t.Name = t.Name .. "myitem"
+    t.Name = t.Name
 end
 
-function events.BuildItemInformationBox(t)
-    if t.Type then
-        t.Type = t.Type .. randomStr("abc", 12)
-        t.BasicStat = t.BasicStat .. randomStr("190", 25)
-        t.Enchantment = t.Enchantment .. randomStr("tyu", 50)
-    elseif t.Name then
-        t.Name = t.Name .. t.Item.Number
-    elseif t.Description then
-        t.Description = t.Description .. "this is description lol"
-    end
-end
