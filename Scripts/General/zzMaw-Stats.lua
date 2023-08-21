@@ -259,7 +259,7 @@ damage1=0
 		if roll<0.5 then
 			res=res/(1+roll*2)
 		else
-			res=res+(100-res)/(roll*2)
+			res=res+(1-res)/(roll*2)
 		end
 		--apply Damage
 		t.Result = t.Damage * (1-res)
