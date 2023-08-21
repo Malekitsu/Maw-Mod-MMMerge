@@ -254,6 +254,13 @@ damage1=0
 		--put here code to change max res
 		maxres=75
 		res=math.min(res,maxres)/100
+		--randomize resistance
+		local roll=math.random()
+		if roll<0.5 then
+			res=res/(1+roll*2)
+		else
+			res=res+(100-res)/(roll*2)
+		end
 		--apply Damage
 		t.Result = t.Damage * (1-res)
 	end
