@@ -132,10 +132,10 @@ return end
 		end
 		--make it standard bonus if no standard bonus
 		if t.Item.Bonus==0 then
-					t.Item.Bonus=math.floor(t.Item.Charges/1000)
-					t.Item.BonusStrength=t.Item.Charges%1000
-					t.Item.Charges=0
-				end
+			t.Item.Bonus=math.floor(t.Item.Charges/1000)
+			t.Item.BonusStrength=t.Item.Charges%1000
+			t.Item.Charges=0
+		end
 				
 		--ancient item
 		ancient=math.random(1,50)
@@ -600,8 +600,8 @@ end
 				Game.ItemsTxt[item.Item.Number].Name = StrColor(0,150,255,string.format("%s", itemName[item.Item.Number]))
 				if item.Item.Bonus2==0 then
 					Game.StdItemsTxt[item.Item.Bonus-1].NameAdd = StrColor(0,150,255,enchantAdd[item.Item.Bonus-1])
-					elseif item.Item.Bonus2>0 then
-						Game.StdItemsTxt[item.Item.Bonus-1].NameAdd = StrColor(0,150,255,enchantAdd2[item.Item.Bonus2-1])
+				elseif item.Item.Bonus2>0 then
+					Game.StdItemsTxt[item.Item.Bonus-1].NameAdd = StrColor(0,150,255,enchantAdd2[item.Item.Bonus2-1])
 				end
 			elseif bonuses==1 then
 				Game.ItemsTxt[item.Item.Number].Name=StrColor(30,255,0,string.format("%s", itemName[item.Item.Number]))
@@ -798,3 +798,98 @@ function events.GameInitialized2()
 Game.SpcItemsTxt[2].BonusStat="Explosive Impact! (half damage)"
 end
 
+------------------------------------------
+--TOOLTIPS--
+------------------------------------------
+function events.BuildItemInformationBox(t)
+	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then 
+		if t.Type then
+			t.Type = t.Type
+			--add code to increase base stats based on bolster enchant
+			t.BasicStat = t.BasicStat
+			--add code to build enchant list
+			t.Enchantment=""
+			if t.Item.Bonus>0 then
+				if t.Item.Bonus>=11 and t.Item.Bonus<=16 then --% values for resistances
+					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. t.Item.BonusStrength/2 .. "%" 
+				else
+					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. t.Item.BonusStrength
+				end
+			end
+			if t.Item.Charges>1000 then
+				local bonus=math.floor(t.Item.Charges/1000)
+				local strength=t.Item.Charges%1000
+				if bonus>=11 and bonus<=16 then --% values for resistances
+					strength=strength/2
+					t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "%" .. "\n" .. t.Enchantment
+				else
+					t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
+				end
+			end
+		elseif t.Name then
+			--add enchant Name
+			t.Name = Game.ItemsTxt[t.Item.Number].Name
+			if t.Item.Bonus2>0 then
+				t.Name= t.Name .. " " .. Game.SpcItemsTxt[t.Item.Bonus2-1].NameAdd
+			elseif t.Item.Bonus>0 then
+				t.Name= t.Name .. " " .. Game.StdItemsTxt[t.Item.Bonus-1].NameAdd
+			end
+			--choose colour
+			local bonus=0
+			if t.Item.Bonus>0 then
+				bonus=bonus+1
+			end
+			if t.Item.Bonus2>0 then
+				bonus=bonus+1
+			end
+			if t.Item.Charges>1000 then
+				bonus=bonus+1
+			end
+			if bonus==3 then
+				t.Name=StrColor(163,53,238,t.Name)
+			elseif bonus==2 then
+				t.Name=StrColor(0,150,255,t.Name)
+			elseif bonus==1 then
+				t.Name=StrColor(30,255,0,t.Name)
+			else
+				t.Name=StrColor(255,255,255,t.Name)
+			end
+		elseif t.Description then
+			if t.Item.Bonus2>0 then
+				local text=Game.SpcItemsTxt[t.Item.Bonus2-1].BonusStat
+				t.Description = StrColor(255,255,153,text) .. "\n\n" .. t.Description
+			end
+		end
+	end
+end
+
+
+--colours
+function events.GameInitialized2()
+	itemStatName = {}
+	itemStatName[1] = StrColor(255, 0, 0, "Might")
+	itemStatName[2] = StrColor(255, 128, 0, "Intellect")
+	itemStatName[3] = StrColor(0, 127, 255, "Personality")
+	itemStatName[4] = StrColor(0, 255, 0, "Endurance")
+	itemStatName[5] = StrColor(255, 255, 0, "Accuracy")
+	itemStatName[6] = StrColor(127, 0, 255, "Speed")
+	itemStatName[7] = StrColor(255, 255, 255, "Luck")
+	itemStatName[8] = StrColor(0, 255, 0, "Hit Points")
+	itemStatName[9] = StrColor(0, 100, 255, "Spell Points")
+	itemStatName[10] = StrColor(230, 204, 128, "Armor Class")
+	itemStatName[11] = StrColor(255, 70, 70, "Fire Resistance")
+	itemStatName[12] = StrColor(173, 216, 230, "Air Resistance")
+	itemStatName[13] = StrColor(100, 180, 255, "Water Resistance")
+	itemStatName[14] = StrColor(0, 180, 0, "Earth Resistance")
+	itemStatName[15] = StrColor(200, 200, 255, "Mind Resistance")
+	itemStatName[16] = StrColor(255, 192, 203, "Body Resistance")
+	itemStatName[17] = StrColor(255,255,153, "Alchemy skill")
+	itemStatName[18] = StrColor(255,255,153, "Stealing skill")
+	itemStatName[19] = StrColor(255,255,153, "Disarm skill")
+	itemStatName[20] = StrColor(255,255,153, "ID Item skill")
+	itemStatName[21] = StrColor(255,255,153, "ID Monster skill")
+	itemStatName[22] = StrColor(255,255,153, "Armsmaster skill")
+	itemStatName[23] = StrColor(255,255,153, "Dodge skill")
+	itemStatName[24] = StrColor(255,255,153, "Unarmed skill")
+	itemStatName[25] = StrColor(255,255,153, "Great might")
+end
