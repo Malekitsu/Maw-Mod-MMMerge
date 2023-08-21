@@ -124,6 +124,10 @@ local ROW_COUNT = 5
 local itemTextRowAddresses = mem.StaticAlloc(ROW_COUNT*4)
 local itemTextRowContentsByIndex = {}
 
+local function getAddrByIndex(index)
+    return u4[itemTextRowAddresses + index * 4]
+end
+
 local function prepareTable(d, rows)
     local t = {}
     for _, row in pairs(rows) do
@@ -250,7 +254,7 @@ hook(code, function(d)
     local t = prepareTable(d, rows)
     itemTooltipEvent(t)
     processNewTexts(t, rows)
-    d.edi = itemTextRowContentsByIndex[rows.Description.index].buf
+    d.edi = getAddrByIndex(INDEX_DESCRIPTION)
 end)
 
 autohook(0x41D4BD, function(d)
@@ -264,15 +268,15 @@ autohook(0x41D4BD, function(d)
     local t = prepareTable(d, rows)
     itemTooltipEvent(t)
     processNewTexts(t, rows)
-    d.eax = itemTextRowContentsByIndex[rows.Name.index].buf
+    d.eax = getAddrByIndex(INDEX_NAME)
 end)
 
 hook(0x41D5DA, function(d)
-    d.eax = itemTextRowContentsByIndex[INDEX_DESCRIPTION].buf
+    d.eax = getAddrByIndex(INDEX_DESCRIPTION)
 end)
 
 autohook(0x41D60C, function(d)
-    d.eax = itemTextRowContentsByIndex[INDEX_NAME].buf
+    d.eax = getAddrByIndex(INDEX_NAME)
 end)
 
 local function randomStr(chars, len)
