@@ -199,12 +199,17 @@ end
 --apply charges effect
 function events.CalcStatBonusByItems(t)
 	for it in t.Player:EnumActiveItems() do
-		if it.Charges ~= nil then
-			stat=math.floor(it.Charges/1000)
+		if it.Charges > 1000 then
+			stat=math.floor(it.Charges/1000)-1
 			bonus=it.Charges%1000
 			if t.Stat==stat then
-				t.Result = t.Result + bonus
+				if stat>=10 and stat<=15 then
+					t.Result = t.Result + bonus * 2
+				else
+					t.Result = t.Result + bonus
+				end
 			end
+
 		end
 	end
 end
@@ -547,7 +552,7 @@ function events.GameInitialized2()
 	Game.SpcItemsTxt[19].BonusStat="Paralysis and SP drain Immunity"
 	Game.SpcItemsTxt[20].BonusStat="Poison and weakness Immunity"
 	Game.SpcItemsTxt[21].BonusStat="Sleep and Unconscious Immunity"
-	Game.SpcItemsTxt[22].BonusStat="Stone and premature ageing Immunity"
+	Game.SpcItemsTxt[22].BonusStat="Stone and premature aging Immunity"
 	Game.SpcItemsTxt[24].BonusStat="Death and erad. Immunity, +5 Levels"
 end
 
