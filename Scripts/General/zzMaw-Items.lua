@@ -330,7 +330,7 @@ enchantbonusdamage[6] = 4
 enchantbonusdamage[7] = 2
 enchantbonusdamage[8] = 3
 enchantbonusdamage[9] = 4
-enchantbonusdamage[10] = 2
+enchantbonusdamage[10] = 200
 enchantbonusdamage[11] = 3
 enchantbonusdamage[12] = 4
 enchantbonusdamage[13] = 2
@@ -340,7 +340,7 @@ enchantbonusdamage[46] = 4
 
 function events.CalcDamageToMonster(t)
     local data = WhoHitMonster()
-    if data and data.Player and t.DamageKind ~= 0 and data.Object == nil then
+    if data and data.Player and t.DamageKind ~= 4 and data.Object == nil and t.ByPlayer==true and t.Melee==true then
 	n=1
 	bonusDamage2=1
         for i = 0,1 do
@@ -348,12 +348,10 @@ function events.CalcDamageToMonster(t)
 			bonusDamage=0
 			-- calculation
 			if it then
-				if it.ExtraData==0 then
-					if (it.Bonus2 >= 4 and it.Bonus2 <= 15) or it.Bonus2 == 46  then
-					local bonusDamage1 = bonusDamage+enchantbonusdamage[it.Bonus2] or 0
-					bonusDamage2=(bonusDamage2*bonusDamage1)^(1/n)
-					n=n+1
-					end
+				if (it.Bonus2 >= 4 and it.Bonus2 <= 15) or it.Bonus2 == 46  then
+				local bonusDamage1 = bonusDamage+enchantbonusdamage[it.Bonus2] or 0
+				bonusDamage2=(bonusDamage2*bonusDamage1)^(1/n)
+				n=n+1
 				end
 			end
         end	
@@ -371,7 +369,7 @@ function events.CalcDamageToMonster(t)
 			if data.Object.Spell==100 then
 			it=data.Player:GetActiveItem(2)
 			-- calculation
-			if (it.Bonus2 >= 4 and it.Bonus2 <= 15) or it.Bonus2 == 46 and it.ExtraData==0 then
+			if (it.Bonus2 >= 4 and it.Bonus2 <= 15) or it.Bonus2 == 46 then
 			local bonusDamage = enchantbonusdamage[it.Bonus2] or 0
 			t.Result=t.Result*bonusDamage
 			end	
@@ -390,7 +388,7 @@ data=WhoHitMonster()
 	if data and data.Player then
 		it=data.Player:GetActiveItem(1)
 		if it then
-			if (it.Bonus2 >= 4 and it.Bonus2 <= 15) or it.Bonus2 == 46 and it.ExtraData==0 then
+			if (it.Bonus2 >= 4 and it.Bonus2 <= 15) or it.Bonus2 == 46 then
 				spellbonusdamage[4] = math.random(6, 8)
 				spellbonusdamage[5] = math.random(18, 24)
 				spellbonusdamage[6] = math.random(36, 48)
@@ -675,4 +673,10 @@ end
 
 function events.GameInitialized2()
 	Game.SpcItemsTxt[2].BonusStat="Explosive Impact! (half damage)"
+end
+
+--max charges empower items by 2 every 
+
+function events.CalcDamageToMonster(t)
+data=WhoHitMonster()
 end
