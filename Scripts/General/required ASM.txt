@@ -1,4 +1,0 @@
-Following list will be orderer by importance:
-1) attribute breakpoints
-2) tooltip hook
-3) item extradata
