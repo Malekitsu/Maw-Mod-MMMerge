@@ -320,61 +320,6 @@ function events.Tick()
 	mindRes=Party[i]:GetResistance(14)/4
 	bodyRes=Party[i]:GetResistance(15)/4
 
-		--FIRE RESISTANCE
-		for it in Party[Game.CurrentPlayer]:EnumActiveItems() do
-			if it.Bonus==11 then
-				fireRes = fireRes+it.BonusStrength/4
-			end
-			if math.floor(it.Charges/1000+1)==11 then
-				fireRes = fireRes+it.Charges%1000/4
-			end
-		end
-		--AIR RESISTANCE
-		for it in Party[Game.CurrentPlayer]:EnumActiveItems() do
-			if it.Bonus==12 then
-				airRes = airRes+it.BonusStrength/4
-			end
-			if math.floor(it.Charges/1000+1)==12 then
-				airRes = airRes+it.Charges%1000/4
-			end
-		end
-		--WATER RESISTANCE
-		for it in Party[Game.CurrentPlayer]:EnumActiveItems() do
-			if it.Bonus==13 then
-				waterRes = waterRes+it.BonusStrength/4
-			end
-			if math.floor(it.Charges/1000+1)==13 then
-				waterRes = waterRes+it.Charges%1000/4
-			end
-		end
-		--EARTH RESISTANCE
-		for it in Party[Game.CurrentPlayer]:EnumActiveItems() do
-			if it.Bonus==14 then
-				earthRes = earthRes+it.BonusStrength/4
-			end
-			if math.floor(it.Charges/1000+1)==11 then
-				earthRes = earthRes+it.Charges%1000/4
-			end
-		end
-		--MIND RESISTANCE
-		for it in Party[Game.CurrentPlayer]:EnumActiveItems() do
-			if it.Bonus==15 then
-				mindRes = mindRes+it.BonusStrength/4
-			end
-			if math.floor(it.Charges/1000+1)==15 then
-				mindRes = mindRes+it.Charges%1000/4
-			end
-		end
-		--BODY RESISTANCE
-		for it in Party[Game.CurrentPlayer]:EnumActiveItems() do
-			if it.Bonus==16 then
-				bodyRes = bodyRes+it.BonusStrength/4
-			end
-			if math.floor(it.Charges/1000+1)==16 then
-				bodyRes = bodyRes+it.Charges%1000/4
-			end
-		end
-
 		--add bonus2
 		for it in Party[Game.CurrentPlayer]:EnumActiveItems() do
 			if it.Bonus2==1 then
@@ -415,12 +360,12 @@ function events.Tick()
 		if bodyRes>=75 then
 			bodyRes=StrColor(0,255,0,"Max")
 		end		
-		Game.GlobalTxt[87]=string.format("Fire %s%s",fireRes,"%")
-		Game.GlobalTxt[6]=string.format("Air %s%s",airRes,"%")
-		Game.GlobalTxt[240]=string.format("Water %s%s",waterRes,"%")
-		Game.GlobalTxt[70]=string.format("Earth %s%s",earthRes,"%")
-		Game.GlobalTxt[142]=string.format("Mind %s%s",mindRes,"%")
-		Game.GlobalTxt[29]=string.format("Body %s%s",bodyRes,"%")
+		Game.GlobalTxt[87]=StrColor(255, 70, 70, string.format("Fire %s%s",fireRes,"%"))
+		Game.GlobalTxt[6]=StrColor(173, 216, 230, string.format("Air %s%s",airRes,"%"))
+		Game.GlobalTxt[240]=StrColor(100, 180, 255, string.format("Water %s%s",waterRes,"%"))
+		Game.GlobalTxt[70]=StrColor(153, 76, 0, string.format("Earth %s%s",earthRes,"%"))
+		Game.GlobalTxt[142]=StrColor(200, 200, 255, string.format("Mind %s%s",mindRes,"%"))
+		Game.GlobalTxt[29]=StrColor(255, 192, 203, string.format("Body %s%s",bodyRes,"%"))		
 	end
 	if Game.CurrentCharScreen==101 then
 		Game.GlobalTxt[87]="Fire"
