@@ -60,15 +60,6 @@ function events.GameInitialized2()
 	enchants[5]={1,2,3}
 	enchants[6]={3}
 end
---check if it's in the table
-function isInTable(table, value)
-    for _, v in ipairs(table) do
-        if v == value then
-            return true
-        end
-    end
-    return false
-end
 
 --create enchant table
 encStrDown={1,1,3,6,10,15,20,24,28,32,36,40,44,48,52,56,60,64,68,76}
@@ -103,6 +94,8 @@ return end
 			partyLevel=vars.MM8LVL+vars.MM7LVL
 		end
 		local partyLevel=math.min(math.floor(partyLevel/20),14)
+		--ADD MAX CHARGES BASED ON PARTY LEVEL
+		t.Item.MaxCharges=math.floor(partyLevel/5)
 		--adjust loot Strength
 		pseudoStr=t.Strength+partyLevel
 		if pseudoStr==1 then 
@@ -132,10 +125,10 @@ return end
 		end
 		--make it standard bonus if no standard bonus
 		if t.Item.Bonus==0 then
-					t.Item.Bonus=math.floor(t.Item.Charges/1000)
-					t.Item.BonusStrength=t.Item.Charges%1000
-					t.Item.Charges=0
-				end
+			t.Item.Bonus=math.floor(t.Item.Charges/1000)
+			t.Item.BonusStrength=t.Item.Charges%1000
+			t.Item.Charges=0
+		end
 				
 		--ancient item
 		ancient=math.random(1,50)
@@ -199,12 +192,17 @@ end
 --apply charges effect
 function events.CalcStatBonusByItems(t)
 	for it in t.Player:EnumActiveItems() do
-		if it.Charges ~= nil then
-			stat=math.floor(it.Charges/1000)
+		if it.Charges > 1000 then
+			stat=math.floor(it.Charges/1000)-1
 			bonus=it.Charges%1000
 			if t.Stat==stat then
-				t.Result = t.Result + bonus
+				if stat>=10 and stat<=15 then
+					t.Result = t.Result + bonus * 2
+				else
+					t.Result = t.Result + bonus
+				end
 			end
+
 		end
 	end
 end
@@ -216,110 +214,110 @@ function events.GameInitialized2()
 --Weapon upscaler 
 
 
-for i=1,2200 do
-	if (i>=1 and i<=83) or (i>=803 and i<=865) or (i>=1603 and i<=1665) then
-		upTierDifference=0
-		downTierDifference=0
-		downDamage=0
-		--set goal damage for weapons (end game weapon damage)
-		goalDamage=35
-		if Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Axe" or Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Sword" then
-			goalDamage=goalDamage*2
-		end
-		currentDamage = (Game.ItemsTxt[i].Mod1DiceCount *Game.ItemsTxt[i]. Mod1DiceSides + 1)/2+Game.ItemsTxt[i].Mod2 
-
-			for v=1,4 do
-				if Game.ItemsTxt[i].NotIdentifiedName==Game.ItemsTxt[i+v].NotIdentifiedName then
-				upTierDifference=upTierDifference+1
-				end
-				if Game.ItemsTxt[i].NotIdentifiedName==Game.ItemsTxt[math.max(i-v,0)].NotIdentifiedName then
-				downTierDifference=downTierDifference+1
-				downDamage = (Game.ItemsTxt[i-v].Mod1DiceCount *Game.ItemsTxt[i-v]. Mod1DiceSides + 1)/2+Game.ItemsTxt[i-v].Mod2
-				elseif downTierDifference==0 then
-						downDamage = currentDamage
-				end
+	for i=1,2200 do
+		if (i>=1 and i<=83) or (i>=803 and i<=865) or (i>=1603 and i<=1665) then
+			upTierDifference=0
+			downTierDifference=0
+			downDamage=0
+			--set goal damage for weapons (end game weapon damage)
+			goalDamage=35
+			if Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Axe" or Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Sword" then
+				goalDamage=goalDamage*2
 			end
+			currentDamage = (Game.ItemsTxt[i].Mod1DiceCount *Game.ItemsTxt[i]. Mod1DiceSides + 1)/2+Game.ItemsTxt[i].Mod2 
 
-		--calculate expected value
-		tierRange=upTierDifference+downTierDifference+1
-		damageRange=goalDamage-downDamage
-		expectedDamageIncrease=damageRange^(downTierDifference/(tierRange-1))
-		Game.ItemsTxt[i].Mod1DiceSides = Game.ItemsTxt[i].Mod1DiceSides + (expectedDamageIncrease / Game.ItemsTxt[i].Mod1DiceCount)
-		Game.ItemsTxt[i].Mod2=expectedDamageIncrease/2
+				for v=1,4 do
+					if Game.ItemsTxt[i].NotIdentifiedName==Game.ItemsTxt[i+v].NotIdentifiedName then
+					upTierDifference=upTierDifference+1
+					end
+					if Game.ItemsTxt[i].NotIdentifiedName==Game.ItemsTxt[math.max(i-v,0)].NotIdentifiedName then
+					downTierDifference=downTierDifference+1
+					downDamage = (Game.ItemsTxt[i-v].Mod1DiceCount *Game.ItemsTxt[i-v]. Mod1DiceSides + 1)/2+Game.ItemsTxt[i-v].Mod2
+					elseif downTierDifference==0 then
+							downDamage = currentDamage
+					end
+				end
 
-		end 
+			--calculate expected value
+			tierRange=upTierDifference+downTierDifference+1
+			damageRange=goalDamage-downDamage
+			expectedDamageIncrease=damageRange^(downTierDifference/(tierRange-1))
+			Game.ItemsTxt[i].Mod1DiceSides = Game.ItemsTxt[i].Mod1DiceSides + (expectedDamageIncrease / Game.ItemsTxt[i].Mod1DiceCount)
+			Game.ItemsTxt[i].Mod2=expectedDamageIncrease/2
+
+			end 
+		end
+
+
+	--do same for artifacts
+	for i=400,405 do
+	goalDamage=75
+	if Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Axe" or Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Sword" then
+		goalDamage=goalDamage*2
+	end
+	downDamage=(Game.ItemsTxt[i].Mod1DiceCount *Game.ItemsTxt[i]. Mod1DiceSides + 1)/2
+	damageRange=goalDamage-downDamage
+	Game.ItemsTxt[i].Mod1DiceSides = Game.ItemsTxt[i].Mod1DiceSides + (damageRange / Game.ItemsTxt[i].Mod1DiceCount)
+	Game.ItemsTxt[i].Mod2=goalDamage/2
 	end
 
+	for i=415,420 do
+	goalDamage=75
+	if Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Axe" or Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Sword" then
+		goalDamage=goalDamage*2
+	end
+	downDamage=(Game.ItemsTxt[i].Mod1DiceCount *Game.ItemsTxt[i]. Mod1DiceSides + 1)/2
+	damageRange=goalDamage-downDamage
+	Game.ItemsTxt[i].Mod1DiceSides = Game.ItemsTxt[i].Mod1DiceSides + (damageRange / Game.ItemsTxt[i].Mod1DiceCount)
+	Game.ItemsTxt[i].Mod2=goalDamage/2
+	end
+	--armors fix
+	Game.ItemsTxt[71].Mod2=2
+	Game.ItemsTxt[72].Mod2=7
+	Game.ItemsTxt[73].Mod2=16
+	Game.ItemsTxt[74].Mod2=28
+	Game.ItemsTxt[75].Mod2=44
 
---do same for artifacts
-for i=400,405 do
-goalDamage=75
-if Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Axe" or Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Sword" then
-	goalDamage=goalDamage*2
-end
-downDamage=(Game.ItemsTxt[i].Mod1DiceCount *Game.ItemsTxt[i]. Mod1DiceSides + 1)/2
-damageRange=goalDamage-downDamage
-Game.ItemsTxt[i].Mod1DiceSides = Game.ItemsTxt[i].Mod1DiceSides + (damageRange / Game.ItemsTxt[i].Mod1DiceCount)
-Game.ItemsTxt[i].Mod2=goalDamage/2
-end
+	Game.ItemsTxt[76].Mod2=8
+	Game.ItemsTxt[77].Mod2=24
+	Game.ItemsTxt[78].Mod2=60
 
-for i=415,420 do
-goalDamage=75
-if Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Axe" or Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Sword" then
-	goalDamage=goalDamage*2
-end
-downDamage=(Game.ItemsTxt[i].Mod1DiceCount *Game.ItemsTxt[i]. Mod1DiceSides + 1)/2
-damageRange=goalDamage-downDamage
-Game.ItemsTxt[i].Mod1DiceSides = Game.ItemsTxt[i].Mod1DiceSides + (damageRange / Game.ItemsTxt[i].Mod1DiceCount)
-Game.ItemsTxt[i].Mod2=goalDamage/2
-end
---armors fix
-Game.ItemsTxt[71].Mod2=2
-Game.ItemsTxt[72].Mod2=7
-Game.ItemsTxt[73].Mod2=16
-Game.ItemsTxt[74].Mod2=28
-Game.ItemsTxt[75].Mod2=44
+	Game.ItemsTxt[79].Mod2=3
+	Game.ItemsTxt[80].Mod2=5
+	Game.ItemsTxt[81].Mod2=9
+	Game.ItemsTxt[82].Mod2=18
+	Game.ItemsTxt[83].Mod2=33
+	Game.ItemsTxt[84].Mod2=2
+	Game.ItemsTxt[85].Mod2=5
+	Game.ItemsTxt[86].Mod2=9
+	Game.ItemsTxt[87].Mod2=18
+	Game.ItemsTxt[88].Mod2=33
 
-Game.ItemsTxt[76].Mod2=8
-Game.ItemsTxt[77].Mod2=24
-Game.ItemsTxt[78].Mod2=60
+	Game.ItemsTxt[406].Mod2=46
+	Game.ItemsTxt[407].Mod2=64
+	Game.ItemsTxt[408].Mod2=38
 
-Game.ItemsTxt[79].Mod2=3
-Game.ItemsTxt[80].Mod2=5
-Game.ItemsTxt[81].Mod2=9
-Game.ItemsTxt[82].Mod2=18
-Game.ItemsTxt[83].Mod2=33
-Game.ItemsTxt[84].Mod2=2
-Game.ItemsTxt[85].Mod2=5
-Game.ItemsTxt[86].Mod2=9
-Game.ItemsTxt[87].Mod2=18
-Game.ItemsTxt[88].Mod2=33
-
-Game.ItemsTxt[406].Mod2=46
-Game.ItemsTxt[407].Mod2=64
-Game.ItemsTxt[408].Mod2=38
-
-Game.ItemsTxt[421].Mod2=60
-Game.ItemsTxt[422].Mod2=77
-Game.ItemsTxt[423].Mod2=61
+	Game.ItemsTxt[421].Mod2=60
+	Game.ItemsTxt[422].Mod2=77
+	Game.ItemsTxt[423].Mod2=61
 
 
 
-------------
---tooltips
-------------
-Game.SpcItemsTxt[3].BonusStat="Adds 6-8 points of Cold damage."
-Game.SpcItemsTxt[4].BonusStat="Adds 18-24 points of Cold damage."
-Game.SpcItemsTxt[5].BonusStat="Adds 36-48 points of Cold damage."
-Game.SpcItemsTxt[6].BonusStat="Adds 4-10 points of Electrical damage."
-Game.SpcItemsTxt[7].BonusStat="Adds 12-30 points of Electrical damage."
-Game.SpcItemsTxt[8].BonusStat="Adds 24-60 points of Electrical damage."
-Game.SpcItemsTxt[9].BonusStat="Adds 2-12 points of Fire damage."
-Game.SpcItemsTxt[10].BonusStat="Adds 6-36 points of Fire damage."
-Game.SpcItemsTxt[11].BonusStat="Adds 12-72 points of Fire damage."
-Game.SpcItemsTxt[12].BonusStat="Adds 10 points of Body damage."
-Game.SpcItemsTxt[13].BonusStat="Adds 24 points of Body damage."
-Game.SpcItemsTxt[14].BonusStat="Adds 48 points of Body damage."
+	------------
+	--tooltips
+	------------
+	Game.SpcItemsTxt[3].BonusStat="Adds 6-8 points of Cold damage."
+	Game.SpcItemsTxt[4].BonusStat="Adds 18-24 points of Cold damage."
+	Game.SpcItemsTxt[5].BonusStat="Adds 36-48 points of Cold damage."
+	Game.SpcItemsTxt[6].BonusStat="Adds 4-10 points of Electrical damage."
+	Game.SpcItemsTxt[7].BonusStat="Adds 12-30 points of Electrical damage."
+	Game.SpcItemsTxt[8].BonusStat="Adds 24-60 points of Electrical damage."
+	Game.SpcItemsTxt[9].BonusStat="Adds 2-12 points of Fire damage."
+	Game.SpcItemsTxt[10].BonusStat="Adds 6-36 points of Fire damage."
+	Game.SpcItemsTxt[11].BonusStat="Adds 12-72 points of Fire damage."
+	Game.SpcItemsTxt[12].BonusStat="Adds 10 points of Body damage."
+	Game.SpcItemsTxt[13].BonusStat="Adds 24 points of Body damage."
+	Game.SpcItemsTxt[14].BonusStat="Adds 48 points of Body damage."
 
 end
 
@@ -421,72 +419,8 @@ data=WhoHitMonster()
 end
 
 
-
---[[
-function events.CalcDamageToMonster(t)
-    local data = WhoHitMonster()
-    if data.Player and data.Object ~= nil and data.Object.Spell<100 then
-		
-		it=data.Player:GetActiveItem(0)
-			
-		--generate randoms
-		enchantbonusdamage = {}
-		enchantbonusdamage[4] = math.random(6, 8)
-		enchantbonusdamage[5] = math.random(18, 24)
-		enchantbonusdamage[6] = math.random(36, 48)
-		enchantbonusdamage[7] = math.random(4, 10)
-		enchantbonusdamage[8] = math.random(12, 30)
-		enchantbonusdamage[9] = math.random(24, 60)
-		enchantbonusdamage[10] = math.random(2, 12)
-		enchantbonusdamage[11] = math.random(6, 36)
-		enchantbonusdamage[12] = math.random(12, 72)
-		enchantbonusdamage[46] = math.random(20, 80)
-		-- calculation
-		if (it.Bonus2 >= 4 and it.Bonus2 <= 15) or it.Bonus2 == 46 then
-		bonusDamage2 = enchantbonusdamage[it.Bonus2] or 0
-		t.Damage = t.Damage+bonusDamage2
-		debug.Message(dump(t.Damage))
-		end
-    end	
-end
---]]
----------------------
---multiple enchant tooltip
----------------------
-
---[[
-mem.autohook(0x41C440, function(d)
-	local t = {Item = structs.Item:new(d.ecx)}
-	events.call("ShowItemTooltip", t)
-end)
-
-mem.autohook(0x41CE00, function(d)
-	events.call("AfterShowItemTooltip")
-end)
-]]
-
 --change tooltip
 function events.GameInitialized2()
-	
-	--STAT NAMES for custom tooltip
-	itemStatName = {}
-	--colours
-
-	itemStatName[1]=StrColor(255,0,0,"Might")
-	itemStatName[2]=StrColor(255,128,0,"Intellect")
-	itemStatName[3]=StrColor(0,127,255,"Personality")
-	itemStatName[4]=StrColor(0,255,0,"Endurance")
-	itemStatName[5]=StrColor(255,255,0,"Accuracy")
-	itemStatName[6]=StrColor(127,0,255,"Speed")
-	itemStatName[7]=StrColor(255,255,255,"Luck")
-	itemStatName[8]=StrColor(0,255,0,"Hit Points")
-	itemStatName[9]=StrColor(0,100,255,"Spell Points")
-	itemStatName[10]=StrColor(230,204,128,"Armor Class")
-	itemStatName[11]=StrColor(255,100,100,"Fire Resistance")
-	itemStatName[12]=StrColor(255,255,100,"Elec Resistance")
-	itemStatName[13]=StrColor(153,255,255,"Cold Resistance")
-	itemStatName[14]=StrColor(0,153,0,"Poison Resistance")
-	
 	--menu stats
 	if ColouredStats==true then
 		Game.GlobalTxt[144]=StrColor(255,0,0,"Might")
@@ -499,10 +433,6 @@ function events.GameInitialized2()
 		Game.GlobalTxt[108]=StrColor(0,255,0,"Hit Points")
 		Game.GlobalTxt[212]=StrColor(0,100,255,"Spell Points")
 		Game.GlobalTxt[12]=StrColor(230,204,128,"Armor Class")
-		Game.GlobalTxt[87]=StrColor(255,100,100,"Fire")
-		Game.GlobalTxt[71]=StrColor(255,255,100,"Elec")
-		Game.GlobalTxt[43]=StrColor(153,255,255,"Cold")
-		Game.GlobalTxt[166]=StrColor(0,153,0,"Poison")
 	end
 	
 	
@@ -547,7 +477,7 @@ function events.GameInitialized2()
 	Game.SpcItemsTxt[19].BonusStat="Paralysis and SP drain Immunity"
 	Game.SpcItemsTxt[20].BonusStat="Poison and weakness Immunity"
 	Game.SpcItemsTxt[21].BonusStat="Sleep and Unconscious Immunity"
-	Game.SpcItemsTxt[22].BonusStat="Stone and premature ageing Immunity"
+	Game.SpcItemsTxt[22].BonusStat="Stone and premature aging Immunity"
 	Game.SpcItemsTxt[24].BonusStat="Death and erad. Immunity, +5 Levels"
 end
 
@@ -600,8 +530,8 @@ end
 				Game.ItemsTxt[item.Item.Number].Name = StrColor(0,150,255,string.format("%s", itemName[item.Item.Number]))
 				if item.Item.Bonus2==0 then
 					Game.StdItemsTxt[item.Item.Bonus-1].NameAdd = StrColor(0,150,255,enchantAdd[item.Item.Bonus-1])
-					elseif item.Item.Bonus2>0 then
-						Game.StdItemsTxt[item.Item.Bonus-1].NameAdd = StrColor(0,150,255,enchantAdd2[item.Item.Bonus2-1])
+				elseif item.Item.Bonus2>0 then
+					Game.StdItemsTxt[item.Item.Bonus-1].NameAdd = StrColor(0,150,255,enchantAdd2[item.Item.Bonus2-1])
 				end
 			elseif bonuses==1 then
 				Game.ItemsTxt[item.Item.Number].Name=StrColor(30,255,0,string.format("%s", itemName[item.Item.Number]))
@@ -798,3 +728,98 @@ function events.GameInitialized2()
 Game.SpcItemsTxt[2].BonusStat="Explosive Impact! (half damage)"
 end
 
+------------------------------------------
+--TOOLTIPS--
+------------------------------------------
+function events.BuildItemInformationBox(t)
+	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then 
+		if t.Type then
+			t.Type = t.Type
+			--add code to increase base stats based on bolster enchant
+			t.BasicStat = t.BasicStat
+			--add code to build enchant list
+			t.Enchantment=""
+			if t.Item.Bonus>0 then
+				if t.Item.Bonus>=11 and t.Item.Bonus<=16 then --% values for resistances
+					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. t.Item.BonusStrength/2 .. "%" 
+				else
+					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. t.Item.BonusStrength
+				end
+			end
+			if t.Item.Charges>1000 then
+				local bonus=math.floor(t.Item.Charges/1000)
+				local strength=t.Item.Charges%1000
+				if bonus>=11 and bonus<=16 then --% values for resistances
+					strength=strength/2
+					t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "%" .. "\n" .. t.Enchantment
+				else
+					t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
+				end
+			end
+		elseif t.Name then
+			--add enchant Name
+			t.Name = Game.ItemsTxt[t.Item.Number].Name
+			if t.Item.Bonus2>0 then
+				t.Name= t.Name .. " " .. Game.SpcItemsTxt[t.Item.Bonus2-1].NameAdd
+			elseif t.Item.Bonus>0 then
+				t.Name= t.Name .. " " .. Game.StdItemsTxt[t.Item.Bonus-1].NameAdd
+			end
+			--choose colour
+			local bonus=0
+			if t.Item.Bonus>0 then
+				bonus=bonus+1
+			end
+			if t.Item.Bonus2>0 then
+				bonus=bonus+1
+			end
+			if t.Item.Charges>1000 then
+				bonus=bonus+1
+			end
+			if bonus==3 then
+				t.Name=StrColor(163,53,238,t.Name)
+			elseif bonus==2 then
+				t.Name=StrColor(0,150,255,t.Name)
+			elseif bonus==1 then
+				t.Name=StrColor(30,255,0,t.Name)
+			else
+				t.Name=StrColor(255,255,255,t.Name)
+			end
+		elseif t.Description then
+			if t.Item.Bonus2>0 then
+				local text=Game.SpcItemsTxt[t.Item.Bonus2-1].BonusStat
+				t.Description = StrColor(255,255,153,text) .. "\n\n" .. t.Description
+			end
+		end
+	end
+end
+
+
+--colours
+function events.GameInitialized2()
+	itemStatName = {}
+	itemStatName[1] = StrColor(255, 0, 0, "Might")
+	itemStatName[2] = StrColor(255, 128, 0, "Intellect")
+	itemStatName[3] = StrColor(0, 127, 255, "Personality")
+	itemStatName[4] = StrColor(0, 255, 0, "Endurance")
+	itemStatName[5] = StrColor(255, 255, 0, "Accuracy")
+	itemStatName[6] = StrColor(127, 0, 255, "Speed")
+	itemStatName[7] = StrColor(255, 255, 255, "Luck")
+	itemStatName[8] = StrColor(0, 255, 0, "Hit Points")
+	itemStatName[9] = StrColor(0, 100, 255, "Spell Points")
+	itemStatName[10] = StrColor(230, 204, 128, "Armor Class")
+	itemStatName[11] = StrColor(255, 70, 70, "Fire Resistance")
+	itemStatName[12] = StrColor(173, 216, 230, "Air Resistance")
+	itemStatName[13] = StrColor(100, 180, 255, "Water Resistance")
+	itemStatName[14] = StrColor(153, 76, 0, "Earth Resistance")
+	itemStatName[15] = StrColor(200, 200, 255, "Mind Resistance")
+	itemStatName[16] = StrColor(255, 192, 203, "Body Resistance")
+	itemStatName[17] = StrColor(255,255,153, "Alchemy skill")
+	itemStatName[18] = StrColor(255,255,153, "Stealing skill")
+	itemStatName[19] = StrColor(255,255,153, "Disarm skill")
+	itemStatName[20] = StrColor(255,255,153, "ID Item skill")
+	itemStatName[21] = StrColor(255,255,153, "ID Monster skill")
+	itemStatName[22] = StrColor(255,255,153, "Armsmaster skill")
+	itemStatName[23] = StrColor(255,255,153, "Dodge skill")
+	itemStatName[24] = StrColor(255,255,153, "Unarmed skill")
+	itemStatName[25] = StrColor(255,255,153, "Great might")
+end
