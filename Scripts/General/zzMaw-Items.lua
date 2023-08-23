@@ -615,8 +615,12 @@ function events.BuildItemInformationBox(t)
 				t.Name=StrColor(255,255,255,t.Name)
 			end
 		elseif t.Description then
-			if t.Item.Bonus2>0 then
-				local text=Game.SpcItemsTxt[t.Item.Bonus2-1].BonusStat
+			if t.Item.Bonus2>0 then	
+				if t.Item.MaxCharges>0 and bonusEffects[t.Item.Bonus2]~= nil then
+					text=checktext(t.Item.MaxCharges,t.Item.Bonus2)
+				else
+					text=Game.SpcItemsTxt[t.Item.Bonus2-1].BonusStat
+				end
 				t.Description = StrColor(255,255,153,text) .. "\n\n" .. t.Description
 			end
 		end
@@ -761,9 +765,9 @@ function events.ModifyItemDamage(t)
 	if t.Item then
 		if t.Item.MaxCharges>0 then
 			if t.Item.MaxCharges <= 20 then
-				mult=(t.Item.MaxCharges-20)
+				mult=1+t.Item.MaxCharges/20
 			else
-				mult=2*(t.Item.MaxCharges-20)/20
+				mult=2+2*(t.Item.MaxCharges-20)/20
 			end
 			local txt=Game.ItemsTxt[t.Item.Number]
 			bonusDamage=txt.Mod2*mult
@@ -776,3 +780,119 @@ function events.ModifyItemDamage(t)
 	end
 	t.Result=bonusDamage
 end
+
+--fix to enchant2 not applying correctly if same bonus is on the item
+--fix to special enchants
+
+bonusEffects = {
+    [1] = { bonusType = 1, bonusRange = {11, 16}, statModifier = 10 },
+    [2] = { bonusType = 2, bonusRange = {1, 7}, statModifier = 10 },
+    [42] = { bonusType = 42, bonusRange = {1, 16}, statModifier = 1 },
+    [43] = { bonusType = 43, bonusValues = {4, 8, 10}, statModifier = 10 },
+    [44] = { bonusType = 44, bonusValues = {8}, statModifier = 10 },
+    [45] = { bonusType = 45, bonusValues = {5, 6}, statModifier = 5 },
+    [46] = { bonusType = 46, bonusValues = {1}, statModifier = 25 },
+    [47] = { bonusType = 47, bonusValues = {9}, statModifier = 10 },
+    [48] = { bonusType = 48, bonusValues = {4, 10}, statModifier = {15, 5} },
+    [49] = { bonusType = 49, bonusValues = {2, 7}, statModifier = 10 },
+    [50] = { bonusType = 50, bonusValues = {11}, statModifier = 30 },
+    [51] = { bonusType = 51, bonusValues = {2, 6, 9}, statModifier = 10 },
+    [52] = { bonusType = 52, bonusValues = {4, 5}, statModifier = 10 },
+    [53] = { bonusType = 53, bonusValues = {1, 3}, statModifier = 10 },
+    [54] = { bonusType = 54, bonusValues = {4}, statModifier = 15 },
+    [55] = { bonusType = 55, bonusValues = {7}, statModifier = 15 },
+    [56] = { bonusType = 56, bonusValues = {1, 4}, statModifier = 5 },
+    [57] = { bonusType = 57, bonusValues = {2, 3}, statModifier = 5 }
+}
+
+function events.CalcStatBonusByItems(t)
+    for it in t.Player:EnumActiveItems() do
+        local bonusData = bonusEffects[it.Bonus2]
+        if bonusData then
+            if bonusData.bonusRange then
+                local lower, upper = bonusData.bonusRange[1], bonusData.bonusRange[2]
+                if it.Bonus >= lower and it.Bonus <= upper then
+                    if t.Stat == it.Bonus - 1 then
+                        t.Result = t.Result + bonusData.statModifier
+                    end
+                end
+            elseif bonusData.bonusValues then
+                for _, value in ipairs(bonusData.bonusValues) do
+                    if it.Bonus == value then
+                        if t.Stat == it.Bonus - 1 then
+                            if type(bonusData.statModifier) == "table" then
+                                t.Result = t.Result + bonusData.statModifier[value]
+                            else
+                                t.Result = t.Result + bonusData.statModifier
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+
+
+
+--make enchant 2 scale with maxcharges
+function events.CalcStatBonusByItems(t)
+    for it in t.Player:EnumActiveItems() do
+		if it.MaxCharges>0 then
+			local bonusData = bonusEffects[it.Bonus2]
+			if bonusData then
+				if it.MaxCharges <= 20 then
+					mult=1+it.MaxCharges/20
+				else
+					mult=2+2*(it.MaxCharges-20)/20
+				end
+				if bonusData.bonusRange then
+					local lower, upper = bonusData.bonusRange[1], bonusData.bonusRange[2]
+					t.Result = t.Result + bonusData.statModifier * mult
+				elseif bonusData.bonusValues then
+					for _, value in ipairs(bonusData.bonusValues) do
+						local modifier = bonusData.statModifier
+						if type(modifier) == "table" then
+							t.Result = t.Result + modifier[value] * mult
+						else
+							t.Result = t.Result + modifier * mult
+						end
+					end
+				end
+			end
+		end
+    end
+end
+
+
+--create dictionary with description list
+function checktext(MaxCharges,bonus2)
+	if MaxCharges <= 20 then
+		mult=1+MaxCharges/20
+	else
+		mult=2+2*(MaxCharges-20)/20
+	end
+	bonus2txt={
+		[1] =  " +" .. bonusEffects[1].statModifier * mult .. " to all Resistances.",
+		[2] = " +" .. bonusEffects[2].statModifier * mult .. " to all Seven Statistics.",
+		[42] = " +" .. bonusEffects[42].statModifier * mult .. " to Seven Stats, HP, SP, Armor, Resistances.",
+		[43] = " +" .. bonusEffects[43].statModifier * mult .. " to Endurance, Armor, Hit points.",
+		[44] = " +" .. bonusEffects[44].statModifier * mult .. " Hit points and Regenerate Hit points over time.",
+		[45] = " +" .. bonusEffects[45].statModifier * mult .. " Speed and Accuracy.",
+		[46] = "Adds 10-20 points of Fire damage and +" .. bonusEffects[46].statModifier * mult.. " Might.",
+		[47] = " +" .. bonusEffects[47].statModifier * mult .. " Spell points and Regenerate Spell points over time.",
+		[48] = " +" .. bonusEffects[48].statModifier[1] * mult .. " Endurance and" .. " +" .. bonusEffects[48].statModifier[2] .. "Armor.",
+		[49] = " +" .. bonusEffects[49].statModifier * mult .. " Intellect and Luck.",
+		[50] = " +" .. bonusEffects[50].statModifier * mult .. " Fire Resistance and Regenerate Hit points over time.",
+		[51] = " +" .. bonusEffects[51].statModifier * mult .. " Spell points, Speed, Intellect.",
+		[52] = " +" .. bonusEffects[52].statModifier * mult .. " Endurance and Accuracy.",
+		[53] = " +" .. bonusEffects[53].statModifier * mult .. " Might and Personality.",
+		[54] = " +" .. bonusEffects[54].statModifier * mult .. " Endurance and Regenerate Hit points over time.",
+		[55] = " +" .. bonusEffects[55].statModifier * mult .. " Luck and Regenerate Spell points over time.",
+		[56] = " +" .. bonusEffects[56].statModifier * mult .. " Might and Endurance.",
+		[57] = " +" .. bonusEffects[57].statModifier * mult .. " Intellect and Personality.",
+	}
+	return bonus2txt[bonus2]
+end
+
