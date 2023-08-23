@@ -237,7 +237,7 @@ function events.GameInitialized2()
 			--calculate expected value
 			tierRange=upTierDifference+downTierDifference+1
 			damageRange=goalDamage-downDamage
-			expectedDamageIncrease=damageRange^(downTierDifference/(tierRange-1))
+			expectedDamageIncrease=damageRange*(downTierDifference/(tierRange-1))
 			Game.ItemsTxt[i].Mod1DiceSides = Game.ItemsTxt[i].Mod1DiceSides + (expectedDamageIncrease / Game.ItemsTxt[i].Mod1DiceCount)
 			Game.ItemsTxt[i].Mod2=expectedDamageIncrease/2
 
@@ -267,37 +267,6 @@ function events.GameInitialized2()
 	Game.ItemsTxt[i].Mod1DiceSides = Game.ItemsTxt[i].Mod1DiceSides + (damageRange / Game.ItemsTxt[i].Mod1DiceCount)
 	Game.ItemsTxt[i].Mod2=goalDamage/2
 	end
-	--armors fix
-	Game.ItemsTxt[71].Mod2=2
-	Game.ItemsTxt[72].Mod2=7
-	Game.ItemsTxt[73].Mod2=16
-	Game.ItemsTxt[74].Mod2=28
-	Game.ItemsTxt[75].Mod2=44
-
-	Game.ItemsTxt[76].Mod2=8
-	Game.ItemsTxt[77].Mod2=24
-	Game.ItemsTxt[78].Mod2=60
-
-	Game.ItemsTxt[79].Mod2=3
-	Game.ItemsTxt[80].Mod2=5
-	Game.ItemsTxt[81].Mod2=9
-	Game.ItemsTxt[82].Mod2=18
-	Game.ItemsTxt[83].Mod2=33
-	Game.ItemsTxt[84].Mod2=2
-	Game.ItemsTxt[85].Mod2=5
-	Game.ItemsTxt[86].Mod2=9
-	Game.ItemsTxt[87].Mod2=18
-	Game.ItemsTxt[88].Mod2=33
-
-	Game.ItemsTxt[406].Mod2=46
-	Game.ItemsTxt[407].Mod2=64
-	Game.ItemsTxt[408].Mod2=38
-
-	Game.ItemsTxt[421].Mod2=60
-	Game.ItemsTxt[422].Mod2=77
-	Game.ItemsTxt[423].Mod2=61
-
-
 
 	------------
 	--tooltips
