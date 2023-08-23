@@ -849,14 +849,20 @@ function events.CalcStatBonusByItems(t)
 				end
 				if bonusData.bonusRange then
 					local lower, upper = bonusData.bonusRange[1], bonusData.bonusRange[2]
-					t.Result = t.Result + bonusData.statModifier * mult
+					if t.Stat>=lower-1 and t.Stat<upper then
+						t.Result = t.Result + bonusData.statModifier * mult
+					end
 				elseif bonusData.bonusValues then
-					for _, value in ipairs(bonusData.bonusValues) do
-						local modifier = bonusData.statModifier
-						if type(modifier) == "table" then
-							t.Result = t.Result + modifier[value] * mult
-						else
-							t.Result = t.Result + modifier * mult
+					for i =1, 3 do
+						if bonusData.bonusValues[i]and bonusData.bonusValues[i]-1==t.Stat then
+							for _, value in ipairs(bonusData.bonusValues) do
+								local modifier = bonusData.statModifier
+								if type(modifier) == "table" then
+									t.Result = t.Result + modifier[value] * mult
+								else
+									t.Result = t.Result + modifier * mult
+								end
+							end
 						end
 					end
 				end
