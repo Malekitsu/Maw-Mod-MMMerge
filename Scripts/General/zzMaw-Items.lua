@@ -902,3 +902,37 @@ function checktext(MaxCharges,bonus2)
 	return bonus2txt[bonus2]
 end
 
+--calculate price
+function events.CalcItemValue(t)
+	--base value
+	basePrice=Game.ItemsTxt[t.Item.Number].Value
+	--add enchant price
+	bonus1=t.Item.BonusStrength*100
+	if t.Item.Bonus==8 or t.Item.Bonus==9 then
+		bonus1=bonus1/2
+	end
+	bonus2=(t.Item.Charges%1000)*100
+	if math.floor(t.Item.Charges/1000)==8 or math.floor(t.Item.Charges/1000)==9 then
+		bonus1=bonus1/2
+	end
+	
+	MaxCharges=t.Item.MaxCharges
+	if MaxCharges <= 20 then
+		mult=1+MaxCharges/20
+	else
+		mult=2+2*(MaxCharges-20)/20
+	end
+	basePrice=basePrice*mult
+	if t.Item.Bonus2>0 then
+		special=Game.SpcItemsTxt[t.Item.Bonus2-1].Value
+		if bonusEffects[t.Item.Bonus2]~=nil then
+			special=special*mult
+		end
+		if special<11 then
+			basePrice=basePrice*special
+		else
+			basePrice=basePrice+special
+		end
+	end
+	t.Value=basePrice+bonus1+bonus2
+end
