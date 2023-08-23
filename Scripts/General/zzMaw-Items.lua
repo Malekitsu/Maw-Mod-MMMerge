@@ -755,5 +755,24 @@ function events.CalcStatBonusByItems(t)
 end
 
 					
+--recalculate actual damage
 function events.ModifyItemDamage(t)
+	bonusDamage=0
+	if t.Item then
+		if t.Item.MaxCharges>0 then
+			if t.Item.MaxCharges <= 20 then
+				mult=(t.Item.MaxCharges-20)
+			else
+				mult=2*(t.Item.MaxCharges-20)/20
+			end
+			local txt=Game.ItemsTxt[t.Item.Number]
+			bonusDamage=txt.Mod2*mult
+			sides=txt.Mod1DiceSides*mult
+			--calculate dices
+			for i=1,txt.Mod1DiceCount do
+				bonusDamage=bonusDamage+math.random(1,sides)
+			end
+		end
+	end
+	t.Result=bonusDamage
 end
