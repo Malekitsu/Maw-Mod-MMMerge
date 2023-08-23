@@ -94,7 +94,7 @@ return end
 			partyLevel=vars.MM8LVL+vars.MM7LVL
 		end
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
-		t.Item.MaxCharges=math.floor(partyLevel/5)
+		t.Item.MaxCharges=math.min(math.floor(partyLevel/5),255)
 		local partyLevel=math.min(math.floor(partyLevel/20),14)
 		--adjust loot Strength
 		pseudoStr=t.Strength+partyLevel
@@ -208,8 +208,6 @@ end
 ----------------------
 function events.GameInitialized2()
 --Weapon upscaler 
-
-
 	for i=1,2200 do
 		if (i>=1 and i<=83) or (i>=803 and i<=865) or (i>=1603 and i<=1665) then
 			upTierDifference=0
@@ -243,30 +241,6 @@ function events.GameInitialized2()
 
 			end 
 		end
-
-
-	--do same for artifacts
-	for i=400,405 do
-	goalDamage=75
-	if Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Axe" or Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Sword" then
-		goalDamage=goalDamage*2
-	end
-	downDamage=(Game.ItemsTxt[i].Mod1DiceCount *Game.ItemsTxt[i]. Mod1DiceSides + 1)/2
-	damageRange=goalDamage-downDamage
-	Game.ItemsTxt[i].Mod1DiceSides = Game.ItemsTxt[i].Mod1DiceSides + (damageRange / Game.ItemsTxt[i].Mod1DiceCount)
-	Game.ItemsTxt[i].Mod2=goalDamage/2
-	end
-
-	for i=415,420 do
-	goalDamage=75
-	if Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Axe" or Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Sword" then
-		goalDamage=goalDamage*2
-	end
-	downDamage=(Game.ItemsTxt[i].Mod1DiceCount *Game.ItemsTxt[i]. Mod1DiceSides + 1)/2
-	damageRange=goalDamage-downDamage
-	Game.ItemsTxt[i].Mod1DiceSides = Game.ItemsTxt[i].Mod1DiceSides + (damageRange / Game.ItemsTxt[i].Mod1DiceCount)
-	Game.ItemsTxt[i].Mod2=goalDamage/2
-	end
 
 	------------
 	--tooltips
@@ -547,10 +521,12 @@ function events.BuildItemInformationBox(t)
 		if t.Type then
 			t.Type = t.Type
 			--add code to increase base stats based on bolster enchant
+			--ARMORS
 			if t.Item.MaxCharges>0 then
-			local equipStat=Game.ItemsTxt[t.Item.Number].EquipStat
+				local txt=Game.ItemsTxt[t.Item.Number]
+				local equipStat=txt.EquipStat
 				if equipStat>=3 and equipStat<=9 then
-				local ac=Game.ItemsTxt[t.Item.Number].Mod2+Game.ItemsTxt[t.Item.Number].Mod1DiceCount 
+				local ac=txt.Mod2+txt.Mod1DiceCount 
 					if ac>0 then
 						if t.Item.MaxCharges <= 20 then
 							local bonusAC=ac*(t.Item.MaxCharges/20)
@@ -559,11 +535,37 @@ function events.BuildItemInformationBox(t)
 							local bonusAC=ac*2+ac*2*((t.Item.MaxCharges-20)/20)
 							ac=ac+math.round(bonusAC)
 						end
-						t.BasicStat= "Armor: +" .. ac
+						t.BasicStat= "Armors: +" .. ac
 					end
 				end
 			end
-			t.BasicStat = t.BasicStat
+			--WEAPONS
+			if t.Item.MaxCharges>0 then
+				local txt=Game.ItemsTxt[t.Item.Number]
+				local equipStat=txt.EquipStat
+				if equipStat<=2 then
+				local bonus=txt.Mod2
+					--attack/+damage
+					if t.Item.MaxCharges <= 20 then
+						local bonusATK=bonus*(t.Item.MaxCharges/20)
+						bonus=bonus+math.round(bonusATK)
+					else
+						local bonusATK=bonus*2+bonus*2*((t.Item.MaxCharges-20)/20)
+						bonus=bonus+math.round(bonusATK)
+					end
+					--dicesides
+					sides=txt.Mod1DiceSides
+					if t.Item.MaxCharges <= 20 then
+						local sidesBonus=sides*(t.Item.MaxCharges/20)
+						sides=sides+math.round(sidesBonus)
+					else
+						local sidesBonus=sides*2+sides*2*((t.Item.MaxCharges-20)/20)
+						sides=sides+math.round(sidesBonus)
+					end
+					t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " ..  txt.Mod1DiceCount .. "d" .. sides .. "+" .. bonus
+				end
+			end
+			
 			
 			--add code to build enchant list
 			t.Enchantment=""
@@ -657,8 +659,8 @@ function events.GameInitialized2()
 	Game.SpcItemsTxt[2].BonusStat="Explosive Impact! (half damage)"
 end
 
---max charges empower items base stats by 2 every 100 levels (every 5 levels you get 1 maxcharges
---apply charges effect
+--max charges empower items base stats by 2 every 100 levels (every 5 levels bolster level you get 1 maxcharges)
+--apply MAXcharges effect
 function events.CalcStatBonusByItems(t)
 	if t.Stat==9 then
 		for it in t.Player:EnumActiveItems() do
@@ -680,7 +682,78 @@ function events.CalcStatBonusByItems(t)
 end
 
 
-function events.CalcDamageToMonster(t)
-	data=WhoHitMonster()
-	
+
+--visual changes in stats menu for scaled weapon
+function events.CalcStatBonusByItems(t)
+	--increase damage depending on max CHARGES, only visual (except for attack)
+	local cs = const.Stats
+	if t.Stat==cs.MeleeDamageMin or t.Stat==cs.MeleeDamageMax or t.Stat==cs.MeleeAttack then
+		for i=0,1 do
+			local it=t.Player:GetActiveItem(i)
+			if	it then
+				if it.MaxCharges>0 then
+					local data=Game.ItemsTxt[it.Number]
+					if data.EquipStat<=2 then
+						--add fix damage
+						local bonus=data.Mod2
+						if it.MaxCharges <= 20 then
+							local bonus=bonus*(it.MaxCharges/20)
+							t.Result=t.Result+math.round(bonus)
+						else
+							local bonus=bonus+bonus*2*((it.MaxCharges-20)/20)
+							t.Result=t.Result+math.round(bonus)
+						end
+						--calculate random damage
+						if t.Stat==cs.MeleeDamageMax then
+							local bonus=data.Mod1DiceSides
+							local dices=data.Mod1DiceCount
+							if it.MaxCharges <= 20 then
+								local bonus=bonus*(it.MaxCharges/20)
+								t.Result=t.Result+math.round(bonus)*dices
+							else
+								local bonus=bonus+bonus*2*((it.MaxCharges-20)/20)
+								t.Result=t.Result+math.round(bonus)*dices
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	--same for bows
+	if t.Stat==cs.RangedDamageMin or t.Stat==cs.RangedDamageMax or t.Stat==cs.RangedAttack then
+		local it=t.Player:GetActiveItem(2)
+		if	it then
+			if it.MaxCharges>0 then
+				local data=Game.ItemsTxt[it.Number]
+				if data.EquipStat<=2 then
+					--add fix damage
+					local bonus=data.Mod2
+					if it.MaxCharges <= 20 then
+						local bonus=bonus*(it.MaxCharges/20)
+						t.Result=t.Result+math.round(bonus)
+					else
+						local bonus=bonus+bonus*2*((it.MaxCharges-20)/20)
+						t.Result=t.Result+math.round(bonus)
+					end
+					--calculate random damage
+					if t.Stat==cs.MeleeDamageMax then
+						local bonus=data.Mod1DiceSides
+						local dices=data.Mod1DiceCount
+						if it.MaxCharges <= 20 then
+							local bonus=bonus*(it.MaxCharges/20)
+							t.Result=t.Result+math.round(bonus)*dices
+						else
+							local bonus=bonus+bonus*2*((it.MaxCharges-20)/20)
+							t.Result=t.Result+math.round(bonus)*dices
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+					
+function events.ModifyItemDamage(t)
 end
