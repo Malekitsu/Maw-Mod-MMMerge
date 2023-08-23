@@ -843,9 +843,9 @@ function events.CalcStatBonusByItems(t)
 			local bonusData = bonusEffects[it.Bonus2]
 			if bonusData then
 				if it.MaxCharges <= 20 then
-					mult=1+it.MaxCharges/20
+					mult=it.MaxCharges/20
 				else
-					mult=2+2*(it.MaxCharges-20)/20
+					mult=1+2*(it.MaxCharges-20)/20
 				end
 				if bonusData.bonusRange then
 					local lower, upper = bonusData.bonusRange[1], bonusData.bonusRange[2]
