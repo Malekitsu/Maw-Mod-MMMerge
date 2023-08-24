@@ -128,7 +128,13 @@ newWeaponSkillResistanceBonuses =
 	[const.Skills.Blaster]	= {0, 0, 0, 0},
 }
 -- armor skill AC bonuses (by rank)
-
+oldArmorSkillACBonuses =
+{
+	[const.Skills.Shield]	= {1, 1, 2, 2,}, 
+	[const.Skills.Leather]	= {1, 1, 2, 2,},
+	[const.Skills.Chain]	= {1, 1, 1, 1,},
+	[const.Skills.Plate]	= {1, 1, 1, 1,},
+}
 newArmorSkillACBonuses =
 {
 	[const.Skills.Shield]	= {1, 2, 3, 5,},
@@ -620,12 +626,12 @@ function events.CalcStatBonusBySkills(t)
 		if shield.equipped then
 		
 			-- subtract old bonus
-			
-			t.Result = t.Result - shield.rank * shield.level
+			local reduction=oldArmorSkillACBonuses[const.Skills.Shield][shield.rank] * shield.level
+			t.Result = t.Result - reduction
 			
 			-- add new bonus
 			
-			t.Result = t.Result + (newArmorSkillACBonuses[shield.skill][shield.rank] * shield.level * (shieldDoubleSkillEffectForKnights and table.find(knightClasses, t.Player.Class) and 2 or 1))
+			t.Result = t.Result + (newArmorSkillACBonuses[shield.skill][shield.rank] * shield.level )
 			
 		end
 		
@@ -637,7 +643,7 @@ function events.CalcStatBonusBySkills(t)
 		
 			-- subtract old bonus
 			
-			t.Result = t.Result - armor.level
+			t.Result = t.Result - oldArmorSkillACBonuses[armor.skill][armor.rank]*armor.level
 			
 			-- add new bonus
 			
