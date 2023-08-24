@@ -854,11 +854,11 @@ function events.CalcStatBonusByItems(t)
 					end
 				elseif bonusData.bonusValues then
 					for i =1, 3 do
-						if bonusData.bonusValues[i]and bonusData.bonusValues[i]-1==t.Stat then
-							for _, value in ipairs(bonusData.bonusValues) do
+						if bonusData.bonusValues[i] then
+							if bonusData.bonusValues[i]-1==t.Stat then
 								local modifier = bonusData.statModifier
 								if type(modifier) == "table" then
-									t.Result = t.Result + modifier[value] * mult
+									t.Result = t.Result + modifier[i] * mult
 								else
 									t.Result = t.Result + modifier * mult
 								end
@@ -888,7 +888,7 @@ function checktext(MaxCharges,bonus2)
 		[45] = " +" .. bonusEffects[45].statModifier * mult .. " Speed and Accuracy.",
 		[46] = "Adds 10-20 points of Fire damage and +" .. bonusEffects[46].statModifier * mult.. " Might.",
 		[47] = " +" .. bonusEffects[47].statModifier * mult .. " Spell points and Regenerate Spell points over time.",
-		[48] = " +" .. bonusEffects[48].statModifier[1] * mult .. " Endurance and" .. " +" .. bonusEffects[48].statModifier[2] .. "Armor.",
+		[48] = " +" .. bonusEffects[48].statModifier[1] * mult .. " Endurance and" .. " +" .. bonusEffects[48].statModifier[2] * mult.. " Armor.",
 		[49] = " +" .. bonusEffects[49].statModifier * mult .. " Intellect and Luck.",
 		[50] = " +" .. bonusEffects[50].statModifier * mult .. " Fire Resistance and Regenerate Hit points over time.",
 		[51] = " +" .. bonusEffects[51].statModifier * mult .. " Spell points, Speed, Intellect.",
