@@ -999,6 +999,7 @@ end
 function events.CalcStatBonusBySkills(t)
 	if t.Stat == const.Stats.MeleeDamageBase then  -- t.Result ~= 0 is for speedup
 		local s, m = SplitSkill(t.Player.Skills[const.Skills.Armsmaster])
+		s=s+checkbonus(22, t.PlayerIndex)
 		if m == 3 then
 			t.Result=t.Result+s
 		elseif m ==4 then
@@ -1383,4 +1384,13 @@ function events.LoadMap(wasInGame)
 end
 
 
-
+--function that checks for enchant that increases skill 
+function checkbonus(enchantNumber, playerIndex)
+	local skillBonus=0
+	for it in Party[playerIndex]:EnumActiveItems() do
+		if it.Bonus==enchantNumber then
+			skillBonus=it.BonusStrength
+		end
+	end
+	return skillBonus
+end
