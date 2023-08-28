@@ -1388,7 +1388,7 @@ end
 function checkbonus(enchantNumber, playerIndex)
 	local skillBonus=0
 	for it in Party[playerIndex]:EnumActiveItems() do
-		if it.Bonus==enchantNumber then
+		if it.Bonus==enchantNumber and it.BonusStrength>skillBonus then
 			skillBonus=it.BonusStrength
 		end
 	end
