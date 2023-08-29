@@ -33,6 +33,8 @@ oldWeaponSkillAttackBonuses =
 	[const.Skills.Bow]		= {1, 1, 1, 1,},
 	[const.Skills.Mace]		= {1, 1, 1, 1,},
 	[const.Skills.Blaster]	= {1, 2, 3, 5,},
+	[const.Skills.Unarmed]	= {1, 1, 2, 2,},
+	
 }
 newWeaponSkillAttackBonuses =
 {
@@ -44,6 +46,7 @@ newWeaponSkillAttackBonuses =
 	[const.Skills.Bow]		= {3, 3, 3, 3,},
 	[const.Skills.Mace]		= {1, 2, 2, 2,},
 	[const.Skills.Blaster]	= {5, 10, 15, 20,},
+	[const.Skills.Unarmed]	= {2, 2, 3, 3,},
 }
 -- weapon skill recovery bonuses (by rank)
 
@@ -57,6 +60,7 @@ oldWeaponSkillRecoveryBonuses =
 	[const.Skills.Bow]		= {0, 1, 1, 1,},
 	[const.Skills.Blaster]	= {0, 0, 0, 0,},
 	[const.Skills.Mace]		= {0, 0, 0, 0,},
+	[const.Skills.Unarmed]	= {0, 0, 0, 0,},
 }
 newWeaponSkillRecoveryBonuses =
 {
@@ -68,6 +72,7 @@ newWeaponSkillRecoveryBonuses =
 	[const.Skills.Bow]		= {1, 2, 2, 3,},
 	[const.Skills.Mace]		= {0, 0, 0, 0,},
 	[const.Skills.Blaster]	= {0, 0, 0, 0,},
+	[const.Skills.Unarmed]	= {0, 1, 1, 2,},
 }
 -- weapon skill damage bonuses (by rank)
 oldWeaponSkillDamageBonuses =
@@ -80,10 +85,11 @@ oldWeaponSkillDamageBonuses =
 	[const.Skills.Bow]		= {0, 0, 0, 1},
 	[const.Skills.Mace]		= {0, 1, 1, 1},
 	[const.Skills.Blaster]	= {0, 0, 0, 0},
+	[const.Skills.Unarmed]	= {1, 1, 2, 2,},
 }
 newWeaponSkillDamageBonuses =
 {
-	[const.Skills.Staff]	= {0, 0, 1, 1,},
+	[const.Skills.Staff]	= {0, 1, 2, 3,},
 	[const.Skills.Sword]	= {0, 1, 2, 2,},
 	[const.Skills.Dagger]	= {0, 0, 1, 1,},
 	[const.Skills.Axe]		= {1, 2, 3, 4,},
@@ -91,6 +97,7 @@ newWeaponSkillDamageBonuses =
 	[const.Skills.Bow]		= {1, 2, 2, 3,},
 	[const.Skills.Mace]		= {1, 2, 3, 4,},
 	[const.Skills.Blaster]	= {0, 0, 0, 0,},
+	[const.Skills.Unarmed]	= {2, 3, 4, 4,},
 }
 -- weapon skill AC bonuses (by rank)
 
@@ -104,6 +111,8 @@ oldWeaponSkillACBonuses =
 	[const.Skills.Bow]		= {0, 0, 0, 0,},
 	[const.Skills.Mace]		= {0, 0, 0, 0,},
 	[const.Skills.Blaster]	= {0, 0, 0, 0,},
+	[const.Skills.Unarmed]	= {0, 0, 0, 0,},
+	
 }
 newWeaponSkillACBonuses =
 {
@@ -115,6 +124,7 @@ newWeaponSkillACBonuses =
 	[const.Skills.Bow]		= {0, 0, 0, 0,},
 	[const.Skills.Mace]		= {0, 0, 0, 0,},
 	[const.Skills.Blaster]	= {0, 0, 0, 0,},
+	[const.Skills.Unarmed]	= {0, 0, 0, 0,},
 }
 newWeaponSkillResistanceBonuses =
 {
@@ -126,6 +136,8 @@ newWeaponSkillResistanceBonuses =
 	[const.Skills.Bow]		= {0, 0, 0, 0},
 	[const.Skills.Mace]		= {0, 0, 0, 0},
 	[const.Skills.Blaster]	= {0, 0, 0, 0},
+	[const.Skills.Unarmed]	= {0, 0, 0, 0,},
+	
 }
 -- armor skill AC bonuses (by rank)
 oldArmorSkillACBonuses =
@@ -549,11 +561,19 @@ function events.CalcStatBonusBySkills(t)
 				-- add new bonus for main weapon
 				-- removing the class bonus from main hand if main hand sword or dagger
 				if main.skill == const.Skills.Sword then
-				t.Result = t.Result + (newWeaponSkillDamageBonuses[main.skill][main.rank] * mainEffectiveSkillLevel)-(classMeleeDamageBonus*mainEffectiveSkillLevel)
-					elseif main.skill == const.Skills.Dagger then
 					t.Result = t.Result + (newWeaponSkillDamageBonuses[main.skill][main.rank] * mainEffectiveSkillLevel)-(classMeleeDamageBonus*mainEffectiveSkillLevel)
-						else
+				elseif main.skill == const.Skills.Dagger then
+					t.Result = t.Result + (newWeaponSkillDamageBonuses[main.skill][main.rank] * mainEffectiveSkillLevel)-(classMeleeDamageBonus*mainEffectiveSkillLevel)
+				elseif main.skill == const.Skills.Staff then
+					local punch=t.Player:GetSkill(const.Skills.Unarmed)
+					local s,m = SplitSkill(punch)
+					if m==4 then
+						t.Result=t.Result-oldWeaponSkillDamageBonuses[const.Skills.Unarmed][m]*s
+						t.Result=t.Result+newWeaponSkillDamageBonuses[const.Skills.Unarmed][m]*s
 						t.Result = t.Result + (newWeaponSkillDamageBonuses[main.skill][main.rank] * mainEffectiveSkillLevel)
+					end
+				else
+					t.Result = t.Result + (newWeaponSkillDamageBonuses[main.skill][main.rank] * mainEffectiveSkillLevel)
 				end
 				
 				-- add new bonus for extra weapon if any
@@ -567,17 +587,13 @@ function events.CalcStatBonusBySkills(t)
 				if classMeleeWeaponSkillDamageBonus[t.Player.Class] ~= nil then
 					t.Result = t.Result + (classMeleeDamageBonus * mainEffectiveSkillLevel)
 				end
-				
-				--[[ add class bonus for extra hand weapon if any and different from main weapon
-				
-				if extra.weapon and extra.skill ~= main.skill then
-					if classMeleeWeaponSkillDamageBonus[t.Player.Class] ~= nil then
-						t.Result = t.Result + math.round(classMeleeWeaponSkillDamageBonus[t.Player.Class] * extraEffectiveSkillLevel)
-					end
-				end
-				]]
-			end
 			
+			end
+		else
+			local punch=t.Player:GetSkill(const.Skills.Unarmed)
+			local s,m = SplitSkill(punch)
+			t.Result=t.Result-oldWeaponSkillDamageBonuses[const.Skills.Unarmed][m]*s
+			t.Result=t.Result+newWeaponSkillDamageBonuses[const.Skills.Unarmed][m]*s			
 		end
 		
 	-- calculate AC bonus by skill
@@ -750,16 +766,14 @@ local function getWeaponRecoveryCorrection(equipmentData1, equipmentData2, playe
 			oldRecoveryBonus = oldRecoveryBonus + (oldWeaponSkillRecoveryBonuses[equipmentData1.skill][equipmentData1.rank] * equipmentData1.level)
 		end
 		newRecoveryBonus = newRecoveryBonus + (newWeaponSkillRecoveryBonuses[equipmentData1.skill][equipmentData1.rank] * equipmentData1.level)
-		
-		-- class bonus
-		
-		--if equipmentData1.skill == const.Skills.Bow or (blastersUseClassMultipliers and equipmentData1.skill == const.Skills.Blaster) then
-		--	local rangedWeaponSkillSpeedBonusMultiplier = classRangedWeaponSkillSpeedBonusMultiplier[player.Class]
-		--	if rangedWeaponSkillSpeedBonusMultiplier ~= nil then
-		--		newRecoveryBonus = newRecoveryBonus * rangedWeaponSkillSpeedBonusMultiplier
-		--	end
-		--end
-		
+		--add unarmed bonus
+		if equipmentData1.skill==const.Skills.Staff and equipmentData1.rank==4 then
+			local unarmed=t.Player:GetSkill(const.Skills.Unarmed)
+			s,m=SplitSkill(unarmed)	
+			if s>1 then
+				newRecoveryBonus = newRecoveryBonus + newWeaponSkillRecoveryBonuses[const.Skills.Unarmed][m]*s
+			end
+		end
 		-- replace old with new bonus
 
 		correction = correction 
@@ -877,7 +891,12 @@ function events.GetAttackDelay(t)
 				end
 				
 			end
-			
+		else
+			local unarmed=t.Player:GetSkill(const.Skills.Unarmed)
+			s,m=SplitSkill(unarmed)	
+			if s>1 then
+				t.Result = t.Result - newWeaponSkillRecoveryBonuses[const.Skills.Unarmed][m]*s
+			end		
 		end
 		
 	end
@@ -1029,170 +1048,172 @@ end
 --AUTO GENERATING TOOLTIPS
 ------------------------
 function events.GameInitialized2()
-	for i=0,7 do
-		attack=false
-		recovery=false
-		damage=false
-		ac=false
-		res=false
-		baseString=string.format("%s\n------------------------------------------------------------\n         ",Game.SkillDescriptions[i])
-		for v=1,4 do
-			if newWeaponSkillAttackBonuses[i][v]~=0 then
-				attack=true
+	for i=0,33 do
+		if i<=7 or i==33 then
+			attack=false
+			recovery=false
+			damage=false
+			ac=false
+			res=false
+			baseString=string.format("%s\n------------------------------------------------------------\n         ",Game.SkillDescriptions[i])
+			for v=1,4 do
+				if newWeaponSkillAttackBonuses[i][v]~=0 then
+					attack=true
+				end
+				if newWeaponSkillRecoveryBonuses[i][v]~=0 then
+					recovery=true
+				end
+				if newWeaponSkillDamageBonuses[i][v]~=0 then
+					damage=true
+				end
+				if newWeaponSkillACBonuses[i][v]~=0 then
+					ac=true
+				end
+				if newWeaponSkillResistanceBonuses[i][v]~=0 then
+					res=true
+				end
 			end
-			if newWeaponSkillRecoveryBonuses[i][v]~=0 then
-				recovery=true
+			
+			--Novice
+			normal=""
+			if attack then
+				baseString=string.format("%s Attack|",baseString)
+				normal=string.format("%s      %s|",normal,newWeaponSkillAttackBonuses[i][1])
 			end
-			if newWeaponSkillDamageBonuses[i][v]~=0 then
-				damage=true
+			if recovery then
+				normal=string.format("%s      %s|",normal,newWeaponSkillRecoveryBonuses[i][1])
+				baseString=string.format("%s Speed|",baseString)
 			end
-			if newWeaponSkillACBonuses[i][v]~=0 then
-				ac=true
+			if damage then
+				normal=string.format("%s     %s|",normal,newWeaponSkillDamageBonuses[i][1])
+				baseString=string.format("%s Dmg|",baseString)
 			end
-			if newWeaponSkillResistanceBonuses[i][v]~=0 then
-				res=true
+			if ac then
+				normal=string.format("%s  %s|",normal,newWeaponSkillACBonuses[i][1])
+				baseString=string.format("%s AC|",baseString)
 			end
+			if res then
+				normal=string.format("%s    %s|",normal,newWeaponSkillResistanceBonuses[i][1])
+				baseString=string.format("%s Res|",baseString)
+			end
+			Game.SkillDesNormal[i]=normal
+			
+			--Expert
+			expert=""
+			if attack then
+				expert=string.format("%s      %s|",expert,newWeaponSkillAttackBonuses[i][2])
+			end
+			if recovery then
+				expert=string.format("%s      %s|",expert,newWeaponSkillRecoveryBonuses[i][2])
+			end
+			if damage then
+				expert=string.format("%s     %s|",expert,newWeaponSkillDamageBonuses[i][2])
+			end
+			if ac then
+				expert=string.format("%s  %s|",expert,newWeaponSkillACBonuses[i][2])
+			end
+			if res then
+				expert=string.format("%s    %s|",expert,newWeaponSkillResistanceBonuses[i][2])
+			end
+			Game.SkillDesExpert[i]=expert
+			--Master
+			master=""
+			if attack then
+				master=string.format("%s      %s|",master,newWeaponSkillAttackBonuses[i][3])
+			end
+			if recovery then
+				master=string.format("%s      %s|",master,newWeaponSkillRecoveryBonuses[i][3])
+			end
+			if damage then
+				master=string.format("%s     %s|",master,newWeaponSkillDamageBonuses[i][3])
+			end
+			if ac then
+				master=string.format("%s  %s|",master,newWeaponSkillACBonuses[i][3])
+			end
+			if res then
+				master=string.format("%s    %s|",master,newWeaponSkillResistanceBonuses[i][3])
+			end
+			Game.SkillDesMaster[i]=master
+			--GrandMaster
+			gm=""
+			if attack then
+				gm=string.format("%s      %s|",gm,newWeaponSkillAttackBonuses[i][4])
+			end
+			if recovery then
+				gm=string.format("%s      %s|",gm,newWeaponSkillRecoveryBonuses[i][4])
+			end
+			if damage then
+				gm=string.format("%s     %s|",gm,newWeaponSkillDamageBonuses[i][4])
+			end
+			if ac then
+				gm=string.format("%s  %s|",gm,newWeaponSkillACBonuses[i][4])
+			end
+			if res then
+				gm=string.format("%s    %s|",gm,newWeaponSkillResistanceBonuses[i][4])
+			end
+			Game.SkillDesGM[i]=gm
+			Game.SkillDescriptions[i]=string.format("%s",baseString)
 		end
-		
-		--Novice
-		normal=""
-		if attack then
-			baseString=string.format("%s Attack|",baseString)
-			normal=string.format("%s      %s|",normal,newWeaponSkillAttackBonuses[i][1])
-		end
-		if recovery then
-			normal=string.format("%s      %s|",normal,newWeaponSkillRecoveryBonuses[i][1])
-			baseString=string.format("%s Speed|",baseString)
-		end
-		if damage then
-			normal=string.format("%s     %s|",normal,newWeaponSkillDamageBonuses[i][1])
-			baseString=string.format("%s Dmg|",baseString)
-		end
-		if ac then
-			normal=string.format("%s  %s|",normal,newWeaponSkillACBonuses[i][1])
-			baseString=string.format("%s AC|",baseString)
-		end
-		if res then
-			normal=string.format("%s    %s|",normal,newWeaponSkillResistanceBonuses[i][1])
-			baseString=string.format("%s Res|",baseString)
-		end
-		Game.SkillDesNormal[i]=normal
-		
-		--Expert
-		expert=""
-		if attack then
-			expert=string.format("%s      %s|",expert,newWeaponSkillAttackBonuses[i][2])
-		end
-		if recovery then
-			expert=string.format("%s      %s|",expert,newWeaponSkillRecoveryBonuses[i][2])
-		end
-		if damage then
-			expert=string.format("%s     %s|",expert,newWeaponSkillDamageBonuses[i][2])
-		end
-		if ac then
-			expert=string.format("%s  %s|",expert,newWeaponSkillACBonuses[i][2])
-		end
-		if res then
-			expert=string.format("%s    %s|",expert,newWeaponSkillResistanceBonuses[i][2])
-		end
-		Game.SkillDesExpert[i]=expert
-		--Master
-		master=""
-		if attack then
-			master=string.format("%s      %s|",master,newWeaponSkillAttackBonuses[i][3])
-		end
-		if recovery then
-			master=string.format("%s      %s|",master,newWeaponSkillRecoveryBonuses[i][3])
-		end
-		if damage then
-			master=string.format("%s     %s|",master,newWeaponSkillDamageBonuses[i][3])
-		end
-		if ac then
-			master=string.format("%s  %s|",master,newWeaponSkillACBonuses[i][3])
-		end
-		if res then
-			master=string.format("%s    %s|",master,newWeaponSkillResistanceBonuses[i][3])
-		end
-		Game.SkillDesMaster[i]=master
-		--GrandMaster
-		gm=""
-		if attack then
-			gm=string.format("%s      %s|",gm,newWeaponSkillAttackBonuses[i][4])
-		end
-		if recovery then
-			gm=string.format("%s      %s|",gm,newWeaponSkillRecoveryBonuses[i][4])
-		end
-		if damage then
-			gm=string.format("%s     %s|",gm,newWeaponSkillDamageBonuses[i][4])
-		end
-		if ac then
-			gm=string.format("%s  %s|",gm,newWeaponSkillACBonuses[i][4])
-		end
-		if res then
-			gm=string.format("%s    %s|",gm,newWeaponSkillResistanceBonuses[i][4])
-		end
-		Game.SkillDesGM[i]=gm
-		Game.SkillDescriptions[i]=string.format("%s",baseString)
 	end
 	
 
 --now do same for armors
 	for i=8,32 do
 		if i<12 or i==32 then
-		recoveryPen=false
-		ac=false
-		res=false
-		baseString=string.format("%s\n------------------------------------------------------------\n         ",Game.SkillDescriptions[i])
-		for v=1,4 do
-			if newArmorSkillACBonuses[i][v]~=0 then
-				ac=true
+			recoveryPen=false
+			ac=false
+			res=false
+			baseString=string.format("%s\n------------------------------------------------------------\n         ",Game.SkillDescriptions[i])
+			for v=1,4 do
+				if newArmorSkillACBonuses[i][v]~=0 then
+					ac=true
+				end
+				if newArmorSkillResistanceBonuses[i][v]~=0 then
+					res=true
+				end
 			end
-			if newArmorSkillResistanceBonuses[i][v]~=0 then
-				res=true
+			
+			--Novice
+			normal=""
+			if ac then
+				normal=string.format("%s  %s|",normal,newArmorSkillACBonuses[i][1])
+				baseString=string.format("%s AC|",baseString)
 			end
+			if res then
+				normal=string.format("%s    %s|",normal,newArmorSkillResistanceBonuses[i][1])
+				baseString=string.format("%s Res|",baseString)
+			end
+			Game.SkillDesNormal[i]=normal
+			
+			--Expert
+			expert=""
+			if ac then
+				expert=string.format("%s  %s|",expert,newArmorSkillACBonuses[i][2])
+			end
+			if res then
+				expert=string.format("%s    %s|",expert,newArmorSkillResistanceBonuses[i][2])
+			end
+			Game.SkillDesExpert[i]=expert
+			--Master
+			master=""
+			if ac then
+				master=string.format("%s  %s|",master,newArmorSkillACBonuses[i][3])
+			end
+			if res then
+				master=string.format("%s    %s|",master,newArmorSkillResistanceBonuses[i][3])
+			end
+			Game.SkillDesMaster[i]=master
+			--GrandMaster
+			gm=""
+			if ac then
+				gm=string.format("%s  %s|",gm,newArmorSkillACBonuses[i][4])
+			end
+			if res then
+				gm=string.format("%s    %s|",gm,newArmorSkillResistanceBonuses[i][4])
+			end
+			Game.SkillDesGM[i]=gm
+			Game.SkillDescriptions[i]=string.format("%s",baseString)
 		end
-		
-		--Novice
-		normal=""
-		if ac then
-			normal=string.format("%s  %s|",normal,newArmorSkillACBonuses[i][1])
-			baseString=string.format("%s AC|",baseString)
-		end
-		if res then
-			normal=string.format("%s    %s|",normal,newArmorSkillResistanceBonuses[i][1])
-			baseString=string.format("%s Res|",baseString)
-		end
-		Game.SkillDesNormal[i]=normal
-		
-		--Expert
-		expert=""
-		if ac then
-			expert=string.format("%s  %s|",expert,newArmorSkillACBonuses[i][2])
-		end
-		if res then
-			expert=string.format("%s    %s|",expert,newArmorSkillResistanceBonuses[i][2])
-		end
-		Game.SkillDesExpert[i]=expert
-		--Master
-		master=""
-		if ac then
-			master=string.format("%s  %s|",master,newArmorSkillACBonuses[i][3])
-		end
-		if res then
-			master=string.format("%s    %s|",master,newArmorSkillResistanceBonuses[i][3])
-		end
-		Game.SkillDesMaster[i]=master
-		--GrandMaster
-		gm=""
-		if ac then
-			gm=string.format("%s  %s|",gm,newArmorSkillACBonuses[i][4])
-		end
-		if res then
-			gm=string.format("%s    %s|",gm,newArmorSkillResistanceBonuses[i][4])
-		end
-		Game.SkillDesGM[i]=gm
-		Game.SkillDescriptions[i]=string.format("%s",baseString)
-	end
 	end
 	
 	--adjust tooltips with special effects
@@ -1214,6 +1235,7 @@ function events.GameInitialized2()
 	Game.SkillDesGM[const.Skills.Shield]=string.format("%s halve dmg from phys projectiles",Game.SkillDesGM[const.Skills.Shield])
 	Game.SkillDesMaster[const.Skills.Armsmaster]=string.format("Skills adds 2 damage to all melee weapons")
 	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s usable with Leather Armor",Game.SkillDesGM[const.Skills.Dodging])
+	Game.SkillDesGM[const.Skills.Unarmed]=string.format("%s 5+0.5%% dodge chance",Game.SkillDesGM[const.Skills.Unarmed])
 end
 
 --REMOVE PLATE/MAIL physical damage reduction
