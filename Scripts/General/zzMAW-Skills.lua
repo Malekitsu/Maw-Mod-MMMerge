@@ -107,11 +107,11 @@ oldWeaponSkillACBonuses =
 }
 newWeaponSkillACBonuses =
 {
-	[const.Skills.Staff]	= {1, 2, 3, 4,},
+	[const.Skills.Staff]	= {1, 1, 2, 2,},
 	[const.Skills.Sword]	= {0, 0, 0, 1,},
 	[const.Skills.Dagger]	= {0, 0, 0, 0,},
 	[const.Skills.Axe]		= {0, 0, 0, 0,},
-	[const.Skills.Spear]	= {1, 2, 4, 6,},
+	[const.Skills.Spear]	= {1, 2, 2, 3,},
 	[const.Skills.Bow]		= {0, 0, 0, 0,},
 	[const.Skills.Mace]		= {0, 0, 0, 0,},
 	[const.Skills.Blaster]	= {0, 0, 0, 0,},
@@ -134,22 +134,24 @@ oldArmorSkillACBonuses =
 	[const.Skills.Leather]	= {1, 1, 2, 2,},
 	[const.Skills.Chain]	= {1, 1, 1, 1,},
 	[const.Skills.Plate]	= {1, 1, 1, 1,},
+	[const.Skills.Dodging]	= {1, 2, 3, 3,},
 }
 newArmorSkillACBonuses =
 {
-	[const.Skills.Shield]	= {1, 2, 3, 5,},
-	[const.Skills.Leather]	= {1, 2, 3, 3,},
-	[const.Skills.Chain]	= {2, 3, 4, 5,},
-	[const.Skills.Plate]	= {3, 4, 5, 7,},
+	[const.Skills.Shield]	= {1, 2, 2, 3,},
+	[const.Skills.Leather]	= {1, 1, 2, 2,},
+	[const.Skills.Chain]	= {1, 2, 3, 3,},
+	[const.Skills.Plate]	= {2, 2, 3, 4,},
+	[const.Skills.Dodging]	= {2, 3, 4, 4,},
 }
 -- armor skill resistance bonuses (by rank)
 
 newArmorSkillResistanceBonuses =
 {
-	[const.Skills.Leather]	= {2, 4, 6, 9,},
+	[const.Skills.Leather]	= {2, 4, 6, 8,},
 	[const.Skills.Chain]	= {2, 3, 4, 6,},
-	[const.Skills.Plate]	= {0, 1, 2, 3,},
-	[const.Skills.Shield]	= {0, 0, 0, 0,},
+	[const.Skills.Plate]	= {1, 2, 3, 4,},
+	[const.Skills.Shield]	= {2, 4, 6, 8,},
 }
 
 twoHandedWeaponDamageBonusByMastery = {
@@ -865,7 +867,7 @@ function events.GetAttackDelay(t)
 		
 	end
 	
-	-- turn recovery time into a multiplier rather than divisor
+	-- turn recovery time into a multiplier rather than divisor-
 	
 	local recoveryBonus = 100 - t.Result
 	local correctedRecoveryTime = math.floor(100 / (1 + recoveryBonus / 100))
