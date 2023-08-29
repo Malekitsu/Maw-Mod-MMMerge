@@ -1,0 +1,11 @@
+Command	X	Y	Width	Height	NewX	NewY	Click	Draw	Condition	Format	NewWidth	NewHeight	Canvas	NewCanvas	Comment
+SCREEN					ScreenW	ScreenH			(s0 or s20) and Game.Loading < 2						READ REMOTE PLAYERS
+STAGE Read
+	120	60	300	294				+						RemPlayers
+
+SCREEN									(s0 or s20) and Game.Loading < 2						RECOVER NPC
+recover													RemPlayers
+
+SCREEN					ScreenW	ScreenH			(s0 or s20) and Game.Loading < 2						DRAW NPC
+STAGE DrawViewUI
+					0	B - 120							RemPlayers
