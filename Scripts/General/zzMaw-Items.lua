@@ -118,10 +118,12 @@ return end
 		if enc2Chance[pseudoStr]>roll2 then
 			t.Item.Charges=math.random(1,16)*1000
 			t.Item.Charges=t.Item.Charges+math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
+			--[[ no skill bonuses
 			if math.random(1,10)==10 then
 				t.Item.Charges=math.random(17,24)*1000
 				t.Item.Charges=t.Item.Charges+math.round(math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])^0.5)
 			end
+			]]
 		end
 		--make it standard bonus if no standard bonus
 		if t.Item.Bonus==0 then
@@ -177,8 +179,15 @@ return end
 		if t.Item.Bonus==8 or t.Item.Bonus==9 then
 			t.Item.BonusStrength=t.Item.BonusStrength*2
 		end
-		if t.Item.Charges%1000==7 or t.Item.Charges%1000==8 then
+		if math.floor(t.Item.Charges/1000)==8 or math.floor(t.Item.Charges/1000)==9 then
 			t.Item.Charges=t.Item.Charges+t.Item.Charges%1000
+		end
+		--nerf to AC
+		if t.Item.Bonus==10 then
+			t.Item.BonusStrength=t.Item.BonusStrength/2
+		end
+		if math.floor(t.Item.Charges/1000)==10 then
+			t.Item.Charges=t.Item.Charges-math.floor(t.Item.Charges%1000)/2
 		end
 	end
 end
