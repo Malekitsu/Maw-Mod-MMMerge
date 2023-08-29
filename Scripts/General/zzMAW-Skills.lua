@@ -152,6 +152,7 @@ newArmorSkillResistanceBonuses =
 	[const.Skills.Chain]	= {2, 3, 4, 6,},
 	[const.Skills.Plate]	= {1, 2, 3, 4,},
 	[const.Skills.Shield]	= {2, 4, 6, 8,},
+	[const.Skills.Dodging]	= {0, 0, 0, 0,},
 }
 
 twoHandedWeaponDamageBonusByMastery = {
@@ -640,7 +641,7 @@ function events.CalcStatBonusBySkills(t)
 		-- AC bonus from armor skill
 		
 		local armor = equipmentData.armor
-		
+		local dodge=t.Player:GetSkill(const.Skills.Dodging)
 		if armor.equipped then
 		
 			-- subtract old bonus
@@ -651,6 +652,20 @@ function events.CalcStatBonusBySkills(t)
 			
 			t.Result = t.Result + (newArmorSkillACBonuses[armor.skill][armor.rank] * armor.level)
 			
+			--check for dodge
+			if armor.skill==const.Skills.Leather then
+				if dodge>256 then
+					s,m=SplitSkill(dodge)
+					t.Result = t.Result - oldArmorSkillACBonuses[const.Skills.Dodging][m] * s
+					t.Result = t.Result + newArmorSkillACBonuses[const.Skills.Dodging][m] * s
+				end		
+			end
+		else
+			s,m=SplitSkill(dodge)
+			--calculate dodge
+			t.Result = t.Result - oldArmorSkillACBonuses[const.Skills.Dodging][m] * s
+			t.Result = t.Result + newArmorSkillACBonuses[const.Skills.Dodging][m] * s
+		
 		end
 		
 	end
@@ -1000,8 +1015,7 @@ end
 ----------------------
 function events.CalcStatBonusBySkills(t)
 	if t.Stat == const.Stats.MeleeDamageBase then  -- t.Result ~= 0 is for speedup
-		local s, m = SplitSkill(t.Player.Skills[const.Skills.Armsmaster])
-		s=s+checkbonus(22, t.PlayerIndex)
+		local s, m = SplitSkill(t.Player:GetSkill(const.Skills.Armsmaster))
 		if m == 3 then
 			t.Result=t.Result+s
 		elseif m ==4 then
@@ -1123,7 +1137,8 @@ function events.GameInitialized2()
 	
 
 --now do same for armors
-	for i=8,11 do
+	for i=8,32 do
+		if i<12 or i==32 then
 		recoveryPen=false
 		ac=false
 		res=false
@@ -1178,6 +1193,7 @@ function events.GameInitialized2()
 		Game.SkillDesGM[i]=gm
 		Game.SkillDescriptions[i]=string.format("%s",baseString)
 	end
+	end
 	
 	--adjust tooltips with special effects
 	Game.SkillDesGM[const.Skills.Axe]=string.format("%s 1%% to halve AC",Game.SkillDesGM[const.Skills.Axe])
@@ -1195,7 +1211,9 @@ function events.GameInitialized2()
 	Game.SkillDesExpert[const.Skills.Plate]=string.format("%s recovery penalty halved",Game.SkillDesExpert[const.Skills.Plate])
 	Game.SkillDesGM[const.Skills.Plate]=string.format("%s recovery penalty eliminated",Game.SkillDesGM[const.Skills.Plate])
 	Game.SkillDesExpert[const.Skills.Shield]=string.format("%s recovery penalty eliminated",Game.SkillDesExpert[const.Skills.Shield])
+	Game.SkillDesGM[const.Skills.Shield]=string.format("%s halve dmg from phys projectiles",Game.SkillDesGM[const.Skills.Shield])
 	Game.SkillDesMaster[const.Skills.Armsmaster]=string.format("Skills adds 2 damage to all melee weapons")
+	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s usable with Leather Armor",Game.SkillDesGM[const.Skills.Dodging])
 end
 
 --REMOVE PLATE/MAIL physical damage reduction
