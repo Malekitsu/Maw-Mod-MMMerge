@@ -53,7 +53,7 @@ end
 function events.CalcDamageToPlayer(t)
 	if t.DamageKind==4 then 
 	AC=t.Player:GetArmorClass()
-	t.Result=t.Result/(math.max(AC^0.85/200+0.75,1))
+	t.Result=t.Result/(AC/300+1)
 	end
 end
 --endurance
@@ -110,7 +110,6 @@ function events.BuildStatInformationBox(t)
 	if t.Stat==5 then
 	i=Game.CurrentPlayer
 	speed=Party[i]:GetSpeed()
-	ac=Party[i]:GetArmorClass()
 	t.Text=string.format("%s\n\nDodge chance: %s%s",Game.StatsDescriptions[5],math.floor(1000-0.995^(speed/10)*1000)/10	,"%")
 	end
 	if t.Stat==6 then
@@ -158,7 +157,7 @@ function events.BuildStatInformationBox(t)
 	if t.Stat==9 then
 	i=Game.CurrentPlayer
 	ac=Party[i]:GetArmorClass()
-	acReduction=math.round(1000-1000/math.max(ac^0.85/100+0.5,1))/10
+	acReduction=math.round(1000-1000/(ac/300+1))/10
 	t.Text=string.format("%s\n\nPhysical damage reduction from AC: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%"))
 	end
 	if t.Stat==19 then
