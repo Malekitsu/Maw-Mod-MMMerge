@@ -64,14 +64,15 @@ function events.UseMouseItem(t)
 			t.Allow=false
 			pl:ShowFaceAnimation(36)
 			evt.PlaySound(143)
-			if it.Charges>0 then
+			if it.Charges==0 then
+				it.Charges=5
+			elseif it.Charges>1 then
 				it.Charges=it.Charges-1
-			else
+			elseif it.Charges==2 then
 				it.Number=0
 			end
 			return
 		end
-		
 		-------------------------
 		--PERMANENT BUFFS
 		------------------------
@@ -191,16 +192,23 @@ function events.BuildItemInformationBox(t)
 		t.Description=potionText[t.Item.Number] .. "\n(To drink, pick the potion up and right-click over a character's portrait.  To mix, pick the potion up and right-click over another potion.)"
 	end
 	if t.Item.Number==222 then
-		t.Description=StrColor(255,255,153,"\nHeals " .. math.round(t.Item.Bonus^1.4)+10 .. " Hit Points") .. "\n" .. t.Description
+		t.Description=StrColor(255,255,153,"Heals " .. math.round(t.Item.Bonus^1.4)+10 .. " Hit Points") .. "\n" .. t.Description
 	end
 	if t.Item.Number==223 then
-		t.Description=StrColor(255,255,153,"\nRestores " .. math.round(t.Item.Bonus^1.4*3/2)+10 .. " Spell Points") .. "\n" .. t.Description
+		t.Description=StrColor(255,255,153,"Restores " .. math.round(t.Item.Bonus^1.4*3/2)+10 .. " Spell Points") .. "\n" .. t.Description
 	end
 	if t.Item.Number==253 then
-		t.Description=StrColor(255,255,153,"\nHeals " .. math.round(t.Item.Bonus^1.4*3)+10 .. " Hit Points") .. "\n" .. t.Description
+		t.Description=StrColor(255,255,153,"Heals " .. math.round(t.Item.Bonus^1.4*3)+10 .. " Hit Points") .. "\n" .. t.Description
 	end
 	if t.Item.Number==254 then
-		t.Description=StrColor(255,255,153,"\nRestores " .. math.round(t.Item.Bonus^1.4*2)+10 .. " Spell Points") .. "\n" .. t.Description
+		t.Description=StrColor(255,255,153,"Restores " .. math.round(t.Item.Bonus^1.4*2)+10 .. " Spell Points") .. "\n" .. t.Description
+	end
+	if itemBuffMapping[t.Item.Number] then
+		local charges=t.Item.Charges-1
+		if charges==-1 then
+			charges=5
+		end
+		t.Description=StrColor(255,255,153,"Charges: " .. charges) .. "\n" .. t.Description
 	end
 end
 
@@ -230,11 +238,11 @@ potionText={
 	[243] = "Temporarily increases Endurance by 10+(1 x Power) for (30 x Power) minutes",
 	[244] = "Temporarily increases Speed by 10+(1 x Power) for (30 x Power) minutes",
 	[245] = "Temporarily increases Accuracy by 10+(1 x Power) for (30 x Power) minutes",
-	[246] = "Adds 'of Flame' property to a non-magic weapon.",
-	[247] = "Adds 'of Frost' property to a non-magic weapon.",
-	[248] = "Adds 'of Poison' property to a non-magic weapon.",
-	[249] = "Adds 'of Sparks' property to a non-magic weapon.",
-	[250] = "Adds 'of Swiftness' property to a non-magic weapon.",
+	[246] = "Adds 'of Flame' property to a weapon.",
+	[247] = "Adds 'of Frost' property to a weapon.",
+	[248] = "Adds 'of Poison' property to a weapon.",
+	[249] = "Adds 'of Sparks' property to a weapon.",
+	[250] = "Adds 'of Swiftness' property to a weapon.",
 	[251] = "Cures and prevents Paralysis for 6 hours.",
 	[252] = "Removes all conditions except Dead, Stoned, or Eradicated.",
 	[253] = "",
@@ -247,7 +255,7 @@ potionText={
 	[260] = "Increases temporary Mind resistance by 20+(1 x Power) for (30 x Power) minutes",
 	[261] = "Increases temporary Body resistance by 20+(1 x Power) for (30 x Power) minutes",
 	[262] = "Cures Stoned condition.",
-	[263] = "Adds 'of Dragon Slaying' to a non-magic weapon.",
+	[263] = "Adds 'of Dragon Slaying' to a weapon.",
 	[264] = "Adds 30 to permanent Luck.",
 	[265] = "Adds 30 to permanent Speed.",
 	[266] = "Adds 30 to permanent Intellect.",
@@ -262,3 +270,5 @@ potionText={
 	[281] = "Increases Fire, Air, Water, Earth, Mind and Body resistances temporarily by 10+ (1 x Power) for (30 x Power) minutes",
 	[282] = "Increases the character's level by 10+0.25 per power for (30 x Power) minutes",
 }
+
+
