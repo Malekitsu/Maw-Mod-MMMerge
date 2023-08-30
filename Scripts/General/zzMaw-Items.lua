@@ -252,44 +252,6 @@ function events.GameInitialized2()
 end
 
 
-spellbonusdamage={}
-spellbonusdamage[13] = 10
-spellbonusdamage[14] = 24
-spellbonusdamage[15] = 48
-
-aoespells = {6, 7, 8, 9, 10, 15, 22, 26, 32, 41, 43, 84, 92, 97, 98, 99}
-function events.CalcSpellDamage(t)
-data=WhoHitMonster()
-	if data and data.Player then
-		it=data.Player:GetActiveItem(1)
-		if it then
-			if (it.Bonus2 >= 4 and it.Bonus2 <= 15) or it.Bonus2 == 46 then
-				spellbonusdamage[4] = math.random(6, 8)
-				spellbonusdamage[5] = math.random(18, 24)
-				spellbonusdamage[6] = math.random(36, 48)
-				spellbonusdamage[7] = math.random(4, 10)
-				spellbonusdamage[8] = math.random(12, 30)
-				spellbonusdamage[9] = math.random(24, 60)
-				spellbonusdamage[10] = math.random(2, 12)
-				spellbonusdamage[11] = math.random(6, 36)
-				spellbonusdamage[12] = math.random(12, 72)
-				spellbonusdamage[46] = math.random(40, 80)
-				buffed=0
-				bonusDamage = spellbonusdamage[it.Bonus2] or 0
-				for i = 1, #aoespells do
-					if aoespells[i] == t.Spell then
-						t.Result = t.Result+bonusDamage/5
-						buffed=1
-						break
-					end
-				end
-				if buffed==0 then
-				t.Result = t.Result+bonusDamage
-				end
-			end
-		end
-	end
-end
 
 
 --change tooltip
