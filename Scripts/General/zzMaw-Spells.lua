@@ -236,6 +236,49 @@ function events.CalcSpellDamage(t)
 	end
 end
 
+--add enchant damage
+
+
+spellbonusdamage={}
+spellbonusdamage[4] = {["low"]=6, ["high"]=8}
+spellbonusdamage[5] = {["low"]=18, ["high"]=24}
+spellbonusdamage[6] = {["low"]=36, ["high"]=48}
+spellbonusdamage[7] = {["low"]=4, ["high"]=10}
+spellbonusdamage[8] = {["low"]=12, ["high"]=30}
+spellbonusdamage[9] = {["low"]=24, ["high"]=60}
+spellbonusdamage[10] = {["low"]=2, ["high"]=12}
+spellbonusdamage[11] = {["low"]=6, ["high"]=36}
+spellbonusdamage[12] = {["low"]=12, ["high"]=72}
+spellbonusdamage[13] = {["low"]=12, ["high"]=12}
+spellbonusdamage[14] = {["low"]=24, ["high"]=24}
+spellbonusdamage[15] = {["low"]=48, ["high"]=48}
+
+aoespells = {6, 7, 8, 9, 10, 15, 22, 26, 32, 41, 43, 84, 92, 97, 98, 99}
+function events.CalcSpellDamage(t)
+data=WhoHitMonster()
+	if data and data.Player then
+		it=data.Player:GetActiveItem(1)
+		if it then
+			if spellbonusdamage[it.Bonus2] then
+				damage=math.random(spellbonusdamage[it.Bonus2]["low"],spellbonusdamage[it.Bonus2]["high"])
+				for i = 1, #aoespells do
+					if aoespells[i] == t.Spell then
+						damage=damage/2.5
+					end
+				end
+				if it.MaxCharges>0 then
+					if it.MaxCharges <= 20 then
+						mult=1+it.MaxCharges/20
+					else
+						mult=2+2*(it.MaxCharges-20)/20
+					end
+					damage=damage*mult
+				end
+				t.Result = t.Result+damage
+			end
+		end
+	end
+end
 
 --function for tooltips
 function dmgAddTooltip(level,spellIndex)
