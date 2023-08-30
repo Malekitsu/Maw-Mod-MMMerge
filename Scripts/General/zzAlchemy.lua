@@ -188,26 +188,26 @@ end
 
 function events.BuildItemInformationBox(t)
 	if potionText[t.Item.Number] then
-		t.Description=potionText[t.Item.Number].." (To drink, pick the potion up and right-click over a character's portrait.  To mix, pick the potion up and right-click over another potion.)"
+		t.Description=potionText[t.Item.Number] .. "\n(To drink, pick the potion up and right-click over a character's portrait.  To mix, pick the potion up and right-click over another potion.)"
 	end
 	if t.Item.Number==222 then
-		t.Description=StrColor(255,255,153,"\nRestores " .. math.round(t.Item.Bonus^1.4)+10 .. " Hit Points") .. "\n\n" .. t.Description
+		t.Description=StrColor(255,255,153,"\nHeals " .. math.round(t.Item.Bonus^1.4)+10 .. " Hit Points") .. "\n" .. t.Description
 	end
 	if t.Item.Number==223 then
-		t.Description=StrColor(255,255,153,"\nRestores " .. math.round(t.Item.Bonus^1.4*3/2)+10 .. " Spell Points") .. "\n\n" .. t.Description
+		t.Description=StrColor(255,255,153,"\nRestores " .. math.round(t.Item.Bonus^1.4*3/2)+10 .. " Spell Points") .. "\n" .. t.Description
 	end
 	if t.Item.Number==253 then
-		t.Description=StrColor(255,255,153,"\nRestores " .. math.round(t.Item.Bonus^1.4*3)+10 .. " Hit Points") .. "\n\n" .. t.Description
+		t.Description=StrColor(255,255,153,"\nHeals " .. math.round(t.Item.Bonus^1.4*3)+10 .. " Hit Points") .. "\n" .. t.Description
 	end
 	if t.Item.Number==254 then
-		t.Description=StrColor(255,255,153,"\nRestores " .. math.round(t.Item.Bonus^1.4*2)+10 .. " Spell Points") .. "\n\n" .. t.Description
+		t.Description=StrColor(255,255,153,"\nRestores " .. math.round(t.Item.Bonus^1.4*2)+10 .. " Spell Points") .. "\n" .. t.Description
 	end
 end
 
 
 potionText={
-	[222] = "Heals 10 plus the potion strength Hit Points.",
-	[223] = "Restores 10 plus the potion strength Spell Points.",
+	[222] = "",
+	[223] = "",
 	[224] = "Cures and prevents Weakness for 6 hours.",
 	[225] = "Cures and prevents Disease for 6 hours.",
 	[226] = "Cures and prevents Poison for 6 hours.",
@@ -237,8 +237,8 @@ potionText={
 	[250] = "Adds 'of Swiftness' property to a non-magic weapon.",
 	[251] = "Cures and prevents Paralysis for 6 hours.",
 	[252] = "Removes all conditions except Dead, Stoned, or Eradicated.",
-	[253] = "Heals three times the potion's strength of hit points.",
-	[254] = "Restores three times the potion's strength of spell points.",
+	[253] = "",
+	[254] = "",
 	[255] = "Increases temporary Luck.",
 	[256] = "Increases temporary Fire resistance.",
 	[257] = "Increases temporary Air resistance.",
