@@ -272,3 +272,68 @@ potionText={
 }
 
 
+
+
+--rework to reagents
+reagentList={
+	--mm8
+	[200] = 1, [201] = 5, [202] = 10, [203] = 20, [204] = 30, --red
+	[205] = 1, [206] = 5, [207] = 10, [208] = 20, [209] = 30, --blue
+	[210] = 1, [211] = 5, [212] = 10, [213] = 20, [214] = 30, --yellow
+	[215] = 1, [216] = 5, [217] = 10, [218] = 20, [219] = 45, --gray
+	--mm7
+	[1002] = 1, [1003] = 5, [1004] = 10, [1005] = 20, [1006] = 30, --red
+	[1007] = 1, [1008] = 5, [1009] = 10, [1010] = 20, [1011] = 30, --blue
+	[1012] = 1, [1013] = 5, [1014] = 10, [1015] = 20, [1016] = 30, --yellow
+	[1017] = 1, [1018] = 5, [1019] = 10, [1020] = 20, [1021] = 45, --gray
+	--mm6
+	[1762] = 1, [1763] = 1, [1764] = 1,
+}
+function events.Tick()
+	if lastModifiedReagent and lastModifiedReagent~=0 then
+		Game.ItemsTxt[lastModifiedReagent].Mod1DiceCount=reagentList[lastModifiedReagent]
+	end
+	if reagentList[Mouse.Item.Number] then
+		local it=Game.ItemsTxt[Mouse.Item.Number]
+		if Mouse.Item.Bonus>0 then
+			it.Mod1DiceCount=math.floor(reagentList[Mouse.Item.Number]*((Mouse.Item.Bonus*0.75)/20+1)+Mouse.Item.Bonus*0.75)
+		end
+		local alc=Party[Game.CurrentPlayer]:GetSkill(const.Skills.Alchemy)
+		s,m=SplitSkill(alc)
+		if m==3 then
+			it.Mod1DiceCount=it.Mod1DiceCount+s*0.5
+		elseif m==4 then
+			it.Mod1DiceCount=it.Mod1DiceCount+s
+			lastModifiedReagent=Mouse.Item.Number
+		end
+	end
+end
+
+
+function events.BuildItemInformationBox(t)
+	if reagentList[t.Item.Number] then
+		t.Enchantment="Power: " .. reagentList[t.Item.Number] *((t.Item.Bonus*0.75)/20+1)+t.Item.Bonus*0.75
+	end
+end
+
+--add scaling effect on reagents
+function events.ItemGenerated(t)
+	if Map.MapStatsIndex==0 then return end
+	if t.Strength==7 then 
+		return
+	end
+	if reagentList[t.Item.Number] then
+		t.Handled=true
+		--calculate party level
+		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+		if currentWorld==1 then
+			partyLevel=vars.MM7LVL+vars.MM6LVL
+		elseif currentWorld==2 then
+			partyLevel=vars.MM8LVL+vars.MM6LVL
+		elseif currentWorld==3 then
+			partyLevel=vars.MM8LVL+vars.MM7LVL
+		end
+		--ADD MAX CHARGES BASED ON PARTY LEVEL
+		t.Item.Bonus=math.min(math.floor(partyLevel/5),255)
+	end
+end
