@@ -3,6 +3,15 @@ function events.LoadMap()
 		vars.PlayerBuff={} 
 		for i=0,4 do
 			vars.PlayerBuff[i]={}
+			vars.PlayerBuff[i]["weakness"]=0
+			vars.PlayerBuff[i]["disease"]=0
+			vars.PlayerBuff[i]["poison"]=0
+			vars.PlayerBuff[i]["sleep"]=0
+			vars.PlayerBuff[i]["fear"]=0
+			vars.PlayerBuff[i]["curse"]=0
+			vars.PlayerBuff[i]["insanity"]=0
+			vars.PlayerBuff[i]["paralysis"]=0
+			vars.PlayerBuff[i]["stone"]=0
 		end
 	end
 end
