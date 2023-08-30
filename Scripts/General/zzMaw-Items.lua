@@ -83,7 +83,6 @@ return end
 		t.Item.Bonus=0
 		t.Item.Bonus2=0
 		t.Item.BonusStrength=0
-		Game.ShowStatusText("success")
 		--calculate party level
 		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
 		if currentWorld==1 then
@@ -248,82 +247,10 @@ function events.GameInitialized2()
 			Game.ItemsTxt[i].Mod1DiceSides = Game.ItemsTxt[i].Mod1DiceSides + (expectedDamageIncrease / Game.ItemsTxt[i].Mod1DiceCount)
 			Game.ItemsTxt[i].Mod2=expectedDamageIncrease/2
 
-			end 
-		end
-
-	------------
-	--tooltips
-	------------
-	Game.SpcItemsTxt[3].BonusStat="Adds 6-8 points of Cold damage."
-	Game.SpcItemsTxt[4].BonusStat="Adds 18-24 points of Cold damage."
-	Game.SpcItemsTxt[5].BonusStat="Adds 36-48 points of Cold damage."
-	Game.SpcItemsTxt[6].BonusStat="Adds 4-10 points of Electrical damage."
-	Game.SpcItemsTxt[7].BonusStat="Adds 12-30 points of Electrical damage."
-	Game.SpcItemsTxt[8].BonusStat="Adds 24-60 points of Electrical damage."
-	Game.SpcItemsTxt[9].BonusStat="Adds 2-12 points of Fire damage."
-	Game.SpcItemsTxt[10].BonusStat="Adds 6-36 points of Fire damage."
-	Game.SpcItemsTxt[11].BonusStat="Adds 12-72 points of Fire damage."
-	Game.SpcItemsTxt[12].BonusStat="Adds 10 points of Body damage."
-	Game.SpcItemsTxt[13].BonusStat="Adds 24 points of Body damage."
-	Game.SpcItemsTxt[14].BonusStat="Adds 48 points of Body damage."
-
-end
-
---ENCHANTS HERE
---MELEE bonuses
-enchantbonusdamage = {}
-enchantbonusdamage[4] = 2
-enchantbonusdamage[5] = 3
-enchantbonusdamage[6] = 4
-enchantbonusdamage[7] = 2
-enchantbonusdamage[8] = 3
-enchantbonusdamage[9] = 4
-enchantbonusdamage[10] = 2
-enchantbonusdamage[11] = 3
-enchantbonusdamage[12] = 4
-enchantbonusdamage[13] = 2
-enchantbonusdamage[14] = 3
-enchantbonusdamage[15] = 4
-enchantbonusdamage[46] = 4
-
-function events.CalcDamageToMonster(t)
-    local data = WhoHitMonster()
-    if data and data.Player and t.DamageKind ~= 4 and data.Object == nil and t.ByPlayer==true and t.Melee==true then
-	n=1
-	bonusDamage2=1
-        for i = 0,1 do
-			it=data.Player:GetActiveItem(i)
-			bonusDamage=0
-			-- calculation
-			if it then
-				if (it.Bonus2 >= 4 and it.Bonus2 <= 15) or it.Bonus2 == 46  then
-				local bonusDamage1 = bonusDamage+enchantbonusdamage[it.Bonus2] or 0
-				bonusDamage2=(bonusDamage2*bonusDamage1)^(1/n)
-				n=n+1
-				end
-			end
-        end	
-		
-		if n~=0 and bonusDamage2~=0 then
-		t.Result = bonusDamage2*t.Result
-		end
-    end
-end
-
---bows 
-function events.CalcDamageToMonster(t)
-    local data = WhoHitMonster()
-    if data and data.Player and t.DamageKind ~= 0 and data.Object~=nil then
-			if data.Object.Spell==100 then
-			it=data.Player:GetActiveItem(2)
-			-- calculation
-			if (it.Bonus2 >= 4 and it.Bonus2 <= 15) or it.Bonus2 == 46 then
-			local bonusDamage = enchantbonusdamage[it.Bonus2] or 0
-			t.Result=t.Result*bonusDamage
-			end	
-		end
+		end 
 	end
- end
+end
+
 
 spellbonusdamage={}
 spellbonusdamage[13] = 10
@@ -625,7 +552,7 @@ function events.BuildItemInformationBox(t)
 			end
 		elseif t.Description then
 			if t.Item.Bonus2>0 then	
-				if t.Item.MaxCharges>0 and bonusEffects[t.Item.Bonus2]~= nil then
+				if (t.Item.MaxCharges>0 and bonusEffects[t.Item.Bonus2]~= nil) or weaponenchants[t.Item.Bonus2] then
 					text=checktext(t.Item.MaxCharges,t.Item.Bonus2)
 				else
 					text=Game.SpcItemsTxt[t.Item.Bonus2-1].BonusStat
@@ -891,11 +818,23 @@ function checktext(MaxCharges,bonus2)
 	bonus2txt={
 		[1] =  " +" .. bonusEffects[1].statModifier * mult .. " to all Resistances.",
 		[2] = " +" .. bonusEffects[2].statModifier * mult .. " to all Seven Statistics.",
+		[4] ="Adds " .. 6*mult .. "-" .. 8*mult .. " points of Cold damage.",
+		[5] ="Adds " .. 18*mult .. "-" .. 24*mult .. " points of Cold damage.",
+		[6] ="Adds " .. 36*mult .. "-" .. 48*mult .. " points of Cold damage.",
+		[7] ="Adds " .. 4*mult .. "-" .. 10*mult .. " points of Electrical damage.",
+		[8] ="Adds " .. 12*mult .. "-" .. 30*mult .. " points of Electrical damage.",
+		[9] ="Adds " .. 24*mult .. "-" .. 60*mult .. " points of Electrical damage.",
+		[10] ="Adds " .. 2*mult .. "-" .. 12*mult .. " points of Fire damage.",
+		[11] ="Adds " .. 6*mult .. "-" .. 36*mult .. " points of Fire damage.",
+		[12] ="Adds " .. 12*mult .. "-" .. 72*mult .. " points of Fire damage.",
+		[13] ="Adds " .. 12*mult .. " points of Body damage.",
+		[14] ="Adds " .. 24*mult .. " points of Body damage.",
+		[15] ="Adds " .. 48*mult .. " points of Body damage.",
 		[42] = " +" .. bonusEffects[42].statModifier * mult .. " to Seven Stats, HP, SP, Armor, Resistances.",
 		[43] = " +" .. bonusEffects[43].statModifier * mult .. " to Endurance, Armor, Hit points.",
 		[44] = " +" .. bonusEffects[44].statModifier * mult .. " Hit points and Regenerate Hit points over time.",
 		[45] = " +" .. bonusEffects[45].statModifier * mult .. " Speed and Accuracy.",
-		[46] = "Adds 10-20 points of Fire damage and +" .. bonusEffects[46].statModifier * mult.. " Might.",
+		[46] = "Adds " .. 40*mult .. "-" .. 80*mult .. " points of Fire damage and +" .. bonusEffects[46].statModifier * mult.. " Might.",
 		[47] = " +" .. bonusEffects[47].statModifier * mult .. " Spell points and Regenerate Spell points over time.",
 		[48] = " +" .. bonusEffects[48].statModifier[1] * mult .. " Endurance and" .. " +" .. bonusEffects[48].statModifier[2] * mult.. " Armor.",
 		[49] = " +" .. bonusEffects[49].statModifier * mult .. " Intellect and Luck.",
@@ -945,3 +884,56 @@ function events.CalcItemValue(t)
 	end
 	t.Value=basePrice+bonus1+bonus2
 end
+
+--modify weapon enchant damage
+
+--ENCHANTS HERE
+--MELEE bonuses
+enchantbonusdamage = {}
+enchantbonusdamage[4] = 2
+enchantbonusdamage[5] = 3
+enchantbonusdamage[6] = 4
+enchantbonusdamage[7] = 2
+enchantbonusdamage[8] = 3
+enchantbonusdamage[9] = 4
+enchantbonusdamage[10] = 2
+enchantbonusdamage[11] = 3
+enchantbonusdamage[12] = 4
+enchantbonusdamage[13] = 2
+enchantbonusdamage[14] = 3
+enchantbonusdamage[15] = 4
+enchantbonusdamage[46] = 4
+
+function events.ItemAdditionalDamage(t)
+	--empower enchants
+	if enchantbonusdamage[t.Item.Bonus2] then
+		t.Result=t.Result*enchantbonusdamage[t.Item.Bonus2]
+	else
+		t.Result=t.Result*4
+	end
+	--scaling Bonus
+	if t.Item.MaxCharges>0 then
+		if t.Item.MaxCharges <= 20 then
+				mult=1+t.Item.MaxCharges/20
+		else
+				mult=2+2*(t.Item.MaxCharges-20)/20
+		end
+		t.Result=t.Result*mult
+	end	
+end
+
+--weaponenchants
+weaponenchants={
+	[4] = true ,
+	[5] = true ,
+	[6] = true ,
+	[7] = true ,
+	[8] = true ,
+	[9] = true ,
+	[10] = true ,
+	[11] = true ,
+	[12] = true ,
+	[13] = true ,
+	[14] = true ,
+	[15] = true ,
+}
