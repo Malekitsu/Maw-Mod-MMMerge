@@ -592,8 +592,10 @@ function events.CalcStatBonusBySkills(t)
 		else
 			local punch=t.Player:GetSkill(const.Skills.Unarmed)
 			local s,m = SplitSkill(punch)
-			t.Result=t.Result-oldWeaponSkillDamageBonuses[const.Skills.Unarmed][m]*s
-			t.Result=t.Result+newWeaponSkillDamageBonuses[const.Skills.Unarmed][m]*s			
+			if m>0 then
+				t.Result=t.Result-oldWeaponSkillDamageBonuses[const.Skills.Unarmed][m]*s
+				t.Result=t.Result+newWeaponSkillDamageBonuses[const.Skills.Unarmed][m]*s		
+			end
 		end
 		
 	-- calculate AC bonus by skill
@@ -679,9 +681,10 @@ function events.CalcStatBonusBySkills(t)
 		else
 			s,m=SplitSkill(dodge)
 			--calculate dodge
-			t.Result = t.Result - oldArmorSkillACBonuses[const.Skills.Dodging][m] * s
-			t.Result = t.Result + newArmorSkillACBonuses[const.Skills.Dodging][m] * s
-		
+			if m>0 then
+				t.Result = t.Result - oldArmorSkillACBonuses[const.Skills.Dodging][m] * s
+				t.Result = t.Result + newArmorSkillACBonuses[const.Skills.Dodging][m] * s
+			end
 		end
 		
 	end
