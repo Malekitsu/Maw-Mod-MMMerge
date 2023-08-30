@@ -31,6 +31,17 @@ function events.UseMouseItem(t)
 			pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
 			return
 		end
+		if it.Number==253 then
+			heal=math.round(it.Bonus^1.4*3+30)-it.Bonus*5
+			pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
+			return
+		--mana potion
+		elseif it.Number==254 then
+			spRestore=math.round(it.Bonus^1.4*2)-it.Bonus*5
+			pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
+			return
+		end
+		
 		------------------------
 		--STATUS POTIONS--
 		------------------------
@@ -175,3 +186,79 @@ function events.DoBadThingToPlayer(t)
 	end
 end
 
+function events.BuildItemInformationBox(t)
+	if potionText[t.Item.Number] then
+		t.Description=potionText[t.Item.Number].." (To drink, pick the potion up and right-click over a character's portrait.  To mix, pick the potion up and right-click over another potion.)"
+	end
+	if t.Item.Number==222 then
+		t.Description=StrColor(255,255,153,"\nRestores " .. math.round(t.Item.Bonus^1.4)+10 .. " Hit Points") .. "\n\n" .. t.Description
+	end
+	if t.Item.Number==223 then
+		t.Description=StrColor(255,255,153,"\nRestores " .. math.round(t.Item.Bonus^1.4*3/2)+10 .. " Spell Points") .. "\n\n" .. t.Description
+	end
+	if t.Item.Number==253 then
+		t.Description=StrColor(255,255,153,"\nRestores " .. math.round(t.Item.Bonus^1.4*3)+10 .. " Hit Points") .. "\n\n" .. t.Description
+	end
+	if t.Item.Number==254 then
+		t.Description=StrColor(255,255,153,"\nRestores " .. math.round(t.Item.Bonus^1.4*2)+10 .. " Spell Points") .. "\n\n" .. t.Description
+	end
+end
+
+
+potionText={
+	[222] = "Heals 10 plus the potion strength Hit Points.",
+	[223] = "Restores 10 plus the potion strength Spell Points.",
+	[224] = "Cures and prevents Weakness for 6 hours.",
+	[225] = "Cures and prevents Disease for 6 hours.",
+	[226] = "Cures and prevents Poison for 6 hours.",
+	[227] = "Remove and prevents inducted Sleep for 6 hours.",
+	[228] = "Grants Haste (as the spell) for 30 minutes per point of potion strength.",
+	[229] = "Grants Heroism (as the spell) for 30 minutes per point of potion strength.",
+	[230] = "Grants Bless (as the spell) for 30 minutes per point of potion strength.",
+	[231] = "Grants Preservation (as the spell) for 30 minutes per point of potion strength.",
+	[232] = "Grants Shield (as the spell) for 30 minutes per point of potion strength.",
+	[233] = "Grants Recharge Item (as the spell).",
+	[234] = "Grants Stone Skin (as the spell) for 30 minutes per point of potion strength.",
+	[235] = "Prevents drowning damage.",
+	[236] = "Increases item's roughness, making it more resistant to breaking.",
+	[237] = "Cures and prevents Fear for 6 hours.",
+	[238] = "Cures and prevents Curse for 6 hours.",
+	[239] = "Cures and prevents Insanity for 6 hours.",
+	[240] = "Temporarily increases Might.",
+	[241] = "Temporarily increases Intellect.",
+	[242] = "Temporarily increases Personality.",
+	[243] = "Temporarily increases Endurance.",
+	[244] = "Temporarily increases Speed.",
+	[245] = "Temporarily increases Accuracy.",
+	[246] = "Adds 'of Flame' property to a non-magic weapon.",
+	[247] = "Adds 'of Frost' property to a non-magic weapon.",
+	[248] = "Adds 'of Poison' property to a non-magic weapon.",
+	[249] = "Adds 'of Sparks' property to a non-magic weapon.",
+	[250] = "Adds 'of Swiftness' property to a non-magic weapon.",
+	[251] = "Cures and prevents Paralysis for 6 hours.",
+	[252] = "Removes all conditions except Dead, Stoned, or Eradicated.",
+	[253] = "Heals three times the potion's strength of hit points.",
+	[254] = "Restores three times the potion's strength of spell points.",
+	[255] = "Increases temporary Luck.",
+	[256] = "Increases temporary Fire resistance.",
+	[257] = "Increases temporary Air resistance.",
+	[258] = "Increases temporary Water resistance.",
+	[259] = "Increases temporary Earth resistance.",
+	[260] = "Increases temporary Mind resistance.",
+	[261] = "Increases temporary Body resistance.",
+	[262] = "Cures Stoned condition.",
+	[263] = "Adds 'of Dragon Slaying' to a non-magic weapon.",
+	[264] = "Adds 30 to permanent Luck.",
+	[265] = "Adds 30 to permanent Speed.",
+	[266] = "Adds 30 to permanent Intellect.",
+	[267] = "Adds 30 to permanent Endurance.",
+	[268] = "Adds 30 to permanent Personality.",
+	[269] = "Adds 30 to permanent Accuracy.",
+	[270] = "Adds 30 to permanent Might.",
+	[271] = "Removes all unnatural aging, 10 years of PERMANENT aging, reduces all stats by 5.",
+
+	[279] = "Permanently adds 5 to all seven stats, HP, SP, AC and resistances at the cost of 10 years of PERMANENT aging",
+	[280] = "Increases all Seven Statistics temporarily by 10+(1 x Power) for (30 x Power) minutes",
+	[281] = "Increases Fire, Air, Water, Earth, Mind and Body resistances temporarily by 10+ (1 x Power) for (30 x Power) minutes",
+	[282] = "Increases the character's level by 10+0.25 per power for (30 x Power) minutes",
+}
