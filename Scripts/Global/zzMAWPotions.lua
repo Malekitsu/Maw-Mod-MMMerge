@@ -137,35 +137,53 @@ evt.PotionEffects[43] = function(IsDrunk, t, Power)
 	if t.Bonus2==0 and Game.ItemsTxt[t.Number].Skill<7 then
 		t.Bonus2=46
 		Mouse.Item.Number=0
+		mem.u4[0x51E100] = 0x100 
+		t.Condition = t.Condition:Or(0x10)
+		evt.PlaySound(12070)
 	end
 end
 evt.PotionEffects[26] = function(IsDrunk, t, Power)
 	if t.Bonus2==0 and Game.ItemsTxt[t.Number].Skill<7 then
 		t.Bonus2=11
 		Mouse.Item.Number=0
+		mem.u4[0x51E100] = 0x100 
+		t.Condition = t.Condition:Or(0x10)
+		evt.PlaySound(12070)
 	end
 end
 evt.PotionEffects[27] = function(IsDrunk, t, Power)
 	if t.Bonus2==0 and Game.ItemsTxt[t.Number].Skill<7 then
 		t.Bonus2=5
 		Mouse.Item.Number=0
+		mem.u4[0x51E100] = 0x100 
+		t.Condition = t.Condition:Or(0x10)
+		evt.PlaySound(12070)
 	end
 end
 evt.PotionEffects[28] = function(IsDrunk, t, Power)
 	if t.Bonus2==0 and Game.ItemsTxt[t.Number].Skill<7 then
 		t.Bonus2=14
 		Mouse.Item.Number=0
+		mem.u4[0x51E100] = 0x100 
+		t.Condition = t.Condition:Or(0x10)
+		evt.PlaySound(12070)
 	end
 end
 evt.PotionEffects[29] = function(IsDrunk, t, Power)
 	if t.Bonus2==0 and Game.ItemsTxt[t.Number].Skill<7 then
 		t.Bonus2=46
 		Mouse.Item.Number=0
+		mem.u4[0x51E100] = 0x100 
+		t.Condition = t.Condition:Or(0x10)
+		evt.PlaySound(12070)
 	end
 end
 evt.PotionEffects[30] = function(IsDrunk, t, Power)
 	if t.Bonus2==0 and Game.ItemsTxt[t.Number].Skill<7 then
 		t.Bonus2=59
 		Mouse.Item.Number=0
+		mem.u4[0x51E100] = 0x100 
+		t.Condition = t.Condition:Or(0x10)
+		evt.PlaySound(12070)
 	end
 end
