@@ -187,3 +187,16 @@ evt.PotionEffects[30] = function(IsDrunk, t, Power)
 		evt.PlaySound(12070)
 	end
 end
+
+--remove mixing for removed flasks
+function events.GameInitialized2()
+	for i=1,70 do
+		for v=1,70 do
+			local output=Game.MixPotions[i][v]
+			if removelist[output+220] then
+				Game.MixPotions[i][v]=0
+			end
+		end
+	end	
+end
+
