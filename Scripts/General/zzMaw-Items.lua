@@ -157,9 +157,8 @@ return end
 				end	
 			end	
 		end
+		
 		::continue::
-		
-		
 		
 		--primordial item
 		primordial=math.random(1,100)
@@ -778,20 +777,20 @@ function checktext(MaxCharges,bonus2)
 		mult=2+2*(MaxCharges-20)/20
 	end
 	bonus2txt={
-		[1] =  " +" .. bonusEffects[1].statModifier * mult .. " to all Resistances.",
-		[2] = " +" .. bonusEffects[2].statModifier * mult .. " to all Seven Statistics.",
-		[4] ="Adds " .. 6*mult .. "-" .. 8*mult .. " points of Cold damage. (Increases also spell damage)",
-		[5] ="Adds " .. 18*mult .. "-" .. 24*mult .. " points of Cold damage. (Increases also spell damage)",
-		[6] ="Adds " .. 36*mult .. "-" .. 48*mult .. " points of Cold damage. (Increases also spell damage)",
-		[7] ="Adds " .. 4*mult .. "-" .. 10*mult .. " points of Electrical damage. (Increases also spell damage)",
-		[8] ="Adds " .. 12*mult .. "-" .. 30*mult .. " points of Electrical damage. (Increases also spell damage)",
-		[9] ="Adds " .. 24*mult .. "-" .. 60*mult .. " points of Electrical damage. (Increases also spell damage)",
-		[10] ="Adds " .. 2*mult .. "-" .. 12*mult .. " points of Fire damage. (Increases also spell damage)",
-		[11] ="Adds " .. 6*mult .. "-" .. 36*mult .. " points of Fire damage. (Increases also spell damage)",
-		[12] ="Adds " .. 12*mult .. "-" .. 72*mult .. " points of Fire damage. (Increases also spell damage)",
-		[13] ="Adds " .. 12*mult .. " points of Body damage.",
-		[14] ="Adds " .. 24*mult .. " points of Body damage.",
-		[15] ="Adds " .. 48*mult .. " points of Body damage.",
+		[1] =  " +" .. math.round(bonusEffects[1].statModifier * mult) .. " to all Resistances.",
+		[2] = " +" .. math.round(bonusEffects[2].statModifier * mult) .. " to all Seven Statistics.",
+		[4] ="Adds " .. math.round(6*mult) .. "-" .. math.round(8*mult) .. " points of Cold damage. (Increases also spell damage)",
+		[5] ="Adds " .. math.round(18*mult) .. "-" .. math.round(24*mult) .. " points of Cold damage. (Increases also spell damage)",
+		[6] ="Adds " .. math.round(36*mult) .. "-" .. math.round(48*mult) .. " points of Cold damage. (Increases also spell damage)",
+		[7] ="Adds " .. math.round(4*mult) .. "-" .. math.round(10*mult) .. " points of Electrical damage. (Increases also spell damage)",
+		[8] ="Adds " .. math.round(12*mult) .. "-" .. math.round(30*mult) .. " points of Electrical damage. (Increases also spell damage)",
+		[9] ="Adds " .. math.round(24*mult) .. "-" .. math.round(60*mult) .. " points of Electrical damage. (Increases also spell damage)",
+		[10] ="Adds " .. math.round(2*mult) .. "-" .. math.round(12*mult) .. " points of Fire damage. (Increases also spell damage)",
+		[11] ="Adds " .. math.round(6*mult) .. "-" .. math.round(36*mult) .. " points of Fire damage. (Increases also spell damage)",
+		[12] ="Adds " .. math.round(12*mult) .. "-" .. math.round(72*mult) .. " points of Fire damage. (Increases also spell damage)",
+		[13] ="Adds " .. math.round(12*mult) .. " points of Body damage.",
+		[14] ="Adds " .. math.round(24*mult) .. " points of Body damage.",
+		[15] ="Adds " .. math.round(48*mult) .. " points of Body damage.",
 		--spell enchants
 		[26] = "Air Magic Skill +" .. math.round(MaxCharges/4)+5,
 		[27] = "Body Magic Skill +" .. math.round(MaxCharges/4)+5,
@@ -803,22 +802,30 @@ function checktext(MaxCharges,bonus2)
 		[33] = "Spirit Magic Skill +" .. math.round(MaxCharges/4)+5,
 		[34] = "Water Magic Skill +" .. math.round(MaxCharges/4)+5,
 		--stats enchants
-		[42] = " +" .. bonusEffects[42].statModifier * mult .. " to Seven Stats, HP, SP, Armor, Resistances.",
-		[43] = " +" .. bonusEffects[43].statModifier * mult .. " to Endurance, Armor, Hit points.",
-		[44] = " +" .. bonusEffects[44].statModifier * mult .. " Hit points and Regenerate Hit points over time.",
-		[45] = " +" .. bonusEffects[45].statModifier * mult .. " Speed and Accuracy.",
-		[46] = "Adds " .. 40*mult .. "-" .. 80*mult .. " points of Fire damage and +" .. bonusEffects[46].statModifier * mult.. " Might.",
-		[47] = " +" .. bonusEffects[47].statModifier * mult .. " Spell points and Regenerate Spell points over time.",
-		[48] = " +" .. bonusEffects[48].statModifier[1] * mult .. " Endurance and" .. " +" .. bonusEffects[48].statModifier[2] * mult.. " Armor.",
-		[49] = " +" .. bonusEffects[49].statModifier * mult .. " Intellect and Luck.",
-		[50] = " +" .. bonusEffects[50].statModifier * mult .. " Fire Resistance and Regenerate Hit points over time.",
-		[51] = " +" .. bonusEffects[51].statModifier * mult .. " Spell points, Speed, Intellect.",
-		[52] = " +" .. bonusEffects[52].statModifier * mult .. " Endurance and Accuracy.",
-		[53] = " +" .. bonusEffects[53].statModifier * mult .. " Might and Personality.",
-		[54] = " +" .. bonusEffects[54].statModifier * mult .. " Endurance and Regenerate Hit points over time.",
-		[55] = " +" .. bonusEffects[55].statModifier * mult .. " Luck and Regenerate Spell points over time.",
-		[56] = " +" .. bonusEffects[56].statModifier * mult .. " Might and Endurance.",
-		[57] = " +" .. bonusEffects[57].statModifier * mult .. " Intellect and Personality.",
+		[42] = " +" .. math.round(bonusEffects[42].statModifier * mult) .. " to Seven Stats, HP, SP, Armor, Resistances.",
+		[43] = " +" .. math.round(bonusEffects[43].statModifier * mult) .. " to Endurance, Armor, Hit points.",
+		[44] = " +" .. math.round(bonusEffects[44].statModifier * mult) .. " Hit points and Regenerate Hit points over time.",
+		[45] = " +" .. math.round(bonusEffects[45].statModifier * mult) .. " Speed and Accuracy.",
+		[46] = "Adds " .. math.round(40*mult) .. "-" .. math.round(80*mult) .. " points of Fire damage and +" .. math.round(bonusEffects[46].statModifier * mult).. " Might.",
+		[47] = " +" .. math.round(bonusEffects[47].statModifier * mult) .. " Spell points and Regenerate Spell points over time.",
+		[48] = " +" .. math.round(bonusEffects[48].statModifier[1] * mult) .. " Endurance and" .. " +" .. math.round(bonusEffects[48].statModifier[2] * mult).. " Armor.",
+		[49] = " +" .. math.round(bonusEffects[49].statModifier * mult) .. " Intellect and Luck.",
+		[50] = " +" .. math.round(bonusEffects[50].statModifier * mult) .. " Fire Resistance and Regenerate Hit points over time.",
+		[51] = " +" .. math.round(bonusEffects[51].statModifier * mult) .. " Spell points, Speed, Intellect.",
+		[52] = " +" .. math.round(bonusEffects[52].statModifier * mult) .. " Endurance and Accuracy.",
+		[53] = " +" .. math.round(bonusEffects[53].statModifier * mult) .. " Might and Personality.",
+		[54] = " +" .. math.round(bonusEffects[54].statModifier * mult) .. " Endurance and Regenerate Hit points over time.",
+		[55] = " +" .. math.round(bonusEffects[55].statModifier * mult) .. " Luck and Regenerate Spell points over time.",
+		[56] = " +" .. math.round(bonusEffects[56].statModifier * mult) .. " Might and Endurance.",
+		[57] = " +" .. math.round(bonusEffects[57].statModifier * mult) .. " Intellect and Personality.",
+		--max resistance enchant
+		[74] = "Increase Max Fire Resistance by " .. 5+math.round(MaxCharges/8) .. "%",
+		[75] = "Increase Max Air Resistance by " .. 5+math.round(MaxCharges/8) .. "%",
+		[76] = "Increase Max Water Resistance by " .. 5+math.round(MaxCharges/8) .. "%",
+		[77] = "Increase Max Earth Resistance by " .. 5+math.round(MaxCharges/8) .. "%",
+		[78] = "Increase Max Mind Resistance by " .. 5+math.round(MaxCharges/8) .. "%",
+		[79] = "Increase Max Body Resistance by " .. 5+math.round(MaxCharges/8) .. "%",
+		[80] = "Increase All Max Resistance by " .. 2+math.round(MaxCharges/20) .. "%",
 	}
 
 	
@@ -920,6 +927,13 @@ enchantList={
 	[32] = true ,
 	[33] = true ,
 	[34] = true ,
+	[74] = true ,
+	[75] = true ,
+	[76] = true ,
+	[77] = true ,
+	[78] = true ,
+	[79] = true ,
+	[80] = true ,
 }
 
 --remove older "of x spell school" enchant and replace
