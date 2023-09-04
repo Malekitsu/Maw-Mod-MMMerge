@@ -91,6 +91,8 @@ return end
 			partyLevel=vars.MM8LVL+vars.MM6LVL
 		elseif currentWorld==3 then
 			partyLevel=vars.MM8LVL+vars.MM7LVL
+		elseif currentWorld==4 then
+			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 		end
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
 		t.Item.MaxCharges=math.min(math.floor(partyLevel/5),255)
