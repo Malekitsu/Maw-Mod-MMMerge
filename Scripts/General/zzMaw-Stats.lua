@@ -225,6 +225,17 @@ function events.Regeneration(t)
 	end
 end
 
+
+--resistance map
+damageKindToMaxResistanceEnchant={
+	[0] = 74,
+	[1] = 75,
+	[2] = 76,
+	[3] = 77,
+	[7] = 78,
+	[8] = 79,
+}
+
 --reduce damage by %
 function events.CalcDamageToPlayer(t)
 damage1=0
@@ -252,6 +263,14 @@ damage1=0
 		luck=t.Player:GetLuck()/20
 		--put here code to change max res
 		maxres=75
+		for it in t.Player:EnumActiveItems() do
+			if it.Bonus2==damageKindToMaxResistanceEnchant[t.DamageKind] then
+				maxres=maxres+5+math.round(it.MaxCharges/8)
+			elseif it.Bonus2==80 then
+				maxres=maxres+2+math.round(it.MaxCharges/20)
+			end
+		end
+		maxres=math.min(maxres,90)
 		res=math.min(res,maxres)/100
 		--randomize resistance
 		local roll=math.random()
