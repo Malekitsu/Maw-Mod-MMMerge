@@ -514,7 +514,7 @@ function events.BuildItemInformationBox(t)
 			end
 		elseif t.Description then
 			if t.Item.Bonus2>0 then	
-				if (t.Item.MaxCharges>0 and bonusEffects[t.Item.Bonus2]~= nil) or weaponenchants[t.Item.Bonus2] then
+				if (t.Item.MaxCharges>0 and bonusEffects[t.Item.Bonus2]~= nil) or enchantList[t.Item.Bonus2] then
 					text=checktext(t.Item.MaxCharges,t.Item.Bonus2)
 				else
 					text=Game.SpcItemsTxt[t.Item.Bonus2-1].BonusStat
@@ -792,6 +792,17 @@ function checktext(MaxCharges,bonus2)
 		[13] ="Adds " .. 12*mult .. " points of Body damage.",
 		[14] ="Adds " .. 24*mult .. " points of Body damage.",
 		[15] ="Adds " .. 48*mult .. " points of Body damage.",
+		--spell enchants
+		[26] = "Air Magic Skill +" .. math.round(MaxCharges/4)+5,
+		[27] = "Body Magic Skill +" .. math.round(MaxCharges/4)+5,
+		[28] = "Dark Magic Skill +" .. math.round(MaxCharges/4)+5,
+		[29] = "Earth Magic Skill +" .. math.round(MaxCharges/4)+5,
+		[30] = "Fire Magic Skill +" .. math.round(MaxCharges/4)+5,
+		[31] = "Light Magic Skill +" .. math.round(MaxCharges/4)+5,
+		[32] = "Mind Magic Skill +" .. math.round(MaxCharges/4)+5,
+		[33] = "Spirit Magic Skill +" .. math.round(MaxCharges/4)+5,
+		[34] = "Water Magic Skill +" .. math.round(MaxCharges/4)+5,
+		--stats enchants
 		[42] = " +" .. bonusEffects[42].statModifier * mult .. " to Seven Stats, HP, SP, Armor, Resistances.",
 		[43] = " +" .. bonusEffects[43].statModifier * mult .. " to Endurance, Armor, Hit points.",
 		[44] = " +" .. bonusEffects[44].statModifier * mult .. " Hit points and Regenerate Hit points over time.",
@@ -809,6 +820,8 @@ function checktext(MaxCharges,bonus2)
 		[56] = " +" .. bonusEffects[56].statModifier * mult .. " Might and Endurance.",
 		[57] = " +" .. bonusEffects[57].statModifier * mult .. " Intellect and Personality.",
 	}
+
+	
 	return bonus2txt[bonus2]
 end
 
@@ -884,8 +897,8 @@ function events.ItemAdditionalDamage(t)
 	end	
 end
 
---weaponenchants
-weaponenchants={
+--weaponenchants and ring enchants checker
+enchantList={
 	[4] = true ,
 	[5] = true ,
 	[6] = true ,
@@ -898,4 +911,41 @@ weaponenchants={
 	[13] = true ,
 	[14] = true ,
 	[15] = true ,
+	[26] = true ,
+	[27] = true ,
+	[28] = true ,
+	[29] = true ,
+	[30] = true ,
+	[31] = true ,
+	[32] = true ,
+	[33] = true ,
+	[34] = true ,
 }
+
+--remove older "of x spell school" enchant and replace
+
+--create enchant Map
+magicEnchantMap={}
+magicEnchantMap[const.Skills.Fire] = 30
+magicEnchantMap[const.Skills.Air] = 26
+magicEnchantMap[const.Skills.Water] = 34
+magicEnchantMap[const.Skills.Earth] = 29
+magicEnchantMap[const.Skills.Spirit] = 33
+magicEnchantMap[const.Skills.Mind] = 32
+magicEnchantMap[const.Skills.Body] = 27
+magicEnchantMap[const.Skills.Light] = 31
+magicEnchantMap[const.Skills.Dark] = 28
+
+
+function events.GetSkill(t)
+	if magicEnchantMap[t.Skill] then
+		for it in t.Player:EnumActiveItems() do
+			if it.Bonus2==magicEnchantMap[t.Skill] then
+				t.Result=t.Result-math.floor(t.Result/3)
+				spellBonus=math.max(5+math.round(it.MaxCharges/4))
+			end
+		end
+		t.Result=t.Result+spellBonus
+	end
+end
+
