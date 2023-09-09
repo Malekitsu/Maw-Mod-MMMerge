@@ -955,6 +955,7 @@ magicEnchantMap[const.Skills.Dark] = 28
 
 function events.GetSkill(t)
 	if magicEnchantMap[t.Skill] then
+		spellBonus=0
 		for it in t.Player:EnumActiveItems() do
 			if it.Bonus2==magicEnchantMap[t.Skill] then
 				t.Result=t.Result-math.floor(t.Result/3)
