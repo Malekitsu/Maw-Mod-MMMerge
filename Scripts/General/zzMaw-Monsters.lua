@@ -251,6 +251,7 @@ function events.LoadMap()
 	else
 		debug.Message("You are in an unknown world, report this bug in MAW discord")
 	end
+	bolsterLevel=math.max(bolsterLevel*0.95-4,0)
 	if bolsterLevel>=120 then 
 		bolsterLevel=120+(bolsterLevel-120)/2
 	end
