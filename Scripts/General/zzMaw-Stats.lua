@@ -57,22 +57,35 @@ function events.CalcDamageToPlayer(t)
 	end
 end
 --endurance
-fullHP={}
+fullHP2={}
 for i =0,300 do
-fullHP[i]=0
+fullHP2[i]=0
 end
 
 function events.CalcStatBonusByItems(t)
   if t.Stat == const.Stats.HP then
 	endurance=t.Player:GetEndurance()/1000
-	i=t.Player:GetIndex()
-	t.Result=t.Result+fullHP[i]*endurance
+	index2=t.PlayerIndex
+	t.Result=t.Result+math.round(fullHP2[index2]*endurance)
   end
 end
 
 function events.Tick()
 	for i=0,Party.High do
-		fullHP[i]=Game.Classes.HPFactor[Party[i].Class]*Party[i]:GetLevel()+Game.Classes.HPBase[Party[i].Class]
+		endurance2=Party[i]:GetEndurance()
+		if endurance2<=21 then
+		endEff2=(endurance2-13)/2
+		else
+			endEff2=math.floor(endurance2/5)
+		end
+		skill=Party[index].Skills[const.Skills.Bodybuilding]
+		s,m=SplitSkill(skill)
+		if m==4 then
+			m=5
+		end
+		BBHP=s*m
+		index3=Party[i]:GetIndex()
+		fullHP2[index3]=Game.Classes.HPFactor[Party[i].Class]*(Party[i]:GetLevel()+endEff2+BBHP)+Game.Classes.HPBase[Party[i].Class]
 	end
 end
 
@@ -118,19 +131,24 @@ function events.BuildStatInformationBox(t)
 	t.Text=string.format("%s\n\nCritical strike chance: %s%s",Game.StatsDescriptions[6],luck/20+5,"%")
 	end
 	if t.Stat==7 then
-	i=Game.CurrentPlayer
-	endurance2=Party[i]:GetEndurance()
-	HPScaling=Game.Classes.HPFactor[Party[i].Class]
-	skill=Party[i].Skills[const.Skills.Bodybuilding]
+	local index=Game.CurrentPlayer
+	endurance2=Party[index]:GetEndurance()
+	if endurance2<=21 then
+		endEff=(endurance2-13)/2
+	else
+		endEff=math.floor(endurance2/5)
+	end
+	HPScaling=Game.Classes.HPFactor[Party[index].Class]
+	skill=Party[index].Skills[const.Skills.Bodybuilding]
 	s,m=SplitSkill(skill)
 	if m==4 then
 		m=5
 	end
 	BBHP=HPScaling*s*m
-	local fullHP=Party[i]:GetFullHP()
-	enduranceTotalBonus=math.floor(fullHP-fullHP/(1+endurance2/500))+math.floor(endurance2/10)*HPScaling
-	level=Party[i]:GetLevel()
-	BASEHP=Game.Classes.HPBase[math.floor(Party[i].Class/3)]+level*HPScaling
+	local fullHP=Party[index]:GetFullHP()
+	enduranceTotalBonus=math.round(fullHP-fullHP/(1+endurance2/1000))+endEff*HPScaling
+	level=Party[index]:GetLevel()
+	BASEHP=Game.Classes.HPBase[Party[index].Class]+level*HPScaling
 	t.Text=string.format("%s\n\nHP bonus from Endurance: %s\n\nHP bonus from Body building: %s\n\nHP bonus from items: %s\n\nBase HP: %s",t.Text,StrColor(0,255,0,enduranceTotalBonus), StrColor(0,255,0,BBHP),StrColor(0,255,0,math.round(fullHP-enduranceTotalBonus-BBHP-BASEHP)),StrColor(0,255,0,BASEHP))
 	end
 	if t.Stat==8 then
