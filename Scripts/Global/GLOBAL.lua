@@ -33,7 +33,10 @@ function calculateGold(gold)
 	gold=gold*(1+partyLevel/100)+250*partyLevel
 	return gold
 end
-
+-- "Power Stone"
+evt.CanShowTopic[12] = function()
+	return evt.Cmp{"Inventory", Value = 617}         -- "Power Stone"
+end
 evt.global[12] = function()
 	evt.SetMessage{Str = 12}         -- "So Clanleader Onefang gave you that power stone he was holding onto! It will power the portal on the southwestern tip of the island. To use it, hold an image of the stone in your mind as you step onto the portal."
 	evt.ForPlayer("All")
@@ -196,7 +199,10 @@ evt.global[29] = function()
 		evt.SetNPCGreeting{NPC = 3, Greeting = 11}         -- "Elgar Fellmoon" : "Have you done as I've asked of you?"
 	end
 end
-
+-- "Ancient Home Found!"
+evt.CanShowTopic[36] = function()
+	return evt.Cmp{"QBits", Value = 69}         -- Ancient Troll Homeland Found
+end
 evt.global[36] = function()
 	evt.SetMessage{Str = 45}         --[[ "You have found our Ancient Home?
 Its located in the western area of the Murmurwoods?
@@ -251,6 +257,10 @@ I will teach the rest of you what skills I can, perhaps it will be enough to hel
 	end
 	evt.Subtract{"QBits", Value = 68}         -- "Find the Ancient Troll Homeland and return to Volog Sandwind in the Ironsand Desert."
 	evt.SetNPCTopic{NPC = 43, Index = 1, Event = 612}         -- "Volog Sandwind" : "Roster Join Event"
+end
+-- "Deliver Report"
+evt.CanShowTopic[41] = function()
+	return evt.Cmp{"QBits", Value = 11}         -- "Report to Bastian Loudrin, the merchant guildmaster in Alvar."
 end
 evt.global[41] = function()
 	evt.SetMessage{Str = 50}         -- "Disaster in Dagger Wound, too? This is indeed disturbing. If one were to believe all the rumors, one would think that all of Jadame is in upheaval and chaos.I wish I knew more. I rely on our caravan masters for news, but all who were supposed to arrive here this month have not. What I do hear, troubles me. Hurricanes, floods, and now a volcano! The worst I've heard is that a sea of fire has appeared in the Ironsand Desert--and this from many sources.I wonder if this crystal in Ravenshore has something to do with it. Its appearance at the onset of the calamity seems to be more than a coincidence."
@@ -346,6 +356,10 @@ Perhaps he would know of a cure, or even have it in his possession.
 If he cannot help, promise you will return here and kill me so I may at last be at rest!" ]]
 		evt.Add{"QBits", Value = 72}         -- "Inquire about a cure for Blazen Stormlance from Dervish Chevron in Ravenshore."
 	end
+end
+-- "Promotion to Champion"
+evt.CanShowTopic[58] = function()
+	return evt.Cmp{"QBits", Value = 73}         -- Received Cure for Blazen Stormlance
 end
 evt.global[58] = function()
 	evt.ForPlayer("All")
@@ -481,6 +495,10 @@ In doing this, you will prove to me your worthiness.
 		evt.SetNPCTopic{NPC = 53, Index = 1, Event = 61}         -- "Deftclaw Redreaver" : "Dragon Slayers"
 	end
 end
+-- "Dragon Slayers"
+evt.CanShowTopic[61] = function()
+	return not evt.Cmp{"QBits", Value = 75}         -- Killed all Dragon Slayers in southwest encampment in Area 5
+end
 evt.global[61] = function()
 	if not evt.Cmp{"QBits", Value = 21} then         -- Allied with Charles Quioxte's Dragon Hunters. Return Dragon Egg to Quixote done.
 		if evt.Cmp{"QBits", Value = 22} then         -- Allied with Dragons. Return Dragon Egg to Dragons done.
@@ -491,6 +509,10 @@ Where is the sword of Whistlebone the Slayer?!?" ]]
 He must be planning another assault upon the Dragon Caves!" ]]
 		end
 	end
+end
+-- "Sword of the Slayer"
+evt.CanShowTopic[62] = function()
+	return evt.Cmp{"QBits", Value = 75}         -- Killed all Dragon Slayers in southwest encampment in Area 5
 end
 evt.global[62] = function()
 	evt.ForPlayer("All")
@@ -611,6 +633,10 @@ evt.global[64] = function()
 	end
 	evt.Add{"History8", Value = 0}
 end
+-- "Quest"
+evt.CanShowTopic[71] = function()
+	return evt.Cmp{"Inventory", Value = 732}         -- "Certificate of Authentication"
+end
 evt.global[71] = function()
 	evt.ForPlayer("All")
 	if not evt.Cmp{"Inventory", Value = 541} then         -- "Axe of Balthazar"
@@ -692,6 +718,10 @@ The others in your group will be taught what skills we have that maybe useful to
 	evt.Subtract{"Inventory", Value = 541}         -- "Axe of Balthazar"
 	evt.Subtract{"Inventory", Value = 732}         -- "Certificate of Authentication"
 	evt.SetNPCTopic{NPC = 58, Index = 0, Event = 740}         -- "Tessalar" : "Promote Minotuars"
+end
+-- "Quest"
+evt.CanShowTopic[81] = function()
+	return evt.Cmp{"Inventory", Value = 626}         -- "Prophecies of the Sun"
 end
 evt.global[81] = function()
 	evt.ForPlayer("All")
@@ -875,6 +905,10 @@ Lets begin!After we have completed, good friend Lathean can handle any future pr
 		goto _30
 	end
 	goto _28
+end
+-- "Return of Korbu"
+evt.CanShowTopic[90] = function()
+	return evt.Cmp{"QBits", Value = 80}         -- "Find the Sarcophagus of Korbu and Korbu's Remains and return them to Lathean in Shadowspire."
 end
 evt.global[90] = function()
 	evt.ForPlayer("All")
@@ -1146,6 +1180,10 @@ I will go introduce this to the water supply!" ]]
 		evt.SetMessage{Str = 745}         -- "Without the Anointed Herb Potion we cannot remove the poison from our water supply!"
 	end
 end
+-- "Do you have the Ingredients?"
+evt.CanShowTopic[181] = function()
+	return evt.Cmp{"QBits", Value = 113}         -- "Bring Thistle on the Dagger Wound Islands the basic ingredients for a potion of Pure Speed."
+end
 evt.global[181] = function()
 	if not evt.CheckItemsCount{MinItemIndex = 200, MaxItemIndex = 204, Count = 4} then         -- "Widowsweep Berries"..."Phoenix Feather"
 		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
@@ -1193,6 +1231,14 @@ Still, this is not your fault and you deserve some reward for returning to me!" 
 Do not waste my time unless you have it!" ]]
 	end
 end
+-- "Finally!"
+evt.CanShowTopic[186] = function()
+	return evt.Cmp{"QBits", Value = 140}         -- Killed all Dire Wolves in Ravenshore
+end
+-- "Finally!"
+evt.CanShowTopic[186] = function()
+	return evt.Cmp{"QBits", Value = 140}         -- Killed all Dire Wolves in Ravenshore
+end
 evt.global[186] = function()
 	evt.SetMessage{Str = 753}         --[[ "You have killed all of the dire wolves in the region!
 Travelers are once again safe. However, I now find myself in need of a new business!" ]]
@@ -1226,6 +1272,10 @@ If I stop, they die.
 Can you rescue them for me?" ]]
 		evt.Add{"QBits", Value = 119}         -- "Rescue Arion Hunter's daughter from Ogre Fortress in Alvar."
 	end
+end
+-- "Report has been delivered?"
+evt.CanShowTopic[189] = function()
+	return evt.Cmp{"QBits", Value = 118}         -- Delivered false report to Stanley
 end
 evt.global[189] = function()
 	evt.SetMessage{Str = 634}         --[[ "You delivered the report to Stanley?
@@ -1279,6 +1329,10 @@ Return to me when you have killed all of the ogres in this region, and I will re
 		evt.Add{"QBits", Value = 129}         -- "Kill all Ogres in the Alvar canyon area and in Ogre Fortress and return to Keldon in Alvar."
 	end
 end
+-- "Do you have the Ingredients?"
+evt.CanShowTopic[203] = function()
+	return evt.Cmp{"QBits", Value = 115}         -- "Bring Rihansi in Alvar the basic ingredients for a potion of Pure Luck."
+end
 evt.global[203] = function()
 	if not evt.CheckItemsCount{MinItemIndex = 200, MaxItemIndex = 204, Count = 2} then         -- "Widowsweep Berries"..."Phoenix Feather"
 		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
@@ -1303,6 +1357,10 @@ Take this potion as your reward!" ]]
 		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
 Return when you have them all." ]]
 	end
+end
+-- "Do you have the Ingredients?"
+evt.CanShowTopic[212] = function()
+	return evt.Cmp{"QBits", Value = 121}         -- "Bring Talion in the Ironsand Desert the basic ingredients for a potion of Pure Endurance."
 end
 evt.global[212] = function()
 	if not evt.CheckItemsCount{MinItemIndex = 200, MaxItemIndex = 204, Count = 2} then         -- "Widowsweep Berries"..."Phoenix Feather"
@@ -1369,6 +1427,10 @@ The flower also is the only means of an antidote for the Dragons." ]]
 Why waste my time?" ]]
 	end
 end
+-- "Quest"
+evt.CanShowTopic[219] = function()
+	return not evt.Cmp{"QBits", Value = 22}         -- Allied with Dragons. Return Dragon Egg to Dragons done.
+end
 evt.global[219] = function()
 	if evt.Cmp{"QBits", Value = 155} then         -- Killed all Dragons in Garrote Gorge Area
 		evt.Subtract{"QBits", Value = 154}         -- "Kill all the Dragons in the Garrote Gorge wilderness area. Return to Avalon in Garrote Gorge."
@@ -1389,6 +1451,10 @@ Help us in his crusade against the Dragons of Garrote Gorge. If all of the Drago
 I will reward you well." ]]
 		evt.Add{"QBits", Value = 154}         -- "Kill all the Dragons in the Garrote Gorge wilderness area. Return to Avalon in Garrote Gorge."
 	end
+end
+-- "Quest"
+evt.CanShowTopic[221] = function()
+	return not evt.Cmp{"QBits", Value = 21}         -- Allied with Charles Quioxte's Dragon Hunters. Return Dragon Egg to Quixote done.
 end
 evt.global[221] = function()
 	if evt.Cmp{"QBits", Value = 158} then         -- Killed all Dragon Hunters in Garrote Gorge wilderness area
@@ -1470,6 +1536,10 @@ Here, take you reward for it is nothing compared to the box!" ]]
 		evt.SetMessage{Str = 776}         -- "I need not see you again until you have the Puzzle Box!"
 	end
 end
+-- "Do you have the Ingredients?"
+evt.CanShowTopic[234] = function()
+	return evt.Cmp{"QBits", Value = 123}         -- "Bring Kelvin in Shadowspire the basic ingredients for a potion of Pure Intellect."
+end
 evt.global[234] = function()
 	if not evt.CheckItemsCount{MinItemIndex = 200, MaxItemIndex = 204, Count = 1} then         -- "Widowsweep Berries"..."Phoenix Feather"
 		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
@@ -1513,6 +1583,10 @@ We are in your debt and here is your reward as promised!" ]]
 Do not bother me until you have it!" ]]
 	end
 end
+-- "Thanks for the Ingredients"
+evt.CanShowTopic[240] = function()
+	return evt.Cmp{"QBits", Value = 125}         -- "Bring Castigeir in Murmurwoods the basic ingredients for a potion of Pure Personality."
+end
 evt.global[240] = function()
 	if not evt.CheckItemsCount{MinItemIndex = 200, MaxItemIndex = 204, Count = 1} then         -- "Widowsweep Berries"..."Phoenix Feather"
 		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
@@ -1536,6 +1610,10 @@ Here is your potion!" ]]
 		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
 Return when you have them all." ]]
 	end
+end
+-- "Do you have the Ingredients?"
+evt.CanShowTopic[246] = function()
+	return evt.Cmp{"QBits", Value = 133}         -- returned ingredients for a potion of Pure Accuracy
 end
 evt.global[246] = function()
 	if not evt.CheckItemsCount{MinItemIndex = 200, MaxItemIndex = 204, Count = 2} then         -- "Widowsweep Berries"..."Phoenix Feather"
@@ -1573,6 +1651,10 @@ Will that person be you?" ]]
 " ]]
 		evt.Add{"QBits", Value = 236}         -- "Find the treasure of the Dread Pirate Stanley."
 	end
+end
+-- "Yellow Fever"
+evt.CanShowTopic[290] = function()
+	return evt.Cmp{"QBits", Value = 101}         -- "Deliver Cure Disease Scrolls to the six huts on the outer Dagger Wound Islands.  Return to Aislen on Dagger Wound Island."
 end
 evt.global[290] = function()
 	if evt.Cmp{"QBits", Value = 108} then         -- Yellow Fever epidemic cured!
@@ -1614,6 +1696,10 @@ Thank you for your help!" ]]
 	evt.SetMessage{Str = 741}         --[[ "Thanks for the cure, but others in the area are still sick!
 Be sure to deliver the cure to them as well!" ]]
 end
+-- "Yellow Fever"
+evt.CanShowTopic[291] = function()
+	return evt.Cmp{"QBits", Value = 101}         -- "Deliver Cure Disease Scrolls to the six huts on the outer Dagger Wound Islands.  Return to Aislen on Dagger Wound Island."
+end
 evt.global[291] = function()
 	if evt.Cmp{"QBits", Value = 108} then         -- Yellow Fever epidemic cured!
 		evt.SetMessage{Str = 621}         --[[ "The Yellow Fever epidemic is over!
@@ -1653,6 +1739,10 @@ Thank you for your help!" ]]
 	end
 	evt.SetMessage{Str = 741}         --[[ "Thanks for the cure, but others in the area are still sick!
 Be sure to deliver the cure to them as well!" ]]
+end
+-- "Yellow Fever"
+evt.CanShowTopic[292] = function()
+	return evt.Cmp{"QBits", Value = 101}         -- "Deliver Cure Disease Scrolls to the six huts on the outer Dagger Wound Islands.  Return to Aislen on Dagger Wound Island."
 end
 evt.global[292] = function()
 	if evt.Cmp{"QBits", Value = 108} then         -- Yellow Fever epidemic cured!
@@ -1694,6 +1784,10 @@ Thank you for your help!" ]]
 	evt.SetMessage{Str = 741}         --[[ "Thanks for the cure, but others in the area are still sick!
 Be sure to deliver the cure to them as well!" ]]
 end
+-- "Yellow Fever"
+evt.CanShowTopic[293] = function()
+	return evt.Cmp{"QBits", Value = 101}         -- "Deliver Cure Disease Scrolls to the six huts on the outer Dagger Wound Islands.  Return to Aislen on Dagger Wound Island."
+end
 evt.global[293] = function()
 	if evt.Cmp{"QBits", Value = 108} then         -- Yellow Fever epidemic cured!
 		evt.SetMessage{Str = 621}         --[[ "The Yellow Fever epidemic is over!
@@ -1733,6 +1827,10 @@ Thank you for your help!" ]]
 	end
 	evt.SetMessage{Str = 741}         --[[ "Thanks for the cure, but others in the area are still sick!
 Be sure to deliver the cure to them as well!" ]]
+end
+-- "Yellow Fever"
+evt.CanShowTopic[294] = function()
+	return evt.Cmp{"QBits", Value = 101}         -- "Deliver Cure Disease Scrolls to the six huts on the outer Dagger Wound Islands.  Return to Aislen on Dagger Wound Island."
 end
 evt.global[294] = function()
 	if evt.Cmp{"QBits", Value = 108} then         -- Yellow Fever epidemic cured!
@@ -1774,6 +1872,10 @@ Thank you for your help!" ]]
 	evt.SetMessage{Str = 741}         --[[ "Thanks for the cure, but others in the area are still sick!
 Be sure to deliver the cure to them as well!" ]]
 end
+-- "Yellow Fever"
+evt.CanShowTopic[295] = function()
+	return evt.Cmp{"QBits", Value = 101}         -- "Deliver Cure Disease Scrolls to the six huts on the outer Dagger Wound Islands.  Return to Aislen on Dagger Wound Island."
+end
 evt.global[295] = function()
 	if evt.Cmp{"QBits", Value = 108} then         -- Yellow Fever epidemic cured!
 		evt.SetMessage{Str = 621}         --[[ "The Yellow Fever epidemic is over!
@@ -1814,6 +1916,14 @@ Thank you for your help!" ]]
 	evt.SetMessage{Str = 741}         --[[ "Thanks for the cure, but others in the area are still sick!
 Be sure to deliver the cure to them as well!" ]]
 end
+-- "Report!"
+evt.CanShowTopic[298] = function()
+	if not evt.Cmp{"QBits", Value = 117} then         -- "Deliver fake report to the Dread Pirate Stanley in the Pirate's Rest Tavern on the Island of Regna."
+		return false
+	else
+		return evt.Cmp{"Inventory", Value = 602}         -- "False Report"
+	end
+end
 evt.global[298] = function()
 	evt.SetMessage{Str = 777}         --[[ "You're new aren't you?
 Tell Arion Hunter that I expect more of his rabble than the likes of you!
@@ -1829,6 +1939,10 @@ You make me sick!" ]]
 	evt.Add{"Gold", Value = calculateGold(15000)}
 	evt.SetNPCTopic{NPC = 108, Index = 0, Event = 0}         -- "Dread Pirate Stanley"
 	evt.MoveNPC{NPC = 108, HouseId = 0}         -- "Dread Pirate Stanley"
+end
+-- "Fire Resistance Potion"
+evt.CanShowTopic[571] = function()
+	return evt.Cmp{"QBits", Value = 142}         -- "Deliver Fire Resistance Potions to the six southernmost houses of Rust.  Return to Hobert in Rust."
 end
 evt.global[571] = function()
 	if evt.Cmp{"QBits", Value = 149} then         -- Southern houses of Rust all have Potions of Fire Resistance.
@@ -1869,6 +1983,10 @@ Perhaps we can survive until a new home can be found for us!" ]]
 	evt.SetMessage{Str = 761}         --[[ "Thanks for the potion, but others in the area are without protection!
 Be sure to deliver a potion to them as well!" ]]
 end
+-- "Fire Resistance Potion"
+evt.CanShowTopic[572] = function()
+	return evt.Cmp{"QBits", Value = 142}         -- "Deliver Fire Resistance Potions to the six southernmost houses of Rust.  Return to Hobert in Rust."
+end
 evt.global[572] = function()
 	if evt.Cmp{"QBits", Value = 149} then         -- Southern houses of Rust all have Potions of Fire Resistance.
 		evt.SetMessage{Str = 654}         --[[ "You have at least pushed our demise away for a time, but a new home needs to be found for us!
@@ -1907,6 +2025,10 @@ Perhaps we can survive until a new home can be found for us!" ]]
 	end
 	evt.SetMessage{Str = 761}         --[[ "Thanks for the potion, but others in the area are without protection!
 Be sure to deliver a potion to them as well!" ]]
+end
+-- "Fire Resistance Potion"
+evt.CanShowTopic[573] = function()
+	return evt.Cmp{"QBits", Value = 142}         -- "Deliver Fire Resistance Potions to the six southernmost houses of Rust.  Return to Hobert in Rust."
 end
 evt.global[573] = function()
 	if evt.Cmp{"QBits", Value = 149} then         -- Southern houses of Rust all have Potions of Fire Resistance.
@@ -1947,6 +2069,10 @@ Perhaps we can survive until a new home can be found for us!" ]]
 	evt.SetMessage{Str = 761}         --[[ "Thanks for the potion, but others in the area are without protection!
 Be sure to deliver a potion to them as well!" ]]
 end
+-- "Fire Resistance Potion"
+evt.CanShowTopic[574] = function()
+	return evt.Cmp{"QBits", Value = 142}         -- "Deliver Fire Resistance Potions to the six southernmost houses of Rust.  Return to Hobert in Rust."
+end
 evt.global[574] = function()
 	if evt.Cmp{"QBits", Value = 149} then         -- Southern houses of Rust all have Potions of Fire Resistance.
 		evt.SetMessage{Str = 654}         --[[ "You have at least pushed our demise away for a time, but a new home needs to be found for us!
@@ -1986,6 +2112,10 @@ Perhaps we can survive until a new home can be found for us!" ]]
 	evt.SetMessage{Str = 761}         --[[ "Thanks for the potion, but others in the area are without protection!
 Be sure to deliver a potion to them as well!" ]]
 end
+-- "Fire Resistance Potion"
+evt.CanShowTopic[575] = function()
+	return evt.Cmp{"QBits", Value = 142}         -- "Deliver Fire Resistance Potions to the six southernmost houses of Rust.  Return to Hobert in Rust."
+end
 evt.global[575] = function()
 	if evt.Cmp{"QBits", Value = 149} then         -- Southern houses of Rust all have Potions of Fire Resistance.
 		evt.SetMessage{Str = 654}         --[[ "You have at least pushed our demise away for a time, but a new home needs to be found for us!
@@ -2024,6 +2154,10 @@ Perhaps we can survive until a new home can be found for us!" ]]
 	end
 	evt.SetMessage{Str = 761}         --[[ "Thanks for the potion, but others in the area are without protection!
 Be sure to deliver a potion to them as well!" ]]
+end
+-- "Fire Resistance Potion"
+evt.CanShowTopic[576] = function()
+	return evt.Cmp{"QBits", Value = 142}         -- "Deliver Fire Resistance Potions to the six southernmost houses of Rust.  Return to Hobert in Rust."
 end
 evt.global[576] = function()
 	if evt.Cmp{"QBits", Value = 149} then         -- Southern houses of Rust all have Potions of Fire Resistance.
@@ -2169,6 +2303,10 @@ evt.global[656] = function()
 	end
 	evt.SetMessage{Str = 807}         -- "Very good, you have found me some of the cheese I seek. But now I have my heart set on a full cheese tasting with all three cheeses eaten at once so I can savor them in comparison. Come back when you have then all. I will not take what you have now. I don't think I could resist sampling what you leave--and then the cheese tasting would be ruined!"
 end
+-- "Thank you!"
+evt.CanShowTopic[741] = function()
+	return evt.Cmp{"QBits", Value = 119}         -- "Rescue Arion Hunter's daughter from Ogre Fortress in Alvar."
+end
 evt.global[741] = function()
 	evt.SetMessage{Str = 930}         --[[ "My father sent you to rescue me?
 I am grateful.
@@ -2178,6 +2316,10 @@ I will return to my father and let him know of your assistance!" ]]
 	evt.SetNPCTopic{NPC = 102, Index = 0, Event = 0}         -- "Irabelle Hunter"
 	evt.Subtract{"QBits", Value = 119}         -- "Rescue Arion Hunter's daughter from Ogre Fortress in Alvar."
 	evt.Add{"QBits", Value = 120}         -- Rescued Smuggler Leader's Familly 
+end
+-- "Congratulations"
+evt.CanShowTopic[753] = function()
+	return evt.Cmp{"QBits", Value = 519}         -- Finished Scavenger Hunt
 end
 evt.global[753] = function()
 	evt.SetMessage{Str = 945}         --[[ "Congratulations!
@@ -3349,6 +3491,10 @@ Now THERE'S a job!
 Yes sir.
 Get things done righteo quick, I'll say. Heh." ]]
 end
+-- "Hunter?"
+evt.CanShowTopic[833] = function()
+	return evt.Cmp{"QBits", Value = 549}         -- "Solve the secret to the entrance of the Faerie Mound in Avlee and speak to the Faerie King."
+end
 evt.global[833] = function()
 	evt.SetMessage{Str = 1123}         --[[ "Come to my door looking for magic?
 Thee've always had it, if thee knew where to look.
@@ -4071,6 +4217,10 @@ Your part of the bargain isn't finished.
 No help 'til you're done.
 " ]]
 end
+-- "Artifact"
+evt.CanShowTopic[868] = function()
+	return evt.Cmp{"Inventory", Value = 1436}         -- "Gryphonheart's Trumpet"
+end
 evt.global[868] = function()
 	evt.SetMessage{Str = 1188}         --[[ "[Lady Ellen gasps in delight] You have Gryphonheart's Trumpet!
 This is wonderful!
@@ -4083,6 +4233,10 @@ Thank you for bringing it back to us!" ]]
 	evt.Subtract{"QBits", Value = 591}         -- "Retrieve Gryphonheart's Trumpet from the battle in the Tularean Forest and return it to whichever side you choose."
 	evt.Set{"QBits", Value = 596}         -- Gave artifact to humans
 	evt.SetNPCTopic{NPC = 406, Index = 2, Event = 0}         -- "Ellen Rockway"
+end
+-- "Artifact"
+evt.CanShowTopic[872] = function()
+	return evt.Cmp{"Inventory", Value = 1436}         -- "Gryphonheart's Trumpet"
 end
 evt.global[872] = function()
 	evt.SetMessage{Str = 1195}         --[[ "You have Gryphonheart's Trumpet!
@@ -4207,6 +4361,10 @@ So hurry up and deliver those plans!
 I'm counting on you!" ]]
 	end
 end
+-- "Artifact"
+evt.CanShowTopic[880] = function()
+	return evt.Cmp{"Inventory", Value = 1436}         -- "Gryphonheart's Trumpet"
+end
 evt.global[880] = function()
 	evt.SetMessage{Str = 287}         --[[ "My loyal subjects!
 You were the ones who took the Trumpet!
@@ -4320,6 +4478,10 @@ And she'll become suspicious if I stay the execution.
 I've never stayed one before." ]]
 	end
 end
+-- "Artifact"
+evt.CanShowTopic[887] = function()
+	return evt.Cmp{"Inventory", Value = 1436}         -- "Gryphonheart's Trumpet"
+end
 evt.global[887] = function()
 	evt.SetMessage{Str = 288}         --[[ "Ah, the Trumpet!
 You captured it!
@@ -4334,6 +4496,10 @@ My factor will deposit 5,000 gold in your account for your services." ]]
 	evt.Subtract{"QBits", Value = 591}         -- "Retrieve Gryphonheart's Trumpet from the battle in the Tularean Forest and return it to whichever side you choose."
 	evt.Set{"QBits", Value = 597}         -- Gave artifact to elves
 	evt.SetNPCTopic{NPC = 409, Index = 4, Event = 0}         -- "ElfKing"
+end
+-- "Artifact"
+evt.CanShowTopic[890] = function()
+	return evt.Cmp{"Inventory", Value = 1436}         -- "Gryphonheart's Trumpet"
 end
 evt.global[890] = function()
 	evt.ForPlayer("All")
@@ -4808,6 +4974,9 @@ You help has made my collection complete!" ]]
 		evt.SetMessage{Str = 1400}         --[[ "Did Lord Markham refuse to give you the Quill, or have you not even visited him yet?
 His Manor is in Tatalia, please don't forget to help me." ]]
 	end
+end
+evt.CanShowTopic[939] = function()
+	return evt.Cmp{"Inventory", Value = 1409}         -- "Letter from Johann Kerrid to the Faerie King"
 end
 -- "Pipes"
 evt.global[939] = function()
