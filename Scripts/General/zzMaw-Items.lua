@@ -640,7 +640,7 @@ function events.CalcStatBonusByItems(t)
 						t.Result=t.Result+math.round(bonus)
 					end
 					--calculate random damage
-					if t.Stat==cs.MeleeDamageMax then
+					if t.Stat==cs.RangedDamageMax then
 						local bonus=data.Mod1DiceSides
 						local dices=data.Mod1DiceCount
 						if it.MaxCharges <= 20 then
