@@ -134,7 +134,7 @@ end
 function events.CalcStatBonusByItems(t)
 	local PLT = PlayerEffects[t.Player]
 	if PLT then
-		t.Result = t.Result + (PLT.Stats[t.Stat] or 0)
+		t.Result = t.Result + (PLT.Stats[t.Stat] or 0)*(math.min(t.Player.LevelBase/80,2.5))
 	elseif Game.CurrentScreen == AdvInnScreen or PlayerInParty(t.PlayerIndex) then
 		StoreEffects(t.Player)
 	end
@@ -203,7 +203,11 @@ end
 local function HPSPoverTime(Player, HPSP, Amount, PlayerId)
 	local Cond = Player:GetMainCondition()
 	if Cond >= 17 or Cond < 14 then
-		Player[HPSP] = min(Player[HPSP] + Amount, Player["GetFull" .. HPSP](Player))
+		if amount>0 then
+			Player[HPSP] = min(Player[HPSP] + Player["GetFull" .. HPSP](Player)*0.01, Player["GetFull" .. HPSP](Player))
+		elseif amount<0 then
+			Player[HPSP] = min(Player[HPSP] - Player["GetFull" .. HPSP](Player)*0.02, Player["GetFull" .. HPSP](Player))
+		end
 	end
 end
 
@@ -302,7 +306,7 @@ function events.ItemAdditionalDamage(t)
 
 	t.DamageKind = Effect.DamageKind or t.DamageKind
 	if Effect.Add then
-		t.Result = t.Result + Effect.Add
+		t.Result = t.Result + Effect.Add * math.min(t.Player.LevelBase/80,2.5) * 2
 	end
 	if Effect.Special then
 		Effect.Special(t)
@@ -1040,12 +1044,12 @@ GetBonusList(1331).HPSPRegen = {HP = 3, SP = 3}
 -- Elven Chainmail
 GetBonusList(1335).HPSPRegen = {HP = 3}
 
-GetSpcBonusList(37).HPSPRegen = {HP = 2}
-GetSpcBonusList(38).HPSPRegen = {SP = 1}
-GetSpcBonusList(44).HPSPRegen = {HP = 2}
-GetSpcBonusList(47).HPSPRegen = {SP = 1}
-GetSpcBonusList(55).HPSPRegen = {SP = 1}
-GetSpcBonusList(66).HPSPRegen = {HP = 2, SP = 1}
+GetSpcBonusList(37).HPSPRegen = {HP = 0}
+GetSpcBonusList(38).HPSPRegen = {SP = 0}
+GetSpcBonusList(44).HPSPRegen = {HP = 0}
+GetSpcBonusList(47).HPSPRegen = {SP = 0}
+GetSpcBonusList(55).HPSPRegen = {SP = 0}
+GetSpcBonusList(66).HPSPRegen = {HP = 0, SP = 0}
 
 GetSpcBonusList(73).EffectImmunities = {
 	[const.MonsterBonus.Dead] 	= true,
