@@ -265,7 +265,7 @@ local function getPlayerEquipmentData(player)
 		equipmentData.main.equipStat = equipmentData.main.itemTxt.EquipStat + 1
 		equipmentData.main.skill = equipmentData.main.itemTxt.Skill 
 		
-		if equipmentData.main.skill >= 0 then
+		if equipmentData.main.skill >= 0 and equipmentData.main.skill <= 38 then
 			equipmentData.main.level, equipmentData.main.rank = SplitSkill(player.Skills[equipmentData.main.skill])
 		end
 		
