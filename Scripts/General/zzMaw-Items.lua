@@ -965,3 +965,45 @@ function events.GetSkill(t)
 		t.Result=t.Result+spellBonus
 	end
 end
+
+--BOOK COST
+
+local modifiedBookValues =
+{
+	[0] = 100,
+	[1] = 200,
+	[2] = 300,
+	[3] = 500,
+	[4] = 1000,
+	[5] = 2000,
+	[6] = 4000,
+	[7] = 6000,
+	[8] = 8000,
+	[9] = 10000,
+	[10] = 15000,
+}
+
+
+
+function events.GameInitialized2()
+	for i=0,8 do
+		for j=1,11 do
+			Game.ItemsTxt[399+11*i+j].Value=modifiedBookValues[j-1]
+		end
+	end
+	for i=1,22 do
+		Game.ItemsTxt[476+i].Value=Game.ItemsTxt[476+i].Value*2
+	end
+	--single books cost increased
+	Game.ItemsTxt[408].Value= 40000
+	Game.ItemsTxt[420].Value= 40000
+	Game.ItemsTxt[421].Value= 40000
+	Game.ItemsTxt[430].Value= 20000
+	Game.ItemsTxt[432].Value= 60000
+	Game.ItemsTxt[454].Value= 60000
+	Game.ItemsTxt[482].Value= 20000
+	Game.ItemsTxt[484].Value= 40000
+	Game.ItemsTxt[485].Value= 60000
+	Game.ItemsTxt[498].Value= 100000
+	
+end
