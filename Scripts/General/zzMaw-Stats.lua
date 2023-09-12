@@ -78,7 +78,7 @@ function events.Tick()
 		else
 			endEff2=math.floor(endurance2/5)
 		end
-		skill=Party[index].Skills[const.Skills.Bodybuilding]
+		skill=Party[i].Skills[const.Skills.Bodybuilding]
 		s,m=SplitSkill(skill)
 		if m==4 then
 			m=5
