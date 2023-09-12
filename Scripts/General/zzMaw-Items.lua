@@ -677,7 +677,7 @@ function events.ModifyItemDamage(t)
 			end
 		end
 	end
-	t.Result=bonusDamage
+	t.Result=t.Result+bonusDamage
 end
 
 --fix to enchant2 not applying correctly if same bonus is on the item
@@ -965,4 +965,3 @@ function events.GetSkill(t)
 		t.Result=t.Result+spellBonus
 	end
 end
-
