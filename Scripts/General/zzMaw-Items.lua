@@ -219,6 +219,7 @@ function events.GameInitialized2()
 --Weapon upscaler 
 	for i=1,2200 do
 		if (i>=1 and i<=83) or (i>=803 and i<=865) or (i>=1603 and i<=1665) then
+			
 			upTierDifference=0
 			downTierDifference=0
 			downDamage=0
@@ -1006,4 +1007,26 @@ function events.GameInitialized2()
 	Game.ItemsTxt[485].Value= 60000
 	Game.ItemsTxt[498].Value= 100000
 	
+end
+
+--------------------------------------
+--ARTIFACTS REWORK
+--------------------------------------
+--Increase Base Stats of weapons (handled in line 210)
+artWeap1h={500,501,502,503,504,508,509,510,512,523,524,526,529,538,542,1302,1303,1304,1305,1308,1312,1316,1319,1328,1329,1330,1333,1340,1342,1343,1344,1345,1353,1354,2020,2021,2023,2025,2035,2036,2038,2040}
+artWeap2h={505,506,507,511,525,526,527,528,530,539,540,541,1309,1310,1311,1320,1351,2022,2024,2037,2039}
+
+
+function events.GameInitialized2()
+--Artifact upscaler 
+	for j=1,#artWeap1h do
+		i=artWeap1h[j]
+		Game.ItemsTxt[i].Mod1DiceSides = ((Game.ItemsTxt[i].Mod1DiceSides+1)*2)-1
+		Game.ItemsTxt[i].Mod2=Game.ItemsTxt[i].Mod2*2
+	end
+	for j=1,#artWeap2h do
+		i=artWeap2h[j]
+		Game.ItemsTxt[i].Mod1DiceSides = ((Game.ItemsTxt[i].Mod1DiceSides+1)*3)-1
+		Game.ItemsTxt[i].Mod2=Game.ItemsTxt[i].Mod2*3
+	end
 end
