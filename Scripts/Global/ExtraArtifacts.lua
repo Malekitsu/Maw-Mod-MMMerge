@@ -203,9 +203,9 @@ end
 local function HPSPoverTime(Player, HPSP, Amount, PlayerId)
 	local Cond = Player:GetMainCondition()
 	if Cond >= 17 or Cond < 14 then
-		if amount>0 then
+		if Amount and Amount>0 then
 			Player[HPSP] = min(Player[HPSP] + Player["GetFull" .. HPSP](Player)*0.01, Player["GetFull" .. HPSP](Player))
-		elseif amount<0 then
+		elseif Amount and Amount<0 then
 			Player[HPSP] = min(Player[HPSP] - Player["GetFull" .. HPSP](Player)*0.02, Player["GetFull" .. HPSP](Player))
 		end
 	end
