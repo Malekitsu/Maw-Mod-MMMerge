@@ -595,6 +595,10 @@ function events.CalcStatBonusByItems(t)
 		for i=0,1 do
 			local it=t.Player:GetActiveItem(i)
 			if	it then
+				if table.find(artWeap1h,it.Number) or table.find(artWeap2h,it.Number) then
+					it.MaxCharges=0
+					return
+				end
 				if it.MaxCharges>0 then
 					local data=Game.ItemsTxt[it.Number]
 					if data.EquipStat<=2 then
@@ -628,6 +632,10 @@ function events.CalcStatBonusByItems(t)
 	if t.Stat==cs.RangedDamageMin or t.Stat==cs.RangedDamageMax or t.Stat==cs.RangedAttack then
 		local it=t.Player:GetActiveItem(2)
 		if	it then
+			if table.find(artWeap1h,it.Number) or table.find(artWeap2h,it.Number) then
+				it.MaxCharges=0
+				return
+			end
 			if it.MaxCharges>0 then
 				local data=Game.ItemsTxt[it.Number]
 				if data.EquipStat<=2 then
@@ -656,6 +664,7 @@ function events.CalcStatBonusByItems(t)
 			end
 		end
 	end
+	
 end
 
 					
