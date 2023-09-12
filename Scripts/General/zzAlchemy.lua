@@ -1,17 +1,18 @@
 function events.LoadMap()
-	if not vars.PlayerBuff then
-		vars.PlayerBuff={} 
+	if not vars.PlayerBuffs then
+		vars.PlayerBuffs={} 
 		for i=0,4 do
-			vars.PlayerBuff[i]={}
-			vars.PlayerBuff[i]["weakness"]=0
-			vars.PlayerBuff[i]["disease"]=0
-			vars.PlayerBuff[i]["poison"]=0
-			vars.PlayerBuff[i]["sleep"]=0
-			vars.PlayerBuff[i]["fear"]=0
-			vars.PlayerBuff[i]["curse"]=0
-			vars.PlayerBuff[i]["insanity"]=0
-			vars.PlayerBuff[i]["paralysis"]=0
-			vars.PlayerBuff[i]["stone"]=0
+			local index=Party[i]:GetIndex()
+			vars.PlayerBuffs[index]={}
+			vars.PlayerBuffs[index]["weakness"]=0
+			vars.PlayerBuffs[index]["disease"]=0
+			vars.PlayerBuffs[index]["poison"]=0
+			vars.PlayerBuffs[index]["sleep"]=0
+			vars.PlayerBuffs[index]["fear"]=0
+			vars.PlayerBuffs[index]["curse"]=0
+			vars.PlayerBuffs[index]["insanity"]=0
+			vars.PlayerBuffs[index]["paralysis"]=0
+			vars.PlayerBuffs[index]["stone"]=0
 		end
 	end
 end
@@ -47,7 +48,7 @@ function events.UseMouseItem(t)
 		------------------------
 		if itemImmunityMapping[it.Number] then 
 			local txt=itemImmunityMapping[it.Number]
-			vars.PlayerBuff[t.PlayerSlot][txt]=Game.Time+Const.Hour*6
+			vars.PlayerBuffs[t.PlayerSlot][txt]=Game.Time+Const.Hour*6
 		end
 		--------------------
 		--BUFFS--
@@ -139,47 +140,47 @@ itemPermanentBuffMapping = {
 function events.DoBadThingToPlayer(t)
 	if t.Allow==true then
 		if t.Thing==1 then
-			if vars.PlayerBuff[t.PlayerIndex]["curse"]>Game.Time then
+			if vars.PlayerBuffs[t.PlayerIndex]["curse"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Curse Immunity")
 			end
 		elseif t.Thing==2 then
-			if vars.PlayerBuff[t.PlayerIndex]["weakness"]>Game.Time then
+			if vars.PlayerBuffs[t.PlayerIndex]["weakness"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Weakness Immunity")
 			end 
 		elseif t.Thing==3 then
-			if vars.PlayerBuff[t.PlayerIndex]["sleep"]>Game.Time then
+			if vars.PlayerBuffs[t.PlayerIndex]["sleep"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Forced Sleep Immunity")
 			end 
 		elseif t.Thing==5 then
-			if vars.PlayerBuff[t.PlayerIndex]["insanity"]>Game.Time then
+			if vars.PlayerBuffs[t.PlayerIndex]["insanity"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Insanity Immunity")
 			end 
 		elseif t.Thing==6 or t.Thing==7 or t.Thing==8 then
-			if vars.PlayerBuff[t.PlayerIndex]["poison"]>Game.Time then
+			if vars.PlayerBuffs[t.Player:GetIndex()]["poison"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Poison Immunity")
 			end 
 		elseif t.Thing==9 or t.Thing==10 or t.Thing==11 then
-			if vars.PlayerBuff[t.PlayerIndex]["disease"]>Game.Time then
+			if vars.PlayerBuffs[t.PlayerIndex]["disease"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Disease Immunity")
 			end 
 		elseif t.Thing==12 then
-			if vars.PlayerBuff[t.PlayerIndex]["paralysis"]>Game.Time then
+			if vars.PlayerBuffs[t.PlayerIndex]["paralysis"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Paralysis Immunity")
 			end 
 		elseif t.Thing==15 then
-			if vars.PlayerBuff[t.PlayerIndex]["stone"]>Game.Time then
+			if vars.PlayerBuffs[t.PlayerIndex]["stone"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Petrify Immunity")
 			end 
 		elseif t.Thing==23 then
-			if vars.PlayerBuff[t.PlayerIndex]["fear"]>Game.Time then
+			if vars.PlayerBuffs[t.PlayerIndex]["fear"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Fear Immunity")
 			end 
