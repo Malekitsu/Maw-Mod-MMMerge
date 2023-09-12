@@ -1044,13 +1044,6 @@ GetBonusList(1331).HPSPRegen = {HP = 3, SP = 3}
 -- Elven Chainmail
 GetBonusList(1335).HPSPRegen = {HP = 3}
 
-GetSpcBonusList(37).HPSPRegen = {HP = 0}
-GetSpcBonusList(38).HPSPRegen = {SP = 0}
-GetSpcBonusList(44).HPSPRegen = {HP = 0}
-GetSpcBonusList(47).HPSPRegen = {SP = 0}
-GetSpcBonusList(55).HPSPRegen = {SP = 0}
-GetSpcBonusList(66).HPSPRegen = {HP = 0, SP = 0}
-
 GetSpcBonusList(73).EffectImmunities = {
 	[const.MonsterBonus.Dead] 	= true,
 	[const.MonsterBonus.Errad] 	= true}
