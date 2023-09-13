@@ -3,14 +3,17 @@ function events.GenerateItem(t)
 	Handled = true
 	--calculate party experience
 	if Map.MapStatsIndex==0 then return end
-		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
-		if currentWorld==1 then
-			partyLevel=vars.MM8LVL
-		elseif currentWorld==2 then
-			partyLevel=vars.MM7LVL
-		elseif currentWorld==3 then
-			partyLevel=vars.MM6LVL
-		end
+	currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+	if currentWorld==4 then
+		return
+	end
+	if currentWorld==1 then
+		partyLevel=vars.MM8LVL
+	elseif currentWorld==2 then
+		partyLevel=vars.MM7LVL
+	elseif currentWorld==3 then
+		partyLevel=vars.MM6LVL
+	end
 
 	--nerf if item is strong
 	if partyLevel<(t.Strength-3)*20 and t.Strength<7 then
@@ -72,9 +75,13 @@ spcEncChance={0,0,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40}
 
 
 function events.ItemGenerated(t)
-if Map.MapStatsIndex==0 then 
-return end
-	if t.Strength==7 then 
+	if Game.ItemsTxt[t.Item.Number].Skill==40 then
+		return
+	end
+	t.Item.MaxCharges=0
+	if Map.MapStatsIndex==0 then 
+	return end
+	if t.Strength==7 then
 		return
 	end
 	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then
@@ -568,6 +575,10 @@ function events.CalcStatBonusByItems(t)
 	if t.Stat==9 then
 		for it in t.Player:EnumActiveItems() do
 			if it.MaxCharges > 0 then
+				if table.find(artArmors,it.Number) then
+					it.MaxCharges=0
+					return
+				end
 				local equipStat=Game.ItemsTxt[it.Number].EquipStat
 				if equipStat>=3 and equipStat<=9 then
 					local ac=Game.ItemsTxt[it.Number].Mod2+Game.ItemsTxt[it.Number].Mod1DiceCount 
@@ -1025,7 +1036,7 @@ end
 --Increase Base Stats of weapons (handled in line 210)
 artWeap1h={500,501,502,503,504,508,509,510,512,523,524,526,529,538,542,1302,1303,1304,1305,1308,1312,1316,1319,1328,1329,1330,1333,1340,1342,1343,1344,1345,1353,1354,2020,2021,2023,2025,2035,2036,2038,2040}
 artWeap2h={505,506,507,511,525,526,527,528,530,539,540,541,1309,1310,1311,1320,1351,2022,2024,2037,2039}
-
+artArmors={513,514,515,516,517,518,520,522,533,534,1306,1307,1313,1314,1318,1321,1322,1323,1324,1327,1331,1332,1334,1335,1336,1337,1346,1349,1350,1352,2026,2027,2028,2030,2031,2041,2042,2043,2045,2046}
 
 function events.GameInitialized2()
 --Artifact upscaler 
