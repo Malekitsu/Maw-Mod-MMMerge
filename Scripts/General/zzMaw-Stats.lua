@@ -66,7 +66,9 @@ function events.CalcStatBonusByItems(t)
   if t.Stat == const.Stats.HP then
 	endurance=t.Player:GetEndurance()/1000
 	index2=t.PlayerIndex
-	t.Result=t.Result+math.round(fullHP2[index2]*endurance)
+	local skill=t.Player.Skills[const.Skills.Bodybuilding]
+	local s,m=SplitSkill(skill)
+	t.Result=t.Result+math.round(fullHP2[index2]*endurance)+s^2
   end
 end
 
@@ -78,14 +80,14 @@ function events.Tick()
 		else
 			endEff2=math.floor(endurance2/5)
 		end
-		skill=Party[i].Skills[const.Skills.Bodybuilding]
-		s,m=SplitSkill(skill)
+		local skill=Party[i].Skills[const.Skills.Bodybuilding]
+		local s,m=SplitSkill(skill)
 		if m==4 then
 			m=5
 		end
 		BBHP=s*m
 		index3=Party[i]:GetIndex()
-		fullHP2[index3]=Game.Classes.HPFactor[Party[i].Class]*(Party[i]:GetLevel()+endEff2+BBHP)+Game.Classes.HPBase[Party[i].Class]
+		fullHP2[index3]=Game.Classes.HPFactor[Party[i].Class]*(Party[i]:GetLevel()+endEff2+BBHP)+Game.Classes.HPBase[Party[i].Class]+s^2
 	end
 end
 
@@ -139,13 +141,14 @@ function events.BuildStatInformationBox(t)
 		endEff=math.floor(endurance2/5)
 	end
 	HPScaling=Game.Classes.HPFactor[Party[index].Class]
+	if Party[index].Class==6
 	skill=Party[index].Skills[const.Skills.Bodybuilding]
 	s,m=SplitSkill(skill)
 	if m==4 then
 		m=5
 	end
-	BBHP=HPScaling*s*m
-	local fullHP=Party[index]:GetFullHP()
+	BBHP=HPScaling*s*m+s^2
+	fullHP=Party[index]:GetFullHP()
 	enduranceTotalBonus=math.round(fullHP-fullHP/(1+endurance2/1000))+endEff*HPScaling
 	level=Party[index]:GetLevel()
 	BASEHP=Game.Classes.HPBase[Party[index].Class]+level*HPScaling
