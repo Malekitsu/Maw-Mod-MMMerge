@@ -305,8 +305,8 @@ function events.Tick()
 			it.Mod1DiceCount=it.Mod1DiceCount+s*0.5
 		elseif m==4 then
 			it.Mod1DiceCount=it.Mod1DiceCount+s
-			lastModifiedReagent=Mouse.Item.Number
 		end
+		lastModifiedReagent=Mouse.Item.Number
 	end
 end
 
