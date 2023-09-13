@@ -90,6 +90,10 @@ function events.Tick()
 		fullHP2[index3]=Game.Classes.HPFactor[Party[i].Class]*(Party[i]:GetLevel()+endEff2+BBHP)+Game.Classes.HPBase[Party[i].Class]+s^2
 	end
 end
+--body building description
+function events.GameInitialized2()
+	Game.SkillDescriptions[27]=Game.SkillDescriptions[24] .. "\n\nHit Points are also increased by an amount equal to Skill^2"
+end
 
 function events.BuildStatInformationBox(t)
 	if t.Stat==0 then
@@ -141,7 +145,6 @@ function events.BuildStatInformationBox(t)
 		endEff=math.floor(endurance2/5)
 	end
 	HPScaling=Game.Classes.HPFactor[Party[index].Class]
-	if Party[index].Class==6
 	skill=Party[index].Skills[const.Skills.Bodybuilding]
 	s,m=SplitSkill(skill)
 	if m==4 then
