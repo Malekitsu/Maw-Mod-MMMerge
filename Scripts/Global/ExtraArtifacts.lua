@@ -203,11 +203,7 @@ end
 local function HPSPoverTime(Player, HPSP, Amount, PlayerId)
 	local Cond = Player:GetMainCondition()
 	if Cond >= 17 or Cond < 14 then
-		if Amount and Amount>0 then
-			Player[HPSP] = min(Player[HPSP] + Player["GetFull" .. HPSP](Player)*0.01, Player["GetFull" .. HPSP](Player))
-		elseif Amount and Amount<0 then
-			Player[HPSP] = min(Player[HPSP] - Player["GetFull" .. HPSP](Player)*0.02, Player["GetFull" .. HPSP](Player))
-		end
+		Player[HPSP] = min(Player[HPSP] + Amount, Player["GetFull" .. HPSP](Player))
 	end
 end
 
@@ -1043,6 +1039,13 @@ GetBonusList(2035).HPSPRegen = {HP = -3}
 GetBonusList(1331).HPSPRegen = {HP = 3, SP = 3}
 -- Elven Chainmail
 GetBonusList(1335).HPSPRegen = {HP = 3}
+
+GetSpcBonusList(37).HPSPRegen = {HP = 2}
+GetSpcBonusList(38).HPSPRegen = {SP = 1}
+GetSpcBonusList(44).HPSPRegen = {HP = 2}
+GetSpcBonusList(47).HPSPRegen = {SP = 1}
+GetSpcBonusList(55).HPSPRegen = {SP = 1}
+GetSpcBonusList(66).HPSPRegen = {HP = 2, SP = 1}
 
 GetSpcBonusList(73).EffectImmunities = {
 	[const.MonsterBonus.Dead] 	= true,
