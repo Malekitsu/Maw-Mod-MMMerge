@@ -407,3 +407,28 @@ for i=1, 60 do
 	
 
 ]]
+
+
+function events.GameInitialized2()
+	for i=1,Game.MapStats.High do
+		if Game.MapStats[i].Mon1Low==1 then
+			Game.MapStats[i].Mon1Low=2
+		end
+		if Game.MapStats[i].Mon1Hi<=3 then
+			Game.MapStats[i].Mon1Hi=Game.MapStats[i].Mon1Hi+1
+		end 
+		if Game.MapStats[i].Mon2Low==1 then
+			Game.MapStats[i].Mon2Low=2
+		end
+		if Game.MapStats[i].Mon2Hi<=3 then
+			Game.MapStats[i].Mon2Hi=Game.MapStats[i].Mon1Hi+1
+		end 
+		if Game.MapStats[i].Mon3Low==1 then
+			Game.MapStats[i].Mon3Low=2
+		end
+		if Game.MapStats[i].Mon3Hi<=3 then
+			Game.MapStats[i].Mon3Hi=Game.MapStats[i].Mon1Hi+1
+		end 
+
+	end
+end
