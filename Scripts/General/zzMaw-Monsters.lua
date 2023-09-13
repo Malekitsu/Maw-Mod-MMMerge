@@ -20,6 +20,12 @@ end
 --------------------------------------
 
 function events.AfterLoadMap()	
+	for i=0, Map.Monsters.High do
+		local mon=Map.Monsters[i]
+		local lvlMult=(mon.Level+3)/(Game.MonstersTxt[Map.Monsters[i].Id].Level+3)
+		mon.TreasureDiceCount=Game.MonstersTxt[Map.Monsters[i].Id].TreasureDiceCount*lvlMult
+		mon.TreasureDiceSides=Game.MonstersTxt[Map.Monsters[i].Id].TreasureDiceSides*lvlMult
+	end
 	if mapvars.boosted==nil then
 		mapvars.boosted=true
 		--calculate party experience
@@ -39,7 +45,8 @@ function events.AfterLoadMap()
 		--calculate average level for unique monsters
 		for i=0, Map.Monsters.High do
 			--VELOCITY/SPEED on hostile monsters only
-			local mon=Map.Monsters[i]
+			--gold fix
+			
 			if mon.Hostile==true then
 				mon.Velocity = (mon.Velocity + (400 - mon.Velocity) / 2 + 50)
 			end
@@ -122,7 +129,6 @@ function events.AfterLoadMap()
 				-------------------------
 				--END DAMAGE CALCULATION
 				-------------------------
-		
 			end
 		end
 	end	
@@ -144,8 +150,6 @@ function events.CalcDamageToPlayer(t)
 		t.Result=t.Result
 	end
 end
-
-
 
 
 --CREATE OLD TABLE COPY
@@ -293,7 +297,7 @@ function events.LoadMap()
 		--experience
 		mon.Experience = math.round(mon.Level*(mon.Level+10))
 		--Gold
-		levelMultiplier = (mon.Level) / (LevelB)
+		--levelMultiplier = (mon.Level) / (LevelB)
 		--mon.TreasureDiceCount=math.min(mon.TreasureDiceCount*levelMultiplier,250)
 		--mon.TreasureDiceSides=math.min(mon.TreasureDiceSides*levelMultiplier,250)
 	end
