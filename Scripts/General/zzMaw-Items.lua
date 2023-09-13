@@ -936,6 +936,7 @@ enchantList={
 	[32] = true ,
 	[33] = true ,
 	[34] = true ,
+	[46] = true ,
 	[74] = true ,
 	[75] = true ,
 	[76] = true ,
