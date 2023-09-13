@@ -963,13 +963,16 @@ magicEnchantMap[const.Skills.Dark] = 28
 function events.GetSkill(t)
 	if magicEnchantMap[t.Skill] then
 		spellBonus=0
+		malus=0
+		local skill = t.Player.Skills[t.Skill]
+		local s,m=SplitSkill(skill)
 		for it in t.Player:EnumActiveItems() do
 			if it.Bonus2==magicEnchantMap[t.Skill] then
-				t.Result=t.Result-math.floor(t.Result/3)
+				malus=math.floor(s/2)
 				spellBonus=math.max(5+math.round(it.MaxCharges/4))
 			end
 		end
-		t.Result=t.Result+spellBonus
+		t.Result=t.Result+spellBonus-malus
 	end
 end
 
