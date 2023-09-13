@@ -421,13 +421,13 @@ function events.GameInitialized2()
 			Game.MapStats[i].Mon2Low=2
 		end
 		if Game.MapStats[i].Mon2Hi<=3 then
-			Game.MapStats[i].Mon2Hi=Game.MapStats[i].Mon1Hi+1
+			Game.MapStats[i].Mon2Hi=Game.MapStats[i].Mon2Hi+1
 		end 
 		if Game.MapStats[i].Mon3Low==1 then
 			Game.MapStats[i].Mon3Low=2
 		end
 		if Game.MapStats[i].Mon3Hi<=3 then
-			Game.MapStats[i].Mon3Hi=Game.MapStats[i].Mon1Hi+1
+			Game.MapStats[i].Mon3Hi=Game.MapStats[i].Mon3Hi+1
 		end 
 
 	end
