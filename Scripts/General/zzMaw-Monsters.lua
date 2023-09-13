@@ -22,7 +22,7 @@ end
 function events.AfterLoadMap()	
 	for i=0, Map.Monsters.High do
 		local mon=Map.Monsters[i]
-		local lvlMult=(mon.Level+3)/(Game.MonstersTxt[Map.Monsters[i].Id].Level+3)
+		lvlMult=(mon.Level+5)/(basetable[Map.Monsters[i].Id].Level+5)
 		mon.TreasureDiceCount=Game.MonstersTxt[Map.Monsters[i].Id].TreasureDiceCount*lvlMult
 		mon.TreasureDiceSides=Game.MonstersTxt[Map.Monsters[i].Id].TreasureDiceSides*lvlMult
 	end
