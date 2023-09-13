@@ -902,8 +902,6 @@ function events.ItemAdditionalDamage(t)
 	--empower enchants
 	if enchantbonusdamage[t.Item.Bonus2] then
 		t.Result=t.Result*enchantbonusdamage[t.Item.Bonus2]
-	else
-		t.Result=t.Result*4
 	end
 	--scaling Bonus
 	if t.Item.MaxCharges>0 then
