@@ -699,6 +699,7 @@ function events.CalcStatBonusByItems(t)
 	local main = equipmentData.main
 	local extra = equipmentData.extra
 	local armor = equipmentData.armor
+	local shield = equipmentData.shield
 	
 	-- calculate resistance
 	
@@ -739,8 +740,10 @@ function events.CalcStatBonusByItems(t)
 								
 		if armor.equipped then
 			t.Result = t.Result + (newArmorSkillResistanceBonuses[armor.skill][armor.rank] * armor.level)
+		end	
+		if shield.equipped then
+			t.Result = t.Result + (newArmorSkillResistanceBonuses[shield.skill][shield.rank] * shield.level)
 		end
-		
 	end
 	
 end
