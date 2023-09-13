@@ -365,40 +365,39 @@ function events.DoBadThingToPlayer(t)
 end
 
 --hp and sp regen
-function events.LoadMap(wasInGame)
-local function restoreHPEnchant() 
-	for _, pl in Party do 
-	HPregen=0
-	totHP=pl:GetFullHP()
-		for it in pl:EnumActiveItems() do
-			if it.Bonus2 == 37 or it.Bonus2==44 or it.Bonus2==50 or it.Bonus2==54 then		
-				HPregen=math.max(HPregen+totHP*0.005,HPregen+1)	
+	local function restoreHPEnchant() 
+		for _, pl in Party do 
+		HPregen=0
+		totHP=pl:GetFullHP()
+			for it in pl:EnumActiveItems() do
+				if it.Bonus2 == 37 or it.Bonus2==44 or it.Bonus2==50 or it.Bonus2==54 then		
+					HPregen=math.max(HPregen+totHP*0.005,HPregen+1)	
+				end
 			end
-		end
-	HPregen=math.max(HPregen-1,0)
-	pl.HP=math.min(pl.HP+math.round(HPregen),totHP)
-	end 
-end
-Timer(restoreHPEnchant, const.Minute*5) 
+		HPregen=math.max(HPregen-1,0)
+		pl.HP=math.min(pl.HP+math.round(HPregen),totHP)
+		end 
+	end
+	Timer(restoreHPEnchant, const.Minute*5) 
 
 
-local function restoreSPEnchant() 
-	for _, pl in Party do 
-	SPregen=0
-	totSP=pl:GetFullSP()
-		for it in pl:EnumActiveItems() do
-			if it.Bonus2 == 38 or it.Bonus2==47 or it.Bonus2==55 then		
-				SPregen=math.max(SPregen+totSP*0.005,SPregen+1)
+	local function restoreSPEnchant() 
+		for _, pl in Party do 
+		SPregen=0
+		totSP=pl:GetFullSP()
+			for it in pl:EnumActiveItems() do
+				if it.Bonus2 == 38 or it.Bonus2==47 or it.Bonus2==55 then		
+					SPregen=math.max(SPregen+totSP*0.005,SPregen+1)
+				end
 			end
-		end
-	SPregen=math.max(SPregen-1,0)
-	pl.SP=math.min(pl.SP+math.round(SPregen),totSP)
-	end 
-end
-Timer(restoreSPEnchant, const.Minute*5) 
+		SPregen=math.max(SPregen-1,0)
+		pl.SP=math.min(pl.SP+math.round(SPregen),totSP)
+		end 
+	end
+	Timer(restoreSPEnchant, const.Minute*5) 
 end
 
-end
+
 
 --carnage fix
 function events.CalcDamageToMonster(t)
