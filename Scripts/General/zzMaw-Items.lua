@@ -117,7 +117,7 @@ function events.ItemGenerated(t)
 		if enc1Chance[pseudoStr]>roll1 then
 			t.Item.Bonus=math.random(1,16)
 			t.Item.BonusStrength=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
-			if math.random(1,10)==10 then
+			if math.random(1,5)==5 then
 				t.Item.Bonus=math.random(17,24)
 				t.Item.BonusStrength=math.ceil(t.Item.BonusStrength^0.5)
 			end
@@ -862,6 +862,9 @@ function events.CalcItemValue(t)
 	bonus1=t.Item.BonusStrength*100
 	if t.Item.Bonus==8 or t.Item.Bonus==9 then
 		bonus1=bonus1/2
+	end
+	if t.Item.Bonus>16 and t.Item.Bonus<=24 then
+		bonus1=(bonus1/100)^2*100
 	end
 	bonus2=(t.Item.Charges%1000)*100
 	if math.floor(t.Item.Charges/1000)==8 or math.floor(t.Item.Charges/1000)==9 then
