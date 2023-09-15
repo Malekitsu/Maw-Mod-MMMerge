@@ -26,7 +26,7 @@ DragonAbility	-	-	-	-	-	-	-	-	-	-	M	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	
 IdentifyItem	-	-	-	-	-	-	-	-	M	M	M	G	E	E	E	E	-	-	-	-	-	-	-	-	-	-	-	-	-	-	B	B	E	E	M	M	G	G	-	-	E	E	M	M	M	G	G	M	-	-	-	M	M
 Merchant	E	E	E	E	M	M	M	M	M	G	E	E	E	E	E	E	E	E	E	E	E	E	-	-	-	-	E	E	E	E	B	B	B	B	M	M	M	M	B	B	E	E	B	B	B	B	B	B	-	-	M	B	B
 Repair	E	E	E	E	E	E	E	E	E	E	-	-	-	-	-	-	M	M	G	G	-	-	-	-	-	-	M	M	G	G	B	B	E	E	B	B	B	B	M	M	-	-	-	E	-	-	E	E	-	-	E	E	E
-Bodybuilding	E	E	E	E	B	B	B	B	-	-	M	M	-	-	-	-	M	M	M	M	M	G	M	M	G	G	M	M	M	M	E	E	E	E	E	E	E	E	M	G	-	-	-	-	-	-	-	-	-	-	B	-	-
+Bodybuilding	E	E	E	E	B	B	B	B	B	B	M	M	B	B	B	B	M	M	M	M	M	G	M	M	G	G	M	M	M	M	E	E	E	E	E	E	E	E	M	G	B	B	B	B	B	B	B	B	B	-	B	B	-
 Meditation	E	E	E	E	M	M	M	M	E	E	M	M	M	M	G	G	-	-	-	-	-	-	-	-	-	-	E	E	E	E	B	B	B	B	-	-	-	-	-	-	-	-	M	M	M	M	M	G	-	-	M	M	M
 Perception	M	M	G	G	E	E	E	E	M	M	M	G	E	E	E	E	E	E	E	E	M	G	E	E	E	E	B	B	B	B	M	M	M	M	M	M	M	M	B	B	E	E	E	E	E	E	E	E	B	B	E	E	E
 Regeneration	-	-	-	-	-	-	-	-	-	-	E	E	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	G	E	M	-	-	-	E	-	-	-	-	-	-	-
