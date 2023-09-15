@@ -191,7 +191,7 @@ function events.ItemGenerated(t)
 		end
 		--nerf to AC
 		if t.Item.Bonus==10 then
-			t.Item.BonusStrength=t.Item.BonusStrength/2
+			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength/2)
 		end
 		if math.floor(t.Item.Charges/1000)==10 then
 			t.Item.Charges=t.Item.Charges-math.floor(t.Item.Charges%1000)/2
