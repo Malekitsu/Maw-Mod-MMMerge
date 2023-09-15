@@ -8,20 +8,20 @@ function events.GenerateItem(t)
 		return
 	end
 	if currentWorld==1 then
-		partyLevel=vars.MM8LVL
+		partyLevelItemGen=vars.MM8LVL
 	elseif currentWorld==2 then
-		partyLevel=vars.MM7LVL
+		partyLevelItemGen=vars.MM7LVL
 	elseif currentWorld==3 then
-		partyLevel=vars.MM6LVL
+		partyLevelItemGen=vars.MM6LVL
 	end
 
 	--nerf if item is strong
-	if partyLevel<(t.Strength-3)*20 and t.Strength<7 then
+	if partyLevelItemGen<(t.Strength-3)*20 and t.Strength<7 then
 		t.Strength=t.Strength-1
 	end
-	if (t.Strength-2)*20>partyLevel and t.Strength>2 and t.Strength<7 then
+	if (t.Strength-2)*20>partyLevelItemGen and t.Strength>2 and t.Strength<7 then
 		roll=math.random((t.Strength-3)*20,(t.Strength-2)*20)
-		if roll>partyLevel then
+		if roll>partyLevelItemGen then
 			t.Strength=t.Strength-1
 		end
 	end
@@ -75,12 +75,9 @@ spcEncChance={0,0,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40}
 
 
 function events.ItemGenerated(t)
-	if Game.ItemsTxt[t.Item.Number].Skill==40 then
-		return
+	if Map.MapStatsIndex==0 then
+		return 
 	end
-	t.Item.MaxCharges=0
-	if Map.MapStatsIndex==0 then 
-	return end
 	if t.Strength==7 then
 		return
 	end
@@ -103,9 +100,13 @@ function events.ItemGenerated(t)
 		end
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
 		t.Item.MaxCharges=math.min(math.floor(partyLevel/5),255)
-		local partyLevel=math.min(math.floor(partyLevel/20),14)
+		partyLevel1=math.min(math.floor(partyLevel/18),14)
 		--adjust loot Strength
-		pseudoStr=t.Strength+partyLevel
+		ps1=t.Strength
+		pseudoStr=ps1+partyLevel1
+		if math.random(1,18)>partyLevel1%18 then
+			pseudoStr=pseudoStr+1
+		end
 		if pseudoStr==1 then 
 			return 
 		end
@@ -143,9 +144,9 @@ function events.ItemGenerated(t)
 		--ancient item
 		ancient=math.random(1,50)
 		if ancient<=t.Strength-4 then
-			t.Item.Charges=math.random(math.round(encStrUp[partyLevel+6]+1),math.round(encStrUp[partyLevel+6]*1.25))+math.random(1,16)*1000
+			t.Item.Charges=math.random(math.round(encStrUp[pseudoStr+3]+1),math.round(encStrUp[pseudoStr+3]*1.25))+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.random(math.round(encStrUp[partyLevel+6]+1),math.round(encStrUp[partyLevel+6]*1.25))
+			t.Item.BonusStrength=math.random(math.round(encStrUp[pseudoStr+3]+1),math.round(encStrUp[pseudoStr+3]*1.25))
 			rollSpc=0
 		end
 		--apply special enchant
@@ -172,9 +173,9 @@ function events.ItemGenerated(t)
 		--primordial item
 		primordial=math.random(1,100)
 		if primordial<=t.Strength-4 then
-			t.Item.Charges=math.round(encStrUp[partyLevel+6]*1.25)+math.random(1,16)*1000
+			t.Item.Charges=math.round(encStrUp[pseudoStr+3]*1.25)+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.round(encStrUp[partyLevel+6]*1.25)
+			t.Item.BonusStrength=math.round(encStrUp[pseudoStr+3]*1.25)
 			if t.Item.Number>60 then
 				t.Item.Bonus2=math.random(1,2)
 				else
