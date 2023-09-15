@@ -589,7 +589,7 @@ function events.CalcStatBonusBySkills(t)
 				end
 			
 			end
-		else
+		elseif not main.weapon and not extra.weapon then
 			local punch=t.Player:GetSkill(const.Skills.Unarmed)
 			local s,m = SplitSkill(punch)
 			if m>0 then
