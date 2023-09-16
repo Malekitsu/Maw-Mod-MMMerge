@@ -1370,9 +1370,10 @@ function events.KeyDown(t)
 			end
 			if heal then
 				Party[0].Items[index].Number=0
-				evt.Add("HP",20+bonus*2)
+				local healAmount=math.round(bonus^1.4)+10
+				evt.Add("HP",healAmount)
 				vars.healthPotionCooldown=15
-				Game.ShowStatusText(string.format("Health Potion heals for %s hit points",20+bonus*2))
+				Game.ShowStatusText(string.format("Health Potion heals for %s hit points",healAmount))
 			end
 		else
 			Game.ShowStatusText(string.format("Health Potion has %s seconds of cooldown remaining",vars.healthPotionCooldown))
@@ -1410,9 +1411,10 @@ function events.KeyDown(t)
 			end
 			if heal then
 				Party[0].Items[index].Number=0
+				local spAmount=math.round(Bonus^1.4*2/3)+10
 				evt.Add("SP",20+bonus*2)
 				vars.manaPotionCooldown=15
-				Game.ShowStatusText(string.format("Mana Potion restores %s mana",20+bonus*2))
+				Game.ShowStatusText(string.format("Mana Potion restores %s mana",spAmount))
 			end
 		else
 			Game.ShowStatusText(string.format("Mana Potion has %s seconds of cooldown remaining",vars.manaPotionCooldown))
