@@ -29,6 +29,7 @@ end
 
 --create tables to calculate special enchant
 function events.GameInitialized2()
+	Game.ItemsTxt[67].NotIdentifiedName="Mace"
 	--calculate totals by enchant type
 	totBonus2={}
 	for k=0,3 do
