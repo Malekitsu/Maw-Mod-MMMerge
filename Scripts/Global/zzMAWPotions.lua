@@ -133,9 +133,11 @@ for i=1,#removelist do
 	end
 end
 
+
 evt.PotionEffects[43] = function(IsDrunk, t, Power)
 	if t.Bonus2==0 and Game.ItemsTxt[t.Number].Skill<7 then
-		t.Bonus2=46
+		local enchNumber=(t.Number+t.Charges+t.MaxCharges+t.Bonus+t.BonusStrength)%4
+		t.Bonus2=enchNumber*3+6
 		Mouse.Item.Number=0
 		mem.u4[0x51E100] = 0x100 
 		t.Condition = t.Condition:Or(0x10)
@@ -171,7 +173,7 @@ evt.PotionEffects[28] = function(IsDrunk, t, Power)
 end
 evt.PotionEffects[29] = function(IsDrunk, t, Power)
 	if t.Bonus2==0 and Game.ItemsTxt[t.Number].Skill<7 then
-		t.Bonus2=46
+		t.Bonus2=8
 		Mouse.Item.Number=0
 		mem.u4[0x51E100] = 0x100 
 		t.Condition = t.Condition:Or(0x10)
