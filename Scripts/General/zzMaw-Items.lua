@@ -435,7 +435,7 @@ function events.BuildItemInformationBox(t)
 				local equipStat=txt.EquipStat
 				if equipStat>=3 and equipStat<=9 then
 				local ac3=txt.Mod2+txt.Mod1DiceCount 
-					if ac>0 then
+					if ac3>0 then
 						local lookup=0
 						while Game.ItemsTxt[t.Item.Number].NotIdentifiedName==Game.ItemsTxt[t.Item.Number+lookup+1].NotIdentifiedName do 
 							lookup=lookup+1
