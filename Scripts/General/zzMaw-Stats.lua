@@ -365,23 +365,23 @@ function events.Tick()
 		--add bonus2
 		for it in Party[Game.CurrentPlayer]:EnumActiveItems() do
 			if it.Bonus2==1 then
-				fireRes=fireRes+10/2
-				airRes=airRes+10/2
-				waterRes=waterRes+10/2
-				earthRes=earthRes+10/2
-				mindRest=mindRes+10/2
-				bodyRes=bodyRes+10/2
+				fireRes=fireRes+10/4
+				airRes=airRes+10/4
+				waterRes=waterRes+10/4
+				earthRes=earthRes+10/4
+				mindRes=mindRes+10/4
+				bodyRes=bodyRes+10/4
 			end
 			if it.Bonus2==42 then
-				fireRes=fireRes+1/2
-				airRes=airRes+1/2
-				waterRes=waterRes+1/2
-				earthRes=earthRes+1/2
-				mindRest=mindRes+1/2
-				bodyRes=bodyRes+1/2
+				fireRes=fireRes+1/4
+				airRes=airRes+1/4
+				waterRes=waterRes+1/4
+				earthRes=earthRes+1/4
+				mindRes=mindRes+1/4
+				bodyRes=bodyRes+1/4
 			end
 			if it.Bonus2==50 then
-				fireRes=fireRes+30/2
+				fireRes=fireRes+30/4
 			end
 		end
 		if fireRes>=75 then
