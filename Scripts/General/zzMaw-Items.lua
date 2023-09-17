@@ -74,6 +74,8 @@ enc1Chance={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80}
 enc2Chance={20,30,35,40,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60}
 spcEncChance={0,0,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40}
 
+primordialWeapEnchants={41,46}
+primordialArmorEnchants={1,2,80}
 
 function events.ItemGenerated(t)
 	if Map.MapStatsIndex==0 then
@@ -114,7 +116,7 @@ function events.ItemGenerated(t)
 		roll1=math.random(1,100)
 		roll2=math.random(1,100)
 		rollSpc=math.random(1,100)
-		
+		power=0
 		--apply enchant1
 		if enc1Chance[pseudoStr]>roll1 then
 			t.Item.Bonus=math.random(1,16)
@@ -143,44 +145,62 @@ function events.ItemGenerated(t)
 		end
 				
 		--ancient item
-		ancient=math.random(1,50)
-		if ancient<=t.Strength-4 then
+		ancient=false
+		ancientRoll=math.random(1,50)
+		if ancientRoll<=1 then
+			ancient=true
 			t.Item.Charges=math.random(math.round(encStrUp[pseudoStr+3]+1),math.round(encStrUp[pseudoStr+3]*1.25))+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
 			t.Item.BonusStrength=math.random(math.round(encStrUp[pseudoStr+3]+1),math.round(encStrUp[pseudoStr+3]*1.25))
-			rollSpc=0
+			power=2
+			chargesBonus=math.random(1,5)
+			t.Item.MaxCharges=t.Item.MaxCharges+chargesBonus
+			t.Item.BonusExpireTime=1
 		end
 		--apply special enchant
-		if spcEncChance[pseudoStr]>rollSpc then
+		if spcEncChance[pseudoStr]>rollSpc or ancient then
 			n=t.Item.Number
 			c=Game.ItemsTxt[n].EquipStat
-			if c<12 and t.Strength>=3 then
-				totB2=itemStrength[t.Strength][c]
+			if c<12 then
+				power=ps1+power
+				power=math.max(math.min(power,6),3)
+				totB2=itemStrength[power][c]
 				roll=math.random(1,totB2)
 				tot=0
 				for i=0,Game.SpcItemsTxt.High do
 					if roll<=tot then
 						t.Item.Bonus2=i
 						goto continue
-					elseif table.find(enchants[t.Strength], Game.SpcItemsTxt[i].Lvl) then
+					elseif table.find(enchants[power], Game.SpcItemsTxt[i].Lvl) then
 						tot=tot+Game.SpcItemsTxt[i].ChanceForSlot[c]
 					end
 				end	
-			end	
+			end			
+			::continue::
 		end
 		
 		::continue::
 		
 		--primordial item
-		primordial=math.random(1,100)
-		if primordial<=t.Strength-4 then
+		primordial=math.random(1,200)
+		if primordial<=1 then
+			if ancient then
+				t.Item.MaxCharges=t.Item.MaxCharges-chargesBonus
+			end
+			t.Item.BonusExpireTime=2
 			t.Item.Charges=math.round(encStrUp[pseudoStr+3]*1.25)+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
 			t.Item.BonusStrength=math.round(encStrUp[pseudoStr+3]*1.25)
-			if t.Item.Number>60 then
-				t.Item.Bonus2=math.random(1,2)
-				else
-				t.Item.Bonus2=41
+			t.Item.MaxCharges=t.Item.MaxCharges+5
+			--apply special enchant
+			n=t.Item.Number
+			c=Game.ItemsTxt[n].EquipStat
+			if c<=2 then
+				roll=math.random(1,#primordialWeapEnchants)
+				t.Item.Bonus2=primordialWeapEnchants[roll]
+			else
+				roll=math.random(1,#primordialArmorEnchants)
+				t.Item.Bonus2=primordialArmorEnchants[roll]
 			end
 		end			
 		
@@ -526,7 +546,11 @@ function events.BuildItemInformationBox(t)
 			if t.Item.Charges>1000 then
 				bonus=bonus+1
 			end
-			if bonus==3 then
+			if t.Item.BonusExpireTime==1 then
+				t.Name=StrColor(255,128,0,"Ancient " .. t.Name)
+			elseif t.Item.BonusExpireTime==2 then
+				t.Name=StrColor(255,0,0,"Primordial " .. t.Name)
+			elseif bonus==3 then
 				t.Name=StrColor(163,53,238,t.Name)
 			elseif bonus==2 then
 				t.Name=StrColor(0,150,255,t.Name)
