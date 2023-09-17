@@ -559,3 +559,60 @@ end
 ---------------------------
 ----END OF SPELL REWORK----
 ---------------------------
+
+---------------------------------------------
+--HEALING SCALING WITH PERSONALITY AND CRIT--
+---------------------------------------------
+
+function events.Action(t)
+	--heal
+	if t.Action==141 then
+		local persBonus=Party[Game.CurrentPlayer]:GetPersonality()/1000
+		local intBonus=Party[Game.CurrentPlayer]:GetIntellect()/1000
+		local statBonus=math.max(persBonus,intBonus)
+		crit=Party[Game.CurrentPlayer]:GetLuck()/2000+0.05
+		local body=Party[Game.CurrentPlayer]:GetSkill(const.Skills.Body)
+		local s,m=SplitSkill(body)
+		local baseHeal=(5+(m+1)*s)
+		local extraHeal=baseHeal*statBonus
+		roll=math.random()
+		local gotCrit=false
+		if roll<crit then
+			extraHeal=(extraHeal+baseHeal)*(1.5+statBonus)-baseHeal
+			gotCrit=true
+		end
+		--apply heal
+		local maxHP=Party[t.Param-1]:GetFullHP()
+		Party[t.Param-1].HP=math.min(Party[t.Param-1].HP+extraHeal,maxHP)
+		if gotCrit then
+			Sleep(1)
+			Game.ShowStatusText("Critical Heal")
+		end
+	end
+	--power cure
+	if t.Action==142 then
+		local persBonus=Party[Game.CurrentPlayer]:GetPersonality()/1000
+		local intBonus=Party[Game.CurrentPlayer]:GetIntellect()/1000
+		local statBonus=math.max(persBonus,intBonus)
+		crit=Party[Game.CurrentPlayer]:GetLuck()/2000+0.05
+		local body=Party[Game.CurrentPlayer]:GetSkill(const.Skills.Body)
+		local s,m=SplitSkill(body)
+		local baseHeal=(10+s*5)
+		local extraHeal=baseHeal*statBonus
+		roll=math.random()
+		local gotCrit=false
+		if roll<crit then
+			extraHeal=(extraHeal+baseHeal)*(1.5+statBonus)-baseHeal
+			gotCrit=true
+		end
+		--apply heal
+		for i=0,Party.High do
+			local maxHP=Party[i]:GetFullHP()
+			Party[i].HP=math.min(Party[i].HP+extraHeal,maxHP)
+		end
+		if gotCrit then
+			Sleep(1)
+			Game.ShowStatusText("Critical Heal")
+		end
+	end
+end
