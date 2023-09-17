@@ -458,22 +458,29 @@ function events.BuildItemInformationBox(t)
 				local txt=Game.ItemsTxt[t.Item.Number]
 				local equipStat=txt.EquipStat
 				if equipStat<=2 then
-				local bonus=txt.Mod2
+					
+					local lookup=0
+					while Game.ItemsTxt[t.Item.Number].NotIdentifiedName==Game.ItemsTxt[t.Item.Number+lookup+1].NotIdentifiedName do 
+						lookup=lookup+1
+					end
+					local bonus=txt.Mod2
+					local bonus2=Game.ItemsTxt[t.Item.Number+lookup].Mod2
 					--attack/+damage
 					if t.Item.MaxCharges <= 20 then
-						local bonusATK=bonus*(t.Item.MaxCharges/20)
+						local bonusATK=bonus2*(t.Item.MaxCharges/20)
 						bonus=bonus+math.round(bonusATK)
 					else
-						local bonusATK=bonus*2+bonus*2*((t.Item.MaxCharges-20)/20)
+						local bonusATK=(bonus2+bonus)*(t.Item.MaxCharges/20)
 						bonus=bonus+math.round(bonusATK)
 					end
 					--dicesides
-					sides=txt.Mod1DiceSides
+					local sides=txt.Mod1DiceSides
+					local sides2=Game.ItemsTxt[t.Item.Number+lookup].Mod1DiceSides
 					if t.Item.MaxCharges <= 20 then
-						local sidesBonus=sides*(t.Item.MaxCharges/20)
+						local sidesBonus=sides2*(t.Item.MaxCharges/20)
 						sides=sides+math.round(sidesBonus)
 					else
-						local sidesBonus=sides*2+sides*2*((t.Item.MaxCharges-20)/20)
+						local sidesBonus=(sides2+sides)*(t.Item.MaxCharges/20)
 						sides=sides+math.round(sidesBonus)
 					end
 					t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " ..  txt.Mod1DiceCount .. "d" .. sides .. "+" .. bonus
@@ -625,24 +632,30 @@ function events.CalcStatBonusByItems(t)
 				if it.MaxCharges>0 then
 					local data=Game.ItemsTxt[it.Number]
 					if data.EquipStat<=2 then
+						lookup=0
+						while Game.ItemsTxt[it.Number].NotIdentifiedName==Game.ItemsTxt[it.Number+lookup+1].NotIdentifiedName do 
+							lookup=lookup+1
+						end
 						--add fix damage
 						local bonus=data.Mod2
+						local bonus2=Game.ItemsTxt[it.Number+lookup].Mod2
 						if it.MaxCharges <= 20 then
-							local bonus=bonus*(it.MaxCharges/20)
+							local bonus=bonus2*(it.MaxCharges/20)
 							t.Result=t.Result+math.round(bonus)
 						else
-							local bonus=bonus+bonus*2*((it.MaxCharges-20)/20)
+							local bonus=(bonus+bonus2)*(it.MaxCharges/20)
 							t.Result=t.Result+math.round(bonus)
 						end
 						--calculate random damage
 						if t.Stat==cs.MeleeDamageMax then
 							local bonus=data.Mod1DiceSides
+							local bonus2=Game.ItemsTxt[it.Number+lookup].Mod1DiceSides
 							local dices=data.Mod1DiceCount
 							if it.MaxCharges <= 20 then
-								local bonus=bonus*(it.MaxCharges/20)
+								local bonus=bonus2*(it.MaxCharges/20)
 								t.Result=t.Result+math.round(bonus)*dices
 							else
-								local bonus=bonus+bonus*2*((it.MaxCharges-20)/20)
+								local bonus=(bonus+bonus2)*(it.MaxCharges/20)
 								t.Result=t.Result+math.round(bonus)*dices
 							end
 						end
@@ -662,24 +675,26 @@ function events.CalcStatBonusByItems(t)
 			if it.MaxCharges>0 then
 				local data=Game.ItemsTxt[it.Number]
 				if data.EquipStat<=2 then
-					--add fix damage
+				--add fix damage
 					local bonus=data.Mod2
+					local bonus2=Game.ItemsTxt[it.Number+lookup].Mod2
 					if it.MaxCharges <= 20 then
-						local bonus=bonus*(it.MaxCharges/20)
+						local bonus=bonus2*(it.MaxCharges/20)
 						t.Result=t.Result+math.round(bonus)
 					else
-						local bonus=bonus+bonus*2*((it.MaxCharges-20)/20)
+						local bonus=(bonus+bonus2)*(it.MaxCharges/20)
 						t.Result=t.Result+math.round(bonus)
 					end
 					--calculate random damage
 					if t.Stat==cs.RangedDamageMax then
 						local bonus=data.Mod1DiceSides
+						local bonus2=Game.ItemsTxt[it.Number+lookup].Mod1DiceSides
 						local dices=data.Mod1DiceCount
 						if it.MaxCharges <= 20 then
-							local bonus=bonus*(it.MaxCharges/20)
+							local bonus=bonus2*(it.MaxCharges/20)
 							t.Result=t.Result+math.round(bonus)*dices
 						else
-							local bonus=bonus+bonus*2*((it.MaxCharges-20)/20)
+							local bonus=(bonus+bonus2)*(it.MaxCharges/20)
 							t.Result=t.Result+math.round(bonus)*dices
 						end
 					end
@@ -696,21 +711,28 @@ function events.ModifyItemDamage(t)
 	bonusDamage=0
 	if t.Item then
 		if t.Item.MaxCharges>0 then
+			lookup=0
+			while Game.ItemsTxt[t.Item.Number].NotIdentifiedName==Game.ItemsTxt[t.Item.Number+lookup+1].NotIdentifiedName do 
+				lookup=lookup+1
+			end
+			add=Game.ItemsTxt[t.Item.Number].Mod2
+			add2=Game.ItemsTxt[t.Item.Number+lookup].Mod2
+			side=Game.ItemsTxt[t.Item.Number].Mod1DiceSides
+			side2=Game.ItemsTxt[t.Item.Number+lookup].Mod1DiceSides
 			if t.Item.MaxCharges <= 20 then
-				mult=1+t.Item.MaxCharges/20
+				newside=side+side2*(t.Item.MaxCharges/20)
+				newbonus=add+add2*(t.Item.MaxCharges/20)
 			else
-				mult=2+2*(t.Item.MaxCharges-20)/20
+				newside=side+(side+side2)*(t.Item.MaxCharges/20)
+				newbonus=add+(add+add2)*(t.Item.MaxCharges/20)
 			end
-			local txt=Game.ItemsTxt[t.Item.Number]
-			bonusDamage=txt.Mod2*mult
-			sides=txt.Mod1DiceSides*mult
 			--calculate dices
-			for i=1,txt.Mod1DiceCount do
-				bonusDamage=bonusDamage+math.random(1,sides)
+			for i=1,Game.ItemsTxt[t.Item.Number].Mod1DiceCount do
+				bonusDamage=bonusDamage+math.random(1,newside)
 			end
+			t.Result=bonusDamage+newbonus
 		end
 	end
-	t.Result=t.Result+bonusDamage
 end
 
 --fix to enchant2 not applying correctly if same bonus is on the item
