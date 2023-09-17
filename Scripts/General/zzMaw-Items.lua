@@ -434,15 +434,21 @@ function events.BuildItemInformationBox(t)
 				local txt=Game.ItemsTxt[t.Item.Number]
 				local equipStat=txt.EquipStat
 				if equipStat>=3 and equipStat<=9 then
-				local ac=txt.Mod2+txt.Mod1DiceCount 
+				local ac3=txt.Mod2+txt.Mod1DiceCount 
 					if ac>0 then
-						if t.Item.MaxCharges <= 20 then
-							local bonusAC=ac*(t.Item.MaxCharges/20)
-							ac=ac+math.round(bonusAC)
-						else
-							local bonusAC=ac*2+ac*2*((t.Item.MaxCharges-20)/20)
-							ac=ac+math.round(bonusAC)
+						local lookup=0
+						while Game.ItemsTxt[t.Item.Number].NotIdentifiedName==Game.ItemsTxt[t.Item.Number+lookup+1].NotIdentifiedName do 
+							lookup=lookup+1
 						end
+						local ac=Game.ItemsTxt[t.Item.Number].Mod2+Game.ItemsTxt[t.Item.Number].Mod1DiceCount 
+						local ac2=Game.ItemsTxt[t.Item.Number+lookup].Mod2+Game.ItemsTxt[t.Item.Number+lookup].Mod1DiceCount 
+						local bonusAC=ac2*(t.Item.MaxCharges/20)
+						if t.Item.MaxCharges <= 20 then
+							ac=ac3+math.round(bonusAC)
+						else
+							local bonusAC=(ac+ac2)*(t.Item.MaxCharges/20)
+							ac=ac3+math.round(bonusAC)
+						end		
 						t.BasicStat= "Armors: +" .. ac
 					end
 				end
@@ -583,12 +589,17 @@ function events.CalcStatBonusByItems(t)
 				end
 				local equipStat=Game.ItemsTxt[it.Number].EquipStat
 				if equipStat>=3 and equipStat<=9 then
-					local ac=Game.ItemsTxt[it.Number].Mod2+Game.ItemsTxt[it.Number].Mod1DiceCount 
+					lookup=0
+					while Game.ItemsTxt[it.Number].NotIdentifiedName==Game.ItemsTxt[it.Number+lookup+1].NotIdentifiedName do 
+						lookup=lookup+1
+					end
+					ac=Game.ItemsTxt[it.Number].Mod2+Game.ItemsTxt[it.Number].Mod1DiceCount 
+					ac2=Game.ItemsTxt[it.Number+lookup].Mod2+Game.ItemsTxt[it.Number+lookup].Mod1DiceCount 
+					bonusAC=ac2*(it.MaxCharges/20)
 					if it.MaxCharges <= 20 then
-						local bonusAC=ac*(it.MaxCharges/20)
 						t.Result=t.Result+math.round(bonusAC)
 					else
-						local bonusAC=ac*2+ac*2*((it.MaxCharges-20)/20)
+						bonusAC=(ac+ac2)*(it.MaxCharges/20)
 						t.Result=t.Result+math.round(bonusAC)
 					end
 				end
