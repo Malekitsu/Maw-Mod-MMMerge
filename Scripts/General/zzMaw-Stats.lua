@@ -184,47 +184,8 @@ function events.BuildStatInformationBox(t)
 	acReduction=math.round(1000-1000/(ac/300+1))/10
 	t.Text=string.format("%s\n\nPhysical damage reduction from AC: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%"))
 	end
-	if t.Stat==19 then
-		i=Game.CurrentPlayer
-		res=Party[i]:GetResistance(10)
-		totalReduction=100*(30/(30+res)+(30/(30+res))*(1-(30/(30+res)))/2+(30/(30+res))*(1-(30/(30+res)))^2/4+(30/(30+res))*(1-(30/(30+res)))^3/8+(1-(30/(30+res)))^4/16)
-		totalReduction= 100-math.round(totalReduction*100)/100
-		t.Text=string.format("%s\n\nAverage Damage Reduction: %s %s",t.Text,totalReduction,"%")
-	end
-	if t.Stat==20 then
-		i=Game.CurrentPlayer
-		res=Party[i]:GetResistance(11)
-		totalReduction=100*(30/(30+res)+(30/(30+res))*(1-(30/(30+res)))/2+(30/(30+res))*(1-(30/(30+res)))^2/4+(30/(30+res))*(1-(30/(30+res)))^3/8+(1-(30/(30+res)))^4/16)
-		totalReduction= 100-math.round(totalReduction*100)/100
-		t.Text=string.format("%s\n\nAverage Damage Reduction: %s %s",t.Text,totalReduction,"%")
-	end
-	if t.Stat==21 then
-		i=Game.CurrentPlayer
-		res=Party[i]:GetResistance(12)
-		totalReduction=100*(30/(30+res)+(30/(30+res))*(1-(30/(30+res)))/2+(30/(30+res))*(1-(30/(30+res)))^2/4+(30/(30+res))*(1-(30/(30+res)))^3/8+(1-(30/(30+res)))^4/16)
-		totalReduction= 100-math.round(totalReduction*100)/100
-		t.Text=string.format("%s\n\nAverage Damage Reduction: %s %s",t.Text,totalReduction,"%")
-	end
-	if t.Stat==22 then
-		i=Game.CurrentPlayer
-		res=Party[i]:GetResistance(13)
-		totalReduction=100*(30/(30+res)+(30/(30+res))*(1-(30/(30+res)))/2+(30/(30+res))*(1-(30/(30+res)))^2/4+(30/(30+res))*(1-(30/(30+res)))^3/8+(1-(30/(30+res)))^4/16)
-		totalReduction= 100-math.round(totalReduction*100)/100
-		t.Text=string.format("%s\n\nAverage Damage Reduction: %s %s",t.Text,totalReduction,"%")
-	end
-	if t.Stat==23 then
-		i=Game.CurrentPlayer
-		res=Party[i]:GetResistance(14)
-		totalReduction=100*(30/(30+res)+(30/(30+res))*(1-(30/(30+res)))/2+(30/(30+res))*(1-(30/(30+res)))^2/4+(30/(30+res))*(1-(30/(30+res)))^3/8+(1-(30/(30+res)))^4/16)
-		totalReduction= 100-math.round(totalReduction*100)/100
-		t.Text=string.format("%s\n\nAverage Damage Reduction: %s %s",t.Text,totalReduction,"%")
-	end
-	if t.Stat==24 then
-		i=Game.CurrentPlayer
-		res=Party[i]:GetResistance(15)
-		totalReduction=100*(30/(30+res)+(30/(30+res))*(1-(30/(30+res)))/2+(30/(30+res))*(1-(30/(30+res)))^2/4+(30/(30+res))*(1-(30/(30+res)))^3/8+(1-(30/(30+res)))^4/16)
-		totalReduction= 100-math.round(totalReduction*100)/100
-		t.Text=string.format("%s\n\nAverage Damage Reduction: %s %s",t.Text,totalReduction,"%")
+	if t.Stat>=19 and t.Stat<=24 then
+		t.Text=t.Text .. "\n\nDamage is reduced by an amount equal to % shown above.\nMax resistance is 75%(beside immune status) and can be increased with some special enchants\n\nLight resistance is equal to the lowest between Mind and Body resistances.\nDark resistance is equal to the lowest between elemental resistances\nEnergy resistance is equal to the lowest resistance"
 	end
 end
 
@@ -263,27 +224,36 @@ damageKindToMaxResistanceEnchant={
 --reduce damage by %
 function events.CalcDamageToPlayer(t)
 damage1=0
-	if t.DamageKind==0 or t.DamageKind==1 or t.DamageKind==2 or t.DamageKind==3 or t.DamageKind==7 or t.DamageKind==8 then
+	if t.DamageKind==0 or t.DamageKind==1 or t.DamageKind==2 or t.DamageKind==3 or t.DamageKind==7 or t.DamageKind==8 or t.DamageKind==9 or t.DamageKind==10 or t.DamageKind==12 then
 	--get resistances
 		if t.DamageKind==0 then
-		res=t.Player:GetResistance(10)/4
+			res=t.Player:GetResistance(10)/4
 		end
 		if t.DamageKind==1 then
-		res=t.Player:GetResistance(11)/4
+			res=t.Player:GetResistance(11)/4
 		end
 		if t.DamageKind==2 then
-		res=t.Player:GetResistance(12)/4
-		res2=0
+			res=t.Player:GetResistance(12)/4
+			res2=0
 		end
 		if t.DamageKind==3 then
-		res=t.Player:GetResistance(13)/4
+			res=t.Player:GetResistance(13)/4
 		end
 		if t.DamageKind==7 then
-		res=t.Player:GetResistance(14)/4
+			res=t.Player:GetResistance(14)/4
 		end
 		if t.DamageKind==8 then
-		res=t.Player:GetResistance(15)/4
-		end	
+			res=t.Player:GetResistance(15)/4
+		end
+		if t.DamageKind==9 then
+			res=math.min(t.Player:GetResistance(14),t.Player:GetResistance(15))/4
+		end
+		if t.DamageKind==10 then
+			res=math.min(t.Player:GetResistance(10),t.Player:GetResistance(11),t.Player:GetResistance(12),t.Player:GetResistance(13))/4
+		end
+		if t.DamageKind==12 then
+			res=math.min(t.Player:GetResistance(10),t.Player:GetResistance(11),t.Player:GetResistance(12),t.Player:GetResistance(13),t.Player:GetResistance(14),t.Player:GetResistance(15))/4
+		end
 		luck=t.Player:GetLuck()/20
 		--put here code to change max res
 		maxres=75
@@ -296,6 +266,8 @@ damage1=0
 		end
 		maxres=math.min(maxres,90)
 		res=math.min(res,maxres)/100
+		
+		
 		--randomize resistance
 		local roll=math.random()
 		if roll<0.5 then
