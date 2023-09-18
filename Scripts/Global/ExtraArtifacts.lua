@@ -146,7 +146,11 @@ function events.GetSkill(t)
 	local PLT = PlayerEffects[t.Player]
 	if PLT then
 		local Skill, Mas = SplitSkill(t.Result)
-		Skill = Skill + math.min((PLT.Skills[t.Skill] or 0),Skill*0.5)
+		if t.Skill>=12 and t.Skill<=20 then
+			Skill = Skill + math.min((PLT.Skills[t.Skill] or 0),Skill*0.5)
+		else
+			Skill = Skill + math.floor((PLT.Skills[t.Skill] or 0)*t.Player.LevelBase/80)
+		end
 		t.Result = JoinSkill(Skill, Mas)
 	elseif Game.CurrentScreen == AdvInnScreen or PlayerInParty(t.PlayerIndex) then
 		StoreEffects(t.Player)
@@ -275,13 +279,13 @@ function events.GetAttackDelay(t)
 	local Pl = t.Player
 	local PLT = PlayerEffects[Pl]
 	if PLT then
-		t.Result = t.Result + (PLT.AttackDelay[t.Ranged and 1 or 2] or 0)
+		t.Result = t.Result *(((PLT.AttackDelay[t.Ranged and 1 or 2] or 0)/2+100)/100)
 
 		local MHItem = Pl.ItemMainHand > 0 and Pl.Items[Pl.ItemMainHand] or false
 		if MHItem and not MHItem.Broken and Game.ItemsTxt[MHItem.Number].Skill == 7 then
-			t.Result = max(t.Result, 5)
+			t.Result = max(t.Result, 0)
 		else
-			t.Result = max(t.Result, 30)
+			t.Result = max(t.Result, 0)
 		end
 	elseif Game.CurrentScreen == AdvInnScreen or PlayerInParty(t.PlayerIndex) then
 		StoreEffects(Pl)
