@@ -352,15 +352,15 @@ end
 
 --TOOLTIPS
 function events.Tick()
-	if Game.CurrentCharScreen==100 then
-	local i=Game.CurrentPlayer 
-	if i==-1 then return end --prevent bug message
-	fireRes=Party[i]:GetResistance(10)/4
-	airRes=Party[i]:GetResistance(11)/4
-	waterRes=Party[i]:GetResistance(12)/4
-	earthRes=Party[i]:GetResistance(13)/4
-	mindRes=Party[i]:GetResistance(14)/4
-	bodyRes=Party[i]:GetResistance(15)/4
+	if Game.CurrentCharScreen==100 and Game.CurrentScreen==7 and not statChanged then
+		local i=Game.CurrentPlayer 
+		if i==-1 then return end --prevent bug message
+		fireRes=Party[i]:GetResistance(10)/4
+		airRes=Party[i]:GetResistance(11)/4
+		waterRes=Party[i]:GetResistance(12)/4
+		earthRes=Party[i]:GetResistance(13)/4
+		mindRes=Party[i]:GetResistance(14)/4
+		bodyRes=Party[i]:GetResistance(15)/4
 
 		--add bonus2
 		for it in Party[Game.CurrentPlayer]:EnumActiveItems() do
@@ -407,14 +407,16 @@ function events.Tick()
 		Game.GlobalTxt[240]=StrColor(100, 180, 255, string.format("Water %s%s",waterRes,"%"))
 		Game.GlobalTxt[70]=StrColor(153, 76, 0, string.format("Earth %s%s",earthRes,"%"))
 		Game.GlobalTxt[142]=StrColor(200, 200, 255, string.format("Mind %s%s",mindRes,"%"))
-		Game.GlobalTxt[29]=StrColor(255, 192, 203, string.format("Body %s%s",bodyRes,"%"))		
-	end
-	if Game.CurrentCharScreen==101 then
+		Game.GlobalTxt[29]=StrColor(255, 192, 203, string.format("Body %s%s",bodyRes,"%"))	
+		statsChanged=true
+	elseif statsChanged then
 		Game.GlobalTxt[87]="Fire"
-		Game.GlobalTxt[71]="Elec"
-		Game.GlobalTxt[43]="Cold"
-		Game.GlobalTxt[166]="Poison"
-		Game.GlobalTxt[138]="Magic"
+		Game.GlobalTxt[6]="Air"
+		Game.GlobalTxt[240]="Water"
+		Game.GlobalTxt[70]="Earth"
+		Game.GlobalTxt[142]="Mind"
+		Game.GlobalTxt[29]="Body"
+		statsChanged=false
 	end
 end
 
