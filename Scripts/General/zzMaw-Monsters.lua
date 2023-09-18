@@ -46,9 +46,9 @@ function events.AfterLoadMap()
 		for i=0, Map.Monsters.High do
 			--VELOCITY/SPEED on hostile monsters only
 			--gold fix
-			
-			if mon.Hostile==true then
-				mon.Velocity = (mon.Velocity + (400 - mon.Velocity) / 2 + 50)
+			mon=Map.Monsters[i]
+			if mon.Velocity>150 then
+				mon.Velocity = (mon.Velocity + (400 - mon.Velocity) / 4 +50)
 			end
 			if  (mon.FullHitPoints ~= Game.MonstersTxt[Map.Monsters[i].Id].FullHitPoints) and mon.Level>5 then
 				--level increase 
