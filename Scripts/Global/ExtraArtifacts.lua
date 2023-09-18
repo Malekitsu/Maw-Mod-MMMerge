@@ -280,7 +280,6 @@ function events.GetAttackDelay(t)
 	local PLT = PlayerEffects[Pl]
 	if PLT then
 		t.Result = t.Result *(((PLT.AttackDelay[t.Ranged and 1 or 2] or 0)/2+100)/100)
-
 		local MHItem = Pl.ItemMainHand > 0 and Pl.Items[Pl.ItemMainHand] or false
 		if MHItem and not MHItem.Broken and Game.ItemsTxt[MHItem.Number].Skill == 7 then
 			t.Result = max(t.Result, 0)
@@ -380,7 +379,7 @@ StoreEffects = function(Player)
 					if Mod.Stats then
 						T = PLT.Stats
 						for k,v in pairs(Mod.Stats) do
-							T[k] = (T[k] or 0) + v
+							T[k] = (T[k] or 0) + v 
 						end
 					end
 					-- Skills
@@ -632,7 +631,92 @@ end
 
 --------------------------------
 ---- Stat bonuses
-
+GetBonusList(500).Stats = {	[const.Stats.Accuracy] = 40}
+GetBonusList(501).Stats = {	[const.Stats.Might] = 40}
+GetBonusList(502).Stats = {	[const.Stats.AirResistance] = 40}
+GetBonusList(503).Stats = {	[const.Stats.Endurance] = 40,
+							[const.Stats.Luck] = 40}
+GetBonusList(504).Stats = {	[const.Stats.Might] = 20}
+GetBonusList(505).Stats = {	[const.Stats.FireResistance] = 40}
+GetBonusList(506).Stats = {	[const.Stats.Endurance] = 20}
+GetBonusList(507).Stats = {[const.Stats.Might] 		= 10,
+							[const.Stats.Intellect] 	= 10,
+							[const.Stats.Personality] 	= 10,
+							[const.Stats.Speed] 		= 10,
+							[const.Stats.Accuracy]		= 10,
+							[const.Stats.Endurance] 	= 10,
+							[const.Stats.Luck]			= 10}
+GetBonusList(509).Stats = {	[const.Stats.Personality]   = 40}
+GetBonusList(510).Stats = { [const.Stats.Might] 		= 20,
+							[const.Stats.Endurance] 	= 20}		
+GetBonusList(512).Stats = { [const.Stats.Accuracy] 		= 50}						
+GetBonusList(513).Stats = { [const.Stats.Endurance] 	= 30}						
+GetBonusList(514).Stats = { [const.Stats.Might] 		= 10,
+							[const.Stats.Intellect] 	= 10,
+							[const.Stats.Personality] 	= 10,
+							[const.Stats.Speed] 		= 10,
+							[const.Stats.Accuracy]		= 10,
+							[const.Stats.Endurance] 	= 10,
+							[const.Stats.Luck]			= 10,
+							[const.Stats.FireResistance]	= 10,
+							[const.Stats.AirResistance]		= 10,
+							[const.Stats.WaterResistance]	= 10,
+							[const.Stats.EarthResistance]	= 10,
+							[const.Stats.MindResistance]	= 10,
+							[const.Stats.BodyResistance]	= 10,
+							[const.Stats.SpiritResistance]	= 10}	
+GetBonusList(514).Stats = { [const.Stats.Speed] 		= 15,							
+							[const.Stats.Accuracy] 		= 15}
+GetBonusList(518).Stats = { [const.Stats.Speed] 		= 30}
+GetBonusList(519).Stats = { [const.Stats.FireResistance]	= 40,
+							[const.Stats.AirResistance]		= 40,
+							[const.Stats.WaterResistance]	= 40,
+							[const.Stats.EarthResistance]	= 40}
+GetBonusList(520).Stats = { [const.Stats.Personality]	= 15,
+							[const.Stats.Intellect]		= 15}							
+GetBonusList(522).Stats = { [const.Stats.Intellect]	= 30,
+							[const.Stats.FireResistance]	= 10,
+							[const.Stats.AirResistance]		= 10,
+							[const.Stats.WaterResistance]	= 10,
+							[const.Stats.EarthResistance]	= 10,
+							[const.Stats.MindResistance]	= 10,
+							[const.Stats.BodyResistance]	= 10}
+GetBonusList(523).Stats = { [const.Stats.Intellect]	= 30,
+							[const.Stats.WaterResistance]	= -50,
+							[const.Stats.Personality]	= -15}
+GetBonusList(524).Stats = {	[const.Stats.Speed]	= 70,
+							[const.Stats.Accuracy]	= 70,
+							[const.Stats.ArmorClass]	= -20}						
+GetBonusList(525).Stats = {	[const.Stats.Speed]	= -20}		
+GetBonusList(526).Stats = {	[const.Stats.Might]	= 70,
+							[const.Stats.Accuracy]		= 70,
+							[const.Stats.Personality]	= 50,
+							[const.Stats.Intellect]	= 50}		
+GetBonusList(527).Stats = {	[const.Stats.Might]	= 50,
+							[const.Stats.Luck]	= -40}
+GetBonusList(528).Stats	= {	[const.Stats.WaterResistance]	= 70,
+							[const.Stats.FireResistance]	= -70}		
+GetBonusList(529).Stats	= {	[const.Stats.Might]	= 40,
+							[const.Stats.Accuracy]	= -40}		
+GetBonusList(530).Stats	= {	[const.Stats.ArmorClass]	= -40}		
+GetBonusList(531).Stats	= {	[const.Stats.Accuracy]	= 100,
+							[const.Stats.ArmorClass]	= -20}		
+GetBonusList(532).Stats	= {	[const.Stats.Accuracy]	= -50}		
+GetBonusList(533).Stats	= {	[const.Stats.Intellect]	= 70,
+							[const.Stats.Personality]	= 70,
+							[const.Stats.MindResistance]	= -30,
+							[const.Stats.SpiritResistance]	= -30}		
+GetBonusList(534).Stats	= {	[const.Stats.Luck]	= -15,
+							[const.Stats.Personality]	= -15}
+GetBonusList(535).Stats	= {	[const.Stats.Intellect]	= 40,
+							[const.Stats.Endurance]	= -20}			
+GetBonusList(536).Stats	= {	[const.Stats.Luck]	= 90,
+							[const.Stats.Personality]	= -50}		
+GetBonusList(537).Stats	= {	[const.Stats.Might]	= 100,
+							[const.Stats.Accuracy]	= -30,
+							[const.Stats.ArmorClass]	= -15}							
+							
+							
 -- Crown of final Dominion
 GetBonusList(521).Stats = {	[const.Stats.Intellect] = 50}
 
@@ -1196,3 +1280,103 @@ OnHitEffects[2040] = {
 		CastSpellDirect(125,Skill,Mas)
 		evt.CastSpell(18, Mas, Skill, t.Monster.X,t.Monster.Y,t.Monster.Z+50, t.Monster.X,t.Monster.Y,t.Monster.Z)
 	end}
+
+-----
+--REMOVE MM8 BONUSES
+----
+artBon={}
+
+artBon[500] = {	[const.Stats.Accuracy] = 40}
+artBon[501] = {	[const.Stats.Might] = 40}
+artBon[502] = {	[const.Stats.AirResistance] = 40}
+artBon[503] = {	[const.Stats.Endurance] = 40,
+							[const.Stats.Luck] = 40}
+artBon[504] = {	[const.Stats.Might] = 20}
+artBon[505] = {	[const.Stats.FireResistance] = 40}
+artBon[506] = {	[const.Stats.Endurance] = 20}
+artBon[507] = {[const.Stats.Might] 		= 10,
+							[const.Stats.Intellect] 	= 10,
+							[const.Stats.Personality] 	= 10,
+							[const.Stats.Speed] 		= 10,
+							[const.Stats.Accuracy]		= 10,
+							[const.Stats.Endurance] 	= 10,
+							[const.Stats.Luck]			= 10}
+artBon[509] = {	[const.Stats.Personality]   = 40}
+artBon[510] = { [const.Stats.Might] 		= 20,
+							[const.Stats.Endurance] 	= 20}		
+artBon[512] = { [const.Stats.Accuracy] 		= 50}						
+artBon[513] = { [const.Stats.Endurance] 	= 30}						
+artBon[514] = { [const.Stats.Might] 		= 10,
+							[const.Stats.Intellect] 	= 10,
+							[const.Stats.Personality] 	= 10,
+							[const.Stats.Speed] 		= 10,
+							[const.Stats.Accuracy]		= 10,
+							[const.Stats.Endurance] 	= 10,
+							[const.Stats.Luck]			= 10,
+							[const.Stats.FireResistance]	= 10,
+							[const.Stats.AirResistance]		= 10,
+							[const.Stats.WaterResistance]	= 10,
+							[const.Stats.EarthResistance]	= 10,
+							[const.Stats.MindResistance]	= 10,
+							[const.Stats.BodyResistance]	= 10,
+							[const.Stats.SpiritResistance]	= 10}	
+artBon[514] = { [const.Stats.Speed] 		= 15,							
+							[const.Stats.Accuracy] 		= 15}
+artBon[518] = { [const.Stats.Speed] 		= 30}
+artBon[519] = { [const.Stats.FireResistance]	= 40,
+							[const.Stats.AirResistance]		= 40,
+							[const.Stats.WaterResistance]	= 40,
+							[const.Stats.EarthResistance]	= 40}
+artBon[520] = { [const.Stats.Personality]	= 15,
+							[const.Stats.Intellect]		= 15}							
+artBon[522] = { [const.Stats.Intellect]	= 30,
+							[const.Stats.FireResistance]	= 10,
+							[const.Stats.AirResistance]		= 10,
+							[const.Stats.WaterResistance]	= 10,
+							[const.Stats.EarthResistance]	= 10,
+							[const.Stats.MindResistance]	= 10,
+							[const.Stats.BodyResistance]	= 10}
+artBon[523] = { [const.Stats.Intellect]	= 30,
+							[const.Stats.WaterResistance]	= -50,
+							[const.Stats.Personality]	= -15}
+artBon[524] = {	[const.Stats.Speed]	= 70,
+							[const.Stats.Accuracy]	= 70,
+							[const.Stats.ArmorClass]	= -20}						
+artBon[525] = {	[const.Stats.Speed]	= -20}		
+artBon[526] = {	[const.Stats.Might]	= 70,
+							[const.Stats.Accuracy]		= 70,
+							[const.Stats.Personality]	= 50,
+							[const.Stats.Intellect]	= 50}		
+artBon[527] = {	[const.Stats.Might]	= 50,
+							[const.Stats.Luck]	= -40}
+artBon[528]	= {	[const.Stats.WaterResistance]	= 70,
+							[const.Stats.FireResistance]	= -70}		
+artBon[529]	= {	[const.Stats.Might]	= 40,
+							[const.Stats.Accuracy]	= -40}		
+artBon[530]	= {	[const.Stats.ArmorClass]	= -40}		
+artBon[531]	= {	[const.Stats.Accuracy]	= 100,
+							[const.Stats.ArmorClass]	= -20}		
+artBon[532]	= {	[const.Stats.Accuracy]	= -50}		
+artBon[533]	= {	[const.Stats.Intellect]	= 70,
+							[const.Stats.Personality]	= 70,
+							[const.Stats.MindResistance]	= -30,
+							[const.Stats.SpiritResistance]	= -30}		
+artBon[534]	= {	[const.Stats.Luck]	= -15,
+							[const.Stats.Personality]	= -15}
+artBon[535]	= {	[const.Stats.Intellect]	= 40,
+							[const.Stats.Endurance]	= -20}			
+artBon[536]	= {	[const.Stats.Luck]	= 90,
+							[const.Stats.Personality]	= -50}		
+artBon[537]	= {	[const.Stats.Might]	= 100,
+							[const.Stats.Accuracy]	= -30,
+							[const.Stats.ArmorClass]	= -15}		
+
+function events.CalcStatBonusByItems(t)
+	for it in t.Player:EnumActiveItems() do
+		if it.Number>=500 and it.Number <=537 and it.Number~=521 then
+			if artBon[it.Number] and artBon[it.Number][t.Stat] then
+				t.Result=t.Result-artBon[it.Number][t.Stat]
+			end
+		end
+	end
+end
