@@ -184,6 +184,24 @@ function events.BuildStatInformationBox(t)
 	acReduction=math.round(1000-1000/(ac/300+1))/10
 	t.Text=string.format("%s\n\nPhysical damage reduction from AC: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%"))
 	end
+	if t.Stat==13 or t.Stat==14 then
+		bolsterLevel8=vars.MM7LVL+vars.MM6LVL
+		bolsterLevel7=vars.MM8LVL+vars.MM6LVL
+		bolsterLevel6=vars.MM8LVL+vars.MM7LVL
+		bolsterLevel8=math.max(bolsterLevel8*0.95-4,0)
+		if bolsterLevel8>=120 then 
+			bolsterLevel8=120+(bolsterLevel-120)/2
+		end
+		bolsterLevel7=math.max(bolsterLevel7*0.95-4,0)
+		if bolsterLevel7>=120 then 
+			bolsterLevel7=120+(bolsterLevel-120)/2
+		end
+		bolsterLevel6=math.max(bolsterLevel6*0.95-4,0)
+		if bolsterLevel6>=120 then 
+			bolsterLevel6=120+(bolsterLevel-120)/2
+		end
+		t.Text=t.Text .."\n\nLevels gained in MM6: " .. StrColor(255,255,153,math.round(vars.MM6LVL*100)/100) .. "\nLevels gained in MM7: " .. StrColor(255,255,153,math.round(vars.MM7LVL*100)/100) .. "\nLevels gained in MM8: " .. StrColor(255,255,153,math.round(vars.MM8LVL*100)/100) .. "\n\nBolster Level in MM6: " .. StrColor(255,255,153,math.round(bolsterLevel8)) .."\nBolster Level in MM7: " .. StrColor(255,255,153,math.round(bolsterLevel7)) .."\nBolster Level in MM6: " .. StrColor(255,255,153,math.round(bolsterLevel6))
+	end
 	if t.Stat>=19 and t.Stat<=24 then
 		t.Text=t.Text .. "\n\nDamage is reduced by an amount equal to % shown above.\nMax resistance is 75%(beside immune status) and can be increased with some special enchants\n\nLight resistance is equal to the lowest between Mind and Body resistances.\nDark resistance is equal to the lowest between elemental resistances\nEnergy resistance is equal to the lowest resistance"
 	end
