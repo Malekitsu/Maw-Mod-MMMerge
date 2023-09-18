@@ -1113,3 +1113,41 @@ function events.GameInitialized2()
 		Game.ItemsTxt[i].Mod2=Game.ItemsTxt[i].Mod2*3
 	end
 end
+
+--[[
+function events.BuildItemInformationBox(t)
+	if t.Description and artifactTextBuilder(t.Item.Number,0) and Game.CurrentPlayer>=0 then
+		level=Party[Game.CurrentPlayer].LevelBase
+		t.Description=artifactTextBuilder(t.Item.Number,level)
+	end
+end
+
+require("string")
+function artifactTextBuilder(n,lvl)
+	lvl=math.min(lvl/80,2.5)
+	artifactTxt={
+		[2023]= "Heavy, yet seemingly light as a feather in skilled hands, Excalibur confers great might upon its wielder.  Opponents do not easily walk away from blows struck by this legendary weapon.  (Special Powers:  +" .. math.round(30*lvl) .. " Might)",
+		[2024]= "Traditionally carried by the High Druid, but lost during struggles over religious doctrine, Merlin acts as a reservoir of spell power the wielder can draw upon at any time.  Merlin is enchanted with swiftness, and rains blows upon enemies much faster than an ordinary staff. (Special Powers:  Swiftness and +" .. math.round(40*lvl) .. " Spell Points)",
+	}
+	
+	return artifactTxt[n]
+end
+]]
+function events.BuildItemInformationBox(t)
+	if t.Description then
+		require("string")
+		pattern = "(%d+)"
+		text=t.Description
+		t.Description = text:gsub(pattern, replaceNumber)
+	end
+end
+
+function replaceNumber(match)
+	lvl=Party[Game.CurrentPlayer].LevelBase
+	lvl=math.min(lvl/80,2.5)
+    num = tonumber(match)
+    if num then
+        return tostring(math.floor(num * lvl))
+    end
+    return match
+end
