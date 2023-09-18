@@ -352,7 +352,7 @@ end
 
 --TOOLTIPS
 function events.Tick()
-	if Game.CurrentCharScreen==100 and Game.CurrentScreen==7 and not statChanged then
+	if Game.CurrentCharScreen==100 and Game.CurrentScreen==7 and not statsChanged then
 		local i=Game.CurrentPlayer 
 		if i==-1 then return end --prevent bug message
 		fireRes=Party[i]:GetResistance(10)/4
@@ -409,7 +409,7 @@ function events.Tick()
 		Game.GlobalTxt[142]=StrColor(200, 200, 255, string.format("Mind %s%s",mindRes,"%"))
 		Game.GlobalTxt[29]=StrColor(255, 192, 203, string.format("Body %s%s",bodyRes,"%"))	
 		statsChanged=true
-	elseif statsChanged then
+	elseif statsChanged and (Game.CurrentCharScreen~=100 or Game.CurrentScreen~=7) then
 		Game.GlobalTxt[87]="Fire"
 		Game.GlobalTxt[6]="Air"
 		Game.GlobalTxt[240]="Water"
