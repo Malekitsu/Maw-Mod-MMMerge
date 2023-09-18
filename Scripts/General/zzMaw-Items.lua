@@ -469,7 +469,7 @@ function events.BuildItemInformationBox(t)
 							local bonusAC=(ac+ac2)*(t.Item.MaxCharges/20)
 							ac=ac3+math.round(bonusAC)
 						end		
-						t.BasicStat= "Armors: +" .. ac
+						t.BasicStat= "Armor: +" .. ac
 					end
 				end
 			end
@@ -1114,6 +1114,7 @@ function events.GameInitialized2()
 	end
 end
 
+--below commented code might turn useful if I have to modify some artifact text individually
 --[[
 function events.BuildItemInformationBox(t)
 	if t.Description and artifactTextBuilder(t.Item.Number,0) and Game.CurrentPlayer>=0 then
@@ -1134,7 +1135,7 @@ function artifactTextBuilder(n,lvl)
 end
 ]]
 function events.BuildItemInformationBox(t)
-	if t.Description then
+	if t.Description and ((t.Item.Number>=500 and t.Item.Number<=543) or (t.Item.Number>=1302 and t.Item.Number<=1354) or (t.Item.Number>=2020 and t.Item.Number<=2049)) then
 		require("string")
 		pattern = "(%d+)"
 		text=t.Description
@@ -1150,4 +1151,91 @@ function replaceNumber(match)
         return tostring(math.floor(num * lvl))
     end
     return match
+end
+
+--------------------------------
+--ARTIFACTS BASE STATS SCALING--
+--------------------------------
+
+function events.BuildItemInformationBox(t)
+	if (t.Item.Number>=500 and t.Item.Number<=543) or (t.Item.Number>=1302 and t.Item.Number<=1354) or (t.Item.Number>=2020 and t.Item.Number<=2049) then 
+		if t.Type then
+			local txt=Game.ItemsTxt[t.Item.Number]
+			local ac=math.ceil(Party[Game.CurrentPlayer].LevelBase*(txt.Mod2+txt.Mod1DiceCount)/80)
+			if ac>0 then 			
+				t.BasicStat= "Armor: +" .. ac
+			end
+			--WEAPONS
+			local equipStat=txt.EquipStat
+			if equipStat<=2 then
+				local bonus=math.ceil(Party[Game.CurrentPlayer].LevelBase*(txt.Mod2)/80)
+				local sides=math.ceil(Party[Game.CurrentPlayer].LevelBase*(txt.Mod1DiceSides)/80)
+				t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " ..  txt.Mod1DiceCount .. "d" .. sides .. "+" .. bonus
+			end
+		end
+	end
+end
+--increase artifact ac
+function events.CalcStatBonusByItems(t)
+	if t.Stat==const.Stats.ArmorClass then
+		for it in t.Player:EnumActiveItems() do 
+			if (it.Number>=500 and it.Number<=543) or (it.Number>=1302 and it.Number<=1354) or (it.Number>=2020 and it.Number<=2049) then 
+				local txt=Game.ItemsTxt[it.Number]
+				c=txt.EquipStat
+				if c>2 then
+					t.Result=t.Result-(txt.Mod2+txt.Mod1DiceCount)+math.ceil((txt.Mod2+txt.Mod1DiceCount)*t.Player.LevelBase/80)
+				end
+			end
+		end
+	end
+end
+--increase artifact damage tooltip
+function events.CalcStatBonusByItems(t)
+	local cs = const.Stats
+	if t.Stat==cs.MeleeDamageMin or t.Stat==cs.MeleeDamageMax or t.Stat==cs.MeleeAttack then
+		for it in t.Player:EnumActiveItems() do 
+			if (it.Number>=500 and it.Number<=543) or (it.Number>=1302 and it.Number<=1354) or (it.Number>=2020 and it.Number<=2049) then 
+				txt=Game.ItemsTxt[it.Number]
+				c=txt.EquipStat
+				if c<=1 then
+				t.Result=t.Result-txt.Mod2+math.ceil(txt.Mod2*t.Player.LevelBase/80)
+					if t.Stat==cs.MeleeDamageMax then
+						t.Result=t.Result-(txt.Mod1DiceCount*txt.Mod1DiceSides-txt.Mod1DiceCount)+(txt.Mod1DiceCount*txt.Mod1DiceSides*t.Player.LevelBase/80)
+					end
+				end
+			end	
+		end
+	end
+	--same for ranged
+	if t.Stat==cs.RangedDamageMin or t.Stat==cs.RangedDamageMax or t.Stat==cs.RangedAttack then
+		for it in t.Player:EnumActiveItems() do 
+			if (it.Number>=500 and it.Number<=543) or (it.Number>=1302 and it.Number<=1354) or (it.Number>=2020 and it.Number<=2049) then 
+				txt=Game.ItemsTxt[it.Number]
+				c=txt.EquipStat
+				if c==2 then
+				t.Result=t.Result-txt.Mod2+math.ceil(txt.Mod2*t.Player.LevelBase/80)
+					if t.Stat==cs.RangedDamageMax then
+						t.Result=t.Result-(txt.Mod1DiceCount*txt.Mod1DiceSides-txt.Mod1DiceCount)+(txt.Mod1DiceCount*txt.Mod1DiceSides*t.Player.LevelBase/80)
+					end
+				end
+			end	
+		end
+	end
+end
+
+--modify actual damage
+--recalculate actual damage
+function events.ModifyItemDamage(t)
+	if t.Item then
+		if (t.Item.Number>=500 and t.Item.Number<=543) or (t.Item.Number>=1302 and t.Item.Number<=1354) or (t.Item.Number>=2020 and t.Item.Number<=2049) then 
+			bonusDamage=0
+			add=math.ceil(Game.ItemsTxt[t.Item.Number].Mod2*t.Player.LevelBase/80)
+			side=math.ceil(Game.ItemsTxt[t.Item.Number].Mod1DiceSides*t.Player.LevelBase/80)
+			--calculate dices
+			for i=1,Game.ItemsTxt[t.Item.Number].Mod1DiceCount do
+				bonusDamage=bonusDamage+math.random(1,side)
+			end
+			t.Result=bonusDamage+add
+		end
+	end
 end
