@@ -952,6 +952,24 @@ GetBonusList(1332).Stats = {[const.Stats.Intellect] 	= -20,
 
 --------------------------------
 ---- Skill bonuses
+GetBonusList(502).Skills =	{	[const.Skills.Armsmaster] = 7}
+GetBonusList(512).Skills =	{	[const.Skills.Bow] = 4}
+GetBonusList(517).Skills =	{	[const.Skills.DisarmTraps] = 8,
+								[const.Skills.Bow] = 8,
+								[const.Skills.Armsmaster] = 8}
+GetBonusList(531).Skills =	{	[const.Skills.Bow] = 4}
+GetBonusList(535).Skills =	{	[const.Skills.Alchemy] = 5}
+
+
+
+
+
+
+
+
+
+
+
 
 -- Hero's belt
 GetBonusList(1337).Skills =	{	[const.Skills.Armsmaster] = 5}
@@ -1376,6 +1394,25 @@ function events.CalcStatBonusByItems(t)
 		if it.Number>=500 and it.Number <=537 and it.Number~=521 then
 			if artBon[it.Number] and artBon[it.Number][t.Stat] then
 				t.Result=t.Result-artBon[it.Number][t.Stat]
+			end
+		end
+	end
+end
+
+artSkill={}
+artSkill[502] =	{	[const.Skills.Armsmaster] = 7}
+artSkill[512] =	{	[const.Skills.Bow] = 4}
+artSkill[517] =	{	[const.Skills.DisarmTraps] = 8,
+								[const.Skills.Bow] = 8,
+								[const.Skills.Armsmaster] = 8}
+artSkill[531] =	{	[const.Skills.Bow] = 4}
+artSkill[535] =	{	[const.Skills.Alchemy] = 5}
+
+function events.GetSkill(t)
+	for it in t.Player:EnumActiveItems() do
+		if it.Number>=500 and it.Number <=537 and it.Number~=521 then
+			if artSkill[it.Number] and artSkill[it.Number][t.Skill] then
+				t.Result=t.Result-artSkill[it.Number][t.Skill]
 			end
 		end
 	end
