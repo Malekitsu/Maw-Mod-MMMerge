@@ -1444,3 +1444,28 @@ function checkbonus(enchantNumber, playerIndex)
 	end
 	return skillBonus
 end
+
+function events.Action(t)
+	if t.Action==121 then
+		if t.Param>=12 and t.Param<=22 then
+			t.Handled=false
+			pl=Party[Game.CurrentPlayer]
+			local currentCost=SplitSkill(pl.Skills[t.Param])+1
+			if currentCost>60 then
+				return
+			end
+			--calculate actual cost
+			local n=1
+			for i=1,11 do
+				s=SplitSkill(Party[Game.CurrentPlayer].Skills[11+i])
+				if s>currentCost then
+					n=n+1
+				end
+			end
+			local actualCost=math.ceil(currentCost/n)
+			if pl.SkillPoints>=actualCost then
+				pl.SkillPoints=pl.SkillPoints+currentCost-actualCost
+			end
+		end
+	end
+end
