@@ -30,6 +30,7 @@ end
 --create tables to calculate special enchant
 function events.GameInitialized2()
 	Game.ItemsTxt[67].NotIdentifiedName="Mace"
+	Game.ItemsTxt[804].NotIdentifiedName="Longsword"
 	--calculate totals by enchant type
 	totBonus2={}
 	for k=0,3 do
@@ -1239,3 +1240,55 @@ function events.ModifyItemDamage(t)
 		end
 	end
 end
+
+------------------------------------------------------------------
+--bruteforce fix to items spawning maxcharges more than intended--
+------------------------------------------------------------------
+function events.BeforeNewGameAutosave()
+	for i=0,Party.High do
+		for j=1, Party[0].Items.High do
+			Party[i].Items[j].MaxCharges=0
+			Party[i].Items[j].Charges=0
+		end
+	end
+end
+
+function events.BuildItemInformationBox(t)
+	currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+	if currentWorld==1 then
+		partyLevel=vars.MM7LVL+vars.MM6LVL
+	elseif currentWorld==2 then
+		partyLevel=vars.MM8LVL+vars.MM6LVL
+	elseif currentWorld==3 then
+		partyLevel=vars.MM8LVL+vars.MM7LVL
+	elseif currentWorld==4 then
+		partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+	end
+	maxItemBolster=(partyLevel)/5+5
+	--failsafe
+	if t.Item.Charges==0 and t.Item.Bonus2==0 and t.Item.Bonus==0 then
+		t.Item.MaxCharges=0
+	end
+end
+
+--do the same if someone is trying to equip on a player
+function events.Action(t)
+	if t.Action==133 then
+		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+		if currentWorld==1 then
+			partyLevel=vars.MM7LVL+vars.MM6LVL
+		elseif currentWorld==2 then
+			partyLevel=vars.MM8LVL+vars.MM6LVL
+		elseif currentWorld==3 then
+			partyLevel=vars.MM8LVL+vars.MM7LVL
+		elseif currentWorld==4 then
+			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+		end
+		maxItemBolster=(partyLevel)/5+5
+		--failsafe
+		if Mouse.Item and Mouse.Item.Charges==0 and Mouse.Item.Bonus2==0 and Mouse.Item.Bonus==0 then
+			Mouse.Item.MaxCharges=0
+		end
+	end
+end
+
