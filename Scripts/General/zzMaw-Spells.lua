@@ -616,3 +616,19 @@ function events.Action(t)
 		end
 	end
 end
+
+--Invisibility Nerf
+function events.Action(t)
+	if t.Action == 142 then
+		local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[const.Skills.Water])
+		Sleep(1)
+		local minutesPerSkill=(m-3)*3+3
+		local baseDuration=(m-3)*15+15
+		Party.SpellBuffs[11].ExpireTime=Game.Time+const.Minute*(baseDuration+minutesPerSkill*s)
+	end
+end
+
+function events.GameInitialized2()
+	Game.SpellsTxt[19].Master="Duration 15+3 minutes per point of skill"
+	Game.SpellsTxt[19].GM="Duration 30+6 minutes per point of skill"
+end
