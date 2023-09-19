@@ -1254,16 +1254,7 @@ function events.BeforeNewGameAutosave()
 end
 
 function events.BuildItemInformationBox(t)
-	currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
-	if currentWorld==1 then
-		partyLevel=vars.MM7LVL+vars.MM6LVL
-	elseif currentWorld==2 then
-		partyLevel=vars.MM8LVL+vars.MM6LVL
-	elseif currentWorld==3 then
-		partyLevel=vars.MM8LVL+vars.MM7LVL
-	elseif currentWorld==4 then
-		partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-	end
+	partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 	maxItemBolster=(partyLevel)/5+5
 	--failsafe
 	if t.Item.Charges==0 and t.Item.Bonus2==0 and t.Item.Bonus==0 then
@@ -1274,16 +1265,7 @@ end
 --do the same if someone is trying to equip on a player
 function events.Action(t)
 	if t.Action==133 then
-		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
-		if currentWorld==1 then
-			partyLevel=vars.MM7LVL+vars.MM6LVL
-		elseif currentWorld==2 then
-			partyLevel=vars.MM8LVL+vars.MM6LVL
-		elseif currentWorld==3 then
-			partyLevel=vars.MM8LVL+vars.MM7LVL
-		elseif currentWorld==4 then
-			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-		end
+		partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 		maxItemBolster=(partyLevel)/5+5
 		--failsafe
 		if Mouse.Item and Mouse.Item.Charges==0 and Mouse.Item.Bonus2==0 and Mouse.Item.Bonus==0 then
@@ -1291,4 +1273,3 @@ function events.Action(t)
 		end
 	end
 end
-
