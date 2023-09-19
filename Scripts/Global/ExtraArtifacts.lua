@@ -635,11 +635,11 @@ end
 ---- Stat bonuses
 GetBonusList(500).Stats = {	[const.Stats.Accuracy] = 40}
 GetBonusList(501).Stats = {	[const.Stats.Might] = 40}
-GetBonusList(502).Stats = {	[const.Stats.AirResistance] = 40}
+GetBonusList(502).Stats = {	[const.Stats.AirResistance] = 80}
 GetBonusList(503).Stats = {	[const.Stats.Endurance] = 40,
 							[const.Stats.Luck] = 40}
 GetBonusList(504).Stats = {	[const.Stats.Might] = 20}
-GetBonusList(505).Stats = {	[const.Stats.FireResistance] = 40}
+GetBonusList(505).Stats = {	[const.Stats.FireResistance] = 80}
 GetBonusList(506).Stats = {	[const.Stats.Endurance] = 20}
 GetBonusList(507).Stats = {[const.Stats.Might] 		= 10,
 							[const.Stats.Intellect] 	= 10,
@@ -660,31 +660,31 @@ GetBonusList(514).Stats = { [const.Stats.Might] 		= 10,
 							[const.Stats.Accuracy]		= 10,
 							[const.Stats.Endurance] 	= 10,
 							[const.Stats.Luck]			= 10,
-							[const.Stats.FireResistance]	= 10,
-							[const.Stats.AirResistance]		= 10,
-							[const.Stats.WaterResistance]	= 10,
-							[const.Stats.EarthResistance]	= 10,
-							[const.Stats.MindResistance]	= 10,
-							[const.Stats.BodyResistance]	= 10,
-							[const.Stats.SpiritResistance]	= 10}	
+							[const.Stats.FireResistance]	= 20,
+							[const.Stats.AirResistance]		= 20,
+							[const.Stats.WaterResistance]	= 20,
+							[const.Stats.EarthResistance]	= 20,
+							[const.Stats.MindResistance]	= 20,
+							[const.Stats.BodyResistance]	= 20,
+							[const.Stats.SpiritResistance]	= 20}	
 GetBonusList(514).Stats = { [const.Stats.Speed] 		= 15,							
 							[const.Stats.Accuracy] 		= 15}
 GetBonusList(518).Stats = { [const.Stats.Speed] 		= 30}
-GetBonusList(519).Stats = { [const.Stats.FireResistance]	= 40,
-							[const.Stats.AirResistance]		= 40,
-							[const.Stats.WaterResistance]	= 40,
-							[const.Stats.EarthResistance]	= 40}
+GetBonusList(519).Stats = { [const.Stats.FireResistance]	= 80,
+							[const.Stats.AirResistance]		= 80,
+							[const.Stats.WaterResistance]	= 80,
+							[const.Stats.EarthResistance]	= 80}
 GetBonusList(520).Stats = { [const.Stats.Personality]	= 15,
 							[const.Stats.Intellect]		= 15}							
 GetBonusList(522).Stats = { [const.Stats.Intellect]	= 30,
-							[const.Stats.FireResistance]	= 10,
-							[const.Stats.AirResistance]		= 10,
-							[const.Stats.WaterResistance]	= 10,
-							[const.Stats.EarthResistance]	= 10,
-							[const.Stats.MindResistance]	= 10,
-							[const.Stats.BodyResistance]	= 10}
+							[const.Stats.FireResistance]	= 20,
+							[const.Stats.AirResistance]		= 20,
+							[const.Stats.WaterResistance]	= 20,
+							[const.Stats.EarthResistance]	= 20,
+							[const.Stats.MindResistance]	= 20,
+							[const.Stats.BodyResistance]	= 20}
 GetBonusList(523).Stats = { [const.Stats.Intellect]	= 30,
-							[const.Stats.WaterResistance]	= -50,
+							[const.Stats.WaterResistance]	= -100,
 							[const.Stats.Personality]	= -15}
 GetBonusList(524).Stats = {	[const.Stats.Speed]	= 70,
 							[const.Stats.Accuracy]	= 70,
@@ -696,8 +696,8 @@ GetBonusList(526).Stats = {	[const.Stats.Might]	= 70,
 							[const.Stats.Intellect]	= 50}		
 GetBonusList(527).Stats = {	[const.Stats.Might]	= 50,
 							[const.Stats.Luck]	= -40}
-GetBonusList(528).Stats	= {	[const.Stats.WaterResistance]	= 70,
-							[const.Stats.FireResistance]	= -70}		
+GetBonusList(528).Stats	= {	[const.Stats.WaterResistance]	= 140,
+							[const.Stats.FireResistance]	= -140}		
 GetBonusList(529).Stats	= {	[const.Stats.Might]	= 40,
 							[const.Stats.Accuracy]	= -40}		
 GetBonusList(530).Stats	= {	[const.Stats.ArmorClass]	= -40}		
@@ -706,8 +706,8 @@ GetBonusList(531).Stats	= {	[const.Stats.Accuracy]	= 100,
 GetBonusList(532).Stats	= {	[const.Stats.Accuracy]	= -50}		
 GetBonusList(533).Stats	= {	[const.Stats.Intellect]	= 70,
 							[const.Stats.Personality]	= 70,
-							[const.Stats.MindResistance]	= -30,
-							[const.Stats.SpiritResistance]	= -30}		
+							[const.Stats.MindResistance]	= -60,
+							[const.Stats.SpiritResistance]	= -60}		
 GetBonusList(534).Stats	= {	[const.Stats.Luck]	= -15,
 							[const.Stats.Personality]	= -15}
 GetBonusList(535).Stats	= {	[const.Stats.Intellect]	= 40,
@@ -728,13 +728,13 @@ GetBonusList(543).Stats = {	[const.Stats.Endurance] = 20}
 -- Hero's belt
 GetBonusList(1337).Stats = {[const.Stats.Might] = 15}
 -- Lady's Escort ring
-GetBonusList(1338).Stats = {[const.Stats.FireResistance]	= 10,
-							[const.Stats.AirResistance]		= 10,
-							[const.Stats.WaterResistance]	= 10,
-							[const.Stats.EarthResistance]	= 10,
-							[const.Stats.MindResistance]	= 10,
-							[const.Stats.BodyResistance]	= 10,
-							[const.Stats.SpiritResistance]	= 10}
+GetBonusList(1338).Stats = {[const.Stats.FireResistance]	= 20,
+							[const.Stats.AirResistance]		= 20,
+							[const.Stats.WaterResistance]	= 20,
+							[const.Stats.EarthResistance]	= 20,
+							[const.Stats.MindResistance]	= 20,
+							[const.Stats.BodyResistance]	= 20,
+							[const.Stats.SpiritResistance]	= 20}
 -- Splitter
 GetBonusList(1308).Stats = {[const.Stats.FireResistance] = 65000}
 -- Puck
@@ -766,23 +766,23 @@ GetBonusList(1316).Stats = {[const.Stats.Might] 		= 150,
 							[const.Stats.Speed] 		= -40}
 -- Hareck's Leather
 GetBonusList(1318).Stats = {[const.Stats.Luck]				= 50,
-							[const.Stats.FireResistance] 	= -10,
-							[const.Stats.AirResistance] 	= -10,
-							[const.Stats.WaterResistance] 	= -10,
-							[const.Stats.EarthResistance] 	= -10,
-							[const.Stats.MindResistance] 	= -10,
-							[const.Stats.BodyResistance] 	= -10,
-							[const.Stats.SpiritResistance] 	= -10}
+							[const.Stats.FireResistance] 	= -20,
+							[const.Stats.AirResistance] 	= -20,
+							[const.Stats.WaterResistance] 	= -20,
+							[const.Stats.EarthResistance] 	= -20,
+							[const.Stats.MindResistance] 	= -20,
+							[const.Stats.BodyResistance] 	= -20,
+							[const.Stats.SpiritResistance] 	= -20}
 -- Amuck
 GetBonusList(1320).Stats = {[const.Stats.Might] 		= 100,
 							[const.Stats.Endurance] 	= 100,
 							[const.Stats.ArmorClass] 	= -15}
 -- Glory shield
-GetBonusList(1321).Stats = {[const.Stats.BodyResistance] = -10,
-							[const.Stats.MindResistance] = -10}
+GetBonusList(1321).Stats = {[const.Stats.BodyResistance] = -20,
+							[const.Stats.MindResistance] = -20}
 -- Kelebrim
 GetBonusList(1322).Stats = {[const.Stats.Endurance] = 50,
-							[const.Stats.EarthResistance] = -30}
+							[const.Stats.EarthResistance] = -60}
 -- Taledon's Helm
 GetBonusList(1323).Stats = {
 	[const.Stats.Might] = 15,
@@ -795,7 +795,7 @@ GetBonusList(1324).Stats = {[const.Stats.Endurance] = -50}
 GetBonusList(1325).Stats = {
 	[const.Stats.Personality] = 30,
 	[const.Stats.ArmorClass] = -20,
-	[const.Stats.WaterResistance] = 50
+	[const.Stats.WaterResistance] = 100
 }
 -- Titan's Belt
 GetBonusList(1326).Stats = {
@@ -806,13 +806,13 @@ GetBonusList(1326).Stats = {
 GetBonusList(1327).Stats = {
 	[const.Stats.Speed] = 50,
 	[const.Stats.Luck] = 50,
-	[const.Stats.FireResistance] = -15,
-	[const.Stats.AirResistance] = -15,
-	[const.Stats.WaterResistance] = -15,
-	[const.Stats.EarthResistance] = -15,
-	[const.Stats.MindResistance] = -15,
-	[const.Stats.BodyResistance] = -15,
-	[const.Stats.SpiritResistance] = -15
+	[const.Stats.FireResistance] = -30,
+	[const.Stats.AirResistance] = -30,
+	[const.Stats.WaterResistance] = -30,
+	[const.Stats.EarthResistance] = -30,
+	[const.Stats.MindResistance] = -30,
+	[const.Stats.BodyResistance] = -30,
+	[const.Stats.SpiritResistance] = -30
 }
 -- Ania Selving
 GetBonusList(1328).Stats = {[const.Stats.ArmorClass] = -25,
@@ -821,7 +821,7 @@ GetBonusList(1328).Stats = {[const.Stats.ArmorClass] = -25,
 GetBonusList(1329).Stats = {[const.Stats.Speed] = -40}
 -- Mekorig's hammer
 GetBonusList(1330).Stats = {[const.Stats.Might] = 75,
-							[const.Stats.AirResistance] = -50}
+							[const.Stats.AirResistance] = -100}
 -- Mind's Eye
 GetBonusList(1334).Stats = {
 	[const.Stats.Intellect] = 15,
@@ -834,7 +834,7 @@ GetBonusList(1335).Stats = {[const.Stats.Speed] = 15,
 GetBonusList(1336).Stats = {
 	[const.Stats.Might] = 15,
 	[const.Stats.Endurance] = 15,
-	[const.Stats.FireResistance] = 30
+	[const.Stats.FireResistance] = 60
 }
 -- Vampire cloak
 GetBonusList(1352).Stats = {[const.Stats.Intellect] = 10, [const.Stats.Luck] = 10}
@@ -878,7 +878,7 @@ GetBonusList(2034).Stats = {[const.Stats.SP] = 20}
 -- Hades
 GetBonusList(2035).Stats = {[const.Stats.Luck] = 20}
 -- Ares
-GetBonusList(2036).Stats = {[const.Stats.FireResistance] = 25}
+GetBonusList(2036).Stats = {[const.Stats.FireResistance] = 50}
 -- Poseidon
 GetBonusList(2037).Stats = {[const.Stats.Might] 	 = 20,
 							[const.Stats.Endurance]  = 20,
@@ -893,19 +893,19 @@ GetBonusList(2039).Stats = {[const.Stats.Might] 	= 50,
 							[const.Stats.Endurance] = 20,
 							[const.Stats.Intellect]	= -30}
 -- Artemis
-GetBonusList(2040).Stats = {[const.Stats.FireResistance] 	= -10,
-							[const.Stats.AirResistance] 	= -10,
-							[const.Stats.WaterResistance] 	= -10,
-							[const.Stats.EarthResistance] 	= -10}
+GetBonusList(2040).Stats = {[const.Stats.FireResistance] 	= -20,
+							[const.Stats.AirResistance] 	= -20,
+							[const.Stats.WaterResistance] 	= -20,
+							[const.Stats.EarthResistance] 	= -20}
 -- Apollo
 GetBonusList(2041).Stats = {[const.Stats.Endurance]			= -30,
-							[const.Stats.FireResistance] 	= 20,
-							[const.Stats.AirResistance] 	= 20,
-							[const.Stats.WaterResistance] 	= 20,
-							[const.Stats.EarthResistance] 	= 20,
-							[const.Stats.MindResistance] 	= 20,
-							[const.Stats.BodyResistance] 	= 20,
-							[const.Stats.SpiritResistance] 	= 20,
+							[const.Stats.FireResistance] 	= 40,
+							[const.Stats.AirResistance] 	= 40,
+							[const.Stats.WaterResistance] 	= 40,
+							[const.Stats.EarthResistance] 	= 40,
+							[const.Stats.MindResistance] 	= 40,
+							[const.Stats.BodyResistance] 	= 40,
+							[const.Stats.SpiritResistance] 	= 40,
 							[const.Stats.Luck]				= 20}
 -- Zeus
 GetBonusList(2042).Stats = {[const.Stats.HP] 		= 50,
@@ -918,10 +918,10 @@ GetBonusList(2043).Stats = {[const.Stats.Speed] = -20,
 -- Odin
 GetBonusList(2044).Stats = {
 	[const.Stats.Speed] = -40,
-	[const.Stats.FireResistance] = 50,
-	[const.Stats.AirResistance] = 50,
-	[const.Stats.WaterResistance] = 50,
-	[const.Stats.EarthResistance] = 50
+	[const.Stats.FireResistance] = 100,
+	[const.Stats.AirResistance] = 100,
+	[const.Stats.WaterResistance] = 100,
+	[const.Stats.EarthResistance] = 100
 }
 -- Atlas
 GetBonusList(2045).Stats = {
@@ -947,7 +947,7 @@ GetBonusList(2049).Stats = {[const.Stats.HP] = 50,
 -- Hermes's Sandals
 GetBonusList(1331).Stats = {[const.Stats.Speed] = 100,
 							[const.Stats.Accuracy] = 50,
-							[const.Stats.AirResistance] = 50}
+							[const.Stats.AirResistance] = 100}
 -- Cloak of the sheep
 GetBonusList(1332).Stats = {[const.Stats.Intellect] 	= -20,
 							[const.Stats.Personality] 	= -20}
