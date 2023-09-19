@@ -85,7 +85,7 @@ function events.ItemGenerated(t)
 	if t.Strength==7 then
 		return
 	end
-	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then
+	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) or reagentList[t.Item.Number] then
 		t.Handled=true
 		--reset enchants
 		t.Item.Bonus=0
@@ -101,6 +101,11 @@ function events.ItemGenerated(t)
 			partyLevel=vars.MM8LVL+vars.MM7LVL
 		elseif currentWorld==4 then
 			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+		end
+		--modify reagents
+		if reagentList[t.Item.Number] then
+			t.Item.Bonus=math.round(partyLevel/3)
+		
 		end
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
 		t.Item.MaxCharges=math.min(math.floor(partyLevel/5),255)
