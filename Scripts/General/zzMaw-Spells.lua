@@ -620,7 +620,7 @@ end
 --Invisibility Nerf
 function events.Action(t)
 	if t.Action == 142 then
-		local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[const.Skills.Water])
+		local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[const.Skills.Air])
 		Sleep(1)
 		local minutesPerSkill=(m-3)*3+3
 		local baseDuration=(m-3)*15+15
