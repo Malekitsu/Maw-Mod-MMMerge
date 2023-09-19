@@ -196,7 +196,7 @@ function events.BuildItemInformationBox(t)
 		t.Description=StrColor(255,255,153,"Heals " .. math.round(t.Item.Bonus^1.4)+10 .. " Hit Points") .. "\n" .. t.Description
 	end
 	if t.Item.Number==223 then
-		t.Description=StrColor(255,255,153,"Restores " .. math.round(t.Item.Bonus^1.4*3/2)+10 .. " Spell Points") .. "\n" .. t.Description
+		t.Description=StrColor(255,255,153,"Restores " .. math.round(t.Item.Bonus^1.4*2/3)+10 .. " Spell Points") .. "\n" .. t.Description
 	end
 	if t.Item.Number==253 then
 		t.Description=StrColor(255,255,153,"Heals " .. math.round(t.Item.Bonus^1.4*3)+10 .. " Hit Points") .. "\n" .. t.Description
