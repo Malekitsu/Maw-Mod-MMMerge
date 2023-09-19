@@ -338,3 +338,57 @@ function events.ItemGenerated(t)
 		t.Item.Bonus=math.min(math.floor(partyLevel/5),255)
 	end
 end
+
+
+function events.MonsterKilled(mon)
+	if mon.Ally == 9999 then -- no drop from reanimated monsters
+		return
+	end
+	dropPossible=false
+	for i=0,Party.High do
+		s,m = SplitSkill(Party[i].Skills[const.Skills.Alchemy])
+		if m>=3 then
+			dropPossible=true
+			chance=(m-2)/40
+		end
+	end
+	if dropPossible and math.random()<chance then
+		-- check bolster level
+		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+		if currentWorld==1 then
+			partyLevel=vars.MM7LVL+vars.MM6LVL
+		elseif currentWorld==2 then
+			partyLevel=vars.MM8LVL+vars.MM6LVL
+		elseif currentWorld==3 then
+			partyLevel=vars.MM8LVL+vars.MM7LVL
+		elseif currentWorld==4 then
+			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+		end
+		--determine level
+		local lvl=basetable[mon.Id].Level
+		tier=math.round(math.min(math.max((lvl/20)*(math.random()/2+0.75),1),5))
+		roll=math.random(1,#reagentDropTable[tier])
+		reagent=reagentDropTable[tier][roll]
+		evt.SummonObject(reagent, mon.X, mon.Y, mon.Z + 100, 100)
+		for i=0,Map.Objects.High do 
+			i=Map.Objects.High-i
+			if Map.Objects[i].X==mon.X and Map.Objects[i].Y==mon.Y then
+				Map.Objects[i].Item.Bonus=math.round(partyLevel/3)
+				return
+			end
+		end
+	end
+end
+
+reagentDropTable={}
+reagentDropTable[1]={200,205,210,215,1002,1007,1012,1017}
+reagentDropTable[2]={201,206,211,216,1003,1008,1013,1018}
+reagentDropTable[3]={202,207,212,217,1004,1009,1014,1019}
+reagentDropTable[4]={203,208,213,218,1005,1010,1015,1020}
+reagentDropTable[5]={204,209,214,219,1006,1011,1016,1021}
+function events.GameInitialized2()
+	Game.SkillDescriptions[const.Skills.Alchemy]=Game.SkillDescriptions[const.Skills.Alchemy] .. "\n\nMaster will grant a small chance (2.5%) to drop random reagents from Monsters.\nAt GM this chance is doubled."
+	Game.SkillDesMaster[const.Skills.Alchemy]="Allows to make white potions. Power when mixing will be increased to 1.5 per skill point."
+	Game.SkillDesMaster[const.Skills.Alchemy]="Allows to make white potions. Power when mixing will be increased to 1.5 per skill point."
+	Game.SkillDesGM[const.Skills.Alchemy]="Allows to make black potions. Power when mixing will be increased to 2 per skill point."
+end
