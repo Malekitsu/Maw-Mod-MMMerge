@@ -105,7 +105,7 @@ function events.ItemGenerated(t)
 		--modify reagents
 		if reagentList[t.Item.Number] then
 			t.Item.Bonus=math.round(partyLevel/3)
-		
+			return
 		end
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
 		t.Item.MaxCharges=math.min(math.floor(partyLevel/5),255)
