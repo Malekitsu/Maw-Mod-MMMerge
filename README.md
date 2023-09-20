@@ -9,7 +9,7 @@ Maw Mod code adapted for MMMerge
 - If you have issues try moving mm8 into desktop and change mm8.exe to windows xp sp3 compatibility mode
 
 ## Overview
-This mod is divided into 6 parts:
+This mod is divided into 8 parts:
 - Item rework
 - Stats rework
 - Skill rework
