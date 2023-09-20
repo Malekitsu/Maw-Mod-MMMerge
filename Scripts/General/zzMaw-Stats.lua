@@ -342,7 +342,7 @@ end
 
 --TOOLTIPS
 function events.Tick()
-	if Game.CurrentCharScreen==100 and Game.CurrentScreen==7 and not statsChanged then
+	if Game.CurrentCharScreen==100 and Game.CurrentScreen==7 then
 		local i=Game.CurrentPlayer 
 		if i==-1 then return end --prevent bug message
 		fireRes=Party[i]:GetResistance(10)/4
