@@ -313,7 +313,8 @@ end
 
 function events.BuildItemInformationBox(t)
 	if reagentList[t.Item.Number] then
-		t.Enchantment="Power: " .. math.round(reagentList[t.Item.Number] *((t.Item.Bonus*0.75)/20+1)+t.Item.Bonus*0.75)
+		local bonus=math.round(reagentList[t.Item.Number] *((t.Item.Bonus*0.75)/20+1)+t.Item.Bonus*0.75)
+		t.Enchantment="Power: " .. bonus
 	end
 end
 
