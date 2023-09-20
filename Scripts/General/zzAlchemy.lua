@@ -291,6 +291,9 @@ reagentList={
 	[1762] = 1, [1763] = 1, [1764] = 1,
 }
 function events.Tick()
+	if Game.CurrentPlayer<0 then 
+		return
+	end
 	if lastModifiedReagent and lastModifiedReagent~=0 then
 		Game.ItemsTxt[lastModifiedReagent].Mod1DiceCount=reagentList[lastModifiedReagent]
 	end
