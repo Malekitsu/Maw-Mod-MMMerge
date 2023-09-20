@@ -127,7 +127,7 @@ function events.ItemGenerated(t)
 		if enc1Chance[pseudoStr]>roll1 then
 			t.Item.Bonus=math.random(1,16)
 			t.Item.BonusStrength=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
-			if math.random(1,5)==5 then
+			if math.random(1,10)==10 then
 				t.Item.Bonus=math.random(17,24)
 				t.Item.BonusStrength=math.ceil(t.Item.BonusStrength^0.5)
 			end
