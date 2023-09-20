@@ -923,6 +923,12 @@ end
 function events.CalcItemValue(t)
 	--base value
 	basePrice=Game.ItemsTxt[t.Item.Number].Value
+	if reagentList[t.Item.Number] then
+		local bonus=math.round(reagentList[t.Item.Number] *((t.Item.Bonus*0.75)/20+1)+t.Item.Bonus*0.75)
+		t.Enchantment="Power: " .. bonus
+		t.Value=bonus*10
+		return
+	end
 	--add enchant price
 	bonus1=t.Item.BonusStrength*100
 	if t.Item.Bonus==8 or t.Item.Bonus==9 then
