@@ -624,7 +624,9 @@ function events.Action(t)
 		Sleep(1)
 		local minutesPerSkill=(m-3)*3+3
 		local baseDuration=(m-3)*15+15
-		Party.SpellBuffs[11].ExpireTime=Game.Time+const.Minute*(baseDuration+minutesPerSkill*s)
+		if Party.SpellBuffs[11].ExpireTime>Game.Time+const.Minute*(baseDuration+minutesPerSkill*s) then
+			Party.SpellBuffs[11].ExpireTime=Game.Time+const.Minute*(baseDuration+minutesPerSkill*s)
+		end
 	end
 end
 
