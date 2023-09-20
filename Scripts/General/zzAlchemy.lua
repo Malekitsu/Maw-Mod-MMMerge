@@ -369,14 +369,10 @@ function events.MonsterKilled(mon)
 		local lvl=basetable[mon.Id].Level
 		tier=math.round(math.min(math.max((lvl/20)*(math.random()/2+0.75),1),5))
 		roll=math.random(1,#reagentDropTable[tier])
-		reagent=reagentDropTable[tier][roll]
-		evt.SummonObject(reagent, mon.X, mon.Y, mon.Z + 100, 100)
-		for i=0,Map.Objects.High do 
-			i=Map.Objects.High-i
-			if Map.Objects[i].X==mon.X and Map.Objects[i].Y==mon.Y then
-				Map.Objects[i].Item.Bonus=math.round(partyLevel/3)
-				return
-			end
+		reagent=reagentDropTable[tier][roll]	
+		obj = SummonItem(reagent, mon.X, mon.Y, mon.Z + 100, 100)
+		if obj then
+			obj.Item.Bonus=math.round(partyLevel/3)
 		end
 	end
 end
