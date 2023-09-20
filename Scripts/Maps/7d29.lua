@@ -1,4 +1,4 @@
-
+--HARMONDALE CASTLE
 -- Golem quest (wizard first promotion) (mm7)
 
 evt.Map[376] = function()
