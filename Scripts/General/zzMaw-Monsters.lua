@@ -257,11 +257,9 @@ function events.LoadMap()
 		--level increase centered on B type
 		mon.Level=math.min(basetable[i].Level+bolsterLevel,255)
 		
-		--HPbase.Level
-		rebalanceLevel=(basetable[i].Level*0.4+mon.Level*0.6)
-		mon.HP=math.min(math.round(rebalanceLevel*(rebalanceLevel/10+3)*2),32500)
+		--HP
 		
-		--mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2),32500)
+		mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2),32500)
 		if ItemRework and StatsRework then
 			mon.HP=math.min(math.round(mon.HP*(1+mon.Level/180),32500))
 		end
@@ -322,7 +320,7 @@ function events.LoadMap()
 		
 		mon.ArmorClass=mon.ArmorClass*((levelMult+10)/(LevelB+10))
 		mon.ArmorClass=mon.Level
-		dmgMult=(levelMult/18+1.25)*((levelMult+2)/(2+LevelB))*((levelMult^1.25-1)/1000+1)*((levelMult^1.25-1)/1000+1)
+		dmgMult=(levelMult/18+1.25)*((levelMult+2)/(2+LevelB))*((levelMult^1.35-1)/1000+1)^2
 		-----------------------------------------------------------
 		--DAMAGE COMPUTATION DOWN HERE, FOR BALANCE MODIFY ABOVE^
 		--attack 1
