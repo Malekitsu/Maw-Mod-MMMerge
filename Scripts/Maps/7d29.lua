@@ -43,7 +43,7 @@ evt.map[1000] = function()
 	if not vars.goblingKing then
 		if evt.CheckMonstersKilled{CheckType = 1, Id = 56, Count = 0, InvisibleAsDead = 0} then
 			vars.goblingKing=true
-			name[300]="Goblin King"
+			Game.PlaceMonTxt[300]="Goblin King"
 			Sleep(1)
 			Game.ShowStatusText("Noises from the throne room")
 			pseudoSpawnpoint{monster = 271, x = -5110, y = 2852, z = 65, count = 1, powerChances = {0, 0, 100}, radius = 64, group = 1, 
