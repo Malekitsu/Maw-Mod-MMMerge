@@ -1500,7 +1500,8 @@ function events.CalcDamageToPlayer(t)
 					if Party[coverChance[i].index].HP>lastMaxHp then
 						local index=coverChance[i]["index"]
 						local p=coverChance[i]["p"]
-						if math.random()<p then
+						roll=math.random()
+						if roll<p then
 							lastMaxHp=Party[index].HP
 							coverPlayerIndex=index
 						end
