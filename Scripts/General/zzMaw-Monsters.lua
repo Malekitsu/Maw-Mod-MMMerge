@@ -258,7 +258,7 @@ function events.LoadMap()
 		mon.Level=math.min(basetable[i].Level+bolsterLevel,255)
 		
 		--HPbase.Level
-		rebalanceLevel=(basetable[i].Level+mon.Level)/2
+		rebalanceLevel=(basetable[i].Level*0.4+mon.Level*0.6)
 		mon.HP=math.min(math.round(rebalanceLevel*(rebalanceLevel/10+3)*2),32500)
 		
 		--mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2),32500)
