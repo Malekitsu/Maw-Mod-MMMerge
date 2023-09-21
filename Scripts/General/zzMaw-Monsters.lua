@@ -136,20 +136,7 @@ end
 
 
 --MODIFY MONSTERS SPELL DAMAGE
-
-function events.CalcDamageToPlayer(t)
-	data=WhoHitPlayer()
-	if data and data.Monster and data.Object and data.Object.Spell<100 then
-		dmgMult=(data.Monster.Level/16+0.75)
-		if ItemRework==true  then
-			dmgMult=dmgMult*((data.Monster.Level^1.15-1)/1000+1)
-		end
-		if StatsRework==true then
-			dmgMult=dmgMult*((data.Monster.Level^1.25-1)/1000+1)
-		end			
-		t.Result=t.Result
-	end
-end
+--moved in resistance rework in MAW-STATS
 
 
 --CREATE OLD TABLE COPY
