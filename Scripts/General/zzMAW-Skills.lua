@@ -1235,10 +1235,11 @@ function events.GameInitialized2()
 	Game.SkillDesExpert[const.Skills.Leather]=string.format("%s recovery penalty eliminated",Game.SkillDesExpert[const.Skills.Leather])
 	Game.SkillDesExpert[const.Skills.Chain]=string.format("%s recovery penalty halved",Game.SkillDesExpert[const.Skills.Chain])
 	Game.SkillDesMaster[const.Skills.Chain]=string.format("%s recovery penalty eliminated",Game.SkillDesMaster[const.Skills.Chain])
-	Game.SkillDesExpert[const.Skills.Plate]=string.format("%s recovery penalty halved",Game.SkillDesExpert[const.Skills.Plate])
-	Game.SkillDesGM[const.Skills.Plate]=string.format("%s recovery penalty eliminated",Game.SkillDesGM[const.Skills.Plate])
+	Game.SkillDesExpert[const.Skills.Plate]=string.format("%s rec. pen. halved, 5%% cover",Game.SkillDesExpert[const.Skills.Plate])
+	Game.SkillDesMaster[const.Skills.Plate]=string.format("%s 10%% cover",Game.SkillDesMaster[const.Skills.Plate])
+	Game.SkillDesGM[const.Skills.Plate]=string.format("%s rec. pen. elim., 15%% cover",Game.SkillDesGM[const.Skills.Plate])
 	Game.SkillDesExpert[const.Skills.Shield]=string.format("%s recovery penalty eliminated",Game.SkillDesExpert[const.Skills.Shield])
-	Game.SkillDesGM[const.Skills.Shield]=string.format("%s halve dmg from phys projectiles",Game.SkillDesGM[const.Skills.Shield])
+	Game.SkillDesGM[const.Skills.Shield]=string.format("%s halve dmg from phys projectiles\n         and grants 15%% magic cover",Game.SkillDesGM[const.Skills.Shield])
 	Game.SkillDesMaster[const.Skills.Armsmaster]=string.format("Skills adds 2 damage to all melee weapons")
 	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s usable with Leather Armor",Game.SkillDesGM[const.Skills.Dodging])
 	Game.SkillDesGM[const.Skills.Unarmed]=string.format("%s 5+0.5%% dodge chance",Game.SkillDesGM[const.Skills.Unarmed])
@@ -1469,3 +1470,58 @@ function events.Action(t)
 		end
 	end
 end
+
+--plate cover
+function events.CalcDamageToPlayer(t)
+	if t.Result>0 and t.DamageKind==const.Damage.Phys then
+		--check for armor
+		local it=t.Player:GetActiveItem(3)
+		if it and Game.ItemsTxt[it.Number].Skill~=11 then
+			local coverChance={}
+			local coverIndex=1
+			--iterate for players to build cover dictionary
+			for i=0,Party.High do
+				if Party[i].Dead==0 and Party[i].Paralyzed==0 and Party[i].Unconscious==0 and Party[i].Stoned==0 and Party[i].Eradicated==0 then
+					local it=Party[i]:GetActiveItem(3)
+					if it and Game.ItemsTxt[it.Number].Skill==11 then 
+						local plate=Party[i].Skills[const.Skills.Plate]
+						local s,m=SplitSkill(plate)
+						m=math.min(m,3)
+						coverChance[coverIndex]={p=0.05*m,index=i}
+						coverIndex=coverIndex+1
+					end
+				end
+			end
+			--roll once per player with player and pick the one with max hp
+			coverPlayerIndex=-1
+			if coverChance[1] then
+				lastMaxHp=0
+				for i=1,#coverChance do
+					if Party[coverChance[i].index].HP>lastMaxHp then
+						local index=coverChance[i]["index"]
+						local p=coverChance[i]["p"]
+						if math.random()<p+1 then
+							lastMaxHp=Party[index].HP
+							coverPlayerIndex=index
+						end
+					end
+				end
+			end
+			--actually substitute damage
+			if coverPlayerIndex>=0 then
+				local ac=t.Player:GetArmorClass()
+				trueDamage=t.Result/(1/(ac/300+1))
+				t.Result=0
+				--substitute and reduce damage
+				local ac=Party[coverPlayerIndex]:GetArmorClass()
+				local damageTaken=trueDamage*(1/(ac/300+1))
+				Party[coverPlayerIndex].HP=Party[coverPlayerIndex].HP-damageTaken
+				Game.ShowStatusText(string.format("%s protects %s",Party[coverPlayerIndex].Name,t.Player.Name))
+				Party[coverPlayerIndex]:ShowFaceAnimation(24)
+			end	
+		end
+	end
+end
+
+
+
