@@ -73,10 +73,10 @@ function events.AfterLoadMap()
 end
 
 --MAW
-name[300]="Goblin's Liutenant"
+Game.PlaceMonTxt[301]="Goblin's Liutenant"
 if not mapvars.maw then
 	mapvars.maw=true
-	pseudoSpawnpoint{monster = 106,  x = 7253, y = 5093, z = 481 , count = 1, powerChances = {100, 0, 0}, radius = 0, group = 1, transform = function(mon) mon.NameId=300 mon.Velocity=0 mon.SpellChance=100 end}
+	pseudoSpawnpoint{monster = 106,  x = 7253, y = 5093, z = 481 , count = 1, powerChances = {100, 0, 0}, radius = 0, group = 1, transform = function(mon) mon.NameId=301 mon.Velocity=0 mon.SpellChance=100 end}
 end
 
 
