@@ -134,7 +134,7 @@ end
 function events.CalcStatBonusByItems(t)
 	local PLT = PlayerEffects[t.Player]
 	if PLT then
-		t.Result = t.Result + (PLT.Stats[t.Stat] or 0)*(math.min(t.Player.LevelBase/80,2.5))
+		t.Result = t.Result + (PLT.Stats[t.Stat] or 0)*math.max((math.min(t.Player.LevelBase/100,2.5)),0.5)
 	elseif Game.CurrentScreen == AdvInnScreen or PlayerInParty(t.PlayerIndex) then
 		StoreEffects(t.Player)
 	end
@@ -149,7 +149,7 @@ function events.GetSkill(t)
 		if t.Skill>=12 and t.Skill<=20 then
 			Skill = Skill + math.min((PLT.Skills[t.Skill] or 0),Skill*0.5)
 		else
-			Skill = Skill + math.floor((PLT.Skills[t.Skill] or 0)*math.min(t.Player.LevelBase/80,2.5))
+			Skill = Skill + math.floor((PLT.Skills[t.Skill] or 0)*math.min(math.min(t.Player.LevelBase/100,2.5),0.5))
 		end
 		t.Result = JoinSkill(Skill, Mas)
 	elseif Game.CurrentScreen == AdvInnScreen or PlayerInParty(t.PlayerIndex) then
@@ -305,9 +305,9 @@ function events.ItemAdditionalDamage(t)
 
 	t.DamageKind = Effect.DamageKind or t.DamageKind
 	if Effect.Add then
-		t.Result = t.Result + Effect.Add * math.min(t.Player.LevelBase/80,2.5) * 2
+		t.Result = t.Result + Effect.Add * math.max(math.min(t.Player.LevelBase/100,2.5) * 2,0.5)
 	elseif t.Item.Bonus2==0 then
-		t.Result=t.Result*2*math.min(t.Player.LevelBase/80,2.5)
+		t.Result=t.Result*2*math.max(math.min(t.Player.LevelBase/100,2.5),0.5)
 	end
 	if Effect.Special then
 		Effect.Special(t)
