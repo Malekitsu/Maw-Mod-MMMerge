@@ -1157,7 +1157,7 @@ end
 
 function replaceNumber(match)
 	lvl=Party[Game.CurrentPlayer].LevelBase
-	lvl=math.min(lvl/80,2.5)
+	lvl=math.max(math.min(lvl/100,2.5),0.5)
     num = tonumber(match)
     if num then
         return tostring(math.floor(num * lvl))
@@ -1173,15 +1173,15 @@ function events.BuildItemInformationBox(t)
 	if (t.Item.Number>=500 and t.Item.Number<=543) or (t.Item.Number>=1302 and t.Item.Number<=1354) or (t.Item.Number>=2020 and t.Item.Number<=2049) then 
 		if t.Type then
 			local txt=Game.ItemsTxt[t.Item.Number]
-			local ac=math.ceil((txt.Mod2+txt.Mod1DiceCount)*math.min(Party[Game.CurrentPlayer].LevelBase/80,2.5))
+			local ac=math.ceil((txt.Mod2+txt.Mod1DiceCount)*math.max(math.min(Party[Game.CurrentPlayer].LevelBase/100,2.5),0.5))
 			if ac>0 then 			
 				t.BasicStat= "Armor: +" .. ac
 			end
 			--WEAPONS
 			local equipStat=txt.EquipStat
 			if equipStat<=2 then
-				local bonus=math.ceil((txt.Mod2)*math.min(Party[Game.CurrentPlayer].LevelBase/80,2.5))
-				local sides=math.ceil((txt.Mod1DiceSides)*math.min(Party[Game.CurrentPlayer].LevelBase/80,2.5))
+				local bonus=math.ceil((txt.Mod2)*math.max(math.min(Party[Game.CurrentPlayer].LevelBase/100,2.5),0.5))
+				local sides=math.ceil((txt.Mod1DiceSides)*math.max(math.min(Party[Game.CurrentPlayer].LevelBase/100,2.5),0.5))
 				t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " ..  txt.Mod1DiceCount .. "d" .. sides .. "+" .. bonus
 			end
 		end
@@ -1195,7 +1195,7 @@ function events.CalcStatBonusByItems(t)
 				local txt=Game.ItemsTxt[it.Number]
 				c=txt.EquipStat
 				if c>2 then
-					t.Result=t.Result-(txt.Mod2+txt.Mod1DiceCount)+math.ceil((txt.Mod2+txt.Mod1DiceCount)*math.min(t.Player.LevelBase/80,2.5))
+					t.Result=t.Result-(txt.Mod2+txt.Mod1DiceCount)+math.ceil((txt.Mod2+txt.Mod1DiceCount)*math.max(math.min(t.Player.LevelBase/100,2.5),0.5))
 				end
 			end
 		end
@@ -1210,9 +1210,9 @@ function events.CalcStatBonusByItems(t)
 				txt=Game.ItemsTxt[it.Number]
 				c=txt.EquipStat
 				if c<=1 then
-				t.Result=t.Result-txt.Mod2+math.ceil(txt.Mod2*math.min(t.Player.LevelBase/80,2.5))
+				t.Result=t.Result-txt.Mod2+math.ceil(txt.Mod2*math.max(math.min(t.Player.LevelBase/100,2.5),0.5))
 					if t.Stat==cs.MeleeDamageMax then
-						t.Result=t.Result-(txt.Mod1DiceCount*txt.Mod1DiceSides-txt.Mod1DiceCount)+(txt.Mod1DiceCount*txt.Mod1DiceSides*math.min(t.Player.LevelBase/80,2.5))
+						t.Result=t.Result-(txt.Mod1DiceCount*txt.Mod1DiceSides-txt.Mod1DiceCount)+(txt.Mod1DiceCount*txt.Mod1DiceSides*math.max(math.min(t.Player.LevelBase/100,2.5),0.5))
 					end
 				end
 			end	
@@ -1225,9 +1225,9 @@ function events.CalcStatBonusByItems(t)
 				txt=Game.ItemsTxt[it.Number]
 				c=txt.EquipStat
 				if c==2 then
-				t.Result=t.Result-txt.Mod2+math.ceil(txt.Mod2*math.min(t.Player.LevelBase/80,2.5))
+				t.Result=t.Result-txt.Mod2+math.ceil(txt.Mod2*math.max(math.min(t.Player.LevelBase/100,2.5),0.5))
 					if t.Stat==cs.RangedDamageMax then
-						t.Result=t.Result-(txt.Mod1DiceCount*txt.Mod1DiceSides-txt.Mod1DiceCount)+(txt.Mod1DiceCount*txt.Mod1DiceSides*math.min(t.Player.LevelBase/80,2.5))
+						t.Result=t.Result-(txt.Mod1DiceCount*txt.Mod1DiceSides-txt.Mod1DiceCount)+(txt.Mod1DiceCount*txt.Mod1DiceSides*math.max(math.min(t.Player.LevelBase/100,2.5),0.5))
 					end
 				end
 			end	
@@ -1241,8 +1241,8 @@ function events.ModifyItemDamage(t)
 	if t.Item then
 		if (t.Item.Number>=500 and t.Item.Number<=543) or (t.Item.Number>=1302 and t.Item.Number<=1354) or (t.Item.Number>=2020 and t.Item.Number<=2049) then 
 			bonusDamage=0
-			add=math.ceil(Game.ItemsTxt[t.Item.Number].Mod2*math.min(t.Player.LevelBase/80,2.5))
-			side=math.ceil(Game.ItemsTxt[t.Item.Number].Mod1DiceSides*math.min(t.Player.LevelBase/80,2.5))
+			add=math.ceil(Game.ItemsTxt[t.Item.Number].Mod2*math.max(math.min(t.Player.LevelBase/100,2.5),0.5))
+			side=math.ceil(Game.ItemsTxt[t.Item.Number].Mod1DiceSides*math.max(math.min(t.Player.LevelBase/100,2.5),0.5))
 			--calculate dices
 			for i=1,Game.ItemsTxt[t.Item.Number].Mod1DiceCount do
 				bonusDamage=bonusDamage+math.random(1,side)
