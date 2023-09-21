@@ -1523,5 +1523,25 @@ function events.CalcDamageToPlayer(t)
 	end
 end
 
-
+--AUTOREPAIR
+function events.Regeneration(t)
+	repair=0
+	for i=0,Party.High do
+		v=Party[i]
+		ko = v.Eradicated or v.Dead or v.Stoned or v.Paralyzed or v.Unconscious or v.Asleep
+		r,m = SplitSkill(v.Skills[const.Skills.Repair])
+		if r*m>repair and (ko == 0) then
+			repair=r*m
+		end
+	end
+	v=t.Player.Items
+	for k=1, v.High do
+		if v[k].Broken == true then
+			if v[k]:T().IdRepSt<=repair then
+				v[k].Broken = false
+				Game.ShowStatusText("Repaired")
+			end
+		end
+	end
+end
 
