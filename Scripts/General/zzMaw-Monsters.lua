@@ -257,8 +257,11 @@ function events.LoadMap()
 		--level increase centered on B type
 		mon.Level=math.min(basetable[i].Level+bolsterLevel,255)
 		
-		--HP
-		mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2),32500)
+		--HPbase.Level
+		rebalanceLevel=(basetable[i].Level+mon.Level)/2
+		mon.HP=math.min(math.round(rebalanceLevel*(rebalanceLevel/10+3)*2),32500)
+		
+		--mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2),32500)
 		if ItemRework and StatsRework then
 			mon.HP=math.min(math.round(mon.HP*(1+mon.Level/180),32500))
 		end
