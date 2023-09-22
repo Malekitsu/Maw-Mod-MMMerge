@@ -1286,3 +1286,35 @@ function events.Action(t)
 		end
 	end
 end
+
+--vampiric nerf
+gotVamp={}
+function events.ItemAdditionalDamage(t)
+	vamp=false
+	for i=0,1 do
+		it=t.Player:GetActiveItem(0)
+		if it then
+			vamp=it.Bonus2==41 or it.Bonus2==16
+		end
+	end
+	if t.Vampiric or vamp then
+		t.Vampiric = false
+		gotVamp[t.Player:GetIndex()]=true
+	else
+		gotVamp[t.Player:GetIndex()]=false
+	end
+end
+
+function events.GameInitialized2() --make it load later compared to other scripts
+	function events.CalcDamageToMonster(t)
+		if t.DamageKind==4 then
+			data=WhoHitMonster()
+			if data and data.Player and not data.Object then
+				if gotVamp[data.Player:GetIndex()] then
+					t.Player.HP=math.min(t.Player:GetFullHP(),t.Player.HP+t.Result*0.05)
+				end
+			end
+		end
+	end
+end
+				
