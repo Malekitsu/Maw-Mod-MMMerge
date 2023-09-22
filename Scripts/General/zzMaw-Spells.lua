@@ -590,7 +590,7 @@ function events.Action(t)
 		end
 	end
 	--power cure
-	if t.Action==142 and t.Action.Param=77 then
+	if t.Action==142 and t.Action.Param==77 then
 		local persBonus=Party[Game.CurrentPlayer]:GetPersonality()/1000
 		local intBonus=Party[Game.CurrentPlayer]:GetIntellect()/1000
 		local statBonus=math.max(persBonus,intBonus)
@@ -616,10 +616,16 @@ function events.Action(t)
 		end
 	end
 end
-
+function events.GameInitialized2()
+	Game.Spells[68]["SpellPointsNormal"]=2
+	Game.Spells[68]["SpellPointsExpert"]=3
+	Game.Spells[68]["SpellPointsMaster"]=4
+	Game.Spells[68]["SpellPointsGM"]=5
+end
+	
 --Invisibility Nerf
 function events.Action(t)
-	if t.Action == 142 and t.Action.Param=19 then
+	if t.Action == 142 and t.Action.Param==19 then
 		local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[const.Skills.Air])
 		Sleep(1)
 		local minutesPerSkill=(m-3)*3+3
