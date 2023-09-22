@@ -155,9 +155,9 @@ function events.ItemGenerated(t)
 		ancientRoll=math.random(1,50)
 		if ancientRoll<=1 then
 			ancient=true
-			t.Item.Charges=math.random(math.round(encStrUp[pseudoStr+3]+1),math.round(encStrUp[pseudoStr+3]*1.25))+math.random(1,16)*1000
+			t.Item.Charges=math.random(math.round(encStrUp[pseudoStr]+1),math.round(encStrUp[pseudoStr]*1.25))+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.random(math.round(encStrUp[pseudoStr+3]+1),math.round(encStrUp[pseudoStr+3]*1.25))
+			t.Item.BonusStrength=math.random(math.round(encStrUp[pseudoStr]+1),math.round(encStrUp[pseudoStr]*1.25))
 			power=2
 			chargesBonus=math.random(1,5)
 			t.Item.MaxCharges=t.Item.MaxCharges+chargesBonus
@@ -194,9 +194,9 @@ function events.ItemGenerated(t)
 				t.Item.MaxCharges=t.Item.MaxCharges-chargesBonus
 			end
 			t.Item.BonusExpireTime=2
-			t.Item.Charges=math.round(encStrUp[pseudoStr+3]*1.25)+math.random(1,16)*1000
+			t.Item.Charges=math.round(encStrUp[pseudoStr]*1.25)+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.round(encStrUp[pseudoStr+3]*1.25)
+			t.Item.BonusStrength=math.round(encStrUp[pseudoStr]*1.25)
 			t.Item.MaxCharges=t.Item.MaxCharges+5
 			--apply special enchant
 			n=t.Item.Number
@@ -921,46 +921,48 @@ end
 
 --calculate price
 function events.CalcItemValue(t)
-	--base value
-	basePrice=Game.ItemsTxt[t.Item.Number].Value
-	if reagentList[t.Item.Number] then
-		local bonus=math.round(reagentList[t.Item.Number] *((t.Item.Bonus*0.75)/20+1)+t.Item.Bonus*0.75)
-		t.Enchantment="Power: " .. bonus
-		t.Value=bonus*10
-		return
-	end
-	--add enchant price
-	bonus1=t.Item.BonusStrength*100
-	if t.Item.Bonus==8 or t.Item.Bonus==9 then
-		bonus1=bonus1/2
-	end
-	if t.Item.Bonus>16 and t.Item.Bonus<=24 then
-		bonus1=(bonus1/100)^2*100
-	end
-	bonus2=(t.Item.Charges%1000)*100
-	if math.floor(t.Item.Charges/1000)==8 or math.floor(t.Item.Charges/1000)==9 then
-		bonus1=bonus1/2
-	end
-	
-	MaxCharges=t.Item.MaxCharges
-	if MaxCharges <= 20 then
-		mult=1+MaxCharges/20
-	else
-		mult=2+2*(MaxCharges-20)/20
-	end
-	basePrice=basePrice*mult
-	if t.Item.Bonus2>0 then
-		special=Game.SpcItemsTxt[t.Item.Bonus2-1].Value
-		if bonusEffects[t.Item.Bonus2]~=nil then
-			special=special*mult
+	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then
+		--base value
+		basePrice=Game.ItemsTxt[t.Item.Number].Value
+		if reagentList[t.Item.Number] then
+			local bonus=math.round(reagentList[t.Item.Number] *((t.Item.Bonus*0.75)/20+1)+t.Item.Bonus*0.75)
+			t.Enchantment="Power: " .. bonus
+			t.Value=bonus*10
+			return
 		end
-		if special<11 then
-			basePrice=basePrice*special
+		--add enchant price
+		bonus1=t.Item.BonusStrength*100
+		if t.Item.Bonus==8 or t.Item.Bonus==9 then
+			bonus1=bonus1/2
+		end
+		if t.Item.Bonus>16 and t.Item.Bonus<=24 then
+			bonus1=(bonus1/100)^2*100
+		end
+		bonus2=(t.Item.Charges%1000)*100
+		if math.floor(t.Item.Charges/1000)==8 or math.floor(t.Item.Charges/1000)==9 then
+			bonus1=bonus1/2
+		end
+		
+		MaxCharges=t.Item.MaxCharges
+		if MaxCharges <= 20 then
+			mult=1+MaxCharges/20
 		else
-			basePrice=basePrice+special
+			mult=2+2*(MaxCharges-20)/20
 		end
+		basePrice=basePrice*mult
+		if t.Item.Bonus2>0 then
+			special=Game.SpcItemsTxt[t.Item.Bonus2-1].Value
+			if bonusEffects[t.Item.Bonus2]~=nil then
+				special=special*mult
+			end
+			if special<11 then
+				basePrice=basePrice*special
+			else
+				basePrice=basePrice+special
+			end
+		end
+		t.Value=basePrice+bonus1+bonus2
 	end
-	t.Value=basePrice+bonus1+bonus2
 end
 
 --modify weapon enchant damage
