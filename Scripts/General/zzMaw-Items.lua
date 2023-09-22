@@ -1264,6 +1264,10 @@ function events.BeforeNewGameAutosave()
 		for j=1, Party[0].Items.High do
 			Party[i].Items[j].MaxCharges=0
 			Party[i].Items[j].Charges=0
+			Party[i].Items[j].BonusExpireTime=0
+			if Party[i].Items[j].Bonus>24 then
+				Party[i].Items[j].Bonus=0
+			end
 		end
 	end
 end
