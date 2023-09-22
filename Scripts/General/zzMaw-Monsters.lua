@@ -16,10 +16,16 @@ BLevel={}
 	end
 end
 --------------------------------------
---DO THE SAME BUT FOR UNIQUE MONSTERS
+--UNIQUE MONSTERS BUFF
 --------------------------------------
 
 function events.AfterLoadMap()	
+	for i=0, Map.Monsters.High do
+		--SPEED
+		if Map.Monsters[i].Velocity>150 then
+			Map.Monsters[i].Velocity=(Map.Monsters[i].Velocity + (400 - Map.Monsters[i].Velocity) / 2 +100)
+		end
+	end	
 	for i=0, Map.Monsters.High do
 		local mon=Map.Monsters[i]
 		lvlMult=(mon.Level+5)/(basetable[Map.Monsters[i].Id].Level+5)
@@ -44,12 +50,9 @@ function events.AfterLoadMap()
 		end
 		--calculate average level for unique monsters
 		for i=0, Map.Monsters.High do
-			--VELOCITY/SPEED on hostile monsters only
 			--gold fix
 			mon=Map.Monsters[i]
-			if mon.Velocity>150 then
-				mon.Velocity = (mon.Velocity + (400 - mon.Velocity) / 4 +50)
-			end
+			
 			if  (mon.FullHitPoints ~= Game.MonstersTxt[Map.Monsters[i].Id].FullHitPoints) and mon.Level>5 then
 				--level increase 
 				oldLevel=mon.Level
@@ -60,7 +63,7 @@ function events.AfterLoadMap()
 				mon.FullHP=mon.HP
 
 				--damage
-				dmgMult=(mon.Level/20+1.25)*((mon.Level^1.15-1)/1000+1)*((mon.Level^1.25-1)/1000+1)	
+				dmgMult=(mon.Level/20+1.25)*((mon.Level^1.35-1)/1000+1)*((mon.Level^1.35-1)/1000+1)	
 				-----------------------------------------------------------
 				--DAMAGE COMPUTATION DOWN HERE, FOR BALANCE MODIFY ABOVE^
 				--attack 1
@@ -294,6 +297,7 @@ function events.LoadMap()
 		mon=Game.MonstersTxt[i]
 		base=basetable[i]		
 		LevelB=BLevel[i]
+		
 		--ADJUST HP
 		hpMult=1
 		if i%3==1 then
