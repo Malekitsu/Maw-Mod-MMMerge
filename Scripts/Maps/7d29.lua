@@ -1,4 +1,4 @@
---HARMONDALE CASTLE
+
 -- Golem quest (wizard first promotion) (mm7)
 
 evt.Map[376] = function()
@@ -51,10 +51,11 @@ evt.map[1000] = function()
 								mon.FullHP = mon.FullHP*3 
 								mon.HP = mon.FullHP  
 								mon.NameId=300
+								mon.Velocity=400
 								end}
-			pseudoSpawnpoint{monster = 271, x = -5122, y = 2219, z = 1, count = 2, powerChances = {0, 100, 0}, radius = 128, group = 1}
-			pseudoSpawnpoint{monster = 271,  x = -4423, y = 1456, z = 1 , count = 3, powerChances = {100, 0, 0}, radius = 256, group = 1}
-			pseudoSpawnpoint{monster = 271,  x = -5937, y = 1456, z = 1  , count = 3, powerChances = {100, 0, 0}, radius = 256, group = 1}
+			pseudoSpawnpoint{monster = 271, x = -5122, y = 2219, z = 1, count = 2, powerChances = {0, 100, 0}, radius = 128, group = 1, transform = function(mon) mon.Velocity=400 end}
+			pseudoSpawnpoint{monster = 271,  x = -4423, y = 1456, z = 1 , count = 3, powerChances = {100, 0, 0}, radius = 256, group = 1, transform = function(mon) mon.Velocity=400 end}
+			pseudoSpawnpoint{monster = 271,  x = -5937, y = 1456, z = 1  , count = 3, powerChances = {100, 0, 0}, radius = 256, group = 1, transform = function(mon) mon.Velocity=400 end}
 		end
 	end
 end
