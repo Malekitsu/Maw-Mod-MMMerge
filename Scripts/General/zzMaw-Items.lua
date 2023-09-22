@@ -182,7 +182,6 @@ function events.ItemGenerated(t)
 					end
 				end	
 			end			
-			::continue::
 		end
 		
 		::continue::
@@ -224,10 +223,13 @@ function events.ItemGenerated(t)
 		if math.floor(t.Item.Charges/1000)==10 then
 			t.Item.Charges=t.Item.Charges-math.floor(t.Item.Charges%1000)/2
 		end
+		-- buff to 2h weapons enchants
+		if t.Item:T().EquipStat == 1 then
+			t.Item.BonusStrength=t.Item.BonusStrength*2
+			t.Item.Charges=t.Item.Charges+t.Item.Charges%1000
+		end
 	end
 end
-
-
 
 --apply charges effect
 function events.CalcStatBonusByItems(t)
