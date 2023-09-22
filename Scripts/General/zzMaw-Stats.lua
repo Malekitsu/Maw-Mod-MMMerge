@@ -3,10 +3,10 @@ function events.CalcDamageToMonster(t)
 	--luck/accuracy bonus
 	if data and data.Player and t.DamageKind==4 then
 		if data.Object==nil or data.Object.Spell==133 then
-			luck=data.Player:GetLuck()
-			accuracy=data.Player:GetAccuracy()
+			luck=data.Player:GetLuck()/15
+			accuracy=data.Player:GetAccuracy()*3/2
 			critDamage=accuracy/500
-			critChance=50+luck/2
+			critChance=50+luck*4/3
 			roll=math.random(1, 1000)
 			if roll <= critChance then
 				t.Result=t.Result*(1.5+critDamage)
@@ -41,8 +41,8 @@ function events.CalcSpellDamage(t)
 		luck=data.Player:GetLuck()
 		bonus=math.max(intellect,personality)
 		critDamage=bonus/1000
-		t.Result=t.Result*(1+bonus/1000)
-		critChance=50+luck
+		t.Result=t.Result*(1+bonus/1000*3/2) 
+		critChance=50+luck*4/3
 		roll=math.random(1, 1000)
 		if roll <= critChance then
 			t.Result=t.Result*(1.5+critDamage)
@@ -107,12 +107,12 @@ function events.BuildStatInformationBox(t)
 	fullSP=Party[i]:GetFullSP()
 	personality=Party[i]:GetPersonality()
 	intellect=Party[i]:GetIntellect()
-	t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing: %s%s",Game.StatsDescriptions[1],intellect/10,"%",intellect/10+50,"%")
+	t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing: %s%s",Game.StatsDescriptions[1],intellect/10,"%",intellect/10*3/2+50,"%")
 	end
 	if t.Stat==2 then
 	i=Game.CurrentPlayer
 	personality=Party[i]:GetPersonality()
-	t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing bonus: %s%s",Game.StatsDescriptions[2],personality/10,"%",personality/10+50,"%")
+	t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing bonus: %s%s",Game.StatsDescriptions[2],personality/10,"%",personality/10*3/2+50,"%")
 	end
 	if t.Stat==3 then
 	i=Game.CurrentPlayer
@@ -124,7 +124,7 @@ function events.BuildStatInformationBox(t)
 	if t.Stat==4 then
 	i=Game.CurrentPlayer
 	accuracy=Party[i]:GetAccuracy()
-	t.Text=string.format("%s\n\nCritical melee and bow strike damage bonus: %s%s",Game.StatsDescriptions[4],accuracy/5+50,"%")
+	t.Text=string.format("%s\n\nCritical melee and bow strike damage bonus: %s%s",Game.StatsDescriptions[4],accuracy/5*3/2+50,"%")
 	end
 	if t.Stat==5 then
 	i=Game.CurrentPlayer
@@ -134,7 +134,7 @@ function events.BuildStatInformationBox(t)
 	if t.Stat==6 then
 	i=Game.CurrentPlayer
 	luck=Party[i]:GetLuck()
-	t.Text=string.format("%s\n\nCritical strike chance: %s%s",Game.StatsDescriptions[6],luck/20+5,"%")
+	t.Text=string.format("%s\n\nCritical strike chance: %s%s",Game.StatsDescriptions[6],math.round((luck/20*4/3+5)*100)/100,"%")
 	end
 	if t.Stat==7 then
 	local index=Game.CurrentPlayer
