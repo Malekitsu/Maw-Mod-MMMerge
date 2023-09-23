@@ -1412,7 +1412,7 @@ function events.KeyDown(t)
 			end
 			if heal then
 				Party[0].Items[index].Number=0
-				local spAmount=math.round(Bonus^1.4*2/3)+10
+				local spAmount=math.round(bonus^1.4*2/3)+10
 				evt.Add("SP",20+bonus*2)
 				vars.manaPotionCooldown=15
 				Game.ShowStatusText(string.format("Mana Potion restores %s mana",spAmount))
