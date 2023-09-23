@@ -152,8 +152,9 @@ function events.ItemGenerated(t)
 				
 		--ancient item
 		ancient=false
-		ancientRoll=math.random(1,50)
-		if ancientRoll<=1 then
+		ancientChance=(enc1Chance[pseudoStr]/100)*(enc2Chance[pseudoStr]/100)*(spcEncChance[pseudoStr]/100)/4
+		ancientRoll=math.random()
+		if ancientRoll<=ancientChance then
 			ancient=true
 			t.Item.Charges=math.random(math.round(encStrUp[pseudoStr]+1),math.round(encStrUp[pseudoStr]*1.25))+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
@@ -187,8 +188,9 @@ function events.ItemGenerated(t)
 		::continue::
 		
 		--primordial item
-		primordial=math.random(1,200)
-		if primordial<=1 then
+		primordial=math.random()
+		primordialChance=ancientChance/4
+		if primordial<=primordialChance then
 			if ancient then
 				t.Item.MaxCharges=t.Item.MaxCharges-chargesBonus
 			end
