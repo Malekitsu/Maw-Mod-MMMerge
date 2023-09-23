@@ -59,11 +59,12 @@ function events.AfterLoadMap()
 				mon.Level=math.min(mon.Level+partyLvl,255)
 				--HP calculated based on previous HP rapported to the previous level
 				HPRateo=mon.HP/(oldLevel*(oldLevel/10+3))
-				mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2*(1+mon.Level/180))*HPRateo,32500)
+				HPBolsterLevel=oldLevel*(1+(0.75*partyLvl/100))+partyLvl*0.75
+				mon.HP=math.min(math.round(HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180))*HPRateo,32500)
 				mon.FullHP=mon.HP
 
 				--damage
-				dmgMult=(mon.Level/20+1.25)*((mon.Level^1.35-1)/1000+1)*((mon.Level^1.35-1)/1000+1)	
+				dmgMult=(mon.Level/15+1.5)*((mon.Level^1.3-1)/1000+1)^2
 				-----------------------------------------------------------
 				--DAMAGE COMPUTATION DOWN HERE, FOR BALANCE MODIFY ABOVE^
 				--attack 1
@@ -261,10 +262,10 @@ function events.LoadMap()
 		mon.Level=math.min(basetable[i].Level+bolsterLevel,255)
 		
 		--HP
-		
-		mon.HP=math.min(math.round(mon.Level*(mon.Level/10+3)*2),32500)
+		HPBolsterLevel=basetable[i].Level*(1+(0.75*bolsterLevel/100))+bolsterLevel*0.75
+		mon.HP=math.min(math.round(HPBolsterLevel*(HPBolsterLevel/10+3)*2),32500)
 		if ItemRework and StatsRework then
-			mon.HP=math.min(math.round(mon.HP*(1+mon.Level/180),32500))
+			mon.HP=math.min(math.round(mon.HP*(1+HPBolsterLevel/180),32500))
 		end
 		mon.FullHP=mon.HP
 		--[[resistances
@@ -324,7 +325,7 @@ function events.LoadMap()
 		
 		mon.ArmorClass=mon.ArmorClass*((levelMult+10)/(LevelB+10))
 		mon.ArmorClass=mon.Level
-		dmgMult=(levelMult/18+1.25)*((levelMult+2)/(2+LevelB))*((levelMult^1.35-1)/1000+1)^2
+		dmgMult=(levelMult/15+1.5)*((levelMult+2)/(2+LevelB))*((levelMult^1.3-1)/1000+1)^2
 		-----------------------------------------------------------
 		--DAMAGE COMPUTATION DOWN HERE, FOR BALANCE MODIFY ABOVE^
 		--attack 1
