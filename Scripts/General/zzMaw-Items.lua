@@ -333,8 +333,16 @@ function events.DoBadThingToPlayer(t)
         end
     end
 end
-
-
+function events.GameInitialized2()
+--new tooltips
+	Game.SpcItemsTxt[17].BonusStat="Disease and Curse Immunity"
+	Game.SpcItemsTxt[18].BonusStat="Insanity and SP drain Immunity"
+	Game.SpcItemsTxt[19].BonusStat="Paralysis and fear Immunity"
+	Game.SpcItemsTxt[20].BonusStat="Poison and weakness Immunity"
+	Game.SpcItemsTxt[21].BonusStat="Sleep and Unconscious Immunity"
+	Game.SpcItemsTxt[22].BonusStat="Stone and premature ageing Immunity"
+	Game.SpcItemsTxt[24].BonusStat="Death and erad. Immunity, +5 Levels"
+end
 --------------------
 --STATUS REWORK (needs to stay after status immunity)
 --------------------
