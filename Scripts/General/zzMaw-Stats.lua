@@ -339,15 +339,24 @@ function events.CalcDamageToPlayer(t)
 		maxres=math.min(maxres,90)
 		res=math.min(res,maxres)/100
 		
+		--fix for multiplayer
+		local REMOTE_OWNER_BIT = 0x800
+		local source = WhoHitPlayer()
+		if source then
+		local obj = source.Object
+			if obj and bit.And(obj.Bits, REMOTE_OWNER_BIT) > 0 then
+				return
+			end
+		end
 		
-		--[[randomize resistance
-		local roll=math.random()
+		--randomize resistance
+		local roll=(math.random()+math.random())/2
 		if roll<0.5 then
-			res=res/(1+roll*2)
+			res=math.max(res-((1-res)*roll*2),0)
 		else
 			res=res+(1-res)/(roll*2)
 		end
-		]]
+		
 		--apply Damage
 		t.Result = t.Damage * (1-res)
 		data=WhoHitPlayer()
