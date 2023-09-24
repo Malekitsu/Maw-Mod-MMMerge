@@ -178,6 +178,7 @@ function events.BuildStatInformationBox(t)
 	regen=math.ceil(fullSP*SPregenItem*0.005)+medRegen
 	t.Text=string.format("%s\n\nSpell point regen per 10 seconds: %s",t.Text,StrColor(40,100,255,regen))
 	end
+	
 	if t.Stat==9 then
 	i=Game.CurrentPlayer
 	ac=Party[i]:GetArmorClass()
@@ -185,8 +186,9 @@ function events.BuildStatInformationBox(t)
 	lvl=Party[i].LevelBase
 	blockChance= 100-math.round((5+lvl*2)/(10+lvl*2+ac)*10000)/100
 	totRed= math.round((100-blockChance)*(100-acReduction))/100
-	t.Text=string.format("%s\n\nPhysical damage reduction from AC: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\nBlock chance vs same level monsters: " .. StrColor(255,255,100,blockChance) .. StrColor(255,255,100,"%") .. "\n\nTotal average reduction: " .. StrColor(255,255,100,totRed) .. "%")
+	t.Text=string.format("%s\n\nPhysical damage reduction from AC: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\nBlock chance vs same level monsters: " .. StrColor(255,255,100,blockChance) .. StrColor(255,255,100,"%") .. "\n\nTotal average damage taken: " .. StrColor(255,255,100,totRed) .. "%")
 	end
+	
 	if t.Stat==13 or t.Stat==14 then
 		bolsterLevel8=vars.MM7LVL+vars.MM6LVL
 		bolsterLevel7=vars.MM8LVL+vars.MM6LVL
