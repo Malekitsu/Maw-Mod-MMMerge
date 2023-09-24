@@ -7,7 +7,6 @@ evt.Map[1000] = function()
 		end
 	end
 end
-
 Timer(evt.map[1000].last, const.Minute)
 
 evt.Map[1001] = function()
@@ -24,6 +23,4 @@ evt.Map[1001] = function()
 		end
 	end
 end
-
-Timer(evt.map[1000].last, const.Minute)
 Timer(evt.map[1001].last, const.Minute)
