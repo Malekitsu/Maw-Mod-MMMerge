@@ -350,12 +350,8 @@ function events.CalcDamageToPlayer(t)
 		end
 		
 		--randomize resistance
-		local roll=(math.random()+math.random())/2
-		if roll<0.5 then
-			res=math.max(res-((1-res)*roll*2),0)
-		else
-			res=res+(1-res)/(roll*2)
-		end
+		local roll=(math.random()+math.random())-1
+		res=math.max(0, res+(math.min(res,1-res)*roll))
 		
 		--apply Damage
 		t.Result = t.Damage * (1-res)
