@@ -182,7 +182,9 @@ function events.BuildStatInformationBox(t)
 	i=Game.CurrentPlayer
 	ac=Party[i]:GetArmorClass()
 	acReduction=math.round(1000-1000/(ac/300+1))/10
-	t.Text=string.format("%s\n\nPhysical damage reduction from AC: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%"))
+	lvl=Party[i].LevelBase
+	blockChance= 100-math.round((5+lvl*2)/(10+lvl*2+ac)*10000)/100
+	t.Text=string.format("%s\n\nPhysical damage reduction from AC: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\nBlock chance vs same level monsters: " .. StrColor(255,255,100,blockChance) .. StrColor(255,255,100,"%"))
 	end
 	if t.Stat==13 or t.Stat==14 then
 		bolsterLevel8=vars.MM7LVL+vars.MM6LVL
@@ -202,6 +204,58 @@ function events.BuildStatInformationBox(t)
 		end
 		t.Text=t.Text .."\n\nLevels gained in MM6: " .. StrColor(255,255,153,math.round(vars.MM6LVL*100)/100) .. "\nLevels gained in MM7: " .. StrColor(255,255,153,math.round(vars.MM7LVL*100)/100) .. "\nLevels gained in MM8: " .. StrColor(255,255,153,math.round(vars.MM8LVL*100)/100) .. "\n\nBolster Level in MM6: " .. StrColor(255,255,153,math.round(bolsterLevel6)) .."\nBolster Level in MM7: " .. StrColor(255,255,153,math.round(bolsterLevel7)) .."\nBolster Level in MM8: " .. StrColor(255,255,153,math.round(bolsterLevel8))
 	end
+	if t.Stat==15 then
+	local i=Game.CurrentPlayer
+	local atk=Party[i]:GetMeleeAttack()
+	local lvl=Party[i].LevelBase
+	local hitChance= math.round((15+atk*2)/(30+atk*2+lvl)*10000)/100
+	t.Text=string.format("%s\n\nHit chance vs same level monster: %s%s",t.Text,StrColor(255,255,100,hitChance),StrColor(255,255,100,"%"))
+	end
+	
+	if t.Stat==16 then
+	local i=Game.CurrentPlayer
+	local low=Party[i]:GetMeleeDamageMin()
+	local high=Party[i]:GetMeleeDamageMax()
+	local might=Party[i]:GetMight()
+	local accuracy=Party[i]:GetAccuracy()
+	local luck=Party[i]:GetLuck()
+	local delay=Party[i]:GetAttackDelay()
+	local dmg=(low+high)/2
+	--hit chance
+	local atk=Party[i]:GetMeleeAttack()
+	local lvl=Party[i].LevelBase
+	local hitChance= (15+atk*2)/(30+atk*2+lvl)
+	local DPS=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
+	t.Text=string.format("%s\n\nDamage per second: %s",t.Text,StrColor(255,255,100,DPS))
+	end
+	
+	
+	
+	if t.Stat==17 then
+	local i=Game.CurrentPlayer
+	local atk=Party[i]:GetRangedAttack()
+	local lvl=Party[i].LevelBase
+	local hitChance= math.round((15+atk*2)/(30+atk*2+lvl)*10000)/100
+	t.Text=string.format("%s\n\nHit chance vs same level monster: %s%s",t.Text,StrColor(255,255,100,hitChance),StrColor(255,255,100,"%"))
+	end
+	
+	if t.Stat==18 then
+	local i=Game.CurrentPlayer
+	local low=Party[i]:GetRangedDamageMin()
+	local high=Party[i]:GetRangedDamageMax()
+	local might=Party[i]:GetMight()
+	local accuracy=Party[i]:GetAccuracy()
+	local luck=Party[i]:GetLuck()
+	local delay=Party[i]:GetAttackDelay()
+	local dmg=(low+high)/2
+	--hit chance
+	local atk=Party[i]:GetRangedAttack()
+	local lvl=Party[i].LevelBase
+	local hitChance= (15+atk*2)/(30+atk*2+lvl)
+	local DPS=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
+	t.Text=string.format("%s\n\nDamage per second: %s",t.Text,StrColor(255,255,100,DPS))
+	end
+	
 	if t.Stat>=19 and t.Stat<=24 then
 		t.Text=t.Text .. "\n\nDamage is reduced by an amount equal to % shown above.\nMax resistance is 75%(beside immune status) and can be increased with some special enchants\n\nLight resistance is equal to the lowest between Mind and Body resistances.\nDark resistance is equal to the lowest between elemental resistances\nEnergy resistance is equal to the lowest resistance"
 	end
