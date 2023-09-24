@@ -15,7 +15,23 @@ evt.Map[1001] = function()
 	if mapvars.ambush and spawnCount>0 then
 		spawnCount=spawnCount-1
 		if spawnCount==0 then
-			pseudoSpawnpoint{monster = 296,  x = -7532, y = 7495, z = -1535, count = 1, powerChances = {0, 100, 0}, radius = 256, group = 1,transform = function(mon) mon.ShowOnMap = true mon.HP=mon.HP*2.5 mon.FullHP=mon.HP mon.Attack1Type=0 mon.Attack1Missile = 0 mon.Spell = 6 mon.SpellChance = 25 mon.SpellSkill=3 mon.MoveSpeed=400 mon.MoveType= 0 mon.TreasureItemLevel  = 6 mon.TreasureItemPercent = 100 mon.TreasureItemPercent = 100 end}
+			pseudoSpawnpoint{monster = 296,  x = -7532, y = 7495, z = -1535, count = 1, powerChances = {0, 100, 0}, radius = 256, group = 1,transform = function(mon) mon.ShowOnMap = true 
+				mon.HP=mon.HP*2.5 
+				mon.FullHP=mon.HP 
+				mon.Attack1Type=0 
+				mon.Attack1Missile = 0 
+				mon.Spell = 6 
+				mon.SpellChance = 100 
+				mon.SpellSkill=math.min(3+math.round(bolsterLevel/10),60)
+				mon.Velocity=400 
+				mon.MoveType= 0 
+				mon.TreasureItemPercent = 100 
+				if bolsterLevel>25 then
+					mon.Items[0].Number=405
+				else
+					mon.Items[0].Number=410
+				end
+			end}
 			return
 		end
 		pseudoSpawnpoint{monster = 412,  x = -7532, y = 7495, z = -1535, count = 1, powerChances = {50, 35, 15}, radius = 256, group = 1,transform = function(mon) mon.ShowOnMap = true end}
