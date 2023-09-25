@@ -429,3 +429,11 @@ function events.GameInitialized2()
 
 	end
 end
+
+--fix to monsters AI
+function events.GameInitialized2()
+	Game.HostileTxt[152][0]=4
+	Game.HostileTxt[143][0]=4
+	Game.HostileTxt[152][143]=0
+	Game.HostileTxt[143][152]=0
+end
