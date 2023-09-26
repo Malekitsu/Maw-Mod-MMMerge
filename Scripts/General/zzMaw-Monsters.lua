@@ -332,15 +332,15 @@ function events.LoadMap()
 		mon.Attack1.DamageAdd = base.Attack1.DamageAdd * dmgMult
 		b=base.Attack1.DamageDiceSides * dmgMult^0.5
 		mon.Attack1.DamageDiceSides = base.Attack1.DamageDiceSides * dmgMult^0.5
+		e=base.Attack1.DamageDiceCount * dmgMult^0.5
 		mon.Attack1.DamageDiceCount = base.Attack1.DamageDiceCount * dmgMult^0.5
 		--attack 2
 		c=mon.Attack2.DamageAdd * dmgMult
 		mon.Attack2.DamageAdd = base.Attack2.DamageAdd * dmgMult
 		d=mon.Attack2.DamageDiceSides * dmgMult
 		mon.Attack2.DamageDiceSides = base.Attack2.DamageDiceSides * dmgMult^0.5
+		f=base.Attack2.DamageDiceCount * dmgMult^0.5
 		mon.Attack2.DamageDiceCount = base.Attack2.DamageDiceCount * dmgMult^0.5
-		e=0
-		f=0
 		--OVERFLOW FIX
 		--Attack 1 Overflow fix
 		--add damage fix
@@ -355,7 +355,7 @@ function events.LoadMap()
 		Overflow = b / 250
 		mon.Attack1.DamageDiceSides = 250
 		--checking for dice count overflow
-		e = mon.Attack1.DamageDiceCount * Overflow
+		e = e * Overflow
 		mon.Attack1.DamageDiceCount = e
 		end
 		--Just in case Dice Count fix
@@ -375,7 +375,7 @@ function events.LoadMap()
 		Overflow = d / 250
 		mon.Attack2.DamageDiceSides = 250
 		--checking for dice count overflow
-		f=mon.Attack2.DamageDiceCount * Overflow
+		f=f * Overflow
 		mon.Attack2.DamageDiceCount = mon.Attack2.DamageDiceCount * Overflow
 		end
 		--Just in case Dice Count fix
