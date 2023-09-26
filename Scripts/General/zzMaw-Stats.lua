@@ -415,7 +415,7 @@ function events.CalcDamageToPlayer(t)
 		data=WhoHitPlayer()
 		if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
 			oldLevel=BLevel[data.Monster.Id]
-			dmgMult=(data.Monster.Level/15+1.5)*((data.Monster.Level+2)/(oldLevel+2))*((data.Monster.Level^1.3-1)/1000+1)^2
+			dmgMult=(data.Monster.Level/20+1)*((data.Monster.Level+2)/(oldLevel+2))*((data.Monster.Level^1.4-1)/1000+1)
 			t.Result=t.Result*dmgMult
 		end
 		--actually substitute damage
