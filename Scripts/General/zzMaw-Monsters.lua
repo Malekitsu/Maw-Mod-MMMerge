@@ -131,7 +131,7 @@ function events.AfterLoadMap()
 					end
 				end
 				-------------------------
-				--END DAMAGE CALCULATION
+				--end DAMAGE CALCULATION
 				-------------------------
 			end
 		end
@@ -262,7 +262,7 @@ function events.LoadMap()
 		mon.Level=math.min(basetable[i].Level+bolsterLevel,255)
 		
 		--HP
-		HPBolsterLevel=basetable[i].Level*(1+(0.75*bolsterLevel/100))+bolsterLevel*0.75
+		HPBolsterLevel=basetable[i].Level*(1+(0.25*bolsterLevel/100))+bolsterLevel*0.75
 		mon.HP=math.min(math.round(HPBolsterLevel*(HPBolsterLevel/10+3)*2),32500)
 		if ItemRework and StatsRework then
 			mon.HP=math.min(math.round(mon.HP*(1+HPBolsterLevel/180),32500))
@@ -353,8 +353,23 @@ function events.LoadMap()
 		mon.Attack2.DamageDiceCount = basetable[i].Attack2.DamageDiceCount * dmgMult^0.5
 
 		-------------------------
-		--END DAMAGE CALCULATION
+		--end DAMAGE CALCULATION
 		-------------------------
+	end
+	if bolsterLevel>20 then
+		for i=1, 651 do
+			--calculate level scaling
+			mon=Game.MonstersTxt[i]
+			if i%3==1 then
+				mon.HP=(mon.HP+mon.HP*(basetable[i].FullHP/basetable[i+1].FullHP))/2
+			elseif i%3==0 then
+				mon.HP=(mon.HP+mon.HP*(basetable[i].FullHP/basetable[i-1].FullHP))/2
+			end
+			mon.FullHP=mon.HP
+			if mon.FullHP>1000 then
+				mon.FullHP=math.round(mon.FullHP/10)*10
+			end
+		end
 	end
 end
 
