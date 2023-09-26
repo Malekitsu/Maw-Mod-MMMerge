@@ -62,28 +62,28 @@ function events.GameInitialized2()
 	--if you change diceMin or values that are 0 remember to update the tooltip manually 
 	spellPowers =
 		{
-			[2] = {dmgAdd = 0, diceMin = 1, diceMax = 3, },--fire bolt
+			[2] = {dmgAdd =6, diceMin = 1, diceMax = 3, },--fire bolt
 			[6] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--fireball
 			[7] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--fire spike, the only spell with damage depending on mastery, fix in events.calcspelldamage
 			[8] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--immolation
 			[9] = {dmgAdd = 8, diceMin = 1, diceMax = 1, },--meteor shower
 			[10] = {dmgAdd = 12, diceMin = 2, diceMax = 2, },--inferno
 			[11] = {dmgAdd = 15, diceMin = 1, diceMax = 15, },--incinerate
-			[15] = {dmgAdd = 2, diceMin = 1, diceMax = 1, },--sparks
+			[15] = {dmgAdd = 4, diceMin = 2, diceMax = 2, },--sparks
 			[18] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--lightning bolt
 			[20] = {dmgAdd = 12, diceMin = 1, diceMax = 12, },--implosion
 			[22] = {dmgAdd = 20, diceMin = 1, diceMax = 1, },--starburst
-			[24] = {dmgAdd = 2, diceMin = 1, diceMax = 2, },--poison spray
+			[24] = {dmgAdd = 4, diceMin = 1, diceMax = 2, },--poison spray
 			[26] = {dmgAdd = 0, diceMin = 1, diceMax = 4, },--ice bolt
 			[29] = {dmgAdd = 9, diceMin = 1, diceMax = 9, },--acid burst
 			[32] = {dmgAdd = 12, diceMin = 1, diceMax = 6, },--ice blast
-			[37] = {dmgAdd = 5, diceMin = 1, diceMax = 3, },--deadly swarm
+			[37] = {dmgAdd = 12, diceMin = 1, diceMax = 4, },--deadly swarm
 			[39] = {dmgAdd = 0, diceMin = 1, diceMax = 9, },--blades
 			[41] = {dmgAdd = 10, diceMin = 1, diceMax = 10, },--rock blast
 			[43] = {dmgAdd = 20, diceMin = 2, diceMax = 2, },--death blossom
 			[44] = {dmgAdd = 15, diceMin = 1, diceMax = 1, },--mass distorsion, nerfed
 			[52] = {dmgAdd = 10, diceMin = 2, diceMax = 8, },--spirit lash
-			[59] = {dmgAdd = 3, diceMin = 1, diceMax = 3, },--mind blast
+			[59] = {dmgAdd = 8, diceMin = 1, diceMax = 4, },--mind blast
 			[65] = {dmgAdd = 12, diceMin = 1, diceMax = 12, },--psychic shock
 			[70] = {dmgAdd = 8, diceMin = 1, diceMax = 2, },--harm
 			[76] = {dmgAdd = 20, diceMin = 1, diceMax = 10, },--flying fist
@@ -506,7 +506,7 @@ function events.Tick()
 			
 				
 			--change tooltips according to ascended damage
-			Game.SpellsTxt[2].Description=string.format("Launches a burst of fire at a single target.  Damage is 1-%s points of damage per point of skill in Fire Magic.   Firebolt is safe, effective and has a low casting cost.",diceMaxTooltip(level,2))
+			Game.SpellsTxt[2].Description=string.format("Launches a burst of fire at a single target.  Damage is %s+1-%s points of damage per point of skill in Fire Magic.   Firebolt is safe, effective and has a low casting cost.",dmgAddTooltip(level,2),diceMaxTooltip(level,2))
 			Game.SpellsTxt[6].Description=string.format("Fires a ball of fire at a single target. When it hits, the ball explodes damaging all those nearby, including your characters if they're too close.  Fireball does 1-%s points of damage per point of skill in Fire Magic.",diceMaxTooltip(level,6))
 			--fire spikes fix
 			Game.SpellsTxt[7].Expert=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",diceMaxTooltip(level,7))
