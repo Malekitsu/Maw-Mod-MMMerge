@@ -361,9 +361,9 @@ function events.LoadMap()
 			--calculate level scaling
 			mon=Game.MonstersTxt[i]
 			if i%3==1 then
-				mon.HP=(mon.HP+mon.HP*(basetable[i].FullHP/basetable[i+1].FullHP))/2
+				mon.HP=(mon.HP*0.3+Game.MonstersTxt[i+1].HP*(basetable[i].FullHP/basetable[i+1].FullHP))/1.3
 			elseif i%3==0 then
-				mon.HP=(mon.HP+mon.HP*(basetable[i].FullHP/basetable[i-1].FullHP))/2
+				mon.HP=(mon.HP*0.3+Game.MonstersTxt[i-1].HP*(basetable[i].FullHP/basetable[i-1].FullHP))/1.3
 			end
 			mon.FullHP=mon.HP
 			if mon.FullHP>1000 then
