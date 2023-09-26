@@ -20,14 +20,27 @@ function events.CalcDamageToMonster(t)
 end
 
 --speed
+--revert unarmed code from misctweaks
+function events.GetArmorClass(t)
+	if t.AC==10000 then
+		t.AC=t.Player:GetArmorClass()
+	end
+end
+
 function events.CalcDamageToPlayer(t)
+	--UNARMED bonus aswell
+	unarmed=0
+	Skill, Mas = SplitSkill(t.Player:GetSkill(const.Skills.Unarmed))
+	if Mas == 4 then
+		unarmed=Skill
+	end
 	speed=t.Player:GetSpeed()
 	speedEffect=speed/10
-	dodgeChance=(1-0.995^speedEffect)*100
-	roll=math.random(1, 100)
+	dodgeChance=1-0.995^(speedEffect+unarmed)
+	roll=math.random()
 	if roll<=dodgeChance then
 		t.Result=0
-		--Game.ShowStatusText("Evaded")
+		Game.ShowStatusText("Evaded")
 		evt.FaceExpression{Player = t.PlayerIndex, Frame = 33}
 	end
 end
