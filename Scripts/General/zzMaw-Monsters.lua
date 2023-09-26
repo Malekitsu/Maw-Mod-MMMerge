@@ -64,7 +64,7 @@ function events.AfterLoadMap()
 				mon.FullHP=mon.HP
 
 				--damage
-				dmgMult=(mon.Level/15+1.5)*((mon.Level^1.3-1)/1000+1)^2
+				dmgMult=(mon.Level/15+1.5)*((mon.Level+2)/(oldLevel+2))*((mon.Level^1.3-1)/1000+1)^2
 				-----------------------------------------------------------
 				--DAMAGE COMPUTATION DOWN HERE, FOR BALANCE MODIFY ABOVE^
 				--attack 1
