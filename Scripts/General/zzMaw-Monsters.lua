@@ -323,12 +323,8 @@ function events.LoadMap()
 			levelMult=Game.MonstersTxt[i].Level
 		end
 		
-		mon.ArmorClass=mon.ArmorClass*((levelMult+10)/(LevelB+10))
+		mon.ArmorClass=base.ArmorClass*((levelMult+10)/(LevelB+10))
 		dmgMult=(levelMult/15+1.5)*((levelMult+2)/(2+LevelB))*((levelMult^1.3-1)/1000+1)^2	
-		if i==271 or i==272 or i==273 then
-			debug.Message(dump(dmgMult))
-			
-		end
 		-----------------------------------------------------------
 		--DAMAGE COMPUTATION DOWN HERE, FOR BALANCE MODIFY ABOVE^
 		--attack 1
