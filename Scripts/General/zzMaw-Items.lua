@@ -715,6 +715,10 @@ function events.CalcStatBonusByItems(t)
 				return
 			end
 			if it.MaxCharges>0 then
+				lookup=0
+				while Game.ItemsTxt[it.Number].NotIdentifiedName==Game.ItemsTxt[it.Number+lookup+1].NotIdentifiedName do 
+					lookup=lookup+1
+				end
 				local data=Game.ItemsTxt[it.Number]
 				if data.EquipStat<=2 then
 				--add fix damage
