@@ -73,13 +73,6 @@ function events.AfterLoadMap()
 end
 
 --MAW
-Game.PlaceMonTxt[301]="Goblin's Liutenant"
-if not mapvars.maw then
-	mapvars.maw=true
-	pseudoSpawnpoint{monster = 106,  x = 7253, y = 5093, z = 481 , count = 1, powerChances = {100, 0, 0}, radius = 0, group = 1, transform = function(mon) mon.NameId=301 mon.Velocity=0 mon.SpellChance=100 end}
-end
-
-
 evt.Map[1000] = function()
 	if not mapvars.ambush then
 		if Party.X>17390 and Party.X<19429 and Party.Y>-20015 and Party.Y<-19454 and Party.Z<800 then
@@ -92,4 +85,34 @@ evt.Map[1000] = function()
 		end
 	end
 end
- Timer(evt.map[1000].last, const.Minute*0.5)
+Timer(evt.map[1000].last, const.Minute*0.5)
+
+--fort
+Game.PlaceMonTxt[301]="Goblin's Liutenant"
+if not mapvars.maw then
+	mapvars.maw=true
+	pseudoSpawnpoint{monster = 106,  x = 8200, y = 4098, z = 385 , count = 1, powerChances = {100, 0, 0}, radius = 0, group = 1, transform = function(mon) mon.NameId=301 mon.Z=385 mon.Velocity=0 mon.SpellChance=100 mon.HP=mon.HP*3 mon.FullHP=mon.HP end}
+end
+ 
+ 
+function events.MonsterKilled(mon)
+	if mon.NameId==301 then
+		mapvars.fortclear=true
+	end
+end
+
+evt.Map[1001] = function()
+	spawn=spawn or 0
+	if not mapvars.fortclear and getDistance(8200,4098,385)<2000 then
+		Game.ShowStatusText("Goblin Reinforcements")
+		pseudoSpawnpoint{monster = 271,  x = 6613, y = 2546, z = 122 , count = 1, powerChances = {60, 30, 10}, radius = 64, group = 1}
+		pseudoSpawnpoint{monster = 271,  x = 6601, y = 5690, z = 122 , count = 1, powerChances = {60, 30, 10}, radius = 64, group = 1}
+		pseudoSpawnpoint{monster = 271,  x = 9765, y = 2500, z = 122 , count = 1, powerChances = {60, 30, 10}, radius = 64, group = 1}
+		pseudoSpawnpoint{monster = 271,  x = 9765, y = 2500, z = 122  , count = 1, powerChances = {60, 30, 10}, radius = 64, group = 1}
+		spawn=spawn+1
+		if spawn==10 then 
+			mapvars.fortclear=true
+		end
+	end
+end
+Timer(evt.map[1001].last, const.Minute*5)
