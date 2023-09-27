@@ -922,7 +922,17 @@ function events.GetAttackDelay(t)
 	
 end
 
-
+function calculateAngle(vector1, vector2)
+    local dotProduct = vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z
+    local magnitude1 = math.sqrt(vector1.x^2 + vector1.y^2 + vector1.z^2)
+    local magnitude2 = math.sqrt(vector2.x^2 + vector2.y^2 + vector2.z^2)
+    
+    local cosineTheta = dotProduct / (magnitude1 * magnitude2)
+    local angleRadians = math.acos(cosineTheta)
+    local angleDegrees = math.deg(angleRadians)
+    
+    return angleDegrees
+end
 
 local function navigateMissile(object)
 
@@ -973,9 +983,15 @@ local function navigateMissile(object)
 		end
 	-- assume all objects not owned by party and without target are targetting party
 	-- this creates issues with cosmetic projectiles like CI Obelisk Arena Paralyze and Gharik/Baa lava fireballs
-	elseif RealTimeHoming==true then 
-		if ownerKind ~= const.ObjectRefKind.Party and targetKind == const.ObjectRefKind.Nothing  then
+	elseif ownerKind == const.ObjectRefKind.Monster and targetKind == const.ObjectRefKind.Nothing then
+		local delta_x = Party.X - object.X
+		local delta_y = Party.Y - object.Y
+		local delta_z = Party.Z - object.Z
+		angleDegrees = calculateAngle({ x = delta_x, y = delta_y, z = delta_z }, { x = object.VelocityX, y = object.VelocityY, z = object.VelocityZ })
+		if angleDegrees<10 then
 			targetPosition = {["X"] = Party.X, ["Y"] = Party.Y, ["Z"] = Party.Z + 120, }
+		else
+			return
 		end
 	else
 		-- ignore other missiles targetting
