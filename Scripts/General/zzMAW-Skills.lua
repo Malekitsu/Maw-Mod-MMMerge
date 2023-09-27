@@ -934,6 +934,7 @@ function calculateAngle(vector1, vector2)
     return angleDegrees
 end
 
+homingDegree=1.25
 local function navigateMissile(object)
 
 	-- exclude some special non targeting spells
@@ -983,12 +984,12 @@ local function navigateMissile(object)
 		end
 	-- assume all objects not owned by party and without target are targetting party
 	-- this creates issues with cosmetic projectiles like CI Obelisk Arena Paralyze and Gharik/Baa lava fireballs
-	elseif ownerKind == const.ObjectRefKind.Monster and targetKind == const.ObjectRefKind.Nothing then
+	elseif ownerKind == const.ObjectRefKind.Monster or ownerKind == 2 then
 		local delta_x = Party.X - object.X
 		local delta_y = Party.Y - object.Y
 		local delta_z = Party.Z - object.Z
-		angleDegrees = calculateAngle({ x = delta_x, y = delta_y, z = delta_z }, { x = object.VelocityX, y = object.VelocityY, z = object.VelocityZ })
-		if angleDegrees<10 then
+		angleDegrees = calculateAngle({ x = delta_x, y = delta_y, z = 0 }, { x = object.VelocityX, y = object.VelocityY, z = 0 })
+		if angleDegrees<homingDegree then
 			targetPosition = {["X"] = Party.X, ["Y"] = Party.Y, ["Z"] = Party.Z + 120, }
 		else
 			return
@@ -1030,7 +1031,7 @@ function events.Tick()
 
 	-- navigateMissiles
 	if homingProjectiles then
-		for objectIndex = 1,Map.Objects.high do
+		for objectIndex = 0,Map.Objects.high do
 			local object =  Map.Objects[objectIndex]
 			navigateMissile(object)
 		end
