@@ -4,7 +4,7 @@ evt.Map[1000] = function()
 			mapvars.ambush=true
 			Game.ShowStatusText("Monsters swarming...")
 			pseudoSpawnpoint{monster = 412,  x = -7532, y = 7495, z = -1535, count = 4, powerChances = {50, 35, 15}, radius = 256, group = 1,transform = function(mon) mon.ShowOnMap = true end}
-			spawnCount=20
+			mapvars.spawnCount=20
 		end
 	end
 end
@@ -12,9 +12,9 @@ Timer(evt.map[1000].last, const.Minute)
 
  
 evt.Map[1001] = function()
-	if mapvars.ambush and spawnCount>0 then
-		spawnCount=spawnCount-1
-		if spawnCount==0 then
+	if mapvars.ambush and mapvars.spawnCount>0 then
+		mapvars.spawnCount=mapvars.spawnCount-1
+		if mapvars.spawnCount==0 then
 			pseudoSpawnpoint{monster = 296,  x = -7532, y = 7495, z = -1535, count = 1, powerChances = {0, 100, 0}, radius = 256, group = 1,transform = function(mon) mon.ShowOnMap = true 
 				mon.HP=mon.HP*2.5 
 				mon.FullHP=mon.HP 
