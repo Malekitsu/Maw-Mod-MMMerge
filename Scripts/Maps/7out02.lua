@@ -102,15 +102,15 @@ function events.MonsterKilled(mon)
 end
 
 evt.Map[1001] = function()
-	spawn=spawn or 0
+	mapvars.spawn=mapvars.spawn or 0
 	if not mapvars.fortclear and getDistance(8200,4098,385)<2000 then
 		Game.ShowStatusText("Goblin Reinforcements")
 		pseudoSpawnpoint{monster = 271,  x = 6613, y = 2546, z = 122 , count = 1, powerChances = {60, 30, 10}, radius = 64, group = 1}
 		pseudoSpawnpoint{monster = 271,  x = 6601, y = 5690, z = 122 , count = 1, powerChances = {60, 30, 10}, radius = 64, group = 1}
 		pseudoSpawnpoint{monster = 271,  x = 9765, y = 2500, z = 122 , count = 1, powerChances = {60, 30, 10}, radius = 64, group = 1}
 		pseudoSpawnpoint{monster = 271,  x = 9765, y = 2500, z = 122  , count = 1, powerChances = {60, 30, 10}, radius = 64, group = 1}
-		spawn=spawn+1
-		if spawn==10 then 
+		mapvars.spawn=mapvars.spawn+1
+		if mapvars.spawn==10 then 
 			mapvars.fortclear=true
 		end
 	end
