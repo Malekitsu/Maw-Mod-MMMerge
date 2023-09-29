@@ -309,6 +309,7 @@ damageKindToMaxResistanceEnchant={
 
 --reduce damage by %
 function events.CalcDamageToPlayer(t)
+	if t.Result<1 then return end
 	if t.DamageKind==0 or t.DamageKind==1 or t.DamageKind==2 or t.DamageKind==3 or t.DamageKind==7 or t.DamageKind==8 or t.DamageKind==9 or t.DamageKind==10 or t.DamageKind==12 then
 		covered=false
 		--check for shield
