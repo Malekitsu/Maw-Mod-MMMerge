@@ -12,7 +12,7 @@ Timer(evt.map[1000].last, const.Minute)
 
  
 evt.Map[1001] = function()
-	if mapvars.ambush and mapvars.spawnCount>0 then
+	if mapvars.ambush and mapvars.spawnCount and mapvars.spawnCount>0 then
 		mapvars.spawnCount=mapvars.spawnCount-1
 		if mapvars.spawnCount==0 then
 			pseudoSpawnpoint{monster = 296,  x = -7532, y = 7495, z = -1535, count = 1, powerChances = {0, 100, 0}, radius = 256, group = 1,transform = function(mon) mon.ShowOnMap = true 
@@ -27,9 +27,9 @@ evt.Map[1001] = function()
 				mon.MoveType= 0 
 				mon.TreasureItemPercent = 100 
 				if bolsterLevel>25 then
-					mon.Items[0].Number=405
-				else
 					mon.Items[0].Number=410
+				else
+					mon.Items[0].Number=405
 				end
 			end}
 			return
