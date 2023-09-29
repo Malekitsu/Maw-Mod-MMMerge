@@ -20,11 +20,9 @@ function events.CalcDamageToMonster(t)
 end
 
 --speed
---revert unarmed code from misctweaks
+--remove AC from hit calculation and unarmed code from misctweaks
 function events.GetArmorClass(t)
-	if t.AC==10000 then
-		t.AC=t.Player:GetArmorClass()
-	end
+	t.AC=0
 end
 
 function events.CalcDamageToPlayer(t)
@@ -428,7 +426,15 @@ function events.CalcDamageToPlayer(t)
 		data=WhoHitPlayer()
 		if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
 			oldLevel=BLevel[data.Monster.Id]
-			dmgMult=(data.Monster.Level/20+1)*((data.Monster.Level+2)/(oldLevel+2))*((data.Monster.Level^1.4-1)/1000+1)
+			local i=data.Monster.Id
+			if i%3==1 then
+				levelMult=Game.MonstersTxt[i+1].Level
+			elseif i%3==0 then
+				levelMult=Game.MonstersTxt[i-1].Level
+			else
+				levelMult=Game.MonstersTxt[i].Level
+			end
+			dmgMult=(levelMult/20+1)*((levelMult+2)/(oldLevel+2))*((levelMult^1.4-1)/1000+1)
 			t.Result=t.Result*dmgMult
 		end
 		--actually substitute damage
