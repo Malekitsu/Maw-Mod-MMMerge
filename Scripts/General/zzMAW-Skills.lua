@@ -1566,3 +1566,28 @@ function events.Regeneration(t)
 	end
 end
 
+--identify item shared to all the party
+function events.GetSkill(t)
+	if t.Skill==const.Skills.IdentifyItem then
+		if Game.CurrentPlayer>=0 then
+			s,m=SplitSkill(t.Result)
+			currentIdentify=s*m
+			maxIdentify=s*m
+			checkOver=false
+		end
+		for i=0,Party.High do
+			s,m=SplitSkill(Party[i].Skills[const.Skills.IdentifyItem])
+			bonus=0
+			for it in Party[i]:EnumActiveItems() do
+				if it.Bonus==20 and it.BonusStrength>bonus then
+					bonus=it.BonusStrength
+				end
+			end
+			s=s+bonus
+			if s*m>currentIdentify then
+				maxIdentify=JoinSkill(s,m)
+			end
+		end
+		t.Result=maxIdentify
+	end
+end
