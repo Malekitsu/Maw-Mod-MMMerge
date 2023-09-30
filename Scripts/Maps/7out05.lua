@@ -14,6 +14,7 @@ function events.ExitNPC(i)
 	end
 end
 
+--maw
 mapvars.ambush={}
 mapvars.alert={}
 --spawn monsters at night
@@ -34,6 +35,7 @@ evt.Map[1000] = function()
 				Game.ShowStatusText("In the night the deads rise")
 				mapvars.spawnCount=10
 				mapvars.firstSpawn=true
+				mawmapvarsend(firstSpawn,true)
 			end
 		end
 	end
