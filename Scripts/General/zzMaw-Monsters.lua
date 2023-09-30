@@ -28,9 +28,13 @@ function events.AfterLoadMap()
 	end	
 	for i=0, Map.Monsters.High do
 		local mon=Map.Monsters[i]
+		if not basetable[Map.Monsters[i].Id] then 
+			goto continue
+		end
 		lvlMult=(mon.Level+5)/(basetable[Map.Monsters[i].Id].Level+5)
 		mon.TreasureDiceCount=Game.MonstersTxt[Map.Monsters[i].Id].TreasureDiceCount*lvlMult
 		mon.TreasureDiceSides=Game.MonstersTxt[Map.Monsters[i].Id].TreasureDiceSides*lvlMult
+		:: continue :: 
 	end
 	if mapvars.boosted==nil then
 		mapvars.boosted=true
