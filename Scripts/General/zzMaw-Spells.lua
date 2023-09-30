@@ -68,35 +68,35 @@ function events.GameInitialized2()
 			[8] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--immolation
 			[9] = {dmgAdd = 8, diceMin = 1, diceMax = 1, },--meteor shower
 			[10] = {dmgAdd = 12, diceMin = 2, diceMax = 2, },--inferno
-			[11] = {dmgAdd = 15, diceMin = 1, diceMax = 15, },--incinerate
-			[15] = {dmgAdd = 4, diceMin = 2, diceMax = 2, },--sparks
-			[18] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--lightning bolt
-			[20] = {dmgAdd = 12, diceMin = 1, diceMax = 12, },--implosion
+			[11] = {dmgAdd = 32, diceMin = 1, diceMax = 21, },--incinerate
+			[15] = {dmgAdd = 3, diceMin = 2, diceMax = 2, },--sparks
+			[18] = {dmgAdd = 15, diceMin = 1, diceMax = 9, },--lightning bolt
+			[20] = {dmgAdd = 20, diceMin = 1, diceMax = 16, },--implosion
 			[22] = {dmgAdd = 20, diceMin = 1, diceMax = 1, },--starburst
 			[24] = {dmgAdd = 4, diceMin = 1, diceMax = 2, },--poison spray
-			[26] = {dmgAdd = 0, diceMin = 1, diceMax = 4, },--ice bolt
-			[29] = {dmgAdd = 9, diceMin = 1, diceMax = 9, },--acid burst
-			[32] = {dmgAdd = 12, diceMin = 1, diceMax = 6, },--ice blast
-			[37] = {dmgAdd = 12, diceMin = 1, diceMax = 4, },--deadly swarm
-			[39] = {dmgAdd = 0, diceMin = 1, diceMax = 9, },--blades
-			[41] = {dmgAdd = 10, diceMin = 1, diceMax = 10, },--rock blast
-			[43] = {dmgAdd = 20, diceMin = 2, diceMax = 2, },--death blossom
+			[26] = {dmgAdd = 8, diceMin = 1, diceMax = 5, },--ice bolt
+			[29] = {dmgAdd = 15, diceMin = 1, diceMax = 9, },--acid burst
+			[32] = {dmgAdd = 6, diceMin = 1, diceMax = 9, },--ice blast
+			[37] = {dmgAdd = 8, diceMin = 1, diceMax = 4, },--deadly swarm
+			[39] = {dmgAdd = 12, diceMin = 1, diceMax = 8, },--blades
+			[41] = {dmgAdd = 8, diceMin = 1, diceMax = 8, },--rock blast
+			[43] = {dmgAdd = 0, diceMin = 1, diceMax = 12, },--death blossom
 			[44] = {dmgAdd = 15, diceMin = 1, diceMax = 1, },--mass distorsion, nerfed
-			[52] = {dmgAdd = 10, diceMin = 2, diceMax = 8, },--spirit lash
-			[59] = {dmgAdd = 8, diceMin = 1, diceMax = 4, },--mind blast
-			[65] = {dmgAdd = 12, diceMin = 1, diceMax = 12, },--psychic shock
-			[70] = {dmgAdd = 8, diceMin = 1, diceMax = 2, },--harm
-			[76] = {dmgAdd = 20, diceMin = 1, diceMax = 10, },--flying fist
-			[78] = {dmgAdd = 0, diceMin = 1, diceMax = 4, },--light bolt
+			[52] = {dmgAdd = 10, diceMin = 2, diceMax = 12, },--spirit lash
+			[59] = {dmgAdd = 8, diceMin = 1, diceMax = 5, },--mind blast
+			[65] = {dmgAdd = 30, diceMin = 1, diceMax = 20, },--psychic shock
+			[70] = {dmgAdd = 8, diceMin = 1, diceMax = 4, },--harm
+			[76] = {dmgAdd = 30, diceMin = 1, diceMax = 11, },--flying fist
+			[78] = {dmgAdd = 12, diceMin = 1, diceMax = 4, },--light bolt
 			[79] = {dmgAdd = 16, diceMin = 1, diceMax = 16, },--destroy undead
-			[84] = {dmgAdd = 25, diceMin = 1, diceMax = 1, },--prismatic light
-			[87] = {dmgAdd = 20, diceMin = 1, diceMax = 20, },--sunray
+			[84] = {dmgAdd = 25, diceMin = 2, diceMax = 2, },--prismatic light
+			[87] = {dmgAdd = 60, diceMin = 1, diceMax = 20, },--sunray
 			[90] = {dmgAdd = 25, diceMin = 1, diceMax = 10, },--toxic cloud
 			[93] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--shrapmetal
 			[97] = {dmgAdd = 0, diceMin = 1, diceMax = 25, },--dragon breath
 			[98] = {dmgAdd = 50, diceMin = 1, diceMax = 1, },--armageddon
 			[99] = {dmgAdd = 25, diceMin = 1, diceMax = 8, },--souldrinker
-			[103] = {dmgAdd = 17, diceMin = 1, diceMax = 17, },--darkfire bolt
+			[103] = {dmgAdd = 30, diceMin = 1, diceMax = 22, },--darkfire bolt
 			[111] = {dmgAdd = 15, diceMin = 1, diceMax = 3, },--lifedrain scales with mastery, fixed in calcspelldamage
 			[123] = {dmgAdd = 10, diceMin = 1, diceMax = 10, },--flame blast scales with mastery, fixed in calcspelldamage
 		}
@@ -156,7 +156,7 @@ function events.GameInitialized2()
 			if i==123 then 
 				manaCost=120
 			end
-			local theoreticalDamage160=manaCost^0.7
+			local theoreticalDamage160=manaCost^0.5*2.5
 			--scale new values according to original differences
 			local dmgAdd160=math.round(theoreticalDamage80*dmgAddProportion)
 			if spellPowers[i].diceMax==spellPowers[i].diceMin then
@@ -519,24 +519,24 @@ function events.Tick()
 			Game.SpellsTxt[10].Description=string.format("Inferno burns all monsters in sight when cast, excluding your characters.  One or two castings can clear out a room of weak or moderately powerful creatures. Each monster takes %s points of damage plus %s per point of skill in Fire Magic.  This spell only works indoors.",dmgAddTooltip(level,10),diceMaxTooltip(level,10))
 			Game.SpellsTxt[11].Description=string.format("Among the strongest direct damage spells available, Incinerate inflicts massive damage on a single target.  Only the strongest of monsters can expect to survive this spell.  Damage is %s points plus 1-%s per point of skill in Fire Magic.",dmgAddTooltip(level,11),diceMaxTooltip(level,11))
 			Game.SpellsTxt[15].Description=string.format("Sparks fires small balls of lightning into the world that bounce around until they hit something or dissipate. It is hard to tell where they will go, so this spell is best used in a room crowded with small monsters. Each spark does %s points plus %s per point of skill in Air Magic.",dmgAddTooltip(level,15),diceMaxTooltip(level,15))
-			Game.SpellsTxt[18].Description=string.format("Lightning Bolt discharges electricity from the caster's hand to a single target.  It always hits and does 1-%s points of damage per point of skill in Air Magic.",diceMaxTooltip(level,18))
+			Game.SpellsTxt[18].Description=string.format("Lightning Bolt discharges electricity from the caster's hand to a single target.  It always hits and does %s + 1-%s points of damage per point of skill in Air Magic.",dmgAddTooltip(level,18),diceMaxTooltip(level,18))
 			Game.SpellsTxt[20].Description=string.format("Implosion is a nasty spell that affects a single target by destroying the air around it, causing a sudden inrush from the surrounding air, a thunderclap, and %s points plus 1-%s points of damage per point of skill in Air Magic.",dmgAddTooltip(level,20),diceMaxTooltip(level,20))
-			Game.SpellsTxt[22].Description=string.format("Calls stars from the heavens to smite and burn your enemies.  Twenty stars are called, and the damage for each star is 20 points plus 1 per point of skill in Air Magic. Try not to get caught in the blast! This spell only works outdoors.",dmgAddTooltip(level,22),diceMaxTooltip(level,22))
+			Game.SpellsTxt[22].Description=string.format("Calls stars from the heavens to smite and burn your enemies.  Twenty stars are called, and the damage for each star is %s points plus %s per point of skill in Air Magic. Try not to get caught in the blast! This spell only works outdoors.",dmgAddTooltip(level,22),diceMaxTooltip(level,22))
 			Game.SpellsTxt[24].Description=string.format("Sprays poison at monsters directly in front of your characters.  Damage is low, but few monsters have resistance to Water Magic, so it usually works.  Each shot does %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(level,24),diceMaxTooltip(level,24))
-			Game.SpellsTxt[26].Description=string.format("Fires a bolt of ice at a single target.  The missile does 1-%s points of damage per point of skill in Water Magic.",diceMaxTooltip(level,26))
+			Game.SpellsTxt[26].Description=string.format("Fires a bolt of ice at a single target.  The missile does %s + 1-%s points of damage per point of skill in Water Magic.",dmgAddTooltip(level,26),diceMaxTooltip(level,26))
 			Game.SpellsTxt[29].Description=string.format("Acid burst squirts a jet of extremely caustic acid at a single victim.  It always hits and does %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(level,29),diceMaxTooltip(level,29))
 			Game.SpellsTxt[32].Description=string.format("Fires a ball of ice in the direction the caster is facing.  The ball will shatter when it hits something, launching 7 shards of ice in all directions except the caster's.  The shards will ricochet until they strike a creature or melt.  Each shard does %s points of damage plus 1-%s per point of skill in Water Magic.",dmgAddTooltip(level,32),diceMaxTooltip(level,32))
 			Game.SpellsTxt[37].Description=string.format("Summons a swarm of biting, stinging insects to bedevil a single target.  The swarm does %s points of damage plus 1-%s per point of skill in Earth Magic.",dmgAddTooltip(level,37),diceMaxTooltip(level,37))
 			Game.SpellsTxt[39].Description=string.format("Fires a rotating, razor-thin metal blade at a single monster.  The blade does 1-%s points of damage per point of skill in Earth Magic.",diceMaxTooltip(level,39))
 			Game.SpellsTxt[41].Description=string.format("Releases a magical stone into the world that will explode when it comes into contact with a creature or enough time passes.  The rock will bounce and roll until it finds a resting spot, so be careful not to be caught in the blast.  The explosion causes %s points of damage plus 1-%s points of damage per point of skill in Earth Magic.",dmgAddTooltip(level,41),diceMaxTooltip(level,41))
-			Game.SpellsTxt[43].Description=string.format("Launches a magical stone which bursts in air, sending shards of explosive earth raining to the ground.  The damage is %s points plus %s per point of skill in Earth Magic for each shard.  This spell can only be used outdoors.",dmgAddTooltip(level,43),diceMaxTooltip(level,43))
+			Game.SpellsTxt[43].Description=string.format("Launches a magical stone which bursts in air, sending shards of explosive earth raining to the ground.  The damage is 1-%s per point of skill in Earth Magic for each shard.  This spell can only be used outdoors.",diceMaxTooltip(level,43))
 			Game.SpellsTxt[44].Description=string.format("Increases the weight of a single target enormously for an instant, causing internal damage equal to %s%% of the monster's hit points plus another %s%% per point of skill in Earth Magic.  The bigger they are, the harder they fall.",dmgAddTooltip(level,44),diceMaxTooltip(level,44))
 			Game.SpellsTxt[52].Description=string.format("This spell weakens the link between a target's body and soul, causing %s + 2-%s points of damage per point of skill in Spirit Magic to all monsters near the caster.",dmgAddTooltip(level,52),diceMaxTooltip(level,52))
 			Game.SpellsTxt[59].Description=string.format("Fires a bolt of mental force which damages a single target's nervous system.  Mind Blast does %s points of damage plus 1-%s per point of skill in Mind Magic.",dmgAddTooltip(level,59),diceMaxTooltip(level,59))
 			Game.SpellsTxt[65].Description=string.format("Similar to Mind Blast, Psychic Shock targets a single creature with mind damaging magic--only it has a much greater effect.  Psychic Shock does %s points of damage plus 1-%s per point of skill in Mind Magic.",dmgAddTooltip(level,65),diceMaxTooltip(level,65))
 			Game.SpellsTxt[70].Description=string.format("Directly inflicts magical damage upon a single creature.  Harm does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(level,70),diceMaxTooltip(level,70))
 			Game.SpellsTxt[76].Description=string.format("Flying Fist throws a heavy magical force at a single opponent that does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(level,76),diceMaxTooltip(level,76))
-			Game.SpellsTxt[78].Description=string.format("Fires a bolt of light at a single target that does 1-%s points of damage per point of skill in light magic.  Damage vs. Undead is doubled.",diceMaxTooltip(level,78))
+			Game.SpellsTxt[78].Description=string.format("Fires a bolt of light at a single target that does %s + 1-%s points of damage per point of skill in light magic.  Damage vs. Undead is doubled.",dmgAddTooltip(level,78),diceMaxTooltip(level,78))
 			Game.SpellsTxt[79].Description=string.format("Calls upon the power of heaven to undo the evil magic that extends the lives of the undead, inflicting %s points of damage plus 1-%s per point of skill in Light Magic upon a single, unlucky target.  This spell only works on the undead.",dmgAddTooltip(level,79),diceMaxTooltip(level,79))
 			Game.SpellsTxt[84].Description=string.format("Inflicts %s points of damage plus %s per point of skill in Light Magic on all creatures in sight.  This spell can only be cast indoors.",dmgAddTooltip(level,84),diceMaxTooltip(level,84))
 			Game.SpellsTxt[87].Description=string.format("Sunray is the second most devastating damage spell in the game. It does %s points of damage plus 1-%s points per point of skill in Light Magic, by concentrating the light of the sun on one unfortunate creature. It only works outdoors during the day.",dmgAddTooltip(level,87),diceMaxTooltip(level,87))
