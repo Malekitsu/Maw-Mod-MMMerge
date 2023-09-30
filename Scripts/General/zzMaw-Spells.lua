@@ -19,6 +19,14 @@ function events.Tick()
 		Party.SpellBuffs[2].Power=(Party.SpellBuffs[2].Power-10)/(m+1)*(m/2)+5*m
 		Party.SpellBuffs[2].Skill=1
 	end
+	
+	if Party.SpellBuffs[14].Power>10 then
+		if Party.SpellBuffs[14].Skill==4 then
+			Party.SpellBuffs[14].Power=10
+		else
+			Party.SpellBuffs[14].Power=5
+		end
+	end
 end
 
 ----------------
@@ -36,6 +44,9 @@ function events.GameInitialized2()
 	Game.SpellsTxt[85].Description="Simultaneously casts Protection from Fire, Air, Water, Earth, Mind, and Body, plus Feather Fall and Wizard Eye on all your characters at two times your skill in Light Magic."
 	Game.SpellsTxt[85].Master="All spells cast at two times skill"
 	Game.SpellsTxt[85].GM="All spells cast at three times skill"
+	
+	--Protection from magic
+	Game.SpellsTxt[85].Description="Protection from Magic affects the entire party at once, granting immunity to certain spells and monster abilities that cause debilitation conditions.  These are:  Poison, Disease, Stone, Paralyze, and Weak.  Every time this spell saves a character from an effect, it weakens.  The spell can survive 1 attack per point of skill in body magic up to 10 attacks--after that, Protection from Magic is broken."
 end
 
 ------------------------------
