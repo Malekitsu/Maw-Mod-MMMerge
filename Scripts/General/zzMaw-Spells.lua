@@ -405,7 +405,10 @@ end
 --adjust mana cost and tooltips	
 function events.Tick()
 	index=Game.CurrentPlayer
-	if index>=0 then
+	if index> Party.High then
+		Game.CurrentPlayer=0
+	end
+	if index>=0 and index<Party.High then
 		local level=Party[index].LevelBase
 		if lastIndex~=index or lastLevel~=level then
 			lastIndex=index
