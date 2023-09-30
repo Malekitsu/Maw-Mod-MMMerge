@@ -338,7 +338,7 @@ function events.LoadMap()
 		--attack 2
 		c=base.Attack2.DamageAdd * dmgMult
 		mon.Attack2.DamageAdd = base.Attack2.DamageAdd * dmgMult
-		d=base.Attack2.DamageDiceSides * dmgMult
+		d=base.Attack2.DamageDiceSides * dmgMult^0.5
 		mon.Attack2.DamageDiceSides = base.Attack2.DamageDiceSides * dmgMult^0.5
 		f=base.Attack2.DamageDiceCount * dmgMult^0.5
 		mon.Attack2.DamageDiceCount = base.Attack2.DamageDiceCount * dmgMult^0.5
@@ -377,7 +377,7 @@ function events.LoadMap()
 		mon.Attack2.DamageDiceSides = 250
 		--checking for dice count overflow
 		f=f * Overflow
-		mon.Attack2.DamageDiceCount = mon.Attack2.DamageDiceCount * Overflow
+		mon.Attack2.DamageDiceCount = f 
 		end
 		--Just in case Dice Count fix
 		if (f > 250) then
