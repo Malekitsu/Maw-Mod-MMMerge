@@ -584,7 +584,7 @@ function events.Action(t)
 		local persBonus=Party[Game.CurrentPlayer]:GetPersonality()/1000
 		local intBonus=Party[Game.CurrentPlayer]:GetIntellect()/1000
 		local statBonus=math.max(persBonus,intBonus)
-		crit=Party[Game.CurrentPlayer]:GetLuck()/2000+0.05
+		crit=Party[Game.CurrentPlayer]:GetLuck()/1500+0.05
 		local body=Party[Game.CurrentPlayer]:GetSkill(const.Skills.Body)
 		local s,m=SplitSkill(body)
 		local baseHeal=(5+(m+1)*s)
@@ -592,7 +592,7 @@ function events.Action(t)
 		roll=math.random()
 		local gotCrit=false
 		if roll<crit then
-			extraHeal=(extraHeal+baseHeal)*(1.5+statBonus)-baseHeal
+			extraHeal=(extraHeal+baseHeal)*(1.5+statBonus*3/2)-baseHeal
 			gotCrit=true
 		end
 		--apply heal
@@ -608,7 +608,7 @@ function events.Action(t)
 		local persBonus=Party[Game.CurrentPlayer]:GetPersonality()/1000
 		local intBonus=Party[Game.CurrentPlayer]:GetIntellect()/1000
 		local statBonus=math.max(persBonus,intBonus)
-		crit=Party[Game.CurrentPlayer]:GetLuck()/2000+0.05
+		crit=Party[Game.CurrentPlayer]:GetLuck()/1500+0.05
 		local body=Party[Game.CurrentPlayer]:GetSkill(const.Skills.Body)
 		local s,m=SplitSkill(body)
 		local baseHeal=(10+s*5)
@@ -616,7 +616,7 @@ function events.Action(t)
 		roll=math.random()
 		local gotCrit=false
 		if roll<crit then
-			extraHeal=(extraHeal+baseHeal)*(1.5+statBonus)-baseHeal
+			extraHeal=(extraHeal+baseHeal)*(1.5+statBonus*3/2)-baseHeal
 			gotCrit=true
 		end
 		--apply heal
