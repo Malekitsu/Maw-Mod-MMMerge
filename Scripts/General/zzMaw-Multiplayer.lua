@@ -2,19 +2,18 @@ function p()
 	debug.Message(dump(string.format(" x = " .. Party.X .. ", y = " .. Party.Y .. ", z = " .. Party.Z .. " "))) 
 end
 
-function events.sendMapMaw(mapvars)
-	mapvars.maw={}
-	mapvars.maw[0]="maw event"
-	mapvars.maw[1]=100
-	mapvars.maw[2]=200
-	Multiplayer.broadcast_mapdata(mapvars.maw)
+function mawmapvarsend(name,value)
+	maw={}
+	maw[0]="maw mapvar"
+	maw[1]=name
+	maw[2]=value
+	Multiplayer.broadcast_mapdata(maw)
 end
 
 function events.MultiplayerUserdataArrived(t)
-	if t[0]=="maw event" then
-		for i=1,#mapvars.maw do
-			mapvars.maw[i]=t[i]
-		end
+	if t[0]=="maw mapvar" then
+		mapvars.maw=mapvars.maw or {}
+		mapvars.maw[t[1]]=t[2]
 	end
 end
 
