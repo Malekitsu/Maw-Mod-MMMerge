@@ -22,7 +22,9 @@ end
 --speed
 --remove AC from hit calculation and unarmed code from misctweaks
 function events.GetArmorClass(t)
-	t.AC=0
+	if t.AC==10000 then
+		t.AC=t.Player:GetArmorClass()
+	end
 end
 
 function events.CalcDamageToPlayer(t)
@@ -63,8 +65,8 @@ end
 --AC 
 function events.CalcDamageToPlayer(t)
 	if t.DamageKind==4 then 
-	AC=t.Player:GetArmorClass()
-	t.Result=t.Result/(AC/300+1)
+		AC=t.Player:GetArmorClass()
+		t.Result=t.Result/(AC/300+1)
 	end
 end
 --endurance
