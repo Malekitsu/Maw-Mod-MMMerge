@@ -1478,15 +1478,13 @@ function events.Action(t)
 			--calculate actual cost
 			local n=1
 			for i=1,11 do
-				s=SplitSkill(Party[Game.CurrentPlayer].Skills[11+i])
-				if s>currentCost then
+				local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[11+i])
+				if s>=currentCost then
 					n=n+1
 				end
 			end
 			local actualCost=math.ceil(currentCost/n)
-			if pl.SkillPoints>=actualCost then
-				pl.SkillPoints=pl.SkillPoints+currentCost-actualCost
-			end
+			pl.SkillPoints=pl.SkillPoints+currentCost-actualCost
 		end
 	end
 end
