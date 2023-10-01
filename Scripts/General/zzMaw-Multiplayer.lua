@@ -3,6 +3,7 @@ function p()
 end
 
 function mawmapvarsend(name,value)
+	if not Multiplayer then return end
 	maw={}
 	maw[0]="maw mapvar"
 	maw[1]=name
@@ -12,8 +13,7 @@ end
 
 function events.MultiplayerUserdataArrived(t)
 	if t[0]=="maw mapvar" then
-		mapvars.maw=mapvars.maw or {}
-		mapvars.maw[t[1]]=t[2]
+		mapvars[t[1]]=t[2]
 	end
 end
 
