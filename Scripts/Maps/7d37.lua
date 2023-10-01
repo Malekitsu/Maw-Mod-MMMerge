@@ -36,4 +36,5 @@ if not mapvars.mawSpawn then
 		end
 		}
 	mapvars.mawSpawn=true
+	mawmapvarsend("mawSpawn",true)
 end

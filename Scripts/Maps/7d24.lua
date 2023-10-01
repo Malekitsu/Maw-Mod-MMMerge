@@ -2,9 +2,11 @@ evt.Map[1000] = function()
 	if not mapvars.ambush then
 		if Party.X>-8205 and Party.X<-7060 and Party.Y>6216 and Party.Y<7546 then
 			mapvars.ambush=true
+			mawmapvarsend("ambush",true)
 			Game.ShowStatusText("Monsters swarming...")
 			pseudoSpawnpoint{monster = 412,  x = -7532, y = 7495, z = -1535, count = 4, powerChances = {50, 35, 15}, radius = 256, group = 1,transform = function(mon) mon.ShowOnMap = true end}
 			mapvars.spawnCount=20
+			mawmapvarsend("spawnCount",0)
 		end
 	end
 end

@@ -35,7 +35,7 @@ evt.Map[1000] = function()
 				Game.ShowStatusText("In the night the deads rise")
 				mapvars.spawnCount=10
 				mapvars.firstSpawn=true
-				mawmapvarsend(firstSpawn,true)
+				mawmapvarsend("firstSpawn",true)
 			end
 		end
 	end

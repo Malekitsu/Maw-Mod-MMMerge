@@ -2,8 +2,8 @@ evt.Map[1000] = function()
 	if not mapvars.ambush then
 		if Party.X>-1183 and Party.X<526 and Party.Y>10342 and Party.Y<12144 then
 			mapvars.ambush=true
-			mawmapvarsend(ambush,true)
-			mawmapvarsend(ambush2,true)
+			mawmapvarsend("ambush",true)
+			mawmapvarsend("ambush2",true)
 			Game.ShowStatusText("It's a trap!")
 			pseudoSpawnpoint{monster = 412,  x = -3723, y = 9579, z = 1, count = 8, powerChances = {70, 30, 0}, radius = 256, group = 1,transform = function(mon) mon.ShowOnMap = true end}
 		end
