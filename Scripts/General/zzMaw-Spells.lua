@@ -169,7 +169,7 @@ function events.GameInitialized2()
 			end
 			local theoreticalDamage160=manaCost^0.5*2.5
 			--scale new values according to original differences
-			local dmgAdd160=math.round(theoreticalDamage80*dmgAddProportion)
+			local dmgAdd160=math.round(theoreticalDamage160*dmgAddProportion)
 			if spellPowers[i].diceMax==spellPowers[i].diceMin then
 				diceMax160=math.round(theoreticalDamage160*diceMaxProportion)
 			else
@@ -408,7 +408,7 @@ function events.Tick()
 	if index> Party.High then
 		Game.CurrentPlayer=0
 	end
-	if index>=0 and index<Party.High then
+	if index>=0 and index<=Party.High then
 		local level=Party[index].LevelBase
 		if lastIndex~=index or lastLevel~=level then
 			lastIndex=index
