@@ -2502,6 +2502,15 @@ I grant you the title of Rogue, and a small payment for your services. " ]]
 		evt.Add{"QBits", Value = 1561}         -- Promoted to Honorary Rogue
 		evt.Add{"Experience", Value = calculateExp(15000)}
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Thief} then
+		evt.Set{"ClassIs", Value = const.Class.Rogue}
+		evt.Add{"QBits", Value = 1560}         -- Promoted to Rogue
+		evt.Add{"Experience", Value = calculateExp(30000)}
+	else
+		evt.Add{"QBits", Value = 1561}         -- Promoted to Honorary Rogue
+		evt.Add{"Experience", Value = calculateExp(15000)}
+	end
 	evt.Subtract{"Inventory", Value = 1426}         -- "Vase"
 	evt.Subtract{"QBits", Value = 724}         -- Vase - I lost it
 	evt.ForPlayer("All")
@@ -2568,6 +2577,15 @@ For your services, I hereby promote the Rogues among you to the status of Spy, a
 		evt.Add{"QBits", Value = 1563}         -- Promoted to Honorary Spy
 		evt.Add{"Experience", Value = calculateExp(40000)}
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Rogue} then
+		evt.Set{"ClassIs", Value = const.Class.Spy}
+		evt.Add{"QBits", Value = 1562}         -- Promoted to Spy
+		evt.Add{"Experience", Value = calculateExp(80000)}
+	else
+		evt.Add{"QBits", Value = 1563}         -- Promoted to Honorary Spy
+		evt.Add{"Experience", Value = calculateExp(40000)}
+	end
 	evt.Add{"Gold", Value = calculateGold(15000)}
 	evt.Subtract{"QBits", Value = 531}         -- "Go to Watchtower 6 in the Deyja Moors, and move the weight from the top of the tower to the bottom of the tower.  Then return to William Lasker in the Erathian Sewers."
 	evt.ForPlayer("All")
@@ -2616,6 +2634,15 @@ Here is a small payment to help cover the expenses you incurred on the job. " ]]
 		evt.Add{"Experience", Value = calculateExp(40000)}
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.Rogue} then
+		evt.Set{"ClassIs", Value = const.Class.Assassin}
+		evt.Add{"QBits", Value = 1564}         -- Promoted to Assassin
+		evt.Add{"Experience", Value = calculateExp(80000)}
+	else
+		evt.Add{"QBits", Value = 1565}         -- Promoted to Honorary Assassin
+		evt.Add{"Experience", Value = calculateExp(40000)}
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.Rogue} then
 		evt.Set{"ClassIs", Value = const.Class.Assassin}
 		evt.Add{"QBits", Value = 1564}         -- Promoted to Assassin
@@ -2673,6 +2700,15 @@ Surely we will meet again, Crusaders!" ]]
 		evt.Add{"Experience", Value = calculateExp(15000)}
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.Paladin} then
+		evt.Set{"ClassIs", Value = const.Class.Crusader}
+		evt.Add{"QBits", Value = 1590}         -- Promoted to Crusader
+		evt.Add{"Experience", Value = calculateExp(30000)}
+	else
+		evt.Add{"QBits", Value = 1591}         -- Promoted to Honorary Crusader
+		evt.Add{"Experience", Value = calculateExp(15000)}
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.Paladin} then
 		evt.Set{"ClassIs", Value = const.Class.Crusader}
 		evt.Add{"QBits", Value = 1590}         -- Promoted to Crusader
@@ -2739,6 +2775,15 @@ Therefore do I solemnly declare thee Heroes! " ]]
 		evt.Add{"QBits", Value = 1593}         -- Promoted to Honorary Hero
 		evt.Add{"Experience", Value = calculateExp(40000)}
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Crusader} then
+		evt.Set{"ClassIs", Value = const.Class.Hero}
+		evt.Add{"QBits", Value = 1592}         -- Promoted to Hero
+		evt.Add{"Experience", Value = calculateExp(80000)}
+	else
+		evt.Add{"QBits", Value = 1593}         -- Promoted to Honorary Hero
+		evt.Add{"Experience", Value = calculateExp(40000)}
+	end
 	evt.Subtract{"QBits", Value = 536}         -- "Rescue Alice Hargreaves from William's Tower in the Deyja Moors then talk to Sir Charles Quixote."
 	evt.Subtract{"QBits", Value = 1685}         -- Replacement for NPCs ¹54 ver. 7
 	evt.Subtract{"Reputation", Value = 10}
@@ -2789,6 +2834,15 @@ Go now upon the world and make all fear your name." ]]
 		evt.Add{"Experience", Value = calculateExp(40000)}
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.Crusader} then
+		evt.Set{"ClassIs", Value = const.Class.Villain}
+		evt.Add{"QBits", Value = 1594}         -- Promoted to Villain
+		evt.Add{"Experience", Value = calculateExp(80000)}
+	else
+		evt.Add{"QBits", Value = 1595}         -- Promoted to Honorary Villain
+		evt.Add{"Experience", Value = calculateExp(40000)}
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.Crusader} then
 		evt.Set{"ClassIs", Value = const.Class.Villain}
 		evt.Add{"QBits", Value = 1594}         -- Promoted to Villain
@@ -2850,6 +2904,15 @@ I shall now promote all Monks to Initiates and everyone else to Honorary Initiat
 		evt.Add{"QBits", Value = 1573}         -- Promoted to Honorary Initiate
 		evt.Add{"Experience", Value = calculateExp(15000)}
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Monk} then
+		evt.Set{"ClassIs", Value = const.Class.Initiate}
+		evt.Add{"QBits", Value = 1572}         -- Promoted to Initiate
+		evt.Add{"Experience", Value = calculateExp(30000)}
+	else
+		evt.Add{"QBits", Value = 1573}         -- Promoted to Honorary Initiate
+		evt.Add{"Experience", Value = calculateExp(15000)}
+	end
 	evt.Subtract{"QBits", Value = 539}         -- "Find the lost meditation spot in the Dwarven Barrows."
 	evt.ForPlayer("All")
 	evt.SetNPCTopic{NPC = 377, Index = 0, Event = 811}         -- "Bartholomew Hume" : "Master"
@@ -2897,6 +2960,15 @@ Your journey only ends with your eventual death-- never close your mind." ]]
 		evt.Add{"Experience", Value = calculateExp(40000)}
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.Initiate} then
+		evt.Set{"ClassIs", Value = const.Class.Master}
+		evt.Add{"QBits", Value = 1574}         -- Promoted to Master
+		evt.Add{"Experience", Value = calculateExp(80000)}
+	else
+		evt.Add{"QBits", Value = 1575}         -- Promoted to Honorary Master
+		evt.Add{"Experience", Value = calculateExp(40000)}
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.Initiate} then
 		evt.Set{"ClassIs", Value = const.Class.Master}
 		evt.Add{"QBits", Value = 1574}         -- Promoted to Master
@@ -3006,6 +3078,15 @@ This was just a training exercise, after all." ]]
 		evt.Add{"QBits", Value = 1577}         -- Promoted to Honorary Ninja
 		evt.Add{"Experience", Value = calculateExp(40000)}
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Initiate} then
+		evt.Set{"ClassIs", Value = const.Class.Ninja}
+		evt.Add{"QBits", Value = 1576}         -- Promoted to Ninja
+		evt.Add{"Experience", Value = calculateExp(80000)}
+	else
+		evt.Add{"QBits", Value = 1577}         -- Promoted to Honorary Ninja
+		evt.Add{"Experience", Value = calculateExp(40000)}
+	end
 	evt.Subtract{"QBits", Value = 541}         -- "Crack the code in the School of Sorcery in the Bracada Desert to reveal the location of the Tomb of Ashwar Nog'Nogoth.  Discover the tomb's location, enter it, and then return it to Stephan Sand in the Pit."
 	evt.Subtract{"Reputation", Value = 10}
 	evt.ForPlayer("All")
@@ -3054,6 +3135,15 @@ I am happy to promote all Warrior Mages to Master Archers, and all Honorary Warr
 		evt.Add{"Experience", Value = calculateExp(40000)}
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.WarriorMage} then
+		evt.Set{"ClassIs", Value = const.Class.MasterArcher}
+		evt.Add{"QBits", Value = 1586}         -- Promoted to Master Archer
+		evt.Add{"Experience", Value = calculateExp(80000)}
+	else
+		evt.Add{"QBits", Value = 1587}         -- Promoted to Honorary Master Archer
+		evt.Add{"Experience", Value = calculateExp(40000)}
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.WarriorMage} then
 		evt.Set{"ClassIs", Value = const.Class.MasterArcher}
 		evt.Add{"QBits", Value = 1586}         -- Promoted to Master Archer
@@ -3123,6 +3213,15 @@ I already weary of your company." ]]
 		evt.Add{"QBits", Value = 1585}         -- Promoted to Honorary Warrior Mage
 		evt.Add{"Experience", Value = calculateExp(15000)}
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Archer} then
+		evt.Set{"ClassIs", Value = const.Class.WarriorMage}
+		evt.Add{"QBits", Value = 1584}         -- Promoted to Warrior Mage
+		evt.Add{"Experience", Value = calculateExp(30000)}
+	else
+		evt.Add{"QBits", Value = 1585}         -- Promoted to Honorary Warrior Mage
+		evt.Add{"Experience", Value = calculateExp(15000)}
+	end
 	evt.Subtract{"QBits", Value = 543}         -- "Sabotage the lift in the Red Dwarf Mines in the Bracada Desert then return to Steagal Snick in Avlee."
 	evt.Add{"Gold", Value = calculateGold(7500)}
 	evt.Subtract{"Reputation", Value = 5}
@@ -3173,6 +3272,15 @@ I am happy that I was wrong." ]]
 		evt.Add{"Experience", Value = calculateExp(40000)}
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.WarriorMage} then
+		evt.Set{"ClassIs", Value = const.Class.Sniper}
+		evt.Add{"QBits", Value = 1588}         -- Promoted to Sniper
+		evt.Add{"Experience", Value = calculateExp(80000)}
+	else
+		evt.Add{"QBits", Value = 1589}         -- Promoted to Honorary Sniper
+		evt.Add{"Experience", Value = calculateExp(40000)}
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.WarriorMage} then
 		evt.Set{"ClassIs", Value = const.Class.Sniper}
 		evt.Add{"QBits", Value = 1588}         -- Promoted to Sniper
@@ -3240,6 +3348,15 @@ Always fight for the Light, Champions!" ]]
 		evt.Add{"QBits", Value = 1569}         -- Promoted to Honorary Champion
 		evt.Add{"Experience", Value = calculateExp(40000)}
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Cavalier} then
+		evt.Set{"ClassIs", Value = const.Class.Champion}
+		evt.Add{"QBits", Value = 1568}         -- Promoted to Champion
+		evt.Add{"Experience", Value = calculateExp(80000)}
+	else
+		evt.Add{"QBits", Value = 1569}         -- Promoted to Honorary Champion
+		evt.Add{"Experience", Value = calculateExp(40000)}
+	end
 	evt.Subtract{"QBits", Value = 545}         -- "Win five arena challenges then return to Leda Rowan in the Bracada Desert."
 	evt.Subtract{"Reputation", Value = 10}
 	evt.ForPlayer("All")
@@ -3298,6 +3415,15 @@ Carry your title with pride!" ]]
 		evt.Add{"QBits", Value = 1567}         -- Promoted to Honorary Cavalier
 		evt.Add{"Experience", Value = calculateExp(15000)}
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Knight} then
+		evt.Set{"ClassIs", Value = const.Class.Cavalier}
+		evt.Add{"QBits", Value = 1566}         -- Promoted to Cavalier
+		evt.Add{"Experience", Value = calculateExp(30000)}
+	else
+		evt.Add{"QBits", Value = 1567}         -- Promoted to Honorary Cavalier
+		evt.Add{"Experience", Value = calculateExp(15000)}
+	end
 	evt.Subtract{"QBits", Value = 546}         -- "Destroy all the undead in the Haunted House in the Barrow Downs and return to Frederick Org in Erathia."
 	evt.Subtract{"Reputation", Value = 5}
 	evt.ForPlayer("All")
@@ -3348,6 +3474,15 @@ You've done well, my students!" ]]
 		evt.Add{"Experience", Value = calculateExp(40000)}
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.Cavalier} then
+		evt.Set{"ClassIs", Value = const.Class.BlackKnight}
+		evt.Add{"QBits", Value = 1570}         -- Promoted to Black Knight
+		evt.Add{"Experience", Value = calculateExp(80000)}
+	else
+		evt.Add{"QBits", Value = 1571}         -- Promoted to Honorary Black Knight
+		evt.Add{"Experience", Value = calculateExp(40000)}
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.Cavalier} then
 		evt.Set{"ClassIs", Value = const.Class.BlackKnight}
 		evt.Add{"QBits", Value = 1570}         -- Promoted to Black Knight
@@ -3420,6 +3555,15 @@ For service to the Land and the Light, I hereby promote all Hunters among you to
 		evt.Add{"QBits", Value = 1581}         -- Promoted to Honorary Ranger Lord
 		evt.Add{"Experience", Value = calculateExp(40000)}
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Hunter} then
+		evt.Set{"ClassIs", Value = const.Class.RangerLord}
+		evt.Add{"QBits", Value = 1580}         -- Promoted to Ranger Lord
+		evt.Add{"Experience", Value = calculateExp(80000)}
+	else
+		evt.Add{"QBits", Value = 1581}         -- Promoted to Honorary Ranger Lord
+		evt.Add{"Experience", Value = calculateExp(40000)}
+	end
 	evt.Subtract{"QBits", Value = 548}         -- "Calm the trees in the Tularean Forest by speaking to the Oldest Tree then return to Lysander Sweet in the Bracada Desert."
 	evt.Subtract{"Reputation", Value = 10}
 	evt.ForPlayer("All")
@@ -3481,6 +3625,15 @@ Good job." ]]
 		evt.Add{"QBits", Value = 1583}         -- Promoted to Honorary Bounty Hunter
 		evt.Add{"Experience", Value = calculateExp(40000)}
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Hunter} then
+		evt.Set{"ClassIs", Value = const.Class.BountyHunter}
+		evt.Add{"QBits", Value = 1582}         -- Promoted to Bounty Hunter
+		evt.Add{"Experience", Value = calculateExp(80000)}
+	else
+		evt.Add{"QBits", Value = 1583}         -- Promoted to Honorary Bounty Hunter
+		evt.Add{"Experience", Value = calculateExp(40000)}
+	end
 	evt.Subtract{"QBits", Value = 550}         -- "Collect 10,000 gold worth of bounties from the Bounty Hunts in the town halls, then return to Ebednezer Sower in the Tularean Forest."
 	evt.Subtract{"Reputation", Value = 10}
 	evt.ForPlayer("All")
@@ -3529,6 +3682,15 @@ Clever the ones who can knock on my door!" ]]
 		evt.Add{"Experience", Value = calculateExp(15000)}
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.Ranger} then
+		evt.Set{"ClassIs", Value = const.Class.Hunter}
+		evt.Add{"QBits", Value = 1578}         -- Promoted to Hunter
+		evt.Add{"Experience", Value = calculateExp(30000)}
+	else
+		evt.Add{"QBits", Value = 1579}         -- Promoted to Honorary Hunter
+		evt.Add{"Experience", Value = calculateExp(15000)}
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.Ranger} then
 		evt.Set{"ClassIs", Value = const.Class.Hunter}
 		evt.Add{"QBits", Value = 1578}         -- Promoted to Hunter
@@ -3617,6 +3779,15 @@ Thank you so much for your help!" ]]
 		evt.Add{"QBits", Value = 1610}         -- Promoted to Honorary Priest of the Light
 		evt.Add{"Experience", Value = calculateExp(40000)}
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Priest} then
+		evt.Set{"ClassIs", Value = const.Class.PriestLight}
+		evt.Add{"QBits", Value = 1609}         -- Promoted to Priest of the Light
+		evt.Add{"Experience", Value = calculateExp(80000)}
+	else
+		evt.Add{"QBits", Value = 1610}         -- Promoted to Honorary Priest of the Light
+		evt.Add{"Experience", Value = calculateExp(40000)}
+	end
 	evt.Subtract{"QBits", Value = 554}         -- "Purify the Altar of Evil in the Temple of the Moon on Evenmorn Isle then return to Rebecca Devine in Celeste."
 	evt.Add{"Gold", Value = calculateGold(10000)}
 	evt.Subtract{"Reputation", Value = 10}
@@ -3668,6 +3839,15 @@ Thank you so much for your good work!" ]]
 		evt.Add{"Experience", Value = calculateExp(15000)}
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.Cleric} then
+		evt.Set{"ClassIs", Value = const.Class.Priest}
+		evt.Add{"QBits", Value = 1607}         -- Promoted to Priest
+		evt.Add{"Experience", Value = calculateExp(30000)}
+	else
+		evt.Add{"QBits", Value = 1608}         -- Promoted to Honorary Priest
+		evt.Add{"Experience", Value = calculateExp(15000)}
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.Cleric} then
 		evt.Set{"ClassIs", Value = const.Class.Priest}
 		evt.Add{"QBits", Value = 1607}         -- Promoted to Priest
@@ -3731,6 +3911,15 @@ Thank you so much for your help!" ]]
 		evt.Add{"QBits", Value = 1612}         -- Promoted to Honorary Priest of the Dark
 		evt.Add{"Experience", Value = calculateExp(40000)}
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Priest} then
+		evt.Set{"ClassIs", Value = const.Class.PriestDark}
+		evt.Add{"QBits", Value = 1611}         -- Promoted to Priest of the Dark
+		evt.Add{"Experience", Value = calculateExp(80000)}
+	else
+		evt.Add{"QBits", Value = 1612}         -- Promoted to Honorary Priest of the Dark
+		evt.Add{"Experience", Value = calculateExp(40000)}
+	end
 	evt.Subtract{"QBits", Value = 556}         -- "Deface the Altar of Good in the Temple of the Sun on Evenmorn Isle then return to Daedalus Falk in the Deyja Moors."
 	evt.Add{"Gold", Value = calculateGold(10000)}
 	evt.Subtract{"Reputation", Value = 10}
@@ -3784,6 +3973,15 @@ He'll attack intruders relentlessly.
 		evt.Add{"Experience", Value = calculateExp(15000)}
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.Sorcerer} then
+		evt.Set{"ClassIs", Value = const.Class.Wizard}
+		evt.Add{"QBits", Value = 1619}         -- Promoted to Wizard
+		evt.Add{"Experience", Value = calculateExp(30000)}
+	else
+		evt.Add{"QBits", Value = 1620}         -- Promoted to Honorary Wizard
+		evt.Add{"Experience", Value = calculateExp(15000)}
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.Sorcerer} then
 		evt.Set{"ClassIs", Value = const.Class.Wizard}
 		evt.Add{"QBits", Value = 1619}         -- Promoted to Wizard
@@ -3855,6 +4053,15 @@ Both open simultaneously, and quill arises from the desk to begin copying the te
 		evt.Add{"QBits", Value = 1622}         -- Promoted to Honorary Archmage
 		evt.Add{"Experience", Value = calculateExp(40000)}
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Wizard} then
+		evt.Set{"ClassIs", Value = const.Class.ArchMage}
+		evt.Add{"QBits", Value = 1621}         -- Promoted to Archmage
+		evt.Add{"Experience", Value = calculateExp(80000)}
+	else
+		evt.Add{"QBits", Value = 1622}         -- Promoted to Honorary Archmage
+		evt.Add{"Experience", Value = calculateExp(40000)}
+	end
 	evt.Subtract{"QBits", Value = 559}         -- "Find the Book of Divine Intervention in the Breeding Zone in the Pit and return it to Thomas Grey in the School of Sorcery."
 	evt.Subtract{"QBits", Value = 738}         -- Book of Divine Intervention - I lost it
 	evt.Add{"Gold", Value = calculateGold(10000)}
@@ -3873,6 +4080,10 @@ evt.global[847] = function()
 				goto _11
 			end
 			evt.ForPlayer(3)
+			if not evt.Cmp{"Inventory", Value = 1417} then         -- "Lich Jar"
+				goto _11
+			end
+			evt.ForPlayer(4)
 			if not evt.Cmp{"Inventory", Value = 1417} then         -- "Lich Jar"
 				goto _11
 			end
@@ -3926,6 +4137,15 @@ Remember, each one of you must have a Jar to be Promoted." ]]
 		evt.Add{"Experience", Value = calculateExp(40000)}
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.Wizard} then
+		evt.Set{"ClassIs", Value = const.Class.Lich}
+		evt.Add{"QBits", Value = 1623}         -- Promoted to Lich
+		evt.Add{"Experience", Value = calculateExp(80000)}
+	else
+		evt.Add{"QBits", Value = 1624}         -- Promoted to Honorary Lich
+		evt.Add{"Experience", Value = calculateExp(40000)}
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.Wizard} then
 		evt.Set{"ClassIs", Value = const.Class.Lich}
 		evt.Add{"QBits", Value = 1623}         -- Promoted to Lich
@@ -4010,6 +4230,15 @@ Remember, circles three, then return to me." ]]
 		evt.Add{"QBits", Value = 1614}         -- Promoted to Honorary Great Druid
 		evt.Add{"Experience", Value = calculateExp(15000)}
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Druid} then
+		evt.Set{"ClassIs", Value = const.Class.GreatDruid}
+		evt.Add{"QBits", Value = 1613}         -- Promoted to Great Druid
+		evt.Add{"Experience", Value = calculateExp(30000)}
+	else
+		evt.Add{"QBits", Value = 1614}         -- Promoted to Honorary Great Druid
+		evt.Add{"Experience", Value = calculateExp(15000)}
+	end
 	evt.Subtract{"QBits", Value = 561}         -- "Visit the three stonehenge monoliths in Tatalia, the Evenmorn Islands, and Avlee, then return to Anthony Green in the Tularean Forest."
 	evt.Subtract{"Reputation", Value = 5}
 	evt.ForPlayer("All")
@@ -4057,6 +4286,15 @@ Your service will be remembered!" ]]
 		evt.Add{"Experience", Value = calculateExp(40000)}
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.GreatDruid} then
+		evt.Set{"ClassIs", Value = const.Class.ArchDruid}
+		evt.Add{"QBits", Value = 1615}         -- Promoted to Arch Druid
+		evt.Add{"Experience", Value = calculateExp(80000)}
+	else
+		evt.Add{"QBits", Value = 1616}         -- Promoted to Honorary Arch Druid
+		evt.Add{"Experience", Value = calculateExp(40000)}
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.GreatDruid} then
 		evt.Set{"ClassIs", Value = const.Class.ArchDruid}
 		evt.Add{"QBits", Value = 1615}         -- Promoted to Arch Druid
@@ -4123,6 +4361,15 @@ Of course, that's just an honorary title if you weren't a natural Great Druid to
 		evt.Add{"Experience", Value = calculateExp(40000)}
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.GreatDruid} then
+		evt.Set{"ClassIs", Value = const.Class.Warlock}
+		evt.Add{"QBits", Value = 1617}         -- Promoted to Warlock
+		evt.Add{"Experience", Value = calculateExp(80000)}
+	else
+		evt.Add{"QBits", Value = 1618}         -- Promoted to Honorary Warlock
+		evt.Add{"Experience", Value = calculateExp(40000)}
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.GreatDruid} then
 		evt.Set{"ClassIs", Value = const.Class.Warlock}
 		evt.Add{"QBits", Value = 1617}         -- Promoted to Warlock
@@ -5347,6 +5594,13 @@ I hereby officially promote all paladins to the status of crusader, and all non-
 	else
 		evt.Add{"QBits", Value = 1636}         -- Received Promotion to Honorary Crusader
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Paladin} then
+		evt.Set{"ClassIs", Value = const.Class.Crusader}
+		evt.Add{"QBits", Value = 1635}         -- Received Promotion to Crusader
+	else
+		evt.Add{"QBits", Value = 1636}         -- Received Promotion to Honorary Crusader
+	end
 	evt.Add{"Gold", Value = calculateGold(5000)}
 	evt.Subtract{"QBits", Value = 1699}         -- Replacement for NPCs ¹11 ver. 6
 	evt.Subtract{"QBits", Value = 1112}         -- "Rescue a Damsel in Distress and return with her to Wilbur Humphrey in Castle Ironfist."
@@ -5393,6 +5647,13 @@ I hereby officially promote all crusaders to heroes, and all honorary crusaders 
 		evt.Add{"QBits", Value = 1638}         -- Received Promotion to Honorary Hero
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.Crusader} then
+		evt.Set{"ClassIs", Value = const.Class.Hero}
+		evt.Add{"QBits", Value = 1637}         -- Received Promotion to Hero
+	else
+		evt.Add{"QBits", Value = 1638}         -- Received Promotion to Honorary Hero
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.Crusader} then
 		evt.Set{"ClassIs", Value = const.Class.Hero}
 		evt.Add{"QBits", Value = 1637}         -- Received Promotion to Hero
@@ -5513,6 +5774,13 @@ Congratulations! " ]]
 	else
 		evt.Add{"QBits", Value = 1648}         -- Received Promotion to Honorary Priest
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Cleric} then
+		evt.Set{"ClassIs", Value = const.Class.Priest}
+		evt.Add{"QBits", Value = 1647}         -- Received Promotion to Priest
+	else
+		evt.Add{"QBits", Value = 1648}         -- Received Promotion to Honorary Priest
+	end
 end
 -- "High Priests"
 evt.global[1351] = function()
@@ -5554,6 +5822,13 @@ I hereby promote all priests to high priests, and all honorary priests to honora
 		evt.Add{"QBits", Value = 1650}         -- Received Promotion to Honorary High Priest
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.Priest} then
+		evt.Set{"ClassIs", Value = const.Class.PriestLight}
+		evt.Add{"QBits", Value = 1649}         -- Received Promotion to High Priest
+	else
+		evt.Add{"QBits", Value = 1650}         -- Received Promotion to Honorary High Priest
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.Priest} then
 		evt.Set{"ClassIs", Value = const.Class.PriestLight}
 		evt.Add{"QBits", Value = 1649}         -- Received Promotion to High Priest
@@ -5654,6 +5929,13 @@ Now, let me show you the secrets of the wizard." ]]
 	else
 		evt.Add{"QBits", Value = 1640}         -- Received Promotion to Honorary Wizard
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Sorcerer} then
+		evt.Set{"ClassIs", Value = const.Class.Wizard}
+		evt.Add{"QBits", Value = 1639}         -- Received Promotion to Wizard
+	else
+		evt.Add{"QBits", Value = 1640}         -- Received Promotion to Honorary Wizard
+	end
 	evt.Add{"ReputationIs", Value = 2}
 	evt.Subtract{"QBits", Value = 1135}         -- "Drink from the Fountain of Magic and return to Lord Albert Newton in Mist."
 	evt.SetNPCTopic{NPC = 790, Index = 1, Event = 1372}         -- "Albert Newton" : "Master Wizards"
@@ -5701,6 +5983,13 @@ Let me show you the secrets of the crystal. " ]]
 		evt.Add{"QBits", Value = 1642}         -- Received Promotion to Honorary Archmage
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.Wizard} then
+		evt.Set{"ClassIs", Value = const.Class.ArchMage}
+		evt.Add{"QBits", Value = 1641}         -- Received Promotion to Archmage
+	else
+		evt.Add{"QBits", Value = 1642}         -- Received Promotion to Honorary Archmage
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.Wizard} then
 		evt.Set{"ClassIs", Value = const.Class.ArchMage}
 		evt.Add{"QBits", Value = 1641}         -- Received Promotion to Archmage
@@ -5789,6 +6078,13 @@ I gladly promote you to the rank of cavalier!" ]]
 	else
 		evt.Add{"QBits", Value = 1644}         -- Received Promotion to Honorary Cavalier
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Knight} then
+		evt.Set{"ClassIs", Value = const.Class.Cavalier}
+		evt.Add{"QBits", Value = 1643}         -- Received Promotion to Cavalier
+	else
+		evt.Add{"QBits", Value = 1644}         -- Received Promotion to Honorary Cavalier
+	end
 	evt.SetNPCTopic{NPC = 791, Index = 1, Event = 1383}         -- "Osric Temper" : "Champions"
 	evt.SetNPCTopic{NPC = 792, Index = 0, Event = 1380}         -- "Chadwick Blackpoole" : "Cavaliers"
 end
@@ -5829,6 +6125,13 @@ May your enemies fear your approach and your allies rally behind your courage. A
 		evt.Add{"QBits", Value = 1646}         -- Received Promotion to Honorary Champion
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.Cavalier} then
+		evt.Set{"ClassIs", Value = const.Class.Champion}
+		evt.Add{"QBits", Value = 1645}         -- Received Promotion to Champion
+	else
+		evt.Add{"QBits", Value = 1646}         -- Received Promotion to Honorary Champion
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.Cavalier} then
 		evt.Set{"ClassIs", Value = const.Class.Champion}
 		evt.Add{"QBits", Value = 1645}         -- Received Promotion to Champion
@@ -5998,6 +6301,13 @@ I hereby promote all archers to the status of warrior mage, and all non-archers 
 	else
 		evt.Add{"QBits", Value = 1656}         -- Received Promotion to Honorary Battle Mage
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Archer} then
+		evt.Set{"ClassIs", Value = const.Class.WarriorMage}
+		evt.Add{"QBits", Value = 1655}         -- Received Promotion to Battle Mage
+	else
+		evt.Add{"QBits", Value = 1656}         -- Received Promotion to Honorary Battle Mage
+	end
 	evt.Subtract{"QBits", Value = 1145}         -- "Retrieve the key to the Dragon Towers from Icewind Keep south of Whitecap, and bring it to Lord Stromgard at Castle Stromgard."
 	evt.Add{"ReputationIs", Value = 2}
 	evt.ForPlayer("All")
@@ -6058,6 +6368,13 @@ The easiest is in Whitecap to the west of us." ]]
 		evt.Add{"QBits", Value = 1658}         -- Received Promotion to Honorary Warrior Mage
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.WarriorMage} then
+		evt.Set{"ClassIs", Value = const.Class.MasterArcher}
+		evt.Add{"QBits", Value = 1657}         -- Received Promotion to Warrior Mage
+	else
+		evt.Add{"QBits", Value = 1658}         -- Received Promotion to Honorary Warrior Mage
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.WarriorMage} then
 		evt.Set{"ClassIs", Value = const.Class.MasterArcher}
 		evt.Add{"QBits", Value = 1657}         -- Received Promotion to Warrior Mage
@@ -6583,6 +6900,13 @@ I hereby promote all druids to great druids and all non-druids to honorary druid
 	else
 		evt.Add{"QBits", Value = 1652}         -- Received Promotion to Honorary Great Druid
 	end
+	evt.ForPlayer(4)
+	if evt.Cmp{"ClassIs", Value = const.Class.Druid} then
+		evt.Set{"ClassIs", Value = const.Class.GreatDruid}
+		evt.Add{"QBits", Value = 1651}         -- Received Promotion to Great Druid
+	else
+		evt.Add{"QBits", Value = 1652}         -- Received Promotion to Honorary Great Druid
+	end
 	evt.Add{"ReputationIs", Value = 2}
 	evt.ForPlayer("All")
 	evt.Subtract{"QBits", Value = 1142}         -- "Visit the Altar of the Sun in the circle of stones north of Silver Cove on an equinox or solstice (HINT:  March 20th is an equinox)."
@@ -6622,6 +6946,13 @@ I hereby promote all great druids to arch druids, and all honorary great druids 
 		evt.Add{"QBits", Value = 1654}         -- Received Promotion to Honorary Arch Druid
 	end
 	evt.ForPlayer(3)
+	if evt.Cmp{"ClassIs", Value = const.Class.GreatDruid} then
+		evt.Set{"ClassIs", Value = const.Class.ArchDruid}
+		evt.Add{"QBits", Value = 1653}         -- Received Promotion to Arch Druid
+	else
+		evt.Add{"QBits", Value = 1654}         -- Received Promotion to Honorary Arch Druid
+	end
+	evt.ForPlayer(4)
 	if evt.Cmp{"ClassIs", Value = const.Class.GreatDruid} then
 		evt.Set{"ClassIs", Value = const.Class.ArchDruid}
 		evt.Add{"QBits", Value = 1653}         -- Received Promotion to Arch Druid
