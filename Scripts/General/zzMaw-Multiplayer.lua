@@ -54,7 +54,7 @@ function events.PlayerCastSpell(t)
 		Multiplayer.broadcast_mapdata(healData)
 	end
 	if Multiplayer and t.SpellId==68 and t.TargetKind==4 then
-		if healData and healData[1] then
+		if healData and healData[5] then
 			Party[t.TargetId].HP=Party[t.TargetId].HP+healData[1]
 			if Party.High==0 then
 				Sleep(1)
@@ -66,8 +66,8 @@ function events.PlayerCastSpell(t)
 				Sleep(1)
 				Game.ShowStatusText(string.format(healData[3] .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[4] .. " hit points"))
 			end
-			healData[1]=false
-			Multiplayer.broadcast_mapdata(healCast)
+			healData[5]=false
+			Multiplayer.broadcast_mapdata(healData)
 		end
 	end
 end
