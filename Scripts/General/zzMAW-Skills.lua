@@ -1589,3 +1589,10 @@ function events.GetSkill(t)
 		t.Result=maxIdentify
 	end
 end
+
+--merchant fix
+function events.GetMerchantTotalSkill(t)
+	if t.Result==10000 then
+	t.Result=1000
+	end
+end
