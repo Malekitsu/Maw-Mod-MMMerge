@@ -119,7 +119,7 @@ function events.ItemGenerated(t)
 		if pseudoStr==1 then 
 			return 
 		end
-		pseudoStr=math.min(20,#encStrDown)
+		pseudoStr=math.min(pseudoStr,#encStrDown)
 		roll1=math.random(1,100)
 		roll2=math.random(1,100)
 		rollSpc=math.random(1,100)
