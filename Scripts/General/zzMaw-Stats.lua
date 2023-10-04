@@ -517,33 +517,45 @@ function events.Tick()
 	if Game.CurrentCharScreen==100 and Game.CurrentScreen==7 then
 		local i=Game.CurrentPlayer 
 		if i==-1 then return end --prevent bug message
-		fireRes=Party[i]:GetResistance(10)/4
-		airRes=Party[i]:GetResistance(11)/4
-		waterRes=Party[i]:GetResistance(12)/4
-		earthRes=Party[i]:GetResistance(13)/4
-		mindRes=Party[i]:GetResistance(14)/4
-		bodyRes=Party[i]:GetResistance(15)/4
-
+		--calculate party level
+		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+		if currentWorld==1 then
+			partyLevel=vars.MM7LVL+vars.MM6LVL
+		elseif currentWorld==2 then
+			partyLevel=vars.MM8LVL+vars.MM6LVL
+		elseif currentWorld==3 then
+			partyLevel=vars.MM8LVL+vars.MM7LVL
+		elseif currentWorld==4 then
+			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+		end
+		penaltyLevel=math.min(math.round(partyLevel/5)*5,250)
+		penalty=math.min(penaltyLevel,100)
+		fireRes=Party[i]:GetResistance(10)/2 - penalty
+		airRes=Party[i]:GetResistance(11)/2 - penalty
+		waterRes=Party[i]:GetResistance(12)/2 - penalty
+		earthRes=Party[i]:GetResistance(13)/2 - penalty
+		mindRes=Party[i]:GetResistance(14)/2 - penalty
+		bodyRes=Party[i]:GetResistance(15)/2 - penalty
 		--add bonus2
 		for it in Party[Game.CurrentPlayer]:EnumActiveItems() do
 			if it.Bonus2==1 then
-				fireRes=fireRes+10/4
-				airRes=airRes+10/4
-				waterRes=waterRes+10/4
-				earthRes=earthRes+10/4
-				mindRes=mindRes+10/4
-				bodyRes=bodyRes+10/4
+				fireRes=fireRes+10/2
+				airRes=airRes+10/2
+				waterRes=waterRes+10/2
+				earthRes=earthRes+10/2
+				mindRes=mindRes+10/2
+				bodyRes=bodyRes+10/2
 			end
 			if it.Bonus2==42 then
-				fireRes=fireRes+1/4
-				airRes=airRes+1/4
-				waterRes=waterRes+1/4
-				earthRes=earthRes+1/4
-				mindRes=mindRes+1/4
-				bodyRes=bodyRes+1/4
+				fireRes=fireRes+1/2
+				airRes=airRes+1/2
+				waterRes=waterRes+1/2
+				earthRes=earthRes+1/2
+				mindRes=mindRes+1/2
+				bodyRes=bodyRes+1/2
 			end
 			if it.Bonus2==50 then
-				fireRes=fireRes+30/4
+				fireRes=fireRes+30/2
 			end
 		end
 		if fireRes>=75 then
