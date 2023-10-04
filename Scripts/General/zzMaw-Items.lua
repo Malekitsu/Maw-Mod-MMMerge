@@ -119,6 +119,7 @@ function events.ItemGenerated(t)
 		if pseudoStr==1 then 
 			return 
 		end
+		pseudoStr=math.max(2,#encStrDown)
 		roll1=math.random(1,100)
 		roll2=math.random(1,100)
 		rollSpc=math.random(1,100)
@@ -230,6 +231,13 @@ function events.ItemGenerated(t)
 			t.Item.BonusStrength=t.Item.BonusStrength*2
 			t.Item.Charges=t.Item.Charges+t.Item.Charges%1000
 		end
+		--nerf magic resistance a bit
+		if math.floor(t.Item.Charges/1000)>10 then
+			originalBonus=t.Item.Charges%1000
+			t.Item.Charges=t.Item.Charges-originalBonus+originalBonus^0.85*2
+			t.Item.BonusStrength=t.Item.BonusStrength^0.85*2
+		end
+		
 	end
 end
 
@@ -1337,4 +1345,42 @@ function events.GameInitialized2() --make it load later compared to other script
 		end
 	end
 end
-				
+
+
+function increaseBase(target, item)
+	debug.Message(dump(target))
+	debug.Message(dump(item))
+	return 2
+end
+			
+--[[crafting system
+function events.GameInitialized2()
+--Adds a special enchant (rare)
+2066
+--Adds a Base enchant to an item (rare)
+2053
+--Increase base enchant value by 1, up to a value determined by consumable level
+2057
+2058
+2060
+2061
+2062
+2059
+2063
+2064
+2065
+2056
+--Rerolls Base enchant
+618
+--Rerolls Special enchant
+617
+
+--Increase base item strength up to +5 (having 25% extra base stats and special enchant value)
+1477
+
+--Creates a copy of the item (very rare) 
+657
+]]
+
+
+ 
