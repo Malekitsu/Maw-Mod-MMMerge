@@ -234,8 +234,10 @@ function events.ItemGenerated(t)
 		--nerf magic resistance a bit
 		if math.floor(t.Item.Charges/1000)>10 then
 			originalBonus=t.Item.Charges%1000
-			t.Item.Charges=t.Item.Charges-originalBonus+originalBonus^0.85*2
-			t.Item.BonusStrength=t.Item.BonusStrength^0.85*2
+			t.Item.Charges=t.Item.Charges-originalBonus+originalBonus^0.7*2
+		end
+		if t.Item.Bonus>10 and t.Item.Bonus<=16 then
+			t.Item.BonusStrength=t.Item.BonusStrength^0.7*2
 		end
 		
 	end
