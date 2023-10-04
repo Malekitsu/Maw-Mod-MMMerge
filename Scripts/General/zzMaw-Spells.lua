@@ -1,42 +1,300 @@
 -------------------------------------------------
---Nerf to Day of Protection and Day of the Gods--
+------------------SPELL CHANGES------------------
 -------------------------------------------------
-function events.Tick()
-	--Day of Protection
-	dopList = {0, 1, 4, 6, 12, 17}
+--day of protection buff list
+local dopList = {0, 1, 4, 6, 12, 17}
+
+--Remove curse matrix
+local curseBase={0,12,24,36}
+local curseScaling={0,2,4,6}
+
+--lesser heal matrix
+local lesserHealBase={5,10,15,20}
+local lesserHealScaling={1,2,3,4}
+
+--greater heal matrix
+local greaterHealBase={0,0,25,40}
+local greaterHealScaling={0,0,6,9}
+
+--modify Spells
+function events.PlayerCastSpell(t)
+	--Invisibility
+	if t.SpellId==19 then
+		t.Skill=1
+		t.Mastery=3
+		local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Air))
+		minutesPerSkill=(m-3)*3+3
+		baseDuration=(m-3)*15+15
+		Party.SpellBuffs[11].ExpireTime=Game.Time+const.Minute*(baseDuration+minutesPerSkill*s)
+		Party.SpellBuffs[11].Power=1000
+		--online code
+		return
+	end
 	
+	--cure curse
+	if t.SpellId==49 then
+		local persBonus=t.Player:GetPersonality()/1000
+		local intBonus=t.Player:GetIntellect()/1000
+		local statBonus=math.max(persBonus,intBonus)
+		local crit=t.Player:GetLuck()/1500+0.05
+		local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
+		local baseHeal=curseBase[m]+curseScaling[m]*s
+		local totHeal=baseHeal*(statBonus+1)
+		roll=math.random()
+		local gotCrit=false
+		if roll<crit then
+			totHeal=(totHeal)*(1.5+statBonus*3/2)
+			gotCrit=true
+		end
+		local totHeal=math.round(totHeal)
+		--apply heal
+		if t.TargetKind==4 then
+			local maxHP=Party[t.TargetId]:GetFullHP()
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+totHeal,maxHP)
+			if gotCrit then
+				Sleep(1)
+				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal .. " Hit points(critical)"))
+			else
+				Sleep(1)
+				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal .. " Hit points"))
+			end
+		else
+			--online code
+		end
+	end
+	
+	--heroism
+	if t.SpellId==51 then
+		local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
+		local power=5+s*2
+		for i=0,Party.High do
+			if Party.SpellBuffs[9].Power<=	power then
+				Party.SpellBuffs[9].Power = power
+			end
+		end
+		--online code
+		return
+	end
+	
+	--resurrection
+	if t.SpellId==55 then
+		local persBonus=t.Player:GetPersonality()/1000
+		local intBonus=t.Player:GetIntellect()/1000
+		local statBonus=math.max(persBonus,intBonus)
+		local crit=t.Player:GetLuck()/1500+0.05
+		local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
+		local baseHeal=200+20*s
+		local totHeal=baseHeal*(statBonus+1)
+		roll=math.random()
+		local gotCrit=false
+		if roll<crit then
+			totHeal=(totHeal)*(1.5+statBonus*3/2)
+			gotCrit=true
+		end
+		local totHeal=math.round(totHeal)
+		--apply heal
+		if t.TargetKind==4 then
+			local maxHP=Party[t.TargetId]:GetFullHP()
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+totHeal,maxHP)
+			if gotCrit then
+				Sleep(1)
+				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal .. " Hit points(critical)"))
+			else
+				Sleep(1)
+				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal .. " Hit points"))
+			end
+		else
+			--online code
+		end
+	end
+	
+	--lesser heal
+	if t.SpellId==68 then
+		t.Skill=0
+		local persBonus=t.Player:GetPersonality()/1000
+		local intBonus=t.Player:GetIntellect()/1000
+		local statBonus=math.max(persBonus,intBonus)
+		local crit=t.Player:GetLuck()/1500+0.05
+		local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
+		local baseHeal=lesserHealBase[m]+lesserHealScaling[m]*s
+		local totHeal=baseHeal*(statBonus+1)
+		roll=math.random()
+		local gotCrit=false
+		if roll<crit then
+			totHeal=(totHeal)*(1.5+statBonus*3/2)
+			gotCrit=true
+		end
+		--remove base heal
+		local totHeal=math.round(totHeal-5)
+		--apply heal
+		if t.TargetKind==4 then
+			local maxHP=Party[t.TargetId]:GetFullHP()
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+totHeal,maxHP)
+			if gotCrit then
+				Sleep(1)
+				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal .. " Hit points(critical)"))
+			else
+				Sleep(1)
+				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal .. " Hit points"))
+			end
+		else
+			--online code
+		end
+	end
+	
+	--cure disease, reworked to greater heal
+	if t.SpellId==74 then
+		local persBonus=t.Player:GetPersonality()/1000
+		local intBonus=t.Player:GetIntellect()/1000
+		local statBonus=math.max(persBonus,intBonus)
+		local crit=t.Player:GetLuck()/1500+0.05
+		local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
+		local baseHeal=greaterHealBase[m]+greaterHealScaling[m]*s
+		local totHeal=baseHeal*(statBonus+1)
+		roll=math.random()
+		local gotCrit=false
+		if roll<crit then
+			totHeal=(totHeal)*(1.5+statBonus*3/2)
+			gotCrit=true
+		end
+		local totHeal=math.round(totHeal)
+		--apply heal
+		if t.TargetKind==4 then
+			local maxHP=Party[t.TargetId]:GetFullHP()
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+totHeal,maxHP)
+			if gotCrit then
+				Sleep(1)
+				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal .. " Hit points(critical)"))
+			else
+				Sleep(1)
+				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal .. " Hit points"))
+			end
+		else
+			--online code
+		end
+	end
+	
+	--protection from Magic, no need for online code
+	if t.SpellId==75 then
+		local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Light))
+		if m==4 then
+			t.Skill=10
+		else
+			t.Skill=math.min(t.Skill,10)
+		end
+		return
+	end
+	
+	--power cure
+	if t.SpellId==77 then
+		t.Skill=0
+		local persBonus=t.Player:GetPersonality()/1000
+		local intBonus=t.Player:GetIntellect()/1000
+		local statBonus=math.max(persBonus,intBonus)
+		local crit=t.Player:GetLuck()/1500+0.05
+		local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
+		local baseHeal=3*s
+		local totHeal=baseHeal*(statBonus+1)
+		roll=math.random()
+		local gotCrit=false
+		if roll<crit then
+			totHeal=(totHeal)*(1.5+statBonus*3/2)
+			gotCrit=true
+		end
+		totHeal=math.round(totHeal)
+		--apply heal
+		if t.TargetKind==0 then
+			local maxHP=Party[t.TargetId]:GetFullHP()
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+totHeal,maxHP)
+			if gotCrit then
+				Sleep(1)
+				Game.ShowStatusText(string.format(t.Player.Name .. " heals all party for " .. totHeal+10 .. " Hit points(critical)"))
+			else
+				Sleep(1)
+				Game.ShowStatusText(string.format(t.Player.Name .. " heals all party for " .. totHeal+10 .. " Hit points"))
+			end
+		else
+			--online code
+		end
+	end
 	
 	--Day of the Gods
-	if Party.SpellBuffs[2].Skill>=2 then
-		m=Party.SpellBuffs[2].Skill
-		Party.SpellBuffs[2].Power=(Party.SpellBuffs[2].Power-10)/(m+1)*(m/2)+5*m
-		Party.SpellBuffs[2].Skill=1
+	if t.SpellId==83 then
+		t.Skill=0
+		local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Light))
+		local power=m*5+s*m/2
+		for i=0,Party.High do
+			if Party.SpellBuffs[2].Power<=	power then
+				Party.SpellBuffs[2].Power = power
+				Party.SpellBuffs[2].Skill = t.Mastery
+				Party.SpellBuffs[2].ExpireTime = Game.Time+const.Hour*s
+			end
+		end
+		--online code
+		return
 	end
 	
-	if Party.SpellBuffs[14].Power>10 then
-		if Party.SpellBuffs[14].Skill==4 then
-			Party.SpellBuffs[14].Power=10
-		else
-			Party.SpellBuffs[14].Power=5
-		end
-	end
-end
-function events.PlayerCastSpell(t)
+	--Day of Protection
+	dopList = {0, 1, 4, 6, 12, 17}
 	if t.SpellId==85 then
-		if t.Mastery==3 then
-			t.Skill=t.Skill/2
-		elseif t.Mastery==4 then
-			t.Skill=t.Skill/5*3
+		t.Skill=0
+		local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Light))
+		local power=s*(m-1)
+		for i=0,Party.High do
+			for _, buffId in ipairs(dopList) do
+				if Party.SpellBuffs[buffId].Power<=power then
+					Party.SpellBuffs[buffId].Power = power
+					Party.SpellBuffs[buffId].Skill = t.Mastery
+					Party.SpellBuffs[buffId].ExpireTime = Game.Time+const.Hour*s
+				end
+			end
 		end
+		--online code
+		return
 	end
+	
 end
 
-----------------
---Tooltips fix--
-----------------
+------------------------------
+--Tooltips and mana cost fix--
+------------------------------
 
 --Day of Protection
 function events.GameInitialized2()
+	--Invisibility
+	Game.SpellsTxt[19].Master="Duration 15+3 minutes per point of skill"
+	Game.SpellsTxt[19].GM="Duration 30+6 minutes per point of skill"
+	--curse
+	Game.SpellsTxt[49].Description=string.format(Game.SpellsTxt[49].Description .. "\n\nExpert has 1 hour limit per skill point, Master has 1 day per skill point, Grand has not time limit.")
+	Game.SpellsTxt[49].Normal="n/a\n"
+	Game.SpellsTxt[49].Expert="5 Mana cost: \ncures 12 + 2 HP per point of skill\n1 hour limit\n"
+	Game.SpellsTxt[49].Master="8 Mana cost: \ncures 24 + 4 HP per point of skill\n1 day limit\n"
+	Game.SpellsTxt[49].GM="16 Mana cost: \ncures 36 + 6 HP per point of skill\nno limit\n"
+	
+	--heroism
+	Game.SpellsTxt[51].Description="Heroism increases the damage a character does on a successful attack by 5 + 2 point per point of skill in Spirit Magic. This spell affects the entire party at once."
+	
+	--resurrection
+	Game.SpellsTxt[55].GM="Cures 200 + 20 HP per point of skill"
+	
+	--heal
+	Game.SpellsTxt[68].Normal="2 Mana cost: \ncures 5 + 1 HP per point of skill\n1 hour limit\n"
+	Game.SpellsTxt[68].Expert="3 Mana cost: \ncures 10 + 2 HP per point of skill\n1 hour limit\n"
+	Game.SpellsTxt[68].Master="5 Mana cost: \ncures 15 + 3 HP per point of skill\n1 day limit\n"
+	Game.SpellsTxt[68].GM="8 Mana cost: \ncures 20 + 4 HP per point of skill\nno limit\n"
+	
+	--greater heal
+	Game.SpellsTxt[74].Name="Greater Heal"
+	Game.SpellsTxt[74].ShortName="Greater Heal"
+	Game.SpellsTxt[74].Normal="n/a\n"
+	Game.SpellsTxt[74].Expert="n/a\n"
+	Game.SpellsTxt[74].Master="15 Mana cost: \ncures 25 + 6 HP per point of skill\n1 day limit\n"
+	Game.SpellsTxt[74].GM="25 Mana cost: \ncures 40 + 9 HP per point of skill\nno limit\n"
+	
+	--Protection from magic
+	Game.SpellsTxt[75].Description="Protection from Magic affects the entire party at once, granting immunity to certain spells and monster abilities that cause debilitation conditions.  These are:  Poison, Disease, Stone, Paralyze, and Weak.  Every time this spell saves a character from an effect, it weakens.  The spell can survive 1 attack per point of skill in body magic up to 10 attacks--after that, Protection from Magic is broken."
+	
+	--day of protection
 	Game.SpellsTxt[83].Description="Temporarily increases all seven stats on all your characters by 1 per skill in Light Magic.  This spell lasts until you rest."
 	Game.SpellsTxt[83].Expert="All stats increased by 10+1 per skill"
 	Game.SpellsTxt[83].Master="All stats increased by 15+1.5 per skill"
@@ -47,8 +305,26 @@ function events.GameInitialized2()
 	Game.SpellsTxt[85].Master="All spells cast at two times skill"
 	Game.SpellsTxt[85].GM="All spells cast at three times skill"
 	
-	--Protection from magic
-	Game.SpellsTxt[75].Description="Protection from Magic affects the entire party at once, granting immunity to certain spells and monster abilities that cause debilitation conditions.  These are:  Poison, Disease, Stone, Paralyze, and Weak.  Every time this spell saves a character from an effect, it weakens.  The spell can survive 1 attack per point of skill in body magic up to 10 attacks--after that, Protection from Magic is broken."
+	-------------
+	--MANA COST--
+	-------------
+	--remove curse
+	Game.Spells[49]["SpellPointsExpert"]=5
+	Game.Spells[49]["SpellPointsMaster"]=8
+	Game.Spells[49]["SpellPointsGM"]=16
+	
+	--resurrection
+	Game.Spells[55]["SpellPointsGM"]=200
+	
+	--heal
+	Game.Spells[68]["SpellPointsNormal"]=2
+	Game.Spells[68]["SpellPointsExpert"]=3
+	Game.Spells[68]["SpellPointsMaster"]=5
+	Game.Spells[68]["SpellPointsGM"]=8
+
+	--greater heal
+	Game.Spells[74]["SpellPointsGM"]=25
+	
 end
 
 ------------------------------
@@ -573,13 +849,13 @@ function events.Tick()
 	end
 end
 ---------------------------
-----END OF SPELL REWORK----
+----end OF SPELL REWORK----
 ---------------------------
 
 ---------------------------------------------
 --HEALING SCALING WITH PERSONALITY AND CRIT--
 ---------------------------------------------
-
+--[[
 function events.Action(t)
 	--heal
 	if Game.CurrentPlayer<0 then return end
@@ -640,20 +916,5 @@ function events.GameInitialized2()
 	Game.Spells[68]["SpellPointsGM"]=5
 end
 	
---Invisibility Nerf
-function events.Action(t)
-	if t.Action == 142 and t.Action.Param==19 then
-		local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[const.Skills.Air])
-		Sleep(1)
-		local minutesPerSkill=(m-3)*3+3
-		local baseDuration=(m-3)*15+15
-		if Party.SpellBuffs[11].ExpireTime>Game.Time+const.Minute*(baseDuration+minutesPerSkill*s) then
-			Party.SpellBuffs[11].ExpireTime=Game.Time+const.Minute*(baseDuration+minutesPerSkill*s)
-		end
-	end
-end
 
-function events.GameInitialized2()
-	Game.SpellsTxt[19].Master="Duration 15+3 minutes per point of skill"
-	Game.SpellsTxt[19].GM="Duration 30+6 minutes per point of skill"
-end
+]]
