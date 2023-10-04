@@ -1348,18 +1348,26 @@ end
 
 --
 function events.LoadMap(wasInGame)
+	checkCharge=180
 	vars.chargeCooldown=vars.chargeCooldown or 25
+	lastCharge=vars.chargeCooldown
 	charge=false
-	local function chargeTimer() 
+	Timer(chargeTimer, const.Minute/2) 
+end
+function chargeTimer() 
 		if vars.chargeCooldown>0 then
 			vars.chargeCooldown=vars.chargeCooldown-1
 		end
 	end
-	Timer(chargeTimer, const.Minute/2) 
-end
-
 --movement
 function events.Tick()
+	if Multiplayer and Multiplayer.client_monsters()[0] and checkCharge>=0 then
+		--check for charge working
+		checkCharge=checkCharge-1
+	end
+	if checkCharge==0 and lastCharge==vars.chargeCooldown then
+		Timer(chargeTimer, const.Minute/2) 
+	end
 	if charge~=true then return end --return if charge event is off
 	--get closer to Monster
 	Party.X=Party.X-distanceX/22
