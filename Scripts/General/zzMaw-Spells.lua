@@ -46,7 +46,7 @@ function events.GameInitialized2()
 	Game.SpellsTxt[85].GM="All spells cast at three times skill"
 	
 	--Protection from magic
-	Game.SpellsTxt[85].Description="Protection from Magic affects the entire party at once, granting immunity to certain spells and monster abilities that cause debilitation conditions.  These are:  Poison, Disease, Stone, Paralyze, and Weak.  Every time this spell saves a character from an effect, it weakens.  The spell can survive 1 attack per point of skill in body magic up to 10 attacks--after that, Protection from Magic is broken."
+	Game.SpellsTxt[75].Description="Protection from Magic affects the entire party at once, granting immunity to certain spells and monster abilities that cause debilitation conditions.  These are:  Poison, Disease, Stone, Paralyze, and Weak.  Every time this spell saves a character from an effect, it weakens.  The spell can survive 1 attack per point of skill in body magic up to 10 attacks--after that, Protection from Magic is broken."
 end
 
 ------------------------------
@@ -580,6 +580,7 @@ end
 
 function events.Action(t)
 	--heal
+	if Game.CurrentPlayer<0 then return end
 	if t.Action==141 then
 		local persBonus=Party[Game.CurrentPlayer]:GetPersonality()/1000
 		local intBonus=Party[Game.CurrentPlayer]:GetIntellect()/1000
