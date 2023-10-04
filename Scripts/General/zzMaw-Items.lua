@@ -119,7 +119,7 @@ function events.ItemGenerated(t)
 		if pseudoStr==1 then 
 			return 
 		end
-		pseudoStr=math.max(2,#encStrDown)
+		pseudoStr=math.min(20,#encStrDown)
 		roll1=math.random(1,100)
 		roll2=math.random(1,100)
 		rollSpc=math.random(1,100)
@@ -538,7 +538,7 @@ function events.BuildItemInformationBox(t)
 			t.Enchantment=""
 			if t.Item.Bonus>0 then
 				if t.Item.Bonus>=11 and t.Item.Bonus<=16 then --% values for resistances
-					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. t.Item.BonusStrength/2 .. "%" 
+					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. t.Item.BonusStrength .. "%" 
 				else
 					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. t.Item.BonusStrength
 				end
@@ -547,7 +547,7 @@ function events.BuildItemInformationBox(t)
 				local bonus=math.floor(t.Item.Charges/1000)
 				local strength=t.Item.Charges%1000
 				if bonus>=11 and bonus<=16 then --% values for resistances
-					strength=strength/2
+					strength=strength
 					t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "%" .. "\n" .. t.Enchantment
 				else
 					t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
