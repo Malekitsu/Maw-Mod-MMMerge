@@ -392,3 +392,178 @@ function events.GameInitialized2()
 	Game.SkillDesMaster[const.Skills.Alchemy]="Allows to make white potions. Power when mixing will be increased to 1.5 per skill point."
 	Game.SkillDesGM[const.Skills.Alchemy]="Allows to make black potions. Power when mixing will be increased to 2 per skill point."
 end
+
+for i=1,10 do
+	evt.PotionEffects[70+i] = function(IsDrunk, t, Power)
+		if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+			if t.Bonus==0 and t.Charges<=1000 then 
+				return
+			end
+			
+			if craftWaitTime>0 then return end
+			--pick which enchant to pick that is below the item power
+			tier=(Mouse.Item.Number-1050)
+			maxStrength=tier*10
+			upgradeAmount=math.round(maxStrength^0.5/2)
+			if t.BonusStrength>=maxStrength and t.Charges%1000>=maxStrength then 
+				Game.ShowStatusText("Gem power is not enough")
+				return
+			end
+			if t.BonusStrength<=t.Charges%1000 or (t.Charges<=1000 and t.BonusStrength<maxStrength) then
+				t.BonusStrength=math.min(t.BonusStrength+upgradeAmount,maxStrength)
+			elseif t.Charges%1000<maxStrength and t.Charges>1000 then
+				newBonus=math.min(t.Charges%1000+upgradeAmount,maxStrength)
+				t.Charges=t.Charges-t.Charges%1000+newBonus
+			else
+				Game.ShowStatusText("Gem power is not enough")
+				return
+			end
+			if Mouse.Item.Charges<=1 then
+				Mouse.Item.Number=0
+			else
+				Mouse.Item.Charges=Mouse.Item.Charges-1
+				enchanted=true
+			end
+			mem.u4[0x51E100] = 0x100 
+			t.Condition = t.Condition:Or(0x10)
+			evt.PlaySound(12070)
+		end
+	end
+end
+
+function events.GameInitialized2()
+	craftWaitTime=craftWaitTime or 0
+end
+function events.Tick()
+	if enchanted then
+		craftWaitTime=30
+		enchanted=false
+	end
+	if craftWaitTime>0 then
+		craftWaitTime=craftWaitTime-1
+	end
+end
+
+evt.PotionEffects[81] = function(IsDrunk, t, Power)
+	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+		if t.Bonus2~=0 then 
+			return
+		end
+		n=t.Number
+		c=Game.ItemsTxt[n].EquipStat
+		math.randomseed(t.Number+t.MaxCharges+t.Bonus+math.floor(t.Charges/1000))
+		if c<12 then
+			power=6
+			totB2=itemStrength[power][c]
+			roll=math.random(1,totB2)
+			tot=0
+			for i=0,Game.SpcItemsTxt.High do
+				if roll<=tot then
+					t.Bonus2=i
+					goto continue
+				elseif table.find(enchants[power], Game.SpcItemsTxt[i].Lvl) then
+					tot=tot+Game.SpcItemsTxt[i].ChanceForSlot[c]
+				end
+			end	
+		end			
+		::continue::
+		Mouse.Item.Number=0
+		mem.u4[0x51E100] = 0x100 
+		t.Condition = t.Condition:Or(0x10)
+		evt.PlaySound(12070)
+	end
+end
+
+evt.PotionEffects[82] = function(IsDrunk, t, Power)
+	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+		if t.Charges>1000 or t.BonusStrength==0 then 
+			return
+		end
+		math.randomseed(t.Number+t.MaxCharges+t.Bonus+t.Bonus2)
+		t.Charges=math.random(1,16)*1000+math.min(math.round(t.BonusStrength*(1+0.25*math.random())),100)
+		Mouse.Item.Number=0
+		mem.u4[0x51E100] = 0x100 
+		t.Condition = t.Condition:Or(0x10)
+		evt.PlaySound(12070)
+	end
+end
+
+evt.PotionEffects[83] = function(IsDrunk, t, Power)
+	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+		t.MaxCharges=t.MaxCharges+2
+		Mouse.Item.Number=0
+		mem.u4[0x51E100] = 0x100 
+		t.Condition = t.Condition:Or(0x10)
+		evt.PlaySound(12070)
+	end
+end
+
+evt.PotionEffects[84] = function(IsDrunk, t, Power)
+	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+		Mouse.Item.Number=t.Number
+		Mouse.Item.Bonus=t.Bonus
+		Mouse.Item.BonusStrength=t.BonusStrength
+		Mouse.Item.Charges=t.Charges
+		Mouse.Item.Bonus2=t.Bonus2
+		Mouse.Item.MaxCharges=t.MaxCharges
+		Mouse.Item.BonusExpireTime=t.BonusExpireTime
+		
+		mem.u4[0x51E100] = 0x100 
+		t.Condition = t.Condition:Or(0x10)
+		evt.PlaySound(12070)
+	end
+end
+
+
+craftDropChances={
+		["gems"]=0.01,
+		[1061]=0.001,
+		[1062]=0.001,
+		[1063]=0.0025,
+		[1064]=0.0005,
+	}
+function events.MonsterKilled(mon)
+	if mon.Ally == 9999 then -- no drop from reanimated monsters
+		return
+	end
+	-- check bolster level
+	currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+	if currentWorld==1 then
+		partyLevel=vars.MM7LVL+vars.MM6LVL
+	elseif currentWorld==2 then
+		partyLevel=vars.MM8LVL+vars.MM6LVL
+	elseif currentWorld==3 then
+		partyLevel=vars.MM8LVL+vars.MM7LVL
+	elseif currentWorld==4 then
+		partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+	end
+	bonusRoll=1+partyLevel/150
+	--pick base craft material
+	baseCraftDrop=false
+	if math.random()<craftDropChances.gems*bonusRoll then
+		baseCraftDrop=true
+		craftStrength=mon.Level/25+(math.random(0,50)-25)/25
+		craftStrength=math.max(math.min(craftStrength,10),1)
+		crafMaterialNumber=1050+craftStrength
+	end	
+	if baseCraftDrop then
+		obj = SummonItem(crafMaterialNumber, mon.X, mon.Y, mon.Z + 100, 100)
+		if obj then
+			obj.Item.Charges=1
+		end
+	end
+	--pick special drop
+	if math.random()<craftDropChances[1061]*bonusRoll then
+		obj = SummonItem(1061, mon.X, mon.Y, mon.Z + 100, 100)
+	end
+	if math.random()<craftDropChances[1062]*bonusRoll then
+		obj = SummonItem(1062, mon.X, mon.Y, mon.Z + 100, 100)
+	end
+	if math.random()<craftDropChances[1063]*bonusRoll then
+		obj = SummonItem(1063, mon.X, mon.Y, mon.Z + 100, 100)
+	end
+	if math.random()<craftDropChances[1064]*bonusRoll then
+		obj = SummonItem(1064, mon.X, mon.Y, mon.Z + 100, 100)
+	end
+end
+
