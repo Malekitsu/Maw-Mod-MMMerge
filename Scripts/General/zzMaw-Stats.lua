@@ -384,33 +384,48 @@ function events.CalcDamageToPlayer(t)
 		end
 		--get resistances
 		if t.DamageKind==0 then
-			res=Party[coverPlayerIndex]:GetResistance(10)/4
+			res=Party[coverPlayerIndex]:GetResistance(10)/2
 		end
 		if t.DamageKind==1 then
-			res=Party[coverPlayerIndex]:GetResistance(11)/4
+			res=Party[coverPlayerIndex]:GetResistance(11)/2
 		end
 		if t.DamageKind==2 then
-			res=Party[coverPlayerIndex]:GetResistance(12)/4
+			res=Party[coverPlayerIndex]:GetResistance(12)/2
 			res2=0
 		end
 		if t.DamageKind==3 then
-			res=Party[coverPlayerIndex]:GetResistance(13)/4
+			res=Party[coverPlayerIndex]:GetResistance(13)/2
 		end
 		if t.DamageKind==7 then
-			res=Party[coverPlayerIndex]:GetResistance(14)/4
+			res=Party[coverPlayerIndex]:GetResistance(14)/2
 		end
 		if t.DamageKind==8 then
-			res=Party[coverPlayerIndex]:GetResistance(15)/4
+			res=Party[coverPlayerIndex]:GetResistance(15)/2
 		end
 		if t.DamageKind==9 then
-			res=math.min(Party[coverPlayerIndex]:GetResistance(14),Party[coverPlayerIndex]:GetResistance(15))/4
+			res=math.min(Party[coverPlayerIndex]:GetResistance(14),Party[coverPlayerIndex]:GetResistance(15))/2
 		end
 		if t.DamageKind==10 then
-			res=math.min(Party[coverPlayerIndex]:GetResistance(10),Party[coverPlayerIndex]:GetResistance(11),Party[coverPlayerIndex]:GetResistance(12),Party[coverPlayerIndex]:GetResistance(13))/4
+			res=math.min(Party[coverPlayerIndex]:GetResistance(10),Party[coverPlayerIndex]:GetResistance(11),Party[coverPlayerIndex]:GetResistance(12),Party[coverPlayerIndex]:GetResistance(13))/2
 		end
 		if t.DamageKind==12 then
-			res=math.min(Party[coverPlayerIndex]:GetResistance(10),Party[coverPlayerIndex]:GetResistance(11),Party[coverPlayerIndex]:GetResistance(12),Party[coverPlayerIndex]:GetResistance(13),Party[coverPlayerIndex]:GetResistance(14),Party[coverPlayerIndex]:GetResistance(15))/4
+			res=math.min(Party[coverPlayerIndex]:GetResistance(10),Party[coverPlayerIndex]:GetResistance(11),Party[coverPlayerIndex]:GetResistance(12),Party[coverPlayerIndex]:GetResistance(13),Party[coverPlayerIndex]:GetResistance(14),Party[coverPlayerIndex]:GetResistance(15))/2
 		end
+		--calculate penalty
+		--calculate party level
+		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+		if currentWorld==1 then
+			partyLevel=vars.MM7LVL+vars.MM6LVL
+		elseif currentWorld==2 then
+			partyLevel=vars.MM8LVL+vars.MM6LVL
+		elseif currentWorld==3 then
+			partyLevel=vars.MM8LVL+vars.MM7LVL
+		elseif currentWorld==4 then
+			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+		end
+		penaltyLevel=math.min(math.round(partyLevel/5)*5,250)
+		penalty=math.min(penaltyLevel,100)
+		res=res-penalty
 		--put here code to change max res
 		maxres=75
 		for it in Party[coverPlayerIndex]:EnumActiveItems() do
@@ -442,11 +457,13 @@ function events.CalcDamageToPlayer(t)
 		end
 		
 		--randomize resistance
-		local roll=(math.random()+math.random())-1
-		res=math.max(0, res+(math.min(res,1-res)*roll))
-		
+		if res>0 then
+			local roll=(math.random()+math.random())-1
+			res=math.max(0, res+(math.min(res,1-res)*roll))
+		end
 		--apply Damage
 		t.Result = t.Damage * (1-res)
+		--modify spell damage as it's not handled in maw-monsters
 		data=WhoHitPlayer()
 		if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
 			oldLevel=BLevel[data.Monster.Id]
@@ -493,6 +510,20 @@ function events.CalcStatBonusByItems(t)
 			t.Result = t.Result+it.BonusStrength
 		end
 	end
+	
+	--add bonus2
+	for it in t.Player:EnumActiveItems() do
+		if it.Bonus2==1 and t.Stat>=10 and t.Stat<=15 then
+			t.Result=t.Result+10
+		end
+		if it.Bonus2==42 and t.Stat>=10 and t.Stat<=15 then
+			t.Result=t.Result+1
+		end
+		if it.Bonus2==50 and t.Stat==10 then
+			t.Result=t.Result+30
+		end
+	end
+	
 	--add luck to resistances
 	if t.Stat>=10 and t.Stat<=15 then
 		luck=t.Player:GetLuck()
@@ -536,28 +567,7 @@ function events.Tick()
 		earthRes=Party[i]:GetResistance(13)/2 - penalty
 		mindRes=Party[i]:GetResistance(14)/2 - penalty
 		bodyRes=Party[i]:GetResistance(15)/2 - penalty
-		--add bonus2
-		for it in Party[Game.CurrentPlayer]:EnumActiveItems() do
-			if it.Bonus2==1 then
-				fireRes=fireRes+10/2
-				airRes=airRes+10/2
-				waterRes=waterRes+10/2
-				earthRes=earthRes+10/2
-				mindRes=mindRes+10/2
-				bodyRes=bodyRes+10/2
-			end
-			if it.Bonus2==42 then
-				fireRes=fireRes+1/2
-				airRes=airRes+1/2
-				waterRes=waterRes+1/2
-				earthRes=earthRes+1/2
-				mindRes=mindRes+1/2
-				bodyRes=bodyRes+1/2
-			end
-			if it.Bonus2==50 then
-				fireRes=fireRes+30/2
-			end
-		end
+		
 		if fireRes>=75 then
 			fireRes=StrColor(0,255,0,"Max")
 		end
