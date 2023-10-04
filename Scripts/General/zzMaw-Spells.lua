@@ -4,14 +4,7 @@
 function events.Tick()
 	--Day of Protection
 	dopList = {0, 1, 4, 6, 12, 17}
-	for i = 1, #dopList do
-		item=dopList[i]
-		if Party.SpellBuffs[item].Skill>=2 then
-			m=Party.SpellBuffs[item].Skill
-			Party.SpellBuffs[item].Power=Party.SpellBuffs[item].Power/(m+1)*(m-1)
-			Party.SpellBuffs[item].Skill=1
-		end
-	end
+	
 	
 	--Day of the Gods
 	if Party.SpellBuffs[2].Skill>=2 then
@@ -25,6 +18,15 @@ function events.Tick()
 			Party.SpellBuffs[14].Power=10
 		else
 			Party.SpellBuffs[14].Power=5
+		end
+	end
+end
+function events.PlayerCastSpell(t)
+	if t.SpellId==85 then
+		if t.Mastery==3 then
+			t.Skill=t.Skill/2
+		elseif t.Mastery==4 then
+			t.Skill=t.Skill/5*3
 		end
 	end
 end
