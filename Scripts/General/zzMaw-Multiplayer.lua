@@ -110,7 +110,8 @@ function events.MAWSpell(t)
 			end
 		end
 	elseif t[0]=="Heroism" then
-		
+		Party.SpellBuffs[11].ExpireTime=t[2]
+		Party.SpellBuffs[9].Power = t[3]
 	elseif t[0]=="Resurrection" then
 	
 	elseif t[0]=="Heal" then
