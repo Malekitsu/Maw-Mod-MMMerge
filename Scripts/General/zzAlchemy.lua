@@ -526,18 +526,12 @@ function events.MonsterKilled(mon)
 	if mon.Ally == 9999 then -- no drop from reanimated monsters
 		return
 	end
-	-- check bolster level
-	currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
-	if currentWorld==1 then
-		partyLevel=vars.MM7LVL+vars.MM6LVL
-	elseif currentWorld==2 then
-		partyLevel=vars.MM8LVL+vars.MM6LVL
-	elseif currentWorld==3 then
-		partyLevel=vars.MM8LVL+vars.MM7LVL
-	elseif currentWorld==4 then
-		partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+	--level bonus
+	partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+	bonusRoll=1+partyLevel/200
+	if Multiplayer and Multiplayer.client_monsters()[0] then
+		bonusRoll=bonusRoll/(1+#Multiplayer.client_monsters())
 	end
-	bonusRoll=1+partyLevel/150
 	--pick base craft material
 	baseCraftDrop=false
 	if math.random()<craftDropChances.gems*bonusRoll then
