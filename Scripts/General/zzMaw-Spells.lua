@@ -112,7 +112,7 @@ function events.PlayerCastSpell(t)
 			for i, v in pairs(Multiplayer.client_monsters()) do
 				local mon = Multiplayer.get_client_mon(i)
 				if mon and Multiplayer.utils.distance(Party, mon) < 3000 then
-					allyID=Multiplayer.posessed_by_player(16)
+					allyID=Multiplayer.posessed_by_player(mon)
 					table.insert(data[1],allyID)
 				end
 			end
@@ -151,7 +151,20 @@ function events.PlayerCastSpell(t)
 				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal .. " Hit points"))
 			end
 		else
-			--online code
+			if not Multiplayer or not Multiplayer.client_monsters()[0] then
+				return
+			elseif t.TargetKind==3 then
+				client_id = Multiplayer.posessed_by_player(t.TargetId)
+				if not client_id then
+					return 
+				end
+				data[0]="Resurrection"
+				data[1]=client_id
+				data[2]=totHeal
+				data[3]=gotCrit
+				data[4]=t.Player.Name
+				Multiplayer.broadcast_mapdata(data, "MAWSpell")
+			end
 		end
 	end
 	
@@ -185,7 +198,20 @@ function events.PlayerCastSpell(t)
 				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal+5 .. " Hit points"))
 			end
 		else
-			--online code
+			if not Multiplayer or not Multiplayer.client_monsters()[0] then
+				return
+			elseif t.TargetKind==3 then
+				client_id = Multiplayer.posessed_by_player(t.TargetId)
+				if not client_id then
+					return 
+				end
+				data[0]="Resurrection"
+				data[1]=client_id
+				data[2]=totHeal
+				data[3]=gotCrit
+				data[4]=t.Player.Name
+				Multiplayer.broadcast_mapdata(data, "MAWSpell")
+			end
 		end
 	end
 	
@@ -217,7 +243,20 @@ function events.PlayerCastSpell(t)
 				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal .. " Hit points"))
 			end
 		else
-			--online code
+			if not Multiplayer or not Multiplayer.client_monsters()[0] then
+				return
+			elseif t.TargetKind==3 then
+				client_id = Multiplayer.posessed_by_player(t.TargetId)
+				if not client_id then
+					return 
+				end
+				data[0]="Resurrection"
+				data[1]=client_id
+				data[2]=totHeal
+				data[3]=gotCrit
+				data[4]=t.Player.Name
+				Multiplayer.broadcast_mapdata(data, "MAWSpell")
+			end
 		end
 	end
 	
@@ -261,7 +300,20 @@ function events.PlayerCastSpell(t)
 				Game.ShowStatusText(string.format(t.Player.Name .. " heals all party for " .. totHeal+10 .. " Hit points"))
 			end
 		else
-			--online code
+			if not Multiplayer or not Multiplayer.client_monsters()[0] then
+				return
+			elseif t.TargetKind==3 then
+				client_id = Multiplayer.posessed_by_player(t.TargetId)
+				if not client_id then
+					return 
+				end
+				data[0]="Resurrection"
+				data[1]=client_id
+				data[2]=totHeal
+				data[3]=gotCrit
+				data[4]=t.Player.Name
+				Multiplayer.broadcast_mapdata(data, "MAWSpell")
+			end
 		end
 	end
 	
@@ -278,6 +330,23 @@ function events.PlayerCastSpell(t)
 			end
 		end
 		--online code
+		if not Multiplayer or not Multiplayer.client_monsters()[0] then
+			return
+		else
+			data={}
+			data[0]="DoG"
+			--check for players in the nearbies
+			for i, v in pairs(Multiplayer.client_monsters()) do
+				local mon = Multiplayer.get_client_mon(i)
+				if mon and Multiplayer.utils.distance(Party, mon) < 3000 then
+					allyID=Multiplayer.posessed_by_player(mon)
+					table.insert(data[1],allyID)
+				end
+			end
+			data[2]=Party.SpellBuffs[2].ExpireTime
+			data[3]=power
+			Multiplayer.broadcast_mapdata(data, "MAWSpell")
+		end
 		return
 	end
 	
@@ -296,7 +365,23 @@ function events.PlayerCastSpell(t)
 				end
 			end
 		end
-		--online code
+		if not Multiplayer or not Multiplayer.client_monsters()[0] then
+			return
+		else
+			data={}
+			data[0]="DoP"
+			--check for players in the nearbies
+			for i, v in pairs(Multiplayer.client_monsters()) do
+				local mon = Multiplayer.get_client_mon(i)
+				if mon and Multiplayer.utils.distance(Party, mon) < 3000 then
+					allyID=Multiplayer.posessed_by_player(mon)
+					table.insert(data[1],allyID)
+				end
+			end
+			data[2]=Party.SpellBuffs[11].ExpireTime
+			data[3]=power
+			Multiplayer.broadcast_mapdata(data, "MAWSpell")
+		end
 		return
 	end
 	
