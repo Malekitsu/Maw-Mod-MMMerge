@@ -25,10 +25,10 @@ function events.PlayerCastSpell(t)
 		if not table.find(Multiplayer.client_monsters(),t.TargetId) then
 			return
 		end
-		local persBonus=Party[Game.CurrentPlayer]:GetPersonality()/1000
-		local intBonus=Party[Game.CurrentPlayer]:GetIntellect()/1000
+		local persBonus=t.Player:GetPersonality()/1000
+		local intBonus=t.Player:GetIntellect()/1000
 		local statBonus=math.max(persBonus,intBonus)
-		local crit=Party[Game.CurrentPlayer]:GetLuck()/1500+0.05
+		local crit=t.Player:GetLuck()/1500+0.05
 		local baseHeal=(5+(t.Mastery+1)*t.Skill)
 		local extraHeal=baseHeal*statBonus
 		roll=math.random()
@@ -77,5 +77,51 @@ function events.MultiplayerUserdataArrived(t)
 		for i=0,5 do
 			healData[i]=t[i]
 		end
+	end
+end
+
+
+------------------
+--ONLINE HANDLER--
+------------------
+--here goes instructions for the player receiving the data in the function above
+function events.GameInitialized2()
+	Multiplayer.allow_remote_event("MAWSpell")
+end
+function events.MAWSpell(t)
+	--return if you are not the target
+	if not table.find(t[1],Multiplayer.my_id) then
+		return
+	end
+	if t[0]=="Invisibility" then
+		Party.SpellBuffs[11].ExpireTime=t[2]
+		Party.SpellBuffs[11].Power=t[3]
+		
+	elseif t[0]=="Cure Curse" then
+		if Party.High==0 then
+			local maxHP=Party[0]:GetFullHP()
+			Party[0].HP=math.min(Party[0].HP+t[2],maxHP)
+			if t[3] then
+				Sleep(1)
+				Game.ShowStatusText(string.format(t[4] .. " heals you for " .. totHeal .. " Hit points(critical)"))
+			else
+				Sleep(1)
+				Game.ShowStatusText(string.format(t[4] .. " heals you for " .. totHeal .. " Hit points"))
+			end
+		end
+	elseif t[0]=="Heroism" then
+		
+	elseif t[0]=="Resurrection" then
+	
+	elseif t[0]=="Heal" then
+	
+	elseif t[0]=="Greater Heal" then
+	
+	elseif t[0]=="Power Cure" then
+	
+	elseif t[0]=="DoG" then
+	
+	elseif t[0]=="DoP" then
+	
 	end
 end
