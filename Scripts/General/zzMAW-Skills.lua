@@ -1492,7 +1492,9 @@ function events.Action(t)
 				end
 			end
 			local actualCost=math.ceil(currentCost/n)
-			pl.SkillPoints=pl.SkillPoints+currentCost-actualCost
+			if pl.SkillPoints>actualCost then
+				pl.SkillPoints=pl.SkillPoints+currentCost-actualCost
+			end
 		end
 	end
 end
