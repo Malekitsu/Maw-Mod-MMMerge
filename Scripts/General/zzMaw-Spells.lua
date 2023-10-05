@@ -28,6 +28,23 @@ function events.PlayerCastSpell(t)
 		Party.SpellBuffs[11].ExpireTime=Game.Time+const.Minute*(baseDuration+minutesPerSkill*s)
 		Party.SpellBuffs[11].Power=1000
 		--online code
+		if not Multiplayer or not Multiplayer.client_monsters()[0] then
+			return
+		else
+			data={}
+			data[0]="Invisibility"
+			--check for players in the nearbies
+			for i, v in pairs(Multiplayer.client_monsters()) do
+				local mon = Multiplayer.get_client_mon(i)
+				if mon and Multiplayer.utils.distance(Party, mon) < 3000 then
+					allyID=Multiplayer.posessed_by_player(16)
+					table.insert(data[1],allyID)
+				end
+			end
+			data[2]=Party.SpellBuffs[11].ExpireTime
+			data[3]=Party.SpellBuffs[11].Power
+			Multiplayer.broadcast_mapdata(data, "MAWSpell")
+		end
 		return
 	end
 	
@@ -53,13 +70,26 @@ function events.PlayerCastSpell(t)
 			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+totHeal,maxHP)
 			if gotCrit then
 				Sleep(1)
-				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal .. " Hit points(critical)"))
+				Game.ShowStatusText(string.format(t.Player.Name .. " heals for " .. totHeal .. " Hit points(critical)"))
 			else
 				Sleep(1)
-				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal .. " Hit points"))
+				Game.ShowStatusText(string.format(t.Player.Name .. " heals for " .. totHeal .. " Hit points"))
 			end
 		else
-			--online code
+			if not Multiplayer or not Multiplayer.client_monsters()[0] then
+				return
+			elseif t.TargetKind==3 then
+				client_id = Multiplayer.posessed_by_player(t.TargetId)
+				if not client_id then
+					return 
+				end
+				data[0]="Cure Curse"
+				data[1]=client_id
+				data[2]=totHeal
+				data[3]=gotCrit
+				data[4]=t.Player.Name
+				Multiplayer.broadcast_mapdata(data, "MAWSpell")
+			end
 		end
 	end
 	
@@ -132,10 +162,10 @@ function events.PlayerCastSpell(t)
 			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+totHeal,maxHP)
 			if gotCrit then
 				Sleep(1)
-				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal .. " Hit points(critical)"))
+				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name.. " for " .. totHeal+5 .. " Hit points(critical)"))
 			else
 				Sleep(1)
-				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal .. " Hit points"))
+				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal+5 .. " Hit points"))
 			end
 		else
 			--online code
@@ -255,12 +285,15 @@ function events.PlayerCastSpell(t)
 	
 end
 
+------------------------------------------------------
+--online data are processed in zzMAW-Multiplayer.lua--
+------------------------------------------------------
+
 ------------------------------
 --Tooltips and mana cost fix--
 ------------------------------
-
---Day of Protection
 function events.GameInitialized2()
+--Day of Protection
 	--Invisibility
 	Game.SpellsTxt[19].Master="Duration 15+3 minutes per point of skill"
 	Game.SpellsTxt[19].GM="Duration 30+6 minutes per point of skill"
