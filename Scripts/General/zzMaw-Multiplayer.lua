@@ -17,70 +17,6 @@ function events.MultiplayerUserdataArrived(t)
 	end
 end
 
-
-
-function events.PlayerCastSpell(t)
-	if Multiplayer	 and t.SpellId==68 and t.TargetKind==3 and t.Mastery>0 then
-		--return if target is not an online teammate
-		if not table.find(Multiplayer.client_monsters(),t.TargetId) then
-			return
-		end
-		local persBonus=t.Player:GetPersonality()/1000
-		local intBonus=t.Player:GetIntellect()/1000
-		local statBonus=math.max(persBonus,intBonus)
-		local crit=t.Player:GetLuck()/1500+0.05
-		local baseHeal=(5+(t.Mastery+1)*t.Skill)
-		local extraHeal=baseHeal*statBonus
-		roll=math.random()
-		local gotCrit=false
-		if roll<crit then
-			extraHeal=(extraHeal+baseHeal)*(1.5+statBonus*3/2)-baseHeal
-			gotCrit=true
-		end
-		if gotCrit then
-			Sleep(1)
-			Game.ShowStatusText(string.format("You Heal for " .. math.round(baseHeal+extraHeal) .. " Hit points(crit)"))
-		else
-			Sleep(1)
-			Game.ShowStatusText(string.format("You Heal for " .. math.round(baseHeal+extraHeal) .. " Hit points"))
-		end
-		healData={}
-		healData[0]="heal"
-		healData[1]=math.round(extraHeal)
-		healData[2]=gotCrit
-		healData[3]=t.Player.Name
-		healData[4]=math.round(baseHeal+extraHeal)
-		healData[5]=true
-		Multiplayer.broadcast_mapdata(healData)
-	end
-	if Multiplayer and t.SpellId==68 and t.TargetKind==4 then
-		if healData and healData[5] then
-			Party[t.TargetId].HP=Party[t.TargetId].HP+healData[1]
-			if Party.High==0 then
-				Sleep(1)
-				Game.ShowStatusText(string.format(healData[3] .. " critical heals you for " .. healData[4] .. " hit points"))
-			elseif	healData[2] then
-				Sleep(1)
-				Game.ShowStatusText(string.format(healData[3] .. " critical heals " .. Party[t.TargetId].Name .. " for " .. healData[4] .. " hit points"))
-			else
-				Sleep(1)
-				Game.ShowStatusText(string.format(healData[3] .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[4] .. " hit points"))
-			end
-			healData[5]=false
-			Multiplayer.broadcast_mapdata(healData)
-		end
-	end
-end
-
-function events.MultiplayerUserdataArrived(t)
-	if t[0]=="heal" then
-		for i=0,5 do
-			healData[i]=t[i]
-		end
-	end
-end
-
-
 ------------------
 --ONLINE HANDLER--
 ------------------
@@ -97,7 +33,7 @@ function events.MAWSpell(t)
 		Party.SpellBuffs[11].ExpireTime=t[2]
 		Party.SpellBuffs[11].Power=t[3]
 		
-	elseif t[0]=="Cure Curse" then
+	elseif t[0]=="Cure Curse" or t[0]=="Heal" or t[0]=="Greater Heal" or t[0]=="Power Cure" or t[0]=="Resurrection" then
 		if Party.High==0 then
 			local maxHP=Party[0]:GetFullHP()
 			Party[0].HP=math.min(Party[0].HP+t[2],maxHP)
@@ -109,20 +45,25 @@ function events.MAWSpell(t)
 				Game.ShowStatusText(string.format(t[4] .. " heals you for " .. totHeal .. " Hit points"))
 			end
 		end
+		
 	elseif t[0]=="Heroism" then
-		Party.SpellBuffs[11].ExpireTime=t[2]
-		Party.SpellBuffs[9].Power = t[3]
-	elseif t[0]=="Resurrection" then
-	
-	elseif t[0]=="Heal" then
-	
-	elseif t[0]=="Greater Heal" then
-	
-	elseif t[0]=="Power Cure" then
-	
+		if Party.SpellBuffs[9].Power<=t[3] then
+			Party.SpellBuffs[9].ExpireTime=t[2]
+			Party.SpellBuffs[9].Power = t[3]
+		end
+
 	elseif t[0]=="DoG" then
-	
+		if Party.SpellBuffs[2].Power<=t[3] then
+			Party.SpellBuffs[2].ExpireTime=t[2]
+			Party.SpellBuffs[2].Power = t[3]
+		end
+		
 	elseif t[0]=="DoP" then
-	
+		for _, buffId in ipairs(dopList) do
+			if Party.SpellBuffs[buffId].Power<=t[3] then
+				Party.SpellBu ffs[buffId].ExpireTime = t[2]
+				Party.SpellBuffs[buffId].Power = t[3]
+			end
+		end
 	end
 end
