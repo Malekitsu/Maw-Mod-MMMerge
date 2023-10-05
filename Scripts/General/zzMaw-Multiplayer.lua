@@ -61,7 +61,7 @@ function events.MAWSpell(t)
 	elseif t[0]=="DoP" then
 		for _, buffId in ipairs(dopList) do
 			if Party.SpellBuffs[buffId].Power<=t[3] then
-				Party.SpellBu ffs[buffId].ExpireTime = t[2]
+				Party.SpellBuffs[buffId].ExpireTime = t[2]
 				Party.SpellBuffs[buffId].Power = t[3]
 			end
 		end
