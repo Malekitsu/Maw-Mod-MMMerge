@@ -18,6 +18,16 @@ local greaterHealScaling={0,0,6,9}
 
 --modify Spells
 function events.PlayerCastSpell(t)
+	--check if casted by another party member
+	casterByMyParty=false
+	for i=0,Party.High do
+		if t.Player:GetIndex()==Party[i]:GetIndex() then
+			casterByMyParty=true
+		end
+	end
+	if not casterByMyParty then 
+		return
+	end
 	--Invisibility
 	if t.SpellId==19 then
 		t.Skill=1
