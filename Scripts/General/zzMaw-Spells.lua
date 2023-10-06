@@ -18,255 +18,233 @@ local greaterHealScaling={0,0,6,9}
 
 --modify Spells
 function events.PlayerCastSpell(t)
-	--check if casted by another party member
-	casterByMyParty=false
-	for i=0,Party.High do
-		if t.Player:GetIndex()==Party[i]:GetIndex() then
-			casterByMyParty=true
-		end
-	end
-	if not casterByMyParty then 
-		return
-	end
 	--Invisibility
 	if t.SpellId==19 then
-		t.Skill=1
-		t.Mastery=3
-		local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Air))
-		minutesPerSkill=(m-3)*3+3
-		baseDuration=(m-3)*15+15
-		Party.SpellBuffs[11].ExpireTime=Game.Time+const.Minute*(baseDuration+minutesPerSkill*s)
-		Party.SpellBuffs[11].Power=1000
-		--online code
-		if not Multiplayer or not Multiplayer.client_monsters()[0] then
-			return
-		else
-			data={}
-			data[0]="Invisibility"
-			--check for players in the nearbies
-			for i, v in pairs(Multiplayer.client_monsters()) do
-				local mon = Multiplayer.get_client_mon(i)
-				if mon and Multiplayer.utils.distance(Party, mon) < 3000 then
-					allyID=Multiplayer.posessed_by_player(mon)
-					table.insert(data[1],allyID)
-				end
-			end
-			data[2]=Party.SpellBuffs[11].ExpireTime
-			data[3]=Party.SpellBuffs[11].Power
-			Multiplayer.broadcast_mapdata(data, "MAWSpell")
+		if not t.RemoteData then
+			t.Skill=1
+			t.Mastery=3
+			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Air))
+			minutesPerSkill=(m-3)*3+3
+			baseDuration=(m-3)*15+15
+			Party.SpellBuffs[11].ExpireTime=Game.Time+const.Minute*(baseDuration+minutesPerSkill*s)
+			Party.SpellBuffs[11].Power=1000
+			--online code
+			t.MultiplayerData[1]=Party.SpellBuffs[11].ExpireTime
+			t.MultiplayerData[2]=Party.SpellBuffs[11].Power
+		elseif t.RemoteData then
+			Party.SpellBuffs[11].ExpireTime=t.RemoteData[1]
+			Party.SpellBuffs[11].Power=t.RemoteData[2]
 		end
-		return
 	end
 	
 	--cure curse
 	if t.SpellId==49 then
-		local persBonus=t.Player:GetPersonality()/1000
-		local intBonus=t.Player:GetIntellect()/1000
-		local statBonus=math.max(persBonus,intBonus)
-		local crit=t.Player:GetLuck()/1500+0.05
-		local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
-		local baseHeal=curseBase[m]+curseScaling[m]*s
-		local totHeal=baseHeal*(statBonus+1)
-		roll=math.random()
-		local gotCrit=false
-		if roll<crit then
-			totHeal=(totHeal)*(1.5+statBonus*3/2)
-			gotCrit=true
-		end
-		local totHeal=math.round(totHeal)
-		--apply heal
-		if t.TargetKind==4 then
-			local maxHP=Party[t.TargetId]:GetFullHP()
-			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+totHeal,maxHP)
+		if not t.RemoteData then
+			local persBonus=t.Player:GetPersonality()/1000
+			local intBonus=t.Player:GetIntellect()/1000
+			local statBonus=math.max(persBonus,intBonus)
+			local crit=t.Player:GetLuck()/1500+0.05
+			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
+			local baseHeal=curseBase[m]+curseScaling[m]*s
+			totHeal=baseHeal*(statBonus+1)
+			roll=math.random()
+			gotCrit=false
+			if roll<crit then
+				totHeal=(totHeal)*(1.5+statBonus*3/2)
+				gotCrit=true
+			end
 			if gotCrit then
-				Sleep(1)
-				Game.ShowStatusText(string.format(t.Player.Name .. " heals for " .. totHeal .. " Hit points(critical)"))
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
 			else
-				Sleep(1)
-				Game.ShowStatusText(string.format(t.Player.Name .. " heals for " .. totHeal .. " Hit points"))
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
 			end
-		else
-			if not Multiplayer or not Multiplayer.client_monsters()[0] then
-				return
-			elseif t.TargetKind==3 then
-				client_id = Multiplayer.posessed_by_player(t.TargetId)
-				if not client_id then
-					return 
-				end
-				data[0]="Cure Curse"
-				data[1]=client_id
-				data[2]=totHeal
-				data[3]=gotCrit
-				data[4]=t.Player.Name
-				Multiplayer.broadcast_mapdata(data, "MAWSpell")
+		end
+		--end of healing calculation
+		if t.TargetKind == 3 then
+			t.MultiplayerData[1]=math.round(totHeal) --total heal
+			t.MultiplayerData[2]=gotCrit --crit 
+		elseif t.TargetKind == 4 and t.RemoteData then
+			local healData = t.RemoteData
+			local name = Multiplayer.client_name(t.RemoteData.client_id)
+
+			Party[t.TargetId].HP=Party[t.TargetId].HP+healData[1]
+			if Party.High==0 and healData[2] then
+				Game.ShowStatusText(string.format(name .. " heals you for " .. healData[1] .. " hit points(crit)"))
+			elseif Party.High==0 then
+				Game.ShowStatusText(string.format(name .. " heals you for " .. healData[1] .. " hit points"))
+			elseif	healData[2] then
+				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[1] .. " hit points(crit)"))
+			else
+				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[1] .. " hit points"))
 			end
+		elseif t.TargetKind == 4 and not t.RemoteData then
+			Party[t.TargetId].HP=Party[t.TargetId].HP+math.round(totHeal)
 		end
 	end
 	
 	--heroism
 	if t.SpellId==51 then
-		local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
-		local power=5+s*2
-		for i=0,Party.High do
-			if Party.SpellBuffs[9].Power<=	power then
-				Party.SpellBuffs[9].Power = power
-			end
-		end
-		--online code
-		if not Multiplayer or not Multiplayer.client_monsters()[0] then
-			return
-		else
-			data={}
-			data[0]="Heroism"
-			--check for players in the nearbies
-			for i, v in pairs(Multiplayer.client_monsters()) do
-				local mon = Multiplayer.get_client_mon(i)
-				if mon and Multiplayer.utils.distance(Party, mon) < 3000 then
-					allyID=Multiplayer.posessed_by_player(mon)
-					table.insert(data[1],allyID)
+		if not t.RemoteData then
+			local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
+			local power=5+s*2
+			for i=0,Party.High do
+				if Party.SpellBuffs[9].Power<=	power then
+					Party.SpellBuffs[9].Power = power
 				end
 			end
-			data[2]=Party.SpellBuffs[11].ExpireTime
-			data[3]=power
-			Multiplayer.broadcast_mapdata(data, "MAWSpell")
+			if t.MultiplayerData then
+				t.MultiplayerData[1]=power
+			end
+		elseif t.RemoteData then
+			for i=0,Party.High do
+				if Party.SpellBuffs[9].Power<=	t.RemoteData[1] then
+					Party.SpellBuffs[9].Power = t.RemoteData[1]
+				end
+			end
 		end
-		return
 	end
 	
 	--resurrection
-	if t.SpellId==55 then
-		local persBonus=t.Player:GetPersonality()/1000
-		local intBonus=t.Player:GetIntellect()/1000
-		local statBonus=math.max(persBonus,intBonus)
-		local crit=t.Player:GetLuck()/1500+0.05
-		local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
-		local baseHeal=200+20*s
-		local totHeal=baseHeal*(statBonus+1)
-		roll=math.random()
-		local gotCrit=false
-		if roll<crit then
-			totHeal=(totHeal)*(1.5+statBonus*3/2)
-			gotCrit=true
-		end
-		local totHeal=math.round(totHeal)
-		--apply heal
-		if t.TargetKind==4 then
-			local maxHP=Party[t.TargetId]:GetFullHP()
-			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+totHeal,maxHP)
+	if t.SpellId == 55 then
+		if not t.RemoteData then
+			local persBonus=t.Player:GetPersonality()/1000
+			local intBonus=t.Player:GetIntellect()/1000
+			local statBonus=math.max(persBonus,intBonus)
+			local crit=t.Player:GetLuck()/1500+0.05
+			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
+			local baseHeal=200+20*s
+			totHeal=baseHeal*(statBonus+1)
+			roll=math.random()
+			gotCrit=false
+			if roll<crit then
+				totHeal=(totHeal)*(1.5+statBonus*3/2)
+				gotCrit=true
+			end
 			if gotCrit then
-				Sleep(1)
-				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal .. " Hit points(critical)"))
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
 			else
-				Sleep(1)
-				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal .. " Hit points"))
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
 			end
-		else
-			if not Multiplayer or not Multiplayer.client_monsters()[0] then
-				return
-			elseif t.TargetKind==3 then
-				client_id = Multiplayer.posessed_by_player(t.TargetId)
-				if not client_id then
-					return 
-				end
-				data[0]="Resurrection"
-				data[1]=client_id
-				data[2]=totHeal
-				data[3]=gotCrit
-				data[4]=t.Player.Name
-				Multiplayer.broadcast_mapdata(data, "MAWSpell")
+		end
+		--end of healing calculation
+		if t.TargetKind == 3 then
+			t.MultiplayerData[1]=math.round(totHeal) --total heal
+			t.MultiplayerData[2]=gotCrit --crit 
+			return
+		elseif t.TargetKind == 4 and t.RemoteData then
+			local healData = t.RemoteData
+			local name = Multiplayer.client_name(t.RemoteData.client_id)
+
+			Party[t.TargetId].HP=Party[t.TargetId].HP+healData[1]
+			if Party.High==0 and healData[2] then
+				Game.ShowStatusText(string.format(name .. " heals you for " .. healData[1] .. " hit points(crit)"))
+			elseif Party.High==0 then
+				Game.ShowStatusText(string.format(name .. " heals you for " .. healData[1] .. " hit points"))
+			elseif	healData[2] then
+				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[1] .. " hit points(crit)"))
+			else
+				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[1] .. " hit points"))
 			end
+		elseif t.TargetKind == 4 and not t.RemoteData then
+			Party[t.TargetId].HP=Party[t.TargetId].HP+math.round(totHeal)
 		end
 	end
+	
 	
 	--lesser heal
-	if t.SpellId==68 then
-		t.Skill=0
-		local persBonus=t.Player:GetPersonality()/1000
-		local intBonus=t.Player:GetIntellect()/1000
-		local statBonus=math.max(persBonus,intBonus)
-		local crit=t.Player:GetLuck()/1500+0.05
-		local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
-		local baseHeal=lesserHealBase[m]+lesserHealScaling[m]*s
-		local totHeal=baseHeal*(statBonus+1)
-		roll=math.random()
-		local gotCrit=false
-		if roll<crit then
-			totHeal=(totHeal)*(1.5+statBonus*3/2)
-			gotCrit=true
-		end
-		--remove base heal
-		local totHeal=math.round(totHeal-5)
-		--apply heal
-		if t.TargetKind==4 then
-			local maxHP=Party[t.TargetId]:GetFullHP()
-			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+totHeal,maxHP)
+	if t.SpellId == 68 then
+		if not t.RemoteData then
+			t.Skill=0
+			local persBonus=t.Player:GetPersonality()/1000
+			local intBonus=t.Player:GetIntellect()/1000
+			local statBonus=math.max(persBonus,intBonus)
+			local crit=t.Player:GetLuck()/1500+0.05
+			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
+			local baseHeal=lesserHealBase[m]+lesserHealScaling[m]*s
+			totHeal=baseHeal*(statBonus+1)
+			roll=math.random()
+			gotCrit=false
+			if roll<crit then
+				totHeal=(totHeal)*(1.5+statBonus*3/2)
+				gotCrit=true
+			end
+			--remove base heal
+			totHeal=math.round(totHeal-5)
 			if gotCrit then
-				Sleep(1)
-				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name.. " for " .. totHeal+5 .. " Hit points(critical)"))
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal+5) .. " Hit points(crit)"))
 			else
-				Sleep(1)
-				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal+5 .. " Hit points"))
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal+5) .. " Hit points"))
 			end
-		else
-			if not Multiplayer or not Multiplayer.client_monsters()[0] then
-				return
-			elseif t.TargetKind==3 then
-				client_id = Multiplayer.posessed_by_player(t.TargetId)
-				if not client_id then
-					return 
-				end
-				data[0]="Resurrection"
-				data[1]=client_id
-				data[2]=totHeal
-				data[3]=gotCrit
-				data[4]=t.Player.Name
-				Multiplayer.broadcast_mapdata(data, "MAWSpell")
+		end
+		--end of healing calculation
+		if t.TargetKind == 3 then
+			t.MultiplayerData[1]=math.round(totHeal) --bonus heal
+			t.MultiplayerData[2]=gotCrit --crit 
+			t.MultiplayerData[3]=math.round(5+totHeal) --total heal
+			return
+		elseif t.TargetKind == 4 and t.RemoteData then
+			local healData = t.RemoteData
+			local name = Multiplayer.client_name(t.RemoteData.client_id)
+
+			Party[t.TargetId].HP=Party[t.TargetId].HP+healData[1]
+			if Party.High==0 and healData[2] then
+				Game.ShowStatusText(string.format(name .. " heals you for " .. healData[3] .. " hit points(crit)"))
+			elseif Party.High==0 then
+				Game.ShowStatusText(string.format(name .. " heals you for " .. healData[3] .. " hit points"))
+			elseif	healData[2] then
+				Game.ShowStatusText(string.format(name .. "  heals " .. Party[t.TargetId].Name .. " for " .. healData[3] .. " hit points(crit)"))
+			else
+				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[3] .. " hit points"))
 			end
+		elseif t.TargetKind == 4 and not t.RemoteData then
+			Party[t.TargetId].HP=Party[t.TargetId].HP+math.round(totHeal)
 		end
 	end
+
 	
 	--cure disease, reworked to greater heal
 	if t.SpellId==74 then
-		local persBonus=t.Player:GetPersonality()/1000
-		local intBonus=t.Player:GetIntellect()/1000
-		local statBonus=math.max(persBonus,intBonus)
-		local crit=t.Player:GetLuck()/1500+0.05
-		local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
-		local baseHeal=greaterHealBase[m]+greaterHealScaling[m]*s
-		local totHeal=baseHeal*(statBonus+1)
-		roll=math.random()
-		local gotCrit=false
-		if roll<crit then
-			totHeal=(totHeal)*(1.5+statBonus*3/2)
-			gotCrit=true
-		end
-		local totHeal=math.round(totHeal)
-		--apply heal
-		if t.TargetKind==4 then
-			local maxHP=Party[t.TargetId]:GetFullHP()
-			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+totHeal,maxHP)
+		if not t.RemoteData then
+			local persBonus=t.Player:GetPersonality()/1000
+			local intBonus=t.Player:GetIntellect()/1000
+			local statBonus=math.max(persBonus,intBonus)
+			local crit=t.Player:GetLuck()/1500+0.05
+			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
+			local baseHeal=greaterHealBase[m]+greaterHealScaling[m]*s
+			totHeal=baseHeal*(statBonus+1)
+			roll=math.random()
+			gotCrit=false
+			if roll<crit then
+				totHeal=(totHeal)*(1.5+statBonus*3/2)
+				gotCrit=true
+			end
 			if gotCrit then
-				Sleep(1)
-				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal .. " Hit points(critical)"))
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
 			else
-				Sleep(1)
-				Game.ShowStatusText(string.format(t.Player.Name .. " heals " .. Party[t.TargetId].Name .. " for " .. totHeal .. " Hit points"))
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
 			end
-		else
-			if not Multiplayer or not Multiplayer.client_monsters()[0] then
-				return
-			elseif t.TargetKind==3 then
-				client_id = Multiplayer.posessed_by_player(t.TargetId)
-				if not client_id then
-					return 
-				end
-				data[0]="Resurrection"
-				data[1]=client_id
-				data[2]=totHeal
-				data[3]=gotCrit
-				data[4]=t.Player.Name
-				Multiplayer.broadcast_mapdata(data, "MAWSpell")
+		end
+		--end of healing calculation
+		if t.TargetKind == 3 then
+			t.MultiplayerData[1]=math.round(totHeal) --total heal
+			t.MultiplayerData[2]=gotCrit --crit 
+			return
+		elseif t.TargetKind == 4 and t.RemoteData then
+			local healData = t.RemoteData
+			local name = Multiplayer.client_name(t.RemoteData.client_id)
+
+			Party[t.TargetId].HP=Party[t.TargetId].HP+healData[1]
+			if Party.High==0 and healData[2] then
+				Game.ShowStatusText(string.format(name .. " heals you for " .. healData[1] .. " hit points(crit)"))
+			elseif Party.High==0 then
+				Game.ShowStatusText(string.format(name .. " heals you for " .. healData[1] .. " hit points"))
+			elseif	healData[2] then
+				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[1] .. " hit points(crit)"))
+			else
+				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[1] .. " hit points"))
 			end
+		elseif t.TargetKind == 4 and not t.RemoteData then
+			Party[t.TargetId].HP=Party[t.TargetId].HP+math.round(totHeal)
 		end
 	end
 	
@@ -278,95 +256,86 @@ function events.PlayerCastSpell(t)
 		else
 			t.Skill=math.min(t.Skill,10)
 		end
-		return
 	end
 	
 	--power cure
 	if t.SpellId==77 then
-		t.Skill=0
-		local persBonus=t.Player:GetPersonality()/1000
-		local intBonus=t.Player:GetIntellect()/1000
-		local statBonus=math.max(persBonus,intBonus)
-		local crit=t.Player:GetLuck()/1500+0.05
-		local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
-		local baseHeal=3*s
-		local totHeal=baseHeal*(statBonus+1)
-		roll=math.random()
-		local gotCrit=false
-		if roll<crit then
-			totHeal=(totHeal)*(1.5+statBonus*3/2)
-			gotCrit=true
-		end
-		totHeal=math.round(totHeal)
-		--apply heal
-		if t.TargetKind==0 then
-			local maxHP=Party[t.TargetId]:GetFullHP()
-			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+totHeal,maxHP)
-			if gotCrit then
-				Sleep(1)
-				Game.ShowStatusText(string.format(t.Player.Name .. " heals all party for " .. totHeal+10 .. " Hit points(critical)"))
-			else
-				Sleep(1)
-				Game.ShowStatusText(string.format(t.Player.Name .. " heals all party for " .. totHeal+10 .. " Hit points"))
+		if not t.RemoteData then
+			t.Skill=0
+			local persBonus=t.Player:GetPersonality()/1000
+			local intBonus=t.Player:GetIntellect()/1000
+			local statBonus=math.max(persBonus,intBonus)
+			local crit=t.Player:GetLuck()/1500+0.05
+			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
+			local baseHeal=10+3*s
+			totHeal=baseHeal*(statBonus+1)
+			roll=math.random()
+			gotCrit=false
+			if roll<crit then
+				totHeal=(totHeal)*(1.5+statBonus*3/2)
+				gotCrit=true
 			end
-		else
-			if not Multiplayer or not Multiplayer.client_monsters()[0] then
-				return
-			elseif t.TargetKind==3 then
-				client_id = Multiplayer.posessed_by_player(t.TargetId)
-				if not client_id then
-					return 
-				end
-				data[0]="Resurrection"
-				data[1]=client_id
-				data[2]=totHeal
-				data[3]=gotCrit
-				data[4]=t.Player.Name
-				Multiplayer.broadcast_mapdata(data, "MAWSpell")
+			--remove base heal
+			totHeal=math.round(totHeal-10)
+			if gotCrit then
+				Game.ShowStatusText(string.format("You Heal the Party for " .. math.round(totHeal+10) .. " Hit points(crit)"))
+			else
+				Game.ShowStatusText(string.format("You Heal the Party for " .. math.round(totHeal+10) .. " Hit points"))
+			end
+		end
+		--end of healing calculation
+		if not t.RemoteData then
+			for i=0,Party.High do
+				Party[i].HP=Party[t.TargetId].HP+totHeal
+			end
+			if t.MultiplayerData then
+				t.MultiplayerData[1]=math.round(totHeal) --bonus heal
+				t.MultiplayerData[2]=gotCrit --crit 
+				t.MultiplayerData[3]=math.round(10+totHeal) --total heal
+			end
+		elseif t.RemoteData then
+			local healData = t.RemoteData
+			local name = Multiplayer.client_name(t.RemoteData.client_id)
+			for i=0,Party.High do
+				Party[i].HP=Party[t.TargetId].HP+healData[1]
+			end
+			if	healData[2] then
+				Game.ShowStatusText(string.format(name .. " heals the Party for " .. healData[3] .. " hit points"))
+			else
+				Game.ShowStatusText(string.format(name .. " heals the Party for " .. healData[3] .. " hit points(crit)"))
 			end
 		end
 	end
 	
 	--Day of the Gods
 	if t.SpellId==83 then
-		t.Skill=0
-		local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Light))
-		local power=m*5+s*m/2
-		for i=0,Party.High do
+		if not t.RemoteData then
+			t.Skill=0
+			local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Light))
+			local power=m*5+s*m/2
 			if Party.SpellBuffs[2].Power<=	power then
 				Party.SpellBuffs[2].Power = power
 				Party.SpellBuffs[2].Skill = t.Mastery
 				Party.SpellBuffs[2].ExpireTime = Game.Time+const.Hour*s
 			end
-		end
-		--online code
-		if not Multiplayer or not Multiplayer.client_monsters()[0] then
-			return
-		else
-			data={}
-			data[0]="DoG"
-			--check for players in the nearbies
-			for i, v in pairs(Multiplayer.client_monsters()) do
-				local mon = Multiplayer.get_client_mon(i)
-				if mon and Multiplayer.utils.distance(Party, mon) < 3000 then
-					allyID=Multiplayer.posessed_by_player(mon)
-					table.insert(data[1],allyID)
-				end
+			if t.MultiplayerData then
+				t.MultiplayerData[1]=power
+				t.MultiplayerData[2]=Game.Time+const.Hour*s
 			end
-			data[2]=Party.SpellBuffs[2].ExpireTime
-			data[3]=power
-			Multiplayer.broadcast_mapdata(data, "MAWSpell")
+		--online code
+		elseif t.RemoteData then
+			Party.SpellBuffs[2].Power=t.RemoteData[1]
+			Party.SpellBuffs[2].ExpireTime = t.RemoteData[2]
 		end
-		return
 	end
 	
 	--Day of Protection
 	dopList = {0, 1, 4, 6, 12, 17}
 	if t.SpellId==85 then
-		t.Skill=0
-		local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Light))
-		local power=s*(m-1)
-		for i=0,Party.High do
+		if not t.RemoteData then
+			t.Skill=0
+			local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Light))
+			local power=s*(m-1)
 			for _, buffId in ipairs(dopList) do
 				if Party.SpellBuffs[buffId].Power<=power then
 					Party.SpellBuffs[buffId].Power = power
@@ -374,27 +343,20 @@ function events.PlayerCastSpell(t)
 					Party.SpellBuffs[buffId].ExpireTime = Game.Time+const.Hour*s
 				end
 			end
-		end
-		if not Multiplayer or not Multiplayer.client_monsters()[0] then
-			return
-		else
-			data={}
-			data[0]="DoP"
-			--check for players in the nearbies
-			for i, v in pairs(Multiplayer.client_monsters()) do
-				local mon = Multiplayer.get_client_mon(i)
-				if mon and Multiplayer.utils.distance(Party, mon) < 3000 then
-					allyID=Multiplayer.posessed_by_player(mon)
-					table.insert(data[1],allyID)
+			if t.MultiplayerData then
+				t.MultiplayerData[1]=power
+				t.MultiplayerData[2]=Game.Time+const.Hour*s
+			end
+		elseif t.RemoteData then
+			for _, buffId in ipairs(dopList) do
+				if Party.SpellBuffs[buffId].Power<=t.RemoteData[1] then
+					Party.SpellBuffs[buffId].Power = t.RemoteData[1]
+					Party.SpellBuffs[buffId].Skill = t.Mastery
+					Party.SpellBuffs[buffId].ExpireTime = t.RemoteData[2]
 				end
 			end
-			data[2]=Party.SpellBuffs[11].ExpireTime
-			data[3]=power
-			Multiplayer.broadcast_mapdata(data, "MAWSpell")
-		end
-		return
+		end	
 	end
-	
 end
 
 ------------------------------------------------------
@@ -996,70 +958,3 @@ end
 ---------------------------
 ----end OF SPELL REWORK----
 ---------------------------
-
----------------------------------------------
---HEALING SCALING WITH PERSONALITY AND CRIT--
----------------------------------------------
---[[
-function events.Action(t)
-	--heal
-	if Game.CurrentPlayer<0 then return end
-	if t.Action==141 then
-		local persBonus=Party[Game.CurrentPlayer]:GetPersonality()/1000
-		local intBonus=Party[Game.CurrentPlayer]:GetIntellect()/1000
-		local statBonus=math.max(persBonus,intBonus)
-		crit=Party[Game.CurrentPlayer]:GetLuck()/1500+0.05
-		local body=Party[Game.CurrentPlayer]:GetSkill(const.Skills.Body)
-		local s,m=SplitSkill(body)
-		local baseHeal=(5+(m+1)*s)
-		local extraHeal=baseHeal*statBonus
-		roll=math.random()
-		local gotCrit=false
-		if roll<crit then
-			extraHeal=(extraHeal+baseHeal)*(1.5+statBonus*3/2)-baseHeal
-			gotCrit=true
-		end
-		--apply heal
-		local maxHP=Party[t.Param-1]:GetFullHP()
-		Party[t.Param-1].HP=math.min(Party[t.Param-1].HP+extraHeal,maxHP)
-		if gotCrit then
-			Sleep(1)
-			Game.ShowStatusText("Critical Heal")
-		end
-	end
-	--power cure
-	if t.Action==142 and t.Action.Param==77 then
-		local persBonus=Party[Game.CurrentPlayer]:GetPersonality()/1000
-		local intBonus=Party[Game.CurrentPlayer]:GetIntellect()/1000
-		local statBonus=math.max(persBonus,intBonus)
-		crit=Party[Game.CurrentPlayer]:GetLuck()/1500+0.05
-		local body=Party[Game.CurrentPlayer]:GetSkill(const.Skills.Body)
-		local s,m=SplitSkill(body)
-		local baseHeal=(10+s*5)
-		local extraHeal=baseHeal*statBonus
-		roll=math.random()
-		local gotCrit=false
-		if roll<crit then
-			extraHeal=(extraHeal+baseHeal)*(1.5+statBonus*3/2)-baseHeal
-			gotCrit=true
-		end
-		--apply heal
-		for i=0,Party.High do
-			local maxHP=Party[i]:GetFullHP()
-			Party[i].HP=math.min(Party[i].HP+extraHeal,maxHP)
-		end
-		if gotCrit then
-			Sleep(1)
-			Game.ShowStatusText("Critical Heal")
-		end
-	end
-end
-function events.GameInitialized2()
-	Game.Spells[68]["SpellPointsNormal"]=2
-	Game.Spells[68]["SpellPointsExpert"]=3
-	Game.Spells[68]["SpellPointsMaster"]=4
-	Game.Spells[68]["SpellPointsGM"]=5
-end
-	
-
-]]
