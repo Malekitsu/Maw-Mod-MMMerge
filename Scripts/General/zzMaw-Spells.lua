@@ -86,19 +86,23 @@ function events.PlayerCastSpell(t)
 	if t.SpellId==51 then
 		if not t.RemoteData then
 			local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
-			local power=5+s*2
+			local power=10+s*m/2
+			local duration= Game.Time+(2+s*const.Hour)
 			for i=0,Party.High do
 				if Party.SpellBuffs[9].Power<=	power then
 					Party.SpellBuffs[9].Power = power
+					Party.SpellBuffs[9].ExpireTime= duration
 				end
 			end
 			if t.MultiplayerData then
 				t.MultiplayerData[1]=power
+				t.MultiplayerData[1]=duration
 			end
 		elseif t.RemoteData then
 			for i=0,Party.High do
 				if Party.SpellBuffs[9].Power<=	t.RemoteData[1] then
 					Party.SpellBuffs[9].Power = t.RemoteData[1]
+					Party.SpellBuffs[9].ExpireTime = t.RemoteData[2]
 				end
 			end
 		end
@@ -209,7 +213,7 @@ function events.PlayerCastSpell(t)
 			local intBonus=t.Player:GetIntellect()/1000
 			local statBonus=math.max(persBonus,intBonus)
 			local crit=t.Player:GetLuck()/1500+0.05
-			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
+			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
 			local baseHeal=greaterHealBase[m]+greaterHealScaling[m]*s
 			totHeal=baseHeal*(statBonus+1)
 			roll=math.random()
@@ -250,7 +254,7 @@ function events.PlayerCastSpell(t)
 	
 	--protection from Magic, no need for online code
 	if t.SpellId==75 then
-		local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Light))
+		local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Body))
 		if m==4 then
 			t.Skill=10
 		else
@@ -379,7 +383,11 @@ function events.GameInitialized2()
 	Game.SpellsTxt[49].GM="16 Mana cost: \ncures 36 + 6 HP per point of skill\nno limit\n"
 	
 	--heroism
-	Game.SpellsTxt[51].Description="Heroism increases the damage a character does on a successful attack by 5 + 2 point per point of skill in Spirit Magic. This spell affects the entire party at once."
+	Game.SpellsTxt[51].Description="Heroism increases the damage a character does on a successful attack by 10 + 1 point per point of skill in Spirit Magic. This spell affects the entire party at once.\nLasts for 2 hours plus 1 hour per point of skill"
+	Game.SpellsTxt[51].Expert="Increases damage by 10 plus 1 per skill point"
+	Game.SpellsTxt[51].Master="Increases damage by 10 plus 1.5 per skill point"
+	Game.SpellsTxt[51].GM="Increases damage by 10 plus 2 per skill point"
+	
 	
 	--resurrection
 	Game.SpellsTxt[55].GM="Cures 200 + 20 HP per point of skill"
