@@ -774,7 +774,7 @@ local function getWeaponRecoveryCorrection(equipmentData1, equipmentData2, playe
 		newRecoveryBonus = newRecoveryBonus + (newWeaponSkillRecoveryBonuses[equipmentData1.skill][equipmentData1.rank] * equipmentData1.level)
 		--add unarmed bonus
 		if equipmentData1.skill==const.Skills.Staff and equipmentData1.rank==4 then
-			local unarmed=t.Player:GetSkill(const.Skills.Unarmed)
+			local unarmed=player:GetSkill(const.Skills.Unarmed)
 			s,m=SplitSkill(unarmed)	
 			if s>1 then
 				newRecoveryBonus = newRecoveryBonus + newWeaponSkillRecoveryBonuses[const.Skills.Unarmed][m]*s
