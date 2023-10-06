@@ -534,7 +534,7 @@ function events.MonsterKilled(mon)
 	end
 	--pick base craft material
 	baseCraftDrop=false
-	if math.random()<craftDropChances.gems*bonusRoll then
+	if math.random()*bonusRoll<craftDropChances.gems then
 		baseCraftDrop=true
 		craftStrength=mon.Level/25+(math.random(0,50)-25)/25
 		craftStrength=math.max(math.min(craftStrength,10),1)
