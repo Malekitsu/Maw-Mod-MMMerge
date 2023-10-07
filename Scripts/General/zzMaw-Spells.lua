@@ -76,7 +76,7 @@ local greaterHealScaling={0,0,6,9}
 --modify Spells
 function events.PlayerCastSpell(t)
 	--Invisibility
-	if t.SpellId==19 then
+	if t.SpellId==19 and t.Mastery>2 then
 		if not t.RemoteData then
 			t.Skill=1
 			t.Mastery=3
