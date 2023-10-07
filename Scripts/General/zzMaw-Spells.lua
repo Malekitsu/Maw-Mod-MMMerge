@@ -86,8 +86,10 @@ function events.PlayerCastSpell(t)
 			Party.SpellBuffs[11].ExpireTime=Game.Time+const.Minute*(baseDuration+minutesPerSkill*s)
 			Party.SpellBuffs[11].Power=1000
 			--online code
-			t.MultiplayerData[1]=Party.SpellBuffs[11].ExpireTime
-			t.MultiplayerData[2]=Party.SpellBuffs[11].Power
+			if t.MultiplayerData then
+				t.MultiplayerData[1]=Party.SpellBuffs[11].ExpireTime
+				t.MultiplayerData[2]=Party.SpellBuffs[11].Power
+			end
 		elseif t.RemoteData then
 			Party.SpellBuffs[11].ExpireTime=t.RemoteData[1]
 			Party.SpellBuffs[11].Power=t.RemoteData[2]
