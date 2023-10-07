@@ -332,6 +332,19 @@ damageKindToMaxResistanceEnchant={
 
 --reduce damage by %
 function events.CalcDamageToPlayer(t)
+	--recalculate skill
+	local skill=SplitSkill(data.Monster.SpellSkill)
+	damage=Game.Spells[data.Object.Spell].DamageAdd
+	if skill>0 then
+		for i=1,skill do 
+			damage=damage+math.random(Game.Spells[data.Object.Spell].DamageDiceSides,Game.Spells[data.Object.Spell].DamageDiceSides)
+		end
+		t.Result=damage
+		t.Damage=damage
+		if t.DamageKind==4 then
+			t.DamageKind=3
+		end
+	end
 	if t.Result<1 then return end
 	if t.DamageKind==0 or t.DamageKind==1 or t.DamageKind==2 or t.DamageKind==3 or t.DamageKind==7 or t.DamageKind==8 or t.DamageKind==9 or t.DamageKind==10 or t.DamageKind==12 then
 		covered=false
@@ -423,7 +436,11 @@ function events.CalcDamageToPlayer(t)
 		elseif currentWorld==4 then
 			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 		end
-		penaltyLevel=math.min(math.round(partyLevel/5)*5,250)
+		penaltyLevel=math.max(partyLevel*0.95-4,0)
+		if penaltyLevel>=120 then 
+			penaltyLevel=120+(bolsterLevel-120)/2
+		end
+		penaltyLevel=math.round(penaltyLevel/5)*5
 		penalty=math.min(penaltyLevel,100)
 		res=res-penalty
 		--put here code to change max res
@@ -514,7 +531,7 @@ function events.CalcStatBonusByItems(t)
 	--add bonus2
 	for it in t.Player:EnumActiveItems() do
 		if it.Bonus2==1 and t.Stat>=10 and t.Stat<=15 then
-			t.Result=t.Result+10
+			t.Result=t.Result
 		end
 		if it.Bonus2==42 and t.Stat>=10 and t.Stat<=15 then
 			t.Result=t.Result+1
@@ -559,7 +576,11 @@ function events.Tick()
 		elseif currentWorld==4 then
 			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 		end
-		penaltyLevel=math.min(math.round(partyLevel/5)*5,250)
+		partyLevel=math.max(partyLevel*0.95-4,0)
+		if partyLevel>=120 then 
+			partyLevel=120+(bolsterLevel-120)/2
+		end
+		penaltyLevel=math.round(partyLevel/5)*5
 		penalty=math.min(penaltyLevel,100)
 		fireRes=Party[i]:GetResistance(10)/2 - penalty
 		airRes=Party[i]:GetResistance(11)/2 - penalty
