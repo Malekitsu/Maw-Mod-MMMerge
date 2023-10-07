@@ -360,7 +360,7 @@ function events.PlayerCastSpell(t)
 			local healData = t.RemoteData
 			local name = Multiplayer.client_name(t.RemoteData.client_id)
 			for i=0,Party.High do
-				Party[i].HP=Party[t.TargetId].HP+healData[1]
+				Party[i].HP=Party[i].HP+healData[1]
 			end
 			if	healData[2] then
 				Game.ShowStatusText(string.format(name .. " heals the Party for " .. healData[3] .. " hit points"))
