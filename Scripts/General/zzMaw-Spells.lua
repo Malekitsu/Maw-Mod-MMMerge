@@ -515,8 +515,8 @@ function events.GameInitialized2()
 		spellCostMaster[i] = Game.Spells[i]["SpellPointsMaster"]
 		spellCostGM[i] = Game.Spells[i]["SpellPointsGM"]
 	end
-	ascendanceCost={10,15,20,30,40,50,60,70,80,90,100,[0]=100}
-	ascendanceCost2={20,30,40,60,80,100,120,140,160,180,200,[0]=200}
+	ascendanceCost={4,6,8,10,15,20,25,30,40,50,60,[0]=60}
+	ascendanceCost2={5,10,20,35,50,70,90,115,140,170,200,[0]=200}
 	spells={2,6,7,8,9,10,11,15,18,20,22,24,26,29,32,37,39,41,43,44,52,59,65,70,76,78,79,84,87,90,93,97,98,99,103,111,123}
 	lastIndex=-1 --used later
 
