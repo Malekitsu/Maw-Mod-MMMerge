@@ -1,3 +1,4 @@
+--[[
 local u1, u2, u4, i1, i2, i4 = mem.u1, mem.u2, mem.u4, mem.i1, mem.i2, mem.i4
 local hook, autohook, autohook2, asmpatch = mem.hook, mem.autohook, mem.autohook2, mem.asmpatch
 local max, min, round, random = math.max, math.min, math.round, math.random
@@ -23,3 +24,4 @@ autohook2(0x47AC46, scaleHook)
 -- indoor
 autohook2(0x43D02E, scaleHook)
 autohook2(0x43D04D, scaleHook)
+]]
