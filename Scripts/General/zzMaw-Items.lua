@@ -589,7 +589,7 @@ function events.BuildItemInformationBox(t)
 			end
 		elseif t.Description then
 			if t.Item.Bonus2>0 then	
-				if (t.Item.MaxCharges>0 and bonusEffects[t.Item.Bonus2]~= nil) or enchantList[t.Item.Bonus2] then
+				if (t.Item.MaxCharges>=0 and bonusEffects[t.Item.Bonus2]~= nil) or enchantList[t.Item.Bonus2] then
 					text=checktext(t.Item.MaxCharges,t.Item.Bonus2)
 				else
 					text=Game.SpcItemsTxt[t.Item.Bonus2-1].BonusStat
@@ -890,7 +890,7 @@ function checktext(MaxCharges,bonus2)
 		mult=2+2*(MaxCharges-20)/20
 	end
 	bonus2txt={
-		[1] =  " +" .. math.round(bonusEffects[1].statModifier * mult) .. " to all Resistances.",
+		[1] =  " +" .. math.round(bonusEffects[1].statModifier * mult)/2 .. "% to all Resistances.",
 		[2] = " +" .. math.round(bonusEffects[2].statModifier * mult) .. " to all Seven Statistics.",
 		[4] ="Adds " .. math.round(6*mult) .. "-" .. math.round(8*mult) .. " points of Cold damage. (Increases also spell damage)",
 		[5] ="Adds " .. math.round(18*mult) .. "-" .. math.round(24*mult) .. " points of Cold damage. (Increases also spell damage)",
@@ -923,7 +923,7 @@ function checktext(MaxCharges,bonus2)
 		[47] = " +" .. math.round(bonusEffects[47].statModifier * mult) .. " Spell points and Regenerate Spell points over time.",
 		[48] = " +" .. math.round(bonusEffects[48].statModifier[1] * mult) .. " Endurance and" .. " +" .. math.round(bonusEffects[48].statModifier[2] * mult).. " Armor.",
 		[49] = " +" .. math.round(bonusEffects[49].statModifier * mult) .. " Intellect and Luck.",
-		[50] = " +" .. math.round(bonusEffects[50].statModifier * mult) .. " Fire Resistance and Regenerate Hit points over time.",
+		[50] = " +" .. math.round(bonusEffects[50].statModifier * mult) .. "% Fire Resistance and Regenerate Hit points over time.",
 		[51] = " +" .. math.round(bonusEffects[51].statModifier * mult) .. " Spell points, Speed, Intellect.",
 		[52] = " +" .. math.round(bonusEffects[52].statModifier * mult) .. " Endurance and Accuracy.",
 		[53] = " +" .. math.round(bonusEffects[53].statModifier * mult) .. " Might and Personality.",
