@@ -1,3 +1,60 @@
+local u1, u2, u4, i1, i2, i4 = mem.u1, mem.u2, mem.u4, mem.i1, mem.i2, mem.i4
+local hook, autohook, autohook2, asmpatch = mem.hook, mem.autohook, mem.autohook2, mem.asmpatch
+local max, min, floor, ceil, round, random = math.max, math.min, math.floor, math.ceil, math.round, math.random
+local format = string.format
+local MS = Merge.ModSettings
+
+local mmver = offsets.MMVersion
+function mmv(...)
+	local r = select(mmver - 5, ...)
+	assert(r ~= nil)
+	return r
+end
+
+local function getPartyIndex(player)
+	for i, pl in Party do
+		if pl == player then
+			return i
+		end
+	end
+end
+
+local function getSpellQueueData(spellQueuePtr, targetPtr)
+	local t = {Spell = i2[spellQueuePtr], Caster = Party.PlayersArray[i2[spellQueuePtr + 2]]}
+	t.SpellSchool = ceil(t.Spell / 11)
+	local flags = u2[spellQueuePtr + 8]
+	if flags:And(0x10) ~= 0 then -- caster is target
+		t.Caster = Party[i2[spellQueuePtr + 4]]
+	end
+    t.CasterIndex = getPartyIndex(t.Caster)
+
+	if flags:And(1) ~= 0 then
+		t.FromScroll = true
+		t.Skill, t.Mastery = SplitSkill(u2[spellQueuePtr + 0xA])
+	else
+		if mmver > 6 then
+			t.Skill, t.Mastery = SplitSkill(t.Caster:GetSkill(const.Skills.Fire + t.SpellSchool - 1))
+		else -- no GetSkill
+			t.Skill, t.Mastery = SplitSkill(t.Caster.Skills[const.Skills.Fire + t.SpellSchool - 1]) -- TODO: factor in "of X magic" rings
+		end
+	end
+
+	local targetIdKey = mmv("TargetIndex", "TargetIndex", "TargetRosterId")
+	if targetPtr then
+		if type(targetPtr) == "number" then
+			t[targetIdKey], t.Target = internal.GetPlayer(targetPtr)
+		else
+			t[targetIdKey], t.Target = targetPtr:GetIndex(), targetPtr
+		end
+	else
+		local pl = Party[i2[spellQueuePtr + 4]]
+		t[targetIdKey], t.Target = pl:GetIndex(), pl
+	end
+	return t
+end
+
+-- START OF ACTUAL CHANGES --
+
 -------------------------------------------------
 ------------------SPELL CHANGES------------------
 -------------------------------------------------
@@ -963,6 +1020,95 @@ function events.Tick()
 		end
 	end
 end
+
+-- shared life overflow fix
+function randomizeHP()
+	for i, pl in Party do
+		pl.HP = random(1, pl:GetFullHP())
+	end
+end
+
+-- TODO: test very negative amounts (like -50000), they asserted previously
+function doSharedLife(amount)
+	-- for each iteration, try to top up lowest HP deficit party member, increasing others' HP along the way
+	local function shouldParticipate(pl)
+		return pl.Dead == 0 and pl.Eradicated == 0 and pl.Stoned == 0 -- as in default code
+	end
+
+	local activePlayers = {}
+	local fullHPs = {}
+	amount = amount or 0
+	for i, pl in Party do
+		if shouldParticipate(pl) then
+			table.insert(activePlayers, pl)
+			fullHPs[pl:GetIndex()] = pl:GetFullHP()
+			amount = amount + pl.HP
+			pl.HP = 0
+		end
+	end
+	local affectedPlayers = table.copy(activePlayers)
+	local pool = amount
+	local steps = 0
+	while amount > 0 and #activePlayers > 0 do
+		steps = steps + 1
+		local minDeficit = math.huge
+		for i, pl in ipairs(activePlayers) do
+			local def = fullHPs[pl:GetIndex()] - pl.HP
+			if def > 0 then
+				minDeficit = min(minDeficit, def)
+			end
+		end
+
+		local part = minDeficit
+		if minDeficit * #activePlayers > amount then
+			part = amount:div(#activePlayers)
+		end
+
+		amount = amount - part * #activePlayers
+
+		local newPlayers = {}
+		for i, pl in ipairs(activePlayers) do
+			pl.HP = pl.HP + part
+			if part == 0 and amount > 0 then
+				pl.HP = pl.HP + 1
+				amount = amount - 1
+			end
+			if pl.HP ~= fullHPs[pl:GetIndex()] then
+				table.insert(newPlayers, pl)
+			end
+		end
+		activePlayers = newPlayers
+	end
+	local result = 0
+	local everyoneFull = true
+	for i, pl in ipairs(affectedPlayers) do
+		result = result + pl.HP
+		if pl.HP > 0 then
+			pl.Unconscious = 0
+		end
+		if pl.HP ~= pl:GetFullHP() then
+			everyoneFull = false
+		end
+	end
+	assert((pool == result) or everyoneFull, format("Pool %d, result %d, everyoneFull: %s", pool, result, everyoneFull))
+	--printf("Steps: %d", steps)
+	return affectedPlayers
+	--debug.Message(format("%d HP left", amount))
+end
+
+-- replace shared life code with my own
+hook(0x42A171, function(d)
+	local amount = u4[d.ebp - 4]
+	local t = getSpellQueueData(d.ebx)
+	t.Amount = amount
+	events.call("HealingSpellPower", t)
+	local affectedPlayers = doSharedLife(t.Amount)
+	for i, pl in ipairs(affectedPlayers) do
+		mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, u4[0x75CE00]), const.Spells.SharedLife, getPartyIndex(pl)) -- show animation
+	end
+end)
+asmpatch(0x42A176, "jmp absolute 0x42C200") -- "cast successful"
+
 ---------------------------
 ----end OF SPELL REWORK----
 ---------------------------
