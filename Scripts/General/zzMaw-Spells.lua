@@ -371,7 +371,7 @@ function events.PlayerCastSpell(t)
 	--Day of the Gods
 	if t.SpellId==83 then
 		if not t.RemoteData then
-			t.Skill=0
+			t.Skill=1
 			local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Light))
 			local power=m*5+s*m/2
 			if Party.SpellBuffs[2].Power<=	power then
