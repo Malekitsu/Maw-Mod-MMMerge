@@ -333,16 +333,19 @@ damageKindToMaxResistanceEnchant={
 --reduce damage by %
 function events.CalcDamageToPlayer(t)
 	--recalculate skill
-	local skill=SplitSkill(data.Monster.SpellSkill)
-	damage=Game.Spells[data.Object.Spell].DamageAdd
-	if skill>0 then
-		for i=1,skill do 
-			damage=damage+math.random(Game.Spells[data.Object.Spell].DamageDiceSides,Game.Spells[data.Object.Spell].DamageDiceSides)
-		end
-		t.Result=damage
-		t.Damage=damage
-		if t.DamageKind==4 then
-			t.DamageKind=3
+	data=WhoHitPlayer()
+	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
+		local skill=SplitSkill(data.Monster.SpellSkill)
+		damage=Game.Spells[data.Object.Spell].DamageAdd
+		if skill>0 then
+			for i=1,skill do 
+				damage=damage+math.random(Game.Spells[data.Object.Spell].DamageDiceSides,Game.Spells[data.Object.Spell].DamageDiceSides)
+			end
+			t.Result=damage
+			t.Damage=damage
+			if t.DamageKind==4 then
+				t.DamageKind=3
+			end
 		end
 	end
 	if t.Result<1 then return end
