@@ -516,11 +516,11 @@ end
 
 
 craftDropChances={
-		["gems"]=0.01,
-		[1061]=0.001,
-		[1062]=0.001,
-		[1063]=0.0025,
-		[1064]=0.0005,
+		["gems"]=0.005,
+		[1061]=0.000125,
+		[1062]=0.000125,
+		[1063]=0.00125,
+		[1064]=0.0001,
 	}
 function events.MonsterKilled(mon)
 	if mon.Ally == 9999 then -- no drop from reanimated monsters
