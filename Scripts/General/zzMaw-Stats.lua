@@ -339,7 +339,7 @@ function events.CalcDamageToPlayer(t)
 		damage=Game.Spells[data.Object.Spell].DamageAdd
 		if skill>0 then
 			for i=1,skill do 
-				damage=damage+math.random(Game.Spells[data.Object.Spell].DamageDiceSides,Game.Spells[data.Object.Spell].DamageDiceSides)
+				damage=damage+math.random(1,Game.Spells[data.Object.Spell].DamageDiceSides)
 			end
 			t.Result=damage
 			t.Damage=damage
