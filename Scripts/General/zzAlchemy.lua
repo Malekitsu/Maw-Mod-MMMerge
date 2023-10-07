@@ -48,7 +48,7 @@ function events.UseMouseItem(t)
 		------------------------
 		if itemImmunityMapping[it.Number] then 
 			local txt=itemImmunityMapping[it.Number]
-			vars.PlayerBuffs[t.PlayerSlot][txt]=Game.Time+Const.Hour*6
+			vars.PlayerBuffs[Party[t.PlayerSlot]:GetIndex()][txt]=Game.Time+Const.Hour*6
 		end
 		--------------------
 		--BUFFS--
