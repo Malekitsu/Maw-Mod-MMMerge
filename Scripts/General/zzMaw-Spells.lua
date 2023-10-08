@@ -561,7 +561,7 @@ function events.GameInitialized2()
 			[93] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--shrapmetal
 			[97] = {dmgAdd = 0, diceMin = 1, diceMax = 25, },--dragon breath
 			[98] = {dmgAdd = 50, diceMin = 1, diceMax = 1, },--armageddon
-			[99] = {dmgAdd = 25, diceMin = 1, diceMax = 8, },--souldrinker
+			[99] = {dmgAdd = 50, diceMin = 1, diceMax = 5, },--souldrinker
 			[103] = {dmgAdd = 30, diceMin = 1, diceMax = 22, },--darkfire bolt
 			[111] = {dmgAdd = 15, diceMin = 1, diceMax = 3, },--lifedrain scales with mastery, fixed in calcspelldamage
 			[123] = {dmgAdd = 10, diceMin = 1, diceMax = 10, },--flame blast scales with mastery, fixed in calcspelldamage
