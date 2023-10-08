@@ -352,7 +352,7 @@ function events.PlayerCastSpell(t)
 		--end of healing calculation
 		if not t.RemoteData then
 			for i=0,Party.High do
-				Party[i].HP=Party[t.TargetId].HP+totHeal
+				Party[i].HP=Party[i].HP+totHeal
 			end
 			if t.MultiplayerData then
 				t.MultiplayerData[1]=math.round(totHeal) --bonus heal
