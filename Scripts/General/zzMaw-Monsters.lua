@@ -252,7 +252,7 @@ mapLevel={
 	["The Tularean Forest"] = 15,
 	["Stone City"] = 17,
 	["The Hall of the Pit"] = 17,
-	["Erathia"] = 17.5,
+	["Erathia"] = 17,
 	["The Tidewater Caverns"] = 18,
 	["The Tularean Caves"] = 18,
 	["Evenmorn Island"] = 20,
@@ -285,7 +285,6 @@ mapLevel={
 	["Castle Lambent"] = 65,
 	["Thunderfist Mountain"] = 65,
 	["The Hidden Tomb"] = 65,
-	["The Lincoln"] = 100,
 	["Shoals"] = 70,
 	["Mount Nighon"] = 70,
 	["Tunnels to Eeofol"] = 70,
@@ -297,6 +296,7 @@ mapLevel={
 	["The Maze"] = 90,
 	["Wromthrax's Cave"] = 90,
 	["The Dragon Caves"] = 92,
+	["The Lincoln"] = 100,
 }
 
 
