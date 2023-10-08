@@ -239,6 +239,7 @@ end
 mapLevel={
 	["The Temple of the Moon"] = 3,
 	["Emerald Island"] = 3,
+	["The Dragon's Lair"] = 4,
 	["Harmondale"] = 5,
 	["Castle Harmondale"] = 5,
 	["The Barrow Downs"] = 10,
@@ -261,7 +262,6 @@ mapLevel={
 	["The Bracada Desert"] = 25,
 	["Tatalia"] = 25,
 	["Avlee"] = 25,
-	["The Dragon's Lair"] = 26,
 	["Lord Markham's Manor"] = 27,
 	["Fort Riverstride"] = 30,
 	["Nighon Tunnels"] = 30,
