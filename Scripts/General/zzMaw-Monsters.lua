@@ -235,6 +235,71 @@ function events.LeaveMap()
 	end
 end
 
+--MAP LEVELS
+mapLevel={
+	["The Temple of the Moon"] = 4.5,
+	["Emerald Island"] = 5.5,
+	["Harmondale"] = 7.5,
+	["Castle Harmondale"] = 10,
+	["The Barrow Downs"] = 10.5,
+	["White Cliff Cave"] = 10.5,
+	["The Hall under the Hill"] = 12,
+	["Zokarr's Tomb"] = 13.5,
+	["Barrow I"] = 14.5,
+	["Deyja"] = 14.5,
+	["The Haunted Mansion"] = 14.5,
+	["The Erathian Sewers"] = 15,
+	["The Bandit Caves"] = 15,
+	["The Tularean Forest"] = 15.5,
+	["Stone City"] = 17,
+	["The Hall of the Pit"] = 17,
+	["Erathia"] = 17.5,
+	["The Tidewater Caverns"] = 18,
+	["The Tularean Caves"] = 18.5,
+	["Evenmorn Island"] = 20,
+	["Grand Temple of the Sun"] = 22,
+	["Grand Temple of the Moon"] = 25,
+	["The Bracada Desert"] = 25,
+	["Tatalia"] = 25,
+	["Avlee"] = 25.5,
+	["The Dragon's Lair"] = 26,
+	["Lord Markham's Manor"] = 27.5,
+	["Fort Riverstride"] = 30,
+	["Nighon Tunnels"] = 30,
+	["Castle Gryphonheart"] = 31,
+	["The Red Dwarf Mines"] = 32,
+	["William Setag's Tower"] = 33.5,
+	["Castle Navan"] = 35,
+	["The Mercenary Guild"] = 43.5,
+	["The Temple of Baa"] = 45,
+	["The School of Sorcery"] = 45,
+	["Celeste"] = 47,
+	["Watchtower 6"] = 50,
+	["Temple of the Dark"] = 50,
+	["Clanker's Laboratory"] = 50,
+	["The Wine Cellar"] = 50,
+	["Castle Gloaming"] = 55,
+	["The Walls of Mist"] = 55,
+	["The Pit"] = 60,
+	["Temple of the Light"] = 60,
+	["The Breeding Zone"] = 65,
+	["Castle Lambent"] = 65,
+	["Thunderfist Mountain"] = 65,
+	["The Hidden Tomb"] = 65,
+	["The Lincoln"] = 69.5,
+	["Shoals"] = 70,
+	["Mount Nighon"] = 70,
+	["Tunnels to Eeofol"] = 70,
+	["The Land of the Giants"] = 74.5,
+	["The Small House"] = 80,
+	["The Strange Temple"] = 80,
+	["The Titans' Stronghold"] = 83.5,
+	["Colony Zod"] = 85,
+	["The Maze"] = 90,
+	["Wromthrax's Cave"] = 90,
+	["The Dragon Caves"] = 92.5,
+}
+
 
 function events.LoadMap()
 	--calculate party experience
@@ -265,8 +330,18 @@ function events.LoadMap()
 		--level increase centered on B type
 		mon.Level=math.min(basetable[i].Level+bolsterLevel,255)
 		
+		--monsters scale based on map
+		extraBolster=0
+		local mapName=Game.MapStats[Map.MapStatsIndex].Name
+		if mapLevel[mapName] then
+			if LevelB<mapLevel[mapName] then
+				extraBolster=mapLevel[mapName]-LevelB
+			end
+		end
+		mon.Level=mon.Level+extraBolster
+		
 		--HP
-		HPBolsterLevel=basetable[i].Level*(1+(0.25*bolsterLevel/100))+bolsterLevel*0.75
+		HPBolsterLevel=basetable[i].Level*(1+(0.25*(bolsterLevel+extraBolster)/100))+(bolsterLevel+extraBolster)*0.75
 		mon.HP=math.min(math.round(HPBolsterLevel*(HPBolsterLevel/10+3)*2),32500)
 		if ItemRework and StatsRework then
 			mon.HP=math.min(math.round(mon.HP*(1+HPBolsterLevel/180),32500))
@@ -480,7 +555,7 @@ function events.GameInitialized2()
 	end
 end
 
---fix to monsters AI
+--fix to monsters AI (zombies and ghouls)
 function events.GameInitialized2()
 	Game.HostileTxt[152][0]=4
 	Game.HostileTxt[143][0]=4
