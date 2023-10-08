@@ -1,4 +1,3 @@
---[[
 local u1, u2, u4, i1, i2, i4 = mem.u1, mem.u2, mem.u4, mem.i1, mem.i2, mem.i4
 local hook, autohook, autohook2, asmpatch = mem.hook, mem.autohook, mem.autohook2, mem.asmpatch
 local max, min, round, random = math.max, math.min, math.round, math.random
@@ -10,18 +9,19 @@ local function getSFTItem(p)
 end
 
 -- cosmetic change: some monsters (mainly bosses) can be larger
-local scaleHook = function(d)
-	local t = {Scale = d.eax, Frame = getSFTItem(d.ebx)}
-	t.MonsterIndex, t.Monster = internal.GetMonster(d.edi - 0x9A)
-	events.call("MonsterSpriteScale", t)
-	d.eax = t.Scale
+local scaleHook = function(indoor)
+	return function(d)
+		local t = {Scale = d.eax, Frame = getSFTItem(d.ebx)}
+		t.MonsterIndex, t.Monster = internal.GetMonster(indoor and d.edi or (d.edi - 0x9A))
+		events.call("MonsterSpriteScale", t)
+		d.eax = t.Scale
+	end
 end
 
 -- outdoor
-autohook2(0x47AC26, scaleHook)
-autohook2(0x47AC46, scaleHook)
+autohook2(0x47AC26, scaleHook())
+autohook2(0x47AC46, scaleHook())
 
 -- indoor
-autohook2(0x43D02E, scaleHook)
-autohook2(0x43D04D, scaleHook)
-]]
+autohook2(0x43D02E, scaleHook(true))
+autohook2(0x43D04D, scaleHook(true))
