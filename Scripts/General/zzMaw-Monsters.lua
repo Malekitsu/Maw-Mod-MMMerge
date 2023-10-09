@@ -561,3 +561,628 @@ function events.GameInitialized2()
 	Game.HostileTxt[152][143]=0
 	Game.HostileTxt[143][152]=0
 end
+
+--map levels
+mapLevels={
+["Dagger Wound Island"] = 
+{["Low"] = 6 , ["Mid"] = 8 , ["High"] = 11},
+
+["Ravenshore"] = 
+{["Low"] = 14 , ["Mid"] = 14 , ["High"] = 17},
+
+["Alvar"] = 
+{["Low"] = 18 , ["Mid"] = 20 , ["High"] = 27},
+
+["Ironsand Desert"] = 
+{["Low"] = 13 , ["Mid"] = 28 , ["High"] = 36},
+
+["Garrote Gorge"] = 
+{["Low"] = 28 , ["Mid"] = 30 , ["High"] = 35},
+
+["Shadowspire"] = 
+{["Low"] = 13 , ["Mid"] = 28 , ["High"] = 45},
+
+["Murmurwoods"] = 
+{["Low"] = 23 , ["Mid"] = 27 , ["High"] = 35},
+
+["Ravage Roaming"] = 
+{["Low"] = 20 , ["Mid"] = 28 , ["High"] = 35},
+
+["Plane of Air"] = 
+{["Low"] = 50 , ["Mid"] = 59 , ["High"] = 65},
+
+["Plane of Earth"] = 
+{["Low"] = 20 , ["Mid"] = 60 , ["High"] = 65},
+
+["Plane of Fire"] = 
+{["Low"] = 49 , ["Mid"] = 55 , ["High"] = 65},
+
+["Plane of Water"] = 
+{["Low"] = 30 , ["Mid"] = 65 , ["High"] = 70},
+
+["Regna"] = 
+{["Low"] = 31 , ["Mid"] = 31 , ["High"] = 50},
+
+["Plane Between Planes"] = 
+{["Low"] = 58 , ["Mid"] = 70 , ["High"] = 70},
+
+["Tutorial"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["Abandoned Temple"] = 
+{["Low"] = 5 , ["Mid"] = 6 , ["High"] = 7},
+
+["Pirate Outpost"] = 
+{["Low"] = 5 , ["Mid"] = 31 , ["High"] = 31},
+
+["Smuggler's Cove"] = 
+{["Low"] = 11 , ["Mid"] = 13 , ["High"] = 17},
+
+["Dire Wolf Den"] = 
+{["Low"] = 11 , ["Mid"] = 12.5 , ["High"] = 14},
+
+["Merchant House of Alvar"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["Escaton's Crystal"] = 
+{["Low"] = 80 , ["Mid"] = 90 , ["High"] = 100},
+
+["Wasp Nest"] = 
+{["Low"] = 18 , ["Mid"] = 18 , ["High"] = 18},
+
+["Ogre Fortress"] = 
+{["Low"] = 17 , ["Mid"] = 20 , ["High"] = 28},
+
+["Troll Tomb"] = 
+{["Low"] = 13 , ["Mid"] = 13 , ["High"] = 13},
+
+["Cyclops Larder"] = 
+{["Low"] = 36 , ["Mid"] = 36 , ["High"] = 36},
+
+["Chain of Fire"] = 
+{["Low"] = 13 , ["Mid"] = 31 , ["High"] = 49},
+
+["Dragon Hunter's Camp"] = 
+{["Low"] = 17 , ["Mid"] = 23.5 , ["High"] = 30},
+
+["Dragon Cave"] = 
+{["Low"] = 35 , ["Mid"] = 60 , ["High"] = 85},
+
+["Naga Vault"] = 
+{["Low"] = 7 , ["Mid"] = 17.5 , ["High"] = 28},
+
+["Necromancers' Guild"] = 
+{["Low"] = 13 , ["Mid"] = 28 , ["High"] = 42},
+
+["Mad Necromancer's Lab "] = 
+{["Low"] = 13 , ["Mid"] = 42 , ["High"] = 45},
+
+["Vampire Crypt"] = 
+{["Low"] = 28 , ["Mid"] = 28 , ["High"] = 28},
+
+["Temple of the Sun"] = 
+{["Low"] = 20 , ["Mid"] = 20 , ["High"] = 20},
+
+["Druid Circle"] = 
+{["Low"] = 20 , ["Mid"] = 24 , ["High"] = 60},
+
+["Balthazar Lair"] = 
+{["Low"] = 30 , ["Mid"] = 44.5 , ["High"] = 59},
+
+["Barbarian Fortress"] = 
+{["Low"] = 17 , ["Mid"] = 20 , ["High"] = 28},
+
+["The Crypt of Korbu"] = 
+{["Low"] = 28 , ["Mid"] = 41.5 , ["High"] = 55},
+
+["Castle of Air"] = 
+{["Low"] = 65 , ["Mid"] = 65 , ["High"] = 65},
+
+["Tomb of Lord Brinne"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["Castle of Fire"] = 
+{["Low"] = 65 , ["Mid"] = 65 , ["High"] = 65},
+
+["War Camp"] = 
+{["Low"] = 13 , ["Mid"] = 55 , ["High"] = 59},
+
+["Pirate Stronghold"] = 
+{["Low"] = 17 , ["Mid"] = 31 , ["High"] = 31},
+
+["Abandoned Pirate Keep"] = 
+{["Low"] = 28 , ["Mid"] = 31 , ["High"] = 50},
+
+["Passage Under Regna"] = 
+{["Low"] = 20 , ["Mid"] = 31 , ["High"] = 50},
+
+["Small Sub Pen"] = 
+{["Low"] = 31 , ["Mid"] = 31 , ["High"] = 50},
+
+["Escaton's Palace"] = 
+{["Low"] = 58 , ["Mid"] = 64 , ["High"] = 70},
+
+["Prison of the Lord of Air"] = 
+{["Low"] = 58 , ["Mid"] = 65 , ["High"] = 80},
+
+["Prison of the Lord of Fire"] = 
+{["Low"] = 58 , ["Mid"] = 65 , ["High"] = 100},
+
+["Prison of the Lord of Water"] = 
+{["Low"] = 58 , ["Mid"] = 65 , ["High"] = 70},
+
+["Prison of the Lord of Earth"] = 
+{["Low"] = 65 , ["Mid"] = 70 , ["High"] = 70},
+
+["Uplifted Library"] = 
+{["Low"] = 20 , ["Mid"] = 25 , ["High"] = 30},
+
+["Dark Dwarf Compound"] = 
+{["Low"] = 20 , ["Mid"] = 22 , ["High"] = 24},
+
+["Arena"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["Ancient Troll Home"] = 
+{["Low"] = 23 , ["Mid"] = 25 , ["High"] = 27},
+
+["Grand Temple of Eep"] = 
+{["Low"] = 11 , ["Mid"] = 13 , ["High"] = 17},
+
+["Chapel of Eep"] = 
+{["Low"] = 11 , ["Mid"] = 13 , ["High"] = 17},
+
+["Church of Eep"] = 
+{["Low"] = 11 , ["Mid"] = 13 , ["High"] = 17},
+
+["Old Loeb's Cave"] = 
+{["Low"] = 35 , ["Mid"] = 60 , ["High"] = 85},
+
+["Ilsingore's Cave"] = 
+{["Low"] = 35 , ["Mid"] = 60 , ["High"] = 85},
+
+["Yaardrake's Cave"] = 
+{["Low"] = 35 , ["Mid"] = 60 , ["High"] = 85},
+
+["NWC"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["Emerald Island"] = 
+{["Low"] = 5 , ["Mid"] = 5 , ["High"] = 5},
+
+["Harmondale"] = 
+{["Low"] = 6 , ["Mid"] = 11.5 , ["High"] = 17},
+
+["Erathia"] = 
+{["Low"] = 14 , ["Mid"] = 18.5 , ["High"] = 23},
+
+["The Tularean Forest"] = 
+{["Low"] = 18 , ["Mid"] = 22 , ["High"] = 24},
+
+["Deyja"] = 
+{["Low"] = 13 , ["Mid"] = 15 , ["High"] = 17},
+
+["The Bracada Desert"] = 
+{["Low"] = 23 , ["Mid"] = 29 , ["High"] = 35},
+
+["Evenmorn Island"] = 
+{["Low"] = 10 , ["Mid"] = 13 , ["High"] = 22},
+
+["Mount Nighon"] = 
+{["Low"] = 35 , ["Mid"] = 39 , ["High"] = 55},
+
+["The Barrow Downs"] = 
+{["Low"] = 11 , ["Mid"] = 13 , ["High"] = 22},
+
+["The Land of the Giants"] = 
+{["Low"] = 50 , ["Mid"] = 75 , ["High"] = 90},
+
+["Tatalia"] = 
+{["Low"] = 19 , ["Mid"] = 23.5 , ["High"] = 28},
+
+["Avlee"] = 
+{["Low"] = 22 , ["Mid"] = 24 , ["High"] = 28},
+
+["Shoals"] = 
+{["Low"] = 36 , ["Mid"] = 36 , ["High"] = 36},
+
+["The Erathian Sewers"] = 
+{["Low"] = 5 , ["Mid"] = 8.5 , ["High"] = 12},
+
+["The Maze"] = 
+{["Low"] = 35 , ["Mid"] = 55 , ["High"] = 59},
+
+["Castle Gloaming"] = 
+{["Low"] = 30 , ["Mid"] = 33 , ["High"] = 35},
+
+["The Temple of Baa"] = 
+{["Low"] = 8 , ["Mid"] = 20 , ["High"] = 50},
+
+["The Arena"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["The Temple of the Moon"] = 
+{["Low"] = 5 , ["Mid"] = 6 , ["High"] = 8},
+
+["Thunderfist Mountain"] = 
+{["Low"] = 35 , ["Mid"] = 40 , ["High"] = 59},
+
+["The Tularean Caves"] = 
+{["Low"] = 14 , ["Mid"] = 22 , ["High"] = 28},
+
+["The Titans' Stronghold"] = 
+{["Low"] = 75 , ["Mid"] = 82.5 , ["High"] = 90},
+
+["The Breeding Zone"] = 
+{["Low"] = 11 , ["Mid"] = 26 , ["High"] = 60},
+
+["The Walls of Mist"] = 
+{["Low"] = 22 , ["Mid"] = 35 , ["High"] = 44},
+
+["Clanker's Laboratory"] = 
+{["Low"] = 11 , ["Mid"] = 35 , ["High"] = 40},
+
+["Zokarr's Tomb"] = 
+{["Low"] = 17 , ["Mid"] = 18 , ["High"] = 19},
+
+["The School of Sorcery"] = 
+{["Low"] = 35 , ["Mid"] = 35 , ["High"] = 35},
+
+["Watchtower 6"] = 
+{["Low"] = 30 , ["Mid"] = 30 , ["High"] = 35},
+
+["The Wine Cellar"] = 
+{["Low"] = 6 , ["Mid"] = 33 , ["High"] = 35},
+
+["The Tidewater Caverns"] = 
+{["Low"] = 10 , ["Mid"] = 12 , ["High"] = 13},
+
+["Lord Markham's Manor"] = 
+{["Low"] = 17 , ["Mid"] = 38.5 , ["High"] = 60},
+
+["Grand Temple of the Moon"] = 
+{["Low"] = 19 , ["Mid"] = 19.5 , ["High"] = 20},
+
+["The Mercenary Guild"] = 
+{["Low"] = 14 , ["Mid"] = 19 , ["High"] = 60},
+
+["White Cliff Cave"] = 
+{["Low"] = 14 , ["Mid"] = 16 , ["High"] = 18},
+
+["The Hall under the Hill"] = 
+{["Low"] = 5 , ["Mid"] = 5 , ["High"] = 5},
+
+["The Lincoln"] = 
+{["Low"] = 70 , ["Mid"] = 70 , ["High"] = 70},
+
+["Stone City"] = 
+{["Low"] = 14 , ["Mid"] = 17 , ["High"] = 20},
+
+["Celeste"] = 
+{["Low"] = 35 , ["Mid"] = 39 , ["High"] = 50},
+
+["The Pit"] = 
+{["Low"] = 30 , ["Mid"] = 33 , ["High"] = 35},
+
+["Colony Zod"] = 
+{["Low"] = 50 , ["Mid"] = 50 , ["High"] = 50},
+
+["The Dragon's Lair"] = 
+{["Low"] = 5 , ["Mid"] = 45 , ["High"] = 85},
+
+["Castle Harmondale"] = 
+{["Low"] = 5 , ["Mid"] = 6 , ["High"] = 6},
+
+["Castle Lambent"] = 
+{["Low"] = 35 , ["Mid"] = 35 , ["High"] = 50},
+
+["Fort Riverstride"] = 
+{["Low"] = 17 , ["Mid"] = 19 , ["High"] = 24},
+
+["Castle Navan"] = 
+{["Low"] = 5 , ["Mid"] = 22 , ["High"] = 23},
+
+["Castle Gryphonheart"] = 
+{["Low"] = 19 , ["Mid"] = 24 , ["High"] = 60},
+
+["The Red Dwarf Mines"] = 
+{["Low"] = 18 , ["Mid"] = 29 , ["High"] = 40},
+
+["Nighon Tunnels"] = 
+{["Low"] = 11 , ["Mid"] = 20 , ["High"] = 35},
+
+["Tunnels to Eeofol"] = 
+{["Low"] = 40 , ["Mid"] = 50 , ["High"] = 60},
+
+["The Haunted Mansion"] = 
+{["Low"] = 13 , ["Mid"] = 17 , ["High"] = 19},
+
+["Barrow VII"] = 
+{["Low"] = 11 , ["Mid"] = 12 , ["High"] = 13},
+
+["Barrow IV"] = 
+{["Low"] = 10 , ["Mid"] = 11.5 , ["High"] = 13},
+
+["Barrow II"] = 
+{["Low"] = 13 , ["Mid"] = 15 , ["High"] = 17},
+
+["Barrow XIV"] = 
+{["Low"] = 17 , ["Mid"] = 18 , ["High"] = 19},
+
+["Barrow III"] = 
+{["Low"] = 17 , ["Mid"] = 18 , ["High"] = 19},
+
+["Barrow IX"] = 
+{["Low"] = 10 , ["Mid"] = 10.5 , ["High"] = 11},
+
+["Barrow VI"] = 
+{["Low"] = 17 , ["Mid"] = 18 , ["High"] = 19},
+
+["Barrow I"] = 
+{["Low"] = 17 , ["Mid"] = 18 , ["High"] = 19},
+
+["Barrow VIII"] = 
+{["Low"] = 17 , ["Mid"] = 18 , ["High"] = 19},
+
+["Barrow XIII"] = 
+{["Low"] = 17 , ["Mid"] = 18 , ["High"] = 19},
+
+["Barrow X"] = 
+{["Low"] = 10 , ["Mid"] = 10.5 , ["High"] = 11},
+
+["Barrow XII"] = 
+{["Low"] = 10 , ["Mid"] = 11.5 , ["High"] = 13},
+
+["Barrow V"] = 
+{["Low"] = 10 , ["Mid"] = 11.5 , ["High"] = 13},
+
+["Barrow XI"] = 
+{["Low"] = 13 , ["Mid"] = 15 , ["High"] = 17},
+
+["Barrow XV"] = 
+{["Low"] = 13 , ["Mid"] = 15 , ["High"] = 17},
+
+["Wromthrax's Cave"] = 
+{["Low"] = 90 , ["Mid"] = 90 , ["High"] = 90},
+
+["William Setag's Tower"] = 
+{["Low"] = 5 , ["Mid"] = 32.5 , ["High"] = 60},
+
+["The Hidden Tomb"] = 
+{["Low"] = 30 , ["Mid"] = 31.5 , ["High"] = 33},
+
+["The Dragon Caves"] = 
+{["Low"] = 90 , ["Mid"] = 90 , ["High"] = 90},
+
+["The Bandit Caves"] = 
+{["Low"] = 12 , ["Mid"] = 13 , ["High"] = 14},
+
+["The Small House"] = 
+{["Low"] = 5 , ["Mid"] = 42.5 , ["High"] = 80},
+
+["Temple of the Light"] = 
+{["Low"] = 16 , ["Mid"] = 20 , ["High"] = 50},
+
+["Temple of the Dark"] = 
+{["Low"] = 17 , ["Mid"] = 20 , ["High"] = 33},
+
+["Grand Temple of the Sun"] = 
+{["Low"] = 16 , ["Mid"] = 18 , ["High"] = 20},
+
+["The Hall of the Pit"] = 
+{["Low"] = 13 , ["Mid"] = 17 , ["High"] = 22},
+
+["Sweet Water"] = 
+{["Low"] = 70 , ["Mid"] = 85 , ["High"] = 100},
+
+["Paradise Valley"] = 
+{["Low"] = 55 , ["Mid"] = 75 , ["High"] = 90},
+
+["Hermit's Isle"] = 
+{["Low"] = 36 , ["Mid"] = 55 , ["High"] = 75},
+
+["Kriegspire"] = 
+{["Low"] = 40 , ["Mid"] = 45 , ["High"] = 79},
+
+["Blackshire"] = 
+{["Low"] = 40 , ["Mid"] = 44 , ["High"] = 50},
+
+["Dragonsand"] = 
+{["Low"] = 50 , ["Mid"] = 60 , ["High"] = 90},
+
+["Frozen Highlands"] = 
+{["Low"] = 17 , ["Mid"] = 19 , ["High"] = 20},
+
+["Free Haven"] = 
+{["Low"] = 6 , ["Mid"] = 12.5 , ["High"] = 19},
+
+["Mire of the Damned"] = 
+{["Low"] = 17 , ["Mid"] = 26 , ["High"] = 29},
+
+["Silver Cove"] = 
+{["Low"] = 30 , ["Mid"] = 31.5 , ["High"] = 33},
+
+["Bootleg Bay"] = 
+{["Low"] = 7 , ["Mid"] = 12 , ["High"] = 12},
+
+["Castle Ironfist"] = 
+{["Low"] = 5 , ["Mid"] = 5 , ["High"] = 7},
+
+["Eel Infested Waters"] = 
+{["Low"] = 24 , ["Mid"] = 35 , ["High"] = 36},
+
+["Misty Islands"] = 
+{["Low"] = 5 , ["Mid"] = 5 , ["High"] = 5},
+
+["New Sorpigal"] = 
+{["Low"] = 6 , ["Mid"] = 6 , ["High"] = 6},
+
+["Goblinwatch"] = 
+{["Low"] = 5 , ["Mid"] = 5 , ["High"] = 6},
+
+["Abandoned Temple"] = 
+{["Low"] = 6 , ["Mid"] = 8 , ["High"] = 10},
+
+["Shadow Guild Hideout"] = 
+{["Low"] = 12 , ["Mid"] = 16 , ["High"] = 20},
+
+["Hall of the Fire Lord"] = 
+{["Low"] = 6 , ["Mid"] = 13 , ["High"] = 20},
+
+["Snergle's Caverns"] = 
+{["Low"] = 30 , ["Mid"] = 32.5 , ["High"] = 35},
+
+["Dragoons' Caverns"] = 
+{["Low"] = 18 , ["Mid"] = 20 , ["High"] = 26},
+
+["Silver Helm Outpost"] = 
+{["Low"] = 16 , ["Mid"] = 26 , ["High"] = 34},
+
+["Shadow Guild"] = 
+{["Low"] = 12 , ["Mid"] = 20 , ["High"] = 66},
+
+["Snergle's Iron Mines"] = 
+{["Low"] = 30 , ["Mid"] = 33 , ["High"] = 40},
+
+["Dragoons' Keep"] = 
+{["Low"] = 26 , ["Mid"] = 30 , ["High"] = 34},
+
+["Corlagon's Estate"] = 
+{["Low"] = 26 , ["Mid"] = 29 , ["High"] = 55},
+
+["Silver Helm Stronghold"] = 
+{["Low"] = 5 , ["Mid"] = 12 , ["High"] = 40},
+
+["The Monolith"] = 
+{["Low"] = 24 , ["Mid"] = 30 , ["High"] = 40},
+
+["Tomb of Ethric the Mad"] = 
+{["Low"] = 26 , ["Mid"] = 29 , ["High"] = 55},
+
+["Icewind Keep"] = 
+{["Low"] = 20 , ["Mid"] = 23 , ["High"] = 26},
+
+["Warlord's Fortress"] = 
+{["Low"] = 34 , ["Mid"] = 40 , ["High"] = 80},
+
+["Lair of the Wolf"] = 
+{["Low"] = 26 , ["Mid"] = 40 , ["High"] = 45},
+
+["Gharik's Forge"] = 
+{["Low"] = 39 , ["Mid"] = 39 , ["High"] = 50},
+
+["Agar's Laboratory"] = 
+{["Low"] = 35 , ["Mid"] = 40 , ["High"] = 55},
+
+["Caves of the Dragon Riders"] = 
+{["Low"] = 60 , ["Mid"] = 70 , ["High"] = 80},
+
+["Temple of Baa"] = 
+{["Low"] = 8 , ["Mid"] = 16 , ["High"] = 26},
+
+["Temple of the Fist"] = 
+{["Low"] = 5 , ["Mid"] = 10.5 , ["High"] = 16},
+
+["Temple of Tsantsa"] = 
+{["Low"] = 10 , ["Mid"] = 12 , ["High"] = 12},
+
+["Temple of the Sun"] = 
+{["Low"] = 30 , ["Mid"] = 54.5 , ["High"] = 79},
+
+["Temple of the Moon"] = 
+{["Low"] = 10 , ["Mid"] = 30 , ["High"] = 45},
+
+["Supreme Temple of Baa"] = 
+{["Low"] = 39 , ["Mid"] = 70 , ["High"] = 70},
+
+["Superior Temple of Baa"] = 
+{["Low"] = 30 , ["Mid"] = 50 , ["High"] = 70},
+
+["Temple of the Snake"] = 
+{["Low"] = 45 , ["Mid"] = 67.5 , ["High"] = 90},
+
+["Castle Alamos"] = 
+{["Low"] = 44 , ["Mid"] = 50 , ["High"] = 50},
+
+["Castle Darkmoor"] = 
+{["Low"] = 40 , ["Mid"] = 55 , ["High"] = 80},
+
+["Castle Kriegspire"] = 
+{["Low"] = 35 , ["Mid"] = 45 , ["High"] = 79},
+
+["Free Haven Sewer"] = 
+{["Low"] = 5 , ["Mid"] = 12 , ["High"] = 16},
+
+["Tomb of VARN"] = 
+{["Low"] = 65 , ["Mid"] = 66 , ["High"] = 90},
+
+["Oracle of Enroth"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["Control Center"] = 
+{["Low"] = 90 , ["Mid"] = 90 , ["High"] = 90},
+
+["The Hive"] = 
+{["Low"] = 70 , ["Mid"] = 85 , ["High"] = 100},
+
+["The Arena"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["Dragon's Lair"] = 
+{["Low"] = 90 , ["Mid"] = 90 , ["High"] = 90},
+
+["pending"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["pending"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["pending"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["pending"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["pending"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["pending"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["pending"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["pending"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["pending"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["pending"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["pending"] = 
+{["Low"] = 40 , ["Mid"] = 50 , ["High"] = 50},
+
+["pending"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["Devil Outpost"] = 
+{["Low"] = 70 , ["Mid"] = 70 , ["High"] = 70},
+
+["New World Computing"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+["The Breach"] = 
+{["Low"] = 23 , ["Mid"] = 23 , ["High"] = 23},
+
+["The Breach"] = 
+{["Low"] = 28 , ["Mid"] = 40 , ["High"] = 65},
+
+["Basement of the Breach"] = 
+{["Low"] = 40 , ["Mid"] = 40 , ["High"] = 40},
+
+["The Strange Temple"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+}
