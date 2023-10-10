@@ -976,7 +976,7 @@ function events.CalcItemValue(t)
 			mult=2+2*(MaxCharges-20)/20
 		end
 		basePrice=basePrice*mult
-		if t.Item.Bonus2>0 then
+		if t.Item.Bonus2>0 and t.Item.BonusExpireTime<Game.Time then
 			special=Game.SpcItemsTxt[t.Item.Bonus2-1].Value
 			if bonusEffects[t.Item.Bonus2]~=nil then
 				special=special*mult
