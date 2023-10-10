@@ -1186,3 +1186,50 @@ mapLevels={
 {["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
 
 }
+
+--[[
+mapLevels={}
+text=""
+for i=0,#Game.MapStats do
+	mapLevels[i]={}
+	a=0
+	b=0
+	c=0
+	for v=0,#Game.MonstersTxt do
+		if Game.MonstersTxt[v].Picture==string.format(Game.MapStats[i].Monster1Pic .. " B") and Game.MonstersTxt[v].AIType ~= 1 then
+			a=Game.MonstersTxt[v].Level
+		end
+		if Game.MonstersTxt[v].Picture==string.format(Game.MapStats[i].Monster2Pic .. " B") and Game.MonstersTxt[v].AIType ~= 1 then
+			b=Game.MonstersTxt[v].Level
+		end
+		if Game.MonstersTxt[v].Picture==string.format(Game.MapStats[i].Monster3Pic .. " B") and Game.MonstersTxt[v].AIType ~= 1 then
+			c=Game.MonstersTxt[v].Level
+		end
+	end
+	if a > b then
+    a, b = b, a
+	end
+
+	if b > c then
+		b, c = c, b
+	end
+
+	if a > b then
+		a, b = b, a
+	end
+	
+	if b==0 then
+		b=c
+	end
+	if a==0 then
+		a=b
+		b=(b+c)/2
+	end
+	
+	mapLevels[i]["Low"]=a
+	mapLevels[i]["Mid"]=b
+	mapLevels[i]["High"]=c
+	text=string.format(text .. '["' .. Game.MapStats[i].Name .. '"] = \n{["Low"] = ' .. a .. ' , ["Mid"] = ' .. b .. ' , ["High"] = ' .. c .. '},\n\n'  )
+end	
+print(text)			
+]]
