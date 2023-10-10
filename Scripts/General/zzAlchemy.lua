@@ -140,22 +140,22 @@ itemPermanentBuffMapping = {
 function events.DoBadThingToPlayer(t)
 	if t.Allow==true then
 		if t.Thing==1 then
-			if vars.PlayerBuffs[t.PlayerIndex]["curse"]>Game.Time then
+			if vars.PlayerBuffs[t.Player:GetIndex()]["curse"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Curse Immunity")
 			end
 		elseif t.Thing==2 then
-			if vars.PlayerBuffs[t.PlayerIndex]["weakness"]>Game.Time then
+			if vars.PlayerBuffs[t.Player:GetIndex()]["weakness"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Weakness Immunity")
 			end 
 		elseif t.Thing==3 then
-			if vars.PlayerBuffs[t.PlayerIndex]["sleep"]>Game.Time then
+			if vars.PlayerBuffs[t.Player:GetIndex()]["sleep"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Forced Sleep Immunity")
 			end 
 		elseif t.Thing==5 then
-			if vars.PlayerBuffs[t.PlayerIndex]["insanity"]>Game.Time then
+			if vars.PlayerBuffs[t.Player:GetIndex()]["insanity"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Insanity Immunity")
 			end 
@@ -165,22 +165,22 @@ function events.DoBadThingToPlayer(t)
 				Game.ShowStatusText("Poison Immunity")
 			end 
 		elseif t.Thing==9 or t.Thing==10 or t.Thing==11 then
-			if vars.PlayerBuffs[t.PlayerIndex]["disease"]>Game.Time then
+			if vars.PlayerBuffs[t.Player:GetIndex()]["disease"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Disease Immunity")
 			end 
 		elseif t.Thing==12 then
-			if vars.PlayerBuffs[t.PlayerIndex]["paralysis"]>Game.Time then
+			if vars.PlayerBuffs[t.Player:GetIndex()]["paralysis"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Paralysis Immunity")
 			end 
 		elseif t.Thing==15 then
-			if vars.PlayerBuffs[t.PlayerIndex]["stone"]>Game.Time then
+			if vars.PlayerBuffs[t.Player:GetIndex()]["stone"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Petrify Immunity")
 			end 
 		elseif t.Thing==23 then
-			if vars.PlayerBuffs[t.PlayerIndex]["fear"]>Game.Time then
+			if vars.PlayerBuffs[t.Player:GetIndex()]["fear"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Fear Immunity")
 			end 
