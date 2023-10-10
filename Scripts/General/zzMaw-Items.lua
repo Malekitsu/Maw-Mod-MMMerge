@@ -1299,10 +1299,6 @@ end
 function events.BuildItemInformationBox(t)
 	partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 	maxItemBolster=(partyLevel)/5+5
-	--failsafe
-	if t.Item.Charges==0 and t.Item.Bonus2==0 and t.Item.Bonus==0 then
-		t.Item.MaxCharges=0
-	end
 end
 
 --do the same if someone is trying to equip on a player
