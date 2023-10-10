@@ -488,8 +488,8 @@ evt.PotionEffects[82] = function(IsDrunk, t, Power)
 end
 
 evt.PotionEffects[83] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
-		t.MaxCharges=t.MaxCharges+2
+	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) and t.MaxCharges<55 then
+		t.MaxCharges=math.min(t.MaxCharges+2,55)
 		Mouse.Item.Number=0
 		mem.u4[0x51E100] = 0x100 
 		t.Condition = t.Condition:Or(0x10)
