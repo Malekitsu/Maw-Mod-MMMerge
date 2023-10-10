@@ -1,8 +1,7 @@
 function events.LoadMap()
-	if not vars.PlayerBuffs then
-		vars.PlayerBuffs={} 
-		for i=0,Party.High do
-			local index=Party[i]:GetIndex()
+	for i=0,Party.High do
+		local index=Party[i]:GetIndex()
+		if not vars.PlayerBuffs[index] then
 			vars.PlayerBuffs[index]={}
 			vars.PlayerBuffs[index]["weakness"]=0
 			vars.PlayerBuffs[index]["disease"]=0
