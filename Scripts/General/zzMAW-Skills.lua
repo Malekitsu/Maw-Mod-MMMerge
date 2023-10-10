@@ -1243,7 +1243,7 @@ function events.GameInitialized2()
 	Game.SkillDesGM[const.Skills.Axe]=string.format("%s 1%% to halve AC",Game.SkillDesGM[const.Skills.Axe])
 	Game.SkillDesMaster[const.Skills.Bow]=string.format("%s 2 arrows",Game.SkillDesMaster[const.Skills.Bow])
 	Game.SkillDesExpert[const.Skills.Dagger]=string.format("%s can dual wield",Game.SkillDesExpert[const.Skills.Dagger])
-	Game.SkillDesMaster[const.Skills.Dagger]=string.format("%s 2.5+0.5 crit%%",Game.SkillDesMaster[const.Skills.Dagger])
+	Game.SkillDesMaster[const.Skills.Dagger]=string.format("%s 2.5+0.5 crit%%/skill",Game.SkillDesMaster[const.Skills.Dagger])
 	Game.SkillDesMaster[const.Skills.Mace]=string.format("%s 1%% to stun",Game.SkillDesMaster[const.Skills.Mace])
 	Game.SkillDesGM[const.Skills.Mace]=string.format("%s 1%% to paralyze",Game.SkillDesGM[const.Skills.Mace])
 	Game.SkillDesMaster[const.Skills.Spear]=string.format("%s can hold with 1 hand",Game.SkillDesMaster[const.Skills.Spear])
@@ -1362,7 +1362,7 @@ function chargeTimer()
 	end
 --movement
 function events.Tick()
-	if Multiplayer and Multiplayer.client_monsters()[0] and checkCharge>=0 then
+	if Multiplayer and Multiplayer.client_monsters()[0] and checkCharge and checkCharge>=0 then
 		--check for charge working
 		checkCharge=checkCharge-1
 	end
