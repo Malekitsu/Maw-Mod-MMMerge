@@ -66,7 +66,7 @@ newWeaponSkillRecoveryBonuses =
 {
 	[const.Skills.Staff]	= {0, 0, 0, 0,},
 	[const.Skills.Sword]	= {0, 2, 2, 3,},
-	[const.Skills.Dagger]	= {0, 0, 1, 1,},
+	[const.Skills.Dagger]	= {0, 0, 0, 1,},
 	[const.Skills.Axe]		= {0, 1, 2, 2,},
 	[const.Skills.Spear]	= {0, 0, 0, 0,},
 	[const.Skills.Bow]		= {1, 2, 2, 3,},
@@ -1243,6 +1243,7 @@ function events.GameInitialized2()
 	Game.SkillDesGM[const.Skills.Axe]=string.format("%s 1%% to halve AC",Game.SkillDesGM[const.Skills.Axe])
 	Game.SkillDesMaster[const.Skills.Bow]=string.format("%s 2 arrows",Game.SkillDesMaster[const.Skills.Bow])
 	Game.SkillDesExpert[const.Skills.Dagger]=string.format("%s can dual wield",Game.SkillDesExpert[const.Skills.Dagger])
+	Game.SkillDesMaster[const.Skills.Dagger]=string.format("%s 2.5+0.5 crit%%",Game.SkillDesMaster[const.Skills.Dagger])
 	Game.SkillDesMaster[const.Skills.Mace]=string.format("%s 1%% to stun",Game.SkillDesMaster[const.Skills.Mace])
 	Game.SkillDesGM[const.Skills.Mace]=string.format("%s 1%% to paralyze",Game.SkillDesGM[const.Skills.Mace])
 	Game.SkillDesMaster[const.Skills.Spear]=string.format("%s can hold with 1 hand",Game.SkillDesMaster[const.Skills.Spear])
