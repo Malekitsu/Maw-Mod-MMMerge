@@ -108,7 +108,7 @@ function events.ItemGenerated(t)
 			return
 		end
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
-		t.Item.MaxCharges=math.min(math.floor(partyLevel/5),255)
+		t.Item.MaxCharges=math.min(math.floor(partyLevel/5),50)
 		partyLevel1=math.min(math.floor(partyLevel/18),14)
 		--adjust loot Strength
 		ps1=t.Strength
