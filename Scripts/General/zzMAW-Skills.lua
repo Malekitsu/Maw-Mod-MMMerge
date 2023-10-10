@@ -97,7 +97,7 @@ newWeaponSkillDamageBonuses =
 	[const.Skills.Bow]		= {1, 2, 2, 3,},
 	[const.Skills.Mace]		= {1, 2, 3, 4,},
 	[const.Skills.Blaster]	= {0, 0, 0, 0,},
-	[const.Skills.Unarmed]	= {2, 3, 4, 4,},
+	[const.Skills.Unarmed]	= {4, 5, 6, 6,},
 }
 -- weapon skill AC bonuses (by rank)
 
