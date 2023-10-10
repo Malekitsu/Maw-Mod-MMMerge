@@ -7,7 +7,20 @@ function events.CalcDamageToMonster(t)
 			accuracy=data.Player:GetAccuracy()*3/2
 			critDamage=accuracy/500
 			critChance=50+luck*4/3
-			roll=math.random(1, 1000)
+			--dagget bonus
+			daggerCritBonus=0
+			for i=0,1 do
+				if data.Player:GetActiveItem(i) then
+					itSkill=data.Player:GetActiveItem(i):T().Skill
+					if itSkill==2 then
+						s,m=SplitSkill(data.Player:GetSkill(const.Skills.Dagger))
+						if m>2 then
+							daggerCritBonus=daggerCritBonus+2.5+0.5*s
+						end
+					end
+				end
+			end
+			roll=math.random(1, 1000)+daggerCritBonus*10
 			if roll <= critChance then
 				t.Result=t.Result*(1.5+critDamage)
 			end
@@ -147,7 +160,19 @@ function events.BuildStatInformationBox(t)
 	if t.Stat==6 then
 		i=Game.CurrentPlayer
 		luck=Party[i]:GetLuck()
-		t.Text=string.format("%s\n\nCritical strike chance: %s%s",Game.StatsDescriptions[6],math.round((luck/20*4/3+5)*100)/100,"%")
+		daggerCritBonus=0
+		for v=0,1 do
+			if Party[i]:GetActiveItem(v) then
+				itSkill=Party[i]:GetActiveItem(v):T().Skill
+				if itSkill==2 then
+					s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Dagger))
+					if m>2 then
+						daggerCritBonus=daggerCritBonus+2.5+0.5*s
+					end
+				end
+			end
+		end
+		t.Text=string.format("%s\n\nCritical strike chance: %s%s",Game.StatsDescriptions[6],math.round((luck/20*4/3+5+daggerCritBonus)*100)/100,"%")
 	end
 	if t.Stat==7 then
 		local index=Game.CurrentPlayer
@@ -241,8 +266,20 @@ function events.BuildStatInformationBox(t)
 		local atk=Party[i]:GetMeleeAttack()
 		local lvl=Party[i].LevelBase
 		local hitChance= (15+atk*2)/(30+atk*2+lvl)
+		local daggerCritBonus=0
+		for v=0,1 do
+			if Party[i]:GetActiveItem(v) then
+				itSkill=Party[i]:GetActiveItem(v):T().Skill
+				if itSkill==2 then
+					s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Dagger))
+					if m>2 then
+						daggerCritBonus=daggerCritBonus+0.025+0.005*s
+					end
+				end
+			end
+		end
 		--damage tracker
-		local DPS=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
+		local DPS=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
 		t.Text=string.format("%s\n\nDamage per second: %s",t.Text,StrColor(255,255,100,DPS))
 		vars.damageTrack=vars.damageTrack or {}
 		vars.damageTrack[Party[i]:GetIndex()]=vars.damageTrack[Party[i]:GetIndex()] or 0
