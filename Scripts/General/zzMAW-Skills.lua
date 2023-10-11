@@ -1578,11 +1578,11 @@ end
 --identify item shared to all the party
 function events.GetSkill(t)
 	if t.Skill==const.Skills.IdentifyItem then
+		if Game.HouseScreen==-1 then return end
 		if Game.CurrentPlayer>=0 then
 			s,m=SplitSkill(t.Result)
 			currentIdentify=s*m
 			maxIdentify=s*m
-			checkOver=false
 		end
 		for i=0,Party.High do
 			s,m=SplitSkill(Party[i].Skills[const.Skills.IdentifyItem])
@@ -1593,17 +1593,54 @@ function events.GetSkill(t)
 				end
 			end
 			s=s+bonus
-			if s*m>currentIdentify then
+			if s*m>=currentIdentify then
+				currentIdentify=s*m
 				maxIdentify=JoinSkill(s,m)
 			end
 		end
 		t.Result=maxIdentify
+	end
+	if t.Skill==const.Skills.IdentifyMonster then
+		if Game.HouseScreen==-1 then return end
+		if Game.CurrentPlayer>=0 then
+			s,m=SplitSkill(t.Result)
+			currentIdentifyMonster=s*m
+			maxIdentifyMonster=s*m
+		end
+		for i=0,Party.High do
+			s,m=SplitSkill(Party[i].Skills[const.Skills.IdentifyMonster])
+			bonus=0
+			for it in Party[i]:EnumActiveItems() do
+				if it.Bonus==21 and it.BonusStrength>bonus then
+					bonus=it.BonusStrength
+				end
+			end
+			s=s+bonus
+			if s*m>=currentIdentifyMonster then
+				currentIdentifyMonster=s*m
+				maxIdentifyMonster=JoinSkill(s,m)
+			end
+		end
+		t.Result=maxIdentifyMonster
 	end
 end
 
 --merchant fix
 function events.GetMerchantTotalSkill(t)
 	if t.Result==10000 then
-	t.Result=1000
+		t.Result=1000
+		return
 	end
+	if Game.HouseScreen==-1 or Game.HouseScreen==1 or Game.HouseScreen==96 then return end
+	currentMerchant=0
+	maxMerchant=0
+	for i=0,Party.High do
+		s,m=SplitSkill(Party[i].Skills[const.Skills.Merchant])
+		if s*m>currentMerchant then
+			maxMerchant=s*m+12
+		end
+	end
+	t.Result=maxMerchant
 end
+--Party[2].Skills[const.Skills.Merchant]=1
+--
