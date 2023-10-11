@@ -1,4 +1,5 @@
 function events.LoadMap()
+	vars.PlayerBuffs=vars.PlayerBuffs or {}
 	for i=0,Party.High do
 		local index=Party[i]:GetIndex()
 		if not vars.PlayerBuffs[index] then
