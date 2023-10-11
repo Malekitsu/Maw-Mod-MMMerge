@@ -4,7 +4,7 @@ function events.CalcDamageToMonster(t)
 	if data and data.Player and t.DamageKind==4 then
 		if data.Object==nil or data.Object.Spell==133 then
 			luck=data.Player:GetLuck()/15
-			critDamage=data.Player:GetAccuracy()*3/10
+			critDamage=data.Player:GetAccuracy()*3/1000
 			critChance=50+luck
 			--dagget bonus
 			daggerCritBonus=0
