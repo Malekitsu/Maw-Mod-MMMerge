@@ -1623,6 +1623,22 @@ function events.GetSkill(t)
 		end
 		t.Result=maxIdentifyMonster
 	end
+	if t.Skill==const.Skills.Repair then
+		if Game.HouseScreen==-1 then return end
+		if Game.CurrentPlayer>=0 then
+			s,m=SplitSkill(t.Result)
+			currentRepair=s*m
+			maxRepair=s*m
+		end
+		for i=0,Party.High do
+			s,m=SplitSkill(Party[i].Skills[const.Skills.Repair])
+			if s*m>=currentRepair then
+				currentRepair=s*m
+				maxRepair=JoinSkill(s,m)
+			end
+		end
+		t.Result=maxRepair
+	end
 end
 
 --merchant fix
@@ -1642,5 +1658,3 @@ function events.GetMerchantTotalSkill(t)
 	end
 	t.Result=maxMerchant
 end
---Party[2].Skills[const.Skills.Merchant]=1
---
