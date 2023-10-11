@@ -960,8 +960,11 @@ function events.CalcItemValue(t)
 		bonus1=t.Item.BonusStrength*100
 		if t.Item.Bonus==8 or t.Item.Bonus==9 then
 			bonus1=bonus1/2
-		end
-		if t.Item.Bonus>16 and t.Item.Bonus<=24 then
+		elseif t.Item.Bonus==10 then
+			bonus1=bonus1*2
+		elseif t.Item.Bonus>10 and t.Item.Bonus<=16 then
+			bonus1=bonus1^1.177
+		elseif t.Item.Bonus>16 and t.Item.Bonus<=24 then
 			bonus1=(bonus1/100)^2*100
 		end
 		bonus2=(t.Item.Charges%1000)*100
