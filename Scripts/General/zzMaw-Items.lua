@@ -988,6 +988,24 @@ function events.CalcItemValue(t)
 			end
 		end
 		t.Value=basePrice+bonus1+bonus2
+		if Game.HouseScreen==2 or Game.HouseScreen==95 then
+			count=0
+			if t.Item.Bonus>0 then
+				count=count+1
+			end
+			if t.Item.Charges>1000 then
+				count=count+1
+			end
+			if t.Item.Bonus2>0 then
+				count=count+1
+			end
+			if t.Item.BonusExpireTime>0 and t.Item.BonusExpireTime<3 then
+				count=count+t.Item.BonusExpireTime
+			end	
+			if count>2 then
+				t.Value=t.Value^(1+count*0.1-0.2)
+			end
+		end	
 	end
 end
 
