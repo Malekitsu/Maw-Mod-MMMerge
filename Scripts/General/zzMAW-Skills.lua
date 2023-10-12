@@ -1577,13 +1577,12 @@ end
 
 --identify item shared to all the party
 function events.GetSkill(t)
+	if Game.CurrentPlayer==-1 then return end
 	if t.Skill==const.Skills.IdentifyItem then
 		if Game.HouseScreen==-1 then return end
-		if Game.CurrentPlayer>=0 then
-			s,m=SplitSkill(t.Result)
-			currentIdentify=s*m
-			maxIdentify=s*m
-		end
+		s,m=SplitSkill(t.Result)
+		currentIdentify=s*m
+		maxIdentify=s*m
 		for i=0,Party.High do
 			s,m=SplitSkill(Party[i].Skills[const.Skills.IdentifyItem])
 			bonus=0
