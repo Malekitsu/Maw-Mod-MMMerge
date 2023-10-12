@@ -827,11 +827,11 @@ function events.CalcStatBonusByItems(t)
                     end
                 end
             elseif bonusData.bonusValues then
-                for _, value in ipairs(bonusData.bonusValues) do
+                for i, value in ipairs(bonusData.bonusValues) do
                     if it.Bonus == value then
                         if t.Stat == it.Bonus - 1 then
                             if type(bonusData.statModifier) == "table" then
-                                t.Result = t.Result + bonusData.statModifier[value]
+                                t.Result = t.Result + bonusData.statModifier[i]
                             else
                                 t.Result = t.Result + bonusData.statModifier
                             end
