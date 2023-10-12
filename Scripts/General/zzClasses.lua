@@ -122,7 +122,7 @@ end
 
 ---deactivate offhand weapon
 function events.CalcDamageToMonster(t)
-	if (t.Player.Class==55 or t.Player.Class==54 or t.Player.Class==53) then
+	if t.Player and (t.Player.Class==55 or t.Player.Class==54 or t.Player.Class==53) then
 		data=WhoHitMonster()
 		if data and data.Player then
 			item=data.Player:GetActiveItem(0)
