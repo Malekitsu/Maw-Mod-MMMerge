@@ -1214,3 +1214,5 @@ for i=0,#Game.MapStats do
 	mapLevels[i]["High"]=c
 	text=string.format(text .. '["' .. Game.MapStats[i].Name .. '"] = \n{["Low"] = ' .. a .. ' , ["Mid"] = ' .. b .. ' , ["High"] = ' .. c .. '},\n\n'  )
 end
+
+]]
