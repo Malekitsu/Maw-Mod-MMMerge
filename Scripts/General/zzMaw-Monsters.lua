@@ -235,71 +235,6 @@ function events.LeaveMap()
 	end
 end
 
---MAP LEVELS
-mapLevel={
-	["The Temple of the Moon"] = 3,
-	["Emerald Island"] = 3,
-	["The Dragon's Lair"] = 4,
-	["Harmondale"] = 5,
-	["Castle Harmondale"] = 5,
-	["The Barrow Downs"] = 10,
-	["White Cliff Cave"] = 10,
-	["The Hall under the Hill"] = 12,
-	["Zokarr's Tomb"] = 13,
-	["Deyja"] = 14,
-	["The Haunted Mansion"] = 14,
-	["The Erathian Sewers"] = 15,
-	["The Bandit Caves"] = 15,
-	["The Tularean Forest"] = 15,
-	["Stone City"] = 17,
-	["The Hall of the Pit"] = 17,
-	["Erathia"] = 17,
-	["The Tidewater Caverns"] = 18,
-	["The Tularean Caves"] = 18,
-	["Evenmorn Island"] = 20,
-	["Grand Temple of the Sun"] = 22,
-	["Grand Temple of the Moon"] = 25,
-	["The Bracada Desert"] = 25,
-	["Tatalia"] = 25,
-	["Avlee"] = 25,
-	["Lord Markham's Manor"] = 27,
-	["Fort Riverstride"] = 30,
-	["Nighon Tunnels"] = 30,
-	["Castle Gryphonheart"] = 31,
-	["The Red Dwarf Mines"] = 32,
-	["William Setag's Tower"] = 33,
-	["Castle Navan"] = 35,
-	["The Mercenary Guild"] = 43,
-	["The Temple of Baa"] = 45,
-	["The School of Sorcery"] = 45,
-	["Celeste"] = 47,
-	["Watchtower 6"] = 50,
-	["Temple of the Dark"] = 50,
-	["Clanker's Laboratory"] = 50,
-	["The Wine Cellar"] = 50,
-	["Castle Gloaming"] = 55,
-	["The Walls of Mist"] = 55,
-	["The Pit"] = 60,
-	["Temple of the Light"] = 60,
-	["The Breeding Zone"] = 65,
-	["Castle Lambent"] = 65,
-	["Thunderfist Mountain"] = 65,
-	["The Hidden Tomb"] = 65,
-	["Shoals"] = 70,
-	["Mount Nighon"] = 70,
-	["Tunnels to Eeofol"] = 70,
-	["The Land of the Giants"] = 74,
-	["The Small House"] = 80,
-	["The Strange Temple"] = 80,
-	["The Titans' Stronghold"] = 83,
-	["Colony Zod"] = 85,
-	["The Maze"] = 90,
-	["Wromthrax's Cave"] = 90,
-	["The Dragon Caves"] = 92,
-	["The Lincoln"] = 100,
-}
-
-
 function events.LoadMap()
 	--calculate party experience
 	currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
@@ -318,9 +253,31 @@ function events.LoadMap()
 	if bolsterLevel>=120 then 
 		bolsterLevel=120+(bolsterLevel-120)/2
 	end
-				 
+	
+	--check for current map monsters
+	currentMapMonsters={}
+	for i=1, 651 do	
+		mon=Game.MonstersTxt[i]
+		for v=1,3 do 
+			if Game.MapStats[Map.MapStatsIndex]["Monster" .. v .. "Pic"] .. " B" == mon.Picture then
+				currentMapMonsters[v]= i
+			end			
+		end
+	end
+	if #currentMapMonsters>=2 then
+		if Game.MonstersTxt[currentMapMonsters[1]].Level>Game.MonstersTxt[currentMapMonsters[2]].Level then
+			currentMapMonsters[1], currentMapMonsters[2] = currentMapMonsters[2], currentMapMonsters[1]
+			if #currentMapMonsters==3 then
+				if Game.MonstersTxt[currentMapMonsters[2]].Level > Game.MonstersTxt[currentMapMonsters[3]].Level then
+					currentMapMonsters[3], currentMapMonsters[2] = currentMapMonsters[2], currentMapMonsters[3]
+				end
+				if Game.MonstersTxt[currentMapMonsters[1]].Level>Game.MonstersTxt[currentMapMonsters[2]].Level then
+					currentMapMonsters[1], currentMapMonsters[2] = currentMapMonsters[2], currentMapMonsters[1]
+				end
+			end
+		end
+	end
 	for i=1, 651 do
-		
 		--calculate level scaling
 		mon=Game.MonstersTxt[i]
 		base=basetable[i]		
@@ -331,12 +288,32 @@ function events.LoadMap()
 		
 		--monsters scale based on map
 		extraBolster=0
+		--scale non map monsters based on MID
 		local mapName=Game.MapStats[Map.MapStatsIndex].Name
-		if mapLevel[mapName] then
-			if LevelB<mapLevel[mapName] then
-				extraBolster=mapLevel[mapName]-LevelB
+		if mapLevels[mapName].Mid then
+			if LevelB<mapLevels[mapName].Low then
+				extraBolster=(mapLevels[mapName].Low-LevelB)/2
+			elseif LevelB>mapLevels[mapName].High then
+				extraBolster=(mapLevels[mapName].High-LevelB)/2
 			end
 		end
+		--scale map monsters
+		if #currentMapMonsters>0 then 
+			for j=1, #currentMapMonsters do
+				if math.abs(i-currentMapMonsters[j])<=1 then
+					if j==1 then
+						extraBolster=mapLevels[mapName].Low-LevelB
+					elseif j==2 and #currentMapMonsters==3 then
+						extraBolster=mapLevels[mapName].Mid-LevelB
+					elseif j==2 and #currentMapMonsters==2 then
+						extraBolster=mapLevels[mapName].High-LevelB
+					elseif j==3 then
+						extraBolster=mapLevels[mapName].High-LevelB
+					end
+				end
+			end
+		end
+		
 		mon.Level=mon.Level+extraBolster
 		
 		--HP
@@ -522,10 +499,6 @@ Debug Message
 	Trap = 0,
 	Tres = 0
 }
-for i=1, 60 do
-	local map=Game.MapStats[i]
-	if map.
-	
 
 ]]
 
@@ -550,8 +523,13 @@ function events.GameInitialized2()
 		if Game.MapStats[i].Mon3Hi<=3 then
 			Game.MapStats[i].Mon3Hi=Game.MapStats[i].Mon3Hi+1
 		end 
-
 	end
+	--individual map CHANGES-----
+	--hall under the hill
+	Game.MapStats[96].Monster2Pic="Will ' O Wisp"
+	Game.MapStats[96].Monster3Pic="Unicorn"
+	Game.MapStats[96].Mon3Low=1
+	Game.MapStats[96].Mon3Hi=3
 end
 
 --fix to monsters AI (zombies and ghouls)
@@ -564,6 +542,7 @@ end
 
 --map levels
 mapLevels={
+--MM8
 ["Dagger Wound Island"] = 
 {["Low"] = 6 , ["Mid"] = 8 , ["High"] = 11},
 
@@ -747,125 +726,13 @@ mapLevels={
 ["NWC"] = 
 {["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
 
+
+--MM7
 ["Emerald Island"] = 
 {["Low"] = 5 , ["Mid"] = 5 , ["High"] = 5},
 
-["Harmondale"] = 
-{["Low"] = 6 , ["Mid"] = 11.5 , ["High"] = 17},
-
-["Erathia"] = 
-{["Low"] = 14 , ["Mid"] = 18.5 , ["High"] = 23},
-
-["The Tularean Forest"] = 
-{["Low"] = 18 , ["Mid"] = 22 , ["High"] = 24},
-
-["Deyja"] = 
-{["Low"] = 13 , ["Mid"] = 15 , ["High"] = 17},
-
-["The Bracada Desert"] = 
-{["Low"] = 23 , ["Mid"] = 29 , ["High"] = 35},
-
-["Evenmorn Island"] = 
-{["Low"] = 10 , ["Mid"] = 13 , ["High"] = 22},
-
-["Mount Nighon"] = 
-{["Low"] = 35 , ["Mid"] = 39 , ["High"] = 55},
-
-["The Barrow Downs"] = 
-{["Low"] = 11 , ["Mid"] = 13 , ["High"] = 22},
-
-["The Land of the Giants"] = 
-{["Low"] = 50 , ["Mid"] = 75 , ["High"] = 90},
-
-["Tatalia"] = 
-{["Low"] = 19 , ["Mid"] = 23.5 , ["High"] = 28},
-
-["Avlee"] = 
-{["Low"] = 22 , ["Mid"] = 24 , ["High"] = 28},
-
-["Shoals"] = 
-{["Low"] = 36 , ["Mid"] = 36 , ["High"] = 36},
-
-["The Erathian Sewers"] = 
-{["Low"] = 5 , ["Mid"] = 8.5 , ["High"] = 12},
-
-["The Maze"] = 
-{["Low"] = 35 , ["Mid"] = 55 , ["High"] = 59},
-
-["Castle Gloaming"] = 
-{["Low"] = 30 , ["Mid"] = 33 , ["High"] = 35},
-
-["The Temple of Baa"] = 
-{["Low"] = 8 , ["Mid"] = 20 , ["High"] = 50},
-
-["The Arena"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
-
 ["The Temple of the Moon"] = 
 {["Low"] = 5 , ["Mid"] = 6 , ["High"] = 8},
-
-["Thunderfist Mountain"] = 
-{["Low"] = 35 , ["Mid"] = 40 , ["High"] = 59},
-
-["The Tularean Caves"] = 
-{["Low"] = 14 , ["Mid"] = 22 , ["High"] = 28},
-
-["The Titans' Stronghold"] = 
-{["Low"] = 75 , ["Mid"] = 82.5 , ["High"] = 90},
-
-["The Breeding Zone"] = 
-{["Low"] = 11 , ["Mid"] = 26 , ["High"] = 60},
-
-["The Walls of Mist"] = 
-{["Low"] = 22 , ["Mid"] = 35 , ["High"] = 44},
-
-["Clanker's Laboratory"] = 
-{["Low"] = 11 , ["Mid"] = 35 , ["High"] = 40},
-
-["Zokarr's Tomb"] = 
-{["Low"] = 17 , ["Mid"] = 18 , ["High"] = 19},
-
-["The School of Sorcery"] = 
-{["Low"] = 35 , ["Mid"] = 35 , ["High"] = 35},
-
-["Watchtower 6"] = 
-{["Low"] = 30 , ["Mid"] = 30 , ["High"] = 35},
-
-["The Wine Cellar"] = 
-{["Low"] = 6 , ["Mid"] = 33 , ["High"] = 35},
-
-["The Tidewater Caverns"] = 
-{["Low"] = 10 , ["Mid"] = 12 , ["High"] = 13},
-
-["Lord Markham's Manor"] = 
-{["Low"] = 17 , ["Mid"] = 38.5 , ["High"] = 60},
-
-["Grand Temple of the Moon"] = 
-{["Low"] = 19 , ["Mid"] = 19.5 , ["High"] = 20},
-
-["The Mercenary Guild"] = 
-{["Low"] = 14 , ["Mid"] = 19 , ["High"] = 60},
-
-["White Cliff Cave"] = 
-{["Low"] = 14 , ["Mid"] = 16 , ["High"] = 18},
-
-["The Hall under the Hill"] = 
-{["Low"] = 5 , ["Mid"] = 5 , ["High"] = 5},
-
-["The Lincoln"] = 
-{["Low"] = 70 , ["Mid"] = 70 , ["High"] = 70},
-
-["Stone City"] = 
-{["Low"] = 14 , ["Mid"] = 17 , ["High"] = 20},
-
-["Celeste"] = 
-{["Low"] = 35 , ["Mid"] = 39 , ["High"] = 50},
-
-["The Pit"] = 
-{["Low"] = 30 , ["Mid"] = 33 , ["High"] = 35},
-
-["Colony Zod"] = 
-{["Low"] = 50 , ["Mid"] = 50 , ["High"] = 50},
 
 ["The Dragon's Lair"] = 
 {["Low"] = 5 , ["Mid"] = 45 , ["High"] = 85},
@@ -873,29 +740,11 @@ mapLevels={
 ["Castle Harmondale"] = 
 {["Low"] = 5 , ["Mid"] = 6 , ["High"] = 6},
 
-["Castle Lambent"] = 
-{["Low"] = 35 , ["Mid"] = 35 , ["High"] = 50},
+["Harmondale"] = 
+{["Low"] = 6 , ["Mid"] = 11.5 , ["High"] = 17},
 
-["Fort Riverstride"] = 
-{["Low"] = 17 , ["Mid"] = 19 , ["High"] = 24},
-
-["Castle Navan"] = 
-{["Low"] = 5 , ["Mid"] = 22 , ["High"] = 23},
-
-["Castle Gryphonheart"] = 
-{["Low"] = 19 , ["Mid"] = 24 , ["High"] = 60},
-
-["The Red Dwarf Mines"] = 
-{["Low"] = 18 , ["Mid"] = 29 , ["High"] = 40},
-
-["Nighon Tunnels"] = 
-{["Low"] = 11 , ["Mid"] = 20 , ["High"] = 35},
-
-["Tunnels to Eeofol"] = 
-{["Low"] = 40 , ["Mid"] = 50 , ["High"] = 60},
-
-["The Haunted Mansion"] = 
-{["Low"] = 13 , ["Mid"] = 17 , ["High"] = 19},
+["The Barrow Downs"] = 
+{["Low"] = 11 , ["Mid"] = 13 , ["High"] = 16},
 
 ["Barrow VII"] = 
 {["Low"] = 11 , ["Mid"] = 12 , ["High"] = 13},
@@ -942,36 +791,172 @@ mapLevels={
 ["Barrow XV"] = 
 {["Low"] = 13 , ["Mid"] = 15 , ["High"] = 17},
 
-["Wromthrax's Cave"] = 
-{["Low"] = 90 , ["Mid"] = 90 , ["High"] = 90},
+["White Cliff Cave"] = 
+{["Low"] = 14 , ["Mid"] = 16 , ["High"] = 18},
 
-["William Setag's Tower"] = 
-{["Low"] = 5 , ["Mid"] = 32.5 , ["High"] = 60},
+["The Hall under the Hill"] = 
+{["Low"] = 12 , ["Mid"] = 18 , ["High"] = 24},
 
-["The Hidden Tomb"] = 
-{["Low"] = 30 , ["Mid"] = 31.5 , ["High"] = 33},
+["Zokarr's Tomb"] = 
+{["Low"] = 17 , ["Mid"] = 18 , ["High"] = 19},
 
-["The Dragon Caves"] = 
-{["Low"] = 90 , ["Mid"] = 90 , ["High"] = 90},
+["Deyja"] = 
+{["Low"] = 14 , ["Mid"] = 16 , ["High"] = 18},
+
+["The Haunted Mansion"] = 
+{["Low"] = 14 , ["Mid"] = 17 , ["High"] = 19},
+
+["The Erathian Sewers"] = 
+{["Low"] = 15 , ["Mid"] = 18.5 , ["High"] = 22},
 
 ["The Bandit Caves"] = 
-{["Low"] = 12 , ["Mid"] = 13 , ["High"] = 14},
+{["Low"] = 15 , ["Mid"] = 16 , ["High"] = 17},
+
+["The Tularean Forest"] = 
+{["Low"] = 18 , ["Mid"] = 22 , ["High"] = 24},
+
+["Stone City"] = 
+{["Low"] = 17 , ["Mid"] = 18.5 , ["High"] = 20},
+
+["Erathia"] = 
+{["Low"] = 17 , ["Mid"] = 20 , ["High"] = 23},
+
+["The Tidewater Caverns"] = 
+{["Low"] = 18 , ["Mid"] = 20 , ["High"] = 21},
+
+["The Tularean Caves"] = 
+{["Low"] = 18 , ["Mid"] = 22 , ["High"] = 28},
+
+["Evenmorn Island"] = 
+{["Low"] = 20 , ["Mid"] = 23 , ["High"] = 26},
+
+["Grand Temple of the Sun"] = 
+{["Low"] = 22 , ["Mid"] = 24 , ["High"] = 26},
+
+["Grand Temple of the Moon"] = 
+{["Low"] = 25 , ["Mid"] = 27 , ["High"] = 29},
+
+["The Bracada Desert"] = 
+{["Low"] = 25 , ["Mid"] = 29 , ["High"] = 35},
+
+["Tatalia"] = 
+{["Low"] = 19 , ["Mid"] = 23.5 , ["High"] = 28},
+
+["Avlee"] = 
+{["Low"] = 22 , ["Mid"] = 24 , ["High"] = 28},
+
+["Lord Markham's Manor"] = 
+{["Low"] = 28 , ["Mid"] = 44 , ["High"] = 60},
+
+["Fort Riverstride"] = 
+{["Low"] = 30 , ["Mid"] = 32 , ["High"] = 37},
+
+["Nighon Tunnels"] = 
+{["Low"] = 31 , ["Mid"] = 33 , ["High"] = 35},
+
+["Castle Gryphonheart"] = 
+{["Low"] = 31 , ["Mid"] = 36 , ["High"] = 50},
+
+["The Red Dwarf Mines"] = 
+{["Low"] = 32 , ["Mid"] = 40 , ["High"] = 48},
+
+["William Setag's Tower"] = 
+{["Low"] = 33 , ["Mid"] = 46.5 , ["High"] = 60},
+
+["Castle Navan"] = 
+{["Low"] = 25 , ["Mid"] = 32 , ["High"] = 43},
+
+["The Hall of the Pit"] = 
+{["Low"] = 33 , ["Mid"] = 37 , ["High"] = 42},
+
+["The Mercenary Guild"] = 
+{["Low"] = 44 , ["Mid"] = 49 , ["High"] = 60},
+
+["The Temple of Baa"] = 
+{["Low"] = 38 , ["Mid"] = 44 , ["High"] = 50},
+
+["The School of Sorcery"] = 
+{["Low"] = 45 , ["Mid"] = 45 , ["High"] = 45},
+
+["Celeste"] = 
+{["Low"] = 35 , ["Mid"] = 39 , ["High"] = 50},
+
+["Watchtower 6"] = 
+{["Low"] = 45 , ["Mid"] = 45 , ["High"] = 50},
+
+["Temple of the Dark"] = 
+{["Low"] = 47 , ["Mid"] = 50 , ["High"] = 63},
+
+["Clanker's Laboratory"] = 
+{["Low"] = 50 , ["Mid"] = 55 , ["High"] = 60},
+
+["The Wine Cellar"] = 
+{["Low"] = 42 , ["Mid"] = 45 , ["High"] = 55},
+
+["Castle Gloaming"] = 
+{["Low"] = 53 , ["Mid"] = 57 , ["High"] = 62},
+
+["The Walls of Mist"] = 
+{["Low"] = 42 , ["Mid"] = 55 , ["High"] = 64},
+
+["The Pit"] = 
+{["Low"] = 50 , ["Mid"] = 53 , ["High"] = 55},
+
+["Temple of the Light"] = 
+{["Low"] = 42 , ["Mid"] = 48 , ["High"] = 60},
+
+["The Breeding Zone"] = 
+{["Low"] = 44 , ["Mid"] = 52 , ["High"] = 70},
+
+["Castle Lambent"] = 
+{["Low"] = 55 , ["Mid"] = 55 , ["High"] = 75},
+
+["Thunderfist Mountain"] = 
+{["Low"] = 55 , ["Mid"] = 65 , ["High"] = 75},
+
+["The Hidden Tomb"] = 
+{["Low"] = 65 , ["Mid"] = 67.5 , ["High"] = 70},
+
+["Shoals"] = 
+{["Low"] = 70 , ["Mid"] = 70 , ["High"] = 70},
+
+["Mount Nighon"] = 
+{["Low"] = 65 , ["Mid"] = 69 , ["High"] = 85},
+
+["Tunnels to Eeofol"] = 
+{["Low"] = 60 , ["Mid"] = 70 , ["High"] = 80},
+
+["The Land of the Giants"] = 
+{["Low"] = 70 , ["Mid"] = 75 , ["High"] = 90},
 
 ["The Small House"] = 
 {["Low"] = 5 , ["Mid"] = 42.5 , ["High"] = 80},
 
-["Temple of the Light"] = 
-{["Low"] = 16 , ["Mid"] = 20 , ["High"] = 50},
+["The Strange Temple"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
 
-["Temple of the Dark"] = 
-{["Low"] = 17 , ["Mid"] = 20 , ["High"] = 33},
+["The Titans' Stronghold"] = 
+{["Low"] = 75 , ["Mid"] = 82.5 , ["High"] = 90},
 
-["Grand Temple of the Sun"] = 
-{["Low"] = 16 , ["Mid"] = 18 , ["High"] = 20},
+["Colony Zod"] = 
+{["Low"] = 85 , ["Mid"] = 85 , ["High"] = 85},
 
-["The Hall of the Pit"] = 
-{["Low"] = 13 , ["Mid"] = 17 , ["High"] = 22},
+["The Maze"] = 
+{["Low"] = 75 , ["Mid"] = 85 , ["High"] = 89},
 
+["Wromthrax's Cave"] = 
+{["Low"] = 90 , ["Mid"] = 90 , ["High"] = 90},
+
+["The Dragon Caves"] = 
+{["Low"] = 90 , ["Mid"] = 90 , ["High"] = 90},
+
+["The Lincoln"] = 
+{["Low"] = 100 , ["Mid"] = 100 , ["High"] = 100},
+
+["The Arena"] = 
+{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+
+--MM6
 ["Sweet Water"] = 
 {["Low"] = 70 , ["Mid"] = 85 , ["High"] = 100},
 
@@ -1209,11 +1194,9 @@ for i=0,#Game.MapStats do
 	if a > b then
     a, b = b, a
 	end
-
 	if b > c then
 		b, c = c, b
 	end
-
 	if a > b then
 		a, b = b, a
 	end
@@ -1230,6 +1213,4 @@ for i=0,#Game.MapStats do
 	mapLevels[i]["Mid"]=b
 	mapLevels[i]["High"]=c
 	text=string.format(text .. '["' .. Game.MapStats[i].Name .. '"] = \n{["Low"] = ' .. a .. ' , ["Mid"] = ' .. b .. ' , ["High"] = ' .. c .. '},\n\n'  )
-end	
-print(text)			
-]]
+end
