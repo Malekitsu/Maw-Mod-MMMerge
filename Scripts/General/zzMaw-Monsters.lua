@@ -258,9 +258,11 @@ function events.LoadMap()
 	currentMapMonsters={}
 	for i=1, 651 do	
 		mon=Game.MonstersTxt[i]
+		local index=1
 		for v=1,3 do 
 			if Game.MapStats[Map.MapStatsIndex]["Monster" .. v .. "Pic"] .. " B" == mon.Picture then
-				currentMapMonsters[v]= i
+				currentMapMonsters[index]= i
+				index=index+1
 			end			
 		end
 	end
