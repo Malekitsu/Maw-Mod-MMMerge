@@ -256,9 +256,9 @@ function events.LoadMap()
 	
 	--check for current map monsters
 	currentMapMonsters={}
+	local index=1
 	for i=1, 651 do	
 		mon=Game.MonstersTxt[i]
-		local index=1
 		for v=1,3 do 
 			if Game.MapStats[Map.MapStatsIndex]["Monster" .. v .. "Pic"] .. " B" == mon.Picture then
 				currentMapMonsters[index]= i
@@ -299,6 +299,7 @@ function events.LoadMap()
 				extraBolster=(mapLevels[mapName].High-LevelB)/2
 			end
 		end
+		
 		--scale map monsters
 		if #currentMapMonsters>0 then 
 			for j=1, #currentMapMonsters do
@@ -316,6 +317,9 @@ function events.LoadMap()
 			end
 		end
 		
+		if mapName=="The Arena" then
+			extraBolster = 0
+		end
 		mon.Level=mon.Level+extraBolster
 		
 		--HP
@@ -339,7 +343,7 @@ function events.LoadMap()
 		--]]
 		for v=0,10 do
 			if v~=5 then
-			mon.Resistances[v]=math.min(math.round((mon.Level-basetable[i].Level)/18)*5+basetable[i].Resistances[v],65000)	
+			mon.Resistances[v]=math.min(math.max(math.round((mon.Level-basetable[i].Level)/18)*5,0)+basetable[i].Resistances[v],65000)	
 			end
 		end
 		
@@ -830,13 +834,13 @@ mapLevels={
 {["Low"] = 18 , ["Mid"] = 22 , ["High"] = 28},
 
 ["Evenmorn Island"] = 
-{["Low"] = 20 , ["Mid"] = 23 , ["High"] = 26},
+{["Low"] = 24 , ["Mid"] = 27 , ["High"] = 30},
 
 ["Grand Temple of the Sun"] = 
-{["Low"] = 22 , ["Mid"] = 24 , ["High"] = 26},
+{["Low"] = 26 , ["Mid"] = 28 , ["High"] = 30},
 
 ["Grand Temple of the Moon"] = 
-{["Low"] = 25 , ["Mid"] = 27 , ["High"] = 29},
+{["Low"] = 29 , ["Mid"] = 31 , ["High"] = 33},
 
 ["The Bracada Desert"] = 
 {["Low"] = 25 , ["Mid"] = 29 , ["High"] = 35},
