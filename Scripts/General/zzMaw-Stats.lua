@@ -88,13 +88,13 @@ fullHP2[i]=0
 end
 
 function events.CalcStatBonusByItems(t)
-  if t.Stat == const.Stats.HP then
-	endurance=t.Player:GetEndurance()/1000
-	index2=t.PlayerIndex
-	local skill=t.Player.Skills[const.Skills.Bodybuilding]
-	local s,m=SplitSkill(skill)
-	t.Result=t.Result+math.round(fullHP2[index2]*endurance)+s^2/2
-  end
+	if t.Stat == const.Stats.HP then
+		endurance=t.Player:GetEndurance()/1000
+		index2=t.PlayerIndex
+		local skill=t.Player.Skills[const.Skills.Bodybuilding]
+		local s,m=SplitSkill(skill)
+		t.Result=t.Result+math.round(fullHP2[index2]*endurance)+s^2/2
+	end
 end
 
 function events.Tick()
@@ -386,82 +386,35 @@ function events.CalcDamageToPlayer(t)
 	end
 	if t.Result<1 then return end
 	if t.DamageKind==0 or t.DamageKind==1 or t.DamageKind==2 or t.DamageKind==3 or t.DamageKind==7 or t.DamageKind==8 or t.DamageKind==9 or t.DamageKind==10 or t.DamageKind==12 then
-		covered=false
-		--check for shield
-		local it=t.Player:GetActiveItem(0)
-		local shield=t.Player.Skills[const.Skills.Shield]
-		local s,m=SplitSkill(shield)
-		if it and Game.ItemsTxt[it.Number].Skill~=8 and m<4 then
-			local magicCoverChance={}
-			local coverIndex=1
-			--iterate for players to build cover dictionary
-			for i=0,Party.High do
-				if Party[i].Dead==0 and Party[i].Paralyzed==0 and Party[i].Unconscious==0 and Party[i].Stoned==0 and Party[i].Eradicated==0 then
-					local it=Party[i]:GetActiveItem(0)
-					if it and Game.ItemsTxt[it.Number].Skill==8 then 
-						local shield=Party[i].Skills[const.Skills.Shield]
-						local s,m=SplitSkill(shield)
-						if m==4 then
-							magicCoverChance[coverIndex]={p=0.15,index=i}
-							coverIndex=coverIndex+1
-						end
-					end
-				end
-			end
-			--roll once per player with player and pick the one with max hp
-			coverPlayerIndex=-1
-			if magicCoverChance[1] then
-				lastMaxHp=0
-				for i=1,#magicCoverChance do
-					if Party[magicCoverChance[i].index].HP>lastMaxHp then
-						local index=magicCoverChance[i]["index"]
-						local p=magicCoverChance[i]["p"]
-						if math.random()<p then
-							lastMaxHp=Party[index].HP
-							coverPlayerIndex=index
-							covered=true
-						end
-					end
-				end
-			end
-		end
-			
 		
-		if not covered then
-			for i=0,Party.High do
-				if Party[i]:GetIndex()==t.Player:GetIndex() then
-					coverPlayerIndex=i
-				end
-			end
-		end
 		--get resistances
 		if t.DamageKind==0 then
-			res=Party[coverPlayerIndex]:GetResistance(10)/2
+			res=t.Player:GetResistance(10)/2
 		end
 		if t.DamageKind==1 then
-			res=Party[coverPlayerIndex]:GetResistance(11)/2
+			res=t.Player:GetResistance(11)/2
 		end
 		if t.DamageKind==2 then
-			res=Party[coverPlayerIndex]:GetResistance(12)/2
+			res=t.Player:GetResistance(12)/2
 			res2=0
 		end
 		if t.DamageKind==3 then
-			res=Party[coverPlayerIndex]:GetResistance(13)/2
+			res=t.Player:GetResistance(13)/2
 		end
 		if t.DamageKind==7 then
-			res=Party[coverPlayerIndex]:GetResistance(14)/2
+			res=t.Player:GetResistance(14)/2
 		end
 		if t.DamageKind==8 then
-			res=Party[coverPlayerIndex]:GetResistance(15)/2
+			res=t.Player:GetResistance(15)/2
 		end
 		if t.DamageKind==9 then
-			res=math.min(Party[coverPlayerIndex]:GetResistance(14),Party[coverPlayerIndex]:GetResistance(15))/2
+			res=math.min(t.Player:GetResistance(14),t.Player:GetResistance(15))/2
 		end
 		if t.DamageKind==10 then
-			res=math.min(Party[coverPlayerIndex]:GetResistance(10),Party[coverPlayerIndex]:GetResistance(11),Party[coverPlayerIndex]:GetResistance(12),Party[coverPlayerIndex]:GetResistance(13))/2
+			res=math.min(t.Player:GetResistance(10),t.Player:GetResistance(11),t.Player:GetResistance(12),t.Player:GetResistance(13))/2
 		end
 		if t.DamageKind==12 then
-			res=math.min(Party[coverPlayerIndex]:GetResistance(10),Party[coverPlayerIndex]:GetResistance(11),Party[coverPlayerIndex]:GetResistance(12),Party[coverPlayerIndex]:GetResistance(13),Party[coverPlayerIndex]:GetResistance(14),Party[coverPlayerIndex]:GetResistance(15))/2
+			res=math.min(t.Player:GetResistance(10),t.Player:GetResistance(11),t.Player:GetResistance(12),t.Player:GetResistance(13),t.Player:GetResistance(14),t.Player:GetResistance(15))/2
 		end
 		--calculate penalty
 		--calculate party level
@@ -484,16 +437,16 @@ function events.CalcDamageToPlayer(t)
 		res=res-penalty
 		--put here code to change max res
 		maxres=75
-		for it in Party[coverPlayerIndex]:EnumActiveItems() do
+		for it in t.Player:EnumActiveItems() do
 			if it.Bonus2==damageKindToMaxResistanceEnchant[t.DamageKind] then
 				maxres=maxres+5+math.round(it.MaxCharges/8)
 			elseif it.Bonus2==80 then
 				maxres=maxres+2+math.round(it.MaxCharges/20)
 			end
 		end
-		local it=Party[coverPlayerIndex]:GetActiveItem(0)
+		local it=t.Player:GetActiveItem(0)
 		if it and Game.ItemsTxt[it.Number].Skill==8 then 
-			local shield=Party[coverPlayerIndex].Skills[const.Skills.Shield]
+			local shield=t.Player.Skills[const.Skills.Shield]
 			local s,m=SplitSkill(shield)
 			if m==4 then 
 				maxres=maxres+0.25*s
@@ -533,14 +486,7 @@ function events.CalcDamageToPlayer(t)
 			end
 			dmgMult=(levelMult/20+1)*((levelMult+2)/(oldLevel+2))*((levelMult^1.4-1)/1000+1)
 			t.Result=t.Result*dmgMult
-		end
-		--actually substitute damage
-		if covered then
-			Party[coverPlayerIndex].HP=Party[coverPlayerIndex].HP-t.Result
-			Game.ShowStatusText(string.format("%s protects %s",Party[coverPlayerIndex].Name,t.Player.Name))
-			Party[coverPlayerIndex]:ShowFaceAnimation(24)
-			t.Result=0
-		end			
+		end		
 	end
 end
 
