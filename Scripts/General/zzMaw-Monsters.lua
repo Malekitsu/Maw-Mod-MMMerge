@@ -310,7 +310,7 @@ function events.LoadMap()
 			end
 		end
 		
-		if mapName=="The Arena" then
+		if mapName=="The Arena" or mapName=="Arena" then
 			extraBolster = 0
 		end
 		mon.Level=math.min(mon.Level+extraBolster,255)
