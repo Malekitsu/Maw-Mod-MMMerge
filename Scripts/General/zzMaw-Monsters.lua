@@ -49,9 +49,6 @@ function events.AfterLoadMap()
 		elseif currentWorld==4 then
 			partyLvl=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
 		end
-		if partyLvl>=120 then 
-			partyLvl=120+(partyLvl-120)/2
-		end
 		--calculate average level for unique monsters
 		for i=0, Map.Monsters.High do
 			--gold fix
@@ -66,7 +63,6 @@ function events.AfterLoadMap()
 				HPBolsterLevel=oldLevel*(1+(0.75*partyLvl/100))+partyLvl*0.75
 				mon.HP=math.min(math.round(HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180))*HPRateo,32500)
 				mon.FullHP=mon.HP
-
 				--damage
 				dmgMult=(mon.Level/15+1.5)*((mon.Level+2)/(oldLevel+2))*((mon.Level^1.4-1)/1000+1)
 				-----------------------------------------------------------
@@ -250,9 +246,6 @@ function events.LoadMap()
 		debug.Message("You are in an unknown world, report this bug in MAW discord")
 	end
 	bolsterLevel=math.max(bolsterLevel*0.95-4,0)
-	if bolsterLevel>=120 then 
-		bolsterLevel=120+(bolsterLevel-120)/2
-	end
 	
 	--check for current map monsters
 	currentMapMonsters={}
@@ -269,13 +262,13 @@ function events.LoadMap()
 	if #currentMapMonsters>=2 then
 		if Game.MonstersTxt[currentMapMonsters[1]].Level>Game.MonstersTxt[currentMapMonsters[2]].Level then
 			currentMapMonsters[1], currentMapMonsters[2] = currentMapMonsters[2], currentMapMonsters[1]
-			if #currentMapMonsters==3 then
-				if Game.MonstersTxt[currentMapMonsters[2]].Level > Game.MonstersTxt[currentMapMonsters[3]].Level then
-					currentMapMonsters[3], currentMapMonsters[2] = currentMapMonsters[2], currentMapMonsters[3]
-				end
-				if Game.MonstersTxt[currentMapMonsters[1]].Level>Game.MonstersTxt[currentMapMonsters[2]].Level then
-					currentMapMonsters[1], currentMapMonsters[2] = currentMapMonsters[2], currentMapMonsters[1]
-				end
+		end
+		if #currentMapMonsters==3 then
+			if Game.MonstersTxt[currentMapMonsters[2]].Level > Game.MonstersTxt[currentMapMonsters[3]].Level then
+				currentMapMonsters[3], currentMapMonsters[2] = currentMapMonsters[2], currentMapMonsters[3]
+			end
+			if Game.MonstersTxt[currentMapMonsters[1]].Level>Game.MonstersTxt[currentMapMonsters[2]].Level then
+				currentMapMonsters[1], currentMapMonsters[2] = currentMapMonsters[2], currentMapMonsters[1]
 			end
 		end
 	end
@@ -320,7 +313,7 @@ function events.LoadMap()
 		if mapName=="The Arena" then
 			extraBolster = 0
 		end
-		mon.Level=mon.Level+extraBolster
+		mon.Level=math.min(mon.Level+extraBolster,255)
 		
 		--HP
 		HPBolsterLevel=basetable[i].Level*(1+(0.25*(bolsterLevel+extraBolster)/100))+(bolsterLevel+extraBolster)*0.75
@@ -461,6 +454,13 @@ function events.LoadMap()
 			if mon.FullHP>1000 then
 				mon.FullHP=math.round(mon.FullHP/10)*10
 			end
+		end
+	end
+	for i=1, 651 do
+		mon=Game.MonstersTxt[i]
+		if mon.FullHP>=2^15 then
+			mon.FullHP=2^15-1
+			mon.HP=2^15-1
 		end
 	end
 end
