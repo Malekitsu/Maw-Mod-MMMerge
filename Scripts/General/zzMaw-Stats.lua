@@ -230,17 +230,8 @@ function events.BuildStatInformationBox(t)
 		bolsterLevel7=vars.MM8LVL+vars.MM6LVL
 		bolsterLevel6=vars.MM8LVL+vars.MM7LVL
 		bolsterLevel8=math.max(bolsterLevel8*0.95-4,0)
-		if bolsterLevel8>=120 then 
-			bolsterLevel8=120+(bolsterLevel-120)/2
-		end
 		bolsterLevel7=math.max(bolsterLevel7*0.95-4,0)
-		if bolsterLevel7>=120 then 
-			bolsterLevel7=120+(bolsterLevel-120)/2
-		end
 		bolsterLevel6=math.max(bolsterLevel6*0.95-4,0)
-		if bolsterLevel6>=120 then 
-			bolsterLevel6=120+(bolsterLevel-120)/2
-		end
 		t.Text=t.Text .."\n\nLevels gained in MM6: " .. StrColor(255,255,153,math.round(vars.MM6LVL*100)/100) .. "\nLevels gained in MM7: " .. StrColor(255,255,153,math.round(vars.MM7LVL*100)/100) .. "\nLevels gained in MM8: " .. StrColor(255,255,153,math.round(vars.MM8LVL*100)/100) .. "\n\nBolster Level in MM6: " .. StrColor(255,255,153,math.round(bolsterLevel6)) .."\nBolster Level in MM7: " .. StrColor(255,255,153,math.round(bolsterLevel7)) .."\nBolster Level in MM8: " .. StrColor(255,255,153,math.round(bolsterLevel8))
 	end
 	if t.Stat==15 then
@@ -428,9 +419,6 @@ function events.CalcDamageToPlayer(t)
 			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 		end
 		penaltyLevel=math.max(partyLevel*0.95-4,0)
-		if penaltyLevel>=120 then 
-			penaltyLevel=120+(bolsterLevel-120)/2
-		end
 		penaltyLevel=math.round(penaltyLevel/5)*5
 		penalty=math.min(penaltyLevel,100)
 		res=res-penalty
@@ -561,9 +549,6 @@ function events.Tick()
 			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 		end
 		partyLevel=math.max(partyLevel*0.95-4,0)
-		if partyLevel>=120 then 
-			partyLevel=120+(bolsterLevel-120)/2
-		end
 		penaltyLevel=math.round(partyLevel/5)*5
 		penalty=math.min(penaltyLevel,100)
 		fireRes=Party[i]:GetResistance(10)/2 - penalty
