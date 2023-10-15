@@ -52,7 +52,6 @@ function events.CalcDamageToPlayer(t)
 	roll=math.random()
 	if roll<=dodgeChance then
 		t.Result=0
-		Game.ShowStatusText("Evaded")
 		evt.FaceExpression{Player = t.PlayerIndex, Frame = 33}
 	end
 end
