@@ -341,7 +341,7 @@ function events.LoadMap()
 		end
 		
 		--experience
-		mon.Experience = math.round(mon.Level^1.8+mon.Level*20)
+		mon.Experience = math.round(mon.Level^1.7+mon.Level*20)
 		--Gold
 		--levelMultiplier = (mon.Level) / (LevelB)
 		--mon.TreasureDiceCount=math.min(mon.TreasureDiceCount*levelMultiplier,250)
