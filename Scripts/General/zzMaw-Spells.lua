@@ -129,7 +129,10 @@ function events.PlayerCastSpell(t)
 			local healData = t.RemoteData
 			local name = Multiplayer.client_name(t.RemoteData.client_id)
 
-			Party[t.TargetId].HP=Party[t.TargetId].HP+healData[1]
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+healData[1],Party[t.TargetId]:GetFullHP())
+			if Party[t.TargetId].HP>0 then
+				Party[t.TargetId].Unconscious=0
+			end
 			if Party.High==0 and healData[2] then
 				Game.ShowStatusText(string.format(name .. " heals you for " .. healData[1] .. " hit points(crit)"))
 			elseif Party.High==0 then
@@ -140,7 +143,10 @@ function events.PlayerCastSpell(t)
 				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[1] .. " hit points"))
 			end
 		elseif t.TargetKind == 4 and not t.RemoteData then
-			Party[t.TargetId].HP=Party[t.TargetId].HP+math.round(totHeal)
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+math.round(totHeal),Party[t.TargetId]:GetFullHP())
+			if Party[t.TargetId].HP>0 then
+				Party[t.TargetId].Unconscious=0
+			end
 		end
 	end
 	
@@ -201,7 +207,10 @@ function events.PlayerCastSpell(t)
 			local healData = t.RemoteData
 			local name = Multiplayer.client_name(t.RemoteData.client_id)
 
-			Party[t.TargetId].HP=Party[t.TargetId].HP+healData[1]
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+healData[1],Party[t.TargetId]:GetFullHP())
+			if Party[t.TargetId].HP>0 then
+				Party[t.TargetId].Unconscious=0
+			end
 			if Party.High==0 and healData[2] then
 				Game.ShowStatusText(string.format(name .. " heals you for " .. healData[1] .. " hit points(crit)"))
 			elseif Party.High==0 then
@@ -212,7 +221,10 @@ function events.PlayerCastSpell(t)
 				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[1] .. " hit points"))
 			end
 		elseif t.TargetKind == 4 and not t.RemoteData then
-			Party[t.TargetId].HP=Party[t.TargetId].HP+math.round(totHeal)
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+math.round(totHeal),Party[t.TargetId]:GetFullHP())
+			if Party[t.TargetId].HP>0 then
+				Party[t.TargetId].Unconscious=0
+			end
 		end
 	end
 	
@@ -253,6 +265,9 @@ function events.PlayerCastSpell(t)
 			local name = Multiplayer.client_name(t.RemoteData.client_id)
 
 			Party[t.TargetId].HP=Party[t.TargetId].HP+healData[1]
+			if Party[t.TargetId].HP>0 then
+				Party[t.TargetId].Unconscious=0
+			end
 			if Party.High==0 and healData[2] then
 				Game.ShowStatusText(string.format(name .. " heals you for " .. healData[3] .. " hit points(crit)"))
 			elseif Party.High==0 then
@@ -264,6 +279,9 @@ function events.PlayerCastSpell(t)
 			end
 		elseif t.TargetKind == 4 and not t.RemoteData then
 			Party[t.TargetId].HP=Party[t.TargetId].HP+math.round(totHeal)
+			if Party[t.TargetId].HP>0 then
+				Party[t.TargetId].Unconscious=0
+			end
 		end
 	end
 
@@ -299,7 +317,10 @@ function events.PlayerCastSpell(t)
 			local healData = t.RemoteData
 			local name = Multiplayer.client_name(t.RemoteData.client_id)
 
-			Party[t.TargetId].HP=Party[t.TargetId].HP+healData[1]
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+healData[1],Party[t.TargetId]:GetFullHP())
+			if Party[t.TargetId].HP>0 then
+				Party[t.TargetId].Unconscious=0
+			end
 			if Party.High==0 and healData[2] then
 				Game.ShowStatusText(string.format(name .. " heals you for " .. healData[1] .. " hit points(crit)"))
 			elseif Party.High==0 then
@@ -310,7 +331,10 @@ function events.PlayerCastSpell(t)
 				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[1] .. " hit points"))
 			end
 		elseif t.TargetKind == 4 and not t.RemoteData then
-			Party[t.TargetId].HP=Party[t.TargetId].HP+math.round(totHeal)
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+math.round(totHeal),Party[t.TargetId]:GetFullHP())
+			if Party[t.TargetId].HP>0 then
+				Party[t.TargetId].Unconscious=0
+			end
 		end
 	end
 	
@@ -353,6 +377,9 @@ function events.PlayerCastSpell(t)
 		if not t.RemoteData then
 			for i=0,Party.High do
 				Party[i].HP=Party[i].HP+totHeal
+				if Party[t.TargetId].HP>0 then
+					Party[t.TargetId].Unconscious=0
+				end
 			end
 			if t.MultiplayerData then
 				t.MultiplayerData[1]=math.round(totHeal) --bonus heal
@@ -364,6 +391,9 @@ function events.PlayerCastSpell(t)
 			local name = Multiplayer.client_name(t.RemoteData.client_id)
 			for i=0,Party.High do
 				Party[i].HP=Party[i].HP+healData[1]
+				if Party[t.TargetId].HP>0 then
+					Party[t.TargetId].Unconscious=0
+				end
 			end
 			if	healData[2] then
 				Game.ShowStatusText(string.format(name .. " heals the Party for " .. healData[3] .. " hit points"))
