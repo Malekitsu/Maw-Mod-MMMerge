@@ -64,7 +64,7 @@ function events.AfterLoadMap()
 				mon.HP=math.min(math.round(HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180))*HPRateo,32500)
 				mon.FullHP=mon.HP
 				--damage
-				dmgMult=(mon.Level/15+1.5)*((mon.Level+2)/(oldLevel+2))*((mon.Level^1.4-1)/1000+1)
+				dmgMult=(mon.Level/9+1.15)*((mon.Level+2)/(oldLevel+2))
 				-----------------------------------------------------------
 				--DAMAGE COMPUTATION DOWN HERE, FOR BALANCE MODIFY ABOVE^
 				--attack 1
@@ -379,7 +379,7 @@ function events.LoadMap()
 		
 		mon.ArmorClass=base.ArmorClass*((levelMult+10)/(LevelB+10))
 		mon.ArmorClass=mon.Level
-		dmgMult=(levelMult/15+1.5)*((levelMult+2)/(2+LevelB))*((levelMult^1.4-1)/1000+1)	
+		dmgMult=(levelMult/9+1.15)*((levelMult+2)/(2+LevelB))	
 		-----------------------------------------------------------
 		--DAMAGE COMPUTATION DOWN HERE, FOR BALANCE MODIFY ABOVE^
 		--attack 1
