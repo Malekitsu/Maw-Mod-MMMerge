@@ -471,7 +471,7 @@ function events.CalcDamageToPlayer(t)
 			else
 				levelMult=Game.MonstersTxt[i].Level
 			end
-			dmgMult=(levelMult/20+1)*((levelMult+2)/(oldLevel+2))*((levelMult^1.4-1)/1000+1)
+			dmgMult=(levelMult/12+1)*((levelMult+2)/(oldLevel+2))
 			t.Result=t.Result*dmgMult
 		end		
 	end
