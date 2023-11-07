@@ -94,7 +94,8 @@
 
 		local function fix(strData, strRoomData)
 			local tData = mapvars[strData]
-			if tData and type(tData) == "table" then
+
+			local function ProcessCash()
 				for RoomId,Room in pairs(tData) do
 					local RoomData = Map.Rooms[RoomId][strRoomData]
 					for i,v in RoomData do
@@ -107,7 +108,9 @@
 					end
 					RoomData.count = count
 				end
-			else
+			end
+
+			local function GenerateFix()
 				local cRoomId
 				mapvars[strData] = {}
 				for RoomId,Room in Map.Rooms do
@@ -131,6 +134,13 @@
 					Room[strRoomData].count = pos
 				end
 			end
+
+			if tData and type(tData) == "table" then
+				if pcall(ProcessCash) then
+					return
+				end
+			end
+			GenerateFix()
 		end
 
 		fix("RoomSpritesFix", "Sprites")
@@ -164,6 +174,7 @@
 	mem.asmpatch(0x4bd454, "push 4")
 	mem.asmpatch(0x4bd88b, "jmp 0x4bd8c4 - 0x4bd88b")
 	Game.PrintEndCard = function(Text, BackImg)
+		Game.EscMessage() -- to prevent custom UI being drawn on top.
 		if Text then
 			Game.GlobalTxt[676] = Text
 		end
@@ -234,6 +245,15 @@
 
 	-- The Bandit Caves
 	["mdt14.blv"] = 10,
+
+	-- Thunderfist mountain
+	["7d07.blv"] = 406,
+
+	-- Nighon tunnels
+	["7d35.blv"] = 845, -- no proper transition text, using this one instead "Placeholder"
+
+	-- Tunnels to Eofol
+	["7d36.blv"] = 1317, -- no proper transition text, using this one instead "Placeholder"
 
 	-- The Haunted Mansion
 	["7d37.blv"] = 11,
@@ -418,8 +438,15 @@
 
 	-- evt.SetSprite correction.
 	mem.autohook(0x445bd2, function(d) --0x445bd2, 0x445bee
-		if d.ecx >= 0  then return end
+		if d.ecx >= 0 then
+			return
+		end
+
 		d.ecx = math.abs(d.ecx)
+		if d.ecx >= Map.Sprites.count then
+			return
+		end
+
 		local DecName = mem.string(mem.u4[d.esp+4])
 		Map.Sprites[d.ecx].Invisible = d.edx == 0
 		if DecName ~= "0" then
@@ -529,26 +556,11 @@
 		end
 	end
 
-	-- Prevent looting of items too far away from party.
-	local function GetDist(x,y,z)
-		local px, py, pz  = XYZ(Party)
-		return math.sqrt((px-x)^2 + (py-y)^2 + (pz-z)^2)
-	end
-
-	mem.autohook2(0x468514, function(d)
-		local obj = Mouse:GetTarget()
-		if d.edx ~= obj.Index or (obj.Kind == 2 and GetDist(XYZ(Map.Objects[obj.Index])) > 500) then
-			d:push(0x4686a5)
-			return true
-		end
-	end)
-
 	-- Remove artifacts found limit
 	function events.LoadMap(WasInGame)
 		if not WasInGame then
 			for i,v in Party.ArtifactsFound do
 				Party.ArtifactsFound[i] = false
-				break
 			end
 		end
 	end
@@ -770,3 +782,55 @@
 		local Target = structs.Item:new(d.ecx)
 		Target.Bonus = Target.Bonus + Mouse.Item.Bonus
 	end)
+
+
+	-- Random music for mm6 maps
+	do
+		local grasslands = {37,38,39}
+		local dungeons = {41,42,43}
+		local temples = {49,50}
+		local castles = {50}
+
+		local MapMusicSets = {} -- map id = {}
+
+		for i = 146, 151 do
+			MapMusicSets[i] = grasslands
+		end
+		for i = 154, 171 do
+			MapMusicSets[i] = dungeons
+		end
+		for i = 172, 179 do
+			MapMusicSets[i] = temples
+		end
+		for i = 180, 182 do
+			MapMusicSets[i] = castles
+		end
+		-- rest have special tracks
+
+		function events.PlayMapTrack(t)
+			local set = MapMusicSets[t.MapIndex]
+			if set then
+				t.Track = set[math.random(1, #set)]
+			end
+		end
+
+		Game.MapMusicSets = MapMusicSets
+	end
+
+	-- fix UI break on outdoor NPC question screen, when pressing spacebar
+	function events.Action(t)
+		if t.Action == 113 and Game.CurrentScreen == 4 and mem.u4[0x5CCCE4] == 1 and mem.u4[0x6C8DDC] == 1 then
+			t.Handled = true
+		end
+	end
+
+	-- divison by zero, when using evt.SetDoorState with invalid door
+	mem.asmpatch(0x447263, [[
+		test esi, esi
+		jne @std
+		inc esi
+		@std:
+		cdq
+		idiv esi
+		mov edi, eax
+	]])
