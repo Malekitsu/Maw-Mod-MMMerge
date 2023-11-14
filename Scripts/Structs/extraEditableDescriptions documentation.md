@@ -44,7 +44,7 @@ Advanced table argument (`Effects` and `Resistances`) is an array of basic table
 }
 ```
 
-X and Y coordinates will only have effect if `UseIndividualTextCoordinates` field is false in accompanying header entry.
+X and Y coordinates will only have effect if `UseIndividualTextCoordinates` field is true in accompanying header entry.
 
 `Tooltip` field is structs.Dlg entry for monster dialog. In particular, it must be passed to structs.Fnt.Draw() family of functions if you use them. Theoretically you can change some stuff here, haven't tested much, but for sure changing dialog size won't work here. Instead, you can use:
 ```lua
