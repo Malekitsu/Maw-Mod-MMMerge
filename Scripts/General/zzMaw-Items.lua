@@ -822,7 +822,7 @@ bonusEffectsBase = {
 bonusEffects = {
     [1] = { bonusType = 1, bonusRange = {11, 16}, statModifier = 10 },
     [2] = { bonusType = 2, bonusRange = {1, 7}, statModifier = 10 },
-    [42] = { bonusType = 42, bonusRange = {1, 16}, statModifier = 1 },
+    [42] = { bonusType = 42, bonusRange = {1, 16}, statModifier = 3 },
     [43] = { bonusType = 43, bonusValues = {4, 8, 10}, statModifier = 10 },
     [44] = { bonusType = 44, bonusValues = {8}, statModifier = 10 },
     [45] = { bonusType = 45, bonusValues = {5, 6}, statModifier = 10 },
@@ -889,6 +889,8 @@ function events.CalcStatBonusByItems(t)
 				local lower, upper = bonusData.bonusRange[1], bonusData.bonusRange[2]
 				if t.Stat>=lower-1 and t.Stat<upper then
 					t.Result = t.Result + bonusData.statModifier * mult
+					--subtract base value and add maw value
+					t.Result = t.Result + bonusData.statModifier - bonusEffectsBase[it.Bonus2].statModifier
 				end
 			elseif bonusData.bonusValues then
 				for i =1, 3 do
