@@ -184,7 +184,7 @@ function events.PlayerCastSpell(t)
 			local statBonus=math.max(persBonus,intBonus)
 			local crit=t.Player:GetLuck()/1500+0.05
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
-			local baseHeal=200+20*s
+			local baseHeal=resurrectionBase+resurrectionScaling*s
 			totHeal=baseHeal*(statBonus+1)
 			roll=math.random()
 			gotCrit=false
@@ -357,7 +357,7 @@ function events.PlayerCastSpell(t)
 			local statBonus=math.max(persBonus,intBonus)
 			local crit=t.Player:GetLuck()/1500+0.05
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
-			local baseHeal=10+3*s
+			local baseHeal=powerHealBase+powerHealScaling*s
 			totHeal=baseHeal*(statBonus+1)
 			roll=math.random()
 			gotCrit=false
@@ -485,10 +485,10 @@ function events.GameInitialized2()
 	Game.SpellsTxt[55].GM="Cures 200 + 20 HP per point of skill"
 	
 	--heal
-	Game.SpellsTxt[68].Normal="2 Mana cost: \ncures 5 + 1 HP per point of skill\n1 hour limit\n"
-	Game.SpellsTxt[68].Expert="3 Mana cost: \ncures 10 + 2 HP per point of skill\n1 hour limit\n"
-	Game.SpellsTxt[68].Master="5 Mana cost: \ncures 15 + 3 HP per point of skill\n1 day limit\n"
-	Game.SpellsTxt[68].GM="8 Mana cost: \ncures 20 + 4 HP per point of skill\nno limit\n"
+	Game.SpellsTxt[68].Normal="2 Mana cost: \ncures 5 + 1 HP per point of skill"
+	Game.SpellsTxt[68].Expert="3 Mana cost: \ncures 10 + 2 HP per point of skill"
+	Game.SpellsTxt[68].Master="5 Mana cost: \ncures 15 + 3 HP per point of skill"
+	Game.SpellsTxt[68].GM="8 Mana cost: \ncures 20 + 4 HP per point of skill"
 	
 	--greater heal
 	Game.SpellsTxt[74].Name="Greater Heal"
@@ -501,6 +501,9 @@ function events.GameInitialized2()
 	--Protection from magic
 	Game.SpellsTxt[75].Description="Protection from Magic affects the entire party at once, granting immunity to certain spells and monster abilities that cause debilitation conditions.  These are:  Poison, Disease, Stone, Paralyze, and Weak.  Every time this spell saves a character from an effect, it weakens.  The spell can survive 1 attack per point of skill in body magic up to 10 attacks--after that, Protection from Magic is broken."
 	
+	--Power Cure
+	Game.SpellsTxt[75].Description="Cures hit points of all characters in your party at once.  The number cured is equal to 10 plus 5 per point of skill in Body Magic."
+	
 	--day of protection
 	Game.SpellsTxt[83].Description="Temporarily increases all seven stats on all your characters by 1 per skill in Light Magic.  This spell lasts until you rest."
 	Game.SpellsTxt[83].Expert="All stats increased by 10+1 per skill"
@@ -512,25 +515,7 @@ function events.GameInitialized2()
 	Game.SpellsTxt[85].Master="All spells cast at two times skill"
 	Game.SpellsTxt[85].GM="All spells cast at three times skill"
 	
-	-------------
-	--MANA COST--
-	-------------
-	--remove curse
-	Game.Spells[49]["SpellPointsExpert"]=5
-	Game.Spells[49]["SpellPointsMaster"]=8
-	Game.Spells[49]["SpellPointsGM"]=16
-	
-	--resurrection
-	Game.Spells[55]["SpellPointsGM"]=200
-	
-	--heal
-	Game.Spells[68]["SpellPointsNormal"]=2
-	Game.Spells[68]["SpellPointsExpert"]=3
-	Game.Spells[68]["SpellPointsMaster"]=5
-	Game.Spells[68]["SpellPointsGM"]=8
 
-	--greater heal
-	Game.Spells[74]["SpellPointsGM"]=25
 	
 end
 
@@ -579,8 +564,8 @@ function events.GameInitialized2()
 			[43] = {dmgAdd = 0, diceMin = 1, diceMax = 12, },--death blossom
 			[44] = {dmgAdd = 15, diceMin = 1, diceMax = 1, },--mass distorsion, nerfed
 			[52] = {dmgAdd = 10, diceMin = 2, diceMax = 12, },--spirit lash
-			[59] = {dmgAdd = 8, diceMin = 1, diceMax = 5, },--mind blast
-			[65] = {dmgAdd = 30, diceMin = 1, diceMax = 20, },--psychic shock
+			[59] = {dmgAdd = 12, diceMin = 1, diceMax = 7, },--mind blast
+			[65] = {dmgAdd = 45, diceMin = 1, diceMax = 30, },--psychic shock
 			[70] = {dmgAdd = 8, diceMin = 1, diceMax = 4, },--harm
 			[76] = {dmgAdd = 30, diceMin = 1, diceMax = 11, },--flying fist
 			[78] = {dmgAdd = 12, diceMin = 1, diceMax = 4, },--light bolt
@@ -1052,6 +1037,118 @@ function events.Tick()
 			Game.SpellsTxt[123].Expert=string.format("Damage %s points plus 1-%s points per point of skill",dmgAddTooltip(level,123),diceMaxTooltip(level,123))
 			Game.SpellsTxt[123].Master=string.format("Damage %s points plus 1-%s points per point of skill",math.round(dmgAddTooltip(level,123)/10*11),math.round(diceMaxTooltip(level,123)/10*11))
 			Game.SpellsTxt[123].GM=string.format("Damage %s points plus 1-%s points per point of skill",math.round(dmgAddTooltip(level,123)/10*12),math.round(diceMaxTooltip(level,123)/10*12))
+			
+			--remove curse
+			Game.SpellsTxt[49].Master="8 Mana cost: \ncures 24 + 4 HP per point of skill\n1 day limit\n"
+			Game.SpellsTxt[49].GM="16 Mana cost: \ncures 36 + 6 HP per point of skill\nno limit\n"
+			Game.Spells[49]["SpellPointsExpert"]=5
+			Game.Spells[49]["SpellPointsMaster"]=8
+			Game.Spells[49]["SpellPointsGM"]=16
+			--Remove curse matrix
+			curseBase={0,12,24,36}
+			curseScaling={0,2,4,6}
+			if level>=120 then
+				Game.SpellsTxt[49].Master="16 Mana cost: \ncures 36 + 6 HP per point of skill\n1 day limit\n"
+				Game.SpellsTxt[49].GM="32 Mana cost: \ncures 72 + 9 HP per point of skill\nno limit\n"
+				Game.Spells[49]["SpellPointsMaster"]=16
+				Game.Spells[49]["SpellPointsGM"]=32
+				curseBase={0,12,36,72}
+				curseScaling={0,2,6,9}
+			end
+			if level>=200 then
+				Game.SpellsTxt[49].Master="32 Mana cost: \ncures 72 + 9 HP per point of skill\n1 day limit\n"
+				Game.SpellsTxt[49].GM="64 Mana cost: \ncures 150 + 13 HP per point of skill\nno limit\n"
+				Game.Spells[49]["SpellPointsMaster"]=32
+				Game.Spells[49]["SpellPointsGM"]=64
+				curseBase={0,12,72,150}
+				curseScaling={0,2,9,14}
+			end
+				
+			--resurrection
+			Game.Spells[55]["SpellPointsGM"]=200
+			resurrectionBase={0,0,0,200}
+			resurrectionScaling={0,0,0,20}
+			Game.SpellsTxt[55].GM="Cures 200 + 20 HP per point of skill"
+			if level>=160 then
+				Game.SpellsTxt[55].GM="Cures 400 + 30 HP per point of skill"
+				Game.Spells[55]["SpellPointsGM"]=400
+				resurrectionBase={0,0,0,400}
+				resurrectionScaling={0,0,0,30}
+			end
+			if level>=240 then
+				Game.SpellsTxt[55].GM="Cures 800 + 45 HP per point of skill"
+				Game.Spells[55]["SpellPointsGM"]=800
+				resurrectionBase={0,0,0,800}
+				resurrectionScaling={0,0,0,45}
+			end
+			
+			--heal
+			Game.Spells[68]["SpellPointsNormal"]=2
+			Game.Spells[68]["SpellPointsExpert"]=3
+			Game.Spells[68]["SpellPointsMaster"]=5
+			Game.Spells[68]["SpellPointsGM"]=8
+			lesserHealBase={5,10,15,20}
+			lesserHealScaling={1,2,3,4}
+			Game.SpellsTxt[68].Master="5 Mana cost: \ncures 15 + 3 HP per point of skill"
+			Game.SpellsTxt[68].GM="8 Mana cost: \ncures 20 + 4 HP per point of skill"
+			
+			if level>=88 then
+				Game.SpellsTxt[68].Master="10 Mana cost: \ncures 30 + 5 HP per point of skill"
+				Game.SpellsTxt[68].GM="15 Mana cost: \ncures 50 + 7 HP per point of skill"
+				Game.Spells[68]["SpellPointsMaster"]=10
+				Game.Spells[68]["SpellPointsGM"]=15
+				lesserHealBase={5,10,30,50}
+				lesserHealScaling={1,2,5,7}
+			end
+			if level>=168 then
+				Game.SpellsTxt[68].Master="20 Mana cost: \ncures 60 + 8 HP per point of skill"
+				Game.SpellsTxt[68].GM="30 Mana cost: \ncures 100 + 12 HP per point of skill"
+				Game.Spells[68]["SpellPointsMaster"]=20
+				Game.Spells[68]["SpellPointsGM"]=30
+				lesserHealBase={5,10,60,100}
+				lesserHealScaling={1,2,8,12}
+			end
+			
+			--greater heal
+			Game.Spells[74]["SpellPointsMaster"]=15
+			Game.Spells[74]["SpellPointsGM"]=25
+			Game.SpellsTxt[74].Master="15 Mana cost: \ncures 25 + 6 HP per point of skill\n1 day limit\n"
+			Game.SpellsTxt[74].GM="25 Mana cost: \ncures 40 + 9 HP per point of skill\nno limit\n"
+			greaterHealBase={0,0,25,40}
+			greaterHealScaling={0,0,6,9}
+			if level>=136 then
+				Game.SpellsTxt[74].Master="35 Mana cost: \ncures 50 + 10 HP per point of skill\n1 day limit\n"
+				Game.SpellsTxt[74].GM="50 Mana cost: \ncures 75 + 13 HP per point of skill\nno limit\n"
+				Game.Spells[74]["SpellPointsMaster"]=35
+				Game.Spells[74]["SpellPointsGM"]=50
+				greaterHealBase={0,12,50,75}
+				greaterHealScaling={0,2,10,13}
+			end
+			if level>=216 then
+				Game.SpellsTxt[74].Master="90 Mana cost: \ncures 100 + 18 HP per point of skill\n1 day limit\n"
+				Game.SpellsTxt[74].GM="125 Mana cost: \ncures 160 + 25 HP per point of skill\nno limit\n"
+				Game.Spells[74]["SpellPointsMaster"]=90
+				Game.Spells[74]["SpellPointsGM"]=125
+				greaterHealBase={0,12,100,160}
+				greaterHealScaling={0,2,18,25}
+			end
+			
+			Game.Spells[77]["SpellPointsGM"]=30
+			powerHealBase = 10
+			powerHealScaling = 3
+			Game.SpellsTxt[77].GM="This spell is as good as it will ever get! ...maybe..."
+			if level>=160 then
+				Game.Spells[77]["SpellPointsGM"]=60
+				powerHealBase = 30
+				powerHealScaling = 5
+				Game.SpellsTxt[77].GM="Cures all party members by 30 plus 5 per point of skill"
+			end
+			if level>=240 then
+				Game.Spells[77]["SpellPointsGM"]=90
+				powerHealBase = 50
+				powerHealScaling = 7
+				Game.SpellsTxt[77].GM="Cures all party members by 50 plus 7 per point of skill"
+			end
 		end
 	end
 end
