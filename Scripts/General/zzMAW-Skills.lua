@@ -718,24 +718,14 @@ function events.CalcStatBonusByItems(t)
 	then
 	
 		-- resistance bonus from weapon
-		
-		for playerIndex = 0,#Party do
-		
-			local weaponResistancePlayer = Party.Players[playerIndex]
-			local weaponResistancePlayerEquipmentData = getPlayerEquipmentData(weaponResistancePlayer)
-			local weaponResistancePlayerMain = weaponResistancePlayerEquipmentData.main
-			local weaponResistancePlayerExtra = weaponResistancePlayerEquipmentData.extra
-		
-			if weaponResistancePlayerMain.equipped and weaponResistancePlayerMain.weapon then
-				t.Result = t.Result + (newWeaponSkillResistanceBonuses[weaponResistancePlayerMain.skill][weaponResistancePlayerMain.rank] * weaponResistancePlayerMain.level)
-			end
-			
-			if weaponResistancePlayerExtra.equipped and weaponResistancePlayerExtra.weapon then
-				t.Result = t.Result + (newWeaponSkillResistanceBonuses[weaponResistancePlayerExtra.skill][weaponResistancePlayerExtra.rank] * weaponResistancePlayerExtra.level)
-			end
-			
+		if main.equipped and main.weapon then
+			t.Result = t.Result + (newWeaponSkillResistanceBonuses[main.skill][main.rank] * main.level)
 		end
 		
+		if extra.equipped and extra.weapon then
+			t.Result = t.Result + (newWeaponSkillResistanceBonuses[extra.skill][extra.rank] * extra.level)
+		end
+
 		-- resistance bonus from armor
 								
 		if armor.equipped then
