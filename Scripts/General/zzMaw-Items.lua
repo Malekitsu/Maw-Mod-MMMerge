@@ -793,8 +793,8 @@ end
 
 --fix to enchant2 not applying correctly if same bonus is on the item
 --fix to special enchants
-
-bonusEffects = {
+--VANILLA ENCHANTS, used to check if there is any difference to compute
+bonusEffectsBase = {
     [1] = { bonusType = 1, bonusRange = {11, 16}, statModifier = 10 },
     [2] = { bonusType = 2, bonusRange = {1, 7}, statModifier = 10 },
     [42] = { bonusType = 42, bonusRange = {1, 16}, statModifier = 1 },
@@ -812,9 +812,38 @@ bonusEffects = {
     [54] = { bonusType = 54, bonusValues = {4}, statModifier = 15 },
     [55] = { bonusType = 55, bonusValues = {7}, statModifier = 15 },
     [56] = { bonusType = 56, bonusValues = {1, 4}, statModifier = 5 },
-    [57] = { bonusType = 57, bonusValues = {2, 3}, statModifier = 5 }
+    [57] = { bonusType = 57, bonusValues = {2, 3}, statModifier = 5 },
+    [74] = { bonusType = 53, bonusValues = {3, 5}, statModifier = 0 },
+    [75] = { bonusType = 53, bonusValues = {1, 2}, statModifier = 0 },
+    [76] = { bonusType = 53, bonusValues = {2, 5}, statModifier = 0 },
 }
 
+--MODIFY THIS TO CHANGE ACTUAL VALUES
+bonusEffects = {
+    [1] = { bonusType = 1, bonusRange = {11, 16}, statModifier = 10 },
+    [2] = { bonusType = 2, bonusRange = {1, 7}, statModifier = 10 },
+    [42] = { bonusType = 42, bonusRange = {1, 16}, statModifier = 1 },
+    [43] = { bonusType = 43, bonusValues = {4, 8, 10}, statModifier = 10 },
+    [44] = { bonusType = 44, bonusValues = {8}, statModifier = 10 },
+    [45] = { bonusType = 45, bonusValues = {5, 6}, statModifier = 10 },
+    [46] = { bonusType = 46, bonusValues = {1}, statModifier = 25 },
+    [47] = { bonusType = 47, bonusValues = {9}, statModifier = 10 },
+    [48] = { bonusType = 48, bonusValues = {4, 10}, statModifier = {15, 5} },
+    [49] = { bonusType = 49, bonusValues = {2, 7}, statModifier = 10 },
+    [50] = { bonusType = 50, bonusValues = {11}, statModifier = 30 },
+    [51] = { bonusType = 51, bonusValues = {2, 6, 9}, statModifier = 10 },
+    [52] = { bonusType = 52, bonusValues = {4, 5}, statModifier = 10 },
+    [53] = { bonusType = 53, bonusValues = {1, 3}, statModifier = 20 },
+    [54] = { bonusType = 54, bonusValues = {4}, statModifier = 15 },
+    [55] = { bonusType = 55, bonusValues = {7}, statModifier = 15 },
+    [56] = { bonusType = 56, bonusValues = {1, 4}, statModifier = 10 },
+    [57] = { bonusType = 57, bonusValues = {2, 3}, statModifier = 15 },
+    [74] = { bonusType = 53, bonusValues = {3, 5}, statModifier = 20 },
+    [75] = { bonusType = 53, bonusValues = {1, 2}, statModifier = 20 },
+    [76] = { bonusType = 53, bonusValues = {2, 5}, statModifier = 20 },
+}
+
+--I guess it's to fix a bug when both enchants are on an item, not sure
 function events.CalcStatBonusByItems(t)
     for it in t.Player:EnumActiveItems() do
         local bonusData = bonusEffects[it.Bonus2]
@@ -849,29 +878,31 @@ end
 --make enchant 2 scale with maxcharges
 function events.CalcStatBonusByItems(t)
     for it in t.Player:EnumActiveItems() do
-		if it.MaxCharges>0 then
-			local bonusData = bonusEffects[it.Bonus2]
-			if bonusData then
-				if it.MaxCharges <= 20 then
-					mult=it.MaxCharges/20
-				else
-					mult=1+2*(it.MaxCharges-20)/20
+		local bonusData = bonusEffects[it.Bonus2]
+		if bonusData then
+			if it.MaxCharges <= 20 then
+				mult=it.MaxCharges/20
+			else
+				mult=1+2*(it.MaxCharges-20)/20
+			end
+			if bonusData.bonusRange then
+				local lower, upper = bonusData.bonusRange[1], bonusData.bonusRange[2]
+				if t.Stat>=lower-1 and t.Stat<upper then
+					t.Result = t.Result + bonusData.statModifier * mult
 				end
-				if bonusData.bonusRange then
-					local lower, upper = bonusData.bonusRange[1], bonusData.bonusRange[2]
-					if t.Stat>=lower-1 and t.Stat<upper then
-						t.Result = t.Result + bonusData.statModifier * mult
-					end
-				elseif bonusData.bonusValues then
-					for i =1, 3 do
-						if bonusData.bonusValues[i] then
-							if bonusData.bonusValues[i]-1==t.Stat then
-								local modifier = bonusData.statModifier
-								if type(modifier) == "table" then
-									t.Result = t.Result + modifier[i] * mult
-								else
-									t.Result = t.Result + modifier * mult
-								end
+			elseif bonusData.bonusValues then
+				for i =1, 3 do
+					if bonusData.bonusValues[i] then
+						if bonusData.bonusValues[i]-1==t.Stat then
+							local modifier = bonusData.statModifier
+							if type(modifier) == "table" then
+								t.Result = t.Result + modifier[i] * mult 
+								--subtract base value and add maw value
+								t.Result = t.Result + modifier[i] - bonusEffectsBase[it.Bonus2].statModifier[i]
+							else
+								t.Result = t.Result + modifier * mult
+								--subtract base value and add maw value
+								t.Result = t.Result + modifier - bonusEffectsBase[it.Bonus2].statModifier
 							end
 						end
 					end
@@ -931,10 +962,10 @@ function checktext(MaxCharges,bonus2)
 		[55] = " +" .. math.round(bonusEffects[55].statModifier * mult) .. " Luck and Regenerate Spell points over time.",
 		[56] = " +" .. math.round(bonusEffects[56].statModifier * mult) .. " Might and Endurance.",
 		[57] = " +" .. math.round(bonusEffects[57].statModifier * mult) .. " Intellect and Personality.",
-		--max resistance enchant
-		[74] = "Increase Max Fire Resistance by " .. 5+math.round(MaxCharges/8) .. "%",
-		[75] = "Increase Max Air Resistance by " .. 5+math.round(MaxCharges/8) .. "%",
-		[76] = "Increase Max Water Resistance by " .. 5+math.round(MaxCharges/8) .. "%",
+		--hybrids enchants 
+		[74] = " +" .. math.round(bonusEffects[74].statModifier * mult) .. " Personality and Accuracy.",
+		[75] = " +" .. math.round(bonusEffects[75].statModifier * mult) .. " Intellect and Might.",
+		[76] = " +" .. math.round(bonusEffects[76].statModifier * mult) .. " Intellect and Accuracy.",
 		[77] = "Increase Max Earth Resistance by " .. 5+math.round(MaxCharges/8) .. "%",
 		[78] = "Increase Max Mind Resistance by " .. 5+math.round(MaxCharges/8) .. "%",
 		[79] = "Increase Max Body Resistance by " .. 5+math.round(MaxCharges/8) .. "%",
