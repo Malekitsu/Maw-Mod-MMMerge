@@ -379,32 +379,31 @@ function events.CalcDamageToPlayer(t)
 		
 		--get resistances
 		if t.DamageKind==0 then
-			res=t.Player:GetResistance(10)/2
+			res=t.Player:GetResistance(10)
 		end
 		if t.DamageKind==1 then
-			res=t.Player:GetResistance(11)/2
+			res=t.Player:GetResistance(11)
 		end
 		if t.DamageKind==2 then
-			res=t.Player:GetResistance(12)/2
-			res2=0
+			res=t.Player:GetResistance(12)
 		end
 		if t.DamageKind==3 then
-			res=t.Player:GetResistance(13)/2
+			res=t.Player:GetResistance(13)
 		end
 		if t.DamageKind==7 then
-			res=t.Player:GetResistance(14)/2
+			res=t.Player:GetResistance(14)
 		end
 		if t.DamageKind==8 then
-			res=t.Player:GetResistance(15)/2
+			res=t.Player:GetResistance(15)
 		end
 		if t.DamageKind==9 then
-			res=math.min(t.Player:GetResistance(14),t.Player:GetResistance(15))/2
+			res=math.min(t.Player:GetResistance(14),t.Player:GetResistance(15))
 		end
 		if t.DamageKind==10 then
-			res=math.min(t.Player:GetResistance(10),t.Player:GetResistance(11),t.Player:GetResistance(12),t.Player:GetResistance(13))/2
+			res=math.min(t.Player:GetResistance(10),t.Player:GetResistance(11),t.Player:GetResistance(12),t.Player:GetResistance(13))
 		end
 		if t.DamageKind==12 then
-			res=math.min(t.Player:GetResistance(10),t.Player:GetResistance(11),t.Player:GetResistance(12),t.Player:GetResistance(13),t.Player:GetResistance(14),t.Player:GetResistance(15))/2
+			res=math.min(t.Player:GetResistance(10),t.Player:GetResistance(11),t.Player:GetResistance(12),t.Player:GetResistance(13),t.Player:GetResistance(14),t.Player:GetResistance(15))
 		end
 		--calculate penalty
 		--calculate party level
@@ -550,30 +549,38 @@ function events.Tick()
 		end
 		partyLevel=math.max(partyLevel*0.95-4,0)
 		penaltyLevel=math.round(partyLevel/5)*5
-		penalty=math.min(penaltyLevel,100)
-		fireRes=Party[i]:GetResistance(10)/2 - penalty
-		airRes=Party[i]:GetResistance(11)/2 - penalty
-		waterRes=Party[i]:GetResistance(12)/2 - penalty
-		earthRes=Party[i]:GetResistance(13)/2 - penalty
-		mindRes=Party[i]:GetResistance(14)/2 - penalty
-		bodyRes=Party[i]:GetResistance(15)/2 - penalty
+		penalty=math.min(penaltyLevel,200)
+		fireRes=Party[i]:GetResistance(10) - penalty
+		airRes=Party[i]:GetResistance(11) - penalty
+		waterRes=Party[i]:GetResistance(12) - penalty
+		earthRes=Party[i]:GetResistance(13) - penalty
+		mindRes=Party[i]:GetResistance(14) - penalty
+		bodyRes=Party[i]:GetResistance(15) - penalty
 		
-		if fireRes>=75 then
+		--calculate new resistances
+		fireRes=100-100/2^(fireRes/100)
+		airRes=100-100/2^(airRes/100)
+		waterRes=100-100/2^(waterRes/100)
+		earthRes=100-100/2^(earthRes/100)
+		mindRes=100-100/2^(mindRes/100)
+		bodyRes=100-100/2^(bodyRes/100)
+		
+		if fireRes>=93.75 then
 			fireRes=StrColor(0,255,0,"Max")
 		end
-		if airRes>=75 then
+		if airRes>=93.75 then
 			airRes=StrColor(0,255,0,"Max")
 		end
-		if waterRes>=75 then
+		if waterRes>=93.75 then
 			waterRes=StrColor(0,255,0,"Max")
 		end
-		if earthRes>=75 then
+		if earthRes>=93.75 then
 			earthRes=StrColor(0,255,0,"Max")
 		end
-		if mindRes>=75 then
+		if mindRes>=93.75 then
 			mindRes=StrColor(0,255,0,"Max")
 		end
-		if bodyRes>=75 then
+		if bodyRes>=93.75 then
 			bodyRes=StrColor(0,255,0,"Max")
 		end		
 		Game.GlobalTxt[87]=StrColor(255, 70, 70, string.format("Fire %s%s",fireRes,"%"))
@@ -594,13 +601,14 @@ function events.Tick()
 	end
 end
 
+--stats breakpoints
 function events.GetStatisticEffect(t)
 	if t.Value >=25 then
 		t.Result=math.floor(t.Value/5)
 	end
 end
 
-
+--recount
 function events.CalcDamageToMonster(t)
 	data=WhoHitMonster()
 	if data and data.Player then
