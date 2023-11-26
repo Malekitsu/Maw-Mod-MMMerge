@@ -540,7 +540,7 @@ function events.BuildItemInformationBox(t)
 			t.Enchantment=""
 			if t.Item.Bonus>0 then
 				if t.Item.Bonus>=11 and t.Item.Bonus<=16 then --% values for resistances
-					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. t.Item.BonusStrength .. "%" 
+					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. t.Item.BonusStrength*2
 				else
 					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. t.Item.BonusStrength
 				end
@@ -550,7 +550,7 @@ function events.BuildItemInformationBox(t)
 				local strength=t.Item.Charges%1000
 				if bonus>=11 and bonus<=16 then --% values for resistances
 					strength=strength
-					t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "%" .. "\n" .. t.Enchantment
+					t.Enchantment = itemStatName[bonus] .. " +" .. strength*2 .. "\n" .. t.Enchantment
 				else
 					t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
 				end
@@ -1250,7 +1250,7 @@ function replaceNumber(match)
 	lvl=math.max(math.min(lvl/100,2.5),0.5)
     num = tonumber(match)
     if num then
-        return tostring(math.floor(num * lvl))
+        return tostring(math.round(num * lvl))
     end
     return match
 end
