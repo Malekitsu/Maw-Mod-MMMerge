@@ -1106,8 +1106,8 @@ function events.GameInitialized2()
 				baseString=string.format("%s AC|",baseString)
 			end
 			if res then
-				normal=string.format("%s    %s",normal,newWeaponSkillResistanceBonuses[i][1]/2)
-				baseString=string.format("%s Res%%",baseString)
+				normal=string.format("%s    %s",normal,newWeaponSkillResistanceBonuses[i][1])
+				baseString=string.format("%s Res",baseString)
 			end
 			Game.SkillDesNormal[i]=normal
 			
@@ -1126,7 +1126,7 @@ function events.GameInitialized2()
 				expert=string.format("%s  %s|",expert,newWeaponSkillACBonuses[i][2])
 			end
 			if res then
-				expert=string.format("%s    %s",expert,newWeaponSkillResistanceBonuses[i][2]/2)
+				expert=string.format("%s    %s",expert,newWeaponSkillResistanceBonuses[i][2])
 			end
 			Game.SkillDesExpert[i]=expert
 			--Master
@@ -1144,7 +1144,7 @@ function events.GameInitialized2()
 				master=string.format("%s  %s|",master,newWeaponSkillACBonuses[i][3])
 			end
 			if res then
-				master=string.format("%s    %s",master,newWeaponSkillResistanceBonuses[i][3]/2)
+				master=string.format("%s    %s",master,newWeaponSkillResistanceBonuses[i][3])
 			end
 			Game.SkillDesMaster[i]=master
 			--GrandMaster
@@ -1162,7 +1162,7 @@ function events.GameInitialized2()
 				gm=string.format("%s  %s|",gm,newWeaponSkillACBonuses[i][4])
 			end
 			if res then
-				gm=string.format("%s    %s",gm,newWeaponSkillResistanceBonuses[i][4]/2)
+				gm=string.format("%s    %s",gm,newWeaponSkillResistanceBonuses[i][4])
 			end
 			Game.SkillDesGM[i]=gm
 			Game.SkillDescriptions[i]=string.format("%s",baseString)
@@ -1193,8 +1193,8 @@ function events.GameInitialized2()
 				baseString=string.format("%s AC|",baseString)
 			end
 			if res then
-				normal=string.format("%s    %s",normal,newArmorSkillResistanceBonuses[i][1]/2)
-				baseString=string.format("%s Res%%",baseString)
+				normal=string.format("%s    %s",normal,newArmorSkillResistanceBonuses[i][1])
+				baseString=string.format("%s Res",baseString)
 			end
 			Game.SkillDesNormal[i]=normal
 			
@@ -1204,7 +1204,7 @@ function events.GameInitialized2()
 				expert=string.format("%s  %s|",expert,newArmorSkillACBonuses[i][2])
 			end
 			if res then
-				expert=string.format("%s    %s",expert,newArmorSkillResistanceBonuses[i][2]/2)
+				expert=string.format("%s    %s",expert,newArmorSkillResistanceBonuses[i][2])
 			end
 			Game.SkillDesExpert[i]=expert
 			--Master
@@ -1213,7 +1213,7 @@ function events.GameInitialized2()
 				master=string.format("%s  %s|",master,newArmorSkillACBonuses[i][3])
 			end
 			if res then
-				master=string.format("%s    %s",master,newArmorSkillResistanceBonuses[i][3]/2)
+				master=string.format("%s    %s",master,newArmorSkillResistanceBonuses[i][3])
 			end
 			Game.SkillDesMaster[i]=master
 			--GrandMaster
@@ -1222,7 +1222,7 @@ function events.GameInitialized2()
 				gm=string.format("%s  %s|",gm,newArmorSkillACBonuses[i][4])
 			end
 			if res then
-				gm=string.format("%s    %s",gm,newArmorSkillResistanceBonuses[i][4]/2)
+				gm=string.format("%s    %s",gm,newArmorSkillResistanceBonuses[i][4])
 			end
 			Game.SkillDesGM[i]=gm
 			Game.SkillDescriptions[i]=string.format("%s",baseString)
