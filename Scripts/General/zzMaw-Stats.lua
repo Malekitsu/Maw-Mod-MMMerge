@@ -422,6 +422,8 @@ function events.CalcDamageToPlayer(t)
 		penalty=math.min(penaltyLevel,100)
 		res=res-penalty
 		--put here code to change max res
+		--max resistance enchants are no longer used
+		--[[
 		maxres=75
 		for it in t.Player:EnumActiveItems() do
 			if it.Bonus2==damageKindToMaxResistanceEnchant[t.DamageKind] then
@@ -439,8 +441,8 @@ function events.CalcDamageToPlayer(t)
 			end
 		end
 		maxres=math.min(maxres,90)
-		res=math.min(res,maxres)/100
-		
+		]]
+		res=1-1/2^(res/100)
 		--fix for multiplayer
 		local REMOTE_OWNER_BIT = 0x800
 		local source = WhoHitPlayer()
@@ -558,12 +560,12 @@ function events.Tick()
 		bodyRes=Party[i]:GetResistance(15) - penalty
 		
 		--calculate new resistances
-		fireRes=100-100/2^(fireRes/100)
-		airRes=100-100/2^(airRes/100)
-		waterRes=100-100/2^(waterRes/100)
-		earthRes=100-100/2^(earthRes/100)
-		mindRes=100-100/2^(mindRes/100)
-		bodyRes=100-100/2^(bodyRes/100)
+		fireRes=math.round((100-100/2^(fireRes/100))*100)/100
+		airRes=math.round((100-100/2^(airRes/100))*100)/100
+		waterRes=math.round((100-100/2^(waterRes/100))*100)/100
+		earthRes=math.round((100-100/2^(earthRes/100))*100)/100
+		mindRes=math.round((100-100/2^(mindRes/100))*100)/100
+		bodyRes=math.round((100-100/2^(bodyRes/100))*100)/100
 		
 		if fireRes>=93.75 then
 			fireRes=StrColor(0,255,0,"Max")
