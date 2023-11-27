@@ -33,7 +33,18 @@ end
 
 --speed
 --remove AC from hit calculation and unarmed code from misctweaks
+nextACToZero=0
+function events.PlayerAttacked(t)
+	if t.Attacker.Object then
+		nextACToZero=2
+	end
+end
+
 function events.GetArmorClass(t)
+	if nextACToZero>0 then
+		t.AC=0
+		nextACToZero=nextACToZero-1
+	end
 	if t.AC==10000 then
 		t.AC=t.Player:GetArmorClass()
 	end
@@ -219,10 +230,10 @@ function events.BuildStatInformationBox(t)
 		i=Game.CurrentPlayer
 		ac=Party[i]:GetArmorClass()
 		acReduction=math.round(1000-1000/(ac/300+1))/10
-		lvl=Party[i].LevelBase
+		lvl=math.min(Party[i].LevelBase, 255)
 		blockChance= 100-math.round((5+lvl*2)/(10+lvl*2+ac)*10000)/100
 		totRed= 100-math.round((100-blockChance)*(100-acReduction))/100
-		t.Text=string.format("%s\n\nPhysical damage reduction from AC: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\nBlock chance vs same level monsters: " .. StrColor(255,255,100,blockChance) .. StrColor(255,255,100,"%") .. "\n\nTotal average damage reduction: " .. StrColor(255,255,100,totRed) .. "%")
+		t.Text=string.format("%s\n\nPhysical damage reduction from AC: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\nBlock chance vs same level monsters (up to 255): " .. StrColor(255,255,100,blockChance) .. StrColor(255,255,100,"%") .. "\n\nTotal average damage reduction: " .. StrColor(255,255,100,totRed) .. "%")
 	end
 	
 	if t.Stat==13 or t.Stat==14 then
