@@ -924,7 +924,7 @@ function calculateAngle(vector1, vector2)
     return angleDegrees
 end
 
-homingDegree=1
+homingDegree=0.5
 local function navigateMissile(object)
 
 	-- exclude some special non targeting spells
