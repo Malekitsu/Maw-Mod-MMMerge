@@ -160,10 +160,10 @@ newArmorSkillACBonuses =
 
 newArmorSkillResistanceBonuses =
 {
-	[const.Skills.Leather]	= {2, 4, 6, 8,},
-	[const.Skills.Chain]	= {2, 3, 4, 6,},
-	[const.Skills.Plate]	= {1, 2, 3, 4,},
-	[const.Skills.Shield]	= {2, 4, 6, 8,},
+	[const.Skills.Leather]	= {1, 2, 3, 4,},
+	[const.Skills.Chain]	= {1, 2, 2, 3,},
+	[const.Skills.Plate]	= {1, 1, 2, 2,},
+	[const.Skills.Shield]	= {1, 2, 3, 4,},
 	[const.Skills.Dodging]	= {0, 0, 0, 0,},
 }
 
