@@ -425,13 +425,37 @@ function events.PlayerCastSpell(t)
 		end
 	end
 	
+	--protection spells
+	protectionSpells={[25]={0,14} ,[69]={1,18} ,[36]={4,15} ,[3]={6,12} ,[58]={12,17} ,[14]={17,13} } --first value is spell ID, second is school skill ID
+	if protectionSpells[t.SpellId] then
+		if not t.RemoteData then
+			t.Skill=1
+			local buffId=protectionSpells[t.SpellId][1]
+			local s,m = SplitSkill(t.Player:GetSkill(protectionSpells[t.SpellId][2]))
+			local power=s*math.min(m,3)
+			if Party.SpellBuffs[buffId].Power<=	power then
+				Party.SpellBuffs[buffId].Power = power
+				Party.SpellBuffs[buffId].Skill = t.Mastery
+				Party.SpellBuffs[buffId].ExpireTime = Game.Time+const.Hour*s
+			end
+			if t.MultiplayerData then
+				t.MultiplayerData[1]=power
+				t.MultiplayerData[2]=Game.Time+const.Hour*s
+			end
+		--online code
+		elseif t.RemoteData then
+			Party.SpellBuffs[buffId].Power=t.RemoteData[1]
+			Party.SpellBuffs[buffId].ExpireTime = t.RemoteData[2]
+		end
+	end
+	
 	--Day of Protection
 	dopList = {0, 1, 4, 6, 12, 17}
 	if t.SpellId==85 then
 		if not t.RemoteData then
 			t.Skill=0
 			local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Light))
-			local power=s*(m-1)
+			local power=s*m/2
 			for _, buffId in ipairs(dopList) do
 				if Party.SpellBuffs[buffId].Power<=power then
 					Party.SpellBuffs[buffId].Power = power
@@ -504,6 +528,11 @@ function events.GameInitialized2()
 	--Power Cure
 	Game.SpellsTxt[75].Description="Cures hit points of all characters in your party at once.  The number cured is equal to 10 plus 5 per point of skill in Body Magic."
 	
+	--protections
+	protectionSpells={25,69,36,3,58,14}
+	for _, i in ipairs(protectionSpells) do
+		Game.SpellsTxt[i].GM="3 points resistance per point of skill"
+	end
 	--day of protection
 	Game.SpellsTxt[83].Description="Temporarily increases all seven stats on all your characters by 1 per skill in Light Magic.  This spell lasts until you rest."
 	Game.SpellsTxt[83].Expert="All stats increased by 10+1 per skill"
@@ -512,8 +541,8 @@ function events.GameInitialized2()
 
 	--Day of the Gods
 	Game.SpellsTxt[85].Description="Simultaneously casts Protection from Fire, Air, Water, Earth, Mind, and Body, plus Feather Fall and Wizard Eye on all your characters at two times your skill in Light Magic."
-	Game.SpellsTxt[85].Master="All spells cast at two times skill"
-	Game.SpellsTxt[85].GM="All spells cast at three times skill"
+	Game.SpellsTxt[85].Master="All spells cast at 1.5 times skill"
+	Game.SpellsTxt[85].GM="All spells cast at 2 times skill"
 	
 
 	
