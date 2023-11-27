@@ -1222,3 +1222,59 @@ for i=0,#Game.MapStats do
 end
 
 ]]
+
+--monster tooltips
+function events.BuildMonsterInformationBox(t)
+	--some statistics here, calculate the standard deviation of dices to get the range of which 95% will fall into
+	mean=t.Monster.Attack1.DamageAdd+t.Monster.Attack1.DamageDiceCount*(t.Monster.Attack1.DamageDiceSides+1)/2
+	range=(t.Monster.Attack1.DamageDiceSides^2*t.Monster.Attack1.DamageDiceCount/12)^0.5*1.96
+	lowerLimit=math.round(math.max(mean-range, t.Monster.Attack1.DamageAdd+t.Monster.Attack1.DamageDiceCount))
+	upperLimit=math.round(math.min(mean+range, t.Monster.Attack1.DamageAdd+t.Monster.Attack1.DamageDiceCount*t.Monster.Attack1.DamageDiceSides))
+	
+	
+	if t.Monster.Attack1.Missile == 0 then
+		text=string.format(table.find(const.Damage,t.Monster.Attack1.Type) .. "-Melee")
+	else
+		text=string.format(table.find(const.Damage,t.Monster.Attack1.Type) .. "-Ranged")
+	end
+	t.Damage.Text=string.format("Attack 00000	050" .. lowerLimit .. "-" .. upperLimit .. " " .. text)
+	if t.Monster.Attack2Chance>0 then
+		mean=t.Monster.Attack2.DamageAdd+t.Monster.Attack2.DamageDiceCount*(t.Monster.Attack2.DamageDiceSides+1)/2
+		range=(t.Monster.Attack2.DamageDiceSides^2*t.Monster.Attack2.DamageDiceCount/12)^0.5*1.96
+		lowerLimit=math.round(math.max(mean-range, t.Monster.Attack2.DamageAdd+t.Monster.Attack2.DamageDiceCount))
+		upperLimit=math.round(math.min(mean+range, t.Monster.Attack2.DamageAdd+t.Monster.Attack2.DamageDiceCount*t.Monster.Attack2.DamageDiceSides))
+		if t.Monster.Attack1.Missile == 0 then
+			text=string.format(table.find(const.Damage,t.Monster.Attack1.Type) .. "-Melee")
+		else
+			text=string.format(table.find(const.Damage,t.Monster.Attack1.Type) .. "-Ranged")
+		end
+		t.Damage.Text=string.format(t.Damage.Text .. "\n" .. lowerLimit .. "-" .. upperLimit .. " " .. text)
+	end
+	--spell
+	if t.Monster.SpellChance>0 then
+		spellId=t.Monster.Spell
+		spell=Game.Spells[spellId]
+		name=Game.SpellsTxt[spellId].Name
+		skill=SplitSkill(t.Monster.SpellSkill)
+		--get damage multiplier
+		oldLevel=BLevel[t.Monster.Id]
+		local i=t.Monster.Id
+		if i%3==1 then
+			levelMult=Game.MonstersTxt[i+1].Level
+		elseif i%3==0 then
+			levelMult=Game.MonstersTxt[i-1].Level
+		else
+			levelMult=Game.MonstersTxt[i].Level
+		end
+		dmgMult=(levelMult/12+1)*((levelMult+2)/(oldLevel+2))
+		
+		--calculate
+		mean=spell.DamageAdd+skill*(spell.DamageDiceSides+1)/2
+		range=(spell.DamageDiceSides^2*skill/12)^0.5*1.96
+		lowerLimit=math.round(math.max(mean-range, spell.DamageAdd+skill)*dmgMult)
+		upperLimit=math.round(math.min(mean+range, spell.DamageAdd+skill*spell.DamageDiceSides)*dmgMult)
+		
+		t.SpellFirst.Text=string.format("Spell00000	040" .. name .. " " .. lowerLimit .. "-" .. upperLimit)
+	end
+end
+
