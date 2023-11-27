@@ -1251,7 +1251,7 @@ function events.BuildMonsterInformationBox(t)
 		t.Damage.Text=string.format(t.Damage.Text .. "\n" .. lowerLimit .. "-" .. upperLimit .. " " .. text)
 	end
 	--spell
-	if t.Monster.SpellChance>0 then
+	if t.Monster.SpellChance>0 and t.Monster.Spell>0 then
 		spellId=t.Monster.Spell
 		spell=Game.Spells[spellId]
 		name=Game.SpellsTxt[spellId].Name
