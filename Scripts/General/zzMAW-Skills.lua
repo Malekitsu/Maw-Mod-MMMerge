@@ -357,14 +357,15 @@ function events.CalcStatBonusBySkills(t)
 		local bow = equipmentData.bow
 	
 		if bow.weapon then
-		
+			
+			local s=SplitSkill(t.Player:GetSkill(const.Skills.Bow))
 			-- calculate old bonus
 			
-			local oldBonus = (oldWeaponSkillAttackBonuses[bow.skill][bow.rank] * bow.level)
+			local oldBonus = (oldWeaponSkillAttackBonuses[bow.skill][bow.rank] * s)
 			
 			-- calculate new bonus
 			
-			local newBonus = (newWeaponSkillAttackBonuses[bow.skill][bow.rank] * bow.level)
+			local newBonus = (newWeaponSkillAttackBonuses[bow.skill][bow.rank] * s)
 			
 			if bow.skill == const.Skills.Bow then
 				local rangedWeaponSkillAttackBonusMultiplier = classRangedWeaponSkillAttackBonusMultiplier[t.Player.Class]
@@ -374,7 +375,7 @@ function events.CalcStatBonusBySkills(t)
 			end
 			
 			-- recalculate bonus
-			
+			t.Result = t.Result - oldBonus + newBonus
 			
 		end
 		
@@ -385,29 +386,20 @@ function events.CalcStatBonusBySkills(t)
 		local bow = equipmentData.bow
 	
 		if bow.weapon then
-		
+			local s=SplitSkill(t.Player:GetSkill(const.Skills.Bow))
 			-- calculate old bonus
 			
-			local oldBonus = 0
+			local oldBonus = oldWeaponSkillDamageBonuses[bow.skill][bow.rank] * s
 			
 			-- calculate new bonus
-			
-			local newBonus = 0
-			
-			-- add new bonus for ranged weapon
 			local might=t.Player:GetMight()
 			if might<=21 then
 				mightBonus=(might-1)/2-6
 			else
 				mightBonus=math.floor(might/5)
 			end
-			t.Result = t.Result + newWeaponSkillDamageBonuses[bow.skill][bow.rank] * bow.level+mightBonus
 			
-			-- add class bonus for ranged weapon
-			
-			if classRangedWeaponSkillDamageBonus[t.Player.Class] ~= nil then
-				t.Result = t.Result + (classRangedWeaponSkillDamageBonus[t.Player.Class] * bow.level)
-			end
+			local newBonus = newWeaponSkillDamageBonuses[bow.skill][bow.rank] * s + mightBonus
 			
 			-- recalculate bonus
 			
@@ -1030,9 +1022,9 @@ end
 
 --BOW DAMAGE SKILL BONUS
 function events.ModifyItemDamage(t)
-    local s, m = SplitSkill(t.Player.Skills[const.Skills.Bow])
+    local s, m = SplitSkill(t.Player:GetSkill(const.Skills.Bow))
     if t.Item:T().EquipStat == const.ItemType.Missile - 1 then
-		local dmgBonus=newWeaponSkillDamageBonuses[const.Skills.Bow][m]
+		local dmgBonus=newWeaponSkillDamageBonuses[const.Skills.Bow][m] - oldWeaponSkillDamageBonuses[const.Skills.Bow][m]
 		local might=t.Player:GetMight()
 		if might<=21 then
 			mightBonus=(might-1)/2-6
@@ -1693,4 +1685,3 @@ function events.GetMerchantTotalSkill(t)
 	end
 	t.Result=maxMerchant
 end
-
