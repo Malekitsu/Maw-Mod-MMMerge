@@ -183,7 +183,11 @@ function events.BuildStatInformationBox(t)
 				end
 			end
 		end
-		t.Text=string.format("%s\n\nCritical strike chance: %s%s",Game.StatsDescriptions[6],math.round((luck/10*2/3+5+daggerCritBonus)*100)/100,"%")
+		t.Text=string.format("%s\n\nCritical strike chance: %s%%",Game.StatsDescriptions[6],math.round((luck/10*2/3+5)*100)/100)
+		if daggerCritBonus>0 then
+			
+		t.Text=string.format("%s\n\nCritical strike chance: %s%%(%s%% with dagger)",Game.StatsDescriptions[6],math.round((luck/10*2/3+5)*100)/100, math.round((luck/10*2/3+5+daggerCritBonus)*100)/100)
+		end
 	end
 	if t.Stat==7 then
 		local index=Game.CurrentPlayer
