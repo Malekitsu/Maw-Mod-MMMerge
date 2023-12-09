@@ -23,12 +23,16 @@ function events.EvtGlobal(i) -- happens after related global evt executed
 	
 	-- calculate differencies and recalculate rewards
 	local GoldReward = Party.Gold - LastStats.Gold
-	Party.Gold = Party.Gold + calculateGold(GoldReward)
+	if GoldReward>0 then
+		Party.Gold = Party.Gold + calculateGold(GoldReward)
+	end
 	local ExpRewards = {}
 	for i, Exp in pairs(LastStats.Exp) do
 		if i < Party.count then
 			ExpRewards[i] = Party[i].Exp - Exp
-			Party[i].Exp = Party[i].Exp + calculateExp(ExpRewards[i])
+			if ExpRewards[i]>0 then
+				Party[i].Exp = Party[i].Exp + calculateExp(ExpRewards[i])
+			end
 		end
 	end
 	
