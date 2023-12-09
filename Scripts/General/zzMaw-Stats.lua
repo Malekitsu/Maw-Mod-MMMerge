@@ -3,13 +3,13 @@ function events.CalcDamageToMonster(t)
 	--luck/accuracy bonus
 	if data and data.Player and t.DamageKind==4 then
 		if data.Object==nil or data.Object.Spell==133 then
-			luck=data.Player:GetLuck()/15
+			luck=data.Player:GetLuck()/1.5
 			critDamage=data.Player:GetAccuracy()*3/1000
 			critChance=50+luck
-			--dagget bonus
+			--dagger bonus
 			daggerCritBonus=0
 			for i=0,1 do
-				if data.Player:GetActiveItem(i) then
+				if data.Player:GetActiveItem(i) and data.Object==nil then
 					itSkill=data.Player:GetActiveItem(i):T().Skill
 					if itSkill==2 then
 						s,m=SplitSkill(data.Player:GetSkill(const.Skills.Dagger))
@@ -19,9 +19,10 @@ function events.CalcDamageToMonster(t)
 					end
 				end
 			end
-			roll=math.random(1, 1000)+daggerCritBonus
+			roll=math.random(1, 1000)-daggerCritBonus
 			if roll <= critChance then
 				t.Result=t.Result*(1.5+critDamage)
+				crit=true
 			end
 	--might bonus
 			might=data.Player:GetMight()
@@ -81,6 +82,7 @@ function events.CalcSpellDamage(t)
 		roll=math.random(1, 1000)
 		if roll <= critChance then
 			t.Result=t.Result*(1.5+critDamage)
+			crit=true
 		end
 	end
 end
@@ -643,6 +645,40 @@ function events.CalcDamageToMonster(t)
 			mapvars.damageTrack[data.Player:GetIndex()] = mapvars.damageTrack[data.Player:GetIndex()] + damage
 		end
 	end
+	dmg=t.Result
 end
 
-			
+--crit message
+local hook, autohook, autohook2, asmpatch = mem.hook, mem.autohook, mem.autohook2, mem.asmpatch
+local u1, u2, u4, i1, i2, i4 = mem.u1, mem.u2, mem.u4, mem.i1, mem.i2, mem.i4
+local critAttackMsg = "%s critically hits %s for %lu damage!" .. string.char(0)
+local critShootMsg = "%s critically shoots %s for %lu points!" .. string.char(0)
+local critKillMsg = "%s critically inflicts %lu points killing %s!" .. string.char(0)
+
+local crit, dmg = false
+local function critProcHook(d)
+	local i, pl = internal.GetPlayer(u4[d.ebp - 0x8])
+	crit, dmg = crit, dmg
+	if not crit then return end
+	d.eax = dmg
+end
+
+autohook2(0x43703F, critProcHook) -- shoot (ranged)
+autohook2(0x437148, critProcHook) -- spell
+autohook2(0x437243, critProcHook) -- melee attack
+
+autohook(0x4376AC, function(d)
+	if not crit then return end
+	local addr, result = u4[d.esp + 4]
+	if addr == u4[0x6016D8] then -- attack
+		result = mem.topointer(critAttackMsg)
+	elseif addr == u4[0x60173C] then -- shoot
+		result = mem.topointer(critShootMsg)
+	elseif addr == u4[0x601704] then -- kill
+		result = mem.topointer(critKillMsg)
+	else
+		error("Unknown attack message type")
+	end
+	u4[d.esp + 4] = result
+	crit = false
+end)
