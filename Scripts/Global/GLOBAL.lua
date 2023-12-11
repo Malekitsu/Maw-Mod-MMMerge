@@ -52,7 +52,7 @@ function calculateExp(experience)
 	elseif currentWorld==4 then
 		partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 	end
-	experience=experience*(1+partyLevel/100)+750*partyLevel - experience
+	experience=experience*(1+partyLevel/100)+500*partyLevel - experience
 	return experience
 end
 function calculateGold(gold)
