@@ -160,12 +160,10 @@ function events.PlayerCastSpell(t)
 			local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
 			local power = 10 + s * m/2
 			local duration = Game.Time + (2 + s) * const.Hour
-			for i=0,Party.High do
-				if Party.SpellBuffs[9].Power <= power then
-					Party.SpellBuffs[9].Power = power
-					Party.SpellBuffs[9].Skill = m
-					Party.SpellBuffs[9].ExpireTime= duration
-				end
+			if Party.SpellBuffs[9].Power <= power then
+				Party.SpellBuffs[9].Power = power
+				Party.SpellBuffs[9].Skill = m
+				Party.SpellBuffs[9].ExpireTime= duration
 			end
 			if t.MultiplayerData then
 				t.MultiplayerData[1]=power
@@ -173,12 +171,10 @@ function events.PlayerCastSpell(t)
 				t.MultiplayerData[3]=duration
 			end
 		elseif t.RemoteData then
-			for i=0,Party.High do
-				if Party.SpellBuffs[9].Power<=	t.RemoteData[1] then
-					Party.SpellBuffs[9].Power = t.RemoteData[1]
-					Party.SpellBuffs[9].Skill = t.RemoteData[2]
-					Party.SpellBuffs[9].ExpireTime = t.RemoteData[3]
-				end
+			if Party.SpellBuffs[9].Power<=	t.RemoteData[1] then
+				Party.SpellBuffs[9].Power = t.RemoteData[1]
+				Party.SpellBuffs[9].Skill = t.RemoteData[2]
+				Party.SpellBuffs[9].ExpireTime = t.RemoteData[3]
 			end
 		end
 	end
