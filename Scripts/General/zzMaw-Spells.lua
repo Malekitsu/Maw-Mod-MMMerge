@@ -487,7 +487,7 @@ function events.PlayerCastSpell(t)
 	
 	local applyHoP = function(s, m)
 		--calculate some common values
-		local buffedPower = 5 + (m + 1) * s --Bless and Stoneskin 4x/5x power value
+		local sharedPower = s + 5 --Bless/Haste/Stoneskin power value
 		local commonTime = Game.Time + const.Hour
 		if m == 3 then commonTime = commonTime + s * const.Hour end --Expiration for M Bless/Shield/Stoneskin
 		if m > 3 then commonTime = commonTime + 5 * s * const.Hour end --Expiration for GM Bless/Shield/Stoneskin
@@ -496,25 +496,22 @@ function events.PlayerCastSpell(t)
 		local buffId = const.PlayerBuff.Bless
 		
 		for i=0,Party.High do
-			if Party[i].SpellBuffs[buffId].Power <= buffedPower then
-				Party[i].SpellBuffs[buffId].Power = buffedPower
+			if Party[i].SpellBuffs[buffId].Power <= sharedPower then
+				Party[i].SpellBuffs[buffId].Power = sharedPower
 				Party[i].SpellBuffs[buffId].Skill = m
 				Party[i].SpellBuffs[buffId].ExpireTime = commonTime
 			end
 		end
 		
 		for _, buffId in ipairs(hopList) do
-			local power = 0
+			local power = sharedPower
 			local expireTime = commonTime
 			
 			if buffId == const.PartyBuff.Haste then
-				power = s + 5
 				expireTime = Game.Time + const.Hour + (m + 1) * m * Const.Minute * s
 			elseif buffId == const.PartyBuff.Heroism then
-				power = 10 + (s * m + s) * m / 2
+				power = 10 + s * m / 2
 				expireTime = Game.Time + (2 + s * (m + 1)) * const.Hour
-			elseif buffId == const.PartyBuff.Stoneskin then
-				power = buffedPower
 			end
 			
 			if Party.SpellBuffs[buffId].Power <= power then
