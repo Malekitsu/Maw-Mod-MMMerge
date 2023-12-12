@@ -19,8 +19,8 @@ Knight	35	4	0	0	-
 Cavalier	35	6	0	0	-
 BlackKnight	35	8	0	0	-
 Champion	35	8	0	0	-
-Minotaur	30	4	5	1	P
-MinotaurLord	30	6	5	2	P
+Minotaur	30	5	5	1	P
+MinotaurLord	30	8	5	2	P
 Monk	35	4	0	0	-
 Initiate	35	6	0	1	P
 Master	35	8	0	1	P
@@ -37,20 +37,20 @@ Thief	30	4	0	0	-
 Rogue	30	5	0	1	I
 Assassin	30	6	0	1	I
 Spy	30	6	0	1	I
-Troll	45	5	0	0	-
-WarTroll	45	10	0	0	-
+Troll	45	6	0	0	-
+WarTroll	45	12	0	0	-
 Vampire	30	3	10	2	P
 Nosferatu	30	5	10	4	P
 Sorcerer	20	2	15	3	I
 Wizard	20	3	25	4	I
 Necromancer	20	2	25	3	I
-Lich	20	4	25	6	I
-ArchMage	20	4	25	6	I
-Dark ArchMage	20	4	25	6	I
+Lich	20	4	25	7	I
+ArchMage	20	4	25	7	I
+Dark ArchMage	20	4	25	7	I
 Peasant	20	2	0	0	-
 n/u	20	2	0	0	-
 High Priest	30	4	15	5	P
-Master Wizard	20	4	25	6	I
+Master Wizard	20	4	25	7	I
 n/u	20	2	0	0	-
 Seraphim	40	3	15	1	P
 Angel	40	4	15	2	P
