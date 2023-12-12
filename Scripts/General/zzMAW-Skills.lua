@@ -468,9 +468,15 @@ function events.CalcStatBonusBySkills(t)
 				-- recalculate bonus
 				
 				t.Result = t.Result - oldBonus + newBonus
-				
+					
 			end
-			
+		elseif not main.weapon and not extra.weapon then
+			local punch=t.Player:GetSkill(const.Skills.Unarmed)
+			local s,m = SplitSkill(punch)
+			if m>0 then
+				t.Result=t.Result-oldWeaponSkillAttackBonuses[const.Skills.Unarmed][m]*s
+				t.Result=t.Result+newWeaponSkillAttackBonuses[const.Skills.Unarmed][m]*s	
+			end
 		end
 		
 	-- calculate melee damage bonus by skill
