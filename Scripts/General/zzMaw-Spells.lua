@@ -61,6 +61,9 @@ end
 --day of protection buff list
 local dopList = {0, 1, 4, 6, 12, 17}
 
+--hour of power buff list
+local hopList = {8, 9, 14, 15}
+
 --Remove curse matrix
 local curseBase={0,12,24,36}
 local curseScaling={0,2,4,6}
@@ -151,26 +154,30 @@ function events.PlayerCastSpell(t)
 	end
 	
 	--heroism
-	if t.SpellId==51 then
+	if t.SpellId==const.Spells.Heroism then
 		if not t.RemoteData then
+			t.Skill = 0
 			local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
-			local power=10+s*m/2
-			local duration= Game.Time+(2+s*const.Hour)
+			local power = 10 + s * m/2
+			local duration = Game.Time + (2 + s) * const.Hour
 			for i=0,Party.High do
-				if Party.SpellBuffs[9].Power<=	power then
+				if Party.SpellBuffs[9].Power <= power then
 					Party.SpellBuffs[9].Power = power
+					Party.SpellBuffs[9].Skill = m
 					Party.SpellBuffs[9].ExpireTime= duration
 				end
 			end
 			if t.MultiplayerData then
 				t.MultiplayerData[1]=power
-				t.MultiplayerData[1]=duration
+				t.MultiplayerData[2]=m
+				t.MultiplayerData[3]=duration
 			end
 		elseif t.RemoteData then
 			for i=0,Party.High do
 				if Party.SpellBuffs[9].Power<=	t.RemoteData[1] then
 					Party.SpellBuffs[9].Power = t.RemoteData[1]
-					Party.SpellBuffs[9].ExpireTime = t.RemoteData[2]
+					Party.SpellBuffs[9].Skill = t.RemoteData[2]
+					Party.SpellBuffs[9].ExpireTime = t.RemoteData[3]
 				end
 			end
 		end
@@ -473,6 +480,90 @@ function events.PlayerCastSpell(t)
 					Party.SpellBuffs[buffId].Power = t.RemoteData[1]
 					Party.SpellBuffs[buffId].Skill = t.Mastery
 					Party.SpellBuffs[buffId].ExpireTime = t.RemoteData[2]
+				end
+			end
+		end	
+	end
+	
+	local applyHoP = function(s, m)
+		--calculate some common values
+		local buffedPower = 5 + (m + 1) * s --Bless and Stoneskin 4x/5x power value
+		local commonTime = Game.Time + const.Hour
+		if m == 3 then commonTime = commonTime + s * const.Hour end --Expiration for M Bless/Shield/Stoneskin
+		if m > 3 then commonTime = commonTime + 5 * s * const.Hour end --Expiration for GM Bless/Shield/Stoneskin
+		
+		--start with Bless
+		local buffId = const.PlayerBuff.Bless
+		
+		for i=0,Party.High do
+			if Party[i].SpellBuffs[buffId].Power <= buffedPower then
+				Party[i].SpellBuffs[buffId].Power = buffedPower
+				Party[i].SpellBuffs[buffId].Skill = m
+				Party[i].SpellBuffs[buffId].ExpireTime = commonTime
+			end
+		end
+		
+		for _, buffId in ipairs(hopList) do
+			local power = 0
+			local expireTime = commonTime
+			
+			if buffId == const.PartyBuff.Haste then
+				power = s + 5
+				expireTime = Game.Time + const.Hour + (m + 1) * m * Const.Minute * s
+			elseif buffId == const.PartyBuff.Heroism then
+				power = 10 + (s * m + s) * m / 2
+				expireTime = Game.Time + (2 + s * (m + 1)) * const.Hour
+			elseif buffId == const.PartyBuff.Stoneskin then
+				power = buffedPower
+			end
+			
+			if Party.SpellBuffs[buffId].Power <= power then
+				Party.SpellBuffs[buffId].Power = power
+				Party.SpellBuffs[buffId].Skill = m
+				Party.SpellBuffs[buffId].ExpireTime = expireTime
+			end
+		end
+	end
+	
+	--Hour of Power
+	if t.SpellId==const.Spells.HourOfPower then
+		if not t.RemoteData then
+			t.Skill = 0
+			local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Light))
+			applyHoP(s, m)
+			if t.MultiplayerData then
+				t.MultiplayerData[1] = s
+				t.MultiplayerData[2] = m
+			end
+		elseif t.RemoteData then
+			applyHoP(t.RemoteData[1], t.RemoteData[2])
+		end	
+	end
+	
+	--Pain Reflection
+	if t.SpellId==const.Spells.PainReflection then
+		if not t.RemoteData then
+			t.Skill = 0
+			local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Dark))
+			local power= s + 14
+			local expireMult = m > 3 and 15 or 5
+			for i=0,Party.High do
+				if Party[i].SpellBuffs[10].Power <= power then
+					Party[i].SpellBuffs[10].Power = power
+					Party[i].SpellBuffs[10].Skill = t.Mastery
+					Party[i].SpellBuffs[10].ExpireTime = Game.Time + const.Hour + const.Minute * expireMult * s
+				end
+			end
+			if t.MultiplayerData then
+				t.MultiplayerData[1] = power
+				t.MultiplayerData[2] = Game.Time + const.Hour + const.Minute * expireMult * s
+			end
+		elseif t.RemoteData then
+			for i=0,Party.High do
+				if Party[i].SpellBuffs[10].Power <= t.RemoteData[1] then
+					Party[i].SpellBuffs[10].Power = t.RemoteData[1]
+					Party[i].SpellBuffs[10].Skill = t.Mastery
+					Party[i].SpellBuffs[10].ExpireTime = t.RemoteData[2]
 				end
 			end
 		end	
