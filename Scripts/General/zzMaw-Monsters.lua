@@ -797,6 +797,9 @@ mapLevels={
 ["Barrow XV"] = 
 {["Low"] = 13 , ["Mid"] = 15 , ["High"] = 17},
 
+["The Red Dwarf Mines"] = 
+{["Low"] = 18 , ["Mid"] = 23 , ["High"] = 28},
+
 ["White Cliff Cave"] = 
 {["Low"] = 14 , ["Mid"] = 16 , ["High"] = 18},
 
@@ -862,9 +865,6 @@ mapLevels={
 
 ["Castle Gryphonheart"] = 
 {["Low"] = 31 , ["Mid"] = 36 , ["High"] = 50},
-
-["The Red Dwarf Mines"] = 
-{["Low"] = 32 , ["Mid"] = 40 , ["High"] = 48},
 
 ["William Setag's Tower"] = 
 {["Low"] = 33 , ["Mid"] = 46.5 , ["High"] = 60},
