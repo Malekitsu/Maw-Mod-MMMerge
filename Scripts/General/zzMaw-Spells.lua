@@ -1362,8 +1362,9 @@ function events.CalcDamageToMonster(t)
 		return
 	end
 	data=WhoHitMonster()
-	if data and data.Player then
-		Party.SpellBuffs[5].ExpireTime=Party.SpellBuffs[7].ExpireTime
+	flyTime=Party.SpellBuffs[7].ExpireTime
+	if data and data.Player and flyTime>Game.Time then
+		Party.SpellBuffs[5].ExpireTime=flyTime
 		Party.SpellBuffs[7].ExpireTime=0
 	end
 end
