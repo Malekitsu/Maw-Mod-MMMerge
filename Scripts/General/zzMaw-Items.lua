@@ -1377,6 +1377,7 @@ end
 
 --vampiric nerf
 gotVamp={}
+gotBowVamp={}
 function events.ItemAdditionalDamage(t)
 	vamp=false
 	for i=0,1 do
@@ -1391,18 +1392,39 @@ function events.ItemAdditionalDamage(t)
 	else
 		gotVamp[t.Player:GetIndex()]=false
 	end
+	it=t.Player:GetActiveItem(2)
+	--bow
+	vamp=false
+	it=t.Player:GetActiveItem(2)
+	if it then
+		vamp=it.Bonus2==41 or it.Bonus2==16
+	end
+	if vamp then
+		t.Vampiric = false
+		gotBowVamp[t.Player:GetIndex()]=true
+	else
+		gotBowVamp[t.Player:GetIndex()]=false
+	end
 end
 
 function events.GameInitialized2() --make it load later compared to other scripts
 	function events.CalcDamageToMonster(t)
 		if t.DamageKind==4 then
 			data=WhoHitMonster()
-			if data and data.Player and not data.Object then
-				if gotVamp[data.Player:GetIndex()] then
+			
+			if data and data.Player then
+				--melee
+				if gotVamp[data.Player:GetIndex()] and not data.Object then
+					t.Player.HP=math.min(t.Player:GetFullHP(),t.Player.HP+t.Result*0.05)
+				end
+				--ranged
+				if gotVamp[data.Player:GetIndex()] and data.Object and data.Object.Spell==133 then
 					t.Player.HP=math.min(t.Player:GetFullHP(),t.Player.HP+t.Result*0.05)
 				end
 			end
-		end
+			
+
+		end 
 	end
 end
 
