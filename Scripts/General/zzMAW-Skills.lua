@@ -1675,19 +1675,19 @@ function events.GetSkill(t)
 end
 
 --merchant fix
+merchantCheck=false
 function events.GetMerchantTotalSkill(t)
-	if t.Result==10000 then
-		t.Result=1000
-		return
-	end
+	if not merchantCheck then return end --avoid loops
+	merchantCheck=true
 	if Game.HouseScreen==-1 or Game.HouseScreen==1 or Game.HouseScreen==96 then return end
 	currentMerchant=0
 	maxMerchant=0
 	for i=0,Party.High do
-		s,m=SplitSkill(Party[i].Skills[const.Skills.Merchant])
-		if s*m>currentMerchant then
-			maxMerchant=s*m+12
+		merc=Party[i]:GetMerchantTotalSkill()
+		if merc>maxMerchant then
+			maxMerchant=merc
 		end
 	end
+	merchantCheck=false
 	t.Result=maxMerchant
 end
