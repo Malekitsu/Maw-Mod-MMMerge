@@ -472,7 +472,8 @@ function events.PickCorpse(t)
 	mon.TreasureDiceSides=math.min(mon.TreasureDiceSides*goldMult^0.5,255)
 	
 	--calculate loot chances
-	mon.TreasureItemPercent= math.round(mon.TreasureItemPercent^0.85*(bolsterLevel+lvl+30)^0.5/(lvl+8)^0.5)
+	
+	mon.TreasureItemPercent= math.round(mon.TreasureItemPercent^0.85 + (50 - mon.TreasureItemPercent^0.85 / 2) * bolsterLevel / 250)
 	
 end
 
