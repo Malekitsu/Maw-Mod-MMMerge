@@ -51,7 +51,6 @@ function events.AfterLoadMap()
 		end
 		--calculate average level for unique monsters
 		for i=0, Map.Monsters.High do
-			--gold fix
 			mon=Map.Monsters[i]
 			
 			if  (mon.FullHitPoints ~= Game.MonstersTxt[Map.Monsters[i].Id].FullHitPoints) and mon.Level>5 then
@@ -342,10 +341,6 @@ function events.LoadMap()
 		
 		--experience
 		mon.Experience = math.round(mon.Level^1.7+mon.Level*20)
-		--Gold
-		--levelMultiplier = (mon.Level) / (LevelB)
-		--mon.TreasureDiceCount=math.min(mon.TreasureDiceCount*levelMultiplier,250)
-		--mon.TreasureDiceSides=math.min(mon.TreasureDiceSides*levelMultiplier,250)
 	end
 	--CALCULATE DAMAGE AND HP
 	for i=1, 651 do
@@ -463,6 +458,22 @@ function events.LoadMap()
 			mon.HP=2^15-1
 		end
 	end
+end
+
+--LOOT FIX
+function events.PickCorpse(t)
+	--calculate bolster
+	lvl=BLevel[mon.Id]
+	--calculate gold
+	mon=t.Monster
+	gold=mon.TreasureDiceCount*(mon.TreasureDiceSides+1)/2
+	goldMult=(bolsterLevel+lvl)^1.4/(lvl)^1.4
+	mon.TreasureDiceCount=math.min(mon.TreasureDiceCount*goldMult^0.5,255)
+	mon.TreasureDiceSides=math.min(mon.TreasureDiceSides*goldMult^0.5,255)
+	
+	--calculate loot chances
+	mon.TreasureItemPercent= math.round(mon.TreasureItemPercent^0.85*(bolsterLevel+lvl+30)^0.5/(lvl+8)^0.5)
+	
 end
 
 -----------------------------
@@ -797,9 +808,6 @@ mapLevels={
 ["Barrow XV"] = 
 {["Low"] = 13 , ["Mid"] = 15 , ["High"] = 17},
 
-["The Red Dwarf Mines"] = 
-{["Low"] = 18 , ["Mid"] = 23 , ["High"] = 28},
-
 ["White Cliff Cave"] = 
 {["Low"] = 14 , ["Mid"] = 16 , ["High"] = 18},
 
@@ -835,6 +843,9 @@ mapLevels={
 
 ["The Tularean Caves"] = 
 {["Low"] = 18 , ["Mid"] = 22 , ["High"] = 28},
+
+["The Red Dwarf Mines"] = 
+{["Low"] = 18 , ["Mid"] = 23 , ["High"] = 28},
 
 ["Evenmorn Island"] = 
 {["Low"] = 24 , ["Mid"] = 27 , ["High"] = 30},
