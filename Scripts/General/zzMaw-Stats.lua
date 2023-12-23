@@ -166,7 +166,15 @@ function events.BuildStatInformationBox(t)
 	if t.Stat==5 then
 		i=Game.CurrentPlayer
 		speed=Party[i]:GetSpeed()
-		t.Text=string.format("%s\n\nDodge chance: %s%s",Game.StatsDescriptions[5],math.floor(1000-0.995^(speed/10)*1000)/10	,"%")
+		unarmed=0
+		Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Unarmed))
+		if Mas == 4 then
+			unarmed=Skill
+		end
+		speed=Party[i]:GetSpeed()
+		speedEffect=speed/10
+		dodgeChance=1-0.995^(speedEffect+unarmed)
+		t.Text=string.format("%s\n\nDodge chance: %s%s",Game.StatsDescriptions[5],math.floor(dodgeChance*1000)/10	,"%")
 	end
 	if t.Stat==6 then
 		i=Game.CurrentPlayer
