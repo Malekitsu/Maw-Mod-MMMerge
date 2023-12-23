@@ -26,16 +26,6 @@ function events.AfterLoadMap()
 			Map.Monsters[i].Velocity=(Map.Monsters[i].Velocity + (400 - Map.Monsters[i].Velocity) / 2 +100)
 		end
 	end	
-	for i=0, Map.Monsters.High do
-		local mon=Map.Monsters[i]
-		if not basetable[Map.Monsters[i].Id] then 
-			goto continue
-		end
-		lvlMult=(mon.Level+5)/(basetable[Map.Monsters[i].Id].Level+5)
-		mon.TreasureDiceCount=Game.MonstersTxt[Map.Monsters[i].Id].TreasureDiceCount*lvlMult
-		mon.TreasureDiceSides=Game.MonstersTxt[Map.Monsters[i].Id].TreasureDiceSides*lvlMult
-		:: continue :: 
-	end
 	if mapvars.boosted==nil then
 		mapvars.boosted=true
 		--calculate party experience
@@ -467,7 +457,7 @@ function events.PickCorpse(t)
 	--calculate gold
 	mon=t.Monster
 	gold=mon.TreasureDiceCount*(mon.TreasureDiceSides+1)/2
-	goldMult=(bolsterLevel+lvl)^1.4/(lvl)^1.4
+	goldMult=(bolsterLevel+lvl)^1.5/(lvl)^1.5
 	mon.TreasureDiceCount=math.min(mon.TreasureDiceCount*goldMult^0.5,255)
 	mon.TreasureDiceSides=math.min(mon.TreasureDiceSides*goldMult^0.5,255)
 	
