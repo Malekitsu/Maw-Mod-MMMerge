@@ -511,27 +511,84 @@ Debug Message
 ]]
 
 
+--MAP CHANGES
+--BACKUP
+local function deepcopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[deepcopy(orig_key)] = deepcopy(orig_value)
+        end
+        setmetatable(copy, deepcopy(getmetatable(orig)))
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
+-- Create a backup of Game.MapStats
+BackupMapStats = deepcopy(Game.MapStats)
+
 function events.GameInitialized2()
-	for i=1,Game.MapStats.High do
-		if Game.MapStats[i].Mon1Low==1 then
-			Game.MapStats[i].Mon1Low=2
-		end
-		if Game.MapStats[i].Mon1Hi<=3 then
-			Game.MapStats[i].Mon1Hi=Game.MapStats[i].Mon1Hi+1
-		end 
-		if Game.MapStats[i].Mon2Low==1 then
-			Game.MapStats[i].Mon2Low=2
-		end
-		if Game.MapStats[i].Mon2Hi<=3 then
-			Game.MapStats[i].Mon2Hi=Game.MapStats[i].Mon2Hi+1
-		end 
-		if Game.MapStats[i].Mon3Low==1 then
-			Game.MapStats[i].Mon3Low=2
-		end
-		if Game.MapStats[i].Mon3Hi<=3 then
-			Game.MapStats[i].Mon3Hi=Game.MapStats[i].Mon3Hi+1
-		end 
+	--add difficulty related damage
+	if Game.BolsterAmount%50~=0 or Game.BolsterAmount==0 then
+		Game.BolsterAmount=100
 	end
+
+	--MAW
+	if Game.BolsterAmount<=100 then
+		for i=1,Game.MapStats.High do
+			Game.MapStats[i].Mon1Low=BackupMapStats[i].Mon1Low
+			Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi
+			Game.MapStats[i].Mon2Low=BackupMapStats[i].Mon2Low
+			Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi
+			Game.MapStats[i].Mon3Low=BackupMapStats[i].Mon3Low
+			Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi
+		end
+	end
+	
+	--Hard
+	if Game.BolsterAmount==150 then
+		for i=1,Game.MapStats.High do
+			if Game.MapStats[i].Mon1Hi<=3 then
+				Game.MapStats[i].Mon1Hi=Game.MapStats[i].Mon1Hi+1
+			end 
+			if Game.MapStats[i].Mon2Hi<=3 then
+				Game.MapStats[i].Mon2Hi=Game.MapStats[i].Mon2Hi+1
+			end 
+			if Game.MapStats[i].Mon3Hi<=3 then
+				Game.MapStats[i].Mon3Hi=Game.MapStats[i].Mon3Hi+1
+			end 
+		end
+	end
+	
+	--Hell
+	if Game.BolsterAmount==200 then
+		for i=1,Game.MapStats.High do
+			if Game.MapStats[i].Mon1Low==1 then
+				Game.MapStats[i].Mon1Low=2
+			end
+			if Game.MapStats[i].Mon1Hi<=3 then
+				Game.MapStats[i].Mon1Hi=Game.MapStats[i].Mon1Hi+1
+			end 
+			if Game.MapStats[i].Mon2Low==1 then
+				Game.MapStats[i].Mon2Low=2
+			end
+			if Game.MapStats[i].Mon2Hi<=3 then
+				Game.MapStats[i].Mon2Hi=Game.MapStats[i].Mon2Hi+1
+			end 
+			if Game.MapStats[i].Mon3Low==1 then
+				Game.MapStats[i].Mon3Low=2
+			end
+			if Game.MapStats[i].Mon3Hi<=3 then
+				Game.MapStats[i].Mon3Hi=Game.MapStats[i].Mon3Hi+1
+			end 
+		end
+	end
+	
+	
 	--individual map CHANGES-----
 	--hall under the hill
 	Game.MapStats[96].Monster2Pic="Will ' O Wisp"
