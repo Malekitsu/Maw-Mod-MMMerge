@@ -250,7 +250,7 @@ function events.BuildStatInformationBox(t)
 		t.Text=string.format("%s\n\nPhysical damage reduction from AC: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\nBlock chance vs same level monsters (up to 255): " .. StrColor(255,255,100,blockChance) .. StrColor(255,255,100,"%") .. "\n\nTotal average damage reduction: " .. StrColor(255,255,100,totRed) .. "%")
 	end
 	
-	if t.Stat==5234672 then
+	if t.Stat==11 then
 		i=Game.CurrentPlayer
 		--get spell and its damage
 		spellIndex=Party[i].QuickSpell
@@ -293,7 +293,7 @@ function events.BuildStatInformationBox(t)
 		
 	end
 	
-	if t.Stat==11 then
+	if t.Stat==5234672 then
 		i=Game.CurrentPlayer
 		fullHP=Party[i]:GetFullHP()
 		--AC
