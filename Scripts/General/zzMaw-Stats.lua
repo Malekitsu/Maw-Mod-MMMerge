@@ -250,6 +250,23 @@ function events.BuildStatInformationBox(t)
 		t.Text=string.format("%s\n\nPhysical damage reduction from AC: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\nBlock chance vs same level monsters (up to 255): " .. StrColor(255,255,100,blockChance) .. StrColor(255,255,100,"%") .. "\n\nTotal average damage reduction: " .. StrColor(255,255,100,totRed) .. "%")
 	end
 	
+	if t.Stat==11 then
+		fullHP=Party[index]:GetFullHP()
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	end
+	
 	if t.Stat==13 or t.Stat==14 then
 		bolsterLevel8=vars.MM7LVL+vars.MM6LVL
 		bolsterLevel7=vars.MM8LVL+vars.MM6LVL
@@ -430,22 +447,6 @@ function events.CalcDamageToPlayer(t)
 		if t.DamageKind==12 then
 			res=math.min(t.Player:GetResistance(10),t.Player:GetResistance(11),t.Player:GetResistance(12),t.Player:GetResistance(13),t.Player:GetResistance(14),t.Player:GetResistance(15))
 		end
-		--calculate penalty
-		--calculate party level
-		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
-		if currentWorld==1 then
-			partyLevel=vars.MM7LVL+vars.MM6LVL
-		elseif currentWorld==2 then
-			partyLevel=vars.MM8LVL+vars.MM6LVL
-		elseif currentWorld==3 then
-			partyLevel=vars.MM8LVL+vars.MM7LVL
-		elseif currentWorld==4 then
-			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-		end
-		penaltyLevel=math.max(partyLevel*0.95-4,0)
-		penaltyLevel=math.round(penaltyLevel/5)*5
-		penalty=math.min(penaltyLevel,100)
-		res=res-penalty
 		res=1-1/2^(res/100)
 		--fix for multiplayer
 		local REMOTE_OWNER_BIT = 0x800
@@ -526,28 +527,14 @@ end
 --TOOLTIPS
 function events.Tick()
 	if Game.CurrentCharScreen==100 and Game.CurrentScreen==7 then
-		local i=Game.CurrentPlayer 
+		i=Game.CurrentPlayer 
 		if i==-1 then return end --prevent bug message
-		--calculate party level
-		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
-		if currentWorld==1 then
-			partyLevel=vars.MM7LVL+vars.MM6LVL
-		elseif currentWorld==2 then
-			partyLevel=vars.MM8LVL+vars.MM6LVL
-		elseif currentWorld==3 then
-			partyLevel=vars.MM8LVL+vars.MM7LVL
-		elseif currentWorld==4 then
-			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-		end
-		partyLevel=math.max(partyLevel*0.95-4,0)
-		penaltyLevel=math.round(partyLevel/5)*5
-		penalty=math.min(penaltyLevel,200)
-		fireRes=Party[i]:GetResistance(10) - penalty
-		airRes=Party[i]:GetResistance(11) - penalty
-		waterRes=Party[i]:GetResistance(12) - penalty
-		earthRes=Party[i]:GetResistance(13) - penalty
-		mindRes=Party[i]:GetResistance(14) - penalty
-		bodyRes=Party[i]:GetResistance(15) - penalty
+		fireRes=Party[i]:GetResistance(10)
+		airRes=Party[i]:GetResistance(11)
+		waterRes=Party[i]:GetResistance(12)
+		earthRes=Party[i]:GetResistance(13)
+		mindRes=Party[i]:GetResistance(14)
+		bodyRes=Party[i]:GetResistance(15)
 		
 		--calculate new resistances
 		fireRes=math.round((100-100/2^(fireRes/100))*100)/100
@@ -713,3 +700,26 @@ autohook(0x4376AC, function(d)
 	u4[d.esp + 4] = result
 	crit = false
 end)
+
+
+--decrease resistances based on bolster
+
+function events.CalcStatBonusByItems(t)
+	if t.Stat>9 and t.Stat<16 then
+		--calculate party level
+		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+		if currentWorld==1 then
+			partyLevel=vars.MM7LVL+vars.MM6LVL
+		elseif currentWorld==2 then
+			partyLevel=vars.MM8LVL+vars.MM6LVL
+		elseif currentWorld==3 then
+			partyLevel=vars.MM8LVL+vars.MM7LVL
+		elseif currentWorld==4 then
+			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+		end
+		partyLevel=math.max(partyLevel*0.95-4,0)
+		penaltyLevel=math.round(partyLevel/5)*5
+		penalty=math.min(penaltyLevel,200)
+		t.Result=t.Result-penalty
+	end
+end
