@@ -251,12 +251,43 @@ function events.BuildStatInformationBox(t)
 	end
 	
 	if t.Stat==11 then
-		fullHP=Party[index]:GetFullHP()
+		i=Game.CurrentPlayer
+		fullHP=Party[i]:GetFullHP()
+		--AC
+		ac=Party[i]:GetArmorClass()
+		acReduction=1-1/(ac/300+1)
+		lvl=math.min(Party[i].LevelBase, 255)
+		blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
+		ACRed= 1 - (1-blockChance)*(1-acReduction)
+		--speed
+		speed=Party[i]:GetSpeed()
+		unarmed=0
+		Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Unarmed))
+		if Mas == 4 then
+			unarmed=Skill+10
+		end
+		speed=Party[i]:GetSpeed()
+		speedEffect=speed/10
+		dodgeChance=0.995^(speedEffect+unarmed)
+		fullHP=fullHP/dodgeChance
+		--resistances
+		res={}
+		res[1]=t.Player:GetResistance(10)
+		res[2]=t.Player:GetResistance(11)
+		res[3]=t.Player:GetResistance(12)
+		res[4]=t.Player:GetResistance(13)
+		res[5]=t.Player:GetResistance(14)
+		res[6]=t.Player:GetResistance(15)
+		res[7]=math.min(res[1],res[2],res[3],res[4],res[5],res[6])
+		for i=1,7 do 
+			res[i]=1-1/2^(res[i]/100)
+		end
+		--calculation
+		reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
+		vitality=math.round(fullHP/reduction)	
 		
 		
-		
-		
-		
+		t.Text=string.format("%s\n\nVitality: %s",t.Text,StrColor(0,255,0,vitality))
 		
 		
 		
