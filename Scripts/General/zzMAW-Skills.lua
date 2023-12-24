@@ -901,7 +901,6 @@ function events.GetAttackDelay(t)
 	local correctedRecoveryTime = math.floor(100 / (1 + recoveryBonus / 100))
 	
 	t.Result = correctedRecoveryTime
-	
 	-- cap melee recovery
 	
 	if not t.Ranged then
@@ -1245,7 +1244,7 @@ function events.GameInitialized2()
 	Game.SkillDesMaster[const.Skills.Plate]=string.format("%s 10%% cover",Game.SkillDesMaster[const.Skills.Plate])
 	Game.SkillDesGM[const.Skills.Plate]=string.format("%s rec. pen. elim., 15%% cover",Game.SkillDesGM[const.Skills.Plate])
 	Game.SkillDesExpert[const.Skills.Shield]=string.format("%s recovery penalty eliminated",Game.SkillDesExpert[const.Skills.Shield])
-	Game.SkillDesGM[const.Skills.Shield]=string.format("%s halve dmg from phys projectiles\nGrants 15%% magic cover and each point in skill will increase max resistances by 0.25%%",Game.SkillDesGM[const.Skills.Shield])
+	Game.SkillDesGM[const.Skills.Shield]=string.format("%s halve dmg from phys projectiles\nGrants 15%% magic cover",Game.SkillDesGM[const.Skills.Shield])
 	Game.SkillDesMaster[const.Skills.Armsmaster]=string.format("Skills adds 2 damage to all melee weapons")
 	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s usable with Leather Armor",Game.SkillDesGM[const.Skills.Dodging])
 	Game.SkillDesGM[const.Skills.Unarmed]=string.format("%s 5+0.5%% dodge chance",Game.SkillDesGM[const.Skills.Unarmed])
