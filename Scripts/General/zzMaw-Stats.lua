@@ -286,7 +286,16 @@ function events.BuildStatInformationBox(t)
 		critDamage=bonus*3/2000
 		power=power*(1+bonus/1000) 
 		critChance=0.05+critChance
-		delay=Game.Spells[11].DelayGM
+		
+		if mastery==1 then
+			delay=Game.Spells[11].DelayNormal
+		elseif mastery==2 then
+			delay=Game.Spells[11].DelayExpert
+		elseif mastery==3 then
+			delay=Game.Spells[11].DelayMaster
+		elseif mastery==4 then
+			delay=Game.Spells[11].DelayGM
+		end
 		power=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/100))
 		
 		t.Text=string.format("%s\n\nPower: %s",t.Text,StrColor(255,0,0,power))
