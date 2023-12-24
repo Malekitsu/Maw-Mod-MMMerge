@@ -74,7 +74,7 @@ function events.CalcSpellDamage(t)
 	if data and data.Player then
 		intellect=data.Player:GetIntellect()	
 		personality=data.Player:GetPersonality()
-		critChance=data.Player:GetLuck()/15
+		critChance=data.Player:GetLuck()/1500
 		bonus=math.max(intellect,personality)
 		critDamage=bonus*3/2000
 		t.Result=t.Result*(1+bonus/1000) 
@@ -250,6 +250,49 @@ function events.BuildStatInformationBox(t)
 		t.Text=string.format("%s\n\nPhysical damage reduction from AC: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\nBlock chance vs same level monsters (up to 255): " .. StrColor(255,255,100,blockChance) .. StrColor(255,255,100,"%") .. "\n\nTotal average damage reduction: " .. StrColor(255,255,100,totRed) .. "%")
 	end
 	
+	if t.Stat==5234672 then
+		i=Game.CurrentPlayer
+		--get spell and its damage
+		spellIndex=Party[i].QuickSpell
+		if not spellPowers[spellIndex] then return end --if not an offensive spell return
+		spellTier=spellIndex%11
+		if spellTier==0 then
+			spellTier=11
+		end
+		if Party[i].LevelBase>=spellTier*8+152 then
+			diceMin=spellPowers160[spellIndex].diceMin
+			diceMax=spellPowers160[spellIndex].diceMax
+			damageAdd=spellPowers160[spellIndex].dmgAdd
+		elseif Party[i].LevelBase>=spellTier*8+72 then
+			diceMin=spellPowers80[spellIndex].diceMin
+			diceMax=spellPowers80[spellIndex].diceMax
+			damageAdd=spellPowers80[spellIndex].dmgAdd
+		else
+			diceMin=spellPowers[spellIndex].diceMin
+			diceMax=spellPowers[spellIndex].diceMax
+			damageAdd=spellPowers[spellIndex].dmgAdd
+		end
+		--calculate damage
+		--skill
+		skillType=math.floor(spellIndex/11)+12
+		skill, mastery=SplitSkill(Party[i]:GetSkill(skillType))
+		
+		power=damageAdd + skill*(diceMin+diceMax)/2
+		
+		intellect=Party[i]:GetIntellect()	
+		personality=Party[i]:GetPersonality()
+		critChance=Party[i]:GetLuck()/1500
+		bonus=math.max(intellect,personality)
+		critDamage=bonus*3/2000
+		power=power*(1+bonus/1000) 
+		critChance=0.05+critChance
+		delay=Game.Spells[11].DelayGM
+		power=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/100))
+		
+		t.Text=string.format("%s\n\nPower: %s",t.Text,StrColor(255,0,0,power))
+		
+	end
+	
 	if t.Stat==11 then
 		i=Game.CurrentPlayer
 		fullHP=Party[i]:GetFullHP()
@@ -285,17 +328,7 @@ function events.BuildStatInformationBox(t)
 		--calculation
 		reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
 		vitality=math.round(fullHP/reduction)	
-		
-		
 		t.Text=string.format("%s\n\nVitality: %s",t.Text,StrColor(0,255,0,vitality))
-		
-		
-		
-		
-		
-		
-		
-		
 	end
 	
 	if t.Stat==13 or t.Stat==14 then
