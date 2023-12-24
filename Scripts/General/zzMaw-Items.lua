@@ -67,13 +67,13 @@ function events.GameInitialized2()
 end
 
 --create enchant table
-encStrDown={1,1,3,6,10,15,20,24,28,32,36,40,44,48,52,56,60,64,68,76}
-encStrUp={3,5,8,12,17,25,30,35,40,45,50,55,60,65,70,75,80,85,90,100}
+encStrDown={1,1,3,6,10,15,20,24,28,32,36,40,44,48,52,56,60,64,68,76,84,92,105,120}
+encStrUp={3,5,8,12,17,25,30,35,40,45,50,55,60,65,70,75,80,85,90,100,110,120,135,150}
 
 
-enc1Chance={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80}
-enc2Chance={20,30,35,40,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60}
-spcEncChance={0,0,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40}
+enc1Chance={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84}
+enc2Chance={20,30,35,40,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64}
+spcEncChance={0,0,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44}
 
 primordialWeapEnchants={41,46}
 primordialArmorEnchants={1,2,80}
@@ -112,7 +112,15 @@ function events.ItemGenerated(t)
 		partyLevel1=math.min(math.floor(partyLevel/18),14)
 		--adjust loot Strength
 		ps1=t.Strength
-		pseudoStr=ps1+partyLevel1
+		
+		--difficulty settings
+		if Game.BolsterAmount==150 then
+			difficultyExtraPower=2
+		elseif Game.BolsterAmount==200 then
+			difficultyExtraPower=4	
+		end
+		
+		pseudoStr=ps1+partyLevel1+difficultyExtraPower
 		if math.random(1,18)>partyLevel1%18 then
 			pseudoStr=pseudoStr+1
 		end
