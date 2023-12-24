@@ -114,6 +114,7 @@ function events.ItemGenerated(t)
 		ps1=t.Strength
 		
 		--difficulty settings
+		difficultyExtraPower=0
 		if Game.BolsterAmount==150 then
 			difficultyExtraPower=2
 		elseif Game.BolsterAmount==200 then
