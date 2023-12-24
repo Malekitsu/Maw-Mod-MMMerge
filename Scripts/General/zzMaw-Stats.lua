@@ -55,14 +55,12 @@ function events.CalcDamageToPlayer(t)
 	--UNARMED bonus aswell
 	unarmed=0
 	Skill, Mas = SplitSkill(t.Player:GetSkill(const.Skills.Unarmed))
-	base=0
 	if Mas == 4 then
-		unarmed=Skill
-		base=0.05
+		unarmed=Skill+10
 	end
 	speed=t.Player:GetSpeed()
 	speedEffect=speed/10
-	dodgeChance=1-0.995^(speedEffect+unarmed)+base
+	dodgeChance=1-0.995^(speedEffect+unarmed)
 	roll=math.random()
 	if roll<=dodgeChance then
 		t.Result=0
@@ -170,14 +168,12 @@ function events.BuildStatInformationBox(t)
 		speed=Party[i]:GetSpeed()
 		unarmed=0
 		Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Unarmed))
-		base=0
 		if Mas == 4 then
-			unarmed=Skill
-			base=0.05
+			unarmed=Skill+10
 		end
 		speed=Party[i]:GetSpeed()
 		speedEffect=speed/10
-		dodgeChance=1-0.995^(speedEffect+unarmed)+base
+		dodgeChance=1-0.995^(speedEffect+unarmed)
 		t.Text=string.format("%s\n\nDodge chance: %s%s",Game.StatsDescriptions[5],math.floor(dodgeChance*1000)/10	,"%")
 	end
 	if t.Stat==6 then
