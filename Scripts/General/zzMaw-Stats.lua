@@ -667,14 +667,18 @@ local critAttackMsg = "%s critically hits %s for %lu damage!" .. string.char(0)
 local critShootMsg = "%s critically shoots %s for %lu points!" .. string.char(0)
 local critKillMsg = "%s critically inflicts %lu points killing %s!" .. string.char(0)
 
-local crit, dmg = false
-local function critProcHook(d)
-	local i, pl = internal.GetPlayer(u4[d.ebp - 0x8])
-	crit, dmg = crit, dmg
-	if not crit then return end
-	d.eax = dmg
+local function isCrit()
+	if crit then
+		crit=false
+		return true
+	end
 end
 
+	
+local crit = false
+local function critProcHook(d)
+	crit = isCrit()
+end
 autohook2(0x43703F, critProcHook) -- shoot (ranged)
 autohook2(0x437148, critProcHook) -- spell
 autohook2(0x437243, critProcHook) -- melee attack
