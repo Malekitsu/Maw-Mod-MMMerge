@@ -254,7 +254,59 @@ function events.BuildStatInformationBox(t)
 		i=Game.CurrentPlayer
 		--get spell and its damage
 		spellIndex=Party[i].QuickSpell
-		if not spellPowers[spellIndex] then return end --if not an offensive spell return
+		
+		--if not an offensive spell then calculate highest between melee and ranged
+		if not spellPowers[spellIndex] then 
+			--MELEE
+			local i=Game.CurrentPlayer
+			local low=Party[i]:GetMeleeDamageMin()
+			local high=Party[i]:GetMeleeDamageMax()
+			local might=Party[i]:GetMight()
+			local accuracy=Party[i]:GetAccuracy()
+			local luck=Party[i]:GetLuck()
+			local delay=Party[i]:GetAttackDelay()
+			local dmg=(low+high)/2
+			--hit chance
+			local atk=Party[i]:GetMeleeAttack()
+			local lvl=Party[i].LevelBase
+			local hitChance= (15+atk*2)/(30+atk*2+lvl)
+			local daggerCritBonus=0
+			for v=0,1 do
+				if Party[i]:GetActiveItem(v) then
+					itSkill=Party[i]:GetActiveItem(v):T().Skill
+					if itSkill==2 then
+						s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Dagger))
+						if m>2 then
+							daggerCritBonus=daggerCritBonus+0.025+0.005*s
+						end
+					end
+				end
+			end
+			DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
+			
+			--RANGED
+			local low=Party[i]:GetRangedDamageMin()
+			local high=Party[i]:GetRangedDamageMax()
+			local accuracy=Party[i]:GetAccuracy()
+			local luck=Party[i]:GetLuck()
+			local delay=Party[i]:GetAttackDelay(true)
+			local dmg=(low+high)/2
+			--hit chance
+			local atk=Party[i]:GetRangedAttack()
+			local lvl=Party[i].LevelBase
+			local hitChance= (15+atk*2)/(30+atk*2+lvl)
+			local DPS2=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
+			local s,m=SplitSkill(Party[i].Skills[const.Skills.Bow])
+			if m>=3 then
+				DPS2=DPS2*2
+			end
+			power=math.max(DPS1,DPS2)
+			
+			t.Text=string.format("%s\n\nPower: %s",t.Text,StrColor(255,0,0,power))
+			return
+		end
+		
+		--SPELLS
 		spellTier=spellIndex%11
 		if spellTier==0 then
 			spellTier=11
@@ -303,50 +355,51 @@ function events.BuildStatInformationBox(t)
 	end
 	
 	if t.Stat==5234672 then
-		i=Game.CurrentPlayer
-		fullHP=Party[i]:GetFullHP()
+		local i=Game.CurrentPlayer
+		local fullHP=Party[i]:GetFullHP()
 		--AC
-		ac=Party[i]:GetArmorClass()
-		acReduction=1-1/(ac/300+1)
-		lvl=math.min(Party[i].LevelBase, 255)
-		blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
-		ACRed= 1 - (1-blockChance)*(1-acReduction)
+		local ac=Party[i]:GetArmorClass()
+		local acReduction=1-1/(ac/300+1)
+		local lvl=math.min(Party[i].LevelBase, 255)
+		local blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
+		local ACRed= 1 - (1-blockChance)*(1-acReduction)
 		--speed
-		speed=Party[i]:GetSpeed()
-		unarmed=0
-		Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Unarmed))
+		local speed=Party[i]:GetSpeed()
+		local unarmed=0
+		local Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Unarmed))
 		if Mas == 4 then
 			unarmed=Skill+10
 		end
-		speed=Party[i]:GetSpeed()
-		speedEffect=speed/10
-		dodgeChance=0.995^(speedEffect+unarmed)
-		fullHP=fullHP/dodgeChance
+		local speed=Party[i]:GetSpeed()
+		local speedEffect=speed/10
+		local dodgeChance=0.995^(speedEffect+unarmed)
+		local fullHP=fullHP/dodgeChance
 		--resistances
-		res={}
-		res[1]=t.Player:GetResistance(10)
-		res[2]=t.Player:GetResistance(11)
-		res[3]=t.Player:GetResistance(12)
-		res[4]=t.Player:GetResistance(13)
-		res[5]=t.Player:GetResistance(14)
-		res[6]=t.Player:GetResistance(15)
+		res={
+			[1]=t.Player:GetResistance(10),
+			[2]=t.Player:GetResistance(11),
+			[3]=t.Player:GetResistance(12),
+			[4]=t.Player:GetResistance(13),
+			[5]=t.Player:GetResistance(14),
+			[6]=t.Player:GetResistance(15),
+		}
 		res[7]=math.min(res[1],res[2],res[3],res[4],res[5],res[6])
 		for i=1,7 do 
 			res[i]=1-1/2^(res[i]/100)
 		end
 		--calculation
-		reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
+		local reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
 		vitality=math.round(fullHP/reduction)	
 		t.Text=string.format("%s\n\nVitality: %s",t.Text,StrColor(0,255,0,vitality))
 	end
 	
 	if t.Stat==13 or t.Stat==14 then
-		bolsterLevel8=vars.MM7LVL+vars.MM6LVL
-		bolsterLevel7=vars.MM8LVL+vars.MM6LVL
-		bolsterLevel6=vars.MM8LVL+vars.MM7LVL
-		bolsterLevel8=math.max(bolsterLevel8*0.95-4,0)
-		bolsterLevel7=math.max(bolsterLevel7*0.95-4,0)
-		bolsterLevel6=math.max(bolsterLevel6*0.95-4,0)
+		local bolsterLevel8=vars.MM7LVL+vars.MM6LVL
+		local bolsterLevel7=vars.MM8LVL+vars.MM6LVL
+		local bolsterLevel6=vars.MM8LVL+vars.MM7LVL
+		local bolsterLevel8=math.max(bolsterLevel8*0.95-4,0)
+		local bolsterLevel7=math.max(bolsterLevel7*0.95-4,0)
+		local bolsterLevel6=math.max(bolsterLevel6*0.95-4,0)
 		t.Text=t.Text .."\n\nLevels gained in MM6: " .. StrColor(255,255,153,math.round(vars.MM6LVL*100)/100) .. "\nLevels gained in MM7: " .. StrColor(255,255,153,math.round(vars.MM7LVL*100)/100) .. "\nLevels gained in MM8: " .. StrColor(255,255,153,math.round(vars.MM8LVL*100)/100) .. "\n\nBolster Level in MM6: " .. StrColor(255,255,153,math.round(bolsterLevel6)) .."\nBolster Level in MM7: " .. StrColor(255,255,153,math.round(bolsterLevel7)) .."\nBolster Level in MM8: " .. StrColor(255,255,153,math.round(bolsterLevel8))
 	end
 	if t.Stat==15 then
@@ -412,7 +465,7 @@ function events.BuildStatInformationBox(t)
 		local might=Party[i]:GetMight()
 		local accuracy=Party[i]:GetAccuracy()
 		local luck=Party[i]:GetLuck()
-		local delay=Party[i]:GetAttackDelay()
+		local delay=Party[i]:GetAttackDelay(true)
 		local dmg=(low+high)/2
 		--hit chance
 		local atk=Party[i]:GetRangedAttack()
