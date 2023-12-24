@@ -114,21 +114,21 @@ function events.ItemGenerated(t)
 		ps1=t.Strength
 		
 		--difficulty settings
-		difficultyExtraPower=0
+		difficultyExtraPower=1
 		if Game.BolsterAmount==150 then
-			difficultyExtraPower=2
+			difficultyExtraPower=1.3
 		elseif Game.BolsterAmount==200 then
-			difficultyExtraPower=4	
+			difficultyExtraPower=1.6	
 		end
 		
-		pseudoStr=ps1+partyLevel1+difficultyExtraPower
+		pseudoStr=ps1+partyLevel1
 		if math.random(1,18)>partyLevel1%18 then
-			pseudoStr=pseudoStr+1
+			pseudoStr=pseudoStr
 		end
 		if pseudoStr==1 then 
 			return 
 		end
-		pseudoStr=math.min(pseudoStr,#encStrDown)
+		pseudoStr=math.min(pseudoStr,20) --CAP CURRENTLY AT 20
 		roll1=math.random(1,100)
 		roll2=math.random(1,100)
 		rollSpc=math.random(1,100)
@@ -136,7 +136,7 @@ function events.ItemGenerated(t)
 		--apply enchant1
 		if enc1Chance[pseudoStr]>roll1 then
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
+			t.Item.BonusStrength=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])*difficultyExtraPower
 			if math.random(1,10)==10 then
 				t.Item.Bonus=math.random(17,24)
 				t.Item.BonusStrength=math.ceil(t.Item.BonusStrength^0.5)
@@ -145,7 +145,7 @@ function events.ItemGenerated(t)
 		--apply enchant2
 		if enc2Chance[pseudoStr]>roll2 then
 			t.Item.Charges=math.random(1,16)*1000
-			t.Item.Charges=t.Item.Charges+math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
+			t.Item.Charges=t.Item.Charges+math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])*difficultyExtraPower
 			--[[ no skill bonuses
 			if math.random(1,10)==10 then
 				t.Item.Charges=math.random(17,24)*1000
@@ -166,9 +166,9 @@ function events.ItemGenerated(t)
 		ancientRoll=math.random()
 		if ancientRoll<=ancientChance then
 			ancient=true
-			t.Item.Charges=math.random(math.round(encStrUp[pseudoStr]+1),math.round(encStrUp[pseudoStr]*1.25))+math.random(1,16)*1000
+			t.Item.Charges=math.random(math.round(encStrUp[pseudoStr]+1),math.round(encStrUp[pseudoStr]*1.25))*difficultyExtraPower+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.random(math.round(encStrUp[pseudoStr]+1),math.round(encStrUp[pseudoStr]*1.25))
+			t.Item.BonusStrength=math.random(math.round(encStrUp[pseudoStr]+1),math.round(encStrUp[pseudoStr]*1.25))*difficultyExtraPower
 			power=2
 			chargesBonus=math.random(1,5)
 			t.Item.MaxCharges=t.Item.MaxCharges+chargesBonus
@@ -205,9 +205,9 @@ function events.ItemGenerated(t)
 				t.Item.MaxCharges=t.Item.MaxCharges-chargesBonus
 			end
 			t.Item.BonusExpireTime=2
-			t.Item.Charges=math.round(encStrUp[pseudoStr]*1.25)+math.random(1,16)*1000
+			t.Item.Charges=math.round(encStrUp[pseudoStr]*1.25)*difficultyExtraPower+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.round(encStrUp[pseudoStr]*1.25)
+			t.Item.BonusStrength=math.round(encStrUp[pseudoStr]*1.25)*difficultyExtraPower
 			t.Item.MaxCharges=t.Item.MaxCharges+5
 			--apply special enchant
 			n=t.Item.Number
@@ -239,16 +239,7 @@ function events.ItemGenerated(t)
 		if t.Item:T().EquipStat == 1 then
 			t.Item.BonusStrength=t.Item.BonusStrength*2
 			t.Item.Charges=t.Item.Charges+t.Item.Charges%1000
-		end
-		--nerf magic resistance a bit
-		if math.floor(t.Item.Charges/1000)>10 then
-			originalBonus=t.Item.Charges%1000
-			t.Item.Charges=t.Item.Charges-originalBonus+originalBonus^0.7*2
-		end
-		if t.Item.Bonus>10 and t.Item.Bonus<=16 then
-			t.Item.BonusStrength=t.Item.BonusStrength^0.7*2
-		end
-		
+		end		
 	end
 end
 
@@ -548,21 +539,12 @@ function events.BuildItemInformationBox(t)
 			--add code to build enchant list
 			t.Enchantment=""
 			if t.Item.Bonus>0 then
-				if t.Item.Bonus>=11 and t.Item.Bonus<=16 then --% values for resistances
-					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. t.Item.BonusStrength*2
-				else
-					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. t.Item.BonusStrength
-				end
+				t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. t.Item.BonusStrength
 			end
 			if t.Item.Charges>1000 then
 				local bonus=math.floor(t.Item.Charges/1000)
 				local strength=t.Item.Charges%1000
-				if bonus>=11 and bonus<=16 then --% values for resistances
-					strength=strength
-					t.Enchantment = itemStatName[bonus] .. " +" .. strength*2 .. "\n" .. t.Enchantment
-				else
-					t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
-				end
+				t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
 			end
 		elseif t.Name then
 			--add enchant Name
@@ -940,7 +922,7 @@ function checktext(MaxCharges,bonus2)
 		mult=2+2*(MaxCharges-20)/20
 	end
 	bonus2txt={
-		[1] =  " +" .. math.floor(bonusEffects[1].statModifier * mult)/2 .. "% to all Resistances.",
+		[1] =  " +" .. math.floor(bonusEffects[1].statModifier * mult) .. " to all Resistances.",
 		[2] = " +" .. math.floor(bonusEffects[2].statModifier * mult) .. " to all Seven Statistics.",
 		[4] ="Adds " .. math.floor(6*mult) .. "-" .. math.floor(8*mult) .. " points of Cold damage. (Increases also spell damage)",
 		[5] ="Adds " .. math.floor(18*mult) .. "-" .. math.floor(24*mult) .. " points of Cold damage. (Increases also spell damage)",
@@ -973,7 +955,7 @@ function checktext(MaxCharges,bonus2)
 		[47] = " +" .. math.floor(bonusEffects[47].statModifier * mult) .. " Spell points and Regenerate Spell points over time.",
 		[48] = " +" .. math.floor(bonusEffects[48].statModifier[1] * mult) .. " Endurance and" .. " +" .. math.floor(bonusEffects[48].statModifier[2] * mult).. " Armor.",
 		[49] = " +" .. math.floor(bonusEffects[49].statModifier * mult) .. " Intellect and Luck.",
-		[50] = " +" .. math.floor(bonusEffects[50].statModifier * mult) .. "% Fire Resistance and Regenerate Hit points over time.",
+		[50] = " +" .. math.floor(bonusEffects[50].statModifier * mult) .. " Fire Resistance and Regenerate Hit points over time.",
 		[51] = " +" .. math.floor(bonusEffects[51].statModifier * mult) .. " Spell points, Speed, Intellect.",
 		[52] = " +" .. math.floor(bonusEffects[52].statModifier * mult) .. " Endurance and Accuracy.",
 		[53] = " +" .. math.floor(bonusEffects[53].statModifier * mult) .. " Might and Personality.",
@@ -1012,14 +994,16 @@ function events.CalcItemValue(t)
 			bonus1=bonus1/2
 		elseif t.Item.Bonus==10 then
 			bonus1=bonus1*2
-		elseif t.Item.Bonus>10 and t.Item.Bonus<=16 then
-			bonus1=bonus1^1.177
 		elseif t.Item.Bonus>16 and t.Item.Bonus<=24 then
 			bonus1=(bonus1/100)^2*100
 		end
+		
 		bonus2=(t.Item.Charges%1000)*100
-		if math.floor(t.Item.Charges/1000)==8 or math.floor(t.Item.Charges/1000)==9 then
-			bonus1=bonus1/2
+		bonus2Type=math.floor(t.Item.Charges/1000)
+		if bonus2Type==8 or bonus2Type==9 then
+			bonus2=bonus2/2
+		elseif bonus2Type==10 then
+			bonus2=bonus2*2
 		end
 		
 		MaxCharges=t.Item.MaxCharges
@@ -1028,6 +1012,7 @@ function events.CalcItemValue(t)
 		else
 			mult=2+2*(MaxCharges-20)/20
 		end
+		
 		basePrice=basePrice*mult
 		if t.Item.Bonus2>0 and t.Item.BonusExpireTime<Game.Time then
 			special=Game.SpcItemsTxt[t.Item.Bonus2-1].Value
