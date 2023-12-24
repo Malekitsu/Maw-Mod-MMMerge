@@ -503,43 +503,8 @@ function events.CalcDamageToPlayer(t)
 	end
 end
 
---double resistance from items rating
+--add luck to resistances
 function events.CalcStatBonusByItems(t)
-	for it in t.Player:EnumActiveItems() do
-		if t.Stat == const.Stats.FireResistance and it.Bonus==11 then
-			t.Result = t.Result+it.BonusStrength
-		end
-		if t.Stat == const.Stats.AirResistance and it.Bonus==12 then
-			t.Result = t.Result+it.BonusStrength
-		end
-		if t.Stat == const.Stats.WaterResistance and it.Bonus==13 then
-			t.Result = t.Result+it.BonusStrength
-		end
-		if t.Stat == const.Stats.EarthResistance and it.Bonus==14 then
-			t.Result = t.Result+it.BonusStrength
-		end
-		if t.Stat == const.Stats.MindResistance and it.Bonus==15 then
-			t.Result = t.Result+it.BonusStrength
-		end
-		if t.Stat == const.Stats.BodyResistance and it.Bonus==16 then
-			t.Result = t.Result+it.BonusStrength
-		end
-	end
-	
-	--add bonus2
-	for it in t.Player:EnumActiveItems() do
-		if it.Bonus2==1 and t.Stat>=10 and t.Stat<=15 then
-			t.Result=t.Result
-		end
-		if it.Bonus2==42 and t.Stat>=10 and t.Stat<=15 then
-			t.Result=t.Result+1
-		end
-		if it.Bonus2==50 and t.Stat==10 then
-			t.Result=t.Result+30
-		end
-	end
-	
-	--add luck to resistances
 	if t.Stat>=10 and t.Stat<=15 then
 		luck=t.Player:GetLuck()
 		if luck<=21 then
@@ -642,7 +607,26 @@ damageKindMap={
 	[10]=const.Damage.Dark,
 }
 function events.CalcDamageToMonster(t)
-	
+	--difficulty setting
+	if Game.BolsterAmount%50~=0 or Game.BolsterAmount==0 then
+		Game.BolsterAmount=100
+	end
+	--easy
+	if Game.BolsterAmount==50 then
+		t.Result=t.Result*1.5
+	end
+	--MAW
+	if Game.BolsterAmount==100 then
+		t.Result=t.Result*1
+	end
+	--Hard
+	if Game.BolsterAmount==150 then
+		t.Result=t.Result/1.4
+	end
+	--Hell
+	if Game.BolsterAmount==200 then
+		t.Result=t.Result/1.8
+	end
 	
 	index=table.find(damageKindMap,t.DamageKind)
 	res=t.Monster.Resistances[index]
