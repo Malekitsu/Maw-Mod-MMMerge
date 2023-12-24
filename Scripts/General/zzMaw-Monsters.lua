@@ -1280,3 +1280,13 @@ function events.BuildMonsterInformationBox(t)
 	end
 end
 
+--disable bolster
+function events.LoadMap()
+	vars.ExtraSettings.UseMonsterBolster=false
+	Game.UseMonsterBolster=false
+end
+
+--disable base monster Resistances
+function events.CalcDamageToMonster(t)
+	t.Result=t.Damage
+end
