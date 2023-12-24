@@ -446,27 +446,6 @@ function events.CalcDamageToPlayer(t)
 		penaltyLevel=math.round(penaltyLevel/5)*5
 		penalty=math.min(penaltyLevel,100)
 		res=res-penalty
-		--put here code to change max res
-		--max resistance enchants are no longer used
-		--[[
-		maxres=75
-		for it in t.Player:EnumActiveItems() do
-			if it.Bonus2==damageKindToMaxResistanceEnchant[t.DamageKind] then
-				maxres=maxres+5+math.round(it.MaxCharges/8)
-			elseif it.Bonus2==80 then
-				maxres=maxres+2+math.round(it.MaxCharges/20)
-			end
-		end
-		local it=t.Player:GetActiveItem(0)
-		if it and Game.ItemsTxt[it.Number].Skill==8 then 
-			local shield=t.Player.Skills[const.Skills.Shield]
-			local s,m=SplitSkill(shield)
-			if m==4 then 
-				maxres=maxres+0.25*s
-			end
-		end
-		maxres=math.min(maxres,90)
-		]]
 		res=1-1/2^(res/100)
 		--fix for multiplayer
 		local REMOTE_OWNER_BIT = 0x800
@@ -499,7 +478,28 @@ function events.CalcDamageToPlayer(t)
 			end
 			dmgMult=(levelMult/12+1)*((levelMult+2)/(oldLevel+2))
 			t.Result=t.Result*dmgMult
-		end		
+		end
+	end
+	
+	--add difficulty related damage
+	if Game.BolsterAmount%50~=0 or Game.BolsterAmount==0 then
+		Game.BolsterAmount=100
+	end
+	--easy
+	if Game.BolsterAmount==50 then
+		t.Result=t.Result*0.7
+	end
+	--MAW
+	if Game.BolsterAmount==100 then
+		t.Result=t.Result*1
+	end
+	--Hard
+	if Game.BolsterAmount==150 then
+		t.Result=t.Result*1.5
+	end
+	--Hell
+	if Game.BolsterAmount==200 then
+		t.Result=t.Result*2
 	end
 end
 
@@ -626,6 +626,37 @@ function events.Tick()
 		Game.GlobalTxt[29]="Body"
 		statsChanged=false
 	end
+end
+
+
+damageKindMap={
+	[0]=const.Damage.Fire,
+	[1]=const.Damage.Air,
+	[2]=const.Damage.Water,
+	[3]=const.Damage.Earth,
+	[4]=const.Damage.Phys,
+	[6]=const.Damage.Spirit,
+	[7]=const.Damage.Mind,
+	[8]=const.Damage.Body,
+	[9]=const.Damage.Light,
+	[10]=const.Damage.Dark,
+}
+function events.CalcDamageToMonster(t)
+	
+	
+	index=table.find(damageKindMap,t.DamageKind)
+	res=t.Monster.Resistances[index]
+	if not res then return end
+	
+	res=1-1/2^(res/100)
+	--randomize resistance
+	if res>0 then
+		--local roll=(math.random()+math.random())-1
+		--res=math.max(0, res+(math.min(res,1-res)*roll))
+	end
+	--apply Damage
+	t.Result = t.Result * (1-res)
+	
 end
 
 --stats breakpoints
