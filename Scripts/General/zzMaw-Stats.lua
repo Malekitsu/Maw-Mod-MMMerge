@@ -666,8 +666,10 @@ function events.CalcStatBonusByItems(t)
 		luck=t.Player:GetLuck()
 		if luck<=21 then
 			luck=(luck-1)/2-6
-		else
+		elseif luck<=100 then
 			luck=math.floor(luck/5)
+		else
+			luck=math.floor(luck/10)+10
 		end
 		t.Result=t.Result+luck
 	end	
