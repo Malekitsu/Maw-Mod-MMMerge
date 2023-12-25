@@ -1776,6 +1776,8 @@ function events.BuildItemInformationBox(t)
 			
 			--add item base AC
 			
+			newAC=newAC+getNewArmor(t.Item)-getNewArmor(it)
+			
 			--calculate new HP
 			newEndurance=Party[index]:GetEndurance()+newEnd
 			if newEndurance<=21 then
@@ -1934,4 +1936,33 @@ function calculateStatsAdd(item, stats)
 		end
 	end	
 	return statValue
+end
+
+function getNewArmor(it)
+	local txt=it:T()
+	local charges=it.MaxCharges
+	if txt.EquipStat>=3 and txt.EquipStat<=9 then
+		local ac3=txt.Mod2+txt.Mod1DiceCount
+		local n=it.Number
+		if charges>0 then
+			if ac3>0 then
+				local lookup=0
+				while txt.NotIdentifiedName==Game.ItemsTxt[n+lookup+1].NotIdentifiedName do 
+					lookup=lookup+1
+				end
+				local ac=txt.Mod2+txt.Mod1DiceCount 
+				local ac2=Game.ItemsTxt[n+lookup].Mod2+Game.ItemsTxt[n+lookup].Mod1DiceCount 
+				local bonusAC=ac2*(charges/20)
+				if charges <= 20 then
+					ac3=ac3+math.round(bonusAC)
+				else
+					local bonusAC=(ac+ac2)*(charges/20)
+					ac3=ac3+math.round(bonusAC)
+				end				
+			end
+		end
+		return ac3	
+	else
+		return 0
+	end
 end
