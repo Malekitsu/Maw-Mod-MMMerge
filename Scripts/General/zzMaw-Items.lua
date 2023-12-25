@@ -1518,11 +1518,11 @@ function events.BuildItemInformationBox(t)
 				--hit chance
 				atk=Party[i]:GetRangedAttack()
 				hitChance= (15+atk*2)/(30+atk*2+lvl)
-				DPS2=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
 				s,m=SplitSkill(Party[i].Skills[const.Skills.Bow])
 				if m>=3 then
-					DPS2=DPS2*2
+					dmg=dmg*2
 				end
+				DPS2=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
 				if DPS1>DPS2 then
 					power=DPS1
 					powerType="Melee"
@@ -1669,7 +1669,7 @@ function events.BuildItemInformationBox(t)
 				if powerType=="Melee" then
 					delay=math.max(Party[i]:GetAttackDelay(),30)
 				else
-					delay=math.max(Party[i]:GetAttackDelay(true),30)
+					delay=Party[i]:GetAttackDelay(true)
 				end
 				recoveryBonus=recoveryBonus+newSpeed-oldSpeed
 				
@@ -1743,12 +1743,12 @@ function events.BuildItemInformationBox(t)
 			fullHP=fullHP/dodgeChance
 			--resistances
 			res={
-				[1]=Party[i]:GetResistance(10),
-				[2]=Party[i]:GetResistance(11),
-				[3]=Party[i]:GetResistance(12),
-				[4]=Party[i]:GetResistance(13),
-				[5]=Party[i]:GetResistance(14),
-				[6]=Party[i]:GetResistance(15),
+				[1]=math.min(Party[i]:GetResistance(10),400),
+				[2]=math.min(Party[i]:GetResistance(11),400),
+				[3]=math.min(Party[i]:GetResistance(12),400),
+				[4]=math.min(Party[i]:GetResistance(13),400),
+				[5]=math.min(Party[i]:GetResistance(14),400),
+				[6]=math.min(Party[i]:GetResistance(15),400),
 			}
 			res[7]=math.min(res[1],res[2],res[3],res[4],res[5],res[6])
 			for i=1,7 do 
@@ -1802,9 +1802,9 @@ function events.BuildItemInformationBox(t)
 			HPScaling=Game.Classes.HPFactor[Party[i].Class]
 			
 			--remove old
-			fullHP=math.round(Party[i]:GetFullHP()/(1+Party[i]:GetEndurance()/1000)-oldEndEff*HPScaling)
+			fullHP=Party[i]:GetFullHP()/(1+Party[i]:GetEndurance()/1000)-oldEndEff*HPScaling
 			--add new 
-			fullHP=math.round(fullHP+newHP+newEndEff*HPScaling)
+			fullHP=fullHP+newHP+newEndEff*HPScaling
 			
 			fullHP=math.round((fullHP+newHP)*(1+(Party[i]:GetEndurance()+newEnd)/1000))
 			
@@ -1829,23 +1829,27 @@ function events.BuildItemInformationBox(t)
 			oldLuck=Party[index]:GetLuck()
 			if oldLuck<=21 then
 				oldLuckEff=(oldLuck-13)/2
-			else
+			elseif oldLuck<=100 then
 				oldLuckEff=math.floor(oldLuck/5)
+			else
+				oldLuckEff=math.floor(oldLuck/10)+10
 			end
 			luck=Party[index]:GetLuck()+newLuck
 			if luck<=21 then
 				newLuckEff=(luck-13)/2
+			elseif oldLuck<=100 then
+				newLuckEff=math.floor(oldLuck/5)
 			else
-				newLuckEff=math.floor(luck/5)
+				newLuckEff=math.floor(oldLuck/10)+10
 			end
 			luckChanged=newLuckEff-oldLuckEff
 			res={
-				[1]=Party[i]:GetResistance(10)+newFire+luckChanged,
-				[2]=Party[i]:GetResistance(11)+newAir+luckChanged,
-				[3]=Party[i]:GetResistance(12)+newWater+luckChanged,
-				[4]=Party[i]:GetResistance(13)+newEarth+luckChanged,
-				[5]=Party[i]:GetResistance(14)+newMind+luckChanged,
-				[6]=Party[i]:GetResistance(15)+newBody+luckChanged,
+				[1]=math.min(Party[i]:GetResistance(10)+newFire+luckChanged,400),
+				[2]=math.min(Party[i]:GetResistance(11)+newAir+luckChanged,400),
+				[3]=math.min(Party[i]:GetResistance(12)+newWater+luckChanged,400),
+				[4]=math.min(Party[i]:GetResistance(13)+newEarth+luckChanged,400),
+				[5]=math.min(Party[i]:GetResistance(14)+newMind+luckChanged,400),
+				[6]=math.min(Party[i]:GetResistance(15)+newBody+luckChanged,400),
 			}
 			res[7]=math.min(res[1],res[2],res[3],res[4],res[5],res[6])
 			for i=1,7 do 
