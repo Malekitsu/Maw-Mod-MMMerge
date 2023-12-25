@@ -1721,8 +1721,160 @@ function events.BuildItemInformationBox(t)
 				t.Description = t.Description .. "\n\n" .. "Power: " .. StrColor(0,255,0,"+") .. StrColor(0,255,0,newPower) .. " (" .. StrColor(0,255,0,"+") .. StrColor(0,255,0,percentage) .. "%)"
 			end
 			
+			--vitality calculation
+			--old vitality
+			local fullHP=Party[i]:GetFullHP()
+			--AC
+			local ac=Party[i]:GetArmorClass()
+			local acReduction=1-1/(ac/300+1)
+			local lvl=math.min(Party[i].LevelBase, 255)
+			local blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
+			local ACRed= 1 - (1-blockChance)*(1-acReduction)
+			--speed
+			local speed=Party[i]:GetSpeed()
+			local unarmed=0
+			local Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Unarmed))
+			if Mas == 4 then
+				unarmed=Skill+10
+			end
+			local speed=Party[i]:GetSpeed()
+			local speedEffect=speed/10
+			local dodgeChance=0.995^(speedEffect+unarmed)
+			local fullHP=fullHP/dodgeChance
+			--resistances
+			res={
+				[1]=Party[i]:GetResistance(10),
+				[2]=Party[i]:GetResistance(11),
+				[3]=Party[i]:GetResistance(12),
+				[4]=Party[i]:GetResistance(13),
+				[5]=Party[i]:GetResistance(14),
+				[6]=Party[i]:GetResistance(15),
+			}
+			res[7]=math.min(res[1],res[2],res[3],res[4],res[5],res[6])
+			for i=1,7 do 
+				res[i]=1-1/2^(res[i]/100)
+			end
+			--calculation
+			local reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
+			oldVitality=math.round(fullHP/reduction)	
+			
+			--check for stats changes
+			stats={4,6,7,8,10,11,12,13,14,15,16}	
+			end1, speed1, luck1, hp1, ac1, fire1, air1, water1, earth1, mind1, body1 = unpack(calculateStatsAdd(t.Item, stats))
+			end2, speed2, luck2, hp2, ac2, fire2, air2, water2, earth2, mind2, body2 = unpack(calculateStatsAdd(it, stats))
+			newEnd=end1-end2
+			newSpeed=speed1-speed2
+			newLuck=luck1-luck2
+			newHP=hp1-hp2
+			newAC=ac1-ac2
+			newFire=fire1-fire2
+			newAir=air1-air2
+			newWater=water1-water2
+			newEarth=earth1-earth2
+			newMind=mind1-mind2
+			newBody=body1-body2
+			
+			--calculate new HP
+			newEndurance=Party[index]:GetEndurance()+newEnd
+			if newEndurance<=21 then
+				newEndEff=(newEndurance-13)/2
+			else
+				newEndEff=math.floor(newEndurance/5)
+			end
 			
 			
+			level=Party[i]:GetLevel()+newEndEff
+			if t.Item.Bonus2==25 then
+				level=level+5
+			end
+			if it.Bonus2==25 then
+				level=level-5
+			end
+			HPScaling=Game.Classes.HPFactor[Party[i].Class]
+			
+			skill=Party[index].Skills[const.Skills.Bodybuilding]
+			s,m=SplitSkill(skill)
+			if m==4 then
+				m=5
+			end
+			BBHP=HPScaling*s*m+s^2/2
+			
+			itemHP=0
+			for it in Party[i]:EnumActiveItems() do
+				if math.floor(it.Charges/1000)==8 then
+					itemHP=itemHP+it.Charges%100
+				end
+				if it.Bonus==8 then
+					itemHP=itemHP+it.BonusStrength
+				end
+				MaxCharges=it.MaxCharges
+				if MaxCharges <= 20 then
+					mult=1+MaxCharges/20
+				else
+					mult=2+2*(MaxCharges-20)/20
+				end
+
+				b2=bonusEffects[it.Bonus2]
+				if b2 then
+					if b2.bonusValues then 
+						for v=1,#b2.bonusValues do
+							if b2.bonusValues[v]==8 then
+								itemHP=itemHP+math.floor(b2.statModifier*mult)
+							end
+						end
+					elseif b2.bonusRange then
+						if b2.bonusRange[1]<=8 and b2.bonusRange[2]>=8 then
+							itemHP=itemHP+math.floor(b2.statModifier*mult)
+						end
+					end
+				end
+				
+			end
+			
+			
+			
+			fullHP=math.round((Game.Classes.HPBase[Party[i].Class]+level*HPScaling+newHP+BBHP+itemHP)*(1+newEndurance/1000))
+			
+			ac=Party[i]:GetArmorClass()+newAC
+			acReduction=1-1/(ac/300+1)
+			lvl=math.min(Party[i].LevelBase, 255)
+			blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
+			ACRed= 1 - (1-blockChance)*(1-acReduction)
+			--speed
+			speed=Party[i]:GetSpeed()+newSpeed
+			unarmed=0
+			Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Unarmed))
+			if Mas == 4 then
+				unarmed=Skill+10
+			end
+			speed=Party[i]:GetSpeed()+newSpeed
+			speedEffect=speed/10
+			dodgeChance=0.995^(speedEffect+unarmed)
+			fullHP=fullHP/dodgeChance
+			--resistances
+			res={
+				[1]=Party[i]:GetResistance(10)+newFire,
+				[2]=Party[i]:GetResistance(11)+newAir,
+				[3]=Party[i]:GetResistance(12)+newWater,
+				[4]=Party[i]:GetResistance(13)+newEarth,
+				[5]=Party[i]:GetResistance(14)+newMind,
+				[6]=Party[i]:GetResistance(15)+newBody,
+			}
+			res[7]=math.min(res[1],res[2],res[3],res[4],res[5],res[6])
+			for i=1,7 do 
+				res[i]=1-1/2^(res[i]/100)
+			end
+			--calculation
+			reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
+			vitality=math.round(fullHP/reduction)	
+			
+			newVitality=vitality-oldVitality
+			percentage=math.round((vitality/oldVitality-1)*10000)/100
+			if newVitality<0 then
+				t.Description = t.Description .. "\n\n" .. "Vitality: " .. StrColor(255,0,0,newVitality) .. " (" .. StrColor(255,0,0,percentage) .. "%)"
+			elseif newVitality>0 then
+				t.Description = t.Description .. "\n\n" .. "Vitality: " .. StrColor(0,255,0,"+") .. StrColor(0,255,0,newVitality) .. " (" .. StrColor(0,255,0,"+") .. StrColor(0,255,0,percentage) .. "%)"
+			end
 		end
 	end
 end
