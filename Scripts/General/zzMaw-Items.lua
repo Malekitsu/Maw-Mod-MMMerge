@@ -1490,7 +1490,7 @@ function events.BuildItemInformationBox(t)
 				might=Party[i]:GetMight()
 				accuracy=Party[i]:GetAccuracy()
 				luck=Party[i]:GetLuck()
-				delay=Party[i]:GetAttackDelay()
+				delay=math.max(Party[i]:GetAttackDelay(),30)
 				dmg=(low+high)/2
 				--hit chance
 				atk=Party[i]:GetMeleeAttack()
@@ -1723,24 +1723,24 @@ function events.BuildItemInformationBox(t)
 			
 			--vitality calculation
 			--old vitality
-			local fullHP=Party[i]:GetFullHP()
+			fullHP=Party[i]:GetFullHP()
 			--AC
-			local ac=Party[i]:GetArmorClass()
-			local acReduction=1-1/(ac/300+1)
-			local lvl=math.min(Party[i].LevelBase, 255)
-			local blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
-			local ACRed= 1 - (1-blockChance)*(1-acReduction)
+			ac=Party[i]:GetArmorClass()
+			acReduction=1-1/(ac/300+1)
+			lvl=math.min(Party[i].LevelBase, 255)
+			blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
+			ACRed= 1 - (1-blockChance)*(1-acReduction)
 			--speed
-			local speed=Party[i]:GetSpeed()
-			local unarmed=0
-			local Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Unarmed))
+			speed=Party[i]:GetSpeed()
+			unarmed=0
+			Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Unarmed))
 			if Mas == 4 then
 				unarmed=Skill+10
 			end
-			local speed=Party[i]:GetSpeed()
-			local speedEffect=speed/10
-			local dodgeChance=0.995^(speedEffect+unarmed)
-			local fullHP=fullHP/dodgeChance
+			speed=Party[i]:GetSpeed()
+			speedEffect=speed/10
+			dodgeChance=0.995^(speedEffect+unarmed)
+			fullHP=fullHP/dodgeChance
 			--resistances
 			res={
 				[1]=Party[i]:GetResistance(10),
@@ -1779,13 +1779,18 @@ function events.BuildItemInformationBox(t)
 			newAC=newAC+getNewArmor(t.Item)-getNewArmor(it)
 			
 			--calculate new HP
-			newEndurance=Party[index]:GetEndurance()+newEnd
+			newEndurance=Party[i]:GetEndurance()+newEnd
 			if newEndurance<=21 then
 				newEndEff=(newEndurance-13)/2
 			else
 				newEndEff=math.floor(newEndurance/5)
 			end
-			
+			oldEndurance=Party[i]:GetEndurance()
+			if newEndurance<=21 then
+				oldEndEff=(oldEndurance-13)/2
+			else
+				oldEndEff=math.floor(oldEndurance/5)
+			end
 			
 			level=Party[i]:GetLevel()+newEndEff
 			if t.Item.Bonus2==25 then
@@ -1796,48 +1801,12 @@ function events.BuildItemInformationBox(t)
 			end
 			HPScaling=Game.Classes.HPFactor[Party[i].Class]
 			
-			skill=Party[index].Skills[const.Skills.Bodybuilding]
-			s,m=SplitSkill(skill)
-			if m==4 then
-				m=5
-			end
-			BBHP=HPScaling*s*m+s^2/2
+			--remove old
+			fullHP=math.round(Party[i]:GetFullHP()/(1+Party[i]:GetEndurance()/1000)-oldEndEff*HPScaling)
+			--add new 
+			fullHP=math.round(fullHP+newHP+newEndEff*HPScaling)
 			
-			itemHP=0
-			for it in Party[i]:EnumActiveItems() do
-				if math.floor(it.Charges/1000)==8 then
-					itemHP=itemHP+it.Charges%1000
-				end
-				if it.Bonus==8 then
-					itemHP=itemHP+it.BonusStrength
-				end
-				MaxCharges=it.MaxCharges
-				if MaxCharges <= 20 then
-					mult=1+MaxCharges/20
-				else
-					mult=2+2*(MaxCharges-20)/20
-				end
-
-				b2=bonusEffects[it.Bonus2]
-				if b2 then
-					if b2.bonusValues then 
-						for v=1,#b2.bonusValues do
-							if b2.bonusValues[v]==8 then
-								itemHP=itemHP+math.floor(b2.statModifier*mult)
-							end
-						end
-					elseif b2.bonusRange then
-						if b2.bonusRange[1]<=8 and b2.bonusRange[2]>=8 then
-							itemHP=itemHP+math.floor(b2.statModifier*mult)
-						end
-					end
-				end
-				
-			end
-			
-			
-			
-			fullHP=math.round((Game.Classes.HPBase[Party[i].Class]+level*HPScaling+newHP+BBHP+itemHP)*(1+newEndurance/1000))
+			fullHP=math.round((fullHP+newHP)*(1+(Party[i]:GetEndurance()+newEnd)/1000))
 			
 			ac=Party[i]:GetArmorClass()+newAC
 			acReduction=1-1/(ac/300+1)
@@ -1854,7 +1823,7 @@ function events.BuildItemInformationBox(t)
 			speed=Party[i]:GetSpeed()+newSpeed
 			speedEffect=speed/10
 			dodgeChance=0.995^(speedEffect+unarmed)
-			fullHP=fullHP/dodgeChance
+			vitality=fullHP/dodgeChance
 			--resistances
 			--luck
 			oldLuck=Party[index]:GetLuck()
@@ -1884,7 +1853,7 @@ function events.BuildItemInformationBox(t)
 			end
 			--calculation
 			reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
-			vitality=math.round(fullHP/reduction)	
+			vitality=math.round(vitality/reduction)	
 			
 			newVitality=vitality-oldVitality
 			percentage=math.round((vitality/oldVitality-1)*10000)/100
