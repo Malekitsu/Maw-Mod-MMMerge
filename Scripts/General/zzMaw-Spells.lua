@@ -615,7 +615,7 @@ function events.GameInitialized2()
 	--protections
 	protectionSpells={25,69,36,3,58,14}
 	for _, i in ipairs(protectionSpells) do
-		Game.SpellsTxt[i].GM="3 points resistance per point of skill"
+		Game.SpellsTxt[i].GM="Effect is now passive"
 	end
 	--day of protection
 	Game.SpellsTxt[83].Description="Temporarily increases all seven stats on all your characters by 1 per skill in Light Magic.  This spell lasts until you rest."
@@ -1381,7 +1381,29 @@ function events.GameInitialized2()
 end
 
 
+--WHEN GM ELEMENTAL BUFFS WILL BE GRANTED PASSIVELY
+TimerPeriod=const.Minute/2
+schools={12,13,14,15,17,18}
+buffsOrdered = {6, 0, 17, 4, 12, 1}
+function elementalBuffs()
+	--buffs to apply
+	for i=0, Party.High do
+		for v=1,6 do
+			s,m=SplitSkill(Party[i]:GetSkill(schools[v]))
+			if m==4 then
+				if Party.SpellBuffs[buffsOrdered[v]].Power<=s*3 then
+					Party.SpellBuffs[buffsOrdered[v]].ExpireTime=Game.Time+const.Hour
+					Party.SpellBuffs[buffsOrdered[v]].Power=s*3
+					Party.SpellBuffs[buffsOrdered[v]].Skill=4
+				end
+			end
+		end
+	end
+end
 
+function events.AfterLoadMap()
+	Timer(elementalBuffs, TimerPeriod, true)
+end
 
 
 ---------------------------
