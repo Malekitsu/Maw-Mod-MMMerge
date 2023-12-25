@@ -124,7 +124,40 @@ function events.Tick()
 		end
 		BBHP=s*m
 		index3=Party[i]:GetIndex()
-		fullHP2[index3]=Game.Classes.HPFactor[Party[i].Class]*(Party[i]:GetLevel()+endEff2+BBHP)+Game.Classes.HPBase[Party[i].Class]+s^2/2
+		
+		itemHP=0
+		for it in Party[i]:EnumActiveItems() do
+			if math.floor(it.Charges/1000)==8 then
+				itemHP=itemHP+it.Charges%100
+			end
+			if it.Bonus==8 then
+				itemHP=itemHP+it.BonusStrength
+			end
+			MaxCharges=it.MaxCharges
+			if MaxCharges <= 20 then
+				mult=1+MaxCharges/20
+			else
+				mult=2+2*(MaxCharges-20)/20
+			end
+
+			b2=bonusEffects[it.Bonus2]
+			if b2 then
+				if b2.bonusValues then 
+					for v=1,#b2.bonusValues do
+						if b2.bonusValues[v]==8 then
+							itemHP=itemHP+math.floor(b2.statModifier*mult)
+						end
+					end
+				elseif b2.bonusRange then
+					if b2.bonusRange[1]<=8 and b2.bonusRange[2]>=8 then
+						itemHP=itemHP+math.floor(b2.statModifier*mult)
+					end
+				end
+			end
+			
+		end
+		
+		fullHP2[index3]=Game.Classes.HPFactor[Party[i].Class]*(Party[i]:GetLevel()+endEff2+BBHP)+Game.Classes.HPBase[Party[i].Class]+s^2/2+itemHP
 	end
 end
 --body building description
