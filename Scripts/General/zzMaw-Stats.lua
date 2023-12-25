@@ -287,13 +287,10 @@ function events.BuildStatInformationBox(t)
 			--RANGED
 			local low=Party[i]:GetRangedDamageMin()
 			local high=Party[i]:GetRangedDamageMax()
-			local accuracy=Party[i]:GetAccuracy()
-			local luck=Party[i]:GetLuck()
 			local delay=Party[i]:GetAttackDelay(true)
 			local dmg=(low+high)/2
 			--hit chance
 			local atk=Party[i]:GetRangedAttack()
-			local lvl=Party[i].LevelBase
 			local hitChance= (15+atk*2)/(30+atk*2+lvl)
 			local DPS2=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
 			local s,m=SplitSkill(Party[i].Skills[const.Skills.Bow])
