@@ -325,11 +325,12 @@ function events.BuildStatInformationBox(t)
 			--hit chance
 			local atk=Party[i]:GetRangedAttack()
 			local hitChance= (15+atk*2)/(30+atk*2+lvl)
-			local DPS2=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
+			
 			local s,m=SplitSkill(Party[i].Skills[const.Skills.Bow])
 			if m>=3 then
-				DPS2=DPS2*2
+				dmg=dmg*2
 			end
+			local DPS2=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
 			power=math.max(DPS1,DPS2)
 			
 			t.Text=string.format("%s\n\nPower: %s",t.Text,StrColor(255,0,0,power))
