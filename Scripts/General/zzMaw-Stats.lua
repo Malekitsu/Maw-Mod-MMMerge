@@ -105,7 +105,7 @@ function events.CalcStatBonusByItems(t)
 		index2=t.PlayerIndex
 		local skill=t.Player.Skills[const.Skills.Bodybuilding]
 		local s,m=SplitSkill(skill)
-		t.Result=t.Result+math.round(fullHP2[index2]*endurance)+s^2/2
+		t.Result=t.Result+math.round(fullHP2[index2]*endurance+s^2/2)
 	end
 end
 
@@ -128,7 +128,7 @@ function events.Tick()
 		itemHP=0
 		for it in Party[i]:EnumActiveItems() do
 			if math.floor(it.Charges/1000)==8 then
-				itemHP=itemHP+it.Charges%100
+				itemHP=itemHP+it.Charges%1000
 			end
 			if it.Bonus==8 then
 				itemHP=itemHP+it.BonusStrength
