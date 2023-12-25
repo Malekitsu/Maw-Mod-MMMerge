@@ -251,7 +251,7 @@ function events.CalcStatBonusByItems(t)
 			bonus=it.Charges%1000
 			if t.Stat==stat then
 				if stat>=10 and stat<=15 then
-					t.Result = t.Result + bonus * 2
+					t.Result = t.Result + bonus
 				else
 					t.Result = t.Result + bonus
 				end
@@ -1852,13 +1852,27 @@ function events.BuildItemInformationBox(t)
 			dodgeChance=0.995^(speedEffect+unarmed)
 			fullHP=fullHP/dodgeChance
 			--resistances
+			--luck
+			oldLuck=Party[index]:GetLuck()
+			if oldLuck<=21 then
+				oldLuckEff=(oldLuck-13)/2
+			else
+				oldLuckEff=math.floor(oldLuck/5)
+			end
+			luck=Party[index]:GetLuck()+newLuck
+			if luck<=21 then
+				newLuckEff=(luck-13)/2
+			else
+				newLuckEff=math.floor(luck/5)
+			end
+			luckChanged=newLuckEff-oldLuckEff
 			res={
-				[1]=Party[i]:GetResistance(10)+newFire,
-				[2]=Party[i]:GetResistance(11)+newAir,
-				[3]=Party[i]:GetResistance(12)+newWater,
-				[4]=Party[i]:GetResistance(13)+newEarth,
-				[5]=Party[i]:GetResistance(14)+newMind,
-				[6]=Party[i]:GetResistance(15)+newBody,
+				[1]=Party[i]:GetResistance(10)+newFire+luckChanged,
+				[2]=Party[i]:GetResistance(11)+newAir+luckChanged,
+				[3]=Party[i]:GetResistance(12)+newWater+luckChanged,
+				[4]=Party[i]:GetResistance(13)+newEarth+luckChanged,
+				[5]=Party[i]:GetResistance(14)+newMind+luckChanged,
+				[6]=Party[i]:GetResistance(15)+newBody+luckChanged,
 			}
 			res[7]=math.min(res[1],res[2],res[3],res[4],res[5],res[6])
 			for i=1,7 do 
