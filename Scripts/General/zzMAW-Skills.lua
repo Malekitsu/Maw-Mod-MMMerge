@@ -897,8 +897,15 @@ function events.GetAttackDelay(t)
 	
 	-- turn recovery time into a multiplier rather than divisor-
 	
-	local recoveryBonus = 100 - t.Result
-	local correctedRecoveryTime = math.floor(100 / (1 + recoveryBonus / 100))
+	speed=t.Player:GetSpeed()
+	if speed>=21 then
+		bonus=math.floor(speed/5)
+	else
+		bonus=(speed-13)/2
+	end
+	
+	recoveryBonus = 100 - t.Result + bonus
+	correctedRecoveryTime = math.floor(100 / (1 + recoveryBonus / 100))
 	
 	t.Result = correctedRecoveryTime
 	-- cap melee recovery
