@@ -590,8 +590,7 @@ function events.BuildItemInformationBox(t)
 		end
 	end
 end
-
-
+	
 --colours
 function events.GameInitialized2()
 	itemStatName = {}
@@ -1459,4 +1458,312 @@ function events.GameInitialized2()
 ]]
 
 
- 
+--SHOW POWER/VITALITY CHANGE IN TOOLTIPS
+slotMap={
+	[0]=0,
+	[1]=1,
+	[2]=2,
+	[3]=3,
+	[4]=0,
+	[5]=4,
+	[6]=5,
+	[7]=6,
+	[8]=7,
+	[9]=8,
+	[11]=9,
+	[10]=10,
+}
+	
+
+function events.BuildItemInformationBox(t)
+	if t.Description then
+		if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then 
+			i=Game.CurrentPlayer
+			--get spell and its damage
+			spellIndex=Party[i].QuickSpell
+			
+			--if not an offensive spell then calculate highest between melee and ranged
+			if not spellPowers[spellIndex] then 
+				--MELEE
+				low=Party[i]:GetMeleeDamageMin()
+				high=Party[i]:GetMeleeDamageMax()
+				might=Party[i]:GetMight()
+				accuracy=Party[i]:GetAccuracy()
+				luck=Party[i]:GetLuck()
+				delay=Party[i]:GetAttackDelay()
+				dmg=(low+high)/2
+				--hit chance
+				atk=Party[i]:GetMeleeAttack()
+				lvl=Party[i].LevelBase
+				hitChance= (15+atk*2)/(30+atk*2+lvl)
+				daggerCritBonus=0
+				for v=0,1 do
+					if Party[i]:GetActiveItem(v) then
+						itSkill=Party[i]:GetActiveItem(v):T().Skill
+						if itSkill==2 then
+							s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Dagger))
+							if m>2 then
+								daggerCritBonus=daggerCritBonus+0.025+0.005*s
+							end
+						end
+					end
+				end
+				DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
+				
+				--RANGED
+				low=Party[i]:GetRangedDamageMin()
+				high=Party[i]:GetRangedDamageMax()
+				delay=Party[i]:GetAttackDelay(true)
+				dmg=(low+high)/2
+				--hit chance
+				atk=Party[i]:GetRangedAttack()
+				hitChance= (15+atk*2)/(30+atk*2+lvl)
+				DPS2=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
+				s,m=SplitSkill(Party[i].Skills[const.Skills.Bow])
+				if m>=3 then
+					DPS2=DPS2*2
+				end
+				if DPS1>DPS2 then
+					power=DPS1
+					powerType="Melee"
+				else
+					power=DPS2
+					powerType="Ranged"
+				end
+			else
+				--SPELLS
+				spellTier=spellIndex%11
+				if spellTier==0 then
+					spellTier=11
+				end
+				if Party[i].LevelBase>=spellTier*8+152 then
+					diceMin=spellPowers160[spellIndex].diceMin
+					diceMax=spellPowers160[spellIndex].diceMax
+					damageAdd=spellPowers160[spellIndex].dmgAdd
+				elseif Party[i].LevelBase>=spellTier*8+72 then
+					diceMin=spellPowers80[spellIndex].diceMin
+					diceMax=spellPowers80[spellIndex].diceMax
+					damageAdd=spellPowers80[spellIndex].dmgAdd
+				else
+					diceMin=spellPowers[spellIndex].diceMin
+					diceMax=spellPowers[spellIndex].diceMax
+					damageAdd=spellPowers[spellIndex].dmgAdd
+				end
+				--calculate damage
+				--skill
+				skillType=math.floor(spellIndex/11)+12
+				skill, mastery=SplitSkill(Party[i]:GetSkill(skillType))
+				
+				power=damageAdd + skill*(diceMin+diceMax)/2
+				
+				intellect=Party[i]:GetIntellect()	
+				personality=Party[i]:GetPersonality()
+				critChance=Party[i]:GetLuck()/1500
+				bonus=math.max(intellect,personality)
+				critDamage=bonus*3/2000
+				power=power*(1+bonus/1000) 
+				critChance=0.05+critChance
+				
+				if mastery==1 then
+					delay=Game.Spells[11].DelayNormal
+				elseif mastery==2 then
+					delay=Game.Spells[11].DelayExpert
+				elseif mastery==3 then
+					delay=Game.Spells[11].DelayMaster
+				elseif mastery==4 then
+					delay=Game.Spells[11].DelayGM
+				end
+				powerType="Spell"
+				power=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/100))
+			end
+			
+			oldPower=power
+			
+			--list of stats that influence damage
+			slot=t.Item:T().EquipStat
+			it=Party[i]:GetActiveItem(slotMap[slot])
+			if not it then return end
+			--calculate spell damage
+			if powerType=="Spell" then
+				stats={2,3,7}
+				intellect1, personality1, luck1 = unpack(calculateStatsAdd(t.Item, stats))
+				intellect2, personality2, luck2 = unpack(calculateStatsAdd(it, stats))
+				bonusInt=intellect1-intellect2
+				bonusPers=personality1-personality2
+				bonusLuck=luck1-luck2
+				
+				power=damageAdd + skill*(diceMin+diceMax)/2
+				
+				intellect=Party[i]:GetIntellect()+bonusInt
+				personality=Party[i]:GetPersonality()+bonusPers
+				critChance=(Party[i]:GetLuck()+bonusLuck)/1500
+				bonus=math.max(intellect,personality)
+				critDamage=bonus*3/2000
+				power=power*(1+bonus/1000) 
+				critChance=0.05+critChance
+
+				powerType="Spell"
+				power=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/100))
+				
+			elseif powerType=="Melee" or powerType=="Ranged" then
+				stats={1,5,6,7}
+				
+				might1, acc1, speed1, luck1 = unpack(calculateStatsAdd(t.Item, stats))
+				might2, acc2, speed2, luck2 = unpack(calculateStatsAdd(it, stats))
+				
+				bonusMight=might1-might2
+				bonusAcc=acc1-acc2
+				bonusSpeed=speed1-speed2
+				bonusLuck=luck1-luck2
+				
+				--calculate new DPS
+				--might
+				might=Party[i]:GetMight()
+				if might>=21 then
+					oldBonusDamage=math.floor(might/5)
+				else
+					oldBonusDamage=(might-13)/2
+				end
+				might=might+bonusMight
+				if might>=21 then
+					newBonusDamage=math.floor(might/5)
+				else
+					newBonusDamage=(might-13)/2
+				end
+				if powerType=="Melee" then
+					low=Party[i]:GetMeleeDamageMin()
+					high=Party[i]:GetMeleeDamageMax()
+				else
+					low=Party[i]:GetRangedDamageMin()
+					high=Party[i]:GetRangedDamageMax()
+				end
+				dmg=(low+high)/2+newBonusDamage-oldBonusDamage
+				
+				--accuracy
+				accuracy=Party[i]:GetAccuracy()
+				if accuracy>=21 then
+					oldAttack=math.floor(accuracy/5)
+				else
+					oldAttack=(accuracy-13)/2
+				end
+				accuracy=accuracy+bonusAcc
+				if accuracy>=21 then
+					newAttack=math.floor(accuracy/5)
+				else
+					newAttack=(accuracy-13)/2
+				end
+				
+				--speed
+				speed=Party[i]:GetSpeed()
+				if speed>=21 then
+					oldSpeed=math.floor(speed/5)
+				else
+					oldSpeed=(speed-13)/2
+				end
+				speed=speed+bonusSpeed
+				if speed>=21 then
+					newSpeed=math.floor(speed/5)
+				else
+					newSpeed=(speed-13)/2
+				end
+				if powerType=="Melee" then
+					delay=math.max(Party[i]:GetAttackDelay(),30)
+				else
+					delay=math.max(Party[i]:GetAttackDelay(true),30)
+				end
+				recoveryBonus=recoveryBonus+newSpeed-oldSpeed
+				
+				if powerType=="Melee" then
+					delay=math.max(math.floor(100 / (1 + recoveryBonus / 100)),30)
+				else
+					delay=math.floor(100 / (1 + recoveryBonus / 100))
+				end
+				
+				--luck
+				luck=Party[i]:GetLuck()+bonusLuck
+				--hit chance
+				if powerType=="Melee" then
+					atk=Party[i]:GetMeleeAttack()+newAttack-oldAttack
+				else
+					atk=Party[i]:GetRangedAttack()
+				end
+				atk=atk+newAttack-oldAttack
+				lvl=Party[i].LevelBase
+				hitChance= (15+atk*2)/(30+atk*2+lvl)
+				daggerCritBonus=0
+				if powerType=="Melee" then
+					for v=0,1 do
+						if Party[i]:GetActiveItem(v) then
+							itSkill=Party[i]:GetActiveItem(v):T().Skill
+							if itSkill==2 then
+								s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Dagger))
+								if m>2 then
+									daggerCritBonus=daggerCritBonus+0.025+0.005*s
+								end
+							end
+						end
+					end
+				else
+					s,m=SplitSkill(Party[i].Skills[const.Skills.Bow])
+					if m>=3 then
+						dmg=dmg*2
+					end
+				end
+				power=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)				
+			end
+			
+			
+			newPower=power-oldPower
+			percentage=math.round((power/oldPower-1)*10000)/100
+			if newPower<0 then
+				t.Description = t.Description .. "\n\n" .. "Power: " .. StrColor(255,0,0,newPower) .. " (" .. StrColor(255,0,0,percentage) .. "%)"
+			elseif newPower>0 then
+				t.Description = t.Description .. "\n\n" .. "Power: " .. StrColor(0,255,0,"+") .. StrColor(0,255,0,newPower) .. " (" .. StrColor(0,255,0,"+") .. StrColor(0,255,0,percentage) .. "%)"
+			end
+			
+			
+			
+		end
+	end
+end
+
+
+
+function calculateStatsAdd(item, stats)
+	statValue={}
+	for i=1,#stats do
+		statValue[i]=0
+		--bonus1
+		if item.Bonus==stats[i] then
+			statValue[i]=statValue[i]+item.BonusStrength
+		end
+		--bonus2
+		if math.floor(item.Charges/1000)==stats[i] then
+			statValue[i]=statValue[i]+item.Charges%1000
+		end
+		--bonus special
+		--maxcharges mult
+		MaxCharges=item.MaxCharges
+		if MaxCharges <= 20 then
+			mult=1+MaxCharges/20
+		else
+			mult=2+2*(MaxCharges-20)/20
+		end
+		
+		b2=bonusEffects[item.Bonus2]
+		if b2 then
+			if b2.bonusValues then 
+				for v=1,#b2.bonusValues do
+					if b2.bonusValues[v]==stats[i] then
+						statValue[i]=statValue[i]+math.floor(b2.statModifier*mult)
+					end
+				end
+			elseif b2.bonusRange then
+				if b2.bonusRange[1]<=stats[i] and b2.bonusRange[2]>=stats[i] then
+					statValue[i]=statValue[i]+math.floor(b2.statModifier*mult)
+				end
+			end
+		end
+	end	
+	return statValue
+end
