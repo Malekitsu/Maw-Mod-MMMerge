@@ -1802,7 +1802,7 @@ function events.BuildItemInformationBox(t)
 			itemHP=0
 			for it in Party[i]:EnumActiveItems() do
 				if math.floor(it.Charges/1000)==8 then
-					itemHP=itemHP+it.Charges%100
+					itemHP=itemHP+it.Charges%1000
 				end
 				if it.Bonus==8 then
 					itemHP=itemHP+it.BonusStrength
