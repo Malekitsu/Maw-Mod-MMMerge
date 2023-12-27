@@ -107,23 +107,29 @@ function events.ItemGenerated(t)
 			t.Item.Bonus=math.round(partyLevel/3)
 			return
 		end
+		
+		--difficulty settings
+		difficultyExtraPower=1
+		LevelBonus=0
+		if Game.BolsterAmount==150 then
+			difficultyExtraPower=1.3
+			levelBonus=10
+		elseif Game.BolsterAmount==200 then
+			difficultyExtraPower=1.6	
+			LevelBonus=20
+		end
+		partyLevel=partyLevel+LevelBonus
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
 		t.Item.MaxCharges=math.min(math.floor(partyLevel/5),50)
 		partyLevel1=math.min(math.floor(partyLevel/18),14)
 		--adjust loot Strength
 		ps1=t.Strength
 		
-		--difficulty settings
-		difficultyExtraPower=1
-		if Game.BolsterAmount==150 then
-			difficultyExtraPower=1.3
-		elseif Game.BolsterAmount==200 then
-			difficultyExtraPower=1.6	
-		end
+		
 		
 		pseudoStr=ps1+partyLevel1
-		if math.random(1,18)>partyLevel1%18 then
-			pseudoStr=pseudoStr
+		if math.random(1,18)<partyLevel1%18 then
+			pseudoStr=pseudoStr+1
 		end
 		if pseudoStr==1 then 
 			return 
@@ -1806,7 +1812,7 @@ function events.BuildItemInformationBox(t)
 			--add new 
 			fullHP=fullHP+newHP+newEndEff*HPScaling
 			
-			fullHP=math.round((fullHP+newHP)*(1+(Party[i]:GetEndurance()+newEnd)/1000))
+			fullHP=math.round((fullHP)*(1+(Party[i]:GetEndurance()+newEnd)/1000))
 			
 			ac=Party[i]:GetArmorClass()+newAC
 			acReduction=1-1/(ac/300+1)
@@ -1897,7 +1903,9 @@ function calculateStatsAdd(item, stats)
 		if b2 then
 			if b2.bonusValues then 
 				for v=1,#b2.bonusValues do
-					if b2.bonusValues[v]==stats[i] then
+					if item.Bonus2==48 and bonusEffects[48].bonusValues[v]==stats[i] then
+						statValue[i]=statValue[i]+math.floor(b2.statModifier[v]*mult)
+					elseif b2.bonusValues[v]==stats[i] then
 						statValue[i]=statValue[i]+math.floor(b2.statModifier*mult)
 					end
 				end
