@@ -1683,6 +1683,9 @@ end
 --merchant fix
 merchantCheck=false
 function events.GetMerchantTotalSkill(t)
+	if t.Result==10000 then
+		t.Result=1000
+	end
 	if not merchantCheck then return end --avoid loops
 	merchantCheck=true
 	if Game.HouseScreen==-1 or Game.HouseScreen==1 or Game.HouseScreen==96 then return end
