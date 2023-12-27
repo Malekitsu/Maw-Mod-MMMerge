@@ -68,10 +68,10 @@ end
 function events.CalcStatBonusBySkills(t)
 	if t.Stat==const.Stats.MeleeDamageBase then
 		if t.Player.Class==55 or t.Player.Class==54 or t.Player.Class==53 then
-			light=t.Player.Skills[const.Skills.Light]
+			light=t.Player:GetSkill(const.Skills.Light)
 			lightS,lightM=SplitSkill(light)
 			--get mind
-			mind=t.Player.Skills[const.Skills.Mind]
+			mind=t.Player:GetSkill(const.Skills.Mind)
 			mindS,mindM=SplitSkill(mind)
 			levelBonus=2+math.min(t.Player.LevelBase,250)/100
 			damage=mindS*levelBonus + lightS*levelBonus
@@ -104,7 +104,6 @@ function events.CalcDamageToPlayer(t)
 			if currentMana>=treshold then
 				t.Player.SP=t.Player.SP-(totMana/4)
 				--calculate healing
-				mastery=SplitSkill(t.Player.Skills[const.Skills.Thievery])
 				heal=totMana
 				for i=0,Party.High do
 					if Party[i]:GetIndex()==t.PlayerIndex then
