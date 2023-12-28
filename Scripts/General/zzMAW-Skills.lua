@@ -470,13 +470,12 @@ function events.CalcStatBonusBySkills(t)
 				t.Result = t.Result - oldBonus + newBonus
 					
 			end
-		elseif not main.weapon and not extra.weapon then
-			local punch=t.Player:GetSkill(const.Skills.Unarmed)
-			local s,m = SplitSkill(punch)
-			if m>0 then
-				t.Result=t.Result-oldWeaponSkillAttackBonuses[const.Skills.Unarmed][m]*s
-				t.Result=t.Result+newWeaponSkillAttackBonuses[const.Skills.Unarmed][m]*s	
-			end
+		end
+		local punch=t.Player:GetSkill(const.Skills.Unarmed)
+		local s,m = SplitSkill(punch)
+		if (m>0 and not main.weapon and not extra.weapon) or (main.skill==const.Skills.Staff and m==4) then
+			t.Result=t.Result-oldWeaponSkillAttackBonuses[const.Skills.Unarmed][m]*s
+			t.Result=t.Result+newWeaponSkillAttackBonuses[const.Skills.Unarmed][m]*s
 		end
 		
 	-- calculate melee damage bonus by skill
@@ -511,8 +510,14 @@ function events.CalcStatBonusBySkills(t)
 				-- add new bonus for main weapon
 				
 				t.Result = t.Result + newWeaponSkillDamageBonuses[main.skill][main.rank] * main.level
-
-				
+				if main.skill == const.Skills.Staff then
+					local punch=t.Player:GetSkill(const.Skills.Unarmed)
+					local s,m = SplitSkill(punch)
+					if m==4 then
+						t.Result=t.Result-oldWeaponSkillDamageBonuses[const.Skills.Unarmed][m]*s
+						t.Result=t.Result+newWeaponSkillDamageBonuses[const.Skills.Unarmed][m]*s
+					end
+				end
 				-- add class bonus for main hand weapon
 				
 				if classMeleeWeaponSkillDamageBonus[t.Player.Class] ~= nil then
@@ -528,7 +533,6 @@ function events.CalcStatBonusBySkills(t)
 			-- dual wield
 			
 			else
-				
 				-- calculate effective skill levels
 				
 				local mainEffectiveSkillLevel
@@ -562,14 +566,6 @@ function events.CalcStatBonusBySkills(t)
 					t.Result = t.Result + (newWeaponSkillDamageBonuses[main.skill][main.rank] * mainEffectiveSkillLevel)-(classMeleeDamageBonus*mainEffectiveSkillLevel)
 				elseif main.skill == const.Skills.Dagger then
 					t.Result = t.Result + (newWeaponSkillDamageBonuses[main.skill][main.rank] * mainEffectiveSkillLevel)-(classMeleeDamageBonus*mainEffectiveSkillLevel)
-				elseif main.skill == const.Skills.Staff then
-					local punch=t.Player:GetSkill(const.Skills.Unarmed)
-					local s,m = SplitSkill(punch)
-					if m==4 then
-						t.Result=t.Result-oldWeaponSkillDamageBonuses[const.Skills.Unarmed][m]*s
-						t.Result=t.Result+newWeaponSkillDamageBonuses[const.Skills.Unarmed][m]*s
-						t.Result = t.Result + (newWeaponSkillDamageBonuses[main.skill][main.rank] * mainEffectiveSkillLevel)
-					end
 				else
 					t.Result = t.Result + (newWeaponSkillDamageBonuses[main.skill][main.rank] * mainEffectiveSkillLevel)
 				end
@@ -1050,12 +1046,14 @@ end
 --ARMSMASTER CODE, so far it's 2 damage at master and 4 at GM
 ----------------------
 function events.CalcStatBonusBySkills(t)
-	if t.Stat == const.Stats.MeleeDamageBase then  -- t.Result ~= 0 is for speedup
-		local s, m = SplitSkill(t.Player:GetSkill(const.Skills.Armsmaster))
-		if m == 3 then
-			t.Result=t.Result+s
-		elseif m ==4 then
-			t.Result=t.Result+s*2
+	if t.Stat == const.Stats.MeleeDamageBase then
+		if t.Player:GetActiveItem(1) then
+			local s, m = SplitSkill(t.Player:GetSkill(const.Skills.Armsmaster))
+			if m == 3 then
+				t.Result=t.Result+s
+			elseif m ==4 then
+				t.Result=t.Result+s*2
+			end
 		end
 	end
 end
@@ -1487,7 +1485,7 @@ function events.Action(t)
 				end
 			end
 			local actualCost=math.ceil(currentCost/n)
-			if pl.SkillPoints>actualCost then
+			if pl.SkillPoints>=actualCost then
 				pl.SkillPoints=pl.SkillPoints+currentCost-actualCost
 			end
 		end
