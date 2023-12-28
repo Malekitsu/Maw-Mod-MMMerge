@@ -836,7 +836,7 @@ end
 
 
 
-meleeRecoveryCap=0
+meleeRecoveryCap=30
 
 
 -- corrects attack delay
