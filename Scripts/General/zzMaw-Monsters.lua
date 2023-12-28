@@ -1303,9 +1303,9 @@ function events.BuildMonsterInformationBox(t)
 		lowerLimit=math.round(math.max(mean-range, t.Monster.Attack2.DamageAdd+t.Monster.Attack2.DamageDiceCount))
 		upperLimit=math.round(math.min(mean+range, t.Monster.Attack2.DamageAdd+t.Monster.Attack2.DamageDiceCount*t.Monster.Attack2.DamageDiceSides))
 		if t.Monster.Attack2.Missile == 0 then
-			text=string.format(table.find(const.Damage,t.Monster.Attack1.Type) .. "-Melee")
+			text=string.format(table.find(const.Damage,t.Monster.Attack2.Type) .. "-Melee")
 		else
-			text=string.format(table.find(const.Damage,t.Monster.Attack1.Type) .. "-Ranged")
+			text=string.format(table.find(const.Damage,t.Monster.Attack2.Type) .. "-Ranged")
 		end
 		t.Damage.Text=string.format(t.Damage.Text .. "\n" .. lowerLimit .. "-" .. upperLimit .. " " .. text)
 	end
