@@ -304,8 +304,12 @@ function events.GameInitialized2()
 			Game.ItemsTxt[i].Mod1DiceSides = Game.ItemsTxt[i].Mod1DiceSides + (expectedDamageIncrease / Game.ItemsTxt[i].Mod1DiceCount)
 			Game.ItemsTxt[i].Mod2=expectedDamageIncrease/2
 
-		end 
+		elseif Game.ItemsTxt[i].Skill==8 then
+	--increase shield value
+			Game.ItemsTxt[i].Mod2=Game.ItemsTxt[i].Mod2*2+Game.ItemsTxt[i].Mod1DiceCount  
+		end
 	end
+	
 end
 
 
