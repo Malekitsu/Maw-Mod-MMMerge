@@ -609,7 +609,10 @@ end
 mapLevels={
 --MM8
 ["Dagger Wound Island"] = 
-{["Low"] = 6 , ["Mid"] = 8 , ["High"] = 11},
+{["Low"] = 6 , ["Mid"] = 8 , ["High"] = 8},
+
+["Abandoned Temple"] = 
+{["Low"] = 5 , ["Mid"] = 6 , ["High"] = 7},
 
 ["Ravenshore"] = 
 {["Low"] = 14 , ["Mid"] = 14 , ["High"] = 17},
@@ -652,9 +655,6 @@ mapLevels={
 
 ["Tutorial"] = 
 {["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
-
-["Abandoned Temple"] = 
-{["Low"] = 5 , ["Mid"] = 6 , ["High"] = 7},
 
 ["Pirate Outpost"] = 
 {["Low"] = 5 , ["Mid"] = 31 , ["High"] = 31},
@@ -1302,7 +1302,7 @@ function events.BuildMonsterInformationBox(t)
 		range=(t.Monster.Attack2.DamageDiceSides^2*t.Monster.Attack2.DamageDiceCount/12)^0.5*1.96
 		lowerLimit=math.round(math.max(mean-range, t.Monster.Attack2.DamageAdd+t.Monster.Attack2.DamageDiceCount))
 		upperLimit=math.round(math.min(mean+range, t.Monster.Attack2.DamageAdd+t.Monster.Attack2.DamageDiceCount*t.Monster.Attack2.DamageDiceSides))
-		if t.Monster.Attack1.Missile == 0 then
+		if t.Monster.Attack2.Missile == 0 then
 			text=string.format(table.find(const.Damage,t.Monster.Attack1.Type) .. "-Melee")
 		else
 			text=string.format(table.find(const.Damage,t.Monster.Attack1.Type) .. "-Ranged")
