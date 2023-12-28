@@ -644,7 +644,7 @@ function events.CalcDamageToPlayer(t)
 			t.Result=t.Result*dmgMult
 		end
 	end
-	
+
 	--add difficulty related damage
 	if Game.BolsterAmount%50~=0 or Game.BolsterAmount==0 then
 		Game.BolsterAmount=100
@@ -665,6 +665,8 @@ function events.CalcDamageToPlayer(t)
 	if Game.BolsterAmount==200 then
 		t.Result=t.Result*2
 	end
+	
+	
 end
 
 --add luck to resistances
@@ -759,6 +761,15 @@ damageKindMap={
 	[10]=const.Damage.Dark,
 }
 function events.CalcDamageToMonster(t)
+		
+	--SPEED WILL NOW INCREASE DAMAGE IF OVERCAPPED
+	if not t.Object then
+		delay=t.Player:GetAttackDelay()
+		delay=recoveryBonus
+		if recoveryBonus>233 then
+			t.Result=math.round(t.Result*recoveryBonus/233)
+		end
+	end
 	--difficulty setting
 	if Game.BolsterAmount%50~=0 or Game.BolsterAmount==0 then
 		Game.BolsterAmount=100
