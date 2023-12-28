@@ -1847,10 +1847,10 @@ function events.BuildItemInformationBox(t)
 			luck=Party[index]:GetLuck()+newLuck
 			if luck<=21 then
 				newLuckEff=(luck-13)/2
-			elseif oldLuck<=100 then
-				newLuckEff=math.floor(oldLuck/5)
+			elseif luck<=100 then
+				newLuckEff=math.floor(luck/5)
 			else
-				newLuckEff=math.floor(oldLuck/10)+10
+				newLuckEff=math.floor(luck/10)+10
 			end
 			luckChanged=newLuckEff-oldLuckEff
 			res={
