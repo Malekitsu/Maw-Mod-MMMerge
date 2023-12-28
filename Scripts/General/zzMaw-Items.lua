@@ -112,10 +112,10 @@ function events.ItemGenerated(t)
 		difficultyExtraPower=1
 		LevelBonus=0
 		if Game.BolsterAmount==150 then
-			difficultyExtraPower=1.3
+			difficultyExtraPower=1.1
 			levelBonus=10
 		elseif Game.BolsterAmount==200 then
-			difficultyExtraPower=1.6	
+			difficultyExtraPower=1.2	
 			LevelBonus=20
 		end
 		partyLevel=partyLevel+LevelBonus
