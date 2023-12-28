@@ -36,8 +36,14 @@ end
 --remove AC from hit calculation and unarmed code from misctweaks
 nextACToZero=0
 function events.PlayerAttacked(t)
-	if t.Attacker.Object then
-		nextACToZero=2
+	if t.Attacker.MonsterAction==0 then
+		if t.Attacker.Monster.Attack1.Type~=4 then
+			nextACToZero=2
+		end
+	elseif t.Attacker.MonsterAction==1 then
+		if t.Attacker.Monster.Attack2.Type~=4 then
+			nextACToZero=2
+		end
 	end
 end
 
