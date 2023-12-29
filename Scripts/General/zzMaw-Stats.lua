@@ -304,6 +304,10 @@ function events.BuildStatInformationBox(t)
 			local accuracy=Party[i]:GetAccuracy()
 			local luck=Party[i]:GetLuck()
 			local delay=Party[i]:GetAttackDelay()
+			bonusMult=1
+			if recoveryBonus>233 then
+				bonusMult=recoveryBonus/233
+			end
 			local dmg=(low+high)/2
 			--hit chance
 			local atk=Party[i]:GetMeleeAttack()
@@ -321,7 +325,7 @@ function events.BuildStatInformationBox(t)
 					end
 				end
 			end
-			DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
+			DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*bonusMult)
 			
 			--RANGED
 			local low=Party[i]:GetRangedDamageMin()
@@ -763,7 +767,7 @@ damageKindMap={
 function events.CalcDamageToMonster(t)
 		
 	--SPEED WILL NOW INCREASE DAMAGE IF OVERCAPPED
-	if not t.Object then
+	if not t.Object and t.Player then
 		delay=t.Player:GetAttackDelay()
 		delay=recoveryBonus
 		if recoveryBonus>233 then
