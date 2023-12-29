@@ -58,7 +58,7 @@ function events.UseMouseItem(t)
 			pl.SpellBuffs[buff].Power=it.Bonus+10
 			pl.SpellBuffs[buff].ExpireTime=Game.Time+const.Minute*30*it.Bonus
 			
-			if it.Number<=234 then
+			if it.Number<=234 and not it.Number<=229 then
 				pl.SpellBuffs[buff].Power=math.round(pl.SpellBuffs[buff].Power/2)
 			end
 		--disable original behaviour and simulate sound
@@ -96,6 +96,7 @@ function events.UseMouseItem(t)
 end
 
 itemBuffMapping = {
+	[228] = 7,	 --haste
 	[229] = 8, 	 --heroism
     [230] = 1,	 --bless
     [234] = 14,  --stoneskin
@@ -222,7 +223,7 @@ potionText={
 	[226] = "Cures and prevents Poison for 6 hours.",
 	[227] = "Remove and prevents inducted Sleep for 6 hours.",
 	[228] = "Increases Speed for 30 minutes per point of potion strength. (30 minutes per potion strength)",
-	[229] = "Increases Melee damage by 5+(0.5 x Power) for (30 x Power) minutes",
+	[229] = "Increases Melee damage by 10+(1 x Power) for (30 x Power) minutes",
 	[230] = "Increases Attack by 5+(0.5 x Power) for (30 x Power) minutes",
 	[231] = "Grants Preservation (as the spell) for 30 minutes per point of potion strength.",
 	[232] = "Grants Shield (as the spell) for 30 minutes per point of potion strength.",
