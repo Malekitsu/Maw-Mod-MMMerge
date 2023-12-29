@@ -691,7 +691,7 @@ function events.GameInitialized2()
 			[98] = {dmgAdd = 50, diceMin = 1, diceMax = 1, },--armageddon
 			[99] = {dmgAdd = 50, diceMin = 1, diceMax = 5, },--souldrinker
 			[103] = {dmgAdd = 30, diceMin = 1, diceMax = 22, },--darkfire bolt
-			[111] = {dmgAdd = 15, diceMin = 1, diceMax = 3, },--lifedrain scales with mastery, fixed in calcspelldamage
+			[111] = {dmgAdd = 15, diceMin = 1, diceMax = 6, },--lifedrain scales with mastery, fixed in calcspelldamage
 			[123] = {dmgAdd = 10, diceMin = 1, diceMax = 10, },--flame blast scales with mastery, fixed in calcspelldamage
 		}
 
@@ -1398,6 +1398,11 @@ function elementalBuffs()
 				end
 			end
 		end
+	end
+	if Party.High==0 then
+		Party.SpellBuffs[19].ExpireTime=Game.Time+const.Hour
+		Party.SpellBuffs[19].Power=10
+		Party.SpellBuffs[19].Skill=2
 	end
 end
 
