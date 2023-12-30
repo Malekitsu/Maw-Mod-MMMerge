@@ -67,7 +67,7 @@ function events.UseMouseItem(t)
 			evt.PlaySound(143)
 			if it.Charges==0 then
 				it.Charges=5
-			elseif it.Charges>1 then
+			elseif it.Charges>2 then
 				it.Charges=it.Charges-1
 			elseif it.Charges==2 then
 				it.Number=0
