@@ -1698,3 +1698,10 @@ function events.GetMerchantTotalSkill(t)
 	merchantCheck=false
 	t.Result=maxMerchant
 end
+
+--identify item fix
+function events.CanIdentifyItem(t)
+	if NPCFollowers.HaveProfession(4) then
+		t.CanIdentify = true
+	end
+end
