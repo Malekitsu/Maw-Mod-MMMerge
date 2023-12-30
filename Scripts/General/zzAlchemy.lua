@@ -58,7 +58,7 @@ function events.UseMouseItem(t)
 			pl.SpellBuffs[buff].Power=it.Bonus+10
 			pl.SpellBuffs[buff].ExpireTime=Game.Time+const.Minute*30*it.Bonus
 			
-			if it.Number<=234 and not it.Number==229 then
+			if it.Number<=234 and it.Number~=229 then
 				pl.SpellBuffs[buff].Power=math.round(pl.SpellBuffs[buff].Power/2)
 			end
 		--disable original behaviour and simulate sound
