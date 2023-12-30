@@ -1616,27 +1616,6 @@ end
 --identify item shared to all the party
 function events.GetSkill(t)
 	if Game.CurrentPlayer==-1 then return end
-	if t.Skill==const.Skills.IdentifyItem then
-		if Game.HouseScreen==-1 then return end
-		s,m=SplitSkill(t.Result)
-		currentIdentify=s*m
-		maxIdentify=s*m
-		for i=0,Party.High do
-			s,m=SplitSkill(Party[i].Skills[const.Skills.IdentifyItem])
-			bonus=0
-			for it in Party[i]:EnumActiveItems() do
-				if it.Bonus==20 and it.BonusStrength>bonus then
-					bonus=it.BonusStrength
-				end
-			end
-			s=s+bonus
-			if s*m>=currentIdentify then
-				currentIdentify=s*m
-				maxIdentify=JoinSkill(s,m)
-			end
-		end
-		t.Result=maxIdentify
-	end
 	if t.Skill==const.Skills.IdentifyMonster then
 		if Game.HouseScreen==-1 then return end
 		if Game.CurrentPlayer>=0 then
@@ -1701,6 +1680,15 @@ end
 
 --identify item fix
 function events.CanIdentifyItem(t)
+	t.CanIdentify = false
+	skillRequired=Game.ItemsTxt[t.Item.Number].IdRepSt
+	for i=0,Party.High do
+		s, m=SplitSkill(Party[i]:GetSkill(const.Skills.IdentifyItem))
+		skill=s*m
+		if skill>=skillRequired or m==4 then
+			t.CanIdentify = true
+		end
+	end
 	if NPCFollowers.HaveProfession(4) then
 		t.CanIdentify = true
 	end
