@@ -1702,16 +1702,26 @@ function MawRegen()
 	for i=0,Party.High do
 		local Cond = Party[i]:GetMainCondition()
 		if Cond == 18 or Cond == 17 or Cond < 14 then
+			--regeneration skill
 			local RegS, RegM = SplitSkill(Party[i]:GetSkill(const.Skills.Regeneration))
-			if RegM > 0 then
-				if RegM==4 then
-					RegM=5
-				end
-				FHP	= Party[i]:GetFullHP()
-				regenHP[i] = regenHP[i] + FHP^0.5*RegS^1.5*((RegM+1)/5000)
-				Party[i].HP = math.min(FHP, Party[i].HP + regenHP[i])
-				regenHP[i]=regenHP[i]%1
+			if RegM==4 then
+				RegM=5
 			end
+			FHP	= Party[i]:GetFullHP()
+			regenHP[i] = regenHP[i] + FHP^0.5*RegS^1.5*((RegM+1)/5000)
+			--regeneration spell
+			Buff=Party[i].SpellBuffs[const.PlayerBuff.Regeneration]
+			if Buff.ExpireTime > Game.Time and Buff.Caster >= 0 and Buff.Caster <= Party.High then
+				Buff.Power=0
+				RegS, RegM = SplitSkill(Party[Buff.Caster]:GetSkill(const.Skills.Body))
+				regenHP[i] = regenHP[i] + FHP^0.5*RegS^1.3*((RegM+1)/20000) -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
+			end
+			
+			Party[i].HP = math.min(FHP, Party[i].HP + regenHP[i])
+			if Party[i].HP>0 then
+				Party[i].Unconscious=0
+			end
+			regenHP[i]=regenHP[i]%1
 		end
 	end
 	--SP
