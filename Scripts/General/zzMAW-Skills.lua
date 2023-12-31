@@ -1693,3 +1693,28 @@ function events.CanIdentifyItem(t)
 		t.CanIdentify = true
 	end
 end
+
+--MAW REGEN, once every 0.1 seconds
+regenHP={0,0,0,0,0}
+regenSP={0,0,0,0,[0]=0}
+function MawRegen()
+	for i=0,Party.High do
+		local Cond = Party[i]:GetMainCondition()
+		if Cond == 18 or Cond == 17 or Cond < 14 then
+			local RegS, RegM = SplitSkill(Party[i]:GetSkill(const.Skills.Meditation))
+			if RegM > 0 then
+				if RegM==4 then
+					RegM=5
+				end
+				FSP	= Party[i]:GetFullSP()
+				regenSP[i] = regenSP[i] + FSP^0.35*RegS^1.4*((RegM+5)/5000)
+				Party[i].SP = math.min(FSP, Party[i].SP + regenSP[i])
+				regenSP[i]=regenSP[i]%1
+			end
+		end
+	end
+end
+
+function events.LoadMap(wasInGame)
+	Timer(MawRegen, const.Minute/20) 
+end
