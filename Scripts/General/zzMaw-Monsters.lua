@@ -531,7 +531,7 @@ end
 -- Create a backup of Game.MapStats
 BackupMapStats = deepcopy(Game.MapStats)
 
-function events.GameInitialized2()
+function events.LoadMap()
 	--add difficulty related damage
 	if Game.BolsterAmount%50~=0 or Game.BolsterAmount==0 then
 		Game.BolsterAmount=100
@@ -617,11 +617,23 @@ mapLevels={
 ["Ravenshore"] = 
 {["Low"] = 14 , ["Mid"] = 14 , ["High"] = 17},
 
+["Smuggler's Cove"] = 
+{["Low"] = 11 , ["Mid"] = 13 , ["High"] = 17},
+
+["Dire Wolf Den"] = 
+{["Low"] = 14 , ["Mid"] = 14 , ["High"] = 14},
+
+["Chapel of Eep"] = 
+{["Low"] = 14 , ["Mid"] = 16 , ["High"] = 20},
+
 ["Alvar"] = 
-{["Low"] = 18 , ["Mid"] = 20 , ["High"] = 27},
+{["Low"] = 21 , ["Mid"] = 24 , ["High"] = 35},
 
 ["Ironsand Desert"] = 
-{["Low"] = 13 , ["Mid"] = 28 , ["High"] = 36},
+{["Low"] = 16 , ["Mid"] = 28 , ["High"] = 36},
+
+["Troll Tomb"] = 
+{["Low"] = 18 , ["Mid"] = 18 , ["High"] = 18},
 
 ["Garrote Gorge"] = 
 {["Low"] = 28 , ["Mid"] = 30 , ["High"] = 35},
@@ -659,12 +671,6 @@ mapLevels={
 ["Pirate Outpost"] = 
 {["Low"] = 5 , ["Mid"] = 31 , ["High"] = 31},
 
-["Smuggler's Cove"] = 
-{["Low"] = 11 , ["Mid"] = 13 , ["High"] = 17},
-
-["Dire Wolf Den"] = 
-{["Low"] = 11 , ["Mid"] = 12.5 , ["High"] = 14},
-
 ["Merchant House of Alvar"] = 
 {["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
 
@@ -675,10 +681,7 @@ mapLevels={
 {["Low"] = 18 , ["Mid"] = 18 , ["High"] = 18},
 
 ["Ogre Fortress"] = 
-{["Low"] = 17 , ["Mid"] = 20 , ["High"] = 28},
-
-["Troll Tomb"] = 
-{["Low"] = 13 , ["Mid"] = 13 , ["High"] = 13},
+{["Low"] = 20 , ["Mid"] = 24 , ["High"] = 24},
 
 ["Cyclops Larder"] = 
 {["Low"] = 36 , ["Mid"] = 36 , ["High"] = 36},
@@ -771,9 +774,6 @@ mapLevels={
 {["Low"] = 23 , ["Mid"] = 25 , ["High"] = 27},
 
 ["Grand Temple of Eep"] = 
-{["Low"] = 11 , ["Mid"] = 13 , ["High"] = 17},
-
-["Chapel of Eep"] = 
 {["Low"] = 11 , ["Mid"] = 13 , ["High"] = 17},
 
 ["Church of Eep"] = 
@@ -1346,4 +1346,12 @@ end
 --disable base monster Resistances
 function events.CalcDamageToMonster(t)
 	t.Result=t.Damage
+end
+
+--disable respawn in outside maps (mostly)
+outSideMaps={1,2,3,4,5,6,7,8,13, 62,63,64,65,66,67,68,69,70,72,73,74,99,100,140,141,143,144,145,146,147,148,149,150,151}
+function events.GameInitialized2()
+	for i=1,#outSideMaps do
+	Game.MapStats[i].RefillDays=-1
+	end
 end
