@@ -1695,9 +1695,26 @@ function events.CanIdentifyItem(t)
 end
 
 --MAW REGEN, once every 0.1 seconds
-regenHP={0,0,0,0,0}
+regenHP={0,0,0,0,[0]=0}
 regenSP={0,0,0,0,[0]=0}
 function MawRegen()
+	--HP
+	for i=0,Party.High do
+		local Cond = Party[i]:GetMainCondition()
+		if Cond == 18 or Cond == 17 or Cond < 14 then
+			local RegS, RegM = SplitSkill(Party[i]:GetSkill(const.Skills.Regeneration))
+			if RegM > 0 then
+				if RegM==4 then
+					RegM=5
+				end
+				FHP	= Party[i]:GetFullHP()
+				regenHP[i] = regenHP[i] + FHP^0.5*RegS^1.5*((RegM+1)/5000)
+				Party[i].HP = math.min(FHP, Party[i].HP + regenHP[i])
+				regenHP[i]=regenHP[i]%1
+			end
+		end
+	end
+	--SP
 	for i=0,Party.High do
 		local Cond = Party[i]:GetMainCondition()
 		if Cond == 18 or Cond == 17 or Cond < 14 then
