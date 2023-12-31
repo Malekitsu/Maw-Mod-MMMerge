@@ -661,11 +661,10 @@
 			local RegS, RegM = SplitSkill(Player:GetSkill(const.Skills.Meditation))
 			if RegM > 0 then
 				local FSP	= Player:GetFullSP()
-				if RegM==4 then
-					RegM=5
-				end
-				local Add = math.ceil(FSP^0.5*RegS^0.7*((RegM+5)/50))
-				Player.SP = math.min(FSP, Player.SP + Add)
+				--local RegP	= 0.25*(2^(RegM-1))/100
+				--Player.SP	= math.min(FSP, Player.SP + math.ceil(FSP*RegP))
+				--local Add = RegM + math.floor(RegS/10)
+				--Player.SP = math.min(FSP, Player.SP + Add)
 			end
 		end
 	end
