@@ -266,7 +266,7 @@ local function getPlayerEquipmentData(player)
 		equipmentData.main.skill = equipmentData.main.itemTxt.Skill 
 		
 		if equipmentData.main.skill >= 0 and equipmentData.main.skill <= 38 then
-			equipmentData.main.level, equipmentData.main.rank = SplitSkill(player.Skills[equipmentData.main.skill])
+			equipmentData.main.level, equipmentData.main.rank = SplitSkill(player:GetSkill(equipmentData.main.skill))
 		end
 		
 		if equipmentData.main.skill >= 0 and equipmentData.main.skill <= 7 then
@@ -286,8 +286,8 @@ local function getPlayerEquipmentData(player)
 		equipmentData.extra.equipStat = equipmentData.extra.itemTxt.EquipStat + 1
 		equipmentData.extra.skill = equipmentData.extra.itemTxt.Skill 
 		
-		if equipmentData.extra.skill >= 0 then
-			equipmentData.extra.level, equipmentData.extra.rank = SplitSkill(player.Skills[equipmentData.extra.skill])
+		if equipmentData.extra.skill >= 0 and equipmentData.extra.skill <= 7 then --for some reason 8 crash
+			equipmentData.extra.level, equipmentData.extra.rank = SplitSkill(player:GetSkill(equipmentData.extra.skill))
 		end
 		
 		if equipmentData.extra.skill >= 0 and equipmentData.extra.skill <= 7 then
@@ -332,7 +332,7 @@ local function getPlayerEquipmentData(player)
 		equipmentData.armor.item = player.Items[player.ItemArmor]
 		local itemArmorTxt = Game.ItemsTxt[equipmentData.armor.item.Number]
 		equipmentData.armor.skill = itemArmorTxt.Skill 
-		equipmentData.armor.level, equipmentData.armor.rank = SplitSkill(player.Skills[equipmentData.armor.skill])
+		equipmentData.armor.level, equipmentData.armor.rank = SplitSkill(player:GetSkill(equipmentData.armor.skill))
 		
 	end
 	
