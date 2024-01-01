@@ -168,7 +168,7 @@ function events.Tick()
 end
 --body building description
 function events.GameInitialized2()
-	Game.SkillDescriptions[27]=Game.SkillDescriptions[24] .. "\n\nHit Points are also increased by an amount equal to Skill^2 divided by 2"
+	Game.SkillDescriptions[27]=Game.SkillDescriptions[27] .. "\n\nHit Points are also increased by an amount equal to Skill^2 divided by 2"
 end
 
 function events.BuildStatInformationBox(t)
