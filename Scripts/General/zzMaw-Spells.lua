@@ -429,7 +429,7 @@ function events.PlayerCastSpell(t)
 	end
 	
 	--protection spells
-	protectionSpells={[25]={0,14} ,[69]={1,18} ,[36]={4,15} ,[3]={6,12} ,[58]={12,17} ,[14]={17,13} } --first value is spell ID, second is school skill ID
+	protectionSpells={[25]={17,14} ,[69]={1,18} ,[36]={4,15} ,[3]={6,12} ,[58]={12,17} ,[14]={0,13} } --first value is spell ID, second is school skill ID
 	if protectionSpells[t.SpellId] then
 		if not t.RemoteData then
 			t.Skill=1
