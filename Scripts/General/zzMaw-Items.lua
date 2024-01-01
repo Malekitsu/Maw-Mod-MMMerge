@@ -1363,14 +1363,14 @@ end
 
 function events.BuildItemInformationBox(t)
 	partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-	maxItemBolster=(partyLevel)/5+5
+	maxItemBolster=(partyLevel)/5+20
 end
 
 --do the same if someone is trying to equip on a player
 function events.Action(t)
 	if t.Action==133 then
 		partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-		maxItemBolster=(partyLevel)/5+5
+		maxItemBolster=(partyLevel)/5+20
 		--failsafe
 		if Mouse.Item and Mouse.Item.Charges==0 and Mouse.Item.Bonus2==0 and Mouse.Item.Bonus==0 then
 			Mouse.Item.MaxCharges=0
@@ -1500,7 +1500,12 @@ function events.BuildItemInformationBox(t)
 				might=Party[i]:GetMight()
 				accuracy=Party[i]:GetAccuracy()
 				luck=Party[i]:GetLuck()
-				delay=math.max(Party[i]:GetAttackDelay(),30)
+				delay=math.max(Party[i]:GetAttackDelay())
+				recovery=recoveryBonus
+				bonusMult=1
+				if recoveryBonus>233 then
+					bonusMult=math.round(recovery/233)
+				end
 				dmg=(low+high)/2
 				--hit chance
 				atk=Party[i]:GetMeleeAttack()
@@ -1518,7 +1523,7 @@ function events.BuildItemInformationBox(t)
 						end
 					end
 				end
-				DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
+				DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)*bonusMult
 				
 				--RANGED
 				low=Party[i]:GetRangedDamageMin()
@@ -1676,17 +1681,23 @@ function events.BuildItemInformationBox(t)
 				else
 					newSpeed=(speed-13)/2
 				end
+				
 				if powerType=="Melee" then
-					delay=math.max(Party[i]:GetAttackDelay(),30)
+					delay=math.max(Party[i]:GetAttackDelay())
 				else
 					delay=Party[i]:GetAttackDelay(true)
 				end
 				recoveryBonus=recoveryBonus+newSpeed-oldSpeed
+				bonusMult=1
 				
 				if powerType=="Melee" then
 					delay=math.max(math.floor(100 / (1 + recoveryBonus / 100)),30)
 				else
 					delay=math.floor(100 / (1 + recoveryBonus / 100))
+				end
+				
+				if recoveryBonus>233 then
+					bonusMult=recoveryBonus/233
 				end
 				
 				--luck
@@ -1719,7 +1730,7 @@ function events.BuildItemInformationBox(t)
 						dmg=dmg*2
 					end
 				end
-				power=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)				
+				power=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*bonusMult)
 			end
 			
 			
