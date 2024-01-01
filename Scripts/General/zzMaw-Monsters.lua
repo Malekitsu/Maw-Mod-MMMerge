@@ -1298,12 +1298,19 @@ end
 
 --monster tooltips
 function events.BuildMonsterInformationBox(t)
+	--show level Below HP
+	t.ArmorClass.Text=string.format("Level:         " .. t.Monster.Level .. "\n" .. "58992Armor Class0000000000	100?")
+
+	--difficulty multiplier
+	diff=Game.BolsterAmount/100 or 1
+	if diff==0.5 then
+		diff=0.7
+	end
 	--some statistics here, calculate the standard deviation of dices to get the range of which 95% will fall into
 	mean=t.Monster.Attack1.DamageAdd+t.Monster.Attack1.DamageDiceCount*(t.Monster.Attack1.DamageDiceSides+1)/2
 	range=(t.Monster.Attack1.DamageDiceSides^2*t.Monster.Attack1.DamageDiceCount/12)^0.5*1.96
-	lowerLimit=math.round(math.max(mean-range, t.Monster.Attack1.DamageAdd+t.Monster.Attack1.DamageDiceCount))
-	upperLimit=math.round(math.min(mean+range, t.Monster.Attack1.DamageAdd+t.Monster.Attack1.DamageDiceCount*t.Monster.Attack1.DamageDiceSides))
-	
+	lowerLimit=math.round(math.max(mean-range, t.Monster.Attack1.DamageAdd+t.Monster.Attack1.DamageDiceCount))*diff
+	upperLimit=math.round(math.min(mean+range, t.Monster.Attack1.DamageAdd+t.Monster.Attack1.DamageDiceCount*t.Monster.Attack1.DamageDiceSides))*diff
 	
 	if t.Monster.Attack1.Missile == 0 then
 		text=string.format(table.find(const.Damage,t.Monster.Attack1.Type) .. "-Melee")
@@ -1314,8 +1321,8 @@ function events.BuildMonsterInformationBox(t)
 	if t.Monster.Attack2Chance>0 then
 		mean=t.Monster.Attack2.DamageAdd+t.Monster.Attack2.DamageDiceCount*(t.Monster.Attack2.DamageDiceSides+1)/2
 		range=(t.Monster.Attack2.DamageDiceSides^2*t.Monster.Attack2.DamageDiceCount/12)^0.5*1.96
-		lowerLimit=math.round(math.max(mean-range, t.Monster.Attack2.DamageAdd+t.Monster.Attack2.DamageDiceCount))
-		upperLimit=math.round(math.min(mean+range, t.Monster.Attack2.DamageAdd+t.Monster.Attack2.DamageDiceCount*t.Monster.Attack2.DamageDiceSides))
+		lowerLimit=math.round(math.max(mean-range, t.Monster.Attack2.DamageAdd+t.Monster.Attack2.DamageDiceCount))*diff
+		upperLimit=math.round(math.min(mean+range, t.Monster.Attack2.DamageAdd+t.Monster.Attack2.DamageDiceCount*t.Monster.Attack2.DamageDiceSides))*diff
 		if t.Monster.Attack2.Missile == 0 then
 			text=string.format(table.find(const.Damage,t.Monster.Attack2.Type) .. "-Melee")
 		else
@@ -1344,8 +1351,8 @@ function events.BuildMonsterInformationBox(t)
 		--calculate
 		mean=spell.DamageAdd+skill*(spell.DamageDiceSides+1)/2
 		range=(spell.DamageDiceSides^2*skill/12)^0.5*1.96
-		lowerLimit=math.round(math.max(mean-range, spell.DamageAdd+skill)*dmgMult)
-		upperLimit=math.round(math.min(mean+range, spell.DamageAdd+skill*spell.DamageDiceSides)*dmgMult)
+		lowerLimit=math.round(math.max(mean-range, spell.DamageAdd+skill)*dmgMult)*diff
+		upperLimit=math.round(math.min(mean+range, spell.DamageAdd+skill*spell.DamageDiceSides)*dmgMult)*diff
 		
 		t.SpellFirst.Text=string.format("Spell00000	040" .. name .. " " .. lowerLimit .. "-" .. upperLimit)
 	end
