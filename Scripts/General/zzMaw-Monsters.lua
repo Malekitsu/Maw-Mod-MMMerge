@@ -450,6 +450,20 @@ function events.LoadMap()
 	end
 end
 
+function events.LoadMap()
+	--DRAGON BREATH FIX
+	for i=1, 651 do
+		mon=Game.MonstersTxt[i]
+		if mon.Spell==97 then
+			s,m=SplitSkill(mon.SpellSkill)
+			mon.SpellSkill=JoinSkill(math.ceil(s/2), m)
+		elseif mon.Spell==93 then
+			s,m=SplitSkill(mon.SpellSkill)
+			mon.SpellSkill=JoinSkill(math.ceil(s/1.5), m)
+		end
+	end
+end
+
 --LOOT FIX
 function events.PickCorpse(t)
 	--calculate bolster
