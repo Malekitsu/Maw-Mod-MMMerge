@@ -364,7 +364,7 @@ function events.LoadMap()
 		
 		mon.ArmorClass=base.ArmorClass*((levelMult+10)/(LevelB+10))
 		mon.ArmorClass=mon.Level
-		dmgMult=(levelMult/9+1.15)*((levelMult+2)/(2+LevelB))	
+		dmgMult=(levelMult/9+1.15)*((levelMult+10)/(10+LevelB))	
 		-----------------------------------------------------------
 		--DAMAGE COMPUTATION DOWN HERE, FOR BALANCE MODIFY ABOVE^
 		--attack 1
@@ -1346,7 +1346,7 @@ function events.BuildMonsterInformationBox(t)
 		else
 			levelMult=Game.MonstersTxt[i].Level
 		end
-		dmgMult=(levelMult/12+1)*((levelMult+2)/(oldLevel+2))
+		dmgMult=(levelMult/12+1)*((levelMult+10)/(oldLevel+10))
 		
 		--calculate
 		mean=spell.DamageAdd+skill*(spell.DamageDiceSides+1)/2
