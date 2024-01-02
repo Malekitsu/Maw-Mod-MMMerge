@@ -249,14 +249,14 @@ function events.LoadMap()
 		end
 	end
 	if #currentMapMonsters>=2 then
-		if Game.MonstersTxt[currentMapMonsters[1]].Level>Game.MonstersTxt[currentMapMonsters[2]].Level then
+		if basetable[currentMapMonsters[1]].Level>basetable[currentMapMonsters[2]].Level then
 			currentMapMonsters[1], currentMapMonsters[2] = currentMapMonsters[2], currentMapMonsters[1]
 		end
 		if #currentMapMonsters==3 then
-			if Game.MonstersTxt[currentMapMonsters[2]].Level > Game.MonstersTxt[currentMapMonsters[3]].Level then
+			if basetable[currentMapMonsters[2]].Level > basetable[currentMapMonsters[3]].Level then
 				currentMapMonsters[3], currentMapMonsters[2] = currentMapMonsters[2], currentMapMonsters[3]
 			end
-			if Game.MonstersTxt[currentMapMonsters[1]].Level>Game.MonstersTxt[currentMapMonsters[2]].Level then
+			if basetable[currentMapMonsters[1]].Level>basetable[currentMapMonsters[2]].Level then
 				currentMapMonsters[1], currentMapMonsters[2] = currentMapMonsters[2], currentMapMonsters[1]
 			end
 		end
@@ -311,21 +311,12 @@ function events.LoadMap()
 			mon.HP=math.min(math.round(mon.HP*(1+HPBolsterLevel/180),32500))
 		end
 		mon.FullHP=mon.HP
-		--[[resistances
-		Game.MonstersTxt[i].FireResistance=base.FireResistance+(math.round(mon.Level-base.Level)/18)*5
-		Game.MonstersTxt[i].AirResistance=base.AirResistance+(math.round(mon.Level-base.Level)/18)*5
-		Game.MonstersTxt[i].WaterResistance=base.WaterResistance+(math.round(mon.Level-base.Level)/18)*5
-		Game.MonstersTxt[i].EarthResistance=base.EarthResistance+(math.round(mon.Level-base.Level)/18)*5
-		Game.MonstersTxt[i].MindResistance=base.MindResistance+(math.round(mon.Level-base.Level)/18)*5
-		Game.MonstersTxt[i].SpiritResistance=base.SpiritResistance+(math.round(mon.Level-base.Level)/18)*5
-		Game.MonstersTxt[i].BodyResistance=base.BodyResistance+(math.round(mon.Level-base.Level)/18)*5
-		Game.MonstersTxt[i].LightResistance=base.LightResistance+(math.round(mon.Level-base.Level)/18)*5
-		Game.MonstersTxt[i].DarkResistance=base.DarkResistance+(math.round(mon.Level-base.Level)/18)*5
-		Game.MonstersTxt[i].PhysResistance=base.PhysResistance+(math.round(mon.Level-base.Level)/18)*5
-		--]]
+		
+		--resistances 
+		bolsterRes=math.max(math.round((mon.Level-basetable[i].Level)/18)*5,0)
 		for v=0,10 do
 			if v~=5 then
-			mon.Resistances[v]=math.min(math.max(math.round((mon.Level-basetable[i].Level)/18)*5,0)+basetable[i].Resistances[v],65000)	
+			mon.Resistances[v]=math.min(bolsterRes+basetable[i].Resistances[v],bolsterRes+200)	
 			end
 		end
 		
@@ -462,6 +453,7 @@ function events.LoadMap()
 			mon.SpellSkill=JoinSkill(math.ceil(s/1.5), m)
 		end
 	end
+	
 end
 
 --LOOT FIX
@@ -701,7 +693,7 @@ mapLevels={
 {["Low"] = 36 , ["Mid"] = 36 , ["High"] = 36},
 
 ["Chain of Fire"] = 
-{["Low"] = 13 , ["Mid"] = 31 , ["High"] = 49},
+{["Low"] = 31 , ["Mid"] = 40 , ["High"] = 49},
 
 ["Dragon Hunter's Camp"] = 
 {["Low"] = 17 , ["Mid"] = 23.5 , ["High"] = 30},
