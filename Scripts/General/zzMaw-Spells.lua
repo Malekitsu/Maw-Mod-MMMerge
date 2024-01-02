@@ -415,11 +415,11 @@ function events.PlayerCastSpell(t)
 			if Party.SpellBuffs[2].Power<=	power then
 				Party.SpellBuffs[2].Power = power
 				Party.SpellBuffs[2].Skill = t.Mastery
-				Party.SpellBuffs[2].ExpireTime = Game.Time+const.Hour*s
+				Party.SpellBuffs[2].ExpireTime = Game.Time+const.Hour*s*4
 			end
 			if t.MultiplayerData then
 				t.MultiplayerData[1]=power
-				t.MultiplayerData[2]=Game.Time+const.Hour*s
+				t.MultiplayerData[2]=Game.Time+const.Hour*s*4
 			end
 		--online code
 		elseif t.RemoteData then
@@ -463,12 +463,12 @@ function events.PlayerCastSpell(t)
 				if Party.SpellBuffs[buffId].Power<=power then
 					Party.SpellBuffs[buffId].Power = power
 					Party.SpellBuffs[buffId].Skill = t.Mastery
-					Party.SpellBuffs[buffId].ExpireTime = Game.Time+const.Hour*s
+					Party.SpellBuffs[buffId].ExpireTime = Game.Time+const.Hour*s*4
 				end
 			end
 			if t.MultiplayerData then
 				t.MultiplayerData[1]=power
-				t.MultiplayerData[2]=Game.Time+const.Hour*s
+				t.MultiplayerData[2]=Game.Time+const.Hour*s*4
 			end
 		elseif t.RemoteData then
 			for _, buffId in ipairs(dopList) do
