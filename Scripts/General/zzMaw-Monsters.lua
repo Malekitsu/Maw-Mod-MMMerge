@@ -466,7 +466,6 @@ function events.PickCorpse(t)
 	goldMult=(bolsterLevel+lvl)^1.5/(lvl)^1.5
 	mon.TreasureDiceCount=math.min(mon.TreasureDiceCount*goldMult^0.5,255)
 	mon.TreasureDiceSides=math.min(mon.TreasureDiceSides*goldMult^0.5,255)
-	
 	--calculate loot chances
 	
 	mon.TreasureItemPercent= math.round(mon.TreasureItemPercent^0.85 + (50 - mon.TreasureItemPercent^0.85 / 2) * bolsterLevel / 250)
@@ -651,7 +650,7 @@ mapLevels={
 {["Low"] = 23 , ["Mid"] = 27 , ["High"] = 35},
 
 ["Ravage Roaming"] = 
-{["Low"] = 20 , ["Mid"] = 28 , ["High"] = 35},
+{["Low"] = 28 , ["Mid"] = 28 , ["High"] = 35},
 
 ["Plane of Air"] = 
 {["Low"] = 50 , ["Mid"] = 59 , ["High"] = 65},
@@ -720,13 +719,13 @@ mapLevels={
 {["Low"] = 20 , ["Mid"] = 24 , ["High"] = 60},
 
 ["Balthazar Lair"] = 
-{["Low"] = 30 , ["Mid"] = 44.5 , ["High"] = 59},
+{["Low"] = 35 , ["Mid"] = 47 , ["High"] = 59},
 
 ["Barbarian Fortress"] = 
-{["Low"] = 17 , ["Mid"] = 20 , ["High"] = 28},
+{["Low"] = 25 , ["Mid"] = 28 , ["High"] = 36},
 
 ["The Crypt of Korbu"] = 
-{["Low"] = 28 , ["Mid"] = 41.5 , ["High"] = 55},
+{["Low"] = 32 , ["Mid"] = 36 , ["High"] = 40},
 
 ["Castle of Air"] = 
 {["Low"] = 65 , ["Mid"] = 65 , ["High"] = 65},
@@ -783,7 +782,7 @@ mapLevels={
 {["Low"] = 11 , ["Mid"] = 13 , ["High"] = 17},
 
 ["Church of Eep"] = 
-{["Low"] = 11 , ["Mid"] = 13 , ["High"] = 17},
+{["Low"] = 20 , ["Mid"] = 22 , ["High"] = 26},
 
 ["Old Loeb's Cave"] = 
 {["Low"] = 35 , ["Mid"] = 60 , ["High"] = 85},
@@ -1367,4 +1366,7 @@ function events.GameInitialized2()
 	for i=1,#outSideMaps do
 	Game.MapStats[i].RefillDays=-1
 	end
+	
+	--fix shots being blocked by monsters
+	Game.PatchOptions.FixMonstersBlockingShots=true
 end
