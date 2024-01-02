@@ -560,7 +560,12 @@ function events.BuildItemInformationBox(t)
 			--add enchant Name
 			t.Name = Game.ItemsTxt[t.Item.Number].Name
 			if t.Item.Bonus2>0 then
-				t.Name= t.Name .. " " .. Game.SpcItemsTxt[t.Item.Bonus2-1].NameAdd
+				enchString=Game.SpcItemsTxt[t.Item.Bonus2-1].NameAdd
+				if string.match(enchString, "^%u") then
+					t.Name= enchString .. " " .. t.Name
+				else
+					t.Name= t.Name .. " " .. enchString
+				end
 			elseif t.Item.Bonus>0 then
 				t.Name= t.Name .. " " .. Game.StdItemsTxt[t.Item.Bonus-1].NameAdd
 			end
