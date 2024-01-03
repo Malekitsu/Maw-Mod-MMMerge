@@ -1,3 +1,122 @@
+--code to share promotions
+--game ordered from mm6 to mm8, first promotion then honorary promotion qbits, mm7 has 4 qbits total
+promotionList={
+--Archer
+[1]=		{1657,1658,		1586,1587,1588,1589,	1537,20},--dark elf 
+--Cleric
+[2]=		{1648,1649,		1609,1610,1611,1612,	1546,31},
+--Dark Elf
+[3]=	{1657,1658,		1586,1587,1588,1589,	1537,20},--archer
+--Dragon
+[4]=		{1645,1646,		1568,1569,1570,1571,	1543,1544},--knight 
+--Druid
+[5]= 		{1651,1652,		1615,1616,1617,1618,	1546,31},--cleric
+--Knight
+[6]=		{1645,1646,		1568,1569,1570,1571,	1540,1541},
+--Minotaur
+[7]=	{1637,1638,		1592,1593,1594,1595,	1545,29},--paladin
+--Monk
+[8]=		{1645,1646,		1568,1569,1570,1571,	1538,1539},--knight and troll
+--Paladin
+[9]=	{1637,1638,		1592,1593,1594,1595,	1545,29},--minotaur
+--Ranger
+[10]=		{1657,1658,		1580,1581,1582,1583,	1537,20},--archer, dark elf
+--Thief
+[11]=		{1657,1658,		1564,1565,1566,1567,	1547,33},--archer, vampire
+--Troll
+[12]=		{1645,1646,		1568,1569,1570,1571,	1538,1539},--knight and monk
+--Vampire
+[13]=	{1657,1658,		1564,1565,1566,1567,	1547,33},--archer, thief
+--Sorcerer
+[14]=	{1641,1642,		1621,1622,1623,1624,	1548,35},--necromancer
+--Necromancer
+[15]=	{1641,1642,		1621,1622,1623,1624,	1548,35},--sorcerer
+--Peasant
+[16]=	{0,0,		0,0,0,0,	0,0},
+--Seraphim
+[17]=	{1648,1649,		1609,1610,1611,1612,	1546,31}--cleric
+}
+
+function events.GameInitialized2()
+	oldNames={}
+	oldHP={}
+	oldSP={}
+	for i=0,Game.ClassNames.High do
+		oldNames[i]=Game.ClassNames[i]
+		oldHP[i]=Game.Classes.HPFactor[i]
+		oldSP[i]=Game.Classes.SPFactor[i]
+	end
+end
+
+promotionCount={}
+function checkPromo()
+	for i= 0,Game.Classes.HPFactor.High do
+		--extablish which class needs upgrade
+		if Game.ClassesExtra[i].Step==2 then
+			totalPromotions=0
+			prom=promotionList[Game.ClassesExtra[i].Kind]
+			if Party.QBits[prom[1]] or Party.QBits[prom[2]] then
+				totalPromotions=totalPromotions+1
+			end
+			if Party.QBits[prom[3]] or Party.QBits[prom[4]] or Party.QBits[prom[5]] or Party.QBits[prom[6]] then
+				totalPromotions=totalPromotions+1
+			end
+			if prom[8]<105 then
+				check=Party[0].Awards[prom[8]]
+			else
+				check=Party.QBits[prom[8]]
+			end
+			if Party.QBits[prom[7]] or check then
+				totalPromotions=totalPromotions+1
+			end
+			promotionCount[Game.ClassesExtra[i].Kind]=totalPromotions
+			--upgrade class
+			if totalPromotions>1 then
+				Game.Classes.HPFactor[i]=oldHP[i]*(0.75+0.25*totalPromotions)
+				Game.Classes.SPFactor[i]=oldSP[i]*(0.75+0.25*totalPromotions)
+				if totalPromotions==2 then
+					Game.ClassNames[i]=string.format("Elder " .. oldNames[i])
+				else
+					Game.ClassNames[i]=string.format("Ultimate " .. oldNames[i])
+				end
+			else
+				Game.Classes.HPFactor[i]=oldHP[i]
+				Game.Classes.SPFactor[i]=oldSP[i]
+				Game.ClassNames[i]=oldNames[i]
+			end
+		end
+	end
+	--check promotion
+	for i=0,Party.High do
+		class=Party[i].Class
+		kind=Game.ClassesExtra[class].Kind
+		if promotionCount[kind]>=1 and Game.ClassesExtra[class].Step<2 then --check if promotion
+			--search for available promotions
+			promotionCount={}
+			for v=0,#Game.ClassesExtra do
+				if Game.ClassesExtra[v].Kind==kind and Game.ClassesExtra[v].Step==2 then
+					table.insert(promotionCount, v)
+				end
+			end
+			if #promotionCount==1 then
+				Party[i].Class=promotionCount[1]
+			elseif #promotionCount>1 then
+				Party[i].Class=promotionCount[math.random(1,#promotionCount)]
+			end
+		end
+	end 
+end
+
+
+function events.LoadMap()
+	checkPromo()
+end
+
+function events.EvtGlobal(i)
+	checkPromo()
+end
+
+
 ----------------------------------------------------------------------
 --SERAPHIM
 ----------------------------------------------------------------------
@@ -134,3 +253,4 @@ function events.CalcDamageToMonster(t)
 		end
 	end
 end
+
