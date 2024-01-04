@@ -43,7 +43,7 @@ function events.AfterLoadMap()
 		for i=0, Map.Monsters.High do
 			mon=Map.Monsters[i]
 			
-			if  (mon.FullHitPoints ~= Game.MonstersTxt[Map.Monsters[i].Id].FullHitPoints) and mon.Level>5 then
+			if  mon.NameId >=1 then
 				--level increase 
 				oldLevel=mon.Level
 				mon.Level=math.min(mon.Level+partyLvl,255)
@@ -354,7 +354,6 @@ function events.LoadMap()
 		end
 		
 		mon.ArmorClass=base.ArmorClass*((levelMult+10)/(LevelB+10))
-		mon.ArmorClass=mon.Level
 		dmgMult=(levelMult/9+1.15)*((levelMult+10)/(10+LevelB))	
 		-----------------------------------------------------------
 		--DAMAGE COMPUTATION DOWN HERE, FOR BALANCE MODIFY ABOVE^
@@ -447,7 +446,7 @@ function events.LoadMap()
 		mon=Game.MonstersTxt[i]
 		if mon.Spell==97 then
 			s,m=SplitSkill(mon.SpellSkill)
-			mon.SpellSkill=JoinSkill(math.ceil(s/4), m)
+			mon.SpellSkill=JoinSkill(math.ceil(s/2), m)
 		elseif mon.Spell==93 then
 			s,m=SplitSkill(mon.SpellSkill)
 			mon.SpellSkill=JoinSkill(math.ceil(s/1.5), m)
@@ -641,10 +640,10 @@ mapLevels={
 {["Low"] = 18 , ["Mid"] = 18 , ["High"] = 18},
 
 ["Garrote Gorge"] = 
-{["Low"] = 28 , ["Mid"] = 30 , ["High"] = 35},
+{["Low"] = 38 , ["Mid"] = 45 , ["High"] = 50},
 
 ["Shadowspire"] = 
-{["Low"] = 13 , ["Mid"] = 28 , ["High"] = 45},
+{["Low"] = 28 , ["Mid"] = 35 , ["High"] = 45},
 
 ["Murmurwoods"] = 
 {["Low"] = 23 , ["Mid"] = 27 , ["High"] = 35},
@@ -695,22 +694,22 @@ mapLevels={
 {["Low"] = 31 , ["Mid"] = 40 , ["High"] = 49},
 
 ["Dragon Hunter's Camp"] = 
-{["Low"] = 17 , ["Mid"] = 23.5 , ["High"] = 30},
+{["Low"] = 35 , ["Mid"] = 40 , ["High"] = 45},
 
 ["Dragon Cave"] = 
 {["Low"] = 35 , ["Mid"] = 60 , ["High"] = 85},
 
 ["Naga Vault"] = 
-{["Low"] = 7 , ["Mid"] = 17.5 , ["High"] = 28},
+{["Low"] = 30 , ["Mid"] = 34 , ["High"] = 38},
 
 ["Necromancers' Guild"] = 
 {["Low"] = 13 , ["Mid"] = 28 , ["High"] = 42},
 
 ["Mad Necromancer's Lab "] = 
-{["Low"] = 13 , ["Mid"] = 42 , ["High"] = 45},
+{["Low"] = 37 , ["Mid"] = 42 , ["High"] = 45},
 
 ["Vampire Crypt"] = 
-{["Low"] = 28 , ["Mid"] = 28 , ["High"] = 28},
+{["Low"] = 42 , ["Mid"] = 42 , ["High"] = 42},
 
 ["Temple of the Sun"] = 
 {["Low"] = 20 , ["Mid"] = 20 , ["High"] = 20},
@@ -767,7 +766,7 @@ mapLevels={
 {["Low"] = 65 , ["Mid"] = 70 , ["High"] = 70},
 
 ["Uplifted Library"] = 
-{["Low"] = 20 , ["Mid"] = 25 , ["High"] = 30},
+{["Low"] = 30 , ["Mid"] = 35 , ["High"] = 40},
 
 ["Dark Dwarf Compound"] = 
 {["Low"] = 20 , ["Mid"] = 22 , ["High"] = 24},
@@ -779,7 +778,7 @@ mapLevels={
 {["Low"] = 23 , ["Mid"] = 25 , ["High"] = 27},
 
 ["Grand Temple of Eep"] = 
-{["Low"] = 11 , ["Mid"] = 13 , ["High"] = 17},
+{["Low"] = 21 , ["Mid"] = 23 , ["High"] = 27},
 
 ["Church of Eep"] = 
 {["Low"] = 20 , ["Mid"] = 22 , ["High"] = 26},
@@ -1370,3 +1369,11 @@ function events.GameInitialized2()
 	--fix shots being blocked by monsters
 	Game.PatchOptions.FixMonstersBlockingShots=true
 end
+
+--[[Naga
+function events.MonsterSpriteScale(t)
+	if t.Monster.FullHP>3205 then
+		t.Scale=t.Scale
+	end
+end
+]]
