@@ -16,11 +16,11 @@ function events.GenerateItem(t)
 	end
 
 	--nerf if item is strong
-	if partyLevelItemGen<(t.Strength-3)*20 and t.Strength<7 then
+	if partyLevelItemGen<(t.Strength-3)*18 and t.Strength<7 then
 		t.Strength=t.Strength-1
 	end
-	if (t.Strength-2)*20>partyLevelItemGen and t.Strength>2 and t.Strength<7 then
-		roll=math.random((t.Strength-3)*20,(t.Strength-2)*20)
+	if (t.Strength-2)*18>partyLevelItemGen and t.Strength>2 and t.Strength<7 then
+		roll=math.random((t.Strength-3)*18,(t.Strength-2)*18)
 		if roll>partyLevelItemGen then
 			t.Strength=t.Strength-1
 		end
@@ -1377,7 +1377,7 @@ function events.Action(t)
 		partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 		maxItemBolster=(partyLevel)/5+20
 		--failsafe
-		if Mouse.Item and Mouse.Item.Charges==0 and Mouse.Item.Bonus2==0 and Mouse.Item.Bonus==0 then
+		if Mouse.Item and Mouse.Item.Charges==0 and Mouse.Item.Bonus==0 and Mouse.Item.MaxCharges>maxItemBolster then
 			Mouse.Item.MaxCharges=0
 		end
 	end
