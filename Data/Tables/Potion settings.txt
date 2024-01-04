@@ -42,7 +42,7 @@ Pot Id	Item Id	Required mastery	Drinkable	Usable	Notes
 40	260	3	x	-	Mind Resistance
 41	261	3	x	-	Body Resistance
 42	262	4	x	-	Stone to Flesh
-43	262	4	-	x	Slaying Potion
+43	263	4	-	x	Slaying Potion
 44	264	4	x	-	Pure Luck
 45	265	4	x	-	Pure Speed
 46	266	4	x	-	Pure Intellect
