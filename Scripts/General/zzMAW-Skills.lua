@@ -471,11 +471,16 @@ function events.CalcStatBonusBySkills(t)
 					
 			end
 		end
-		local punch=t.Player:GetSkill(const.Skills.Unarmed)
-		local s,m = SplitSkill(punch)
+		
+		local staff=t.Player:GetSkill(const.Skills.Staff)
+		local s,m = SplitSkill(staff)
 		if (m>0 and not main.weapon and not extra.weapon) or (main.skill==const.Skills.Staff and m==4) then
-			t.Result=t.Result-oldWeaponSkillAttackBonuses[const.Skills.Unarmed][m]*s
-			t.Result=t.Result+newWeaponSkillAttackBonuses[const.Skills.Unarmed][m]*s
+			local punch=t.Player:GetSkill(const.Skills.Unarmed)
+			local s,m = SplitSkill(punch)
+			if s>0 then
+				t.Result=t.Result-oldWeaponSkillAttackBonuses[const.Skills.Unarmed][m]*s
+				t.Result=t.Result+newWeaponSkillAttackBonuses[const.Skills.Unarmed][m]*s
+			end
 		end
 		
 	-- calculate melee damage bonus by skill
@@ -511,11 +516,15 @@ function events.CalcStatBonusBySkills(t)
 				
 				t.Result = t.Result + newWeaponSkillDamageBonuses[main.skill][main.rank] * main.level
 				if main.skill == const.Skills.Staff then
-					local punch=t.Player:GetSkill(const.Skills.Unarmed)
-					local s,m = SplitSkill(punch)
+					local staff=t.Player:GetSkill(const.Skills.Staff)
+					local s,m = SplitSkill(staff)
 					if m==4 then
-						t.Result=t.Result-oldWeaponSkillDamageBonuses[const.Skills.Unarmed][m]*s
-						t.Result=t.Result+newWeaponSkillDamageBonuses[const.Skills.Unarmed][m]*s
+						local punch=t.Player:GetSkill(const.Skills.Unarmed)
+						local s,m = SplitSkill(punch)
+						if m>0 then
+							t.Result=t.Result-oldWeaponSkillDamageBonuses[const.Skills.Unarmed][m]*s
+							t.Result=t.Result+newWeaponSkillDamageBonuses[const.Skills.Unarmed][m]*s
+						end
 					end
 				end
 				-- add class bonus for main hand weapon
