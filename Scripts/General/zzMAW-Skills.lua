@@ -1,3 +1,26 @@
+local function UncapSkills(char)
+	for _,skill in pairs(const.Skills) do
+		local value = char.Skills[skill]
+		
+		if value > 0x100 then
+			char.Skills[skill] = value - 0x100 + 0x1000
+		elseif value > 0x80 then
+			char.Skills[skill] = value - 0x80 + 0x800
+		elseif value > 0x40 then
+			char.Skills[skill] = value - 0x40 + 0x400
+		end
+	end
+end
+
+function events.LoadMap(wasInGame)
+	if not vars.UncappedSkills then
+		vars.UncappedSkills = 1
+		for i=0,Party.PlayersArray.High do
+			UncapSkills(Party.PlayersArray[i])
+		end
+	end
+end
+
 -- weapon base recovery bonuses
 
 oldWeaponBaseRecoveryBonuses =
