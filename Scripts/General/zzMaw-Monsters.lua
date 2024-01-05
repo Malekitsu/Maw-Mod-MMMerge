@@ -680,7 +680,7 @@ mapLevels={
 {["Low"] = 30 , ["Mid"] = 65 , ["High"] = 70},
 
 ["Regna"] = 
-{["Low"] = 31 , ["Mid"] = 31 , ["High"] = 50},
+{["Low"] = 45 , ["Mid"] = 50 , ["High"] = 55},
 
 ["Plane Between Planes"] = 
 {["Low"] = 58 , ["Mid"] = 70 , ["High"] = 70},
@@ -764,7 +764,7 @@ mapLevels={
 {["Low"] = 20 , ["Mid"] = 31 , ["High"] = 50},
 
 ["Small Sub Pen"] = 
-{["Low"] = 31 , ["Mid"] = 31 , ["High"] = 50},
+{["Low"] = 50 , ["Mid"] = 55 , ["High"] = 55},
 
 ["Escaton's Palace"] = 
 {["Low"] = 58 , ["Mid"] = 64 , ["High"] = 70},
