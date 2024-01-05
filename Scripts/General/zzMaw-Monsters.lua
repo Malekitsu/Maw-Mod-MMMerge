@@ -375,14 +375,14 @@ function events.LoadMap()
 		
 		
 		a=(base.Attack1.DamageAdd+bonusDamage) * dmgMult
-		mon.Attack1.DamageAdd = base.Attack1.DamageAdd * dmgMult
+		mon.Attack1.DamageAdd = (base.Attack1.DamageAdd+bonusDamage) * dmgMult
 		b=base.Attack1.DamageDiceSides * dmgMult^0.5
 		mon.Attack1.DamageDiceSides = base.Attack1.DamageDiceSides * dmgMult^0.5
 		e=base.Attack1.DamageDiceCount * dmgMult^0.5
 		mon.Attack1.DamageDiceCount = base.Attack1.DamageDiceCount * dmgMult^0.5
 		--attack 2
 		c=(base.Attack2.DamageAdd+bonusDamage) * dmgMult
-		mon.Attack2.DamageAdd = base.Attack2.DamageAdd * dmgMult
+		mon.Attack2.DamageAdd = (base.Attack2.DamageAdd+bonusDamage) * dmgMult
 		d=base.Attack2.DamageDiceSides * dmgMult^0.5
 		mon.Attack2.DamageDiceSides = base.Attack2.DamageDiceSides * dmgMult^0.5
 		f=base.Attack2.DamageDiceCount * dmgMult^0.5
