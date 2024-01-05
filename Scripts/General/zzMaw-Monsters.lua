@@ -25,6 +25,14 @@ function events.AfterLoadMap()
 		if Map.Monsters[i].Velocity>150 then
 			Map.Monsters[i].Velocity=(Map.Monsters[i].Velocity + (400 - Map.Monsters[i].Velocity) / 2 +100)
 		end
+		--resistances
+		--resistances 
+		bolsterRes=math.max(math.round((Map.Monsters[i].Level-basetable[Map.Monsters[i].Id].Level)/9)*5,0)
+		for v=0,10 do
+			if v~=5 then
+			Map.Monsters[i].Resistances[v]=math.min(bolsterRes+basetable[Map.Monsters[i].Id].Resistances[v],bolsterRes+200)	
+			end
+		end
 	end	
 	if mapvars.boosted==nil then
 		mapvars.boosted=true
@@ -313,7 +321,7 @@ function events.LoadMap()
 		mon.FullHP=mon.HP
 		
 		--resistances 
-		bolsterRes=math.max(math.round((mon.Level-basetable[i].Level)/18)*5,0)
+		bolsterRes=math.max(math.round((mon.Level-basetable[i].Level)/9)*5,0)
 		for v=0,10 do
 			if v~=5 then
 			mon.Resistances[v]=math.min(bolsterRes+basetable[i].Resistances[v],bolsterRes+200)	
@@ -353,19 +361,27 @@ function events.LoadMap()
 			levelMult=Game.MonstersTxt[i].Level
 		end
 		
+		bonusDamage=(levelMult-LevelB)*0.5
+		if bonusDamage>=20 then
+			levelMult=Game.MonstersTxt[i].Level
+		end
+		
 		mon.ArmorClass=base.ArmorClass*((levelMult+10)/(LevelB+10))
-		dmgMult=(levelMult/9+1.15)*((levelMult+10)/(10+LevelB))	
+		
+		dmgMult=(levelMult/9+1.15) --BONUS DAMAGE FROM LEVEL ADDED BELOW
 		-----------------------------------------------------------
 		--DAMAGE COMPUTATION DOWN HERE, FOR BALANCE MODIFY ABOVE^
 		--attack 1
-		a=base.Attack1.DamageAdd * dmgMult
+		
+		
+		a=(base.Attack1.DamageAdd+bonusDamage) * dmgMult
 		mon.Attack1.DamageAdd = base.Attack1.DamageAdd * dmgMult
 		b=base.Attack1.DamageDiceSides * dmgMult^0.5
 		mon.Attack1.DamageDiceSides = base.Attack1.DamageDiceSides * dmgMult^0.5
 		e=base.Attack1.DamageDiceCount * dmgMult^0.5
 		mon.Attack1.DamageDiceCount = base.Attack1.DamageDiceCount * dmgMult^0.5
 		--attack 2
-		c=base.Attack2.DamageAdd * dmgMult
+		c=(base.Attack2.DamageAdd+bonusDamage) * dmgMult
 		mon.Attack2.DamageAdd = base.Attack2.DamageAdd * dmgMult
 		d=base.Attack2.DamageDiceSides * dmgMult^0.5
 		mon.Attack2.DamageDiceSides = base.Attack2.DamageDiceSides * dmgMult^0.5
@@ -673,7 +689,7 @@ mapLevels={
 {["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
 
 ["Pirate Outpost"] = 
-{["Low"] = 5 , ["Mid"] = 31 , ["High"] = 31},
+{["Low"] = 45 , ["Mid"] = 51 , ["High"] = 51},
 
 ["Merchant House of Alvar"] = 
 {["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
@@ -688,7 +704,7 @@ mapLevels={
 {["Low"] = 20 , ["Mid"] = 24 , ["High"] = 24},
 
 ["Cyclops Larder"] = 
-{["Low"] = 36 , ["Mid"] = 36 , ["High"] = 36},
+{["Low"] = 42 , ["Mid"] = 42 , ["High"] = 42},
 
 ["Chain of Fire"] = 
 {["Low"] = 31 , ["Mid"] = 40 , ["High"] = 49},
@@ -703,7 +719,7 @@ mapLevels={
 {["Low"] = 30 , ["Mid"] = 34 , ["High"] = 38},
 
 ["Necromancers' Guild"] = 
-{["Low"] = 13 , ["Mid"] = 28 , ["High"] = 42},
+{["Low"] = 28 , ["Mid"] = 34 , ["High"] = 42},
 
 ["Mad Necromancer's Lab "] = 
 {["Low"] = 37 , ["Mid"] = 42 , ["High"] = 45},
@@ -712,10 +728,10 @@ mapLevels={
 {["Low"] = 42 , ["Mid"] = 42 , ["High"] = 42},
 
 ["Temple of the Sun"] = 
-{["Low"] = 20 , ["Mid"] = 20 , ["High"] = 20},
+{["Low"] = 40 , ["Mid"] = 40 , ["High"] = 40},
 
 ["Druid Circle"] = 
-{["Low"] = 20 , ["Mid"] = 24 , ["High"] = 60},
+{["Low"] = 45 , ["Mid"] = 49 , ["High"] = 60},
 
 ["Balthazar Lair"] = 
 {["Low"] = 35 , ["Mid"] = 47 , ["High"] = 59},
