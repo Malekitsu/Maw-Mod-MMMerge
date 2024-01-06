@@ -452,7 +452,7 @@ evt.PotionEffects[81] = function(IsDrunk, t, Power)
 		end
 		n=t.Number
 		c=Game.ItemsTxt[n].EquipStat
-		math.randomseed(t.Number+t.MaxCharges+t.Bonus+math.floor(t.Charges/1000))
+		math.randomseed(t.Number*10000+t.MaxCharges*1000+t.Bonus*100+t.BonusStrength*10+t.Charges)
 		if c<12 then
 			power=6
 			totB2=itemStrength[power][c]
@@ -480,7 +480,7 @@ evt.PotionEffects[82] = function(IsDrunk, t, Power)
 		if t.Charges>1000 or t.BonusStrength==0 then 
 			return
 		end
-		math.randomseed(t.Number+t.MaxCharges+t.Bonus+t.Bonus2)
+		math.randomseed(t.Number*10000+t.MaxCharges*1000+t.Bonus*100+t.BonusStrength*10+t.Charges)
 		t.Charges=math.random(1,16)*1000+math.min(math.round(t.BonusStrength*(1+0.25*math.random())),100)
 		Mouse.Item.Number=0
 		mem.u4[0x51E100] = 0x100 
@@ -537,7 +537,7 @@ function events.MonsterKilled(mon)
 	baseCraftDrop=false
 	if math.random()<craftDropChances.gems*bonusRoll then
 		baseCraftDrop=true
-		craftStrength=mon.Level/25+(math.random(0,50)-25)/25
+		craftStrength=mon.Level/25+(math.random(0,50)-25)/25+1
 		craftStrength=math.max(math.min(craftStrength,10),1)
 		crafMaterialNumber=1050+craftStrength
 	end	
