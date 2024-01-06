@@ -473,18 +473,26 @@ end
 
 --LOOT FIX
 function events.PickCorpse(t)
-	--calculate bolster
-	lvl=BLevel[mon.Id]
 	--calculate gold
 	mon=t.Monster
+	--calculate bolster
+	lvl=BLevel[mon.Id]
 	gold=mon.TreasureDiceCount*(mon.TreasureDiceSides+1)/2
-	goldMult=(bolsterLevel+lvl)^1.5/(lvl)^1.5
-	mon.TreasureDiceCount=math.min(mon.TreasureDiceCount*goldMult^0.5,255)
-	mon.TreasureDiceSides=math.min(mon.TreasureDiceSides*goldMult^0.5,255)
+	newGold=(bolsterLevel+lvl)*7.5
+	if mon.Id%3==1 then
+		newGold=newGold/2
+	elseif mon.Id%3==0 then
+		newGold=newGold*2
+	end
+	if gold>0 and newGold>gold then
+		goldMult=(bolsterLevel+lvl)^1.5/(lvl)^1.5
+		mon.TreasureDiceCount=math.min(newGold^0.5,255)
+		mon.TreasureDiceSides=math.min(newGold^0.5*2,255)
+	end
 	--calculate loot chances
-	
-	mon.TreasureItemPercent= math.round(mon.TreasureItemPercent^0.85 + (50 - mon.TreasureItemPercent^0.85 / 2) * bolsterLevel / 250)
-	
+	if bolsterLevel>50 or mon.TreasureItemPercent>70 then
+		mon.TreasureItemPercent= math.round(mon.TreasureItemPercent^0.85 + (50 - mon.TreasureItemPercent^0.85 / 2) * bolsterLevel / 250)
+	end
 end
 
 -----------------------------
@@ -671,10 +679,10 @@ mapLevels={
 {["Low"] = 60 , ["Mid"] = 62 , ["High"] = 65},
 
 ["Plane of Earth"] = 
-{["Low"] = 20 , ["Mid"] = 60 , ["High"] = 65},
+{["Low"] = 70 , ["Mid"] = 75 , ["High"] = 80},
 
 ["Plane of Fire"] = 
-{["Low"] = 49 , ["Mid"] = 55 , ["High"] = 65},
+{["Low"] = 65 , ["Mid"] = 70 , ["High"] = 75},
 
 ["Plane of Water"] = 
 {["Low"] = 60 , ["Mid"] = 65 , ["High"] = 70},
@@ -749,10 +757,10 @@ mapLevels={
 {["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
 
 ["Castle of Fire"] = 
-{["Low"] = 65 , ["Mid"] = 65 , ["High"] = 65},
+{["Low"] = 75 , ["Mid"] = 75 , ["High"] = 75},
 
 ["War Camp"] = 
-{["Low"] = 13 , ["Mid"] = 55 , ["High"] = 59},
+{["Low"] = 65 , ["Mid"] = 70 , ["High"] = 75},
 
 ["Pirate Stronghold"] = 
 {["Low"] = 50 , ["Mid"] = 55 , ["High"] = 55},
