@@ -668,7 +668,7 @@ mapLevels={
 {["Low"] = 28 , ["Mid"] = 28 , ["High"] = 35},
 
 ["Plane of Air"] = 
-{["Low"] = 50 , ["Mid"] = 59 , ["High"] = 65},
+{["Low"] = 60 , ["Mid"] = 62 , ["High"] = 65},
 
 ["Plane of Earth"] = 
 {["Low"] = 20 , ["Mid"] = 60 , ["High"] = 65},
@@ -677,7 +677,7 @@ mapLevels={
 {["Low"] = 49 , ["Mid"] = 55 , ["High"] = 65},
 
 ["Plane of Water"] = 
-{["Low"] = 30 , ["Mid"] = 65 , ["High"] = 70},
+{["Low"] = 60 , ["Mid"] = 65 , ["High"] = 70},
 
 ["Regna"] = 
 {["Low"] = 45 , ["Mid"] = 50 , ["High"] = 55},
@@ -755,13 +755,13 @@ mapLevels={
 {["Low"] = 13 , ["Mid"] = 55 , ["High"] = 59},
 
 ["Pirate Stronghold"] = 
-{["Low"] = 17 , ["Mid"] = 31 , ["High"] = 31},
+{["Low"] = 50 , ["Mid"] = 55 , ["High"] = 55},
 
 ["Abandoned Pirate Keep"] = 
-{["Low"] = 28 , ["Mid"] = 31 , ["High"] = 50},
+{["Low"] = 50 , ["Mid"] = 55 , ["High"] = 60},
 
 ["Passage Under Regna"] = 
-{["Low"] = 20 , ["Mid"] = 31 , ["High"] = 50},
+{["Low"] = 50 , ["Mid"] = 55 , ["High"] = 60},
 
 ["Small Sub Pen"] = 
 {["Low"] = 50 , ["Mid"] = 55 , ["High"] = 55},
