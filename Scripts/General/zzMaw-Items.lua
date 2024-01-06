@@ -1509,7 +1509,7 @@ function events.BuildItemInformationBox(t)
 				recovery=recoveryBonus
 				bonusMult=1
 				if recoveryBonus>233 then
-					bonusMult=math.round(recovery/233)
+					bonusMult=recovery/233
 				end
 				dmg=(low+high)/2
 				--hit chance
@@ -1528,7 +1528,7 @@ function events.BuildItemInformationBox(t)
 						end
 					end
 				end
-				DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)*bonusMult
+				DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*bonusMult)
 				
 				--RANGED
 				low=Party[i]:GetRangedDamageMin()
