@@ -530,36 +530,7 @@ function events.PlayerCastSpell(t)
 			end
 		elseif t.RemoteData then
 			applyHoP(t.RemoteData[1], t.RemoteData[2])
-		end	
-	end
-	
-	--Pain Reflection
-	if t.SpellId==const.Spells.PainReflection then
-		if not t.RemoteData then
-			t.Skill = 0
-			local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Dark))
-			local power= s + 14
-			local expireMult = m > 3 and 15 or 5
-			for i=0,Party.High do
-				if Party[i].SpellBuffs[10].Power <= power then
-					Party[i].SpellBuffs[10].Power = power
-					Party[i].SpellBuffs[10].Skill = t.Mastery
-					Party[i].SpellBuffs[10].ExpireTime = Game.Time + const.Hour + const.Minute * expireMult * s
-				end
-			end
-			if t.MultiplayerData then
-				t.MultiplayerData[1] = power
-				t.MultiplayerData[2] = Game.Time + const.Hour + const.Minute * expireMult * s
-			end
-		elseif t.RemoteData then
-			for i=0,Party.High do
-				if Party[i].SpellBuffs[10].Power <= t.RemoteData[1] then
-					Party[i].SpellBuffs[10].Power = t.RemoteData[1]
-					Party[i].SpellBuffs[10].Skill = t.Mastery
-					Party[i].SpellBuffs[10].ExpireTime = t.RemoteData[2]
-				end
-			end
-		end	
+		end
 	end
 end
 
