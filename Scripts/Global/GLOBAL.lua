@@ -31,10 +31,29 @@ function events.EvtGlobal(i) -- happens after related global evt executed
 		if i < Party.count then
 			ExpRewards[i] = Party[i].Exp - Exp
 			if ExpRewards[i]>0 then
-				Party[i].Exp = Party[i].Exp + calculateExp(ExpRewards[i])
+				bonusExp=calculateExp(ExpRewards[i])
+				Party[i].Exp = Party[i].Exp + bonusExp
+				
+				--bolster code
+				bonusExp=(bonusExp+ExpRewards[i])/Party.Count
+				local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
+				local currentLVL=calcLevel(bonusExp + vars.EXPBEFORE)
+					
+				if currentWorld==1 then
+					vars.MM8LVL = vars.MM8LVL + currentLVL - vars.LVLBEFORE
+				elseif currentWorld==2 then
+					vars.MM7LVL = vars.MM7LVL + currentLVL - vars.LVLBEFORE
+				elseif currentWorld==3 then
+					vars.MM6LVL = vars.MM6LVL + currentLVL - vars.LVLBEFORE
+				elseif currentWorld==4 then
+					vars.MMMLVL = vars.MMMLVL + currentLVL - vars.LVLBEFORE
+				end
+				vars.EXPBEFORE = vars.EXPBEFORE + bonusExp
+				vars.LVLBEFORE = calcLevel(vars.EXPBEFORE)
 			end
 		end
 	end
+	
 	
 		
 end
