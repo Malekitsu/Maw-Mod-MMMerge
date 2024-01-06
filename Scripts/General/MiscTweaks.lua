@@ -633,7 +633,7 @@
 		end
 	end
 
-	-- Make regeneration skill and spell mm7-alike
+	--[[ Make regeneration skill and spell mm7-alike
 	function events.RegenTick(Player)
 		local Cond = Player:GetMainCondition()
 		if Cond == 18 or Cond < 14 then
@@ -653,7 +653,7 @@
 			end
 		end
 	end
-
+	]]
 	-- Add a bit of sp regeneration by meditation skill
 	function events.RegenTick(Player)
 		local Cond = Player:GetMainCondition()
