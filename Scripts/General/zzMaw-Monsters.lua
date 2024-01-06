@@ -27,7 +27,7 @@ function events.AfterLoadMap()
 		end
 		--resistances
 		--resistances 
-		bolsterRes=math.max(math.round((Map.Monsters[i].Level-basetable[Map.Monsters[i].Id].Level)/9)*5,0)
+		bolsterRes=math.max(math.round((Map.Monsters[i].Level-basetable[Map.Monsters[i].Id].Level)/18)*5,0)
 		for v=0,10 do
 			if v~=5 then
 			Map.Monsters[i].Resistances[v]=math.min(bolsterRes+basetable[Map.Monsters[i].Id].Resistances[v],bolsterRes+200)	
@@ -321,7 +321,7 @@ function events.LoadMap()
 		mon.FullHP=mon.HP
 		
 		--resistances 
-		bolsterRes=math.max(math.round((mon.Level-basetable[i].Level)/9)*5,0)
+		bolsterRes=math.max(math.round((mon.Level-basetable[i].Level)/18)*5,0)
 		for v=0,10 do
 			if v~=5 then
 			mon.Resistances[v]=math.min(bolsterRes+basetable[i].Resistances[v],bolsterRes+200)	
@@ -691,7 +691,7 @@ mapLevels={
 {["Low"] = 45 , ["Mid"] = 50 , ["High"] = 55},
 
 ["Plane Between Planes"] = 
-{["Low"] = 58 , ["Mid"] = 70 , ["High"] = 70},
+{["Low"] = 85 , ["Mid"] = 90 , ["High"] = 90},
 
 ["Tutorial"] = 
 {["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
@@ -703,7 +703,7 @@ mapLevels={
 {["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
 
 ["Escaton's Crystal"] = 
-{["Low"] = 80 , ["Mid"] = 90 , ["High"] = 100},
+{["Low"] = 70 , ["Mid"] = 80 , ["High"] = 90},
 
 ["Wasp Nest"] = 
 {["Low"] = 18 , ["Mid"] = 18 , ["High"] = 18},
@@ -775,19 +775,19 @@ mapLevels={
 {["Low"] = 50 , ["Mid"] = 55 , ["High"] = 55},
 
 ["Escaton's Palace"] = 
-{["Low"] = 58 , ["Mid"] = 64 , ["High"] = 70},
+{["Low"] = 80 , ["Mid"] = 90 , ["High"] = 100},
 
 ["Prison of the Lord of Air"] = 
-{["Low"] = 58 , ["Mid"] = 65 , ["High"] = 80},
+{["Low"] = 85 , ["Mid"] = 90 , ["High"] = 100},
 
 ["Prison of the Lord of Fire"] = 
-{["Low"] = 58 , ["Mid"] = 65 , ["High"] = 100},
+{["Low"] = 85 , ["Mid"] = 90 , ["High"] = 100},
 
 ["Prison of the Lord of Water"] = 
-{["Low"] = 58 , ["Mid"] = 65 , ["High"] = 70},
+{["Low"] = 85 , ["Mid"] = 90 , ["High"] = 100},
 
 ["Prison of the Lord of Earth"] = 
-{["Low"] = 65 , ["Mid"] = 70 , ["High"] = 70},
+{["Low"] = 85 , ["Mid"] = 90 , ["High"] = 100},
 
 ["Uplifted Library"] = 
 {["Low"] = 30 , ["Mid"] = 35 , ["High"] = 40},
