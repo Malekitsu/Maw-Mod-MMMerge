@@ -438,9 +438,9 @@ function events.BuildStatInformationBox(t)
 		local bolsterLevel8=vars.MM7LVL+vars.MM6LVL
 		local bolsterLevel7=vars.MM8LVL+vars.MM6LVL
 		local bolsterLevel6=vars.MM8LVL+vars.MM7LVL
-		local bolsterLevel8=math.max(bolsterLevel8*0.95-4,0)
-		local bolsterLevel7=math.max(bolsterLevel7*0.95-4,0)
-		local bolsterLevel6=math.max(bolsterLevel6*0.95-4,0)
+		local bolsterLevel8=math.max(bolsterLevel8-4,0)
+		local bolsterLevel7=math.max(bolsterLevel7-4,0)
+		local bolsterLevel6=math.max(bolsterLevel6-4,0)
 		t.Text=t.Text .."\n\nLevels gained in MM6: " .. StrColor(255,255,153,math.round(vars.MM6LVL*100)/100) .. "\nLevels gained in MM7: " .. StrColor(255,255,153,math.round(vars.MM7LVL*100)/100) .. "\nLevels gained in MM8: " .. StrColor(255,255,153,math.round(vars.MM8LVL*100)/100) .. "\n\nBolster Level in MM6: " .. StrColor(255,255,153,math.round(bolsterLevel6)) .."\nBolster Level in MM7: " .. StrColor(255,255,153,math.round(bolsterLevel7)) .."\nBolster Level in MM8: " .. StrColor(255,255,153,math.round(bolsterLevel8))
 	end
 	if t.Stat==15 then
@@ -897,7 +897,7 @@ function events.CalcStatBonusByItems(t)
 		elseif currentWorld==4 then
 			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 		end
-		partyLevel=math.max(partyLevel*0.95-4,0)
+		partyLevel=math.max(partyLevel-4,0)
 		penaltyLevel=math.round(partyLevel/5)*5
 		penalty=math.min(penaltyLevel,200)
 		t.Result=t.Result-penalty
