@@ -6,6 +6,11 @@ function calcLevel(x)
 	local level=((500+(250000+2000*x)^0.5)/1000)
 	return level
 end 
+function calcExp(lvl)
+	local lvl=lvl-1
+	local EXP=lvl*(lvl+1)*500
+	return EXP
+end 
 
 function events.GameInitialized2()
 BLevel={}
@@ -199,13 +204,14 @@ end
 function events.BeforeNewGameAutosave()
 vars.UNKNOWNEXP=0
 vars.LVLBEFORE=0
+vars.EXPBEFORE=0
 vars.MM6LVL=0
 vars.MM7LVL=0
 vars.MM8LVL=0
 vars.MMMLVL=0
 end
 
-
+--[[
 function events.LeaveMap()
 	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 	Exp=Party[0].Experience
@@ -227,6 +233,28 @@ function events.LeaveMap()
 		vars.LVLBEFORE=currentExp
 	end
 end
+]]
+
+function events.LoadMap()
+	vars.EXPBEFORE=vars.EXPBEFORE or calcExp(vars.LVLBEFORE) --for working retroactively
+end
+
+function events.MonsterKillExp(t)
+	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
+	local currentLVL=calcLevel(t.Exp/4 + vars.EXPBEFORE)
+		
+	if currentWorld==1 then
+		vars.MM8LVL = vars.MM8LVL + currentLVL - vars.LVLBEFORE
+	elseif currentWorld==2 then
+		vars.MM7LVL = vars.MM7LVL + currentLVL - vars.LVLBEFORE
+	elseif currentWorld==3 then
+		vars.MM6LVL = vars.MM6LVL + currentLVL - vars.LVLBEFORE
+	elseif currentWorld==4 then
+		vars.MMMLVL = vars.MMMLVL + currentLVL - vars.LVLBEFORE
+	end
+	vars.EXPBEFORE = vars.EXPBEFORE + t.Exp/4
+	vars.LVLBEFORE = calcLevel(vars.EXPBEFORE)
+end
 
 function events.LoadMap()
 	--calculate party experience
@@ -242,7 +270,7 @@ function events.LoadMap()
 	else
 		debug.Message("You are in an unknown world, report this bug in MAW discord")
 	end
-	bolsterLevel=math.max(bolsterLevel*0.95-4,0)
+	bolsterLevel=math.max(bolsterLevel-4,0)
 	
 	--check for current map monsters
 	currentMapMonsters={}
