@@ -78,12 +78,48 @@ spcEncChance={0,0,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43
 primordialWeapEnchants={41,46}
 primordialArmorEnchants={1,2,80}
 
+
+
 function events.ItemGenerated(t)
 	if Map.MapStatsIndex==0 then
 		return 
 	end
 	if t.Strength==7 then
 		return
+	end
+	--spawn crafting materials in alchemy shops, substituting recipes
+	if (Game.HouseScreen==2 or Game.HouseScreen==95) then
+		if t.Item:T().EquipStat>=12 and math.random()<0.05 or t.Item:T().EquipStat==19 then
+			t.Item.Bonus=0
+			t.Item.BonusStrength=0
+			t.Item.Bonus2=0
+			t.Item.Charges=0
+			t.Item.MaxCharges=0
+			roll=math.random(1,1000)/math.min(((Party.Gold+1)/500000),10)
+			if roll<=2 then
+				t.Item.Number=1064
+				return
+			elseif roll<=5 then
+				t.Item.Number=1061
+				return
+			elseif roll<=10 then
+				t.Item.Number=1062
+				return
+			elseif roll<=30 then
+				t.Item.Number=1063
+				return
+			else
+				partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+				reagentLevel=math.floor(partyLevel/25)
+				if math.random()<0.05 then
+					reagentLevel=reagentLevel+2
+				elseif math.random()<0.25 then
+					reagentLevel=reagentLevel+1
+				end
+				t.Item.Number=1051+math.min(reagentLevel,9)
+				return
+			end
+		end
 	end
 	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) or reagentList[t.Item.Number] then
 		t.Handled=true
@@ -169,6 +205,10 @@ function events.ItemGenerated(t)
 		--ancient item
 		ancient=false
 		ancientChance=(enc1Chance[pseudoStr]/100)*(enc2Chance[pseudoStr]/100)*(spcEncChance[pseudoStr]/100)/4
+		--INCREASE ANCIENT AND PRIMORDIAL CHANCE IN SHOPS BASED ON MONEY
+		if Game.HouseScreen==2 or Game.HouseScreen==95 then
+			ancientChance=ancientChance*math.min(1+Party.Gold/1000000,5)
+		end
 		ancientRoll=math.random()
 		if ancientRoll<=ancientChance then
 			ancient=true
@@ -1057,10 +1097,33 @@ function events.CalcItemValue(t)
 			if count>2 then
 				t.Value=t.Value^(1+count*0.1-0.2)
 			end
+			
 		end	
+	end
+	--add reagents price
+	if Game.HouseScreen==2 or Game.HouseScreen==95 then
+		if reagentPrices[t.Item.Number] then
+			t.Value=reagentPrices[t.Item.Number]
+		end
 	end
 end
 
+reagentPrices={
+	[1051] = 1000,
+	[1052] = 5000,
+	[1053] = 15000,
+	[1054] = 30000,
+	[1055] = 50000,
+	[1056] = 100000,
+	[1057] = 200000,
+	[1058] = 350000,
+	[1059] = 500000,
+	[1060] = 750000,
+	[1061] = 1250000,
+	[1062] = 750000,
+	[1063] = 325000,
+	[1064] = 6668999,
+}
 --modify weapon enchant damage
 
 --ENCHANTS HERE
@@ -1180,6 +1243,15 @@ local modifiedBookValues =
 
 
 function events.GameInitialized2()
+	--add crafting material price
+	for i=1,10 do
+		Game.ItemsTxt[1050+i].Value=i*1000
+	end
+	Game.ItemsTxt[1061].Value=30000
+	Game.ItemsTxt[1062].Value=20000
+	Game.ItemsTxt[1063].Value=15000
+	Game.ItemsTxt[1064].Value=100000
+	
 	for i=0,8 do
 		for j=1,11 do
 			Game.ItemsTxt[399+11*i+j].Value=modifiedBookValues[j-1]
