@@ -1777,3 +1777,9 @@ end
 function events.LoadMap(wasInGame)
 	Timer(MawRegen, const.Minute/20) 
 end
+
+--learning capped at 60 +9%
+function events.GetLearningTotalSkill(t)
+	t.Result=math.min(t.Result,69)
+end
+
