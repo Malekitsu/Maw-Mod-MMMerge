@@ -1676,7 +1676,7 @@ function events.GetSkill(t)
 		if Game.CurrentPlayer>=0 then
 			s,m=SplitSkill(t.Result)
 			currentRepair=s*m
-			maxRepair=s*m
+			maxRepair=t.Result
 		end
 		for i=0,Party.High do
 			s,m=SplitSkill(Party[i].Skills[const.Skills.Repair])
