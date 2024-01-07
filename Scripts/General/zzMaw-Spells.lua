@@ -81,8 +81,14 @@ function events.PlayerCastSpell(t)
 	if t.IsSpellScroll then -- disable for scrolls
 		return
 	end
+	if t.Player.SP<t.SPCost then 
+		return
+	end
 	--Invisibility
 	if t.SpellId==19 then
+		if Party.EnemyDetectorRed or Party.EnemyDetectorYellow then
+			return
+		end
 		if not t.RemoteData then
 			t.Skill=1
 			t.Mastery=3
