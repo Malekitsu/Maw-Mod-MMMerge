@@ -265,7 +265,7 @@ function events.BuildStatInformationBox(t)
 		if m==4 then
 			m=5
 		end
-		local medRegen = math.round(fullSP^0.5*s^0.7*((m+5)/50))
+		local medRegen = math.round(fullSP^0.35*s^1.4*((m+5)/50))+2
 		local SPregenItem=0
 		local bonusregen=0
 		for it in Party[i]:EnumActiveItems() do
