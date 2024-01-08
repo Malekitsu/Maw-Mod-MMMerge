@@ -139,7 +139,7 @@ itemPermanentBuffMapping = {
 }
 
 function events.DoBadThingToPlayer(t)
-	if t.Allow==true then
+	if t.Allow==true and vars.PlayerBuffs[t.Player:GetIndex()] then
 		if t.Thing==1 then
 			if vars.PlayerBuffs[t.Player:GetIndex()]["curse"]>Game.Time then
 				t.Allow=false
