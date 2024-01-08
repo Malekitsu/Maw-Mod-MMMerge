@@ -27,6 +27,34 @@ function events.GenerateItem(t)
 	end
 end
 
+--grayface fix treasure code
+local function NeedSeed()
+	local t = mapvars.MonsterSeed
+	if not t then
+		t = {}
+		mapvars.MonsterSeed = t
+		for i = 0, Map.Monsters.Limit - 1 do
+			t[i] = Game.RandSeed
+			for i = 1, 30 do
+				Game.Rand()
+			end
+		end
+	end
+	return t
+end
+
+events.LoadMap = NeedSeed
+
+local function f(t)
+	local seed = NeedSeed()
+	Game.RandSeed = seed[t.MonsterIndex]
+	t.CallDefault()
+	seed[t.MonsterIndex] = Game.RandSeed
+end
+
+events.PickCorpse = f
+events.CastTelepathy = f
+
 --create tables to calculate special enchant
 function events.GameInitialized2()
 	Game.ItemsTxt[67].NotIdentifiedName="Mace"
@@ -78,9 +106,18 @@ spcEncChance={0,0,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43
 primordialWeapEnchants={41,46}
 primordialArmorEnchants={1,2,80}
 
-
-
 function events.ItemGenerated(t)
+	if vars then
+		if vars.SeedList==nil then
+			vars.SeedList={}
+			for i=0,2500 do
+				vars.SeedList[i]=math.random(1,100000)
+			end
+		end
+		math.randomseed(vars.SeedList[t.Item.Number])
+		vars.SeedList[t.Item.Number]=vars.SeedList[t.Item.Number]+1
+	end
+
 	if Map.MapStatsIndex==0 then
 		return 
 	end
