@@ -478,7 +478,7 @@ end
 		totHP=pl:GetFullHP()
 			for it in pl:EnumActiveItems() do
 				if it.Bonus2 == 37 or it.Bonus2==44 or it.Bonus2==50 or it.Bonus2==54 then		
-					HPregen=math.max(HPregen+totHP*0.005,HPregen+1)	
+					HPregen=math.max(HPregen+totHP*0.02,HPregen+1)	
 				end
 			end
 		HPregen=math.max(HPregen-1,0)
@@ -494,7 +494,7 @@ end
 		totSP=pl:GetFullSP()
 			for it in pl:EnumActiveItems() do
 				if it.Bonus2 == 38 or it.Bonus2==47 or it.Bonus2==55 then		
-					SPregen=math.max(SPregen+totSP*0.005,SPregen+1)
+					SPregen=math.max(SPregen+totSP*0.02,SPregen+1)
 				end
 			end
 		SPregen=math.max(SPregen-1,0)
