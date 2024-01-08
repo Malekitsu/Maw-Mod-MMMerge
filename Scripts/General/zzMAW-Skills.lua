@@ -1831,3 +1831,8 @@ function events.LoadMap()
 		end
 	end
 end
+
+function events.CalcTrainingTime(t)
+	s,m=SplitSkill(Party[Game.CurrentPlayer]:GetSkill(const.Skills.Learning))
+	t.Time=const.Day*(5-m)
+end
