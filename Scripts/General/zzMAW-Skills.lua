@@ -1832,7 +1832,17 @@ function events.LoadMap()
 	end
 end
 
+--reduced training time
 function events.CalcTrainingTime(t)
 	s,m=SplitSkill(Party[Game.CurrentPlayer]:GetSkill(const.Skills.Learning))
 	t.Time=const.Day*(5-m)
+end
+
+--open time at 5 instead of 6
+function events.GameInitialized2()
+	for i =0,Game.Houses.High do
+		if Game.Houses[i].OpenHour==6 then
+			Game.Houses[i].OpenHour=5
+		end
+	end
 end
