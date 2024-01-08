@@ -1818,3 +1818,16 @@ function events.Tick()
 		Game.SkillDescriptions[28] = string.format("%s\n\nCurrent SP Regeneration: %s\nNext Level Bonus: %s SP Regen",baseMedStr,StrColor(30,30,255,spRegen),StrColor(30,30,255,"+" .. spRegen2))
 	end
 end
+
+function events.LoadMap()
+	vars.hirelingFix=vars.hirelingFix or false
+	if not vars.hirelingFix then
+		for i=0,Party.PlayersArray.High do
+			for v=0,38 do 
+				if Party.PlayersArray[i].Skills[v]>4864 then --2^12+2^8*3 no idea why
+					Party.PlayersArray[i].Skills[v]=Party.PlayersArray[i].Skills[v]-3840 --1024*3+2^8*3 no idea why
+				end
+			end
+		end
+	end
+end
