@@ -70,7 +70,7 @@ local curseScaling={0,2,4,6}
 
 --lesser heal matrix
 local lesserHealBase={5,10,15,20}
-local lesserHealScaling={1,2,3,4}
+local lesserHealScaling={2,3,4,5}
 
 --greater heal matrix
 local greaterHealBase={0,0,25,40}
@@ -570,10 +570,10 @@ function events.GameInitialized2()
 	Game.SpellsTxt[55].GM="Cures 200 + 20 HP per point of skill"
 	
 	--heal
-	Game.SpellsTxt[68].Normal="2 Mana cost: \ncures 5 + 1 HP per point of skill"
-	Game.SpellsTxt[68].Expert="3 Mana cost: \ncures 10 + 2 HP per point of skill"
-	Game.SpellsTxt[68].Master="5 Mana cost: \ncures 15 + 3 HP per point of skill"
-	Game.SpellsTxt[68].GM="8 Mana cost: \ncures 20 + 4 HP per point of skill"
+	Game.SpellsTxt[68].Normal="3 Mana cost: \ncures 5 + 2 HP per point of skill"
+	Game.SpellsTxt[68].Expert="5 Mana cost: \ncures 10 + 3 HP per point of skill"
+	Game.SpellsTxt[68].Master="8 Mana cost: \ncures 15 + 4 HP per point of skill"
+	Game.SpellsTxt[68].GM="12 Mana cost: \ncures 20 + 5 HP per point of skill"
 	
 	--greater heal
 	Game.SpellsTxt[74].Name="Greater Heal"
@@ -1173,14 +1173,14 @@ function events.Tick()
 			end
 			
 			--heal
-			Game.Spells[68]["SpellPointsNormal"]=2
-			Game.Spells[68]["SpellPointsExpert"]=3
-			Game.Spells[68]["SpellPointsMaster"]=5
-			Game.Spells[68]["SpellPointsGM"]=8
+			Game.Spells[68]["SpellPointsNormal"]=3
+			Game.Spells[68]["SpellPointsExpert"]=5
+			Game.Spells[68]["SpellPointsMaster"]=8
+			Game.Spells[68]["SpellPointsGM"]=12
 			lesserHealBase={5,10,15,20}
-			lesserHealScaling={1,2,3,4}
-			Game.SpellsTxt[68].Master="5 Mana cost: \ncures 15 + 3 HP per point of skill"
-			Game.SpellsTxt[68].GM="8 Mana cost: \ncures 20 + 4 HP per point of skill"
+			lesserHealScaling={2,3,4,5}
+			Game.SpellsTxt[68].Master="5 Mana cost: \ncures 15 + 4 HP per point of skill"
+			Game.SpellsTxt[68].GM="8 Mana cost: \ncures 20 + 5 HP per point of skill"
 			
 			if level>=88 then
 				Game.SpellsTxt[68].Master="10 Mana cost: \ncures 30 + 5 HP per point of skill"
@@ -1188,7 +1188,7 @@ function events.Tick()
 				Game.Spells[68]["SpellPointsMaster"]=10
 				Game.Spells[68]["SpellPointsGM"]=15
 				lesserHealBase={5,10,30,50}
-				lesserHealScaling={1,2,5,7}
+				lesserHealScaling={2,3,5,7}
 			end
 			if level>=168 then
 				Game.SpellsTxt[68].Master="20 Mana cost: \ncures 60 + 8 HP per point of skill"
@@ -1196,7 +1196,7 @@ function events.Tick()
 				Game.Spells[68]["SpellPointsMaster"]=20
 				Game.Spells[68]["SpellPointsGM"]=30
 				lesserHealBase={5,10,60,100}
-				lesserHealScaling={1,2,8,12}
+				lesserHealScaling={2,3,8,12}
 			end
 			
 			--greater heal
