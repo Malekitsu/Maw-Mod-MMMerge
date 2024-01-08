@@ -88,7 +88,7 @@ oldWeaponSkillRecoveryBonuses =
 newWeaponSkillRecoveryBonuses =
 {
 	[const.Skills.Staff]	= {0, 0, 0, 0,},
-	[const.Skills.Sword]	= {0, 2, 2, 3,},
+	[const.Skills.Sword]	= {0, 1, 2, 2,},
 	[const.Skills.Dagger]	= {0, 0, 0, 1,},
 	[const.Skills.Axe]		= {0, 1, 2, 2,},
 	[const.Skills.Spear]	= {0, 0, 0, 0,},
@@ -113,7 +113,7 @@ oldWeaponSkillDamageBonuses =
 newWeaponSkillDamageBonuses =
 {
 	[const.Skills.Staff]	= {0, 1, 2, 3,},
-	[const.Skills.Sword]	= {0, 1, 2, 2,},
+	[const.Skills.Sword]	= {1, 1, 2, 2,},
 	[const.Skills.Dagger]	= {0, 0, 1, 1,},
 	[const.Skills.Axe]		= {1, 2, 3, 4,},
 	[const.Skills.Spear]	= {0, 1, 2, 3,},
@@ -1783,3 +1783,38 @@ function events.GetLearningTotalSkill(t)
 	t.Result=math.min(t.Result,69)
 end
 
+
+--DINAMIC SKILL TOOLTIP
+function events.GameInitialized2()
+	baseRegStr=Game.SkillDescriptions[30]
+	baseMedStr=Game.SkillDescriptions[28]
+end
+function events.Tick()
+	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
+		--regeneration tooltip
+		pl=Party[Game.CurrentPlayer]
+		local FHP=pl:GetFullHP()
+		local s,m = SplitSkill(pl:GetSkill(30))
+		if m==4 then
+			m=5
+		end
+		local hpRegen = math.round(FHP^0.5*s^1.5*((m+1)/25))/10
+		local hpRegen2 = math.round(FHP^0.5*(s+1)^1.5*((m+1)/25))/10
+		Game.SkillDescriptions[30] = string.format("%s\n\nCurrent HP Regeneration: %s\nNext Level Bonus: %s HP Regen",baseRegStr,StrColor(0,255,0,hpRegen),StrColor(0,255,0,"+" .. hpRegen2-hpRegen))
+		--meditation tooltip
+		local FSP=pl:GetFullSP()
+		local s,m = SplitSkill(pl:GetSkill(28))
+		if m==4 then
+			m=5
+		end
+		local spRegen = (FSP^0.35*s^1.4*((m+5)/50)+2)/10
+		local spRegen2 = (FSP^0.35*(s+1)^1.4*((m+5)/50)+2)/10
+		local spRegen2 = math.round((spRegen2-spRegen)*100)/100
+		if spRegen>10 then
+			spRegen = math.round((spRegen)*10)/10
+		else
+			spRegen = math.round((spRegen)*100)/100
+		end
+		Game.SkillDescriptions[28] = string.format("%s\n\nCurrent SP Regeneration: %s\nNext Level Bonus: %s SP Regen",baseMedStr,StrColor(30,30,255,spRegen),StrColor(30,30,255,"+" .. spRegen2))
+	end
+end
