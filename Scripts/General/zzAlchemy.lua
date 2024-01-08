@@ -392,6 +392,23 @@ function events.GameInitialized2()
 	Game.SkillDesMaster[const.Skills.Alchemy]="Allows to make white potions. Power when mixing will be increased to 1.5 per skill point."
 	Game.SkillDesMaster[const.Skills.Alchemy]="Allows to make white potions. Power when mixing will be increased to 1.5 per skill point."
 	Game.SkillDesGM[const.Skills.Alchemy]="Allows to make black potions. Power when mixing will be increased to 2 per skill point."
+	
+	--crafting gems tooltip
+	for i = 1, 10 do
+		local power = math.round((i * 10) ^ 0.5 / 2, 0)
+		local twoHanded = i * 10 * 2 .. " - " .. power * 2
+		local bodyArmor = math.floor(i * 1.5 * 10) .. " - " .. math.floor(power * 1.5)
+		local helmEtc = math.floor(i * 1.25 * 10) .. " - " .. math.floor(power * 1.25)
+		local rings = math.floor(i * 0.75 * 10) .. " - " .. math.floor(power * 0.75)
+
+		Game.ItemsTxt[1050 + i].Notes = "A special Gem that allows to increase an item Enchant Strength (right-click on an item with a base enchant to use)\n\nMax Power: " 
+		.. StrColor(255, 128, 0, tostring(i * 10)) 
+		.. "\nBonus: " .. StrColor(255, 128, 0, tostring(power)) 
+		.. "\n\nItem Modifier:\nTwo Handed Weapons: " .. StrColor(255, 128, 0, twoHanded)
+		.. "\nBody Armor: " .. StrColor(255, 128, 0, bodyArmor)
+		.. "\nHelm-Boots-Gloves-Bow: " .. StrColor(255, 128, 0, helmEtc)
+		.. "\nRings: " .. StrColor(255, 128, 0, rings)
+	end
 end
 
 for i=1,10 do
@@ -404,13 +421,34 @@ for i=1,10 do
 			if craftWaitTime>0 then return end
 			--pick which enchant to pick that is below the item power
 			tier=(Mouse.Item.Number-1050)
-			maxStrength=tier*10
+			mult=slotMult[t:T().EquipStat]
+			maxStrength=math.floor(tier*10*mult)
 			upgradeAmount=math.round(maxStrength^0.5/2)
 			if t.BonusStrength>=maxStrength and t.Charges%1000>=maxStrength then 
 				Game.ShowStatusText("Gem power is not enough")
 				return
 			end
-			if t.BonusStrength<=t.Charges%1000 or (t.Charges<=1000 and t.BonusStrength<maxStrength) then
+			baseEnchantValue=t.BonusStrength
+			--check for special enchant
+			if t.Bonus>=17 then
+				skillMaxStrength=math.floor(math.max((tier*10)^0.5*mult, math.round(tier*mult)))
+				if t.BonusStrength<skillMaxStrength then
+					t.BonusStrength=t.BonusStrength+1
+					if Mouse.Item.Charges<=1 then
+						Mouse.Item.Number=0
+					else
+						Mouse.Item.Charges=Mouse.Item.Charges-1
+						enchanted=true
+					end
+					mem.u4[0x51E100] = 0x100 
+					t.Condition = t.Condition:Or(0x10)
+					evt.PlaySound(12070)
+					return
+				else
+					baseEnchantValue=math.huge
+				end
+			end
+			if baseEnchantValue<=t.Charges%1000 or (t.Charges<=1000 and baseEnchantValue<maxStrength) then
 				t.BonusStrength=math.min(t.BonusStrength+upgradeAmount,maxStrength)
 			elseif t.Charges%1000<maxStrength and t.Charges>1000 then
 				newBonus=math.min(t.Charges%1000+upgradeAmount,maxStrength)
