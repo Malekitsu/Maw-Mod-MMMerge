@@ -269,10 +269,12 @@ function events.ItemGenerated(t)
 		
 		--buff to hp and mana items
 		if t.Item.Bonus==8 or t.Item.Bonus==9 then
-			t.Item.BonusStrength=t.Item.BonusStrength*2
+			t.Item.BonusStrength=t.Item.BonusStrength*(2+t.Item.BonusStrength/50)
 		end
 		if math.floor(t.Item.Charges/1000)==8 or math.floor(t.Item.Charges/1000)==9 then
-			t.Item.Charges=t.Item.Charges+t.Item.Charges%1000
+			power=t.Item.Charges%1000
+			power=math.min(power*(2+power/50),999) --cap is 999
+			t.Item.Charges=math.floor(t.Item.Charges/1000)*1000+power
 		end
 		--nerf to AC
 		if t.Item.Bonus==10 then
@@ -286,7 +288,9 @@ function events.ItemGenerated(t)
 		if mult then
 			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*mult)
 			local bonus=math.ceil(t.Item.Charges%1000*(mult-1))
-			t.Item.Charges=t.Item.Charges+bonus
+			bonus=t.Item.Charges%1000
+			bonus=math.min(bonus*mult,999) --cap is 999
+			t.Item.Charges=math.floor(t.Item.Charges/1000)*1000+bonus
 		end		
 	end
 end
