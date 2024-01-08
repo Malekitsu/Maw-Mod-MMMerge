@@ -358,6 +358,9 @@ function events.LoadMap()
 		
 		--experience
 		mon.Experience = math.round(mon.Level^1.7+mon.Level*20)
+		if currentWorld==2 then
+			mon.Experience = math.round(mon.Experience*1.5, mon.Experience+500)
+		end
 	end
 	--CALCULATE DAMAGE AND HP
 	for i=1, 651 do
