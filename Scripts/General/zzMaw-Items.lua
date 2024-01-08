@@ -279,15 +279,20 @@ function events.ItemGenerated(t)
 			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength/2)
 		end
 		if math.floor(t.Item.Charges/1000)==10 then
-			t.Item.Charges=t.Item.Charges-math.floor(t.Item.Charges%1000)/2
+			t.Item.Charges=t.Item.Charges-math.floor(t.Item.Charges%1000/2)
 		end
 		-- buff to 2h weapons enchants
-		if t.Item:T().EquipStat == 1 then
-			t.Item.BonusStrength=t.Item.BonusStrength*2
-			t.Item.Charges=t.Item.Charges+t.Item.Charges%1000
+		local mult=slotMult[t.Item:T().EquipStat]
+		if mult then
+			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*mult)
+			local bonus=math.ceil(t.Item.Charges%1000*(mult-1))
+			t.Item.Charges=t.Item.Charges+bonus
 		end		
 	end
 end
+
+--items stats multiplier:
+slotMult={2,1.25,1.5,1,1.25,1,1,1.25,1.25,0.75,1,[0]=1	}
 
 --apply charges effect
 function events.CalcStatBonusByItems(t)
