@@ -255,17 +255,37 @@ function events.BuildStatInformationBox(t)
 		enduranceTotalBonus=math.round(fullHP-fullHP/(1+endurance2/1000))+endEff*HPScaling
 		level=Party[index]:GetLevel()
 		BASEHP=Game.Classes.HPBase[Party[index].Class]+level*HPScaling
-		t.Text=string.format("%s\n\nHP bonus from Endurance: %s\n\nHP bonus from Body building: %s\n\nHP bonus from items: %s\n\nBase HP: %s",t.Text,StrColor(0,255,0,enduranceTotalBonus), StrColor(0,255,0,BBHP),StrColor(0,255,0,math.round(fullHP-enduranceTotalBonus-BBHP-BASEHP)),StrColor(0,255,0,BASEHP))
-	end
-	if t.Stat==8 then
+		--hp regen calculation
 		local i=Game.CurrentPlayer
-		local fullSP=Party[i]:GetFullSP()
-		local skill=Party[i].Skills[const.Skills.Meditation]
+		local FHP=Party[i]:GetFullHP()
+		local skill=Party[i]:GetSkill(const.Skills.Regeneration)
 		local s,m=SplitSkill(skill)
 		if m==4 then
 			m=5
 		end
-		local medRegen = math.round(fullSP^0.35*s^1.4*((m+5)/50))+2
+		local hpRegen = math.round(FHP^0.5*s^1.5*((m+1)/25))
+		local HPregenItem=0
+		local bonusregen=0
+		for it in Party[i]:EnumActiveItems() do
+			if it.Bonus2 == 37 or it.Bonus2==44 or it.Bonus2==50 or it.Bonus2==54 then	
+				HPregenItem=HPregenItem+1
+				bonusregen=1
+			end
+		end
+		HPregenItem=HPregenItem
+		regen=math.ceil(FHP*HPregenItem*0.02)+hpRegen+bonusregen
+		
+		t.Text=string.format("%s\n\nHP bonus from Endurance: %s\nHP bonus from Body building: %s\nHP bonus from items: %s\nBase HP: %s\n\n HP Regen per second: %s",t.Text,StrColor(0,255,0,enduranceTotalBonus), StrColor(0,255,0,BBHP),StrColor(0,255,0,math.round(fullHP-enduranceTotalBonus-BBHP-BASEHP)),StrColor(0,255,0,BASEHP),StrColor(0,255,0,regen/10))
+	end
+	if t.Stat==8 then
+		local i=Game.CurrentPlayer
+		local fullSP=Party[i]:GetFullSP()
+		local skill=Party[i]:GetSkill(const.Skills.Meditation)
+		local s,m=SplitSkill(skill)
+		if m==4 then
+			m=5
+		end
+		local medRegen = math.round(fullSP^0.35*s^1.4*(m+5)/50)+2
 		local SPregenItem=0
 		local bonusregen=0
 		for it in Party[i]:EnumActiveItems() do
@@ -274,9 +294,9 @@ function events.BuildStatInformationBox(t)
 				bonusregen=1
 			end
 		end
-		SPregenItem=SPregenItem+bonusregen
-		regen=math.ceil(fullSP*SPregenItem*0.005)+medRegen
-		t.Text=string.format("%s\n\nSpell point regen per 10 seconds: %s",t.Text,StrColor(40,100,255,regen))
+		SPregenItem=SPregenItem
+		regen=math.ceil(fullSP*SPregenItem*0.02)+medRegen+bonusregen
+		t.Text=string.format("%s\n\nSpell point regen per second: %s",t.Text,StrColor(40,100,255,regen/10))
 	end
 	
 	if t.Stat==9 then
