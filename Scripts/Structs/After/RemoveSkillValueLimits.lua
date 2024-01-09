@@ -938,8 +938,6 @@ cmp eax, edx
 mem.asmpatch(0x4B5B9E, "or edx, " .. MasterBitVStr)
 
 -- Lloyd's Beacon interface
---   Patched in SpellsExtra
---[==[
 mem.asmpatch(0x4D1485, [[
 test ah, 0x10
 mov dword ptr [ebp-0x14], 1
@@ -949,9 +947,6 @@ jnz absolute 0x4D14A2
 test ah, 0x4
 ]])
 mem.nop2(0x4D148A, 0x4D1497)
-]==]
---   Patched in SpellsExtra
---[==[
 mem.asmpatch(0x4D173D, [[
 test ah, 0x10
 mov dword ptr [ebp-0x18], 1
@@ -961,6 +956,5 @@ jnz absolute 0x4D1756
 test ah, 0x4
 ]])
 mem.nop2(0x4D1747, 0x4D174F)
-]==]
 
 Log(Merge.Log.Info, "Init finished: %s", LogId)
