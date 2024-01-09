@@ -15,14 +15,16 @@ function events.GenerateItem(t)
 		partyLevelItemGen=vars.MM6LVL
 	end
 
-	--nerf if item is strong
-	if partyLevelItemGen<(t.Strength-3)*18 and t.Strength<7 then
-		t.Strength=t.Strength-1
-	end
-	if (t.Strength-2)*18>partyLevelItemGen and t.Strength>2 and t.Strength<7 then
-		roll=math.random((t.Strength-3)*18,(t.Strength-2)*18)
-		if roll>partyLevelItemGen then
+	--nerf items in shops is strong if low level
+	if (Game.HouseScreen==2 or Game.HouseScreen==95) then
+		if partyLevelItemGen<(t.Strength-3)*18 and t.Strength<7 then
 			t.Strength=t.Strength-1
+		end
+		if (t.Strength-2)*18>partyLevelItemGen and t.Strength>2 and t.Strength<7 then
+			roll=math.random((t.Strength-3)*18,(t.Strength-2)*18)
+			if roll>partyLevelItemGen then
+				t.Strength=t.Strength-1
+			end
 		end
 	end
 end
