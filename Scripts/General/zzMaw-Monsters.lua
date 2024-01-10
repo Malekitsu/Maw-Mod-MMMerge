@@ -1438,14 +1438,14 @@ end
 
 --TRUE NIGHTMARE MODE
 function events.CanSaveGame(t)
-	if Game.BolsterAmount~=250 then return end
+	if Game.BolsterAmount~=300 then return end
 	if (Party.EnemyDetectorYellow or Party.EnemyDetectorRed) and t.SaveKind ~=1 then
 		t.Result=false
 		Game.ShowStatusText("Can't save now")
 	end
 end
 function events.CanCastLloyd(t)
-	if Game.BolsterAmount~=250 then return end
+	if Game.BolsterAmount~=300 then return end
 	if Party.EnemyDetectorYellow or Party.EnemyDetectorRed then
 		t.Result=false
 		Sleep(1)
@@ -1453,13 +1453,13 @@ function events.CanCastLloyd(t)
 	end
 end
 function events.CanCastTownPortal(t)
-	if Game.BolsterAmount~=250 then return end
+	if Game.BolsterAmount~=300 then return end
 	if Party.EnemyDetectorYellow or Party.EnemyDetectorRed then
 		t.Can=false
 	end
 end	
 function events.LoadMap()
-	if Game.BolsterAmount==250 then
+	if Game.BolsterAmount==300 then
 		for i=1,Game.MapStats.High do
 			if Game.MapStats[i].Mon1Hi>1 then
 				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+3
@@ -1477,7 +1477,7 @@ function events.LoadMap()
 	end
 end
 function events.CalcStatBonusByItems(t)
-	if Game.BolsterAmount~=250 then return end
+	if Game.BolsterAmount~=300 then return end
 	if t.Stat>9 and t.Stat<16 then
 		--calculate party level
 		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
@@ -1505,7 +1505,7 @@ function events.GameInitialized2()
 	end
 end
 function events.LoadMap()
-	if Game.BolsterAmount==250 then
+	if Game.BolsterAmount==300 then
 		if Map.IndoorOrOutdoor==1 then
 			if mapvars.monsterMap==nil then
 				mapvars.monsterMap={["cleared"]=false, ["names"]={}}
@@ -1586,13 +1586,14 @@ end
 --ask confirmation and instructions for true nightmare mode
 function events.Tick()
 	if vars.trueNightmare then
-		Game.BolsterAmount=250
+		Game.BolsterAmount=300
 		return
 	end
 	if Game.BolsterAmount==250 then
-		answer=Question("You activated True Nightmare Mode.\nMonsters will be stronger and they will not let you to save nor teleport away from them.\nLeaving a dungeon before killing most of them (80%) will cause monsters to respawn.\nClearing a dungeon will grant you extra rewards.\nRespawned monsters will give less experience and loot.\nOnce True Nightmare is activated there is no way back, are you sure? (yes/no)")
+		answer=Question("You activated Nightmare Mode.\nMonsters will be stronger and they will not let you to save nor teleport away from them.\nLeaving a dungeon before killing most of them (80%) will cause monsters to respawn.\nClearing a dungeon will grant you extra rewards.\nRespawned monsters will give less experience and loot.\nOnce True Nightmare is activated there is no way back, are you sure? (yes/no)")
 		if answer=="yes" then
 			vars.trueNightmare=true
+			Game.BolsterAmount=300
 		else
 			Game.BolsterAmount=200
 		end
