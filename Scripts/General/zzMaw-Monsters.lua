@@ -1668,8 +1668,10 @@ function events.LoadMap()
 		end
 	end
 	if mapvars.bossNames then
-		for key, value in ipairs(mapvars.bossNames) do
-			Game.PlaceMonTxt[key]=value
+		for i=221,300 do
+			if mapvars.bossNames[i] then
+			Game.PlaceMonTxt[i]=mapvars.bossNames[i]
+			end
 		end
 	end
 end
@@ -1679,7 +1681,7 @@ function generateBoss(index,nameIndex)
 	mon.FullHP=math.round(math.min(mon.FullHP*2+math.random()*2, 32000))
 	mon.HP=mon.FullHP
 	mon.Exp=mon.Exp*10
-	mon.Level=math.round(math.min(mon.Level*1.1+math.random()*0.2,255))
+	mon.Level=math.round(math.min(mon.Level*(1.1+math.random()*0.2),255))
 	mon.TreasureDiceCount=(mon.Level*100)^0.5
 	mon.TreasureDiceSides=(mon.Level*100)^0.5
 	mon.TreasureItemPercent=100
