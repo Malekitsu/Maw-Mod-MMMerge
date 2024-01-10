@@ -1552,6 +1552,53 @@ function events.PickCorpse(t)
 		t.Monster.TreasureDiceSides=math.round(t.Monster.TreasureDiceSides/4)
 	end
 end
+--check for dungeon clear
+function events.MonsterKilled(mon)
+	if mapvars.monsterMap and mapvars.completed==nil then
+		n=Map.Monsters.Count
+		m=0
+		for i=0,Map.Monsters.High do
+			monster=Map.Monsters[i]
+			if monster.AIState==4 or monster.AIState==5 or monster.AIState==11 or monster.AIState==19 then
+				m=m+1
+			end
+		end
+		if mapvars.monsterMap.cleared==false and m/n>=0.8 then
+			mapvars.monsterMap.cleared=true
+			Message("Monsters are weakened and can no longer resurrect")
+		end
+		if m/n>0.95 then
+			name=Game.MapStats[Map.MapStatsIndex].Name
+			mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
+			experience=math.ceil(m^0.7*(mapLevel^1.7+mapLevel*20)/3/1000)*1000  
+			gold=math.ceil(experience^0.9/1000)*1000 
+			evt.ForPlayer(0)
+			evt.Add{"Gold", Value = gold}
+			evt.ForPlayer("All")
+			evt.Add{"Experience", Value = experience}
+			Message(string.format("Dungeon Completed! You gain " .. experience .. " Exp and " .. gold .. " Gold and an Item"))
+			mapvars.completed=true
+			vars.dungeonCompletedList=vars.dungeonCompletedList or {}
+			vars.dungeonCompletedList[name]=true
+		end
+	end
+end
+--ask confirmation and instructions for true nightmare mode
+function events.Tick()
+	if vars.trueNightmare then
+		Game.BolsterAmount=250
+		return
+	end
+	if Game.BolsterAmount==250 then
+		answer=Question("You activated True Nightmare Mode.\nMonsters will be stronger and they will not let you to save nor teleport away from them.\nLeaving a dungeon before killing most of them (80%) will cause monsters to respawn.\nClearing a dungeon will grant you extra rewards.\nRespawned monsters will give less experience and loot.\nOnce True Nightmare is activated there is no way back, are you sure? (yes/no)")
+		if answer=="yes" then
+			vars.trueNightmare=true
+		else
+			Game.BolsterAmount=200
+		end
+	end
+end
+
 --dungeon entrance level 
 function events.GameInitialized2()
 	for i=1,109 do 
