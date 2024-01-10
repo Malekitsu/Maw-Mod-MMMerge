@@ -193,7 +193,7 @@ function events.PlayerCastSpell(t)
 			local statBonus=math.max(persBonus,intBonus)
 			local crit=t.Player:GetLuck()/1500+0.05
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
-			local baseHeal=resurrectionBase+resurrectionScaling*s
+			local baseHeal=resurrectionBase[m]+resurrectionScaling[m]*s
 			totHeal=baseHeal*(statBonus+1)
 			roll=math.random()
 			gotCrit=false
