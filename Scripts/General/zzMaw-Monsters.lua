@@ -591,8 +591,22 @@ local function deepcopy(orig)
 end
 
 -- Create a backup of Game.MapStats
-BackupMapStats = deepcopy(Game.MapStats)
-
+BackupMapStats={}
+function events.GameInitialized2()
+	for i=1,Game.MapStats.High do
+		BackupMapStats[i]={}
+		BackupMapStats[i].Mon1Low=Game.MapStats[i].Mon1Low
+		BackupMapStats[i].Mon1Hi=Game.MapStats[i].Mon1Hi
+		BackupMapStats[i].Mon2Low=Game.MapStats[i].Mon2Low
+		BackupMapStats[i].Mon2Hi=Game.MapStats[i].Mon2Hi
+		BackupMapStats[i].Mon3Low=Game.MapStats[i].Mon3Low
+		BackupMapStats[i].Mon3Hi=Game.MapStats[i].Mon3Hi
+		BackupMapStats[i].Mon1Dif=Game.MapStats[i].Mon1Dif
+		BackupMapStats[i].Mon2Dif=Game.MapStats[i].Mon2Dif
+		BackupMapStats[i].Mon3Dif=Game.MapStats[i].Mon3Dif
+	end
+end
+--BackupMapStats = deepcopy(Game.MapStats)
 function events.LoadMap()
 	--add difficulty related damage
 	if Game.BolsterAmount%50~=0 or Game.BolsterAmount==0 then
@@ -615,13 +629,13 @@ function events.LoadMap()
 	if Game.BolsterAmount==150 then
 		for i=1,Game.MapStats.High do
 			if Game.MapStats[i].Mon1Hi<=3 then
-				Game.MapStats[i].Mon1Hi=Game.MapStats[i].Mon1Hi+1
+				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+1
 			end 
 			if Game.MapStats[i].Mon2Hi<=3 then
-				Game.MapStats[i].Mon2Hi=Game.MapStats[i].Mon2Hi+1
+				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+1
 			end 
 			if Game.MapStats[i].Mon3Hi<=3 then
-				Game.MapStats[i].Mon3Hi=Game.MapStats[i].Mon3Hi+1
+				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+1
 			end 
 		end
 	end
@@ -633,23 +647,39 @@ function events.LoadMap()
 				Game.MapStats[i].Mon1Low=2
 			end
 			if Game.MapStats[i].Mon1Hi<=3 then
-				Game.MapStats[i].Mon1Hi=Game.MapStats[i].Mon1Hi+1
+				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+1
 			end 
 			if Game.MapStats[i].Mon2Low==1 then
 				Game.MapStats[i].Mon2Low=2
 			end
 			if Game.MapStats[i].Mon2Hi<=3 then
-				Game.MapStats[i].Mon2Hi=Game.MapStats[i].Mon2Hi+1
+				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+1
 			end 
 			if Game.MapStats[i].Mon3Low==1 then
 				Game.MapStats[i].Mon3Low=2
 			end
 			if Game.MapStats[i].Mon3Hi<=3 then
-				Game.MapStats[i].Mon3Hi=Game.MapStats[i].Mon3Hi+1
+				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+1
 			end 
 		end
 	end
 	
+	if Game.BolsterAmount==300 then
+		for i=1,Game.MapStats.High do
+			if Game.MapStats[i].Mon1Hi>1 then
+				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+3
+			end 
+			if Game.MapStats[i].Mon2Hi>1 then
+				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+3
+			end 
+			if Game.MapStats[i].Mon3Hi>1 then
+				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+3
+			end 
+			Game.MapStats[i].Mon1Dif=math.min(BackupMapStats[i].Mon1Dif+2,5)
+			Game.MapStats[i].Mon2Dif=math.min(BackupMapStats[i].Mon2Dif+2,5)
+			Game.MapStats[i].Mon3Dif=math.min(BackupMapStats[i].Mon3Dif+2,5)
+		end
+	end
 	
 	--individual map CHANGES-----
 	--hall under the hill
@@ -1460,24 +1490,6 @@ function events.CanCastTownPortal(t)
 		t.Can=false
 	end
 end	
-function events.LoadMap()
-	if Game.BolsterAmount==300 then
-		for i=1,Game.MapStats.High do
-			if Game.MapStats[i].Mon1Hi>1 then
-				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+3
-			end 
-			if Game.MapStats[i].Mon2Hi>1 then
-				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+3
-			end 
-			if Game.MapStats[i].Mon3Hi>1 then
-				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+3
-			end 
-			Game.MapStats[i].Mon1Dif=math.min(BackupMapStats[i].Mon1Dif+2,5)
-			Game.MapStats[i].Mon2Dif=math.min(BackupMapStats[i].Mon2Dif+2,5)
-			Game.MapStats[i].Mon3Dif=math.min(BackupMapStats[i].Mon3Dif+2,5)
-		end
-	end
-end
 function events.CalcStatBonusByItems(t)
 	if Game.BolsterAmount~=300 then return end
 	if t.Stat>9 and t.Stat<16 then
@@ -1592,7 +1604,7 @@ function nightmare()
 		return
 	end
 	if Game.BolsterAmount==250 then
-		answer=Question("You activated Nightmare Mode.\nMonsters will be much stronger and they will not let you save nor teleport away from them, however, items found will be much stronger.\nLeaving a dungeon before killing most of them (80%) will cause monsters to respawn.\nClearing a dungeon will grant you extra rewards.\nRespawned monsters will give less experience and loot.\nOnce True Nightmare is activated there is no way back, are you sure? (yes/no)")
+		answer=Question("You activated Nightmare Mode, monsters will be much stronger and they will not let you save nor teleport away from them, however, items found will be much stronger.\nLeaving a dungeon before killing most of them (80%) will cause monsters to respawn.\nClearing a dungeon will grant you extra rewards.\nRespawned monsters will give less experience and loot, once True Nightmare is activated there is no way back, are you sure? (yes/no)")
 		if answer=="yes" or answer=="Yes" or answer=="YES" then
 			vars.trueNightmare=true
 			Game.BolsterAmount=300
@@ -1656,6 +1668,11 @@ function events.LoadMap()
 			end
 		end
 	end
+	if mapvars.bossNames then
+		for key, value in ipairs(mapvars.bossNames) do
+			Game.PlaceMonTxt[key]=value
+		end
+	end
 end
 
 function generateBoss(index,nameIndex)
@@ -1671,6 +1688,8 @@ function generateBoss(index,nameIndex)
 	mon.TreasureItemLevel=math.min(mon.TreasureItemLevel+1, 6)
 	mon.NameId=220+nameIndex
 	Game.PlaceMonTxt[mon.NameId]=string.format("Elite " .. Game.MonstersTxt[mon.Id].Name)
+	mapvars.bossNames=mapvars.bossNames or {}
+	mapvars.bossNames[mon.NameId]=Game.PlaceMonTxt[mon.NameId]
 	
 	dmgMult=1.5+math.random()
 	a=mon.Attack1.DamageAdd * dmgMult
