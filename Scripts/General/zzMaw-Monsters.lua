@@ -1591,6 +1591,7 @@ function events.MonsterKilled(mon)
 			evt.ForPlayer("All")
 			evt.Add{"Experience", Value = experience}
 			Message(string.format("Dungeon Completed! You gain " .. experience .. " Exp and " .. gold .. " Gold and an Item"))
+			evt.GiveItem{Id=math.min(1050+math.ceil(Party[0].LevelBase/25+0.5),1060)}
 			mapvars.completed=true
 			vars.dungeonCompletedList=vars.dungeonCompletedList or {}
 			vars.dungeonCompletedList[name]=true
