@@ -1590,10 +1590,12 @@ function nightmare()
 		return
 	end
 	if Game.BolsterAmount==250 then
-		answer=Question("You activated Nightmare Mode.\nMonsters will be stronger and they will not let you save nor teleport away from them.\nLeaving a dungeon before killing most of them (80%) will cause monsters to respawn.\nClearing a dungeon will grant you extra rewards.\nRespawned monsters will give less experience and loot.\nOnce True Nightmare is activated there is no way back, are you sure? (yes/no)")
-		if answer=="yes" then
+		answer=Question("You activated Nightmare Mode.\nMonsters will be much stronger and they will not let you save nor teleport away from them, however, items found will be much stronger.\nLeaving a dungeon before killing most of them (80%) will cause monsters to respawn.\nClearing a dungeon will grant you extra rewards.\nRespawned monsters will give less experience and loot.\nOnce True Nightmare is activated there is no way back, are you sure? (yes/no)")
+		if answer=="yes" or answer=="Yes" or answer=="YES" then
 			vars.trueNightmare=true
 			Game.BolsterAmount=300
+			Sleep(1)
+			Message("Welcome to the Nightmare...\nGood luck.. you will need")
 		else
 			Sleep(1)
 			Message("Difficulty reverted to Hell")
