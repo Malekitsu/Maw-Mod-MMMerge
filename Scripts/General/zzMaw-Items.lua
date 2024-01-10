@@ -209,6 +209,9 @@ function events.ItemGenerated(t)
 		elseif Game.BolsterAmount==200 then
 			difficultyExtraPower=1.2	
 			LevelBonus=20
+		elseif Game.BolsterAmount==300 then
+			difficultyExtraPower=1.4	
+			LevelBonus=30
 		end
 		partyLevel=partyLevel+LevelBonus
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
