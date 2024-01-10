@@ -1376,8 +1376,7 @@ end
 
 --monster tooltips
 function events.BuildMonsterInformationBox(t)
-	mon=Map.Monsters[Mouse:GetTarget().Index]
-
+	local mon = t.Monster
 	--show level Below HP
 	t.ArmorClass.Text=string.format("Level:         " .. mon.Level .. "\n" .. "58992Armor Class0000000000	100?")
 	
