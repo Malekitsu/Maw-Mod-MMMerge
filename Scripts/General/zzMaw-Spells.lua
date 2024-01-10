@@ -1333,7 +1333,7 @@ asmpatch(0x42A176, "jmp absolute 0x42C200") -- "cast successful"
 
 
 --removes fly when attacking, except in certain maps
-flyAllowedMaps={"elema.odm","elemf.odm","elemw.odm","out12.odm","outa1.odm","outa2.odm","outa3.odm","outb3.odm"}
+flyAllowedMaps={"elema.odm","elemf.odm","elemw.odm","out12.odm","outa1.odm","outa2.odm","outa3.odm","outb3.odm","out05.odm"}
 function events.CalcDamageToMonster(t)
 	if table.find(flyAllowedMaps,Map.Name) then 
 		return
