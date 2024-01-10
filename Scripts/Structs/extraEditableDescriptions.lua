@@ -144,7 +144,7 @@ do
             allocatedSizes[addr] = newLen
         end
         mem.copy(addr, newStr .. string.char(0))
-        return addr, newLen
+        return addr, allocatedSize
     end
 end
 
@@ -526,7 +526,7 @@ autohook(0x41E928, function(d)
     local resistancesEntry = deferredTextCallParams[CALL_PARAM_RESISTANCES]
 
     local t = {}
-    t.Monster = Game.DialogLogic.MonsterInfoMonster
+    t.Monster = select(2, internal.GetMonster(u4[d.ebp - 0x10]))
     t.Tooltip = structs.Dlg:new(u4[d.ebp - 8])
     local function addFormattingArgs(t, entry, centered)
         if centered then
@@ -711,7 +711,7 @@ function events.GameInitialized1()
 
     -- skip a big batch of NOPs
     asmpatch(0x41E07F, "jmp absolute 0x41E0EF")
-        
+    
     -- skip small chunk of code taken care of by our hook function
     asmpatch(0x41E164, "jmp " .. 0x41E1A4 - 0x41E164)
 end
@@ -721,19 +721,20 @@ end
 function events.BuildMonsterInformationBox(t)
 end
 
-function test1(t)
-    t.EffectsHeader.Text = "abc-" .. t.EffectsHeader.Text .. "-cba" -- abc-Effects-cba
-    t.EffectsHeader.X = t.EffectsHeader.X + 30 -- moved right
-    t.Damage = false -- don't draw
-    t.SpellFirst.Text = "frieblla"
-    t.Resistances[2].Color = RGB(111, 111, 111)
-    for i, res in ipairs(t.Resistances) do
-        if i % 2 == 1 then
-            res.X = res.X - 20
-        else
-            res.X = res.X + 20
-        end
-    end
-    t.ResistancesHeader.UseIndividualTextCoordinates = true
-    t.HitPoints.Color = RGB(111, 111, 111)
-end
+-- function test1(t)
+--     t.EffectsHeader.Text = "abc-" .. t.EffectsHeader.Text .. "-cba" -- abc-Effects-cba
+--     t.EffectsHeader.X = t.EffectsHeader.X + 30 -- moved right
+--     t.Damage = false -- don't draw
+--     t.SpellFirst.Text = "frieblla"
+--     t.Resistances[2].Color = RGB(111, 111, 111)
+--     for i, res in ipairs(t.Resistances) do
+--         if i % 2 == 1 then
+--             res.X = res.X - 20
+--         else
+--             res.X = res.X + 20
+--         end
+--     end
+--     t.ResistancesHeader.UseIndividualTextCoordinates = true
+--     t.HitPoints.Color = RGB(111, 111, 111)
+
+-- end
