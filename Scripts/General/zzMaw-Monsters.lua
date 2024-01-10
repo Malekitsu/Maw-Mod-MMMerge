@@ -1491,8 +1491,8 @@ function events.CalcStatBonusByItems(t)
 			partyLevel=0
 		end
 		partyLevel=math.max(partyLevel-4,0)
-		penaltyLevel=partyLevel-30
-		penalty=math.min(penaltyLevel,90)
+		penaltyLevel=math.max(partyLevel-30,0)
+		penalty=math.min(penaltyLevel,100)
 		t.Result=t.Result-penalty
 	end
 end
@@ -1584,20 +1584,30 @@ function events.MonsterKilled(mon)
 	end
 end
 --ask confirmation and instructions for true nightmare mode
-function events.Tick()
+function nightmare()
 	if vars.trueNightmare then
 		Game.BolsterAmount=300
 		return
 	end
 	if Game.BolsterAmount==250 then
-		answer=Question("You activated Nightmare Mode.\nMonsters will be stronger and they will not let you to save nor teleport away from them.\nLeaving a dungeon before killing most of them (80%) will cause monsters to respawn.\nClearing a dungeon will grant you extra rewards.\nRespawned monsters will give less experience and loot.\nOnce True Nightmare is activated there is no way back, are you sure? (yes/no)")
+		answer=Question("You activated Nightmare Mode.\nMonsters will be stronger and they will not let you save nor teleport away from them.\nLeaving a dungeon before killing most of them (80%) will cause monsters to respawn.\nClearing a dungeon will grant you extra rewards.\nRespawned monsters will give less experience and loot.\nOnce True Nightmare is activated there is no way back, are you sure? (yes/no)")
 		if answer=="yes" then
 			vars.trueNightmare=true
 			Game.BolsterAmount=300
 		else
+			Sleep(1)
+			Message("Difficulty reverted to Hell")
 			Game.BolsterAmount=200
 		end
 	end
+	--game introduction
+	if not vars.introduction then
+		vars.introduction=true
+		Message("Greeting adventurer!\nYour journey is about to start, but first make sure to check the difficulty settings (ESC-->Controls-->Extra Settings(on the top)-->Bolstering Power)")
+	end
+end
+function events.LoadMap(wasInGame)
+	Timer(nightmare, const.Minute/4) 
 end
 
 --dungeon entrance level 
