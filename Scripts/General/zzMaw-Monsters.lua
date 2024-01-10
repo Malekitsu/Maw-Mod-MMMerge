@@ -1347,9 +1347,9 @@ end
 --monster tooltips
 function events.BuildMonsterInformationBox(t)
 	mon=Map.Monsters[Mouse:GetTarget().Index]
-	
+
 	--show level Below HP
-	t.ArmorClass.Text=string.format("Level:         " .. t.Monster.Level .. "\n" .. "58992Armor Class0000000000	100?")
+	t.ArmorClass.Text=string.format("Level:         " .. mon.Level .. "\n" .. "58992Armor Class0000000000	100?")
 	
 	--difficulty multiplier
 	diff=Game.BolsterAmount/100 or 1
