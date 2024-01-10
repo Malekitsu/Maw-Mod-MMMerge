@@ -361,6 +361,10 @@ function events.LoadMap()
 		if currentWorld==2 then
 			mon.Experience = math.round(mon.Experience*2, mon.Experience+1000)
 		end
+		--true nightmare nerf
+		if Game.BolsterAmount==250 then
+			mon.Experience=mon.Experience*0.75
+		end
 	end
 	--CALCULATE DAMAGE AND HP
 	for i=1, 651 do
@@ -525,7 +529,6 @@ function events.PickCorpse(t)
 		mon.TreasureItemPercent= math.round(mon.TreasureItemPercent^0.85 + (50 - mon.TreasureItemPercent^0.85 / 2) * bolsterLevel / 250)
 	end
 end
-
 -----------------------------
 -----MAP MONSTER CHANGES-----
 -----------------------------
@@ -1432,3 +1435,131 @@ function events.MonsterSpriteScale(t)
 	end
 end
 ]]
+
+--TRUE NIGHTMARE MODE
+function events.CanSaveGame(t)
+	if Game.BolsterAmount~=250 then return end
+	if (Party.EnemyDetectorYellow or Party.EnemyDetectorRed) and t.SaveKind ~=1 then
+		t.Result=false
+		Game.ShowStatusText("Can't save now")
+	end
+end
+function events.CanCastLloyd(t)
+	if Game.BolsterAmount~=250 then return end
+	if Party.EnemyDetectorYellow or Party.EnemyDetectorRed then
+		t.Result=false
+		Sleep(1)
+		Game.ShowStatusText("Can't teleport now")
+	end
+end
+function events.CanCastTownPortal(t)
+	if Game.BolsterAmount~=250 then return end
+	if Party.EnemyDetectorYellow or Party.EnemyDetectorRed then
+		t.Can=false
+	end
+end	
+function events.LoadMap()
+	if Game.BolsterAmount==250 then
+		for i=1,Game.MapStats.High do
+			if Game.MapStats[i].Mon1Hi>1 then
+				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+3
+			end 
+			if Game.MapStats[i].Mon2Hi>1 then
+				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+3
+			end 
+			if Game.MapStats[i].Mon3Hi>1 then
+				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+3
+			end 
+			Game.MapStats[i].Mon1Dif=math.min(BackupMapStats[i].Mon1Dif+2,5)
+			Game.MapStats[i].Mon2Dif=math.min(BackupMapStats[i].Mon2Dif+2,5)
+			Game.MapStats[i].Mon3Dif=math.min(BackupMapStats[i].Mon3Dif+2,5)
+		end
+	end
+end
+function events.CalcStatBonusByItems(t)
+	if Game.BolsterAmount~=250 then return end
+	if t.Stat>9 and t.Stat<16 then
+		--calculate party level
+		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+		if currentWorld==1 then
+			partyLevel=vars.MM8LVL
+		elseif currentWorld==2 then
+			partyLevel=vars.MM7LVL
+		elseif currentWorld==3 then
+			partyLevel=vars.MM6LVL
+		elseif currentWorld==4 then
+			partyLevel=0
+		end
+		partyLevel=math.max(partyLevel-4,0)
+		penaltyLevel=partyLevel-30
+		penalty=math.min(penaltyLevel,90)
+		t.Result=t.Result-penalty
+	end
+end
+
+--resurrect monsters
+--new names
+function events.GameInitialized2()
+	for i=0,Game.MonstersTxt.High do
+		Game.PlaceMonTxt[i+300]=string.format("Resurrected " .. Game.MonstersTxt[i].Name)
+	end
+end
+function events.LoadMap()
+	if Game.BolsterAmount==250 then
+		if Map.IndoorOrOutdoor==1 then
+			if mapvars.monsterMap==nil then
+				mapvars.monsterMap={["cleared"]=false, ["names"]={}}
+				for i=0,Map.Monsters.High do
+					mon=Map.Monsters[i]
+					if mon.NameId==0 then
+						mapvars.monsterMap[i]={["x"] = mon.X, ["y"] = mon.Y, ["z"] = mon.Z, ["exp"]=mon.Exp, ["item"]=mon.TreasureItemPercent, ["gold"]=mon.TreasureDiceSides, ["respawn"]=true}
+					else
+						mapvars.monsterMap[i]={["respawn"]=false}
+					end
+				end
+			end
+		end
+	end
+end
+function events.LeaveMap()
+	if mapvars.monsterMap and mapvars.monsterMap.cleared==false then
+		for i=0,#mapvars.monsterMap do
+			mon=Map.Monsters[i]
+			old=mapvars.monsterMap[i]
+			if (mon.AIState==const.AIState.Removed or mon.AIState==const.AIState.Dead)  then --no unique monsters respawn
+				mon.HP=mon.FullHP
+				mon.X, mon.Y, mon.Z=old.x, old.y, old.z 
+				mon.AIState=0
+				mon.Exp=old.exp/4
+				mon.ShowOnMap=false
+				mon.NameId=mon.Id+300
+				if mon.AIState==const.AIState.Removed then
+					mon.TreasureItemPercent=0 --math.round(old.item/4)
+					mon.TreasureDiceSides=0 --math.round(old.gold/4)
+					mapvars.MonsterSeed[i] = Game.RandSeed
+					for i = 1, 30 do
+						Game.Rand()
+					end
+				end
+			end
+		end
+	end
+end
+
+function events.PickCorpse(t)
+	if t.Monster.NameId>300 then
+		t.Monster.TreasureItemPercent=t.Monster.TreasureItemPercent/4
+		t.Monster.TreasureDiceSides=math.round(t.Monster.TreasureDiceSides/4)
+	end
+end
+--dungeon entrance level 
+function events.GameInitialized2()
+	for i=1,109 do 
+		name=Game.Houses[340+i].Name
+		if mapLevels[name] then
+			levelLow=mapLevels[name].Low
+			levelHigh=mapLevels[name].High
+			Game.TransTxt[46+i]=string.format(Game.TransTxt[46+i] .. "\nLevel Recommended:\n" .. levelLow .. "-" .. levelHigh)
+		end
+	end
+end
