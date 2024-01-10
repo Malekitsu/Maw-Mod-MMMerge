@@ -30,6 +30,23 @@ function events.GenerateItem(t)
 end
 
 --grayface fix treasure code
+function events.PickCorpse(t)
+	Game.RandSeed=mapvars.MonsterSeed[t.MonsterIndex]
+	Sleep(1)
+	mapvars.MonsterSeed[t.MonsterIndex]=Game.RandSeed
+end
+function events.LoadMap()
+	if not mapvars.MonsterSeed then
+		mapvars.MonsterSeed={}
+		for i = 0, Map.Monsters.Limit - 1 do
+			mapvars.MonsterSeed[i] = Game.RandSeed
+			for i = 1, 30 do
+				Game.Rand()
+			end
+		end
+	end
+end
+--[[
 local function NeedSeed()
 	local t = mapvars.MonsterSeed
 	if not t then
@@ -56,7 +73,7 @@ end
 
 events.PickCorpse = f
 events.CastTelepathy = f
-
+]]
 --create tables to calculate special enchant
 function events.GameInitialized2()
 	Game.ItemsTxt[67].NotIdentifiedName="Mace"
