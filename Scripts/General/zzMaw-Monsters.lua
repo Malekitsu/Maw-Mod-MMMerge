@@ -1377,6 +1377,7 @@ end
 --monster tooltips
 function events.BuildMonsterInformationBox(t)
 	local mon = t.Monster
+
 	--show level Below HP
 	t.ArmorClass.Text=string.format("Level:         " .. mon.Level .. "\n" .. "58992Armor Class0000000000	100?")
 	
@@ -1603,8 +1604,7 @@ function nightmare()
 		return
 	end
 	if Game.BolsterAmount==250 then
-		answer=Question("You activated Nightmare Mode, monsters will be much stronger and they will not let you save nor teleport away from them, however, items found will be much stronger.\nLeaving a dungeon before killing most of them (80%) will cause monsters to respawn.\nClearing a dungeon will grant you extra rewards.\nRespawned monsters will give less experience and loot, once True Nightmare is activated there is no way back, are you sure? (yes/no)")
-		if answer=="yes" or answer=="Yes" or answer=="YES" then
+			answer=Question("You activated Nightmare Mode, monsters will be much stronger and you can't save nor teleport away from them, however, items found will be much stronger.\nLeaving a dungeon before killing most of them will cause monsters to respawn.\nClearing a dungeon will grant you extra rewards.\nRespawned monsters give less experience and loot, once True Nightmare is activated there is no way back, are you sure? (yes/no)")		if answer=="yes" or answer=="Yes" or answer=="YES" then
 			vars.trueNightmare=true
 			Game.BolsterAmount=300
 			Sleep(1)
