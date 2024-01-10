@@ -689,7 +689,9 @@ function events.CalcDamageToPlayer(t)
 	if Game.BolsterAmount==200 then
 		t.Result=t.Result*2
 	end
-	
+	if Game.BolsterAmount==300 then
+		t.Result=t.Result*3
+	end
 	
 end
 
@@ -814,7 +816,10 @@ function events.CalcDamageToMonster(t)
 	if Game.BolsterAmount==200 then
 		t.Result=t.Result/1.8
 	end
-	
+	--Hell
+	if Game.BolsterAmount==300 then
+		t.Result=t.Result/3
+	end
 	index=table.find(damageKindMap,t.DamageKind)
 	res=t.Monster.Resistances[index]
 	if not res then return end
