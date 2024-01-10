@@ -1346,47 +1346,49 @@ end
 
 --monster tooltips
 function events.BuildMonsterInformationBox(t)
+	mon=Map.Monsters[Mouse:GetTarget().Index]
+	
 	--show level Below HP
 	t.ArmorClass.Text=string.format("Level:         " .. t.Monster.Level .. "\n" .. "58992Armor Class0000000000	100?")
-
+	
 	--difficulty multiplier
 	diff=Game.BolsterAmount/100 or 1
 	if diff==0.5 then
 		diff=0.7
 	end
 	--some statistics here, calculate the standard deviation of dices to get the range of which 95% will fall into
-	mean=t.Monster.Attack1.DamageAdd+t.Monster.Attack1.DamageDiceCount*(t.Monster.Attack1.DamageDiceSides+1)/2
-	range=(t.Monster.Attack1.DamageDiceSides^2*t.Monster.Attack1.DamageDiceCount/12)^0.5*1.96
-	lowerLimit=math.round(math.max(mean-range, t.Monster.Attack1.DamageAdd+t.Monster.Attack1.DamageDiceCount))*diff
-	upperLimit=math.round(math.min(mean+range, t.Monster.Attack1.DamageAdd+t.Monster.Attack1.DamageDiceCount*t.Monster.Attack1.DamageDiceSides))*diff
+	mean=mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*(mon.Attack1.DamageDiceSides+1)/2
+	range=(mon.Attack1.DamageDiceSides^2*mon.Attack1.DamageDiceCount/12)^0.5*1.96
+	lowerLimit=math.round(math.max(mean-range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount))*diff
+	upperLimit=math.round(math.min(mean+range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*mon.Attack1.DamageDiceSides))*diff
 	
-	if t.Monster.Attack1.Missile == 0 then
-		text=string.format(table.find(const.Damage,t.Monster.Attack1.Type) .. "-Melee")
+	if mon.Attack1.Missile == 0 then
+		text=string.format(table.find(const.Damage,mon.Attack1.Type) .. "-Melee")
 	else
-		text=string.format(table.find(const.Damage,t.Monster.Attack1.Type) .. "-Ranged")
+		text=string.format(table.find(const.Damage,mon.Attack1.Type) .. "-Ranged")
 	end
 	t.Damage.Text=string.format("Attack 00000	050" .. lowerLimit .. "-" .. upperLimit .. " " .. text)
-	if t.Monster.Attack2Chance>0 then
-		mean=t.Monster.Attack2.DamageAdd+t.Monster.Attack2.DamageDiceCount*(t.Monster.Attack2.DamageDiceSides+1)/2
-		range=(t.Monster.Attack2.DamageDiceSides^2*t.Monster.Attack2.DamageDiceCount/12)^0.5*1.96
-		lowerLimit=math.round(math.max(mean-range, t.Monster.Attack2.DamageAdd+t.Monster.Attack2.DamageDiceCount))*diff
-		upperLimit=math.round(math.min(mean+range, t.Monster.Attack2.DamageAdd+t.Monster.Attack2.DamageDiceCount*t.Monster.Attack2.DamageDiceSides))*diff
-		if t.Monster.Attack2.Missile == 0 then
-			text=string.format(table.find(const.Damage,t.Monster.Attack2.Type) .. "-Melee")
+	if mon.Attack2Chance>0 then
+		mean=mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*(mon.Attack2.DamageDiceSides+1)/2
+		range=(mon.Attack2.DamageDiceSides^2*mon.Attack2.DamageDiceCount/12)^0.5*1.96
+		lowerLimit=math.round(math.max(mean-range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount))*diff
+		upperLimit=math.round(math.min(mean+range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*mon.Attack2.DamageDiceSides))*diff
+		if mon.Attack2.Missile == 0 then
+			text=string.format(table.find(const.Damage,mon.Attack2.Type) .. "-Melee")
 		else
-			text=string.format(table.find(const.Damage,t.Monster.Attack2.Type) .. "-Ranged")
+			text=string.format(table.find(const.Damage,mon.Attack2.Type) .. "-Ranged")
 		end
 		t.Damage.Text=string.format(t.Damage.Text .. "\n" .. lowerLimit .. "-" .. upperLimit .. " " .. text)
 	end
 	--spell
-	if t.Monster.SpellChance>0 and t.Monster.Spell>0 then
-		spellId=t.Monster.Spell
+	if mon.SpellChance>0 and mon.Spell>0 then
+		spellId=mon.Spell
 		spell=Game.Spells[spellId]
 		name=Game.SpellsTxt[spellId].Name
-		skill=SplitSkill(t.Monster.SpellSkill)
+		skill=SplitSkill(mon.SpellSkill)
 		--get damage multiplier
-		oldLevel=BLevel[t.Monster.Id]
-		local i=t.Monster.Id
+		oldLevel=BLevel[mon.Id]
+		local i=mon.Id
 		if i%3==1 then
 			levelMult=Game.MonstersTxt[i+1].Level
 		elseif i%3==0 then
@@ -1620,6 +1622,117 @@ function events.GameInitialized2()
 			levelLow=mapLevels[name].Low
 			levelHigh=mapLevels[name].High
 			Game.TransTxt[46+i]=string.format(Game.TransTxt[46+i] .. "\nLevel Recommended:\n" .. levelLow .. "-" .. levelHigh)
+		end
+	end
+end
+
+--[[BOSSES SKILLS
+bosses have baseline more damage, hp, loot, spells and exp
+extra abilities:
+Extra HP
+Summon monsters as a special ability
+Inflicts some random status effect (mostly poison3)
+has 1 to 4 extra mini bosses
+teleport behind party
+]]
+
+function events.LoadMap()
+	if Map.IndoorOrOutdoor==1 and Game.BolsterAmount==300 then
+		if not mapvars.bossGenerated then
+			mapvars.bossGenerated=true
+			possibleMonsters={}
+			bossSpawns=math.ceil((Map.Monsters.Count-30)/150)
+			for i=0,Map.Monsters.High do
+				if Map.Monsters[i].Id%3==0 then
+					table.insert(possibleMonsters,i)
+				end
+			end
+			if bossSpawns>0 then
+				for v=1,bossSpawns do
+					index=math.random(1, #possibleMonsters)
+					generateBoss(possibleMonsters[index],v)
+					table.remove(possibleMonsters,index)
+				end
+			end
+		end
+	end
+end
+
+function generateBoss(index,nameIndex)
+	mon=Map.Monsters[index]
+	mon.FullHP=math.round(math.min(mon.FullHP*2+math.random()*2, 32000))
+	mon.HP=mon.FullHP
+	mon.Exp=mon.Exp*10
+	mon.Level=math.round(math.min(mon.Level*1.1+math.random()*0.2,255))
+	mon.TreasureDiceCount=(mon.Level*100)^0.5
+	mon.TreasureDiceSides=(mon.Level*100)^0.5
+	mon.TreasureItemPercent=100
+	mon.TreasureItemType=math.random(1,12)
+	mon.TreasureItemLevel=math.min(mon.TreasureItemLevel+1, 6)
+	mon.NameId=220+nameIndex
+	Game.PlaceMonTxt[mon.NameId]=string.format("Elite " .. Game.MonstersTxt[mon.Id].Name)
+	
+	dmgMult=1.5+math.random()
+	a=mon.Attack1.DamageAdd * dmgMult
+	mon.Attack1.DamageAdd = mon.Attack1.DamageAdd * dmgMult
+	b=mon.Attack1.DamageDiceSides * dmgMult^0.5
+	mon.Attack1.DamageDiceSides = mon.Attack1.DamageDiceSides * dmgMult^0.5
+	mon.Attack1.DamageDiceCount = mon.Attack1.DamageDiceCount * dmgMult^0.5
+	--attack 2
+	c=mon.Attack2.DamageAdd * dmgMult
+	mon.Attack2.DamageAdd = mon.Attack2.DamageAdd * dmgMult
+	d=mon.Attack2.DamageDiceSides * dmgMult
+	mon.Attack2.DamageDiceSides = mon.Attack2.DamageDiceSides * dmgMult^0.5
+	mon.Attack2.DamageDiceCount = mon.Attack2.DamageDiceCount * dmgMult^0.5
+	--OVERFLOW FIX
+	--Attack 1 Overflow fix
+	--add damage fix
+	a=0
+	b=0
+	c=0
+	d=0
+	e=0
+	f=0
+	if (a > 250) then
+	Overflow = a - 250
+	mon.Attack1.DamageAdd = 250
+	b=b + (math.round(2*Overflow/mon.Attack1.DamageDiceCount))
+	mon.Attack1.DamageDiceSides = b 
+	end
+	--Dice Sides fix
+	if (b > 250) then
+	Overflow = b / 250
+	mon.Attack1.DamageDiceSides = 250
+	--checking for dice count overflow
+	e = mon.Attack1.DamageDiceCount * Overflow
+	mon.Attack1.DamageDiceCount = mon.Attack1.DamageDiceCount * Overflow
+	end
+	--Just in case Dice Count fix
+	if not (e == nil) then
+		if (e > 250) then
+		mon.Attack1.DamageDiceCount = 250
+		end
+	end
+	--Attack 2 Overflow fix, same formula
+	--add damage fix
+	if (c > 250) then
+	Overflow = c - 250
+	mon.Attack2.DamageAdd = 250
+	d=d + (math.round(2*Overflow/mon.Attack2.DamageDiceCount))
+	mon.Attack2.DamageDiceSides = d
+	end
+	--Dice Sides fix
+	if (d > 250) then
+	Overflow = d / 250
+	mon.Attack2.DamageDiceSides = 250
+	--checking for dice count overflow
+	f=mon.Attack2.DamageDiceCount * Overflow
+	mon.Attack2.DamageDiceCount = mon.Attack2.DamageDiceCount * Overflow
+	end
+	--Just in case Dice Count fix
+	if not (f ==nil) then
+		if (f > 250) then
+		mon.Attack2.DamageDiceCount = 250
 		end
 	end
 end
