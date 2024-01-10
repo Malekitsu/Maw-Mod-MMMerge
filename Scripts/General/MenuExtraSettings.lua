@@ -233,7 +233,7 @@ function events.GameInitialized2()
 	
 
 	-- Bolster amount
-	MAWBOLSTER={[50]="Easy", [100]="MAW", [150]="Hard", [200]="Hell", [250]="Night\nmare"}
+	MAWBOLSTER={[50]="Easy", [100]="MAW", [150]="Hard", [200]="Hell", [250]="Night\nmare", [300]="Night\nmare"}
 	Game.BolsterAmount = Game.BolsterAmount or 100
 	NumberRegulator(ExSetScr, 103, 220, "BolsterAmount",
 		function(t, val)
