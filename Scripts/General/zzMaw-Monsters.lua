@@ -56,7 +56,7 @@ function events.AfterLoadMap()
 		for i=0, Map.Monsters.High do
 			mon=Map.Monsters[i]
 			
-			if  mon.NameId >=1 then
+			if  mon.NameId >=1 and mon.NameId<220 then
 				--level increase 
 				oldLevel=mon.Level
 				mon.Level=math.min(mon.Level+partyLvl,255)
@@ -1669,10 +1669,8 @@ function events.LoadMap()
 		end
 	end
 	if mapvars.bossNames then
-		for i=221,300 do
-			if mapvars.bossNames[i] then
-			Game.PlaceMonTxt[i]=mapvars.bossNames[i]
-			end
+		for key, value in pairs(mapvars.bossNames) do
+			Game.PlaceMonTxt[key]=value
 		end
 	end
 end
@@ -1688,11 +1686,19 @@ function generateBoss(index,nameIndex)
 	mon.TreasureItemPercent=100
 	mon.TreasureItemType=math.random(1,12)
 	mon.TreasureItemLevel=math.min(mon.TreasureItemLevel+1, 6)
-	mon.NameId=220+nameIndex
-	Game.PlaceMonTxt[mon.NameId]=string.format("Elite " .. Game.MonstersTxt[mon.Id].Name)
-	mapvars.bossNames=mapvars.bossNames or {}
-	mapvars.bossNames[mon.NameId]=Game.PlaceMonTxt[mon.NameId]
 	
+	--name and skills
+	mon.NameId=220+nameIndex
+	mapvars.bossNames=mapvars.bossNames or {}
+	mapvars.bossSkillList=mapvars.SkillList or {}
+	skill=SkillList[math.random(1,#SkillList)]
+	mapvars.bossSkills=mapvars.bossSkills or {}
+	mapvars.bossSkills[mon.NameId]=mapvars.bossSkills[mon.NameId] or {}
+	table.insert(mapvars.bossSkills[mon.NameId],skill)
+	Game.PlaceMonTxt[mon.NameId]=string.format(skill .. " " .. Game.MonstersTxt[mon.Id].Name)
+	
+	mapvars.bossNames[mon.NameId]=Game.PlaceMonTxt[mon.NameId]
+	--damage calculation, need to fix this shit
 	dmgMult=1.5+math.random()
 	a=mon.Attack1.DamageAdd * dmgMult
 	mon.Attack1.DamageAdd = mon.Attack1.DamageAdd * dmgMult
@@ -1756,4 +1762,49 @@ function generateBoss(index,nameIndex)
 		mon.Attack2.DamageDiceCount = 250
 		end
 	end
+end
+
+--SKILLS
+SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Splitting","Adamantite",} --defensives
+
+--on attack skills
+function events.GameInitialized2() --to make the after all the other code
+	function events.CalcDamageToPlayer(t)
+		data=WhoHitPlayer()
+		if data and data.Monster and data.Monster.NameId>220 then
+			local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+			if skill=="Summoner" then
+				if math.random()<0.4 then
+					pseudoSpawnpoint{monster = data.Monster.Id-2, x = (Party.X+data.Monster.X)/2, y = (Party.Y+data.Monster.Y)/2, z = Party.Z, count = 1, powerChances = {75, 25, 0}, radius = 64, group = 1}
+				end
+			elseif skill=="Venomous" then
+				t.Player.Poison3=Game.Time
+			elseif skill=="Exploding" then
+				t.Result=t.Result/2
+				aoeDamage=t.Result/Party.Count
+				for i=0,Party.High do
+					evt.DamagePlayer{Player=Party[i], DamageType=t.DamageKind, Damage = aoeDamage}
+				end
+			end
+		end
+	end
+
+	--on damage taken
+	function events.CalcDamageToMonster(t)
+		if t.Monster.NameId>220 then
+			local skill = string.match(Game.PlaceMonTxt[t.Monster.NameId], "([^%s]+)")
+			if skill=="Thorn" then
+				if t.DamageKind==4 then
+					evt.DamagePlayer{Player=t.Player, DamageType=t.DamageKind, Damage = t.Result*0.25}
+				end
+			elseif skill=="Reflecting" then
+				if t.DamageKind~=4 then
+					evt.DamagePlayer{Player=t.Player, DamageType=t.DamageKind, Damage = t.Result*0.25}
+				end
+			elseif skill=="Adamantite" then
+				t.Result=math.round(math.max(t.Result-t.Monster.Level^1.15,t.Result/10))
+			end
+		end
+	end
+
 end
