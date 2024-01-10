@@ -236,7 +236,7 @@ end
 ]]
 
 function events.LoadMap()
-	vars.EXPBEFORE=vars.EXPBEFORE or calcExp(vars.LVLBEFORE) --for working retroactively
+	vars.EXPBEFORE=vars.EXPBEFORE or calcExp(vars.LVLBEFORE or 1) --for working retroactively
 end
 
 function events.MonsterKillExp(t)
