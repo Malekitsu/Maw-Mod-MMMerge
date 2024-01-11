@@ -96,7 +96,7 @@ end
 function events.CalcDamageToPlayer(t)
 	if t.DamageKind==4 then 
 		AC=t.Player:GetArmorClass()
-		t.Result=t.Result/(AC/300+1)
+		t.Result=t.Result/2^(AC/300)
 	end
 end
 --endurance
@@ -690,9 +690,12 @@ function events.CalcDamageToPlayer(t)
 		t.Result=t.Result*2
 	end
 	if Game.BolsterAmount==300 then
-		t.Result=t.Result*3
+		if data and data.Monster then
+			t.Result=t.Result*(3+data.Monster.Level/85)
+		else
+			t.Result=t.Result*3
+		end
 	end
-	
 end
 
 --add luck to resistances
@@ -816,9 +819,9 @@ function events.CalcDamageToMonster(t)
 	if Game.BolsterAmount==200 then
 		t.Result=t.Result/1.8
 	end
-	--Hell
+	--Nightmare
 	if Game.BolsterAmount==300 then
-		t.Result=t.Result/3
+		t.Result=t.Result/(3+t.Monster.Level/50)
 	end
 	index=table.find(damageKindMap,t.DamageKind)
 	res=t.Monster.Resistances[index]
