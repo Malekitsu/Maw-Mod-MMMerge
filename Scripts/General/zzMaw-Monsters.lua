@@ -84,10 +84,6 @@ function events.AfterLoadMap()
 				--OVERFLOW FIX
 				--Attack 1 Overflow fix
 				--add damage fix
-				a=0
-				b=0
-				c=0
-				d=0
 				e=0
 				f=0
 				if (a > 250) then
@@ -1377,7 +1373,7 @@ end
 --monster tooltips
 function events.BuildMonsterInformationBox(t)
 	local mon = t.Monster
-
+	mon=Map.Monsters[Mouse:GetTarget().Index]
 	--show level Below HP
 	t.ArmorClass.Text=string.format("Level:         " .. mon.Level .. "\n" .. "58992Armor Class0000000000	100?")
 	
@@ -1648,7 +1644,7 @@ has 1 to 4 extra mini bosses
 teleport behind party
 ]]
 
-function events.LoadMap()
+function events.AfterLoadMap()
 	if Map.IndoorOrOutdoor==1 and Game.BolsterAmount==300 then
 		if not mapvars.bossGenerated then
 			mapvars.bossGenerated=true
@@ -1714,10 +1710,6 @@ function generateBoss(index,nameIndex)
 	--OVERFLOW FIX
 	--Attack 1 Overflow fix
 	--add damage fix
-	a=0
-	b=0
-	c=0
-	d=0
 	e=0
 	f=0
 	if (a > 250) then
@@ -1765,8 +1757,8 @@ function generateBoss(index,nameIndex)
 end
 
 --SKILLS
-SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Splitting","Adamantite",} --defensives
-
+SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Adamantite",} --defensives
+--to add: splitting
 --on attack skills
 function events.GameInitialized2() --to make the after all the other code
 	function events.CalcDamageToPlayer(t)
