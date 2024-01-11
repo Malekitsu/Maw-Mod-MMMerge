@@ -1369,7 +1369,18 @@ for i=0,#Game.MapStats do
 end
 
 ]]
-
+function events.KeyDown(t)
+	--base numbers
+	if t.Alt then
+		baseDamageValue=true
+	end	
+end
+function events.KeyUp(t)
+	--base numbers
+	if t.Alt then
+		baseDamageValue=false
+	end	
+end
 --monster tooltips
 function events.BuildMonsterInformationBox(t)
 	local mon = t.Monster
@@ -1391,22 +1402,24 @@ function events.BuildMonsterInformationBox(t)
 	lowerLimit=math.round(math.max(mean-range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount)*diff)
 	upperLimit=math.round(math.min(mean+range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*mon.Attack1.DamageDiceSides)*diff)
 	
-	if mon.Attack1.Missile == 0 then
-		text=string.format(table.find(const.Damage,mon.Attack1.Type) .. "-Melee")
-	else
-		text=string.format(table.find(const.Damage,mon.Attack1.Type) .. "-Ranged")
+	text=string.format(table.find(const.Damage,mon.Attack1.Type))
+	if not baseDamageValue then
+		lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit))
+		upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit))
 	end
 	t.Damage.Text=string.format("Attack 00000	050" .. lowerLimit .. "-" .. upperLimit .. " " .. text)
+	
 	if mon.Attack2Chance>0 then
 		mean=mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*(mon.Attack2.DamageDiceSides+1)/2
 		range=(mon.Attack2.DamageDiceSides^2*mon.Attack2.DamageDiceCount/12)^0.5*1.96
 		lowerLimit=math.round(math.max(mean-range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount)*diff)
 		upperLimit=math.round(math.min(mean+range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*mon.Attack2.DamageDiceSides)*diff)
-		if mon.Attack2.Missile == 0 then
-			text=string.format(table.find(const.Damage,mon.Attack2.Type) .. "-Melee")
-		else
-			text=string.format(table.find(const.Damage,mon.Attack2.Type) .. "-Ranged")
+		if not baseDamageValue then
+			lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit))
+			upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit))
 		end
+		text=string.format(table.find(const.Damage,mon.Attack2.Type))
+		
 		t.Damage.Text=string.format(t.Damage.Text .. "\n" .. lowerLimit .. "-" .. upperLimit .. " " .. text)
 	end
 	--spell
@@ -1430,10 +1443,15 @@ function events.BuildMonsterInformationBox(t)
 		--calculate
 		mean=spell.DamageAdd+skill*(spell.DamageDiceSides+1)/2
 		range=(spell.DamageDiceSides^2*skill/12)^0.5*1.96
-		lowerLimit=math.round(math.max(mean-range, spell.DamageAdd+skill)*dmgMult)*diff
-		upperLimit=math.round(math.min(mean+range, spell.DamageAdd+skill*spell.DamageDiceSides)*dmgMult)*diff
-		
+		lowerLimit=math.round(math.max(mean-range, spell.DamageAdd+skill)*dmgMult*diff)
+		upperLimit=math.round(math.min(mean+range, spell.DamageAdd+skill*spell.DamageDiceSides)*dmgMult*diff)
+		if not baseDamageValue then
+			lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit))
+			upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit))
+		end
 		t.SpellFirst.Text=string.format("Spell00000	040" .. name .. " " .. lowerLimit .. "-" .. upperLimit)
+		
+		
 	end
 end
 
