@@ -187,12 +187,16 @@ function events.ItemGenerated(t)
 		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
 		if currentWorld==1 then
 			partyLevel=vars.MM7LVL+vars.MM6LVL
+			currentLevel=vars.MM8LVL
 		elseif currentWorld==2 then
 			partyLevel=vars.MM8LVL+vars.MM6LVL
+			currentLevel=vars.MM7LVL
 		elseif currentWorld==3 then
 			partyLevel=vars.MM8LVL+vars.MM7LVL
+			currentLevel=vars.MM6LVL
 		elseif currentWorld==4 then
 			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+			currentLevel=vars.MMMLVL
 		end
 		--modify reagents
 		if reagentList[t.Item.Number] then
@@ -213,15 +217,19 @@ function events.ItemGenerated(t)
 			difficultyExtraPower=1.4	
 			LevelBonus=40
 		end
+		if Game.HouseScreen==2 or Game.HouseScreen==95 then --nerf shops if no exp in current world
+			partyLevel=math.round(partyLevel*(math.min(partyLevel/216 + currentLevel/108,1)))
+		end
 		partyLevel=partyLevel+LevelBonus
+		
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
-		t.Item.MaxCharges=math.min(math.floor(partyLevel/5),50)
-		partyLevel1=math.min(math.floor(partyLevel/18),14)
+		cap1=50+LevelBonus/5
+		t.Item.MaxCharges=math.min(math.floor(partyLevel/5),cap1)
+		cap2=14+math.floor(LevelBonus/18)
+		partyLevel1=math.min(math.floor(partyLevel/18),cap2)
 		--adjust loot Strength
 		ps1=t.Strength
-		
-		
-		
+
 		pseudoStr=ps1+partyLevel1
 		if math.random(1,18)<partyLevel1%18 then
 			pseudoStr=pseudoStr+1
@@ -332,8 +340,12 @@ function events.ItemGenerated(t)
 		end
 		if math.floor(t.Item.Charges/1000)==8 or math.floor(t.Item.Charges/1000)==9 then
 			power=t.Item.Charges%1000
-			power=math.min(power*(2+power/50),999) --cap is 999
-			t.Item.Charges=math.floor(t.Item.Charges/1000)*1000+power
+			power=power*(2+power/50) --cap is 999
+			if power > 999 and t.Item.Bonus<17 then --swap base with charges
+				t.ItemBonus, t.Item.BonusStrength, t.Item.Charges=math.floor(t.Item.Charges/1000), power, t.ItemBonus*1000+t.ItemBonusStrength
+			else 
+				t.Item.Charges=math.floor(t.Item.Charges/1000)*1000+power
+			end
 		end
 		--nerf to AC
 		if t.Item.Bonus==10 then
@@ -1113,7 +1125,7 @@ function events.CalcItemValue(t)
 		--add enchant price
 		bonus1=t.Item.BonusStrength*100
 		if t.Item.Bonus==8 or t.Item.Bonus==9 then
-			bonus1=bonus1/2
+			bonus1=5*((2*bonus1+100)^0.5-10)
 		elseif t.Item.Bonus==10 then
 			bonus1=bonus1*2
 		elseif t.Item.Bonus>16 and t.Item.Bonus<=24 then
@@ -1123,7 +1135,7 @@ function events.CalcItemValue(t)
 		bonus2=(t.Item.Charges%1000)*100
 		bonus2Type=math.floor(t.Item.Charges/1000)
 		if bonus2Type==8 or bonus2Type==9 then
-			bonus2=bonus2/2
+			bonus2=5*((2*bonus2+100)^0.5-10)
 		elseif bonus2Type==10 then
 			bonus2=bonus2*2
 		end
@@ -1162,8 +1174,17 @@ function events.CalcItemValue(t)
 			if t.Item.BonusExpireTime>0 and t.Item.BonusExpireTime<3 then
 				count=count+t.Item.BonusExpireTime
 			end	
-			if count>2 then
-				t.Value=t.Value^(1+count*0.1-0.2)
+			if count>0 then
+				t.Value=t.Value^(1+count*0.06)
+				if t.Value>200000  then
+					t.Value=math.round(t.Value/1000)*1000
+				elseif t.Value>50000  then
+					t.Value=math.round(t.Value/500)*500	
+				elseif t.Value>1000  then
+					t.Value=math.round(t.Value/100)*100
+				elseif t.Value>100 then
+					t.Value=math.round(t.Value/10)*10
+				end
 			end
 			
 		end	
