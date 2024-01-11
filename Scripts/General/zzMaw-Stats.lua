@@ -92,13 +92,7 @@ function events.CalcSpellDamage(t)
 		end
 	end
 end
---AC 
-function events.CalcDamageToPlayer(t)
-	if t.DamageKind==4 then 
-		AC=t.Player:GetArmorClass()
-		t.Result=t.Result/2^(AC/300)
-	end
-end
+
 --endurance
 fullHP2={}
 for i =0,300 do
@@ -575,19 +569,12 @@ function events.Regeneration(t)
 end
 
 
---resistance map
-damageKindToMaxResistanceEnchant={
-	[0] = 74,
-	[1] = 75,
-	[2] = 76,
-	[3] = 77,
-	[7] = 78,
-	[8] = 79,
-}
+
 
 --reduce damage by %
 function events.CalcDamageToPlayer(t)
-	--recalculate skill
+	if t.Result<1 then return end
+	--recalculate spells damage
 	data=WhoHitPlayer()
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
 		local skill=SplitSkill(data.Monster.SpellSkill)
@@ -603,70 +590,33 @@ function events.CalcDamageToPlayer(t)
 			end
 		end
 	end
-	if t.Result<1 then return end
-	if t.DamageKind==0 or t.DamageKind==1 or t.DamageKind==2 or t.DamageKind==3 or t.DamageKind==7 or t.DamageKind==8 or t.DamageKind==9 or t.DamageKind==10 or t.DamageKind==12 then
-		
-		--get resistances
-		if t.DamageKind==0 then
-			res=t.Player:GetResistance(10)
+	
+	--fix for multiplayer
+	local REMOTE_OWNER_BIT = 0x800
+	local source = WhoHitPlayer()
+	if source then
+	local obj = source.Object
+		if obj and bit.And(obj.Bits, REMOTE_OWNER_BIT) > 0 then
+			return
 		end
-		if t.DamageKind==1 then
-			res=t.Player:GetResistance(11)
+	end
+	
+	--apply Damage
+	t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true)
+	--modify spell damage as it's not handled in maw-monsters
+	data=WhoHitPlayer()
+	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
+		oldLevel=BLevel[data.Monster.Id]
+		local i=data.Monster.Id
+		if i%3==1 then
+			levelMult=Game.MonstersTxt[i+1].Level
+		elseif i%3==0 then
+			levelMult=Game.MonstersTxt[i-1].Level
+		else
+			levelMult=Game.MonstersTxt[i].Level
 		end
-		if t.DamageKind==2 then
-			res=t.Player:GetResistance(12)
-		end
-		if t.DamageKind==3 then
-			res=t.Player:GetResistance(13)
-		end
-		if t.DamageKind==7 then
-			res=t.Player:GetResistance(14)
-		end
-		if t.DamageKind==8 then
-			res=t.Player:GetResistance(15)
-		end
-		if t.DamageKind==9 then
-			res=math.min(t.Player:GetResistance(14),t.Player:GetResistance(15))
-		end
-		if t.DamageKind==10 then
-			res=math.min(t.Player:GetResistance(10),t.Player:GetResistance(11),t.Player:GetResistance(12),t.Player:GetResistance(13))
-		end
-		if t.DamageKind==12 then
-			res=math.min(t.Player:GetResistance(10),t.Player:GetResistance(11),t.Player:GetResistance(12),t.Player:GetResistance(13),t.Player:GetResistance(14),t.Player:GetResistance(15))
-		end
-		res=1-1/2^(res/100)
-		--fix for multiplayer
-		local REMOTE_OWNER_BIT = 0x800
-		local source = WhoHitPlayer()
-		if source then
-		local obj = source.Object
-			if obj and bit.And(obj.Bits, REMOTE_OWNER_BIT) > 0 then
-				return
-			end
-		end
-		
-		--randomize resistance
-		if res>0 then
-			local roll=(math.random()+math.random())-1
-			res=math.max(0, res+(math.min(res,1-res)*roll))
-		end
-		--apply Damage
-		t.Result = t.Damage * (1-res)
-		--modify spell damage as it's not handled in maw-monsters
-		data=WhoHitPlayer()
-		if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
-			oldLevel=BLevel[data.Monster.Id]
-			local i=data.Monster.Id
-			if i%3==1 then
-				levelMult=Game.MonstersTxt[i+1].Level
-			elseif i%3==0 then
-				levelMult=Game.MonstersTxt[i-1].Level
-			else
-				levelMult=Game.MonstersTxt[i].Level
-			end
-			dmgMult=(levelMult/12+1)*((levelMult+2)/(oldLevel+2))
-			t.Result=t.Result*dmgMult
-		end
+		dmgMult=(levelMult/12+1)*((levelMult+2)/(oldLevel+2))
+		t.Result=t.Result*dmgMult
 	end
 
 	--add difficulty related damage
@@ -930,4 +880,49 @@ function events.CalcStatBonusByItems(t)
 		penalty=math.min(penaltyLevel,200)
 		t.Result=t.Result-penalty
 	end
+end
+
+--resistance map
+damageKindResistance={
+	[0] = {10},
+	[1] = {11},
+	[2] = {12},
+	[3] = {13},
+	[7] = {14},
+	[8] = {15},
+	[9] = {14,15},
+	[10] = {10,11,12,13},
+	[12] = {10,11,12,13,14,15},
+}
+
+function calcMawDamage(pl,damageKind,damage,rand)
+	--AC for phys
+	if damageKind==4 then 
+		local AC=pl:GetArmorClass()
+		local damage=math.round(damage/2^(AC/300))
+		return damage
+	end
+
+	--get resistances
+	if not damageKindResistance[damageKind] then
+		local damage=math.round(damage)
+		return damage
+	end
+	local res=400
+	local resList=damageKindResistance[damageKind]
+	for i=1,#resList do
+		local playerRes = pl:GetResistance(resList[i])
+		if playerRes<res then
+			res=playerRes
+		end
+	end
+	
+	--randomize resistance
+	if res>0 and rand then
+		local roll=(math.random()+math.random())-1
+		res=math.max(0, res+(math.min(res,1-res)*roll))
+	end
+	
+	local damage=math.round(damage/2^(res/100))
+	return damage
 end
