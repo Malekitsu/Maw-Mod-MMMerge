@@ -527,7 +527,7 @@ vars.poisonTime=vars.poisonTime or {}
 		end
 	end
 end
-Timer(poisonTimer, const.Minute) 
+Timer(poisonTimer, const.Minute/2) 
 
 function events.DoBadThingToPlayer(t)
 		if (t.Thing==6 or t.Thing==7 or t.Thing==8) and t.Allow then
