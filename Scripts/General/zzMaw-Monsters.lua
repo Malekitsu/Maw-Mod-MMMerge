@@ -67,70 +67,11 @@ function events.AfterLoadMap()
 				mon.FullHP=mon.HP
 				--damage
 				dmgMult=(mon.Level/9+1.15)*((mon.Level+2)/(oldLevel+2))
-				-----------------------------------------------------------
-				--DAMAGE COMPUTATION DOWN HERE, FOR BALANCE MODIFY ABOVE^
-				--attack 1
-				a=mon.Attack1.DamageAdd * dmgMult
-				mon.Attack1.DamageAdd = mon.Attack1.DamageAdd * dmgMult
-				b=mon.Attack1.DamageDiceSides * dmgMult^0.5
-				mon.Attack1.DamageDiceSides = mon.Attack1.DamageDiceSides * dmgMult^0.5
-				mon.Attack1.DamageDiceCount = mon.Attack1.DamageDiceCount * dmgMult^0.5
-				--attack 2
-				c=mon.Attack2.DamageAdd * dmgMult
-				mon.Attack2.DamageAdd = mon.Attack2.DamageAdd * dmgMult
-				d=mon.Attack2.DamageDiceSides * dmgMult
-				mon.Attack2.DamageDiceSides = mon.Attack2.DamageDiceSides * dmgMult^0.5
-				mon.Attack2.DamageDiceCount = mon.Attack2.DamageDiceCount * dmgMult^0.5
-				--OVERFLOW FIX
-				--Attack 1 Overflow fix
-				--add damage fix
-				e=0
-				f=0
-				if (a > 250) then
-				Overflow = a - 250
-				mon.Attack1.DamageAdd = 250
-				b=b + (math.round(2*Overflow/mon.Attack1.DamageDiceCount))
-				mon.Attack1.DamageDiceSides = b 
-				end
-				--Dice Sides fix
-				if (b > 250) then
-				Overflow = b / 250
-				mon.Attack1.DamageDiceSides = 250
-				--checking for dice count overflow
-				e = mon.Attack1.DamageDiceCount * Overflow
-				mon.Attack1.DamageDiceCount = mon.Attack1.DamageDiceCount * Overflow
-				end
-				--Just in case Dice Count fix
-				if not (e == nil) then
-					if (e > 250) then
-					mon.Attack1.DamageDiceCount = 250
-					end
-				end
-				--Attack 2 Overflow fix, same formula
-				--add damage fix
-				if (c > 250) then
-				Overflow = c - 250
-				mon.Attack2.DamageAdd = 250
-				d=d + (math.round(2*Overflow/mon.Attack2.DamageDiceCount))
-				mon.Attack2.DamageDiceSides = d
-				end
-				--Dice Sides fix
-				if (d > 250) then
-				Overflow = d / 250
-				mon.Attack2.DamageDiceSides = 250
-				--checking for dice count overflow
-				f=mon.Attack2.DamageDiceCount * Overflow
-				mon.Attack2.DamageDiceCount = mon.Attack2.DamageDiceCount * Overflow
-				end
-				--Just in case Dice Count fix
-				if not (f ==nil) then
-					if (f > 250) then
-					mon.Attack2.DamageDiceCount = 250
-					end
-				end
-				-------------------------
-				--end DAMAGE CALCULATION
-				-------------------------
+				atk1=mon.Attack1
+				debug.Message(dump(string.format("%s %s %s", atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount)))
+				atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult)
+				atk2=mon.Attack2
+				atk2.DamageAdd, atk2.DamageDiceSides, atk2.DamageDiceCount = calcDices(atk2.DamageAdd,atk2.DamageDiceSides,atk2.DamageDiceCount,dmgMult)
 			end
 		end
 	end	
@@ -168,18 +109,6 @@ function events.GameInitialized2()
 		basetable[i].FullHP=Game.MonstersTxt[i].FullHP
 		basetable[i].FullHitPoints=Game.MonstersTxt[i].FullHitPoints
 		basetable[i].Level=Game.MonstersTxt[i].Level
-		--[[
-		basetable[i].FireResistance=Game.MonstersTxt[i].FireResistance
-		basetable[i].AirResistance=Game.MonstersTxt[i].AirResistance
-		basetable[i].WaterResistance=Game.MonstersTxt[i].WaterResistance
-		basetable[i].EarthResistance=Game.MonstersTxt[i].EarthResistance
-		basetable[i].MindResistance=Game.MonstersTxt[i].MindResistance
-		basetable[i].SpiritResistance=Game.MonstersTxt[i].SpiritResistance
-		basetable[i].BodyResistance=Game.MonstersTxt[i].BodyResistance
-		basetable[i].LightResistance=Game.MonstersTxt[i].LightResistance
-		basetable[i].DarkResistance=Game.MonstersTxt[i].DarkResistance
-		basetable[i].PhysResistance=Game.MonstersTxt[i].PhysResistance	
-		]]
 		basetable[i].TreasureDiceCount=Game.MonstersTxt[i].TreasureDiceCount
 		basetable[i].TreasureDiceSides=Game.MonstersTxt[i].TreasureDiceSides
 		basetable[i].TreasureItemLevel=Game.MonstersTxt[i].TreasureItemLevel
@@ -399,69 +328,12 @@ function events.LoadMap()
 		
 		mon.ArmorClass=base.ArmorClass*((levelMult+10)/(LevelB+10))
 		
-		dmgMult=(levelMult/9+1.15) --BONUS DAMAGE FROM LEVEL ADDED BELOW
-		-----------------------------------------------------------
-		--DAMAGE COMPUTATION DOWN HERE, FOR BALANCE MODIFY ABOVE^
-		--attack 1
-		
-		
-		a=(base.Attack1.DamageAdd+bonusDamage) * dmgMult
-		mon.Attack1.DamageAdd = (base.Attack1.DamageAdd+bonusDamage) * dmgMult
-		b=base.Attack1.DamageDiceSides * dmgMult^0.5
-		mon.Attack1.DamageDiceSides = base.Attack1.DamageDiceSides * dmgMult^0.5
-		e=base.Attack1.DamageDiceCount * dmgMult^0.5
-		mon.Attack1.DamageDiceCount = base.Attack1.DamageDiceCount * dmgMult^0.5
-		--attack 2
-		c=(base.Attack2.DamageAdd+bonusDamage) * dmgMult
-		mon.Attack2.DamageAdd = (base.Attack2.DamageAdd+bonusDamage) * dmgMult
-		d=base.Attack2.DamageDiceSides * dmgMult^0.5
-		mon.Attack2.DamageDiceSides = base.Attack2.DamageDiceSides * dmgMult^0.5
-		f=base.Attack2.DamageDiceCount * dmgMult^0.5
-		mon.Attack2.DamageDiceCount = base.Attack2.DamageDiceCount * dmgMult^0.5
-		--OVERFLOW FIX
-		--Attack 1 Overflow fix
-		--add damage fix
-		if (a > 250) then
-		Overflow = a - 250
-		mon.Attack1.DamageAdd = 250
-		b=b + (math.round(2*Overflow/mon.Attack1.DamageDiceCount))
-		mon.Attack1.DamageDiceSides = b 
-		end
-		--Dice Sides fix
-		if (b > 250) then
-		Overflow = b / 250
-		mon.Attack1.DamageDiceSides = 250
-		--checking for dice count overflow
-		e = e * Overflow
-		mon.Attack1.DamageDiceCount = e
-		end
-		--Just in case Dice Count fix
-		if (e > 250) then
-		mon.Attack1.DamageDiceCount = 250
-		end
-		--Attack 2 Overflow fix, same formula
-		--add damage fix
-		if (c > 250) then
-		Overflow = c - 250
-		mon.Attack2.DamageAdd = 250
-		d=d + (math.round(2*Overflow/mon.Attack2.DamageDiceCount))
-		mon.Attack2.DamageDiceSides = d
-		end
-		--Dice Sides fix
-		if (d > 250) then
-		Overflow = d / 250
-		mon.Attack2.DamageDiceSides = 250
-		--checking for dice count overflow
-		f=f * Overflow
-		mon.Attack2.DamageDiceCount = f 
-		end
-		--Just in case Dice Count fix
-		if (f > 250) then
-		mon.Attack2.DamageDiceCount = 250
-		end
-		-------------------------
-		--end DAMAGE CALCULATION
-		-------------------------
+		dmgMult=(levelMult/9+1.15)
+		--DAMAGE COMPUTATION
+		atk1=base.Attack1
+		mon.Attack1.DamageAdd, mon.Attack1.DamageDiceSides, mon.Attack1.DamageDiceCount = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult,bonusDamage)
+		atk2=base.Attack2
+		mon.Attack2.DamageAdd, mon.Attack2.DamageDiceSides, mon.Attack2.DamageDiceCount = calcDices(atk2.DamageAdd,atk2.DamageDiceSides,atk2.DamageDiceCount,dmgMult,bonusDamage)
 	end
 	if bolsterLevel>20 then
 		for i=1, 651 do
@@ -1717,64 +1589,10 @@ function generateBoss(index,nameIndex)
 	mapvars.bossNames[mon.NameId]=Game.PlaceMonTxt[mon.NameId]
 	--damage calculation, need to fix this shit
 	dmgMult=1.5+math.random()
-	a=mon.Attack1.DamageAdd * dmgMult
-	mon.Attack1.DamageAdd = mon.Attack1.DamageAdd * dmgMult
-	b=mon.Attack1.DamageDiceSides * dmgMult^0.5
-	mon.Attack1.DamageDiceSides = mon.Attack1.DamageDiceSides * dmgMult^0.5
-	mon.Attack1.DamageDiceCount = mon.Attack1.DamageDiceCount * dmgMult^0.5
-	--attack 2
-	c=mon.Attack2.DamageAdd * dmgMult
-	mon.Attack2.DamageAdd = mon.Attack2.DamageAdd * dmgMult
-	d=mon.Attack2.DamageDiceSides * dmgMult
-	mon.Attack2.DamageDiceSides = mon.Attack2.DamageDiceSides * dmgMult^0.5
-	mon.Attack2.DamageDiceCount = mon.Attack2.DamageDiceCount * dmgMult^0.5
-	--OVERFLOW FIX
-	--Attack 1 Overflow fix
-	--add damage fix
-	e=0
-	f=0
-	if (a > 250) then
-	Overflow = a - 250
-	mon.Attack1.DamageAdd = 250
-	b=b + (math.round(2*Overflow/mon.Attack1.DamageDiceCount))
-	mon.Attack1.DamageDiceSides = b 
-	end
-	--Dice Sides fix
-	if (b > 250) then
-	Overflow = b / 250
-	mon.Attack1.DamageDiceSides = 250
-	--checking for dice count overflow
-	e = mon.Attack1.DamageDiceCount * Overflow
-	mon.Attack1.DamageDiceCount = mon.Attack1.DamageDiceCount * Overflow
-	end
-	--Just in case Dice Count fix
-	if not (e == nil) then
-		if (e > 250) then
-		mon.Attack1.DamageDiceCount = 250
-		end
-	end
-	--Attack 2 Overflow fix, same formula
-	--add damage fix
-	if (c > 250) then
-	Overflow = c - 250
-	mon.Attack2.DamageAdd = 250
-	d=d + (math.round(2*Overflow/mon.Attack2.DamageDiceCount))
-	mon.Attack2.DamageDiceSides = d
-	end
-	--Dice Sides fix
-	if (d > 250) then
-	Overflow = d / 250
-	mon.Attack2.DamageDiceSides = 250
-	--checking for dice count overflow
-	f=mon.Attack2.DamageDiceCount * Overflow
-	mon.Attack2.DamageDiceCount = mon.Attack2.DamageDiceCount * Overflow
-	end
-	--Just in case Dice Count fix
-	if not (f ==nil) then
-		if (f > 250) then
-		mon.Attack2.DamageDiceCount = 250
-		end
-	end
+	atk1=mon.Attack1
+	atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult)
+	atk2=mon.Attack2
+	atk2.DamageAdd, atk2.DamageDiceSides, atk2.DamageDiceCount = calcDices(atk2.DamageAdd,atk2.DamageDiceSides,atk2.DamageDiceCount,dmgMult)
 end
 
 --SKILLS
@@ -1820,4 +1638,30 @@ function events.GameInitialized2() --to make the after all the other code
 		end
 	end
 
+end
+
+function calcDices(add,sides,count, mult, bonusDamage)
+	local bonusDamage=bonusDamage or 0
+	local add=math.round((add+bonusDamage)*mult)
+	local sides=math.round(sides*mult^0.5)
+	local count=math.round(count*mult^0.5)
+	if add > 250 then
+		Overflow=add-250
+		add=250
+		sides=sides + (math.round(2*Overflow/count))
+	end
+	if sides > 250 then
+		Overflow = sides / 250
+		sides = 250
+		--checking for dice count overflow
+		count=math.round(count* Overflow)
+	end
+	if count > 250 then
+		Overflow = count / 250
+		count = 250
+		--checking for dice count overflow
+		sides=math.round(math.min(sides * Overflow,250))
+	end
+	
+	return add, sides, count
 end
