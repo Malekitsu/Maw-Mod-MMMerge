@@ -862,11 +862,11 @@ local function BolsterMonsters()
 
 		for i,v in Map.Monsters do
 			mon=Map.Monsters[i]
-			--if  (mon.FullHitPoints == Game.MonstersTxt[mon.Id].FullHitPoints) then
+			if  (mon.FullHitPoints == Game.MonstersTxt[mon.Id].FullHitPoints) then
 				if v.Id > 0 and v.Id < Game.MonstersTxt.Limit then
 					PrepareMapMon(v, MapSettings)
 				end
-			--end
+			end
 		end
 	end
 
