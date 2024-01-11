@@ -899,7 +899,7 @@ function calcMawDamage(pl,damageKind,damage,rand)
 	--AC for phys
 	if damageKind==4 then 
 		local AC=pl:GetArmorClass()
-		local damage=math.round(damage/2^(AC/300))
+		local damage=math.round(damage/2^(math.min(AC/300,4)))
 		return damage
 	end
 
