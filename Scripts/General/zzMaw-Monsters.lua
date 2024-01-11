@@ -1382,11 +1382,14 @@ function events.BuildMonsterInformationBox(t)
 	if diff==0.5 then
 		diff=0.7
 	end
+	if Game.BolsterAmount==300 then
+		diff=diff+mon.Level/85
+	end
 	--some statistics here, calculate the standard deviation of dices to get the range of which 95% will fall into
 	mean=mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*(mon.Attack1.DamageDiceSides+1)/2
 	range=(mon.Attack1.DamageDiceSides^2*mon.Attack1.DamageDiceCount/12)^0.5*1.96
-	lowerLimit=math.round(math.max(mean-range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount))*diff
-	upperLimit=math.round(math.min(mean+range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*mon.Attack1.DamageDiceSides))*diff
+	lowerLimit=math.round(math.max(mean-range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount)*diff)
+	upperLimit=math.round(math.min(mean+range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*mon.Attack1.DamageDiceSides)*diff)
 	
 	if mon.Attack1.Missile == 0 then
 		text=string.format(table.find(const.Damage,mon.Attack1.Type) .. "-Melee")
@@ -1397,8 +1400,8 @@ function events.BuildMonsterInformationBox(t)
 	if mon.Attack2Chance>0 then
 		mean=mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*(mon.Attack2.DamageDiceSides+1)/2
 		range=(mon.Attack2.DamageDiceSides^2*mon.Attack2.DamageDiceCount/12)^0.5*1.96
-		lowerLimit=math.round(math.max(mean-range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount))*diff
-		upperLimit=math.round(math.min(mean+range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*mon.Attack2.DamageDiceSides))*diff
+		lowerLimit=math.round(math.max(mean-range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount)*diff)
+		upperLimit=math.round(math.min(mean+range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*mon.Attack2.DamageDiceSides)*diff)
 		if mon.Attack2.Missile == 0 then
 			text=string.format(table.find(const.Damage,mon.Attack2.Type) .. "-Melee")
 		else
