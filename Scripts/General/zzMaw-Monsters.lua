@@ -1240,6 +1240,7 @@ for i=0,#Game.MapStats do
 end
 
 ]]
+baseDamageValue=false
 function events.KeyDown(t)
 	--base numbers
 	if t.Alt then
