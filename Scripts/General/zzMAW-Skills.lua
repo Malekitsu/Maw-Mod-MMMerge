@@ -1690,13 +1690,13 @@ function events.GetSkill(t)
 end
 
 --merchant fix
-merchantCheck=true
+merchantCheck=false
 function events.GetMerchantTotalSkill(t)
 	if t.Result==10000 then
 		t.Result=1000
 	end
-	if not merchantCheck then return end --avoid loops
-	merchantCheck=false
+	if merchantCheck then return end --avoid loops
+	merchantCheck=true
 	if Game.HouseScreen==-1 or Game.HouseScreen==1 or Game.HouseScreen==96 then return end
 	currentMerchant=0
 	maxMerchant=0
@@ -1706,7 +1706,7 @@ function events.GetMerchantTotalSkill(t)
 			maxMerchant=merc
 		end
 	end
-	merchantCheck=true
+	merchantCheck=false
 	t.Result=maxMerchant
 end
 
