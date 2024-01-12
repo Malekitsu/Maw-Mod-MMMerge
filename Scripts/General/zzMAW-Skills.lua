@@ -1832,11 +1832,6 @@ function events.LoadMap()
 	end
 end
 
---reduced training time
-function events.CalcTrainingTime(t)
-	s,m=SplitSkill(Party[Game.CurrentPlayer]:GetSkill(const.Skills.Learning))
-	t.Time=const.Day*(5-m)
-end
 
 --open time at 5 instead of 6
 function events.GameInitialized2()
@@ -1844,5 +1839,43 @@ function events.GameInitialized2()
 		if Game.Houses[i].OpenHour==6 then
 			Game.Houses[i].OpenHour=5
 		end
+	end
+end
+
+--training centers bolster
+
+function events.CalcTrainingTime(t)
+	if Game.CurrentPlayer==0 then
+		vars.trainings=vars.trainings or {0,0,0}
+		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+		vars.trainings[currentWorld]=vars.trainings[currentWorld]+1
+	end	
+	--reduced training time
+	s,m=SplitSkill(Party[Game.CurrentPlayer]:GetSkill(const.Skills.Learning))
+	t.Time=const.Day*(5-m)
+end
+local trainingCenters={
+	[1]={1,2,3,4,5,6},
+	[2]={7,8,9,10,11,12,13,14,15,16},
+	[3]={20,21,22,23,24,25,26,27,28,29}
+}
+function events.GameInitialized2()
+	baseTrainers={}
+	for i=1,29 do
+		baseTrainers[i]=Game.HouseRules.Training[i].Quality
+	end
+end
+	
+function events.LoadMap()
+	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
+	local bolster=0
+	vars.trainings=vars.trainings or {0,0,0}
+	for i=1,3 do 
+		if i~=currentWorld then
+			bolster=bolster+vars.trainings[i]
+		end
+	end
+	for i=1,#trainingCenters[currentWorld] do
+		Game.HouseRules.Training[trainingCenters[currentWorld][i]].Quality=math.min(baseTrainers[trainingCenters[currentWorld][i]]+bolster,65535)
 	end
 end
