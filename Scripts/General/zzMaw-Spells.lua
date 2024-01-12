@@ -58,16 +58,11 @@ end
 -------------------------------------------------
 ------------------SPELL CHANGES------------------
 -------------------------------------------------
---day of protection buff list
-local dopList = {0, 1, 4, 6, 12, 17}
-
 --hour of power buff list
 local hopList = {8, 9, 14, 15}
-
 --Remove curse matrix
 local curseBase={0,12,24,36}
 local curseScaling={0,2,4,6}
-
 --lesser heal matrix
 local lesserHealBase={5,10,15,20}
 local lesserHealScaling={2,3,4,5}
@@ -90,21 +85,13 @@ function events.PlayerCastSpell(t)
 			return
 		end
 		if not t.RemoteData then
-			t.Skill=1
-			t.Mastery=3
-			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Air))
-			minutesPerSkill=(m-3)*3+3
-			baseDuration=(m-3)*15+15
-			Party.SpellBuffs[11].ExpireTime=Game.Time+const.Minute*(baseDuration+minutesPerSkill*s)
-			Party.SpellBuffs[11].Power=1000
-			--online code
+			invisCasted={true,t.Skill,t.Mastery}
 			if t.MultiplayerData then
-				t.MultiplayerData[1]=Party.SpellBuffs[11].ExpireTime
-				t.MultiplayerData[2]=Party.SpellBuffs[11].Power
+				t.MultiplayerData[1]=invisCasted
 			end
+		--online code
 		elseif t.RemoteData then
-			Party.SpellBuffs[11].ExpireTime=t.RemoteData[1]
-			Party.SpellBuffs[11].Power=t.RemoteData[2]
+			invisCasted=t.RemoteData[1]
 		end
 	end
 	
@@ -415,22 +402,13 @@ function events.PlayerCastSpell(t)
 	--Day of the Gods
 	if t.SpellId==83 then
 		if not t.RemoteData then
-			t.Skill=1
-			local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Light))
-			local power=m*5+s*m/2
-			if Party.SpellBuffs[2].Power<=	power then
-				Party.SpellBuffs[2].Power = power
-				Party.SpellBuffs[2].Skill = t.Mastery
-				Party.SpellBuffs[2].ExpireTime = Game.Time+const.Hour*s*4
-			end
+			DoGCasted={true,t.Skill,t.Mastery}
 			if t.MultiplayerData then
-				t.MultiplayerData[1]=power
-				t.MultiplayerData[2]=Game.Time+const.Hour*s*4
+				t.MultiplayerData[1]=DoGCasted
 			end
 		--online code
 		elseif t.RemoteData then
-			Party.SpellBuffs[2].Power=t.RemoteData[1]
-			Party.SpellBuffs[2].ExpireTime = t.RemoteData[2]
+			DoGCasted=t.RemoteData[1]
 		end
 	end
 	
@@ -458,33 +436,17 @@ function events.PlayerCastSpell(t)
 		end
 	end
 	
-	--Day of Protection
-	dopList = {0, 1, 4, 6, 12, 17}
+	--day of the gods
 	if t.SpellId==85 then
 		if not t.RemoteData then
-			t.Skill=0
-			local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Light))
-			local power=s*m/2
-			for _, buffId in ipairs(dopList) do
-				if Party.SpellBuffs[buffId].Power<=power then
-					Party.SpellBuffs[buffId].Power = power
-					Party.SpellBuffs[buffId].Skill = t.Mastery
-					Party.SpellBuffs[buffId].ExpireTime = Game.Time+const.Hour*s*4
-				end
-			end
+			DoPCasted={true,t.Skill,t.Mastery}
 			if t.MultiplayerData then
-				t.MultiplayerData[1]=power
-				t.MultiplayerData[2]=Game.Time+const.Hour*s*4
+				t.MultiplayerData[1]=DoPCasted
 			end
+		--online code
 		elseif t.RemoteData then
-			for _, buffId in ipairs(dopList) do
-				if Party.SpellBuffs[buffId].Power<=t.RemoteData[1] then
-					Party.SpellBuffs[buffId].Power = t.RemoteData[1]
-					Party.SpellBuffs[buffId].Skill = t.Mastery
-					Party.SpellBuffs[buffId].ExpireTime = t.RemoteData[2]
-				end
-			end
-		end	
+			DoPCasted=t.RemoteData[1]
+		end
 	end
 	
 	local applyHoP = function(s, m)
@@ -544,14 +506,45 @@ end
 --online data are processed in zzMAW-Multiplayer.lua--
 ------------------------------------------------------
 
+--tick event to manually override buffs, as code seems to be unreliable (might be to recent skill limit removal
+function events.Tick()
+	if DoGCasted and DoGCasted[1] then
+		local power=DoGCasted[3]*5+DoGCasted[2]*DoGCasted[3]/2
+		Party.SpellBuffs[2].Power = power
+		Party.SpellBuffs[2].ExpireTime = Game.Time+const.Hour*DoGCasted[2]*2
+		DoGCasted[1]=false
+	end
+	if DoPCasted and DoPCasted[1] then
+		local power=DoPCasted[2]*DoPCasted[3]/2
+		--day of protection buff list
+		local dopList = {0, 1, 4, 6, 12, 17}
+		for i=1,#dopList do
+			Party.SpellBuffs[dopList[i]].Power = power
+			Party.SpellBuffs[dopList[i]].ExpireTime = Game.Time+const.Hour*s*2
+		end
+		DoPCasted[1]=false
+	end
+	
+	
+	if invisCasted and invisCasted[1] then
+		local m=invisCasted[3]-2
+		local duration=m*15+m*invisCasted[2]
+		Party.SpellBuffs[11].Power = invisCasted[2]
+		Party.SpellBuffs[11].ExpireTime = Game.Time+duration*const.Minute
+		invisCasted[1]=false
+	end
+end
+
+
+
 ------------------------------
 --Tooltips and mana cost fix--
 ------------------------------
 function events.GameInitialized2()
 --Day of Protection
 	--Invisibility
-	Game.SpellsTxt[19].Master="Duration 15+3 minutes per point of skill"
-	Game.SpellsTxt[19].GM="Duration 30+6 minutes per point of skill"
+	Game.SpellsTxt[19].Master="Duration 15+1 minutes per point of skill"
+	Game.SpellsTxt[19].GM="Duration 30+2 minutes per point of skill"
 	--curse
 	Game.SpellsTxt[49].Description=string.format(Game.SpellsTxt[49].Description .. "\n\nExpert has 1 hour limit per skill point, Master has 1 day per skill point, Grand has not time limit.")
 	Game.SpellsTxt[49].Normal="n/a\n"
@@ -594,13 +587,13 @@ function events.GameInitialized2()
 	for _, i in ipairs(protectionSpells) do
 		Game.SpellsTxt[i].GM="Effect is now passive"
 	end
-	--day of protection
+	--day of Gods 
 	Game.SpellsTxt[83].Description="Temporarily increases all seven stats on all your characters by 1 per skill in Light Magic.  This spell lasts until you rest."
 	Game.SpellsTxt[83].Expert="All stats increased by 10+1 per skill"
 	Game.SpellsTxt[83].Master="All stats increased by 15+1.5 per skill"
 	Game.SpellsTxt[83].GM="All stats increased by 20+2 per skill"
 
-	--Day of the Gods
+	--Day of the protection
 	Game.SpellsTxt[85].Description="Simultaneously casts Protection from Fire, Air, Water, Earth, Mind, and Body, plus Feather Fall and Wizard Eye on all your characters at two times your skill in Light Magic."
 	Game.SpellsTxt[85].Master="All spells cast at 1.5 times skill"
 	Game.SpellsTxt[85].GM="All spells cast at 2 times skill"
