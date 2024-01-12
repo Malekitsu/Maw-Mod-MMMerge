@@ -1459,19 +1459,18 @@ end
 function events.MonsterKilled(mon)
 	if mapvars.monsterMap and mapvars.completed==nil then
 		n=Map.Monsters.Count
-		m=0
+		m=1
+		if mon.NameId>220 and mon.NameId<300 then
+			m=30
+		end
 		for i=0,Map.Monsters.High do
 			monster=Map.Monsters[i]
 			if monster.AIState==4 or monster.AIState==5 or monster.AIState==11 or monster.AIState==16 or monster.AIState==17 or monster.AIState==19 or monster.NameId>300 then
 				m=m+1
 				if monster.NameId>220 and monster.NameId<300 then
-					m=m+49
+					m=m+29
 				end
 			end
-		end
-		if mapvars.monsterMap.cleared==false and m/n>=0.8 then
-			mapvars.monsterMap.cleared=true
-			Message("Monsters are weakened and can no longer resurrect")
 		end
 		if m/n>0.95 then
 			name=Game.MapStats[Map.MapStatsIndex].Name
@@ -1482,11 +1481,16 @@ function events.MonsterKilled(mon)
 			evt.Add{"Gold", Value = gold}
 			evt.ForPlayer("All")
 			evt.Add{"Experience", Value = experience}
-			Message(string.format("Dungeon Completed! You gain " .. experience .. " Exp and " .. gold .. " Gold and an Item"))
+			Message(string.format("Dungeon Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Item"))
 			evt.GiveItem{Id=math.min(1050+math.ceil(Party[0].LevelBase/25+0.5),1060)}
 			mapvars.completed=true
 			vars.dungeonCompletedList=vars.dungeonCompletedList or {}
 			vars.dungeonCompletedList[name]=true
+			return
+		end
+		if mapvars.monsterMap.cleared==false and m/n>=0.8 then
+			mapvars.monsterMap.cleared=true
+			Message("Monsters are weakened and can no longer resurrect")
 		end
 	end
 end
