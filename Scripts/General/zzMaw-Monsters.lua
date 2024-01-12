@@ -68,7 +68,6 @@ function events.AfterLoadMap()
 				--damage
 				dmgMult=(mon.Level/9+1.15)*((mon.Level+2)/(oldLevel+2))
 				atk1=mon.Attack1
-				debug.Message(dump(string.format("%s %s %s", atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount)))
 				atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult)
 				atk2=mon.Attack2
 				atk2.DamageAdd, atk2.DamageDiceSides, atk2.DamageDiceCount = calcDices(atk2.DamageAdd,atk2.DamageDiceSides,atk2.DamageDiceCount,dmgMult)
@@ -1275,13 +1274,13 @@ function events.BuildMonsterInformationBox(t)
 	upperLimit=math.round(math.min(mean+range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*mon.Attack1.DamageDiceSides)*diff)
 	
 	text=string.format(table.find(const.Damage,mon.Attack1.Type))
-	if not baseDamageValue then
+	if not baseDamageValue and Game.CurrentPlayer>=0 then
 		lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit))
 		upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit))
 	end
 	t.Damage.Text=string.format("Attack 00000	050" .. lowerLimit .. "-" .. upperLimit .. " " .. text)
 	
-	if mon.Attack2Chance>0 then
+	if mon.Attack2Chance>0 and Game.CurrentPlayer>=0 then
 		mean=mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*(mon.Attack2.DamageDiceSides+1)/2
 		range=(mon.Attack2.DamageDiceSides^2*mon.Attack2.DamageDiceCount/12)^0.5*1.96
 		lowerLimit=math.round(math.max(mean-range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount)*diff)
@@ -1317,7 +1316,7 @@ function events.BuildMonsterInformationBox(t)
 		range=(spell.DamageDiceSides^2*skill/12)^0.5*1.96
 		lowerLimit=math.round(math.max(mean-range, spell.DamageAdd+skill)*dmgMult*diff)
 		upperLimit=math.round(math.min(mean+range, spell.DamageAdd+skill*spell.DamageDiceSides)*dmgMult*diff)
-		if not baseDamageValue then
+		if not baseDamageValue and Game.CurrentPlayer>=0 then
 			lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit))
 			upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit))
 		end
