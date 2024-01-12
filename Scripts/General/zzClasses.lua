@@ -34,7 +34,9 @@ promotionList={
 --Peasant
 [16]=	{0,0,		0,0,0,0,	0,0},
 --Seraphim
-[17]=	{1648,1649,		1609,1610,1611,1612,	1546,31}--cleric
+[17]=	{1648,1649,		1609,1610,1611,1612,	1546,31},--cleric
+--DK
+[18]=	{1645,1646,		1568,1569,1570,1571,	1540,1541},
 }
 
 function events.GameInitialized2()
@@ -90,7 +92,7 @@ function checkPromo()
 	for i=0,Party.High do
 		class=Party[i].Class
 		kind=Game.ClassesExtra[class].Kind
-		if promotionCount[kind]>=1 and Game.ClassesExtra[class].Step<2 then --check if promotion
+		if promotionCount[kind] and promotionCount[kind]>=1 and Game.ClassesExtra[class].Step<2 then --check if promotion
 			--search for available promotions
 			promotionCount={}
 			for v=0,#Game.ClassesExtra do
@@ -253,4 +255,27 @@ function events.CalcDamageToMonster(t)
 		end
 	end
 end
+
+
+---------------------------------------
+--DEATH KNIGHT
+---------------------------------------
+
+--skills
+--death grip
+
+--runic power
+	--attacks will grant 10-12-15-17-20 runic power
+
+--spells
+--dark grants some leech (flat, based on promotion)
+--water adds damage/attack speed
+--earth grants some damage reduction
+
+--spells scale with strength
+
+
+
+--spells taking you below 35% of HP will trigger anti-magic shell, 
+		--reducing spell damage taken by 50% and converting spell damage into runic power (lasts 5 seconds, 1 minute cooldown, capped to max player HP)
 
