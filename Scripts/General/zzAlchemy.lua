@@ -396,7 +396,7 @@ end
 function events.BuildItemInformationBox(t)
 	if t.Item.Number>=1051 and t.Item.Number<=1060 then
 		if t.Description then
-			local mult=math.max((Game.BolsterAmount-100)/500+1,1)
+			local mult=math.max((Game.BolsterAmount-100)/250+1,1)
 			local tier=(t.Item.Number-1050)*mult
 			local power = math.round((tier * 10) ^ 0.5 / 2, 0)
 			local twoHanded = tier * 10 * 2 .. " - " .. power * 2
@@ -417,14 +417,10 @@ end
 
 for i=1,10 do
 	evt.PotionEffects[70+i] = function(IsDrunk, t, Power)
-		if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
-			if t.Bonus==0 and t.Charges<=1000 then 
-				return
-			end
-			
+		if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then			
 			if craftWaitTime>0 then return end
 			--pick which enchant to pick that is below the item power
-			local bolsterMult=math.max((Game.BolsterAmount-100)/500+1,1)
+			local bolsterMult=math.max((Game.BolsterAmount-100)/250+1,1)
 			tier=(Mouse.Item.Number-1050)*bolsterMult
 			mult=slotMult[t:T().EquipStat]
 			maxStrength=math.floor(tier*10*mult)
@@ -439,12 +435,8 @@ for i=1,10 do
 				skillMaxStrength=math.floor(math.max((tier*10)^0.5*mult, math.round(tier*mult)))
 				if t.BonusStrength<skillMaxStrength then
 					t.BonusStrength=t.BonusStrength+1
-					if Mouse.Item.Charges<=1 then
-						Mouse.Item.Number=0
-					else
-						Mouse.Item.Charges=Mouse.Item.Charges-1
-						enchanted=true
-					end
+					Mouse.Item.Number=0
+					enchanted=true
 					mem.u4[0x51E100] = 0x100 
 					t.Condition = t.Condition:Or(0x10)
 					evt.PlaySound(12070)
@@ -462,12 +454,9 @@ for i=1,10 do
 				Game.ShowStatusText("Gem power is not enough")
 				return
 			end
-			if Mouse.Item.Charges<=1 then
-				Mouse.Item.Number=0
-			else
-				Mouse.Item.Charges=Mouse.Item.Charges-1
-				enchanted=true
-			end
+			
+			Mouse.Item.Number=0
+			enchanted=true
 			mem.u4[0x51E100] = 0x100 
 			t.Condition = t.Condition:Or(0x10)
 			evt.PlaySound(12070)
