@@ -31,11 +31,13 @@ end
 
 --grayface fix treasure code
 function events.PickCorpse(t)
+	if Game.BolsterAmount~=300 then return end
 	Game.RandSeed=mapvars.MonsterSeed[t.MonsterIndex]
 	Sleep(1)
 	mapvars.MonsterSeed[t.MonsterIndex]=Game.RandSeed
 end
 function events.LoadMap()
+	if Game.BolsterAmount~=300 then return end
 	if not mapvars.MonsterSeed then
 		mapvars.MonsterSeed={}
 		for i = 0, Map.Monsters.Limit - 1 do
@@ -126,7 +128,7 @@ primordialWeapEnchants={41,46}
 primordialArmorEnchants={1,2,80}
 
 function events.ItemGenerated(t)
-	if vars then
+	if vars and Game.BolsterAmount==300 then
 		if vars.SeedList==nil then
 			vars.SeedList={}
 			for i=0,2500 do
