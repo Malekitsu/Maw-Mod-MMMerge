@@ -1869,7 +1869,7 @@ end
 function events.LoadMap()
 	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 	local bolster=0
-	vars.trainings=vars.trainings or {0,0,0}
+	vars.trainings=vars.trainings or {vars.MM8LVL,vars.MM7LVL,vars.MM6LVL}
 	for i=1,3 do 
 		if i~=currentWorld then
 			bolster=bolster+vars.trainings[i]
