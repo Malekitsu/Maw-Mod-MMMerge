@@ -1179,8 +1179,8 @@ function events.Tick()
 			Game.Spells[68]["SpellPointsGM"]=12
 			lesserHealBase={5,10,15,20}
 			lesserHealScaling={2,3,4,5}
-			Game.SpellsTxt[68].Master="5 Mana cost: \ncures 15 + 4 HP per point of skill"
-			Game.SpellsTxt[68].GM="8 Mana cost: \ncures 20 + 5 HP per point of skill"
+			Game.SpellsTxt[68].Master="8 Mana cost: \ncures 15 + 4 HP per point of skill"
+			Game.SpellsTxt[68].GM="12 Mana cost: \ncures 20 + 5 HP per point of skill"
 			
 			if level>=88 then
 				Game.SpellsTxt[68].Master="10 Mana cost: \ncures 30 + 5 HP per point of skill"
