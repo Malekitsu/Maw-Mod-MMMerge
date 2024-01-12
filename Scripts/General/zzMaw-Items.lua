@@ -220,7 +220,7 @@ function events.ItemGenerated(t)
 		if Game.HouseScreen==2 or Game.HouseScreen==95 then --nerf shops if no exp in current world
 			partyLevel=math.round(partyLevel*(math.min(partyLevel/216 + currentLevel/108,1)))
 		end
-		partyLevel=partyLevel+LevelBonus
+		partyLevel=partyLevel+(LevelBonus*math.min((currentLevel/54),1))
 		
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
 		cap1=50+LevelBonus/5
