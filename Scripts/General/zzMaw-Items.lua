@@ -507,7 +507,7 @@ vars.poisonTime=vars.poisonTime or {}
 			Party[i].Poison3=0
 			Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
 			else
-			Party[i].HP=Party[i].HP-math.ceil(Party[i].LevelBase*Game.Classes.HPFactor[Party[i].Class]*0.06)
+			Party[i].HP=Party[i].HP-math.ceil(Party[i].LevelBase*Game.Classes.HPFactor[Party[i].Class]*0.06)*(Game.BolsterAmount/100)
 			end 
 		else if Party[i].Poison2>0 then
 				if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
@@ -520,7 +520,7 @@ vars.poisonTime=vars.poisonTime or {}
 				Party[i].Poison2=0
 				Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
 				else
-				Party[i].HP=Party[i].HP-math.ceil(Party[i].LevelBase*Game.Classes.HPFactor[Party[i].Class]*0.04)
+				Party[i].HP=Party[i].HP-math.ceil(Party[i].LevelBase*Game.Classes.HPFactor[Party[i].Class]*0.04)*(Game.BolsterAmount/100)
 				end 
 			else if Party[i].Poison1>0 then
 					if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
@@ -533,7 +533,7 @@ vars.poisonTime=vars.poisonTime or {}
 					Party[i].Poison1=0
 					Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
 					else
-					Party[i].HP=Party[i].HP-math.ceil(Party[i].LevelBase*Game.Classes.HPFactor[Party[i].Class]*0.02)
+					Party[i].HP=Party[i].HP-math.ceil(Party[i].LevelBase*Game.Classes.HPFactor[Party[i].Class]*0.02)*(Game.BolsterAmount/100)
 					end 
 				else vars.poisonTime[i]=0
 				end
