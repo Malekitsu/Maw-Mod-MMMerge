@@ -55,3 +55,6 @@
 53	17	0	Seraphim
 54	17	1	Angel
 55	17	2	Archangel
+56	18	0	Death Knight
+57	18	1	Death Lord
+58	18	2	Lich King
