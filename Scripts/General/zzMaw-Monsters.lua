@@ -1474,7 +1474,17 @@ function events.MonsterKilled(mon)
 		end
 		if m/n>0.95 then
 			name=Game.MapStats[Map.MapStatsIndex].Name
-			mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
+			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
+			if currentWorld==1 then
+			mapLevel=vars.MM6LVL+vars.MM7LVL
+			elseif currentWorld==2 then
+				mapLevel=vars.MM8LVL+vars.MM6LVL
+			elseif currentWorld==3 then
+				mapLevel=vars.MM8LVL+vars.MM7LVL
+			else 
+				mapLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+			end
+			mapLevel=mapLevel+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
 			experience=math.ceil(m^0.7*(mapLevel^1.7+mapLevel*20)/3/1000)*1000  
 			gold=math.ceil(experience^0.9/1000)*1000 
 			evt.ForPlayer(0)
@@ -1610,7 +1620,7 @@ function events.GameInitialized2() --to make the after all the other code
 	function events.CalcDamageToPlayer(t)
 		data=WhoHitPlayer()
 		if data and data.Monster and data.Monster.NameId>220 then
-			local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+			skill = string.match(Game.PlaceMonTxt[data.Monster.NameId], "([^%s]+)")
 			if skill=="Summoner" then
 				if math.random()<0.4 then
 					pseudoSpawnpoint{monster = data.Monster.Id-2, x = (Party.X+data.Monster.X)/2, y = (Party.Y+data.Monster.Y)/2, z = Party.Z, count = 1, powerChances = {75, 25, 0}, radius = 64, group = 1}
@@ -1621,7 +1631,8 @@ function events.GameInitialized2() --to make the after all the other code
 				t.Result=t.Result/2
 				aoeDamage=t.Result/Party.Count
 				for i=0,Party.High do
-					evt.DamagePlayer{Player=Party[i], DamageType=t.DamageKind, Damage = aoeDamage}
+					Party[i].HP=Party[i].HP-aoeDamage
+					Party[i]:ShowFaceAnimation(24)
 				end
 			end
 		end
@@ -1630,14 +1641,14 @@ function events.GameInitialized2() --to make the after all the other code
 	--on damage taken
 	function events.CalcDamageToMonster(t)
 		if t.Monster.NameId>220 then
-			local skill = string.match(Game.PlaceMonTxt[t.Monster.NameId], "([^%s]+)")
+			skill = string.match(Game.PlaceMonTxt[t.Monster.NameId], "([^%s]+)")
 			if skill=="Thorn" then
 				if t.DamageKind==4 then
-					evt.DamagePlayer{Player=t.Player, DamageType=t.DamageKind, Damage = t.Result*0.25}
+					evt.DamagePlayer{Player=t.Player, DamageType=t.DamageKind, Damage = t.Result}
 				end
 			elseif skill=="Reflecting" then
 				if t.DamageKind~=4 then
-					evt.DamagePlayer{Player=t.Player, DamageType=t.DamageKind, Damage = t.Result*0.25}
+					evt.DamagePlayer{Player=t.Player, DamageType=t.DamageKind, Damage = t.Result}
 				end
 			elseif skill=="Adamantite" then
 				t.Result=math.round(math.max(t.Result-t.Monster.Level^1.15,t.Result/10))
@@ -1646,7 +1657,6 @@ function events.GameInitialized2() --to make the after all the other code
 	end
 
 end
-
 function calcDices(add,sides,count, mult, bonusDamage)
 	local bonusDamage=bonusDamage or 0
 	local add=math.round((add+bonusDamage)*mult)
