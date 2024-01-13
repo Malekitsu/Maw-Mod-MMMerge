@@ -36,6 +36,12 @@ function events.PickCorpse(t)
 	Sleep(1)
 	mapvars.MonsterSeed[t.MonsterIndex]=Game.RandSeed
 end
+function events.CastTelepathy(t)
+	if Game.BolsterAmount~=300 then return end
+	Game.RandSeed=mapvars.MonsterSeed[t.MonsterIndex]
+	Sleep(1)
+	mapvars.MonsterSeed[t.MonsterIndex]=Game.RandSeed
+end
 function events.LoadMap()
 	if Game.BolsterAmount~=300 then return end
 	if not mapvars.MonsterSeed then
