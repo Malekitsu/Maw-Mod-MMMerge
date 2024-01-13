@@ -1133,7 +1133,7 @@ function events.CalcItemValue(t)
 		--add enchant price
 		bonus1=t.Item.BonusStrength*100
 		if t.Item.Bonus==8 or t.Item.Bonus==9 then
-			bonus1=5*((2*bonus1+100)^0.5-10)
+			bonus1=5*((2*t.Item.BonusStrength+100)^0.5-10)*100
 		elseif t.Item.Bonus==10 then
 			bonus1=bonus1*2
 		elseif t.Item.Bonus>16 and t.Item.Bonus<=24 then
@@ -1184,18 +1184,17 @@ function events.CalcItemValue(t)
 			end	
 			if count>0 then
 				t.Value=t.Value^(1+count*0.06)
-				if t.Value>200000  then
-					t.Value=math.round(t.Value/1000)*1000
-				elseif t.Value>50000  then
-					t.Value=math.round(t.Value/500)*500	
-				elseif t.Value>1000  then
-					t.Value=math.round(t.Value/100)*100
-				elseif t.Value>100 then
-					t.Value=math.round(t.Value/10)*10
-				end
 			end
-			
 		end	
+		if t.Value>200000  then
+			t.Value=math.round(t.Value/1000)*1000
+		elseif t.Value>50000  then
+			t.Value=math.round(t.Value/500)*500	
+		elseif t.Value>1000  then
+			t.Value=math.round(t.Value/100)*100
+		elseif t.Value>100 then
+			t.Value=math.round(t.Value/10)*10
+		end
 	end
 	--add reagents price
 	if Game.HouseScreen==2 or Game.HouseScreen==95 then
