@@ -540,7 +540,7 @@ function events.Tick()
 		local dopList = {0, 1, 4, 6, 12, 17}
 		for i=1,#dopList do
 			Party.SpellBuffs[dopList[i]].Power = power
-			Party.SpellBuffs[dopList[i]].ExpireTime = Game.Time+const.Hour*s*2
+			Party.SpellBuffs[dopList[i]].ExpireTime = Game.Time+const.Hour*DoPCasted[2]*2
 		end
 		DoPCasted[1]=false
 	end
