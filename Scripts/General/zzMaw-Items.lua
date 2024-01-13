@@ -226,7 +226,7 @@ function events.ItemGenerated(t)
 			LevelBonus=40
 		end
 		if Game.HouseScreen==2 or Game.HouseScreen==95 then --nerf shops if no exp in current world
-			partyLevel=math.round(partyLevel*(math.min(partyLevel/216 + currentLevel/108,1)))
+			partyLevel=math.round(partyLevel*(math.min(partyLevel/160 + currentLevel/80,1)))
 		end
 		partyLevel=partyLevel+(LevelBonus*math.min((currentLevel/54),1))
 		
