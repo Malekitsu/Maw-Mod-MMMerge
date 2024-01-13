@@ -177,12 +177,12 @@ function events.BuildStatInformationBox(t)
 		fullSP=Party[i]:GetFullSP()
 		personality=Party[i]:GetPersonality()
 		intellect=Party[i]:GetIntellect()
-		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing: %s%s",Game.StatsDescriptions[1],intellect/10,"%",intellect*3/20+50,"%")
+		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing: %s%s\nCritical heal effect is halved in Nightmare",Game.StatsDescriptions[1],intellect/10,"%",intellect*3/20+50,"%")
 	end
 	if t.Stat==2 then
 		i=Game.CurrentPlayer
 		personality=Party[i]:GetPersonality()
-		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing bonus: %s%s",Game.StatsDescriptions[2],personality/10,"%",personality*3/20+50,"%")
+		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing bonus: %s%s\nCritical heal effect is halved in Nightmare",Game.StatsDescriptions[2],personality/10,"%",personality*3/20+50,"%")
 	end
 	if t.Stat==3 then
 		i=Game.CurrentPlayer
