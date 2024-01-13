@@ -642,8 +642,28 @@ function events.CalcDamageToPlayer(t)
 	if Game.BolsterAmount==300 then
 		if data and data.Monster then
 			t.Result=t.Result*(3+data.Monster.Level/85)
-		else
-			t.Result=t.Result*3
+		elseif t.DamageKind~=4 and t.DamageKind~=2 then --drown and fall
+			name=Game.MapStats[Map.MapStatsIndex].Name
+			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
+			if currentWorld==1 then
+				bolster=vars.MM6LVL+vars.MM7LVL
+			elseif currentWorld==2 then
+				bolster=vars.MM8LVL+vars.MM6LVL
+			elseif currentWorld==3 then
+				bolster=vars.MM8LVL+vars.MM7LVL
+			else 
+				bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+			end
+			mapLevel=bolster+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
+			--trap and objects multiplier
+			mult=(mapLevel/12+1)*(3+mapLevel/85)
+			if data.Object.SpellType==15 then 
+				bonusDamage=mapLevel/24
+			else
+				bonusDamage=mapLevel/8
+			end
+			damage=(t.Damage+bonusDamage)*mult
+			t.Result=calcMawDamage(t.Player,t.DamageKind,damage,true)
 		end
 	end
 end
