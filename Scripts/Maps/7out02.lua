@@ -119,3 +119,17 @@ evt.Map[1001] = function()
 	end
 end
 Timer(evt.map[1001].last, const.Minute*5)
+
+evt.hint[2666]="Enroth"
+evt.map[2666] = function()
+	evt.MoveToMap{-9729, -10555, 160, 512, 0, 0, 0, 3, "oute3.odm"}
+end
+
+evt.hint[1888]="Jadame"
+evt.map[1888] = function()
+	if evt.Cmp{"QBits", Value = 93} then
+		evt.MoveToMap{10219, -15624, 265, 0, 0, 0, 0, 3, "out02.odm"}
+	else
+		evt.MoveToMap{3560, 7696, 544, 0, 0, 0, 0, 3, "out01.odm"}
+	end
+end
