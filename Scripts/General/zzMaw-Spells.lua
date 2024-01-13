@@ -108,7 +108,11 @@ function events.PlayerCastSpell(t)
 			roll=math.random()
 			gotCrit=false
 			if roll<crit then
-				totHeal=(totHeal)*(1.5+statBonus*3/2)
+				mult=(0.5+statBonus*3/2)
+				if Game.BolsterAmount==300 then
+					mult=mult/2
+				end
+				totHeal=totHeal*(1+mult)
 				gotCrit=true
 			end
 			if gotCrit then
@@ -185,7 +189,11 @@ function events.PlayerCastSpell(t)
 			roll=math.random()
 			gotCrit=false
 			if roll<crit then
-				totHeal=(totHeal)*(1.5+statBonus*3/2)
+				mult=(0.5+statBonus*3/2)
+				if Game.BolsterAmount==300 then
+					mult=mult/2
+				end
+				totHeal=totHeal*(1+mult)
 				gotCrit=true
 			end
 			if gotCrit then
@@ -239,7 +247,11 @@ function events.PlayerCastSpell(t)
 			roll=math.random()
 			gotCrit=false
 			if roll<crit then
-				totHeal=(totHeal)*(1.5+statBonus*3/2)
+				mult=(0.5+statBonus*3/2)
+				if Game.BolsterAmount==300 then
+					mult=mult/2
+				end
+				totHeal=totHeal*(1+mult)
 				gotCrit=true
 			end
 			--remove base heal
@@ -295,7 +307,11 @@ function events.PlayerCastSpell(t)
 			roll=math.random()
 			gotCrit=false
 			if roll<crit then
-				totHeal=(totHeal)*(1.5+statBonus*3/2)
+				mult=(0.5+statBonus*3/2)
+				if Game.BolsterAmount==300 then
+					mult=mult/2
+				end
+				totHeal=totHeal*(1+mult)
 				gotCrit=true
 			end
 			if gotCrit then
@@ -358,7 +374,11 @@ function events.PlayerCastSpell(t)
 			roll=math.random()
 			gotCrit=false
 			if roll<crit then
-				totHeal=(totHeal)*(1.5+statBonus*3/2)
+				mult=(0.5+statBonus*3/2)
+				if Game.BolsterAmount==300 then
+					mult=mult/2
+				end
+				totHeal=totHeal*(1+mult)
 				gotCrit=true
 			end
 			--remove base heal
