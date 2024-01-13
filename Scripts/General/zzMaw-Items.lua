@@ -282,7 +282,7 @@ function events.ItemGenerated(t)
 		ancientChance=(enc1Chance[pseudoStr]/100)*(enc2Chance[pseudoStr]/100)*(spcEncChance[pseudoStr]/100)/4
 		--INCREASE ANCIENT AND PRIMORDIAL CHANCE IN SHOPS BASED ON MONEY
 		if Game.HouseScreen==2 or Game.HouseScreen==95 then
-			ancientChance=ancientChance*math.min(1+Party.Gold/1000000,5)
+			ancientChance=ancientChance*math.min(1+(Party.Gold+Party.BankGold)/1000000,5)
 		end
 		ancientRoll=math.random()
 		if ancientRoll<=ancientChance then
