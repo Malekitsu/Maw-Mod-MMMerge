@@ -263,7 +263,7 @@ function events.PlayerCastSpell(t)
 			end
 		end
 		--end of healing calculation
-		if t.TargetKind == 3 then
+		if t.TargetKind == 3 and t.MultiplayerData then
 			t.MultiplayerData[1]=math.round(totHeal) --bonus heal
 			t.MultiplayerData[2]=gotCrit --crit 
 			t.MultiplayerData[3]=math.round(5+totHeal) --total heal
@@ -527,7 +527,7 @@ end
 ------------------------------------------------------
 
 --tick event to manually override buffs, as code seems to be unreliable (might be to recent skill limit removal
-function events.Tick()
+function events.CalcStatBonusByMagic(t)
 	if DoGCasted and DoGCasted[1] then
 		local power=DoGCasted[3]*5+DoGCasted[2]*DoGCasted[3]/2
 		Party.SpellBuffs[2].Power = power
