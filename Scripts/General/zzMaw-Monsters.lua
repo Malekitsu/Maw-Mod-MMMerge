@@ -30,7 +30,10 @@ function events.AfterLoadMap()
 		if Map.Monsters[i].Velocity>150 then
 			Map.Monsters[i].Velocity=(Map.Monsters[i].Velocity + (400 - Map.Monsters[i].Velocity) / 2 +100)
 		end
-		--resistances
+		--fix broken spell levels
+		if Map.Monsters[i].SpellSkill>64 and Map.Monsters[i].SpellSkill<1024 then
+			Map.Monsters[i].SpellSkill=Map.Monsters[i].SpellSkill%64
+		end
 		--resistances 
 		bolsterRes=math.max(math.round((Map.Monsters[i].Level-basetable[Map.Monsters[i].Id].Level)/18)*5,0)
 		for v=0,10 do
