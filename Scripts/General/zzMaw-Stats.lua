@@ -1,8 +1,8 @@
 function events.CalcDamageToMonster(t)
 	local data = WhoHitMonster()	
 	--luck/accuracy bonus
-	if data and data.Player and t.DamageKind==4 then
-		if data.Object==nil or data.Object.Spell==133 then
+	if data and data.Player and (t.DamageKind==4 or data.Player.Class==10 or data.Player.Class==11) then --dragons
+		if data.Object==nil or data.Object.Spell==133 or data.Player.Class==10 or data.Player.Class==11 then
 			luck=data.Player:GetLuck()/1.5
 			critDamage=data.Player:GetAccuracy()*3/1000
 			critChance=50+luck
@@ -93,7 +93,9 @@ end
 --intellect/personality
 function events.CalcSpellDamage(t)
 	local data = WhoHitMonster()
+	if data and data.Player and (data.Player.Class==10 or data.Player.Class==11) then return end
 	if data and data.Player then
+		if data.Player.Class==10 or data.Player.Class==11 then return end --dragons scale off might
 		intellect=data.Player:GetIntellect()	
 		personality=data.Player:GetPersonality()
 		critChance=data.Player:GetLuck()/1500
