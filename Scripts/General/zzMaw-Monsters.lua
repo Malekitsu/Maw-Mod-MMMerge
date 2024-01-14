@@ -283,7 +283,7 @@ function events.LoadMap()
 		--experience
 		mon.Experience = math.round(mon.Level^1.7+mon.Level*20)
 		if currentWorld==2 then
-			mon.Experience = math.round(mon.Experience*2, mon.Experience+1000)
+			mon.Experience = math.min(mon.Experience*2, mon.Experience+1000)
 		end
 		--true nightmare nerf
 		if Game.BolsterAmount==250 then
