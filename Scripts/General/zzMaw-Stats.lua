@@ -33,6 +33,24 @@ function events.CalcDamageToMonster(t)
 end
 
 --speed
+--SPEED WILL NOW REDUCE RECOVERY TIME
+masteryName={"Normal", "Expert", "Master", "GM"}
+oldTable={}
+function events.GameInitialized2()
+	for i=0,132 do 
+		oldTable[i]={}
+		for v=1,4 do
+			oldTable[i][v]=Game.Spells[i]["Delay" .. masteryName[v]]
+		end
+	end
+end
+function events.PlayerCastSpell(t)
+	local spell=t.SpellId
+	local m=t.Mastery
+	local haste=math.floor(t.Player:GetSpeed()/10)
+	Game.Spells[spell]["Delay" .. masteryName[m]]=oldTable[spell][m]/(1+haste/100)
+end
+
 --remove AC from hit calculation and unarmed code from misctweaks
 nextACToZero=0
 function events.PlayerAttacked(t)
@@ -58,15 +76,13 @@ function events.GetArmorClass(t)
 end
 
 function events.CalcDamageToPlayer(t)
-	--UNARMED bonus aswell
+	--UNARMED bonus 
 	unarmed=0
 	Skill, Mas = SplitSkill(t.Player:GetSkill(const.Skills.Unarmed))
 	if Mas == 4 then
 		unarmed=Skill+10
 	end
-	speed=t.Player:GetSpeed()
-	speedEffect=speed/10
-	dodgeChance=1-0.995^(speedEffect+unarmed)
+	dodgeChance=1-0.995^(unarmed)
 	roll=math.random()
 	if roll<=dodgeChance then
 		t.Result=0
@@ -203,11 +219,19 @@ function events.BuildStatInformationBox(t)
 		Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Unarmed))
 		if Mas == 4 then
 			unarmed=Skill+10
+			dodgeChance=1-0.995^(unarmed)
+			t.Text=string.format("%s\n\nDodge chance: %s%%",Game.StatsDescriptions[5],math.floor(dodgeChance*1000)/10)
 		end
+		--spell haste
 		speed=Party[i]:GetSpeed()
-		speedEffect=speed/10
-		dodgeChance=1-0.995^(speedEffect+unarmed)
-		t.Text=string.format("%s\n\nDodge chance: %s%s",Game.StatsDescriptions[5],math.floor(dodgeChance*1000)/10	,"%")
+		speedEffect=math.floor(speed/10)
+		--melee haste
+		delay=math.max(Party[i]:GetAttackDelay())
+		meleeHaste=recoveryBonus
+		--bow haste
+		delay=Party[i]:GetAttackDelay(true)
+		bowHaste=recoveryBonus
+		t.Text=string.format("%s\n\nMelee Haste:   %s%%\nRanged Haste: %s%%\nSpell Haste:   %s%%",t.Text,meleeHaste,bowHaste,speedEffect)
 	end
 	if t.Stat==6 then
 		i=Game.CurrentPlayer
@@ -381,7 +405,7 @@ function events.BuildStatInformationBox(t)
 		end
 		--calculate damage
 		--skill
-		skillType=math.floor(spellIndex/11)+12
+		skillType=math.floor((spellIndex-1)/11)+12
 		skill, mastery=SplitSkill(Party[i]:GetSkill(skillType))
 		
 		power=damageAdd + skill*(diceMin+diceMax)/2
@@ -393,17 +417,9 @@ function events.BuildStatInformationBox(t)
 		critDamage=bonus*3/2000
 		power=power*(1+bonus/1000) 
 		critChance=0.05+critChance
-		
-		if mastery==1 then
-			delay=Game.Spells[11].DelayNormal
-		elseif mastery==2 then
-			delay=Game.Spells[11].DelayExpert
-		elseif mastery==3 then
-			delay=Game.Spells[11].DelayMaster
-		elseif mastery==4 then
-			delay=Game.Spells[11].DelayGM
-		end
-		power=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/100))
+		haste=math.floor((Party[i]:GetSpeed())/10)/100+1
+		delay=oldTable[spellIndex][mastery]
+		power=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/100)*haste)
 		
 		t.Text=string.format("%s\n\nPower: %s",t.Text,StrColor(255,0,0,power))
 		
@@ -418,16 +434,16 @@ function events.BuildStatInformationBox(t)
 		local lvl=math.min(Party[i].LevelBase, 255)
 		local blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 		local ACRed= 1 - (1-blockChance)*(1-acReduction)
-		--speed
+		--unarmed
 		local speed=Party[i]:GetSpeed()
 		local unarmed=0
 		local Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Unarmed))
 		if Mas == 4 then
 			unarmed=Skill+10
 		end
-		local speed=Party[i]:GetSpeed()
-		local speedEffect=speed/10
-		local dodgeChance=0.995^(speedEffect+unarmed)
+		--local speed=Party[i]:GetSpeed()
+		--local speedEffect=speed/10
+		local dodgeChance=0.995^(unarmed)
 		local fullHP=fullHP/dodgeChance
 		--resistances
 		res={
@@ -615,7 +631,7 @@ function events.CalcDamageToPlayer(t)
 		else
 			levelMult=Game.MonstersTxt[i].Level
 		end
-		dmgMult=(levelMult/12+1)*((levelMult+2)/(oldLevel+2))
+		dmgMult=(levelMult/12+1)*((levelMult+2)/(oldLevel+2))* 375/(375+mon.Level) --last one is due to the dodge nerf
 		t.Result=t.Result*dmgMult
 	end
 
