@@ -1717,7 +1717,7 @@ function events.BuildItemInformationBox(t)
 				critDamage=bonus*3/2000
 				power=power*(1+bonus/1000) 
 				critChance=0.05+critChance
-				
+				haste=math.floor(Party[i]:GetSpeed()/10)/100+1
 				if mastery==1 then
 					delay=Game.Spells[11].DelayNormal
 				elseif mastery==2 then
@@ -1728,7 +1728,7 @@ function events.BuildItemInformationBox(t)
 					delay=Game.Spells[11].DelayGM
 				end
 				powerType="Spell"
-				power=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/100))
+				power=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/100)*haste)
 			end
 			
 			oldPower=power
@@ -1739,12 +1739,13 @@ function events.BuildItemInformationBox(t)
 			if not it then return end
 			--calculate spell damage
 			if powerType=="Spell" then
-				stats={2,3,7}
-				intellect1, personality1, luck1 = unpack(calculateStatsAdd(t.Item, stats))
-				intellect2, personality2, luck2 = unpack(calculateStatsAdd(it, stats))
+				stats={2,3,6,7}
+				intellect1, personality1, speed1, luck1 = unpack(calculateStatsAdd(t.Item, stats))
+				intellect2, personality2, speed2, luck2 = unpack(calculateStatsAdd(it, stats))
 				bonusInt=intellect1-intellect2
 				bonusPers=personality1-personality2
 				bonusLuck=luck1-luck2
+				bonusSpeed=speed1-speed2
 				
 				power=damageAdd + skill*(diceMin+diceMax)/2
 				
@@ -1755,9 +1756,10 @@ function events.BuildItemInformationBox(t)
 				critDamage=bonus*3/2000
 				power=power*(1+bonus/1000) 
 				critChance=0.05+critChance
-
+				haste=math.floor((Party[i]:GetSpeed()+bonusSpeed)/10)/100+1
+				
 				powerType="Spell"
-				power=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/100))
+				power=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/100)*haste)
 				
 			elseif powerType=="Melee" or powerType=="Ranged" then
 				stats={1,5,6,7}
@@ -1891,15 +1893,13 @@ function events.BuildItemInformationBox(t)
 			blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 			ACRed= 1 - (1-blockChance)*(1-acReduction)
 			--speed
-			speed=Party[i]:GetSpeed()
 			unarmed=0
 			Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Unarmed))
+			dodgeChance=1
 			if Mas == 4 then
 				unarmed=Skill+10
+				dodgeChance=0.995^(unarmed)
 			end
-			speed=Party[i]:GetSpeed()
-			speedEffect=speed/10
-			dodgeChance=0.995^(speedEffect+unarmed)
 			fullHP=fullHP/dodgeChance
 			--resistances
 			res={
@@ -1967,22 +1967,34 @@ function events.BuildItemInformationBox(t)
 			fullHP=fullHP+newHP+newEndEff*HPScaling
 			
 			fullHP=math.round((fullHP)*(1+(Party[i]:GetEndurance()+newEnd)/1000))
+			ac=Party[i]:GetArmorClass()
+			oldSpeed=Party[i]:GetSpeed()
+			if oldSpeed<=21 then
+				oldSpeedEff=(oldSpeed-13)/2
+			else
+				oldSpeedEff=math.floor(oldSpeed/5)
+			end
+			newSpeed=Party[i]:GetSpeed()+newSpeed
+			if newSpeed<=21 then
+				newSpeedEff=(newSpeed-13)/2
+			else
+				newSpeedEff=math.floor(newSpeed/5)
+			end
+			newSpeedEff=newSpeedEff-oldSpeedEff
 			
-			ac=Party[i]:GetArmorClass()+newAC
+			ac=ac+newAC+newSpeedEff
 			acReduction=1-1/(ac/300+1)
 			lvl=math.min(Party[i].LevelBase, 255)
 			blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 			ACRed= 1 - (1-blockChance)*(1-acReduction)
 			--speed
-			speed=Party[i]:GetSpeed()+newSpeed
 			unarmed=0
 			Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Unarmed))
+			dodgeChance=1
 			if Mas == 4 then
 				unarmed=Skill+10
+				dodgeChance=0.995^(unarmed)
 			end
-			speed=Party[i]:GetSpeed()+newSpeed
-			speedEffect=speed/10
-			dodgeChance=0.995^(speedEffect+unarmed)
 			vitality=fullHP/dodgeChance
 			--resistances
 			--luck
