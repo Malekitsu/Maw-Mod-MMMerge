@@ -383,14 +383,20 @@ function events.CalcStatBonusByItems(t)
 		if it.Charges > 1000 then
 			stat=math.floor(it.Charges/1000)-1
 			bonus=it.Charges%1000
+			if t.Player.Class==10 or t.Player.Class==11 then
+				bonus=bonus*3
+			end
 			if t.Stat==stat then
-				if stat>=10 and stat<=15 then
-					t.Result = t.Result + bonus
-				else
-					t.Result = t.Result + bonus
+				t.Result = t.Result + bonus
+			end
+		end
+		--bonus for dragons
+		if t.Player.Class==10 or t.Player.Class==11 then --add base bonus
+			if it.Bonus > 0 and it.Bonus <17 then
+				if t.Stat==it.Bonus-1 then
+					t.Result = t.Result + it.BonusStrength*2
 				end
 			end
-
 		end
 	end
 end
@@ -1025,6 +1031,9 @@ function events.CalcStatBonusByItems(t)
 				mult=it.MaxCharges/20
 			else
 				mult=1+2*(it.MaxCharges-20)/20
+			end
+			if t.Player.Class==10 or t.Player.Class==11 then --dragon bonus
+				mult=mult*3
 			end
 			if bonusData.bonusRange then
 				local lower, upper = bonusData.bonusRange[1], bonusData.bonusRange[2]
