@@ -1033,7 +1033,7 @@ function events.CalcStatBonusByItems(t)
 				mult=1+2*(it.MaxCharges-20)/20
 			end
 			if t.Player.Class==10 or t.Player.Class==11 then --dragon bonus
-				mult=mult*3
+				mult=2+mult*3
 			end
 			if bonusData.bonusRange then
 				local lower, upper = bonusData.bonusRange[1], bonusData.bonusRange[2]
