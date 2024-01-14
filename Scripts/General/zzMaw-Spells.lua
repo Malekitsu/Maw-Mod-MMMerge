@@ -665,7 +665,7 @@ function events.GameInitialized2()
 			[39] = {dmgAdd = 12, diceMin = 1, diceMax = 8, },--blades
 			[41] = {dmgAdd = 8, diceMin = 1, diceMax = 8, },--rock blast
 			[43] = {dmgAdd = 0, diceMin = 1, diceMax = 12, },--death blossom
-			[44] = {dmgAdd = 15, diceMin = 1, diceMax = 1, },--mass distorsion, nerfed
+			[44] = {dmgAdd = 15, diceMin = 0.5, diceMax = 0.5, },--mass distorsion, nerfed
 			[52] = {dmgAdd = 10, diceMin = 2, diceMax = 12, },--spirit lash
 			[59] = {dmgAdd = 12, diceMin = 1, diceMax = 7, },--mind blast
 			[65] = {dmgAdd = 45, diceMin = 1, diceMax = 30, },--psychic shock
@@ -757,7 +757,7 @@ end
 function events.CalcSpellDamage(t)
 	--mass distorsion
 	if t.Spell == 44 then 
-		t.Result = t.HP*0.15+t.HP*t.Skill*0.01
+		t.Result = t.HP*0.15+t.HP*t.Skill*0.005
 		return
 	end
 	--check for spell tier
