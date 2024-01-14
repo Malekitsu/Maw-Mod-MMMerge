@@ -1878,9 +1878,9 @@ function events.BuildItemInformationBox(t)
 			newPower=power-oldPower
 			percentage=math.round((power/oldPower-1)*10000)/100
 			if newPower<0 then
-				t.Description = t.Description .. "\n\n" .. "Power: " .. StrColor(255,0,0,newPower) .. " (" .. StrColor(255,0,0,percentage) .. "%)"
+				t.Description = t.Description .. "\n\n" .. "Power: " .. StrColor(255,0,0,percentage .. "%")
 			elseif newPower>0 then
-				t.Description = t.Description .. "\n\n" .. "Power: " .. StrColor(0,255,0,"+") .. StrColor(0,255,0,newPower) .. " (" .. StrColor(0,255,0,"+") .. StrColor(0,255,0,percentage) .. "%)"
+				t.Description = t.Description .. "\n\n" .. "Power: " .. StrColor(0,255,0,"+" .. percentage .. "%")
 			end
 			
 			--vitality calculation
@@ -2034,9 +2034,9 @@ function events.BuildItemInformationBox(t)
 			newVitality=vitality-oldVitality
 			percentage=math.round((vitality/oldVitality-1)*10000)/100
 			if newVitality<0 then
-				t.Description = t.Description .. "\n" .. "Vitality: " .. StrColor(255,0,0,newVitality) .. " (" .. StrColor(255,0,0,percentage) .. "%)"
+				t.Description = t.Description .. "\n" .. "Vitality: " .. StrColor(255,0,0, percentage .. "%")
 			elseif newVitality>0 then
-				t.Description = t.Description .. "\n" .. "Vitality: " .. StrColor(0,255,0,"+") .. StrColor(0,255,0,newVitality) .. " (" .. StrColor(0,255,0,"+") .. StrColor(0,255,0,percentage) .. "%)"
+				t.Description = t.Description .. "\n" .. "Vitality: " .. StrColor(0,255,0,"+" .. percentage .. "%")
 			end
 		end
 	end
