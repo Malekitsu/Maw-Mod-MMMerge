@@ -527,11 +527,12 @@ end
 ------------------------------------------------------
 
 --tick event to manually override buffs, as code seems to be unreliable (might be to recent skill limit removal
-function events.CalcStatBonusByMagic(t)
+function events.CalcStatBonusByItems(t)
 	if DoGCasted and DoGCasted[1] then
 		local power=DoGCasted[3]*5+DoGCasted[2]*DoGCasted[3]/2
 		Party.SpellBuffs[2].Power = power
 		Party.SpellBuffs[2].ExpireTime = Game.Time+const.Hour*DoGCasted[2]*2
+		Sleep(1)
 		DoGCasted[1]=false
 	end
 	if DoPCasted and DoPCasted[1] then
@@ -542,6 +543,7 @@ function events.CalcStatBonusByMagic(t)
 			Party.SpellBuffs[dopList[i]].Power = power
 			Party.SpellBuffs[dopList[i]].ExpireTime = Game.Time+const.Hour*DoPCasted[2]*2
 		end
+		Sleep(1)
 		DoPCasted[1]=false
 	end
 	
@@ -550,7 +552,8 @@ function events.CalcStatBonusByMagic(t)
 		local m=invisCasted[3]-2
 		local duration=m*15+m*invisCasted[2]
 		Party.SpellBuffs[11].Power = invisCasted[2]
-		Party.SpellBuffs[11].ExpireTime = Game.Time+duration*const.Minute
+		Party.SpellBuffs[11].ExpireTime = Game.Time+duration*const.Minute*1.5
+		Sleep(1)
 		invisCasted[1]=false
 	end
 end
@@ -563,8 +566,8 @@ end
 function events.GameInitialized2()
 --Day of Protection
 	--Invisibility
-	Game.SpellsTxt[19].Master="Duration 15+1 minutes per point of skill"
-	Game.SpellsTxt[19].GM="Duration 30+2 minutes per point of skill"
+	Game.SpellsTxt[19].Master="Duration 15+1.5 minutes per point of skill"
+	Game.SpellsTxt[19].GM="Duration 30+3 minutes per point of skill"
 	--curse
 	Game.SpellsTxt[49].Description=string.format(Game.SpellsTxt[49].Description .. "\n\nExpert has 1 hour limit per skill point, Master has 1 day per skill point, Grand has not time limit.")
 	Game.SpellsTxt[49].Normal="n/a\n"
