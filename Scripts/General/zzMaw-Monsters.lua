@@ -69,7 +69,7 @@ function events.AfterLoadMap()
 				mon.HP=math.min(math.round(HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180))*HPRateo,32500)
 				mon.FullHP=mon.HP
 				--damage
-				dmgMult=(mon.Level/9+1.15)*((mon.Level+2)/(oldLevel+2)) --last one is due to the dodge nerf
+				dmgMult=(mon.Level/9+1.15)*((mon.Level+2)/(oldLevel+2))
 				atk1=mon.Attack1
 				atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult)
 				atk2=mon.Attack2
@@ -330,7 +330,7 @@ function events.LoadMap()
 		
 		mon.ArmorClass=base.ArmorClass*((levelMult+10)/(LevelB+10))
 		
-		dmgMult=(levelMult/9+1.15)* 375/(375+levelMult) --last one is due to the dodge nerf
+		dmgMult=(levelMult/9+1.15)
 		--DAMAGE COMPUTATION
 		atk1=base.Attack1
 		mon.Attack1.DamageAdd, mon.Attack1.DamageDiceSides, mon.Attack1.DamageDiceCount = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult,bonusDamage)
@@ -1432,7 +1432,7 @@ function events.LeaveMap()
 		for i=0,#mapvars.monsterMap do
 			mon=Map.Monsters[i]
 			old=mapvars.monsterMap[i]
-			if mon and old and (mon.AIState==const.AIState.Removed or mon.AIState==const.AIState.Dead)  then --no unique monsters respawn
+			if mon and old and old.respawn and (mon.AIState==const.AIState.Removed or mon.AIState==const.AIState.Dead)  then --no unique monsters respawn
 				mon.HP=mon.FullHP
 				mon.X, mon.Y, mon.Z=old.x, old.y, old.z 
 				mon.AIState=0
