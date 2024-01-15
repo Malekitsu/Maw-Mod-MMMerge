@@ -377,29 +377,6 @@ end
 --items stats multiplier:
 slotMult={2,1.25,1.5,1,1.25,1,1,1.25,1.25,0.75,1,[0]=1	}
 
---apply charges effect
-function events.CalcStatBonusByItems(t)
-	for it in t.Player:EnumActiveItems() do
-		if it.Charges > 1000 then
-			stat=math.floor(it.Charges/1000)-1
-			bonus=it.Charges%1000
-			if t.Player.Class==10 or t.Player.Class==11 then
-				bonus=bonus*3
-			end
-			if t.Stat==stat then
-				t.Result = t.Result + bonus
-			end
-		end
-		--bonus for dragons
-		if t.Player.Class==10 or t.Player.Class==11 then --add base bonus
-			if it.Bonus > 0 and it.Bonus <17 then
-				if t.Stat==it.Bonus-1 then
-					t.Result = t.Result + it.BonusStrength*2
-				end
-			end
-		end
-	end
-end
 
 ----------------------
 --weapon rework
@@ -491,13 +468,14 @@ function events.DoBadThingToPlayer(t)
 end
 function events.GameInitialized2()
 --new tooltips
+	Game.SpcItemsTxt[2].BonusStat="Explosive Impact! (half damage)"
 	Game.SpcItemsTxt[17].BonusStat="Disease and Curse Immunity"
 	Game.SpcItemsTxt[18].BonusStat="Insanity and SP drain Immunity"
 	Game.SpcItemsTxt[19].BonusStat="Paralysis and fear Immunity"
 	Game.SpcItemsTxt[20].BonusStat="Poison and weakness Immunity"
 	Game.SpcItemsTxt[21].BonusStat="Sleep and Unconscious Immunity"
 	Game.SpcItemsTxt[22].BonusStat="Stone and premature ageing Immunity"
-	Game.SpcItemsTxt[24].BonusStat="Death and erad. Immunity, +5 Levels"
+	Game.SpcItemsTxt[24].BonusStat="Death and Eradication Immunity"
 end
 --------------------
 --STATUS REWORK (needs to stay after status immunity)
@@ -769,137 +747,6 @@ function events.GameInitialized2()
 	itemStatName[24] = StrColor(255,255,153, "Unarmed skill")
 	itemStatName[25] = StrColor(255,255,153, "Great might")
 end
-
-
-function events.GameInitialized2()
-	Game.SpcItemsTxt[2].BonusStat="Explosive Impact! (half damage)"
-end
-
---max charges empower items base stats by 2 every 100 levels (every 5 levels bolster level you get 1 maxcharges)
---apply MAXcharges effect
-function events.CalcStatBonusByItems(t)
-	if t.Stat==9 then
-		for it in t.Player:EnumActiveItems() do
-			if it.MaxCharges > 0 then
-				if table.find(artArmors,it.Number) then
-					it.MaxCharges=0
-					return
-				end
-				local equipStat=Game.ItemsTxt[it.Number].EquipStat
-				if equipStat>=3 and equipStat<=9 then
-					lookup=0
-					while Game.ItemsTxt[it.Number].NotIdentifiedName==Game.ItemsTxt[it.Number+lookup+1].NotIdentifiedName do 
-						lookup=lookup+1
-					end
-					ac=Game.ItemsTxt[it.Number].Mod2+Game.ItemsTxt[it.Number].Mod1DiceCount 
-					ac2=Game.ItemsTxt[it.Number+lookup].Mod2+Game.ItemsTxt[it.Number+lookup].Mod1DiceCount 
-					bonusAC=ac2*(it.MaxCharges/20)
-					if it.MaxCharges <= 20 then
-						t.Result=t.Result+math.round(bonusAC)
-					else
-						bonusAC=(ac+ac2)*(it.MaxCharges/20)
-						t.Result=t.Result+math.round(bonusAC)
-					end
-				end
-			end
-		end
-	end
-end
-
-
-
---visual changes in stats menu for scaled weapon
-function events.CalcStatBonusByItems(t)
-	--increase damage depending on max CHARGES, only visual (except for attack)
-	local cs = const.Stats
-	if t.Stat==cs.MeleeDamageMin or t.Stat==cs.MeleeDamageMax or t.Stat==cs.MeleeAttack then
-		for i=0,1 do
-			local it=t.Player:GetActiveItem(i)
-			if	it then
-				if table.find(artWeap1h,it.Number) or table.find(artWeap2h,it.Number) then
-					it.MaxCharges=0
-					return
-				end
-				if it.MaxCharges>0 then
-					local data=Game.ItemsTxt[it.Number]
-					if data.EquipStat<=2 then
-						lookup=0
-						while Game.ItemsTxt[it.Number].NotIdentifiedName==Game.ItemsTxt[it.Number+lookup+1].NotIdentifiedName do 
-							lookup=lookup+1
-						end
-						--add fix damage
-						local bonus=data.Mod2
-						local bonus2=Game.ItemsTxt[it.Number+lookup].Mod2
-						if it.MaxCharges <= 20 then
-							local bonus=bonus2*(it.MaxCharges/20)
-							t.Result=t.Result+math.round(bonus)
-						else
-							local bonus=(bonus+bonus2)*(it.MaxCharges/20)
-							t.Result=t.Result+math.round(bonus)
-						end
-						--calculate random damage
-						if t.Stat==cs.MeleeDamageMax then
-							local bonus=data.Mod1DiceSides
-							local bonus2=Game.ItemsTxt[it.Number+lookup].Mod1DiceSides
-							local dices=data.Mod1DiceCount
-							if it.MaxCharges <= 20 then
-								local bonus=bonus2*(it.MaxCharges/20)
-								t.Result=t.Result+math.round(bonus)*dices
-							else
-								local bonus=(bonus+bonus2)*(it.MaxCharges/20)
-								t.Result=t.Result+math.round(bonus)*dices
-							end
-						end
-					end
-				end
-			end
-		end
-	end
-	--same for bows
-	if t.Stat==cs.RangedDamageMin or t.Stat==cs.RangedDamageMax or t.Stat==cs.RangedAttack then
-		local it=t.Player:GetActiveItem(2)
-		if	it then
-			if table.find(artWeap1h,it.Number) or table.find(artWeap2h,it.Number) then
-				it.MaxCharges=0
-				return
-			end
-			if it.MaxCharges>0 then
-				lookup=0
-				while Game.ItemsTxt[it.Number].NotIdentifiedName==Game.ItemsTxt[it.Number+lookup+1].NotIdentifiedName do 
-					lookup=lookup+1
-				end
-				local data=Game.ItemsTxt[it.Number]
-				if data.EquipStat<=2 then
-				--add fix damage
-					local bonus=data.Mod2
-					local bonus2=Game.ItemsTxt[it.Number+lookup].Mod2
-					if it.MaxCharges <= 20 then
-						local bonus=bonus2*(it.MaxCharges/20)
-						t.Result=t.Result+math.round(bonus)
-					else
-						local bonus=(bonus+bonus2)*(it.MaxCharges/20)
-						t.Result=t.Result+math.round(bonus)
-					end
-					--calculate random damage
-					if t.Stat==cs.RangedDamageMax then
-						local bonus=data.Mod1DiceSides
-						local bonus2=Game.ItemsTxt[it.Number+lookup].Mod1DiceSides
-						local dices=data.Mod1DiceCount
-						if it.MaxCharges <= 20 then
-							local bonus=bonus2*(it.MaxCharges/20)
-							t.Result=t.Result+math.round(bonus)*dices
-						else
-							local bonus=(bonus+bonus2)*(it.MaxCharges/20)
-							t.Result=t.Result+math.round(bonus)*dices
-						end
-					end
-				end
-			end
-		end
-	end
-	
-end
-
 					
 --recalculate actual damage
 function events.ModifyItemDamage(t)
@@ -989,81 +836,6 @@ bonusEffects = {
     [79] = { bonusType = 53, bonusValues = {15, 16}, statModifier = 20 },
     [80] = { bonusType = 53, bonusRange = {1, 16}, statModifier = 5 },
 }
-
---I guess it's to fix a bug when both enchants are on an item, not sure
-function events.CalcStatBonusByItems(t)
-    for it in t.Player:EnumActiveItems() do
-        local bonusData = bonusEffects[it.Bonus2]
-        if bonusData then
-            if bonusData.bonusRange then
-                local lower, upper = bonusData.bonusRange[1], bonusData.bonusRange[2]
-                if it.Bonus >= lower and it.Bonus <= upper then
-                    if t.Stat == it.Bonus - 1 then
-                        t.Result = t.Result + bonusData.statModifier
-                    end
-                end
-            elseif bonusData.bonusValues then
-                for i, value in ipairs(bonusData.bonusValues) do
-                    if it.Bonus == value then
-                        if t.Stat == it.Bonus - 1 then
-                            if type(bonusData.statModifier) == "table" then
-                                t.Result = t.Result + bonusData.statModifier[i]
-                            else
-                                t.Result = t.Result + bonusData.statModifier
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
-
-
-
-
---make enchant 2 scale with maxcharges
-function events.CalcStatBonusByItems(t)
-    for it in t.Player:EnumActiveItems() do
-		local bonusData = bonusEffects[it.Bonus2]
-		if bonusData then
-			if it.MaxCharges <= 20 then
-				mult=it.MaxCharges/20
-			else
-				mult=1+2*(it.MaxCharges-20)/20
-			end
-			if t.Player.Class==10 or t.Player.Class==11 then --dragon bonus
-				mult=2+mult*3
-			end
-			if bonusData.bonusRange then
-				local lower, upper = bonusData.bonusRange[1], bonusData.bonusRange[2]
-				if t.Stat>=lower-1 and t.Stat<upper then
-					t.Result = t.Result + bonusData.statModifier * mult
-					--subtract base value and add maw value
-					t.Result = t.Result + bonusData.statModifier - bonusEffectsBase[it.Bonus2].statModifier
-				end
-			elseif bonusData.bonusValues then
-				for i =1, 3 do
-					if bonusData.bonusValues[i] then
-						if bonusData.bonusValues[i]-1==t.Stat then
-							local modifier = bonusData.statModifier
-							if type(modifier) == "table" then
-								t.Result = t.Result + modifier[i] * mult 
-								--subtract base value and add maw value
-								t.Result = t.Result + modifier[i] - bonusEffectsBase[it.Bonus2].statModifier[i]
-							else
-								t.Result = t.Result + modifier * mult
-								--subtract base value and add maw value
-								t.Result = t.Result + modifier - bonusEffectsBase[it.Bonus2].statModifier
-							end
-						end
-					end
-				end
-			end
-		end
-    end
-end
-
 
 --create dictionary with description list
 function checktext(MaxCharges,bonus2)
@@ -1298,7 +1070,6 @@ enchantList={
 }
 
 --remove older "of x spell school" enchant and replace
-
 --create enchant Map
 magicEnchantMap={}
 magicEnchantMap[const.Skills.Fire] = 30
@@ -1312,21 +1083,6 @@ magicEnchantMap[const.Skills.Light] = 31
 magicEnchantMap[const.Skills.Dark] = 28
 
 
-function events.GetSkill(t)
-	if magicEnchantMap[t.Skill] then
-		spellBonus=0
-		malus=0
-		local skill = t.Player.Skills[t.Skill]
-		local s,m=SplitSkill(skill)
-		for it in t.Player:EnumActiveItems() do
-			if it.Bonus2==magicEnchantMap[t.Skill] then
-				malus=math.floor(s/2)
-				spellBonus=math.max(5+math.round(it.MaxCharges/4))
-			end
-		end
-		t.Result=t.Result+spellBonus-malus
-	end
-end
 
 --BOOK COST
 
@@ -2121,4 +1877,349 @@ function getNewArmor(it)
 	else
 		return 0
 	end
+end
+
+
+
+--[[
+function events.ModifyItemDamage(t)
+t.Result=0
+end
+
+function events.CalcStatBonusBySkills(t)
+t.Result=0
+end
+]]
+
+plItemsStats={}	
+for i=0,200 do
+	plItemsStats[i]={}
+	for v=1,50 do
+		plItemsStats[i][v]=0
+	end
+end
+function events.CalcStatBonusByItems(t)
+	t.Result=0
+	if t.Stat>=0 and t.Stat<16 then
+		if plItemsStats[t.PlayerIndex] then
+			t.Result=plItemsStats[t.PlayerIndex][t.Stat+1]
+		end
+	end
+	if statMap[t.Stat] then
+		t.Result=plItemsStats[t.PlayerIndex][statMap[t.Stat]]
+	end
+end
+
+
+function events.GameInitialized2()
+	--weapons and armors
+    referenceAC = {}
+    referenceWeaponAttack = {}
+    referenceWeaponSides = {}
+
+    for i = 0, Game.ItemsTxt.High - 1 do
+        local txt = Game.ItemsTxt
+        local lookup = 0
+        while txt[i].NotIdentifiedName == txt[i + lookup + 1].NotIdentifiedName do
+            lookup = lookup + 1
+        end
+
+        if (txt[i].Skill >= 8 and txt[i].Skill <= 11) or txt[i].Skill == 40 then
+            -- Armors
+            referenceAC[i] = txt[i + lookup].Mod2 + txt[i + lookup].Mod1DiceCount
+        elseif txt[i].Skill <= 5 then
+            -- Weapons
+            referenceWeaponAttack[i] = txt[i + lookup].Mod2
+            referenceWeaponSides[i] = txt[i + lookup].Mod1DiceSides
+        end
+    end
+end
+
+function itemStats(index)
+	if index==-1 or index==nil then
+		return 0
+	end
+	for i=0,Party.High do 
+		if Party[i]:GetIndex()==index then
+			id=i
+		end
+	end
+	if id>Party.High then return end
+	local pl=Party[id]
+	tab=plItemsStats[index]
+	
+	--set all to 0
+	tab={}
+	for i=1,50 do
+		tab[i]=0
+	end
+	
+	
+	for it in pl:EnumActiveItems() do
+		--bolster mult
+		mult=1
+		if it.MaxCharges <= 20 then
+			mult=1+it.MaxCharges/20
+		else
+			mult=2+2*(it.MaxCharges-20)/20
+		end
+		
+		if it.Bonus>0 then 
+			tab[it.Bonus]=tab[it.Bonus]+it.BonusStrength
+		end
+		if it.Charges>1000 then
+			tab[math.floor(it.Charges/1000)]=tab[math.floor(it.Charges/1000)]+it.Charges%1000
+		end
+		if it.Bonus2>0 then
+			bonusData = bonusEffects[it.Bonus2]
+			if bonusData then
+				if bonusData.bonusRange then
+					for i=bonusData.bonusRange[1], bonusData.bonusRange[2] do
+						tab[i]=tab[i]+bonusData.statModifier*mult
+					end
+				elseif bonusData.bonusValues then
+					for i =1, 3 do
+						if bonusData.bonusValues[i] then
+							 modifier = bonusData.statModifier
+							if type(modifier) == "table" then
+								tab[bonusData.bonusValues[i]] = math.round(tab[bonusData.bonusValues[i]] + modifier[i] * mult)
+							else
+								tab[bonusData.bonusValues[i]] = math.round(tab[bonusData.bonusValues[i]] + modifier * mult)
+							end
+						end
+					end
+				end
+			end
+		end
+		--armors
+		local txt=it:T()
+		if (txt.Skill>=8 and txt.Skill<=11) or txt.Skill==40 then --AC from items
+			local ac=txt.Mod1DiceCount+txt.Mod2
+			if it.MaxCharges>0 then 
+				local ac2=referenceAC[it.Number]
+				local bonusAC=ac2*(it.MaxCharges/20)
+				if it.MaxCharges <= 20 then
+					ac=ac+math.round(bonusAC)
+				else
+					ac=ac+math.round((ac+ac2)*(it.MaxCharges/20))
+				end
+			end
+			tab[10]=tab[10]+ac
+		end
+		--weapons
+		if txt.Skill <= 5 then
+			local bonus = txt.Mod2
+			local bonus2 = referenceWeaponAttack[it.Number]
+			local bonusATK
+
+			if it.MaxCharges <= 20 then
+				bonusATK = bonus2 * (it.MaxCharges / 20)
+			else
+				bonusATK = (bonus2 + bonus) * (it.MaxCharges / 20)
+			end
+			bonus = bonus + math.round(bonusATK)
+
+			local sides = txt.Mod1DiceSides
+			local sides2 = referenceWeaponSides[it.Number]
+			local sidesBonus
+			
+			if it.MaxCharges <= 20 then
+				sidesBonus = sides2 * (it.MaxCharges / 20)
+			else
+				sidesBonus = (sides2 + sides) * (it.MaxCharges / 20)
+			end
+			sidesBonus = sides + math.round(sidesBonus)
+			
+			if txt.Skill ~= 5 then
+				tab[40] = tab[40] + math.round(bonus)
+				tab[41] = tab[41] + math.round(bonus)
+				tab[42] = tab[42] + txt.Mod1DiceCount+tab[41]
+				tab[43] = tab[43] + math.round(sidesBonus)*txt.Mod1DiceCount+tab[41]
+			else
+				tab[44] = tab[44] + math.round(bonus)
+				tab[45] = tab[45] + math.round(bonus)
+				tab[46] = tab[46] + math.round(txt.Mod1DiceCount)+tab[45]
+				tab[47] = tab[47] + math.round(sidesBonus)*txt.Mod1DiceCount+tab[45]
+			end
+		end
+		
+		--skills
+		if skills[it.Bonus] then
+			tab[it.Bonus]=math.max(tab[it.Bonus], it.BonusStrength)
+		end
+		if equipSpellMap[it.Bonus2] then
+			tab[it.Bonus2]= 5 +  math.floor(it.MaxCharges/4)
+		end
+	end	
+	--------------
+	--end of items
+	--------------
+	--dragon
+	if pl.Class==10 or pl.Class==11 then
+		for i=1,16 do
+			tab[i]=tab[i]*3
+		end
+	end
+	--nightmare and bolster
+		--calculate party level
+	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+	if currentWorld==1 then
+		partyLevel=vars.MM8LVL
+	elseif currentWorld==2 then
+		partyLevel=vars.MM7LVL
+	elseif currentWorld==3 then
+		partyLevel=vars.MM6LVL
+	elseif currentWorld==4 then
+		partyLevel=0
+	end
+	local partyLevel=math.max(partyLevel-4,0)
+	local penaltyLevel=partyLevel
+	penalty=math.min(penaltyLevel,100)
+	
+	penalty=math.min(penaltyLevel,200)
+	if Game.BolsterAmount==300 then 
+		penaltyLevel=math.max(partyLevel-30,0)
+		penalty=penalty+math.min(penaltyLevel,100)
+	end
+	--add luck to resistances
+	local luck=tab[7]+pl.LuckBase+pl.LuckBonus
+	if luck<=21 then
+		luck=(luck-13)/2
+	elseif luck<=100 then
+		luck=math.floor(luck/5)
+	else
+		luck=math.floor(luck/10)+10
+	end
+	
+	for i=11, 16 do
+		tab[i]=tab[i]-penalty+luck
+	end	
+	--BB HP INCREASE
+	local endurance=tab[4]+pl.EnduranceBase+pl.EnduranceBonus+Party.SpellBuffs[2].Power
+	local endEff
+	if endurance<=21 then
+		endEff=(endurance-13)/2
+	else
+		endEff=math.floor(endurance/5)
+	end
+	
+	local s,m=SplitSkill(pl.Skills[const.Skills.Bodybuilding])	
+	if m==4 then
+		m=5
+	end
+	BBHP=s*m
+	BBBonus=math.round(s^2/2)
+	level=pl.LevelBonus+pl.LevelBase
+	baseHP=Game.Classes.HPBase[pl.Class]+Game.Classes.HPFactor[pl.Class]*(level+endEff+BBHP)
+	fullHP=baseHP+tab[8]+BBBonus
+	Endurancebonus=fullHP*endurance/1000
+	tab[8]=tab[8]+Endurancebonus+BBBonus
+	return tab
+end
+
+equipSpellMap={
+	[30] = const.Skills.Fire,
+	[26] = const.Skills.Air,
+	[34] = const.Skills.Water,
+	[29] = const.Skills.Earth,
+	[33] = const.Skills.Spirit,
+	[32] = const.Skills.Mind,
+	[27] = const.Skills.Body,
+	[31] = const.Skills.Light,
+	[28] = const.Skills.Dark,
+}
+
+
+--create enchant Map
+magicEnchantMap={
+	[const.Skills.Fire] = 30,
+	[const.Skills.Air] = 26,
+	[const.Skills.Water] = 34,
+	[const.Skills.Earth] = 29,
+	[const.Skills.Spirit] = 33,
+	[const.Skills.Mind] = 32,
+	[const.Skills.Body] = 27,
+	[const.Skills.Light] = 31,
+	[const.Skills.Dark] = 28,
+}
+skills={
+	[17]=const.Skills.Alchemy, 
+	[18]=const.Skills.Stealing, 
+	[17]=const.Skills.Alchemy, 
+	[19]=const.Skills.DisarmTraps, 
+	[20]=const.Skills.IdentifyItem, 
+	[21]=const.Skills.IdentifyMonster, 
+	[22]=const.Skills.Armsmaster, 
+	[23]=const.Skills.Dodge, 
+	[24]=const.Skills.Unarmed, 
+}
+
+statMap={
+	[const.Stats.FireMagic]=30,
+	[const.Stats.AirMagic]=26,
+	[const.Stats.WaterMagic]=34,
+	[const.Stats.EarthMagic]=29,
+	[const.Stats.SpiritMagic]=33,
+	[const.Stats.MindMagic]=32,
+	[const.Stats.BodyMagic]=27,
+	[const.Stats.LightMagic]=31,
+	[const.Stats.DarkMagic]=28,
+	[const.Stats.MeleeAttack]=40,
+	[const.Stats.MeleeDamageBase]=41,
+	[const.Stats.MeleeDamageMin]=42,
+	[const.Stats.MeleeDamageMax]=43,
+	[const.Stats.RangedAttack]=44,
+	[const.Stats.RangedDamageBase]=45,
+	[const.Stats.RangedDamageMin]=46,
+	[const.Stats.RangedDamageMax]=47,
+	
+}
+
+--refresh stats
+function events.AfterLoadMap()
+	mawRefresh("all")
+end
+function events.Action(t)
+	if t.Action==110 or t.Action==115 or t.Action==133 then
+		if Game.CurrentPlayer==-1 then return end
+		id=Party[Game.CurrentPlayer]:GetIndex()
+		function events.Tick() 
+			events.Remove("Tick", 1)
+			mawRefresh(id)
+		end
+	end
+end
+function events.CalcDamageToPlayer(t)
+	function events.Tick() 
+		events.Remove("Tick", 1)
+		mawRefresh(t.PlayerIndex)
+	end
+end
+function mawRefresh(i)
+	if i=="all" then
+		for v=0,Party.High do
+			local id=Party[v]:GetIndex()
+			plItemsStats[id]=itemStats(id)
+		end
+		return
+	end
+	plItemsStats[i]=itemStats(i)
+end
+
+local stats={"Might", "Intellect", "Personality", "Endurance", "Accuracy", "Speed", "LUCK", "HP", "SP", "ArmorClass", "Fire", "Air", "Water", "Earth", "Mind", "Body"}
+function mawPlayerBaseStats(index)
+	local pl=Party[index]
+	local tab=plItemsStats[index]
+	--set all to 0
+	for i=1,7 do
+		tab[i]=pl[stats[i] .. "Base"] + pl[stats[i]  .. "Bonus"]
+	end
+	for i=8,9 do
+		tab[i]=0
+	end
+	tab[10]=pl[ArmorClassBonus]
+	for i=11,16 do
+		tab[i]=pl[stats[i] .. "ResistanceBase"] + pl[stats[i]  .. "ResistanceBonus"]
+	end
+	
 end
