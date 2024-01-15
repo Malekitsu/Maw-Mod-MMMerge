@@ -73,6 +73,13 @@ local greaterHealScaling={0,0,6,9}
 
 --modify Spells
 function events.PlayerCastSpell(t)
+	--refresh everyone before and after casting
+	mawRefresh(t.PlayerIndex)
+	function events.Tick() 
+		events.Remove("Tick", 1)
+		mawRefresh("all")
+	end
+	
 	if t.IsSpellScroll then -- disable for scrolls
 		return
 	end
@@ -85,7 +92,11 @@ function events.PlayerCastSpell(t)
 			return
 		end
 		if not t.RemoteData then
-			invisCasted={true,t.Skill,t.Mastery}
+			function events.Tick() 
+				events.Remove("Tick", 1)
+				invisCasted={true,t.Skill,t.Mastery}
+				mawBuffs()
+			end
 			if t.MultiplayerData then
 				t.MultiplayerData[1]=invisCasted
 			end
@@ -422,7 +433,11 @@ function events.PlayerCastSpell(t)
 	--Day of the Gods
 	if t.SpellId==83 then
 		if not t.RemoteData then
-			DoGCasted={true,t.Skill,t.Mastery}
+			function events.Tick() 
+				events.Remove("Tick", 1)
+				DoGCasted={true,t.Skill,t.Mastery}
+				mawBuffs()
+			end
 			if t.MultiplayerData then
 				t.MultiplayerData[1]=DoGCasted
 			end
@@ -459,7 +474,11 @@ function events.PlayerCastSpell(t)
 	--day of the gods
 	if t.SpellId==85 then
 		if not t.RemoteData then
-			DoPCasted={true,t.Skill,t.Mastery}
+			function events.Tick() 
+				events.Remove("Tick", 1)
+				DoPCasted={true,t.Skill,t.Mastery}
+				mawBuffs()
+			end
 			if t.MultiplayerData then
 				t.MultiplayerData[1]=DoPCasted
 			end
@@ -527,7 +546,7 @@ end
 ------------------------------------------------------
 
 --tick event to manually override buffs, as code seems to be unreliable (might be to recent skill limit removal
-function events.CalcStatBonusByItems(t)
+function mawBuffs()
 	if DoGCasted and DoGCasted[1] then
 		local power=DoGCasted[3]*5+DoGCasted[2]*DoGCasted[3]/2
 		Party.SpellBuffs[2].Power = power
@@ -546,8 +565,6 @@ function events.CalcStatBonusByItems(t)
 		Sleep(1)
 		DoPCasted[1]=false
 	end
-	
-	
 	if invisCasted and invisCasted[1] then
 		local m=invisCasted[3]-2
 		local duration=m*15+m*invisCasted[2]
@@ -556,6 +573,8 @@ function events.CalcStatBonusByItems(t)
 		Sleep(1)
 		invisCasted[1]=false
 	end
+	--refresh stats
+	mawRefresh("all")
 end
 
 
