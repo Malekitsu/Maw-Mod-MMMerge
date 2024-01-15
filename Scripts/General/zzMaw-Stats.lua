@@ -111,73 +111,7 @@ function events.CalcSpellDamage(t)
 	end
 end
 
---endurance
-fullHP2={}
-for i =0,300 do
-fullHP2[i]=0
-end
 
-function events.CalcStatBonusByItems(t)
-	if t.Stat == const.Stats.HP then
-		endurance=t.Player:GetEndurance()/1000
-		index2=t.PlayerIndex
-		local skill=t.Player.Skills[const.Skills.Bodybuilding]
-		local s,m=SplitSkill(skill)
-		t.Result=t.Result+math.round(fullHP2[index2]*endurance+s^2/2)
-	end
-end
-
-function events.Tick()
-	for i=0,Party.High do
-		endurance2=Party[i]:GetEndurance()
-		if endurance2<=21 then
-		endEff2=(endurance2-13)/2
-		else
-			endEff2=math.floor(endurance2/5)
-		end
-		local skill=Party[i].Skills[const.Skills.Bodybuilding]
-		local s,m=SplitSkill(skill)
-		if m==4 then
-			m=5
-		end
-		BBHP=s*m
-		index3=Party[i]:GetIndex()
-		
-		itemHP=0
-		for it in Party[i]:EnumActiveItems() do
-			if math.floor(it.Charges/1000)==8 then
-				itemHP=itemHP+it.Charges%1000
-			end
-			if it.Bonus==8 then
-				itemHP=itemHP+it.BonusStrength
-			end
-			MaxCharges=it.MaxCharges
-			if MaxCharges <= 20 then
-				mult=1+MaxCharges/20
-			else
-				mult=2+2*(MaxCharges-20)/20
-			end
-
-			b2=bonusEffects[it.Bonus2]
-			if b2 then
-				if b2.bonusValues then 
-					for v=1,#b2.bonusValues do
-						if b2.bonusValues[v]==8 then
-							itemHP=itemHP+math.floor(b2.statModifier*mult)
-						end
-					end
-				elseif b2.bonusRange then
-					if b2.bonusRange[1]<=8 and b2.bonusRange[2]>=8 then
-						itemHP=itemHP+math.floor(b2.statModifier*mult)
-					end
-				end
-			end
-			
-		end
-		
-		fullHP2[index3]=Game.Classes.HPFactor[Party[i].Class]*(Party[i]:GetLevel()+endEff2+BBHP)+Game.Classes.HPBase[Party[i].Class]+s^2/2+itemHP
-	end
-end
 --body building description
 function events.GameInitialized2()
 	Game.SkillDescriptions[27]=Game.SkillDescriptions[27] .. "\n\nHit Points are also increased by an amount equal to Skill^2 divided by 2"
@@ -686,28 +620,6 @@ function events.CalcDamageToPlayer(t)
 	end
 end
 
---add luck to resistances
-function events.CalcStatBonusByItems(t)
-	if t.Stat>=10 and t.Stat<=15 then
-		luck=t.Player:GetLuck()
-		if luck<=21 then
-			luck=(luck-1)/2-6
-		elseif luck<=100 then
-			luck=math.floor(luck/5)
-		else
-			luck=math.floor(luck/10)+10
-		end
-		t.Result=t.Result+luck
-	end	
-end
-
-
-
-
-
-
-
-
 --TOOLTIPS
 function events.Tick()
 	if Game.CurrentCharScreen==100 and Game.CurrentScreen==7 then
@@ -896,29 +808,6 @@ autohook(0x4376AC, function(d)
 	u4[d.esp + 4] = result
 	crit = false
 end)
-
-
---decrease resistances based on bolster
-
-function events.CalcStatBonusByItems(t)
-	if t.Stat>9 and t.Stat<16 then
-		--calculate party level
-		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
-		if currentWorld==1 then
-			partyLevel=vars.MM7LVL+vars.MM6LVL
-		elseif currentWorld==2 then
-			partyLevel=vars.MM8LVL+vars.MM6LVL
-		elseif currentWorld==3 then
-			partyLevel=vars.MM8LVL+vars.MM7LVL
-		elseif currentWorld==4 then
-			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-		end
-		partyLevel=math.max(partyLevel-4,0)
-		penaltyLevel=math.round(partyLevel/5)*5
-		penalty=math.min(penaltyLevel,200)
-		t.Result=t.Result-penalty
-	end
-end
 
 --resistance map
 damageKindResistance={
