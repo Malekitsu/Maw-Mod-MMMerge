@@ -194,8 +194,6 @@ function events.LoadMap()
 		bolsterLevel=vars.MM8LVL+vars.MM7LVL
 	elseif currentWorld==4 then
 		bolsterLevel=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
-	else
-		debug.Message("You are in an unknown world, report this bug in MAW discord")
 	end
 	bolsterLevel=math.max(bolsterLevel-4,0)
 	
@@ -1382,26 +1380,7 @@ function events.CanCastTownPortal(t)
 		t.Can=false
 	end
 end	
-function events.CalcStatBonusByItems(t)
-	if Game.BolsterAmount~=300 then return end
-	if t.Stat>9 and t.Stat<16 then
-		--calculate party level
-		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
-		if currentWorld==1 then
-			partyLevel=vars.MM8LVL
-		elseif currentWorld==2 then
-			partyLevel=vars.MM7LVL
-		elseif currentWorld==3 then
-			partyLevel=vars.MM6LVL
-		elseif currentWorld==4 then
-			partyLevel=0
-		end
-		partyLevel=math.max(partyLevel-4,0)
-		penaltyLevel=math.max(partyLevel-30,0)
-		penalty=math.min(penaltyLevel,100)
-		t.Result=t.Result-penalty
-	end
-end
+
 
 --resurrect monsters
 --new names
@@ -1428,7 +1407,8 @@ function events.LoadMap()
 	end
 end
 function events.LeaveMap()
-	if mapvars.monsterMap and mapvars.monsterMap.cleared==false then
+	if Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.monsterMap.cleared==false then
+		if Map.Monsters.Count==0 then return end
 		for i=0,#mapvars.monsterMap do
 			mon=Map.Monsters[i]
 			old=mapvars.monsterMap[i]
@@ -1461,7 +1441,7 @@ function events.PickCorpse(t)
 end
 --check for dungeon clear
 function events.MonsterKilled(mon)
-	if mapvars.monsterMap and mapvars.completed==nil then
+	if Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.completed==nil then
 		n=Map.Monsters.Count
 		m=1
 		if mon.NameId>220 and mon.NameId<300 then
