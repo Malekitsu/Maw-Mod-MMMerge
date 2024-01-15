@@ -2061,23 +2061,32 @@ function itemStats(index)
 		end
 	end
 	--nightmare and bolster
-		--calculate party level
-	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+	currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
 	if currentWorld==1 then
-		partyLevel=vars.MM8LVL
+		partyLevel=vars.MM7LVL+vars.MM6LVL
 	elseif currentWorld==2 then
-		partyLevel=vars.MM7LVL
+		partyLevel=vars.MM8LVL+vars.MM6LVL
 	elseif currentWorld==3 then
-		partyLevel=vars.MM6LVL
+		partyLevel=vars.MM8LVL+vars.MM7LVL
 	elseif currentWorld==4 then
-		partyLevel=0
+		partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 	end
-	local partyLevel=math.max(partyLevel-4,0)
-	local penaltyLevel=partyLevel
-	penalty=math.min(penaltyLevel,100)
-	
+	partyLevel=math.max(partyLevel-4,0)
+	penaltyLevel=math.round(partyLevel/5)*5
 	penalty=math.min(penaltyLevel,200)
+
+	--calculate party level
 	if Game.BolsterAmount==300 then 
+		if currentWorld==1 then
+			partyLevel=vars.MM8LVL
+		elseif currentWorld==2 then
+			partyLevel=vars.MM7LVL
+		elseif currentWorld==3 then
+			partyLevel=vars.MM6LVL
+		elseif currentWorld==4 then
+			partyLevel=0
+		end
+		penalty=math.min(penaltyLevel,200)
 		penaltyLevel=math.max(partyLevel-30,0)
 		penalty=penalty+math.min(penaltyLevel,100)
 	end
