@@ -1436,7 +1436,8 @@ function events.LeaveMap()
 				mon.HP=mon.FullHP
 				mon.X, mon.Y, mon.Z=old.x, old.y, old.z 
 				mon.AIState=0
-				mon.Exp=old.exp/4
+				mon.Exp=old.exp or mon.Exp
+				mon.Exp=mon.Exp/4
 				mon.ShowOnMap=false
 				mon.NameId=mon.Id+300
 				if mon.AIState==const.AIState.Removed then
@@ -1499,6 +1500,7 @@ function events.MonsterKilled(mon)
 			mapvars.completed=true
 			vars.dungeonCompletedList=vars.dungeonCompletedList or {}
 			vars.dungeonCompletedList[name]=true
+			mapvars.monsterMap.cleared=true
 			return
 		end
 		if mapvars.monsterMap.cleared==false and m/n>=0.8 then
