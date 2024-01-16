@@ -2055,6 +2055,7 @@ function itemStats(index)
 		--artifacts stats bonus
 		
 		if artifactStatsBonus[it.Number] then
+			artifactMult=math.min(math.max(pl.LevelBase/80,0.5),3)
 			for key,value in pairs(artifactStatsBonus[it.Number]) do
 				tab[key+1]=tab[key+1]+value*artifactMult
 			end
