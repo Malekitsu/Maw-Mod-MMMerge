@@ -1993,7 +1993,7 @@ function itemStats(index)
 				end
 			end
 			--artifacts
-			if (it.Number>=500 and it.Number<=543) or (it.Number>=1302 and it.Number<=1354) or (it.Number>=2020 and it.Number<=2049) then 
+			if artArmors[it.Number] then 
 				artifactMult=math.min(math.max(pl.LevelBase/80,0.5),3)
 				acBonus=math.ceil(acBonus*artifactMult)
 			end
@@ -2023,7 +2023,7 @@ function itemStats(index)
 			end
 			sidesBonus = sides + math.round(sidesBonus)
 			
-			if (it.Number>=500 and it.Number<=543) or (it.Number>=1302 and it.Number<=1354) or (it.Number>=2020 and it.Number<=2049) then 
+			if artWeap1h[it.Number] or artWeap2h[it.Number] then 
 				if txt.EquipStat<=1 then
 					artifactMult=math.min(math.max(pl.LevelBase/80,0.5),3)
 					bonus=math.ceil(txt.Mod2*artifactMult)
