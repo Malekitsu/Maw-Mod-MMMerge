@@ -615,7 +615,7 @@ function events.CalcDamageToPlayer(t)
 				bonusDamage=mapLevel/8
 			end
 			damage=(t.Damage+bonusDamage)*mult
-			t.Result=calcMawDamage(t.Player,t.DamageKind,damage)
+			t.Result=math.min(calcMawDamage(t.Player,t.DamageKind,damage),mapLevel*10)
 		end
 	end
 end
