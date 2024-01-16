@@ -1983,6 +1983,7 @@ function itemStats(index)
 		local txt=it:T()
 		if (txt.Skill>=8 and txt.Skill<=11) or txt.Skill==40 then --AC from items
 			local ac=txt.Mod1DiceCount+txt.Mod2
+			local acBonus=ac
 			if it.MaxCharges>0 then 
 				local ac2=referenceAC[it.Number]
 				local bonusAC=ac2*(it.MaxCharges/20)
