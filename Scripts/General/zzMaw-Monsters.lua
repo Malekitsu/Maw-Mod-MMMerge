@@ -1598,7 +1598,7 @@ function generateBoss(index,nameIndex)
 end
 
 --SKILLS
-SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Adamantite",} --defensives
+SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Adamantite","Swapper","Regenerating",} --defensives
 --to add: splitting
 --on attack skills
 function events.GameInitialized2() --to make the after all the other code
@@ -1607,7 +1607,7 @@ function events.GameInitialized2() --to make the after all the other code
 		if data and data.Monster and data.Monster.NameId>220 then
 			skill = string.match(Game.PlaceMonTxt[data.Monster.NameId], "([^%s]+)")
 			if skill=="Summoner" then
-				if math.random()<0.4 then
+				if math.random()<0.4 or t.DamageKind==4 then
 					pseudoSpawnpoint{monster = data.Monster.Id-2, x = (Party.X+data.Monster.X)/2, y = (Party.Y+data.Monster.Y)/2, z = Party.Z, count = 1, powerChances = {75, 25, 0}, radius = 64, group = 1}
 				end
 			elseif skill=="Venomous" then
@@ -1619,6 +1619,11 @@ function events.GameInitialized2() --to make the after all the other code
 					Party[i].HP=Party[i].HP-aoeDamage
 					Party[i]:ShowFaceAnimation(24)
 				end
+			elseif skill=="Swapper" then	
+				t.Result=0
+				Game.ShowStatusText("*Swap*")
+				Party.X, Party.Y, Party.Z, data.Monster.X, data.Monster.Y, data.Monster.Z = data.Monster.X, data.Monster.Y, data.Monster.Z, Party.X, Party.Y, Party.Z
+				Party.Direction, data.Monster.Direction=data.Monster.Direction, Party.Direction
 			end
 		end
 	end
@@ -1626,21 +1631,45 @@ function events.GameInitialized2() --to make the after all the other code
 	--on damage taken
 	function events.CalcDamageToMonster(t)
 		if t.Monster.NameId>220 then
-			skill = string.match(Game.PlaceMonTxt[t.Monster.NameId], "([^%s]+)")
-			if skill=="Thorn" then
-				if t.DamageKind==4 then
-					evt.DamagePlayer{Player=t.Player, DamageType=t.DamageKind, Damage = t.Result}
+			if t.Player then
+				local id=t.Player:GetIndex()
+				for i=0,Party.High do
+					if Party[i]:GetIndex()==id then
+						index=i
+					end
 				end
-			elseif skill=="Reflecting" then
-				if t.DamageKind~=4 then
-					evt.DamagePlayer{Player=t.Player, DamageType=t.DamageKind, Damage = t.Result}
+				skill = string.match(Game.PlaceMonTxt[t.Monster.NameId], "([^%s]+)")
+				if skill=="Thorn" then
+					if t.DamageKind==4 then
+						evt.DamagePlayer{Player=Party[index], DamageType=t.DamageKind, Damage = t.Result*4}
+					end
+				elseif skill=="Reflecting" then
+					if t.DamageKind~=4 then
+						evt.DamagePlayer{Player=Party[index], DamageType=t.DamageKind, Damage = t.Result*4}
+					end
+				elseif skill=="Adamantite" then
+					t.Result=math.round(math.max(t.Result-t.Monster.Level^1.15,t.Result/10))
+				elseif skill=="Swapper" then
+					for i=0,Map.Monsters.High do
+						mon=Map.Monsters[i]
+						if mon.HP>0 and (mon.NameId<220 or mon.NameId>300) then
+							t.Result=0
+							Game.ShowStatusText("*Swap*")
+							mon.X, mon.Y, mon.Z, t.Monster.X, t.Monster.Y, t.Monster.Z = t.Monster.X, t.Monster.Y, t.Monster.Z, mon.X, mon.Y, mon.Z
+						end
+					end
+				elseif skill=="Regenerating" then
+					id=t.Monster:GetIndex()
+					mapvars.regenerating=mapvars.regenerating or {}
+					mapvars.regenerating[id] = mapvars.regenerating[id] or 0
+					mapvars.regenerating[id] = mapvars.regenerating[id] + 1
+					if t.Result>t.Monster.HP then
+						mapvars.regenerating[id]=-1
+					end
 				end
-			elseif skill=="Adamantite" then
-				t.Result=math.round(math.max(t.Result-t.Monster.Level^1.15,t.Result/10))
 			end
 		end
 	end
-
 end
 function calcDices(add,sides,count, mult, bonusDamage)
 	local bonusDamage=bonusDamage or 0
@@ -1692,4 +1721,20 @@ function events.LoadMap(wasInGame)
 	end
 
 	Timer(checkOutOfBound, const.Minute) 
+end
+
+--regenerating skill
+function eliteRegen()
+	if mapvars.regenerating then
+		for key, value in pairs(mapvars.regenerating) do	
+			if value>0 then
+				mon=Map.Monsters[key]
+				mon.HP=mon.HP+mon.FullHitPoints*0.01*0.99^value
+			end
+		end
+	end
+end
+
+function events.LoadMap(wasInGame)
+	Timer(eliteRegen, const.Minute/20) 
 end
