@@ -296,8 +296,9 @@ function events.LoadMap()
 		else
 			levelMult=Game.MonstersTxt[i].Level
 		end
-		
-		bonusDamage=math.max(((levelMult-LevelB)*2)^0.88,0)
+
+		bonusDamage=math.max((levelMult-LevelB)*0.5,0)
+		--bonusDamage=math.max(((levelMult-LevelB)*2)^0.88,0)
 		if bonusDamage>=20 then
 			levelMult=Game.MonstersTxt[i].Level
 		end
