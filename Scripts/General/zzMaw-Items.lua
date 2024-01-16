@@ -1188,7 +1188,7 @@ end
 
 function replaceNumber(match)
 	lvl=Party[Game.CurrentPlayer].LevelBase
-	lvl=math.max(math.min(lvl/100,2.5),0.5)
+	lvl=math.max(math.min(lvl/80,3),0.5)
     num = tonumber(match)
     if num then
         return tostring(math.round(num * lvl))
@@ -1203,35 +1203,23 @@ end
 function events.BuildItemInformationBox(t)
 	if (t.Item.Number>=500 and t.Item.Number<=543) or (t.Item.Number>=1302 and t.Item.Number<=1354) or (t.Item.Number>=2020 and t.Item.Number<=2049) then 
 		if t.Type then
+			local artifactMult=math.max(math.min(Party[Game.CurrentPlayer].LevelBase/80,3),0.5)
 			local txt=Game.ItemsTxt[t.Item.Number]
-			local ac=math.ceil((txt.Mod2+txt.Mod1DiceCount)*math.max(math.min(Party[Game.CurrentPlayer].LevelBase/100,2.5),0.5))
+			local ac=math.ceil((txt.Mod2+txt.Mod1DiceCount)*artifactMult)
 			if ac>0 then 			
 				t.BasicStat= "Armor: +" .. ac
 			end
 			--WEAPONS
 			local equipStat=txt.EquipStat
 			if equipStat<=2 then
-				local bonus=math.ceil((txt.Mod2)*math.max(math.min(Party[Game.CurrentPlayer].LevelBase/100,2.5),0.5))
-				local sides=math.ceil((txt.Mod1DiceSides)*math.max(math.min(Party[Game.CurrentPlayer].LevelBase/100,2.5),0.5))
+				local bonus=math.ceil(txt.Mod2*artifactMult)
+				local sides=math.ceil(txt.Mod1DiceSides*artifactMult)
 				t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " ..  txt.Mod1DiceCount .. "d" .. sides .. "+" .. bonus
 			end
 		end
 	end
 end
---increase artifact ac
-function events.CalcStatBonusByItems(t)
-	if t.Stat==const.Stats.ArmorClass then
-		for it in t.Player:EnumActiveItems() do 
-			if (it.Number>=500 and it.Number<=543) or (it.Number>=1302 and it.Number<=1354) or (it.Number>=2020 and it.Number<=2049) then 
-				local txt=Game.ItemsTxt[it.Number]
-				c=txt.EquipStat
-				if c>2 then
-					t.Result=t.Result-(txt.Mod2+txt.Mod1DiceCount)+math.ceil((txt.Mod2+txt.Mod1DiceCount)*math.max(math.min(t.Player.LevelBase/100,2.5),0.5))
-				end
-			end
-		end
-	end
-end
+
 --increase artifact damage tooltip
 function events.CalcStatBonusByItems(t)
 	local cs = const.Stats
@@ -1999,12 +1987,17 @@ function itemStats(index)
 				local ac2=referenceAC[it.Number]
 				local bonusAC=ac2*(it.MaxCharges/20)
 				if it.MaxCharges <= 20 then
-					ac=ac+math.round(bonusAC)
+					acBonus=ac+math.round(bonusAC)
 				else
-					ac=ac+math.round((ac+ac2)*(it.MaxCharges/20))
+					acBonus=ac+math.round((ac+ac2)*(it.MaxCharges/20))
 				end
 			end
-			tab[10]=tab[10]+ac
+			--artifacts
+			if (it.Number>=500 and it.Number<=543) or (it.Number>=1302 and it.Number<=1354) or (it.Number>=2020 and it.Number<=2049) then 
+				artifactMult=math.min(math.max(pl.LevelBase/80,0.5),3)
+				acBonus=math.ceil(acBonus*artifactMult)
+			end
+			tab[10]=tab[10]+acBonus
 		end
 		--weapons
 		if txt.Skill <= 5 then
@@ -2030,6 +2023,14 @@ function itemStats(index)
 			end
 			sidesBonus = sides + math.round(sidesBonus)
 			
+			if (it.Number>=500 and it.Number<=543) or (it.Number>=1302 and it.Number<=1354) or (it.Number>=2020 and it.Number<=2049) then 
+				if txt.EquipStat<=1 then
+					artifactMult=math.min(math.max(pl.LevelBase/80,0.5),3)
+					bonus=math.ceil(txt.Mod2*artifactMult)
+					sidesBonus=math.ceil(txt.Mod1DiceSides*artifactMult)
+				end
+			end	
+			
 			if txt.Skill ~= 5 then
 				tab[40] = tab[40] + math.round(bonus)
 				tab[41] = tab[41] + math.round(bonus)
@@ -2051,12 +2052,12 @@ function itemStats(index)
 			tab[it.Bonus2]= 5 +  math.floor(it.MaxCharges/4)
 		end
 		--artifacts stats bonus
+		
 		if artifactStatsBonus[it.Number] then
 			for key,value in pairs(artifactStatsBonus[it.Number]) do
-				tab[key+1]=tab[key+1]+value*math.min(math.max(pl.LevelBase/80,0.5),3)
+				tab[key+1]=tab[key+1]+value*artifactMult
 			end
 		end
-		
 	end	
 	--------------
 	--end of items
