@@ -138,30 +138,6 @@ vars.MM8LVL=0
 vars.MMMLVL=0
 end
 
---[[
-function events.LeaveMap()
-	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
-	Exp=Party[0].Experience
-	if currentWorld==1 then
-		currentExp=calcLevel(Exp)
-		vars.MM8LVL=vars.MM8LVL+currentExp-vars.LVLBEFORE
-		vars.LVLBEFORE=currentExp
-	elseif currentWorld==2 then
-		currentExp=calcLevel(Exp)
-		vars.MM7LVL=vars.MM7LVL+currentExp-vars.LVLBEFORE
-		vars.LVLBEFORE=currentExp
-	elseif currentWorld==3 then
-		currentExp=calcLevel(Exp)
-		vars.MM6LVL=vars.MM6LVL+currentExp-vars.LVLBEFORE
-		vars.LVLBEFORE=currentExp
-	elseif currentWorld==4 then
-		currentExp=calcLevel(Exp)
-		vars.MMMLVL=vars.MMMLVL+currentExp-vars.LVLBEFORE
-		vars.LVLBEFORE=currentExp
-	end
-end
-]]
-
 function events.LoadMap()
 	vars.EXPBEFORE=vars.EXPBEFORE or calcExp(vars.LVLBEFORE or 1) --for working retroactively
 end
@@ -1641,11 +1617,11 @@ function events.GameInitialized2() --to make the after all the other code
 				skill = string.match(Game.PlaceMonTxt[t.Monster.NameId], "([^%s]+)")
 				if skill=="Thorn" then
 					if t.DamageKind==4 then
-						evt.DamagePlayer{Player=Party[index], DamageType=t.DamageKind, Damage = t.Result*4}
+						Party[index]:DoDamage(t.Result*2,4) 
 					end
 				elseif skill=="Reflecting" then
 					if t.DamageKind~=4 then
-						evt.DamagePlayer{Player=Party[index], DamageType=t.DamageKind, Damage = t.Result*4}
+						Party[index]:DoDamage(t.Result*2,4) 
 					end
 				elseif skill=="Adamantite" then
 					t.Result=math.round(math.max(t.Result-t.Monster.Level^1.15,t.Result/10))
