@@ -608,14 +608,14 @@ function events.CalcDamageToPlayer(t)
 			end
 			mapLevel=bolster+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
 			--trap and objects multiplier
-			mult=(mapLevel/12+1)*(3+mapLevel/85)
+			mult=(mapLevel/20+1)*(3+mapLevel/85)
 			if data and data.Object and data.Object.SpellType==15 then 
 				bonusDamage=mapLevel/24
 			else
 				bonusDamage=mapLevel/8
 			end
 			damage=(t.Damage+bonusDamage)*mult
-			t.Result=calcMawDamage(t.Player,t.DamageKind,damage,true)
+			t.Result=calcMawDamage(t.Player,t.DamageKind,damage)
 		end
 	end
 end
