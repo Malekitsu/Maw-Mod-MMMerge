@@ -242,7 +242,7 @@ function events.LoadMap()
 		mon.Level=math.min(mon.Level+extraBolster,255)
 		
 		--HP
-		HPBolsterLevel=basetable[i].Level*(1+(0.25*(bolsterLevel+extraBolster)/100))+(bolsterLevel+extraBolster)*0.75
+		HPBolsterLevel=basetable[i].Level*(1+(0.1*(bolsterLevel+extraBolster)/100))+(bolsterLevel+extraBolster)*0.9
 		mon.HP=math.min(math.round(HPBolsterLevel*(HPBolsterLevel/10+3)*2),32500)
 		if ItemRework and StatsRework then
 			mon.HP=math.min(math.round(mon.HP*(1+HPBolsterLevel/180),32500))
@@ -304,7 +304,7 @@ function events.LoadMap()
 		
 		mon.ArmorClass=base.ArmorClass*((levelMult+10)/(LevelB+10))
 		
-		dmgMult=(levelMult/9+1.15)
+		dmgMult=(levelMult/9+1.15)*((levelMult+10)/(LevelB+10))
 		--DAMAGE COMPUTATION
 		atk1=base.Attack1
 		mon.Attack1.DamageAdd, mon.Attack1.DamageDiceSides, mon.Attack1.DamageDiceCount = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult,bonusDamage)
