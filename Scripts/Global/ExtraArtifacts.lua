@@ -1,3 +1,5 @@
+
+
 local min, max, floor, ceil, random = math.min, math.max, math.floor, math.ceil, math.random
 local PlayerEffects		= {}
 local ArtifactBonuses	= {}
@@ -130,16 +132,16 @@ function events.CanWearItem(t)
 end
 
 -- Stat bonuses
-
+--[[
 function events.CalcStatBonusByItems(t)
 	local PLT = PlayerEffects[t.Player]
 	if PLT then
-		t.Result = t.Result + (PLT.Stats[t.Stat] or 0)*math.max((math.min(t.Player.LevelBase/100,2.5)),0.5)
+		t.Result = t.Result + (PLT.Stats[t.Stat] or 0)*math.max((math.min(t.Player.LevelBase/100+1,3.5)),1.5)
 	elseif Game.CurrentScreen == AdvInnScreen or PlayerInParty(t.PlayerIndex) then
 		StoreEffects(t.Player)
 	end
 end
-
+]]
 -- Skill bonuses
 
 function events.GetSkill(t)
@@ -1224,7 +1226,7 @@ OnHitEffects[1312] = {
 -- Old Nick
 OnHitEffects[1319] = {
 	DamageKind 	= const.Damage.Water,
-	Add			= 8,
+	Add			= 36,
 	Special = function(t)
 		if Game.Bolster.Monsters[t.Monster.Id].Type == const.MonsterKind.Elf then
 			t.Result = t.Result*2
@@ -1390,7 +1392,7 @@ artBon[536]	= {	[const.Stats.Luck]				= 90,
 artBon[537]	= {	[const.Stats.Might]				= 100,
 				[const.Stats.Accuracy]			= -30,
 				[const.Stats.ArmorClass]		= -15}		
-
+--[[
 function events.CalcStatBonusByItems(t)
 	for it in t.Player:EnumActiveItems() do
 		if it.Number>=500 and it.Number <=537 and it.Number~=521 then
@@ -1400,7 +1402,7 @@ function events.CalcStatBonusByItems(t)
 		end
 	end
 end
-
+]]
 artSkill={}
 artSkill[502] =	{	[const.Skills.Armsmaster] 	= 7}
 artSkill[512] =	{	[const.Skills.Bow] 			= 4}
