@@ -297,14 +297,14 @@ function events.LoadMap()
 			levelMult=Game.MonstersTxt[i].Level
 		end
 		
-		bonusDamage=math.max((levelMult-LevelB)*0.5,0)
+		bonusDamage=math.max((levelMult-LevelB*0.5),0)
 		if bonusDamage>=20 then
 			levelMult=Game.MonstersTxt[i].Level
 		end
 		
 		mon.ArmorClass=base.ArmorClass*((levelMult+10)/(LevelB+10))
 		
-		dmgMult=(levelMult/9+1.15)*((levelMult+10)/(LevelB+10))
+		dmgMult=(levelMult/9+1.15)
 		--DAMAGE COMPUTATION
 		atk1=base.Attack1
 		mon.Attack1.DamageAdd, mon.Attack1.DamageDiceSides, mon.Attack1.DamageDiceCount = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult,bonusDamage)
