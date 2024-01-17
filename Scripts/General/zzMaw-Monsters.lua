@@ -243,19 +243,24 @@ function events.LoadMap()
 		
 		--HP
 		HPBolsterLevel=basetable[i].Level*(1+(0.1*(bolsterLevel+extraBolster)/100))+(bolsterLevel+extraBolster)*0.9
-		mon.HP=math.min(math.round(HPBolsterLevel*(HPBolsterLevel/10+3)*2),32500)
-		if ItemRework and StatsRework then
-			mon.HP=math.min(math.round(mon.HP*(1+HPBolsterLevel/180),32500))
+		HP=HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180)
+		hpOvercap=0
+		while HP>32500 do
+			HP=math.round(HP/2)
+			hpOvercap=hpOvercap+1
 		end
+		
+		mon.HP=HP
 		mon.FullHP=mon.HP
 		
 		--resistances 
 		bolsterRes=math.max(math.round((mon.Level-basetable[i].Level)/2),0)
 		for v=0,10 do
 			if v~=5 then
-			mon.Resistances[v]=math.min(bolsterRes+basetable[i].Resistances[v],bolsterRes+200)	
+			mon.Resistances[v]=math.min(bolsterRes+basetable[i].Resistances[v],bolsterRes+200)
 			end
 		end
+		mon.Resistances[0]=mon.Resistances[0]+hpOvercap*1000
 		
 		--experience
 		mon.Experience = math.round(mon.Level^1.7+mon.Level*20)
@@ -1232,7 +1237,7 @@ function events.KeyUp(t)
 end
 --monster tooltips
 function events.BuildMonsterInformationBox(t)
-	mon = t.Monster
+	--mon = t.Monster
 	mon=Map.Monsters[Mouse:GetTarget().Index]
 	--show level Below HP
 	t.ArmorClass.Text=string.format("Level:         " .. mon.Level .. "\n" .. "58992Armor Class0000000000	100?")
@@ -1299,10 +1304,17 @@ function events.BuildMonsterInformationBox(t)
 			upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit))
 		end
 		t.SpellFirst.Text=string.format("Spell00000	040" .. name .. " " .. lowerLimit .. "-" .. upperLimit)
-		
+	end
+	
+	if mon.Resistances[0]>=1000 then
+		res=mon.Resistances[0]%1000
+		t.Resistances[1].Text=string.format("Fire\01200000	070" .. res)
+		hp=t.Monster.FullHP*2^math.floor(mon.Resistances[0]/1000)
+		t.HitPoints.Text=string.format("02016Hit Points0000000000	100" .. hp)
 		
 	end
 end
+
 
 --disable bolster
 function events.LoadMap()
