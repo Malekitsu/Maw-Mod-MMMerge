@@ -2071,6 +2071,7 @@ function itemStats(index)
 		end
 	end
 	--nightmare and bolster
+	--[[
 	currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
 	if currentWorld==1 then
 		partyLevel=vars.MM7LVL+vars.MM6LVL
@@ -2100,6 +2101,7 @@ function itemStats(index)
 		penaltyLevel=math.max(partyLevel-30,0)
 		penalty=penalty+math.min(penaltyLevel,100)
 	end
+	]]
 	--add luck to resistances
 	local luck=tab[7]+pl.LuckBase+pl.LuckBonus
 	if luck<=21 then
@@ -2111,7 +2113,7 @@ function itemStats(index)
 	end
 	
 	for i=11, 16 do
-		tab[i]=tab[i]-penalty+luck
+		tab[i]=tab[i]+luck -- -penalty
 	end	
 	--BB HP INCREASE
 	local endurance=tab[4]+pl.EnduranceBase+pl.EnduranceBonus+Party.SpellBuffs[2].Power
