@@ -35,7 +35,7 @@ function events.AfterLoadMap()
 			Map.Monsters[i].SpellSkill=Map.Monsters[i].SpellSkill%64
 		end
 		--resistances 
-		bolsterRes=math.max(math.round((Map.Monsters[i].Level-basetable[Map.Monsters[i].Id].Level)/18)*5,0)
+		bolsterRes=math.max(math.round((Map.Monsters[i].Level-basetable[Map.Monsters[i].Id].Level)/2),0)
 		for v=0,10 do
 			if v~=5 then
 			Map.Monsters[i].Resistances[v]=math.min(bolsterRes+basetable[Map.Monsters[i].Id].Resistances[v],bolsterRes+200)	
@@ -69,7 +69,7 @@ function events.AfterLoadMap()
 				mon.HP=math.min(math.round(HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180))*HPRateo,32500)
 				mon.FullHP=mon.HP
 				--damage
-				dmgMult=(mon.Level/9+1.15)*((mon.Level+2)/(oldLevel+2))
+				dmgMult=(mon.Level/12+1.15)*((mon.Level+2)/(oldLevel+2))*(1+(mon.Level/100)^1.3)
 				atk1=mon.Attack1
 				atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult)
 				atk2=mon.Attack2
@@ -250,7 +250,7 @@ function events.LoadMap()
 		mon.FullHP=mon.HP
 		
 		--resistances 
-		bolsterRes=math.max(math.round((mon.Level-basetable[i].Level)/18)*5,0)
+		bolsterRes=math.max(math.round((mon.Level-basetable[i].Level)/2),0)
 		for v=0,10 do
 			if v~=5 then
 			mon.Resistances[v]=math.min(bolsterRes+basetable[i].Resistances[v],bolsterRes+200)	
@@ -296,16 +296,15 @@ function events.LoadMap()
 		else
 			levelMult=Game.MonstersTxt[i].Level
 		end
-
-		bonusDamage=math.max((levelMult-LevelB)*0.5,0)
-		--bonusDamage=math.max(((levelMult-LevelB)*2)^0.88,0)
+		
+		bonusDamage=math.max((levelMult-LevelB)^0.88,0)
 		if bonusDamage>=20 then
 			levelMult=Game.MonstersTxt[i].Level
 		end
 		
 		mon.ArmorClass=base.ArmorClass*((levelMult+10)/(LevelB+10))
 		
-		dmgMult=(levelMult/9+1.15)
+		dmgMult=(levelMult/12+1.15)*(1+(levelMult/100)^1.3)
 		--DAMAGE COMPUTATION
 		atk1=base.Attack1
 		mon.Attack1.DamageAdd, mon.Attack1.DamageDiceSides, mon.Attack1.DamageDiceCount = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult,bonusDamage)
