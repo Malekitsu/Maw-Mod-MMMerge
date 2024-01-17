@@ -78,6 +78,9 @@ function events.AfterLoadMap()
 			end
 		end
 	end	
+	
+	--rebolster current monsters according to monsterstxt
+	recalculateMawMonster()
 end
 
 
@@ -127,6 +130,58 @@ function events.GameInitialized2()
 		end
 	end
 end
+
+function recalculateMawMonster()
+	mult=1
+	--easy
+	if Game.BolsterAmount==50 then
+		mult=0.7
+	end
+	--MAW
+	if Game.BolsterAmount==100 then
+		mult=1
+	end
+	--Hard
+	if Game.BolsterAmount==150 then
+		mult=1.4
+	end
+	--Hell
+	if Game.BolsterAmount==200 then
+		mult=1.8
+	end
+	
+	for i=0, Map.Monsters.High do
+		local mon=Map.Monsters[i]
+		--Nightmare
+		if Game.BolsterAmount==300 then
+			mult=(3+mon.Level/100)
+		end
+		if mon.NameId==0 then
+			local txt=Game.MonstersTxt[mon.Id]
+			for v=0,10 do
+				if v~=5 then
+					mon.Resistances[v]=	txt.Resistances[v]
+				end
+			end
+			local currentHPPercentage=mon.HP/mon.FullHitPoints
+			hp=txt.FullHitPoints*mult
+			hpOvercap=0
+			while hp>32500 do
+				hp=math.round(hp/2)
+				hpOvercap=hpOvercap+1
+			end
+			mon.Resistances[0]=mon.Resistances[0]+hpOvercap*1000
+			mon.FullHitPoints=hp
+			mon.HP=mon.FullHitPoints*currentHPPercentage
+			mon.Attack1.DamageAdd, mon.Attack1.DamageDiceSides, mon.Attack1.DamageDiceCount = txt.Attack1.DamageAdd, txt.Attack1.DamageDiceSides, txt.Attack1.DamageDiceCount
+			mon.Attack2.DamageAdd, mon.Attack2.DamageDiceSides, mon.Attack2.DamageDiceCount = txt.Attack2.DamageAdd, txt.Attack2.DamageDiceSides, txt.Attack2.DamageDiceCount
+			mon.Level=txt.Level
+			
+			mon.Experience=txt.Experience
+		end
+	end
+end
+
 
 --MONSTER BOLSTERING
 function events.BeforeNewGameAutosave()
