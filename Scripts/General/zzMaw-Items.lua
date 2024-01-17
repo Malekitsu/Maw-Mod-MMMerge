@@ -1917,6 +1917,17 @@ function events.CalcStatBonusByItems(t)
 	end
 end
 
+--get artifacts Skills
+function events.GetSkill(t)
+	if t.Skill<=38 then
+		local bonus=0
+		if plItemsStats[t.PlayerIndex] and plItemsStats[t.PlayerIndex][t.Skill+50] then
+			bonus = plItemsStats[t.PlayerIndex][t.Skill+50]
+		end
+		s,m=SplitSkill(t.Player.Skills[t.Skill])
+		t.Result=math.max(t.Result,bonus+JoinSkill(s,m))
+	end
+end
 
 function events.GameInitialized2()
 	--weapons and armors
@@ -2077,6 +2088,14 @@ function itemStats(index)
 			artifactMult=math.min(math.max(pl.LevelBase/80,0.5),3)
 			for key,value in pairs(artifactStatsBonus[it.Number]) do
 				tab[key+1]=tab[key+1]+value*artifactMult
+			end
+		end
+		--artifacts skill bonuses
+		if artifactSkillBonus[it.Number] then
+			artifactMult=math.min(math.max(pl.LevelBase/80,0.5),3)
+			for key,value in pairs(artifactSkillBonus[it.Number]) do
+				tab[key+50]=tab[key+50] or 0
+				tab[key+50]=tab[key+50]+value*artifactMult
 			end
 		end
 	end	
@@ -2587,21 +2606,6 @@ artifactSkillBonus[2030] =	{	[const.Skills.Stealing] = 10,
 -- Hades
 artifactSkillBonus[2035] =	{	[const.Skills.DisarmTraps] = 10}
 
---get artifacts Skills
-function events.GetSkill(t)
-	if t.Skill<=38 then
-		local bonus=0
-		for it in t.Player:EnumActiveItems() do
-			if artifactSkillBonus[it.Number] and artifactSkillBonus[it.Number][t.Skill] then
-				bonus = math.max(bonus, artifactSkillBonus[it.Number][t.Skill])
-			end
-		end
-		local mult=math.min(math.max(t.Player.LevelBase/80,0,5),3)
-		bonus=bonus*mult
-		s,m=SplitSkill(t.Player.Skills[t.Skill])
-		t.Result=math.max(t.Result,bonus+JoinSkill(s,m))
-	end
-end
 --refresh stats
 function events.AfterLoadMap()
 	mawRefresh("all")
