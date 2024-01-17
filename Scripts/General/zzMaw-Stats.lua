@@ -899,9 +899,9 @@ function events.GameInitialized2()
 			function events.Tick() 
 				events.Remove("Tick", 1)
 				if shoot=="shoots" then
-				msg=string.format("%s shoots %s for %s points!", name, MSGdamage, MSGdamage)
+				msg=string.format("%s shoots %s for %s points!", name, monName, MSGdamage)
 				else
-					msg=string.format("%s hits %s for %s points!", name, MSGdamage, MSGdamage)
+					msg=string.format("%s hits %s for %s points!", name, monName, MSGdamage)
 				end
 				if t.Result>t.Monster.HP then
 					msg=string.format("%s inflicts %s points killing %s!", name, MSGdamage, monName)
