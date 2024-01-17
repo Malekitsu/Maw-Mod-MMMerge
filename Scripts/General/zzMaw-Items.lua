@@ -242,6 +242,9 @@ function events.ItemGenerated(t)
 		ps1=t.Strength
 
 		pseudoStr=ps1+partyLevel1
+		if bossLoot then
+			pseudoStr=pseudoStr+2
+		end
 		if math.random(1,18)<partyLevel1%18 then
 			pseudoStr=pseudoStr+1
 		end
@@ -253,6 +256,12 @@ function events.ItemGenerated(t)
 		roll2=math.random(1,100)
 		rollSpc=math.random(1,100)
 		power=0
+		if bossLoot then
+			roll1=roll1/2.5
+			roll2=roll1/2.5
+			rollSpc=roll1/2.5
+			bossLoot=false
+		end
 		--apply enchant1
 		if enc1Chance[pseudoStr]>roll1 then
 			t.Item.Bonus=math.random(1,16)
@@ -283,6 +292,7 @@ function events.ItemGenerated(t)
 		--ancient item
 		ancient=false
 		ancientChance=(enc1Chance[pseudoStr]/100)*(enc2Chance[pseudoStr]/100)*(spcEncChance[pseudoStr]/100)/4
+		
 		--INCREASE ANCIENT AND PRIMORDIAL CHANCE IN SHOPS BASED ON MONEY
 		if Game.HouseScreen==2 or Game.HouseScreen==95 then
 			ancientChance=ancientChance*math.min(1+(Party.Gold+Party.BankGold)/1000000,5)
@@ -296,6 +306,7 @@ function events.ItemGenerated(t)
 			power=2
 			chargesBonus=math.random(1,5)
 			t.Item.MaxCharges=t.Item.MaxCharges+chargesBonus
+			math.max(t.Item.MaxCharges*(chargesBonus/20)+chargesBonus, t.Item.MaxCharges*(1+chargesBonus))
 			t.Item.BonusExpireTime=1
 		end
 		--apply special enchant
@@ -329,10 +340,10 @@ function events.ItemGenerated(t)
 				t.Item.MaxCharges=t.Item.MaxCharges-chargesBonus
 			end
 			t.Item.BonusExpireTime=2
-			t.Item.Charges=math.round(encStrUp[pseudoStr]*1.25)*difficultyExtraPower+math.random(1,16)*1000
+			t.Item.Charges=math.ceil(encStrUp[pseudoStr]*1.25)*difficultyExtraPower+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.round(encStrUp[pseudoStr]*1.25)*difficultyExtraPower
-			t.Item.MaxCharges=t.Item.MaxCharges+5
+			t.Item.BonusStrength=math.ceil(encStrUp[pseudoStr]*1.25)*difficultyExtraPower
+			t.Item.MaxCharges=math.max(t.Item.MaxCharges*0.25+5, t.Item.MaxCharges*1.25)
 			--apply special enchant
 			n=t.Item.Number
 			c=Game.ItemsTxt[n].EquipStat
