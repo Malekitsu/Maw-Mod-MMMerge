@@ -703,30 +703,7 @@ function events.CalcDamageToMonster(t)
 			t.Result=math.round(t.Result*recoveryBonus/233)
 		end
 	end
-	--difficulty setting
-	if Game.BolsterAmount%50~=0 or Game.BolsterAmount==0 then
-		Game.BolsterAmount=100
-	end
-	--easy
-	if Game.BolsterAmount==50 then
-		t.Result=t.Result*1.5
-	end
-	--MAW
-	if Game.BolsterAmount==100 then
-		t.Result=t.Result*1
-	end
-	--Hard
-	if Game.BolsterAmount==150 then
-		t.Result=t.Result/1.4
-	end
-	--Hell
-	if Game.BolsterAmount==200 then
-		t.Result=t.Result/1.8
-	end
-	--Nightmare
-	if Game.BolsterAmount==300 then
-		t.Result=t.Result/(3+t.Monster.Level/50)
-	end
+	
 	index=table.find(damageKindMap,t.DamageKind)
 	res=t.Monster.Resistances[index]
 	if not res then return end
