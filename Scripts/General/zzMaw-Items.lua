@@ -1641,7 +1641,8 @@ function events.BuildItemInformationBox(t)
 			fullHP=Party[i]:GetFullHP()
 			--AC
 			ac=Party[i]:GetArmorClass()
-			acReduction=1-1/(ac/300+1)
+			local lvl=math.min(Party[i].LevelBase,200)
+			local acReduction=1-1/2^(ac/(200+lvl))
 			lvl=math.min(Party[i].LevelBase, 255)
 			blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 			ACRed= 1 - (1-blockChance)*(1-acReduction)
@@ -1664,8 +1665,9 @@ function events.BuildItemInformationBox(t)
 				[6]=math.min(Party[i]:GetResistance(15),400),
 			}
 			res[7]=math.min(res[1],res[2],res[3],res[4],res[5],res[6])
+			local lvl=math.min(Party[i].LevelBase/1.6,125)
 			for i=1,7 do 
-				res[i]=1-1/2^(res[i]/100)
+				res[i]=1-1/2^(res[i]/(75+lvl))
 			end
 			--calculation
 			local reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
@@ -1736,7 +1738,8 @@ function events.BuildItemInformationBox(t)
 			newSpeedEff=newSpeedEff-oldSpeedEff
 			
 			ac=ac+newAC+newSpeedEff
-			acReduction=1-1/(ac/300+1)
+			local lvl=math.min(Party[i].LevelBase,200)
+			local acReduction=1-1/2^(ac/(200+lvl))
 			lvl=math.min(Party[i].LevelBase, 255)
 			blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 			ACRed= 1 - (1-blockChance)*(1-acReduction)
@@ -1777,9 +1780,11 @@ function events.BuildItemInformationBox(t)
 				[6]=math.min(Party[i]:GetResistance(15)+newBody+luckChanged,400),
 			}
 			res[7]=math.min(res[1],res[2],res[3],res[4],res[5],res[6])
+			local lvl=math.min(Party[i].LevelBase/1.6,125)
 			for i=1,7 do 
-				res[i]=1-1/2^(res[i]/100)
+				res[i]=1-1/2^(res[i]/(75+lvl))
 			end
+			
 			--calculation
 			reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
 			vitality=math.round(vitality/reduction)	
