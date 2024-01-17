@@ -740,7 +740,7 @@ function events.GameInitialized2()
 			if i==123 then 
 				manaCost=60
 			end
-			local theoreticalDamage80=manaCost^0.5*2.5
+			local theoreticalDamage80=manaCost^0.6*1.6
 			--scale new values according to original differences
 			local dmgAdd80=math.round(theoreticalDamage80*dmgAddProportion)
 			if spellPowers[i].diceMax==spellPowers[i].diceMin then
