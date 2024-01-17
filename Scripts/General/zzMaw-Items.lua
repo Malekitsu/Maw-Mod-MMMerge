@@ -33,14 +33,18 @@ end
 function events.PickCorpse(t)
 	if Game.BolsterAmount~=300 then return end
 	Game.RandSeed=mapvars.MonsterSeed[t.MonsterIndex]
-	Sleep(1)
-	mapvars.MonsterSeed[t.MonsterIndex]=Game.RandSeed
+	function events.Tick() 
+		events.Remove("Tick", 1)
+		mapvars.MonsterSeed[t.MonsterIndex]=Game.RandSeed
+	end
 end
 function events.CastTelepathy(t)
 	if Game.BolsterAmount~=300 then return end
 	Game.RandSeed=mapvars.MonsterSeed[t.MonsterIndex]
-	Sleep(1)
-	mapvars.MonsterSeed[t.MonsterIndex]=Game.RandSeed
+	function events.Tick() 
+		events.Remove("Tick", 1)
+		mapvars.MonsterSeed[t.MonsterIndex]=Game.RandSeed
+	end
 end
 function events.LoadMap()
 	if Game.BolsterAmount~=300 then return end
@@ -229,7 +233,8 @@ function events.ItemGenerated(t)
 		bonusCharges=(difficultyExtraPower-1)*20
 		cap1=50*difficultyExtraPower+bonusCharges
 		t.Item.MaxCharges=math.min(math.floor(partyLevel/5),cap1)
-		t.Item.MaxCharges=math.max(t.Item.MaxCharges+bonusCharges, t.Item.MaxCharges*difficultyExtraPower)
+		--bolster boost
+		t.Item.MaxCharges=math.max(t.Item.MaxCharges+bonusCharges+t.Item.MaxCharges*(difficultyExtraPower-1), t.Item.MaxCharges*difficultyExtraPower) 
 		
 		cap2=14+ math.floor((difficultyExtraPower-1)*5)
 		partyLevel1=math.min(math.floor(partyLevel/18),cap2)
