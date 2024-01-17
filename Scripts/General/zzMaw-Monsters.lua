@@ -1384,10 +1384,8 @@ function events.GameInitialized2()
 	Game.MapStats[i].RefillDays=-1
 	end
 	
-	--fix shots being blocked by monsters
-	Game.PatchOptions.FixMonstersBlockingShots=true
+	
 end
-
 --[[Naga
 function events.MonsterSpriteScale(t)
 	if t.Monster.FullHP>3205 then
@@ -1475,6 +1473,9 @@ function events.PickCorpse(t)
 	if t.Monster.NameId>300 then
 		t.Monster.TreasureItemPercent=t.Monster.TreasureItemPercent/4
 		t.Monster.TreasureDiceSides=math.round(t.Monster.TreasureDiceSides/4)
+	elseif t.Monster.NameId>220 then
+		TreasureItemPercent=100
+		bossLoot=true
 	end
 end
 --check for dungeon clear
@@ -1538,6 +1539,7 @@ function nightmare()
 			vars.trueNightmare=true
 			Game.BolsterAmount=300
 			Sleep(1)
+			recalculateMawMonster()
 			Message("Welcome to the Nightmare...\nGood luck.. you will need")
 		else
 			Sleep(1)
@@ -1606,7 +1608,7 @@ end
 
 function generateBoss(index,nameIndex)
 	mon=Map.Monsters[index]
-	HP=math.round(mon.FullHP*2+math.random()*2)
+	HP=math.round(mon.FullHP*2*(1+mon.Level/80)*(1+math.random()))
 	hpOvercap=0
 	while HP>32500 do
 		HP=math.round(HP/2)
@@ -1634,7 +1636,6 @@ function generateBoss(index,nameIndex)
 	Game.PlaceMonTxt[mon.NameId]=string.format(skill .. " " .. Game.MonstersTxt[mon.Id].Name)
 	
 	mapvars.bossNames[mon.NameId]=Game.PlaceMonTxt[mon.NameId]
-	--damage calculation, need to fix this shit
 	dmgMult=1.5+math.random()
 	atk1=mon.Attack1
 	atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult)
