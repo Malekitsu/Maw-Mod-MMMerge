@@ -214,26 +214,24 @@ function events.ItemGenerated(t)
 		
 		--difficulty settings
 		difficultyExtraPower=1
-		LevelBonus=0
 		if Game.BolsterAmount==150 then
 			difficultyExtraPower=1.1
-			levelBonus=10
 		elseif Game.BolsterAmount==200 then
-			difficultyExtraPower=1.2	
-			LevelBonus=20
+			difficultyExtraPower=1.2
 		elseif Game.BolsterAmount==300 then
-			difficultyExtraPower=1.4	
-			LevelBonus=40
+			difficultyExtraPower=1.4
 		end
 		if Game.HouseScreen==2 or Game.HouseScreen==95 then --nerf shops if no exp in current world
 			partyLevel=math.round(partyLevel*(math.min(partyLevel/160 + currentLevel/80,1)))
 		end
-		partyLevel=partyLevel+(LevelBonus*math.min((currentLevel/54),1))
 		
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
-		cap1=50+LevelBonus/5
+		bonusCharges=(difficultyExtraPower-1)*20
+		cap1=50*difficultyExtraPower+bonusCharges
 		t.Item.MaxCharges=math.min(math.floor(partyLevel/5),cap1)
-		cap2=14+math.floor(LevelBonus/18)
+		t.Item.MaxCharges=math.max(t.Item.MaxCharges+bonusCharges, t.Item.MaxCharges*difficultyExtraPower)
+		
+		cap2=14+ math.floor((difficultyExtraPower-1)*5)
 		partyLevel1=math.min(math.floor(partyLevel/18),cap2)
 		--adjust loot Strength
 		ps1=t.Strength
