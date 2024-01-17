@@ -1287,7 +1287,7 @@ function events.BuildMonsterInformationBox(t)
 		else
 			levelMult=Game.MonstersTxt[i].Level
 		end
-		dmgMult=(levelMult/12+1)*((levelMult+10)/(oldLevel+10))
+		dmgMult=(levelMult/12+1)*((levelMult+10)/(oldLevel+10))*(1+(levelMult/100)^1.3)
 		
 		--calculate
 		mean=spell.DamageAdd+skill*(spell.DamageDiceSides+1)/2
