@@ -823,15 +823,15 @@ end
 --
 function events.GameInitialized2()
 	function events.CalcDamageToMonster(t)
-		MSGdamage=MSGdamage or 0
-		MSGdamage=MSGdamage+math.ceil(t.Result)
+		divide=1
 		if t.Monster.Resistances[0]>=1000 then
 			divide=2^math.floor(t.Monster.Resistances[0]/1000)
 			t.Result=t.Result/divide
 		end
-		if MSGdamage<1 then return end
 		data=WhoHitMonster()
 		if data and data.Player then
+			MSGdamage=MSGdamage or 0
+			MSGdamage=MSGdamage+math.ceil(t.Result)*divide
 			attackIsSpell=false
 			castedAoe=false
 			shoot="hits"
