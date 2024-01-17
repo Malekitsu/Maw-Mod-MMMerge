@@ -567,7 +567,7 @@ function events.CalcDamageToPlayer(t)
 		else
 			levelMult=Game.MonstersTxt[i].Level
 		end
-		dmgMult=(levelMult/12+1)*((levelMult+2)/(oldLevel+2))* 375/(375+mon.Level) --last one is due to the dodge nerf
+		dmgMult=(levelMult/12+1)*((levelMult+2)/(oldLevel+2))*(1+(levelMult/100)^1.3)
 		t.Result=t.Result*dmgMult
 	end
 
@@ -727,7 +727,7 @@ function events.CalcDamageToMonster(t)
 	res=t.Monster.Resistances[index]
 	if not res then return end
 	
-	res=1-1/2^(res/100)
+	res=1-1/2^(res%1000/100)
 	--randomize resistance
 	if res>0 then
 		--local roll=(math.random()+math.random())-1
@@ -773,28 +773,11 @@ end
 --crit message
 local hook, autohook, autohook2, asmpatch = mem.hook, mem.autohook, mem.autohook2, mem.asmpatch
 local u1, u2, u4, i1, i2, i4 = mem.u1, mem.u2, mem.u4, mem.i1, mem.i2, mem.i4
-local critAttackMsg = "%s critically hits %s for %lu damage!" .. string.char(0)
-local critShootMsg = "%s critically shoots %s for %lu points!" .. string.char(0)
-local critKillMsg = "%s critically inflicts %lu points killing %s!" .. string.char(0)
-
-local function isCrit()
-	if crit then
-		crit=false
-		return true
-	end
-end
-
-	
-local crit = false
-local function critProcHook(d)
-	crit = isCrit()
-end
-autohook2(0x43703F, critProcHook) -- shoot (ranged)
-autohook2(0x437148, critProcHook) -- spell
-autohook2(0x437243, critProcHook) -- melee attack
+local critAttackMsg = "" 
+local critShootMsg = "" 
+local critKillMsg = "" 
 
 autohook(0x4376AC, function(d)
-	if not crit then return end
 	local addr, result = u4[d.esp + 4]
 	if addr == u4[0x6016D8] then -- attack
 		result = mem.topointer(critAttackMsg)
@@ -854,3 +837,105 @@ function calcMawDamage(pl,damageKind,damage,rand)
 	local damage=math.round(damage/2^(res/100))
 	return damage
 end
+
+
+--
+function events.GameInitialized2()
+	function events.CalcDamageToMonster(t)
+		MSGdamage=MSGdamage or 0
+		MSGdamage=MSGdamage+math.ceil(t.Result)
+		if t.Monster.Resistances[0]>=1000 then
+			divide=2^math.floor(t.Monster.Resistances[0]/1000)
+			t.Result=t.Result/divide
+		end
+		if MSGdamage<1 then return end
+		data=WhoHitMonster()
+		if data and data.Player then
+			attackIsSpell=false
+			castedAoe=false
+			shoot="hits"
+			kill=""
+			critMessage= ""
+			if data.Object then 
+				if data.Object.SpellType>1 and data.Object.SpellType<133 then
+					name=Game.SpellsTxt[data.Object.SpellType].Name
+					attackIsSpell=true
+				else
+					name=t.Player.Name
+					shoot="shoots"
+				end
+			else
+				name=t.Player.Name
+			end
+			if t.Result>t.Monster.HP then
+				kill="killing"
+				shoot="inflicts"
+			end
+			if crit then
+				critMessage="critically"
+			end
+			if t.Monster.NameId>0 then
+				monName=Game.PlaceMonTxt[t.Monster.NameId]
+			else
+				monName=Game.MonstersTxt[t.Monster.Id].Name
+			end
+			
+			if crit then
+				name=string.format(name .. " critically")
+			end			
+			if shoot=="shoots" then
+				msg=string.format("%s shoots %s for %s points!", name, MSGdamage, monName)
+			else
+				msg=string.format("%s hits %s for %s points!", name, MSGdamage, monName)
+			end
+			if t.Result>t.Monster.HP then
+				msg=string.format("%s inflicts %s points killing %s!", name, MSGdamage, monName)
+			end
+			calls=calls or 0
+			calls=calls+1
+			if calls>=2 and attackIsSpell then
+				castedAoe=true
+			end
+			function events.Tick() 
+				events.Remove("Tick", 1)
+				if shoot=="shoots" then
+				msg=string.format("%s shoots %s for %s points!", name, MSGdamage, MSGdamage)
+				else
+					msg=string.format("%s hits %s for %s points!", name, MSGdamage, MSGdamage)
+				end
+				if t.Result>t.Monster.HP then
+					msg=string.format("%s inflicts %s points killing %s!", name, MSGdamage, monName)
+				end
+				if castedAoe then
+					msg=string.format("%s hits for a total of %s points!", name, MSGdamage)
+				end
+				Game.ShowStatusText(msg)
+				if calls>0 then
+					calls=calls-1
+				end
+				if calls==0 then
+					MSGdamage=0
+				end
+			end
+		end	
+	end
+
+end
+
+--[[
+	function events.CalcDamageToMonster(t)
+		data=WhoHitMonster()
+		if data and data.Player then
+			lastDamagingAttacker=lastDamagingAttacker or -1 
+			id=data.Player:GetIndex()
+			if lastDamagingAttacker~=id then
+				lastDamagingAttacker=id
+				MSGdamage=0
+			end
+			function events.Tick() 
+				events.Remove("Tick", 1)
+				if Game.CurrentPlayer==-1
+			end
+		end
+	end
+	]]
