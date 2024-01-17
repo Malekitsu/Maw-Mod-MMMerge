@@ -1243,9 +1243,9 @@ function events.CalcStatBonusByItems(t)
 				txt=Game.ItemsTxt[it.Number]
 				c=txt.EquipStat
 				if c<=1 then
-				t.Result=t.Result-txt.Mod2+math.ceil(txt.Mod2*math.max(math.min(t.Player.LevelBase/100,2.5),0.5))
+				t.Result=t.Result-txt.Mod2+math.ceil(txt.Mod2*math.max(math.min(t.Player.LevelBase/80,3),0.5))
 					if t.Stat==cs.MeleeDamageMax then
-						t.Result=t.Result-(txt.Mod1DiceCount*txt.Mod1DiceSides-txt.Mod1DiceCount)+(txt.Mod1DiceCount*txt.Mod1DiceSides*math.max(math.min(t.Player.LevelBase/100,2.5),0.5))
+						t.Result=t.Result-(txt.Mod1DiceCount*txt.Mod1DiceSides-txt.Mod1DiceCount)+(txt.Mod1DiceCount*txt.Mod1DiceSides*math.max(math.min(t.Player.LevelBase/80,3),0.5))
 					end
 				end
 			end	
@@ -1258,9 +1258,9 @@ function events.CalcStatBonusByItems(t)
 				txt=Game.ItemsTxt[it.Number]
 				c=txt.EquipStat
 				if c==2 then
-				t.Result=t.Result-txt.Mod2+math.ceil(txt.Mod2*math.max(math.min(t.Player.LevelBase/100,2.5),0.5))
+				t.Result=t.Result-txt.Mod2+math.ceil(txt.Mod2*math.max(math.min(t.Player.LevelBase/80,3),0.5))
 					if t.Stat==cs.RangedDamageMax then
-						t.Result=t.Result-(txt.Mod1DiceCount*txt.Mod1DiceSides-txt.Mod1DiceCount)+(txt.Mod1DiceCount*txt.Mod1DiceSides*math.max(math.min(t.Player.LevelBase/100,2.5),0.5))
+						t.Result=t.Result-(txt.Mod1DiceCount*txt.Mod1DiceSides-txt.Mod1DiceCount)+(txt.Mod1DiceCount*txt.Mod1DiceSides*math.max(math.min(t.Player.LevelBase/80,3),0.5))
 					end
 				end
 			end	
@@ -1274,8 +1274,8 @@ function events.ModifyItemDamage(t)
 	if t.Item then
 		if (t.Item.Number>=500 and t.Item.Number<=543) or (t.Item.Number>=1302 and t.Item.Number<=1354) or (t.Item.Number>=2020 and t.Item.Number<=2049) then 
 			bonusDamage=0
-			add=math.ceil(Game.ItemsTxt[t.Item.Number].Mod2*math.max(math.min(t.Player.LevelBase/100,2.5),0.5))
-			side=math.ceil(Game.ItemsTxt[t.Item.Number].Mod1DiceSides*math.max(math.min(t.Player.LevelBase/100,2.5),0.5))
+			add=math.ceil(Game.ItemsTxt[t.Item.Number].Mod2*math.max(math.min(t.Player.LevelBase/80,3),0.5))
+			side=math.ceil(Game.ItemsTxt[t.Item.Number].Mod1DiceSides*math.max(math.min(t.Player.LevelBase/80,3),0.5))
 			--calculate dices
 			for i=1,Game.ItemsTxt[t.Item.Number].Mod1DiceCount do
 				bonusDamage=bonusDamage+math.random(1,side)
@@ -2544,9 +2544,64 @@ artifactStatsBonus[2049] = {[const.Stats.HP] = 100,
 							[const.Stats.Luck] = 50,
 							[const.Stats.Personality] = -50}
 
+--SKILLS ARTEFACTS
+---- Skill bonuses
+artifactSkillBonus={}
+artifactSkillBonus[502] =	{	[const.Skills.Armsmaster] = 7}
+artifactSkillBonus[512] =	{	[const.Skills.Bow] = 4}
+artifactSkillBonus[517] =	{	[const.Skills.DisarmTraps] = 8,
+								[const.Skills.Bow] = 8,
+								[const.Skills.Armsmaster] = 8}
+artifactSkillBonus[531] =	{	[const.Skills.Bow] = 4}
+artifactSkillBonus[535] =	{	[const.Skills.Alchemy] = 5}
+-- Hero's belt
+artifactSkillBonus[1337] =	{	[const.Skills.Armsmaster] = 5}
+-- Wallace
+artifactSkillBonus[1304] =	{	[const.Skills.Armsmaster] = 10}
+-- Corsair
+artifactSkillBonus[1305] =	{	[const.Skills.DisarmTraps] = 10}
+-- Hands of the Master
+artifactSkillBonus[1313] =	{	[const.Skills.Unarmed] = 10,
+								[const.Skills.Dodging] = 10}
+-- Ethric's Staff
+artifactSkillBonus[1317] =	{	[const.Skills.Meditation] = 15}
+-- Hareck's Leather
+artifactSkillBonus[1318] =	{	[const.Skills.DisarmTraps] = 5,
+								[const.Skills.Unarmed] = 5,}
+-- Old Nick
+artifactSkillBonus[1319] =	{	[const.Skills.DisarmTraps] = 5}
+-- Glory shield
+artifactSkillBonus[1321] =	{	[const.Skills.Shield] = 5}
+-- Scholar's Cap
+artifactSkillBonus[1324] = {	[const.Skills.Learning] = 15}
+-- Ania Selving
+artifactSkillBonus[1328] =	{	[const.Skills.Bow] = 5}
+-- Faerie ring
+artifactSkillBonus[1347] =	{	[const.Skills.Fire] = 5,
+								[const.Skills.Air] = 5,
+								[const.Skills.Water] = 5,
+								[const.Skills.Earth] = 5}
+-- Pendragon
+artifactSkillBonus[2030] =	{	[const.Skills.Stealing] = 10,
+								[const.Skills.DisarmTraps] = 10}
+-- Hades
+artifactSkillBonus[2035] =	{	[const.Skills.DisarmTraps] = 10}
 
-
-
+--get artifacts Skills
+function events.GetSkill(t)
+	if t.Skill<=38 then
+		local bonus=0
+		for it in t.Player:EnumActiveItems() do
+			if artifactSkillBonus[it.Number] and artifactSkillBonus[it.Number][t.Skill] then
+				bonus = math.max(bonus, artifactSkillBonus[it.Number][t.Skill])
+			end
+		end
+		local mult=math.min(math.max(t.Player.LevelBase/80,0,5),3)
+		bonus=bonus*mult
+		s,m=SplitSkill(t.Player.Skills[t.Skill])
+		t.Result=math.max(t.Result,bonus+JoinSkill(s,m))
+	end
+end
 --refresh stats
 function events.AfterLoadMap()
 	mawRefresh("all")
