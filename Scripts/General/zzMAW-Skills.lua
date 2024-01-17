@@ -1693,7 +1693,7 @@ end
 merchantCheck=false
 function events.GetMerchantTotalSkill(t)
 	if t.Result==10000 then
-		t.Result=1000
+		t.Result=100
 	end
 	if merchantCheck then return end --avoid loops
 	merchantCheck=true
