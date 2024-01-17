@@ -294,7 +294,7 @@ function events.LoadMap()
 			levelMult=totalLevel[i]
 		end
 		
-		bonusDamage=math.max((levelMult-LevelB)^0.88,0)
+		bonusDamage=math.max((levelMult^0.88-LevelB^0.88),0)
 		if bonusDamage>=20 then
 			levelMult=totalLevel[i]
 		end
