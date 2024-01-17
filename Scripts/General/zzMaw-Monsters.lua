@@ -38,7 +38,8 @@ function events.AfterLoadMap()
 		bolsterRes=math.max(math.round((Map.Monsters[i].Level-basetable[Map.Monsters[i].Id].Level)/2),0)
 		for v=0,10 do
 			if v~=5 then
-			Map.Monsters[i].Resistances[v]=math.min(bolsterRes+basetable[Map.Monsters[i].Id].Resistances[v],bolsterRes+200)	
+			hpMult=math.floor(Map.Monsters[i].Resistances[v]/1000)
+			Map.Monsters[i].Resistances[v]=math.min(bolsterRes+basetable[Map.Monsters[i].Id].Resistances[v],bolsterRes+200)+1000*hpMult	
 			end
 		end
 	end	
@@ -240,30 +241,22 @@ function events.LoadMap()
 			extraBolster = 0
 		end
 		mon.Level=math.min(mon.Level+extraBolster,255)
-		
+		totalLevel=totalLevel or {}
+		totalLevel[i]=basetable[i].Level+bolsterLevel+extraBolster
 		--HP
 		HPBolsterLevel=basetable[i].Level*(1+(0.1*(bolsterLevel+extraBolster)/100))+(bolsterLevel+extraBolster)*0.9
-		HP=HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180)
-		hpOvercap=0
-		while HP>32500 do
-			HP=math.round(HP/2)
-			hpOvercap=hpOvercap+1
-		end
-		
-		mon.HP=HP
-		mon.FullHP=mon.HP
-		
+		HPtable=HPtable or {}
+		HPtable[i]=HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180)
 		--resistances 
-		bolsterRes=math.max(math.round((mon.Level-basetable[i].Level)/2),0)
+		bolsterRes=math.max(math.round((totalLevel[i]-basetable[i].Level)/2),0)
 		for v=0,10 do
 			if v~=5 then
 			mon.Resistances[v]=math.min(bolsterRes+basetable[i].Resistances[v],bolsterRes+200)
 			end
 		end
-		mon.Resistances[0]=mon.Resistances[0]+hpOvercap*1000
 		
 		--experience
-		mon.Experience = math.round(mon.Level^1.7+mon.Level*20)
+		mon.Experience = math.round(totalLevel[i]^1.7+totalLevel[i]*20)
 		if currentWorld==2 then
 			mon.Experience = math.min(mon.Experience*2, mon.Experience+1000)
 		end
@@ -281,30 +274,29 @@ function events.LoadMap()
 		--ADJUST HP
 		hpMult=1
 		if i%3==1 then
-			lvl=Game.MonstersTxt[i+2].Level
-			if mon.Level*2<=lvl then
-				hpMult=hpMult+lvl/(mon.Level*5)
+			lvl=totalLevel[i+2]
+			if totalLevel[i]*2<=lvl then
+				hpMult=hpMult+lvl/(totalLevel[i]*5)
 			end
 		elseif i%3==2 then
-			lvl=Game.MonstersTxt[i+1].Level
-			if Game.MonstersTxt[i-1].Level*2<=lvl then
-				hpMult=hpMult+lvl/(mon.Level*5)
+			lvl=totalLevel[i+1]
+			if totalLevel[i-1]*2<=lvl then
+				hpMult=hpMult+lvl/(totalLevel[i]*5)
 			end
 		end
-		mon.HP=mon.HP*hpMult
-		mon.FullHP=mon.HP
+		HPtable[i]=HPtable[i]*hpMult
 		--damage
 		if i%3==1 then
-			levelMult=Game.MonstersTxt[i+1].Level
+			levelMult=totalLevel[i+1]
 		elseif i%3==0 then
-			levelMult=Game.MonstersTxt[i-1].Level
+			levelMult=totalLevel[i-1]
 		else
-			levelMult=Game.MonstersTxt[i].Level
+			levelMult=totalLevel[i]
 		end
 		
 		bonusDamage=math.max((levelMult-LevelB)^0.88,0)
 		if bonusDamage>=20 then
-			levelMult=Game.MonstersTxt[i].Level
+			levelMult=totalLevel[i]
 		end
 		
 		mon.ArmorClass=base.ArmorClass*((levelMult+10)/(LevelB+10))
@@ -321,23 +313,26 @@ function events.LoadMap()
 			--calculate level scaling
 			mon=Game.MonstersTxt[i]
 			if i%3==1 then
-				mon.HP=(mon.HP*0.3+Game.MonstersTxt[i+1].HP*(basetable[i].FullHP/basetable[i+1].FullHP))/1.3
+				HPtable[i]=(HPtable[i]*0.3+HPtable[i+1]*(basetable[i].FullHP/basetable[i+1].FullHP))/1.3
 			elseif i%3==0 then
-				mon.HP=(mon.HP*0.3+Game.MonstersTxt[i-1].HP*(basetable[i].FullHP/basetable[i-1].FullHP))/1.3
+				mon.HP=(HPtable[i]*0.3+HPtable[i-1]*(basetable[i].FullHP/basetable[i-1].FullHP))/1.3
 			end
-			mon.FullHP=mon.HP
+			
+			hpOvercap=0
+			while HPtable[i]>32500 do
+				HPtable[i]=math.round(HPtable[i]/2)
+				hpOvercap=hpOvercap+1
+			end
+			mon.Resistances[0]=mon.Resistances[0]+hpOvercap*1000
+			mon.HP=HPtable[i]
+			mon.FullHP=HPtable[i]
 			if mon.FullHP>1000 then
 				mon.FullHP=math.round(mon.FullHP/10)*10
+				mon.HP=math.round(mon.HP/10)*10
 			end
 		end
 	end
-	for i=1, 651 do
-		mon=Game.MonstersTxt[i]
-		if mon.FullHP>=2^15 then
-			mon.FullHP=2^15-1
-			mon.HP=2^15-1
-		end
-	end
+	
 end
 
 function events.LoadMap()
@@ -1556,7 +1551,14 @@ end
 
 function generateBoss(index,nameIndex)
 	mon=Map.Monsters[index]
-	mon.FullHP=math.round(math.min(mon.FullHP*2+math.random()*2, 32000))
+	HP=math.round(mon.FullHP*2+math.random()*2)
+	hpOvercap=0
+	while HP>32500 do
+		HP=math.round(HP/2)
+		hpOvercap=hpOvercap+1
+	end
+	mon.Resistances[0]=mon.Resistances[0]+1000*hpOvercap
+	mon.FullHP=HP
 	mon.HP=mon.FullHP
 	mon.Exp=mon.Exp*10
 	mon.Level=math.round(math.min(mon.Level*(1.1+math.random()*0.2),255))
