@@ -1934,7 +1934,7 @@ function events.GameInitialized2()
         if (txt[i].Skill >= 8 and txt[i].Skill <= 11) or txt[i].Skill == 40 then
             -- Armors
             referenceAC[i] = txt[i + lookup].Mod2 + txt[i + lookup].Mod1DiceCount
-        elseif txt[i].Skill <= 5 then
+        elseif txt[i].Skill <= 6 or txt[i].Skill==39 then
             -- Weapons
             referenceWeaponAttack[i] = txt[i + lookup].Mod2
             referenceWeaponSides[i] = txt[i + lookup].Mod1DiceSides
@@ -2020,7 +2020,7 @@ function itemStats(index)
 			tab[10]=tab[10]+acBonus
 		end
 		--weapons
-		if txt.Skill <= 5 then
+		if txt.Skill <= 6 or txt.Skill==39 then
 			local bonus = txt.Mod2
 			local bonus2 = referenceWeaponAttack[it.Number]
 			local bonusATK
