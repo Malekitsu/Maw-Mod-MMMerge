@@ -256,7 +256,9 @@ function events.BuildStatInformationBox(t)
 	if t.Stat==9 then
 		i=Game.CurrentPlayer
 		ac=Party[i]:GetArmorClass()
-		acReduction=math.round(1000-1000/(ac/300+1))/10
+		local lvl=math.min(Party[i].LevelBase,200)
+		local acReduction=1-1/2^(ac/(200+lvl))
+		acReduction=math.round(1000-1000/2^(ac/(200+lvl)))/10
 		lvl=math.min(Party[i].LevelBase, 255)
 		blockChance= 100-math.round((5+lvl*2)/(10+lvl*2+ac)*10000)/100
 		totRed= 100-math.round((100-blockChance)*(100-acReduction))/100
@@ -366,7 +368,8 @@ function events.BuildStatInformationBox(t)
 		local fullHP=Party[i]:GetFullHP()
 		--AC
 		local ac=Party[i]:GetArmorClass()
-		local acReduction=1-1/(ac/300+1)
+		local lvl=math.min(Party[i].LevelBase,200)
+		local acReduction=1-1/2^(ac/(200+lvl))
 		local lvl=math.min(Party[i].LevelBase, 255)
 		local blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 		local ACRed= 1 - (1-blockChance)*(1-acReduction)
@@ -391,8 +394,9 @@ function events.BuildStatInformationBox(t)
 			[6]=t.Player:GetResistance(15),
 		}
 		res[7]=math.min(res[1],res[2],res[3],res[4],res[5],res[6])
+		lvl=math.min(Party[i].LevelBase/1.6,125)
 		for i=1,7 do 
-			res[i]=1-1/2^(res[i]/100)
+			res[i]=1-1/2^(res[i]/(75+lvl))
 		end
 		--calculation
 		local reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
@@ -495,7 +499,7 @@ function events.BuildStatInformationBox(t)
 	end
 	
 	if t.Stat>=19 and t.Stat<=24 then
-		t.Text=t.Text .. "\n\nDamage is reduced by an amount equal to % shown above.\nMax resistance is 75%(beside immune status) and can be increased with some special enchants\n\nLight resistance is equal to the lowest between Mind and Body resistances.\nDark resistance is equal to the lowest between elemental resistances\nEnergy resistance is equal to the lowest resistance"
+		t.Text=t.Text .. "\n\nDamage is reduced by an amount equal to % shown.\nMax resistance is 93.75%(beside immune status)\n\nLight resistance is equal to the lowest between Mind and Body resistances.\nDark resistance is equal to the lowest between elemental resistances\nEnergy resistance is equal to the lowest resistance"
 	end
 end
 
@@ -567,7 +571,7 @@ function events.CalcDamageToPlayer(t)
 		else
 			levelMult=Game.MonstersTxt[i].Level
 		end
-		dmgMult=(levelMult/12+1)*((levelMult+2)/(oldLevel+2))*(1+(levelMult/100)^1.3)
+		dmgMult=(levelMult/9+1)*((levelMult+2)/(oldLevel+2))*(1+(levelMult/200))
 		t.Result=t.Result*dmgMult
 	end
 
@@ -631,14 +635,14 @@ function events.Tick()
 		earthRes=Party[i]:GetResistance(13)
 		mindRes=Party[i]:GetResistance(14)
 		bodyRes=Party[i]:GetResistance(15)
-		
+		lvl=math.min(Party[i].LevelBase/1.6,125)
 		--calculate new resistances
-		fireRes=math.round((100-100/2^(fireRes/100))*100)/100
-		airRes=math.round((100-100/2^(airRes/100))*100)/100
-		waterRes=math.round((100-100/2^(waterRes/100))*100)/100
-		earthRes=math.round((100-100/2^(earthRes/100))*100)/100
-		mindRes=math.round((100-100/2^(mindRes/100))*100)/100
-		bodyRes=math.round((100-100/2^(bodyRes/100))*100)/100
+		fireRes=math.round((100-100/2^(fireRes/(75+lvl)))*100)/100
+		airRes=math.round((100-100/2^(airRes/(75+lvl)))*100)/100
+		waterRes=math.round((100-100/2^(waterRes/(75+lvl)))*100)/100
+		earthRes=math.round((100-100/2^(earthRes/(75+lvl)))*100)/100
+		mindRes=math.round((100-100/2^(mindRes/(75+lvl)))*100)/100
+		bodyRes=math.round((100-100/2^(bodyRes/(75+lvl)))*100)/100
 		
 		if fireRes>=93.75 then
 			fireRes=StrColor(0,255,0,"Max")
@@ -810,7 +814,7 @@ function calcMawDamage(pl,damageKind,damage,rand)
 	--AC for phys
 	if damageKind==4 then 
 		local AC=pl:GetArmorClass()
-		local damage=math.round(damage/2^(math.min(AC/300,4)))
+		local damage=math.round(damage/2^(math.min(AC/math.min(200+pl.LevelBase,400),4)))
 		return damage
 	end
 
@@ -834,7 +838,7 @@ function calcMawDamage(pl,damageKind,damage,rand)
 		res=math.max(0, res+(math.min(res,1-res)*roll))
 	end
 	
-	local damage=math.round(damage/2^(res/100))
+	local damage=math.round(damage/2^math.min(res/math.min(75+pl.LevelBase/1.6,200)),4)
 	return damage
 end
 
