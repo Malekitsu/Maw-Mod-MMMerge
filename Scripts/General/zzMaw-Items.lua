@@ -2054,14 +2054,13 @@ function itemStats(index)
 			end
 			sidesBonus = sides + math.round(sidesBonus)
 			
-			if artWeap1h[it.Number] or artWeap2h[it.Number] then 
+			if table.find(artWeap1h,it.Number) or table.find(artWeap2h,it.Number) then 
 				if txt.EquipStat<=1 then
 					artifactMult=math.min(math.max(pl.LevelBase/80,0.5),3)
 					bonus=math.ceil(txt.Mod2*artifactMult)
 					sidesBonus=math.ceil(txt.Mod1DiceSides*artifactMult)
 				end
 			end	
-			
 			if txt.Skill ~= 5 then
 				tab[40] = tab[40] + math.round(bonus)
 				tab[41] = tab[41] + math.round(bonus)
