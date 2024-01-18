@@ -303,7 +303,7 @@ function events.LoadMap()
 		HPtable=HPtable or {}
 		HPtable[i]=HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180)
 		--resistances 
-		bolsterRes=math.max(math.round((totalLevel[i]-basetable[i].Level)/2),0)
+		bolsterRes=math.max(math.round((totalLevel[i]-basetable[i].Level)/10)*5,0)
 		for v=0,10 do
 			if v~=5 then
 			mon.Resistances[v]=math.min(bolsterRes+basetable[i].Resistances[v],bolsterRes+200)
@@ -1298,7 +1298,7 @@ function events.BuildMonsterInformationBox(t)
 		diff=0.7
 	end
 	if Game.BolsterAmount==300 then
-		diff=diff+mon.Level/85
+		diff=diff
 	end
 	--some statistics here, calculate the standard deviation of dices to get the range of which 95% will fall into
 	mean=mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*(mon.Attack1.DamageDiceSides+1)/2
@@ -1342,7 +1342,7 @@ function events.BuildMonsterInformationBox(t)
 		else
 			levelMult=Game.MonstersTxt[i].Level
 		end
-		dmgMult=(levelMult/9+1)*((levelMult+10)/(oldLevel+10))*(1+(levelMult/200))
+		dmgMult=(levelMult/12+1.15)*((levelMult+10)/(oldLevel+10))*(1+(levelMult/200))
 		
 		--calculate
 		mean=spell.DamageAdd+skill*(spell.DamageDiceSides+1)/2
