@@ -529,7 +529,7 @@ end
 
 --reduce damage by %
 function events.CalcDamageToPlayer(t)
-	if t.Result<1 then return end
+	if t.Damage==0 and t.Result==0 then return end
 	--recalculate spells damage
 	data=WhoHitPlayer()
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
@@ -558,7 +558,6 @@ function events.CalcDamageToPlayer(t)
 	end
 	
 	--apply Damage
-	t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true)
 	--modify spell damage as it's not handled in maw-monsters
 	data=WhoHitPlayer()
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
@@ -571,9 +570,11 @@ function events.CalcDamageToPlayer(t)
 		else
 			levelMult=Game.MonstersTxt[i].Level
 		end
-		dmgMult=(levelMult/9+1)*((levelMult+2)/(oldLevel+2))*(1+(levelMult/200))
-		t.Result=t.Result*dmgMult
+		dmgMult=(levelMult/12+1.15)*((levelMult+10)/(oldLevel+10))*(1+(levelMult/200))
+		t.Damage=t.Result*dmgMult
 	end
+	
+	t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true)
 
 	--add difficulty related damage
 	if Game.BolsterAmount%50~=0 or Game.BolsterAmount==0 then
@@ -597,7 +598,7 @@ function events.CalcDamageToPlayer(t)
 	end
 	if Game.BolsterAmount==300 then
 		if data and data.Monster then
-			t.Result=t.Result*(3+data.Monster.Level/85)
+			t.Result=t.Result*3
 		elseif t.DamageKind~=4 and t.DamageKind~=2 then --drown and fall
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
@@ -612,7 +613,7 @@ function events.CalcDamageToPlayer(t)
 			end
 			mapLevel=bolster+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
 			--trap and objects multiplier
-			mult=(mapLevel/20+1)*(3+mapLevel/85)
+			mult=(mapLevel/20+1)*3
 			if data and data.Object and data.Object.SpellType==15 then 
 				bonusDamage=mapLevel/24
 			else
