@@ -1906,9 +1906,15 @@ end
 --get artifacts Skills
 function events.GetSkill(t)
 	if t.Skill>=12 and t.Skill<=20 then
-		bonus = plItemsStats[t.PlayerIndex][table.find(equipSpellMap,t.Skill)]
-		s,m=SplitSkill(t.Player.Skills[t.Skill])
-		t.Result=math.max(t.Result,bonus+JoinSkill(s,m))
+		bonus1 = plItemsStats[t.PlayerIndex][table.find(equipSpellMap,t.Skill)]
+		t.Result=math.max(t.Result,bonus1+t.Player.Skills[t.Skill])
+	end
+	if t.Skill<=38 then
+		local bonus=0
+		if plItemsStats[t.PlayerIndex] and plItemsStats[t.PlayerIndex][t.Skill+50] then
+			bonus = plItemsStats[t.PlayerIndex][t.Skill+50]
+		end
+		t.Result=math.max(t.Result,bonus+t.Player.Skills[t.Skill])
 	end
 end
 
