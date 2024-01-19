@@ -1521,9 +1521,41 @@ function events.Action(t)
 				pl.SkillPoints=pl.SkillPoints+currentCost-actualCost
 			end
 		end
+		if table.find(partySharedSkills,t.Param) then
+			maxS=0
+			maxM=0
+			increased=-1
+			for i=0,Party.High do
+				skill=partySharedSkills[table.find(partySharedSkills,t.Param)]
+				s,m=SplitSkill(Party[i].Skills[skill])
+				if Game.CurrentPlayer==i then
+					if Party[i].SkillPoints>s then
+						s=s+1
+						increased=i
+					end
+				end
+				if s>maxS then
+					maxS=s
+				end
+				if m>maxM then
+					maxM=m
+				end
+			end
+			for i=0,Party.High do
+				if increased==i then
+					Party[i].Skills[skill]=JoinSkill(maxS-1,maxM)
+				else
+					Party[i].Skills[skill]=JoinSkill(maxS,maxM)
+				end
+			end
+			if s>=10 and m==4 then
+				t.Handled=true
+				Game.ShowStatusText("This skill is already as good as it will ever get")
+			end
+		end
 	end
 end
-
+partySharedSkills={24,25,26,31,34}
 --plate&shield cover
 --change target
 function events.PlayerAttacked(t)
@@ -1645,87 +1677,6 @@ function events.Regeneration(t)
 	end
 end
 
---identify item shared to all the party
-function events.GetSkill(t)
-	if Game.CurrentPlayer==-1 then return end
-	if t.Skill==const.Skills.IdentifyMonster then
-		if Game.HouseScreen==-1 then return end
-		if Game.CurrentPlayer>=0 then
-			s,m=SplitSkill(t.Result)
-			currentIdentifyMonster=s*m
-			maxIdentifyMonster=s*m
-		end
-		for i=0,Party.High do
-			s,m=SplitSkill(Party[i].Skills[const.Skills.IdentifyMonster])
-			bonus=0
-			for it in Party[i]:EnumActiveItems() do
-				if it.Bonus==21 and it.BonusStrength>bonus then
-					bonus=it.BonusStrength
-				end
-			end
-			s=s+bonus
-			if s*m>=currentIdentifyMonster then
-				currentIdentifyMonster=s*m
-				maxIdentifyMonster=JoinSkill(s,m)
-			end
-		end
-		t.Result=maxIdentifyMonster
-	end
-	if t.Skill==const.Skills.Repair then
-		if Game.HouseScreen==-1 then return end
-		if Game.CurrentPlayer>=0 then
-			s,m=SplitSkill(t.Result)
-			currentRepair=s*m
-			maxRepair=t.Result
-		end
-		for i=0,Party.High do
-			s,m=SplitSkill(Party[i].Skills[const.Skills.Repair])
-			if s*m>=currentRepair then
-				currentRepair=s*m
-				maxRepair=JoinSkill(s,m)
-			end
-		end
-		t.Result=maxRepair
-	end
-end
-
---merchant fix
-merchantCheck=false
-function events.GetMerchantTotalSkill(t)
-	if t.Result==10000 then
-		t.Result=100
-	end
-	if merchantCheck then return end --avoid loops
-	merchantCheck=true
-	if Game.HouseScreen==-1 or Game.HouseScreen==1 or Game.HouseScreen==96 then return end
-	currentMerchant=0
-	maxMerchant=0
-	for i=0,Party.High do
-		merc=Party[i]:GetMerchantTotalSkill()
-		if merc>maxMerchant then
-			maxMerchant=merc
-		end
-	end
-	merchantCheck=false
-	t.Result=maxMerchant
-end
-
---identify item fix
-function events.CanIdentifyItem(t)
-	t.CanIdentify = false
-	skillRequired=Game.ItemsTxt[t.Item.Number].IdRepSt
-	for i=0,Party.High do
-		s, m=SplitSkill(Party[i]:GetSkill(const.Skills.IdentifyItem))
-		skill=s*m
-		if skill>=skillRequired or m==4 then
-			t.CanIdentify = true
-		end
-	end
-	if NPCFollowers.HaveProfession(4) then
-		t.CanIdentify = true
-	end
-end
-
 --MAW REGEN, once every 0.1 seconds
 regenHP={0,0,0,0,[0]=0}
 regenSP={0,0,0,0,[0]=0}
@@ -1823,11 +1774,20 @@ function events.LoadMap()
 	vars.hirelingFix=vars.hirelingFix or false
 	if not vars.hirelingFix then
 		for i=0,Party.PlayersArray.High do
+			pl=Party.PlayersArray[i]
 			for v=0,38 do 
-				if Party.PlayersArray[i].Skills[v]>4864 then --2^12+2^8*3 no idea why
-					Party.PlayersArray[i].Skills[v]=Party.PlayersArray[i].Skills[v]-3840 --1024*3+2^8*3 no idea why
-				end
+				if pl.Skills[v]>4864 then --2^12+2^8*3 no idea why
+					pl.Skills[v]=pl.Skills[v]-3840 --1024*3+2^8*3 no idea why
+					
+				end	
 			end
+			extraSkillPoints=0
+			for j=1,5 do
+				s=SplitSkill(pl.Skills[partySharedSkills[j]])
+				extraSkillPoints=extraSkillPoints+(s*(s+1)/2-1)
+				pl.Skills[partySharedSkills[j]]=1
+			end	
+			pl.SkillPoints=pl.SkillPoints+extraSkillPoints
 		end
 	end
 end
