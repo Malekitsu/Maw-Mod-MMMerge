@@ -1656,18 +1656,9 @@ function events.BuildItemInformationBox(t)
 			end
 			fullHP=fullHP/dodgeChance
 			--resistances
-			res={
-				[1]=math.min(Party[i]:GetResistance(10),400),
-				[2]=math.min(Party[i]:GetResistance(11),400),
-				[3]=math.min(Party[i]:GetResistance(12),400),
-				[4]=math.min(Party[i]:GetResistance(13),400),
-				[5]=math.min(Party[i]:GetResistance(14),400),
-				[6]=math.min(Party[i]:GetResistance(15),400),
-			}
-			res[7]=math.min(res[1],res[2],res[3],res[4],res[5],res[6])
-			local lvl=math.min(Party[i].LevelBase/1.6,125)
-			for i=1,7 do 
-				res[i]=1-1/2^(res[i]/(75+lvl))
+			res={0,1,2,3,7,8,12}
+			for j=1,7 do 
+				res[j]=1-calcMawDamage(Party[i],res[j],10000)/10000
 			end
 			--calculation
 			local reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
@@ -1772,17 +1763,17 @@ function events.BuildItemInformationBox(t)
 			end
 			luckChanged=newLuckEff-oldLuckEff
 			res={
-				[1]=math.min(Party[i]:GetResistance(10)+newFire+luckChanged,400),
-				[2]=math.min(Party[i]:GetResistance(11)+newAir+luckChanged,400),
-				[3]=math.min(Party[i]:GetResistance(12)+newWater+luckChanged,400),
-				[4]=math.min(Party[i]:GetResistance(13)+newEarth+luckChanged,400),
-				[5]=math.min(Party[i]:GetResistance(14)+newMind+luckChanged,400),
-				[6]=math.min(Party[i]:GetResistance(15)+newBody+luckChanged,400),
+				[1]=Party[i]:GetResistance(10)+newFire+luckChanged,
+				[2]=Party[i]:GetResistance(11)+newAir+luckChanged,
+				[3]=Party[i]:GetResistance(12)+newWater+luckChanged,
+				[4]=Party[i]:GetResistance(13)+newEarth+luckChanged,
+				[5]=Party[i]:GetResistance(14)+newMind+luckChanged,
+				[6]=Party[i]:GetResistance(15)+newBody+luckChanged,
 			}
 			res[7]=math.min(res[1],res[2],res[3],res[4],res[5],res[6])
-			local lvl=math.min(Party[i].LevelBase/1.6,125)
-			for i=1,7 do 
-				res[i]=1-1/2^(res[i]/(75+lvl))
+			bolster=(Game.BolsterAmount/100-1)/4+1
+			for j=1,7 do 
+				res[j]=1-1/2^math.min(res[j]/math.min(75+Party[i].LevelBase*0.5*bolster,200*bolster),4)
 			end
 			
 			--calculation
