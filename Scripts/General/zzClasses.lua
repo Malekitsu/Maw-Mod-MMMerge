@@ -211,34 +211,35 @@ function events.LoadMap(wasInGame)
 	end
 end
 
-function events.CalcDamageToPlayer(t)
+function events.GameInitialized2()
+	function events.CalcDamageToPlayer(t)
 
---divine protection
-	if (t.Player.Class==55 or t.Player.Class==54 or t.Player.Class==53) and t.Player.Unconscious==0 and t.Player.Dead==0 and t.Player.Eradicated==0 then
-		if vars.divineProtectionCooldown[t.PlayerIndex]==nil then
-			vars.divineProtectionCooldown[t.PlayerIndex]=0
-		end		
-		if t.Result>=t.Player.HP and Game.Time>vars.divineProtectionCooldown[t.PlayerIndex] then
-			totMana=t.Player:GetFullSP()
-			currentMana=t.Player.SP
-			treshold=totMana/4
-			if currentMana>=treshold then
-				t.Player.SP=t.Player.SP-(totMana/4)
-				--calculate healing
-				heal=totMana
-				for i=0,Party.High do
-					if Party[i]:GetIndex()==t.PlayerIndex then
-						evt[i].Add("HP",heal)
+	--divine protection
+		if (t.Player.Class==55 or t.Player.Class==54 or t.Player.Class==53) and t.Player.Unconscious==0 and t.Player.Dead==0 and t.Player.Eradicated==0 then
+			if vars.divineProtectionCooldown[t.PlayerIndex]==nil then
+				vars.divineProtectionCooldown[t.PlayerIndex]=0
+			end		
+			if t.Result>=t.Player.HP and Game.Time>vars.divineProtectionCooldown[t.PlayerIndex] then
+				totMana=t.Player:GetFullSP()
+				currentMana=t.Player.SP
+				treshold=totMana/4
+				if currentMana>=treshold then
+					t.Player.SP=t.Player.SP-(totMana/4)
+					--calculate healing
+					heal=totMana
+					for i=0,Party.High do
+						if Party[i]:GetIndex()==t.PlayerIndex then
+							evt[i].Add("HP",heal)
+						end
 					end
+					vars.divineProtectionCooldown[t.PlayerIndex] = Game.Time + const.Minute * 150
+					Game.ShowStatusText("Divine Protection saves you from lethal damage")
+					t.Result=math.min(t.Result, t.Player.HP-1)
 				end
-				vars.divineProtectionCooldown[t.PlayerIndex] = Game.Time + const.Minute * 150
-				Game.ShowStatusText("Divine Protection saves you from lethal damage")
-				t.Result=math.min(t.Result, t.Player.HP-1)
-			end
-		end	
+			end	
+		end
 	end
 end
-
 
 ---deactivate offhand weapon
 function events.CalcDamageToMonster(t)
