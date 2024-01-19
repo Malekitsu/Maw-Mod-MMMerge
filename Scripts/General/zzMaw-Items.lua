@@ -1083,21 +1083,6 @@ enchantList={
 	[80] = true ,
 }
 
---remove older "of x spell school" enchant and replace
---create enchant Map
-magicEnchantMap={}
-magicEnchantMap[const.Skills.Fire] = 30
-magicEnchantMap[const.Skills.Air] = 26
-magicEnchantMap[const.Skills.Water] = 34
-magicEnchantMap[const.Skills.Earth] = 29
-magicEnchantMap[const.Skills.Spirit] = 33
-magicEnchantMap[const.Skills.Mind] = 32
-magicEnchantMap[const.Skills.Body] = 27
-magicEnchantMap[const.Skills.Light] = 31
-magicEnchantMap[const.Skills.Dark] = 28
-
-
-
 --BOOK COST
 
 local modifiedBookValues =
@@ -1920,11 +1905,8 @@ end
 
 --get artifacts Skills
 function events.GetSkill(t)
-	if t.Skill<=38 then
-		local bonus=0
-		if plItemsStats[t.PlayerIndex] and plItemsStats[t.PlayerIndex][t.Skill+50] then
-			bonus = plItemsStats[t.PlayerIndex][t.Skill+50]
-		end
+	if t.Skill>=12 and t.Skill<=20 then
+		bonus = plItemsStats[t.PlayerIndex][table.find(equipSpellMap,t.Skill)]
 		s,m=SplitSkill(t.Player.Skills[t.Skill])
 		t.Result=math.max(t.Result,bonus+JoinSkill(s,m))
 	end
@@ -1954,6 +1936,7 @@ function events.GameInitialized2()
     end
 end
 
+--RECALCULATE THE WHOLE ITEMS EFFECTS
 function itemStats(index)
 	if index==-1 or index==nil then
 		return 0
@@ -2010,6 +1993,7 @@ function itemStats(index)
 				end
 			end
 		end
+
 		--armors
 		local txt=it:T()
 		if (txt.Skill>=8 and txt.Skill<=11) or txt.Skill==40 then --AC from items
@@ -2186,20 +2170,6 @@ equipSpellMap={
 	[27] = const.Skills.Body,
 	[31] = const.Skills.Light,
 	[28] = const.Skills.Dark,
-}
-
-
---create enchant Map
-magicEnchantMap={
-	[const.Skills.Fire] = 30,
-	[const.Skills.Air] = 26,
-	[const.Skills.Water] = 34,
-	[const.Skills.Earth] = 29,
-	[const.Skills.Spirit] = 33,
-	[const.Skills.Mind] = 32,
-	[const.Skills.Body] = 27,
-	[const.Skills.Light] = 31,
-	[const.Skills.Dark] = 28,
 }
 
 statMap={
