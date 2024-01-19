@@ -579,9 +579,11 @@ function events.CalcDamageToPlayer(t)
 		dmgMult=(levelMult/12+1.15)*((levelMult+10)/(oldLevel+10))*(1+(levelMult/200))
 		t.Damage=t.Result*dmgMult
 	end
-	
-	t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true,data.Monster.Level)
-
+	if data and data.Monster then
+		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true,data.Monster.Level)
+	else
+		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true)
+	end
 	--add difficulty related damage
 	if Game.BolsterAmount%50~=0 or Game.BolsterAmount==0 then
 		Game.BolsterAmount=100
