@@ -1908,7 +1908,7 @@ for i=0,200 do
 end
 function events.CalcStatBonusByItems(t)
 	t.Result=0
-	if t.Stat>=0 and t.Stat<16 then
+	if t.Stat>=0 and t.Stat<24 then
 		if plItemsStats[t.PlayerIndex] then
 			t.Result=plItemsStats[t.PlayerIndex][t.Stat+1]
 		end
@@ -2076,7 +2076,7 @@ function itemStats(index)
 		end
 		
 		--skills
-		if skills[it.Bonus] then
+		if it.Bonus>16 then
 			tab[it.Bonus]=math.max(tab[it.Bonus], it.BonusStrength)
 		end
 		if equipSpellMap[it.Bonus2] then
@@ -2200,17 +2200,6 @@ magicEnchantMap={
 	[const.Skills.Body] = 27,
 	[const.Skills.Light] = 31,
 	[const.Skills.Dark] = 28,
-}
-skills={
-	[17]=const.Skills.Alchemy, 
-	[18]=const.Skills.Stealing, 
-	[17]=const.Skills.Alchemy, 
-	[19]=const.Skills.DisarmTraps, 
-	[20]=const.Skills.IdentifyItem, 
-	[21]=const.Skills.IdentifyMonster, 
-	[22]=const.Skills.Armsmaster, 
-	[23]=const.Skills.Dodge, 
-	[24]=const.Skills.Unarmed, 
 }
 
 statMap={
