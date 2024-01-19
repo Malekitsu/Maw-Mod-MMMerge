@@ -61,6 +61,14 @@ function events.AfterLoadMap()
 			mon=Map.Monsters[i]
 			
 			if  mon.NameId >=1 and mon.NameId<220 then
+				
+				--horizontal progression
+				if Game.freeProgression==false then
+					name=Game.MapStats[Map.MapStatsIndex].Name
+					if not horizontalMaps[name] then
+						partyLvl=mon.Level*3
+					end
+				end
 				--level increase 
 				oldLevel=mon.Level
 				mon.Level=math.min(mon.Level+partyLvl,255)
@@ -264,7 +272,7 @@ function events.LoadMap()
 		if Game.freeProgression==false then
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			if not horizontalMaps[name] then
-				bolsterLevel=base.Level*(1-LevelB/100) + LevelB*(LevelB/100) + LevelB*0.5
+				bolsterLevel=base.Level*(1-LevelB/100) + LevelB*(LevelB/100) + LevelB*0.75
 			end
 		end
 		
