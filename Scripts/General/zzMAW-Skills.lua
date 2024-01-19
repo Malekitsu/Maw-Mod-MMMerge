@@ -1548,7 +1548,7 @@ function events.Action(t)
 					Party[i].Skills[skill]=JoinSkill(maxS,maxM)
 				end
 			end
-			if s>=10 and m==4 then
+			if maxS>=10 and maxM==4 then
 				t.Handled=true
 				Game.ShowStatusText("This skill is already as good as it will ever get")
 			end
