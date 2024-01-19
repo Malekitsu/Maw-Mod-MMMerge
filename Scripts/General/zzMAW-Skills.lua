@@ -1771,8 +1771,8 @@ function events.Tick()
 end
 
 function events.LoadMap()
-	vars.hirelingFix=vars.hirelingFix or false
-	if not vars.hirelingFix then
+	if vars.hirelingFix then
+		vars.hirelingFix=false
 		for i=0,Party.PlayersArray.High do
 			pl=Party.PlayersArray[i]
 			for v=0,38 do 
@@ -1784,8 +1784,10 @@ function events.LoadMap()
 			extraSkillPoints=0
 			for j=1,5 do
 				s=SplitSkill(pl.Skills[partySharedSkills[j]])
-				extraSkillPoints=extraSkillPoints+(s*(s+1)/2-1)
-				pl.Skills[partySharedSkills[j]]=1
+				if s>1 then
+					extraSkillPoints=extraSkillPoints+(s*(s+1)/2-1)
+					pl.Skills[partySharedSkills[j]]=1
+				end
 			end	
 			pl.SkillPoints=pl.SkillPoints+extraSkillPoints
 		end
