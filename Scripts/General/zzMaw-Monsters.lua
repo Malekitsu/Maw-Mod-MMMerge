@@ -149,13 +149,13 @@ function recalculateMawMonster()
 	if Game.BolsterAmount==200 then
 		mult=1.8
 	end
-	
+	--Nightmare
+	if Game.BolsterAmount==300 then
+		mult=3
+	end
 	for i=0, Map.Monsters.High do
 		local mon=Map.Monsters[i]
-		--Nightmare
-		if Game.BolsterAmount==300 then
-			mult=(3+mon.Level/100)
-		end
+		
 		if mon.NameId==0 then
 			local txt=Game.MonstersTxt[mon.Id]
 			for v=0,10 do
@@ -260,8 +260,16 @@ function events.LoadMap()
 		base=basetable[i]		
 		LevelB=BLevel[i]
 		
-		--level increase centered on B type
-		mon.Level=math.min(basetable[i].Level+bolsterLevel,255)
+		--horizontal progression
+		if horizontalProgression then
+			name=Game.MapStats[Map.MapStatsIndex].Name
+			if not horizontalMaps[name] then
+				bolsterLevel=base.Level*(1-LevelB/100) + LevelB*(LevelB/100) + LevelB*0.5
+			end
+		end
+		
+		
+		mon.Level=math.min(base.Level+bolsterLevel,255)
 		
 		--monsters scale based on map
 		extraBolster=0
@@ -292,7 +300,7 @@ function events.LoadMap()
 			end
 		end
 		
-		if mapName=="The Arena" or mapName=="Arena" then
+		if mapName=="The Arena" or mapName=="Arena" or horizontalProgression then
 			extraBolster = 0
 		end
 		mon.Level=math.min(mon.Level+extraBolster,255)
@@ -316,7 +324,7 @@ function events.LoadMap()
 			mon.Experience = math.min(mon.Experience*2, mon.Experience+1000)
 		end
 		--true nightmare nerf
-		if Game.BolsterAmount==250 then
+		if Game.BolsterAmount==300 then
 			mon.Experience=mon.Experience*0.75
 		end
 	end
@@ -363,7 +371,45 @@ function events.LoadMap()
 		atk2=base.Attack2
 		mon.Attack2.DamageAdd, mon.Attack2.DamageDiceSides, mon.Attack2.DamageDiceCount = calcDices(atk2.DamageAdd,atk2.DamageDiceSides,atk2.DamageDiceCount,dmgMult,bonusDamage)
 	end
-	if bolsterLevel>20 then
+	--adjust damage if it's too similiar between monster type
+	if bolsterLevel>10 or horizontalProgression then
+		for i=1, 651 do
+			mon=Game.MonstersTxt[i]
+			base=basetable[i]		
+			LevelB=BLevel[i]
+			
+			if i%3==1 then
+				bMon=basetable[i+1]
+			elseif i%3==0 then
+				bMon=basetable[i-1]
+			else
+				bMon=basetable[i]
+			end
+			bonusDamage=0
+			atk1=base.Attack1
+			currentBaseDamage=atk1.DamageAdd+atk1.DamageDiceCount*(1+atk1.DamageDiceSides)/2
+			batck1=bMon.Attack1
+			bBaseDamage=batck1.DamageAdd+batck1.DamageDiceCount*(1+batck1.DamageDiceSides)/2
+			dmgMult=currentBaseDamage/bBaseDamage
+			mon.Attack1.DamageAdd, mon.Attack1.DamageDiceSides, mon.Attack1.DamageDiceCount = calcDices(mon.Attack1.DamageAdd,mon.Attack1.DamageDiceSides,mon.Attack1.DamageDiceCount,dmgMult,bonusDamage)
+			
+			atk2=base.Attack2
+			currentBaseDamage=atk2.DamageAdd+atk2.DamageDiceCount*(1+atk2.DamageDiceSides)/2
+			batck2=bMon.Attack2
+			bBaseDamage=batck2.DamageAdd+batck2.DamageDiceCount*(1+batck2.DamageDiceSides)/2
+			if currentBaseDamage==0 or bBaseDamage==0 then
+				dmgMult=1
+			else
+				dmgMult=currentBaseDamage/bBaseDamage
+			end
+			mon.Attack2.DamageAdd, mon.Attack2.DamageDiceSides, mon.Attack2.DamageDiceCount = calcDices(mon.Attack2.DamageAdd,mon.Attack2.DamageDiceSides,mon.Attack2.DamageDiceCount,dmgMult,bonusDamage)
+		end
+			
+	end
+		
+		
+	
+	if bolsterLevel>20 or horizontalProgression then
 		for i=1, 651 do
 			--calculate level scaling
 			mon=Game.MonstersTxt[i]
@@ -596,6 +642,16 @@ function events.GameInitialized2()
 	Game.HostileTxt[143][152]=0
 end
 
+--maps not to bolster in horizontal progression
+horizontalMaps={["Dagger Wound Island"] =true,
+				["Abandoned Temple"] =true,
+				["Emerald Island"]=true,
+				["The Temple of the Moon"]=true,
+				["The Dragon's Lair"]=true,
+				["Castle Harmondale"]=true,
+				["New Sorpigal"]=true,
+				["Goblinwatch"]=true,
+				["Abandoned Temple"]=true,}
 --map levels
 mapLevels={
 --MM8
