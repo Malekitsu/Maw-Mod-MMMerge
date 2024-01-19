@@ -156,7 +156,7 @@ function events.GameInitialized2()
 	local ExSetScr = NewSettingsPage("MergeExtraSettings", " General settings", "ExSetScr")
 	const.Screens.ExtraSettings = const.Screens.MergeExtraSettings
 
-	local VarsToStore = {"UseMonsterBolster", "BolsterAmount", "ShowWeatherEffects", "ImprovedPathfinding", "MonsterDensity"}
+	local VarsToStore = {"UseMonsterBolster", "BolsterAmount", "ShowWeatherEffects", "ImprovedPathfinding", "freeProgression"}
 	local RETURN = const.Keys.RETURN
 	local ESCAPE = const.Keys.ESCAPE
 
@@ -227,7 +227,7 @@ function events.GameInitialized2()
 			Game.PlaySound(412)
 		end}
 
-	--OnOffTumbler(ExSetScr, 95, 175, VarsToStore[1])
+	OnOffTumbler(ExSetScr, 95, 175, VarsToStore[5])
 	OnOffTumbler(ExSetScr, 95, 251, VarsToStore[3])
 	OnOffTumbler(ExSetScr, 95, 326, VarsToStore[4])
 	
