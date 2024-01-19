@@ -1641,8 +1641,7 @@ function events.BuildItemInformationBox(t)
 			fullHP=Party[i]:GetFullHP()
 			--AC
 			ac=Party[i]:GetArmorClass()
-			local lvl=math.min(Party[i].LevelBase,200)
-			local acReduction=1-1/2^(ac/(200+lvl))
+			local acReduction=1-calcMawDamage(Party[i],4,10000)/10000
 			lvl=math.min(Party[i].LevelBase, 255)
 			blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 			ACRed= 1 - (1-blockChance)*(1-acReduction)
@@ -1729,8 +1728,9 @@ function events.BuildItemInformationBox(t)
 			newSpeedEff=newSpeedEff-oldSpeedEff
 			
 			ac=ac+newAC+newSpeedEff
-			local lvl=math.min(Party[i].LevelBase,200)
-			local acReduction=1-1/2^(ac/(200+lvl))
+			local lvl=Party[i].LevelBase
+			bolster=(Game.BolsterAmount/100-1)/4+1
+			local acReduction=1-1/2^math.min(ac/math.min(150+lvl*bolster,400*bolster),4)
 			lvl=math.min(Party[i].LevelBase, 255)
 			blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 			ACRed= 1 - (1-blockChance)*(1-acReduction)
@@ -1771,7 +1771,6 @@ function events.BuildItemInformationBox(t)
 				[6]=Party[i]:GetResistance(15)+newBody+luckChanged,
 			}
 			res[7]=math.min(res[1],res[2],res[3],res[4],res[5],res[6])
-			bolster=(Game.BolsterAmount/100-1)/4+1
 			for j=1,7 do 
 				res[j]=1-1/2^math.min(res[j]/math.min(75+Party[i].LevelBase*0.5*bolster,200*bolster),4)
 			end
