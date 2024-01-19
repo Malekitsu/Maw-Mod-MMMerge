@@ -53,14 +53,22 @@ end
 
 --remove AC from hit calculation and unarmed code from misctweaks
 nextACToZero=0
+acNerf=0
 function events.PlayerAttacked(t)
 	if t.Attacker.MonsterAction==0 then
+		ac=t.Player:GetArmorClass()
 		if t.Attacker.Monster.Attack1.Type~=4 then
 			nextACToZero=2
+		elseif Game.BolsterAmount>100 then
+			acNerf=2
+			nerfAmount=Game.BolsterAmount/100
 		end
 	elseif t.Attacker.MonsterAction==1 then
 		if t.Attacker.Monster.Attack2.Type~=4 then
 			nextACToZero=2
+		elseif Game.BolsterAmount>100 then
+			acNerf=2
+			nerfAmount=Game.BolsterAmount/100
 		end
 	end
 end
@@ -69,9 +77,12 @@ function events.GetArmorClass(t)
 	if nextACToZero>0 then
 		t.AC=0
 		nextACToZero=nextACToZero-1
+	elseif acNerf>0 then
+		t.AC=t.AC/nerfAmount
+		acNerf=acNerf-1
 	end
 	if t.AC==10000 then
-		t.AC=t.Player:GetArmorClass()
+		t.AC=ac
 	end
 end
 
@@ -257,9 +268,12 @@ function events.BuildStatInformationBox(t)
 		i=Game.CurrentPlayer
 		ac=Party[i]:GetArmorClass()
 		local lvl=math.min(Party[i].LevelBase,200)
-		local acReduction=1-1/2^(ac/(200+lvl))
-		acReduction=math.round(1000-1000/2^(ac/(200+lvl)))/10
+		local acReduction=100-calcMawDamage(Party[i],4,10000)/100
 		lvl=math.min(Party[i].LevelBase, 255)
+		if Game.BolsterAmount>100 then
+			nerfAmount=Game.BolsterAmount/100
+			ac=ac/nerfAmount
+		end
 		blockChance= 100-math.round((5+lvl*2)/(10+lvl*2+ac)*10000)/100
 		totRed= 100-math.round((100-blockChance)*(100-acReduction))/100
 		t.Text=string.format("%s\n\nPhysical damage reduction from AC: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\nBlock chance vs same level monsters (up to 255): " .. StrColor(255,255,100,blockChance) .. StrColor(255,255,100,"%") .. "\n\nTotal average damage reduction: " .. StrColor(255,255,100,totRed) .. "%")
@@ -369,7 +383,7 @@ function events.BuildStatInformationBox(t)
 		--AC
 		local ac=Party[i]:GetArmorClass()
 		local lvl=math.min(Party[i].LevelBase,200)
-		local acReduction=1-1/2^(ac/(200+lvl))
+		local acReduction=1-calcMawDamage(t.Player,4,10000)/10000
 		local lvl=math.min(Party[i].LevelBase, 255)
 		local blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 		local ACRed= 1 - (1-blockChance)*(1-acReduction)
@@ -385,19 +399,11 @@ function events.BuildStatInformationBox(t)
 		local dodgeChance=0.995^(unarmed)
 		local fullHP=fullHP/dodgeChance
 		--resistances
-		res={
-			[1]=t.Player:GetResistance(10),
-			[2]=t.Player:GetResistance(11),
-			[3]=t.Player:GetResistance(12),
-			[4]=t.Player:GetResistance(13),
-			[5]=t.Player:GetResistance(14),
-			[6]=t.Player:GetResistance(15),
-		}
-		res[7]=math.min(res[1],res[2],res[3],res[4],res[5],res[6])
-		lvl=math.min(Party[i].LevelBase/1.6,125)
+		res={0,1,2,3,7,8,12}
 		for i=1,7 do 
-			res[i]=1-1/2^(res[i]/(75+lvl))
+			res[i]=1-calcMawDamage(t.Player,res[i],10000)/10000
 		end
+		
 		--calculation
 		local reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
 		vitality=math.round(fullHP/reduction)	
@@ -637,14 +643,20 @@ function events.Tick()
 		mindRes=Party[i]:GetResistance(14)
 		bodyRes=Party[i]:GetResistance(15)
 		lvl=math.min(Party[i].LevelBase/1.6,125)
-		--calculate new resistances
-		fireRes=math.round((100-100/2^(fireRes/(75+lvl)))*100)/100
-		airRes=math.round((100-100/2^(airRes/(75+lvl)))*100)/100
-		waterRes=math.round((100-100/2^(waterRes/(75+lvl)))*100)/100
-		earthRes=math.round((100-100/2^(earthRes/(75+lvl)))*100)/100
-		mindRes=math.round((100-100/2^(mindRes/(75+lvl)))*100)/100
-		bodyRes=math.round((100-100/2^(bodyRes/(75+lvl)))*100)/100
-		
+		fireRes=100-math.round(calcMawDamage(Party[i],0,10000))/100
+		airRes=100-math.round(calcMawDamage(Party[i],1,10000))/100
+		waterRes=100-math.round(calcMawDamage(Party[i],2,10000))/100
+		earthRes=100-math.round(calcMawDamage(Party[i],3,10000))/100
+		mindRes=100-math.round(calcMawDamage(Party[i],7,10000))/100
+		bodyRes=100-math.round(calcMawDamage(Party[i],8,10000))/100
+		--[[calculate new resistances
+		fireRes=math.round((100-100/2^(fireRes/(75+lvl/1.6)))*100)/100
+		airRes=math.round((100-100/2^(airRes/(75+lvl/1.6)))*100)/100
+		waterRes=math.round((100-100/2^(waterRes/(75+lvl/1.6)))*100)/100
+		earthRes=math.round((100-100/2^(earthRes/(75+lvl/1.6)))*100)/100
+		mindRes=math.round((100-100/2^(mindRes/(75+lvl/1.6)))*100)/100
+		bodyRes=math.round((100-100/2^(bodyRes/(75+lvl/1.6)))*100)/100
+		]]
 		if fireRes>=93.75 then
 			fireRes=StrColor(0,255,0,"Max")
 		end
@@ -788,11 +800,15 @@ damageKindResistance={
 	[12] = {10,11,12,13,14,15},
 }
 
-function calcMawDamage(pl,damageKind,damage,rand)
+function calcMawDamage(pl,damageKind,damage,rand,monLvl)
+	monLvl=monLvl or pl.LevelBase
+	bolster=(Game.BolsterAmount/100-1)/4+1
+	
 	--AC for phys
 	if damageKind==4 then 
-		local AC=pl:GetArmorClass()
-		local damage=math.round(damage/2^(math.min(AC/math.min(200+pl.LevelBase,400),4)))
+		extraACFromCAP=extraACFromCAP or 0
+		local AC=pl:GetArmorClass()+extraACFromCAP
+		local damage=math.round(damage/2^(math.min(AC/math.min(150+monLvl*bolster,400*bolster),4)))
 		return damage
 	end
 
@@ -801,7 +817,7 @@ function calcMawDamage(pl,damageKind,damage,rand)
 		local damage=math.round(damage)
 		return damage
 	end
-	local res=400
+	local res=math.huge
 	local resList=damageKindResistance[damageKind]
 	for i=1,#resList do
 		local playerRes = pl:GetResistance(resList[i])
@@ -816,7 +832,7 @@ function calcMawDamage(pl,damageKind,damage,rand)
 		res=math.max(0, res+(math.min(res,1-res)*roll))
 	end
 	
-	local damage=math.round(damage/2^math.min(res/math.min(75+pl.LevelBase/1.6,200)),4)
+	local damage=math.round(damage/2^math.min(res/math.min(75+monLvl*0.5*bolster,200*bolster)),4)
 	return damage
 end
 
