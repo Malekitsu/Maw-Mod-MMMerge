@@ -580,7 +580,7 @@ function events.CalcDamageToPlayer(t)
 		t.Damage=t.Result*dmgMult
 	end
 	
-	t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true)
+	t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true,data.Monster.Level)
 
 	--add difficulty related damage
 	if Game.BolsterAmount%50~=0 or Game.BolsterAmount==0 then
