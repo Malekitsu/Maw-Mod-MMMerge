@@ -1289,6 +1289,7 @@ end
 --bruteforce fix to items spawning maxcharges more than intended--
 ------------------------------------------------------------------
 function events.BeforeNewGameAutosave()
+	vars.hirelingFix=true
 	for i=0,Party.High do
 		for j=1, Party[0].Items.High do
 			Party[i].Items[j].MaxCharges=0
