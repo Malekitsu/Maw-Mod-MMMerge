@@ -261,7 +261,7 @@ function events.LoadMap()
 		LevelB=BLevel[i]
 		
 		--horizontal progression
-		if horizontalProgression then
+		if Game.freeProgression==false then
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			if not horizontalMaps[name] then
 				bolsterLevel=base.Level*(1-LevelB/100) + LevelB*(LevelB/100) + LevelB*0.5
@@ -300,7 +300,7 @@ function events.LoadMap()
 			end
 		end
 		
-		if mapName=="The Arena" or mapName=="Arena" or horizontalProgression then
+		if mapName=="The Arena" or mapName=="Arena" or Game.freeProgression==false then
 			extraBolster = 0
 		end
 		mon.Level=math.min(mon.Level+extraBolster,255)
@@ -372,7 +372,7 @@ function events.LoadMap()
 		mon.Attack2.DamageAdd, mon.Attack2.DamageDiceSides, mon.Attack2.DamageDiceCount = calcDices(atk2.DamageAdd,atk2.DamageDiceSides,atk2.DamageDiceCount,dmgMult,bonusDamage)
 	end
 	--adjust damage if it's too similiar between monster type
-	if bolsterLevel>10 or horizontalProgression then
+	if bolsterLevel>10 or Game.freeProgression==false then
 		for i=1, 651 do
 			mon=Game.MonstersTxt[i]
 			base=basetable[i]		
@@ -409,7 +409,7 @@ function events.LoadMap()
 		
 		
 	
-	if bolsterLevel>20 or horizontalProgression then
+	if bolsterLevel>20 or Game.freeProgression==false then
 		for i=1, 651 do
 			--calculate level scaling
 			mon=Game.MonstersTxt[i]
