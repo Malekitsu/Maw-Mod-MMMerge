@@ -579,8 +579,10 @@ function events.CalcDamageToPlayer(t)
 		dmgMult=(levelMult/12+1.15)*((levelMult+10)/(oldLevel+10))*(1+(levelMult/200))
 		t.Damage=t.Result*dmgMult
 	end
-	if data and data.Monster then
+	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
 		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true,data.Monster.Level)
+	elseif data and data.Monster then
+		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,false,data.Monster.Level)
 	else
 		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true)
 	end
@@ -834,7 +836,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		res=math.max(0, res+(math.min(res,1-res)*roll))
 	end
 	
-	local damage=math.round(damage/2^math.min(res/math.min(75+monLvl*0.5*bolster,200*bolster)),4)
+	local damage=math.round(damage/2^math.min(res/math.min(75+monLvl*0.5*bolster,200*bolster),4))
 	return damage
 end
 
