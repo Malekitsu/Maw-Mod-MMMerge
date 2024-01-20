@@ -688,7 +688,7 @@ mapLevels={
 {["Low"] = 16 , ["Mid"] = 28 , ["High"] = 36},
 
 ["Troll Tomb"] = 
-{["Low"] = 18 , ["Mid"] = 18 , ["High"] = 18},
+{["Low"] = 16 , ["Mid"] = 16 , ["High"] = 16},
 
 ["Garrote Gorge"] = 
 {["Low"] = 38 , ["Mid"] = 45 , ["High"] = 50},
@@ -1372,8 +1372,8 @@ function events.BuildMonsterInformationBox(t)
 	
 	text=string.format(table.find(const.Damage,mon.Attack1.Type))
 	if not baseDamageValue and Game.CurrentPlayer>=0 then
-		lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit,false,mon.LevelBase))
-		upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit,false,mon.LevelBase))
+		lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit,false,mon.Level))
+		upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit,false,mon.Level))
 	end
 	t.Damage.Text=string.format("Attack 00000	050" .. lowerLimit .. "-" .. upperLimit .. " " .. text)
 	
@@ -1383,8 +1383,8 @@ function events.BuildMonsterInformationBox(t)
 		lowerLimit=math.round(math.max(mean-range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount)*diff)
 		upperLimit=math.round(math.min(mean+range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*mon.Attack2.DamageDiceSides)*diff)
 		if not baseDamageValue then
-			lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit,false,mon.LevelBase))
-			upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit,false,mon.LevelBase))
+			lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit,false,mon.Level))
+			upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit,false,mon.Level))
 		end
 		text=string.format(table.find(const.Damage,mon.Attack2.Type))
 		
@@ -1414,8 +1414,8 @@ function events.BuildMonsterInformationBox(t)
 		lowerLimit=math.round(math.max(mean-range, spell.DamageAdd+skill)*dmgMult*diff)
 		upperLimit=math.round(math.min(mean+range, spell.DamageAdd+skill*spell.DamageDiceSides)*dmgMult*diff)
 		if not baseDamageValue and Game.CurrentPlayer>=0 then
-			lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit,false,mon.LevelBase))
-			upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit,false,mon.LevelBase))
+			lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit,false,mon.Level))
+			upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit,false,mon.Level))
 		end
 		t.SpellFirst.Text=string.format("Spell00000	040" .. name .. " " .. lowerLimit .. "-" .. upperLimit)
 	end
