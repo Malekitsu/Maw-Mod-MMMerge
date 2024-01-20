@@ -216,6 +216,8 @@ function events.ItemGenerated(t)
 			return
 		end
 		
+		partyLevel=math.min(vars.MM8LVL+vars.MM7LVL+vars.MM6LVL-math.min(currentLevel,72), partyLevel+36)
+		
 		--difficulty settings
 		difficultyExtraPower=1
 		if Game.BolsterAmount==150 then
@@ -2608,3 +2610,104 @@ function mawPlayerBaseStats(index)
 		tab[i]=pl[stats[i] .. "ResistanceBase"] + pl[stats[i]  .. "ResistanceBonus"]
 	end
 end
+
+
+--randomize item shop
+
+function events.KeyDown(t)
+	--base numbers
+	if t.Key==82 then
+		refreshItems()
+	end	
+end
+
+shopArmors={31,32,33,34,5}
+function refreshItems()
+	id=Game:GetCurrentHouse()
+	if Game.HouseScreen==2 then
+		h=Game.ShopItems[id]
+	elseif Game.HouseScreen==95 then
+		h=Game.ShopSpecialItems[id]
+	else 
+		return
+	end
+	
+	currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+	if currentWorld==1 then
+		currentLevel=vars.MM8LVL
+	elseif currentWorld==2 then
+		currentLevel=vars.MM7LVL
+	elseif currentWorld==3 then
+		currentLevel=vars.MM6LVL
+	elseif currentWorld==4 then
+		currentLevel=vars.MMMLVL
+	end
+	partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL-math.min(currentLevel,54)
+	--calculate power
+	strength=math.floor(currentLevel/18)+2
+	strength=math.min(strength,5)
+	partyLevel1=math.min(math.floor(partyLevel/18),cap2)
+	cost=(partyLevel1+strength)^2*150
+	if cost>Party.Gold then
+		return
+	else
+		Party.Gold=Party.Gold-cost
+	end
+	
+	for i=0,11 do
+		if math.random(1,18)<currentLevel%18 then
+			strength=strength+1
+		end
+		if h[i].Number~=0 then
+			itemType= h[i]:T().EquipStat
+			if itemType==3 or itemType==4 then
+				it=math.random(1,#shopArmors)
+				h[i]:Randomize(strength, shopArmors[it])
+			else
+				rnd=math.random(1,#vars.shopType[id])
+				h[i]:Randomize(strength, vars.shopType[id][rnd])
+			end
+			h[i].Identified = true
+			Game.GuildItemIconPtr[i] = Game.IconsLod:LoadBitmapPtr(h[i]:T().Picture)
+		end
+	end
+end
+
+--get house info and fix broken prices
+function events.ShopItemsGenerated(t)
+	if Game.HouseScreen==2 or Game.HouseScreen==95 then
+		Game.ShowStatusText("Press R to refresh new items (20000 gold)")
+	else 
+		return
+	end
+	--broken price fix
+	id=Game:GetCurrentHouse()
+	for i=0,Party.High do
+		s,m=SplitSkill(Party[i].Skills[const.Skills.Merchant])
+		if s>15 or m==4 then
+			Game.Houses[id].Val=1
+		end
+	end
+	--check item types to determine what shop is this
+	h=Game.ShopSpecialItems[id]
+	s=Game.ShopItems[id]
+	vars.shopType={}
+	vars.shopType[id]={}
+	for i=0,11 do
+		itemType=h[i]:T().EquipStat
+		if h[i].Number>0 and itemType~=3 and itemType~=4 and itemType~=19 then
+			itemType=h[i]:T().EquipStat+1
+			if not table.find(vars.shopType[id],itemType) then
+				table.insert(vars.shopType[id],itemType)
+			end
+		end
+		itemType=s[i]:T().EquipStat
+		if s[i].Number>0 and itemType~=3 and itemType~=4 and itemType~=19 then
+			itemType=s[i]:T().EquipStat+1
+			if not table.find(vars.shopType[id],itemType) then
+				table.insert(vars.shopType[id],itemType)
+			end
+		end
+	end
+end
+
