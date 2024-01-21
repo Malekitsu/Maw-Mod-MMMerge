@@ -2656,7 +2656,7 @@ function refreshItems()
 	
 	for i=0,11 do
 		if math.random(1,18)<currentLevel%18 then
-			strength=strength+1
+			strength=math.min(strength+1,5)
 		end
 		if h[i].Number~=0 then
 			itemType= h[i]:T().EquipStat
