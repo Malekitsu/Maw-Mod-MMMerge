@@ -2653,6 +2653,10 @@ function refreshItems()
 	else
 		Party.Gold=Party.Gold-cost
 	end
+	--check for shop
+	if not vars.shopType[id] then
+		mawStoreShop()
+	end
 	
 	for i=0,11 do
 		if math.random(1,18)<currentLevel%18 then
@@ -2675,6 +2679,10 @@ end
 
 --get house info and fix broken prices
 function events.ShopItemsGenerated(t)
+	mawStoreShop()
+end
+
+function mawStoreShop()
 	if Game.HouseScreen==2 or Game.HouseScreen==95 then
 		Game.ShowStatusText("Press R to refresh new items (20000 gold)")
 	else 
@@ -2710,4 +2718,3 @@ function events.ShopItemsGenerated(t)
 		end
 	end
 end
-
