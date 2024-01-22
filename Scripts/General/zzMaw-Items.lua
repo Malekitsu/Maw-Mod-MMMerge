@@ -1381,6 +1381,7 @@ slotMap={
 
 function events.BuildItemInformationBox(t)
 	if t.Description then
+		if Game.CurrentPlayer==-1 then return end
 		if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then 
 			i=Game.CurrentPlayer
 			--get spell and its damage
