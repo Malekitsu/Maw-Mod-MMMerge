@@ -2644,6 +2644,17 @@ function refreshItems()
 		currentLevel=vars.MMMLVL
 	end
 	partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL-math.min(currentLevel,54)
+	--cap
+	difficultyExtraPower=1
+	if Game.BolsterAmount==150 then
+		difficultyExtraPower=1.1
+	elseif Game.BolsterAmount==200 then
+		difficultyExtraPower=1.2
+	elseif Game.BolsterAmount==300 then
+		difficultyExtraPower=1.4
+	end
+	cap2=14+ math.floor((difficultyExtraPower-1)*5)
+
 	--calculate power
 	strength=math.floor(currentLevel/18)+2
 	strength=math.min(strength,5)
