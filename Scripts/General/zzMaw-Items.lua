@@ -1470,11 +1470,7 @@ function events.BuildItemInformationBox(t)
 				accuracy=Party[i]:GetAccuracy()
 				luck=Party[i]:GetLuck()
 				delay=math.max(Party[i]:GetAttackDelay())
-				recovery=recoveryBonus
-				bonusMult=1
-				if recoveryBonus>233 then
-					bonusMult=recovery/233
-				end
+				bonusMult=damageMultiplier[Party[i]:GetIndex()].Melee
 				dmg=(low+high)/2
 				--hit chance
 				atk=Party[i]:GetMeleeAttack()
@@ -1655,22 +1651,18 @@ function events.BuildItemInformationBox(t)
 				
 				if powerType=="Melee" then
 					delay=math.max(Party[i]:GetAttackDelay())
+					bonusMult=damageMultiplier[Party[i]:GetIndex()]["Melee"]
 				else
 					delay=Party[i]:GetAttackDelay(true)
+					bonusMult=1
 				end
-				recoveryBonus=recoveryBonus+newSpeed-oldSpeed
-				bonusMult=1
+				recoveryBonus=bonusSpeed+newSpeed-oldSpeed
 				
 				if powerType=="Melee" then
 					delay=math.max(math.floor(100 / (1 + recoveryBonus / 100)),30)
 				else
 					delay=math.floor(100 / (1 + recoveryBonus / 100))
-				end
-				
-				if recoveryBonus>233 then
-					bonusMult=recoveryBonus/233
-				end
-				
+				end				
 				--luck
 				luck=Party[i]:GetLuck()+bonusLuck
 				--hit chance
@@ -1739,7 +1731,6 @@ function events.BuildItemInformationBox(t)
 			--calculation
 			local reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
 			oldVitality=math.round(fullHP/reduction)	
-			
 			--check for stats changes
 			stats={4,6,7,8,10,11,12,13,14,15,16}	
 			end1, speed1, luck1, hp1, ac1, fire1, air1, water1, earth1, mind1, body1 = unpack(calculateStatsAdd(t.Item, stats))
@@ -1796,7 +1787,7 @@ function events.BuildItemInformationBox(t)
 			else
 				oldSpeedEff=math.floor(oldSpeed/5)
 			end
-			newSpeed=Party[i]:GetSpeed()+newSpeed
+			local newSpeed=Party[i]:GetSpeed()+newSpeed
 			if newSpeed<=21 then
 				newSpeedEff=(newSpeed-13)/2
 			else
@@ -1807,7 +1798,7 @@ function events.BuildItemInformationBox(t)
 			ac=ac+newAC+newSpeedEff
 			local lvl=Party[i].LevelBase
 			bolster=(Game.BolsterAmount/100-1)/4+1
-			local acReduction=1-1/2^math.min(ac/math.min(150+lvl*bolster,400*bolster),4)
+			local acReduction=1-math.round(1/2^math.min(ac/math.min(150+lvl*bolster,400*bolster),4)*10000)/10000
 			lvl=math.min(Party[i].LevelBase, 255)
 			blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 			ACRed= 1 - (1-blockChance)*(1-acReduction)
@@ -1849,13 +1840,13 @@ function events.BuildItemInformationBox(t)
 			}
 			res[7]=math.min(res[1],res[2],res[3],res[4],res[5],res[6])
 			for j=1,7 do 
-				res[j]=1-1/2^math.min(res[j]/math.min(75+Party[i].LevelBase*0.5*bolster,200*bolster),4)
+				res[j]=1-math.round(1/2^math.min(res[j]/math.min(75+Party[i].LevelBase*0.5*bolster,200*bolster),4)*10000)/10000
 			end
 			
 			--calculation
 			reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
 			vitality=math.round(vitality/reduction)	
-			
+						
 			newVitality=vitality-oldVitality
 			percentage=math.round((vitality/oldVitality-1)*10000)/100
 			if newVitality<0 then
@@ -2165,38 +2156,6 @@ function itemStats(index)
 			tab[i]=tab[i]*3
 		end
 	end
-	--nightmare and bolster
-	--[[
-	currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
-	if currentWorld==1 then
-		partyLevel=vars.MM7LVL+vars.MM6LVL
-	elseif currentWorld==2 then
-		partyLevel=vars.MM8LVL+vars.MM6LVL
-	elseif currentWorld==3 then
-		partyLevel=vars.MM8LVL+vars.MM7LVL
-	elseif currentWorld==4 then
-		partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-	end
-	partyLevel=math.max(partyLevel-4,0)
-	penaltyLevel=math.round(partyLevel/5)*5
-	penalty=math.min(penaltyLevel,200)
-
-	--calculate party level
-	if Game.BolsterAmount==300 then 
-		if currentWorld==1 then
-			partyLevel=vars.MM8LVL
-		elseif currentWorld==2 then
-			partyLevel=vars.MM7LVL
-		elseif currentWorld==3 then
-			partyLevel=vars.MM6LVL
-		elseif currentWorld==4 then
-			partyLevel=0
-		end
-		penalty=math.min(penaltyLevel,200)
-		penaltyLevel=math.max(partyLevel-30,0)
-		penalty=penalty+math.min(penaltyLevel,100)
-	end
-	]]
 	--add luck to resistances
 	local luck=tab[7]+pl.LuckBase+pl.LuckBonus
 	if luck<=21 then
@@ -2226,10 +2185,52 @@ function itemStats(index)
 	BBHP=s*m
 	BBBonus=math.round(s^2/2)
 	level=pl.LevelBonus+pl.LevelBase
-	baseHP=Game.Classes.HPBase[pl.Class]+Game.Classes.HPFactor[pl.Class]*(level+endEff+BBHP)
+	hpScaling=Game.Classes.HPFactor[pl.Class]
+	baseHP=Game.Classes.HPBase[pl.Class]+hpScaling*(level+endEff+BBHP)
 	fullHP=baseHP+tab[8]+BBBonus
 	Endurancebonus=fullHP*endurance/1000
-	tab[8]=tab[8]+Endurancebonus+BBBonus
+	tab[8]=tab[8]+Endurancebonus+BBBonus+hpScaling*BBHP
+	
+	--get bonus stats from skills
+	
+	--meditation
+	local s,m=SplitSkill(pl.Skills[const.Skills.Meditation])	
+	if m==4 then
+		m=5
+	end
+	tab[9]=tab[9]+Game.Classes.SPFactor[pl.Class]*s*m
+	
+	ACBONUS=0
+	for i=0,3 do 
+		local item=pl:GetActiveItem(i)
+		if item then
+			skill=item:T().Skill
+			s,m = SplitSkill(pl:GetSkill(skill))
+			if skillAC[skill] and skillAC[skill][m] then
+				tab[10]=tab[10]+skillAC[skill][m]*s
+			end
+			if skillResistance[skill] and skillResistance[skill][m] then
+				for v=11,16 do
+					tab[v]=tab[v]+skillResistance[skill][m]*s
+				end
+			end
+			if skillAttack[skill] and skillAttack[skill][m] then
+				if i~=2 then
+					tab[40]=tab[40]+skillAttack[skill][m]*s
+				else
+					tab[44]=tab[44]+skillAttack[skill][m]*s
+				end
+			end
+			if skillDamage[skill] and skillDamage[skill][m] then
+				if i~=2 then
+					tab[41]=tab[41]+skillDamage[skill][m]*s
+				else
+					tab[45]=tab[45]+skillDamage[skill][m]*s
+				end
+			end
+		end
+	end
+	
 	return tab
 end
 
