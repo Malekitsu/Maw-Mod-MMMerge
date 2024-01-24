@@ -1,4 +1,4 @@
-function getItemData()
+--[[function getItemData()
 	a=""
 	Mouse.Item.Number=1
 	for i=0,125 do
@@ -26,42 +26,34 @@ function getItemData()
 	Mouse.Item.Number=0
 	debug.Message(a)
 end
+use this only if you need to write a new item size list, due to different game version]] 
 
 function events.KeyDown(t)
-	if t.Key==82 then
-		if Game.CurrentScreen==7 and Game.CurrentCharScreen==103 then
-			sortInventory()
-			Game.ShowStatusText("Inventory sorted")
-		end
-	end
-end
-function events.KeyDown(t)
-	if t.Key==84 then
-		if Game.CurrentScreen==7 and Game.CurrentCharScreen==103 then
-			sortInventory(true)
-			Game.ShowStatusText("All inventories have been sorted")
-		end
-	end
-end
-function events.KeyDown(t)
-	if t.Key==69 then
-		if Game.CurrentScreen==7 and Game.CurrentCharScreen==103 then
-			vars.alchemyPlayer=vars.alchemyPlayer or -1
-			if vars.alchemyPlayer==Game.CurrentPlayer then
-				vars.alchemyPlayer=-1
-				Game.ShowStatusText(string.format("No alchemy preference when sorting"))
-			else
-				vars.alchemyPlayer=Game.CurrentPlayer
-				Game.ShowStatusText(string.format(Party[Game.CurrentPlayer].Name .. " will now take alchemy items when sorting"))
-			end
-		end
-	end
+    if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 103 then
+        if t.Key == 82 then
+            sortInventory(false)
+            Game.ShowStatusText("Inventory sorted")
+        elseif t.Key == 84 then
+            sortInventory(true)
+            Game.ShowStatusText("All inventories have been sorted")
+        elseif t.Key == 69 then
+            vars.alchemyPlayer = vars.alchemyPlayer or -1
+            if vars.alchemyPlayer == Game.CurrentPlayer then
+                vars.alchemyPlayer = -1
+                Game.ShowStatusText("No alchemy preference when sorting")
+            else
+                vars.alchemyPlayer = Game.CurrentPlayer
+                Game.ShowStatusText(Party[Game.CurrentPlayer].Name .. " will now take alchemy items when sorting")
+            end
+        end
+    end
 end
 
 function sortInventory(all)
 	evt.Add("Items", 0)
-	itemList={}
-	j=0
+	local itemList={}
+	local j=0
+	local low, high
 	if all then
 		low=0
 		high=Party.High
@@ -71,9 +63,9 @@ function sortInventory(all)
 	end
 	
 	for i=low,high do
-		pl=Party[i]
+		local pl=Party[i]
 		for i=1,138 do
-			it=pl.Items[i]
+			local it=pl.Items[i]
 			if it.BodyLocation>0 then
 				if not pl:GetActiveItem(itemEquipStat[it.BodyLocation]) then
 					it.BodyLocation=0
@@ -179,6 +171,7 @@ function sortInventory(all)
 	
 	if itemList[1] then
 		lastPlayer=Game.CurrentPlayer
+		vars.alchemyPlayer=vars.alchemyPlayer or -1
 		for i=1,#itemList do
 			if vars.alchemyPlayer>=0 then
 				if table.find(alchemyItemsOrder,itemList[i].Number) or (itemList[i].Number>=220 and itemList[i].Number<300) then
