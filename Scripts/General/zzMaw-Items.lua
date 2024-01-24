@@ -683,6 +683,16 @@ function events.BuildItemInformationBox(t)
 				local bonus=math.floor(t.Item.Charges/1000)
 				local strength=t.Item.Charges%1000
 				t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
+			elseif t.Item.Bonus~=0 and t.Item.BonusStrength~=0 and t.Item.Bonus2~=0 then
+				if extraDescription then
+					math.randomseed(t.Item.Number*10000+t.Item.MaxCharges*1000+t.Item.Bonus*100+t.Item.BonusStrength*10+t.Item.Charges)
+					local charges=math.random(1,16)*1000+math.min(math.round(t.Item.BonusStrength*(1+0.25*math.random())),100)
+					local bonus=math.floor(charges/1000)
+					local strength=charges%1000
+					txt=baseStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
+					t.Enchantment = StrColor(100,100,100, txt)
+					vars.extraShown=true
+				end
 			end
 		elseif t.Name then
 			--add enchant Name
@@ -729,11 +739,53 @@ function events.BuildItemInformationBox(t)
 					text=Game.SpcItemsTxt[t.Item.Bonus2-1].BonusStat
 				end
 				t.Description = StrColor(255,255,153,text) .. "\n\n" .. t.Description
+			elseif t.Item.Bonus>0 and t.Item.Charges>1000 and extraDescription then
+				n=t.Item.Number
+				c=Game.ItemsTxt[n].EquipStat
+				math.randomseed(t.Item.Number*10000+t.Item.MaxCharges*1000+t.Item.Bonus*100+t.Item.BonusStrength*10+t.Item.Charges)
+				if c<12 then
+					power=6
+					totB2=itemStrength[power][c]
+					roll=math.random(1,totB2)
+					tot=0
+					for i=0,Game.SpcItemsTxt.High do
+						if roll<=tot then
+							enchantNumber=i
+							goto continue
+						elseif table.find(enchants[power], Game.SpcItemsTxt[i].Lvl) then
+							tot=tot+Game.SpcItemsTxt[i].ChanceForSlot[c]
+						end
+					end	
+				end
+				:: continue ::
+				if (t.Item.MaxCharges>=0 and bonusEffects[enchantNumber]~= nil) or enchantList[enchantNumber] then
+					text=checktext(t.Item.MaxCharges,enchantNumber)
+				else
+					text=Game.SpcItemsTxt[enchantNumber-1].BonusStat
+				end
+				t.Description = StrColor(100,100,100,text) .. "\n\n" .. t.Description
+				vars.extraShown=true
+			elseif (t.Item.Bonus>0 and t.Item.Charges>1000) or (t.Item.Bonus>0 and t.Item.Bonus2>0) then
+				if not extraDescription and not vars.extraShown then
+					t.Description = t.Description .. "\n\n" .. StrColor(100,100,100,"Press alt to show craftable stats")
+				end
 			end
 		end
 	end
 end
-	
+
+extraDescription=false
+function events.KeyDown(t)
+	if t.Alt then
+		extraDescription=true
+	end	
+end
+function events.KeyUp(t)
+	if t.Alt then
+		extraDescription=false
+	end	
+end
+
 --colours
 function events.GameInitialized2()
 	itemStatName = {}
@@ -762,6 +814,26 @@ function events.GameInitialized2()
 	itemStatName[23] = StrColor(255,255,153, "Dodge skill")
 	itemStatName[24] = StrColor(255,255,153, "Unarmed skill")
 	itemStatName[25] = StrColor(255,255,153, "Great might")
+	
+	baseStatName={
+		[1]="Might",
+		[2]="Intellect",
+		[3]="Personality",
+		[4]="Endurance",
+		[5]="Accuracy",
+		[6]="Speed",
+		[7]="Luck",
+		[8]="Hit Points",
+		[9]="Spell Points",
+		[10]="Armor Class",
+		[11]="Fire Resistance",
+		[12]="Air Resistance",
+		[13]="Water Resistance",
+		[14]="Earth Resistance",
+		[15]="Mind Resistance",
+		[16]="Body Resistance",
+	}
+		
 end
 					
 --recalculate actual damage
