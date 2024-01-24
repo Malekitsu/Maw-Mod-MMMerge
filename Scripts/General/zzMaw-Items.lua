@@ -2113,8 +2113,8 @@ function itemStats(index)
 			if txt.Skill ~= 5 then
 				tab[40] = tab[40] + math.round(bonus)
 				tab[41] = tab[41] + math.round(bonus)
-				tab[42] = tab[42] + txt.Mod1DiceCount+tab[41]
-				tab[43] = tab[43] + math.round(sidesBonus)*txt.Mod1DiceCount+tab[41]
+				tab[42] = tab[42] + txt.Mod1DiceCount+math.round(bonus)
+				tab[43] = tab[43] + math.round(sidesBonus)*txt.Mod1DiceCount+math.round(bonus)
 			else
 				tab[44] = tab[44] + math.round(bonus)
 				tab[45] = tab[45] + math.round(bonus)
@@ -2204,8 +2204,8 @@ function itemStats(index)
 	for i=0,3 do 
 		local item=pl:GetActiveItem(i)
 		if item then
-			skill=item:T().Skill
-			s,m = SplitSkill(pl:GetSkill(skill))
+			local skill=item:T().Skill
+			local s,m = SplitSkill(pl:GetSkill(skill))
 			if skillAC[skill] and skillAC[skill][m] then
 				tab[10]=tab[10]+skillAC[skill][m]*s
 			end
@@ -2223,18 +2223,33 @@ function itemStats(index)
 			end
 			if skillDamage[skill] and skillDamage[skill][m] then
 				if i~=2 then
-					tab[41]=tab[41]+skillDamage[skill][m]*s
+					tab[41]=tab[42]+skillDamage[skill][m]*s
+					tab[42]=tab[42]+skillDamage[skill][m]*s
+					tab[43]=tab[43]+skillDamage[skill][m]*s
 				else
+					tab[44]=tab[45]+skillDamage[skill][m]*s
 					tab[45]=tab[45]+skillDamage[skill][m]*s
+					tab[46]=tab[46]+skillDamage[skill][m]*s
 				end
 			end
 		end
+	end
+	--armsmaster
+	local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
+	if m>0 then
+		tab[40]=tab[40]+armsmasterAttack[m]*s
+		tab[41]=tab[41]+armsmasterDamage[m]*s
+		tab[42]=tab[42]+armsmasterDamage[m]*s
+		tab[43]=tab[43]+armsmasterDamage[m]*s
 	end
 	--necessary to load attack speed and damage multiplier
 	pl:GetAttackDelay()
 	pl:GetAttackDelay(true)
 	return tab
 end
+
+armsmasterAttack={0,1,1,2}
+armsmasterDamage={0,0,2,4}
 
 equipSpellMap={
 	[30] = const.Skills.Fire,
