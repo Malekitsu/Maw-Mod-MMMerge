@@ -2230,7 +2230,9 @@ function itemStats(index)
 			end
 		end
 	end
-	
+	--necessary to load attack speed and damage multiplier
+	pl:GetAttackDelay()
+	pl:GetAttackDelay(true)
 	return tab
 end
 
