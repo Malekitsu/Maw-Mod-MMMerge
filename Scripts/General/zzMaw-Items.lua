@@ -2702,6 +2702,7 @@ end
 shopArmors={31,32,33,34,5}
 function refreshItems()
 	id=Game:GetCurrentHouse()
+	if id==nil or id>133 then return end
 	if Game.HouseScreen==2 then
 		h=Game.ShopItems[id]
 	elseif Game.HouseScreen==95 then
@@ -2772,11 +2773,7 @@ function events.ShopItemsGenerated(t)
 end
 
 function mawStoreShop()
-	if Game.HouseScreen==2 or Game.HouseScreen==95 then
-		Game.ShowStatusText("Press R to refresh new items (20000 gold)")
-	else 
-		return
-	end
+
 	--broken price fix
 	id=Game:GetCurrentHouse()
 	for i=0,Party.High do
@@ -2785,6 +2782,12 @@ function mawStoreShop()
 			Game.Houses[id].Val=1
 		end
 	end
+	if Game.HouseScreen==2 or Game.HouseScreen==95 then
+		Game.ShowStatusText("Press R to refresh new items (20000 gold)")
+	else 
+		return
+	end
+	if id>133 then return end
 	--check item types to determine what shop is this
 	h=Game.ShopSpecialItems[id]
 	s=Game.ShopItems[id]
