@@ -174,10 +174,10 @@ function events.BuildStatInformationBox(t)
 		speedEffect=math.floor(speed/10)
 		--melee haste
 		delay=math.max(Party[i]:GetAttackDelay())
-		meleeHaste=recoveryBonus
+		meleeHaste=bonusSpeed
 		--bow haste
 		delay=Party[i]:GetAttackDelay(true)
-		bowHaste=recoveryBonus
+		bowHaste=bonusSpeed
 		t.Text=string.format("%s\n\nMelee Haste:   %s%%\nRanged Haste: %s%%\nSpell Haste:   %s%%",t.Text,meleeHaste,bowHaste,speedEffect)
 	end
 	if t.Stat==6 then
@@ -294,10 +294,7 @@ function events.BuildStatInformationBox(t)
 			local accuracy=Party[i]:GetAccuracy()
 			local luck=Party[i]:GetLuck()
 			local delay=Party[i]:GetAttackDelay()
-			bonusMult=1
-			if recoveryBonus>233 then
-				bonusMult=recoveryBonus/233
-			end
+			bonusMult=damageMultiplier[Party[i]:GetIndex()]["Melee"]
 			local dmg=(low+high)/2
 			--hit chance
 			local atk=Party[i]:GetMeleeAttack()
@@ -714,11 +711,7 @@ function events.CalcDamageToMonster(t)
 		
 	--SPEED WILL NOW INCREASE DAMAGE IF OVERCAPPED
 	if not t.Object and t.Player then
-		delay=t.Player:GetAttackDelay()
-		delay=recoveryBonus
-		if recoveryBonus>233 then
-			t.Result=math.round(t.Result*recoveryBonus/233)
-		end
+		t.Result=math.round(t.Result*damageMultiplier[t.PlayerIndex]["Melee"])
 	end
 	
 	index=table.find(damageKindMap,t.DamageKind)
