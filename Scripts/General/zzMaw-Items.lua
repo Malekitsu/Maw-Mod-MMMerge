@@ -1214,8 +1214,8 @@ end
 --ARTIFACTS REWORK
 --------------------------------------
 --Increase Base Stats of weapons (handled in line 210)
-artWeap1h={500,501,502,503,504,508,509,510,512,523,524,526,529,538,542,1302,1303,1304,1305,1308,1312,1316,1319,1328,1329,1330,1333,1340,1342,1343,1344,1345,1353,1354,2020,2021,2023,2025,2035,2036,2038,2040}
-artWeap2h={505,506,507,511,525,526,527,528,530,539,540,541,1309,1310,1311,1320,1351,2022,2024,2037,2039}
+artWeap1h={500,501,502,503,504,506,507,508,509,510,512,523,524,526,527,528,529,538,539,542,1302,1303,1304,1305,1308,1310,1311,1312,1316,1319,1328,1329,1330,1333,1340,1342,1343,1344,1345,1353,1354,2020,2021,2023,2025,2035,2036,2037,2038,2040}
+artWeap2h={505,511,525,526,530,540,541,1309,1320,1351,2022,2024,2039}
 artArmors={513,514,515,516,517,518,520,522,533,534,1306,1307,1313,1314,1318,1321,1322,1323,1324,1327,1331,1332,1334,1335,1336,1337,1346,1349,1350,1352,2026,2027,2028,2030,2031,2041,2042,2043,2045,2046}
 
 function events.GameInitialized2()
@@ -1263,7 +1263,7 @@ end
 
 function replaceNumber(match)
 	lvl=Party[Game.CurrentPlayer].LevelBase
-	lvl=math.max(math.min(lvl/80,3),0.5)
+	lvl=artifactPowerMult(lvl)
     num = tonumber(match)
     if num then
         return tostring(math.round(num * lvl))
@@ -1278,7 +1278,7 @@ end
 function events.BuildItemInformationBox(t)
 	if (t.Item.Number>=500 and t.Item.Number<=543) or (t.Item.Number>=1302 and t.Item.Number<=1354) or (t.Item.Number>=2020 and t.Item.Number<=2049) then 
 		if t.Type then
-			local artifactMult=math.max(math.min(Party[Game.CurrentPlayer].LevelBase/80,3),0.5)
+			local artifactMult=artifactPowerMult(Party[Game.CurrentPlayer].LevelBase)
 			local txt=Game.ItemsTxt[t.Item.Number]
 			local ac=math.ceil((txt.Mod2+txt.Mod1DiceCount)*artifactMult)
 			if ac>0 then 			
@@ -1294,7 +1294,7 @@ function events.BuildItemInformationBox(t)
 		end
 	end
 end
-
+--[[
 --increase artifact damage tooltip
 function events.CalcStatBonusByItems(t)
 	local cs = const.Stats
@@ -1304,9 +1304,9 @@ function events.CalcStatBonusByItems(t)
 				txt=Game.ItemsTxt[it.Number]
 				c=txt.EquipStat
 				if c<=1 then
-				t.Result=t.Result-txt.Mod2+math.ceil(txt.Mod2*math.max(math.min(t.Player.LevelBase/80,3),0.5))
+					t.Result=t.Result-txt.Mod2+math.ceil(txt.Mod2*artifactPowerMult(t.Player.LevelBase))
 					if t.Stat==cs.MeleeDamageMax then
-						t.Result=t.Result-(txt.Mod1DiceCount*txt.Mod1DiceSides-txt.Mod1DiceCount)+(txt.Mod1DiceCount*txt.Mod1DiceSides*math.max(math.min(t.Player.LevelBase/80,3),0.5))
+						t.Result=t.Result-(txt.Mod1DiceCount*txt.Mod1DiceSides-txt.Mod1DiceCount)+(txt.Mod1DiceCount*txt.Mod1DiceSides*artifactPowerMult(t.Player.LevelBase))
 					end
 				end
 			end	
@@ -1319,24 +1319,24 @@ function events.CalcStatBonusByItems(t)
 				txt=Game.ItemsTxt[it.Number]
 				c=txt.EquipStat
 				if c==2 then
-				t.Result=t.Result-txt.Mod2+math.ceil(txt.Mod2*math.max(math.min(t.Player.LevelBase/80,3),0.5))
+				t.Result=t.Result-txt.Mod2+math.ceil(txt.Mod2*artifactPowerMult(t.Player.LevelBase))
 					if t.Stat==cs.RangedDamageMax then
-						t.Result=t.Result-(txt.Mod1DiceCount*txt.Mod1DiceSides-txt.Mod1DiceCount)+(txt.Mod1DiceCount*txt.Mod1DiceSides*math.max(math.min(t.Player.LevelBase/80,3),0.5))
+						t.Result=t.Result-(txt.Mod1DiceCount*txt.Mod1DiceSides-txt.Mod1DiceCount)+(txt.Mod1DiceCount*txt.Mod1DiceSides*artifactPowerMult(t.Player.LevelBase))
 					end
 				end
 			end	
 		end
 	end
 end
-
+]]
 --modify actual damage
 --recalculate actual damage
 function events.ModifyItemDamage(t)
 	if t.Item then
 		if (t.Item.Number>=500 and t.Item.Number<=543) or (t.Item.Number>=1302 and t.Item.Number<=1354) or (t.Item.Number>=2020 and t.Item.Number<=2049) then 
 			bonusDamage=0
-			add=math.ceil(Game.ItemsTxt[t.Item.Number].Mod2*math.max(math.min(t.Player.LevelBase/80,3),0.5))
-			side=math.ceil(Game.ItemsTxt[t.Item.Number].Mod1DiceSides*math.max(math.min(t.Player.LevelBase/80,3),0.5))
+			add=math.ceil(Game.ItemsTxt[t.Item.Number].Mod2*artifactPowerMult(t.Player.LevelBase))
+			side=math.ceil(Game.ItemsTxt[t.Item.Number].Mod1DiceSides*artifactPowerMult(t.Player.LevelBase))
 			--calculate dices
 			for i=1,Game.ItemsTxt[t.Item.Number].Mod1DiceCount do
 				bonusDamage=bonusDamage+math.random(1,side)
@@ -2083,7 +2083,7 @@ function itemStats(index)
 			end
 			--artifacts
 			if artArmors[it.Number] then 
-				artifactMult=math.min(math.max(pl.LevelBase/80,0.5),3)
+				artifactMult=artifactPowerMult(pl.LevelBase)
 				acBonus=math.ceil(acBonus*artifactMult)
 			end
 			tab[10]=tab[10]+acBonus
@@ -2114,7 +2114,7 @@ function itemStats(index)
 			
 			if table.find(artWeap1h,it.Number) or table.find(artWeap2h,it.Number) then 
 				if txt.EquipStat<=1 then
-					artifactMult=math.min(math.max(pl.LevelBase/80,0.5),3)
+					artifactMult=artifactPowerMult(pl.LevelBase)
 					bonus=math.ceil(txt.Mod2*artifactMult)
 					sidesBonus=math.ceil(txt.Mod1DiceSides*artifactMult)
 				end
@@ -2142,14 +2142,14 @@ function itemStats(index)
 		--artifacts stats bonus
 		
 		if artifactStatsBonus[it.Number] then
-			artifactMult=math.min(math.max(pl.LevelBase/80,0.5),3)
+			artifactMult=artifactPowerMult(pl.LevelBase)
 			for key,value in pairs(artifactStatsBonus[it.Number]) do
 				tab[key+1]=tab[key+1]+value*artifactMult
 			end
 		end
 		--artifacts skill bonuses
 		if artifactSkillBonus[it.Number] then
-			artifactMult=math.min(math.max(pl.LevelBase/80,0.5),3)
+			artifactMult=artifactPowerMult(pl.LevelBase)
 			for key,value in pairs(artifactSkillBonus[it.Number]) do
 				tab[key+50]=tab[key+50] or 0
 				tab[key+50]=tab[key+50]+value*artifactMult
@@ -2803,4 +2803,10 @@ function mawStoreShop()
 			end
 		end
 	end
+end
+
+--maw artifact scaling calculation
+function artifactPowerMult(level)
+	local mult=math.max(math.min(level/80,3),0.5)
+	return mult
 end
