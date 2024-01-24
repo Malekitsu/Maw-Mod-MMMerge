@@ -1825,6 +1825,9 @@ function events.GameInitialized2()
 	baseTrainers={}
 	for i=1,29 do
 		baseTrainers[i]=Game.HouseRules.Training[i].Quality
+		if baseTrainers[i]==-1 then
+			baseTrainers[i]=1000
+		end
 	end
 end
 	
@@ -1838,6 +1841,6 @@ function events.LoadMap()
 		end
 	end
 	for i=1,#trainingCenters[currentWorld] do
-		Game.HouseRules.Training[trainingCenters[currentWorld][i]].Quality=math.min(baseTrainers[trainingCenters[currentWorld][i]]+bolster,65535)
+		Game.HouseRules.Training[trainingCenters[currentWorld][i]].Quality=math.min(baseTrainers[trainingCenters[currentWorld][i]]+bolster,1000)
 	end
 end
