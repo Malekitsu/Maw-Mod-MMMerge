@@ -1432,3 +1432,21 @@ end
 ---------------------------
 ----end OF SPELL REWORK----
 ---------------------------
+--[[allow for spells to be learned freely in horizontal moderately
+function events.CanLearnSpell(t)
+	if Game.freeProgression then
+		if t.Player.Spells[t.Spell] then
+			return
+		end
+		local school=math.floor(t.Spell/11)+12
+		if t.Player.Skills[school]>0 then
+			vars.horizontaSpells=vars.horizontaSpells or {}
+			vars.horizontaSpells[t.PlayerIndex]=vars.horizontaSpells[t.PlayerIndex] or {}
+			vars.horizontaSpells[t.PlayerIndex][t.Spell]=true
+			t.Player.Spells[t.Spell]=true
+			Mouse.Item.Number=0
+		end
+	end
+end
+]]
+--to be implemented soon
