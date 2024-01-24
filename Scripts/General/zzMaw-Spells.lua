@@ -514,7 +514,7 @@ function events.PlayerCastSpell(t)
 			if buffId == const.PartyBuff.Haste then
 				expireTime = Game.Time + const.Hour + (m + 1) * m * Const.Minute * s
 			elseif buffId == const.PartyBuff.Heroism then
-				power = 10 + s * m / 2
+				power = 10 + s -- * m / 2
 				expireTime = Game.Time + (2 + s * (m + 1)) * const.Hour
 			end
 			
