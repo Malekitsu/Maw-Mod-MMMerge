@@ -39,7 +39,7 @@ function events.KeyDown(t)
 	if t.Key==84 then
 		if Game.CurrentScreen==7 and Game.CurrentCharScreen==103 then
 			sortInventory(true)
-			Game.ShowStatusText("All inventories have been sorted sorted")
+			Game.ShowStatusText("All inventories have been sorted")
 		end
 	end
 end
