@@ -1529,7 +1529,7 @@ function events.Action(t)
 				skill=partySharedSkills[table.find(partySharedSkills,t.Param)]
 				s,m=SplitSkill(Party[i].Skills[skill])
 				if Game.CurrentPlayer==i then
-					if Party[i].SkillPoints>s then
+					if Party[i].SkillPoints>s and (s<10 or m~=4) then
 						s=s+1
 						increased=i
 					end
