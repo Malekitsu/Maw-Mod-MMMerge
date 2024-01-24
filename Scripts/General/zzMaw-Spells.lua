@@ -450,9 +450,10 @@ function events.PlayerCastSpell(t)
 	--protection spells
 	protectionSpells={[25]={17,14} ,[69]={1,18} ,[36]={4,15} ,[3]={6,12} ,[58]={12,17} ,[14]={0,13} } --first value is spell ID, second is school skill ID
 	if protectionSpells[t.SpellId] then
+		local buffId = protectionSpells[t.SpellId][1]
+
 		if not t.RemoteData then
 			t.Skill=1
-			local buffId=protectionSpells[t.SpellId][1]
 			local s,m = SplitSkill(t.Player:GetSkill(protectionSpells[t.SpellId][2]))
 			local power=s*math.min(m,3)
 			if Party.SpellBuffs[buffId].Power<=	power then
