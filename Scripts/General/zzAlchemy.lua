@@ -509,7 +509,7 @@ end
 
 evt.PotionEffects[82] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
-		if t.Charges>1000 or t.BonusStrength==0 then 
+		if t.Bonus==0 or t.BonusStrength==0 or t.Bonus2==0 then 
 			return
 		end
 		math.randomseed(t.Number*10000+t.MaxCharges*1000+t.Bonus*100+t.BonusStrength*10+t.Charges)
