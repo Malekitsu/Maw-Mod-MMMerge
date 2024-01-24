@@ -31,86 +31,160 @@ function events.KeyDown(t)
 	if t.Key==82 then
 		if Game.CurrentScreen==7 and Game.CurrentCharScreen==103 then
 			sortInventory()
+			Game.ShowStatusText("Inventory sorted")
+		end
+	end
+end
+function events.KeyDown(t)
+	if t.Key==84 then
+		if Game.CurrentScreen==7 and Game.CurrentCharScreen==103 then
+			sortInventory(true)
+			Game.ShowStatusText("All inventories have been sorted sorted")
+		end
+	end
+end
+function events.KeyDown(t)
+	if t.Key==69 then
+		if Game.CurrentScreen==7 and Game.CurrentCharScreen==103 then
+			vars.alchemyPlayer=vars.alchemyPlayer or -1
+			if vars.alchemyPlayer==Game.CurrentPlayer then
+				vars.alchemyPlayer=-1
+				Game.ShowStatusText(string.format("No alchemy preference when sorting"))
+			else
+				vars.alchemyPlayer=Game.CurrentPlayer
+				Game.ShowStatusText(string.format(Party[Game.CurrentPlayer].Name .. " will now take alchemy items when sorting"))
+			end
 		end
 	end
 end
 
-function sortInventory() --by malekith
+function sortInventory(all)
 	evt.Add("Items", 0)
 	itemList={}
 	j=0
-	pl=Party[Game.CurrentPlayer]
-	for i=1,138 do
-		it=pl.Items[i]
-		if it.BodyLocation>0 then
-			if not pl:GetActiveItem(itemEquipStat[it.BodyLocation]) then
-				it.BodyLocation=0
+	if all then
+		low=0
+		high=Party.High
+	else
+		low=Game.CurrentPlayer
+		high=Game.CurrentPlayer
+	end
+	
+	for i=low,high do
+		pl=Party[i]
+		for i=1,138 do
+			it=pl.Items[i]
+			if it.BodyLocation>0 then
+				if not pl:GetActiveItem(itemEquipStat[it.BodyLocation]) then
+					it.BodyLocation=0
+				end
 			end
-		end
-		if it.Number ~=0 and it.BodyLocation==0 then
-			for v=0,125 do 
-				if pl.Inventory[v]==i then
-					j=j+1
-					itemList[j] = {} 
-					--iterating doesn't seem to work
-					itemList[j]["Bonus"]=it.Bonus
-					itemList[j]["Bonus2"]=it.Bonus2
-					itemList[j]["BonusExpireTime"]=it.BonusExpireTime
-					itemList[j]["BonusStrength"]=it.BonusStrength
-					itemList[j]["Broken"]=it.Broken
-					itemList[j]["Charges"]=it.Charges
-					itemList[j]["Condition"]=it.Condition 
-					itemList[j]["Hardened"]=it.Hardened
-					itemList[j]["Identified"]=it.Identified
-					itemList[j]["MaxCharges"]=it.MaxCharges
-					itemList[j]["Number"]=it.Number
-					itemList[j]["Owner"]=it.Owner
-					itemList[j]["Refundable"]=it.Refundable
-					itemList[j]["Stolen"]=it.Stolen
-					itemList[j]["TemporaryBonus"]=it.TemporaryBonus
-					itemList[j]["size"]=itemSizeMap[it.Number][2]
+			if it.Number ~=0 and it.BodyLocation==0 then
+				for v=0,125 do 
+					if pl.Inventory[v]==i then
+						j=j+1
+						itemList[j] = {} 
+						--iterating doesn't seem to work
+						itemList[j]["Bonus"]=it.Bonus
+						itemList[j]["Bonus2"]=it.Bonus2
+						itemList[j]["BonusExpireTime"]=it.BonusExpireTime
+						itemList[j]["BonusStrength"]=it.BonusStrength
+						itemList[j]["Broken"]=it.Broken
+						itemList[j]["Charges"]=it.Charges
+						itemList[j]["Condition"]=it.Condition 
+						itemList[j]["Hardened"]=it.Hardened
+						itemList[j]["Identified"]=it.Identified
+						itemList[j]["MaxCharges"]=it.MaxCharges
+						itemList[j]["Number"]=it.Number
+						itemList[j]["Owner"]=it.Owner
+						itemList[j]["Refundable"]=it.Refundable
+						itemList[j]["Stolen"]=it.Stolen
+						itemList[j]["TemporaryBonus"]=it.TemporaryBonus
+						itemList[j]["size"]=itemSizeMap[it.Number][2]
+					end
 				end
 			end
 		end
-	end
-	table.sort(itemList, function(a, b)
-		if a["size"] == b["size"] then
-			-- When sizes are equal, compare by skill
-			local skillA = Game.ItemsTxt[a["Number"]].Skill
-			local skillB = Game.ItemsTxt[b["Number"]].Skill
-			
-			if skillA == skillB then
-				-- If skills are also equal, then sort by item number
-				return a["Number"] < b["Number"]
+	
+	
+		--empty inventory
+		removeList={}
+		for i=0,125 do
+			if pl.Inventory[i]>0 then
+				if pl.Items[pl.Inventory[i]].BodyLocation==0 then
+					removeList[-i-1]=true
+					pl.Inventory[i]=0 
+				end
+			elseif removeList[pl.Inventory[i]] then
+				pl.Inventory[i]=0
+			end
+		end
+		for i=1,138 do
+			if pl.Items[i].BodyLocation==0 then
+				pl.Items[i].Number=0
+			end
+		end
+		
+		table.sort(itemList, function(a, b)
+			-- Custom function to find index of an item in alchemyItemsOrder
+			local function getIndexInOrder(number)
+				for index, value in ipairs(alchemyItemsOrder) do
+					if value == number then
+						return index
+					end
+				end
+				return nil -- Return nil if the item is not found
+			end
+
+			-- Special sorting for items with number >= 220 and < 300
+			if (a["Number"] >= 220 and a["Number"] < 300) or (b["Number"] >= 220 and b["Number"] < 300) then
+				-- Ensure that items in the specified range are sorted first and from biggest to smallest
+				if (a["Number"] >= 220 and a["Number"] < 300) and (b["Number"] >= 220 and b["Number"] < 300) then
+					return a["Number"] > b["Number"] -- Both in range, sort descending
+				else
+					return a["Number"] >= 220 and a["Number"] < 300 -- Only one in range, it goes first
+				end
+			end
+
+			-- Sorting according to alchemyItemsOrder
+			local indexA = getIndexInOrder(a["Number"])
+			local indexB = getIndexInOrder(b["Number"])
+			if indexA and indexB then -- If both items are in the list
+				return indexA < indexB
+			elseif indexA or indexB then -- If only one item is in the list, it goes first
+				return indexA ~= nil
+			end
+
+			-- Original sorting logic
+			if a["size"] == b["size"] then
+				-- When sizes are equal, compare by skill
+				local skillA = Game.ItemsTxt[a["Number"]].Skill
+				local skillB = Game.ItemsTxt[b["Number"]].Skill
+				
+				if skillA == skillB then
+					-- If skills are also equal, then sort by item number
+					return a["Number"] < b["Number"]
+				else
+					-- Otherwise, sort by skill
+					return skillA < skillB
+				end
 			else
-				-- Otherwise, sort by skill
-				return skillA < skillB
+				-- Primary sort by size
+				return a["size"] > b["size"]
 			end
-		else
-			-- Primary sort by size
-			return a["size"] > b["size"]
-		end
-	end)
-	--empty inventory
-	removeList={}
-	for i=0,125 do
-		if pl.Inventory[i]>0 then
-			if pl.Items[pl.Inventory[i]].BodyLocation==0 then
-				removeList[-i-1]=true
-				pl.Inventory[i]=0 
-			end
-		elseif removeList[pl.Inventory[i]] then
-			pl.Inventory[i]=0
-		end
-	end
-	for i=1,138 do
-		if pl.Items[i].BodyLocation==0 then
-			pl.Items[i].Number=0
-		end
+		end)
+
 	end
 	
+	
 	if itemList[1] then
+		lastPlayer=Game.CurrentPlayer
 		for i=1,#itemList do
+			if vars.alchemyPlayer>=0 then
+				if table.find(alchemyItemsOrder,itemList[i].Number) or (itemList[i].Number>=220 and itemList[i].Number<300) then
+					Game.CurrentPlayer=vars.alchemyPlayer
+				end
+			end
 			evt.Add("Items", itemList[i].Number)
 			it=Mouse.Item
 			it.Bonus=itemList[i].Bonus
@@ -127,12 +201,22 @@ function sortInventory() --by malekith
 			it.Refundable=itemList[i].Refundable
 			it.Stolen=itemList[i].Stolen
 			it.TemporaryBonus=itemList[i].TemporaryBonus
+			
+			Game.CurrentPlayer=lastPlayer
 		end
 		evt.Add("Items", 0)
 	end
 	table.clear(itemList)
 end	
 
+
+-- Define the alchemyItemsOrder list for reference in sorting
+alchemyItemsOrder = {
+	200, 1002, 1764, 201, 1003, 202, 1004, 203, 1005, 204, 1006,
+	205, 1007, 1763, 206, 1008, 207, 1009, 208, 1010, 209, 1011,
+	210, 1012, 1762, 211, 1013, 212, 1014, 213, 1015, 214, 1016,
+	215, 1017, 216, 1018, 217, 1019, 218, 1020, 219, 1021
+}
 itemEquipStat={
 	[1]=0,
 	[2]=1,
