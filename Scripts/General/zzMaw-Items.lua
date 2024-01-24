@@ -262,7 +262,6 @@ function events.ItemGenerated(t)
 			roll1=roll1/2.5
 			roll2=roll1/2.5
 			rollSpc=roll1/2.5
-			bossLoot=false
 		end
 		--apply enchant1
 		if enc1Chance[pseudoStr]>roll1 then
@@ -294,7 +293,10 @@ function events.ItemGenerated(t)
 		--ancient item
 		ancient=false
 		ancientChance=(enc1Chance[pseudoStr]/100)*(enc2Chance[pseudoStr]/100)*(spcEncChance[pseudoStr]/100)/4
-		
+		if bossLoot then
+			ancientChance=ancientChance*10
+			bossLoot=false
+		end
 		--INCREASE ANCIENT AND PRIMORDIAL CHANCE IN SHOPS BASED ON MONEY
 		if Game.HouseScreen==2 or Game.HouseScreen==95 then
 			ancientChance=ancientChance*math.min(1+(Party.Gold+Party.BankGold)/1000000,5)
