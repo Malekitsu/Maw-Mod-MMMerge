@@ -1454,6 +1454,13 @@ slotMap={
 	
 
 function events.BuildItemInformationBox(t)
+	--maxcharges fix
+	partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+	maxItemBolster=(partyLevel)/5+20
+	--failsafe
+	if t.Item and t.Item.Charges==0 and t.Item.Bonus==0 and t.Item.MaxCharges>maxItemBolster then
+		t.Item.MaxCharges=0
+	end
 	if t.Description then
 		if Game.CurrentPlayer==-1 then return end
 		if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then 
