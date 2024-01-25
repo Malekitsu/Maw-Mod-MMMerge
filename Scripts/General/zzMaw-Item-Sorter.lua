@@ -64,62 +64,46 @@ function sortInventory(all)
 	
 	for i=low,high do
 		local pl=Party[i]
-		for i=1,138 do
-			local it=pl.Items[i]
-			if it.BodyLocation>0 then
-				if not pl:GetActiveItem(itemEquipStat[it.BodyLocation]) then
-					it.BodyLocation=0
-				end
-			end
-			if it.Number ~=0 and it.BodyLocation==0 then
-				for v=0,125 do 
-					if pl.Inventory[v]==i then
-						j=j+1
-						itemList[j] = {} 
-						--iterating doesn't seem to work
-						itemList[j]["Bonus"]=it.Bonus
-						itemList[j]["Bonus2"]=it.Bonus2
-						itemList[j]["BonusExpireTime"]=it.BonusExpireTime
-						itemList[j]["BonusStrength"]=it.BonusStrength
-						itemList[j]["Broken"]=it.Broken
-						itemList[j]["Charges"]=it.Charges
-						itemList[j]["Condition"]=it.Condition 
-						itemList[j]["Hardened"]=it.Hardened
-						itemList[j]["Identified"]=it.Identified
-						itemList[j]["MaxCharges"]=it.MaxCharges
-						itemList[j]["Number"]=it.Number
-						itemList[j]["Owner"]=it.Owner
-						itemList[j]["Refundable"]=it.Refundable
-						itemList[j]["Stolen"]=it.Stolen
-						itemList[j]["TemporaryBonus"]=it.TemporaryBonus
-						itemList[j]["size"]=itemSizeMap[it.Number][2]
-						if itemList[j]["size"]==1 and itemSizeMap[it.Number][1] >1 then
-							itemList[j]["size"]=1.5
-						end
-					end
-				end
-			end
-		end
-	
-	
-		--empty inventory
+		
 		removeList={}
 		for i=0,125 do
 			if pl.Inventory[i]>0 then
 				if pl.Items[pl.Inventory[i]].BodyLocation==0 then
 					removeList[-i-1]=true
-					pl.Inventory[i]=0 
 				end
-			elseif removeList[pl.Inventory[i]] then
+				local it=pl.Items[pl.Inventory[i]]
+				j=j+1
+				itemList[j] = {} 
+				--iterating doesn't seem to work
+				itemList[j]["Bonus"]=it.Bonus
+				itemList[j]["Bonus2"]=it.Bonus2
+				itemList[j]["BonusExpireTime"]=it.BonusExpireTime
+				itemList[j]["BonusStrength"]=it.BonusStrength
+				itemList[j]["Broken"]=it.Broken
+				itemList[j]["Charges"]=it.Charges
+				itemList[j]["Condition"]=it.Condition 
+				itemList[j]["Hardened"]=it.Hardened
+				itemList[j]["Identified"]=it.Identified
+				itemList[j]["MaxCharges"]=it.MaxCharges
+				itemList[j]["Number"]=it.Number
+				itemList[j]["Owner"]=it.Owner
+				itemList[j]["Refundable"]=it.Refundable
+				itemList[j]["Stolen"]=it.Stolen
+				itemList[j]["TemporaryBonus"]=it.TemporaryBonus
+				itemList[j]["size"]=itemSizeMap[it.Number][2]
+				if itemList[j]["size"]==1 and itemSizeMap[it.Number][1] >1 then
+					itemList[j]["size"]=1.5
+				end
+				pl.Inventory[i]=0 
+				it.Number=0
+			end
+		end
+			
+		for i=0,125 do
+			if removeList[pl.Inventory[i]] then
 				pl.Inventory[i]=0
 			end
 		end
-		for i=1,138 do
-			if pl.Items[i].BodyLocation==0 then
-				pl.Items[i].Number=0
-			end
-		end
-		
 		vars.alchemyPlayer=vars.alchemyPlayer or -1
 		table.sort(itemList, function(a, b)
 			-- Custom function to find index of an item in alchemyItemsOrder
