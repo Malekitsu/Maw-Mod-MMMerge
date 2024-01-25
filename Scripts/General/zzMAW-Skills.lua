@@ -146,7 +146,7 @@ function events.GetAttackDelay(t)
 			local it=t.Player:GetActiveItem(i)
 			if it then
 				local skill=it:T().Skill
-				if baseSpeed==baseRecovery[skill] then
+				if baseRecovery[skill] then
 					baseSpeed=baseSpeed-100+baseRecovery[skill]
 				end
 				local s,m = SplitSkill(t.Player:GetSkill(skill))
@@ -194,7 +194,7 @@ function events.GetAttackDelay(t)
 			damageMultiplier[t.PlayerIndex]["Melee"]=damageMultiplier[t.PlayerIndex]["Melee"]*extraMult
 		end
 	end
-	t.Result=attackRecovery
+	t.Result=math.max(attackRecovery,speedCap)
 end
 
 function calculateAngle(vector1, vector2)
