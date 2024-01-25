@@ -1442,6 +1442,11 @@ function events.LoadMap()
 	Game.UseMonsterBolster=false
 end
 
+--disable base monster Resistances
+function events.CalcDamageToMonster(t)
+	t.Result=t.Damage
+end
+
 --disable respawn in outside maps (mostly)
 outSideMaps={1,2,3,4,5,6,7,8,13, 62,63,64,65,66,67,68,69,70,72,73,74,99,100,140,141,143,144,145,146,147,148,149,150,151}
 function events.GameInitialized2()
