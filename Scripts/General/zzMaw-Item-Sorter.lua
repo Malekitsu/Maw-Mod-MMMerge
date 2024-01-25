@@ -93,6 +93,9 @@ function sortInventory(all)
 						itemList[j]["Stolen"]=it.Stolen
 						itemList[j]["TemporaryBonus"]=it.TemporaryBonus
 						itemList[j]["size"]=itemSizeMap[it.Number][2]
+						if itemList[j]["size"]==1 and itemSizeMap[it.Number][1] >1 then
+							itemList[j]["size"]=1.5
+						end
 					end
 				end
 			end
@@ -117,6 +120,7 @@ function sortInventory(all)
 			end
 		end
 		
+		vars.alchemyPlayer=vars.alchemyPlayer or -1
 		table.sort(itemList, function(a, b)
 			-- Custom function to find index of an item in alchemyItemsOrder
 			local function getIndexInOrder(number)
@@ -129,24 +133,26 @@ function sortInventory(all)
 			end
 
 			-- Special sorting for items with number >= 220 and < 300
-			if (a["Number"] >= 220 and a["Number"] < 300) or (b["Number"] >= 220 and b["Number"] < 300) then
-				-- Ensure that items in the specified range are sorted first and from biggest to smallest
-				if (a["Number"] >= 220 and a["Number"] < 300) and (b["Number"] >= 220 and b["Number"] < 300) then
-					return a["Number"] > b["Number"] -- Both in range, sort descending
-				else
-					return a["Number"] >= 220 and a["Number"] < 300 -- Only one in range, it goes first
+			if vars.alchemyPlayer>=0 then
+				if (a["Number"] >= 220 and a["Number"] < 300) or (b["Number"] >= 220 and b["Number"] < 300) then
+					-- Ensure that items in the specified range are sorted first and from biggest to smallest
+					if (a["Number"] >= 220 and a["Number"] < 300) and (b["Number"] >= 220 and b["Number"] < 300) then
+						return a["Number"] > b["Number"] -- Both in range, sort descending
+					else
+						return a["Number"] >= 220 and a["Number"] < 300 -- Only one in range, it goes first
+					end
+				end
+
+				-- Sorting according to alchemyItemsOrder
+				local indexA = getIndexInOrder(a["Number"])
+				local indexB = getIndexInOrder(b["Number"])
+				if indexA and indexB then -- If both items are in the list
+					return indexA < indexB
+				elseif indexA or indexB then -- If only one item is in the list, it goes first
+					return indexA ~= nil
 				end
 			end
-
-			-- Sorting according to alchemyItemsOrder
-			local indexA = getIndexInOrder(a["Number"])
-			local indexB = getIndexInOrder(b["Number"])
-			if indexA and indexB then -- If both items are in the list
-				return indexA < indexB
-			elseif indexA or indexB then -- If only one item is in the list, it goes first
-				return indexA ~= nil
-			end
-
+			
 			-- Original sorting logic
 			if a["size"] == b["size"] then
 				-- When sizes are equal, compare by skill
