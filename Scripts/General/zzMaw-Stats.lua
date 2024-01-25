@@ -3,6 +3,24 @@ function events.CalcDamageToMonster(t)
 	--luck/accuracy bonus
 	if data and data.Player and (t.DamageKind==4 or data.Player.Class==10 or data.Player.Class==11) then --dragons
 		if data.Object==nil or data.Object.Spell==133 or data.Player.Class==10 or data.Player.Class==11 then
+			
+			--OVERRIDE DAMAGE WITH MAW CALCULATION
+			if data.Object==nil then
+				baseDamage=t.Player:GetMeleeDamageMin()
+				maxDamage=t.Player:GetMeleeDamageMax()
+				randomDamage=(maxDamage-baseDamage)*(math.random()+math.random())/2
+			else --bow
+				baseDamage=t.Player:GetRangedDamageMin()
+				maxDamage=t.Player:GetRangedDamageMax()
+				randomDamage=(maxDamage-baseDamage)*(math.random()+math.random())/2
+			end
+			
+			t.Result=baseDamage+randomDamage
+			
+			if t.Result>maxDamage then
+				debug.Message(string.format(t.Result .. "  " .. maxDamage))
+			end
+				
 			luck=data.Player:GetLuck()/1.5
 			critDamage=data.Player:GetAccuracy()*3/1000
 			critChance=50+luck
@@ -24,10 +42,6 @@ function events.CalcDamageToMonster(t)
 				t.Result=t.Result*(1.5+critDamage)
 				crit=true
 			end
-	--might bonus
-			might=data.Player:GetMight()
-			damageBonus=might/1000
-			t.Result=t.Result*(1+damageBonus)
 		end
 	end
 end
@@ -726,7 +740,6 @@ function events.CalcDamageToMonster(t)
 	end
 	--apply Damage
 	t.Result = t.Result * (1-res)
-	
 end
 
 --stats breakpoints
