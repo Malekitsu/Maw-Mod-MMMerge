@@ -935,8 +935,7 @@ function MawRegen()
 			--regeneration spell
 			Buff=Party[i].SpellBuffs[const.PlayerBuff.Regeneration]
 			if Buff.ExpireTime > Game.Time and Buff.Caster >= 0 and Buff.Caster <= Party.High then
-				Buff.Power=0
-				RegS, RegM = SplitSkill(Party[Buff.Caster]:GetSkill(const.Skills.Body))
+				RegS, RegM = SplitSkill(Buff.Skill)
 				regenHP[i] = regenHP[i] + FHP^0.5*RegS^1.3*((RegM+1)/10000) -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
 			end
 			
