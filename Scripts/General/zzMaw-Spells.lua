@@ -103,6 +103,7 @@ function events.PlayerCastSpell(t)
 		--online code
 		elseif t.RemoteData then
 			invisCasted=t.RemoteData[1]
+			mawBuffs()
 		end
 	end
 	
@@ -303,7 +304,24 @@ function events.PlayerCastSpell(t)
 			end
 		end
 	end
-
+	
+	--REGENERATION
+	if t.SpellId==71 then
+		if not t.RemoteData then
+			function events.Tick() 
+				events.Remove("Tick", 1)
+				regenerationCasted={true,t.Skill,t.Mastery,t.TargetId}
+				mawBuffs()
+			end
+			if t.MultiplayerData then
+				t.MultiplayerData[1]=regenerationCasted
+			end
+		--online code
+		elseif t.RemoteData then
+			regenerationCasted=t.RemoteData[1]
+			mawBuffs()
+		end
+	end
 	
 	--cure disease, reworked to greater heal
 	if t.SpellId==74 then
@@ -444,16 +462,16 @@ function events.PlayerCastSpell(t)
 		--online code
 		elseif t.RemoteData then
 			DoGCasted=t.RemoteData[1]
+			mawBuffs()
 		end
 	end
 	
 	--protection spells
 	protectionSpells={[25]={17,14} ,[69]={1,18} ,[36]={4,15} ,[3]={6,12} ,[58]={12,17} ,[14]={0,13} } --first value is spell ID, second is school skill ID
 	if protectionSpells[t.SpellId] then
-		local buffId = protectionSpells[t.SpellId][1]
-
 		if not t.RemoteData then
 			t.Skill=1
+			local buffId=protectionSpells[t.SpellId][1]
 			local s,m = SplitSkill(t.Player:GetSkill(protectionSpells[t.SpellId][2]))
 			local power=s*math.min(m,3)
 			if Party.SpellBuffs[buffId].Power<=	power then
@@ -486,6 +504,7 @@ function events.PlayerCastSpell(t)
 		--online code
 		elseif t.RemoteData then
 			DoPCasted=t.RemoteData[1]
+			mawBuffs()
 		end
 	end
 	
@@ -514,7 +533,7 @@ function events.PlayerCastSpell(t)
 			if buffId == const.PartyBuff.Haste then
 				expireTime = Game.Time + const.Hour + (m + 1) * m * Const.Minute * s
 			elseif buffId == const.PartyBuff.Heroism then
-				power = 10 + s -- * m / 2
+				power = 10 + s -- nerf * m / 2
 				expireTime = Game.Time + (2 + s * (m + 1)) * const.Hour
 			end
 			
@@ -573,6 +592,12 @@ function mawBuffs()
 		Party.SpellBuffs[11].ExpireTime = Game.Time+duration*const.Minute*1.5
 		Sleep(1)
 		invisCasted[1]=false
+	end
+	if regenerationCasted and regenerationCasted[1] then
+		Buff=Party[regenerationCasted[4]].SpellBuffs[const.PlayerBuff.Regeneration]
+		Buff.Power=0
+		Buff.Skill=JoinSkill(regenerationCasted[2], regenerationCasted[3])
+		regenerationCasted[1]=false
 	end
 	--refresh stats
 	mawRefresh("all")
@@ -1449,4 +1474,3 @@ function events.CanLearnSpell(t)
 	end
 end
 ]]
---to be implemented soon
