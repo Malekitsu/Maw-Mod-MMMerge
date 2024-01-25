@@ -27,9 +27,9 @@ baseRecovery =
 	[const.Skills.Bow] = 100,
 	[const.Skills.Blaster] = 50,
 	[const.Skills.Staff] = 120,
-	[const.Skills.Axe] = 130,
+	[const.Skills.Axe] = 150,
 	[const.Skills.Sword] = 90,
-	[const.Skills.Spear] = 110,
+	[const.Skills.Spear] = 120,
 	[const.Skills.Mace] = 100,
 	[const.Skills.Dagger] = 80,
 }
@@ -181,7 +181,7 @@ function events.GetAttackDelay(t)
 	else
 		damageMultiplier[t.PlayerIndex]["Melee"]=1*baseSpeed/100
 	end
-	local speedCap=30
+	local speedCap=baseSpeed/3
 	bonusSpeedMult=(100+bonusSpeed)/100
 	attackRecovery=baseSpeed/bonusSpeedMult
 	if attackRecovery<speedCap and not t.Ranged then
@@ -330,22 +330,6 @@ function events.ModifyItemDamage(t)
         t.Result = t.Result + mightBonus +s * dmgBonus
     end
 end
-----------------------
---ARMSMASTER CODE, so far it's 2 damage at master and 4 at GM
-----------------------
-function events.CalcStatBonusBySkills(t)
-	if t.Stat == const.Stats.MeleeDamageBase then
-		if t.Player:GetActiveItem(1) then
-			local s, m = SplitSkill(t.Player:GetSkill(const.Skills.Armsmaster))
-			if m == 3 then
-				t.Result=t.Result+s
-			elseif m ==4 then
-				t.Result=t.Result+s*2
-			end
-		end
-	end
-end
-
 
 ------------------------
 --AUTO GENERATING TOOLTIPS
