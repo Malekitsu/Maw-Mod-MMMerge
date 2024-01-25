@@ -2235,7 +2235,8 @@ function itemStats(index)
 		end
 	end
 	--armsmaster
-	local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
+	local s,m = SplitSkill(pl.Skills[const.Skills.Armsmaster])
+	s=s+tab[22]
 	if m>0 then
 		tab[40]=tab[40]+armsmasterAttack[m]*s
 		tab[41]=tab[41]+armsmasterDamage[m]*s
@@ -2245,6 +2246,18 @@ function itemStats(index)
 	--necessary to load attack speed and damage multiplier
 	pl:GetAttackDelay()
 	pl:GetAttackDelay(true)
+	--add might and speed multiplier
+	local might=tab[1]+pl.MightBase+pl.MightBonus+Party.SpellBuffs[2].Power
+	if might<=21 then
+		mightEffect=(might-13)/2
+	else
+		mightEffect=math.floor(might/5)
+	end
+	local bonusDamage=mightEffect+Party.SpellBuffs[const.PartyBuff.Heroism].Power
+	tab[42]=tab[42]+(tab[42]+bonusDamage)*might/1000
+	tab[43]=tab[43]+(tab[43]+bonusDamage)*might/1000
+	tab[46]=tab[46]+(tab[46]+bonusDamage)*might/1000
+	tab[47]=tab[47]+(tab[47]+bonusDamage)*might/1000
 	return tab
 end
 
