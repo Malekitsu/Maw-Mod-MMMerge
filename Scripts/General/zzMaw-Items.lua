@@ -696,6 +696,22 @@ function events.BuildItemInformationBox(t)
 					vars.extraShown=true
 				end
 			end
+			if t.Item.Bonus==0 and t.Item.Bonus2==0 and t.Item.Charges<1000 and extraDescription then
+				if vars.enchantSeedList==nil then
+				vars.enchantSeedList={}
+					for i=0,2500 do
+						vars.enchantSeedList[i]=math.random(1,100000)
+					end
+				end
+				math.randomseed(vars.enchantSeedList[t.Item.Number]+t.Item.MaxCharges)
+				if math.random(1,10)==1 then
+					bonus=math.random(17,24)
+				else
+					bonus=math.random(1,16)
+				end
+				txt=baseStatName[bonus] .. " +X"
+				t.Enchantment = StrColor(100,100,100, txt)
+			end
 		elseif t.Name then
 			--add enchant Name
 			t.Name = Game.ItemsTxt[t.Item.Number].Name
@@ -834,6 +850,14 @@ function events.GameInitialized2()
 		[14]="Earth Resistance",
 		[15]="Mind Resistance",
 		[16]="Body Resistance",
+		[17]="Alchemy skill",
+		[18]="Stealing skill",
+		[19]="Disarm skill",
+		[20]="ID Item skill",
+		[21]="ID Monster skill",
+		[22]="Armsmaster skill",
+		[23]="Dodge skill",
+		[24]="Unarmed skill",
 	}
 		
 end
