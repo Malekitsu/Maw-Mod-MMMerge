@@ -254,6 +254,12 @@ function events.BuildStatInformationBox(t)
 		HPregenItem=HPregenItem
 		regen=math.ceil(FHP*HPregenItem*0.02)+hpRegen+bonusregen
 		
+		Buff=Party[i].SpellBuffs[const.PlayerBuff.Regeneration]
+		if Buff.ExpireTime > Game.Time then
+			RegS, RegM = SplitSkill(Buff.Skill)
+			regen = math.ceil(regen + FHP^0.5*RegS^1.3*((RegM+1)/100)) 
+		end
+	
 		t.Text=string.format("%s\n\nHP bonus from Endurance: %s\nHP bonus from Body building: %s\nHP bonus from items: %s\nBase HP: %s\n\n HP Regen per second: %s",t.Text,StrColor(0,255,0,enduranceTotalBonus), StrColor(0,255,0,BBHP),StrColor(0,255,0,math.round(fullHP-enduranceTotalBonus-BBHP-BASEHP)),StrColor(0,255,0,BASEHP),StrColor(0,255,0,regen/10))
 	end
 	if t.Stat==8 then
