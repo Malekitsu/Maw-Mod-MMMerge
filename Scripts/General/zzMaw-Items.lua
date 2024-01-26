@@ -1520,7 +1520,7 @@ function events.BuildItemInformationBox(t)
 					end
 				end
 				DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*bonusMult)
-				
+				--debug.Message(string.format("%s %s %s %s %s %s %s %s ", dmg,might,daggerCritBonus,luck,accuracy,delay,hitChance,bonusMult))
 				--RANGED
 				low=Party[i]:GetRangedDamageMin()
 				high=Party[i]:GetRangedDamageMax()
@@ -1690,9 +1690,9 @@ function events.BuildItemInformationBox(t)
 				recoveryBonus=bonusSpeed+newSpeed-oldSpeed
 				
 				if powerType=="Melee" then
-					delay=math.max(math.floor(100 / (1 + recoveryBonus / 100)),30)
+					delay=math.max(math.floor(baseSpeed / (1 + recoveryBonus / 100)),30)
 				else
-					delay=math.floor(100 / (1 + recoveryBonus / 100))
+					delay=math.floor(baseSpeed / (1 + recoveryBonus / 100))
 				end				
 				--luck
 				luck=Party[i]:GetLuck()+bonusLuck
@@ -1725,6 +1725,7 @@ function events.BuildItemInformationBox(t)
 					end
 				end
 				power=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*bonusMult)
+				--debug.Message(string.format("%s %s %s %s %s %s %s %s ", dmg,might,daggerCritBonus,luck,accuracy,delay,hitChance,bonusMult))
 			end
 			
 			
@@ -1743,6 +1744,7 @@ function events.BuildItemInformationBox(t)
 			ac=Party[i]:GetArmorClass()
 			local acReduction=1-calcMawDamage(Party[i],4,10000)/10000
 			lvl=math.min(Party[i].LevelBase, 255)
+			local ac=ac/(Game.BolsterAmount/100)
 			blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 			ACRed= 1 - (1-blockChance)*(1-acReduction)
 			--speed
@@ -1831,6 +1833,7 @@ function events.BuildItemInformationBox(t)
 			bolster=(Game.BolsterAmount/100-1)/4+1
 			local acReduction=1-math.round(1/2^math.min(ac/math.min(150+lvl*bolster,400*bolster),4)*10000)/10000
 			lvl=math.min(Party[i].LevelBase, 255)
+			local ac=ac/(Game.BolsterAmount/100)
 			blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 			ACRed= 1 - (1-blockChance)*(1-acReduction)
 			--speed
