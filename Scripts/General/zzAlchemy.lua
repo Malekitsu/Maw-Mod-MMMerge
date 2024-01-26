@@ -29,6 +29,7 @@ end
 
 function events.UseMouseItem(t)
 	--override
+	if it.Number<221 or it.Number>=300 then return end
 	t.Allow=false
 	local it=Mouse.Item
 	local pl=Party[t.PlayerSlot]
