@@ -62,7 +62,7 @@ evt.PotionEffects[18] = function(IsDrunk, t, Power)
 				end
 			end
 			math.randomseed(vars.enchantSeedList[t.Number]+t.MaxCharges)
-			if math.random(1,10) then
+			if math.random(1,10)==1 then
 				t.Bonus=math.random(17,24)
 				t.BonusStrength=Mouse.Item.Bonus^0.5
 			else
