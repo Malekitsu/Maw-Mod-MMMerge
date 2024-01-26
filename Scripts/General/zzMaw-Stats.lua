@@ -16,11 +16,11 @@ function events.CalcDamageToMonster(t)
 			end
 			
 			t.Result=baseDamage+randomDamage
-			
+			--[[
 			if t.Result>maxDamage then
 				debug.Message(string.format(t.Result .. "  " .. maxDamage))
 			end
-				
+			]]
 			luck=data.Player:GetLuck()/1.5
 			critDamage=data.Player:GetAccuracy()*3/1000
 			critChance=50+luck
