@@ -349,7 +349,7 @@ potionText={
 	[259] = "Grant XP to the player.",
 	[260] = "Permanently adds 30/60/90 to Fire, Air, Water and Earth Resistance, single-use.\nRequire 55 power per step to work.\n",
 	[261] = "Permanently adds 30/60/90 to Mind and Body Resistance, single-use.\nRequire 55 power per step to work.\n",
-	[262] = "Adds 'of Darkness' property to a non-magic weapon.\nRequire 55 power to work.\n",
+	[262] = "Adds 'of Darkness' property to a non-magic weapon.\nRequire 100 power to work.\n",
 	[263] = "Fix caracter age at 60.\nRequire 55 power to work.\n",
 }
 
