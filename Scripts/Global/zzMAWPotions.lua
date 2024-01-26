@@ -1,140 +1,22 @@
-
-vars.PotionBuffs = vars.PotionBuffs or {}
-local PSet	= vars.PotionBuffs
-PSet.UsedPotions = PSet.UsedPotions or {}
-
-local function GetPlayerId(Player)
-	return Player:GetIndex()
-end
-
-local function GetPartyId(Player)
-	for i, v in Party do
-		if v['?ptr'] == Player['?ptr'] then
-			return i
-		end
+evt.PotionEffects[42] = function(IsDrunk, t, Power)
+	if Mouse.Item.Bonus<100 then
+		Game.ShowStatusText("This potion has not enough power")
+		return
+	end
+	if t.Bonus2==0 and Game.ItemsTxt[t.Number].Skill<7 then
+		local enchNumber=(t.Number+t.Charges+t.MaxCharges+t.Bonus+t.BonusStrength)%4
+		t.Bonus2=41
+		Mouse.Item.Number=0
+		mem.u4[0x51E100] = 0x100 
+		t.Condition = t.Condition:Or(0x10)
+		evt.PlaySound(12070)
 	end
 end
-
--- Rejuvenation potion
-evt.PotionEffects[51] = function(IsDrunk, Target, Power)
-	if IsDrunk then
-		Target.MightBase		= Target.MightBase - 5
-		Target.IntellectBase	= Target.IntellectBase - 5
-		Target.PersonalityBase	= Target.PersonalityBase - 5
-		Target.EnduranceBase	= Target.EnduranceBase - 5
-		Target.AccuracyBase		= Target.AccuracyBase - 5
-		Target.SpeedBase		= Target.SpeedBase - 5
-		Target.LuckBase			= Target.LuckBase - 5
-
-		for i,v in Target.Resistances do
-			v.Base = v.Base - 5
-		end
-		Target.BirthYear = Target.BirthYear + 10
+evt.PotionEffects[32] = function(IsDrunk, t, Power)
+	if Mouse.Item.Bonus<55 then
+		Game.ShowStatusText("This potion has not enough power")
+		return
 	end
-end
-
--- Divine boost
-evt.PotionEffects[60] = function(IsDrunk, Target, Power)
-	if IsDrunk then
-		local Buffs = Target.SpellBuffs
-		local ExpireTime = Game.Time + Power*const.Minute*30
-		local Effect = 10+Power
-
-		for k,v in pairs({"TempLuck", "TempIntellect", "TempPersonality", "TempAccuracy", "TempEndurance", "TempSpeed", "TempMight"}) do
-			Buff = Buffs[const.PlayerBuff[v]]
-			Buff.ExpireTime = ExpireTime
-			Buff.Power = Effect
-		end
-	end
-end
-
--- Divine protection
-evt.PotionEffects[61] = function(IsDrunk, Target, Power)
-	if IsDrunk then
-		local Buffs = Target.SpellBuffs
-		local ExpireTime = Game.Time + Power*const.Minute*30
-		local Effect = 10+Power
-
-		for k,v in pairs({"AirResistance", "BodyResistance", "EarthResistance", "FireResistance", "MindResistance", "WaterResistance"}) do
-			Buff = Buffs[const.PlayerBuff[v]]
-			Buff.ExpireTime = ExpireTime
-			Buff.Power = Effect
-		end
-	end
-end
-
--- Divine Transcendence
-evt.PotionEffects[62] = function(IsDrunk, Target, Power)
-	if IsDrunk then
-		local PlayerId = GetPartyId(Target)
-		evt[PlayerId].Add{"LevelBonus", 10+math.round(Power/4)}
-	end
-end
-
--- Potion of Doom
-evt.PotionEffects[59] = function(IsDrunk, Target, Power)
-	if IsDrunk then
-		if Game.Year<=Target.BirthYear+100 then
-			Target.MightBase		= Target.MightBase + 5
-			Target.IntellectBase	= Target.IntellectBase + 5
-			Target.PersonalityBase	= Target.PersonalityBase + 5
-			Target.EnduranceBase	= Target.EnduranceBase + 5
-			Target.AccuracyBase		= Target.AccuracyBase + 5
-			Target.SpeedBase		= Target.SpeedBase + 5
-			Target.LuckBase			= Target.LuckBase + 5
-
-			for i,v in Target.Resistances do
-				v.Base = v.Base + 5
-			end
-			Target.BirthYear = Target.BirthYear - 10
-		else
-			Game.ShowStatusText("Can't drink anymore")
-		end
-	end
-end
-
--- Pure resistances
-local function PureResistance(Target, Stat, ItemId)
-	local PlayerId = GetPlayerId(Target)
-	PSet.UsedPotions[PlayerId] = PSet.UsedPotions[PlayerId] or {}
-
-	local t = PSet.UsedPotions[PlayerId]
-	if t[ItemId] then
-		return -1
-	else
-		t[ItemId] = true
-		Target.Resistances[Stat].Base = Target.Resistances[Stat].Base + 40
-	end
-end
-
-evt.PotionEffects[64] = function(IsDrunk, Target, Power, ItemId) return PureResistance(Target, 0, ItemId) end
-evt.PotionEffects[65] = function(IsDrunk, Target, Power, ItemId) return PureResistance(Target, 1, ItemId) end
-evt.PotionEffects[66] = function(IsDrunk, Target, Power, ItemId) return PureResistance(Target, 2, ItemId) end
-evt.PotionEffects[67] = function(IsDrunk, Target, Power, ItemId) return PureResistance(Target, 3, ItemId) end
-evt.PotionEffects[68] = function(IsDrunk, Target, Power, ItemId) return PureResistance(Target, 7, ItemId) end
-evt.PotionEffects[69] = function(IsDrunk, Target, Power, ItemId) return PureResistance(Target, 8, ItemId) end
-
--- Protection from Magic
-evt.PotionEffects[70] = function(IsDrunk, Target, Power)
-	if IsDrunk then
-		local Buff = Party.SpellBuffs[const.PartyBuff.ProtectionFromMagic]
-		Buff.ExpireTime = Game.Time + const.Minute*30*math.max(Power, 1)
-		Buff.Power = 3
-		Buff.Skill = JoinSkill(10,4)
-	end
-end
-
---remove older potions
-removelist={52,53,54,55,56,57,58,63}
-
-for i=1,#removelist do
-	evt.PotionEffects[removelist[i]] = function(IsDrunk, t, Power)
-		Game.ShowStatusText("This potion has no power in MAW")
-	end
-end
-
-
-evt.PotionEffects[43] = function(IsDrunk, t, Power)
 	if t.Bonus2==0 and Game.ItemsTxt[t.Number].Skill<7 then
 		local enchNumber=(t.Number+t.Charges+t.MaxCharges+t.Bonus+t.BonusStrength)%4
 		t.Bonus2=enchNumber*3+6
@@ -144,43 +26,24 @@ evt.PotionEffects[43] = function(IsDrunk, t, Power)
 		evt.PlaySound(12070)
 	end
 end
-evt.PotionEffects[26] = function(IsDrunk, t, Power)
+evt.PotionEffects[23] = function(IsDrunk, t, Power)
+	if Mouse.Item.Bonus<40 then
+		Game.ShowStatusText("This potion has not enough power")
+		return
+	end
 	if t.Bonus2==0 and Game.ItemsTxt[t.Number].Skill<7 then
-		t.Bonus2=11
+		t.Bonus2=math.random(1,4)*3+2
 		Mouse.Item.Number=0
 		mem.u4[0x51E100] = 0x100 
 		t.Condition = t.Condition:Or(0x10)
 		evt.PlaySound(12070)
 	end
 end
-evt.PotionEffects[27] = function(IsDrunk, t, Power)
-	if t.Bonus2==0 and Game.ItemsTxt[t.Number].Skill<7 then
-		t.Bonus2=5
-		Mouse.Item.Number=0
-		mem.u4[0x51E100] = 0x100 
-		t.Condition = t.Condition:Or(0x10)
-		evt.PlaySound(12070)
+evt.PotionEffects[24] = function(IsDrunk, t, Power)
+	if Mouse.Item.Bonus<40 then
+		Game.ShowStatusText("This potion has not enough power")
+		return
 	end
-end
-evt.PotionEffects[28] = function(IsDrunk, t, Power)
-	if t.Bonus2==0 and Game.ItemsTxt[t.Number].Skill<7 then
-		t.Bonus2=14
-		Mouse.Item.Number=0
-		mem.u4[0x51E100] = 0x100 
-		t.Condition = t.Condition:Or(0x10)
-		evt.PlaySound(12070)
-	end
-end
-evt.PotionEffects[29] = function(IsDrunk, t, Power)
-	if t.Bonus2==0 and Game.ItemsTxt[t.Number].Skill<7 then
-		t.Bonus2=8
-		Mouse.Item.Number=0
-		mem.u4[0x51E100] = 0x100 
-		t.Condition = t.Condition:Or(0x10)
-		evt.PlaySound(12070)
-	end
-end
-evt.PotionEffects[30] = function(IsDrunk, t, Power)
 	if t.Bonus2==0 and Game.ItemsTxt[t.Number].Skill<7 then
 		t.Bonus2=59
 		Mouse.Item.Number=0
@@ -189,16 +52,44 @@ evt.PotionEffects[30] = function(IsDrunk, t, Power)
 		evt.PlaySound(12070)
 	end
 end
-
---remove mixing for removed flasks
-function events.GameInitialized2()
-	for i=1,70 do
-		for v=1,70 do
-			local output=Game.MixPotions[i][v]
-			if removelist[output+220] then
-				Game.MixPotions[i][v]=0
+evt.PotionEffects[18] = function(IsDrunk, t, Power)
+	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+		if t.Bonus2==0 and t.Bonus==0 and t.Charges<1000 then
+			if vars.enchantSeedList==nil then
+				vars.enchantSeedList={}
+				for i=0,2500 do
+					vars.enchantSeedList[i]=math.random(1,100000)
+				end
 			end
+			math.randomseed(vars.enchantSeedList[t.Number]+t.MaxCharges)
+			if math.random(1,10) then
+				t.Bonus=math.random(17,24)
+				t.BonusStrength=Mouse.Item.Bonus^0.5
+			else
+				t.Bonus=math.random(1,16)
+				t.BonusStrength=Mouse.Item.Bonus/2
+			end
+			
+			--buff to hp and mana items
+			if t.Bonus==8 or t.Bonus==9 then
+				t.BonusStrength=t.BonusStrength*(2+t.BonusStrength/50)
+			end
+			--nerf to AC
+			if t.Bonus==10 then
+				t.BonusStrength=math.ceil(t.BonusStrength/2)
+			end
+			-- buff to 2h weapons enchants
+			local mult=slotMult[t:T().EquipStat]
+			if mult then
+				t.BonusStrength=math.ceil(t.BonusStrength*mult)
+			end		
+			
+			vars.enchantSeedList[t.Number]=vars.enchantSeedList[t.Number]+math.random(1,1000)
+			Mouse.Item.Number=0
+			mem.u4[0x51E100] = 0x100 
+			t.Condition = t.Condition:Or(0x10)
+			evt.PlaySound(12070)
 		end
-	end	
+	end
 end
 
