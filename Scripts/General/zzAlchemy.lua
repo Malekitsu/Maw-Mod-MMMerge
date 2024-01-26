@@ -1,3 +1,12 @@
+function events.GameInitialized2()
+	for i=252, 263 do
+		Game.ItemsTxt[i].Picture="item182"
+	end
+	for i=264,299 do
+		Game.ItemsTxt[i].Name="Potion Deleted in MAW"
+	end
+end
+
 function events.LoadMap()
 	vars.PlayerBuffs=vars.PlayerBuffs or {}
 	for i=0,Party.High do
@@ -15,128 +24,203 @@ function events.LoadMap()
 			vars.PlayerBuffs[index]["stone"]=0
 		end
 	end
+	vars.BlackPotions=vars.BlackPotions or {}
 end
 
 function events.UseMouseItem(t)
-	if t.Allow==true then
-		local it=Mouse.Item
-		local pl=Party[t.PlayerSlot]
-		--healing potion
-		if it.Number==222 then
-			heal=math.round(it.Bonus^1.4)-it.Bonus
-			pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
-			return
-		--mana potion
-		elseif it.Number==223 then
-			spRestore=math.round(it.Bonus^1.4*2/3)-it.Bonus
-			pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
-			return
+	--override
+	t.Allow=false
+	local it=Mouse.Item
+	local pl=Party[t.PlayerSlot]
+	local index=pl:GetIndex()
+	
+	--check power
+	if potionPowerRequirement[it.Number] and potionPowerRequirement[it.Number]>Mouse.Item.Bonus then
+		Game.ShowStatusText("This potion has not enough power")
+		return
+	end
+	--healing potion
+	if it.Number==222 then
+		heal=math.round(it.Bonus^1.4)-it.Bonus
+		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
+		return
+	--mana potion
+	elseif it.Number==223 then
+		spRestore=math.round(it.Bonus^1.4*2/3)-it.Bonus
+		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
+		return
+	end
+	if it.Number==253 then
+		heal=math.round(it.Bonus^1.4*3+30)-it.Bonus*5
+		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
+		return
+	--mana potion
+	elseif it.Number==254 then
+		spRestore=math.round(it.Bonus^1.4*2)-it.Bonus*5
+		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
+		return
+	end
+	--Regen
+	if it.Number==233 then
+		Buff=pl.SpellBuffs[const.PlayerBuff.Regeneration]
+		Buff.ExpireTime = Game.Time+const.Hour*6
+		Buff.Skill=JoinSkill(it.Bonus/2,4)
+	end
+	--mana regen
+	if it.Number==232 then
+		vars.bonusMeditation=vars.bonusMeditation or {}
+		vars.bonusMeditation[index]={Game.Time+const.Hour*6, it.Bonus/10 + 2}
+	end
+	------------------------
+	--STATUS IMMUNITY POTIONS--
+	------------------------
+	if it.Number==237 then
+		Party.SpellBuffs[13].ExpireTime=Game.Time+const.Hour*6
+		Party.SpellBuffs[13].Power=5+math.floor(it.Bonus/10)
+		Party.SpellBuffs[13].Skill=3
+		if it.Bonus>=55 then
+			Party.SpellBuffs[13].Skill=4
 		end
-		if it.Number==253 then
-			heal=math.round(it.Bonus^1.4*3+30)-it.Bonus*5
-			pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
-			return
-		--mana potion
-		elseif it.Number==254 then
-			spRestore=math.round(it.Bonus^1.4*2)-it.Bonus*5
-			pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
-			return
+	end
+	
+	if itemImmunityMapping[it.Number] then 
+		for i=1,#itemImmunityMapping[it.Number] do
+			local txt=itemImmunityMapping[it.Number][i]
+			vars.PlayerBuffs[index][txt]=Game.Time+Const.Hour*6
 		end
-		
-		------------------------
-		--STATUS POTIONS--
-		------------------------
-		if itemImmunityMapping[it.Number] then 
-			local txt=itemImmunityMapping[it.Number]
-			vars.PlayerBuffs[Party[t.PlayerSlot]:GetIndex()][txt]=Game.Time+Const.Hour*6
-		end
-		--------------------
-		--BUFFS--
-		--------------------
-		if itemBuffMapping[it.Number] then
-			local buff=itemBuffMapping[it.Number]
+	end
+	--------------------
+	--BUFFS--
+	--------------------
+	if itemBuffMapping[it.Number] then
+		local buff=itemBuffMapping[it.Number]
+		if type(buff)=="table" then
+			for i=1,#buff do
+				buffID=itemBuffMapping[it.Number][i]
+				pl.SpellBuffs[buffID].Power=it.Bonus+10
+				pl.SpellBuffs[buffID].ExpireTime=Game.Time+const.Hour*6
+			end
+		else
 			pl.SpellBuffs[buff].Power=it.Bonus+10
-			pl.SpellBuffs[buff].ExpireTime=Game.Time+const.Minute*30*it.Bonus
-			
-			if it.Number<=234 and it.Number~=229 then
-				pl.SpellBuffs[buff].Power=math.round(pl.SpellBuffs[buff].Power/2)
-			end
-		--disable original behaviour and simulate sound
-			t.Allow=false
-			pl:ShowFaceAnimation(36)
-			evt.PlaySound(143)
-			if it.Charges==0 then
-				it.Charges=5
-			elseif it.Charges>2 then
-				it.Charges=it.Charges-1
-			elseif it.Charges==2 then
-				it.Number=0
-			end
-			return
+			pl.SpellBuffs[buff].ExpireTime=Game.Time+const.Hour*6
 		end
-		-------------------------
-		--PERMANENT BUFFS
-		------------------------
-		if it.Number==264 and not Party[0].UsedBlackPotions[it.Number] then
-			pl.LuckBase=pl.LuckBase-20
-		elseif it.Number==265 and not Party[0].UsedBlackPotions[it.Number] then
-			pl.SpeedBase=pl.SpeedBase-20
-		elseif it.Number==266 and not Party[0].UsedBlackPotions[it.Number] then
-			pl.IntellectBase=pl.IntellectBase-20
-		elseif it.Number==267 and not Party[0].UsedBlackPotions[it.Number] then
-			pl.EnduranceBase=pl.EnduranceBase-20
-		elseif it.Number==268 and not Party[0].UsedBlackPotions[it.Number] then
-			pl.PersonalityBase=pl.PersonalityBase-20
-		elseif it.Number==269 and not Party[0].UsedBlackPotions[it.Number] then
-			pl.AccuracyBase=pl.AccuracyBase-20
-		elseif it.Number==270 and not Party[0].UsedBlackPotions[it.Number] then
-			pl.MightBase=pl.MightBase-20
-		end		
+		--half effect for bless, heroism and stoneskin
+		if (it.Number<=234 and it.Number~=229) or it.Number==250 or  it.Number==251 then
+			pl.SpellBuffs[buff].Power=math.round(pl.SpellBuffs[buff].Power/2)
+		end
+	end
+	
+	
+	-------------------------
+	--PERMANENT BUFFS
+	------------------------	
+	if blackPermanentBuffs[it.Number] then
+		--create vars if not in yet
+		if not vars.BlackPotions[index] then
+			vars.BlackPotions[index]={}
+			for key,_ in pairs(blackPermanentBuffs) do 
+				for key2,value2 in pairs(blackPermanentBuffs[key]) do
+					vars.BlackPotions[index][value2]=0
+				end
+			end
+		end
+		--effect
+		local power=math.min(math.floor(it.Bonus/55),3)*20
+		for i=1,#blackPermanentBuffs do
+			local stat=blackPermanentBuffs[i]
+			if power>vars.BlackPotions[index][stat] then
+				local buff=power-vars.BlackPotions[index][stat]
+				pl[stat]=pl[stat]+buff
+			else
+				return
+			end
+		end
+	end	
+	
+	--age potions
+	if it.Number==256 then
+		pl.BirthYear=1172-20+math.floor(Game.Time/const.Year)
+		Party[0].AgeBonus=0
+	end
+	if it.Number==263 then
+		pl.BirthYear=1172-80+math.floor(Game.Time/const.Year)
+		Party[0].AgeBonus=0
+	end
+	
+	--exp potion
+	if it.Number==259 then
+		local experience=it.Bonus*1000
+		pl.Exp=plExp+experience
+	end
+	
+	--consume
+	if potionUsingCharges[Mouse.Item.Number] then
+		if it.Charges==0 then
+			it.Charges=5
+		elseif it.Charges>2 then
+			it.Charges=it.Charges-1
+		elseif it.Charges==2 then
+			it.Number=0
+		end
+	else
+		Mouse.Item.Number=0
+	end	
+	pl:ShowFaceAnimation(36)
+	evt.PlaySound(143)
+end
+
+function events.GetSkill(t)
+	if t.Skill==const.Skills.Meditation then
+		if vars and vars.bonusMeditation and vars.bonusMeditation[t.PlayerIndex] and vars.bonusMeditation[t.PlayerIndex][1]>Game.Time then
+			t.Result=t.Result+vars.bonusMeditation[t.PlayerIndex][2]
+		end
 	end
 end
 
+potionUsingCharges={228,229,230,231,232,234,235,236,239,240,241,248,249,250,251,257,258}
+potionPowerRequirement={
+	[231]=20,
+	[235]=20,
+	[236]=20,
+	[239]=20,
+	[245]=40,
+	[256]=55,
+	[263]=55,
+}
+blackPermanentBuffs={
+	[253]={"MightBase","AccuracyBase"},
+	[254]={"IntellectBase","PersonalityBase"},
+	[255]={"EnduranceBase","SpeedBase","LuckBase"},
+	[260]={"FireResistanceBase","AirResistanceBase","WaterResistanceBase","EarthResistanceBase"},
+	[261]={"MindResistanceBase","BodyResistanceBase"},
+}
 itemBuffMapping = {
 	[228] = 7,	 --haste
 	[229] = 8, 	 --heroism
     [230] = 1,	 --bless
+	[231] = {11,13}, -- shield, Preservation
     [234] = 14,  --stoneskin
-    [240] = 19,  --might
-    [241] = 17,  --intellect
-    [242] = 20,  --personality
-    [243] = 16,  --endurace
-    [244] = 15,  --accuracy
-    [245] = 21,  --speed
-    [255] = 18,  --luck
-	[256] = 5,   --Fire
-	[257] = 0,   --Air
-	[258] = 22,  --Water
-	[259] = 3,   --Earth
-	[260] = 9,   --Mind
-	[261] = 2,   --Body
+    [235] = 23,  --water breathing
+	
+    [240] = {19,15},  --might, accuracy
+    [241] = {17,20},  --intellect, personality
+    [242] = {16,21,18},  --endurance, speed, luck
+    [248] = {5,0,22,3}, --elemental
+    [249] = {9,2},  --self
+    [250] = {7,8,1},  --Champions
+    [251] = {11,13,14},  --Paladins
+    [257] = {19,15,17,20,16,21,18},  --stats
+    [258] = {5,0,22,3,9,2},  --resistances
 }
 itemImmunityMapping = {
-	[224] = "weakness",
-	[225] = "disease",
-	[226] = "poison",
-	[227] = "sleep",
-	[237] = "fear",
-	[238] = "curse",
-	[239] = "insanity",
-	[251] = "paralysis",
-	[262] = "stone",
+	[224] = {"weakness","sleep"},
+	[225] = {"disease","poison"},
+	[226] = {"curse","paralysis"},
+	[227] = {"fear","insanity"},
+	[239] = {"stone"},
+	[245] = {"weakness","sleep","disease","poison","curse","paralysis","fear","insanity","stone"}
 }
 
-itemPermanentBuffMapping = {
-	[264] = "weakness",
-	[225] = "disease",
-	[226] = "poison",
-	[227] = "sleep",
-	[237] = "fear",
-	[238] = "curse",
-	[239] = "insanity",
-	[251] = "paralysis",
-	[262] = "stone",
-}
 
 function events.DoBadThingToPlayer(t)
 	if t.Allow==true and vars.PlayerBuffs[t.Player:GetIndex()] then
@@ -191,7 +275,9 @@ end
 
 function events.BuildItemInformationBox(t)
 	if potionText[t.Item.Number] then
-		t.Description=potionText[t.Item.Number] .. "\n(To drink, pick the potion up and right-click over a character's portrait.  To mix, pick the potion up and right-click over another potion.)"
+		t.Description=potionText[t.Item.Number]--REMOVED .. "\n(To drink, pick the potion up and right-click over a character's portrait.  To mix, pick the potion up and right-click over another potion.)"
+	elseif t.Item.Number>=264 and t.Item.Number<=299 then
+		t.Description="This potion has been removed"
 	end
 	if t.Item.Number==222 then
 		t.Description=StrColor(255,255,153,"Heals " .. math.round(t.Item.Bonus^1.4)+10 .. " Hit Points") .. "\n" .. t.Description
@@ -205,75 +291,108 @@ function events.BuildItemInformationBox(t)
 	if t.Item.Number==254 then
 		t.Description=StrColor(255,255,153,"Restores " .. math.round(t.Item.Bonus^1.4*2)+10 .. " Spell Points") .. "\n" .. t.Description
 	end
-	if itemBuffMapping[t.Item.Number] then
+	if potionUsingCharges[t.Item.Number] then
 		local charges=t.Item.Charges-1
 		if charges==-1 then
 			charges=5
 		end
 		t.Description=StrColor(255,255,153,"Charges: " .. charges) .. "\n" .. t.Description
 	end
+	
+	if potionRecipeText[t.Item.Number] then
+		if extraDescription then
+			t.Description=t.Description .. "\n\n" .. potionRecipeText[t.Item.Number]
+		else
+			t.Description=t.Description .. StrColor(100,100,100,"\n\nPress alt to show recipe list")
+		end
+	end
 end
-
 
 potionText={
 	[222] = "",
 	[223] = "",
-	[224] = "Cures and prevents Weakness for 6 hours.",
-	[225] = "Cures and prevents Disease for 6 hours.",
-	[226] = "Cures and prevents Poison for 6 hours.",
-	[227] = "Remove and prevents inducted Sleep for 6 hours.",
-	[228] = "Increases Speed for 30 minutes per point of potion strength. (30 minutes per potion strength)",
-	[229] = "Increases Melee damage by 10+(1 x Power) for (30 x Power) minutes",
-	[230] = "Increases Attack by 5+(0.5 x Power) for (30 x Power) minutes",
-	[231] = "Grants Preservation (as the spell) for 30 minutes per point of potion strength.",
-	[232] = "Grants Shield (as the spell) for 30 minutes per point of potion strength.",
-	[233] = "Grants Recharge Item (as the spell).",
-	[234] = "Increases Armor Class  by 5+(0.5 x Power) for (30 x Power) minutes",
-	[235] = "Prevents drowning damage.",
-	[236] = "Increases item's roughness, making it more resistant to breaking.",
-	[237] = "Cures and prevents Fear for 6 hours.",
-	[238] = "Cures and prevents Curse for 6 hours.",
-	[239] = "Cures and prevents Insanity for 6 hours.",
-	[240] = "Temporarily increases Might by 10+(1 x Power) for (30 x Power) minutes",
-	[241] = "Temporarily increases Intellect by 10+(1 x Power) for (30 x Power) minutes",
-	[242] = "Temporarily increases Personality by 10+(1 x Power) for (30 x Power) minutes",
-	[243] = "Temporarily increases Endurance by 10+(1 x Power) for (30 x Power) minutes",
-	[244] = "Temporarily increases Speed by 10+(1 x Power) for (30 x Power) minutes",
-	[245] = "Temporarily increases Accuracy by 10+(1 x Power) for (30 x Power) minutes",
-	[246] = "Adds 'of Flame' property to a weapon.",
-	[247] = "Adds 'of Frost' property to a weapon.",
-	[248] = "Adds 'of Poison' property to a weapon.",
-	[249] = "Adds 'of Sparks' property to a weapon.",
-	[250] = "Adds 'of Swiftness' property to a weapon.",
-	[251] = "Cures and prevents Paralysis for 6 hours.",
-	[252] = "Removes all conditions except Dead, Stoned, or Eradicated.",
-	[253] = "",
-	[254] = "",
-	[255] = "Increases temporary Luck by 10+(1 x Power) for (30 x Power) minutes",
-	[256] = "Increases temporary Fire resistance by by 20+(1 x Power) for (30 x Power) minutes",
-	[257] = "Increases temporary Air resistance by 20+(1 x Power) for (30 x Power) minutes",
-	[258] = "Increases temporary Water resistance by 20+(1 x Power) for (30 x Power) minutes",
-	[259] = "Increases temporary Earth resistance by 20+(1 x Power) for (30 x Power) minutes",
-	[260] = "Increases temporary Mind resistance by 20+(1 x Power) for (30 x Power) minutes",
-	[261] = "Increases temporary Body resistance by 20+(1 x Power) for (30 x Power) minutes",
-	[262] = "Cures Stoned condition.",
-	[263] = "Adds a permanent random Superior Elemental Damage Enchantment to a weapon.",
-	[264] = "Adds 30 to permanent Luck.",
-	[265] = "Adds 30 to permanent Speed.",
-	[266] = "Adds 30 to permanent Intellect.",
-	[267] = "Adds 30 to permanent Endurance.",
-	[268] = "Adds 30 to permanent Personality.",
-	[269] = "Adds 30 to permanent Accuracy.",
-	[270] = "Adds 30 to permanent Might.",
-	[271] = "Removes all unnatural aging, 10 years of PERMANENT aging, reduces all stats by 5.",
-
-	[279] = "Permanently adds 5 to all seven stats, HP, SP, AC and resistances at the cost of 10 years of PERMANENT aging",
-	[280] = "Increases all Seven Statistics temporarily by 10+(1 x Power) for (30 x Power) minutes",
-	[281] = "Increases Fire, Air, Water, Earth, Mind and Body resistances temporarily by 10+ (1 x Power) for (30 x Power) minutes",
-	[282] = "Increases the character's level by 10+0.25 per power for (30 x Power) minutes",
+	[224] = "Cures and prevents Weakness and inducted Sleep for 6 hours.",
+	[225] = "Cures and prevents Disease and Poison for 6 hours.",
+	[226] = "Cures and prevents Curse and Paralysis for 6 hours.",
+	[227] = "Cures and prevents Fear and Insanity for 6 hours.",
+	[228] = "Increases Speed for 6 Hours",
+	[229] = "Increases Melee damage by 5+(0.5 x Power) for 6 Hours",
+	[230] = "Increases Attack by 5+(0.5 x Power) for 6 Hours",
+	[231] = "Grants Preservation and Shield (as the spell) for 6 Hours\nRequire 20 power to work.\n",
+	[232] = "Grants bonus to Meditation skill for 6 hours.",
+	[233] = "Regenerates Health for 6 hours.",
+	[234] = "Increases Armor Class  by 5+(0.5 x Power) for 6 Hours",
+	[235] = "Prevents drowning damage for 6 hours.\nRequire 20 power to work.\n",
+	[236] = "Increases item's roughness, making it more resistant to breaking.\nRequire 20 power to work.\n",
+	[237] = "Grant 5 +1 per 10 potion power charges of Magic Protection (as the spell) for 6 hours.\nFrom 55 power on will protect also from death and eradication.\n",
+	[238] = "Grant 1 enchant to an unenchanted item, based on potion Power.\nRequire at least 20 power to work.\n",
+	[239] = "Cures and prevent Stoned condition for 6 hours.\nRequire 20 power to work.\n",
+	[240] = "Temporarily increases by 10+(1 x Power) Might and Accuracy for 6 hours.",
+	[241] = "Temporarily increases by 10+(1 x Power) Intellect and Personality for 6 hours.",
+	[242] = "Temporarily increases by 10+(1 x Power) Endurance, Speed and Luck for 6 hours.",
+	[243] = "Adds a random tier 2 elemental damage enchant to a weapon\nRequire 40 power to work.\n",
+	[244] = "Adds 'of Swiftness' property to a non-magic weapon.\nRequire 40 power to work.\n",
+	[245] = "Removes and prevents all conditions except Dead and Eradicated for 6 hours.\nRequire 40 power to work.\n",
+	[246] = "Heals three times the potion's strength of hit points.",
+	[247] = "Restores three times the potion's strength of spell points.",
+	[248] = "Increases temporary Fire, Air, Water and Earth resistance. (Dark)",
+	[249] = "Increases temporary Mind and Body resistance. (Light)",
+	[250] = "Provides Haste+Heroism+Bless.",
+	[251] = "Provides Protection+Stone Skin+Magic Protection.",
+	[252] = "Adds a random tier 3 elemental damage enchant to a weapon.\nRequire 55 power to work.\n.",
+	[253] = "Adds 20/40/60 to permanent Might and Accuracy.\nRequire 55 power per step to work.\n",
+	[254] = "Adds 20/40/60 to permanent Intellect and Wisdom.\nRequire 55 power per step to work.\n",
+	[255] = "Adds 20/40/60 to permanent Endurance, Speed and Luck.\nRequire 55 power per step to work.\n",
+	[256] = "Fix caracter age at 20.\nRequire 55 power to work.\n",
+	[257] = "Increases all Seven Statistics temporarily by 10+(1 x Power) for 6 hours.",
+	[258] = "Increases all resistances temporarily by 10+ (1 x Power) for 6 hours.",
+	[259] = "Grant XP to the player.",
+	[260] = "Permanently adds 30/60/90 to Fire, Air, Water and Earth Resistance, single-use.\nRequire 55 power per step to work.\n",
+	[261] = "Permanently adds 30/60/90 to Mind and Body Resistance, single-use.\nRequire 55 power per step to work.\n",
+	[262] = "Adds 'of Darkness' property to a non-magic weapon.\nRequire 55 power to work.\n",
+	[263] = "Fix caracter age at 60.\nRequire 55 power to work.\n",
 }
 
-
+potionRecipeText={
+	--orange
+	[225]="Recipes:\nAdd Red: Haste\nAdd Blue: Protection\nAdd Yellow: Stone Skin\nAdd Purple: Magic Protection\nAdd Green: Stone to Flesh",
+	--purple
+	[226]="Recipes:\nAdd Red: Heroism\nAdd Blue: Quickmind\nAdd Yellow: Water Breathing\nAdd Orange: Magic Protection\nAdd Green: Enchant Item",
+	--green
+	[227]="Recipes:\nAdd Red: Bless\nAdd Blue: Regeneration\nAdd Yellow: Harden Item\nAdd Orange: Magic Protection\nAdd Purple: Enchant Item",
+	--7-8-9
+	[228]="Recipes:\nAdd Orange: Champion's Potion\nAdd Purple: Power Boost\nAdd Green: Divine Cure",
+	[229]="Recipes:\nAdd Orange: Champion's Potion\nAdd Purple: Power Boost\nAdd Green: Divine Cure",
+	[230]="Recipes:\nAdd Orange: Champion's Potion\nAdd Purple: Power Boost\nAdd Green: Divine Cure",
+	--10-11-12
+	[231]="Recipes:\nAdd Orange: Lesser Element\nAdd Purple: Wisdom Boost\nAdd Green: Divine Magic",
+	[232]="Recipes:\nAdd Orange: Lesser Element\nAdd Purple: Wisdom Boost\nAdd Green: Divine Magic",
+	[233]="Recipes:\nAdd Orange: Lesser Element\nAdd Purple: Wisdom Boost\nAdd Green: Divine Magic",
+	--13-14-15
+	[234]="Recipes:\nAdd Orange: Swiftness\nAdd Purple: Resilience Boost\nAdd Green: Divine Restoration",
+	[235]="Recipes:\nAdd Orange: Swiftness\nAdd Purple: Resilience Boost\nAdd Green: Divine Restoration",
+	[236]="Recipes:\nAdd Orange: Swiftness\nAdd Purple: Resilience Boost\nAdd Green: Divine Restoration",
+	--16-17-18
+	[237]="Recipes:\nAdd Orange: Self Resistance\nAdd Purple: Elemental Resistance\nAdd Green: Paladin's Potion",
+	[238]="Recipes:\nAdd Orange: Self Resistance\nAdd Purple: Elemental Resistance\nAdd Green: Paladin's Potion",
+	[239]="Recipes:\nAdd Orange: Self Resistance\nAdd Purple: Elemental Resistance\nAdd Green: Paladin's Potion",
+	--19-20-21
+	[240]="Recipes:\nAdd Red: Pure Power\nAdd Blue: Pure Wisdom\nAdd Yellow: Pure Resilience",
+	[241]="Recipes:\nAdd Red: Pure Power\nAdd Blue: Pure Wisdom\nAdd Yellow: Pure Resilience",
+	[242]="Recipes:\nAdd Red: Pure Power\nAdd Blue: Pure Wisdom\nAdd Yellow: Pure Resilience",
+	--22-23-24
+	[243]="Recipes:\nAdd Red: Divine Blessing\nAdd Blue: Darkness\nAdd Yellow: Greater Element",
+	[244]="Recipes:\nAdd Red: Divine Blessing\nAdd Blue: Darkness\nAdd Yellow: Greater Element",
+	[245]="Recipes:\nAdd Red: Divine Blessing\nAdd Blue: Darkness\nAdd Yellow: Greater Element",
+	--25-26-27
+	[246]="Recipes:\nAdd Red: Twilight\nAdd Blue: Dawn\nAdd Yellow: Trascendance",
+	[247]="Recipes:\nAdd Red: Twilight\nAdd Blue: Dawn\nAdd Yellow: Trascendance",
+	[248]="Recipes:\nAdd Red: Twilight\nAdd Blue: Dawn\nAdd Yellow: Trascendance",
+	--28-29-30
+	[249]="Recipes:\nAdd Red: Pure Elemental Resistance\nAdd Blue: Divine Resistance\nAdd Yellow: Pure Self Resistance",
+	[250]="Recipes:\nAdd Red: Pure Elemental Resistance\nAdd Blue: Divine Resistance\nAdd Yellow: Pure Self Resistance",
+	[251]="Recipes:\nAdd Red: Pure Elemental Resistance\nAdd Blue: Divine Resistance\nAdd Yellow: Pure Self Resistance",
+}
 
 
 --rework to reagents
