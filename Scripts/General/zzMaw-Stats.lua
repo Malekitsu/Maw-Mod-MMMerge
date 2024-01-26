@@ -280,7 +280,7 @@ function events.BuildStatInformationBox(t)
 			end
 		end
 		SPregenItem=SPregenItem
-		regen=math.ceil(fullSP*SPregenItem*0.02)+medRegen+bonusregen
+		regen=math.ceil(fullSP*SPregenItem*0.01)+medRegen+bonusregen
 		t.Text=string.format("%s\n\nSpell point regen per second: %s",t.Text,StrColor(40,100,255,regen/10))
 	end
 	
@@ -402,6 +402,7 @@ function events.BuildStatInformationBox(t)
 		local lvl=math.min(Party[i].LevelBase,200)
 		local acReduction=1-calcMawDamage(t.Player,4,10000)/10000
 		local lvl=math.min(Party[i].LevelBase, 255)
+		local ac=ac/(Game.BolsterAmount/100)
 		local blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 		local ACRed= 1 - (1-blockChance)*(1-acReduction)
 		--unarmed
