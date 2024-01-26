@@ -777,9 +777,13 @@
 	--end
 
 	-- Make mixing catalyst potions add up result catalyst power
+	
 	mem.autohook(0x415b25, function(d)
 		local Target = structs.Item:new(d.ecx)
-		Target.Bonus = Target.Bonus + Mouse.Item.Bonus
+		local s,m = SplitSkill(Party[Game.CurrentPlayer]:GetSkill(const.Skills.Alchemy))
+		local bonus = math.round(math.max(Target.Bonus + Mouse.Item.Bonus*0.5,Target.Bonus*0.5 + Mouse.Item.Bonus))
+		bonus= math.min(bonus,s*m/2)
+		Target.Bonus = math.max(bonus, Target.Bonus, Mouse.Item.Bonus)
 	end)
 
 
