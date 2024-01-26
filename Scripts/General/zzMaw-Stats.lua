@@ -8,19 +8,19 @@ function events.CalcDamageToMonster(t)
 			if data.Object==nil then
 				baseDamage=t.Player:GetMeleeDamageMin()
 				maxDamage=t.Player:GetMeleeDamageMax()
-				randomDamage=(maxDamage-baseDamage)*(math.random()+math.random())/2
+				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
+				damage=math.round(randomDamage/2)
 			else --bow
 				baseDamage=t.Player:GetRangedDamageMin()
 				maxDamage=t.Player:GetRangedDamageMax()
-				randomDamage=(maxDamage-baseDamage)*(math.random()+math.random())/2
+				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
+				damage=math.round(randomDamage/2)
 			end
 			
-			t.Result=baseDamage+randomDamage
-			--[[
+			t.Result=damage
 			if t.Result>maxDamage then
 				debug.Message(string.format(t.Result .. "  " .. maxDamage))
 			end
-			]]
 			luck=data.Player:GetLuck()/1.5
 			critDamage=data.Player:GetAccuracy()*3/1000
 			critChance=50+luck
