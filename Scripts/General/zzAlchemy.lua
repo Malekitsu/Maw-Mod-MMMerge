@@ -294,7 +294,7 @@ function events.BuildItemInformationBox(t)
 	if t.Item.Number==247 then
 		t.Description=StrColor(255,255,153,"Restores " .. math.round(t.Item.Bonus^1.4*2)+10 .. " Spell Points") .. "\n" .. t.Description
 	end
-	if potionUsingCharges[t.Item.Number] then
+	if table.find(potionUsingCharges,t.Item.Number) then
 		local charges=t.Item.Charges-1
 		if charges==-1 then
 			charges=5
