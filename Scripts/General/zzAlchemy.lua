@@ -127,7 +127,7 @@ function events.UseMouseItem(t)
 		end
 		--effect
 		local power=math.min(math.floor(it.Bonus/55),3)*20
-		if it.Number==260 or it.Number==261 then
+		if it.Number==261 or it.Number==262 then
 			power=power*1.5
 		end
 		for i=1,#blackPermanentBuffs[it.Number] do
@@ -144,11 +144,11 @@ function events.UseMouseItem(t)
 	end	
 	
 	--age potions
-	if it.Number==256 then
+	if it.Number==258 then
 		pl.BirthYear=1172-20+math.floor(Game.Time/const.Year)
 		Party[0].AgeBonus=0
 	end
-	if it.Number==263 then
+	if it.Number==260 then
 		pl.BirthYear=1172-80+math.floor(Game.Time/const.Year)
 		Party[0].AgeBonus=0
 	end
@@ -194,11 +194,11 @@ potionPowerRequirement={
 	[263]=55,
 }
 blackPermanentBuffs={
-	[253]={"MightBase","AccuracyBase"},
-	[254]={"IntellectBase","PersonalityBase"},
-	[255]={"EnduranceBase","SpeedBase","LuckBase"},
-	[260]={"FireResistanceBase","AirResistanceBase","WaterResistanceBase","EarthResistanceBase"},
-	[261]={"MindResistanceBase","BodyResistanceBase"},
+	[252]={"MightBase","AccuracyBase"},
+	[253]={"IntellectBase","PersonalityBase"},
+	[254]={"EnduranceBase","SpeedBase","LuckBase"},
+	[261]={"FireResistanceBase","AirResistanceBase","WaterResistanceBase","EarthResistanceBase"},
+	[262]={"MindResistanceBase","BodyResistanceBase"},
 }
 itemBuffMapping = {
 	[228] = 7,	 --haste
@@ -216,7 +216,7 @@ itemBuffMapping = {
     [250] = {7,8,1},  --Champions
     [251] = {11,13,14},  --Paladins
     [257] = {19,15,17,20,16,21,18},  --stats
-    [258] = {5,0,22,3,9,2},  --resistances
+    [263] = {5,0,22,3,9,2},  --resistances
 }
 itemImmunityMapping = {
 	[224] = {"weakness","sleep"},
@@ -345,18 +345,18 @@ potionText={
 	[249] = "Increases temporary Mind and Body resistance. (Light)",
 	[250] = "Provides Haste+Heroism+Bless.",
 	[251] = "Provides Protection+Stone Skin+Magic Protection.",
-	[252] = "Adds a random tier 3 elemental damage enchant to a weapon.\nRequire 55 power to work.\n.",
-	[253] = "Adds 20/40/60 to permanent Might and Accuracy.\nRequire 55 power per step to work.\n",
-	[254] = "Adds 20/40/60 to permanent Intellect and Wisdom.\nRequire 55 power per step to work.\n",
-	[255] = "Adds 20/40/60 to permanent Endurance, Speed and Luck.\nRequire 55 power per step to work.\n",
-	[256] = "Fix caracter age at 20.\nRequire 55 power to work.\n",
+	[252] = "Adds 20/40/60 to permanent Might and Accuracy.\nRequire 55 power per step to work.\n",
+	[253] = "Adds 20/40/60 to permanent Intellect and Wisdom.\nRequire 55 power per step to work.\n",
+	[254] = "Adds 20/40/60 to permanent Endurance, Speed and Luck.\nRequire 55 power per step to work.\n",
+	[255] = "Adds a random tier 3 elemental damage enchant to a weapon.\nRequire 55 power to work.\n.",
+	[256] = "Adds 'of Darkness' property to a non-magic weapon.\nRequire 100 power to work.\n",
 	[257] = "Increases all Seven Statistics temporarily by 10+(1 x Power) for 6 hours.",
-	[258] = "Increases all resistances temporarily by 10+ (1 x Power) for 6 hours.",
+	[258] = "Fix caracter age at 20.\nRequire 55 power to work.\n",
 	[259] = "Grant XP to the player.",
-	[260] = "Permanently adds 30/60/90 to Fire, Air, Water and Earth Resistance, single-use.\nRequire 55 power per step to work.\n",
-	[261] = "Permanently adds 30/60/90 to Mind and Body Resistance, single-use.\nRequire 55 power per step to work.\n",
-	[262] = "Adds 'of Darkness' property to a non-magic weapon.\nRequire 100 power to work.\n",
-	[263] = "Fix caracter age at 60.\nRequire 55 power to work.\n",
+	[260] = "Fix caracter age at 60.\nRequire 55 power to work.\n",
+	[261] = "Permanently adds 30/60/90 to Fire, Air, Water and Earth Resistance, single-use.\nRequire 55 power per step to work.\n",
+	[262] = "Permanently adds 30/60/90 to Mind and Body Resistance, single-use.\nRequire 55 power per step to work.\n",
+	[263] = "Increases all resistances temporarily by 10+ (1 x Power) for 6 hours.",
 }
 
 potionRecipeText={
