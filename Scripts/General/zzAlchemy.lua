@@ -158,12 +158,12 @@ function events.UseMouseItem(t)
 	
 	--consume
 	if potionUsingCharges[Mouse.Item.Number] then
-		if it.Charges==0 then
-			it.Charges=5
-		elseif it.Charges>2 then
-			it.Charges=it.Charges-1
-		elseif it.Charges==2 then
-			it.Number=0
+		if Mouse.Item.Charges==0 then
+			Mouse.Item.Charges=5
+		elseif Mouse.Item.Charges>2 then
+			Mouse.Item.Charges=Mouse.Item.Charges-1
+		elseif Mouse.Item.Charges==2 then
+			Mouse.Item.Number=0
 		end
 	else
 		Mouse.Item.Number=0
