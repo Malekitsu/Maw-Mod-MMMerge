@@ -269,7 +269,6 @@ function events.ItemGenerated(t)
 			t.Item.BonusStrength=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])*difficultyExtraPower
 			if math.random(1,10)==10 then
 				t.Item.Bonus=math.random(17,24)
-				t.Item.BonusStrength=math.ceil(t.Item.BonusStrength^0.5)
 			end
 		end
 		--apply enchant2
@@ -373,12 +372,15 @@ function events.ItemGenerated(t)
 				t.Item.Charges=math.floor(t.Item.Charges/1000)*1000+power
 			end
 		end
-		--nerf to AC
+		--nerf to AC and skills
 		if t.Item.Bonus==10 then
 			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength/2)
 		end
 		if math.floor(t.Item.Charges/1000)==10 then
 			t.Item.Charges=t.Item.Charges-math.floor(t.Item.Charges%1000/2)
+		end
+		if t.Item.Bonus>=17 and t.Item.Bonus<24 then
+			t.Item.BonusStrength=math.ceil(math.max(t.Item.BonusStrength^0.5,t.Item.BonusStrength/10))
 		end
 		-- buff to 2h weapons enchants
 		local mult=slotMult[t.Item:T().EquipStat]
