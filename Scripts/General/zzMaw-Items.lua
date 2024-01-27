@@ -1906,7 +1906,7 @@ function events.BuildItemInformationBox(t)
 				tot=tot+t.Item:T().ChanceByLevel[i]
 				lvl=lvl+t.Item:T().ChanceByLevel[i]*i
 			end
-			itemLevel=itemLevel+math.round(lvl/tot*3.333)
+			itemLevel=itemLevel+math.round(lvl/tot*18-17)
 			t.Description = t.Description .. "\n\nItem Level: " .. itemLevel
 		end	
 	end
