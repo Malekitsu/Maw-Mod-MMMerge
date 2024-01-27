@@ -1903,8 +1903,8 @@ function events.BuildItemInformationBox(t)
 	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then 
 		if t.Description then
 			local itemLevel=t.Item.MaxCharges*5
-			tot=0
-			lvl=0
+			local tot=0
+			local lvl=0
 			for i=1, 6 do
 				tot=tot+t.Item:T().ChanceByLevel[i]
 				lvl=lvl+t.Item:T().ChanceByLevel[i]*i
