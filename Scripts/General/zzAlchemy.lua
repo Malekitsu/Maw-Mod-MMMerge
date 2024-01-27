@@ -152,7 +152,7 @@ function events.UseMouseItem(t)
 	
 	--exp potion
 	if it.Number==259 then
-		local experience=it.Bonus*1000
+		local experience=it.Bonus*500
 		pl.Exp=pl.Exp+experience
 	end
 	
@@ -288,6 +288,9 @@ function events.BuildItemInformationBox(t)
 	if t.Item.Number==223 then
 		t.Description=StrColor(255,255,153,"Restores " .. math.round(t.Item.Bonus^1.4*2/3)+10 .. " Spell Points") .. "\n" .. t.Description
 	end
+	if t.Item.Number==232 then
+		t.Description="Grants " .. StrColor(0,0,200,2+math.floor(t.Item.Bonus/10)) .. " bonus to Meditation skill for 6 hours."
+	end
 	if t.Item.Number==246 then
 		t.Description=StrColor(255,255,153,"Heals " .. math.round(t.Item.Bonus^1.4*3)+10 .. " Hit Points") .. "\n" .. t.Description
 	end
@@ -299,7 +302,7 @@ function events.BuildItemInformationBox(t)
 		if charges==-1 then
 			charges=5
 		end
-		t.Description=StrColor(255,255,153,"Charges: " .. charges) .. "\n" .. t.Description
+		t.Description=StrColor(255,255,153,"Charges: " .. charges) .. "\n\n" .. t.Description
 	end
 	
 	if potionRecipeText[t.Item.Number] then
@@ -349,7 +352,7 @@ potionText={
 	[256] = "Adds 'of Darkness' property to a non-magic weapon.\nRequire 100 power to work.\n",
 	[257] = "Increases all Seven Statistics temporarily by 10+(1 x Power) for 6 hours.",
 	[258] = "Fix caracter age at 20.\nRequire 55 power to work.\n",
-	[259] = "Grant XP to the player.",
+	[259] = "Grant 500 Experience point per Power to the player.",
 	[260] = "Fix caracter age at 60.\nRequire 55 power to work.\n",
 	[261] = "Permanently adds 30/60/90 to Fire, Air, Water and Earth Resistance, single-use.\nRequire 55 power per step to work.\n",
 	[262] = "Permanently adds 30/60/90 to Mind and Body Resistance, single-use.\nRequire 55 power per step to work.\n",
@@ -672,9 +675,9 @@ end
 
 craftDropChances={
 		["gems"]=0.005,
-		[1061]=0.000125,
-		[1062]=0.000125,
-		[1063]=0.00125,
+		[1061]=0.00025,
+		[1062]=0.00025,
+		[1063]=0.0005,
 		[1064]=0.00001,
 	}
 function events.MonsterKilled(mon)
@@ -683,7 +686,7 @@ function events.MonsterKilled(mon)
 	end
 	--level bonus
 	partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-	bonusRoll=1+partyLevel/200
+	bonusRoll=1+partyLevel/50
 	if Multiplayer and Multiplayer.client_monsters()[0] then
 		bonusRoll=bonusRoll/(1+#Multiplayer.client_monsters())
 	end
