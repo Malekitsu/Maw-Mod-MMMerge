@@ -51,12 +51,12 @@ function events.UseMouseItem(t)
 		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
 		return
 	end
-	if it.Number==253 then
+	if it.Number==246 then
 		heal=math.round(it.Bonus^1.4*3+30)-it.Bonus*5
 		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
 		return
 	--mana potion
-	elseif it.Number==254 then
+	elseif it.Number==247 then
 		spRestore=math.round(it.Bonus^1.4*2)-it.Bonus*5
 		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
 		return
@@ -127,12 +127,17 @@ function events.UseMouseItem(t)
 		end
 		--effect
 		local power=math.min(math.floor(it.Bonus/55),3)*20
-		for i=1,#blackPermanentBuffs do
-			local stat=blackPermanentBuffs[i]
+		if it.Number==260 or it.Number==261 then
+			power=power*1.5
+		end
+		for i=1,#blackPermanentBuffs[it.Number] do
+			local stat=blackPermanentBuffs[it.Number][i]
 			if power>vars.BlackPotions[index][stat] then
 				local buff=power-vars.BlackPotions[index][stat]
 				pl[stat]=pl[stat]+buff
+				vars.BlackPotions[index][stat]=buff
 			else
+				Game.ShowStatusText("Can't benefit anymore")
 				return
 			end
 		end
@@ -286,10 +291,10 @@ function events.BuildItemInformationBox(t)
 	if t.Item.Number==223 then
 		t.Description=StrColor(255,255,153,"Restores " .. math.round(t.Item.Bonus^1.4*2/3)+10 .. " Spell Points") .. "\n" .. t.Description
 	end
-	if t.Item.Number==253 then
+	if t.Item.Number==246 then
 		t.Description=StrColor(255,255,153,"Heals " .. math.round(t.Item.Bonus^1.4*3)+10 .. " Hit Points") .. "\n" .. t.Description
 	end
-	if t.Item.Number==254 then
+	if t.Item.Number==247 then
 		t.Description=StrColor(255,255,153,"Restores " .. math.round(t.Item.Bonus^1.4*2)+10 .. " Spell Points") .. "\n" .. t.Description
 	end
 	if potionUsingCharges[t.Item.Number] then
