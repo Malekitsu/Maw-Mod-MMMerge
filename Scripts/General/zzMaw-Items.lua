@@ -1904,6 +1904,7 @@ function events.BuildItemInformationBox(t)
 		if t.Description then
 			local itemLevel=t.Item.MaxCharges*5
 			tot=0
+			lvl=0
 			for i=1, 6 do
 				tot=tot+t.Item:T().ChanceByLevel[i]
 				lvl=lvl+t.Item:T().ChanceByLevel[i]*i
