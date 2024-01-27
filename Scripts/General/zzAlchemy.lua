@@ -2,6 +2,7 @@ function events.GameInitialized2()
 	for i=252, 263 do
 		Game.ItemsTxt[i].Picture="item182"
 	end
+	
 	for i=264,299 do
 		Game.ItemsTxt[i].Name="Potion Deleted in MAW"
 	end
@@ -44,22 +45,18 @@ function events.UseMouseItem(t)
 	if it.Number==222 then
 		heal=math.round(it.Bonus^1.4)-it.Bonus
 		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
-		return
 	--mana potion
 	elseif it.Number==223 then
 		spRestore=math.round(it.Bonus^1.4*2/3)-it.Bonus
 		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
-		return
 	end
 	if it.Number==246 then
 		heal=math.round(it.Bonus^1.4*3+30)-it.Bonus*5
 		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
-		return
 	--mana potion
 	elseif it.Number==247 then
 		spRestore=math.round(it.Bonus^1.4*2)-it.Bonus*5
 		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
-		return
 	end
 	--Regen
 	if it.Number==233 then
@@ -678,7 +675,7 @@ craftDropChances={
 		[1061]=0.000125,
 		[1062]=0.000125,
 		[1063]=0.00125,
-		[1064]=0.0001,
+		[1064]=0.00001,
 	}
 function events.MonsterKilled(mon)
 	if mon.Ally == 9999 then -- no drop from reanimated monsters
