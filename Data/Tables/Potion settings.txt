@@ -31,18 +31,18 @@ Pot Id	Item Id	Required mastery	Drinkable	Usable	Notes
 29	249	3	x	-	Self Resistance
 30	250	3	x	-	Champion's potion
 31	251	3	x	-	Paladin's Potion
-32	252	3	-	x	Greater Element
-33	253	3	x	-	Pure Power
-34	254	3	x	-	Pure Wisdom
-35	255	3	x	-	Pure Resilience
-36	256	3	x	-	Dawn
+32	252	3	x	-	Pure Power
+33	253	3	x	-	Pure Wisdom
+34	254	3	x	-	Pure Resilience
+35	255	3	-	x	Greater Element
+36	256	3	-	x	Darkness
 37	257	3	x	-	Divine Blessing
-38	258	3	x	-	Divine Resistance
+38	258	3	x	-	Twilight
 39	259	3	x	-	Transcendence
-40	260	3	x	-	Pure Elemental Resistance
-41	261	3	x	-	Pure Self Resistance
-42	262	4	-	x	Darkness
-43	263	4	x	-	Twillight
+40	260	3	x	-	Dawn
+41	261	3	x	-	Pure Elemental Resistance
+42	262	4	x	-	Pure Self Resistance
+43	263	4	x	-	Divine Resistance
 44	264	4	-	-	Pure Luck
 45	265	4	-	-	Pure Speed
 46	266	4	-	-	Pure Intellect
