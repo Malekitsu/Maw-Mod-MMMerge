@@ -1888,6 +1888,17 @@ function events.BuildItemInformationBox(t)
 			elseif newVitality>0 then
 				t.Description = t.Description .. "\n" .. "Vitality: " .. StrColor(0,255,0,"+" .. percentage .. "%")
 			end
+			
+			if extraDescription then
+				local itemLevel=t.Item.MaxCharges*5
+				tot=0
+				for i=1, 6 do
+					tot=tot+t.Item:T().ChanceByLevel[i]
+					lvl=t.Item:T().ChanceByLevel[i]*i
+				end
+				itemLevel=itemLevel+math.round(lvl/tot*3.333)
+				t.Description = t.Description .. "\n\nItem Level: " .. itemLevel
+			end			
 		end
 	end
 end
