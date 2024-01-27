@@ -1899,7 +1899,7 @@ end
 --item level
 function events.BuildItemInformationBox(t)
 	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then 
-		if extraDescription and t.Description then
+		if t.Description then
 			local itemLevel=t.Item.MaxCharges*5
 			tot=0
 			for i=1, 6 do
