@@ -1,4 +1,4 @@
-evt.PotionEffects[42] = function(IsDrunk, t, Power)
+evt.PotionEffects[36] = function(IsDrunk, t, Power)
 	if Mouse.Item.Bonus<100 then
 		Game.ShowStatusText("This potion has not enough power")
 		return
@@ -12,7 +12,7 @@ evt.PotionEffects[42] = function(IsDrunk, t, Power)
 		evt.PlaySound(12070)
 	end
 end
-evt.PotionEffects[32] = function(IsDrunk, t, Power)
+evt.PotionEffects[35] = function(IsDrunk, t, Power)
 	if Mouse.Item.Bonus<55 then
 		Game.ShowStatusText("This potion has not enough power")
 		return
