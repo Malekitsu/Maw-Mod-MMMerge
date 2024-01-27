@@ -153,7 +153,7 @@ function events.UseMouseItem(t)
 	--exp potion
 	if it.Number==259 then
 		local experience=it.Bonus*1000
-		pl.Exp=plExp+experience
+		pl.Exp=pl.Exp+experience
 	end
 	
 	--consume
