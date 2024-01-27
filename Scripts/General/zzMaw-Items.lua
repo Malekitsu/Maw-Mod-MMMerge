@@ -379,7 +379,7 @@ function events.ItemGenerated(t)
 		if math.floor(t.Item.Charges/1000)==10 then
 			t.Item.Charges=t.Item.Charges-math.floor(t.Item.Charges%1000/2)
 		end
-		if t.Item.Bonus>=17 and t.Item.Bonus<24 then
+		if t.Item.Bonus>=17 and t.Item.Bonus<=24 then
 			t.Item.BonusStrength=math.ceil(math.max(t.Item.BonusStrength^0.5,t.Item.BonusStrength/10))
 		end
 		-- buff to 2h weapons enchants
