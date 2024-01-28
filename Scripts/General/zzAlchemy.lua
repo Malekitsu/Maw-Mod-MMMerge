@@ -137,11 +137,11 @@ function events.UseMouseItem(t)
 	
 	--age potions
 	if it.Number==258 then
-		pl.BirthYear=1172-20+math.floor(Game.Time/const.Year)
+		pl.BirthYear=1172-60+math.floor(Game.Time/const.Year)
 		Party[0].AgeBonus=0
 	end
 	if it.Number==260 then
-		pl.BirthYear=1172-80+math.floor(Game.Time/const.Year)
+		pl.BirthYear=1172-20+math.floor(Game.Time/const.Year)
 		Party[0].AgeBonus=0
 	end
 	
@@ -346,9 +346,9 @@ potionText={
 	[255] = "Adds a random tier 3 elemental damage enchant to a weapon.\nRequire 55 power to work.\n.",
 	[256] = "Adds 'of Darkness' property to a non-magic weapon.\nRequire 100 power to work.\n",
 	[257] = "Increases all Seven Statistics temporarily by 10+(1 x Power) for 6 hours.",
-	[258] = "Fix caracter age at 20.\nRequire 55 power to work.\n",
+	[258] = "Fix caracter age at 60.\nRequire 55 power to work.\n",
 	[259] = "Grant 500 Experience point per Power to the player.",
-	[260] = "Fix caracter age at 60.\nRequire 55 power to work.\n",
+	[260] = "Fix caracter age at 20.\nRequire 55 power to work.\n",
 	[261] = "Permanently adds 30/60/90 to Fire, Air, Water and Earth Resistance, single-use.\nRequire 55 power per step to work.\n",
 	[262] = "Permanently adds 30/60/90 to Mind and Body Resistance, single-use.\nRequire 55 power per step to work.\n",
 	[263] = "Increases all resistances temporarily by 10+ (1 x Power) for 6 hours.",
