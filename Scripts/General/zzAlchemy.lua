@@ -9,13 +9,13 @@ function events.GameInitialized2()
 end
 
 function events.LoadMap()
-	vars.PlayerBuffs=vars.PlayerBuffs or {}
+	vars.PlayerAlchemyBuffs=vars.PlayerAlchemyBuffs or {}
 	for i=0,Party.High do
 		local index=Party[i]:GetIndex()
-		if not vars.PlayerBuffs[index] then
-			vars.PlayerBuffs[index]={}
+		if not vars.PlayerAlchemyBuffs[index] then
+			vars.PlayerAlchemyBuffs[index]={}
 			for i=1,#itemImmunityMapping[245] do
-				vars.PlayerBuffs[index][i]=0
+				vars.PlayerAlchemyBuffs[index][i]=0
 			end
 		end
 	end
@@ -78,7 +78,7 @@ function events.UseMouseItem(t)
 	if itemImmunityMapping[it.Number] then 
 		for i=1,#itemImmunityMapping[it.Number] do
 			local txt=itemImmunityMapping[it.Number][i]
-			vars.PlayerBuffs[index][txt]=Game.Time+Const.Hour*6
+			vars.PlayerAlchemyBuffs[index][txt]=Game.Time+Const.Hour*6
 			pl[itemImmunityMapping[it.Number][i]]=0
 		end
 	end
@@ -221,49 +221,49 @@ itemImmunityMapping = {
 
 
 function events.DoBadThingToPlayer(t)
-	if t.Allow==true and vars.PlayerBuffs[t.Player:GetIndex()] then
+	if t.Allow==true and vars.PlayerAlchemyBuffs[t.Player:GetIndex()] then
 		if t.Thing==1 then
-			if vars.PlayerBuffs[t.Player:GetIndex()]["Cursed"]>Game.Time then
+			if vars.PlayerAlchemyBuffs[t.Player:GetIndex()]["Cursed"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Curse Immunity")
 			end
 		elseif t.Thing==2 then
-			if vars.PlayerBuffs[t.Player:GetIndex()]["Weak"]>Game.Time then
+			if vars.PlayerAlchemyBuffs[t.Player:GetIndex()]["Weak"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Weakness Immunity")
 			end 
 		elseif t.Thing==3 then
-			if vars.PlayerBuffs[t.Player:GetIndex()]["Asleep"]>Game.Time then
+			if vars.PlayerAlchemyBuffs[t.Player:GetIndex()]["Asleep"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Forced Sleep Immunity")
 			end 
 		elseif t.Thing==5 then
-			if vars.PlayerBuffs[t.Player:GetIndex()]["Insane"]>Game.Time then
+			if vars.PlayerAlchemyBuffs[t.Player:GetIndex()]["Insane"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Insanity Immunity")
 			end 
 		elseif t.Thing==6 or t.Thing==7 or t.Thing==8 then
-			if vars.PlayerBuffs[t.Player:GetIndex()]["Poison1"]>Game.Time then
+			if vars.PlayerAlchemyBuffs[t.Player:GetIndex()]["Poison1"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Poison Immunity")
 			end 
 		elseif t.Thing==9 or t.Thing==10 or t.Thing==11 then
-			if vars.PlayerBuffs[t.Player:GetIndex()]["Disease1"]>Game.Time then
+			if vars.PlayerAlchemyBuffs[t.Player:GetIndex()]["Disease1"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Disease Immunity")
 			end 
 		elseif t.Thing==12 then
-			if vars.PlayerBuffs[t.Player:GetIndex()]["Paralyzed"]>Game.Time then
+			if vars.PlayerAlchemyBuffs[t.Player:GetIndex()]["Paralyzed"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Paralysis Immunity")
 			end 
 		elseif t.Thing==15 then
-			if vars.PlayerBuffs[t.Player:GetIndex()]["Stoned"]>Game.Time then
+			if vars.PlayerAlchemyBuffs[t.Player:GetIndex()]["Stoned"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Petrify Immunity")
 			end 
 		elseif t.Thing==23 then
-			if vars.PlayerBuffs[t.Player:GetIndex()]["Afraid"]>Game.Time then
+			if vars.PlayerAlchemyBuffs[t.Player:GetIndex()]["Afraid"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Fear Immunity")
 			end 
