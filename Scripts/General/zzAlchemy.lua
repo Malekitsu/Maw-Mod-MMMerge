@@ -14,15 +14,9 @@ function events.LoadMap()
 		local index=Party[i]:GetIndex()
 		if not vars.PlayerBuffs[index] then
 			vars.PlayerBuffs[index]={}
-			vars.PlayerBuffs[index]["weakness"]=0
-			vars.PlayerBuffs[index]["disease"]=0
-			vars.PlayerBuffs[index]["poison"]=0
-			vars.PlayerBuffs[index]["sleep"]=0
-			vars.PlayerBuffs[index]["fear"]=0
-			vars.PlayerBuffs[index]["curse"]=0
-			vars.PlayerBuffs[index]["insanity"]=0
-			vars.PlayerBuffs[index]["paralysis"]=0
-			vars.PlayerBuffs[index]["stone"]=0
+			for i=1,#itemImmunityMapping[245] do
+				vars.PlayerBuffs[index][i]=0
+			end
 		end
 	end
 	vars.BlackPotions=vars.BlackPotions or {}
@@ -43,19 +37,19 @@ function events.UseMouseItem(t)
 	end
 	--healing potion
 	if it.Number==222 then
-		heal=math.round(it.Bonus^1.4)
+		heal=math.round(it.Bonus^1.4)-it.Bonus
 		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
 	--mana potion
 	elseif it.Number==223 then
-		spRestore=math.round(it.Bonus^1.4*2/3)
+		spRestore=math.round(it.Bonus^1.4*2/3)-it.Bonus
 		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
 	end
 	if it.Number==246 then
-		heal=math.round(it.Bonus^1.4*3+30)
+		heal=math.round(it.Bonus^1.4*3+30)-it.Bonus*5
 		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
 	--mana potion
 	elseif it.Number==247 then
-		spRestore=math.round(it.Bonus^1.4*2)
+		spRestore=math.round(it.Bonus^1.4*2)-it.Bonus*5
 		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
 	end
 	--Regen
@@ -85,6 +79,7 @@ function events.UseMouseItem(t)
 		for i=1,#itemImmunityMapping[it.Number] do
 			local txt=itemImmunityMapping[it.Number][i]
 			vars.PlayerBuffs[index][txt]=Game.Time+Const.Hour*6
+			pl[itemImmunityMapping[it.Number][i]]=0
 		end
 	end
 	--------------------
@@ -157,7 +152,7 @@ function events.UseMouseItem(t)
 	end
 	
 	--consume
-	if potionUsingCharges[Mouse.Item.Number] then
+	if table.find(potionUsingCharges,Mouse.Item.Number) then
 		if Mouse.Item.Charges==0 then
 			Mouse.Item.Charges=5
 		elseif Mouse.Item.Charges>2 then
@@ -180,7 +175,7 @@ function events.GetSkill(t)
 	end
 end
 
-potionUsingCharges={228,229,230,231,232,234,235,236,239,240,241,248,249,250,251,257,258}
+potionUsingCharges={228,229,230,231,232,234,235,239,240,241,248,249,250,251,257,258}
 potionPowerRequirement={
 	[231]=20,
 	[235]=20,
@@ -216,59 +211,59 @@ itemBuffMapping = {
     [263] = {5,0,22,3,9,2},  --resistances
 }
 itemImmunityMapping = {
-	[224] = {"weakness","sleep"},
-	[225] = {"disease","poison"},
-	[226] = {"curse","paralysis"},
-	[227] = {"fear","insanity"},
-	[239] = {"stone"},
-	[245] = {"weakness","sleep","disease","poison","curse","paralysis","fear","insanity","stone"}
+	[224] = {"Weak","Asleep"},
+	[225] = {"Disease1","Disease2","Disease3","Poison1","Poison2","Poison3"},
+	[226] = {"Cursed","Paralyzed"},
+	[227] = {"Afraid","Insane"},
+	[239] = {"Stoned"},
+	[245] = {"Weak","Asleep","Disease1","Disease2","Disease3","Poison1","Poison2","Poison3","Cursed","Paralyzed","Afraid","Insane","Stoned"}
 }
 
 
 function events.DoBadThingToPlayer(t)
 	if t.Allow==true and vars.PlayerBuffs[t.Player:GetIndex()] then
 		if t.Thing==1 then
-			if vars.PlayerBuffs[t.Player:GetIndex()]["curse"]>Game.Time then
+			if vars.PlayerBuffs[t.Player:GetIndex()]["Cursed"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Curse Immunity")
 			end
 		elseif t.Thing==2 then
-			if vars.PlayerBuffs[t.Player:GetIndex()]["weakness"]>Game.Time then
+			if vars.PlayerBuffs[t.Player:GetIndex()]["Weak"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Weakness Immunity")
 			end 
 		elseif t.Thing==3 then
-			if vars.PlayerBuffs[t.Player:GetIndex()]["sleep"]>Game.Time then
+			if vars.PlayerBuffs[t.Player:GetIndex()]["Asleep"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Forced Sleep Immunity")
 			end 
 		elseif t.Thing==5 then
-			if vars.PlayerBuffs[t.Player:GetIndex()]["insanity"]>Game.Time then
+			if vars.PlayerBuffs[t.Player:GetIndex()]["Insane"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Insanity Immunity")
 			end 
 		elseif t.Thing==6 or t.Thing==7 or t.Thing==8 then
-			if vars.PlayerBuffs[t.Player:GetIndex()]["poison"]>Game.Time then
+			if vars.PlayerBuffs[t.Player:GetIndex()]["Poison1"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Poison Immunity")
 			end 
 		elseif t.Thing==9 or t.Thing==10 or t.Thing==11 then
-			if vars.PlayerBuffs[t.Player:GetIndex()]["disease"]>Game.Time then
+			if vars.PlayerBuffs[t.Player:GetIndex()]["Disease1"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Disease Immunity")
 			end 
 		elseif t.Thing==12 then
-			if vars.PlayerBuffs[t.Player:GetIndex()]["paralysis"]>Game.Time then
+			if vars.PlayerBuffs[t.Player:GetIndex()]["Paralyzed"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Paralysis Immunity")
 			end 
 		elseif t.Thing==15 then
-			if vars.PlayerBuffs[t.Player:GetIndex()]["stone"]>Game.Time then
+			if vars.PlayerBuffs[t.Player:GetIndex()]["Stoned"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Petrify Immunity")
 			end 
 		elseif t.Thing==23 then
-			if vars.PlayerBuffs[t.Player:GetIndex()]["fear"]>Game.Time then
+			if vars.PlayerBuffs[t.Player:GetIndex()]["Afraid"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Fear Immunity")
 			end 
