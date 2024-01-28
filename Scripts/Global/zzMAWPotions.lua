@@ -18,8 +18,7 @@ evt.PotionEffects[35] = function(IsDrunk, t, Power)
 		return
 	end
 	if t.Bonus2==0 and Game.ItemsTxt[t.Number].Skill<7 then
-		local enchNumber=(t.Number+t.Charges+t.MaxCharges+t.Bonus+t.BonusStrength)%4
-		t.Bonus2=enchNumber*3+6
+		t.Bonus2=math.random(1,4)*3+3
 		Mouse.Item.Number=0
 		mem.u4[0x51E100] = 0x100 
 		t.Condition = t.Condition:Or(0x10)
@@ -92,4 +91,18 @@ evt.PotionEffects[18] = function(IsDrunk, t, Power)
 		end
 	end
 end
-
+--[[ not working
+evt.PotionEffects[16] = function(IsDrunk, t, Power)
+	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) or table.find(artWeap1h, t.Number) or table.find(artWeap2h, t.Number) or table.find(artArmors, t.Number)  then
+		if not t.Hardened then			
+			t.Hardened=true
+			Mouse.Item.Number=0
+			mem.u4[0x51E100] = 0x100 
+			t.Condition = t.Condition:Or(0x10)
+			evt.PlaySound(12070)
+		else
+			return
+		end
+	end
+end
+]]
