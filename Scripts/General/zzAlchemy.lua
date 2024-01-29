@@ -15,7 +15,7 @@ function events.LoadMap()
 		if not vars.PlayerAlchemyBuffs[index] then
 			vars.PlayerAlchemyBuffs[index]={}
 			for i=1,#itemImmunityMapping[245] do
-				vars.PlayerAlchemyBuffs[index][i]=0
+				vars.PlayerAlchemyBuffs[index][itemImmunityMapping[245][i]]=0
 			end
 		end
 	end
