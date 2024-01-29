@@ -38,8 +38,12 @@ function events.AfterLoadMap()
 		bolsterRes=math.max(math.round((Map.Monsters[i].Level-basetable[Map.Monsters[i].Id].Level)/2),0)
 		for v=0,10 do
 			if v~=5 then
-			hpMult=math.floor(Map.Monsters[i].Resistances[v]/1000)
-			Map.Monsters[i].Resistances[v]=math.min(bolsterRes+basetable[Map.Monsters[i].Id].Resistances[v],bolsterRes+200)+1000*hpMult	
+				if v==0 and Map.Monsters[i].Resistances[v]<65000 then
+					hpMult=math.floor(Map.Monsters[i].Resistances[v]/1000)
+					Map.Monsters[i].Resistances[v]=math.min(bolsterRes+basetable[Map.Monsters[i].Id].Resistances[v],bolsterRes+200)+1000*hpMult	
+				else
+					Map.Monsters[i].Resistances[v]=math.min(bolsterRes+basetable[Map.Monsters[i].Id].Resistances[v],bolsterRes+200)
+				end
 			end
 		end
 	end	
