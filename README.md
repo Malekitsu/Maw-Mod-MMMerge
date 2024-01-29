@@ -23,9 +23,6 @@ This mod is divided into 8 parts:
 
 ## Item Rework
 - Items can now have up to 3 enchants: 2 base enchants and 1 special.
-- Loot level is slightly influenced by the player's level:
-  - Going early game in late areas will result in worse loot.
-  - Late-game loot has been improved.
 - You will have a chance to find ancient and primordial items:
   - Ancients will have higher stats.
   - Primordials will be similar to ancients but with consistently perfect stats.
