@@ -20,7 +20,7 @@ function events.CalcDamageToMonster(t)
 			end
 			
 			t.Result=damage*dmgMult
-			
+
 			luck=data.Player:GetLuck()/1.5
 			critDamage=data.Player:GetAccuracy()*3/1000
 			critChance=50+luck
@@ -834,7 +834,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		local damage=math.round(damage)
 		return damage
 	end
-	res=math.huge
+	local res=math.huge
 	local resList=damageKindResistance[damageKind]
 	for i=1,#resList do
 		local playerRes = pl:GetResistance(resList[i])
