@@ -37,19 +37,19 @@ function events.UseMouseItem(t)
 	end
 	--healing potion
 	if it.Number==222 then
-		heal=math.round(it.Bonus^1.4)-it.Bonus
+		heal=math.round(it.Bonus^1.4+10)
 		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
 	--mana potion
 	elseif it.Number==223 then
-		spRestore=math.round(it.Bonus^1.4*2/3)-it.Bonus
+		spRestore=math.round(it.Bonus^1.4*2/3+10)
 		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
 	end
 	if it.Number==246 then
-		heal=math.round(it.Bonus^1.4*3+30)-it.Bonus*5
+		heal=math.round(it.Bonus^1.4*3+30)
 		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
 	--mana potion
 	elseif it.Number==247 then
-		spRestore=math.round(it.Bonus^1.4*2)-it.Bonus*5
+		spRestore=math.round(it.Bonus^1.4*2)
 		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
 	end
 	--Regen
