@@ -834,7 +834,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		local damage=math.round(damage)
 		return damage
 	end
-	local res=math.huge
+	res=math.huge
 	local resList=damageKindResistance[damageKind]
 	for i=1,#resList do
 		local playerRes = pl:GetResistance(resList[i])
@@ -843,13 +843,15 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		end
 	end
 	
+	res=1/2^math.min(res/math.min(75+monLvl*0.5*bolster,200*bolster),4)
+	
 	--randomize resistance
 	if res>0 and rand then
 		local roll=(math.random()+math.random())-1
 		res=math.max(0, res+(math.min(res,1-res)*roll))
 	end
 	
-	local damage=math.round(damage/2^math.min(res/math.min(75+monLvl*0.5*bolster,200*bolster),4))
+	local damage=math.round(damage*res)
 	return damage
 end
 
