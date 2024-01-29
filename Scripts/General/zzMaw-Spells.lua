@@ -693,8 +693,8 @@ function events.GameInitialized2()
 		spellCostMaster[i] = Game.Spells[i]["SpellPointsMaster"]
 		spellCostGM[i] = Game.Spells[i]["SpellPointsGM"]
 	end
-	ascendanceCost={4,6,8,10,15,20,25,30,40,50,60,[0]=60}
-	ascendanceCost2={5,10,20,35,50,70,90,115,140,170,200,[0]=200}
+	ascendanceCost={11,14,17,20,35,50,65,80,95,110,125,[0]=125}
+	ascendanceCost2={25,30,35,40,70,100,140,180,220,260,300,[0]=300}
 	spells={2,6,7,8,9,10,11,15,18,20,22,24,26,29,32,37,39,41,43,44,52,59,65,70,76,78,79,84,87,90,93,97,98,99,103,111,123}
 	lastIndex=-1 --used later
 
@@ -756,7 +756,7 @@ function events.GameInitialized2()
 			--get new mana cost and calculate theoretical Damage for level 80+
 			local manaCost=ascendanceCost[i%11]
 			if i>77 and i<100 then
-				manaCost=manaCost*1.5
+				manaCost=manaCost+50
 			end
 			--exception for racial spells
 			if i==103 then 
@@ -783,7 +783,7 @@ function events.GameInitialized2()
 			--get new mana cost and calculate theoretical Damage for level 80+
 			local manaCost=ascendanceCost2[i%11]
 			if i>77 and i<100 then
-				manaCost=manaCost*1.5
+				manaCost=manaCost+100
 			end
 			--exception for racial spells
 			if i==103 then 
