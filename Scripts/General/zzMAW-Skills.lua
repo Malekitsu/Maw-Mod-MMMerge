@@ -27,11 +27,11 @@ baseRecovery =
 	[const.Skills.Bow] = 100,
 	[const.Skills.Blaster] = 50,
 	[const.Skills.Staff] = 120,
-	[const.Skills.Axe] = 150,
-	[const.Skills.Sword] = 90,
+	[const.Skills.Axe] = 140,
+	[const.Skills.Sword] = 80,
 	[const.Skills.Spear] = 120,
 	[const.Skills.Mace] = 100,
-	[const.Skills.Dagger] = 80,
+	[const.Skills.Dagger] = 60,
 }
 
 skillAttack =
@@ -124,16 +124,31 @@ function events.CalcStatBonusBySkills(t)
 	t.Result=0
 end
 
+
 function events.GetAttackDelay(t)
 	t.Result=100
 	baseSpeed=100
+	speedCap=0
 	bonusSpeed=0
+	count=0
 	if t.Ranged then
 		local it=t.Player:GetActiveItem(2)
 		if it then
 			local skill=it:T().Skill
-			baseSpeed=baseRecovery[skill] or 100
-			local s,m = SplitSkill(t.Player:GetSkill(skill))
+			if baseRecovery[skill] then
+				count=count+1
+				local tot=0
+				local lvl=0
+				for i=1, 6 do
+					tot=tot+it:T().ChanceByLevel[i]
+					lvl=lvl+it:T().ChanceByLevel[i]*i
+				end
+				local itemLevel=math.round(lvl/tot*18-17)+it.MaxCharges*5
+				baseSpeed=baseRecovery[skill] * (1+itemLevel/150)
+				baseSpeed=math.round(baseSpeed/10)*10
+				speedCap=baseRecovery[skill]/2
+			end
+			
 			if skillRecovery[skill] and skillRecovery[skill][m] then
 				bonusSpeed=skillRecovery[skill][m]*s
 			end
@@ -147,7 +162,19 @@ function events.GetAttackDelay(t)
 			if it then
 				local skill=it:T().Skill
 				if baseRecovery[skill] then
-					baseSpeed=baseSpeed-100+baseRecovery[skill]
+					count=count+1
+					local tot=0
+					local lvl=0
+					for i=1, 6 do
+						tot=tot+it:T().ChanceByLevel[i]
+						lvl=lvl+it:T().ChanceByLevel[i]*i
+					end
+					local itemLevel=math.round(lvl/tot*18-17)+it.MaxCharges*5
+					baseSpeed=baseRecovery[skill] * (1+itemLevel/150)
+					baseSpeed=math.round(baseSpeed/10)*10
+					--average between the 2 items
+					baseSpeed=baseSpeed/count
+					speedCap=(speedCap+(baseRecovery[skill]/2))/count
 				end
 				local s,m = SplitSkill(t.Player:GetSkill(skill))
 				if skillRecovery[skill] and skillRecovery[skill][m] then
@@ -181,7 +208,7 @@ function events.GetAttackDelay(t)
 	else
 		damageMultiplier[t.PlayerIndex]["Melee"]=1*baseSpeed/100
 	end
-	local speedCap=baseSpeed/3
+	local speedCap=baseSpeed/2
 	bonusSpeedMult=(100+bonusSpeed)/100
 	attackRecovery=baseSpeed/bonusSpeedMult
 	if attackRecovery<speedCap and not t.Ranged then
