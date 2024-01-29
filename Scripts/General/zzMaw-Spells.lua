@@ -248,7 +248,7 @@ function events.PlayerCastSpell(t)
 	--lesser heal
 	if t.SpellId == 68 then
 		if not t.RemoteData then
-			t.Skill=0
+			t.Skill=0 --not working
 			local persBonus=t.Player:GetPersonality()/1000
 			local intBonus=t.Player:GetIntellect()/1000
 			local statBonus=math.max(persBonus,intBonus)
@@ -267,18 +267,19 @@ function events.PlayerCastSpell(t)
 				gotCrit=true
 			end
 			--remove base heal
-			totHeal=math.round(totHeal-5)
+			tooltipHeal=totHeal
+			totHeal=math.round(totHeal-(5+(m+1)*s))
 			if gotCrit then
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal+5) .. " Hit points(crit)"))
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(tooltipHeal) .. " Hit points(crit)"))
 			else
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal+5) .. " Hit points"))
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(tooltipHeal) .. " Hit points"))
 			end
 		end
 		--end of healing calculation
 		if t.TargetKind == 3 and t.MultiplayerData then
 			t.MultiplayerData[1]=math.round(totHeal) --bonus heal
 			t.MultiplayerData[2]=gotCrit --crit 
-			t.MultiplayerData[3]=math.round(5+totHeal) --total heal
+			t.MultiplayerData[3]=math.round(tooltipHeal) --total heal
 			return
 		elseif t.TargetKind == 4 and t.RemoteData then
 			local healData = t.RemoteData
@@ -411,11 +412,12 @@ function events.PlayerCastSpell(t)
 				gotCrit=true
 			end
 			--remove base heal
-			totHeal=math.round(totHeal-10)
+			tooltipHeal=totHeal
+			totHeal=math.round(totHeal-(10+5*s))
 			if gotCrit then
-				Game.ShowStatusText(string.format("You Heal the Party for " .. math.round(totHeal+10) .. " Hit points(crit)"))
+				Game.ShowStatusText(string.format("You Heal the Party for " .. math.round(tooltipHeal) .. " Hit points(crit)"))
 			else
-				Game.ShowStatusText(string.format("You Heal the Party for " .. math.round(totHeal+10) .. " Hit points"))
+				Game.ShowStatusText(string.format("You Heal the Party for " .. math.round(tooltipHeal) .. " Hit points"))
 			end
 		end
 		--end of healing calculation
@@ -429,7 +431,7 @@ function events.PlayerCastSpell(t)
 			if t.MultiplayerData then
 				t.MultiplayerData[1]=math.round(totHeal) --bonus heal
 				t.MultiplayerData[2]=gotCrit --crit 
-				t.MultiplayerData[3]=math.round(10+totHeal) --total heal
+				t.MultiplayerData[3]=math.round(tooltipHeal) --total heal
 			end
 		elseif t.RemoteData then
 			local healData = t.RemoteData
