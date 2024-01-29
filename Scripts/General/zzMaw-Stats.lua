@@ -10,14 +10,17 @@ function events.CalcDamageToMonster(t)
 				maxDamage=t.Player:GetMeleeDamageMax()
 				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
 				damage=math.round(randomDamage/2)
+				dmgMult=damageMultiplier[t.PlayerIndex]["Ranged"]
 			else --bow
 				baseDamage=t.Player:GetRangedDamageMin()
 				maxDamage=t.Player:GetRangedDamageMax()
 				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
 				damage=math.round(randomDamage/2)
+				dmgMult=damageMultiplier[t.PlayerIndex]["Melee"]
 			end
 			
-			t.Result=damage
+			t.Result=damage*dmgMult
+			
 			luck=data.Player:GetLuck()/1.5
 			critDamage=data.Player:GetAccuracy()*3/1000
 			critChance=50+luck
@@ -39,6 +42,13 @@ function events.CalcDamageToMonster(t)
 				t.Result=t.Result*(1.5+critDamage)
 				crit=true
 			end
+					
+			--WEAPON SPEED MULTIPLIER
+			if not t.Object and t.Player then
+				t.Result=math.round(t.Result*damageMultiplier[t.PlayerIndex]["Melee"])
+			end
+	
+			
 		end
 	end
 end
@@ -311,7 +321,6 @@ function events.BuildStatInformationBox(t)
 			local accuracy=Party[i]:GetAccuracy()
 			local luck=Party[i]:GetLuck()
 			local delay=Party[i]:GetAttackDelay()
-			bonusMult=damageMultiplier[Party[i]:GetIndex()]["Melee"]
 			local dmg=(low+high)/2
 			--hit chance
 			local atk=Party[i]:GetMeleeAttack()
@@ -329,7 +338,7 @@ function events.BuildStatInformationBox(t)
 					end
 				end
 			end
-			DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*bonusMult)
+			DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
 			
 			--RANGED
 			local low=Party[i]:GetRangedDamageMin()
@@ -726,12 +735,6 @@ damageKindMap={
 	[10]=const.Damage.Dark,
 }
 function events.CalcDamageToMonster(t)
-		
-	--SPEED WILL NOW INCREASE DAMAGE IF OVERCAPPED
-	if not t.Object and t.Player then
-		t.Result=math.round(t.Result*damageMultiplier[t.PlayerIndex]["Melee"])
-	end
-	
 	index=table.find(damageKindMap,t.DamageKind)
 	res=t.Monster.Resistances[index]
 	if not res then return end
