@@ -466,7 +466,6 @@ end
 -----------------------------
 ---IMMUNITY REWORK
 -----------------------------
-
 function events.DoBadThingToPlayer(t)
     local protectionMessages = {
         [18] = { [9] = "disease", [10] = "disease", [11] = "disease", [1] = "curse" },
@@ -1759,7 +1758,7 @@ function events.BuildItemInformationBox(t)
 			end
 			fullHP=fullHP/dodgeChance
 			--resistances
-			res={0,1,2,3,7,8,12}
+			local res={0,1,2,3,7,8,12}
 			for j=1,7 do 
 				res[j]=1-calcMawDamage(Party[i],res[j],10000)/10000
 			end
@@ -1866,7 +1865,7 @@ function events.BuildItemInformationBox(t)
 				newLuckEff=math.floor(luck/10)+10
 			end
 			luckChanged=newLuckEff-oldLuckEff
-			res={
+			local res={
 				[1]=Party[i]:GetResistance(10)+newFire+luckChanged,
 				[2]=Party[i]:GetResistance(11)+newAir+luckChanged,
 				[3]=Party[i]:GetResistance(12)+newWater+luckChanged,
