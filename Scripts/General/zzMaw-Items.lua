@@ -1911,6 +1911,20 @@ function events.BuildItemInformationBox(t)
 			itemLevel=itemLevel+math.round(lvl/tot*18-17)
 			t.Description = t.Description .. "\n\nItem Level: " .. itemLevel
 		end	
+		if t.Type and baseRecovery[t.Item:T().Skill] then
+			local itemLevel=t.Item.MaxCharges*5
+			local tot=0
+			local lvl=0
+			for i=1, 6 do
+				tot=tot+t.Item:T().ChanceByLevel[i]
+				lvl=lvl+t.Item:T().ChanceByLevel[i]*i
+			end
+			itemLevel=itemLevel+math.round(lvl/tot*18-17)
+			baseSpeed=baseRecovery[t.Item:T().Skill] * (1+itemLevel/150)
+			baseSpeed=math.round(baseSpeed/10)/10
+			
+			t.Type = t.Type .. "   Attack Speed: " .. baseSpeed
+		end
 	end
 end
 
