@@ -21,6 +21,7 @@ This mod is divided into 8 parts:
 - Bolster rework
 - Mechanics rework
 
+##GUIDE IS OUTDATED, A NEW ONE WILL COME SOON
 ## Item Rework
 - Items can now have up to 3 enchants: 2 base enchants and 1 special.
 - You will have a chance to find ancient and primordial items:
