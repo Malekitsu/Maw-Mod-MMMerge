@@ -1502,7 +1502,6 @@ function events.BuildItemInformationBox(t)
 				accuracy=Party[i]:GetAccuracy()
 				luck=Party[i]:GetLuck()
 				delay=math.max(Party[i]:GetAttackDelay())
-				bonusMult=damageMultiplier[Party[i]:GetIndex()].Melee
 				dmg=(low+high)/2
 				--hit chance
 				atk=Party[i]:GetMeleeAttack()
@@ -1520,7 +1519,7 @@ function events.BuildItemInformationBox(t)
 						end
 					end
 				end
-				DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*bonusMult)
+				DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
 				--debug.Message(string.format("%s %s %s %s %s %s %s %s ", dmg,might,daggerCritBonus,luck,accuracy,delay,hitChance,bonusMult))
 				--RANGED
 				low=Party[i]:GetRangedDamageMin()
@@ -1681,13 +1680,6 @@ function events.BuildItemInformationBox(t)
 					newSpeed=(speed-13)/2
 				end
 				
-				if powerType=="Melee" then
-					delay=math.max(Party[i]:GetAttackDelay())
-					bonusMult=damageMultiplier[Party[i]:GetIndex()]["Melee"]
-				else
-					delay=Party[i]:GetAttackDelay(true)
-					bonusMult=1
-				end
 				recoveryBonus=bonusSpeed+newSpeed-oldSpeed
 				
 				if powerType=="Melee" then
@@ -1725,7 +1717,7 @@ function events.BuildItemInformationBox(t)
 						dmg=dmg*2
 					end
 				end
-				power=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*bonusMult)
+				power=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
 				--debug.Message(string.format("%s %s %s %s %s %s %s %s ", dmg,might,daggerCritBonus,luck,accuracy,delay,hitChance,bonusMult))
 			end
 			
