@@ -128,7 +128,6 @@ end
 function events.GetAttackDelay(t)
 	t.Result=100
 	baseSpeed=100
-	speedCap=0
 	bonusSpeed=0
 	count=0
 	if t.Ranged then
@@ -146,7 +145,6 @@ function events.GetAttackDelay(t)
 				local itemLevel=math.round(lvl/tot*18-17)+it.MaxCharges*5
 				baseSpeed=baseRecovery[skill] * (1+itemLevel/150)
 				baseSpeed=math.round(baseSpeed/10)*10
-				speedCap=baseRecovery[skill]/2
 			end
 			
 			if skillRecovery[skill] and skillRecovery[skill][m] then
@@ -174,7 +172,6 @@ function events.GetAttackDelay(t)
 					baseSpeed=math.round(baseSpeed/10)*10
 					--average between the 2 items
 					baseSpeed=baseSpeed/count
-					speedCap=(speedCap+(baseRecovery[skill]/2))/count
 				end
 				local s,m = SplitSkill(t.Player:GetSkill(skill))
 				if skillRecovery[skill] and skillRecovery[skill][m] then
@@ -208,20 +205,8 @@ function events.GetAttackDelay(t)
 	else
 		damageMultiplier[t.PlayerIndex]["Melee"]=1*baseSpeed/100
 	end
-	local speedCap=baseSpeed/2
-	bonusSpeedMult=(100+bonusSpeed)/100
-	attackRecovery=baseSpeed/bonusSpeedMult
-	if attackRecovery<speedCap and not t.Ranged then
-		local extraMult=speedCap/attackRecovery
-		attackRecovery=speedCap
-		
-		if t.Ranged then
-			damageMultiplier[t.PlayerIndex]["Ranged"]=damageMultiplier[t.PlayerIndex]["Ranged"]*extraMult
-		else
-			damageMultiplier[t.PlayerIndex]["Melee"]=damageMultiplier[t.PlayerIndex]["Melee"]*extraMult
-		end
-	end
-	t.Result=math.max(attackRecovery,speedCap)
+	local bonusSpeedMult=(100+bonusSpeed)/100
+	t.Result=baseSpeed/bonusSpeedMult
 end
 
 function calculateAngle(vector1, vector2)
