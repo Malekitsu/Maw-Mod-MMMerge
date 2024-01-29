@@ -63,12 +63,11 @@ evt.PotionEffects[18] = function(IsDrunk, t, Power)
 			math.randomseed(vars.enchantSeedList[t.Number]+t.MaxCharges)
 			if math.random(1,10)==1 then
 				t.Bonus=math.random(17,24)
-				t.BonusStrength=Mouse.Item.Bonus^0.5
 			else
 				t.Bonus=math.random(1,16)
-				t.BonusStrength=Mouse.Item.Bonus/2
 			end
 			
+			t.BonusStrength=Mouse.Item.Bonus/2
 			--buff to hp and mana items
 			if t.Bonus==8 or t.Bonus==9 then
 				t.BonusStrength=t.BonusStrength*(2+t.BonusStrength/50)
@@ -81,7 +80,12 @@ evt.PotionEffects[18] = function(IsDrunk, t, Power)
 			local mult=slotMult[t:T().EquipStat]
 			if mult then
 				t.BonusStrength=math.ceil(t.BonusStrength*mult)
-			end		
+			end	
+			
+			--nerf to skill enchant
+			if t.Bonus>=17 then
+				t.BonusStrength=math.max(Mouse.Item.Bonus^0.5, math.ceil(Mouse.Item.Bonus/10))
+			end
 			
 			vars.enchantSeedList[t.Number]=vars.enchantSeedList[t.Number]+math.random(1,1000)
 			Mouse.Item.Number=0
