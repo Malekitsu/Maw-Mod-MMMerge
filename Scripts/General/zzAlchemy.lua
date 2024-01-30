@@ -365,7 +365,7 @@ potionRecipeText={
 	--orange
 	[225]="Recipes:\nAdd Red: Haste\nAdd Blue: Protection\nAdd Yellow: Stone Skin\nAdd Purple: Magic Protection\nAdd Green: Stone to Flesh",
 	--purple
-	[226]="Recipes:\nAdd Red: Heroism\nAdd Blue: Quickmind\nAdd Yellow: Water Breathing\nAdd Orange: Magic Protection\nAdd Green: Enchant Item",
+	[226]="Recipes:\nAdd Red: Heroism\nAdd Blue: Meditation\nAdd Yellow: Water Breathing\nAdd Orange: Magic Protection\nAdd Green: Enchant Item",
 	--green
 	[227]="Recipes:\nAdd Red: Bless\nAdd Blue: Regeneration\nAdd Yellow: Harden Item\nAdd Orange: Magic Protection\nAdd Purple: Enchant Item",
 	--7-8-9
