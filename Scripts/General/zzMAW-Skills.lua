@@ -159,20 +159,27 @@ function events.GetAttackDelay(t)
 			local it=t.Player:GetActiveItem(i)
 			if it then
 				local skill=it:T().Skill
+				count=count+1
 				if baseRecovery[skill] then
-					count=count+1
-					local tot=0
-					local lvl=0
-					for i=1, 6 do
-						tot=tot+it:T().ChanceByLevel[i]
-						lvl=lvl+it:T().ChanceByLevel[i]*i
+					if (it.Number>=500 and it.Number<=543) or (it.Number>=1302 and it.Number<=1354) or (it.Number>=2020 and it.Number<=2049) then 
+						itemLevel=artifactPowerMult(t.Player.LevelBase)*100
+						currentSpeed=baseRecovery[it:T().Skill] * (0.75+itemLevel/200)
+						currentSpeed=math.round(currentSpeed/10)*10
+					elseif baseRecovery[skill] then
+						local tot=0
+						local lvl=0
+						for i=1, 6 do
+							tot=tot+it:T().ChanceByLevel[i]
+							lvl=lvl+it:T().ChanceByLevel[i]*i
+						end
+						local itemLevel=math.round(lvl/tot*18-17)+it.MaxCharges*5
+						currentSpeed=baseRecovery[skill] * (0.75+itemLevel/200)
+						currentSpeed=math.round(currentSpeed/10)*10
+						
 					end
-					local itemLevel=math.round(lvl/tot*18-17)+it.MaxCharges*5
-					currentSpeed=baseRecovery[skill] * (0.75+itemLevel/200)
-					currentSpeed=math.round(currentSpeed/10)*10
-					--average between the 2 items
-					baseSpeed=(baseSpeed+currentSpeed)/count
 				end
+				--average between the 2 items
+				baseSpeed=(baseSpeed+currentSpeed)/count
 				local s,m = SplitSkill(t.Player:GetSkill(skill))
 				if skillRecovery[skill] and skillRecovery[skill][m] then
 					bonusSpeed=bonusSpeed+skillRecovery[skill][m]*s
