@@ -130,6 +130,7 @@ function events.GetAttackDelay(t)
 	baseSpeed=0
 	bonusSpeed=0
 	count=0
+	currentSpeed=0
 	if t.Ranged then
 		local it=t.Player:GetActiveItem(2)
 		if it then
