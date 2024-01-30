@@ -188,7 +188,9 @@ function events.GetAttackDelay(t)
 			end
 		end
 	end
-	
+	if baseSpeed==0 then
+		baseSpeed=100
+	end
 	local speed=t.Player:GetSpeed()
 	if speed<=21 then
 		speedEffect=(speed-13)/2
