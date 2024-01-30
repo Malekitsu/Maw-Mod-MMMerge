@@ -777,6 +777,7 @@ function events.GameInitialized2()
 				diceMax80=math.round(theoreticalDamage80*(diceMaxProportion)*2)+1
 			end
 			spellPowers80[i]={dmgAdd = dmgAdd80, diceMin = 1, diceMax = diceMax80,}
+			spellPowers80[44]={dmgAdd = 15, diceMin = 0.5, diceMax = 0.5} 
 			----------
 			--do the same, but for level 160
 			----------
@@ -804,6 +805,7 @@ function events.GameInitialized2()
 				diceMax160=math.round(theoreticalDamage160*(diceMaxProportion)*2)+1
 			end
 			spellPowers160[i]={dmgAdd = dmgAdd160, diceMin = 1, diceMax = diceMax160,}
+			spellPowers160[44]={dmgAdd = 15, diceMin = 0.5, diceMax = 0.5} 
 		end
 	end
 end
