@@ -14,8 +14,8 @@ function events.LoadMap()
 		local index=Party[i]:GetIndex()
 		if not vars.PlayerAlchemyBuffs[index] or not vars.PlayerAlchemyBuffs[index]["Stoned"] then
 			vars.PlayerAlchemyBuffs[index]={}
-			for i=1,#itemImmunityMapping[245] do
-				vars.PlayerAlchemyBuffs[index][itemImmunityMapping[245][i]]=0
+			for i=1,#itemImmunityMapping[246] do
+				vars.PlayerAlchemyBuffs[index][itemImmunityMapping[246][i]]=0
 			end
 		end
 	end
