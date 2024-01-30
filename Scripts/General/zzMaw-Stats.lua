@@ -10,13 +10,13 @@ function events.CalcDamageToMonster(t)
 				maxDamage=t.Player:GetMeleeDamageMax()
 				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
 				damage=math.round(randomDamage/2)
-				dmgMult=damageMultiplier[t.PlayerIndex]["Ranged"]
+				dmgMult=damageMultiplier[t.PlayerIndex]["Melee"]
 			else --bow
 				baseDamage=t.Player:GetRangedDamageMin()
 				maxDamage=t.Player:GetRangedDamageMax()
 				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
 				damage=math.round(randomDamage/2)
-				dmgMult=damageMultiplier[t.PlayerIndex]["Melee"]
+				dmgMult=damageMultiplier[t.PlayerIndex]["Ranged"]
 			end
 			
 			t.Result=damage*dmgMult
@@ -42,13 +42,6 @@ function events.CalcDamageToMonster(t)
 				t.Result=t.Result*(1.5+critDamage)
 				crit=true
 			end
-					
-			--WEAPON SPEED MULTIPLIER
-			if not t.Object and t.Player then
-				t.Result=math.round(t.Result*damageMultiplier[t.PlayerIndex]["Melee"])
-			end
-	
-			
 		end
 	end
 end
