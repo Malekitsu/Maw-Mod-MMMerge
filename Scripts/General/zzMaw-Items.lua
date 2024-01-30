@@ -1680,13 +1680,13 @@ function events.BuildItemInformationBox(t)
 					newSpeed=(speed-13)/2
 				end
 				
-				recoveryBonus=bonusSpeed+newSpeed-oldSpeed
-				
+				recoveryBonus=damageMultiplier[Party[i]:GetIndex()]["bonusSpeedMelee"]+newSpeed-oldSpeed
 				if powerType=="Melee" then
-					delay=math.max(math.floor(baseSpeed / (1 + recoveryBonus / 100)),30)
+					delay=math.max(math.floor(100 / (1 + recoveryBonus / 100)),30)
 				else
-					delay=math.floor(baseSpeed / (1 + recoveryBonus / 100))
-				end				
+					delay=math.floor(100 / (1 + recoveryBonus / 100))
+				end	
+				--debug.Message(string.format("%s %s %s", delay, recoveryBonus, baseSpeed))				
 				--luck
 				luck=Party[i]:GetLuck()+bonusLuck
 				--hit chance
