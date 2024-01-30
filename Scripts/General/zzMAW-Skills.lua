@@ -196,6 +196,9 @@ function events.GetAttackDelay(t)
 		speedEffect=math.floor(speed/5)
 	end
 	bonusSpeed=bonusSpeed+speedEffect
+	if t.Player.SpellBuffs[const.PlayerBuff.Haste].ExpireTime>Game.Time then
+		bonusSpeed=bonusSpeed+20
+	end
 	
 	damageMultiplier=damageMultiplier or {}
 	damageMultiplier[t.PlayerIndex]=damageMultiplier[t.PlayerIndex] or {}
@@ -205,7 +208,7 @@ function events.GetAttackDelay(t)
 	else
 		damageMultiplier[t.PlayerIndex]["Melee"]=1*baseSpeed/100
 	end
-	local bonusSpeedMult=(100+bonusSpeed)/100
+	bonusSpeedMult=(100+bonusSpeed)/100
 	t.Result=baseSpeed/bonusSpeedMult
 end
 
