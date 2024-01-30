@@ -1519,7 +1519,7 @@ function events.BuildItemInformationBox(t)
 						end
 					end
 				end
-				DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
+				DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])
 				--debug.Message(string.format("%s %s %s %s %s %s %s %s ", dmg,might,daggerCritBonus,luck,accuracy,delay,hitChance,bonusMult))
 				--RANGED
 				low=Party[i]:GetRangedDamageMin()
@@ -1533,7 +1533,7 @@ function events.BuildItemInformationBox(t)
 				if m>=3 then
 					dmg=dmg*2
 				end
-				DPS2=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
+				DPS2=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])
 				if DPS1>DPS2 then
 					power=DPS1
 					powerType="Melee"
@@ -1683,8 +1683,10 @@ function events.BuildItemInformationBox(t)
 				recoveryBonus=damageMultiplier[Party[i]:GetIndex()]["bonusSpeedMelee"]+newSpeed-oldSpeed
 				if powerType=="Melee" then
 					delay=math.max(math.floor(damageMultiplier[Party[i]:GetIndex()]["baseSpeedMelee"] / (1 + recoveryBonus / 100)),30)
+					weaponSpeedMult=damageMultiplier[Party[i]:GetIndex()]["Melee"]
 				else
 					delay=math.floor(damageMultiplier[Party[i]:GetIndex()]["baseSpeedRanged"] / (1 + recoveryBonus / 100))
+					weaponSpeedMult=damageMultiplier[Party[i]:GetIndex()]["Ranged"]
 				end	
 				--debug.Message(string.format("%s %s %s", delay, recoveryBonus, baseSpeed))				
 				--luck
@@ -1717,7 +1719,7 @@ function events.BuildItemInformationBox(t)
 						dmg=dmg*2
 					end
 				end
-				power=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance)
+				power=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*weaponSpeedMult)
 				--debug.Message(string.format("%s %s %s %s %s %s %s %s ", dmg,might,daggerCritBonus,luck,accuracy,delay,hitChance,bonusMult))
 			end
 			
