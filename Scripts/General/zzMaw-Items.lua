@@ -1682,9 +1682,9 @@ function events.BuildItemInformationBox(t)
 				
 				recoveryBonus=damageMultiplier[Party[i]:GetIndex()]["bonusSpeedMelee"]+newSpeed-oldSpeed
 				if powerType=="Melee" then
-					delay=math.max(math.floor(100 / (1 + recoveryBonus / 100)),30)
+					delay=math.max(math.floor(damageMultiplier[Party[i]:GetIndex()]["baseSpeedMelee"] / (1 + recoveryBonus / 100)),30)
 				else
-					delay=math.floor(100 / (1 + recoveryBonus / 100))
+					delay=math.floor(damageMultiplier[Party[i]:GetIndex()]["baseSpeedRanged"] / (1 + recoveryBonus / 100))
 				end	
 				--debug.Message(string.format("%s %s %s", delay, recoveryBonus, baseSpeed))				
 				--luck
@@ -1912,7 +1912,7 @@ function events.BuildItemInformationBox(t)
 				lvl=lvl+t.Item:T().ChanceByLevel[i]*i
 			end
 			itemLevel=itemLevel+math.round(lvl/tot*18-17)
-			baseSpeed=baseRecovery[t.Item:T().Skill] * (1+itemLevel/150)
+			baseSpeed=baseRecovery[t.Item:T().Skill] * (0.75+itemLevel/200)
 			baseSpeed=math.round(baseSpeed/10)/10
 			
 			t.Type = t.Type .. "\nAttack Speed: " .. baseSpeed
