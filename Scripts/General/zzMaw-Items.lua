@@ -862,35 +862,6 @@ function events.GameInitialized2()
 	}
 		
 end
-					
---recalculate actual damage
-function events.ModifyItemDamage(t)
-	bonusDamage=0
-	if t.Item then
-		if t.Item.MaxCharges>0 then
-			lookup=0
-			while Game.ItemsTxt[t.Item.Number].NotIdentifiedName==Game.ItemsTxt[t.Item.Number+lookup+1].NotIdentifiedName do 
-				lookup=lookup+1
-			end
-			add=Game.ItemsTxt[t.Item.Number].Mod2
-			add2=Game.ItemsTxt[t.Item.Number+lookup].Mod2
-			side=Game.ItemsTxt[t.Item.Number].Mod1DiceSides
-			side2=Game.ItemsTxt[t.Item.Number+lookup].Mod1DiceSides
-			if t.Item.MaxCharges <= 20 then
-				newside=side+side2*(t.Item.MaxCharges/20)
-				newbonus=add+add2*(t.Item.MaxCharges/20)
-			else
-				newside=side+(side+side2)*(t.Item.MaxCharges/20)
-				newbonus=add+(add+add2)*(t.Item.MaxCharges/20)
-			end
-			--calculate dices
-			for i=1,Game.ItemsTxt[t.Item.Number].Mod1DiceCount do
-				bonusDamage=bonusDamage+math.random(1,newside)
-			end
-			t.Result=bonusDamage+newbonus
-		end
-	end
-end
 
 --fix to enchant2 not applying correctly if same bonus is on the item
 --fix to special enchants
@@ -1363,23 +1334,6 @@ function events.CalcStatBonusByItems(t)
 	end
 end
 ]]
---modify actual damage
---recalculate actual damage
-function events.ModifyItemDamage(t)
-	if t.Item then
-		if (t.Item.Number>=500 and t.Item.Number<=543) or (t.Item.Number>=1302 and t.Item.Number<=1354) or (t.Item.Number>=2020 and t.Item.Number<=2049) then 
-			bonusDamage=0
-			add=math.ceil(Game.ItemsTxt[t.Item.Number].Mod2*artifactPowerMult(t.Player.LevelBase))
-			side=math.ceil(Game.ItemsTxt[t.Item.Number].Mod1DiceSides*artifactPowerMult(t.Player.LevelBase))
-			--calculate dices
-			for i=1,Game.ItemsTxt[t.Item.Number].Mod1DiceCount do
-				bonusDamage=bonusDamage+math.random(1,side)
-			end
-			t.Result=bonusDamage+add
-		end
-	end
-end
-
 ------------------------------------------------------------------
 --bruteforce fix to items spawning maxcharges more than intended--
 ------------------------------------------------------------------
@@ -2003,15 +1957,10 @@ end
 
 
 
---[[
+
 function events.ModifyItemDamage(t)
 t.Result=0
 end
-
-function events.CalcStatBonusBySkills(t)
-t.Result=0
-end
-]]
 
 plItemsStats={}	
 for i=0,200 do
@@ -2298,9 +2247,11 @@ function itemStats(index)
 					tab[42]=tab[42]+skillDamage[skill][m]*s
 					tab[43]=tab[43]+skillDamage[skill][m]*s
 				else
-					tab[44]=tab[45]+skillDamage[skill][m]*s
+					removeVanillaCalculation=0
+					if m==4 then removeVanillaCalculation=1 end
 					tab[45]=tab[45]+skillDamage[skill][m]*s
-					tab[46]=tab[46]+skillDamage[skill][m]*s
+					tab[46]=tab[46]+skillDamage[skill][m]*s-(removeVanillaCalculation*s)
+					tab[47]=tab[47]+skillDamage[skill][m]*s-(removeVanillaCalculation*s)
 				end
 			end
 		end
