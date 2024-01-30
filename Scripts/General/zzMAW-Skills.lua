@@ -342,24 +342,6 @@ function events.Tick()
 	end
 end
 
---BOW DAMAGE SKILL BONUS
-function events.ModifyItemDamage(t)
-    local s, m = SplitSkill(t.Player:GetSkill(const.Skills.Bow))
-    if t.Item:T().EquipStat == const.ItemType.Missile - 1 then
-		local dmgBonus=skillDamage[const.Skills.Bow][m]
-		if m==4 then
-			dmgBonus=dmgBonus-s
-		end
-		local might=t.Player:GetMight()
-		if might<=21 then
-			mightBonus=(might-1)/2-6
-		else
-			mightBonus=math.floor(might/5)
-		end
-        t.Result = t.Result + mightBonus +s * dmgBonus
-    end
-end
-
 ------------------------
 --AUTO GENERATING TOOLTIPS
 ------------------------
