@@ -1316,6 +1316,15 @@ function events.BuildItemInformationBox(t)
 				local sides=math.ceil(txt.Mod1DiceSides*artifactMult)
 				t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " ..  txt.Mod1DiceCount .. "d" .. sides .. "+" .. bonus
 			end
+			
+			if baseRecovery[t.Item:T().Skill] then
+				local itemLevel=artifactMult*100
+				baseSpeed=baseRecovery[t.Item:T().Skill] * (0.75+itemLevel/200)
+				baseSpeed=math.round(baseSpeed/10)/10
+				
+				t.Type = t.Type .. "\nAttack Speed: " .. baseSpeed
+			end
+			
 		end
 	end
 end
