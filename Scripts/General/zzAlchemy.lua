@@ -98,7 +98,7 @@ function events.UseMouseItem(t)
 			pl.SpellBuffs[buff].ExpireTime=Game.Time+const.Hour*6
 		end
 		--half effect for bless, heroism and stoneskin
-		if (it.Number<=234 and it.Number~=229) or it.Number==250 or  it.Number==251 then
+		if (it.Number<=234 and it.Number~=229) or it.Number==245 or  it.Number==251 then
 			if type(buff)=="table" then
 				for i=1,#buff do
 					buffID=itemBuffMapping[it.Number][i]
@@ -188,7 +188,7 @@ potionPowerRequirement={
 	[235]=20,
 	[236]=20,
 	[239]=20,
-	[245]=40,
+	[246]=40,
 	[256]=55,
 	[263]=55,
 }
@@ -210,9 +210,9 @@ itemBuffMapping = {
     [240] = {19,15},  --might, accuracy
     [241] = {17,20},  --intellect, personality
     [242] = {16,21,18},  --endurance, speed, luck
-    [248] = {5,0,22,3}, --elemental
-    [249] = {9,2},  --self
-    [250] = {7,8,1},  --Champions
+    [245] = {7,8,1},  --Champions
+    [249] = {5,0,22,3}, --elemental
+    [250] = {9,2},  --self
     [251] = {11,13,14},  --Paladins
     [257] = {19,15,17,20,16,21,18},  --stats
     [263] = {5,0,22,3,9,2},  --resistances
@@ -223,7 +223,7 @@ itemImmunityMapping = {
 	[226] = {"Cursed","Paralyzed"},
 	[227] = {"Afraid","Insane"},
 	[239] = {"Stoned"},
-	[245] = {"Weak","Asleep","Disease1","Disease2","Disease3","Poison1","Poison2","Poison3","Cursed","Paralyzed","Afraid","Insane","Stoned"}
+	[246] = {"Weak","Asleep","Disease1","Disease2","Disease3","Poison1","Poison2","Poison3","Cursed","Paralyzed","Afraid","Insane","Stoned"}
 }
 
 
@@ -340,12 +340,12 @@ potionText={
 	[242] = "Temporarily increases by 10+(1 x Power) Endurance, Speed and Luck for 6 hours.",
 	[243] = "Adds a random tier 2 elemental damage enchant to a weapon\nRequire 40 power to work.\n",
 	[244] = "Adds 'of Swiftness' property to a non-magic weapon.\nRequire 40 power to work.\n",
-	[245] = "Removes and prevents all conditions except Dead and Eradicated for 6 hours.\nRequire 40 power to work.\n",
-	[246] = "Heals three times the potion's strength of hit points.",
-	[247] = "Restores three times the potion's strength of spell points.",
-	[248] = "Increases temporary Fire, Air, Water and Earth resistance. (Dark)",
-	[249] = "Increases temporary Mind and Body resistance. (Light)",
-	[250] = "Provides Haste+Heroism+Bless.",
+	[245] = "Provides Haste+Heroism+Bless.",
+	[246] = "Removes and prevents all conditions except Dead and Eradicated for 6 hours.\nRequire 40 power to work.\n",
+	[247] = "Heals three times the potion's strength of hit points.",
+	[248] = "Restores three times the potion's strength of spell points.",
+	[249] = "Increases temporary Fire, Air, Water and Earth resistance. (Dark)",
+	[250] = "Increases temporary Mind and Body resistance. (Light)",
 	[251] = "Provides Protection+Stone Skin+Magic Protection.",
 	[252] = "Adds 20/40/60 to permanent Might and Accuracy.\nRequire 55 power per step to work.\n",
 	[253] = "Adds 20/40/60 to permanent Intellect and Wisdom.\nRequire 55 power per step to work.\n",
