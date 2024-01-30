@@ -168,7 +168,7 @@ function events.GetAttackDelay(t)
 						lvl=lvl+it:T().ChanceByLevel[i]*i
 					end
 					local itemLevel=math.round(lvl/tot*18-17)+it.MaxCharges*5
-					currentSpeed=baseRecovery[skill] * (1+itemLevel/150)
+					currentSpeed=baseRecovery[skill] * (0.75+itemLevel/200)
 					currentSpeed=math.round(currentSpeed/10)*10
 					--average between the 2 items
 					baseSpeed=(baseSpeed+currentSpeed)/count
@@ -208,9 +208,11 @@ function events.GetAttackDelay(t)
 	if t.Ranged then
 		damageMultiplier[t.PlayerIndex]["Ranged"]=1*baseSpeed/100
 		damageMultiplier[t.PlayerIndex]["bonusSpeedRanged"]=bonusSpeed
+		damageMultiplier[t.PlayerIndex]["baseSpeedRanged"]=baseSpeed
 	else
 		damageMultiplier[t.PlayerIndex]["Melee"]=1*baseSpeed/100
 		damageMultiplier[t.PlayerIndex]["bonusSpeedMelee"]=bonusSpeed
+		damageMultiplier[t.PlayerIndex]["baseSpeedMelee"]=baseSpeed
 	end
 	bonusSpeedMult=(100+bonusSpeed)/100
 	t.Result=baseSpeed/bonusSpeedMult
