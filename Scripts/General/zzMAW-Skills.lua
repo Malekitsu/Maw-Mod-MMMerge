@@ -147,7 +147,7 @@ function events.GetAttackDelay(t)
 				baseSpeed=baseRecovery[skill] * (1+itemLevel/150)
 				baseSpeed=math.round(baseSpeed/10)*10
 			end
-			
+			local s,m = SplitSkill(t.Player:GetSkill(skill))
 			if skillRecovery[skill] and skillRecovery[skill][m] then
 				bonusSpeed=skillRecovery[skill][m]*s
 			end
