@@ -280,3 +280,226 @@ end
 --spells taking you below 35% of HP will trigger anti-magic shell, 
 		--reducing spell damage taken by 50% and converting spell damage into runic power (lasts 5 seconds, 1 minute cooldown, capped to max player HP)
 
+
+
+
+
+-- DRAGON REWORK
+local dragonFang={
+	["Attack"]={2,3,4,5,[0]=0},
+	["Damage"]={4,5,6,8,[0]=0},
+	--["Speed"]={0,0,1,2,[0]=0},
+}
+local dragonBreath={
+	--["Attack"]={0,0,0,0,[0]=0},
+	["Damage"]={3,4,5,6,[0]=0},
+	--["Speed"]={0,0,1,1,[0]=0},
+}
+local dragonScales={
+	["AC"]={2,3,4,5,[0]=0},
+	["Resistances"]={2,3,4,5,[0]=0},
+}
+
+function events.GameInitialized2()
+	function events.CalcStatBonusByItems(t)
+		if t.Player.Class~=10 and t.Player.Class~=11 then return end
+		--melee
+		if t.Stat==27 then --min damage
+			local pl=t.Player
+			local s, m = SplitSkill(pl:GetSkill(const.Skills.Unarmed)) 
+			local bonus= (dragonFang.Damage[m]-1) * s + t.Player.LevelBase +10
+			t.Result=bonus
+			local might=t.Player:GetMight()
+
+			t.Result=math.round(bonus*(1+might/1000))
+			
+		elseif t.Stat==28 then --max damage
+			local pl=t.Player
+			local s, m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
+			local bonus= (dragonFang.Damage[m]+1) * s + t.Player.LevelBase +10
+			local might=t.Player:GetMight()
+			t.Result=math.round(bonus*(1+might/1000))
+			
+		elseif t.Stat==25 then --attack
+			local pl=t.Player
+			local s, m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
+			local bonus= (dragonFang.Attack[m]) * s +10
+			t.Result=t.Result+bonus 
+			
+		end
+		--breath
+		if t.Stat==31 then --min damage
+			local pl=t.Player
+			local s, m = SplitSkill(pl:GetSkill(const.Skills.DragonAbility))
+			local bonus= (dragonBreath.Damage[m]-1) * s
+			local might=t.Player:GetMight()
+			local mightEffect
+			if might>=25 then
+				mightEffect=math.floor(might/5)
+			else
+				mightEffect=math.floor((might-13)/2)
+			end
+			t.Result=math.round((bonus+mightEffect)*(1+might/1000))
+			
+		elseif t.Stat==32 then --max damage
+			local pl=t.Player
+			local s, m = SplitSkill(pl:GetSkill(const.Skills.DragonAbility))
+			local bonus= (dragonBreath.Damage[m]+1) * s
+			local might=t.Player:GetMight()
+			local mightEffect
+			if might>=25 then
+				mightEffect=math.floor(might/5)
+			else
+				mightEffect=math.floor((might-13)/2)
+			end
+			t.Result=math.round((bonus+mightEffect)*(1+might/1000))
+		
+		--AC
+		elseif t.Stat==9 then
+			local pl=t.Player
+			local s, m = SplitSkill(pl:GetSkill(const.Skills.Dodging))
+			local bonus= (dragonScales.AC[m]-skillAC[const.Skills.Dodging][m]) * s + t.Player.LevelBase
+			t.Result=t.Result+bonus
+		elseif t.Stat>=10 and t.Stat<=15 then
+			local pl=t.Player
+			local s, m = SplitSkill(pl:GetSkill(const.Skills.Dodging))
+			local bonus= (dragonScales.Resistances[m]) * s
+			t.Result=t.Result+bonus
+		end
+	end
+	
+	function events.GetAttackDelay(t)
+		if t.Player.Class==10 or t.Player.Class==11 then
+			t.Result=100
+		end	
+	end
+	
+	--skill text
+	normal=""
+	normal=string.format("%s      %s|",normal,dragonFang.Attack[1])
+	--normal=string.format("%s      %s|",normal,dragonFang.Speed[1])
+	normal=string.format("%s     %s|",normal,dragonFang.Damage[1])
+	fangsNormal=normal
+	normal=""
+	normal=string.format("%s  %s|",normal,dragonScales.AC[1])
+	normal=string.format("%s    %s",normal,dragonScales.Resistances[1])
+	scalesNormal=normal
+	
+	expert=""
+	expert=string.format("%s      %s|",expert,dragonFang.Attack[2])
+	--expert=string.format("%s      %s|",expert,dragonFang.Speed[2])
+	expert=string.format("%s     %s|",expert,dragonFang.Damage[2])
+	fangsExpert=expert
+	expert=""
+	expert=string.format("%s  %s|",expert,dragonScales.AC[2])
+	expert=string.format("%s    %s",expert,dragonScales.Resistances[2])
+	scalesExpert=expert
+	
+	master=""
+	master=string.format("%s      %s|",master,dragonFang.Attack[3])
+	--master=string.format("%s      %s|",master,dragonFang.Speed[3])
+	master=string.format("%s     %s|",master,dragonFang.Damage[3])
+	fangsMaster=master
+	master=""
+	master=string.format("%s  %s|",master,dragonScales.AC[3])
+	master=string.format("%s    %s",master,dragonScales.Resistances[3])
+	scalesMaster=master
+	
+	gm=""
+	gm=string.format("%s      %s|",gm,dragonFang.Attack[4])
+	--gm=string.format("%s      %s|",gm,dragonFang.Speed[4])
+	gm=string.format("%s     %s|",gm,dragonFang.Damage[4])
+	fangsGM=gm
+	gm=""
+	gm=string.format("%s  %s|",gm,dragonScales.AC[4])
+	gm=string.format("%s    %s",gm,dragonScales.Resistances[4])
+	scalesGM=gm
+	
+	--make fangs and scales learnable
+	Game.Classes.Skills[10][32]=3
+	Game.Classes.Skills[10][33]=3
+	Game.Classes.Skills[11][32]=4
+	Game.Classes.Skills[11][33]=4
+end
+
+
+function events.LoadMap()
+	if not unarmedText then
+		unarmedText=Game.SkillDescriptions[33]
+		unarmedTextN=Game.SkillDesNormal[33]
+		unarmedTextE=Game.SkillDesExpert[33]
+		unarmedTextM=Game.SkillDesMaster[33]
+		unarmedTextGM=Game.SkillDesGM[33]
+		dodgeText=Game.SkillDescriptions[32]
+		dodgeTextN=Game.SkillDesNormal[32]
+		dodgeTextE=Game.SkillDesExpert[32]
+		dodgeTextM=Game.SkillDesMaster[32]
+		dodgeTextGM=Game.SkillDesGM[32]
+	end
+end
+
+function events.Action(t)
+	if t.Action==110 then
+		if Party[t.Param-1].Class==10 or Party[t.Param-1].Class==11 then
+			dragonSkill(true)
+		else
+			dragonSkill(false)
+		end
+	elseif t.Action==176 then
+		local current=Game.CurrentPlayer
+		local maxParty=Game.Party.High
+		for i=1,Party.Count do
+			newSelected=current+i
+			if newSelected>maxParty then
+				newSelected=newSelected-Party.Count
+			end
+			local pl=Party[newSelected]
+			if pl.Dead==0 and pl.Stoned==0 and pl.Paralyzed==0 and pl.Eradicated==0 and pl.Asleep==0 and pl.Unconscious==0 then
+				if pl.Class==10 or pl.Class==11 then
+					dragonSkill(true)
+				else
+					dragonSkill(false)
+				end
+			end
+		end
+	end
+end
+
+
+function dragonSkill(dragon)
+	if dragon then
+		Game.SkillNames[33]="Fangs"
+		Game.SkillDescriptions[33]="Dragons can use their fangs to deal atrocious damage to enemies.\n\nWhenever this skill is below dragon skill it will push monsters away\n\n------------------------------------------------------------\n          Attack| Dmg|"
+		Game.SkillDesNormal[33]=fangsNormal
+		Game.SkillDesExpert[33]=fangsExpert
+		Game.SkillDesMaster[33]=fangsMaster
+		Game.SkillDesGM[33]=fangsGM
+		Game.SkillNames[32]="Scales"
+		Game.SkillDescriptions[32]="Dragons scales are hard enough to work as natural armor, allowing to block and reduce incoming damage\n\n------------------------------------------------------------\n          AC| Res"
+		Game.SkillDesNormal[32]=scalesNormal
+		Game.SkillDesExpert[32]=scalesExpert
+		Game.SkillDesMaster[32]=scalesMaster
+		Game.SkillDesGM[32]=scalesGM
+		if Game.CurrentPlayer==-1 then return end
+		if Party[Game.CurrentPlayer].Class==10 or Party[Game.CurrentPlayer].Class==11 then
+			if Party[Game.CurrentPlayer].Skills[33]==0 then
+				Party[Game.CurrentPlayer].Skills[33]=1
+			elseif Party[Game.CurrentPlayer].Skills[32]==0 then
+				Party[Game.CurrentPlayer].Skills[32]=1
+			end
+		end
+	else
+		Game.SkillNames[33]="Unarmed"
+		Game.SkillDescriptions[33]=unarmedText
+		Game.SkillDesNormal[33]=unarmedTextN
+		Game.SkillDesExpert[33]=unarmedTextE
+		Game.SkillDesMaster[33]=unarmedTextM
+		Game.SkillDesGM[33]=unarmedTextGM
+		Game.SkillNames[32]="Dodging"
+		Game.SkillDescriptions[32]=dodgeText
+		Game.SkillDesNormal[32]=dodgeTextN
+		Game.SkillDesExpert[32]=dodgeTextE
+		Game.SkillDesMaster[32]=dodgeTextM
+		Game.SkillDesGM[32]=dodgeTextGM
+	end
+end
