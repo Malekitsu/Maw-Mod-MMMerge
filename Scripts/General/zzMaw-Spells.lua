@@ -777,7 +777,6 @@ function events.GameInitialized2()
 				diceMax80=math.round(theoreticalDamage80*(diceMaxProportion)*2)+1
 			end
 			spellPowers80[i]={dmgAdd = dmgAdd80, diceMin = 1, diceMax = diceMax80,}
-			spellPowers80[44]={dmgAdd = 15, diceMin = 0.5, diceMax = 0.5} 
 			----------
 			--do the same, but for level 160
 			----------
@@ -805,9 +804,10 @@ function events.GameInitialized2()
 				diceMax160=math.round(theoreticalDamage160*(diceMaxProportion)*2)+1
 			end
 			spellPowers160[i]={dmgAdd = dmgAdd160, diceMin = 1, diceMax = diceMax160,}
-			spellPowers160[44]={dmgAdd = 15, diceMin = 0.5, diceMax = 0.5} 
 		end
 	end
+	spellPowers160[44]={dmgAdd = 15, diceMin = 0.5, diceMax = 0.5}
+	spellPowers80[44]={dmgAdd = 15, diceMin = 0.5, diceMax = 0.5} 
 end
 
 --calculate spell Damage
@@ -935,6 +935,7 @@ function dmgAddTooltip(level,spellIndex)
 			local dmgAdd=spellPowers[spellIndex].dmgAdd
 			return dmgAdd
 		end
+		return
 	end
 	if spellIndex==111 then 
 		if level>=180 then
@@ -947,6 +948,7 @@ function dmgAddTooltip(level,spellIndex)
 			local dmgAdd=spellPowers[spellIndex].dmgAdd
 			return dmgAdd
 		end
+		return
 	end
 	if spellIndex==123 then 
 		if level>=200 then
@@ -959,6 +961,7 @@ function dmgAddTooltip(level,spellIndex)
 			local dmgAdd=spellPowers[spellIndex].dmgAdd
 			return dmgAdd
 		end
+		return
 	end
 	--check for index to see if to show normal or ascended spells
 	local index=spellIndex%11
