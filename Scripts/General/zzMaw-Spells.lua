@@ -811,7 +811,7 @@ function events.GameInitialized2()
 		end
 	end
 	spellPowers160[44]={dmgAdd = 15, diceMin = 0.5, diceMax = 0.5}
-	spellPowers80[44]={dmgAdd = 15, diceMin = 0.5, diceMax = 0.5} 
+	spellPowers80[44]={dmgAdd = 15, diceMin = 0.5, diceMax = 0.5}
 end
 
 --calculate spell Damage
@@ -1062,10 +1062,10 @@ function events.Tick()
 					local check=(num2)*8+72
 					if level>=check2 then
 						if num>77 then --increase light and dark cost
-							Game.Spells[num]["SpellPointsNormal"] = ascendanceCost2[num2]*1.5
-							Game.Spells[num]["SpellPointsExpert"] = ascendanceCost2[num2]*1.5
-							Game.Spells[num]["SpellPointsMaster"] = ascendanceCost2[num2]*1.5
-							Game.Spells[num]["SpellPointsGM"] = ascendanceCost2[num2]*1.5
+							Game.Spells[num]["SpellPointsNormal"] = ascendanceCost2[num2]+100
+							Game.Spells[num]["SpellPointsExpert"] = ascendanceCost2[num2]+100
+							Game.Spells[num]["SpellPointsMaster"] = ascendanceCost2[num2]+100
+							Game.Spells[num]["SpellPointsGM"] = ascendanceCost2[num2]+100
 						else
 							Game.Spells[num]["SpellPointsNormal"] = ascendanceCost2[num2]
 							Game.Spells[num]["SpellPointsExpert"] = ascendanceCost2[num2]
@@ -1074,10 +1074,10 @@ function events.Tick()
 						end
 					elseif level>=check then
 						if num>77 then --increase light and dark cost
-							Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[num2]*1.5
-							Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[num2]*1.5
-							Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[num2]*1.5
-							Game.Spells[num]["SpellPointsGM"] = ascendanceCost[num2]*1.5
+							Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[num2]+50
+							Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[num2]+50
+							Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[num2]+50
+							Game.Spells[num]["SpellPointsGM"] = ascendanceCost[num2]+50
 						else
 							Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[num2]
 							Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[num2]
