@@ -358,7 +358,8 @@ function events.GameInitialized2()
 		elseif t.Stat==9 then
 			local pl=t.Player
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.Dodging))
-			local bonus= (dragonScales.AC[m]-skillAC[const.Skills.Dodging][m]) * s + t.Player.LevelBase
+			local oldDodge=skillAC[const.Skills.Dodging][m] or 0
+			local bonus= (dragonScales.AC[m]-oldDodge) * s + pl.LevelBase
 			t.Result=t.Result+bonus
 		elseif t.Stat>=10 and t.Stat<=15 then
 			local pl=t.Player
@@ -501,5 +502,53 @@ function dragonSkill(dragon)
 		Game.SkillDesExpert[32]=dodgeTextE
 		Game.SkillDesMaster[32]=dodgeTextM
 		Game.SkillDesGM[32]=dodgeTextGM
+	end
+end
+
+function events.CalcDamageToMonster(t)
+	data=WhoHitMonster()
+	if data and data.Player and (data.Player.Class==10 or data.Player.Class==11) then
+		if data.Object==nil then
+			local breath = SplitSkill(data.Player:GetSkill(const.Skills.DragonAbility))
+			local fang = SplitSkill(data.Player:GetSkill(const.Skills.Unarmed))
+			if breath>=fang then
+				Map.Monsters[t.MonsterIndex].VelocityZ=400
+				local x, y = directionToUnitVector(Party.Direction)
+				push=push or {}
+				table.insert(push,{["directionX"]=x, ["directionY"]=y, ["duration"]=120, ["totalDuration"]=120, ["totalForce"]=1000, ["currentForce"]=1000, ["id"]=t.MonsterIndex})
+			end
+		end
+	end
+end
+
+-- Function to convert party direction to radians
+function directionToRadians(direction)
+    -- Convert the direction from 0-2048 scale to 0-2π scale
+    return (direction / 2048) * 2 * math.pi
+end
+
+-- Function to calculate the unit vector based on the direction
+function directionToUnitVector(direction)
+    local radians = directionToRadians(direction)
+    local x = math.cos(radians)
+    local y = math.sin(radians)
+	asdd=direction
+	asdx=x
+	asdy=y
+    return x, y
+end
+
+function events.Tick()
+	if push and push[1] then
+		for i=1, #push do
+			if push[i].duration>0 then
+				push[i].duration=push[i].duration-1
+				mon=Map.Monsters[push[i].id]
+				mon.VelocityX=push[i].directionX * push[i].currentForce
+				mon.VelocityY=push[i].directionY * push[i].currentForce
+				mon.VelocityZ=push[i].currentForce/2 - push[i].totalForce/4
+				push[i].currentForce=push[i].currentForce - push[i].totalForce / push[i].totalDuration
+			end
+		end
 	end
 end
