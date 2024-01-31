@@ -693,6 +693,10 @@ function events.GameInitialized2()
 		spellCostMaster[i] = Game.Spells[i]["SpellPointsMaster"]
 		spellCostGM[i] = Game.Spells[i]["SpellPointsGM"]
 	end
+	--vampire
+	spellCostMaster[111]=10
+	spellCostGM[111]=15
+	
 	ascendanceCost={11,14,17,20,35,50,65,80,95,110,125,[0]=125}
 	ascendanceCost2={25,30,35,40,70,100,140,180,220,260,300,[0]=300}
 	spells={2,6,7,8,9,10,11,15,18,20,22,24,26,29,32,37,39,41,43,44,52,59,65,70,76,78,79,84,87,90,93,97,98,99,103,111,123}
@@ -1112,15 +1116,15 @@ function events.Tick()
 					local check2=180
 					local check=100
 					if level>=check2 then
-						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost2[4]
-						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost2[4]
-						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost2[4]
-						Game.Spells[num]["SpellPointsGM"] = ascendanceCost2[4]
+						Game.Spells[num]["SpellPointsNormal"] = 20
+						Game.Spells[num]["SpellPointsExpert"] = 20
+						Game.Spells[num]["SpellPointsMaster"] = 40
+						Game.Spells[num]["SpellPointsGM"] = 60
 					elseif level>=check then
-						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[4]
-						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[4]
-						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[4]
-						Game.Spells[num]["SpellPointsGM"] = ascendanceCost[4]
+						Game.Spells[num]["SpellPointsNormal"] = 10
+						Game.Spells[num]["SpellPointsExpert"] = 10
+						Game.Spells[num]["SpellPointsMaster"] = 20
+						Game.Spells[num]["SpellPointsGM"] = 30
 					else
 						Game.Spells[num]["SpellPointsNormal"]=spellCostNormal[num]
 						Game.Spells[num]["SpellPointsExpert"]=spellCostExpert[num]
