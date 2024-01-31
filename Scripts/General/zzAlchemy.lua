@@ -686,6 +686,7 @@ function events.MonsterKilled(mon)
 	if mon.Ally == 9999 then -- no drop from reanimated monsters
 		return
 	end
+	mon.Ally=9999
 	--level bonus
 	partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 	bonusRoll=1+partyLevel/50
