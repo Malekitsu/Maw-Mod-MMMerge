@@ -288,7 +288,7 @@ end
 local dragonFang={
 	["Attack"]={2,3,4,5,[0]=0},
 	["Damage"]={4,5,6,8,[0]=0},
-	--["Speed"]={0,0,1,2,[0]=0},
+	["Speed"]={0,0,1,2,[0]=0},
 }
 local dragonBreath={
 	--["Attack"]={0,0,0,0,[0]=0},
@@ -505,17 +505,28 @@ function dragonSkill(dragon)
 	end
 end
 
-function events.CalcDamageToMonster(t)
-	data=WhoHitMonster()
-	if data and data.Player and (data.Player.Class==10 or data.Player.Class==11) then
-		if data.Object==nil then
-			local breath = SplitSkill(data.Player:GetSkill(const.Skills.DragonAbility))
-			local fang = SplitSkill(data.Player:GetSkill(const.Skills.Unarmed))
-			if breath>=fang then
-				Map.Monsters[t.MonsterIndex].VelocityZ=400
-				local x, y = directionToUnitVector(Party.Direction)
-				push=push or {}
-				table.insert(push,{["directionX"]=x, ["directionY"]=y, ["duration"]=120, ["totalDuration"]=120, ["totalForce"]=1000, ["currentForce"]=1000, ["id"]=t.MonsterIndex})
+function events.GameInitialized2()
+	function events.CalcDamageToMonster(t)
+		data=WhoHitMonster()
+		if data and data.Player and (data.Player.Class==10 or data.Player.Class==11) then
+			if data.Object==nil then
+				local breath = SplitSkill(data.Player:GetSkill(const.Skills.DragonAbility))
+				local fang, fangM = SplitSkill(data.Player:GetSkill(const.Skills.Unarmed))
+				if breath>=fang then
+					Map.Monsters[t.MonsterIndex].VelocityZ=400
+					local x, y = directionToUnitVector(Party.Direction)
+					push=push or {}
+					table.insert(push,{["directionX"]=x, ["directionY"]=y, ["duration"]=120, ["totalDuration"]=120, ["totalForce"]=1000, ["currentForce"]=1000, ["id"]=t.MonsterIndex})
+				end
+				--increase damage based on speed
+				local speed=data.Player:GetSpeed()
+				if speed>=25 then
+					speed=math.floor(speed/5)
+				else
+					speed=math.floor((speed-13)/2)
+				end
+				speed=speed+dragonFang.Speed[fangM]*fang
+				t.Result=t.Result*(1+speed/100)
 			end
 		end
 	end
