@@ -1739,7 +1739,6 @@ function events.GameInitialized2() --to make the after all the other code
 					Party[i]:ShowFaceAnimation(24)
 				end
 			elseif skill=="Swapper" then	
-				t.Result=0
 				Game.ShowStatusText("*Swap*")
 				Party.X, Party.Y, Party.Z, data.Monster.X, data.Monster.Y, data.Monster.Z = data.Monster.X, data.Monster.Y, data.Monster.Z, Party.X, Party.Y, Party.Z
 				Party.Direction, data.Monster.Direction=data.Monster.Direction, Party.Direction
@@ -1771,7 +1770,7 @@ function events.GameInitialized2() --to make the after all the other code
 				elseif skill=="Swapper" then
 					for i=0,Map.Monsters.High do
 						mon=Map.Monsters[i]
-						if mon.HP>0 and (mon.NameId<220 or mon.NameId>300) then
+						if mon.HP>0 and mon.AIState==const.AIState.Active and (mon.NameId<220 or mon.NameId>300) then
 							t.Result=0
 							Game.ShowStatusText("*Swap*")
 							mon.X, mon.Y, mon.Z, t.Monster.X, t.Monster.Y, t.Monster.Z = t.Monster.X, t.Monster.Y, t.Monster.Z, mon.X, mon.Y, mon.Z
