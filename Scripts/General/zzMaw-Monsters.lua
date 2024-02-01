@@ -1505,7 +1505,7 @@ function events.LoadMap()
 				for i=0,Map.Monsters.High do
 					mon=Map.Monsters[i]
 					if mon.NameId==0 then
-						mapvars.monsterMap[i]={["x"] = mon.X, ["y"] = mon.Y, ["z"] = mon.Z, ["exp"]=mon.Exp, ["item"]=mon.TreasureItemPercent, ["gold"]=mon.TreasureDiceSides, ["respawn"]=true}
+						mapvars.monsterMap[i]={["x"] = mon.X, ["y"] = mon.Y, ["z"] = mon.Z, ["exp"]=mon.Exp, ["item"]=mon.TreasureItemPercent, ["gold"]=mon.TreasureDiceSides, ["respawn"]=true, ["Ally"]=mon.Ally}
 					else
 						mapvars.monsterMap[i]={["respawn"]=false}
 					end
@@ -1528,6 +1528,7 @@ function events.LeaveMap()
 				mon.Exp=mon.Exp/4
 				mon.ShowOnMap=false
 				mon.NameId=mon.Id+300
+				mon.Ally=old.Ally or 0
 				if mon.AIState==const.AIState.Removed then
 					mon.TreasureItemPercent=0 --math.round(old.item/4)
 					mon.TreasureDiceSides=0 --math.round(old.gold/4)
