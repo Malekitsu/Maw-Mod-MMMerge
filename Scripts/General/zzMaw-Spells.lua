@@ -834,11 +834,16 @@ function events.CalcSpellDamage(t)
 	local data=WhoHitMonster()
 	if data and data.Player then
 	--calculate if level is>treshold to check for lvl 100 spells
-		if data.Player.LevelBase>=spellTier*8+152 then
+		--vampiric ascends 20 levels later
+		local extraRequiredLevels=0
+		if t.Spell==111 then
+			extraRequiredLevels=20
+		end
+		if data.Player.LevelBase>=spellTier*8+152+extraRequiredLevels then
 			diceMin=spellPowers160[t.Spell].diceMin
 			diceMax=spellPowers160[t.Spell].diceMax
 			damageAdd=spellPowers160[t.Spell].dmgAdd
-		elseif data.Player.LevelBase>=spellTier*8+72 then
+		elseif data.Player.LevelBase>=spellTier*8+72+extraRequiredLevels then
 			diceMin=spellPowers80[t.Spell].diceMin
 			diceMax=spellPowers80[t.Spell].diceMax
 			damageAdd=spellPowers80[t.Spell].dmgAdd
