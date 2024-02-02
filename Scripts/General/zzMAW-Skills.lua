@@ -160,6 +160,9 @@ function events.GetAttackDelay(t)
 			local it=t.Player:GetActiveItem(i)
 			if it then
 				local skill=it:T().Skill
+				if skill==8 then
+					goto continue
+				end
 				count=count+1
 				if baseRecovery[skill] then
 					if (it.Number>=500 and it.Number<=543) or (it.Number>=1302 and it.Number<=1354) or (it.Number>=2020 and it.Number<=2049) then 
@@ -188,14 +191,16 @@ function events.GetAttackDelay(t)
 				if it.Bonus2==41 or it.Bonus==59 then
 					bonusSpeed=bonusSpeed+20
 				end
-				local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Armsmaster))
-				if m==4 then
-					s=s*2
-				end
-				bonusSpeed=bonusSpeed+s
+				
 			end
+			:: continue ::
 		end
 	end
+	local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Armsmaster))
+	if m==4 then
+		s=s*2
+	end
+	bonusSpeed=bonusSpeed+s
 	if baseSpeed==0 then
 		baseSpeed=100
 	end
