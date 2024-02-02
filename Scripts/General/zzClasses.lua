@@ -570,10 +570,10 @@ function events.GameInitialized2()
 				local breath = SplitSkill(data.Player:GetSkill(const.Skills.DragonAbility))
 				local fang, fangM = SplitSkill(data.Player:GetSkill(const.Skills.Unarmed))
 				if breath>=fang then
-					Map.Monsters[t.MonsterIndex].VelocityZ=400
 					local x, y = directionToUnitVector(Party.Direction)
 					push=push or {}
-					table.insert(push,{["directionX"]=x, ["directionY"]=y, ["duration"]=120, ["totalDuration"]=120, ["totalForce"]=1000, ["currentForce"]=1000, ["id"]=t.MonsterIndex})
+					mult=fang/t.Monster.Level^0.7
+					table.insert(push,{["directionX"]=x, ["directionY"]=y, ["duration"]=60*mult^0.5, ["totalDuration"]=60*mult^0.5, ["totalForce"]=800*mult, ["currentForce"]=800*mult, ["id"]=t.MonsterIndex})
 				end
 				--increase damage based on speed
 				local speed=pl:GetSpeed()
