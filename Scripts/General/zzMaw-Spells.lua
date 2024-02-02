@@ -1492,3 +1492,119 @@ function events.CanLearnSpell(t)
 	end
 end
 ]]
+
+local mastery={"Normal", "Expert", "Master", "GM"}
+function events.Action(t)
+	if t.Action==25 then
+		local pl=Party[Game.CurrentPlayer]
+		if pl.QuickSpell==68 and pl.RecoveryDelay==0 then
+			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
+			local cost=Game.Spells[68]["SpellPoints" .. mastery[m]]
+			if pl.SP<cost then return end
+			t.Handled=true
+			pl.SP=pl.SP-cost
+			local persBonus=pl:GetPersonality()/1000
+			local intBonus=pl:GetIntellect()/1000
+			local statBonus=math.max(persBonus,intBonus)
+			local crit=pl:GetLuck()/1500+0.05
+			local baseHeal=lesserHealBase[m]+lesserHealScaling[m]*s
+			local totHeal=baseHeal*(statBonus+1)
+			local roll=math.random()
+			local gotCrit=false
+			if roll<crit then
+				local mult=(0.5+statBonus*3/2)
+				if Game.BolsterAmount==300 then
+					mult=mult/2
+				end
+				totHeal=totHeal*(1+mult)
+				gotCrit=true
+			end
+			if gotCrit then
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
+			else
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
+			end
+			-- Define the variables
+			a={}
+			a[0]=2
+			a[1]=2
+			a[2]=2
+			a[3]=2
+			a[4]=2
+			for i=0,Party.High do
+				if Party[i].Dead==0 and Party[i].Eradicated==0 then
+					a[i] = Party[i].HP/Party[i]:GetFullHP()
+				end
+			end
+			a, b, c, d, e= a[0], a[1], a[2], a[3], a[4] 
+			-- Find the maximum value and its position
+			min_value = math.min(a, b, c, d, e)
+			min_index = indexof({a, b, c, d, e}, min_value)
+			min_index = min_index - 1
+			--apply heal
+			evt[min_index].Add("HP",totHeal)		
+			--bug fix
+			if Party[min_index].HP>0 then
+			Party[min_index].Unconscious=0
+			end
+			local haste=math.floor(pl:GetSpeed()/10)
+			local delay=Game.Spells[68]["Delay" .. mastery[m]]
+			pl:SetRecoveryDelay(delay)
+			
+		elseif pl.QuickSpell==74 then
+			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
+			local cost=Game.Spells[74]["SpellPoints" .. mastery[m]]
+			if pl.SP<cost then return end
+			t.Handled=true
+			pl.SP=pl.SP-cost
+			local persBonus=pl:GetPersonality()/1000
+			local intBonus=pl:GetIntellect()/1000
+			local statBonus=math.max(persBonus,intBonus)
+			local crit=pl:GetLuck()/1500+0.05
+			local baseHeal=greaterHealBase[m]+greaterHealScaling[m]*s
+			local totHeal=baseHeal*(statBonus+1)
+			local roll=math.random()
+			local gotCrit=false
+			if roll<crit then
+				local mult=(0.5+statBonus*3/2)
+				if Game.BolsterAmount==300 then
+					mult=mult/2
+				end
+				totHeal=totHeal*(1+mult)
+				gotCrit=true
+			end
+			if gotCrit then
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
+			else
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
+			end
+			-- Define the variables
+			a={}
+			a[0]=2
+			a[1]=2
+			a[2]=2
+			a[3]=2
+			a[4]=2
+			for i=0,Party.High do
+				if Party[i].Dead==0 and Party[i].Eradicated==0 then
+					a[i] = Party[i].HP/Party[i]:GetFullHP()
+				end
+			end
+			a, b, c, d, e= a[0], a[1], a[2], a[3], a[4] 
+			-- Find the maximum value and its position
+			min_value = math.min(a, b, c, d, e)
+			min_index = indexof({a, b, c, d, e}, min_value)
+			min_index = min_index - 1
+			--apply heal
+			evt[min_index].Add("HP",totHeal)		
+			--bug fix
+			if Party[min_index].HP>0 then
+			Party[min_index].Unconscious=0
+			end
+			local haste=math.floor(pl:GetSpeed()/10)
+			local delay=Game.Spells[74]["Delay" .. mastery[m]]
+			pl:SetRecoveryDelay(delay)
+		
+		end
+	end
+end
