@@ -722,3 +722,9 @@ function events.MonsterKilled(mon)
 	end
 end
 
+
+function events.GameInitialized2()
+	--special crafting items
+	Game.ItemsTxt[1061].Notes="This Eye allows to add a Special enchant to any equipment that has already 2 base enchants\n(right-click on an item with a base enchant to use)"
+	Game.ItemsTxt[1062].Notes="This Hourglass allows to add a second base enchant to any equipment that has 1 base and a special enchant\n(right-click on an item with a base enchant to use)"
+end
