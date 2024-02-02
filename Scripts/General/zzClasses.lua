@@ -442,7 +442,7 @@ end
 function events.Action(t)
 	if t.Action==110 then
 		if Party[t.Param-1].Class==10 or Party[t.Param-1].Class==11 then
-			dragonSkill(true)
+			dragonSkill(true, t.Param-1)
 		else
 			dragonSkill(false)
 		end
@@ -457,20 +457,76 @@ function events.Action(t)
 			local pl=Party[newSelected]
 			if pl.Dead==0 and pl.Stoned==0 and pl.Paralyzed==0 and pl.Eradicated==0 and pl.Asleep==0 and pl.Unconscious==0 then
 				if pl.Class==10 or pl.Class==11 then
-					dragonSkill(true)
+					dragonSkill(true, newSelected)
 				else
-					dragonSkill(false)
+					dragonSkill(false, newSelected)
 				end
 			end
 		end
 	end
 end
 
+--show damage in real time
+function events.Tick() 
+	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
+		i=Game.CurrentPlayer 
+		if i==-1 then return end 
+		local pl=Party[i]
+		if pl.Class==10 or pl.Class==11 then
+			Game.SkillNames[33]="Fangs"
+			local fang, fangM = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
+			--increase damage based on speed
+			local speed=pl:GetSpeed()
+			if speed>=25 then
+				speed=math.floor(speed/5)
+			else
+				speed=math.floor((speed-13)/2)
+			end
+			speed=speed+dragonFang.Speed[fangM]*fang
+			--increase damage based on might
+			local mightBase=pl:GetMight()
+			local might
+			if mightBase>=25 then
+				might=math.floor(mightBase/5)
+			else
+				might=math.floor((mightBase-13)/2)
+			end
+			
+			local baseDamage=dragonFang.Damage[fangM]*fang+might
+			local damage=math.round(baseDamage*(1+speed/100)*(1+mightBase/1000))
+				
+			Game.SkillDescriptions[33]="Dragons can use their fangs to deal atrocious damage to enemies.\n\nWhenever this skill is below dragon skill it will push monsters away\nThis skill converts attack speed directly into damage.\n\nCurrent Damage:  " .. StrColor(255,0,0,damage) .. "\n------------------------------------------------------------\n          Attack| Dmg|"
+		end
+	end
+ end
 
-function dragonSkill(dragon)
+function dragonSkill(dragon, index)	
 	if dragon then
+		if index==-1 then return end
+		pl=Party[index]
 		Game.SkillNames[33]="Fangs"
-		Game.SkillDescriptions[33]="Dragons can use their fangs to deal atrocious damage to enemies.\n\nWhenever this skill is below dragon skill it will push monsters away\n\n------------------------------------------------------------\n          Attack| Dmg|"
+		local fang, fangM = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
+		--increase damage based on speed
+		local speed=pl:GetSpeed()
+		if speed>=25 then
+			speed=math.floor(speed/5)
+		else
+			speed=math.floor((speed-13)/2)
+		end
+		speed=speed+dragonFang.Speed[fangM]*fang
+		--increase damage based on might
+		local mightBase=pl:GetMight()
+		local might
+		if mightBase>=25 then
+			might=math.floor(mightBase/5)
+		else
+			might=math.floor((mightBase-13)/2)
+		end
+		
+		local baseDamage=dragonFang.Damage[fangM]*fang+might
+		local damage=math.round(baseDamage*(1+speed/100)*(1+mightBase/1000))
+		
+		Game.SkillDescriptions[33]="Dragons can use their fangs to deal atrocious damage to enemies.\n\nWhenever this skill is below dragon skill it will push monsters away\nThis skill converts attack speed directly into damage.\n\nCurrent Damage:  " .. StrColor(255,0,0,damage) .. "\n------------------------------------------------------------\n          Attack| Dmg|"
 		Game.SkillDesNormal[33]=fangsNormal
 		Game.SkillDesExpert[33]=fangsExpert
 		Game.SkillDesMaster[33]=fangsMaster
@@ -481,12 +537,13 @@ function dragonSkill(dragon)
 		Game.SkillDesExpert[32]=scalesExpert
 		Game.SkillDesMaster[32]=scalesMaster
 		Game.SkillDesGM[32]=scalesGM
-		if Game.CurrentPlayer==-1 then return end
-		if Party[Game.CurrentPlayer].Class==10 or Party[Game.CurrentPlayer].Class==11 then
-			if Party[Game.CurrentPlayer].Skills[33]==0 then
-				Party[Game.CurrentPlayer].Skills[33]=1
-			elseif Party[Game.CurrentPlayer].Skills[32]==0 then
-				Party[Game.CurrentPlayer].Skills[32]=1
+		if index==-1 then return end
+		if pl.Class==10 or pl.Class==11 then
+			if pl.Skills[33]==0 then
+				pl.Skills[33]=1
+			end
+			if pl.Skills[32]==0 then
+				pl.Skills[32]=1
 			end
 		end
 	else
@@ -518,15 +575,49 @@ function events.GameInitialized2()
 					push=push or {}
 					table.insert(push,{["directionX"]=x, ["directionY"]=y, ["duration"]=120, ["totalDuration"]=120, ["totalForce"]=1000, ["currentForce"]=1000, ["id"]=t.MonsterIndex})
 				end
+				local fang, fangM = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
 				--increase damage based on speed
-				local speed=data.Player:GetSpeed()
+				local speed=pl:GetSpeed()
 				if speed>=25 then
 					speed=math.floor(speed/5)
 				else
 					speed=math.floor((speed-13)/2)
 				end
 				speed=speed+dragonFang.Speed[fangM]*fang
-				t.Result=t.Result*(1+speed/100)
+				--increase damage based on might
+				local mightBase=pl:GetMight()
+				local might
+				if mightBase>=25 then
+					might=math.floor(mightBase/5)
+				else
+					might=math.floor((mightBase-13)/2)
+				end
+				
+				local baseDamage=dragonFang.Damage[fangM]*fang+might
+				local damage=math.round(baseDamage*(1+speed/100)*(1+mightBase/1000))
+				
+				--check by damage type
+				index=table.find(damageKindMap,t.DamageKind)
+				res=t.Monster.Resistances[index]
+				if not res then return end
+				res=1-1/2^(res%1000/100)
+				--randomize resistance
+				if res>0 then
+					--local roll=(math.random()+math.random())-1
+					--res=math.max(0, res+(math.min(res,1-res)*roll))
+				end
+				luck=data.Player:GetLuck()/1.5
+				critDamage=data.Player:GetAccuracy()*3/1000
+				critChance=50+luck
+				roll=math.random(1, 1000)
+				crit=false
+				if roll <= critChance then
+					damage=damage*(1.5+critDamage)
+					crit=true
+				end
+				
+				--apply Damage
+				t.Result = damage * (1-res)
 			end
 		end
 	end
