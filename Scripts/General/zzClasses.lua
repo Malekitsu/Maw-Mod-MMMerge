@@ -378,7 +378,7 @@ function events.GameInitialized2()
 	--skill text
 	normal=""
 	normal=string.format("%s      %s|",normal,dragonFang.Attack[1])
-	--normal=string.format("%s      %s|",normal,dragonFang.Speed[1])
+	normal=string.format("%s      %s|",normal,dragonFang.Speed[1])
 	normal=string.format("%s     %s|",normal,dragonFang.Damage[1])
 	fangsNormal=normal
 	normal=""
@@ -388,7 +388,7 @@ function events.GameInitialized2()
 	
 	expert=""
 	expert=string.format("%s      %s|",expert,dragonFang.Attack[2])
-	--expert=string.format("%s      %s|",expert,dragonFang.Speed[2])
+	expert=string.format("%s      %s|",expert,dragonFang.Speed[2])
 	expert=string.format("%s     %s|",expert,dragonFang.Damage[2])
 	fangsExpert=expert
 	expert=""
@@ -398,7 +398,7 @@ function events.GameInitialized2()
 	
 	master=""
 	master=string.format("%s      %s|",master,dragonFang.Attack[3])
-	--master=string.format("%s      %s|",master,dragonFang.Speed[3])
+	master=string.format("%s      %s|",master,dragonFang.Speed[3])
 	master=string.format("%s     %s|",master,dragonFang.Damage[3])
 	fangsMaster=master
 	master=""
@@ -408,7 +408,7 @@ function events.GameInitialized2()
 	
 	gm=""
 	gm=string.format("%s      %s|",gm,dragonFang.Attack[4])
-	--gm=string.format("%s      %s|",gm,dragonFang.Speed[4])
+	gm=string.format("%s      %s|",gm,dragonFang.Speed[4])
 	gm=string.format("%s     %s|",gm,dragonFang.Damage[4])
 	fangsGM=gm
 	gm=""
@@ -495,7 +495,7 @@ function events.Tick()
 			local baseDamage=dragonFang.Damage[fangM]*fang+might
 			local damage=math.round(baseDamage*(1+speed/100)*(1+mightBase/1000))
 				
-			Game.SkillDescriptions[33]="Dragons can use their fangs to deal atrocious damage to enemies.\n\nWhenever this skill is below dragon skill it will push monsters away\nThis skill converts attack speed directly into damage.\n\nCurrent Damage:  " .. StrColor(255,0,0,damage) .. "\n------------------------------------------------------------\n          Attack| Dmg|"
+			Game.SkillDescriptions[33]="Dragons can use their fangs to deal atrocious damage to enemies.\n\nWhenever this skill is below dragon skill it will push monsters away\nThis skill converts attack speed directly into damage.\n\nCurrent Damage:  " .. StrColor(255,0,0,damage) .. "\n------------------------------------------------------------\n          Attack| Speed| Dmg"
 		end
 	end
  end
