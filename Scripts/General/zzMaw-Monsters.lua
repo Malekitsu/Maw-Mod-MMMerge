@@ -176,7 +176,7 @@ function recalculateMawMonster()
 				end
 			end
 			local currentHPPercentage=mon.HP/mon.FullHitPoints
-			hp=txt.FullHitPoints*mult
+			hp=HPtable[mon.Id]*mult
 			hpOvercap=0
 			while hp>32500 do
 				hp=math.round(hp/2)
