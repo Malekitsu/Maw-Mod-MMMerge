@@ -949,3 +949,135 @@ end
 		end
 	end
 	]]
+
+
+
+function events.Tick()
+	if Game.CurrentCharScreen==100 and Game.CurrentScreen==7 then
+		i=Game.CurrentPlayer
+		--get spell and its damage
+		spellIndex=Party[i].QuickSpell
+		
+		--if not an offensive spell then calculate highest between melee and ranged
+		if not spellPowers[spellIndex] then 
+			--MELEE
+			local i=Game.CurrentPlayer
+			local low=Party[i]:GetMeleeDamageMin()
+			local high=Party[i]:GetMeleeDamageMax()
+			local might=Party[i]:GetMight()
+			local accuracy=Party[i]:GetAccuracy()
+			local luck=Party[i]:GetLuck()
+			local delay=Party[i]:GetAttackDelay()
+			local dmg=(low+high)/2
+			--hit chance
+			local atk=Party[i]:GetMeleeAttack()
+			local lvl=Party[i].LevelBase
+			local hitChance= (15+atk*2)/(30+atk*2+lvl)
+			local daggerCritBonus=0
+			for v=0,1 do
+				if Party[i]:GetActiveItem(v) then
+					itSkill=Party[i]:GetActiveItem(v):T().Skill
+					if itSkill==2 then
+						s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Dagger))
+						if m>2 then
+							daggerCritBonus=daggerCritBonus+0.025+0.005*s
+						end
+					end
+				end
+			end
+			DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])
+			
+			--RANGED
+			local low=Party[i]:GetRangedDamageMin()
+			local high=Party[i]:GetRangedDamageMax()
+			local delay=Party[i]:GetAttackDelay(true)
+			local dmg=(low+high)/2
+			--hit chance
+			local atk=Party[i]:GetRangedAttack()
+			local hitChance= (15+atk*2)/(30+atk*2+lvl)
+			
+			local s,m=SplitSkill(Party[i].Skills[const.Skills.Bow])
+			if m>=3 then
+				dmg=dmg*2
+			end
+			local DPS2=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])
+			power=math.max(DPS1,DPS2)
+			
+			Game.GlobalTxt[47]=string.format("Power: %s\n\n\n\n\n\n\n\n",StrColor(255,0,0,power))
+		else
+		
+			--SPELLS
+			spellTier=spellIndex%11
+			if spellTier==0 then
+				spellTier=11
+			end
+			if Party[i].LevelBase>=spellTier*8+152 then
+				diceMin=spellPowers160[spellIndex].diceMin
+				diceMax=spellPowers160[spellIndex].diceMax
+				damageAdd=spellPowers160[spellIndex].dmgAdd
+			elseif Party[i].LevelBase>=spellTier*8+72 then
+				diceMin=spellPowers80[spellIndex].diceMin
+				diceMax=spellPowers80[spellIndex].diceMax
+				damageAdd=spellPowers80[spellIndex].dmgAdd
+			else
+				diceMin=spellPowers[spellIndex].diceMin
+				diceMax=spellPowers[spellIndex].diceMax
+				damageAdd=spellPowers[spellIndex].dmgAdd
+			end
+			--calculate damage
+			--skill
+			skillType=math.floor((spellIndex-1)/11)+12
+			skill, mastery=SplitSkill(Party[i]:GetSkill(skillType))
+			
+			power=damageAdd + skill*(diceMin+diceMax)/2
+			
+			intellect=Party[i]:GetIntellect()	
+			personality=Party[i]:GetPersonality()
+			critChance=Party[i]:GetLuck()/1500
+			bonus=math.max(intellect,personality)
+			critDamage=bonus*3/2000
+			power=power*(1+bonus/1000) 
+			critChance=0.05+critChance
+			haste=math.floor((Party[i]:GetSpeed())/10)/100+1
+			delay=oldTable[spellIndex][mastery]
+			power=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/100)*haste)
+			
+			Game.GlobalTxt[47]=string.format("Power: %s\n\n\n\n\n\n\n\n",StrColor(255,0,0,power))
+		end
+		
+		local i=Game.CurrentPlayer
+		local fullHP=Party[i]:GetFullHP()
+		--AC
+		local ac=Party[i]:GetArmorClass()
+		local lvl=math.min(Party[i].LevelBase,200)
+		local acReduction=1-calcMawDamage(Party[i],4,10000)/10000
+		local lvl=math.min(Party[i].LevelBase, 255)
+		local ac=ac/(Game.BolsterAmount/100)
+		local blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
+		local ACRed= 1 - (1-blockChance)*(1-acReduction)
+		--unarmed
+		local speed=Party[i]:GetSpeed()
+		local unarmed=0
+		local Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Unarmed))
+		if Mas == 4 then
+			unarmed=Skill+10
+		end
+		--local speed=Party[i]:GetSpeed()
+		--local speedEffect=speed/10
+		local dodgeChance=0.995^(unarmed)
+		local fullHP=fullHP/dodgeChance
+		--resistances
+		res={0,1,2,3,7,8,12}
+		for v=1,7 do 
+			res[v]=1-calcMawDamage(Party[i],res[v],10000)/10000
+		end
+		
+		--calculation
+		local reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
+		vitality=math.round(fullHP/reduction)	
+		Game.GlobalTxt[172]=string.format("Vitality: %s\n\n\n\n\n\n\n\n",StrColor(0,255,0,vitality))
+	else
+		Game.GlobalTxt[47]="Condition"
+		Game.GlobalTxt[172]="Quick Spell"
+	end
+end
