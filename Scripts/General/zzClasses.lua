@@ -575,7 +575,6 @@ function events.GameInitialized2()
 					push=push or {}
 					table.insert(push,{["directionX"]=x, ["directionY"]=y, ["duration"]=120, ["totalDuration"]=120, ["totalForce"]=1000, ["currentForce"]=1000, ["id"]=t.MonsterIndex})
 				end
-				local fang, fangM = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
 				--increase damage based on speed
 				local speed=pl:GetSpeed()
 				if speed>=25 then
@@ -583,6 +582,7 @@ function events.GameInitialized2()
 				else
 					speed=math.floor((speed-13)/2)
 				end
+				local fang, fangM = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
 				speed=speed+dragonFang.Speed[fangM]*fang
 				--increase damage based on might
 				local mightBase=pl:GetMight()
@@ -601,11 +601,6 @@ function events.GameInitialized2()
 				res=t.Monster.Resistances[index]
 				if not res then return end
 				res=1-1/2^(res%1000/100)
-				--randomize resistance
-				if res>0 then
-					--local roll=(math.random()+math.random())-1
-					--res=math.max(0, res+(math.min(res,1-res)*roll))
-				end
 				luck=data.Player:GetLuck()/1.5
 				critDamage=data.Player:GetAccuracy()*3/1000
 				critChance=50+luck
@@ -619,6 +614,41 @@ function events.GameInitialized2()
 				--apply Damage
 				t.Result = damage * (1-res)
 			end
+		elseif t.DamageKind==50 then
+			--increase damage based on speed
+			local speed=pl:GetSpeed()
+			if speed>=25 then
+				speed=math.floor(speed/5)
+			else
+				speed=math.floor((speed-13)/2)
+			end
+			speed=speed/2
+			--increase damage based on might
+			local mightBase=pl:GetMight()
+			local might
+			if mightBase>=25 then
+				might=math.floor(mightBase/5)
+			else
+				might=math.floor((mightBase-13)/2)
+			end
+			
+			--breath
+			local breath, breathM = SplitSkill(pl:GetSkill(const.Skills.Dragon))
+			local baseDamage=dragonBreath.Damage[breathM]*breath+might
+			local damage=math.round(baseDamage*(1+speed/100)*(1+mightBase/1000))
+			
+			luck=data.Player:GetLuck()/1.5
+			critDamage=data.Player:GetAccuracy()*3/1000
+			critChance=50+luck
+			roll=math.random(1, 1000)
+			crit=false
+			if roll <= critChance then
+				damage=damage*(1.5+critDamage)
+				crit=true
+			end
+			
+			--apply Damage
+			t.Result = damage
 		end
 	end
 end
