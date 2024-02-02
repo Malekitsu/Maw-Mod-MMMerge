@@ -1,8 +1,8 @@
 function events.CalcDamageToMonster(t)
 	local data = WhoHitMonster()	
 	--luck/accuracy bonus
-	if data and data.Player and (t.DamageKind==4 or data.Player.Class==10 or data.Player.Class==11) then --dragons
-		if data.Object==nil or data.Object.Spell==133 or data.Player.Class==10 or data.Player.Class==11 then
+	if data and data.Player and t.DamageKind==4 then --dragons
+		if data.Object==nil or data.Object.Spell==133 then
 			
 			--OVERRIDE DAMAGE WITH MAW CALCULATION
 			if data.Object==nil then
