@@ -572,7 +572,7 @@ function events.GameInitialized2()
 				if breath>=fang then
 					local x, y = directionToUnitVector(Party.Direction)
 					push=push or {}
-					mult=fang/t.Monster.Level^0.7
+					mult=fang/t.Monster.Level^0.75
 					table.insert(push,{["directionX"]=x, ["directionY"]=y, ["duration"]=60*mult^0.5, ["totalDuration"]=60*mult^0.5, ["totalForce"]=800*mult, ["currentForce"]=800*mult, ["id"]=t.MonsterIndex})
 				end
 				--increase damage based on speed
