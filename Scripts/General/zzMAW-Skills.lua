@@ -163,6 +163,13 @@ function events.GetAttackDelay(t)
 				if skill==8 then
 					goto continue
 				end
+				if table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number) then
+					if i==0 then 
+						goto continue
+					else
+						skill=3
+					end
+				end
 				count=count+1
 				if baseRecovery[skill] then
 					if (it.Number>=500 and it.Number<=543) or (it.Number>=1302 and it.Number<=1354) or (it.Number>=2020 and it.Number<=2049) then 
@@ -1097,5 +1104,116 @@ function events.LoadMap()
 	end
 	for i=1,#trainingCenters[currentWorld] do
 		Game.HouseRules.Training[trainingCenters[currentWorld][i]].Quality=math.min(baseTrainers[trainingCenters[currentWorld][i]]+bolster,1000)
+	end
+end
+
+--minotaurs equipping axes offhand
+--[[requires master for 2h axes, expert for 1h axes (so I expect people starting with 2h axes, then 2h axes+single axe, then double 2h axes.
+function events.Action(t)
+	if t.Action==133 then
+		local pl=Party[Game.CurrentPlayer]
+		local race=Game.CharacterPortraits[Party[Game.CurrentPlayer].Face].Race
+		if race==const.Race.Minotaur then
+			local it=Mouse.Item
+			local txt=it:T()
+			if txt.Skill==const.Skills.Axe then
+				local s,m = SplitSkill(pl.Skills[const.Skills.Axe])
+				if m<2 then return end --requires expert axe
+				if txt.EquipStat==0 then
+					local s,m = SplitSkill(pl.Skills[const.Skills.Dagger])
+					if m<2 then
+						pl.Skills[const.Skills.Dagger]=JoinSkill(s,2)
+					end
+					txt.Skill=2
+					function events.Tick() 
+						events.Remove("Tick", 1)
+						txt.Skill=3
+					end
+				elseif txt.EquipStat==1 and m>=3 then
+					local s,m = SplitSkill(pl.Skills[const.Skills.Dagger])
+					if m<2 then
+						pl.Skills[const.Skills.Dagger]=JoinSkill(s,2)
+					end
+					txt.Skill=2
+					txt.EquipStat=0
+					function events.Tick() 
+						events.Remove("Tick", 1)
+						txt.Skill=3
+						txt.EquipStat=1
+					end
+				end
+			end
+		end
+	end
+end
+]]
+function events.Tick()
+	if Game.CurrentScreen==7 then
+		local pl=Party[Game.CurrentPlayer]
+		local race=Game.CharacterPortraits[Party[Game.CurrentPlayer].Face].Race
+		if race==const.Race.Minotaur and not minotaurDetected then
+			local s,m = SplitSkill(pl.Skills[3])
+			if m>=2 then
+				for i=1,#oneHandedAxes do
+					txt=Game.ItemsTxt[oneHandedAxes[i]]
+					txt.Skill=2
+					txt.EquipStat=0
+				end
+				for i=1,#twoHandedAxes do
+					txt=Game.ItemsTxt[twoHandedAxes[i]]
+					txt.Skill=3
+					txt.EquipStat=0
+				end
+			end
+			if m>=3 then
+				for i=1,#twoHandedAxes do
+					txt=Game.ItemsTxt[twoHandedAxes[i]]
+					txt.Skill=2
+					txt.EquipStat=0
+				end
+			end
+			pl.Skills[2]=1024
+			minotaurDetected=true
+		elseif race~=const.Race.Minotaur and minotaurDetected then
+			for i=1,#oneHandedAxes do
+				txt=Game.ItemsTxt[oneHandedAxes[i]]
+				txt.Skill=3
+				txt.EquipStat=0
+			end
+			for i=1,#twoHandedAxes do
+				txt=Game.ItemsTxt[twoHandedAxes[i]]
+				txt.Skill=3
+				txt.EquipStat=1
+			end
+			minotaurDetected=false
+		end
+	elseif minotaurDetected then
+		for i=1,#oneHandedAxes do
+			txt=Game.ItemsTxt[oneHandedAxes[i]]
+			txt.Skill=3
+			txt.EquipStat=0
+		end
+		for i=1,#twoHandedAxes do
+			txt=Game.ItemsTxt[twoHandedAxes[i]]
+			txt.Skill=3
+			txt.EquipStat=1
+		end
+		minotaurDetected=false
+	end
+end
+
+--list of 2h axes and 1h axe
+function events.GameInitialized2()
+	oneHandedAxes={}
+	twoHandedAxes={}
+	for i=1, Game.ItemsTxt.High do
+		txt=Game.ItemsTxt[i]
+		if txt.Skill==3 then
+			if txt.EquipStat==1 then
+				table.insert(twoHandedAxes,i)
+			else
+				table.insert(oneHandedAxes,i)
+			end
+		end
 	end
 end
