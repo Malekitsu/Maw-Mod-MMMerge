@@ -1151,7 +1151,7 @@ function events.Tick()
 	if Game.CurrentScreen==7 then
 		local pl=Party[Game.CurrentPlayer]
 		local race=Game.CharacterPortraits[Party[Game.CurrentPlayer].Face].Race
-		if race==const.Race.Minotaur and not minotaurDetected then
+		if race==const.Race.Minotaur and not minotaurDetected and (const.Class<34 or const.Class>37) then
 			local s,m = SplitSkill(pl.Skills[3])
 			if m>=2 then
 				for i=1,#oneHandedAxes do
@@ -1216,4 +1216,5 @@ function events.GameInitialized2()
 			end
 		end
 	end
+	
 end
