@@ -2301,6 +2301,17 @@ function itemStats(index)
 		tab[42]=tab[42]+armsmasterDamage[m]*s
 		tab[43]=tab[43]+armsmasterDamage[m]*s
 	end
+	--unarmed
+	local s,m = SplitSkill(pl.Skills[const.Skills.Unarmed])
+	if (m>=1 and not pl:GetActiveItem(0) and not pl:GetActiveItem(1)) or (m==4 and pl:GetActiveItem(1) and pl:GetActiveItem(1):T().Skill==0 ) then
+		s=s+tab[22]
+		if m>0 then
+			tab[40]=tab[40]+skillAttack[const.Skills.Unarmed][m]*s
+			tab[41]=tab[41]+skillDamage[const.Skills.Unarmed][m]*s
+			tab[42]=tab[42]+skillDamage[const.Skills.Unarmed][m]*s
+			tab[43]=tab[43]+skillDamage[const.Skills.Unarmed][m]*s
+		end
+	end
 	--necessary to load attack speed and damage multiplier
 	pl:GetAttackDelay()
 	pl:GetAttackDelay(true)
