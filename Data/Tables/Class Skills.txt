@@ -23,10 +23,10 @@ Dark	-	-	-	M	-	-	-	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	-	-	-	-	-	-	-	-
 DarkElfAbility	-	-	-	-	-	-	-	-	M	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
 VampireAbility	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
 DragonAbility	-	-	-	-	-	-	-	-	-	-	M	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
-IdentifyItem	-	-	-	-	-	-	-	-	M	M	M	G	E	E	E	E	-	-	-	-	-	-	-	-	-	-	E	M	M	M	B	B	E	E	M	M	G	G	-	-	E	E	M	M	M	G	G	M	-	-	-	M	M	E	E	E	E	M	M
+IdentifyItem	M	M	G	G	-	-	-	-	M	M	M	G	E	E	E	E	B	E	E	E	-	-	E	M	M	M	E	M	M	M	B	B	E	E	M	M	G	G	-	-	E	E	M	M	M	G	G	M	-	-	-	M	M	E	E	E	E	M	M
 Merchant	E	E	E	E	M	M	G	G	M	G	E	E	E	E	E	E	E	E	E	E	E	E	-	-	-	-	E	E	E	E	M	M	M	M	M	M	M	M	B	B	E	E	B	B	B	B	B	B	-	-	G	B	B	M	M	G	E	E	E
 Repair	E	E	M	M	E	E	E	E	E	E	-	-	-	-	-	-	M	M	G	G	-	-	-	-	-	-	M	M	G	G	B	B	E	E	B	B	B	B	M	M	-	-	E	E	E	M	M	M	-	-	E	M	E	E	E	E	M	M	G
-Bodybuilding	E	M	M	M	B	E	E	E	E	E	M	M	B	B	B	B	M	M	M	M	M	G	M	M	G	G	M	M	M	M	E	M	M	M	E	E	E	E	M	G	E	M	B	B	B	B	B	B	B	-	E	B	-	E	M	M	M	M	M
+Bodybuilding	E	M	M	M	B	E	E	E	E	E	M	M	B	B	B	B	M	M	M	M	M	M	M	M	G	G	M	M	M	M	E	M	M	M	E	E	E	E	M	G	E	M	B	B	B	B	B	B	B	-	E	B	-	E	M	M	M	M	M
 Meditation	E	M	M	M	M	M	M	M	E	M	M	M	M	M	G	G	-	-	-	-	E	M	-	-	-	-	E	E	M	M	E	M	M	M	E	M	M	M	-	-	B	E	M	M	M	M	M	G	-	-	M	M	M	E	M	M	-	-	-
 Perception	M	M	G	G	E	E	E	E	M	M	M	G	E	E	E	E	E	M	M	M	M	G	E	E	E	E	E	M	M	M	M	M	M	M	M	M	M	M	B	E	E	E	E	E	E	E	E	E	B	B	E	E	E	M	M	G	E	M	M
 Regeneration	-	-	-	-	-	-	-	-	-	-	E	E	-	-	-	-	-	-	-	-	B	E	B	E	E	E	-	-	-	-	-	-	-	-	-	-	-	-	M	G	E	M	-	-	-	E	-	-	-	-	-	-	-	-	-	-	B	E	E
@@ -34,8 +34,8 @@ DisarmTraps	B	E	M	M	-	-	-	-	M	G	-	-	-	-	-	-	B	B	E	E	M	M	B	E	M	M	-	-	-	-	E	E	E	E	
 Dodging	E	E	E	E	-	-	-	-	E	E	-	-	-	-	-	-	E	E	E	E	-	-	M	M	G	G	B	B	B	B	E	E	E	E	M	M	M	M	-	-	E	E	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
 Unarmed	B	B	B	B	-	-	-	-	-	-	-	-	-	-	-	-	E	E	E	E	E	E	M	M	G	G	B	B	B	B	B	B	B	B	E	E	E	E	E	E	B	B	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
 IdentifyMonster	-	-	-	-	M	G	G	G	-	-	M	M	E	E	E	E	E	E	E	E	-	-	E	E	E	E	-	-	-	-	M	M	G	G	-	-	-	-	E	E	M	G	M	M	M	M	M	M	-	-	E	M	M	-	-	-	E	E	E
-Armsmaster	E	E	M	M	E	E	E	E	E	E	-	-	B	B	B	B	M	M	G	G	M	G	M	M	M	M	E	M	M	M	E	E	E	E	M	M	M	M	M	M	E	M	-	-	-	-	-	-	-	-	B	-	-	-	-	-	M	M	G
+Armsmaster	E	E	M	M	E	E	E	E	E	E	-	-	B	B	B	B	M	M	G	G	-	-	M	M	M	M	E	M	M	M	E	E	E	E	M	M	M	M	M	M	E	M	-	-	-	-	-	-	-	-	B	-	-	-	-	-	M	M	G
 Stealing	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	B	B	E	E	-	-	-	-	E	E	E	E	M	M	G	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
 Alchemy	E	E	E	E	E	E	E	E	M	G	M	M	M	M	G	G	-	-	-	-	B	B	E	M	G	G	B	E	E	E	M	G	G	G	E	M	G	G	-	-	M	G	M	M	M	G	G	G	-	-	E	G	M	-	-	-	-	-	-
-Learning	M	M	M	M	M	M	M	M	E	M	M	G	M	M	M	M	M	M	G	G	B	B	M	M	G	G	E	M	M	M	E	M	M	M	E	M	M	M	E	M	M	M	M	M	M	M	M	M	B	B	M	M	M	E	M	M	M	M	M
+Learning	M	M	M	M	M	M	M	M	E	M	M	G	M	M	M	M	M	M	G	G	E	M	M	M	G	G	E	M	M	M	E	M	M	M	E	M	M	M	E	M	M	M	M	M	M	M	M	M	B	B	M	M	M	E	M	M	M	M	M
 																																																											
