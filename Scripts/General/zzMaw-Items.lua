@@ -1287,10 +1287,13 @@ function events.BuildItemInformationBox(t)
 				local sides=math.ceil(txt.Mod1DiceSides*artifactMult)
 				t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " ..  txt.Mod1DiceCount .. "d" .. sides .. "+" .. bonus
 			end
-			
-			if baseRecovery[t.Item:T().Skill] then
+			local skill=t.Item:T().Skill
+			if table.find(twoHandedAxes, t.Item.Number) or table.find(oneHandedAxes, t.Item.Number) then
+				skill=3
+			end
+			if baseRecovery[skill] then
 				local itemLevel=artifactMult*100
-				baseSpeed=baseRecovery[t.Item:T().Skill] * (0.75+itemLevel/200)
+				baseSpeed=baseRecovery[skill] * (0.75+itemLevel/200)
 				baseSpeed=math.round(baseSpeed/10)/10
 				
 				t.Type = t.Type .. "\nAttack Speed: " .. baseSpeed
@@ -1868,7 +1871,13 @@ function events.BuildItemInformationBox(t)
 			itemLevel=itemLevel+math.round(lvl/tot*18-17)
 			t.Description = t.Description .. "\n\nItem Level: " .. itemLevel
 		end	
-		if t.Type and baseRecovery[t.Item:T().Skill] then
+		
+		--attack speed tooltip
+		local skill=t.Item:T().Skill
+		if table.find(twoHandedAxes, t.Item.Number) or table.find(oneHandedAxes, t.Item.Number) then
+			skill=3
+		end
+		if t.Type and baseRecovery[skill] then
 			local itemLevel=t.Item.MaxCharges*5
 			local tot=0
 			local lvl=0
@@ -1877,7 +1886,7 @@ function events.BuildItemInformationBox(t)
 				lvl=lvl+t.Item:T().ChanceByLevel[i]*i
 			end
 			itemLevel=itemLevel+math.round(lvl/tot*18-17)
-			baseSpeed=baseRecovery[t.Item:T().Skill] * (0.75+itemLevel/200)
+			baseSpeed=baseRecovery[skill] * (0.75+itemLevel/200)
 			baseSpeed=math.round(baseSpeed/10)/10
 			
 			t.Type = t.Type .. "\nAttack Speed: " .. baseSpeed
@@ -2225,7 +2234,30 @@ function itemStats(index)
 		local item=pl:GetActiveItem(i)
 		if item then
 			local skill=item:T().Skill
+			--minotaur fix
+			if i==1 then
+				if table.find(oneHandedAxes, item.Number) or table.find(twoHandedAxes, item.Number) then
+					skill=3
+				end				
+			end
 			local s,m = SplitSkill(pl:GetSkill(skill))
+			
+			local bonusDamage=0
+			if item.EquipStat==1 then
+				bonusDamage=twoHandedWeaponDamageBonusByMastery[m]
+			elseif skill==4 and  not pl:GetActiveItem(0) then
+				bonusDamage=twoHandedWeaponDamageBonusByMastery[m]
+			end
+			--minotaur axe overrides, no extra damage if 2h weapon in offhand
+			if skill==3 and table.find(twoHandedAxes, item.Number) then
+				local offHand=pl:GetActiveItem(0)
+				if offHand and table.find(twoHandedAxes, offHand.Number) then
+					bonusDamage=0
+				else
+					bonusDamage=3
+				end
+			end
+			
 			if skillAC[skill] and skillAC[skill][m] then
 				tab[10]=tab[10]+skillAC[skill][m]*s
 			end
@@ -2243,9 +2275,9 @@ function itemStats(index)
 			end
 			if skillDamage[skill] and skillDamage[skill][m] then
 				if i~=2 then
-					tab[41]=tab[42]+skillDamage[skill][m]*s
-					tab[42]=tab[42]+skillDamage[skill][m]*s
-					tab[43]=tab[43]+skillDamage[skill][m]*s
+					tab[41]=tab[42]+skillDamage[skill][m]*s+bonusDamage*s
+					tab[42]=tab[42]+skillDamage[skill][m]*s+bonusDamage*s
+					tab[43]=tab[43]+skillDamage[skill][m]*s+bonusDamage*s
 				else
 					removeVanillaCalculation=0
 					if m==4 then removeVanillaCalculation=1 end
