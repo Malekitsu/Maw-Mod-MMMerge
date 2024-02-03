@@ -2243,7 +2243,7 @@ function itemStats(index)
 			local s,m = SplitSkill(pl:GetSkill(skill))
 			
 			local bonusDamage=0
-			if item.EquipStat==1 then
+			if item:T().EquipStat==1 then
 				bonusDamage=twoHandedWeaponDamageBonusByMastery[m]
 			elseif skill==4 and  not pl:GetActiveItem(0) then
 				bonusDamage=twoHandedWeaponDamageBonusByMastery[m]
