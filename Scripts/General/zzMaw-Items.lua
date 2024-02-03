@@ -2303,7 +2303,8 @@ function itemStats(index)
 	end
 	--unarmed
 	local s,m = SplitSkill(pl.Skills[const.Skills.Unarmed])
-	if (m>=1 and not pl:GetActiveItem(0) and not pl:GetActiveItem(1)) or (m==4 and pl:GetActiveItem(1) and pl:GetActiveItem(1):T().Skill==0 ) then
+	local s1,m1 = SplitSkill(pl.Skills[const.Skills.Staff])
+	if (m>=1 and not pl:GetActiveItem(0) and not pl:GetActiveItem(1)) or (m1==4 and pl:GetActiveItem(1) and pl:GetActiveItem(1):T().Skill==0 ) then
 		s=s+tab[22]
 		if m>0 then
 			tab[40]=tab[40]+skillAttack[const.Skills.Unarmed][m]*s
