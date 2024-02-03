@@ -19,8 +19,8 @@ Knight	35	4	0	0	-
 Cavalier	35	6	0	0	-
 BlackKnight	35	8	0	0	-
 Champion	35	8	0	0	-
-Minotaur	30	5	5	1	P
-MinotaurLord	30	8	5	2	P
+Minotaur	30	4	5	1	P
+MinotaurLord	30	6	5	2	P
 Monk	35	4	0	0	-
 Initiate	35	6	0	1	P
 Master	35	8	0	1	P
