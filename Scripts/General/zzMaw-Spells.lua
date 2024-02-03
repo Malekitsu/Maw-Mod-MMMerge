@@ -1495,7 +1495,7 @@ end
 
 local mastery={"Normal", "Expert", "Master", "GM"}
 function events.Action(t)
-	if t.Action==25 then
+	if t.Action==25 and autoTargetHeals then
 		local pl=Party[Game.CurrentPlayer]
 		if pl.QuickSpell==68 and pl.RecoveryDelay==0 then
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
@@ -1550,8 +1550,8 @@ function events.Action(t)
 			local haste=math.floor(pl:GetSpeed()/10)
 			local delay=Game.Spells[68]["Delay" .. mastery[m]]
 			pl:SetRecoveryDelay(delay)
-			
-		elseif pl.QuickSpell==74 then
+			pl.Expression=40
+		elseif pl.QuickSpell==74 and pl.RecoveryDelay==0 then
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
 			local cost=Game.Spells[74]["SpellPoints" .. mastery[m]]
 			if pl.SP<cost then return end
@@ -1604,8 +1604,8 @@ function events.Action(t)
 			local haste=math.floor(pl:GetSpeed()/10)
 			local delay=Game.Spells[74]["Delay" .. mastery[m]]
 			pl:SetRecoveryDelay(delay)
-			
-		elseif pl.QuickSpell==49 then
+			pl.Expression=40
+		elseif pl.QuickSpell==49 and pl.RecoveryDelay==0 then
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Spirit))
 			local cost=Game.Spells[49]["SpellPoints" .. mastery[m]]
 			if pl.SP<cost then return end
@@ -1658,6 +1658,7 @@ function events.Action(t)
 			local haste=math.floor(pl:GetSpeed()/10)
 			local delay=Game.Spells[49]["Delay" .. mastery[m]]
 			pl:SetRecoveryDelay(delay)
+			pl.Expression=40
 		end
 	end
 end
