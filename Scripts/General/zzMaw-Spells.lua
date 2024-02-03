@@ -772,7 +772,7 @@ function events.GameInitialized2()
 			if i==123 then 
 				manaCost=60
 			end
-			local theoreticalDamage80=manaCost^0.6*1.6
+			local theoreticalDamage80=manaCost^0.6*1.4
 			--scale new values according to original differences
 			local dmgAdd80=math.round(theoreticalDamage80*dmgAddProportion)
 			if spellPowers[i].diceMax==spellPowers[i].diceMin then
@@ -1156,7 +1156,10 @@ function events.Tick()
 						Game.Spells[num]["SpellPointsMaster"]=spellCostMaster[num] 
 						Game.Spells[num]["SpellPointsGM"]=spellCostGM[num]	
 					end	
-				end		
+				end
+				if num==44 then	
+						Game.Spells[num]["SpellPointsGM"]=level^1.6/12.5
+				end	
 			end	
 			
 			
