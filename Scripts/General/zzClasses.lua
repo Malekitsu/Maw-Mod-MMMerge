@@ -685,3 +685,11 @@ function events.Tick()
 		end
 	end
 end
+
+function events.GetMaxSkillLevel(t)
+	if t.Skill==35 or t.Skill==2 then
+		if Game.CharacterPortraits[t.Player.Face].Race == const.Race.Minotaur then
+			t.Result=0
+		end
+	end
+end
