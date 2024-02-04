@@ -750,7 +750,7 @@ function events.GameInitialized2()
 	for i =1,132 do
 		if spellPowers[i] then
 			--calculate damage assuming formula is manacost^0.7
-			local theoreticalDamage=spellCostNormal[i]^0.7
+			local theoreticalDamage=spellCostGM[i]^0.7
 			local dmgAddProportion=spellPowers[i].dmgAdd/theoreticalDamage
 			if spellPowers[i].diceMax==spellPowers[i].diceMin then
 				diceMaxProportion=spellPowers[i].diceMax/theoreticalDamage
@@ -760,7 +760,7 @@ function events.GameInitialized2()
 			--get new mana cost and calculate theoretical Damage for level 80+
 			local manaCost=ascendanceCost[i%11]
 			if i>77 and i<100 then
-				manaCost=manaCost+50
+				manaCost=manaCost+100
 			end
 			--exception for racial spells
 			if i==103 then 
@@ -787,7 +787,7 @@ function events.GameInitialized2()
 			--get new mana cost and calculate theoretical Damage for level 80+
 			local manaCost=ascendanceCost2[i%11]
 			if i>77 and i<100 then
-				manaCost=manaCost+100
+				manaCost=manaCost+200
 			end
 			--exception for racial spells
 			if i==103 then 
