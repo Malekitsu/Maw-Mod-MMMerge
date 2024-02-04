@@ -14,7 +14,7 @@ Incinerate	30	30	30	30	90	90	90	90	15	15
 Wizard Eye	1	1	1	0	60	60	60	60	0	0
 Feather Fall	2	2	2	2	120	120	120	100	0	0
 Air Resistance	3	3	3	3	120	120	120	120	0	0
-Sparks	4	4	4	4	110	100	90	80	2	1
+Sparks	4	8	10	12	110	100	90	80	2	1
 Jump	5	5	5	5	90	90	70	50	0	0
 Shield	8	8	8	8	120	120	120	120	0	0
 Lightning Bolt	10	10	10	10	100	100	90	70	0	8
@@ -23,7 +23,7 @@ Implosion	20	20	20	20	100	100	100	90	10	10
 Fly	25	25	25	25	250	250	250	250	0	0
 Starburst	30	30	30	30	90	90	90	90	20	1
 Awaken	1	1	1	1	60	60	60	20	0	0
-Poison Spray	2	2	2	2	110	100	90	70	2	2
+Poison Spray	2	4	5	6	110	100	90	70	2	2
 Water Resistance	3	3	3	3	120	120	120	120	0	0
 Ice Bolt	4	4	4	4	110	100	90	80	0	4
 Water Walk	5	5	5	5	150	150	150	150	0	0
