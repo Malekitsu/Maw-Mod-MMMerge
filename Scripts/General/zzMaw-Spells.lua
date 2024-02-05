@@ -1604,6 +1604,9 @@ function events.Action(t)
 			if Party[min_index].HP>0 then
 			Party[min_index].Unconscious=0
 			end
+			Party[min_index].Disease1=0
+			Party[min_index].Disease2=0
+			Party[min_index].Disease3=0
 			local haste=math.floor(pl:GetSpeed()/10)
 			local delay=Game.Spells[74]["Delay" .. mastery[m]]
 			pl:SetRecoveryDelay(delay)
@@ -1658,6 +1661,7 @@ function events.Action(t)
 			if Party[min_index].HP>0 then
 			Party[min_index].Unconscious=0
 			end
+			Party[min_index].Cursed=0
 			local haste=math.floor(pl:GetSpeed()/10)
 			local delay=Game.Spells[49]["Delay" .. mastery[m]]
 			pl:SetRecoveryDelay(delay)
