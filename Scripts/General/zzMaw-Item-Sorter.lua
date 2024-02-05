@@ -72,30 +72,32 @@ function sortInventory(all)
 					removeList[-i-1]=true
 				end
 				local it=pl.Items[pl.Inventory[i]]
-				j=j+1
-				itemList[j] = {} 
-				--iterating doesn't seem to work
-				itemList[j]["Bonus"]=it.Bonus
-				itemList[j]["Bonus2"]=it.Bonus2
-				itemList[j]["BonusExpireTime"]=it.BonusExpireTime
-				itemList[j]["BonusStrength"]=it.BonusStrength
-				itemList[j]["Broken"]=it.Broken
-				itemList[j]["Charges"]=it.Charges
-				itemList[j]["Condition"]=it.Condition 
-				itemList[j]["Hardened"]=it.Hardened
-				itemList[j]["Identified"]=it.Identified
-				itemList[j]["MaxCharges"]=it.MaxCharges
-				itemList[j]["Number"]=it.Number
-				itemList[j]["Owner"]=it.Owner
-				itemList[j]["Refundable"]=it.Refundable
-				itemList[j]["Stolen"]=it.Stolen
-				itemList[j]["TemporaryBonus"]=it.TemporaryBonus
-				itemList[j]["size"]=itemSizeMap[it.Number][2]
-				if itemList[j]["size"]==1 and itemSizeMap[it.Number][1] >1 then
-					itemList[j]["size"]=1.5
+				if it.Number>0 then
+					j=j+1
+					itemList[j] = {} 
+					--iterating doesn't seem to work
+					itemList[j]["Bonus"]=it.Bonus
+					itemList[j]["Bonus2"]=it.Bonus2
+					itemList[j]["BonusExpireTime"]=it.BonusExpireTime
+					itemList[j]["BonusStrength"]=it.BonusStrength
+					itemList[j]["Broken"]=it.Broken
+					itemList[j]["Charges"]=it.Charges
+					itemList[j]["Condition"]=it.Condition 
+					itemList[j]["Hardened"]=it.Hardened
+					itemList[j]["Identified"]=it.Identified
+					itemList[j]["MaxCharges"]=it.MaxCharges
+					itemList[j]["Number"]=it.Number
+					itemList[j]["Owner"]=it.Owner
+					itemList[j]["Refundable"]=it.Refundable
+					itemList[j]["Stolen"]=it.Stolen
+					itemList[j]["TemporaryBonus"]=it.TemporaryBonus
+					itemList[j]["size"]=itemSizeMap[it.Number][2]
+					if itemList[j]["size"]==1 and itemSizeMap[it.Number][1] >1 then
+						itemList[j]["size"]=1.5
+					end
+					pl.Inventory[i]=0 
+					it.Number=0
 				end
-				pl.Inventory[i]=0 
-				it.Number=0
 			end
 		end
 			
