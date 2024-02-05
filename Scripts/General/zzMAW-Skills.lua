@@ -768,7 +768,7 @@ function events.Action(t)
 			t.Handled=false
 			pl=Party[Game.CurrentPlayer]
 			local currentCost=SplitSkill(pl.Skills[t.Param])+1
-			if currentCost>60 then
+			if currentCost>1000 then
 				return
 			end
 			--calculate actual cost
@@ -1217,4 +1217,94 @@ function events.GameInitialized2()
 		end
 	end
 	
+end
+
+
+--HORIZONTAL SKILL PROGRESSION
+learningRequirements={0,6,12,20}
+function events.CanTeachSkillMastery(t)
+	if Game.freeProgression then return end -- only in horizontal mode
+	if t.Allow==false then return end --if failing for special requirements (stats, gold, already learned etc)
+	if t.Skill>23 then return end --apply only for weapon-armor-spells
+	local masteries={"","n Expert", " Master", " GrandMaster"}
+	local skill=SplitSkill(Party[Game.CurrentPlayer].Skills[t.Skill])
+	if skill<learningRequirements[t.Mastery] then
+		t.Allow=false
+		t.Text="You need at least " .. learningRequirements[t.Mastery] .. " skill to become a" ..  masteries[t.Mastery]
+	end
+end
+--reset and store masteries for free progression
+--ask confirmation and instructions for true nightmare mode
+function horizontalModeMasteries()
+	if Game.freeProgression then
+		vars.freeProgression=true
+	end
+	if not Game.freeProgression and vars.freeProgression then --detect difficulty change, from free to horizontal, remove and store
+		vars.freeProgression=false
+		vars.storedMasteries=vars.storedMasteries or {}
+		for i=0,Party.PlayersArray.High do
+			pl=Party.PlayersArray[i]
+			vars.storedMasteries[i]=vars.storedMasteries[i] or {}
+			for v=0,23 do 
+				local s,m = SplitSkill(pl.Skills[v])
+				while m>0 and s<learningRequirements[m] do
+					vars.storedMasteries[i][v]=vars.storedMasteries[i][v] or 0
+					vars.storedMasteries[i][v]=math.max(vars.storedMasteries[i][v],m)
+					m=m-1
+					pl.Skills[v]=JoinSkill(s,m)
+				end
+			end
+		end
+	end
+	if Game.freeProgression and vars.storedMasteries then
+		for i=0,Party.PlayersArray.High do
+			pl=Party.PlayersArray[i]
+			vars.storedMasteries[i]=vars.storedMasteries[i] or {}
+			for v=0,23 do
+				if vars.storedMasteries[i][v] then
+					local s,m = SplitSkill(pl.Skills[v])
+					pl.Skills[v]=JoinSkill(s,math.max(vars.storedMasteries[i][v],m))
+				end
+			end
+		end
+		vars.storedMasteries=nil
+	end
+end
+
+
+function events.LoadMap(wasInGame)
+	Timer(horizontalModeMasteries, const.Minute/4) 
+end
+function events.Action(t)
+	horizontalModeMasteries()
+end
+
+--restore masteries also on skill levelup
+function events.Action(t)
+	if t.Action==121 then
+		if t.Param<=23 then
+			t.Handled=false
+			pl=Party[Game.CurrentPlayer]
+			local currentCost=SplitSkill(pl.Skills[t.Param])+1
+			--calculate actual cost
+			local n=1
+			for i=1,11 do
+				local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[11+i])
+				if s>=currentCost then
+					n=n+1
+				end
+			end
+			local actualCost=math.ceil(currentCost/n)
+			if pl.SkillPoints>=actualCost then
+				id=pl:GetIndex()
+				local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[t.Param])
+				if vars.storedMasteries and vars.storedMasteries[id] and vars.storedMasteries[id][t.Param] then
+					while m<4 and vars.storedMasteries[id][t.Param]>m and s+1>=learningRequirements[m+1] do
+						Party[Game.CurrentPlayer].Skills[t.Param]=JoinSkill(s,m+1)
+						m=m+1
+					end
+				end
+			end
+		end
+	end
 end
