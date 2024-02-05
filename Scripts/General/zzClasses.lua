@@ -565,8 +565,8 @@ end
 function events.GameInitialized2()
 	function events.CalcDamageToMonster(t)
 		data=WhoHitMonster()
-		local pl=data.Player
 		if data and data.Player and (data.Player.Class==10 or data.Player.Class==11) then
+			local pl=data.Player
 			if data.Object==nil then
 				local breath = SplitSkill(data.Player:GetSkill(const.Skills.DragonAbility))
 				local fang, fangM = SplitSkill(data.Player:GetSkill(const.Skills.Unarmed))
