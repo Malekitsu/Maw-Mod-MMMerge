@@ -614,42 +614,42 @@ function events.GameInitialized2()
 				
 				--apply Damage
 				t.Result = damage * (1-res)
+			elseif t.DamageKind==50 then
+				--increase damage based on speed
+				local speed=pl:GetSpeed()
+				if speed>=25 then
+					speed=math.floor(speed/5)
+				else
+					speed=math.floor((speed-13)/2)
+				end
+				speed=speed/2
+				--increase damage based on might
+				local mightBase=pl:GetMight()
+				local might
+				if mightBase>=25 then
+					might=math.floor(mightBase/5)
+				else
+					might=math.floor((mightBase-13)/2)
+				end
+				
+				--breath
+				local breath, breathM = SplitSkill(pl:GetSkill(const.Skills.DragonAbility))
+				local baseDamage=dragonBreath.Damage[breathM]*breath+might
+				local damage=math.round(baseDamage*(1+speed/100)*(1+mightBase/1000))
+				
+				luck=data.Player:GetLuck()/1.5
+				critDamage=data.Player:GetAccuracy()*3/1000
+				critChance=50+luck
+				roll=math.random(1, 1000)
+				crit=false
+				if roll <= critChance then
+					damage=damage*(1.5+critDamage)
+					crit=true
+				end
+				
+				--apply Damage
+				t.Result = damage
 			end
-		elseif t.DamageKind==50 then
-			--increase damage based on speed
-			local speed=pl:GetSpeed()
-			if speed>=25 then
-				speed=math.floor(speed/5)
-			else
-				speed=math.floor((speed-13)/2)
-			end
-			speed=speed/2
-			--increase damage based on might
-			local mightBase=pl:GetMight()
-			local might
-			if mightBase>=25 then
-				might=math.floor(mightBase/5)
-			else
-				might=math.floor((mightBase-13)/2)
-			end
-			
-			--breath
-			local breath, breathM = SplitSkill(pl:GetSkill(const.Skills.DragonAbility))
-			local baseDamage=dragonBreath.Damage[breathM]*breath+might
-			local damage=math.round(baseDamage*(1+speed/100)*(1+mightBase/1000))
-			
-			luck=data.Player:GetLuck()/1.5
-			critDamage=data.Player:GetAccuracy()*3/1000
-			critChance=50+luck
-			roll=math.random(1, 1000)
-			crit=false
-			if roll <= critChance then
-				damage=damage*(1.5+critDamage)
-				crit=true
-			end
-			
-			--apply Damage
-			t.Result = damage
 		end
 	end
 end
