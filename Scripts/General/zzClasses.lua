@@ -634,7 +634,7 @@ function events.GameInitialized2()
 			end
 			
 			--breath
-			local breath, breathM = SplitSkill(pl:GetSkill(const.Skills.Dragon))
+			local breath, breathM = SplitSkill(pl:GetSkill(const.Skills.DragonAbility))
 			local baseDamage=dragonBreath.Damage[breathM]*breath+might
 			local damage=math.round(baseDamage*(1+speed/100)*(1+mightBase/1000))
 			
