@@ -84,7 +84,7 @@ evt.PotionEffects[18] = function(IsDrunk, t, Power)
 			
 			--nerf to skill enchant
 			if t.Bonus>=17 then
-				t.BonusStrength=math.max(Mouse.Item.Bonus^0.5, math.ceil(Mouse.Item.Bonus/10))
+				t.BonusStrength=math.max(t.BonusStrength^0.5, math.ceil(t.BonusStrength/10))
 			end
 			
 			vars.enchantSeedList[t.Number]=vars.enchantSeedList[t.Number]+math.random(1,1000)
