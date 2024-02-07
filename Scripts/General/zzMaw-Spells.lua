@@ -1544,7 +1544,8 @@ function events.Action(t)
 			min_index = indexof({a, b, c, d, e}, min_value)
 			min_index = min_index - 1
 			--apply heal
-			evt[min_index].Add("HP",totHeal)		
+			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
+			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, Party[min_index]:GetFullHP())	
 			--bug fix
 			if Party[min_index].HP>0 then
 			Party[min_index].Unconscious=0
@@ -1598,7 +1599,8 @@ function events.Action(t)
 			min_index = indexof({a, b, c, d, e}, min_value)
 			min_index = min_index - 1
 			--apply heal
-			evt[min_index].Add("HP",totHeal)		
+			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
+			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, Party[min_index]:GetFullHP())	
 			--bug fix
 			if Party[min_index].HP>0 then
 			Party[min_index].Unconscious=0
@@ -1655,7 +1657,8 @@ function events.Action(t)
 			min_index = indexof({a, b, c, d, e}, min_value)
 			min_index = min_index - 1
 			--apply heal
-			evt[min_index].Add("HP",totHeal)		
+			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
+			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, Party[min_index]:GetFullHP())
 			--bug fix
 			if Party[min_index].HP>0 then
 			Party[min_index].Unconscious=0
@@ -1668,3 +1671,78 @@ function events.Action(t)
 		end
 	end
 end
+
+
+----------------------------------------
+--CC REWORK
+----------------------------------------
+
+function events.PlayerCastSpell(t)
+	if t.SpellId==81 then
+		t.Handled=true
+		function events.Tick() 
+			events.Remove("Tick", 1)
+			mawCC(t.SpellId,t.TargetId,t.Skill,t.Mastery)
+		end
+		t.Skill=0
+	end
+end
+
+function mawCC(spell, id, skill, mastery)
+	if spell==81 then
+		local mon=Map.Monsters[id]
+		local res=mon.Resistances[9]
+		local hitChance=(30+skill*2)/(30+mon.Level/4+res)
+		local debuff=mon.SpellBuffs[const.MonsterBuff.Paralyze]
+		if math.random()>hitChance then --success
+			debuff.ExpireTime=Game.Time+const.Minute*3
+			if mon.Velocity>0 then
+				local back=mon.Velocity
+				mon.VelocityX=0
+				mon.VelocityY=0
+				mon.VelocityZ=0
+				mon.Velocity=0
+				local timer=debuff.ExpireTime
+				function events.Tick()
+					if timer<Game.Time then
+						events.Remove("Tick", 1)
+						mon.Velocity=back
+					end
+				end
+			end
+			Game.ShowStatusText("Paralyzed")
+		elseif debuff.ExpireTime>Game.Time+const.Minute*3 then
+			debuff.ExpireTime=0
+		end
+	end
+end
+--[[
+	MonsterBuff = {
+		ArmorHalved = 21,
+		Berserk = 8,
+		Bless = 16,
+		Charm = 1,
+		DamageHalved = 23,
+		DayOfProtection = 12,
+		Enslave = 11,
+		Fate = 10,
+		Fear = 4,
+		Hammerhands = 20,
+		Haste = 18,
+		Heroism = 17,
+		HourOfPower = 13,
+		MassDistortion = 9,
+		MeleeOnly = 22,
+		Mistform = 25,
+		Null = 0,
+		PainReflection = 19,
+		Paralyze = 6,
+		Shield = 14,
+		ShrinkingRay = 3,
+		Slow = 7,
+		StoneSkin = 15,
+		Stoned = 5,
+		Summoned = 2,
+		Wander = 24
+	},
+]]
