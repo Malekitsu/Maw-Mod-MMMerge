@@ -824,94 +824,92 @@ partySharedSkills={24,25,26,31,34}
 function events.PlayerAttacked(t)
 	if t.Attacker and t.Attacker.Monster then
 		if (t.Attacker.MonsterAction==0 or t.Attacker.MonsterAction==1) and t.Attacker.Monster["Attack" .. t.Attacker.MonsterAction+1].Type==4 then
-	
+			local it=t.Player:GetActiveItem(3)
+			if it and Game.ItemsTxt[it.Number].Skill==11 then return end --doesn't apply if have plate already
 			--PLATE COVER
 			--check for armor
-			local it=Party[t.PlayerSlot]:GetActiveItem(3)
-			if it and Game.ItemsTxt[it.Number].Skill~=11 then
-				coverChance={}
-				local coverIndex=1
-				--iterate for players to build cover dictionary
-				for i=0,Party.High do
-					if Party[i].Dead==0 and Party[i].Paralyzed==0 and Party[i].Unconscious==0 and Party[i].Stoned==0 and Party[i].Eradicated==0 then
-						local it=Party[i]:GetActiveItem(3)
-						if it and Game.ItemsTxt[it.Number].Skill==11 then 
-							local plate=Party[i].Skills[const.Skills.Plate]
-							local s,m=SplitSkill(plate)
-							m=math.min(m,3)
-							coverChance[coverIndex]={p=0.05*m,index=i}
-							coverIndex=coverIndex+1
+			coverChance={}
+			local coverIndex=1
+			--iterate for players to build cover dictionary
+			for i=0,Party.High do
+				if Party[i].Dead==0 and Party[i].Paralyzed==0 and Party[i].Unconscious==0 and Party[i].Stoned==0 and Party[i].Eradicated==0 then
+					local it=Party[i]:GetActiveItem(3)
+					if it and Game.ItemsTxt[it.Number].Skill==11 then 
+						local plate=Party[i].Skills[const.Skills.Plate]
+						local s,m=SplitSkill(plate)
+						m=math.min(m,3)
+						coverChance[coverIndex]={p=0.05*m,index=i}
+						coverIndex=coverIndex+1
+					end
+				end
+			end
+			--roll once per player with player and pick the one with max hp
+			coverPlayer=-1
+			if coverChance[1] then
+				lastMaxHp=0
+				cover=false
+				for i=1,#coverChance do
+					if Party[coverChance[i].index].HP>lastMaxHp then
+						local index=coverChance[i].index
+						local p=coverChance[i].p
+						roll=math.random()
+						if roll<p then
+							lastMaxHp=Party[index].HP
+							coverPlayer=index
+							cover=true
 						end
 					end
 				end
-				--roll once per player with player and pick the one with max hp
-				coverPlayerIndex=-1
-				if coverChance[1] then
-					lastMaxHp=0
-					cover=false
-					for i=1,#coverChance do
-						if Party[coverChance[i].index].HP>lastMaxHp then
-							local index=coverChance[i].index
-							local p=coverChance[i].p
-							roll=math.random()
-							if roll<p then
-								lastMaxHp=Party[index].HP
-								coverPlayer=index
-								cover=true
-							end
-						end
-					end
-					if cover then
-						Party[t.PlayerSlot]:ShowFaceAnimation(6)
-						Party[coverPlayer]:ShowFaceAnimation(14)
-						Game.ShowStatusText(Party[coverPlayer].Name .. " cover " .. Party[t.PlayerSlot].Name)
-						t.PlayerSlot=coverPlayer
-					end
+				
+				if cover then
+					mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Shield, t.PlayerSlot)
+					Party[coverPlayer]:ShowFaceAnimation(14)
+					Game.ShowStatusText(Party[coverPlayer].Name .. " cover " .. Party[t.PlayerSlot].Name)
+					t.PlayerSlot=coverPlayer
 				end
-			end	
+			end
 		else
 			local it=t.Player:GetActiveItem(0)
 			local shield=t.Player.Skills[const.Skills.Shield]
 			local s,m=SplitSkill(shield)
-			if it and (Game.ItemsTxt[it.Number].Skill~=8 or m<4) then
-				magicCoverChance={}
-				local coverIndex=1
-				--iterate for players to build cover dictionary
-				for i=0,Party.High do
-					if Party[i].Dead==0 and Party[i].Paralyzed==0 and Party[i].Unconscious==0 and Party[i].Stoned==0 and Party[i].Eradicated==0 then
-						local it=Party[i]:GetActiveItem(0)
-						if it and Game.ItemsTxt[it.Number].Skill==8 then 
-							local shield=Party[i].Skills[const.Skills.Shield]
-							local s,m=SplitSkill(shield)
-							if m==4 then
-								magicCoverChance[coverIndex]={p=0.15,index=i}
-								coverIndex=coverIndex+1
-							end
+			if it and Game.ItemsTxt[it.Number].Skill==8 and m==4 then return end --doesn't apply if have shield and GM already
+			magicCoverChance={}
+			local coverIndex=1
+			--iterate for players to build cover dictionary
+			for i=0,Party.High do
+				if Party[i].Dead==0 and Party[i].Paralyzed==0 and Party[i].Unconscious==0 and Party[i].Stoned==0 and Party[i].Eradicated==0 then
+					local it=Party[i]:GetActiveItem(0)
+					if it and Game.ItemsTxt[it.Number].Skill==8 then 
+						local shield=Party[i].Skills[const.Skills.Shield]
+						local s,m=SplitSkill(shield)
+						if m==4 then
+							magicCoverChance[coverIndex]={p=0.15,index=i}
+							coverIndex=coverIndex+1
 						end
 					end
 				end
-				--roll once per player with player and pick the one with max hp
-				coverPlayerIndex=-1
-				if magicCoverChance[1] then
-					lastMaxHp=0
-					cover=false
-					for i=1,#magicCoverChance do
-						if Party[magicCoverChance[i].index].HP>lastMaxHp then
-							local index=magicCoverChance[i].index
-							local p=magicCoverChance[i].p
-							if math.random()<p then
-								lastMaxHp=Party[index].HP
-								coverPlayerIndex=index
-								cover=true
-							end
+			end
+			--roll once per player with player and pick the one with max hp
+			coverPlayerIndex=-1
+			if magicCoverChance[1] then
+				lastMaxHp=0
+				cover=false
+				for i=1,#magicCoverChance do
+					if Party[magicCoverChance[i].index].HP>lastMaxHp then
+						local index=magicCoverChance[i].index
+						local p=magicCoverChance[i].p
+						if math.random()<p then
+							lastMaxHp=Party[index].HP
+							coverPlayerIndex=index
+							cover=true
 						end
 					end
-					if cover then
-						Party[t.PlayerSlot]:ShowFaceAnimation(6)
-						Party[coverPlayerIndex]:ShowFaceAnimation(14)
-						Game.ShowStatusText(Party[coverPlayerIndex].Name .. " cover " .. Party[t.PlayerSlot].Name)
-						t.PlayerSlot=coverPlayerIndex
-					end
+				end
+				if cover then
+					mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Shield, t.PlayerSlot)
+					Party[coverPlayerIndex]:ShowFaceAnimation(14)
+					Game.ShowStatusText(Party[coverPlayerIndex].Name .. " cover " .. Party[t.PlayerSlot].Name)
+					t.PlayerSlot=coverPlayerIndex
 				end
 			end
 		end
