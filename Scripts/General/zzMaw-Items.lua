@@ -2915,3 +2915,52 @@ function artifactPowerMult(level)
 	local mult=math.max(math.min(level/80,3),0.5)
 	return mult
 end
+
+playerToPartyBuff={
+	[0]=0,
+	[2]=1,
+	[3]=4,
+	[5]=6,
+	[8]=9,
+	[9]=12,
+	[14]=15,
+	[15]=2,
+	[16]=2,
+	[17]=2,
+	[18]=2,
+	[19]=2,
+	[20]=2,
+	[21]=2,
+	[22]=17,
+}
+statToPlayerbuff={
+	[11]=0,
+	[15]=2,
+	[13]=3,
+	[11]=5,
+	[27]=8,
+	[28]=8,
+	[14]=9,
+	[9]=14,
+	[4]=15,
+	[3]=16,
+	[1]=17,
+	[6]=18,
+	[0]=19,
+	[2]=20,
+	[5]=21,
+	[12]=22,
+}
+function events.CalcStatBonusByItems(t)
+	if statToPlayerbuff[t.Stat] then
+		local stat1=statToPlayerbuff[t.Stat]
+		local power1=t.Player.SpellBuffs[stat1].Power
+		local stat2=playerToPartyBuff[stat1]
+		local power2=Party.SpellBuffs[stat2].Power
+		if power1>=power2 then
+			t.Result=t.Result-power2
+		else
+			t.Result=t.Result-power1
+		end
+	end
+end
