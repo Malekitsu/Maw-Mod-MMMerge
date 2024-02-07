@@ -2034,6 +2034,7 @@ function itemStats(index)
 	if index==-1 or index==nil then
 		return 0
 	end
+	local id=0
 	for i=0,Party.High do 
 		if Party[i]:GetIndex()==index then
 			id=i
