@@ -1678,17 +1678,82 @@ end
 ----------------------------------------
 
 function events.PlayerCastSpell(t)
-	if t.SpellId==81 then
-		t.Handled=true
+	if t.SpellId==35 then
+		--t.Handled=true
+		t.Player.SP=t.Player.SP-2
 		function events.Tick() 
 			events.Remove("Tick", 1)
 			mawCC(t.SpellId,t.TargetId,t.Skill,t.Mastery)
 		end
 		t.Skill=0
 	end
+	if t.SpellId==62 then
+		--t.Handled=true
+		t.Player.SP=t.Player.SP-10
+		function events.Tick() 
+			events.Remove("Tick", 1)
+			mawCC(t.SpellId,t.TargetId,t.Skill,t.Mastery)
+		end
+		t.Skill=0
+	end
+	if t.SpellId==66 then
+		--t.Handled=true
+		t.Player.SP=t.Player.SP-30
+		function events.Tick() 
+			events.Remove("Tick", 1)
+			mawCC(t.SpellId,t.TargetId,t.Skill,t.Mastery)
+		end
+		t.Skill=0
+	end
+	if t.SpellId==81 then
+		--t.Handled=true
+		t.Player.SP=t.Player.SP-15
+		function events.Tick() 
+			events.Remove("Tick", 1)
+			mawCC(t.SpellId,t.TargetId,t.Skill,t.Mastery)
+		end
+		t.Skill=0
+	end
+	
 end
 
 function mawCC(spell, id, skill, mastery)
+	if spell==35 then
+		local mon=Map.Monsters[id]
+		local res=mon.Resistances[3]
+		local hitChance=(30+skill*2)/(30+mon.Level/4+res)
+		local debuff=mon.SpellBuffs[const.MonsterBuff.Slow]
+		if math.random()>hitChance then --success
+			debuff.ExpireTime=Game.Time+const.Minute*6
+			Game.ShowStatusText("Berseked")
+		elseif debuff.ExpireTime>Game.Time+const.Minute*6 then
+			debuff.ExpireTime=0
+		end
+	end
+	if spell==62 then
+		local mon=Map.Monsters[id]
+		local res=mon.Resistances[7]
+		local hitChance=(30+skill*2)/(30+mon.Level/4+res)
+		local debuff=mon.SpellBuffs[const.MonsterBuff.Berserk]
+		if math.random()>hitChance then --success
+			debuff.ExpireTime=Game.Time+const.Minute*3
+			Game.ShowStatusText("Berseked")
+		elseif debuff.ExpireTime>Game.Time+const.Minute*3 then
+			debuff.ExpireTime=0
+		end
+	end
+	if spell==66 then
+		local mon=Map.Monsters[id]
+		local res=mon.Resistances[7]
+		local hitChance=(30+skill*2)/(30+mon.Level/4+res)
+		local debuff=mon.SpellBuffs[const.MonsterBuff.Enslave]
+		if math.random()>hitChance then --success
+			debuff.ExpireTime=Game.Time+const.Minute*3
+			Game.ShowStatusText("Enslaved")
+		elseif debuff.ExpireTime>Game.Time+const.Minute*3 then
+			debuff.ExpireTime=0
+		end
+	end
 	if spell==81 then
 		local mon=Map.Monsters[id]
 		local res=mon.Resistances[9]
@@ -1717,6 +1782,13 @@ function mawCC(spell, id, skill, mastery)
 	end
 end
 --[[
+mass fear; 40 mana , 6 secs, skill/2 first cast
+slow 12 sec duration, skill first cast
+paralyze 6 sec, skill x 2 first cast
+shrink ray 3 sec duration, skill/2 first cas
+berserk 6 sec, skill x 2 first cast
+enslave 6 sec, skill x 2 first cast
+
 	MonsterBuff = {
 		ArmorHalved = 21,
 		Berserk = 8,
