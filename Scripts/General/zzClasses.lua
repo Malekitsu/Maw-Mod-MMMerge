@@ -441,7 +441,8 @@ end
 
 function events.Action(t)
 	if t.Action==110 then
-		if Party[t.Param-1].Class==10 or Party[t.Param-1].Class==11 then
+		local race=Game.CharacterPortraits[Party[t.Param-1].Face].Race
+		if race==const.Race.Dragon then
 			dragonSkill(true, t.Param-1)
 		else
 			dragonSkill(false)
@@ -456,7 +457,8 @@ function events.Action(t)
 			end
 			local pl=Party[newSelected]
 			if pl.Dead==0 and pl.Stoned==0 and pl.Paralyzed==0 and pl.Eradicated==0 and pl.Asleep==0 and pl.Unconscious==0 then
-				if pl.Class==10 or pl.Class==11 then
+				local race=Game.CharacterPortraits[pl.Face].Race
+				if race==const.Race.Dragon then
 					dragonSkill(true, newSelected)
 				else
 					dragonSkill(false, newSelected)
