@@ -370,7 +370,7 @@ function events.GameInitialized2()
 	end
 	
 	function events.GetAttackDelay(t)
-		if t.Player.Class==10 or t.Player.Class==11 then
+		if Game.CharacterPortraits[t.Player.Face].Race==const.Race.Dragon then
 			t.Result=100
 		end	
 	end
@@ -474,7 +474,8 @@ function events.Tick()
 		i=Game.CurrentPlayer 
 		if i==-1 then return end 
 		local pl=Party[i]
-		if pl.Class==10 or pl.Class==11 then
+		race=Game.CharacterPortraits[pl.Face].Race
+		if race==const.Race.Dragon then
 			Game.SkillNames[33]="Fangs"
 			local fang, fangM = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
 			--increase damage based on speed
@@ -571,7 +572,7 @@ end
 function events.GameInitialized2()
 	function events.CalcDamageToMonster(t)
 		data=WhoHitMonster()
-		if data and data.Player and (data.Player.Class==10 or data.Player.Class==11) then
+		if data and data.Player and Game.CharacterPortraits[data.Player.Face].Race==const.Race.Dragon then
 			local pl=data.Player
 			if data.Object==nil then
 				local breath = SplitSkill(data.Player:GetSkill(const.Skills.DragonAbility))
