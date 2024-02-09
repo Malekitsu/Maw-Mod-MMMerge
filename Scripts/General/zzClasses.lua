@@ -302,7 +302,7 @@ local dragonScales={
 
 function events.GameInitialized2()
 	function events.CalcStatBonusByItems(t)
-		if Game.CharacterPortraits[t.Player.Face].Race==const.Race.Dragon then return end
+		if Game.CharacterPortraits[t.Player.Face].Race~=const.Race.Dragon then return end
 		--melee
 		if t.Stat==27 then --min damage
 			local pl=t.Player
