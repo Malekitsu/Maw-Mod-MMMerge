@@ -440,6 +440,14 @@ function events.LoadMap()
 end
 
 function events.Action(t)
+	if t.Action==114 then
+		local race=Game.CharacterPortraits[Party[Game.CurrentPlayer].Face].Race
+		if race==const.Race.Dragon then
+			dragonSkill(true, Game.CurrentPlayer)
+		else
+			dragonSkill(false)
+		end
+	end
 	if t.Action==110 then
 		local race=Game.CharacterPortraits[Party[t.Param-1].Face].Race
 		if race==const.Race.Dragon then
