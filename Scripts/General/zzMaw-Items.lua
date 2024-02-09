@@ -2183,7 +2183,7 @@ function itemStats(index)
 	--dragon
 	if pl.Class==10 or pl.Class==11 then
 		for i=1,16 do
-			tab[i]=tab[i]*3
+			tab[i]=tab[i]*2
 		end
 	end
 	--add luck to resistances
