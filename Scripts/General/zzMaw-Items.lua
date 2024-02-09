@@ -2181,7 +2181,7 @@ function itemStats(index)
 	--end of items
 	--------------
 	--dragon
-	if pl.Class==10 or pl.Class==11 then
+	if Game.CharacterPortraits[pl.Face].Race==const.Race.Dragon then
 		for i=1,16 do
 			tab[i]=tab[i]*2
 		end
