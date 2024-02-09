@@ -540,13 +540,17 @@ function dragonSkill(dragon, index)
 		Game.SkillDesMaster[32]=scalesMaster
 		Game.SkillDesGM[32]=scalesGM
 		if index==-1 then return end
-		if pl.Class==10 or pl.Class==11 then
+		if dragon then
 			if pl.Skills[33]==0 then
 				pl.Skills[33]=1
 			end
 			if pl.Skills[32]==0 then
 				pl.Skills[32]=1
 			end
+			if pl.Skills[23]==0 then
+				pl.Skills[23]=1
+			end
+			
 		end
 	else
 		Game.SkillNames[33]="Unarmed"
