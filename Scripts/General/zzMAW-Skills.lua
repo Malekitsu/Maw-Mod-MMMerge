@@ -821,6 +821,7 @@ end
 partySharedSkills={24,25,26,31,34}
 --plate&shield cover
 --change target
+plateCoverChance={0,5,10,15}
 function events.PlayerAttacked(t)
 	if t.Attacker and t.Attacker.Monster then
 		if (t.Attacker.MonsterAction==0 or t.Attacker.MonsterAction==1) and t.Attacker.Monster["Attack" .. t.Attacker.MonsterAction+1].Type==4 then
@@ -837,8 +838,7 @@ function events.PlayerAttacked(t)
 					if it and Game.ItemsTxt[it.Number].Skill==11 then 
 						local plate=Party[i].Skills[const.Skills.Plate]
 						local s,m=SplitSkill(plate)
-						m=math.min(m,3)
-						coverChance[coverIndex]={p=0.05*m,index=i}
+						coverChance[coverIndex]={p=plateCoverChance[m],index=i}
 						coverIndex=coverIndex+1
 					end
 				end
