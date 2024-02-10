@@ -240,7 +240,7 @@ function events.LoadMap()
 		bolsterLevel=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
 	end
 	bolsterLevel=math.max(bolsterLevel-4,0)
-	
+	bolsterLevel2=bolsterLevel --used for loot
 	--check for current map monsters
 	currentMapMonsters={}
 	local index=1
@@ -470,21 +470,21 @@ function events.PickCorpse(t)
 	--calculate bolster
 	lvl=BLevel[mon.Id]
 	gold=mon.TreasureDiceCount*(mon.TreasureDiceSides+1)/2
-	newGold=(bolsterLevel+lvl)*7.5
+	newGold=(bolsterLevel2+lvl)*7.5
 	if mon.Id%3==1 then
 		newGold=newGold/2
 	elseif mon.Id%3==0 then
 		newGold=newGold*2
 	end
 	if gold>0 and newGold>gold then
-		goldMult=(bolsterLevel+lvl)^1.5/(lvl)^1.5
+		goldMult=(bolsterLevel2+lvl)^1.5/(lvl)^1.5
 		mon.TreasureDiceCount=math.min(newGold^0.5,255)
 		mon.TreasureDiceSides=math.min(newGold^0.5*2,255)
 	end
 	--calculate loot chances
 	if Game.freeProgression then
-		if bolsterLevel>50 or mon.TreasureItemPercent>70 then
-			mon.TreasureItemPercent= math.round(mon.TreasureItemPercent^0.85 + (50 - mon.TreasureItemPercent^0.85 / 2) * bolsterLevel / 250)
+		if bolsterLevel2>50 or mon.TreasureItemPercent>70 then
+			mon.TreasureItemPercent= math.round(mon.TreasureItemPercent^0.85 + (50 - mon.TreasureItemPercent^0.85 / 2) * bolsterLevel2 / 250)
 			mon.TreasureItemLevel=math.max(t.Monster.TreasureItemLevel,1)
 			if math.random()<0.7 then
 				mon.TreasureItemType=0
