@@ -272,13 +272,6 @@ function events.LoadMap()
 		base=basetable[i]		
 		LevelB=BLevel[i]
 		
-		--horizontal progression
-		if Game.freeProgression==false then
-			name=Game.MapStats[Map.MapStatsIndex].Name
-			if not horizontalMaps[name] then
-				bolsterLevel=base.Level*(1-LevelB/100) + LevelB*(LevelB/100) + LevelB*0.75
-			end
-		end
 		
 		
 		mon.Level=math.min(base.Level+bolsterLevel,255)
@@ -318,8 +311,23 @@ function events.LoadMap()
 		mon.Level=math.min(mon.Level+extraBolster,255)
 		totalLevel=totalLevel or {}
 		totalLevel[i]=basetable[i].Level+bolsterLevel+extraBolster
+		
+		--horizontal progression
+		if Game.freeProgression==false then
+			name=Game.MapStats[Map.MapStatsIndex].Name
+			mon.Level=math.min(base.Level+15,mon.Level)
+			if not horizontalMaps[name] then
+				horizontalMultiplier=2.5
+				extraBolster=extraBolster*horizontalMultiplier
+				bolsterLevel=base.Level*horizontalMultiplier-base.Level
+				totalLevel[i]=math.max(base.Level*horizontalMultiplier-(base.Level-LevelB)+extraBolster-5, 5)
+				mon.Level=math.min(totalLevel[i],255)
+			end
+		end
+		
+		
 		--HP
-		HPBolsterLevel=basetable[i].Level*(1+(0.1*(bolsterLevel+extraBolster)/100))+(bolsterLevel+extraBolster)*0.9
+		HPBolsterLevel=basetable[i].Level*(1+(0.1*(totalLevel[i]-basetable[i].Level)/100))+(totalLevel[i]-basetable[i].Level)*0.9
 		HPtable=HPtable or {}
 		HPtable[i]=HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180)
 		--resistances 
@@ -331,7 +339,7 @@ function events.LoadMap()
 		end
 		
 		--experience
-		mon.Experience = math.round(totalLevel[i]^1.7+totalLevel[i]*20)
+		mon.Experience = math.round(totalLevel[i]^1.8+totalLevel[i]*20)
 		if currentWorld==2 then
 			mon.Experience = math.min(mon.Experience*2, mon.Experience+1000)
 		end
@@ -1582,7 +1590,7 @@ function events.MonsterKilled(mon)
 				mapLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 			end
 			mapLevel=mapLevel+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
-			experience=math.ceil(m^0.7*(mapLevel^1.7+mapLevel*20)/3/1000)*1000  
+			experience=math.ceil(m^0.7*(mapLevel^1.8+mapLevel*20)/3/1000)*1000  
 			gold=math.ceil(experience^0.9/1000)*1000 
 			evt.ForPlayer(0)
 			evt.Add{"Gold", Value = gold}
