@@ -217,7 +217,9 @@ function events.ItemGenerated(t)
 		end
 		
 		partyLevel=math.min(vars.MM8LVL+vars.MM7LVL+vars.MM6LVL-math.min(currentLevel,72), partyLevel+36)
-		
+		if not Game.freeProgression then
+			partyLevel=(vars.MM8LVL+vars.MM7LVL+vars.MM6LVL)*0.75
+		end
 		--difficulty settings
 		difficultyExtraPower=1
 		if Game.BolsterAmount==150 then
@@ -227,7 +229,7 @@ function events.ItemGenerated(t)
 		elseif Game.BolsterAmount==300 then
 			difficultyExtraPower=1.4
 		end
-		if Game.HouseScreen==2 or Game.HouseScreen==95 then --nerf shops if no exp in current world
+		if (Game.HouseScreen==2 or Game.HouseScreen==95) and Game.freeProgression then --nerf shops if no exp in current world
 			partyLevel=math.round(partyLevel*(math.min(partyLevel/160 + currentLevel/80,1)))
 		end
 		
