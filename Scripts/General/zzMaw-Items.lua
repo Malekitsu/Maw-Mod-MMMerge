@@ -2061,7 +2061,11 @@ function itemStats(index)
 		end
 		
 		if it.Bonus>0 then 
-			tab[it.Bonus]=tab[it.Bonus]+it.BonusStrength
+			if it.Bonus<=16 then
+				tab[it.Bonus]=tab[it.Bonus]+it.BonusStrength
+			else
+				tab[it.Bonus]=math.max(tab[it.Bonus],it.BonusStrength)
+			end
 		end
 		if it.Charges>1000 then
 			tab[math.floor(it.Charges/1000)]=tab[math.floor(it.Charges/1000)]+it.Charges%1000
