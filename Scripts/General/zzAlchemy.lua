@@ -182,7 +182,7 @@ function events.GetSkill(t)
 	end
 end
 
-potionUsingCharges={228,229,230,231,232,234,235,239,240,241,248,249,250,251,257,258}
+potionUsingCharges={228,229,230,231,232,233,234,235,237,240,241,242,245,248,249,250,251,257,263}
 potionPowerRequirement={
 	[231]=20,
 	[235]=20,
@@ -350,7 +350,7 @@ potionText={
 	[252] = "Adds 20/40/60 to permanent Might and Accuracy.\nRequire 55 power per step to work.\n",
 	[253] = "Adds 20/40/60 to permanent Intellect and Wisdom.\nRequire 55 power per step to work.\n",
 	[254] = "Adds 20/40/60 to permanent Endurance, Speed and Luck.\nRequire 55 power per step to work.\n",
-	[255] = "Adds a random tier 3 elemental damage enchant to a weapon.\nRequire 55 power to work.\n.",
+	[255] = "Adds a random tier 3 elemental damage enchant to a weapon.\nRequire 55 power to work.\n",
 	[256] = "Adds 'of Darkness' property to a non-magic weapon.\nRequire 100 power to work.\n",
 	[257] = "Increases all Seven Statistics temporarily by 10+(1 x Power) for 6 hours.",
 	[258] = "Fix caracter age at 60.\nRequire 55 power to work.\n",
