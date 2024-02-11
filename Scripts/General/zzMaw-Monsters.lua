@@ -70,7 +70,7 @@ function events.AfterLoadMap()
 				if Game.freeProgression==false then
 					name=Game.MapStats[Map.MapStatsIndex].Name
 					if not horizontalMaps[name] then
-						partyLvl=mon.Level*3
+						partyLvl=mon.Level*1.5
 					end
 				end
 				--level increase 
