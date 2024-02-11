@@ -732,7 +732,7 @@ end
 function events.GameInitialized2()
 	function events.CalcSpellDamage(t)
 		local data = WhoHitMonster()
-		if data.Player and (data.Player.Class==60 or data.Player.Class==61 or data.Player.Class==62) then	
+		if data and data.Player and (data.Player.Class==60 or data.Player.Class==61 or data.Player.Class==62) then	
 			m1=SplitSkill(data.Player:GetSkill(const.Skills.Air))
 			m2=SplitSkill(data.Player:GetSkill(const.Skills.Earth))
 			m3=SplitSkill(data.Player:GetSkill(const.Skills.Fire))
