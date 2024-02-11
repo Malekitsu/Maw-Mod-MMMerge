@@ -315,7 +315,7 @@ function events.LoadMap()
 		--horizontal progression
 		if Game.freeProgression==false then
 			name=Game.MapStats[Map.MapStatsIndex].Name
-			mon.Level=math.min(base.Level*2.5-5,mon.Level)
+			mon.Level=math.max(math.min(base.Level*2.5-5,mon.Level),1)
 			if not horizontalMaps[name] then
 				horizontalMultiplier=2.5
 				extraBolster=extraBolster*horizontalMultiplier
