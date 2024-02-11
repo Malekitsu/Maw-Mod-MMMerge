@@ -664,12 +664,12 @@ function events.Tick()
 		mindRes=Party[i]:GetResistance(14)
 		bodyRes=Party[i]:GetResistance(15)
 		lvl=math.min(Party[i].LevelBase/1.6,125)
-		fireRes=100-math.round(calcMawDamage(Party[i],0,10000))/100
-		airRes=100-math.round(calcMawDamage(Party[i],1,10000))/100
-		waterRes=100-math.round(calcMawDamage(Party[i],2,10000))/100
-		earthRes=100-math.round(calcMawDamage(Party[i],3,10000))/100
-		mindRes=100-math.round(calcMawDamage(Party[i],7,10000))/100
-		bodyRes=100-math.round(calcMawDamage(Party[i],8,10000))/100
+		fireRes=100-math.max(math.round(calcMawDamage(Party[i],0,10000))/100, 0)
+		airRes=100-math.max(math.round(calcMawDamage(Party[i],1,10000))/100, 0)
+		waterRes=100-math.max(math.round(calcMawDamage(Party[i],2,10000))/100, 0)
+		earthRes=100-math.max(math.round(calcMawDamage(Party[i],3,10000))/100, 0)
+		mindRes=100-math.max(math.round(calcMawDamage(Party[i],7,10000))/100, 0)
+		bodyRes=100-math.max(math.round(calcMawDamage(Party[i],8,10000))/100, 0)
 		--[[calculate new resistances
 		fireRes=math.round((100-100/2^(fireRes/(75+lvl/1.6)))*100)/100
 		airRes=math.round((100-100/2^(airRes/(75+lvl/1.6)))*100)/100
