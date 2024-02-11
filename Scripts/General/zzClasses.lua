@@ -747,13 +747,13 @@ function events.GameInitialized2()
 
 	function events.CalcDamageToPlayer(t)
 		if (t.Player.Class==59 or t.Player.Class==60 or t.Player.Class==61) and t.Player.Unconscious==0 and t.Player.Dead==0 and t.Player.Eradicated==0  then
-			m1=SplitSkill(data.Player:GetSkill(const.Skills.Air))
-			m2=SplitSkill(data.Player:GetSkill(const.Skills.Earth))
-			m3=SplitSkill(data.Player:GetSkill(const.Skills.Fire))
-			m4=SplitSkill(data.Player:GetSkill(const.Skills.Water))
-			m5=SplitSkill(data.Player:GetSkill(const.Skills.Spirit))
-			m6=SplitSkill(data.Player:GetSkill(const.Skills.Body))
-			m7=SplitSkill(data.Player:GetSkill(const.Skills.Mind))
+			m1=SplitSkill(t.Player:GetSkill(const.Skills.Air))
+			m2=SplitSkill(t.Player:GetSkill(const.Skills.Earth))
+			m3=SplitSkill(t.Player:GetSkill(const.Skills.Fire))
+			m4=SplitSkill(t.Player:GetSkill(const.Skills.Water))
+			m5=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
+			m6=SplitSkill(t.Player:GetSkill(const.Skills.Body))
+			m7=SplitSkill(t.Player:GetSkill(const.Skills.Mind))
 			m8=m2+m3+m4+m5+m1+m6+m7
 			mult=(Game.BolsterAmount/100)
 			t.Result=math.max(t.Result*0.99^(m1+m8/7)-m4^1.33*mult,0)
@@ -789,4 +789,3 @@ function events.GameInitialized2()
 		end
 	end
 end
-
