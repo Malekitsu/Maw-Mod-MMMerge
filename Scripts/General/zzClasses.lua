@@ -747,10 +747,16 @@ function events.GameInitialized2()
 
 	function events.CalcDamageToPlayer(t)
 		if (t.Player.Class==59 or t.Player.Class==60 or t.Player.Class==61) and t.Player.Unconscious==0 and t.Player.Dead==0 and t.Player.Eradicated==0  then
-			m1=SplitSkill(t.Player:GetSkill(const.Skills.Air))
-			m4=SplitSkill(t.Player:GetSkill(const.Skills.Water))
+			m1=SplitSkill(data.Player:GetSkill(const.Skills.Air))
+			m2=SplitSkill(data.Player:GetSkill(const.Skills.Earth))
+			m3=SplitSkill(data.Player:GetSkill(const.Skills.Fire))
+			m4=SplitSkill(data.Player:GetSkill(const.Skills.Water))
+			m5=SplitSkill(data.Player:GetSkill(const.Skills.Spirit))
+			m6=SplitSkill(data.Player:GetSkill(const.Skills.Body))
+			m7=SplitSkill(data.Player:GetSkill(const.Skills.Mind))
+			m8=m2+m3+m4+m5+m1+m6+m7
 			mult=(Game.BolsterAmount/100)
-			t.Result=math.max(t.Result*0.99^m1-m4^1.25*mult,0)
+			t.Result=math.max(t.Result*0.99^(m1+m8/7)-m4^1.33,0)
 		end
 	end
 	
@@ -761,8 +767,8 @@ function events.GameInitialized2()
 			m6=SplitSkill(data.Player:GetSkill(const.Skills.Body))
 			m7=SplitSkill(data.Player:GetSkill(const.Skills.Mind))
 			data.Player.SP=math.min(data.Player.SP+m7, data.Player:GetFullSP())
-			data.Player.HP=math.min((data.Player.HP+m6)+(m2^0.4/250)/100*t.Result, data.Player:GetFullHP())
-			t.Result=t.Result*(1+m5/100)+math.max(t.Monster.HP*(m3^0.4/250),m3)
+			data.Player.HP=math.min((data.Player.HP+m6^1.33)+m2/100*t.Result, data.Player:GetFullHP())
+			t.Result=t.Result+math.max(t.Monster.HP*(m3^0.5/500),m3)
 		end
 	end
 	
@@ -778,7 +784,7 @@ function events.GameInitialized2()
 				m6=SplitSkill(t.Player:GetSkill(const.Skills.Body))
 				m7=SplitSkill(t.Player:GetSkill(const.Skills.Mind))
 				m8=m2+m3+m4+m5+m1+m6+m7
-				t.Result=t.Result+m8 --*(0.5+mastery/10)+mastery*2
+				t.Result=(t.Result+m8)*(1+m5/100) --*(0.5+mastery/10)+mastery*2
 			end
 		end
 	end
