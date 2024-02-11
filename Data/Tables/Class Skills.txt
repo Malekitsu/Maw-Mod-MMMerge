@@ -1,41 +1,41 @@
-	Archer	WarriorMage	MasterArcher	Sniper	Cleric	Priest	PriestLight	PriestDark	DarkElf	Patriarch	Dragon	GreatWyrm	Druid	GreatDruid	Warlock	ArchDruid	Knight	Cavalier	BlackKnight	Champion	Minotaur	MinotaurLord	Monk	Initiate	Master	Ninja	Paladin	Crusader	Hero	Villain	Ranger	Hunter	BountyHunter	RangerLord	Thief	Rogue	Assassin	Spy	Troll	WarTroll	Vampire	Nosferatu	Sorcerer	Wizard	Necromancer	Lich	ArchMage	Dark Archmage	Peasant	n/u	High Priest	Master Wizard	n/u	Seraphim	Angel	Archangel	Death Knight	Death Lord	Lich King
-Staff	E	M	M	M	B	B	B	B	-	-	-	-	E	M	M	M	E	E	G	G	M	M	M	M	G	G	E	M	M	M	E	E	E	E	-	-	-	-	M	G	E	M	M	M	M	M	M	M	-	-	B	M	M	E	E	E	-	-	-
-Sword	E	M	M	M	-	-	-	-	M	M	-	-	-	-	-	-	M	M	G	G	E	M	E	E	E	E	M	M	M	M	E	M	M	M	M	M	M	M	M	M	M	M	-	-	-	-	-	-	-	-	-	-	-	M	M	G	M	M	G
-Dagger	E	M	M	M	-	-	-	-	M	M	-	-	M	M	M	M	E	E	E	E	E	E	E	E	E	E	E	E	E	E	E	E	E	E	M	M	G	G	E	E	M	G	E	M	E	M	M	M	-	-	-	M	E	-	-	-	-	-	-
-Axe	E	M	M	M	-	-	-	-	-	-	-	-	-	-	-	-	E	E	M	M	M	G	-	-	-	-	E	M	M	M	E	M	G	G	-	-	-	-	M	M	E	E	-	-	-	-	-	-	-	-	-	-	-	E	E	E	M	M	G
-Spear	E	M	M	M	-	-	-	-	-	-	-	-	-	-	-	-	M	M	G	G	M	M	E	E	E	E	E	M	M	M	E	M	G	M	-	-	-	-	E	M	-	-	-	-	-	-	-	-	-	-	-	-	-	M	M	G	-	-	-
-Bow	M	M	G	G	E	M	M	M	M	G	-	-	E	E	E	E	E	E	M	M	E	E	B	B	B	B	E	E	E	E	M	M	G	G	E	M	M	M	E	M	B	B	B	B	B	B	B	B	B	B	M	B	B	E	E	E	E	E	E
-Mace	-	-	-	-	E	M	M	M	B	B	-	-	E	E	E	E	M	M	M	M	M	M	-	-	-	-	M	M	G	G	-	-	-	-	E	E	E	E	M	G	E	M	-	-	-	-	-	-	-	-	M	-	-	E	M	M	M	M	M
-Blaster	G	G	G	G	G	G	G	G	G	G	-	-	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	B	B	G	G	G	G	G	G	G	G	G
-Shield	-	-	-	-	E	M	M	M	E	E	-	-	E	E	E	E	M	M	G	G	-	-	-	-	-	-	M	M	G	G	E	E	E	E	B	B	B	B	E	E	M	M	-	-	-	-	-	-	-	-	M	-	-	M	M	M	-	-	-
-Leather	M	M	M	M	E	E	E	E	M	M	-	-	E	E	E	E	E	E	E	E	E	E	M	M	M	M	E	E	E	E	M	M	M	M	M	M	G	G	M	G	M	M	E	M	E	M	M	M	B	B	E	M	E	E	E	E	E	E	E
-Chain	M	M	G	G	E	E	M	M	M	G	-	-	-	-	-	-	M	M	M	M	M	G	-	-	-	-	M	M	M	M	M	M	M	M	E	E	E	E	E	E	E	E	-	-	-	-	-	-	-	-	M	-	-	M	M	M	M	M	M
-Plate	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	M	G	G	M	M	-	-	-	-	M	M	M	M	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	M	M	M	M	G
-Fire	E	M	G	G	-	-	-	-	E	M	-	-	E	M	G	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	E	E	M	M	E	M	M	M	-	-	-	-	E	M	M	G	G	G	-	-	-	G	G	-	-	-	-	-	-
-Air	E	M	G	G	-	-	-	-	E	M	-	-	E	M	G	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	E	E	M	M	E	M	M	M	-	-	-	-	E	M	M	G	G	G	-	-	-	G	G	-	-	-	-	-	-
-Water	E	M	G	G	-	-	-	-	E	M	-	-	E	M	G	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	E	E	M	M	E	M	M	M	-	-	-	-	E	M	M	G	G	G	-	-	-	G	G	-	-	-	E	M	G
-Earth	E	M	G	G	-	-	-	-	E	M	-	-	E	M	G	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	E	E	M	M	E	M	M	M	-	-	-	-	E	M	M	G	G	G	-	-	-	G	G	-	-	-	E	M	G
-Spirit	-	-	-	-	E	M	G	G	-	-	-	-	E	M	G	G	-	-	-	-	E	M	-	B	E	E	E	M	G	G	E	E	M	M	-	-	-	-	-	-	E	M	-	-	-	-	-	-	-	-	G	-	-	E	M	M	-	-	-
-Mind	-	-	-	-	E	M	G	G	-	-	-	-	E	M	G	G	-	-	-	-	E	M	-	B	E	E	E	M	G	G	E	E	M	M	-	-	-	-	-	-	E	M	-	-	-	-	-	-	-	-	G	-	-	E	M	M	-	-	-
-Body	-	-	-	-	E	M	G	G	-	-	-	-	E	M	G	G	-	-	-	-	E	M	-	B	E	E	E	M	M	M	E	E	M	M	-	-	-	-	-	-	E	M	-	-	-	-	-	-	-	-	G	-	-	E	M	M	-	-	-
-Light	-	-	M	-	-	-	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	G	-	-	-	M	M	M	M	M	G	-	-	-
-Dark	-	-	-	M	-	-	-	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	G	-	G	-	-	M	M	M	-	-	-	E	M	G
-DarkElfAbility	-	-	-	-	-	-	-	-	M	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
-VampireAbility	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
-DragonAbility	-	-	-	-	-	-	-	-	-	-	M	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
-IdentifyItem	M	M	G	G	-	-	-	-	M	M	M	G	E	E	E	E	B	E	E	E	-	-	E	M	M	M	E	M	M	M	B	B	E	E	M	M	G	G	-	-	E	E	M	M	M	G	G	M	-	-	-	M	M	E	E	E	E	M	M
-Merchant	E	E	E	E	M	M	G	G	M	G	E	E	E	E	E	E	E	E	E	E	E	E	-	-	-	-	E	E	E	E	M	M	M	M	M	M	M	M	B	B	E	E	B	B	B	B	B	B	-	-	G	B	B	M	M	G	E	E	E
-Repair	E	E	M	M	E	E	E	E	E	E	-	-	-	-	-	-	M	M	G	G	-	-	-	-	-	-	M	M	G	G	B	B	E	E	B	B	B	B	M	M	-	-	E	E	E	M	M	M	-	-	E	M	E	E	E	E	M	M	G
-Bodybuilding	E	M	M	M	B	E	E	E	E	E	M	M	B	B	B	B	M	M	M	M	M	M	M	M	G	G	M	M	M	M	E	M	M	M	E	E	E	E	M	G	E	M	B	B	B	B	B	B	B	-	E	B	-	E	M	M	M	M	M
-Meditation	E	M	M	M	M	M	M	M	E	M	M	M	M	M	G	G	-	-	-	-	E	M	-	-	-	-	E	E	M	M	E	M	M	M	E	M	M	M	-	-	B	E	M	M	M	M	M	G	-	-	M	M	M	E	M	M	-	-	-
-Perception	M	M	G	G	E	E	E	E	M	M	M	G	E	E	E	E	E	M	M	M	M	G	E	E	E	E	E	M	M	M	M	M	M	M	M	M	M	M	B	E	E	E	E	E	E	E	E	E	B	B	E	E	E	M	M	G	E	M	M
-Regeneration	-	-	-	-	-	-	-	-	-	-	E	E	-	-	-	-	-	-	-	-	B	E	B	E	E	E	-	-	-	-	-	-	-	-	-	-	-	-	M	G	E	M	-	-	-	E	-	-	-	-	-	-	-	-	-	-	B	E	E
-DisarmTraps	B	E	M	M	-	-	-	-	M	G	-	-	-	-	-	-	B	B	E	E	M	M	B	E	M	M	-	-	-	-	E	E	E	E	M	M	G	G	B	B	E	E	-	-	B	B	B	B	-	-	-	B	B	B	B	B	B	B	E
-Dodging	E	E	E	E	-	-	-	-	E	E	-	-	-	-	-	-	E	E	E	E	-	-	M	M	G	G	B	B	B	B	E	E	E	E	M	M	M	M	-	-	E	E	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
-Unarmed	B	B	B	B	-	-	-	-	-	-	-	-	-	-	-	-	E	E	E	E	E	E	M	M	G	G	B	B	B	B	B	B	B	B	E	E	E	E	E	E	B	B	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
-IdentifyMonster	-	-	-	-	M	G	G	G	-	-	M	M	E	E	E	E	E	E	E	E	-	-	E	E	E	E	-	-	-	-	M	M	G	G	-	-	-	-	E	E	M	G	M	M	M	M	M	M	-	-	E	M	M	-	-	-	E	E	E
-Armsmaster	E	E	M	M	E	E	E	E	E	E	-	-	B	B	B	B	M	M	G	G	-	-	M	M	M	M	E	M	M	M	E	E	E	E	M	M	M	M	M	M	E	M	-	-	-	-	-	-	-	-	B	-	-	-	-	-	M	M	G
-Stealing	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	B	B	E	E	-	-	-	-	E	E	E	E	M	M	G	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
-Alchemy	E	E	E	E	E	E	E	E	M	G	M	M	M	M	G	G	-	-	-	-	B	B	E	M	G	G	B	E	E	E	M	G	G	G	E	M	G	G	-	-	M	G	M	M	M	G	G	G	-	-	E	G	M	-	-	-	-	-	-
-Learning	M	M	M	M	M	M	M	M	E	M	M	G	M	M	M	M	M	M	G	G	E	M	M	M	G	G	E	M	M	M	E	M	M	M	E	M	M	M	E	M	M	M	M	M	M	M	M	M	B	B	M	M	M	E	M	M	M	M	M
-																																																											
+	Archer	WarriorMage	MasterArcher	Sniper	Cleric	Priest	PriestLight	PriestDark	DarkElf	Patriarch	Dragon	GreatWyrm	Druid	GreatDruid	Warlock	ArchDruid	Knight	Cavalier	BlackKnight	Champion	Minotaur	MinotaurLord	Monk	Initiate	Master	Ninja	Paladin	Crusader	Hero	Villain	Ranger	Hunter	BountyHunter	RangerLord	Thief	Rogue	Assassin	Spy	Troll	WarTroll	Vampire	Nosferatu	Sorcerer	Wizard	Necromancer	Lich	ArchMage	Dark Archmage	Peasant	n/u	High Priest	Master Wizard	n/u	Seraphim	Angel	Archangel	Death Knight	Death Lord	Lich King	Shaman	Kemet	Marabout
+Staff	E	M	M	M	B	B	B	B	-	-	-	-	E	M	M	M	E	E	G	G	M	M	M	M	G	G	E	M	M	M	E	E	E	E	-	-	-	-	M	G	E	M	M	M	M	M	M	M	-	-	B	M	M	E	E	E	-	-	-	E	M	M
+Sword	E	M	M	M	-	-	-	-	M	M	-	-	-	-	-	-	M	M	G	G	E	M	E	E	E	E	M	M	M	M	E	M	M	M	M	M	M	M	M	M	M	M	-	-	-	-	-	-	-	-	-	-	-	M	M	G	M	M	G	-	-	-
+Dagger	E	M	M	M	-	-	-	-	M	M	-	-	M	M	M	M	E	E	E	E	E	E	E	E	E	E	E	E	E	E	E	E	E	E	M	M	G	G	E	E	M	G	E	M	E	M	M	M	-	-	-	M	E	-	-	-	-	-	-	M	M	M
+Axe	E	M	M	M	-	-	-	-	-	-	-	-	-	-	-	-	E	E	M	M	M	G	-	-	-	-	E	M	M	M	E	M	G	G	-	-	-	-	M	M	E	E	-	-	-	-	-	-	-	-	-	-	-	E	E	E	M	M	G	-	-	-
+Spear	E	M	M	M	-	-	-	-	-	-	-	-	-	-	-	-	M	M	G	G	M	M	E	E	E	E	E	M	M	M	E	M	G	M	-	-	-	-	E	M	-	-	-	-	-	-	-	-	-	-	-	-	-	M	M	G	-	-	-	-	-	-
+Bow	M	M	G	G	E	M	M	M	M	G	-	-	E	E	E	E	E	E	M	M	E	E	B	B	B	B	E	E	E	E	M	M	G	G	E	M	M	M	E	M	B	B	B	B	B	B	B	B	B	B	M	B	B	E	E	E	E	E	E	E	E	E
+Mace	-	-	-	-	E	M	M	M	B	B	-	-	E	E	E	E	M	M	M	M	M	M	-	-	-	-	M	M	G	G	-	-	-	-	E	E	E	E	M	G	E	M	-	-	-	-	-	-	-	-	M	-	-	E	M	M	M	M	M	E	E	E
+Blaster	G	G	G	G	G	G	G	G	G	G	-	-	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	B	B	G	G	G	G	G	G	G	G	G	G	G	G
+Shield	-	-	-	-	E	M	M	M	E	E	-	-	E	E	E	E	M	M	G	G	-	-	-	-	-	-	M	M	G	G	E	E	E	E	B	B	B	B	E	E	M	M	-	-	-	-	-	-	-	-	M	-	-	M	M	M	-	-	-	E	E	E
+Leather	M	M	M	M	E	E	E	E	M	M	-	-	E	E	E	E	E	E	E	E	E	E	M	M	M	M	E	E	E	E	M	M	M	M	M	M	G	G	M	G	M	M	E	M	E	M	M	M	B	B	E	M	E	E	E	E	E	E	E	E	E	E
+Chain	M	M	G	G	E	E	M	M	M	G	-	-	-	-	-	-	M	M	M	M	M	G	-	-	-	-	M	M	M	M	M	M	M	M	E	E	E	E	E	E	E	E	-	-	-	-	-	-	-	-	M	-	-	M	M	M	M	M	M	-	-	-
+Plate	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	M	G	G	E	E	-	-	-	-	M	M	M	M	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	M	M	M	M	G	-	-	-
+Fire	E	M	G	G	-	-	-	-	E	M	-	-	E	M	G	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	E	E	M	M	E	M	M	M	-	-	-	-	E	M	M	G	G	G	-	-	-	G	G	-	-	-	-	-	-	E	M	G
+Air	E	M	G	G	-	-	-	-	E	M	-	-	E	M	G	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	E	E	M	M	E	M	M	M	-	-	-	-	E	M	M	G	G	G	-	-	-	G	G	-	-	-	-	-	-	E	M	G
+Water	E	M	G	G	-	-	-	-	E	M	-	-	E	M	G	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	E	E	M	M	E	M	M	M	-	-	-	-	E	M	M	G	G	G	-	-	-	G	G	-	-	-	E	M	G	E	M	G
+Earth	E	M	G	G	-	-	-	-	E	M	-	-	E	M	G	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	E	E	M	M	E	M	M	M	-	-	-	-	E	M	M	G	G	G	-	-	-	G	G	-	-	-	E	M	G	E	M	G
+Spirit	-	-	-	-	E	M	G	G	-	-	-	-	E	M	G	G	-	-	-	-	E	M	-	B	E	E	E	M	G	G	E	E	M	M	-	-	-	-	-	-	E	M	-	-	-	-	-	-	-	-	G	-	-	E	M	M	-	-	-	E	M	G
+Mind	-	-	-	-	E	M	G	G	-	-	-	-	E	M	G	G	-	-	-	-	E	M	-	B	E	E	E	M	G	G	E	E	M	M	-	-	-	-	-	-	E	M	-	-	-	-	-	-	-	-	G	-	-	E	M	M	-	-	-	E	M	G
+Body	-	-	-	-	E	M	G	G	-	-	-	-	E	M	G	G	-	-	-	-	E	M	-	B	E	E	E	M	M	M	E	E	M	M	-	-	-	-	-	-	E	M	-	-	-	-	-	-	-	-	G	-	-	E	M	M	-	-	-	E	M	G
+Light	-	-	M	-	-	-	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	G	-	-	-	M	M	M	M	M	G	-	-	-	-	-	-
+Dark	-	-	-	M	-	-	-	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	G	-	G	-	-	M	M	M	-	-	-	E	M	G	-	-	-
+DarkElfAbility	-	-	-	-	-	-	-	-	M	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+VampireAbility	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+DragonAbility	-	-	-	-	-	-	-	-	-	-	M	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+IdentifyItem	M	M	G	G	-	-	-	-	M	M	M	G	E	E	E	E	B	E	E	E	-	-	E	M	M	M	E	M	M	M	B	B	E	E	M	M	G	G	-	-	E	E	M	M	M	G	G	M	-	-	-	M	M	E	E	E	E	M	M	E	E	E
+Merchant	E	E	E	E	M	M	G	G	M	G	E	E	E	E	E	E	E	E	E	E	E	E	-	-	-	-	E	E	E	E	M	M	M	M	M	M	M	M	B	B	E	E	B	B	B	B	B	B	-	-	G	B	B	M	M	G	E	E	E	E	E	E
+Repair	E	E	M	M	E	E	E	E	E	E	-	-	-	-	-	-	M	M	G	G	-	-	-	-	-	-	M	M	G	G	B	B	E	E	B	B	B	B	M	M	-	-	E	E	E	M	M	M	-	-	E	M	E	E	E	E	M	M	G	-	-	-
+Bodybuilding	E	M	M	M	B	E	E	E	E	E	M	M	B	B	B	B	M	M	M	M	M	M	M	M	G	G	M	M	M	M	E	M	M	M	E	E	E	E	M	G	E	M	B	B	B	B	B	B	B	-	E	B	-	E	M	M	M	M	M	B	B	B
+Meditation	E	M	M	M	M	M	M	M	E	M	M	M	M	M	G	G	-	-	-	-	E	M	-	-	-	-	E	E	M	M	E	M	M	M	E	M	M	M	-	-	B	E	M	M	M	M	M	G	-	-	M	M	M	E	M	M	-	-	-	M	M	G
+Perception	M	M	G	G	E	E	E	E	M	M	M	G	E	E	E	E	E	M	M	M	M	G	E	E	E	E	E	M	M	M	M	M	M	M	M	M	M	M	B	E	E	E	E	E	E	E	E	E	B	B	E	E	E	M	M	G	E	M	M	E	E	E
+Regeneration	-	-	-	-	-	-	-	-	-	-	E	E	-	-	-	-	-	-	-	-	B	E	B	E	E	E	-	-	-	-	-	-	-	-	-	-	-	-	M	G	E	M	-	-	-	E	-	-	-	-	-	-	-	-	-	-	B	E	E	-	-	-
+DisarmTraps	B	E	M	M	-	-	-	-	M	G	-	-	-	-	-	-	B	B	E	E	M	M	B	E	M	M	-	-	-	-	E	E	E	E	M	M	G	G	B	B	E	E	-	-	B	B	B	B	-	-	-	B	B	B	B	B	B	B	E	-	-	-
+Dodging	E	E	E	E	-	-	-	-	E	E	-	-	-	-	-	-	E	E	E	E	-	-	M	M	G	G	B	B	B	B	E	E	E	E	M	M	M	M	-	-	E	E	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+Unarmed	B	B	B	B	-	-	-	-	-	-	-	-	-	-	-	-	E	E	E	E	E	E	M	M	G	G	B	B	B	B	B	B	B	B	E	E	E	E	E	E	B	B	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+IdentifyMonster	-	-	-	-	M	G	G	G	-	-	M	M	E	E	E	E	E	E	E	E	-	-	E	E	E	E	-	-	-	-	M	M	G	G	-	-	-	-	E	E	M	G	M	M	M	M	M	M	-	-	E	M	M	-	-	-	E	E	E	E	E	E
+Armsmaster	E	E	M	M	E	E	E	E	E	E	-	-	B	B	B	B	M	M	G	G	-	-	M	M	M	M	E	M	M	M	E	E	E	E	M	M	M	M	M	M	E	M	-	-	-	-	-	-	-	-	B	-	-	-	-	-	M	M	G	B	B	B
+Stealing	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	B	B	E	E	-	-	-	-	E	E	E	E	M	M	G	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+Alchemy	E	E	E	E	E	E	E	E	M	G	M	M	M	M	G	G	-	-	-	-	B	B	M	M	G	G	B	E	E	E	M	G	G	G	M	M	G	G	-	-	M	G	M	M	M	G	G	G	-	-	E	G	M	-	-	-	-	-	-	M	M	G
+Learning	M	M	M	M	M	M	M	M	E	M	M	G	M	M	M	M	M	M	G	G	E	M	M	M	G	G	E	M	M	M	E	M	M	M	E	M	M	M	E	M	M	M	M	M	M	M	M	M	B	B	M	M	M	E	M	M	M	M	M	M	M	M
+																																																														

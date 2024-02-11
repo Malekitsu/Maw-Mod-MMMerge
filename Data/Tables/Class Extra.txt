@@ -58,3 +58,6 @@
 56	18	0	Death Knight
 57	18	1	Death Lord
 58	18	2	Lich King
+59	19	0	Shaman
+60	19	1	Kemet
+61	19	2	Marabout
