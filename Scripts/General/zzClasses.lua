@@ -36,7 +36,9 @@ promotionList={
 --Seraphim
 [17]=	{1648,1649,		1609,1610,1611,1612,	1546,31},--cleric
 --DK
-[18]=	{1645,1646,		1568,1569,1570,1571,	1540,1541},
+[18]=	{1645,1646,		1568,1569,1570,1571,	1540,1541},--same as knight
+--SHAMAN
+[19]=	{1651,1652,		1615,1616,1617,1618,	1546,31}, --same as druid
 }
 
 function events.GameInitialized2()
@@ -283,8 +285,9 @@ end
 
 
 
-
+----------------------------------
 -- DRAGON REWORK
+----------------------------------
 local dragonFang={
 	["Attack"]={2,3,4,5,[0]=0},
 	["Damage"]={4,5,6,8,[0]=0},
@@ -708,3 +711,76 @@ function events.GetMaxSkillLevel(t)
 		end
 	end
 end
+
+
+---------------------------------------
+--SHAMAN
+---------------------------------------
+function events.HealingSpellPower(t)
+	if (t.Caster.Class==59 or t.Caster.Class==60 or t.Caster.Class==61) then	
+		m1=SplitSkill(t.Caster:GetSkill(const.Skills.Air))
+		m2=SplitSkill(t.Caster:GetSkill(const.Skills.Earth))
+		m3=SplitSkill(t.Caster:GetSkill(const.Skills.Fire))
+		m4=SplitSkill(t.Caster:GetSkill(const.Skills.Water))
+		m5=SplitSkill(t.Caster:GetSkill(const.Skills.Spirit))
+		m6=SplitSkill(t.Caster:GetSkill(const.Skills.Body))
+		m7=SplitSkill(t.Caster:GetSkill(const.Skills.Mind))
+		m8=m2+m3+m4+m5+m1+m6+m7
+		t.Result =t.Result+t.Result*m8/200
+	end
+end
+function events.GameInitialized2()
+	function events.CalcSpellDamage(t)
+		local data = WhoHitMonster()
+		if data.Player and (data.Player.Class==60 or data.Player.Class==61 or data.Player.Class==62) then	
+			m1=SplitSkill(data.Player:GetSkill(const.Skills.Air))
+			m2=SplitSkill(data.Player:GetSkill(const.Skills.Earth))
+			m3=SplitSkill(data.Player:GetSkill(const.Skills.Fire))
+			m4=SplitSkill(data.Player:GetSkill(const.Skills.Water))
+			m5=SplitSkill(data.Player:GetSkill(const.Skills.Spirit))
+			m6=SplitSkill(data.Player:GetSkill(const.Skills.Body))
+			m7=SplitSkill(data.Player:GetSkill(const.Skills.Mind))
+			m8=m2+m3+m4+m5+m1+m6+m7
+			t.Result =t.Result+t.Result*m8/200
+		end
+	end
+
+	function events.CalcDamageToPlayer(t)
+		if (t.Player.Class==59 or t.Player.Class==60 or t.Player.Class==61) and t.Player.Unconscious==0 and t.Player.Dead==0 and t.Player.Eradicated==0  then
+			m1=SplitSkill(t.Player:GetSkill(const.Skills.Air))
+			m4=SplitSkill(t.Player:GetSkill(const.Skills.Water))
+			mult=(Game.BolsterAmount/100)
+			t.Result=math.max(t.Result*0.99^m1-m4^1.25*mult,0)
+		end
+	end
+	
+	function events.CalcDamageToMonster(t)	
+		local data = WhoHitMonster()
+		if data and data.Player and (data.Player.Class==59 or data.Player.Class==60 or data.Player.Class==61) and t.DamageKind==0 and data.Object==nil then	
+			m2=SplitSkill(data.Player:GetSkill(const.Skills.Earth))
+			m6=SplitSkill(data.Player:GetSkill(const.Skills.Body))
+			m7=SplitSkill(data.Player:GetSkill(const.Skills.Mind))
+			data.Player.SP=math.min(data.Player.SP+m7, data.Player:GetFullSP())
+			data.Player.HP=math.min((data.Player.HP+m6)+(m2^0.4/250)/100*t.Result, data.Player:GetFullHP())
+			t.Result=t.Result*(1+m5/100)+math.max(t.Monster.HP*(m3^0.4/250),m3)
+		end
+	end
+	
+	function events.CalcStatBonusBySkills(t)
+		if t.Stat==const.Stats.MeleeDamageBase then
+			if t.Player.Class==59 or t.Player.Class==60 or t.Player.Class==61 then	
+				--mastery=SplitSkill(t.Player:GetSkill(const.Skills.Thievery))
+				m1=SplitSkill(t.Player:GetSkill(const.Skills.Air))
+				m2=SplitSkill(t.Player:GetSkill(const.Skills.Earth))
+				m3=SplitSkill(t.Player:GetSkill(const.Skills.Fire))
+				m4=SplitSkill(t.Player:GetSkill(const.Skills.Water))
+				m5=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
+				m6=SplitSkill(t.Player:GetSkill(const.Skills.Body))
+				m7=SplitSkill(t.Player:GetSkill(const.Skills.Mind))
+				m8=m2+m3+m4+m5+m1+m6+m7
+				t.Result=t.Result+m8 --*(0.5+mastery/10)+mastery*2
+			end
+		end
+	end
+end
+
