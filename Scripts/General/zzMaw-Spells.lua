@@ -1676,111 +1676,77 @@ end
 ----------------------------------------
 --CC REWORK
 ----------------------------------------
+CCMAP={
+	[const.Spells.Slow]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["DamageKind"]=const.Damage.Earth,["Debuff"]=const.MonsterBuff.Slow},
+	[60]=					{["Duration"]=const.Minute*6, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--Mind Charm, has no const value, due to dark elf one overwriting
+	[const.Spells.Charm]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--dark elf one
+	[const.Spells.Berserk]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Berserk},
+	[const.Spells.MassFear]={["Duration"]=const.Minute*6, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Fear},
+	[const.Spells.Enslave]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Enslave},
+	[const.Spells.Paralyze]={["Duration"]=const.Minute*6, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["DamageKind"]=const.Damage.Light,["Debuff"]=const.MonsterBuff.Paralyze},	
+[const.Spells.ShrinkingRay]={["Duration"]=const.Minute*6, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["DamageKind"]=const.Damage.Dark,["Debuff"]=const.MonsterBuff.ShrinkingRay},
+[const.Spells.DarkGrasp]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["DamageKind"]=const.Damage.Mind, ["Debuff"]={const.MonsterBuff.ArmorHalved, const.MonsterBuff.Slow, const.MonsterBuff.DamageHalved, const.MonsterBuff.MeleeOnly}},																									
+}
+
+function events.Action(t)
+	local id=Game.CurrentPlayer
+	for key, value in pairs(CCMAP) do
+		local lvl=Party[id].LevelBase
+		local baseCost=value.BaseCost
+		local cost=math.round(baseCost+(lvl/5)) --edit here to change mana cost
+		
+		Game.Spells[key]["SpellPointsNormal"]=cost
+		Game.Spells[key]["SpellPointsExpert"]=cost
+		Game.Spells[key]["SpellPointsMaster"]=cost
+		Game.Spells[key]["SpellPointsGM"]=cost
+	end
+end
 
 function events.PlayerCastSpell(t)
-	if t.SpellId==35 then
-		--t.Handled=true
-		t.Player.SP=t.Player.SP-2
+	if CCMAP[t.SpellId] then
+		local resistance={}
+		local level={}
+		local cc=CCMAP[t.SpellId]
+		for i=0,Map.Monsters.High do
+			local mon=Map.Monsters[i]
+			local res=mon.Resistances[cc.DamageKind]
+			local lvl=mon.Level
+				resistance[i]=res
+				level[i]=lvl
+			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Earth))
+			local newLevel=calcEffectChance(lvl, res, s)
+			mon.Resistances[3]=0
+			mon.Level=newLevel
+		end
 		function events.Tick() 
 			events.Remove("Tick", 1)
-			mawCC(t.SpellId,t.TargetId,t.Skill,t.Mastery)
-		end
-		t.Skill=0
-	end
-	if t.SpellId==62 then
-		--t.Handled=true
-		t.Player.SP=t.Player.SP-10
-		function events.Tick() 
-			events.Remove("Tick", 1)
-			mawCC(t.SpellId,t.TargetId,t.Skill,t.Mastery)
-		end
-		t.Skill=0
-	end
-	if t.SpellId==66 then
-		--t.Handled=true
-		t.Player.SP=t.Player.SP-30
-		function events.Tick() 
-			events.Remove("Tick", 1)
-			mawCC(t.SpellId,t.TargetId,t.Skill,t.Mastery)
-		end
-		t.Skill=0
-	end
-	if t.SpellId==81 then
-		--t.Handled=true
-		t.Player.SP=t.Player.SP-15
-		function events.Tick() 
-			events.Remove("Tick", 1)
-			mawCC(t.SpellId,t.TargetId,t.Skill,t.Mastery)
-		end
-		t.Skill=0
-	end
-	
-end
-
-function mawCC(spell, id, skill, mastery)
-	if spell==35 then
-		local mon=Map.Monsters[id]
-		local res=mon.Resistances[3]
-		local hitChance=(30)/(30+mon.Level/4+res) * (1+skill*2/100)
-		local debuff=mon.SpellBuffs[const.MonsterBuff.Slow]
-		if math.random()<hitChance then --success
-			debuff.ExpireTime=Game.Time+const.Minute*4
-			Game.ShowStatusText("Berseked")
-		elseif debuff.ExpireTime>Game.Time+const.Minute*4 then
-			debuff.ExpireTime=0
-		end
-	end
-	if spell==62 then
-		local mon=Map.Monsters[id]
-		local res=mon.Resistances[7]
-		local hitChance=(30)/(30+mon.Level/4+res) * (1+skill*2/100)
-		local debuff=mon.SpellBuffs[const.MonsterBuff.Berserk]
-		if math.random()<hitChance then --success
-			debuff.ExpireTime=Game.Time+const.Minute*1
-			Game.ShowStatusText("Berseked")
-		elseif debuff.ExpireTime>Game.Time+const.Minute*1 then
-			debuff.ExpireTime=0
-		end
-	end
-	if spell==66 then
-		local mon=Map.Monsters[id]
-		local res=mon.Resistances[7]
-		local hitChance=(30)/(30+mon.Level/4+res) * (1+skill*2/100)
-		local debuff=mon.SpellBuffs[const.MonsterBuff.Enslave]
-		if math.random()<hitChance then --success
-			debuff.ExpireTime=Game.Time+const.Minute*3
-			Game.ShowStatusText("Enslaved")
-		elseif debuff.ExpireTime>Game.Time+const.Minute*3 then
-			debuff.ExpireTime=0
-		end
-	end
-	if spell==81 then
-		local mon=Map.Monsters[id]
-		local res=mon.Resistances[9]
-		local hitChance=(30)/(30+mon.Level/4+res) * (1+skill*2/100)
-		local debuff=mon.SpellBuffs[const.MonsterBuff.Paralyze]
-		if math.random()<hitChance then --success
-			debuff.ExpireTime=Game.Time+const.Minute*3
-			if mon.Velocity>0 then
-				local back=mon.Velocity
-				mon.VelocityX=0
-				mon.VelocityY=0
-				mon.VelocityZ=0
-				mon.Velocity=0
-				local timer=debuff.ExpireTime
-				function events.Tick()
-					if timer<Game.Time then
-						events.Remove("Tick", 1)
-						mon.Velocity=back
+			for i=0,Map.Monsters.High do
+				local mon=Map.Monsters[i]
+				mon.Level=level[i]
+				mon.Resistances[cc.DamageKind]=resistance[i]
+				if type(cc.Debuff)=="table" then
+					for key,value in pairs(cc.Debuff) do 
+						local debuff=mon.SpellBuffs[value]
+						debuff.ExpireTime=math.min(debuff.ExpireTime, Game.Time+cc.Duration)
 					end
+				else
+					local debuff=mon.SpellBuffs[cc.Debuff]
+					debuff.ExpireTime=math.min(debuff.ExpireTime, Game.Time+cc.Duration)
 				end
 			end
-			Game.ShowStatusText("Paralyzed")
-		elseif debuff.ExpireTime>Game.Time+const.Minute*3 then
-			debuff.ExpireTime=0
 		end
 	end
 end
+
+function calcEffectChance(lvl, res, skill)
+	totRes=lvl/4+res
+	mult=(1+skill*0.02)
+	newRes=(totRes+30)/mult-30
+	newLevel=math.max(math.round(newRes*4),0)
+	return newLevel
+end
+
+
 --[[
 mass fear; 40 mana , 6 secs, skill/2 first cast
 slow 12 sec duration, skill first cast
