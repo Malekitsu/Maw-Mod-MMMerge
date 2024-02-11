@@ -1677,15 +1677,15 @@ end
 --CC REWORK
 ----------------------------------------
 CCMAP={
-	[const.Spells.Slow]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["DamageKind"]=const.Damage.Earth,["Debuff"]=const.MonsterBuff.Slow},
-	[60]=					{["Duration"]=const.Minute*6, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--Mind Charm, has no const value, due to dark elf one overwriting
-	[const.Spells.Charm]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--dark elf one
-	[const.Spells.Berserk]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Berserk},
-	[const.Spells.MassFear]={["Duration"]=const.Minute*6, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Fear},
-	[const.Spells.Enslave]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Enslave},
-	[const.Spells.Paralyze]={["Duration"]=const.Minute*6, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["DamageKind"]=const.Damage.Light,["Debuff"]=const.MonsterBuff.Paralyze},	
-[const.Spells.ShrinkingRay]={["Duration"]=const.Minute*6, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["DamageKind"]=const.Damage.Dark,["Debuff"]=const.MonsterBuff.ShrinkingRay},
-[const.Spells.DarkGrasp]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["DamageKind"]=const.Damage.Mind, ["Debuff"]={const.MonsterBuff.ArmorHalved, const.MonsterBuff.Slow, const.MonsterBuff.DamageHalved, const.MonsterBuff.MeleeOnly}},																									
+	[const.Spells.Slow]=	{["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Earth, ["DamageKind"]=const.Damage.Earth,["Debuff"]=const.MonsterBuff.Slow},
+	[60]=					{["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--Mind Charm, has no const value, due to dark elf one overwriting
+	[const.Spells.Charm]=	{["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.DarkElfAbility, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--dark elf one
+	[const.Spells.Berserk]=	{["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Berserk},
+	[const.Spells.MassFear]={["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Fear},
+	[const.Spells.Enslave]=	{["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Enslave},
+	[const.Spells.Paralyze]={["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Light, ["DamageKind"]=const.Damage.Light,["Debuff"]=const.MonsterBuff.Paralyze},	
+[const.Spells.ShrinkingRay]={["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark,["Debuff"]=const.MonsterBuff.ShrinkingRay},
+[const.Spells.DarkGrasp]=	{["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]={const.MonsterBuff.ArmorHalved, const.MonsterBuff.Slow, const.MonsterBuff.DamageHalved, const.MonsterBuff.MeleeOnly}},																									
 }
 
 function events.Action(t)
@@ -1714,20 +1714,27 @@ function events.PlayerCastSpell(t)
 			local lvl=mon.Level
 				resistance[i]=res
 				level[i]=lvl
-			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Earth))
-			local newLevel=calcEffectChance(lvl, res, s)
+			local s,m=SplitSkill(t.Player:GetSkill(cc.School))
+			local newLevel=calcEffectChance(lvl, res, s, cc.ChanceMult)
 			mon.Resistances[3]=0
 			mon.Level=newLevel
 		end
+		local reset=1
+		if cc.DamageKind==const.Damage.Dark then
+			reset=100
+		end
 		function events.Tick() 
-			events.Remove("Tick", 1)
+			reset=reset-1
+			if reset==0 then
+				events.Remove("Tick", 1)
+			end
 			for i=0,Map.Monsters.High do
 				local mon=Map.Monsters[i]
 				mon.Level=level[i]
 				mon.Resistances[cc.DamageKind]=resistance[i]
 				if type(cc.Debuff)=="table" then
-					for key,value in pairs(cc.Debuff) do 
-						local debuff=mon.SpellBuffs[value]
+					for v =1,4 do 
+						local debuff=mon.SpellBuffs[cc.Debuff[v]]
 						debuff.ExpireTime=math.min(debuff.ExpireTime, Game.Time+cc.Duration)
 					end
 				else
@@ -1739,9 +1746,9 @@ function events.PlayerCastSpell(t)
 	end
 end
 
-function calcEffectChance(lvl, res, skill)
+function calcEffectChance(lvl, res, skill, chance)
 	totRes=lvl/4+res
-	mult=(1+skill*0.02)
+	mult=(1+skill*chance)
 	newRes=(totRes+30)/mult-30
 	newLevel=math.max(math.round(newRes*4),0)
 	return newLevel
