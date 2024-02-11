@@ -462,7 +462,7 @@ function events.LoadMap()
 		mon=Game.MonstersTxt[i]
 		if mon.Spell==97 then
 			s,m=SplitSkill(mon.SpellSkill)
-			mon.SpellSkill=JoinSkill(math.ceil(s/2), m)
+			mon.SpellSkill=JoinSkill(math.ceil(s/1.5), m)
 		elseif mon.Spell==93 then
 			s,m=SplitSkill(mon.SpellSkill)
 			mon.SpellSkill=JoinSkill(math.ceil(s/1.5), m)
