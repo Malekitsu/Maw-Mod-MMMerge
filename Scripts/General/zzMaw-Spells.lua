@@ -828,6 +828,7 @@ function events.Action(t)
 	if t.Action==25 and autoTargetHeals then
 		local pl=Party[Game.CurrentPlayer]
 		if pl.QuickSpell==68 and pl.RecoveryDelay==0 then
+			local sp=healingSpells[68]
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
 			local cost=Game.Spells[68]["SpellPoints" .. masteryName[m]]
 			if pl.SP<cost then return end
@@ -837,7 +838,7 @@ function events.Action(t)
 			local intBonus=pl:GetIntellect()/1000
 			local statBonus=math.max(persBonus,intBonus)
 			local crit=pl:GetLuck()/1500+0.05
-			local baseHeal=lesserHealBase[m]+lesserHealScaling[m]*s
+			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
 			local totHeal=baseHeal*(statBonus+1)
 			local roll=math.random()
 			local gotCrit=false
@@ -883,6 +884,7 @@ function events.Action(t)
 			pl:SetRecoveryDelay(delay)
 			pl.Expression=40
 		elseif pl.QuickSpell==74 and pl.RecoveryDelay==0 then
+			local sp=healingSpells[74]
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
 			local cost=Game.Spells[74]["SpellPoints" .. masteryName[m]]
 			if pl.SP<cost then return end
@@ -892,7 +894,7 @@ function events.Action(t)
 			local intBonus=pl:GetIntellect()/1000
 			local statBonus=math.max(persBonus,intBonus)
 			local crit=pl:GetLuck()/1500+0.05
-			local baseHeal=greaterHealBase[m]+greaterHealScaling[m]*s
+			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
 			local totHeal=baseHeal*(statBonus+1)
 			local roll=math.random()
 			local gotCrit=false
@@ -941,6 +943,7 @@ function events.Action(t)
 			pl:SetRecoveryDelay(delay)
 			pl.Expression=40
 		elseif pl.QuickSpell==49 and pl.RecoveryDelay==0 then
+			local sp=healingSpells[49]
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Spirit))
 			local cost=Game.Spells[49]["SpellPoints" .. masteryName[m]]
 			if pl.SP<cost then return end
@@ -950,7 +953,7 @@ function events.Action(t)
 			local intBonus=pl:GetIntellect()/1000
 			local statBonus=math.max(persBonus,intBonus)
 			local crit=pl:GetLuck()/1500+0.05
-			local baseHeal=greaterHealBase[m]+greaterHealScaling[m]*s
+			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
 			local totHeal=baseHeal*(statBonus+1)
 			local roll=math.random()
 			local gotCrit=false
