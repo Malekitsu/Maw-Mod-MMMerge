@@ -1214,7 +1214,7 @@ function ascendSpellDamage(skill, mastery, spell)
 	diceMax=spellPowers[spell].diceMax
 	damageAdd=spellPowers[spell].dmgAdd
 	local ascensionLevel=math.min(math.floor(skill/11),2)
-	spelltier=spell%11
+	local spelltier=spell%11
 	if spelltier==0 then 
 		spelltier=11
 	end
@@ -1297,14 +1297,19 @@ function events.Action(t)
 			lastLevel=level
 			s,m = SplitSkill(level)
 			for _, num in ipairs(spells) do 
-				if num%11==0 then
-					tier=11
-				else
-					tier=num%11
+				local ascensionLevel=math.min(math.floor(s/11),2)
+				local spelltier=num%11
+				if spelltier==0 then 
+					spelltier=11
 				end
-				if s>=tier then
+				if ascensionLevel>=33 then
+					ascensionLevel=3
+				elseif spelltier<=ascensionLevel%11  then
+					ascensionLevel=ascensionLevel+1
+				end
+				if s>=spelltier then
 					for i=1,4 do
-						Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+0.5*s)*(1-0.1*m)
+						Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+0.15*ascensionLevel*s)*(1-0.1*m)
 					end
 					if num==44 then	
 						Game.Spells[num]["SpellPointsGM"]=Party[index].LevelBase^1.6/12.5
