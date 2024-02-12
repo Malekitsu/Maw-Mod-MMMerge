@@ -32,7 +32,7 @@ end
 --grayface fix treasure code
 function events.PickCorpse(t)
 	if Game.BolsterAmount~=300 then return end
-	Game.RandSeed=mapvars.MonsterSeed[t.MonsterIndex]
+		Game.RandSeed=mapvars.MonsterSeed[t.MonsterIndex]
 	function events.Tick() 
 		events.Remove("Tick", 1)
 		mapvars.MonsterSeed[t.MonsterIndex]=Game.RandSeed
@@ -1457,51 +1457,51 @@ function events.BuildItemInformationBox(t)
 	if t.Description then
 		if Game.CurrentPlayer==-1 then return end
 		if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then 
-			i=Game.CurrentPlayer
+			local i=Game.CurrentPlayer
 			--get spell and its damage
-			spellIndex=Party[i].QuickSpell
-			
+			local spellIndex=Party[i].QuickSpell
+			local pl=Party[i]
 			--if not an offensive spell then calculate highest between melee and ranged
 			if not spellPowers[spellIndex] then 
 				--MELEE
-				low=Party[i]:GetMeleeDamageMin()
-				high=Party[i]:GetMeleeDamageMax()
-				might=Party[i]:GetMight()
-				accuracy=Party[i]:GetAccuracy()
-				luck=Party[i]:GetLuck()
-				delay=math.max(Party[i]:GetAttackDelay())
+				low=pl:GetMeleeDamageMin()
+				high=pl:GetMeleeDamageMax()
+				might=pl:GetMight()
+				accuracy=pl:GetAccuracy()
+				luck=pl:GetLuck()
+				delay=math.max(pl:GetAttackDelay())
 				dmg=(low+high)/2
 				--hit chance
-				atk=Party[i]:GetMeleeAttack()
-				lvl=Party[i].LevelBase
+				atk=pl:GetMeleeAttack()
+				lvl=pl.LevelBase
 				hitChance= (15+atk*2)/(30+atk*2+lvl)
 				daggerCritBonus=0
 				for v=0,1 do
-					if Party[i]:GetActiveItem(v) then
-						itSkill=Party[i]:GetActiveItem(v):T().Skill
+					if pl:GetActiveItem(v) then
+						itSkill=pl:GetActiveItem(v):T().Skill
 						if itSkill==2 then
-							s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Dagger))
+							s,m=SplitSkill(pl:GetSkill(const.Skills.Dagger))
 							if m>2 then
 								daggerCritBonus=daggerCritBonus+0.025+0.005*s
 							end
 						end
 					end
 				end
-				DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])
+				DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[pl:GetIndex()]["Melee"])
 				--debug.Message(string.format("%s %s %s %s %s %s %s %s ", dmg,might,daggerCritBonus,luck,accuracy,delay,hitChance,bonusMult))
 				--RANGED
-				low=Party[i]:GetRangedDamageMin()
-				high=Party[i]:GetRangedDamageMax()
-				delay=Party[i]:GetAttackDelay(true)
+				low=pl:GetRangedDamageMin()
+				high=pl:GetRangedDamageMax()
+				delay=pl:GetAttackDelay(true)
 				dmg=(low+high)/2
 				--hit chance
-				atk=Party[i]:GetRangedAttack()
+				atk=pl:GetRangedAttack()
 				hitChance= (15+atk*2)/(30+atk*2+lvl)
-				s,m=SplitSkill(Party[i].Skills[const.Skills.Bow])
+				s,m=SplitSkill(pl.Skills[const.Skills.Bow])
 				if m>=3 then
 					dmg=dmg*2
 				end
-				DPS2=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])
+				DPS2=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[pl:GetIndex()]["Ranged"])
 				if DPS1>DPS2 then
 					power=DPS1
 					powerType="Melee"
@@ -1515,11 +1515,11 @@ function events.BuildItemInformationBox(t)
 				if spellTier==0 then
 					spellTier=11
 				end
-				if Party[i].LevelBase>=spellTier*8+152 then
+				if pl.LevelBase>=spellTier*8+152 then
 					diceMin=spellPowers160[spellIndex].diceMin
 					diceMax=spellPowers160[spellIndex].diceMax
 					damageAdd=spellPowers160[spellIndex].dmgAdd
-				elseif Party[i].LevelBase>=spellTier*8+72 then
+				elseif pl.LevelBase>=spellTier*8+72 then
 					diceMin=spellPowers80[spellIndex].diceMin
 					diceMax=spellPowers80[spellIndex].diceMax
 					damageAdd=spellPowers80[spellIndex].dmgAdd
@@ -1531,18 +1531,18 @@ function events.BuildItemInformationBox(t)
 				--calculate damage
 				--skill
 				skillType=math.floor(spellIndex/11)+12
-				skill, mastery=SplitSkill(Party[i]:GetSkill(skillType))
+				skill, mastery=SplitSkill(pl:GetSkill(skillType))
 				
 				power=damageAdd + skill*(diceMin+diceMax)/2
 				
-				intellect=Party[i]:GetIntellect()	
-				personality=Party[i]:GetPersonality()
-				critChance=Party[i]:GetLuck()/1500
+				intellect=pl:GetIntellect()	
+				personality=pl:GetPersonality()
+				critChance=pl:GetLuck()/1500
 				bonus=math.max(intellect,personality)
 				critDamage=bonus*3/2000
 				power=power*(1+bonus/1000) 
 				critChance=0.05+critChance
-				haste=math.floor(Party[i]:GetSpeed()/10)/100+1
+				haste=math.floor(pl:GetSpeed()/10)/100+1
 				if mastery==1 then
 					delay=Game.Spells[11].DelayNormal
 				elseif mastery==2 then
@@ -1560,7 +1560,7 @@ function events.BuildItemInformationBox(t)
 			
 			--list of stats that influence damage
 			slot=t.Item:T().EquipStat
-			it=Party[i]:GetActiveItem(slotMap[slot])
+			it=pl:GetActiveItem(slotMap[slot])
 			if not it then return end
 			--calculate spell damage
 			if powerType=="Spell" then
@@ -1574,14 +1574,14 @@ function events.BuildItemInformationBox(t)
 				
 				power=damageAdd + skill*(diceMin+diceMax)/2
 				
-				intellect=Party[i]:GetIntellect()+bonusInt
-				personality=Party[i]:GetPersonality()+bonusPers
-				critChance=(Party[i]:GetLuck()+bonusLuck)/1500
+				intellect=pl:GetIntellect()+bonusInt
+				personality=pl:GetPersonality()+bonusPers
+				critChance=(pl:GetLuck()+bonusLuck)/1500
 				bonus=math.max(intellect,personality)
 				critDamage=bonus*3/2000
 				power=power*(1+bonus/1000) 
 				critChance=0.05+critChance
-				haste=math.floor((Party[i]:GetSpeed()+bonusSpeed)/10)/100+1
+				haste=math.floor((pl:GetSpeed()+bonusSpeed)/10)/100+1
 				
 				powerType="Spell"
 				power=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/100)*haste)
@@ -1599,7 +1599,7 @@ function events.BuildItemInformationBox(t)
 				
 				--calculate new DPS
 				--might
-				might=Party[i]:GetMight()
+				might=pl:GetMight()
 				if might>=21 then
 					oldBonusDamage=math.floor(might/5)
 				else
@@ -1612,16 +1612,16 @@ function events.BuildItemInformationBox(t)
 					newBonusDamage=(might-13)/2
 				end
 				if powerType=="Melee" then
-					low=Party[i]:GetMeleeDamageMin()
-					high=Party[i]:GetMeleeDamageMax()
+					low=pl:GetMeleeDamageMin()
+					high=pl:GetMeleeDamageMax()
 				else
-					low=Party[i]:GetRangedDamageMin()
-					high=Party[i]:GetRangedDamageMax()
+					low=pl:GetRangedDamageMin()
+					high=pl:GetRangedDamageMax()
 				end
 				dmg=(low+high)/2+newBonusDamage-oldBonusDamage
 				
 				--accuracy
-				accuracy=Party[i]:GetAccuracy()
+				accuracy=pl:GetAccuracy()
 				if accuracy>=21 then
 					oldAttack=math.floor(accuracy/5)
 				else
@@ -1635,7 +1635,7 @@ function events.BuildItemInformationBox(t)
 				end
 				
 				--speed
-				speed=Party[i]:GetSpeed()
+				speed=pl:GetSpeed()
 				if speed>=21 then
 					oldSpeed=math.floor(speed/5)
 				else
@@ -1648,33 +1648,33 @@ function events.BuildItemInformationBox(t)
 					newSpeed=(speed-13)/2
 				end
 				
-				recoveryBonus=damageMultiplier[Party[i]:GetIndex()]["bonusSpeedMelee"]+newSpeed-oldSpeed
+				recoveryBonus=damageMultiplier[pl:GetIndex()]["bonusSpeedMelee"]+newSpeed-oldSpeed
 				if powerType=="Melee" then
-					delay=math.max(math.floor(damageMultiplier[Party[i]:GetIndex()]["baseSpeedMelee"] / (1 + recoveryBonus / 100)),30)
-					weaponSpeedMult=damageMultiplier[Party[i]:GetIndex()]["Melee"]
+					delay=math.max(math.floor(damageMultiplier[pl:GetIndex()]["baseSpeedMelee"] / (1 + recoveryBonus / 100)),30)
+					weaponSpeedMult=damageMultiplier[pl:GetIndex()]["Melee"]
 				else
-					delay=math.floor(damageMultiplier[Party[i]:GetIndex()]["baseSpeedRanged"] / (1 + recoveryBonus / 100))
-					weaponSpeedMult=damageMultiplier[Party[i]:GetIndex()]["Ranged"]
+					delay=math.floor(damageMultiplier[pl:GetIndex()]["baseSpeedRanged"] / (1 + recoveryBonus / 100))
+					weaponSpeedMult=damageMultiplier[pl:GetIndex()]["Ranged"]
 				end	
 				--debug.Message(string.format("%s %s %s", delay, recoveryBonus, baseSpeed))				
 				--luck
-				luck=Party[i]:GetLuck()+bonusLuck
+				luck=pl:GetLuck()+bonusLuck
 				--hit chance
 				if powerType=="Melee" then
-					atk=Party[i]:GetMeleeAttack()+newAttack-oldAttack
+					atk=pl:GetMeleeAttack()+newAttack-oldAttack
 				else
-					atk=Party[i]:GetRangedAttack()
+					atk=pl:GetRangedAttack()
 				end
 				atk=atk+newAttack-oldAttack
-				lvl=Party[i].LevelBase
+				lvl=pl.LevelBase
 				hitChance= (15+atk*2)/(30+atk*2+lvl)
 				daggerCritBonus=0
 				if powerType=="Melee" then
 					for v=0,1 do
-						if Party[i]:GetActiveItem(v) then
-							itSkill=Party[i]:GetActiveItem(v):T().Skill
+						if pl:GetActiveItem(v) then
+							itSkill=pl:GetActiveItem(v):T().Skill
 							if itSkill==2 then
-								s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Dagger))
+								s,m=SplitSkill(pl:GetSkill(const.Skills.Dagger))
 								if m>2 then
 									daggerCritBonus=daggerCritBonus+0.025+0.005*s
 								end
@@ -1682,7 +1682,7 @@ function events.BuildItemInformationBox(t)
 						end
 					end
 				else
-					s,m=SplitSkill(Party[i].Skills[const.Skills.Bow])
+					s,m=SplitSkill(pl.Skills[const.Skills.Bow])
 					if m>=3 then
 						dmg=dmg*2
 					end
@@ -1702,17 +1702,17 @@ function events.BuildItemInformationBox(t)
 			
 			--vitality calculation
 			--old vitality
-			fullHP=Party[i]:GetFullHP()
+			fullHP=pl:GetFullHP()
 			--AC
-			ac=Party[i]:GetArmorClass()
-			local acReduction=1-calcMawDamage(Party[i],4,10000)/10000
-			lvl=math.min(Party[i].LevelBase, 255)
+			ac=pl:GetArmorClass()
+			local acReduction=1-calcMawDamage(pl,4,10000)/10000
+			lvl=math.min(pl.LevelBase, 255)
 			local ac=ac/(Game.BolsterAmount/100)
 			blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 			ACRed= 1 - (1-blockChance)*(1-acReduction)
 			--speed
 			unarmed=0
-			Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Unarmed))
+			Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
 			dodgeChance=1
 			if Mas == 4 then
 				unarmed=Skill+10
@@ -1722,7 +1722,7 @@ function events.BuildItemInformationBox(t)
 			--resistances
 			local res={0,1,2,3,7,8,12}
 			for j=1,7 do 
-				res[j]=1-calcMawDamage(Party[i],res[j],10000)/10000
+				res[j]=1-calcMawDamage(pl,res[j],10000)/10000
 			end
 			--calculation
 			local reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
@@ -1748,42 +1748,42 @@ function events.BuildItemInformationBox(t)
 			newAC=newAC+getNewArmor(t.Item)-getNewArmor(it)
 			
 			--calculate new HP
-			newEndurance=Party[i]:GetEndurance()+newEnd
+			newEndurance=pl:GetEndurance()+newEnd
 			if newEndurance<=21 then
 				newEndEff=(newEndurance-13)/2
 			else
 				newEndEff=math.floor(newEndurance/5)
 			end
-			oldEndurance=Party[i]:GetEndurance()
+			oldEndurance=pl:GetEndurance()
 			if newEndurance<=21 then
 				oldEndEff=(oldEndurance-13)/2
 			else
 				oldEndEff=math.floor(oldEndurance/5)
 			end
 			
-			level=Party[i]:GetLevel()+newEndEff
+			level=pl:GetLevel()+newEndEff
 			if t.Item.Bonus2==25 then
 				level=level+5
 			end
 			if it.Bonus2==25 then
 				level=level-5
 			end
-			HPScaling=Game.Classes.HPFactor[Party[i].Class]
+			HPScaling=Game.Classes.HPFactor[pl.Class]
 			
 			--remove old
-			fullHP=Party[i]:GetFullHP()/(1+Party[i]:GetEndurance()/1000)-oldEndEff*HPScaling
+			fullHP=pl:GetFullHP()/(1+pl:GetEndurance()/1000)-oldEndEff*HPScaling
 			--add new 
 			fullHP=fullHP+newHP+newEndEff*HPScaling
 			
-			fullHP=math.round((fullHP)*(1+(Party[i]:GetEndurance()+newEnd)/1000))
-			ac=Party[i]:GetArmorClass()
-			oldSpeed=Party[i]:GetSpeed()
+			fullHP=math.round((fullHP)*(1+(pl:GetEndurance()+newEnd)/1000))
+			ac=pl:GetArmorClass()
+			oldSpeed=pl:GetSpeed()
 			if oldSpeed<=21 then
 				oldSpeedEff=(oldSpeed-13)/2
 			else
 				oldSpeedEff=math.floor(oldSpeed/5)
 			end
-			local newSpeed=Party[i]:GetSpeed()+newSpeed
+			local newSpeed=pl:GetSpeed()+newSpeed
 			if newSpeed<=21 then
 				newSpeedEff=(newSpeed-13)/2
 			else
@@ -1792,16 +1792,16 @@ function events.BuildItemInformationBox(t)
 			newSpeedEff=newSpeedEff-oldSpeedEff
 			
 			ac=ac+newAC+newSpeedEff
-			local lvl=Party[i].LevelBase
+			local lvl=pl.LevelBase
 			bolster=(Game.BolsterAmount/100-1)/4+1
 			local acReduction=1-math.round(1/2^math.min(ac/math.min(150+lvl*bolster,400*bolster),4)*10000)/10000
-			lvl=math.min(Party[i].LevelBase, 255)
+			lvl=math.min(pl.LevelBase, 255)
 			local ac=ac/(Game.BolsterAmount/100)
 			blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 			ACRed= 1 - (1-blockChance)*(1-acReduction)
 			--speed
 			unarmed=0
-			Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Unarmed))
+			Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
 			dodgeChance=1
 			if Mas == 4 then
 				unarmed=Skill+10
@@ -1810,7 +1810,7 @@ function events.BuildItemInformationBox(t)
 			vitality=fullHP/dodgeChance
 			--resistances
 			--luck
-			oldLuck=Party[index]:GetLuck()
+			oldLuck=pl:GetLuck()
 			if oldLuck<=21 then
 				oldLuckEff=(oldLuck-13)/2
 			elseif oldLuck<=100 then
@@ -1818,7 +1818,7 @@ function events.BuildItemInformationBox(t)
 			else
 				oldLuckEff=math.floor(oldLuck/10)+10
 			end
-			luck=Party[index]:GetLuck()+newLuck
+			luck=pl:GetLuck()+newLuck
 			if luck<=21 then
 				newLuckEff=(luck-13)/2
 			elseif luck<=100 then
@@ -1828,16 +1828,16 @@ function events.BuildItemInformationBox(t)
 			end
 			luckChanged=newLuckEff-oldLuckEff
 			local res={
-				[1]=Party[i]:GetResistance(10)+newFire+luckChanged,
-				[2]=Party[i]:GetResistance(11)+newAir+luckChanged,
-				[3]=Party[i]:GetResistance(12)+newWater+luckChanged,
-				[4]=Party[i]:GetResistance(13)+newEarth+luckChanged,
-				[5]=Party[i]:GetResistance(14)+newMind+luckChanged,
-				[6]=Party[i]:GetResistance(15)+newBody+luckChanged,
+				[1]=pl:GetResistance(10)+newFire+luckChanged,
+				[2]=pl:GetResistance(11)+newAir+luckChanged,
+				[3]=pl:GetResistance(12)+newWater+luckChanged,
+				[4]=pl:GetResistance(13)+newEarth+luckChanged,
+				[5]=pl:GetResistance(14)+newMind+luckChanged,
+				[6]=pl:GetResistance(15)+newBody+luckChanged,
 			}
 			res[7]=math.min(res[1],res[2],res[3],res[4],res[5],res[6])
 			for j=1,7 do 
-				res[j]=1-math.round(1/2^math.min(res[j]/math.min(75+Party[i].LevelBase*0.5*bolster,200*bolster),4)*10000)/10000
+				res[j]=1-math.round(1/2^math.min(res[j]/math.min(75+pl.LevelBase*0.5*bolster,200*bolster),4)*10000)/10000
 			end
 			
 			--calculation
