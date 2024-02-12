@@ -354,23 +354,8 @@ function events.BuildStatInformationBox(t)
 		end
 		
 		--SPELLS
-		spellTier=spellIndex%11
-		if spellTier==0 then
-			spellTier=11
-		end
-		if Party[i].LevelBase>=spellTier*8+152 then
-			diceMin=spellPowers160[spellIndex].diceMin
-			diceMax=spellPowers160[spellIndex].diceMax
-			damageAdd=spellPowers160[spellIndex].dmgAdd
-		elseif Party[i].LevelBase>=spellTier*8+72 then
-			diceMin=spellPowers80[spellIndex].diceMin
-			diceMax=spellPowers80[spellIndex].diceMax
-			damageAdd=spellPowers80[spellIndex].dmgAdd
-		else
-			diceMin=spellPowers[spellIndex].diceMin
-			diceMax=spellPowers[spellIndex].diceMax
-			damageAdd=spellPowers[spellIndex].dmgAdd
-		end
+		local s, m =  SplitSkill(Party[i].Skills[const.Skills.Learning])
+		diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, spellIndex)
 		--calculate damage
 		--skill
 		skillType=math.floor((spellIndex-1)/11)+12
@@ -1007,23 +992,8 @@ function events.Tick()
 		else
 		
 			--SPELLS
-			spellTier=spellIndex%11
-			if spellTier==0 then
-				spellTier=11
-			end
-			if Party[i].LevelBase>=spellTier*8+152 then
-				diceMin=spellPowers160[spellIndex].diceMin
-				diceMax=spellPowers160[spellIndex].diceMax
-				damageAdd=spellPowers160[spellIndex].dmgAdd
-			elseif Party[i].LevelBase>=spellTier*8+72 then
-				diceMin=spellPowers80[spellIndex].diceMin
-				diceMax=spellPowers80[spellIndex].diceMax
-				damageAdd=spellPowers80[spellIndex].dmgAdd
-			else
-				diceMin=spellPowers[spellIndex].diceMin
-				diceMax=spellPowers[spellIndex].diceMax
-				damageAdd=spellPowers[spellIndex].dmgAdd
-			end
+			local s, m = SplitSkill(Party[i].Skills[const.Skills.Learning])
+			diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, spellIndex)
 			--calculate damage
 			--skill
 			skillType=math.floor((spellIndex-1)/11)+12
