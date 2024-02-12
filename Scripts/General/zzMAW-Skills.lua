@@ -1248,11 +1248,12 @@ end
 
 
 --HORIZONTAL SKILL PROGRESSION
-learningRequirements={0,6,12,20}
+local learningRequirements={0,6,12,20}
+local horizontalSkills={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,27,28,32,33,38}
 function events.CanTeachSkillMastery(t)
 	if Game.freeProgression then return end -- only in horizontal mode
 	if t.Allow==false then return end --if failing for special requirements (stats, gold, already learned etc)
-	if t.Skill>23 then return end --apply only for weapon-armor-spells
+	if not table.find(horizontalSkills, t.Skill) then return end
 	local masteries={"","n Expert", " Master", " GrandMaster"}
 	local skill=SplitSkill(Party[Game.CurrentPlayer].Skills[t.Skill])
 	if skill<learningRequirements[t.Mastery] then
