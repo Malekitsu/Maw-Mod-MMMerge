@@ -821,7 +821,7 @@ end
 partySharedSkills={24,25,26,31,34}
 --plate&shield cover
 --change target
-plateCoverChance={0,5,10,15}
+plateCoverChance={0,0.05,0.01,0.015}
 function events.PlayerAttacked(t)
 	if t.Attacker and t.Attacker.Monster then
 		if (t.Attacker.MonsterAction==0 or t.Attacker.MonsterAction==1) and t.Attacker.Monster["Attack" .. t.Attacker.MonsterAction+1].Type==4 then
@@ -989,9 +989,9 @@ function events.LoadMap(wasInGame)
 	Timer(MawRegen, const.Minute/20) 
 end
 
---learning capped at 60 +9%
+--learning bonus removed
 function events.GetLearningTotalSkill(t)
-	t.Result=math.min(t.Result,69)
+	t.Result=0
 end
 
 
@@ -1306,3 +1306,4 @@ function events.Action(t)
 		end
 	end
 end
+
