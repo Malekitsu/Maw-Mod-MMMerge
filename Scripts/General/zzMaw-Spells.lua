@@ -1220,7 +1220,7 @@ function ascendSpellDamage(skill, mastery, spell)
 	end
 	if ascensionLevel>=33 then
 		ascensionLevel=3
-	elseif spelltier<=ascensionLevel%11  then
+	elseif spelltier<=skill%11  then
 		ascensionLevel=ascensionLevel+1
 	end
 	diceMax=diceMax * (1+0.04 * skill * ascensionLevel)
@@ -1295,16 +1295,17 @@ function events.Action(t)
 		if lastIndex~=index or lastLevel~=level then
 			lastIndex=index
 			lastLevel=level
-			s,m = SplitSkill(level)
-			for _, num in ipairs(spells) do 
+			local s,m = SplitSkill(level)
+			for v=1,#spells do 
+				num=spells[v]
 				local ascensionLevel=math.min(math.floor(s/11),2)
 				local spelltier=num%11
 				if spelltier==0 then 
 					spelltier=11
 				end
-				if ascensionLevel>=33 then
+				if s>=33 then
 					ascensionLevel=3
-				elseif spelltier<=ascensionLevel%11  then
+				elseif spelltier<=s%11  then
 					ascensionLevel=ascensionLevel+1
 				end
 				if s>=spelltier then
@@ -1367,7 +1368,23 @@ function events.Action(t)
 			Game.SpellsTxt[123].Master=string.format("Damage %s points plus 1-%s points per point of skill",math.round(dmgAddTooltip(s, m,123)/10*11),math.round(diceMaxTooltip(s, m,123)/10*11))
 			Game.SpellsTxt[123].GM=string.format("Damage %s points plus 1-%s points per point of skill",math.round(dmgAddTooltip(s, m,123)/10*12),math.round(diceMaxTooltip(s, m,123)/10*12))
 			
-			
+			for i=1, #spells do
+				local ascensionLevel=math.min(math.floor(s/11),2)
+				local spelltier=spells[i]%11
+				if spelltier==0 then 
+					spelltier=11
+				end
+				if ascensionLevel>=33 then
+					ascensionLevel=3
+				elseif spelltier<=s%11  then
+					ascensionLevel=ascensionLevel+1
+				end
+				if ascensionLevel>=1 then
+					Game.SpellsTxt[spells[i]].Description=Game.SpellsTxt[spells[i]].Description .. "\n\nAscension level: " .. ascensionLevel
+				else
+					Game.SpellsTxt[spells[i]].Description=Game.SpellsTxt[spells[i]].Description .. "\n\nNot Ascended"
+				end
+			end
 			-----------------------
 			--Healing Spells
 			-----------------------
