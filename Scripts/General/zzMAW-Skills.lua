@@ -989,10 +989,6 @@ function events.LoadMap(wasInGame)
 	Timer(MawRegen, const.Minute/20) 
 end
 
---learning bonus removed
-function events.GetLearningTotalSkill(t)
-	t.Result=0
-end
 
 
 --DINAMIC SKILL TOOLTIP
@@ -1054,6 +1050,40 @@ function events.LoadMap()
 	end
 end
 
+--ASCENDANCE
+--learning bonus removed and replaced with ascendance
+function events.GetLearningTotalSkill(t)
+	t.Result=0
+end
+
+--retroactive fix
+function events.LoadMap()
+	vars.learningFix=vars.learningFix or {}
+	for i=0,Party.PlayersArray.High do
+		pl=Party.PlayersArray[i]
+		local id=pl:GetIndex()
+		if vars.learningFix[id] then 
+			return 
+		end 
+		local s, m = SplitSkill(pl.Skills[const.Skills.Learning])
+		while s>1 do
+			pl.SkillPoints=pl.SkillPoints+s
+			s=s-1
+		end
+		pl.Skills[const.Skills.Learning]=0
+		vars.learningFix[id]=true
+	end
+end
+
+function events.GameInitialized2()
+	Game.SkillDescriptions[const.Skills.Learning]="Increases spell damage at the expense of higher mana. Each skill level boosts the corresponding tier's spells, up to Tier 11 (e.g., Incinerate, Starburst). Spells can be ascended three times, culminating at skill level 33. This skill affects all magic schools, enabling up to three enhancements per spell (ascended damage amount shown in spell tooltip). \n\nLevel up to unlock the full destructive or healing potential of your magic, balancing higher damage with greater mana expenditure.\n"
+	Game.SkillNames[const.Skills.Learning]="Ascension"
+	Game.SkillDesNormal[const.Skills.Learning]= "Each point of skill will increase damage and mana cost."
+	Game.SkillDesExpert[const.Skills.Learning]= "Double effect of Skill"
+	Game.SkillDesMaster[const.Skills.Learning]= "Triple effect of Skill"
+	Game.SkillDesGM[const.Skills.Learning]= "Quaduple Effect of Skill"
+end
+
 
 --open time at 5 instead of 6
 function events.GameInitialized2()
@@ -1073,8 +1103,7 @@ function events.CalcTrainingTime(t)
 		vars.trainings[currentWorld]=vars.trainings[currentWorld]+1
 	end	
 	--reduced training time
-	s,m=SplitSkill(Party[Game.CurrentPlayer]:GetSkill(const.Skills.Learning))
-	t.Time=const.Day*(5-m)
+	t.Time=const.Day*2
 end
 local trainingCenters={
 	[1]={1,2,3,4,5,6},
