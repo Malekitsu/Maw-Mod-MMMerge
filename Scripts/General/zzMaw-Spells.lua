@@ -632,30 +632,15 @@ function events.GameInitialized2()
 	Game.SpellsTxt[51].Expert="Increases damage by 10 plus 1 per skill point"
 	Game.SpellsTxt[51].Master="Increases damage by 10 plus 1.5 per skill point"
 	Game.SpellsTxt[51].GM="Increases damage by 10 plus 2 per skill point"
-	
-	
-	--resurrection
-	Game.SpellsTxt[55].GM="Cures 200 + 20 HP per point of skill"
-	
-	--heal
-	Game.SpellsTxt[68].Normal="3 Mana cost: \ncures 5 + 2 HP per point of skill"
-	Game.SpellsTxt[68].Expert="5 Mana cost: \ncures 10 + 3 HP per point of skill"
-	Game.SpellsTxt[68].Master="8 Mana cost: \ncures 15 + 4 HP per point of skill"
-	Game.SpellsTxt[68].GM="12 Mana cost: \ncures 20 + 5 HP per point of skill"
-	
+
 	--greater heal
 	Game.SpellsTxt[74].Name="Greater Heal"
 	Game.SpellsTxt[74].ShortName="Greater Heal"
 	Game.SpellsTxt[74].Normal="n/a\n"
 	Game.SpellsTxt[74].Expert="n/a\n"
-	Game.SpellsTxt[74].Master="15 Mana cost: \ncures 25 + 6 HP per point of skill\n1 day limit\n"
-	Game.SpellsTxt[74].GM="25 Mana cost: \ncures 40 + 9 HP per point of skill\nno limit\n"
 	
 	--Protection from magic
 	Game.SpellsTxt[75].Description="Protection from Magic affects the entire party at once, granting immunity to certain spells and monster abilities that cause debilitation conditions.  These are:  Poison, Disease, Stone, Paralyze, and Weak.  Every time this spell saves a character from an effect, it weakens.  The spell can survive 1 attack per point of skill in body magic up to 10 attacks--after that, Protection from Magic is broken."
-	
-	--Power Cure
-	Game.SpellsTxt[77].Description="Cures hit points of all characters in your party at once.  The number cured is equal to 10 plus 3 per point of skill in Body Magic."
 	
 	--protections
 	protectionSpells={25,69,36,3,58,14}
@@ -676,6 +661,787 @@ function events.GameInitialized2()
 
 	
 end
+
+-- shared life overflow fix
+function randomizeHP()
+	for i, pl in Party do
+		pl.HP = random(1, pl:GetFullHP())
+	end
+end
+
+-- TODO: test very negative amounts (like -50000), they asserted previously
+function doSharedLife(amount)
+	-- for each iteration, try to top up lowest HP deficit party member, increasing others' HP along the way
+	local function shouldParticipate(pl)
+		return pl.Dead == 0 and pl.Eradicated == 0 and pl.Stoned == 0 -- as in default code
+	end
+
+	local activePlayers = {}
+	local fullHPs = {}
+	amount = amount or 0
+	for i, pl in Party do
+		if shouldParticipate(pl) then
+			table.insert(activePlayers, pl)
+			fullHPs[pl:GetIndex()] = pl:GetFullHP()
+			amount = amount + pl.HP
+			pl.HP = 0
+		end
+	end
+	local affectedPlayers = table.copy(activePlayers)
+	local pool = amount
+	local steps = 0
+	while amount > 0 and #activePlayers > 0 do
+		steps = steps + 1
+		local minDeficit = math.huge
+		for i, pl in ipairs(activePlayers) do
+			local def = fullHPs[pl:GetIndex()] - pl.HP
+			if def > 0 then
+				minDeficit = min(minDeficit, def)
+			end
+		end
+
+		local part = minDeficit
+		if minDeficit * #activePlayers > amount then
+			part = amount:div(#activePlayers)
+		end
+
+		amount = amount - part * #activePlayers
+
+		local newPlayers = {}
+		for i, pl in ipairs(activePlayers) do
+			pl.HP = pl.HP + part
+			if part == 0 and amount > 0 then
+				pl.HP = pl.HP + 1
+				amount = amount - 1
+			end
+			if pl.HP ~= fullHPs[pl:GetIndex()] then
+				table.insert(newPlayers, pl)
+			end
+		end
+		activePlayers = newPlayers
+	end
+	local result = 0
+	local everyoneFull = true
+	for i, pl in ipairs(affectedPlayers) do
+		result = result + pl.HP
+		if pl.HP > 0 then
+			pl.Unconscious = 0
+		end
+		if pl.HP ~= pl:GetFullHP() then
+			everyoneFull = false
+		end
+	end
+	assert((pool == result) or everyoneFull, format("Pool %d, result %d, everyoneFull: %s", pool, result, everyoneFull))
+	--printf("Steps: %d", steps)
+	return affectedPlayers
+	--debug.Message(format("%d HP left", amount))
+end
+
+-- replace shared life code with my own
+hook(0x42A171, function(d)
+	local amount = u4[d.ebp - 4]
+	local t = getSpellQueueData(d.ebx)
+	t.Amount = amount
+	events.call("HealingSpellPower", t)
+	local affectedPlayers = doSharedLife(t.Amount)
+	for i, pl in ipairs(affectedPlayers) do
+		mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, u4[0x75CE00]), const.Spells.SharedLife, getPartyIndex(pl)) -- show animation
+	end
+end)
+asmpatch(0x42A176, "jmp absolute 0x42C200") -- "cast successful"
+
+
+--removes fly when attacking, except in certain maps
+flyAllowedMaps={"elema.odm","elemf.odm","elemw.odm","out12.odm","outa1.odm","outa2.odm","outa3.odm","outb3.odm","out05.odm"}
+function events.CalcDamageToMonster(t)
+	if table.find(flyAllowedMaps,Map.Name) then 
+		return
+	end
+	data=WhoHitMonster()
+	flyTime=Party.SpellBuffs[7].ExpireTime
+	if data and data.Player and flyTime>Game.Time then
+		Party.SpellBuffs[5].ExpireTime=flyTime
+		Party.SpellBuffs[7].ExpireTime=0
+	end
+end
+
+function events.LoadMap()
+	if table.find(flyAllowedMaps,Map.Name) then 
+		Sleep(5)
+		Game.ShowStatusText("Fly is allowed without restrictions here")
+	end
+end
+
+function events.GameInitialized2()
+	Game.SpellsTxt[21].Description= "Grants the power of flight to your characters!  This spell is very expensive and only works outdoors, but it is very useful.  Fly will drain one spell point every five minutes it is in use (i.e. when you aren't touching the ground).\n\nWith the exception of few places, attacking monsters will cancel the effect"
+end
+
+
+--WHEN GM ELEMENTAL BUFFS WILL BE GRANTED PASSIVELY
+TimerPeriod=const.Minute/2
+schools={12,13,14,15,17,18}
+buffsOrdered = {6, 0, 17, 4, 12, 1}
+function elementalBuffs()
+	--buffs to apply
+	for i=0, Party.High do
+		for v=1,6 do
+			s,m=SplitSkill(Party[i]:GetSkill(schools[v]))
+			if m==4 then
+				if Party.SpellBuffs[buffsOrdered[v]].Power<=s*3 then
+					Party.SpellBuffs[buffsOrdered[v]].ExpireTime=Game.Time+const.Hour
+					Party.SpellBuffs[buffsOrdered[v]].Power=s*3
+					Party.SpellBuffs[buffsOrdered[v]].Skill=4
+				end
+			end
+		end
+	end
+	if Party.High==0 then
+		Party.SpellBuffs[19].ExpireTime=Game.Time+const.Hour
+		Party.SpellBuffs[19].Power=10
+		Party.SpellBuffs[19].Skill=2
+	end
+end
+
+function events.AfterLoadMap()
+	Timer(elementalBuffs, TimerPeriod, true)
+end
+
+
+---------------------------
+----end OF SPELL REWORK----
+---------------------------
+--[[allow for spells to be learned freely in horizontal moderately
+function events.CanLearnSpell(t)
+	if Game.freeProgression then
+		if t.Player.Spells[t.Spell] then
+			return
+		end
+		local school=math.floor(t.Spell/11)+12
+		if t.Player.Skills[school]>0 then
+			vars.horizontaSpells=vars.horizontaSpells or {}
+			vars.horizontaSpells[t.PlayerIndex]=vars.horizontaSpells[t.PlayerIndex] or {}
+			vars.horizontaSpells[t.PlayerIndex][t.Spell]=true
+			t.Player.Spells[t.Spell]=true
+			Mouse.Item.Number=0
+		end
+	end
+end
+]]
+
+masteryName={"Normal", "Expert", "Master", "GM"}
+function events.Action(t)
+	if t.Action==25 and autoTargetHeals then
+		local pl=Party[Game.CurrentPlayer]
+		if pl.QuickSpell==68 and pl.RecoveryDelay==0 then
+			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
+			local cost=Game.Spells[68]["SpellPoints" .. masteryName[m]]
+			if pl.SP<cost then return end
+			t.Handled=true
+			pl.SP=pl.SP-cost
+			local persBonus=pl:GetPersonality()/1000
+			local intBonus=pl:GetIntellect()/1000
+			local statBonus=math.max(persBonus,intBonus)
+			local crit=pl:GetLuck()/1500+0.05
+			local baseHeal=lesserHealBase[m]+lesserHealScaling[m]*s
+			local totHeal=baseHeal*(statBonus+1)
+			local roll=math.random()
+			local gotCrit=false
+			if roll<crit then
+				local mult=(0.5+statBonus*3/2)
+				if Game.BolsterAmount==300 then
+					mult=mult/2
+				end
+				totHeal=totHeal*(1+mult)
+				gotCrit=true
+			end
+			if gotCrit then
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
+			else
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
+			end
+			-- Define the variables
+			a={}
+			a[0]=2
+			a[1]=2
+			a[2]=2
+			a[3]=2
+			a[4]=2
+			for i=0,Party.High do
+				if Party[i].Dead==0 and Party[i].Eradicated==0 then
+					a[i] = Party[i].HP/Party[i]:GetFullHP()
+				end
+			end
+			a, b, c, d, e= a[0], a[1], a[2], a[3], a[4] 
+			-- Find the maximum value and its position
+			min_value = math.min(a, b, c, d, e)
+			min_index = indexof({a, b, c, d, e}, min_value)
+			min_index = min_index - 1
+			--apply heal
+			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
+			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, Party[min_index]:GetFullHP())	
+			--bug fix
+			if Party[min_index].HP>0 then
+			Party[min_index].Unconscious=0
+			end
+			local haste=math.floor(pl:GetSpeed()/10)
+			local delay=Game.Spells[68]["Delay" .. masteryName[m]]
+			pl:SetRecoveryDelay(delay)
+			pl.Expression=40
+		elseif pl.QuickSpell==74 and pl.RecoveryDelay==0 then
+			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
+			local cost=Game.Spells[74]["SpellPoints" .. masteryName[m]]
+			if pl.SP<cost then return end
+			t.Handled=true
+			pl.SP=pl.SP-cost
+			local persBonus=pl:GetPersonality()/1000
+			local intBonus=pl:GetIntellect()/1000
+			local statBonus=math.max(persBonus,intBonus)
+			local crit=pl:GetLuck()/1500+0.05
+			local baseHeal=greaterHealBase[m]+greaterHealScaling[m]*s
+			local totHeal=baseHeal*(statBonus+1)
+			local roll=math.random()
+			local gotCrit=false
+			if roll<crit then
+				local mult=(0.5+statBonus*3/2)
+				if Game.BolsterAmount==300 then
+					mult=mult/2
+				end
+				totHeal=totHeal*(1+mult)
+				gotCrit=true
+			end
+			if gotCrit then
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
+			else
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
+			end
+			-- Define the variables
+			a={}
+			a[0]=2
+			a[1]=2
+			a[2]=2
+			a[3]=2
+			a[4]=2
+			for i=0,Party.High do
+				if Party[i].Dead==0 and Party[i].Eradicated==0 then
+					a[i] = Party[i].HP/Party[i]:GetFullHP()
+				end
+			end
+			a, b, c, d, e= a[0], a[1], a[2], a[3], a[4] 
+			-- Find the maximum value and its position
+			min_value = math.min(a, b, c, d, e)
+			min_index = indexof({a, b, c, d, e}, min_value)
+			min_index = min_index - 1
+			--apply heal
+			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
+			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, Party[min_index]:GetFullHP())	
+			--bug fix
+			if Party[min_index].HP>0 then
+			Party[min_index].Unconscious=0
+			end
+			Party[min_index].Disease1=0
+			Party[min_index].Disease2=0
+			Party[min_index].Disease3=0
+			local haste=math.floor(pl:GetSpeed()/10)
+			local delay=Game.Spells[74]["Delay" .. masteryName[m]]
+			pl:SetRecoveryDelay(delay)
+			pl.Expression=40
+		elseif pl.QuickSpell==49 and pl.RecoveryDelay==0 then
+			local s,m=SplitSkill(pl:GetSkill(const.Skills.Spirit))
+			local cost=Game.Spells[49]["SpellPoints" .. masteryName[m]]
+			if pl.SP<cost then return end
+			t.Handled=true
+			pl.SP=pl.SP-cost
+			local persBonus=pl:GetPersonality()/1000
+			local intBonus=pl:GetIntellect()/1000
+			local statBonus=math.max(persBonus,intBonus)
+			local crit=pl:GetLuck()/1500+0.05
+			local baseHeal=greaterHealBase[m]+greaterHealScaling[m]*s
+			local totHeal=baseHeal*(statBonus+1)
+			local roll=math.random()
+			local gotCrit=false
+			if roll<crit then
+				local mult=(0.5+statBonus*3/2)
+				if Game.BolsterAmount==300 then
+					mult=mult/2
+				end
+				totHeal=totHeal*(1+mult)
+				gotCrit=true
+			end
+			if gotCrit then
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
+			else
+				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
+			end
+			-- Define the variables
+			a={}
+			a[0]=2
+			a[1]=2
+			a[2]=2
+			a[3]=2
+			a[4]=2
+			for i=0,Party.High do
+				if Party[i].Dead==0 and Party[i].Eradicated==0 then
+					a[i] = Party[i].HP/Party[i]:GetFullHP()
+				end
+			end
+			a, b, c, d, e= a[0], a[1], a[2], a[3], a[4] 
+			-- Find the maximum value and its position
+			min_value = math.min(a, b, c, d, e)
+			min_index = indexof({a, b, c, d, e}, min_value)
+			min_index = min_index - 1
+			--apply heal
+			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
+			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, Party[min_index]:GetFullHP())
+			--bug fix
+			if Party[min_index].HP>0 then
+			Party[min_index].Unconscious=0
+			end
+			Party[min_index].Cursed=0
+			local haste=math.floor(pl:GetSpeed()/10)
+			local delay=Game.Spells[49]["Delay" .. masteryName[m]]
+			pl:SetRecoveryDelay(delay)
+			pl.Expression=40
+		end
+	end
+end
+
+
+----------------------------------------
+--CC REWORK
+----------------------------------------
+CCMAP={
+	[const.Spells.Slow]=	{["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Earth, ["DamageKind"]=const.Damage.Earth,["Debuff"]=const.MonsterBuff.Slow},
+	[60]=					{["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--Mind Charm, has no const value, due to dark elf one overwriting
+	[const.Spells.Charm]=	{["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.DarkElfAbility, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--dark elf one
+	[const.Spells.Berserk]=	{["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Berserk},
+	[const.Spells.MassFear]={["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Fear},
+	[const.Spells.Enslave]=	{["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Enslave},
+	[const.Spells.Paralyze]={["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Light, ["DamageKind"]=const.Damage.Light,["Debuff"]=const.MonsterBuff.Paralyze},	
+[const.Spells.ShrinkingRay]={["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark,["Debuff"]=const.MonsterBuff.ShrinkingRay},
+[const.Spells.DarkGrasp]=	{["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]={const.MonsterBuff.ArmorHalved, const.MonsterBuff.Slow, const.MonsterBuff.DamageHalved, const.MonsterBuff.MeleeOnly}},																									
+}
+
+function events.Action(t)
+	local id=Game.CurrentPlayer
+	if id<0 then return end
+	for key, value in pairs(CCMAP) do
+		local lvl=Party[id].LevelBase
+		local baseCost=value.BaseCost
+		local cost=math.round(baseCost+(lvl/5)) --edit here to change mana cost
+		
+		Game.Spells[key]["SpellPointsNormal"]=cost
+		Game.Spells[key]["SpellPointsExpert"]=cost
+		Game.Spells[key]["SpellPointsMaster"]=cost
+		Game.Spells[key]["SpellPointsGM"]=cost
+	end
+end
+
+function events.PlayerCastSpell(t)
+	if CCMAP[t.SpellId] then
+		local resistance={}
+		local level={}
+		local cc=CCMAP[t.SpellId]
+		for i=0,Map.Monsters.High do
+			local mon=Map.Monsters[i]
+			local res=mon.Resistances[cc.DamageKind]
+			local lvl=mon.Level
+				resistance[i]=res
+				level[i]=lvl
+			local s,m=SplitSkill(t.Player:GetSkill(cc.School))
+			local newLevel=calcEffectChance(lvl, res, s, cc.ChanceMult)
+			mon.Resistances[3]=0
+			mon.Level=newLevel
+		end
+		local reset=1
+		if cc.DamageKind==const.Damage.Dark then
+			reset=100
+		end
+		function events.Tick() 
+			reset=reset-1
+			if reset==0 then
+				events.Remove("Tick", 1)
+			end
+			for i=0,Map.Monsters.High do
+				local mon=Map.Monsters[i]
+				mon.Level=level[i]
+				mon.Resistances[cc.DamageKind]=resistance[i]
+				if type(cc.Debuff)=="table" then
+					for v =1,4 do 
+						local debuff=mon.SpellBuffs[cc.Debuff[v]]
+						debuff.ExpireTime=math.min(debuff.ExpireTime, Game.Time+cc.Duration)
+					end
+				else
+					local debuff=mon.SpellBuffs[cc.Debuff]
+					debuff.ExpireTime=math.min(debuff.ExpireTime, Game.Time+cc.Duration)
+				end
+			end
+		end
+	end
+end
+
+function calcEffectChance(lvl, res, skill, chance)
+	totRes=lvl/4+res
+	mult=(1+skill*chance)
+	newRes=(totRes+30)/mult-30
+	newLevel=math.max(math.round(newRes*4),0)
+	return newLevel
+end
+------------------------------
+------MANA COST CHANGE--------
+------------------------------
+
+--spell cost increase dictionary
+function events.GameInitialized2()
+	spellCost={}
+	for i=1,132 do
+		spellCost[i]={}
+		for v=1,4 do
+			spellCost[i][masteryName[v]] = Game.Spells[i]["SpellPoints" .. masteryName[v]]
+		end
+	end
+	--vampire
+	spellCost[111][masteryName[3]]=10
+	spellCost[111][masteryName[4]]=15
+	
+	spells={2,6,7,8,9,10,11,15,18,20,22,24,26,29,32,37,39,41,43,44,52,59,65,70,76,78,79,84,87,90,93,97,98,99,103,111,123}
+	lastIndex=-1 --used later
+
+	--if you change diceMin or values that are 0 remember to update the tooltip manually 
+	spellPowers =
+		{
+			[2] = {dmgAdd =6, diceMin = 1, diceMax = 3, },--fire bolt
+			[6] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--fireball
+			[7] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--fire spike, the only spell with damage depending on mastery, fix in events.calcspelldamage
+			[8] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--immolation
+			[9] = {dmgAdd = 8, diceMin = 1, diceMax = 1, },--meteor shower
+			[10] = {dmgAdd = 12, diceMin = 2, diceMax = 2, },--inferno
+			[11] = {dmgAdd = 32, diceMin = 1, diceMax = 21, },--incinerate
+			[15] = {dmgAdd = 3, diceMin = 2, diceMax = 2, },--sparks
+			[18] = {dmgAdd = 15, diceMin = 1, diceMax = 9, },--lightning bolt
+			[20] = {dmgAdd = 20, diceMin = 1, diceMax = 16, },--implosion
+			[22] = {dmgAdd = 20, diceMin = 1, diceMax = 1, },--starburst
+			[24] = {dmgAdd = 4, diceMin = 1, diceMax = 2, },--poison spray
+			[26] = {dmgAdd = 8, diceMin = 1, diceMax = 5, },--ice bolt
+			[29] = {dmgAdd = 15, diceMin = 1, diceMax = 9, },--acid burst
+			[32] = {dmgAdd = 6, diceMin = 1, diceMax = 6, },--ice blast
+			[37] = {dmgAdd = 8, diceMin = 1, diceMax = 4, },--deadly swarm
+			[39] = {dmgAdd = 12, diceMin = 1, diceMax = 8, },--blades
+			[41] = {dmgAdd = 8, diceMin = 1, diceMax = 8, },--rock blast
+			[43] = {dmgAdd = 0, diceMin = 1, diceMax = 12, },--death blossom
+			[44] = {dmgAdd = 15, diceMin = 0.5, diceMax = 0.5, },--mass distorsion, nerfed
+			[52] = {dmgAdd = 10, diceMin = 2, diceMax = 12, },--spirit lash
+			[59] = {dmgAdd = 12, diceMin = 1, diceMax = 7, },--mind blast
+			[65] = {dmgAdd = 45, diceMin = 1, diceMax = 30, },--psychic shock
+			[70] = {dmgAdd = 8, diceMin = 1, diceMax = 4, },--harm
+			[76] = {dmgAdd = 30, diceMin = 1, diceMax = 11, },--flying fist
+			[78] = {dmgAdd = 12, diceMin = 1, diceMax = 4, },--light bolt
+			[79] = {dmgAdd = 16, diceMin = 1, diceMax = 16, },--destroy undead
+			[84] = {dmgAdd = 25, diceMin = 2, diceMax = 2, },--prismatic light
+			[87] = {dmgAdd = 60, diceMin = 1, diceMax = 20, },--sunray
+			[90] = {dmgAdd = 25, diceMin = 1, diceMax = 10, },--toxic cloud
+			[93] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--shrapmetal
+			[97] = {dmgAdd = 0, diceMin = 1, diceMax = 25, },--dragon breath
+			[98] = {dmgAdd = 50, diceMin = 1, diceMax = 1, },--armageddon
+			[99] = {dmgAdd = 50, diceMin = 1, diceMax = 5, },--souldrinker
+			[103] = {dmgAdd = 30, diceMin = 1, diceMax = 22, },--darkfire bolt
+			[111] = {dmgAdd = 15, diceMin = 1, diceMax = 6, },--lifedrain scales with mastery, fixed in calcspelldamage
+			[123] = {dmgAdd = 10, diceMin = 1, diceMax = 10, },--flame blast scales with mastery, fixed in calcspelldamage
+		}
+end
+
+--calculate spell Damage
+function events.CalcSpellDamage(t)
+	--mass distorsion
+	if t.Spell == 44 then 
+		t.Result = t.HP*0.15+t.HP*t.Skill*0.005
+		return
+	end
+	--check for spell tier
+	local spellTier=t.Spell%11
+	if spellTier==0 then
+		spellTier=11
+	end
+	--take damage info
+	if spellPowers[t.Spell]==nil then return end
+	diceMin=spellPowers[t.Spell].diceMin
+	diceMax=spellPowers[t.Spell].diceMax
+	damageAdd=spellPowers[t.Spell].dmgAdd
+	local data=WhoHitMonster()
+	if data and data.Player then
+		local s,m = SplitSkill(data.Player.Skills[const.Skills.Learning])
+		diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, t.Spell)
+	end
+	--calculate
+	if t.Spell>1 and t.Spell<132 then
+		if diceMin~=diceMax then --roll dices
+			damage=0
+			for i=1,t.Skill do
+				damage=damage+math.random(diceMin,diceMax)
+			end
+			t.Result=damageAdd+damage
+		else
+			t.Result=damageAdd+spellPowers[t.Spell].diceMax*t.Skill
+		end
+	end
+	
+	--fix for mastery scaling spells
+	if t.Spell == 7 then  -- fire spike
+		if t.Mastery==3 then
+			t.Result=t.Result/6*8
+		elseif t.Mastery==4 then
+			t.Result=t.Result/6*10
+		end
+	end
+	if t.Spell == 111 then  -- lifedrain
+		if t.Mastery==3 then
+			t.Result=t.Result/3*5
+		elseif t.Mastery==4 then
+			t.Result=t.Result/3*7
+		end
+	end
+	if t.Spell == 123 then  -- flame blast
+		if t.Mastery==3 then
+			t.Result=t.Result/10*11
+		elseif t.Mastery==4 then
+			t.Result=t.Result/10*12
+		end
+	end
+end
+
+
+function ascendSpellDamage(skill, mastery, spell)
+	diceMin=spellPowers[spell].diceMin
+	diceMax=spellPowers[spell].diceMax
+	damageAdd=spellPowers[spell].dmgAdd
+	local ascensionLevel=math.min(math.floor(s/11),2)
+	if spell%11>ascensionLevel%11 then
+		ascensionLevel=ascensionLevel+1
+	end
+	diceMax=diceMax * (1+0.04 * skill * ascensionLevel)
+	damageAdd=damageAdd+skill * ascensionLevel^2 * 2
+	diceMin, damageMax, damageAdd = math.round(diceMin), math.round(diceMax), math.round(damageAdd)
+	return diceMin, damageMax, damageAdd
+end
+
+--add enchant damage
+
+
+spellbonusdamage={}
+spellbonusdamage[4] = {["low"]=6, ["high"]=8}
+spellbonusdamage[5] = {["low"]=18, ["high"]=24}
+spellbonusdamage[6] = {["low"]=36, ["high"]=48}
+spellbonusdamage[7] = {["low"]=4, ["high"]=10}
+spellbonusdamage[8] = {["low"]=12, ["high"]=30}
+spellbonusdamage[9] = {["low"]=24, ["high"]=60}
+spellbonusdamage[10] = {["low"]=2, ["high"]=12}
+spellbonusdamage[11] = {["low"]=6, ["high"]=36}
+spellbonusdamage[12] = {["low"]=12, ["high"]=72}
+spellbonusdamage[13] = {["low"]=12, ["high"]=12}
+spellbonusdamage[14] = {["low"]=24, ["high"]=24}
+spellbonusdamage[15] = {["low"]=48, ["high"]=48}
+
+aoespells = {6, 7, 8, 9, 10, 15, 22, 26, 32, 41, 43, 84, 92, 97, 98, 99, 123}
+function events.CalcSpellDamage(t)
+data=WhoHitMonster()
+	if data and data.Player then
+		it=data.Player:GetActiveItem(1)
+		if it then
+			if spellbonusdamage[it.Bonus2] then
+				damage=math.random(spellbonusdamage[it.Bonus2]["low"],spellbonusdamage[it.Bonus2]["high"])
+				for i = 1, #aoespells do
+					if aoespells[i] == t.Spell then
+						damage=damage/2.5
+					end
+				end
+				if it.MaxCharges>0 then
+					if it.MaxCharges <= 20 then
+						mult=1+it.MaxCharges/20
+					else
+						mult=2+2*(it.MaxCharges-20)/20
+					end
+					damage=damage*mult
+				end
+				t.Result = t.Result+damage
+			end
+		end
+	end
+end
+
+--function for tooltips
+function dmgAddTooltip(skill, mastery, spell)
+	_, _, dmgAdd = ascendSpellDamage(skill, mastery, spell)
+	return dmgAdd
+end
+
+function diceMaxTooltip(skill, mastery, spell)
+	_, diceMax, _ = ascendSpellDamage(skill, mastery, spell)
+	return diceMax
+end
+
+--adjust mana cost and tooltips	
+function events.Action(t)
+	index=Game.CurrentPlayer
+	if index> Party.High then
+		Game.CurrentPlayer=0
+	end
+	if index>=0 and index<=Party.High then
+		local level=Party[index].Skills[const.Skills.Learning]
+		if lastIndex~=index or lastLevel~=level then
+			lastIndex=index
+			lastLevel=level
+			s,m = SplitSkill(level)
+			for _, num in ipairs(spells) do 
+				for i=1,4 do
+					Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+0.5*s)*(1-0.1*m)
+				end
+				if num==44 then	
+					Game.Spells[num]["SpellPointsGM"]=Party[index].LevelBase^1.6/12.5
+				end	
+			end				
+				
+			--change tooltips according to ascended damage
+			Game.SpellsTxt[2].Description=string.format("Launches a burst of fire at a single target.  Damage is %s+1-%s points of damage per point of skill in Fire Magic.   Firebolt is safe, effective and has a low casting cost.",dmgAddTooltip(s, m,2),diceMaxTooltip(s, m,2))
+			Game.SpellsTxt[6].Description=string.format("Fires a ball of fire at a single target. When it hits, the ball explodes damaging all those nearby, including your characters if they're too close.  Fireball does 1-%s points of damage per point of skill in Fire Magic.",diceMaxTooltip(s, m,6))
+			--fire spikes fix
+			Game.SpellsTxt[7].Expert=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",diceMaxTooltip(s, m,7))
+			Game.SpellsTxt[7].Master=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",math.round(diceMaxTooltip(s, m,7)/6*8))
+			Game.SpellsTxt[7].GM=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",math.round(diceMaxTooltip(s, m,7)/6*10))
+			----------------------------------------
+			
+			Game.SpellsTxt[8].Description=string.format("Surrounds your characters with a very hot fire that is only harmful to others.  The spell will deliver 1-%s points of damage per point of skill to all nearby monsters for as long as they remain in the area of effect.",diceMaxTooltip(s, m,8))
+			Game.SpellsTxt[9].Description=string.format("Summons flaming rocks from the sky which fall in a large radius surrounding your chosen target.  Try not to be near the victim when you use this spell.  A single meteor does %s points of damage plus %s per point of skill in Fire Magic.  This spell only works outdoors.",dmgAddTooltip(s, m,9),diceMaxTooltip(s, m,9))
+			Game.SpellsTxt[10].Description=string.format("Inferno burns all monsters in sight when cast, excluding your characters.  One or two castings can clear out a room of weak or moderately powerful creatures. Each monster takes %s points of damage plus %s per point of skill in Fire Magic.  This spell only works indoors.",dmgAddTooltip(s, m,10),diceMaxTooltip(s, m,10))
+			Game.SpellsTxt[11].Description=string.format("Among the strongest direct damage spells available, Incinerate inflicts massive damage on a single target.  Only the strongest of monsters can expect to survive this spell.  Damage is %s points plus 1-%s per point of skill in Fire Magic.",dmgAddTooltip(s, m,11),diceMaxTooltip(s, m,11))
+			Game.SpellsTxt[15].Description=string.format("Sparks fires small balls of lightning into the world that bounce around until they hit something or dissipate. It is hard to tell where they will go, so this spell is best used in a room crowded with small monsters. Each spark does %s points plus %s per point of skill in Air Magic.",dmgAddTooltip(s, m,15),diceMaxTooltip(s, m,15))
+			Game.SpellsTxt[18].Description=string.format("Lightning Bolt discharges electricity from the caster's hand to a single target.  It always hits and does %s + 1-%s points of damage per point of skill in Air Magic.",dmgAddTooltip(s, m,18),diceMaxTooltip(s, m,18))
+			Game.SpellsTxt[20].Description=string.format("Implosion is a nasty spell that affects a single target by destroying the air around it, causing a sudden inrush from the surrounding air, a thunderclap, and %s points plus 1-%s points of damage per point of skill in Air Magic.",dmgAddTooltip(s, m,20),diceMaxTooltip(s, m,20))
+			Game.SpellsTxt[22].Description=string.format("Calls stars from the heavens to smite and burn your enemies.  Twenty stars are called, and the damage for each star is %s points plus %s per point of skill in Air Magic. Try not to get caught in the blast! This spell only works outdoors.",dmgAddTooltip(s, m,22),diceMaxTooltip(s, m,22))
+			Game.SpellsTxt[24].Description=string.format("Sprays poison at monsters directly in front of your characters.  Damage is low, but few monsters have resistance to Water Magic, so it usually works.  Each shot does %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,24),diceMaxTooltip(s, m,24))
+			Game.SpellsTxt[26].Description=string.format("Fires a bolt of ice at a single target.  The missile does %s + 1-%s points of damage per point of skill in Water Magic.",dmgAddTooltip(s, m,26),diceMaxTooltip(s, m,26))
+			Game.SpellsTxt[29].Description=string.format("Acid burst squirts a jet of extremely caustic acid at a single victim.  It always hits and does %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,29),diceMaxTooltip(s, m,29))
+			Game.SpellsTxt[32].Description=string.format("Fires a ball of ice in the direction the caster is facing.  The ball will shatter when it hits something, launching 7 shards of ice in all directions except the caster's.  The shards will ricochet until they strike a creature or melt.  Each shard does %s points of damage plus 1-%s per point of skill in Water Magic.",dmgAddTooltip(s, m,32),diceMaxTooltip(s, m,32))
+			Game.SpellsTxt[37].Description=string.format("Summons a swarm of biting, stinging insects to bedevil a single target.  The swarm does %s points of damage plus 1-%s per point of skill in Earth Magic.",dmgAddTooltip(s, m,37),diceMaxTooltip(s, m,37))
+			Game.SpellsTxt[39].Description=string.format("Fires a rotating, razor-thin metal blade at a single monster.  The blade does 1-%s points of damage per point of skill in Earth Magic.",diceMaxTooltip(s, m,39))
+			Game.SpellsTxt[41].Description=string.format("Releases a magical stone into the world that will explode when it comes into contact with a creature or enough time passes.  The rock will bounce and roll until it finds a resting spot, so be careful not to be caught in the blast.  The explosion causes %s points of damage plus 1-%s points of damage per point of skill in Earth Magic.",dmgAddTooltip(s, m,41),diceMaxTooltip(s, m,41))
+			Game.SpellsTxt[43].Description=string.format("Launches a magical stone which bursts in air, sending shards of explosive earth raining to the ground.  The damage is 1-%s per point of skill in Earth Magic for each shard.  This spell can only be used outdoors.",diceMaxTooltip(s, m,43))
+			Game.SpellsTxt[44].Description=string.format("Increases the weight of a single target enormously for an instant, causing internal damage equal to %s%% of the monster's hit points plus another %s%% per point of skill in Earth Magic.  The bigger they are, the harder they fall.",dmgAddTooltip(s, m,44),diceMaxTooltip(s, m,44))
+			Game.SpellsTxt[52].Description=string.format("This spell weakens the link between a target's body and soul, causing %s + 2-%s points of damage per point of skill in Spirit Magic to all monsters near the caster.",dmgAddTooltip(s, m,52),diceMaxTooltip(s, m,52))
+			Game.SpellsTxt[59].Description=string.format("Fires a bolt of mental force which damages a single target's nervous system.  Mind Blast does %s points of damage plus 1-%s per point of skill in Mind Magic.",dmgAddTooltip(s, m,59),diceMaxTooltip(s, m,59))
+			Game.SpellsTxt[65].Description=string.format("Similar to Mind Blast, Psychic Shock targets a single creature with mind damaging magic--only it has a much greater effect.  Psychic Shock does %s points of damage plus 1-%s per point of skill in Mind Magic.",dmgAddTooltip(s, m,65),diceMaxTooltip(s, m,65))
+			Game.SpellsTxt[70].Description=string.format("Directly inflicts magical damage upon a single creature.  Harm does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(s, m,70),diceMaxTooltip(s, m,70))
+			Game.SpellsTxt[76].Description=string.format("Flying Fist throws a heavy magical force at a single opponent that does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(s, m,76),diceMaxTooltip(s, m,76))
+			Game.SpellsTxt[76].Description=string.format("Flying Fist throws a heavy magical force at a single opponent that does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(s, m,76),diceMaxTooltip(s, m,76))
+			Game.SpellsTxt[78].Description=string.format("Fires a bolt of light at a single target that does %s + 1-%s points of damage per point of skill in light magic.  Damage vs. Undead is doubled.",dmgAddTooltip(s, m,78),diceMaxTooltip(s, m,78))
+			Game.SpellsTxt[79].Description=string.format("Calls upon the power of heaven to undo the evil magic that extends the lives of the undead, inflicting %s points of damage plus 1-%s per point of skill in Light Magic upon a single, unlucky target.  This spell only works on the undead.",dmgAddTooltip(s, m,79),diceMaxTooltip(s, m,79))
+			Game.SpellsTxt[84].Description=string.format("Inflicts %s points of damage plus %s per point of skill in Light Magic on all creatures in sight.  This spell can only be cast indoors.",dmgAddTooltip(s, m,84),diceMaxTooltip(s, m,84))
+			Game.SpellsTxt[87].Description=string.format("Sunray is the second most devastating damage spell in the game. It does %s points of damage plus 1-%s points per point of skill in Light Magic, by concentrating the light of the sun on one unfortunate creature. It only works outdoors during the day.",dmgAddTooltip(s, m,87),diceMaxTooltip(s, m,87))
+			Game.SpellsTxt[90].Description=string.format("A poisonous cloud of noxious gases is formed in front of the caster and moves slowly away from your characters.  The cloud does %s points of damage plus 1-%s per point of skill in Dark Magic and lasts until something runs into it.",dmgAddTooltip(s, m,90),diceMaxTooltip(s, m,90))
+			Game.SpellsTxt[93].Description=string.format("Fires a blast of hot, jagged metal in front of the caster, striking any creature that gets in the way.  Each piece inflicts 1-%s points of damage per point of skill in Dark Magic.",diceMaxTooltip(s, m,93))
+			Game.SpellsTxt[97].Description=string.format("Dragon Breath empowers the caster to exhale a cloud of toxic vapors that targets a single monster and damage all creatures nearby, doing 1-%s points of damage per point of skill in Dark Magic.",diceMaxTooltip(s, m,97))
+			Game.SpellsTxt[98].Description=string.format("This spell is the town killer. Armageddon inflicts %s points of damage plus %s point of damage for every point of Dark skill your character has to every creature on the map, including all your characters. It can only be cast three times per day and only outdoors.",dmgAddTooltip(s, m,98),diceMaxTooltip(s, m,98))
+			Game.SpellsTxt[99].Description=string.format("This horrible spell sucks the life from all creatures in sight, friend or enemy.  Souldrinker then transfers that life to your party in much the same fashion as Shared Life.  Damage (and healing) is %s + 1-%s per point of skill.",dmgAddTooltip(s, m,99),diceMaxTooltip(s, m,99))
+			
+			Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is 1-%s per point of skill.",diceMaxTooltip(s, m,103))
+			Game.SpellsTxt[111].Description=string.format("Lifedrain allows the vampire to damage his or her target and simultaneously heal based on the damage done in the Lifedrain.  This ability does %s points of damage plus 1-%s points of damage per skill.",dmgAddTooltip(s, m,111),diceMaxTooltip(s, m,111))
+			Game.SpellsTxt[111].Master=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*5),math.round(diceMaxTooltip(s, m,111)/3*5))
+			Game.SpellsTxt[111].GM=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*7),math.round(diceMaxTooltip(s, m,111)/3*7))
+			Game.SpellsTxt[123].Expert=string.format("Damage %s points plus 1-%s points per point of skill",dmgAddTooltip(s, m,123),diceMaxTooltip(s, m,123))
+			Game.SpellsTxt[123].Master=string.format("Damage %s points plus 1-%s points per point of skill",math.round(dmgAddTooltip(s, m,123)/10*11),math.round(diceMaxTooltip(s, m,123)/10*11))
+			Game.SpellsTxt[123].GM=string.format("Damage %s points plus 1-%s points per point of skill",math.round(dmgAddTooltip(s, m,123)/10*12),math.round(diceMaxTooltip(s, m,123)/10*12))
+			
+			
+			-----------------------
+			--Healing Spells
+			-----------------------
+			healingSpells={
+				[const.Spells.RemoveCurse]=	{["Cost"]={0,5,8,16}, ["Base"]={0,12,24,36}, ["Scaling"]={0,2,4,6}},
+				[const.Spells.Resurrection]={["Cost"]={0,0,0,200}, ["Base"]={0,0,0,200}, ["Scaling"]={0,0,0,20}},
+				[const.Spells.Heal]=		{["Cost"]={3,5,8,16}, ["Base"]={5,10,15,20}, ["Scaling"]={2,3,4,5}},
+				[const.Spells.CureDisease]=	{["Cost"]={0,0,15,25}, ["Base"]={0,0,25,40}, ["Scaling"]={0,0,6,9}},
+				[const.Spells.PowerCure]=	{["Cost"]={0,0,0,30}, ["Base"]={0,0,0,10}, ["Scaling"]={0,0,0,3}}
+			}
+			
+			--remove curse
+			local sp=healingSpells[49]
+			Game.Spells[49]["SpellPointsExpert"]=sp.Cost[2]
+			Game.Spells[49]["SpellPointsMaster"]=sp.Cost[3]
+			Game.Spells[49]["SpellPointsGM"]=sp.Cost[4]
+			Game.SpellsTxt[49].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[3], sp.Base[3], sp.Scaling[3])
+			Game.SpellsTxt[49].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[4], sp.Base[4], sp.Scaling[4])
+
+			--resurrection
+			local sp=healingSpells[55]
+			Game.Spells[55]["SpellPointsGM"]=sp.Cost[4]
+			Game.SpellsTxt[55].GM=string.format("Cures %s + %s HP per point of skill", sp.Base[4], sp.Scaling[4])
+			
+			--heal
+			local sp=healingSpells[68]
+			Game.Spells[68]["SpellPointsNormal"]=sp.Cost[1]
+			Game.Spells[68]["SpellPointsExpert"]=sp.Cost[2]
+			Game.Spells[68]["SpellPointsMaster"]=sp.Cost[3]
+			Game.Spells[68]["SpellPointsGM"]=sp.Cost[4]
+			Game.SpellsTxt[68].Normal=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[1], sp.Base[1], sp.Scaling[1])
+			Game.SpellsTxt[68].Expert=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[2], sp.Base[2], sp.Scaling[2])
+			Game.SpellsTxt[68].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[3], sp.Base[3], sp.Scaling[3])
+			Game.SpellsTxt[68].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[4], sp.Base[4], sp.Scaling[4])
+			
+			--greater heal
+			local sp=healingSpells[74]
+			Game.Spells[74]["SpellPointsMaster"]=sp.Cost[3]
+			Game.Spells[74]["SpellPointsGM"]=sp.Cost[4]
+			Game.SpellsTxt[74].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[3], sp.Base[3], sp.Scaling[3])
+			Game.SpellsTxt[74].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\nno limit\n",sp.Cost[4], sp.Base[4], sp.Scaling[4])
+			
+			--power heal
+			local sp=healingSpells[77]
+			Game.Spells[77]["SpellPointsGM"]=sp.Cost[4]
+			Game.SpellsTxt[77].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[4], sp.Base[4], sp.Scaling[4])
+		end
+	end
+end
+
+
+--[[
+mass fear; 40 mana , 6 secs, skill/2 first cast
+slow 12 sec duration, skill first cast
+paralyze 6 sec, skill x 2 first cast
+shrink ray 3 sec duration, skill/2 first cas
+berserk 6 sec, skill x 2 first cast
+enslave 6 sec, skill x 2 first cast
+
+	MonsterBuff = {
+		ArmorHalved = 21,
+		Berserk = 8,
+		Bless = 16,
+		Charm = 1,
+		DamageHalved = 23,
+		DayOfProtection = 12,
+		Enslave = 11,
+		Fate = 10,
+		Fear = 4,
+		Hammerhands = 20,
+		Haste = 18,
+		Heroism = 17,
+		HourOfPower = 13,
+		MassDistortion = 9,
+		MeleeOnly = 22,
+		Mistform = 25,
+		Null = 0,
+		PainReflection = 19,
+		Paralyze = 6,
+		Shield = 14,
+		ShrinkingRay = 3,
+		Slow = 7,
+		StoneSkin = 15,
+		Stoned = 5,
+		Summoned = 2,
+		Wander = 24
+	},
+]]
+
+
+--[[old ascendance, from level 80 every 8 levels, no skills involved
+
 
 ------------------------------
 ------MANA COST CHANGE--------
@@ -1328,467 +2094,4 @@ function events.Tick()
 		end
 	end
 end
-
--- shared life overflow fix
-function randomizeHP()
-	for i, pl in Party do
-		pl.HP = random(1, pl:GetFullHP())
-	end
-end
-
--- TODO: test very negative amounts (like -50000), they asserted previously
-function doSharedLife(amount)
-	-- for each iteration, try to top up lowest HP deficit party member, increasing others' HP along the way
-	local function shouldParticipate(pl)
-		return pl.Dead == 0 and pl.Eradicated == 0 and pl.Stoned == 0 -- as in default code
-	end
-
-	local activePlayers = {}
-	local fullHPs = {}
-	amount = amount or 0
-	for i, pl in Party do
-		if shouldParticipate(pl) then
-			table.insert(activePlayers, pl)
-			fullHPs[pl:GetIndex()] = pl:GetFullHP()
-			amount = amount + pl.HP
-			pl.HP = 0
-		end
-	end
-	local affectedPlayers = table.copy(activePlayers)
-	local pool = amount
-	local steps = 0
-	while amount > 0 and #activePlayers > 0 do
-		steps = steps + 1
-		local minDeficit = math.huge
-		for i, pl in ipairs(activePlayers) do
-			local def = fullHPs[pl:GetIndex()] - pl.HP
-			if def > 0 then
-				minDeficit = min(minDeficit, def)
-			end
-		end
-
-		local part = minDeficit
-		if minDeficit * #activePlayers > amount then
-			part = amount:div(#activePlayers)
-		end
-
-		amount = amount - part * #activePlayers
-
-		local newPlayers = {}
-		for i, pl in ipairs(activePlayers) do
-			pl.HP = pl.HP + part
-			if part == 0 and amount > 0 then
-				pl.HP = pl.HP + 1
-				amount = amount - 1
-			end
-			if pl.HP ~= fullHPs[pl:GetIndex()] then
-				table.insert(newPlayers, pl)
-			end
-		end
-		activePlayers = newPlayers
-	end
-	local result = 0
-	local everyoneFull = true
-	for i, pl in ipairs(affectedPlayers) do
-		result = result + pl.HP
-		if pl.HP > 0 then
-			pl.Unconscious = 0
-		end
-		if pl.HP ~= pl:GetFullHP() then
-			everyoneFull = false
-		end
-	end
-	assert((pool == result) or everyoneFull, format("Pool %d, result %d, everyoneFull: %s", pool, result, everyoneFull))
-	--printf("Steps: %d", steps)
-	return affectedPlayers
-	--debug.Message(format("%d HP left", amount))
-end
-
--- replace shared life code with my own
-hook(0x42A171, function(d)
-	local amount = u4[d.ebp - 4]
-	local t = getSpellQueueData(d.ebx)
-	t.Amount = amount
-	events.call("HealingSpellPower", t)
-	local affectedPlayers = doSharedLife(t.Amount)
-	for i, pl in ipairs(affectedPlayers) do
-		mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, u4[0x75CE00]), const.Spells.SharedLife, getPartyIndex(pl)) -- show animation
-	end
-end)
-asmpatch(0x42A176, "jmp absolute 0x42C200") -- "cast successful"
-
-
---removes fly when attacking, except in certain maps
-flyAllowedMaps={"elema.odm","elemf.odm","elemw.odm","out12.odm","outa1.odm","outa2.odm","outa3.odm","outb3.odm","out05.odm"}
-function events.CalcDamageToMonster(t)
-	if table.find(flyAllowedMaps,Map.Name) then 
-		return
-	end
-	data=WhoHitMonster()
-	flyTime=Party.SpellBuffs[7].ExpireTime
-	if data and data.Player and flyTime>Game.Time then
-		Party.SpellBuffs[5].ExpireTime=flyTime
-		Party.SpellBuffs[7].ExpireTime=0
-	end
-end
-
-function events.LoadMap()
-	if table.find(flyAllowedMaps,Map.Name) then 
-		Sleep(5)
-		Game.ShowStatusText("Fly is allowed without restrictions here")
-	end
-end
-
-function events.GameInitialized2()
-	Game.SpellsTxt[21].Description= "Grants the power of flight to your characters!  This spell is very expensive and only works outdoors, but it is very useful.  Fly will drain one spell point every five minutes it is in use (i.e. when you aren't touching the ground).\n\nWith the exception of few places, attacking monsters will cancel the effect"
-end
-
-
---WHEN GM ELEMENTAL BUFFS WILL BE GRANTED PASSIVELY
-TimerPeriod=const.Minute/2
-schools={12,13,14,15,17,18}
-buffsOrdered = {6, 0, 17, 4, 12, 1}
-function elementalBuffs()
-	--buffs to apply
-	for i=0, Party.High do
-		for v=1,6 do
-			s,m=SplitSkill(Party[i]:GetSkill(schools[v]))
-			if m==4 then
-				if Party.SpellBuffs[buffsOrdered[v]].Power<=s*3 then
-					Party.SpellBuffs[buffsOrdered[v]].ExpireTime=Game.Time+const.Hour
-					Party.SpellBuffs[buffsOrdered[v]].Power=s*3
-					Party.SpellBuffs[buffsOrdered[v]].Skill=4
-				end
-			end
-		end
-	end
-	if Party.High==0 then
-		Party.SpellBuffs[19].ExpireTime=Game.Time+const.Hour
-		Party.SpellBuffs[19].Power=10
-		Party.SpellBuffs[19].Skill=2
-	end
-end
-
-function events.AfterLoadMap()
-	Timer(elementalBuffs, TimerPeriod, true)
-end
-
-
----------------------------
-----end OF SPELL REWORK----
----------------------------
---[[allow for spells to be learned freely in horizontal moderately
-function events.CanLearnSpell(t)
-	if Game.freeProgression then
-		if t.Player.Spells[t.Spell] then
-			return
-		end
-		local school=math.floor(t.Spell/11)+12
-		if t.Player.Skills[school]>0 then
-			vars.horizontaSpells=vars.horizontaSpells or {}
-			vars.horizontaSpells[t.PlayerIndex]=vars.horizontaSpells[t.PlayerIndex] or {}
-			vars.horizontaSpells[t.PlayerIndex][t.Spell]=true
-			t.Player.Spells[t.Spell]=true
-			Mouse.Item.Number=0
-		end
-	end
-end
-]]
-
-local mastery={"Normal", "Expert", "Master", "GM"}
-function events.Action(t)
-	if t.Action==25 and autoTargetHeals then
-		local pl=Party[Game.CurrentPlayer]
-		if pl.QuickSpell==68 and pl.RecoveryDelay==0 then
-			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
-			local cost=Game.Spells[68]["SpellPoints" .. mastery[m]]
-			if pl.SP<cost then return end
-			t.Handled=true
-			pl.SP=pl.SP-cost
-			local persBonus=pl:GetPersonality()/1000
-			local intBonus=pl:GetIntellect()/1000
-			local statBonus=math.max(persBonus,intBonus)
-			local crit=pl:GetLuck()/1500+0.05
-			local baseHeal=lesserHealBase[m]+lesserHealScaling[m]*s
-			local totHeal=baseHeal*(statBonus+1)
-			local roll=math.random()
-			local gotCrit=false
-			if roll<crit then
-				local mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount==300 then
-					mult=mult/2
-				end
-				totHeal=totHeal*(1+mult)
-				gotCrit=true
-			end
-			if gotCrit then
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
-			else
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
-			end
-			-- Define the variables
-			a={}
-			a[0]=2
-			a[1]=2
-			a[2]=2
-			a[3]=2
-			a[4]=2
-			for i=0,Party.High do
-				if Party[i].Dead==0 and Party[i].Eradicated==0 then
-					a[i] = Party[i].HP/Party[i]:GetFullHP()
-				end
-			end
-			a, b, c, d, e= a[0], a[1], a[2], a[3], a[4] 
-			-- Find the maximum value and its position
-			min_value = math.min(a, b, c, d, e)
-			min_index = indexof({a, b, c, d, e}, min_value)
-			min_index = min_index - 1
-			--apply heal
-			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
-			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, Party[min_index]:GetFullHP())	
-			--bug fix
-			if Party[min_index].HP>0 then
-			Party[min_index].Unconscious=0
-			end
-			local haste=math.floor(pl:GetSpeed()/10)
-			local delay=Game.Spells[68]["Delay" .. mastery[m]]
-			pl:SetRecoveryDelay(delay)
-			pl.Expression=40
-		elseif pl.QuickSpell==74 and pl.RecoveryDelay==0 then
-			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
-			local cost=Game.Spells[74]["SpellPoints" .. mastery[m]]
-			if pl.SP<cost then return end
-			t.Handled=true
-			pl.SP=pl.SP-cost
-			local persBonus=pl:GetPersonality()/1000
-			local intBonus=pl:GetIntellect()/1000
-			local statBonus=math.max(persBonus,intBonus)
-			local crit=pl:GetLuck()/1500+0.05
-			local baseHeal=greaterHealBase[m]+greaterHealScaling[m]*s
-			local totHeal=baseHeal*(statBonus+1)
-			local roll=math.random()
-			local gotCrit=false
-			if roll<crit then
-				local mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount==300 then
-					mult=mult/2
-				end
-				totHeal=totHeal*(1+mult)
-				gotCrit=true
-			end
-			if gotCrit then
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
-			else
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
-			end
-			-- Define the variables
-			a={}
-			a[0]=2
-			a[1]=2
-			a[2]=2
-			a[3]=2
-			a[4]=2
-			for i=0,Party.High do
-				if Party[i].Dead==0 and Party[i].Eradicated==0 then
-					a[i] = Party[i].HP/Party[i]:GetFullHP()
-				end
-			end
-			a, b, c, d, e= a[0], a[1], a[2], a[3], a[4] 
-			-- Find the maximum value and its position
-			min_value = math.min(a, b, c, d, e)
-			min_index = indexof({a, b, c, d, e}, min_value)
-			min_index = min_index - 1
-			--apply heal
-			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
-			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, Party[min_index]:GetFullHP())	
-			--bug fix
-			if Party[min_index].HP>0 then
-			Party[min_index].Unconscious=0
-			end
-			Party[min_index].Disease1=0
-			Party[min_index].Disease2=0
-			Party[min_index].Disease3=0
-			local haste=math.floor(pl:GetSpeed()/10)
-			local delay=Game.Spells[74]["Delay" .. mastery[m]]
-			pl:SetRecoveryDelay(delay)
-			pl.Expression=40
-		elseif pl.QuickSpell==49 and pl.RecoveryDelay==0 then
-			local s,m=SplitSkill(pl:GetSkill(const.Skills.Spirit))
-			local cost=Game.Spells[49]["SpellPoints" .. mastery[m]]
-			if pl.SP<cost then return end
-			t.Handled=true
-			pl.SP=pl.SP-cost
-			local persBonus=pl:GetPersonality()/1000
-			local intBonus=pl:GetIntellect()/1000
-			local statBonus=math.max(persBonus,intBonus)
-			local crit=pl:GetLuck()/1500+0.05
-			local baseHeal=greaterHealBase[m]+greaterHealScaling[m]*s
-			local totHeal=baseHeal*(statBonus+1)
-			local roll=math.random()
-			local gotCrit=false
-			if roll<crit then
-				local mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount==300 then
-					mult=mult/2
-				end
-				totHeal=totHeal*(1+mult)
-				gotCrit=true
-			end
-			if gotCrit then
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
-			else
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
-			end
-			-- Define the variables
-			a={}
-			a[0]=2
-			a[1]=2
-			a[2]=2
-			a[3]=2
-			a[4]=2
-			for i=0,Party.High do
-				if Party[i].Dead==0 and Party[i].Eradicated==0 then
-					a[i] = Party[i].HP/Party[i]:GetFullHP()
-				end
-			end
-			a, b, c, d, e= a[0], a[1], a[2], a[3], a[4] 
-			-- Find the maximum value and its position
-			min_value = math.min(a, b, c, d, e)
-			min_index = indexof({a, b, c, d, e}, min_value)
-			min_index = min_index - 1
-			--apply heal
-			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
-			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, Party[min_index]:GetFullHP())
-			--bug fix
-			if Party[min_index].HP>0 then
-			Party[min_index].Unconscious=0
-			end
-			Party[min_index].Cursed=0
-			local haste=math.floor(pl:GetSpeed()/10)
-			local delay=Game.Spells[49]["Delay" .. mastery[m]]
-			pl:SetRecoveryDelay(delay)
-			pl.Expression=40
-		end
-	end
-end
-
-
-----------------------------------------
---CC REWORK
-----------------------------------------
-CCMAP={
-	[const.Spells.Slow]=	{["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Earth, ["DamageKind"]=const.Damage.Earth,["Debuff"]=const.MonsterBuff.Slow},
-	[60]=					{["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--Mind Charm, has no const value, due to dark elf one overwriting
-	[const.Spells.Charm]=	{["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.DarkElfAbility, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--dark elf one
-	[const.Spells.Berserk]=	{["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Berserk},
-	[const.Spells.MassFear]={["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Fear},
-	[const.Spells.Enslave]=	{["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Enslave},
-	[const.Spells.Paralyze]={["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Light, ["DamageKind"]=const.Damage.Light,["Debuff"]=const.MonsterBuff.Paralyze},	
-[const.Spells.ShrinkingRay]={["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark,["Debuff"]=const.MonsterBuff.ShrinkingRay},
-[const.Spells.DarkGrasp]=	{["Duration"]=const.Minute, ["ChanceMult"]=0.02, ["BaseCost"]=2, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]={const.MonsterBuff.ArmorHalved, const.MonsterBuff.Slow, const.MonsterBuff.DamageHalved, const.MonsterBuff.MeleeOnly}},																									
-}
-
-function events.Action(t)
-	local id=Game.CurrentPlayer
-	if id<0 then return end
-	for key, value in pairs(CCMAP) do
-		local lvl=Party[id].LevelBase
-		local baseCost=value.BaseCost
-		local cost=math.round(baseCost+(lvl/5)) --edit here to change mana cost
-		
-		Game.Spells[key]["SpellPointsNormal"]=cost
-		Game.Spells[key]["SpellPointsExpert"]=cost
-		Game.Spells[key]["SpellPointsMaster"]=cost
-		Game.Spells[key]["SpellPointsGM"]=cost
-	end
-end
-
-function events.PlayerCastSpell(t)
-	if CCMAP[t.SpellId] then
-		local resistance={}
-		local level={}
-		local cc=CCMAP[t.SpellId]
-		for i=0,Map.Monsters.High do
-			local mon=Map.Monsters[i]
-			local res=mon.Resistances[cc.DamageKind]
-			local lvl=mon.Level
-				resistance[i]=res
-				level[i]=lvl
-			local s,m=SplitSkill(t.Player:GetSkill(cc.School))
-			local newLevel=calcEffectChance(lvl, res, s, cc.ChanceMult)
-			mon.Resistances[3]=0
-			mon.Level=newLevel
-		end
-		local reset=1
-		if cc.DamageKind==const.Damage.Dark then
-			reset=100
-		end
-		function events.Tick() 
-			reset=reset-1
-			if reset==0 then
-				events.Remove("Tick", 1)
-			end
-			for i=0,Map.Monsters.High do
-				local mon=Map.Monsters[i]
-				mon.Level=level[i]
-				mon.Resistances[cc.DamageKind]=resistance[i]
-				if type(cc.Debuff)=="table" then
-					for v =1,4 do 
-						local debuff=mon.SpellBuffs[cc.Debuff[v]]
-						debuff.ExpireTime=math.min(debuff.ExpireTime, Game.Time+cc.Duration)
-					end
-				else
-					local debuff=mon.SpellBuffs[cc.Debuff]
-					debuff.ExpireTime=math.min(debuff.ExpireTime, Game.Time+cc.Duration)
-				end
-			end
-		end
-	end
-end
-
-function calcEffectChance(lvl, res, skill, chance)
-	totRes=lvl/4+res
-	mult=(1+skill*chance)
-	newRes=(totRes+30)/mult-30
-	newLevel=math.max(math.round(newRes*4),0)
-	return newLevel
-end
-
-
---[[
-mass fear; 40 mana , 6 secs, skill/2 first cast
-slow 12 sec duration, skill first cast
-paralyze 6 sec, skill x 2 first cast
-shrink ray 3 sec duration, skill/2 first cas
-berserk 6 sec, skill x 2 first cast
-enslave 6 sec, skill x 2 first cast
-
-	MonsterBuff = {
-		ArmorHalved = 21,
-		Berserk = 8,
-		Bless = 16,
-		Charm = 1,
-		DamageHalved = 23,
-		DayOfProtection = 12,
-		Enslave = 11,
-		Fate = 10,
-		Fear = 4,
-		Hammerhands = 20,
-		Haste = 18,
-		Heroism = 17,
-		HourOfPower = 13,
-		MassDistortion = 9,
-		MeleeOnly = 22,
-		Mistform = 25,
-		Null = 0,
-		PainReflection = 19,
-		Paralyze = 6,
-		Shield = 14,
-		ShrinkingRay = 3,
-		Slow = 7,
-		StoneSkin = 15,
-		Stoned = 5,
-		Summoned = 2,
-		Wander = 24
-	},
 ]]
