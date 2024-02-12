@@ -60,16 +60,7 @@ end
 -------------------------------------------------
 --hour of power buff list
 local hopList = {8, 9, 14, 15}
---Remove curse matrix
-local curseBase={0,12,24,36}
-local curseScaling={0,2,4,6}
---lesser heal matrix
-local lesserHealBase={5,10,15,20}
-local lesserHealScaling={2,3,4,5}
 
---greater heal matrix
-local greaterHealBase={0,0,25,40}
-local greaterHealScaling={0,0,6,9}
 
 --modify Spells
 function events.PlayerCastSpell(t)
@@ -110,12 +101,13 @@ function events.PlayerCastSpell(t)
 	--cure curse
 	if t.SpellId==49 then
 		if not t.RemoteData then
+			local sp=healingSpells[49]
 			local persBonus=t.Player:GetPersonality()/1000
 			local intBonus=t.Player:GetIntellect()/1000
 			local statBonus=math.max(persBonus,intBonus)
 			local crit=t.Player:GetLuck()/1500+0.05
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
-			local baseHeal=curseBase[m]+curseScaling[m]*s
+			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
 			totHeal=baseHeal*(statBonus+1)
 			roll=math.random()
 			gotCrit=false
@@ -191,12 +183,13 @@ function events.PlayerCastSpell(t)
 	--resurrection
 	if t.SpellId == 55 then
 		if not t.RemoteData then
+			local sp=healingSpells[55]
 			local persBonus=t.Player:GetPersonality()/1000
 			local intBonus=t.Player:GetIntellect()/1000
 			local statBonus=math.max(persBonus,intBonus)
 			local crit=t.Player:GetLuck()/1500+0.05
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
-			local baseHeal=resurrectionBase[m]+resurrectionScaling[m]*s
+			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
 			totHeal=baseHeal*(statBonus+1)
 			roll=math.random()
 			gotCrit=false
@@ -248,13 +241,13 @@ function events.PlayerCastSpell(t)
 	--lesser heal
 	if t.SpellId == 68 then
 		if not t.RemoteData then
-			t.Skill=0 --not working
+			local sp=healingSpells[68]
 			local persBonus=t.Player:GetPersonality()/1000
 			local intBonus=t.Player:GetIntellect()/1000
 			local statBonus=math.max(persBonus,intBonus)
 			local crit=t.Player:GetLuck()/1500+0.05
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
-			local baseHeal=lesserHealBase[m]+lesserHealScaling[m]*s
+			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
 			totHeal=baseHeal*(statBonus+1)
 			roll=math.random()
 			gotCrit=false
@@ -327,12 +320,13 @@ function events.PlayerCastSpell(t)
 	--cure disease, reworked to greater heal
 	if t.SpellId==74 then
 		if not t.RemoteData then
+			local sp=healingSpells[74]
 			local persBonus=t.Player:GetPersonality()/1000
 			local intBonus=t.Player:GetIntellect()/1000
 			local statBonus=math.max(persBonus,intBonus)
 			local crit=t.Player:GetLuck()/1500+0.05
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
-			local baseHeal=greaterHealBase[m]+greaterHealScaling[m]*s
+			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
 			totHeal=baseHeal*(statBonus+1)
 			roll=math.random()
 			gotCrit=false
@@ -393,13 +387,14 @@ function events.PlayerCastSpell(t)
 	--power cure
 	if t.SpellId==77 then
 		if not t.RemoteData then
+			local sp=healingSpells[77]
 			t.Skill=0
 			local persBonus=t.Player:GetPersonality()/1000
 			local intBonus=t.Player:GetIntellect()/1000
 			local statBonus=math.max(persBonus,intBonus)
 			local crit=t.Player:GetLuck()/1500+0.05
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
-			local baseHeal=powerHealBase+powerHealScaling*s
+			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
 			totHeal=baseHeal*(statBonus+1)
 			roll=math.random()
 			gotCrit=false
@@ -1225,8 +1220,27 @@ function ascendSpellDamage(skill, mastery, spell)
 	end
 	diceMax=diceMax * (1+0.04 * skill * ascensionLevel)
 	damageAdd=damageAdd+skill * ascensionLevel^2 * 2
-	diceMin, damageMax, damageAdd = math.round(diceMin), math.round(diceMax), math.round(damageAdd)
-	return diceMin, damageMax, damageAdd
+	diceMin, diceMax, damageAdd = math.round(diceMin), math.round(diceMax), math.round(damageAdd)
+	return diceMin, diceMax, damageAdd
+end
+
+function ascendSpellHealing(skill, mastery, spell, healM)
+	base=healingSpells[spell].Base[healM]
+	scaling=healingSpells[spell].Scaling[healM]
+	local ascensionLevel=math.min(math.floor(skill/11),2)
+	local spelltier=spell%11
+	if spelltier==0 then 
+		spelltier=11
+	end
+	if ascensionLevel>=33 then
+		ascensionLevel=3
+	elseif spelltier<=skill%11  then
+		ascensionLevel=ascensionLevel+1
+	end
+	scaling=scaling * (1+0.04 * skill * ascensionLevel)
+	base=base+skill * ascensionLevel^2 * 2
+	scaling, base = math.round(scaling), math.round(base)
+	return scaling, base
 end
 
 --add enchant damage
@@ -1284,6 +1298,14 @@ function diceMaxTooltip(skill, mastery, spell)
 	return diceMax
 end
 
+--backup healing tooltips
+local healingList={49, 55, 68, 74, 77}
+function events.GameInitialized2()
+	baseHealTooltip={}
+	for i=1,5 do
+		baseHealTooltip[healingList[i]]=Game.SpellsTxt[healingList[i]].Description
+	end
+end
 --adjust mana cost and tooltips	
 function events.Action(t)
 	index=Game.CurrentPlayer
@@ -1385,6 +1407,7 @@ function events.Action(t)
 					Game.SpellsTxt[spells[i]].Description=Game.SpellsTxt[spells[i]].Description .. "\n\nNot Ascended"
 				end
 			end
+			
 			-----------------------
 			--Healing Spells
 			-----------------------
@@ -1395,6 +1418,27 @@ function events.Action(t)
 				[const.Spells.CureDisease]=	{["Cost"]={0,0,15,25}, ["Base"]={0,0,25,40}, ["Scaling"]={0,0,6,9}},
 				[const.Spells.PowerCure]=	{["Cost"]={0,0,0,30}, ["Base"]={0,0,0,10}, ["Scaling"]={0,0,0,3}}
 			}
+			for i=1, 5 do
+				local ascensionLevel=math.min(math.floor(s/11),2)
+				local spelltier=healingList[i]%11
+				if spelltier==0 then 
+					spelltier=11
+				end
+				if ascensionLevel>=33 then
+					ascensionLevel=3
+				elseif spelltier<=s%11  then
+					ascensionLevel=ascensionLevel+1
+				end
+				if ascensionLevel>=1 then
+					Game.SpellsTxt[healingList[i]].Description=baseHealTooltip[healingList[i]] .. "\n\nAscension level: " .. ascensionLevel
+				else
+					Game.SpellsTxt[healingList[i]].Description=baseHealTooltip[healingList[i]] .. "\n\nNot Ascended"
+				end
+				for v=1,4 do
+					healingSpells[healingList[i]].Cost[v]=math.round(healingSpells[healingList[i]].Cost[v]*(1+0.15*ascensionLevel*s)*(1-0.1*m))
+					healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
+				end
+			end
 			
 			--remove curse
 			local sp=healingSpells[49]
