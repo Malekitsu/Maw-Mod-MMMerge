@@ -1078,10 +1078,10 @@ end
 function events.GameInitialized2()
 	Game.SkillDescriptions[const.Skills.Learning]="Increases spell damage at the expense of higher mana. Each skill level boosts the corresponding tier's spells, up to Tier 11 (e.g., Incinerate, Starburst). Spells can be ascended three times, culminating at skill level 33. This skill affects all magic schools, enabling up to three enhancements per spell (ascended damage amount shown in spell tooltip). \n\nLevel up to unlock the full destructive or healing potential of your magic, balancing higher damage with greater mana expenditure.\n"
 	Game.SkillNames[const.Skills.Learning]="Ascension"
-	Game.SkillDesNormal[const.Skills.Learning]= "Each point of skill will increase damage and mana cost."
-	Game.SkillDesExpert[const.Skills.Learning]= "Double effect of Skill"
-	Game.SkillDesMaster[const.Skills.Learning]= "Triple effect of Skill"
-	Game.SkillDesGM[const.Skills.Learning]= "Quaduple Effect of Skill"
+	Game.SkillDesNormal[const.Skills.Learning]= "Mana cost reduced by 10%."
+	Game.SkillDesExpert[const.Skills.Learning]= "Mana cost reduced by 20%"
+	Game.SkillDesMaster[const.Skills.Learning]= "Mana cost reduced by 30%"
+	Game.SkillDesGM[const.Skills.Learning]= "Mana cost reduced by 40%"
 end
 
 
