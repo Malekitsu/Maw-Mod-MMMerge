@@ -9,7 +9,7 @@ Mace	-	-	-	-	E	M	M	M	B	B	-	-	E	E	E	E	M	M	M	M	M	M	-	-	-	-	M	M	G	G	-	-	-	-	E	E	E	E
 Blaster	G	G	G	G	G	G	G	G	G	G	-	-	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	B	B	G	G	G	G	G	G	G	G	G	G	G	G
 Shield	-	-	-	-	E	M	M	M	E	E	-	-	E	E	E	E	M	M	G	G	-	-	-	-	-	-	M	M	G	G	E	E	E	E	B	B	B	B	E	E	M	M	-	-	-	-	-	-	-	-	M	-	-	M	M	M	-	-	-	E	M	M
 Leather	M	M	M	M	E	E	E	E	M	M	-	-	E	E	E	E	E	E	E	E	E	E	M	M	M	M	E	E	E	E	M	M	M	M	M	M	G	G	M	G	M	M	E	M	E	M	M	M	B	B	E	M	E	E	E	E	E	E	E	E	M	M
-Chain	M	M	G	G	E	E	M	M	M	G	-	-	-	-	-	-	M	M	M	M	M	G	-	-	-	-	M	M	M	M	M	M	M	M	E	E	E	E	E	E	E	E	-	-	-	-	-	-	-	-	M	-	-	M	M	M	M	M	M	M	M	GM
+Chain	M	M	G	G	E	E	M	M	M	G	-	-	-	-	-	-	M	M	M	M	M	G	-	-	-	-	M	M	M	M	M	M	M	M	E	E	E	E	E	E	E	E	-	-	-	-	-	-	-	-	M	-	-	M	M	M	M	M	M	M	M	G
 Plate	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	M	G	G	E	E	-	-	-	-	M	M	M	M	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	M	M	M	M	G	-	-	-
 Fire	E	M	G	G	-	-	-	-	E	M	-	-	E	M	G	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	E	E	M	M	E	M	M	M	-	-	-	-	E	M	M	G	G	G	-	-	-	G	G	-	-	-	-	-	-	E	M	G
 Air	E	M	G	G	-	-	-	-	E	M	-	-	E	M	G	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	E	E	M	M	E	M	M	M	-	-	-	-	E	M	M	G	G	G	-	-	-	G	G	-	-	-	-	-	-	E	M	G
@@ -23,7 +23,7 @@ Dark	-	-	-	M	-	-	-	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	-	-	-	-	-	-	-	-
 DarkElfAbility	-	-	-	-	-	-	-	-	M	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
 VampireAbility	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	M	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
 DragonAbility	-	-	-	-	-	-	-	-	-	-	M	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
-IdentifyItem	M	M	G	G	-	-	-	-	M	M	M	G	E	E	E	E	B	E	E	E	-	-	E	M	M	M	E	M	M	M	B	B	E	E	M	M	G	G	-	-	E	E	M	M	M	G	G	M	-	-	-	M	M	E	E	E	E	M	M	M	M	GM
+IdentifyItem	M	M	G	G	-	-	-	-	M	M	M	G	E	E	E	E	B	E	E	E	-	-	E	M	M	M	E	M	M	M	B	B	E	E	M	M	G	G	-	-	E	E	M	M	M	G	G	M	-	-	-	M	M	E	E	E	E	M	M	M	M	G
 Merchant	E	E	E	E	M	M	G	G	M	G	E	E	E	E	E	E	E	E	E	E	E	E	-	-	-	-	E	E	E	E	M	M	M	M	M	M	M	M	B	B	E	E	B	B	B	B	B	B	-	-	G	B	B	M	M	G	E	E	E	E	E	E
 Repair	E	E	M	M	E	E	E	E	E	E	-	-	-	-	-	-	M	M	G	G	-	-	-	-	-	-	M	M	G	G	B	B	E	E	B	B	B	B	M	M	-	-	E	E	E	M	M	M	-	-	E	M	E	E	E	E	M	M	G	E	M	M
 Bodybuilding	E	M	M	M	B	E	E	E	E	E	M	M	B	B	B	B	M	M	M	M	M	M	M	M	G	G	M	M	M	M	E	M	M	M	E	E	E	E	M	G	E	M	B	B	B	B	B	B	B	-	E	B	-	E	M	M	M	M	M	E	E	E
