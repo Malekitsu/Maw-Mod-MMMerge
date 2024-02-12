@@ -58,6 +58,6 @@ Archangel	40	5	15	3	P
 Death Knight	35	4	100	0	I
 Death Lord	35	5	115	0	I
 Lich King	35	7	130	0	I
-Shaman	35	2	10	1	IP
-Sekhem	35	3	10	1	IP
-Marabou	35	4	10	1	IP
+Shaman	25	3	10	1	IP
+Sekhem	25	4	10	1	IP
+Marabou	25	5	10	1	IP
