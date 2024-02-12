@@ -212,7 +212,7 @@ end
 
 function events.MonsterKillExp(t)
 	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
-	local currentLVL=calcLevel(t.Exp/4 + vars.EXPBEFORE)
+	local currentLVL=calcLevel(t.Exp/5 + vars.EXPBEFORE)
 		
 	if currentWorld==1 then
 		vars.MM8LVL = vars.MM8LVL + currentLVL - vars.LVLBEFORE
@@ -223,7 +223,7 @@ function events.MonsterKillExp(t)
 	elseif currentWorld==4 then
 		vars.MMMLVL = vars.MMMLVL + currentLVL - vars.LVLBEFORE
 	end
-	vars.EXPBEFORE = vars.EXPBEFORE + t.Exp/4
+	vars.EXPBEFORE = vars.EXPBEFORE + t.Exp/5
 	vars.LVLBEFORE = calcLevel(vars.EXPBEFORE)
 end
 
@@ -315,7 +315,7 @@ function events.LoadMap()
 		--horizontal progression
 		if Game.freeProgression==false then
 			name=Game.MapStats[Map.MapStatsIndex].Name
-			mon.Level=math.max(math.min(base.Level*2.5-5,mon.Level),1)
+			mon.Level=math.max(math.min(base.Level*2.5-5,mon.Level+bolsterLevel+extraBolster),1)
 			if not horizontalMaps[name] then
 				horizontalMultiplier=2.5
 				extraBolster=extraBolster*horizontalMultiplier
