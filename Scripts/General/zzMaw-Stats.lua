@@ -42,6 +42,9 @@ function events.CalcDamageToMonster(t)
 				t.Result=t.Result*(1.5+critDamage)
 				crit=true
 			end
+			if data.Player.Weak>0 then
+				t.Result=t.Result*0.5
+			end
 		end
 	end
 end
