@@ -1511,23 +1511,7 @@ function events.BuildItemInformationBox(t)
 				end
 			else
 				--SPELLS
-				spellTier=spellIndex%11
-				if spellTier==0 then
-					spellTier=11
-				end
-				if pl.LevelBase>=spellTier*8+152 then
-					diceMin=spellPowers160[spellIndex].diceMin
-					diceMax=spellPowers160[spellIndex].diceMax
-					damageAdd=spellPowers160[spellIndex].dmgAdd
-				elseif pl.LevelBase>=spellTier*8+72 then
-					diceMin=spellPowers80[spellIndex].diceMin
-					diceMax=spellPowers80[spellIndex].diceMax
-					damageAdd=spellPowers80[spellIndex].dmgAdd
-				else
-					diceMin=spellPowers[spellIndex].diceMin
-					diceMax=spellPowers[spellIndex].diceMax
-					damageAdd=spellPowers[spellIndex].dmgAdd
-				end
+				diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, spellIndex)
 				--calculate damage
 				--skill
 				skillType=math.floor(spellIndex/11)+12
