@@ -144,27 +144,6 @@ function events.GameInitialized2()
 end
 
 function recalculateMawMonster()
-	mult=1
-	--easy
-	if Game.BolsterAmount==50 then
-		mult=0.7
-	end
-	--MAW
-	if Game.BolsterAmount==100 then
-		mult=1
-	end
-	--Hard
-	if Game.BolsterAmount==150 then
-		mult=1.4
-	end
-	--Hell
-	if Game.BolsterAmount==200 then
-		mult=1.8
-	end
-	--Nightmare
-	if Game.BolsterAmount==300 then
-		mult=3
-	end
 	for i=0, Map.Monsters.High do
 		local mon=Map.Monsters[i]
 		
@@ -176,7 +155,7 @@ function recalculateMawMonster()
 				end
 			end
 			local currentHPPercentage=mon.HP/mon.FullHitPoints
-			hp=HPtable[mon.Id]*mult
+			hp=HPtable[mon.Id]
 			hpOvercap=0
 			while hp>32500 do
 				hp=math.round(hp/2)
@@ -193,7 +172,24 @@ function recalculateMawMonster()
 		end
 	end
 end
-
+--refresh on difficulty change
+function events.Action(t)
+	if t.Action==113 then
+		lastBolster=lastBolster or Game.BolsterAmount
+		lastMode=lastMode or Game.freeProgression
+		if Game.BolsterAmount~=lastBolster or lastMode~=Game.freeProgression then
+			if vars.trueNightmare and Game.BolsterAmount~=300 then
+				Game.BolsterAmount=300
+				recalculateMonsterTable()
+				recalculateMawMonster()
+			else
+				recalculateMonsterTable()
+				recalculateMawMonster()
+			end
+		end
+		
+	end
+end
 
 --MONSTER BOLSTERING
 function events.BeforeNewGameAutosave()
@@ -228,6 +224,11 @@ function events.MonsterKillExp(t)
 end
 
 function events.LoadMap()
+	recalculateMonsterTable()
+	recalculateMawMonster()
+end
+
+function recalculateMonsterTable()
 	--calculate party experience
 	currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
 	if currentWorld==1 then
@@ -367,6 +368,28 @@ function events.LoadMap()
 				hpMult=hpMult+lvl/(totalLevel[i]*5)
 			end
 		end
+		
+		--easy
+		if Game.BolsterAmount==50 then
+			hpMult=hpMult*0.7
+		end
+		--MAW
+		if Game.BolsterAmount==100 then
+			hpMult=hpMult*1
+		end
+		--Hard
+		if Game.BolsterAmount==150 then
+			hpMult=hpMult*1.4
+		end
+		--Hell
+		if Game.BolsterAmount==200 then
+			hpMult=hpMult*1.8
+		end
+		--Nightmare
+		if Game.BolsterAmount==300 then
+			hpMult=hpMult*3
+		end
+		
 		HPtable[i]=HPtable[i]*hpMult
 		--damage
 		if i%3==1 then
@@ -1612,8 +1635,10 @@ function events.MonsterKilled(mon)
 end
 --ask confirmation and instructions for true nightmare mode
 function nightmare()
-	if vars.trueNightmare then
+	if vars.trueNightmare and Game.BolsterAmount~=300 then
 		Game.BolsterAmount=300
+		recalculateMonsterTable()
+		recalculateMawMonster()
 		return
 	end
 	if Game.BolsterAmount==250 then
@@ -1621,12 +1646,15 @@ function nightmare()
 			vars.trueNightmare=true
 			Game.BolsterAmount=300
 			Sleep(1)
+			recalculateMonsterTable()
 			recalculateMawMonster()
 			Message("Welcome to the Nightmare...\nGood luck.. you will need")
 		else
 			Sleep(1)
 			Message("Difficulty reverted to Hell")
 			Game.BolsterAmount=200
+			recalculateMonsterTable()
+			recalculateMawMonster()
 		end
 	end
 	--game introduction
