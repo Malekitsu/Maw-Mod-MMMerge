@@ -218,7 +218,7 @@ function events.GetAttackDelay(t)
 		speedEffect=math.floor(speed/5)
 	end
 	bonusSpeed=bonusSpeed+speedEffect
-	if t.Player.SpellBuffs[const.PlayerBuff.Haste].ExpireTime>Game.Time then
+	if t.Player.SpellBuffs[const.PlayerBuff.Haste].ExpireTime>Game.Time or Party.SpellBuffs[const.PartyBuff.Haste].ExpireTime>Game.Time then
 		bonusSpeed=bonusSpeed+20
 	end
 	
