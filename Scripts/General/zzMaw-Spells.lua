@@ -1100,8 +1100,8 @@ function events.GameInitialized2()
 		end
 	end
 	--vampire
-	spellCost[111][masteryName[3]]=10
-	spellCost[111][masteryName[4]]=15
+	spellCost[111][masteryName[3]]=8
+	spellCost[111][masteryName[4]]=10
 	
 	spells={2,6,7,8,9,10,11,15,18,20,22,24,26,29,32,37,39,41,43,44,52,59,65,70,76,78,79,84,87,90,93,97,98,99,103,111,123}
 	lastIndex=-1 --used later
@@ -1194,9 +1194,9 @@ function events.CalcSpellDamage(t)
 	end
 	if t.Spell == 111 then  -- lifedrain
 		if t.Mastery==3 then
-			t.Result=t.Result/3*5
+			t.Result=t.Result/3*4
 		elseif t.Mastery==4 then
-			t.Result=t.Result/3*7
+			t.Result=t.Result/3*5
 		end
 	end
 	if t.Spell == 123 then  -- flame blast
@@ -1390,8 +1390,8 @@ function events.Action(t)
 			
 			Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is 1-%s per point of skill.",diceMaxTooltip(s, m,103))
 			Game.SpellsTxt[111].Description=string.format("Lifedrain allows the vampire to damage his or her target and simultaneously heal based on the damage done in the Lifedrain.  This ability does %s points of damage plus 1-%s points of damage per skill.",dmgAddTooltip(s, m,111),diceMaxTooltip(s, m,111))
-			Game.SpellsTxt[111].Master=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*5),math.round(diceMaxTooltip(s, m,111)/3*5))
-			Game.SpellsTxt[111].GM=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*7),math.round(diceMaxTooltip(s, m,111)/3*7))
+			Game.SpellsTxt[111].Master=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*4),math.round(diceMaxTooltip(s, m,111)/3*4))
+			Game.SpellsTxt[111].GM=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*5),math.round(diceMaxTooltip(s, m,111)/3*5))
 			Game.SpellsTxt[123].Description="This ability is an upgraded version of the normal Dragon breath weapon attack.  It acts much like a fireball, striking its target and exploding out to hit everything near it, except the explosion does much more damage than most fireballs."
 			Game.SpellsTxt[123].Expert=string.format("Damage %s points plus 1-%s points per point of skill",dmgAddTooltip(s, m,123),diceMaxTooltip(s, m,123))
 			Game.SpellsTxt[123].Master=string.format("Damage %s points plus 1-%s points per point of skill",math.round(dmgAddTooltip(s, m,123)/10*11),math.round(diceMaxTooltip(s, m,123)/10*11))
@@ -1421,7 +1421,7 @@ function events.Action(t)
 			healingSpells={
 				[const.Spells.RemoveCurse]=	{["Cost"]={0,5,8,16}, ["Base"]={0,12,24,36}, ["Scaling"]={0,2,4,6}},
 				[const.Spells.Resurrection]={["Cost"]={0,0,0,200}, ["Base"]={0,0,0,200}, ["Scaling"]={0,0,0,20}},
-				[const.Spells.Heal]=		{["Cost"]={3,5,8,16}, ["Base"]={5,10,15,20}, ["Scaling"]={2,3,4,5}},
+				[const.Spells.Heal]=		{["Cost"]={3,3,3,3}, ["Base"]={5,5,5,5}, ["Scaling"]={2,2,2,2}},
 				[const.Spells.CureDisease]=	{["Cost"]={0,0,15,25}, ["Base"]={0,0,25,40}, ["Scaling"]={0,0,6,9}},
 				[const.Spells.PowerCure]=	{["Cost"]={0,0,0,30}, ["Base"]={0,0,0,10}, ["Scaling"]={0,0,0,3}}
 			}
@@ -1546,8 +1546,8 @@ function events.GameInitialized2()
 		spellCostGM[i] = Game.Spells[i]["SpellPointsGM"]
 	end
 	--vampire
-	spellCostMaster[111]=10
-	spellCostGM[111]=15
+	spellCostMaster[111]=8
+	spellCostGM[111]=10
 	
 	ascendanceCost={11,14,17,20,35,50,65,80,95,110,125,[0]=125}
 	ascendanceCost2={25,30,35,40,70,100,140,180,220,260,300,[0]=300}
@@ -1619,7 +1619,7 @@ function events.GameInitialized2()
 				manaCost=100
 			end
 			if i==111 then 
-				manaCost=30
+				manaCost=15
 			end
 			if i==123 then 
 				manaCost=60
@@ -1646,7 +1646,7 @@ function events.GameInitialized2()
 				manaCost=200
 			end
 			if i==111 then 
-				manaCost=60
+				manaCost=25
 			end
 			if i==123 then 
 				manaCost=120
@@ -1689,7 +1689,7 @@ function events.CalcSpellDamage(t)
 		--vampiric ascends 20 levels later
 		local extraRequiredLevels=0
 		if t.Spell==111 then
-			extraRequiredLevels=20
+		--	extraRequiredLevels=20
 		end
 		if data.Player.LevelBase>=spellTier*8+152+extraRequiredLevels then
 			diceMin=spellPowers160[t.Spell].diceMin
@@ -1724,9 +1724,9 @@ function events.CalcSpellDamage(t)
 	end
 	if t.Spell == 111 then  -- lifedrain
 		if t.Mastery==3 then
-			t.Result=t.Result/3*5
+			t.Result=t.Result/3*4
 		elseif t.Mastery==4 then
-			t.Result=t.Result/3*7
+			t.Result=t.Result/3*5
 		end
 	end
 	if t.Spell == 123 then  -- flame blast
@@ -1975,13 +1975,13 @@ function events.Tick()
 					if level>=check2 then
 						Game.Spells[num]["SpellPointsNormal"] = 20
 						Game.Spells[num]["SpellPointsExpert"] = 20
-						Game.Spells[num]["SpellPointsMaster"] = 40
-						Game.Spells[num]["SpellPointsGM"] = 60
+						Game.Spells[num]["SpellPointsMaster"] = 20
+						Game.Spells[num]["SpellPointsGM"] = 25
 					elseif level>=check then
 						Game.Spells[num]["SpellPointsNormal"] = 10
 						Game.Spells[num]["SpellPointsExpert"] = 10
-						Game.Spells[num]["SpellPointsMaster"] = 20
-						Game.Spells[num]["SpellPointsGM"] = 30
+						Game.Spells[num]["SpellPointsMaster"] = 15
+						Game.Spells[num]["SpellPointsGM"] = 15
 					else
 						Game.Spells[num]["SpellPointsNormal"]=spellCostNormal[num]
 						Game.Spells[num]["SpellPointsExpert"]=spellCostExpert[num]
@@ -2060,8 +2060,8 @@ function events.Tick()
 			
 			Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is 1-%s per point of skill.",diceMaxTooltip(level,103))
 			Game.SpellsTxt[111].Description=string.format("Lifedrain allows the vampire to damage his or her target and simultaneously heal based on the damage done in the Lifedrain.  This ability does %s points of damage plus 1-%s points of damage per skill.",dmgAddTooltip(level,111),diceMaxTooltip(level,111))
-			Game.SpellsTxt[111].Master=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(level,111)/3*5),math.round(diceMaxTooltip(level,111)/3*5))
-			Game.SpellsTxt[111].GM=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(level,111)/3*7),math.round(diceMaxTooltip(level,111)/3*7))
+			Game.SpellsTxt[111].Master=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(level,111)/3*4),math.round(diceMaxTooltip(level,111)/3*4))
+			Game.SpellsTxt[111].GM=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(level,111)/3*5),math.round(diceMaxTooltip(level,111)/3*5))
 			Game.SpellsTxt[123].Expert=string.format("Damage %s points plus 1-%s points per point of skill",dmgAddTooltip(level,123),diceMaxTooltip(level,123))
 			Game.SpellsTxt[123].Master=string.format("Damage %s points plus 1-%s points per point of skill",math.round(dmgAddTooltip(level,123)/10*11),math.round(diceMaxTooltip(level,123)/10*11))
 			Game.SpellsTxt[123].GM=string.format("Damage %s points plus 1-%s points per point of skill",math.round(dmgAddTooltip(level,123)/10*12),math.round(diceMaxTooltip(level,123)/10*12))
