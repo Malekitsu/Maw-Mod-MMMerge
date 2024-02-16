@@ -334,7 +334,7 @@ function events.BuildStatInformationBox(t)
 					end
 				end
 			end
-			DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])
+			DPS1=math.round(dmg*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])
 			
 			--RANGED
 			local low=Party[i]:GetRangedDamageMin()
@@ -458,7 +458,7 @@ function events.BuildStatInformationBox(t)
 			end
 		end
 		--damage tracker
-		local DPS=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])
+		local DPS=math.round(dmg*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])
 		t.Text=string.format("%s\n\nDamage per second: %s",t.Text,StrColor(255,255,100,DPS))
 		vars.damageTrack=vars.damageTrack or {}
 		vars.damageTrack[Party[i]:GetIndex()]=vars.damageTrack[Party[i]:GetIndex()] or 0
@@ -493,7 +493,7 @@ function events.BuildStatInformationBox(t)
 		local atk=Party[i]:GetRangedAttack()
 		local lvl=Party[i].LevelBase
 		local hitChance= (15+atk*2)/(30+atk*2+lvl)
-		local DPS=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])
+		local DPS=math.round(dmg*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])
 		local s,m=SplitSkill(Party[i].Skills[const.Skills.Bow])
 		if m>=3 then
 			DPS=DPS*2
@@ -973,7 +973,7 @@ function events.Tick()
 					end
 				end
 			end
-			DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])
+			DPS1=math.round(dmg*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])
 			
 			--RANGED
 			local low=Party[i]:GetRangedDamageMin()
@@ -988,7 +988,7 @@ function events.Tick()
 			if m>=3 then
 				dmg=dmg*2
 			end
-			local DPS2=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])
+			local DPS2=math.round(dmg*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])
 			power=math.max(DPS1,DPS2)
 			
 			Game.GlobalTxt[47]=string.format("Power: %s\n\n\n\n\n\n\n\n",StrColor(255,0,0,power))
