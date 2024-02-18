@@ -1898,3 +1898,19 @@ end
 function events.MonsterKilled(mon)
 	mon.Z=mon.Z-1
 end
+
+--resize some monsters that tends to stuck
+local resizeList={
+	207,208,209, --behemoth
+	300,301,302, --minotaur
+	578,579,560, --minotaur mm6
+	498,499,500, --demons mm6
+	501,502,503, --demons mm6
+}
+function events.GameInitialized2()
+	for i=1, #resizeList do
+		local id=resizeList[i]
+		Game.MonListBin[id].Height=Game.MonListBin[id].Height*0.75
+		Game.MonListBin[id].Radius=Game.MonListBin[id].Radius*0.75
+	end
+end
