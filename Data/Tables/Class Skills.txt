@@ -37,5 +37,5 @@ IdentifyMonster	-	-	-	-	M	G	G	G	-	-	M	M	E	E	E	E	E	E	E	E	-	-	E	E	E	E	-	-	-	-	M	M	
 Armsmaster	E	E	M	M	E	E	E	E	E	E	-	-	B	B	B	B	M	M	G	G	-	-	M	M	M	M	E	M	M	M	E	E	E	E	M	M	M	M	M	M	E	M	-	-	-	-	-	-	-	-	B	-	-	-	-	-	M	M	G	E	E	E
 Stealing	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	B	B	E	E	-	-	-	-	E	E	E	E	M	M	G	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
 Alchemy	E	E	E	E	E	E	E	E	M	G	M	M	M	M	G	G	-	-	-	-	B	B	M	M	G	G	B	E	E	E	M	G	G	G	M	M	G	G	-	-	M	G	M	M	M	G	G	G	-	-	E	G	M	-	-	-	-	-	-	E	E	E
-Learning	M	M	M	M	M	M	M	M	E	M	M	G	M	M	M	M	M	M	G	G	E	M	M	M	G	G	E	M	M	M	E	M	M	M	E	M	M	M	E	M	M	M	M	M	M	M	M	M	B	B	M	M	M	E	M	M	M	M	M	M	M	M
+Learning	M	M	G	M	M	M	G	G	M	G	M	G	M	M	G	G	-	-	-	-	M	G	M	M	G	G	M	M	G	G	M	M	G	G	-	M	G	G	-	-	M	G	M	M	M	G	G	G	B	B	G	G	M	M	M	G	-	-	-	M	M	G
 																																																														
