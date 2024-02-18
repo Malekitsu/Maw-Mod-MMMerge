@@ -977,7 +977,7 @@ function MawRegen()
 					RegM=5
 				end
 				FSP	= Party[i]:GetFullSP()
-				regenSP[i] = regenSP[i] + FSP^0.35*RegS^1.4*((RegM+5)/5000) +0.1
+				regenSP[i] = regenSP[i] + FSP^0.35*RegS^1.4*((RegM+5)/5000) +0.02
 				Party[i].SP = math.min(FSP, Party[i].SP + regenSP[i])
 				regenSP[i]=regenSP[i]%1
 			end
