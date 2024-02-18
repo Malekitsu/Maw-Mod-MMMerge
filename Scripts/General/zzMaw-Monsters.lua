@@ -1893,3 +1893,8 @@ end
 function events.LoadMap(wasInGame)
 	Timer(eliteRegen, const.Minute/20) 
 end
+
+--fix for stucked in death animation monsters
+function events.MonsterKilled(mon)
+	mon.Z=mon.Z-1
+end
