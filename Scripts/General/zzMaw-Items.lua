@@ -1510,12 +1510,13 @@ function events.BuildItemInformationBox(t)
 					powerType="Ranged"
 				end
 			else
-				--SPELLS
-				diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, spellIndex)
+				
 				--calculate damage
 				--skill
 				skillType=math.floor(spellIndex/11)+12
 				skill, mastery=SplitSkill(pl:GetSkill(skillType))
+				--SPELLS
+				diceMin, diceMax, damageAdd = ascendSpellDamage(skill, mastery, spellIndex)
 				
 				power=damageAdd + skill*(diceMin+diceMax)/2
 				
