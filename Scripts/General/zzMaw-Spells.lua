@@ -1218,7 +1218,7 @@ function ascendSpellDamage(skill, mastery, spell)
 	if spelltier==0 then 
 		spelltier=11
 	end
-	if ascensionLevel>=33 then
+	if skill>=33 then
 		ascensionLevel=3
 	elseif spelltier<=skill%11  then
 		ascensionLevel=ascensionLevel+1
@@ -1237,7 +1237,7 @@ function ascendSpellHealing(skill, mastery, spell, healM)
 	if spelltier==0 then 
 		spelltier=11
 	end
-	if ascensionLevel>=33 then
+	if skill>=33 then
 		ascensionLevel=3
 	elseif spelltier<=skill%11  then
 		ascensionLevel=ascensionLevel+1
@@ -1403,7 +1403,7 @@ function events.Action(t)
 				if spelltier==0 then 
 					spelltier=11
 				end
-				if ascensionLevel>=33 then
+				if s>=33 then
 					ascensionLevel=3
 				elseif spelltier<=s%11  then
 					ascensionLevel=ascensionLevel+1
