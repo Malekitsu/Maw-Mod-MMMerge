@@ -558,6 +558,22 @@ function events.CalcDamageToPlayer(t)
 		end
 	end
 	
+	--properly calculate friendly fire damage
+	if data and data.Player and data.Spell then	
+		local s,m = SplitSkill(data.Player.Skills[const.Skills.Learning])
+		local diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, data.Spell)
+		local damage=damageAdd
+		for i=1, data.SpellSkill do
+			damage=damage+math.random(diceMin,diceMax)
+		end
+		local distance=getDistance(data.Object.X,data.Object.Y,data.Object.Z)/512
+		local damageMult=math.max(1-distance, 0)
+		damage=damage*damageMult
+		
+		--no crit nor intellect buff
+		t.Result=calcMawDamage(t.Player,t.DamageKind,damage,false,data.Player.LevelBase)
+		return
+	end
 	--fix for multiplayer
 	local REMOTE_OWNER_BIT = 0x800
 	local source = WhoHitPlayer()
