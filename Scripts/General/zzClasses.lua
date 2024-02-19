@@ -10,13 +10,13 @@ promotionList={
 --Dragon
 [4]=		{1645,1646,		1568,1569,1570,1571,	1543,1544},--knight 
 --Druid
-[5]= 		{1651,1652,		1615,1616,1617,1618,	1546,31},--cleric
+[5]= 		{1653,1654,		1615,1616,1617,1618,	1546,31},--cleric
 --Knight
 [6]=		{1645,1646,		1568,1569,1570,1571,	1540,1541},
 --Minotaur
 [7]=	{1637,1638,		1592,1593,1594,1595,	1545,29},--paladin
 --Monk
-[8]=		{1645,1646,		1568,1569,1570,1571,	1538,1539},--knight and troll
+[8]=		{1645,1646,		1574,1575,1576,1577,	1538,1539},--knight and troll
 --Paladin
 [9]=	{1637,1638,		1592,1593,1594,1595,	1545,29},--minotaur
 --Ranger
@@ -38,7 +38,17 @@ promotionList={
 --DK
 [18]=	{1645,1646,		1568,1569,1570,1571,	1540,1541},--same as knight
 --SHAMAN
-[19]=	{1651,1652,		1615,1616,1617,1618,	1546,31}, --same as druid
+[19]=	{1653,1654,		1615,1616,1617,1618,	1546,31}, --same as druid
+}
+
+--mid promotionlist
+midPromo={
+--Seraphim
+[17]=	{1646,1647,		1607,1608},--cleric
+--DK
+[18]=	{1643,1644,		1566,1567},--same as knight
+--SHAMAN
+[19]=	{1651,1652,		1613,1614}, --same as druid
 }
 
 function events.GameInitialized2()
@@ -109,6 +119,22 @@ function checkPromo()
 			end
 		end
 	end 
+	
+	--mid promo
+	for i=0,Party.High do
+		class=Party[i].Class
+		kind=Game.ClassesExtra[class].Kind
+		if Game.ClassesExtra[class].Step==0 and midPromo[Game.ClassesExtra[class].Kind] then
+			prom=midPromo[Game.ClassesExtra[class].Kind]
+			for v=1,4 do
+				if Party.QBits[prom[v]] then
+					Party[i].Class=Party[i].Class+1
+					goto continue
+				end
+			end
+			::continue::
+		end
+	end
 end
 
 
