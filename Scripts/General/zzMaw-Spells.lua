@@ -304,7 +304,10 @@ function events.PlayerCastSpell(t)
 		if not t.RemoteData then
 			function events.Tick() 
 				events.Remove("Tick", 1)
-				regenerationCasted={true,t.Skill,t.Mastery,t.TargetId}
+				regenerationCasted={true,t.Skill,t.Mastery}
+				for i=0, Party.High do
+					mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Regeneration, i)
+				end
 				mawBuffs()
 			end
 			if t.MultiplayerData then
@@ -591,10 +594,13 @@ function mawBuffs()
 		invisCasted[1]=false
 	end
 	if regenerationCasted and regenerationCasted[1] then
-		Buff=Party[regenerationCasted[4]].SpellBuffs[const.PlayerBuff.Regeneration]
-		Buff.Power=0
-		Buff.Skill=JoinSkill(regenerationCasted[2], regenerationCasted[3])
-		regenerationCasted[1]=false
+		for i=0, Party.High do
+			Buff=Party[i].SpellBuffs[const.PlayerBuff.Regeneration]
+			Buff.Power=0
+			Buff.Skill=JoinSkill(regenerationCasted[2], regenerationCasted[3])
+			Buff.ExpireTime=Game.Time+const.Hour*regenerationCasted[2]
+			regenerationCasted[1]=false
+		end
 	end
 	--refresh stats
 	mawRefresh("all")
