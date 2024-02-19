@@ -286,31 +286,6 @@ function events.CalcDamageToMonster(t)
 end
 
 
----------------------------------------
---DEATH KNIGHT
----------------------------------------
-
---skills
---death grip
-
---runic power
-	--attacks will grant 10-12-15-17-20 runic power
-
---spells
---dark grants some leech (flat, based on promotion)
---water adds damage/attack speed
---earth grants some damage reduction
-
---spells scale with strength
-
-
-
---spells taking you below 35% of HP will trigger anti-magic shell, 
-		--reducing spell damage taken by 50% and converting spell damage into runic power (lasts 5 seconds, 1 minute cooldown, capped to max player HP)
-
-
-
-
 ----------------------------------
 -- DRAGON REWORK
 ----------------------------------
@@ -815,3 +790,54 @@ function events.GameInitialized2()
 		end
 	end
 end
+
+
+
+---------------------------------------
+--DEATH KNIGHT
+---------------------------------------
+
+--skills
+--death grip
+
+--runic power
+dkClass={56,57,58}
+spRegen={
+	[56]=10,
+	[57]=15,
+	[58]=20,
+}
+function events.CalcDamageToMonster(t)
+	local data = WhoHitMonster()	
+	if data and data.Player and t.DamageKind==4 and table.find(dkClass, data.Player.Class) then
+		pl=data.Player
+		pl.SP=math.min(data.Player:GetFullSP(), pl.SP+spRegen[pl.Class])
+	end
+end
+
+--spells
+function events.GameInitialized2()
+	function events.CalcStatBonusBySkills(t)
+		if t.Stat==const.Stats.MeleeDamageBase then
+			if dkClass[t.Player.Class] then	
+				--mastery=SplitSkill(t.Player:GetSkill(const.Skills.Thievery))
+				s1, m1=SplitSkill(t.Player:GetSkill(const.Skills.Water))
+				s2, m2=SplitSkill(t.Player:GetSkill(const.Skills.Earth))
+				s3, m3=SplitSkill(t.Player:GetSkill(const.Skills.Dark))
+				t.Result=t.Result+(s1+s2+s3)*2
+			end
+		end
+	end
+end
+--dark grants some leech (flat, based on promotion)
+--water adds damage/attack speed
+--earth grants some damage reduction
+
+--spells scale with strength
+
+
+
+--spells taking you below 35% of HP will trigger anti-magic shell, 
+		--reducing spell damage taken by 50% and converting spell damage into runic power (lasts 5 seconds, 1 minute cooldown, capped to max player HP)
+
+
