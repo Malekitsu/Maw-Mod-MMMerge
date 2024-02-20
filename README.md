@@ -25,12 +25,26 @@ This mod is divided into 8 parts:
 - Items can now have up to 3 enchants: 2 base enchants and 1 special.
 - You will have a chance to find ancient and primordial items:
   - Ancients will have higher stats.
-  - Primordials will be similar to ancients but with consistently perfect stats.
+  - Primordials will be similar to ancients but with consistently perfect rolls.
+- Items have item level shown
 - Enchants that increase your damage output are now stronger and apply to spells as well.
 - Special enchantments that increase magic school levels now provide a flat bonus.
+- You can now sort current inventory by pressing R, and all party inventory by pressing T
+- pressing E will assign the current player all the alchemy items when sorting with T
+- Some actions have been taken to prevent save-scumming to get loot
+- You can press R when in shops to reroll all the item
+- Gold cost depends on the loot power
+- Items will now show power and vitality changes with currently equipped item, check the Stats rework section for more info
+
+###Weapons
+- Weapons have attack speed stat
+  - Damage will be multiplied by the attack speed
+  - This is not shown in stats menu
+  - Elemental enchants and spells are not affected
+- Weapons will tend to get slower as you progress, making speed cap very hard to reach
 
 ## Stats Rework
-- Stats now provide 1 effect every 5 points (e.g., 500 Might will increase melee damage by 100).
+- Stats now provide 1 effect every 5 points (e.g., 500 Might will increase melee/ranged damage by 100).
 - Might now applies to bows as well.
 - Each stat has a unique additional bonus (visible by right-clicking the stat in the menu):
   - Might: Every 10 points increase physical damage by 1%.
@@ -41,22 +55,40 @@ This mod is divided into 8 parts:
   - Luck: Every 15 points increase critical strike chance by 0.5% (base crit % is 5%).
   - Luck: Every 5 points will increase all resistances by 1.
   - Armor Class: Reduces physical damage taken.
+ 
+You can now see POWER and VITALITY stats:
+- Power will show the DPS you are capable of
+  - If you don't have any offensive quickspell, the highest between melee or ranged damage will be shown
+  - Spell will count only for a single hit
+    - If fireball is equipped, power is counted only as if 1 monster was hit
+    - If shrapnel is equipped, power is counted only as if 1 hit is done
+- Vitality show your effective health:
+  - It accounts for damage reduction from resistances and Armor Class
 
 ### Resistances
 - Now are in percentage and no longer rolled randomly;
 - Cap is at 93.75%.
-- Reduced amount depends on monster level.
-  - The amount shown in stats menu is the amount of damage reduction vs same level monster enemies.
-  - When right-clicking a monster you will already see the reduced damage, press alt to show unreduced damage.
+- Light damage is now reduced by the lowest between your mind and body resistance
+- Dark damage is now reduced by the lowest elemental resistance
+- Energy damage is now reduced by the lowest resistance
+- Reduced amount depends on monster level
+  - The amount shown in stats menu is the amount of damage reduction vs same level monster enemies
+  - When right-clicking a monster you will already see the reduced damage, press alt to show unreduced damage
+- Monster resistances will no longer have immunities, but will still take much less damage
+- Damage to monster with resistances is no longer random
+- Each 100 resistance means half damage, the actual formula is: damage/2^(res/100)
 
 ## Skill Rework
 - Most weapon and armor skills have been rebalanced; for complete information, check the in-game tooltips:
   - Weapons are now on par with damage in terms of damage output; they are better compared to single-target ranged spells but weaker than shotgun and AoE spells
   - Armors will now also provide magic resistance
   - Weapons are now balanced between each other
+- Id Item, Id Monster, Repair, Merchant and Disarm are now shared to all party members
+  - Click on the skill to share to all party
 
 ## Spells Rework
-- Many spells have been rebalanced.
+- Many spells have been rebalanced
+- Leveling a 2nd school will now cost half of the skill points, a 3rd one will cost 1/3, and so on
 - Body and Spirit school have 1 extra healing spell
 - ASCENSION
   - This skill replaces learning
@@ -64,12 +96,14 @@ This mod is divided into 8 parts:
   - Increasing the spell will ascend the spells of it's current tier (tier 1 are all cost 1 spells, tier 11 are all the cost 30 spells; different values for dark/light)
   - Ascended spells will cost more and deal more damage
 - To keep up with the increasing spell cost, meditation will now restore mana continuously and a much more faster rate
+- Control effects, such as fear or paralysis, are much more reliable, depending on the skill itself, but last for less time.
 
 ## Monsters
 - Monsters are now much stronger, with significantly increased stats.
 - Monster run speed has been increased.
 - Monsters are balanced to scale in a way that follows naturally the party progression.
-- You can now change difficulty, getting more loot rewards.
+- You can now change difficulty, getting more loot rewards and more.
+  - check the bolster/difficulty section.
 
 ## Alchemy
 - Reworked the whole alchemy recipes/potions.
