@@ -132,7 +132,7 @@ But if you’re curious to know more about the mod and the specific changes, rea
 
 ## Monsters
   - Monster hitpoints have been doubled
-- Monsters deal double damage early on, and keep pace with increased player hitpoint and defenses, ending up at around 7 times vanilla damage, so you will need to balance both the offensive and defensive part of your build.
+- Monsters deal double damage early on, and keep pace with increased player hitpoint and defenses, ending up at around 12 times vanilla damage at level 100 and x 250 at level 250, so you will need to balance both the offensive and defensive part of your build.
 - Most monster, melee in particular, have increased speed
 - Most ranged attacks now have homing, making dodging shots difficult. You can only dodge ranged attacks by running in and out of range or dodging behind an object/wall. Homing missiles can be disabled.
 - With monsters automatically hitting and outrunning player, carefully pulling monsters becomes essential to survival.
