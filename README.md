@@ -18,10 +18,9 @@ This mod is divided into 8 parts:
 - Spells rework
 - Monster rework
 - Alchemy rework
-- Bolster rework
+- Bolster & Difficulty rework
 - Mechanics rework
 
-##GUIDE IS OUTDATED, A NEW ONE WILL COME SOON
 ## Item Rework
 - Items can now have up to 3 enchants: 2 base enchants and 1 special.
 - You will have a chance to find ancient and primordial items:
@@ -35,65 +34,93 @@ This mod is divided into 8 parts:
 - Might now applies to bows as well.
 - Each stat has a unique additional bonus (visible by right-clicking the stat in the menu):
   - Might: Every 10 points increase physical damage by 1%.
-  - Int/Pers: Every 10 points increase spell damage by 1% and spell critical damage by 1% (only the highest between the two will be applied).
+  - Int/Pers: Every 10 points increase spell damage by 1% and spell critical damage by 1.5% (only the highest between the two will be applied).
   - Endurance: Every 10 points increase health by 1%.
-  - Accuracy: Every 10 points increase melee/bow critical damage by 2%.
-  - Speed: Every 10 points increase dodge by 0.5% (multiplicative).
-  - Luck: Every 10 points increase critical strike chance by 0.5% (base crit % is 5%).
+  - Accuracy: Every 10 points increase melee/bow critical damage by 3%.
+  - Speed: Every 10 points increase increases attack speed by 2% and cast speed by 1%.
+  - Luck: Every 15 points increase critical strike chance by 0.5% (base crit % is 5%).
+  - Luck: Every 5 points will increase all resistances by 1.
   - Armor Class: Reduces physical damage taken.
 
 ### Resistances
-- Now are in percentage; each 4 points in resistance will reduce damage by 1%, capped at 75%.
-- The cap can be increased by special enchantments, up to 90%.
+- Now are in percentage and no longer rolled randomly;
+- Cap is at 93.75%.
+- Reduced amount depends on monster level.
+  - The amount shown in stats menu is the amount of damage reduction vs same level monster enemies.
+  - When right-clicking a monster you will already see the reduced damage, press alt to show unreduced damage.
 
 ## Skill Rework
 - Most weapon and armor skills have been rebalanced; for complete information, check the in-game tooltips:
-  - Weapons are now on par with damage in terms of damage output; they are better compared to single-target ranged spells but weaker than shotgun and AoE spells.
-  - Armors will now also provide magic resistance.
-  - Weapons are now balanced between each other.
+  - Weapons are now on par with damage in terms of damage output; they are better compared to single-target ranged spells but weaker than shotgun and AoE spells
+  - Armors will now also provide magic resistance
+  - Weapons are now balanced between each other
 
 ## Spells Rework
-- Starting at level 80, spells will be upgraded every 8 levels.
-  - At level 80, tier 1 spells get an upgrade, at level 88, tier 2 spells, and so on.
-  - Spells can be upgraded up to 2 times, up to player level 240.
-  - Mana cost and damage are increased.
-- Some spell tuning has been performed.
+- Many spells have been rebalanced.
+- Body and Spirit school have 1 extra healing spell
+- ASCENSION
+  - This skill replaces learning
+  - Reduce mana cost of spells on by 10-20-30-40% on N-E-M-GM.
+  - Increasing the spell will ascend the spells of it's current tier (tier 1 are all cost 1 spells, tier 11 are all the cost 30 spells; different values for dark/light)
+  - Ascended spells will cost more and deal more damage
+- To keep up with the increasing spell cost, meditation will now restore mana continuously and a much more faster rate
 
 ## Monsters
 - Monsters are now much stronger, with significantly increased stats.
 - Monster run speed has been increased.
-- Monsters are balanced so that you will never need to use the bolster button.
+- Monsters are balanced to scale in a way that follows naturally the party progression.
+- You can now change difficulty, getting more loot rewards.
 
 ## Alchemy
-- Due to the powerful nature of stats, some nerfs were required.
-- Health and mana potions will now heal much more based on power level and will remain relevant throughout the game.
-- You have 2 shortcuts that will automatically consume the strongest health/mana potion from inventory (15-second cooldown).
-- Status-removing potions will now also provide immunity for 6 hours.
-- Some redundant potions have been removed.
-- Enchant flasks are now permanent.
-- Doom potions will now provide a huge boost but increase permanent age (can be used multiple times, up to 100 age).
-- Rejuvenation will now reduce all stats but decrease permanent age.
+- Reworked the whole alchemy recipes/potions.
+  - There a less amount of potions, but each one of them will be useful
+  - Buff potions have now 5 charges and last for 6 hours
+  - Some potions will have some power requirement to work
+  - Pressing alt will show you the recipes
+  - Health and mana potions will now heal much more based on power level and will remain relevant throughout the game
+- In single player, you have 2 shortcuts that will automatically consume the strongest health/mana (G and V key) potion from inventory (15-second cooldown)
 
-## Bolster
-- Bolster is no longer applied unless you change continents.
-- When you change continents, monsters will retain a portion of the levels gained from other continents.
-- Along with monster strength, loot strength will increase, including base stats, value, and enchants.
-- Level is calculated based on the experience of the first party member; you are free to use hirelings.
-- Adjustments have been made to ensure diversity among monsters of the same tier.
 
-The actual formula is (level-4)*0.95, calculated based on experience, with other diminishing formulas applying after 120 bolster levels.
-
+## Bolster & Difficulty
+- There are 2 game modes, and you can check bolster value by right clicking level in stats menu:
+- Free Progression (set monster bolster to on):
+  - Recommended if you want to play just 1 of the 3 continents
+  - Bolster is no longer applied unless you change continent
+  - When you change continents, monsters will retain the levels you gained from other continents
+  - Along with monster strength, loot strength will increase, including base stats, value, and enchants
 ### Example
-- Example 1:
   - You clear Might and Magic 6 at level 100.
   - Going to MM7 will increase all monster levels by 100, requiring you to start from the beginning without skipping.
   - You finish MM7 at level 180 and then proceed to MM8.
   - Monster levels are now increased by 180.
   - Going back to MM6 will increase monster levels by 80 (180-100=80).
 
+- Horizontal Progression (set monster bolster to off):
+  - Recommended if you plan to clear the full game
+  - There is no monster bolster
+  - Monsters will scale naturally up to level 250+
+  - You will need to change continent often to be able to progress
+  - Only loot will be "bolstered"
+  - Most skills skills masteries will require 6-12-20 to learn E-M-GM
+  - There are teleporters conveniently placed in starting cities (New Sorpigal, Harmondale, Ravenshore)
+
+- Difficulty:
+  - You can choose between Easy-MAW-Hard-Hell-Nightmare
+    - Damage and monster HP will be multiplied corrispondently by 0.7 - 1 - 1.5 - 2 - 3
+    - Loot power will be increased by 0% - 0% - 10% - 20% - 40%
+    - Once in Nightmare you can't change difficulty
+      - You can't save nor teleport with monsters in the nearbies
+      - Dungeons will now spawn elite monsters, with unique abilities
+      - Exiting a dungeon before killing a set amount of monsters will make monsters resurrect (a message will be shown)
+      - Killing most enemies will give you some exp-gold and crafting item
+
+
+
 ## Mechanics Rework
 - Dual-wielding weapons will now allow the player to benefit fully from both weapons.
+- Minotaurs can dual wield axes and 2h axes, at expert and master.
 - Recovery is now multiplicative; a 50 bonus recovery will increase attack speed by 50%.
 - Player projectiles will now home in on the target.
-
-Overall, changes have been made using mathematics and statistics to ensure balance, providing a smooth gaming experience. Many features are still missing, but the core mechanics are in place.
+- Monster projectiles will now tend to home players:
+  - Moving sideways is not enough to dodge, but running is enough
+  - Flying up and down doesn't work
