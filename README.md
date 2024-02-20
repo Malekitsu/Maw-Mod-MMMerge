@@ -26,12 +26,12 @@ This mod is divided the following parts:
 # What you need to know
 The mod has been balanced to be medium difficulty for veteran players. There is an easy mode that can be enabled in "Extra settings". Especially early on it might be a challenge even for veteran players due to the jump in difficulty. Here’s some advice to help you familiarize yourself with the dynamics of the mod.
 
-Monsters are much stronger, weapons more useful and spells more balanced. Forget what you know about some spell, class or weapon being useless : it has probably been changed.
-Defensive skills are important even early in the game. Bodybuilding has been changed so that it doesn’t fall off late game. Early on it will greatly increase your hitpoints, consider prioritizing it.
-Meditation has been buffed significantly to reduce downtime, and buff casters early. Later on spell costs increase significantly though.
-Because monsters move faster than you and you can't dodge their attacks, pulling monsters is now key to victory, and carelessly alerting too many monsters will get you killed very fast.
-Try to fight monsters that aren’t too much higher level than you, monster and player strength increases exponentially with level.
-Items and stats are much more significant than in vanilla
+- Monsters are much stronger, weapons more useful and spells more balanced. Forget what you know about some spell, class or weapon being useless : it has probably been changed.
+- Defensive skills are important even early in the game. Bodybuilding has been changed so that it doesn’t fall off late game. Early on it will greatly increase your hitpoints, consider prioritizing it.
+- Meditation has been buffed significantly to reduce downtime, and buff casters early. Later on spell costs increase significantly though.
+- Because monsters move faster than you and you can't dodge their attacks, pulling monsters is now key to victory, and carelessly alerting too many monsters will get you killed very fast.
+- Try to fight monsters that aren’t too much higher level than you, monster and player strength increases exponentially with level.
+- Items and stats are much more significant than in vanilla
 
 That’s really all you need to know to get started, just install and enjoy the fun 🙂
 
