@@ -37,7 +37,7 @@ This mod is divided the following parts:
 - Gold cost depends on the loot power
 - Items will now show power and vitality changes with currently equipped item, check the Stats rework section for more info
 
-###Weapons
+### Weapons
 - Weapons have attack speed stat
   - Damage will be multiplied by the attack speed
   - This is not shown in stats menu
