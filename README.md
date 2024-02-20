@@ -151,7 +151,7 @@ But if you’re curious to know more about the mod and the specific changes, rea
 ## Bolster & Difficulty
 - There are 2 game modes, and you can check bolster value by right clicking level in stats menu:
 - Free Progression (set monster bolster to on):
-  - Recommended if you want to play just 1 of the 3 continents
+  - Recommended if you want to play just 1 of the 3 continents, or one continent at a time. You can also move freely between continents but arent rewarded for doing so.
   - Bolster is no longer applied unless you change continent
   - When you change continents, monsters will retain the levels you gained from other continents
   - Along with monster strength, loot strength will increase, including base stats, value, and enchants
