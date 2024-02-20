@@ -2,13 +2,13 @@
 Maw Mod code adapted for MMMerge
 ## Install instruction
 - download MM8 from GOG
-following 3 files needs to be copied into MM8 folder in that exact order.
-  - download MMMerge at this link: https://drive.google.com/file/d/1f5-V-DtxB3u977RqdDH7hGbtZiGOQAGt/view
-  - download Multiplayer Here: https://gitlab.com/letr.rod/mmmerge/-/archive/multiplayer/mmmerge-multiplayer.zip
+- following 3 files needs to be copied into MM8 folder in that exact order.
+  - download MMMerge here: https://drive.google.com/file/d/1f5-V-DtxB3u977RqdDH7hGbtZiGOQAGt/view
+  - download Multiplayer here: https://gitlab.com/letr.rod/mmmerge/-/archive/multiplayer/mmmerge-multiplayer.zip
   - download MAW MMMerge here: https://github.com/Malekitsu/Maw-Mod-MMMerge/archive/refs/heads/main.zip
 - put MM8 folder into desktop
 - set mm8.exe into Windows Service pack 2 (or 3) compatibility mode.
-- check difficulty level (ingame esc/controls/extra setting on top)
+- check difficulty & bolster settings once in game (ingame esc/controls/extra setting on top)
 
 ## Overview
 This mod is divided into 8 parts:
