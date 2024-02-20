@@ -11,9 +11,10 @@ Maw Mod code adapted for MMMerge
 - check difficulty & bolster settings once in game (ingame esc/controls/extra setting on top)
 
 ## Overview
-This mod is divided into 8 parts:
+This mod is divided the following parts:
 - Item rework
 - Stats rework
+- Class rework
 - Skill rework
 - Spells rework
 - Monster rework
@@ -56,7 +57,7 @@ This mod is divided into 8 parts:
   - Luck: Every 5 points will increase all resistances by 1.
   - Armor Class: Reduces physical damage taken.
  
-You can now see POWER and VITALITY stats:
+### You can now see POWER and VITALITY stats:
 - Power will show the DPS you are capable of
   - If you don't have any offensive quickspell, the highest between melee or ranged damage will be shown
   - Spell will count only for a single hit
@@ -85,6 +86,16 @@ You can now see POWER and VITALITY stats:
   - Weapons are now balanced between each other
 - Id Item, Id Monster, Repair, Merchant and Disarm are now shared to all party members
   - Click on the skill to share to all party
+- Regeneration and Meditation will now be much stronger and work continuously instead of every 10 seconds
+
+## Class Rework
+- most underused classes have been balanced to have some uniqueness
+- misc skills are now a bit more accessible
+
+### MAW Classes
+- Added Seraphim, Death Knight and Shaman Class
+- Press the icon top right on party creation to enable them
+- Make sure to read their perks by right clicking on the class name
 
 ## Spells Rework
 - Many spells have been rebalanced
@@ -142,6 +153,7 @@ You can now see POWER and VITALITY stats:
   - You can choose between Easy-MAW-Hard-Hell-Nightmare
     - Damage and monster HP will be multiplied corrispondently by 0.7 - 1 - 1.5 - 2 - 3
     - Loot power will be increased by 0% - 0% - 10% - 20% - 40%
+    - Monster density will increase aswell
     - Once in Nightmare you can't change difficulty
       - You can't save nor teleport with monsters in the nearbies
       - Dungeons will now spawn elite monsters, with unique abilities
