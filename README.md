@@ -10,8 +10,14 @@ Maw Mod code adapted for MMMerge
 - set mm8.exe into Windows Service pack 2 (or 3) compatibility mode.
 - check difficulty & bolster settings once in game (ingame esc/controls/extra setting on top)
 
+## Discord Link
+If you have any installation issue, bug, question or just share your adventures, you can in Discord at the following link:
+
+
+https://discord.gg/n59XMtMcnF
+
 ## Overview
-This mod is divided the following parts:
+The mod is very big and changes most game mechanics, for simplicity I'll divide in the following sections:
 - What you need to know
 - Item rework
 - Stats rework
