@@ -11,7 +11,7 @@ Maw Mod code adapted for MMMerge
 - check difficulty & bolster settings once in game (ingame esc/controls/extra setting on top)
 
 ## Discord Link
-If you have any installation issue, bug, question or just want to share your adventures, you can in Discord at the following link:
+If you have any installation issue, bug, question or just want to share your adventures, you can join Discord at the following link:
 
 
 https://discord.gg/n59XMtMcnF
