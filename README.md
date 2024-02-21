@@ -117,6 +117,11 @@ But if you’re curious to know more about the mod and the specific changes, rea
 - Added Seraphim, Death Knight and Shaman Class
 - Press the icon top right on party creation to enable them
 - Make sure to read their perks by right clicking on the class name
+- Classes can be promoted crossworld (MM8 only on 2nd promotion)
+
+  
+  ![image](https://github.com/Malekitsu/Maw-Mod-MMMerge/assets/114432644/003d4409-3fee-41a4-a941-e356aaa6b42b)
+
 
 ## Spells Rework
 - Many spells have been rebalanced
