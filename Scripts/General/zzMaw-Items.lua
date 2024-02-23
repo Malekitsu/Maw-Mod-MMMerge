@@ -2736,14 +2736,14 @@ function events.AfterLoadMap()
 	mawRefresh("all")
 end
 function events.Action(t)
-	if t.Action==110 or t.Action==115 or t.Action==133 then
+	--if t.Action==110 or t.Action==115 or t.Action==133 then
 		if Game.CurrentPlayer==-1 then return end
-		id=Party[Game.CurrentPlayer]:GetIndex()
+		local id=Party[Game.CurrentPlayer]:GetIndex()
 		function events.Tick() 
 			events.Remove("Tick", 1)
 			mawRefresh(id)
 		end
-	end
+	--end
 end
 function events.CalcDamageToPlayer(t)
 	function events.Tick() 
@@ -2862,6 +2862,14 @@ function events.ShopItemsGenerated(t)
 	mawStoreShop()
 end
 
+--attempt to fix price overflow, apparently due to gm merchant
+function events.GetMerchantTotalSkill(t)
+	if merchantFix then
+		t.Result=1
+	end
+end
+
+
 function mawStoreShop()
 
 	--broken price fix
@@ -2870,6 +2878,9 @@ function mawStoreShop()
 		s,m=SplitSkill(Party[i].Skills[const.Skills.Merchant])
 		if s>15 or m==4 then
 			Game.Houses[id].Val=1
+			merchantFix=true
+		else
+			merchantFix=false
 		end
 	end
 	if Game.HouseScreen==2 or Game.HouseScreen==95 then
