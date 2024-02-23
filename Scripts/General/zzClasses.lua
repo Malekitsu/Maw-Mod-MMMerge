@@ -756,7 +756,7 @@ function events.GameInitialized2()
 			m6=SplitSkill(t.Player:GetSkill(const.Skills.Body))
 			m7=SplitSkill(t.Player:GetSkill(const.Skills.Mind))
 			m8=m2+m3+m4+m5+m1+m6+m7
-			mult=(Game.BolsterAmount/100)
+			mult=((Game.BolsterAmount/100)-1)/2+1
 			t.Result=math.max(t.Result*0.99^(m1+m8/7)-m4^1.33*mult,0)
 		end
 	end
