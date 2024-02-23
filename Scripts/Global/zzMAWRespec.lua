@@ -100,7 +100,7 @@ end
 function respecMastery(id)
 	local index=Party[id]:GetIndex()
 	vars.oldPlayerMasteries=vars.oldPlayerMasteries or {}
-	vars.oldPlayerMasteries[index]={}
+	vars.oldPlayerMasteries[index]=vars.oldPlayerMasteries[index] or {}
 	local p=Party[id]
 	for i=0, p.Skills.High do
 		local s, m = SplitSkill(p.Skills[i])
