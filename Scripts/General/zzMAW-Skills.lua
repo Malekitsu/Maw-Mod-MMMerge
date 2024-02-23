@@ -1307,30 +1307,36 @@ function events.Action(t)
 	horizontalModeMasteries()
 end
 
---restore masteries also on skill levelup
+--restore masteries 
 function events.Action(t)
 	if t.Action==121 then
-		if t.Param<=23 then
-			t.Handled=false
-			pl=Party[Game.CurrentPlayer]
-			local currentCost=SplitSkill(pl.Skills[t.Param])+1
-			--calculate actual cost
-			local n=1
+		t.Handled=false
+		pl=Party[Game.CurrentPlayer]
+		local currentCost=SplitSkill(pl.Skills[t.Param])+1
+		--calculate actual cost
+		local n=1
+		if t.Param>=12 and t.Param<=23 then
 			for i=1,11 do
 				local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[11+i])
 				if s>=currentCost then
 					n=n+1
 				end
 			end
-			local actualCost=math.ceil(currentCost/n)
-			if pl.SkillPoints>=actualCost then
-				id=pl:GetIndex()
-				local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[t.Param])
-				if vars.storedMasteries and vars.storedMasteries[id] and vars.storedMasteries[id][t.Param] then
-					while m<4 and vars.storedMasteries[id][t.Param]>m and s+1>=learningRequirements[m+1] do
-						Party[Game.CurrentPlayer].Skills[t.Param]=JoinSkill(s,m+1)
-						m=m+1
-					end
+		end
+		local actualCost=math.ceil(currentCost/n)
+		if pl.SkillPoints>=actualCost then
+			local id=pl:GetIndex()
+			local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[t.Param])
+			if table.find(horizontalSkills, t.Param) and vars.storedMasteries and vars.storedMasteries[id] and vars.storedMasteries[id][t.Param] then
+				while m<4 and vars.storedMasteries[id][t.Param]>m and s+1>=learningRequirements[m+1] do
+					Party[Game.CurrentPlayer].Skills[t.Param]=JoinSkill(s,m+1)
+					m=m+1
+				end
+			end
+			if vars.oldPlayerMasteries and vars.oldPlayerMasteries[id] then
+				while m<4 and vars.oldPlayerMasteries[id][t.Param]>m and s+1>=learningRequirements[m+1] do
+					Party[Game.CurrentPlayer].Skills[t.Param]=JoinSkill(s,m+1)
+					m=m+1
 				end
 			end
 		end
