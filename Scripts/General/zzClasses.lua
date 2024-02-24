@@ -855,7 +855,7 @@ function events.CalcDamageToMonster(t)
 		local pl=data.Player
 		pl.SP=math.min(data.Player:GetFullSP(), pl.SP+spRegen[pl.Class])
 		local blood=SplitSkill(pl.Skills[const.Skills.Dark])
-		pl.HP=math.min(data.Player:GetFullHP(), pl.HP+t.Resul*blood/100)
+		pl.HP=math.min(data.Player:GetFullHP(), pl.HP+t.Result*blood/100)
 	end
 end
 
