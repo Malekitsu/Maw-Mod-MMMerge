@@ -852,8 +852,10 @@ spRegen={
 function events.CalcDamageToMonster(t)
 	local data = WhoHitMonster()	
 	if data and data.Player and t.DamageKind==4 and table.find(dkClass, data.Player.Class) then
-		pl=data.Player
+		local pl=data.Player
 		pl.SP=math.min(data.Player:GetFullSP(), pl.SP+spRegen[pl.Class])
+		local blood=SplitSkill(pl.Skills[const.Skills.Body])
+		pl.HP=math.min(data.Player:GetFullHP(), pl.HP+t.Resul*blood/100)
 	end
 end
 
@@ -869,7 +871,7 @@ function events.GameInitialized2()
 				t.Result=t.Result+(s1+s2+s3)*2
 			end
 		end
-	end
+	end	
 end
 --dark grants some leech (flat, based on promotion)
 --water adds damage/attack speed
