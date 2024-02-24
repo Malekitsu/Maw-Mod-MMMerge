@@ -2792,7 +2792,7 @@ end
 shopArmors={31,32,33,34,5}
 function refreshItems()
 	id=Game:GetCurrentHouse()
-	if id==nil or id>133 then return end
+	if id==nil or id>=97 then return end
 	if Game.HouseScreen==2 then
 		h=Game.ShopItems[id]
 	elseif Game.HouseScreen==95 then
