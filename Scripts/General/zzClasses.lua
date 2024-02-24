@@ -757,8 +757,8 @@ function events.GameInitialized2()
 		end
 	end
 	
-	function events.CalcStatBonusBySkills(t)
-		if t.Stat==const.Stats.MeleeDamageBase then
+	function events.CalcStatBonusByItems(t)
+		if t.Stat==const.Stats.MeleeDamageMax or t.Stat==const.Stats.MeleeDamageMin then
 			if table.find(shamanClass, t.Player.Class) then	
 				--mastery=SplitSkill(t.Player.Skills[const.Skills.Thievery))
 				m1=SplitSkill(t.Player.Skills[const.Skills.Fire])
