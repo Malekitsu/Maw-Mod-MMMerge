@@ -854,7 +854,7 @@ function events.CalcDamageToMonster(t)
 	if data and data.Player and t.DamageKind==4 and table.find(dkClass, data.Player.Class) then
 		local pl=data.Player
 		pl.SP=math.min(data.Player:GetFullSP(), pl.SP+spRegen[pl.Class])
-		local blood=SplitSkill(pl.Skills[const.Skills.Body])
+		local blood=SplitSkill(pl.Skills[const.Skills.Dark])
 		pl.HP=math.min(data.Player:GetFullHP(), pl.HP+t.Resul*blood/100)
 	end
 end
@@ -864,7 +864,6 @@ function events.GameInitialized2()
 	function events.CalcStatBonusBySkills(t)
 		if t.Stat==const.Stats.MeleeDamageBase then
 			if dkClass[t.Player.Class] then	
-				--mastery=SplitSkill(t.Player:GetSkill(const.Skills.Thievery))
 				s1, m1=SplitSkill(t.Player:GetSkill(const.Skills.Water))
 				s2, m2=SplitSkill(t.Player:GetSkill(const.Skills.Earth))
 				s3, m3=SplitSkill(t.Player:GetSkill(const.Skills.Dark))
