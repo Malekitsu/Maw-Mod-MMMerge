@@ -717,73 +717,57 @@ end
 ---------------------------------------
 --SHAMAN
 ---------------------------------------
-function events.HealingSpellPower(t)
-	if (t.Caster.Class==59 or t.Caster.Class==60 or t.Caster.Class==61) then	
-		m1=SplitSkill(t.Caster:GetSkill(const.Skills.Air))
-		m2=SplitSkill(t.Caster:GetSkill(const.Skills.Earth))
-		m3=SplitSkill(t.Caster:GetSkill(const.Skills.Fire))
-		m4=SplitSkill(t.Caster:GetSkill(const.Skills.Water))
-		m5=SplitSkill(t.Caster:GetSkill(const.Skills.Spirit))
-		m6=SplitSkill(t.Caster:GetSkill(const.Skills.Body))
-		m7=SplitSkill(t.Caster:GetSkill(const.Skills.Mind))
-		m8=m2+m3+m4+m5+m1+m6+m7
-		t.Result =t.Result+t.Result*m8/200
-	end
-end
+local shamanClass={59, 60, 61}
+
 function events.GameInitialized2()
 	function events.CalcSpellDamage(t)
 		local data = WhoHitMonster()
-		if data and data.Player and (data.Player.Class==60 or data.Player.Class==61 or data.Player.Class==62) then	
-			m1=SplitSkill(data.Player:GetSkill(const.Skills.Air))
-			m2=SplitSkill(data.Player:GetSkill(const.Skills.Earth))
-			m3=SplitSkill(data.Player:GetSkill(const.Skills.Fire))
-			m4=SplitSkill(data.Player:GetSkill(const.Skills.Water))
-			m5=SplitSkill(data.Player:GetSkill(const.Skills.Spirit))
-			m6=SplitSkill(data.Player:GetSkill(const.Skills.Body))
-			m7=SplitSkill(data.Player:GetSkill(const.Skills.Mind))
+		if data and data.Player and table.find(shamanClass, data.Player.Class)  then	
+			m1=SplitSkill(data.Player.Skills[const.Skills.Fire])
+			m2=SplitSkill(data.Player.Skills[const.Skills.Air])
+			m3=SplitSkill(data.Player.Skills[const.Skills.Water])
+			m4=SplitSkill(data.Player.Skills[const.Skills.Earth])
+			m5=SplitSkill(data.Player.Skills[const.Skills.Spirit])
+			m6=SplitSkill(data.Player.Skills[const.Skills.Mind])
+			m7=SplitSkill(data.Player.Skills[const.Skills.Body])
 			m8=m2+m3+m4+m5+m1+m6+m7
 			t.Result =t.Result+t.Result*m8/200
 		end
 	end
 
 	function events.CalcDamageToPlayer(t)
-		if (t.Player.Class==59 or t.Player.Class==60 or t.Player.Class==61) and t.Player.Unconscious==0 and t.Player.Dead==0 and t.Player.Eradicated==0  then
-			m1=SplitSkill(t.Player:GetSkill(const.Skills.Air))
-			m2=SplitSkill(t.Player:GetSkill(const.Skills.Earth))
-			m3=SplitSkill(t.Player:GetSkill(const.Skills.Fire))
-			m4=SplitSkill(t.Player:GetSkill(const.Skills.Water))
-			m5=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
-			m6=SplitSkill(t.Player:GetSkill(const.Skills.Body))
-			m7=SplitSkill(t.Player:GetSkill(const.Skills.Mind))
-			m8=m2+m3+m4+m5+m1+m6+m7
+		if table.find(shamanClass, t.Player.Class) and t.Player.Unconscious==0 and t.Player.Dead==0 and t.Player.Eradicated==0  then
+			m2=SplitSkill(t.Player.Skills[const.Skills.Air])
+			m3=SplitSkill(t.Player.Skills[const.Skills.Water])
 			mult=((Game.BolsterAmount/100)-1)/2+1
-			t.Result=math.max(t.Result*0.99^(m1+m8/7)-m4^1.33*mult,0)
+			t.Result=math.max(t.Result*0.99^m2-m3^1.33*mult,0)
 		end
 	end
 	
 	function events.CalcDamageToMonster(t)	
 		local data = WhoHitMonster()
-		if data and data.Player and (data.Player.Class==59 or data.Player.Class==60 or data.Player.Class==61) and t.DamageKind==0 and data.Object==nil then	
-			m2=SplitSkill(data.Player:GetSkill(const.Skills.Earth))
-			m6=SplitSkill(data.Player:GetSkill(const.Skills.Body))
-			m7=SplitSkill(data.Player:GetSkill(const.Skills.Mind))
-			data.Player.SP=math.min(data.Player.SP+m7, data.Player:GetFullSP())
-			data.Player.HP=math.min((data.Player.HP+m6^1.33)+m2/100*t.Result, data.Player:GetFullHP())
-			t.Result=t.Result+math.max(t.Monster.HP*(m3^0.5/500),m3)
+		if data and data.Player and table.find(shamanClass, data.Player.Class) and t.DamageKind==4 and data.Object==nil then	
+			m1=SplitSkill(t.Player.Skills[const.Skills.Fire])
+			m4=SplitSkill(data.Player.Skills[const.Skills.Earth])
+			m6=SplitSkill(data.Player.Skills[const.Skills.Mind])
+			m7=SplitSkill(data.Player.Skills[const.Skills.Body])
+			data.Player.SP=math.min(data.Player.SP+m6, data.Player:GetFullSP())
+			data.Player.HP=math.min((data.Player.HP+m7^1.33)+m4/100*t.Result, data.Player:GetFullHP())
+			t.Result=t.Result+math.max(t.Monster.HP*(m1^0.5/500),m1)
 		end
 	end
 	
 	function events.CalcStatBonusBySkills(t)
 		if t.Stat==const.Stats.MeleeDamageBase then
-			if t.Player.Class==59 or t.Player.Class==60 or t.Player.Class==61 then	
-				--mastery=SplitSkill(t.Player:GetSkill(const.Skills.Thievery))
-				m1=SplitSkill(t.Player:GetSkill(const.Skills.Air))
-				m2=SplitSkill(t.Player:GetSkill(const.Skills.Earth))
-				m3=SplitSkill(t.Player:GetSkill(const.Skills.Fire))
-				m4=SplitSkill(t.Player:GetSkill(const.Skills.Water))
-				m5=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
-				m6=SplitSkill(t.Player:GetSkill(const.Skills.Body))
-				m7=SplitSkill(t.Player:GetSkill(const.Skills.Mind))
+			if table.find(shamanClass, t.Player.Class) then	
+				--mastery=SplitSkill(t.Player.Skills[const.Skills.Thievery))
+				m1=SplitSkill(t.Player.Skills[const.Skills.Fire])
+				m2=SplitSkill(t.Player.Skills[const.Skills.Air])
+				m3=SplitSkill(t.Player.Skills[const.Skills.Water])
+				m4=SplitSkill(t.Player.Skills[const.Skills.Earth])
+				m5=SplitSkill(t.Player.Skills[const.Skills.Spirit])
+				m6=SplitSkill(t.Player.Skills[const.Skills.Mind])
+				m7=SplitSkill(t.Player.Skills[const.Skills.Body])
 				m8=m2+m3+m4+m5+m1+m6+m7
 				t.Result=(t.Result+m8)*(1+m5/100) --*(0.5+mastery/10)+mastery*2
 			end
@@ -791,6 +775,59 @@ function events.GameInitialized2()
 	end
 end
 
+local baseSchoolsTxt={}
+function events.GameInitialized2()
+	for i=12,18 do
+		baseSchoolsTxt[i]=Game.SkillDescriptions[i]
+	end
+end
+
+local function shamanSkills(isShaman)
+	if isShaman then
+		pl=Party[Game.CurrentPlayer]
+		local m1=SplitSkill(pl.Skills[const.Skills.Fire])
+		local m2=SplitSkill(pl.Skills[const.Skills.Air])
+		local m3=SplitSkill(pl.Skills[const.Skills.Water])
+		local m4=SplitSkill(pl.Skills[const.Skills.Earth])
+		local m5=SplitSkill(pl.Skills[const.Skills.Spirit])
+		local m6=SplitSkill(pl.Skills[const.Skills.Mind])
+		local m7=SplitSkill(pl.Skills[const.Skills.Body])
+		
+		local fireDamage=math.round(m1^0.5/0.05)/100
+		Game.SkillDescriptions[12]=baseSchoolsTxt[12] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks deal an extra " .. fireDamage .. "% of monster Hit points"
+		local airReduction=100-math.round(0.99^m2*10000)/100
+		Game.SkillDescriptions[13]=baseSchoolsTxt[13] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nReduce all damage taken by " .. airReduction .. " %"
+		mult=((Game.BolsterAmount/100)-1)/2+1
+		local waterReduction=math.round(m3^1.33*mult)
+		Game.SkillDescriptions[14]=baseSchoolsTxt[14] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)"
+		Game.SkillDescriptions[15]=baseSchoolsTxt[15] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks heal by " .. m4 .. "% of damage done"
+		Game.SkillDescriptions[16]=baseSchoolsTxt[16] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nIncreases melee damage by " .. m5 .. "%"
+		Game.SkillDescriptions[17]=baseSchoolsTxt[17] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks restore " .. m6 .. " Spell Points"
+		local hpRestore=math.round(m7^1.33)
+		Game.SkillDescriptions[18]=baseSchoolsTxt[18] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks restore " .. hpRestore .. " Hit Points"
+	else
+		for i=12,18 do
+			Game.SkillDescriptions[i]=baseSchoolsTxt[i]
+		end
+	end
+end
+
+local function checkSkills()
+	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
+		if table.find(shamanClass, Party[Game.CurrentPlayer].Class) then
+			shamanSkills(true)
+		else
+			shamanSkills(false)
+		end
+	end
+end
+--add tooltips
+function events.Action(t)
+	function events.Tick() 
+		events.Remove("Tick", 1)
+		checkSkills()
+	end
+end
 
 
 ---------------------------------------
