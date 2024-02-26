@@ -862,35 +862,108 @@ spRegen={
 	[57]=15,
 	[58]=20,
 }
-function events.CalcDamageToMonster(t)
-	local data = WhoHitMonster()	
-	if data and data.Player and t.DamageKind==4 and table.find(dkClass, data.Player.Class) then
-		local pl=data.Player
-		pl.SP=math.min(data.Player:GetFullSP(), pl.SP+spRegen[pl.Class])
-		local blood=SplitSkill(pl.Skills[const.Skills.Dark])
-		pl.HP=math.min(data.Player:GetFullHP(), pl.HP+t.Result*blood/100)
-	end
-end
+
+
 
 --spells
 function events.GameInitialized2()
+	--damage from skills
 	function events.CalcStatBonusBySkills(t)
-		if t.Stat==const.Stats.MeleeDamageBase then
-			if dkClass[t.Player.Class] then	
-				s1, m1=SplitSkill(t.Player:GetSkill(const.Skills.Water))
-				s2, m2=SplitSkill(t.Player:GetSkill(const.Skills.Earth))
-				s3, m3=SplitSkill(t.Player:GetSkill(const.Skills.Dark))
-				t.Result=t.Result+(s1+s2+s3)*2
+		if t.Stat==const.Stats.MeleeDamageMax or t.Stat==const.Stats.MeleeDamageMin then
+			if table.find(dkClass, t.Player.Class) then	
+				local s1, m1=SplitSkill(t.Player.Skills[const.Skills.Water])
+				--local s2, m2=SplitSkill(t.Player.Skills[const.Skills.Body])
+				local s3, m3=SplitSkill(t.Player.Skills[const.Skills.Dark])
+				t.Result=t.Result+(s1+s3)*3
 			end
 		end
 	end	
+	--body leech damage
+	function events.CalcDamageToMonster(t)
+		local data = WhoHitMonster()
+		if data and data.Player and t.DamageKind==4 and table.find(dkClass, data.Player.Class) then
+			local pl=data.Player
+			pl.SP=math.min(data.Player:GetFullSP(), pl.SP+spRegen[pl.Class])
+			local blood=SplitSkill(pl.Skills[const.Skills.Body])
+			pl.HP=math.min(data.Player:GetFullHP(), pl.HP+t.Result*blood/100)
+		end
+		
+		if data and data.Player and table.find(dkClass, data.Player.Class)  and data.Object and data.Object.Spell>0 and data.Object.Spell<=99 then
+			
+			--scale with might
+			t.Result=t.Result*(1+data.Player:GetMight()/1000)
+			
+			--add physical damage to spells
+			baseDamage=t.Player:GetMeleeDamageMin()
+			maxDamage=t.Player:GetMeleeDamageMax()
+			randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
+			damage=math.round(randomDamage/2)
+			damage=damage/2^(t.Monster.Resistances[4])
+			t.Result=t.Result+damage
+			
+			luck=data.Player:GetLuck()/1.5
+			critDamage=data.Player:GetAccuracy()*3/1000
+			critChance=50+luck
+			roll=math.random(1, 1000)
+			if roll <= critChance then
+				t.Result=t.Result*(1.5+critDamage)
+				crit=true
+			end
+			if data.Player.Weak>0 then
+				t.Result=t.Result*0.5
+			end
+		end
+	end
+	
+	function events.GetAttackDelay(t)
+		if table.find(dkClass, t.Player.Class) then
+			local s, m=SplitSkill(t.Player.Skills[const.Skills.Water])
+			t.Result=t.Result/(1+s/100)
+		end
+	end
+	
+	function events.CalcDamageToPlayer(t) --body reduces phys damage, unholy magic damage
+		if table.find(dkClass, t.Player.Class) then
+			if t.DamageKind==4 then
+				local s, m=SplitSkill(t.Player.Skills[const.Skills.Body])
+				t.Result=t.Result*0.99^s
+			else
+				local s, m=SplitSkill(t.Player.Skills[const.Skills.Dark])
+				t.Result=t.Result*0.99^s
+			end			
+		end
+	end
+		
 end
---dark grants some leech (flat, based on promotion)
---water adds damage/attack speed
---earth grants some damage reduction
 
---spells scale with strength
+DKSpellList={
+	[const.Skills.Water]={26, 27, 29, 32},
+	[const.Skills.Body]={68, 71, 74, 76},
+	[const.Skills.Dark]={91, 90, 96, 97},
+}
 
+function events.Action(t)
+	if t.Action==105 then
+		pl=Party[Game.CurrentPlayer]
+		if table.find(dkClass, pl.Class) then
+			for i=1,99 do
+				pl.Spells[i]=false
+			end
+			local s1, m1=SplitSkill(pl.Skills[const.Skills.Water])
+			local s2, m2=SplitSkill(pl.Skills[const.Skills.Body])
+			local s3, m3=SplitSkill(pl.Skills[const.Skills.Dark])
+			for i=1, m1 do
+				pl.Spells[DKSpellList[const.Skills.Water][i]]=true
+			end
+			for i=1, m2 do
+				pl.Spells[DKSpellList[const.Skills.Body][i]]=true
+			end
+			for i=1, m3 do
+				pl.Spells[DKSpellList[const.Skills.Dark][i]]=true
+			end
+		end
+	end
+end
 
 
 --spells taking you below 35% of HP will trigger anti-magic shell, 
