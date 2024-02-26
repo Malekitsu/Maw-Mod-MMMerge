@@ -660,7 +660,7 @@ function events.GameInitialized2()
 	Game.SpellsTxt[85].GM="All spells cast at 2 times skill"
 	
 
-	
+	Game.SpellsTxt[114].Description="Mistform allows the vampire to reduce physical damage by 75%.  However, a vampire in Mistform cannot perform any physical attacks.  Vampires in Mistform are able to use spells and abilities and are affected by spells and abilities."
 end
 
 -- shared life overflow fix
