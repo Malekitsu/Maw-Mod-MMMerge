@@ -560,14 +560,14 @@ function events.CalcDamageToPlayer(t)
 					pl=t.Player
 					if pl:GetActiveItem(0) then
 						local n=pl:GetActiveItem(0).Number
-						if Game.ItemsTxt[n].Skill==const.Skills.Shield then
-							s,m=SplitSkill(t.Player.Skills[const.Skills.Chain])
+						if Game.ItemsTxt[n].Skill==const.Skills.Shield then --shield skill
+							s,m=SplitSkill(t.Player.Skills[const.Skills.Shield])
 							if m>=4 then
 								t.Damage=t.Damage*0.85
 							end
 						end
 					end
-					if pl.SpellBuffs[11].ExpireTime>Game.Time or Party.SpellBuffs[14].ExpireTime>Game.Time  then
+					if pl.SpellBuffs[11].ExpireTime>Game.Time or Party.SpellBuffs[14].ExpireTime>Game.Time  then --shield buff
 						t.Damage=t.Damage*0.85
 					end
 				end
