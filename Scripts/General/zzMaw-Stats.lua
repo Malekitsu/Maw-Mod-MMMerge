@@ -542,7 +542,7 @@ end
 function events.CalcDamageToPlayer(t)
 
 	data=WhoHitPlayer()
-	
+	pl=t.Player
 	
 	
 	if t.Damage==0 and t.Result==0 then return end
@@ -557,7 +557,6 @@ function events.CalcDamageToPlayer(t)
 			t.Damage=damage
 			if data and data.Object then
 				if data.Object.Spell==0 then
-					pl=t.Player
 					if pl:GetActiveItem(0) then
 						local n=pl:GetActiveItem(0).Number
 						if Game.ItemsTxt[n].Skill==const.Skills.Shield then --shield skill
@@ -575,8 +574,9 @@ function events.CalcDamageToPlayer(t)
 		end
 	end
 	
-	
-	
+	if t.DamageKind==4 and pl.SpellBuffs[26].ExpireTime>Game.Time then --mistform 
+		t.Damage=t.Damage*0.25
+	end
 	--recalculate spells damage
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
 		local skill=SplitSkill(data.Monster.SpellSkill)
