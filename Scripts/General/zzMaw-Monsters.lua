@@ -306,7 +306,7 @@ function recalculateMonsterTable()
 			end
 		end
 		
-		if mapName=="The Arena" or mapName=="Arena" or Game.freeProgression==false then
+		if mapName=="The Arena" or mapName=="Arena" then
 			extraBolster = 0
 		end
 		mon.Level=math.min(mon.Level+extraBolster,255)
@@ -320,8 +320,9 @@ function recalculateMonsterTable()
 			if not horizontalMaps[name] then
 				horizontalMultiplier=2.5
 				extraBolster=extraBolster*horizontalMultiplier
-				bolsterLevel=base.Level*horizontalMultiplier-base.Level
-				totalLevel[i]=math.max(base.Level*horizontalMultiplier-(base.Level-LevelB)+extraBolster-5, 5)
+				bolsterLevel=base.Level*horizontalMultiplier
+				flattener=(base.Level-LevelB)*horizontalMultiplier*0.6 --necessary to avoid making too much difference between monster tier
+				totalLevel[i]=math.max(base.Level*horizontalMultiplier+extraBolster-5-flattener, 5)
 				mon.Level=math.min(totalLevel[i],255)
 			end
 		end
@@ -1395,8 +1396,11 @@ function events.BuildMonsterInformationBox(t)
 	--mon = t.Monster
 	mon=Map.Monsters[Mouse:GetTarget().Index]
 	--show level Below HP
-	t.ArmorClass.Text=string.format("Level:         " .. mon.Level .. "\n" .. t.ArmorClass.Text)
-	
+	if mon.Id2>0 then
+		t.ArmorClass.Text=string.format("Level:          " .. math.round(totalLevel[mon.Id]) .. "\n" .. t.ArmorClass.Text)
+	else 
+		t.ArmorClass.Text=string.format("Level:          " .. mon.Level .. "\n" .. t.ArmorClass.Text)
+	end
 	--difficulty multiplier
 	diff=Game.BolsterAmount/100 or 1
 	if diff==0.5 then
