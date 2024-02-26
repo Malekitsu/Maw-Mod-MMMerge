@@ -121,7 +121,7 @@ end
 --intellect/personality
 function events.CalcSpellDamage(t)
 	local data = WhoHitMonster()
-	if data and data.Player and (data.Player.Class==10 or data.Player.Class==11) then return end
+	if data and data.Player and (data.Player.Class==10 or data.Player.Class==11 or table.find(dkClass, data.Player.Class)) then return end
 	if data and data.Player then
 		if data.Player.Class==10 or data.Player.Class==11 then return end --dragons scale off might
 		intellect=data.Player:GetIntellect()	
