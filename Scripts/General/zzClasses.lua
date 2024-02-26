@@ -758,7 +758,10 @@ function events.GameInitialized2()
 				mult=2^math.floor(t.Monster.Resistances[0]/1000)
 				fireDamage=fireDamage*mult
 			end
-			t.Result=t.Result+math.max(t.Monster.HP*fireDamage,m1)
+			fireDamage=math.max(t.Monster.HP*fireDamage,m1)
+			fireRes=t.Monster.Resistances[0]
+			fireDamage=fireDamage/2^(fireRes/100)
+			t.Result=t.Result+fireDamage
 		end
 	end
 	
@@ -799,7 +802,7 @@ local function shamanSkills(isShaman)
 		local m7=SplitSkill(pl.Skills[const.Skills.Body])
 		
 		local fireDamage=math.round(m1^0.5/0.05)/100
-		Game.SkillDescriptions[12]=baseSchoolsTxt[12] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks deal an extra " .. fireDamage .. "% of monster Hit points"
+		Game.SkillDescriptions[12]=baseSchoolsTxt[12] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks deal an extra " .. fireDamage .. "% of monster Hit points as fire damage"
 		local airReduction=100-math.round(0.99^m2*10000)/100
 		Game.SkillDescriptions[13]=baseSchoolsTxt[13] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nReduce all damage taken by " .. airReduction .. " %"
 		mult=((Game.BolsterAmount/100)-1)/2+1
