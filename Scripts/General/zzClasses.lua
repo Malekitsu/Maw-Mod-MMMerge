@@ -150,9 +150,9 @@ end
 ----------------------------------------------------------------------
 --SERAPHIM
 ----------------------------------------------------------------------
-
-Game.ClassDescriptions[53]="Seraphim is a divine warrior, blessed by the gods with otherworldly powers that set him apart from mortal fighters. His origins are shrouded in mystery, but it is said that he was chosen by the divine to carry out their will on the mortal plane. Some whisper that he was born from the union of a mortal and an angel, while others believe that he was created by the gods themselves. Regardless of his origins, there is no denying the power that Seraphim wields, and his presence on the battlefield is a testament to the will of the divine.\n\nProficiency in Plate, Sword, Mace, and Shield (can't dual wield)\n3 HP and 1 mana points gained per level\n\nAbilities:\n\nGods Wrath: Attacks deal extra magic damage based on Light skill (2 damage added per point in Light and Mind)\n\nHoly Strikes: Attacking will heal the most injured party member based on Body skill (2 points per point in Body and Spirit)\n\nDivine Protection: converts 25% of mana into self-healing when facing lethal attacks (2 healing per mana spent), 5 minutes cooldown."
-
+function events.GameInitialized2()
+	Game.ClassDescriptions[53]="Seraphim is a divine warrior, blessed by the gods with otherworldly powers that set him apart from mortal fighters. His origins are shrouded in mystery, but it is said that he was chosen by the divine to carry out their will on the mortal plane. Some whisper that he was born from the union of a mortal and an angel, while others believe that he was created by the gods themselves. Regardless of his origins, there is no denying the power that Seraphim wields, and his presence on the battlefield is a testament to the will of the divine.\n\nProficiency in Plate, Sword, Mace, and Shield (can't dual wield)\n3 HP and 1 mana points gained per level\n\nAbilities:\n\nGods Wrath: Attacks deal extra magic damage based on Light skill (2 damage added per point in Light and Mind)\n\nHoly Strikes: Attacking will heal the most injured party member based on Body skill (2 points per point in Body and Spirit)\n\nDivine Protection: converts 25% of mana into self-healing when facing lethal attacks (2 healing per mana spent), 5 minutes cooldown."
+end
 
 --body magic will increase healing done on attack
 --bunch of code for healing most injured player
@@ -721,7 +721,9 @@ end
 ---------------------------------------
 --SHAMAN
 ---------------------------------------
-Game.ClassDescriptions[59] = "The Shaman is a mystical warrior whose knowledge of magic enhances his martial prowess.\nYou can check following values by checking magic schools description in skills menu.\n\n - Each rank in Magic schools will increase spell damage and healing by 0.5%\n - Each point in Air will reduce damage by 1% (multiplicative)\n - Each point in Water will reduce damage by Skill^1.33 (increased depending on difficulty)\n\nMelee damage calculation:\n - Each point in spirit will increase damage by 1%\n - Each point in any schools will increase damage by 1\n - Each point in Fire will deal around 0.025% of total monster HP as fire damage\n\nRecovery on Melee attack:\n - Each point in Earth will heal by 1% of damage\n - Each point in Body will heal by skill^1.33\n - Each point in mind will restore 1 mana"
+function events.GameInitialized2()
+	Game.ClassDescriptions[59] = "The Shaman is a mystical warrior whose knowledge of magic enhances his martial prowess.\nYou can check following values by checking magic schools description in skills menu.\n\n - Each rank in Magic schools will increase spell damage and healing by 0.5%\n - Each point in Air will reduce damage by 1% (multiplicative)\n - Each point in Water will reduce damage by Skill^1.33 (increased depending on difficulty)\n\nMelee damage calculation:\n - Each point in spirit will increase damage by 1%\n - Each point in any schools will increase damage by 1\n - Each point in Fire will deal around 0.025% of total monster HP as fire damage\n\nRecovery on Melee attack:\n - Each point in Earth will heal by 1% of damage\n - Each point in Body will heal by skill^1.33\n - Each point in mind will restore 1 mana"
+end
 
 local shamanClass={59, 60, 61}
 
@@ -847,7 +849,9 @@ end
 ---------------------------------------
 --DEATH KNIGHT
 ---------------------------------------
-Game.ClassDescriptions[56] = "The Death Knight:\n\nEach point in magic school will increase base physical damage by 2\n\nEach Point in Dark magic will increase life leech by 1%"
+function events.GameInitialized2()
+	Game.ClassDescriptions[56] = "The Death Knight:\n\nEach point in magic school will increase base physical damage by 2\n\nEach Point in Dark magic will increase life leech by 1%"
+end
 --skills
 --death grip
 
