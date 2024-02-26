@@ -759,7 +759,7 @@ function events.GameInitialized2()
 				fireDamage=fireDamage*mult
 			end
 			fireDamage=math.max(t.Monster.HP*fireDamage,m1)
-			fireRes=t.Monster.Resistances[0]
+			fireRes=t.Monster.Resistances[0]%1000
 			fireDamage=fireDamage/2^(fireRes/100)
 			t.Result=t.Result+fireDamage
 		end
