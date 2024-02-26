@@ -847,7 +847,7 @@ end
 ---------------------------------------
 --DEATH KNIGHT
 ---------------------------------------
-
+Game.ClassDescriptions[56] = "The Death Knight:\n\nEach point in magic school will increase base physical damage by 2\n\nEach Point in Dark magic will increase life leech by 1%"
 --skills
 --death grip
 
