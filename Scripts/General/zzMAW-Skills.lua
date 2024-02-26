@@ -544,31 +544,10 @@ function events.GameInitialized2()
 	Game.SkillDesMaster[const.Skills.Plate]=string.format("%s 10%% cover",Game.SkillDesMaster[const.Skills.Plate])
 	Game.SkillDesGM[const.Skills.Plate]=string.format("%s rec. pen. elim., 15%% cover",Game.SkillDesGM[const.Skills.Plate])
 	Game.SkillDesExpert[const.Skills.Shield]=string.format("%s recovery penalty eliminated",Game.SkillDesExpert[const.Skills.Shield])
-	Game.SkillDesGM[const.Skills.Shield]=string.format("%s halve dmg from phys projectiles\nGrants 15%% magic cover",Game.SkillDesGM[const.Skills.Shield])
+	Game.SkillDesGM[const.Skills.Shield]=string.format("%s\nGrants 15%% magic cover and projectile damage reduction",Game.SkillDesGM[const.Skills.Shield])
 	Game.SkillDesMaster[const.Skills.Armsmaster]=string.format("Skills adds 2 damage to all melee weapons")
 	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s usable with Leather Armor",Game.SkillDesGM[const.Skills.Dodging])
 	Game.SkillDesGM[const.Skills.Unarmed]=string.format("%s 5+0.5%% dodge chance",Game.SkillDesGM[const.Skills.Unarmed])
-end
-
---REMOVE PLATE/MAIL physical damage reduction
-
-function events.CalcDamageToPlayer(t)
-	if t.DamageKind==const.Damage.Phys then
-		if Party[0]:GetActiveItem(3) then
-			local n=Party[0]:GetActiveItem(3).Number
-			if Game.ItemsTxt[n].Skill==const.Skills.Plate then
-				s,m=SplitSkill(t.Player.Skills[const.Skills.Plate])
-				if m>=3 then
-					t.Result=t.Result*2
-				end
-			elseif Game.ItemsTxt[n].Skill==const.Skills.Chain then
-				s,m=SplitSkill(t.Player.Skills[const.Skills.Chain])
-				if m>=4 then
-					t.Result=t.Result/0.65
-				end		
-			end
-		end
-	end
 end
 
 ---------------------------------------
@@ -1122,6 +1101,7 @@ end
 	
 function events.LoadMap()
 	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
+	if currentWorld==4 then return end
 	local bolster=0
 	vars.trainings=vars.trainings or {vars.MM8LVL,vars.MM7LVL,vars.MM6LVL}
 	for i=1,3 do 
