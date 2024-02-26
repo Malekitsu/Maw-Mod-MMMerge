@@ -965,6 +965,11 @@ function events.Action(t)
 	end
 end
 
+function events.CanLearnSpell(t)
+	if table.find(dkClass, t.Player.Class) then
+		t.NeedMastery = 5
+	end
+end
 
 --spells taking you below 35% of HP will trigger anti-magic shell, 
 		--reducing spell damage taken by 50% and converting spell damage into runic power (lasts 5 seconds, 1 minute cooldown, capped to max player HP)
