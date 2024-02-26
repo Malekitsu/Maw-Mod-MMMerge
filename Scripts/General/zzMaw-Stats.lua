@@ -1,7 +1,7 @@
 function events.CalcDamageToMonster(t)
 	local data = WhoHitMonster()	
 	--luck/accuracy bonus
-	if data and data.Player and t.DamageKind==4 then --dragons
+	if data and data.Player and t.DamageKind==4 then
 		if data.Object==nil or data.Object.Spell==133 then
 			
 			--OVERRIDE DAMAGE WITH MAW CALCULATION
@@ -540,9 +540,44 @@ end
 
 --reduce damage by %
 function events.CalcDamageToPlayer(t)
-	if t.Damage==0 and t.Result==0 then return end
-	--recalculate spells damage
+
 	data=WhoHitPlayer()
+	
+	
+	
+	if t.Damage==0 and t.Result==0 then return end
+	--works for attack 1 and 2
+	if data and data.Monster then --manually recalculate monster damage
+		if data.MonsterAction<=1 then
+			local atk=data.Monster["Attack" .. data.MonsterAction+1]
+			local damage=atk.DamageAdd
+			for i=1,atk.DamageDiceCount do
+				damage=damage+math.random(1, atk.DamageDiceSides)
+			end
+			t.Damage=damage
+			if data and data.Object then
+				if data.Object.Spell==0 then
+					pl=t.Player
+					if pl:GetActiveItem(0) then
+						local n=pl:GetActiveItem(0).Number
+						if Game.ItemsTxt[n].Skill==const.Skills.Shield then
+							s,m=SplitSkill(t.Player.Skills[const.Skills.Chain])
+							if m>=4 then
+								t.Damage=t.Damage*0.85
+							end
+						end
+					end
+					if pl.SpellBuffs[11].ExpireTime>Game.Time or Party.SpellBuffs[14].ExpireTime>Game.Time  then
+						t.Damage=t.Damage*0.85
+					end
+				end
+			end	
+		end
+	end
+	
+	
+	
+	--recalculate spells damage
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
 		local skill=SplitSkill(data.Monster.SpellSkill)
 		damage=Game.Spells[data.Object.Spell].DamageAdd
@@ -600,6 +635,7 @@ function events.CalcDamageToPlayer(t)
 		dmgMult=(levelMult/12+1.15)*((levelMult+10)/(oldLevel+10))*(1+(levelMult/200))
 		t.Damage=t.Result*dmgMult
 	end
+	
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
 		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true,data.Monster.Level)
 	elseif data and data.Monster then
