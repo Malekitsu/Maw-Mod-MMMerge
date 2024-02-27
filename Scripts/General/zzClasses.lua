@@ -938,7 +938,7 @@ end
 
 DKSpellList={
 	[const.Skills.Water]={26, 27, 29, 32},
-	[const.Skills.Body]={68, 71, 74, 76},
+	[const.Skills.Body]={68, 71, 76, 74},
 	[const.Skills.Dark]={91, 90, 96, 97},
 }
 
@@ -968,6 +968,36 @@ end
 function events.CanLearnSpell(t)
 	if table.find(dkClass, t.Player.Class) then
 		t.NeedMastery = 5
+	end
+end
+
+--change spell cost to personalized value:
+local DKManaCost{
+	[26]=15
+	[27]=0
+	[29]=30
+	[32]=50
+	[68]=20
+	[71]=60
+	[76]=40
+	[74]=70
+	[91]=0
+	[90]=30
+	[96]=20
+	[97]=70
+
+}
+function events.Action(t)
+	local index=Game.CurrentPlayer
+	if index>=0 and index<=Party.High then
+		local pl=Party[index]
+		if table.find(dkClass, pl.Class) then
+			for key, value in pairs(DKManaCost) do
+				for i=1,4 do
+					Game.Spells[key]["SpellPoints" .. masteryName[i]]=value
+				end
+			end
+		end
 	end
 end
 
