@@ -2742,6 +2742,7 @@ function events.Action(t)
 		function events.Tick() 
 			events.Remove("Tick", 1)
 			mawRefresh(id)
+			mawRefresh(id) --fixes some skill not being accounted on the first go this could be optimized, but it doesn't affects performance
 		end
 	--end
 end
@@ -2874,17 +2875,16 @@ function mawStoreShop()
 
 	--broken price fix
 	id=Game:GetCurrentHouse()
+	merchantFix=false
 	for i=0,Party.High do
 		s,m=SplitSkill(Party[i].Skills[const.Skills.Merchant])
 		if s>15 or m==4 then
 			Game.Houses[id].Val=1
 			merchantFix=true
-		else
-			merchantFix=false
 		end
 	end
 	if Game.HouseScreen==2 or Game.HouseScreen==95 then
-		Game.ShowStatusText("Press R to refresh new items (20000 gold)")
+		Game.ShowStatusText("Press R to refresh new items (20000 gold)") --not working
 	else 
 		return
 	end
