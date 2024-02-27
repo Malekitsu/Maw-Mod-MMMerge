@@ -1115,22 +1115,22 @@ function events.GameInitialized2()
 	--if you change diceMin or values that are 0 remember to update the tooltip manually 
 	spellPowers =
 		{
-			[2] = {dmgAdd =6, diceMin = 1, diceMax = 3, },--fire bolt
+			[2] = {dmgAdd =12, diceMin = 1, diceMax = 3, },--fire bolt
 			[6] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--fireball
 			[7] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--fire spike, the only spell with damage depending on mastery, fix in events.calcspelldamage
 			[8] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--immolation
-			[9] = {dmgAdd = 8, diceMin = 1, diceMax = 1, },--meteor shower
+			[9] = {dmgAdd = 6, diceMin = 1, diceMax = 1, },--meteor shower
 			[10] = {dmgAdd = 12, diceMin = 2, diceMax = 2, },--inferno
 			[11] = {dmgAdd = 32, diceMin = 1, diceMax = 21, },--incinerate
 			[15] = {dmgAdd = 3, diceMin = 2, diceMax = 2, },--sparks
 			[18] = {dmgAdd = 15, diceMin = 1, diceMax = 9, },--lightning bolt
 			[20] = {dmgAdd = 20, diceMin = 1, diceMax = 16, },--implosion
-			[22] = {dmgAdd = 20, diceMin = 1, diceMax = 1, },--starburst
+			[22] = {dmgAdd = 8, diceMin = 1, diceMax = 1, },--starburst
 			[24] = {dmgAdd = 4, diceMin = 1, diceMax = 2, },--poison spray
-			[26] = {dmgAdd = 8, diceMin = 1, diceMax = 5, },--ice bolt
-			[29] = {dmgAdd = 15, diceMin = 1, diceMax = 9, },--acid burst
+			[26] = {dmgAdd = 15, diceMin = 1, diceMax = 5, },--ice bolt
+			[29] = {dmgAdd = 12, diceMin = 1, diceMax = 9, },--acid burst
 			[32] = {dmgAdd = 6, diceMin = 1, diceMax = 6, },--ice blast
-			[37] = {dmgAdd = 8, diceMin = 1, diceMax = 4, },--deadly swarm
+			[37] = {dmgAdd = 16, diceMin = 1, diceMax = 4, },--deadly swarm
 			[39] = {dmgAdd = 12, diceMin = 1, diceMax = 8, },--blades
 			[41] = {dmgAdd = 8, diceMin = 1, diceMax = 8, },--rock blast
 			[43] = {dmgAdd = 0, diceMin = 1, diceMax = 12, },--death blossom
@@ -1149,7 +1149,7 @@ function events.GameInitialized2()
 			[97] = {dmgAdd = 0, diceMin = 1, diceMax = 25, },--dragon breath
 			[98] = {dmgAdd = 50, diceMin = 1, diceMax = 1, },--armageddon
 			[99] = {dmgAdd = 50, diceMin = 1, diceMax = 5, },--souldrinker
-			[103] = {dmgAdd = 30, diceMin = 1, diceMax = 22, },--darkfire bolt
+			[103] = {dmgAdd = 60, diceMin = 1, diceMax = 40, },--darkfire bolt
 			[111] = {dmgAdd = 15, diceMin = 1, diceMax = 6, },--lifedrain scales with mastery, fixed in calcspelldamage
 			[123] = {dmgAdd = 10, diceMin = 1, diceMax = 10, },--flame blast scales with mastery, fixed in calcspelldamage
 		}
