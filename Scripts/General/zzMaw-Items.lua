@@ -2866,7 +2866,7 @@ end
 --attempt to fix price overflow, apparently due to gm merchant
 function events.GetMerchantTotalSkill(t)
 	if merchantFix then
-		t.Result=50
+		t.Result=100
 	end
 end
 
