@@ -57,6 +57,9 @@ But if you’re curious to know more about the mod and the specific changes, rea
 - You can press R when in shops to reroll all the item
 - Gold cost depends on the loot power
 - Items will now show power and vitality changes with currently equipped item, check the Stats rework section for more info
+- Items with enchant that add damage to attack will increase also all spell damage by that amount if equipped in main hand
+  - Doesn't apply to strength+fire damage enchant
+  - AoE and shotgun spells will gain 40% of that amount
 
 ### Weapons
 - Weapons have attack speed stat
