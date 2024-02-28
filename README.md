@@ -157,7 +157,8 @@ But if you’re curious to know more about the mod and the specific changes, rea
 - Alchemy has been balanced vs light magic to provide ca double buffs but it doesnt reduce the cost of other spellschools and lacks the many nonbuffing spells Light has.
 - Alchemy buffs do not stack with Light magic
 - Access to either Light Magic or Alchemy makes the party much stronger than without it
-
+Down here the full recipe list:
+![image](https://github.com/Malekitsu/Maw-Mod-MMMerge/assets/106842972/0e2ec9bb-1850-417a-b8c7-6129ef951ca3)
 
 ## Bolster & Difficulty
 - There are 2 game modes, and you can check bolster value by right clicking level in stats menu:
