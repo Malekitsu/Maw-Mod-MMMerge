@@ -696,51 +696,29 @@ function events.Tick()
 	if Game.CurrentCharScreen==100 and Game.CurrentScreen==7 then
 		i=Game.CurrentPlayer 
 		if i==-1 then return end --prevent bug message
-		fireRes=Party[i]:GetResistance(10)
-		airRes=Party[i]:GetResistance(11)
-		waterRes=Party[i]:GetResistance(12)
-		earthRes=Party[i]:GetResistance(13)
-		mindRes=Party[i]:GetResistance(14)
-		bodyRes=Party[i]:GetResistance(15)
-		lvl=math.min(Party[i].LevelBase/1.6,125)
-		fireRes=100-math.max(math.round(calcMawDamage(Party[i],0,1000))/10, 0)
-		airRes=100-math.max(math.round(calcMawDamage(Party[i],1,1000))/10, 0)
-		waterRes=100-math.max(math.round(calcMawDamage(Party[i],2,1000))/10, 0)
-		earthRes=100-math.max(math.round(calcMawDamage(Party[i],3,1000))/10, 0)
-		mindRes=100-math.max(math.round(calcMawDamage(Party[i],7,1000))/10, 0)
-		bodyRes=100-math.max(math.round(calcMawDamage(Party[i],8,1000))/10, 0)
-		--[[calculate new resistances
-		fireRes=math.round((100-100/2^(fireRes/(75+lvl/1.6)))*100)/100
-		airRes=math.round((100-100/2^(airRes/(75+lvl/1.6)))*100)/100
-		waterRes=math.round((100-100/2^(waterRes/(75+lvl/1.6)))*100)/100
-		earthRes=math.round((100-100/2^(earthRes/(75+lvl/1.6)))*100)/100
-		mindRes=math.round((100-100/2^(mindRes/(75+lvl/1.6)))*100)/100
-		bodyRes=math.round((100-100/2^(bodyRes/(75+lvl/1.6)))*100)/100
-		]]
-		if fireRes>=93.75 then
-			fireRes=StrColor(0,255,0,"Max")
+		pl=Party[i]
+		local resistances={}
+		local resistances2={}
+		local damageList={0,1,2,3,7,8}
+		for i=10,15 do
+			resistances[i]=pl:GetResistance(i)
+			if resistances[i]>=64000 then
+				resistances[i]="Immune"
+			end
+			resistances2[i]=100-math.max(math.round(calcMawDamage(pl,damageList[i-9],1000))/10, 0)
+			if resistances2[i]>=93.75 then
+				resistances2[i]=StrColor(0,255,0,"Max")
+			elseif resistances2[i]%1==0 then
+				resistances2[i]=resistances2[i] .. ".0"
+			end
 		end
-		if airRes>=93.75 then
-			airRes=StrColor(0,255,0,"Max")
-		end
-		if waterRes>=93.75 then
-			waterRes=StrColor(0,255,0,"Max")
-		end
-		if earthRes>=93.75 then
-			earthRes=StrColor(0,255,0,"Max")
-		end
-		if mindRes>=93.75 then
-			mindRes=StrColor(0,255,0,"Max")
-		end
-		if bodyRes>=93.75 then
-			bodyRes=StrColor(0,255,0,"Max")
-		end		
-		Game.GlobalTxt[87]=StrColor(255, 70, 70,    string.format("Fire\t            %s%s",fireRes,"%"))
-		Game.GlobalTxt[6]=StrColor(173, 216, 230,   string.format("Air\t            %s%s",airRes,"%"))
-		Game.GlobalTxt[240]=StrColor(100, 180, 255, string.format("Water\t            %s%s",waterRes,"%"))
-		Game.GlobalTxt[70]=StrColor(153, 76, 0,     string.format("Earth\t            %s%s",earthRes,"%"))
-		Game.GlobalTxt[142]=StrColor(200, 200, 255, string.format("Mind\t            %s%s",mindRes,"%"))
-		Game.GlobalTxt[29]=StrColor(255, 192, 203,  string.format("Body\t            %s%s",bodyRes,"%"))	
+		
+		Game.GlobalTxt[87]=StrColor(255, 70, 70,    string.format("Fire\t            %s%s ",resistances2[10],"%")) .. string.format("%6s", resistances[10]) .. "\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[6]=StrColor(173, 216, 230,   string.format("Air\t            %s%s ",resistances2[11],"%")) .. string.format("%6s", resistances[11]) .. "\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[240]=StrColor(100, 180, 255, string.format("Water\t            %s%s ",resistances2[12],"%")) .. string.format("%6s", resistances[12]) .. "\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[70]=StrColor(153, 76, 0,     string.format("Earth\t            %s%s ",resistances2[13],"%")) .. string.format("%6s", resistances[13]) .. "\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[142]=StrColor(200, 200, 255, string.format("Mind\t            %s%s ",resistances2[14],"%")) .. string.format("%6s", resistances[14]) .. "\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[29]=StrColor(255, 192, 203,  string.format("Body\t            %s%s ",resistances2[15],"%"))	 .. string.format("%6s", resistances[15]) .. "\n\n\n\n\n\n\n\n\n"
 		statsChanged=true
 	elseif statsChanged and (Game.CurrentCharScreen~=100 or Game.CurrentScreen~=7) then
 		Game.GlobalTxt[87]="Fire"
