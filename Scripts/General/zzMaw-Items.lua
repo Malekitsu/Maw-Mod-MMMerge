@@ -603,7 +603,7 @@ end
 function events.CalcDamageToMonster(t)
     local data = WhoHitMonster()
 	if data and data.Player and data.Object ~= nil then
-		if data.Object.Item.Bonus2==3 then
+		if data.Object.Item.Bonus2==3 or data.Object.Item.Number==2025 then
 			t.Result=t.Result/2
 		end
 	end
