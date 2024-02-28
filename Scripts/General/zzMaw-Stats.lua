@@ -149,7 +149,7 @@ function events.BuildStatInformationBox(t)
 	if t.Stat==0 then
 		i=Game.CurrentPlayer
 		might=Party[i]:GetMight()
-		t.Text=string.format("%s\n\nBonus Meele/Bow Damage: %s%s",Game.StatsDescriptions[0],might/10,"%")
+		t.Text=string.format("%s\n\nBonus Melee/Bow Damage: %s%s",Game.StatsDescriptions[0],might/10,"%")
 	end
 	if t.Stat==1 then
 		i=Game.CurrentPlayer
@@ -334,7 +334,7 @@ function events.BuildStatInformationBox(t)
 					end
 				end
 			end
-			DPS1=math.round(dmg*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])
+			DPS1=math.round(dmg*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/6000)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])/100
 			
 			--RANGED
 			local low=Party[i]:GetRangedDamageMin()
@@ -349,7 +349,7 @@ function events.BuildStatInformationBox(t)
 			if m>=3 then
 				dmg=dmg*2
 			end
-			local DPS2=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])
+			local DPS2=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/6000)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])/100
 			power=math.max(DPS1,DPS2)
 			
 			t.Text=string.format("%s\n\nPower: %s",t.Text,StrColor(255,0,0,power))
@@ -375,9 +375,9 @@ function events.BuildStatInformationBox(t)
 		critChance=0.05+critChance
 		haste=math.floor((Party[i]:GetSpeed())/10)/100+1
 		delay=oldTable[spellIndex][mastery]
-		power=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/100)*haste)
+		power=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/6000)*haste)/100
 		
-		t.Text=string.format("%s\n\nPower: %s",t.Text,StrColor(255,0,0,power))
+		t.Text=string.format("%s\n\nSpellPower: %s",t.Text,StrColor(255,0,0,power))
 		
 	end
 	
@@ -458,7 +458,7 @@ function events.BuildStatInformationBox(t)
 			end
 		end
 		--damage tracker
-		local DPS=math.round(dmg*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])
+		local DPS=math.round(dmg*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/6000)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])/100
 		t.Text=string.format("%s\n\nDamage per second: %s",t.Text,StrColor(255,255,100,DPS))
 		vars.damageTrack=vars.damageTrack or {}
 		vars.damageTrack[Party[i]:GetIndex()]=vars.damageTrack[Party[i]:GetIndex()] or 0
@@ -493,7 +493,7 @@ function events.BuildStatInformationBox(t)
 		local atk=Party[i]:GetRangedAttack()
 		local lvl=Party[i].LevelBase
 		local hitChance= (15+atk*2)/(30+atk*2+lvl)
-		local DPS=math.round(dmg*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])
+		local DPS=math.round(dmg*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/6000)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])/100
 		local s,m=SplitSkill(Party[i].Skills[const.Skills.Bow])
 		if m>=3 then
 			DPS=DPS*2
@@ -635,7 +635,6 @@ function events.CalcDamageToPlayer(t)
 		dmgMult=(levelMult/12+1.15)*((levelMult+10)/(oldLevel+10))*(1+(levelMult/200))
 		t.Damage=t.Result*dmgMult
 	end
-	
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
 		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true,data.Monster.Level)
 	elseif data and data.Monster then
@@ -704,12 +703,12 @@ function events.Tick()
 		mindRes=Party[i]:GetResistance(14)
 		bodyRes=Party[i]:GetResistance(15)
 		lvl=math.min(Party[i].LevelBase/1.6,125)
-		fireRes=100-math.max(math.round(calcMawDamage(Party[i],0,10000))/100, 0)
-		airRes=100-math.max(math.round(calcMawDamage(Party[i],1,10000))/100, 0)
-		waterRes=100-math.max(math.round(calcMawDamage(Party[i],2,10000))/100, 0)
-		earthRes=100-math.max(math.round(calcMawDamage(Party[i],3,10000))/100, 0)
-		mindRes=100-math.max(math.round(calcMawDamage(Party[i],7,10000))/100, 0)
-		bodyRes=100-math.max(math.round(calcMawDamage(Party[i],8,10000))/100, 0)
+		fireRes=100-math.max(math.round(calcMawDamage(Party[i],0,1000))/10, 0)
+		airRes=100-math.max(math.round(calcMawDamage(Party[i],1,1000))/10, 0)
+		waterRes=100-math.max(math.round(calcMawDamage(Party[i],2,1000))/10, 0)
+		earthRes=100-math.max(math.round(calcMawDamage(Party[i],3,1000))/10, 0)
+		mindRes=100-math.max(math.round(calcMawDamage(Party[i],7,1000))/10, 0)
+		bodyRes=100-math.max(math.round(calcMawDamage(Party[i],8,1000))/10, 0)
 		--[[calculate new resistances
 		fireRes=math.round((100-100/2^(fireRes/(75+lvl/1.6)))*100)/100
 		airRes=math.round((100-100/2^(airRes/(75+lvl/1.6)))*100)/100
@@ -736,12 +735,12 @@ function events.Tick()
 		if bodyRes>=93.75 then
 			bodyRes=StrColor(0,255,0,"Max")
 		end		
-		Game.GlobalTxt[87]=StrColor(255, 70, 70, string.format("Fire %s%s",fireRes,"%"))
-		Game.GlobalTxt[6]=StrColor(173, 216, 230, string.format("Air %s%s",airRes,"%"))
-		Game.GlobalTxt[240]=StrColor(100, 180, 255, string.format("Water %s%s",waterRes,"%"))
-		Game.GlobalTxt[70]=StrColor(153, 76, 0, string.format("Earth %s%s",earthRes,"%"))
-		Game.GlobalTxt[142]=StrColor(200, 200, 255, string.format("Mind %s%s",mindRes,"%"))
-		Game.GlobalTxt[29]=StrColor(255, 192, 203, string.format("Body %s%s",bodyRes,"%"))	
+		Game.GlobalTxt[87]=StrColor(255, 70, 70,    string.format("Fire\t            %s%s",fireRes,"%"))
+		Game.GlobalTxt[6]=StrColor(173, 216, 230,   string.format("Air\t            %s%s",airRes,"%"))
+		Game.GlobalTxt[240]=StrColor(100, 180, 255, string.format("Water\t            %s%s",waterRes,"%"))
+		Game.GlobalTxt[70]=StrColor(153, 76, 0,     string.format("Earth\t            %s%s",earthRes,"%"))
+		Game.GlobalTxt[142]=StrColor(200, 200, 255, string.format("Mind\t            %s%s",mindRes,"%"))
+		Game.GlobalTxt[29]=StrColor(255, 192, 203,  string.format("Body\t            %s%s",bodyRes,"%"))	
 		statsChanged=true
 	elseif statsChanged and (Game.CurrentCharScreen~=100 or Game.CurrentScreen~=7) then
 		Game.GlobalTxt[87]="Fire"
@@ -999,7 +998,7 @@ function events.Tick()
 		spellIndex=Party[i].QuickSpell
 		
 		--if not an offensive spell then calculate highest between melee and ranged
-		if not spellPowers[spellIndex] then 
+
 			--MELEE
 			local i=Game.CurrentPlayer
 			local low=Party[i]:GetMeleeDamageMin()
@@ -1025,7 +1024,7 @@ function events.Tick()
 					end
 				end
 			end
-			DPS1=math.round(dmg*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])
+			DPS1=math.round(dmg*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/600)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])/10
 			
 			--RANGED
 			local low=Party[i]:GetRangedDamageMin()
@@ -1040,12 +1039,8 @@ function events.Tick()
 			if m>=3 then
 				dmg=dmg*2
 			end
-			local DPS2=math.round(dmg*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])
-			power=math.max(DPS1,DPS2)
-			
-			Game.GlobalTxt[47]=string.format("Power: %s\n\n\n\n\n\n\n\n",StrColor(255,0,0,power))
-		else
-		
+			local DPS2=math.round(dmg*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/600)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])/10
+                        if spellPowers[spellIndex] then 
 			--SPELLS
 			local s, m = SplitSkill(Party[i].Skills[const.Skills.Learning])
 			diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, spellIndex)
@@ -1065,11 +1060,12 @@ function events.Tick()
 			critChance=0.05+critChance
 			haste=math.floor((Party[i]:GetSpeed())/10)/100+1
 			delay=oldTable[spellIndex][mastery]
-			power=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/100)*haste)
-			
-			Game.GlobalTxt[47]=string.format("Power: %s\n\n\n\n\n\n\n\n",StrColor(255,0,0,power))
-		end
-		
+			DPS3=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/600)*haste)/10			
+			Game.GlobalTxt[47]=string.format("M/R/S:%s/%s/%s\n\n\n\n\n\n\n",StrColor(255,0,0,DPS1),StrColor(200,200,0,DPS2),StrColor(50,50,220,DPS3))
+		   else
+		        Game.GlobalTxt[47]=string.format("M/R:%s/%s\n\n\n\n\n\n\n",StrColor(255,0,0,DPS1),StrColor(200,200,0,DPS2))
+		    end
+				
 		local i=Game.CurrentPlayer
 		local fullHP=Party[i]:GetFullHP()
 		--AC
