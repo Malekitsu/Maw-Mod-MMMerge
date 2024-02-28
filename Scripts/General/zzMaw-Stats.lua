@@ -1024,7 +1024,7 @@ function events.Tick()
 					end
 				end
 			end
-			DPS1=math.round(dmg*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/600)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])/10
+			DPS1=math.round(dmg*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/60)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])
 			
 			--RANGED
 			local low=Party[i]:GetRangedDamageMin()
@@ -1039,7 +1039,7 @@ function events.Tick()
 			if m>=3 then
 				dmg=dmg*2
 			end
-			local DPS2=math.round(dmg*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/600)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])/10
+			local DPS2=math.round(dmg*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/60)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])
                         if spellPowers[spellIndex] then 
 			--SPELLS
 			local s, m = SplitSkill(Party[i].Skills[const.Skills.Learning])
@@ -1060,7 +1060,7 @@ function events.Tick()
 			critChance=0.05+critChance
 			haste=math.floor((Party[i]:GetSpeed())/10)/100+1
 			delay=oldTable[spellIndex][mastery]
-			DPS3=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/600)*haste)/10			
+			DPS3=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/60)*haste)			
 			Game.GlobalTxt[47]=string.format("M/R/S:%s/%s/%s\n\n\n\n\n\n\n",StrColor(255,0,0,DPS1),StrColor(200,200,0,DPS2),StrColor(50,50,220,DPS3))
 		   else
 		        Game.GlobalTxt[47]=string.format("M/R:%s/%s\n\n\n\n\n\n\n",StrColor(255,0,0,DPS1),StrColor(200,200,0,DPS2))
