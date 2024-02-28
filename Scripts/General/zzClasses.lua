@@ -972,20 +972,19 @@ function events.CanLearnSpell(t)
 end
 
 --change spell cost to personalized value:
-local DKManaCost{
-	[26]=15
-	[27]=0
-	[29]=30
-	[32]=50
-	[68]=20
-	[71]=60
-	[76]=40
-	[74]=70
-	[91]=0
-	[90]=30
-	[96]=20
-	[97]=70
-
+local DKManaCost={
+	[26]=15,
+	[27]=0,
+	[29]=30,
+	[32]=50,
+	[68]=20,
+	[71]=60,
+	[76]=40,
+	[74]=70,
+	[91]=0,
+	[90]=30,
+	[96]=20,
+	[97]=70,
 }
 function events.Action(t)
 	local index=Game.CurrentPlayer
@@ -1003,5 +1002,4 @@ end
 
 --spells taking you below 35% of HP will trigger anti-magic shell, 
 		--reducing spell damage taken by 50% and converting spell damage into runic power (lasts 5 seconds, 1 minute cooldown, capped to max player HP)
-
 
