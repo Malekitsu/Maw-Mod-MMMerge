@@ -1034,11 +1034,19 @@ function events.Action(t)
 		local baseCost=value.BaseCost
 		local scalingCost=value.ScalingCost
 		local cost=math.round(baseCost+(lvl/scalingCost)) --edit here to change mana cost
-		
 		Game.Spells[key]["SpellPointsNormal"]=cost
 		Game.Spells[key]["SpellPointsExpert"]=cost
 		Game.Spells[key]["SpellPointsMaster"]=cost
 		Game.Spells[key]["SpellPointsGM"]=cost
+	end
+end
+
+--Tooltips
+function events.GameInitialized2()
+	for key, value in pairs(CCMAP) do
+		local duration=value.Duration/const.Minute*2
+		local bonus=value.ChanceMult*100
+		Game.SpellsTxt[key].Description=Game.SpellsTxt[key].Description .. "\n\nDuration: " .. duration .. " seconds" .. "\nBonus Hit chance per skill level: " .. bonus .. "%"
 	end
 end
 
@@ -1055,8 +1063,8 @@ function events.PlayerCastSpell(t)
 				level[i]=lvl
 			local s,m=SplitSkill(t.Player:GetSkill(cc.School))
 			local newLevel=calcEffectChance(lvl, res, s, cc.ChanceMult)
-			mon.Resistances[cc.DamageKind]=0
-			mon.Level=newLevel
+			mon.Resistances[cc.DamageKind]=newLevel/4
+			mon.Level=0
 		end
 		local reset=1
 		if cc.DamageKind==const.Damage.Dark then
