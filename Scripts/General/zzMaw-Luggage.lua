@@ -9,7 +9,7 @@ local count = 5
 
 function events.KeyDown(t)
 
-    if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 103 then
+    if (Game.CurrentScreen == 7 and Game.CurrentCharScreen == 103) or Game.CurrentScreen==13 then
 		me = Party[Game.CurrentPlayer]
 		--[[
 		if t.Key >= NUMPAD0 and t.Key < NUMPAD0 + 10 then
