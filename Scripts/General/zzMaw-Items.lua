@@ -29,9 +29,8 @@ function events.GenerateItem(t)
 	end
 end
 
---grayface fix treasure code
 function events.PickCorpse(t)
-	if Game.BolsterAmount~=300 then return end
+	--if Game.BolsterAmount~=300 then return end
 		Game.RandSeed=mapvars.MonsterSeed[t.MonsterIndex]
 	function events.Tick() 
 		events.Remove("Tick", 1)
@@ -39,7 +38,7 @@ function events.PickCorpse(t)
 	end
 end
 function events.CastTelepathy(t)
-	if Game.BolsterAmount~=300 then return end
+	--if Game.BolsterAmount~=300 then return end
 	Game.RandSeed=mapvars.MonsterSeed[t.MonsterIndex]
 	function events.Tick() 
 		events.Remove("Tick", 1)
@@ -47,7 +46,7 @@ function events.CastTelepathy(t)
 	end
 end
 function events.LoadMap()
-	if Game.BolsterAmount~=300 then return end
+	--if Game.BolsterAmount~=300 then return end
 	if not mapvars.MonsterSeed then
 		mapvars.MonsterSeed={}
 		for i = 0, Map.Monsters.Limit - 1 do
