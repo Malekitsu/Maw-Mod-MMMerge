@@ -1028,7 +1028,7 @@ CCMAP={
 
 function events.Action(t)
 	local id=Game.CurrentPlayer
-	if id<0 then return end
+	if id<0 or id>Party.High then return end
 	for key, value in pairs(CCMAP) do
 		local lvl=Party[id].LevelBase
 		local baseCost=value.BaseCost
