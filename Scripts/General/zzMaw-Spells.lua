@@ -1324,8 +1324,9 @@ function events.Action(t)
 		Game.CurrentPlayer=0
 	end
 	if index>=0 and index<=Party.High then
-		local level=Party[index].Skills[const.Skills.Learning]
-		if lastIndex~=index or lastLevel~=level then
+		local pl=Party[index]
+		local level=pl.Skills[const.Skills.Learning]
+		if lastIndex~=index or lastLevel~=level or table.find(shamanClass, pl.Class) then
 			lastIndex=index
 			lastLevel=level
 			local s,m = SplitSkill(level)
@@ -1346,7 +1347,7 @@ function events.Action(t)
 						Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+0.15*ascensionLevel*s)*(1-0.1*m)
 					end
 					if num==44 then	
-						Game.Spells[num]["SpellPointsGM"]=Party[index].LevelBase^1.6/12.5
+						Game.Spells[num]["SpellPointsGM"]=pl.LevelBase^1.6/12.5
 					end	
 				end
 			end				
@@ -1450,9 +1451,29 @@ function events.Action(t)
 				for v=1,4 do
 					healingSpells[healingList[i]].Cost[v]=math.round(healingSpells[healingList[i]].Cost[v]*(1+0.15*ascensionLevel*s)*(1-0.1*m))
 					healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
+					
+					
 				end
 			end
-			
+			--shaman modifier
+			if table.find(shamanClass, pl.Class) then
+				local m1,m2,m3,m4,m5,m6,m7,m8
+				m1=SplitSkill(pl.Skills[const.Skills.Fire])
+				m2=SplitSkill(pl.Skills[const.Skills.Air])
+				m3=SplitSkill(pl.Skills[const.Skills.Water])
+				m4=SplitSkill(pl.Skills[const.Skills.Earth])
+				m5=SplitSkill(pl.Skills[const.Skills.Spirit])
+				m6=SplitSkill(pl.Skills[const.Skills.Mind])
+				m7=SplitSkill(pl.Skills[const.Skills.Body])
+				m8=m2+m3+m4+m5+m1+m6+m7
+				local mult=1+m8/200
+				for i=1,5 do
+					for v=1,4 do
+						healingSpells[healingList[i]].Scaling[v]=math.round(healingSpells[healingList[i]].Scaling[v]*mult)
+						healingSpells[healingList[i]].Base[v]=math.round(healingSpells[healingList[i]].Base[v]*mult)
+					end
+				end
+			end
 			--remove curse
 			local sp=healingSpells[49]
 			Game.Spells[49]["SpellPointsExpert"]=sp.Cost[2]
