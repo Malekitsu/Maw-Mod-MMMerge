@@ -868,13 +868,13 @@ spRegen={
 --spells
 function events.GameInitialized2()
 	--damage from skills
-	function events.CalcStatBonusBySkills(t)
+	function events.CalcStatBonusByItems(t)
 		if t.Stat==const.Stats.MeleeDamageMax or t.Stat==const.Stats.MeleeDamageMin then
 			if table.find(dkClass, t.Player.Class) then	
 				local s1, m1=SplitSkill(t.Player.Skills[const.Skills.Water])
 				--local s2, m2=SplitSkill(t.Player.Skills[const.Skills.Body])
 				local s3, m3=SplitSkill(t.Player.Skills[const.Skills.Dark])
-				t.Result=t.Result+(s1+s3)*3
+				t.Result=t.Result+s1*math.min(m1, 3)+s3*math.min(m3, 3)
 			end
 		end
 	end	
