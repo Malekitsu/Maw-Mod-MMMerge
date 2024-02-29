@@ -943,7 +943,8 @@ DKSpellList={
 }
 
 function events.Action(t)
-	if t.Action==105 then
+	if t.Action==105 and Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
+		
 		pl=Party[Game.CurrentPlayer]
 		if table.find(dkClass, pl.Class) then
 			for i=1,99 do
