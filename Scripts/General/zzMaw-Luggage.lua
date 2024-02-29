@@ -30,3 +30,22 @@ function events.KeyDown(t)
 		end		
 	end
 end
+
+function events.GameInitialized2()
+	for i=1,5 do
+		CustomUI.CreateButton{
+			IconUp = "SlChar" .. i .. "U",
+			IconDown = "SlChar" .. i .. "D",
+			Screen = 7,
+			Layer = 1,
+			X =	455+i*30,
+			Y =	372,
+			Masked = true,
+			Action = function() changeBag(Party[Game.CurrentPlayer], i-1) end,
+		}
+	end
+end
+
+function changeBag(pl, bag)
+	mem.dll.Luggage.activate(pl , bag)
+end
