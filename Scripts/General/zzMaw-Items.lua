@@ -2736,7 +2736,7 @@ function events.AfterLoadMap()
 end
 function events.Action(t)
 	--if t.Action==110 or t.Action==115 or t.Action==133 then
-		if Game.CurrentPlayer==-1 then return end
+		if Game.CurrentPlayer==-1 or Game.CurrentPlayer>Party.High then return end
 		local id=Party[Game.CurrentPlayer]:GetIndex()
 		function events.Tick() 
 			events.Remove("Tick", 1)
