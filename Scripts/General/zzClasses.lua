@@ -898,7 +898,7 @@ function events.GameInitialized2()
 			maxDamage=t.Player:GetMeleeDamageMax()
 			randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
 			damage=math.round(randomDamage/2)
-			damage=damage/2^(t.Monster.Resistances[4])
+			damage=damage/2^(t.Monster.Resistances[4]/100)
 			t.Result=t.Result+damage
 			
 			luck=data.Player:GetLuck()/1.5
@@ -979,7 +979,7 @@ local DKManaCost={
 	[29]=30,
 	[32]=50,
 	[68]=20,
-	[71]=60,
+	[71]=40,
 	[76]=40,
 	[74]=70,
 	[91]=0,
