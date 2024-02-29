@@ -706,6 +706,7 @@ function events.Tick()
 				resistances[i]="Immune"
 			end
 			resistances2[i]=100-math.max(math.round(calcMawDamage(pl,damageList[i-9],1000))/10, 0)
+			resistances2[i]=math.round(resistances2[i]*100)/100
 			if resistances2[i]>=93.75 then
 				resistances2[i]=StrColor(0,255,0,"Max")
 			elseif resistances2[i]%1==0 then
