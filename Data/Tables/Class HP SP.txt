@@ -55,9 +55,9 @@ n/u	20	2	0	0	-
 Seraphim	40	3	15	1	P
 Angel	40	4	15	2	P
 Archangel	40	5	15	3	P
-Death Knight	35	4	100	0	I
-Death Lord	35	5	115	0	I
-Lich King	35	7	130	0	I
+Death Knight	35	4	40	0	I
+Death Lord	35	5	70	0	I
+Lich King	35	7	100	0	I
 Shaman	25	3	10	1	IP
 Sekhem	25	4	10	1	IP
 Marabou	25	5	10	1	IP
