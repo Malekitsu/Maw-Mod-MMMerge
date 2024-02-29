@@ -725,7 +725,7 @@ function events.GameInitialized2()
 	Game.ClassDescriptions[59] = "The Shaman is a mystical warrior whose knowledge of magic enhances his martial prowess.\nYou can check following values by checking magic schools description in skills menu.\n\n - Each rank in Magic schools will increase spell damage and healing by 0.5%\n - Each point in Air will reduce damage by 1% (multiplicative)\n - Each point in Water will reduce damage by Skill^1.33 (increased depending on difficulty)\n\nMelee damage calculation:\n - Each point in spirit will increase damage by 1%\n - Each point in any schools will increase damage by 1\n - Each point in Fire will deal around 0.025% of total monster HP as fire damage\n\nRecovery on Melee attack:\n - Each point in Earth will heal by 1% of damage\n - Each point in Body will heal by skill^1.33\n - Each point in mind will restore 1 mana"
 end
 
-local shamanClass={59, 60, 61}
+shamanClass={59, 60, 61}
 
 function events.GameInitialized2()
 	function events.CalcSpellDamage(t)
