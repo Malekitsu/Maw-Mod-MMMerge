@@ -1533,23 +1533,22 @@ function events.GameInitialized2()
 	end
 end
 function events.LoadMap()
-	if Game.BolsterAmount==300 then
-		if Map.IndoorOrOutdoor==1 then
-			if mapvars.monsterMap==nil then
-				mapvars.monsterMap={["cleared"]=false, ["names"]={}}
-				for i=0,Map.Monsters.High do
-					mon=Map.Monsters[i]
-					if mon.NameId==0 then
-						mapvars.monsterMap[i]={["x"] = mon.X, ["y"] = mon.Y, ["z"] = mon.Z, ["exp"]=mon.Exp, ["item"]=mon.TreasureItemPercent, ["gold"]=mon.TreasureDiceSides, ["respawn"]=true, ["Ally"]=mon.Ally}
-					else
-						mapvars.monsterMap[i]={["respawn"]=false}
-					end
+	if Map.IndoorOrOutdoor==1 then
+		if mapvars.monsterMap==nil then
+			mapvars.monsterMap={["cleared"]=false, ["names"]={}}
+			for i=0,Map.Monsters.High do
+				mon=Map.Monsters[i]
+				if mon.NameId==0 then
+					mapvars.monsterMap[i]={["x"] = mon.X, ["y"] = mon.Y, ["z"] = mon.Z, ["exp"]=mon.Exp, ["item"]=mon.TreasureItemPercent, ["gold"]=mon.TreasureDiceSides, ["respawn"]=true, ["Ally"]=mon.Ally}
+				else
+					mapvars.monsterMap[i]={["respawn"]=false}
 				end
 			end
 		end
 	end
 end
 function events.LeaveMap()
+	if Game.BolsterAmount~=300 then return end
 	if Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.monsterMap.cleared==false then
 		if Map.Monsters.Count==0 then return end
 		for i=0,#mapvars.monsterMap do
@@ -1671,7 +1670,7 @@ function events.LoadMap(wasInGame)
 	Timer(nightmare, const.Minute/4) 
 end
 
---dungeon entrance level 
+--[[dungeon entrance level 
 function events.GameInitialized2()
 	for i=1,109 do 
 		name=Game.Houses[340+i].Name
@@ -1682,7 +1681,7 @@ function events.GameInitialized2()
 		end
 	end
 end
-
+]]
 --[[BOSSES SKILLS
 bosses have baseline more damage, hp, loot, spells and exp
 extra abilities:
@@ -1694,7 +1693,7 @@ teleport behind party
 ]]
 
 function events.AfterLoadMap()
-	if Map.IndoorOrOutdoor==1 and Game.BolsterAmount==300 then
+	if Map.IndoorOrOutdoor==1 then
 		if not mapvars.bossGenerated then
 			mapvars.bossGenerated=true
 			possibleMonsters={}
