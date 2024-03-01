@@ -931,7 +931,7 @@ function events.GameInitialized2()
 				else
 					msg=string.format("%s hits %s for %s points!", name, monName, MSGdamage)
 				end
-				if t.Result>t.Monster.HP then
+				if t.Monster.HP==0 then
 					msg=string.format("%s inflicts %s points killing %s!", name, MSGdamage, monName)
 				end
 				if castedAoe then
