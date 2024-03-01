@@ -709,14 +709,6 @@ function events.Tick()
 	end
 end
 
-function events.GetMaxSkillLevel(t)
-	if t.Skill==35 or t.Skill==2 then
-		if Game.CharacterPortraits[t.Player.Face].Race == const.Race.Minotaur then
-			t.Result=0
-		end
-	end
-end
-
 
 ---------------------------------------
 --SHAMAN
@@ -881,12 +873,6 @@ function events.GameInitialized2()
 	--body leech damage
 	function events.CalcDamageToMonster(t)
 		local data = WhoHitMonster()
-		if data and data.Player and t.DamageKind==4 and table.find(dkClass, data.Player.Class) then
-			local pl=data.Player
-			pl.SP=math.min(data.Player:GetFullSP(), pl.SP+spRegen[pl.Class])
-			local blood=SplitSkill(pl.Skills[const.Skills.Body])
-			pl.HP=math.min(data.Player:GetFullHP(), pl.HP+t.Result*blood/100)
-		end
 		
 		if data and data.Player and table.find(dkClass, data.Player.Class)  and data.Object and data.Object.Spell>0 and data.Object.Spell<=99 then
 			
@@ -913,6 +899,27 @@ function events.GameInitialized2()
 				t.Result=t.Result*0.5
 			end
 		end
+		if data and data.Player and  t.DamageKind==4 and table.find(dkClass, data.Player.Class) then
+			local pl=data.Player
+			if t.DamageKind==4 then
+				local regen=spRegen[pl.Class]
+				if t.Result>t.Monster.HP then
+					regen=regen*1.5
+				end
+				pl.SP=math.min(data.Player:GetFullSP(), pl.SP+regen)
+			end
+			local blood=SplitSkill(pl.Skills[const.Skills.Body])
+			pl.HP=math.min(data.Player:GetFullHP(), pl.HP+t.Result*blood/100)
+		end
+		if data and data.Object then
+			if data.Object.Spell==90 then --toxic cloud
+				local blood=SplitSkill(pl.Skills[const.Skills.Body])
+				pl.HP=math.min(data.Player:GetFullHP(), pl.HP+t.Result*blood/100)
+			elseif data.Object.Spell==26 then --ice bolt
+				t.Monster.SpellBuffs[const.MonsterBuff.Slow].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.Slow].ExpireTime, Game.Time+const.Minute)
+			end
+		end
+		
 	end
 	
 	function events.GetAttackDelay(t)
