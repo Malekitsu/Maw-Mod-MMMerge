@@ -834,8 +834,9 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	
 	--AC for phys
 	if damageKind==4 then 
-		extraACFromCAP=extraACFromCAP or 0
-		local AC=pl:GetArmorClass()+extraACFromCAP
+		local AC=pl:GetArmorClass()
+		local AC=pl:GetArmorClass()
+		local AC=pl:GetArmorClass()--multiple times to avoid chance to hit code to interfere with AC
 		local damage=math.round(damage/2^(math.min(AC/math.min(150+monLvl*bolster,400*bolster),4)))
 		return damage
 	end
