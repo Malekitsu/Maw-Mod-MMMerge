@@ -1,4 +1,4 @@
---[[local function hlp(Player)
+local function hlp(Player)
 		if mem.dll.skillz.PlayerID(Player)< 0 then
 			Message("Invalid player call for Skillz.dll")
 		end 
@@ -64,9 +64,9 @@ Skillz = {
 
 local thanked = false
 function events.AfterLoadMap()
-	if not thanked then 
-		Skillz.thanks()
-		thanked = true
-	end
+    if (not vars.Skillz_Thanked) and (not thanked) then 
+        Skillz.thanks()
+        thanked = true
+        vars.Skillz_Thanked = true
+    end
 end
-]]
