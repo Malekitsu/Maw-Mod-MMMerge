@@ -1237,6 +1237,9 @@ function ascendSpellDamage(skill, mastery, spell)
 	elseif spelltier<=skill%11  then
 		ascensionLevel=ascensionLevel+1
 	end
+	if diceMax==diceMin then
+		diceMin=diceMin * (1+0.04 * skill * ascensionLevel)
+	end	
 	diceMax=diceMax * (1+0.04 * skill * ascensionLevel)
 	damageAdd=damageAdd*(1+skill * (ascensionLevel+1) / 8)
 	diceMin, diceMax, damageAdd = math.round(diceMin), math.round(diceMax), math.round(damageAdd)
