@@ -752,7 +752,7 @@ function events.GameInitialized2()
 			m6=SplitSkill(data.Player.Skills[const.Skills.Mind])
 			m7=SplitSkill(data.Player.Skills[const.Skills.Body])
 			data.Player.SP=math.min(data.Player.SP+m6, data.Player:GetFullSP())
-			data.Player.HP=math.min((data.Player.HP+m7^1.33)+m4/100*t.Result, data.Player:GetFullHP())
+			data.Player.HP=math.min((data.Player.HP+m7^1.33)+(m4^0.6*2)/100*t.Result, data.Player:GetFullHP())
 			local fireDamage=(m1^0.5/500)
 			if t.Monster.Resistances[0]>=1000 then
 				mult=2^math.floor(t.Monster.Resistances[0]/1000)
@@ -808,7 +808,8 @@ local function shamanSkills(isShaman)
 		mult=((Game.BolsterAmount/100)-1)/2+1
 		local waterReduction=math.round(m3^1.33*mult)
 		Game.SkillDescriptions[14]=baseSchoolsTxt[14] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)"
-		Game.SkillDescriptions[15]=baseSchoolsTxt[15] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks heal by " .. m4 .. "% of damage done"
+		local leech=math.round(m4^0.6*200)/100
+		Game.SkillDescriptions[15]=baseSchoolsTxt[15] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks heal by " .. leech .. "% of damage done"
 		Game.SkillDescriptions[16]=baseSchoolsTxt[16] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nIncreases melee damage by " .. m5 .. "%"
 		Game.SkillDescriptions[17]=baseSchoolsTxt[17] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks restore " .. m6 .. " Spell Points"
 		local hpRestore=math.round(m7^1.33)
@@ -909,12 +910,12 @@ function events.GameInitialized2()
 				pl.SP=math.min(data.Player:GetFullSP(), pl.SP+regen)
 			end
 			local blood=SplitSkill(pl.Skills[const.Skills.Body])
-			pl.HP=math.min(data.Player:GetFullHP(), pl.HP+t.Result*blood/100)
+			pl.HP=math.min(data.Player:GetFullHP(), pl.HP+t.Result*(blood^0.6*2)/100)
 		end
 		if data and data.Object then
 			if data.Object.Spell==90 then --toxic cloud
 				local blood=SplitSkill(pl.Skills[const.Skills.Body])
-				pl.HP=math.min(data.Player:GetFullHP(), pl.HP+t.Result*blood/100)
+				pl.HP=math.min(data.Player:GetFullHP(), pl.HP+t.Result*(blood^0.6*2)/100)
 			elseif data.Object.Spell==26 then --ice bolt
 				t.Monster.SpellBuffs[const.MonsterBuff.Slow].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.Slow].ExpireTime, Game.Time+const.Minute)
 			end
