@@ -281,26 +281,31 @@ function recalculateMonsterTable()
 		extraBolster=0
 		--scale non map monsters based on MID
 		local mapName=Game.MapStats[Map.MapStatsIndex].Name
-		if mapLevels[mapName].Mid then
-			if LevelB<mapLevels[mapName].Low then
-				extraBolster=(mapLevels[mapName].Low-LevelB)/2
-			elseif LevelB>mapLevels[mapName].High then
-				extraBolster=(mapLevels[mapName].High-LevelB)/2
+		local mp=mapLevels[mapName]
+		if mp.Mid then
+			if LevelB<mp.Low then
+				extraBolster=(mp.Low-LevelB)/2
+			elseif LevelB>mp.High then
+				extraBolster=(mp.High-LevelB)/2
 			end
 		end
 		
+		
+		local mean=(mp.Low+mp.Mid+mp.High)/3
+		local adjust=0
 		--scale map monsters
 		if #currentMapMonsters>0 then 
 			for j=1, #currentMapMonsters do
 				if math.abs(i-currentMapMonsters[j])<=1 then
 					if j==1 then
-						extraBolster=mapLevels[mapName].Low-LevelB
+						extraBolster=mp.Low-LevelB
+						adjust=(mean-mp.Low)*1.5
 					elseif j==2 and #currentMapMonsters==3 then
-						extraBolster=mapLevels[mapName].Mid-LevelB
-					elseif j==2 and #currentMapMonsters==2 then
-						extraBolster=mapLevels[mapName].High-LevelB
-					elseif j==3 then
-						extraBolster=mapLevels[mapName].High-LevelB
+						extraBolster=mp.Mid-LevelB
+						adjust=(mean-mp.Mid)*1.5
+					elseif (j==2 and #currentMapMonsters==2) or j==3 then
+						extraBolster=mp.High-LevelB
+						adjust=(mean-mp.High)*1.5
 					end
 				end
 			end
@@ -322,10 +327,12 @@ function recalculateMonsterTable()
 			totalLevel[i]=level-flattener
 			mon.Level=math.min(totalLevel[i],255)
 			if not horizontalMaps[name] then
+				local mean=(mp.Low+mp.Mid+mp.High)/3
+				
 				extraBolster=extraBolster*horizontalMultiplier
 				bolsterLevel=base.Level*horizontalMultiplier
 				flattener=(base.Level-LevelB)*horizontalMultiplier*0.6 --necessary to avoid making too much difference between monster tier
-				totalLevel[i]=math.max(base.Level*horizontalMultiplier+extraBolster-5-flattener, 5)
+				totalLevel[i]=math.max(base.Level*horizontalMultiplier+extraBolster-5-flattener+adjust, 5)
 				mon.Level=math.min(totalLevel[i],255)
 			end
 		end
@@ -436,7 +443,7 @@ function recalculateMonsterTable()
 			currentBaseDamage=atk1.DamageAdd+atk1.DamageDiceCount*(1+atk1.DamageDiceSides)/2
 			batck1=bMon.Attack1
 			bBaseDamage=batck1.DamageAdd+batck1.DamageDiceCount*(1+batck1.DamageDiceSides)/2
-			dmgMult=currentBaseDamage/bBaseDamage
+			dmgMult=math.min(math.max(currentBaseDamage/bBaseDamage,0.75),1.3)
 			mon.Attack1.DamageAdd, mon.Attack1.DamageDiceSides, mon.Attack1.DamageDiceCount = calcDices(mon.Attack1.DamageAdd,mon.Attack1.DamageDiceSides,mon.Attack1.DamageDiceCount,dmgMult,bonusDamage)
 			
 			atk2=base.Attack2
@@ -446,7 +453,7 @@ function recalculateMonsterTable()
 			if currentBaseDamage==0 or bBaseDamage==0 then
 				dmgMult=1
 			else
-				dmgMult=currentBaseDamage/bBaseDamage
+				dmgMult=math.min(math.max(currentBaseDamage/bBaseDamage,0.75),1.3)
 			end
 			mon.Attack2.DamageAdd, mon.Attack2.DamageDiceSides, mon.Attack2.DamageDiceCount = calcDices(mon.Attack2.DamageAdd,mon.Attack2.DamageDiceSides,mon.Attack2.DamageDiceCount,dmgMult,bonusDamage)
 		end
@@ -1155,7 +1162,7 @@ mapLevels={
 {["Low"] = 7 , ["Mid"] = 12 , ["High"] = 12},
 
 ["Castle Ironfist"] = 
-{["Low"] = 5 , ["Mid"] = 5 , ["High"] = 7},
+{["Low"] = 4 , ["Mid"] = 5 , ["High"] = 7},
 
 ["Eel Infested Waters"] = 
 {["Low"] = 24 , ["Mid"] = 35 , ["High"] = 36},
@@ -1167,7 +1174,7 @@ mapLevels={
 {["Low"] = 6 , ["Mid"] = 6 , ["High"] = 6},
 
 ["Goblinwatch"] = 
-{["Low"] = 5 , ["Mid"] = 5 , ["High"] = 6},
+{["Low"] = 4 , ["Mid"] = 4 , ["High"] = 6},
 
 ["Abandoned Temple"] = 
 {["Low"] = 6 , ["Mid"] = 8 , ["High"] = 10},
@@ -1185,7 +1192,7 @@ mapLevels={
 {["Low"] = 18 , ["Mid"] = 20 , ["High"] = 26},
 
 ["Silver Helm Outpost"] = 
-{["Low"] = 16 , ["Mid"] = 26 , ["High"] = 34},
+{["Low"] = 5 , ["Mid"] = 12 , ["High"] = 16},
 
 ["Shadow Guild"] = 
 {["Low"] = 12 , ["Mid"] = 20 , ["High"] = 66},
@@ -1200,7 +1207,7 @@ mapLevels={
 {["Low"] = 26 , ["Mid"] = 29 , ["High"] = 55},
 
 ["Silver Helm Stronghold"] = 
-{["Low"] = 5 , ["Mid"] = 12 , ["High"] = 40},
+{["Low"] = 26 , ["Mid"] = 40 , ["High"] = 50},
 
 ["The Monolith"] = 
 {["Low"] = 24 , ["Mid"] = 30 , ["High"] = 40},
@@ -1230,7 +1237,7 @@ mapLevels={
 {["Low"] = 8 , ["Mid"] = 16 , ["High"] = 26},
 
 ["Temple of the Fist"] = 
-{["Low"] = 5 , ["Mid"] = 10.5 , ["High"] = 16},
+{["Low"] = 4 , ["Mid"] = 10 , ["High"] = 16},
 
 ["Temple of Tsantsa"] = 
 {["Low"] = 10 , ["Mid"] = 12 , ["High"] = 12},
@@ -1260,7 +1267,7 @@ mapLevels={
 {["Low"] = 35 , ["Mid"] = 45 , ["High"] = 79},
 
 ["Free Haven Sewer"] = 
-{["Low"] = 5 , ["Mid"] = 12 , ["High"] = 16},
+{["Low"] = 4 , ["Mid"] = 12 , ["High"] = 16},
 
 ["Tomb of VARN"] = 
 {["Low"] = 65 , ["Mid"] = 66 , ["High"] = 90},
