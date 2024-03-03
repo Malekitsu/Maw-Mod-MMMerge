@@ -856,7 +856,30 @@ spRegen={
 	[58]=20,
 }
 
+--change spell cost to personalized value:
+local DKManaCost={
+	[26]=15,
+	[27]=0,
+	[29]=30,
+	[32]=50,
+	[68]=6,
+	[71]=0,
+	[76]=12,
+	[74]=70,
+	[91]=0,
+	[90]=30,
+	[96]=15,
+	[97]=100,
+}
 
+local DKDamageMult={
+	[26]=1,
+	[29]=1.5,
+	[32]=0.6,
+	[74]=1.5,
+	[90]=1.2,
+	[97]=0.5,
+}
 
 --spells
 function events.GameInitialized2()
@@ -874,53 +897,104 @@ function events.GameInitialized2()
 	--body leech damage
 	function events.CalcDamageToMonster(t)
 		local data = WhoHitMonster()
-		
-		if data and data.Player and table.find(dkClass, data.Player.Class)  and data.Object and data.Object.Spell>0 and data.Object.Spell<=99 then
-			
-			--scale with might
-			t.Result=t.Result*(1+data.Player:GetMight()/1000)
-			
-			--add physical damage to spells
-			baseDamage=t.Player:GetMeleeDamageMin()
-			maxDamage=t.Player:GetMeleeDamageMax()
-			randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
-			damage=math.round(randomDamage/2)
-			damage=damage/2^(t.Monster.Resistances[4]/100)
-			t.Result=t.Result+damage
-			
-			luck=data.Player:GetLuck()/1.5
-			critDamage=data.Player:GetAccuracy()*3/1000
-			critChance=50+luck
-			roll=math.random(1, 1000)
-			if roll <= critChance then
-				t.Result=t.Result*(1.5+critDamage)
-				crit=true
-			end
-			if data.Player.Weak>0 then
-				t.Result=t.Result*0.5
-			end
-		end
-		if data and data.Player and  t.DamageKind==4 and table.find(dkClass, data.Player.Class) then
+		if data and data.Player and table.find(dkClass, data.Player.Class) then
 			local pl=data.Player
-			if t.DamageKind==4 then
-				local regen=spRegen[pl.Class]
-				if t.Result>t.Monster.HP then
-					regen=regen*1.5
+			if data.Object and data.Object.Spell>0 and data.Object.Spell<=99 then
+				--add physical damage to spells
+				baseDamage=pl:GetMeleeDamageMin()
+				maxDamage=pl:GetMeleeDamageMax()
+				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
+				damage=math.round(randomDamage/2)
+				damage=damage/2^(t.Monster.Resistances[4]/100)
+				local mult=damageMultiplier[t.PlayerIndex]["Melee"]
+				t.Result=damage*mult
+				luck=pl:GetLuck()/1.5
+				critDamage=pl:GetAccuracy()*3/1000
+				critChance=50+luck
+				roll=math.random(1, 1000)
+				if roll <= critChance then
+					t.Result=t.Result*(1.5+critDamage)
+					crit=true
 				end
-				pl.SP=math.min(data.Player:GetFullSP(), pl.SP+regen)
+				if pl.Weak>0 then
+					t.Result=t.Result*0.5
+				end
+				
+				--add spell modifier
+				if data.Object.Spell==26 or data.Object.Spell==29 then
+					local s,m=SplitSkill(pl.Skills[const.Skills.Water])
+					if m>=3 then
+						t.Result=t.Result*(1+s/100)
+					end
+				elseif data.Object.Spell==97 then
+					local s,m=SplitSkill(pl.Skills[const.Skills.Dark])
+					t.Result=t.Result*(1+s/100)
+				end
+				if DKDamageMult[data.Object.Spell] then
+					t.Result=t.Result*DKDamageMult[data.Object.Spell]
+					if data.Object.Spell==76 then
+						local s,m=SplitSkill(pl.Skills[const.Skills.Body])
+						if m==4 then
+							t.Result=t.Result/3*4
+						end
+					end
+				end
 			end
-			local blood=SplitSkill(pl.Skills[const.Skills.Body])
-			pl.HP=math.min(data.Player:GetFullHP(), pl.HP+t.Result*(blood^0.6*2)/100)
-		end
-		if data and data.Object then
-			if data.Object.Spell==90 then --toxic cloud
-				local blood=SplitSkill(pl.Skills[const.Skills.Body])
-				pl.HP=math.min(data.Player:GetFullHP(), pl.HP+t.Result*(blood^0.6*2)/100)
-			elseif data.Object.Spell==26 then --ice bolt
-				t.Monster.SpellBuffs[const.MonsterBuff.Slow].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.Slow].ExpireTime, Game.Time+const.Minute)
+			--life leech
+			if t.DamageKind==4 and table.find(dkClass, data.Player.Class) then
+				local pl=data.Player
+				if t.DamageKind==4 then
+					local regen=spRegen[pl.Class]
+					if t.Result>t.Monster.HP then
+						regen=regen*1.5
+					end
+					pl.SP=math.min(pl:GetFullSP(), pl.SP+regen)
+				end
+				local bloodS, bloodM=SplitSkill(pl.Skills[const.Skills.Body])
+				local heal=t.Result*(bloodS^0.6*2)/100
+				--current active leech spell
+				vars.dkActiveAttackSpell=vars.dkActiveAttackSpell or {}
+				local id=pl:GetIndex()
+				leech=0
+				if vars.dkActiveAttackSpell and (vars.dkActiveAttackSpell[id]==68 or vars.dkActiveAttackSpell[id]==74) then
+					leech=bloodS^1.33 * (1+bloodM/4)
+					pl.SP=pl.SP-6
+					if vars.dkActiveAttackSpell[id]==74 then
+						leech=bloodS^1.33 * 4
+						pl.SP=pl.SP-6
+					end
+				end
+				pl.HP=math.min(pl:GetFullHP(), pl.HP+heal+leech)
+				
+				--dark grasp
+				if vars.dkActiveAttackSpell and vars.dkActiveAttackSpell[id]==96 then
+					pl.SP=pl.SP-15
+					t.Monster.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime, Game.Time+const.Minute)
+					local s, m=SplitSkill(pl.Skills[const.Skills.Dark])
+					if m==4 then
+						t.Monster.SpellBuffs[const.MonsterBuff.MeleeOnly].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.MeleeOnly].ExpireTime, Game.Time+const.Minute)
+					end
+				end
+			end
+			
+			--spell effect
+			if data and data.Object then
+				if data.Object.Spell==90 then --toxic cloud
+					local s, m=SplitSkill(pl.Skills[const.Skills.Body])
+					local leech=t.Result*(s^0.6*2)/100 * (1+(m-2)/2)
+					pl.HP=math.min(pl:GetFullHP(), pl.HP+leech)
+				elseif data.Object.Spell==26 then --ice bolt
+					local s,m=SplitSkill(pl.Skills[const.Skills.Water])
+					if m>=2 then
+						local power=math.floor(m/2)*2
+						t.Monster.SpellBuffs[const.MonsterBuff.Slow].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.Slow].ExpireTime, Game.Time+const.Minute)
+						t.Monster.SpellBuffs[const.MonsterBuff.Slow].Power=power
+					end
+				elseif data.Object.Spell==76 then
+					t.Monster.SpellBuffs[const.MonsterBuff.Paralyze].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.Paralyze].ExpireTime, Game.Time+const.Minute)
+				end
 			end
 		end
-		
 	end
 	
 	function events.GetAttackDelay(t)
@@ -941,7 +1015,130 @@ function events.GameInitialized2()
 			end			
 		end
 	end
+	
 		
+	function events.Action(t)
+		if (t.Action==142 and t.Param==68) or (t.Action==142 and t.Param==74) or (t.Action==142 and t.Param==96) then
+			if table.find(dkClass, Party[Game.CurrentPlayer].Class) then
+				t.Handled=true
+				vars.dkActiveAttackSpell=vars.dkActiveAttackSpell or {}
+				local id=Party[Game.CurrentPlayer]:GetIndex()
+				if vars.dkActiveAttackSpell[id]==t.Param then
+					vars.dkActiveAttackSpell[id]=false
+					Game.ShowStatusText(Game.SpellsTxt[t.Param].Name .. " on attack disabled")
+				else
+					Game.ShowStatusText(Game.SpellsTxt[t.Param].Name .. " on attack activated")
+					vars.dkActiveAttackSpell[id]=t.Param
+				end
+			end
+		end
+		--same for quickcast
+		if t.Action==25 and table.find(dkClass, Party[Game.CurrentPlayer].Class) then
+			local pl=Party[Game.CurrentPlayer]
+			local id=pl:GetIndex()
+			if pl.QuickSpell==68 or pl.QuickSpell==74 or pl.QuickSpell==96 then
+				t.Handled=true
+				vars.dkActiveAttackSpell=vars.dkActiveAttackSpell or {}
+				local id=Party[Game.CurrentPlayer]:GetIndex()
+				if vars.dkActiveAttackSpell[id]==t.Param then
+					vars.dkActiveAttackSpell[id]=false
+					Game.ShowStatusText(Game.SpellsTxt[pl.QuickSpell].Name .. " on attack disabled")
+				else
+					Game.ShowStatusText(Game.SpellsTxt[pl.QuickSpell].Name .. " on attack activated")
+					vars.dkActiveAttackSpell[id]=t.Param
+				end
+			end
+		end
+	end
+	
+	function events.Action(t)
+		local index=Game.CurrentPlayer
+		if index>=0 and index<=Party.High then
+			local pl=Party[index]
+			if table.find(dkClass, pl.Class) then
+				for key, value in pairs(DKManaCost) do
+					for i=1,4 do
+						Game.Spells[key]["SpellPoints" .. masteryName[i]]=value
+					end
+				end
+				Game.SpellsTxt[26].Name="Icy Touch"
+				Game.SpellsTxt[26].Description="This spell is exclusive to Death Knights and deals damage equal to 100% of current weapon damage."
+				Game.SpellsTxt[26].Normal="No additional effects"
+				Game.SpellsTxt[26].Expert="Monster slows by 1/2 of speed"
+				Game.SpellsTxt[26].Master="Increases total damage by 1% per spell skill"
+				Game.SpellsTxt[26].GM="Monster slows by 1/4 of speed"
+				
+				Game.SpellsTxt[29].Name="Frostbite"
+				Game.SpellsTxt[29].Description="This is the strongest single damage spell available to death knights and deals damage equal to 150% of current weapon damage."
+				Game.SpellsTxt[29].Expert="n/a"
+				Game.SpellsTxt[29].Master="No additional effects"
+				Game.SpellsTxt[29].GM="Increases total damage by 1% per spell skill"
+				
+				Game.SpellsTxt[32].Name="Ice Bomb"
+				Game.SpellsTxt[32].Description="Throw an ice bomb that shatters upon hitting something, most effective versus big foes or multiple enemies.\nDeals damage equal to 60% of current weapon damage."
+				Game.SpellsTxt[32].Expert="n/a"
+				Game.SpellsTxt[32].Master="n/a"
+				Game.SpellsTxt[32].GM="Increases total damage by 1% per spell skill"
+				
+				
+				
+				local bloodS, bloodM=SplitSkill(pl.Skills[const.Skills.Body])
+				local leech=bloodS^1.33
+				Game.SpellsTxt[68].Name="Blood Leech"
+				Game.SpellsTxt[68].Description="Activating this spell imbues the knight body with blood, leeching life upon attacking at the cost of 6 spell points."
+				Game.SpellsTxt[68].Normal="Leeches " .. math.round(leech * 1.25) .. " Hit Points"
+				Game.SpellsTxt[68].Expert="Leeches " .. math.round(leech * 1.5) .. " Hit Points"
+				Game.SpellsTxt[68].Master="Leeches " .. math.round(leech * 1.75) .. " Hit Points"
+				Game.SpellsTxt[68].GM="Leeches " .. math.round(leech * 2) .. " Hit Points"
+				
+				Game.SpellsTxt[74].Name="Superior Blood Leech"
+				Game.SpellsTxt[74].Description="Activating this spell imbues the knight essence with blood, leeching a superior amount of life upon attacking at the cost of 12 spell points."
+				Game.SpellsTxt[74].GM="Leeches " .. math.round(leech * 4) .. " Hit Points"
+				
+				Game.SpellsTxt[76].Name="Asphyxiate"
+				Game.SpellsTxt[76].Description="Asphyxiate the target deal damage equal to 150% and making him unable to act for 2 seconds"
+				Game.SpellsTxt[76].Master="No additional effects"
+				Game.SpellsTxt[76].GM="Damage increased to 200%"
+				
+				Game.SpellsTxt[90].Name="Death Coil"
+				Game.SpellsTxt[90].Description="A deadly spell capable to heal the caster upon hitting the target by an amount equal to the unholy skill bonus. Deals damage equal to 120% of the base weapon damage"
+				Game.SpellsTxt[90].Expert="No additional effects"
+				Game.SpellsTxt[90].Master="Heal increased by 50%"
+				Game.SpellsTxt[90].GM="Heal increased by 100%"
+				
+				Game.SpellsTxt[96].Name="Death Grasp"
+				Game.SpellsTxt[96].Description="Activating this spell imbues the knight body with dark powers, empairing oppenents powers (damage halved) upon attacking 15 spell points."
+				Game.SpellsTxt[96].Expert="n/a"
+				Game.SpellsTxt[96].Master="No additional effects"
+				Game.SpellsTxt[96].GM="Monster looses the ability to deal ranged damage"
+				
+				Game.SpellsTxt[97].Name="Death Breath"
+				Game.SpellsTxt[97].Description="A lethal explosion dealing huge damage to all monsters in the area. Can be used safely also in close combat.\nDeals damage equal to 50% of weapon damage"
+				Game.SpellsTxt[97].Expert="n/a"
+				Game.SpellsTxt[97].Master="n/a"
+				Game.SpellsTxt[97].GM="Increases total damage by 1% per spell skill"
+				
+				--skill names and desc
+				
+				Game.SkillNames[14]="Frost"
+				Game.SkillNames[18]="Blood"
+				Game.SkillNames[20]="Unholy"
+				
+				Game.SkillDescriptions[14]="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and increases attack speed by 1% per skill point."
+				leech=math.round(bloodS^0.6*2*100)/100
+				Game.SkillDescriptions[18]="This skill is only available to death knights and reduces physical damage taken by 1% per skill point.\nAdditionally it will make your attacks to leech damage based on damage done.\n\nCurrent leech: " .. leech .. "%"            
+				Game.SkillDescriptions[20]="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and reduces magical damage taken by 1% per skill point."				
+			end
+		end
+	end
+	--spells speed depends on weapon
+	function events.PlayerCastSpell(t)
+		if table.find(dkClass, t.Player.Class) then
+			local spell=t.SpellId
+			local m=t.Mastery
+			Game.Spells[spell]["Delay" .. masteryName[m]]=t.Player:GetAttackDelay()
+		end
+	end
 end
 
 DKSpellList={
@@ -980,34 +1177,9 @@ function events.CanLearnSpell(t)
 	end
 end
 
---change spell cost to personalized value:
-local DKManaCost={
-	[26]=15,
-	[27]=0,
-	[29]=30,
-	[32]=50,
-	[68]=20,
-	[71]=40,
-	[76]=40,
-	[74]=70,
-	[91]=0,
-	[90]=30,
-	[96]=20,
-	[97]=70,
-}
-function events.Action(t)
-	local index=Game.CurrentPlayer
-	if index>=0 and index<=Party.High then
-		local pl=Party[index]
-		if table.find(dkClass, pl.Class) then
-			for key, value in pairs(DKManaCost) do
-				for i=1,4 do
-					Game.Spells[key]["SpellPoints" .. masteryName[i]]=value
-				end
-			end
-		end
-	end
-end
+
+
+
 
 --spells taking you below 35% of HP will trigger anti-magic shell, 
 		--reducing spell damage taken by 50% and converting spell damage into runic power (lasts 5 seconds, 1 minute cooldown, capped to max player HP)
