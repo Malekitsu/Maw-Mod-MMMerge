@@ -434,16 +434,16 @@ end
 
 function events.LoadMap()
 	if not unarmedText then
-		unarmedText=Game.SkillDescriptions[33]
-		unarmedTextN=Game.SkillDesNormal[33]
-		unarmedTextE=Game.SkillDesExpert[33]
-		unarmedTextM=Game.SkillDesMaster[33]
-		unarmedTextGM=Game.SkillDesGM[33]
-		dodgeText=Game.SkillDescriptions[32]
-		dodgeTextN=Game.SkillDesNormal[32]
-		dodgeTextE=Game.SkillDesExpert[32]
-		dodgeTextM=Game.SkillDesMaster[32]
-		dodgeTextGM=Game.SkillDesGM[32]
+		unarmedText=Skillz.getDesc(33,1)
+		unarmedTextN=Skillz.getDesc(33,2)
+		unarmedTextE=Skillz.getDesc(33,3)
+		unarmedTextM=Skillz.getDesc(33,4)
+		unarmedTextGM=Skillz.getDesc(33,5)
+		dodgeText=Skillz.getDesc(32,1)
+		dodgeTextN=Skillz.getDesc(32,2)
+		dodgeTextE=Skillz.getDesc(32,3)
+		dodgeTextM=Skillz.getDesc(32,4)
+		dodgeTextGM=Skillz.getDesc(32,5)
 	end
 end
 
@@ -786,7 +786,7 @@ end
 local baseSchoolsTxt={}
 function events.GameInitialized2()
 	for i=12,18 do
-		baseSchoolsTxt[i]=Game.SkillDescriptions[i]
+		baseSchoolsTxt[i]=Skillz.getDesc(i,1)
 	end
 end
 
@@ -1086,7 +1086,7 @@ end
 --tooltips
 local baseSchoolsTxtDK={}
 function events.GameInitialized2()
-	baseSchoolsTxtDK={[14]=Game.SkillDescriptions[14], [18]=Game.SkillDescriptions[18], [20]=Game.SkillDescriptions[20]}
+	baseSchoolsTxtDK={[14]=Skillz.getDesc(14,1), [18]=Skillz.getDesc(18,1), [20]=Skillz.getDesc(20,1)}
 	spellDesc={}
 	for key, value in pairs(DKSpellList) do
 		for i=1,#DKSpellList[key] do
