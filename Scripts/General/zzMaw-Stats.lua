@@ -364,7 +364,28 @@ function events.BuildStatInformationBox(t)
 		skillType=math.floor((spellIndex-1)/11)+12
 		skill, mastery=SplitSkill(Party[i]:GetSkill(skillType))
 		
-		power=damageAdd + skill*(diceMin+diceMax)/2
+		--add enchant
+		it=Party[i]:GetActiveItem(1)
+		local enchantDamage=0
+		if it then
+			if spellbonusdamage[it.Bonus2] then
+				enchantDamage=(spellbonusdamage[it.Bonus2]["low"]+spellbonusdamage[it.Bonus2]["high"])/2
+				for i = 1, #aoespells do
+					if aoespells[i] == spellIndex then
+						enchantDamage=enchantDamage/2.5
+					end
+				end
+				if it.MaxCharges>0 then
+					if it.MaxCharges <= 20 then
+						mult=1+it.MaxCharges/20
+					else
+						mult=2+2*(it.MaxCharges-20)/20
+					end
+					enchantDamage=enchantDamage*mult
+				end
+			end
+		end
+		power=damageAdd + skill*(diceMin+diceMax)/2 + enchantDamage
 		
 		intellect=Party[i]:GetIntellect()	
 		personality=Party[i]:GetPersonality()
@@ -1020,7 +1041,7 @@ function events.Tick()
 				dmg=dmg*2
 			end
 			local DPS2=math.round(dmg*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/60)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])
-                        if spellPowers[spellIndex] then 
+        if spellPowers[spellIndex] then 
 			--SPELLS
 			local s, m = SplitSkill(Party[i].Skills[const.Skills.Learning])
 			diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, spellIndex)
@@ -1028,8 +1049,27 @@ function events.Tick()
 			--skill
 			skillType=math.floor((spellIndex-1)/11)+12
 			skill, mastery=SplitSkill(Party[i]:GetSkill(skillType))
-			
-			power=damageAdd + skill*(diceMin+diceMax)/2
+			it=Party[i]:GetActiveItem(1)
+			local enchantDamage=0
+			if it then
+				if spellbonusdamage[it.Bonus2] then
+					enchantDamage=(spellbonusdamage[it.Bonus2]["low"]+spellbonusdamage[it.Bonus2]["high"])/2
+					for i = 1, #aoespells do
+						if aoespells[i] == spellIndex then
+							enchantDamage=enchantDamage/2.5
+						end
+					end
+					if it.MaxCharges>0 then
+						if it.MaxCharges <= 20 then
+							mult=1+it.MaxCharges/20
+						else
+							mult=2+2*(it.MaxCharges-20)/20
+						end
+						enchantDamage=enchantDamage*mult
+					end
+				end
+			end
+			power=damageAdd + skill*(diceMin+diceMax)/2+enchantDamage
 			
 			intellect=Party[i]:GetIntellect()	
 			personality=Party[i]:GetPersonality()
