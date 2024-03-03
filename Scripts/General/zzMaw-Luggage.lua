@@ -58,10 +58,15 @@ function events.GameInitialized2()
 	end
 end
 
+local function failure()
+	Game.ShowStatusText("It is not possible")
+end
+
 function changeBag(pl, bag)
-	mem.dll.Luggage.activate(pl , bag)
+	if mem.dll.Luggage.activate(pl , bag) == 0 then failure() end
 end
 
 function changeEq(pl, eq)
-	mem.dll.Luggage.activate2(pl , eq)
+	if mem.dll.Luggage.activate2(pl , eq)== 0 then failure() end
+
 end
