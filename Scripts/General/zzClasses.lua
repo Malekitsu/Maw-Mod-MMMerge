@@ -875,6 +875,8 @@ function events.GameInitialized2()
 				local s3, m3=SplitSkill(t.Player.Skills[const.Skills.Dark])
 				t.Result=t.Result+s1*math.min(m1, 3)+s3*math.min(m3, 3)
 			end
+		elseif t.Stat==const.Stats.SpellPoints then
+			t.Result=0
 		end
 	end	
 	--body leech damage
