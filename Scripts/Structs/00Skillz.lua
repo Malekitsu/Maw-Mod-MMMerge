@@ -59,11 +59,22 @@ Skillz = {
 	MasteryTable_get = function(race, clas, skill_ID)
 	return mem.dll.skillz.MasteryLimit_raw(race, clas, skill_ID) end,
 	MasteryTable_set = function(race, clas, skill_ID, modifier)
-	mem.dll.skillz.MasteryLimit_raw(race, clas, skill_ID, modifier) end
+	mem.dll.skillz.MasteryLimit_raw(race, clas, skill_ID, modifier) end,
+	CleanMastery=function(Player)
+	return mem.dll.skillz.CleanMastery(Player) end
 }
 
 local thanked = false
 function events.AfterLoadMap()
+	if (not vars.Skillz_Thanked) then 
+		refund = 0
+		for _, pl in Party do
+			refund = refund + Skillz.CleanMastery(pl)
+		end
+		refund = refund * 500
+		Party.AddGold(refund)
+	end
+
     if (not vars.Skillz_Thanked) and (not thanked) then 
         Skillz.thanks()
         thanked = true
