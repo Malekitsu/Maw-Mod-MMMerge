@@ -4,7 +4,7 @@ local SUBTRACT= 109
 local OEM_PLUS= 187
 local OEM_MINUS= 189
 
-local count = 8
+local count = 5
 
 
 function events.KeyDown(t)
@@ -32,25 +32,25 @@ function events.KeyDown(t)
 end
 
 function events.GameInitialized2()
-	for i=1,8 do
+	for i=1,count do
 		CustomUI.CreateButton{
 			IconUp = "RanNum" .. i .. "n",
 			IconDown = "RanNum" .. i .. "s",
 			Screen = 7,
 			Layer = 1,
-			X =	485+(i-1)%4*30 +15,
-			Y =	370+((i-1)-(i-1)%4)/4 *80,
+			X =	472+(i-1)%5*30 +15,
+			Y =	373+((i-1)-(i-1)%5)/5 *80,
 			Masked = true,
 			Action = function() changeBag(Party[Game.CurrentPlayer], i-1) end,
 		}
 	end
-	for i=1,8 do
+	for i=1,3 do
 		CustomUI.CreateButton{
 			IconUp = "RanNum" .. i .. "n",
 			IconDown = "RanNum" .. i .. "s",
 			Screen = 7,
 			Layer = 1,
-			X =	370+i*30,
+			X =	360+30*(8-count)+i*45,
 			Y =	0,
 			Masked = true,
 			Action = function() changeEq(Party[Game.CurrentPlayer], i-1) end,
@@ -69,5 +69,4 @@ end
 
 function changeEq(pl, eq)
 	if mem.dll.Luggage.activate2(pl , eq)== 0 then failure() end
-
 end
