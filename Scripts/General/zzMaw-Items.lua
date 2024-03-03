@@ -1966,6 +1966,7 @@ for i=0,200 do
 	end
 end
 function events.CalcStatBonusByItems(t)
+	if Game.CurrentScreen==21 then return end
 	t.Result=0
 	if t.Stat>=0 and t.Stat<24 then
 		if plItemsStats[t.PlayerIndex] then
