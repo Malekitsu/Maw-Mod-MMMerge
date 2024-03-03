@@ -61,7 +61,6 @@ end
 --hour of power buff list
 local hopList = {8, 9, 14, 15}
 
-
 --modify Spells
 function events.PlayerCastSpell(t)
 	--refresh everyone before and after casting
@@ -800,11 +799,25 @@ function elementalBuffs()
 		Party.SpellBuffs[19].ExpireTime=Game.Time+const.Hour
 		Party.SpellBuffs[19].Power=10
 		Party.SpellBuffs[19].Skill=2
+		Party.SpellBuffs[16].ExpireTime=Game.Time+const.Hour
+		Party.SpellBuffs[16].Power=2
+		Party.SpellBuffs[16].Skill=1
 	end
 end
 
 function events.AfterLoadMap()
 	Timer(elementalBuffs, TimerPeriod, true)
+end
+
+--let town portal scroll to be reused if solo
+function events.PlayerCastSpell(t)
+	if Party.High==0 and t.IsSpellScroll then
+		if t.SpellId==31 then
+			evt.Add("Items",330)
+		elseif t.SpellId==33 then
+			evt.Add("Items",332)
+		end
+	end
 end
 
 
