@@ -70,3 +70,19 @@ function events.AfterLoadMap()
         vars.Skillz_Thanked = true
     end
 end
+
+
+-- Compatibility layer
+local function GetMaxSkill(a, b, c) -- a - Race or Player structure, b - Class or skill id, c - skill id
+
+		local Race, Class, Skill
+		if type(a) == "number" then
+			Race, Class, Skill = a, b, c
+		else
+			Race, Class, Skill = Game.CharacterPortraits[a.Face].Race, a.Class, b
+		end
+		return Skillz.MasteryTable_get(Race, Class, Skill)
+end
+	GetMaxSkillLevel	 = GetMaxSkill
+	GetMaxAvailableSkill = GetMaxSkill
+	
