@@ -37,6 +37,7 @@ The mod is very big and changes most game mechanics, for simplicity I'll divide 
 - Spells rework
 - Monster rework
 - Alchemy rework
+- Crafting System
 - Bolster & Difficulty rework
 - Mechanics rework
 
@@ -175,6 +176,24 @@ But if you’re curious to know more about the mod and the specific changes, rea
 - Access to either Light Magic or Alchemy makes the party much stronger than without it
 Down here the full recipe list:
 ![image](https://github.com/Malekitsu/Maw-Mod-MMMerge/assets/106842972/0e2ec9bb-1850-417a-b8c7-6129ef951ca3)
+
+## Crafting 
+- 14 new crafting items have been added
+- They are dropped randomly when killing monsters and in shops
+- The higher the monster level, the higher is the drop chance
+- 10 of them are gems, that increase the lowest between base enchants strength
+  - You will find stronger gems as you progress in the game
+- Crafting cube, increases base stats (such as weapon damage or AC) and special enchant strength
+- Hourglass, adds a normal enchant to an item that has already a normal and a special enchant
+- The Eye, adds a special enchant to an item with 2 normal enchants
+- Mirror, duplicates any equipment (artifacts excluded). Very rare.
+In addition to that, there are some crafting you can do with potions
+
+Tips:
+- Enchant is predetermined, so save and reload will not change the outcome
+- You can check the outcome before using the item by pressing ALT
+- If you use any crafting item, such as gems, the outcome will change
+
 
 ## Bolster & Difficulty
 - There are 2 game modes, and you can check bolster value by right clicking level in stats menu:
