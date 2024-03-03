@@ -365,7 +365,7 @@ function events.GameInitialized2()
 			damage=false
 			ac=false
 			res=false
-			baseString=string.format("%s\n------------------------------------------------------------\n         ",Game.SkillDescriptions[i])
+			baseString=string.format("%s\n------------------------------------------------------------\n         ",Skillz.getDesc(i,1))
 			for v=1,4 do
 				if skillAttack[i][v]~=0 then
 					attack=true
@@ -473,7 +473,7 @@ function events.GameInitialized2()
 			recoveryPen=false
 			ac=false
 			res=false
-			baseString=string.format("%s\n------------------------------------------------------------\n         ",Game.SkillDescriptions[i])
+			baseString=string.format("%s\n------------------------------------------------------------\n         ",Skillz.getDesc(i,1))
 			for v=1,4 do
 				if skillAC[i][v]~=0 then
 					ac=true
@@ -972,8 +972,8 @@ end
 
 --DINAMIC SKILL TOOLTIP
 function events.GameInitialized2()
-	baseRegStr=Game.SkillDescriptions[30]
-	baseMedStr=Game.SkillDescriptions[28]
+	baseRegStr=Skillz.getDesc(30,1)
+	baseMedStr=Skillz.getDesc(28,1)
 end
 function events.Tick()
 	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
