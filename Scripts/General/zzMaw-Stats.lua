@@ -899,6 +899,11 @@ function events.GameInitialized2()
 		end
 		data=WhoHitMonster()
 		if data and data.Player then
+			for i=0, Party.High do
+				if Party[i]:GetIndex()==t.PlayerIndex then
+					checkSkills(i) --to use the correct spell name
+				end
+			end
 			MSGdamage=MSGdamage or 0
 			MSGdamage=MSGdamage+math.ceil(t.Result)*divide
 			attackIsSpell=false
@@ -967,9 +972,13 @@ function events.GameInitialized2()
 					MSGdamage=0
 				end
 			end
-		end	
+		end
+		--restore tooltips
+		local id=Game.CurrentPlayer
+		if id>=0 and id<=Party.High then
+			checkSkills(id)
+		end
 	end
-
 end
 
 --[[
