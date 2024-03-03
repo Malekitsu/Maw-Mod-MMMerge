@@ -78,8 +78,8 @@ function events.AfterLoadMap()
     if (not vars.Skillz_Thanked) and (not thanked) then 
         Skillz.thanks()
         thanked = true
-        vars.Skillz_Thanked = true
     end
+    vars.Skillz_Thanked = true
 end
 
 
