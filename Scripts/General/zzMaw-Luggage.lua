@@ -4,7 +4,7 @@ local SUBTRACT= 109
 local OEM_PLUS= 187
 local OEM_MINUS= 189
 
-local count = 5
+local count = 8
 
 
 function events.KeyDown(t)
@@ -32,25 +32,25 @@ function events.KeyDown(t)
 end
 
 function events.GameInitialized2()
-	for i=1,5 do
+	for i=1,8 do
 		CustomUI.CreateButton{
-			IconUp = "SlChar" .. i .. "U",
-			IconDown = "SlChar" .. i .. "D",
+			IconUp = "RanNum" .. i .. "n",
+			IconDown = "RanNum" .. i .. "s",
 			Screen = 7,
 			Layer = 1,
-			X =	455+i*30,
-			Y =	372,
+			X =	485+(i-1)%4*30 +15,
+			Y =	370+((i-1)-(i-1)%4)/4 *80,
 			Masked = true,
 			Action = function() changeBag(Party[Game.CurrentPlayer], i-1) end,
 		}
 	end
-	for i=1,5 do
+	for i=1,8 do
 		CustomUI.CreateButton{
-			IconUp = "SlChar" .. i .. "U",
-			IconDown = "SlChar" .. i .. "D",
+			IconUp = "RanNum" .. i .. "n",
+			IconDown = "RanNum" .. i .. "s",
 			Screen = 7,
 			Layer = 1,
-			X =	455+i*30,
+			X =	370+i*30,
 			Y =	0,
 			Masked = true,
 			Action = function() changeEq(Party[Game.CurrentPlayer], i-1) end,
