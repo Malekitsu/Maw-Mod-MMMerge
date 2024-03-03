@@ -60,6 +60,7 @@ end
 
 local function failure()
 	Game.ShowStatusText("It is not possible")
+	evt.PlaySound(27)
 end
 
 function changeBag(pl, bag)
