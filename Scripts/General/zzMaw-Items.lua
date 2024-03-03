@@ -154,9 +154,10 @@ function events.ItemGenerated(t)
 	if t.Strength==7 then
 		return
 	end
-	--spawn crafting materials in alchemy shops, substituting recipes
+	--spawn crafting materials in misc shops, substituting recipes
 	if (Game.HouseScreen==2 or Game.HouseScreen==95) then
-		if t.Item:T().EquipStat>=12 and math.random()<0.05 or t.Item:T().EquipStat==19 then
+		id=Game:GetCurrentHouse()
+		if (t.Item:T().EquipStat>=12 and math.random()<0.05 or t.Item:T().EquipStat==19) and id<=110 then 
 			t.Item.Bonus=0
 			t.Item.BonusStrength=0
 			t.Item.Bonus2=0
