@@ -833,6 +833,7 @@ masteryName={"Normal", "Expert", "Master", "GM"}
 function events.Action(t)
 	if t.Action==25 and autoTargetHeals then
 		local pl=Party[Game.CurrentPlayer]
+		if table.find(dkClass, Party[Game.CurrentPlayer].Class) then return end
 		if pl.QuickSpell==68 and pl.RecoveryDelay==0 then
 			local sp=healingSpells[68]
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
@@ -886,7 +887,7 @@ function events.Action(t)
 			Party[min_index].Unconscious=0
 			end
 			local haste=math.floor(pl:GetSpeed()/10)
-			local delay=Game.Spells[68]["Delay" .. masteryName[m]]
+			local delay=math.round(Game.Spells[68]["Delay" .. masteryName[m]]/(1+haste/100))
 			pl:SetRecoveryDelay(delay)
 			pl.Expression=40
 		elseif pl.QuickSpell==74 and pl.RecoveryDelay==0 then
@@ -945,7 +946,7 @@ function events.Action(t)
 			Party[min_index].Disease2=0
 			Party[min_index].Disease3=0
 			local haste=math.floor(pl:GetSpeed()/10)
-			local delay=Game.Spells[74]["Delay" .. masteryName[m]]
+			local delay=math.round(Game.Spells[74]["Delay" .. masteryName[m]]/(1+haste/100))
 			pl:SetRecoveryDelay(delay)
 			pl.Expression=40
 		elseif pl.QuickSpell==49 and pl.RecoveryDelay==0 then
@@ -1002,7 +1003,7 @@ function events.Action(t)
 			end
 			Party[min_index].Cursed=0
 			local haste=math.floor(pl:GetSpeed()/10)
-			local delay=Game.Spells[49]["Delay" .. masteryName[m]]
+			local delay=math.round(Game.Spells[49]["Delay" .. masteryName[m]]/(1+haste/100))
 			pl:SetRecoveryDelay(delay)
 			pl.Expression=40
 		end
@@ -1237,9 +1238,6 @@ function ascendSpellDamage(skill, mastery, spell)
 	elseif spelltier<=skill%11  then
 		ascensionLevel=ascensionLevel+1
 	end
-	if diceMax==diceMin then
-		diceMin=diceMin * (1+0.04 * skill * ascensionLevel)
-	end	
 	diceMax=diceMax * (1+0.04 * skill * ascensionLevel)
 	damageAdd=damageAdd*(1+skill * (ascensionLevel+1) / 8)
 	diceMin, diceMax, damageAdd = math.round(diceMin), math.round(diceMax), math.round(damageAdd)
