@@ -826,7 +826,7 @@ end
 --DEATH KNIGHT
 ---------------------------------------
 function events.GameInitialized2()
-	Game.ClassDescriptions[56] = "The Death Knight:\n\nEach point in magic school will increase base physical damage by 2\n\nEach Point in Dark magic will increase life leech by 1%"
+	Game.ClassDescriptions[56] = "This class combines the evil forces with brute power, making it powerful and versatile.\n Learning Frost/Blood/Unholy E/M/GM will unlock automatically new spells. However death knight can't learn spells from books.\n\nFrost:\n\nIncreases damage by 1-2-3 (at Novice, Master, Grandmaster levels) and boosts attack speed by 1% for every skill point invested.\n\nBlood:\n\nThis skill fortifies their resilience, reducing physical damage taken by 1% per skill point. Additionally, it endows their attacks with a leech effect, converting a portion of the damage dealt into health recovery.\n\nUnholy:\n\nIt amplifies damage by 1-2-3 (at Novice, Master, Grandmaster levels) and diminishes magical damage received by 1% for each skill point allocated."
 end
 --skills
 --death grip
