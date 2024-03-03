@@ -6,7 +6,7 @@ This mod is the culmination of efforts from a dedicated team, with each member b
 - **Malekith** - _Lead Developer and Designer_: Responsible most of the coding effort and the primary force behind the mod's design direction.
 - **Rawsugar** - _Co-Lead Designer_: Played a pivotal role in crafting the mod's formulas and design concepts, shaping the gameplay experience.
 - **Eksekk** - _Senior Contributor_: Offered significant support by tackling challenging tasks and adding features that enhanced the mod's depth and functionality.
-- **Yuji Sakai** - _Contributor_: Brought fresh code contributions to the project recently, further enriching the mod's content.
+- **Yuji Sakai/Knightmarevive** - _Contributor_: Brought fresh code contributions to the project recently, further enriching the mod's content.
 
 We express our deepest appreciation to all the discord community member. Their advices and feedbacks played a a very important role in the development.
 
