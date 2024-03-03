@@ -790,9 +790,9 @@ function events.GameInitialized2()
 	end
 end
 
-local function shamanSkills(isShaman)
+local function shamanSkills(isShaman, id)
 	if isShaman then
-		pl=Party[Game.CurrentPlayer]
+		pl=Party[id]
 		local m1=SplitSkill(pl.Skills[const.Skills.Fire])
 		local m2=SplitSkill(pl.Skills[const.Skills.Air])
 		local m3=SplitSkill(pl.Skills[const.Skills.Water])
@@ -818,23 +818,6 @@ local function shamanSkills(isShaman)
 		for i=12,18 do
 			Game.SkillDescriptions[i]=baseSchoolsTxt[i]
 		end
-	end
-end
-
-local function checkSkills()
-	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
-		if table.find(shamanClass, Party[Game.CurrentPlayer].Class) then
-			shamanSkills(true)
-		else
-			shamanSkills(false)
-		end
-	end
-end
---add tooltips
-function events.Action(t)
-	function events.Tick() 
-		events.Remove("Tick", 1)
-		checkSkills()
 	end
 end
 
@@ -1051,86 +1034,6 @@ function events.GameInitialized2()
 		end
 	end
 	
-	function events.Action(t)
-		local index=Game.CurrentPlayer
-		if index>=0 and index<=Party.High then
-			local pl=Party[index]
-			if table.find(dkClass, pl.Class) then
-				for key, value in pairs(DKManaCost) do
-					for i=1,4 do
-						Game.Spells[key]["SpellPoints" .. masteryName[i]]=value
-					end
-				end
-				Game.SpellsTxt[26].Name="Icy Touch"
-				Game.SpellsTxt[26].Description="This spell is exclusive to Death Knights and deals damage equal to 100% of current weapon damage."
-				Game.SpellsTxt[26].Normal="No additional effects"
-				Game.SpellsTxt[26].Expert="Monster slows by 1/2 of speed"
-				Game.SpellsTxt[26].Master="Increases total damage by 1% per spell skill"
-				Game.SpellsTxt[26].GM="Monster slows by 1/4 of speed"
-				
-				Game.SpellsTxt[29].Name="Frostbite"
-				Game.SpellsTxt[29].Description="This is the strongest single damage spell available to death knights and deals damage equal to 150% of current weapon damage."
-				Game.SpellsTxt[29].Expert="n/a"
-				Game.SpellsTxt[29].Master="No additional effects"
-				Game.SpellsTxt[29].GM="Increases total damage by 1% per spell skill"
-				
-				Game.SpellsTxt[32].Name="Ice Bomb"
-				Game.SpellsTxt[32].Description="Throw an ice bomb that shatters upon hitting something, most effective versus big foes or multiple enemies.\nDeals damage equal to 60% of current weapon damage."
-				Game.SpellsTxt[32].Expert="n/a"
-				Game.SpellsTxt[32].Master="n/a"
-				Game.SpellsTxt[32].GM="Increases total damage by 1% per spell skill"
-				
-				
-				
-				local bloodS, bloodM=SplitSkill(pl.Skills[const.Skills.Body])
-				local leech=bloodS^1.33
-				Game.SpellsTxt[68].Name="Blood Leech"
-				Game.SpellsTxt[68].Description="Activating this spell imbues the knight body with blood, leeching life upon attacking at the cost of 6 spell points."
-				Game.SpellsTxt[68].Normal="Leeches " .. math.round(leech * 1.25) .. " Hit Points"
-				Game.SpellsTxt[68].Expert="Leeches " .. math.round(leech * 1.5) .. " Hit Points"
-				Game.SpellsTxt[68].Master="Leeches " .. math.round(leech * 1.75) .. " Hit Points"
-				Game.SpellsTxt[68].GM="Leeches " .. math.round(leech * 2) .. " Hit Points"
-				
-				Game.SpellsTxt[74].Name="Superior Blood Leech"
-				Game.SpellsTxt[74].Description="Activating this spell imbues the knight essence with blood, leeching a superior amount of life upon attacking at the cost of 12 spell points."
-				Game.SpellsTxt[74].GM="Leeches " .. math.round(leech * 4) .. " Hit Points"
-				
-				Game.SpellsTxt[76].Name="Asphyxiate"
-				Game.SpellsTxt[76].Description="Asphyxiate the target deal damage equal to 150% and making him unable to act for 2 seconds"
-				Game.SpellsTxt[76].Master="No additional effects"
-				Game.SpellsTxt[76].GM="Damage increased to 200%"
-				
-				Game.SpellsTxt[90].Name="Death Coil"
-				Game.SpellsTxt[90].Description="A deadly spell capable to heal the caster upon hitting the target by an amount equal to the unholy skill bonus. Deals damage equal to 120% of the base weapon damage"
-				Game.SpellsTxt[90].Expert="No additional effects"
-				Game.SpellsTxt[90].Master="Heal increased by 50%"
-				Game.SpellsTxt[90].GM="Heal increased by 100%"
-				
-				Game.SpellsTxt[96].Name="Death Grasp"
-				Game.SpellsTxt[96].Description="Activating this spell imbues the knight body with dark powers, empairing oppenents powers (damage halved) upon attacking 15 spell points."
-				Game.SpellsTxt[96].Expert="n/a"
-				Game.SpellsTxt[96].Master="No additional effects"
-				Game.SpellsTxt[96].GM="Monster looses the ability to deal ranged damage"
-				
-				Game.SpellsTxt[97].Name="Death Breath"
-				Game.SpellsTxt[97].Description="A lethal explosion dealing huge damage to all monsters in the area. Can be used safely also in close combat.\nDeals damage equal to 50% of weapon damage"
-				Game.SpellsTxt[97].Expert="n/a"
-				Game.SpellsTxt[97].Master="n/a"
-				Game.SpellsTxt[97].GM="Increases total damage by 1% per spell skill"
-				
-				--skill names and desc
-				
-				Game.SkillNames[14]="Frost"
-				Game.SkillNames[18]="Blood"
-				Game.SkillNames[20]="Unholy"
-				
-				Game.SkillDescriptions[14]="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and increases attack speed by 1% per skill point."
-				leech=math.round(bloodS^0.6*2*100)/100
-				Game.SkillDescriptions[18]="This skill is only available to death knights and reduces physical damage taken by 1% per skill point.\nAdditionally it will make your attacks to leech damage based on damage done.\n\nCurrent leech: " .. leech .. "%"            
-				Game.SkillDescriptions[20]="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and reduces magical damage taken by 1% per skill point."				
-			end
-		end
-	end
 	--spells speed depends on weapon
 	function events.PlayerCastSpell(t)
 		if table.find(dkClass, t.Player.Class) then
@@ -1178,9 +1081,133 @@ function events.CanLearnSpell(t)
 end
 
 
+--tooltips
+local baseSchoolsTxtDK={}
+function events.GameInitialized2()
+	baseSchoolsTxtDK={[14]=Game.SkillDescriptions[14], [18]=Game.SkillDescriptions[18], [20]=Game.SkillDescriptions[20]}
+	spellDesc={}
+	for key, value in pairs(DKSpellList) do
+		for i=1,#DKSpellList[key] do
+			local spellID=DKSpellList[key][i]
+			spellDesc[spellID]={}
+			spellDesc[spellID]["Name"]=Game.SpellsTxt[value[i]].Name
+			spellDesc[spellID]["Description"]=Game.SpellsTxt[value[i]].Description
+			spellDesc[spellID]["Normal"]=Game.SpellsTxt[value[i]].Normal
+			spellDesc[spellID]["Expert"]=Game.SpellsTxt[value[i]].Expert
+			spellDesc[spellID]["Master"]=Game.SpellsTxt[value[i]].Master
+			spellDesc[spellID]["GM"]=Game.SpellsTxt[value[i]].GM
+		end
+	end
+end
+
+local function dkSkills(isDK, id)
+	if isDK then
+		pl=Party[id]
+		for key, value in pairs(DKManaCost) do
+			for i=1,4 do
+				Game.Spells[key]["SpellPoints" .. masteryName[i]]=value
+			end
+		end
+		Game.SpellsTxt[26].Name="Icy Touch"
+		Game.SpellsTxt[26].Description="This spell is exclusive to Death Knights and deals damage equal to 100% of current weapon damage."
+		Game.SpellsTxt[26].Normal="No additional effects"
+		Game.SpellsTxt[26].Expert="Monster slows by 1/2 of speed"
+		Game.SpellsTxt[26].Master="Increases total damage by 1% per spell skill"
+		Game.SpellsTxt[26].GM="Monster slows by 1/4 of speed"
+		
+		Game.SpellsTxt[29].Name="Frostbite"
+		Game.SpellsTxt[29].Description="This is the strongest single damage spell available to death knights and deals damage equal to 150% of current weapon damage."
+		Game.SpellsTxt[29].Expert="n/a"
+		Game.SpellsTxt[29].Master="No additional effects"
+		Game.SpellsTxt[29].GM="Increases total damage by 1% per spell skill"
+		
+		Game.SpellsTxt[32].Name="Ice Bomb"
+		Game.SpellsTxt[32].Description="Throw an ice bomb that shatters upon hitting something, most effective versus big foes or multiple enemies.\nDeals damage equal to 60% of current weapon damage."
+		Game.SpellsTxt[32].Expert="n/a"
+		Game.SpellsTxt[32].Master="n/a"
+		Game.SpellsTxt[32].GM="Increases total damage by 1% per spell skill"
+		
+		
+		
+		local bloodS, bloodM=SplitSkill(pl.Skills[const.Skills.Body])
+		local leech=bloodS^1.33
+		Game.SpellsTxt[68].Name="Blood Leech"
+		Game.SpellsTxt[68].Description="Activating this spell imbues the knight body with blood, leeching life upon attacking at the cost of 6 spell points."
+		Game.SpellsTxt[68].Normal="Leeches " .. math.round(leech * 1.25) .. " Hit Points"
+		Game.SpellsTxt[68].Expert="Leeches " .. math.round(leech * 1.5) .. " Hit Points"
+		Game.SpellsTxt[68].Master="Leeches " .. math.round(leech * 1.75) .. " Hit Points"
+		Game.SpellsTxt[68].GM="Leeches " .. math.round(leech * 2) .. " Hit Points"
+		
+		Game.SpellsTxt[74].Name="Superior Blood Leech"
+		Game.SpellsTxt[74].Description="Activating this spell imbues the knight essence with blood, leeching a superior amount of life upon attacking at the cost of 12 spell points."
+		Game.SpellsTxt[74].GM="Leeches " .. math.round(leech * 4) .. " Hit Points"
+		
+		Game.SpellsTxt[76].Name="Asphyxiate"
+		Game.SpellsTxt[76].Description="Asphyxiate the target deal damage equal to 150% and making him unable to act for 2 seconds"
+		Game.SpellsTxt[76].Master="No additional effects"
+		Game.SpellsTxt[76].GM="Damage increased to 200%"
+		
+		Game.SpellsTxt[90].Name="Death Coil"
+		Game.SpellsTxt[90].Description="A deadly spell capable to heal the caster upon hitting the target by an amount equal to the unholy skill bonus. Deals damage equal to 120% of the base weapon damage"
+		Game.SpellsTxt[90].Expert="No additional effects"
+		Game.SpellsTxt[90].Master="Heal increased by 50%"
+		Game.SpellsTxt[90].GM="Heal increased by 100%"
+		
+		Game.SpellsTxt[96].Name="Death Grasp"
+		Game.SpellsTxt[96].Description="Activating this spell imbues the knight body with dark powers, empairing oppenents powers (damage halved) upon attacking 15 spell points."
+		Game.SpellsTxt[96].Expert="n/a"
+		Game.SpellsTxt[96].Master="No additional effects"
+		Game.SpellsTxt[96].GM="Monster looses the ability to deal ranged damage"
+		
+		Game.SpellsTxt[97].Name="Death Breath"
+		Game.SpellsTxt[97].Description="A lethal explosion dealing huge damage to all monsters in the area. Can be used safely also in close combat.\nDeals damage equal to 50% of weapon damage"
+		Game.SpellsTxt[97].Expert="n/a"
+		Game.SpellsTxt[97].Master="n/a"
+		Game.SpellsTxt[97].GM="Increases total damage by 1% per spell skill"
+		
+		--skill names and desc
+		
+		Game.SkillNames[14]="Frost"
+		Game.SkillNames[18]="Blood"
+		Game.SkillNames[20]="Unholy"
+		
+		Game.SkillDescriptions[14]="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and increases attack speed by 1% per skill point."
+		leech=math.round(bloodS^0.6*2*100)/100
+		Game.SkillDescriptions[18]="This skill is only available to death knights and reduces physical damage taken by 1% per skill point.\nAdditionally it will make your attacks to leech damage based on damage done.\n\nCurrent leech: " .. leech .. "%"            
+		Game.SkillDescriptions[20]="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and reduces magical damage taken by 1% per skill point."	
+	else
+		for key, value in pairs(baseSchoolsTxtDK) do
+			Game.SkillDescriptions[key]=value
+		end
+		for key, value in pairs(spellDesc) do
+			for key2, value2 in pairs(value) do
+				Game.SpellsTxt[key][key2]=value2
+			end
+		end
+	end
+end
 
 
-
---spells taking you below 35% of HP will trigger anti-magic shell, 
-		--reducing spell damage taken by 50% and converting spell damage into runic power (lasts 5 seconds, 1 minute cooldown, capped to max player HP)
-
+function checkSkills(id)
+	shamanSkills(false, id)
+	dkSkills(false, id)
+	local class=Party[id].Class
+	if table.find(shamanClass, class) then
+		shamanSkills(true, id)
+		return
+	end
+	if table.find(dkClass, Party[id].Class) then
+		dkSkills(true, id)
+		return
+	end
+end
+--add tooltips
+function events.Action(t)
+	local id=Game.CurrentPlayer
+	if id>=0 and id<=Party.High then
+		function events.Tick() 
+			events.Remove("Tick", 1)
+			checkSkills(id)
+		end
+	end
+end
