@@ -1018,7 +1018,7 @@ function events.GameInitialized2()
 			end
 		end
 		--same for quickcast
-		if t.Action==25 and table.find(dkClass, Party[Game.CurrentPlayer].Class) then
+		if t.Action==25 and Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High and table.find(dkClass, Party[Game.CurrentPlayer].Class) then
 			local pl=Party[Game.CurrentPlayer]
 			local id=pl:GetIndex()
 			if pl.QuickSpell==68 or pl.QuickSpell==74 or pl.QuickSpell==96 then
