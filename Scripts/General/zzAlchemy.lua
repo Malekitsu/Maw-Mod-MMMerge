@@ -49,7 +49,7 @@ function events.UseMouseItem(t)
 		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
 	--mana potion
 	elseif it.Number==247 then
-		spRestore=math.round(it.Bonus^1.4*2)
+		spRestore=math.round(it.Bonus^1.4*2+30)
 		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
 	end
 	--Regen
@@ -294,10 +294,10 @@ function events.BuildItemInformationBox(t)
 		t.Description="Grants " .. StrColor(0,0,200,2+math.floor(t.Item.Bonus/10)) .. " bonus to Meditation skill for 6 hours."
 	end
 	if t.Item.Number==246 then
-		t.Description=StrColor(255,255,153,"Heals " .. math.round(t.Item.Bonus^1.4*3)+10 .. " Hit Points") .. "\n" .. t.Description
+		t.Description=StrColor(255,255,153,"Heals " .. math.round(t.Item.Bonus^1.4*3)+30 .. " Hit Points") .. "\n" .. t.Description
 	end
 	if t.Item.Number==247 then
-		t.Description=StrColor(255,255,153,"Restores " .. math.round(t.Item.Bonus^1.4*2)+10 .. " Spell Points") .. "\n" .. t.Description
+		t.Description=StrColor(255,255,153,"Restores " .. math.round(t.Item.Bonus^1.4*2)+30 .. " Spell Points") .. "\n" .. t.Description
 	end
 	if table.find(potionUsingCharges,t.Item.Number) then
 		local charges=t.Item.Charges-1
