@@ -875,7 +875,7 @@ function events.GameInitialized2()
 				local s3, m3=SplitSkill(t.Player.Skills[const.Skills.Dark])
 				t.Result=t.Result+s1*math.min(m1, 3)+s3*math.min(m3, 3)
 			end
-		elseif t.Stat==const.Stats.SpellPoints then
+		elseif t.Stat==const.Stats.SpellPoints and table.find(dkClass, t.Player.Class) then
 			t.Result=0
 		end
 	end	
@@ -1018,7 +1018,7 @@ function events.GameInitialized2()
 			end
 		end
 		--same for quickcast
-		if t.Action==25 and table.find(dkClass, Party[Game.CurrentPlayer].Class) then
+		if t.Action==25 and Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High and table.find(dkClass, Party[Game.CurrentPlayer].Class) then
 			local pl=Party[Game.CurrentPlayer]
 			local id=pl:GetIndex()
 			if pl.QuickSpell==68 or pl.QuickSpell==74 or pl.QuickSpell==96 then
