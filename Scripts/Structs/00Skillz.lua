@@ -83,6 +83,9 @@ function events.AfterLoadMap()
 end
 
 
+function events.GameInitialized2()
+	mem.dll.skillz.initPortraits(Game.CharacterPortraits)
+end
 -- Compatibility layer
 local function GetMaxSkill(a, b, c) -- a - Race or Player structure, b - Class or skill id, c - skill id
 
