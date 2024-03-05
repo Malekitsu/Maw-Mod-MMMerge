@@ -18,14 +18,14 @@ function events.KeyDown(t)
 		]]
 		page = mem.dll.Luggage.current(me)
 		if t.Key == OEM_MINUS then
-		mem.dll.Luggage.activate(me , (page-1)%count)
+		changeBag(me , (page-1)%count)
 		end
 		if t.Key == OEM_PLUS then
-			mem.dll.Luggage.activate(me , (page+1)%count)
+			changeBag(me , (page+1)%count)
 		end
 		if Party.High==0 then
 			if t.Key>=49 and t.Key<=48+count then
-				mem.dll.Luggage.activate(me , t.Key-49)
+				changeBag(me , t.Key-49)
 			end
 		end		
 	end
@@ -62,6 +62,8 @@ local function failure()
 	Game.ShowStatusText("It is not possible")
 	evt.PlaySound(27)
 end
+
+
 
 function changeBag(pl, bag)
 	if mem.dll.Luggage.activate(pl , bag) == 0 then failure() end
