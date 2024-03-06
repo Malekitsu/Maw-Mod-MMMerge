@@ -72,3 +72,44 @@ end
 function changeEq(pl, eq)
 	if mem.dll.Luggage.activate2(pl , eq)== 0 then failure() end
 end
+
+
+local base = 0
+function structs.f.LuggageFrame(define)
+
+--[[	
+	define[base+ 0x0].array(1, 138).struct(structs.Item) 'Items'
+	define[base+0x1368].array(1, 126).i4 'Inventory'
+	define[base+0x1560].array(1, 16).i4 'EquippedItems'
+	]]
+	
+	
+	define
+	.array(1, 138).struct(structs.Item) 'Items'
+	.array(1, 126).i4 'Inventory'
+	.array(1, 16).i4 'EquippedItems'
+	
+	
+	return define
+end
+
+--[[
+function structs.LuggageFrame.new()
+    local instance = {
+        Items = {},           -- Initialize with an empty table or any default values
+        Inventory = {},       -- Initialize with an empty table or any default values
+        EquippedItems = {}    -- Initialize with an empty table or any default values
+    }
+
+    setmetatable(instance, { __index = structs.LuggageFrame })  -- Set the metatable for the instance
+
+    return instance
+end
+]]
+
+function peekBag(pl, bag)
+	base = mem.dll.Luggage.LuggageSlot(pl , bag)
+	frame =  structs.LuggageFrame:new(base)
+	-- return structs.LuggageFrame(frame)
+	return frame
+end
