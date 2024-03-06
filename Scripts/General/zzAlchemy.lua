@@ -44,11 +44,11 @@ function events.UseMouseItem(t)
 		spRestore=math.round(it.Bonus^1.4*2/3+10)
 		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
 	end
-	if it.Number==246 then
+	if it.Number==247 then
 		heal=math.round(it.Bonus^1.4*3+30)
 		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
 	--mana potion
-	elseif it.Number==247 then
+	elseif it.Number==248 then
 		spRestore=math.round(it.Bonus^1.4*2+30)
 		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
 	end
@@ -367,7 +367,7 @@ potionRecipeText={
 	--purple
 	[226]="Recipes:\nAdd Red: Heroism\nAdd Blue: Meditation\nAdd Yellow: Water Breathing\nAdd Orange: Magic Protection\nAdd Green: Enchant Item",
 	--green
-	[227]="Recipes:\nAdd Red: Bless\nAdd Blue: Regeneration\nAdd Yellow: Harden Item\nAdd Orange: Magic Protection\nAdd Purple: Enchant Item",
+	[227]="Recipes:\nAdd Red: Bless\nAdd Blue: Regeneration\nAdd Yellow: Harden Item\nAdd Orange: Stone to Flesh\nAdd Purple: Enchant Item",
 	--7-8-9
 	[228]="Recipes:\nAdd Orange: Champion's Potion\nAdd Purple: Power Boost\nAdd Green: Divine Cure",
 	[229]="Recipes:\nAdd Orange: Champion's Potion\nAdd Purple: Power Boost\nAdd Green: Divine Cure",

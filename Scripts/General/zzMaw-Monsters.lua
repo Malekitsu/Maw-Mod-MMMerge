@@ -1601,11 +1601,11 @@ function events.MonsterKilled(mon)
 		n=Map.Monsters.Count
 		m=1
 		if mon.NameId>220 and mon.NameId<300 then
-			m=30
+			m=15
 		end
 		for i=0,Map.Monsters.High do
 			monster=Map.Monsters[i]
-			if monster.AIState==4 or monster.AIState==5 or monster.AIState==11 or monster.AIState==16 or monster.AIState==17 or monster.AIState==19 or monster.NameId>300 then
+			if monster.AIState==4 or monster.AIState==5 or monster.AIState==11 or monster.AIState==16 or monster.AIState==17 or monster.AIState==19 or monster.NameId>300 or monster.ShowAsHostile==false then
 				m=m+1
 				if monster.NameId>220 and monster.NameId<300 then
 					m=m+29
@@ -1708,7 +1708,7 @@ function events.AfterLoadMap()
 			possibleMonsters={}
 			bossSpawns=math.ceil((Map.Monsters.Count-30)/150)
 			for i=0,Map.Monsters.High do
-				if Map.Monsters[i].Id%3==0 then
+				if Map.Monsters[i].Id%3==0 and Map.Monsters[i].ShowAsHostile then
 					table.insert(possibleMonsters,i)
 				end
 			end
@@ -1896,7 +1896,7 @@ function eliteRegen()
 		for key, value in pairs(mapvars.regenerating) do	
 			if value>0 then
 				mon=Map.Monsters[key]
-				mon.HP=mon.HP+mon.FullHitPoints*0.01*0.99^value
+				mon.HP=math.min(mon.HP+mon.FullHitPoints*0.01*0.99^value, mon.FullHP)
 			end
 		end
 	end
