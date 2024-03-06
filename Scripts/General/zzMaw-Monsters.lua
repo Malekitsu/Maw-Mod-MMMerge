@@ -1708,7 +1708,7 @@ function events.AfterLoadMap()
 			possibleMonsters={}
 			bossSpawns=math.ceil((Map.Monsters.Count-30)/150)
 			for i=0,Map.Monsters.High do
-				if Map.Monsters[i].Id%3==0 and Map.Monsters[i].ShowAsHostile then
+				if Map.Monsters[i].Id%3==0 then
 					table.insert(possibleMonsters,i)
 				end
 			end
