@@ -1048,15 +1048,17 @@ function events.LoadMap()
 					
 				end	
 			end
+			--[[ no longer needed, changed skill sharing system
 			extraSkillPoints=0
 			for j=1,5 do
-				s=SplitSkill(pl.Skills[partySharedSkills[j]])
+				s=SplitSkill(pl.Skills[partySharedSkills[j] ])
 				if s>1 then
 					extraSkillPoints=extraSkillPoints+(s*(s+1)/2-1)
-					pl.Skills[partySharedSkills[j]]=1
+					pl.Skills[partySharedSkills[j] ]=1
 				end
 			end	
 			pl.SkillPoints=pl.SkillPoints+extraSkillPoints
+			]]
 		end
 	end
 end
