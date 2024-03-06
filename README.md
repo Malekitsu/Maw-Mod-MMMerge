@@ -7,6 +7,7 @@ This mod is the culmination of efforts from a dedicated team, with each member b
 - **Rawsugar** - _Co-Lead Designer_: Played a pivotal role in crafting the mod's formulas and design concepts, shaping the gameplay experience.
 - **Eksekk** - _Senior Contributor_: Offered significant support by tackling challenging tasks and adding features that enhanced the mod's depth and functionality.
 - **Yuji Sakai/Knightmarevive** - _Contributor_: Brought fresh code contributions to the project recently, further enriching the mod's content.
+- **2D (Perduelion)** - _Contributor_: Basically designed the new alchemy design all by himself, making an amazing job.
 
 We express our deepest appreciation to all the discord community member. Their advices and feedbacks played a a very important role in the development.
 
