@@ -1193,14 +1193,16 @@ end
 function checkSkills(id)
 	shamanSkills(false, id)
 	dkSkills(false, id)
-	local class=Party[id].Class
-	if table.find(shamanClass, class) then
-		shamanSkills(true, id)
-		return
-	end
-	if table.find(dkClass, Party[id].Class) then
-		dkSkills(true, id)
-		return
+	if id>=0 and id<=Party.High then
+		local class=Party[id].Class
+		if table.find(shamanClass, class) then
+			shamanSkills(true, id)
+			return
+		end
+		if table.find(dkClass, Party[id].Class) then
+			dkSkills(true, id)
+			return
+		end
 	end
 end
 --add tooltips
