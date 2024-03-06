@@ -1411,7 +1411,7 @@ artSkill[517] =	{	[const.Skills.DisarmTraps] 	= 8,
 					[const.Skills.Armsmaster] 	= 8}
 artSkill[531] =	{	[const.Skills.Bow] 			= 4}
 artSkill[535] =	{	[const.Skills.Alchemy] 		= 5}
-
+--[[
 function events.GetSkill(t)
 	for it in t.Player:EnumActiveItems() do
 		if it.Number>=500 and it.Number <=537 and it.Number~=521 then
@@ -1421,3 +1421,4 @@ function events.GetSkill(t)
 		end
 	end
 end
+]]
