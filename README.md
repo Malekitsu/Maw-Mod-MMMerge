@@ -41,6 +41,7 @@ The mod is very big and changes most game mechanics, for simplicity I'll divide 
 - Crafting System
 - Bolster & Difficulty rework
 - Mechanics rework
+- Solo leveling
 
 # What you need to know
 The mod has been balanced to be medium difficulty for veteran players. There is an easy mode that can be enabled in "Extra settings". Especially early on it might be a challenge even for veteran players due to the jump in difficulty. Here’s some advice to help you familiarize yourself with the dynamics of the mod.
@@ -240,3 +241,13 @@ Tips:
 - Monster projectiles will now tend to home players:
   - Moving sideways is not enough to dodge, but running is enough
   - Flying up and down doesn't work
+
+## Solo
+The game is designed to make solo play viable.
+It will be much harder at first, but you can concentrate all of your resources into 1 character and get 5 times the normal experience from monsters.
+In addition to that there are some QoL changes:
+- Multibag: You can now store up to 5 items in the inventory
+- Heroes Boon: You have permanent wizard eye and torch light
+- Teleport: Town Portal and Lloyd beacon scrolls are not consumed on use
+- Master of all: You can learn many misc skills up to GM (Alchemy, Disarm Trap, Merchant, Identify Item/Monster, Repair)
+
