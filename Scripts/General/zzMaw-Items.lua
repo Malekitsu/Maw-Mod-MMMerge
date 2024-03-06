@@ -2915,7 +2915,9 @@ end
 
 --maw artifact scaling calculation
 function artifactPowerMult(level)
-	local mult=math.max(math.min(level/80,3),0.5)
+	local bol=Game.BolsterAmount
+	bol=(bol/100-1)/5+1
+	local mult=math.max(math.min(level/80*bol,3*bol),0.5)
 	return mult
 end
 
