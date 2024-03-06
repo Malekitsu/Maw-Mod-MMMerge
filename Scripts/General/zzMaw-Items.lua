@@ -1980,17 +1980,14 @@ end
 
 --get artifacts Skills
 function events.GetSkill(t)
+	local bonus=0
 	if t.Skill>=12 and t.Skill<=20 then
-		bonus1 = plItemsStats[t.PlayerIndex][table.find(equipSpellMap,t.Skill)]
-		t.Result=math.max(t.Result,bonus1+t.Player.Skills[t.Skill])
+		bonus = plItemsStats[t.PlayerIndex][table.find(equipSpellMap,t.Skill)]
 	end
-	if t.Skill<=38 then
-		local bonus=0
-		if plItemsStats[t.PlayerIndex] and plItemsStats[t.PlayerIndex][t.Skill+50] then
-			bonus = plItemsStats[t.PlayerIndex][t.Skill+50]
-		end
-		t.Result=math.max(t.Result,bonus+t.Player.Skills[t.Skill])
+	if plItemsStats[t.PlayerIndex] and plItemsStats[t.PlayerIndex][t.Skill+50] then
+		bonus = bonus+plItemsStats[t.PlayerIndex][t.Skill+50]
 	end
+	t.Result=bonus+t.Player.Skills[t.Skill]
 end
 
 function events.GameInitialized2()
@@ -2165,7 +2162,7 @@ function itemStats(index)
 			artifactMult=artifactPowerMult(pl.LevelBase)
 			for key,value in pairs(artifactSkillBonus[it.Number]) do
 				tab[key+50]=tab[key+50] or 0
-				tab[key+50]=tab[key+50]+value*artifactMult
+				tab[key+50]=tab[key+50]+math.round(value*artifactMult)
 			end
 		end
 	end	
@@ -2398,7 +2395,7 @@ artifactStatsBonus[514] = { [const.Stats.Might] 		= 20,
 							[const.Stats.MindResistance]	= 20,
 							[const.Stats.BodyResistance]	= 20,
 							[const.Stats.SpiritResistance]	= 20}	
-artifactStatsBonus[514] = { [const.Stats.Speed] 		= 60,							
+artifactStatsBonus[515] = { [const.Stats.Speed] 		= 60,							
 							[const.Stats.Accuracy] 		= 60}
 artifactStatsBonus[518] = { [const.Stats.Speed] 		= 60}
 artifactStatsBonus[519] = { [const.Stats.FireResistance]	= 40,
@@ -2562,7 +2559,8 @@ artifactStatsBonus[1334] = {
 }
 -- Elven Chainmail
 artifactStatsBonus[1335] = {[const.Stats.Speed] = 30,
-							[const.Stats.Accuracy] = 30}
+							[const.Stats.Accuracy] = 30
+}
 -- Forge Gauntlets
 artifactStatsBonus[1336] = {
 							[const.Stats.Might] = 30,
