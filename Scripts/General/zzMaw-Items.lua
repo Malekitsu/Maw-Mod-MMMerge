@@ -1987,7 +1987,9 @@ function events.GetSkill(t)
 	if plItemsStats[t.PlayerIndex] and plItemsStats[t.PlayerIndex][t.Skill+50] then
 		bonus = bonus+plItemsStats[t.PlayerIndex][t.Skill+50]
 	end
-	t.Result=bonus+t.Player.Skills[t.Skill]
+	if t.Skill<=38 then
+		t.Result=bonus+t.Player.Skills[t.Skill]
+	end
 end
 
 function events.GameInitialized2()
