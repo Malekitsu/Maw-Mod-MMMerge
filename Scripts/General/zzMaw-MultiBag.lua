@@ -13,21 +13,39 @@ function events.KeyDown(t)
 end
 
 function events.GameInitialized2()
+	multibagButton={}
 	for i=1,count do
-		CustomUI.CreateButton{
-			IconUp = "SlChar" .. i .. "U",
-			IconDown = "SlChar" .. i .. "D",
-			Screen = {7, 13, 15},
-			Layer = 1,
-			X =	455+i*30,
-			Y =	372,
-			Masked = true,
-			Action = function() changeBag(Party[Game.CurrentPlayer], i) end,
+		multibagButton[i]=CustomUI.CreateButton{
+		IconUp = "SlChar" .. i .. "U",
+		IconDown = "SlChar" .. i .. "D",
+		Screen = {7, 13, 15},
+		Layer = 1,
+		X =	455+i*30,
+		Y =	372,
+		Masked = true,
+		Action = function() changeBag(Party[Game.CurrentPlayer], i) end,
 		}
 	end
+	arcomageButtonFix=false
 end
 
-
+function events.Action(t)
+	if t.Action==29 and not arcomageButtonFix then
+		for i=1,count do
+			multibagButton[i].Y=multibagButton[i].Y+1000
+		end
+		arcomageButtonFix=true
+		function events.Tick()
+			if Game.HouseScreen~=104 then
+				events.Remove("Tick", 1)
+				for i=1,count do
+					multibagButton[i].Y=372
+					arcomageButtonFix=false
+				end
+			end
+		end
+	end
+end
 
 --multiple inventory code
 function changeBag(pl, bag)
