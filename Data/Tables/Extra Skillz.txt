@@ -1,2 +1,0 @@
-Race	Class	Skill	modifier
-
