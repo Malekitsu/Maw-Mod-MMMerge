@@ -125,6 +125,8 @@ But if you’re curious to know more about the mod and the specific changes, rea
 - Id Item, Id Monster, Repair, Merchant and Disarm are now shared to all party members
   - Click on the skill to share to all party
 - Regeneration and Meditation will now be much stronger and work continuously instead of every 10 seconds
+- You can now reset your skill points at the Seer, Judge Gray, or Oracle.
+  - Masteries (Expert/Master/GM) will automatically be grant once you get to the required skill level, if you had previously
 
 ## Class Rework
 - most underused classes have been balanced to have some uniqueness
