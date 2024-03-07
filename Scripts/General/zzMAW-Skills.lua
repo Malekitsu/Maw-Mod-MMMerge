@@ -1379,6 +1379,8 @@ function events.GetMerchantTotalSkill(t)
 		if s*m>maxMerchantSkill then
 			if m==4 then
 				maxMerchantSkill=100
+			else
+				maxMerchantSkill=s*m
 			end
 		end		
 	end
