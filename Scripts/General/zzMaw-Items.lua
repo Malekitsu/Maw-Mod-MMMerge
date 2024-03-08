@@ -2016,6 +2016,17 @@ function events.GameInitialized2()
     end
 end
 
+local bonusBaseEnchantSkill={
+	[17]=const.Skills.Alchemy,
+	[18]=const.Skills.Stealing,
+	[19]=const.Skills.DisarmTraps,
+	[20]=const.Skills.IdentifyItem,
+	[21]=const.Skills.IdentifyMonster,
+	[22]=const.Skills.Armsmaster,
+	[23]=const.Skills.Dodging,
+	[24]=const.Skills.Unarmed,
+}
+
 --RECALCULATE THE WHOLE ITEMS EFFECTS
 function itemStats(index)
 	if index==-1 or index==nil then
@@ -2051,7 +2062,8 @@ function itemStats(index)
 			if it.Bonus<=16 then
 				tab[it.Bonus]=tab[it.Bonus]+it.BonusStrength
 			else
-				tab[it.Bonus]=math.max(tab[it.Bonus],it.BonusStrength)
+				local tabNumber=bonusBaseEnchantSkill[it.Bonus]+50
+				tab[tabNumber]=math.max(tab[tabNumber] or 0, it.BonusStrength)
 			end
 		end
 		if it.Charges>1000 then
@@ -2145,9 +2157,6 @@ function itemStats(index)
 		end
 		
 		--skills
-		if it.Bonus>16 then
-			tab[it.Bonus]=math.max(tab[it.Bonus], it.BonusStrength)
-		end
 		if equipSpellMap[it.Bonus2] then
 			tab[it.Bonus2]= 5 +  math.floor(it.MaxCharges/4)
 		end
@@ -2285,8 +2294,7 @@ function itemStats(index)
 		end
 	end
 	--armsmaster
-	local s,m = SplitSkill(pl.Skills[const.Skills.Armsmaster])
-	s=s+tab[22]
+	local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
 	if m>0 then
 		tab[40]=tab[40]+armsmasterAttack[m]*s
 		tab[41]=tab[41]+armsmasterDamage[m]*s
@@ -2294,10 +2302,9 @@ function itemStats(index)
 		tab[43]=tab[43]+armsmasterDamage[m]*s
 	end
 	--unarmed
-	local s,m = SplitSkill(pl.Skills[const.Skills.Unarmed])
-	local s1,m1 = SplitSkill(pl.Skills[const.Skills.Staff])
+	local s,m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
+	local s1,m1 = SplitSkill(pl:GetSkill(const.Skills.Staff))
 	if (m>=1 and not pl:GetActiveItem(0) and not pl:GetActiveItem(1)) or (m1==4 and pl:GetActiveItem(1) and pl:GetActiveItem(1):T().Skill==0 ) then
-		s=s+tab[22]
 		if m>0 then
 			tab[40]=tab[40]+skillAttack[const.Skills.Unarmed][m]*s
 			tab[41]=tab[41]+skillDamage[const.Skills.Unarmed][m]*s
