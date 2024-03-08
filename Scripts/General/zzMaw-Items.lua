@@ -271,6 +271,11 @@ function events.ItemGenerated(t)
 			t.Item.BonusStrength=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])*difficultyExtraPower
 			if math.random(1,10)==10 then
 				t.Item.Bonus=math.random(17,24)
+				if (t.Item.Number:T().Skill==10 or t.Item.Number:T().Skill==11) and t.Item.Bonus==23 then
+					t.Item.Bonus=22
+				elseif (t.Item.Number:T().Skill<=7 and t.Item.Number:T().Skill>0) and t.Item.Bonus==24 then
+					t.Item.Bonus=22
+				end
 			end
 		end
 		--apply enchant2
