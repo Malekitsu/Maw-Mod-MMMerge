@@ -2242,9 +2242,13 @@ function itemStats(index)
 		if item then
 			local skill=item:T().Skill
 			--minotaur fix
-			if i==1 then
+			if i==1 or i==0 then
 				if table.find(oneHandedAxes, item.Number) or table.find(twoHandedAxes, item.Number) then
-					skill=3
+					if i==0 then
+						skill=2
+					else
+						skill=3
+					end
 				end				
 			end
 			local s,m = SplitSkill(pl:GetSkill(skill))
