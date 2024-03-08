@@ -8,8 +8,11 @@ This mod is the culmination of efforts from a dedicated team, with each member b
 - **Eksekk** - _Senior Contributor_: Offered significant support by tackling challenging tasks and adding features that enhanced the mod's depth and functionality.
 - **Yuji Sakai/Knightmarevive** - _Contributor_: Brought fresh code contributions to the project recently, further enriching the mod's content.
 - **2D (Perduelion)** - _Contributor_: Basically designed the new alchemy design all by himself, making an amazing job.
+- **Thor Thunderfist** - _Contributor_: Adapted the code for skill limit removal.
 
-We express our deepest appreciation to all the discord community member. Their advices and feedbacks played a a very important role in the development.
+We express our deepest appreciation to all the discord community member. Their advices and feedbacks played a very important role in the development. Most noticeably, but not only:
+
+Viktor, Hagnak, ArkTolei, MR___TJ, Spazzledorf, Torkvato, LiGx, Mercs/Zan Team.
 
 
 ## Install instruction
