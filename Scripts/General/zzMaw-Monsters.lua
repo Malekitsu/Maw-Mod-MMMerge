@@ -1924,3 +1924,11 @@ function events.GameInitialized2()
 		Game.MonListBin[id].Radius=Game.MonListBin[id].Radius*0.75
 	end
 end
+
+--fix to The Temple of BAA in MM7
+function events.GameInitialized2()
+	Game.PlaceMonTxt[211]="Cleric of Baa"
+	Game.PlaceMonTxt[212]="Priest of Baa"
+	Game.PlaceMonTxt[213]="Cardinal of Baa"
+	Game.PlaceMonTxt[214]="High Cardinal"
+end
