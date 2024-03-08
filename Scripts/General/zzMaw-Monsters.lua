@@ -469,7 +469,7 @@ function recalculateMonsterTable()
 			if i%3==1 then
 				HPtable[i]=(HPtable[i]*0.3+HPtable[i+1]*(basetable[i].FullHP/basetable[i+1].FullHP))/1.3
 			elseif i%3==0 then
-				mon.HP=(HPtable[i]*0.3+HPtable[i-1]*(basetable[i].FullHP/basetable[i-1].FullHP))/1.3
+				HPtable[i]=(HPtable[i]*0.3+HPtable[i-1]*(basetable[i].FullHP/basetable[i-1].FullHP))/1.3
 			end
 			
 			hpOvercap=0
@@ -1712,7 +1712,7 @@ function events.AfterLoadMap()
 					table.insert(possibleMonsters,i)
 				end
 			end
-			if bossSpawns>0 then
+			if bossSpawns>0 and #possibleMonsters>0 then
 				for v=1,bossSpawns do
 					index=math.random(1, #possibleMonsters)
 					generateBoss(possibleMonsters[index],v)
