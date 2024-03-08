@@ -460,8 +460,6 @@ function recalculateMonsterTable()
 			
 	end
 		
-		
-	
 	if bolsterLevel>20 or Game.freeProgression==false then
 		for i=1, 651 do
 			--calculate level scaling
@@ -1605,7 +1603,7 @@ function events.MonsterKilled(mon)
 		end
 		for i=0,Map.Monsters.High do
 			monster=Map.Monsters[i]
-			if monster.AIState==4 or monster.AIState==5 or monster.AIState==11 or monster.AIState==16 or monster.AIState==17 or monster.AIState==19 or monster.NameId>300 or monster.ShowAsHostile==false then
+			if monster.AIState==4 or monster.AIState==5 or monster.AIState==11 or monster.AIState==16 or monster.AIState==17 or monster.AIState==19 or monster.NameId>300 then
 				m=m+1
 				if monster.NameId>220 and monster.NameId<300 then
 					m=m+29
