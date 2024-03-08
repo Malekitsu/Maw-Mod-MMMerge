@@ -2312,6 +2312,12 @@ function itemStats(index)
 			tab[43]=tab[43]+skillDamage[const.Skills.Unarmed][m]*s
 		end
 	end
+	local buff=pl.SpellBuffs[6]
+	if buff.ExpireTime>Game.Time then --hammerhand buff
+		tab[41]=tab[41]+buff.Power
+		tab[42]=tab[42]+buff.Power
+		tab[43]=tab[43]+buff.Power
+	end
 	--necessary to load attack speed and damage multiplier
 	pl:GetAttackDelay()
 	pl:GetAttackDelay(true)
