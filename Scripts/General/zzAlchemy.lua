@@ -174,10 +174,12 @@ function events.UseMouseItem(t)
 	evt.PlaySound(143)
 end
 
-function events.GetSkill(t)
-	if t.Skill==const.Skills.Meditation then
-		if vars and vars.bonusMeditation and vars.bonusMeditation[t.PlayerIndex] and vars.bonusMeditation[t.PlayerIndex][1]>Game.Time then
-			t.Result=t.Result+vars.bonusMeditation[t.PlayerIndex][2]
+function events.GameInitialized2()
+	function events.GetSkill(t)
+		if t.Skill==const.Skills.Meditation then
+			if vars and vars.bonusMeditation and vars.bonusMeditation[t.PlayerIndex] and vars.bonusMeditation[t.PlayerIndex][1]>Game.Time then
+				t.Result=t.Result+vars.bonusMeditation[t.PlayerIndex][2]
+			end
 		end
 	end
 end
