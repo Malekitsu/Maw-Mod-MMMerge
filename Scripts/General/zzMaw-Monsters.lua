@@ -313,6 +313,7 @@ function recalculateMonsterTable()
 		
 		if mapName=="The Arena" or mapName=="Arena" then
 			extraBolster = 0
+			bolsterLevel = 0
 		end
 		mon.Level=math.min(mon.Level+extraBolster,255)
 		totalLevel=totalLevel or {}
