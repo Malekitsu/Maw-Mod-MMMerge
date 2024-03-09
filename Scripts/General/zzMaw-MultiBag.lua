@@ -135,20 +135,22 @@ function changeBag(pl, bag)
 		for i=0,125 do
 			if pl.Inventory[i]>0 then
 				 it=pl.Items[pl.Inventory[i]]
-				 id=-i-1
-				 x, y=itemSizeMap[it.Number][1], itemSizeMap[it.Number][2]
-				 inv=pl.Inventory
-				 currentPosition=i-1
-				for j=1, x do
-					currentPosition=currentPosition+1
-					if pl.Inventory[currentPosition]<=0 then
-						pl.Inventory[currentPosition]=id
-					end
-					 yPos=currentPosition
-					for k=1,y-1 do
-						yPos=yPos+14
-						if yPos<126 and pl.Inventory[yPos]<=0 then
-							pl.Inventory[yPos]=id
+				 if it.Number>0 then
+					 id=-i-1
+					 x, y=itemSizeMap[it.Number][1], itemSizeMap[it.Number][2]
+					 inv=pl.Inventory
+					 currentPosition=i-1
+					for j=1, x do
+						currentPosition=currentPosition+1
+						if pl.Inventory[currentPosition]<=0 then
+							pl.Inventory[currentPosition]=id
+						end
+						 yPos=currentPosition
+						for k=1,y-1 do
+							yPos=yPos+14
+							if yPos<126 and pl.Inventory[yPos]<=0 then
+								pl.Inventory[yPos]=id
+							end
 						end
 					end
 				end
