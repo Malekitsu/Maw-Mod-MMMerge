@@ -1186,6 +1186,9 @@ local function dkSkills(isDK, id)
 				Game.SpellsTxt[key][key2]=value2
 			end
 		end
+		Game.SkillNames[14]="Water"
+		Game.SkillNames[18]="Body"
+		Game.SkillNames[20]="Dark"
 	end
 end
 
@@ -1199,7 +1202,7 @@ function checkSkills(id)
 			shamanSkills(true, id)
 			return
 		end
-		if table.find(dkClass, Party[id].Class) then
+		if table.find(dkClass, class) then
 			dkSkills(true, id)
 			return
 		end
@@ -1212,6 +1215,43 @@ function events.Action(t)
 		function events.Tick() 
 			events.Remove("Tick", 1)
 			checkSkills(id)
+		end
+	end
+end
+
+function events.Action(t)
+	if t.Action==114 then
+		local class=Party[Game.CurrentPlayer].Class
+		if table.find(dkClass, class) then
+			dkSkills(true, id)
+		else
+			dkSkills(false)
+		end
+	end
+	if t.Action==110 then
+		local class=Party[t.Param-1].Class
+		if table.find(dkClass, class) then
+			dkSkills(true, t.Param-1)
+		else
+			dkSkills(false)
+		end
+	elseif t.Action==176 then
+		local current=Game.CurrentPlayer
+		local maxParty=Game.Party.High
+		for i=1,Party.Count do
+			newSelected=current+i
+			if newSelected>maxParty then
+				newSelected=newSelected-Party.Count
+			end
+			local pl=Party[newSelected]
+			if pl.Dead==0 and pl.Stoned==0 and pl.Paralyzed==0 and pl.Eradicated==0 and pl.Asleep==0 and pl.Unconscious==0 then
+				local class=pl.Class
+				if table.find(dkClass, class) then
+					dkSkills(true, newSelected)
+				else
+					dkSkills(false, newSelected)
+				end
+			end
 		end
 	end
 end
