@@ -53,9 +53,6 @@ function RespecSkills(npcID)
 	local refund=0
 	local p=Party[id]
 	for i=0, p.Skills.High do
-		if table.find(partySharedSkills, i) then
-			goto continue
-		end
 		local skill=SplitSkill(p.Skills[i])
 		if skill>1 then
 			if i>=12 and i<=23 then
