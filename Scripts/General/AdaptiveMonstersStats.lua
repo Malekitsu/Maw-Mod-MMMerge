@@ -980,7 +980,7 @@ local function Init()
 		ArenaMonstersList = List
 		ArenaMapSettings = Game.Bolster.Maps[Map.MapStatsIndex]
 	end
-
+	--[[
 	function events.GenerateArenaMonster(t)
 		local MonId = ArenaMonstersList[random(#ArenaMonstersList)]
 
@@ -991,7 +991,7 @@ local function Init()
 			PrepareTxtMon(MonId, ArenaPartyLevel, ArenaMapSettings, true)
 		end
 	end
-
+]]
 	-- Add player's armor class penalty depending on enemy's bolster
 	local NewCode = mem.asmpatch(0x48db2f, [[
 	nop; mem hook
