@@ -1500,13 +1500,7 @@ function events.GameInitialized2()
 		Game.MapStats[outSideMaps[i]].RefillDays=1000000000
 	end
 end
---[[Naga
-function events.MonsterSpriteScale(t)
-	if t.Monster.FullHP>3205 then
-		t.Scale=t.Scale
-	end
-end
-]]
+
 
 --TRUE NIGHTMARE MODE
 function events.CanSaveGame(t)
@@ -1931,4 +1925,11 @@ function events.GameInitialized2()
 	Game.PlaceMonTxt[212]="Priest of Baa"
 	Game.PlaceMonTxt[213]="Cardinal of Baa"
 	Game.PlaceMonTxt[214]="High Cardinal"
+end
+
+
+function events.MonsterSpriteScale(t)
+	if Map.Monsters[math.round(t.MonsterIndex)].NameId>220 and Map.Monsters[math.round(t.MonsterIndex)].NameId<300 then
+		t.Scale=t.Scale*1.4
+	end
 end
