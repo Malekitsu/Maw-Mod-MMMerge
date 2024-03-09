@@ -467,8 +467,8 @@ function events.Action(t)
 		local current=Game.CurrentPlayer
 		local maxParty=Game.Party.High
 		for i=1,Party.Count do
-			newSelected=current+i
-			if newSelected>maxParty then
+			newSelected=current+i+1
+			while newSelected>maxParty do
 				newSelected=newSelected-Party.Count
 			end
 			local pl=Party[newSelected]
@@ -1223,7 +1223,7 @@ function events.Action(t)
 	if t.Action==114 then
 		local class=Party[Game.CurrentPlayer].Class
 		if table.find(dkClass, class) then
-			dkSkills(true, id)
+			dkSkills(true, Game.CurrentPlayer)
 		else
 			dkSkills(false)
 		end
@@ -1239,8 +1239,8 @@ function events.Action(t)
 		local current=Game.CurrentPlayer
 		local maxParty=Game.Party.High
 		for i=1,Party.Count do
-			newSelected=current+i
-			if newSelected>maxParty then
+			newSelected=current+i+1
+			while newSelected>maxParty do
 				newSelected=newSelected-Party.Count
 			end
 			local pl=Party[newSelected]
