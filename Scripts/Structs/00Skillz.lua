@@ -16,6 +16,12 @@ Skillz = {
 	set = function(Player, skill_ID, value) 
 		hlp(Player)
 		mem.dll.skillz.set(Player, skill_ID, value) end,
+	get2 = function(Player, skill_ID) 
+		hlp(Player)
+		return mem.dll.skillz.get2(Player, skill_ID) end, 
+	set2 = function(Player, skill_ID, value) 
+		hlp(Player)
+		mem.dll.skillz.set2(Player, skill_ID, value) end,
 		
 	getName = function(skill_ID)
 		return mem.string(mem.dll.skillz.getName(skill_ID))
@@ -100,3 +106,13 @@ end
 	GetMaxSkillLevel	 = GetMaxSkill
 	GetMaxAvailableSkill = GetMaxSkill
 	
+	
+function JoinSkill2(sk, mas)
+	return mas * 65536 + sk
+end
+
+function SplitSkill2(arg)
+	sk = arg % 65536
+	mas = (arg - sk) / 65536
+	return sk, mas
+end
