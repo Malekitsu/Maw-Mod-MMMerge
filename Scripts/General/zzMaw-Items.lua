@@ -271,6 +271,12 @@ function events.ItemGenerated(t)
 			t.Item.BonusStrength=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])*difficultyExtraPower
 			if math.random(1,10)==10 then
 				t.Item.Bonus=math.random(17,24)
+				local skill=t.Item:T().Skill
+				if (skill==10 or skill==11) and t.Item.Bonus==23 then
+					t.Item.Bonus=22
+				elseif (skill<=7 and skill>0) and t.Item.Bonus==24 then
+					t.Item.Bonus=22
+				end
 			end
 		end
 		--apply enchant2
@@ -1980,16 +1986,15 @@ end
 
 --get artifacts Skills
 function events.GetSkill(t)
+	local bonus=0
 	if t.Skill>=12 and t.Skill<=20 then
-		bonus1 = plItemsStats[t.PlayerIndex][table.find(equipSpellMap,t.Skill)]
-		t.Result=math.max(t.Result,bonus1+t.Player.Skills[t.Skill])
+		bonus = plItemsStats[t.PlayerIndex][table.find(equipSpellMap,t.Skill)]
+	end
+	if plItemsStats[t.PlayerIndex] and plItemsStats[t.PlayerIndex][t.Skill+50] then
+		bonus = bonus+plItemsStats[t.PlayerIndex][t.Skill+50]
 	end
 	if t.Skill<=38 then
-		local bonus=0
-		if plItemsStats[t.PlayerIndex] and plItemsStats[t.PlayerIndex][t.Skill+50] then
-			bonus = plItemsStats[t.PlayerIndex][t.Skill+50]
-		end
-		t.Result=math.max(t.Result,bonus+t.Player.Skills[t.Skill])
+		t.Result=bonus+t.Player.Skills[t.Skill]
 	end
 end
 
@@ -2016,6 +2021,17 @@ function events.GameInitialized2()
         end
     end
 end
+
+local bonusBaseEnchantSkill={
+	[17]=const.Skills.Alchemy,
+	[18]=const.Skills.Stealing,
+	[19]=const.Skills.DisarmTraps,
+	[20]=const.Skills.IdentifyItem,
+	[21]=const.Skills.IdentifyMonster,
+	[22]=const.Skills.Armsmaster,
+	[23]=const.Skills.Dodging,
+	[24]=const.Skills.Unarmed,
+}
 
 --RECALCULATE THE WHOLE ITEMS EFFECTS
 function itemStats(index)
@@ -2052,7 +2068,8 @@ function itemStats(index)
 			if it.Bonus<=16 then
 				tab[it.Bonus]=tab[it.Bonus]+it.BonusStrength
 			else
-				tab[it.Bonus]=math.max(tab[it.Bonus],it.BonusStrength)
+				local tabNumber=bonusBaseEnchantSkill[it.Bonus]+50
+				tab[tabNumber]=math.max(tab[tabNumber] or 0, it.BonusStrength)
 			end
 		end
 		if it.Charges>1000 then
@@ -2146,9 +2163,6 @@ function itemStats(index)
 		end
 		
 		--skills
-		if it.Bonus>16 then
-			tab[it.Bonus]=math.max(tab[it.Bonus], it.BonusStrength)
-		end
 		if equipSpellMap[it.Bonus2] then
 			tab[it.Bonus2]= 5 +  math.floor(it.MaxCharges/4)
 		end
@@ -2165,7 +2179,7 @@ function itemStats(index)
 			artifactMult=artifactPowerMult(pl.LevelBase)
 			for key,value in pairs(artifactSkillBonus[it.Number]) do
 				tab[key+50]=tab[key+50] or 0
-				tab[key+50]=tab[key+50]+value*artifactMult
+				tab[key+50]=tab[key+50]+math.round(value*artifactMult)
 			end
 		end
 	end	
@@ -2228,9 +2242,13 @@ function itemStats(index)
 		if item then
 			local skill=item:T().Skill
 			--minotaur fix
-			if i==1 then
+			if i==1 or i==0 then
 				if table.find(oneHandedAxes, item.Number) or table.find(twoHandedAxes, item.Number) then
-					skill=3
+					if i==0 then
+						skill=2
+					else
+						skill=3
+					end
 				end				
 			end
 			local s,m = SplitSkill(pl:GetSkill(skill))
@@ -2286,8 +2304,7 @@ function itemStats(index)
 		end
 	end
 	--armsmaster
-	local s,m = SplitSkill(pl.Skills[const.Skills.Armsmaster])
-	s=s+tab[22]
+	local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
 	if m>0 then
 		tab[40]=tab[40]+armsmasterAttack[m]*s
 		tab[41]=tab[41]+armsmasterDamage[m]*s
@@ -2295,16 +2312,21 @@ function itemStats(index)
 		tab[43]=tab[43]+armsmasterDamage[m]*s
 	end
 	--unarmed
-	local s,m = SplitSkill(pl.Skills[const.Skills.Unarmed])
-	local s1,m1 = SplitSkill(pl.Skills[const.Skills.Staff])
+	local s,m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
+	local s1,m1 = SplitSkill(pl:GetSkill(const.Skills.Staff))
 	if (m>=1 and not pl:GetActiveItem(0) and not pl:GetActiveItem(1)) or (m1==4 and pl:GetActiveItem(1) and pl:GetActiveItem(1):T().Skill==0 ) then
-		s=s+tab[22]
 		if m>0 then
 			tab[40]=tab[40]+skillAttack[const.Skills.Unarmed][m]*s
 			tab[41]=tab[41]+skillDamage[const.Skills.Unarmed][m]*s
 			tab[42]=tab[42]+skillDamage[const.Skills.Unarmed][m]*s
 			tab[43]=tab[43]+skillDamage[const.Skills.Unarmed][m]*s
 		end
+	end
+	local buff=pl.SpellBuffs[6]
+	if buff.ExpireTime>Game.Time then --hammerhand buff
+		tab[41]=tab[41]+buff.Power
+		tab[42]=tab[42]+buff.Power
+		tab[43]=tab[43]+buff.Power
 	end
 	--necessary to load attack speed and damage multiplier
 	pl:GetAttackDelay()
@@ -2398,7 +2420,7 @@ artifactStatsBonus[514] = { [const.Stats.Might] 		= 20,
 							[const.Stats.MindResistance]	= 20,
 							[const.Stats.BodyResistance]	= 20,
 							[const.Stats.SpiritResistance]	= 20}	
-artifactStatsBonus[514] = { [const.Stats.Speed] 		= 60,							
+artifactStatsBonus[515] = { [const.Stats.Speed] 		= 60,							
 							[const.Stats.Accuracy] 		= 60}
 artifactStatsBonus[518] = { [const.Stats.Speed] 		= 60}
 artifactStatsBonus[519] = { [const.Stats.FireResistance]	= 40,
@@ -2562,7 +2584,8 @@ artifactStatsBonus[1334] = {
 }
 -- Elven Chainmail
 artifactStatsBonus[1335] = {[const.Stats.Speed] = 30,
-							[const.Stats.Accuracy] = 30}
+							[const.Stats.Accuracy] = 30
+}
 -- Forge Gauntlets
 artifactStatsBonus[1336] = {
 							[const.Stats.Might] = 30,
@@ -2915,7 +2938,9 @@ end
 
 --maw artifact scaling calculation
 function artifactPowerMult(level)
-	local mult=math.max(math.min(level/80,3),0.5)
+	local bol=Game.BolsterAmount
+	bol=(bol/100-1)/5+1
+	local mult=math.max(math.min(level/80*bol,3*bol),0.5)
 	return mult
 end
 

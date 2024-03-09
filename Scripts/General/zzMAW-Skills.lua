@@ -34,6 +34,15 @@ baseRecovery =
 	[const.Skills.Dagger] = 60,
 }
 
+weaponImpair =
+{
+	[const.Skills.Leather]	= {10, 10, 0, 0,},
+	[const.Skills.Chain]	= {20, 10, 0, 10,},
+	[const.Skills.Plate]	= {20, 10, 10, 0,},
+	[const.Skills.Shield]	= {10, 0, 0, 0,},
+}
+
+
 skillAttack =
 {
 	[const.Skills.Staff]	= {1, 2, 2, 2,},
@@ -236,6 +245,27 @@ function events.GetAttackDelay(t)
 	end
 	bonusSpeedMult=(100+bonusSpeed)/100
 	t.Result=baseSpeed/bonusSpeedMult
+	
+	--slow depending on item
+	delay=0
+	local it=t.Player:GetActiveItem(0)
+	if it then
+		local skill=it:T().Skill
+		if weaponImpair[skill] then
+			local s,m=SplitSkill(t.Player:GetSkill(skill))
+			delay=delay+weaponImpair[skill][m]
+		end
+	end
+	local it=t.Player:GetActiveItem(3)
+	if it then
+		local skill=it:T().Skill
+		if weaponImpair[skill] then
+			local s,m=SplitSkill(t.Player:GetSkill(skill))
+			delay=delay+weaponImpair[skill][m]
+		end
+	end
+	local delayMult=1+delay/100
+	t.Result=t.Result*delayMult
 end
 
 function calculateAngle(vector1, vector2)
@@ -365,7 +395,7 @@ function events.GameInitialized2()
 			damage=false
 			ac=false
 			res=false
-			baseString=string.format("%s\n------------------------------------------------------------\n         ",Skillz.getDesc(i,1))
+			baseString=string.format("%s\n------------------------------------------------------------\n         ",	Game.SkillDescriptions[i])
 			for v=1,4 do
 				if skillAttack[i][v]~=0 then
 					attack=true
@@ -473,7 +503,7 @@ function events.GameInitialized2()
 			recoveryPen=false
 			ac=false
 			res=false
-			baseString=string.format("%s\n------------------------------------------------------------\n         ",Skillz.getDesc(i,1))
+			baseString=string.format("%s\n------------------------------------------------------------\n         ",	Game.SkillDescriptions[i])
 			for v=1,4 do
 				if skillAC[i][v]~=0 then
 					ac=true
@@ -743,6 +773,7 @@ end
 
 function events.Action(t)
 	if t.Action==121 then
+		vars.checkSoloMastery=true --makes skills to be automatically learned if solo
 		if t.Param>=12 and t.Param<=22 then
 			t.Handled=false
 			pl=Party[Game.CurrentPlayer]
@@ -763,6 +794,7 @@ function events.Action(t)
 				pl.SkillPoints=pl.SkillPoints+currentCost-actualCost
 			end
 		end
+		--[[  skill share system, disabled, fix at the bottom
 		if table.find(partySharedSkills,t.Param) then
 			maxS=0
 			maxM=0
@@ -795,9 +827,9 @@ function events.Action(t)
 				Game.ShowStatusText("This skill is already as good as it will ever get")
 			end
 		end
+		]]
 	end
 end
-partySharedSkills={24,25,26,31,34}
 --plate&shield cover
 --change target
 plateCoverChance={0,0.05,0.01,0.015}
@@ -972,8 +1004,8 @@ end
 
 --DINAMIC SKILL TOOLTIP
 function events.GameInitialized2()
-	baseRegStr=Skillz.getDesc(30,1)
-	baseMedStr=Skillz.getDesc(28,1)
+	baseRegStr=	Game.SkillDescriptions[30]
+	baseMedStr=	Game.SkillDescriptions[28]
 end
 function events.Tick()
 	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
@@ -1016,15 +1048,17 @@ function events.LoadMap()
 					
 				end	
 			end
+			--[[ no longer needed, changed skill sharing system
 			extraSkillPoints=0
 			for j=1,5 do
-				s=SplitSkill(pl.Skills[partySharedSkills[j]])
+				s=SplitSkill(pl.Skills[partySharedSkills[j] ])
 				if s>1 then
 					extraSkillPoints=extraSkillPoints+(s*(s+1)/2-1)
-					pl.Skills[partySharedSkills[j]]=1
+					pl.Skills[partySharedSkills[j] ]=1
 				end
 			end	
 			pl.SkillPoints=pl.SkillPoints+extraSkillPoints
+			]]
 		end
 	end
 end
@@ -1321,5 +1355,139 @@ function events.Action(t)
 			end
 		end
 	end
+end
+
+function events.CanRepairItem(t)
+	local requiredSkill=t.Item:T().IdRepSt
+	local maxRepairSkill=0
+	for i=0, Party.High do
+		local s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Repair))
+		if s*m>maxRepairSkill then
+			maxRepairSkill=s*m
+		end		
+	end
+	if maxRepairSkill>requiredSkill then
+		t.CanRepair = true
+	end
+end
+
+local check=true
+function events.GetMerchantTotalSkill(t)
+	local maxMerchantSkill=0
+	for i=0, Party.High do
+		local s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Merchant))
+		if s*m>maxMerchantSkill then
+			if m==4 then
+				maxMerchantSkill=100
+			else
+				maxMerchantSkill=s*m
+			end
+		end		
+	end
+	t.Result=7+maxMerchantSkill
+end
+
+function events.CanIdentifyItem(t)
+	local requiredSkill=t.Item:T().IdRepSt
+	local maxIdentifySkill=0
+	for i=0, Party.High do
+		local s,m=SplitSkill(Party[i]:GetSkill(const.Skills.IdentifyItem))
+		if s*m>maxIdentifySkill then
+			maxIdentifySkill=s*m
+		end		
+	end
+	if maxIdentifySkill>requiredSkill then
+		t.CanIdentify = true
+	end
+end
+
+function events.GetDisarmTrapTotalSkill(t)
+	local maxDisarmSkill=0
+	for i=0, Party.High do
+		local s,m=SplitSkill(Party[i]:GetSkill(const.Skills.DisarmTraps))
+		if s*m>maxDisarmSkill then
+			maxDisarmSkill=s*m
+		end		
+	end
+	t.Result = maxDisarmSkill
+end
+
+function events.CanIdentifyMonster(t)
+	local requiredSkill=t.Monster.Level^0.7
+	local maxS=0
+	local maxM=0
+	AllowNovice = false
+	AllowExpert = false
+	AllowMaster = false
+	AllowSpells = false
+	AllowGM = false
+	for i=0, Party.High do
+		local s,m=SplitSkill(Party[i]:GetSkill(const.Skills.IdentifyMonster))
+		if s*m>maxS then
+			maxS=s*m
+		end
+		if m>maxM then
+			maxM=m
+		end
+	end
+	if maxS>requiredSkill then
+		if m>=1 then
+			AllowNovice = true
+		end
+		if m>=2 then
+			AllowExpert = true
+		end
+		if m>=3 then
+			AllowMaster = true
+			AllowSpells = true
+		end
+		if m>=4 then
+			AllowGM = true
+		end
+	end
+end
+
+local partySharedSkills={24,25,26,31,34,37}
+local skillRequirements={1,4,7,10}
+function events.Tick()
+	--give masteries to solo player
+	vars.checkSoloMastery=vars.checkSoloMastery or true
+	if vars.checkSoloMastery and Party.High==0 then
+		vars.soloMiscMasteries=vars.soloMiscMasteries or {}
+		local id=Party[0]:GetIndex()
+		vars.soloMiscMasteries[id]=vars.soloMiscMasteries[id] or {}
+		for i=1, #partySharedSkills do
+			local s, m=SplitSkill(Party[0].Skills[partySharedSkills[i]])
+			local m2=0
+			for v=1,#skillRequirements do
+				if s>=skillRequirements[v] then
+					m2=m2+1
+				end
+			end
+			if m2>m then
+				vars.soloMiscMasteries[id][partySharedSkills[i]]=vars.soloMiscMasteries[id][partySharedSkills[i]] or 0
+				vars.soloMiscMasteries[id][partySharedSkills[i]]=math.max(vars.soloMiscMasteries[id][partySharedSkills[i]], m)
+				vars.removeSoloMastery=true
+			end
+			Party[0].Skills[partySharedSkills[i]]=JoinSkill(s,m2)
+		end
+		vars.checkSoloMastery=false--set to true when learning allocating skill points
+	end 
+	
+	--remove masteries when no longer solo
+	vars.removeSoloMastery=vars.removeSoloMastery or true
+	if vars.removeSoloMastery and Party.High>0 then
+		for i=0,Party.PlayersArray.High do
+			vars.soloMiscMasteries=vars.soloMiscMasteries or {}
+			if vars.soloMiscMasteries[i] then
+				for key, value in pairs(vars.soloMiscMasteries[i]) do
+					local s,m=SplitSkill(Party.PlayersArray[i].Skills[key])
+					Party.PlayersArray[i].Skills[key]=JoinSkill(s,value)
+				end
+				vars.soloMiscMasteries[i]=nil
+			end
+		end
+		vars.removeSoloMastery=false
+	end	
 end
 

@@ -313,6 +313,7 @@ function recalculateMonsterTable()
 		
 		if mapName=="The Arena" or mapName=="Arena" then
 			extraBolster = 0
+			bolsterLevel = 0
 		end
 		mon.Level=math.min(mon.Level+extraBolster,255)
 		totalLevel=totalLevel or {}
@@ -460,8 +461,6 @@ function recalculateMonsterTable()
 			
 	end
 		
-		
-	
 	if bolsterLevel>20 or Game.freeProgression==false then
 		for i=1, 651 do
 			--calculate level scaling
@@ -469,7 +468,7 @@ function recalculateMonsterTable()
 			if i%3==1 then
 				HPtable[i]=(HPtable[i]*0.3+HPtable[i+1]*(basetable[i].FullHP/basetable[i+1].FullHP))/1.3
 			elseif i%3==0 then
-				mon.HP=(HPtable[i]*0.3+HPtable[i-1]*(basetable[i].FullHP/basetable[i-1].FullHP))/1.3
+				--HPtable[i]=(HPtable[i]*0.3+HPtable[i-1]*(basetable[i].FullHP/basetable[i-1].FullHP))/1.3
 			end
 			
 			hpOvercap=0
@@ -1502,13 +1501,7 @@ function events.GameInitialized2()
 		Game.MapStats[outSideMaps[i]].RefillDays=1000000000
 	end
 end
---[[Naga
-function events.MonsterSpriteScale(t)
-	if t.Monster.FullHP>3205 then
-		t.Scale=t.Scale
-	end
-end
-]]
+
 
 --TRUE NIGHTMARE MODE
 function events.CanSaveGame(t)
@@ -1605,7 +1598,7 @@ function events.MonsterKilled(mon)
 		end
 		for i=0,Map.Monsters.High do
 			monster=Map.Monsters[i]
-			if monster.AIState==4 or monster.AIState==5 or monster.AIState==11 or monster.AIState==16 or monster.AIState==17 or monster.AIState==19 or monster.NameId>300 or monster.ShowAsHostile==false then
+			if monster.AIState==4 or monster.AIState==5 or monster.AIState==11 or monster.AIState==16 or monster.AIState==17 or monster.AIState==19 or monster.NameId>300 then
 				m=m+1
 				if monster.NameId>220 and monster.NameId<300 then
 					m=m+29
@@ -1712,7 +1705,7 @@ function events.AfterLoadMap()
 					table.insert(possibleMonsters,i)
 				end
 			end
-			if bossSpawns>0 then
+			if bossSpawns>0 and #possibleMonsters>0 then
 				for v=1,bossSpawns do
 					index=math.random(1, #possibleMonsters)
 					generateBoss(possibleMonsters[index],v)
@@ -1924,5 +1917,20 @@ function events.GameInitialized2()
 		local id=resizeList[i]
 		Game.MonListBin[id].Height=Game.MonListBin[id].Height*0.75
 		Game.MonListBin[id].Radius=Game.MonListBin[id].Radius*0.75
+	end
+end
+
+--fix to The Temple of BAA in MM7
+function events.GameInitialized2()
+	Game.PlaceMonTxt[211]="Cleric of Baa"
+	Game.PlaceMonTxt[212]="Priest of Baa"
+	Game.PlaceMonTxt[213]="Cardinal of Baa"
+	Game.PlaceMonTxt[214]="High Cardinal"
+end
+
+
+function events.MonsterSpriteScale(t)
+	if Map.Monsters[math.round(t.MonsterIndex)].NameId>220 and Map.Monsters[math.round(t.MonsterIndex)].NameId<300 then
+		t.Scale=t.Scale*1.4
 	end
 end

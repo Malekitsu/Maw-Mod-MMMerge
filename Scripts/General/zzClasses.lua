@@ -4,7 +4,7 @@ promotionList={
 --Archer
 [1]=		{1657,1658,		1586,1587,1588,1589,	1537,20},--dark elf 
 --Cleric
-[2]=		{1648,1649,		1609,1610,1611,1612,	1546,31},
+[2]=		{1649,1650,		1609,1610,1611,1612,	1546,31},
 --Dark Elf
 [3]=	{1657,1658,		1586,1587,1588,1589,	1537,20},--archer
 --Dragon
@@ -34,7 +34,7 @@ promotionList={
 --Peasant
 [16]=	{0,0,		0,0,0,0,	0,0},
 --Seraphim
-[17]=	{1648,1649,		1609,1610,1611,1612,	1546,31},--cleric
+[17]=	{1649,1650,		1609,1610,1611,1612,	1546,31},--cleric
 --DK
 [18]=	{1645,1646,		1568,1569,1570,1571,	1540,1541},--same as knight
 --SHAMAN
@@ -434,16 +434,16 @@ end
 
 function events.LoadMap()
 	if not unarmedText then
-		unarmedText=Skillz.getDesc(33,1)
-		unarmedTextN=Skillz.getDesc(33,2)
-		unarmedTextE=Skillz.getDesc(33,3)
-		unarmedTextM=Skillz.getDesc(33,4)
-		unarmedTextGM=Skillz.getDesc(33,5)
-		dodgeText=Skillz.getDesc(32,1)
-		dodgeTextN=Skillz.getDesc(32,2)
-		dodgeTextE=Skillz.getDesc(32,3)
-		dodgeTextM=Skillz.getDesc(32,4)
-		dodgeTextGM=Skillz.getDesc(32,5)
+		unarmedText=Game.SkillDescriptions[33]
+		unarmedTextN=Game.SkillDesNormal[33]
+		unarmedTextE=Game.SkillDesExpert[33]
+		unarmedTextM=Game.SkillDesMaster[33]
+		unarmedTextGM=Game.SkillDesGM[33]
+		dodgeText=Game.SkillDescriptions[32]
+		dodgeTextN=Game.SkillDesNormal[32]
+		dodgeTextE=Game.SkillDesExpert[32]
+		dodgeTextM=Game.SkillDesMaster[32]
+		dodgeTextGM=Game.SkillDesGM[32]
 	end
 end
 
@@ -467,8 +467,8 @@ function events.Action(t)
 		local current=Game.CurrentPlayer
 		local maxParty=Game.Party.High
 		for i=1,Party.Count do
-			newSelected=current+i
-			if newSelected>maxParty then
+			newSelected=current+i+1
+			while newSelected>maxParty do
 				newSelected=newSelected-Party.Count
 			end
 			local pl=Party[newSelected]
@@ -714,7 +714,7 @@ end
 --SHAMAN
 ---------------------------------------
 function events.GameInitialized2()
-	Game.ClassDescriptions[59] = "The Shaman is a mystical warrior whose knowledge of magic enhances his martial prowess.\nYou can check following values by checking magic schools description in skills menu.\n\n - Each rank in Magic schools will increase spell damage and healing by 0.5%\n - Each point in Air will reduce damage by 1% (multiplicative)\n - Each point in Water will reduce damage by Skill^1.33 (increased depending on difficulty)\n\nMelee damage calculation:\n - Each point in spirit will increase damage by 1%\n - Each point in any schools will increase damage by 1\n - Each point in Fire will deal around 0.025% of total monster HP as fire damage\n\nRecovery on Melee attack:\n - Each point in Earth will heal by 1% of damage\n - Each point in Body will heal by skill^1.33\n - Each point in mind will restore 1 mana"
+	Game.ClassDescriptions[59] = "The Shaman is a mystical warrior whose knowledge of magic enhances his martial prowess.\nYou can check following values by checking magic schools description in skills menu.\n\n - Each rank in Magic schools will increase spell damage and healing by 0.5% and Physical damage by 1\n - Each point in Air will reduce damage by 1% (multiplicative)\n - Each point in Water will reduce damage by Skill^1.33 (increased depending on difficulty)\n\nMelee damage calculation:\n - Each point in spirit will increase melee damage by 1%\n - Each point in any schools will increase damage by 1\n - Each point in Fire will deal around 0.025% of total monster HP as fire damage\n\nRecovery on Melee attack:\n - Each point in Earth will heal by 1% of damage\n - Each point in Body will heal by skill^1.33\n - Each point in mind will restore 1 mana"
 end
 
 shamanClass={59, 60, 61}
@@ -786,7 +786,7 @@ end
 local baseSchoolsTxt={}
 function events.GameInitialized2()
 	for i=12,18 do
-		baseSchoolsTxt[i]=Skillz.getDesc(i,1)
+		baseSchoolsTxt[i]=Game.SkillDescriptions[i]
 	end
 end
 
@@ -1086,7 +1086,7 @@ end
 --tooltips
 local baseSchoolsTxtDK={}
 function events.GameInitialized2()
-	baseSchoolsTxtDK={[14]=Skillz.getDesc(14,1), [18]=Skillz.getDesc(18,1), [20]=Skillz.getDesc(20,1)}
+	baseSchoolsTxtDK={[14]=Game.SkillDescriptions[14], [18]=Game.SkillDescriptions[18], [20]=Game.SkillDescriptions[20]}
 	spellDesc={}
 	for key, value in pairs(DKSpellList) do
 		for i=1,#DKSpellList[key] do
@@ -1186,6 +1186,9 @@ local function dkSkills(isDK, id)
 				Game.SpellsTxt[key][key2]=value2
 			end
 		end
+		Game.SkillNames[14]="Water"
+		Game.SkillNames[18]="Body"
+		Game.SkillNames[20]="Dark"
 	end
 end
 
@@ -1193,14 +1196,16 @@ end
 function checkSkills(id)
 	shamanSkills(false, id)
 	dkSkills(false, id)
-	local class=Party[id].Class
-	if table.find(shamanClass, class) then
-		shamanSkills(true, id)
-		return
-	end
-	if table.find(dkClass, Party[id].Class) then
-		dkSkills(true, id)
-		return
+	if id>=0 and id<=Party.High then
+		local class=Party[id].Class
+		if table.find(shamanClass, class) then
+			shamanSkills(true, id)
+			return
+		end
+		if table.find(dkClass, class) then
+			dkSkills(true, id)
+			return
+		end
 	end
 end
 --add tooltips
@@ -1210,6 +1215,43 @@ function events.Action(t)
 		function events.Tick() 
 			events.Remove("Tick", 1)
 			checkSkills(id)
+		end
+	end
+end
+
+function events.Action(t)
+	if t.Action==114 then
+		local class=Party[Game.CurrentPlayer].Class
+		if table.find(dkClass, class) then
+			dkSkills(true, Game.CurrentPlayer)
+		else
+			dkSkills(false)
+		end
+	end
+	if t.Action==110 then
+		local class=Party[t.Param-1].Class
+		if table.find(dkClass, class) then
+			dkSkills(true, t.Param-1)
+		else
+			dkSkills(false)
+		end
+	elseif t.Action==176 then
+		local current=Game.CurrentPlayer
+		local maxParty=Game.Party.High
+		for i=1,Party.Count do
+			newSelected=current+i+1
+			while newSelected>maxParty do
+				newSelected=newSelected-Party.Count
+			end
+			local pl=Party[newSelected]
+			if pl.Dead==0 and pl.Stoned==0 and pl.Paralyzed==0 and pl.Eradicated==0 and pl.Asleep==0 and pl.Unconscious==0 then
+				local class=pl.Class
+				if table.find(dkClass, class) then
+					dkSkills(true, newSelected)
+				else
+					dkSkills(false, newSelected)
+				end
+			end
 		end
 	end
 end
