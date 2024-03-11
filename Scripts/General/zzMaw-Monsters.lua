@@ -519,7 +519,7 @@ function events.PickCorpse(t)
 	if gold>0 and newGold>gold then
 		goldMult=(bolsterLevel2+lvl)^1.5/(lvl)^1.5
 		mon.TreasureDiceCount=math.min(newGold^0.5,255)
-		mon.TreasureDiceSides=math.min(newGold^0.5*2,255)
+		mon.TreasureDiceSides=math.min(newGold^0.5,255)
 	end
 	--calculate loot chances
 	if Game.freeProgression then
