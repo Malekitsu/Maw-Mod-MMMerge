@@ -1886,7 +1886,7 @@ function events.LoadMap(wasInGame)
 				mapvars.monsterX[i]=mapvars.monsterX[i] or mon.X
 				mapvars.monsterY[i]=mapvars.monsterY[i] or mon.Y
 				mapvars.monsterZ[i]=mapvars.monsterZ[i] or mon.Z
-				if mapvars.monsterZ[i]-mon.Z>7000 or mapvars.monsterZ[i]-mon.Z<7000 then
+				if mapvars.monsterZ[i]-mon.Z>7000 or mapvars.monsterZ[i]-mon.Z<-7000 then
 					mon.X, mon.Y, mon.Z= mapvars.monsterX[i], mapvars.monsterY[i], mapvars.monsterZ[i]
 				end
 			end
