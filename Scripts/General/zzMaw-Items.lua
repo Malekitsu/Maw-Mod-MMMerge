@@ -304,10 +304,7 @@ function events.ItemGenerated(t)
 			ancientChance=ancientChance*10
 			bossLoot=false
 		end
-		--INCREASE ANCIENT AND PRIMORDIAL CHANCE IN SHOPS BASED ON MONEY
-		if Game.HouseScreen==2 or Game.HouseScreen==95 then
-			ancientChance=ancientChance*math.min(1+(Party.Gold+Party.BankGold)/1000000,5)
-		end
+	
 		ancientRoll=math.random()
 		if ancientRoll<=ancientChance then
 			ancient=true
@@ -343,9 +340,14 @@ function events.ItemGenerated(t)
 		
 		::continue::
 		
+		
 		--primordial item
 		primordial=math.random()
 		primordialChance=ancientChance/4
+		--No primordials in shop
+		if Game.HouseScreen==2 or Game.HouseScreen==95 then
+			primordialChance=0
+		end
 		if primordial<=primordialChance then
 			if ancient then
 				t.Item.MaxCharges=t.Item.MaxCharges-chargesBonus
@@ -1043,6 +1045,9 @@ function events.CalcItemValue(t)
 			end
 		end
 		t.Value=basePrice+bonus1+bonus2
+		if Game.HouseScreen==3 or Game.HouseScreen==94 then
+			t.Value=t.Value*0.4
+		end
 		if Game.HouseScreen==2 or Game.HouseScreen==95 then
 			count=0
 			if t.Item.Bonus>0 then
@@ -2852,7 +2857,7 @@ function refreshItems()
 	strength=math.floor(currentLevel/18)+2
 	strength=math.min(strength,5)
 	partyLevel1=math.min(math.floor(partyLevel/18),cap2)
-	cost=(partyLevel1+strength)^2*150
+	cost=(partyLevel1+strength)^2*250
 	if cost>Party.Gold then
 		return
 	else
