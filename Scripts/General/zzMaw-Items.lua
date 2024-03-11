@@ -31,7 +31,7 @@ end
 
 function events.PickCorpse(t)
 	--if Game.BolsterAmount~=300 then return end
-		Game.RandSeed=mapvars.MonsterSeed[t.MonsterIndex]
+	Game.RandSeed=mapvars.MonsterSeed[t.MonsterIndex]
 	function events.Tick() 
 		events.Remove("Tick", 1)
 		mapvars.MonsterSeed[t.MonsterIndex]=Game.RandSeed
@@ -137,7 +137,7 @@ primordialWeapEnchants={41,46}
 primordialArmorEnchants={1,2,80}
 
 function events.ItemGenerated(t)
-	if vars and Game.BolsterAmount==300 then
+	if vars then
 		if vars.SeedList==nil then
 			vars.SeedList={}
 			for i=0,2500 do
@@ -223,12 +223,17 @@ function events.ItemGenerated(t)
 		--difficulty settings
 		difficultyExtraPower=1
 		if Game.BolsterAmount==150 then
-			difficultyExtraPower=1.1
+			difficultyExtraPower=1.025
 		elseif Game.BolsterAmount==200 then
-			difficultyExtraPower=1.2
+			difficultyExtraPower=1.05
 		elseif Game.BolsterAmount==300 then
-			difficultyExtraPower=1.4
+			difficultyExtraPower=1.1
 		end
+		local flatBonus=(difficultyExtraPower-1)*50
+		if math.random<flatBonus%1 then
+			flatBonus=flatBonus+1
+		end
+		
 		if (Game.HouseScreen==2 or Game.HouseScreen==95) and Game.freeProgression then --nerf shops if no exp in current world
 			partyLevel=math.round(partyLevel*(math.min(partyLevel/160 + currentLevel/80,1)))
 		end
@@ -240,7 +245,7 @@ function events.ItemGenerated(t)
 		--bolster boost
 		t.Item.MaxCharges=math.max(t.Item.MaxCharges+bonusCharges+t.Item.MaxCharges*(difficultyExtraPower-1), t.Item.MaxCharges*difficultyExtraPower) 
 		
-		cap2=14+ math.floor((difficultyExtraPower-1)*5)
+		cap2=14+ math.floor((difficultyExtraPower-1)*10)
 		partyLevel1=math.min(math.floor(partyLevel/18),cap2)
 		--adjust loot Strength
 		ps1=t.Strength
@@ -256,19 +261,30 @@ function events.ItemGenerated(t)
 			return 
 		end
 		pseudoStr=math.min(pseudoStr,20) --CAP CURRENTLY AT 20
-		roll1=math.random(1,100)
-		roll2=math.random(1,100)
-		rollSpc=math.random(1,100)
+		roll1=math.random()
+		roll2=math.random()
+		rollSpc=math.random()
 		power=0
 		if bossLoot then
-			roll1=roll1/2.5
-			roll2=roll1/2.5
-			rollSpc=roll1/2.5
+			roll1=roll1/2
+			roll2=roll1/2
+			rollSpc=roll1/2
 		end
-		--apply enchant1
-		if enc1Chance[pseudoStr]>roll1 then
+		--difficulty multiplier 
+		diffMult=Game.BolsterAmount/100
+		--calculate chances
+		local p1=enc1Chance[pseudoStr]/100
+		local p2=enc2Chance[pseudoStr]/100
+		local p3=spcEncChance[pseudoStr]/100
+		p1=math.min(p1+(1-p1)*(diffMult-1)/10, p1*diffMult)
+		p2=math.min(p2+(1-p2)*(diffMult-1)/10, p2*diffMult)
+		p3=math.min(p3+(1-p3)*(diffMult-1)/10, p3*diffMult)
+		
+		if p1>roll1 then
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])*difficultyExtraPower
+			t.Item.BonusStrength=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
+			--bolster
+			t.Item.BonusStrength=math.max(t.Item.BonusStrength*difficultyExtraPower, t.Item.BonusStrength+flatBonus)
 			if math.random(1,10)==10 then
 				t.Item.Bonus=math.random(17,24)
 				local skill=t.Item:T().Skill
@@ -280,9 +296,12 @@ function events.ItemGenerated(t)
 			end
 		end
 		--apply enchant2
-		if enc2Chance[pseudoStr]>roll2 then
-			t.Item.Charges=math.random(1,16)*1000
-			t.Item.Charges=t.Item.Charges+math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])*difficultyExtraPower
+		if p2>roll2 then
+			t.Item.Charges=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
+			--bolster
+			t.Item.Charges=math.max(t.Item.Charges*difficultyExtraPower, t.Item.Charges+flatBonus)
+			--bonus type
+			t.Item.Charges=t.Item.Charges+math.random(1,16)*1000
 			--[[ no skill bonuses
 			if math.random(1,10)==10 then
 				t.Item.Charges=math.random(17,24)*1000
@@ -299,7 +318,7 @@ function events.ItemGenerated(t)
 				
 		--ancient item
 		ancient=false
-		ancientChance=(enc1Chance[pseudoStr]/100)*(enc2Chance[pseudoStr]/100)*(spcEncChance[pseudoStr]/100)/4
+		ancientChance=(p1*p2*p3)/4
 		if bossLoot then
 			ancientChance=ancientChance*10
 			bossLoot=false
@@ -308,9 +327,12 @@ function events.ItemGenerated(t)
 		ancientRoll=math.random()
 		if ancientRoll<=ancientChance then
 			ancient=true
-			t.Item.Charges=math.random(math.round(encStrUp[pseudoStr]+1),math.round(encStrUp[pseudoStr]*1.25))*difficultyExtraPower+math.random(1,16)*1000
+			t.Item.Charges=math.random(math.round(encStrUp[pseudoStr]+1),math.round(encStrUp[pseudoStr]*1.25))
+			t.Item.Charges=math.max(t.Item.Charges*difficultyExtraPower, t.Item.Charges+flatBonus) --bolster
+			t.Item.Charges=t.Item.Charges+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.random(math.round(encStrUp[pseudoStr]+1),math.round(encStrUp[pseudoStr]*1.25))*difficultyExtraPower
+			t.Item.BonusStrength=math.random(math.round(encStrUp[pseudoStr]+1),math.round(encStrUp[pseudoStr]*1.25))
+			t.Item.BonusStrength=math.max(t.Item.BonusStrength*difficultyExtraPower, t.Item.BonusStrength+flatBonus) --bolster
 			power=2
 			chargesBonus=math.random(1,5)
 			t.Item.MaxCharges=t.Item.MaxCharges+chargesBonus
@@ -318,7 +340,7 @@ function events.ItemGenerated(t)
 			t.Item.BonusExpireTime=1
 		end
 		--apply special enchant
-		if spcEncChance[pseudoStr]>rollSpc or ancient then
+		if p3>rollSpc or ancient then
 			n=t.Item.Number
 			c=Game.ItemsTxt[n].EquipStat
 			if c<12 then
@@ -353,9 +375,11 @@ function events.ItemGenerated(t)
 				t.Item.MaxCharges=t.Item.MaxCharges-chargesBonus
 			end
 			t.Item.BonusExpireTime=2
-			t.Item.Charges=math.ceil(encStrUp[pseudoStr]*1.25)*difficultyExtraPower+math.random(1,16)*1000
+			t.Item.Charges=math.ceil(encStrUp[pseudoStr]*1.25)+math.random(1,16)*1000
+			t.Item.Charges=math.max(t.Item.Charges*difficultyExtraPower, t.Item.Charges+flatBonus) --bolster
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.ceil(encStrUp[pseudoStr]*1.25)*difficultyExtraPower
+			t.Item.BonusStrength=math.ceil(encStrUp[pseudoStr]*1.25)
+			t.Item.BonusStrength=math.max(t.Item.BonusStrength*difficultyExtraPower, t.Item.BonusStrength+flatBonus) --bolster
 			t.Item.MaxCharges=math.max(t.Item.MaxCharges*0.25+5, t.Item.MaxCharges*1.25)
 			--apply special enchant
 			n=t.Item.Number
@@ -2845,13 +2869,13 @@ function refreshItems()
 	--cap
 	difficultyExtraPower=1
 	if Game.BolsterAmount==150 then
-		difficultyExtraPower=1.1
+		difficultyExtraPower=1.025
 	elseif Game.BolsterAmount==200 then
-		difficultyExtraPower=1.2
+		difficultyExtraPower=1.05
 	elseif Game.BolsterAmount==300 then
-		difficultyExtraPower=1.4
+		difficultyExtraPower=1.1
 	end
-	cap2=14+ math.floor((difficultyExtraPower-1)*5)
+	cap2=14+ math.floor((difficultyExtraPower-1)*10)
 
 	--calculate power
 	strength=math.floor(currentLevel/18)+2
