@@ -1388,7 +1388,7 @@ function events.GetMerchantTotalSkill(t)
 end
 --half price for sold items
 function events.GetMerchantTotalSkill(t)
-	if Game.HouseScreen==94 then
+	if Game.HouseScreen==94 or Game.HouseScreen==3 then
 		t.Result=math.min(t.Result,25)
 	end
 end
