@@ -873,6 +873,9 @@ function events.GameInitialized2()
 				local s1, m1=SplitSkill(t.Player.Skills[const.Skills.Water])
 				--local s2, m2=SplitSkill(t.Player.Skills[const.Skills.Body])
 				local s3, m3=SplitSkill(t.Player.Skills[const.Skills.Dark])
+				local might=t.Player:GetMight()
+				local bonus=s1*math.min(m1, 3)+s3*math.min(m3, 3)
+				bonus=bonus*(1+might/1000)
 				t.Result=t.Result+s1*math.min(m1, 3)+s3*math.min(m3, 3)
 			end
 		elseif t.Stat==const.Stats.SpellPoints and table.find(dkClass, t.Player.Class) then
@@ -928,13 +931,6 @@ function events.GameInitialized2()
 			--life leech
 			if t.DamageKind==4 and table.find(dkClass, data.Player.Class) then
 				local pl=data.Player
-				if t.DamageKind==4 then
-					local regen=spRegen[pl.Class]
-					if t.Result>t.Monster.HP then
-						regen=regen*1.5
-					end
-					pl.SP=math.min(pl:GetFullSP(), pl.SP+regen)
-				end
 				local bloodS, bloodM=SplitSkill(pl.Skills[const.Skills.Body])
 				local heal=t.Result*(bloodS^0.6*2)/100
 				--current active leech spell
@@ -959,6 +955,14 @@ function events.GameInitialized2()
 					if m==4 then
 						t.Monster.SpellBuffs[const.MonsterBuff.MeleeOnly].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.MeleeOnly].ExpireTime, Game.Time+const.Minute)
 					end
+				end
+				--restore SP
+				if t.DamageKind==4 then
+					local regen=spRegen[pl.Class]
+					if t.Result>t.Monster.HP then
+						regen=regen*1.5
+					end
+					pl.SP=math.min(pl:GetFullSP(), pl.SP+regen)
 				end
 			end
 			
