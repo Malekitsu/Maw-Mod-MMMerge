@@ -1895,6 +1895,12 @@ function events.LoadMap(wasInGame)
 
 	Timer(checkOutOfBound, const.Minute) 
 end
+function events.LeaveMap()
+	mapvars.monsterX=nil
+	mapvars.monsterY=nil
+	mapvars.monsterZ=nil
+end
+
 
 --regenerating skill
 function eliteRegen()
