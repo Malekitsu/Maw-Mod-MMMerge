@@ -526,10 +526,10 @@ function events.PickCorpse(t)
 		if bolsterLevel2>50 or mon.TreasureItemPercent>70 then
 			mon.TreasureItemPercent= math.round(mon.TreasureItemPercent^0.85 + (50 - mon.TreasureItemPercent^0.85 / 2) * bolsterLevel2 / 250)
 			mon.TreasureItemLevel=math.max(t.Monster.TreasureItemLevel,1)
-			if math.random()<0.7 then
-				mon.TreasureItemType=0
-			end
 		end
+	end
+	if mon.Item==0 and math.random()<0.7 then
+		mon.TreasureItemType=0
 	end
 end
 -----------------------------
@@ -1404,7 +1404,7 @@ function events.BuildMonsterInformationBox(t)
 	--mon = t.Monster
 	mon=Map.Monsters[Mouse:GetTarget().Index]
 	--show level Below HP
-	if mon.Id2>0 then
+	if mon.NameId==0 then
 		t.ArmorClass.Text=string.format("Level:          " .. math.round(totalLevel[mon.Id]) .. "\n" .. t.ArmorClass.Text)
 	else 
 		t.ArmorClass.Text=string.format("Level:          " .. mon.Level .. "\n" .. t.ArmorClass.Text)
@@ -1609,7 +1609,7 @@ function events.MonsterKilled(mon)
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 			if currentWorld==1 then
-			mapLevel=vars.MM6LVL+vars.MM7LVL
+				mapLevel=vars.MM6LVL+vars.MM7LVL
 			elseif currentWorld==2 then
 				mapLevel=vars.MM8LVL+vars.MM6LVL
 			elseif currentWorld==3 then
