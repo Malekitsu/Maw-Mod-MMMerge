@@ -483,7 +483,7 @@ function events.MonsterKilled(mon)
 		s,m = SplitSkill(Party[i].Skills[const.Skills.Alchemy])
 		if m>=3 then
 			dropPossible=true
-			chance=(m-2)/40
+			chance=(m-2)/100
 		end
 	end
 	if dropPossible and math.random()<chance then
@@ -500,7 +500,7 @@ function events.MonsterKilled(mon)
 		end
 		--determine level
 		local lvl=basetable[mon.Id].Level
-		tier=math.round(math.min(math.max((lvl/20)*(math.random()/2+0.75),1),5))
+		tier=math.round(math.min(math.max((lvl/20)*(math.random()/2+1.75),1),5))
 		roll=math.random(1,#reagentDropTable[tier])
 		reagent=reagentDropTable[tier][roll]	
 		obj = SummonItem(reagent, mon.X, mon.Y, mon.Z + 100, 100)
@@ -517,7 +517,7 @@ reagentDropTable[3]={202,207,212,217,1004,1009,1014,1019}
 reagentDropTable[4]={203,208,213,218,1005,1010,1015,1020}
 reagentDropTable[5]={204,209,214,219,1006,1011,1016,1021}
 function events.GameInitialized2()
-	Game.SkillDescriptions[const.Skills.Alchemy]=Game.SkillDescriptions[const.Skills.Alchemy] .. "\n\nMaster will grant a small chance (2.5%) to drop random reagents from Monsters.\nAt GM this chance is doubled."
+	Game.SkillDescriptions[const.Skills.Alchemy]=Game.SkillDescriptions[const.Skills.Alchemy] .. "\n\nMaster will grant 1% to drop random reagents from Monsters.\nAt GM this chance is doubled."
 	Game.SkillDesMaster[const.Skills.Alchemy]="Allows to make white potions. Power when mixing will be increased to 1.5 per skill point."
 	Game.SkillDesMaster[const.Skills.Alchemy]="Allows to make white potions. Power when mixing will be increased to 1.5 per skill point."
 	Game.SkillDesGM[const.Skills.Alchemy]="Allows to make black potions. Power when mixing will be increased to 2 per skill point."
