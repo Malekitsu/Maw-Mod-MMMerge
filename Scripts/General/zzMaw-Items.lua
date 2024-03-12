@@ -230,7 +230,7 @@ function events.ItemGenerated(t)
 			difficultyExtraPower=1.1
 		end
 		local flatBonus=(difficultyExtraPower-1)*50
-		if math.random<flatBonus%1 then
+		if math.random()<flatBonus%1 then
 			flatBonus=flatBonus+1
 		end
 		
