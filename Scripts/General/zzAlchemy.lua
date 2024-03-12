@@ -525,16 +525,16 @@ end
 function events.BuildItemInformationBox(t)
 	if t.Item.Number>=1051 and t.Item.Number<=1060 then
 		if t.Description then
-			local mult=math.max((Game.BolsterAmount-100)/250+1,1)
+			local mult=math.max((Game.BolsterAmount-100)/1000+1,1)
 			local tier=(t.Item.Number-1050)*mult
-			local power = math.round((tier * 10) ^ 0.5 / 2, 0)
-			local twoHanded = tier * 10 * 2 .. " - " .. power * 2
-			local bodyArmor = math.floor(tier * 1.5 * 10) .. " - " .. math.floor(power * 1.5)
-			local helmEtc = math.floor(tier * 1.25 * 10) .. " - " .. math.floor(power * 1.25)
-			local rings = math.floor(tier * 0.75 * 10) .. " - " .. math.floor(power * 0.75)
+			local power = math.round((tier * 10) ^ 0.5 / 2)
+			local twoHanded = tier * 10 * 2
+			local bodyArmor = math.round(tier * 1.5 * 10)
+			local helmEtc = math.round(tier * 1.25 * 10)
+			local rings = math.round(tier * 0.75 * 10)
 
 			t.Description = "A special Gem that allows to increase an item Enchant Strength (right-click on an item with a base enchant to use)\n\nMax Power: " 
-			.. StrColor(255, 128, 0, tostring(tier * 10)) 
+			.. StrColor(255, 128, 0, tostring(tier * 10)) .. " (halved on AC)"
 			.. "\nBonus: " .. StrColor(255, 128, 0, tostring(power)) 
 			.. "\n\nItem Modifier:\nTwo Handed Weapons: " .. StrColor(255, 128, 0, twoHanded)
 			.. "\nBody Armor: " .. StrColor(255, 128, 0, bodyArmor)
@@ -549,16 +549,18 @@ for i=1,10 do
 		if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then			
 			if craftWaitTime>0 then return end
 			--pick which enchant to pick that is below the item power
-			local bolsterMult=math.max((Game.BolsterAmount-100)/250+1,1)
+			local bolsterMult=math.max((Game.BolsterAmount-100)/1000+1,1)
 			tier=(Mouse.Item.Number-1050)*bolsterMult
+			upgradeAmount=math.round((tier*10)^0.5/2)
 			mult=slotMult[t:T().EquipStat]
-			maxStrength=math.floor(tier*10*mult)
-			upgradeAmount=math.round(maxStrength^0.5/2)
-			if t.BonusStrength>=maxStrength and t.Charges%1000>=maxStrength then 
+			maxStrength1=math.round(tier*10*mult)
+			maxStrength2=maxStrength1
+			if t.BonusStrength>=maxStrength1 and t.Charges%1000>=maxStrength1 then 
 				Game.ShowStatusText("Gem power is not enough")
 				return
 			end
-			baseEnchantValue=t.BonusStrength
+			enc1=t.BonusStrength
+			enc2=t.Charges%1000
 			--check for special enchant
 			if t.Bonus>=17 then
 				skillMaxStrength=math.floor(math.max((tier*10)^0.5*mult, math.round(tier*mult)))
@@ -571,13 +573,22 @@ for i=1,10 do
 					evt.PlaySound(12070)
 					return
 				else
-					baseEnchantValue=math.huge
+					enc1=math.huge
 				end
 			end
-			if baseEnchantValue<=t.Charges%1000 or (t.Charges<=1000 and baseEnchantValue<maxStrength) then
-				t.BonusStrength=math.min(t.BonusStrength+upgradeAmount,maxStrength)
-			elseif t.Charges%1000<maxStrength and t.Charges>1000 then
-				newBonus=math.min(t.Charges%1000+upgradeAmount,maxStrength)
+			if t.Bonus==10 then
+				enc1=enc1*2
+				maxStrength1=math.ceil(maxStrength1/2)
+			end
+			if math.floor(t.Charges/1000)==10 then
+				enc2=enc2*2
+				maxStrength2=math.ceil(maxStrength2/2)
+			end
+			
+			if (enc1<=enc2 and enc1<maxStrength1) or (t.Charges<=1000 and t.BonusStrength<maxStrength1) then
+				t.BonusStrength=math.min(t.BonusStrength+upgradeAmount,maxStrength1)
+			elseif t.Charges%1000<maxStrength2 and t.Charges>1000 then
+				newBonus=math.min(t.Charges%1000+upgradeAmount,maxStrength2)
 				t.Charges=t.Charges-t.Charges%1000+newBonus
 			else
 				Game.ShowStatusText("Gem power is not enough")
