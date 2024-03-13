@@ -1314,6 +1314,8 @@ data=WhoHitMonster()
 					end
 					damage=damage*mult
 				end
+				local attackSpeedMult=getBaseAttackSpeed(it)
+				damage=math.round(damage*attackSpeedMult)
 				t.Result = t.Result+damage
 			end
 		end
