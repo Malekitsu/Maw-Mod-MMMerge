@@ -375,8 +375,9 @@ function events.ItemGenerated(t)
 				t.Item.MaxCharges=t.Item.MaxCharges-chargesBonus
 			end
 			t.Item.BonusExpireTime=2
-			t.Item.Charges=math.ceil(encStrUp[pseudoStr]*1.25)+math.random(1,16)*1000
+			t.Item.Charges=math.ceil(encStrUp[pseudoStr]*1.25)
 			t.Item.Charges=math.max(t.Item.Charges*difficultyExtraPower, t.Item.Charges+flatBonus) --bolster
+			t.Item.Charges=t.Item.Charges+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
 			t.Item.BonusStrength=math.ceil(encStrUp[pseudoStr]*1.25)
 			t.Item.BonusStrength=math.max(t.Item.BonusStrength*difficultyExtraPower, t.Item.BonusStrength+flatBonus) --bolster
