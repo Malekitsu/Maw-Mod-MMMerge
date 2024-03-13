@@ -563,8 +563,8 @@ for i=1,10 do
 			enc2=t.Charges%1000
 			--check for special enchant
 			if t.Bonus>=17 then
-				skillMaxStrength=math.floor(math.max((tier*10)^0.5*mult, math.round(tier*mult)))
-				if t.BonusStrength<skillMaxStrength then
+				maxStrength1=math.floor(math.max((tier*10)^0.5*mult, math.round(tier*mult)))
+				if t.BonusStrength<maxStrength1 then
 					t.BonusStrength=t.BonusStrength+1
 					Mouse.Item.Number=0
 					enchanted=true
