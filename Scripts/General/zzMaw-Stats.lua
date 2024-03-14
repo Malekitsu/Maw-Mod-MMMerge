@@ -65,6 +65,10 @@ function events.PlayerCastSpell(t)
 	local spell=t.SpellId
 	local m=t.Mastery
 	local haste=math.floor(t.Player:GetSpeed()/10)
+	local it=t.Player:GetActiveItem(1)
+	if it and it.Bonus2==40 then
+		haste=haste+20
+	end
 	Game.Spells[spell]["Delay" .. masteryName[m]]=oldTable[spell][m]/(1+haste/100)
 end
 
@@ -188,14 +192,18 @@ function events.BuildStatInformationBox(t)
 		end
 		--spell haste
 		speed=Party[i]:GetSpeed()
-		speedEffect=math.floor(speed/10)
+		spellSpeedEffect=math.floor(speed/10)
+		local it=Party[i]:GetActiveItem(1)
+		if it and it.Bonus2==40 then
+			spellSpeedEffect=spellSpeedEffect+20
+		end
 		--melee haste
 		delay=math.max(Party[i]:GetAttackDelay())
 		meleeHaste=bonusSpeed
 		--bow haste
 		delay=Party[i]:GetAttackDelay(true)
 		bowHaste=bonusSpeed
-		t.Text=string.format("%s\n\nMelee Haste:   %s%%\nRanged Haste: %s%%\nSpell Haste:   %s%%",t.Text,meleeHaste,bowHaste,speedEffect)
+		t.Text=string.format("%s\n\nMelee Haste:   %s%%\nRanged Haste: %s%%\nSpell Haste:   %s%%",t.Text,meleeHaste,bowHaste,spellSpeedEffect)
 	end
 	if t.Stat==6 then
 		i=Game.CurrentPlayer
