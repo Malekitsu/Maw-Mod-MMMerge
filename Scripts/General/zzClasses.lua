@@ -1056,9 +1056,9 @@ function events.GameInitialized2()
 			local spell=t.SpellId
 			local m=t.Mastery
 			Game.Spells[spell]["Delay" .. masteryName[m]]=t.Player:GetAttackDelay()
-		end
-		if t.SpellId==68 or t.SpellId==74 then
-			t.Handled=true
+			if t.SpellId==68 or t.SpellId==74 then
+				t.Handled=true
+			end
 		end
 	end
 end
@@ -1230,9 +1230,9 @@ function checkSkills(id)
 end
 --add tooltips
 function events.Action(t)
-	local id=Game.CurrentPlayer
-	if id>=0 and id<=Party.High then
-		function events.Tick() 
+	function events.Tick() 
+		local id=Game.CurrentPlayer
+		if id>=0 and id<=Party.High then
 			events.Remove("Tick", 1)
 			checkSkills(id)
 		end
