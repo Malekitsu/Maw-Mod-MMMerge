@@ -1329,6 +1329,7 @@ function events.BuildItemInformationBox(t)
 		pattern = "(%d+)"
 		text=t.Description
 		t.Description = text:gsub(pattern, replaceNumber)
+		t.Description = t.Description .. "\n\nScale with player level, starting at level 40 up to level 250."
 	end
 end
 
@@ -3014,7 +3015,7 @@ end
 --maw artifact scaling calculation
 function artifactPowerMult(level)
 	local bol=Game.BolsterAmount
-	bol=(bol/100-1)/5+1
+	bol=(bol/100-1)/20+1
 	local mult=math.max(math.min(level/80*bol,3*bol),0.5)
 	return mult
 end
