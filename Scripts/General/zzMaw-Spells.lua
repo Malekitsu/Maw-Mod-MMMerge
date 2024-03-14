@@ -239,6 +239,7 @@ function events.PlayerCastSpell(t)
 	
 	--lesser heal
 	if t.SpellId == 68 then
+		if table.find(dkClass, t.Player.Class) then return end
 		if not t.RemoteData then
 			local sp=healingSpells[68]
 			local persBonus=t.Player:GetPersonality()/1000
@@ -321,6 +322,7 @@ function events.PlayerCastSpell(t)
 	
 	--cure disease, reworked to greater heal
 	if t.SpellId==74 then
+		if table.find(dkClass, t.Player.Class) then return end
 		if not t.RemoteData then
 			local sp=healingSpells[74]
 			local persBonus=t.Player:GetPersonality()/1000
