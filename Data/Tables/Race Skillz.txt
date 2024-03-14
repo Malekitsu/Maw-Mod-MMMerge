@@ -1,16 +1,16 @@
 	Human(0)	Vampire(1)	DarkElf(2)	Minotaur(3)	Troll(4)	Dragon(5)	Undead(6)	Elf(7)	Goblin(8)	Dwarf(9)	Zombie(10)
-Staff	=	=	=	=	=	=	=	=	=	=	=
-Sword	=	=	=	=	=	=	=	=	=	=	=
-Dagger	=	=	=	=	=	=	=	=	=	=	=
-Axe	=	=	=	Eg	=	=	=	=	=	Eg	=
-Spear	=	=	=	=	=	=	=	=	=	=	=
-Bow	=	=	=	=	=	=	=	=	=	=	=
-Mace	=	=	=	=	=	=	=	=	=	=	=
-Blaster	=	=	=	=	=	=	=	=	=	=	=
-Shield	=	=	=	=	=	=	=	=	=	=	=
-Leather	=	=	=	=	=	=	=	=	=	=	=
-Chain	=	=	=	=	=	=	=	=	=	=	=
-Plate	=	=	=	=	=	=	=	=	=	=	=
+Staff	=	=	=	=	=	0	=	=	=	=	=
+Sword	=	=	=	=	=	0	=	=	=	=	=
+Dagger	=	=	=	0	=	0	=	=	=	=	=
+Axe	=	=	=	Eg	=	0	=	=	=	Eg	=
+Spear	=	=	=	=	=	0	=	=	=	=	=
+Bow	=	=	=	=	=	0	=	=	=	=	=
+Mace	=	=	=	=	=	0	=	=	=	=	=
+Blaster	=	=	=	=	=	0	=	=	=	=	=
+Shield	=	=	=	=	=	0	=	=	=	=	=
+Leather	=	=	=	=	=	0	=	=	=	=	=
+Chain	=	=	=	=	=	0	=	=	=	=	=
+Plate	=	=	=	=	=	0	=	=	=	=	=
 Fire	=	=	=	=	=	=	=	=	=	=	=
 Air	=	=	=	=	=	=	=	=	=	=	=
 Water	=	=	=	=	=	=	=	=	=	=	=
@@ -34,7 +34,7 @@ DisarmTraps	=	=	=	=	=	=	=	=	=	=	=
 Dodging	=	=	=	=	=	Mg	=	=	=	=	=
 Unarmed	=	=	=	=	=	Mg	=	=	=	=	=
 IdentifyMonster	=	=	=	=	=	=	=	=	=	=	=
-Armsmaster	=	=	=	=	=	=	=	=	=	=	=
+Armsmaster	=	=	=	0	=	=	=	=	=	=	=
 Stealing	=	=	=	=	=	=	=	=	=	=	=
 Alchemy	=	=	=	=	=	=	=	=	=	=	=
 Learning	=	=	=	=	=	=	=	=	=	=	=
