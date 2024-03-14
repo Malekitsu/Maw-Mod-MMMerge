@@ -45,7 +45,29 @@ function events.Action(t)
 			end
 		end
 	end
+	--keep the button pushed effect
+	function events.Tick()
+		events.Remove("Tick", 1)
+		if Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
+			local pl=Party[Game.CurrentPlayer]
+			local id=pl:GetIndex()
+			vars.mawbags=vars.mawbags or {}
+			if not vars.mawbags[id] then
+				currentBag=1
+			else
+				currentBag=vars.mawbags[id].CurrentBag
+			end
+			for i=1,5 do
+				if i==currentBag then
+					multibagButton[i].IUpSrc="SlChar" .. i .. "D"
+				else
+					multibagButton[i].IUpSrc="SlChar" .. i .. "U"
+				end
+			end
+		end
+	end	
 end
+
 
 --multiple inventory code
 function changeBag(pl, bag)
@@ -55,6 +77,15 @@ function changeBag(pl, bag)
 		vars.mawbags[id]={}
 		vars.mawbags[id]["CurrentBag"]=1
 	end
+	
+	for i=1,5 do
+		if i==bag then
+			multibagButton[i].IUpSrc="SlChar" .. i .. "D"
+		else
+			multibagButton[i].IUpSrc="SlChar" .. i .. "U"
+		end
+	end
+	
 	--store current bag
 	local itemList={}
 	local removeList={}
