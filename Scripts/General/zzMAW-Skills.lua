@@ -1386,6 +1386,12 @@ function events.GetMerchantTotalSkill(t)
 	end
 	t.Result=7+maxMerchantSkill
 end
+--half price for sold items
+function events.GetMerchantTotalSkill(t)
+	if Game.HouseScreen==94 or Game.HouseScreen==3 then
+		t.Result=math.min(t.Result,25)
+	end
+end
 
 function events.CanIdentifyItem(t)
 	local requiredSkill=t.Item:T().IdRepSt
