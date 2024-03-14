@@ -1047,6 +1047,9 @@ function events.GameInitialized2()
 			local m=t.Mastery
 			Game.Spells[spell]["Delay" .. masteryName[m]]=t.Player:GetAttackDelay()
 		end
+		if t.SpellId==68 or t.SpellId==74 then
+			t.Handled=true
+		end
 	end
 end
 
