@@ -71,14 +71,16 @@ Skillz = {
 }
 
 local thanked = false
-function events.AfterLoadMap()
+function events.BeforeNewGameAutosave()
 	if (not vars.Skillz_Thanked) then 
 		refund = 0
 		for _, pl in Party do
 			refund = refund + Skillz.CleanMastery(pl)
 		end
 		refund = refund * 500
-		Party.AddGold(refund)
+		if refund>0 then
+			Party.AddGold(refund)
+		end
 	end
 
     if (not vars.Skillz_Thanked) and (not thanked) then 
