@@ -434,12 +434,12 @@ end
 
 function events.LoadMap()
 	if not unarmedText then
-		unarmedText=Game.SkillDescriptions[33]
+		unarmedText=Skillz.getDesc(33,1)
 		unarmedTextN=Game.SkillDesNormal[33]
 		unarmedTextE=Game.SkillDesExpert[33]
 		unarmedTextM=Game.SkillDesMaster[33]
 		unarmedTextGM=Game.SkillDesGM[33]
-		dodgeText=Game.SkillDescriptions[32]
+		dodgeText=Skillz.getDesc(32,1)
 		dodgeTextN=Game.SkillDesNormal[32]
 		dodgeTextE=Game.SkillDesExpert[32]
 		dodgeTextM=Game.SkillDesMaster[32]
@@ -492,7 +492,7 @@ function events.Tick()
 		local pl=Party[i]
 		race=Game.CharacterPortraits[pl.Face].Race
 		if race==const.Race.Dragon then
-			Game.SkillNames[33]="Fangs"
+			Skillz.setName(33, "Fangs")
 			local fang, fangM = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
 			--increase damage based on speed
 			local speed=pl:GetSpeed()
@@ -514,7 +514,8 @@ function events.Tick()
 			local baseDamage=dragonFang.Damage[fangM]*fang+might
 			local damage=math.round(baseDamage*(1+speed/100)*(1+mightBase/1000))
 				
-			Game.SkillDescriptions[33]="Dragons can use their fangs to deal atrocious damage to enemies.\n\nWhenever this skill is below dragon skill it will push monsters away\nThis skill converts attack speed directly into damage.\n\nCurrent Damage:  " .. StrColor(255,0,0,damage) .. "\n------------------------------------------------------------\n          Attack| Speed| Dmg"
+			local txt="Dragons can use their fangs to deal atrocious damage to enemies.\n\nWhenever this skill is below dragon skill it will push monsters away\nThis skill converts attack speed directly into damage.\n\nCurrent Damage:  " .. StrColor(255,0,0,damage) .. "\n------------------------------------------------------------\n          Attack| Speed| Dmg"
+			Skillz.setDesc(33,1,txt)
 		end
 	end
  end
@@ -523,7 +524,7 @@ function dragonSkill(dragon, index)
 	if dragon then
 		if index==-1 then return end
 		pl=Party[index]
-		Game.SkillNames[33]="Fangs"
+		Skillz.setName(33, "Fangs")
 		local fang, fangM = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
 		--increase damage based on speed
 		local speed=pl:GetSpeed()
@@ -545,13 +546,15 @@ function dragonSkill(dragon, index)
 		local baseDamage=dragonFang.Damage[fangM]*fang+might
 		local damage=math.round(baseDamage*(1+speed/100)*(1+mightBase/1000))
 		
-		Game.SkillDescriptions[33]="Dragons can use their fangs to deal atrocious damage to enemies.\n\nWhenever this skill is below dragon skill it will push monsters away\nThis skill converts attack speed directly into damage.\n\nCurrent Damage:  " .. StrColor(255,0,0,damage) .. "\n------------------------------------------------------------\n          Attack| Dmg|"
+		local txt="Dragons can use their fangs to deal atrocious damage to enemies.\n\nWhenever this skill is below dragon skill it will push monsters away\nThis skill converts attack speed directly into damage.\n\nCurrent Damage:  " .. StrColor(255,0,0,damage) .. "\n------------------------------------------------------------\n          Attack| Dmg|"
+		Skillz.setDesc(33,1,txt)
 		Game.SkillDesNormal[33]=fangsNormal
 		Game.SkillDesExpert[33]=fangsExpert
 		Game.SkillDesMaster[33]=fangsMaster
 		Game.SkillDesGM[33]=fangsGM
-		Game.SkillNames[32]="Scales"
-		Game.SkillDescriptions[32]="Dragons scales are hard enough to work as natural armor, allowing to block and reduce incoming damage\n\n------------------------------------------------------------\n          AC| Res"
+		Skillz.setName(32,"Scales")
+		txt="Dragons scales are hard enough to work as natural armor, allowing to block and reduce incoming damage\n\n------------------------------------------------------------\n          AC| Res"
+		Skillz.setDesc(32,1,txt)
 		Game.SkillDesNormal[32]=scalesNormal
 		Game.SkillDesExpert[32]=scalesExpert
 		Game.SkillDesMaster[32]=scalesMaster
@@ -570,14 +573,14 @@ function dragonSkill(dragon, index)
 			
 		end
 	else
-		Game.SkillNames[33]="Unarmed"
-		Game.SkillDescriptions[33]=unarmedText
+		Skillz.setName(33,"Unarmed")
+		Skillz.setDesc(33,1,unarmedText)
 		Game.SkillDesNormal[33]=unarmedTextN
 		Game.SkillDesExpert[33]=unarmedTextE
 		Game.SkillDesMaster[33]=unarmedTextM
 		Game.SkillDesGM[33]=unarmedTextGM
-		Game.SkillNames[32]="Dodging"
-		Game.SkillDescriptions[32]=dodgeText
+		Skillz.setName(32,"Dodging")
+		Skillz.setDesc(32,1,dodgeText)
 		Game.SkillDesNormal[32]=dodgeTextN
 		Game.SkillDesExpert[32]=dodgeTextE
 		Game.SkillDesMaster[32]=dodgeTextM
@@ -786,7 +789,7 @@ end
 local baseSchoolsTxt={}
 function events.GameInitialized2()
 	for i=12,18 do
-		baseSchoolsTxt[i]=Game.SkillDescriptions[i]
+		baseSchoolsTxt[i]=Skillz.getDesc(i,1)
 	end
 end
 
@@ -800,23 +803,30 @@ local function shamanSkills(isShaman, id)
 		local m5=SplitSkill(pl.Skills[const.Skills.Spirit])
 		local m6=SplitSkill(pl.Skills[const.Skills.Mind])
 		local m7=SplitSkill(pl.Skills[const.Skills.Body])
-		
+		local txt
 		local fireDamage=math.round(m1^0.5/0.05)/100
-		Game.SkillDescriptions[12]=baseSchoolsTxt[12] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks deal an extra " .. fireDamage .. "% of monster Hit points as fire damage"
+		txt=baseSchoolsTxt[12] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks deal an extra " .. fireDamage .. "% of monster Hit points as fire damage"
+		Skillz.setDesc(12,1,txt)
 		local airReduction=100-math.round(0.99^m2*10000)/100
-		Game.SkillDescriptions[13]=baseSchoolsTxt[13] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nReduce all damage taken by " .. airReduction .. " %"
+		txt=baseSchoolsTxt[13] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nReduce all damage taken by " .. airReduction .. " %"
+		Skillz.setDesc(13,1,txt)
 		mult=((Game.BolsterAmount/100)-1)/2+1
 		local waterReduction=math.round(m3^1.33*mult)
-		Game.SkillDescriptions[14]=baseSchoolsTxt[14] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)"
+		txt=baseSchoolsTxt[14] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)"
+		Skillz.setDesc(14,1,txt)
 		local leech=math.round(m4^0.6*200)/100
-		Game.SkillDescriptions[15]=baseSchoolsTxt[15] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks heal by " .. leech .. "% of damage done"
-		Game.SkillDescriptions[16]=baseSchoolsTxt[16] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nIncreases melee damage by " .. m5 .. "%"
-		Game.SkillDescriptions[17]=baseSchoolsTxt[17] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks restore " .. m6 .. " Spell Points"
+		txt=baseSchoolsTxt[15] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks heal by " .. leech .. "% of damage done"
+		Skillz.setDesc(15,1,txt)
+		txt=baseSchoolsTxt[16] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nIncreases melee damage by " .. m5 .. "%"
+		Skillz.setDesc(16,1,txt)
+		txt=baseSchoolsTxt[17] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks restore " .. m6 .. " Spell Points"
+		Skillz.setDesc(17,1,txt)
 		local hpRestore=math.round(m7^1.33)
-		Game.SkillDescriptions[18]=baseSchoolsTxt[18] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks restore " .. hpRestore .. " Hit Points"
+		txt=baseSchoolsTxt[18] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks restore " .. hpRestore .. " Hit Points"
+		Skillz.setDesc(18,1,txt)
 	else
 		for i=12,18 do
-			Game.SkillDescriptions[i]=baseSchoolsTxt[i]
+			Skillz.setDesc(i,1,baseSchoolsTxt[i])
 		end
 	end
 end
@@ -1093,7 +1103,7 @@ end
 --tooltips
 local baseSchoolsTxtDK={}
 function events.GameInitialized2()
-	baseSchoolsTxtDK={[14]=Game.SkillDescriptions[14], [18]=Game.SkillDescriptions[18], [20]=Game.SkillDescriptions[20]}
+	baseSchoolsTxtDK={[14]=Skillz.getDesc(14,1), [18]=Skillz.getDesc(18,1), [20]=Skillz.getDesc(20,1)}
 	spellDesc={}
 	for key, value in pairs(DKSpellList) do
 		for i=1,#DKSpellList[key] do
@@ -1176,26 +1186,29 @@ local function dkSkills(isDK, id)
 		
 		--skill names and desc
 		
-		Game.SkillNames[14]="Frost"
-		Game.SkillNames[18]="Blood"
-		Game.SkillNames[20]="Unholy"
-		
-		Game.SkillDescriptions[14]="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and increases attack speed by 1% per skill point."
+		Skillz.setName(14, "Frost")
+		Skillz.setName(18, "Blood")
+		Skillz.setName(20, "Unholy")
+		local txt
+		txt="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and increases attack speed by 1% per skill point.\n"
+		Skillz.setDesc(14,1,txt)
 		leech=math.round(bloodS^0.6*2*100)/100
-		Game.SkillDescriptions[18]="This skill is only available to death knights and reduces physical damage taken by 1% per skill point.\nAdditionally it will make your attacks to leech damage based on damage done.\n\nCurrent leech: " .. leech .. "%"            
-		Game.SkillDescriptions[20]="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and reduces magical damage taken by 1% per skill point."	
+		txt="This skill is only available to death knights and reduces physical damage taken by 1% per skill point.\nAdditionally it will make your attacks to leech damage based on damage done.\n\nCurrent leech: " .. leech .. "%\n"            
+		Skillz.setDesc(18,1,txt)
+		txt="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and reduces magical damage taken by 1% per skill point.\n"	
+		Skillz.setDesc(20,1,txt)
 	else
 		for key, value in pairs(baseSchoolsTxtDK) do
-			Game.SkillDescriptions[key]=value
+			Skillz.setDesc(key,1,value)
 		end
 		for key, value in pairs(spellDesc) do
 			for key2, value2 in pairs(value) do
 				Game.SpellsTxt[key][key2]=value2
 			end
 		end
-		Game.SkillNames[14]="Water"
-		Game.SkillNames[18]="Body"
-		Game.SkillNames[20]="Dark"
+		Skillz.setName(14, "Water")
+		Skillz.setName(18, "Body")
+		Skillz.setName(20, "Dark")
 	end
 end
 

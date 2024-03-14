@@ -5,6 +5,14 @@ chargeKey=69
 healthPotionKey=71
 manaPotionKey=86
 Game.PatchOptions.FixMonstersBlockingShots=true
+
+function events.GameInitialized2()
+	for i=0,11 do
+		Skillz.setDesc(i,1,Skillz.getDesc(i,1) .. "\n")
+	end
+end
+
+
 ---------------------------------
 --HERE IS THE KEYBIND LIST--
 ---------------------------------

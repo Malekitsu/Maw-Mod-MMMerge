@@ -204,7 +204,7 @@ function events.GetAttackDelay(t)
 				if skillRecovery[skill] and skillRecovery[skill][m] then
 					bonusSpeed=bonusSpeed+skillRecovery[skill][m]*s
 				end	
-				if it.Bonus2==41 or it.Bonus2==59 then
+				if it.Bonus2==41 or it.Bonus==59 then
 					bonusSpeed=bonusSpeed+20
 				end
 				
@@ -395,7 +395,7 @@ function events.GameInitialized2()
 			damage=false
 			ac=false
 			res=false
-			baseString=string.format("%s\n------------------------------------------------------------\n         ",	Game.SkillDescriptions[i])
+			baseString=string.format("%s\n------------------------------------------------------------\n",	Skillz.getDesc(i,1))
 			for v=1,4 do
 				if skillAttack[i][v]~=0 then
 					attack=true
@@ -416,83 +416,55 @@ function events.GameInitialized2()
 			
 			--Novice
 			normal=""
-			if attack then
-				baseString=string.format("%s Attack|",baseString)
-				normal=string.format("%s      %s|",normal,skillAttack[i][1])
-			end
-			if recovery then
-				normal=string.format("%s      %s|",normal,skillRecovery[i][1])
-				baseString=string.format("%s Speed|",baseString)
-			end
-			if damage then
-				normal=string.format("%s     %s|",normal,skillDamage[i][1])
-				baseString=string.format("%s Dmg|",baseString)
-			end
-			if ac then
-				normal=string.format("%s  %s|",normal,skillAC[i][1])
-				baseString=string.format("%s AC|",baseString)
-			end
-			if res then
-				normal=string.format("%s    %s",normal,skillResistance[i][1])
-				baseString=string.format("%s Res",baseString)
-			end
-			Game.SkillDesNormal[i]=normal
-			
-			--Expert
 			expert=""
-			if attack then
-				expert=string.format("%s      %s|",expert,skillAttack[i][2])
-			end
-			if recovery then
-				expert=string.format("%s      %s|",expert,skillRecovery[i][2])
-			end
-			if damage then
-				expert=string.format("%s     %s|",expert,skillDamage[i][2])
-			end
-			if ac then
-				expert=string.format("%s  %s|",expert,skillAC[i][2])
-			end
-			if res then
-				expert=string.format("%s    %s",expert,skillResistance[i][2])
-			end
-			Game.SkillDesExpert[i]=expert
-			--Master
 			master=""
-			if attack then
-				master=string.format("%s      %s|",master,skillAttack[i][3])
-			end
-			if recovery then
-				master=string.format("%s      %s|",master,skillRecovery[i][3])
-			end
-			if damage then
-				master=string.format("%s     %s|",master,skillDamage[i][3])
-			end
-			if ac then
-				master=string.format("%s  %s|",master,skillAC[i][3])
-			end
-			if res then
-				master=string.format("%s    %s",master,skillResistance[i][3])
-			end
-			Game.SkillDesMaster[i]=master
-			--GrandMaster
 			gm=""
+			local tab=0
 			if attack then
-				gm=string.format("%s      %s|",gm,skillAttack[i][4])
+				tab=tab+73
+				baseString=string.format("%s\t0" .. tab .. "Attack|",baseString)
+				normal=string.format("%s\t" .. tab+32 .. "%s|",normal,skillAttack[i][1])
+				expert=string.format("%s\t" .. tab+32 .. "%s|",expert,skillAttack[i][2])
+				master=string.format("%s\t" .. tab+32 .. "%s|",master,skillAttack[i][3])
+				gm=string.format("%s\t" .. tab+32 .. "%s|",gm,skillAttack[i][4])
 			end
 			if recovery then
-				gm=string.format("%s      %s|",gm,skillRecovery[i][4])
+				tab=tab+55
+				baseString=string.format("%s\t" .. tab .. "Speed|",baseString)
+				normal=string.format("%s\t" .. tab+33 .. "%s|",normal,skillRecovery[i][1])
+				expert=string.format("%s\t" .. tab+33 .. "%s|",expert,skillRecovery[i][2])
+				master=string.format("%s\t" .. tab+33 .. "%s|",master,skillRecovery[i][3])
+				gm=string.format("%s\t" .. tab+33 .. "%s|",gm,skillRecovery[i][4])
 			end
 			if damage then
-				gm=string.format("%s     %s|",gm,skillDamage[i][4])
+				tab=tab+55
+				baseString=string.format("%s\t" .. tab .. "Dmg|",baseString)
+				normal=string.format("%s\t" .. tab+22 .. "%s|",normal,skillDamage[i][1])
+				expert=string.format("%s\t" .. tab+22 .. "%s|",expert,skillDamage[i][2])
+				master=string.format("%s\t" .. tab+22 .. "%s|",master,skillDamage[i][3])
+				gm=string.format("%s\t" .. tab+22 .. "%s|",gm,skillDamage[i][4])
 			end
 			if ac then
-				gm=string.format("%s  %s|",gm,skillAC[i][4])
+				tab=tab+39
+				baseString=string.format("%s\t" .. tab .. "AC|",baseString)
+				normal=string.format("%s\t" .. tab+9 .. "%s|",normal,skillAC[i][1])
+				expert=string.format("%s\t" .. tab+9 .. "%s|",expert,skillAC[i][2])
+				master=string.format("%s\t" .. tab+9 .. "%s|",master,skillAC[i][3])
+				gm=string.format("%s\t" .. tab+9 .. "%s|",gm,skillAC[i][4])
 			end
 			if res then
-				gm=string.format("%s    %s",gm,skillResistance[i][4])
+				baseString=string.format("%sRes",baseString)
+				normal=string.format("%s\t" .. tab+30 .. "%s",normal,skillResistance[i][1])
+				expert=string.format("%s\t" .. tab+30 .. "%s",expert,skillResistance[i][2])
+				master=string.format("%s\t" .. tab+30 .. "%s",master,skillResistance[i][3])
+				gm=string.format("%s\t" .. tab+30 .. "%s",gm,skillResistance[i][4])
 			end
+			baseString=baseString .. "\t000"
+			Game.SkillDesNormal[i]=normal
+			Game.SkillDesExpert[i]=expert
+			Game.SkillDesMaster[i]=master
 			Game.SkillDesGM[i]=gm
-			Game.SkillDescriptions[i]=string.format("%s",baseString)
+			Skillz.setDesc(i,1,baseString)
 		end
 	end
 	
@@ -503,7 +475,7 @@ function events.GameInitialized2()
 			recoveryPen=false
 			ac=false
 			res=false
-			baseString=string.format("%s\n------------------------------------------------------------\n         ",	Game.SkillDescriptions[i])
+			baseString=string.format("%s\n------------------------------------------------------------\n         ",	Skillz.getDesc(i,1))
 			for v=1,4 do
 				if skillAC[i][v]~=0 then
 					ac=true
@@ -515,44 +487,29 @@ function events.GameInitialized2()
 			
 			--Novice
 			normal=""
-			if ac then
-				normal=string.format("%s  %s|",normal,skillAC[i][1])
-				baseString=string.format("%s AC|",baseString)
-			end
-			if res then
-				normal=string.format("%s    %s",normal,skillResistance[i][1])
-				baseString=string.format("%s Res",baseString)
-			end
-			Game.SkillDesNormal[i]=normal
-			
-			--Expert
 			expert=""
-			if ac then
-				expert=string.format("%s  %s|",expert,skillAC[i][2])
-			end
-			if res then
-				expert=string.format("%s    %s",expert,skillResistance[i][2])
-			end
-			Game.SkillDesExpert[i]=expert
-			--Master
 			master=""
-			if ac then
-				master=string.format("%s  %s|",master,skillAC[i][3])
-			end
-			if res then
-				master=string.format("%s    %s",master,skillResistance[i][3])
-			end
-			Game.SkillDesMaster[i]=master
-			--GrandMaster
 			gm=""
 			if ac then
+				baseString=string.format("%s\t075\t000AC|",baseString)
+				normal=string.format("%s  %s|",normal,skillAC[i][1])
+				expert=string.format("%s  %s|",expert,skillAC[i][2])
+				master=string.format("%s  %s|",master,skillAC[i][3])
 				gm=string.format("%s  %s|",gm,skillAC[i][4])
 			end
 			if res then
+				baseString=string.format("%s Res",baseString)
+				normal=string.format("%s    %s",normal,skillResistance[i][1])
+				expert=string.format("%s    %s",expert,skillResistance[i][2])
+				master=string.format("%s    %s",master,skillResistance[i][3])
 				gm=string.format("%s    %s",gm,skillResistance[i][4])
 			end
+			baseString=baseString
+			Game.SkillDesNormal[i]=normal
+			Game.SkillDesExpert[i]=expert
+			Game.SkillDesMaster[i]=master
 			Game.SkillDesGM[i]=gm
-			Game.SkillDescriptions[i]=string.format("%s",baseString)
+			Skillz.setDesc(i,1,baseString)
 		end
 	end
 	
@@ -1004,8 +961,8 @@ end
 
 --DINAMIC SKILL TOOLTIP
 function events.GameInitialized2()
-	baseRegStr=	Game.SkillDescriptions[30]
-	baseMedStr=	Game.SkillDescriptions[28]
+	baseRegStr=	Skillz.getDesc(30,1)
+	baseMedStr=	Skillz.getDesc(28,1)
 end
 function events.Tick()
 	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
@@ -1018,7 +975,8 @@ function events.Tick()
 		end
 		local hpRegen = math.round(FHP^0.5*s^1.5*((m+1)/25))/10
 		local hpRegen2 = math.round(FHP^0.5*(s+1)^1.5*((m+1)/25))/10
-		Game.SkillDescriptions[30] = string.format("%s\n\nCurrent HP Regeneration: %s\nNext Level Bonus: %s HP Regen",baseRegStr,StrColor(0,255,0,hpRegen),StrColor(0,255,0,"+" .. hpRegen2-hpRegen))
+		local txt = string.format("%s\n\nCurrent HP Regeneration: %s\nNext Level Bonus: %s HP Regen",baseRegStr,StrColor(0,255,0,hpRegen),StrColor(0,255,0,"+" .. hpRegen2-hpRegen))
+		Skillz.setDesc(30,1,txt)
 		--meditation tooltip
 		local FSP=pl:GetFullSP()
 		local s,m = SplitSkill(pl:GetSkill(28))
@@ -1033,7 +991,8 @@ function events.Tick()
 		else
 			spRegen = math.round((spRegen)*100)/100
 		end
-		Game.SkillDescriptions[28] = string.format("%s\n\nCurrent SP Regeneration: %s\nNext Level Bonus: %s SP Regen",baseMedStr,StrColor(30,30,255,spRegen),StrColor(30,30,255,"+" .. spRegen2))
+		txt= string.format("%s\n\nCurrent SP Regeneration: %s\nNext Level Bonus: %s SP Regen",baseMedStr,StrColor(30,30,255,spRegen),StrColor(30,30,255,"+" .. spRegen2))
+		Skillz.setDesc(28,1,txt)
 	end
 end
 
@@ -1089,8 +1048,9 @@ function events.LoadMap()
 end
 
 function events.GameInitialized2()
-	Game.SkillDescriptions[const.Skills.Learning]="Increases spell damage at the expense of higher mana. Each skill level boosts the corresponding tier's spells, up to Tier 11 (e.g., Incinerate, Starburst). Spells can be ascended three times, culminating at skill level 33. This skill affects all magic schools, enabling up to three enhancements per spell (ascended damage amount shown in spell tooltip). \n\nLevel up to unlock the full destructive or healing potential of your magic, balancing higher damage with greater mana expenditure.\n"
-	Game.SkillNames[const.Skills.Learning]="Ascension"
+	local txt="Increases spell damage at the expense of higher mana. Each skill level boosts the corresponding tier's spells, up to Tier 11 (e.g., Incinerate, Starburst). Spells can be ascended three times, culminating at skill level 33. This skill affects all magic schools, enabling up to three enhancements per spell (ascended damage amount shown in spell tooltip). \n\nLevel up to unlock the full destructive or healing potential of your magic, balancing higher damage with greater mana expenditure.\n"
+	Skillz.setDesc(const.Skills.Learning,1,txt)
+	Skillz.setName(const.Skills.Learning, "Ascension")
 	Game.SkillDesNormal[const.Skills.Learning]= "Mana cost reduced by 10%."
 	Game.SkillDesExpert[const.Skills.Learning]= "Mana cost reduced by 20%"
 	Game.SkillDesMaster[const.Skills.Learning]= "Mana cost reduced by 30%"

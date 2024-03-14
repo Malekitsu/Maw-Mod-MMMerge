@@ -146,7 +146,8 @@ end
 
 --body building description
 function events.GameInitialized2()
-	Game.SkillDescriptions[27]=Game.SkillDescriptions[27] .. "\n\nHit Points are also increased by an amount equal to Skill^2 divided by 2"
+	txt=Skillz.getDesc(27,1) .. "\n\nHit Points are also increased by an amount equal to Skill^2 divided by 2"
+	Skillz.setDesc(27,1,txt)
 end
 
 function events.BuildStatInformationBox(t)
@@ -1140,5 +1141,12 @@ function events.Tick()
 	else
 		Game.GlobalTxt[47]="Condition"
 		Game.GlobalTxt[172]="Quick Spell"
+	end
+end
+
+
+function events.GameInitialized2()
+	for i=12,38 do
+		Skillz.setDesc(i,1,Skillz.getDesc(i,1) .. "\n")
 	end
 end

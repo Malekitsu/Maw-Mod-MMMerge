@@ -517,7 +517,7 @@ reagentDropTable[3]={202,207,212,217,1004,1009,1014,1019}
 reagentDropTable[4]={203,208,213,218,1005,1010,1015,1020}
 reagentDropTable[5]={204,209,214,219,1006,1011,1016,1021}
 function events.GameInitialized2()
-	Game.SkillDescriptions[const.Skills.Alchemy]=Game.SkillDescriptions[const.Skills.Alchemy] .. "\n\nMaster will grant 1% to drop random reagents from Monsters.\nAt GM this chance is doubled."
+	Skillz.setDesc(const.Skills.Alchemy,1,Skillz.getDesc(const.Skills.Alchemy,1) .. "\n\nMaster will grant 1% to drop random reagents from Monsters.\nAt GM this chance is doubled.")
 	Game.SkillDesMaster[const.Skills.Alchemy]="Allows to make white potions. Power when mixing will be increased to 1.5 per skill point."
 	Game.SkillDesMaster[const.Skills.Alchemy]="Allows to make white potions. Power when mixing will be increased to 1.5 per skill point."
 	Game.SkillDesGM[const.Skills.Alchemy]="Allows to make black potions. Power when mixing will be increased to 2 per skill point."
