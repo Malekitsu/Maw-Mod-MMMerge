@@ -37,7 +37,7 @@ baseRecovery =
 weaponImpair =
 {
 	[const.Skills.Leather]	= {10, 10, 0, 0,},
-	[const.Skills.Chain]	= {20, 10, 0, 10,},
+	[const.Skills.Chain]	= {20, 10, 0, 0,},
 	[const.Skills.Plate]	= {20, 10, 10, 0,},
 	[const.Skills.Shield]	= {10, 0, 0, 0,},
 }
@@ -1490,3 +1490,4 @@ function events.Tick()
 		vars.removeSoloMastery=false
 	end	
 end
+
