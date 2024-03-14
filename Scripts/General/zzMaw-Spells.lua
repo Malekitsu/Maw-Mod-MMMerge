@@ -1080,8 +1080,15 @@ function events.PlayerCastSpell(t)
 				level[i]=lvl
 			local s,m=SplitSkill(t.Player:GetSkill(cc.School))
 			local newLevel=calcEffectChance(lvl, res, s, cc.ChanceMult)
-			mon.Resistances[cc.DamageKind]=newLevel/4
-			mon.Level=0
+			local hit=(30/(30+newLevel/4))
+			if hit>math.random() then
+				mon.Resistances[cc.DamageKind]=0
+				mon.Level=0
+				Game.ShowStatusText("Hit")
+			else
+				mon.Resistances[cc.DamageKind]=65000
+				Game.ShowStatusText("Miss")
+			end
 		end
 		local reset=1
 		if cc.DamageKind==const.Damage.Dark then
