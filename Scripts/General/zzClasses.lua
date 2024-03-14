@@ -1230,9 +1230,9 @@ function checkSkills(id)
 end
 --add tooltips
 function events.Action(t)
-	local id=Game.CurrentPlayer
-	if id>=0 and id<=Party.High then
-		function events.Tick() 
+	function events.Tick() 
+		local id=Game.CurrentPlayer
+		if id>=0 and id<=Party.High then
 			events.Remove("Tick", 1)
 			checkSkills(id)
 		end
