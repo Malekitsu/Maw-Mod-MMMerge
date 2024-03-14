@@ -425,7 +425,36 @@ function events.ItemGenerated(t)
 			bonus=t.Item.Charges%1000
 			bonus=math.min(bonus*mult,999) --cap is 999
 			t.Item.Charges=math.floor(t.Item.Charges/1000)*1000+bonus
-		end		
+		end
+		--check if int/pers or might/accuracy item to change special enchant
+		local melee=0
+		local caster=0
+		if t.Item.Bonus2==39 or t.Item.Bonus2==40 or t.Item.Bonus2==41 or t.Item.Bonus2==46 then
+			if t.Item.Bonus==1 or t.Item.Bonus==5 then
+				melee=melee+1
+			elseif t.Item.Bonus==2 or t.Item.Bonus==3 then
+				caster=caster+1
+			end
+			local bonus=math.floor(t.Item.Charges/1000)
+			if bonus==1 or bonus==5 then
+				melee=melee+1
+			elseif bonus==2 or bonus==3 then
+				caster=caster+1
+			end
+			if melee>caster then
+				if t.Item.Bonus2==39 then
+					t.Item.Bonus2=46
+				elseif t.Item.Bonus2==40 then
+					t.Item.Bonus2=41
+				end
+			elseif caster>melee
+				if t.Item.Bonus2==46 then
+					t.Item.Bonus2=39
+				elseif t.Item.Bonus2==41 then
+					t.Item.Bonus2=40
+				end
+			end
+		end
 	end
 end
 
@@ -904,6 +933,7 @@ end
 bonusEffectsBase = {
     [1] = { bonusType = 1, bonusRange = {11, 16}, statModifier = 10 },
     [2] = { bonusType = 2, bonusRange = {1, 7}, statModifier = 10 },
+    [39] = { bonusType = 39, bonusValues = {2, 3}, statModifier = 0 },
     [42] = { bonusType = 42, bonusRange = {1, 16}, statModifier = 1 },
     [43] = { bonusType = 43, bonusValues = {4, 8, 10}, statModifier = 10 },
     [44] = { bonusType = 44, bonusValues = {8}, statModifier = 10 },
@@ -933,6 +963,7 @@ bonusEffectsBase = {
 bonusEffects = {
     [1] = { bonusType = 1, bonusRange = {11, 16}, statModifier = 10 },
     [2] = { bonusType = 2, bonusRange = {1, 7}, statModifier = 10 },
+    [39] = { bonusType = 39, bonusValues = {2, 3}, statModifier = 25 },
     [42] = { bonusType = 42, bonusRange = {1, 16}, statModifier = 3 },
     [43] = { bonusType = 43, bonusValues = {4, 8, 10}, statModifier = 10 },
     [44] = { bonusType = 44, bonusValues = {8}, statModifier = 10 },
@@ -992,6 +1023,8 @@ function checktext(MaxCharges,bonus2,it)
 		[33] = "Spirit Magic Skill +" .. math.floor(MaxCharges/4)+5,
 		[34] = "Water Magic Skill +" .. math.floor(MaxCharges/4)+5,
 		--stats enchants
+		[39] = "Adds " .. math.floor(40*mult*attackSpeedMult) .. "-" .. math.floor(80*mult*attackSpeedMult) .. " to spell damage(main hand only) and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Intellect and personality.",
+		[40] = "Drain Hit Points from target and Increased Weapon speed.",
 		[42] = " +" .. math.floor(bonusEffects[42].statModifier * mult) .. " to Seven Stats, HP, SP, Armor, Resistances.",
 		[43] = " +" .. math.floor(bonusEffects[43].statModifier * mult) .. " to Endurance, Armor, Hit points.",
 		[44] = " +" .. math.floor(bonusEffects[44].statModifier * mult) .. " Hit points and Regenerate Hit points over time.",
@@ -1465,6 +1498,12 @@ function events.GameInitialized2() --make it load later compared to other script
 					local heal=math.min(t.Result*0.05, fullHP*0.05) 
 					t.Player.HP=math.min(fullHP,t.Player.HP+heal)
 				end
+			end
+		elseif data and data.Player then --spell leech
+			it=t.Player:GetActiveItem(1)
+			if it and it.Bonus2==40 then
+				local heal=math.min(t.Result*0.05, fullHP*0.05) 
+				t.Player.HP=math.min(fullHP,t.Player.HP+heal)
 			end
 		end 
 	end
