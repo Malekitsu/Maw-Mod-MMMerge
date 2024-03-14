@@ -473,7 +473,8 @@ function events.PlayerCastSpell(t)
 			t.Skill=1
 			local s,m = SplitSkill(t.Player:GetSkill(protectionSpells[t.SpellId][2]))
 			local power=s*math.min(m,3)
-			if Party.SpellBuffs[buffId].Power<=	power then
+			function events.Tick()
+				events.Remove("Tick", 1)
 				Party.SpellBuffs[buffId].Power = power
 				Party.SpellBuffs[buffId].Skill = t.Mastery
 				Party.SpellBuffs[buffId].ExpireTime = Game.Time+const.Hour*s
