@@ -10,6 +10,8 @@ This mod is the culmination of efforts from a dedicated team, with each member b
 - **2D (Perduelion)** - _Contributor_: Basically designed the new alchemy design all by himself, making an amazing job.
 - **Thor Thunderfist** - _Contributor_: Adapted the code for skill limit removal.
 
+Special thanks to Rodril, that indirectly made the whole project possible and has always been available. 
+
 We express our deepest appreciation to all the discord community member. Their advices and feedbacks played a very important role in the development. Most noticeably, but not only:
 
 Viktor, Hagnak, ArkTolei, MR___TJ, Spazzledorf, Torkvato, LiGx, Mercs/Zan Team.
@@ -20,6 +22,7 @@ Viktor, Hagnak, ArkTolei, MR___TJ, Spazzledorf, Torkvato, LiGx, Mercs/Zan Team.
 - following 3 files needs to be copied into MM8 folder in that exact order.
   - download MMMerge here: https://drive.google.com/file/d/1f5-V-DtxB3u977RqdDH7hGbtZiGOQAGt/view
   - download Multiplayer here: https://gitlab.com/letr.rod/mmmerge/-/archive/multiplayer/mmmerge-multiplayer.zip
+  - download Patch here: https://drive.google.com/file/d/1IwF-MADHqpXOjHwOzYJxLcoUKh1Q4gXb/view
   - download MAW MMMerge here: https://github.com/Malekitsu/Maw-Mod-MMMerge/archive/refs/heads/main.zip
 - put MM8 folder into desktop
 - set mm8.exe into Windows Service pack 2 (or 3) compatibility mode.
