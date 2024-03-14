@@ -606,6 +606,9 @@ function events.CalcDamageToPlayer(t)
 	if t.DamageKind==4 and pl.SpellBuffs[26].ExpireTime>Game.Time then --mistform 
 		t.Damage=t.Damage*0.25
 	end
+	if t.Monster and t.Monster.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime>=Game.Time then
+		t.Damage=t.Damage/2
+	end
 	--recalculate spells damage
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
 		local skill=SplitSkill(data.Monster.SpellSkill)
