@@ -2494,8 +2494,7 @@ artifactStatsBonus[514] = { [const.Stats.Might] 		= 20,
 							[const.Stats.WaterResistance]	= 20,
 							[const.Stats.EarthResistance]	= 20,
 							[const.Stats.MindResistance]	= 20,
-							[const.Stats.BodyResistance]	= 20,
-							[const.Stats.SpiritResistance]	= 20}	
+							[const.Stats.BodyResistance]	= 20,}	
 artifactStatsBonus[515] = { [const.Stats.Speed] 		= 60,							
 							[const.Stats.Accuracy] 		= 60}
 artifactStatsBonus[518] = { [const.Stats.Speed] 		= 60}
@@ -2539,8 +2538,8 @@ artifactStatsBonus[532]	= {	[const.Stats.Might]	= 60,
 							[const.Stats.Speed]	= 60,}		
 artifactStatsBonus[533]	= {	[const.Stats.Intellect]	= 140,
 							[const.Stats.Personality] = 140,
-							[const.Stats.MindResistance]	= -200,
-							[const.Stats.SpiritResistance]	= -200}		
+							[const.Stats.MindResistance]	= -100,
+							[const.Stats.BodyResistance]	= -100}		
 artifactStatsBonus[534]	= {	[const.Stats.Luck]	= -15,
 							[const.Stats.Endurance]	= 50}
 artifactStatsBonus[535]	= {	[const.Stats.Intellect]	= 60,
