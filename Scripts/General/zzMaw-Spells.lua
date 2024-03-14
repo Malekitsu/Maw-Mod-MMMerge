@@ -1292,6 +1292,7 @@ spellbonusdamage[12] = {["low"]=12, ["high"]=72}
 spellbonusdamage[13] = {["low"]=12, ["high"]=12}
 spellbonusdamage[14] = {["low"]=24, ["high"]=24}
 spellbonusdamage[15] = {["low"]=48, ["high"]=48}
+spellbonusdamage[39] = {["low"]=40, ["high"]=80}
 
 aoespells = {6, 7, 8, 9, 10, 15, 22, 26, 32, 41, 43, 84, 92, 97, 98, 99, 123}
 function events.CalcSpellDamage(t)
