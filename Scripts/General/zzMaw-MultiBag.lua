@@ -140,7 +140,7 @@ function changeBag(pl, bag)
 		for i=1,#bags do
 			local it=bags[i]
 			local inv
-			while pl.Items[i+j].Number>0 do
+			while j<=138 and pl.Items[i+j].Number>0 do
 				j=j+1
 			end
 			
@@ -167,10 +167,10 @@ function changeBag(pl, bag)
 			if pl.Inventory[i]>0 then
 				 it=pl.Items[pl.Inventory[i]]
 				 if it.Number>0 then
-					 id=-i-1
-					 x, y=itemSizeMap[it.Number][1], itemSizeMap[it.Number][2]
-					 inv=pl.Inventory
-					 currentPosition=i-1
+					local id=-i-1
+					local x, y=itemSizeMap[it.Number][1], itemSizeMap[it.Number][2]
+					local inv=pl.Inventory
+					local currentPosition=i-1
 					for j=1, x do
 						currentPosition=currentPosition+1
 						if pl.Inventory[currentPosition]<=0 then
@@ -189,3 +189,193 @@ function changeBag(pl, bag)
 		end	
 	end
 end
+
+--sortMultiBag(Party[0])
+--debug.Message(dump(tempBag))
+
+function events.KeyDown(t)
+    if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 103 then
+        if t.Key == 67 then
+            sortMultiBag(Party[Game.CurrentPlayer])
+            Game.ShowStatusText("Inventory sorted")
+		end
+	end
+end
+
+function sortMultiBag(pl)
+	local id=pl:GetIndex()
+	local lastBag=false
+	if vars.mawbags and vars.mawbags[id] and vars.mawbags[id]["CurrentBag"] then
+		lastBag=vars.mawbags[id]["CurrentBag"]
+	end
+	changeBag(pl, 1)
+	vars.mawbags=vars.mawbags or {}
+	if not vars.mawbags[id] then
+		vars.mawbags[id]={}
+		vars.mawbags[id]["CurrentBag"]=1
+	end
+	--put all items into a temporary bag
+	tempBag={}
+	for bag,item in pairs(vars.mawbags[id]) do
+		if type(bag)=="number" and type(item)=="table" then
+			for i=1, #item do
+				if type(item)=="table" then
+					table.insert(tempBag, item[i])
+				end
+			end
+		end
+	end
+	--sort items
+	table.sort(tempBag, function(a, b)
+		-- Custom function to find index of an item in alchemyItemsOrder
+		local function getIndexInOrder(number)
+			for index, value in ipairs(alchemyItemsOrder) do
+				if value == number then
+					return index
+				end
+			end
+			return nil -- Return nil if the item is not found
+		end
+
+		-- Special sorting for items with number >= 220 and < 300
+		if vars.alchemyPlayer>=0 then
+			if (a["Number"] >= 220 and a["Number"] < 300) or (b["Number"] >= 220 and b["Number"] < 300) then
+				-- Ensure that items in the specified range are sorted first and from biggest to smallest
+				if (a["Number"] >= 220 and a["Number"] < 300) and (b["Number"] >= 220 and b["Number"] < 300) then
+					return a["Number"] > b["Number"] -- Both in range, sort descending
+				else
+					return a["Number"] >= 220 and a["Number"] < 300 -- Only one in range, it goes first
+				end
+			end
+
+			-- Sorting according to alchemyItemsOrder
+			local indexA = getIndexInOrder(a["Number"])
+			local indexB = getIndexInOrder(b["Number"])
+			if indexA and indexB then -- If both items are in the list
+				return indexA < indexB
+			elseif indexA or indexB then -- If only one item is in the list, it goes first
+				return indexA ~= nil
+			end
+		end
+		
+		-- Original sorting logic
+		if a["size"] == b["size"] then
+			-- When sizes are equal, compare by skill
+			local skillA = Game.ItemsTxt[a["Number"]].Skill
+			local skillB = Game.ItemsTxt[b["Number"]].Skill
+			
+			if skillA == skillB then
+				-- If skills are also equal, then sort by item number
+				return a["Number"] < b["Number"]
+			else
+				-- Otherwise, sort by skill
+				return skillA < skillB
+			end
+		else
+			-- Primary sort by size
+			return a["size"] > b["size"]
+		end
+	end)
+	--remove all items
+	vars.mawbags[id]={}
+	vars.mawbags[id]["CurrentBag"]=1
+	for i=0,125 do
+		pl.Inventory[i]=0
+	end
+	--place items
+	local currentItem={1,1,1,1,1}
+	for i=1, #tempBag do
+		local it=tempBag[i]
+		local placeFound=false
+		local x, y=itemSizeMap[it.Number][1], itemSizeMap[it.Number][2]
+		local currentBag=1
+		if vars.mawbags[id]["CurrentBag"]~=1 then
+			changeBag(pl, 1)
+		end
+		while not placeFound do
+			for j=0,125 do
+				asddd=asddd or 0
+				asddd=asddd+1
+				j=j*14%126+math.floor(j/9)
+				--pick the correct inventory slot
+				local inv=pl.Inventory
+				if inv[j]==0 then
+					local currentPosition=j-1
+					local currentLine=math.ceil((j+1)/14)
+					for n=1, x do
+						currentPosition=currentPosition+1
+						if currentLine~=math.ceil((currentPosition+1)/14) then
+							goto continue
+						end
+						if currentPosition>=126 and inv[currentPosition]~=0 then
+							goto continue
+						end
+						local yPos=currentPosition
+						for k=1,y-1 do
+							yPos=yPos+14
+							if yPos>=126 or inv[yPos]~=0 then
+								goto continue
+							end
+						end
+					end
+					while not placeFound and currentItem[currentBag]<=138 do
+						if pl.Items[currentItem[currentBag]].BodyLocation==0 then
+							placeItem(pl,it,j,currentItem[currentBag],x,y)
+							currentItem[currentBag]=currentItem[currentBag]+1
+							placeFound=true
+						else 
+							currentItem[currentBag]=currentItem[currentBag]+1
+						end
+					end
+					goto nextItem
+				end
+				:: continue ::				
+			end	
+			--no inventory slots, go to next bag
+			changeBag(pl, currentBag+1)
+			currentBag=currentBag+1
+		end
+		:: nextItem ::
+		placeFound=true
+	end
+	if lastBag then
+		changeBag(pl, lastBag)
+	end
+end
+
+function placeItem(pl,it,invSlot,itemId,x, y)
+	local occupiedCode=-itemId-1
+	for n=1, x do
+		if n==1 then
+			pl.Inventory[invSlot]=itemId
+		else
+			pl.Inventory[invSlot]=occupiedCode
+		end
+		yPos=invSlot
+		invSlot=invSlot+1
+		for k=1,y-1 do
+			yPos=yPos+14
+			pl.Inventory[yPos]=occupiedCode
+		end
+	end
+	local inv=pl.Items[itemId]
+	inv["Bonus"]=it.Bonus
+	inv["Bonus2"]=it.Bonus2
+	inv["BonusExpireTime"]=it.BonusExpireTime
+	inv["BonusStrength"]=it.BonusStrength
+	inv["Broken"]=it.Broken
+	inv["Charges"]=it.Charges
+	inv["Condition"]=it.Condition 
+	inv["Hardened"]=it.Hardened
+	inv["Identified"]=it.Identified
+	inv["MaxCharges"]=it.MaxCharges
+	inv["Number"]=it.Number
+	inv["Owner"]=it.Owner
+	inv["Refundable"]=it.Refundable
+	inv["Stolen"]=it.Stolen
+	inv["TemporaryBonus"]=it.TemporaryBonus
+end
+
+for i=220, 299 do
+	itemSizeMap[i][2]=1
+end	
