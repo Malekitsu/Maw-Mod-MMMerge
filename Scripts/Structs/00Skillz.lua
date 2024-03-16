@@ -84,7 +84,7 @@ function events.BeforeNewGameAutosave()
 	end
 
     if (not vars.Skillz_Thanked) and (not thanked) then 
-        Skillz.thanks()
+        --Skillz.thanks()
         thanked = true
     end
     vars.Skillz_Thanked = true
