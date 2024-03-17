@@ -118,6 +118,10 @@ function changeBag(pl, bag)
 				itemList[j]["TemporaryBonus"]=it.TemporaryBonus
 				itemList[j]["Location"]=i
 				itemList[j]["oldLocation"]=pl.Inventory[i]
+				itemList[j]["size"]=itemSizeMap[it.Number][2]
+				if itemList[j]["size"]==1 and itemSizeMap[it.Number][1] >1 then
+					itemList[j]["size"]=1.5
+				end
 				pl.Inventory[i]=0 
 				it.Number=0
 			end
