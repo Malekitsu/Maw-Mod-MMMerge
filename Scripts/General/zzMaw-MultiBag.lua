@@ -212,6 +212,9 @@ function sortMultiBag(pl)
 	if vars.mawbags and vars.mawbags[id] and vars.mawbags[id]["CurrentBag"] then
 		lastBag=vars.mawbags[id]["CurrentBag"]
 	end
+	for i=1,5 do
+		changeBag(pl, i)
+	end
 	changeBag(pl, 1)
 	vars.mawbags=vars.mawbags or {}
 	if not vars.mawbags[id] then
@@ -322,13 +325,16 @@ function sortMultiBag(pl)
 							end
 						end
 					end
-					while not placeFound and currentItem[currentBag]<=138 do
-						if pl.Items[currentItem[currentBag]].BodyLocation==0 then
+					while not placeFound do
+						if currentItem[currentBag]<=138 and pl.Items[currentItem[currentBag]].BodyLocation==0 then
 							placeItem(pl,it,j,currentItem[currentBag],x,y)
 							currentItem[currentBag]=currentItem[currentBag]+1
 							placeFound=true
 						else 
 							currentItem[currentBag]=currentItem[currentBag]+1
+							if currentItem[currentBag]>138 then
+								goto continue
+							end
 						end
 					end
 					goto nextItem
