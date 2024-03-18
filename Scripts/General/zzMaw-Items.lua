@@ -16,14 +16,16 @@ function events.GenerateItem(t)
 	end
 
 	--nerf items in shops is strong if low level
-	if (Game.HouseScreen==2 or Game.HouseScreen==95) then
-		if partyLevelItemGen<(t.Strength-3)*18 and t.Strength<7 then
-			t.Strength=t.Strength-1
-		end
-		if (t.Strength-2)*18>partyLevelItemGen and t.Strength>2 and t.Strength<7 then
-			roll=math.random((t.Strength-3)*18,(t.Strength-2)*18)
-			if roll>partyLevelItemGen then
+	if Game.freeProgression then
+		if (Game.HouseScreen==2 or Game.HouseScreen==95) then
+			if partyLevelItemGen<(t.Strength-3)*18 and t.Strength<7 then
 				t.Strength=t.Strength-1
+			end
+			if (t.Strength-2)*18>partyLevelItemGen and t.Strength>2 and t.Strength<7 then
+				roll=math.random((t.Strength-3)*18,(t.Strength-2)*18)
+				if roll>partyLevelItemGen then
+					t.Strength=t.Strength-1
+				end
 			end
 		end
 	end
@@ -137,6 +139,13 @@ primordialWeapEnchants={41,46}
 primordialArmorEnchants={1,2,80}
 
 function events.ItemGenerated(t)
+	--boss items forced
+	if bossLoot then
+		if not (t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736)) then
+			t.Item:Randomize(t.Strength, 0, true)
+			return
+		end
+	end
 	if vars then
 		if vars.SeedList==nil then
 			vars.SeedList={}
@@ -289,7 +298,7 @@ function events.ItemGenerated(t)
 			t.Item.Bonus=math.random(1,16)
 			t.Item.BonusStrength=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
 			--bolster
-			t.Item.BonusStrength=math.max(t.Item.BonusStrength*difficultyExtraPower, t.Item.BonusStrength+flatBonus)
+			t.Item.BonusStrength=math.max(math.ceil(t.Item.BonusStrength*difficultyExtraPower), t.Item.BonusStrength+flatBonus)
 			if math.random(1,10)==10 then
 				t.Item.Bonus=math.random(17,24)
 				local skill=t.Item:T().Skill
@@ -304,7 +313,7 @@ function events.ItemGenerated(t)
 		if p2>roll2 then
 			t.Item.Charges=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
 			--bolster
-			t.Item.Charges=math.max(t.Item.Charges*difficultyExtraPower, t.Item.Charges+flatBonus)
+			t.Item.Charges=math.max(math.ceil(t.Item.Charges*difficultyExtraPower), t.Item.Charges+flatBonus)
 			--bonus type
 			t.Item.Charges=t.Item.Charges+math.random(1,16)*1000
 			--[[ no skill bonuses
@@ -332,12 +341,12 @@ function events.ItemGenerated(t)
 		ancientRoll=math.random()
 		if ancientRoll<=ancientChance then
 			ancient=true
-			t.Item.Charges=math.random(math.round(encStrUp[pseudoStr]+1),math.round(encStrUp[pseudoStr]*1.25))
-			t.Item.Charges=math.max(t.Item.Charges*difficultyExtraPower, t.Item.Charges+flatBonus) --bolster
+			t.Item.Charges=math.random(math.round(encStrUp[pseudoStr]+1),math.ceil(encStrUp[pseudoStr]*1.25))
+			t.Item.Charges=math.max(math.ceil(t.Item.Charges*difficultyExtraPower), t.Item.Charges+flatBonus) --bolster
 			t.Item.Charges=t.Item.Charges+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.random(math.round(encStrUp[pseudoStr]+1),math.round(encStrUp[pseudoStr]*1.25))
-			t.Item.BonusStrength=math.max(t.Item.BonusStrength*difficultyExtraPower, t.Item.BonusStrength+flatBonus) --bolster
+			t.Item.BonusStrength=math.random(math.round(encStrUp[pseudoStr]+1),math.ceil(encStrUp[pseudoStr]*1.25))
+			t.Item.BonusStrength=math.max(math.ceil(t.Item.BonusStrength*difficultyExtraPower), t.Item.BonusStrength+flatBonus) --bolster
 			power=2
 			chargesBonus=math.random(1,5)
 			t.Item.MaxCharges=t.Item.MaxCharges+chargesBonus
@@ -381,11 +390,11 @@ function events.ItemGenerated(t)
 			end
 			t.Item.BonusExpireTime=2
 			t.Item.Charges=math.ceil(encStrUp[pseudoStr]*1.25)
-			t.Item.Charges=math.max(t.Item.Charges*difficultyExtraPower, t.Item.Charges+flatBonus) --bolster
+			t.Item.Charges=math.max(math.ceil(t.Item.Charges*difficultyExtraPower), t.Item.Charges+flatBonus) --bolster
 			t.Item.Charges=t.Item.Charges+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
 			t.Item.BonusStrength=math.ceil(encStrUp[pseudoStr]*1.25)
-			t.Item.BonusStrength=math.max(t.Item.BonusStrength*difficultyExtraPower, t.Item.BonusStrength+flatBonus) --bolster
+			t.Item.BonusStrength=math.max(math.ceil(t.Item.BonusStrength*difficultyExtraPower), t.Item.BonusStrength+flatBonus) --bolster
 			t.Item.MaxCharges=math.max(t.Item.MaxCharges*0.25+5, t.Item.MaxCharges*1.25)
 			--apply special enchant
 			n=t.Item.Number
