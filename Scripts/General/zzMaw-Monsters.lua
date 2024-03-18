@@ -1584,7 +1584,7 @@ function events.PickCorpse(t)
 		t.Monster.TreasureDiceSides=math.round(t.Monster.TreasureDiceSides/4)
 	elseif t.Monster.NameId>220 then
 		t.Monster.TreasureItemPercent=100
-		t.Monster.TreasureItemLevel=math.min((math.ceil(t.Monster.Level/18+1),6)
+		t.Monster.TreasureItemLevel=math.min(math.ceil(t.Monster.Level/18+1),6)
 		bossLoot=true
 	end
 end
