@@ -219,6 +219,10 @@ function events.ItemGenerated(t)
 		partyLevel=math.min(vars.MM8LVL+vars.MM7LVL+vars.MM6LVL-math.min(currentLevel,72), partyLevel+36)
 		if not Game.freeProgression then
 			partyLevel=(vars.MM8LVL+vars.MM7LVL+vars.MM6LVL)*0.75
+			local name=Game.MapStats[Map.MapStatsIndex].Name
+			if mapLevels[name] and mapLevels[name].Low~=0 then
+				partyLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)
+			end
 		end
 		--difficulty settings
 		difficultyExtraPower=1
@@ -245,7 +249,8 @@ function events.ItemGenerated(t)
 		--bolster boost
 		t.Item.MaxCharges=math.max(t.Item.MaxCharges+bonusCharges+t.Item.MaxCharges*(difficultyExtraPower-1), t.Item.MaxCharges*difficultyExtraPower) 
 		
-		cap2=14+ math.floor((difficultyExtraPower-1)*10)
+		bonusCap=math.floor((difficultyExtraPower-1)*10)
+		cap2=14+bonusCap
 		partyLevel1=math.min(math.floor(partyLevel/18),cap2)
 		--adjust loot Strength
 		ps1=t.Strength
@@ -260,7 +265,7 @@ function events.ItemGenerated(t)
 		if pseudoStr==1 then 
 			return 
 		end
-		pseudoStr=math.min(pseudoStr,20) --CAP CURRENTLY AT 20
+		pseudoStr=math.min(pseudoStr,20+bonusCap) --CAP CURRENTLY AT 20
 		roll1=math.random()
 		roll2=math.random()
 		rollSpc=math.random()
@@ -1429,14 +1434,9 @@ function events.BeforeNewGameAutosave()
 	end
 end
 
-function events.BuildItemInformationBox(t)
-	partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-	maxItemBolster=(partyLevel)/5+20
-end
-
---do the same if someone is trying to equip on a player
+--fix maxcharges if someone is trying to equip on a player
 function events.Action(t)
-	if t.Action==133 then
+	if t.Action==133 and Game.freeProgression then
 		partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 		maxItemBolster=(partyLevel)/5+20
 		--failsafe
@@ -1534,7 +1534,7 @@ function events.BuildItemInformationBox(t)
 	partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 	maxItemBolster=(partyLevel)/5+20
 	--failsafe
-	if t.Item and t.Item.Charges==0 and t.Item.Bonus==0 and t.Item.MaxCharges>maxItemBolster then
+	if Game.freeProgression and t.Item and t.Item.Charges==0 and t.Item.Bonus==0 and t.Item.MaxCharges>maxItemBolster then
 		t.Item.MaxCharges=0
 	end
 	if t.Description then
@@ -1940,6 +1940,22 @@ function events.BuildItemInformationBox(t)
 			end
 			itemLevel=itemLevel+math.round(lvl/tot*18-17)
 			t.Description = t.Description .. "\n\nItem Level: " .. itemLevel
+			local levelRequired=math.max(1,math.floor((itemLevel-36)*0.7))
+			if t.Item.BonusExpireTime<=2 then
+				levelRequired=math.max(1,levelRequired-t.Item.BonusExpireTime*18)
+			end
+			local txt="\n\nLevel Required: " .. levelRequired
+			--check if equippable
+			local id=Game.CurrentPlayer
+			if id<0 or id>Party.High then
+				id=0
+			end
+			local plLvl=Party[id].LevelBase
+			if plLvl<levelRequired then
+				txt=StrColor(255,0,0,txt)
+			end
+			t.Description = t.Description .. txt
+			
 		end	
 		
 		--attack speed tooltip
