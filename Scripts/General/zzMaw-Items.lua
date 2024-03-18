@@ -3114,3 +3114,27 @@ function getBaseAttackSpeed(it)
 	end
 	return 1
 end
+
+--items have an item level requirement
+function events.CanWearItem(t)
+	it=Mouse.Item
+	if it.Number<=151 or (it.Number>=803 and it.Number<=936) or (it.Number>=1603 and it.Number<=1736) then 
+		local itemLevel=it.MaxCharges*5
+		local tot=0
+		local lvl=0
+		for i=1, 6 do
+			tot=tot+it:T().ChanceByLevel[i]
+			lvl=lvl+it:T().ChanceByLevel[i]*i
+		end
+		itemLevel=itemLevel+math.round(lvl/tot*18-17)
+		local levelRequired=math.max(1,math.floor((itemLevel-36)*0.7))
+		if it.BonusExpireTime<=2 then
+			levelRequired=math.max(1,levelRequired-it.BonusExpireTime*18)
+		end
+		--check if equippable
+		local plLvl=Party[t.PlayerId].LevelBase
+		if plLvl<levelRequired then
+			t.Available=false
+		end
+	end	
+end
