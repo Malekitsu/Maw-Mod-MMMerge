@@ -1755,7 +1755,7 @@ function events.BuildItemInformationBox(t)
 						dmg=dmg*2
 					end
 				end
-				power=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*weaponSpeedMult)
+				power=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/((delay*delayMult)/100)*hitChance*weaponSpeedMult)
 				--debug.Message(string.format("%s %s %s %s %s %s %s %s ", dmg,might,daggerCritBonus,luck,accuracy,delay,hitChance,bonusMult))
 			end
 			
