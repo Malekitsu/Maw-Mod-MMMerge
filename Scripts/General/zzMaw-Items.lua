@@ -2201,7 +2201,7 @@ function itemStats(index)
 
 		--armors
 		local txt=it:T()
-		if (txt.Skill>=8 and txt.Skill<=11) or txt.Skill==40 then --AC from items
+		if (txt.Skill>=8 and txt.Skill<=11) or (txt.Skill==40 and txt.EquipStat~=12) then --AC from items
 			local ac=txt.Mod1DiceCount+txt.Mod2
 			local acBonus=ac
 			if it.MaxCharges>0 then 
