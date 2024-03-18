@@ -264,7 +264,7 @@ function events.GetAttackDelay(t)
 			delay=delay+weaponImpair[skill][m]
 		end
 	end
-	local delayMult=1+delay/100
+	delayMult=1+delay/100
 	t.Result=t.Result*delayMult
 end
 
