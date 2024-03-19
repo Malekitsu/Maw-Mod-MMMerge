@@ -1949,7 +1949,12 @@ function events.BuildItemInformationBox(t)
 			end
 			itemLevel=itemLevel+math.round(lvl/tot*18-17)
 			t.Description = t.Description .. "\n\nItem Level: " .. itemLevel
-			local levelRequired=math.max(1,math.floor((itemLevel-36)*0.7))
+			local levelRequired=(t.Item.MaxCharges)*3+lvl/tot*6-17
+			if Game.BolsterAmount>=300 then
+				levelRequired=levelRequired-10
+			end
+			
+			levelRequired=math.max(1,math.floor(levelRequired))
 			if t.Item.BonusExpireTime<=2 then
 				levelRequired=math.max(1,levelRequired-t.Item.BonusExpireTime*18)
 			end
@@ -3127,10 +3132,11 @@ function events.CanWearItem(t)
 			lvl=lvl+it:T().ChanceByLevel[i]*i
 		end
 		itemLevel=itemLevel+math.round(lvl/tot*18-17)
-		local levelRequired=math.max(1,math.floor((itemLevel-36)*0.7))
-		if it.BonusExpireTime<=2 then
-			levelRequired=math.max(1,levelRequired-it.BonusExpireTime*18)
+		local levelRequired=(t.Item.MaxCharges)*3+lvl/tot*6-17
+		if Game.BolsterAmount>=300 then
+			levelRequired=levelRequired-10
 		end
+		levelRequired=math.max(1,math.floor(levelRequired))
 		--check if equippable
 		local plLvl=Party[t.PlayerId].LevelBase
 		if plLvl<levelRequired then
