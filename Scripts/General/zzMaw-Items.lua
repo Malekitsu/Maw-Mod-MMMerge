@@ -3132,7 +3132,7 @@ function events.CanWearItem(t)
 			lvl=lvl+it:T().ChanceByLevel[i]*i
 		end
 		itemLevel=itemLevel+math.round(lvl/tot*18-17)
-		local levelRequired=(t.Item.MaxCharges)*3+lvl/tot*6-17
+		local levelRequired=(it.MaxCharges)*3+lvl/tot*6-17
 		if Game.BolsterAmount>=300 then
 			levelRequired=levelRequired-10
 		end
