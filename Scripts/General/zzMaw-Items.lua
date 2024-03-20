@@ -3136,6 +3136,9 @@ function events.CanWearItem(t)
 		if Game.BolsterAmount>=300 then
 			levelRequired=levelRequired-10
 		end
+		if it.BonusExpireTime<=2 then
+			levelRequired=math.max(1,levelRequired-it.BonusExpireTime*18)
+		end
 		levelRequired=math.max(1,math.floor(levelRequired))
 		--check if equippable
 		local plLvl=Party[t.PlayerId].LevelBase
