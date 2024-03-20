@@ -849,8 +849,16 @@ masteryName={"Normal", "Expert", "Master", "GM"}
 function events.Action(t)
 	if t.Action==25 and autoTargetHeals then
 		local pl=Party[Game.CurrentPlayer]
+		local spellCast=0
+		if t.Param==0 then
+			spellCast=pl.QuickSpell
+		elseif t.Param==1 then
+			spellCast=pl.AttackSpell
+		end
+		--spellCast=ExtraQuickSpells.SpellSlots[pl:GetIndex()][1] might turn useful later
+		
 		if table.find(dkClass, Party[Game.CurrentPlayer].Class) then return end
-		if pl.QuickSpell==68 and pl.RecoveryDelay==0 then
+		if spellCast==68 and pl.RecoveryDelay==0 then
 			local sp=healingSpells[68]
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
 			local cost=Game.Spells[68]["SpellPoints" .. masteryName[m]]
@@ -906,7 +914,7 @@ function events.Action(t)
 			local delay=math.round(Game.Spells[68]["Delay" .. masteryName[m]]/(1+haste/100))
 			pl:SetRecoveryDelay(delay)
 			pl.Expression=40
-		elseif pl.QuickSpell==74 and pl.RecoveryDelay==0 then
+		elseif spellCast==74 and pl.RecoveryDelay==0 then
 			local sp=healingSpells[74]
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
 			local cost=Game.Spells[74]["SpellPoints" .. masteryName[m]]
@@ -965,7 +973,7 @@ function events.Action(t)
 			local delay=math.round(Game.Spells[74]["Delay" .. masteryName[m]]/(1+haste/100))
 			pl:SetRecoveryDelay(delay)
 			pl.Expression=40
-		elseif pl.QuickSpell==49 and pl.RecoveryDelay==0 then
+		elseif spellCast==49 and pl.RecoveryDelay==0 then
 			local sp=healingSpells[49]
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Spirit))
 			local cost=Game.Spells[49]["SpellPoints" .. masteryName[m]]
