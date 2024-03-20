@@ -1,3 +1,26 @@
+function events.KeyDown(t)
+    if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 100 then
+        if t.Key == 82 then -- "r" key
+            Game.ShowStatusText(string.format("Map data reset, press Y to continue..."))
+            map_data_reset_confirmation = 1;
+        end
+
+        if (t.Key ~= 89) and (t.Key ~= 82) and (map_data_reset_confirmation == 1) then -- not "y" key
+            map_data_reset_confirmation = 0; -- aborting reset without confirmation
+        end
+
+        if t.Key == 89 and (map_data_reset_confirmation == 1) then -- "y" key
+            Game.ShowStatusText(string.format("Current map data reset."))
+            map_data_reset_confirmation = 0;
+            local i
+            for i = 0, Party.High do
+                mapvars.damageTrack[Party[i]:GetIndex()] = 0 -- melee
+                mapvars.damageTrackRanged[Party[i]:GetIndex()] = 0 -- ranged
+            end
+        end
+    end
+end
+
 function events.CalcDamageToMonster(t)
 	local data = WhoHitMonster()	
 	--luck/accuracy bonus
@@ -492,12 +515,35 @@ function events.BuildStatInformationBox(t)
 		t.Text=string.format("%s\n\nDamage per second: %s",t.Text,StrColor(255,255,100,DPS))
 		vars.damageTrack=vars.damageTrack or {}
 		vars.damageTrack[Party[i]:GetIndex()]=vars.damageTrack[Party[i]:GetIndex()] or 0
+
 		mapvars.damageTrack=mapvars.damageTrack or {}
 		mapvars.damageTrack[Party[i]:GetIndex()]=mapvars.damageTrack[Party[i]:GetIndex()] or 0
+		mapvars.damageTrackRanged=mapvars.damageTrackRanged or {}
+		mapvars.damageTrackRanged[Party[i]:GetIndex()]=mapvars.damageTrackRanged[Party[i]:GetIndex()] or 0
+
 		local damage= vars.damageTrack[Party[Game.CurrentPlayer]:GetIndex()] or 0
 		t.Text=string.format("%s\n\nTotal Damage done: %s",t.Text,StrColor(255,255,100,math.round(damage)))
 		local damage= mapvars.damageTrack[Party[Game.CurrentPlayer]:GetIndex()] or 0
 		t.Text=string.format("%s\nDamage done in current map: %s",t.Text,StrColor(255,255,100,math.round(damage)))
+
+            	t.Text = string.format("%s\n\nMap percentage, Melee/Ranged/Total:", t.Text)
+		local total_map_damage_m = 0
+		local total_map_damage_r = 0                
+		local player_damage_m = {}
+		local player_damage_r = {}
+        	for i = 0, Party.High do
+            		player_damage_m[i] = (mapvars.damageTrack[Party[i]:GetIndex()] or 0)
+            		player_damage_r[i] = (mapvars.damageTrackRanged[Party[i]:GetIndex()] or 0)
+            		total_map_damage_m = total_map_damage_m + player_damage_m[i]
+            		total_map_damage_r = total_map_damage_r + player_damage_r[i]
+        	end
+
+        for i = 0, Party.High do
+            t.Text = string.format("%s\n %s\t %29s\t%32s %s\t%37s %s\t%42s", t.Text, Game.ClassNames[Party[i].Class],
+                math.round(100 * player_damage_m[i] / total_map_damage_m),'/', 
+                math.round(100 * player_damage_r[i] / total_map_damage_r),'/',
+                math.round(100 * (player_damage_m[i] + player_damage_r[i]) / (total_map_damage_m + total_map_damage_r)),' %')
+        end
 	end
 	
 	
@@ -531,12 +577,37 @@ function events.BuildStatInformationBox(t)
 		t.Text=string.format("%s\n\nDamage per second: %s",t.Text,StrColor(255,255,100,DPS))
 		vars.damageTrackRanged=vars.damageTrackRanged or {}
 		vars.damageTrackRanged[Party[i]:GetIndex()]=vars.damageTrackRanged[Party[i]:GetIndex()] or 0
+
+		mapvars.damageTrack=mapvars.damageTrack or {}
+		mapvars.damageTrack[Party[i]:GetIndex()]=mapvars.damageTrack[Party[i]:GetIndex()] or 0
 		mapvars.damageTrackRanged=mapvars.damageTrackRanged or {}
 		mapvars.damageTrackRanged[Party[i]:GetIndex()]=mapvars.damageTrackRanged[Party[i]:GetIndex()] or 0
+
 		local damage= vars.damageTrackRanged[Party[Game.CurrentPlayer]:GetIndex()] or 0
 		t.Text=string.format("%s\n\nTotal Ranged Damage done: %s",t.Text,StrColor(255,255,100,math.round(damage)))
 		local damage= mapvars.damageTrackRanged[Party[Game.CurrentPlayer]:GetIndex()] or 0
 		t.Text=string.format("%s\nRanged Damage done in current map: %s",t.Text,StrColor(255,255,100,math.round(damage)))
+
+            	t.Text = string.format("%s\n\nMap percentage, Melee/Ranged/Total:", t.Text)
+		local total_map_damage_m = 0
+		local total_map_damage_r = 0                
+		local player_damage_m = {}
+		local player_damage_r = {}
+        	for i = 0, Party.High do
+            		player_damage_m[i] = (mapvars.damageTrack[Party[i]:GetIndex()] or 0)
+            		player_damage_r[i] = (mapvars.damageTrackRanged[Party[i]:GetIndex()] or 0)
+            		total_map_damage_m = total_map_damage_m + player_damage_m[i]
+            		total_map_damage_r = total_map_damage_r + player_damage_r[i]
+        	end
+
+        for i = 0, Party.High do
+            t.Text = string.format("%s\n %s\t %29s\t%32s %s\t%37s %s\t%42s", t.Text, Game.ClassNames[Party[i].Class],
+                math.round(100 * player_damage_m[i] / total_map_damage_m),'/', 
+                math.round(100 * player_damage_r[i] / total_map_damage_r),'/',
+                math.round(100 * (player_damage_m[i] + player_damage_r[i]) / (total_map_damage_m + total_map_damage_r)),' %')
+        end
+
+
 	end
 	
 	if t.Stat>=19 and t.Stat<=24 then
