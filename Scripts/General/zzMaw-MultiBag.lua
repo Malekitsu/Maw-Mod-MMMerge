@@ -245,7 +245,7 @@ function sortMultiBag(pl)
 		end
 
 		-- Special sorting for items with number >= 220 and < 300
-		if vars.alchemyPlayer>=0 then
+		if vars.alchemyPlayer and vars.alchemyPlayer>=0 then
 			if (a["Number"] >= 220 and a["Number"] < 300) or (b["Number"] >= 220 and b["Number"] < 300) then
 				-- Ensure that items in the specified range are sorted first and from biggest to smallest
 				if (a["Number"] >= 220 and a["Number"] < 300) and (b["Number"] >= 220 and b["Number"] < 300) then
