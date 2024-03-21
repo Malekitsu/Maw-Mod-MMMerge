@@ -1415,7 +1415,7 @@ function events.BuildMonsterInformationBox(t)
 		diff=0.7
 	end
 	if Game.BolsterAmount==300 then
-		diff=diff
+		diff=math.min(diff, 2+mon.Level/100)
 	end
 	--some statistics here, calculate the standard deviation of dices to get the range of which 95% will fall into
 	mean=mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*(mon.Attack1.DamageDiceSides+1)/2
