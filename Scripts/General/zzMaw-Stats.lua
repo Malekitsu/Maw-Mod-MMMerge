@@ -768,7 +768,7 @@ function events.CalcDamageToPlayer(t)
 	end
 	if Game.BolsterAmount==300 then
 		if data and data.Monster then
-			t.Result=t.Result*3
+			t.Result=t.Result*math.min(3, data.Monster.Level/100+2)
 		elseif t.DamageKind~=4 and t.DamageKind~=2 then --drown and fall
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
