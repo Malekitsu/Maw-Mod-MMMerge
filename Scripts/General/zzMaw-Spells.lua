@@ -1269,9 +1269,11 @@ function ascendSpellDamage(skill, mastery, spell)
 	elseif spelltier<=skill%11  then
 		ascensionLevel=ascensionLevel+1
 	end
-	diceMax=diceMax * (1+0.04 * skill * ascensionLevel)
-	damageAdd=damageAdd*(1+skill * (ascensionLevel+1) / 8)
-	diceMin, diceMax, damageAdd = math.round(diceMin), math.round(diceMax), math.round(damageAdd)
+	if ascensionLevel>0 then
+		diceMax=diceMax * (1+0.04 * skill * ascensionLevel)
+		damageAdd=damageAdd*(1+skill * (ascensionLevel+1) / 8)
+		diceMin, diceMax, damageAdd = math.round(diceMin), math.round(diceMax), math.round(damageAdd)
+	end
 	return diceMin, diceMax, damageAdd
 end
 
@@ -1288,9 +1290,11 @@ function ascendSpellHealing(skill, mastery, spell, healM)
 	elseif spelltier<=skill%11  then
 		ascensionLevel=ascensionLevel+1
 	end
-	scaling=scaling * (1+0.04 * skill * ascensionLevel)
-	base=base*(1+skill * (ascensionLevel+1) / 8)
-	scaling, base = math.round(scaling), math.round(base)
+	if ascensionLevel>0 then
+		scaling=scaling * (1+0.04 * skill * ascensionLevel)
+		base=base*(1+skill * (ascensionLevel+1) / 8)
+		scaling, base = math.round(scaling), math.round(base)
+	end
 	return scaling, base
 end
 
