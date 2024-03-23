@@ -2850,11 +2850,6 @@ artifactSkillBonus[1321] =	{	[const.Skills.Shield] = 5}
 artifactSkillBonus[1324] = {	[const.Skills.Learning] = 15}
 -- Ania Selving
 artifactSkillBonus[1328] =	{	[const.Skills.Bow] = 5}
--- Faerie ring
-artifactSkillBonus[1347] =	{	[const.Skills.Fire] = 5,
-								[const.Skills.Air] = 5,
-								[const.Skills.Water] = 5,
-								[const.Skills.Earth] = 5}
 -- Pendragon
 artifactSkillBonus[2030] =	{	[const.Skills.Stealing] = 10,
 								[const.Skills.DisarmTraps] = 10}
