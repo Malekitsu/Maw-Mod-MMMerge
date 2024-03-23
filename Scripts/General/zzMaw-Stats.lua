@@ -1133,14 +1133,19 @@ function events.Tick()
 				dmg=dmg*2
 			end
 			local DPS2=math.round(dmg*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/60)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])
-        if spellPowers[spellIndex] then 
-			--SPELLS
-			local s, m = SplitSkill(Party[i].Skills[const.Skills.Learning])
-			diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, spellIndex)
+        if spellPowers[spellIndex] or (healingSpells and healingSpells[spellIndex]) then 
 			--calculate damage
 			--skill
 			skillType=math.floor((spellIndex-1)/11)+12
 			skill, mastery=SplitSkill(Party[i]:GetSkill(skillType))
+			--SPELLS
+			local s, m = SplitSkill(Party[i].Skills[const.Skills.Learning])
+			if spellPowers[spellIndex] then
+				diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, spellIndex)
+			else
+				diceMin, diceMax, damageAdd = healingSpells[spellIndex].Scaling[mastery], healingSpells[spellIndex].Scaling[mastery], healingSpells[spellIndex].Base[mastery]
+			end
+			
 			it=Party[i]:GetActiveItem(1)
 			local enchantDamage=0
 			if it then
@@ -1168,6 +1173,9 @@ function events.Tick()
 			critChance=Party[i]:GetLuck()/1500
 			bonus=math.max(intellect,personality)
 			critDamage=bonus*3/2000
+			if healingSpells[spellIndex] then
+				critDamage=critDamage/2
+			end
 			power=power*(1+bonus/1000) 
 			critChance=0.05+critChance
 			haste=math.floor((Party[i]:GetSpeed())/10)/100+1
