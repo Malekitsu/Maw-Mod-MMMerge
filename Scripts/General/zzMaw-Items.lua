@@ -1523,7 +1523,7 @@ end
 
 --SHOW POWER/VITALITY CHANGE IN TOOLTIPS
 slotMap={
-	[0]=0,
+	[0]=1,
 	[1]=1,
 	[2]=2,
 	[3]=3,
@@ -1548,393 +1548,95 @@ function events.BuildItemInformationBox(t)
 	end
 	if t.Description then
 		if Game.CurrentPlayer==-1 then return end
-		if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then 
+		local equipStat=t.Item:T().EquipStat
+		if equipStat<=11 then 
 			local i=Game.CurrentPlayer
-			--get spell and its damage
-			local spellIndex=Party[i].QuickSpell
 			local pl=Party[i]
-			--if not an offensive spell then calculate highest between melee and ranged
-			if not spellPowers[spellIndex] then 
-				--MELEE
-				low=pl:GetMeleeDamageMin()
-				high=pl:GetMeleeDamageMax()
-				might=pl:GetMight()
-				accuracy=pl:GetAccuracy()
-				luck=pl:GetLuck()
-				delay=math.max(pl:GetAttackDelay())
-				dmg=(low+high)/2
-				--hit chance
-				atk=pl:GetMeleeAttack()
-				lvl=pl.LevelBase
-				hitChance= (15+atk*2)/(30+atk*2+lvl)
-				daggerCritBonus=0
-				for v=0,1 do
-					if pl:GetActiveItem(v) then
-						itSkill=pl:GetActiveItem(v):T().Skill
-						if itSkill==2 then
-							s,m=SplitSkill(pl:GetSkill(const.Skills.Dagger))
-							if m>2 then
-								daggerCritBonus=daggerCritBonus+0.025+0.005*s
-							end
-						end
-					end
-				end
-				DPS1=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[pl:GetIndex()]["Melee"])
-				--debug.Message(string.format("%s %s %s %s %s %s %s %s ", dmg,might,daggerCritBonus,luck,accuracy,delay,hitChance,bonusMult))
-				--RANGED
-				low=pl:GetRangedDamageMin()
-				high=pl:GetRangedDamageMax()
-				delay=pl:GetAttackDelay(true)
-				dmg=(low+high)/2
-				--hit chance
-				atk=pl:GetRangedAttack()
-				hitChance= (15+atk*2)/(30+atk*2+lvl)
-				s,m=SplitSkill(pl.Skills[const.Skills.Bow])
-				if m>=3 then
-					dmg=dmg*2
-				end
-				DPS2=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/100)*hitChance*damageMultiplier[pl:GetIndex()]["Ranged"])
-				if DPS1>DPS2 then
-					power=DPS1
-					powerType="Melee"
-				else
-					power=DPS2
-					powerType="Ranged"
-				end
+			oldDPS1, oldDPS2, oldDPS3, oldVitality=calcPowerVitality(pl)
+			--substitute item
+			local slot=slotMap[equipStat]
+			local i=0
+			local found=false
+			local index=0
+			local itemBackup={}
+			local it=pl:GetActiveItem(slot)
+			if it then
+				--backup item
+				itemBackup["BodyLocation"]=it.BodyLocation
+				itemBackup["Bonus"]=it.Bonus
+				itemBackup["Bonus2"]=it.Bonus2
+				itemBackup["BonusExpireTime"]=it.BonusExpireTime
+				itemBackup["BonusStrength"]=it.BonusStrength
+				itemBackup["Broken"]=it.Broken
+				itemBackup["Charges"]=it.Charges
+				itemBackup["Condition"]=it.Condition
+				itemBackup["Hardened"]=it.Hardened
+				itemBackup["Identified"]=it.Identified
+				itemBackup["MaxCharges"]=it.MaxCharges
+				itemBackup["Number"]=it.Number
+				itemBackup["Owner"]=it.Owner
+				itemBackup["Refundable"]=it.Refundable
+				itemBackup["Stolen"]=it.Stolen
+				itemBackup["TemporaryBonus"]=it.TemporaryBonus
+				
+				--substitute item
+				it.BodyLocation=t.Item.BodyLocation
+				it.Bonus=t.Item.Bonus
+				it.Bonus2=t.Item.Bonus2
+				it.BonusExpireTime=t.Item.BonusExpireTime
+				it.BonusStrength=t.Item.BonusStrength
+				it.Broken=t.Item.Broken
+				it.Charges=t.Item.Charges
+				it.Condition=t.Item.Condition
+				it.Hardened=t.Item.Hardened
+				it.Identified=t.Item.Identified
+				it.MaxCharges=t.Item.MaxCharges
+				it.Number=t.Item.Number
+				it.Owner=t.Item.Owner
+				it.Refundable=t.Item.Refundable
+				it.Stolen=t.Item.Stolen
+				it.TemporaryBonus=t.Item.TemporaryBonus
 			else
-				
-				--calculate damage
-				--skill
-				skillType=math.floor(spellIndex/11)+12
-				skill, mastery=SplitSkill(pl:GetSkill(skillType))
-				--SPELLS
-				diceMin, diceMax, damageAdd = ascendSpellDamage(skill, mastery, spellIndex)
-				
-				power=damageAdd + skill*(diceMin+diceMax)/2
-				
-				intellect=pl:GetIntellect()	
-				personality=pl:GetPersonality()
-				critChance=pl:GetLuck()/1500
-				bonus=math.max(intellect,personality)
-				critDamage=bonus*3/2000
-				power=power*(1+bonus/1000) 
-				critChance=0.05+critChance
-				haste=math.floor(pl:GetSpeed()/10)/100+1
-				if mastery==1 then
-					delay=Game.Spells[11].DelayNormal
-				elseif mastery==2 then
-					delay=Game.Spells[11].DelayExpert
-				elseif mastery==3 then
-					delay=Game.Spells[11].DelayMaster
-				elseif mastery==4 then
-					delay=Game.Spells[11].DelayGM
-				end
-				powerType="Spell"
-				power=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/100)*haste)
+				return
+				debug.Message(dump(it))
 			end
+			mawRefresh(Game.CurrentPlayer)
+			mawRefresh(Game.CurrentPlayer)
 			
-			oldPower=power
-			
-			--list of stats that influence damage
-			slot=t.Item:T().EquipStat
-			it=pl:GetActiveItem(slotMap[slot])
-			if not it then return end
-			--calculate spell damage
-			if powerType=="Spell" then
-				stats={2,3,6,7}
-				intellect1, personality1, speed1, luck1 = unpack(calculateStatsAdd(t.Item, stats))
-				intellect2, personality2, speed2, luck2 = unpack(calculateStatsAdd(it, stats))
-				bonusInt=intellect1-intellect2
-				bonusPers=personality1-personality2
-				bonusLuck=luck1-luck2
-				bonusSpeed=speed1-speed2
-				
-				power=damageAdd + skill*(diceMin+diceMax)/2
-				
-				intellect=pl:GetIntellect()+bonusInt
-				personality=pl:GetPersonality()+bonusPers
-				critChance=(pl:GetLuck()+bonusLuck)/1500
-				bonus=math.max(intellect,personality)
-				critDamage=bonus*3/2000
-				power=power*(1+bonus/1000) 
-				critChance=0.05+critChance
-				haste=math.floor((pl:GetSpeed()+bonusSpeed)/10)/100+1
-				
-				powerType="Spell"
-				power=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/100)*haste)
-				
-			elseif powerType=="Melee" or powerType=="Ranged" then
-				stats={1,5,6,7}
-				
-				might1, acc1, speed1, luck1 = unpack(calculateStatsAdd(t.Item, stats))
-				might2, acc2, speed2, luck2 = unpack(calculateStatsAdd(it, stats))
-				
-				bonusMight=might1-might2
-				bonusAcc=acc1-acc2
-				bonusSpeed=speed1-speed2
-				bonusLuck=luck1-luck2
-				
-				--calculate new DPS
-				--might
-				might=pl:GetMight()
-				if might>=21 then
-					oldBonusDamage=math.floor(might/5)
-				else
-					oldBonusDamage=(might-13)/2
-				end
-				might=might+bonusMight
-				if might>=21 then
-					newBonusDamage=math.floor(might/5)
-				else
-					newBonusDamage=(might-13)/2
-				end
-				if powerType=="Melee" then
-					low=pl:GetMeleeDamageMin()
-					high=pl:GetMeleeDamageMax()
-				else
-					low=pl:GetRangedDamageMin()
-					high=pl:GetRangedDamageMax()
-				end
-				dmg=(low+high)/2+newBonusDamage-oldBonusDamage
-				
-				--accuracy
-				accuracy=pl:GetAccuracy()
-				if accuracy>=21 then
-					oldAttack=math.floor(accuracy/5)
-				else
-					oldAttack=(accuracy-13)/2
-				end
-				accuracy=accuracy+bonusAcc
-				if accuracy>=21 then
-					newAttack=math.floor(accuracy/5)
-				else
-					newAttack=(accuracy-13)/2
-				end
-				
-				--speed
-				speed=pl:GetSpeed()
-				if speed>=21 then
-					oldSpeed=math.floor(speed/5)
-				else
-					oldSpeed=(speed-13)/2
-				end
-				speed=speed+bonusSpeed
-				if speed>=21 then
-					newSpeed=math.floor(speed/5)
-				else
-					newSpeed=(speed-13)/2
-				end
-				
-				recoveryBonus=damageMultiplier[pl:GetIndex()]["bonusSpeedMelee"]+newSpeed-oldSpeed
-				if powerType=="Melee" then
-					delay=math.max(math.floor(damageMultiplier[pl:GetIndex()]["baseSpeedMelee"] / (1 + recoveryBonus / 100)),30)
-					weaponSpeedMult=damageMultiplier[pl:GetIndex()]["Melee"]
-				else
-					delay=math.floor(damageMultiplier[pl:GetIndex()]["baseSpeedRanged"] / (1 + recoveryBonus / 100))
-					weaponSpeedMult=damageMultiplier[pl:GetIndex()]["Ranged"]
-				end	
-				--debug.Message(string.format("%s %s %s", delay, recoveryBonus, baseSpeed))				
-				--luck
-				luck=pl:GetLuck()+bonusLuck
-				--hit chance
-				if powerType=="Melee" then
-					atk=pl:GetMeleeAttack()+newAttack-oldAttack
-				else
-					atk=pl:GetRangedAttack()
-				end
-				atk=atk+newAttack-oldAttack
-				lvl=pl.LevelBase
-				hitChance= (15+atk*2)/(30+atk*2+lvl)
-				daggerCritBonus=0
-				if powerType=="Melee" then
-					for v=0,1 do
-						if pl:GetActiveItem(v) then
-							itSkill=pl:GetActiveItem(v):T().Skill
-							if itSkill==2 then
-								s,m=SplitSkill(pl:GetSkill(const.Skills.Dagger))
-								if m>2 then
-									daggerCritBonus=daggerCritBonus+0.025+0.005*s
-								end
-							end
-						end
-					end
-				else
-					s,m=SplitSkill(pl.Skills[const.Skills.Bow])
-					if m>=3 then
-						dmg=dmg*2
-					end
-				end
-				power=math.round((dmg*(1+might/1000))*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/((delay*delayMult)/100)*hitChance*weaponSpeedMult)
-				--debug.Message(string.format("%s %s %s %s %s %s %s %s ", dmg,might,daggerCritBonus,luck,accuracy,delay,hitChance,bonusMult))
+			newDPS1, newDPS2, newDPS3, newVitality=calcPowerVitality(pl)
+			increaseDPSPercent=math.round(math.max(newDPS1, newDPS2, newDPS3)/math.max(oldDPS1, oldDPS2, oldDPS3)*10000)/100-100
+			increaseVitalityPercent=math.round(newVitality/oldVitality*10000)/100-100
+			if increaseDPSPercent<0 then
+				t.Description = t.Description .. "\n\n" .. "Power: " .. StrColor(255,0,0,increaseDPSPercent .. "%")
+			elseif increaseDPSPercent>0 then
+				t.Description = t.Description .. "\n\n" .. "Power: " .. StrColor(0,255,0,"+" .. increaseDPSPercent .. "%")
 			end
-			
-			
-			newPower=power-oldPower
-			percentage=math.round((power/oldPower-1)*10000)/100
-			if newPower<0 then
-				t.Description = t.Description .. "\n\n" .. "Power: " .. StrColor(255,0,0,percentage .. "%")
-			elseif newPower>0 then
-				t.Description = t.Description .. "\n\n" .. "Power: " .. StrColor(0,255,0,"+" .. percentage .. "%")
+			if increaseVitalityPercent<0 then
+				t.Description = t.Description .. "\n" .. "Vitality: " .. StrColor(255,0,0, increaseVitalityPercent .. "%")
+			elseif increaseVitalityPercent>0 then
+				t.Description = t.Description .. "\n" .. "Vitality: " .. StrColor(0,255,0,"+" .. increaseVitalityPercent .. "%")
 			end
-			
-			--vitality calculation
-			--old vitality
-			fullHP=pl:GetFullHP()
-			--AC
-			ac=pl:GetArmorClass()
-			local acReduction=1-calcMawDamage(pl,4,10000)/10000
-			lvl=math.min(pl.LevelBase, 255)
-			local ac=ac/(Game.BolsterAmount/100)
-			blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
-			ACRed= 1 - (1-blockChance)*(1-acReduction)
-			--speed
-			unarmed=0
-			Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
-			dodgeChance=1
-			if Mas == 4 then
-				unarmed=Skill+10
-				dodgeChance=0.995^(unarmed)
-			end
-			fullHP=fullHP/dodgeChance
-			--resistances
-			local res={0,1,2,3,7,8,12}
-			for j=1,7 do 
-				res[j]=1-calcMawDamage(pl,res[j],10000)/10000
-			end
-			--calculation
-			local reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
-			oldVitality=math.round(fullHP/reduction)	
-			--check for stats changes
-			stats={4,6,7,8,10,11,12,13,14,15,16}	
-			end1, speed1, luck1, hp1, ac1, fire1, air1, water1, earth1, mind1, body1 = unpack(calculateStatsAdd(t.Item, stats))
-			end2, speed2, luck2, hp2, ac2, fire2, air2, water2, earth2, mind2, body2 = unpack(calculateStatsAdd(it, stats))
-			newEnd=end1-end2
-			newSpeed=speed1-speed2
-			newLuck=luck1-luck2
-			newHP=hp1-hp2
-			newAC=ac1-ac2
-			newFire=fire1-fire2
-			newAir=air1-air2
-			newWater=water1-water2
-			newEarth=earth1-earth2
-			newMind=mind1-mind2
-			newBody=body1-body2
-			
-			--add item base AC
-			
-			newAC=newAC+getNewArmor(t.Item)-getNewArmor(it)
-			
-			--calculate new HP
-			newEndurance=pl:GetEndurance()+newEnd
-			if newEndurance<=21 then
-				newEndEff=(newEndurance-13)/2
-			else
-				newEndEff=math.floor(newEndurance/5)
-			end
-			oldEndurance=pl:GetEndurance()
-			if newEndurance<=21 then
-				oldEndEff=(oldEndurance-13)/2
-			else
-				oldEndEff=math.floor(oldEndurance/5)
-			end
-			
-			level=pl:GetLevel()+newEndEff
-			if t.Item.Bonus2==25 then
-				level=level+5
-			end
-			if it.Bonus2==25 then
-				level=level-5
-			end
-			HPScaling=Game.Classes.HPFactor[pl.Class]
-			
-			--remove old
-			fullHP=pl:GetFullHP()/(1+pl:GetEndurance()/1000)-oldEndEff*HPScaling
-			--add new 
-			fullHP=fullHP+newHP+newEndEff*HPScaling
-			
-			fullHP=math.round((fullHP)*(1+(pl:GetEndurance()+newEnd)/1000))
-			ac=pl:GetArmorClass()
-			oldSpeed=pl:GetSpeed()
-			if oldSpeed<=21 then
-				oldSpeedEff=(oldSpeed-13)/2
-			else
-				oldSpeedEff=math.floor(oldSpeed/5)
-			end
-			local newSpeed=pl:GetSpeed()+newSpeed
-			if newSpeed<=21 then
-				newSpeedEff=(newSpeed-13)/2
-			else
-				newSpeedEff=math.floor(newSpeed/5)
-			end
-			newSpeedEff=newSpeedEff-oldSpeedEff
-			
-			ac=ac+newAC+newSpeedEff
-			local lvl=pl.LevelBase
-			bolster=(Game.BolsterAmount/100-1)/4+1
-			local acReduction=1-math.round(1/2^math.min(ac/math.min(150+lvl*bolster,400*bolster),4)*10000)/10000
-			lvl=math.min(pl.LevelBase, 255)
-			local ac=ac/(Game.BolsterAmount/100)
-			blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
-			ACRed= 1 - (1-blockChance)*(1-acReduction)
-			--speed
-			unarmed=0
-			Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
-			dodgeChance=1
-			if Mas == 4 then
-				unarmed=Skill+10
-				dodgeChance=0.995^(unarmed)
-			end
-			vitality=fullHP/dodgeChance
-			--resistances
-			--luck
-			oldLuck=pl:GetLuck()
-			if oldLuck<=21 then
-				oldLuckEff=(oldLuck-13)/2
-			elseif oldLuck<=100 then
-				oldLuckEff=math.floor(oldLuck/5)
-			else
-				oldLuckEff=math.floor(oldLuck/10)+10
-			end
-			luck=pl:GetLuck()+newLuck
-			if luck<=21 then
-				newLuckEff=(luck-13)/2
-			elseif luck<=100 then
-				newLuckEff=math.floor(luck/5)
-			else
-				newLuckEff=math.floor(luck/10)+10
-			end
-			luckChanged=newLuckEff-oldLuckEff
-			local res={
-				[1]=pl:GetResistance(10)+newFire+luckChanged,
-				[2]=pl:GetResistance(11)+newAir+luckChanged,
-				[3]=pl:GetResistance(12)+newWater+luckChanged,
-				[4]=pl:GetResistance(13)+newEarth+luckChanged,
-				[5]=pl:GetResistance(14)+newMind+luckChanged,
-				[6]=pl:GetResistance(15)+newBody+luckChanged,
-			}
-			res[7]=math.min(res[1],res[2],res[3],res[4],res[5],res[6])
-			for j=1,7 do 
-				res[j]=1-math.round(1/2^math.min(res[j]/math.min(75+pl.LevelBase*0.5*bolster,200*bolster),4)*10000)/10000
-			end
-			
-			--calculation
-			reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
-			vitality=math.round(vitality/reduction)	
-						
-			newVitality=vitality-oldVitality
-			percentage=math.round((vitality/oldVitality-1)*10000)/100
-			if newVitality<0 then
-				t.Description = t.Description .. "\n" .. "Vitality: " .. StrColor(255,0,0, percentage .. "%")
-			elseif newVitality>0 then
-				t.Description = t.Description .. "\n" .. "Vitality: " .. StrColor(0,255,0,"+" .. percentage .. "%")
-			end
-			
-
-			
+			--restore item
+			it.BodyLocation=itemBackup["BodyLocation"]
+			it.Bonus=itemBackup["Bonus"]
+			it.Bonus2=itemBackup["Bonus2"]
+			it.BonusExpireTime=itemBackup["BonusExpireTime"]
+			it.BonusStrength=itemBackup["BonusStrength"]
+			it.Broken=itemBackup["Broken"]
+			it.Charges=itemBackup["Charges"]
+			it.Condition=itemBackup["Condition"]
+			it.Hardened=itemBackup["Hardened"]
+			it.Identified=itemBackup["Identified"]
+			it.MaxCharges=itemBackup["MaxCharges"]
+			it.Number=itemBackup["Number"]
+			it.Owner=itemBackup["Owner"]
+			it.Refundable=itemBackup["Refundable"]
+			it.Stolen=itemBackup["Stolen"]
+			it.TemporaryBonus=itemBackup["TemporaryBonus"]
+			mawRefresh(Game.CurrentPlayer)
+			mawRefresh(Game.CurrentPlayer)
 		end
-	
 	end
-	
 end
 --item level
 function events.BuildItemInformationBox(t)
