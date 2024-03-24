@@ -1552,7 +1552,7 @@ function events.BuildItemInformationBox(t)
 		if equipStat<=11 then 
 			local i=Game.CurrentPlayer
 			local pl=Party[i]
-			oldDPS1, oldDPS2, oldDPS3, oldVitality=calcPowerVitality(pl)
+			local oldDPS1, oldDPS2, oldDPS3, oldVitality=calcPowerVitality(pl)
 			--substitute item
 			local slot=slotMap[equipStat]
 			local i=0
@@ -1603,9 +1603,9 @@ function events.BuildItemInformationBox(t)
 			mawRefresh(Game.CurrentPlayer)
 			mawRefresh(Game.CurrentPlayer)
 			
-			newDPS1, newDPS2, newDPS3, newVitality=calcPowerVitality(pl)
-			increaseDPSPercent=math.round(math.max(newDPS1, newDPS2, newDPS3)/math.max(oldDPS1, oldDPS2, oldDPS3)*10000)/100-100
-			increaseVitalityPercent=math.round(newVitality/oldVitality*10000)/100-100
+			local newDPS1, newDPS2, newDPS3, newVitality=calcPowerVitality(pl)
+			local increaseDPSPercent=math.round(math.max(newDPS1, newDPS2, newDPS3)/math.max(oldDPS1, oldDPS2, oldDPS3)*10000)/100-100
+			local increaseVitalityPercent=math.round(newVitality/oldVitality*10000)/100-100
 			if increaseDPSPercent<0 then
 				t.Description = t.Description .. "\n\n" .. "Power: " .. StrColor(255,0,0,increaseDPSPercent .. "%")
 			elseif increaseDPSPercent>0 then
