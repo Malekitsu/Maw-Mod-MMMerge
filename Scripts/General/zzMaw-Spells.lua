@@ -913,6 +913,7 @@ function events.Action(t)
 			local haste=math.floor(pl:GetSpeed()/10)
 			local delay=math.round(Game.Spells[68]["Delay" .. masteryName[m]]/(1+haste/100))
 			pl:SetRecoveryDelay(delay)
+			evt.PlaySound(16010)
 			pl.Expression=40
 		elseif spellCast==74 and pl.RecoveryDelay==0 then
 			local sp=healingSpells[74]
@@ -972,6 +973,7 @@ function events.Action(t)
 			local haste=math.floor(pl:GetSpeed()/10)
 			local delay=math.round(Game.Spells[74]["Delay" .. masteryName[m]]/(1+haste/100))
 			pl:SetRecoveryDelay(delay)
+			evt.PlaySound(16070)
 			pl.Expression=40
 		elseif spellCast==49 and pl.RecoveryDelay==0 then
 			local sp=healingSpells[49]
@@ -1029,6 +1031,7 @@ function events.Action(t)
 			local haste=math.floor(pl:GetSpeed()/10)
 			local delay=math.round(Game.Spells[49]["Delay" .. masteryName[m]]/(1+haste/100))
 			pl:SetRecoveryDelay(delay)
+			evt.PlaySound(14040)
 			pl.Expression=40
 		end
 	end
