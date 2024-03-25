@@ -1552,6 +1552,7 @@ function events.BuildItemInformationBox(t)
 		if equipStat<=11 then 
 			local i=Game.CurrentPlayer
 			local pl=Party[i]
+			local playerIndex=pl:GetIndex()
 			local oldDPS1, oldDPS2, oldDPS3, oldVitality=calcPowerVitality(pl)
 			--substitute item
 			local slot=slotMap[equipStat]
@@ -1599,12 +1600,12 @@ function events.BuildItemInformationBox(t)
 			else
 				return
 			end
-			mawRefresh(Game.CurrentPlayer)
-			mawRefresh(Game.CurrentPlayer)
+			mawRefresh(playerIndex)
+			mawRefresh(playerIndex)
 			
 			local newDPS1, newDPS2, newDPS3, newVitality=calcPowerVitality(pl)
-			local increaseDPSPercent=math.round(math.max(newDPS1, newDPS2, newDPS3)/math.max(oldDPS1, oldDPS2, oldDPS3)*10000)/100-100
-			local increaseVitalityPercent=math.round(newVitality/oldVitality*10000)/100-100
+			local increaseDPSPercent=math.round(math.max(newDPS1, newDPS2, newDPS3)/math.max(oldDPS1, oldDPS2, oldDPS3)*10000-10000)/100
+			local increaseVitalityPercent=math.round(newVitality/oldVitality*10000-10000)/100
 			if increaseDPSPercent<0 then
 				t.Description = t.Description .. "\n\n" .. "Power: " .. StrColor(255,0,0,increaseDPSPercent .. "%")
 			elseif increaseDPSPercent>0 then
@@ -1632,8 +1633,8 @@ function events.BuildItemInformationBox(t)
 			it.Refundable=itemBackup["Refundable"]
 			it.Stolen=itemBackup["Stolen"]
 			it.TemporaryBonus=itemBackup["TemporaryBonus"]
-			mawRefresh(Game.CurrentPlayer)
-			mawRefresh(Game.CurrentPlayer)
+			mawRefresh(playerIndex)
+			mawRefresh(playerIndex)
 		end
 	end
 end
