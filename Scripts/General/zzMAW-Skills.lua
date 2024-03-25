@@ -36,97 +36,99 @@ baseRecovery =
 
 weaponImpair =
 {
-	[const.Skills.Leather]	= {10, 10, 0, 0,},
-	[const.Skills.Chain]	= {20, 10, 0, 0,},
-	[const.Skills.Plate]	= {20, 10, 10, 0,},
-	[const.Skills.Shield]	= {10, 0, 0, 0,},
+	[const.Skills.Leather]	= {[0]=10, 10, 10, 0, 0,},
+	[const.Skills.Chain]	= {[0]=20, 20, 10, 0, 0,},
+	[const.Skills.Plate]	= {[0]=20, 20, 10, 10, 0,},
+	[const.Skills.Shield]	= {[0]=10, 10, 0, 0, 0,},
 }
 
 
 skillAttack =
 {
-	[const.Skills.Staff]	= {1, 2, 2, 2,},
-	[const.Skills.Sword]	= {1, 2, 2, 2,},
-	[const.Skills.Dagger]	= {1, 2, 2, 2,},
-	[const.Skills.Axe]		= {1, 2, 2, 2,},
-	[const.Skills.Spear]	= {1, 2, 2, 3,},
-	[const.Skills.Bow]		= {3, 3, 3, 3,},
-	[const.Skills.Mace]		= {1, 2, 2, 2,},
-	[const.Skills.Blaster]	= {5, 10, 15, 20,},
-	[const.Skills.Unarmed]	= {2, 2, 3, 3,},
+	[const.Skills.Staff]	= {[0]=0, 1, 2, 2, 2,},
+	[const.Skills.Sword]	= {[0]=0, 1, 2, 2, 2,},
+	[const.Skills.Dagger]	= {[0]=0, 1, 2, 2, 2,},
+	[const.Skills.Axe]		= {[0]=0, 1, 2, 2, 2,},
+	[const.Skills.Spear]	= {[0]=0, 1, 2, 2, 3,},
+	[const.Skills.Bow]		= {[0]=0, 3, 3, 3, 3,},
+	[const.Skills.Mace]		= {[0]=0, 1, 2, 2, 2,},
+	[const.Skills.Blaster]	= {[0]=0, 5, 10, 15, 20,},
+	[const.Skills.Unarmed]	= {[0]=0, 2, 2, 3, 3,},
 }
 -- weapon skill recovery bonuses (by rank)
 
 skillRecovery =
 {
-	[const.Skills.Staff]	= {0, 0, 0, 0,},
-	[const.Skills.Sword]	= {0, 1, 2, 2,},
-	[const.Skills.Dagger]	= {0, 0, 0, 1,},
-	[const.Skills.Axe]		= {0, 1, 2, 2,},
-	[const.Skills.Spear]	= {0, 0, 0, 0,},
-	[const.Skills.Bow]		= {1, 2, 2, 3,},
-	[const.Skills.Mace]		= {0, 0, 0, 0,},
-	[const.Skills.Blaster]	= {0, 0, 0, 0,},
-	[const.Skills.Unarmed]	= {0, 1, 1, 2,},
+	[const.Skills.Staff]	= {[0]=0, 0, 0, 0, 0,},
+	[const.Skills.Sword]	= {[0]=0, 0, 1, 2, 2,},
+	[const.Skills.Dagger]	= {[0]=0, 0, 0, 0, 1,},
+	[const.Skills.Axe]		= {[0]=0, 0, 1, 2, 2,},
+	[const.Skills.Spear]	= {[0]=0, 0, 0, 0, 0,},
+	[const.Skills.Bow]		= {[0]=0, 1, 2, 2, 3,},
+	[const.Skills.Mace]		= {[0]=0, 0, 0, 0, 0,},
+	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0,},
+	[const.Skills.Unarmed]	= {[0]=0, 0, 1, 1, 2,},
 }
 
 skillDamage =
 {
-	[const.Skills.Staff]	= {0, 1, 2, 3,},
-	[const.Skills.Sword]	= {1, 1, 2, 2,},
-	[const.Skills.Dagger]	= {0, 0, 1, 1,},
-	[const.Skills.Axe]		= {1, 2, 3, 4,},
-	[const.Skills.Spear]	= {0, 1, 2, 3,},
-	[const.Skills.Bow]		= {1, 2, 2, 3,},
-	[const.Skills.Mace]		= {1, 2, 3, 4,},
-	[const.Skills.Blaster]	= {0, 0, 0, 0,},
-	[const.Skills.Unarmed]	= {4, 5, 6, 6,},
+	[const.Skills.Staff]	= {[0]=0, 0, 1, 2, 3,},
+	[const.Skills.Sword]	= {[0]=0, 1, 1, 2, 2,},
+	[const.Skills.Dagger]	= {[0]=0, 0, 0, 1, 1,},
+	[const.Skills.Axe]		= {[0]=0, 1, 2, 3, 4,},
+	[const.Skills.Spear]	= {[0]=0, 0, 1, 2, 3,},
+	[const.Skills.Bow]		= {[0]=0, 1, 2, 2, 3,},
+	[const.Skills.Mace]		= {[0]=0, 1, 2, 3, 4,},
+	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0,},
+	[const.Skills.Unarmed]	= {[0]=0, 4, 5, 6, 6,},
 }
 -- weapon skill AC bonuses (by rank)
 
 skillAC =
 {
-	[const.Skills.Staff]	= {1, 1, 2, 2,},
-	[const.Skills.Sword]	= {0, 0, 0, 1,},
-	[const.Skills.Dagger]	= {0, 0, 0, 0,},
-	[const.Skills.Axe]		= {0, 0, 0, 0,},
-	[const.Skills.Spear]	= {1, 2, 2, 3,},
-	[const.Skills.Bow]		= {0, 0, 0, 0,},
-	[const.Skills.Mace]		= {0, 0, 0, 0,},
-	[const.Skills.Blaster]	= {0, 0, 0, 0,},
-	[const.Skills.Unarmed]	= {0, 0, 0, 0,},
+	[const.Skills.Staff]	= {[0]=0, 1, 1, 2, 2,},
+	[const.Skills.Sword]	= {[0]=0, 0, 0, 0, 1,},
+	[const.Skills.Dagger]	= {[0]=0, 0, 0, 0, 0,},
+	[const.Skills.Axe]		= {[0]=0, 0, 0, 0, 0,},
+	[const.Skills.Spear]	= {[0]=0, 1, 2, 2, 3,},
+	[const.Skills.Bow]		= {[0]=0, 0, 0, 0, 0,},
+	[const.Skills.Mace]		= {[0]=0, 0, 0, 0, 0,},
+	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0,},
+	[const.Skills.Unarmed]	= {[0]=0, 0, 0, 0, 0,},
 	
-	[const.Skills.Shield]	= {1, 2, 2, 3,},
-	[const.Skills.Leather]	= {1, 1, 2, 2,},
-	[const.Skills.Chain]	= {1, 2, 3, 3,},
-	[const.Skills.Plate]	= {2, 2, 3, 4,},
-	[const.Skills.Dodging]	= {2, 3, 4, 4,},
+	[const.Skills.Shield]	= {[0]=0, 1, 2, 2, 3,},
+	[const.Skills.Leather]	= {[0]=0, 1, 1, 2, 2,},
+	[const.Skills.Chain]	= {[0]=0, 1, 2, 3, 3,},
+	[const.Skills.Plate]	= {[0]=0, 2, 2, 3, 4,},
+	[const.Skills.Dodging]	= {[0]=0, 2, 3, 4, 4,},
 }
 skillResistance =
 {
-	[const.Skills.Staff]	= {0, 1, 2, 2},
-	[const.Skills.Sword]	= {0, 0, 0, 0},
-	[const.Skills.Dagger]	= {0, 0, 0, 0},
-	[const.Skills.Axe]		= {0, 0, 0, 0},
-	[const.Skills.Spear]	= {0, 0, 0, 0},
-	[const.Skills.Bow]		= {0, 0, 0, 0},
-	[const.Skills.Mace]		= {0, 0, 0, 0},
-	[const.Skills.Blaster]	= {0, 0, 0, 0},
-	[const.Skills.Unarmed]	= {0, 0, 0, 0,},
+	[const.Skills.Staff]	= {[0]=0, 0, 1, 2, 2},
+	[const.Skills.Sword]	= {[0]=0, 0, 0, 0, 0},
+	[const.Skills.Dagger]	= {[0]=0, 0, 0, 0, 0},
+	[const.Skills.Axe]		= {[0]=0, 0, 0, 0, 0},
+	[const.Skills.Spear]	= {[0]=0, 0, 0, 0, 0},
+	[const.Skills.Bow]		= {[0]=0, 0, 0, 0, 0},
+	[const.Skills.Mace]		= {[0]=0, 0, 0, 0, 0},
+	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0},
+	[const.Skills.Unarmed]	= {[0]=0, 0, 0, 0, 0,},
 	
-	[const.Skills.Leather]	= {1, 2, 3, 4,},
-	[const.Skills.Chain]	= {1, 2, 2, 3,},
-	[const.Skills.Plate]	= {1, 1, 2, 2,},
-	[const.Skills.Shield]	= {1, 2, 3, 4,},
-	[const.Skills.Dodging]	= {0, 0, 0, 0,},
+	[const.Skills.Leather]	= {[0]=0, 1, 2, 3, 4,},
+	[const.Skills.Chain]	= {[0]=0, 1, 2, 2, 3,},
+	[const.Skills.Plate]	= {[0]=0, 1, 1, 2, 2,},
+	[const.Skills.Shield]	= {[0]=0, 1, 2, 3, 4,},
+	[const.Skills.Dodging]	= {[0]=0, 0, 0, 0, 0,},
 }
 
 
 twoHandedWeaponDamageBonusByMastery = {
+	[0]=0, 
 	[const.Novice] = 1, 
 	[const.Expert] = 2, 
 	[const.Master] = 3, 
-	[const.GM] = 3 }
+	[const.GM] = 3 
+}
 
 --all stats bonus are calculated in Maw Items, as this function only changes hp,sp,ac,attack and damage
 function events.CalcStatBonusBySkills(t)
