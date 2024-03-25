@@ -1598,7 +1598,6 @@ function events.BuildItemInformationBox(t)
 				it.TemporaryBonus=t.Item.TemporaryBonus
 			else
 				return
-				debug.Message(dump(it))
 			end
 			mawRefresh(Game.CurrentPlayer)
 			mawRefresh(Game.CurrentPlayer)
