@@ -525,7 +525,7 @@ end
 function events.BuildItemInformationBox(t)
 	if t.Item.Number>=1051 and t.Item.Number<=1060 then
 		if t.Description then
-			local mult=math.max((Game.BolsterAmount-100)/1000+1,1)
+			local mult=math.max((Game.BolsterAmount-100)/500+1,1)
 			local tier=(t.Item.Number-1050)*mult
 			local power = math.round((tier * 10) ^ 0.5 / 2)
 			local twoHanded = tier * 10 * 2
@@ -549,7 +549,7 @@ for i=1,10 do
 		if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then			
 			if craftWaitTime>0 then return end
 			--pick which enchant to pick that is below the item power
-			local bolsterMult=math.max((Game.BolsterAmount-100)/1000+1,1)
+			local bolsterMult=math.max((Game.BolsterAmount-100)/500+1,1)
 			tier=(Mouse.Item.Number-1050)*bolsterMult
 			upgradeAmount=math.round((tier*10)^0.5/2)
 			mult=slotMult[t:T().EquipStat]
