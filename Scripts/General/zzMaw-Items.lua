@@ -1136,7 +1136,7 @@ function events.CalcItemValue(t)
 				count=count+t.Item.BonusExpireTime
 			end	
 			if count>0 then
-				t.Value=t.Value^(1+count*0.06)
+				t.Value=t.Value^(1+count*0.08)
 			end
 		end	
 		if t.Value>200000  then
