@@ -1090,7 +1090,7 @@ function events.Tick()
 		local pl=Party[i]
 		DPS1, DPS2, DPS3, vitality=calcPowerVitality(pl)
 		--get spell and its damage
-		spellIndex=Party[i].QuickSpell
+		spellIndex = pl.AttackSpell==0 and pl.QuickSpell or pl.AttackSpell
 		
         if spellPowers[spellIndex] or (healingSpells and healingSpells[spellIndex]) then 		
 			Game.GlobalTxt[47]=string.format("M/R/S:%s/%s/%s\n\n\n\n\n\n\n",StrColor(255,0,0,DPS1),StrColor(200,200,0,DPS2),StrColor(50,50,220,DPS3))
@@ -1116,7 +1116,7 @@ function calcPowerVitality(pl)
 	local DPS2=0
 	local DPS3=0
 	--get spell and its damage
-	spellIndex=pl.QuickSpell
+	spellIndex = pl.AttackSpell==0 and pl.QuickSpell or pl.AttackSpell
 	--MELEE
 	local i=Game.CurrentPlayer
 	local low=pl:GetMeleeDamageMin()
