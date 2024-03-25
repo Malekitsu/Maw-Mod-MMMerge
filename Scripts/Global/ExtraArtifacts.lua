@@ -925,11 +925,11 @@ OnHitEffects[2036] = {
 OnHitEffects[2040] = {
 	DamageKind 	= const.Damage.Air,
 	Add			= 20,
-	Special = function(t)
+	--[[Special = function(t)
 		local Skill, Mas = SpellPowerByItemSkill(t.Player, t.Item)
 		CastSpellDirect(125,Skill,Mas)
 		evt.CastSpell(18, Mas, Skill, t.Monster.X,t.Monster.Y,t.Monster.Z+50, t.Monster.X,t.Monster.Y,t.Monster.Z)
-	end}
+	end]]}
 
 -----
 --REMOVE MM8 BONUSES
