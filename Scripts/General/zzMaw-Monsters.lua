@@ -1624,7 +1624,7 @@ function events.MonsterKilled(mon)
 			evt.Add{"Gold", Value = gold}
 			evt.ForPlayer("All")
 			evt.Add{"Experience", Value = experience}
-			Message(string.format("Dungeon Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Item"))
+			Game.EscMessage(string.format("Dungeon Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Item"))
 			evt.Add("Items",math.min(1050+math.ceil(Party[0].LevelBase/25+0.5),1060))
 			mapvars.completed=true
 			vars.dungeonCompletedList=vars.dungeonCompletedList or {}
@@ -1634,7 +1634,7 @@ function events.MonsterKilled(mon)
 		end
 		if mapvars.monsterMap.cleared==false and m/n>=0.8 then
 			mapvars.monsterMap.cleared=true
-			Message("Monsters are weakened and can no longer resurrect")
+			Game.EscMessage("Monsters are weakened and can no longer resurrect")
 		end
 	end
 end
