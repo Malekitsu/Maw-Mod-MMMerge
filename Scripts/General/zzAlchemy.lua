@@ -687,6 +687,20 @@ evt.PotionEffects[84] = function(IsDrunk, t, Power)
 	end
 end
 
+evt.PotionEffects[85] = function(IsDrunk, t, Power)
+	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+		if Game.ItemsTxt[t.Number].NotIdentifiedName==Game.ItemsTxt[t.Number+1].NotIdentifiedName and t.BodyLocation==0 then
+			t.Number=t.Number+1
+			Mouse.Item.Number=0
+		else
+			return
+		end
+		mem.u4[0x51E100] = 0x100 
+		t.Condition = t.Condition:Or(0x10)
+		evt.PlaySound(12070)
+	end
+end
+
 
 craftDropChances={
 		["gems"]=0.005,
@@ -694,6 +708,7 @@ craftDropChances={
 		[1062]=0.00025,
 		[1063]=0.0005,
 		[1064]=0.00001,
+		[1065]=0.00025,
 	}
 function events.MonsterKilled(mon)
 	if mon.Ally == 9999 then -- no drop from reanimated monsters
