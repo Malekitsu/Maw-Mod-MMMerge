@@ -84,4 +84,5 @@ Pot Id	Item Id	Required mastery	Drinkable	Usable	Notes
 82	1062	0	-	x	Hourglass of Time
 83	1063	0	-	x	Control Cube
 84	1064	0	-	x	Enchanted Amulet
-85	1064	0	-	x	Enchanted Amulet
+85	1065	0	-	x	Emerald
+85	1066	0	-	x	Enchanted Amulet
