@@ -192,7 +192,6 @@ potionPowerRequirement={
 	[239]=20,
 	[246]=40,
 	[256]=55,
-	[263]=55,
 }
 blackPermanentBuffs={
 	[252]={"MightBase","AccuracyBase"},
