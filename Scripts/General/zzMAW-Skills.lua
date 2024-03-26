@@ -1286,6 +1286,7 @@ end
 --restore masteries 
 function events.Action(t)
 	if t.Action==121 then
+		if t.Param>39 then return end -- to do it better later
 		t.Handled=false
 		pl=Party[Game.CurrentPlayer]
 		local currentCost=SplitSkill(pl.Skills[t.Param])+1
@@ -1453,3 +1454,15 @@ function events.Tick()
 	end	
 end
 
+--new cover skill
+function events.GameInitialized2()
+	local coverSkill=50
+	Skillz.new_armor(coverSkill)
+	Skillz.setName(coverSkill, "Cover")
+	Skillz.setDesc(coverSkill, 1, "Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nGrants 5 plus 1% chance per skill point to Cover an ally.\n")
+	Skillz.setDesc(coverSkill, 2, "Allow use to Cover Physical damage\n")
+	Skillz.setDesc(coverSkill, 3, "Allow use to Cover Projectiles damage")
+	Skillz.setDesc(coverSkill, 4, "Allow use to Cover Spells damage")
+	Skillz.setDesc(coverSkill, 5, "Attacking will increase you next Cover chance by 30%")
+	Skillz.learn_at(coverSkill, 30)
+end
