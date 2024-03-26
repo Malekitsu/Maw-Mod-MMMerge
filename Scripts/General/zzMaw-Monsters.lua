@@ -1329,13 +1329,13 @@ mapLevels={
 {["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
 
 ["The Breach"] = 
-{["Low"] = 23 , ["Mid"] = 23 , ["High"] = 23},
+{["Low"] = 100 , ["Mid"] = 110 , ["High"] = 120},
 
 ["The Breach"] = 
-{["Low"] = 28 , ["Mid"] = 40 , ["High"] = 65},
+{["Low"] = 100 , ["Mid"] = 110 , ["High"] = 120},
 
 ["Basement of the Breach"] = 
-{["Low"] = 40 , ["Mid"] = 40 , ["High"] = 40},
+{["Low"] = 100 , ["Mid"] = 110 , ["High"] = 120},
 
 ["The Strange Temple"] = 
 {["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
