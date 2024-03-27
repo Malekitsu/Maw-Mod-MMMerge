@@ -1466,3 +1466,13 @@ function events.GameInitialized2()
 	Skillz.setDesc(coverSkill, 5, "Attacking will increase you next Cover chance by 30%")
 	Skillz.learn_at(coverSkill, 30)
 end
+
+function events.BuildItemInformationBox(t)
+	if t.Item.Identified==false then
+		for k,v in pairs(vars.NPCFollowers) do
+			if Game.NPC[v].Profession == 4 then
+				t.Item.Identified=true
+			end
+		end
+	end
+end
