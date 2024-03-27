@@ -747,6 +747,9 @@ function events.MonsterKilled(mon)
 	if math.random()<craftDropChances[1064]*bonusRoll then
 		obj = SummonItem(1064, mon.X, mon.Y, mon.Z + 100, 100)
 	end
+	if math.random()<craftDropChances[1065]*bonusRoll then
+		obj = SummonItem(1065, mon.X, mon.Y, mon.Z + 100, 100)
+	end
 end
 
 
