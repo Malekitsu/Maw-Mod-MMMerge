@@ -320,13 +320,11 @@ function recalculateMonsterTable()
 		totalLevel[i]=basetable[i].Level+bolsterLevel+extraBolster
 		
 		--horizontal progression
-		local name=Game.MapStats[Map.MapStatsIndex].Name
-		if not horizontalMaps[name] and Game.freeProgression==false then
+		if Game.freeProgression==false then
 			horizontalMultiplier=2.5
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local level=math.max(math.min((base.Level+extraBolster)*horizontalMultiplier,mon.Level+bolsterLevel+extraBolster),1)
-			flattener=(base.Level-LevelB)*horizontalMultiplier*0.6
-			totalLevel[i]=level-flattener
+			totalLevel[i]=level
 			mon.Level=math.min(totalLevel[i],255)
 			if not horizontalMaps[name] then
 				local mean=(mp.Low+mp.Mid+mp.High)/3
