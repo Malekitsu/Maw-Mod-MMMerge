@@ -1467,12 +1467,10 @@ function events.GameInitialized2()
 	Skillz.learn_at(coverSkill, 30)
 end
 
-function events.BuildItemInformationBox(t)
-	if t.Item.Identified==false then
-		for k,v in pairs(vars.NPCFollowers) do
-			if Game.NPC[v].Profession == 4 then
-				t.Item.Identified=true
-			end
+function events.CanIdentifyItem(t)
+	for k,v in pairs(vars.NPCFollowers) do
+		if Game.NPC[v].Profession == 4 then
+			t.CanIdentify = true
 		end
 	end
 end
