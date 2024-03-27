@@ -791,97 +791,51 @@ function events.Action(t)
 end
 --plate&shield cover
 --change target
-plateCoverChance={0,0.05,0.01,0.015}
 function events.PlayerAttacked(t)
 	if t.Attacker and t.Attacker.Monster then
+		local masteryRequired=0
 		if (t.Attacker.MonsterAction==0 or t.Attacker.MonsterAction==1) and t.Attacker.Monster["Attack" .. t.Attacker.MonsterAction+1].Type==4 then
-			local it=t.Player:GetActiveItem(3)
-			if it and Game.ItemsTxt[it.Number].Skill==11 then return end --doesn't apply if have plate already
-			--PLATE COVER
-			--check for armor
-			coverChance={}
-			local coverIndex=1
-			--iterate for players to build cover dictionary
-			for i=0,Party.High do
-				if Party[i].Dead==0 and Party[i].Paralyzed==0 and Party[i].Unconscious==0 and Party[i].Stoned==0 and Party[i].Eradicated==0 then
-					local it=Party[i]:GetActiveItem(3)
-					if it and Game.ItemsTxt[it.Number].Skill==11 then 
-						local plate=Party[i].Skills[const.Skills.Plate]
-						local s,m=SplitSkill(plate)
-						coverChance[coverIndex]={p=plateCoverChance[m],index=i}
-						coverIndex=coverIndex+1
-					end
-				end
-			end
-			--roll once per player with player and pick the one with max hp
-			coverPlayer=-1
-			if coverChance[1] then
-				lastMaxHp=0
-				cover=false
-				for i=1,#coverChance do
-					if Party[coverChance[i].index].HP>lastMaxHp then
-						local index=coverChance[i].index
-						local p=coverChance[i].p
-						roll=math.random()
-						if roll<p then
-							lastMaxHp=Party[index].HP
-							coverPlayer=index
-							cover=true
-						end
-					end
-				end
-				
-				if cover then
-					mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Shield, t.PlayerSlot)
-					Party[coverPlayer]:ShowFaceAnimation(14)
-					Game.ShowStatusText(Party[coverPlayer].Name .. " cover " .. Party[t.PlayerSlot].Name)
-					t.PlayerSlot=coverPlayer
-				end
-			end
+			masteryRequired=1
+		elseif t.Attacker.MonsterAction==2 then
+			masteryRequired=3
 		else
-			local it=t.Player:GetActiveItem(0)
-			local shield=t.Player.Skills[const.Skills.Shield]
-			local s,m=SplitSkill(shield)
-			if it and Game.ItemsTxt[it.Number].Skill==8 and m==4 then return end --doesn't apply if have shield and GM already
-			magicCoverChance={}
-			local coverIndex=1
-			--iterate for players to build cover dictionary
-			for i=0,Party.High do
-				if Party[i].Dead==0 and Party[i].Paralyzed==0 and Party[i].Unconscious==0 and Party[i].Stoned==0 and Party[i].Eradicated==0 then
-					local it=Party[i]:GetActiveItem(0)
-					if it and Game.ItemsTxt[it.Number].Skill==8 then 
-						local shield=Party[i].Skills[const.Skills.Shield]
-						local s,m=SplitSkill(shield)
-						if m==4 then
-							magicCoverChance[coverIndex]={p=0.15,index=i}
-							coverIndex=coverIndex+1
-						end
-					end
+			masteryRequired=2
+		end
+		if not vars.covering then
+			vars.covering={}
+			for i=0,4 do
+				vars.covering[i]=true
+			end
+		end
+		cover={}
+		for i=0,Party.High do
+			local s, m= SplitSkill(Skillz.get(Party[i], 50))
+			if s>0 and vars.covering[i] and m>=masteryRequired and i~=t.PlayerSlot then
+				cover[i]={["Chance"]=1-(0.99^s-0.05),["Mastery"]= m}
+			else
+				cover[i]=false
+			end
+		end
+		
+		--roll once per player with player and pick the one with max hp
+		coverPlayerIndex=-1
+		lastMaxHp=0
+		covered=false
+		for i=0,#cover-1 do
+			if cover[i] then
+				local hp=Party[i].HP/Party[i]:GetFullHP()
+				if cover[i].Chance>math.random() and hp>lastMaxHp then
+					lastMaxHp=hp
+					coverPlayerIndex=i
+					covered=true
 				end
 			end
-			--roll once per player with player and pick the one with max hp
-			coverPlayerIndex=-1
-			if magicCoverChance[1] then
-				lastMaxHp=0
-				cover=false
-				for i=1,#magicCoverChance do
-					if Party[magicCoverChance[i].index].HP>lastMaxHp then
-						local index=magicCoverChance[i].index
-						local p=magicCoverChance[i].p
-						if math.random()<p then
-							lastMaxHp=Party[index].HP
-							coverPlayerIndex=index
-							cover=true
-						end
-					end
-				end
-				if cover then
-					mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Shield, t.PlayerSlot)
-					Party[coverPlayerIndex]:ShowFaceAnimation(14)
-					Game.ShowStatusText(Party[coverPlayerIndex].Name .. " cover " .. Party[t.PlayerSlot].Name)
-					t.PlayerSlot=coverPlayerIndex
-				end
-			end
+		end
+		if covered then
+			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Shield, t.PlayerSlot)
+			Party[coverPlayerIndex]:ShowFaceAnimation(14)
+			Game.ShowStatusText(Party[coverPlayerIndex].Name .. " cover " .. Party[t.PlayerSlot].Name)
+			t.PlayerSlot=coverPlayerIndex
 		end
 	end
 end
@@ -1459,7 +1413,7 @@ function events.GameInitialized2()
 	local coverSkill=50
 	Skillz.new_armor(coverSkill)
 	Skillz.setName(coverSkill, "Cover")
-	Skillz.setDesc(coverSkill, 1, "Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nGrants 5 plus 1% chance per skill point to Cover an ally.\n")
+	Skillz.setDesc(coverSkill, 1, "Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nGrants 5 plus 1% chance per skill point to Cover an ally.\n\nPress P to enable/disable\n")
 	Skillz.setDesc(coverSkill, 2, "Allow use to Cover Physical damage\n")
 	Skillz.setDesc(coverSkill, 3, "Allow use to Cover Projectiles damage")
 	Skillz.setDesc(coverSkill, 4, "Allow use to Cover Spells damage")
@@ -1467,6 +1421,63 @@ function events.GameInitialized2()
 	Skillz.learn_at(coverSkill, 30)
 end
 
+--fix to cover skill and misc
+function events.Tick()
+	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
+		local index=Game.CurrentPlayer
+		if index>=0 and index<=Party.High then
+			if Skillz.get(Party[index],50)>0 then
+				Game.GlobalTxt[143]="\nMisc"
+			else
+				Game.GlobalTxt[143]="Misc"
+			end
+		end	
+		if not vars.covering then
+			vars.covering={}
+			for i=0,4 do
+				vars.covering[i]=true
+			end
+		end
+		local s= SplitSkill(Skillz.get(Party[Game.CurrentPlayer], 50))
+		local chance=math.round((1-(0.99^s-0.05))*10000)/100
+		local txt="Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nGrants 5 plus 1% chance per skill point to Cover. \nCurrent cover chance: " .. chance .. "%\n\nPress P to enable/disable\n"
+		if vars.covering[Game.CurrentPlayer] then
+			txt=txt .. StrColor(255,0,0,"\nCurrently disabled\n")
+			Skillz.setDesc(50, 1, txt)
+		else
+			txt=txt .. StrColor(0,255,0,"\nCurrently enabled\n")
+			Skillz.setDesc(50, 1, txt)
+		end
+	end
+end
+function events.KeyDown(t)
+	if t.Key==const.Keys.P then
+		if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
+			vars.covering=vars.covering or {}
+			if vars.covering[Game.CurrentPlayer] then
+				vars.covering[Game.CurrentPlayer]=false
+				Game.ShowStatusText("Cover Disabled")
+			else
+				vars.covering[Game.CurrentPlayer]=true
+				Game.ShowStatusText("Cover Enabled")
+			end
+		end
+	end
+end
+local coverRequirements={6,12,20}
+function events.Action(t)
+	if t.Action==121 then
+		if t.Param==50 then
+			local pl=Party[Game.CurrentPlayer]
+			local s,m=SplitSkill(Skillz.get(pl,50))
+			if pl.SkillPoints>s and coverRequirements[m] and s+1>=coverRequirements[m] then
+				Skillz.set(pl,50,JoinSkill(s, m+1))
+			end
+		end
+	end
+end
+		
+		
 function events.CanIdentifyItem(t)
 	for k,v in pairs(vars.NPCFollowers) do
 		if Game.NPC[v].Profession == 4 then
