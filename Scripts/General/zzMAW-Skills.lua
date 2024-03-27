@@ -811,6 +811,10 @@ function events.PlayerAttacked(t)
 			local s, m= SplitSkill(Skillz.get(Party[i], 50))
 			if s>0 and vars.covering[i] and m>=masteryRequired and i~=t.PlayerSlot then
 				cover[i]={["Chance"]=1-(0.99^s-0.05),["Mastery"]= m}
+				if coverBonus[i] then
+					cover[i].Chance=cover[i].Chance+0.3
+					coverBonus[i]=false
+				end
 			else
 				cover[i]=false
 			end
@@ -1420,7 +1424,7 @@ function events.GameInitialized2()
 	Skillz.learn_at(coverSkill, 30)
 end
 
---fix to cover skill and misc
+-- COVER SKILL
 function events.Tick()
 	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
 		local index=Game.CurrentPlayer
@@ -1475,7 +1479,24 @@ function events.Action(t)
 		end
 	end
 end
-		
+coverBonus={}
+function events.CalcDamageToMonster(t)
+	data = WhoHitMonster()	
+	if data and data.Player and t.DamageKind==4 then
+		if data.Object==nil then
+			local s, m=SplitSkill(Skillz.get(data.Player,50))
+			if m>=4 then
+				for i=0, Party.High do
+					if Party[i]:GetIndex()==t.PlayerIndex then
+						coverBonus[i]=true
+						return
+					end
+				end
+			end
+		end
+	end
+end	
+
 		
 function events.CanIdentifyItem(t)
 	for k,v in pairs(vars.NPCFollowers) do
