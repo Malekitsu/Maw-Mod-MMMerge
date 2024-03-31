@@ -134,7 +134,7 @@ function events.UseMouseItem(t)
 			if power>vars.BlackPotions[index][stat] then
 				local buff=power-vars.BlackPotions[index][stat]
 				pl[stat]=pl[stat]+buff
-				vars.BlackPotions[index][stat]=buff
+				vars.BlackPotions[index][stat]=power
 			else
 				Game.ShowStatusText("Can't benefit anymore")
 				return
