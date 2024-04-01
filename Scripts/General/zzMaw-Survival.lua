@@ -324,24 +324,26 @@ function events.GameInitialized2()
 	
 	
 	function events.PickCorpse(t)
-		mon=t.Monster
-		--calculate bolster
-		lvl=BLevel[mon.Id]
-		gold=mon.TreasureDiceCount*(mon.TreasureDiceSides+1)/2
-		newGold=(bolsterLevel2+lvl)*7.5
-		local mult=1
-		if mon.Id%3==1 then
-			mult=0.5
-		elseif mon.Id%3==0 then
-			mult=2
+		if not survivalMaps[Map.Name] and vars.SuvivalMode then
+			mon=t.Monster
+			--calculate bolster
+			lvl=BLevel[mon.Id]
+			gold=mon.TreasureDiceCount*(mon.TreasureDiceSides+1)/2
+			newGold=(bolsterLevel2+lvl)*7.5
+			local mult=1
+			if mon.Id%3==1 then
+				mult=0.5
+			elseif mon.Id%3==0 then
+				mult=2
+			end
+			newGold=newGold*mult
+			goldMult=(bolsterLevel2+lvl)^1.5/(lvl)^1.5
+			mon.TreasureDiceCount=math.min(newGold^0.5,255)
+			mon.TreasureDiceSides=math.min(newGold^0.5,255)
+			--calculate loot chances
+			mon.TreasureItemPercent= math.round(mon.Level^0.7*2*mult)
+			mon.TreasureItemLevel=math.max(math.min(math.ceil(mon.Level/15),6),1)
+			mon.TreasureItemType=0
 		end
-		newGold=newGold*mult
-		goldMult=(bolsterLevel2+lvl)^1.5/(lvl)^1.5
-		mon.TreasureDiceCount=math.min(newGold^0.5,255)
-		mon.TreasureDiceSides=math.min(newGold^0.5,255)
-		--calculate loot chances
-		mon.TreasureItemPercent= math.round(mon.Level^0.7*2*mult)
-		mon.TreasureItemLevel=math.max(math.min(math.ceil(mon.Level/15),6),1)
-		mon.TreasureItemType=0
 	end
 end
