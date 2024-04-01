@@ -111,10 +111,10 @@ end
 
 function events.DeathMap(t)
 	if vars.SuvivalMode then
-		t.Name = "7out02.odm"
-		Party.X=-16832
-		Party.Y=12512
-		Party.Z=372
+		t.Name = "oute3.odm"
+		Party.X=-9729
+		Party.Y=-10555
+		Party.Z=160
 		Party.Direction=0
 		Party.Gold=goldCollectedSurvival
 	end
@@ -130,7 +130,7 @@ end
 function events.Tick()
 	if vars.survivalTeleport then
 		vars.survivalTeleport=false
-		evt.MoveToMap{-16832, 12512, 372, 0, 0, 0, 0, 0, "7out02.odm"}
+		evt.MoveToMap{-9729, -10555, 160, 512, 0, 0, 0, 0, "oute3.odm"}
 		Party.Gold=5000
 	end
 end
