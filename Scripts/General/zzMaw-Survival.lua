@@ -70,8 +70,8 @@ function survivalSpawns()
 		currentMapLevel=currentMapLevel+0.2
 		survivalMonsterTable(math.ceil(currentMapLevel))
 		--spawn monsters
-		local x=math.random(1000,4000)
-		local y=math.random(1000,4000)
+		local x=math.random(500,3500)
+		local y=math.random(500,3500)
 		if math.random()>0.5 then
 			x=-x
 		end
@@ -134,10 +134,6 @@ function events.Tick()
 		Party.Gold=5000
 	end
 end
-
-
-
-
 
 --monster balance specifically for survival
 function survivalMonsterTable(currentMapLevel)
@@ -305,4 +301,47 @@ function survivalMonsterTable(currentMapLevel)
 		mon.MoveType=math.min(mon.MoveType,1)
 	end
 	
+end
+
+function events.GameInitialized2()
+	function events.CalcDamageToPlayer(t)
+		if not survivalMaps[Map.Name] and vars.SuvivalMode then
+			t.Result=0
+		end
+	end
+	function events.CalcDamageToMonster(t)
+		if not survivalMaps[Map.Name] and vars.SuvivalMode then
+			t.Result=0
+		end
+	end
+	function events.CanOpenChest(t)
+		if not survivalMaps[Map.Name] and vars.SuvivalMode then
+			t.CanOpenChest=false
+			t.CanOpen=false
+			t.ChestId = 22
+		end
+	end
+	
+	
+	function events.PickCorpse(t)
+		mon=t.Monster
+		--calculate bolster
+		lvl=BLevel[mon.Id]
+		gold=mon.TreasureDiceCount*(mon.TreasureDiceSides+1)/2
+		newGold=(bolsterLevel2+lvl)*7.5
+		local mult=1
+		if mon.Id%3==1 then
+			mult=0.5
+		elseif mon.Id%3==0 then
+			mult=2
+		end
+		newGold=newGold*mult
+		goldMult=(bolsterLevel2+lvl)^1.5/(lvl)^1.5
+		mon.TreasureDiceCount=math.min(newGold^0.5,255)
+		mon.TreasureDiceSides=math.min(newGold^0.5,255)
+		--calculate loot chances
+		mon.TreasureItemPercent= math.round(mon.Level^0.7*2*mult)
+		mon.TreasureItemLevel=math.max(math.min(math.ceil(mon.Level/15),6),1)
+		mon.TreasureItemType=0
+	end
 end
