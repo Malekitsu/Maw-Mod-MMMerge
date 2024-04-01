@@ -122,6 +122,10 @@ Timer(evt.map[1001].last, const.Minute*5)
 
 evt.hint[2666]="Enroth"
 evt.map[2666] = function()
+	if vars.SuvivalMode then
+		evt.MoveToMap{12567, 1728, 1, 512, 0, 0, 0, 0, "7out01.odm"}
+		return
+	end
 	evt.MoveToMap{-9729, -10555, 160, 512, 0, 0, 0, 3, "oute3.odm"}
 end
 
