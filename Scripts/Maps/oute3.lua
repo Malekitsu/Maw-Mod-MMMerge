@@ -95,6 +95,10 @@ end
 
 evt.hint[1777]="Antagarich"
 evt.map[1777] = function()
+	if vars.SuvivalMode then
+		evt.MoveToMap{12567, 1728, 1, 512, 0, 0, 0, 0, "7out01.odm"}
+		return
+	end
 	if evt.Cmp{"QBits", Value = 527} then
 		evt.MoveToMap{-16832, 12512, 372, 0, 0, 0, 0, 3, "7out02.odm"}
 	else
