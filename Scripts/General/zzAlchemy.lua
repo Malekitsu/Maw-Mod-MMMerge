@@ -688,7 +688,7 @@ end
 
 evt.PotionEffects[85] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
-		if Game.ItemsTxt[t.Number].NotIdentifiedName==Game.ItemsTxt[t.Number+1].NotIdentifiedName and t.BodyLocation==0 then
+		if Game.ItemsTxt[t.Number].NotIdentifiedName==Game.ItemsTxt[t.Number+1].NotIdentifiedName and (t.BodyLocation==0 or Party[0]:GetActiveItem(t.BodyLocation-1)==nil) then
 			t.Number=t.Number+1
 			Mouse.Item.Number=0
 		else
