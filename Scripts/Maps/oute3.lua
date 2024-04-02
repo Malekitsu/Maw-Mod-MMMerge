@@ -114,3 +114,8 @@ evt.map[1888] = function()
 		evt.MoveToMap{3560, 7696, 544, 0, 0, 0, 0, 3, "out01.odm"}
 	end
 end
+
+Game.MapEvtLines:RemoveEvent(104)
+evt.map[104] = function()
+	evt.MoveToMap{X = -9477, Y = -13062, Z = 129, Direction = 0, LookAngle = 0, SpeedZ = 0, HouseId = 0, Icon = 0, Name = "outb3.odm"}
+end
