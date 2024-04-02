@@ -1445,10 +1445,10 @@ function events.Tick()
 		local chance=math.round((1-(0.99^s-0.05))*10000)/100
 		local txt="Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nGrants 5 plus 1% chance per skill point to Cover. \nCurrent cover chance: " .. chance .. "%\n\nPress P to enable/disable\n"
 		if vars.covering[Game.CurrentPlayer] then
-			txt=txt .. StrColor(255,0,0,"\nCurrently enabled\n")
+			txt=txt .. StrColor(0,255,0,"\nCurrently enabled\n")
 			Skillz.setDesc(50, 1, txt)
 		else
-			txt=txt .. StrColor(0,255,0,"\nCurrently disabled\n")
+			txt=txt .. StrColor(255,0,0,"\nCurrently disabled\n")
 			Skillz.setDesc(50, 1, txt)
 		end
 	end
