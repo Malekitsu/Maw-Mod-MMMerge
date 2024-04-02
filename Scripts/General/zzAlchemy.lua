@@ -184,7 +184,7 @@ function events.GameInitialized2()
 	end
 end
 
-potionUsingCharges={228,229,230,231,232,233,234,235,237,240,241,242,245,248,249,250,251,257,263}
+potionUsingCharges={228,229,230,231,232,233,234,235,237,240,241,242,245,247,248,249,250,251,257,263}
 potionPowerRequirement={
 	[231]=20,
 	[235]=20,
@@ -294,11 +294,11 @@ function events.BuildItemInformationBox(t)
 	if t.Item.Number==232 then
 		t.Description="Grants " .. StrColor(0,0,200,2+math.floor(t.Item.Bonus/10)) .. " bonus to Meditation skill for 6 hours."
 	end
-	if t.Item.Number==246 then
-		t.Description=StrColor(255,255,153,"Heals " .. math.round(t.Item.Bonus^1.4*3)+30 .. " Hit Points") .. "\n" .. t.Description
-	end
 	if t.Item.Number==247 then
-		t.Description=StrColor(255,255,153,"Restores " .. math.round(t.Item.Bonus^1.4*2)+30 .. " Spell Points") .. "\n" .. t.Description
+		t.Description=StrColor(255,255,153,"Heals " .. math.round(t.Item.Bonus^1.4*1.5)+20 .. " Hit Points") .. "\n" .. t.Description
+	end
+	if t.Item.Number==248 then
+		t.Description=StrColor(255,255,153,"Restores " .. math.round(t.Item.Bonus^1.4)+20 .. " Spell Points") .. "\n" .. t.Description
 	end
 	if table.find(potionUsingCharges,t.Item.Number) then
 		local charges=t.Item.Charges-1
@@ -343,8 +343,8 @@ potionText={
 	[244] = "Adds 'of Swiftness' property to a non-magic weapon.\nRequire 40 power to work.\n",
 	[245] = "Provides Haste+Heroism+Bless.",
 	[246] = "Removes and prevents all conditions except Dead and Eradicated for 6 hours.\nRequire 40 power to work.\n",
-	[247] = "Heals three times the potion's strength of hit points.",
-	[248] = "Restores three times the potion's strength of spell points.",
+	[247] = "Heals based on the potion's power of hit points.",
+	[248] = "Restores based on the potion's power of spell points.",
 	[249] = "Increases temporary Fire, Air, Water and Earth resistance. (Dark)",
 	[250] = "Increases temporary Mind and Body resistance. (Light)",
 	[251] = "Provides Protection+Stone Skin+Magic Protection.",
