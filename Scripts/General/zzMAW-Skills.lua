@@ -127,7 +127,7 @@ twoHandedWeaponDamageBonusByMastery = {
 	[const.Novice] = 1, 
 	[const.Expert] = 2, 
 	[const.Master] = 3, 
-	[const.GM] = 3 
+	[const.GM] = 4 
 }
 
 --all stats bonus are calculated in Maw Items, as this function only changes hp,sp,ac,attack and damage
