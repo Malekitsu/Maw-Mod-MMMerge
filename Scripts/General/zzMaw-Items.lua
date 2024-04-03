@@ -1921,7 +1921,7 @@ function itemStats(index)
 				end
 			end
 			--artifacts
-			if artArmors[it.Number] then 
+			if table.find(artArmors,it.Number) then 
 				artifactMult=artifactPowerMult(pl.LevelBase)
 				acBonus=math.ceil(acBonus*artifactMult)
 			end
