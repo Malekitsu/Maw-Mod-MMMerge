@@ -155,7 +155,15 @@ function events.UseMouseItem(t)
 	--exp potion
 	if it.Number==259 then
 		local experience=it.Bonus*500
-		pl.Exp=pl.Exp+experience
+		vars.expPot=vars.expPot or {}
+		vars.expPot[index]=vars.expPot[index] or 0
+		if vars.expPot[index]/(pl.Exp-vars.expPot[index])<0.25 then
+			pl.Exp=pl.Exp+experience
+			vars.expPot[index]=vars.expPot[index]+experience
+		else
+			Game.ShowStatusText("You need to gain more exp. to benefit from this potion")
+			return
+		end
 	end
 	
 	--consume
@@ -300,6 +308,18 @@ function events.BuildItemInformationBox(t)
 	if t.Item.Number==248 then
 		t.Description=StrColor(255,255,153,"Restores " .. math.round(t.Item.Bonus^1.4)+20 .. " Spell Points") .. "\n" .. t.Description
 	end
+	if t.Item.Number==259 then
+		vars.expPot=vars.expPot or {}
+		vars.expPot[index]=vars.expPot[index] or 0
+		local percent=math.round(vars.expPot[index]/(pl.Exp-vars.expPot[index])*10000)/100
+		if percent<25 then
+			str=StrColor(0,255,0,percent .. "%")
+		else
+			str=StrColor(255,0,0,percent .. "%")
+		end
+		t.Description=t.Description .. "\n\nCan benefit only if experience gained this way is less than 25% of base experience\nCurrent amount: " .. str
+	end
+		
 	if table.find(potionUsingCharges,t.Item.Number) then
 		local charges=t.Item.Charges-1
 		if charges==-1 then
