@@ -20,7 +20,7 @@ Viktor, Hagnak, ArkTolei, MR___TJ, Spazzledorf, Torkvato, LiGx, Mercs/Zan Team.
 ## Install instruction
 - download MM8 from GOG
 - following 3 files needs to be copied into MM8 folder in that exact order.
-  - download MMMerge here: https://drive.google.com/file/d/1f5-V-DtxB3u977RqdDH7hGbtZiGOQAGt/view
+  - download MMMerge here: https://1drv.ms/u/s!AklOx6zaOmQgbHB1-Avia15ruaI?e=H4IcBJ 
   - download Multiplayer here: https://gitlab.com/letr.rod/mmmerge/-/archive/multiplayer/mmmerge-multiplayer.zip
   - download Patch here: https://drive.google.com/file/d/1IwF-MADHqpXOjHwOzYJxLcoUKh1Q4gXb/view
   - download MAW MMMerge here: https://github.com/Malekitsu/Maw-Mod-MMMerge/archive/refs/heads/main.zip
