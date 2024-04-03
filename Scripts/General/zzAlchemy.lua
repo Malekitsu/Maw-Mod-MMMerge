@@ -440,9 +440,11 @@ reagentList={
 	[1762] = 1, [1763] = 1, [1764] = 1,
 }
 function events.Tick()
+	alcBonus=alcBonus or {}
 	if Game.CurrentPlayer<0 then 
 		return
 	end
+	alcBonus[Party[Game.CurrentPlayer]:GetIndex()]=0
 	if lastModifiedReagent and lastModifiedReagent~=0 then
 		Game.ItemsTxt[lastModifiedReagent].Mod1DiceCount=reagentList[lastModifiedReagent]
 	end
@@ -453,15 +455,30 @@ function events.Tick()
 		end
 		local alc=Party[Game.CurrentPlayer]:GetSkill(const.Skills.Alchemy)
 		s,m=SplitSkill(alc)
+		local bonus=0
 		if m==3 then
-			it.Mod1DiceCount=it.Mod1DiceCount+s*0.5
+			bonus=s*0.5
 		elseif m==4 then
-			it.Mod1DiceCount=it.Mod1DiceCount+s
+			bonus=s
+		end
+		if it.Mod1DiceCount+bonus>255 then
+			local id=Party[Game.CurrentPlayer]:GetIndex()
+			alcBonus[id]=it.Mod1DiceCount+bonus-255
+			it.Mod1DiceCount=255
+		else
+			it.Mod1DiceCount=it.Mod1DiceCount+bonus
 		end
 		lastModifiedReagent=Mouse.Item.Number
 	end
 end
-
+--increase alchemy skill to fix reagent power overflow
+function events.GameInitialized2()
+	function events.GetSkill(t)
+		if t.Skill==const.Skills.Alchemy and alcBonus and alcBonus[t.PlayerIndex] then
+			t.Result=t.Result+alcBonus[t.PlayerIndex]
+		end
+	end
+end
 
 function events.BuildItemInformationBox(t)
 	if reagentList[t.Item.Number] then
