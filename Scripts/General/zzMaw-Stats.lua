@@ -157,8 +157,8 @@ function events.CalcSpellDamage(t)
 		bonus=math.max(intellect,personality)
 		critDamage=bonus*3/2000
 		t.Result=t.Result*(1+bonus/1000) 
-		critChance=50+critChance*100
-		roll=math.random(1, 1000)
+		critChance=5+critChance*100
+		roll=math.random(1, 100)
 		if roll <= critChance then
 			t.Result=t.Result*(1.5+critDamage)
 			crit=true
