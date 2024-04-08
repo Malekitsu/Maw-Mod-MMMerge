@@ -3,12 +3,15 @@ local count = 5
 function events.KeyDown(t)
 
     if ((Game.CurrentScreen == 7 or Game.CurrentScreen==15) and Game.CurrentCharScreen == 103) or Game.CurrentScreen==13 then
-		pl = Party[Game.CurrentPlayer]
-		if Party.High==0 then
-			if t.Key>=49 and t.Key<=48+count then
-				changeBag(pl , t.Key-48)
+		local id=Game.CurrentPlayer
+		if id>=0 and id <=Party.High then
+			local pl = Party[Game.CurrentPlayer]
+			if Party.High==0 then
+				if t.Key>=49 and t.Key<=48+count then
+					changeBag(pl , t.Key-48)
+				end
 			end
-		end		
+		end
 	end
 end
 
