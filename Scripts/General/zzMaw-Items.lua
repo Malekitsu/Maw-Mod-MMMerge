@@ -172,17 +172,20 @@ function events.ItemGenerated(t)
 			t.Item.Bonus2=0
 			t.Item.Charges=0
 			t.Item.MaxCharges=0
-			roll=math.random(1,1000)/math.min(((Party.Gold+1)/500000),10)
+			roll=math.random(1,1000)/math.min(((Party.Gold+1)/1000000),10)
 			if roll<=2 then
 				t.Item.Number=1064
 				return
-			elseif roll<=5 then
+			elseif roll<=7 then
 				t.Item.Number=1061
 				return
-			elseif roll<=10 then
+			elseif roll<=12 then
 				t.Item.Number=1062
 				return
-			elseif roll<=30 then
+			elseif roll<=15 then
+				t.Item.Number=1065
+				return
+			elseif roll<=35 then
 				t.Item.Number=1063
 				return
 			else
@@ -1172,6 +1175,7 @@ reagentPrices={
 	[1062] = 750000,
 	[1063] = 325000,
 	[1064] = 6668999,
+	[1065] = 2000000,
 }
 --modify weapon enchant damage
 
