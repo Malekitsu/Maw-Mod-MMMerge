@@ -1321,7 +1321,8 @@ spellbonusdamage[39] = {["low"]=40, ["high"]=80}
 
 aoespells = {6, 7, 8, 9, 10, 15, 22, 26, 32, 41, 43, 84, 92, 97, 98, 99, 123}
 function events.CalcSpellDamage(t)
-data=WhoHitMonster()
+	data=WhoHitMonster()
+	if data and data.Spell==44 then return end
 	if data and data.Player then
 		it=data.Player:GetActiveItem(1)
 		if it then
