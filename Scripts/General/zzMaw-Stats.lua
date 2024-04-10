@@ -147,6 +147,9 @@ end
 
 --intellect/personality
 function events.CalcSpellDamage(t)
+	if t.Spell==44 then
+		return 
+	end
 	local data = WhoHitMonster()
 	if data and data.Player and (data.Player.Class==10 or data.Player.Class==11 or table.find(dkClass, data.Player.Class)) then return end
 	if data and data.Player then
@@ -975,12 +978,16 @@ end
 --
 function events.GameInitialized2()
 	function events.CalcDamageToMonster(t)
+		data=WhoHitMonster()
 		divide=1
-		if t.Monster.Resistances[0]>=1000 then
+		if data and data.Spell==44 then
+			if t.Monster.Resistances[0]>=1000 then
+				divide=2^math.floor(t.Monster.Resistances[0]/1000)
+			end
+		elseif t.Monster.Resistances[0]>=1000 then
 			divide=2^math.floor(t.Monster.Resistances[0]/1000)
 			t.Result=t.Result/divide
 		end
-		data=WhoHitMonster()
 		if data and data.Player then
 			for i=0, Party.High do
 				if Party[i]:GetIndex()==t.PlayerIndex then
