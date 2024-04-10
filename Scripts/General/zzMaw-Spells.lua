@@ -1202,7 +1202,7 @@ end
 function events.CalcSpellDamage(t)
 	--mass distorsion
 	if t.Spell == 44 then 
-		t.Result = t.HP*0.15+t.HP*t.Skill*0.005
+		t.Result = math.min(t.HP*0.15+t.HP*t.Skill*0.005, 32500)
 		return
 	end
 	--check for spell tier
@@ -1401,13 +1401,13 @@ function ascension()
 				for i=1,4 do
 					Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+0.15*ascensionLevel*s)*(1-0.1*m)
 				end
-				if num==44 then	
-					Game.Spells[num]["SpellPointsGM"]=pl.LevelBase^1.6/12.5
-				end
 			else
 				for i=1,4 do
 					Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num]
 				end
+			end
+			if num==44 then	
+				Game.Spells[num]["SpellPointsGM"]=math.min(pl.LevelBase, 255)^1.6/12.5
 			end
 		end				
 			
