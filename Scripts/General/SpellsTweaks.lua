@@ -36,7 +36,8 @@ local function CanApplySlowMassDistort(d)
 	if CanApplySpell(Skill, Mastery, Res) then
 		d.eax = 1
 	else
-		d.eax = 0
+		--d.eax = 0
+		d.eax = 1
 	end
 end
 
