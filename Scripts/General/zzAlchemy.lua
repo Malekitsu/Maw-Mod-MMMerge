@@ -591,12 +591,12 @@ for i=1,10 do
 			mult=slotMult[t:T().EquipStat]
 			maxStrength1=math.round(tier*10*mult)
 			maxStrength2=maxStrength1
-			if t.BonusStrength>=maxStrength1 and t.Charges%1000>=maxStrength1 then 
+			enc1=t.BonusStrength
+			enc2=t.Charges%1000
+			if enc1>=maxStrength1 and enc2>=maxStrength1 then 
 				Game.ShowStatusText("Gem power is not enough")
 				return
 			end
-			enc1=t.BonusStrength
-			enc2=t.Charges%1000
 			--check for special enchant
 			if t.Bonus>=17 then
 				maxStrength1=math.floor(math.max((tier*10)^0.5*mult, math.round(tier*mult)))
@@ -613,7 +613,6 @@ for i=1,10 do
 				end
 			end
 			if t.Bonus==10 then
-				enc1=enc1*2
 				maxStrength1=math.ceil(maxStrength1/2)
 			end
 			if math.floor(t.Charges/1000)==10 then
@@ -621,7 +620,7 @@ for i=1,10 do
 				maxStrength2=math.ceil(maxStrength2/2)
 			end
 			
-			if (enc1<=enc2 and enc1<maxStrength1) or (t.Charges<=1000 and t.BonusStrength<maxStrength1) then
+			if (enc1<=enc2 and enc1<maxStrength1) then
 				t.BonusStrength=math.min(t.BonusStrength+upgradeAmount,maxStrength1)
 			elseif t.Charges%1000<maxStrength2 and t.Charges>1000 then
 				newBonus=math.min(t.Charges%1000+upgradeAmount,maxStrength2)
