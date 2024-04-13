@@ -614,7 +614,7 @@ function events.BuildStatInformationBox(t)
 	end
 	
 	if t.Stat>=19 and t.Stat<=24 then
-		t.Text=t.Text .. "\n\nDamage is reduced by an amount equal to % shown.\nMax resistance is 93.75%(beside immune status)\n\nLight resistance is equal to the lowest between Mind and Body resistances.\nDark resistance is equal to the lowest between elemental resistances\nEnergy resistance is equal to the lowest resistance"
+		t.Text=t.Text .. "\n\nDamage is reduced by an amount equal to % shown.\n\nLight resistance is equal to the lowest between Mind and Body resistances.\nDark resistance is equal to the lowest between elemental resistances\nEnergy resistance is equal to the lowest resistance"
 	end
 end
 
@@ -743,7 +743,7 @@ function events.CalcDamageToPlayer(t)
 		t.Damage=t.Result*dmgMult
 	end
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
-		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true,data.Monster.Level)
+		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,false,data.Monster.Level) -- spell randomization is off
 	elseif data and data.Monster then
 		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,false,data.Monster.Level)
 	else
@@ -814,9 +814,7 @@ function events.Tick()
 			end
 			resistances2[i]=100-math.max(math.round(calcMawDamage(pl,damageList[i-9],1000))/10, 0)
 			resistances2[i]=math.round(resistances2[i]*100)/100
-			if resistances2[i]>=93.75 then
-				resistances2[i]=StrColor(0,255,0,"Max")
-			elseif resistances2[i]%1==0 then
+			if resistances2[i]%1==0 then
 				resistances2[i]=resistances2[i] .. ".0"
 			end
 		end
@@ -944,7 +942,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		local AC=pl:GetArmorClass()
 		local AC=pl:GetArmorClass()
 		local AC=pl:GetArmorClass()--multiple times to avoid chance to hit code to interfere with AC
-		local damage=math.round(damage/2^(math.min(AC/math.min(150+monLvl*bolster,400*bolster),4)))
+		local damage=math.round(damage/2^(AC/math.min(150+monLvl*bolster,400*bolster)))
 		return damage
 	end
 
@@ -962,7 +960,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		end
 	end
 	
-	res=1/2^math.min(res/math.min(75+monLvl*0.5*bolster,200*bolster),4)
+	res=1/2^math.min(res/math.min(75+monLvl*0.5*bolster,200*bolster))
 	
 	--randomize resistance
 	if res>0 and rand then
