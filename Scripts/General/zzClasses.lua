@@ -1206,9 +1206,9 @@ local function dkSkills(isDK, id)
 				Game.SpellsTxt[key][key2]=value2
 			end
 		end
-		Skillz.setName(14, "Water")
-		Skillz.setName(18, "Body")
-		Skillz.setName(20, "Dark")
+		Skillz.setName(14, "Water Magic")
+		Skillz.setName(18, "Body Magic")
+		Skillz.setName(20, "Dark Magic")
 	end
 end
 
