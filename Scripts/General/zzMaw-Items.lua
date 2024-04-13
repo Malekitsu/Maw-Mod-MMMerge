@@ -2782,7 +2782,7 @@ playerToPartyBuff={
 	[22]=17,
 }
 statToPlayerbuff={
-	[11]=0,
+	[10]=0,
 	[15]=2,
 	[13]=3,
 	[11]=5,
