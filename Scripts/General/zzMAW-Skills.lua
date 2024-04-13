@@ -36,7 +36,7 @@ baseRecovery =
 
 weaponImpair =
 {
-	[const.Skills.Leather]	= {[0]=10, 10, 10, 0, 0,},
+	[const.Skills.Leather]	= {[0]=10, 10, 0, 0, 0,},
 	[const.Skills.Chain]	= {[0]=20, 20, 10, 0, 0,},
 	[const.Skills.Plate]	= {[0]=20, 20, 10, 10, 0,},
 	[const.Skills.Shield]	= {[0]=10, 10, 0, 0, 0,},
