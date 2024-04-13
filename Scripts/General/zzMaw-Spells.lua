@@ -924,6 +924,7 @@ function events.Action(t)
 			pl:SetRecoveryDelay(delay)
 			evt.PlaySound(16010)
 			pl.Expression=40
+			Party.SpellBuffs[11].ExpireTime=0 --invisibility
 		elseif spellCast==74 and pl.RecoveryDelay==0 then
 			local sp=healingSpells[74]
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
@@ -984,6 +985,7 @@ function events.Action(t)
 			pl:SetRecoveryDelay(delay)
 			evt.PlaySound(16070)
 			pl.Expression=40
+			Party.SpellBuffs[11].ExpireTime=0 --invisibility
 		elseif spellCast==49 and pl.RecoveryDelay==0 then
 			local sp=healingSpells[49]
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Spirit))
@@ -1042,6 +1044,7 @@ function events.Action(t)
 			pl:SetRecoveryDelay(delay)
 			evt.PlaySound(14040)
 			pl.Expression=40
+			Party.SpellBuffs[11].ExpireTime=0 --invisibility
 		end
 	end
 end
