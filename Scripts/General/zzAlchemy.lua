@@ -684,15 +684,14 @@ end
 
 evt.PotionEffects[82] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
-		if t.Bonus==0 or t.BonusStrength==0 or t.Bonus2==0 then 
-			return
+		if t.Bonus>0 and t.BonusStrength>0 and t.Charges<=1000 then 
+			math.randomseed(t.Number*10000+t.MaxCharges*1000+t.Bonus*100+t.BonusStrength*10+t.Charges)
+			t.Charges=math.random(1,16)*1000+math.min(math.round(t.BonusStrength*(1+0.25*math.random())),100)
+			Mouse.Item.Number=0
+			mem.u4[0x51E100] = 0x100 
+			t.Condition = t.Condition:Or(0x10)
+			evt.PlaySound(12070)
 		end
-		math.randomseed(t.Number*10000+t.MaxCharges*1000+t.Bonus*100+t.BonusStrength*10+t.Charges)
-		t.Charges=math.random(1,16)*1000+math.min(math.round(t.BonusStrength*(1+0.25*math.random())),100)
-		Mouse.Item.Number=0
-		mem.u4[0x51E100] = 0x100 
-		t.Condition = t.Condition:Or(0x10)
-		evt.PlaySound(12070)
 	end
 end
 
