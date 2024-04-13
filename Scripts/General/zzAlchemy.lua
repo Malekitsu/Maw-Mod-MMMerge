@@ -451,7 +451,7 @@ function events.Tick()
 	if reagentList[Mouse.Item.Number] then
 		local it=Game.ItemsTxt[Mouse.Item.Number]
 		if Mouse.Item.Bonus>0 then
-			it.Mod1DiceCount=math.floor(reagentList[Mouse.Item.Number]*((Mouse.Item.Bonus*0.75)/20+1)+Mouse.Item.Bonus*0.75)
+			it.Mod1DiceCount=math.floor(reagentList[Mouse.Item.Number]*((Mouse.Item.Bonus*0.25)/20+1)+Mouse.Item.Bonus*0.75)
 		end
 		local alc=Party[Game.CurrentPlayer]:GetSkill(const.Skills.Alchemy)
 		s,m=SplitSkill(alc)
@@ -482,7 +482,7 @@ end
 
 function events.BuildItemInformationBox(t)
 	if reagentList[t.Item.Number] then
-		local bonus=math.round(reagentList[t.Item.Number] *((t.Item.Bonus*0.75)/20+1)+t.Item.Bonus*0.75)
+		local bonus=math.round(reagentList[t.Item.Number] *((t.Item.Bonus*0.25)/20+1)+t.Item.Bonus*0.75)
 		t.Enchantment="Power: " .. bonus
 	end
 end
