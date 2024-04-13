@@ -767,7 +767,7 @@ function events.BuildItemInformationBox(t)
 				local bonus=math.floor(t.Item.Charges/1000)
 				local strength=t.Item.Charges%1000
 				t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
-			elseif t.Item.Bonus~=0 and t.Item.BonusStrength~=0 and t.Item.Bonus2~=0 then
+			elseif t.Item.Bonus~=0 and t.Item.BonusStrength~=0 then
 				if extraDescription then
 					math.randomseed(t.Item.Number*10000+t.Item.MaxCharges*1000+t.Item.Bonus*100+t.Item.BonusStrength*10+t.Item.Charges)
 					local charges=math.random(1,16)*1000+math.min(math.round(t.Item.BonusStrength*(1+0.25*math.random())),100)
@@ -839,7 +839,8 @@ function events.BuildItemInformationBox(t)
 					text=Game.SpcItemsTxt[t.Item.Bonus2-1].BonusStat
 				end
 				t.Description = StrColor(255,255,153,text) .. "\n\n" .. t.Description
-			elseif t.Item.Bonus>0 and t.Item.Charges>1000 and extraDescription then
+			end
+			if t.Item.Bonus>0 and t.Item.Bonus2==0 and extraDescription then
 				n=t.Item.Number
 				c=Game.ItemsTxt[n].EquipStat
 				math.randomseed(t.Item.Number*10000+t.Item.MaxCharges*1000+t.Item.Bonus*100+t.Item.BonusStrength*10+t.Item.Charges)
@@ -865,7 +866,8 @@ function events.BuildItemInformationBox(t)
 				end
 				t.Description = StrColor(100,100,100,text) .. "\n\n" .. t.Description
 				vars.extraShown=true
-			elseif (t.Item.Bonus>0 and t.Item.Charges>1000) or (t.Item.Bonus>0 and t.Item.Bonus2>0) then
+			end
+			if t.Item.Bonus>0 and t.Item.BonusStrength>0 then
 				if not extraDescription and not vars.extraShown then
 					t.Description = t.Description .. "\n\n" .. StrColor(100,100,100,"Press alt to show craftable stats")
 				end
