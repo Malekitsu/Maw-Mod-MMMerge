@@ -1416,7 +1416,7 @@ function ascension()
 				end
 			else
 				for i=1,4 do
-					Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num]
+					Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]
 				end
 			end
 			if num==44 then	
