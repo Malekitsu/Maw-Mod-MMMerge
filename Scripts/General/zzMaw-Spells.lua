@@ -1185,7 +1185,7 @@ function events.GameInitialized2()
 			[37] = {dmgAdd = 16, diceMin = 1, diceMax = 4, },--deadly swarm
 			[39] = {dmgAdd = 12, diceMin = 1, diceMax = 8, },--blades
 			[41] = {dmgAdd = 8, diceMin = 1, diceMax = 8, },--rock blast
-			[43] = {dmgAdd = 0, diceMin = 1, diceMax = 12, },--death blossom
+			[43] = {dmgAdd = 0, diceMin = 1, diceMax = 5, },--death blossom
 			[44] = {dmgAdd = 15, diceMin = 0.5, diceMax = 0.5, },--mass distorsion, nerfed
 			[52] = {dmgAdd = 10, diceMin = 2, diceMax = 12, },--spirit lash
 			[59] = {dmgAdd = 12, diceMin = 1, diceMax = 7, },--mind blast
