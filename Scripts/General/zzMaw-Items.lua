@@ -1656,16 +1656,28 @@ function events.BuildItemInformationBox(t)
 			end
 			itemLevel=itemLevel+math.round(lvl/tot*18-17)
 			t.Description = t.Description .. "\n\nItem Level: " .. itemLevel
-			local levelRequired=(t.Item.MaxCharges)*3+lvl/tot*6-17
+			local levelRequired=(t.Item.MaxCharges)*3+lvl/tot*2-12
 			if Game.BolsterAmount>=300 then
-				levelRequired=levelRequired-10
+				levelRequired=levelRequired-6
 			end
 			
 			levelRequired=math.max(1,math.floor(levelRequired))
 			if t.Item.BonusExpireTime<=2 then
-				levelRequired=math.max(1,levelRequired-t.Item.BonusExpireTime*18)
+				levelRequired=math.max(1,levelRequired-t.Item.BonusExpireTime*5)
 			end
-			local txt="\n\nLevel Required: " .. levelRequired
+			local enchants=1
+			if t.Item.Bonus>0 then
+				enchants=enchants+1
+			end
+			if t.Item.Bonus2>0 then
+				enchants=enchants+1
+			end
+			if t.Item.Charges>1000 then
+				enchants=enchants+1
+			end
+			levelRequired=math.round(levelRequired*enchants/4)
+			local txt="\n\nLevel Required: " .. levelRequired 
+			--local txt="" --not shown when can equip
 			--check if equippable
 			local id=Game.CurrentPlayer
 			if id<0 or id>Party.High then
@@ -2834,13 +2846,25 @@ function events.CanWearItem(t)
 			lvl=lvl+it:T().ChanceByLevel[i]*i
 		end
 		itemLevel=itemLevel+math.round(lvl/tot*18-17)
-		local levelRequired=(it.MaxCharges)*3+lvl/tot*6-17
+		local levelRequired=(it.MaxCharges)*3+lvl/tot*3-12
 		if Game.BolsterAmount>=300 then
-			levelRequired=levelRequired-10
+			levelRequired=levelRequired-6
 		end
 		if it.BonusExpireTime<=2 then
-			levelRequired=math.max(1,levelRequired-it.BonusExpireTime*18)
+			levelRequired=math.max(1,levelRequired-it.BonusExpireTime*5)
 		end
+		local enchants=1
+		if it.Bonus>0 then
+			enchants=enchants+1
+		end
+		if it.Bonus2>0 then
+			enchants=enchants+1
+		end
+		if it.Charges>1000 then
+			enchants=enchants+1
+		end
+		levelRequired=math.round(levelRequired*enchants/4)
+		
 		levelRequired=math.max(1,math.floor(levelRequired))
 		--check if equippable
 		local plLvl=Party[t.PlayerId].LevelBase
