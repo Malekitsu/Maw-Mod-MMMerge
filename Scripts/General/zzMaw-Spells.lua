@@ -229,9 +229,18 @@ function events.PlayerCastSpell(t)
 				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[1] .. " hit points"))
 			end
 		elseif t.TargetKind == 4 and not t.RemoteData then
-			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+math.round(totHeal),Party[t.TargetId]:GetFullHP())
-			if Party[t.TargetId].HP>0 then
-				Party[t.TargetId].Unconscious=0
+			if Party[t.TargetId].Dead>0 or Party[t.TargetId].Eradicated>0 then
+				local hp=Party[t.TargetId].HP
+				function events.Tick() 
+					events.Remove("Tick", 1)
+					Party[t.TargetId].HP=math.max(hp+math.round(totHeal), 1)
+					debug.Message(dump(Party[t.TargetId].HP))
+				end
+			else
+				Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+math.round(totHeal),Party[t.TargetId]:GetFullHP())
+				if Party[t.TargetId].HP>0 then
+					Party[t.TargetId].Unconscious=0
+				end
 			end
 		end
 	end
