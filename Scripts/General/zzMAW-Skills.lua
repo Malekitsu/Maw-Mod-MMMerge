@@ -1506,3 +1506,8 @@ function events.CanIdentifyItem(t)
 		end
 	end
 end
+
+--fix for "yo" text
+function events.GameInitialized2()
+	Game.NPCText[128]="You don't meet the requirements, and cannot be taught until you do."	
+end
