@@ -178,7 +178,7 @@ function events.Action(t)
 		lastBolster=lastBolster or Game.BolsterAmount
 		lastMode=lastMode or Game.freeProgression
 		if Game.BolsterAmount~=lastBolster or lastMode~=Game.freeProgression then
-			if vars.trueNightmare and Game.BolsterAmount~=300 then
+			if vars.trueNightmare and Game.BolsterAmount~=300 and vars.Mode~=2 then
 				Game.BolsterAmount=300
 				recalculateMonsterTable()
 				recalculateMawMonster()
@@ -358,6 +358,9 @@ function recalculateMonsterTable()
 		if Game.BolsterAmount==300 then
 			mon.Experience=mon.Experience*0.75
 		end
+		if vars.Mode==2 then
+			mon.Experience=mon.Experience/2
+		end
 	end
 	--CALCULATE DAMAGE AND HP
 	for i=1, 651 do
@@ -401,6 +404,9 @@ function recalculateMonsterTable()
 		--Nightmare
 		if Game.BolsterAmount==300 then
 			hpMult=hpMult*3
+		end
+		if Game.BolsterAmount==600 then
+			hpMult=hpMult*4*(1+totalLevel[i]/127.5)
 		end
 		
 		HPtable[i]=HPtable[i]*hpMult
@@ -527,6 +533,9 @@ function events.PickCorpse(t)
 	if Game.freeProgression then
 		if bolsterLevel2>50 or mon.TreasureItemPercent>70 then
 			mon.TreasureItemPercent= math.round(mon.TreasureItemPercent^0.85 + (50 - mon.TreasureItemPercent^0.85 / 2) * bolsterLevel2 / 250)
+			if vars.Mode==2 then
+				mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.6)
+			end
 			mon.TreasureItemLevel=math.max(t.Monster.TreasureItemLevel,1)
 		end
 	end
@@ -679,6 +688,23 @@ function events.LoadMap()
 			end 
 			if Game.MapStats[i].Mon3Hi>1 then
 				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+3
+			end 
+			Game.MapStats[i].Mon1Dif=math.min(BackupMapStats[i].Mon1Dif+1,5)
+			Game.MapStats[i].Mon2Dif=math.min(BackupMapStats[i].Mon2Dif+1,5)
+			Game.MapStats[i].Mon3Dif=math.min(BackupMapStats[i].Mon3Dif+1,5)
+		end
+	end
+	
+	if vars.Mode==2 then
+		for i=1,Game.MapStats.High do
+			if Game.MapStats[i].Mon1Hi>1 then
+				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+6
+			end 
+			if Game.MapStats[i].Mon2Hi>1 then
+				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+6
+			end 
+			if Game.MapStats[i].Mon3Hi>1 then
+				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+6
 			end 
 			Game.MapStats[i].Mon1Dif=math.min(BackupMapStats[i].Mon1Dif+2,5)
 			Game.MapStats[i].Mon2Dif=math.min(BackupMapStats[i].Mon2Dif+2,5)
@@ -1422,6 +1448,10 @@ function events.BuildMonsterInformationBox(t)
 	if Game.BolsterAmount==300 then
 		diff=math.min(diff, 2+mon.Level/100)
 	end
+	if vars.Mode==2 then
+		diff=math.min(4, 3+mon.Level/50)
+	end
+	
 	--some statistics here, calculate the standard deviation of dices to get the range of which 95% will fall into
 	mean=mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*(mon.Attack1.DamageDiceSides+1)/2
 	range=(mon.Attack1.DamageDiceSides^2*mon.Attack1.DamageDiceCount/12)^0.5*1.96
@@ -1510,14 +1540,14 @@ end
 
 --TRUE NIGHTMARE MODE
 function events.CanSaveGame(t)
-	if Game.BolsterAmount~=300 then return end
+	if Game.BolsterAmount~=300 and vars and vars.Mode~=2 then return end
 	if (Party.EnemyDetectorYellow or Party.EnemyDetectorRed) and t.SaveKind ~=1 then
 		t.Result=false
 		Game.ShowStatusText("Can't save now")
 	end
 end
 function events.CanCastLloyd(t)
-	if Game.BolsterAmount~=300 then return end
+	if Game.BolsterAmount~=300 and vars.Mode~=2 then return end
 	if Party.EnemyDetectorYellow or Party.EnemyDetectorRed then
 		t.Result=false
 		Sleep(1)
@@ -1525,7 +1555,7 @@ function events.CanCastLloyd(t)
 	end
 end
 function events.CanCastTownPortal(t)
-	if Game.BolsterAmount~=300 then return end
+	if Game.BolsterAmount~=300 and vars.Mode~=2 then return end
 	if Party.EnemyDetectorYellow or Party.EnemyDetectorRed then
 		t.Can=false
 	end
@@ -1555,7 +1585,7 @@ function events.LoadMap()
 	end
 end
 function events.LeaveMap()
-	if Game.BolsterAmount~=300 then return end
+	if Game.BolsterAmount~=300 and vars.Mode~=2 then return end
 	if Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.monsterMap.cleared==false then
 		if Map.Monsters.Count==0 then return end
 		for i=0,#mapvars.monsterMap do
@@ -1637,7 +1667,7 @@ function events.MonsterKilled(mon)
 			mapvars.monsterMap.cleared=true
 			return
 		end
-		if mapvars.monsterMap.cleared==false and m/n>=0.8 then
+		if mapvars.monsterMap.cleared==false and m/n>=0.8 and Game.BolsterAmount<300 then
 			mapvars.monsterMap.cleared=true
 			Game.EscMessage("Monsters are weakened and can no longer resurrect")
 		end
@@ -1645,6 +1675,10 @@ function events.MonsterKilled(mon)
 end
 --ask confirmation and instructions for true nightmare mode
 function nightmare()
+	if vars.Mode==2 then
+		Game.BolsterAmount=600
+		return
+	end
 	if vars.trueNightmare and Game.BolsterAmount~=300 then
 		Game.BolsterAmount=300
 		recalculateMonsterTable()
@@ -1700,11 +1734,14 @@ teleport behind party
 ]]
 
 function events.AfterLoadMap()
-	if Map.IndoorOrOutdoor==1 then
+	if Map.IndoorOrOutdoor==1 or vars.Mode==2 then
 		if not mapvars.bossGenerated then
 			mapvars.bossGenerated=true
 			possibleMonsters={}
 			bossSpawns=math.ceil((Map.Monsters.Count-30)/150)
+			if vars.Mode==2 then
+				bossSpawns=math.ceil((Map.Monsters.Count-30)/60)
+			end
 			for i=0,Map.Monsters.High do
 				if Map.Monsters[i].Id%3==0 then
 					table.insert(possibleMonsters,i)
@@ -1955,6 +1992,10 @@ end
 
 function events.MonsterSpriteScale(t)
 	if Map.Monsters[math.round(t.MonsterIndex)].NameId>220 and Map.Monsters[math.round(t.MonsterIndex)].NameId<300 then
-		t.Scale=t.Scale*1.4
+		if Map.IndoorOrOutdoor==1 then
+			t.Scale=t.Scale*1.4
+		else
+			t.Scale=t.Scale*2
+		end
 	end
 end
