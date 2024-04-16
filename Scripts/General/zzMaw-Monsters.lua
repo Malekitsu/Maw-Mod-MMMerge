@@ -1117,7 +1117,7 @@ mapLevels={
 {["Low"] = 75 , ["Mid"] = 85 , ["High"] = 89},
 
 ["Wromthrax's Cave"] = 
-{["Low"] = 90 , ["Mid"] = 90 , ["High"] = 90},
+{["Low"] = 55 , ["Mid"] = 55 , ["High"] = 55},
 
 ["The Dragon Caves"] = 
 {["Low"] = 90 , ["Mid"] = 90 , ["High"] = 90},
