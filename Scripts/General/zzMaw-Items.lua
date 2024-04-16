@@ -288,7 +288,7 @@ function events.ItemGenerated(t)
 			rollSpc=roll1/2
 		end
 		--difficulty multiplier 
-		diffMult=Game.BolsterAmount/100
+		diffMult=math.max(Game.BolsterAmount, 100)/100
 		--calculate chances
 		local p1=enc1Chance[pseudoStr]/100
 		local p2=enc2Chance[pseudoStr]/100
@@ -2760,7 +2760,7 @@ end
 
 --maw artifact scaling calculation
 function artifactPowerMult(level)
-	local bol=Game.BolsterAmount
+	local bol=math.max(Game.BolsterAmount, 100)
 	bol=(bol/100-1)/20+1
 	local mult=math.max(math.min(level/80*bol,3*bol),0.5)
 	return mult
