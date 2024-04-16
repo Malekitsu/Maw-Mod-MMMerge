@@ -1182,6 +1182,7 @@ end
 
 --HORIZONTAL SKILL PROGRESSION
 local learningRequirements={0,6,12,20}
+local learningRequirementsNormal={0,4,7,10}
 local horizontalSkills={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,27,28,32,33,38}
 function events.CanTeachSkillMastery(t)
 	if Game.freeProgression then return end -- only in horizontal mode
@@ -1262,13 +1263,13 @@ function events.Action(t)
 			local id=pl:GetIndex()
 			local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[t.Param])
 			if table.find(horizontalSkills, t.Param) and vars.storedMasteries and vars.storedMasteries[id] and vars.storedMasteries[id][t.Param] then
-				while m<4 and vars.storedMasteries[id][t.Param]>m and s+1>=learningRequirements[m+1] do
+				while m<4 and vars.storedMasteries[id][t.Param]>m and ((s+1>=learningRequirements[m+1] and not Game.freeProgression) or (s+1>=learningRequirementsNormal[m+1] and Game.freeProgression))  do
 					Party[Game.CurrentPlayer].Skills[t.Param]=JoinSkill(s,m+1)
 					m=m+1
 				end
 			end
 			if vars.oldPlayerMasteries and vars.oldPlayerMasteries[id] then
-				while m<4 and vars.oldPlayerMasteries[id][t.Param]>m and s+1>=learningRequirements[m+1] do
+				while m<4 and vars.oldPlayerMasteries[id][t.Param]>m and ((s+1>=learningRequirements[m+1] and not Game.freeProgression) or (s+1>=learningRequirementsNormal[m+1] and Game.freeProgression)) do
 					Party[Game.CurrentPlayer].Skills[t.Param]=JoinSkill(s,m+1)
 					m=m+1
 				end
