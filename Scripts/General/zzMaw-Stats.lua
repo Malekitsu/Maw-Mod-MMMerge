@@ -754,7 +754,7 @@ function events.CalcDamageToPlayer(t)
 		Game.BolsterAmount=100
 	end
 	--easy
-	if Game.BolsterAmount==50 then
+	if Game.BolsterAmount==0 then
 		t.Result=t.Result*0.4
 	end
 	--normal
