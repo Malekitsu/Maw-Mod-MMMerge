@@ -570,7 +570,7 @@ function events.BuildItemInformationBox(t)
 			local rings = math.round(tier * 0.75 * 10)
 
 			t.Description = "A special Gem that allows to increase an item Enchant Strength (right-click on an item with a base enchant to use)\n\nMax Power: " 
-			.. StrColor(255, 128, 0, tostring(tier * 10)) .. " (halved on AC)"
+			.. StrColor(255, 128, 0, tostring(tier * 10)) .. " (65% on AC)"
 			.. "\nBonus: " .. StrColor(255, 128, 0, tostring(power)) 
 			.. "\n\nItem Modifier:\nTwo Handed Weapons: " .. StrColor(255, 128, 0, twoHanded)
 			.. "\nBody Armor: " .. StrColor(255, 128, 0, bodyArmor)
@@ -616,11 +616,12 @@ for i=1,10 do
 				end
 			end
 			if t.Bonus==10 then
-				maxStrength1=math.ceil(maxStrength1/2)
+				enc1=enc1*1.5
+				maxStrength1=math.ceil(maxStrength1*0.65)
 			end
 			if math.floor(t.Charges/1000)==10 then
-				enc2=enc2*2
-				maxStrength2=math.ceil(maxStrength2/2)
+				enc2=enc2*1.5
+				maxStrength2=math.ceil(maxStrength2*0.65)
 			end
 			
 			if (enc1<=enc2 and enc1<maxStrength1) then
