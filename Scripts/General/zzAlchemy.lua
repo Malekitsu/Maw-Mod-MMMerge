@@ -593,6 +593,9 @@ for i=1,10 do
 			maxStrength2=maxStrength1
 			enc1=t.BonusStrength
 			enc2=t.Charges%1000
+			if enc2==0 then
+				enc2=math.huge
+			end
 			if enc1>=maxStrength1 and enc2>=maxStrength1 then 
 				Game.ShowStatusText("Gem power is not enough")
 				return
