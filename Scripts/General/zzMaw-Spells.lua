@@ -20,6 +20,15 @@ local function getPartyIndex(player)
 end
 
 local function getSpellQueueData(spellQueuePtr, targetPtr)
+	-- find active queue slot
+	local i = 0
+	while i2[spellQueuePtr] == 0 do
+		spellQueuePtr = spellQueuePtr + 0x14
+		i = i + 1
+		if i >= 10 then
+			error("No active spell queue slot found")
+		end
+	end
 	local t = {Spell = i2[spellQueuePtr], Caster = Party.PlayersArray[i2[spellQueuePtr + 2]]}
 	t.SpellSchool = ceil(t.Spell / 11)
 	local flags = u2[spellQueuePtr + 8]
