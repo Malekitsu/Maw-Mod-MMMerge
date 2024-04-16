@@ -378,8 +378,11 @@ function recalculateMonsterTable()
 				hpMult=hpMult+lvl/(totalLevel[i]*5)
 			end
 		end
-		
 		--easy
+		if Game.BolsterAmount==50 then
+			hpMult=hpMult*0.4
+		end
+		--normal
 		if Game.BolsterAmount==50 then
 			hpMult=hpMult*0.7
 		end
@@ -611,7 +614,7 @@ end
 --BackupMapStats = deepcopy(Game.MapStats)
 function events.LoadMap()
 	--add difficulty related damage
-	if Game.BolsterAmount%50~=0 or Game.BolsterAmount==0 then
+	if Game.BolsterAmount%50~=0 then
 		Game.BolsterAmount=100
 	end
 
