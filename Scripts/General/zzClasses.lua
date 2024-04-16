@@ -742,7 +742,7 @@ function events.GameInitialized2()
 		if table.find(shamanClass, t.Player.Class) and t.Player.Unconscious==0 and t.Player.Dead==0 and t.Player.Eradicated==0  then
 			m2=SplitSkill(t.Player.Skills[const.Skills.Air])
 			m3=SplitSkill(t.Player.Skills[const.Skills.Water])
-			mult=((Game.BolsterAmount/100)-1)/2+1
+			mult=((math.max(Game.BolsterAmount, 100)/100)-1)/2+1
 			t.Result=math.max(t.Result*0.99^m2-m3^1.33*mult,0)
 		end
 	end
@@ -810,7 +810,7 @@ local function shamanSkills(isShaman, id)
 		local airReduction=100-math.round(0.99^m2*10000)/100
 		txt=baseSchoolsTxt[13] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nReduce all damage taken by " .. airReduction .. " %"
 		Skillz.setDesc(13,1,txt)
-		mult=((Game.BolsterAmount/100)-1)/2+1
+		mult=((math.max(Game.BolsterAmount, 100)/100)-1)/2+1
 		local waterReduction=math.round(m3^1.33*mult)
 		txt=baseSchoolsTxt[14] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)"
 		Skillz.setDesc(14,1,txt)
