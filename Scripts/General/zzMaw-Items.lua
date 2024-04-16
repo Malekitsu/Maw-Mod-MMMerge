@@ -135,8 +135,9 @@ enc1Chance={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83
 enc2Chance={20,30,35,40,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64}
 spcEncChance={0,0,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44}
 
-primordialWeapEnchants={41,46}
+primordialWeapEnchants={39,40,41,46}
 primordialArmorEnchants={1,2,80}
+
 
 function events.ItemGenerated(t)
 	--boss items forced
@@ -204,6 +205,7 @@ function events.ItemGenerated(t)
 	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) or reagentList[t.Item.Number] then
 		t.Handled=true
 		--reset enchants
+		t.Item.BonusExpireTime=0
 		t.Item.Bonus=0
 		t.Item.Bonus2=0
 		t.Item.BonusStrength=0
@@ -238,12 +240,8 @@ function events.ItemGenerated(t)
 		end
 		--difficulty settings
 		difficultyExtraPower=1
-		if Game.BolsterAmount==150 then
-			difficultyExtraPower=1.025
-		elseif Game.BolsterAmount==200 then
-			difficultyExtraPower=1.05
-		elseif Game.BolsterAmount==300 then
-			difficultyExtraPower=1.1
+		if Game.BolsterAmount>100 then
+			difficultyExtraPower=(Game.BolsterAmount-100)/2000+1
 		end
 		local flatBonus=(difficultyExtraPower-1)*50
 		if math.random()<flatBonus%1 then
@@ -393,11 +391,11 @@ function events.ItemGenerated(t)
 			end
 			t.Item.BonusExpireTime=2
 			t.Item.Charges=math.ceil(encStrUp[pseudoStr]*1.25)
-			t.Item.Charges=math.max(math.ceil(t.Item.Charges*difficultyExtraPower), t.Item.Charges+flatBonus) --bolster
-			t.Item.Charges=t.Item.Charges+math.random(1,16)*1000
+			t.Item.Charges=math.max(math.ceil(t.Item.Charges*difficultyExtraPower), math.ceil(t.Item.Charges+flatBonus)) --bolster
+			t.Item.Charges=math.round(t.Item.Charges+math.random(1,16)*1000)
 			t.Item.Bonus=math.random(1,16)
 			t.Item.BonusStrength=math.ceil(encStrUp[pseudoStr]*1.25)
-			t.Item.BonusStrength=math.max(math.ceil(t.Item.BonusStrength*difficultyExtraPower), t.Item.BonusStrength+flatBonus) --bolster
+			t.Item.BonusStrength=math.max(math.ceil(t.Item.BonusStrength*difficultyExtraPower), math.ceil(t.Item.BonusStrength+flatBonus)) --bolster
 			t.Item.MaxCharges=math.max(t.Item.MaxCharges*0.25+5, t.Item.MaxCharges*1.25)
 			--apply special enchant
 			n=t.Item.Number
@@ -411,25 +409,60 @@ function events.ItemGenerated(t)
 			end
 		end			
 		
+		--legendary
+		if t.Item.BonusExpireTime==2 then
+			legendaryChance=primordialChance/5
+			if primordialChance>math.random() then
+				local complement={[39]=40,[40]=39,[41]=46,[46]=41,[1]=80,[2]=math.random()<0.5 and 1 or 80,[80]=1}
+				t.Item.BonusExpireTime=3
+			end
+			local relevantStats={1,2,3,4,5,6,7,8,10}
+			t.Item.MaxCharges=math.round(t.Item.MaxCharges*1.2)
+			local roll=math.random(1,3)
+			if roll==1 then
+				local stats={1, 5, 6, 7}
+				t.Item.Bonus=stats[math.random(1,4)]
+				t.Item.Charges=t.Item.Charges%1000+stats[math.random(1,4)]*1000
+			elseif roll==2 then
+				local stats={4, 6, 8, 10}
+				t.Item.Bonus=stats[math.random(1,4)]
+				t.Item.Charges=t.Item.Charges%1000+stats[math.random(1,4)]*1000
+			elseif roll==3 then
+				local stats={2, 3, 4, 6, 7}
+				t.Item.Bonus=stats[math.random(1,5)]
+				t.Item.Charges=t.Item.Charges%1000+stats[math.random(1,5)]*1000
+				if (t.Item.Bonus==2 and math.floor(t.Item.Charges/1000)==3) or (t.Item.Bonus==2 and math.floor(t.Item.Charges/1000)==3) then
+					t.Item.Bonus=(t.Item.Bonus==2 and 3) or (t.Item.Bonus==3 and 2) 
+				end
+				--increase stats
+				t.Item.Charges=math.ceil(t.Item.Charges%1000*0.2+t.Item.Charges)
+				t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*1.2)
+			end
+		end
+		
 		--buff to hp and mana items
 		if t.Item.Bonus==8 or t.Item.Bonus==9 then
 			t.Item.BonusStrength=t.Item.BonusStrength*(2+t.Item.BonusStrength/50)
 		end
 		if math.floor(t.Item.Charges/1000)==8 or math.floor(t.Item.Charges/1000)==9 then
-			power=t.Item.Charges%1000
+			local power=t.Item.Charges%1000
 			power=power*(2+power/50) --cap is 999
-			if power > 999 and t.Item.Bonus<17 then --swap base with charges
-				t.ItemBonus, t.Item.BonusStrength, t.Item.Charges=math.floor(t.Item.Charges/1000), power, t.ItemBonus*1000+t.ItemBonusStrength
+			if power >= 999 and t.Item.Bonus<17 then --swap base with charges
+				local bonus=t.Item.Bonus
+				local str=t.Item.BonusStrength
+				t.Item.Bonus=math.floor(t.Item.Charges/1000)
+				t.Item.BonusStrength=power
+				t.Item.Charges= bonus*1000+str
 			else 
 				t.Item.Charges=math.floor(t.Item.Charges/1000)*1000+power
 			end
 		end
 		--nerf to AC and skills
 		if t.Item.Bonus==10 then
-			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength/2)
+			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*0.65)
 		end
 		if math.floor(t.Item.Charges/1000)==10 then
-			t.Item.Charges=t.Item.Charges-math.floor(t.Item.Charges%1000/2)
+			t.Item.Charges=t.Item.Charges-math.floor(t.Item.Charges%1000*0.65)
 		end
 		if t.Item.Bonus>=17 and t.Item.Bonus<=24 then
 			t.Item.BonusStrength=math.ceil(math.max(t.Item.BonusStrength^0.5,t.Item.BonusStrength/10))
@@ -471,6 +504,9 @@ function events.ItemGenerated(t)
 					t.Item.Bonus2=40
 				end
 			end
+		end
+		if math.abs(t.Item.Charges%1000-t.Item.BonusStrength)<=1 then
+			t.Item.Charges=math.floor(t.Item.Charges/1000)*1000+t.Item.BonusStrength
 		end
 	end
 end
@@ -822,6 +858,8 @@ function events.BuildItemInformationBox(t)
 				t.Name=StrColor(255,128,0,"Ancient " .. t.Name)
 			elseif t.Item.BonusExpireTime==2 then
 				t.Name=StrColor(255,0,0,"Primordial " .. t.Name)
+			elseif t.Item.BonusExpireTime==3 then
+				t.Name=StrColor(255,255,30,"Legendary " .. t.Name)
 			elseif bonus==3 then
 				t.Name=StrColor(163,53,238,t.Name)
 			elseif bonus==2 then
