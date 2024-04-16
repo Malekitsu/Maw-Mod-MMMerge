@@ -750,10 +750,14 @@ function events.CalcDamageToPlayer(t)
 		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true)
 	end
 	--add difficulty related damage
-	if Game.BolsterAmount%50~=0 or Game.BolsterAmount==0 then
+	if Game.BolsterAmount%50~=0 then
 		Game.BolsterAmount=100
 	end
 	--easy
+	if Game.BolsterAmount==50 then
+		t.Result=t.Result*0.4
+	end
+	--normal
 	if Game.BolsterAmount==50 then
 		t.Result=t.Result*0.7
 	end
@@ -941,7 +945,7 @@ damageKindResistance={
 
 function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	monLvl=monLvl or pl.LevelBase
-	bolster=(Game.BolsterAmount/100-1)/4+1
+	bolster=(math.max(Game.BolsterAmount, 100)/100-1)/4+1
 	
 	--AC for phys
 	if damageKind==4 then 
