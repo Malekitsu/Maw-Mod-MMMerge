@@ -775,26 +775,30 @@ asmpatch(0x42A176, "jmp absolute 0x42C200") -- "cast successful"
 --removes fly when attacking, except in certain maps
 flyAllowedMaps={"elema.odm","elemf.odm","elemw.odm","out12.odm","outa1.odm","outa2.odm","outa3.odm","outb3.odm","out05.odm"}
 function events.CalcDamageToMonster(t)
-	if table.find(flyAllowedMaps,Map.Name) then 
-		return
-	end
-	data=WhoHitMonster()
-	flyTime=Party.SpellBuffs[7].ExpireTime
-	if data and data.Player and flyTime>Game.Time then
-		Party.SpellBuffs[5].ExpireTime=flyTime
-		Party.SpellBuffs[7].ExpireTime=0
+	if Game.BolsterAmount>100 then
+		if table.find(flyAllowedMaps,Map.Name) then 
+			return
+		end
+		data=WhoHitMonster()
+		flyTime=Party.SpellBuffs[7].ExpireTime
+		if data and data.Player and flyTime>Game.Time then
+			Party.SpellBuffs[5].ExpireTime=flyTime
+			Party.SpellBuffs[7].ExpireTime=0
+		end
 	end
 end
 
 function events.LoadMap()
 	if table.find(flyAllowedMaps,Map.Name) then 
-		Sleep(5)
-		Game.ShowStatusText("Fly is allowed without restrictions here")
+		if Game.BolsterAmount>100 then
+			Sleep(5)
+			Game.ShowStatusText("Fly is allowed without restrictions here")
+		end
 	end
 end
 
 function events.GameInitialized2()
-	Game.SpellsTxt[21].Description= "Grants the power of flight to your characters!  This spell is very expensive and only works outdoors, but it is very useful.  Fly will drain one spell point every five minutes it is in use (i.e. when you aren't touching the ground).\n\nWith the exception of few places, attacking monsters will cancel the effect"
+	Game.SpellsTxt[21].Description= "Grants the power of flight to your characters!  This spell is very expensive and only works outdoors, but it is very useful.  Fly will drain one spell point every five minutes it is in use (i.e. when you aren't touching the ground).\n\nAt higher difficulties, with the exception of few places, attacking monsters will cancel the effect"
 end
 
 
