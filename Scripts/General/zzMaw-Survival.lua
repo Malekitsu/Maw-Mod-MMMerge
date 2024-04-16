@@ -195,8 +195,12 @@ function survivalMonsterTable(currentMapLevel)
 		end
 		
 		--easy
+		if Game.BolsterAmount==0 then
+			hpMult=hpMult*0.6
+		end	
+		--normal
 		if Game.BolsterAmount==50 then
-			hpMult=hpMult*0.7
+			hpMult=hpMult*0.8
 		end
 		--MAW
 		if Game.BolsterAmount==100 then
@@ -321,8 +325,6 @@ function events.GameInitialized2()
 			t.ChestId = 22
 		end
 	end
-	
-	
 	function events.PickCorpse(t)
 		if not survivalMaps[Map.Name] and vars.SuvivalMode then
 			mon=t.Monster
@@ -341,7 +343,7 @@ function events.GameInitialized2()
 			mon.TreasureDiceCount=math.min(newGold^0.5,255)
 			mon.TreasureDiceSides=math.min(newGold^0.5,255)
 			--calculate loot chances
-			mon.TreasureItemPercent= math.round(mon.Level^0.7*2*mult)
+			mon.TreasureItemPercent= math.min(math.round(mon.Level^0.7*2*mult),100)
 			mon.TreasureItemLevel=math.max(math.min(math.ceil(mon.Level/15),6),1)
 			mon.TreasureItemType=0
 		end
