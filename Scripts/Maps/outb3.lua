@@ -56,6 +56,9 @@ end
 
 Game.MapEvtLines:RemoveEvent(92)
 evt.map[92] = function()
+	if vars.Mode==2 then
+		Game.ShowStatusText("Access have been destroyed")
+	end
 	if Party[0].LevelBase>=255 or Game.BolsterAmount<=100 then
 		evt.MoveToMap{X = -640, Y = 512, Z = -416, Direction = 512, LookAngle = 0, SpeedZ = 0, HouseId = 0, Icon = 0, Name = "znwc.blv"}
 	else
