@@ -379,7 +379,7 @@ function recalculateMonsterTable()
 			end
 		end
 		--easy
-		if Game.BolsterAmount==50 then
+		if Game.BolsterAmount==0 then
 			hpMult=hpMult*0.6
 		end
 		--normal
