@@ -93,7 +93,7 @@ end
 -- simplify number regulator creation
 local Regulators = {}
 
-local function NumberRegulator(Screen, X, Y, VarName, OnChange, ReprFunc, Init, Min, Max, Step)
+local function NumberRegulator(Screen, X, Y, VarName, OnChange, ReprFunc, Init, Min, Max, Step, Width)
 	local Regulator = {
 		OnChange = OnChange,
 		Repr = ReprFunc or tostring,
@@ -107,7 +107,7 @@ local function NumberRegulator(Screen, X, Y, VarName, OnChange, ReprFunc, Init, 
 		Text = Regulator.Repr(Regulator.Value),
 		Layer 	= 0,
 		Screen	= Screen,
-		Width = 60,	Height = 10,
+		Width = Width or 60,	Height = 10,
 		X = X + 40, Y = Y}
 
 	-- Decrease bolster
@@ -156,7 +156,7 @@ function events.GameInitialized2()
 	local ExSetScr = NewSettingsPage("MergeExtraSettings", " General settings", "ExSetScr")
 	const.Screens.ExtraSettings = const.Screens.MergeExtraSettings
 
-	local VarsToStore = {"UseMonsterBolster", "BolsterAmount", "ShowWeatherEffects", "ImprovedPathfinding", "freeProgression"}
+	local VarsToStore = {"UseMonsterBolster", "BolsterAmount", "ShowWeatherEffects", "ImprovedPathfinding", "freeProgression", "Mode"}
 	local RETURN = const.Keys.RETURN
 	local ESCAPE = const.Keys.ESCAPE
 
@@ -231,9 +231,29 @@ function events.GameInitialized2()
 	OnOffTumbler(ExSetScr, 95, 251, VarsToStore[3])
 	OnOffTumbler(ExSetScr, 95, 326, VarsToStore[4])
 	
-
+	-- Game mode
+	gameMode={[0]="Normal", [1]="Survival", [2]="Doom"}
+	Game.Mode = Game.Mode or 0
+	NumberRegulator(21, 530, 20, "Mode",
+		function(t, val)
+			Game.Mode = val
+		end,
+		function(val)
+			return gameMode[Game.Mode]
+		end,
+		Game.Mode, 0, 2, 1, 70)
+	--store value
+	function events.BeforeNewGameAutosave()
+		Game.Mode=Game.Mode or 0
+		vars.Mode=Game.Mode
+	end
+	function events.Action(t)
+		if t.Action==132 or t.Action==124 then
+			Game.Mode=0
+		end
+	end
 	-- Bolster amount
-	MAWBOLSTER={[0]="Easy", [50]="Norm.", [100]="MAW", [150]="Hard", [200]="Hell", [250]="Night\nmare", [300]="Night\nmare"}
+	MAWBOLSTER={[0]="Easy", [50]="Norm.", [100]="MAW", [150]="Hard", [200]="Hell", [250]="Night\nmare", [300]="Night\nmare",[600]="Doom"}
 	Game.BolsterAmount = Game.BolsterAmount or 50
 	NumberRegulator(ExSetScr, 103, 220, "BolsterAmount",
 		function(t, val)
