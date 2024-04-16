@@ -851,6 +851,12 @@ damageKindMap={
 	[10]=const.Damage.Dark,
 }
 function events.CalcDamageToMonster(t)
+	local data=WhoHitMonster()
+	if data and data.Player and data.Spell then
+		if data.Spell==const.Spells.Blades then
+			t.DamageKind=const.Damage.Phys
+		end
+	end
 	index=table.find(damageKindMap,t.DamageKind)
 	res=t.Monster.Resistances[index]
 	if not res then return end
