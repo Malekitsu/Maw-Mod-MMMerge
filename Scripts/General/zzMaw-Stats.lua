@@ -1072,6 +1072,9 @@ function events.GameInitialized2()
 		if id>=0 and id<=Party.High then
 			checkSkills(id)
 		end
+		if t.Result>32500 then
+			t.Result=32500
+		end
 	end
 end
 
