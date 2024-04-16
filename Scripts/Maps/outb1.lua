@@ -40,3 +40,43 @@ end
 RefillTimer(function()
 	evt.Set{"MapVar0", Value = 10}
 end, const.Month)
+
+Game.MapEvtLines:RemoveEvent(261)
+evt.hint[261] = evt.str[14]  -- "Shrine of Cold"
+evt.map[261] = function()
+	if not evt.Cmp{"QBits", Value = 1230} then         -- NPC
+		evt.Set{"QBits", Value = 1230}         -- NPC
+		if evt.Cmp{"QBits", Value = 1240} then         -- NPC
+			evt.ForPlayer("All")
+			evt.Add{"WaterResistance", Value = 3}
+			evt.StatusText{Str = 17}         -- "+3 Cold resistance permanent"
+		else
+			evt.Set{"QBits", Value = 1240}         -- NPC
+			evt.ForPlayer("All")
+			evt.Add{"WaterResistance", Value = 10}
+			evt.StatusText{Str = 16}         -- "+10 Cold resistance permanent"
+		end
+		return
+	end
+	evt.StatusText{Str = 15}         -- "You pray at the shrine."
+end
+
+Game.MapEvtLines:RemoveEvent(262)
+evt.hint[262] = evt.str[21]  -- "Shrine of Fire"
+evt.map[262] = function()
+	if not evt.Cmp{"QBits", Value = 1230} then         -- NPC
+		evt.Set{"QBits", Value = 1230}         -- NPC
+		if evt.Cmp{"QBits", Value = 1238} then         -- NPC
+			evt.ForPlayer("All")
+			evt.Add{"FireResistance", Value = 3}
+			evt.StatusText{Str = 24}         -- "+3 Fire permanent"
+		else
+			evt.Set{"QBits", Value = 1238}         -- NPC
+			evt.ForPlayer("All")
+			evt.Add{"FireResistance", Value = 10}
+			evt.StatusText{Str = 23}         -- "+10 Fire permanent"
+		end
+		return
+	end
+	evt.StatusText{Str = 22}         -- "You pray at the shrine."
+end

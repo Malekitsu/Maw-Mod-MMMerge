@@ -119,3 +119,22 @@ Game.MapEvtLines:RemoveEvent(104)
 evt.map[104] = function()
 	evt.MoveToMap{X = -9477, Y = -13062, Z = 129, Direction = 0, LookAngle = 0, SpeedZ = 0, HouseId = 0, Icon = 0, Name = "outb3.odm"}
 end
+
+Game.MapEvtLines:RemoveEvent(261)
+evt.hint[261] = evt.str[23]  -- "Shrine of Luck"
+evt.map[261] = function()
+	if not evt.Cmp{"QBits", Value = 1230} then         -- NPC
+		evt.Set{"QBits", Value = 1230}         -- NPC
+		if evt.Cmp{"QBits", Value = 1237} then         -- NPC
+			evt.ForPlayer("All")
+			evt.Add{"BaseLuck", Value = 3}
+		else
+			evt.Set{"QBits", Value = 1237}         -- NPC
+			evt.ForPlayer("All")
+			evt.Add{"BaseLuck", Value = 10}
+			evt.StatusText{Str = 25}         -- "+10 Luck permanent"
+		end
+		return
+	end
+	evt.StatusText{Str = 24}         -- "You pray at the shrine."
+end
