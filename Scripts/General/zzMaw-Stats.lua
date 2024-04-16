@@ -105,14 +105,14 @@ function events.PlayerAttacked(t)
 			nextACToZero=2
 		elseif Game.BolsterAmount>100 then
 			acNerf=2
-			nerfAmount=Game.BolsterAmount/100
+			nerfAmount=math.min(Game.BolsterAmount,300)/100
 		end
 	elseif t.Attacker.MonsterAction==1 then
 		if t.Attacker.Monster.Attack2.Type~=4 then
 			nextACToZero=2
 		elseif Game.BolsterAmount>100 then
 			acNerf=2
-			nerfAmount=Game.BolsterAmount/100
+			nerfAmount=math.min(Game.BolsterAmount,300)/100
 		end
 	end
 end
@@ -800,6 +800,34 @@ function events.CalcDamageToPlayer(t)
 			t.Result=math.min(calcMawDamage(t.Player,t.DamageKind,damage),mapLevel*10)
 		end
 	end
+	if vars.Mode==2 then
+		if data and data.Monster then
+			t.Result=t.Result*math.min(4, data.Monster.Level/50+3)
+		elseif t.DamageKind~=4 and t.DamageKind~=2 then --drown and fall
+			name=Game.MapStats[Map.MapStatsIndex].Name
+			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
+			if currentWorld==1 then
+				bolster=vars.MM6LVL+vars.MM7LVL
+			elseif currentWorld==2 then
+				bolster=vars.MM8LVL+vars.MM6LVL
+			elseif currentWorld==3 then
+				bolster=vars.MM8LVL+vars.MM7LVL
+			else 
+				bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+			end
+			mapLevel=bolster+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
+			--trap and objects multiplier
+			mult=(mapLevel/8+1)*4
+			if data and data.Object and data.Object.SpellType==15 then 
+				bonusDamage=mapLevel/12
+			else
+				bonusDamage=mapLevel/4
+			end
+			damage=(t.Damage+bonusDamage)*mult
+			t.Result=math.min(calcMawDamage(t.Player,t.DamageKind,damage),mapLevel*20)
+		end
+	end
+	
 end
 
 --TOOLTIPS
