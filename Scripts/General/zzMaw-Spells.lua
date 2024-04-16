@@ -121,7 +121,7 @@ function events.PlayerCastSpell(t)
 			gotCrit=false
 			if roll<crit then
 				mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount==300 then
+				if Game.BolsterAmount>=300 then
 					mult=mult/2
 				end
 				totHeal=totHeal*(1+mult)
@@ -203,7 +203,7 @@ function events.PlayerCastSpell(t)
 			gotCrit=false
 			if roll<crit then
 				mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount==300 then
+				if Game.BolsterAmount>=300 then
 					mult=mult/2
 				end
 				totHeal=totHeal*(1+mult)
@@ -271,7 +271,7 @@ function events.PlayerCastSpell(t)
 			gotCrit=false
 			if roll<crit then
 				mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount==300 then
+				if Game.BolsterAmount>=300 then
 					mult=mult/2
 				end
 				totHeal=totHeal*(1+mult)
@@ -354,7 +354,7 @@ function events.PlayerCastSpell(t)
 			gotCrit=false
 			if roll<crit then
 				mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount==300 then
+				if Game.BolsterAmount>=300 then
 					mult=mult/2
 				end
 				totHeal=totHeal*(1+mult)
@@ -422,7 +422,7 @@ function events.PlayerCastSpell(t)
 			gotCrit=false
 			if roll<crit then
 				mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount==300 then
+				if Game.BolsterAmount>=300 then
 					mult=mult/2
 				end
 				totHeal=totHeal*(1+mult)
@@ -897,7 +897,7 @@ function events.Action(t)
 			local gotCrit=false
 			if roll<crit then
 				local mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount==300 then
+				if Game.BolsterAmount>=300 then
 					mult=mult/2
 				end
 				totHeal=totHeal*(1+mult)
@@ -955,7 +955,7 @@ function events.Action(t)
 			local gotCrit=false
 			if roll<crit then
 				local mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount==300 then
+				if Game.BolsterAmount>=300 then
 					mult=mult/2
 				end
 				totHeal=totHeal*(1+mult)
@@ -1016,7 +1016,7 @@ function events.Action(t)
 			local gotCrit=false
 			if roll<crit then
 				local mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount==300 then
+				if Game.BolsterAmount>=300 then
 					mult=mult/2
 				end
 				totHeal=totHeal*(1+mult)
