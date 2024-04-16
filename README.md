@@ -112,7 +112,6 @@ But if you’re curious to know more about the mod and the specific changes, rea
 
 ### Resistances
 - Now are in percentage and no longer rolled randomly;
-- Cap is at 93.75%.
 - Light damage is now reduced by the lowest between your mind and body resistance
 - Dark damage is now reduced by the lowest elemental resistance
 - Energy damage is now reduced by the lowest resistance
@@ -141,7 +140,7 @@ But if you’re curious to know more about the mod and the specific changes, rea
 ### MAW Classes
 - Added Seraphim, Death Knight and Shaman Class
 - Press the icon top right on party creation to enable them
-- Make sure to read their perks by right clicking on the class name
+- Make sure to read their perks by right clicking on the class name upon character creation
 - Classes can be promoted crossworld (MM8 only on 2nd promotion)
 - Classes with multiple promotions available will get a random promotion.
   - You can just save/reload until you get the desired promotion.
@@ -194,8 +193,8 @@ Down here the full recipe list:
 - 10 of them are gems, that increase the lowest between base enchants strength
   - You will find stronger gems as you progress in the game
 - Crafting cube, increases base stats (such as weapon damage or AC) and special enchant strength
-- Hourglass, adds a normal enchant to an item that has already a normal and a special enchant
-- The Eye, adds a special enchant to an item with 2 normal enchants
+- Hourglass, adds a normal enchant to an item that has already a normal enchant
+- The Eye, adds a special enchant to an item with at least 1 normal enchants
 - Mirror, duplicates any equipment (artifacts excluded). Very rare.
 In addition to that, there are some crafting you can do with potions
 
@@ -224,14 +223,15 @@ Tips:
   - There is no monster bolster
   - Monsters will scale naturally up to level 250+
   - You will need to change continent often to be able to progress
-  - Only loot will be "bolstered"
+  - Level requirement on item will prevent abusing late game loot too early on, but shouldn't never be an issue in a normal playthrough
   - Most skills skills masteries will require 6-12-20 to learn E-M-GM
   - There are teleporters conveniently placed in starting cities (New Sorpigal, Harmondale, Ravenshore)
 
 - Difficulty:
-  - You can choose between Easy-MAW-Hard-Hell-Nightmare
-    - Damage and monster HP will be multiplied corrispondently by 0.7 - 1 - 1.5 - 2 - 3
-    - Loot power will be increased by 0% - 0% - 10% - 20% - 40%
+  - You can choose between Easy-Normal-MAW-Hard-Hell-Nightmare
+    - Damage and monster HP will be multiplied corrispondently by 0.6-0.8 - 1 - 1.5 - 2 - 3
+    - Loot power will be increased by 0% - 0% - 2.5% - 5% - 10%
+    - Chance to get enchants, Ancients and Primordials increases aswell from Hard on
     - Monster density will increase aswell
     - Once in Nightmare you can't change difficulty
       - You can't save nor teleport with monsters in the nearbies
