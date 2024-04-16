@@ -1416,6 +1416,9 @@ function events.BuildMonsterInformationBox(t)
 	if diff==0.5 then
 		diff=0.7
 	end
+	if diff==0 then
+		diff=0.4
+	end
 	if Game.BolsterAmount==300 then
 		diff=math.min(diff, 2+mon.Level/100)
 	end
