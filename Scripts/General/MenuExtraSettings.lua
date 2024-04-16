@@ -246,6 +246,12 @@ function events.GameInitialized2()
 	function events.BeforeNewGameAutosave()
 		Game.Mode=Game.Mode or 0
 		vars.Mode=Game.Mode
+		if vars.Mode==2 then
+			Party.Gold=5000
+			for i=0,Party.High do
+				Party[i].Experience=Party[i].Experience+10000/Party.Count
+			end
+		end
 	end
 	function events.Action(t)
 		if t.Action==132 or t.Action==124 then
