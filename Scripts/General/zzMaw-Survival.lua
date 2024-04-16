@@ -1,7 +1,7 @@
 local survivalMaps={
 	["7out01.odm"]=1, -- emerald isle
 }
---survival mode
+--[[survival mode
 function events.GameInitialized2()
 	SurvivalModeSwitch=CustomUI.CreateButton{
 	IconUp	 	= "TmblrOn",
@@ -16,7 +16,7 @@ function events.GameInitialized2()
 	setSurvival()
 	setSurvival()
 end
-
+]]
 function setSurvival()
 	if SurvivalMode then
 		SurvivalMode=false
@@ -121,7 +121,7 @@ function events.DeathMap(t)
 end
 
 function events.BeforeNewGameAutosave()
-	if SurvivalMode then
+	if Game.Mode==1 then
 		vars.SuvivalMode=true
 		vars.survivalTeleport=true
 	end
