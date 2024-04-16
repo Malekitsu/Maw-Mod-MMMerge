@@ -233,8 +233,8 @@ function events.GameInitialized2()
 	
 
 	-- Bolster amount
-	MAWBOLSTER={[50]="Easy", [100]="MAW", [150]="Hard", [200]="Hell", [250]="Night\nmare", [300]="Night\nmare"}
-	Game.BolsterAmount = Game.BolsterAmount or 100
+	MAWBOLSTER={[0]="Easy", [50]="Nor\nmal", [100]="MAW", [150]="Hard", [200]="Hell", [250]="Night\nmare", [300]="Night\nmare"}
+	Game.BolsterAmount = Game.BolsterAmount or 50
 	NumberRegulator(ExSetScr, 103, 220, "BolsterAmount",
 		function(t, val)
 			Game.BolsterAmount = val
@@ -242,7 +242,7 @@ function events.GameInitialized2()
 		function(val)
 			return MAWBOLSTER[Game.BolsterAmount]
 		end,
-		Game.BolsterAmount, 50, 250, 50)
+		Game.BolsterAmount, 0, 250, 50)
 
 	-- Frame limit
 	Game.FrameLimit = MF.GetRegistryValue("m_framelimit", 0)
