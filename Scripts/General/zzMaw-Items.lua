@@ -750,6 +750,8 @@ legendaryEffects={
 	[18]="Reduce all damage taken by 10%",
 	[19]="Your weapon enchants now scales with the highest between might/int./pers.",
 	[20]="Base enchants on this items can be upgraded up to twice the cap value with crafting Gems",
+	[21]="Increase melee damage by 5% for each enemy in the nearbies",
+	[22]="Reduces damage by 3% for each enemy in the nearbies",
 }
 
 function events.BuildItemInformationBox(t)
@@ -894,6 +896,27 @@ function events.BuildItemInformationBox(t)
 		elseif t.Description then
 			if legendaryEffects[t.Item.BonusExpireTime]then
 				local legText=legendaryEffects[t.Item.BonusExpireTime]
+				if t.Item.BonusExpireTime==21 then
+					local count=0
+					for i=0, Map.Monsters.High do
+						dist=getDistanceToMonster(Map.Monsters[i])
+						if dist<=384 then
+							count=count+1
+						end
+					end
+					local dmg=count*5
+					legText=legText .. "\n Current bonus Damage: " .. red .. "%"
+				elseif t.Item.BonusExpireTime==22 then
+					local count=0
+					for i=0, Map.Monsters.High do
+						dist=getDistanceToMonster(Map.Monsters[i])
+						if dist<=384 then
+							count=count+1
+						end
+					end
+					local red=math.round((1-0.97^count)*10000)/100
+					legText=legText .. "\n Current Reduction: " .. red .. "%"
+				end
 				t.Description = StrColor(255,255,30,legText) .. "\n\n" .. t.Description
 			end
 			if t.Item.Bonus2>0 then	
