@@ -590,6 +590,10 @@ for i=1,10 do
 			upgradeAmount=math.round((tier*10)^0.5/2)
 			mult=slotMult[t:T().EquipStat]
 			maxStrength1=math.round(tier*10*mult)
+			--legendary [20]
+			if t.BonusExpireTime==20 then
+				maxStrength1=maxStrength1*2
+			end
 			maxStrength2=maxStrength1
 			enc1=t.BonusStrength
 			enc2=t.Charges%1000
