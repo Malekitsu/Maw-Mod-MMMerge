@@ -413,8 +413,17 @@ function events.ItemGenerated(t)
 		if t.Item.BonusExpireTime==2 then
 			legendaryChance=primordialChance/5
 			if primordialChance>math.random() then
-				local complement={[39]=40,[40]=39,[41]=46,[46]=41,[1]=80,[2]=math.random()<0.5 and 1 or 80,[80]=1}
-				t.Item.BonusExpireTime=3
+				--roll legendary effect
+				local roll=math.random(11,#legendaryEffects)
+				t.Item.BonusExpireTime=roll
+				--adjust bonus 2 if enchant damage legendary
+				if t.Item.BonusExpireTime==19 then
+					if t.Item.Bonus2==40 then
+						t.Item.Bonus2=39
+					elseif t.Item.Bonus2==41 then
+						t.Item.Bonus2=46
+					end
+				end
 			end
 			local relevantStats={1,2,3,4,5,6,7,8,10}
 			t.Item.MaxCharges=math.round(t.Item.MaxCharges*1.2)
@@ -730,6 +739,19 @@ end
 ------------------------------------------
 --TOOLTIPS--
 ------------------------------------------
+legendaryEffects={
+	[11]="Killing a monster will recover you action time",
+	[12]="When a base enchantment increases one of the stats—might, intellect, or personality—the two lesser stats will each receive a bonus equivalent to 75% of the value of the highest stat.",
+	[13]="Immunity to all status effects from monsters",
+	[14]="Critical chance over 100% increases total damage",
+	[15]="Divine protection (instead of dying you go back to 25% HP, once every 5 minutes)",
+	[16]="Your highest resistance will always be used against non physical attacks",
+	[17]="Your hits will deal 1% of total monster HP health (0.4% for AoE, multi-hit spells and arrows)",
+	[18]="Reduce all damage taken by 10%",
+	[19]="Your weapon enchants now scales with the highest between might/int./pers.",
+	[20]="Base enchants on this items can be upgraded up to twice the cap value with crafting Gems",
+}
+
 function events.BuildItemInformationBox(t)
 	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then 
 		if t.Type then
@@ -858,7 +880,7 @@ function events.BuildItemInformationBox(t)
 				t.Name=StrColor(255,128,0,"Ancient " .. t.Name)
 			elseif t.Item.BonusExpireTime==2 then
 				t.Name=StrColor(255,0,0,"Primordial " .. t.Name)
-			elseif t.Item.BonusExpireTime==3 then
+			elseif legendaryEffects[t.Item.BonusExpireTime] then
 				t.Name=StrColor(255,255,30,"Legendary " .. t.Name)
 			elseif bonus==3 then
 				t.Name=StrColor(163,53,238,t.Name)
@@ -870,6 +892,10 @@ function events.BuildItemInformationBox(t)
 				t.Name=StrColor(255,255,255,t.Name)
 			end
 		elseif t.Description then
+			if legendaryEffects[t.Item.BonusExpireTime]then
+				local legText=legendaryEffects[t.Item.BonusExpireTime]
+				t.Description = StrColor(255,255,30,legText) .. "\n\n" .. t.Description
+			end
 			if t.Item.Bonus2>0 then	
 				if (t.Item.MaxCharges>=0 and bonusEffects[t.Item.Bonus2]~= nil) or enchantList[t.Item.Bonus2] then
 					text=checktext(t.Item.MaxCharges,t.Item.Bonus2,t.Item)
@@ -1054,21 +1080,34 @@ function checktext(MaxCharges,bonus2,it)
 		mult=2+2*(MaxCharges-20)/20
 	end
 	local attackSpeedMult=getBaseAttackSpeed(it)
+	local id=Game.CurrentPlayer
+	if id<0 or id>Party.High then
+		id=0
+	end
+	local legDmgMult=1
+	local pl=Party[id]
+	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
+		local str=pl:GetMight()
+		local int=pl:GetIntellect()
+		local pers=pl:GetPersonality()
+		local bonusStat=math.max(str,int,pers)
+		legDmgMult=(1+bonusStat/1000)
+	end
 	bonus2txt={
 		[1] =  " +" .. math.floor(bonusEffects[1].statModifier * mult) .. " to all Resistances.",
 		[2] = " +" .. math.floor(bonusEffects[2].statModifier * mult) .. " to all Seven Statistics.",
-		[4] ="Adds " .. math.floor(6*mult*attackSpeedMult) .. "-" .. math.floor(8*mult*attackSpeedMult) .. " points of Cold damage. (Increases also all spell damage if equipped in main hand)",
-		[5] ="Adds " .. math.floor(18*mult*attackSpeedMult) .. "-" .. math.floor(24*mult*attackSpeedMult) .. " points of Cold damage. (Increases also all spell damage if equipped in main hand)",
-		[6] ="Adds " .. math.floor(36*mult*attackSpeedMult) .. "-" .. math.floor(48*mult*attackSpeedMult) .. " points of Cold damage. (Increases also all spell damage if equipped in main hand)",
-		[7] ="Adds " .. math.floor(4*mult*attackSpeedMult) .. "-" .. math.floor(10*mult*attackSpeedMult) .. " points of Electrical damage. (Increases also all spell damage if equipped in main hand)",
-		[8] ="Adds " .. math.floor(12*mult*attackSpeedMult) .. "-" .. math.floor(30*mult*attackSpeedMult) .. " points of Electrical damage. (Increases also all spell damage if equipped in main hand)",
-		[9] ="Adds " .. math.floor(24*mult*attackSpeedMult) .. "-" .. math.floor(60*mult*attackSpeedMult) .. " points of Electrical damage. (Increases also all spell damage if equipped in main hand)",
-		[10] ="Adds " .. math.floor(2*mult*attackSpeedMult) .. "-" .. math.floor(12*mult*attackSpeedMult) .. " points of Fire damage. (Increases also all spell damage if equipped in main hand)",
-		[11] ="Adds " .. math.floor(6*mult*attackSpeedMult) .. "-" .. math.floor(36*mult*attackSpeedMult) .. " points of Fire damage. (Increases also all spell damage if equipped in main hand)",
-		[12] ="Adds " .. math.floor(12*mult*attackSpeedMult) .. "-" .. math.floor(72*mult*attackSpeedMult) .. " points of Fire damage. (Increases also all spell damage if equipped in main hand)",
-		[13] ="Adds " .. math.floor(12*mult*attackSpeedMult) .. " points of Body damage. (Increases also all spell damage if equipped in main hand)",
-		[14] ="Adds " .. math.floor(24*mult*attackSpeedMult) .. " points of Body damage. (Increases also all spell damage if equipped in main hand)",
-		[15] ="Adds " .. math.floor(48*mult*attackSpeedMult) .. " points of Body damage. (Increases also all spell damage if equipped in main hand)",
+		[4] ="Adds " .. math.floor(6*mult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(8*mult*attackSpeedMult*legDmgMult) .. " points of Cold damage. (Increases also all spell damage if equipped in main hand)",
+		[5] ="Adds " .. math.floor(18*mult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(24*mult*attackSpeedMult*legDmgMult) .. " points of Cold damage. (Increases also all spell damage if equipped in main hand)",
+		[6] ="Adds " .. math.floor(36*mult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(48*mult*attackSpeedMult*legDmgMult) .. " points of Cold damage. (Increases also all spell damage if equipped in main hand)",
+		[7] ="Adds " .. math.floor(4*mult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(10*mult*attackSpeedMult*legDmgMult) .. " points of Electrical damage. (Increases also all spell damage if equipped in main hand)",
+		[8] ="Adds " .. math.floor(12*mult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(30*mult*attackSpeedMult*legDmgMult) .. " points of Electrical damage. (Increases also all spell damage if equipped in main hand)",
+		[9] ="Adds " .. math.floor(24*mult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(60*mult*attackSpeedMult*legDmgMult) .. " points of Electrical damage. (Increases also all spell damage if equipped in main hand)",
+		[10] ="Adds " .. math.floor(2*mult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(12*mult*attackSpeedMult*legDmgMult) .. " points of Fire damage. (Increases also all spell damage if equipped in main hand)",
+		[11] ="Adds " .. math.floor(6*mult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(36*mult*attackSpeedMult*legDmgMult) .. " points of Fire damage. (Increases also all spell damage if equipped in main hand)",
+		[12] ="Adds " .. math.floor(12*mult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(72*mult*attackSpeedMult*legDmgMult) .. " points of Fire damage. (Increases also all spell damage if equipped in main hand)",
+		[13] ="Adds " .. math.floor(12*mult*attackSpeedMult*legDmgMult) .. " points of Body damage. (Increases also all spell damage if equipped in main hand)",
+		[14] ="Adds " .. math.floor(24*mult*attackSpeedMult*legDmgMult) .. " points of Body damage. (Increases also all spell damage if equipped in main hand)",
+		[15] ="Adds " .. math.floor(48*mult*attackSpeedMult*legDmgMult) .. " points of Body damage. (Increases also all spell damage if equipped in main hand)",
 		--spell enchants
 		[26] = "Air Magic Skill +" .. math.floor(MaxCharges/4)+5,
 		[27] = "Body Magic Skill +" .. math.floor(MaxCharges/4)+5,
@@ -1080,13 +1119,13 @@ function checktext(MaxCharges,bonus2,it)
 		[33] = "Spirit Magic Skill +" .. math.floor(MaxCharges/4)+5,
 		[34] = "Water Magic Skill +" .. math.floor(MaxCharges/4)+5,
 		--stats enchants
-		[39] = "Adds " .. math.floor(40*mult*attackSpeedMult) .. "-" .. math.floor(80*mult*attackSpeedMult) .. " to spell damage(main hand only) and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Intellect and personality.",
+		[39] = "Adds " .. math.floor(40*mult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(80*mult*attackSpeedMult*legDmgMult) .. " to spell damage(main hand only) and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Intellect and personality.",
 		[40] = "Spells Drain Hit points from target and Increased Spell speed.(main hand only).",
 		[42] = " +" .. math.floor(bonusEffects[42].statModifier * mult) .. " to Seven Stats, HP, SP, Armor, Resistances.",
 		[43] = " +" .. math.floor(bonusEffects[43].statModifier * mult) .. " to Endurance, Armor, Hit points.",
 		[44] = " +" .. math.floor(bonusEffects[44].statModifier * mult) .. " Hit points and Regenerate Hit points over time.",
 		[45] = " +" .. math.floor(bonusEffects[45].statModifier * mult) .. " Speed and Accuracy.",
-		[46] = "Adds " .. math.floor(40*mult*attackSpeedMult) .. "-" .. math.floor(80*mult*attackSpeedMult) .. " points of Fire damage and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Might.",
+		[46] = "Adds " .. math.floor(40*mult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(80*mult*attackSpeedMult*legDmgMult) .. " points of Fire damage and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Might.",
 		[47] = " +" .. math.floor(bonusEffects[47].statModifier * mult) .. " Spell points and Regenerate Spell points over time.",
 		[48] = " +" .. math.floor(bonusEffects[48].statModifier[1] * mult) .. " Endurance and" .. " +" .. math.floor(bonusEffects[48].statModifier[2] * mult).. " Armor.",
 		[49] = " +" .. math.floor(bonusEffects[49].statModifier * mult) .. " Intellect and Luck.",
@@ -1161,6 +1200,9 @@ function events.CalcItemValue(t)
 			end
 		end
 		t.Value=basePrice+bonus1+bonus2
+		if t.Item.BonusExpireTime>10 and t.Item.BonusExpireTime<1000 then
+			t.Value=t.Value*2.5
+		end
 		if Game.HouseScreen==3 or Game.HouseScreen==94 then
 			t.Value=t.Value*0.4
 		end
@@ -1239,7 +1281,16 @@ enchantbonusdamage[46] = 4
 function events.ItemAdditionalDamage(t)
 	--empower enchants
 	if enchantbonusdamage[t.Item.Bonus2] then
-		t.Result=t.Result*enchantbonusdamage[t.Item.Bonus2]
+		local id=t.Player:GetIndex()
+		local mult=1
+		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
+			local str=t.Player:GetMight()
+			local int=t.Player:GetIntellect()
+			local pers=t.Player:GetPersonality()
+			local bonusStat=math.max(str,int,pers)
+			mult=(1+bonusStat/1000)
+		end
+		t.Result=t.Result*enchantbonusdamage[t.Item.Bonus2]*mult
 	end
 	--scaling Bonus
 	if t.Item.MaxCharges>0 then
@@ -1940,7 +1991,7 @@ function itemStats(index)
 		end
 		if it.Charges>1000 then
 			tab[math.floor(it.Charges/1000)]=tab[math.floor(it.Charges/1000)]+it.Charges%1000
-		end
+		end		
 		if it.Bonus2>0 then
 			bonusData = bonusEffects[it.Bonus2]
 			if bonusData then
