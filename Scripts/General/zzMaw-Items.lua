@@ -411,8 +411,7 @@ function events.ItemGenerated(t)
 		
 		--legendary
 		if t.Item.BonusExpireTime==2 then
-			legendaryChance=primordialChance/5
-			if primordialChance>math.random() then
+			if math.random(1,5)==5 then
 				--roll legendary effect
 				local roll=math.random(11,#legendaryEffects)
 				t.Item.BonusExpireTime=roll
