@@ -10,10 +10,15 @@ local legendaryEffects={
 	[18]="Reduce all damage taken by 10%",
 	[19]="Your weapon enchants now scales with the highest between might/int./pers.",
 	[20]="Base enchants on this items can be upgraded up to twice the cap value with crafting items",
+	[21]="Increase melee damage by 5% for each enemy in the nearbies"
+	[22]="Reduces damage by 3% for each enemy in the nearbies"
 }
 
 
 ]]
+function getDistanceToMonster(monster)
+	return math.sqrt((Party.X - monster.X) * (Party.X - monster.X) + (Party.Y - monster.Y) * (Party.Y - monster.Y)) - monster.BodyRadius
+end
 --give legendary effect if dropped prior this file inclusion
 function events.BuildItemInformationBox(t)
 	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then 
@@ -52,6 +57,16 @@ function events.CalcDamageToMonster(t)
 			dmg=dmg*0.4
 		end
 		t.Result=t.Result+dmg
+	end
+	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 21) then
+		local mult=1
+		for i=0, Map.Monsters.High do
+			dist=getDistanceToMonster(Map.Monsters[i])
+			if dist<=384 then
+				mult=mult+0.05
+			end
+		end
+		t.Result=t.Result*mult
 	end
 	--end of [17]
 	if t.Player then
@@ -142,6 +157,19 @@ function events.LoadMap(wasInGame)
 end
 function events.CalcDamageToPlayer(t)
 	local id=t.Player:GetIndex()
+	--legendary [22]
+	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 22) then
+		local count=0
+		for i=0, Map.Monsters.High do
+			dist=getDistanceToMonster(Map.Monsters[i])
+			if dist<=384 then
+				count=count+1
+			end
+		end
+		t.Result=t.Result*0.97^count
+	end
+	--end of [22]
+	
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 15) then
 		if t.Player.Unconscious==0 and t.Player.Dead==0 and t.Player.Eradicated==0 then
 			if vars.legendaryProtectionCooldown[t.PlayerIndex]==nil then
