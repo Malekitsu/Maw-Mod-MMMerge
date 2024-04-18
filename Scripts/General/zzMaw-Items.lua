@@ -905,7 +905,7 @@ function events.BuildItemInformationBox(t)
 						end
 					end
 					local dmg=count*5
-					legText=legText .. "\n Current bonus Damage: " .. red .. "%"
+					legText=legText .. "\nCurrent bonus Damage: " .. red .. "%"
 				elseif t.Item.BonusExpireTime==22 then
 					local count=0
 					for i=0, Map.Monsters.High do
@@ -915,7 +915,7 @@ function events.BuildItemInformationBox(t)
 						end
 					end
 					local red=math.round((1-0.97^count)*10000)/100
-					legText=legText .. "\n Current Reduction: " .. red .. "%"
+					legText=legText .. "\nCurrent Reduction: " .. red .. "%"
 				end
 				t.Description = StrColor(255,255,30,legText) .. "\n\n" .. t.Description
 			end
