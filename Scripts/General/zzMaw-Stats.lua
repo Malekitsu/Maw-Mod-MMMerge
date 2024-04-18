@@ -418,6 +418,14 @@ function events.BuildStatInformationBox(t)
 					end
 					enchantDamage=enchantDamage*mult
 				end
+				local id=Party[i]:GetIndex()
+				if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
+					local str=t.Player:GetMight()
+					local int=t.Player:GetIntellect()
+					local pers=t.Player:GetPersonality()
+					local bonusStat=math.max(str,int,pers)
+					enchantDamage=enchantDamage*(1+bonusStat/1000)
+				end
 			end
 		end
 		power=damageAdd + skill*(diceMin+diceMax)/2 + enchantDamage
@@ -998,6 +1006,18 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		end
 	end
 	
+	--LEGENDARY POWER 16
+	local id=pl:GetIndex()
+	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 16) then
+		local resList=damageKindResistance[12]
+		for i=1,#resList do
+			local playerRes = pl:GetResistance(resList[i])
+			if playerRes>res then
+				res=playerRes
+			end
+		end
+	end
+	
 	res=1/2^math.min(res/math.min(75+monLvl*0.5*bolster,200*bolster))
 	
 	--randomize resistance
@@ -1234,6 +1254,14 @@ function calcPowerVitality(pl)
 						mult=2+2*(it.MaxCharges-20)/20
 					end
 					enchantDamage=enchantDamage*mult
+				end
+				local id=pl:GetIndex()
+				if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
+					local str=pl:GetMight()
+					local int=pl:GetIntellect()
+					local pers=pl:GetPersonality()
+					local bonusStat=math.max(str,int,pers)
+					enchantDamage=enchantDamage*(1+bonusStat/1000)
 				end
 			end
 		end
