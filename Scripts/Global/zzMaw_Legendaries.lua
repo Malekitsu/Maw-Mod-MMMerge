@@ -58,8 +58,8 @@ function events.CalcDamageToMonster(t)
 		--[14]="Critical chance over 100% increases total damage",
 		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 14) then
 			local luck=t.Player:GetLuck()
+			t.Result=math.round(math.max(t.Result, t.Result*(luck/1500)))
 		end
-		t.Result=math.round(math.max(t.Result, t.Result*(luck/1500)))
 		--end of [14]
 		if t.Result>=t.Monster.HP then
 			local id=t.Player:GetIndex()
