@@ -389,7 +389,7 @@ function placeItem(pl,it,invSlot,itemId,x, y)
 	inv["TemporaryBonus"]=it.TemporaryBonus
 end
 
-function events.Action()
+function events.Action(t)
 	if t.Action==113 or t.Action==123 then
 		if vars.SmallerPotionBottles then
 			for i=220, 299 do
