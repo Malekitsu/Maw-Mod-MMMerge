@@ -286,7 +286,7 @@ function events.ItemGenerated(t)
 			rollSpc=roll1/2
 		end
 		--difficulty multiplier 
-		diffMult=math.max(Game.BolsterAmount, 100)/100
+		diffMult=math.max(math.min(Game.BolsterAmount,300), 100)/100
 		--calculate chances
 		local p1=enc1Chance[pseudoStr]/100
 		local p2=enc2Chance[pseudoStr]/100
