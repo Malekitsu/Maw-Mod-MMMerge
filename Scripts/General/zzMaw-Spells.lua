@@ -1369,7 +1369,7 @@ function events.CalcSpellDamage(t)
 				local attackSpeedMult=getBaseAttackSpeed(it)
 				damage=math.round(damage*attackSpeedMult)
 				--legendary bonus[19]
-				local id=t.Player:GetIndex()
+				local id=data.Player:GetIndex()
 				if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
 					local str=t.Player:GetMight()
 					local int=t.Player:GetIntellect()
