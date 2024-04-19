@@ -323,7 +323,7 @@ function recalculateMonsterTable()
 		if Game.freeProgression==false then
 			horizontalMultiplier=2.5
 			name=Game.MapStats[Map.MapStatsIndex].Name
-			local level=math.max(math.min((base.Level+extraBolster)*horizontalMultiplier,mon.Level+bolsterLevel+extraBolster),1)
+			local level=math.max(math.min((base.Level+extraBolster)*horizontalMultiplier,base.Level+bolsterLevel+extraBolster),1)
 			totalLevel[i]=level
 			mon.Level=math.min(totalLevel[i],255)
 			if not horizontalMaps[name] then
@@ -742,7 +742,7 @@ horizontalMaps={["Dagger Wound Island"] =true,
 mapLevels={
 --MM8
 ["Dagger Wound Island"] = 
-{["Low"] = 6 , ["Mid"] = 8 , ["High"] = 8},
+{["Low"] = 5 , ["Mid"] = 6 , ["High"] = 6},
 
 ["Abandoned Temple"] = 
 {["Low"] = 5 , ["Mid"] = 6 , ["High"] = 7},
@@ -933,7 +933,7 @@ mapLevels={
 {["Low"] = 5 , ["Mid"] = 6 , ["High"] = 8},
 
 ["The Dragon's Lair"] = 
-{["Low"] = 5 , ["Mid"] = 45 , ["High"] = 85},
+{["Low"] = 5 , ["Mid"] = 20 , ["High"] = 35},
 
 ["Castle Harmondale"] = 
 {["Low"] = 5 , ["Mid"] = 6 , ["High"] = 6},
@@ -2013,6 +2013,3 @@ function events.BeforeLoadMap()
 		end
 	end
 end
-	
-	
-
