@@ -1012,7 +1012,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		local resList=damageKindResistance[12]
 		for i=1,#resList do
 			local playerRes = pl:GetResistance(resList[i])
-			if playerRes>res then
+			if playerRes>res and playerRes<64000 then
 				res=playerRes
 			end
 		end
