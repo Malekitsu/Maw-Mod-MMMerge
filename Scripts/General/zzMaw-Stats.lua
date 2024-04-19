@@ -1100,7 +1100,7 @@ function events.GameInitialized2()
 			local id=t.Monster.Id
 			function events.Tick()
 				events.Remove("Tick", 1)
-				if id<=Map.Monster.High then
+				if id<=Map.Monsters.High then
 					if shoot=="shoots" then
 					msg=string.format("%s shoots %s for %s points!", name, monName, MSGdamage)
 					else
