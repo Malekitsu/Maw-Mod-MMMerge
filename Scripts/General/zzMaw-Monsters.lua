@@ -1747,11 +1747,13 @@ function events.AfterLoadMap()
 					table.insert(possibleMonsters,i)
 				end
 			end
-			if bossSpawns>0 and #possibleMonsters>0 then
+			if bossSpawns>0 then
 				for v=1,bossSpawns do
-					index=math.random(1, #possibleMonsters)
-					generateBoss(possibleMonsters[index],v)
-					table.remove(possibleMonsters,index)
+					if #possibleMonsters>0 then
+						index=math.random(1, #possibleMonsters)
+						generateBoss(possibleMonsters[index],v)
+						table.remove(possibleMonsters,index)
+					end
 				end
 			end
 		end
