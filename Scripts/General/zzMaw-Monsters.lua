@@ -1862,7 +1862,7 @@ function events.GameInitialized2() --to make the after all the other code
 				elseif skill=="Swapper" then
 					for i=0,Map.Monsters.High do
 						mon=Map.Monsters[i]
-						if mon.HP>0 and mon.AIState==const.AIState.Active and (mon.NameId<220 or mon.NameId>300) then
+						if mon.HP>0 and mon.AIState==const.AIState.Active and mon.ShowOnMap and mon.ShowAsHostile and (mon.NameId<220 or mon.NameId>300) then
 							t.Result=0
 							Game.ShowStatusText("*Swap*")
 							mon.X, mon.Y, mon.Z, t.Monster.X, t.Monster.Y, t.Monster.Z = t.Monster.X, t.Monster.Y, t.Monster.Z, mon.X, mon.Y, mon.Z
@@ -1958,7 +1958,12 @@ function eliteRegen()
 		for key, value in pairs(mapvars.regenerating) do	
 			if value>0 then
 				mon=Map.Monsters[key]
-				mon.HP=math.min(mon.HP+mon.FullHitPoints*0.01*0.99^value, mon.FullHP)
+				lastTimeWhenCalled=lastTimeWhenCalled or Game.Time
+				local timePassed=Game.Time-lastTimeWhenCalled
+				lastTimeWhenCalled=Game.Time
+				--call is 20 times per minute, which is 12.8 
+				local timeMultiplier=timePassed/12.8
+				mon.HP=math.min(mon.HP+mon.FullHitPoints*0.01*0.99^value*timeMultiplier, mon.FullHP)
 			end
 		end
 	end
