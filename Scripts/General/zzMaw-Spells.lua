@@ -243,7 +243,6 @@ function events.PlayerCastSpell(t)
 				function events.Tick() 
 					events.Remove("Tick", 1)
 					Party[t.TargetId].HP=math.max(hp+math.round(totHeal), 1)
-					debug.Message(dump(Party[t.TargetId].HP))
 				end
 			else
 				Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+math.round(totHeal),Party[t.TargetId]:GetFullHP())
