@@ -1097,10 +1097,10 @@ function events.GameInitialized2()
 			if calls>=2 and attackIsSpell then
 				castedAoe=true
 			end
-			local id=t.Monster.Id
+			local id=t.MonsterIndex
 			function events.Tick()
 				events.Remove("Tick", 1)
-				--if id<=Map.Monsters.High then
+				if id<=Map.Monsters.High then
 					if shoot=="shoots" then
 					msg=string.format("%s shoots %s for %s points!", name, monName, MSGdamage)
 					else
@@ -1119,7 +1119,7 @@ function events.GameInitialized2()
 					if calls==0 then
 						MSGdamage=0
 					end
-				--end
+				end
 			end
 		end
 		--restore tooltips
