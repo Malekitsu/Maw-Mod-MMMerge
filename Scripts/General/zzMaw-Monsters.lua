@@ -1676,7 +1676,11 @@ end
 --ask confirmation and instructions for true nightmare mode
 function nightmare()
 	if vars.Mode==2 then
-		Game.BolsterAmount=600
+		if Game.BolsterAmount~=600 then
+			Game.BolsterAmount=600
+			recalculateMonsterTable()
+			recalculateMawMonster()
+		end
 		return
 	end
 	if vars.trueNightmare and Game.BolsterAmount~=300 then
@@ -2001,3 +2005,14 @@ function events.MonsterSpriteScale(t)
 		end
 	end
 end
+
+function events.BeforeLoadMap()
+	if vars.Mode==2 then
+		for i=1, Game.MonstersTxt.High do
+			Game.MonstersTxt[i].AIType=0
+		end
+	end
+end
+	
+	
+
