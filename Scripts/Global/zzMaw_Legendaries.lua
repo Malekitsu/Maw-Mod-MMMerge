@@ -73,7 +73,19 @@ function events.CalcDamageToMonster(t)
 		--[14]="Critical chance over 100% increases total damage",
 		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 14) then
 			local luck=t.Player:GetLuck()
-			t.Result=math.round(math.max(t.Result, t.Result*(luck/1500)))
+			for v=0,1 do
+				local pl=t.Player
+				if pl:GetActiveItem(v) then
+					itSkill=pl:GetActiveItem(v):T().Skill
+					if itSkill==2 then
+						s,m=SplitSkill(pl:GetSkill(const.Skills.Dagger))
+						if m>2 then
+							daggerCritBonus=daggerCritBonus+0.025+0.005*s
+						end
+					end
+				end
+			end
+			t.Result=math.round(math.max(t.Result, t.Result*(luck/1500)+daggerCritBonus))
 		end
 		--end of [14]
 		if t.Result>=t.Monster.HP then
