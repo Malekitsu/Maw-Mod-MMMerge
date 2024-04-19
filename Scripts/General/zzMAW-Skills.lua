@@ -870,6 +870,11 @@ regenHP={0,0,0,0,[0]=0}
 regenSP={0,0,0,0,[0]=0}
 function MawRegen()
 	--HP
+	lastRegenTime=lastRegenTime or Game.Time
+	timePassed=Game.Time-lastRegenTime
+	lastRegenTime=Game.Time
+	--call is 20 times per minute, which is 12.8 
+	timeMultiplier=timePassed/12.8
 	for i=0,Party.High do
 		local Cond = Party[i]:GetMainCondition()
 		if Cond == 18 or Cond == 17 or Cond < 14 then
@@ -879,12 +884,12 @@ function MawRegen()
 				RegM=5
 			end
 			FHP	= Party[i]:GetFullHP()
-			regenHP[i] = regenHP[i] + FHP^0.5*RegS^1.5*((RegM+1)/2500)
+			regenHP[i] = regenHP[i] + FHP^0.5*RegS^1.5*((RegM+1)/2500)*timeMultiplier
 			--regeneration spell
 			Buff=Party[i].SpellBuffs[const.PlayerBuff.Regeneration]
 			if Buff.ExpireTime > Game.Time then
 				RegS, RegM = SplitSkill(Buff.Skill)
-				regenHP[i] = regenHP[i] + FHP^0.5*RegS^1.3*((RegM+1)/10000) -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
+				regenHP[i] = regenHP[i] + FHP^0.5*RegS^1.3*((RegM+1)/10000)*timeMultiplier -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
 			end
 			
 			Party[i].HP = math.min(FHP, Party[i].HP + regenHP[i])
@@ -905,7 +910,7 @@ function MawRegen()
 				end
 				FSP	= Party[i]:GetFullSP()
 				regenSP[i] = regenSP[i] + FSP^0.35*RegS^1.4*((RegM+5)/5000) +0.02
-				Party[i].SP = math.min(FSP, Party[i].SP + regenSP[i])
+				Party[i].SP = math.min(FSP, Party[i].SP + regenSP[i]*timeMultiplier)
 				regenSP[i]=regenSP[i]%1
 			end
 		end
