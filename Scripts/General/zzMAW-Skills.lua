@@ -950,7 +950,7 @@ function events.Tick()
 		else
 			spRegen = math.round((spRegen)*100)/100
 		end
-		txt= string.format("%s\n\nCurrent SP Regeneration: %s\nNext Level Bonus: %s SP Regen",baseMedStr,StrColor(30,30,255,spRegen),StrColor(30,30,255,"+" .. spRegen2))
+		txt= string.format("%s\n\nCurrent SP Regeneration: %s\nNext Level Bonus: %s SP Regen",baseMedStr,StrColor(60,60,255,spRegen),StrColor(60,60,255,"+" .. spRegen2))
 		Skillz.setDesc(28,1,txt)
 	end
 end
