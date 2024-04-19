@@ -1049,6 +1049,7 @@ function events.GameInitialized2()
 		if baseTrainers[i]==-1 then
 			baseTrainers[i]=1000
 		end
+		baseTrainers[i]=math.max(baseTrainers[i], 10)
 	end
 end
 	
