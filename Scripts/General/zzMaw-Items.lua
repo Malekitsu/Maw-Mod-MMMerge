@@ -1481,7 +1481,11 @@ end
 function events.BuildItemInformationBox(t)
 	if (t.Item.Number>=500 and t.Item.Number<=543) or (t.Item.Number>=1302 and t.Item.Number<=1354) or (t.Item.Number>=2020 and t.Item.Number<=2049) then 
 		if t.Type then
-			local artifactMult=artifactPowerMult(Party[Game.CurrentPlayer].LevelBase)
+			local id=Game.CurrentPlayer
+			if id==-1 then
+				id=0
+			end
+			local artifactMult=artifactPowerMult(Party[id].LevelBase)
 			local txt=Game.ItemsTxt[t.Item.Number]
 			local ac=math.ceil((txt.Mod2+txt.Mod1DiceCount)*artifactMult)
 			if ac>0 then 			
