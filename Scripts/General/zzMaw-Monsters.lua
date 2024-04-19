@@ -1737,6 +1737,7 @@ has 1 to 4 extra mini bosses
 teleport behind party
 ]]
 
+
 function events.AfterLoadMap()
 	if Map.IndoorOrOutdoor==1 or vars.Mode==2 then
 		if not mapvars.bossGenerated then
@@ -1747,7 +1748,8 @@ function events.AfterLoadMap()
 				bossSpawns=math.ceil((Map.Monsters.Count-30)/60)
 			end
 			for i=0,Map.Monsters.High do
-				if Map.Monsters[i].Id%3==0 then
+				local id=Map.Monsters[i].Id
+				if id%3==0 and Game.MonstersTxt[id].AIType~=1 then
 					table.insert(possibleMonsters,i)
 				end
 			end
