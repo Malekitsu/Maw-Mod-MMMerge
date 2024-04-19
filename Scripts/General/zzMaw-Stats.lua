@@ -708,6 +708,11 @@ function events.CalcDamageToPlayer(t)
 		end
 	end
 	
+	--carnage fix
+	if data and data.Player and data.Spell==133 then
+		t.Result=0
+	end
+	
 	--properly calculate friendly fire damage
 	if data and data.Player and data.Spell and data.Spell<133 and data.Spell>0 then	
 		local s,m = SplitSkill(data.Player.Skills[const.Skills.Learning])
