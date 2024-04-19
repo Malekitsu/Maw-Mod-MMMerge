@@ -1097,25 +1097,28 @@ function events.GameInitialized2()
 			if calls>=2 and attackIsSpell then
 				castedAoe=true
 			end
-			function events.Tick() 
+			local id=t.Monster.Id
+			function events.Tick()
 				events.Remove("Tick", 1)
-				if shoot=="shoots" then
-				msg=string.format("%s shoots %s for %s points!", name, monName, MSGdamage)
-				else
-					msg=string.format("%s hits %s for %s points!", name, monName, MSGdamage)
-				end
-				if t.Monster.HP==0 then
-					msg=string.format("%s inflicts %s points killing %s!", name, MSGdamage, monName)
-				end
-				if castedAoe then
-					msg=string.format("%s hits for a total of %s points!", name, MSGdamage)
-				end
-				Game.ShowStatusText(msg)
-				if calls>0 then
-					calls=calls-1
-				end
-				if calls==0 then
-					MSGdamage=0
+				if id<=Map.Monster.High then
+					if shoot=="shoots" then
+					msg=string.format("%s shoots %s for %s points!", name, monName, MSGdamage)
+					else
+						msg=string.format("%s hits %s for %s points!", name, monName, MSGdamage)
+					end
+					if t.Monster.HP==0 then
+						msg=string.format("%s inflicts %s points killing %s!", name, MSGdamage, monName)
+					end
+					if castedAoe then
+						msg=string.format("%s hits for a total of %s points!", name, MSGdamage)
+					end
+					Game.ShowStatusText(msg)
+					if calls>0 then
+						calls=calls-1
+					end
+					if calls==0 then
+						MSGdamage=0
+					end
 				end
 			end
 		end
