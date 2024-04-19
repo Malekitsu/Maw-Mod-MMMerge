@@ -1370,9 +1370,9 @@ function events.CalcSpellDamage(t)
 				--legendary bonus[19]
 				local id=data.Player:GetIndex()
 				if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
-					local str=t.Player:GetMight()
-					local int=t.Player:GetIntellect()
-					local pers=t.Player:GetPersonality()
+					local str=data.Player:GetMight()
+					local int=data.Player:GetIntellect()
+					local pers=data.Player:GetPersonality()
 					local bonusStat=math.max(str,int,pers)
 					damage=damage*(1+bonusStat/1000)
 				end
