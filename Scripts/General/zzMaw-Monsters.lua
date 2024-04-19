@@ -1852,7 +1852,7 @@ function events.GameInitialized2() --to make the after all the other code
 						Party[index]:DoDamage(t.Result*2,4) 
 					end
 				elseif skill=="Adamantite" then
-					t.Result=math.round(math.max(t.Result-t.Monster.Level^1.15*4,t.Result/10))
+					t.Result=math.round(math.max(t.Result-t.Monster.Level^1.15*4,t.Result/4))
 				elseif skill=="Swapper" then
 					for i=0,Map.Monsters.High do
 						mon=Map.Monsters[i]
