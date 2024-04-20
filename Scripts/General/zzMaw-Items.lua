@@ -904,7 +904,7 @@ function events.BuildItemInformationBox(t)
 						end
 					end
 					local dmg=count*5
-					legText=legText .. "\nCurrent bonus Damage: " .. red .. "%"
+					legText=legText .. "\nCurrent bonus Damage: " .. dmg .. "%"
 				elseif t.Item.BonusExpireTime==22 then
 					local count=0
 					for i=0, Map.Monsters.High do
