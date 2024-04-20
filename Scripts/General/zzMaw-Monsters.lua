@@ -1749,7 +1749,7 @@ function events.AfterLoadMap()
 			end
 			for i=0,Map.Monsters.High do
 				local id=Map.Monsters[i].Id
-				if id%3==0 and Game.MonstersTxt[id].AIType~=1 then
+				if id%3==0 and Game.MonstersTxt[id].AIType~=0 then
 					table.insert(possibleMonsters,i)
 				end
 			end
