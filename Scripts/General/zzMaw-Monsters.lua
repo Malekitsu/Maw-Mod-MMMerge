@@ -1958,9 +1958,9 @@ function eliteRegen()
 		for key, value in pairs(mapvars.regenerating) do	
 			if value>0 then
 				mon=Map.Monsters[key]
-				lastTimeWhenCalled=lastTimeWhenCalled or Game.Time
-				local timePassed=Game.Time-lastTimeWhenCalled
-				lastTimeWhenCalled=Game.Time
+				vars.lastTimeWhenCalled=vars.lastTimeWhenCalled or Game.Time
+				local timePassed=Game.Time-vars.lastTimeWhenCalled
+				vars.lastTimeWhenCalled=Game.Time
 				--call is 20 times per minute, which is 12.8 
 				local timeMultiplier=timePassed/12.8
 				mon.HP=math.min(mon.HP+mon.FullHitPoints*0.01*0.99^value*timeMultiplier, mon.FullHP)
