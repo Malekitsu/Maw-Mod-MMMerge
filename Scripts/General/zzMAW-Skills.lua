@@ -870,9 +870,9 @@ regenHP={0,0,0,0,[0]=0}
 regenSP={0,0,0,0,[0]=0}
 function MawRegen()
 	--HP
-	lastRegenTime=lastRegenTime or Game.Time
-	timePassed=Game.Time-lastRegenTime
-	lastRegenTime=Game.Time
+	vars.lastRegenTime=vars.lastRegenTime or Game.Time
+	timePassed=Game.Time-vars.lastRegenTime
+	vars.lastRegenTime=Game.Time
 	--call is 20 times per minute, which is 12.8 
 	timeMultiplier=timePassed/12.8
 	for i=0,Party.High do
