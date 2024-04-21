@@ -1963,7 +1963,9 @@ function eliteRegen()
 				vars.lastTimeWhenCalled=Game.Time
 				--call is 20 times per minute, which is 12.8 
 				local timeMultiplier=timePassed/12.8
-				mon.HP=math.min(mon.HP+mon.FullHitPoints*0.01*0.99^value*timeMultiplier, mon.FullHP)
+				if mon.HP>0 then
+					mon.HP=math.min(mon.HP+mon.FullHitPoints*0.01*0.99^value*timeMultiplier, mon.FullHP)
+				end
 			end
 		end
 	end
