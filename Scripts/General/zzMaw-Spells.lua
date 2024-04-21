@@ -1226,7 +1226,7 @@ end
 function events.CalcSpellDamage(t)
 	--mass distorsion
 	if t.Spell == 44 then 
-		t.Result = math.min(t.HP*0.15+t.HP*t.Skill*0.005, 32500)
+		t.Result = math.min(t.HP*0.15+t.HP*t.Skill*0.005)
 		return
 	end
 	--check for spell tier
