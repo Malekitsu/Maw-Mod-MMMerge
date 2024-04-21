@@ -596,9 +596,19 @@ for i=1,10 do
 			end
 			maxStrength2=maxStrength1
 			enc1=t.BonusStrength
+			--hp/mana
+			if t.Bonus==8 or t.Bonus==9 then
+				enc1=5*(enc1*2+100)^0.5-50
+				maxStrength1=maxStrength1*(2+maxStrength1/50)
+			end
 			enc2=t.Charges%1000
+			chargeBonus=math.floor(t.Charges/1000)
 			if enc2==0 then
 				enc2=math.huge
+			end
+			if chargeBonus==8 or chargeBonus==9 then
+				enc2=5*(enc2*2+100)^0.5-50
+				maxStrength2=maxStrength2*(2+maxStrength2/50)
 			end
 			if enc1>=maxStrength1 and enc2>=maxStrength1 then 
 				Game.ShowStatusText("Gem power is not enough")
@@ -628,17 +638,31 @@ for i=1,10 do
 				maxStrength2=math.ceil(maxStrength2*0.65)
 			end
 			
-			if (enc1<=enc2 and enc1<maxStrength1) then
+			if ((enc1<=enc2 or t.Charges%1000==999) and enc1<maxStrength1) then
+				if t.Bonus==8 or t.Bonus==9 then
+					upgradeAmount=(upgradeAmount^2+1)*2
+					if t.BonusStrength==math.min(t.BonusStrength+upgradeAmount,maxStrength1) then
+						Game.ShowStatusText("Gem power is not enough")
+						return
+					end
+				end
 				t.BonusStrength=math.min(t.BonusStrength+upgradeAmount,maxStrength1)
 			elseif t.Charges%1000<maxStrength2 and t.Charges>1000 then
-				newBonus=math.min(t.Charges%1000+upgradeAmount,maxStrength2)
+				if chargeBonus==8 or chargeBonus==9 then
+					upgradeAmount=(upgradeAmount^2+1)*2
+					if t.Charges%1000==math.min(t.Charges%1000+upgradeAmount,maxStrength2,999) then
+						Game.ShowStatusText("Gem power is not enough")
+						return
+					end
+				end
+				newBonus=math.min(t.Charges%1000+upgradeAmount,maxStrength2,999)
 				t.Charges=t.Charges-t.Charges%1000+newBonus
 			else
 				Game.ShowStatusText("Gem power is not enough")
 				return
 			end
 			
-			Mouse.Item.Number=0
+			--Mouse.Item.Number=0
 			enchanted=true
 			mem.u4[0x51E100] = 0x100 
 			t.Condition = t.Condition:Or(0x10)
@@ -704,8 +728,8 @@ evt.PotionEffects[82] = function(IsDrunk, t, Power)
 end
 
 evt.PotionEffects[83] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) and t.MaxCharges<55 then
-		t.MaxCharges=math.min(t.MaxCharges+2,55)
+	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) and t.MaxCharges<(55+Game.BolsterAmount/30) then
+		t.MaxCharges=math.min(t.MaxCharges+2,55+Game.BolsterAmount/30)
 		Mouse.Item.Number=0
 		mem.u4[0x51E100] = 0x100 
 		t.Condition = t.Condition:Or(0x10)
