@@ -1740,7 +1740,7 @@ teleport behind party
 
 function events.AfterLoadMap()
 	if Map.IndoorOrOutdoor==1 or vars.Mode==2 then
-		if not mapvars.bossGenerated then
+		if not mapvars.bossGenerated or not mapvars.bossNames then
 			mapvars.bossGenerated=true
 			possibleMonsters={}
 			bossSpawns=math.ceil((Map.Monsters.Count-30)/150)
