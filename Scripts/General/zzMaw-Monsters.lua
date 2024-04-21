@@ -621,7 +621,7 @@ function events.GameInitialized2()
 	end
 end
 --BackupMapStats = deepcopy(Game.MapStats)
-function events.LoadMap()
+function events.BeforeLoadMap()
 	--add difficulty related damage
 	if Game.BolsterAmount%50~=0 then
 		Game.BolsterAmount=100
@@ -706,9 +706,9 @@ function events.LoadMap()
 			if Game.MapStats[i].Mon3Hi>1 then
 				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+6
 			end 
-			Game.MapStats[i].Mon1Dif=math.min(BackupMapStats[i].Mon1Dif+2,5)
-			Game.MapStats[i].Mon2Dif=math.min(BackupMapStats[i].Mon2Dif+2,5)
-			Game.MapStats[i].Mon3Dif=math.min(BackupMapStats[i].Mon3Dif+2,5)
+			Game.MapStats[i].Mon1Dif=math.min(BackupMapStats[i].Mon1Dif+1,5)
+			Game.MapStats[i].Mon2Dif=math.min(BackupMapStats[i].Mon2Dif+1,5)
+			Game.MapStats[i].Mon3Dif=math.min(BackupMapStats[i].Mon3Dif+1,5)
 		end
 	end
 	
