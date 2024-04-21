@@ -203,11 +203,23 @@ end
 function events.KeyDown(t)
     if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 103 then
         if t.Key == 67 then
-            sortMultiBag(Party[Game.CurrentPlayer])
-            Game.ShowStatusText("Inventory sorted")
+			if vars.SmallerPotionBottles then
+				for i=220, 299 do
+					itemSizeMap[i][2]=1
+				end	
+			else
+				for i=220, 299 do
+					itemSizeMap[i][2]=2
+				end	
+			end
+			Game.ShowStatusText("MultiBag Sort disabled until next release (bugged)")
+			return
+            --sortMultiBag(Party[Game.CurrentPlayer])
+            --Game.ShowStatusText("Inventory sorted")
 		end
 	end
 end
+
 
 function sortMultiBag(pl)
 	local id=pl:GetIndex()
