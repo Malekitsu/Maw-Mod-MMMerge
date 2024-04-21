@@ -98,7 +98,6 @@ function events.CalcDamageToMonster(t)
 			end
 		end
 	end
-	t.Result=math.min(t.Result, 32500)
 end
 
 
