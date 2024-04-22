@@ -535,7 +535,7 @@ function events.GameInitialized2()
 	Game.SkillDesGM[const.Skills.Shield]=string.format("%s15%% proj. damage reduction",Game.SkillDesGM[const.Skills.Shield])
 	Game.SkillDesMaster[const.Skills.Armsmaster]=string.format("Skills adds 2 damage to all melee weapons")
 	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s usable with Leather Armor",Game.SkillDesGM[const.Skills.Dodging])
-	Game.SkillDesGM[const.Skills.Unarmed]=string.format("%s 5+0.5%% dodge chance",Game.SkillDesGM[const.Skills.Unarmed])
+	Game.SkillDesGM[const.Skills.Unarmed]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Unarmed])
 end
 
 ---------------------------------------
