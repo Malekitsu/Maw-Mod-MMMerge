@@ -662,7 +662,7 @@ for i=1,10 do
 				return
 			end
 			
-			--Mouse.Item.Number=0
+			Mouse.Item.Number=0
 			enchanted=true
 			mem.u4[0x51E100] = 0x100 
 			t.Condition = t.Condition:Or(0x10)
