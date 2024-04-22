@@ -874,7 +874,7 @@ function MawRegen()
 	timePassed=Game.Time-vars.lastRegenTime
 	vars.lastRegenTime=Game.Time
 	--call is 20 times per minute, which is 12.8 
-	timeMultiplier=timePassed/12.8
+	local timeMultiplier=Game.TurnBased and timePassed/12.8 or 1
 	for i=0,Party.High do
 		local Cond = Party[i]:GetMainCondition()
 		if Cond == 18 or Cond == 17 or Cond < 14 then
