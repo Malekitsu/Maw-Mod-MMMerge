@@ -1962,7 +1962,7 @@ function eliteRegen()
 				local timePassed=Game.Time-vars.lastTimeWhenCalled
 				vars.lastTimeWhenCalled=Game.Time
 				--call is 20 times per minute, which is 12.8 
-				local timeMultiplier=timePassed/12.8
+				local timeMultiplier=Game.TurnBased and timePassed/12.8 or 1
 				if mon.HP>0 then
 					mon.HP=math.min(mon.HP+mon.FullHitPoints*0.01*0.99^value*timeMultiplier, mon.FullHP)
 				end
