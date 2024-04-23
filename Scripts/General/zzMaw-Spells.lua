@@ -869,6 +869,7 @@ end
 masteryName={"Normal", "Expert", "Master", "GM"}
 function events.Action(t)
 	if t.Action==25 and autoTargetHeals then
+		ascension()
 		local pl=Party[Game.CurrentPlayer]
 		local spellCast=0
 		if t.Param==0 then
