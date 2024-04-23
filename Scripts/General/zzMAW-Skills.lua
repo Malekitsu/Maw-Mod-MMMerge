@@ -1514,6 +1514,6 @@ function events.CanIdentifyItem(t)
 end
 
 --fix for "yo" text
-function events.GameInitialized2()
+function events.Action()
 	Game.NPCText[128]="You don't meet the requirements, and cannot be taught until you do."	
 end
