@@ -1777,10 +1777,11 @@ function events.BuildItemInformationBox(t)
 			if Game.BolsterAmount>=300 then
 				levelRequired=levelRequired-6
 			end
-			
-			levelRequired=math.max(1,math.floor(levelRequired))
+			if vars.Mode==2 then
+				levelRequired=levelRequired-3
+			end
 			if t.Item.BonusExpireTime<=2 then
-				levelRequired=math.max(1,levelRequired-t.Item.BonusExpireTime*5)
+				levelRequired=levelRequired-t.Item.BonusExpireTime*5
 			end
 			local enchants=3
 			if t.Item.Bonus>0 then
@@ -1792,7 +1793,7 @@ function events.BuildItemInformationBox(t)
 			if t.Item.Charges>1000 then
 				enchants=enchants+1
 			end
-			levelRequired=math.round(levelRequired*enchants/6)
+			levelRequired=math.max(1,math.floor(levelRequired*enchants/6))
 			local txt="\n\nLevel Required: " .. levelRequired 
 			--local txt="" --not shown when can equip
 			--check if equippable
@@ -2967,8 +2968,11 @@ function events.CanWearItem(t)
 		if Game.BolsterAmount>=300 then
 			levelRequired=levelRequired-6
 		end
+		if vars.Mode==2 then
+			levelRequired=levelRequired-3
+		end
 		if it.BonusExpireTime<=2 then
-			levelRequired=math.max(1,levelRequired-it.BonusExpireTime*5)
+			levelRequired=levelRequired-it.BonusExpireTime*5
 		end
 		local enchants=3
 		if it.Bonus>0 then
@@ -2980,8 +2984,7 @@ function events.CanWearItem(t)
 		if it.Charges>1000 then
 			enchants=enchants+1
 		end
-		levelRequired=math.round(levelRequired*enchants/6)
-		
+		levelRequired=levelRequired*enchants/6
 		levelRequired=math.max(1,math.floor(levelRequired))
 		--check if equippable
 		local plLvl=Party[t.PlayerId].LevelBase
