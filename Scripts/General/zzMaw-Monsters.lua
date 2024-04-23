@@ -1615,8 +1615,8 @@ end
 
 function events.PickCorpse(t)
 	if t.Monster.NameId>300 then
-		t.Monster.TreasureItemPercent=t.Monster.TreasureItemPercent/4
-		t.Monster.TreasureDiceSides=math.round(t.Monster.TreasureDiceSides/4)
+		t.Monster.TreasureItemPercent=math.round(t.Monster.TreasureItemPercent/4)
+		t.Monster.TreasureDiceSides=math.max(math.round(t.Monster.TreasureDiceSides/4),1)
 	elseif t.Monster.NameId>220 then
 		t.Monster.TreasureItemPercent=100
 		t.Monster.TreasureItemLevel=math.min(math.ceil(t.Monster.Level/18+1),6)
