@@ -53,7 +53,7 @@ function events.CalcDamageToMonster(t)
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 17) then
 		local dmg=t.Monster.HP*0.01
 		data=WhoHitMonster()
-		if (data.Object.Spell and table.find(aoespells, data.Object.Spell)) or data.Object.Spell==133 then
+		if (data and data.Object and data.Object.Spell and table.find(aoespells, data.Object.Spell)) or data.Object.Spell==133 then
 			dmg=dmg*0.4
 		end
 		t.Result=t.Result+dmg
@@ -61,9 +61,11 @@ function events.CalcDamageToMonster(t)
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 21) then
 		local mult=1
 		for i=0, Map.Monsters.High do
-			dist=getDistanceToMonster(Map.Monsters[i])
-			if dist<=384 then
-				mult=mult+0.05
+			if Map.Monsters[i].Active then
+				dist=getDistanceToMonster(Map.Monsters[i])
+				if dist<=384 then
+					mult=mult+0.05
+				end
 			end
 		end
 		t.Result=t.Result*mult
@@ -172,9 +174,11 @@ function events.CalcDamageToPlayer(t)
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 22) then
 		local count=0
 		for i=0, Map.Monsters.High do
-			dist=getDistanceToMonster(Map.Monsters[i])
-			if dist<=384 then
-				count=count+1
+			if Map.Monsters[i].Active then
+				dist=getDistanceToMonster(Map.Monsters[i])
+				if dist<=384 then
+					count=count+1
+				end
 			end
 		end
 		t.Result=t.Result*0.97^count
