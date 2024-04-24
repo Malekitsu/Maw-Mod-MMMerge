@@ -693,7 +693,7 @@ end
 		HPregen=0
 		totHP=pl:GetFullHP()
 			for it in pl:EnumActiveItems() do
-				if it.Bonus2 == 37 or it.Bonus2==44 or it.Bonus2==50 or it.Bonus2==54 then		
+				if it.Bonus2 == 37 or it.Bonus2==44 or it.Bonus2==50 or it.Bonus2==54 or it.Bonus2==66 then		
 					HPregen=math.max(HPregen+totHP*0.02,HPregen+1)	
 				end
 			end
@@ -709,7 +709,7 @@ end
 		SPregen=0
 		totSP=pl:GetFullSP()
 			for it in pl:EnumActiveItems() do
-				if it.Bonus2 == 38 or it.Bonus2==47 or it.Bonus2==55 then		
+				if it.Bonus2 == 38 or it.Bonus2==47 or it.Bonus2==55 or it.Bonus2==66 then		
 					SPregen=math.max(SPregen+totSP*0.02,SPregen+1)
 				end
 			end
@@ -2020,6 +2020,7 @@ function itemStats(index)
 				tab[tabNumber]=math.max(tab[tabNumber] or 0, it.BonusStrength)
 			end
 		end
+		--fix for double enchants
 		if it.Bonus2==62 then
 			tab[74]=math.max(tab[74] or 0, 3)
 			tab[84]=math.max(tab[84] or 0, 3)
