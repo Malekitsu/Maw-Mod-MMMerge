@@ -898,9 +898,11 @@ function events.BuildItemInformationBox(t)
 				if t.Item.BonusExpireTime==21 then
 					local count=0
 					for i=0, Map.Monsters.High do
-						dist=getDistanceToMonster(Map.Monsters[i])
-						if dist<=384 then
-							count=count+1
+						if Map.Monsters[i].Active then
+							dist=getDistanceToMonster(Map.Monsters[i])
+							if dist<=384 then
+								count=count+1
+							end
 						end
 					end
 					local dmg=count*5
@@ -908,9 +910,11 @@ function events.BuildItemInformationBox(t)
 				elseif t.Item.BonusExpireTime==22 then
 					local count=0
 					for i=0, Map.Monsters.High do
-						dist=getDistanceToMonster(Map.Monsters[i])
-						if dist<=384 then
-							count=count+1
+						if Map.Monsters[i].Active then
+							dist=getDistanceToMonster(Map.Monsters[i])
+							if dist<=384 then
+								count=count+1
+							end
 						end
 					end
 					local red=math.round((1-0.97^count)*10000)/100
