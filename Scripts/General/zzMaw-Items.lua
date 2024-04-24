@@ -2020,6 +2020,10 @@ function itemStats(index)
 				tab[tabNumber]=math.max(tab[tabNumber] or 0, it.BonusStrength)
 			end
 		end
+		if it.Bonus2==62 then
+			tab[74]=math.max(tab[74] or 0, 3)
+			tab[84]=math.max(tab[84] or 0, 3)
+		end		
 		if it.Charges>1000 then
 			tab[math.floor(it.Charges/1000)]=tab[math.floor(it.Charges/1000)]+it.Charges%1000
 		end		
@@ -2959,6 +2963,9 @@ end
 --items have an item level requirement
 function events.CanWearItem(t)
 	it=Mouse.Item
+	if vars.Mode==2 and not it.Identified then
+		t.Available=false
+	end
 	if it.Number<=151 or (it.Number>=803 and it.Number<=936) or (it.Number>=1603 and it.Number<=1736) then 
 		local itemLevel=it.MaxCharges*5
 		local tot=0
@@ -2996,4 +3003,19 @@ function events.CanWearItem(t)
 			t.Available=false
 		end
 	end	
+end
+
+--chests blocked if trapped
+function events.CanOpenChest(t)
+	if vars.Mode==2 then
+		local skillRequired=Game.MapStats[Map.Name].Lock
+		t.CanOpen=false
+		for i=0,Party.High do
+			local s, m = SplitSkill(Party[i].Skills[const.Skills.DisarmTraps])
+			local skill=s*m
+			if m==4 or skill>=skillRequired then
+				t.CanOpen=true
+			end
+		end
+	end
 end
