@@ -900,7 +900,7 @@ function events.BuildItemInformationBox(t)
 					for i=0, Map.Monsters.High do
 						if Map.Monsters[i].Active then
 							dist=getDistanceToMonster(Map.Monsters[i])
-							if dist<=384 then
+							if dist<=512 then
 								count=count+1
 							end
 						end
@@ -912,7 +912,7 @@ function events.BuildItemInformationBox(t)
 					for i=0, Map.Monsters.High do
 						if Map.Monsters[i].Active then
 							dist=getDistanceToMonster(Map.Monsters[i])
-							if dist<=384 then
+							if dist<=512 then
 								count=count+1
 							end
 						end
