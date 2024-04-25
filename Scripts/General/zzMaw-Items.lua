@@ -3007,6 +3007,7 @@ function events.CanWearItem(t)
 end
 
 --chests blocked if trapped
+--[[
 function events.CanOpenChest(t)
 	if vars.Mode==2 then
 		local skillRequired=Game.MapStats[Map.Name].Lock
@@ -3020,3 +3021,4 @@ function events.CanOpenChest(t)
 		end
 	end
 end
+]]
