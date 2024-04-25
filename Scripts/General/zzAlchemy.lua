@@ -608,7 +608,7 @@ for i=1,10 do
 			end
 			if chargeBonus==8 or chargeBonus==9 then
 				enc2=5*(enc2*2+100)^0.5-50
-				maxStrength2=maxStrength2*(2+maxStrength2/50)
+				maxStrength2=math.floor(maxStrength2*(2+maxStrength2/50))
 			end
 			if enc1>=maxStrength1 and enc2>=maxStrength1 then 
 				Game.ShowStatusText("Gem power is not enough")
