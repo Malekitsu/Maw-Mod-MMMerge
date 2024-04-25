@@ -769,7 +769,7 @@ end
 
 
 craftDropChances={
-		["gems"]=0.005,
+		["gems"]=0.0075,
 		[1061]=0.00025,
 		[1062]=0.00025,
 		[1063]=0.0005,
@@ -784,6 +784,9 @@ function events.MonsterKilled(mon)
 	--level bonus
 	partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 	bonusRoll=1+partyLevel/50
+	if mon.NameId>=220 and mon.NameId <300 then
+		bonusRoll=bonusRoll*10
+	end
 	if Multiplayer and Multiplayer.client_monsters()[0] then
 		bonusRoll=bonusRoll/(1+#Multiplayer.client_monsters())
 	end
