@@ -1382,6 +1382,22 @@ local modifiedBookValues =
 	[10] = 15000,
 }
 
+local modifiedBookValuesMM6 =
+{
+	[0] = 100,
+	[1] = 200,
+	[2] = 300,
+	[3] = 300,
+	[4] = 500,
+	[5] = 500,
+	[6] = 1000,
+	[7] = 2000,
+	[8] = 4000,
+	[9] = 6000,
+	[10] = 8000,
+	[11] = 10000,
+	[12] = 15000,
+}
 
 
 function events.GameInitialized2()
@@ -1399,15 +1415,21 @@ function events.GameInitialized2()
 		for j=1,11 do
 			Game.ItemsTxt[399+11*i+j].Value=modifiedBookValues[j-1]
 			Game.ItemsTxt[1201+11*i+j].Value=modifiedBookValues[j-1]
-			Game.ItemsTxt[1901+11*i+j].Value=modifiedBookValues[j-1]
 		end
 	end
+	--MM6
+	for i=0,8 do
+		for j=1,13 do
+			Game.ItemsTxt[1901+13*i+j].Value=modifiedBookValuesMM6[j-1]
+		end
+	end
+	
 	for i=1,22 do
 		Game.ItemsTxt[476+i].Value=Game.ItemsTxt[476+i].Value*2
 	end
 	--single books cost increased
-	local id={399,1201,1901}
-	for i=1,3 do
+	local id={399,1201}
+	for i=1,#id do
 		Game.ItemsTxt[9+id[i]].Value= 40000
 		Game.ItemsTxt[21+id[i]].Value= 40000
 		Game.ItemsTxt[22+id[i]].Value= 40000
@@ -1419,6 +1441,19 @@ function events.GameInitialized2()
 		Game.ItemsTxt[86+id[i]].Value= 60000
 		Game.ItemsTxt[99+id[i]].Value= 100000
 	end
+	--MM6
+	local id=1901
+	Game.ItemsTxt[11+id].Value= 40000
+	Game.ItemsTxt[25+id].Value= 40000
+	Game.ItemsTxt[26+id].Value= 40000
+	Game.ItemsTxt[37+id].Value= 20000
+	Game.ItemsTxt[39+id].Value= 60000
+	Game.ItemsTxt[65+id].Value= 60000
+	Game.ItemsTxt[99+id].Value= 20000
+	Game.ItemsTxt[101+id].Value= 40000
+	Game.ItemsTxt[102+id].Value= 60000
+	Game.ItemsTxt[117+id].Value= 100000
+	
 end
 
 --------------------------------------
