@@ -599,7 +599,7 @@ for i=1,10 do
 			--hp/mana
 			if t.Bonus==8 or t.Bonus==9 then
 				enc1=5*(enc1*2+100)^0.5-50
-				maxStrength1=maxStrength1*(2+maxStrength1/50)
+				maxStrength1=math.floor(maxStrength1*(2+maxStrength1/50))
 			end
 			enc2=t.Charges%1000
 			chargeBonus=math.floor(t.Charges/1000)
