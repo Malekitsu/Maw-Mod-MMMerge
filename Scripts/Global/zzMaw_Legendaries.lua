@@ -90,24 +90,35 @@ function events.CalcDamageToMonster(t)
 			t.Result=math.round(math.max(t.Result, t.Result*(luck/1500)+daggerCritBonus))
 		end
 		--end of [14]
-		if t.Result>=t.Monster.HP then
-			local id=t.Player:GetIndex()
-			if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 11) then
-				data=WhoHitMonster()
-				--no aoe spells
-				if (data and data.Object and table.find(aoespells,data.Object.Spell)) or (data and data.Spell==133) then
-					return
-				else				
-					function events.Tick()
-						events.Remove("Tick", 1)
+		local id=t.PlayerIndex
+		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 11) then
+			data=WhoHitMonster()
+			--no aoe spells
+			if (data and data.Object and table.find(aoespells,data.Object.Spell)) or (data and data.Spell==133) then
+				return
+			else				
+				function events.Tick()
+					events.Remove("Tick", 1)
+					if t.Monster.HP<=0 then
 						t.Player.RecoveryDelay=0
+						changePlayer(id)
 					end
 				end
 			end
 		end
 	end
 end
-
+function changePlayer(id)
+	function events.Tick()
+		events.Remove("Tick", 1)
+		for i=0, Party.High do
+			if Party[i]:GetIndex()==id then
+				Game.CurrentPlayer=i
+				return
+			end
+		end
+	end
+end
 
 --[12]="75% of base enchants increasing might, intellect or personality will increase the other 2 stats (highest one is picked)",
 function events.CalcStatBonusByItems(t)
