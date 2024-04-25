@@ -3007,10 +3007,9 @@ function events.CanWearItem(t)
 end
 
 --chests blocked if trapped
---[[
 function events.CanOpenChest(t)
 	if vars.Mode==2 then
-		local skillRequired=Game.MapStats[Map.Name].Lock
+		local skillRequired=Game.MapStats[Map.MapStatsIndex].Lock
 		t.CanOpen=false
 		for i=0,Party.High do
 			local s, m = SplitSkill(Party[i].Skills[const.Skills.DisarmTraps])
@@ -3021,4 +3020,3 @@ function events.CanOpenChest(t)
 		end
 	end
 end
-]]
