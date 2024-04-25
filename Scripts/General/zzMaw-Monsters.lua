@@ -1665,7 +1665,7 @@ function events.MonsterKilled(mon)
 			mapvars.monsterMap.cleared=true
 			return
 		end
-		if mapvars.monsterMap.cleared==false and m/n>=0.7 and Game.BolsterAmount>=300 then
+		if mapvars.monsterMap.cleared==false and m/n>=0.65 and Game.BolsterAmount>=300 then
 			mapvars.monsterMap.cleared=true
 			Game.EscMessage("Monsters are weakened and can no longer resurrect")
 		end
