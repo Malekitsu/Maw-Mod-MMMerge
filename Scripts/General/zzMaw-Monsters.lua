@@ -469,10 +469,9 @@ function recalculateMonsterTable()
 			
 	end
 		
-	if bolsterLevel>20 or Game.freeProgression==false then
-		for i=1, 651 do
+	for i=1, 651 do
+		if bolsterLevel>20 or Game.freeProgression==false then
 			--calculate level scaling
-			mon=Game.MonstersTxt[i]
 			if i%3==1 then
 				HPtable[i]=(HPtable[i]*0.3+HPtable[i+1]*(basetable[i].FullHP/basetable[i+1].FullHP))/1.3
 			elseif i%3==0 then
@@ -491,9 +490,12 @@ function recalculateMonsterTable()
 				mon.FullHP=math.round(mon.FullHP/10)*10
 				mon.HP=math.round(mon.HP/10)*10
 			end
+		else
+			mon=Game.MonstersTxt[i]
+			mon.HP=HPtable[i]
+			mon.FullHP=HPtable[i]
 		end
 	end
-	
 end
 
 function events.LoadMap()
