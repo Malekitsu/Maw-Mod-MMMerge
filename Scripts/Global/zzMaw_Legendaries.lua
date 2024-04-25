@@ -93,9 +93,15 @@ function events.CalcDamageToMonster(t)
 		if t.Result>=t.Monster.HP then
 			local id=t.Player:GetIndex()
 			if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 11) then
-				function events.Tick()
-					events.Remove("Tick", 1)
-					t.Player.RecoveryDelay=0
+				data=WhoHitMonster()
+				--no aoe spells
+				if (data and data.Object and table.find(aoespells,data.Object.Spell)) or (data and data.Spell==133) then
+					return
+				else				
+					function events.Tick()
+						events.Remove("Tick", 1)
+						t.Player.RecoveryDelay=0
+					end
 				end
 			end
 		end
