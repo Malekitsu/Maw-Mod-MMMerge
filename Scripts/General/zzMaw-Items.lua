@@ -739,7 +739,7 @@ end
 --TOOLTIPS--
 ------------------------------------------
 legendaryEffects={
-	[11]="Killing a monster will recover you action time",
+	[11]="Killing a monster with a single-target attack will recover you action time",
 	[12]="When a base enchantment increases one of the stats-might, intellect, or personality-the two lesser stats will each receive a bonus equivalent to 75% of the value of the highest stat.",
 	[13]="Immunity to all status effects from monsters",
 	[14]="Critical chance over 100% increases total damage",
