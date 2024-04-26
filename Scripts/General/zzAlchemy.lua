@@ -641,7 +641,7 @@ for i=1,10 do
 			if ((enc1<=enc2 or t.Charges%1000==999) and enc1<maxStrength1) then
 				if t.Bonus==8 or t.Bonus==9 then
 					upgradeAmount=(upgradeAmount^2+1)*2
-					if t.BonusStrength==math.min(t.BonusStrength+upgradeAmount,maxStrength1) then
+					if t.BonusStrength>=math.min(t.BonusStrength+upgradeAmount,maxStrength1) then
 						Game.ShowStatusText("Gem power is not enough")
 						return
 					end
