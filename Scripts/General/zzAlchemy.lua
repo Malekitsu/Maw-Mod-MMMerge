@@ -580,97 +580,79 @@ function events.BuildItemInformationBox(t)
 	end
 end
 
+local function upgradeGem(it, tier)
+	local enchanted=false
+	--bolster multiplier
+	local bolsterMult=math.max((Game.BolsterAmount-100)/500+1,1)
+	local tier=tier*bolsterMult
+	--2nd enchant value
+	local bonus2=math.floor(it.Charges/1000)
+	local bonus2Strength=it.Charges%1000
+	--upgrade amount
+	local upgradeAmount1=math.round((tier*10)^0.5/2)
+	local upgradeAmount2=upgradeAmount1
+	--base value
+	local maxValue1=tier*10
+	local maxValue2=maxValue1
+	--hp/sp value
+	if it.Bonus==8 or it.Bonus==9 then
+		maxValue1=math.floor(maxValue1*(2+maxValue1/50))*mult
+		upgradeAmount1=upgradeAmount1^2+1
+	end
+	if bonus2==8 or bonus2==9 then
+		maxValue2=math.floor(upgradeAmount2*(2+upgradeAmount2/50))*mult
+		upgradeAmount2=upgradeAmount2^2+1
+	end
+	--AC
+	if it.Bonus==10 then
+		maxValue1=math.floor(maxValue1*0.65)
+	end
+	if bonus2==10 then
+		maxValue2=math.floor(maxValue2*0.65)
+	end
+	--skills
+	if it.Bonus>=17 then
+		maxStrength1=math.floor(math.max((tier*10)^0.5, math.round(tier)))
+		upgradeAmount1=1
+	end
+	--item slot multiplier and legendary multiplier
+	local mult=slotMult[it:T().EquipStat] or 1
+	if it.BonusExpireTime==20 then
+		mult=mult*2
+	end
+	maxValue1=maxValue1*mult
+	maxValue2=maxValue2*mult
+	--pick the lowest one
+	local bonus1percent=it.BonusStrength/maxValue1
+	local bonus2percent=bonus2Strength/maxValue2
+	--apply enchant
+	if bonus1percent<=bonus2percent and it.BonusStrength<maxValue1 then
+		enchanted=true
+		it.BonusStrength=math.min(it.BonusStrength+upgradeAmount1,maxValue1)
+	elseif bonus2percent<=bonus1percent and bonus2Strength<maxValue2 and bonus2Strength<999 then --currently capped at 999
+		enchanted=true
+		it.Charges=bonus2*1000+math.min(bonus2Strength+upgradeAmount2,maxValue2,999)
+	end
+	return enchanted
+end
+
 for i=1,10 do
 	evt.PotionEffects[70+i] = function(IsDrunk, t, Power)
 		if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then			
 			if craftWaitTime>0 then return end
-			--pick which enchant to pick that is below the item power
-			local bolsterMult=math.max((Game.BolsterAmount-100)/500+1,1)
-			tier=(Mouse.Item.Number-1050)*bolsterMult
-			upgradeAmount=math.round((tier*10)^0.5/2)
-			mult=slotMult[t:T().EquipStat]
-			maxStrength1=math.round(tier*10*mult)
-			--legendary [20]
-			if t.BonusExpireTime==20 then
-				maxStrength1=maxStrength1*2
-			end
-			maxStrength2=maxStrength1
-			enc1=t.BonusStrength
-			--hp/mana
-			if t.Bonus==8 or t.Bonus==9 then
-				enc1=5*(enc1*2+100)^0.5-50
-				maxStrength1=math.floor(maxStrength1*(2+maxStrength1/50))
-			end
-			enc2=t.Charges%1000
-			chargeBonus=math.floor(t.Charges/1000)
-			if enc2==0 then
-				enc2=math.huge
-			end
-			if chargeBonus==8 or chargeBonus==9 then
-				enc2=5*(enc2*2+100)^0.5-50
-				maxStrength2=math.floor(maxStrength2*(2+maxStrength2/50))
-			end
-			if enc1>=maxStrength1 and enc2>=maxStrength1 then 
-				Game.ShowStatusText("Gem power is not enough")
-				return
-			end
-			--check for special enchant
-			if t.Bonus>=17 then
-				maxStrength1=math.floor(math.max((tier*10)^0.5*mult, math.round(tier*mult)))
-				if t.BonusStrength<maxStrength1 then
-					t.BonusStrength=t.BonusStrength+1
-					Mouse.Item.Number=0
-					enchanted=true
-					mem.u4[0x51E100] = 0x100 
-					t.Condition = t.Condition:Or(0x10)
-					evt.PlaySound(12070)
-					return
-				else
-					enc1=math.huge
-				end
-			end
-			if t.Bonus==10 then
-				enc1=enc1*1.5
-				maxStrength1=math.ceil(maxStrength1*0.65)
-			end
-			if math.floor(t.Charges/1000)==10 then
-				enc2=enc2*1.5
-				maxStrength2=math.ceil(maxStrength2*0.65)
-			end
-			
-			if ((enc1<=enc2 or t.Charges%1000==999) and enc1<maxStrength1) then
-				if t.Bonus==8 or t.Bonus==9 then
-					upgradeAmount=(upgradeAmount^2+1)*2
-					if t.BonusStrength>=math.min(t.BonusStrength+upgradeAmount,maxStrength1) then
-						Game.ShowStatusText("Gem power is not enough")
-						return
-					end
-				end
-				t.BonusStrength=math.min(t.BonusStrength+upgradeAmount,maxStrength1)
-			elseif t.Charges%1000<maxStrength2 and t.Charges>1000 then
-				if chargeBonus==8 or chargeBonus==9 then
-					upgradeAmount=(upgradeAmount^2+1)*2
-					if t.Charges%1000==math.min(t.Charges%1000+upgradeAmount,maxStrength2,999) then
-						Game.ShowStatusText("Gem power is not enough")
-						return
-					end
-				end
-				newBonus=math.min(t.Charges%1000+upgradeAmount,maxStrength2,999)
-				t.Charges=t.Charges-t.Charges%1000+newBonus
+			local tier=(Mouse.Item.Number-1050)
+			local enchanted=upgradeGem(t, tier)
+			if enchanted then
+				Mouse.Item.Number=0
+				mem.u4[0x51E100] = 0x100 
+				t.Condition = t.Condition:Or(0x10)
+				evt.PlaySound(12070)
 			else
 				Game.ShowStatusText("Gem power is not enough")
-				return
 			end
-			
-			Mouse.Item.Number=0
-			enchanted=true
-			mem.u4[0x51E100] = 0x100 
-			t.Condition = t.Condition:Or(0x10)
-			evt.PlaySound(12070)
 		end
 	end
 end
-
 function events.GameInitialized2()
 	craftWaitTime=craftWaitTime or 0
 end
