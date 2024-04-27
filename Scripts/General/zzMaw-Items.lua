@@ -3050,6 +3050,9 @@ end
 function events.CanOpenChest(t)
 	if vars.Mode==2 then
 		local skillRequired=Game.MapStats[Map.MapStatsIndex].Lock
+		if skillRequired>=4 then 
+			skillRequired=skillRequired*2
+		end
 		t.CanOpen=false
 		for i=0,Party.High do
 			local s, m = SplitSkill(Party[i].Skills[const.Skills.DisarmTraps])
@@ -3057,6 +3060,14 @@ function events.CanOpenChest(t)
 			if m==4 or skill>=skillRequired then
 				t.CanOpen=true
 			end
+		end
+		if not t.CanOpen then
+			local id=Game.CurrentPlayer
+			if id<0 or id>Party.High then
+				id=0
+			end
+			evt.FaceAnimation(id,const.FaceAnimation.DoorLocked)
+			Game.ShowStatusText("Not enough disarm skill")
 		end
 	end
 end
