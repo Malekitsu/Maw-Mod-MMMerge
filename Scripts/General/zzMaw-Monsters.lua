@@ -337,7 +337,7 @@ function recalculateMonsterTable()
 				extraBolster=extraBolster*horizontalMultiplier
 				bolsterLevel=base.Level*horizontalMultiplier
 				flattener=(base.Level-LevelB)*horizontalMultiplier*0.6 --necessary to avoid making too much difference between monster tier
-				totalLevel[i]=math.max(base.Level*horizontalMultiplier+extraBolster-5-flattener+adjust, 5)-4
+				totalLevel[i]=math.max(base.Level*horizontalMultiplier+extraBolster-5-flattener+adjust-4, 5)
 				mon.Level=math.min(totalLevel[i],255)
 			end
 		end
