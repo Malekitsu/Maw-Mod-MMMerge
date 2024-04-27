@@ -475,7 +475,7 @@ function recalculateMonsterTable()
 	end
 		
 	for i=1, 651 do
-		if bolsterLevel>20 or Game.freeProgression==false then
+		if bolsterLevel>20 or Game.freeProgression==false or HPtable[i]>32500 then
 			--calculate level scaling
 			if i%3==1 then
 				HPtable[i]=(HPtable[i]*0.3+HPtable[i+1]*(basetable[i].FullHP/basetable[i+1].FullHP))/1.3
@@ -484,13 +484,14 @@ function recalculateMonsterTable()
 			end
 			
 			hpOvercap=0
-			while HPtable[i]>32500 do
-				HPtable[i]=math.round(HPtable[i]/2)
+			actualHP=HPtable[i]
+			while actualHP>32500 do
+				actualHP=math.round(actualHP/2)
 				hpOvercap=hpOvercap+1
 			end
 			mon.Resistances[0]=mon.Resistances[0]+hpOvercap*1000
-			mon.HP=HPtable[i]
-			mon.FullHP=HPtable[i]
+			mon.HP=actualHP
+			mon.FullHP=actualHP
 			if mon.FullHP>1000 then
 				mon.FullHP=math.round(mon.FullHP/10)*10
 				mon.HP=math.round(mon.HP/10)*10
