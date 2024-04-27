@@ -88,11 +88,6 @@ function events.AfterLoadMap()
 				atk2=mon.Attack2
 				atk2.DamageAdd, atk2.DamageDiceSides, atk2.DamageDiceCount = calcDices(atk2.DamageAdd,atk2.DamageDiceSides,atk2.DamageDiceCount,dmgMult)
 			end
-			if vars.Mode==2 then
-				if mon.AIType~=1 then
-					mon.AIType=0
-				end
-			end
 		end
 	end	
 	
@@ -174,6 +169,11 @@ function recalculateMawMonster()
 			mon.Level=txt.Level
 			
 			mon.Experience=txt.Experience
+		end
+		if vars.Mode==2 then
+			if mon.AIType~=1 then
+				mon.AIType=0
+			end
 		end
 	end
 end
