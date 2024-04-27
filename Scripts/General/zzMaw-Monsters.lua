@@ -1879,8 +1879,11 @@ function events.GameInitialized2() --to make the after all the other code
 					mapvars.regenerating=mapvars.regenerating or {}
 					mapvars.regenerating[id] = mapvars.regenerating[id] or 0
 					mapvars.regenerating[id] = mapvars.regenerating[id] + 1
-					if t.Result>t.Monster.HP then
-						mapvars.regenerating[id]=-1
+					function events.Tick()
+						events.Remove("Tick", 1)
+						if t.Monster.HP<=0 then
+							mapvars.regenerating[id]=-1
+						end
 					end
 				end
 			end
