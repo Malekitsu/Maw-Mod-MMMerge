@@ -1,7 +1,7 @@
 function events.GenerateItem(t)
 	--get party average level
 	Handled = true
-	--calculate party experience
+	--[[calculate party experience
 	if Map.MapStatsIndex==0 then return end
 	currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
 	if currentWorld==4 then
@@ -29,6 +29,7 @@ function events.GenerateItem(t)
 			end
 		end
 	end
+	]]
 end
 
 function events.PickCorpse(t)
@@ -230,13 +231,19 @@ function events.ItemGenerated(t)
 			return
 		end
 		
-		partyLevel=math.min(vars.MM8LVL+vars.MM7LVL+vars.MM6LVL-math.min(currentLevel,72), partyLevel+36)
+		local name=Game.MapStats[Map.MapStatsIndex].Name
+		mapLevel=mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High
 		if not Game.freeProgression then
 			partyLevel=(vars.MM8LVL+vars.MM7LVL+vars.MM6LVL)*0.75
-			local name=Game.MapStats[Map.MapStatsIndex].Name
 			if mapLevels[name] and mapLevels[name].Low~=0 and Game.HouseScreen~=2 and Game.HouseScreen~=95 then
-				partyLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)
+				partyLevel=mapLevel
+				mapLevel=0
 			end
+		elseif mapLevels[name] and mapLevels[name].Low~=0 then
+			partyLevel=mapLevel*0.2+partyLevel
+		else
+			partyLevel=partyLevel+math.min(currentLevel/2,54)
+			mapLevel=0
 		end
 		--difficulty settings
 		difficultyExtraPower=1
@@ -247,17 +254,20 @@ function events.ItemGenerated(t)
 		if math.random()<flatBonus%1 then
 			flatBonus=flatBonus+1
 		end
-		
-		if (Game.HouseScreen==2 or Game.HouseScreen==95) and Game.freeProgression then --nerf shops if no exp in current world
+		--nerf shops if no exp in current world
+		--[[
+		if (Game.HouseScreen==2 or Game.HouseScreen==95) and Game.freeProgression then 
 			partyLevel=math.round(partyLevel*(math.min(partyLevel/160 + currentLevel/80,1)))
 		end
-		
+		]]
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
 		bonusCharges=(difficultyExtraPower-1)*20
 		cap1=50*difficultyExtraPower+bonusCharges
-		t.Item.MaxCharges=math.min(math.floor(partyLevel/5),cap1)
+		asdcharge=math.min(math.floor(partyLevel/5+mapLevel/40),cap1)
+		t.Item.MaxCharges=math.min(math.floor(partyLevel/5+mapLevel/40),cap1)
 		--bolster boost
-		t.Item.MaxCharges=math.max(t.Item.MaxCharges+bonusCharges+t.Item.MaxCharges*(difficultyExtraPower-1), t.Item.MaxCharges*difficultyExtraPower) 
+		asdcharge2=math.floor(t.Item.MaxCharges*difficultyExtraPower+bonusCharges)
+		t.Item.MaxCharges=math.floor(t.Item.MaxCharges*difficultyExtraPower+bonusCharges)
 		
 		bonusCap=math.floor((difficultyExtraPower-1)*10)
 		cap2=14+bonusCap
@@ -351,7 +361,6 @@ function events.ItemGenerated(t)
 			power=2
 			chargesBonus=math.random(1,5)
 			t.Item.MaxCharges=t.Item.MaxCharges+chargesBonus
-			math.max(t.Item.MaxCharges*(chargesBonus/20)+chargesBonus, t.Item.MaxCharges*(1+chargesBonus))
 			t.Item.BonusExpireTime=1
 		end
 		--apply special enchant
@@ -467,10 +476,10 @@ function events.ItemGenerated(t)
 		end
 		--nerf to AC and skills
 		if t.Item.Bonus==10 then
-			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*0.65)
+			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*0.667)
 		end
 		if math.floor(t.Item.Charges/1000)==10 then
-			t.Item.Charges=t.Item.Charges-math.floor(t.Item.Charges%1000*0.65)
+			t.Item.Charges=t.Item.Charges-math.floor(t.Item.Charges%1000*0.667)
 		end
 		if t.Item.Bonus>=17 and t.Item.Bonus<=24 then
 			t.Item.BonusStrength=math.ceil(math.max(t.Item.BonusStrength^0.5,t.Item.BonusStrength/10))
@@ -1112,7 +1121,8 @@ function checktext(MaxCharges,bonus2,it)
 	end
 	local legDmgMult=1
 	local pl=Party[id]
-	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
+	local index=pl:GetIndex()
+	if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 19) then
 		local str=pl:GetMight()
 		local int=pl:GetIntellect()
 		local pers=pl:GetPersonality()
@@ -3055,7 +3065,7 @@ function events.CanOpenChest(t)
 		end
 		t.CanOpen=false
 		for i=0,Party.High do
-			local s, m = SplitSkill(Party[i].Skills[const.Skills.DisarmTraps])
+			local s, m = SplitSkill(Party[i]:GetSkill(const.Skills.DisarmTraps))
 			local skill=s*m
 			if m==4 or skill>=skillRequired then
 				t.CanOpen=true
