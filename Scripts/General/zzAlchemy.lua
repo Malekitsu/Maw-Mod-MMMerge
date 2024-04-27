@@ -605,10 +605,10 @@ local function upgradeGem(it, tier)
 	end
 	--AC
 	if it.Bonus==10 then
-		maxValue1=math.floor(maxValue1*0.65)
+		maxValue1=math.floor(maxValue1*0.667)
 	end
 	if bonus2==10 then
-		maxValue2=math.floor(maxValue2*0.65)
+		maxValue2=math.floor(maxValue2*0.667)
 	end
 	--skills
 	if it.Bonus>=17 then
@@ -620,8 +620,8 @@ local function upgradeGem(it, tier)
 	if it.BonusExpireTime==20 then
 		mult=mult*2
 	end
-	maxValue1=maxValue1*mult
-	maxValue2=maxValue2*mult
+	maxValue1=math.floor(maxValue1*mult)
+	maxValue2=math.floor(maxValue2*mult)
 	--pick the lowest one
 	local bonus1percent=it.BonusStrength/maxValue1
 	local bonus2percent=bonus2Strength/maxValue2
