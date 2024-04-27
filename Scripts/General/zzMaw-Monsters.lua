@@ -70,7 +70,7 @@ function events.AfterLoadMap()
 				if Game.freeProgression==false then
 					name=Game.MapStats[Map.MapStatsIndex].Name
 					if not horizontalMaps[name] then
-						partyLvl=mon.Level*1.5
+						partyLvl=mon.Level*2
 					end
 				end
 				--level increase 
@@ -326,7 +326,7 @@ function recalculateMonsterTable()
 		
 		--horizontal progression
 		if Game.freeProgression==false then
-			horizontalMultiplier=2.5
+			horizontalMultiplier=3
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local level=math.max(math.min((base.Level+extraBolster)*horizontalMultiplier,base.Level+bolsterLevel+extraBolster),1)
 			totalLevel[i]=level
@@ -337,7 +337,7 @@ function recalculateMonsterTable()
 				extraBolster=extraBolster*horizontalMultiplier
 				bolsterLevel=base.Level*horizontalMultiplier
 				flattener=(base.Level-LevelB)*horizontalMultiplier*0.6 --necessary to avoid making too much difference between monster tier
-				totalLevel[i]=math.max(base.Level*horizontalMultiplier+extraBolster-5-flattener+adjust, 5)
+				totalLevel[i]=math.max(base.Level*horizontalMultiplier+extraBolster-5-flattener+adjust, 5)-4
 				mon.Level=math.min(totalLevel[i],255)
 			end
 		end
