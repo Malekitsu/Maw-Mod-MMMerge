@@ -2029,3 +2029,20 @@ function events.BeforeLoadMap()
 		end
 	end
 end
+
+--nerf to movement speed in doom
+function events.Tick()
+	if Game.TurnBased then
+		if vars.Mode==2 then
+			if Game.TurnBasedPhase==2 then
+				turnBaseStartPositionX, turnBaseStartPositionY = Party.X, Party.Y
+			elseif Game.TurnBasedPhase==3 then
+				local dist=getDistance(turnBaseStartPositionX, turnBaseStartPositionY, Party.Z)
+				Game.ShowStatusText(dist)
+				if dist>370 then
+					Game.TurnBasedPhase=1
+				end
+			end
+		end
+	end
+end
