@@ -737,7 +737,7 @@ end
 
 evt.PotionEffects[85] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
-		if Game.ItemsTxt[t.Number].NotIdentifiedName==Game.ItemsTxt[t.Number+1].NotIdentifiedName and (t.BodyLocation==0 or Party[Game.CurrentPlayer]:GetActiveItem(t.BodyLocation-1)==nil) then
+		if Game.ItemsTxt[t.Number].NotIdentifiedName==Game.ItemsTxt[t.Number+1].NotIdentifiedName then
 			t.Number=t.Number+1
 			Mouse.Item.Number=0
 		else
@@ -746,6 +746,7 @@ evt.PotionEffects[85] = function(IsDrunk, t, Power)
 		mem.u4[0x51E100] = 0x100 
 		t.Condition = t.Condition:Or(0x10)
 		evt.PlaySound(12070)
+		Game:ExitHouseScreen()
 	end
 end
 
