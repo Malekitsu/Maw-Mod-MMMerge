@@ -612,7 +612,7 @@ local function upgradeGem(it, tier)
 	end
 	--skills
 	if it.Bonus>=17 then
-		maxStrength1=math.floor(math.max((tier*10)^0.5, math.round(tier)))
+		maxValue1=math.floor(math.max((tier*10)^0.5, math.round(tier)))
 		upgradeAmount1=1
 	end
 	--item slot multiplier and legendary multiplier
