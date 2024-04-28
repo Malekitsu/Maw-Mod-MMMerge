@@ -1834,15 +1834,19 @@ function events.BuildItemInformationBox(t)
 			end
 			itemLevel=itemLevel+math.round(lvl/tot*18-17)
 			t.Description = t.Description .. "\n\nItem Level: " .. itemLevel
-			local levelRequired=(t.Item.MaxCharges)*3+lvl/tot*2-12
+			local maxCharges=t.Item.MaxCharges
+			if t.Item.BonusExpireTime>0 and t.Item.BonusExpireTime<=2 then
+				maxCharges=math.floor(math.min(maxCharges/1.2,maxCharges-5))
+			end
+			if t.Item.BonusExpireTime>10 and t.Item.BonusExpireTime<=100 then
+				maxCharges=math.floor(math.min(maxCharges/1.2,maxCharges-5))
+			end
+			local levelRequired=(maxCharges)*3+lvl/tot*2-12
 			if Game.BolsterAmount>=300 then
 				levelRequired=levelRequired-6
 			end
 			if vars.Mode==2 then
 				levelRequired=levelRequired-3
-			end
-			if t.Item.BonusExpireTime<=2 then
-				levelRequired=levelRequired-t.Item.BonusExpireTime*5
 			end
 			local enchants=3
 			if t.Item.Bonus>0 then
@@ -3026,15 +3030,19 @@ function events.CanWearItem(t)
 			lvl=lvl+it:T().ChanceByLevel[i]*i
 		end
 		itemLevel=itemLevel+math.round(lvl/tot*18-17)
-		local levelRequired=(it.MaxCharges)*3+lvl/tot*2-12
+		local maxCharges=it.MaxCharges
+		if it.BonusExpireTime>0 and it.BonusExpireTime<=2 then
+			maxCharges=math.floor(math.min(maxCharges/1.2,maxCharges-5))
+		end
+		if it.BonusExpireTime>10 and it.BonusExpireTime<=100 then
+			maxCharges=math.floor(math.min(maxCharges/1.2,maxCharges-5))
+		end
+		local levelRequired=(maxCharges)*3+lvl/tot*2-12
 		if Game.BolsterAmount>=300 then
 			levelRequired=levelRequired-6
 		end
 		if vars.Mode==2 then
 			levelRequired=levelRequired-3
-		end
-		if it.BonusExpireTime<=2 then
-			levelRequired=levelRequired-it.BonusExpireTime*5
 		end
 		local enchants=3
 		if it.Bonus>0 then
