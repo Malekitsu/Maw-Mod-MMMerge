@@ -432,27 +432,27 @@ function events.ItemGenerated(t)
 						t.Item.Bonus2=46
 					end
 				end
-			end
-			local relevantStats={1,2,3,4,5,6,7,8,10}
-			t.Item.MaxCharges=math.round(t.Item.MaxCharges*1.2)
-			local roll=math.random(1,3)
-			if roll==1 then
-				local stats={1, 5, 6, 7}
-				t.Item.Bonus=stats[math.random(1,4)]
-				t.Item.Charges=t.Item.Charges%1000+stats[math.random(1,4)]*1000
-			elseif roll==2 then
-				local stats={4, 6, 8, 10}
-				t.Item.Bonus=stats[math.random(1,4)]
-				t.Item.Charges=t.Item.Charges%1000+stats[math.random(1,4)]*1000
-			elseif roll==3 then
-				local stats={2, 3, 4, 6, 7}
-				t.Item.Bonus=stats[math.random(1,5)]
-				t.Item.Charges=t.Item.Charges%1000+stats[math.random(1,5)]*1000
-				if (t.Item.Bonus==2 and math.floor(t.Item.Charges/1000)==3) or (t.Item.Bonus==2 and math.floor(t.Item.Charges/1000)==3) then
-					t.Item.Bonus=(t.Item.Bonus==2 and 3) or (t.Item.Bonus==3 and 2) 
+				local relevantStats={1,2,3,4,5,6,7,8,10}
+				t.Item.MaxCharges=math.round(t.Item.MaxCharges*1.2)
+				local roll=math.random(1,3)
+				if roll==1 then
+					local stats={1, 5, 6, 7}
+					t.Item.Bonus=stats[math.random(1,4)]
+					t.Item.Charges=t.Item.Charges%1000+stats[math.random(1,4)]*1000
+				elseif roll==2 then
+					local stats={4, 6, 8, 10}
+					t.Item.Bonus=stats[math.random(1,4)]
+					t.Item.Charges=t.Item.Charges%1000+stats[math.random(1,4)]*1000
+				elseif roll==3 then
+					local stats={2, 3, 4, 6, 7}
+					t.Item.Bonus=stats[math.random(1,5)]
+					t.Item.Charges=t.Item.Charges%1000+stats[math.random(1,5)]*1000
+					if (t.Item.Bonus==2 and math.floor(t.Item.Charges/1000)==3) or (t.Item.Bonus==2 and math.floor(t.Item.Charges/1000)==3) then
+						t.Item.Bonus=(t.Item.Bonus==2 and 3) or (t.Item.Bonus==3 and 2) 
+					end
 				end
 				--increase stats
-				t.Item.Charges=math.ceil(t.Item.Charges%1000*0.2+t.Item.Charges)
+				t.Item.Charges=math.ceil(math.min(t.Item.Charges%1000*0.2,999)+t.Item.Charges)
 				t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*1.2)
 			end
 		end
