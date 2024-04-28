@@ -625,6 +625,9 @@ local function upgradeGem(it, tier)
 	--pick the lowest one
 	local bonus1percent=it.BonusStrength/maxValue1
 	local bonus2percent=bonus2Strength/maxValue2
+	if it.Charges<1000 then
+		bonus2percent=math.huge
+	end
 	--apply enchant
 	if bonus1percent<=bonus2percent and it.BonusStrength<maxValue1 then
 		enchanted=true
