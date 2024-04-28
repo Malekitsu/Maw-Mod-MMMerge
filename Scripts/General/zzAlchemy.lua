@@ -625,8 +625,14 @@ local function upgradeGem(it, tier)
 	--pick the lowest one
 	local bonus1percent=it.BonusStrength/maxValue1
 	local bonus2percent=bonus2Strength/maxValue2
+	if it.Bonus==0 then
+		bonus1percent=math.huge
+	end
 	if it.Charges<1000 then
 		bonus2percent=math.huge
+	end
+	if it.Bonus==0 and it.Charges<1000 then
+		return "no enchants"
 	end
 	--apply enchant
 	if bonus1percent<=bonus2percent and it.BonusStrength<maxValue1 then
@@ -645,6 +651,10 @@ for i=1,10 do
 			if craftWaitTime>0 then return end
 			local tier=(Mouse.Item.Number-1050)
 			local enchanted=upgradeGem(t, tier)
+			if enchanted=="no enchants" then
+				Game.ShowStatusText("No enchants")
+				return
+			end
 			if enchanted then
 				Mouse.Item.Number=0
 				mem.u4[0x51E100] = 0x100 
