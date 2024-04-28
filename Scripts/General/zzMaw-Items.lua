@@ -479,7 +479,7 @@ function events.ItemGenerated(t)
 			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*0.667)
 		end
 		if math.floor(t.Item.Charges/1000)==10 then
-			t.Item.Charges=t.Item.Charges-math.floor(t.Item.Charges%1000*0.667)
+			t.Item.Charges=t.Item.Charges-math.floor(t.Item.Charges%1000*0.333)
 		end
 		if t.Item.Bonus>=17 and t.Item.Bonus<=24 then
 			t.Item.BonusStrength=math.ceil(math.max(t.Item.BonusStrength^0.5,t.Item.BonusStrength/10))
@@ -524,6 +524,13 @@ function events.ItemGenerated(t)
 		end
 		if math.abs(t.Item.Charges%1000-t.Item.BonusStrength)<=1 then
 			t.Item.Charges=math.floor(t.Item.Charges/1000)*1000+t.Item.BonusStrength
+		end
+		--round above 100
+		if t.Item.BonusStrength>100 then
+			t.Item.BonusStrength=math.round(t.Item.BonusStrength/5)*5
+		end
+		if t.Item.Charges%1000>100 then
+			t.Item.Charges=math.min(math.round(t.Item.Charges%1000/5)*5,999)+math.floor(t.Item.Charges/1000)*1000
 		end
 	end
 end
