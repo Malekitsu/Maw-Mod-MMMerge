@@ -352,11 +352,11 @@ function events.ItemGenerated(t)
 		ancientRoll=math.random()
 		if ancientRoll<=ancientChance then
 			ancient=true
-			t.Item.Charges=math.random(math.round(encStrUp[pseudoStr]+1),math.ceil(encStrUp[pseudoStr]*1.25))
+			t.Item.Charges=math.random(math.round(encStrUp[pseudoStr]+1),math.ceil(encStrUp[pseudoStr]*1.2))
 			t.Item.Charges=math.max(math.ceil(t.Item.Charges*difficultyExtraPower), t.Item.Charges+flatBonus) --bolster
 			t.Item.Charges=t.Item.Charges+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.random(math.round(encStrUp[pseudoStr]+1),math.ceil(encStrUp[pseudoStr]*1.25))
+			t.Item.BonusStrength=math.random(math.round(encStrUp[pseudoStr]+1),math.ceil(encStrUp[pseudoStr]*1.2))
 			t.Item.BonusStrength=math.max(math.ceil(t.Item.BonusStrength*difficultyExtraPower), t.Item.BonusStrength+flatBonus) --bolster
 			power=2
 			chargesBonus=math.random(1,5)
@@ -399,11 +399,11 @@ function events.ItemGenerated(t)
 				t.Item.MaxCharges=t.Item.MaxCharges-chargesBonus
 			end
 			t.Item.BonusExpireTime=2
-			t.Item.Charges=math.ceil(encStrUp[pseudoStr]*1.25)
+			t.Item.Charges=math.ceil(encStrUp[pseudoStr]*1.2)
 			t.Item.Charges=math.max(math.ceil(t.Item.Charges*difficultyExtraPower), math.ceil(t.Item.Charges+flatBonus)) --bolster
 			t.Item.Charges=math.round(t.Item.Charges+math.random(1,16)*1000)
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.ceil(encStrUp[pseudoStr]*1.25)
+			t.Item.BonusStrength=math.ceil(encStrUp[pseudoStr]*1.2)
 			t.Item.BonusStrength=math.max(math.ceil(t.Item.BonusStrength*difficultyExtraPower), math.ceil(t.Item.BonusStrength+flatBonus)) --bolster
 			t.Item.MaxCharges=math.max(t.Item.MaxCharges*0.25+5, t.Item.MaxCharges*1.25)
 			--apply special enchant
