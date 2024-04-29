@@ -16,7 +16,7 @@ Air	E	M	G	G	=	=	=	=	E	M	=	=	E	M	G	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	E	E	M	M	=	E	M	M	
 Water	E	M	G	G	=	=	=	=	E	M	=	=	E	M	G	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	E	E	M	M	=	E	M	M	=	=	=	=	E	M	M	G	G	G	=	=	=	G	G	=	=	=	E	M	G	E	M	G
 Earth	E	M	G	G	=	=	=	=	E	M	=	=	E	M	G	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	E	E	M	M	=	E	M	M	=	=	=	=	E	M	M	G	G	G	=	=	=	G	G	=	=	=	=	=	=	E	M	G
 Spirit	=	=	=	=	E	M	G	G	=	=	=	=	E	M	G	G	=	=	=	=	E	M	=	N	E	E	E	M	G	G	E	E	M	M	=	=	=	=	=	=	E	M	=	=	=	=	=	=	=	=	G	=	=	E	M	M	=	=	=	E	M	G
-Mind	=	=	=	=	E	M	G	G	=	=	=	=	E	M	G	G	=	=	=	=	E	M	=	N	E	E	E	M	G	G	E	E	M	M	=	=	=	=	=	=	E	M	=	=	=	=	=	=	=	=	G	=	=	E	M	M	=	=	=	E	M	G
+Mind	=	=	=	=	E	M	G	G	=	=	=	=	E	M	G	G	=	=	=	=	E	M	=	N	E	E	E	M	G	G	E	E	M	M	=	=	=	=	=	=	M	G	=	=	=	=	=	=	=	=	G	=	=	E	M	M	=	=	=	E	M	G
 Body	=	=	=	=	E	M	G	G	=	=	=	=	E	M	G	G	=	=	=	=	E	M	=	N	E	E	E	M	M	M	E	E	M	M	=	=	=	=	=	=	E	M	=	=	=	=	=	=	=	=	G	=	=	E	M	M	E	M	G	E	M	G
 Light	=	=	M	=	=	=	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	M	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	G	=	=	=	M	M	M	M	M	G	=	=	=	=	=	=
 Dark	=	=	=	M	=	=	=	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	M	=	=	=	=	=	=	=	=	=	=	=	=	=	=	M	G	=	G	=	=	M	M	M	=	=	=	E	M	G	=	=	=
