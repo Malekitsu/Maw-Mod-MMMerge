@@ -1054,10 +1054,10 @@ function events.PlayerCastSpell(t)
 			if hit>math.random() then
 				mon.Resistances[cc.DamageKind]=0
 				mon.Level=0
-				Game.ShowStatusText("Hit" .. "  " .. hit)
+				--Game.ShowStatusText("Hit" .. "  " .. hit)
 			else
 				mon.Resistances[cc.DamageKind]=65000
-				Game.ShowStatusText("Miss" .. "  " .. hit)
+				--Game.ShowStatusText("Miss" .. "  " .. hit)
 			end
 		end
 		local reset=1
