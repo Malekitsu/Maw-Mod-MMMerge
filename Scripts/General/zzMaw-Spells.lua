@@ -1305,10 +1305,11 @@ function ascendSpellDamage(skill, mastery, spell)
 		ascensionLevel=ascensionLevel+1
 	end
 	if ascensionLevel>0 then
-		diceMax=diceMax * (1+0.04 * skill * ascensionLevel)
-		damageAdd=damageAdd*(1+skill * (ascensionLevel+1) / 8)
-		--damageAdd=damageAdd * (1+ascensionLevel^2 * skill / 8)* math.max(skill/1, 1)^0.25
-		--diceMax=diceMax* (1+ascensionLevel * 0.04 * skill) *math.max(40/skill, 1)^0.25
+		-- old formula
+		--diceMax=diceMax * (1+0.04 * skill * ascensionLevel)
+		--damageAdd=damageAdd*(1+skill * (ascensionLevel+1) / 8)
+		diceMax=diceMax * (1+0.05 * skill * ascensionLevel)
+		damageAdd=damageAdd*(1+skill^2 * (ascensionLevel) / 50)
 		diceMin, diceMax, damageAdd = math.round(diceMin), math.round(diceMax), math.round(damageAdd)
 	end
 	return diceMin, diceMax, damageAdd
