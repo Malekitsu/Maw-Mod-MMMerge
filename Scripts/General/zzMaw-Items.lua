@@ -448,7 +448,7 @@ function events.ItemGenerated(t)
 					t.Item.Bonus=stats[math.random(1,5)]
 					t.Item.Charges=t.Item.Charges%1000+stats[math.random(1,5)]*1000
 					if (t.Item.Bonus==2 and math.floor(t.Item.Charges/1000)==3) or (t.Item.Bonus==2 and math.floor(t.Item.Charges/1000)==3) then
-						t.Item.Bonus=(t.Item.Bonus==2 and 3) or (t.Item.Bonus==3 and 2) 
+						t.Item.Bonus=math.floor(t.Item.Charges/1000)
 					end
 				end
 				--increase stats
