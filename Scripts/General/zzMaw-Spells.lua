@@ -1117,13 +1117,20 @@ function events.PlayerCastSpell(t)
 			local s,m=SplitSkill(t.Player:GetSkill(cc.School))
 			local newLevel=calcEffectChance(lvl, res, s, cc.ChanceMult)
 			local hit=(30/(30+newLevel/4))
+			--nerfed cc effects on Doom
+			if vars.Mode==2 then
+				hit=hit/2
+				if mon.NameId>=220 and mon.NameId<300 then
+					hit=hit/2
+				end
+			end
 			if hit>math.random() then
 				mon.Resistances[cc.DamageKind]=0
 				mon.Level=0
-				Game.ShowStatusText("Hit")
+				Game.ShowStatusText("Hit" .. "  " .. hit)
 			else
 				mon.Resistances[cc.DamageKind]=65000
-				Game.ShowStatusText("Miss")
+				Game.ShowStatusText("Miss" .. "  " .. hit)
 			end
 		end
 		local reset=1
@@ -1174,8 +1181,8 @@ function events.GameInitialized2()
 		end
 	end
 	--vampire
-	spellCost[111][masteryName[3]]=8
-	spellCost[111][masteryName[4]]=10
+	spellCost[111][masteryName[3]]=10
+	spellCost[111][masteryName[4]]=15
 	
 	spells={2,6,7,8,9,10,11,15,18,20,22,24,26,29,32,37,39,41,43,44,52,59,65,70,76,78,79,84,87,90,93,97,98,99,103,111,123}
 	lastIndex=-1 --used later
@@ -1268,9 +1275,9 @@ function events.CalcSpellDamage(t)
 	end
 	if t.Spell == 111 then  -- lifedrain
 		if t.Mastery==3 then
-			t.Result=t.Result/3*4
-		elseif t.Mastery==4 then
 			t.Result=t.Result/3*5
+		elseif t.Mastery==4 then
+			t.Result=t.Result/3*7
 		end
 	end
 	if t.Spell == 123 then  -- flame blast
@@ -1300,6 +1307,8 @@ function ascendSpellDamage(skill, mastery, spell)
 	if ascensionLevel>0 then
 		diceMax=diceMax * (1+0.04 * skill * ascensionLevel)
 		damageAdd=damageAdd*(1+skill * (ascensionLevel+1) / 8)
+		--damageAdd=damageAdd * (1+ascensionLevel^2 * skill / 8)* math.max(skill/1, 1)^0.25
+		--diceMax=diceMax* (1+ascensionLevel * 0.04 * skill) *math.max(40/skill, 1)^0.25
 		diceMin, diceMax, damageAdd = math.round(diceMin), math.round(diceMax), math.round(damageAdd)
 	end
 	return diceMin, diceMax, damageAdd
@@ -1493,8 +1502,8 @@ function ascension()
 		
 		Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is 1-%s per point of skill.",diceMaxTooltip(s, m,103))
 		Game.SpellsTxt[111].Description=string.format("Lifedrain allows the vampire to damage his or her target and simultaneously heal based on the damage done in the Lifedrain.  This ability does %s points of damage plus 1-%s points of damage per skill.",dmgAddTooltip(s, m,111),diceMaxTooltip(s, m,111))
-		Game.SpellsTxt[111].Master=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*4),math.round(diceMaxTooltip(s, m,111)/3*4))
-		Game.SpellsTxt[111].GM=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*5),math.round(diceMaxTooltip(s, m,111)/3*5))
+		Game.SpellsTxt[111].Master=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*5),math.round(diceMaxTooltip(s, m,111)/3*5))
+		Game.SpellsTxt[111].GM=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*7),math.round(diceMaxTooltip(s, m,111)/3*7))
 		Game.SpellsTxt[123].Description="This ability is an upgraded version of the normal Dragon breath weapon attack.  It acts much like a fireball, striking its target and exploding out to hit everything near it, except the explosion does much more damage than most fireballs."
 		Game.SpellsTxt[123].Expert=string.format("Damage %s points plus 1-%s points per point of skill",dmgAddTooltip(s, m,123),diceMaxTooltip(s, m,123))
 		Game.SpellsTxt[123].Master=string.format("Damage %s points plus 1-%s points per point of skill",math.round(dmgAddTooltip(s, m,123)/10*11),math.round(diceMaxTooltip(s, m,123)/10*11))
