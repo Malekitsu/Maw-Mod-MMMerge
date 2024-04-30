@@ -21,48 +21,77 @@ function events.KeyDown(t)
     end
 end
 
+function getCritInfo(pl,dmgType)
+	local luck=pl:GetLuck()
+	local totalCrit=luck/1500+0.05
+	local critDamageMultiplier=1
+	if dmgType=="spell" then
+		local intellect=pl:GetIntellect()	
+		local personality=pl:GetPersonality()
+		local bonus=math.max(intellect,personality)
+		critDamageMultiplier=bonus*3/2000+1.5
+	elseif dmgType=="heal" then
+		local intellect=pl:GetIntellect()	
+		local personality=pl:GetPersonality()
+		local bonus=math.max(intellect,personality)
+		critDamageMultiplier=bonus*3/4000+1.25
+	else --physical
+		local accuracy=pl:GetAccuracy()
+		critDamageMultiplier=accuracy*3/1000+1.5
+	end
+	--dagger bonus
+	if not dmgType then
+		for i=0,1 do
+			if pl:GetActiveItem(i) then
+				local itSkill=pl:GetActiveItem(i):T().Skill
+				if itSkill==2 then
+					s,m=SplitSkill(pl:GetSkill(const.Skills.Dagger))
+					if m>2 then
+						totalCrit=totalCrit+0.025+0.005*s
+					end
+				end
+			end
+		end
+	end
+	--legendary bonus
+	local id=pl:GetIndex()
+	if table.find(vars.legendaries[id], 14) then
+		totalCrit=totalCrit+0.1
+	else
+		totalCrit=math.min(totalCrit,1)
+	end
+	local success=math.random()<totalCrit
+	return totalCrit, critDamageMultiplier, success
+end
+
 function events.CalcDamageToMonster(t)
 	local data = WhoHitMonster()	
 	--luck/accuracy bonus
 	if data and data.Player and t.DamageKind==4 then
 		if data.Object==nil or data.Object.Spell==133 then
-			
+			pl=t.Player
 			--OVERRIDE DAMAGE WITH MAW CALCULATION
 			if data.Object==nil then
-				baseDamage=t.Player:GetMeleeDamageMin()
-				maxDamage=t.Player:GetMeleeDamageMax()
+				baseDamage=pl:GetMeleeDamageMin()
+				maxDamage=pl:GetMeleeDamageMax()
 				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
 				damage=math.round(randomDamage/2)
 				dmgMult=damageMultiplier[t.PlayerIndex]["Melee"]
 			else --bow
-				baseDamage=t.Player:GetRangedDamageMin()
-				maxDamage=t.Player:GetRangedDamageMax()
+				baseDamage=pl:GetRangedDamageMin()
+				maxDamage=pl:GetRangedDamageMax()
 				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
 				damage=math.round(randomDamage/2)
 				dmgMult=damageMultiplier[t.PlayerIndex]["Ranged"]
 			end
 			
 			t.Result=damage*dmgMult
-
-			luck=data.Player:GetLuck()/1.5
-			critDamage=data.Player:GetAccuracy()*3/1000
-			critChance=50+luck
-			--dagger bonus
-			daggerCritBonus=0
-			for i=0,1 do
-				if data.Player:GetActiveItem(i) and data.Object==nil then
-					itSkill=data.Player:GetActiveItem(i):T().Skill
-					if itSkill==2 then
-						s,m=SplitSkill(data.Player:GetSkill(const.Skills.Dagger))
-						if m>2 then
-							daggerCritBonus=daggerCritBonus+25+5*s
-						end
-					end
-				end
-			end
-			roll=math.random(1, 1000)-daggerCritBonus
-			if roll <= critChance then
-				t.Result=t.Result*(1.5+critDamage)
+			
+			
+			local critChance, critMult, success=getCritInfo(pl,data.Object.Spell==133)
+			
+			if success then
+				t.Result=t.Result*critMult
 				crit=true
 			end
 			if data.Player.Weak>0 then
@@ -154,16 +183,11 @@ function events.CalcSpellDamage(t)
 	if data and data.Player and (data.Player.Class==10 or data.Player.Class==11 or table.find(dkClass, data.Player.Class)) then return end
 	if data and data.Player then
 		if data.Player.Class==10 or data.Player.Class==11 then return end --dragons scale off might
-		intellect=data.Player:GetIntellect()	
-		personality=data.Player:GetPersonality()
-		critChance=data.Player:GetLuck()/1500
-		bonus=math.max(intellect,personality)
-		critDamage=bonus*3/2000
-		t.Result=t.Result*(1+bonus/1000) 
-		critChance=5+critChance*100
-		roll=math.random(1, 100)
-		if roll <= critChance then
-			t.Result=t.Result*(1.5+critDamage)
+		
+		local critChance, critMult, success=getCritInfo(data.Player,"spell")
+			
+		if success then
+			t.Result=t.Result*critMult
 			crit=true
 		end
 	end
@@ -184,11 +208,8 @@ function events.BuildStatInformationBox(t)
 	end
 	if t.Stat==1 then
 		i=Game.CurrentPlayer
-		meditation=Party[i].Skills[25]%64
-		fullSP=Party[i]:GetFullSP()
-		personality=Party[i]:GetPersonality()
 		intellect=Party[i]:GetIntellect()
-		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing: %s%s\nCritical heal effect is halved in Nightmare",Game.StatsDescriptions[1],intellect/10,"%",intellect*3/20+50,"%")
+		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing: %s%s\nCritical heal effect is halved",Game.StatsDescriptions[1],intellect/10,"%",intellect*3/20+50,"%")
 	end
 	if t.Stat==2 then
 		i=Game.CurrentPlayer
@@ -234,23 +255,12 @@ function events.BuildStatInformationBox(t)
 	end
 	if t.Stat==6 then
 		i=Game.CurrentPlayer
-		luck=Party[i]:GetLuck()
-		daggerCritBonus=0
-		for v=0,1 do
-			if Party[i]:GetActiveItem(v) then
-				itSkill=Party[i]:GetActiveItem(v):T().Skill
-				if itSkill==2 then
-					s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Dagger))
-					if m>2 then
-						daggerCritBonus=daggerCritBonus+2.5+0.5*s
-					end
-				end
-			end
-		end
-		t.Text=string.format("%s\n\nCritical strike chance: %s%%",Game.StatsDescriptions[6],math.round((luck/10*2/3+5)*100)/100)
-		if daggerCritBonus>0 then
-			
-		t.Text=string.format("%s\n\nCritical strike chance: %s%%(%s%% with dagger)",Game.StatsDescriptions[6],math.round((luck/10*2/3+5)*100)/100, math.round((luck/10*2/3+5+daggerCritBonus)*100)/100)
+		local critChance=math.round(getCritInfo(Party[i], "ranged")*10000)/100
+		local daggerCritBonus=math.round(getCritInfo(Party[i])*10000)/100
+		t.Text=string.format("%s\n\nCritical strike chance: %s%%",Game.StatsDescriptions[6],critChance)
+		daggerBonus=daggerCritBonus~=critChance
+		if daggerBonus then
+			t.Text=string.format("%s\n\nCritical strike chance: %s%%(%s%% with dagger)",Game.StatsDescriptions[6],critChance, daggerCritBonus)
 		end
 	end
 	if t.Stat==7 then
@@ -339,52 +349,40 @@ function events.BuildStatInformationBox(t)
 	
 	if t.Stat==5234672 then
 		i=Game.CurrentPlayer
+		local pl=Party[i]
 		--get spell and its damage
-		spellIndex=Party[i].QuickSpell
+		spellIndex=pl.QuickSpell
 		
 		--if not an offensive spell then calculate highest between melee and ranged
 		if not spellPowers[spellIndex] then 
 			--MELEE
-			local i=Game.CurrentPlayer
-			local low=Party[i]:GetMeleeDamageMin()
-			local high=Party[i]:GetMeleeDamageMax()
-			local might=Party[i]:GetMight()
-			local accuracy=Party[i]:GetAccuracy()
-			local luck=Party[i]:GetLuck()
-			local delay=Party[i]:GetAttackDelay()
+			local low=pl:GetMeleeDamageMin()
+			local high=pl:GetMeleeDamageMax()
+			local might=pl:GetMight()
+			local luck=pl:GetLuck()
+			local delay=pl:GetAttackDelay()
 			local dmg=(low+high)/2
 			--hit chance
-			local atk=Party[i]:GetMeleeAttack()
-			local lvl=Party[i].LevelBase
+			local atk=pl:GetMeleeAttack()
+			local lvl=pl.LevelBase
 			local hitChance= (15+atk*2)/(30+atk*2+lvl)
-			local daggerCritBonus=0
-			for v=0,1 do
-				if Party[i]:GetActiveItem(v) then
-					itSkill=Party[i]:GetActiveItem(v):T().Skill
-					if itSkill==2 then
-						s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Dagger))
-						if m>2 then
-							daggerCritBonus=daggerCritBonus+0.025+0.005*s
-						end
-					end
-				end
-			end
-			DPS1=math.round(dmg*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/6000)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])/100
+			local critChance, critDamage=getCritInfo(pl)
+			DPS1=math.round(dmg*(1+critChance*(critDamage-1))/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Melee"])
 			
 			--RANGED
-			local low=Party[i]:GetRangedDamageMin()
-			local high=Party[i]:GetRangedDamageMax()
-			local delay=Party[i]:GetAttackDelay(true)
+			local low=pl:GetRangedDamageMin()
+			local high=pl:GetRangedDamageMax()
+			local delay=pl:GetAttackDelay(true)
 			local dmg=(low+high)/2
 			--hit chance
-			local atk=Party[i]:GetRangedAttack()
+			local atk=pl:GetRangedAttack()
 			local hitChance= (15+atk*2)/(30+atk*2+lvl)
-			
-			local s,m=SplitSkill(Party[i].Skills[const.Skills.Bow])
+			critChance, critDamage=getCritInfo(pl, "ranged")
+			local s,m=SplitSkill(pl.Skills[const.Skills.Bow])
 			if m>=3 then
 				dmg=dmg*2
 			end
-			local DPS2=math.round((dmg*(1+might/1000))*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/6000)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])/100
+			local DPS2=math.round(dmg*(1+critChance*(critDamage-1))/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Ranged"])
 			power=math.max(DPS1,DPS2)
 			
 			t.Text=string.format("%s\n\nPower: %s",t.Text,StrColor(255,0,0,power))
@@ -392,15 +390,15 @@ function events.BuildStatInformationBox(t)
 		end
 		
 		--SPELLS
-		local s, m =  SplitSkill(Party[i].Skills[const.Skills.Learning])
+		local s, m =  SplitSkill(pl.Skills[const.Skills.Learning])
 		diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, spellIndex)
 		--calculate damage
 		--skill
 		skillType=math.floor((spellIndex-1)/11)+12
-		skill, mastery=SplitSkill(Party[i]:GetSkill(skillType))
+		skill, mastery=SplitSkill(pl:GetSkill(skillType))
 		
 		--add enchant
-		it=Party[i]:GetActiveItem(1)
+		it=pl:GetActiveItem(1)
 		local enchantDamage=0
 		if it then
 			if spellbonusdamage[it.Bonus2] then
@@ -418,7 +416,7 @@ function events.BuildStatInformationBox(t)
 					end
 					enchantDamage=enchantDamage*mult
 				end
-				local id=Party[i]:GetIndex()
+				local id=pl:GetIndex()
 				if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
 					local str=t.Player:GetMight()
 					local int=t.Player:GetIntellect()
@@ -430,16 +428,16 @@ function events.BuildStatInformationBox(t)
 		end
 		power=damageAdd + skill*(diceMin+diceMax)/2 + enchantDamage
 		
-		intellect=Party[i]:GetIntellect()	
-		personality=Party[i]:GetPersonality()
-		critChance=Party[i]:GetLuck()/1500
+		intellect=pl:GetIntellect()	
+		personality=pl:GetPersonality()
 		bonus=math.max(intellect,personality)
-		critDamage=bonus*3/2000
+		
+		critChance, critDamage=getCritInfo(pl, "spell")
+		
 		power=power*(1+bonus/1000) 
-		critChance=0.05+critChance
-		haste=math.floor((Party[i]:GetSpeed())/10)/100+1
+		haste=math.floor((pl:GetSpeed())/10)/100+1
 		delay=oldTable[spellIndex][mastery]
-		power=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/6000)*haste)/100
+		power=math.round(power*(1+critChance*(critDamage-1))/(delay/60)*haste)
 		
 		t.Text=string.format("%s\n\nSpellPower: %s",t.Text,StrColor(255,0,0,power))
 		
@@ -447,19 +445,20 @@ function events.BuildStatInformationBox(t)
 	
 	if t.Stat==11 then
 		local i=Game.CurrentPlayer
-		local fullHP=Party[i]:GetFullHP()
+		local pl=Party[i]
+		local fullHP=pl:GetFullHP()
 		--AC
-		local ac=Party[i]:GetArmorClass()
-		local lvl=math.min(Party[i].LevelBase,200)
+		local ac=pl:GetArmorClass()
+		local lvl=math.min(pl.LevelBase,200)
 		local acReduction=1-calcMawDamage(t.Player,4,10000)/10000
-		local lvl=math.min(Party[i].LevelBase, 255)
+		local lvl=math.min(pl.LevelBase, 255)
 		local ac=ac/(Game.BolsterAmount/100)
 		local blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 		local ACRed= 1 - (1-blockChance)*(1-acReduction)
 		--unarmed
-		local speed=Party[i]:GetSpeed()
+		local speed=pl:GetSpeed()
 		local unarmed=0
-		local Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Unarmed))
+		local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
 		if Mas == 4 then
 			unarmed=Skill+10
 		end
@@ -472,7 +471,6 @@ function events.BuildStatInformationBox(t)
 		for i=1,7 do 
 			res[i]=1-calcMawDamage(t.Player,res[i],10000)/10000
 		end
-		
 		--calculation
 		local reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
 		vitality=math.round(fullHP/reduction)	
@@ -605,10 +603,10 @@ function events.BuildStatInformationBox(t)
 		local player_damage_m = {}
 		local player_damage_r = {}
         	for i = 0, Party.High do
-            		player_damage_m[i] = (mapvars.damageTrack[Party[i]:GetIndex()] or 0)
-            		player_damage_r[i] = (mapvars.damageTrackRanged[Party[i]:GetIndex()] or 0)
-            		total_map_damage_m = total_map_damage_m + player_damage_m[i]
-            		total_map_damage_r = total_map_damage_r + player_damage_r[i]
+				player_damage_m[i] = (mapvars.damageTrack[Party[i]:GetIndex()] or 0)
+				player_damage_r[i] = (mapvars.damageTrackRanged[Party[i]:GetIndex()] or 0)
+				total_map_damage_m = total_map_damage_m + player_damage_m[i]
+				total_map_damage_r = total_map_damage_r + player_damage_r[i]
         	end
 
         for i = 0, Party.High do
@@ -1070,7 +1068,6 @@ function calcPowerVitality(pl)
 	--get spell and its damage
 	spellIndex = pl.AttackSpell==0 and pl.QuickSpell or pl.AttackSpell
 	--MELEE
-	local i=Game.CurrentPlayer
 	local low=pl:GetMeleeDamageMin()
 	local high=pl:GetMeleeDamageMax()
 	local might=pl:GetMight()
@@ -1082,19 +1079,8 @@ function calcPowerVitality(pl)
 	local atk=pl:GetMeleeAttack()
 	local lvl=pl.LevelBase
 	local hitChance= (15+atk*2)/(30+atk*2+lvl)
-	local daggerCritBonus=0
-	for v=0,1 do
-		if pl:GetActiveItem(v) then
-			itSkill=pl:GetActiveItem(v):T().Skill
-			if itSkill==2 then
-				s,m=SplitSkill(pl:GetSkill(const.Skills.Dagger))
-				if m>2 then
-					daggerCritBonus=daggerCritBonus+0.025+0.005*s
-				end
-			end
-		end
-	end
-	DPS1=math.round(dmg*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Melee"])
+	local critChance, critMult=getCritInfo(pl)
+	DPS1=math.round(dmg*(1+critChance*(critMult-1))/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Melee"])
 	
 	--RANGED
 	local low=pl:GetRangedDamageMin()
@@ -1109,7 +1095,7 @@ function calcPowerVitality(pl)
 	if m>=3 then
 		dmg=dmg*2
 	end
-	local DPS2=math.round(dmg*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Ranged"])
+	local DPS2=math.round(dmg*(1+critChance*(critMult-1))/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Ranged"])
 	if spellPowers[spellIndex] or (healingSpells and healingSpells[spellIndex]) then 
 		--calculate damage
 		--skill
@@ -1155,20 +1141,18 @@ function calcPowerVitality(pl)
 		
 		intellect=pl:GetIntellect()	
 		personality=pl:GetPersonality()
-		critChance=pl:GetLuck()/1500
 		bonus=math.max(intellect,personality)
-		critDamage=bonus*3/2000
 		if healingSpells and healingSpells[spellIndex] then
-			critDamage=critDamage/2
+			critChance, critDamage=getCritInfo(pl, "heal")
+		else
+			critChance, critDamage=getCritInfo(pl, "spell")
 		end
 		power=power*(1+bonus/1000) 
-		critChance=0.05+critChance
 		haste=math.floor((pl:GetSpeed())/10)/100+1
 		delay=oldTable[spellIndex][mastery]
-		DPS3=math.round(power*(1+(0.05+critChance)*(0.5+critDamage))/(delay/60)*haste)			
+		DPS3=math.round(power*(1+critChance*(critDamage-1))/(delay/60)*haste)			
 	end
 			
-	local i=Game.CurrentPlayer
 	local fullHP=pl:GetFullHP()
 	--AC
 	local ac=pl:GetArmorClass()
