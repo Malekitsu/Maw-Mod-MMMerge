@@ -1812,6 +1812,8 @@ function generateBoss(index,nameIndex)
 	atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult)
 	atk2=mon.Attack2
 	atk2.DamageAdd, atk2.DamageDiceSides, atk2.DamageDiceCount = calcDices(atk2.DamageAdd,atk2.DamageDiceSides,atk2.DamageDiceCount,dmgMult)
+	local s, m=SplitSkill(mon.SpellSkill)
+	mon.SpellSkill=JoinSkill(s*dmgMult, m)
 end
 
 --SKILLS
