@@ -1051,13 +1051,6 @@ function events.PlayerCastSpell(t)
 			local s,m=SplitSkill(t.Player:GetSkill(cc.School))
 			local newLevel=calcEffectChance(lvl, res, s, cc.ChanceMult)
 			local hit=(30/(30+newLevel/4))
-			--nerfed cc effects on Doom
-			if vars.Mode==2 then
-				hit=hit/2
-				if mon.NameId>=220 and mon.NameId<300 then
-					hit=hit/2
-				end
-			end
 			if hit>math.random() then
 				mon.Resistances[cc.DamageKind]=0
 				mon.Level=0
@@ -1099,6 +1092,13 @@ function calcEffectChance(lvl, res, skill, chance)
 	mult=(1+skill*chance)
 	newRes=(totRes+30)/mult-30
 	newLevel=math.max(math.round(newRes*4),0)
+	--nerfed cc effects on Doom
+	if vars.Mode==2 then
+		newLevel=newLevel/2
+		if mon.NameId>=220 and mon.NameId<300 then
+			newLevel=newLevel/2
+		end
+	end
 	return newLevel
 end
 ------------------------------
