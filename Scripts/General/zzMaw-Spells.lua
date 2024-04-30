@@ -1094,9 +1094,9 @@ function calcEffectChance(lvl, res, skill, chance, mon)
 	newLevel=math.max(math.round(newRes*4),0)
 	--nerfed cc effects on Doom
 	if vars.Mode==2 then
-		newLevel=newLevel/2
+		newLevel=newLevel*2
 		if mon.NameId>=220 and mon.NameId<300 then
-			newLevel=newLevel/2
+			newLevel=newLevel*2
 		end
 	end
 	return newLevel
