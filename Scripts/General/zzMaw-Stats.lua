@@ -1112,3 +1112,41 @@ function calcPowerVitality(pl)
 	vitality=math.round(fullHP/reduction)
 	return DPS1, DPS2, DPS3, vitality
 end
+
+--racial skills down below
+function events.CalcStatBonusByItems(t)
+
+	local Res = t.Stat
+	if not (Res >= 10 and Res <= 15) then
+		return
+	end
+
+	local Race = GetRace(t.Player, t.PlayerIndex)
+
+	if Race == 6 and (Res == 15 or Res == 14) then -- Lich's immunities
+		t.Result = 65000
+		t.Player.Resistances[6].Base = 65000
+		t.Player.Resistances[7].Base = 65000
+	
+	elseif Race == 1 and Res == 14 then -- Vampire's mind immunity
+		t.Result = 65000
+		t.Player.Resistances[7].Base = 65000
+	
+	elseif (Race == 2 or Race == 7) and (Res == 10 or Res == 11) then
+		t.Result = t.Result+25
+	
+	elseif Race == 4 and (Res == 12 or Res == 13) then -- Troll's Water and Earth resistance.
+		t.Result = t.Result + 25
+		
+	elseif Race == 8 and (Res == 11 or Res == 13) then -- Goblins's Air and Earth resistance.
+		t.Result = t.Result + 25
+
+	elseif Race == 9 and (Res == 13 or Res == 14) then -- Dwarf's Mind and Earth resistance.
+		t.Result = t.Result + 25
+
+	elseif Race == 5 and Res == 10 then -- Dragon's bonus
+		t.Result = t.Result + 100
+
+	end	
+	
+end
