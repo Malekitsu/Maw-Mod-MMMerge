@@ -170,7 +170,7 @@ function events.GetAttackDelay(t)
 		if it then
 			local skill=it:T().Skill
 			if baseRecovery[skill] then
-				baseSpeed=getItemRecovery(it, playerLevel)
+				baseSpeed=getItemRecovery(it, t.Player.LevelBase)
 			end
 			local s,m = SplitSkill(t.Player:GetSkill(skill))
 			if skillRecovery[skill] and skillRecovery[skill][m] then
@@ -185,7 +185,7 @@ function events.GetAttackDelay(t)
 		for i=0,1 do
 			local it=t.Player:GetActiveItem(i)
 			if it then
-				speed[i]=getItemRecovery(it, playerLevel)
+				speed[i]=getItemRecovery(it, t.Player.LevelBase)
 				local skill=it:T().Skill
 				if table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number) then
 					skill=3
