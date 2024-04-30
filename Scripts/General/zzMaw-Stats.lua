@@ -997,7 +997,15 @@ function calcPowerVitality(pl)
 	local lvl=pl.LevelBase
 	local hitChance= (15+atk*2)/(30+atk*2+lvl)
 	local critChance, critMult=getCritInfo(pl)
-	DPS1=math.round(dmg*(1+critChance*(critMult-1))/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Melee"])
+	local enchantDamage=0
+	for i=0,1 do 
+		it=pl:GetActiveItem(i)
+		if it then
+			local dmg=calcEnchantDamage(pl, it.Bonus2, it.MaxCharges, 0, false)
+			enchantDamage=enchantDamage+dmg
+		end
+	end
+	DPS1=math.round((dmg*(1+critChance*(critMult-1))+enchantDamage)/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Melee"])
 	
 	--RANGED
 	local low=pl:GetRangedDamageMin()
