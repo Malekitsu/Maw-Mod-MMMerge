@@ -561,7 +561,7 @@ end
 function events.BuildItemInformationBox(t)
 	if t.Item.Number>=1051 and t.Item.Number<=1060 then
 		if t.Description then
-			local mult=math.max((Game.BolsterAmount-100)/500+1,1)
+			local mult=math.max((Game.BolsterAmount-100)/1000+1,1)
 			local tier=(t.Item.Number-1050)*mult
 			local power = math.round((tier * 10) ^ 0.5 / 2)
 			local twoHanded = tier * 10 * 2
@@ -583,7 +583,7 @@ end
 local function upgradeGem(it, tier)
 	local enchanted=false
 	--bolster multiplier
-	local bolsterMult=math.max((Game.BolsterAmount-100)/500+1,1)
+	local bolsterMult=math.max((Game.BolsterAmount-100)/1000+1,1)
 	local tier=tier*bolsterMult
 	--2nd enchant value
 	local bonus2=math.floor(it.Charges/1000)
