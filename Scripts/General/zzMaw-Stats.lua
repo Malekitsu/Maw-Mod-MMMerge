@@ -162,21 +162,6 @@ function events.GetArmorClass(t)
 	end
 end
 
-function events.CalcDamageToPlayer(t)
-	--UNARMED bonus 
-	unarmed=0
-	Skill, Mas = SplitSkill(t.Player:GetSkill(const.Skills.Unarmed))
-	if Mas == 4 then
-		unarmed=Skill+10
-	end
-	dodgeChance=1-0.995^(unarmed)
-	roll=math.random()
-	if roll<=dodgeChance then
-		t.Result=0
-		evt.FaceExpression{Player = t.PlayerIndex, Frame = 33}
-	end
-end
-
 --intellect/personality
 function events.CalcSpellDamage(t)
 	if t.Spell==44 then
@@ -571,6 +556,19 @@ function events.CalcDamageToPlayer(t)
 	data=WhoHitPlayer()
 	pl=t.Player
 	
+	--UNARMED DODGE 
+	local unarmed=0
+	local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
+	if Mas == 4 then
+		unarmed=Skill+10
+	end
+	dodgeChance=1-0.995^(unarmed)
+	roll=math.random()
+	if roll<=dodgeChance then
+		t.Result=0
+		evt.FaceExpression{Player = t.PlayerIndex, Frame = 33}
+		return
+	end
 	
 	if t.Damage==0 and t.Result==0 then return end
 	--works for attack 1 and 2
@@ -622,7 +620,7 @@ function events.CalcDamageToPlayer(t)
 			end
 		end
 	end
-	
+		
 	--carnage fix
 	if data and data.Player and data.Spell==133 then
 		t.Result=0
