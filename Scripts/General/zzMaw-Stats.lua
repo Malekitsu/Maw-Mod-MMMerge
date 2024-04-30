@@ -351,95 +351,9 @@ function events.BuildStatInformationBox(t)
 		i=Game.CurrentPlayer
 		local pl=Party[i]
 		--get spell and its damage
-		spellIndex=pl.QuickSpell
-		
-		--if not an offensive spell then calculate highest between melee and ranged
-		if not spellPowers[spellIndex] then 
-			--MELEE
-			local low=pl:GetMeleeDamageMin()
-			local high=pl:GetMeleeDamageMax()
-			local might=pl:GetMight()
-			local luck=pl:GetLuck()
-			local delay=pl:GetAttackDelay()
-			local dmg=(low+high)/2
-			--hit chance
-			local atk=pl:GetMeleeAttack()
-			local lvl=pl.LevelBase
-			local hitChance= (15+atk*2)/(30+atk*2+lvl)
-			local critChance, critDamage=getCritInfo(pl)
-			DPS1=math.round(dmg*(1+critChance*(critDamage-1))/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Melee"])
-			
-			--RANGED
-			local low=pl:GetRangedDamageMin()
-			local high=pl:GetRangedDamageMax()
-			local delay=pl:GetAttackDelay(true)
-			local dmg=(low+high)/2
-			--hit chance
-			local atk=pl:GetRangedAttack()
-			local hitChance= (15+atk*2)/(30+atk*2+lvl)
-			critChance, critDamage=getCritInfo(pl, "ranged")
-			local s,m=SplitSkill(pl.Skills[const.Skills.Bow])
-			if m>=3 then
-				dmg=dmg*2
-			end
-			local DPS2=math.round(dmg*(1+critChance*(critDamage-1))/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Ranged"])
-			power=math.max(DPS1,DPS2)
-			
-			t.Text=string.format("%s\n\nPower: %s",t.Text,StrColor(255,0,0,power))
-			return
-		end
-		
-		--SPELLS
-		local s, m =  SplitSkill(pl.Skills[const.Skills.Learning])
-		diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, spellIndex)
-		--calculate damage
-		--skill
-		skillType=math.floor((spellIndex-1)/11)+12
-		skill, mastery=SplitSkill(pl:GetSkill(skillType))
-		
-		--add enchant
-		it=pl:GetActiveItem(1)
-		local enchantDamage=0
-		if it then
-			if spellbonusdamage[it.Bonus2] then
-				enchantDamage=(spellbonusdamage[it.Bonus2]["low"]+spellbonusdamage[it.Bonus2]["high"])/2
-				for i = 1, #aoespells do
-					if aoespells[i] == spellIndex then
-						enchantDamage=enchantDamage/2.5
-					end
-				end
-				if it.MaxCharges>0 then
-					if it.MaxCharges <= 20 then
-						mult=1+it.MaxCharges/20
-					else
-						mult=2+2*(it.MaxCharges-20)/20
-					end
-					enchantDamage=enchantDamage*mult
-				end
-				local id=pl:GetIndex()
-				if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
-					local str=t.Player:GetMight()
-					local int=t.Player:GetIntellect()
-					local pers=t.Player:GetPersonality()
-					local bonusStat=math.max(str,int,pers)
-					enchantDamage=enchantDamage*(1+bonusStat/1000)
-				end
-			end
-		end
-		power=damageAdd + skill*(diceMin+diceMax)/2 + enchantDamage
-		
-		intellect=pl:GetIntellect()	
-		personality=pl:GetPersonality()
-		bonus=math.max(intellect,personality)
-		
-		critChance, critDamage=getCritInfo(pl, "spell")
-		
-		power=power*(1+bonus/1000) 
-		haste=math.floor((pl:GetSpeed())/10)/100+1
-		delay=oldTable[spellIndex][mastery]
-		power=math.round(power*(1+critChance*(critDamage-1))/(delay/60)*haste)
-		
-		t.Text=string.format("%s\n\nSpellPower: %s",t.Text,StrColor(255,0,0,power))
+		DPS1, DPS2, DPS3, vitality=calcPowerVitality(pl)
+		local txt=string.format("Melee Power: %s\nRanged Power: %s\nSpell Power: %s",StrColor(255,0,0,DPS1),StrColor(200,200,0,DPS2),StrColor(50,50,220,DPS3))
+		t.Text=string.format("%s\n%s",t.Text,txt)
 		
 	end
 	
@@ -1144,10 +1058,11 @@ function calcPowerVitality(pl)
 		bonus=math.max(intellect,personality)
 		if healingSpells and healingSpells[spellIndex] then
 			critChance, critDamage=getCritInfo(pl, "heal")
+			power=power*(1+bonus/2000) 
 		else
 			critChance, critDamage=getCritInfo(pl, "spell")
+			power=power*(1+bonus/1000) 
 		end
-		power=power*(1+bonus/1000) 
 		haste=math.floor((pl:GetSpeed())/10)/100+1
 		delay=oldTable[spellIndex][mastery]
 		DPS3=math.round(power*(1+critChance*(critDamage-1))/(delay/60)*haste)			
