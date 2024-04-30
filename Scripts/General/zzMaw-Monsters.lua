@@ -1658,15 +1658,21 @@ function events.MonsterKilled(mon)
 				mapLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 			end
 			mapLevel=mapLevel+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
+			if not Game.freeProgression then
+				mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)
+			end
 			experience=math.ceil(m^0.7*(mapLevel^1.8+mapLevel*20)/3/1000)*1000  
 			gold=math.ceil(experience^0.9/1000)*1000 
 			evt.ForPlayer(0)
 			evt.Add{"Gold", Value = gold}
-			evt.Add("Items",math.min(1050+math.ceil(Party[0].LevelBase/25+0.5),1060))
-			evt.Add("Items",math.min(1050+math.ceil(Party[0].LevelBase/25+0.5),1060))
+			evt.Add("Items",math.min(1050+math.ceil(mapLevel/25+0.5),1060))
+			evt.Add("Items",math.min(1050+math.ceil(mapLevel/25+0.5),1060))
+			if m>250 and mapLevel>90 then
+				evt.Add("Items", 1063)
+			end
 			evt.ForPlayer("All")
 			evt.Add{"Experience", Value = experience}
-			Game.EscMessage(string.format("Dungeon Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Item"))
+			Game.EscMessage(string.format("Dungeon Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Material"))
 			mapvars.completed=true
 			vars.dungeonCompletedList=vars.dungeonCompletedList or {}
 			vars.dungeonCompletedList[name]=true
