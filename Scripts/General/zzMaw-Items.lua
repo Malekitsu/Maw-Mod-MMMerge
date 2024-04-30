@@ -1434,6 +1434,10 @@ local modifiedBookValuesMM6 =
 
 
 function events.GameInitialized2()
+	--greater heal book 
+	Game.ItemsTxt[473].Name="Greater Heal"
+	Game.ItemsTxt[1275].Name="Greater Heal"
+	Game.ItemsTxt[1989].Name="Greater Heal"
 	--add crafting material price
 	for i=1,10 do
 		Game.ItemsTxt[1050+i].Value=i*1000
