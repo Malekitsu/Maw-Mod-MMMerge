@@ -62,6 +62,21 @@ local function getSpellQueueData(spellQueuePtr, targetPtr)
 	return t
 end
 
+function getHealSpellMultiPlier(pl)
+	local mult=1
+	--crit
+	local critChance, critMult, success=getCritInfo(pl)
+	if success then
+		mult=critMult
+	end
+	--int/pers bonus
+	local persBonus=pl:GetPersonality()
+	local intBonus=pl:GetIntellect()
+	local statBonus=math.max(persBonus,intBonus)/2000
+	mult=mult*(1+statBonus)
+	return mult, success
+end
+
 -- START OF ACTUAL CHANGES --
 
 -------------------------------------------------
@@ -110,23 +125,13 @@ function events.PlayerCastSpell(t)
 	if t.SpellId==49 then
 		if not t.RemoteData then
 			local sp=healingSpells[49]
-			local persBonus=t.Player:GetPersonality()/1000
-			local intBonus=t.Player:GetIntellect()/1000
-			local statBonus=math.max(persBonus,intBonus)
-			local crit=t.Player:GetLuck()/1500+0.05
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
 			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
-			totHeal=baseHeal*(statBonus+1)
-			roll=math.random()
-			gotCrit=false
-			if roll<crit then
-				mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount>=300 then
-					mult=mult/2
-				end
-				totHeal=totHeal*(1+mult)
-				gotCrit=true
-			end
+			
+			local mult, gotCrit=getHealSpellMultiPlier(pl)
+			
+			totHeal=baseHeal*mult
+
 			if gotCrit then
 				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
 			else
@@ -192,23 +197,13 @@ function events.PlayerCastSpell(t)
 	if t.SpellId == 55 then
 		if not t.RemoteData then
 			local sp=healingSpells[55]
-			local persBonus=t.Player:GetPersonality()/1000
-			local intBonus=t.Player:GetIntellect()/1000
-			local statBonus=math.max(persBonus,intBonus)
-			local crit=t.Player:GetLuck()/1500+0.05
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
 			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
-			totHeal=baseHeal*(statBonus+1)
-			roll=math.random()
-			gotCrit=false
-			if roll<crit then
-				mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount>=300 then
-					mult=mult/2
-				end
-				totHeal=totHeal*(1+mult)
-				gotCrit=true
-			end
+			
+			local mult, gotCrit=getHealSpellMultiPlier(pl)
+			
+			totHeal=baseHeal*mult
+
 			if gotCrit then
 				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
 			else
@@ -259,23 +254,13 @@ function events.PlayerCastSpell(t)
 		if table.find(dkClass, t.Player.Class) then return end
 		if not t.RemoteData then
 			local sp=healingSpells[68]
-			local persBonus=t.Player:GetPersonality()/1000
-			local intBonus=t.Player:GetIntellect()/1000
-			local statBonus=math.max(persBonus,intBonus)
-			local crit=t.Player:GetLuck()/1500+0.05
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
 			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
-			totHeal=baseHeal*(statBonus+1)
-			roll=math.random()
-			gotCrit=false
-			if roll<crit then
-				mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount>=300 then
-					mult=mult/2
-				end
-				totHeal=totHeal*(1+mult)
-				gotCrit=true
-			end
+			
+			local mult, gotCrit=getHealSpellMultiPlier(pl)
+			
+			totHeal=baseHeal*mult
+
 			--remove base heal
 			tooltipHeal=totHeal
 			totHeal=math.round(totHeal-(5+(m+1)*s))
@@ -342,23 +327,13 @@ function events.PlayerCastSpell(t)
 		if table.find(dkClass, t.Player.Class) then return end
 		if not t.RemoteData then
 			local sp=healingSpells[74]
-			local persBonus=t.Player:GetPersonality()/1000
-			local intBonus=t.Player:GetIntellect()/1000
-			local statBonus=math.max(persBonus,intBonus)
-			local crit=t.Player:GetLuck()/1500+0.05
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
 			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
-			totHeal=baseHeal*(statBonus+1)
-			roll=math.random()
-			gotCrit=false
-			if roll<crit then
-				mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount>=300 then
-					mult=mult/2
-				end
-				totHeal=totHeal*(1+mult)
-				gotCrit=true
-			end
+			
+			local mult, gotCrit=getHealSpellMultiPlier(pl)
+			
+			totHeal=baseHeal*mult
+
 			if gotCrit then
 				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
 			else
@@ -410,23 +385,13 @@ function events.PlayerCastSpell(t)
 		if not t.RemoteData then
 			local sp=healingSpells[77]
 			t.Skill=0
-			local persBonus=t.Player:GetPersonality()/1000
-			local intBonus=t.Player:GetIntellect()/1000
-			local statBonus=math.max(persBonus,intBonus)
-			local crit=t.Player:GetLuck()/1500+0.05
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
 			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
-			totHeal=baseHeal*(statBonus+1)
-			roll=math.random()
-			gotCrit=false
-			if roll<crit then
-				mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount>=300 then
-					mult=mult/2
-				end
-				totHeal=totHeal*(1+mult)
-				gotCrit=true
-			end
+
+			local mult, gotCrit=getHealSpellMultiPlier(pl)
+			
+			totHeal=baseHeal*mult
+
 			--remove base heal
 			tooltipHeal=totHeal
 			totHeal=math.round(totHeal-(10+5*s))
@@ -887,22 +852,13 @@ function events.Action(t)
 			if pl.SP<cost then return end
 			t.Handled=true
 			pl.SP=pl.SP-cost
-			local persBonus=pl:GetPersonality()/1000
-			local intBonus=pl:GetIntellect()/1000
-			local statBonus=math.max(persBonus,intBonus)
-			local crit=pl:GetLuck()/1500+0.05
+
 			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
-			local totHeal=baseHeal*(statBonus+1)
-			local roll=math.random()
-			local gotCrit=false
-			if roll<crit then
-				local mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount>=300 then
-					mult=mult/2
-				end
-				totHeal=totHeal*(1+mult)
-				gotCrit=true
-			end
+			
+			local mult, gotCrit=getHealSpellMultiPlier(pl)
+			
+			totHeal=baseHeal*mult
+			
 			if gotCrit then
 				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
 			else
@@ -945,22 +901,11 @@ function events.Action(t)
 			if pl.SP<cost then return end
 			t.Handled=true
 			pl.SP=pl.SP-cost
-			local persBonus=pl:GetPersonality()/1000
-			local intBonus=pl:GetIntellect()/1000
-			local statBonus=math.max(persBonus,intBonus)
-			local crit=pl:GetLuck()/1500+0.05
 			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
-			local totHeal=baseHeal*(statBonus+1)
-			local roll=math.random()
-			local gotCrit=false
-			if roll<crit then
-				local mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount>=300 then
-					mult=mult/2
-				end
-				totHeal=totHeal*(1+mult)
-				gotCrit=true
-			end
+			
+			local mult, gotCrit=getHealSpellMultiPlier(pl)
+			
+			totHeal=baseHeal*mult
 			if gotCrit then
 				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
 			else
@@ -1006,22 +951,11 @@ function events.Action(t)
 			if pl.SP<cost then return end
 			t.Handled=true
 			pl.SP=pl.SP-cost
-			local persBonus=pl:GetPersonality()/1000
-			local intBonus=pl:GetIntellect()/1000
-			local statBonus=math.max(persBonus,intBonus)
-			local crit=pl:GetLuck()/1500+0.05
 			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
-			local totHeal=baseHeal*(statBonus+1)
-			local roll=math.random()
-			local gotCrit=false
-			if roll<crit then
-				local mult=(0.5+statBonus*3/2)
-				if Game.BolsterAmount>=300 then
-					mult=mult/2
-				end
-				totHeal=totHeal*(1+mult)
-				gotCrit=true
-			end
+			
+			local mult, gotCrit=getHealSpellMultiPlier(pl)
+			
+			totHeal=baseHeal*mult
 			if gotCrit then
 				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
 			else
