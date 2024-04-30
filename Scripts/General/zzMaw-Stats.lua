@@ -87,8 +87,11 @@ function events.CalcDamageToMonster(t)
 			
 			t.Result=damage*dmgMult
 			
-			
-			local critChance, critMult, success=getCritInfo(pl,data.Object.Spell==133)
+			if data.Object and data.Object.Spell==133 then
+				critChance, critMult, success=getCritInfo(pl,true)
+			else
+				critChance, critMult, success=getCritInfo(pl)
+			end
 			
 			if success then
 				t.Result=t.Result*critMult
