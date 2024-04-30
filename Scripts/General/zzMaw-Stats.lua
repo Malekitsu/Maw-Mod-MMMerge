@@ -999,7 +999,7 @@ function calcPowerVitality(pl)
 	local critChance, critMult=getCritInfo(pl)
 	local enchantDamage=0
 	for i=0,1 do 
-		it=pl:GetActiveItem(i)
+		local it=pl:GetActiveItem(i)
 		if it then
 			local dmg=calcEnchantDamage(pl, it.Bonus2, it.MaxCharges, 0, false)
 			enchantDamage=enchantDamage+dmg
@@ -1015,12 +1015,16 @@ function calcPowerVitality(pl)
 	--hit chance
 	local atk=pl:GetRangedAttack()
 	local hitChance= (15+atk*2)/(30+atk*2+lvl)
-	
+	local it=pl:GetActiveItem(2)
+	if it then
+		local dmg=calcEnchantDamage(pl, it.Bonus2, it.MaxCharges, 0, false)
+		enchantDamage=enchantDamage+dmg
+	end
 	local s,m=SplitSkill(pl.Skills[const.Skills.Bow])
 	if m>=3 then
 		dmg=dmg*2
 	end
-	local DPS2=math.round(dmg*(1+critChance*(critMult-1))/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Ranged"])
+	local DPS2=math.round((dmg*(1+critChance*(critMult-1))+enchantDamage)/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Ranged"])
 	if spellPowers[spellIndex] or (healingSpells and healingSpells[spellIndex]) then 
 		--calculate damage
 		--skill
