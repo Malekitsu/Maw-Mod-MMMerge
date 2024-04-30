@@ -55,7 +55,7 @@ function getCritInfo(pl,dmgType)
 	end
 	--legendary bonus
 	local id=pl:GetIndex()
-	if table.find(vars.legendaries[id], 14) then
+	if vars.legendaries and table.find(vars.legendaries[id], 14) then
 		totalCrit=totalCrit+0.1
 	else
 		totalCrit=math.min(totalCrit,1)
