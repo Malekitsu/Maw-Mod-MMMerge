@@ -1049,7 +1049,7 @@ function events.PlayerCastSpell(t)
 				resistance[i]=res
 				level[i]=lvl
 			local s,m=SplitSkill(t.Player:GetSkill(cc.School))
-			local newLevel=calcEffectChance(lvl, res, s, cc.ChanceMult)
+			local newLevel=calcEffectChance(lvl, res, s, cc.ChanceMult, mon)
 			local hit=(30/(30+newLevel/4))
 			if hit>math.random() then
 				mon.Resistances[cc.DamageKind]=0
@@ -1087,7 +1087,7 @@ function events.PlayerCastSpell(t)
 	end
 end
 
-function calcEffectChance(lvl, res, skill, chance)
+function calcEffectChance(lvl, res, skill, chance, mon)
 	totRes=lvl/4+res
 	mult=(1+skill*chance)
 	newRes=(totRes+30)/mult-30
