@@ -1322,20 +1322,28 @@ enchantbonusdamage[15] = {48,48,["Type"]=8}
 enchantbonusdamage[46] = {40,80,["Type"]=0}
 
 --calculate enchant damage
-function calcEnchantDamage(pl, enchant, maxcharges, resistance)
+function calcEnchantDamage(pl, enchant, maxcharges, resistance,rand)
 	local ench=enchantbonusdamage[enchant]
-	local damage=math.random(ench[1],ench[2])
+	if not ench then
+		return 0
+	end
+	local damage=0
+	if rand then
+		damage=math.random(ench[1],ench[2])
+	else
+		damage=(ench[1]+ench[2])/2
+	end
 	local id=pl:GetIndex()
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
 		local str=pl:GetMight()
 		local int=pl:GetIntellect()
 		local pers=pl:GetPersonality()
 		local bonusStat=math.max(str,int,pers)
-		mult=(1+bonusStat/1000)
+		local mult=(1+bonusStat/1000)
+		damage=damage*mult
 	end
 	damage=damage*(1+maxcharges/20)
-	local res=1-1/2^(resistance%1000/100)
-	damage = damage * (1-res)
+	damage = damage/2^(resistance%1000/100)
 	return damage
 end
 
@@ -1346,13 +1354,13 @@ function events.ItemAdditionalDamage(t)
 		local id=t.Player:GetIndex()
 		local index=table.find(damageKindMap,enchantbonusdamage[t.Item.Bonus2].Type)
 		local res=t.Monster.Resistances[index]
-		damage=calcEnchantDamage(t.Player, t.Item.Bonus2, t.Item.MaxCharges, res)
+		damage=calcEnchantDamage(t.Player, t.Item.Bonus2, t.Item.MaxCharges, res,true)
 		local attackSpeedMult=getBaseAttackSpeed(t.Item)
 		t.Result=math.round(damage*attackSpeedMult)
 		return
 	end
 
-	--attack speed bonus
+	--attack speed bonus, for other enchants
 	local attackSpeedMult=getBaseAttackSpeed(t.Item)
 	t.Result=math.round(t.Result*attackSpeedMult)
 end
