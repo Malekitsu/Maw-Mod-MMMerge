@@ -1,4 +1,5 @@
 function events.CalcDamageToMonster(t)
+	if t.Result==0 then return end
 	data=WhoHitMonster()
 	divide=1
 	if data and data.Spell==44 then
@@ -80,6 +81,9 @@ function events.CalcDamageToMonster(t)
 				Game.ShowStatusText(msg)
 				if calls>0 then
 					calls=calls-1
+					if t.Result==0 then
+						calls=0
+					end
 				end
 				if calls==0 then
 					MSGdamage=0
