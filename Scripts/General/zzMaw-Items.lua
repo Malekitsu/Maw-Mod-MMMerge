@@ -3109,3 +3109,19 @@ function events.CanOpenChest(t)
 		end
 	end
 end
+
+--remove repair/identify from shops
+function events.GetShopItemTreatment(t)
+	if vars.Mode==2 then
+		if t.Action=="identify" or t.Action=="repair" then
+			t.Result=0
+		end
+	end
+end
+function events.CanShopOperateOnItem(t)
+	if vars.Mode==2 then
+		if t.Action=="identify" or t.Action=="repair" then
+			t.Result=false
+		end
+	end
+end
