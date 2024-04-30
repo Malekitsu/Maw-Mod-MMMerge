@@ -128,8 +128,8 @@ function events.GameInitialized2()
 end
 
 --create enchant table
-encStrDown={1,1,3,6,10,15,20,24,28,32,36,40,44,48,52,56,60,64,68,76,84,92,105,120}
-encStrUp={3,5,8,12,17,25,30,35,40,45,50,55,60,65,70,75,80,85,90,100,110,120,135,150}
+encStrDown={1,1,3,6,9,12,15,18,21,24,28,32,36,40,44,48,52,56,60,64,70,76,90,100}
+encStrUp={3,5,8,12,16,20,24,29,34,38,42,48,52,56,60,65,70,75,80,85,90,100,110,120}
 
 
 enc1Chance={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84}
@@ -788,12 +788,12 @@ function events.BuildItemInformationBox(t)
 						local ac=Game.ItemsTxt[t.Item.Number].Mod2+Game.ItemsTxt[t.Item.Number].Mod1DiceCount 
 						local ac2=Game.ItemsTxt[t.Item.Number+lookup].Mod2+Game.ItemsTxt[t.Item.Number+lookup].Mod1DiceCount 
 						local bonusAC=ac2*(t.Item.MaxCharges/20)
-						if t.Item.MaxCharges <= 20 then
+						--if t.Item.MaxCharges <= 20 then
 							ac=ac3+math.round(bonusAC)
-						else
-							local bonusAC=(ac+ac2)*(t.Item.MaxCharges/20)
-							ac=ac3+math.round(bonusAC)
-						end		
+						--else
+						--	local bonusAC=(ac+ac2)*(t.Item.MaxCharges/20)
+						--	ac=ac3+math.round(bonusAC)
+						--end		
 						t.BasicStat= "Armor: +" .. ac
 					end
 				end
@@ -811,23 +811,23 @@ function events.BuildItemInformationBox(t)
 					local bonus=txt.Mod2
 					local bonus2=Game.ItemsTxt[t.Item.Number+lookup].Mod2
 					--attack/+damage
-					if t.Item.MaxCharges <= 20 then
+					--if t.Item.MaxCharges <= 20 then
 						local bonusATK=bonus2*(t.Item.MaxCharges/20)
 						bonus=bonus+math.round(bonusATK)
-					else
-						local bonusATK=(bonus2+bonus)*(t.Item.MaxCharges/20)
-						bonus=bonus+math.round(bonusATK)
-					end
+					--else
+					--	local bonusATK=(bonus2+bonus)*(t.Item.MaxCharges/20)
+					--	bonus=bonus+math.round(bonusATK)
+					--end
 					--dicesides
 					local sides=txt.Mod1DiceSides
 					local sides2=Game.ItemsTxt[t.Item.Number+lookup].Mod1DiceSides
-					if t.Item.MaxCharges <= 20 then
+					--if t.Item.MaxCharges <= 20 then
 						local sidesBonus=sides2*(t.Item.MaxCharges/20)
 						sides=sides+math.round(sidesBonus)
-					else
-						local sidesBonus=(sides2+sides)*(t.Item.MaxCharges/20)
-						sides=sides+math.round(sidesBonus)
-					end
+					--else
+					--	local sidesBonus=(sides2+sides)*(t.Item.MaxCharges/20)
+					--	sides=sides+math.round(sidesBonus)
+					--end
 					t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " ..  txt.Mod1DiceCount .. "d" .. sides .. "+" .. bonus
 				end
 			end
@@ -1116,11 +1116,11 @@ bonusEffects = {
 
 --create dictionary with description list
 function checktext(MaxCharges,bonus2,it)
-	if MaxCharges <= 20 then
+	--if MaxCharges <= 20 then
 		mult=1+MaxCharges/20
-	else
-		mult=2+2*(MaxCharges-20)/20
-	end
+	--else
+	--	mult=2+2*(MaxCharges-20)/20
+	--end
 	local attackSpeedMult=getBaseAttackSpeed(it)
 	local id=Game.CurrentPlayer
 	if id<0 or id>Party.High then
@@ -1224,11 +1224,11 @@ function events.CalcItemValue(t)
 		end
 		
 		MaxCharges=t.Item.MaxCharges
-		if MaxCharges <= 20 then
+		--if MaxCharges <= 20 then
 			mult=1+MaxCharges/20
-		else
-			mult=2+2*(MaxCharges-20)/20
-		end
+		--else
+		--	mult=2+2*(MaxCharges-20)/20
+		--end
 		
 		basePrice=basePrice*mult
 		if t.Item.Bonus2>0 and t.Item.BonusExpireTime<Game.Time then
@@ -1337,11 +1337,11 @@ function events.ItemAdditionalDamage(t)
 	end
 	--scaling Bonus
 	if t.Item.MaxCharges>0 then
-		if t.Item.MaxCharges <= 20 then
+		--if t.Item.MaxCharges <= 20 then
 			mult=1+t.Item.MaxCharges/20
-		else
-			mult=2+2*(t.Item.MaxCharges-20)/20
-		end
+		--else
+		--	mult=2+2*(t.Item.MaxCharges-20)/20
+		--end
 		t.Result=t.Result*mult
 	end	
 	--attack speed bonus
@@ -1911,11 +1911,11 @@ function calculateStatsAdd(item, stats)
 		--bonus special
 		--maxcharges mult
 		MaxCharges=item.MaxCharges
-		if MaxCharges <= 20 then
+		--if MaxCharges <= 20 then
 			mult=1+MaxCharges/20
-		else
-			mult=2+2*(MaxCharges-20)/20
-		end
+		--else
+		--	mult=2+2*(MaxCharges-20)/20
+		--end
 		
 		b2=bonusEffects[item.Bonus2]
 		if b2 then
@@ -2067,11 +2067,11 @@ function itemStats(index)
 	for it in pl:EnumActiveItems() do
 		--bolster mult
 		mult=1
-		if it.MaxCharges <= 20 then
+		--if it.MaxCharges <= 20 then
 			mult=1+it.MaxCharges/20
-		else
-			mult=2+2*(it.MaxCharges-20)/20
-		end
+		--else
+		--	mult=2+2*(it.MaxCharges-20)/20
+		--end
 		
 		if it.Bonus>0 then 
 			if it.Bonus<=16 then
@@ -2119,11 +2119,11 @@ function itemStats(index)
 			if it.MaxCharges>0 then 
 				local ac2=referenceAC[it.Number]
 				local bonusAC=ac2*(it.MaxCharges/20)
-				if it.MaxCharges <= 20 then
+				--if it.MaxCharges <= 20 then
 					acBonus=ac+math.round(bonusAC)
-				else
-					acBonus=ac+math.round((ac+ac2)*(it.MaxCharges/20))
-				end
+				--else
+				--	acBonus=ac+math.round((ac+ac2)*(it.MaxCharges/20))
+				--end
 			end
 			--artifacts
 			if table.find(artArmors,it.Number) then 
