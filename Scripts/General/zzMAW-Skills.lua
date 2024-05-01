@@ -185,19 +185,21 @@ function events.GetAttackDelay(t)
 		for i=0,1 do
 			local it=t.Player:GetActiveItem(i)
 			if it then
-				speed[i]=getItemRecovery(it, t.Player.LevelBase)
 				local skill=it:T().Skill
-				if table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number) then
-					skill=3
-				end
-				local s,m = SplitSkill(t.Player:GetSkill(skill))
-				if skillRecovery[skill] and skillRecovery[skill][m] then
-					if skill~=3 or i~=0 then
-						bonusSpeed=bonusSpeed+skillRecovery[skill][m]*s
+				if skill<8 then
+					speed[i]=getItemRecovery(it, t.Player.LevelBase)
+					if table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number) then
+						skill=3
 					end
-				end	
-				if it.Bonus2==41 or it.Bonus==59 then
-					bonusSpeed=bonusSpeed+20
+					local s,m = SplitSkill(t.Player:GetSkill(skill))
+					if skillRecovery[skill] and skillRecovery[skill][m] then
+						if skill~=3 or i~=0 then
+							bonusSpeed=bonusSpeed+skillRecovery[skill][m]*s
+						end
+					end	
+					if it.Bonus2==41 or it.Bonus==59 then
+						bonusSpeed=bonusSpeed+20
+					end
 				end
 			end
 		end
