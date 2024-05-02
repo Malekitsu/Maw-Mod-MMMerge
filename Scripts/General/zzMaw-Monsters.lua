@@ -2149,3 +2149,66 @@ function events.Tick()
 		end
 	end
 end
+
+--[[
+	{ [9] = "disease", [10] = "disease", [11] = "disease", [1] = "curse" },
+	{ [5] = "insanity", [22] = "spell drain" },
+	{ [12] = "paralysis", [23] = "fear" },
+	{ [6] = "poison", [7] = "poison", [8] = "poison", [2] = "weakness" },
+	{ [3] = "sleep", [13] = "unconscious" },
+	{ [15] = "stone", [21] = "premature ageing" },
+	{ [14] = "death", [16] = "eradication" },
+]]
+
+
+function events.AfterLoadMap()
+	if vars.Mode==2 then
+		if not mapvars.monsterBuffs then
+			mapvars.monsterBuffs=true
+			for i=0,Map.Monsters.High do
+				local mon=Map.Monsters[i]
+				local chance=mon.Level^0.5*2/100
+				if chance>math.random() and (mon.NameId==0 or mon.NameId>=220) then
+					local level=(vars.freeProgression and mon.Level) or mon.Level*2
+					local possibleBuffs={6,7,8,2,23}
+					if level>=15 then
+						table.insert(possibleBuffs,1)
+					end
+					if level>=20 then 
+						table.insert(possibleBuffs,9)
+						table.insert(possibleBuffs,10)
+						table.insert(possibleBuffs,11)
+					end
+					if level>=30 then
+						table.insert(possibleBuffs,12)
+					end
+					if level>=40 then
+						table.insert(possibleBuffs,5)
+					end
+					if level>=50 then
+						table.insert(possibleBuffs,15)
+					end
+					if level>=60 then
+						table.insert(possibleBuffs,3)
+						table.insert(possibleBuffs,13)
+					end
+					if level>=70 then
+						table.insert(possibleBuffs,21)
+					end
+					if level>=80 then
+						table.insert(possibleBuffs,22)
+					end
+					if level>=90 then
+						table.insert(possibleBuffs,14)
+					end
+					if level>=100 then
+						table.insert(possibleBuffs,16)
+					end
+					local buff=possibleBuffs[math.random(1,#possibleBuffs)]
+					mon.Bonus=buff
+					BonusMul=1
+				end
+			end
+		end
+	end
+end
