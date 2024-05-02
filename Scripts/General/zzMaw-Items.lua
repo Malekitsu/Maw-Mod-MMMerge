@@ -1853,7 +1853,7 @@ function events.BuildItemInformationBox(t)
 				lvl=lvl+t.Item:T().ChanceByLevel[i]*i
 			end
 			itemLevel=itemLevel+math.round(lvl/tot*18-17)
-			t.Description = t.Description .. "\n\nItem Level: " .. itemLevel
+			--t.Description = t.Description .. "\n\nItem Level: " .. itemLevel
 			local maxCharges=t.Item.MaxCharges
 			if t.Item.BonusExpireTime>0 and t.Item.BonusExpireTime<=2 then
 				maxCharges=math.floor(math.min(maxCharges/1.2,maxCharges-5))
