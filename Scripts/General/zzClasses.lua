@@ -198,7 +198,7 @@ function events.CalcDamageToMonster(t)
 		--Calculate heal value and apply
 		levelBonus=2+math.min(t.Player.LevelBase,250)/50
 		healValue=bodyS*levelBonus+spiritS*levelBonus
-		personality=data.Player:GetPersonality()
+		personality=data.Player:GetPersonality()/2
 		healValue=healValue*(1+personality/1000)
 		--calculate crit
 		critchance=data.Player:GetLuck()/15*10+50
