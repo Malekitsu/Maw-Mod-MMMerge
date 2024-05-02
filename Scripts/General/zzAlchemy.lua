@@ -29,7 +29,34 @@ function events.UseMouseItem(t)
 	t.Allow=false
 	local pl=Party[t.PlayerSlot]
 	local index=pl:GetIndex()
-	
+	local delay=pl.RecoveryDelay
+	local action=-1
+	local currentPlayer=Game.CurrentPlayer
+	if delay==0 then
+		action=t.PlayerSlot
+	else
+		local id=Game.CurrentPlayer
+		if id>=0 and id<=Party.High then
+			delay=Party[id].RecoveryDelay
+			if delay==0 then
+				action=id
+			end
+		end
+	end
+	if action==-1 then
+		for i=0,Party.High do
+			if action==-1 then
+				delay=Party[i].RecoveryDelay
+				if delay==0 then
+					action=i
+				end
+			end
+		end
+	end
+	if action==-1 then
+		Game.ShowStatusText("Player must be active to consume the potion")
+		return
+	end
 	--check power
 	if potionPowerRequirement[it.Number] and potionPowerRequirement[it.Number]>Mouse.Item.Bonus then
 		Game.ShowStatusText("This potion has not enough power")
@@ -178,8 +205,16 @@ function events.UseMouseItem(t)
 	else
 		Mouse.Item.Number=0
 	end	
+	Party[action]:SetRecoveryDelay(60)
 	pl:ShowFaceAnimation(36)
 	evt.PlaySound(143)
+	--restore to previous player to avoid inventory issues
+	function events.Tick()
+		events.Remove("Tick", 1)
+		if Game.CurrentScreen~=0 then
+			Game.CurrentPlayer=currentPlayer
+		end
+	end
 end
 
 function events.GameInitialized2()
