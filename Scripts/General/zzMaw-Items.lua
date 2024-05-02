@@ -3110,7 +3110,7 @@ function events.CanOpenChest(t)
 	end
 end
 
---remove repair/identify from shops
+--[[remove repair/identify from shops
 function events.GetShopItemTreatment(t)
 	if vars.Mode==2 then
 		if t.Action=="identify" or t.Action=="repair" then
@@ -3122,6 +3122,23 @@ function events.CanShopOperateOnItem(t)
 	if vars.Mode==2 then
 		if t.Action=="identify" or t.Action=="repair" then
 			t.Result=false
+		end
+	end
+end
+]]
+--increase prices
+local houseValues={}
+function events.GetShopItemTreatment(t)
+	local id=GetCurrentHouse()
+	Game.Houses[id].Val=houseValues[id] or Game.Houses[id].Val
+	if vars.Mode==2 then
+		if t.Action=="identify" or t.Action=="repair" then
+			houseValues[id]=houseValues[id] or Game.Houses[id].Val
+			if t.Action=="identify" then
+				Game.Houses[id].Val=t.Item:T().IdRepSt^2
+			else
+				Game.Houses[id].Val=5
+			end
 		end
 	end
 end
