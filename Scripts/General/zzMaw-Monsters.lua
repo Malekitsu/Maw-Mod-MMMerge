@@ -1905,6 +1905,14 @@ function generateBoss(index,nameIndex)
 	mapvars.bossNames=mapvars.bossNames or {}
 	mapvars.bossSkillList=mapvars.SkillList or {}
 	skill=SkillList[math.random(1,#SkillList)]
+	if skill=="Leecher" then
+		mapvars.leecher=mapvars.leecher or {}
+		table.insert(mapvars.leecher, index)
+	end
+	if skill=="Swift" then
+		mapvars.swift=mapvars.swift or {}
+		table.insert(mapvars.swift, index)
+	end
 	mapvars.bossSkills=mapvars.bossSkills or {}
 	mapvars.bossSkills[mon.NameId]=mapvars.bossSkills[mon.NameId] or {}
 	table.insert(mapvars.bossSkills[mon.NameId],skill)
@@ -1921,17 +1929,18 @@ function generateBoss(index,nameIndex)
 end
 
 --SKILLS
-SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Adamantite","Swapper","Regenerating",} --defensives
+SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Adamantite","Swapper","Regenerating","Puller","Leecher","Swift","Doom"} --defensives
 --to add: splitting
 --on attack skills
 function events.GameInitialized2() --to make the after all the other code
 	function events.CalcDamageToPlayer(t)
 		data=WhoHitPlayer()
 		if data and data.Monster and data.Monster.NameId>220 then
-			skill = string.match(Game.PlaceMonTxt[data.Monster.NameId], "([^%s]+)")
+			mon=data.Monster
+			skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
 			if skill=="Summoner" then
 				if math.random()<0.4 or t.DamageKind==4 then
-					pseudoSpawnpoint{monster = data.Monster.Id-2, x = (Party.X+data.Monster.X)/2, y = (Party.Y+data.Monster.Y)/2, z = Party.Z, count = 1, powerChances = {75, 25, 0}, radius = 64, group = 1}
+					pseudoSpawnpoint{monster = mon.Id-2, x = (Party.X+mon.X)/2, y = (Party.Y+mon.Y)/2, z = Party.Z, count = 1, powerChances = {75, 25, 0}, radius = 64, group = 1}
 				end
 			elseif skill=="Venomous" then
 				t.Player.Poison3=Game.Time
@@ -1944,8 +1953,11 @@ function events.GameInitialized2() --to make the after all the other code
 				end
 			elseif skill=="Swapper" then	
 				Game.ShowStatusText("*Swap*")
-				Party.X, Party.Y, Party.Z, data.Monster.X, data.Monster.Y, data.Monster.Z = data.Monster.X, data.Monster.Y, data.Monster.Z, Party.X, Party.Y, Party.Z
-				Party.Direction, data.Monster.Direction=data.Monster.Direction, Party.Direction
+				Party.X, Party.Y, Party.Z, mon.X, mon.Y, mon.Z = mon.X, mon.Y, mon.Z, Party.X, Party.Y, Party.Z
+				Party.Direction, mon.Direction=mon.Direction, Party.Direction
+			elseif skill=="Puller" then
+				local direction=calculateDirection(Party.X, Party.Y,mon.X,mon.Y)
+				evt.Jump{Direction = direction, ZAngle = 128, Speed = 1000}
 			end
 		end
 	end
@@ -1996,6 +2008,59 @@ function events.GameInitialized2() --to make the after all the other code
 		end
 	end
 end
+--leecher drain
+--regenerating skill
+amountHP={0,0,0,0,[0]=0}
+amountSP={0,0,0,0,[0]=0}
+function leecher()
+	if mapvars.leecher then
+		for i=1, #mapvars.leecher do
+			local mon=Map.Monsters[mapvars.leecher[i]]
+			local distance=getDistance(mon.X,mon.Y,mon.Z)
+			if distance<1500 and mon.HP>0 then
+				leechmult=((1500-distance)/1500)^2
+				local timeMultiplier=Game.TurnBased and timePassed/12.8 or 1
+				for i=0,Party.High do
+					local pl=Party[i]
+					if pl.HP>-20 then
+						local drainHP=pl:GetFullHP()*leechmult*0.05*timeMultiplier
+						amountHP[i]=amountHP[i]+drainHP
+						pl.HP=pl.HP - math.floor(amountHP[i])
+						amountHP[i]=amountHP[i]%1
+					end
+					if pl.SP>-20 then
+						local drainSP=pl:GetFullSP()*leechmult*0.025*timeMultiplier
+						amountSP[i]=amountSP[i]+drainSP
+						pl.SP=pl.SP -math.floor(amountSP[i])
+						amountSP[i]=amountSP[i]%1
+					end
+				end
+			end
+		end
+	end
+end
+
+function events.LoadMap(wasInGame)
+	Timer(leecher, const.Minute/4) 
+end
+--swift
+function events.Tick()
+	if mapvars.swift then
+		swiftLocation=swiftLocation or {}
+		for i=1, #mapvars.swift do
+			mon=Map.Monsters[mapvars.swift[i]]
+			if not swiftLocation[i] then
+				swiftLocation[i]={mon.X,mon.Y}
+			end
+			mon.X=mon.X + (mon.X-swiftLocation[i][1])
+			mon.Y=mon.Y + (mon.Y-swiftLocation[i][2])
+			swiftLocation[i][1]=mon.X
+			swiftLocation[i][2]=mon.Y
+		end
+	end
+end
+
+
 function calcDices(add,sides,count, mult, bonusDamage)
 	local bonusDamage=bonusDamage or 0
 	local add=math.round((add+bonusDamage)*mult)
@@ -2215,4 +2280,13 @@ function events.AfterLoadMap()
 			end
 		end
 	end
+end
+
+
+function calculateDirection(x_m, y_m, x_p, y_p)
+    local deltaX = x_p - x_m
+    local deltaY = y_p - y_m
+    local theta = math.atan2(deltaY, deltaX) -- Calculate the angle in radians
+    local direction = math.floor((theta / (2 * math.pi)) * 2048) % 2048
+    return direction
 end
