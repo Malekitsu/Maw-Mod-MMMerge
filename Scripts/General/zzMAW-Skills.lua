@@ -1342,36 +1342,44 @@ function events.GetDisarmTrapTotalSkill(t)
 end
 
 function events.CanIdentifyMonster(t)
-	local requiredSkill=t.Monster.Level^0.7
+	local lvl=0
+	for i=0,Party.High do
+		lvl=Party[i].LevelBase+lvl
+	end
+	lvl=lvl/Party.Count
+	requiredSkill=(t.Monster.Level-lvl)
 	local maxS=0
 	local maxM=0
-	AllowNovice = false
-	AllowExpert = false
-	AllowMaster = false
-	AllowSpells = false
-	AllowGM = false
+	t.AllowNovice = false
+	t.AllowExpert = false
+	t.AllowMaster = false
+	t.AllowSpells = false
+	t.AllowGM = false
 	for i=0, Party.High do
 		local s,m=SplitSkill(Party[i]:GetSkill(const.Skills.IdentifyMonster))
-		if s*m>maxS then
-			maxS=s*m
-		end
-		if m>maxM then
-			maxM=m
+		local s1=SplitSkill(Party[i].Skills[const.Skills.IdentifyMonster])
+		if s1>0 then
+			if s*m>maxS then
+				maxS=s*m
+			end
+			if m>maxM then
+				maxM=m
+			end
 		end
 	end
-	if maxS>requiredSkill then
-		if m>=1 then
-			AllowNovice = true
+	if maxS>=requiredSkill or maxM==4 then
+		if maxM>=1 then
+			t.AllowNovice = true
 		end
-		if m>=2 then
-			AllowExpert = true
+		if maxM>=2 then
+			t.AllowExpert = true
 		end
-		if m>=3 then
-			AllowMaster = true
-			AllowSpells = true
+		if maxM>=3 then
+			t.AllowMaster = true
+			t.AllowSpells = true
 		end
-		if m>=4 then
-			AllowGM = true
+		if maxM>=4 then
+			t.AllowGM = true
 		end
 	end
 end
