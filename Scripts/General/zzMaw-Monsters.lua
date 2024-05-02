@@ -1613,6 +1613,12 @@ function events.BuildMonsterInformationBox(t)
 			t.HitPoints.Text=string.format("02016Hit Points0000000000	100" .. hp)
 		end
 	end
+	--show effects
+	if t.IdentifiedDamage or t.IdentifiedAttack then
+		if effectNames[mon.Bonus] then
+			t.EffectsHeader.Text=t.EffectsHeader.Text .. string.format("\n\n\t15 ") .. effectNames[mon.Bonus]
+		end
+	end
 end
 
 
@@ -2150,15 +2156,13 @@ function events.Tick()
 	end
 end
 
---[[
-	{ [9] = "disease", [10] = "disease", [11] = "disease", [1] = "curse" },
-	{ [5] = "insanity", [22] = "spell drain" },
-	{ [12] = "paralysis", [23] = "fear" },
-	{ [6] = "poison", [7] = "poison", [8] = "poison", [2] = "weakness" },
-	{ [3] = "sleep", [13] = "unconscious" },
-	{ [15] = "stone", [21] = "premature ageing" },
-	{ [14] = "death", [16] = "eradication" },
-]]
+effectNames={
+	[9] = "Disease 1", [10] = "Disease 2", [11] = "Disease 3", [1] = "Curse",
+	[5] = "Insanity", [22] = "Spell drain", [12] = "Paralysis", [23] = "Fear",
+	[6] = "Poison 1", [7] = "Poison 2", [8] = "Poison 3", [2] = "Weakness",
+	[3] = "Sleep", [13] = "Unconscious",[15] = "Stone", [21] = "Premature ageing",
+	[14] = "Death", [16] = "Eradication",
+}
 
 
 function events.AfterLoadMap()
