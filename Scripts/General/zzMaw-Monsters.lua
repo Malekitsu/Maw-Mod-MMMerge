@@ -47,50 +47,6 @@ function events.AfterLoadMap()
 			end
 		end
 	end	
-	if mapvars.boosted==nil then
-		mapvars.boosted=true
-		--calculate party experience
-		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
-		if currentWorld==1 then
-			partyLvl=vars.MM7LVL+vars.MM6LVL
-		elseif currentWorld==2 then
-			partyLvl=vars.MM8LVL+vars.MM6LVL
-		elseif currentWorld==3 then
-			partyLvl=vars.MM8LVL+vars.MM7LVL
-		elseif currentWorld==4 then
-			partyLvl=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
-		end
-		--calculate average level for unique monsters
-		for i=0, Map.Monsters.High do
-			mon=Map.Monsters[i]
-			
-			if  mon.NameId >=1 and mon.NameId<220 then
-				
-				--horizontal progression
-				if Game.freeProgression==false then
-					name=Game.MapStats[Map.MapStatsIndex].Name
-					if not horizontalMaps[name] then
-						partyLvl=mon.Level*2
-					end
-				end
-				--level increase 
-				oldLevel=mon.Level
-				mon.Level=math.min(mon.Level+partyLvl,255)
-				--HP calculated based on previous HP rapported to the previous level
-				HPRateo=mon.HP/(oldLevel*(oldLevel/10+3))
-				HPBolsterLevel=oldLevel*(1+(0.75*partyLvl/100))+partyLvl*0.75
-				mon.HP=math.min(math.round(HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180))*HPRateo,32500)
-				mon.FullHP=mon.HP
-				--damage
-				dmgMult=(mon.Level/9+1.15)*((mon.Level+2)/(oldLevel+2))*(1+(mon.Level/200))
-				atk1=mon.Attack1
-				atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult)
-				atk2=mon.Attack2
-				atk2.DamageAdd, atk2.DamageDiceSides, atk2.DamageDiceCount = calcDices(atk2.DamageAdd,atk2.DamageDiceSides,atk2.DamageDiceCount,dmgMult)
-			end
-		end
-	end	
-	
 	--rebolster current monsters according to monsterstxt
 	recalculateMawMonster()
 end
@@ -176,23 +132,148 @@ function recalculateMawMonster()
 			end
 		end
 	end
+	
+	--unique monsters
+	--store table
+	for i=0, Map.Monsters.High do
+		mon=Map.Monsters[i]
+		if  mon.NameId >=1 and mon.NameId<220 then
+			--store monster data
+			mapvars.oldUniqueMonsterTable=mapvars.oldUniqueMonsterTable or {}
+			if not mapvars.oldUniqueMonsterTable[i] then
+				mapvars.oldUniqueMonsterTable[i]={}
+				--store older relevant info
+				mapvars.oldUniqueMonsterTable[i].ArmorClass=mon.ArmorClass
+				mapvars.oldUniqueMonsterTable[i].Attack1={}
+				mapvars.oldUniqueMonsterTable[i].Attack1.DamageAdd=mon.Attack1.DamageAdd
+				mapvars.oldUniqueMonsterTable[i].Attack1.DamageDiceCount=mon.Attack1.DamageDiceCount
+				mapvars.oldUniqueMonsterTable[i].Attack1.DamageDiceSides=mon.Attack1.DamageDiceSides
+				mapvars.oldUniqueMonsterTable[i].Attack1.Missile=mon.Attack1.Missile
+				mapvars.oldUniqueMonsterTable[i].Attack1.Type=mon.Attack1.Type
+				mapvars.oldUniqueMonsterTable[i].Attack2={}
+				mapvars.oldUniqueMonsterTable[i].Attack2.DamageAdd=mon.Attack2.DamageAdd
+				mapvars.oldUniqueMonsterTable[i].Attack2.DamageDiceCount=mon.Attack2.DamageDiceCount
+				mapvars.oldUniqueMonsterTable[i].Attack2.DamageDiceSides=mon.Attack2.DamageDiceSides
+				mapvars.oldUniqueMonsterTable[i].Attack2.Missile=mon.Attack2.Missile
+				mapvars.oldUniqueMonsterTable[i].Attack2.Type=mon.Attack2.Type
+				mapvars.oldUniqueMonsterTable[i].Exp=mon.Exp
+				mapvars.oldUniqueMonsterTable[i].Experience=mon.Experience
+				mapvars.oldUniqueMonsterTable[i].FullHP=mon.FullHP
+				mapvars.oldUniqueMonsterTable[i].FullHitPoints=mon.FullHitPoints
+				mapvars.oldUniqueMonsterTable[i].Level=mon.Level
+				mapvars.oldUniqueMonsterTable[i].Resistances={}
+				for v=0,10 do 
+					if v~=5 then
+						mapvars.oldUniqueMonsterTable[i].Resistances[v]=mon.Resistances[v]
+						else
+						mapvars.oldUniqueMonsterTable[i].Resistances[v]=0
+					end
+				end
+			end
+		end
+	end
+	if mapvars.boosted==nil then --needed for retrocompatibility, otherwise unique monsters from old saves gets bosted again
+		--calculate party experience
+		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+		if currentWorld==1 then
+			partyLvl=vars.MM7LVL+vars.MM6LVL
+		elseif currentWorld==2 then
+			partyLvl=vars.MM8LVL+vars.MM6LVL
+		elseif currentWorld==3 then
+			partyLvl=vars.MM8LVL+vars.MM7LVL
+		elseif currentWorld==4 then
+			partyLvl=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
+		end
+		
+		mapvars.oldUniqueMonsterTable=mapvars.oldUniqueMonsterTable or {}
+		--calculate average level for unique monsters
+		for i=0, Map.Monsters.High do
+			mon=Map.Monsters[i]
+			if  mon.NameId >=1 and mon.NameId<220 then
+				local oldTable=mapvars.oldUniqueMonsterTable[i]
+				--horizontal progression
+				if Game.freeProgression==false then
+					name=Game.MapStats[Map.MapStatsIndex].Name
+					if not horizontalMaps[name] then
+						partyLvl=oldTable.Level*2
+					end
+				end
+				--level increase 
+				oldLevel=oldTable.Level
+				uniqueMonsterLevel=uniqueMonsterLevel or {}
+				uniqueMonsterLevel[i]=oldTable.Level+partyLvl
+				mon.Level=math.min(uniqueMonsterLevel[i],255)
+				--HP calculated based on previous HP rapported to the previous level
+				HPRateo=oldTable.FullHP/(oldLevel*(oldLevel/10+3))
+				HPBolsterLevel=oldLevel*(1+(0.75*partyLvl/100))+partyLvl*0.75
+				local HP=math.round(HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180))*HPRateo
+				hpMult=1
+				if Game.BolsterAmount==0 then
+					hpMult=hpMult*0.6
+				end
+				--normal
+				if Game.BolsterAmount==50 then
+					hpMult=hpMult*0.8
+				end
+				--MAW
+				if Game.BolsterAmount==100 then
+					hpMult=hpMult*1
+				end
+				--Hard
+				if Game.BolsterAmount==150 then
+					hpMult=hpMult*1.4
+				end
+				--Hell
+				if Game.BolsterAmount==200 then
+					hpMult=hpMult*1.8
+				end
+				--Nightmare
+				if Game.BolsterAmount==300 then
+					hpMult=hpMult*3
+				end
+				if Game.BolsterAmount==600 then
+					hpMult=hpMult*4*(1+uniqueMonsterLevel[i]/127.5)
+				end
+				HP=HP*hpMult
+				
+				hpOvercap=0
+				while HP>32500 do
+					HP=math.round(HP/2)
+					hpOvercap=hpOvercap+1
+				end
+				
+				mon.Resistances[0]=mon.Resistances[0]%1000+hpOvercap*1000
+				local HPproportion=mon.HP/mon.FullHP
+				mon.FullHP=HP
+				mon.HP=mon.FullHP*HPproportion
+				
+				--damage
+				dmgMult=(uniqueMonsterLevel[i]/9+1.15)*((uniqueMonsterLevel[i]+2)/(oldLevel+2))*(1+(uniqueMonsterLevel[i]/200))
+				atk1=mon.Attack1
+				atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount = calcDices(oldTable.Attack1.DamageAdd,oldTable.Attack1.DamageDiceSides,oldTable.Attack1.DamageDiceCount,dmgMult)
+				atk2=mon.Attack2
+				atk2.DamageAdd, atk2.DamageDiceSides, atk2.DamageDiceCount = calcDices(oldTable.Attack2.DamageAdd,oldTable.Attack2.DamageDiceSides,oldTable.Attack2.DamageDiceCount,dmgMult)
+			end
+		end
+	end	
+	
+	
 end
 --refresh on difficulty change
 function events.Action(t)
 	if t.Action==113 then
-		lastBolster=lastBolster or Game.BolsterAmount
-		lastMode=lastMode or Game.freeProgression
-		if Game.BolsterAmount~=lastBolster or lastMode~=Game.freeProgression then
-			if vars.trueNightmare and Game.BolsterAmount~=300 and vars.Mode~=2 then
-				Game.BolsterAmount=300
-				recalculateMonsterTable()
-				recalculateMawMonster()
-			else
-				recalculateMonsterTable()
-				recalculateMawMonster()
-			end
+		if vars.trueNightmare and Game.BolsterAmount~=300 and vars.Mode~=2 then
+			Game.BolsterAmount=300
+			recalculateMonsterTable()
+			recalculateMawMonster()
+		elseif vars.Mode==2 then
+			Game.BolsterAmount=600
+			recalculateMonsterTable()
+			recalculateMawMonster()
+		else 
+			recalculateMonsterTable()
+			recalculateMawMonster()
 		end
-		
 	end
 end
 
@@ -232,6 +313,7 @@ function events.LoadMap()
 	recalculateMonsterTable()
 	recalculateMawMonster()
 end
+
 
 function recalculateMonsterTable()
 	--calculate party experience
