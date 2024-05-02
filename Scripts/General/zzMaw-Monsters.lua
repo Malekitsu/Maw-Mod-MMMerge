@@ -200,9 +200,9 @@ function recalculateMawMonster()
 				end
 				--level increase 
 				oldLevel=oldTable.Level
-				uniqueMonsterLevel=uniqueMonsterLevel or {}
-				uniqueMonsterLevel[i]=oldTable.Level+partyLvl
-				mon.Level=math.min(uniqueMonsterLevel[i],255)
+				mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
+				mapvars.uniqueMonsterLevel[i]=oldTable.Level+partyLvl
+				mon.Level=math.min(mapvars.uniqueMonsterLevel[i],255)
 				--HP calculated based on previous HP rapported to the previous level
 				HPRateo=oldTable.FullHP/(oldLevel*(oldLevel/10+3))
 				HPBolsterLevel=oldLevel*(1+(0.75*partyLvl/100))+partyLvl*0.75
@@ -232,7 +232,7 @@ function recalculateMawMonster()
 					hpMult=hpMult*3
 				end
 				if Game.BolsterAmount==600 then
-					hpMult=hpMult*4*(1+uniqueMonsterLevel[i]/127.5)
+					hpMult=hpMult*4*(1+mapvars.uniqueMonsterLevel[i]/127.5)
 				end
 				HP=HP*hpMult
 				
@@ -248,7 +248,7 @@ function recalculateMawMonster()
 				mon.HP=mon.FullHP*HPproportion
 				
 				--damage
-				dmgMult=(uniqueMonsterLevel[i]/9+1.15)*((uniqueMonsterLevel[i]+2)/(oldLevel+2))*(1+(uniqueMonsterLevel[i]/200))
+				dmgMult=(mapvars.uniqueMonsterLevel[i]/9+1.15)*((mapvars.uniqueMonsterLevel[i]+2)/(oldLevel+2))*(1+(mapvars.uniqueMonsterLevel[i]/200))
 				atk1=mon.Attack1
 				atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount = calcDices(oldTable.Attack1.DamageAdd,oldTable.Attack1.DamageDiceSides,oldTable.Attack1.DamageDiceCount,dmgMult)
 				atk2=mon.Attack2
@@ -1522,12 +1522,15 @@ function events.BuildMonsterInformationBox(t)
 	--mon = t.Monster
 	mon=Map.Monsters[Mouse:GetTarget().Index]
 	--show level Below HP
-	if mon.NameId==0 then
-		t.ArmorClass.Text=string.format("Level:          " .. math.round(totalLevel[mon.Id]) .. "\n" .. t.ArmorClass.Text)
-	elseif uniqueMonsterLevel[Mouse:GetTarget().Index] then
-		t.ArmorClass.Text=string.format("Level:          " .. uniqueMonsterLevel[Mouse:GetTarget().Index] .. "\n" .. t.ArmorClass.Text)
-	else
-		t.ArmorClass.Text=string.format("Level:          " .. mon.Level .. "\n" .. t.ArmorClass.Text)
+	mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
+	if t.IdentifiedHitPoints then
+		if mon.NameId==0 then
+			t.ArmorClass.Text=string.format("Level:          " .. math.round(totalLevel[mon.Id]) .. "\n" .. t.ArmorClass.Text)
+		elseif mapvars.uniqueMonsterLevel[Mouse:GetTarget().Index] then
+			t.ArmorClass.Text=string.format("Level:          " .. mapvars.uniqueMonsterLevel[Mouse:GetTarget().Index] .. "\n" .. t.ArmorClass.Text)
+		else
+			t.ArmorClass.Text=string.format("Level:          " .. mon.Level .. "\n" .. t.ArmorClass.Text)
+		end
 	end
 	--difficulty multiplier
 	diff=Game.BolsterAmount/100 or 1
@@ -1555,57 +1558,60 @@ function events.BuildMonsterInformationBox(t)
 		lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit,false,mon.Level))
 		upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit,false,mon.Level))
 	end
-	t.Damage.Text=string.format("Attack 00000	050" .. lowerLimit .. "-" .. upperLimit .. " " .. text)
-	
-	if mon.Attack2Chance>0 and Game.CurrentPlayer>=0 then
-		mean=mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*(mon.Attack2.DamageDiceSides+1)/2
-		range=(mon.Attack2.DamageDiceSides^2*mon.Attack2.DamageDiceCount/12)^0.5*1.96
-		lowerLimit=math.round(math.max(mean-range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount)*diff)
-		upperLimit=math.round(math.min(mean+range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*mon.Attack2.DamageDiceSides)*diff)
-		if not baseDamageValue then
-			lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit,false,mon.Level))
-			upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit,false,mon.Level))
+	if t.IdentifiedDamage or t.IdentifiedAttack then
+		t.Damage.Text=string.format("Attack 00000	050" .. lowerLimit .. "-" .. upperLimit .. " " .. text)
+		if mon.Attack2Chance>0 and Game.CurrentPlayer>=0 then
+			mean=mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*(mon.Attack2.DamageDiceSides+1)/2
+			range=(mon.Attack2.DamageDiceSides^2*mon.Attack2.DamageDiceCount/12)^0.5*1.96
+			lowerLimit=math.round(math.max(mean-range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount)*diff)
+			upperLimit=math.round(math.min(mean+range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*mon.Attack2.DamageDiceSides)*diff)
+			if not baseDamageValue then
+				lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit,false,mon.Level))
+				upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit,false,mon.Level))
+			end
+			text=string.format(table.find(const.Damage,mon.Attack2.Type))
+			
+			t.Damage.Text=string.format(t.Damage.Text .. "\n" .. lowerLimit .. "-" .. upperLimit .. " " .. text)
 		end
-		text=string.format(table.find(const.Damage,mon.Attack2.Type))
-		
-		t.Damage.Text=string.format(t.Damage.Text .. "\n" .. lowerLimit .. "-" .. upperLimit .. " " .. text)
+		--spell
+		if mon.SpellChance>0 and mon.Spell>0 then
+			spellId=mon.Spell
+			spell=Game.Spells[spellId]
+			name=Game.SpellsTxt[spellId].Name
+			skill=SplitSkill(mon.SpellSkill)
+			--get damage multiplier
+			oldLevel=BLevel[mon.Id]
+			local i=mon.Id
+			if i%3==1 then
+				levelMult=Game.MonstersTxt[i+1].Level
+			elseif i%3==0 then
+				levelMult=Game.MonstersTxt[i-1].Level
+			else
+				levelMult=Game.MonstersTxt[i].Level
+			end
+			dmgMult=(levelMult/12+1.15)*((levelMult+10)/(oldLevel+10))*(1+(levelMult/200))
+			
+			--calculate
+			mean=spell.DamageAdd+skill*(spell.DamageDiceSides+1)/2
+			range=(spell.DamageDiceSides^2*skill/12)^0.5*1.96
+			lowerLimit=math.round(math.max(mean-range, spell.DamageAdd+skill)*dmgMult*diff)
+			upperLimit=math.round(math.min(mean+range, spell.DamageAdd+skill*spell.DamageDiceSides)*dmgMult*diff)
+			if not baseDamageValue and Game.CurrentPlayer>=0 then
+				lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit,false,mon.Level))
+				upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit,false,mon.Level))
+			end
+			t.SpellFirst.Text=string.format("Spell00000	040" .. name .. " " .. lowerLimit .. "-" .. upperLimit)
+		end
 	end
-	--spell
-	if mon.SpellChance>0 and mon.Spell>0 then
-		spellId=mon.Spell
-		spell=Game.Spells[spellId]
-		name=Game.SpellsTxt[spellId].Name
-		skill=SplitSkill(mon.SpellSkill)
-		--get damage multiplier
-		oldLevel=BLevel[mon.Id]
-		local i=mon.Id
-		if i%3==1 then
-			levelMult=Game.MonstersTxt[i+1].Level
-		elseif i%3==0 then
-			levelMult=Game.MonstersTxt[i-1].Level
-		else
-			levelMult=Game.MonstersTxt[i].Level
+	if t.IdentifiedHitPoints then
+		if mon.Resistances[0]>=1000 then
+			res=mon.Resistances[0]%1000
+			if t.IdentifiedResistances then
+				t.Resistances[1].Text=string.format("Fire\01200000	070" .. res)
+			end
+			hp=t.Monster.FullHP*2^math.floor(mon.Resistances[0]/1000)
+			t.HitPoints.Text=string.format("02016Hit Points0000000000	100" .. hp)
 		end
-		dmgMult=(levelMult/12+1.15)*((levelMult+10)/(oldLevel+10))*(1+(levelMult/200))
-		
-		--calculate
-		mean=spell.DamageAdd+skill*(spell.DamageDiceSides+1)/2
-		range=(spell.DamageDiceSides^2*skill/12)^0.5*1.96
-		lowerLimit=math.round(math.max(mean-range, spell.DamageAdd+skill)*dmgMult*diff)
-		upperLimit=math.round(math.min(mean+range, spell.DamageAdd+skill*spell.DamageDiceSides)*dmgMult*diff)
-		if not baseDamageValue and Game.CurrentPlayer>=0 then
-			lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit,false,mon.Level))
-			upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit,false,mon.Level))
-		end
-		t.SpellFirst.Text=string.format("Spell00000	040" .. name .. " " .. lowerLimit .. "-" .. upperLimit)
-	end
-	
-	if mon.Resistances[0]>=1000 then
-		res=mon.Resistances[0]%1000
-		t.Resistances[1].Text=string.format("Fire\01200000	070" .. res)
-		hp=t.Monster.FullHP*2^math.floor(mon.Resistances[0]/1000)
-		t.HitPoints.Text=string.format("02016Hit Points0000000000	100" .. hp)
-		
 	end
 end
 
@@ -1879,8 +1885,9 @@ function generateBoss(index,nameIndex)
 	mon.FullHP=HP
 	mon.HP=mon.FullHP
 	mon.Exp=mon.Exp*10
-	uniqueMonsterLevel[index]=math.round(mon.Level*(1.1+math.random()*0.2))
-	mon.Level=math.min(uniqueMonsterLevel[index],255)
+	mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
+	mapvars.uniqueMonsterLevel[index]=math.round(mon.Level*(1.1+math.random()*0.2))
+	mon.Level=math.min(mapvars.uniqueMonsterLevel[index],255)
 	mon.TreasureDiceCount=(mon.Level*100)^0.5
 	mon.TreasureDiceSides=(mon.Level*100)^0.5
 	mon.TreasureItemPercent=100
