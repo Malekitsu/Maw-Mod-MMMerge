@@ -1524,7 +1524,9 @@ function events.BuildMonsterInformationBox(t)
 	--show level Below HP
 	if mon.NameId==0 then
 		t.ArmorClass.Text=string.format("Level:          " .. math.round(totalLevel[mon.Id]) .. "\n" .. t.ArmorClass.Text)
-	else 
+	elseif uniqueMonsterLevel[Mouse:GetTarget().Index] then
+		t.ArmorClass.Text=string.format("Level:          " .. uniqueMonsterLevel[Mouse:GetTarget().Index] .. "\n" .. t.ArmorClass.Text)
+	else
 		t.ArmorClass.Text=string.format("Level:          " .. mon.Level .. "\n" .. t.ArmorClass.Text)
 	end
 	--difficulty multiplier
@@ -1843,7 +1845,7 @@ function events.AfterLoadMap()
 			end
 			for i=0,Map.Monsters.High do
 				local id=Map.Monsters[i].Id
-				if id%3==0 and Game.MonstersTxt[id].AIType~=1 then
+				if id%3==0 and Game.MonstersTxt[id].AIType~=1 and Map.Monsters[i].NameId==0 then
 					table.insert(possibleMonsters,i)
 				end
 			end
@@ -1877,7 +1879,8 @@ function generateBoss(index,nameIndex)
 	mon.FullHP=HP
 	mon.HP=mon.FullHP
 	mon.Exp=mon.Exp*10
-	mon.Level=math.round(math.min(mon.Level*(1.1+math.random()*0.2),255))
+	uniqueMonsterLevel[index]=math.round(mon.Level*(1.1+math.random()*0.2))
+	mon.Level=math.min(uniqueMonsterLevel[index],255)
 	mon.TreasureDiceCount=(mon.Level*100)^0.5
 	mon.TreasureDiceSides=(mon.Level*100)^0.5
 	mon.TreasureItemPercent=100
