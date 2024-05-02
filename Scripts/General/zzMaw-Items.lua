@@ -1650,9 +1650,12 @@ function events.Action(t)
 	if t.Action==133 and Game.freeProgression then
 		partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 		maxItemBolster=(partyLevel)/5+20
+		if not Game.freeProgression then
+			maxItemBolster=maxItemBolster+10
+		end
 		--failsafe
-		if Mouse.Item and Mouse.Item.Charges==0 and Mouse.Item.Bonus==0 and Mouse.Item.MaxCharges>maxItemBolster then
-			Mouse.Item.MaxCharges=0
+		if Mouse.Item and Mouse.Item.Charges==0 and Mouse.Item.Bonus==0 and Mouse.Item.Bonus2==0 and Mouse.Item.MaxCharges>maxItemBolster then
+			Mouse.Item.MaxCharges=math.round(partyLevel/5)
 		end
 	end
 end
@@ -1746,8 +1749,11 @@ function events.BuildItemInformationBox(t)
 	partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 	maxItemBolster=(partyLevel)/5+20
 	--failsafe
-	if Game.freeProgression and t.Item and t.Item.Charges==0 and t.Item.Bonus==0 and t.Item.MaxCharges>maxItemBolster then
-		t.Item.MaxCharges=0
+	if Game.freeProgression and t.Item and t.Item.Charges==0 and t.Item.Bonus==0 and t.Item.Bonus2==0 and t.Item.MaxCharges>maxItemBolster then
+		if not Game.freeProgression then
+			maxItemBolster=maxItemBolster+10
+		end
+		t.Item.MaxCharges=math.round(partyLevel/5)
 	end
 	if t.Description then
 		if Game.CurrentPlayer==-1 then return end
