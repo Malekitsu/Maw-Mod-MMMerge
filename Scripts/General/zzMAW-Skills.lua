@@ -870,51 +870,79 @@ end
 --MAW REGEN, once every 0.1 seconds
 regenHP={0,0,0,0,[0]=0}
 regenSP={0,0,0,0,[0]=0}
+lastHP={}
+lastSP={}
+waitHP={}
+waitSP={}
 function MawRegen()
 	--HP
 	vars.lastRegenTime=vars.lastRegenTime or Game.Time
 	timePassed=Game.Time-vars.lastRegenTime
 	vars.lastRegenTime=Game.Time
 	--call is 20 times per minute, which is 12.8 
-	local timeMultiplier=Game.TurnBased and timePassed/12.8 or 1
+	local timeMultiplier=(Game.TurnBased and timePassed/12.8) or 1
 	for i=0,Party.High do
-		local Cond = Party[i]:GetMainCondition()
+		pl=Party[i]
+		local Cond = pl:GetMainCondition()
 		if Cond == 18 or Cond == 17 or Cond < 14 then
+			lastHP[i]=lastHP[i] or pl.HP
+			waitHP[i]=waitHP[i] or 0
+			mult=1
+			if lastHP[i]>pl.HP then
+				waitHP[i]=200
+			elseif waitHP[i]>0 then
+				waitHP[i]=waitHP[i]-timeMultiplier
+			else
+				mult=2
+			end
 			--regeneration skill
-			local RegS, RegM = SplitSkill(Party[i]:GetSkill(const.Skills.Regeneration))
+			local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Regeneration))
 			if RegM==4 then
 				RegM=5
 			end
-			FHP	= Party[i]:GetFullHP()
+			FHP	= pl:GetFullHP()
 			regenHP[i] = regenHP[i] + FHP^0.5*RegS^1.5*((RegM+1)/2500)*timeMultiplier
 			--regeneration spell
-			Buff=Party[i].SpellBuffs[const.PlayerBuff.Regeneration]
+			Buff=pl.SpellBuffs[const.PlayerBuff.Regeneration]
 			if Buff.ExpireTime > Game.Time then
 				RegS, RegM = SplitSkill(Buff.Skill)
 				regenHP[i] = regenHP[i] + FHP^0.5*RegS^1.3*((RegM+1)/10000)*timeMultiplier -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
 			end
 			
-			Party[i].HP = math.min(FHP, Party[i].HP + regenHP[i])
-			if Party[i].HP>0 then
-				Party[i].Unconscious=0
+			pl.HP = math.min(FHP, pl.HP + regenHP[i]*mult)
+			if pl.HP>0 then
+				pl.Unconscious=0
 			end
 			regenHP[i]=regenHP[i]%1
+			lastHP[i]=pl.HP
 		end
 	end
 	--SP
 	for i=0,Party.High do
-		local Cond = Party[i]:GetMainCondition()
+		pl=Party[i]
+		local Cond = pl:GetMainCondition()
 		if Cond == 18 or Cond == 17 or Cond < 14 then
-			local RegS, RegM = SplitSkill(Party[i]:GetSkill(const.Skills.Meditation))
+			lastSP[i]=lastSP[i] or pl.SP
+			waitSP[i]=waitSP[i] or 0
+			mult=1
+			if lastSP[i]>pl.SP then
+				waitSP[i]=200
+			elseif waitSP[i]>0 then
+				waitSP[i]=waitSP[i]-timeMultiplier
+			else
+				mult=2
+			end
+			local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Meditation))
 			if RegM > 0 then
 				if RegM==4 then
 					RegM=5
 				end
-				FSP	= Party[i]:GetFullSP()
+				FSP	= pl:GetFullSP()
 				regenSP[i] = regenSP[i] + FSP^0.35*RegS^1.4*((RegM+5)/5000) +0.02
-				Party[i].SP = math.min(FSP, Party[i].SP + regenSP[i]*timeMultiplier)
+				pl.SP = math.min(FSP, pl.SP + regenSP[i]*timeMultiplier*s)
 				regenSP[i]=regenSP[i]%1
 			end
+			lastSP[i]=pl.SP
 		end
 	end
 end
