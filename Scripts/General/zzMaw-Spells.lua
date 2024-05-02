@@ -1495,7 +1495,7 @@ function ascension()
 			if spelltier==0 then 
 				spelltier=11
 			end
-			if ascensionLevel>=33 then
+			if s>=33 then
 				ascensionLevel=3
 			elseif spelltier<=s%11  then
 				ascensionLevel=ascensionLevel+1
@@ -1508,8 +1508,6 @@ function ascension()
 			for v=1,4 do
 				healingSpells[healingList[i]].Cost[v]=math.round(healingSpells[healingList[i]].Cost[v]*(1+0.15*ascensionLevel*s)*(1-0.1*m))
 				healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
-				
-				
 			end
 		end
 		--shaman modifier
