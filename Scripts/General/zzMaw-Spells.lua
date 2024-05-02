@@ -1228,13 +1228,13 @@ function ascendSpellDamage(skill, mastery, spell)
 	diceMin=spellPowers[spell].diceMin
 	diceMax=spellPowers[spell].diceMax
 	damageAdd=spellPowers[spell].dmgAdd
-	local ascensionLevel=math.min(math.floor(skill/11),2)
+	local ascensionLevel=math.min(math.floor(skill/11),4)
 	local spelltier=spell%11
 	if spelltier==0 then 
 		spelltier=11
 	end
-	if skill>=33 then
-		ascensionLevel=3
+	if skill>=55 then
+		ascensionLevel=5
 	elseif spelltier<=skill%11  then
 		ascensionLevel=ascensionLevel+1
 	end
@@ -1242,8 +1242,10 @@ function ascendSpellDamage(skill, mastery, spell)
 		-- old formula
 		--diceMax=diceMax * (1+0.04 * skill * ascensionLevel)
 		--damageAdd=damageAdd*(1+skill * (ascensionLevel+1) / 8)
-		diceMax=diceMax * (1+0.05 * skill * ascensionLevel)
-		damageAdd=damageAdd*(1+skill^2 * (ascensionLevel) / 50)
+		--diceMax=diceMax * (1+0.05 * skill * (ascensionLevel+1))
+		--damageAdd=damageAdd*(1+skill^2 / 45 * (ascensionLevel+1)^2)
+		damageAdd=damageAdd*(1+skill*0.125 * 2^(ascensionLevel+1))
+		diceMax=diceMax * (1+0.05 * skill * (ascensionLevel+1))
 		diceMin, diceMax, damageAdd = math.round(diceMin), math.round(diceMax), math.round(damageAdd)
 	end
 	return diceMin, diceMax, damageAdd
@@ -1354,6 +1356,12 @@ function events.Action(t)
 		ascension()
 	end
 end
+
+-----------------------
+--Healing Spells
+-----------------------
+healingSpellList={const.Spells.RemoveCurse,const.Spells.Resurrection,const.Spells.Heal,const.Spells.CureDisease,const.Spells.PowerCure}
+
 function ascension()
 	index=Game.CurrentPlayer
 	if index> Party.High then
@@ -1367,19 +1375,23 @@ function ascension()
 		local s,m = SplitSkill(level)
 		for v=1,#spells do 
 			num=spells[v]
-			local ascensionLevel=math.min(math.floor(s/11),2)
+			local ascensionLevel=math.min(math.floor(s/11),4)
 			local spelltier=num%11
 			if spelltier==0 then 
 				spelltier=11
 			end
-			if s>=33 then
-				ascensionLevel=3
+			if s>=55 then
+				ascensionLevel=5
 			elseif spelltier<=s%11  then
 				ascensionLevel=ascensionLevel+1
 			end
 			if s>=spelltier then
 				for i=1,4 do
-					Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+0.15*ascensionLevel*s)*(1-0.1*m)
+					if table.find(healingSpellList,num) then
+						Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+0.15*ascensionLevel*s)*(1-0.1*m)
+					else
+						Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+s*0.125)*2^(ascensionLevel)*(1-0.125*m)
+					end
 				end
 			else
 				for i=1,4 do
@@ -1445,18 +1457,21 @@ function ascension()
 		Game.SpellsTxt[123].GM=string.format("Damage %s points plus 1-%s points per point of skill",math.round(dmgAddTooltip(s, m,123)/10*12),math.round(diceMaxTooltip(s, m,123)/10*12))
 		
 		for i=1, #spells do
-			local ascensionLevel=math.min(math.floor(s/11),2)
+			local ascensionLevel=math.min(math.floor(s/11),4)
 			local spelltier=spells[i]%11
 			if spelltier==0 then 
 				spelltier=11
 			end
-			if s>=33 then
-				ascensionLevel=3
+			if s>=55 then
+				ascensionLevel=5
 			elseif spelltier<=s%11  then
 				ascensionLevel=ascensionLevel+1
 			end
 			if spells[i]~=44 then
 				if ascensionLevel>=1 then
+					if ascensionLevel==5 then
+						ascensionLevel="max"
+					end
 					Game.SpellsTxt[spells[i]].Description=Game.SpellsTxt[spells[i]].Description .. "\n\nAscension level: " .. ascensionLevel
 				else
 					Game.SpellsTxt[spells[i]].Description=Game.SpellsTxt[spells[i]].Description .. "\n\nNot Ascended"
