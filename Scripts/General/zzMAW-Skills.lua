@@ -1117,6 +1117,7 @@ end
 ]]
 function events.Tick()
 	if Game.CurrentScreen==7 then
+		if Game.CurrentPlayer<0 or Game.CurrentPlayer>Party.High then return end
 		local pl=Party[Game.CurrentPlayer]
 		local race=Game.CharacterPortraits[Party[Game.CurrentPlayer].Face].Race
 		if race==const.Race.Minotaur and not minotaurDetected and (pl.Class<34 or pl.Class>37) then
