@@ -1244,8 +1244,8 @@ function ascendSpellDamage(skill, mastery, spell)
 		--damageAdd=damageAdd*(1+skill * (ascensionLevel+1) / 8)
 		--diceMax=diceMax * (1+0.05 * skill * (ascensionLevel+1))
 		--damageAdd=damageAdd*(1+skill^2 / 45 * (ascensionLevel+1)^2)
-		damageAdd=damageAdd*(1+skill*0.125 * 2^(ascensionLevel+1))
-		diceMax=diceMax * (1+0.05 * skill * (ascensionLevel+1))
+		damageAdd=damageAdd*(1+skill*0.15 * 2^(ascensionLevel+0.5))
+		diceMax=diceMax * (1+0.03 * skill * (ascensionLevel/2+1))
 		diceMin, diceMax, damageAdd = math.round(diceMin), math.round(diceMax), math.round(damageAdd)
 	end
 	return diceMin, diceMax, damageAdd
@@ -1390,7 +1390,7 @@ function ascension()
 					if table.find(healingSpellList,num) then
 						Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+0.15*ascensionLevel*s)*(1-0.1*m)
 					else
-						Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+s*0.125)*2^(ascensionLevel)*(1-0.125*m)
+						Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+s*0.125)*2^(ascensionLevel-1)*(1-0.125*m)
 					end
 				end
 			else
