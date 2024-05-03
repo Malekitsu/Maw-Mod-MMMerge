@@ -265,7 +265,7 @@ function events.BuildStatInformationBox(t)
 		if m==4 then
 			m=5
 		end
-		BBHP=HPScaling*s*m+s^2/2
+		BBHP=HPScaling*s*m+s^2
 		fullHP=Party[index]:GetFullHP()
 		enduranceTotalBonus=math.round(fullHP-fullHP/(1+endurance2/1000))+endEff*HPScaling
 		level=Party[index]:GetLevel()
