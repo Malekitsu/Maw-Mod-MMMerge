@@ -184,7 +184,7 @@ end
 
 --body building description
 function events.GameInitialized2()
-	txt=Skillz.getDesc(27,1) .. "\n\nHit Points are also increased by an amount equal to Skill^2 divided by 2"
+	txt=Skillz.getDesc(27,1) .. "\n\nHit Points are also increased by an amount equal to Skill^2"
 	Skillz.setDesc(27,1,txt)
 end
 
