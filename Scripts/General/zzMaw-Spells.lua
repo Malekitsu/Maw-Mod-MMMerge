@@ -1259,8 +1259,8 @@ function ascendSpellHealing(skill, mastery, spell, healM)
 	if spelltier==0 then 
 		spelltier=11
 	end
-	if skill>=33 then
-		ascensionLevel=3
+	if skill>=55 then
+		ascensionLevel=5
 	elseif spelltier<=skill%11  then
 		ascensionLevel=ascensionLevel+1
 	end
