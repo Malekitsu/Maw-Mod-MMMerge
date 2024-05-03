@@ -2259,7 +2259,7 @@ function itemStats(index)
 		m=5
 	end
 	BBHP=s*m
-	BBBonus=math.round(s^2/2)
+	BBBonus=math.round(s^2)
 	level=pl.LevelBonus+pl.LevelBase
 	hpScaling=Game.Classes.HPFactor[pl.Class]
 	baseHP=Game.Classes.HPBase[pl.Class]+hpScaling*(level+endEff+BBHP)
