@@ -65,7 +65,7 @@ end
 function getHealSpellMultiPlier(pl)
 	local mult=1
 	--crit
-	local critChance, critMult, success=getCritInfo(pl)
+	local critChance, critMult, success=getCritInfo(pl,"heal")
 	if success then
 		mult=critMult
 	end
