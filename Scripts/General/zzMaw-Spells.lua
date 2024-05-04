@@ -2148,14 +2148,14 @@ function events.Tick()
 			Game.SpellsTxt[123].GM=string.format("Damage %s points plus 1-%s points per point of skill",math.round(dmgAddTooltip(level,123)/10*12),math.round(diceMaxTooltip(level,123)/10*12))
 			
 			--remove curse
-			Game.SpellsTxt[49].Master="8 Mana cost: \ncures 24 + 4 HP per point of skill\n1 day limit\n"
-			Game.SpellsTxt[49].GM="16 Mana cost: \ncures 36 + 6 HP per point of skill\nno limit\n"
+			Game.SpellsTxt[49].Master="8 Mana cost: \ncures 12 + 4 HP per point of skill\n1 day limit\n"
+			Game.SpellsTxt[49].GM="16 Mana cost: \ncures 18 + 6 HP per point of skill\nno limit\n"
 			Game.Spells[49]["SpellPointsExpert"]=5
 			Game.Spells[49]["SpellPointsMaster"]=8
 			Game.Spells[49]["SpellPointsGM"]=16
 			--Remove curse matrix
-			curseBase={0,12,24,36}
-			curseScaling={0,2,4,6}
+			curseBase={0,9,12,18}
+			curseScaling={0,3,4,6}
 			if level>=120 then
 				Game.SpellsTxt[49].Master="16 Mana cost: \ncures 36 + 6 HP per point of skill\n1 day limit\n"
 				Game.SpellsTxt[49].GM="32 Mana cost: \ncures 72 + 9 HP per point of skill\nno limit\n"
@@ -2175,9 +2175,9 @@ function events.Tick()
 				
 			--resurrection
 			Game.Spells[55]["SpellPointsGM"]=200
-			resurrectionBase={0,0,0,200}
-			resurrectionScaling={0,0,0,20}
-			Game.SpellsTxt[55].GM="Cures 200 + 20 HP per point of skill"
+			resurrectionBase={0,0,0,50}
+			resurrectionScaling={0,0,0,15}
+			Game.SpellsTxt[55].GM="Cures 50 + 15 HP per point of skill"
 			if level>=160 then
 				Game.SpellsTxt[55].GM="Cures 400 + 30 HP per point of skill"
 				Game.Spells[55]["SpellPointsGM"]=400
@@ -2196,10 +2196,10 @@ function events.Tick()
 			Game.Spells[68]["SpellPointsExpert"]=5
 			Game.Spells[68]["SpellPointsMaster"]=8
 			Game.Spells[68]["SpellPointsGM"]=12
-			lesserHealBase={5,10,15,20}
+			lesserHealBase={10,10,12,15}
 			lesserHealScaling={2,3,4,5}
-			Game.SpellsTxt[68].Master="8 Mana cost: \ncures 15 + 4 HP per point of skill"
-			Game.SpellsTxt[68].GM="12 Mana cost: \ncures 20 + 5 HP per point of skill"
+			Game.SpellsTxt[68].Master="8 Mana cost: \ncures 12 + 4 HP per point of skill"
+			Game.SpellsTxt[68].GM="12 Mana cost: \ncures 15 + 5 HP per point of skill"
 			
 			if level>=88 then
 				Game.SpellsTxt[68].Master="10 Mana cost: \ncures 30 + 5 HP per point of skill"
@@ -2223,24 +2223,24 @@ function events.Tick()
 			Game.Spells[74]["SpellPointsGM"]=25
 			Game.SpellsTxt[74].Master="15 Mana cost: \ncures 25 + 6 HP per point of skill\n1 day limit\n"
 			Game.SpellsTxt[74].GM="25 Mana cost: \ncures 40 + 9 HP per point of skill\nno limit\n"
-			greaterHealBase={0,0,25,40}
-			greaterHealScaling={0,0,6,9}
-			if level>=136 then
-				Game.SpellsTxt[74].Master="35 Mana cost: \ncures 50 + 10 HP per point of skill\n1 day limit\n"
-				Game.SpellsTxt[74].GM="50 Mana cost: \ncures 75 + 13 HP per point of skill\nno limit\n"
-				Game.Spells[74]["SpellPointsMaster"]=35
-				Game.Spells[74]["SpellPointsGM"]=50
-				greaterHealBase={0,12,50,75}
-				greaterHealScaling={0,2,10,13}
-			end
-			if level>=216 then
-				Game.SpellsTxt[74].Master="90 Mana cost: \ncures 100 + 18 HP per point of skill\n1 day limit\n"
-				Game.SpellsTxt[74].GM="125 Mana cost: \ncures 160 + 25 HP per point of skill\nno limit\n"
-				Game.Spells[74]["SpellPointsMaster"]=90
-				Game.Spells[74]["SpellPointsGM"]=125
-				greaterHealBase={0,12,100,160}
-				greaterHealScaling={0,2,18,25}
-			end
+			greaterHealBase={0,0,18,21}
+			greaterHealScaling={0,0,5,7}
+--			if level>=136 then
+--				Game.SpellsTxt[74].Master="35 Mana cost: \ncures 50 + 10 HP per point of skill\n1 day limit\n"
+--				Game.SpellsTxt[74].GM="50 Mana cost: \ncures 75 + 13 HP per point of skill\nno limit\n"
+--				Game.Spells[74]["SpellPointsMaster"]=35
+----				Game.Spells[74]["SpellPointsGM"]=50
+--				greaterHealBase={0,12,50,75}
+---				greaterHealScaling={0,2,10,13}
+--			end
+--			if level>=216 then
+--				Game.SpellsTxt[74].Master="90 Mana cost: \ncures 100 + 18 HP per point of skill\n1 day limit\n"
+--				Game.SpellsTxt[74].GM="125 Mana cost: \ncures 160 + 25 HP per point of skill\nno limit\n"
+--				Game.Spells[74]["SpellPointsMaster"]=90
+--				Game.Spells[74]["SpellPointsGM"]=125
+	--			greaterHealBase={0,12,100,160}
+--				greaterHealScaling={0,2,18,25}
+--			end
 			
 			Game.Spells[77]["SpellPointsGM"]=30
 			powerHealBase = 10
