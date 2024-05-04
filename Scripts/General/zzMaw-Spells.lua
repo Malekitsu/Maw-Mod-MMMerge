@@ -1265,8 +1265,8 @@ function ascendSpellHealing(skill, mastery, spell, healM)
 		ascensionLevel=ascensionLevel+1
 	end
 	if ascensionLevel>0 then
-		scaling=scaling * (1+0.04 * skill * ascensionLevel)
-		base=base*(1+skill * (ascensionLevel+1) / 8)
+		scaling=scaling * (1+0.01 * skill * (1+ascensionLevel/4)
+		base=base*(1+skill*0.15 * 2^(ascensionLevel))
 		scaling, base = math.round(scaling), math.round(base)
 	end
 	return scaling, base
@@ -1388,7 +1388,7 @@ function ascension()
 			if s>=spelltier then
 				for i=1,4 do
 					if table.find(healingSpellList,num) then
-						Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+0.15*ascensionLevel*s)*(1-0.1*m)
+						Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+s*0.125)*2^(ascensionLevel-1)*(1-0.125*m)
 					else
 						Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+s*0.125)*2^(ascensionLevel-1)*(1-0.125*m)
 					end
@@ -1495,8 +1495,8 @@ function ascension()
 			if spelltier==0 then 
 				spelltier=11
 			end
-			if s>=33 then
-				ascensionLevel=3
+			if s>=55 then
+				ascensionLevel=5
 			elseif spelltier<=s%11  then
 				ascensionLevel=ascensionLevel+1
 			end
