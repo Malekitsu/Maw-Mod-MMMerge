@@ -1483,8 +1483,8 @@ function ascension()
 		--Healing Spells
 		-----------------------
 		healingSpells={
-			[const.Spells.RemoveCurse]=	{["Cost"]={0,5,8,16}, ["Base"]={0,10,12,15}, ["Scaling"]={0,3,4,6}},
-			[const.Spells.Resurrection]={["Cost"]={0,0,0,200}, ["Base"]={0,0,0,50}, ["Scaling"]={0,0,0,20}},
+			[const.Spells.RemoveCurse]=	{["Cost"]={0,5,8,10}, ["Base"]={0,10,12,12}, ["Scaling"]={0,3,4,5}},
+			[const.Spells.Resurrection]={["Cost"]={0,0,0,100}, ["Base"]={0,0,0,42}, ["Scaling"]={0,0,0,14}},
 			[const.Spells.Heal]=		{["Cost"]={2,4,5,8}, ["Base"]={10,10,12,12}, ["Scaling"]={2,3,3,4}},
 			[const.Spells.CureDisease]=	{["Cost"]={0,0,15,25}, ["Base"]={0,0,18,21}, ["Scaling"]={0,0,5,7}},
 			[const.Spells.PowerCure]=	{["Cost"]={0,0,0,30}, ["Base"]={0,0,0,10}, ["Scaling"]={0,0,0,2}}
