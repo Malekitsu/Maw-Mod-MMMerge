@@ -1483,11 +1483,11 @@ function ascension()
 		--Healing Spells
 		-----------------------
 		healingSpells={
-			[const.Spells.RemoveCurse]=	{["Cost"]={0,5,8,16}, ["Base"]={0,12,24,36}, ["Scaling"]={0,2,4,6}},
-			[const.Spells.Resurrection]={["Cost"]={0,0,0,200}, ["Base"]={0,0,0,200}, ["Scaling"]={0,0,0,20}},
-			[const.Spells.Heal]=		{["Cost"]={2,4,8,12}, ["Base"]={5,10,15,25}, ["Scaling"]={2,3,4,5}},
-			[const.Spells.CureDisease]=	{["Cost"]={0,0,15,25}, ["Base"]={0,0,25,40}, ["Scaling"]={0,0,6,9}},
-			[const.Spells.PowerCure]=	{["Cost"]={0,0,0,30}, ["Base"]={0,0,0,10}, ["Scaling"]={0,0,0,3}}
+			[const.Spells.RemoveCurse]=	{["Cost"]={0,5,8,16}, ["Base"]={0,10,12,15}, ["Scaling"]={0,3,4,6}},
+			[const.Spells.Resurrection]={["Cost"]={0,0,0,200}, ["Base"]={0,0,0,50}, ["Scaling"]={0,0,0,20}},
+			[const.Spells.Heal]=		{["Cost"]={2,4,8,12}, ["Base"]={10,10,12,15}, ["Scaling"]={2,3,4,5}},
+			[const.Spells.CureDisease]=	{["Cost"]={0,0,15,25}, ["Base"]={0,0,18,21}, ["Scaling"]={0,0,5,7}},
+			[const.Spells.PowerCure]=	{["Cost"]={0,0,0,30}, ["Base"]={0,0,0,10}, ["Scaling"]={0,0,0,2}}
 		}
 		for i=1, 5 do
 			local ascensionLevel=math.min(math.floor(s/11),2)
