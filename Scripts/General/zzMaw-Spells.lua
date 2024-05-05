@@ -1506,7 +1506,7 @@ function ascension()
 				Game.SpellsTxt[healingList[i]].Description=baseHealTooltip[healingList[i]] .. "\n\nNot Ascended"
 			end
 			for v=1,4 do
-				healingSpells[healingList[i]].Cost[v]=math.round(healingSpells[healingList[i]].Cost[v]*(1+0.15*ascensionLevel*s)*(1-0.1*m))
+				healingSpells[healingList[i]].Cost[v]=math.round(healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*2^(max(1, ascensionLevel-1))*(1-0.125*m))
 				healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
 			end
 		end
