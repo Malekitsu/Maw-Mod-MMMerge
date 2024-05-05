@@ -1254,13 +1254,13 @@ end
 function ascendSpellHealing(skill, mastery, spell, healM)
 	base=healingSpells[spell].Base[healM]
 	scaling=healingSpells[spell].Scaling[healM]
-	local ascensionLevel=math.min(math.floor(skill/11),2)
+	local ascensionLevel=math.min(math.floor(skill/11),4)
 	local spelltier=spell%11
 	if spelltier==0 then 
 		spelltier=11
 	end
-	if skill>=33 then
-		ascensionLevel=3
+	if skill>=55 then
+		ascensionLevel=5
 	elseif spelltier<=skill%11  then
 		ascensionLevel=ascensionLevel+1
 	end
@@ -1490,7 +1490,7 @@ function ascension()
 			[const.Spells.PowerCure]=	{["Cost"]={0,0,0,30}, ["Base"]={0,0,0,10}, ["Scaling"]={0,0,0,2}}
 		}
 		for i=1, 5 do
-			local ascensionLevel=math.min(math.floor(s/11),2)
+			local ascensionLevel=math.min(math.floor(s/11),4)
 			local spelltier=healingList[i]%11
 			if spelltier==0 then 
 				spelltier=11
