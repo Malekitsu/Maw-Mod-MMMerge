@@ -1265,8 +1265,8 @@ function ascendSpellHealing(skill, mastery, spell, healM)
 		ascensionLevel=ascensionLevel+1
 	end
 	if ascensionLevel>0 then
-		scaling=scaling * (1+0.01 * skill * (1+ascensionLevel/4))
-		base=base*(1+skill*0.15 * 2^(ascensionLevel))
+		scaling=scaling * (1+0.01 * skill * ascensionLevel)
+		base=base*(1+skill*0.05 * 2^(ascensionLevel))
 		scaling, base = math.round(scaling), math.round(base)
 	end
 	return scaling, base
@@ -1387,11 +1387,7 @@ function ascension()
 			end
 			if s>=spelltier then
 				for i=1,4 do
-					if table.find(healingSpellList,num) then
-						Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+s*0.125)*2^(ascensionLevel-1)*(1-0.125*m)
-					else
-						Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+s*0.125)*2^(ascensionLevel-1)*(1-0.125*m)
-					end
+					Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+s*0.125)*1.5^(ascensionLevel)*(1-0.125*m)
 				end
 			else
 				for i=1,4 do
@@ -1483,11 +1479,11 @@ function ascension()
 		--Healing Spells
 		-----------------------
 		healingSpells={
-			[const.Spells.RemoveCurse]=	{["Cost"]={0,5,8,10}, ["Base"]={0,10,12,12}, ["Scaling"]={0,3,4,5}},
-			[const.Spells.Resurrection]={["Cost"]={0,0,0,100}, ["Base"]={0,0,0,42}, ["Scaling"]={0,0,0,14}},
-			[const.Spells.Heal]=		{["Cost"]={2,4,5,8}, ["Base"]={4,6,6,8}, ["Scaling"]={2,3,4,5}},
-			[const.Spells.CureDisease]=	{["Cost"]={0,0,15,25}, ["Base"]={0,0,10,14}, ["Scaling"]={0,0,7,9}},
-			[const.Spells.PowerCure]=	{["Cost"]={0,0,0,30}, ["Base"]={0,0,0,5}, ["Scaling"]={0,0,0,3}}
+			[const.Spells.RemoveCurse]=    {["Cost"]={0,5,10,20}, ["Base"]={0,10,20,30}, ["Scaling"]={0,3,4,5}},
+            [const.Spells.Resurrection]={["Cost"]={0,0,0,100}, ["Base"]={0,0,0,100}, ["Scaling"]={0,0,0,14}},
+            [const.Spells.Heal]=        {["Cost"]={2,4,8,16}, ["Base"]={10,15,20,25}, ["Scaling"]={1,2,3,4}},
+            [const.Spells.CureDisease]=    {["Cost"]={0,0,15,25}, ["Base"]={0,0,25,40}, ["Scaling"]={0,0,5,7}},
+            [const.Spells.PowerCure]=    {["Cost"]={0,0,0,30}, ["Base"]={0,0,0,10}, ["Scaling"]={0,0,0,3}}
 		}
 		for i=1, 5 do
 			local ascensionLevel=math.min(math.floor(s/11),4)
@@ -1506,10 +1502,10 @@ function ascension()
 				Game.SpellsTxt[healingList[i]].Description=baseHealTooltip[healingList[i]] .. "\n\nNot Ascended"
 			end
 			if ascensionLevel>=1 then
-			for v=1,4 do
-				healingSpells[healingList[i]].Cost[v]=math.round(healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*2^(ascensionLevel-1)*(1-0.125*m))
-				healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
-			end
+				for v=1,4 do
+					healingSpells[healingList[i]].Cost[v]=math.round(healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.5^(ascensionLevel)*(1-0.125*m))
+					healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
+				end
 			end
 		end
 		--shaman modifier
