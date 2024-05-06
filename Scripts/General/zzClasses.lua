@@ -154,6 +154,9 @@ function events.GameInitialized2()
 	Game.ClassDescriptions[53]="Seraphim is a divine warrior, blessed by the gods with otherworldly powers that set him apart from mortal fighters. His origins are shrouded in mystery, but it is said that he was chosen by the divine to carry out their will on the mortal plane. Some whisper that he was born from the union of a mortal and an angel, while others believe that he was created by the gods themselves. Regardless of his origins, there is no denying the power that Seraphim wields, and his presence on the battlefield is a testament to the will of the divine.\n\nProficiency in Plate, Sword, Mace, and Shield (can't dual wield)\n3 HP and 1 mana points gained per level\n\nAbilities:\n\nGods Wrath: Attacks deal extra magic damage based on Light skill (2 damage added per point in Light and Mind)\n\nHoly Strikes: Attacking will heal the most injured party member based on Body skill (2 points per point in Body and Spirit)\n\nDivine Protection: converts 25% of mana into self-healing when facing lethal attacks (2 healing per mana spent), 5 minutes cooldown."
 end
 
+--class ID
+seraphClass={53,54,55}
+
 --body magic will increase healing done on attack
 --bunch of code for healing most injured player
 function indexof(table, value)
@@ -196,8 +199,9 @@ function events.CalcDamageToMonster(t)
 		min_index = indexof({a, b, c, d, e}, min_value)
 		min_index = min_index - 1
 		--Calculate heal value and apply
-		levelBonus=2+math.min(t.Player.LevelBase,250)/50
-		healValue=bodyS*levelBonus+spiritS*levelBonus
+		levelBonus1=spiritM+math.floor(t.Player.LevelBase/100)
+		levelBonus2=bodyM+math.floor(t.Player.LevelBase/100)
+		healValue=(bodyS*levelBonus2+spiritS*levelBonus1)*damageMultiplier[t.PlayerIndex]["Melee"]
 		personality=data.Player:GetPersonality()/2
 		healValue=healValue*(1+personality/1000)
 		--calculate crit
@@ -218,18 +222,22 @@ end
 
 --mind light increases melee damage
 
-function events.CalcStatBonusBySkills(t)
-	if t.Stat==const.Stats.MeleeDamageBase then
-		if t.Player.Class==55 or t.Player.Class==54 or t.Player.Class==53 then
-			light=t.Player:GetSkill(const.Skills.Light)
-			lightS,lightM=SplitSkill(light)
-			--get mind
-			mind=t.Player:GetSkill(const.Skills.Mind)
-			mindS,mindM=SplitSkill(mind)
-			levelBonus=2+math.min(t.Player.LevelBase,250)/100
-			damage=mindS*levelBonus + lightS*levelBonus
-			t.Result=t.Result+damage
-		end
+function events.GameInitialized2()
+	--damage from skills
+	function events.CalcStatBonusByItems(t)
+		if t.Stat==const.Stats.MeleeDamageMax or t.Stat==const.Stats.MeleeDamageMin then
+			if t.Player.Class==55 or t.Player.Class==54 or t.Player.Class==53 then
+				light=t.Player:GetSkill(const.Skills.Light)
+				lightS,lightM=SplitSkill(light)
+				--get mind
+				mind=t.Player:GetSkill(const.Skills.Mind)
+				mindS,mindM=SplitSkill(mind)
+				levelBonus1=mindM+math.floor(t.Player.LevelBase/100)
+				levelBonus2=lightM+math.floor(t.Player.LevelBase/100)
+				damage=mindS*levelBonus1 + lightS*levelBonus2
+				t.Result=t.Result+damage
+			end
+		end	
 	end
 end
 
@@ -288,6 +296,82 @@ function events.CalcDamageToMonster(t)
 		end
 	end
 end
+
+--skill tooltips
+--tooltips
+function events.GameInitialized2()
+	baseSchoolsTxtSERAPH={
+		[16]=Skillz.getDesc(16,1),
+		[17]=Skillz.getDesc(17,1),
+		[18]=Skillz.getDesc(18,1),
+		[19]=Skillz.getDesc(19,1),
+	}
+end
+
+local function seraphSkills(isSeraph, id)
+	if isSeraph then
+		pl=Party[id]
+		
+		local spiritS, spiritM=SplitSkill(pl:GetSkill(const.Skills.Spirit))
+		local mindS, mindM=SplitSkill(pl:GetSkill(const.Skills.Mind))
+		local bodyS, bodyM=SplitSkill(pl:GetSkill(const.Skills.Body))
+		local lightS, lightM=SplitSkill(pl:GetSkill(const.Skills.Light))
+		local lvlBonus=math.floor(pl.LevelBonus/100)
+		--heal tooltips
+		local pers=pl:GetPersonality()
+		local healMult=1+pers/2000
+		local spiritHeal=math.floor((spiritS*(spiritM+lvlBonus))*healMult)
+		local bodyHeal=math.floor((bodyS*(bodyM+lvlBonus))*healMult)
+		local txt=baseSchoolsTxtSERAPH[16] .. "\n\nSeraphim healing upon attack increases depending on Spirit magic, scaling with personality(weapon speed multiplier applies).\nGets 1 bonus heal each 100 levels.\n\n" .. "Current heal from Spirit: " .. StrColor(0,255,0,spiritHeal) .. "\n"
+		Skillz.setDesc(16,1,txt)
+		local txt=baseSchoolsTxtSERAPH[18] .. "\n\nSeraphim healing upon attack increases depending on Body magic, scaling with personality(weapon speed multiplier applies).\nGets 1 bonus heal each 100 levels.\n\n" .. "Current heal from Body: " .. StrColor(0,255,0,bodyHeal) .. "\n"
+		Skillz.setDesc(18,1,txt)
+		
+		--damage tooltip
+		local might=pl:GetMight()
+		local dmgMult=1+might/1000
+		local mindDMG=math.floor((mindS*(mindM+lvlBonus))*dmgMult)
+		local lightDMG=math.floor((lightS*(lightM+lvlBonus))*dmgMult)
+		local txt=baseSchoolsTxtSERAPH[16] .. "\n\nSeraphim damage upon attack increases depending on Mind magic, scaling with might(weapon speed multiplier applies).\nGets 1 bonus damage each 100 levels.\n\n" .. "Current damage from Mind: " .. StrColor(255,0,0,mindDMG) .. "\n"
+		Skillz.setDesc(17,1,txt)
+		local txt=baseSchoolsTxtSERAPH[18] .. "\n\nSeraphim damage upon attack increases depending on Light magic, scaling with might(weapon speed multiplier applies).\nGets 1 bonus damage each 100 levels.\n\n" .. "Current damage from Light: " .. StrColor(255,0,0,lightDMG) .. "\n"
+		Skillz.setDesc(19,1,txt)
+		
+		--tooltips
+		Skillz.setDesc(16,2,"Increases healing by 1 per Skill point")
+		Skillz.setDesc(16,3,"Increases healing by 2 per Skill point")
+		Skillz.setDesc(16,4,"Increases healing by 3 per Skill point")
+		Skillz.setDesc(16,5,"n/a")
+		
+		Skillz.setDesc(17,2,"Increases damage by 1 per Skill point")
+		Skillz.setDesc(17,3,"Increases damage by 2 per Skill point")
+		Skillz.setDesc(17,4,"Increases damage by 3 per Skill point")
+		Skillz.setDesc(17,5,"n/a")
+		
+		Skillz.setDesc(18,2,"Increases healing by 1 per Skill point")
+		Skillz.setDesc(18,3,"Increases healing by 2 per Skill point")
+		Skillz.setDesc(18,4,"Increases healing by 3 per Skill point")
+		Skillz.setDesc(18,5,"n/a")
+		
+		Skillz.setDesc(19,2,"Increases damage by 1 per Skill point")
+		Skillz.setDesc(19,3,"Increases damage by 2 per Skill point")
+		Skillz.setDesc(19,4,"Increases damage by 3 per Skill point")
+		Skillz.setDesc(19,5,"Increases damage by 4 per Skill point")
+	else
+		for key, value in pairs(baseSchoolsTxtSERAPH) do
+			Skillz.setDesc(key,1,value .. "\n")
+			Skillz.setDesc(key,2,"Effects vary per spell")
+			Skillz.setDesc(key,3,"Effects vary per spell")
+			Skillz.setDesc(key,4,"Effects vary per spell")
+			Skillz.setDesc(key,5,"Effects vary per spell")
+		end
+	end
+end
+
+
+
+
+
 
 
 ----------------------------------
@@ -1216,6 +1300,7 @@ end
 function checkSkills(id)
 	shamanSkills(false, id)
 	dkSkills(false, id)
+	seraphSkills(false, id)
 	if id>=0 and id<=Party.High then
 		local class=Party[id].Class
 		if table.find(shamanClass, class) then
@@ -1226,6 +1311,11 @@ function checkSkills(id)
 			dkSkills(true, id)
 			return
 		end
+		if table.find(seraphClass, class) then
+			seraphSkills(true, id)
+			return
+		end
+		
 	end
 end
 --add tooltips
