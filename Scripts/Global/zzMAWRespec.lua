@@ -59,7 +59,7 @@ function RespecSkills(npcID)
 				local lastSkill=2
 				--reset mastery
 				for i=12,20 do
-					p.Skills[i]=p.Skills[i]%64
+					p.Skills[i]=SplitSkill(p.Skills[i])
 				end	
 				while lastSkill>1 do
 					maxSkill=0
@@ -89,8 +89,11 @@ function RespecSkills(npcID)
 				p.SkillPoints=p.SkillPoints+refund
 			end
 		end
-		::continue::
 	end
+	--custom skills
+	local s=SplitSkill(Skillz.get(p,50))
+	p.SkillPoints=p.SkillPoints+ math.max(s*(s+1)/2-1,0)
+	Skillz.set(p,50,1)
 	Message("Your skill points has been reset!")
 end
 
