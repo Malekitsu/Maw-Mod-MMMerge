@@ -28,7 +28,7 @@
 end
 use this only if you need to write a new item size list, due to different game version]] 
 --[[ here code to clean inventory: sometimes items are stored in items even if they don't appear anywhere in the inventory. Use once inventory is empty
-for i=1,Party[2].Inventory.High do
+for i=1,Party[2].Items.High do
 	if Party[2].Items[i].BodyLocation==0 then
 		Party[2].Items[i].Number=0
 	end
