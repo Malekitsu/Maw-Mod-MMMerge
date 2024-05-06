@@ -27,6 +27,14 @@
 	debug.Message(a)
 end
 use this only if you need to write a new item size list, due to different game version]] 
+--[[ here code to clean inventory: sometimes items are stored in items even if they don't appear anywhere in the inventory. Use once inventory is empty
+for i=1,Party[2].Inventory.High do
+	if Party[2].Items[i].BodyLocation==0 then
+		Party[2].Items[i].Number=0
+	end
+end
+]]
+
 
 function events.KeyDown(t)
     if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 103 then
@@ -186,10 +194,9 @@ function sortInventory(all)
 			it.Refundable=itemList[i].Refundable
 			it.Stolen=itemList[i].Stolen
 			it.TemporaryBonus=itemList[i].TemporaryBonus
-			
+			evt.Add("Items", 0) --to give item to proper player
 			Game.CurrentPlayer=lastPlayer
 		end
-		evt.Add("Items", 0)
 	end
 	table.clear(itemList)
 end	
