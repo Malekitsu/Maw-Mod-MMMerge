@@ -1306,9 +1306,16 @@ function events.Action(t)
 				end
 			end
 			if vars.oldPlayerMasteries and vars.oldPlayerMasteries[id] then
-				while m<4 and vars.oldPlayerMasteries[id][t.Param]>m and ((s+1>=learningRequirements[m+1] and not Game.freeProgression) or (s+1>=learningRequirementsNormal[m+1] and Game.freeProgression)) do
-					Party[Game.CurrentPlayer].Skills[t.Param]=JoinSkill(s,m+1)
-					m=m+1
+				if m<4 and vars.oldPlayerMasteries[id][t.Param]>m then
+					if Game.freeProgression or not table.find(horizontalSkills, t.Param) then
+						requirements={0,4,7,10}
+					else
+						requirements={0,6,12,20}
+					end
+					if s+1>=requirements[m+1] then
+						Party[Game.CurrentPlayer].Skills[t.Param]=JoinSkill(s,m+1)
+						m=m+1
+					end
 				end
 			end
 		end
