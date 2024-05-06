@@ -93,7 +93,9 @@ function RespecSkills(npcID)
 	--custom skills
 	local s=SplitSkill(Skillz.get(p,50))
 	p.SkillPoints=p.SkillPoints+ math.max(s*(s+1)/2-1,0)
-	Skillz.set(p,50,1)
+	if s>0 then
+		Skillz.set(p,50,1)
+	end
 	Message("Your skill points has been reset!")
 end
 
