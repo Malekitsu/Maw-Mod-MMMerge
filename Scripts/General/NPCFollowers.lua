@@ -240,8 +240,8 @@ local function HireNPC()
 		end
 
 		if ProfSet then
-			if Party.Gold < ProfSet.Cost or vars.Mode==2 then
-				if vars.Mode==2 then
+			if Party.Gold < ProfSet.Cost or (vars.Mode==2 and GetCurrentHouse()~=1466 and GetCurrentHouse()~=1486) then
+				if vars.Mode==2  and GetCurrentHouse()~=1466 and GetCurrentHouse()~=1486 then
 					Message("I wouldn't join in your reckless adventure, not even for all the wealth in the world.")
 				else
 					Message(Game.GlobalTxt[155])
@@ -482,7 +482,7 @@ function events.GameInitialized2()
 			evt.Global[NPCFollowers.HirePeasantEvent]	= HireRecruit
 
 			Game.NPCTopic[NPCFollowers.DismissNPCTopic]	 = Game.NPCTopic[38]
-			if vars.Mode==2 then
+			if vars.Mode==2 and GetCurrentHouse()~=1466 and GetCurrentHouse()~=1486 then
 				Game.NPCTopic[1680]="Following you would be foolish"
 				Game.NPCTopic[NPCFollowers.HireNPCTopic]	 = Game.NPCTopic[1680]
 				Game.NPCTopic[NPCFollowers.HirePeasantEvent] = Game.NPCTopic[1680]
