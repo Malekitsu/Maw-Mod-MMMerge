@@ -935,10 +935,10 @@ function MawRegen()
 			local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Meditation))
 			if RegM > 0 then
 				if RegM==4 then
-					RegM=10
+					RegM=8
 				end
 				FSP	= pl:GetFullSP()
-				regenSP[i] = regenSP[i] + FSP^0.35*RegS^1.4*((RegM+5)/7000) +0.02
+				regenSP[i] = regenSP[i] + FSP^0.35*RegS^1.4*((RegM+5)/6000) +0.02
 				pl.SP = math.min(FSP, pl.SP + regenSP[i]*timeMultiplier*mult)
 				regenSP[i]=regenSP[i]%1
 			end
