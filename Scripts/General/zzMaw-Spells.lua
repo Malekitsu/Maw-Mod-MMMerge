@@ -1485,9 +1485,9 @@ function ascension()
 		healingSpells={
 			[const.Spells.RemoveCurse]=	{["Cost"]={0,5,8,10}, ["Base"]={0,10,12,12}, ["Scaling"]={0,3,4,5}},
 			[const.Spells.Resurrection]={["Cost"]={0,0,0,100}, ["Base"]={0,0,0,42}, ["Scaling"]={0,0,0,14}},
-			[const.Spells.Heal]=		{["Cost"]={2,4,5,8}, ["Base"]={10,10,12,12}, ["Scaling"]={2,3,3,4}},
-			[const.Spells.CureDisease]=	{["Cost"]={0,0,15,25}, ["Base"]={0,0,18,21}, ["Scaling"]={0,0,5,7}},
-			[const.Spells.PowerCure]=	{["Cost"]={0,0,0,30}, ["Base"]={0,0,0,10}, ["Scaling"]={0,0,0,2}}
+			[const.Spells.Heal]=		{["Cost"]={2,4,5,8}, ["Base"]={4,6,6,8}, ["Scaling"]={2,3,4,5}},
+			[const.Spells.CureDisease]=	{["Cost"]={0,0,15,25}, ["Base"]={0,0,10,14}, ["Scaling"]={0,0,7,9}},
+			[const.Spells.PowerCure]=	{["Cost"]={0,0,0,30}, ["Base"]={0,0,0,5}, ["Scaling"]={0,0,0,3}}
 		}
 		for i=1, 5 do
 			local ascensionLevel=math.min(math.floor(s/11),4)
