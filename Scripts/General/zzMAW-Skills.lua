@@ -909,7 +909,7 @@ function MawRegen()
 				regenHP[i] = regenHP[i] + FHP^0.5*RegS^1.3*((RegM+1)/10000)*timeMultiplier -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
 			end
 			
-			pl.HP = math.min(FHP, pl.HP + regenHP[i]*mult)
+			pl.HP = math.min(FHP, pl.HP + math.floor(regenHP[i])*mult)
 			if pl.HP>0 then
 				pl.Unconscious=0
 			end
@@ -939,7 +939,7 @@ function MawRegen()
 				end
 				FSP	= pl:GetFullSP()
 				regenSP[i] = regenSP[i] + FSP^0.35*RegS^1.4*((RegM+5)/6000) +0.02
-				pl.SP = math.min(FSP, pl.SP + regenSP[i]*timeMultiplier*mult)
+				pl.SP = math.min(FSP, pl.SP + math.floor(regenSP[i]*timeMultiplier)*mult)
 				regenSP[i]=regenSP[i]%1
 			end
 			lastSP[i]=pl.SP
