@@ -1124,43 +1124,43 @@ function events.GameInitialized2()
 	--if you change diceMin or values that are 0 remember to update the tooltip manually 
 	spellPowers =
 		{
-			[2] = {dmgAdd =12, diceMin = 1, diceMax = 3, },--fire bolt
-			[6] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--fireball
-			[7] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--fire spike, the only spell with damage depending on mastery, fix in events.calcspelldamage
-			[8] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--immolation
-			[9] = {dmgAdd = 6, diceMin = 1, diceMax = 1, },--meteor shower
-			[10] = {dmgAdd = 12, diceMin = 2, diceMax = 2, },--inferno
-			[11] = {dmgAdd = 32, diceMin = 1, diceMax = 21, },--incinerate
-			[15] = {dmgAdd = 3, diceMin = 2, diceMax = 2, },--sparks
-			[18] = {dmgAdd = 15, diceMin = 1, diceMax = 9, },--lightning bolt
-			[20] = {dmgAdd = 20, diceMin = 1, diceMax = 16, },--implosion
-			[22] = {dmgAdd = 8, diceMin = 1, diceMax = 1, },--starburst
-			[24] = {dmgAdd = 4, diceMin = 1, diceMax = 2, },--poison spray
-			[26] = {dmgAdd = 15, diceMin = 1, diceMax = 5, },--ice bolt
-			[29] = {dmgAdd = 12, diceMin = 1, diceMax = 9, },--acid burst
-			[32] = {dmgAdd = 6, diceMin = 1, diceMax = 6, },--ice blast
-			[37] = {dmgAdd = 16, diceMin = 1, diceMax = 4, },--deadly swarm
-			[39] = {dmgAdd = 12, diceMin = 1, diceMax = 8, },--blades
+			[2] = {dmgAdd =8, diceMin = 1, diceMax = 1, },--fire bolt
+			[6] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--fireball
+			[7] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--fire spike, the only spell with damage depending on mastery, fix in events.calcspelldamage
+			[8] = {dmgAdd = 16, diceMin = 1, diceMax = 10, },--immolation
+			[9] = {dmgAdd = 8, diceMin = 1, diceMax = 1, },--meteor shower
+			[10] = {dmgAdd = 12, diceMin = 1, diceMax = 7, },--inferno
+			[11] = {dmgAdd = 18, diceMin = 1, diceMax = 18, },--incinerate
+			[15] = {dmgAdd = 6, diceMin = 1, diceMax = 2, },--sparks
+			[18] = {dmgAdd = 13, diceMin = 1, diceMax = 8, },--lightning bolt
+			[20] = {dmgAdd = 20, diceMin = 1, diceMax = 12, },--implosion
+			[22] = {dmgAdd = 20, diceMin = 1, diceMax = 1, },--starburst
+			[24] = {dmgAdd = 5, diceMin = 1, diceMax = 2, },--poison spray
+			[26] = {dmgAdd = 6, diceMin = 1, diceMax = 6, },--ice bolt
+			[29] = {dmgAdd = 2, diceMin = 1, diceMax = 12, },--acid burst
+			[32] = {dmgAdd = 5, diceMin = 1, diceMax = 5, },--ice blast
+			[37] = {dmgAdd = 5, diceMin = 1, diceMax = 5, },--deadly swarm
+			[39] = {dmgAdd = 7, diceMin = 1, diceMax = 7, },--blades
 			[41] = {dmgAdd = 8, diceMin = 1, diceMax = 8, },--rock blast
-			[43] = {dmgAdd = 0, diceMin = 1, diceMax = 5, },--death blossom
+			[43] = {dmgAdd = 0, diceMin = 1, diceMax = 12, },--death blossom
 			[44] = {dmgAdd = 15, diceMin = 0.5, diceMax = 0.5, },--mass distorsion, nerfed
-			[52] = {dmgAdd = 10, diceMin = 2, diceMax = 12, },--spirit lash
-			[59] = {dmgAdd = 12, diceMin = 1, diceMax = 7, },--mind blast
-			[65] = {dmgAdd = 45, diceMin = 1, diceMax = 30, },--psychic shock
-			[70] = {dmgAdd = 8, diceMin = 1, diceMax = 4, },--harm
-			[76] = {dmgAdd = 30, diceMin = 1, diceMax = 11, },--flying fist
-			[78] = {dmgAdd = 12, diceMin = 1, diceMax = 4, },--light bolt
-			[79] = {dmgAdd = 16, diceMin = 1, diceMax = 16, },--destroy undead
+			[52] = {dmgAdd = 10, diceMin = 2, diceMax = 8, },--spirit lash
+			[59] = {dmgAdd = 16, diceMin = 1, diceMax = 3, },--mind blast
+			[65] = {dmgAdd = 25, diceMin = 1, diceMax = 25, },--psychic shock
+			[70] = {dmgAdd = 4, diceMin = 1, diceMax = 4, },--harm
+			[76] = {dmgAdd = 20, diceMin = 1, diceMax = 5, },--flying fist
+			[78] = {dmgAdd = 12, diceMin = 1, diceMax = 2, },--light bolt
+			[79] = {dmgAdd = 12, diceMin = 1, diceMax = 8, },--destroy undead
 			[84] = {dmgAdd = 25, diceMin = 2, diceMax = 2, },--prismatic light
-			[87] = {dmgAdd = 60, diceMin = 1, diceMax = 20, },--sunray
-			[90] = {dmgAdd = 25, diceMin = 1, diceMax = 10, },--toxic cloud
-			[93] = {dmgAdd = 0, diceMin = 1, diceMax = 6, },--shrapmetal
-			[97] = {dmgAdd = 0, diceMin = 1, diceMax = 25, },--dragon breath
+			[87] = {dmgAdd = 50, diceMin = 1, diceMax = 50, },--sunray
+			[90] = {dmgAdd = 15, diceMin = 1, diceMax = 9, },--toxic cloud
+			[93] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--shrapmetal
+			[97] = {dmgAdd = 0, diceMin = 1, diceMax = 28, },--dragon breath
 			[98] = {dmgAdd = 50, diceMin = 1, diceMax = 1, },--armageddon
-			[99] = {dmgAdd = 50, diceMin = 1, diceMax = 5, },--souldrinker
-			[103] = {dmgAdd = 60, diceMin = 1, diceMax = 40, },--darkfire bolt
-			[111] = {dmgAdd = 15, diceMin = 1, diceMax = 6, },--lifedrain scales with mastery, fixed in calcspelldamage
-			[123] = {dmgAdd = 10, diceMin = 1, diceMax = 10, },--flame blast scales with mastery, fixed in calcspelldamage
+			[99] = {dmgAdd = 25, diceMin = 1, diceMax = 5, },--souldrinker
+			[103] = {dmgAdd = 46, diceMin = 1, diceMax = 28, },--darkfire bolt
+			[111] = {dmgAdd = 18, diceMin = 1, diceMax = 6, },--lifedrain scales with mastery, fixed in calcspelldamage
+			[123] = {dmgAdd = 0, diceMin = 1, diceMax = 25, },--flame blast scales with mastery, fixed in calcspelldamage
 		}
 end
 
