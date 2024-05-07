@@ -1667,7 +1667,7 @@ function events.GameInitialized2()
 			[87] = {dmgAdd = 50, diceMin = 1, diceMax = 50, },--sunray
 			[90] = {dmgAdd = 15, diceMin = 1, diceMax = 9, },--toxic cloud
 			[93] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--shrapmetal
-			[97] = {dmgAdd = 0, diceMin = 1, diceMax = 28, },--dragon breath
+			[97] = {dmgAdd = 0, diceMin = 1, diceMax = 18, },--dragon breath
 			[98] = {dmgAdd = 50, diceMin = 1, diceMax = 1, },--armageddon
 			[99] = {dmgAdd = 25, diceMin = 1, diceMax = 5, },--souldrinker
 			[103] = {dmgAdd = 46, diceMin = 1, diceMax = 28, },--darkfire bolt
