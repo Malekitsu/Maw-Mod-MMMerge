@@ -3093,6 +3093,7 @@ end
 --chests blocked if trapped
 function events.CanOpenChest(t)
 	if vars.Mode==2 then
+		if Map.Chests[t.ChestId].Trapped then return end
 		local skillRequired=Game.MapStats[Map.MapStatsIndex].Lock
 		if skillRequired>=4 then 
 			skillRequired=skillRequired*2
