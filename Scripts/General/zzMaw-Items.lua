@@ -3149,3 +3149,43 @@ function events.GetShopItemTreatment(t)
 		end
 	end
 end
+
+--convert gems, from lower to highest
+--NAMES
+local craftingNames={"Moonstone", "Topaz", "Amethyst", "Amber", "Purple Topaz", "Ruby", "Sunstone", "Emerald", "Sapphire", "Diamond"}
+function events.KeyDown(t)
+	if t.Key ~=85 then
+		gemUpgrading=false
+	end
+    if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 103 then
+		if t.Key ==85 and gemUpgrading then
+			gemUpgrading=false
+			for i=1,9 do
+				local id=1050+i
+				if evt.CheckItemsCount{MinItemIndex = id, MaxItemIndex = id, Count = 3} then
+					evt.Subtract("Items",id)
+					evt.Subtract("Items",id)
+					evt.Subtract("Items",id)
+					evt.Add("Items",id+1)
+					Game.ShowStatusText(string.format("%s created", craftingNames[i+1]))
+					return
+				end
+			end
+			Game.ShowStatusText("No gem to upgrade")
+			return
+		end
+		
+        if t.Key == 85 then -- "u" key
+            gemUpgrading=true
+            for i=1,9 do
+				local id=1050+i
+				if evt.CheckItemsCount{MinItemIndex = id, MaxItemIndex = id, Count = 3} then
+					Game.ShowStatusText(string.format("Convert %s into %s? (U)",craftingNames[i], craftingNames[i+1]))
+					return
+				end
+			end
+			Game.ShowStatusText("No gem to upgrade")
+			return
+        end
+    end
+end
