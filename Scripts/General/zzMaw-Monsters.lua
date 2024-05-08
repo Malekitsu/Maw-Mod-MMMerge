@@ -571,7 +571,7 @@ function recalculateMonsterTable()
 				actualHP=math.round(actualHP/2)
 				hpOvercap=hpOvercap+1
 			end
-			mon.Resistances[0]=mon.Resistances[0]+hpOvercap*1000
+			mon.Resistances[0]=mon.Resistances[0]%1000+hpOvercap*1000
 			mon.HP=actualHP
 			mon.FullHP=actualHP
 			if mon.FullHP>1000 then
@@ -579,6 +579,7 @@ function recalculateMonsterTable()
 				mon.HP=math.round(mon.HP/10)*10
 			end
 		else
+			mon.Resistances[0]=mon.Resistances[0]%1000
 			mon=Game.MonstersTxt[i]
 			mon.HP=HPtable[i]
 			mon.FullHP=HPtable[i]
@@ -2052,8 +2053,10 @@ function events.Tick()
 			if not swiftLocation[i] then
 				swiftLocation[i]={mon.X,mon.Y}
 			end
-			mon.X=mon.X + (mon.X-swiftLocation[i][1])
-			mon.Y=mon.Y + (mon.Y-swiftLocation[i][2])
+			if abs(mon.X-swiftLocation[i][1])<100 and abs(mon.Y-swiftLocation[i][2])<100 then
+				mon.X=mon.X + (mon.X-swiftLocation[i][1])
+				mon.Y=mon.Y + (mon.Y-swiftLocation[i][2])
+			end
 			swiftLocation[i][1]=mon.X
 			swiftLocation[i][2]=mon.Y
 		end
