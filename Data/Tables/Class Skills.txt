@@ -34,7 +34,7 @@ DisarmTraps	B	E	M	M	B	B	B	B	M	G	B	B	B	B	B	B	B	B	E	E	M	M	B	E	M	M	B	B	B	B	E	E	E	E	
 Dodging	E	E	E	E	-	-	-	-	E	E	-	-	-	-	-	-	E	E	E	E	-	-	M	M	G	G	B	B	B	B	E	E	E	E	M	M	M	M	-	-	E	E	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
 Unarmed	B	B	B	B	-	-	-	-	-	-	-	-	-	-	-	-	E	E	E	E	E	E	M	M	G	G	B	B	B	B	B	B	B	B	E	E	E	E	E	E	B	B	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	E	M	M
 IdentifyMonster	B	B	B	B	M	G	G	G	B	B	M	M	E	E	E	E	E	E	E	E	B	B	E	E	E	E	B	B	B	B	M	M	G	G	B	B	B	B	E	E	M	G	M	M	M	M	M	M	B	B	E	M	M	B	B	B	E	E	E	M	M	G
-Armsmaster	E	E	M	M	E	E	E	E	E	E	-	-	B	B	B	B	M	M	G	G	-	-	M	M	M	M	E	M	M	M	E	E	E	E	M	M	M	M	M	M	E	M	-	-	-	-	-	-	-	-	B	-	-	-	-	-	-	-	-	E	E	E
+Armsmaster	E	E	M	M	E	E	E	E	E	E	-	-	B	B	B	B	M	M	G	G	-	-	M	M	M	M	E	M	M	M	E	E	E	E	M	M	G	G	M	M	M	G	-	-	-	-	-	-	-	-	B	-	-	-	-	-	-	-	-	E	E	E
 Stealing	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	B	B	E	E	-	-	-	-	E	E	E	E	M	M	G	G	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
 Alchemy	E	E	E	E	E	E	E	E	M	G	M	M	M	M	G	G	B	B	B	B	B	B	M	M	G	G	B	E	E	E	M	G	G	G	M	M	G	G	B	B	M	G	M	M	M	G	G	G	B	B	E	G	M	B	B	B	M	M	G	E	E	E
 Learning	M	M	G	M	M	M	G	G	M	G	M	G	M	M	G	G	-	-	-	-	M	G	M	M	G	G	M	M	G	G	M	M	G	G	-	M	G	G	-	-	M	G	M	M	M	G	G	G	B	B	G	G	M	M	M	G	-	-	-	M	M	G
