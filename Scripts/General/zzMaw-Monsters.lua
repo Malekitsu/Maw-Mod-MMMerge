@@ -1758,7 +1758,24 @@ function events.MonsterKilled(mon)
 			if not Game.freeProgression then
 				mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)
 			end
-			experience=math.ceil(m^0.7*(mapLevel^1.8+mapLevel*20)/3/1000)*1000  
+			experience=math.ceil(m^0.7*(mapLevel^1.8+mapLevel*20)/3/1000)*1000
+			--bolster code
+			bonusExp=experience
+			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
+			local currentLVL=calcLevel(bonusExp + vars.EXPBEFORE)
+				
+			if currentWorld==1 then
+				vars.MM8LVL = vars.MM8LVL + currentLVL - vars.LVLBEFORE
+			elseif currentWorld==2 then
+				vars.MM7LVL = vars.MM7LVL + currentLVL - vars.LVLBEFORE
+			elseif currentWorld==3 then
+				vars.MM6LVL = vars.MM6LVL + currentLVL - vars.LVLBEFORE
+			elseif currentWorld==4 then
+				vars.MMMLVL = vars.MMMLVL + currentLVL - vars.LVLBEFORE
+			end
+			vars.EXPBEFORE = vars.EXPBEFORE + bonusExp
+			vars.LVLBEFORE = calcLevel(vars.EXPBEFORE)
+			--end
 			gold=math.ceil(experience^0.9/1000)*1000 
 			evt.ForPlayer(0)
 			evt.Add{"Gold", Value = gold}
@@ -2053,7 +2070,7 @@ function events.Tick()
 			if not swiftLocation[i] then
 				swiftLocation[i]={mon.X,mon.Y}
 			end
-			if abs(mon.X-swiftLocation[i][1])<100 and abs(mon.Y-swiftLocation[i][2])<100 then
+			if math.abs(mon.X-swiftLocation[i][1])<100 and math.abs(mon.Y-swiftLocation[i][2])<100 then
 				mon.X=mon.X + (mon.X-swiftLocation[i][1])
 				mon.Y=mon.Y + (mon.Y-swiftLocation[i][2])
 			end
