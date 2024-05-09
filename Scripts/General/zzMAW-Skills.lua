@@ -901,15 +901,15 @@ function MawRegen()
 				RegM=5
 			end
 			FHP	= pl:GetFullHP()
-			regenHP[i] = regenHP[i] + FHP^0.5*RegS^1.5*((RegM+1)/2500)*timeMultiplier
+			regenHP[i] = regenHP[i] + (FHP^0.5*RegS^1.5*((RegM+1)/2500))* timeMultiplier * mult
 			--regeneration spell
 			Buff=pl.SpellBuffs[const.PlayerBuff.Regeneration]
 			if Buff.ExpireTime > Game.Time then
 				RegS, RegM = SplitSkill(Buff.Skill)
-				regenHP[i] = regenHP[i] + FHP^0.5*RegS^1.3*((RegM+1)/10000)*timeMultiplier -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
+				regenHP[i] = regenHP[i] + (FHP^0.5*RegS^1.3*((RegM+1)/10000))* timeMultiplier * mult -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
 			end
-			
-			pl.HP = math.min(FHP, pl.HP + math.floor(regenHP[i])*mult)
+			regenHP[i] = regenHP[i] 
+			pl.HP = math.min(FHP, pl.HP + math.floor(regenHP[i]))
 			if pl.HP>0 then
 				pl.Unconscious=0
 			end
@@ -938,8 +938,8 @@ function MawRegen()
 					RegM=8
 				end
 				FSP	= pl:GetFullSP()
-				regenSP[i] = regenSP[i] + FSP^0.35*RegS^1.4*((RegM+5)/6000) +0.02
-				pl.SP = math.min(FSP, pl.SP + math.floor(regenSP[i]*timeMultiplier)*mult)
+				regenSP[i] = regenSP[i] + (FSP^0.35*RegS^1.4*((RegM+5)/6000) +0.02)*timeMultiplier*mult
+				pl.SP = math.min(FSP, pl.SP + math.floor(regenSP[i]))
 				regenSP[i]=regenSP[i]%1
 			end
 			lastSP[i]=pl.SP
@@ -1563,3 +1563,44 @@ end
 function events.Action()
 	Game.NPCText[128]="You don't meet the requirements, and cannot be taught until you do."	
 end
+
+--[[running
+function events.KeyDown(t)
+	if t.Key ==18 then
+		running=true
+	end
+	if running and t.Key==67 then
+		sliding=true
+	end
+end
+function events.KeyUp(t)
+	if t.Key ==18 then
+		running=false
+	end
+	if t.Key==67 then
+		sliding=false
+	end
+end
+
+function events.Tick()
+	if not sliding then
+		lockMovementX=nil
+		lockMovementY=nil
+		lockMovementZ=nil
+	end
+	if running and not sliding then
+		vars.lastX=vars.lastX or Party.X
+		vars.lastY=vars.lastY or Party.Y
+		push1=(Party.X-vars.lastX)
+		push2=(Party.Y-vars.lastY)
+		Party.X=Party.X+ push1*0.5
+		Party.Y=Party.Y+ push2*0.5
+	end
+	if running and sliding then
+		Party.X=vars.lastX+ push1*1.5
+		Party.Y=vars.lastY+ push2*1.5
+	end
+	vars.lastX=Party.X
+	vars.lastY=Party.Y
+end
+]]
