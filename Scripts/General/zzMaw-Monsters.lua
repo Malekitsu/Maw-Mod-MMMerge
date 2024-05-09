@@ -232,7 +232,7 @@ function recalculateMawMonster()
 					hpMult=hpMult*3
 				end
 				if Game.BolsterAmount==600 then
-					hpMult=hpMult*4*(1+mapvars.uniqueMonsterLevel[i]/127.5)
+					hpMult=hpMult*3.5*(1+mapvars.uniqueMonsterLevel[i]^1.15/127.5)
 				end
 				HP=HP*hpMult
 				
@@ -493,7 +493,7 @@ function recalculateMonsterTable()
 			hpMult=hpMult*3
 		end
 		if Game.BolsterAmount==600 then
-			hpMult=hpMult*4*(1+totalLevel[i]/127.5)
+			hpMult=hpMult*3.5*(1+totalLevel[i]^1.15/127.5)
 		end
 		
 		HPtable[i]=HPtable[i]*hpMult
