@@ -420,7 +420,11 @@ function events.ItemGenerated(t)
 		
 		--legendary
 		if t.Item.BonusExpireTime==2 then
-			if math.random(1,5)==5 then
+			local chance=0.1
+			if vars.Mode==2 then
+				chance=0.2
+			end
+			if chance>=math.random() then
 				--roll legendary effect
 				local roll=math.random(11,#legendaryEffects)
 				t.Item.BonusExpireTime=roll
