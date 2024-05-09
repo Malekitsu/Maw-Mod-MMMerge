@@ -476,7 +476,7 @@ reagentList={
 }
 function events.Tick()
 	alcBonus=alcBonus or {}
-	if Game.CurrentPlayer<0 then 
+	if Game.CurrentPlayer<0 or Game.CurrentPlayer>Party.High then 
 		return
 	end
 	alcBonus[Party[Game.CurrentPlayer]:GetIndex()]=0
