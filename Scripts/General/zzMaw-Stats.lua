@@ -304,9 +304,9 @@ function events.BuildStatInformationBox(t)
 		local skill=Party[i]:GetSkill(const.Skills.Meditation)
 		local s,m=SplitSkill(skill)
 		if m==4 then
-			m=5
+			m=8
 		end
-		local medRegen = math.round(fullSP^0.35*s^1.4*(m+5)/50)+2
+		local medRegen = math.round(fullSP^0.35*s^1.4*(m+5)/60)+2
 		local SPregenItem=0
 		local bonusregen=0
 		for it in Party[i]:EnumActiveItems() do
