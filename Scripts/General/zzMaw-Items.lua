@@ -791,7 +791,7 @@ function events.BuildItemInformationBox(t)
 						end
 						local ac=Game.ItemsTxt[t.Item.Number].Mod2+Game.ItemsTxt[t.Item.Number].Mod1DiceCount 
 						local ac2=Game.ItemsTxt[t.Item.Number+lookup].Mod2+Game.ItemsTxt[t.Item.Number+lookup].Mod1DiceCount 
-						local bonusAC=ac2*(t.Item.MaxCharges/20)
+						local bonusAC=ac2*(t.Item.MaxCharges/40)
 						--if t.Item.MaxCharges <= 20 then
 							ac=ac3+math.round(bonusAC)
 						--else
@@ -2092,17 +2092,44 @@ function itemStats(index)
 	for i=1,50 do
 		tab[i]=0
 	end
-	
-	
+	--used for armor skill	
+	shieldAC=0
+	armorAC=0
+	--iterate items and get bonuses
 	for it in pl:EnumActiveItems() do
-		--bolster mult
-		mult=1
-		--if it.MaxCharges <= 20 then
-			mult=1+it.MaxCharges/20
-		--else
-		--	mult=2+2*(it.MaxCharges-20)/20
-		--end
 		
+		local txt=it:T()
+		if (txt.Skill>=8 and txt.Skill<=11) or (txt.Skill==40 and txt.EquipStat~=12) then --AC from items
+			local mult=0
+			local resMult=0
+			local skill=it:T().Skill
+			local slot=it:T().EquipStat
+						
+			local ac=txt.Mod1DiceCount+txt.Mod2
+			local acBonus=ac
+			if it.MaxCharges>0 then 
+				local ac2=referenceAC[it.Number]
+				local bonusAC=ac2*(it.MaxCharges/40)
+				acBonus=ac+math.round(bonusAC)
+			end
+			--artifacts
+			if table.find(artArmors,it.Number) then 
+				artifactMult=artifactPowerMult(pl.LevelBase)
+				acBonus=math.ceil(acBonus*artifactMult)
+			end
+
+			acBonus=math.round(acBonus*(1+mult))
+			--used later
+			if skill==8 then
+				shieldAC=shieldAC+acBonus
+			else
+				armorAC=armorAC+acBonus
+			end
+			tab[10]=tab[10]+acBonus
+		end
+				
+		--bolster mult
+		mult=1+it.MaxCharges/20
 		if it.Bonus>0 then 
 			if it.Bonus<=16 then
 				tab[it.Bonus]=tab[it.Bonus]+it.BonusStrength
@@ -2141,27 +2168,7 @@ function itemStats(index)
 			end
 		end
 
-		--armors
-		local txt=it:T()
-		if (txt.Skill>=8 and txt.Skill<=11) or (txt.Skill==40 and txt.EquipStat~=12) then --AC from items
-			local ac=txt.Mod1DiceCount+txt.Mod2
-			local acBonus=ac
-			if it.MaxCharges>0 then 
-				local ac2=referenceAC[it.Number]
-				local bonusAC=ac2*(it.MaxCharges/20)
-				--if it.MaxCharges <= 20 then
-					acBonus=ac+math.round(bonusAC)
-				--else
-				--	acBonus=ac+math.round((ac+ac2)*(it.MaxCharges/20))
-				--end
-			end
-			--artifacts
-			if table.find(artArmors,it.Number) then 
-				artifactMult=artifactPowerMult(pl.LevelBase)
-				acBonus=math.ceil(acBonus*artifactMult)
-			end
-			tab[10]=tab[10]+acBonus
-		end
+		
 		--weapons
 		if txt.Skill <= 6 or txt.Skill==39 then
 			local bonus = txt.Mod2
@@ -2227,6 +2234,32 @@ function itemStats(index)
 			end
 		end
 	end	
+	
+	--armor skill multiplier
+	local armorMult=0
+	local resMult=0
+	local it=pl:GetActiveItem(3)
+	if it then
+		bodyArmorSkill=it:T().Skill
+		bodyS, bodyM=SplitSkill(pl:GetSkill(bodyArmorSkill))
+		armorMult=skillItemAC[bodyArmorSkill][bodyM]*bodyS/100
+		armorResMult=skillItemRes[bodyArmorSkill][bodyM]*bodyS/100
+	end
+	local s,m=SplitSkill(pl:GetSkill(const.Skills.Shield))
+	local shieldMult=(skillItemAC[const.Skills.Shield][m]*s/100)
+	local shieldResMult=(skillItemRes[const.Skills.Shield][m]*s/100)
+	
+	itemArmorClassBonus1=math.round(armorAC*armorMult)
+	itemArmorClassBonus2=math.round(shieldAC*shieldMult)
+	tab[10]=tab[10]+itemArmorClassBonus1+itemArmorClassBonus2
+	
+	itemResistanceBonus1=math.round(armorAC*armorResMult) 
+	itemResistanceBonus2=math.round(shieldAC*shieldResMult)
+	
+	for i=11,16 do
+		tab[i]=tab[i]+itemResistanceBonus1+itemResistanceBonus2
+	end
+	
 	--------------
 	--end of items
 	--------------
