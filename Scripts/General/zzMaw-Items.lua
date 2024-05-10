@@ -584,8 +584,7 @@ function events.GameInitialized2()
 	--increase shield value
 			Game.ItemsTxt[i].Mod2=Game.ItemsTxt[i].Mod2*2+Game.ItemsTxt[i].Mod1DiceCount  
 		end
-	end
-	
+	end	
 end
 
 
@@ -2237,7 +2236,9 @@ function itemStats(index)
 	
 	--armor skill multiplier
 	local armorMult=0
-	local resMult=0
+	local armorResMult=0
+	local shieldMult=0
+	local shieldResMult=0
 	local it=pl:GetActiveItem(3)
 	if it then
 		bodyArmorSkill=it:T().Skill
