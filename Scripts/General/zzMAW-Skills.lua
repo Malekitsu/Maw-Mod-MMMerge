@@ -96,11 +96,11 @@ skillAC =
 	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Unarmed]	= {[0]=0, 0, 0, 0, 0,},
 	
-	[const.Skills.Shield]	= {[0]=0, 1, 2, 2, 3,},
-	[const.Skills.Leather]	= {[0]=0, 1, 1, 2, 2,},
-	[const.Skills.Chain]	= {[0]=0, 1, 2, 3, 3,},
-	[const.Skills.Plate]	= {[0]=0, 2, 2, 3, 4,},
-	[const.Skills.Dodging]	= {[0]=0, 2, 3, 4, 4,},
+	--[const.Skills.Shield]	= {[0]=0, 1, 2, 2, 3,},
+	--[const.Skills.Leather]	= {[0]=0, 1, 1, 2, 2,},
+	--[const.Skills.Chain]	= {[0]=0, 1, 2, 3, 3,},
+	--[const.Skills.Plate]	= {[0]=0, 2, 2, 3, 4,},
+	[const.Skills.Dodging]	= {[0]=0, 4, 5, 6, 6,},
 }
 skillResistance =
 {
@@ -114,13 +114,27 @@ skillResistance =
 	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0},
 	[const.Skills.Unarmed]	= {[0]=0, 0, 0, 0, 0,},
 	
-	[const.Skills.Leather]	= {[0]=0, 1, 2, 3, 4,},
-	[const.Skills.Chain]	= {[0]=0, 1, 2, 2, 3,},
-	[const.Skills.Plate]	= {[0]=0, 1, 1, 2, 2,},
-	[const.Skills.Shield]	= {[0]=0, 1, 2, 3, 4,},
+	--[const.Skills.Leather]	= {[0]=0, 1, 2, 3, 4,},
+	--[const.Skills.Chain]	= {[0]=0, 1, 2, 2, 3,},
+	--[const.Skills.Plate]	= {[0]=0, 1, 1, 2, 2,},
+	--[const.Skills.Shield]	= {[0]=0, 1, 2, 3, 4,},
 	[const.Skills.Dodging]	= {[0]=0, 0, 0, 0, 0,},
 }
-
+skillItemAC={
+	[const.Skills.Leather]	= {[0]=0, 1, 2, 3, 4,},
+	[const.Skills.Chain]	= {[0]=0, 2, 3, 4, 5,},
+	[const.Skills.Plate]	= {[0]=0, 3, 4, 5, 6,},
+	[const.Skills.Shield]	= {[0]=0, 4, 4, 8, 8,},
+	[const.Skills.Dodging]	= {[0]=0, 5, 5, 10, 10,},
+}
+skillItemRes={
+	[const.Skills.Leather]	= {[0]=0, 3, 4, 5, 6,},
+	[const.Skills.Chain]	= {[0]=0, 2, 3, 4, 5,},
+	[const.Skills.Plate]	= {[0]=0, 1, 2, 3, 4,},
+	[const.Skills.Shield]	= {[0]=0, 0, 4, 4, 8,},
+	[const.Skills.Dodging]	= {[0]=0, 0, 5, 5, 10,},
+}
+	
 
 twoHandedWeaponDamageBonusByMastery = {
 	[0]=0, 
@@ -471,9 +485,51 @@ function events.GameInitialized2()
 			Skillz.setDesc(i,1,baseString)
 		end
 	end
-	
+end
 
 --now do same for armors
+function events.Action(t)
+	function events.Tick()
+		events.Remove("Tick", 1)
+		if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
+			local i=Game.CurrentPlayer
+			if i<0 or i>Party.High then return end
+			local pl=Party[i]
+			local index=pl:GetIndex()
+			itemStats(index)
+			--base descriptions
+			Skillz.setDesc(8,1,"Shield skill provides great defense against both physical and magical attacks.\n\nShield Skill boosts the AC and Resistances gained from your Shield  by a percent amount.")
+			Skillz.setDesc(9,1,"Leather armor is the lightest armor a character can wear.  While leather provides less protection than chain or plate armor, it also slows your character down the least.\n\nLeather Armor Skill boosts the AC and Resistances gained by ALL armors when equipping a Leather Armor by a percent amount.")
+			Skillz.setDesc(10,1,"Chain armor is the medium armor type.  It provides more protection than leather and less than plate, but it also slows your character down more than leather.\n\nChain Armor Skill boosts the AC and Resistances gained by ALL armors when equipping a Chain Armor by a percent amount.")
+			Skillz.setDesc(11,1,"Plate armor is the heaviest armor type.  It provides the most protection, but it slows your character down more than leather or chain.\n\nPlate Armor Skill boosts the AC and Resistances gained by ALL armors when equipping a Plate Armor by a percent amount.")
+			local it=pl:GetActiveItem(3)
+			if it then
+				local skill=it:T().Skill
+				Skillz.setDesc(skill,1,string.format(Skillz.getDesc(skill,1) .. "\n\nCurrent AC from items: " .. StrColor(255,255,100,armorAC) .. "\n"))
+				Skillz.setDesc(skill,1,string.format(Skillz.getDesc(skill,1) .. "Bonus AC: " .. StrColor(255,255,100,itemArmorClassBonus1) .. "\n"))
+				Skillz.setDesc(skill,1,string.format(Skillz.getDesc(skill,1) .. "Bonus Resistances: " .. StrColor(255,255,100,itemResistanceBonus1) .. "\n"))
+			end
+			local it=pl:GetActiveItem(0)
+			if it then
+				local skill=it:T().Skill
+				if skill==8 then
+					Skillz.setDesc(skill,1,string.format(Skillz.getDesc(skill,1) .. "\n\nBonus AC: " .. StrColor(255,255,100,itemArmorClassBonus2) .. "\n"))
+					Skillz.setDesc(skill,1,string.format(Skillz.getDesc(skill,1) .. "Bonus Resistances: " .. StrColor(255,255,100,itemResistanceBonus2) .. "\n"))
+				end	
+			end
+			
+			baseString="\n------------------------------------------------------------\n         "
+			baseString=string.format("%s\t075AC|",baseString)
+			baseString=string.format("%s Res\t000",baseString)
+			for i=8,11 do
+				Skillz.setDesc(i,1,string.format(Skillz.getDesc(i,1) .. baseString))
+			end
+		end
+	end
+end
+		
+	
+function events.GameInitialized2()
 	for i=8,32 do
 		if i<12 or i==32 then
 			recoveryPen=false
@@ -481,10 +537,10 @@ function events.GameInitialized2()
 			res=false
 			baseString=string.format("%s\n------------------------------------------------------------\n         ",	Skillz.getDesc(i,1))
 			for v=1,4 do
-				if skillAC[i][v]~=0 then
+				if skillItemAC[i][v]~=0 then
 					ac=true
 				end
-				if skillResistance[i][v]~=0 then
+				if skillItemRes[i][v]~=0 then
 					res=true
 				end
 			end
@@ -494,19 +550,26 @@ function events.GameInitialized2()
 			expert=""
 			master=""
 			gm=""
+			
+			local ac=skillItemAC[i]
+			local res=skillItemRes[i]
+			if i==32 then
+				ac=skillAC[i]
+				res=skillResistance[i]
+			end
 			if ac then
-				baseString=string.format("%s\t075\t000AC|",baseString)
-				normal=string.format("%s  %s|",normal,skillAC[i][1])
-				expert=string.format("%s  %s|",expert,skillAC[i][2])
-				master=string.format("%s  %s|",master,skillAC[i][3])
-				gm=string.format("%s  %s|",gm,skillAC[i][4])
+				baseString=string.format("%s\t075AC|",baseString)
+				normal=string.format("%s  %s|",normal,ac[1])
+				expert=string.format("%s  %s|",expert,ac[2])
+				master=string.format("%s  %s|",master,ac[3])
+				gm=string.format("%s  %s|",gm,ac[4])
 			end
 			if res then
-				baseString=string.format("%s Res",baseString)
-				normal=string.format("%s    %s",normal,skillResistance[i][1])
-				expert=string.format("%s    %s",expert,skillResistance[i][2])
-				master=string.format("%s    %s",master,skillResistance[i][3])
-				gm=string.format("%s    %s",gm,skillResistance[i][4])
+				baseString=string.format("%s Res\t000",baseString)
+				normal=string.format("%s    %s",normal,res[1])
+				expert=string.format("%s    %s",expert,res[2])
+				master=string.format("%s    %s",master,res[3])
+				gm=string.format("%s    %s",gm,res[4])
 			end
 			baseString=baseString
 			Game.SkillDesNormal[i]=normal
@@ -534,10 +597,10 @@ function events.GameInitialized2()
 	Game.SkillDesExpert[const.Skills.Plate]=string.format("%s rec. pen. halved",Game.SkillDesExpert[const.Skills.Plate])
 	Game.SkillDesGM[const.Skills.Plate]=string.format("%s rec. pen. elim.",Game.SkillDesGM[const.Skills.Plate])
 	Game.SkillDesExpert[const.Skills.Shield]=string.format("%s recovery penalty eliminated",Game.SkillDesExpert[const.Skills.Shield])
-	Game.SkillDesGM[const.Skills.Shield]=string.format("%s15%% proj. damage reduction",Game.SkillDesGM[const.Skills.Shield])
+	Game.SkillDesGM[const.Skills.Shield]=string.format("%s 15%% proj. damage reduction",Game.SkillDesGM[const.Skills.Shield])
 	Game.SkillDesMaster[const.Skills.Armsmaster]=string.format("Skills adds 2 damage to all melee weapons")
 	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s usable with Leather Armor",Game.SkillDesGM[const.Skills.Dodging])
-	Game.SkillDesGM[const.Skills.Unarmed]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Unarmed])
+	Game.SkillDesGM[const.Skills.Unarmed]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Unarmed])	
 end
 
 ---------------------------------------
