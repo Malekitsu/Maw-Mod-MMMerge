@@ -29,7 +29,7 @@ Repair	+	=	=	=	=	=	=	=	=	=	=
 Bodybuilding	=	=	=	=	=	=	=	=	=	=	=
 Meditation	=	E	E	=	=	E	=	=	=	=	=
 Perception	+	=	=	=	=	=	=	=	=	=	=
-Regeneration	=	=	=	=	=	=	=	=	=	=	=
+Regeneration	=	=	=	=	E	=	=	=	=	=	=
 DisarmTraps	+	=	=	=	=	=	=	=	=	=	=
 Dodging	=	=	=	=	=	M	=	=	=	=	=
 Unarmed	=	=	=	=	=	M	=	=	=	=	=
