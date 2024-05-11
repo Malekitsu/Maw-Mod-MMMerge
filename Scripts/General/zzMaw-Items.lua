@@ -741,15 +741,7 @@ end
 
 
 
---carnage fix
-function events.CalcDamageToMonster(t)
-    local data = WhoHitMonster()
-	if data and data.Player and data.Object ~= nil then
-		if data.Object.Item.Bonus2==3 or data.Object.Item.Number==2025 then
-			t.Result=t.Result/2
-		end
-	end
-end
+--carnage fix tooltip
 function events.GameInitialized2()
 	Game.SpcItemsTxt[2].BonusStat="Explosive Impact! (half damage)"
 end
