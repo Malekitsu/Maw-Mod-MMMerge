@@ -2317,6 +2317,13 @@ function events.AfterLoadMap()
 			end
 		end
 	end
+	--convert disease into poison if below level 20
+	for i=0,Map.Monsters.High do
+		mon=Map.Monsters[i]
+		if mon.Level<20 and (mon.Bonus==9 or mon.Bonus==10 or mon.Bonus==11 then)
+			mon.Bonus=mon.Bonus-3
+		end
+	end
 end
 
 
