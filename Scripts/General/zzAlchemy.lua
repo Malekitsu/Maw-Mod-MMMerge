@@ -119,10 +119,12 @@ function events.UseMouseItem(t)
 				buffID=itemBuffMapping[it.Number][i]
 				pl.SpellBuffs[buffID].Power=it.Bonus+10
 				pl.SpellBuffs[buffID].ExpireTime=Game.Time+const.Hour*6
+				pl.SpellBuffs[buffID].Skill=0
 			end
 		else
 			pl.SpellBuffs[buff].Power=it.Bonus+10
 			pl.SpellBuffs[buff].ExpireTime=Game.Time+const.Hour*6
+			pl.SpellBuffs[buff].Skill=0
 		end
 		--half effect for bless, heroism and stoneskin
 		if (it.Number<=234 and it.Number~=229) or it.Number==245 or  it.Number==251 then
@@ -130,9 +132,11 @@ function events.UseMouseItem(t)
 				for i=1,#buff do
 					buffID=itemBuffMapping[it.Number][i]
 					pl.SpellBuffs[buffID].Power=math.round(pl.SpellBuffs[buffID].Power/2)
+					pl.SpellBuffs[buffID].Skill=0
 				end
 			else
 				pl.SpellBuffs[buff].Power=math.round(pl.SpellBuffs[buff].Power/2)
+				pl.SpellBuffs[buff].Skill=0
 			end
 		end
 	end
