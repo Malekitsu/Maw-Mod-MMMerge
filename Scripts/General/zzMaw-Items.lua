@@ -840,7 +840,26 @@ function events.BuildItemInformationBox(t)
 			elseif t.Item.Bonus~=0 and t.Item.BonusStrength~=0 then
 				if extraDescription then
 					math.randomseed(t.Item.Number*10000+t.Item.MaxCharges*1000+t.Item.Bonus*100+t.Item.BonusStrength*10+t.Item.Charges)
-					local charges=math.random(1,16)*1000+math.min(math.round(t.Item.BonusStrength*(1+0.25*math.random())),100)
+					
+					local mult=math.max((Game.BolsterAmount-100)/1000+1,1)
+					local cap=100*mult
+					local power=t.Item.BonusStrength
+					if t.Item.Bonus==8 or t.Bonus==9 then
+						power=math.floor((-100+(100^2+power*200)^0.5)/2)
+					elseif t.Item.Bonus==10 then
+						power=power*1.5
+					end
+					local stat=math.random(1,16)
+					if stat==8 or stat==9 then
+						power=power*(2+power/50)
+					elseif stat==10 then
+						power=power*0.667
+					end
+					local slotMult=slotMult[t.Item:T().EquipStat] or 1
+					cap=math.min(cap*slotMult,999)
+					
+					charges=stat*1000+math.min(math.round(power*(1+0.25*math.random())),cap)
+					
 					local bonus=math.floor(charges/1000)
 					local strength=charges%1000
 					txt=baseStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
