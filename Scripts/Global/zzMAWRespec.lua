@@ -54,7 +54,7 @@ function RespecSkills(npcID)
 	local p=Party[id]
 	for i=0, p.Skills.High do
 		local skill=SplitSkill(p.Skills[i])
-		if skill>1 then
+		if skill>1 and i~=const.Skills.Alchemy then
 			if i>=12 and i<=23 then
 				local lastSkill=2
 				--reset mastery
