@@ -610,10 +610,13 @@ function events.PickCorpse(t)
 	lvl=BLevel[mon.Id]
 	gold=mon.TreasureDiceCount*(mon.TreasureDiceSides+1)/2
 	newGold=(bolsterLevel2+lvl)*7.5
+	local tier=2
 	if mon.Id%3==1 then
 		newGold=newGold/2
+		tier=1
 	elseif mon.Id%3==0 then
 		newGold=newGold*2
+		tier=3
 	end
 	if gold>0 and newGold>gold then
 		goldMult=(bolsterLevel2+lvl)^1.5/(lvl)^1.5
@@ -621,7 +624,7 @@ function events.PickCorpse(t)
 		mon.TreasureDiceSides=math.min(newGold^0.5,255)
 	end
 	--calculate loot chances
-	mon.TreasureItemPercent= math.ceil(mon.Level^0.5*3)
+	mon.TreasureItemPercent= math.ceil(mon.Level^0.5*(1+tier))
 	if vars.Mode==2 then
 		mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.6)
 	end
