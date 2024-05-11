@@ -598,7 +598,7 @@ function events.BuildItemInformationBox(t)
 		if t.Description then
 			local mult=math.max((Game.BolsterAmount-100)/1000+1,1)
 			local tier=(t.Item.Number-1050)*mult
-			local power = math.round((tier * 10) ^ 0.5 / 2)
+			local power = math.round((tier * 10) ^ 0.5)
 			local twoHanded = tier * 10 * 2
 			local bodyArmor = math.round(tier * 1.5 * 10)
 			local helmEtc = math.round(tier * 1.25 * 10)
@@ -624,7 +624,7 @@ local function upgradeGem(it, tier)
 	local bonus2=math.floor(it.Charges/1000)
 	local bonus2Strength=it.Charges%1000
 	--upgrade amount
-	local upgradeAmount1=math.round((tier*10)^0.5/2)
+	local upgradeAmount1=math.round((tier*10)^0.5)
 	local upgradeAmount2=upgradeAmount1
 	--base value
 	local maxValue1=tier*10
@@ -818,10 +818,10 @@ end
 
 
 craftDropChances={
-		["gems"]=0.0075,
+		["gems"]=0.004,
 		[1061]=0.00025,
 		[1062]=0.00025,
-		[1063]=0.0005,
+		[1063]=0.001,
 		[1064]=0.00001,
 		[1065]=0.00025,
 	}
