@@ -904,6 +904,11 @@ function events.PlayerAttacked(t)
 			Party[coverPlayerIndex]:ShowFaceAnimation(14)
 			Game.ShowStatusText(Party[coverPlayerIndex].Name .. " cover " .. Party[t.PlayerSlot].Name)
 			t.PlayerSlot=coverPlayerIndex
+			local pl=Party[t.PlayerSlot]
+			local id=pl:GetIndex()
+			if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 23) then
+				evt[t.PlayerSlot].Add("HP", Party[t.PlayerSlot]:GetFullHP()*0.03)
+			end
 		end
 	end
 end
@@ -1683,7 +1688,9 @@ function events.GameInitialized2()
 			[const.Skills.Bow]=3,
 			[const.Skills.Meditation]=3,
 		},
-		[const.Race.Minotaur]={},
+		[const.Race.Minotaur]={
+			[const.Skills.Axe]=3,
+		},
 		[const.Race.Troll]={},
 		[const.Race.Dragon]={},
 		[const.Race.Undead]={},
