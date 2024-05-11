@@ -765,25 +765,53 @@ function events.GameInitialized2()
 	Game.SpellsTxt[21].Description= "Grants the power of flight to your characters!  This spell is very expensive and only works outdoors, but it is very useful.  Fly will drain one spell point every five minutes it is in use (i.e. when you aren't touching the ground).\n\nAt higher difficulties, with the exception of few places, attacking monsters will cancel the effect"
 end
 
-
 --WHEN GM ELEMENTAL BUFFS WILL BE GRANTED PASSIVELY
 TimerPeriod=const.Minute/2
 schools={12,13,14,15,17,18}
 buffsOrdered = {6, 0, 17, 4, 12, 1}
+schoolToBuff={
+	[12]=19,
+	[13]=21,
+	[14]=17,
+	[15]=16,
+	[16]=15,
+	[17]=20,
+	[18]=18,
+}
 function elementalBuffs()
 	--buffs to apply
 	for i=0, Party.High do
-		for v=1,6 do
-			s,m=SplitSkill(Party[i]:GetSkill(schools[v]))
-			if m==4 then
-				if Party.SpellBuffs[buffsOrdered[v]].Power<=s*3 then
-					Party.SpellBuffs[buffsOrdered[v]].ExpireTime=Game.Time+const.Hour
-					Party.SpellBuffs[buffsOrdered[v]].Power=s*3
-					Party.SpellBuffs[buffsOrdered[v]].Skill=4
+		local pl=Party[i]
+		if not table.find(dkClass,pl.Class) then
+			for v=1,6 do
+				local s,m=SplitSkill(pl:GetSkill(schools[v]))
+				if m==4 then
+					local power=s*3
+					if Party.SpellBuffs[buffsOrdered[v]].Power<=s*3 then
+						if Party.SpellBuffs[buffsOrdered[v]].Power<=power then
+							Party.SpellBuffs[buffsOrdered[v]].ExpireTime=Game.Time+const.Hour
+							Party.SpellBuffs[buffsOrdered[v]].Power=s*3
+							Party.SpellBuffs[buffsOrdered[v]].Skill=4
+						end
+					end
+				end
+			end
+			--stats bonus
+			for key, value in pairs(schoolToBuff) do
+				local s,m=SplitSkill(pl:GetSkill(key))
+				if m==4 then
+					local power=s*3
+					for k=0, Party.High do
+						if Party[k].SpellBuffs[value].Power<=s*3 then
+							Party[k].SpellBuffs[value].Power=s*3
+							Party[k].SpellBuffs[value].ExpireTime=Game.Time+const.Hour
+						end
+					end
 				end
 			end
 		end
 	end
+	
 	if Party.High==0 then
 		Party.SpellBuffs[19].ExpireTime=math.max(Game.Time+const.Hour, Party.SpellBuffs[19].ExpireTime)
 		Party.SpellBuffs[19].Power=math.max(10,Party.SpellBuffs[19].Power)
