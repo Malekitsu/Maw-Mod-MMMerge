@@ -2190,7 +2190,8 @@ function eliteRegen()
 				--call is 20 times per minute, which is 12.8 
 				local timeMultiplier=Game.TurnBased and timePassed/12.8 or 1
 				if mon.HP>0 then
-					mon.HP=math.min(mon.HP+mon.FullHitPoints*0.01*0.99^value*timeMultiplier, mon.FullHP)
+					local regenAmount=mon.FullHitPoints*0.01*0.99^value*timeMultiplier/(1+mon.Level/50)
+					mon.HP=math.min(mon.HP+regenAmount, mon.FullHP)
 				end
 			end
 		end
