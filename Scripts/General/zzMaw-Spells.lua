@@ -128,7 +128,7 @@ function events.PlayerCastSpell(t)
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
 			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
 			
-			local mult, gotCrit=getHealSpellMultiPlier(pl)
+			local mult, gotCrit=getHealSpellMultiPlier(t.Player)
 			
 			totHeal=baseHeal*mult
 
@@ -200,7 +200,7 @@ function events.PlayerCastSpell(t)
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
 			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
 			
-			local mult, gotCrit=getHealSpellMultiPlier(pl)
+			local mult, gotCrit=getHealSpellMultiPlier(t.Player)
 			
 			totHeal=baseHeal*mult
 
@@ -257,7 +257,7 @@ function events.PlayerCastSpell(t)
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
 			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
 			
-			local mult, gotCrit=getHealSpellMultiPlier(pl)
+			local mult, gotCrit=getHealSpellMultiPlier(t.Player)
 			
 			totHeal=baseHeal*mult
 
@@ -330,7 +330,7 @@ function events.PlayerCastSpell(t)
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
 			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
 			
-			local mult, gotCrit=getHealSpellMultiPlier(pl)
+			local mult, gotCrit=getHealSpellMultiPlier(t.Player)
 			
 			totHeal=baseHeal*mult
 
@@ -388,7 +388,7 @@ function events.PlayerCastSpell(t)
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
 			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
 
-			local mult, gotCrit=getHealSpellMultiPlier(pl)
+			local mult, gotCrit=getHealSpellMultiPlier(t.Player)
 			
 			totHeal=baseHeal*mult
 
