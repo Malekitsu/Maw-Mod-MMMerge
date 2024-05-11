@@ -67,7 +67,7 @@ end
 function events.CalcDamageToMonster(t)
 	local data = WhoHitMonster()	
 	--luck/accuracy bonus
-	if data and data.Player and t.DamageKind==4 then
+	if data and data.Player and (t.DamageKind==4 or data.Object.Spell==133) then
 		if data.Object==nil or data.Object.Spell==133 then
 			pl=t.Player
 			--OVERRIDE DAMAGE WITH MAW CALCULATION
@@ -98,6 +98,9 @@ function events.CalcDamageToMonster(t)
 				crit=true
 			end
 			if data.Player.Weak>0 then
+				t.Result=t.Result*0.5
+			end
+			if data.Object.Spell==133 then
 				t.Result=t.Result*0.5
 			end
 		end
@@ -634,6 +637,7 @@ function events.CalcDamageToPlayer(t)
 	--carnage fix
 	if data and data.Player and data.Spell==133 then
 		t.Result=0
+		return
 	end
 	
 	--properly calculate friendly fire damage
