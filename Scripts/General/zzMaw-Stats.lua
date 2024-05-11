@@ -119,14 +119,24 @@ end
 function events.PlayerCastSpell(t)
 	local spell=t.SpellId
 	local m=t.Mastery
-	local haste=math.floor(t.Player:GetSpeed()/10)
-	local it=t.Player:GetActiveItem(1)
+	Game.Spells[spell]["Delay" .. masteryName[m]]=getSpellDelay(t.Player,spell)
+end
+
+function getSpellDelay(pl,spell)
+	local s,m=SplitSkill(pl.Skills[math.ceil(spell/11)+11])
+	local haste=math.floor(pl:GetSpeed()/10)
+	local it=pl:GetActiveItem(1)
 	if it and it.Bonus2==40 then
 		haste=haste+20
 	end
-	Game.Spells[spell]["Delay" .. masteryName[m]]=oldTable[spell][m]/(1+haste/100)
+	local tier=0
+	local skill=SplitSkill(pl.Skills[const.Skills.Learning])
+	if table.find(spells, spell) or healingSpells[spell] then
+		tier=getAscensionTier(skill,spell)
+	end
+	local delay=math.round(oldTable[spell][m]/(1+haste/100)*1.2^tier)
+	return delay
 end
-
 --remove AC from hit calculation and unarmed code from misctweaks
 nextACToZero=0
 acNerf=0
