@@ -3055,16 +3055,22 @@ statToPlayerbuff={
 	[5]=21,
 	[12]=22,
 }
+
+--
 function events.CalcStatBonusByItems(t)
 	if statToPlayerbuff[t.Stat] then
 		local stat1=statToPlayerbuff[t.Stat]
+		if t.Player.SpellBuffs[stat1].Skill==5 then
+			return 
+		end
 		local power1=t.Player.SpellBuffs[stat1].Power
 		local stat2=playerToPartyBuff[stat1]
 		local power2=Party.SpellBuffs[stat2].Power
 		if power1>=power2 then
-			t.Result=t.Result-power2
+			t.Player.SpellBuffs[stat1].Power=t.Player.SpellBuffs[stat1].Power-power2
+			t.Player.SpellBuffs[stat1].Skill=5
 		else
-			t.Result=t.Result-power1
+			t.Player.SpellBuffs[stat1].Power=0
 		end
 	end
 end
