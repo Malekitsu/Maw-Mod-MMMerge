@@ -49,6 +49,7 @@ end
 
 --[11]="Killing a monster will recover you action time",
 function events.CalcDamageToMonster(t)
+	local id=t.PlayerIndex
 	--[17]="Your hits will deal 1% of current monster HP health (0.4% for AoE, multi-hit spells and arrows)",
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 17) then
 		local dmg=t.Monster.HP*0.02*2^(math.floor(t.Monster.Resistances[0]/1000))
@@ -90,7 +91,19 @@ function events.CalcDamageToMonster(t)
 			t.Result=math.round(math.max(t.Result, t.Result*(luck/1500)+daggerCritBonus))
 		end
 		--end of [14]
-		local id=t.PlayerIndex
+		--[24]="killing a Monster Restores 10% of Health and Mana"
+		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 24) then			
+			function events.Tick()
+				events.Remove("Tick", 1)
+				if t.Monster.HP<=0 then
+					local fullHP=t.Player:GetFullHP()
+					local fullSP=t.Player:GetFullSP()
+					t.Player.HP=math.min(fullHP, t.Player.HP+fullHP*0.1)
+					t.Player.SP=math.min(fullSP, t.Player.SP+fullSP*0.1)
+				end
+			end
+		end
+		--end of 24
 		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 11) then
 			data=WhoHitMonster()
 			--no aoe spells
@@ -108,6 +121,7 @@ function events.CalcDamageToMonster(t)
 		end
 	end
 end
+
 function changePlayer(id)
 	function events.Tick()
 		events.Remove("Tick", 1)
