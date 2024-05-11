@@ -1105,7 +1105,7 @@ function events.LoadMap()
 end
 
 function events.GameInitialized2()
-	local txt="Increases spell damage at the expense of higher mana. Each skill level boosts the corresponding tier's spells, up to Tier 11 (e.g., Incinerate, Starburst). Spells can be ascended three times, culminating at skill level 33. This skill affects all magic schools, enabling up to three enhancements per spell (ascended damage amount shown in spell tooltip). \n\nLevel up to unlock the full destructive or healing potential of your magic, balancing higher damage with greater mana expenditure.\n"
+	local txt="Increases spell damage at the expense of higher mana. Each skill level boosts the corresponding tier's spells, up to Tier 11 (e.g., Incinerate, Starburst). Spells can be ascended five times, culminating at skill level 55. This skill affects all magic schools, enabling up to three enhancements per spell (ascended damage amount shown in spell tooltip). \n\nLevel up to unlock the full destructive or healing potential of your magic, balancing higher damage with greater mana expenditure.\n\nEach ascension tier increases cast time.\n"
 	Skillz.setDesc(const.Skills.Learning,1,txt)
 	Skillz.setName(const.Skills.Learning, "Ascension")
 	Game.SkillDesNormal[const.Skills.Learning]= "Mana cost reduced by 10%."
@@ -1667,3 +1667,47 @@ function events.Tick()
 	vars.lastY=Party.Y
 end
 ]]
+
+--racial skills
+
+function events.GameInitialized2()
+	local MAWRacialSkills={
+		[const.Race.Human]={
+			[const.Skills.Leather]=3,
+			[const.Skills.Chain]=3,
+			[const.Skills.Plate]=3,
+			[const.Skills.Shield]=3,
+		},
+		[const.Race.Vampire]={},
+		[const.Race.DarkElf]={
+			[const.Skills.Bow]=3,
+			[const.Skills.Meditation]=3,
+		},
+		[const.Race.Minotaur]={},
+		[const.Race.Troll]={},
+		[const.Race.Dragon]={},
+		[const.Race.Undead]={},
+		[const.Race.Elf]={
+			[const.Skills.Bow]=3,
+			[const.Skills.Meditation]=3,
+		},
+		[const.Race.Goblin]={
+			[const.Skills.Sword]=3,
+			[const.Skills.Mace]=3,
+			[const.Skills.Dagger]=3,
+		},
+		[const.Race.Dwarf]={
+			[const.Skills.Axe]=3,
+			[const.Skills.Bodybuilding]=3,
+		},
+		[const.Race.Zombie]={},
+	}
+
+	function events.GetSkill(t)
+		local pl=t.Player
+		local race=Game.CharacterPortraits[pl.Face].Race
+		if MAWRacialSkills[race][t.Skill] then
+			t.Result=t.Result+ MAWRacialSkills[race][t.Skill]
+		end
+	end
+end
