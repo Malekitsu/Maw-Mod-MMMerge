@@ -621,15 +621,11 @@ function events.PickCorpse(t)
 		mon.TreasureDiceSides=math.min(newGold^0.5,255)
 	end
 	--calculate loot chances
-	if Game.freeProgression then
-		if bolsterLevel2>50 or mon.TreasureItemPercent>70 then
-			mon.TreasureItemPercent= math.round(mon.TreasureItemPercent^0.85 + (50 - mon.TreasureItemPercent^0.85 / 2) * bolsterLevel2 / 250)
-			if vars.Mode==2 then
-				mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.6)
-			end
-			mon.TreasureItemLevel=math.max(t.Monster.TreasureItemLevel,1)
-		end
+	mon.TreasureItemPercent= math.ceil(mon.Level^0.5*3)
+	if vars.Mode==2 then
+		mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.6)
 	end
+	mon.TreasureItemLevel=math.max(t.Monster.TreasureItemLevel,1)
 	if mon.Item==0 and math.random()<0.7 then
 		mon.TreasureItemType=0
 	end
