@@ -296,14 +296,11 @@ function events.ItemGenerated(t)
 			rollSpc=roll1/2
 		end
 		--difficulty multiplier 
-		diffMult=math.max(math.min(Game.BolsterAmount,300), 100)/100
+		diffMult=math.max((Game.BolsterAmount-100)/1000+1,1)
 		--calculate chances
 		local p1=enc1Chance[pseudoStr]/100
 		local p2=enc2Chance[pseudoStr]/100
 		local p3=spcEncChance[pseudoStr]/100
-		p1=math.min(p1+(1-p1)*(diffMult-1)/10, p1*diffMult)
-		p2=math.min(p2+(1-p2)*(diffMult-1)/10, p2*diffMult)
-		p3=math.min(p3+(1-p3)*(diffMult-1)/10, p3*diffMult)
 		
 		if p1>roll1 then
 			t.Item.Bonus=math.random(1,16)
@@ -343,9 +340,9 @@ function events.ItemGenerated(t)
 				
 		--ancient item
 		ancient=false
-		ancientChance=(p1*p2*p3)/4
+		ancientChance=(p1*p2*p3)/4*diffMult
 		if bossLoot then
-			ancientChance=ancientChance*10
+			ancientChance=ancientChance*5
 			bossLoot=false
 		end
 	
@@ -389,11 +386,7 @@ function events.ItemGenerated(t)
 		
 		--primordial item
 		primordial=math.random()
-		primordialChance=ancientChance/4
-		--No primordials in shop
-		if Game.HouseScreen==2 or Game.HouseScreen==95 then
-			primordialChance=0
-		end
+		primordialChance=ancientChance/4*diffMult
 		if primordial<=primordialChance then
 			if ancient then
 				t.Item.MaxCharges=t.Item.MaxCharges-chargesBonus
@@ -420,9 +413,13 @@ function events.ItemGenerated(t)
 		
 		--legendary
 		if t.Item.BonusExpireTime==2 then
-			local chance=0.1
+			local chance=0.1*diffMult
 			if vars.Mode==2 then
-				chance=0.2
+				chance=chance*2
+			end
+			--No legendary in shop
+			if Game.HouseScreen==2 or Game.HouseScreen==95 then
+				chance=0
 			end
 			if chance>=math.random() then
 				--roll legendary effect
