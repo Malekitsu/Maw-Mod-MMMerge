@@ -93,7 +93,7 @@ function events.PlayerCastSpell(t)
 		events.Remove("Tick", 1)
 		mawRefresh("all")
 	end
-	
+	ascension()
 	if t.IsSpellScroll then -- disable for scrolls
 		return
 	end
