@@ -760,6 +760,7 @@ legendaryEffects={
 	[21]="Increase melee damage by 5% for each enemy in the nearbies",
 	[22]="Reduces damage by 3% for each enemy in the nearbies",
 	[23]="Successfully covering an ally restores 3% of your HP",
+	[24]="killing a Monster Restores 10% of Health and Mana",
 }
 
 function events.BuildItemInformationBox(t)
