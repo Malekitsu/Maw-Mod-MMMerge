@@ -631,11 +631,11 @@ local function upgradeGem(it, tier)
 	local maxValue2=maxValue1
 	--hp/sp value
 	if it.Bonus==8 or it.Bonus==9 then
-		maxValue1=math.floor(maxValue1*(2+maxValue1/50))*mult
+		maxValue1=math.floor(maxValue1*(2+maxValue1/50))
 		upgradeAmount1=upgradeAmount1^2+1
 	end
 	if bonus2==8 or bonus2==9 then
-		maxValue2=math.floor(upgradeAmount2*(2+upgradeAmount2/50))*mult
+		maxValue2=math.floor(upgradeAmount2*(2+upgradeAmount2/50))
 		upgradeAmount2=upgradeAmount2^2+1
 	end
 	--AC
@@ -748,7 +748,25 @@ evt.PotionEffects[82] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
 		if t.Bonus>0 and t.BonusStrength>0 and t.Charges<=1000 then 
 			math.randomseed(t.Number*10000+t.MaxCharges*1000+t.Bonus*100+t.BonusStrength*10+t.Charges)
-			t.Charges=math.random(1,16)*1000+math.min(math.round(t.BonusStrength*(1+0.25*math.random())),100)
+			
+			local mult=math.max((Game.BolsterAmount-100)/1000+1,1)
+			local cap=100*mult
+			local power=t.BonusStrength
+			if t.Bonus==8 or t.Bonus==9 then
+				power=math.floor((-100+(100^2+power*200)^0.5)/2)
+			elseif t.Bonus==10 then
+				power=power*1.5
+			end
+			local stat=math.random(1,16)
+			if stat==8 or stat==9 then
+				power=power*(2+power/50)
+			elseif stat==10 then
+				power=power*0.667
+			end
+			local slotMult=slotMult[t:T().EquipStat] or 1
+			cap=math.min(cap*slotMult,999)
+			
+			t.Charges=stat*1000+math.min(math.round(power*(1+0.25*math.random())),cap)
 			Mouse.Item.Number=0
 			mem.u4[0x51E100] = 0x100 
 			t.Condition = t.Condition:Or(0x10)
