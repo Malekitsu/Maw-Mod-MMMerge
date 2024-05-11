@@ -100,8 +100,8 @@ function events.CalcDamageToMonster(t)
 				function events.Tick()
 					events.Remove("Tick", 1)
 					if t.Monster.HP<=0 then
-						t.Player.RecoveryDelay=0
-						changePlayer(id)
+						t.Player.RecoveryDelay=t.Player.RecoveryDelay/3
+						--changePlayer(id)
 					end
 				end
 			end
