@@ -51,7 +51,7 @@ end
 function events.CalcDamageToMonster(t)
 	--[17]="Your hits will deal 1% of current monster HP health (0.4% for AoE, multi-hit spells and arrows)",
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 17) then
-		local dmg=t.Monster.HP*0.02
+		local dmg=t.Monster.HP*0.02*2^(math.floor(t.Monster.Resistances[0]/1000))
 		data=WhoHitMonster()
 		if (data and data.Object and data.Object.Spell and table.find(aoespells, data.Object.Spell)) or data.Object.Spell==133 then
 			dmg=dmg*0.5
