@@ -2320,7 +2320,7 @@ function events.AfterLoadMap()
 	--convert disease into poison if below level 20
 	for i=0,Map.Monsters.High do
 		mon=Map.Monsters[i]
-		if mon.Level<20 and (mon.Bonus==9 or mon.Bonus==10 or mon.Bonus==11 then)
+		if mon.Level<20 and (mon.Bonus==9 or mon.Bonus==10 or mon.Bonus==11) then
 			mon.Bonus=mon.Bonus-3
 		end
 	end
@@ -2334,3 +2334,4 @@ function calculateDirection(x_m, y_m, x_p, y_p)
     local direction = math.floor((theta / (2 * math.pi)) * 2048) % 2048
     return direction
 end
+
