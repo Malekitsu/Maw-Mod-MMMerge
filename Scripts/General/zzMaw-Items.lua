@@ -277,7 +277,7 @@ function events.ItemGenerated(t)
 
 		pseudoStr=ps1+partyLevel1
 		if bossLoot then
-			pseudoStr=pseudoStr+2
+			pseudoStr=pseudoStr+1
 		end
 		if math.random(1,18)<partyLevel1%18 then
 			pseudoStr=pseudoStr+1
