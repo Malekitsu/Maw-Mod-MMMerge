@@ -341,17 +341,14 @@ local function seraphSkills(isSeraph, id)
 		Skillz.setDesc(16,2,"Increases healing by 1 per Skill point")
 		Skillz.setDesc(16,3,"Increases healing by 2 per Skill point")
 		Skillz.setDesc(16,4,"Increases healing by 3 per Skill point")
-		Skillz.setDesc(16,5,"n/a")
 		
 		Skillz.setDesc(17,2,"Increases damage by 1 per Skill point")
 		Skillz.setDesc(17,3,"Increases damage by 2 per Skill point")
 		Skillz.setDesc(17,4,"Increases damage by 3 per Skill point")
-		Skillz.setDesc(17,5,"n/a")
 		
 		Skillz.setDesc(18,2,"Increases healing by 1 per Skill point")
 		Skillz.setDesc(18,3,"Increases healing by 2 per Skill point")
 		Skillz.setDesc(18,4,"Increases healing by 3 per Skill point")
-		Skillz.setDesc(18,5,"n/a")
 		
 		Skillz.setDesc(19,2,"Increases damage by 1 per Skill point")
 		Skillz.setDesc(19,3,"Increases damage by 2 per Skill point")
@@ -363,8 +360,8 @@ local function seraphSkills(isSeraph, id)
 			Skillz.setDesc(key,2,"Effects vary per spell")
 			Skillz.setDesc(key,3,"Effects vary per spell")
 			Skillz.setDesc(key,4,"Effects vary per spell")
-			Skillz.setDesc(key,5,"Effects vary per spell")
 		end
+		Skillz.setDesc(19,5,"Effects vary per spell")
 	end
 end
 
