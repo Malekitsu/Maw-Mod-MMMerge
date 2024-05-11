@@ -275,6 +275,11 @@ function events.Action(t)
 			recalculateMawMonster()
 		end
 	end
+	lastMonsterNumber=lastMonsterNumber or Map.Monsters.High
+	if lastMonsterNumber~=Map.Monsters.High then
+		lastMonsterNumber=Map.Monsters.High
+		recalculateMawMonster()
+	end
 end
 
 --MONSTER BOLSTERING
@@ -1532,6 +1537,11 @@ local spellToDamageKind={
 }
 
 function events.BuildMonsterInformationBox(t)
+	lastMonsterNumber=lastMonsterNumber or Map.Monsters.High
+	if lastMonsterNumber~=Map.Monsters.High then
+		lastMonsterNumber=Map.Monsters.High
+		recalculateMawMonster()
+	end
 	--mon = t.Monster
 	mon=Map.Monsters[Mouse:GetTarget().Index]
 	--show level Below HP
