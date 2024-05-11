@@ -88,7 +88,7 @@ function events.UseMouseItem(t)
 	--mana regen
 	if it.Number==232 then
 		vars.bonusMeditation=vars.bonusMeditation or {}
-		vars.bonusMeditation[index]={Game.Time+const.Hour*6, it.Bonus/10 + 2}
+		vars.bonusMeditation[index]={Game.Time+const.Hour*6, math.ceil(it.Bonus^0.5/1.5) + 1}
 	end
 	------------------------
 	--STATUS IMMUNITY POTIONS--
@@ -335,7 +335,7 @@ function events.BuildItemInformationBox(t)
 		t.Description=StrColor(255,255,153,"Restores " .. math.round(t.Item.Bonus^1.4*2/3)+10 .. " Spell Points") .. "\n" .. t.Description
 	end
 	if t.Item.Number==232 then
-		t.Description="Grants " .. StrColor(0,0,200,2+math.floor(t.Item.Bonus/10)) .. " bonus to Meditation skill for 6 hours."
+		t.Description="Grants " .. StrColor(0,0,200,math.ceil(t.Item.Bonus^0.5/1.5) + 1) .. " bonus to Meditation skill for 6 hours."
 	end
 	if t.Item.Number==247 then
 		t.Description=StrColor(255,255,153,"Heals " .. math.round(t.Item.Bonus^1.4*1.5)+20 .. " Hit Points") .. "\n" .. t.Description
