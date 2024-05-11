@@ -941,16 +941,17 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	
 	--LEGENDARY POWER 16
 	local id=pl:GetIndex()
+	local maxres=0
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 16) then
 		local resList=damageKindResistance[12]
-		for i=1,#resList do
-			local playerRes = pl:GetResistance(resList[i])
-			if playerRes>res and playerRes<64000 then
-				res=playerRes
+		for i=10,15 do
+			local playerRes = pl:GetResistance(i)
+			if playerRes>maxres and playerRes<64000 then
+				maxres=playerRes
 			end
 		end
+		res=math.min(maxres,res*1.5)
 	end
-	
 	res=1/2^math.min(res/math.min(75+monLvl*0.5*bolster,200*bolster))
 	
 	--randomize resistance
@@ -962,6 +963,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	local damage=math.round(damage*res)
 	return damage
 end
+
 
 
 function events.Tick()
