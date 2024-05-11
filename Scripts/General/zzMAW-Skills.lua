@@ -1711,3 +1711,11 @@ function events.GameInitialized2()
 		end
 	end
 end
+
+--fix cover when starting new Game
+function events.BeforeNewGameAutosave()
+	for i=0,Party.PlayersArray.High do
+		pl=Party.PlayersArray[i]
+		Skillz.set(pl,50,0)
+	end
+end
