@@ -1594,7 +1594,7 @@ function ascension()
 				if table.find(spells, i) then
 					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. speed
 				elseif healingSpells[i] then
-					Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. "\n\nRecovery time: " .. speed
+					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. speed
 				else
 					Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. "\n\nRecovery time: " .. oldTable[i][magicM]
 				end
