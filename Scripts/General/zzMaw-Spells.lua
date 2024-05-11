@@ -805,6 +805,7 @@ function elementalBuffs()
 						if Party[k].SpellBuffs[value].Power<=s*3 then
 							Party[k].SpellBuffs[value].Power=s*3
 							Party[k].SpellBuffs[value].ExpireTime=Game.Time+const.Hour
+							Party[k].SpellBuffs[value].Skill=0
 						end
 					end
 				end
