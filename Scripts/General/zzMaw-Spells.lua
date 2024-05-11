@@ -1171,13 +1171,13 @@ function events.GameInitialized2()
 			[6] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--fireball
 			[7] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--fire spike, the only spell with damage depending on mastery, fix in events.calcspelldamage
 			[8] = {dmgAdd = 16, diceMin = 1, diceMax = 10, },--immolation
-			[9] = {dmgAdd = 4, diceMin = 1, diceMax = 1, },--meteor shower
+			[9] = {dmgAdd = 3, diceMin = 1, diceMax = 1, },--meteor shower
 			[10] = {dmgAdd = 12, diceMin = 1, diceMax = 7, },--inferno
 			[11] = {dmgAdd = 18, diceMin = 1, diceMax = 18, },--incinerate
 			[15] = {dmgAdd = 6, diceMin = 1, diceMax = 2, },--sparks
 			[18] = {dmgAdd = 13, diceMin = 1, diceMax = 8, },--lightning bolt
 			[20] = {dmgAdd = 20, diceMin = 1, diceMax = 12, },--implosion
-			[22] = {dmgAdd = 10, diceMin = 1, diceMax = 1, },--starburst
+			[22] = {dmgAdd = 6, diceMin = 1, diceMax = 1, },--starburst
 			[24] = {dmgAdd = 5, diceMin = 1, diceMax = 2, },--poison spray
 			[26] = {dmgAdd = 6, diceMin = 1, diceMax = 6, },--ice bolt
 			[29] = {dmgAdd = 2, diceMin = 1, diceMax = 12, },--acid burst
