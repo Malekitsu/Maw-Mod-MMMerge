@@ -770,13 +770,13 @@ TimerPeriod=const.Minute/2
 schools={12,13,14,15,17,18}
 buffsOrdered = {6, 0, 17, 4, 12, 1}
 schoolToBuff={
-	[12]=19,
+	[12]=17,
 	[13]=21,
-	[14]=17,
+	[14]=18,
 	[15]=16,
 	[16]=15,
 	[17]=20,
-	[18]=18,
+	[18]=19,
 }
 function elementalBuffs()
 	--buffs to apply
