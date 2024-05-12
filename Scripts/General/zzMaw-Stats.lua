@@ -847,9 +847,9 @@ function events.CalcDamageToMonster(t)
 		end
 	end
 	index=table.find(damageKindMap,t.DamageKind)
-	res=t.Monster.Resistances[index]%1000
+	res=t.Monster.Resistances[index]
 	if not res then return end
-	
+	res=res%1000
 	if t.Player and data.Object==nil and t.DamageKind==4 then
 		local it=t.Player:GetActiveItem(1)
 		if it then 
