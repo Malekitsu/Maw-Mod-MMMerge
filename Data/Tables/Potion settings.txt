@@ -85,4 +85,7 @@ Pot Id	Item Id	Required mastery	Drinkable	Usable	Notes
 83	1063	0	-	x	Control Cube
 84	1064	0	-	x	Enchanted Amulet
 85	1065	0	-	x	Emerald
-85	1066	0	-	x	Enchanted Amulet
+86	1066	0	-	x	Enchanted Amulet
+87	1067	0	-	x	Enchanted Amulet
+88	1068	0	-	x	Enchanted Amulet
+89	1069	0	-	x	Enchanted Amulet
