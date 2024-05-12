@@ -1113,10 +1113,15 @@ function events.GameInitialized2()
 	local txt="Increases spell damage at the expense of higher mana. Each skill level boosts the corresponding tier's spells, up to Tier 11 (e.g., Incinerate, Starburst). Spells can be ascended five times, culminating at skill level 55. This skill affects all magic schools, enabling up to three enhancements per spell (ascended damage amount shown in spell tooltip). \n\nLevel up to unlock the full destructive or healing potential of your magic, balancing higher damage with greater mana expenditure.\n\nEach ascension tier increases cast time.\n"
 	Skillz.setDesc(const.Skills.Learning,1,txt)
 	Skillz.setName(const.Skills.Learning, "Ascension")
-	Game.SkillDesNormal[const.Skills.Learning]= "Mana cost reduced by 10%."
-	Game.SkillDesExpert[const.Skills.Learning]= "Mana cost reduced by 20%"
-	Game.SkillDesMaster[const.Skills.Learning]= "Mana cost reduced by 30%"
-	Game.SkillDesGM[const.Skills.Learning]= "Mana cost reduced by 40%"
+	Game.SkillDesNormal[const.Skills.Learning]= "Mana cost reduced by 12.5%."
+	Game.SkillDesExpert[const.Skills.Learning]= "Mana cost reduced by 25%"
+	Game.SkillDesMaster[const.Skills.Learning]= "Mana cost reduced by 37.5%"
+	Game.SkillDesGM[const.Skills.Learning]= "Mana cost reduced by 50%"
+	
+	Game.SkillDesNormal[const.Skills.Perception]= "Reduces traps and lava damage by 10%."
+	Game.SkillDesExpert[const.Skills.Perception]= "Reduces traps and lava damage by 20%."
+	Game.SkillDesMaster[const.Skills.Perception]= "Reduces traps and lava damage by 30%."
+	Game.SkillDesGM[const.Skills.Perception]= "Reduces traps and lava damage by 50%."
 end
 
 
