@@ -1077,13 +1077,6 @@ function events.GameInitialized2()
 		end
 	end
 	
-	function events.GetAttackDelay(t)
-		if table.find(dkClass, t.Player.Class) then
-			local s, m=SplitSkill(t.Player.Skills[const.Skills.Water])
-			t.Result=t.Result/(1+s/100)
-		end
-	end
-	
 	function events.CalcDamageToPlayer(t) --body reduces phys damage, unholy magic damage
 		if table.find(dkClass, t.Player.Class) then
 			if t.DamageKind==4 then
@@ -1271,13 +1264,15 @@ local function dkSkills(isDK, id)
 		Skillz.setName(18, "Blood")
 		Skillz.setName(20, "Unholy")
 		local txt
-		txt="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and increases attack speed by 1% per skill point.\n"
+		txt="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and increases attack speed by 2% per skill point.\n"
 		Skillz.setDesc(14,1,txt)
 		leech=math.round(bloodS^0.6*2*100)/100
 		txt="This skill is only available to death knights and reduces physical damage taken by 1% per skill point.\nAdditionally it will make your attacks to leech damage based on damage done.\n\nCurrent leech: " .. leech .. "%\n"            
 		Skillz.setDesc(18,1,txt)
 		txt="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and reduces magical damage taken by 1% per skill point.\n"	
 		Skillz.setDesc(20,1,txt)
+		Skillz.setDesc(14,5,"Effects vary per spell")
+		Skillz.setDesc(18,5,"Effects vary per spell")
 	else
 		for key, value in pairs(baseSchoolsTxtDK) do
 			Skillz.setDesc(key,1,value)
@@ -1290,6 +1285,8 @@ local function dkSkills(isDK, id)
 		Skillz.setName(14, "Water Magic")
 		Skillz.setName(18, "Body Magic")
 		Skillz.setName(20, "Dark Magic")
+		Skillz.setDesc(14,5,"Grants 3 Luck to all party per skill point")
+		Skillz.setDesc(18,5,"Grants 3 Might to all party per skill point")
 	end
 end
 
