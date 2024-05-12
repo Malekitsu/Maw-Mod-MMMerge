@@ -608,7 +608,7 @@ function events.BuildItemInformationBox(t)
 			local helmEtc = math.round(tier * 1.25 * 10)
 			local rings = math.round(tier * 0.75 * 10)
 
-			t.Description = "A special Gem that allows to increase an item Enchant Strength (right-click on an item with a base enchant to use)\n\nMax Power: " 
+			t.Description = "A special Gem that allows to increase an item Enchant Strength (right-click on an item with a base enchant to use)\nLegendary items can get 20% more power.\n\nMax Power: " 
 			.. StrColor(255, 128, 0, tostring(tier * 10)) .. " (65% on AC)"
 			.. "\nBonus: " .. StrColor(255, 128, 0, tostring(power)) 
 			.. "\n\nItem Modifier:\nTwo Handed Weapons: " .. StrColor(255, 128, 0, twoHanded)
@@ -629,6 +629,9 @@ local function upgradeGem(it, tier)
 	--bolster multiplier
 	local bolsterMult=math.max((Game.BolsterAmount-100)/1000+1,1)
 	local tier=tier*bolsterMult
+	if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
+		tier=tier*1.2
+	end
 	--2nd enchant value
 	local bonus2=math.floor(it.Charges/1000)
 	local bonus2Strength=it.Charges%1000
