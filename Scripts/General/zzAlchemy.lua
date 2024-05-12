@@ -617,6 +617,11 @@ function events.BuildItemInformationBox(t)
 			.. "\nRings: " .. StrColor(255, 128, 0, rings)
 		end
 	end
+	if t.Item.Number==1067 then
+		if t.Description then
+			t.Description = t.Description .. "\n\n" .. StrColor(255,255,30,legendaryEffects[t.Item.BonusStrength])
+		end
+	end
 end
 
 local function upgradeGem(it, tier)
@@ -820,6 +825,52 @@ evt.PotionEffects[85] = function(IsDrunk, t, Power)
 	end
 end
 
+evt.PotionEffects[86] = function(IsDrunk, t, Power)
+	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+		if t.Bonus==0 and t.Charges<=1000 and t.Bonus2==0 then
+			return 
+		end
+		local done=false
+		while not done do
+			local roll=math.random(1,3)
+			if roll==1 and t.Bonus~=0 then
+				t.Bonus=0
+				t.BonusStrength=0
+				if t.Charges>1000 then
+					t.Bonus=math.floor(t.Charges/1000)
+					t.BonusStrength=t.Charges%1000
+					t.Charges=0
+				end
+				done=true
+			elseif roll==2 and t.Charges>1000 then
+				t.Charges=0
+				done=true
+			elseif roll==3 and t.Bonus2~=0 then
+				t.Bonus2=0
+				done=true
+			end
+		end
+		Mouse.Item.Number=0
+		mem.u4[0x51E100] = 0x100 
+		t.Condition = t.Condition:Or(0x10)
+		evt.PlaySound(12070)
+	end
+end
+
+evt.PotionEffects[87] = function(IsDrunk, t, Power)
+	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+		if t.BonusExpireTime<10 or t.BonusExpireTime>1000 then
+			t.BonusExpireTime=Mouse.Item.BonusStrength
+		else
+			return
+		end
+		Mouse.Item.Number=0
+		mem.u4[0x51E100] = 0x100 
+		t.Condition = t.Condition:Or(0x10)
+		evt.PlaySound(12070)
+	end
+end
+
 
 craftDropChances={
 		["gems"]=0.004,
@@ -828,6 +879,8 @@ craftDropChances={
 		[1063]=0.001,
 		[1064]=0.00001,
 		[1065]=0.00025,
+		[1066]=0.0001,
+		[1067]=0.00002,
 	}
 function events.MonsterKilled(mon)
 	if mon.Ally == 9999 then -- no drop from reanimated monsters
@@ -873,6 +926,14 @@ function events.MonsterKilled(mon)
 	if math.random()<craftDropChances[1065]*bonusRoll then
 		obj = SummonItem(1065, mon.X, mon.Y, mon.Z + 100, 100)
 	end
+	if math.random()<craftDropChances[1066]*bonusRoll then
+		obj = SummonItem(1066, mon.X, mon.Y, mon.Z + 100, 100)
+	end
+	if math.random()<craftDropChances[1067]*bonusRoll then
+		obj = SummonItem(1067, mon.X, mon.Y, mon.Z + 100, 100)
+		obj.Item.BonusStrength=math.random(11,#legendaryEffects)
+	end
+	
 end
 
 
@@ -880,4 +941,5 @@ function events.GameInitialized2()
 	--special crafting items
 	Game.ItemsTxt[1061].Notes="This Eye allows to add a Special enchant to any equipment that has already 2 base enchants\n(right-click on an item with a base enchant to use)"
 	Game.ItemsTxt[1062].Notes="This Hourglass allows to add a second base enchant to any equipment that has 1 base and a special enchant\n(right-click on an item with a base enchant to use)"
+	Game.ItemsTxt[1067].Notes="Oracle's Orb is a mysterious and powerful artifact, a large, purple orb with a haunting face suspended within its core. This enigmatic relic is known for bestowing legendary abilities upon items it enchants.\n\n Adds the following legendary power to an item:"
 end
