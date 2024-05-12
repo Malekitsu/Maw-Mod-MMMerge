@@ -857,7 +857,7 @@ function events.CalcDamageToMonster(t)
 			if skill==const.Skills.Spear then
 				local s,m=SplitSkill(t.Player.Skills[const.Skills.Spear])
 				mult=damageMultiplier[t.PlayerIndex]["Melee"]
-				reduction=math.round(2*mult)
+				reduction=math.round(s*0.1*mult)
 				if m==4 then
 					t.Monster.Resistances[index]=t.Monster.Resistances[index]-math.min(res, reduction)
 				end
