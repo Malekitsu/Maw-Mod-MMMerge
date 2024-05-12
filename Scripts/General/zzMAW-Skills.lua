@@ -234,7 +234,10 @@ function events.GetAttackDelay(t)
 		end
 		bonusSpeed=bonusSpeed+s
 	end
-	
+	if table.find(dkClass, t.Player.Class) then
+		local s, m=SplitSkill(t.Player.Skills[const.Skills.Water])
+		bonusSpeed=bonusSpeed+s*2
+	end
 	if baseSpeed==0 then
 		baseSpeed=100
 	end
