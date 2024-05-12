@@ -717,7 +717,7 @@ function events.CalcDamageToPlayer(t)
 	if Game.BolsterAmount==300 then
 		if data and data.Monster then
 			t.Result=t.Result*math.min(3, data.Monster.Level/100+2)
-		elseif t.DamageKind~=4 and t.DamageKind~=2 then --drown and fall
+		elseif (t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1 then --drown and fall
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 			if currentWorld==1 then
@@ -729,7 +729,12 @@ function events.CalcDamageToPlayer(t)
 			else 
 				bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 			end
-			mapLevel=bolster+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
+			if vars.freeProgression then
+				mapLevel=bolster+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
+			else
+				mapLevel=mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High
+			end
+			
 			--trap and objects multiplier
 			mult=(mapLevel/20+1)*3
 			if data and data.Object and data.Object.SpellType==15 then 
@@ -738,13 +743,18 @@ function events.CalcDamageToPlayer(t)
 				bonusDamage=mapLevel/8
 			end
 			damage=(t.Damage+bonusDamage)*mult
+			local s,m=SplitSkill(t.Player.Skills[const.Skills.Perception])
+			if m==4 then
+				m=5
+			end
+			damage=damage* (10-m)/10
 			t.Result=math.min(calcMawDamage(t.Player,t.DamageKind,damage),mapLevel*10)
 		end
 	end
 	if vars.Mode==2 then
 		if data and data.Monster then
 			t.Result=t.Result*math.min(4, data.Monster.Level/50+3)
-		elseif t.DamageKind~=4 and t.DamageKind~=2 then --drown and fall
+		elseif (t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1 then --drown and fall
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 			if currentWorld==1 then
@@ -756,7 +766,11 @@ function events.CalcDamageToPlayer(t)
 			else 
 				bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 			end
-			mapLevel=bolster+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
+			if vars.freeProgression then
+				mapLevel=bolster+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
+			else
+				mapLevel=mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High
+			end
 			--trap and objects multiplier
 			mult=(mapLevel/8+1)*4
 			if data and data.Object and data.Object.SpellType==15 then 
@@ -765,6 +779,8 @@ function events.CalcDamageToPlayer(t)
 				bonusDamage=mapLevel/4
 			end
 			damage=(t.Damage+bonusDamage)*mult
+			local s,m=SplitSkill(t.Player.Skills[const.Skills.Perception])
+			damage=damage* (10-m)/10
 			t.Result=math.min(calcMawDamage(t.Player,t.DamageKind,damage),mapLevel*20)
 		end
 	end
