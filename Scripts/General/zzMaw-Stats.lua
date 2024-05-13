@@ -135,7 +135,7 @@ function getSpellDelay(pl,spell)
 	end
 	local tier=0
 	local skill=SplitSkill(pl.Skills[const.Skills.Learning])
-	if table.find(spells, spell) or healingSpells[spell] then
+	if table.find(spells, spell) or (healingSpells and healingSpells[spell]) then
 		tier=getAscensionTier(skill,spell)
 	end
 	local delay=math.round(oldTable[spell][m]/(1+haste/100)*1.2^tier)
