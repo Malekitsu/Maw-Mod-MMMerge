@@ -51,13 +51,15 @@ end
 function events.CalcDamageToMonster(t)
 	local id=t.PlayerIndex
 	--[17]="Your hits will deal 1% of current monster HP health (0.4% for AoE, multi-hit spells and arrows)",
+	local data=WhoHitMonster()
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 17) then
-		local dmg=t.Monster.HP*0.02*2^(math.floor(t.Monster.Resistances[0]/1000))
-		data=WhoHitMonster()
-		if (data and data.Object and data.Object.Spell and table.find(aoespells, data.Object.Spell)) or (data and data.Object and data.Object.Spell==133) then
-			dmg=dmg*0.5
+		if t.Result>0 and ((data and data.Object==nil and t.DamageKind==4) or (data and data.Object)) then
+			local dmg=t.Monster.HP*0.02*2^(math.floor(t.Monster.Resistances[0]/1000))
+			if (data and data.Object and data.Object.Spell and table.find(aoespells, data.Object.Spell)) or (data and data.Object and data.Object.Spell==133) then
+				dmg=dmg*0.5
+			end
+			t.Result=t.Result+dmg
 		end
-		t.Result=t.Result+dmg
 	end
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 21) then
 		local mult=1
@@ -93,14 +95,18 @@ function events.CalcDamageToMonster(t)
 		end
 		--end of [14]
 		--[24]="killing a Monster Restores 10% of Health and Mana"
-		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 24) then			
+		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 24) then
+			local restoreHPLeg=true
 			function events.Tick()
 				events.Remove("Tick", 1)
-				if t.Monster.HP<=0 then
-					local fullHP=t.Player:GetFullHP()
-					local fullSP=t.Player:GetFullSP()
-					t.Player.HP=math.min(fullHP, t.Player.HP+fullHP*0.1)
-					t.Player.SP=math.min(fullSP, t.Player.SP+fullSP*0.1)
+				if restoreHPLeg then
+					restoreHPLeg=false
+					if t.Monster.HP<=0 then
+						local fullHP=t.Player:GetFullHP()
+						local fullSP=t.Player:GetFullSP()
+						t.Player.HP=math.min(fullHP, t.Player.HP+fullHP*0.1)
+						t.Player.SP=math.min(fullSP, t.Player.SP+fullSP*0.1)
+					end
 				end
 			end
 		end
@@ -110,12 +116,17 @@ function events.CalcDamageToMonster(t)
 			--no aoe spells
 			if (data and data.Object and table.find(aoespells,data.Object.Spell)) or (data and data.Spell==133) then
 				return
-			else				
+			else
+				reduceRecovery=true
 				function events.Tick()
 					events.Remove("Tick", 1)
-					if t.Monster.HP<=0 then
-						t.Player.RecoveryDelay=t.Player.RecoveryDelay/3
-						--changePlayer(id)
+					if reduceRecovery then
+						reduceRecovery=false
+						if t.Monster.HP<=0 then
+							reduceRecovery=false
+							t.Player.RecoveryDelay=t.Player.RecoveryDelay/4
+							--changePlayer(id)
+						end
 					end
 				end
 			end
