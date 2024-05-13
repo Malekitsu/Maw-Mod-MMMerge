@@ -54,7 +54,7 @@ function events.CalcDamageToMonster(t)
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 17) then
 		local dmg=t.Monster.HP*0.02*2^(math.floor(t.Monster.Resistances[0]/1000))
 		data=WhoHitMonster()
-		if (data and data.Object and data.Object.Spell and table.find(aoespells, data.Object.Spell)) or data.Object.Spell==133 then
+		if (data and data.Object and data.Object.Spell and table.find(aoespells, data.Object.Spell)) or (data and data.Object and data.Object.Spell==133) then
 			dmg=dmg*0.5
 		end
 		t.Result=t.Result+dmg
