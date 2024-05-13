@@ -302,6 +302,10 @@ function events.ItemGenerated(t)
 		local p2=enc2Chance[pseudoStr]/100
 		local p3=spcEncChance[pseudoStr]/100
 		
+		p1=p1^(1/diffMult)
+		p2=p2^(1/diffMult)
+		p3=p3^(1/diffMult)
+		
 		if p1>roll1 then
 			t.Item.Bonus=math.random(1,16)
 			t.Item.BonusStrength=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
@@ -340,7 +344,7 @@ function events.ItemGenerated(t)
 				
 		--ancient item
 		ancient=false
-		ancientChance=(p1*p2*p3)/4*diffMult
+		ancientChance=(p1*p2*p3)/4^(1/diffMult^0.5)
 		if bossLoot then
 			ancientChance=ancientChance*5
 			bossLoot=false
@@ -386,7 +390,7 @@ function events.ItemGenerated(t)
 		
 		--primordial item
 		primordial=math.random()
-		primordialChance=ancientChance/4*diffMult
+		primordialChance=ancientChance/4^(1/diffMult^0.5)
 		if primordial<=primordialChance then
 			if ancient then
 				t.Item.MaxCharges=t.Item.MaxCharges-chargesBonus
