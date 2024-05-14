@@ -1809,7 +1809,7 @@ function events.Action(t)
 			elseif m==4 then
 				txt=txt .. "Chance to Paralyze: " .. chance .. "%"
 			end
-			Skillz.setDesc(6,5,maceGMtxt .. StrColor(0,0,0,txt))
+			Game.SkillDesGM[6]=maceGMtxt .. StrColor(0,0,0,txt)
 		end
 	end
 end
