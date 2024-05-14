@@ -1535,7 +1535,7 @@ function ascension()
 			m6=SplitSkill(pl.Skills[const.Skills.Mind])
 			m7=SplitSkill(pl.Skills[const.Skills.Body])
 			m8=m2+m3+m4+m5+m1+m6+m7
-			local mult=1+m8/200
+			local mult=1+m8/400
 			for i=1,5 do
 				for v=1,4 do
 					healingSpells[healingList[i]].Scaling[v]=math.round(healingSpells[healingList[i]].Scaling[v]*mult)
