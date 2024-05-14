@@ -409,6 +409,7 @@ end
 --AUTO GENERATING TOOLTIPS
 ------------------------
 function events.GameInitialized2()
+	Skillz.setDesc(6,1,Skillz.getDesc(6,1) .. "\nThe paralyze effect lasts for 5 seconds on regular monsters and 2 seconds on bosses. The stun effect lasts for half the duration of the paralyze effect. The chances of successfully applying these effects depend on the skill level and the monster's level.\n")
 	for i=0,33 do
 		if i<=7 or i==33 then
 			attack=false
@@ -588,11 +589,11 @@ function events.GameInitialized2()
 	Game.SkillDesMaster[const.Skills.Bow]=string.format("%s 2 arrows",Game.SkillDesMaster[const.Skills.Bow])
 	Game.SkillDesExpert[const.Skills.Dagger]=string.format("%s can dual wield",Game.SkillDesExpert[const.Skills.Dagger])
 	Game.SkillDesMaster[const.Skills.Dagger]=string.format("%s 2.5+0.5 crit%%/skill",Game.SkillDesMaster[const.Skills.Dagger])
-	Game.SkillDesMaster[const.Skills.Mace]=string.format("%s 1%% to stun",Game.SkillDesMaster[const.Skills.Mace])
-	Game.SkillDesGM[const.Skills.Mace]=string.format("%s 1%% to paralyze",Game.SkillDesGM[const.Skills.Mace])
+	Game.SkillDesMaster[const.Skills.Mace]=string.format("%s chance to stun",Game.SkillDesMaster[const.Skills.Mace])
+	Game.SkillDesGM[const.Skills.Mace]=string.format("%s chance to paralyze",Game.SkillDesGM[const.Skills.Mace])
 	Game.SkillDesMaster[const.Skills.Spear]=string.format("%s can hold with 1 hand",Game.SkillDesMaster[const.Skills.Spear])
 	Game.SkillDesGM[const.Skills.Spear]=string.format("%s each attack reduces monster phys resistance by 0.1 per skill point, multiplied by your base weapon speed",Game.SkillDesGM[const.Skills.Spear])
-	Game.SkillDesMaster[const.Skills.Staff]=string.format("%s and 1%% to stun",Game.SkillDesMaster[const.Skills.Staff])
+	Game.SkillDesMaster[const.Skills.Staff]=string.format("%s 1%% to stun",Game.SkillDesMaster[const.Skills.Staff])
 	Game.SkillDesGM[const.Skills.Staff]=string.format("%s usable with Unarm.",Game.SkillDesGM[const.Skills.Staff])
 	Game.SkillDesMaster[const.Skills.Sword]=string.format("%s can dual wield",Game.SkillDesMaster[const.Skills.Sword])
 	Game.SkillDesExpert[const.Skills.Leather]=string.format("%s recovery penalty eliminated",Game.SkillDesExpert[const.Skills.Leather])
@@ -605,6 +606,8 @@ function events.GameInitialized2()
 	Game.SkillDesMaster[const.Skills.Armsmaster]=string.format("Skills adds 2 damage to all melee weapons")
 	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s usable with Leather Armor",Game.SkillDesGM[const.Skills.Dodging])
 	Game.SkillDesGM[const.Skills.Unarmed]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Unarmed])	
+	
+	maceGMtxt=Game.SkillDesGM[6] --used for mace tooltip
 end
 
 ---------------------------------------
@@ -1733,5 +1736,80 @@ function events.BeforeNewGameAutosave()
 	for i=0,Party.PlayersArray.High do
 		pl=Party.PlayersArray[i]
 		Skillz.set(pl,50,0)
+	end
+end
+
+--mace stun
+function events.CalcDamageToMonster(t)
+	if t.Player then
+		local it=t.Player:GetActiveItem(1)
+		local skill=it:T().Skill
+		local data=WhoHitMonster()
+		if skill==6 and t.DamageKind==0 and data and data.Object==nil then
+			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Mace))
+			if m>=3 then
+				local mon=t.Monster
+				--get Level
+				mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
+				local lvl=mon.Level
+				local id=t.MonsterIndex
+				if mon.NameId==0 then
+					lvl=math.round(totalLevel[id])
+				elseif mapvars.uniqueMonsterLevel[id] then
+					lvl=mapvars.uniqueMonsterLevel[id]
+				end
+				--chance to paralyze
+				local chance=s/lvl^0.65*0.15
+				local applyParalyze=applyParalyze or {}
+				applyParalyze[id]=false
+				local previousDuration=mon.SpellBuffs[6].ExpireTime
+				local duration=0
+				if chance>math.random() then
+					applyParalyze[id]=true
+					duration=const.Minute*2.5
+					if mon.NameId>220 and mon.NameId<300 then
+						duration=duration/2.5
+					end
+					if m==3 then
+						duration=duration/2
+					end
+				end
+				function events.Tick()
+					events.Remove("Tick",1)
+					if applyParalyze[id] then
+						mon.SpellBuffs[6].ExpireTime=Game.Time+duration
+						applyParalyze[id]=false
+					else
+						mon.SpellBuffs[6].ExpireTime=previousDuration
+					end
+				end
+			end
+		end
+	end
+end
+
+
+function events.Action(t)
+	function events.Tick()
+		events.Remove("Tick", 1)
+		if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
+			local i=Game.CurrentPlayer
+			if i<0 or i>Party.High then return end
+			local pl=Party[i]
+			local index=pl:GetIndex()
+			itemStats(index)
+			--base descriptions
+			Skillz.setDesc(6,5,maceGMtxt)
+			if m<3 then return end
+			local s,m=SplitSkill(pl:GetSkill(const.Skills.Mace))
+			local chance=math.round(s/pl.LevelBase^0.65*1500)/100
+			local txt="\n\n"
+			if m==3 then
+				txt=txt .. "Chance to Stun: " .. chance .. "%"
+			elseif m==4 then
+				txt=txt .. "Chance to Paralyze: " .. chance .. "%"
+			end
+			Skillz.setDesc(6,5,maceGMtxt .. StrColor(0,0,0,txt))
+		end
 	end
 end
