@@ -417,7 +417,7 @@ function events.ItemGenerated(t)
 		
 		--legendary
 		if t.Item.BonusExpireTime==2 then
-			local chance=0.1*diffMult
+			local chance=0.1
 			if vars.Mode==2 then
 				chance=chance*2
 			end
