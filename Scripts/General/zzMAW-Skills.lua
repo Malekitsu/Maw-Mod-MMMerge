@@ -1743,6 +1743,7 @@ end
 function events.CalcDamageToMonster(t)
 	if t.Player then
 		local it=t.Player:GetActiveItem(1)
+		if not it then return end
 		local skill=it:T().Skill
 		local data=WhoHitMonster()
 		if skill==6 and t.DamageKind==0 and data and data.Object==nil then
