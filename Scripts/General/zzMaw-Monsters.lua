@@ -1891,7 +1891,8 @@ teleport behind party
 
 
 function events.AfterLoadMap()
-	if Map.IndoorOrOutdoor==1 or vars.Mode==2 then
+	--if Map.IndoorOrOutdoor==1 or vars.Mode==2 then
+	if Game.BolsterAmount>=100 then
 		if not mapvars.bossGenerated or not mapvars.bossNames then
 			mapvars.bossGenerated=true
 			possibleMonsters={}
