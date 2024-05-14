@@ -197,6 +197,17 @@ function changeBag(pl, bag)
 	end
 end
 
+--remove buttons when tooltip is on the bottom right
+function events.BuildItemInformationBox(t)
+	for i=1,5 do
+		multibagButton[i].Active=false
+		function events.Tick()
+			events.Remove("Tick", 1)
+			multibagButton[i].Active=true
+		end
+	end
+end
+
 --sortMultiBag(Party[0])
 --debug.Message(dump(tempBag))
 
