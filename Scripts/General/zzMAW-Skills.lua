@@ -1755,7 +1755,7 @@ function events.CalcDamageToMonster(t)
 				local lvl=mon.Level
 				local id=t.MonsterIndex
 				if mon.NameId==0 then
-					lvl=math.round(totalLevel[id])
+					lvl=totalLevel[id] or mon.Level
 				elseif mapvars.uniqueMonsterLevel[id] then
 					lvl=mapvars.uniqueMonsterLevel[id]
 				end
