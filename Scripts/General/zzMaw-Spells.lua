@@ -667,6 +667,15 @@ end
 function doSharedLife(amount)
 	-- for each iteration, try to top up lowest HP deficit party member, increasing others' HP along the way
 	local function shouldParticipate(pl)
+		if pl.Unconscious then
+			local totalHP=0
+			for i=0,Party.High do
+				totalHP=totalHP+Party[i].HP
+			end
+			if totalHP<0 then
+				return false
+			end
+		end
 		return pl.Dead == 0 and pl.Eradicated == 0 and pl.Stoned == 0 -- as in default code
 	end
 
