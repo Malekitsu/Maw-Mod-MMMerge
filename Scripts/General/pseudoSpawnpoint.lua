@@ -68,11 +68,11 @@ function pseudoSpawnpoint(monster, x, y, z, count, powerChances, radius, group, 
 				local tilesetFileSuffixes = {[0] = "", [1] = 2, [2] = 3}
 				local tilesetsFile = "Tile" .. (Game.Version == 8 and (tilesetFileSuffixes[Map.TilesetsFile] or error("Unknown tileset file " .. Map.TilesetsFile)) or "") .. "Bin"
 				local tileId = Map.TileMap[(64 - y / 0x200):floor()][(64 + x / 0x200):floor()]
-				if Game[tilesetsFile][tileId].Water and Game.MonstersTxt[class * 3 - 2].Fly == 0 then
-					table.insert(failReasons, {"non-flying monster generated above water", x, y, z})
-				else
-					break
-				end
+				--if Game[tilesetsFile][tileId].Water and Game.MonstersTxt[class * 3 - 2].Fly == 0 then
+				--	table.insert(failReasons, {"non-flying monster generated above water", x, y, z})
+				--else
+				break
+				--end
 			end
 			spawnAttempts = spawnAttempts + 1
 			if spawnAttempts >= 20 then
