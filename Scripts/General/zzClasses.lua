@@ -1233,6 +1233,7 @@ local function dkSkills(isDK, id)
 		
 		Game.SpellsTxt[74].Name="Superior Blood Leech"
 		Game.SpellsTxt[74].Description="Activating this spell imbues the knight essence with blood, leeching a superior amount of life upon attacking at the cost of 12 spell points."
+		Game.SpellsTxt[74].Master="n/a"
 		Game.SpellsTxt[74].GM="Leeches " .. math.round(leech * 4) .. " Hit Points"
 		
 		Game.SpellsTxt[76].Name="Asphyxiate"
