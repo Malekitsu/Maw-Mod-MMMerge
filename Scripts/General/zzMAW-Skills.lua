@@ -124,14 +124,14 @@ skillItemAC={
 	[const.Skills.Leather]	= {[0]=0, 1, 2, 3, 4,},
 	[const.Skills.Chain]	= {[0]=0, 2, 3, 4, 5,},
 	[const.Skills.Plate]	= {[0]=0, 3, 4, 5, 6,},
-	[const.Skills.Shield]	= {[0]=0, 4, 4, 8, 8,},
+	[const.Skills.Shield]	= {[0]=0, 2, 4, 6, 8,},
 	[const.Skills.Dodging]	= {[0]=0, 5, 5, 10, 10,},
 }
 skillItemRes={
-	[const.Skills.Leather]	= {[0]=0, 3, 4, 5, 6,},
-	[const.Skills.Chain]	= {[0]=0, 2, 3, 4, 5,},
-	[const.Skills.Plate]	= {[0]=0, 1, 2, 3, 4,},
-	[const.Skills.Shield]	= {[0]=0, 0, 4, 4, 8,},
+	[const.Skills.Leather]	= {[0]=0, 2, 3, 4, 5,},
+	[const.Skills.Chain]	= {[0]=0, 1, 2, 3, 4,},
+	[const.Skills.Plate]	= {[0]=0, 0, 1, 2, 3,},
+	[const.Skills.Shield]	= {[0]=0, 2, 4, 6, 8,},
 	[const.Skills.Dodging]	= {[0]=0, 0, 5, 5, 10,},
 }
 	
@@ -1755,7 +1755,7 @@ function events.CalcDamageToMonster(t)
 				local lvl=mon.Level
 				local id=t.MonsterIndex
 				if mon.NameId==0 then
-					lvl=totalLevel[mon.Id]
+					lvl=math.round(totalLevel[mon.Id])
 				elseif mapvars.uniqueMonsterLevel[id] then
 					lvl=mapvars.uniqueMonsterLevel[id]
 				end
