@@ -850,6 +850,8 @@ function events.PlayerCastSpell(t)
 			evt.Add("Items",330)
 		elseif t.SpellId==33 then
 			evt.Add("Items",332)
+		elseif t.SpellId==21 then
+			evt.Add("Items",320)
 		end
 	end
 end
