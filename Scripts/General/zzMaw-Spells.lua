@@ -667,14 +667,12 @@ end
 function doSharedLife(amount)
 	-- for each iteration, try to top up lowest HP deficit party member, increasing others' HP along the way
 	local function shouldParticipate(pl)
-		if pl.Unconscious then
+		if pl.HP<0 then
 			local totalHP=0
 			for i=0,Party.High do
 				totalHP=totalHP+Party[i].HP
 			end
-			if totalHP<0 then
-				return false
-			end
+			return totalHP>0
 		end
 		return pl.Dead == 0 and pl.Eradicated == 0 and pl.Stoned == 0 -- as in default code
 	end
@@ -1430,7 +1428,7 @@ function ascension()
 			local ascensionLevel=getAscensionTier(s,num)
 			if ascensionLevel>=1 then
 				for i=1,4 do
-					Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+s*0.125)*1.5^(ascensionLevel)*(1-0.125*m)*1.2^ascensionLevel
+					Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m)
 				end
 			else
 				for i=1,4 do
@@ -1528,7 +1526,7 @@ function ascension()
 			end
 			if ascensionLevel>=1 then
 				for v=1,4 do
-					healingSpells[healingList[i]].Cost[v]=math.round(healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.5^(ascensionLevel)*(1-0.125*m))*1.2^ascensionLevel
+					healingSpells[healingList[i]].Cost[v]=math.round(healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m))
 					healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
 				end
 			end
