@@ -296,7 +296,7 @@ function events.ItemGenerated(t)
 			rollSpc=roll1/2
 		end
 		--difficulty multiplier 
-		diffMult=math.max((Game.BolsterAmount-100)/1000+1,1)
+		diffMult=math.max((Game.BolsterAmount-100)/500+1,1)
 		--calculate chances
 		local p1=enc1Chance[pseudoStr]/100
 		local p2=enc2Chance[pseudoStr]/100
@@ -537,6 +537,19 @@ function events.ItemGenerated(t)
 		if t.Item.Charges%1000>100 then
 			t.Item.Charges=math.min(math.round(t.Item.Charges%1000/5)*5,999)+math.floor(t.Item.Charges/1000)*1000
 		end
+		
+		--[[statistics
+		ancientDrops=ancientDrops or 0
+		primordialDrops=primordialDrops or 0
+		legendaryDrops=legendaryDrops or 0
+		if t.Item.BonusExpireTime==1 then
+			ancientDrops=ancientDrops+1
+		elseif t.Item.BonusExpireTime==2 then
+			primordialDrops=primordialDrops+1
+		elseif t.Item.BonusExpireTime>=10 and t.Item.BonusExpireTime<=30 then
+			legendaryDrops=legendaryDrops+1
+		end
+		]]
 	end
 end
 
