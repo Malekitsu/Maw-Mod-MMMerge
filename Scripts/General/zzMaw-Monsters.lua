@@ -665,8 +665,6 @@ function events.PickCorpse(t)
 		t.Monster.TreasureItemPercent=100
 		t.Monster.TreasureItemLevel=math.min(t.Monster.TreasureItemLevel+1,6)
 		bossLoot=true
-		debug.Message(bossLoot)
-		debug.Message(t.Monster.TreasureItemLevel)
 	end
 	
 end
