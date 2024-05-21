@@ -1786,7 +1786,8 @@ function events.MonsterKilled(mon)
 				m=m+1
 			end
 		end
-		if m==n then
+		local requiredRateo=0.99^(math.floor(n/100))
+		if m/n>=requiredRateo then
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 			if currentWorld==1 then
