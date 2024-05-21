@@ -877,22 +877,22 @@ end
 
 craftDropChances={
 		["gems"]=0.004,
-		[1061]=0.00025,
-		[1062]=0.00025,
+		[1061]=0.0002,
+		[1062]=0.0002,
 		[1063]=0.001,
 		[1064]=0.00001,
 		[1065]=0.00025,
-		[1066]=0.0001,
+		[1066]=0.0002,
 		[1067]=0.00002,
 	}
 function events.MonsterKilled(mon)
-	if mon.Ally == 9999 then -- no drop from reanimated monsters
+	if mon.Ally == 9999 or mon.NameId>300 then -- no drop from reanimated monsters
 		return
 	end
 	mon.Ally=9999
 	--level bonus
-	partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-	bonusRoll=1+partyLevel/50
+	--partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+	bonusRoll=1+mon.Level/50
 	if mon.NameId>=220 and mon.NameId <300 then
 		bonusRoll=bonusRoll*10
 	end
