@@ -629,30 +629,32 @@ function events.PickCorpse(t)
 		mon.TreasureDiceSides=math.min(newGold^0.5,255)
 	end
 	--calculate loot chances and quality
-	if t.Item~=0 then return end
-	
-	local name=Game.MapStats[Map.MapStatsIndex].Name
-	local lvl=math.max(basetable[t.Monster.Id].Level, mapLevels[name].Low)
-	local originalValue=math.min(mon.TreasureItemPercent,50)
-	mon.TreasureItemPercent= math.ceil(mon.Level^0.5*(1+tier)*0.5 + originalValue*0.5)
-	if vars.Mode==2 then
-		mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.5)
-	elseif Game.BolsterAmount==300 then
-		mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.75)
+	if t.Item==0 then
+		local name=Game.MapStats[Map.MapStatsIndex].Name
+		local lvl=math.max(basetable[t.Monster.Id].Level, mapLevels[name].Low)
+		local originalValue=math.min(mon.TreasureItemPercent,50)
+		mon.TreasureItemPercent= math.ceil(mon.Level^0.5*(1+tier)*0.5 + originalValue*0.5)
+		if vars.Mode==2 then
+			mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.5)
+		elseif Game.BolsterAmount==300 then
+			mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.75)
+		end
+		
+		local itemTier=lvl/15-1
+		if itemTier%15/15>math.random() then
+			itemTier=itemTier+1
+		end
+		itemTier=math.floor(itemTier+tier)
+		mon.TreasureItemLevel=math.max(math.min(itemTier,6),1)
+		if  itemTier<=0 then
+			mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*2^(itemTier-1))
+		end
+		if math.random()<0.7 then
+			mon.TreasureItemType=0
+		end
 	end
 	
-	local itemTier=lvl/15-1
-	if itemTier%15/15>math.random() then
-		itemTier=itemTier+1
-	end
-	itemTier=math.floor(itemTier+tier)
-	mon.TreasureItemLevel=math.max(math.min(itemTier,6),1)
-	if  itemTier<=0 then
-		mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*2^(itemTier-1))
-	end
-	if math.random()<0.5 then
-		mon.TreasureItemType=0
-	end
+	
 	
 	--special for bosses and resurrected
 	
@@ -663,6 +665,8 @@ function events.PickCorpse(t)
 		t.Monster.TreasureItemPercent=100
 		t.Monster.TreasureItemLevel=math.min(t.Monster.TreasureItemLevel+1,6)
 		bossLoot=true
+		debug.Message(bossLoot)
+		debug.Message(t.Monster.TreasureItemLevel)
 	end
 	
 end
