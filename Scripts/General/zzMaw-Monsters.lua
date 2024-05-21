@@ -628,15 +628,43 @@ function events.PickCorpse(t)
 		mon.TreasureDiceCount=math.min(newGold^0.5,255)
 		mon.TreasureDiceSides=math.min(newGold^0.5,255)
 	end
-	--calculate loot chances
-	mon.TreasureItemPercent= math.ceil(mon.Level^0.5*(1+tier))
+	--calculate loot chances and quality
+	if t.Item~=0 then return end
+	
+	local name=Game.MapStats[Map.MapStatsIndex].Name
+	local lvl=math.max(basetable[t.Monster.Id].Level, mapLevels[name].Low)
+	local originalValue=math.min(mon.TreasureItemPercent,50)
+	mon.TreasureItemPercent= math.ceil(mon.Level^0.5*(1+tier)*0.5 + originalValue*0.5)
 	if vars.Mode==2 then
-		mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.6)
+		mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.5)
+	elseif Game.BolsterAmount==300 then
+		mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.75)
 	end
-	mon.TreasureItemLevel=math.max(t.Monster.TreasureItemLevel,1)
-	if mon.Item==0 and math.random()<0.7 then
+	
+	local itemTier=lvl/10-3
+	if itemTier%15/15>math.random() then
+		itemTier=itemTier+1
+	end
+	itemTier=math.floor(itemTier+tier)
+	mon.TreasureItemLevel=math.max(math.min(itemTier,6),0)
+	if mon.TreasureItemLevel==0 then
+		mon.TreasureItemPercent=0
+	end
+	if math.random()<0.5 then
 		mon.TreasureItemType=0
 	end
+	
+	--special for bosses and resurrected
+	
+	if t.Monster.NameId>300 then
+		t.Monster.TreasureItemPercent=math.round(t.Monster.TreasureItemPercent/4)
+		t.Monster.TreasureDiceSides=math.max(math.round(t.Monster.TreasureDiceSides/4),1)
+	elseif t.Monster.NameId>220 then
+		t.Monster.TreasureItemPercent=100
+		t.Monster.TreasureItemLevel=math.min(t.Monster.TreasureItemLevel,6)
+		bossLoot=true
+	end
+	
 end
 -----------------------------
 -----MAP MONSTER CHANGES-----
@@ -1744,16 +1772,6 @@ function events.LeaveMap()
 	end
 end
 
-function events.PickCorpse(t)
-	if t.Monster.NameId>300 then
-		t.Monster.TreasureItemPercent=math.round(t.Monster.TreasureItemPercent/4)
-		t.Monster.TreasureDiceSides=math.max(math.round(t.Monster.TreasureDiceSides/4),1)
-	elseif t.Monster.NameId>220 then
-		t.Monster.TreasureItemPercent=100
-		t.Monster.TreasureItemLevel=math.min(math.ceil(t.Monster.Level/18+1),6)
-		bossLoot=true
-	end
-end
 --check for dungeon clear
 function events.MonsterKilled(mon)
 	if Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.completed==nil then
@@ -2346,3 +2364,15 @@ function calculateDirection(x_m, y_m, x_p, y_p)
     return direction
 end
 
+--[[reduce drops from gogs and wasps 
+local nerfDropList={201, 202, 217, 653, 654,}  
+function events.MonsterDropItem(t)
+	if table.find(nerfDropList, t.ItemId) then
+		if math.random()<0 then
+			t.Handled=true
+			t.ItemId=0
+			return
+		end
+	end	
+end
+not working]]
