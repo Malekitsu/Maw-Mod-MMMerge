@@ -646,9 +646,9 @@ function events.PickCorpse(t)
 		itemTier=itemTier+1
 	end
 	itemTier=math.floor(itemTier+tier)
-	mon.TreasureItemLevel=math.max(math.min(itemTier,6),0)
-	if mon.TreasureItemLevel==0 then
-		mon.TreasureItemPercent=0
+	mon.TreasureItemLevel=math.max(math.min(itemTier,6),1)
+	if  itemTier<=0 then then
+		mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*2^(itemTier-1))
 	end
 	if math.random()<0.5 then
 		mon.TreasureItemType=0
