@@ -2183,6 +2183,14 @@ function events.LoadMap(wasInGame)
 				mapvars.monsterZ[i]=mapvars.monsterZ[i] or mon.Z
 				if Map.RoomFromPoint(XYZ(mon)) == 0 then 
 					mon.X, mon.Y, mon.Z= mapvars.monsterX[i], mapvars.monsterY[i], mapvars.monsterZ[i]
+					--fix in case starting location is bugged
+					if Map.RoomFromPoint(XYZ(mon)) == 0 then
+						for i=0, Map.Monsters.High do
+							if Map.RoomFromPoint(XYZ(Map.Monsters[i])) > 0 then
+								mon.X, mon.Y, mon.Z= Map.Monsters[i].X, Map.Monsters[i].Y, Map.Monsters[i].Z
+							end
+						end
+					end
 				end
 			end
 		end
