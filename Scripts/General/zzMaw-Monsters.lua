@@ -641,7 +641,7 @@ function events.PickCorpse(t)
 		mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.75)
 	end
 	
-	local itemTier=lvl/10-3
+	local itemTier=lvl/10-2
 	if itemTier%15/15>math.random() then
 		itemTier=itemTier+1
 	end
