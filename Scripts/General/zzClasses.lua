@@ -456,6 +456,11 @@ function events.GameInitialized2()
 			local bonus= (dragonScales.Resistances[m]) * s
 			t.Result=t.Result+bonus
 		end
+		
+		--no mana from items
+		if t.Stat==const.Stats.SpellPoints then
+			t.Result=0
+		end
 	end
 	
 	function events.GetAttackDelay(t)
@@ -836,7 +841,7 @@ function events.GameInitialized2()
 			m6=SplitSkill(data.Player.Skills[const.Skills.Mind])
 			m7=SplitSkill(data.Player.Skills[const.Skills.Body])
 			data.Player.SP=math.min(data.Player.SP+m6, data.Player:GetFullSP())
-			data.Player.HP=math.min((data.Player.HP+m7^1.33)+(m4^0.6*2)/100*t.Result, data.Player:GetFullHP())
+			data.Player.HP=math.min((data.Player.HP+m7^1.33)+(m4/t.Monster.Level)*0.3*t.Result, data.Player:GetFullHP())
 			local fireDamage=(m1^0.5/500)
 			if t.Monster.Resistances[0]>=1000 then
 				mult=2^math.floor(t.Monster.Resistances[0]/1000)
@@ -895,8 +900,8 @@ local function shamanSkills(isShaman, id)
 		local waterReduction=math.round(m3^1.33*mult)
 		txt=baseSchoolsTxt[14] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)"
 		Skillz.setDesc(14,1,txt)
-		local leech=math.round(m4^0.6*200)/100
-		txt=baseSchoolsTxt[15] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks heal by " .. leech .. "% of damage done"
+		local leech=math.round(m4/pl.LevelBase*10000*0.3)/100
+		txt=baseSchoolsTxt[15] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks heal by " .. leech .. "% of damage done (vs. same level monster, up to 255)" 
 		Skillz.setDesc(15,1,txt)
 		txt=baseSchoolsTxt[16] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nIncreases melee damage by " .. m5 .. "%"
 		Skillz.setDesc(16,1,txt)
@@ -984,7 +989,8 @@ function events.GameInitialized2()
 				maxDamage=pl:GetMeleeDamageMax()
 				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
 				damage=math.round(randomDamage/2)
-				damage=damage/2^(t.Monster.Resistances[4]/100)
+				local res=t.Monster.Resistances[t.DamageKind] or t.Monster.Resistances[4]
+				damage=damage/2^(res/100)
 				local mult=damageMultiplier[t.PlayerIndex]["Melee"]
 				t.Result=damage*mult
 				luck=pl:GetLuck()/1.5
@@ -1023,7 +1029,7 @@ function events.GameInitialized2()
 			if t.DamageKind==4 and table.find(dkClass, data.Player.Class) then
 				local pl=data.Player
 				local bloodS, bloodM=SplitSkill(pl.Skills[const.Skills.Body])
-				local heal=t.Result*(bloodS^0.6*2)/100
+				local heal=t.Result*(bloodS/t.Monster.Level)*0.3
 				--current active leech spell
 				vars.dkActiveAttackSpell=vars.dkActiveAttackSpell or {}
 				local id=pl:GetIndex()
@@ -1061,7 +1067,7 @@ function events.GameInitialized2()
 			if data and data.Object then
 				if data.Object.Spell==90 then --toxic cloud
 					local s, m=SplitSkill(pl.Skills[const.Skills.Body])
-					local leech=t.Result*(s^0.6*2)/100 * (1+(m-2)/2)
+					local leech=t.Result*(s/t.Monster.Level)*0.3 * (1+(m-2)/2)
 					pl.HP=math.min(pl:GetFullHP(), pl.HP+leech)
 				elseif data.Object.Spell==26 then --ice bolt
 					local s,m=SplitSkill(pl.Skills[const.Skills.Water])
@@ -1267,8 +1273,8 @@ local function dkSkills(isDK, id)
 		local txt
 		txt="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and increases attack speed by 2% per skill point.\n"
 		Skillz.setDesc(14,1,txt)
-		leech=math.round(bloodS^0.6*2*100)/100
-		txt="This skill is only available to death knights and reduces physical damage taken by 1% per skill point.\nAdditionally it will make your attacks to leech damage based on damage done.\n\nCurrent leech: " .. leech .. "%\n"            
+		leech=math.round(bloodS/math.min(pl.LevelBase,255)*10000*0.3)/100
+		txt="This skill is only available to death knights and reduces physical damage taken by 1% per skill point.\nAdditionally it will make your attacks to leech damage based on damage done.\n\nCurrent leech vs. same level monsters (up to 255): " .. leech .. "%\n"            
 		Skillz.setDesc(18,1,txt)
 		txt="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and reduces magical damage taken by 1% per skill point.\n"	
 		Skillz.setDesc(20,1,txt)
