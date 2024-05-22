@@ -682,6 +682,36 @@ function doSharedLife(amount)
 	local activePlayers = {}
 	local fullHPs = {}
 	amount = amount or 0
+	
+	--skill scaling
+	local id=Game.CurrentPlayer
+	if id>=0 and id<=Party.High then
+		local pl=Party[id]
+		local s,m=SplitSkill(pl:GetSkill(const.Skills.Spirit))
+		local healingAmount=0
+		--remove base bonus
+		if m==3 then
+			healingAmount=healingAmount-s*3
+		elseif m==4 then
+			healingAmount=healingAmount-s*4
+		end
+		
+		local sp=healingSpells[54]
+		local baseHeal=sp.Base[m]+sp.Scaling[m]*s
+		
+		local mult, gotCrit=getHealSpellMultiPlier(pl)
+		
+		totHeal=baseHeal*mult
+
+		if gotCrit then
+			Game.ShowStatusText(string.format("Shared Life heals for " .. math.round(totHeal) .. " Hit points(crit)"))
+		else
+			Game.ShowStatusText(string.format("Shared Life heals for " .. math.round(totHeal) .. " Hit points"))
+		end
+		amount=amount+totHeal-healingAmount
+		
+	end
+	
 	for i, pl in Party do
 		if shouldParticipate(pl) then
 			table.insert(activePlayers, pl)
@@ -1389,10 +1419,10 @@ function diceMaxTooltip(skill, mastery, spell)
 end
 
 --backup healing tooltips
-local healingList={49, 55, 68, 74, 77}
+local healingList={49, 54, 55, 68, 74, 77}
 function events.GameInitialized2()
 	baseHealTooltip={}
-	for i=1,5 do
+	for i=1,6 do
 		baseHealTooltip[healingList[i]]=Game.SpellsTxt[healingList[i]].Description
 	end
 end
@@ -1517,12 +1547,13 @@ function ascension()
 		-----------------------
 		healingSpells={
 			[const.Spells.RemoveCurse]=    {["Cost"]={0,5,10,20}, ["Base"]={0,10,20,30}, ["Scaling"]={0,3,4,5}},
+			[const.Spells.SharedLife]=    {["Cost"]={0,0,25,40}, ["Base"]={0,0,15,20}, ["Scaling"]={0,0,7,9}},
             [const.Spells.Resurrection]={["Cost"]={0,0,0,100}, ["Base"]={0,0,0,100}, ["Scaling"]={0,0,0,14}},
             [const.Spells.Heal]=        {["Cost"]={2,4,8,16}, ["Base"]={10,15,20,25}, ["Scaling"]={1,2,3,4}},
             [const.Spells.CureDisease]=    {["Cost"]={0,0,15,25}, ["Base"]={0,0,25,40}, ["Scaling"]={0,0,5,7}},
             [const.Spells.PowerCure]=    {["Cost"]={0,0,0,30}, ["Base"]={0,0,0,10}, ["Scaling"]={0,0,0,3}}
 		}
-		for i=1, 5 do
+		for i=1, 6 do
 			local ascensionLevel=getAscensionTier(s,healingList[i])
 			if ascensionLevel>=1 then
 				Game.SpellsTxt[healingList[i]].Description=baseHealTooltip[healingList[i]] .. "\n\nAscension level: " .. ascensionLevel
