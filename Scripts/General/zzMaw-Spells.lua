@@ -1594,6 +1594,13 @@ function ascension()
 		Game.SpellsTxt[49].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[3], sp.Base[3], sp.Scaling[3])
 		Game.SpellsTxt[49].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[4], sp.Base[4], sp.Scaling[4])
 
+		--shared life
+		local sp=healingSpells[54]
+		Game.Spells[54]["SpellPointsMaster"]=sp.Cost[3]
+		Game.Spells[54]["SpellPointsGM"]=sp.Cost[4]
+		Game.SpellsTxt[54].Master=string.format("Adds %s + %s HP per point of skill to the pool", sp.Base[3], sp.Scaling[3])
+		Game.SpellsTxt[54].GM=string.format("Adds %s + %s HP per point of skill to the pool", sp.Base[4], sp.Scaling[4])
+		
 		--resurrection
 		local sp=healingSpells[55]
 		Game.Spells[55]["SpellPointsGM"]=sp.Cost[4]
