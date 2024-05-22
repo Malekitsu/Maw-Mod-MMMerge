@@ -629,9 +629,9 @@ function events.PickCorpse(t)
 		mon.TreasureDiceSides=math.min(newGold^0.5,255)
 	end
 	--calculate loot chances and quality
-	if mon.Item==0 then
+	if mon.Item==0 and (mon.NameId<220 or mon.NameId>300) then
 		local name=Game.MapStats[Map.MapStatsIndex].Name
-		local lvl=math.max(basetable[t.Monster.Id].Level, mapLevels[name].Low)
+		local lvl=math.max(basetable[mon.Id].Level, mapLevels[name].Low)
 		local originalValue=math.min(mon.TreasureItemPercent,50)
 		mon.TreasureItemPercent= math.ceil(mon.Level^0.5*(1+tier)*0.5 + originalValue*0.5)
 		if vars.Mode==2 then
@@ -658,12 +658,12 @@ function events.PickCorpse(t)
 	
 	--special for bosses and resurrected
 	
-	if t.Monster.NameId>300 then
-		t.Monster.TreasureItemPercent=math.round(t.Monster.TreasureItemPercent/4)
-		t.Monster.TreasureDiceSides=math.max(math.round(t.Monster.TreasureDiceSides/4),1)
-	elseif t.Monster.NameId>220 then
-		t.Monster.TreasureItemPercent=100
-		t.Monster.TreasureItemLevel=math.min(t.Monster.TreasureItemLevel+1,6)
+	if mon.NameId>300 then
+		mon.TreasureItemPercent=math.round(mon.TreasureItemPercent/4)
+		mon.TreasureDiceSides=math.max(math.round(mon.TreasureDiceSides/4),1)
+	elseif mon.NameId>220 then
+		mon.TreasureItemPercent=100
+		mon.TreasureItemLevel=math.min(mon.TreasureItemLevel+1,6)
 		bossLoot=true
 	end
 	
