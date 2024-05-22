@@ -1731,24 +1731,23 @@ function events.GameInitialized2() --make it load later compared to other script
 			local data=WhoHitMonster()
 			
 			if data and data.Player then
+				local heal=t.Result*data.Player.LevelBase^0.6/t.Monster.Level*0.30
 				--melee
 				if gotVamp[data.Player:GetIndex()] and not data.Object then
 					local fullHP=t.Player:GetFullHP()
-					local heal=math.min(t.Result*0.1, fullHP*0.1) 
 					t.Player.HP=math.min(fullHP,t.Player.HP+heal)
 				end
 				--ranged
 				if gotVamp[data.Player:GetIndex()] and data.Object and data.Object.Spell==133 then
 					local fullHP=t.Player:GetFullHP()
-					local heal=math.min(t.Result*0.05, fullHP*0.05) 
-					t.Player.HP=math.min(fullHP,t.Player.HP+heal)
+					t.Player.HP=math.min(fullHP,t.Player.HP+heal*0.5)
 				end
 			end
 		elseif data and data.Player then --spell leech
 			it=t.Player:GetActiveItem(1)
 			local fullHP=t.Player:GetFullHP()
 			if it and it.Bonus2==40 then
-				local heal=math.min(t.Result*0.05, fullHP*0.05) 
+				local heal=t.Result*data.Player.LevelBase^0.6/t.Monster.Level*0.30
 				t.Player.HP=math.min(fullHP,t.Player.HP+heal)
 			end
 		end 
