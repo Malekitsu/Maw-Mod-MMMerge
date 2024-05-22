@@ -629,7 +629,7 @@ function events.PickCorpse(t)
 		mon.TreasureDiceSides=math.min(newGold^0.5,255)
 	end
 	--calculate loot chances and quality
-	if t.Item==0 then
+	if mon.Item==0 then
 		local name=Game.MapStats[Map.MapStatsIndex].Name
 		local lvl=math.max(basetable[t.Monster.Id].Level, mapLevels[name].Low)
 		local originalValue=math.min(mon.TreasureItemPercent,50)
