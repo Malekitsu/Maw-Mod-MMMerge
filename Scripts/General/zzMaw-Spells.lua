@@ -1193,13 +1193,13 @@ function events.GameInitialized2()
 			[6] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--fireball
 			[7] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--fire spike, the only spell with damage depending on mastery, fix in events.calcspelldamage
 			[8] = {dmgAdd = 16, diceMin = 1, diceMax = 10, },--immolation
-			[9] = {dmgAdd = 3, diceMin = 1, diceMax = 1, },--meteor shower
+			[9] = {dmgAdd = 2, diceMin = 1, diceMax = 1, },--meteor shower
 			[10] = {dmgAdd = 12, diceMin = 1, diceMax = 7, },--inferno
 			[11] = {dmgAdd = 18, diceMin = 1, diceMax = 18, },--incinerate
 			[15] = {dmgAdd = 6, diceMin = 1, diceMax = 2, },--sparks
 			[18] = {dmgAdd = 13, diceMin = 1, diceMax = 8, },--lightning bolt
 			[20] = {dmgAdd = 20, diceMin = 1, diceMax = 12, },--implosion
-			[22] = {dmgAdd = 6, diceMin = 1, diceMax = 1, },--starburst
+			[22] = {dmgAdd = 5, diceMin = 1, diceMax = 1, },--starburst
 			[24] = {dmgAdd = 5, diceMin = 1, diceMax = 2, },--poison spray
 			[26] = {dmgAdd = 6, diceMin = 1, diceMax = 6, },--ice bolt
 			[29] = {dmgAdd = 2, diceMin = 1, diceMax = 12, },--acid burst
@@ -1207,7 +1207,7 @@ function events.GameInitialized2()
 			[37] = {dmgAdd = 5, diceMin = 1, diceMax = 5, },--deadly swarm
 			[39] = {dmgAdd = 7, diceMin = 1, diceMax = 7, },--blades
 			[41] = {dmgAdd = 8, diceMin = 1, diceMax = 8, },--rock blast
-			[43] = {dmgAdd = 0, diceMin = 1, diceMax = 3, },--death blossom
+			[43] = {dmgAdd = 0, diceMin = 1, diceMax = 2, },--death blossom
 			[44] = {dmgAdd = 15, diceMin = 0.5, diceMax = 0.5, },--mass distorsion, nerfed
 			[52] = {dmgAdd = 10, diceMin = 2, diceMax = 8, },--spirit lash
 			[59] = {dmgAdd = 16, diceMin = 1, diceMax = 3, },--mind blast
