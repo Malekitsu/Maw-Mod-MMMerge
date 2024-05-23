@@ -995,6 +995,7 @@ end
 function events.Tick()
 	if Game.CurrentCharScreen==100 and Game.CurrentScreen==7 then
 		local i=Game.CurrentPlayer
+		if i<0 or i>Party.High then return end
 		local pl=Party[i]
 		DPS1, DPS2, DPS3, vitality=calcPowerVitality(pl)
 		--get spell and its damage
@@ -1152,6 +1153,17 @@ function calcPowerVitality(pl)
 	
 	--calculation
 	local reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
+	
+	--dk/shaman bonus
+	if table.find(shamanClass, pl.Class) then
+		local s=SplitSkill(pl.Skills[const.Skills.Air])
+		reduction=reduction*0.99^s
+	elseif table.find(dkClass, pl.Class) then
+		local s1=SplitSkill(pl.Skills[const.Skills.Body])
+		local s2=SplitSkill(pl.Skills[const.Skills.Dark])
+		reduction=reduction*0.99^((s1+s2)/2)
+	end
+	
 	vitality=math.round(fullHP/reduction)
 	return DPS1, DPS2, DPS3, vitality
 end
