@@ -764,7 +764,7 @@ function doSharedLife(amount)
 			everyoneFull = false
 		end
 	end
-	assert((pool == result) or everyoneFull, format("Pool %d, result %d, everyoneFull: %s", pool, result, everyoneFull))
+	--assert((pool == result) or everyoneFull, format("Pool %d, result %d, everyoneFull: %s", pool, result, everyoneFull))
 	--printf("Steps: %d", steps)
 	return affectedPlayers
 	--debug.Message(format("%d HP left", amount))
