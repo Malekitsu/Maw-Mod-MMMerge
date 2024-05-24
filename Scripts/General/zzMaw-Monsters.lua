@@ -298,6 +298,8 @@ function events.LoadMap()
 end
 
 function events.MonsterKillExp(t)
+	
+	
 	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 	local currentLVL=calcLevel(t.Exp/5 + vars.EXPBEFORE)
 		
@@ -1597,7 +1599,7 @@ function events.BuildMonsterInformationBox(t)
 		diff=math.min(diff, 2+mon.Level/100)
 	end
 	if vars.Mode==2 then
-		diff=math.min(4, 3+mon.Level/50)
+		diff=3+mon.Level/50
 	end
 	
 	--some statistics here, calculate the standard deviation of dices to get the range of which 95% will fall into
