@@ -303,7 +303,7 @@ function events.MonsterKillExp(t)
 	if mon.NameId==0 then
 		monLvl=math.round(totalLevel[mon.Id])
 	elseif mapvars.uniqueMonsterLevel[t.MonsterIndex] then
-		monLvl=mapvars.uniqueMonsterLevel[Mouse:GetTarget().Index]
+		monLvl=mapvars.uniqueMonsterLevel[t.MonsterIndex]
 	else
 		monLvl=mon.Level
 	end
