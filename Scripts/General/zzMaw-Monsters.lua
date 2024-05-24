@@ -298,6 +298,16 @@ function events.LoadMap()
 end
 
 function events.MonsterKillExp(t)
+	local partyLvl=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL+vars.MMMLVL
+	local mon=t.Monster
+	if mon.NameId==0 then
+		monLvl=math.round(totalLevel[mon.Id])
+	elseif mapvars.uniqueMonsterLevel[t.MonsterIndex] then
+		monLvl=mapvars.uniqueMonsterLevel[Mouse:GetTarget().Index]
+	else
+		monLvl=mon.Level
+	end
+	t.Exp=math.round(t.Exp*math.min((monLvl/partyLvl)^2,5))
 	
 	
 	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
