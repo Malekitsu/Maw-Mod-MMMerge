@@ -309,7 +309,7 @@ function events.ItemGenerated(t)
 			t.Item.Bonus=math.random(1,16)
 			t.Item.BonusStrength=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
 			--bolster
-			t.Item.BonusStrength=math.max(math.ceil(t.Item.BonusStrength*difficultyExtraPower), t.Item.BonusStrength+flatBonus)
+			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*difficultyExtraPower)
 			if math.random(1,10)==10 then
 				t.Item.Bonus=math.random(17,24)
 				local skill=t.Item:T().Skill
@@ -324,7 +324,7 @@ function events.ItemGenerated(t)
 		if p2>roll2 then
 			t.Item.Charges=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
 			--bolster
-			t.Item.Charges=math.max(math.ceil(t.Item.Charges*difficultyExtraPower), t.Item.Charges+flatBonus)
+			t.Item.Charges=math.ceil(t.Item.Charges*difficultyExtraPower)
 			--bonus type
 			t.Item.Charges=t.Item.Charges+math.random(1,16)*1000
 			--[[ no skill bonuses
