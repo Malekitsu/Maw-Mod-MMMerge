@@ -262,12 +262,11 @@ function events.ItemGenerated(t)
 		]]
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
 		bonusCharges=(difficultyExtraPower-1)*20
-		cap1=50*difficultyExtraPower+bonusCharges
-		asdcharge=math.min(math.floor(partyLevel/5+mapLevel/40),cap1)
-		t.Item.MaxCharges=math.min(math.floor(partyLevel/5+mapLevel/40),cap1)
+		cap1=50*((difficultyExtraPower-1)*2+1)
+		maxChargesCap=50*((difficultyExtraPower-1)*4+1)
+		t.Item.MaxCharges=math.floor(partyLevel/5+mapLevel/40)
 		--bolster boost
-		asdcharge2=math.floor(t.Item.MaxCharges*difficultyExtraPower+bonusCharges)
-		t.Item.MaxCharges=math.floor(t.Item.MaxCharges*difficultyExtraPower+bonusCharges)
+		t.Item.MaxCharges=math.min(math.floor(t.Item.MaxCharges*difficultyExtraPower+bonusCharges),cap1)
 		
 		bonusCap=math.floor((difficultyExtraPower-1)*10)
 		cap2=14+bonusCap
@@ -537,6 +536,9 @@ function events.ItemGenerated(t)
 		if t.Item.Charges%1000>100 then
 			t.Item.Charges=math.min(math.round(t.Item.Charges%1000/5)*5,999)+math.floor(t.Item.Charges/1000)*1000
 		end
+		
+		--maxcharges Cap
+		t.Item.MaxCharges=math.min(maxChargesCap, t.Item.MaxCharges)
 		
 		--[[statistics
 		ancientDrops=ancientDrops or 0
