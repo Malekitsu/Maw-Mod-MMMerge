@@ -124,14 +124,14 @@ skillItemAC={
 	[const.Skills.Leather]	= {[0]=0, 1, 2, 3, 4,},
 	[const.Skills.Chain]	= {[0]=0, 2, 3, 4, 5,},
 	[const.Skills.Plate]	= {[0]=0, 3, 4, 5, 6,},
-	[const.Skills.Shield]	= {[0]=0, 2, 4, 6, 8,},
+	[const.Skills.Shield]	= {[0]=0, 4, 6, 8, 10,},
 	[const.Skills.Dodging]	= {[0]=0, 5, 5, 10, 10,},
 }
 skillItemRes={
 	[const.Skills.Leather]	= {[0]=0, 2, 3, 4, 5,},
 	[const.Skills.Chain]	= {[0]=0, 1, 2, 3, 4,},
 	[const.Skills.Plate]	= {[0]=0, 0, 1, 2, 3,},
-	[const.Skills.Shield]	= {[0]=0, 2, 4, 6, 8,},
+	[const.Skills.Shield]	= {[0]=0, 4, 6, 8, 10,},
 	[const.Skills.Dodging]	= {[0]=0, 0, 5, 5, 10,},
 }
 	
