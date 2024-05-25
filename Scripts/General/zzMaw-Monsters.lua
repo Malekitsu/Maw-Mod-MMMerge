@@ -1610,7 +1610,7 @@ function events.BuildMonsterInformationBox(t)
 		diff=math.min(3, 2+mon.Level/100)
 	end
 	if vars.Mode==2 then
-		diff=3+mon.Level/50
+		diff=2.5+mon.Level/50
 	end
 	
 	--some statistics here, calculate the standard deviation of dices to get the range of which 95% will fall into
