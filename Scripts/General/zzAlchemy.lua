@@ -788,8 +788,20 @@ evt.PotionEffects[82] = function(IsDrunk, t, Power)
 end
 
 evt.PotionEffects[83] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) and t.MaxCharges<(55+Game.BolsterAmount/30) then
-		t.MaxCharges=math.min(t.MaxCharges+4,55+Game.BolsterAmount/30)
+	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+		local difficultyExtraPower=1
+		if Game.BolsterAmount>100 then
+			difficultyExtraPower=(Game.BolsterAmount-100)/2000+1
+		end
+		local maxChargesCap=50*((difficultyExtraPower-1)*2+1)
+		if t.BonusExpireTime>=10 and t.BonusExpireTime<1000 then
+			maxChargesCap=50*((difficultyExtraPower-1)*4+1)
+		end
+		if t.MaxCharges>=maxChargesCap then
+			Game.ShowStatusText("Item power reached its limit")
+			return
+		end
+		t.MaxCharges=math.min(t.MaxCharges+4,maxChargesCap)
 		Mouse.Item.Number=0
 		mem.u4[0x51E100] = 0x100 
 		t.Condition = t.Condition:Or(0x10)
