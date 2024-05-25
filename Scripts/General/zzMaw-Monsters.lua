@@ -653,7 +653,7 @@ function events.PickCorpse(t)
 			mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.75)
 		end
 		
-		local itemTier=lvl/15-1
+		local itemTier=lvl/15-2
 		if itemTier%15/15>math.random() then
 			itemTier=itemTier+1
 		end
@@ -676,7 +676,6 @@ function events.PickCorpse(t)
 		mon.TreasureDiceSides=math.max(math.round(mon.TreasureDiceSides/4),1)
 	elseif mon.NameId>220 then
 		mon.TreasureItemPercent=100
-		mon.TreasureItemLevel=math.min(mon.TreasureItemLevel+1,6)
 		bossLoot=true
 	end
 	
