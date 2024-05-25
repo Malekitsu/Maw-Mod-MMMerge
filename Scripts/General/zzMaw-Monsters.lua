@@ -454,7 +454,8 @@ function recalculateMonsterTable()
 		end
 		
 		--experience
-		mon.Experience = math.round(totalLevel[i]*50)
+		local lvlBase=basetable[i].Level
+		mon.Experience = math.round((lvlBase*20+lvlBase^1.8)*totalLevel[i]/lvlBase)
 		if currentWorld==2 then
 			mon.Experience = math.min(mon.Experience*2, mon.Experience+1000)
 		end
@@ -1817,7 +1818,7 @@ function events.MonsterKilled(mon)
 			if not Game.freeProgression then
 				mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)
 			end
-			experience=math.ceil(m^0.7*(mapLevel*50)/3/1000)*1000
+			experience=math.ceil(m^0.7*(mapLevel*20+mapLevel^1.8)/3/1000)*1000
 			--bolster code
 			bonusExp=experience
 			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
@@ -2401,15 +2402,16 @@ end
 not working]]
 
 --[[
-mapLevels={}
-for i=0,#Game.MapStats do
+mmLevels={}
+for i=0,300 do
+	mmLevels[i]=0
+end
+for i=1,61 do
 	Sleep(1)
-	evt.MoveToMap{0,0,0,0,0,0,0,0,Game.MapStats[i].Name}
-	mapLevels[i]={}
+	evt.MoveToMap{0,0,0,0,0,0,0,0,Game.MapStats[i].FileName}
 	for j=0, Map.Monsters.High do
 		mon=Map.Monsters[j]
-		mapLevels[i][mon.Level]=mapLevels[i][mon.Level] or 0
-		mapLevels[i][mon.Level]=mapLevels[i][mon.Level]+1
+		mmLevels[mon.Level]=mmLevels[mon.Level]+1
 	end
 end
 ]]
