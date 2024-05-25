@@ -1969,7 +1969,7 @@ function generateBoss(index,nameIndex)
 	mon.Resistances[0]=mon.Resistances[0]+1000*hpOvercap
 	mon.FullHP=HP
 	mon.HP=mon.FullHP
-	mon.Exp=mon.Exp*10
+	mon.Exp=mon.Exp*5
 	mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
 	mapvars.uniqueMonsterLevel[index]=math.round(mon.Level*(1.1+math.random()*0.2))
 	mon.Level=math.min(mapvars.uniqueMonsterLevel[index],255)
