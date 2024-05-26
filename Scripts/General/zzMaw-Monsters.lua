@@ -78,6 +78,8 @@ function events.GameInitialized2()
 		basetable[i].Attack2.DamageDiceSides=Game.MonstersTxt[i].Attack2.DamageDiceSides
 		basetable[i].Attack2.Missile=Game.MonstersTxt[i].Attack2.Missile
 		basetable[i].Attack2.Type=Game.MonstersTxt[i].Attack2.Type
+		basetable[i].Attack2Chance=Game.MonstersTxt[i].Attack2Chance
+		basetable[i].SpellChance=Game.MonstersTxt[i].SpellChance
 		basetable[i].Exp=Game.MonstersTxt[i].Exp
 		basetable[i].Experience=Game.MonstersTxt[i].Experience
 		basetable[i].FullHP=Game.MonstersTxt[i].FullHP
@@ -575,10 +577,11 @@ function recalculateMonsterTable()
 	end
 		
 	for i=1, 651 do
+		local mon=Game.MonstersTxt[i]
 		if bolsterLevel>20 or Game.freeProgression==false or HPtable[i]>32500 then
 			--calculate level scaling
 			if i%3==1 then
-				HPtable[i]=(HPtable[i]*0.3+HPtable[i+1]*(basetable[i].FullHP/basetable[i+1].FullHP))/1.3
+				--HPtable[i]=(HPtable[i]*0.3+HPtable[i+1]*(basetable[i].FullHP/basetable[i+1].FullHP))/1.3
 			elseif i%3==0 then
 				--HPtable[i]=(HPtable[i]*0.3+HPtable[i-1]*(basetable[i].FullHP/basetable[i-1].FullHP))/1.3
 			end
@@ -598,10 +601,33 @@ function recalculateMonsterTable()
 			end
 		else
 			mon.Resistances[0]=mon.Resistances[0]%1000
-			mon=Game.MonstersTxt[i]
 			mon.HP=HPtable[i]
 			mon.FullHP=HPtable[i]
 		end
+	end
+	
+	--add ranged attack
+	local startingMaps={"out01.odm","out02.odm","7out01.odm","7out02.odm","oute3.odm","outd3.odm"}
+	if Map.IsOutdoor() and not table.find(startingMaps, Map.Name) then
+		for i=1, 651 do
+			local mon=Game.MonstersTxt[i]
+			local base=basetable[i]
+			if base.Attack1.Missile==0 and base.Attack2Chance==0 and base.SpellChance==0 then
+				local tier=2
+				if i%3==1 then
+					tier=1
+				elseif i%3==0 then
+					tier=3
+				end
+				mon.Attack2Chance=tier*10
+				mon.Attack2.DamageAdd=math.ceil(mon.Attack1.DamageAdd/2)
+				mon.Attack2.DamageDiceCount=math.ceil(mon.Attack1.DamageDiceCount/1.4)
+				mon.Attack2.DamageDiceSides=math.ceil(mon.Attack1.DamageDiceSides/1.4)
+				mon.Attack2.Missile=1
+			end
+		end
+	else --restore to previous
+		mon.Attack2Chance=base.Attack2Chance
 	end
 end
 
