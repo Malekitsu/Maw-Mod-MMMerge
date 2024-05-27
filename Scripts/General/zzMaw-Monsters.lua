@@ -2091,11 +2091,15 @@ function events.GameInitialized2() --to make the after all the other code
 				skill = string.match(Game.PlaceMonTxt[t.Monster.NameId], "([^%s]+)")
 				if skill=="Thorn" then
 					if t.DamageKind==4 then
-						Party[index]:DoDamage(t.Result,4) 
+						reflectedDamage=true
+						Party[index]:DoDamage(t.Result,4)
+						reflectedDamage=true
 					end
 				elseif skill=="Reflecting" then
 					if t.DamageKind~=4 then
+						reflectedDamage=true
 						Party[index]:DoDamage(t.Result,4) 
+						reflectedDamage=false
 					end
 				elseif skill=="Adamantite" then
 					t.Result=math.round(math.max(t.Result-t.Monster.Level^1.15*4,t.Result/4))
