@@ -125,7 +125,7 @@ function recalculateMawMonster()
 			mon.Attack1.DamageAdd, mon.Attack1.DamageDiceSides, mon.Attack1.DamageDiceCount = txt.Attack1.DamageAdd, txt.Attack1.DamageDiceSides, txt.Attack1.DamageDiceCount
 			mon.Attack2.DamageAdd, mon.Attack2.DamageDiceSides, mon.Attack2.DamageDiceCount = txt.Attack2.DamageAdd, txt.Attack2.DamageDiceSides, txt.Attack2.DamageDiceCount
 			mon.Level=txt.Level
-			
+			mon.Attack2Chance=txt.Attack2Chance
 			mon.Experience=txt.Experience
 		end
 		if vars.Mode==2 then
@@ -627,7 +627,11 @@ function recalculateMonsterTable()
 			end
 		end
 	else --restore to previous
-		mon.Attack2Chance=base.Attack2Chance
+		for i=1, 651 do
+			local mon=Game.MonstersTxt[i]
+			local base=basetable[i]
+			mon.Attack2Chance=base.Attack2Chance
+		end
 	end
 end
 
