@@ -147,8 +147,9 @@ function events.EvtMap(evtId)
 				end
 			end
 			if found then
-				mapvars.usedBarrels=mapvars.usedBarrels or {}
-				table.insert(mapvars.usedBarrels, event)
+				vars.usedBarrels=vars.usedBarrels or {}
+				vars.usedBarrels[Map.Name]=vars.usedBarrels[Map.Name] or {}
+				table.insert(vars.usedBarrels[Map.Name], event)
 			end
 		end
 	end
@@ -162,9 +163,9 @@ function events.AfterLoadMap()
 			previousStats[k]=Party[i][stats[j]]
 		end
 	end
-	if mapvars.usedBarrels then
+	if vars.usedBarrels and vars.usedBarrels[Map.Name] then
 		for i=0, Map.Sprites.High do
-			if table.find(mapvars.usedBarrels, Map.Sprites[i].Event) then
+			if table.find(vars.usedBarrels[Map.Name], Map.Sprites[i].Event) then
 				Map.Sprites[i].Event=19999
 			end
 		end
