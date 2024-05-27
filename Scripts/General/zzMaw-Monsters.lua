@@ -1843,44 +1843,52 @@ function events.MonsterKilled(mon)
 			else 
 				mapLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 			end
-			mapLevel=mapLevel+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
-			if not Game.freeProgression then
-				mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)
-			end
-			experience=math.ceil(m^0.7*(mapLevel*20+mapLevel^1.8)/3/1000)*1000
-			--bolster code
-			bonusExp=experience
-			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
-			local currentLVL=calcLevel(bonusExp + vars.EXPBEFORE)
-				
-			if currentWorld==1 then
-				vars.MM8LVL = vars.MM8LVL + currentLVL - vars.LVLBEFORE
-			elseif currentWorld==2 then
-				vars.MM7LVL = vars.MM7LVL + currentLVL - vars.LVLBEFORE
-			elseif currentWorld==3 then
-				vars.MM6LVL = vars.MM6LVL + currentLVL - vars.LVLBEFORE
-			elseif currentWorld==4 then
-				vars.MMMLVL = vars.MMMLVL + currentLVL - vars.LVLBEFORE
-			end
-			vars.EXPBEFORE = vars.EXPBEFORE + bonusExp
-			vars.LVLBEFORE = calcLevel(vars.EXPBEFORE)
-			--end
-			gold=math.ceil(experience^0.9/1000)*1000 
-			evt.ForPlayer(0)
-			evt.Add{"Gold", Value = gold}
-			evt.Add("Items",math.min(1050+math.ceil(mapLevel/25+0.5),1060))
-			evt.Add("Items",math.min(1050+math.ceil(mapLevel/25+0.5),1060))
-			if m>250 and mapLevel>90 then
-				evt.Add("Items", 1063)
-			end
-			evt.ForPlayer("All")
-			evt.Add{"Experience", Value = experience}
-			Game.EscMessage(string.format("Dungeon Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Material"))
-			mapvars.completed=true
+			
 			vars.dungeonCompletedList=vars.dungeonCompletedList or {}
-			vars.dungeonCompletedList[name]=true
-			mapvars.monsterMap.cleared=true
-			return
+			if vars.dungeonCompletedList[name]=="resetted" then
+				Game.EscMessage(string.format("Dungeon Completed!\nReset is possible again."))
+				vars.dungeonCompletedList[name]=true
+				return
+			else
+				mapLevel=mapLevel+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
+				if not Game.freeProgression then
+					mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)
+				end
+				experience=math.ceil(m^0.7*(mapLevel*20+mapLevel^1.8)/3/1000)*1000
+				--bolster code
+				bonusExp=experience
+				local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
+				local currentLVL=calcLevel(bonusExp + vars.EXPBEFORE)
+					
+				if currentWorld==1 then
+					vars.MM8LVL = vars.MM8LVL + currentLVL - vars.LVLBEFORE
+				elseif currentWorld==2 then
+					vars.MM7LVL = vars.MM7LVL + currentLVL - vars.LVLBEFORE
+				elseif currentWorld==3 then
+					vars.MM6LVL = vars.MM6LVL + currentLVL - vars.LVLBEFORE
+				elseif currentWorld==4 then
+					vars.MMMLVL = vars.MMMLVL + currentLVL - vars.LVLBEFORE
+				end
+				vars.EXPBEFORE = vars.EXPBEFORE + bonusExp
+				vars.LVLBEFORE = calcLevel(vars.EXPBEFORE)
+				--end
+				gold=math.ceil(experience^0.9/1000)*1000 
+				evt.ForPlayer(0)
+				evt.Add{"Gold", Value = gold}
+				evt.Add("Items",math.min(1050+math.ceil(mapLevel/25+0.5),1060))
+				evt.Add("Items",math.min(1050+math.ceil(mapLevel/25+0.5),1060))
+				if m>250 and mapLevel>90 then
+					evt.Add("Items", 1063)
+				end
+				evt.ForPlayer("All")
+				evt.Add{"Experience", Value = experience}
+				Game.EscMessage(string.format("Dungeon Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Material"))
+				mapvars.completed=true
+				vars.dungeonCompletedList=vars.dungeonCompletedList or {}
+				vars.dungeonCompletedList[name]=true
+				mapvars.monsterMap.cleared=true
+				return
+			end
 		end
 		if mapvars.monsterMap.cleared==false and m/n>=0.65 and Game.BolsterAmount>=300 then
 			mapvars.monsterMap.cleared=true
