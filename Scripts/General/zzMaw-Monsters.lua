@@ -612,7 +612,7 @@ function recalculateMonsterTable()
 		for i=1, 651 do
 			local mon=Game.MonstersTxt[i]
 			local base=basetable[i]
-			if base.Attack1.Missile==0 and base.Attack2Chance==0 and base.SpellChance==0 then
+			if base.Attack1.Missile==0 and base.Attack2Chance==0 and base.SpellChance==0 and mon.Fly~=1 then
 				local tier=2
 				if i%3==1 then
 					tier=1
