@@ -309,7 +309,7 @@ function events.MonsterKillExp(t)
 	else
 		monLvl=mon.Level
 	end
-	t.Exp=math.round(t.Exp*math.min((monLvl/partyLvl)^2,5))
+	t.Exp=math.round(t.Exp*math.min(((monLvl+10)/(partyLvl+5))^2,5))
 	
 	
 	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
