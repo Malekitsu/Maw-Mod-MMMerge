@@ -109,12 +109,12 @@ end
 
 --used in maps
 resetTxt="The dungeon has already been cleared, but you have the option to reset it and attempt it once more. Please note that no completion rewards will be given for this reset. Would you like to proceed with resetting the dungeon? (yes/no)"
-
+local possibleAnswers={"yes", "Yes", "YES", " yes", " Yes", " YES"} 
 function resetMap(dungeonId)
 	if canResetDungeon(dungeonId) and not vars.resetDungeon and not questionAsked then
 		local answer=Question(resetTxt)
 		questionAsked=true
-		if answer=="yes" or answer=="Yes" or answer=="YES" then 
+		if table.find(possibleAnswers, answer) then 
 			vars.resetDungeon=dungeonId
 			for i=1,Game.MapStats.High do
 				if Game.MapStats[i].FileName==vars.resetDungeon then
