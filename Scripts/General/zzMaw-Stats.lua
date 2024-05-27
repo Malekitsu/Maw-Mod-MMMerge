@@ -566,7 +566,6 @@ end
 
 --reduce damage by %
 function events.CalcDamageToPlayer(t)
-
 	data=WhoHitPlayer()
 	pl=t.Player
 	
@@ -717,7 +716,7 @@ function events.CalcDamageToPlayer(t)
 	if Game.BolsterAmount==300 then
 		if data and data.Monster then
 			t.Result=t.Result*math.min(3, data.Monster.Level/100+2)
-		elseif (t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1 then --drown and fall
+		elseif ((t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1) and not reflectedDamage then --drown and fall
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 			if currentWorld==1 then
@@ -754,7 +753,7 @@ function events.CalcDamageToPlayer(t)
 	if vars.Mode==2 then
 		if data and data.Monster then
 			t.Result=t.Result*(data.Monster.Level/50+2.5)
-		elseif (t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1 then --drown and fall
+		elseif (t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1 and not reflectedDamage then --drown and fall
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 			if currentWorld==1 then
