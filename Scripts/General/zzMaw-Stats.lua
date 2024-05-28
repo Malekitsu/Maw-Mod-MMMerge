@@ -67,7 +67,7 @@ end
 function events.CalcDamageToMonster(t)
 	local data = WhoHitMonster()	
 	--luck/accuracy bonus
-	if data and data.Player and (t.DamageKind==4 or (data and data.Object and data.Object.Spell==133 and data.Object.Item and data.Object.Item.Bonus2==3 and t.Result>0)) then
+	if data and data.Player and (t.DamageKind==4 or (data and data.Object and data.Object.Spell==133 and data.Object.Item and data.Object.Item.Bonus2==3 )) then
 		if data.Object==nil or data.Object.Spell==133 then
 			pl=t.Player
 			--OVERRIDE DAMAGE WITH MAW CALCULATION
@@ -101,7 +101,8 @@ function events.CalcDamageToMonster(t)
 				t.Result=t.Result*0.5
 			end
 			if data and data.Object and data.Object.Spell==133 and data.Object.Item and data.Object.Item.Bonus2==3 then
-				t.Result=t.Result*0.5
+				t.Result=t.Result*0.25
+				debug.Message(t.Result)
 			end
 		end
 	end
