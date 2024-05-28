@@ -93,7 +93,7 @@ function events.PlayerCastSpell(t)
 		events.Remove("Tick", 1)
 		mawRefresh("all")
 	end
-	ascension()
+	--ascension()  removed, Game.CurrentPlayer isn't the player who cast the spell
 	if t.IsSpellScroll then -- disable for scrolls
 		return
 	end
@@ -127,11 +127,9 @@ function events.PlayerCastSpell(t)
 			local sp=healingSpells[49]
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
 			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
-			
 			local mult, gotCrit=getHealSpellMultiPlier(t.Player)
 			
 			totHeal=baseHeal*mult
-
 			if gotCrit then
 				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
 			else
