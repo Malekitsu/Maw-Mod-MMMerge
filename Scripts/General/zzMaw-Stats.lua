@@ -102,7 +102,6 @@ function events.CalcDamageToMonster(t)
 			end
 			if data and data.Object and data.Object.Spell==133 and data.Object.Item and data.Object.Item.Bonus2==3 then
 				t.Result=t.Result*0.25
-				debug.Message(t.Result)
 			end
 		end
 	end
