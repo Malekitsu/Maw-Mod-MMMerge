@@ -706,9 +706,17 @@ function events.PickCorpse(t)
 		mon.TreasureDiceSides=math.max(math.round(mon.TreasureDiceSides/4),1)
 	elseif mon.NameId>220 then
 		mon.TreasureItemPercent=100
+		--item tier
+		local name=Game.MapStats[Map.MapStatsIndex].Name
+		local lvl=math.max(basetable[mon.Id].Level, mapLevels[name].Low)
+		local itemTier=lvl/15+2
+		if itemTier%15/15>math.random() then
+			itemTier=itemTier+1
+		end
+		itemTier=math.floor(itemTier+tier)
+		mon.TreasureItemLevel=math.max(math.min(itemTier,6),2)
 		bossLoot=true
 	end
-	
 end
 -----------------------------
 -----MAP MONSTER CHANGES-----
