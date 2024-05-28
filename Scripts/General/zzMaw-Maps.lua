@@ -94,6 +94,7 @@ function events.AfterLoadMap()
 	for i=1,Game.MapStats.High do
 		Game.MapStats[i].RefillDays=dungeonResetList[i]
 	end
+	vars.dungeonCompletedList=vars.dungeonCompletedList or {}
 	for key, value in pairs(vars.dungeonCompletedList) do
 		if vars.dungeonCompletedList[key]=="resetted" then
 			vars.dungeonCompletedList[key]=true
