@@ -1195,12 +1195,9 @@ function calcEffectChance(lvl, res, skill, chance, mon)
 	mult=(1+skill*chance)
 	newRes=(totRes+30)/mult-30
 	newLevel=math.max(math.round(newRes*4),0)
-	--nerfed cc effects on Doom
-	if vars.Mode==2 then
+	--nerfed cc effects on bosses
+	if mon.NameId>=220 and mon.NameId<300 then
 		newLevel=newLevel*2
-		if mon.NameId>=220 and mon.NameId<300 then
-			newLevel=newLevel*2
-		end
 	end
 	return newLevel
 end
