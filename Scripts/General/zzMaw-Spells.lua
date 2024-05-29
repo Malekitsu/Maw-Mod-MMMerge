@@ -1468,7 +1468,7 @@ function ascension()
 			local ascensionLevel=getAscensionTier(s,num)
 			if ascensionLevel>=1 then
 				for i=1,4 do
-					Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m)*1.2^ascensionLevel
+					Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m)
 				end
 			else
 				for i=1,4 do
@@ -1567,7 +1567,7 @@ function ascension()
 			end
 			if ascensionLevel>=1 then
 				for v=1,4 do
-					healingSpells[healingList[i]].Cost[v]=math.round(healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m)*1.2^ascensionLevel)
+					healingSpells[healingList[i]].Cost[v]=math.round(healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m)
 					healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
 				end
 			end
