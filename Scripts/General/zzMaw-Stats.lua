@@ -849,7 +849,7 @@ function events.CalcDamageToMonster(t)
 	res=t.Monster.Resistances[index]
 	if not res then return end
 	res=res%1000
-	if t.Player and data.Object==nil and t.DamageKind==4 then
+	if t.Player and data and data.Object==nil and t.DamageKind==4 then
 		local it=t.Player:GetActiveItem(1)
 		if it then 
 			skill=it:T().Skill
