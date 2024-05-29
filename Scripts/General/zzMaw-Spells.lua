@@ -1106,14 +1106,23 @@ CCMAP={
 [const.Spells.DarkGrasp]=	{["Duration"]=const.Minute*4, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]={const.MonsterBuff.ArmorHalved, const.MonsterBuff.Slow, const.MonsterBuff.DamageHalved, const.MonsterBuff.MeleeOnly}},																									
 }
 
+function getCCDiffMult(bolster)
+	local diffMult=math.max(((bolster-100)/200)+1,1)
+	if bolster==600 then 
+		diffMult=3
+	end
+	return diffMult
+end
+
 function events.Action(t)
 	local id=Game.CurrentPlayer
 	if id<0 or id>Party.High then return end
+	local mult=getCCDiffMult(Game.BolsterAmount)
 	for key, value in pairs(CCMAP) do
 		local lvl=Party[id].LevelBase
 		local baseCost=value.BaseCost
 		local scalingCost=value.ScalingCost
-		local cost=math.round(baseCost+(lvl/scalingCost)) --edit here to change mana cost
+		local cost=math.round((baseCost+(lvl*scalingCost))*(1+mult/3)) --edit here to change mana cost
 		Game.Spells[key]["SpellPointsNormal"]=cost
 		Game.Spells[key]["SpellPointsExpert"]=cost
 		Game.Spells[key]["SpellPointsMaster"]=cost
@@ -1162,6 +1171,7 @@ function events.PlayerCastSpell(t)
 			if reset==0 then
 				events.Remove("Tick", 1)
 			end
+			local mult=getCCDiffMult(Game.BolsterAmount) 
 			for i=0,Map.Monsters.High do
 				local mon=Map.Monsters[i]
 				mon.Level=level[i]
@@ -1169,11 +1179,11 @@ function events.PlayerCastSpell(t)
 				if type(cc.Debuff)=="table" then
 					for v =1,4 do 
 						local debuff=mon.SpellBuffs[cc.Debuff[v]]
-						debuff.ExpireTime=math.min(debuff.ExpireTime, Game.Time+cc.Duration)
+						debuff.ExpireTime=math.min(debuff.ExpireTime, Game.Time+cc.Duration/(1+mult/6))
 					end
 				else
 					local debuff=mon.SpellBuffs[cc.Debuff]
-					debuff.ExpireTime=math.min(debuff.ExpireTime, Game.Time+cc.Duration)
+					debuff.ExpireTime=math.min(debuff.ExpireTime, Game.Time+cc.Duration/(1+mult/6))
 				end
 			end
 		end
