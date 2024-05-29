@@ -1122,7 +1122,7 @@ function events.Action(t)
 		local lvl=Party[id].LevelBase
 		local baseCost=value.BaseCost
 		local scalingCost=value.ScalingCost
-		local cost=math.round((baseCost+(lvl/scalingCost))*(1+mult/3)) --edit here to change mana cost
+		local cost=math.round((baseCost+(lvl/scalingCost))*(1+mult)) --edit here to change mana cost
 		Game.Spells[key]["SpellPointsNormal"]=cost
 		Game.Spells[key]["SpellPointsExpert"]=cost
 		Game.Spells[key]["SpellPointsMaster"]=cost
