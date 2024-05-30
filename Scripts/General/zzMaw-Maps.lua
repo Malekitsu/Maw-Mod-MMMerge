@@ -924,7 +924,7 @@ function events.AfterLoadMap()
 				resetMap(dungeonId)
 				return
 			end
-			evt.MoveToMap{X = -1114, Y = 2778, Z = 1, Direction = 1280, LookAngle = 0, SpeedZ = 0, HouseId = 415, Icon = 3, Name = "D22.blv"}         -- "Hall under the Hill"
+			evt.MoveToMap{X = -1114, Y = 2778, Z = 1, Direction = 1280, LookAngle = 0, SpeedZ = 0, HouseId = 415, Icon = 3, Name = "7D22.blv"}         -- "Hall under the Hill"
 		end
 	end
 	
