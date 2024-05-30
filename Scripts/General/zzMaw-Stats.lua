@@ -561,7 +561,13 @@ function events.Regeneration(t)
 	end
 end
 
-
+painReflectionHit=false
+--fix for pain reflection:
+function events.CalcDamageToMonster(t)
+	if t.Monster.SpellBuffs[19].ExpireTime>=Game.Time then
+		painReflectionHit=true
+	end
+end
 
 
 --reduce damage by %
@@ -689,6 +695,13 @@ function events.CalcDamageToPlayer(t)
 	else
 		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true)
 	end
+	
+	--PAIN REFLECTION FIX
+	if painReflectionHit then
+		painReflectionHit=false
+		return
+	end
+	
 	--add difficulty related damage
 	if Game.BolsterAmount%50~=0 then
 		Game.BolsterAmount=100
