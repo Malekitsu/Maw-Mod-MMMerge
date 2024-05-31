@@ -578,28 +578,26 @@ function recalculateMonsterTable()
 		
 	for i=1, 651 do
 		local mon=Game.MonstersTxt[i]
-		if bolsterLevel>20 or Game.freeProgression==false or HPtable[i]>32500 then
-			--calculate level scaling
-			if i%3==1 then
-				local rateo=HPtable[i]/HPtable[i+1]
-				HPtable[i]=HPtable[i]*rateo
-			elseif i%3==0 then
-				local rateo=HPtable[i]/HPtable[i-1]
-				HPtable[i]=HPtable[i]*rateo
-			end
-			hpOvercap=0
-			actualHP=HPtable[i]
-			while actualHP>32500 do
-				actualHP=math.round(actualHP/2)
-				hpOvercap=hpOvercap+1
-			end
-			mon.Resistances[0]=mon.Resistances[0]%1000+hpOvercap*1000
-			mon.HP=actualHP
-			mon.FullHP=actualHP
-			if mon.FullHP>1000 then
-				mon.FullHP=math.round(mon.FullHP/10)*10
-				mon.HP=math.round(mon.HP/10)*10
-			end
+		--calculate level scaling
+		if i%3==1 then
+			local rateo=HPtable[i]/HPtable[i+1]
+			HPtable[i]=HPtable[i]*rateo
+		elseif i%3==0 then
+			local rateo=HPtable[i]/HPtable[i-1]
+			HPtable[i]=HPtable[i]*rateo
+		end
+		hpOvercap=0
+		actualHP=HPtable[i]
+		while actualHP>32500 do
+			actualHP=math.round(actualHP/2)
+			hpOvercap=hpOvercap+1
+		end
+		mon.Resistances[0]=mon.Resistances[0]%1000+hpOvercap*1000
+		mon.HP=actualHP
+		mon.FullHP=actualHP
+		if mon.FullHP>1000 then
+			mon.FullHP=math.round(mon.FullHP/10)*10
+			mon.HP=math.round(mon.HP/10)*10
 		end
 	end
 	
