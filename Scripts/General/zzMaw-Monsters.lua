@@ -2031,7 +2031,7 @@ function generateBoss(index,nameIndex)
 	Game.PlaceMonTxt[mon.NameId]=string.format(skill .. " " .. Game.MonstersTxt[mon.Id].Name)
 	
 	mapvars.bossNames[mon.NameId]=Game.PlaceMonTxt[mon.NameId]
-	dmgMult=1.5+math.random()
+	dmgMult=1.5+math.random()*0.5
 	atk1=mon.Attack1
 	atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult)
 	atk2=mon.Attack2
