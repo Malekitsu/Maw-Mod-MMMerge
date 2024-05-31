@@ -119,7 +119,7 @@ function recalculateMawMonster()
 				hp=math.round(hp/2)
 				hpOvercap=hpOvercap+1
 			end
-			mon.Resistances[0]=mon.Resistances[0]+hpOvercap*1000
+			mon.Resistances[0]=mon.Resistances[0]%1000+hpOvercap*1000
 			mon.FullHitPoints=hp
 			mon.HP=mon.FullHitPoints*currentHPPercentage
 			mon.Attack1.DamageAdd, mon.Attack1.DamageDiceSides, mon.Attack1.DamageDiceCount = txt.Attack1.DamageAdd, txt.Attack1.DamageDiceSides, txt.Attack1.DamageDiceCount
@@ -581,11 +581,10 @@ function recalculateMonsterTable()
 		if bolsterLevel>20 or Game.freeProgression==false or HPtable[i]>32500 then
 			--calculate level scaling
 			if i%3==1 then
-				--HPtable[i]=(HPtable[i]*0.3+HPtable[i+1]*(basetable[i].FullHP/basetable[i+1].FullHP))/1.3
+				HPtable[i]=(HPtable[i]*0.3+HPtable[i+1]*(basetable[i].FullHP/basetable[i+1].FullHP))/1.3
 			elseif i%3==0 then
-				--HPtable[i]=(HPtable[i]*0.3+HPtable[i-1]*(basetable[i].FullHP/basetable[i-1].FullHP))/1.3
+				HPtable[i]=(HPtable[i]*0.3+HPtable[i-1]*(basetable[i].FullHP/basetable[i-1].FullHP))/1.3
 			end
-			
 			hpOvercap=0
 			actualHP=HPtable[i]
 			while actualHP>32500 do
