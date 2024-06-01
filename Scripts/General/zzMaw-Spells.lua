@@ -22,7 +22,7 @@ end
 local function getSpellQueueData(spellQueuePtr, targetPtr)
 	-- find active queue slot
 	local i = 0
-	while i2[spellQueuePtr] == 0 and i2[spellQueuePtr + 4] ~= 49 do -- 49 is workaround for merge mechanism, where hireling spells are represented by 49 roster index in party index field, which causes a bug
+	while i2[spellQueuePtr] == 0 or i2[spellQueuePtr + 4] == 49 do -- 49 is workaround for merge mechanism, where hireling spells are represented by 49 roster index in party index field, which causes a bug
 		spellQueuePtr = spellQueuePtr + 0x14
 		i = i + 1
 		if i >= 10 then
