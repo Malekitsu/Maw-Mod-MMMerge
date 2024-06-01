@@ -647,7 +647,7 @@ local function upgradeGem(it, tier)
 		upgradeAmount1=upgradeAmount1^2+1
 	end
 	if bonus2==8 or bonus2==9 then
-		maxValue2=math.floor(upgradeAmount2*(2+upgradeAmount2/50))
+		maxValue2=math.floor(maxValue2*(2+maxValue2/50))
 		upgradeAmount2=upgradeAmount2^2+1
 	end
 	--AC
