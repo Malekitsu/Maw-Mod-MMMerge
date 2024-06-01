@@ -199,7 +199,7 @@ function events.DoBadThingToPlayer(t)
 	local id=pl:GetIndex()
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 13) then
 		t.Allow = false
-		Game.ShowStatusText("Status Immunity")
+		--Game.ShowStatusText("Status Immunity")
 	end
 end
 
