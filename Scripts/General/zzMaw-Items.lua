@@ -1573,7 +1573,7 @@ function events.BuildItemInformationBox(t)
 		pattern = "(%d+)"
 		text=t.Description
 		t.Description = text:gsub(pattern, replaceNumber)
-		t.Description = t.Description .. "\n\nScale with player level, up to level 240."
+		t.Description = t.Description .. "\n\nScale with player level, up to level 250."
 	end
 end
 
@@ -1598,13 +1598,14 @@ function events.BuildItemInformationBox(t)
 			if id==-1 then
 				id=0
 			end
-			local artifactMult=artifactPowerMult(Party[id].LevelBase)
+			local artifactMult=artifactPowerMult(Party[id].LevelBase, true)
 			local txt=Game.ItemsTxt[t.Item.Number]
 			local ac=math.ceil((txt.Mod2+txt.Mod1DiceCount)*artifactMult)
 			if ac>0 then 			
 				t.BasicStat= "Armor: +" .. ac
 			end
 			--WEAPONS
+			artifactMult=artifactPowerMult(Party[id].LevelBase)
 			local equipStat=txt.EquipStat
 			if equipStat<=2 then
 				local bonus=math.ceil(txt.Mod2*artifactMult)
@@ -2141,7 +2142,7 @@ function itemStats(index)
 			end
 			--artifacts
 			if table.find(artArmors,it.Number) then 
-				artifactMult=artifactPowerMult(pl.LevelBase)
+				artifactMult=artifactPowerMult(pl.LevelBase, true)
 				acBonus=math.ceil(acBonus*artifactMult)
 			end
 
@@ -3030,10 +3031,13 @@ function mawStoreShop()
 end
 
 --maw artifact scaling calculation
-function artifactPowerMult(level)
+function artifactPowerMult(level, isAC)
 	local bol=math.max(Game.BolsterAmount, 100)
 	bol=(bol/100-1)/20+1
-	local mult=math.min(level/160+0.5,2)*bol
+	local mult=math.min(level/100+0.5,3)*bol
+	if isAC then
+		mult=math.min(level/167+0.5,3)*bol
+	end
 	return mult
 end
 
