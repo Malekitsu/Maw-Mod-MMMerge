@@ -89,17 +89,19 @@ end
 
 --restore
 function events.AfterLoadMap()
-	questionAsked=false
-	vars.resetDungeon=false
 	for i=1,Game.MapStats.High do
 		Game.MapStats[i].RefillDays=dungeonResetList[i]
 	end
 	vars.dungeonCompletedList=vars.dungeonCompletedList or {}
 	for key, value in pairs(vars.dungeonCompletedList) do
-		if vars.dungeonCompletedList[key]=="resetted" then
+		if vars.dungeonCompletedList[key]=="resetting" and vars.resetDungeon==Map.Name then
+			vars.dungeonCompletedList[key]="resetted"
+		elseif vars.dungeonCompletedList[key]=="resetting" then
 			vars.dungeonCompletedList[key]=true
 		end
 	end
+	questionAsked=false
+	vars.resetDungeon=false
 end
 
 function canResetDungeon(mapFileName)
@@ -126,7 +128,7 @@ function resetMap(dungeonId)
 			vars.resetDungeon=dungeonId
 			for i=1,Game.MapStats.High do
 				if Game.MapStats[i].FileName==vars.resetDungeon then
-					vars.dungeonCompletedList[Game.MapStats[i].Name]="resetted"
+					vars.dungeonCompletedList[Game.MapStats[i].Name]="resetting"
 					Game.MapStats[i].RefillDays=0
 					Game.ShowStatusText("Entering will reset the dungeon")
 				end
