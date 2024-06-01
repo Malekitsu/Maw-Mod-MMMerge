@@ -41,6 +41,7 @@ The mod is very big and changes most game mechanics, for simplicity I'll divide 
 - Stats rework
 - Class rework
 - Skill rework
+- Races rework
 - Spells rework
 - Monster rework
 - Alchemy rework
@@ -132,6 +133,19 @@ But if you’re curious to know more about the mod and the specific changes, rea
 - Regeneration and Meditation will now be much stronger and work continuously instead of every 10 seconds
 - You can now reset your skill points at the Seer, Judge Gray, or Oracle.
   - Masteries (Expert/Master/GM) will automatically be grant once you get to the required skill level, if you had previously
+
+## Race Rework
+- Minotaurs can dual wield axes and 2h axes, at expert and master.
+- Humans have +1 Mastery on utility skills (meaning, for example, that if it was able to learn Expert, can learn Master)
+- Troll has +2 Mastery on regeneration skill
+- Most races have some baseline resistances
+### On top of that races have +3 to the following skill level
+- Humans: Armors and Shield
+- Dark Elf: Bow and Meditation
+- Minotaur: Axe
+- Elf/Dark elf: Bow and Meditation
+- Goblin: Sword, Mace and Dagger
+- Dwarf: Axe and Bodybuilding
 
 ## Class Rework
 - most underused classes have been balanced to have some uniqueness
@@ -243,7 +257,6 @@ Tips:
 
 ## Mechanics Rework
 - Dual-wielding weapons will now allow the player to benefit fully from both weapons.
-- Minotaurs can dual wield axes and 2h axes, at expert and master.
 - Recovery is now multiplicative; a 50 bonus recovery will increase attack speed by 50%.
 - Player projectiles will now home in on the target.
 - Monster projectiles will now tend to home players:
