@@ -669,7 +669,13 @@ function events.PickCorpse(t)
 	--calculate loot chances and quality
 	if mon.Item==0 and (mon.NameId<220 or mon.NameId>300) then
 		local name=Game.MapStats[Map.MapStatsIndex].Name
-		local lvl=math.max(basetable[mon.Id].Level, mapLevels[name].Low)
+		local lvlID=mon.Id
+		if tier==1 then
+			lvlID=mon.Id+1
+		elseif tier==3 then
+			lvlID=mon.Id-1
+		end
+		local lvl=math.max(basetable[lvlID].Level, mapLevels[name].Low)
 		local originalValue=math.min(mon.TreasureItemPercent,50)
 		mon.TreasureItemPercent= math.ceil(mon.Level^0.5*(1+tier)*0.5 + originalValue*0.5)
 		if vars.Mode==2 then
@@ -678,8 +684,8 @@ function events.PickCorpse(t)
 			mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.75)
 		end
 		
-		local itemTier=lvl/15-2
-		if itemTier%15/15>math.random() then
+		local itemTier=lvl/20-1
+		if itemTier%20/20>math.random() then
 			itemTier=itemTier+1
 		end
 		itemTier=math.floor(itemTier+tier)
