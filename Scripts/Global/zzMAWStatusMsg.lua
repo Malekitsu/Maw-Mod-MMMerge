@@ -39,17 +39,13 @@ function events.CalcDamageToMonster(t)
 			shoot="inflicts"
 		end
 		if crit then
-			critMessage="critically"
+			critMessage="(CRIT!)"
 		end
 		if t.Monster.NameId>0 then
 			monName=Game.PlaceMonTxt[t.Monster.NameId]
 		else
 			monName=Game.MonstersTxt[t.Monster.Id].Name
-		end
-		
-		if crit then
-			name=string.format(name .. " critically")
-		end			
+		end	
 		if shoot=="shoots" then
 			msg=string.format("%s shoots %s for %s points!", name, MSGdamage, monName)
 		else
@@ -68,15 +64,15 @@ function events.CalcDamageToMonster(t)
 			events.Remove("Tick", 1)
 			if id<=Map.Monsters.High and MSGdamage>0 then
 				if shoot=="shoots" then
-				msg=string.format("%s shoots %s for %s points!", name, monName, MSGdamage)
+				msg=string.format("%s shoots %s for %s points!%s", name, monName, MSGdamage, critMessage)
 				else
-					msg=string.format("%s hits %s for %s points!", name, monName, MSGdamage)
+					msg=string.format("%s hits %s for %s points!%s", name, monName, MSGdamage, critMessage)
 				end
 				if t.Monster.HP==0 then
-					msg=string.format("%s inflicts %s points killing %s!", name, MSGdamage, monName)
+					msg=string.format("%s inflicts %s points killing %s!%s", name, MSGdamage, monName, critMessage)
 				end
 				if castedAoe then
-					msg=string.format("%s hits for a total of %s points!", name, MSGdamage)
+					msg=string.format("%s hits for a total of %s points!%s", name, MSGdamage, critMessage)
 				end
 				Game.ShowStatusText(msg)
 				if calls>0 then
