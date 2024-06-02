@@ -1631,7 +1631,7 @@ function events.BuildMonsterInformationBox(t)
 		if mon.NameId==0 then
 			t.ArmorClass.Text=string.format("Level:          " .. math.round(totalLevel[mon.Id]) .. "\n" .. t.ArmorClass.Text)
 		elseif mapvars.uniqueMonsterLevel[Mouse:GetTarget().Index] then
-			t.ArmorClass.Text=string.format("Level:          " .. mapvars.uniqueMonsterLevel[Mouse:GetTarget().Index] .. "\n" .. t.ArmorClass.Text)
+			t.ArmorClass.Text=string.format("Level:          " .. math.round(mapvars.uniqueMonsterLevel[Mouse:GetTarget().Index]) .. "\n" .. t.ArmorClass.Text)
 		else
 			t.ArmorClass.Text=string.format("Level:          " .. mon.Level .. "\n" .. t.ArmorClass.Text)
 		end
