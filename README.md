@@ -10,7 +10,7 @@ This mod is the culmination of efforts from a dedicated team, with each member b
 - **2D (Perduelion)** - _Contributor_: Basically designed the new alchemy design all by himself, making an amazing job.
 - **Thor Thunderfist** - _Contributor_: Adapted the code for skill limit removal.
 
-Special thanks to Rodril, that indirectly made the whole project possible and has always been available. 
+Special thanks to Grayface and Rodril, that indirectly made the whole project possible. 
 
 We express our deepest appreciation to all the discord community member. Their advices and feedbacks played a very important role in the development. Most noticeably, but not only:
 
