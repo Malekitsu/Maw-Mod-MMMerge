@@ -2008,7 +2008,8 @@ function generateBoss(index,nameIndex)
 	mon.HP=mon.FullHP
 	mon.Exp=mon.Exp*5
 	mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
-	mapvars.uniqueMonsterLevel[index]=math.round(mon.Level*(1.1+math.random()*0.2))
+	local lvl=totalLevel[mon.Id] or mon.Level
+	mapvars.uniqueMonsterLevel[index]=math.round(lvl*(1.1+math.random()*0.2))
 	mon.Level=math.min(mapvars.uniqueMonsterLevel[index],255)
 	mon.TreasureDiceCount=(mon.Level*100)^0.5
 	mon.TreasureDiceSides=(mon.Level*100)^0.5
