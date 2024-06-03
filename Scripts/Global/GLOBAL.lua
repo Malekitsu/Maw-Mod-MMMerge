@@ -32,7 +32,7 @@ function events.EvtGlobal(i) -- happens after related global evt executed
 				Party[i].Exp = Party[i].Exp + bonusExp
 				
 				--bolster code
-				bonusExp=(bonusExp+ExpRewards[i])/Party.Count
+				bonusExp=(bonusExp+ExpRewards[i])/5
 				local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 				local currentLVL=calcLevel(bonusExp + vars.EXPBEFORE)
 					
