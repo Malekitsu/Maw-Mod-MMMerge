@@ -23,7 +23,7 @@ local function getSpellQueueData(spellQueuePtr, targetPtr)
 	-- find active queue slot
 	local i, foundNpc = 0 -- might be the case where there is only npc spell in queue, which makes my code error with "no active spell queue slot found"
 	while i2[spellQueuePtr] == 0 or i2[spellQueuePtr + 4] == 49 do -- 49 is workaround for merge mechanism, where hireling spells are represented by 49 roster index in party index field, which causes a bug
-		if i2[spellQueuePtr] == 49 then
+		if i2[spellQueuePtr + 4] == 49 then
 			foundNpc = true
 		end
 		spellQueuePtr = spellQueuePtr + 0x14
