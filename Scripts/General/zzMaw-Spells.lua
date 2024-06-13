@@ -21,12 +21,19 @@ end
 
 local function getSpellQueueData(spellQueuePtr, targetPtr)
 	-- find active queue slot
-	local i = 0
+	local i, foundNpc = 0 -- might be the case where there is only npc spell in queue, which makes my code error with "no active spell queue slot found"
 	while i2[spellQueuePtr] == 0 or i2[spellQueuePtr + 4] == 49 do -- 49 is workaround for merge mechanism, where hireling spells are represented by 49 roster index in party index field, which causes a bug
+		if i2[spellQueuePtr] == 49 then
+			foundNpc = true
+		end
 		spellQueuePtr = spellQueuePtr + 0x14
 		i = i + 1
 		if i >= 10 then
-			error("No active spell queue slot found")
+			if foundNpc then
+				return -- no active spell queue slot found, but there is npc spell in queue, which we don't care about
+			else
+				error("No active spell queue slot found") -- not a single spell in queue, invalid state
+			end
 		end
 	end
 	local t = {Spell = i2[spellQueuePtr], Caster = Party.PlayersArray[i2[spellQueuePtr + 2]]}
@@ -769,17 +776,22 @@ function doSharedLife(amount)
 end
 
 -- replace shared life code with my own
-hook(0x42A171, function(d)
+autohook(0x42A171, function(d)
 	local amount = u4[d.ebp - 4]
 	local t = getSpellQueueData(d.ebx)
+	if not t then
+		return -- no player spell, return to original code
+	end
 	t.Amount = amount
 	events.call("HealingSpellPower", t)
 	local affectedPlayers = doSharedLife(t.Amount)
 	for i, pl in ipairs(affectedPlayers) do
 		mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, u4[0x75CE00]), const.Spells.SharedLife, getPartyIndex(pl)) -- show animation
 	end
+	d:push(0x42C200) -- return to "cast successful" code
+	return true
 end)
-asmpatch(0x42A176, "jmp absolute 0x42C200") -- "cast successful"
+--asmpatch(0x42A176, "jmp absolute 0x42C200")
 
 
 --removes fly when attacking, except in certain maps
