@@ -669,7 +669,8 @@ function randomizeHP()
 end
 
 -- TODO: test very negative amounts (like -50000), they asserted previously
-function doSharedLife(amount)
+function doSharedLife(amount, spellQueueData)
+	spellQueueData = spellQueueData or {}
 	-- for each iteration, try to top up lowest HP deficit party member, increasing others' HP along the way
 	local function shouldParticipate(pl)
 		if pl.HP<0 then
@@ -692,7 +693,13 @@ function doSharedLife(amount)
 	local id=Game.CurrentPlayer
 	if id>=0 and id<=Party.High then
 		local pl=Party[id]
-		local s,m=SplitSkill(pl:GetSkill(const.Skills.Spirit))
+
+		local s,m
+		if spellQueueData.FromScroll then
+			s,m = spellQueueData.Skill, spellQueueData.Mastery
+		else -- could simply always use table data if it's provided, but this code gets player by CurrentPlayer, not by queue data, so leaving it for now to not change behavior unintentionally
+			s,m = SplitSkill(pl:GetSkill(const.Skills.Spirit))
+		end
 		local healingAmount=0
 		--remove base bonus
 		if m==3 then
@@ -784,7 +791,7 @@ autohook(0x42A171, function(d)
 	end
 	t.Amount = amount
 	events.call("HealingSpellPower", t)
-	local affectedPlayers = doSharedLife(t.Amount)
+	local affectedPlayers = doSharedLife(t.Amount, t)
 	for i, pl in ipairs(affectedPlayers) do
 		mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, u4[0x75CE00]), const.Spells.SharedLife, getPartyIndex(pl)) -- show animation
 	end
