@@ -981,7 +981,7 @@ function MawRegen()
 			Buff=pl.SpellBuffs[const.PlayerBuff.Regeneration]
 			if Buff.ExpireTime > Game.Time then
 				RegS, RegM = SplitSkill(Buff.Skill)
-				regenHP[i] = regenHP[i] + (FHP^0.5*RegS^1.3*((RegM+1)/10000))* timeMultiplier * mult -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
+				regenHP[i] = regenHP[i] + (FHP^0.5*RegS^1.2*((RegM+1)/10000))* timeMultiplier * mult -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
 			end
 			regenHP[i] = regenHP[i] 
 			pl.HP = math.min(FHP, pl.HP + math.floor(regenHP[i]))
