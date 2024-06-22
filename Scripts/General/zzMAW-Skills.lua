@@ -1013,7 +1013,7 @@ function MawRegen()
 					RegM=8
 				end
 				FSP	= pl:GetFullSP()
-				regenSP[i] = regenSP[i] + (FSP^0.35*RegS^1.4*((RegM+5)/6000) +0.02)*timeMultiplier*mult
+				regenSP[i] = regenSP[i] + (FSP^0.35*RegS^1.75*((RegM+5)/12000) +0.02)*timeMultiplier*mult
 				pl.SP = math.min(FSP, pl.SP + math.floor(regenSP[i]))
 				regenSP[i]=regenSP[i]%1
 			end
@@ -1052,8 +1052,8 @@ function events.Tick()
 		if m==4 then
 			m=8
 		end
-		local spRegen = (FSP^0.35*s^1.4*((m+5)/60)+2)/10
-		local spRegen2 = (FSP^0.35*(s+1)^1.4*((m+5)/60)+2)/10
+		local spRegen = (FSP^0.35*s^1.75*((m+5)/120)+2)/10
+		local spRegen2 = (FSP^0.35*(s+1)^1.75*((m+5)/120)+2)/10
 		local spRegen2 = math.round((spRegen2-spRegen)*100)/100
 		if spRegen>10 then
 			spRegen = math.round((spRegen)*10)/10
