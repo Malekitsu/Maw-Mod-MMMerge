@@ -1250,14 +1250,14 @@ function events.GameInitialized2()
 			[9] = {dmgAdd = 2, diceMin = 1, diceMax = 1, },--meteor shower
 			[10] = {dmgAdd = 12, diceMin = 1, diceMax = 7, },--inferno
 			[11] = {dmgAdd = 18, diceMin = 1, diceMax = 18, },--incinerate
-			[15] = {dmgAdd = 6, diceMin = 1, diceMax = 2, },--sparks
+			[15] = {dmgAdd = 5, diceMin = 1, diceMax = 2, },--sparks
 			[18] = {dmgAdd = 13, diceMin = 1, diceMax = 8, },--lightning bolt
 			[20] = {dmgAdd = 20, diceMin = 1, diceMax = 12, },--implosion
 			[22] = {dmgAdd = 5, diceMin = 1, diceMax = 1, },--starburst
-			[24] = {dmgAdd = 5, diceMin = 1, diceMax = 2, },--poison spray
-			[26] = {dmgAdd = 6, diceMin = 1, diceMax = 6, },--ice bolt
-			[29] = {dmgAdd = 2, diceMin = 1, diceMax = 12, },--acid burst
-			[32] = {dmgAdd = 5, diceMin = 1, diceMax = 5, },--ice blast
+			[24] = {dmgAdd = 6, diceMin = 1, diceMax = 3, },--poison spray
+			[26] = {dmgAdd = 6, diceMin = 1, diceMax = 7, },--ice bolt
+			[29] = {dmgAdd = 2, diceMin = 1, diceMax = 14, },--acid burst
+			[32] = {dmgAdd = 6, diceMin = 1, diceMax = 6, },--ice blast
 			[37] = {dmgAdd = 5, diceMin = 1, diceMax = 5, },--deadly swarm
 			[39] = {dmgAdd = 7, diceMin = 1, diceMax = 7, },--blades
 			[41] = {dmgAdd = 8, diceMin = 1, diceMax = 8, },--rock blast
