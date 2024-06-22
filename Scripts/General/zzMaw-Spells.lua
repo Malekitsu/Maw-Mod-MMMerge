@@ -709,16 +709,16 @@ function doSharedLife(amount, spellQueueData)
 		end
 		
 		local sp=healingSpells[54]
-		local baseHeal=sp.Base[m]+sp.Scaling[m]*s
+		local baseHeal=sp.Base[m]+sp.Scaling[m]*s/2
 		
 		local mult, gotCrit=getHealSpellMultiPlier(pl)
 		
 		totHeal=baseHeal*mult
 
 		if gotCrit then
-			Game.ShowStatusText(string.format("Shared Life heals for " .. math.round(totHeal) .. " Hit points(crit)"))
+			Game.ShowStatusText(string.format("Shared Life heals for " .. math.round(totHeal*2) .. " Hit points(crit)"))
 		else
-			Game.ShowStatusText(string.format("Shared Life heals for " .. math.round(totHeal) .. " Hit points"))
+			Game.ShowStatusText(string.format("Shared Life heals for " .. math.round(totHeal*2) .. " Hit points"))
 		end
 		amount=amount+totHeal-healingAmount
 		
@@ -1571,7 +1571,7 @@ function ascension()
 		-----------------------
 		healingSpells={
 			[const.Spells.RemoveCurse]=    {["Cost"]={0,5,10,20}, ["Base"]={0,10,20,30}, ["Scaling"]={0,3,4,5}},
-			[const.Spells.SharedLife]=    {["Cost"]={0,0,25,40}, ["Base"]={0,0,15,20}, ["Scaling"]={0,0,7,9}},
+			[const.Spells.SharedLife]=    {["Cost"]={0,0,25,40}, ["Base"]={0,0,,0}, ["Scaling"]={0,0,7,9}},
             [const.Spells.Resurrection]={["Cost"]={0,0,0,100}, ["Base"]={0,0,0,100}, ["Scaling"]={0,0,0,14}},
             [const.Spells.Heal]=        {["Cost"]={2,4,8,16}, ["Base"]={10,15,20,25}, ["Scaling"]={1,2,3,4}},
             [const.Spells.CureDisease]=    {["Cost"]={0,0,15,25}, ["Base"]={0,0,25,40}, ["Scaling"]={0,0,5,7}},
