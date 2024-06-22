@@ -292,7 +292,7 @@ function events.BuildStatInformationBox(t)
 		if m==4 then
 			m=5
 		end
-		local hpRegen = math.round(FHP^0.5*s^1.5*((m+1)/25))
+		local hpRegen = math.round(FHP^0.5*s^1.3*((m+1)/25))
 		local HPregenItem=0
 		local bonusregen=0
 		for it in Party[i]:EnumActiveItems() do
@@ -307,7 +307,7 @@ function events.BuildStatInformationBox(t)
 		Buff=Party[i].SpellBuffs[const.PlayerBuff.Regeneration]
 		if Buff.ExpireTime > Game.Time then
 			RegS, RegM = SplitSkill(Buff.Skill)
-			regen = math.ceil(regen + FHP^0.5*RegS^1.3*((RegM+1)/100)) 
+			regen = math.ceil(regen + FHP^0.5*RegS^1.2*((RegM+1)/100)) 
 		end
 	
 		t.Text=string.format("%s\n\nHP bonus from Endurance: %s\nHP bonus from Body building: %s\nHP bonus from items: %s\nBase HP: %s\n\n HP Regen per second: %s",t.Text,StrColor(0,255,0,enduranceTotalBonus), StrColor(0,255,0,BBHP),StrColor(0,255,0,math.round(fullHP-enduranceTotalBonus-BBHP-BASEHP)),StrColor(0,255,0,BASEHP),StrColor(0,255,0,regen/10))
