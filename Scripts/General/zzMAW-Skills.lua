@@ -976,7 +976,7 @@ function MawRegen()
 				RegM=5
 			end
 			FHP	= pl:GetFullHP()
-			regenHP[i] = regenHP[i] + (FHP^0.5*RegS^1.5*((RegM+1)/2500))* timeMultiplier * mult
+			regenHP[i] = regenHP[i] + (FHP^0.5*RegS^1.3*((RegM+1)/2500))* timeMultiplier * mult
 			--regeneration spell
 			Buff=pl.SpellBuffs[const.PlayerBuff.Regeneration]
 			if Buff.ExpireTime > Game.Time then
@@ -1042,8 +1042,8 @@ function events.Tick()
 		if m==4 then
 			m=5
 		end
-		local hpRegen = math.round(FHP^0.5*s^1.5*((m+1)/25))/10
-		local hpRegen2 = math.round(FHP^0.5*(s+1)^1.5*((m+1)/25))/10
+		local hpRegen = math.round(FHP^0.5*s^1.3*((m+1)/25))/10
+		local hpRegen2 = math.round(FHP^0.5*(s+1)^1.3*((m+1)/25))/10
 		local txt = string.format("%s\n\nCurrent HP Regeneration: %s\nNext Level Bonus: %s HP Regen",baseRegStr,StrColor(0,255,0,hpRegen),StrColor(0,255,0,"+" .. hpRegen2-hpRegen))
 		Skillz.setDesc(30,1,txt)
 		--meditation tooltip
