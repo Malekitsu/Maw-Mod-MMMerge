@@ -180,7 +180,7 @@ function changeBag(pl, bag)
 					local currentPosition=i-1
 					for j=1, x do
 						currentPosition=currentPosition+1
-						if pl.Inventory[currentPosition]<=0 then
+						if currentPosition<126 and pl.Inventory[currentPosition]<=0 then
 							pl.Inventory[currentPosition]=id
 						end
 						 yPos=currentPosition
