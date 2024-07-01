@@ -233,11 +233,11 @@ function events.BuildStatInformationBox(t)
 	if t.Stat==5 then
 		i=Game.CurrentPlayer
 		speed=Party[i]:GetSpeed()
-		unarmed=0
-		Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Unarmed))
+		dodging=0
+		Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.ddodging))
 		if Mas == 4 then
-			unarmed=Skill+10
-			dodgeChance=1-0.995^(unarmed)
+			dodging=Skill+10
+			dodgeChance=1-0.995^(dodging)
 			t.Text=string.format("%s\n\nDodge chance: %s%%",Game.StatsDescriptions[5],math.floor(dodgeChance*1000)/10)
 		end
 		--spell haste
@@ -371,16 +371,16 @@ function events.BuildStatInformationBox(t)
 		local ac=ac/(Game.BolsterAmount/100)
 		local blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 		local ACRed= 1 - (1-blockChance)*(1-acReduction)
-		--unarmed
-		local speed=pl:GetSpeed()
-		local unarmed=0
-		local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
+		--dodging
+		--local speed=pl:GetSpeed()
+		local dodging=0
+		local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Dodging))
 		if Mas == 4 then
-			unarmed=Skill+10
+			dodging=Skill+10
 		end
 		--local speed=Party[i]:GetSpeed()
 		--local speedEffect=speed/10
-		local dodgeChance=0.995^(unarmed)
+		local dodgeChance=0.995^(dodging)
 		local fullHP=fullHP/dodgeChance
 		--resistances
 		res={0,1,2,3,7,8,12}
@@ -575,13 +575,13 @@ function events.CalcDamageToPlayer(t)
 	data=WhoHitPlayer()
 	pl=t.Player
 	
-	--UNARMED DODGE 
-	local unarmed=0
-	local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
+	--dodging DODGE 
+	local dodging=0
+	local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Dodging))
 	if Mas == 4 then
-		unarmed=Skill+10
+		dodging=Skill+10
 	end
-	dodgeChance=1-0.995^(unarmed)
+	dodgeChance=1-0.995^(dodging)
 	roll=math.random()
 	if roll<=dodgeChance then
 		t.Result=0
@@ -1146,16 +1146,16 @@ function calcPowerVitality(pl)
 	local ac=ac/(Game.BolsterAmount/100)
 	local blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 	local ACRed= 1 - (1-blockChance)*(1-acReduction)
-	--unarmed
+	--dodging
 	local speed=pl:GetSpeed()
-	local unarmed=0
-	local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
+	local dodging=0
+	local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Dodging))
 	if Mas == 4 then
-		unarmed=Skill+10
+		dodging=Skill+10
 	end
 	--local speed=pl:GetSpeed()
 	--local speedEffect=speed/10
-	local dodgeChance=0.995^(unarmed)
+	local dodgeChance=0.995^(dodging)
 	local fullHP=fullHP/dodgeChance
 	--resistances
 	res={0,1,2,3,7,8,12}
