@@ -80,17 +80,17 @@ skillDamage =
 	[const.Skills.Bow]		= {[0]=0, 1, 2, 2, 3,},
 	[const.Skills.Mace]		= {[0]=0, 1, 2, 3, 4,},
 	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0,},
-	[const.Skills.Unarmed]	= {[0]=0, 4, 5, 6, 6,},
+	[const.Skills.Unarmed]	= {[0]=0, 4, 5, 6, 8,},
 }
 -- weapon skill AC bonuses (by rank)
 
 skillAC =
 {
-	[const.Skills.Staff]	= {[0]=0, 1, 1, 2, 2,},
+	[const.Skills.Staff]	= {[0]=0, 1, 2, 3, 4,},
 	[const.Skills.Sword]	= {[0]=0, 0, 0, 0, 1,},
 	[const.Skills.Dagger]	= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Axe]		= {[0]=0, 0, 0, 0, 0,},
-	[const.Skills.Spear]	= {[0]=0, 1, 2, 2, 3,},
+	[const.Skills.Spear]	= {[0]=0, 1, 2, 3, 4,},
 	[const.Skills.Bow]		= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Mace]		= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0,},
