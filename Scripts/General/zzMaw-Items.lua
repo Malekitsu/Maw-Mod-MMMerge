@@ -2406,7 +2406,7 @@ function itemStats(index)
 			end
 		end
 		local s,m = SplitSkill(pl:GetSkill(const.Skills.Dodging)) 
-		if (i==3 and item==nil and m>=1) or (m==4 and item and item:T().Skill==9) then
+		if (i==3 and item==nil and m>=1) or (m>=3 and item and item:T().Skill==9) then
 			tab[10]=tab[10]+skillAC[const.Skills.Dodging][m]*s
 		end
 	end
