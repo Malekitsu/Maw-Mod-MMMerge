@@ -889,30 +889,6 @@ function events.GetStatisticEffect(t)
 	end
 end
 
---recount
-function events.CalcDamageToMonster(t)
-	data=WhoHitMonster()
-	if data and data.Player then
-		local damage=math.round(t.Result)
-		local damage=math.max(math.min(damage,32768),0)
-		if data.Object then 
-			vars.damageTrackRanged=vars.damageTrackRanged or {}
-			vars.damageTrackRanged[data.Player:GetIndex()]=vars.damageTrackRanged[data.Player:GetIndex()] or 0
-			vars.damageTrackRanged[data.Player:GetIndex()] = vars.damageTrackRanged[data.Player:GetIndex()] + damage
-			mapvars.damageTrackRanged=mapvars.damageTrackRanged or {}
-			mapvars.damageTrackRanged[data.Player:GetIndex()]=mapvars.damageTrackRanged[data.Player:GetIndex()] or 0
-			mapvars.damageTrackRanged[data.Player:GetIndex()] = mapvars.damageTrackRanged[data.Player:GetIndex()] + damage
-		else
-			vars.damageTrack=vars.damageTrack or {}
-			vars.damageTrack[data.Player:GetIndex()]=vars.damageTrack[data.Player:GetIndex()] or 0
-			vars.damageTrack[data.Player:GetIndex()] = vars.damageTrack[data.Player:GetIndex()] + damage
-			mapvars.damageTrack=mapvars.damageTrack or {}
-			mapvars.damageTrack[data.Player:GetIndex()]=mapvars.damageTrack[data.Player:GetIndex()] or 0
-			mapvars.damageTrack[data.Player:GetIndex()] = mapvars.damageTrack[data.Player:GetIndex()] + damage
-		end
-	end
-	dmg=t.Result
-end
 
 --crit message
 local hook, autohook, autohook2, asmpatch = mem.hook, mem.autohook, mem.autohook2, mem.asmpatch
