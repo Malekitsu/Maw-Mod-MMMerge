@@ -234,7 +234,7 @@ function events.BuildStatInformationBox(t)
 		i=Game.CurrentPlayer
 		speed=Party[i]:GetSpeed()
 		dodging=0
-		Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.ddodging))
+		Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Dodging))
 		if Mas == 4 then
 			dodging=Skill+10
 			dodgeChance=1-0.995^(dodging)
