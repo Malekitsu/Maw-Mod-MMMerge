@@ -1014,7 +1014,7 @@ function MawRegen()
 					RegM=8
 				end
 				FSP	= pl:GetFullSP()
-				regenSP[i] = regenSP[i] + (FSP^0.35*RegS^1.75*((RegM+5)/12000) +0.02)*timeMultiplier*mult
+				regenSP[i] = regenSP[i] + (FSP^0.35*RegS^1.75*((RegM+5)/25000) +0.02)*timeMultiplier*mult
 				pl.SP = math.min(FSP, pl.SP + math.floor(regenSP[i]))
 				regenSP[i]=regenSP[i]%1
 			end
