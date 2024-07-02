@@ -1744,11 +1744,34 @@ end
 --TRUE NIGHTMARE MODE
 function events.CanSaveGame(t)
 	if Game.BolsterAmount~=300 and vars and vars.Mode~=2 then return end
-	if (Party.EnemyDetectorYellow or Party.EnemyDetectorRed) and t.SaveKind ~=1 then
+	if t.SaveKind ==1 or foodTaking then
+		return
+	end
+	local requiredFood=0
+	if Map.IndoorOrOutdoor==2 then
+		requiredFood=1
+	else
+		requiredFood=2
+	end
+	if (Party.EnemyDetectorYellow or Party.EnemyDetectorRed) and Map.IndoorOrOutdoor==2 then
+		requiredFood=3
+	elseif (Party.EnemyDetectorYellow or Party.EnemyDetectorRed) and Map.IndoorOrOutdoor==1 then
+		requiredFood=10
+	end
+	
+	if Party.Food<requiredFood then
 		t.Result=false
-		Game.ShowStatusText("Can't save now")
+		Game.ShowStatusText("Not enough food")
+	elseif t.Result==true then
+		Party.Food=Party.Food-requiredFood
+		foodTaking=true
+		function events.Tick()
+			events.Remove("Tick",1)
+			foodTaking=false
+		end
 	end
 end
+
 function events.CanCastLloyd(t)
 	if Game.BolsterAmount~=300 and vars.Mode~=2 then return end
 	if Party.EnemyDetectorYellow or Party.EnemyDetectorRed then
