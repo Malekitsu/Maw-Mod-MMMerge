@@ -232,7 +232,47 @@ function events.CalcDamageToPlayer(t)
 		t.Result=t.Result*0.97^count
 	end
 	--end of [22]
+	--------------------
+	--MANA SHIELD CODE--
+	--------------------
+	local pl=t.Player
+	local s,m=SplitSkill(Skillz.get(pl,51))
+	local m2=m
+	if s>0 and vars.manaShield[Game.CurrentPlayer] then
+		if m==4 then
+			m=100000
+		end
+		done=false
+		local currentHP=pl.HP
+		local totalHP=pl:GetFullHP()
+		local divider=1
+		local damageReduced=0
+		local damage=t.Result
+		while m>0 do
+			divider=divider*2
+			threshold=math.ceil(totalHP/divider)
+			HPAfterDamage=currentHP-damage
+			if HPAfterDamage>=threshold then
+				m=0
+			else
+				damage=math.min(threshold,currentHP)-HPAfterDamage
+				damageReduced=damageReduced+math.ceil(damage/2)
+				damage=math.floor(damage/2)
+			end
+			m=m-1
+		end
+		local manaEfficiency=(1+s^1.5/125 * m2) 
+		local mana=pl.SP
+		reductionPercent=math.min(mana*manaEfficiency/damageReduced,1)
+		damageReduced=damageReduced*reductionPercent
+		pl.SP=math.max(pl.SP-math.floor(damageReduced/manaEfficiency),0)
+		
+		t.Result=t.Result-damageReduced
+	end	
 	
+	
+	
+	---------------------
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 15) then
 		if t.Player.Unconscious==0 and t.Player.Dead==0 and t.Player.Eradicated==0 then
 			if vars.legendaryProtectionCooldown[t.PlayerIndex]==nil then
