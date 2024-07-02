@@ -678,17 +678,18 @@ function events.PickCorpse(t)
 		local lvl=math.max(basetable[lvlID].Level, mapLevels[name].Low)
 		local originalValue=math.min(mon.TreasureItemPercent,50)
 		mon.TreasureItemPercent= math.ceil(mon.Level^0.5*(1+tier)*0.5 + originalValue*0.5)
+		
 		if vars.Mode==2 then
 			mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.5)
 		elseif Game.BolsterAmount==300 then
 			mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.75)
 		end
 		
-		local itemTier=lvl/20-1
+		local itemTier=(lvl+10*tier)/20
 		if itemTier%20/20>math.random() then
 			itemTier=itemTier+1
 		end
-		itemTier=math.floor(itemTier+tier)
+		itemTier=math.floor(itemTier)
 		mon.TreasureItemLevel=math.max(math.min(itemTier,6),1)
 		if  itemTier<=0 then
 			mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*2^(itemTier-1))
@@ -710,11 +711,14 @@ function events.PickCorpse(t)
 		--item tier
 		local name=Game.MapStats[Map.MapStatsIndex].Name
 		local lvl=math.max(basetable[mon.Id].Level, mapLevels[name].Low)
-		local itemTier=lvl/15+2
+		local id=mon:GetIndex()
+		if id and mapvars.uniqueMonsterLevel[id] then
+			lvl=mapvars.uniqueMonsterLevel[id]
+		end		
+		local itemTier=lvl/20+2
 		if itemTier%15/15>math.random() then
 			itemTier=itemTier+1
 		end
-		itemTier=math.floor(itemTier+tier)
 		mon.TreasureItemLevel=math.max(math.min(itemTier,6),2)
 		bossLoot=true
 	end
