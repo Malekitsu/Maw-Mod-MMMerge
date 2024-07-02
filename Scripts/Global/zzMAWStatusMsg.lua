@@ -1,6 +1,6 @@
 function events.CalcDamageToMonster(t)
 	if t.Result==0 then return end
-	data=WhoHitMonster()
+	local data=WhoHitMonster()
 	divide=1
 	if data and data.Spell==44 then
 		if t.Monster.Resistances[0]>=1000 then
@@ -18,6 +18,7 @@ function events.CalcDamageToMonster(t)
 		end
 		MSGdamage=MSGdamage or 0
 		MSGdamage=MSGdamage+math.ceil(t.Result)*divide
+		
 		attackIsSpell=false
 		castedAoe=false
 		shoot="hits"
@@ -75,6 +76,24 @@ function events.CalcDamageToMonster(t)
 					msg=string.format("%s hits for a total of %s points!%s", name, MSGdamage, critMessage)
 				end
 				Game.ShowStatusText(msg)
+				
+				--recount
+				if data.Object then 
+					vars.damageTrackRanged=vars.damageTrackRanged or {}
+					vars.damageTrackRanged[data.Player:GetIndex()]=vars.damageTrackRanged[data.Player:GetIndex()] or 0
+					vars.damageTrackRanged[data.Player:GetIndex()] = vars.damageTrackRanged[data.Player:GetIndex()] + MSGdamage
+					mapvars.damageTrackRanged=mapvars.damageTrackRanged or {}
+					mapvars.damageTrackRanged[data.Player:GetIndex()]=mapvars.damageTrackRanged[data.Player:GetIndex()] or 0
+					mapvars.damageTrackRanged[data.Player:GetIndex()] = mapvars.damageTrackRanged[data.Player:GetIndex()] + MSGdamage
+				else
+					vars.damageTrack=vars.damageTrack or {}
+					vars.damageTrack[data.Player:GetIndex()]=vars.damageTrack[data.Player:GetIndex()] or 0
+					vars.damageTrack[data.Player:GetIndex()] = vars.damageTrack[data.Player:GetIndex()] + MSGdamage
+					mapvars.damageTrack=mapvars.damageTrack or {}
+					mapvars.damageTrack[data.Player:GetIndex()]=mapvars.damageTrack[data.Player:GetIndex()] or 0
+					mapvars.damageTrack[data.Player:GetIndex()] = mapvars.damageTrack[data.Player:GetIndex()] + MSGdamage
+				end
+				
 				if calls>0 then
 					calls=calls-1
 					if t.Result==0 then
