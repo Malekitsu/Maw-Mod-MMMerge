@@ -1033,6 +1033,13 @@ end
 function events.GameInitialized2()
 	baseRegStr=	Skillz.getDesc(30,1)
 	baseMedStr=	Skillz.getDesc(28,1)
+	--meditation tooltip
+	Skillz.setDesc(28,2,"Increases Spell points by 2%")
+	Skillz.setDesc(28,3,"Increases Spell points by 3%")
+	Skillz.setDesc(28,4,"Increases Spell points by 4%")
+	Skillz.setDesc(28,5,"Increases Spell points by 5%")
+	
+	
 end
 function events.Tick()
 	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
@@ -1061,7 +1068,7 @@ function events.Tick()
 		else
 			spRegen = math.round((spRegen)*100)/100
 		end
-		txt= string.format("%s\n\nCurrent SP Regeneration: %s\nNext Level Bonus: %s SP Regen",baseMedStr,StrColor(60,60,255,spRegen),StrColor(60,60,255,"+" .. spRegen2))
+		txt= string.format("%s\n\nIncreases spell points based on SP per level and mastery\n\nCurrent SP Regeneration: %s\nNext Level Bonus: %s SP Regen\n",baseMedStr,StrColor(60,60,255,spRegen),StrColor(60,60,255,"+" .. spRegen2))
 		Skillz.setDesc(28,1,txt)
 	end
 end
