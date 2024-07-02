@@ -1563,10 +1563,13 @@ function events.Tick()
 	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
 		local index=Game.CurrentPlayer
 		if index>=0 and index<=Party.High then
-			if Skillz.get(Party[index],50)>0 then
+			if Skillz.get(Party[index],50)>0 or Skillz.get(Party[index],51)>0 then
 				Game.GlobalTxt[143]="\nMisc"
 			else
 				Game.GlobalTxt[143]="Misc"
+			end
+			if Skillz.get(Party[index],50)>0 and Skillz.get(Party[index],51)>0 then
+				Game.GlobalTxt[143]="\n\nMisc"
 			end
 		end	
 		if not vars.covering then
@@ -1585,6 +1588,27 @@ function events.Tick()
 			txt=txt .. StrColor(255,0,0,"\nCurrently disabled\n")
 			Skillz.setDesc(50, 1, txt)
 		end
+		
+		--MANA SHIELD
+		if not vars.manaShield then
+			vars.manaShield={}
+			for i=0,4 do
+				vars.manaShield[i]=true
+			end
+		end
+		local s, m= SplitSkill(Skillz.get(Party[Game.CurrentPlayer], 51))
+		local efficiency=math.round((1+s^1.5/125*m)*100)/100
+			Skillz.setDesc(manaSkill, 1, "Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n")
+		
+		local txt="Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n" .. "Current Mana consumption per Damage: " .. StrColor(178,255,255, efficiency) .. "\n\nPress M to enable/disable"
+		if vars.manaShield[Game.CurrentPlayer] then
+			txt=txt .. StrColor(0,255,0,"\nCurrently enabled\n")
+			Skillz.setDesc(51, 1, txt)
+		else
+			txt=txt .. StrColor(255,0,0,"\nCurrently disabled\n")
+			Skillz.setDesc(51, 1, txt)
+		end
+		
 	end
 end
 function events.KeyDown(t)
@@ -1600,6 +1624,19 @@ function events.KeyDown(t)
 			end
 		end
 	end
+	if t.Key==const.Keys.M then
+		if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
+			vars.manaShield=vars.manaShield or {}
+			if vars.manaShield[Game.CurrentPlayer] then
+				vars.manaShield[Game.CurrentPlayer]=false
+				Game.ShowStatusText("Mana Shield Disabled")
+			else
+				vars.manaShield[Game.CurrentPlayer]=true
+				Game.ShowStatusText("Mana Shield Enabled")
+			end
+		end
+	end
+	
 end
 local coverRequirements={6,12,20}
 function events.Action(t)
@@ -1812,6 +1849,32 @@ function events.Action(t)
 				txt=txt .. "Chance to Paralyze: " .. chance .. "%"
 			end
 			Game.SkillDesGM[6]=maceGMtxt .. StrColor(0,0,0,txt)
+		end
+	end
+end
+
+--mana shield
+function events.GameInitialized2()
+	local manaSkill=51
+	Skillz.new_armor(manaSkill)
+	Skillz.setName(manaSkill, "Mana Shield")
+	Skillz.setDesc(manaSkill, 1, "Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n")
+	Skillz.setDesc(manaSkill, 2, "When below 50% HP reduces damage by 1/2")
+	Skillz.setDesc(manaSkill, 3, "When below 25% HP reduces damage by 1/4")
+	Skillz.setDesc(manaSkill, 4, "When below 12.5% HP reduces damage by 1/8")
+	Skillz.setDesc(manaSkill, 5, "Reduction increased as your HP reduces, up to infinity")
+	Skillz.learn_at(manaSkill, 23) --temples
+end
+
+local manaShieldRequirements={6,12,20}
+function events.Action(t)
+	if t.Action==121 then
+		if t.Param==51 then
+			local pl=Party[Game.CurrentPlayer]
+			local s,m=SplitSkill(Skillz.get(pl,51))
+			if pl.SkillPoints>s and manaShieldRequirements[m] and s+1>=manaShieldRequirements[m] then
+				Skillz.set(pl,51,JoinSkill(s, m+1))
+			end
 		end
 	end
 end
