@@ -2337,12 +2337,47 @@ function itemStats(index)
 	--get bonus stats from skills
 	
 	--meditation
-	local s,m=SplitSkill(pl.Skills[const.Skills.Meditation])	
+	local manaScaling=Game.Classes.SPFactor[pl.Class]
+	local s,m=SplitSkill(pl.Skills[const.Skills.Meditation])
+	local manaType=Game.Classes.SPStats[pl.Class]
+	local totalMana=manaScaling*pl.LevelBase+Game.Classes.SPBase[pl.Class]
+	local effect=0
+	if manaType==1 then
+		local stat=pl:GetIntellect()
+		if stat<=21 then
+			effect=effect+math.floor((stat-13)/2)
+		else
+			effect=effect+math.floor(stat/5)
+		end
+	elseif manaType==2 then
+		local stat=pl:GetPersonality()
+		if stat<=21 then
+			effect=effect+math.floor((stat-13)/2)
+		else
+			effect=effect+math.floor(stat/5)
+		end
+	elseif manaType==3 then
+		local stat=pl:GetIntellect()
+		if stat<=21 then
+			effect=effect+math.floor((stat-13)/2)
+		else
+			effect=effect+math.floor(stat/5)
+		end
+		local stat=pl:GetPersonality()
+		if stat<=21 then
+			effect=effect+math.floor((stat-13)/2)
+		else
+			effect=effect+math.floor(stat/5)
+		end
+	end
+	totalMana=totalMana+manaScaling*effect
 	if m==4 then
 		m=5
 	end
-	tab[9]=tab[9]+Game.Classes.SPFactor[pl.Class]*s*m
-	
+	totalMana=totalMana+manaScaling*s*m
+	local meditationIncrease=totalMana*math.min((m+1),5)*s/100
+	tab[9]=tab[9]+meditationIncrease
+		
 	ACBONUS=0
 	for i=0,3 do 
 		local item=pl:GetActiveItem(i)
