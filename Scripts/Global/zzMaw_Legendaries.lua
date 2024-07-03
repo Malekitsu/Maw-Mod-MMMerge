@@ -238,11 +238,17 @@ function events.CalcDamageToPlayer(t)
 	local pl=t.Player
 	local s,m=SplitSkill(Skillz.get(pl,51))
 	local m2=m
-	if s>0 and vars.manaShield[Game.CurrentPlayer] then
+	local id=t.PlayerIndex
+	local slot=-1
+	for i=0,Party.High do
+		if Party[i]:GetIndex()==id then
+			slot=i
+		end
+	end
+	if s>0 and vars.manaShield[slot] then
 		if m==4 then
 			m=100000
 		end
-		done=false
 		local currentHP=pl.HP
 		local totalHP=pl:GetFullHP()
 		local divider=1
