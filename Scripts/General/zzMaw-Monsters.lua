@@ -1753,7 +1753,7 @@ function events.CanSaveGame(t)
 	end
 	local requiredFood=0
 	if Map.IndoorOrOutdoor==2 then
-		requiredFood=1
+		requiredFood=0
 	else
 		requiredFood=2
 	end
