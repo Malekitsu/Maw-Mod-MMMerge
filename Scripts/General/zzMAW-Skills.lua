@@ -1651,7 +1651,7 @@ function events.Action(t)
 		if t.Param==50 then
 			local pl=Party[Game.CurrentPlayer]
 			local s,m=SplitSkill(Skillz.get(pl,50))
-			if pl.SkillPoints>s and coverRequirements[m] and s+1>=coverRequirements[m] then
+			if pl.SkillPoints>s and coverRequirements[m] and s+1>=coverRequirements[m] and Skillz.MasteryLimit(pl,50)>m then
 				Skillz.set(pl,50,JoinSkill(s, m+1))
 			end
 		end
@@ -1879,7 +1879,7 @@ function events.Action(t)
 		if t.Param==51 then
 			local pl=Party[Game.CurrentPlayer]
 			local s,m=SplitSkill(Skillz.get(pl,51))
-			if pl.SkillPoints>s and manaShieldRequirements[m] and s+1>=manaShieldRequirements[m] then
+			if pl.SkillPoints>s and manaShieldRequirements[m] and s+1>=manaShieldRequirements[m] and Skillz.MasteryLimit(pl,51)>m then
 				Skillz.set(pl,51,JoinSkill(s, m+1))
 			end
 		end
