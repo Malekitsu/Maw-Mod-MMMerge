@@ -1756,6 +1756,11 @@ function events.GameInitialized2()
 			[const.Skills.Spear]=3,
 			[const.Skills.Meditation]=3,
 		},
+	[const.Race.DarkElf]={
+			[const.Skills.Bow]=3,
+			[const.Skills.Spear]=3,
+			[const.Skills.Meditation]=3,
+		}, 
 		[const.Race.Goblin]={
 			[const.Skills.Sword]=3,
 			[const.Skills.Mace]=3,
