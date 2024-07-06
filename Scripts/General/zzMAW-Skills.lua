@@ -1753,6 +1753,7 @@ function events.GameInitialized2()
 		[const.Race.Undead]={},
 		[const.Race.Elf]={
 			[const.Skills.Bow]=3,
+			[const.Skills.Spear]=3,
 			[const.Skills.Meditation]=3,
 		},
 		[const.Race.Goblin]={
