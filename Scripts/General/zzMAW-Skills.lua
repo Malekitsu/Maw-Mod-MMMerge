@@ -1607,7 +1607,7 @@ function events.Tick()
 		local efficiency=math.round((1+s^1.5/125*m)*100)/100
 			Skillz.setDesc(manaSkill, 1, "Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n")
 		
-		local txt="Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n" .. "Current Mana consumption per Damage: " .. StrColor(178,255,255, efficiency) .. "\n\nPress M to enable/disable"
+		local txt="Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n" .. "Current Damage reduction per Mana: " .. StrColor(178,255,255, efficiency) .. "\n\nPress M to enable/disable"
 		if vars.manaShield[Game.CurrentPlayer] then
 			txt=txt .. StrColor(0,255,0,"\nCurrently enabled\n")
 			Skillz.setDesc(51, 1, txt)
@@ -1872,9 +1872,9 @@ function events.GameInitialized2()
 	Skillz.new_armor(manaSkill)
 	Skillz.setName(manaSkill, "Mana Shield")
 	Skillz.setDesc(manaSkill, 1, "Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n")
-	Skillz.setDesc(manaSkill, 2, "When below 50% HP reduces damage by 1/2")
-	Skillz.setDesc(manaSkill, 3, "When below 25% HP reduces damage by 1/4")
-	Skillz.setDesc(manaSkill, 4, "When below 12.5% HP reduces damage by 1/8")
+	Skillz.setDesc(manaSkill, 2, "When below 50% HP reduces damage to 1/2")
+	Skillz.setDesc(manaSkill, 3, "When below 25% HP reduces damage to 1/4")
+	Skillz.setDesc(manaSkill, 4, "When below 12.5% HP reduces damage to 1/8")
 	Skillz.setDesc(manaSkill, 5, "Reduction increased as your HP reduces, up to infinity")
 	Skillz.learn_at(manaSkill, 23) --temples
 end
