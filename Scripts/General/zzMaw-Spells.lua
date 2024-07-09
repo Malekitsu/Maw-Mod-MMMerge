@@ -1155,6 +1155,11 @@ function events.Action(t)
 		Game.Spells[key]["SpellPointsMaster"]=cost
 		Game.Spells[key]["SpellPointsGM"]=cost
 	end
+	--dragon fix
+	Game.Spells[122]["SpellPointsNormal"]=15
+	Game.Spells[122]["SpellPointsExpert"]=15
+	Game.Spells[122]["SpellPointsMaster"]=25
+	Game.Spells[122]["SpellPointsGM"]=30
 end
 
 --Tooltips
@@ -1245,7 +1250,7 @@ function events.GameInitialized2()
 	spellCost[111][masteryName[3]]=10
 	spellCost[111][masteryName[4]]=15
 	
-	spells={2,6,7,8,9,10,11,15,18,20,22,24,26,29,32,37,39,41,43,44,52,59,65,70,76,78,79,84,87,90,93,97,98,99,103,111,123}
+	spells={2,6,7,8,9,10,11,15,18,20,22,24,26,29,32,37,39,41,43,44,52,59,65,70,76,78,79,84,87,90,93,97,98,99,103,111}
 	lastIndex=-1 --used later
 
 	--if you change diceMin or values that are 0 remember to update the tooltip manually 
@@ -1287,7 +1292,7 @@ function events.GameInitialized2()
 			[99] = {dmgAdd = 25, diceMin = 1, diceMax = 5, },--souldrinker
 			[103] = {dmgAdd = 46, diceMin = 1, diceMax = 28, },--darkfire bolt
 			[111] = {dmgAdd = 18, diceMin = 1, diceMax = 6, },--lifedrain scales with mastery, fixed in calcspelldamage
-			[123] = {dmgAdd = 0, diceMin = 1, diceMax = 25, },--flame blast scales with mastery, fixed in calcspelldamage
+			--[123] = {dmgAdd = 0, diceMin = 1, diceMax = 25, },--scales with breath damage
 		}
 end
 
@@ -1339,13 +1344,6 @@ function events.CalcSpellDamage(t)
 			t.Result=t.Result/3*5
 		elseif t.Mastery==4 then
 			t.Result=t.Result/3*7
-		end
-	end
-	if t.Spell == 123 then  -- flame blast
-		if t.Mastery==3 then
-			t.Result=t.Result/10*11
-		elseif t.Mastery==4 then
-			t.Result=t.Result/10*12
 		end
 	end
 end
@@ -1589,10 +1587,6 @@ function ascension()
 		Game.SpellsTxt[111].Description=string.format("Lifedrain allows the vampire to damage his or her target and simultaneously heal based on the damage done in the Lifedrain.  This ability does %s points of damage plus 1-%s points of damage per skill.",dmgAddTooltip(s, m,111),diceMaxTooltip(s, m,111))
 		Game.SpellsTxt[111].Master=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*5),math.round(diceMaxTooltip(s, m,111)/3*5))
 		Game.SpellsTxt[111].GM=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*7),math.round(diceMaxTooltip(s, m,111)/3*7))
-		Game.SpellsTxt[123].Description="This ability is an upgraded version of the normal Dragon breath weapon attack.  It acts much like a fireball, striking its target and exploding out to hit everything near it, except the explosion does much more damage than most fireballs."
-		Game.SpellsTxt[123].Expert=string.format("Damage %s points plus 1-%s points per point of skill",dmgAddTooltip(s, m,123),diceMaxTooltip(s, m,123))
-		Game.SpellsTxt[123].Master=string.format("Damage %s points plus 1-%s points per point of skill",math.round(dmgAddTooltip(s, m,123)/10*11),math.round(diceMaxTooltip(s, m,123)/10*11))
-		Game.SpellsTxt[123].GM=string.format("Damage %s points plus 1-%s points per point of skill",math.round(dmgAddTooltip(s, m,123)/10*12),math.round(diceMaxTooltip(s, m,123)/10*12))
 		
 		for i=1, #spells do
 			local ascensionLevel=getAscensionTier(s,spells[i])
