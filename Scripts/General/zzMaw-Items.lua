@@ -2350,7 +2350,7 @@ function itemStats(index)
 	
 	--meditation
 	local manaScaling=Game.Classes.SPFactor[pl.Class]
-	local s,m=SplitSkill(pl.Skills[const.Skills.Meditation])
+	local s,m=SplitSkill(pl:GetSkill(const.Skills.Meditation))
 	local manaType=Game.Classes.SPStats[pl.Class]
 	local totalMana=manaScaling*pl.LevelBase+Game.Classes.SPBase[pl.Class]
 	local effect=0
@@ -2670,8 +2670,7 @@ artifactStatsBonus[1318] = {[const.Stats.Luck]				= 100,
 							[const.Stats.WaterResistance] 	= -20,
 							[const.Stats.EarthResistance] 	= -20,
 							[const.Stats.MindResistance] 	= -20,
-							[const.Stats.BodyResistance] 	= -20,
-							[const.Stats.SpiritResistance] 	= -20}
+							[const.Stats.BodyResistance] 	= -20,}
 -- Amuck
 artifactStatsBonus[1320] = {[const.Stats.Might] 		= 100,
 							[const.Stats.Endurance] 	= 100,
@@ -2711,7 +2710,6 @@ artifactStatsBonus[1327] = {
 							[const.Stats.EarthResistance] = -30,
 							[const.Stats.MindResistance] = -30,
 							[const.Stats.BodyResistance] = -30,
-							[const.Stats.SpiritResistance] = -30
 }
 -- Ania Selving
 artifactStatsBonus[1328] = {[const.Stats.ArmorClass] = -25,
@@ -2753,8 +2751,7 @@ artifactStatsBonus[1338] = {[const.Stats.FireResistance]	= 10,
 							[const.Stats.WaterResistance]	= 10,
 							[const.Stats.EarthResistance]	= 10,
 							[const.Stats.MindResistance]	= 10,
-							[const.Stats.BodyResistance]	= 10,
-							[const.Stats.SpiritResistance]	= 10}
+							[const.Stats.BodyResistance]	= 10,}
 -- Thor
 artifactStatsBonus[2021] = {[const.Stats.Might] = 75}
 -- Conan
@@ -2825,7 +2822,6 @@ artifactStatsBonus[2041] = {[const.Stats.Endurance]			= -30,
 							[const.Stats.EarthResistance] 	= 40,
 							[const.Stats.MindResistance] 	= 40,
 							[const.Stats.BodyResistance] 	= 40,
-							[const.Stats.SpiritResistance] 	= 40,
 							[const.Stats.Luck]				= 20}
 -- Zeus
 artifactStatsBonus[2042] = {[const.Stats.Endurance] 		= 50,
@@ -2885,7 +2881,7 @@ artifactSkillBonus[1305] =	{	[const.Skills.DisarmTraps] = 10}
 artifactSkillBonus[1313] =	{	[const.Skills.Unarmed] = 10,
 								[const.Skills.Dodging] = 10}
 -- Ethric's Staff
-artifactSkillBonus[1317] =	{	[const.Skills.Meditation] = 15}
+artifactSkillBonus[1317] =	{	[const.Skills.Meditation] = 8}
 -- Hareck's Leather
 artifactSkillBonus[1318] =	{	[const.Skills.DisarmTraps] = 5,
 								[const.Skills.Unarmed] = 5,}
