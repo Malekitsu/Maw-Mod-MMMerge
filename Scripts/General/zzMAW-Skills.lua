@@ -1009,12 +1009,20 @@ function MawRegen()
 				mult=2
 			end
 			local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Meditation))
-			if RegM > 0 then
+			if RegM > 0 or pl.Class==10 or pl.Class==11 then
 				if RegM==4 then
 					RegM=8
 				end
 				FSP	= pl:GetFullSP()
-				regenSP[i] = regenSP[i] + (FSP^0.35*RegS^1.65*((RegM+5)/12000) +0.02)*timeMultiplier*mult
+				regenSP[i] = regenSP[i] + (FSP^0.35*RegS^1.65*((RegM+5)/12000) +0.02)* timeMultiplier*mult
+				
+				--dragon regen
+				if pl.Class==10 then
+					regenSP[i]=regenSP[i] + 0.2* timeMultiplier*mult
+				elseif pl.Class==11 then
+					regenSP[i]=regenSP[i] + 0.5* timeMultiplier*mult
+				end
+				
 				pl.SP = math.min(FSP, pl.SP + math.floor(regenSP[i]))
 				regenSP[i]=regenSP[i]%1
 			end
