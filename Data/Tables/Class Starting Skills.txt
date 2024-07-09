@@ -37,5 +37,5 @@ IdentifyMonster	-	-	-	-	-	C	-	-	-	-	-	C	C	-	-	C	C	-	-	C	C	C	C	C	-	-	-	-	-	-	-
 Armsmaster	C	C	-	-	-	-	-	-	C	C	C	C	C	C	C	C	C	-	-	C	-	-	-	-	-	-	-	C	C	-	-
 Stealing	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
 Alchemy	-	-	-	-	-	-	C	C	-	-	-	-	-	-	-	-	-	C	C	-	C	C	C	C	-	-	-	-	-	C	-
-Learning	C	C	C	C	-	C	C	C	-	-	-	-	-	-	-	-	-	-	-	-	-	-	C	C	C	C	-	-	-	C	C
+Learning	C	C	C	C	-	-	C	C	-	-	-	-	-	-	-	-	-	-	-	-	-	-	C	C	C	C	-	-	-	C	C
 																														
