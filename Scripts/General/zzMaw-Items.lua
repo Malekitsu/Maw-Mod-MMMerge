@@ -1730,10 +1730,9 @@ end
 
 function events.GameInitialized2() --make it load later compared to other scripts
 	function events.CalcDamageToMonster(t)
-		if t.DamageKind==4 then
-			local data=WhoHitMonster()
-			
-			if data and data.Player then
+		local data=WhoHitMonster()
+		if data and data.Player then
+			if t.DamageKind==4 then
 				local heal=t.Result*data.Player.LevelBase^0.6/t.Monster.Level*0.30
 				--melee
 				if gotVamp[data.Player:GetIndex()] and not data.Object then
@@ -1745,15 +1744,28 @@ function events.GameInitialized2() --make it load later compared to other script
 					local fullHP=t.Player:GetFullHP()
 					t.Player.HP=math.min(fullHP,t.Player.HP+heal*0.5)
 				end
-			end
-		elseif data and data.Player then --spell leech
-			it=t.Player:GetActiveItem(1)
-			local fullHP=t.Player:GetFullHP()
-			if it and it.Bonus2==40 then
-				local heal=t.Result*data.Player.LevelBase^0.6/t.Monster.Level*0.30
+			elseif data and data.Player then --spell leech
+				it=t.Player:GetActiveItem(1)
+				local fullHP=t.Player:GetFullHP()
+				if it and it.Bonus2==40 then
+					local heal=t.Result*data.Player.LevelBase^0.6/t.Monster.Level*0.30
+					t.Player.HP=math.min(fullHP,t.Player.HP+heal)
+				end
+			end 
+		
+			local pl=data.Player
+			local race=Game.CharacterPortraits[pl.Face].Race
+			if race==const.Race.Vampire then
+				heal=t.Result*data.Player.LevelBase^0.6/t.Monster.Level*0.075
+				if pl.Class==40 or pl.Class==41 then
+					heal=heal*2
+				end
+				if data.Object and data.Object.Spell==133 then
+					heal=heal/2
+				end
 				t.Player.HP=math.min(fullHP,t.Player.HP+heal)
 			end
-		end 
+		end
 	end
 end
 
