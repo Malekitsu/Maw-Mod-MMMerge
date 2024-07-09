@@ -1390,7 +1390,7 @@ mapLevels={
 {["Low"] = 12 , ["Mid"] = 16 , ["High"] = 20},
 
 ["Hall of the Fire Lord"] = 
-{["Low"] = 6 , ["Mid"] = 13 , ["High"] = 20},
+{["Low"] = 10 , ["Mid"] = 13 , ["High"] = 20},
 
 ["Snergle's Caverns"] = 
 {["Low"] = 30 , ["Mid"] = 32.5 , ["High"] = 35},
@@ -1399,7 +1399,7 @@ mapLevels={
 {["Low"] = 18 , ["Mid"] = 20 , ["High"] = 26},
 
 ["Silver Helm Outpost"] = 
-{["Low"] = 5 , ["Mid"] = 12 , ["High"] = 16},
+{["Low"] = 8 , ["Mid"] = 12 , ["High"] = 16},
 
 ["Shadow Guild"] = 
 {["Low"] = 12 , ["Mid"] = 20 , ["High"] = 66},
@@ -1429,7 +1429,7 @@ mapLevels={
 {["Low"] = 34 , ["Mid"] = 40 , ["High"] = 80},
 
 ["Lair of the Wolf"] = 
-{["Low"] = 26 , ["Mid"] = 40 , ["High"] = 45},
+{["Low"] = 35 , ["Mid"] = 40 , ["High"] = 45},
 
 ["Gharik's Forge"] = 
 {["Low"] = 39 , ["Mid"] = 39 , ["High"] = 50},
@@ -1456,10 +1456,10 @@ mapLevels={
 {["Low"] = 10 , ["Mid"] = 30 , ["High"] = 45},
 
 ["Supreme Temple of Baa"] = 
-{["Low"] = 39 , ["Mid"] = 70 , ["High"] = 70},
+{["Low"] = 60 , ["Mid"] = 70 , ["High"] = 70},
 
 ["Superior Temple of Baa"] = 
-{["Low"] = 30 , ["Mid"] = 50 , ["High"] = 70},
+{["Low"] = 50 , ["Mid"] = 60 , ["High"] = 70},
 
 ["Temple of the Snake"] = 
 {["Low"] = 45 , ["Mid"] = 67.5 , ["High"] = 90},
@@ -1468,10 +1468,10 @@ mapLevels={
 {["Low"] = 44 , ["Mid"] = 50 , ["High"] = 50},
 
 ["Castle Darkmoor"] = 
-{["Low"] = 40 , ["Mid"] = 55 , ["High"] = 80},
+{["Low"] = 60 , ["Mid"] = 70 , ["High"] = 80},
 
 ["Castle Kriegspire"] = 
-{["Low"] = 35 , ["Mid"] = 45 , ["High"] = 79},
+{["Low"] = 59 , ["Mid"] = 69 , ["High"] = 79},
 
 ["Free Haven Sewer"] = 
 {["Low"] = 4 , ["Mid"] = 12 , ["High"] = 16},
@@ -1486,7 +1486,7 @@ mapLevels={
 {["Low"] = 90 , ["Mid"] = 90 , ["High"] = 90},
 
 ["The Hive"] = 
-{["Low"] = 70 , ["Mid"] = 85 , ["High"] = 100},
+{["Low"] = 80 , ["Mid"] = 90 , ["High"] = 100},
 
 ["The Arena"] = 
 {["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
@@ -1531,7 +1531,7 @@ mapLevels={
 {["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
 
 ["Devil Outpost"] = 
-{["Low"] = 70 , ["Mid"] = 70 , ["High"] = 70},
+{["Low"] = 50 , ["Mid"] = 50 , ["High"] = 50},
 
 ["New World Computing"] = 
 {["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
