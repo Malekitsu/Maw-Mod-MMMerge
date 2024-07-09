@@ -2311,7 +2311,7 @@ function itemStats(index)
 	--dragon
 	if Game.CharacterPortraits[pl.Face].Race==const.Race.Dragon then
 		for i=1,16 do
-			tab[i]=tab[i]*2
+			tab[i]=tab[i]*3
 		end
 	end
 	--add luck to resistances
