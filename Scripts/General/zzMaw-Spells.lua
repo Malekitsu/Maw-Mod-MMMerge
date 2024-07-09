@@ -881,7 +881,7 @@ function elementalBuffs()
 		if race==const.Race.Vampire then
 			local hour=Game.Time%const.Day/const.Hour
 			if (hour>21 or hour<5 or  Map.IndoorOrOutdoor==1) and Map.Name~="7d25.blv" then
-				pl.SpellBuffs[const.PlayerBuff.Preservation].ExpireTime=Game.Time+const.Minute*5
+				pl.SpellBuffs[const.PlayerBuff.Preservation].ExpireTime=math.max(Game.Time+const.Minute*5, pl.SpellBuffs[const.PlayerBuff.Preservation].ExpireTime)
 			end
 		end
 	end
