@@ -1776,6 +1776,7 @@ function events.GameInitialized2()
 		},
 		[const.Race.Dwarf]={
 			[const.Skills.Axe]=3,
+			[const.Skills.Shield]=3,
 			[const.Skills.Bodybuilding]=3,
 		},
 		[const.Race.Zombie]={},
