@@ -1756,6 +1756,7 @@ function events.GameInitialized2() --make it load later compared to other script
 			local pl=data.Player
 			local race=Game.CharacterPortraits[pl.Face].Race
 			if race==const.Race.Vampire then
+				local fullHP=t.Player:GetFullHP()
 				heal=t.Result*data.Player.LevelBase^0.6/t.Monster.Level*0.075
 				if pl.Class==40 or pl.Class==41 then
 					heal=heal*2
