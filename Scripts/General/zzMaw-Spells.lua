@@ -876,6 +876,14 @@ function elementalBuffs()
 				end
 			end
 		end
+		--vampire night preservation
+		local race=Game.CharacterPortraits[pl.Face].Race
+		if race==const.Race.Vampire then
+			local hour=Game.Time%const.Day/const.Hour
+			if (hour>21 or hour<5 or  Map.IndoorOrOutdoor==1) and Map.Name~="7d25.blv" then
+				pl.SpellBuffs[const.PlayerBuff.Preservation].ExpireTime=Game.Time+const.Minute*5
+			end
+		end
 	end
 	
 	if Party.High==0 then
