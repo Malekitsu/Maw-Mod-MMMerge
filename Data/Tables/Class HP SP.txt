@@ -9,8 +9,8 @@ PriestLight	30	4	15	6	P
 PriestDark	30	4	15	6	P
 DarkElf	25	3	10	2	I
 Patriarch	25	5	10	4	I
-Dragon	50	5	5	1	I
-GreatWyrm	50	10	15	1	I
+Dragon	50	5	50	0	I
+GreatWyrm	50	10	120	0	I
 Druid	20	2	10	3	IP
 GreatDruid	20	3	10	4	IP
 Warlock	20	4	10	6	IP
