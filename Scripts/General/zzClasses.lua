@@ -390,6 +390,25 @@ local dragonScales={
 }
 
 function events.GameInitialized2()
+	--fire blast tooltip
+	Game.SpellsTxt[123].Description="This ability is an upgraded version of the normal Dragon breath weapon attack.  It acts much like a fireball, striking its target and exploding out to hit everything near it, except the explosion does much more damage than most fireballs."
+	Game.SpellsTxt[123].Expert="Deals damage equal to 80% of breath damage"
+	Game.SpellsTxt[123].Master="Deals damage equal to 100% of breath damage"
+	Game.SpellsTxt[123].GM="Increases Fire Blast damage by 1% per skill point"
+	--mana cost
+	Game.Spells[123].SpellPointsNormal=10
+	Game.Spells[123].SpellPointsExpert=20
+	Game.Spells[123].SpellPointsMaster=30
+	Game.Spells[123].SpellPointsGM=40
+	
+	Game.Classes.SPBase[10]=50
+	Game.Classes.SPFactor[10]=0
+	Game.Classes.SPStats[10]=3
+	Game.Classes.SPBase[11]=120
+	Game.Classes.SPFactor[11]=0
+	Game.Classes.SPStats[11]=3
+	
+	
 	function events.CalcStatBonusByItems(t)
 		if Game.CharacterPortraits[t.Player.Face].Race~=const.Race.Dragon then return end
 		--melee
@@ -723,10 +742,14 @@ function events.GameInitialized2()
 					damage=damage*(1.5+critDamage)
 					crit=true
 				end
-				
+				if pl.Class==10 then
+					pl.SP=math.min(pl.SP+10, 50)
+				elseif pl.Class==11 then
+					pl.SP=math.min(pl.SP+20, 100)
+				end
 				--apply Damage
 				t.Result = damage * (1-res)
-			elseif t.DamageKind==50 then
+			elseif t.DamageKind==50 or data.Spell==123 then
 				--increase damage based on speed
 				local speed=pl:GetSpeed()
 				if speed>=25 then
@@ -758,7 +781,18 @@ function events.GameInitialized2()
 					damage=damage*(1.5+critDamage)
 					crit=true
 				end
-				
+				if data.Spell==123 then
+					local s,m=SplitSkill(t.Player.Skills[const.Skills.DragonAbility])
+					local mult=1
+					if m<=2 then
+						mult=0.8
+					elseif m==4 then
+						mult=mult+s*0.01
+					end
+					damage=damage*mult
+				end
+				--randomize
+				damage=damage*0.75+(damage*math.random()*0.25)+(damage*math.random()*0.25)
 				--apply Damage
 				t.Result = damage
 			end
