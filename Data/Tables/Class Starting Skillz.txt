@@ -1,7 +1,7 @@
 	Archer	WarriorMage	Cleric	Priest	DarkElf	Dragon	Druid	GreatDruid	Knight	Cavalier	Minotaur	Monk	Initiate	Paladin	Crusader	Ranger	Hunter	Thief	Rogue	Troll	Vampire	Sorcerer	Necromancer	n/u	Peasant	High Priest / Master Wizard	Seraphim	Death Knight	Death Knight	Druid	n/u
 Staff	0	0	1	1	0	0	0	0	0	0	1	1	1	0	0	0	0	0	0	1	0	2	2	2	0	0	0	0	0	0	0
-Sword	1	1	0	0	1	0	0	0	2	2	0	1	1	1	1	1	1	0	1	1	2	0	0	0	0	0	2	1	1	0	0
-Dagger	0	0	0	0	1	0	2	2	0	0	0	1	1	1	1	1	1	2	2	0	1	1	1	1	0	0	0	0	0	2	0
+Sword	1	1	0	0	1	0	0	0	2	2	0	1	1	1	1	1	1	1	1	1	1	0	0	0	0	0	2	1	1	0	0
+Dagger	0	0	0	0	1	0	2	2	0	0	0	1	1	1	1	1	1	2	2	0	2	1	1	1	0	0	0	0	0	2	0
 Axe	1	1	0	0	0	0	0	0	1	1	2	0	0	1	1	2	2	0	0	1	1	0	0	0	0	0	0	2	2	0	0
 Spear	1	1	0	0	0	0	0	0	1	1	1	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0
 Bow	2	2	0	0	2	0	0	0	1	1	0	0	0	0	0	1	1	1	1	1	0	0	0	0	1	1	0	1	0	0	1
