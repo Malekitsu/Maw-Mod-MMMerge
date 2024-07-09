@@ -1786,10 +1786,9 @@ slotMap={
 	[11]=9,
 	[10]=10,
 }
-	
+
 
 function events.BuildItemInformationBox(t)
-	--maxcharges fix
 	partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 	maxItemBolster=(partyLevel)/5+20
 	--failsafe
@@ -2137,6 +2136,10 @@ function itemStats(index)
 	armorAC=0
 	--iterate items and get bonuses
 	for it in pl:EnumActiveItems() do
+		--maxcharges fix for moon cloak
+		if it.Number==1349 or it.Number==1350 then
+			it.MaxCharges=0
+		end
 		
 		local txt=it:T()
 		if (txt.Skill>=8 and txt.Skill<=11) or (txt.Skill==40 and txt.EquipStat~=12) then --AC from items
