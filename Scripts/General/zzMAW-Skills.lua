@@ -1787,6 +1787,7 @@ function events.BeforeNewGameAutosave()
 	for i=0,Party.PlayersArray.High do
 		pl=Party.PlayersArray[i]
 		Skillz.set(pl,50,0)
+		Skillz.set(pl,51,0)
 	end
 end
 
