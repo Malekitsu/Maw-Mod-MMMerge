@@ -1291,7 +1291,7 @@ function events.GameInitialized2()
 			[98] = {dmgAdd = 50, diceMin = 1, diceMax = 1, },--armageddon
 			[99] = {dmgAdd = 25, diceMin = 1, diceMax = 5, },--souldrinker
 			[103] = {dmgAdd = 46, diceMin = 1, diceMax = 28, },--darkfire bolt
-			[111] = {dmgAdd = 18, diceMin = 1, diceMax = 6, },--lifedrain scales with mastery, fixed in calcspelldamage
+			[111] = {dmgAdd = 21, diceMin = 1, diceMax = 7, },--lifedrain scales with mastery, fixed in calcspelldamage
 			--[123] = {dmgAdd = 0, diceMin = 1, diceMax = 25, },--scales with breath damage
 		}
 end
