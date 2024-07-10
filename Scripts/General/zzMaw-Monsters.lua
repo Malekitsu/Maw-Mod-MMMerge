@@ -1387,10 +1387,10 @@ mapLevels={
 {["Low"] = 6 , ["Mid"] = 8 , ["High"] = 10},
 
 ["Shadow Guild Hideout"] = 
-{["Low"] = 12 , ["Mid"] = 16 , ["High"] = 20},
+{["Low"] = 11 , ["Mid"] = 13 , ["High"] = 15},
 
 ["Hall of the Fire Lord"] = 
-{["Low"] = 10 , ["Mid"] = 13 , ["High"] = 20},
+{["Low"] = 10 , ["Mid"] = 10 , ["High"] = 20},
 
 ["Snergle's Caverns"] = 
 {["Low"] = 30 , ["Mid"] = 32.5 , ["High"] = 35},
@@ -1399,7 +1399,7 @@ mapLevels={
 {["Low"] = 18 , ["Mid"] = 20 , ["High"] = 26},
 
 ["Silver Helm Outpost"] = 
-{["Low"] = 8 , ["Mid"] = 12 , ["High"] = 16},
+{["Low"] = 10 , ["Mid"] = 12 , ["High"] = 12},
 
 ["Shadow Guild"] = 
 {["Low"] = 12 , ["Mid"] = 20 , ["High"] = 66},
@@ -1444,19 +1444,19 @@ mapLevels={
 {["Low"] = 8 , ["Mid"] = 16 , ["High"] = 26},
 
 ["Temple of the Fist"] = 
-{["Low"] = 4 , ["Mid"] = 10 , ["High"] = 16},
+{["Low"] = 5 , ["Mid"] = 10 , ["High"] = 11},
 
 ["Temple of Tsantsa"] = 
-{["Low"] = 10 , ["Mid"] = 12 , ["High"] = 12},
+{["Low"] = 9 , ["Mid"] = 10 , ["High"] = 11},
 
 ["Temple of the Sun"] = 
-{["Low"] = 30 , ["Mid"] = 54.5 , ["High"] = 79},
+{["Low"] = 15 , ["Mid"] = 24 , ["High"] = 25},
 
 ["Temple of the Moon"] = 
 {["Low"] = 10 , ["Mid"] = 30 , ["High"] = 45},
 
 ["Supreme Temple of Baa"] = 
-{["Low"] = 60 , ["Mid"] = 70 , ["High"] = 70},
+{["Low"] = 65 , ["Mid"] = 70 , ["High"] = 80},
 
 ["Superior Temple of Baa"] = 
 {["Low"] = 50 , ["Mid"] = 60 , ["High"] = 70},
@@ -1474,7 +1474,7 @@ mapLevels={
 {["Low"] = 59 , ["Mid"] = 69 , ["High"] = 79},
 
 ["Free Haven Sewer"] = 
-{["Low"] = 4 , ["Mid"] = 12 , ["High"] = 16},
+{["Low"] = 4 , ["Mid"] = 10 , ["High"] = 12},
 
 ["Tomb of VARN"] = 
 {["Low"] = 65 , ["Mid"] = 66 , ["High"] = 90},
