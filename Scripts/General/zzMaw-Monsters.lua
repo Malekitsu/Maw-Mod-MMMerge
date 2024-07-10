@@ -1531,7 +1531,7 @@ mapLevels={
 {["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
 
 ["Devil Outpost"] = 
-{["Low"] = 50 , ["Mid"] = 50 , ["High"] = 50},
+{["Low"] = 60 , ["Mid"] = 60 , ["High"] = 60},
 
 ["New World Computing"] = 
 {["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
