@@ -2248,8 +2248,8 @@ function itemStats(index)
 			local blessBonus=0
 			if buffRework then
 				if pl.SpellBuffs[1].ExpireTime>=Game.Time then
-					local skill=getBuffSkill(46)
-					blessBonus=10+pl.LevelBase*(0.5+skill/100)
+					local s,m=getBuffSkill(46)
+					blessBonus=buffPower[46].Base[m]+pl.LevelBase*0.5*(1+buffPower[46].Scaling[m]*s/100)
 				end
 			end
 			
@@ -2513,12 +2513,12 @@ function itemStats(index)
 	if buffRework then 
 		bonusDamage=mightEffect
 		if Party.SpellBuffs[9].ExpireTime>=Game.Time then
-			local skill=getBuffSkill(51)
-			heroismMult=(0.15+0.003*skill)
+			local s,m=getBuffSkill(51)
+			heroismMult=(buffPower[51].Base[m]/100+buffPower[51].Scaling[m]*s/1000)
 		end
 		if pl.SpellBuffs[6].ExpireTime>=Game.Time then
-			local skill=getBuffSkill(73)
-			unarmedMult=(0.15+0.003*skill)
+			local s,m=getBuffSkill(73)
+			unarmedMult=(buffPower[73].Base[m]/100+buffPower[73].Scaling[m]*s/1000)
 		end
 	end
 	
