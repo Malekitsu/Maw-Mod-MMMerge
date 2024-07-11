@@ -63,8 +63,8 @@ function getCritInfo(pl,dmgType)
 	
 	if buffRework then 
 		if pl.SpellBuffs[4].ExpireTime>=Game.Time then
-			local skill=getBuffSkill(47)
-			totalCrit=totalCrit+0.05+0.001*skill
+			local s,m=getBuffSkill(47)
+			totalCrit=totalCrit+buffPower[47].Base[m]/100+buffPower[47].Scaling[m]*s/1000
 		end
 	end
 	
@@ -973,6 +973,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		
 		local buffing=true
 		local skill=0
+		local mastery=0
 		if requiredBuffs then
 			if type(requiredBuffs)=="table" then
 				skill=0
@@ -980,7 +981,8 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 					local buffId=requiredBuffs[i]
 					local spell=buffSpell[i]
 					local s, m=getBuffSkill(spell)
-					skill=skill+s/#requiredBuffs
+					skill=math.min(skill, s)
+					mastery=math.min(mastery, m)
 					if Party.SpellBuffs[buffId].ExpireTime<Game.Time then
 						buffing=false
 					end
@@ -990,16 +992,16 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 				if Party.SpellBuffs[buffId].ExpireTime<Game.Time then
 					buffing=false
 				else
-					skill=getBuffSkill(buffSpell)
+					skill, mastery=getBuffSkill(buffSpell)
 				end
 			end
 		end
 		
-		local reduction=0.85-0.003*skill
+		local reduction=1-spellPowers[3].Base[mastery]/100-spellPowers[3].Scaling[mastery]*skill/1000
 		
 		local s2=getBuffSkill(85)
 		if s2>0 then
-			reduction2=0.85-0.002*skill
+			reduction2=1-spellPowers[85].Base[mastery]/100-spellPowers[85].Scaling[mastery]*skill/1000
 			reduction=math.min(reduction, reduction2)
 		end
 		
