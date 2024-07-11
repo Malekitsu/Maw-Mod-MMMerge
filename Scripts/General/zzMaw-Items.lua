@@ -2244,13 +2244,22 @@ function itemStats(index)
 					sidesBonus=math.ceil(txt.Mod1DiceSides*artifactMult)
 				end
 			end	
+			
+			local blessBonus=0
+			if buffRework then
+				if pl.SpellBuffs[1].ExpireTime>=Game.Time then
+					local skill=getBuffSkill(46)
+					blessBonus=10+pl.LevelBase*(0.5+skill/100)
+				end
+			end
+			
 			if txt.Skill ~= 5 then
-				tab[40] = tab[40] + math.round(bonus)
+				tab[40] = tab[40] + math.round(bonus) + blessBonus
 				tab[41] = tab[41] + math.round(bonus)
 				tab[42] = tab[42] + txt.Mod1DiceCount+math.round(bonus)
 				tab[43] = tab[43] + math.round(sidesBonus)*txt.Mod1DiceCount+math.round(bonus)
 			else
-				tab[44] = tab[44] + math.round(bonus)
+				tab[44] = tab[44] + math.round(bonus) + blessBonus
 				tab[45] = tab[45] + math.round(bonus)
 				tab[46] = tab[46] + math.round(txt.Mod1DiceCount)+tab[45]
 				tab[47] = tab[47] + math.round(sidesBonus)*txt.Mod1DiceCount+tab[45]
@@ -2472,12 +2481,14 @@ function itemStats(index)
 	--unarmed
 	local s,m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
 	local s1,m1 = SplitSkill(pl:GetSkill(const.Skills.Staff))
+	local unarmed=false
 	if (m>=1 and not pl:GetActiveItem(0) and not pl:GetActiveItem(1)) or (m1==4 and pl:GetActiveItem(1) and pl:GetActiveItem(1):T().Skill==0 ) then
 		if m>0 then
 			tab[40]=tab[40]+skillAttack[const.Skills.Unarmed][m]*s
 			tab[41]=tab[41]+skillDamage[const.Skills.Unarmed][m]*s
 			tab[42]=tab[42]+skillDamage[const.Skills.Unarmed][m]*s
 			tab[43]=tab[43]+skillDamage[const.Skills.Unarmed][m]*s
+			unarmed=true
 		end
 	end
 	local buff=pl.SpellBuffs[6]
@@ -2497,15 +2508,29 @@ function itemStats(index)
 		mightEffect=math.floor(might/5)
 	end
 	local bonusDamage=mightEffect+Party.SpellBuffs[const.PartyBuff.Heroism].Power
-	tab[42]=tab[42]+(tab[42]+bonusDamage)*might/1000
-	tab[43]=tab[43]+(tab[43]+bonusDamage)*might/1000
+	local heroismMult=0
+	local unarmedMult=0
+	if buffRework then 
+		bonusDamage=mightEffect
+		if Party.SpellBuffs[9].ExpireTime>=Game.Time then
+			local skill=getBuffSkill(51)
+			heroismMult=(0.15+0.003*skill)
+		end
+		if pl.SpellBuffs[6].ExpireTime>=Game.Time then
+			local skill=getBuffSkill(73)
+			unarmedMult=(0.15+0.003*skill)
+		end
+	end
+	
+	tab[42]=tab[42]+(tab[42]+bonusDamage)*might/1000 + (tab[42]+bonusDamage)*heroismMult + (tab[42]+bonusDamage)*unarmedMult
+	tab[43]=tab[43]+(tab[43]+bonusDamage)*might/1000 + (tab[43]+bonusDamage)*heroismMult + (tab[43]+bonusDamage)*unarmedMult
 	tab[46]=tab[46]+(tab[46]+bonusDamage)*might/1000
 	tab[47]=tab[47]+(tab[47]+bonusDamage)*might/1000
 	return tab
 end
 
-armsmasterAttack={0,1,1,2}
-armsmasterDamage={0,0,2,4}
+armsmasterAttack={0,1,2,2}
+armsmasterDamage={1,2,3,4}
 
 equipSpellMap={
 	[30] = const.Skills.Fire,
