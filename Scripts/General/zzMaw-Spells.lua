@@ -2456,6 +2456,25 @@ if buffRework then
 	buffSpellList={1,3,12,14,19,21,25,27,36,58,69,5,8,17,38,46,47,50,51,71,73,75,83,85,86,95}
 	utilityBuffs={16,19,11,7,18}
 	
+	buffPower={ --values are inteneded as % and /1000 for scaling
+		[3]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--fire res  with current code this is used for all resistance spells
+		[14]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--air res
+		[25]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--water res
+		[36]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--earth res
+		[58]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--mind res
+		[69]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--body res
+		[5]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--haste
+		[17]= {["Base"]={[0]=0,5,5,5,5}, ["Scaling"]={[0]=0,1,1,1,1}},--shield
+		[38]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--stoneskin
+		[46]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--bless
+		[47]= {["Base"]={[0]=0,5,5,5,5}, ["Scaling"]={[0]=0,1,1,1,1}},--fate
+		[50]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--Heroism
+		[51]= {["Base"]={[0]=0,5,5,5,5}, ["Scaling"]={[0]=0,2,2,2,2}},--Regeneration (check code before changing, fomula is complex)
+		[73]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--Hammerhands
+		[83]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,2,2,2,2}},--day of the gods
+		[85]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,2,2,2,2}},--day of Protection
+		[86]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,2,2,2,2}},--hour of power
+	}
 	
 	function events.LoadMap()
 		if not vars.mawbuff then
