@@ -80,7 +80,7 @@ skillDamage =
 	[const.Skills.Bow]		= {[0]=0, 1, 2, 2, 3,},
 	[const.Skills.Mace]		= {[0]=0, 1, 2, 3, 4,},
 	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0,},
-	[const.Skills.Unarmed]	= {[0]=0, 4, 5, 6, 8,},
+	[const.Skills.Unarmed]	= {[0]=0, 3, 4, 5, 6,},
 }
 -- weapon skill AC bonuses (by rank)
 
@@ -287,6 +287,14 @@ function events.GetAttackDelay(t)
 	end
 	delayMult=1+delay/100
 	t.Result=t.Result*delayMult
+	
+	if buffRework then
+		if Party.SpellBuffs[8].ExpireTime>=Game.Time then
+			local skill=getBuffSkill(5)
+			hasteMult=1+0.15+0.003*skill
+			t.Result=t.Result/hasteMult
+		end
+	end
 end
 
 function calculateAngle(vector1, vector2)
@@ -603,7 +611,10 @@ function events.GameInitialized2()
 	Game.SkillDesGM[const.Skills.Plate]=string.format("%s rec. pen. elim.",Game.SkillDesGM[const.Skills.Plate])
 	Game.SkillDesExpert[const.Skills.Shield]=string.format("%s recovery penalty eliminated",Game.SkillDesExpert[const.Skills.Shield])
 	Game.SkillDesGM[const.Skills.Shield]=string.format("%s 15%% proj. damage reduction",Game.SkillDesGM[const.Skills.Shield])
-	Game.SkillDesMaster[const.Skills.Armsmaster]=string.format("Skills adds 2 damage to all melee weapons")
+	Game.SkillDesNormal[const.Skills.Armsmaster]=string.format("Skills adds 1 dmg and 1%% speed")
+	Game.SkillDesExpert[const.Skills.Armsmaster]=string.format("Skills adds 2 dmg, 1 atk, 1%% speed")
+	Game.SkillDesMaster[const.Skills.Armsmaster]=string.format("Skills adds 3 dmg, 2 atk, 1%% speed")
+	Game.SkillDesGM[const.Skills.Armsmaster]=string.format("Skills adds 4 dmg, 2 atk, 2%% speed")
 	Game.SkillDesMaster[const.Skills.Dodging]=string.format("%s usable with Leather Armor",Game.SkillDesGM[const.Skills.Dodging])
 	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Dodging])
 	--Game.SkillDesGM[const.Skills.Unarmed]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Unarmed])	
@@ -980,7 +991,14 @@ function MawRegen()
 			regenHP[i] = regenHP[i] + (FHP^0.5*RegS^1.5*((RegM+1)/2500))* timeMultiplier * mult
 			--regeneration spell
 			Buff=pl.SpellBuffs[const.PlayerBuff.Regeneration]
-			if Buff.ExpireTime > Game.Time then
+			
+			if buffRework then 
+				if pl.SpellBuffs[12].ExpireTime>=Game.Time then
+					local skill=getBuffSkill(71)
+					local skill=(pl.LevelBase)^0.7*(1+skill*0.02)
+					regenHP[i] = regenHP[i] + (FHP^0.5*skill^1.3*(5/10000))* timeMultiplier * mult -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
+				end
+			elseif Buff.ExpireTime > Game.Time then
 				RegS, RegM = SplitSkill(Buff.Skill)
 				regenHP[i] = regenHP[i] + (FHP^0.5*RegS^1.3*((RegM+1)/10000))* timeMultiplier * mult -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
 			end
