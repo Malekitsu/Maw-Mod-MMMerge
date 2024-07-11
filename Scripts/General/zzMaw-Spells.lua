@@ -2415,13 +2415,20 @@ end
 --BUFF REWORK--
 ---------------	
 if buffRework then
+	function events.GameInitialized2()
+		spScaling={}
+		for i=0,Game.Classes.SPFactor.High do
+			spScaling[i]=Game.Classes.SPFactor[i]
+		end
+	end
+
 	buffSpell={
-	[3]= {["Cost"]=30, ["PartyBuff"]=6},--fire res
-	[14]={["Cost"]=30, ["PartyBuff"]=0},--air res
-	[25]={["Cost"]=30, ["PartyBuff"]=17},--water res
-	[36]={["Cost"]=30, ["PartyBuff"]=4},--earth res
-	[58]={["Cost"]=30, ["PartyBuff"]=12},--mind res
-	[69]={["Cost"]=30, ["PartyBuff"]=1},--body res
+	[3]= {["Cost"]=50, ["PartyBuff"]=6},--fire res
+	[14]={["Cost"]=50, ["PartyBuff"]=0},--air res
+	[25]={["Cost"]=50, ["PartyBuff"]=17},--water res
+	[36]={["Cost"]=50, ["PartyBuff"]=4},--earth res
+	[58]={["Cost"]=50, ["PartyBuff"]=12},--mind res
+	[69]={["Cost"]=50, ["PartyBuff"]=1},--body res
 	[5]= {["Cost"]=60, ["PartyBuff"]=8},--haste
 	[8]= {["Cost"]=90, ["PartyBuff"]=10},--immolation
 	[17]={["Cost"]=60, ["PartyBuff"]=14},--shield
@@ -2447,7 +2454,9 @@ if buffRework then
 	}
 
 	buffSpellList={1,3,12,14,19,21,25,27,36,58,69,5,8,17,38,46,47,50,51,71,73,75,83,85,86,95}
-
+	utilityBuffs={16,19,11,7,18}
+	
+	
 	function events.LoadMap()
 		if not vars.mawbuff then
 			vars.mawbuff={}
@@ -2479,7 +2488,7 @@ if buffRework then
 			
 			local cost=0
 			if buffSpell[spellId] then
-				local div=Game.Classes.SPFactor[pl.Class]
+				local div=spScaling[pl.Class]
 				local percentageDecrease=(buffSpell[spellId].Cost/div)*0.01
 				cost=maxManaPool[id]*percentageDecrease
 			elseif utilitySpell[spellId] then
@@ -2498,19 +2507,28 @@ if buffRework then
 			local delay=getSpellDelay(pl,spellId)
 			pl:SetRecoveryDelay(delay)
 			pl.SP=pl.SP-cost
-			mawBuffApply()
+			
+			function events.Tick() 
+				events.Remove("Tick", 1)
+				mawBuffApply()
+			end
 		else
 			vars.mawbuff[spellId]=false
-			mawBuffApply()
-			Game.ShowStatusText("Buff Disabled")
+			function events.Tick() 
+				events.Remove("Tick", 1)
+				mawBuffApply()
+				Game.ShowStatusText("Buff Disabled")
+			end
 		end
 	end
 
 	function mawBuffApply()
 		for i=0, Party.SpellBuffs.High do
 			Party.SpellBuffs[i].ExpireTime=0
-			Party.SpellBuffs[i].Power=0
-			Party.SpellBuffs[i].Skill=0
+			if not table.find(utilityBuffs, i) then
+				Party.SpellBuffs[i].Power=0
+				Party.SpellBuffs[i].Skill=0
+			end
 		end
 		for j=0, Party.High do
 			local pl=Party[j]
@@ -2523,33 +2541,36 @@ if buffRework then
 		for i=1, #buffSpellList do
 			local buff=buffSpellList[i]
 			if vars.mawbuff[buff] then
-				if buff==85 then --day of protection
-					for i=1, #buffSpell[buff].MultiBuff do
-						local buffId=buffSpell[buff].MultiBuff[i]
+				local pl=GetPlayerFromIndex(vars.mawbuff[buff])
+				if pl and pl:IsConscious() then
+					if buff==85 then --day of protection
+						for i=1, #buffSpell[buff].MultiBuff do
+							local buffId=buffSpell[buff].MultiBuff[i]
+							Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
+						end
+					elseif buff==86 then --hour of power
+						for i=1, #buffSpell[buff].MultiBuff do
+							local buffId=buffSpell[buff].MultiBuff[i]
+							Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
+						end
+						local buffId=buffSpell[buff].SingleBuff
+						for i=0, Party.High do
+							Party[i].SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
+						end
+					elseif buffSpell[buff] and buffSpell[buff].PartyBuff then
+						local buffId=buffSpell[buff].PartyBuff
 						Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
-					end
-				elseif buff==86 then --hour of power
-					for i=1, #buffSpell[buff].MultiBuff do
-						local buffId=buffSpell[buff].MultiBuff[i]
+					elseif buffSpell[buff] and buffSpell[buff].SingleBuff then
+						local buffId=buffSpell[buff].SingleBuff
+						for i=0, Party.High do
+							Party[i].SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
+						end
+					elseif utilitySpell[buff] and utilitySpell[buff].PartyBuff then
+						local buffId=utilitySpell[buff].PartyBuff
+						Party.SpellBuffs[buffId].Caster=4 --crashes otherwise
 						Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
-					end
-					local buffId=buffSpell[buff].SingleBuff
-					for i=0, Party.High do
-						Party[i].SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
-					end
-				elseif buffSpell[buff] and buffSpell[buff].PartyBuff then
-					local buffId=buffSpell[buff].PartyBuff
-					Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
-				elseif buffSpell[buff] and buffSpell[buff].SingleBuff then
-					local buffId=buffSpell[buff].SingleBuff
-					for i=0, Party.High do
-						Party[i].SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
-					end
-				elseif utilitySpell[buff] and utilitySpell[buff].PartyBuff then
-					local buffId=utilitySpell[buff].PartyBuff
-					Party.SpellBuffs[buffId].Caster=1 --crashes otherwise
-					Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
-				end	
+					end	
+				end
 			end
 		end
 	end
@@ -2572,7 +2593,7 @@ if buffRework then
 				local pl=Party[id]
 				
 				if buffSpell[spell] then
-					local div=Game.Classes.SPFactor[pl.Class]
+					local div=spScaling[pl.Class]
 					local percentageDecrease=(buffSpell[spell].Cost/div)*0.01
 					currentManaPool[id]=currentManaPool[id]-maxManaPool[id]*percentageDecrease
 				elseif utilitySpell[spell] then
@@ -2590,6 +2611,29 @@ if buffRework then
 		Timer(buffManaLock, const.Minute/20) 
 	end
 	
+	function GetPlayerFromIndex(index)
+		for i=0,Party.High do
+			player=Party[i]
+			if player:GetIndex()==index then
+				return player
+			end
+		end
+		return false
+	end
+	
+	function getBuffSkill(spell)
+		local id=vars.mawbuff[spell]
+		local player=GetPlayerFromIndex(id)
+		if player then
+			local school=11+math.ceil(spell/11)
+			local s,m=SplitSkill(player.Skills[school])
+			return s, m
+		else
+			return 0,0
+		end
+	end
+	
+	--code to make buff work is elsewhere
 	
 end
 
