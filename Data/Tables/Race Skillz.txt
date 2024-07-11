@@ -34,7 +34,7 @@ DisarmTraps	+	=	=	=	=	=	=	=	=	=	=
 Dodging	=	=	=	=	=	M	=	=	=	=	=
 Unarmed	=	=	=	=	=	M	=	=	=	=	=
 IdentifyMonster	+	=	=	=	=	=	=	=	=	=	=
-Armsmaster	=	=	=	0	=	=	=	=	=	=	=
+Armsmaster	=	=	=	=	=	=	=	=	=	=	=
 Stealing	=	=	=	=	=	=	=	=	=	=	=
 Alchemy	=	=	=	=	=	=	=	=	=	=	=
 Learning	=	=	=	=	=	=	=	=	=	=	=
