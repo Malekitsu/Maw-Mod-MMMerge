@@ -289,11 +289,16 @@ function events.GetAttackDelay(t)
 	t.Result=t.Result*delayMult
 	
 	if buffRework then
-		if Party.SpellBuffs[8].ExpireTime>=Game.Time then
-			local skill=getBuffSkill(5)
-			hasteMult=1+0.15+0.003*skill
-			t.Result=t.Result/hasteMult
+		local hasteMult=1
+		if getBuffSkill(86)>0 then
+			local s,m=getBuffSkill(86)
+			hasteMult=1+buffPower[86].Base[m]/100+buffPower[86].Scaling[m]*s/1000
 		end
+		if Party.SpellBuffs[8].ExpireTime>=Game.Time then
+			local s, m=getBuffSkill(5)
+			hasteMult=math.max(1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]*s/1000, hasteMult)
+		end
+		t.Result=t.Result/hasteMult
 	end
 end
 
@@ -994,9 +999,9 @@ function MawRegen()
 			
 			if buffRework then 
 				if pl.SpellBuffs[12].ExpireTime>=Game.Time then
-					local skill=getBuffSkill(71)
-					local skill=(pl.LevelBase)^0.7*(1+skill*0.02)
-					regenHP[i] = regenHP[i] + (FHP^0.5*skill^1.3*(5/10000))* timeMultiplier * mult -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
+					local s,m=getBuffSkill(71)
+					local skill=(pl.LevelBase)^0.65*(1+s*buffPower[71].Base[m]/100)
+					regenHP[i] = regenHP[i] + (FHP^0.5*skill^1.3*(buffPower[71].Base[m]/10000))* timeMultiplier * mult -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
 				end
 			elseif Buff.ExpireTime > Game.Time then
 				RegS, RegM = SplitSkill(Buff.Skill)
