@@ -60,7 +60,16 @@ function getCritInfo(pl,dmgType)
 	else
 		totalCrit=math.min(totalCrit,1)
 	end
+	
+	if buffRework then 
+		if pl.SpellBuffs[4].ExpireTime>=Game.Time then
+			local skill=getBuffSkill(47)
+			totalCrit=totalCrit+0.05+0.001*skill
+		end
+	end
+	
 	local success=math.random()<totalCrit
+	
 	return totalCrit, critDamageMultiplier, success
 end
 
@@ -610,8 +619,10 @@ function events.CalcDamageToPlayer(t)
 							end
 						end
 					end
-					if pl.SpellBuffs[11].ExpireTime>Game.Time or Party.SpellBuffs[14].ExpireTime>Game.Time  then --shield buff
-						t.Damage=t.Damage*0.85
+					if not buffRework then
+						if pl.SpellBuffs[11].ExpireTime>Game.Time or Party.SpellBuffs[14].ExpireTime>Game.Time  then --shield buff
+							t.Damage=t.Damage*0.85
+						end
 					end
 				end
 			end	
@@ -926,12 +937,95 @@ damageKindResistance={
 	[12] = {10,11,12,13,14,15},
 }
 
+buffToResistance={
+	[0] = 6,
+	[1] = 0,
+	[2] = 17,
+	[3] = 4,
+	[6] = 12,
+	[7] = 12,
+	[8] = 1,
+	[9] = {12,1},
+	[10] = {6,0,17,4},
+	[12] = {12,1,6,0,17,4},
+}
+
+buffToSpell={
+	[0] = 3,
+	[1] = 14,
+	[2] = 25,
+	[3] = 36,
+	[6] = 58,
+	[7] = 58,
+	[8] = 69,
+	[9] = {58,69},
+	[10] = {3,14,25,36},
+	[12] = {58,69,3,14,25,36},
+}
+
 function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	monLvl=monLvl or pl.LevelBase
 	bolster=(math.max(Game.BolsterAmount, 100)/100-1)/4+1
 	
+	if buffRework then
+		local requiredBuffs=buffToResistance[damageKind]
+		local buffSpell=buffToSpell[damageKind]
+		
+		local buffing=true
+		local skill=0
+		if requiredBuffs then
+			if type(requiredBuffs)=="table" then
+				skill=0
+				for i=1, #requiredBuffs do
+					local buffId=requiredBuffs[i]
+					local spell=buffSpell[i]
+					local s, m=getBuffSkill(spell)
+					skill=skill+s/#requiredBuffs
+					if Party.SpellBuffs[buffId].ExpireTime<Game.Time then
+						buffing=false
+					end
+				end
+			else
+				local buffId=requiredBuffs
+				if Party.SpellBuffs[buffId].ExpireTime<Game.Time then
+					buffing=false
+				else
+					skill=getBuffSkill(buffSpell)
+				end
+			end
+		end
+		
+		local reduction=0.85-0.003*skill
+		
+		local s2=getBuffSkill(85)
+		if s2>0 then
+			reduction2=0.85-0.002*skill
+			reduction=math.min(reduction, reduction2)
+		end
+		
+		if buffing then 
+			damage=damage*reduction
+		elseif s2>0 then
+			damage=damage*reduction2
+		end
+		
+		if Party.SpellBuffs[14].ExpireTime>=Game.Time then
+			local skill=getBuffSkill(17)
+			damage=damage*(0.95-0.001*skill)
+		end
+		
+	end
+	
 	--AC for phys
 	if damageKind==4 then 
+		
+		if buffRework then
+			if Party.SpellBuffs[15].ExpireTime>=Game.Time then
+				local skill=getBuffSkill(buffSpell)
+				damage=damage*(0.85-0.003*skill)
+			end
+		end
+		
 		local AC=pl:GetArmorClass()
 		local AC=pl:GetArmorClass()
 		local AC=pl:GetArmorClass()--multiple times to avoid chance to hit code to interfere with AC
