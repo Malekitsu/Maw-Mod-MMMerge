@@ -997,11 +997,11 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 			end
 		end
 		
-		local reduction=1-spellPowers[3].Base[mastery]/100-spellPowers[3].Scaling[mastery]*skill/1000
+		local reduction=1-buffPower[3].Base[mastery]/100-buffPower[3].Scaling[mastery]*skill/1000
 		
 		local s2=getBuffSkill(85)
 		if s2>0 then
-			reduction2=1-spellPowers[85].Base[mastery]/100-spellPowers[85].Scaling[mastery]*skill/1000
+			reduction2=1-buffPower[85].Base[mastery]/100-buffPower[85].Scaling[mastery]*skill/1000
 			reduction=math.min(reduction, reduction2)
 		end
 		
