@@ -108,7 +108,7 @@ function events.PlayerCastSpell(t)
 		return
 	end
 	--Invisibility
-	if t.SpellId==19 then
+	if t.SpellId==19 and not buffRework then
 		if Party.EnemyDetectorRed or Party.EnemyDetectorYellow then
 			return
 		end
@@ -173,7 +173,7 @@ function events.PlayerCastSpell(t)
 	end
 	
 	--heroism
-	if t.SpellId==const.Spells.Heroism then
+	if t.SpellId==const.Spells.Heroism and not buffRework then
 		if not t.RemoteData then
 			t.Skill = 0
 			local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
@@ -307,7 +307,7 @@ function events.PlayerCastSpell(t)
 	end
 	
 	--REGENERATION
-	if t.SpellId==71 then
+	if t.SpellId==71 and not buffRework then
 		if not t.RemoteData then
 			function events.Tick() 
 				events.Remove("Tick", 1)
@@ -376,7 +376,7 @@ function events.PlayerCastSpell(t)
 	end
 	
 	--protection from Magic, no need for online code
-	if t.SpellId==75 then
+	if t.SpellId==75 and not buffRework then
 		local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Body))
 		if m==4 then
 			t.Skill=10
@@ -453,7 +453,6 @@ function events.PlayerCastSpell(t)
 			mawBuffs()
 		end
 	end
-	
 	--protection spells
 	protectionSpells={[25]={17,14} ,[69]={1,18} ,[36]={4,15} ,[3]={6,12} ,[58]={12,17} ,[14]={0,13} } --first value is spell ID, second is school skill ID
 	if protectionSpells[t.SpellId] then
@@ -843,34 +842,37 @@ schoolToBuff={
 	[17]=20,
 	[18]=19,
 }
+
 function elementalBuffs()
-	--buffs to apply
-	for i=0, Party.High do
-		local pl=Party[i]
-		if not table.find(dkClass,pl.Class) then
-			for v=1,6 do
-				local s,m=SplitSkill(pl:GetSkill(schools[v]))
-				if m==4 then
-					local power=s*3
-					if Party.SpellBuffs[buffsOrdered[v]].Power<=s*3 then
-						if Party.SpellBuffs[buffsOrdered[v]].Power<=power then
-							Party.SpellBuffs[buffsOrdered[v]].ExpireTime=Game.Time+const.Hour
-							Party.SpellBuffs[buffsOrdered[v]].Power=s*3
-							Party.SpellBuffs[buffsOrdered[v]].Skill=4
+	if not buffRework then
+		--buffs to apply
+		for i=0, Party.High do
+			local pl=Party[i]
+			if not table.find(dkClass,pl.Class) then
+				for v=1,6 do
+					local s,m=SplitSkill(pl:GetSkill(schools[v]))
+					if m==4 then
+						local power=s*3
+						if Party.SpellBuffs[buffsOrdered[v]].Power<=s*3 then
+							if Party.SpellBuffs[buffsOrdered[v]].Power<=power then
+								Party.SpellBuffs[buffsOrdered[v]].ExpireTime=Game.Time+const.Hour
+								Party.SpellBuffs[buffsOrdered[v]].Power=s*3
+								Party.SpellBuffs[buffsOrdered[v]].Skill=4
+							end
 						end
 					end
 				end
-			end
-			--stats bonus
-			for key, value in pairs(schoolToBuff) do
-				local s,m=SplitSkill(pl:GetSkill(key))
-				if m==4 then
-					local power=s*3
-					for k=0, Party.High do
-						if Party[k].SpellBuffs[value].Power<=s*3 then
-							Party[k].SpellBuffs[value].Power=s*3
-							Party[k].SpellBuffs[value].ExpireTime=Game.Time+const.Hour
-							Party[k].SpellBuffs[value].Skill=0
+				--stats bonus
+				for key, value in pairs(schoolToBuff) do
+					local s,m=SplitSkill(pl:GetSkill(key))
+					if m==4 then
+						local power=s*3
+						for k=0, Party.High do
+							if Party[k].SpellBuffs[value].Power<=s*3 then
+								Party[k].SpellBuffs[value].Power=s*3
+								Party[k].SpellBuffs[value].ExpireTime=Game.Time+const.Hour
+								Party[k].SpellBuffs[value].Skill=0
+							end
 						end
 					end
 				end
@@ -885,7 +887,6 @@ function elementalBuffs()
 			end
 		end
 	end
-	
 	if Party.High==0 then
 		Party.SpellBuffs[19].ExpireTime=math.max(Game.Time+const.Hour, Party.SpellBuffs[19].ExpireTime)
 		Party.SpellBuffs[19].Power=math.max(10,Party.SpellBuffs[19].Power)
@@ -1291,7 +1292,7 @@ function events.GameInitialized2()
 			[98] = {dmgAdd = 50, diceMin = 1, diceMax = 1, },--armageddon
 			[99] = {dmgAdd = 25, diceMin = 1, diceMax = 5, },--souldrinker
 			[103] = {dmgAdd = 46, diceMin = 1, diceMax = 28, },--darkfire bolt
-			[111] = {dmgAdd = 21, diceMin = 1, diceMax = 7, },--lifedrain scales with mastery, fixed in calcspelldamage
+			[111] = {dmgAdd = 18, diceMin = 1, diceMax = 6, },--lifedrain scales with mastery, fixed in calcspelldamage
 			--[123] = {dmgAdd = 0, diceMin = 1, diceMax = 25, },--scales with breath damage
 		}
 end
@@ -1583,7 +1584,7 @@ function ascension()
 		Game.SpellsTxt[98].Description=string.format("This spell is the town killer. Armageddon inflicts %s points of damage plus %s point of damage for every point of Dark skill your character has to every creature on the map, including all your characters. It can only be cast three times per day and only outdoors.",dmgAddTooltip(s, m,98),diceMaxTooltip(s, m,98))
 		Game.SpellsTxt[99].Description=string.format("This horrible spell sucks the life from all creatures in sight, friend or enemy.  Souldrinker then transfers that life to your party in much the same fashion as Shared Life.  Damage (and healing) is %s + 1-%s per point of skill.",dmgAddTooltip(s, m,99),diceMaxTooltip(s, m,99))
 		
-		Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,103),diceMaxTooltip(s, m,103))
+		Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is 1-%s per point of skill.",diceMaxTooltip(s, m,103))
 		Game.SpellsTxt[111].Description=string.format("Lifedrain allows the vampire to damage his or her target and simultaneously heal based on the damage done in the Lifedrain.  This ability does %s points of damage plus 1-%s points of damage per skill.",dmgAddTooltip(s, m,111),diceMaxTooltip(s, m,111))
 		Game.SpellsTxt[111].Master=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*5),math.round(diceMaxTooltip(s, m,111)/3*5))
 		Game.SpellsTxt[111].GM=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*7),math.round(diceMaxTooltip(s, m,111)/3*7))
@@ -1715,6 +1716,7 @@ end
 
 
 --[[
+OLD ASCENSION
 mass fear; 40 mana , 6 secs, skill/2 first cast
 slow 12 sec duration, skill first cast
 paralyze 6 sec, skill x 2 first cast
@@ -2408,3 +2410,186 @@ function events.Tick()
 	end
 end
 ]]
+
+---------------
+--BUFF REWORK--
+---------------	
+if buffRework then
+	buffSpell={
+	[3]= {["Cost"]=30, ["PartyBuff"]=6},--fire res
+	[14]={["Cost"]=30, ["PartyBuff"]=0},--air res
+	[25]={["Cost"]=30, ["PartyBuff"]=17},--water res
+	[36]={["Cost"]=30, ["PartyBuff"]=4},--earth res
+	[58]={["Cost"]=30, ["PartyBuff"]=12},--mind res
+	[69]={["Cost"]=30, ["PartyBuff"]=1},--body res
+	[5]= {["Cost"]=60, ["PartyBuff"]=8},--haste
+	[8]= {["Cost"]=90, ["PartyBuff"]=10},--immolation
+	[17]={["Cost"]=60, ["PartyBuff"]=14},--shield
+	[38]={["Cost"]=60, ["PartyBuff"]=15},--stoneskin
+	[46]={["Cost"]=60, ["SingleBuff"]=1},--bless
+	[47]={["Cost"]=60, ["SingleBuff"]=4},--fate
+	[50]={["Cost"]=90, ["SingleBuff"]=11},--preservation
+	[51]={["Cost"]=90, ["PartyBuff"]=9},--Heroism
+	[71]={["Cost"]=90, ["SingleBuff"]=12},--Regeneration
+	[73]={["Cost"]=60, ["SingleBuff"]=6},--Hammerhands
+	[75]={["Cost"]=150,["PartyBuff"]=13},--Protection from magic
+	[83]={["Cost"]=150,["PartyBuff"]=2},--day of the gods
+	[85]={["Cost"]=150,["MultiBuff"]={6,0,17,4,12,1}},--day of Protection
+	[86]={["Cost"]=150,["MultiBuff"]={8,14,15,9}, ["SingleBuff"]=1},--hour of power
+	[95]={["Cost"]=100,["SingleBuff"]=10},--pain reflection
+	}
+	utilitySpell={
+	[1]= {["Cost"]=5,  ["PartyBuff"]=16},--torch
+	[12]={["Cost"]=5,  ["PartyBuff"]=19},--wizard eye
+	[19]={["Cost"]=100,["PartyBuff"]=11},--Invisibility
+	[21]={["Cost"]=120,["PartyBuff"]=7},--fly
+	[27]={["Cost"]=20, ["PartyBuff"]=18},--water walk
+	}
+
+	buffSpellList={1,3,12,14,19,21,25,27,36,58,69,5,8,17,38,46,47,50,51,71,73,75,83,85,86,95}
+
+	function events.LoadMap()
+		if not vars.mawbuff then
+			vars.mawbuff={}
+			for i=1,#buffSpellList do
+				vars.mawbuff[buffSpellList[i]]=false		
+			end
+		end	
+	end
+
+	function events.PlayerCastSpell(t)
+		if buffSpell[t.SpellId] or utilitySpell[t.SpellId] then
+			t.Handled=true
+			mawBuffCast(t.Player, t.PlayerIndex, t.SpellId)
+		end
+	end
+
+	--maw manual buff cast
+	function mawBuffCast(pl, index, spellId)
+		if vars.mawbuff[spellId]~=index then --cast buff
+			local id=-1
+			for i=0, Party.High do
+				if Party[i]:GetIndex()==index then
+					id=i
+				end
+			end
+			if id==-1 then return end
+			
+			pl=Party[id]
+			
+			local cost=0
+			if buffSpell[spellId] then
+				local div=Game.Classes.SPFactor[pl.Class]
+				local percentageDecrease=(buffSpell[spellId].Cost/div)*0.01
+				cost=maxManaPool[id]*percentageDecrease
+			elseif utilitySpell[spellId] then
+				cost=utilitySpell[spellId].Cost
+			end	
+
+			if currentManaPool[id]<cost or pl.SP<cost then
+				Game.ShowStatusText("Not enough Mana")
+				return
+			end
+			
+			vars.mawbuff[spellId]=index
+			for i=0, Party.High do
+				mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), spellId, i)
+			end
+			local delay=getSpellDelay(pl,spellId)
+			pl:SetRecoveryDelay(delay)
+			pl.SP=pl.SP-cost
+			mawBuffApply()
+		else
+			vars.mawbuff[spellId]=false
+			mawBuffApply()
+			Game.ShowStatusText("Buff Disabled")
+		end
+	end
+
+	function mawBuffApply()
+		for i=0, Party.SpellBuffs.High do
+			Party.SpellBuffs[i].ExpireTime=0
+			Party.SpellBuffs[i].Power=0
+			Party.SpellBuffs[i].Skill=0
+		end
+		for j=0, Party.High do
+			local pl=Party[j]
+			for i=0, pl.SpellBuffs.High do
+				pl.SpellBuffs[i].ExpireTime=0
+				pl.SpellBuffs[i].Power=0
+				pl.SpellBuffs[i].Skill=0
+			end
+		end
+		for i=1, #buffSpellList do
+			local buff=buffSpellList[i]
+			if vars.mawbuff[buff] then
+				if buff==85 then --day of protection
+					for i=1, #buffSpell[buff].MultiBuff do
+						local buffId=buffSpell[buff].MultiBuff[i]
+						Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
+					end
+				elseif buff==86 then --hour of power
+					for i=1, #buffSpell[buff].MultiBuff do
+						local buffId=buffSpell[buff].MultiBuff[i]
+						Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
+					end
+					local buffId=buffSpell[buff].SingleBuff
+					for i=0, Party.High do
+						Party[i].SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
+					end
+				elseif buffSpell[buff] and buffSpell[buff].PartyBuff then
+					local buffId=buffSpell[buff].PartyBuff
+					Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
+				elseif buffSpell[buff] and buffSpell[buff].SingleBuff then
+					local buffId=buffSpell[buff].SingleBuff
+					for i=0, Party.High do
+						Party[i].SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
+					end
+				elseif utilitySpell[buff] and utilitySpell[buff].PartyBuff then
+					local buffId=utilitySpell[buff].PartyBuff
+					Party.SpellBuffs[buffId].Caster=1 --crashes otherwise
+					Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
+				end	
+			end
+		end
+	end
+	
+	function buffManaLock()
+		maxManaPool={}
+		currentManaPool={}
+		local partyIndexes={}
+		for i=0,Party.High do
+			local id=Party[i]:GetIndex()
+			partyIndexes[id]=i
+			local sp=Party[i]:GetFullSP()
+			maxManaPool[i]=sp
+			currentManaPool[i]=sp
+		end
+		for i=1, #buffSpellList do
+			local spell=buffSpellList[i]
+			if vars.mawbuff[spell] then
+				local id=partyIndexes[vars.mawbuff[spell]]
+				local pl=Party[id]
+				
+				if buffSpell[spell] then
+					local div=Game.Classes.SPFactor[pl.Class]
+					local percentageDecrease=(buffSpell[spell].Cost/div)*0.01
+					currentManaPool[id]=currentManaPool[id]-maxManaPool[id]*percentageDecrease
+				elseif utilitySpell[spell] then
+					currentManaPool[id]=currentManaPool[id]-utilitySpell[spell].Cost
+				end				
+			end
+		end
+		for i=0, Party.High do
+			Party[i].SP=math.min(currentManaPool[i], Party[i].SP)
+		end
+	end
+
+	function events.LoadMap(wasInGame)
+		Timer(mawBuffApply, const.Minute/2, true)
+		Timer(buffManaLock, const.Minute/20) 
+	end
+	
+	
+end
+
