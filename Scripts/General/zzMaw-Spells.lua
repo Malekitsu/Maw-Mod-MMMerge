@@ -1387,7 +1387,7 @@ end
 function ascendSpellDamage(skill, mastery, spell)
 	--empower spell buff
 	local empowerMult=1
-	if buffRework and vars.vars.mawbuff[28] then
+	if buffRework and vars.mawbuff[28] then
 		local s, m=getBuffSkill(28)
 		empowerMult=1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]/1000*s
 	end
@@ -1716,18 +1716,20 @@ function ascension()
 		if buffRework then
 			for i=1, #buffSpellList do
 				local sp=buffSpellList[i]
+				local txt=Game.SpellsTxt[sp]
 				for v=1,4 do
 					if buffSpell[spell] then
 						local cost=buffSpell[spell].Cost[v]
+						txt.SpellPoints[v]=cost
 					elseif utilitySpell[spell] then
 						local cost=utilitySpell[spell].Cost[v]
+						txt.SpellPoints[v]=cost
 					end
-					sp.SpellPoints[v]=cost
 				end
-				sp.SpellPointsExpert = sp.SpellPoints[1]
-				sp.SpellPointsGM = sp.SpellPoints[2]
-				sp.SpellPointsMaster = sp.SpellPoints[3]
-				sp.SpellPointsNormal = sp.SpellPoints[4]			
+				txt.SpellPointsNormal = txt.SpellPoints[1]
+				txt.SpellPointsExpert = txt.SpellPoints[2]
+				txt.SpellPointsMaster = txt.SpellPoints[3]	
+				txt.SpellPointsGM = txt.SpellPoints[4]			
 			end
 		end
 	end
