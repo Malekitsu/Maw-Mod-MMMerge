@@ -2432,11 +2432,13 @@ if buffRework then
 	[5]= {["Cost"]=60, ["Sound"]=10040,["PartyBuff"]=8},--haste
 	[8]= {["Cost"]=90, ["Sound"]=10070,["PartyBuff"]=10},--immolation
 	[17]={["Cost"]=60, ["Sound"]=11050,["PartyBuff"]=14},--shield
+	[28]={["Cost"]=120, ["Sound"]=10070,},--empower magic
 	[38]={["Cost"]=60, ["Sound"]=13040,["PartyBuff"]=15},--stoneskin
 	[46]={["Cost"]=60, ["Sound"]=14010,["SingleBuff"]=1},--bless
 	[47]={["Cost"]=60, ["Sound"]=14020,["SingleBuff"]=4},--fate
 	[50]={["Cost"]=90, ["Sound"]=14050,["SingleBuff"]=11},--preservation
 	[51]={["Cost"]=90, ["Sound"]=14060,["PartyBuff"]=9},--Heroism
+	[56]={["Cost"]=40, ["Sound"]=15020,},--Meditation
 	[71]={["Cost"]=90, ["Sound"]=16040,["SingleBuff"]=12},--Regeneration
 	[73]={["Cost"]=60, ["Sound"]=16060,["SingleBuff"]=6},--Hammerhands
 	[75]={["Cost"]=150,["Sound"]=16080,["PartyBuff"]=13},--Protection from magic
@@ -2465,10 +2467,12 @@ if buffRework then
 		[69]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--body res
 		[5]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--haste
 		[17]= {["Base"]={[0]=0,5,5,5,5}, ["Scaling"]={[0]=0,1,1,1,1}},--shield
+		[28]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--Empower Magic
 		[38]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--stoneskin
 		[46]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--bless, acc bonus is calculated by using fire res bonus
 		[47]= {["Base"]={[0]=0,5,5,5,5}, ["Scaling"]={[0]=0,1,1,1,1}},--fate
 		[51]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--Heroism
+		[56]= {["Base"]={[0]=0,5,5,5,5}, ["Scaling"]={[0]=0,2,2,2,2}},--Meditation
 		[71]= {["Base"]={[0]=0,5,5,5,5}, ["Scaling"]={[0]=0,2,2,2,2}},--Regeneration (check code before changing, fomula is complex)
 		[73]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--Hammerhands
 		[83]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,2,2,2,2}},--day of the gods
@@ -2483,6 +2487,15 @@ if buffRework then
 				vars.mawbuff[buffSpellList[i]]=false		
 			end
 		end	
+	end
+
+	function events.Action(t)
+		if t.Action==142 and (t.Param==28 or t.Param==56) then
+			t.Handled=true
+			local pl=Party[t.Param2]
+			local id=pl:GetIndex()
+			mawBuffCast(pl, id, t.Param)
+		end		
 	end
 
 	function events.PlayerCastSpell(t)
