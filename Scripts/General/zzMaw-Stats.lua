@@ -346,7 +346,7 @@ function events.BuildStatInformationBox(t)
 		if buffRework and vars.mawbuff[56] then
 			local s, m, level=getBuffSkill(56)
 			local level=level^0.65
-			medRegen = medRegen + math.round((fullSP^0.35*level^1.65*((buffPower[56].Base[m])/300) +2)*(1+buffPower[56].Scaling[m]/100*s))
+			medRegen = medRegen + math.round((fullSP^0.35*level^1.65*((buffPower[56].Base[m])/300) +10)*(1+buffPower[56].Scaling[m]/100*s))
 		end
 		
 		local SPregenItem=0
