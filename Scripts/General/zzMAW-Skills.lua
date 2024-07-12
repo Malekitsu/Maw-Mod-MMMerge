@@ -1040,13 +1040,13 @@ function MawRegen()
 				if buffRework and currentManaPool and currentManaPool[i] then
 					FSP=math.ceil(currentManaPool[i])
 				end
-				regenSP[i] = regenSP[i] + (FSP^0.35*RegS^1.65*((RegM+5)/12000) +0.02)* timeMultiplier*mult
+				regenSP[i] = regenSP[i] + (FSP^0.35*RegS^1.75*((RegM+5)/12000) +0.02)* timeMultiplier*mult
 				
 				--meditation buff
 				if buffRework and vars.mawbuff[56] then
 					local s, m, level=getBuffSkill(56)
 					local level=level^0.65
-					regenSP[i] = regenSP[i] + (FSP^0.35*level^1.65*((buffPower[56].Base[m])/30000) +0.1)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
+					regenSP[i] = regenSP[i] + (FSP^0.35*level^1.75*((buffPower[56].Base[m])/30000) +0.1)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
 				end
 				--dragon regen
 				if pl.Class==10 then
@@ -1103,8 +1103,8 @@ function events.Tick()
 		if m==4 then
 			m=8
 		end
-		local spRegen = (FSP^0.35*s^1.65*((m+5)/120)+2)/10
-		local spRegen2 = (FSP^0.35*(s+1)^1.65*((m+5)/120)+2)/10
+		local spRegen = (FSP^0.35*s^1.75*((m+5)/120)+2)/10
+		local spRegen2 = (FSP^0.35*(s+1)^1.75*((m+5)/120)+2)/10
 		local spRegen2 = math.round((spRegen2-spRegen)*100)/100
 		if spRegen>10 then
 			spRegen = math.round((spRegen)*10)/10
@@ -1648,7 +1648,7 @@ function events.Tick()
 		end
 		local s, m= SplitSkill(Skillz.get(Party[Game.CurrentPlayer], 51))
 		local efficiency=math.round((1+s^1.5/125*m)*100)/100
-			Skillz.setDesc(manaSkill, 1, "Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n")
+			Skillz.setDesc(51, 1, "Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n")
 		
 		local txt="Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n" .. "Current Damage reduction per Mana: " .. StrColor(178,255,255, efficiency) .. "\n\nPress M to enable/disable"
 		if vars.manaShield[Game.CurrentPlayer] then
@@ -1932,6 +1932,32 @@ function events.Action(t)
 			local s,m=SplitSkill(Skillz.get(pl,51))
 			if pl.SkillPoints>s and manaShieldRequirements[m] and s+1>=manaShieldRequirements[m] and Skillz.MasteryLimit(pl,51)>m then
 				Skillz.set(pl,51,JoinSkill(s, m+1))
+			end
+		end
+	end
+end
+
+--Enlightenment
+function events.GameInitialized2()
+	local Enlightenment=52
+	Skillz.new_magic(Enlightenment)
+	Skillz.setName(Enlightenment, "Enlightenment")
+	Skillz.setDesc(Enlightenment, 1, "Unlock the true potential of your mana reserves with Enlightenment, a transformative skill that increases your mana pool and reduces mana reserved by buffs, empowering you to cast more freely and frequently.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n")
+	Skillz.setDesc(Enlightenment, 2, "Reserved mana is reduced by 10%, mana pool increased by 2% per skill level")
+	Skillz.setDesc(Enlightenment, 3, "Reserved mana is reduced by 20%, mana pool increased by 3% per skill level")
+	Skillz.setDesc(Enlightenment, 4, "Reserved mana is reduced by 30%, mana pool increased by 4% per skill level")
+	Skillz.setDesc(Enlightenment, 5, "Reserved mana is reduced by 40%, mana pool increased by 5% per skill level")
+	Skillz.learn_at(Enlightenment, 23) --guilds
+end
+
+local EnlightenmentRequirements={6,12,20}
+function events.Action(t)
+	if t.Action==121 then
+		if t.Param==52 then
+			local pl=Party[Game.CurrentPlayer]
+			local s,m=SplitSkill(Skillz.get(pl,52))
+			if pl.SkillPoints>s and EnlightenmentRequirements[m] and s+1>=EnlightenmentRequirements[m] and Skillz.MasteryLimit(pl,52)>m then
+				Skillz.set(pl,52,JoinSkill(s, m+1))
 			end
 		end
 	end
