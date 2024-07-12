@@ -147,7 +147,15 @@ function getSpellDelay(pl,spell)
 	if table.find(spells, spell) or (healingSpells and healingSpells[spell]) then
 		tier=getAscensionTier(skill,spell)
 	end
-	local delay=math.round(oldTable[spell][m]/(1+haste/100)*1.2^tier)
+	
+	--haste buff
+	local hasteDiv=1
+	if Party.SpellBuffs[8].ExpireTime>=Game.Time then
+		local s, m=getBuffSkill(5)
+		hasteDiv=1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]/1000*s
+	end
+	
+	local delay=math.round(oldTable[spell][m]/(1+haste/100)*1.2^tier/hasteDiv)
 	return delay
 end
 --remove AC from hit calculation and unarmed code from misctweaks
@@ -330,6 +338,14 @@ function events.BuildStatInformationBox(t)
 			m=8
 		end
 		local medRegen = math.round(fullSP^0.35*s^1.65*(m+5)/120)+2
+		
+		--meditation buff
+		if buffRework and vars.vars.mawbuff[56] then
+			local s, m, level=getBuffSkill(56)
+			local level=level^0.65
+			regenSP[i] = regenSP[i] + (fullSP^0.35*level*((buffPower[56].Base[m])/300) +2)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
+		end
+		
 		local SPregenItem=0
 		local bonusregen=0
 		for it in Party[i]:EnumActiveItems() do
