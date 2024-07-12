@@ -967,6 +967,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	monLvl=monLvl or pl.LevelBase
 	bolster=(math.max(Game.BolsterAmount, 100)/100-1)/4+1
 	
+	--[[currently using a different code
 	if buffRework then
 		local requiredBuffs=buffToResistance[damageKind]
 		local buffSpell=buffToSpell[damageKind]
@@ -1017,7 +1018,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		end
 		
 	end
-	
+	]]
 	--AC for phys
 	if damageKind==4 then 
 		
