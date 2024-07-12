@@ -1716,20 +1716,15 @@ function ascension()
 		if buffRework then
 			for i=1, #buffSpellList do
 				local sp=buffSpellList[i]
-				local txt=Game.SpellsTxt[sp]
 				for v=1,4 do
-					if buffSpell[spell] then
-						local cost=buffSpell[spell].Cost[v]
-						txt.SpellPoints[v]=cost
-					elseif utilitySpell[spell] then
-						local cost=utilitySpell[spell].Cost[v]
-						txt.SpellPoints[v]=cost
+					if buffSpell[sp] then
+						local cost=buffSpell[sp].Cost
+						Game.Spells[sp]["SpellPoints" .. masteryName[v]]=cost
+					elseif utilitySpell[sp] then
+						local cost=utilitySpell[sp].Cost
+						Game.Spells[sp]["SpellPoints" .. masteryName[v]]=cost
 					end
 				end
-				txt.SpellPointsNormal = txt.SpellPoints[1]
-				txt.SpellPointsExpert = txt.SpellPoints[2]
-				txt.SpellPointsMaster = txt.SpellPoints[3]	
-				txt.SpellPointsGM = txt.SpellPoints[4]			
 			end
 		end
 	end
