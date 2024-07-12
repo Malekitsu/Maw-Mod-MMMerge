@@ -2759,7 +2759,7 @@ if buffRework then
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
 		sp.Description = string.format("Reserve a percentage of your mana to increase spell damage of your party by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10)
-		sp.Name = "Empower Magic",
+		sp.Name = "Empower Magic"
 		
 		--fate
 		local id=47
@@ -2778,7 +2778,7 @@ if buffRework then
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
 		sp.Description = string.format("Reserve a percentage of your mana to increase your party mana regen.\nRegen depends on the mana pool, caster level and it's increased by %s%% per skill point.\nThis effect remains active until deactivated or lose consciousness.", bf.Scaling[1])
-		sp.Name = "Meditation",
+		sp.Name = "Meditation"
 		
 		--regeneration
 		local id=71
