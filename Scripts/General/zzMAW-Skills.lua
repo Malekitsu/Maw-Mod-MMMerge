@@ -1039,6 +1039,12 @@ function MawRegen()
 				FSP	= pl:GetFullSP()
 				regenSP[i] = regenSP[i] + (FSP^0.35*RegS^1.65*((RegM+5)/12000) +0.02)* timeMultiplier*mult
 				
+				--meditation buff
+				if buffRework and vars.vars.mawbuff[56] then
+					local s, m, level=getBuffSkill(56)
+					local level=level^0.65
+					regenSP[i] = regenSP[i] + (FSP^0.35*level*((buffPower[56].Base[m])/30000) +0.02)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
+				end
 				--dragon regen
 				if pl.Class==10 then
 					regenSP[i]=regenSP[i] + 0.2* timeMultiplier*mult
