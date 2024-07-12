@@ -2343,6 +2343,7 @@ function itemStats(index)
 		end
 		--special case for accuracy, as it comes from bless
 		local accBonus=0
+		local buff=0
 		if pl.SpellBuffs[1].ExpireTime>=Game.Time then
 			local s, m, level=getBuffSkill(46)
 			buff=buffPower[3].Base[m]+(level/2)*(1+buffPower[3].Scaling[m]/100*s)
