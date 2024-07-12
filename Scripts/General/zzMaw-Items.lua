@@ -2248,8 +2248,8 @@ function itemStats(index)
 			local blessBonus=0
 			if buffRework then
 				if pl.SpellBuffs[1].ExpireTime>=Game.Time then
-					local s,m=getBuffSkill(46)
-					blessBonus=buffPower[46].Base[m]+pl.LevelBase*0.5*(1+buffPower[46].Scaling[m]*s/100)
+					local s,m, level=getBuffSkill(46)
+					blessBonus=buffPower[46].Base[m]+level*0.5*(1+buffPower[46].Scaling[m]*s/100)
 				end
 			end
 			
@@ -2318,6 +2318,38 @@ function itemStats(index)
 	--------------
 	--end of items
 	--------------
+	--buffs
+	if buffRework then
+		local buffList={6,0,17,4,12,1}
+		local spellList={3,14,25,36,58,69}
+		local spellStat={[3]=2,[14]=6,[25]=7,[36]=4,[46]=5,[58]=3,[69]=1}
+		--resistances and stats
+		local s, m, level=getBuffSkill(85)
+		local buff2=buffPower[85].Base[m]+(level/2)*(1+buffPower[85].Scaling[m]/100*s)
+		local s, m, level=getBuffSkill(83)
+		local buff3=buffPower[83].Base[m]+(level/2)*(1+buffPower[83].Scaling[m]/100*s)
+		for i=1,6 do
+			local buff=0
+			local statBuff=0
+			if Party.SpellBuffs[buffList[i]].ExpireTime>=Game.Time then
+				local s, m, level=getBuffSkill(spellList[i])
+				buff=buffPower[spellList[i]].Base[m]+(level/2)*(1+buffPower[spellList[i]].Scaling[m]/100*s)
+				buff4=math.max(buff,buff2)
+				tab[i+10]=tab[i+10]+buff4
+			end
+			statBuff=math.max(buff, buff3)
+			local tabID=spellStat[spellList[i]]
+			tab[tabID]=tab[tabID]+statBuff
+		end
+		--special case for accuracy, as it comes from bless
+		local accBonus=0
+		if pl.SpellBuffs[1].ExpireTime>=Game.Time then
+			local s, m, level=getBuffSkill(46)
+			buff=buffPower[3].Base[m]+(level/2)*(1+buffPower[3].Scaling[m]/100*s)
+		end
+		accBonus=math.max(buff3, buff)
+		tab[5]=tab[5]+accBonus
+	end
 	--dragon
 	if Game.CharacterPortraits[pl.Face].Race==const.Race.Dragon then
 		for i=1,16 do
@@ -2492,7 +2524,7 @@ function itemStats(index)
 		end
 	end
 	local buff=pl.SpellBuffs[6]
-	if buff.ExpireTime>Game.Time then --hammerhand buff
+	if buff.ExpireTime>Game.Time and not buffRework then --hammerhand buff
 		tab[41]=tab[41]+buff.Power
 		tab[42]=tab[42]+buff.Power
 		tab[43]=tab[43]+buff.Power
