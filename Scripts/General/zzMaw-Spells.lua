@@ -2455,7 +2455,7 @@ if buffRework then
 	[27]={["Cost"]=20, ["Sound"]=12040, ["PartyBuff"]=18},--water walk
 	}
 
-	buffSpellList={1,3,12,14,19,21,25,27,36,58,69,5,8,17,38,46,47,50,51,71,73,75,83,85,86,95}
+	buffSpellList={1,3,12,14,19,21,25,27,28,36,56,58,69,5,8,17,38,46,47,50,51,71,73,75,83,85,86,95}
 	utilityBuffs={16,19,11,7,18}
 	
 	buffPower={ --values are inteneded as % and /1000 for scaling
