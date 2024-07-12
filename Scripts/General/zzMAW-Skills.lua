@@ -999,8 +999,8 @@ function MawRegen()
 			
 			if buffRework then 
 				if pl.SpellBuffs[12].ExpireTime>=Game.Time then
-					local s,m=getBuffSkill(71)
-					local skill=(pl.LevelBase)^0.65*(1+s*buffPower[71].Base[m]/100)
+					local s,m,level=getBuffSkill(71)
+					local skill=(level)^0.65*(1+s*buffPower[71].Base[m]/100)
 					regenHP[i] = regenHP[i] + (FHP^0.5*skill^1.3*(buffPower[71].Base[m]/10000))* timeMultiplier * mult -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
 				end
 			elseif Buff.ExpireTime > Game.Time then
