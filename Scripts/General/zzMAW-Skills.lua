@@ -1073,12 +1073,6 @@ end
 function events.GameInitialized2()
 	baseRegStr=	Skillz.getDesc(30,1)
 	baseMedStr=	Skillz.getDesc(28,1)
-	--meditation tooltip
-	Skillz.setDesc(28,2,"Increases Spell points by 2%")
-	Skillz.setDesc(28,3,"Increases Spell points by 3%")
-	Skillz.setDesc(28,4,"Increases Spell points by 4%")
-	Skillz.setDesc(28,5,"Increases Spell points by 5%")
-	
 	
 end
 function events.Tick()
