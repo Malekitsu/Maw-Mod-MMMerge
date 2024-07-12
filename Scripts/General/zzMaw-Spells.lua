@@ -2445,14 +2445,14 @@ if buffRework then
 	[36]={["Cost"]=50, ["Sound"]=13020,["PartyBuff"]=4},--earth res
 	[58]={["Cost"]=50, ["Sound"]=15020,["PartyBuff"]=12},--mind res
 	[69]={["Cost"]=50, ["Sound"]=16020,["PartyBuff"]=1},--body res
-	[5]= {["Cost"]=90, ["Sound"]=10040,["PartyBuff"]=8},--haste
+	[5]= {["Cost"]=60, ["Sound"]=10040,["PartyBuff"]=8},--haste
 	[8]= {["Cost"]=90, ["Sound"]=10070,["PartyBuff"]=10},--immolation
 	[17]={["Cost"]=60, ["Sound"]=11050,["PartyBuff"]=14},--shield
 	[28]={["Cost"]=120, ["Sound"]=10070,},--empower magic
 	[38]={["Cost"]=60, ["Sound"]=13040,["PartyBuff"]=15},--stoneskin
 	[46]={["Cost"]=60, ["Sound"]=14010,["SingleBuff"]=1},--bless
 	[47]={["Cost"]=60, ["Sound"]=14020,["SingleBuff"]=4},--fate
-	[50]={["Cost"]=90, ["Sound"]=14050,["SingleBuff"]=11},--preservation
+	[50]={["Cost"]=60, ["Sound"]=14050,["SingleBuff"]=11},--preservation
 	[51]={["Cost"]=90, ["Sound"]=14060,["PartyBuff"]=9},--Heroism
 	[56]={["Cost"]=40, ["Sound"]=15020,},--Meditation
 	[71]={["Cost"]=90, ["Sound"]=16040,["SingleBuff"]=12},--Regeneration
@@ -2543,11 +2543,13 @@ if buffRework then
 			local cost=0
 			if buffSpell[spellId] then
 				local div=spScaling[pl.Class]
-				local percentageDecrease=(buffSpell[spellId].Cost/div)*0.01
+				local s,m=SplitSkill(Skillz.get(pl,52))
+				local percentageDecrease=(buffSpell[spellId].Cost/div*(1-m/10))*0.01
 				cost=maxManaPool[id]*percentageDecrease
 				sound=buffSpell[spellId].Sound
 			elseif utilitySpell[spellId] then
-				cost=utilitySpell[spellId].Cost
+				local s,m=SplitSkill(Skillz.get(pl,52))
+				cost=math.round(utilitySpell[spellId].Cost*(1-m/10))
 				sound=utilitySpell[spellId].Sound
 			end	
 
@@ -2654,10 +2656,12 @@ if buffRework then
 				
 				if buffSpell[spell] then
 					local div=spScaling[pl.Class]
-					local percentageDecrease=(buffSpell[spell].Cost/div)*0.01
+					local s,m=SplitSkill(Skillz.get(pl,52))
+					local percentageDecrease=(buffSpell[spell].Cost/div*(1-m/10))*0.01
 					currentManaPool[id]=currentManaPool[id]-maxManaPool[id]*percentageDecrease
 				elseif utilitySpell[spell] then
-					currentManaPool[id]=currentManaPool[id]-utilitySpell[spell].Cost
+					local s,m=SplitSkill(Skillz.get(pl,52))
+					currentManaPool[id]=currentManaPool[id]-math.round(utilitySpell[spell].Cost*(1-m/10))
 				end				
 			end
 		end
