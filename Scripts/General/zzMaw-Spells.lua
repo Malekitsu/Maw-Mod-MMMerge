@@ -2446,7 +2446,7 @@ if buffRework then
 	[36]={["Cost"]=50, ["Sound"]=13020,["PartyBuff"]=4},--earth res
 	[58]={["Cost"]=50, ["Sound"]=15020,["PartyBuff"]=12},--mind res
 	[69]={["Cost"]=50, ["Sound"]=16020,["PartyBuff"]=1},--body res
-	[5]= {["Cost"]=60, ["Sound"]=10040,["PartyBuff"]=8},--haste
+	[5]= {["Cost"]=90, ["Sound"]=10040,["PartyBuff"]=8},--haste
 	[8]= {["Cost"]=90, ["Sound"]=10070,["PartyBuff"]=10},--immolation
 	[17]={["Cost"]=60, ["Sound"]=11050,["PartyBuff"]=14},--shield
 	[28]={["Cost"]=120, ["Sound"]=10070,},--empower magic
