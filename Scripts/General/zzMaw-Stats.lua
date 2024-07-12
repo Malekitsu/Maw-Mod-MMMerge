@@ -150,7 +150,7 @@ function getSpellDelay(pl,spell)
 	
 	--haste buff
 	local hasteDiv=1
-	if Party.SpellBuffs[8].ExpireTime>=Game.Time then
+	if buffRework and Party.SpellBuffs[8].ExpireTime>=Game.Time then
 		local s, m=getBuffSkill(5)
 		hasteDiv=1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]/1000*s
 	end
