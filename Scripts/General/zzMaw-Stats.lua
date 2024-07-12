@@ -1020,15 +1020,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	end
 	]]
 	--AC for phys
-	if damageKind==4 then 
-		
-		if buffRework then
-			if Party.SpellBuffs[15].ExpireTime>=Game.Time then
-				local skill=getBuffSkill(buffSpell)
-				damage=damage*(0.85-0.003*skill)
-			end
-		end
-		
+	if damageKind==4 then 		
 		local AC=pl:GetArmorClass()
 		local AC=pl:GetArmorClass()
 		local AC=pl:GetArmorClass()--multiple times to avoid chance to hit code to interfere with AC
