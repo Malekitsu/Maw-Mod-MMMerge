@@ -2350,6 +2350,12 @@ function itemStats(index)
 		end
 		accBonus=math.max(buff3, buff)
 		tab[5]=tab[5]+accBonus
+		--stoneskin
+		if Party.SpellBuffs[15].ExpireTime>=Game.Time then
+			local s,m,level=getBuffSkill(38)
+			acBonus=buffPower[38].Base[m]+(level/2)*(1+buffPower[38].Scaling[m]/100*s)
+			tab[10]=tab[10]+acBonus
+		end
 	end
 	--dragon
 	if Game.CharacterPortraits[pl.Face].Race==const.Race.Dragon then
