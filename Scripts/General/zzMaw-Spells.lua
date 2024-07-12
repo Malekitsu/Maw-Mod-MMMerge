@@ -1713,20 +1713,22 @@ function ascension()
 			end
 		end
 		
-		for i=1, #buffSpellList do
-			local sp=buffSpellList[i]
-			for v=1,4 do
-				if buffSpell[spell] then
-					local cost=buffSpell[spell].Cost[v]
-				elseif utilitySpell[spell] then
-					local cost=utilitySpell[spell].Cost[v]
+		if buffRework then
+			for i=1, #buffSpellList do
+				local sp=buffSpellList[i]
+				for v=1,4 do
+					if buffSpell[spell] then
+						local cost=buffSpell[spell].Cost[v]
+					elseif utilitySpell[spell] then
+						local cost=utilitySpell[spell].Cost[v]
+					end
+					sp.SpellPoints[v]=cost
 				end
-				sp.SpellPoints[v]=cost
+				sp.SpellPointsExpert = sp.SpellPoints[1]
+				sp.SpellPointsGM = sp.SpellPoints[2]
+				sp.SpellPointsMaster = sp.SpellPoints[3]
+				sp.SpellPointsNormal = sp.SpellPoints[4]			
 			end
-			sp.SpellPointsExpert = sp.SpellPoints[1]
-			sp.SpellPointsGM = sp.SpellPoints[2]
-			sp.SpellPointsMaster = sp.SpellPoints[3]
-			sp.SpellPointsNormal = sp.SpellPoints[4]			
 		end
 	end
 end
