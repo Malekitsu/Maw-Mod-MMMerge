@@ -2740,57 +2740,57 @@ if buffRework then
 		local id=5
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to increase your party Recovery speed by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10,)
+		sp.Description = string.format("Reserve a percentage of your mana to increase your party Recovery speed by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10)
 		
 		--Shield
 		local id=14
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to reduce any incoming magic damage to your party by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10,)
+		sp.Description = string.format("Reserve a percentage of your mana to reduce any incoming magic damage to your party by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10)
 		
 		--Stoneskin
 		local id=38
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to reduce any incoming physical damage to your party by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10,)
+		sp.Description = string.format("Reserve a percentage of your mana to reduce any incoming physical damage to your party by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10)
 		
 		--Empower Magic
 		local id=28
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to increase spell damage of your party by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10,)
+		sp.Description = string.format("Reserve a percentage of your mana to increase spell damage of your party by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10)
 		sp.Name = "Empower Magic",
 		
 		--fate
 		local id=47
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to increase critical chance of your party by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10,)
+		sp.Description = string.format("Reserve a percentage of your mana to increase critical chance of your party by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10)
 		
 		--heroism
 		local id=51
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to increase your party melee damage by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10,)
+		sp.Description = string.format("Reserve a percentage of your mana to increase your party melee damage by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10)
 		
 		--meditation
 		local id=56
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to increase your party mana regen.\nRegen depends on the mana pool, caster level and it's increased by %s%% per skill point.\nThis effect remains active until deactivated or lose consciousness.", bf.Scaling[1],)
+		sp.Description = string.format("Reserve a percentage of your mana to increase your party mana regen.\nRegen depends on the mana pool, caster level and it's increased by %s%% per skill point.\nThis effect remains active until deactivated or lose consciousness.", bf.Scaling[1])
 		sp.Name = "Meditation",
 		
 		--regeneration
 		local id=71
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to increase your party health regen.\nRegen depends on the health pool, caster level and it's increased by %s%% per skill point.\nThis effect remains active until deactivated or lose consciousness.", bf.Scaling[1],)
+		sp.Description = string.format("Reserve a percentage of your mana to increase your party health regen.\nRegen depends on the health pool, caster level and it's increased by %s%% per skill point.\nThis effect remains active until deactivated or lose consciousness.", bf.Scaling[1])
 		
 		--Hammerhands
 		local id=73
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to increase your party unarmed damage by %s%% plus %s%% per Skill Level.\nStaves with GM skill and Unarmed is considered as unarmed as well.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10,)
+		sp.Description = string.format("Reserve a percentage of your mana to increase your party unarmed damage by %s%% plus %s%% per Skill Level.\nStaves with GM skill and Unarmed is considered as unarmed as well.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10)
 		
 		--day of the gods
 		local id=83
