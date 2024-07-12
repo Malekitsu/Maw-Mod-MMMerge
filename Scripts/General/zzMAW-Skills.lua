@@ -1037,7 +1037,7 @@ function MawRegen()
 					RegM=8
 				end
 				FSP	= pl:GetFullSP()
-				if buffRework and currentManaPool[i] then
+				if buffRework and currentManaPool and currentManaPool[i] then
 					FSP=currentManaPool[i]
 				end
 				regenSP[i] = regenSP[i] + (FSP^0.35*RegS^1.65*((RegM+5)/12000) +0.02)* timeMultiplier*mult
@@ -1096,7 +1096,7 @@ function events.Tick()
 		Skillz.setDesc(30,1,txt)
 		--meditation tooltip
 		local FSP=pl:GetFullSP()
-		if buffRework and currentManaPool[i] then
+		if buffRework and currentManaPool and currentManaPool[i] then
 			fullSP=currentManaPool[Game.CurrentPlayer]
 		end
 		local s,m = SplitSkill(pl:GetSkill(28))
