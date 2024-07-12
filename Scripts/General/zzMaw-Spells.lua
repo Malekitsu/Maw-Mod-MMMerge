@@ -1385,9 +1385,16 @@ end
 
 
 function ascendSpellDamage(skill, mastery, spell)
-	diceMin=spellPowers[spell].diceMin
-	diceMax=spellPowers[spell].diceMax
-	damageAdd=spellPowers[spell].dmgAdd
+	--empower spell buff
+	local empowerMult=1
+	if buffRework and vars.vars.mawbuff[28] then
+		local s, m=getBuffSkill(28)
+		empowerMult=1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]/1000*s
+	end
+	
+	diceMin=spellPowers[spell].diceMin*empowerMult
+	diceMax=spellPowers[spell].diceMax*empowerMult
+	damageAdd=spellPowers[spell].dmgAdd*empowerMult
 	local ascensionLevel=getAscensionTier(skill,spell)
 	if ascensionLevel>0 then
 		-- old formula
@@ -1397,8 +1404,8 @@ function ascendSpellDamage(skill, mastery, spell)
 		--damageAdd=damageAdd*(1+skill^2 / 45 * (ascensionLevel+1)^2)
 		damageAdd=damageAdd*(1+skill*0.15 * 2^(ascensionLevel+0.5)) *1.2^ascensionLevel
 		diceMax=diceMax * (1+0.03 * skill * (ascensionLevel+1)) *1.2^ascensionLevel
-		diceMin, diceMax, damageAdd = math.round(diceMin), math.round(diceMax), math.round(damageAdd)
 	end
+	diceMin, diceMax, damageAdd = math.round(diceMin), math.round(diceMax), math.round(damageAdd)
 	return diceMin, diceMax, damageAdd
 end
 
@@ -1544,7 +1551,7 @@ function ascension()
 		Game.SpellsTxt[7].GM=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",math.round(diceMaxTooltip(s, m,7)/6*10))
 		----------------------------------------
 		
-		Game.SpellsTxt[8].Description=string.format("Surrounds your characters with a very hot fire that is only harmful to others.  The spell will deliver 1-%s points of damage per point of skill to all nearby monsters for as long as they remain in the area of effect.",diceMaxTooltip(s, m,8))
+		Game.SpellsTxt[8].Description=string.format("Reserve a mana percentage to surround your characters with a very hot fire that is only harmful to others.  The spell will deliver 1-%s points of damage per point of skill to all nearby monsters for as long as they remain in the area of effect.",diceMaxTooltip(s, m,8))
 		Game.SpellsTxt[9].Description=string.format("Summons flaming rocks from the sky which fall in a large radius surrounding your chosen target.  Try not to be near the victim when you use this spell.  A single meteor does %s points of damage plus %s per point of skill in Fire Magic.  This spell only works outdoors.",dmgAddTooltip(s, m,9),diceMaxTooltip(s, m,9))
 		Game.SpellsTxt[10].Description=string.format("Inferno burns all monsters in sight when cast, excluding your characters.  One or two castings can clear out a room of weak or moderately powerful creatures. Each monster takes %s points of damage plus %s per point of skill in Fire Magic.  This spell only works indoors.",dmgAddTooltip(s, m,10),diceMaxTooltip(s, m,10))
 		Game.SpellsTxt[11].Description=string.format("Among the strongest direct damage spells available, Incinerate inflicts massive damage on a single target.  Only the strongest of monsters can expect to survive this spell.  Damage is %s points plus 1-%s per point of skill in Fire Magic.",dmgAddTooltip(s, m,11),diceMaxTooltip(s, m,11))
@@ -1704,6 +1711,22 @@ function ascension()
 					Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. "\n\nRecovery time: " .. oldTable[i][magicM]
 				end
 			end
+		end
+		
+		for i=1, #buffSpellList do
+			local sp=buffSpellList[i]
+			for v=1,4 do
+				if buffSpell[spell] then
+					local cost=buffSpell[spell].Cost[v]
+				elseif utilitySpell[spell] then
+					local cost=utilitySpell[spell].Cost[v]
+				end
+				sp.SpellPoints[v]=cost
+			end
+			sp.SpellPointsExpert = sp.SpellPoints[1],
+			sp.SpellPointsGM = sp.SpellPoints[2],
+			sp.SpellPointsMaster = sp.SpellPoints[3],
+			sp.SpellPointsNormal = sp.SpellPoints[4]			
 		end
 	end
 end
@@ -2466,10 +2489,10 @@ if buffRework then
 		[46]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--bless, acc bonus is calculated by using fire res bonus
 		[47]= {["Base"]={[0]=0,5,5,5,5}, ["Scaling"]={[0]=0,1,1,1,1}},--fate
 		[51]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--Heroism
-		[56]= {["Base"]={[0]=0,5,5,5,5}, ["Scaling"]={[0]=0,2,2,2,2}},--Meditation
+		[56]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--Meditation
 		[71]= {["Base"]={[0]=0,5,5,5,5}, ["Scaling"]={[0]=0,2,2,2,2}},--Regeneration (check code before changing, fomula is complex)
 		[73]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--Hammerhands
-		[83]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,2,2,2,2}},--day of the gods
+		[83]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,1.5,1.5,1.5,1.5}},--day of the gods
 		[85]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,2,2,2,2}},--day of Protection
 		[86]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,2,2,2,2}},--hour of power
 	}
@@ -2656,7 +2679,7 @@ if buffRework then
 	function getBuffSkill(spell)
 		local id=vars.mawbuff[spell]
 		local player=GetPlayerFromIndex(id)
-		if player then
+		if player and player:IsConscious() then
 			local school=11+math.ceil(spell/11)
 			local s,m=SplitSkill(player.Skills[school])
 			return s, m, player.LevelBase
@@ -2669,30 +2692,170 @@ if buffRework then
 	
 	--tooltips
 	function events.GameInitialized2()
-		local sp=Game.SpellsTxt[3]
-		local bf=buffPower[3]
-		sp.Description = string.format("Reserve a portion of your mana to enhance your party's resistances and Intellect.\nThe enhancement equals %s plus an additional 1 point for every 2 caster levels.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1])
-		--[[
-		sp.Normal = "1 point resistance per point of skill",
-		sp.Expert = "2 points resistance per point of skill",
-		sp.Master = "3 points resistance per point of skill",
-		sp.GM = "Effect is now passive",
-		sp.GrandMaster = sp.GM
-		sp.Name = "Fire Resistance",
-		sp.ShortName = "Prot Fire",
-		sp.SpellPoints = {
-			0,
-			0,
-			0,
-			0
-		},
-		sp.SpellPointsExpert = sp.SpellPoints[1],
-		sp.SpellPointsGM = sp.SpellPoints[2],
-		sp.SpellPointsMaster = sp.SpellPoints[3],
-		sp.SpellPointsNormal = sp.SpellPoints[4]
-		]]
+		--fire resistance
+		local id=3
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Fire Resistance and Intellect by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		
+		--air resistance
+		local id=14
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Air Resistance and Speed by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		
+		--water resistance
+		local id=25
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Water Resistance and Luck by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		
+		--earth res
+		local id=36
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Earth Resistance and Endurance by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		
+		--mind res
+		local id=58
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Mind Resistance and Personality by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		
+		--body res
+		local id=69
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Body Resistance and Might by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		
+		--Bless
+		local id=46
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Attack and Accuracy.\nThe enhancement equals a flat %s plus an additional 1 point for every 2 caster levels, increased by %s%% per skill level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		
+		--Haste
+		local id=5
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to increase your party Recovery speed by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10,)
+		
+		--Shield
+		local id=14
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to reduce any incoming magic damage to your party by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10,)
+		
+		--Stoneskin
+		local id=38
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to reduce any incoming physical damage to your party by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10,)
+		
+		--Empower Magic
+		local id=28
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to increase spell damage of your party by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10,)
+		sp.Name = "Empower Magic",
+		
+		--fate
+		local id=47
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to increase critical chance of your party by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10,)
+		
+		--heroism
+		local id=51
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to increase your party melee damage by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10,)
+		
+		--meditation
+		local id=56
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to increase your party mana regen.\nRegen depends on the mana pool, caster level and it's increased by %s%% per skill point.\nThis effect remains active until deactivated or lose consciousness.", bf.Scaling[1],)
+		sp.Name = "Meditation",
+		
+		--regeneration
+		local id=71
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to increase your party health regen.\nRegen depends on the health pool, caster level and it's increased by %s%% per skill point.\nThis effect remains active until deactivated or lose consciousness.", bf.Scaling[1],)
+		
+		--Hammerhands
+		local id=73
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to increase your party unarmed damage by %s%% plus %s%% per Skill Level.\nStaves with GM skill and Unarmed is considered as unarmed as well.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10,)
+		
+		--day of the gods
+		local id=83
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to increases all seven stats on all your characters by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		
+		--day of protection
+		local id=85
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to enhance all of your party's Resistances by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		
+		--hour of power
+		local id=86
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to simultaneously casts Haste, Heroism, Shield, Stone Skin, and Bless on all your characters.\nWhile the base effects remain consistent, each additional 3 levels in Light Magic will enhance the effects equivalently to only 2 levels.\nThis effect remains active until deactivated or lose consciousness.")
+		
+		--preservation
+		local id=50
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to  tightly binds the soul to the body. This will delay death due to massive hit point loss, but will not stop a character from going unconscious. If a preserved character's hit points are too low when the spell wears off, he or she will die.\nThis effect remains active until deactivated or lose consciousness.")
+		
+		--Protection from magic
+		local id=75
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana to affect the entire party at once, granting immunity to certain spells and monster abilities that cause debilitation conditions.  These are:  Poison, Disease, Stone, Paralyze, and Weak.\nThis effect remains active until deactivated or lose consciousness.")
+		
+		--pain reflection
+		local id=95
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a percentage of your mana.\nWhen a monster hits a character with Pain Reflection active, the monster takes damage equal to what it inflicted on the character.")
+		
+		--Torch
+		local id=1
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a flat amount of mana to increase the radius of light surrounding your party in the dark.\nThis effect remains active until deactivated or lose consciousness.")
+		
+		--wizard eye
+		local id=12
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a flat amount of mana to show the locations of monsters and other points of interest while outdoors in the minimap.\nThis effect remains active until deactivated or lose consciousness.")
+		
+		--Invisibility
+		local id=19
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a flat amount of mana\nInvisibility works on the minds of nearby creatures, making them unable to notice the party unless spoken to or attacked.  Any attack you make, regardless of whether or not it hits or misses, will break this spell. This spell can't be cast while hostile monsters are nearby.\nThis effect remains active until deactivated, attacking or lose consciousness. While active and no monster is in the nearbies, it gets casted automatically.")
+		
+		--Fly
+		local id=21
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a flat amount of mana to grants the power of flight to your characters!  Only works outdoors, but it is very useful.  Fly will drain one spell point every five minutes it is in use (i.e. when you aren't touching the ground).\nThis effect remains active until deactivated or lose consciousness.")
+		
+		--Water walk
+		local id=27
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Reserve a flat amount of mana\nOnly useful outdoors, Water Walk lets your characters walk along the surface of water without sinking.\nThis effect remains active until deactivated or lose consciousness.")
 	end
-	
 end
 
 --store older Tooltips, need to be after any tooltip change
