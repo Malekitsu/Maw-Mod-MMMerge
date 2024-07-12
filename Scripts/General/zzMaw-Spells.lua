@@ -1504,13 +1504,7 @@ end
 -----------------------
 healingSpellList={const.Spells.RemoveCurse,const.Spells.Resurrection,const.Spells.Heal,const.Spells.CureDisease,const.Spells.PowerCure}
 
---store older Tooltips
-function events.GameInitialized2()
-	oldSpellTooltips={}
-	for i=1,132 do
-		oldSpellTooltips[i]=Game.SpellsTxt[i].Description
-	end
-end
+
 
 function ascension()
 	index=Game.CurrentPlayer
@@ -2673,5 +2667,38 @@ if buffRework then
 	
 	--code to make buff work is elsewhere
 	
+	--tooltips
+	function events.GameInitialized2()
+		local sp=Game.SpellsTxt[3]
+		local bf=buffPower[3]
+		sp.Description = string.format("Reserve a portion of your mana to enhance your party's resistances and Intellect.\nThe enhancement equals %s plus an additional 1 point for every 2 caster levels.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1])
+		--[[
+		sp.Normal = "1 point resistance per point of skill",
+		sp.Expert = "2 points resistance per point of skill",
+		sp.Master = "3 points resistance per point of skill",
+		sp.GM = "Effect is now passive",
+		sp.GrandMaster = sp.GM
+		sp.Name = "Fire Resistance",
+		sp.ShortName = "Prot Fire",
+		sp.SpellPoints = {
+			0,
+			0,
+			0,
+			0
+		},
+		sp.SpellPointsExpert = sp.SpellPoints[1],
+		sp.SpellPointsGM = sp.SpellPoints[2],
+		sp.SpellPointsMaster = sp.SpellPoints[3],
+		sp.SpellPointsNormal = sp.SpellPoints[4]
+		]]
+	end
+	
 end
 
+--store older Tooltips, need to be after any tooltip change
+function events.GameInitialized2()
+	oldSpellTooltips={}
+	for i=1,132 do
+		oldSpellTooltips[i]=Game.SpellsTxt[i].Description
+	end
+end
