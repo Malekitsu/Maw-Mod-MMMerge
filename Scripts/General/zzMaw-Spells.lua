@@ -2538,7 +2538,13 @@ if buffRework then
 			if id==-1 then return end
 			
 			pl=Party[id]
-			
+			if not maxManaPool then
+				for i=0,Party.High do
+					local sp=Party[i]:GetFullSP()
+					maxManaPool[i]=sp
+					currentManaPool[i]=sp
+				end
+			end
 			local cost=0
 			if buffSpell[spellId] then
 				local div=spScaling[pl.Class]
