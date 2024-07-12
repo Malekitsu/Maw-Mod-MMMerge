@@ -343,7 +343,7 @@ function events.BuildStatInformationBox(t)
 		local medRegen = math.round(fullSP^0.35*s^1.65*(m+5)/120)+2
 		
 		--meditation buff
-		if buffRework and vars.vars.mawbuff[56] then
+		if buffRework and vars.mawbuff[56] then
 			local s, m, level=getBuffSkill(56)
 			local level=level^0.65
 			regenSP[i] = regenSP[i] + (fullSP^0.35*level*((buffPower[56].Base[m])/300) +2)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
