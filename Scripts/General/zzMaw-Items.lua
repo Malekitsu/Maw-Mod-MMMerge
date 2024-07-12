@@ -2400,9 +2400,9 @@ function itemStats(index)
 	
 	--get bonus stats from skills
 	
-	--meditation
+	--enlighnenment
 	local manaScaling=Game.Classes.SPFactor[pl.Class]
-	local s,m=SplitSkill(pl:GetSkill(const.Skills.Meditation))
+	local s,m=SplitSkill(Skillz.get(pl,52))
 	local manaType=Game.Classes.SPStats[pl.Class]
 	local totalMana=manaScaling*pl.LevelBase+Game.Classes.SPBase[pl.Class]
 	local effect=0
