@@ -1723,9 +1723,9 @@ function ascension()
 				end
 				sp.SpellPoints[v]=cost
 			end
-			sp.SpellPointsExpert = sp.SpellPoints[1],
-			sp.SpellPointsGM = sp.SpellPoints[2],
-			sp.SpellPointsMaster = sp.SpellPoints[3],
+			sp.SpellPointsExpert = sp.SpellPoints[1]
+			sp.SpellPointsGM = sp.SpellPoints[2]
+			sp.SpellPointsMaster = sp.SpellPoints[3]
 			sp.SpellPointsNormal = sp.SpellPoints[4]			
 		end
 	end
@@ -2461,7 +2461,7 @@ if buffRework then
 	[75]={["Cost"]=150,["Sound"]=16080,["PartyBuff"]=13},--Protection from magic
 	[83]={["Cost"]=150,["Sound"]=17050,["PartyBuff"]=2},--day of the gods
 	[85]={["Cost"]=150,["Sound"]=17070,["MultiBuff"]={6,0,17,4,12,1}},--day of Protection
-	[86]={["Cost"]=150,["Sound"]=17080,["MultiBuff"]={8,14,15,9}, ["SingleBuff"]=1},--hour of power
+	[86]={["Cost"]=250,["Sound"]=17080,["MultiBuff"]={8,14,15,9}, ["SingleBuff"]=1},--hour of power
 	[95]={["Cost"]=100,["Sound"]=18060,["SingleBuff"]=10},--pain reflection
 	}
 	utilitySpell={
