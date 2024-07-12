@@ -2665,7 +2665,11 @@ if buffRework then
 			Party[i].SP=math.min(math.ceil(currentManaPool[i]), Party[i].SP)
 		end
 	end
-
+	
+	function events.LoadMap()
+		buffManaLock()
+	end
+	
 	function events.LoadMap(wasInGame)
 		Timer(mawBuffApply, const.Minute/2, true)
 		Timer(buffManaLock, const.Minute/20) 
