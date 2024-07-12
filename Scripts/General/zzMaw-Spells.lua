@@ -2423,34 +2423,34 @@ if buffRework then
 	end
 
 	buffSpell={
-	[3]= {["Cost"]=50, ["PartyBuff"]=6},--fire res
-	[14]={["Cost"]=50, ["PartyBuff"]=0},--air res
-	[25]={["Cost"]=50, ["PartyBuff"]=17},--water res
-	[36]={["Cost"]=50, ["PartyBuff"]=4},--earth res
-	[58]={["Cost"]=50, ["PartyBuff"]=12},--mind res
-	[69]={["Cost"]=50, ["PartyBuff"]=1},--body res
-	[5]= {["Cost"]=60, ["PartyBuff"]=8},--haste
-	[8]= {["Cost"]=90, ["PartyBuff"]=10},--immolation
-	[17]={["Cost"]=60, ["PartyBuff"]=14},--shield
-	[38]={["Cost"]=60, ["PartyBuff"]=15},--stoneskin
-	[46]={["Cost"]=60, ["SingleBuff"]=1},--bless
-	[47]={["Cost"]=60, ["SingleBuff"]=4},--fate
-	[50]={["Cost"]=90, ["SingleBuff"]=11},--preservation
-	[51]={["Cost"]=90, ["PartyBuff"]=9},--Heroism
-	[71]={["Cost"]=90, ["SingleBuff"]=12},--Regeneration
-	[73]={["Cost"]=60, ["SingleBuff"]=6},--Hammerhands
-	[75]={["Cost"]=150,["PartyBuff"]=13},--Protection from magic
-	[83]={["Cost"]=150,["PartyBuff"]=2},--day of the gods
-	[85]={["Cost"]=150,["MultiBuff"]={6,0,17,4,12,1}},--day of Protection
-	[86]={["Cost"]=150,["MultiBuff"]={8,14,15,9}, ["SingleBuff"]=1},--hour of power
-	[95]={["Cost"]=100,["SingleBuff"]=10},--pain reflection
+	[3]= {["Cost"]=50, ["Sound"]=10020, ["PartyBuff"]=6},--fire res
+	[14]={["Cost"]=50, ["Sound"]=11020,["PartyBuff"]=0},--air res
+	[25]={["Cost"]=50, ["Sound"]=12020,["PartyBuff"]=17},--water res
+	[36]={["Cost"]=50, ["Sound"]=13020,["PartyBuff"]=4},--earth res
+	[58]={["Cost"]=50, ["Sound"]=15020,["PartyBuff"]=12},--mind res
+	[69]={["Cost"]=50, ["Sound"]=16020,["PartyBuff"]=1},--body res
+	[5]= {["Cost"]=60, ["Sound"]=10040,["PartyBuff"]=8},--haste
+	[8]= {["Cost"]=90, ["Sound"]=10070,["PartyBuff"]=10},--immolation
+	[17]={["Cost"]=60, ["Sound"]=11050,["PartyBuff"]=14},--shield
+	[38]={["Cost"]=60, ["Sound"]=13040,["PartyBuff"]=15},--stoneskin
+	[46]={["Cost"]=60, ["Sound"]=14010,["SingleBuff"]=1},--bless
+	[47]={["Cost"]=60, ["Sound"]=14020,["SingleBuff"]=4},--fate
+	[50]={["Cost"]=90, ["Sound"]=14050,["SingleBuff"]=11},--preservation
+	[51]={["Cost"]=90, ["Sound"]=14060,["PartyBuff"]=9},--Heroism
+	[71]={["Cost"]=90, ["Sound"]=16040,["SingleBuff"]=12},--Regeneration
+	[73]={["Cost"]=60, ["Sound"]=16060,["SingleBuff"]=6},--Hammerhands
+	[75]={["Cost"]=150,["Sound"]=16080,["PartyBuff"]=13},--Protection from magic
+	[83]={["Cost"]=150,["Sound"]=17050,["PartyBuff"]=2},--day of the gods
+	[85]={["Cost"]=150,["Sound"]=17070,["MultiBuff"]={6,0,17,4,12,1}},--day of Protection
+	[86]={["Cost"]=150,["Sound"]=17080,["MultiBuff"]={8,14,15,9}, ["SingleBuff"]=1},--hour of power
+	[95]={["Cost"]=100,["Sound"]=18060,["SingleBuff"]=10},--pain reflection
 	}
 	utilitySpell={
-	[1]= {["Cost"]=5,  ["PartyBuff"]=16},--torch
-	[12]={["Cost"]=5,  ["PartyBuff"]=19},--wizard eye
-	[19]={["Cost"]=100,["PartyBuff"]=11},--Invisibility
-	[21]={["Cost"]=120,["PartyBuff"]=7},--fly
-	[27]={["Cost"]=20, ["PartyBuff"]=18},--water walk
+	[1]= {["Cost"]=5,  ["Sound"]=10000, ["PartyBuff"]=16},--torch
+	[12]={["Cost"]=5,  ["Sound"]=11000, ["PartyBuff"]=19},--wizard eye
+	[19]={["Cost"]=100,["Sound"]=11070, ["PartyBuff"]=11},--Invisibility
+	[21]={["Cost"]=120,["Sound"]=11090, ["PartyBuff"]=7},--fly
+	[27]={["Cost"]=20, ["Sound"]=12040, ["PartyBuff"]=18},--water walk
 	}
 
 	buffSpellList={1,3,12,14,19,21,25,27,36,58,69,5,8,17,38,46,47,50,51,71,73,75,83,85,86,95}
@@ -2510,8 +2510,10 @@ if buffRework then
 				local div=spScaling[pl.Class]
 				local percentageDecrease=(buffSpell[spellId].Cost/div)*0.01
 				cost=maxManaPool[id]*percentageDecrease
+				sound=buffSpell[spellId].Sound
 			elseif utilitySpell[spellId] then
 				cost=utilitySpell[spellId].Cost
+				sound=utilitySpell[spellId].Sound
 			end	
 
 			if currentManaPool[id]<cost or pl.SP<cost then
@@ -2523,6 +2525,7 @@ if buffRework then
 			for i=0, Party.High do
 				mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), spellId, i)
 			end
+			evt.PlaySound(sound)
 			local delay=getSpellDelay(pl,spellId)
 			pl:SetRecoveryDelay(delay)
 			pl.SP=pl.SP-cost
@@ -2585,9 +2588,12 @@ if buffRework then
 							Party[i].SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
 						end
 					elseif utilitySpell[buff] and utilitySpell[buff].PartyBuff then
-						local buffId=utilitySpell[buff].PartyBuff
-						Party.SpellBuffs[buffId].Caster=4 --crashes otherwise
-						Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
+						if buff~=19 or (not Party.EnemyDetectorYellow and not Party.EnemyDetectorRed) then --Invisibility
+							local buffId=utilitySpell[buff].PartyBuff
+							Party.SpellBuffs[buffId].Caster=4 --crashes otherwise
+							Party.SpellBuffs[buffId].Bits=1 --allow fly
+							Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
+						end
 					end	
 				end
 			end
