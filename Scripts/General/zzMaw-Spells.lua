@@ -2662,7 +2662,7 @@ if buffRework then
 			end
 		end
 		for i=0, Party.High do
-			Party[i].SP=math.min(currentManaPool[i], Party[i].SP)
+			Party[i].SP=math.min(math.ceil(currentManaPool[i]), Party[i].SP)
 		end
 	end
 
