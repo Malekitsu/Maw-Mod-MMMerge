@@ -332,7 +332,7 @@ function events.BuildStatInformationBox(t)
 	if t.Stat==8 then
 		local i=Game.CurrentPlayer
 		local fullSP=Party[i]:GetFullSP()
-		if buffRework and currentManaPool[i] then
+		if buffRework and currentManaPool and currentManaPool[i] then
 			fullSP=currentManaPool[Game.CurrentPlayer]
 		end
 		local skill=Party[i]:GetSkill(const.Skills.Meditation)
