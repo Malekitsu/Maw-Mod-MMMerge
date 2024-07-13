@@ -2513,6 +2513,9 @@ if buffRework then
 	buffSpellList={1,3,12,14,21,25,27,28,36,56,58,69,5,8,17,38,46,47,50,51,71,73,75,83,85,86,95}
 	utilityBuffs={16,19,11,7,18}
 	
+	mawPartyBuffList={6,0,17,4,12,1,8,10,14,15,9,13,2,16,19,11,7,18}
+	mawPartyBuffIgnore={16,19,11,7,18}
+	
 	buffPower={ --values are inteneded as % and /1000 for scaling
 		[3]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--fire res  
 		[14]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--air res
@@ -2636,15 +2639,16 @@ if buffRework then
 	end
 
 	function mawBuffApply()
-		for i=0, Party.SpellBuffs.High do
-			if i~=11 then
-				Party.SpellBuffs[i].ExpireTime=0
-				if not table.find(utilityBuffs, i) then
-					Party.SpellBuffs[i].Power=0
-					Party.SpellBuffs[i].Skill=0
-				end
+		for i=1, #mawPartyBuffList do
+			local id=mawPartyBuffList[i]
+			Party.SpellBuffs[id].ExpireTime=0
+			if not table.find(mawPartyBuffIgnore, id) then
+				Party.SpellBuffs[id].Power=0
+				Party.SpellBuffs[id].Skill=0
 			end
 		end
+		local s, m=getBuffSkill(1)
+		Party.SpellBuffs[16].Power=m
 		for j=0, Party.High do
 			local pl=Party[j]
 			for i=0, pl.SpellBuffs.High do
