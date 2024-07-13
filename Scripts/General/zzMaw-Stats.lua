@@ -834,10 +834,25 @@ function events.CalcDamageToPlayer(t)
 end
 
 --TOOLTIPS
+function events.Action(t)
+	if buffRework then
+		if t.Action==94 then
+			local i=t.Param-1
+			if i>=0 and i<=Party.Count then
+				local manaPool=math.round(currentManaPool[i]/maxManaPool[i]*1000)/10
+				Game.GlobalTxt[212]=StrColor(0,100,255,"Mana " .. manaPool .. "%")
+			end
+		end
+	end
+end
 function events.Tick()
 	if Game.CurrentCharScreen==100 and Game.CurrentScreen==7 then
 		i=Game.CurrentPlayer 
 		if i==-1 then return end --prevent bug message
+		if buffRework then
+			local manaPool=math.round(currentManaPool[i]/maxManaPool[i]*1000)/10
+			Game.GlobalTxt[212]=StrColor(0,100,255,"Mana " .. manaPool .. "%")
+		end
 		pl=Party[i]
 		local resistances={}
 		local resistances2={}
