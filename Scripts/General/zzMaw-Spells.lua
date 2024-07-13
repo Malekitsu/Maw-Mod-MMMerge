@@ -1584,8 +1584,8 @@ function ascension()
 		Game.SpellsTxt[97].Description=string.format("Dragon Breath empowers the caster to exhale a cloud of toxic vapors that targets a single monster and damage all creatures nearby, doing 1-%s points of damage per point of skill in Dark Magic.",diceMaxTooltip(s, m,97))
 		Game.SpellsTxt[98].Description=string.format("This spell is the town killer. Armageddon inflicts %s points of damage plus %s point of damage for every point of Dark skill your character has to every creature on the map, including all your characters. It can only be cast three times per day and only outdoors.",dmgAddTooltip(s, m,98),diceMaxTooltip(s, m,98))
 		Game.SpellsTxt[99].Description=string.format("This horrible spell sucks the life from all creatures in sight, friend or enemy.  Souldrinker then transfers that life to your party in much the same fashion as Shared Life.  Damage (and healing) is %s + 1-%s per point of skill.",dmgAddTooltip(s, m,99),diceMaxTooltip(s, m,99))
-		Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,103),diceMaxTooltip(s, m,103))
 		
+		Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,103),diceMaxTooltip(s, m,103))
 		Game.SpellsTxt[111].Description=string.format("Lifedrain allows the vampire to damage his or her target and simultaneously heal based on the damage done in the Lifedrain.  This ability does %s points of damage plus 1-%s points of damage per skill.",dmgAddTooltip(s, m,111),diceMaxTooltip(s, m,111))
 		Game.SpellsTxt[111].Master=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*5),math.round(diceMaxTooltip(s, m,111)/3*5))
 		Game.SpellsTxt[111].GM=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*7),math.round(diceMaxTooltip(s, m,111)/3*7))
@@ -1699,6 +1699,53 @@ function ascension()
 		if it and it.Bonus2==40 then
 			haste=haste+20
 		end
+		
+		if buffRework then
+			for i=1, #buffSpellList do
+				local sp=buffSpellList[i]
+				if buffSpell[sp] then
+					local cost, percent=getBuffCost(pl, sp)
+					percent=math.round(percent*10000)/100
+					local txt=StrColor(255,0,0,"\nNot Active")
+					if vars.mawbuff[sp] then
+						for j=0, Party.High do
+							if Party[j]:GetIndex()==vars.mawbuff[sp] then
+								txt=StrColor(0,255,0,"\nActive (" .. Party[j].Name .. ")")
+							end
+						end
+					end
+					Game.SpellsTxt[sp].Description=oldSpellTooltips[sp] .. "\n\nMana Reserved: " .. StrColor(0,100,255,percent .. "%" .. txt)
+				elseif utilitySpell[sp] then
+					local cost, percent=getBuffCost(pl, sp)
+					cost=math.round(cost)
+					local txt=StrColor(255,0,0,"\nNot Active")
+					if vars.mawbuff[sp] then
+						for j=0, Party.High do
+							if Party[j]:GetIndex()==vars.mawbuff[sp] then
+								txt=StrColor(0,255,0,"\nActive(" .. Party[j].Name .. ")")
+							end
+						end
+					end
+					Game.SpellsTxt[sp].Description=oldSpellTooltips[sp] .. "\n\nMana Reserved: " .. cost .. txt
+				end
+				for v=1,4 do
+					if buffSpell[sp] then
+						Game.Spells[sp]["SpellPoints" .. masteryName[v]]=0
+						Game.SpellsTxt[sp].Normal=""
+						Game.SpellsTxt[sp].Expert=""
+						Game.SpellsTxt[sp].Master=""
+						Game.SpellsTxt[sp].GM=""
+					elseif utilitySpell[sp] then
+						Game.Spells[sp]["SpellPoints" .. masteryName[v]]=0
+						Game.SpellsTxt[sp].Normal=""
+						Game.SpellsTxt[sp].Expert=""
+						Game.SpellsTxt[sp].Master=""
+						Game.SpellsTxt[sp].GM=""
+					end
+				end
+			end
+		end
+		
 		for i=1,132 do
 			local magicS, magicM=SplitSkill(pl.Skills[11+math.ceil(i/11)])
 			if magicM>0 then
@@ -1707,26 +1754,14 @@ function ascension()
 					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. speed
 				elseif healingSpells[i] then
 					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. speed
+				elseif buffSpell and (buffSpell[i] or utilitySpell[i]) then
+					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. oldTable[i][magicM]
 				else
 					Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. "\n\nRecovery time: " .. oldTable[i][magicM]
 				end
 			end
 		end
 		
-		if buffRework then
-			for i=1, #buffSpellList do
-				local sp=buffSpellList[i]
-				for v=1,4 do
-					if buffSpell[sp] then
-						local cost=buffSpell[sp].Cost
-						Game.Spells[sp]["SpellPoints" .. masteryName[v]]=cost
-					elseif utilitySpell[sp] then
-						local cost=utilitySpell[sp].Cost
-						Game.Spells[sp]["SpellPoints" .. masteryName[v]]=cost
-					end
-				end
-			end
-		end
 	end
 end
 
@@ -2520,7 +2555,27 @@ if buffRework then
 			mawBuffCast(t.Player, t.PlayerIndex, t.SpellId)
 		end
 	end
-
+	
+	function getBuffCost(pl, spellId)
+		local cost=0
+		local percentageDecrease=0
+		if buffSpell[spellId] then
+			local div=spScaling[pl.Class]
+			local s,m=SplitSkill(Skillz.get(pl,52))
+			percentageDecrease=(buffSpell[spellId].Cost/div*(1-m/10))*0.01
+			local id=pl:GetIndex()
+			for i=0, Party.High do
+				if id==Party[i]:GetIndex() then
+					cost=maxManaPool[i]*percentageDecrease
+				end
+			end
+		elseif utilitySpell[spellId] then
+			local s,m=SplitSkill(Skillz.get(pl,52))
+			cost=math.round(utilitySpell[spellId].Cost*(1-m/10))
+		end	
+		return cost, percentageDecrease
+	end
+	
 	--maw manual buff cast
 	function mawBuffCast(pl, index, spellId)
 		if vars.mawbuff[spellId]~=index then --cast buff
@@ -2540,19 +2595,15 @@ if buffRework then
 					currentManaPool[i]=sp
 				end
 			end
-			local cost=0
+
 			if buffSpell[spellId] then
-				local div=spScaling[pl.Class]
-				local s,m=SplitSkill(Skillz.get(pl,52))
-				local percentageDecrease=(buffSpell[spellId].Cost/div*(1-m/10))*0.01
-				cost=maxManaPool[id]*percentageDecrease
 				sound=buffSpell[spellId].Sound
 			elseif utilitySpell[spellId] then
-				local s,m=SplitSkill(Skillz.get(pl,52))
-				cost=math.round(utilitySpell[spellId].Cost*(1-m/10))
 				sound=utilitySpell[spellId].Sound
 			end	
-
+			
+			local cost=getBuffCost(pl, spellId)
+			
 			if currentManaPool[id]<cost or pl.SP<cost then
 				Game.ShowStatusText("Not enough Mana")
 				return
