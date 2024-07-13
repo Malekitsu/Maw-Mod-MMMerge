@@ -1292,7 +1292,7 @@ function events.GameInitialized2()
 			[98] = {dmgAdd = 50, diceMin = 1, diceMax = 1, },--armageddon
 			[99] = {dmgAdd = 25, diceMin = 1, diceMax = 5, },--souldrinker
 			[103] = {dmgAdd = 46, diceMin = 1, diceMax = 28, },--darkfire bolt
-			[111] = {dmgAdd = 18, diceMin = 1, diceMax = 6, },--lifedrain scales with mastery, fixed in calcspelldamage
+			[111] = {dmgAdd = 21, diceMin = 1, diceMax = 7, },--lifedrain scales with mastery, fixed in calcspelldamage
 			--[123] = {dmgAdd = 0, diceMin = 1, diceMax = 25, },--scales with breath damage
 		}
 end
@@ -1584,8 +1584,8 @@ function ascension()
 		Game.SpellsTxt[97].Description=string.format("Dragon Breath empowers the caster to exhale a cloud of toxic vapors that targets a single monster and damage all creatures nearby, doing 1-%s points of damage per point of skill in Dark Magic.",diceMaxTooltip(s, m,97))
 		Game.SpellsTxt[98].Description=string.format("This spell is the town killer. Armageddon inflicts %s points of damage plus %s point of damage for every point of Dark skill your character has to every creature on the map, including all your characters. It can only be cast three times per day and only outdoors.",dmgAddTooltip(s, m,98),diceMaxTooltip(s, m,98))
 		Game.SpellsTxt[99].Description=string.format("This horrible spell sucks the life from all creatures in sight, friend or enemy.  Souldrinker then transfers that life to your party in much the same fashion as Shared Life.  Damage (and healing) is %s + 1-%s per point of skill.",dmgAddTooltip(s, m,99),diceMaxTooltip(s, m,99))
+		Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,103),diceMaxTooltip(s, m,103))
 		
-		Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is 1-%s per point of skill.",diceMaxTooltip(s, m,103))
 		Game.SpellsTxt[111].Description=string.format("Lifedrain allows the vampire to damage his or her target and simultaneously heal based on the damage done in the Lifedrain.  This ability does %s points of damage plus 1-%s points of damage per skill.",dmgAddTooltip(s, m,111),diceMaxTooltip(s, m,111))
 		Game.SpellsTxt[111].Master=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*5),math.round(diceMaxTooltip(s, m,111)/3*5))
 		Game.SpellsTxt[111].GM=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*7),math.round(diceMaxTooltip(s, m,111)/3*7))
