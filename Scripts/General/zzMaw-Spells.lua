@@ -2665,31 +2665,34 @@ if buffRework then
 					if buff==85 then --day of protection
 						for i=1, #buffSpell[buff].MultiBuff do
 							local buffId=buffSpell[buff].MultiBuff[i]
-							Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
+							Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
 						end
 					elseif buff==86 then --hour of power
 						for i=1, #buffSpell[buff].MultiBuff do
 							local buffId=buffSpell[buff].MultiBuff[i]
-							Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
+							Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
 						end
 						local buffId=buffSpell[buff].SingleBuff
 						for i=0, Party.High do
-							Party[i].SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
+							Party[i].SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
 						end
 					elseif buffSpell[buff] and buffSpell[buff].PartyBuff then
 						local buffId=buffSpell[buff].PartyBuff
-						Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
+						Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
+						if buffId==8 then
+							Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
+						end
 					elseif buffSpell[buff] and buffSpell[buff].SingleBuff then
 						local buffId=buffSpell[buff].SingleBuff
 						for i=0, Party.High do
-							Party[i].SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
+							Party[i].SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
 						end
 					elseif utilitySpell[buff] and utilitySpell[buff].PartyBuff then
 						--if buff~=19 or (not Party.EnemyDetectorYellow and not Party.EnemyDetectorRed) then --Invisibility
 							local buffId=utilitySpell[buff].PartyBuff
 							Party.SpellBuffs[buffId].Caster=4 --crashes otherwise
 							Party.SpellBuffs[buffId].Bits=1 --allow fly
-							Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
+							Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
 						--end
 					end	
 				end
