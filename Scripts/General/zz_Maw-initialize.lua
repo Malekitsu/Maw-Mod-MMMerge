@@ -5,7 +5,7 @@ chargeKey=69
 healthPotionKey=71
 manaPotionKey=86
 Game.PatchOptions.FixMonstersBlockingShots=true
-buffRework=false
+buffRework=true
 
 function events.GameInitialized2()
 	for i=0,11 do
