@@ -2353,6 +2353,10 @@ function itemStats(index)
 		--stoneskin
 		if Party.SpellBuffs[15].ExpireTime>=Game.Time then
 			local s,m,level=getBuffSkill(38)
+			local s2,m2,level2=getBuffSkill(86)
+			s=math.max(s,s2/1.5)
+			m=math.max(m,m2)
+			level=math.max(level,level2)
 			acBonus=buffPower[38].Base[m]+(level/2)*(1+buffPower[38].Scaling[m]/100*s)
 			tab[10]=tab[10]+acBonus
 		end
