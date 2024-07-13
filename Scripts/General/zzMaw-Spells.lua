@@ -108,7 +108,7 @@ function events.PlayerCastSpell(t)
 		return
 	end
 	--Invisibility
-	if t.SpellId==19 and not buffRework then
+	if t.SpellId==19 then
 		if Party.EnemyDetectorRed or Party.EnemyDetectorYellow then
 			return
 		end
@@ -2501,12 +2501,12 @@ if buffRework then
 	utilitySpell={
 	[1]= {["Cost"]=5,  ["Sound"]=10000, ["PartyBuff"]=16},--torch
 	[12]={["Cost"]=5,  ["Sound"]=11000, ["PartyBuff"]=19},--wizard eye
-	[19]={["Cost"]=100,["Sound"]=11070, ["PartyBuff"]=11},--Invisibility
+	--[19]={["Cost"]=100,["Sound"]=11070, ["PartyBuff"]=11},--Invisibility
 	[21]={["Cost"]=120,["Sound"]=11090, ["PartyBuff"]=7},--fly
 	[27]={["Cost"]=20, ["Sound"]=12040, ["PartyBuff"]=18},--water walk
 	}
 
-	buffSpellList={1,3,12,14,19,21,25,27,28,36,56,58,69,5,8,17,38,46,47,50,51,71,73,75,83,85,86,95}
+	buffSpellList={1,3,12,14,21,25,27,28,36,56,58,69,5,8,17,38,46,47,50,51,71,73,75,83,85,86,95}
 	utilityBuffs={16,19,11,7,18}
 	
 	buffPower={ --values are inteneded as % and /1000 for scaling
@@ -2634,10 +2634,12 @@ if buffRework then
 
 	function mawBuffApply()
 		for i=0, Party.SpellBuffs.High do
-			Party.SpellBuffs[i].ExpireTime=0
-			if not table.find(utilityBuffs, i) then
-				Party.SpellBuffs[i].Power=0
-				Party.SpellBuffs[i].Skill=0
+			if i~=11 then
+				Party.SpellBuffs[i].ExpireTime=0
+				if not table.find(utilityBuffs, i) then
+					Party.SpellBuffs[i].Power=0
+					Party.SpellBuffs[i].Skill=0
+				end
 			end
 		end
 		for j=0, Party.High do
@@ -2676,12 +2678,12 @@ if buffRework then
 							Party[i].SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
 						end
 					elseif utilitySpell[buff] and utilitySpell[buff].PartyBuff then
-						if buff~=19 or (not Party.EnemyDetectorYellow and not Party.EnemyDetectorRed) then --Invisibility
+						--if buff~=19 or (not Party.EnemyDetectorYellow and not Party.EnemyDetectorRed) then --Invisibility
 							local buffId=utilitySpell[buff].PartyBuff
 							Party.SpellBuffs[buffId].Caster=4 --crashes otherwise
 							Party.SpellBuffs[buffId].Bits=1 --allow fly
 							Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Hour
-						end
+						--end
 					end	
 				end
 			end
@@ -2902,12 +2904,12 @@ if buffRework then
 		local bf=buffPower[id]
 		sp.Description = string.format("Reserve a flat amount of mana to show the locations of monsters and other points of interest while outdoors in the minimap.\nThis effect remains active until deactivated or lose consciousness.")
 		
-		--Invisibility
+		--[[Invisibility
 		local id=19
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
 		sp.Description = string.format("Reserve a flat amount of mana\nInvisibility works on the minds of nearby creatures, making them unable to notice the party unless spoken to or attacked.  Any attack you make, regardless of whether or not it hits or misses, will break this spell. This spell can't be cast while hostile monsters are nearby.\nThis effect remains active until deactivated, attacking or lose consciousness. While active and no monster is in the nearbies, it gets casted automatically.")
-		
+		]]
 		--Fly
 		local id=21
 		local sp=Game.SpellsTxt[id]
