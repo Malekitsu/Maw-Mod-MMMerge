@@ -2495,7 +2495,7 @@ if buffRework then
 	[75]={["Cost"]=150,["Sound"]=16080,["PartyBuff"]=13},--Protection from magic
 	[83]={["Cost"]=150,["Sound"]=17050,["PartyBuff"]=2},--day of the gods
 	[85]={["Cost"]=150,["Sound"]=17070,["MultiBuff"]={6,0,17,4,12,1}},--day of Protection
-	[86]={["Cost"]=250,["Sound"]=17080,["MultiBuff"]={8,14,15,9}, ["SingleBuff"]=1},--hour of power
+	[86]={["Cost"]=250,["Sound"]=17080,["MultiBuff"]={8,14,15}, ["SingleBuff"]=4},--hour of power
 	[95]={["Cost"]=100,["Sound"]=18060,["SingleBuff"]=10},--pain reflection
 	}
 	utilitySpell={
@@ -2528,7 +2528,7 @@ if buffRework then
 		[73]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--Hammerhands
 		[83]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,1.5,1.5,1.5,1.5}},--day of the gods
 		[85]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,2,2,2,2}},--day of Protection
-		[86]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,2,2,2,2}},--hour of power
+		[86]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--hour of power (formulas don't use this values, but takes skill and divide by 1.5)
 	}
 	
 	function events.LoadMap()
@@ -2873,7 +2873,7 @@ if buffRework then
 		local id=86
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to simultaneously casts Haste, Heroism, Shield, Stone Skin, and Bless on all your characters.\nWhile the base effects remain consistent, each additional 3 levels in Light Magic will enhance the effects equivalently to only 2 levels.\nThis effect remains active until deactivated or lose consciousness.")
+		sp.Description = string.format("Reserve a percentage of your mana to simultaneously casts Haste, Shield, Stone Skin, and Fate on all your characters.\nWhile the base effects remain consistent, each additional 3 levels in Light Magic will enhance the effects equivalently to only 2 levels.\nThis effect remains active until deactivated or lose consciousness.")
 		
 		--preservation
 		local id=50
