@@ -1926,7 +1926,7 @@ function events.GameInitialized2()
 	Skillz.setDesc(manaSkill, 3, "When below 25% HP reduces damage to 1/4")
 	Skillz.setDesc(manaSkill, 4, "When below 12.5% HP reduces damage to 1/8")
 	Skillz.setDesc(manaSkill, 5, "Reduction increased as your HP reduces, up to infinity")
-	Skillz.learn_at(manaSkill, 23) --temples
+	Skillz.learn_at(manaSkill, 3) --alchemy shop
 end
 
 local manaShieldRequirements={6,12,20}
@@ -1947,12 +1947,12 @@ function events.GameInitialized2()
 	local Enlightenment=52
 	Skillz.new_magic(Enlightenment)
 	Skillz.setName(Enlightenment, "Enlightenment")
-	Skillz.setDesc(Enlightenment, 1, "Unlock the true potential of your mana reserves with Enlightenment, a transformative skill that increases your mana pool and reduces mana reserved by buffs, empowering you to cast more freely and frequently.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n")
-	Skillz.setDesc(Enlightenment, 2, "Reserved mana is reduced by 10%, mana pool increased by 2% per skill level")
-	Skillz.setDesc(Enlightenment, 3, "Reserved mana is reduced by 20%, mana pool increased by 3% per skill level")
-	Skillz.setDesc(Enlightenment, 4, "Reserved mana is reduced by 30%, mana pool increased by 4% per skill level")
-	Skillz.setDesc(Enlightenment, 5, "Reserved mana is reduced by 40%, mana pool increased by 5% per skill level")
-	Skillz.learn_at(Enlightenment, 23) --guilds
+	Skillz.setDesc(Enlightenment, 1, "Unlock the true potential of your mana reserves with Enlightenment, a transformative skill that increases your mana pool and reduces mana reserved by buffs, empowering you to cast more freely and frequently.\n\nThe cost of buffs is divided by the amount of mana you gain per level. As you reach higher mastery levels, the divisor increases, but your total mana pool remains the same.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n")
+	Skillz.setDesc(Enlightenment, 2, "Mana is increased by 2% per skill level, cost divisor increased by 0.5")
+	Skillz.setDesc(Enlightenment, 3, "Mana is increased by 3% per skill level, cost divisor increased by 1")
+	Skillz.setDesc(Enlightenment, 4, "Mana is increased by 4% per skill level, cost divisor increased by 1.5")
+	Skillz.setDesc(Enlightenment, 5, "Mana is increased by 5% per skill level, cost divisor increased by 2")
+	Skillz.learn_at(Enlightenment, 3) --alchemy shop
 end
 
 local EnlightenmentRequirements={6,12,20}
