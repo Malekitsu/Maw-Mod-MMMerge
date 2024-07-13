@@ -1606,14 +1606,25 @@ end
 function events.Tick()
 	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
 		local index=Game.CurrentPlayer
+		local pl=Party[index]
 		if index>=0 and index<=Party.High then
-			if Skillz.get(Party[index],50)>0 or Skillz.get(Party[index],51)>0 then
+			if Skillz.get(pl,50)>0 or Skillz.get(pl,51)>0 then
 				Game.GlobalTxt[143]="\nMisc"
 			else
 				Game.GlobalTxt[143]="Misc"
 			end
-			if Skillz.get(Party[index],50)>0 and Skillz.get(Party[index],51)>0 then
-				Game.GlobalTxt[143]="\n\nMisc"
+			local noarmor=true
+			for i=8, 11 do
+				local s=pl.Skills[i]
+				if s>0 then
+					noarmor=false
+				end
+			end
+			if noarmor then
+				Game.GlobalTxt[143]="Misc"
+			end
+			if Skillz.get(pl,50)>0 and Skillz.get(pl,51)>0 then
+				Game.GlobalTxt[143]="\n" .. Game.GlobalTxt[143]
 			end
 		end	
 		if not vars.covering then
@@ -1622,10 +1633,10 @@ function events.Tick()
 				vars.covering[i]=true
 			end
 		end
-		local s= SplitSkill(Skillz.get(Party[Game.CurrentPlayer], 50))
+		local s= SplitSkill(Skillz.get(pl, 50))
 		local chance=math.round((1-(0.99^s-0.05))*10000)/100
 		local txt="Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nGrants 5 plus 1% chance per skill point to Cover. \nCurrent cover chance: " .. chance .. "%\n\nPress P to enable/disable\n"
-		if vars.covering[Game.CurrentPlayer] then
+		if vars.covering[index] then
 			txt=txt .. StrColor(0,255,0,"\nCurrently enabled\n")
 			Skillz.setDesc(50, 1, txt)
 		else
@@ -1640,12 +1651,12 @@ function events.Tick()
 				vars.manaShield[i]=true
 			end
 		end
-		local s, m= SplitSkill(Skillz.get(Party[Game.CurrentPlayer], 51))
+		local s, m= SplitSkill(Skillz.get(pl, 51))
 		local efficiency=math.round((1+s^1.5/125*m)*100)/100
 			Skillz.setDesc(51, 1, "Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n")
 		
 		local txt="Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n" .. "Current Damage reduction per Mana: " .. StrColor(178,255,255, efficiency) .. "\n\nPress M to enable/disable"
-		if vars.manaShield[Game.CurrentPlayer] then
+		if vars.manaShield[index] then
 			txt=txt .. StrColor(0,255,0,"\nCurrently enabled\n")
 			Skillz.setDesc(51, 1, txt)
 		else
