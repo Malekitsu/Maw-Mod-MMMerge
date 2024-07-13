@@ -326,11 +326,20 @@ function events.BuildStatInformationBox(t)
 		regen=math.ceil(FHP*HPregenItem*0.02)+hpRegen+bonusregen
 		
 		Buff=Party[i].SpellBuffs[const.PlayerBuff.Regeneration]
-		if Buff.ExpireTime > Game.Time then
-			RegS, RegM = SplitSkill(Buff.Skill)
-			regen = math.ceil(regen + FHP^0.5*RegS^1.3*((RegM+1)/100)) 
+		
+		if buffRework then
+			if pl.SpellBuffs[12].ExpireTime>=Game.Time then
+				local s,m,level=getBuffSkill(71)
+				local skill=(level)^0.65*(1+s*buffPower[71].Base[m]/100)
+				regen = regen + math.ceil(FHP^0.5*skill^1.3*(buffPower[71].Base[m]/100)) -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
+			end
+		else
+			if Buff.ExpireTime > Game.Time then
+				RegS, RegM = SplitSkill(Buff.Skill)
+				regen = math.ceil(regen + FHP^0.5*RegS^1.3*((RegM+1)/100)) 
+			end
 		end
-	
+		
 		t.Text=string.format("%s\n\nHP bonus from Endurance: %s\nHP bonus from Body building: %s\nHP bonus from items: %s\nBase HP: %s\n\n HP Regen per second: %s",t.Text,StrColor(0,255,0,enduranceTotalBonus), StrColor(0,255,0,BBHP),StrColor(0,255,0,math.round(fullHP-enduranceTotalBonus-BBHP-BASEHP)),StrColor(0,255,0,BASEHP),StrColor(0,255,0,regen/10))
 	end
 	if t.Stat==8 then
