@@ -2565,7 +2565,7 @@ if buffRework then
 			percentageDecrease=(buffSpell[spellId].Cost/div*(1-m/10))*0.01
 			local id=pl:GetIndex()
 			for i=0, Party.High do
-				if id==Party[i]:GetIndex() then
+				if id==Party[i]:GetIndex() and maxManaPool[i] then
 					cost=maxManaPool[i]*percentageDecrease
 				end
 			end
@@ -2604,7 +2604,7 @@ if buffRework then
 			
 			local cost=getBuffCost(pl, spellId)
 			
-			if currentManaPool[id]<cost or pl.SP<cost then
+			if currentManaPool[id]<cost then
 				Game.ShowStatusText("Not enough Mana")
 				return
 			end
@@ -2616,7 +2616,7 @@ if buffRework then
 			evt.PlaySound(sound)
 			local delay=getSpellDelay(pl,spellId)
 			pl:SetRecoveryDelay(delay)
-			pl.SP=pl.SP-cost
+			--pl.SP=pl.SP-cost
 			
 			function events.Tick() 
 				events.Remove("Tick", 1)
@@ -2705,17 +2705,19 @@ if buffRework then
 			local spell=buffSpellList[i]
 			if vars.mawbuff[spell] then
 				local id=partyIndexes[vars.mawbuff[spell]]
-				local pl=Party[id]
-				
-				if buffSpell[spell] then
-					local div=spScaling[pl.Class]
-					local s,m=SplitSkill(Skillz.get(pl,52))
-					local percentageDecrease=(buffSpell[spell].Cost/div*(1-m/10))*0.01
-					currentManaPool[id]=currentManaPool[id]-maxManaPool[id]*percentageDecrease
-				elseif utilitySpell[spell] then
-					local s,m=SplitSkill(Skillz.get(pl,52))
-					currentManaPool[id]=currentManaPool[id]-math.round(utilitySpell[spell].Cost*(1-m/10))
-				end				
+				if id then
+					local pl=Party[id]
+					
+					if buffSpell[spell] then
+						local div=spScaling[pl.Class]
+						local s,m=SplitSkill(Skillz.get(pl,52))
+						local percentageDecrease=(buffSpell[spell].Cost/div*(1-m/10))*0.01
+						currentManaPool[id]=currentManaPool[id]-maxManaPool[id]*percentageDecrease
+					elseif utilitySpell[spell] then
+						local s,m=SplitSkill(Skillz.get(pl,52))
+						currentManaPool[id]=currentManaPool[id]-math.round(utilitySpell[spell].Cost*(1-m/10))
+					end
+				end
 			end
 		end
 		for i=0, Party.High do
