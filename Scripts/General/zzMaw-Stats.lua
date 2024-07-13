@@ -64,7 +64,11 @@ function getCritInfo(pl,dmgType)
 	if buffRework then 
 		if pl.SpellBuffs[4].ExpireTime>=Game.Time then
 			local s,m=getBuffSkill(47)
-			totalCrit=totalCrit+buffPower[47].Base[m]/100+buffPower[47].Scaling[m]*s/1000
+			local s2,m2=getBuffSkill(86)
+			s=math.max(s,s2/1.5)
+			m=math.max(m,m2)
+			local bonus=buffPower[47].Base[m]/100+buffPower[47].Scaling[m]*s/1000
+			totalCrit=totalCrit+bonus
 		end
 	end
 	
@@ -1046,7 +1050,17 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		local damage=math.round(damage/2^(AC/math.min(100+monLvl*0.75*bolster,300*bolster)))
 		return damage
 	end
-
+	
+	--shield buff
+	if Party.SpellBuffs[14].ExpireTime>=Game.Time then
+		local skill=getBuffSkill(17)
+		local s2,m2=getBuffSkill(86)
+		s=math.max(s,s2/1.5)
+		m=math.max(m,m2)
+		damage=damage*(0.9-0.002*skill)
+	end
+			
+	
 	--get resistances
 	if not damageKindResistance[damageKind] then
 		local damage=math.round(damage)
