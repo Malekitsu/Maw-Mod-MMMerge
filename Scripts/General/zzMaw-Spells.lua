@@ -2471,32 +2471,36 @@ if buffRework then
 		for i=0,Game.Classes.SPFactor.High do
 			spScaling[i]=Game.Classes.SPFactor[i]
 		end
+		--dk
+		spScaling[56]=5
+		spScaling[57]=5
+		spScaling[58]=5
 	end
 
 	buffSpell={
-	[3]= {["Cost"]=50, ["Sound"]=10020, ["PartyBuff"]=6},--fire res
-	[14]={["Cost"]=50, ["Sound"]=11020,["PartyBuff"]=0},--air res
-	[25]={["Cost"]=50, ["Sound"]=12020,["PartyBuff"]=17},--water res
-	[36]={["Cost"]=50, ["Sound"]=13020,["PartyBuff"]=4},--earth res
-	[58]={["Cost"]=50, ["Sound"]=15020,["PartyBuff"]=12},--mind res
-	[69]={["Cost"]=50, ["Sound"]=16020,["PartyBuff"]=1},--body res
-	[5]= {["Cost"]=60, ["Sound"]=10040,["PartyBuff"]=8},--haste
-	[8]= {["Cost"]=90, ["Sound"]=10070,["PartyBuff"]=10},--immolation
-	[17]={["Cost"]=60, ["Sound"]=11050,["PartyBuff"]=14},--shield
-	[28]={["Cost"]=120, ["Sound"]=10070,},--empower magic
-	[38]={["Cost"]=60, ["Sound"]=13040,["PartyBuff"]=15},--stoneskin
-	[46]={["Cost"]=60, ["Sound"]=14010,["SingleBuff"]=1},--bless
-	[47]={["Cost"]=60, ["Sound"]=14020,["SingleBuff"]=4},--fate
-	[50]={["Cost"]=60, ["Sound"]=14050,["SingleBuff"]=11},--preservation
-	[51]={["Cost"]=90, ["Sound"]=14060,["PartyBuff"]=9},--Heroism
-	[56]={["Cost"]=40, ["Sound"]=15020,},--Meditation
-	[71]={["Cost"]=90, ["Sound"]=16040,["SingleBuff"]=12},--Regeneration
-	[73]={["Cost"]=60, ["Sound"]=16060,["SingleBuff"]=6},--Hammerhands
-	[75]={["Cost"]=150,["Sound"]=16080,["PartyBuff"]=13},--Protection from magic
-	[83]={["Cost"]=150,["Sound"]=17050,["PartyBuff"]=2},--day of the gods
+	[3]= {["Cost"]=60, ["Sound"]=10020, ["PartyBuff"]=6},--fire res
+	[14]={["Cost"]=60, ["Sound"]=11020,["PartyBuff"]=0},--air res
+	[25]={["Cost"]=60, ["Sound"]=12020,["PartyBuff"]=17},--water res
+	[36]={["Cost"]=60, ["Sound"]=13020,["PartyBuff"]=4},--earth res
+	[58]={["Cost"]=60, ["Sound"]=15020,["PartyBuff"]=12},--mind res
+	[69]={["Cost"]=60, ["Sound"]=16020,["PartyBuff"]=1},--body res
+	[5]= {["Cost"]=120, ["Sound"]=10040,["PartyBuff"]=8},--haste
+	[8]= {["Cost"]=120, ["Sound"]=10070,["PartyBuff"]=10},--immolation
+	[17]={["Cost"]=75, ["Sound"]=11050,["PartyBuff"]=14},--shield
+	[28]={["Cost"]=150, ["Sound"]=10070,},--empower magic
+	[38]={["Cost"]=75, ["Sound"]=13040,["PartyBuff"]=15},--stoneskin
+	[46]={["Cost"]=75, ["Sound"]=14010,["SingleBuff"]=1},--bless
+	[47]={["Cost"]=75, ["Sound"]=14020,["SingleBuff"]=4},--fate
+	[50]={["Cost"]=120, ["Sound"]=14050,["SingleBuff"]=11},--preservation
+	[51]={["Cost"]=120, ["Sound"]=14060,["PartyBuff"]=9},--Heroism
+	[56]={["Cost"]=120, ["Sound"]=15020,},--Meditation
+	[71]={["Cost"]=120, ["Sound"]=16040,["SingleBuff"]=12},--Regeneration
+	[73]={["Cost"]=75, ["Sound"]=16060,["SingleBuff"]=6},--Hammerhands
+	[75]={["Cost"]=180,["Sound"]=16080,["PartyBuff"]=13},--Protection from magic
+	[83]={["Cost"]=200,["Sound"]=17050,["PartyBuff"]=2},--day of the gods
 	[85]={["Cost"]=150,["Sound"]=17070,["MultiBuff"]={6,0,17,4,12,1}},--day of Protection
-	[86]={["Cost"]=250,["Sound"]=17080,["MultiBuff"]={8,14,15}, ["SingleBuff"]=4},--hour of power
-	[95]={["Cost"]=100,["Sound"]=18060,["SingleBuff"]=10},--pain reflection
+	[86]={["Cost"]=300,["Sound"]=17080,["MultiBuff"]={8,14,15}, ["SingleBuff"]=4},--hour of power
+	[95]={["Cost"]=120,["Sound"]=18060,["SingleBuff"]=10},--pain reflection
 	}
 	utilitySpell={
 	[1]= {["Cost"]=5,  ["Sound"]=10000, ["PartyBuff"]=16},--torch
