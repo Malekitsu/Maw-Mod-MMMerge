@@ -2812,7 +2812,7 @@ if buffRework then
 		sp.Description = string.format("Reserve a percentage of your mana to increase your party Recovery speed by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10)
 		
 		--Shield
-		local id=14
+		local id=17
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
 		sp.Description = string.format("Reserve a percentage of your mana to reduce any incoming magic damage to your party by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10)
