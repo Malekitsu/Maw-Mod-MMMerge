@@ -290,12 +290,11 @@ function events.GetAttackDelay(t)
 	
 	if buffRework then
 		local hasteMult=1
-		if getBuffSkill(86)>0 then
-			local s,m=getBuffSkill(86)
-			hasteMult=1+buffPower[86].Base[m]/100+buffPower[86].Scaling[m]*s/1000
-		end
 		if Party.SpellBuffs[8].ExpireTime>=Game.Time then
 			local s, m=getBuffSkill(5)
+			local s2,m2=getBuffSkill(86)
+			s=math.max(s,s2/1.5)
+			m=math.max(m,m2)
 			hasteMult=math.max(1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]*s/1000, hasteMult)
 		end
 		t.Result=t.Result/hasteMult
