@@ -2513,7 +2513,7 @@ if buffRework then
 	buffSpellList={1,3,12,14,21,25,27,28,36,56,58,69,5,8,17,38,46,47,50,51,71,73,75,83,85,86,95}
 	utilityBuffs={16,19,11,7,18}
 	
-	mawPartyBuffList={6,0,17,4,12,1,8,10,14,15,9,13,2,16,19,11,7,18}
+	mawPartyBuffList={6,0,17,4,12,1,8,10,14,15,9,13,2,16,19,7,18}
 	mawPartyBuffIgnore={16,19,11,7,18}
 	
 	buffPower={ --values are inteneded as % and /1000 for scaling
