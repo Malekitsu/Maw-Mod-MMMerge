@@ -310,10 +310,9 @@ function events.BuildStatInformationBox(t)
 		local FHP=Party[i]:GetFullHP()
 		local skill=Party[i]:GetSkill(const.Skills.Regeneration)
 		local s,m=SplitSkill(skill)
-		if m==4 then
-			m=5
-		end
-		local hpRegen = math.round(FHP^0.5*s^1.5*((m+1)/25))
+
+		local regenEffect={[0]=0,3,4,6,6}
+		local hpRegen = math.round(FHP^0.5*s^1.5*((regenEffect[m])/25))
 		local HPregenItem=0
 		local bonusregen=0
 		for it in Party[i]:EnumActiveItems() do
