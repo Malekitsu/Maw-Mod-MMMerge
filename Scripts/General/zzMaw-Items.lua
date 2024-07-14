@@ -134,7 +134,7 @@ encStrUp={3,5,8,12,16,20,24,29,34,38,42,48,52,56,60,65,70,75,80,85,90,100,110,12
 
 enc1Chance={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84}
 enc2Chance={20,30,35,40,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64}
-spcEncChance={0,0,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44}
+spcEncChance={5,10,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44}
 
 primordialWeapEnchants={39,40,41,46}
 primordialArmorEnchants={1,2,80}
@@ -296,6 +296,9 @@ function events.ItemGenerated(t)
 		end
 		--difficulty multiplier 
 		diffMult=math.max((Game.BolsterAmount-100)/1000+1,1)
+		if Game.BolsterAmount==600 then
+			diffMult=math.max((400-100)/1000+1,1)
+		end
 		--calculate chances
 		local p1=enc1Chance[pseudoStr]/100
 		local p2=enc2Chance[pseudoStr]/100
@@ -618,7 +621,7 @@ function events.GameInitialized2()
 		Game.GlobalTxt[211]=StrColor(127,0,255,"Speed")
 		Game.GlobalTxt[136]=StrColor(255,255,255,"Luck")
 		Game.GlobalTxt[108]=StrColor(0,255,0,"Hit Points")
-		Game.GlobalTxt[212]=StrColor(0,100,255,"Spell Points")
+		Game.GlobalTxt[212]=StrColor(0,100,255,"Mana")
 		Game.GlobalTxt[12]=StrColor(230,204,128,"Armor Class")
 	end
 end
