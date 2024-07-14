@@ -1037,7 +1037,8 @@ function MawRegen()
 				end
 				FSP	= pl:GetFullSP()
 				if buffRework and currentManaPool and currentManaPool[i] then
-					FSP=math.ceil(currentManaPool[i])
+					FSP=math.max(math.ceil(currentManaPool[i]),0)
+					
 				end
 				regenSP[i] = regenSP[i] + (FSP^0.35*RegS^1.75*((RegM+5)/12000) +0.02)* timeMultiplier*mult
 				
@@ -1053,7 +1054,6 @@ function MawRegen()
 				elseif pl.Class==11 then
 					regenSP[i]=regenSP[i] + 0.5* timeMultiplier*mult
 				end
-				
 				pl.SP = math.min(FSP, pl.SP + math.floor(regenSP[i]))
 				regenSP[i]=regenSP[i]%1
 			end
