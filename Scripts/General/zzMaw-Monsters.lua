@@ -1843,6 +1843,27 @@ function events.LeaveMap()
 	end
 end
 
+completition=CustomUI.CreateText{
+		Text = "",
+		Layer 	= 1,
+		Screen 	= 0,
+		X = 495, Y = 375}
+percentText=CustomUI.CreateText{
+		Text = "",
+		Layer 	= 1,
+		Screen 	= 0,
+		X = 513, Y = 375}
+
+function events.LoadMap()
+	if mapvars.completition then
+		completition.Text=string.format(mapvars.completition)
+		percentText.Text="%"
+	else
+		completition.Text=""
+		percentText.Text=""
+	end
+end
+
 --check for dungeon clear
 function events.MonsterKilled(mon)
 	if Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.completed==nil then
@@ -1858,6 +1879,10 @@ function events.MonsterKilled(mon)
 			end
 		end
 		local requiredRateo=0.99^(math.floor(n/100))
+		mapvars.completition=math.round(m/n*100)
+		completition.Text=string.format(mapvars.completition)
+		percentText.Text="%"
+		
 		if m/n>=requiredRateo then
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
