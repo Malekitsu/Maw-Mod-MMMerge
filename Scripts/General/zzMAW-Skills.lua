@@ -988,11 +988,15 @@ function MawRegen()
 			end
 			--regeneration skill
 			local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Regeneration))
+			gmMult=1
 			if RegM==4 then
-				RegM=5
+				local tot=pl:GetFullHP()
+				local percentage=pl.HP/tot
+				gmMult=math.min(1+(1-percentage)^2,5)
 			end
+			local regenEffect={[0]=0,3,4,6,6}
 			FHP	= pl:GetFullHP()
-			regenHP[i] = regenHP[i] + (FHP^0.5*RegS^1.5*((RegM+1)/2500))* timeMultiplier * mult
+			regenHP[i] = regenHP[i] + (FHP^0.5*RegS^1.5*((regenEffect[RegM])/2500))* timeMultiplier * mult * gmMult
 			--regeneration spell
 			Buff=pl.SpellBuffs[const.PlayerBuff.Regeneration]
 			
@@ -1080,11 +1084,9 @@ function events.Tick()
 		pl=Party[Game.CurrentPlayer]
 		local FHP=pl:GetFullHP()
 		local s,m = SplitSkill(pl:GetSkill(30))
-		if m==4 then
-			m=5
-		end
-		local hpRegen = math.round(FHP^0.5*s^1.5*((m+1)/25))/10
-		local hpRegen2 = math.round(FHP^0.5*(s+1)^1.5*((m+1)/25))/10
+		local regenEffect={[0]=0,3,4,6,6}
+		local hpRegen = math.round(FHP^0.5*s^1.5*((regenEffect[m])/25))/10
+		local hpRegen2 = math.round(FHP^0.5*(s+1)^1.5*((regenEffect[m])/25))/10
 		local txt = string.format("%s\n\nCurrent HP Regeneration: %s\nNext Level Bonus: %s HP Regen",baseRegStr,StrColor(0,255,0,hpRegen),StrColor(0,255,0,"+" .. hpRegen2-hpRegen))
 		Skillz.setDesc(30,1,txt)
 		--meditation tooltip
@@ -1966,4 +1968,9 @@ function events.Action(t)
 			end
 		end
 	end
+end
+
+--regeneration for Troll
+function events.GameInitialized2()
+	Skillz.setDesc(30, 5, "Increase your regeneration by 1% per every 1% of hp lost")
 end
