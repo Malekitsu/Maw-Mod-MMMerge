@@ -2828,7 +2828,7 @@ if buffRework then
 		local id=38
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to reduce any incoming physical damage to your party by %s%% plus %s%% per Skill Level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10)
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Armor Class by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10)
 		
 		--Empower Magic
 		local id=28
