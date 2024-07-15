@@ -2509,16 +2509,16 @@ if buffRework then
 	[1]= {["Cost"]=5,  ["Sound"]=10000, ["PartyBuff"]=16},--torch
 	[12]={["Cost"]=5,  ["Sound"]=11000, ["PartyBuff"]=19},--wizard eye
 	--[19]={["Cost"]=100,["Sound"]=11070, ["PartyBuff"]=11},--Invisibility
-	[21]={["Cost"]=120,["Sound"]=11090, ["PartyBuff"]=7},--fly
+	--[21]={["Cost"]=120,["Sound"]=11090, ["PartyBuff"]=7},--fly
 	[27]={["Cost"]=20, ["Sound"]=12040, ["PartyBuff"]=18},--water walk
 	[124]={["Cost"]=20, ["Sound"]=21020, ["PartyBuff"]=7},--fly
 	}
 
 	buffSpellList={1,3,12,14,21,25,27,28,36,56,58,69,5,8,17,38,46,47,50,51,71,73,75,83,85,86,95,124}
-	utilityBuffs={16,19,11,7,18}
+	utilityBuffs={16,19,11,18}
 	
 	mawPartyBuffList={6,0,17,4,12,1,8,10,14,15,9,13,2,16,19,18}
-	mawPartyBuffIgnore={16,19,11,7,18}
+	mawPartyBuffIgnore={16,19,11,18}
 	mawSingleBuffList={1,4,11,12,6,10}
 	
 	buffPower={ --values are inteneded as % and /1000 for scaling
@@ -2553,7 +2553,7 @@ if buffRework then
 	end
 
 	function events.Action(t)
-		if t.Action==142 and (t.Param==28 or t.Param==56) then
+		if t.Action==142 and buffSpell[t.Param] or utilitySpell[t.Param] then
 			t.Handled=true
 			local pl=Party[t.Param2]
 			local id=pl:GetIndex()
@@ -2699,11 +2699,11 @@ if buffRework then
 						end
 					elseif utilitySpell[buff] and utilitySpell[buff].PartyBuff then
 						local buffId=utilitySpell[buff].PartyBuff
-						if buffId~=7 or (not Party.EnemyDetectorYellow and not Party.EnemyDetectorRed and Map.IndoorOrOutdoor==2) then --fly
-							Party.SpellBuffs[buffId].Caster=4 --crashes otherwise
-							Party.SpellBuffs[buffId].Bits=1 --allow fly
-							Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
-						end
+						--if buffId~=7 or (not Party.EnemyDetectorYellow and not Party.EnemyDetectorRed and Map.IndoorOrOutdoor==2) then --fly
+						Party.SpellBuffs[buffId].Caster=4 --crashes otherwise
+						Party.SpellBuffs[buffId].Bits=1 --allow fly
+						Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
+						--end
 					end	
 				end
 			end
