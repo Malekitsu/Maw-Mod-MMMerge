@@ -2472,9 +2472,9 @@ if buffRework then
 			spScaling[i]=Game.Classes.SPFactor[i]
 		end
 		--dk
-		spScaling[56]=5
-		spScaling[57]=5
-		spScaling[58]=5
+		spScaling[56]=2
+		spScaling[57]=4
+		spScaling[58]=6
 		spScaling[59]=1
 		spScaling[60]=1.5
 		spScaling[61]=2
@@ -2838,7 +2838,7 @@ if buffRework then
 		local id=38
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Armor Class by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1]/10)
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Armor Class by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1])
 		
 		--Empower Magic
 		local id=28
@@ -2882,13 +2882,13 @@ if buffRework then
 		local id=83
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to increases all seven stats on all your characters by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		sp.Description = string.format("Reserve a percentage of your mana to increases all seven stats on all your characters by %s.\nYou get an additional 1 point for every 3 caster levels, increased by %s%% per skill level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
 		
 		--day of protection
 		local id=85
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to enhance all of your party's Resistances by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		sp.Description = string.format("Reserve a percentage of your mana to enhance all of your party's Resistances by %s.\nYou get an additional 1 point for every 3 caster levels, increased by %s%% per skill level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
 		
 		--hour of power
 		local id=86
