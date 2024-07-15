@@ -2699,7 +2699,7 @@ if buffRework then
 						end
 					elseif utilitySpell[buff] and utilitySpell[buff].PartyBuff then
 						local buffId=utilitySpell[buff].PartyBuff
-						if buffId~=7 or (not Party.EnemyDetectorYellow and not Party.EnemyDetectorRed) then --fly
+						if buffId~=7 or (not Party.EnemyDetectorYellow and not Party.EnemyDetectorRed and Map.IndoorOrOutdoor==2) then --fly
 							Party.SpellBuffs[buffId].Caster=4 --crashes otherwise
 							Party.SpellBuffs[buffId].Bits=1 --allow fly
 							Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
