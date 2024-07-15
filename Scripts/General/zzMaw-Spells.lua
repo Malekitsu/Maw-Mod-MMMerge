@@ -2519,7 +2519,7 @@ if buffRework then
 	
 	mawPartyBuffList={6,0,17,4,12,1,8,10,14,15,9,13,2,16,19,7,18}
 	mawPartyBuffIgnore={16,19,11,7,18}
-	mawSingleBuffList={1,4,11,12,6,10}
+	mawSingleBuffList={1,4,11,12,6,10,9}
 	
 	buffPower={ --values are inteneded as % and /1000 for scaling
 		[3]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--fire res  
@@ -2664,7 +2664,7 @@ if buffRework then
 			]]
 			for k=1,#mawSingleBuffList do
 				local id=mawSingleBuffList[k]
-				pl.SpellBuffs[k].ExpireTime=0
+				pl.SpellBuffs[id].ExpireTime=0
 			end
 		end
 		for i=1, #buffSpellList do
