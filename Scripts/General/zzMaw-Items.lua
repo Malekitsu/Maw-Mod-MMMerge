@@ -2248,21 +2248,13 @@ function itemStats(index)
 				end
 			end	
 			
-			local blessBonus=0
-			if buffRework then
-				if pl.SpellBuffs[1].ExpireTime>=Game.Time then
-					local s,m, level=getBuffSkill(46)
-					blessBonus=buffPower[46].Base[m]+level*0.5*(1+buffPower[46].Scaling[m]*s/100)
-				end
-			end
-			
 			if txt.Skill ~= 5 then
-				tab[40] = tab[40] + math.round(bonus) + blessBonus
+				tab[40] = tab[40] + math.round(bonus)
 				tab[41] = tab[41] + math.round(bonus)
 				tab[42] = tab[42] + txt.Mod1DiceCount+math.round(bonus)
 				tab[43] = tab[43] + math.round(sidesBonus)*txt.Mod1DiceCount+math.round(bonus)
 			else
-				tab[44] = tab[44] + math.round(bonus) + blessBonus
+				tab[44] = tab[44] + math.round(bonus)
 				tab[45] = tab[45] + math.round(bonus)
 				tab[46] = tab[46] + math.round(txt.Mod1DiceCount)+tab[45]
 				tab[47] = tab[47] + math.round(sidesBonus)*txt.Mod1DiceCount+tab[45]
@@ -2290,6 +2282,16 @@ function itemStats(index)
 			end
 		end
 	end	
+	
+	--bless
+	if buffRework then
+		if pl.SpellBuffs[1].ExpireTime>=Game.Time then
+			local s,m, level=getBuffSkill(46)
+			local blessBonus=buffPower[46].Base[m]+level*0.5*(1+buffPower[46].Scaling[m]*s/100)
+			tab[40] = tab[40] + blessBonus
+			tab[44] = tab[44] + blessBonus
+		end
+	end
 	
 	--armor skill multiplier
 	local armorMult=0
@@ -2447,7 +2449,6 @@ function itemStats(index)
 	end
 	local meditationIncrease=totalMana*math.min((m+1),5)*s/100
 	tab[9]=tab[9]+meditationIncrease
-
 	
 	ACBONUS=0
 	for i=0,3 do 
