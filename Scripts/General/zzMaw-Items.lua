@@ -2445,10 +2445,10 @@ function itemStats(index)
 	if m==4 then
 		m=5
 	end
-	totalMana=totalMana+manaScaling*s*m
 	local meditationIncrease=totalMana*math.min((m+1),5)*s/100
 	tab[9]=tab[9]+meditationIncrease
-		
+
+	
 	ACBONUS=0
 	for i=0,3 do 
 		local item=pl:GetActiveItem(i)
