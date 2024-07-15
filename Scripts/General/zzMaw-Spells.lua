@@ -2553,7 +2553,7 @@ if buffRework then
 	end
 
 	function events.Action(t)
-		if t.Action==142 and buffSpell[t.Param] or utilitySpell[t.Param] then
+		if t.Action==142 and (buffSpell[t.Param] or utilitySpell[t.Param]) then
 			t.Handled=true
 			local pl=Party[t.Param2]
 			local id=pl:GetIndex()
