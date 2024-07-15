@@ -619,6 +619,11 @@ function events.BuildItemInformationBox(t)
 	end
 	if t.Item.Number==1067 then
 		if t.Description then
+			if t.Item.BonusStrength<10 or t.Item.BonusStrength>1000 then
+				t.Description="Oracle's Orb is a mysterious and powerful artifact, a large, purple orb with a haunting face suspended within its core. This enigmatic relic is known for storing legendary abilities upon items it enchants.\n\nRight click a legendary item to store its power"
+			else
+				t.Description="Oracle's Orb is a mysterious and powerful artifact, a large, purple orb with a haunting face suspended within its core. This enigmatic relic is known for storing legendary abilities upon items it enchants.\n\nAdds the following legendary power to an item:"
+			end
 			t.Description = t.Description .. "\n\n" .. StrColor(255,255,30,legendaryEffects[t.Item.BonusStrength])
 		end
 	end
@@ -874,12 +879,13 @@ end
 
 evt.PotionEffects[87] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
-		if t.BonusExpireTime<10 or t.BonusExpireTime>1000 then
-			t.BonusExpireTime=Mouse.Item.BonusStrength
+		if (t.BonusExpireTime>=10 and t.BonusExpireTime<1000) then
+			Mouse.Item.BonusStrength=t.BonusExpireTime
+			t.BonusExpireTime=2
 		else
-			return
+			t.BonusExpireTime=Mouse.Item.BonusStrength
+			Mouse.Item.Number=0
 		end
-		Mouse.Item.Number=0
 		mem.u4[0x51E100] = 0x100 
 		t.Condition = t.Condition:Or(0x10)
 		evt.PlaySound(12070)
@@ -895,7 +901,7 @@ craftDropChances={
 		[1064]=0.00001,
 		[1065]=0.00025,
 		[1066]=0.0002,
-		[1067]=0.00002,
+		[1067]=0.00004,
 	}
 function events.MonsterKilled(mon)
 	if mon.Ally == 9999 or mon.NameId>300 then -- no drop from reanimated monsters
@@ -946,7 +952,6 @@ function events.MonsterKilled(mon)
 	end
 	if math.random()<craftDropChances[1067]*bonusRoll then
 		obj = SummonItem(1067, mon.X, mon.Y, mon.Z + 100, 100)
-		obj.Item.BonusStrength=math.random(11,#legendaryEffects)
 	end
 	
 end
@@ -956,5 +961,5 @@ function events.GameInitialized2()
 	--special crafting items
 	Game.ItemsTxt[1061].Notes="This Eye allows to add a Special enchant to any equipment that has already 2 base enchants\n(right-click on an item with a base enchant to use)"
 	Game.ItemsTxt[1062].Notes="This Hourglass allows to add a second base enchant to any equipment that has 1 base and a special enchant\n(right-click on an item with a base enchant to use)"
-	Game.ItemsTxt[1067].Notes="Oracle's Orb is a mysterious and powerful artifact, a large, purple orb with a haunting face suspended within its core. This enigmatic relic is known for bestowing legendary abilities upon items it enchants.\n\n Adds the following legendary power to an item:"
+	Game.ItemsTxt[1067].Notes="Oracle's Orb is a mysterious and powerful artifact, a large, purple orb with a haunting face suspended within its core. This enigmatic relic is known for storing legendary abilities upon items it enchants.\n\n Adds the following legendary power to an item:"
 end
