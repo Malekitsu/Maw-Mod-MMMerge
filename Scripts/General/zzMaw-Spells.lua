@@ -2517,7 +2517,7 @@ if buffRework then
 	buffSpellList={1,3,12,14,21,25,27,28,36,56,58,69,5,8,17,38,46,47,50,51,71,73,75,83,85,86,95,124}
 	utilityBuffs={16,19,11,7,18}
 	
-	mawPartyBuffList={6,0,17,4,12,1,8,10,14,15,9,13,2,16,19,7,18}
+	mawPartyBuffList={6,0,17,4,12,1,8,10,14,15,9,13,2,16,19,18}
 	mawPartyBuffIgnore={16,19,11,7,18}
 	mawSingleBuffList={1,4,11,12,6,10}
 	
@@ -2698,12 +2698,12 @@ if buffRework then
 							Party[i].SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
 						end
 					elseif utilitySpell[buff] and utilitySpell[buff].PartyBuff then
-						--if buff~=19 or (not Party.EnemyDetectorYellow and not Party.EnemyDetectorRed) then --Invisibility
-							local buffId=utilitySpell[buff].PartyBuff
+						local buffId=utilitySpell[buff].PartyBuff
+						if buffId~=7 or (not Party.EnemyDetectorYellow and not Party.EnemyDetectorRed) then --fly
 							Party.SpellBuffs[buffId].Caster=4 --crashes otherwise
 							Party.SpellBuffs[buffId].Bits=1 --allow fly
 							Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
-						--end
+						end
 					end	
 				end
 			end
