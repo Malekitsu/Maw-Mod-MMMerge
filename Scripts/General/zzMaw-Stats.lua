@@ -1076,11 +1076,11 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	
 	--shield buff
 	if Party.SpellBuffs[14].ExpireTime>=Game.Time then
-		local skill=getBuffSkill(17)
+		local s,m=getBuffSkill(17)
 		local s2,m2=getBuffSkill(86)
 		s=math.max(s,s2/1.5)
 		m=math.max(m,m2)
-		damage=damage*(0.9-0.002*skill)
+		damage=damage*(0.9-0.002*s)
 	end
 			
 	
