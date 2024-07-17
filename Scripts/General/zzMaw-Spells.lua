@@ -1264,7 +1264,7 @@ function events.GameInitialized2()
 			[9] = {dmgAdd = 2, diceMin = 1, diceMax = 1, },--meteor shower
 			[10] = {dmgAdd = 12, diceMin = 1, diceMax = 7, },--inferno
 			[11] = {dmgAdd = 18, diceMin = 1, diceMax = 18, },--incinerate
-			[15] = {dmgAdd = 3, diceMin = 1, diceMax = 4, },--sparks
+			[15] = {dmgAdd = 0, diceMin = 1, diceMax = 5, },--sparks
 			[18] = {dmgAdd = 13, diceMin = 1, diceMax = 8, },--lightning bolt
 			[20] = {dmgAdd = 20, diceMin = 1, diceMax = 12, },--implosion
 			[22] = {dmgAdd = 5, diceMin = 1, diceMax = 1, },--starburst
@@ -1556,7 +1556,7 @@ function ascension()
 		Game.SpellsTxt[10].Description=string.format("Inferno burns all monsters in sight when cast, excluding your characters.  One or two castings can clear out a room of weak or moderately powerful creatures. Each monster takes %s points of damage plus %s per point of skill in Fire Magic.  This spell only works indoors.",dmgAddTooltip(s, m,10),diceMaxTooltip(s, m,10))
 		Game.SpellsTxt[11].Description=string.format("Among the strongest direct damage spells available, Incinerate inflicts massive damage on a single target.  Only the strongest of monsters can expect to survive this spell.  Damage is %s points plus 1-%s per point of skill in Fire Magic.",dmgAddTooltip(s, m,11),diceMaxTooltip(s, m,11))
 		Game.SpellsTxt[15].Description=string.format("Sparks fires small balls of lightning into the world that bounce around until they hit something or dissipate. It is hard to tell where they will go, so this spell is best used in a room crowded with small monsters. Each spark does %s points plus 1-%s per point of skill in Air Magic.",dmgAddTooltip(s, m,15),diceMaxTooltip(s, m,15))
-		Game.SpellsTxt[18].Description=string.format("Lightning Bolt discharges electricity from the caster's hand to a single target.  It always hits and does %s + 1-%s points of damage per point of skill in Air Magic.",dmgAddTooltip(s, m,18),diceMaxTooltip(s, m,18))
+		Game.SpellsTxt[18].Description=string.format("Lightning Bolt discharges electricity from the caster's hand to a single target.  It always hits and does 1-%s points of damage per point of skill in Air Magic.",dmgAddTooltip(s, m,18),diceMaxTooltip(s, m,18))
 		Game.SpellsTxt[20].Description=string.format("Implosion is a nasty spell that affects a single target by destroying the air around it, causing a sudden inrush from the surrounding air, a thunderclap, and %s points plus 1-%s points of damage per point of skill in Air Magic.",dmgAddTooltip(s, m,20),diceMaxTooltip(s, m,20))
 		Game.SpellsTxt[22].Description=string.format("Calls stars from the heavens to smite and burn your enemies.  Twenty stars are called, and the damage for each star is %s points plus %s per point of skill in Air Magic. Try not to get caught in the blast! This spell only works outdoors.",dmgAddTooltip(s, m,22),diceMaxTooltip(s, m,22))
 		Game.SpellsTxt[24].Description=string.format("Sprays poison at monsters directly in front of your characters.  Damage is low, but few monsters have resistance to Water Magic, so it usually works.  Each shot does %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,24),diceMaxTooltip(s, m,24))
