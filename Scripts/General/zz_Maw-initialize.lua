@@ -7,6 +7,7 @@ manaPotionKey=86
 Game.PatchOptions.FixMonstersBlockingShots=true
 buffRework=true
 restoreMM6Glory=true
+disableDamageOnFriendlyUnits=true
 
 function events.GameInitialized2()
 	for i=0,11 do
