@@ -2551,12 +2551,7 @@ if restoreMM6Glory then
 	end
 
 	function events.Tick()
-		lastTickTime=lastTickTime or Game.Time
-		if lastTickTime==Game.Time then
-			return
-		else
-			lastTickTime=Game.Time
-		end
+		if Game.Paused then return end
 		for i=0, Map.Objects.High do
 			local obj=Map.Objects[i]
 			lastLocation=lastLocation or {}
@@ -2656,6 +2651,21 @@ if restoreMM6Glory then
 			else
 				lastLocation[i]={obj.X, obj.Y}
 			end
+			
+			--MAKE GM BOW SHOOTING FIRE ARROW
+			if obj.Type==545 and obj.Owner%8==4 then
+				local id=math.floor(obj.Owner/8)
+				for j=0, Party.High do
+					if Party[j]:GetIndex()==id then
+						local pl=Party[j]
+						local s,m=SplitSkill(pl.Skills[const.Skills.Bow])
+						if m==4 then
+							obj.Type=550
+							obj.TypeIndex=427
+						end
+					end
+				end
+			end
 		end
 	end
 
@@ -2667,3 +2677,4 @@ if restoreMM6Glory then
 		end 
 	end
 end
+
