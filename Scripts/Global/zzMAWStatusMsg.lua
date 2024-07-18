@@ -1,4 +1,10 @@
 function events.CalcDamageToMonster(t)
+	
+	-- disable damage on friendly units
+	if disableDamageOnFriendlyUnits and t.Player and t.Monster and t.Monster.Hostile==false then
+		t.Result=0
+	end
+	
 	if t.Result==0 then return end
 	local data=WhoHitMonster()
 	divide=1
