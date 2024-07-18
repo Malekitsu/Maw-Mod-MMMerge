@@ -1,7 +1,7 @@
 function events.CalcDamageToMonster(t)
 	
 	-- disable damage on friendly units
-	if disableDamageOnFriendlyUnits and t.Player and t.Monster and t.Monster.Hostile==false then
+	if disableDamageOnFriendlyUnits and t.Player and t.Monster and t.Monster.Hostile==false and t.Monster.ShowAsHostile==false then
 		t.Result=0
 	end
 	
