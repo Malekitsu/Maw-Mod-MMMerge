@@ -2518,7 +2518,7 @@ if buffRework then
 	utilityBuffs={16,19,11,18}
 	
 	mawPartyBuffList={6,0,17,4,12,1,8,10,14,15,9,13,2,16,19,18}
-	mawPartyBuffIgnore={16,19,11,18}
+	mawPartyBuffIgnore={16,19,11,18,10}
 	mawSingleBuffList={1,4,11,12,6,10}
 	
 	buffPower={ --values are inteneded as % and /1000 for scaling
@@ -2705,6 +2705,9 @@ if buffRework then
 						Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
 						--end
 					end	
+				end
+				if vars.mawbuff[8] then
+					Party.SpellBuffs[10].Caster=vars.mawbuff[8]+1
 				end
 			end
 		end
