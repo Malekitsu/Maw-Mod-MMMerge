@@ -2653,7 +2653,7 @@ if buffRework then
 			end
 		end
 		local s, m=getBuffSkill(1)
-		Party.SpellBuffs[16].Power=m
+		Party.SpellBuffs[16].Power=m+1
 		for j=0, Party.High do
 			local pl=Party[j]
 			--[[for i=0, pl.SpellBuffs.High do
@@ -2700,7 +2700,7 @@ if buffRework then
 					elseif utilitySpell[buff] and utilitySpell[buff].PartyBuff then
 						local buffId=utilitySpell[buff].PartyBuff
 						--if buffId~=7 or (not Party.EnemyDetectorYellow and not Party.EnemyDetectorRed and Map.IndoorOrOutdoor==2) then --fly
-						Party.SpellBuffs[buffId].Caster=4 --crashes otherwise
+						Party.SpellBuffs[buffId].Caster=vars.mawbuff[buff]+1 --crashes otherwise
 						Party.SpellBuffs[buffId].Bits=1 --allow fly
 						Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
 						--end
