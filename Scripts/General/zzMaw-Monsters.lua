@@ -2518,148 +2518,150 @@ end
 -------------------
 --MM6 PROJECTILES--
 -------------------
-transform={
-		[500]=734,
-		[505]=739,
-		[510]=712,
-		[515]=732,
-		[535]=740,
-		[540]=737,
-		[555]=736,
-		[1010]=712
-}
-explosions={
-		[734]=723,
-		[739]=721,
-		[712]=711,
-		[732]=718,
-		[740]=715,
-		[737]=719,
-		[736]=722,
-}
-transformedList={734,739,712,732,740,737,736}
+if restoreMM6Glory then
+	transform={
+			[500]=734,
+			[505]=739,
+			[510]=712,
+			[515]=732,
+			[535]=740,
+			[540]=737,
+			[555]=736,
+			[1010]=712
+	}
+	explosions={
+			[734]=723,
+			[739]=721,
+			[712]=711,
+			[732]=718,
+			[740]=715,
+			[737]=719,
+			[736]=722,
+	}
+	transformedList={734,739,712,732,740,737,736}
 
-Game.ObjListBin[1].SFTGroup 
+	Game.ObjListBin[1].SFTGroup 
 
-function events.Tick()
-	for i=0, Map.Objects.High do
-		local obj=Map.Objects[i]
-		if transform[obj.Type] and obj.Owner%8==3 then
-			obj.Type=transform[obj.Type]
-			obj.TypeIndex=obj.Type-160
-		end		
-	end
-end
-
-function events.Tick()
-	lastTickTime=lastTickTime or Game.Time
-	if lastTickTime==Game.Time then
-		return
-	else
-		lastTickTime=Game.Time
-	end
-	for i=0, Map.Objects.High do
-		local obj=Map.Objects[i]
-		lastLocation=lastLocation or {}
-		lastLocation[i]=lastLocation[i] or {math.huge,math.huge}
-		local dist=getDistance(obj.X,obj.Y,obj.Z)
-		if table.find(transformedList, obj.Type) and (dist<160 or (obj.X==lastLocation[i][1] and obj.Y==lastLocation[i][2])) then
-			obj.Type=explosions[obj.Type]
-			obj.TypeIndex=obj.Type-160
-			obj.VelocityX=0
-			obj.VelocityY=0
-			obj.VelocityZ=0
-			obj.Velocity[1]=0
-			obj.Velocity[2]=0
-			obj.Velocity[0]=0
-			lastLocation[i]={math.huge,math.huge}
-			--get data
-			local id=math.floor(obj.Owner/8)
-			if dist<200 then
-				--calculate damage
-				local id=math.floor(obj.Owner/8)
-				local mon=Map.Monsters[math.floor(obj.Owner/8)]
-				local action=0
-				if obj.SpellSkill~=0 then
-					action=0
-				end
-				mawCustomMonObj={["Monster"]=mon, 
-								["Object"]=obj,
-								["MonsterAction"]=action,
-								["MonsterIndex"]=id,
-								["ObjectIndex"]=i,
-								["Spell"]=obj.Spell,
-								["SpellMastery"]=obj.SpellMastery,
-								["SpellSkill"]=obj.SpellSkill,
-								}
-				
-				--cover code
-				local list={}
-				for k=0,Party.High do
-					if Party[k]:IsConscious() then
-						table.insert(list,k)
-					end
-				end
-				
-				local target=math.random(1,#list)
-				target=list[target] or 0
-				local masteryRequired=2
-				if not vars.covering then
-					vars.covering={}
-					for i=0,4 do
-						vars.covering[i]=true
-					end
-				end
-				cover={}
-				for i=0,Party.High do
-					local s, m= SplitSkill(Skillz.get(Party[i], 50))
-					if s>0 and vars.covering[i] and m>=masteryRequired and i~=target then
-						cover[i]={["Chance"]=1-(0.99^s-0.05),["Mastery"]= m}
-						if coverBonus[i] then
-							cover[i].Chance=cover[i].Chance+0.3
-							coverBonus[i]=false
-						end
-					else
-						cover[i]=false
-					end
-				end
-				
-				--roll once per player with player and pick the one with max hp
-				coverPlayerIndex=-1
-				lastMaxHp=0
-				covered=false
-				for i=0,#cover-1 do
-					if cover[i] then
-						local hp=Party[i].HP/Party[i]:GetFullHP()
-						if cover[i].Chance>math.random() and hp>lastMaxHp then
-							lastMaxHp=hp
-							coverPlayerIndex=i
-							covered=true
-						end
-					end
-				end
-				if covered then
-					mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Shield, target)
-					Party[coverPlayerIndex]:ShowFaceAnimation(14)
-					Game.ShowStatusText(Party[coverPlayerIndex].Name .. " cover " .. Party[target].Name)
-					target=coverPlayerIndex
-					local pl=Party[target]
-					local id=pl:GetIndex()
-					if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 23) then
-						evt[target].Add("HP", Party[target]:GetFullHP()*0.03)
-					end
-				end		
-				
-				--apply damage
-				Party[target]:DoDamage(10000,mon.Attack1.Type)
-				mawCustomMonObj=false
-			end
-		else
-			lastLocation[i]={obj.X, obj.Y}
+	function events.Tick()
+		for i=0, Map.Objects.High do
+			local obj=Map.Objects[i]
+			if transform[obj.Type] and obj.Owner%8==3 then
+				obj.Type=transform[obj.Type]
+				obj.TypeIndex=obj.Type-160
+			end		
 		end
 	end
-end
 
-function events.GameInitialized2()
-	Game.ObjListBin[558].LifeTime=160 --for some stupid reason if I don't do this explosions don't disappear
+	function events.Tick()
+		lastTickTime=lastTickTime or Game.Time
+		if lastTickTime==Game.Time then
+			return
+		else
+			lastTickTime=Game.Time
+		end
+		for i=0, Map.Objects.High do
+			local obj=Map.Objects[i]
+			lastLocation=lastLocation or {}
+			lastLocation[i]=lastLocation[i] or {math.huge,math.huge}
+			local dist=getDistance(obj.X,obj.Y,obj.Z)
+			if table.find(transformedList, obj.Type) and (dist<160 or (obj.X==lastLocation[i][1] and obj.Y==lastLocation[i][2])) then
+				obj.Type=explosions[obj.Type]
+				obj.TypeIndex=obj.Type-160
+				obj.VelocityX=0
+				obj.VelocityY=0
+				obj.VelocityZ=0
+				obj.Velocity[1]=0
+				obj.Velocity[2]=0
+				obj.Velocity[0]=0
+				lastLocation[i]={math.huge,math.huge}
+				--get data
+				local id=math.floor(obj.Owner/8)
+				if dist<200 then
+					--calculate damage
+					local id=math.floor(obj.Owner/8)
+					local mon=Map.Monsters[math.floor(obj.Owner/8)]
+					local action=0
+					if obj.SpellSkill~=0 then
+						action=0
+					end
+					mawCustomMonObj={["Monster"]=mon, 
+									["Object"]=obj,
+									["MonsterAction"]=action,
+									["MonsterIndex"]=id,
+									["ObjectIndex"]=i,
+									["Spell"]=obj.Spell,
+									["SpellMastery"]=obj.SpellMastery,
+									["SpellSkill"]=obj.SpellSkill,
+									}
+					
+					--cover code
+					local list={}
+					for k=0,Party.High do
+						if Party[k]:IsConscious() then
+							table.insert(list,k)
+						end
+					end
+					
+					local target=math.random(1,#list)
+					target=list[target] or 0
+					local masteryRequired=2
+					if not vars.covering then
+						vars.covering={}
+						for i=0,4 do
+							vars.covering[i]=true
+						end
+					end
+					cover={}
+					for i=0,Party.High do
+						local s, m= SplitSkill(Skillz.get(Party[i], 50))
+						if s>0 and vars.covering[i] and m>=masteryRequired and i~=target then
+							cover[i]={["Chance"]=1-(0.99^s-0.05),["Mastery"]= m}
+							if coverBonus[i] then
+								cover[i].Chance=cover[i].Chance+0.3
+								coverBonus[i]=false
+							end
+						else
+							cover[i]=false
+						end
+					end
+					
+					--roll once per player with player and pick the one with max hp
+					coverPlayerIndex=-1
+					lastMaxHp=0
+					covered=false
+					for i=0,#cover-1 do
+						if cover[i] then
+							local hp=Party[i].HP/Party[i]:GetFullHP()
+							if cover[i].Chance>math.random() and hp>lastMaxHp then
+								lastMaxHp=hp
+								coverPlayerIndex=i
+								covered=true
+							end
+						end
+					end
+					if covered then
+						mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Shield, target)
+						Party[coverPlayerIndex]:ShowFaceAnimation(14)
+						Game.ShowStatusText(Party[coverPlayerIndex].Name .. " cover " .. Party[target].Name)
+						target=coverPlayerIndex
+						local pl=Party[target]
+						local id=pl:GetIndex()
+						if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 23) then
+							evt[target].Add("HP", Party[target]:GetFullHP()*0.03)
+						end
+					end		
+					
+					--apply damage
+					Party[target]:DoDamage(10000,mon.Attack1.Type)
+					mawCustomMonObj=false
+				end
+			else
+				lastLocation[i]={obj.X, obj.Y}
+			end
+		end
+	end
+
+	function events.GameInitialized2()
+		Game.ObjListBin[558].LifeTime=160 --for some stupid reason if I don't do this explosions don't disappear
+	end
 end
