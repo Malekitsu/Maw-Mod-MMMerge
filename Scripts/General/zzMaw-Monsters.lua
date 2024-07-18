@@ -2660,6 +2660,10 @@ if restoreMM6Glory then
 	end
 
 	function events.GameInitialized2()
-		Game.ObjListBin[558].LifeTime=160 --for some stupid reason if I don't do this explosions don't disappear
+		for i=540, 558 do
+			if Game.ObjListBin[i].Speed==0 then
+				Game.ObjListBin[i].LifeTime=80 --for some stupid reason if I don't do this explosions don't disappear
+			end
+		end 
 	end
 end
