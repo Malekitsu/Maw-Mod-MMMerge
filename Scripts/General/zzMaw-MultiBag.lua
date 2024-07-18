@@ -223,10 +223,8 @@ function events.KeyDown(t)
 					itemSizeMap[i][2]=2
 				end	
 			end
-			Game.ShowStatusText("MultiBag Sort disabled until next release (bugged)")
-			return
-            --sortMultiBag(Party[Game.CurrentPlayer])
-            --Game.ShowStatusText("Inventory sorted")
+            sortMultibag()
+            Game.ShowStatusText("Inventory sorted")
 		end
 	end
 end
