@@ -2576,8 +2576,8 @@ function itemStats(index)
 	return tab
 end
 
-armsmasterAttack={0,1,2,2}
-armsmasterDamage={1,2,3,4}
+armsmasterAttack={[0]=0,0,1,2,2}
+armsmasterDamage={[0]=0,1,2,3,4}
 
 equipSpellMap={
 	[30] = const.Skills.Fire,
