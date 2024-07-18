@@ -2708,6 +2708,7 @@ if buffRework then
 				end
 			end
 		end
+		mawRefresh("all")
 	end
 	
 	function buffManaLock()
