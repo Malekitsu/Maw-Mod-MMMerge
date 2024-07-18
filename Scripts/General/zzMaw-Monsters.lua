@@ -1906,7 +1906,7 @@ function events.MonsterKilled(mon)
 				if not Game.freeProgression then
 					mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)
 				end
-				experience=math.ceil(m^0.7*(mapLevel*20+mapLevel^1.8)/3/1000)*1000
+				local experience=math.ceil(m^0.7*(mapLevel*20+mapLevel^1.8)/3/1000)*1000
 				--bolster code
 				bonusExp=experience
 				local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
@@ -1932,8 +1932,10 @@ function events.MonsterKilled(mon)
 				if m>250 and mapLevel>90 then
 					evt.Add("Items", 1063)
 				end
-				evt.ForPlayer("All")
-				evt.Add{"Experience", Value = experience}
+				experience=experience*5/Party.Count
+				for i=0,Party.High do
+					evt[i].Add{"Experience", Value = experience}
+				end
 				Game.EscMessage(string.format("Dungeon Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Material"))
 				mapvars.completed=true
 				vars.dungeonCompletedList=vars.dungeonCompletedList or {}
