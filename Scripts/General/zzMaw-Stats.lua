@@ -612,7 +612,7 @@ end
 
 --reduce damage by %
 function events.CalcDamageToPlayer(t)
-	data=WhoHitPlayer()
+	data=mawCustomMonObj or WhoHitPlayer()
 	pl=t.Player
 	
 	--dodging DODGE 
@@ -716,7 +716,6 @@ function events.CalcDamageToPlayer(t)
 	
 	--apply Damage
 	--modify spell damage as it's not handled in maw-monsters
-	data=WhoHitPlayer()
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
 		oldLevel=BLevel[data.Monster.Id]
 		local i=data.Monster.Id
