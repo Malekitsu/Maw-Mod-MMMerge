@@ -2540,8 +2540,6 @@ if restoreMM6Glory then
 	}
 	transformedList={734,739,712,732,740,737,736}
 
-	Game.ObjListBin[1].SFTGroup 
-
 	function events.Tick()
 		for i=0, Map.Objects.High do
 			local obj=Map.Objects[i]
