@@ -2411,7 +2411,6 @@ function itemStats(index)
 	
 	--enlighnenment
 	local manaScaling=Game.Classes.SPFactor[pl.Class]
-	local s,m=SplitSkill(Skillz.get(pl,52))
 	local manaType=Game.Classes.SPStats[pl.Class]
 	local totalMana=manaScaling*pl.LevelBase+Game.Classes.SPBase[pl.Class]
 	local effect=0
@@ -2443,12 +2442,16 @@ function itemStats(index)
 			effect=effect+math.floor(stat/5)
 		end
 	end
-	totalMana=totalMana+manaScaling*effect
-	if m==4 then
-		m=5
+	local s2,m2=SplitSkill(pl:GetSkill(const.Skills.Meditation))
+	if m2==4 then
+		m2=5
 	end
-	local meditationIncrease=totalMana*math.min((m+1),5)*s/100
-	tab[9]=tab[9]+meditationIncrease
+	effect=effect+s2*m2
+	totalMana=totalMana+manaScaling*effect+tab[9]
+	
+	local s,m=SplitSkill(Skillz.get(pl,52))
+	local enlightIncrease=totalMana*(1+math.min((m+1),5)/100)^s-totalMana
+	tab[9]=tab[9]+enlightIncrease+manaScaling*s2*m2
 	
 	ACBONUS=0
 	for i=0,3 do 
