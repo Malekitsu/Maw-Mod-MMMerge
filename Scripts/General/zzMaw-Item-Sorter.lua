@@ -383,9 +383,42 @@ function sortMultibag()
 end	
 
 
+--[[
+function events.KeyDown(t)
+    if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 103 then
+        if t.Key == const.Keys.L then
+			local pl=Party[Game.CurrentPlayer]
+			vars.inventoryLocked=vars.inventoryLocked or {}
+			vars.inventoryLocked[Game.CurrentPlayer]=vars.inventoryLocked[Game.CurrentPlayer] or {}
+			if vars.mawbags[pl:GetIndex()] and vars.mawbags[pl:GetIndex()].CurrentBag then
+				table.insert(vars.inventoryLocked[Game.CurrentPlayer], vars.mawbags[pl:GetIndex()].CurrentBag)
+				Game.ShowStatusText("Inventory number " .. vars.mawbags[pl:GetIndex()].CurrentBag .. " will not be sorted with C"
+			else
+				table.insert(vars.inventoryLocked[Game.CurrentPlayer],1)
+				Game.ShowStatusText("Inventory number " .. 1 .. " will not be sorted with C")
+			end
+		end
+	end
+end
+]]
 
-
-
+function events.KeyDown(t)
+    if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 103 then
+        if t.Key == 67 then
+			if vars.SmallerPotionBottles then
+				for i=220, 299 do
+					itemSizeMap[i][2]=1
+				end	
+			else
+				for i=220, 299 do
+					itemSizeMap[i][2]=2
+				end	
+			end
+            sortMultibag()
+            Game.ShowStatusText("Inventory sorted")
+		end
+	end
+end
 
 
 -- Define the alchemyItemsOrder list for reference in sorting
