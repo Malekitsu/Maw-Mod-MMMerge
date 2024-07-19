@@ -948,6 +948,10 @@ function getAscensionTier(skill,spellID)
 	elseif spelltier<=skill%11  then
 		ascensionTier=ascensionTier+1
 	end
+	local id=Party[Game.CurrentPlayer]:GetIndex()
+	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 25) then
+		ascensionTier=ascensionTier+1
+	end
 	return ascensionTier
 end
 
