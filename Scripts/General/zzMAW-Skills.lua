@@ -1044,13 +1044,13 @@ function MawRegen()
 					FSP=math.max(math.ceil(currentManaPool[i]),0)
 					
 				end
-				regenSP[i] = regenSP[i] + (FSP^0.35*RegS^1.75*((RegM+5)/12000) +0.02)* timeMultiplier*mult
+				regenSP[i] = regenSP[i] + (FSP^0.2*RegS^1.75*((RegM+5)/7000) +0.02)* timeMultiplier*mult
 				
 				--meditation buff
 				if buffRework and vars.mawbuff[56] then
 					local s, m, level=getBuffSkill(56)
-					local level=level^0.65
-					regenSP[i] = regenSP[i] + (FSP^0.35*level^1.75*((buffPower[56].Base[m])/30000) +0.1)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
+					local level=level^0.6
+					regenSP[i] = regenSP[i] + (FSP^0.2*level^1.75*((buffPower[56].Base[m])/20000) +0.1)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
 				end
 				--dragon regen
 				if pl.Class==10 then
@@ -1092,14 +1092,14 @@ function events.Tick()
 		--meditation tooltip
 		local FSP=pl:GetFullSP()
 		if buffRework and currentManaPool and currentManaPool[i] then
-			fullSP=currentManaPool[Game.CurrentPlayer]
+			FSP=currentManaPool[Game.CurrentPlayer]
 		end
 		local s,m = SplitSkill(pl:GetSkill(28))
 		if m==4 then
 			m=8
 		end
-		local spRegen = (FSP^0.35*s^1.75*((m+5)/120)+2)/10
-		local spRegen2 = (FSP^0.35*(s+1)^1.75*((m+5)/120)+2)/10
+		local spRegen = (FSP^0.2*s^1.75*((m+5)/70)+2)/10
+		local spRegen2 = (FSP^0.2*(s+1)^1.75*((m+5)/70)+2)/10
 		local spRegen2 = math.round((spRegen2-spRegen)*100)/100
 		if spRegen>10 then
 			spRegen = math.round((spRegen)*10)/10
