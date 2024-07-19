@@ -211,23 +211,7 @@ end
 --sortMultiBag(Party[0])
 --debug.Message(dump(tempBag))
 
-function events.KeyDown(t)
-    if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 103 then
-        if t.Key == 67 then
-			if vars.SmallerPotionBottles then
-				for i=220, 299 do
-					itemSizeMap[i][2]=1
-				end	
-			else
-				for i=220, 299 do
-					itemSizeMap[i][2]=2
-				end	
-			end
-            sortMultibag()
-            Game.ShowStatusText("Inventory sorted")
-		end
-	end
-end
+
 
 
 function sortMultiBag(pl)
