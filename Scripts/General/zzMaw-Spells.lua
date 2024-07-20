@@ -937,7 +937,7 @@ end
 ]]
 
 --ascension tier 
-function getAscensionTier(skill,spellID)
+function getAscensionTier(skill,spellID, index)
 	local spelltier=spellID%11
 	if spelltier==0 then
 		spelltier=11
@@ -948,7 +948,7 @@ function getAscensionTier(skill,spellID)
 	elseif spelltier<=skill%11  then
 		ascensionTier=ascensionTier+1
 	end
-	local id=Party[Game.CurrentPlayer]:GetIndex()
+	local id=index or Party[Game.CurrentPlayer]:GetIndex()
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 25) then
 		ascensionTier=ascensionTier+1
 	end
@@ -1321,7 +1321,7 @@ function events.CalcSpellDamage(t)
 	local data=WhoHitMonster()
 	if data and data.Player then
 		local s,m = SplitSkill(data.Player.Skills[const.Skills.Learning])
-		diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, t.Spell)
+		diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, t.Spell, data.Player:GetIndex())
 	end
 	--calculate
 	if t.Spell>1 and t.Spell<132 then
@@ -1388,7 +1388,7 @@ function events.CalcDamageToMonster(t)
 end
 
 
-function ascendSpellDamage(skill, mastery, spell)
+function ascendSpellDamage(skill, mastery, spell, index)
 	--empower spell buff
 	local empowerMult=1
 	if buffRework and vars.mawbuff[28] then
@@ -1399,7 +1399,7 @@ function ascendSpellDamage(skill, mastery, spell)
 	diceMin=spellPowers[spell].diceMin*empowerMult
 	diceMax=spellPowers[spell].diceMax*empowerMult
 	damageAdd=spellPowers[spell].dmgAdd*empowerMult
-	local ascensionLevel=getAscensionTier(skill,spell)
+	local ascensionLevel=getAscensionTier(skill,spell,index)
 	if ascensionLevel>0 then
 		-- old formula
 		--diceMax=diceMax * (1+0.04 * skill * ascensionLevel)
