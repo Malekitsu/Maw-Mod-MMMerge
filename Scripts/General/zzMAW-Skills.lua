@@ -1100,7 +1100,7 @@ function events.Tick()
 		end
 		local spRegen = (FSP^0.2*s^1.75*((m+5)/35)+2)/10
 		local spRegen2 = (FSP^0.2*(s+1)^1.75*((m+5)/35)+2)/10
-		local spRegen2 = math.round((spRegen2-spRegen)*50)/100
+		local spRegen2 = math.round((spRegen2-spRegen)*100)/100
 		if spRegen>10 then
 			spRegen = math.round((spRegen)*10)/10
 		else
