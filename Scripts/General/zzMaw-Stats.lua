@@ -352,13 +352,13 @@ function events.BuildStatInformationBox(t)
 		if m==4 then
 			m=8
 		end
-		local medRegen = math.round(fullSP^0.2*s^1.75*(m+5)/70)+2
+		local medRegen = math.round(fullSP^0.2*s^1.75*(m+5)/35)+2
 		
 		--meditation buff
 		if buffRework and vars.mawbuff[56] then
 			local s, m, level=getBuffSkill(56)
 			local level=level^0.6
-			medRegen = medRegen + math.round((fullSP^0.2*level^1.75*((buffPower[56].Base[m])/200) +10)*(1+buffPower[56].Scaling[m]/100*s))
+			medRegen = medRegen + math.round((fullSP^0.2*level^1.75*((buffPower[56].Base[m])/100) +10)*(1+buffPower[56].Scaling[m]/100*s))
 		end
 		
 		local SPregenItem=0
