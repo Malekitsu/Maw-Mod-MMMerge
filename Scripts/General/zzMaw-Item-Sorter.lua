@@ -329,14 +329,20 @@ function sortMultibag()
 	
 	changeBag(pl , 1)
 	local currentBag=1
+	local currentAlchemyBag=1
 	local i=1
 	if itemList[1] then
 		vars.alchemyPlayer=vars.alchemyPlayer or -1
 		lastPlayer=Game.CurrentPlayer
 		while i<=#itemList do
-			if vars.alchemyPlayer>=0 then
+			local alchemyItem=false
+			local alchemyPlayer=Party[vars.alchemyPlayer]
+			if vars.alchemyPlayer>=0 and vars.alchemyPlayer~=Game.CurrentPlayer then
 				if table.find(alchemyItemsOrder,itemList[i].Number) or (itemList[i].Number>=220 and itemList[i].Number<300) then
 					Game.CurrentPlayer=vars.alchemyPlayer
+					alchemyItem=true
+					changeBag(pl , 0)
+					changeBag(alchemyPlayer , currentAlchemyBag)
 				end
 			end
 			evt.Add("Items", itemList[i].Number)
@@ -359,15 +365,30 @@ function sortMultibag()
 			evt.Add("Items", 0) --to give item to proper player
 			local obj=GrabObjects()
 			i=i+1
-			if not obj then
-				currentBag=1
-				changeBag(pl , 1)
-			elseif currentBag~=5 then
-				changeBag(pl , currentBag+1)
-				currentBag=currentBag+1
-				obj.Type=0
-				obj.TypeIndex=0
-				i=i-1
+			
+			if not alchemyItem then
+				if not obj then
+					currentBag=1
+					changeBag(pl , 1)
+				elseif currentBag~=5 then
+					changeBag(pl , currentBag+1)
+					currentBag=currentBag+1
+					obj.Type=0
+					obj.TypeIndex=0
+					i=i-1
+				end
+			else
+				if not obj then
+					changeBag(alchemyPlayer , 0)
+					changeBag(pl , 1)
+					currentAlchemyBag=1
+				elseif alchemyItem and currentAlchemyBag~=5 then
+					changeBag(alchemyPlayer , currentAlchemyBag+1)
+					currentAlchemyBag=currentAlchemyBag+1
+					obj.Type=0
+					obj.TypeIndex=0
+					i=i-1
+				end
 			end
 			Game.CurrentPlayer=lastPlayer
 		end
