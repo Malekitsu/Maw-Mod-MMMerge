@@ -691,7 +691,7 @@ function events.CalcDamageToPlayer(t)
 	--properly calculate friendly fire damage
 	if data and data.Player and data.Spell and data.Spell<133 and data.Spell>0 and data.Spell~=123 then	
 		local s,m = SplitSkill(data.Player.Skills[const.Skills.Learning])
-		local diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, data.Spell)
+		local diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, data.Spell,data.Player:GetIndex())
 		local damage=damageAdd
 		for i=1, data.SpellSkill do
 			damage=damage+math.random(diceMin,diceMax)
