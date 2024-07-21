@@ -2558,6 +2558,17 @@ if buffRework then
 				vars.mawbuff[buffSpellList[i]]=false		
 			end
 		end	
+		--remove buffs from pedestal/scrolls if going into another outside map
+		if Map.IsOutdoor() then
+			for i=1, #buffSpellList do
+				local buff=buffSpellList[i]
+				if vars.mawbuff[buff] then
+					if type(vars.mawbuff[buff])=="string" and vars.mawbuff[buff]~=Map.Name then
+						vars.mawbuff[buff]=false
+					end
+				end
+			end
+		end
 	end
 
 	function events.Action(t)
@@ -2571,8 +2582,17 @@ if buffRework then
 
 	function events.PlayerCastSpell(t)
 		if buffSpell[t.SpellId] or utilitySpell[t.SpellId] then
-			t.Handled=true
-			mawBuffCast(t.Player, t.PlayerIndex, t.SpellId)
+			--fix scrolls and pedestals
+			if t.TargetKind==4 or t.IsSpellScroll then
+				vars.mawbuff[t.SpellId]=Map.Name
+				function events.Tick()
+					events.Remove("Tick",1)
+					mawBuffApply()
+				end
+			else
+				t.Handled=true
+				mawBuffCast(t.Player, t.PlayerIndex, t.SpellId)
+			end
 		end
 	end
 	
@@ -2679,7 +2699,7 @@ if buffRework then
 			local buff=buffSpellList[i]
 			if vars.mawbuff[buff] then
 				local pl=GetPlayerFromIndex(vars.mawbuff[buff])
-				if pl and pl:IsConscious() then
+				if (pl and pl:IsConscious()) or type(vars.mawbuff[buff])=="string" then
 					if buff==85 then --day of protection
 						for i=1, #buffSpell[buff].MultiBuff do
 							local buffId=buffSpell[buff].MultiBuff[i]
@@ -2778,6 +2798,9 @@ if buffRework then
 	
 	function getBuffSkill(spell)
 		local id=vars.mawbuff[spell]
+		if type(id)=="string" then
+			return 7,3,40
+		end
 		local player=GetPlayerFromIndex(id)
 		if player and player:IsConscious() then
 			local school=11+math.ceil(spell/11)
@@ -2955,7 +2978,7 @@ if buffRework then
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
 		sp.Description = string.format("Reserve a flat amount of mana\nOnly useful outdoors, Water Walk lets your characters walk along the surface of water without sinking.\nThis effect remains active until deactivated or lose consciousness.")
-	end
+	end	
 end
 
 --store older Tooltips, need to be after any tooltip change
@@ -2965,3 +2988,4 @@ function events.GameInitialized2()
 		oldSpellTooltips[i]=Game.SpellsTxt[i].Description
 	end
 end
+
