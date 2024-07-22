@@ -27,7 +27,7 @@ end
 function events.AfterLoadMap()	
 	for i=0, Map.Monsters.High do
 		--SPEED
-		if Map.Monsters[i].Velocity>150 then
+		if Map.Monsters[i].Velocity>150 and Map.Monsters[i].Attack1.Missile==0 then
 			Map.Monsters[i].Velocity=(Map.Monsters[i].Velocity + (400 - Map.Monsters[i].Velocity) / 2 +100)
 		end
 		--fix broken spell levels
