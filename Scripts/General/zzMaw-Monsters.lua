@@ -1869,9 +1869,10 @@ function events.MonsterKilled(mon)
 	if Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.completed==nil then
 		n=Map.Monsters.Count
 		m=1
-		if mon.NameId>220 and mon.NameId<300 then
+		--[[if mon.NameId>220 and mon.NameId<300 then
 			m=15
 		end
+		]]
 		for i=0,Map.Monsters.High do
 			monster=Map.Monsters[i]
 			if monster.AIState==4 or monster.AIState==5 or monster.AIState==11 or monster.AIState==16 or monster.AIState==17 or monster.AIState==19 or monster.NameId>300 then
