@@ -722,9 +722,9 @@ function events.GameInitialized2()
 	craftWaitTime=craftWaitTime or 0
 end
 function events.Tick()
-	if enchanted then
-		craftWaitTime=30
-		enchanted=false
+	if craftingItemUsed then
+		craftWaitTime=60
+		craftingItemUsed=false
 	end
 	if craftWaitTime>0 then
 		craftWaitTime=craftWaitTime-1
@@ -879,6 +879,8 @@ end
 
 evt.PotionEffects[87] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+		if craftWaitTime>0 then return end
+		craftingItemUsed=true
 		if (t.BonusExpireTime>=10 and t.BonusExpireTime<1000) then
 			Mouse.Item.BonusStrength=t.BonusExpireTime
 			t.BonusExpireTime=2
