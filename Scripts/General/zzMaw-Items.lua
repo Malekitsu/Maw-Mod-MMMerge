@@ -296,9 +296,6 @@ function events.ItemGenerated(t)
 		end
 		--difficulty multiplier 
 		diffMult=math.max((Game.BolsterAmount-100)/1000+1,1)
-		if Game.BolsterAmount==600 then
-			diffMult=math.max((400-100)/1000+1,1)
-		end
 		--calculate chances
 		local p1=enc1Chance[pseudoStr]/100
 		local p2=enc2Chance[pseudoStr]/100
