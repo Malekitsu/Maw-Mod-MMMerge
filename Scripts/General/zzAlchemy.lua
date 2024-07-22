@@ -348,6 +348,11 @@ function events.BuildItemInformationBox(t)
 		t.Description=StrColor(255,255,153,"Restores " .. math.round(t.Item.Bonus^1.4)+20 .. " Spell Points") .. "\n" .. t.Description
 	end
 	if t.Item.Number==259 then
+		local id=Game.CurrentPlayer
+		if Game.CurrentPlayer<0 or Game.CurrentPlayer>Party.High then
+			id=0
+		end
+		index=Party[id]:GetIndex()
 		vars.expPot=vars.expPot or {}
 		vars.expPot[index]=vars.expPot[index] or 0
 		local percent=math.round(vars.expPot[index]/(pl.Exp-vars.expPot[index])*10000)/100
