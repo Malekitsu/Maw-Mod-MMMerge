@@ -2158,7 +2158,7 @@ function events.GameInitialized2() --to make the after all the other code
 				elseif skill=="Reflecting" then
 					if t.DamageKind~=4 then
 						reflectedDamage=true
-						Party[index]:DoDamage(t.Result,4) 
+						Party[index]:DoDamage(t.Result,t.DamageKind) 
 						reflectedDamage=false
 					end
 				elseif skill=="Adamantite" then
