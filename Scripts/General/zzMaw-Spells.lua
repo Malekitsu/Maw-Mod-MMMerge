@@ -1321,6 +1321,15 @@ function events.CalcSpellDamage(t)
 	local data=WhoHitMonster()
 	if data and data.Player then
 		local s,m = SplitSkill(data.Player.Skills[const.Skills.Learning])
+		if table.find(elementalistClass, data.Player.Class) then
+			s=0
+			m=4
+			for i=12,15 do
+				local skill = SplitSkill(data.Player.Skills[i])
+				s=s+skill
+			end
+			s=s/4
+		end
 		diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, t.Spell, data.Player:GetIndex())
 	end
 	--calculate
@@ -1528,6 +1537,15 @@ function ascension()
 		local level=pl.Skills[const.Skills.Learning]
 		lastLevel=level
 		local s,m = SplitSkill(level)
+		if table.find(elementalistClass, pl.Class) then
+			s=0
+			m=4
+			for i=12,15 do
+				local skill = SplitSkill(pl.Skills[i])
+				s=s+skill
+			end
+			s=s/4
+		end
 		for v=1,#spells do 
 			num=spells[v]
 			local ascensionLevel=getAscensionTier(s,num)
