@@ -158,8 +158,16 @@ function getSpellDelay(pl,spell)
 		local s, m=getBuffSkill(5)
 		hasteDiv=1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]/1000*s
 	end
-	
 	local delay=math.round(oldTable[spell][m]/(1+haste/100)*1.2^tier/hasteDiv)
+	if table.find(elementalistClass, pl.Class) then
+		delay=delay*1.5
+		local id=pl:GetIndex()
+		vars.eleStacks=vars.eleStacks or {}
+		vars.eleStacks[id]=vars.eleStacks[id] or 0
+		local stacks=vars.eleStacks[id]
+		local speedIncrease=1+stacks*0.1
+		delay=delay/speedIncrease
+	end
 	return delay
 end
 --remove AC from hit calculation and unarmed code from misctweaks
