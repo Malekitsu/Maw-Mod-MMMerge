@@ -1461,7 +1461,7 @@ eleOffSpellsIn={2,6,7,10,11,
 
 function events.Action(t)
 	if t.Action==105 then
-		if Game.CurrentPlayer>=0 and Game.Player<=Party.High then
+		if Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
 			local pl=Party[Game.CurrentPlayer]
 			if table.find(elementalistClass, pl.Class) then
 				pl.Spells[2]=true
