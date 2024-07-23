@@ -845,7 +845,7 @@ function events.Action(t)
 	if buffRework then
 		if t.Action==94 then
 			local i=t.Param-1
-			if i>=0 and i<=Party.Count then
+			if i>=0 and i<=Party.High then
 				local manaPool=math.round(currentManaPool[i]/maxManaPool[i]*1000)/10
 				Game.GlobalTxt[212]=StrColor(0,100,255,"Mana " .. manaPool .. "%")
 			end
