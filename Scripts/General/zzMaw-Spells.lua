@@ -1329,6 +1329,10 @@ function events.CalcSpellDamage(t)
 				s=s+skill
 			end
 			s=s/4
+			local id=data.Player:GetIndex()
+			vars.eleStacks=vars.eleStacks or {}
+			vars.eleStacks[id]=vars.eleStacks[id] or 0
+			s=s+vars.eleStacks[id]
 		end
 		diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, t.Spell, data.Player:GetIndex())
 	end
@@ -1545,6 +1549,10 @@ function ascension()
 				s=s+skill
 			end
 			s=s/4
+			local id=data.Player:GetIndex()
+			vars.eleStacks=vars.eleStacks or {}
+			vars.eleStacks[id]=vars.eleStacks[id] or 0
+			s=s+vars.eleStacks[id]
 		end
 		for v=1,#spells do 
 			num=spells[v]
