@@ -1405,7 +1405,7 @@ end
 ----------------
 --ELEMENTALIST--
 ----------------
---[[
+
 elementalistClass={62,63,64}
 
 function events.CanLearnSpell(t)
@@ -1447,8 +1447,14 @@ function events.CalcDamageToMonster(t)
 	end
 end
 
-eleOffSpellsOut={2,6,7,9,11,15,19,20,22,24,26,29,32,37,39,41,43,44}
-eleOffSpellsIn={2,6,7,10,11,15,19,20,24,26,29,32,37,39,41,44}
+eleOffSpellsOut={2,6,7,9,11,
+				15,19,20,22,
+				24,26,29,32,
+				37,39,41,43,44}
+eleOffSpellsIn={2,6,7,10,11,
+				15,19,20,
+				24,26,29,32,
+				37,39,41,44}
 
 function events.Action(t)
 	if t.Action==105 then
@@ -1483,12 +1489,24 @@ end
 
 function events.PlayerCastSpell(t)
 	if table.find(elementalistClass, t.Player.Class) and (table.find(eleOffSpellsOut, t.Spell) or table.find(eleOffSpellsIn, t.Spell)) then
-		
-		
-		--vars.ExtraSettings.SpellSlots[t.PlayerIndex]
-		
-		
+		if Map.IsIndoor()
+			local roll=math.random(1,#eleOffSpellsIn)
+			vars.ExtraSettings.SpellSlots[t.PlayerIndex]=eleOffSpellsOut[roll]
+		else
+			local roll=math.random(1,#eleOffSpellsOut)
+			vars.ExtraSettings.SpellSlots[t.PlayerIndex]=eleOffSpellsOut[roll]
+		end		
 	end
-	
 end
-]]
+
+--starts at +50% recovery time
+--each spell cast grants a stack
+--each stack increases attack speed by 10%, up to 10 stacks (making spell cast half as a normal caster would have)
+--each stack increase ascension skill by 1
+--base ascension skill increased by 1 every 8 elemental school level
+--no ascension cap
+--can't learn ascension
+--attacking or shooting an arrow will reset stacks
+--not casting for more than 5 seconds will reset stacks
+--each spell is categorized between single, AoE or shotgun.
+--each spell can have multiple categories
