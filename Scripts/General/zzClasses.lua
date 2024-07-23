@@ -1400,3 +1400,95 @@ function events.Action(t)
 		end
 	end
 end
+
+
+----------------
+--ELEMENTALIST--
+----------------
+--[[
+elementalistClass={62,63,64}
+
+function events.CanLearnSpell(t)
+	if table.find(elementalistClass, t.Player.Class) then
+		t.NeedMastery = 5
+		Game.ShowStatusText("Elementalists learn their spells through practice")
+	end
+end
+
+spellRequirements={100,200,1000,2000,5000,10000,15000,25000,40000,60000,100000}
+
+function events.CalcDamageToMonster(t)
+	local data=WhoHitMonster()
+	if data and data.Player and data.Object and table.find(elementalistClass, data.Player.Class) and data.Object.Spell<45 and data.Object.Spell>0 then
+		local pl=data.Player
+		local spell=data.Object.Spell
+		local school=math.ceil(spell/11)+11
+		vars.elementalistSpells=vars.elementalistSpells or {}
+		vars.elementalistSpells[pl:GetIndex()]=vars.elementalistSpells[pl:GetIndex()] or {}
+		vars.elementalistSpells[pl:GetIndex()][school]=vars.elementalistSpells[pl:GetIndex()][school] or 0
+		
+		local tier=spell%11==0 and 11 or spell%11
+		local learningBonus=tier^1.5 * t.Monster.Level^0.5
+		if table.find(aoespells,spell) then
+			learningBonus=learningBonus/3
+		end
+		vars.elementalistSpells[pl:GetIndex()][school]=vars.elementalistSpells[pl:GetIndex()][school] + learningBonus
+		school2=(school-12)*11
+		for i=1,11 do
+			local spell2= school2+i
+			if pl.Spells[spell2]==false then
+				local tier=spell2%11==0 and 11 or spell2%11
+				if vars.elementalistSpells[pl:GetIndex()][school]>=spellRequirements[tier] then
+					pl.Spells[spell2]=true
+					Message("Learned " .. Game.SpellsTxt[spell2].Name)
+				end
+			end
+		end		
+	end
+end
+
+eleOffSpellsOut={2,6,7,9,11,15,19,20,22,24,26,29,32,37,39,41,43,44}
+eleOffSpellsIn={2,6,7,10,11,15,19,20,24,26,29,32,37,39,41,44}
+
+function events.Action(t)
+	if t.Action==105 then
+		if Game.CurrentPlayer>=0 and Game.Player<=Party.High then
+			local pl=Party[Game.CurrentPlayer]
+			if table.find(elementalistClass, pl.Class) then
+				pl.Spells[2]=true
+				pl.Spells[15]=true
+				pl.Spells[24]=true
+				pl.Spells[37]=true
+			end
+		end
+	end
+	if t.Action==113 then
+		if Game.CurrentPlayer>=0 and Game.Player<=Party.High then
+			local pl=Party[Game.CurrentPlayer]
+			if table.find(elementalistClass, pl.Class) then
+				local id=pl:GetIndex()
+				vars.elementalistRotation=vars.elementalistRotation or {}
+				vars.elementalistRotation[id]=vars.elementalistRotation[id] or 2
+				pl.QuickSpell=vars.elementalistRotation[id]
+				for i=1,4 do
+					if table.find(eleOffSpellsOut, vars.ExtraSettings.SpellSlots[id][i]) or table.find(eleOffSpellsIn, vars.ExtraSettings.SpellSlots[id][i]) then
+						vars.ExtraSettings.SpellSlots[id][i]=vars.elementalistRotation[id]
+					end
+				end
+			end
+		end
+	end
+end
+
+
+function events.PlayerCastSpell(t)
+	if table.find(elementalistClass, t.Player.Class) and (table.find(eleOffSpellsOut, t.Spell) or table.find(eleOffSpellsIn, t.Spell)) then
+		
+		
+		--vars.ExtraSettings.SpellSlots[t.PlayerIndex]
+		
+		
+	end
+	
+end
+]]
