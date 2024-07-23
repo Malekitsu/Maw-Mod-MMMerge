@@ -336,8 +336,8 @@ function sortMultibag()
 		lastPlayer=Game.CurrentPlayer
 		while i<=#itemList do
 			local alchemyItem=false
-			local alchemyPlayer=Party[vars.alchemyPlayer]
 			if vars.alchemyPlayer>=0 and vars.alchemyPlayer~=Game.CurrentPlayer then
+				alchemyPlayer=Party[vars.alchemyPlayer]
 				if table.find(alchemyItemsOrder,itemList[i].Number) or (itemList[i].Number>=220 and itemList[i].Number<300) then
 					Game.CurrentPlayer=vars.alchemyPlayer
 					alchemyItem=true
@@ -587,8 +587,8 @@ function gigaChadSort()
 		lastPlayer=Game.CurrentPlayer
 		while i<=#itemList do
 			local alchemyItem=false
-			local alchemyPlayer=Party[vars.alchemyPlayer]
 			if vars.alchemyPlayer>=0 and vars.alchemyPlayer~=Game.CurrentPlayer then
+				alchemyPlayer=Party[vars.alchemyPlayer]
 				if table.find(alchemyItemsOrder,itemList[i].Number) or (itemList[i].Number>=220 and itemList[i].Number<300) then
 					Game.CurrentPlayer=vars.alchemyPlayer
 					alchemyItem=true
@@ -683,7 +683,6 @@ function events.KeyDown(t)
 				end	
 			end
             gigaChadSort()
-			local name=Party[Game.CurrentPlayer].Name
             Game.ShowStatusText("All Party bags sorted")
 		end
 	end
@@ -1781,7 +1780,7 @@ itemSizeMap={
 	[1062]={1,3},
 	[1063]={1,1},
 	[1064]={1,2},
-	[1065]={2,2},
+	[1065]={1,2},
 	[1066]={1,1},
 	[1067]={2,2},
 	[1068]={2,2},
