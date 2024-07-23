@@ -1472,7 +1472,7 @@ function events.Action(t)
 		end
 	end
 	if t.Action==113 then
-		if Game.CurrentPlayer>=0 and Game.Player<=Party.High then
+		if Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
 			local pl=Party[Game.CurrentPlayer]
 			if table.find(elementalistClass, pl.Class) then
 				local id=pl:GetIndex()
