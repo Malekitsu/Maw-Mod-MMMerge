@@ -1495,7 +1495,45 @@ function events.PlayerCastSpell(t)
 		else
 			local roll=math.random(1,#eleOffSpellsOut)
 			vars.ExtraSettings.SpellSlots[t.PlayerIndex]=eleOffSpellsOut[roll]
-		end		
+		end
+		vars.eleStacks=vars.eleStacks or {}
+		vars.eleStacks[t.PlayerIndex]=vars.eleStacks[t.PlayerIndex] or 0
+		vars.eleStacks[t.PlayerIndex]=vars.eleStacks[t.PlayerIndex]+1
+		vars.eleTimer=vars.eleTimer or {}
+		vars.eleTimer[t.PlayerIndex]=Game.Time
+	end
+end
+
+function elementalistStacksDecay()
+	for i=0,Party.High do
+		local pl=Party[i]
+		if table.find(elementalistClass, pl.Class) then
+			local id=pl:GetIndex()
+			vars.eleStacks=vars.eleStacks or {}
+			vars.eleStacks[id]=vars.eleStacks[id] or 0
+			vars.eleTimer=vars.eleTimer or {}
+			vars.eleTimer[id]=vars.eleTimer[id] or Game.Time
+			if Game.Time-vars.eleTimer[id]>const.Minute*2 then
+				vars.eleTimer[id]=Game.Time
+				vars.eleStacks[id]=math.max(vars.eleStacks[id]-1,0)
+			end
+		end	
+	end
+end
+
+function events.AfterLoadMap()
+	Timer(elementalBuffs, TimerPeriod, true)
+end
+
+function events.CalcDamageToMonster(t)
+	local data=WhoHitMonster()
+	if data and data.Player and (not data.Object or data.Object.Spell==133) then
+		local pl=data.Player
+		if table.find(elementalistClass, pl.Class) then
+			local id=pl:GetIndex()
+			vars.eleStacks=vars.eleStacks or {}
+			vars.eleStacks[id]=0
+		end
 	end
 end
 
