@@ -1222,13 +1222,15 @@ function events.GameInitialized2()
 	for key, value in pairs(DKSpellList) do
 		for i=1,#DKSpellList[key] do
 			local spellID=DKSpellList[key][i]
-			spellDesc[spellID]={}
-			spellDesc[spellID]["Name"]=Game.SpellsTxt[value[i]].Name
-			spellDesc[spellID]["Description"]=Game.SpellsTxt[value[i]].Description
-			spellDesc[spellID]["Normal"]=Game.SpellsTxt[value[i]].Normal
-			spellDesc[spellID]["Expert"]=Game.SpellsTxt[value[i]].Expert
-			spellDesc[spellID]["Master"]=Game.SpellsTxt[value[i]].Master
-			spellDesc[spellID]["GM"]=Game.SpellsTxt[value[i]].GM
+			if spellID~=71 or buffRework then
+				spellDesc[spellID]={}
+				spellDesc[spellID]["Name"]=Game.SpellsTxt[value[i]].Name
+				spellDesc[spellID]["Description"]=Game.SpellsTxt[value[i]].Description
+				spellDesc[spellID]["Normal"]=Game.SpellsTxt[value[i]].Normal
+				spellDesc[spellID]["Expert"]=Game.SpellsTxt[value[i]].Expert
+				spellDesc[spellID]["Master"]=Game.SpellsTxt[value[i]].Master
+				spellDesc[spellID]["GM"]=Game.SpellsTxt[value[i]].GM
+			end
 		end
 	end
 end
@@ -1326,8 +1328,10 @@ local function dkSkills(isDK, id)
 		Skillz.setName(14, "Water Magic")
 		Skillz.setName(18, "Body Magic")
 		Skillz.setName(20, "Dark Magic")
-		Skillz.setDesc(14,5,"Grants 3 Luck to all party per skill point")
-		Skillz.setDesc(18,5,"Grants 3 Might to all party per skill point")
+		if not buffRework then
+			Skillz.setDesc(14,5,"Grants 3 Luck to all party per skill point")
+			Skillz.setDesc(18,5,"Grants 3 Might to all party per skill point")
+		end
 	end
 end
 
@@ -1350,7 +1354,6 @@ function checkSkills(id)
 			seraphSkills(true, id)
 			return
 		end
-		
 	end
 end
 --add tooltips
@@ -1489,7 +1492,7 @@ end
 
 function events.PlayerCastSpell(t)
 	if table.find(elementalistClass, t.Player.Class) and (table.find(eleOffSpellsOut, t.Spell) or table.find(eleOffSpellsIn, t.Spell)) then
-		if Map.IsIndoor()
+		if Map.IsIndoor() then
 			local roll=math.random(1,#eleOffSpellsIn)
 			vars.ExtraSettings.SpellSlots[t.PlayerIndex]=eleOffSpellsOut[roll]
 		else
