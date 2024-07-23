@@ -2392,7 +2392,7 @@ function itemStats(index)
 		endEff=math.floor(endurance/5)
 	end
 	
-	local s,m=SplitSkill(pl.Skills[const.Skills.Bodybuilding])	
+	local s,m=SplitSkill(pl:GetSkill(const.Skills.Bodybuilding))	
 	if m==4 then
 		m=5
 	end
