@@ -139,6 +139,26 @@ function changeBag(pl, bag)
 			pl.Inventory[i]=0
 		end
 	end
+	for i=1,138 do
+		if pl.Items[i].BodyLocation==0 and pl.Items[i].Broken==false then
+			local it=pl.Items[i]
+			it.Bonus = 0	
+			it.Bonus2 = 0
+			it.BonusExpireTime = 0
+			it.BonusStrength = 0
+			it.Broken = false
+			it.Charges = false
+			it.Condition = 0
+			it.Hardened = false
+			it.Identified = true
+			it.MaxCharges = 0
+			it.Number = 0
+			it.Owner = 0
+			it.Refundable = false
+			it.Stolen = false
+			it.TemporaryBonus = false
+		end                                     
+	end
 	if not vars.mawbags[id][bag] then 
 		return
 	else
