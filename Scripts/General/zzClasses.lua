@@ -1409,7 +1409,7 @@ end
 --ELEMENTALIST--
 ----------------
 
-elementalistClass={62,63,64}
+elementalistClass={62,63,64,44}
 
 function events.CanLearnSpell(t)
 	if table.find(elementalistClass, t.Player.Class) then
@@ -1451,11 +1451,11 @@ function events.CalcDamageToMonster(t)
 end
 
 eleOffSpellsOut={2,6,7,9,11,
-				15,19,20,22,
+				15,18,20,22,
 				24,26,29,32,
 				37,39,41,43,44}
 eleOffSpellsIn={2,6,7,10,11,
-				15,19,20,
+				15,18,20,
 				24,26,29,32,
 				37,39,41,44}
 
@@ -1491,13 +1491,18 @@ end
 
 
 function events.PlayerCastSpell(t)
-	if table.find(elementalistClass, t.Player.Class) and (table.find(eleOffSpellsOut, t.Spell) or table.find(eleOffSpellsIn, t.Spell)) then
+	if table.find(elementalistClass, t.Player.Class) and (table.find(eleOffSpellsOut, t.SpellId) or table.find(eleOffSpellsIn, t.SpellId)) then
 		if Map.IsIndoor() then
 			local roll=math.random(1,#eleOffSpellsIn)
-			vars.ExtraSettings.SpellSlots[t.PlayerIndex]=eleOffSpellsOut[roll]
+			for i=1,4 do
+				vars.ExtraSettings.SpellSlots[t.PlayerIndex][i]=eleOffSpellsIn[roll]
+			end
 		else
 			local roll=math.random(1,#eleOffSpellsOut)
-			vars.ExtraSettings.SpellSlots[t.PlayerIndex]=eleOffSpellsOut[roll]
+			for i=1,4 do
+				vars.ExtraSettings.SpellSlots[t.PlayerIndex][i]=eleOffSpellsOut[roll]
+			end
+			t.Player.QuickSpell=eleOffSpellsOut[roll]
 		end
 		vars.eleStacks=vars.eleStacks or {}
 		vars.eleStacks[t.PlayerIndex]=vars.eleStacks[t.PlayerIndex] or 0
@@ -1525,7 +1530,7 @@ function elementalistStacksDecay()
 end
 
 function events.AfterLoadMap()
-	Timer(elementalBuffs, TimerPeriod, true)
+	Timer(elementalistStacksDecay, const.Minute*2, true)
 end
 
 function events.CalcDamageToMonster(t)
