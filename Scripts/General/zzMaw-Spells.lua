@@ -100,7 +100,16 @@ function events.PlayerCastSpell(t)
 		events.Remove("Tick", 1)
 		mawRefresh("all")
 	end
-	--ascension()  removed, Game.CurrentPlayer isn't the player who cast the spell
+	
+	local currentPl=Game.CurrentPlayer
+	for i=0,Party.High do
+		if Party[i]:GetIndex()==t.PlayerIndex then
+			Game.CurrentPlayer=i
+			ascension()
+		end
+	end
+	Game.CurrentPlayer=currentPl
+	
 	if t.IsSpellScroll then -- disable for scrolls
 		return
 	end
@@ -1549,7 +1558,7 @@ function ascension()
 				s=s+skill
 			end
 			s=s/4
-			local id=data.Player:GetIndex()
+			local id=pl:GetIndex()
 			vars.eleStacks=vars.eleStacks or {}
 			vars.eleStacks[id]=vars.eleStacks[id] or 0
 			s=s+vars.eleStacks[id]
@@ -2726,6 +2735,10 @@ if buffRework then
 			if vars.mawbuff[buff] then
 				local pl=GetPlayerFromIndex(vars.mawbuff[buff])
 				if (pl and pl:IsConscious()) or type(vars.mawbuff[buff])=="string" then
+					if buff==75 then
+						Party.SpellBuffs[13].Power=4 --allow protection from magic to protect from death/eradicate
+						Party.SpellBuffs[13].Skill=4 --allow protection from magic to protect from death/eradicate
+					end
 					if buff==85 then --day of protection
 						for i=1, #buffSpell[buff].MultiBuff do
 							local buffId=buffSpell[buff].MultiBuff[i]
