@@ -216,6 +216,9 @@ function sortMultibag()
 			playerCurrentInventories[i]=1
 		end
 		changeBag(pl , 0)
+		for k=0,125 do
+			Party[i].Inventory[k]=0
+		end
 		if Party[i].Inventory[0]==0 then
 			evt.Add("Items",612)
 			evt.Add("Items",612)
@@ -455,6 +458,9 @@ function gigaChadSort()
 			playerCurrentInventories[i]=1
 		end
 		changeBag(pl , 0)
+		for k=0,125 do
+			Party[i].Inventory[k]=0
+		end
 		if Party[i].Inventory[0]==0 then
 			evt.Add("Items",612)
 			evt.Add("Items",612)
@@ -578,14 +584,13 @@ function gigaChadSort()
 		changeBag(Party[vars.alchemyPlayer] , 0)
 	end
 	
-	local currentBag=1
+	local currentBag=0
 	local currentAlchemyBag=1
 	local i=1
-	Game.CurrentPlayer=0
+	Game.CurrentPlayer=vars.alchemyPlayer~=0 and 0 or 1
 	if itemList[1] then
-		vars.alchemyPlayer=vars.alchemyPlayer or -1
-		lastPlayer=Game.CurrentPlayer
 		while i<=#itemList do
+			Game.CurrentPlayer=vars.alchemyPlayer~=0 and 0 or 1
 			local alchemyItem=false
 			if vars.alchemyPlayer>=0 and vars.alchemyPlayer~=Game.CurrentPlayer then
 				alchemyPlayer=Party[vars.alchemyPlayer]
@@ -621,38 +626,33 @@ function gigaChadSort()
 			evt.Add("Items", 0) --to give item to proper player
 			local obj=GrabObjects()
 			i=i+1
+			if not obj then
+				for k=0, Party.High do
+					local pl=Party[k]
+					if k~=vars.alchemyPlayer then
+						changeBag(pl , currentBag)
+					else
+						changeBag(pl, 0)
+					end
+				end
 			
-			if not alchemyItem then
-				if obj and currentBag~=5 then
-					for k=0, Party.High do
-						local pl=Party[k]
-						if k~=vars.alchemyPlayer then
-							changeBag(pl , currentBag+1)
-						end
+			elseif not alchemyItem and obj and currentBag~=5 then
+				for k=0, Party.High do
+					local pl=Party[k]
+					if k~=vars.alchemyPlayer then
+						changeBag(pl , currentBag+1)
 					end
-					currentBag=currentBag+1
-					obj.Type=0
-					obj.TypeIndex=0
-					i=i-1
 				end
-			else
-				if not obj then
-					changeBag(alchemyPlayer , 0)
-					for k=0, Party.High do
-						local pl=Party[k]
-						if k~=vars.alchemyPlayer then
-							changeBag(pl , currentBag)
-						else
-							changeBag(pl, 0)
-						end
-					end
-				elseif alchemyItem and currentAlchemyBag~=5 then
-					changeBag(alchemyPlayer , currentAlchemyBag+1)
-					currentAlchemyBag=currentAlchemyBag+1
-					obj.Type=0
-					obj.TypeIndex=0
-					i=i-1
-				end
+				currentBag=currentBag+1
+				obj.Type=0
+				obj.TypeIndex=0
+				i=i-1
+			elseif alchemyItem and currentAlchemyBag~=5 then
+				changeBag(alchemyPlayer , currentAlchemyBag+1)
+				currentAlchemyBag=currentAlchemyBag+1
+				obj.Type=0
+				obj.TypeIndex=0
+				i=i-1
 			end
 			Game.CurrentPlayer=lastPlayer
 		end
