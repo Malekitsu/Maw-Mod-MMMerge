@@ -38,13 +38,13 @@ end
 
 function events.KeyDown(t)
     if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 103 then
-        if t.Key == 82 then
+        if t.Key == currentBagSortKey then
             sortInventory(false)
             Game.ShowStatusText("Inventory sorted")
-        elseif t.Key == 84 then
+        elseif t.Key == partyBagSortKey then
             sortInventory(true)
             Game.ShowStatusText("All inventories have been sorted")
-        elseif t.Key == 69 then
+        elseif t.Key == AlchemyBagKey then
             vars.alchemyPlayer = vars.alchemyPlayer or -1
             if vars.alchemyPlayer == Game.CurrentPlayer then
                 vars.alchemyPlayer = -1
@@ -427,7 +427,7 @@ end
 
 function events.KeyDown(t)
     if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 103 then
-        if t.Key == const.Keys.C then
+        if t.Key == multiBagSortKey then
 			if vars.SmallerPotionBottles then
 				for i=220, 299 do
 					itemSizeMap[i][2]=1
@@ -672,7 +672,7 @@ end
 
 function events.KeyDown(t)
     if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 103 then
-        if t.Key == const.Keys.G then
+        if t.Key == partyMultyBagSortKey then
 			if vars.SmallerPotionBottles then
 				for i=220, 299 do
 					itemSizeMap[i][2]=1
