@@ -1,12 +1,14 @@
 local count = 5
 
 function events.KeyDown(t)
-
+	if t.Key==16 then
+		shiftPressed=true
+	end
     if ((Game.CurrentScreen == 7 or Game.CurrentScreen==15) and Game.CurrentCharScreen == 103) or Game.CurrentScreen==13 then
 		local id=Game.CurrentPlayer
-		if id>=0 and id <=Party.High then
+		if (id>=0 and id <=Party.High) then
 			local pl = Party[Game.CurrentPlayer]
-			if Party.High==0 then
+			if Party.High==0 or shiftPressed then
 				if t.Key>=49 and t.Key<=48+count then
 					changeBag(pl , t.Key-48)
 				end
@@ -14,7 +16,11 @@ function events.KeyDown(t)
 		end
 	end
 end
-
+function events.KeyUp(t)
+	if t.Key==16 then
+		shiftPressed=false
+	end
+end
 function events.GameInitialized2()
 	multibagButton={}
 	for i=1,count do
