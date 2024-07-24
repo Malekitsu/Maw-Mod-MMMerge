@@ -1409,7 +1409,7 @@ end
 --ELEMENTALIST--
 ----------------
 
-elementalistClass={62,63,64,44}
+elementalistClass={62,63,64}
 
 function events.CanLearnSpell(t)
 	if table.find(elementalistClass, t.Player.Class) then
