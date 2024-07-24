@@ -9,6 +9,13 @@ buffRework=true
 restoreMM6Glory=true
 disableDamageOnFriendlyUnits=true
 
+--sorting buttons
+currentBagSortKey=82
+partyBagSortKey=84
+multiBagSortKey=67
+partyMultyBagSortKey=71
+AlchemyBagKey=69
+
 function events.GameInitialized2()
 	for i=0,11 do
 		Skillz.setDesc(i,1,Skillz.getDesc(i,1) .. "\n")
