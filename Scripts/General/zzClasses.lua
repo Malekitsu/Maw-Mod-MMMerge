@@ -1504,30 +1504,43 @@ end
 function events.PlayerCastSpell(t)
 	if table.find(elementalistClass, t.Player.Class) and (table.find(eleOffSpellsOut, t.SpellId) or table.find(eleOffSpellsIn, t.SpellId)) then
 		if Map.IsIndoor() then
-			local roll=math.random(1,#eleOffSpellsIn)
-			for i=1,4 do
-				if vars.ExtraSettings.SpellSlots then 
-					vars.ExtraSettings.SpellSlots[t.PlayerIndex][i]=eleOffSpellsIn[roll]
+			castableSpells={}
+			for i=1, #eleOffSpellsIn do
+				if t.Player.Spells[eleOffSpellsIn[i]] then
+					table.insert(castableSpells, eleOffSpellsIn[i])
 				end
 			end
-			if (table.find(eleOffSpellsOut, t.Player.QuickSpell) or table.find(eleOffSpellsIn, t.Player.QuickSpell)) then
-				t.Player.QuickSpell=eleOffSpellsOut[roll]
+			local roll=math.random(1,#castableSpells)
+			
+			for i=1,4 do
+				if vars.ExtraSettings.SpellSlots then 
+					vars.ExtraSettings.SpellSlots[t.PlayerIndex][i]=castableSpells[roll]
+				end
 			end
-			if (table.find(eleOffSpellsOut, t.Player.AttackSpell) or table.find(eleOffSpellsIn, t.Player.AttackSpell)) then
-				t.Player.AttackSpell=eleOffSpellsOut[roll]
+			if (table.find(eleOffSpellsIn, t.Player.QuickSpell) or table.find(eleOffSpellsIn, t.Player.QuickSpell)) then
+				t.Player.QuickSpell=castableSpells[roll]
+			end
+			if (table.find(eleOffSpellsIn, t.Player.AttackSpell) or table.find(eleOffSpellsIn, t.Player.AttackSpell)) then
+				t.Player.AttackSpell=castableSpells[roll]
 			end
 		else
-			local roll=math.random(1,#eleOffSpellsOut)
-			for i=1,4 do
-				if vars.ExtraSettings.SpellSlots then 
-					vars.ExtraSettings.SpellSlots[t.PlayerIndex][i]=eleOffSpellsOut[roll]
+			castableSpells={}
+			for i=1, #eleOffSpellsOut do
+				if t.Player.Spells[eleOffSpellsOut[i]] then
+					table.insert(castableSpells, eleOffSpellsOut[i])
 				end
 			end
-			if (table.find(eleOffSpellsOut, t.Player.QuickSpell) or table.find(eleOffSpellsIn, t.Player.QuickSpell)) then
-				t.Player.QuickSpell=eleOffSpellsOut[roll]
+			local roll=math.random(1,#castableSpells)
+			for i=1,4 do
+				if vars.ExtraSettings.SpellSlots then 
+					vars.ExtraSettings.SpellSlots[t.PlayerIndex][i]=castableSpells[roll]
+				end
 			end
-			if (table.find(eleOffSpellsOut, t.Player.AttackSpell) or table.find(eleOffSpellsIn, t.Player.AttackSpell)) then
-				t.Player.AttackSpell=eleOffSpellsOut[roll]
+			if (table.find(eleOffSpellsOut, t.Player.QuickSpell) or table.find(eleOffSpellsOut, t.Player.QuickSpell)) then
+				t.Player.QuickSpell=castableSpells[roll]
+			end
+			if (table.find(eleOffSpellsOut, t.Player.AttackSpell) or table.find(eleOffSpellsOut, t.Player.AttackSpell)) then
+				t.Player.AttackSpell=castableSpells[roll]
 			end
 		end
 		vars.eleStacks=vars.eleStacks or {}
