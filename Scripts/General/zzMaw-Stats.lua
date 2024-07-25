@@ -745,6 +745,7 @@ function events.CalcDamageToPlayer(t)
 		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true)
 	end
 	if reflectedDamage then
+		reflectedDamage=false
 		return
 	end
 	--PAIN REFLECTION FIX
