@@ -1882,12 +1882,11 @@ function events.MonsterKilled(mon)
 		]]
 		for i=0,Map.Monsters.High do
 			monster=Map.Monsters[i]
-			if monster.AIState==4 or monster.AIState==5 or monster.AIState==11 or monster.AIState==16 or monster.AIState==17 or monster.AIState==19 or monster.NameId>300 or (not monster.Hostile and not monster.ShowAsHostile)then
-				if not monster.Hostile and not monster.ShowAsHostile then
-					n=n-1
-				else
-					m=m+1
-				end
+			if monster.AIState==4 or monster.AIState==5 or monster.AIState==11 or monster.AIState==16 or monster.AIState==17 or monster.AIState==19 or monster.NameId>300 then
+				m=m+1
+			end
+			if not monster.Hostile and not monster.ShowAsHostile and monster.ShowOnMap then
+				n=n-1
 			end
 		end
 		local requiredRateo=0.99^(math.floor(n/100))
