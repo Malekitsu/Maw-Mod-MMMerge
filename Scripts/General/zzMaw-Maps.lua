@@ -87,6 +87,14 @@ function events.GameInitialized2()
 	end
 end
 
+function events.LoadMap()
+	if vars.resetDungeon==Map.Name then
+		vars.mapResetCount=vars.mapResetCount or {}
+		vars.mapResetCount[Map.Name]=vars.mapResetCount[Map.Name] or 0
+		vars.mapResetCount[Map.Name]=vars.mapResetCount[Map.Name]+1
+	end
+end
+
 --restore
 function events.AfterLoadMap()
 	for i=1,Game.MapStats.High do
@@ -118,7 +126,7 @@ function canResetDungeon(mapFileName)
 end
 
 --used in maps
-resetTxt="The dungeon has already been cleared, but you have the option to reset it and attempt it once more. Please note that no completion rewards will be given for this reset. Would you like to proceed with resetting the dungeon? (yes/no)"
+resetTxt="The dungeon has already been cleared, but you have the option to reset it and attempt it once more with even harder monsters. Please note that no completion rewards will be given for this reset. Would you like to proceed with resetting the dungeon? (yes/no)"
 local possibleAnswers={"yes", "Yes", "YES", " yes", " Yes", " YES"} 
 function resetMap(dungeonId)
 	if canResetDungeon(dungeonId) and not vars.resetDungeon and not questionAsked then
