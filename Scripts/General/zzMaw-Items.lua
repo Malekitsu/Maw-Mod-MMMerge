@@ -225,6 +225,13 @@ function events.ItemGenerated(t)
 			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 			currentLevel=vars.MMMLVL
 		end
+		
+		vars.mapResetCount=vars.mapResetCount or {}
+		vars.mapResetCount[Map.Name]=vars.mapResetCount[Map.Name] or 0
+		local bonus=vars.mapResetCount[Map.Name]*20
+		currentLevel=currentLevel+bonus
+		partyLevel=partyLevel+bonus
+		
 		--modify reagents
 		if reagentList[t.Item.Number] then
 			t.Item.Bonus=math.round(partyLevel/3)
