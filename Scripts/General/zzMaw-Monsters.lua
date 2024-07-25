@@ -347,6 +347,13 @@ function recalculateMonsterTable()
 		bolsterLevel=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
 	end
 	bolsterLevel=math.max(bolsterLevel-4,0)
+	
+	--add a bonus in case dungeon is resetted
+	vars.mapResetCount=vars.mapResetCount or {}
+	vars.mapResetCount[Map.Name]=vars.mapResetCount[Map.Name] or 0
+	local bonus=vars.mapResetCount[Map.Name]*20
+	bolsterLevel=bolsterLevel+bonus
+	
 	bolsterLevel2=bolsterLevel --used for loot
 	--check for current map monsters
 	currentMapMonsters={}
