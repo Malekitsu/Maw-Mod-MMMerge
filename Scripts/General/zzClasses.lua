@@ -39,16 +39,20 @@ promotionList={
 [18]=	{1645,1646,		1568,1569,1570,1571,	1540,1541},--same as knight
 --SHAMAN
 [19]=	{1653,1654,		1615,1616,1617,1618,	1546,31}, --same as druid
+--ELEMENTALIST
+[20]=	{1641,1642,		1621,1622,1623,1624,	1548,35},--same as mage
 }
 
 --mid promotionlist
 midPromo={
 --Seraphim
-[17]=	{1646,1647,		1607,1608},--cleric
+[17]=	{1647,1648,		1607,1608},--cleric
 --DK
 [18]=	{1643,1644,		1566,1567},--same as knight
 --SHAMAN
 [19]=	{1651,1652,		1613,1614}, --same as druid
+--ELEMENTALIST
+[20]=	{1639,1640,		1619,1620},--same as mage
 }
 
 function events.GameInitialized2()
@@ -1411,6 +1415,10 @@ end
 
 elementalistClass={62,63,64}
 
+function events.GameInitialized2()
+	Game.Classes.HPFactor[63]=2.5
+end
+
 function events.CanLearnSpell(t)
 	if table.find(elementalistClass, t.Player.Class) then
 		t.NeedMastery = 5
@@ -1421,6 +1429,9 @@ end
 spellRequirements={100,200,1000,2000,5000,10000,15000,25000,40000,60000,100000}
 
 function events.CalcDamageToMonster(t)
+	if t.Monster.Hostile==false and t.Monster.ShowAsHostile==false then
+		return
+	end
 	local data=WhoHitMonster()
 	if data and data.Player and data.Object and table.find(elementalistClass, data.Player.Class) and data.Object.Spell<45 and data.Object.Spell>0 then
 		local pl=data.Player
@@ -1497,12 +1508,23 @@ function events.PlayerCastSpell(t)
 			for i=1,4 do
 				vars.ExtraSettings.SpellSlots[t.PlayerIndex][i]=eleOffSpellsIn[roll]
 			end
+			if (table.find(eleOffSpellsOut, t.Player.QuickSpell) or table.find(eleOffSpellsIn, t.Player.QuickSpell)) then
+				t.Player.QuickSpell=eleOffSpellsOut[roll]
+			end
+			if (table.find(eleOffSpellsOut, t.Player.AttackSpell) or table.find(eleOffSpellsIn, t.Player.AttackSpell)) then
+				t.Player.AttackSpell=eleOffSpellsOut[roll]
+			end
 		else
 			local roll=math.random(1,#eleOffSpellsOut)
 			for i=1,4 do
 				vars.ExtraSettings.SpellSlots[t.PlayerIndex][i]=eleOffSpellsOut[roll]
 			end
-			t.Player.QuickSpell=eleOffSpellsOut[roll]
+			if (table.find(eleOffSpellsOut, t.Player.QuickSpell) or table.find(eleOffSpellsIn, t.Player.QuickSpell)) then
+				t.Player.QuickSpell=eleOffSpellsOut[roll]
+			end
+			if (table.find(eleOffSpellsOut, t.Player.AttackSpell) or table.find(eleOffSpellsIn, t.Player.AttackSpell)) then
+				t.Player.AttackSpell=eleOffSpellsOut[roll]
+			end
 		end
 		vars.eleStacks=vars.eleStacks or {}
 		vars.eleStacks[t.PlayerIndex]=vars.eleStacks[t.PlayerIndex] or 0
