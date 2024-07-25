@@ -2159,7 +2159,7 @@ function events.GameInitialized2() --to make the after all the other code
 					if t.DamageKind==4 then
 						reflectedDamage=true
 						Party[index]:DoDamage(t.Result,4)
-						reflectedDamage=true
+						reflectedDamage=false
 					end
 				elseif skill=="Reflecting" then
 					if t.DamageKind~=4 then
@@ -2583,9 +2583,12 @@ if restoreMM6Glory then
 					local id=math.floor(obj.Owner/8)
 					local mon=Map.Monsters[math.floor(obj.Owner/8)]
 					local action=0
-					if obj.SpellSkill~=0 then
-						action=0
+					if mon.Attack1.Missile==0 and mon.Attack2.Missile>0 then
+						action=1
 					end
+					if obj.SpellSkill~=0 then
+						action=2
+ 					end
 					mawCustomMonObj={["Monster"]=mon, 
 									["Object"]=obj,
 									["MonsterAction"]=action,
