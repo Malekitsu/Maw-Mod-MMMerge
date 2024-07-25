@@ -134,7 +134,7 @@ function events.GameInitialized2()
 end
 function events.PlayerCastSpell(t)
 	local spell=t.SpellId
-	local m=t.Mastery
+	local m=math.max(1,t.Mastery)
 	Game.Spells[spell]["Delay" .. masteryName[m]]=getSpellDelay(t.Player,spell)
 end
 
