@@ -61,3 +61,6 @@ Lich King	35	7	100	0	I
 Shaman	25	3	10	1	IP
 Sekhem	25	4	10	1	IP
 Marabou	25	5	10	1	IP
+Elementalist	15	2	30	4	I
+Elemental Adept	15	2	30	6	I
+Master of Elements	15	3	30	8	I
