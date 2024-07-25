@@ -1491,7 +1491,7 @@ function events.Action(t)
 				vars.elementalistRotation[id]=vars.elementalistRotation[id] or 2
 				pl.QuickSpell=vars.elementalistRotation[id]
 				for i=1,4 do
-					if table.find(eleOffSpellsOut, vars.ExtraSettings.SpellSlots[id][i]) or table.find(eleOffSpellsIn, vars.ExtraSettings.SpellSlots[id][i]) then
+					if vars.ExtraSettings.SpellSlots and (table.find(eleOffSpellsOut, vars.ExtraSettings.SpellSlots[id][i]) or table.find(eleOffSpellsIn, vars.ExtraSettings.SpellSlots[id][i])) then
 						vars.ExtraSettings.SpellSlots[id][i]=vars.elementalistRotation[id]
 					end
 				end
@@ -1506,7 +1506,9 @@ function events.PlayerCastSpell(t)
 		if Map.IsIndoor() then
 			local roll=math.random(1,#eleOffSpellsIn)
 			for i=1,4 do
-				vars.ExtraSettings.SpellSlots[t.PlayerIndex][i]=eleOffSpellsIn[roll]
+				if vars.ExtraSettings.SpellSlots then 
+					vars.ExtraSettings.SpellSlots[t.PlayerIndex][i]=eleOffSpellsIn[roll]
+				end
 			end
 			if (table.find(eleOffSpellsOut, t.Player.QuickSpell) or table.find(eleOffSpellsIn, t.Player.QuickSpell)) then
 				t.Player.QuickSpell=eleOffSpellsOut[roll]
@@ -1517,7 +1519,9 @@ function events.PlayerCastSpell(t)
 		else
 			local roll=math.random(1,#eleOffSpellsOut)
 			for i=1,4 do
-				vars.ExtraSettings.SpellSlots[t.PlayerIndex][i]=eleOffSpellsOut[roll]
+				if vars.ExtraSettings.SpellSlots then 
+					vars.ExtraSettings.SpellSlots[t.PlayerIndex][i]=eleOffSpellsOut[roll]
+				end
 			end
 			if (table.find(eleOffSpellsOut, t.Player.QuickSpell) or table.find(eleOffSpellsIn, t.Player.QuickSpell)) then
 				t.Player.QuickSpell=eleOffSpellsOut[roll]
