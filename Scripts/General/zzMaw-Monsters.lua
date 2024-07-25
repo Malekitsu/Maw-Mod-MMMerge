@@ -1884,7 +1884,7 @@ function events.MonsterKilled(mon)
 			end
 		end
 		local requiredRateo=0.99^(math.floor(n/100))
-		mapvars.completition=math.round(m/n*100)/requiredRateo
+		mapvars.completition=math.round(m/n*100/requiredRateo)
 		completition.Text=string.format(mapvars.completition)
 		percentText.Text="%"
 		if completition.Text=="100" then
