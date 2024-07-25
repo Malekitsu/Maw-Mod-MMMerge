@@ -1214,6 +1214,7 @@ function calcPowerVitality(pl)
 		--skill
 		skillType=math.floor((spellIndex-1)/11)+12
 		skill, mastery=SplitSkill(pl:GetSkill(skillType))
+		local mastery=math.max(1,mastery)
 		--SPELLS
 		local s, m = SplitSkill(pl.Skills[const.Skills.Learning])
 		if spellPowers[spellIndex] then
