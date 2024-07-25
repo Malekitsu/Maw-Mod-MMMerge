@@ -204,6 +204,10 @@ end
 
 
 function sortMultibag()
+	--alchemy fix
+	if vars.alchemyPlayer and vars.alchemyPlayer>Party.High then
+		vars.alchemyPlayer=-1
+	end
 	--let's fill first all inventories
 	local playerCurrentInventories={}
 	local plToSort=Game.CurrentPlayer
@@ -378,6 +382,7 @@ function sortMultibag()
 					currentBag=currentBag+1
 					obj.Type=0
 					obj.TypeIndex=0
+					obj.Item.Number=0
 					i=i-1
 				end
 			else
@@ -390,6 +395,7 @@ function sortMultibag()
 					currentAlchemyBag=currentAlchemyBag+1
 					obj.Type=0
 					obj.TypeIndex=0
+					obj.Item.Number=0
 					i=i-1
 				end
 			end
@@ -445,6 +451,10 @@ function events.KeyDown(t)
 end
 
 function gigaChadSort()
+	--alchemy fix
+	if vars.alchemyPlayer and vars.alchemyPlayer>Party.High then
+		vars.alchemyPlayer=-1
+	end
 	evt.Add("Items", 0)
 	local currentPl=Game.CurrentPlayer
 	Game.CurrentPlayer=0
@@ -646,12 +656,14 @@ function gigaChadSort()
 				currentBag=currentBag+1
 				obj.Type=0
 				obj.TypeIndex=0
+				obj.Item.Number=0
 				i=i-1
 			elseif alchemyItem and currentAlchemyBag~=5 then
 				changeBag(alchemyPlayer , currentAlchemyBag+1)
 				currentAlchemyBag=currentAlchemyBag+1
 				obj.Type=0
 				obj.TypeIndex=0
+				obj.Item.Number=0
 				i=i-1
 			end
 			Game.CurrentPlayer=lastPlayer
