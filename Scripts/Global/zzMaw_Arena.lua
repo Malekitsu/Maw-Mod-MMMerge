@@ -124,7 +124,7 @@ function arenaSpawns()
 		end
 	end
 	
-	local spawn=monTbl[math.min(currentWave,170)].Index-2
+	local spawn=monTbl[math.min(currentWave,#monTbl)].Index-1
 	
 	waveState=waveState or 1
 	
@@ -185,3 +185,10 @@ function endArena(level)
 	arenaTopic()
 end
 
+--[[unfortunately is buggy and will not save many values
+function events.CanSaveGame(t)
+	if mapvars.ArenaCompleted then
+		t.Result=true
+	end
+end
+]]
