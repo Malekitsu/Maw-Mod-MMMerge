@@ -156,7 +156,7 @@ function arenaSpawns()
 		currentWave=currentWave+1
 		wavesToSpawn=wavesToSpawn-1
 		waveState=1
-		waitNextWave=3
+		waitNextWave=6
 	end
 	local n=3
 	local m=(3-wavesToSpawn)+(waveState-1)/6
