@@ -889,9 +889,11 @@ evt.PotionEffects[87] = function(IsDrunk, t, Power)
 		if (t.BonusExpireTime>=10 and t.BonusExpireTime<1000) then
 			Mouse.Item.BonusStrength=t.BonusExpireTime
 			t.BonusExpireTime=2
-		else
+		elseif Mouse.Item.BonusExpireTime>=10 and Mouse.Item.BonusExpireTime<1000 then
 			t.BonusExpireTime=Mouse.Item.BonusStrength
 			Mouse.Item.Number=0
+		else
+			return
 		end
 		mem.u4[0x51E100] = 0x100 
 		t.Condition = t.Condition:Or(0x10)
