@@ -231,7 +231,10 @@ function events.ItemGenerated(t)
 		local bonus=vars.mapResetCount[Map.Name]*20
 		currentLevel=currentLevel+bonus
 		partyLevel=partyLevel+bonus
-		
+		if Map.Name=="d42.blv" then
+			currentLevel=vars.highestArenaWave*10
+			partyLevel=vars.highestArenaWave*7
+		end
 		--modify reagents
 		if reagentList[t.Item.Number] then
 			t.Item.Bonus=math.round(partyLevel/3)
