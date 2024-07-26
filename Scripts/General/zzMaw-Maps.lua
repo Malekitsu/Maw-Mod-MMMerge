@@ -1653,3 +1653,44 @@ function events.AfterLoadMap()
 		end
 	end
 end
+
+--arena monster list
+
+function events.GameInitialized2()
+	-- Initialize the monsterOrderTable
+	local monsterOrderTable = {}
+
+	-- Fill the table with monster levels
+	for i = 1, 651 do
+		local index = i
+		monsterOrderTable[i] = Game.MonstersTxt[index].Level
+	end
+
+	-- Create a table of indices
+	local indices = {}
+	for i = 1, #monsterOrderTable do
+		indices[i] = i
+	end
+
+	-- Sort the indices based on the values in the monsterOrderTable
+	table.sort(indices, function(a, b)
+		return monsterOrderTable[a] < monsterOrderTable[b]
+	end)
+
+	-- Create a new sorted table
+	monTbl = {}
+	for i, index in ipairs(indices) do
+		monTbl[i] = {
+			Index = index,
+			Level = monsterOrderTable[index]
+		}
+	end
+	
+	for i=1,651 do
+		i=652-i
+		if Game.MonstersTxt[monTbl[i].Index].AIType==1 or monTbl[i].Index%3~=0 then
+			table.remove(monTbl, i)
+		end
+	end
+	
+end
