@@ -1584,6 +1584,20 @@ function events.CalcDamageToMonster(t)
 	end
 end
 
+eleOffSpellsOut={2,6,7,9,11,
+				15,18,20,22,
+				24,26,29,32,
+				37,39,41,43,44}
+eleOffSpellsIn={2,6,7,10,11,
+				15,18,20,
+				24,26,29,32,
+				37,39,41,44}
+
+singleTarget={2,11,18,20,24,26,37,39}
+shotGun={2,15,26,37}
+aoeIn={6,10,32,41}
+aoeOut={6,9,22,32,41,43}
+
 --starts at +50% recovery time
 --each spell cast grants a stack
 --each stack increases attack speed by 10%, up to 10 stacks (making spell cast half as a normal caster would have)
