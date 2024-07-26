@@ -316,6 +316,10 @@ function events.MonsterKillExp(t)
 	end
 	t.Exp=math.round(t.Exp*math.min(((monLvl+10)/(partyLvl+5))^2,5))
 	
+	--no bolster from arena
+	if Map.Name=="d42.blv" then
+		return
+	end
 	
 	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 	local currentLVL=calcLevel(t.Exp/5 + vars.EXPBEFORE)
