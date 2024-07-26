@@ -243,17 +243,19 @@ function events.ItemGenerated(t)
 		
 		local name=Game.MapStats[Map.MapStatsIndex].Name
 		mapLevel=mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High
-		if not Game.freeProgression then
-			partyLevel=(vars.MM8LVL+vars.MM7LVL+vars.MM6LVL)*0.75
-			if mapLevels[name] and mapLevels[name].Low~=0 and Game.HouseScreen~=2 and Game.HouseScreen~=95 then
-				partyLevel=mapLevel
+		if Map.Name~="d42.blv" then
+			if not Game.freeProgression then
+				partyLevel=(vars.MM8LVL+vars.MM7LVL+vars.MM6LVL)*0.75
+				if mapLevels[name] and mapLevels[name].Low~=0 and Game.HouseScreen~=2 and Game.HouseScreen~=95 then
+					partyLevel=mapLevel
+					mapLevel=0
+				end
+			elseif mapLevels[name] and mapLevels[name].Low~=0 then
+				partyLevel=mapLevel*0.2+partyLevel
+			else
+				partyLevel=partyLevel+math.min(currentLevel/2,54)
 				mapLevel=0
 			end
-		elseif mapLevels[name] and mapLevels[name].Low~=0 then
-			partyLevel=mapLevel*0.2+partyLevel
-		else
-			partyLevel=partyLevel+math.min(currentLevel/2,54)
-			mapLevel=0
 		end
 		--difficulty settings
 		difficultyExtraPower=1
