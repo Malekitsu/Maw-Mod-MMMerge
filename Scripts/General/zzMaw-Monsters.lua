@@ -102,6 +102,11 @@ function events.GameInitialized2()
 end
 
 function recalculateMawMonster()
+	--arena exception
+	if Map.Name=="d42.blv" then
+		return
+	end
+	
 	for i=0, Map.Monsters.High do
 		local mon=Map.Monsters[i]
 		
@@ -448,6 +453,15 @@ function recalculateMonsterTable()
 				totalLevel[i]=math.max(base.Level*horizontalMultiplier+extraBolster-5-flattener+adjust-4, 5)
 				mon.Level=math.min(totalLevel[i],255)
 			end
+		end
+		
+		--arena
+		if Map.Name=="d42.blv" then
+			horizontalMultiplier=6
+			bolsterLevel=base.Level*horizontalMultiplier
+			flattener=(base.Level-LevelB)*horizontalMultiplier*0.8 --necessary to avoid making too much difference between monster tier
+			totalLevel[i]=math.max(base.Level*horizontalMultiplier-flattener+adjust*2, 5)
+			mon.Level=math.min(totalLevel[i],255)
 		end
 		
 		--HP
@@ -1874,6 +1888,7 @@ end
 --check for dungeon clear
 function events.MonsterKilled(mon)
 	if Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.completed==nil then
+		if Map.Name=="d42.blv" then return end --arena
 		n=Map.Monsters.Count
 		m=1
 		--[[if mon.NameId>220 and mon.NameId<300 then
@@ -2099,7 +2114,9 @@ function generateBoss(index,nameIndex)
 	end
 	if skill=="Swift" then
 		mapvars.swift=mapvars.swift or {}
-		table.insert(mapvars.swift, index)
+		if not table.find(mapvars.swift, index) then
+			table.insert(mapvars.swift, index)
+		end
 	end
 	mapvars.bossSkills=mapvars.bossSkills or {}
 	mapvars.bossSkills[mon.NameId]=mapvars.bossSkills[mon.NameId] or {}
@@ -2241,6 +2258,10 @@ function events.Tick()
 		swiftLocation=swiftLocation or {}
 		for i=1, #mapvars.swift do
 			mon=Map.Monsters[mapvars.swift[i]]
+			skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+			if skill~="Swift" then
+				return
+			end
 			if not swiftLocation[i] then
 				swiftLocation[i]={mon.X,mon.Y}
 			end
