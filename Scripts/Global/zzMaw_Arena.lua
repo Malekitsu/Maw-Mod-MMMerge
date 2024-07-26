@@ -178,7 +178,7 @@ function events.PickCorpse(t)
 end
 
 function endArena(level)
-	local gold=level*10000
+	local gold=level*20000
 	Message("Level " .. currentArenaLevel .. " completed!")
 	evt.Add("Gold",gold)
 	vars.highestArenaWave=vars.highestArenaWave+1
