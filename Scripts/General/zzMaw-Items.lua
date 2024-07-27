@@ -232,7 +232,7 @@ function events.ItemGenerated(t)
 		currentLevel=currentLevel+bonus
 		partyLevel=partyLevel+bonus
 		if Map.Name=="d42.blv" then
-			currentLevel=monTbl[math.min((vars.highestArenaWave+1)*3,#monTbl].Level*6
+			currentLevel=monTbl[math.min((vars.highestArenaWave+1)*3,#monTbl)].Level*6
 			partyLevel=monTbl[math.min((vars.highestArenaWave+1)*3,#monTbl)].Level*6/1.5
 		end
 		--modify reagents
