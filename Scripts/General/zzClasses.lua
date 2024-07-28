@@ -1486,22 +1486,22 @@ end
 
 
 function events.PlayerCastSpell(t)
-	if table.find(elementalistClass, t.Player.Class) and (table.find(eleOffSpellsOut, t.SpellId) or table.find(eleOffSpellsIn, t.SpellId)) then
+	if table.find(elementalistClass, t.Player.Class) and (table.find(eleOffSpellsOut, t.SpellId) or table.find(eleOffSpellsIn, t.SpellId)) and vars.elementalistSpellBinds then
 		local pl=t.Player
 		local index=t.PlayerIndex
 		for i=1,6 do
 			local spell=t.SpellId
 			if i<=4 and ExtraQuickSpells.SpellSlots then
 				if ExtraQuickSpells.SpellSlots[index][i]==spell then
-					ExtraQuickSpells.SpellSlots[index][i]=elementalistRandomizer(pl, elementalistSpellBinds[index][i])
+					ExtraQuickSpells.SpellSlots[index][i]=elementalistRandomizer(pl, vars.elementalistSpellBinds[index][i])
 				end
 			elseif i==5 then
 				if pl.AttackSpell==spell then
-					pl.AttackSpell=elementalistRandomizer(pl, elementalistSpellBinds[index][i])
+					pl.AttackSpell=elementalistRandomizer(pl, vars.elementalistSpellBinds[index][i])
 				end
 			elseif i==6 then
 				if pl.QuickSpell==spell then
-					pl.QuickSpell=elementalistRandomizer(pl, elementalistSpellBinds[index][i])
+					pl.QuickSpell=elementalistRandomizer(pl, vars.elementalistSpellBinds[index][i])
 				end
 			end
 		end
@@ -1618,16 +1618,16 @@ function events.Action(t)
 						spell=pl.QuickSpell
 					end
 					
-					elementalistSpellBinds=elementalistSpellBinds or {}
-					elementalistSpellBinds[index]=elementalistSpellBinds[index] or {}
+					vars.elementalistSpellBinds=vars.elementalistSpellBinds or {}
+					vars.elementalistSpellBinds[index]=vars.elementalistSpellBinds[index] or {}
 					if table.find(singleTarget,spell) then
-						elementalistSpellBinds[index][i]="single"
+						vars.elementalistSpellBinds[index][i]="single"
 					elseif table.find(shotGun,spell) then
-						elementalistSpellBinds[index][i]="shotgun"
+						vars.elementalistSpellBinds[index][i]="shotgun"
 					elseif table.find(aoeIn,spell) or table.find(aoeOut,spell) then
-						elementalistSpellBinds[index][i]="aoe"
+						vars.elementalistSpellBinds[index][i]="aoe"
 					else
-						elementalistSpellBinds[index][i]=false					
+						vars.elementalistSpellBinds[index][i]=false					
 					end
 				end
 			end
