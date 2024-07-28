@@ -314,7 +314,33 @@ function events.MonsterKillExp(t)
 	else
 		monLvl=mon.Level
 	end
-	t.Exp=math.round(t.Exp*math.min(((monLvl+10)/(partyLvl+5))^2,5))
+	t.Handled=true
+	local partyCount=0
+	for i=0, Party.High do
+		if Party[i].Dead==0 and Party[i].Eradicated==0 then
+			partyCount=partyCount+1
+		end
+	end
+	partyCount=math.max(1,partyCount)
+	local experience=t.Exp/partyCount
+	local bolsterExp=0
+	for i=0, Party.High do
+		if Party[i].Dead==0 and Party[i].Eradicated==0 then
+			local playerLevel=math.min(calcLevel(Party[i].Experience),partyLvl) --accounts for the cases which you want to level a low lvl character
+			local multiplier1=((monLvl+10)/(playerLevel+5))^2
+			local multiplier2=1+(monLvl^0.5)-(playerLevel^0.5)
+			mult=math.min(math.max(multiplier1,multiplier2),partyLvl/2+5)
+			local experienceAwarded=experience*mult
+			Party[i].Experience=Party[i].Experience+experienceAwarded
+			
+			--calculate again based for bolster
+			playerLevel=partyLvl
+			multiplier1=((monLvl+10)/(playerLevel+5))^2
+			multiplier2=1+(monLvl^0.5)-(playerLevel^0.5)
+			mult=math.min(math.max(multiplier1,multiplier2),partyLvl/2+5)
+			bolsterExp=bolsterExp+experience*mult
+		end
+	end
 	
 	--no bolster from arena
 	if Map.Name=="d42.blv" then
@@ -322,7 +348,7 @@ function events.MonsterKillExp(t)
 	end
 	
 	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
-	local currentLVL=calcLevel(t.Exp/5 + vars.EXPBEFORE)
+	local currentLVL=calcLevel(bolsterExp/5 + vars.EXPBEFORE)
 		
 	if currentWorld==1 then
 		vars.MM8LVL = vars.MM8LVL + currentLVL - vars.LVLBEFORE
@@ -333,7 +359,7 @@ function events.MonsterKillExp(t)
 	elseif currentWorld==4 then
 		vars.MMMLVL = vars.MMMLVL + currentLVL - vars.LVLBEFORE
 	end
-	vars.EXPBEFORE = vars.EXPBEFORE + t.Exp/5
+	vars.EXPBEFORE = vars.EXPBEFORE + bolsterExp/5
 	vars.LVLBEFORE = calcLevel(vars.EXPBEFORE)
 end
 
