@@ -1482,72 +1482,34 @@ function events.Action(t)
 			end
 		end
 	end
-	if t.Action==113 then
-		if Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
-			local pl=Party[Game.CurrentPlayer]
-			if table.find(elementalistClass, pl.Class) then
-				local id=pl:GetIndex()
-				vars.elementalistRotation=vars.elementalistRotation or {}
-				vars.elementalistRotation[id]=vars.elementalistRotation[id] or 2
-				pl.QuickSpell=vars.elementalistRotation[id]
-				for i=1,4 do
-					if vars.ExtraSettings.SpellSlots and (table.find(eleOffSpellsOut, vars.ExtraSettings.SpellSlots[id][i]) or table.find(eleOffSpellsIn, vars.ExtraSettings.SpellSlots[id][i])) then
-						vars.ExtraSettings.SpellSlots[id][i]=vars.elementalistRotation[id]
-					end
-				end
-			end
-		end
-	end
 end
 
 
 function events.PlayerCastSpell(t)
 	if table.find(elementalistClass, t.Player.Class) and (table.find(eleOffSpellsOut, t.SpellId) or table.find(eleOffSpellsIn, t.SpellId)) then
-		if Map.IsIndoor() then
-			castableSpells={}
-			for i=1, #eleOffSpellsIn do
-				if t.Player.Spells[eleOffSpellsIn[i]] then
-					table.insert(castableSpells, eleOffSpellsIn[i])
+		local pl=t.Player
+		local index=t.PlayerIndex
+		for i=1,6 do
+			local spell=t.SpellId
+			if i<=4 and ExtraQuickSpells.SpellSlots then
+				if ExtraQuickSpells.SpellSlots[index][i]==spell then
+					ExtraQuickSpells.SpellSlots[index][i]=elementalistRandomizer(pl, elementalistSpellBinds[index][i])
 				end
-			end
-			local roll=math.random(1,#castableSpells)
-			
-			for i=1,4 do
-				if vars.ExtraSettings.SpellSlots then 
-					vars.ExtraSettings.SpellSlots[t.PlayerIndex][i]=castableSpells[roll]
+			elseif i==5 then
+				if pl.AttackSpell==spell then
+					pl.AttackSpell=elementalistRandomizer(pl, elementalistSpellBinds[index][i])
 				end
-			end
-			if (table.find(eleOffSpellsIn, t.Player.QuickSpell) or table.find(eleOffSpellsIn, t.Player.QuickSpell)) then
-				t.Player.QuickSpell=castableSpells[roll]
-			end
-			if (table.find(eleOffSpellsIn, t.Player.AttackSpell) or table.find(eleOffSpellsIn, t.Player.AttackSpell)) then
-				t.Player.AttackSpell=castableSpells[roll]
-			end
-		else
-			castableSpells={}
-			for i=1, #eleOffSpellsOut do
-				if t.Player.Spells[eleOffSpellsOut[i]] then
-					table.insert(castableSpells, eleOffSpellsOut[i])
+			elseif i==6 then
+				if pl.QuickSpell==spell then
+					pl.QuickSpell=elementalistRandomizer(pl, elementalistSpellBinds[index][i])
 				end
-			end
-			local roll=math.random(1,#castableSpells)
-			for i=1,4 do
-				if vars.ExtraSettings.SpellSlots then 
-					vars.ExtraSettings.SpellSlots[t.PlayerIndex][i]=castableSpells[roll]
-				end
-			end
-			if (table.find(eleOffSpellsOut, t.Player.QuickSpell) or table.find(eleOffSpellsOut, t.Player.QuickSpell)) then
-				t.Player.QuickSpell=castableSpells[roll]
-			end
-			if (table.find(eleOffSpellsOut, t.Player.AttackSpell) or table.find(eleOffSpellsOut, t.Player.AttackSpell)) then
-				t.Player.AttackSpell=castableSpells[roll]
 			end
 		end
 		vars.eleStacks=vars.eleStacks or {}
-		vars.eleStacks[t.PlayerIndex]=vars.eleStacks[t.PlayerIndex] or 0
-		vars.eleStacks[t.PlayerIndex]=vars.eleStacks[t.PlayerIndex]+1
+		vars.eleStacks[index]=vars.eleStacks[index] or 0
+		vars.eleStacks[index]=vars.eleStacks[index]+1
 		vars.eleTimer=vars.eleTimer or {}
-		vars.eleTimer[t.PlayerIndex]=Game.Time
+		vars.eleTimer[index]=Game.Time
 	end
 end
 
@@ -1562,14 +1524,14 @@ function elementalistStacksDecay()
 			vars.eleTimer[id]=vars.eleTimer[id] or Game.Time
 			if Game.Time-vars.eleTimer[id]>const.Minute*2 then
 				vars.eleTimer[id]=Game.Time
-				vars.eleStacks[id]=math.max(vars.eleStacks[id]-1,0)
+				vars.eleStacks[id]=math.max(math.floor(vars.eleStacks[id]*0.9),0)
 			end
 		end	
 	end
 end
 
 function events.AfterLoadMap()
-	Timer(elementalistStacksDecay, const.Minute*2, true)
+	Timer(elementalistStacksDecay, const.Minute*1.5, true)
 end
 
 function events.CalcDamageToMonster(t)
@@ -1584,19 +1546,94 @@ function events.CalcDamageToMonster(t)
 	end
 end
 
-eleOffSpellsOut={2,6,7,9,11,
-				15,18,20,22,
-				24,26,29,32,
-				37,39,41,43,44}
-eleOffSpellsIn={2,6,7,10,11,
-				15,18,20,
-				24,26,29,32,
-				37,39,41,44}
-
-singleTarget={2,11,18,20,24,26,37,39}
-shotGun={2,15,26,37}
+singleTarget={2,11,18,20,26,37,39}
+shotGun={2,15,24,37}
 aoeIn={6,10,32,41}
 aoeOut={6,9,22,32,41,43}
+
+function elementalistRandomizer(pl, spellType)
+	local possibleSpells={}
+	if spellType=="single" then
+		for i=1,#singleTarget do
+			if pl.Spells[singleTarget[i]] then
+				table.insert(possibleSpells, singleTarget[i])
+			end
+		end
+	elseif spellType=="shotgun" then
+		for i=1,#shotGun do
+			if pl.Spells[shotGun[i]] then
+				table.insert(possibleSpells, shotGun[i])
+			end
+		end
+	elseif spellType=="aoe" and Map.IsIndoor() then
+		for i=1,#aoeOut do
+			if pl.Spells[aoeOut[i]] then
+				table.insert(possibleSpells, aoeOut[i])
+			end
+		end
+	elseif spellType=="aoe" then
+		for i=1,#aoeOut do
+			if pl.Spells[aoeOut[i]] then
+				table.insert(possibleSpells, aoeOut[i])
+			end
+		end
+	end
+	if #possibleSpells>=1 then
+		return possibleSpells[math.random(1,#possibleSpells)]
+	else
+		return false
+	end
+end
+
+--reset stacks when casting from spellbook
+function events.Action(t)
+	if t.Action==142 then
+		local id=Game.CurrentPlayer
+		if id>=0 and id<=Party.High then
+			if table.find(elementalistClass,Party[id].Class) then
+				if table.find(eleOffSpellsOut,t.Param) or table.find(eleOffSpellsIn,t.Param) then
+					vars.eleStacks=vars.eleStacks or {}
+					vars.eleStacks[Party[id]:GetIndex()]=0
+				end
+			end
+		end
+	end
+end
+
+--set current keybind by keybindrotation
+function events.Action(t)
+	if Game.CurrentScreen==8 and t.Action==113 then
+		local id=Game.CurrentPlayer
+		if id>=0 and id<=Party.High then
+			local pl=Party[id]
+			local index=pl:GetIndex()
+			if table.find(elementalistClass,pl.Class) then
+				for i=1,6 do
+					local spell=0
+					if i<=4 and ExtraQuickSpells.SpellSlots then
+						spell=ExtraQuickSpells.SpellSlots[index][i]
+					elseif i==5 then
+						spell=pl.AttackSpell
+					elseif i==6 then
+						spell=pl.QuickSpell
+					end
+					
+					elementalistSpellBinds=elementalistSpellBinds or {}
+					elementalistSpellBinds[index]=elementalistSpellBinds[index] or {}
+					if table.find(singleTarget,spell) then
+						elementalistSpellBinds[index][i]="single"
+					elseif table.find(shotGun,spell) then
+						elementalistSpellBinds[index][i]="shotgun"
+					elseif table.find(aoeIn,spell) or table.find(aoeOut,spell) then
+						elementalistSpellBinds[index][i]="aoe"
+					else
+						elementalistSpellBinds[index][i]=false					
+					end
+				end
+			end
+		end
+	end
+end
 
 --starts at +50% recovery time
 --each spell cast grants a stack
