@@ -1642,17 +1642,51 @@ function events.PlayerCastSpell(t)
 		function events.Tick()
 			events.Remove("Tick",1)
 			obj1=GrabObjects()
-			for i=1,10 do
+			
+			--calculate velocity
+			-- Define math constants
+			local pi = math.pi
+			local sqrt = math.sqrt
+			local atan2 = math.atan2
+			local cos = math.cos
+			local sin = math.sin
+
+			-- Original velocity components
+			local V_x = obj1.VelocityX
+			local V_y = obj1.VelocityY
+
+			-- Number of projectiles and spread angle
+			local n = 5
+			local delta_theta = pi / 12
+
+			-- Calculate the speed
+			local speed = sqrt(V_x * V_x + V_y * V_y)
+
+			-- Original direction angle
+			local theta_0 = atan2(V_y, V_x)
+
+			-- Calculate new velocities for each projectile
+			new_velocities = {}
+
+			for i = -math.floor(n / 2), math.floor(n / 2) do
+				local theta_i = theta_0 + (delta_theta * i)
+				local V_x_i = speed * cos(theta_i)
+				local V_y_i = speed * sin(theta_i)
+				table.insert(new_velocities, {V_x_i, V_y_i})
+			end
+			
+			--manually change it
+			for i=1,n do
+			
 				BeginGrabObjects()
 				Game.SummonObjects(obj1.Type, obj1.X, obj1.Y, obj1.Z, 100,1)
 				obj2=GrabObjects()
 				
-				--manually change it
 				obj2.Age=obj1.Age
 				obj2.AttachToHead=obj1.AttachToHead
 				obj2.AttackType=obj1.AttackType
 				obj2.Bits=obj1.Bits
-				obj2.Direction=obj1.Direction+i*200
+				obj2.Direction=obj2.Direction
 				obj2.DroppedByPlayer=obj1.DroppedByPlayer
 				obj2.HaltTurnBased=obj1.HaltTurnBased
 				obj2.IgnoreRange=obj1.IgnoreRange
@@ -1678,8 +1712,8 @@ function events.PlayerCastSpell(t)
 				obj2.Temporary=obj1.Temporary
 				obj2.Type=obj1.Type
 				obj2.TypeIndex=obj1.TypeIndex
-				obj2.VelocityX=obj1.VelocityX
-				obj2.VelocityY=obj1.VelocityY
+				obj2.VelocityX=new_velocities[i][1]
+				obj2.VelocityY=new_velocities[i][2]
 				obj2.VelocityZ=obj1.VelocityZ
 				obj2.Visible=obj1.Visible
 				obj2.X=obj1.X
@@ -1689,7 +1723,7 @@ function events.PlayerCastSpell(t)
 		end
 	end
 end
-getDistance(obj1.X,obj1.Y,obj1.Z,obj2.X,obj2.Y,obj2.Z,)
+--getDistance(obj1.X,obj1.Y,obj1.Z,obj2.X,obj2.Y,obj2.Z,)
 ]]
 --starts at +50% recovery time
 --each spell cast grants a stack
