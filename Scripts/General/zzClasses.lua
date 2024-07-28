@@ -1635,6 +1635,62 @@ function events.Action(t)
 	end
 end
 
+--[[test code
+function events.PlayerCastSpell(t)
+	if t.SpellId==2 then
+		BeginGrabObjects()
+		function events.Tick()
+			events.Remove("Tick",1)
+			obj1=GrabObjects()
+			for i=1,10 do
+				BeginGrabObjects()
+				Game.SummonObjects(obj1.Type, obj1.X, obj1.Y, obj1.Z, 100,1)
+				obj2=GrabObjects()
+				
+				--manually change it
+				obj2.Age=obj1.Age
+				obj2.AttachToHead=obj1.AttachToHead
+				obj2.AttackType=obj1.AttackType
+				obj2.Bits=obj1.Bits
+				obj2.Direction=obj1.Direction+i*200
+				obj2.DroppedByPlayer=obj1.DroppedByPlayer
+				obj2.HaltTurnBased=obj1.HaltTurnBased
+				obj2.IgnoreRange=obj1.IgnoreRange
+				obj2.LightMultiplier=obj1.LightMultiplier
+				obj2.LookAngle=obj1.LookAngle
+				obj2.MaxAge=obj1.MaxAge
+				obj2.Missile=obj1.Missile
+				obj2.NoZBuffer=obj1.NoZBuffer
+				obj2.Owner=obj1.Owner
+				obj2.Range=obj1.Range
+				obj2.Removed=obj1.Removed
+				obj2.Room=obj1.Room
+				obj2.SkipAFrame=obj1.SkipAFrame
+				obj2.Spell=obj1.Spell
+				obj2.SpellLevel=obj1.SpellLevel
+				obj2.SpellMastery=obj1.SpellMastery
+				obj2.SpellSkill=obj1.SpellSkill
+				obj2.SpellType=obj1.SpellType
+				obj2.StartX=obj1.StartX
+				obj2.StartY=obj1.StartY
+				obj2.StartZ=obj1.StartZ
+				obj2.Target=obj1.Target
+				obj2.Temporary=obj1.Temporary
+				obj2.Type=obj1.Type
+				obj2.TypeIndex=obj1.TypeIndex
+				obj2.VelocityX=obj1.VelocityX
+				obj2.VelocityY=obj1.VelocityY
+				obj2.VelocityZ=obj1.VelocityZ
+				obj2.Visible=obj1.Visible
+				obj2.X=obj1.X
+				obj2.Y=obj1.Y
+				obj2.Z=obj1.Z
+			end
+		end
+	end
+end
+getDistance(obj1.X,obj1.Y,obj1.Z,obj2.X,obj2.Y,obj2.Z,)
+]]
 --starts at +50% recovery time
 --each spell cast grants a stack
 --each stack increases attack speed by 10%, up to 10 stacks (making spell cast half as a normal caster would have)
