@@ -821,7 +821,7 @@ function events.CalcDamageToPlayer(t)
 	end
 	if vars.Mode==2 then
 		if data and data.Monster then
-			t.Result=t.Result*(totalLevel[data.Monster.Id]/50+1.75)
+			t.Result=t.Result*(totalLevel[data.Monster.Id]/50+2)
 		elseif (t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1 then --drown and fall
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
