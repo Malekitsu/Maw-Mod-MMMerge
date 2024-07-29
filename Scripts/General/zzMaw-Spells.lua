@@ -1440,8 +1440,8 @@ function ascendSpellHealing(skill, mastery, spell, healM)
 	scaling=healingSpells[spell].Scaling[healM]
 	local ascensionLevel=getAscensionTier(skill,spell)
 	if ascensionLevel>0 then
-		scaling=scaling * (1+0.03 * skill * ascensionLevel) *1.2^ascensionLevel
-		base=base*(1+skill*0.05 * 2^(ascensionLevel)) *1.2^ascensionLevel
+		scaling=scaling * (1+0.01 * skill * ascensionLevel) *1.2^ascensionLevel
+		base=base*(1+skill*0.05 * 1.5^(ascensionLevel)) *1.2^ascensionLevel
 		scaling, base = math.round(scaling), math.round(base)
 	end
 	return scaling, base
@@ -1663,7 +1663,7 @@ function ascension()
 			end
 			if ascensionLevel>=1 then
 				for v=1,4 do
-					healingSpells[healingList[i]].Cost[v]=math.round(healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m))
+					healingSpells[healingList[i]].Cost[v]=math.round(healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.5^(ascensionLevel)*(1-0.125*m))
 					healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
 				end
 			end
