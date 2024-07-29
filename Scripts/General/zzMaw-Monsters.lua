@@ -1962,8 +1962,8 @@ function events.MonsterKilled(mon)
 			
 			vars.dungeonCompletedList=vars.dungeonCompletedList or {}
 			if vars.dungeonCompletedList[name]=="resetted" then
-				Game.EscMessage(string.format("Dungeon Completed!\nReset is possible again."))
 				vars.dungeonCompletedList[name]=true
+				Game.EscMessage(string.format("Dungeon Completed!\nReset is possible again."))
 				return
 			else
 				mapLevel=mapLevel+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
@@ -2000,11 +2000,11 @@ function events.MonsterKilled(mon)
 				for i=0,Party.High do
 					evt[i].Add{"Experience", Value = experience}
 				end
-				Game.EscMessage(string.format("Dungeon Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Material"))
 				mapvars.completed=true
 				vars.dungeonCompletedList=vars.dungeonCompletedList or {}
 				vars.dungeonCompletedList[name]=true
 				mapvars.monsterMap.cleared=true
+				Game.EscMessage(string.format("Dungeon Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Material"))
 				return
 			end
 		end
