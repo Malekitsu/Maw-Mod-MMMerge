@@ -1963,7 +1963,9 @@ function events.MonsterKilled(mon)
 			vars.dungeonCompletedList=vars.dungeonCompletedList or {}
 			if vars.dungeonCompletedList[name]=="resetted" then
 				vars.dungeonCompletedList[name]=true
-				Game.EscMessage(string.format("Dungeon Completed!\nReset is possible again."))
+				if Game.CurrentScreen~=22 then
+					Game.EscMessage(string.format("Dungeon Completed!\nReset is possible again."))
+				end
 				return
 			else
 				mapLevel=mapLevel+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
@@ -2004,13 +2006,17 @@ function events.MonsterKilled(mon)
 				vars.dungeonCompletedList=vars.dungeonCompletedList or {}
 				vars.dungeonCompletedList[name]=true
 				mapvars.monsterMap.cleared=true
-				Game.EscMessage(string.format("Dungeon Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Material"))
+				if Game.CurrentScreen~=22 then
+					Game.EscMessage(string.format("Dungeon Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Material"))
+				end
 				return
 			end
 		end
 		if mapvars.monsterMap.cleared==false and m/n>=0.65 and Game.BolsterAmount>=300 then
 			mapvars.monsterMap.cleared=true
-			Game.EscMessage("Monsters are weakened and can no longer resurrect")
+			if Game.CurrentScreen~=22 then
+				Game.EscMessage("Monsters are weakened and can no longer resurrect")
+			end
 		end
 	end
 end
