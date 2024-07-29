@@ -1709,7 +1709,7 @@ function events.BuildMonsterInformationBox(t)
 		diff=1.5+math.round(totalLevel[mon.Id])/100
 	end
 	if vars.Mode==2 then
-		diff=1.75+math.round(totalLevel[mon.Id])/50
+		diff=2+math.round(totalLevel[mon.Id])/50
 	end
 	
 	--some statistics here, calculate the standard deviation of dices to get the range of which 95% will fall into
