@@ -662,13 +662,15 @@ function events.GameInitialized2()
 	Game.SpellsTxt[114].Description="Mistform allows the vampire to reduce physical damage by 75%.  However, a vampire in Mistform cannot perform any physical attacks.  Vampires in Mistform are able to use spells and abilities and are affected by spells and abilities."
 
 	--passive spell buffs
-	Skillz.setDesc(const.Skills.Fire,5,"Grants 3 Intellect to all party per skill point")
-	Skillz.setDesc(const.Skills.Air,5,"Grants 3 Speed to all party per skill point")
-	Skillz.setDesc(const.Skills.Water,5,"Grants 3 Luck to all party per skill point")
-	Skillz.setDesc(const.Skills.Earth,5,"Grants 3 Endurance to all party per skill point")
-	Skillz.setDesc(const.Skills.Spirit,5,"Grants 3 Accuracy to all party per skill point")
-	Skillz.setDesc(const.Skills.Mind,5,"Grants 3 Personality to all party per skill point")
-	Skillz.setDesc(const.Skills.Body,5,"Grants 3 Might to all party per skill point")	
+	if not buffRework then
+		Skillz.setDesc(const.Skills.Fire,5,"Grants 3 Intellect to all party per skill point")
+		Skillz.setDesc(const.Skills.Air,5,"Grants 3 Speed to all party per skill point")
+		Skillz.setDesc(const.Skills.Water,5,"Grants 3 Luck to all party per skill point")
+		Skillz.setDesc(const.Skills.Earth,5,"Grants 3 Endurance to all party per skill point")
+		Skillz.setDesc(const.Skills.Spirit,5,"Grants 3 Accuracy to all party per skill point")
+		Skillz.setDesc(const.Skills.Mind,5,"Grants 3 Personality to all party per skill point")
+		Skillz.setDesc(const.Skills.Body,5,"Grants 3 Might to all party per skill point")	
+	end
 end
 
 -- shared life overflow fix
