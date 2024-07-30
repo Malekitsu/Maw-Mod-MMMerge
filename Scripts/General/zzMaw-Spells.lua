@@ -73,13 +73,15 @@ function getHealSpellMultiPlier(pl)
 	local mult=1
 	--crit
 	local critChance, critMult, success=getCritInfo(pl,"heal")
+	--heal crit disabled
+	success=false
 	if success then
 		mult=critMult
 	end
 	--int/pers bonus
 	local persBonus=pl:GetPersonality()
 	local intBonus=pl:GetIntellect()
-	local statBonus=math.max(persBonus,intBonus)/2000
+	local statBonus=math.max(persBonus,intBonus)/1000
 	mult=mult*(1+statBonus)
 	return mult, success
 end
@@ -1440,8 +1442,8 @@ function ascendSpellHealing(skill, mastery, spell, healM)
 	scaling=healingSpells[spell].Scaling[healM]
 	local ascensionLevel=getAscensionTier(skill,spell)
 	if ascensionLevel>0 then
-		scaling=scaling * (1+0.04 * skill * ascensionLevel)
-		base=base*(1+skill*0.15 * ascensionLevel+ascensionLevel^2.5)
+		scaling=scaling * (1+0.01 * skill * ascensionLevel)*1.2^ascensionLevel
+		base=base*(1+skill*0.05 * ascensionLevel*1.5^ascensionLevel)*1.2^ascensionLevel
 		scaling, base = math.round(scaling), math.round(base)
 	end
 	return scaling, base
@@ -1650,8 +1652,8 @@ function ascension()
 			[const.Spells.RemoveCurse]=    {["Cost"]={0,5,10,20}, ["Base"]={0,10,15,25}, ["Scaling"]={0,3,4,5}},
 			[const.Spells.SharedLife]=    {["Cost"]={0,0,25,40}, ["Base"]={0,0,0,0}, ["Scaling"]={0,0,7,9}},
             [const.Spells.Resurrection]={["Cost"]={0,0,0,100}, ["Base"]={0,0,0,100}, ["Scaling"]={0,0,0,14}},
-            [const.Spells.Heal]=        {["Cost"]={2,4,6,8}, ["Base"]={9,11,13,15}, ["Scaling"]={1,2,3,4}},
-            [const.Spells.CureDisease]=    {["Cost"]={0,0,15,25}, ["Base"]={0,0,15,25}, ["Scaling"]={0,0,5,7}},
+            [const.Spells.Heal]=        {["Cost"]={2,4,6,8}, ["Base"]={8,12,16,20}, ["Scaling"]={1,2,3,4}},
+            [const.Spells.CureDisease]=    {["Cost"]={0,0,15,25}, ["Base"]={0,0,25,40}, ["Scaling"]={0,0,5,7}},
             [const.Spells.PowerCure]=    {["Cost"]={0,0,0,30}, ["Base"]={0,0,0,10}, ["Scaling"]={0,0,0,3}}
 		}
 		for i=1, 6 do
