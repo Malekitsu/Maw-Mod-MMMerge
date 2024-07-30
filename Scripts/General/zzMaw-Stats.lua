@@ -1084,7 +1084,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		local AC=pl:GetArmorClass()
 		local AC=pl:GetArmorClass()
 		local AC=pl:GetArmorClass()--multiple times to avoid chance to hit code to interfere with AC
-		local damage=math.round(damage/2^(AC/math.min(100+monLvl*0.75*bolster,300*bolster)))
+		local damage=math.round(damage/2^(AC/math.min(150+monLvl*0.75*bolster,300*bolster)))
 		return damage
 	end
 	
@@ -1125,7 +1125,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		end
 		res=math.min(maxres,res*1.5)
 	end
-	res=1/2^math.min(res/math.min(67+monLvl*0.5*bolster,200*bolster))
+	res=1/2^math.min(res/math.min(75+monLvl*0.5*bolster,200*bolster))
 	
 	--randomize resistance
 	if res>0 and rand then
