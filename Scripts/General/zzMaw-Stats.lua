@@ -240,12 +240,12 @@ function events.BuildStatInformationBox(t)
 	if t.Stat==1 then
 		i=Game.CurrentPlayer
 		intellect=Party[i]:GetIntellect()
-		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing: %s%s\nHeal bonus effect is halved",Game.StatsDescriptions[1],intellect/10,"%",intellect*3/20+50,"%")
+		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing: %s%s\nHealing spells cannot crit",Game.StatsDescriptions[1],intellect/10,"%",intellect*3/20+50,"%")
 	end
 	if t.Stat==2 then
 		i=Game.CurrentPlayer
 		personality=Party[i]:GetPersonality()
-		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing bonus: %s%s\nHeal bonus effect is halved",Game.StatsDescriptions[2],personality/10,"%",personality*3/20+50,"%")
+		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing bonus: %s%s\nHealing spells cannot crit",Game.StatsDescriptions[2],personality/10,"%",personality*3/20+50,"%")
 	end
 	if t.Stat==3 then
 		i=Game.CurrentPlayer
@@ -291,7 +291,7 @@ function events.BuildStatInformationBox(t)
 		t.Text=string.format("%s\n\nCritical strike chance: %s%%",Game.StatsDescriptions[6],critChance)
 		daggerBonus=daggerCritBonus~=critChance
 		if daggerBonus then
-			t.Text=string.format("%s\n\nCritical strike chance: %s%%(%s%% with dagger)",Game.StatsDescriptions[6],critChance, daggerCritBonus)
+			t.Text=string.format("%s\n\nCritical strike chance: %s%%(%s%% with dagger\nHealing Spells cannot crit)",Game.StatsDescriptions[6],critChance, daggerCritBonus)
 		end
 	end
 	if t.Stat==7 then
