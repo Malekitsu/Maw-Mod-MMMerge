@@ -1441,7 +1441,7 @@ function ascendSpellHealing(skill, mastery, spell, healM)
 	local ascensionLevel=getAscensionTier(skill,spell)
 	if ascensionLevel>0 then
 		scaling=scaling * (1+0.05 * skill * ascensionLevel)
-		base=base**(1+skill*0.15 * ascensionLevel+ascensionLevel^2.5)
+		base=base*(1+skill*0.15 * ascensionLevel+ascensionLevel^2.5)
 		scaling, base = math.round(scaling), math.round(base)
 	end
 	return scaling, base
