@@ -206,14 +206,15 @@ function events.CalcDamageToMonster(t)
 		levelBonus1=spiritM+math.floor(t.Player.LevelBase/100)
 		levelBonus2=bodyM+math.floor(t.Player.LevelBase/100)
 		healValue=(bodyS*levelBonus2+spiritS*levelBonus1)*damageMultiplier[t.PlayerIndex]["Melee"]
-		personality=data.Player:GetPersonality()/2
+		personality=data.Player:GetPersonality()
 		healValue=healValue*(1+personality/1000)
-		--calculate crit
+		--[[calculate crit
 		critchance=data.Player:GetLuck()/15*10+50
 		roll=math.random(1,1000)
 		if roll<critchance then
 			healValue=healValue*(1.5+personality*3/2000)
 		end
+		]]
 		--apply heal
 		evt[min_index].Add("HP",healValue)		
 		--bug fix
