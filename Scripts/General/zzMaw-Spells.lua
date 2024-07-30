@@ -1440,8 +1440,8 @@ function ascendSpellHealing(skill, mastery, spell, healM)
 	scaling=healingSpells[spell].Scaling[healM]
 	local ascensionLevel=getAscensionTier(skill,spell)
 	if ascensionLevel>0 then
-		scaling=scaling * (1+0.01 * skill * ascensionLevel) *1.2^ascensionLevel
-		base=base*(1+skill*0.05 * 1.5^(ascensionLevel)) *1.2^ascensionLevel
+		scaling=scaling * (1+0.05 * skill * ascensionLevel)
+		base=base**(1+skill*0.15 * ascensionLevel+ascensionLevel^2.5)
 		scaling, base = math.round(scaling), math.round(base)
 	end
 	return scaling, base
@@ -1647,11 +1647,11 @@ function ascension()
 		--Healing Spells
 		-----------------------
 		healingSpells={
-			[const.Spells.RemoveCurse]=    {["Cost"]={0,5,10,20}, ["Base"]={0,10,20,30}, ["Scaling"]={0,3,4,5}},
+			[const.Spells.RemoveCurse]=    {["Cost"]={0,5,10,20}, ["Base"]={0,10,15,25}, ["Scaling"]={0,3,4,5}},
 			[const.Spells.SharedLife]=    {["Cost"]={0,0,25,40}, ["Base"]={0,0,0,0}, ["Scaling"]={0,0,7,9}},
             [const.Spells.Resurrection]={["Cost"]={0,0,0,100}, ["Base"]={0,0,0,100}, ["Scaling"]={0,0,0,14}},
-            [const.Spells.Heal]=        {["Cost"]={2,4,6,8}, ["Base"]={10,15,20,25}, ["Scaling"]={1,2,3,4}},
-            [const.Spells.CureDisease]=    {["Cost"]={0,0,15,25}, ["Base"]={0,0,35,50}, ["Scaling"]={0,0,5,7}},
+            [const.Spells.Heal]=        {["Cost"]={2,4,6,8}, ["Base"]={9,11,13,15}, ["Scaling"]={1,2,3,4}},
+            [const.Spells.CureDisease]=    {["Cost"]={0,0,15,25}, ["Base"]={0,0,15,25}, ["Scaling"]={0,0,5,7}},
             [const.Spells.PowerCure]=    {["Cost"]={0,0,0,30}, ["Base"]={0,0,0,10}, ["Scaling"]={0,0,0,3}}
 		}
 		for i=1, 6 do
@@ -1663,7 +1663,7 @@ function ascension()
 			end
 			if ascensionLevel>=1 then
 				for v=1,4 do
-					healingSpells[healingList[i]].Cost[v]=math.round(healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.5^(ascensionLevel)*(1-0.125*m))
+					healingSpells[healingList[i]].Cost[v]=math.round(healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m))
 					healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
 				end
 			end
