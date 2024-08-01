@@ -1654,7 +1654,7 @@ function ascension()
 			[const.Spells.RemoveCurse]=    {["Cost"]={0,5,10,20}, ["Base"]={0,10,15,25}, ["Scaling"]={0,3,4,5}},
 			[const.Spells.SharedLife]=    {["Cost"]={0,0,25,40}, ["Base"]={0,0,0,0}, ["Scaling"]={0,0,7,9}},
             [const.Spells.Resurrection]={["Cost"]={0,0,0,100}, ["Base"]={0,0,0,100}, ["Scaling"]={0,0,0,14}},
-            [const.Spells.Heal]=        {["Cost"]={2,4,6,8}, ["Base"]={9,11,13,15}, ["Scaling"]={1,2,3,4}},
+            [const.Spells.Heal]=        {["Cost"]={2,4,6,8}, ["Base"]={7,8,9,10}, ["Scaling"]={1,2,3,4}},
             [const.Spells.CureDisease]=    {["Cost"]={0,0,15,25}, ["Base"]={0,0,15,25}, ["Scaling"]={0,0,5,7}},
             [const.Spells.PowerCure]=    {["Cost"]={0,0,0,30}, ["Base"]={0,0,0,10}, ["Scaling"]={0,0,0,3}}
 		}
