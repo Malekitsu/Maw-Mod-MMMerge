@@ -1780,6 +1780,7 @@ function events.GameInitialized2() --make it load later compared to other script
 				if data.Object and data.Object.Spell==133 then
 					heal=heal/2
 				end
+				heal=math.ceil(heal)
 				t.Player.HP=math.min(fullHP,t.Player.HP+heal)
 			end
 		end
