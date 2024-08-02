@@ -1281,11 +1281,11 @@ function events.GameInitialized2()
 			[9] = {dmgAdd = 2, diceMin = 1, diceMax = 1, },--meteor shower
 			[10] = {dmgAdd = 12, diceMin = 1, diceMax = 7, },--inferno
 			[11] = {dmgAdd = 18, diceMin = 1, diceMax = 18, },--incinerate
-			[15] = {dmgAdd = 0, diceMin = 1, diceMax = 5, },--sparks
+			[15] = {dmgAdd = 0, diceMin = 1, diceMax = 4, },--sparks
 			[18] = {dmgAdd = 13, diceMin = 1, diceMax = 8, },--lightning bolt
 			[20] = {dmgAdd = 20, diceMin = 1, diceMax = 12, },--implosion
 			[22] = {dmgAdd = 5, diceMin = 1, diceMax = 1, },--starburst
-			[24] = {dmgAdd = 6, diceMin = 1, diceMax = 3, },--poison spray
+			[24] = {dmgAdd = 5, diceMin = 1, diceMax = 3, },--poison spray
 			[26] = {dmgAdd = 6, diceMin = 1, diceMax = 7, },--ice bolt
 			[29] = {dmgAdd = 2, diceMin = 1, diceMax = 14, },--acid burst
 			[32] = {dmgAdd = 6, diceMin = 1, diceMax = 6, },--ice blast
@@ -1304,7 +1304,7 @@ function events.GameInitialized2()
 			[84] = {dmgAdd = 25, diceMin = 2, diceMax = 2, },--prismatic light
 			[87] = {dmgAdd = 50, diceMin = 1, diceMax = 50, },--sunray
 			[90] = {dmgAdd = 15, diceMin = 1, diceMax = 9, },--toxic cloud
-			[93] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--shrapmetal
+			[93] = {dmgAdd = 0, diceMin = 1, diceMax = 7, },--shrapmetal
 			[97] = {dmgAdd = 0, diceMin = 1, diceMax = 28, },--dragon breath
 			[98] = {dmgAdd = 50, diceMin = 1, diceMax = 1, },--armageddon
 			[99] = {dmgAdd = 25, diceMin = 1, diceMax = 5, },--souldrinker
