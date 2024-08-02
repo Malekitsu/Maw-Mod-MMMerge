@@ -2271,7 +2271,10 @@ function itemStats(index)
 			local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
 			--weapon 
 			local s2,m2=SplitSkill(pl:GetSkill(skill))
-			local mult=(1+s2*skillDamage[skill][m2]/100)
+			local mult=1
+			if skillDamage[skill] then
+				mult=(1+s2*skillDamage[skill][m2]/100)
+			end
 			local side=sidesBonus*mult
 			local add=bonus*mult
 			local armsDmg=armsmasterDamage[m]*s*mult
