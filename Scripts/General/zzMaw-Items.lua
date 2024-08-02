@@ -841,7 +841,7 @@ function events.BuildItemInformationBox(t)
 					local bonus2=Game.ItemsTxt[t.Item.Number+lookup].Mod2
 					--attack/+damage
 					--if t.Item.MaxCharges <= 20 then
-						local bonusATK=bonus2*(t.Item.MaxCharges/20)
+						local bonusATK=bonus2*(t.Item.MaxCharges/30)
 						bonus=bonus+math.round(bonusATK)
 					--else
 					--	local bonusATK=(bonus2+bonus)*(t.Item.MaxCharges/20)
@@ -851,7 +851,7 @@ function events.BuildItemInformationBox(t)
 					local sides=txt.Mod1DiceSides
 					local sides2=Game.ItemsTxt[t.Item.Number+lookup].Mod1DiceSides
 					--if t.Item.MaxCharges <= 20 then
-						local sidesBonus=sides2*(t.Item.MaxCharges/20)
+						local sidesBonus=sides2*(t.Item.MaxCharges/30)
 						sides=sides+math.round(sidesBonus)
 					--else
 					--	local sidesBonus=(sides2+sides)*(t.Item.MaxCharges/20)
@@ -2236,22 +2236,16 @@ function itemStats(index)
 			local bonus2 = referenceWeaponAttack[it.Number]
 			local bonusATK
 
-			if it.MaxCharges <= 20 then
-				bonusATK = bonus2 * (it.MaxCharges / 20)
-			else
-				bonusATK = (bonus2 + bonus) * (it.MaxCharges / 20)
-			end
+			bonusATK = bonus2 * (it.MaxCharges / 30)
+			
 			bonus = bonus + math.round(bonusATK)
 
 			local sides = txt.Mod1DiceSides
 			local sides2 = referenceWeaponSides[it.Number]
 			local sidesBonus
 			
-			if it.MaxCharges <= 20 then
-				sidesBonus = sides2 * (it.MaxCharges / 20)
-			else
-				sidesBonus = (sides2 + sides) * (it.MaxCharges / 20)
-			end
+			sidesBonus = sides2 * (it.MaxCharges / 30)
+			
 			sidesBonus = sides + math.round(sidesBonus)
 			
 			if table.find(artWeap1h,it.Number) or table.find(artWeap2h,it.Number) then 
@@ -2262,16 +2256,42 @@ function itemStats(index)
 				end
 			end	
 			
-			if txt.Skill ~= 5 then
+			local skill=txt.Skill
+			--minotaur fix
+			local item=pl:GetActiveItem(0)
+			if table.find(oneHandedAxes, it.Number) or table.find(twoHandedAxes, it.Number) then
+				if item then
+					skill=2
+				else
+					skill=3
+				end
+			end	
+			
+			--armsmaster
+			local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
+			--weapon 
+			local s2,m2=SplitSkill(pl:GetSkill(skill))
+			local mult=(1+s2*skillDamage[skill][m2]/100)
+			local side=sidesBonus*mult
+			local add=bonus*mult
+			local armsDmg=armsmasterDamage[m]*s*mult
+			if item and skill ~= 5 then
+				if skill~=8 then
+					armsDmg=armsDmg/2
+				end
+			end
+			
+			local totBonus=armsDmg+add
+			if skill ~= 5 then
 				tab[40] = tab[40] + math.round(bonus)
 				tab[41] = tab[41] + math.round(bonus)
-				tab[42] = tab[42] + txt.Mod1DiceCount+math.round(bonus)
-				tab[43] = tab[43] + math.round(sidesBonus)*txt.Mod1DiceCount+math.round(bonus)
+				tab[42] = tab[42] + txt.Mod1DiceCount+math.round(totBonus)
+				tab[43] = tab[43] + math.round(side)*txt.Mod1DiceCount+math.round(totBonus)
 			else
 				tab[44] = tab[44] + math.round(bonus)
 				tab[45] = tab[45] + math.round(bonus)
-				tab[46] = tab[46] + math.round(txt.Mod1DiceCount)+tab[45]
-				tab[47] = tab[47] + math.round(sidesBonus)*txt.Mod1DiceCount+tab[45]
+				tab[46] = tab[46] + math.round(txt.Mod1DiceCount)+add
+				tab[47] = tab[47] + math.round(side)*txt.Mod1DiceCount+add
 			end
 		end
 		
@@ -2487,22 +2507,6 @@ function itemStats(index)
 			end
 			local s,m = SplitSkill(pl:GetSkill(skill))
 			
-			local bonusDamage=0
-			if item:T().EquipStat==1 then
-				bonusDamage=twoHandedWeaponDamageBonusByMastery[m]
-			elseif skill==4 and  not pl:GetActiveItem(0) then
-				bonusDamage=twoHandedWeaponDamageBonusByMastery[m]
-			end
-			--minotaur axe overrides, no extra damage if 2h weapon in offhand
-			if skill==3 and table.find(twoHandedAxes, item.Number) then
-				local offHand=pl:GetActiveItem(0)
-				if offHand and table.find(twoHandedAxes, offHand.Number) then
-					bonusDamage=0
-				else
-					bonusDamage=3
-				end
-			end
-			
 			if skillAC[skill] and skillAC[skill][m] then
 				tab[10]=tab[10]+skillAC[skill][m]*s
 			end
@@ -2518,18 +2522,9 @@ function itemStats(index)
 					tab[44]=tab[44]+skillAttack[skill][m]*s
 				end
 			end
-			if skillDamage[skill] and skillDamage[skill][m] then
-				if i~=2 then
-					tab[41]=tab[42]+skillDamage[skill][m]*s+bonusDamage*s
-					tab[42]=tab[42]+skillDamage[skill][m]*s+bonusDamage*s
-					tab[43]=tab[43]+skillDamage[skill][m]*s+bonusDamage*s
-				else
-					removeVanillaCalculation=0
-					if m==4 then removeVanillaCalculation=1 end
-					tab[45]=tab[45]+skillDamage[skill][m]*s
-					tab[46]=tab[46]+skillDamage[skill][m]*s-(removeVanillaCalculation*s)
-					tab[47]=tab[47]+skillDamage[skill][m]*s-(removeVanillaCalculation*s)
-				end
+			if i==2 and m==4 then --remove vanilla calculation
+				tab[46]=tab[46]-s
+				tab[47]=tab[47]-s
 			end
 		end
 		local s,m = SplitSkill(pl:GetSkill(const.Skills.Dodging)) 
@@ -2537,13 +2532,11 @@ function itemStats(index)
 			tab[10]=tab[10]+skillAC[const.Skills.Dodging][m]*s
 		end
 	end
-	--armsmaster
+	
+	--armsmaster attack
 	local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
 	if m>0 then
 		tab[40]=tab[40]+armsmasterAttack[m]*s
-		tab[41]=tab[41]+armsmasterDamage[m]*s
-		tab[42]=tab[42]+armsmasterDamage[m]*s
-		tab[43]=tab[43]+armsmasterDamage[m]*s
 	end
 	--unarmed
 	local s,m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
