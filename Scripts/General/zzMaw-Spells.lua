@@ -1432,8 +1432,12 @@ function ascendSpellDamage(skill, mastery, spell, index)
 		--damageAdd=damageAdd*(1+skill * (ascensionLevel+1) / 8)
 		--diceMax=diceMax * (1+0.05 * skill * (ascensionLevel+1))
 		--damageAdd=damageAdd*(1+skill^2 / 45 * (ascensionLevel+1)^2)
-		damageAdd=damageAdd*(1+skill*0.15 * 2^(ascensionLevel+0.5)) *1.2^ascensionLevel
-		diceMax=diceMax * (1+0.03 * skill * (ascensionLevel+1)) *1.2^ascensionLevel
+		
+		--damageAdd=damageAdd*(1+skill*0.05 ) *2^ascensionLevel*1.2^ascensionLevel
+		--diceMax=diceMax *1.25^ascensionLevel*1.2^ascensionLevel
+		
+		damageAdd=damageAdd*(1+skill*0.05 )*(ascensionLevel+1)^2*1.2^ascensionLevel
+		diceMax=diceMax*(1+0.075*(ascensionLevel+1)^2)*1.2^ascensionLevel
 	end
 	diceMin, diceMax, damageAdd = math.round(diceMin), math.round(diceMax), math.round(damageAdd)
 	return diceMin, diceMax, damageAdd
@@ -1654,7 +1658,7 @@ function ascension()
 			[const.Spells.RemoveCurse]=    {["Cost"]={0,5,10,20}, ["Base"]={0,10,15,25}, ["Scaling"]={0,3,4,5}},
 			[const.Spells.SharedLife]=    {["Cost"]={0,0,25,40}, ["Base"]={0,0,0,0}, ["Scaling"]={0,0,7,9}},
             [const.Spells.Resurrection]={["Cost"]={0,0,0,100}, ["Base"]={0,0,0,100}, ["Scaling"]={0,0,0,14}},
-            [const.Spells.Heal]=        {["Cost"]={2,4,6,8}, ["Base"]={7,8,9,10}, ["Scaling"]={1,2,3,4}},
+            [const.Spells.Heal]=        {["Cost"]={2,4,6,8}, ["Base"]={4,6,8,10}, ["Scaling"]={1,2,3,4}},
             [const.Spells.CureDisease]=    {["Cost"]={0,0,15,25}, ["Base"]={0,0,15,25}, ["Scaling"]={0,0,5,7}},
             [const.Spells.PowerCure]=    {["Cost"]={0,0,0,30}, ["Base"]={0,0,0,10}, ["Scaling"]={0,0,0,3}}
 		}
@@ -3035,4 +3039,3 @@ function events.GameInitialized2()
 		oldSpellTooltips[i]=Game.SpellsTxt[i].Description
 	end
 end
-
