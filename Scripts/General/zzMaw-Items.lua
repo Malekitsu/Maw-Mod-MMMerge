@@ -2258,13 +2258,8 @@ function itemStats(index)
 			
 			local skill=txt.Skill
 			--minotaur fix
-			local item=pl:GetActiveItem(0)
 			if table.find(oneHandedAxes, it.Number) or table.find(twoHandedAxes, it.Number) then
-				if item then
-					skill=2
-				else
-					skill=3
-				end
+				skill=3
 			end	
 			
 			--armsmaster
