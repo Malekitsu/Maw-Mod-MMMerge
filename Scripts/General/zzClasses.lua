@@ -225,7 +225,7 @@ function events.CalcDamageToMonster(t)
 		
 end
 
---mind light increases melee damage
+--[[mind light increases melee damage
 
 function events.GameInitialized2()
 	--damage from skills
@@ -245,6 +245,7 @@ function events.GameInitialized2()
 		end	
 	end
 end
+MOVED IN MAW ITEMS, DUE TO WEAPON SCALING]]
 
 --AUTORESS SKILL
 
@@ -337,9 +338,9 @@ local function seraphSkills(isSeraph, id)
 		local dmgMult=1+might/1000
 		local mindDMG=math.floor((mindS*(mindM+lvlBonus))*dmgMult)
 		local lightDMG=math.floor((lightS*(lightM+lvlBonus))*dmgMult)
-		local txt=baseSchoolsTxtSERAPH[16] .. "\n\nSeraphim damage upon attack increases depending on Mind magic, scaling with might(weapon speed multiplier applies).\nGets 1 bonus damage each 100 levels.\n\n" .. "Current damage from Mind: " .. StrColor(255,0,0,mindDMG) .. "\n"
+		local txt=baseSchoolsTxtSERAPH[16] .. "\n\nSeraphim damage upon attack increases depending on Mind magic, scaling with might(weapon speed multiplier applies).\n\n" .. "Current damage from Mind: " .. StrColor(255,0,0,mindDMG) .. "\n"
 		Skillz.setDesc(17,1,txt)
-		local txt=baseSchoolsTxtSERAPH[18] .. "\n\nSeraphim damage upon attack increases depending on Light magic, scaling with might(weapon speed multiplier applies).\nGets 1 bonus damage each 100 levels.\n\n" .. "Current damage from Light: " .. StrColor(255,0,0,lightDMG) .. "\n"
+		local txt=baseSchoolsTxtSERAPH[18] .. "\n\nSeraphim damage upon attack increases depending on Light magic, scaling with might(weapon speed multiplier applies).\n\n" .. "Current damage from Light: " .. StrColor(255,0,0,lightDMG) .. "\n"
 		Skillz.setDesc(19,1,txt)
 		
 		--tooltips
@@ -892,7 +893,7 @@ function events.GameInitialized2()
 			t.Result=t.Result+fireDamage
 		end
 	end
-	
+	--[[
 	function events.CalcStatBonusByItems(t)
 		if t.Stat==const.Stats.MeleeDamageMax or t.Stat==const.Stats.MeleeDamageMin then
 			if table.find(shamanClass, t.Player.Class) then	
@@ -909,6 +910,7 @@ function events.GameInitialized2()
 			end
 		end
 	end
+	MOVED IN MAW ITEMS, DUE TO WEAPON SCALING]]
 end
 
 local baseSchoolsTxt={}
@@ -1001,7 +1003,7 @@ local DKDamageMult={
 
 --spells
 function events.GameInitialized2()
-	--damage from skills
+	--[[damage from skills 
 	function events.CalcStatBonusByItems(t)
 		if t.Stat==const.Stats.MeleeDamageMax or t.Stat==const.Stats.MeleeDamageMin then
 			if table.find(dkClass, t.Player.Class) then	
@@ -1013,7 +1015,10 @@ function events.GameInitialized2()
 				bonus=bonus*(1+might/1000)
 				t.Result=t.Result+s1*math.min(m1, 3)+s3*math.min(m3, 3)
 			end
-		elseif t.Stat==const.Stats.SpellPoints and table.find(dkClass, t.Player.Class) then
+		end
+		MOVED IN MAW ITEMS, DUE TO WEAPON SCALING]]
+			
+		if t.Stat==const.Stats.SpellPoints and table.find(dkClass, t.Player.Class) then
 			t.Result=0
 		end
 	end	
