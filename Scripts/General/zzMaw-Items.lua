@@ -2270,9 +2270,13 @@ function itemStats(index)
 			if skillDamage[skill] then
 				mult=(1+s2*skillDamage[skill][m2]/100)
 			end
+			
 			local side=sidesBonus*mult
 			local add=bonus*mult
 			local armsDmg=armsmasterDamage[m]*s*mult
+			
+			--split armsmaster between main and offhand
+			local item=pl:GetActiveItem(0)
 			if item and skill ~= 5 then
 				if skill~=8 then
 					armsDmg=armsDmg/2
