@@ -341,7 +341,7 @@ function events.BuildStatInformationBox(t)
 		local HPregenItem=0
 		local bonusregen=0
 		for it in Party[i]:EnumActiveItems() do
-			if it.Bonus2 == 37 or it.Bonus2==44 or it.Bonus2==50 or it.Bonus2==54 then	
+			if it.Bonus2 == 37 or it.Bonus2==44 or it.Bonus2==50 or it.Bonus2==54 or it.Bonus2==66 then	
 				HPregenItem=HPregenItem+1
 				bonusregen=1
 			end
@@ -389,7 +389,7 @@ function events.BuildStatInformationBox(t)
 		local SPregenItem=0
 		local bonusregen=0
 		for it in Party[i]:EnumActiveItems() do
-			if it.Bonus2 == 38 or it.Bonus2==47 or it.Bonus2==55 then		
+			if it.Bonus2 == 38 or it.Bonus2==47 or it.Bonus2==55 or it.Bonus2==66 then		
 				SPregenItem=SPregenItem+1
 				bonusregen=1
 			end
