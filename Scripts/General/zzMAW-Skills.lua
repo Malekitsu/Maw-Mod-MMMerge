@@ -60,11 +60,11 @@ skillAttack =
 skillRecovery =
 {
 	[const.Skills.Staff]	= {[0]=0, 0, 0, 0, 0,},
-	[const.Skills.Sword]	= {[0]=0, 0, 2, 3, 5,},
+	[const.Skills.Sword]	= {[0]=0, 0, 2, 3, 3,},
 	[const.Skills.Dagger]	= {[0]=0, 0, 1, 1, 2,},
-	[const.Skills.Axe]		= {[0]=0, 0, 2, 3, 4,},
+	[const.Skills.Axe]		= {[0]=0, 0, 1, 2, 2,},
 	[const.Skills.Spear]	= {[0]=0, 0, 0, 0, 0,},
-	[const.Skills.Bow]		= {[0]=0, 2, 3, 4, 5,},
+	[const.Skills.Bow]		= {[0]=0, 1, 2, 3, 3,},
 	[const.Skills.Mace]		= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Unarmed]	= {[0]=0, 0, 1, 1, 2,},
@@ -72,13 +72,13 @@ skillRecovery =
 
 skillDamage =
 {
-	[const.Skills.Staff]	= {[0]=0, 2, 3, 4, 5,},
-	[const.Skills.Sword]	= {[0]=0, 2, 3, 4, 5,},
-	[const.Skills.Dagger]	= {[0]=0, 2, 3, 4, 5,},
-	[const.Skills.Axe]		= {[0]=0, 2, 3, 4, 5,},
-	[const.Skills.Spear]	= {[0]=0, 2, 3, 4, 4,},
-	[const.Skills.Bow]		= {[0]=0, 4, 6, 8, 10,},
-	[const.Skills.Mace]		= {[0]=0, 2, 3, 4, 4,},
+	[const.Skills.Staff]	= {[0]=0, 2, 3, 3, 4,},
+	[const.Skills.Sword]	= {[0]=0, 2, 3, 3, 4,},
+	[const.Skills.Dagger]	= {[0]=0, 2, 3, 3, 4,},
+	[const.Skills.Axe]		= {[0]=0, 2, 3, 4, 4,},
+	[const.Skills.Spear]	= {[0]=0, 2, 2, 3, 3,},
+	[const.Skills.Bow]		= {[0]=0, 2, 4, 6, 8,},
+	[const.Skills.Mace]		= {[0]=0, 2, 2, 3, 4,},
 	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Unarmed]	= {[0]=0, 3, 4, 5, 6,},
 }
@@ -243,9 +243,9 @@ function events.GetAttackDelay(t)
 	end
 	local speed=t.Player:GetSpeed()
 	if speed<=21 then
-		speedEffect=(speed-13)/2
+		speedEffect=(speed-13)/4
 	else
-		speedEffect=math.floor(speed/5)
+		speedEffect=math.floor(speed/10)
 	end
 	bonusSpeed=bonusSpeed+speedEffect
 	if t.Player.SpellBuffs[const.PlayerBuff.Haste].ExpireTime>Game.Time or (not buffRework and Party.SpellBuffs[const.PartyBuff.Haste].ExpireTime>Game.Time) then
