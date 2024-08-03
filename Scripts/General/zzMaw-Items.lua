@@ -2281,14 +2281,14 @@ function itemStats(index)
 				local s1, m1=SplitSkill(pl.Skills[const.Skills.Water])
 				local s2, m2=SplitSkill(pl.Skills[const.Skills.Dark])
 				local bonus=s1*math.min(m1, 3)+s2*math.min(m2, 3)
-				armsDmg=armsDmg+bonus
+				armsDmg=armsDmg+bonus*mult
 			end
 			--SERAPHIM
 			if table.find(seraphClass, pl.Class) then	
 				local s1, m1=SplitSkill(pl.Skills[const.Skills.Mind])
 				local s2, m2=SplitSkill(pl.Skills[const.Skills.Light])
 				local bonus=s1*m1+s2*m2
-				armsDmg=armsDmg+bonus
+				armsDmg=armsDmg+bonus*mult
 			end
 			--SHAMAN
 			if table.find(shamanClass, pl.Class) then	
@@ -2299,8 +2299,8 @@ function itemStats(index)
 				local m5=SplitSkill(pl.Skills[const.Skills.Spirit])
 				local m6=SplitSkill(pl.Skills[const.Skills.Mind])
 				local m7=SplitSkill(pl.Skills[const.Skills.Body])
-				local m8=m2+m3+m4+m5+m1+m6+m7
-				armsDmg=armsDmg+bonus+m8
+				local bonus=m2+m3+m4+m5+m1+m6+m7
+				armsDmg=armsDmg+bonus*mult
 			end
 			
 			--split armsmaster between main and offhand
