@@ -676,66 +676,66 @@ end
 --------------------
 
 function events.LoadMap(wasInGame)
-local function poisonTimer() 
-
-vars.poisonTime=vars.poisonTime or {}
-	for i = 0, Party.High do
-		if Party[i].Poison3>0 then
-			if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
-			vars.poisonTime[i]=25
-			end
-			if vars.poisonTime[i]>0 then
-			vars.poisonTime[i]=vars.poisonTime[i]-1
-			end
-			if vars.poisonTime[i]==0 then			
-			Party[i].Poison3=0
-			Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
-			else
-			Party[i].HP=Party[i].HP-math.ceil(Party[i].LevelBase*Game.Classes.HPFactor[Party[i].Class]*0.06)*(Game.BolsterAmount/100)
-			end 
-		else if Party[i].Poison2>0 then
+	local function poisonTimer() 
+		vars.poisonTime=vars.poisonTime or {}
+		for i = 0, Party.High do
+			if Party[i].Poison3>0 then
 				if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
-				vars.poisonTime[i]=25
+					vars.poisonTime[i]=20
 				end
 				if vars.poisonTime[i]>0 then
-				vars.poisonTime[i]=vars.poisonTime[i]-1
+					vars.poisonTime[i]=vars.poisonTime[i]-1
 				end
 				if vars.poisonTime[i]==0 then			
-				Party[i].Poison2=0
-				Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
+					Party[i].Poison3=0
+					Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
 				else
-				Party[i].HP=Party[i].HP-math.ceil(Party[i].LevelBase*Game.Classes.HPFactor[Party[i].Class]*0.04)*(Game.BolsterAmount/100)
+					Party[i].HP=Party[i].HP-math.ceil(Party[i].LevelBase*Game.Classes.HPFactor[Party[i].Class]*0.06)*(Game.BolsterAmount/100)
 				end 
-			else if Party[i].Poison1>0 then
+			else if Party[i].Poison2>0 then
 					if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
-					vars.poisonTime[i]=25
+						vars.poisonTime[i]=20
 					end
 					if vars.poisonTime[i]>0 then
-					vars.poisonTime[i]=vars.poisonTime[i]-1
+						vars.poisonTime[i]=vars.poisonTime[i]-1
 					end
 					if vars.poisonTime[i]==0 then			
-					Party[i].Poison1=0
-					Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
+						Party[i].Poison2=0
+						Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
 					else
-					Party[i].HP=Party[i].HP-math.ceil(Party[i].LevelBase*Game.Classes.HPFactor[Party[i].Class]*0.02)*(Game.BolsterAmount/100)
+						Party[i].HP=Party[i].HP-math.ceil(Party[i].LevelBase*Game.Classes.HPFactor[Party[i].Class]*0.04)*(Game.BolsterAmount/100)
 					end 
-				else vars.poisonTime[i]=0
+				else if Party[i].Poison1>0 then
+						if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
+							vars.poisonTime[i]=20
+						end
+						if vars.poisonTime[i]>0 then
+							vars.poisonTime[i]=vars.poisonTime[i]-1
+						end
+						if vars.poisonTime[i]==0 then			
+							Party[i].Poison1=0
+							Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
+						else
+							Party[i].HP=Party[i].HP-math.ceil(Party[i].LevelBase*Game.Classes.HPFactor[Party[i].Class]*0.02)*(Game.BolsterAmount/100)
+						end 
+					else 
+						vars.poisonTime[i]=0
+					end
 				end
 			end
 		end
 	end
-end
-Timer(poisonTimer, const.Minute/2) 
+	Timer(poisonTimer, const.Minute/2) 
 
-function events.DoBadThingToPlayer(t)
+	function events.DoBadThingToPlayer(t)
 		if (t.Thing==6 or t.Thing==7 or t.Thing==8) and t.Allow then
-		if vars.poisonTime[t.PlayerIndex]==nil or vars.poisonTime[t.PlayerIndex]==0 then
-		vars.poisonTime[t.PlayerIndex]=25
-		else
-		vars.poisonTime[t.PlayerIndex]=math.min(vars.poisonTime[t.PlayerIndex]+5,50)
+			if vars.poisonTime[t.PlayerIndex]==nil or vars.poisonTime[t.PlayerIndex]==0 then
+				vars.poisonTime[t.PlayerIndex]=25
+			else
+				vars.poisonTime[t.PlayerIndex]=math.min(vars.poisonTime[t.PlayerIndex]+5,50)
+			end
 		end
 	end
-end
 
 --hp and sp regen
 	local function restoreHPEnchant() 
