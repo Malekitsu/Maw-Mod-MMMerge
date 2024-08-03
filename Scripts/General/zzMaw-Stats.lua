@@ -60,7 +60,7 @@ function getCritInfo(pl,dmgType)
 			if table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number) then
 				local s,m=SplitSkill(pl:GetSkill(const.Skills.Axe))
 				if m==4 then
-					critDamageMultiplier=critDamageMultiplier+0.03*s
+					critDamageMultiplier=critDamageMultiplier+0.05*s
 				end
 			end
 		end
