@@ -29,7 +29,7 @@ function getCritInfo(pl,dmgType)
 		local intellect=pl:GetIntellect()	
 		local personality=pl:GetPersonality()
 		local bonus=math.max(intellect,personality)
-		critDamageMultiplier=bonus*3/2000+1.5
+		critDamageMultiplier=bonus/2000+1.5
 	elseif dmgType=="heal" then
 		local intellect=pl:GetIntellect()	
 		local personality=pl:GetPersonality()
@@ -37,7 +37,7 @@ function getCritInfo(pl,dmgType)
 		critDamageMultiplier=bonus*3/4000+1.25
 	else --physical
 		local accuracy=pl:GetAccuracy()
-		critDamageMultiplier=accuracy*3/1000+1.5
+		critDamageMultiplier=accuracy*2/1000+1.5
 	end
 	--dagger bonus
 	if not dmgType then
@@ -257,12 +257,14 @@ function events.BuildStatInformationBox(t)
 	if t.Stat==1 then
 		i=Game.CurrentPlayer
 		intellect=Party[i]:GetIntellect()
-		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing: %s%s\nHealing spells cannot crit",Game.StatsDescriptions[1],intellect/10,"%",intellect*3/20+50,"%")
+		_,critDmg=getCritInfo(Party[i],"spell")
+		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing: %s%s\nHealing spells cannot crit",Game.StatsDescriptions[1],intellect/10,"%",critDmg*100-100,"%")
 	end
 	if t.Stat==2 then
 		i=Game.CurrentPlayer
 		personality=Party[i]:GetPersonality()
-		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing bonus: %s%s\nHealing spells cannot crit",Game.StatsDescriptions[2],personality/10,"%",personality*3/20+50,"%")
+		_,critDmg=getCritInfo(Party[i],"spell")
+		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing bonus: %s%s\nHealing spells cannot crit",Game.StatsDescriptions[2],personality/10,"%",critDmg*100-100,"%")
 	end
 	if t.Stat==3 then
 		i=Game.CurrentPlayer
@@ -274,7 +276,8 @@ function events.BuildStatInformationBox(t)
 	if t.Stat==4 then
 		i=Game.CurrentPlayer
 		accuracy=Party[i]:GetAccuracy()
-		t.Text=string.format("%s\n\nCritical melee and bow strike damage bonus: %s%s",Game.StatsDescriptions[4],accuracy*3/10+50,"%")
+		_,critDmg=getCritInfo(Party[i])
+		t.Text=string.format("%s\n\nCritical melee and bow strike damage bonus: %s%s",Game.StatsDescriptions[4],critDmg*100-100,"%")
 	end
 	if t.Stat==5 then
 		i=Game.CurrentPlayer
