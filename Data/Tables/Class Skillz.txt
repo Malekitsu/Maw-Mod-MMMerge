@@ -23,7 +23,7 @@ Dark	=	=	=	G	=	=	=	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	G	=	=	=	=	=	=	=	=
 DarkElfAbility	=	=	=	=	=	=	=	=	M	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=
 VampireAbility	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	M	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=
 DragonAbility	=	=	=	=	=	=	=	=	=	=	M	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=
-IdentifyItem	M	M	G	G	N	N	N	N	M	M	M	G	E	E	E	E	N	E	E	E	N	N	E	M	M	M	E	M	M	M	N	N	E	E	M	M	G	G	N	N	E	E	M	M	M	G	G	M	N	N	N	M	M	E	E	E	E	M	M	M	M	G	M	M	G
+IdentifyItem	M	M	G	G	N	N	N	N	M	M	M	G	E	E	E	E	N	E	E	E	N	N	E	M	M	M	E	M	M	M	N	N	E	E	M	M	G	G	N	N	E	E	M	M	M	G	G	G	N	N	N	G	M	E	E	E	E	M	M	M	M	G	M	M	G
 Merchant	E	E	E	E	M	M	G	G	M	G	E	E	E	E	E	E	E	E	E	E	E	E	N	N	N	N	E	E	M	M	M	M	M	M	M	M	M	M	N	N	E	E	N	N	N	N	N	N	N	N	G	N	N	M	M	G	E	E	M	E	E	E	E	E	E
 Repair	E	E	M	M	E	E	E	E	E	E	N	N	N	N	N	N	M	M	G	G	N	N	N	N	N	N	M	M	G	G	N	N	E	E	N	N	N	N	M	M	N	N	E	E	E	M	M	M	N	N	E	M	E	E	E	E	M	M	G	E	M	M	N	N	N
 Bodybuilding	E	M	M	M	M	M	M	M	E	M	M	M	E	E	E	E	M	M	M	M	M	M	M	M	G	G	M	M	M	M	E	M	M	M	E	E	E	E	M	G	E	M	E	E	E	E	E	E	N	=	M	E	=	E	M	M	M	M	M	E	E	E	N	N	N
@@ -51,7 +51,7 @@ Skill48	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	
 Skill49	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=
 Skill50	=	=	=	=	=	=	=	=	=	=	M	M	=	=	=	=	M	M	G	G	M	M	E	M	M	M	M	M	G	G	=	=	=	=	=	=	=	=	M	G	=	=	=	=	=	=	=	=	=	=	=	=	=	M	M	G	M	M	G	=	=	=	=	=	=
 Skill51	N	E	M	M	E	E	M	M	N	M	=	=	E	M	G	G	=	=	=	=	E	M	-	E	M	M	E	E	E	E	E	E	E	E	=	=	E	E	=	=	E	M	E	M	M	G	G	G	=	=	M	G	=	N	N	E	=	=	=	N	N	E	M	M	G
-Skill52	E	M	G	G	M	M	G	G	M	G	=	=	M	M	G	G	=	=	=	=	M	G	-	E	G	G	E	M	G	G	E	M	G	G	=	=	G	G	=	=	M	G	M	M	M	G	G	G	=	=	M	G	=	E	M	G	=	=	=	E	G	G	M	M	G
+Skill52	E	M	G	G	M	M	G	G	M	G	=	=	M	M	G	G	=	=	=	=	M	G	-	E	G	G	E	M	G	G	E	M	G	G	=	=	G	G	=	=	M	G	M	M	M	G	G	G	=	=	G	G	=	E	M	G	=	=	=	E	M	G	M	M	G
 Skill53	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=
 Skill54	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=
 Skill55	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=
