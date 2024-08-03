@@ -1433,11 +1433,11 @@ function ascendSpellDamage(skill, mastery, spell, index)
 		--diceMax=diceMax * (1+0.05 * skill * (ascensionLevel+1))
 		--damageAdd=damageAdd*(1+skill^2 / 45 * (ascensionLevel+1)^2)
 		
-		--damageAdd=damageAdd*(1+skill*0.05 ) *2^ascensionLevel*1.2^ascensionLevel
-		--diceMax=diceMax *1.25^ascensionLevel*1.2^ascensionLevel
+		damageAdd=damageAdd*(1+skill*0.15)*(ascensionLevel+0.5)^2 *1.2^ascensionLevel
+		diceMax=diceMax * (1+0.03 * skill * (ascensionLevel+1)) *1.2^ascensionLevel
 		
-		damageAdd=damageAdd*(1+skill*0.1 )*(ascensionLevel+1)^2*1.2^ascensionLevel
-		diceMax=diceMax*(1+0.15*(ascensionLevel+1)^2)*1.2^ascensionLevel
+		--damageAdd=damageAdd*(1+skill*0.1 )*(ascensionLevel+1)^2*1.2^ascensionLevel
+		--diceMax=diceMax*(1+0.15*(ascensionLevel+1)^2)*1.2^ascensionLevel
 	end
 	diceMin, diceMax, damageAdd = math.round(diceMin), math.round(diceMax), math.round(damageAdd)
 	return diceMin, diceMax, damageAdd
@@ -1576,7 +1576,7 @@ function ascension()
 			local ascensionLevel=getAscensionTier(s,num)
 			if ascensionLevel>=1 then
 				for i=1,4 do
-					Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+s*0.125)*1.5^(ascensionLevel)*(1-0.125*m)
+					Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m)
 				end
 			else
 				for i=1,4 do
