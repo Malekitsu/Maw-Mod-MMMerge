@@ -597,7 +597,7 @@ function events.GameInitialized2()
 	end
 	
 	--adjust tooltips with special effects
-	Game.SkillDesGM[const.Skills.Axe]=string.format("%s 1%% to halve AC",Game.SkillDesGM[const.Skills.Axe])
+	Game.SkillDesGM[const.Skills.Axe]=string.format("%s 1%% to halve AC and increases critical strike damage by 3%% per skill point",Game.SkillDesGM[const.Skills.Axe])
 	Game.SkillDesMaster[const.Skills.Bow]=string.format("%s 2 arrows",Game.SkillDesMaster[const.Skills.Bow])
 	Game.SkillDesExpert[const.Skills.Dagger]=string.format("%s can dual wield",Game.SkillDesExpert[const.Skills.Dagger])
 	Game.SkillDesMaster[const.Skills.Dagger]=string.format("%s 2.5+0.5 crit%%/skill",Game.SkillDesMaster[const.Skills.Dagger])
