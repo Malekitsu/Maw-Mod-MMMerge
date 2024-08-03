@@ -2275,9 +2275,37 @@ function itemStats(index)
 			local add=bonus*mult
 			local armsDmg=armsmasterDamage[m]*s*mult
 			
+			--make classes such as DK, SERAPH,SHAMAN to make their bonus work in a similar way as armsmaster
+			--DK
+			if table.find(dkClass, pl.Class) then	
+				local s1, m1=SplitSkill(pl.Skills[const.Skills.Water])
+				local s2, m2=SplitSkill(pl.Skills[const.Skills.Dark])
+				local bonus=s1*math.min(m1, 3)+s2*math.min(m2, 3)
+				armsDmg=armsDmg+bonus
+			end
+			--SERAPHIM
+			if table.find(seraphClass, pl.Class) then	
+				local s1, m1=SplitSkill(pl.Skills[const.Skills.Water])
+				local s2, m2=SplitSkill(pl.Skills[const.Skills.Dark])
+				local bonus=s1*m1+s2*m2
+				armsDmg=armsDmg+bonus
+			end
+			--SHAMAN
+			if table.find(shamanClass, pl.Class) then	
+				local m1=SplitSkill(pl.Skills[const.Skills.Fire])
+				local m2=SplitSkill(pl.Skills[const.Skills.Air])
+				local m3=SplitSkill(pl.Skills[const.Skills.Water])
+				local m4=SplitSkill(pl.Skills[const.Skills.Earth])
+				local m5=SplitSkill(pl.Skills[const.Skills.Spirit])
+				local m6=SplitSkill(pl.Skills[const.Skills.Mind])
+				local m7=SplitSkill(pl.Skills[const.Skills.Body])
+				local m8=m2+m3+m4+m5+m1+m6+m7
+				armsDmg=armsDmg+bonus+m8
+			end
+			
 			--split armsmaster between main and offhand
 			local item=pl:GetActiveItem(0)
-			if item and skill ~= 5 then
+			if item and skill ~= 5 and item:T().Skill~=8 then
 				if skill~=8 then
 					armsDmg=armsDmg/2
 				end
