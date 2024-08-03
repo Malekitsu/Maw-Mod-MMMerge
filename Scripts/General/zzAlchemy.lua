@@ -674,6 +674,9 @@ local function upgradeGem(it, tier)
 	end
 	--item slot multiplier and legendary multiplier
 	local mult=slotMult[it:T().EquipStat] or 1
+	if table.find(twoHandedAxes, it.Number) then
+		mult=2
+	end
 	if it.BonusExpireTime==20 then
 		mult=mult*2
 	end
