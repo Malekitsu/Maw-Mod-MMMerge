@@ -53,6 +53,18 @@ function getCritInfo(pl,dmgType)
 			end
 		end
 	end
+	--axe bonus
+	if not dmgType then
+		local it=pl:GetActiveItem(1)
+		if it then	
+			if table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number) then
+				local s,m=SplitSkill(pl:GetSkill(const.Skills.Axe))
+				if m==4 then
+					critDamageMultiplier=critDamageMultiplier+0.03*s
+				end
+			end
+		end
+	end
 	--legendary bonus
 	local id=pl:GetIndex()
 	if vars.legendaries and table.find(vars.legendaries[id], 14) then
@@ -216,7 +228,12 @@ function events.CalcSpellDamage(t)
 		if data.Player.Class==10 or data.Player.Class==11 then return end --dragons scale off might
 		
 		local critChance, critMult, success=getCritInfo(data.Player,"spell")
-			
+		
+		--int/pers scaling
+		local int=data.Player:GetIntellect()
+		local per=data.Player:GetPersonality()
+		local mult=math.max(int,per)/1000+1
+		t.Result=t.Result*mult
 		if success then
 			t.Result=t.Result*critMult
 			crit=true
@@ -1268,9 +1285,9 @@ function calcPowerVitality(pl)
 			critChance, critDamage=getCritInfo(pl, "spell")
 			power=power*(1+bonus/1000) 
 		end
-		haste=math.floor((pl:GetSpeed())/10)/100+1
-		delay=oldTable[spellIndex][mastery]
-		DPS3=math.round(power*(1+critChance*(critDamage-1))/(delay/60)*haste)			
+		haste=math.floor(pl:GetSpeed()/10)/100+1
+		delay=getSpellDelay(Party[1],spellIndex)
+		DPS3=math.round(power*(1+critChance*(critDamage-1))/(delay/60))			
 	end
 			
 	local fullHP=pl:GetFullHP()
