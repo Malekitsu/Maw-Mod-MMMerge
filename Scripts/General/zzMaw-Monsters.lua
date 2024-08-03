@@ -2181,7 +2181,7 @@ SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Adamantite","
 --on attack skills
 function events.GameInitialized2() --to make the after all the other code
 	function events.CalcDamageToPlayer(t)
-		data=WhoHitPlayer()
+		data=mawCustomMonObj or WhoHitPlayer()
 		if data and data.Monster and data.Monster.NameId>220 then
 			mon=data.Monster
 			skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
