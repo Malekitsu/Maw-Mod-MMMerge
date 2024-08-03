@@ -1003,8 +1003,8 @@ local DKDamageMult={
 
 --spells
 function events.GameInitialized2()
-	--[[damage from skills 
 	function events.CalcStatBonusByItems(t)
+		--[[damage from skills 
 		if t.Stat==const.Stats.MeleeDamageMax or t.Stat==const.Stats.MeleeDamageMin then
 			if table.find(dkClass, t.Player.Class) then	
 				local s1, m1=SplitSkill(t.Player.Skills[const.Skills.Water])
