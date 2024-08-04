@@ -2611,9 +2611,21 @@ function itemStats(index)
 			unarmedMult=(buffPower[73].Base[m]/100+buffPower[73].Scaling[m]*s/1000)
 		end
 	end
+	local shamanSpiritMult=0
+	if table.find(shamanClass, pl.Class) then
+		local s=SplitSkill(pl.Skills[const.Skills.Spirit])
+		shamanSpiritMult=s/100
+	end
+	tab[42]=tab[42]+(tab[42]+bonusDamage)*might/1000
+	tab[42]=tab[42]+(tab[42]+bonusDamage)*heroismMult 
+	tab[42]=tab[42]+(tab[42]+bonusDamage)*unarmedMult
+	tab[42]=tab[42]+(tab[42]+bonusDamage)*shamanSpiritMult
 	
-	tab[42]=tab[42]+(tab[42]+bonusDamage)*might/1000 + (tab[42]+bonusDamage)*heroismMult + (tab[42]+bonusDamage)*unarmedMult
-	tab[43]=tab[43]+(tab[43]+bonusDamage)*might/1000 + (tab[43]+bonusDamage)*heroismMult + (tab[43]+bonusDamage)*unarmedMult
+	tab[43]=tab[43]+(tab[43]+bonusDamage)*might/1000
+	tab[43]=tab[43]+(tab[43]+bonusDamage)*heroismMult 
+	tab[43]=tab[43]+(tab[43]+bonusDamage)*unarmedMult
+	tab[43]=tab[43]+(tab[43]+bonusDamage)*shamanSpiritMult
+	
 	tab[46]=tab[46]+(tab[46]+bonusDamage)*might/1000
 	tab[47]=tab[47]+(tab[47]+bonusDamage)*might/1000
 	return tab
