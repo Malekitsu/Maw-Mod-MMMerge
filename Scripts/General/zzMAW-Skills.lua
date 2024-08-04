@@ -61,10 +61,10 @@ skillRecovery =
 {
 	[const.Skills.Staff]	= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Sword]	= {[0]=0, 0, 2, 3, 3,},
-	[const.Skills.Dagger]	= {[0]=0, 0, 0, 0, 1,},
+	[const.Skills.Dagger]	= {[0]=0, 1, 1, 1, 2,},
 	[const.Skills.Axe]		= {[0]=0, 0, 1, 2, 2,},
 	[const.Skills.Spear]	= {[0]=0, 0, 0, 0, 0,},
-	[const.Skills.Bow]		= {[0]=0, 1, 2, 3, 3,},
+	[const.Skills.Bow]		= {[0]=0, 1, 2, 3, 5,},
 	[const.Skills.Mace]		= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Unarmed]	= {[0]=0, 0, 1, 1, 2,},
