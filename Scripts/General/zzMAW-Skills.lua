@@ -898,9 +898,9 @@ function events.PlayerAttacked(t)
 		for i=0,Party.High do
 			local s, m= SplitSkill(Skillz.get(Party[i], 50))
 			if s>0 and vars.covering[i] and m>=masteryRequired and i~=t.PlayerSlot then
-				cover[i]={["Chance"]=1-(0.99^s-0.05),["Mastery"]= m}
+				cover[i]={["Chance"]=math.min(0.1+s*0.01,40),["Mastery"]= m}
 				if coverBonus[i] then
-					cover[i].Chance=cover[i].Chance+0.3
+					cover[i].Chance=cover[i].Chance+0.15
 					coverBonus[i]=false
 				end
 			else
@@ -1595,11 +1595,11 @@ function events.GameInitialized2()
 	local coverSkill=50
 	Skillz.new_armor(coverSkill)
 	Skillz.setName(coverSkill, "Cover")
-	Skillz.setDesc(coverSkill, 1, "Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nGrants 5 plus 1% chance per skill point to Cover an ally.\n\nPress P to enable/disable\n")
+	Skillz.setDesc(coverSkill, 1, "Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nGrants 10 plus 1% chance per skill point to Cover an ally, up to 40%.\n\n\nPress P to enable/disable\n")
 	Skillz.setDesc(coverSkill, 2, "Allow use to Cover Physical damage\n")
 	Skillz.setDesc(coverSkill, 3, "Allow use to Cover Projectiles damage")
 	Skillz.setDesc(coverSkill, 4, "Allow use to Cover Spells damage")
-	Skillz.setDesc(coverSkill, 5, "Attacking will increase you next Cover chance by 30%")
+	Skillz.setDesc(coverSkill, 5, "Attacking will increase you next Cover chance by 15%")
 	Skillz.learn_at(coverSkill, 30)
 end
 
@@ -1635,8 +1635,8 @@ function events.Tick()
 			end
 		end
 		local s= SplitSkill(Skillz.get(pl, 50))
-		local chance=math.round((1-(0.99^s-0.05))*10000)/100
-		local txt="Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nGrants 5 plus 1% chance per skill point to Cover. \nCurrent cover chance: " .. chance .. "%\n\nPress P to enable/disable\n"
+		local chance=math.min(10+s,40)
+		local txt="Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nGrants 10 plus 1% chance per skill point to Cover, up to 40%.\n\nCurrent cover chance: " .. chance .. "%\n\nPress P to enable/disable\n"
 		if vars.covering[index] then
 			txt=txt .. StrColor(0,255,0,"\nCurrently enabled\n")
 			Skillz.setDesc(50, 1, txt)
@@ -1700,6 +1700,16 @@ function events.Action(t)
 		if t.Param==50 then
 			local pl=Party[Game.CurrentPlayer]
 			local s,m=SplitSkill(Skillz.get(pl,50))
+			if s==30 then 
+				t.Handled=true
+				Game.ShowStatusText("This skill has reached its limit")
+			elseif s>30 then
+				t.Handled=true
+				while s>30 do
+					pl.SkillPoints=pl.SkillPoints+s
+					s=s-1
+				end
+			end
 			if pl.SkillPoints>s and coverRequirements[m] and s+1>=coverRequirements[m] and Skillz.MasteryLimit(pl,50)>m then
 				Skillz.set(pl,50,JoinSkill(s, m+1))
 			end
