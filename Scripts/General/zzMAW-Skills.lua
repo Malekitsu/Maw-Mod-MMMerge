@@ -1709,6 +1709,7 @@ function events.Action(t)
 					pl.SkillPoints=pl.SkillPoints+s
 					s=s-1
 				end
+				Skillz.set(pl,50,JoinSkill(s,m))
 			end
 			if pl.SkillPoints>s and coverRequirements[m] and s+1>=coverRequirements[m] and Skillz.MasteryLimit(pl,50)>m then
 				Skillz.set(pl,50,JoinSkill(s, m+1))
