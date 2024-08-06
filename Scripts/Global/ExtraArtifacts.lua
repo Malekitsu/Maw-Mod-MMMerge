@@ -154,7 +154,10 @@ function events.GetSkill(t)
 		else
 			Skill = Skill + math.floor((PLT.Skills[t.Skill] or 0)*math.max(math.min(t.Player.LevelBase/100,2.5),0.5))
 		end
-		t.Result = JoinSkill(Skill, Mas)
+		if t.Skill<=38 then --cap at 2x
+			local s,m=SplitSkill(t.Player.Skills[t.Skill])
+			t.Result=JoinSkill(math.min(Skill,s*2),m)
+		end
 	elseif Game.CurrentScreen == AdvInnScreen or PlayerInParty(t.PlayerIndex) then
 		StoreEffects(t.Player)
 	end
