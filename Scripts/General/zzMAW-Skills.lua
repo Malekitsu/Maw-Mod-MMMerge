@@ -422,6 +422,13 @@ end
 ------------------------
 function events.GameInitialized2()
 	Skillz.setDesc(6,1,Skillz.getDesc(6,1) .. "\nThe paralyze effect lasts for 5 seconds on regular monsters and 2 seconds on bosses. The stun effect lasts for half the duration of the paralyze effect. The chances of successfully applying these effects depend on the skill level and the monster's level.\n")
+	Skillz.setDesc(0,1,Skillz.getDesc(0,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping a staff.\n")
+	Skillz.setDesc(1,1,Skillz.getDesc(1,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping a sword.\n")
+	Skillz.setDesc(2,1,Skillz.getDesc(2,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping a dagger.\n")
+	Skillz.setDesc(3,1,Skillz.getDesc(3,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping an axe.\n")
+	Skillz.setDesc(4,1,Skillz.getDesc(4,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping a spear.\n")
+	Skillz.setDesc(5,1,Skillz.getDesc(5,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping a bow.\n")
+	Skillz.setDesc(6,1,Skillz.getDesc(6,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping a mace.\n")
 	for i=0,33 do
 		if i<=7 or i==33 then
 			attack=false
@@ -432,7 +439,7 @@ function events.GameInitialized2()
 			baseString=string.format("%s\n------------------------------------------------------------\n",	Skillz.getDesc(i,1))
 			for v=1,4 do
 				if skillAttack[i][v]~=0 then
-					attack=true
+					attack=true     
 				end
 				if skillRecovery[i][v]~=0 then
 					recovery=true
@@ -472,14 +479,14 @@ function events.GameInitialized2()
 			end
 			if damage then
 				tab=tab+55
-				baseString=string.format("%s\t" .. tab .. "Dmg|",baseString)
-				normal=string.format("%s\t" .. tab+22 .. "%s|",normal,skillDamage[i][1])
-				expert=string.format("%s\t" .. tab+22 .. "%s|",expert,skillDamage[i][2])
-				master=string.format("%s\t" .. tab+22 .. "%s|",master,skillDamage[i][3])
-				gm=string.format("%s\t" .. tab+22 .. "%s|",gm,skillDamage[i][4])
+				baseString=string.format("%s\t" .. tab .. "Dmg%%|",baseString)
+				normal=string.format("%s\t" .. tab+22 .. "%s%%|",normal,skillDamage[i][1])
+				expert=string.format("%s\t" .. tab+22 .. "%s%%|",expert,skillDamage[i][2])
+				master=string.format("%s\t" .. tab+22 .. "%s%%|",master,skillDamage[i][3])
+				gm=string.format("%s\t" .. tab+22 .. "%s%%|",gm,skillDamage[i][4])
 			end
 			if ac then
-				tab=tab+39
+				tab=tab+55
 				baseString=string.format("%s\t" .. tab .. "AC|",baseString)
 				normal=string.format("%s\t" .. tab+9 .. "%s|",normal,skillAC[i][1])
 				expert=string.format("%s\t" .. tab+9 .. "%s|",expert,skillAC[i][2])
