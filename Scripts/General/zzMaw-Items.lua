@@ -144,7 +144,7 @@ function events.ItemGenerated(t)
 	--boss items forced
 	if bossLoot then
 		if not (t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736)) then
-			t.Item:Randomize(t.Strength, 0, true)
+			t.Item:Randomize(t.Strength, 0)
 			return
 		end
 	end
@@ -2091,6 +2091,10 @@ function events.GetSkill(t)
 	end
 	if t.Skill<=38 then
 		t.Result=bonus+t.Player.Skills[t.Skill]
+		--cap the skill up to double the base amount
+		local s1,m1=SplitSkill(t.Result)
+		local s2,m2=SplitSkill(t.Player.Skills[t.Skill])
+		t.Result=JoinSkill(math.min(s1,s2*2),m2)
 	end
 end
 
@@ -2196,13 +2200,17 @@ function itemStats(index)
 				tab[it.Bonus]=tab[it.Bonus]+it.BonusStrength
 			else
 				local tabNumber=bonusBaseEnchantSkill[it.Bonus]+50
-				tab[tabNumber]=math.max(tab[tabNumber] or 0, it.BonusStrength)
+				tab[tabNumber]=tab[tabNumber] or 0
+				tab[tabNumber]=tab[tabNumber]+it.BonusStrength
+				--tab[tabNumber]=math.max(tab[tabNumber] or 0, it.BonusStrength)
 			end
 		end
 		--fix for double enchants
 		if it.Bonus2==62 then
-			tab[74]=math.max(tab[74] or 0, 3)
-			tab[84]=math.max(tab[84] or 0, 3)
+			tab[74]=tab[74] or 0
+			tab[74]=tab[74]+3
+			tab[84]=tab[84] or 0
+			tab[84]=tab[84]+3
 		end		
 		if it.Charges>1000 then
 			tab[math.floor(it.Charges/1000)]=tab[math.floor(it.Charges/1000)]+it.Charges%1000
@@ -2327,7 +2335,8 @@ function itemStats(index)
 		
 		--skills
 		if equipSpellMap[it.Bonus2] then
-			tab[it.Bonus2]= 5 +  math.floor(it.MaxCharges/4)
+			tab[it.Bonus2]=tab[it.Bonus2] or 0
+			tab[it.Bonus2]=tab[it.Bonus2] + (5 +  math.floor(it.MaxCharges/4))
 		end
 		--artifacts stats bonus
 		
