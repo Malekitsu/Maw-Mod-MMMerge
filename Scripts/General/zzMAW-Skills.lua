@@ -1660,7 +1660,7 @@ function events.Tick()
 			end
 		end
 		local s, m= SplitSkill(Skillz.get(pl, 51))
-		local efficiency=math.round((1+s^1.5/125*m)*100)/100
+		local efficiency=math.round((1+s*0.5)*100)/100
 			Skillz.setDesc(51, 1, "Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n")
 		
 		local txt="Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n" .. "Current Damage reduction per Mana: " .. StrColor(178,255,255, efficiency) .. "\n\nPress M to enable/disable"
