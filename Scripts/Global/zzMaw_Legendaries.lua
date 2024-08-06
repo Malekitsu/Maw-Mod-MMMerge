@@ -267,7 +267,7 @@ function events.CalcDamageToPlayer(t)
 			end
 			m=m-1
 		end
-		local manaEfficiency=(1+s^1.5/125 * m2) 
+		local manaEfficiency=(1+s*0.5) 
 		local mana=pl.SP
 		reductionPercent=math.min(mana*manaEfficiency/damageReduced,1)
 		damageReduced=damageReduced*reductionPercent
