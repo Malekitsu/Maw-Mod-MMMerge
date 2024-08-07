@@ -1700,16 +1700,16 @@ function events.BuildMonsterInformationBox(t)
 		diff=0.4
 	end
 	if Game.BolsterAmount==150 then
-		diff=1.12+math.round(totalLevel[mon.Id])/300
+		diff=1.12+math.round(totalLevel[mon.Id])/450
 	end
 	if Game.BolsterAmount==200 then
-		diff=1.25+math.round(totalLevel[mon.Id])/200
+		diff=1.25+math.round(totalLevel[mon.Id])/300
 	end
 	if Game.BolsterAmount==300 then
-		diff=1.5+math.round(totalLevel[mon.Id])/100
+		diff=1.5+math.round(totalLevel[mon.Id])/150
 	end
 	if vars.Mode==2 then
-		diff=2+math.round(totalLevel[mon.Id])/50
+		diff=2+math.round(totalLevel[mon.Id])/75
 	end
 	
 	--some statistics here, calculate the standard deviation of dices to get the range of which 95% will fall into
