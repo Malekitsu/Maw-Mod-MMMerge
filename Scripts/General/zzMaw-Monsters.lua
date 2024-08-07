@@ -2280,7 +2280,7 @@ function leecher()
 						amountHP[i]=amountHP[i]%1
 					end
 					if pl.SP>-20 then
-						local drainSP=pl:GetFullSP()*leechmult*0.025*timeMultiplier
+						local drainSP=pl.SP*leechmult*0.05*timeMultiplier
 						amountSP[i]=amountSP[i]+drainSP
 						pl.SP=pl.SP -math.floor(amountSP[i])
 						amountSP[i]=amountSP[i]%1
