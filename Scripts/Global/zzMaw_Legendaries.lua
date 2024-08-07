@@ -273,7 +273,7 @@ function events.CalcDamageToPlayer(t)
 		damageReduced=damageReduced*reductionPercent
 		pl.SP=math.max(pl.SP-math.floor(damageReduced/manaEfficiency),0)
 		
-		t.Result=t.Result-damageReduced
+		t.Result=(damage+damageReduced)-damageReduced*reductionPercent
 	end	
 	
 	
