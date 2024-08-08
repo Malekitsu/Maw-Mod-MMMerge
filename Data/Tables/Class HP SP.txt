@@ -34,9 +34,9 @@ Hunter	30	5	5	2	IP
 BountyHunter	30	6	5	3	IP
 RangerLord	30	6	5	3	IP
 Thief	30	4	0	0	-
-Rogue	30	5	0	1	I
-Assassin	30	6	0	2	I
-Spy	30	6	0	2	I
+Rogue	30	5	5	1	I
+Assassin	30	6	5	2	I
+Spy	30	6	5	2	I
 Troll	45	6	0	0	-
 WarTroll	45	12	0	0	-
 Vampire	30	3	10	2	P
