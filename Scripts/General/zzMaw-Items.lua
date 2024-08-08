@@ -1210,8 +1210,8 @@ function checktext(MaxCharges,bonus2,it)
 		[33] = "Spirit Magic Skill +" .. math.floor(MaxCharges/4)+5,
 		[34] = "Water Magic Skill +" .. math.floor(MaxCharges/4)+5,
 		--stats enchants
-		[39] = "Adds " .. math.floor(40*mult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(80*mult*attackSpeedMult*legDmgMult) .. " to spell damage(main hand only) and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Intellect and personality.",
-		[40] = "Spells Drain Hit points from target and Increased Spell speed.(main hand only).",
+		[39] = "Adds " .. math.floor(40*mult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(80*mult*attackSpeedMult*legDmgMult) .. " to spell damage(except when equipping off-hand) and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Intellect and personality.",
+		[40] = "Spells Drain Hit points from target and Increased Spell speed.(except when equipping off-hand).",
 		[42] = " +" .. math.floor(bonusEffects[42].statModifier * mult) .. " to Seven Stats, HP, SP, Armor, Resistances.",
 		[43] = " +" .. math.floor(bonusEffects[43].statModifier * mult) .. " to Endurance, Armor, Hit points.",
 		[44] = " +" .. math.floor(bonusEffects[44].statModifier * mult) .. " Hit points and Regenerate Hit points over time.",
