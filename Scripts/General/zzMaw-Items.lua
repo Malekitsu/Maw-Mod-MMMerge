@@ -1634,7 +1634,7 @@ function events.BuildItemInformationBox(t)
 			end
 			if baseRecovery[skill] then
 				local itemLevel=artifactMult*100
-				baseSpeed=baseRecovery[skill] * (0.75+itemLevel/200)
+				baseSpeed=baseRecovery[skill] * (0.75+itemLevel/250)
 				baseSpeed=math.round(baseSpeed/10)/10
 				
 				t.Type = t.Type .. "\nAttack Speed: " .. baseSpeed
@@ -1975,7 +1975,7 @@ function events.BuildItemInformationBox(t)
 				lvl=lvl+t.Item:T().ChanceByLevel[i]*i
 			end
 			itemLevel=itemLevel+math.round(lvl/tot*18-17)
-			baseSpeed=baseRecovery[skill] * (0.75+itemLevel/200)
+			baseSpeed=baseRecovery[skill] * (0.75+itemLevel/250)
 			baseSpeed=math.round(baseSpeed/10)/10
 			
 			t.Type = t.Type .. "\nAttack Speed: " .. baseSpeed
