@@ -1867,7 +1867,7 @@ function events.CalcDamageToMonster(t)
 		if not it then return end
 		local skill=it:T().Skill
 		local data=WhoHitMonster()
-		if skill==6 and t.DamageKind==0 and data and data.Object==nil then
+		if skill==6 and t.DamageKind==4 and data and data.Object==nil then
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Mace))
 			if m>=3 then
 				local mon=t.Monster
