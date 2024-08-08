@@ -1478,36 +1478,38 @@ function events.CalcSpellDamage(t)
 	data=WhoHitMonster()
 	if data and data.Spell==44 then return end
 	if data and data.Player then
-		it=data.Player:GetActiveItem(1)
-		if it then
-			if spellbonusdamage[it.Bonus2] then
-				damage=math.random(spellbonusdamage[it.Bonus2]["low"],spellbonusdamage[it.Bonus2]["high"])
-				for i = 1, #aoespells do
-					if aoespells[i] == t.Spell then
-						damage=damage/2.5
+		for i=1,2 do
+			it=data.Player:GetActiveItem(i)
+			if it then
+				if spellbonusdamage[it.Bonus2] then
+					damage=math.random(spellbonusdamage[it.Bonus2]["low"],spellbonusdamage[it.Bonus2]["high"])
+					for i = 1, #aoespells do
+						if aoespells[i] == t.Spell then
+							damage=damage/2.5
+						end
 					end
-				end
-				if it.MaxCharges>0 then
-					if it.MaxCharges <= 20 then
-						mult=1+it.MaxCharges/20
-					else
-						mult=2+2*(it.MaxCharges-20)/20
+					if it.MaxCharges>0 then
+						if it.MaxCharges <= 20 then
+							mult=1+it.MaxCharges/20
+						else
+							mult=2+2*(it.MaxCharges-20)/20
+						end
+						damage=damage*mult
 					end
-					damage=damage*mult
+					local attackSpeedMult=getBaseAttackSpeed(it)
+					damage=math.round(damage*attackSpeedMult)
+					--legendary bonus[19]
+					local id=data.Player:GetIndex()
+					if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
+						local str=data.Player:GetMight()
+						local int=data.Player:GetIntellect()
+						local pers=data.Player:GetPersonality()
+						local bonusStat=math.max(str,int,pers)
+						damage=damage*(1+bonusStat/1000)
+					end
+					--end for [19]
+					t.Result = t.Result+damage
 				end
-				local attackSpeedMult=getBaseAttackSpeed(it)
-				damage=math.round(damage*attackSpeedMult)
-				--legendary bonus[19]
-				local id=data.Player:GetIndex()
-				if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
-					local str=data.Player:GetMight()
-					local int=data.Player:GetIntellect()
-					local pers=data.Player:GetPersonality()
-					local bonusStat=math.max(str,int,pers)
-					damage=damage*(1+bonusStat/1000)
-				end
-				--end for [19]
-				t.Result = t.Result+damage
 			end
 		end
 	end
