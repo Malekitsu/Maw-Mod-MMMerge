@@ -1881,7 +1881,7 @@ function events.CalcDamageToMonster(t)
 					lvl=mapvars.uniqueMonsterLevel[id]
 				end
 				--chance to paralyze
-				local chance=s/lvl^0.65*0.15
+				local chance=s/lvl^0.65*0.15*damageMultiplier[t.Player:GetIndex()].Melee/math.min(1+lvl/150,3)
 				local applyParalyze=applyParalyze or {}
 				applyParalyze[id]=false
 				local previousDuration=mon.SpellBuffs[6].ExpireTime
@@ -1924,14 +1924,14 @@ function events.Action(t)
 			Skillz.setDesc(6,5,maceGMtxt)
 			if m<3 then return end
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Mace))
-			local chance=math.round(s/pl.LevelBase^0.65*1500)/100
+			local chance=math.round(s/pl.LevelBase^0.65*1500*damageMultiplier[pl:GetIndex()].Melee/math.min(1+pl.LevelBase/150,3))/100
 			local txt="\n\n"
 			if m==3 then
 				txt=txt .. "Chance to Stun: " .. chance .. "%"
 			elseif m==4 then
 				txt=txt .. "Chance to Paralyze: " .. chance .. "%"
 			end
-			Game.SkillDesGM[6]=maceGMtxt .. StrColor(0,0,0,txt)
+			Skillz.setDesc(6,5,maceGMtxt .. StrColor(0,0,0,txt))
 		end
 	end
 end
