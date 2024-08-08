@@ -157,7 +157,7 @@ function getItemRecovery(it, playerLevel)
 	local baseSpeed=100
 	if (it.Number>=500 and it.Number<=543) or (it.Number>=1302 and it.Number<=1354) or (it.Number>=2020 and it.Number<=2049) then 
 		itemLevel=artifactPowerMult(playerLevel)*100
-		baseSpeed=baseRecovery[skill] * (0.75+itemLevel/200)
+		baseSpeed=baseRecovery[skill] * (0.75+itemLevel/250)
 		baseSpeed=math.round(baseSpeed/10)*10
 	elseif baseRecovery[skill] then
 		local tot=0
@@ -167,7 +167,7 @@ function getItemRecovery(it, playerLevel)
 			lvl=lvl+it:T().ChanceByLevel[i]*i
 		end
 		itemLevel=math.round(lvl/tot*18-17)+it.MaxCharges*5
-		baseSpeed=baseRecovery[skill] * (0.75+itemLevel/200)
+		baseSpeed=baseRecovery[skill] * (0.75+itemLevel/250)
 		baseSpeed=math.round(baseSpeed/10)*10
 	end
 	return baseSpeed
