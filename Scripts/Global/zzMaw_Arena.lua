@@ -89,6 +89,7 @@ function startGeneratingWaves(level)
 	isArenaStarted=true
 	bossSpawned=0
 	removedWaves=0
+	waveState=1
 	evt.MoveToMap{X = 3850, Y = 5776, Z = 1, Direction = 512, LookAngle = 0, SpeedZ = 0, HouseId = 0, Icon = 0, Name = "d42.blv"} 
 end
 
@@ -156,7 +157,7 @@ function arenaSpawns()
 		currentWave=currentWave+1
 		wavesToSpawn=wavesToSpawn-1
 		waveState=1
-		waitNextWave=6
+		waitNextWave=12
 	end
 	local n=3
 	local m=(3-wavesToSpawn)+(waveState-1)/6
