@@ -2019,6 +2019,11 @@ function events.MonsterKilled(mon)
 			end
 		end
 	end
+	--fix for leecher
+	local id=mon:GetIndex()
+	if mapvars.leecher and mapvars.leecher[id] then
+		mapvars.leecher[id]=false
+	end
 end
 --ask confirmation and instructions for true nightmare mode
 function nightmare()
