@@ -632,10 +632,10 @@ function recalculateMonsterTable()
 		--calculate level scaling
 		if i%3==1 then
 			local rateo=HPtable[i]/HPtable[i+1]
-			HPtable[i]=HPtable[i]*rateo
+			HPtable[i]=HPtable[i+1]*rateo
 		elseif i%3==0 then
 			local rateo=HPtable[i]/HPtable[i-1]
-			HPtable[i]=HPtable[i]*rateo
+			HPtable[i]=HPtable[i-1]*rateo
 		end
 		hpOvercap=0
 		actualHP=HPtable[i]
