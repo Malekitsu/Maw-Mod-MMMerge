@@ -2608,14 +2608,30 @@ if buffRework then
 			for i=1, #buffSpellList do
 				local buff=buffSpellList[i]
 				if vars.mawbuff[buff] then
-					if type(vars.mawbuff[buff])=="string" and vars.mawbuff[buff]~=Map.Name then
+					if type(vars.mawbuff[buff])=="string" and vars.mawbuff[buff]~=Map.Name and vars.mawbuff[buff]~="Temple" then
 						vars.mawbuff[buff]=false
 					end
 				end
 			end
 		end
+		--remove temples even indoor
+		for i=1, #buffSpellList do
+			if removeTempleBuffs then
+				local buff=buffSpellList[i]
+				if vars.mawbuff[buff] then
+					if vars.mawbuff[buff]=="Temple" then
+						vars.mawbuff[buff]=false
+					end
+				end
+			end
+		end
+		removeTempleBuffs=false
 	end
-
+	
+	function events.LeaveMap()
+		removeTempleBuffs=true
+	end
+	
 	function events.Action(t)
 		if t.Action==142 and (buffSpell[t.Param] or utilitySpell[t.Param]) then
 			t.Handled=true
@@ -2700,9 +2716,10 @@ if buffRework then
 			evt.PlaySound(sound)
 			local delay=getSpellDelay(pl,spellId)
 			if not delay then --this should apply only when donating in temples
-				vars.mawbuff[spellId]=Map.Name
+				vars.mawbuff[spellId]="Temple"
+			else
+				pl:SetRecoveryDelay(delay)
 			end
-			pl:SetRecoveryDelay(delay)
 			--pl.SP=pl.SP-cost
 			
 			function events.Tick() 
