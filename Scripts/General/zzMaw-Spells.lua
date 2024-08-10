@@ -2699,6 +2699,9 @@ if buffRework then
 			end
 			evt.PlaySound(sound)
 			local delay=getSpellDelay(pl,spellId)
+			if not delay then --this should apply only when donating in temples
+				vars.mawbuff[spellId]=Map.Name
+			end
 			pl:SetRecoveryDelay(delay)
 			--pl.SP=pl.SP-cost
 			
