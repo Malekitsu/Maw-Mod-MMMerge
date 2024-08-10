@@ -2274,6 +2274,17 @@ function itemStats(index)
 			local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
 			--weapon 
 			local s2,m2=SplitSkill(pl:GetSkill(skill))
+			
+			if skill==0 then
+				if m2==4 then
+					s,m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
+					s=s/2
+				else
+					s=0
+					m=0
+				end
+			end
+			
 			local mult=1
 			if skillDamage[skill] then
 				mult=(1+s2*skillDamage[skill][m2]/100)
@@ -2282,6 +2293,12 @@ function itemStats(index)
 			local side=sidesBonus*mult
 			local add=bonus*mult
 			local armsDmg=armsmasterDamage[m]*s*mult
+			
+			--substitute with unarmed if staff
+			if skill==0 then
+				armsDmg=skillDamage[33][m]*s*mult
+			end
+			
 			
 			--make classes such as DK, SERAPH,SHAMAN to make their bonus work in a similar way as armsmaster
 			--DK
