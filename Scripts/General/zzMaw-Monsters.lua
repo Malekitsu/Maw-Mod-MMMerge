@@ -2271,24 +2271,26 @@ amountSP={0,0,0,0,[0]=0}
 function leecher()
 	if mapvars.leecher then
 		for i=1, #mapvars.leecher do
-			local mon=Map.Monsters[mapvars.leecher[i]]
-			local distance=getDistance(mon.X,mon.Y,mon.Z)
-			if distance<1500 and mon.HP>0 then
-				leechmult=((1500-distance)/1500)^2
-				local timeMultiplier=Game.TurnBased and timePassed/12.8 or 1
-				for i=0,Party.High do
-					local pl=Party[i]
-					if pl.HP>-20 then
-						local drainHP=pl:GetFullHP()*leechmult*0.05*timeMultiplier
-						amountHP[i]=amountHP[i]+drainHP
-						pl.HP=pl.HP - math.floor(amountHP[i])
-						amountHP[i]=amountHP[i]%1
-					end
-					if pl.SP>-20 then
-						local drainSP=pl.SP*leechmult*0.05*timeMultiplier
-						amountSP[i]=amountSP[i]+drainSP
-						pl.SP=pl.SP -math.floor(amountSP[i])
-						amountSP[i]=amountSP[i]%1
+			if mapvars.leecher[i] then
+				local mon=Map.Monsters[mapvars.leecher[i]]
+				local distance=getDistance(mon.X,mon.Y,mon.Z)
+				if distance<1500 and mon.HP>0 then
+					leechmult=((1500-distance)/1500)^2
+					local timeMultiplier=Game.TurnBased and timePassed/12.8 or 1
+					for i=0,Party.High do
+						local pl=Party[i]
+						if pl.HP>-20 then
+							local drainHP=pl:GetFullHP()*leechmult*0.05*timeMultiplier
+							amountHP[i]=amountHP[i]+drainHP
+							pl.HP=pl.HP - math.floor(amountHP[i])
+							amountHP[i]=amountHP[i]%1
+						end
+						if pl.SP>-20 then
+							local drainSP=pl.SP*leechmult*0.05*timeMultiplier
+							amountSP[i]=amountSP[i]+drainSP
+							pl.SP=pl.SP -math.floor(amountSP[i])
+							amountSP[i]=amountSP[i]%1
+						end
 					end
 				end
 			end
