@@ -1961,7 +1961,7 @@ function events.MonsterKilled(mon)
 			end
 			
 			vars.dungeonCompletedList=vars.dungeonCompletedList or {}
-			if vars.dungeonCompletedList[name]=="resetted" then
+			if vars.dungeonCompletedList[name] then
 				vars.dungeonCompletedList[name]=true
 				if Game.CurrentScreen~=22 then
 					Game.EscMessage(string.format("Dungeon Completed!\nReset is possible again."))
