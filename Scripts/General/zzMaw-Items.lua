@@ -1761,11 +1761,13 @@ function events.GameInitialized2() --make it load later compared to other script
 					t.Player.HP=math.min(fullHP,t.Player.HP+heal*0.5)
 				end
 			elseif data and data.Player then --spell leech
-				it=t.Player:GetActiveItem(1)
-				local fullHP=t.Player:GetFullHP()
-				if it and it.Bonus2==40 then
-					local heal=t.Result*data.Player.LevelBase^0.6/t.Monster.Level*0.30
-					t.Player.HP=math.min(fullHP,t.Player.HP+heal)
+				for i=1,2 do
+					it=t.Player:GetActiveItem(i)
+					local fullHP=t.Player:GetFullHP()
+					if it and it.Bonus2==40 then
+						local heal=t.Result*data.Player.LevelBase^0.6/t.Monster.Level*0.15
+						t.Player.HP=math.min(fullHP,t.Player.HP+heal)
+					end
 				end
 			end 
 		
