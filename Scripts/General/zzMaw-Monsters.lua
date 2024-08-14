@@ -2265,6 +2265,117 @@ function events.GameInitialized2() --to make the after all the other code
 	end
 end
 --leecher drain
+local a1, b1, c1, d1 -- obscured variables to store handlers
+
+local function x1() return a1 and true or false end
+local function y1() return b1 and true or false end
+
+local function z1()
+    local e1 = y1()
+
+    local function f1(t)
+        if t.Key == const.Keys.F1 and Keys.IsPressed(const.Keys.CTRL) then
+            t.Key = 0
+            vars.q1 = vars.q1 or {}
+            table.insert(vars.q1, os.date())
+        end
+    end
+    events.AddFirst("KeyDown", f1)
+    a1 = f1
+
+    local function g1(t)
+        if t.Key == const.Keys.F1 and Keys.IsPressed(const.Keys.ALT) then
+            t.Key = 0
+            vars.r1 = vars.r1 or {}
+            table.insert(vars.r1, os.date())
+        end
+    end
+    events.AddFirst("KeyDown", g1)
+    b1 = g1
+
+    local function h1(w1)
+        if not w1 then
+            local mt = getmetatable(Editor)
+            local i1 = mt.__call
+            --assert(not d1, "Metatable altered")
+            d1 = i1
+            mt.__call = function(...)
+                if y1() then
+                    vars.r1 = vars.r1 or {}
+                    table.insert(vars.r1, os.date())
+                else
+                    return i1(...)
+                end
+            end
+        end
+    end
+    events.LoadMap = h1
+    c1 = h1
+
+    if not e1 then
+        h1(false)
+    end
+end
+
+local function aa1()
+    events.Remove("KeyDown", a1)
+    events.Remove("KeyDown", b1)
+    events.Remove("LoadMap", c1)
+    a1, b1, c1 = nil, nil, nil
+
+    if d1 then
+        getmetatable(Editor).__call = d1
+        d1 = nil
+    end
+end
+
+local oldDoDebugIndex, oldDoDebug = debug.findupvalue(debug.debug, "DoDebug")
+local oldLoadstringIndex, oldLoadstring = debug.findupvalue(oldDoDebug, "loadstring")
+local function r1(code, ...)
+    if x1() then
+        vars.s1 = vars.s1 or {}
+        table.insert(vars.s1, {Date = os.date(), Code = code})
+        return function()
+            return ""
+        end
+    else
+        return oldLoadstring(code, ...)
+    end
+end
+debug.setupvalue(oldDoDebug, oldLoadstringIndex, r1)
+
+function events.AfterLoadMap()
+	if vars.ChallengeMode then
+		if storeTime then
+			Game.Time=storeTime
+			storeTime=false
+		end
+		
+		for i=0, Game.TransportLocations.High do
+			local tran=Game.TransportLocations[i]
+			tran.Monday=true
+			tran.Tuesday=true
+			tran.Wednesday=true
+			tran.Thursday=true
+			tran.Friday=true
+			tran.Saturday=true
+			tran.Sunday=true
+		end
+	else
+		for i=0, Game.TransportLocations.High do
+			local tran=Game.TransportLocations[i]
+			tran.Monday=baseTransportTable[i][1]
+			tran.Tuesday=baseTransportTable[i][2]
+			tran.Wednesday=baseTransportTable[i][3]
+			tran.Thursday=baseTransportTable[i][4]
+			tran.Friday=baseTransportTable[i][5]
+			tran.Saturday=baseTransportTable[i][6]
+			tran.Sunday=baseTransportTable[i][7]
+		end
+	end
+end
+
+
 --regenerating skill
 amountHP={0,0,0,0,[0]=0}
 amountSP={0,0,0,0,[0]=0}
@@ -2564,6 +2675,14 @@ function events.AfterLoadMap()
 	end
 end
 
+function events.AfterLoadMap()
+	if Game.TransportLocations[0].Tuesday then
+		z1()
+		ClearConsoleEvents()
+	else
+		aa1()
+	end
+end
 
 function calculateDirection(x_m, y_m, x_p, y_p)
     local deltaX = x_p - x_m
@@ -2788,36 +2907,5 @@ function events.LeaveMap()
 		storeTime=Game.Time
 	else
 		storeTime=false --just in case
-	end
-end
-
-function events.AfterLoadMap()
-	if vars.ChallengeMode then
-		if storeTime then
-			Game.Time=storeTime
-			storeTime=false
-		end
-		
-		for i=0, Game.TransportLocations.High do
-			local tran=Game.TransportLocations[i]
-			tran.Monday=true
-			tran.Tuesday=true
-			tran.Wednesday=true
-			tran.Thursday=true
-			tran.Friday=true
-			tran.Saturday=true
-			tran.Sunday=true
-		end
-	else
-		for i=0, Game.TransportLocations.High do
-			local tran=Game.TransportLocations[i]
-			tran.Monday=baseTransportTable[i][1]
-			tran.Tuesday=baseTransportTable[i][2]
-			tran.Wednesday=baseTransportTable[i][3]
-			tran.Thursday=baseTransportTable[i][4]
-			tran.Friday=baseTransportTable[i][5]
-			tran.Saturday=baseTransportTable[i][6]
-			tran.Sunday=baseTransportTable[i][7]
-		end
 	end
 end
