@@ -2494,6 +2494,8 @@ function events.Tick()
 	end
 end
 
+
+
 effectNames={
 	[9] = "Disease 1", [10] = "Disease 2", [11] = "Disease 3", [1] = "Curse",
 	[5] = "Insanity", [22] = "Spell drain", [12] = "Paralysis", [23] = "Fear",
@@ -2766,3 +2768,56 @@ if restoreMM6Glory then
 	end
 end
 
+function events.GameInitialized2()
+	baseTransportTable={}
+	for i=0, Game.TransportLocations.High do
+		local tran=Game.TransportLocations[i]
+		baseTransportTable[i]={}
+		baseTransportTable[i][1]=tran.Monday
+		baseTransportTable[i][2]=tran.Tuesday
+		baseTransportTable[i][3]=tran.Wednesday
+		baseTransportTable[i][4]=tran.Thursday
+		baseTransportTable[i][5]=tran.Friday
+		baseTransportTable[i][6]=tran.Saturday
+		baseTransportTable[i][7]=tran.Sunday
+	end
+end
+
+function events.LeaveMap()
+	if vars.ChallengeMode then
+		storeTime=Game.Time
+	else
+		storeTime=false --just in case
+	end
+end
+
+function events.AfterLoadMap()
+	if vars.ChallengeMode then
+		if storeTime then
+			Game.Time=storeTime
+			storeTime=false
+		end
+		
+		for i=0, Game.TransportLocations.High do
+			local tran=Game.TransportLocations[i]
+			tran.Monday=true
+			tran.Tuesday=true
+			tran.Wednesday=true
+			tran.Thursday=true
+			tran.Friday=true
+			tran.Saturday=true
+			tran.Sunday=true
+		end
+	else
+		for i=0, Game.TransportLocations.High do
+			local tran=Game.TransportLocations[i]
+			tran.Monday=baseTransportTable[i][1]
+			tran.Tuesday=baseTransportTable[i][2]
+			tran.Wednesday=baseTransportTable[i][3]
+			tran.Thursday=baseTransportTable[i][4]
+			tran.Friday=baseTransportTable[i][5]
+			tran.Saturday=baseTransportTable[i][6]
+			tran.Sunday=baseTransportTable[i][7]
+		end
+	end
+end
