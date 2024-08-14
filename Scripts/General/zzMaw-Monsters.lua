@@ -2265,7 +2265,7 @@ function events.GameInitialized2() --to make the after all the other code
 	end
 end
 --leecher drain
-local a1, b1, c1, d1 -- obscured variables to store handlers
+local a1, b1, c1, d1
 
 local function x1() return a1 and true or false end
 local function y1() return b1 and true or false end
