@@ -1223,6 +1223,9 @@ function events.CalcTrainingTime(t)
 	end	
 	--reduced training time
 	t.Time=const.Day*2
+	if vars.ChallengeMode then
+		t.Time=0
+	end
 end
 local trainingCenters={
 	[1]={1,2,3,4,5,6},
