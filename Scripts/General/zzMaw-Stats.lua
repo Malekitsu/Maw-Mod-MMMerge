@@ -1291,7 +1291,7 @@ function calcPowerVitality(pl)
 			power=power*(1+bonus/1000) 
 		end
 		haste=math.floor(pl:GetSpeed()/10)/100+1
-		delay=getSpellDelay(pl,spellIndex)
+		delay=getSpellDelay(pl,spellIndex) or 100
 		DPS3=math.round(power*(1+critChance*(critDamage-1))/(delay/60))			
 	end
 			
