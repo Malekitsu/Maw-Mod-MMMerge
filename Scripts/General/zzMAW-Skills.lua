@@ -1206,13 +1206,31 @@ end
 
 --open time at 5 instead of 6
 function events.GameInitialized2()
+	baseOpenTimes={}
+	baseCloseTimes={}
 	for i =0,Game.Houses.High do
 		if Game.Houses[i].OpenHour==6 then
 			Game.Houses[i].OpenHour=5
 		end
+		baseOpenTimes[i]=Game.Houses[i].OpenHour
+		baseCloseTimes[i]=Game.Houses[i].CloseHour
 	end
 end
-
+--challenge mode always open
+function events.LoadMap()
+	if vars.Mode==4 then
+		for i =0,Game.Houses.High do
+			Game.Houses[i].OpenHour=0
+			Game.Houses[i].CloseHour=0
+		end
+	end
+	if vars.Mode~=4 then
+		for i =0,Game.Houses.High do
+			Game.Houses[i].OpenHour=baseOpenTimes[i]
+			Game.Houses[i].CloseHour=baseCloseTimes[i]
+		end
+	end
+end
 --training centers bolster
 
 function events.CalcTrainingTime(t)
