@@ -1641,16 +1641,6 @@ function events.AfterLoadMap()
 			end
 			evt.MoveToMap{X = -2688, Y = 1216, Z = 1153, Direction = 1536, LookAngle = 0, SpeedZ = 0, HouseId = 447, Icon = 5, Name = "6d18.blv"}         -- "Gharik's Forge"
 		end
-
-		Game.MapEvtLines:RemoveEvent(104)
-		evt.map[104] = function()
-			local dungeonId="outb3.blv"
-			if canResetDungeon(dungeonId) and not vars.resetDungeon and not questionAsked then
-				resetMap(dungeonId)
-				return
-			end
-			evt.MoveToMap{X = 12808, Y = 6832, Z = 64, Direction = 512, LookAngle = 0, SpeedZ = 0, HouseId = 0, Icon = 0, Name = "outb3.odm"}
-		end
 	end
 end
 
