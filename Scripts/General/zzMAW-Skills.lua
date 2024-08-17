@@ -1223,12 +1223,14 @@ function events.LoadMap()
 			Game.Houses[i].OpenHour=0
 			Game.Houses[i].CloseHour=0
 		end
+		Game.NPC[1177].EventB=0
 	end
 	if vars.Mode~=4 then
 		for i =0,Game.Houses.High do
 			Game.Houses[i].OpenHour=baseOpenTimes[i]
 			Game.Houses[i].CloseHour=baseCloseTimes[i]
 		end
+		Game.NPC[1177].EventB=1418
 	end
 end
 --training centers bolster
