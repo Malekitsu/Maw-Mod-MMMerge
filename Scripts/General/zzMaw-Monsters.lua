@@ -2750,6 +2750,7 @@ if restoreMM6Glory then
 			if transform[obj.Type] and obj.Owner%8==3 then
 				obj.Type=transform[obj.Type]
 				obj.TypeIndex=obj.Type-160
+				obj.LightMultiplier=0
 			end		
 		end
 	end
@@ -2770,6 +2771,7 @@ if restoreMM6Glory then
 				obj.Velocity[1]=0
 				obj.Velocity[2]=0
 				obj.Velocity[0]=0
+				obj.Age=0
 				lastLocation[i]={math.huge,math.huge}
 				--get data
 				local id=math.floor(obj.Owner/8)
@@ -2794,6 +2796,9 @@ if restoreMM6Glory then
 									["SpellSkill"]=obj.SpellSkill,
 									}
 					
+					obj.X=obj.X+(Party.X-obj.X)/3
+					obj.Y=obj.Y+(Party.Y-obj.Y)/3
+					obj.Z=obj.Z+10
 					--cover code
 					local list={}
 					for k=0,Party.High do
@@ -2875,7 +2880,7 @@ if restoreMM6Glory then
 			end
 		end
 	end
-
+	--[[
 	function events.GameInitialized2()
 		for i=540, 558 do
 			if Game.ObjListBin[i].Speed==0 then
@@ -2883,6 +2888,7 @@ if restoreMM6Glory then
 			end
 		end 
 	end
+	]]
 end
 
 function events.GameInitialized2()
