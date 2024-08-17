@@ -1070,7 +1070,11 @@ function MawRegen()
 					FSP=math.max(math.ceil(currentManaPool[i]),0)
 					
 				end
+				if RegS > 50 then
+				regenSP[i] = regenSP[i] + (FSP^0.2*50^1.75*((RegM+5)/3500)*RegS/50 +0.02)* timeMultiplier*mult
+				else
 				regenSP[i] = regenSP[i] + (FSP^0.2*RegS^1.75*((RegM+5)/3500) +0.02)* timeMultiplier*mult
+				end
 				
 				--meditation buff
 				if buffRework and vars.mawbuff[56] then
@@ -1125,7 +1129,13 @@ function events.Tick()
 			m=8
 		end
 		local spRegen = (FSP^0.2*s^1.75*((m+5)/35)+2)/10
+		if s > 49 then
+		spRegen = (FSP^0.2*50^1.75*((m+5)/35)*s/50+2)/10
+		end
 		local spRegen2 = (FSP^0.2*(s+1)^1.75*((m+5)/35)+2)/10
+		if s > 49 then
+		spRegen2 = (FSP^0.2*(50+1)^1.75*((m+5)/35)*s/50+2)/10
+		end
 		local spRegen2 = math.round((spRegen2-spRegen)*100)/100
 		if spRegen>10 then
 			spRegen = math.round((spRegen)*10)/10
