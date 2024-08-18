@@ -1878,7 +1878,7 @@ function events.LeaveMap()
 		for i=0,#mapvars.monsterMap do
 			mon=Map.Monsters[i]
 			old=mapvars.monsterMap[i]
-			if mon and old and old.respawn and (mon.AIState==const.AIState.Removed or mon.AIState==const.AIState.Dead)  then --no unique monsters respawn
+			if mon and old and old.respawn and (mon.AIState==const.AIState.Removed or mon.AIState==const.AIState.Dead) and mon.Ally~=9999 then --no unique monsters respawn
 				mon.HP=mon.FullHP
 				mon.X, mon.Y, mon.Z=old.x, old.y, old.z 
 				mon.AIState=0
