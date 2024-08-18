@@ -1142,10 +1142,10 @@ CCMAP={
 	[const.Spells.Slow]=	{["Duration"]=const.Minute*4, ["ChanceMult"]=0.03, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Earth, ["DamageKind"]=const.Damage.Earth,["Debuff"]=const.MonsterBuff.Slow},
 	[60]=					{["Duration"]=const.Minute*6, ["ChanceMult"]=0.05, ["BaseCost"]=5, ["ScalingCost"]=4, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--Mind Charm, has no const value, due to dark elf one overwriting
 	[const.Spells.Charm]=	{["Duration"]=const.Minute*3, ["ChanceMult"]=0.05, ["BaseCost"]=1, ["ScalingCost"]=4, ["School"]=const.Skills.DarkElfAbility, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--dark elf one
-	[const.Spells.Berserk]=	{["Duration"]=const.Minute*2, ["ChanceMult"]=0.02, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Berserk},
-	[const.Spells.MassFear]={["Duration"]=const.Minute*2, ["ChanceMult"]=0.005, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Fear},
+	[const.Spells.Berserk]=	{["Duration"]=const.Minute*2, ["ChanceMult"]=0.02, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Berserk},
+	[const.Spells.MassFear]={["Duration"]=const.Minute*3, ["ChanceMult"]=0.005, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Fear},
 	[const.Spells.Fear]=	{["Duration"]=const.Minute*2, ["ChanceMult"]=0.005, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Fear},
-	[const.Spells.Enslave]=	{["Duration"]=const.Minute*3, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=1, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Enslave},
+	[const.Spells.Enslave]=	{["Duration"]=const.Minute*3, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Enslave},
 	[const.Spells.Paralyze]={["Duration"]=const.Minute*3, ["ChanceMult"]=0.04, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Light, ["DamageKind"]=const.Damage.Light,["Debuff"]=const.MonsterBuff.Paralyze},	
 [const.Spells.ShrinkingRay]={["Duration"]=const.Minute*3, ["ChanceMult"]=0.01, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark,["Debuff"]=const.MonsterBuff.ShrinkingRay},
 [const.Spells.DarkGrasp]=	{["Duration"]=const.Minute*4, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]={const.MonsterBuff.ArmorHalved, const.MonsterBuff.Slow, const.MonsterBuff.DamageHalved, const.MonsterBuff.MeleeOnly}},																									
@@ -1289,19 +1289,19 @@ function events.GameInitialized2()
 			[26] = {dmgAdd = 6, diceMin = 1, diceMax = 7, },--ice bolt
 			[29] = {dmgAdd = 2, diceMin = 1, diceMax = 14, },--acid burst
 			[32] = {dmgAdd = 6, diceMin = 1, diceMax = 6, },--ice blast
-			[37] = {dmgAdd = 5, diceMin = 1, diceMax = 5, },--deadly swarm
+			[37] = {dmgAdd = 8, diceMin = 1, diceMax = 5, },--deadly swarm
 			[39] = {dmgAdd = 7, diceMin = 1, diceMax = 7, },--blades
 			[41] = {dmgAdd = 8, diceMin = 1, diceMax = 8, },--rock blast
 			[43] = {dmgAdd = 0, diceMin = 1, diceMax = 2, },--death blossom
 			[44] = {dmgAdd = 15, diceMin = 0.5, diceMax = 0.5, },--mass distorsion, nerfed
 			[52] = {dmgAdd = 10, diceMin = 2, diceMax = 8, },--spirit lash
-			[59] = {dmgAdd = 16, diceMin = 1, diceMax = 3, },--mind blast
+			[59] = {dmgAdd = 12, diceMin = 1, diceMax = 6, },--mind blast
 			[65] = {dmgAdd = 25, diceMin = 1, diceMax = 25, },--psychic shock
 			[70] = {dmgAdd = 4, diceMin = 1, diceMax = 4, },--harm
 			[76] = {dmgAdd = 20, diceMin = 1, diceMax = 5, },--flying fist
 			[78] = {dmgAdd = 12, diceMin = 1, diceMax = 2, },--light bolt
 			[79] = {dmgAdd = 12, diceMin = 1, diceMax = 8, },--destroy undead
-			[84] = {dmgAdd = 25, diceMin = 2, diceMax = 2, },--prismatic light
+			[84] = {dmgAdd = 25, diceMin = 2, diceMax = 5, },--prismatic light
 			[87] = {dmgAdd = 50, diceMin = 1, diceMax = 50, },--sunray
 			[90] = {dmgAdd = 15, diceMin = 1, diceMax = 9, },--toxic cloud
 			[93] = {dmgAdd = 0, diceMin = 1, diceMax = 7, },--shrapmetal
