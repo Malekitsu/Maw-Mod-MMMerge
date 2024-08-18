@@ -1061,36 +1061,34 @@ function MawRegen()
 				mult=2
 			end
 			local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Meditation))
-			if RegM > 0 or pl.Class==10 or pl.Class==11 then
-				if RegM==4 then
-					RegM=8
-				end
-				FSP	= pl:GetFullSP()
-				if buffRework and currentManaPool and currentManaPool[i] then
-					FSP=math.max(math.ceil(currentManaPool[i]),0)
-					
-				end
-				if RegS > 50 then
-				regenSP[i] = regenSP[i] + (FSP^0.2*50^1.75*((RegM+5)/3500)*RegS/50 +0.02)* timeMultiplier*mult
-				else
-				regenSP[i] = regenSP[i] + (FSP^0.2*RegS^1.75*((RegM+5)/3500) +0.02)* timeMultiplier*mult
-				end
-				
-				--meditation buff
-				if buffRework and vars.mawbuff[56] then
-					local s, m, level=getBuffSkill(56)
-					local level=level^0.6
-					regenSP[i] = regenSP[i] + (FSP^0.2*level^1.75*((buffPower[56].Base[m])/10000) +0.1)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
-				end
-				--dragon regen
-				if pl.Class==10 then
-					regenSP[i]=regenSP[i] + 0.2* timeMultiplier*mult
-				elseif pl.Class==11 then
-					regenSP[i]=regenSP[i] + 0.5* timeMultiplier*mult
-				end
-				pl.SP = math.min(FSP, pl.SP + math.floor(regenSP[i]))
-				regenSP[i]=regenSP[i]%1
+			if RegM==4 then
+				RegM=8
 			end
+			FSP	= pl:GetFullSP()
+			if buffRework and currentManaPool and currentManaPool[i] then
+				FSP=math.max(math.ceil(currentManaPool[i]),0)
+				
+			end
+			if RegS > 50 then
+				regenSP[i] = regenSP[i] + (FSP^0.2*50^1.75*((RegM+5)/3500)*RegS/50 +0.02)* timeMultiplier*mult
+			elseif RegM > 0 then
+				regenSP[i] = regenSP[i] + (FSP^0.2*RegS^1.75*((RegM+5)/3500) +0.02)* timeMultiplier*mult
+			end
+			
+			--meditation buff
+			if buffRework and vars.mawbuff[56] then
+				local s, m, level=getBuffSkill(56)
+				local level=level^0.6
+				regenSP[i] = regenSP[i] + (FSP^0.2*level^1.75*((buffPower[56].Base[m])/10000) +0.1)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
+			end
+			--dragon regen
+			if pl.Class==10 then
+				regenSP[i]=regenSP[i] + 0.2* timeMultiplier*mult
+			elseif pl.Class==11 then
+				regenSP[i]=regenSP[i] + 0.5* timeMultiplier*mult
+			end
+			pl.SP = math.min(FSP, pl.SP + math.floor(regenSP[i]))
+			regenSP[i]=regenSP[i]%1
 			lastSP[i]=pl.SP
 		end
 	end
