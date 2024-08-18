@@ -2913,3 +2913,27 @@ function events.LeaveMap()
 		storeTime=false --just in case
 	end
 end
+
+--share experience for monsters killed by summoned/resurrected Monsters
+function events.MonsterKilled(mon)
+	mapvars.monsterKilledList=mapvars.monsterKilledList or {}
+	local data=WhoHitMonster()
+	if data and data.Monster and data.Monster.Ally==9999 then
+		if not mapvars.monsterKilledList[mon:GetIndex()] then --don't give exp again if it already gave it once
+			local consciousPlayers=0
+			for i=0, Party.High do
+				if Party[i]:IsConscious() then
+					consciousPlayers=consciousPlayers+1
+				end
+			end
+			for i=0, Party.High do
+				if Party[i]:IsConscious() then
+					Party[i].Experience=Party[i].Experience+mon.Exp/consciousPlayers
+				end
+			end
+			if consciousPlayers>0 then
+				mapvars.monsterKilledList[mon:GetIndex()]=true
+			end
+		end		
+	end
+end
