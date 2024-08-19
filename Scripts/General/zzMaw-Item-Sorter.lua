@@ -208,6 +208,7 @@ function sortMultibag()
 	if vars.alchemyPlayer and vars.alchemyPlayer>Party.High then
 		vars.alchemyPlayer=-1
 	end
+	evt.Add("Items",0)
 	--let's fill first all inventories
 	local playerCurrentInventories={}
 	local plToSort=Game.CurrentPlayer
