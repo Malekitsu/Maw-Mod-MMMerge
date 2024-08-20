@@ -1953,7 +1953,9 @@ function events.CalcDamageToMonster(t)
 				function events.Tick()
 					events.Remove("Tick",1)
 					if applyParalyze[id] then
-						mon.SpellBuffs[6].ExpireTime=Game.Time+duration
+						if mon.HP~=0 then
+							mon.SpellBuffs[6].ExpireTime=Game.Time+duration
+						end
 						applyParalyze[id]=false
 					else
 						mon.SpellBuffs[6].ExpireTime=previousDuration
