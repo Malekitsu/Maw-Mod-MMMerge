@@ -101,13 +101,13 @@ function events.CalcDamageToMonster(t)
 				maxDamage=pl:GetMeleeDamageMax()
 				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
 				damage=math.round(randomDamage/2)
-				dmgMult=damageMultiplier[t.PlayerIndex]["Melee"]
+				dmgMult=damageMultiplier[data.Player:GetIndex()]["Melee"]
 			else --bow
 				baseDamage=pl:GetRangedDamageMin()
 				maxDamage=pl:GetRangedDamageMax()
 				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
 				damage=math.round(randomDamage/2)
-				dmgMult=damageMultiplier[t.PlayerIndex]["Ranged"]
+				dmgMult=damageMultiplier[data.Player:GetIndex()]["Ranged"]
 			end
 			
 			t.Result=damage*dmgMult
