@@ -2784,7 +2784,7 @@ if restoreMM6Glory then
 					if mon.Attack1.Missile==0 and mon.Attack2.Missile>0 then
 						action=1
 					end
-					if obj.SpellSkill~=0 then
+					if obj.Spell~=0 then
 						action=2
  					end
 					mawCustomMonObj={["Monster"]=mon, 
