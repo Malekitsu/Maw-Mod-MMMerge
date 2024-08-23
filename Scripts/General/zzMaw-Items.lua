@@ -1779,7 +1779,7 @@ function events.GameInitialized2() --make it load later compared to other script
 				if pl.Class==40 or pl.Class==41 then
 					heal=heal*2
 				end
-				if data.Object and data.Object.Spell==133 then
+				if data.Object and data.Object then
 					heal=heal/2
 				end
 				heal=math.ceil(heal)
