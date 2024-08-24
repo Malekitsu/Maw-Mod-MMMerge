@@ -1149,6 +1149,8 @@ CCMAP={
 	[const.Spells.Paralyze]={["Duration"]=const.Minute*3, ["ChanceMult"]=0.04, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Light, ["DamageKind"]=const.Damage.Light,["Debuff"]=const.MonsterBuff.Paralyze},	
 [const.Spells.ShrinkingRay]={["Duration"]=const.Minute*3, ["ChanceMult"]=0.01, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark,["Debuff"]=const.MonsterBuff.ShrinkingRay},
 [const.Spells.DarkGrasp]=	{["Duration"]=const.Minute*4, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]={const.MonsterBuff.ArmorHalved, const.MonsterBuff.Slow, const.MonsterBuff.DamageHalved, const.MonsterBuff.MeleeOnly}},																									
+	[const.Spells.TurnUndead]={["Duration"]=const.Minute*2, ["ChanceMult"]=0.005, ["BaseCost"]=1, ["ScalingCost"]=0.5, ["School"]=const.Skills.Spirit, ["DamageKind"]=const.Damage.Spirit, ["Debuff"]=const.MonsterBuff.Fear},	
+	[const.Spells.ControlUndead]={["Duration"]=const.Minute*3, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=0.5, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]=const.MonsterBuff.Enslave},
 }
 
 function getCCDiffMult(bolster)
@@ -1211,7 +1213,11 @@ function events.PlayerCastSpell(t)
 				mon.Resistances[cc.DamageKind]=65000
 				--Game.ShowStatusText("Miss" .. "  " .. hit)
 			end
+			if (t.SpellId==const.Spells.TurnUndead or t.SpellId==const.Spells.ControlUndead)and Game.IsMonsterOfKind(mon.Id, const.MonsterKind.Undead)~=1 then
+				mon.Resistances[cc.DamageKind]=65000
+			end
 		end
+				
 		local reset=1
 		if cc.DamageKind==const.Damage.Dark then
 			reset=100
