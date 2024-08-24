@@ -1250,13 +1250,12 @@ end
 
 --stun code
 function events.CalcDamageToMonster(t)
-	local data=WhoHitMonster
+	local data=WhoHitMonster()
 	if data and data.Player and data.Object and data.Object.Spell==34 then
 		local cc=CCMAP[const.Spells.Stun]
 		local mon=t.Monster
 		local oldResistance=mon.Resistances[const.Damage.Earth]
-		local mon=Map.Monsters[i]
-		local res=mon.Resistances[cc.DamageKind]
+		local res=mon.Resistances[const.Damage.Earth]
 		local lvl=mon.Level
 		local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Earth))
 		local newLevel=calcEffectChance(lvl, res, s, cc.ChanceMult, mon)
