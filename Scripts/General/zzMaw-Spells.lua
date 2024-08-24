@@ -1139,6 +1139,7 @@ end
 --CC REWORK
 ----------------------------------------
 CCMAP={
+	[const.Spells.Stun]=	{["Duration"]=const.Minute,["ChanceMult"]=0.03, ["BaseCost"]=1, ["ScalingCost"]=10},
 	[const.Spells.Slow]=	{["Duration"]=const.Minute*4, ["ChanceMult"]=0.03, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Earth, ["DamageKind"]=const.Damage.Earth,["Debuff"]=const.MonsterBuff.Slow},
 	[60]=					{["Duration"]=const.Minute*6, ["ChanceMult"]=0.05, ["BaseCost"]=5, ["ScalingCost"]=4, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--Mind Charm, has no const value, due to dark elf one overwriting
 	[const.Spells.Charm]=	{["Duration"]=const.Minute*3, ["ChanceMult"]=0.05, ["BaseCost"]=1, ["ScalingCost"]=4, ["School"]=const.Skills.DarkElfAbility, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--dark elf one
@@ -1193,6 +1194,7 @@ end
 
 function events.PlayerCastSpell(t)
 	if CCMAP[t.SpellId] then
+		if t.SpellId==const.Spells.Stun then return end --stun is handled differently
 		local resistance={}
 		local level={}
 		local cc=CCMAP[t.SpellId]
@@ -1245,6 +1247,34 @@ function events.PlayerCastSpell(t)
 		end
 	end
 end
+
+--stun code
+function events.CalcDamageToMonster(t)
+	local data=WhoHitMonster
+	if data and data.Player and data.Object and data.Object.Spell==34 then
+		local cc=CCMAP[const.Spells.Stun]
+		local mon=t.Monster
+		local oldResistance=mon.Resistances[const.Damage.Earth]
+		local mon=Map.Monsters[i]
+		local res=mon.Resistances[cc.DamageKind]
+		local lvl=mon.Level
+		local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Earth))
+		local newLevel=calcEffectChance(lvl, res, s, cc.ChanceMult, mon)
+		local hit=(30/(30+newLevel/4))
+		if hit>math.random() then
+			mon.Resistances[const.Damage.Earth]=0
+			mon.Level=0
+		else
+			mon.Resistances[const.Damage.Earth]=65000
+		end
+		function events.Tick() 
+			events.Remove("Tick", 1)
+			mon.Level=lvl
+			mon.Resistances[const.Skills.Earth]=res
+		end
+	end
+end
+
 
 function calcEffectChance(lvl, res, skill, chance, mon)
 	totRes=lvl/4+res
