@@ -2548,7 +2548,6 @@ function itemStats(index)
 	local enlightIncrease=totalMana*((m+1)/100*s)
 	tab[9]=tab[9]+enlightIncrease+manaScaling*s2*m2
 	
-	ACBONUS=0
 	for i=0,3 do 
 		local item=pl:GetActiveItem(i)
 		if item then
@@ -2568,7 +2567,7 @@ function itemStats(index)
 			if skillAC[skill] and skillAC[skill][m] then
 				tab[10]=tab[10]+skillAC[skill][m]*s
 			end
-			if skillResistance[skill] and skillResistance[skill][m] then
+			if skillResistance[skill] and skillResistance[skill][m] and skill~=0 then --staff exception
 				for v=11,16 do
 					tab[v]=tab[v]+skillResistance[skill][m]*s
 				end
@@ -2591,6 +2590,21 @@ function itemStats(index)
 		end
 	end
 	
+	--staff party buff
+	local staffResistance=0
+	for i=0, Party.High do
+		local item=Party[i]:GetActiveItem(1)
+		if item then
+			local skill=item:T().Skill
+			if skill==0 then
+				local s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Staff))
+				staffResistance=staffResistance+skillResistance[skill][m]*s
+			end
+		end
+	end
+	for v=11,16 do
+		tab[v]=tab[v]+staffResistance
+	end
 	--armsmaster attack
 	local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
 	if m>0 then
