@@ -104,7 +104,7 @@ skillAC =
 }
 skillResistance =
 {
-	[const.Skills.Staff]	= {[0]=0, 0, 1, 2, 2},
+	[const.Skills.Staff]	= {[0]=0, 1, 2, 3, 4},
 	[const.Skills.Sword]	= {[0]=0, 0, 0, 0, 0},
 	[const.Skills.Dagger]	= {[0]=0, 0, 0, 0, 0},
 	[const.Skills.Axe]		= {[0]=0, 0, 0, 0, 0},
@@ -434,7 +434,7 @@ end
 ------------------------
 function events.GameInitialized2()
 	Skillz.setDesc(6,1,Skillz.getDesc(6,1) .. "\nThe paralyze effect lasts for 5 seconds on regular monsters and 2 seconds on bosses. The stun effect lasts for half the duration of the paralyze effect. The chances of successfully applying these effects depend on the skill level and the monster's level.\n")
-	Skillz.setDesc(0,1,Skillz.getDesc(0,1) .. "\nThis skill increases the damage gained from weapon by a percentage when equipping a staff.\nAt Grandmaster can combine staff and unarmed skill, increasing its damage with staff skill at half effect.\n")
+	Skillz.setDesc(0,1,Skillz.getDesc(0,1) .. "\nThis skill increases the damage gained from weapon by a percentage when equipping a staff.\nAt Grandmaster can combine staff and unarmed skill, increasing its damage with staff skill at half effect.\n\nEach point of mastery will grant a point to all resistances to ALL party.\n")
 	Skillz.setDesc(1,1,Skillz.getDesc(1,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping a sword.\n")
 	Skillz.setDesc(2,1,Skillz.getDesc(2,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping a dagger.\n")
 	Skillz.setDesc(3,1,Skillz.getDesc(3,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping an axe.\n")
