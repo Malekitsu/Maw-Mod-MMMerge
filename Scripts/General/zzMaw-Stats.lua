@@ -1047,7 +1047,7 @@ function compute_damage(x)
     -- If x is not an integer, handle the fractional part
     local fractional_part = x - math.floor(x)
     if fractional_part > 0 then
-        damage = damage * (2 - (math.floor(x) + 1) * 0.2) ^ fractional_part
+        damage = damage * (2.2 - (math.floor(x) + 1) * 0.2) ^ fractional_part
     end
 
     return damage
