@@ -1835,7 +1835,8 @@ function ascension()
 		end
 		
 		for i=1,132 do
-			local magicS, magicM=SplitSkill(pl.Skills[11+math.ceil(i/11)])
+			local skill=11+math.ceil(i/11)
+			local magicS, magicM=SplitSkill(pl.Skills[skill])
 			if magicM>0 then
 				local speed=getSpellDelay(pl,i)
 				if table.find(spells, i) then
@@ -1848,8 +1849,20 @@ function ascension()
 					Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. "\n\nRecovery time: " .. oldTable[i][magicM]
 				end
 			end
+			local capMastery=Skillz.MasteryLimit(pl,skill)
+			local learnableSpells={{1,2,3,4},{5,6,7},{8,9,10},{11}}
+			local txt=StrColor(255,0,0,"\n\nCan't learn")
+			if not pl.Spells[i] then
+				for i=1,capMastery do
+					if table.find(learnableSpells[i],capMastery) then
+						txt=StrColor(255,0,0,"\n\nNot Learned")
+					end
+				end
+			else 
+				txt=""
+			end
+			Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. txt
 		end
-		
 	end
 end
 
