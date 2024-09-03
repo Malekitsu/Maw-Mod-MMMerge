@@ -318,23 +318,7 @@ function events.BuildStatInformationBox(t)
 	end
 	if t.Stat==7 then
 		local index=Game.CurrentPlayer
-		endurance2=Party[index]:GetEndurance()
-		if endurance2<=21 then
-			endEff=(endurance2-13)/2
-		else
-			endEff=math.floor(endurance2/5)
-		end
-		HPScaling=Game.Classes.HPFactor[Party[index].Class]
-		skill=Party[index].Skills[const.Skills.Bodybuilding]
-		s,m=SplitSkill(skill)
-		if m==4 then
-			m=5
-		end
-		BBHP=HPScaling*s*m+s^2
-		fullHP=Party[index]:GetFullHP()
-		enduranceTotalBonus=math.round(fullHP-fullHP/(1+endurance2/1000))+endEff*HPScaling
 		level=Party[index]:GetLevel()
-		BASEHP=Game.Classes.HPBase[Party[index].Class]+level*HPScaling
 		--hp regen calculation
 		local i=Game.CurrentPlayer
 		local FHP=Party[i]:GetFullHP()
@@ -369,7 +353,9 @@ function events.BuildStatInformationBox(t)
 			end
 		end
 		
-		t.Text=string.format("%s\n\nHP bonus from Endurance: %s\nHP bonus from Body building: %s\nHP bonus from items: %s\nBase HP: %s\n\n HP Regen per second: %s",t.Text,StrColor(0,255,0,enduranceTotalBonus), StrColor(0,255,0,BBHP),StrColor(0,255,0,math.round(fullHP-enduranceTotalBonus-BBHP-BASEHP)),StrColor(0,255,0,BASEHP),StrColor(0,255,0,regen/10))
+		hpMap=hpStatsMap[index]
+		
+		t.Text=string.format("%s\n\nHP bonus from Endurance: %s\nHP bonus from Body building: %s\nHP bonus from items: %s\nBase HP: %s\n\n HP Regen per second: %s",t.Text,StrColor(0,255,0,hpMap.totalEnduranceBonus), StrColor(0,255,0,hpMap.totalBBBonus),StrColor(0,255,0,math.round(hpMap.totalhpFromItems)),StrColor(0,255,0,hpMap.totalBaseHP),StrColor(0,255,0,regen/10))
 	end
 	if t.Stat==8 then
 		local i=Game.CurrentPlayer
@@ -1048,6 +1034,26 @@ buffToSpell={
 	[12] = {58,69,3,14,25,36},
 }
 
+function compute_damage(x)
+    -- Start with the base damage multiplier
+    local damage = 1
+
+    -- Loop through each step from 1 to the floor of x
+    for i = 1, math.floor(x) do
+        -- Multiply the damage by (2 - i*0.2)
+        damage = damage * math.max(2.2 - i * 0.2, 1.5)
+    end
+
+    -- If x is not an integer, handle the fractional part
+    local fractional_part = x - math.floor(x)
+    if fractional_part > 0 then
+        damage = damage * (2 - (math.floor(x) + 1) * 0.2) ^ fractional_part
+    end
+
+    return damage
+end
+
+
 function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	monLvl=monLvl or pl.LevelBase
 	bolster=(math.max(Game.BolsterAmount, 100)/100-1)/4+1
@@ -1109,7 +1115,10 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		local AC=pl:GetArmorClass()
 		local AC=pl:GetArmorClass()
 		local AC=pl:GetArmorClass()--multiple times to avoid chance to hit code to interfere with AC
-		local damage=math.round(damage/2^(AC/math.min(120+monLvl*0.75*bolster,300*bolster)))
+		
+		local divider=math.min(120+monLvl*0.75*bolster,300*bolster)
+		local reduction=compute_damage(AC/divider)
+		local damage=math.round(damage/reduction)
 		return damage
 	end
 	
@@ -1150,7 +1159,10 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		end
 		res=math.min(maxres,res*1.5)
 	end
-	res=1/2^math.min(res/math.min(60+monLvl*0.5*bolster,200*bolster))
+	
+	local divider=math.min(60+monLvl*0.5*bolster,200*bolster)
+	local reduction=compute_damage(res/divider)
+	local res=1/reduction	
 	
 	--randomize resistance
 	if res>0 and rand then
