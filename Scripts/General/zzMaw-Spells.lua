@@ -2932,6 +2932,10 @@ if buffRework then
 		end
 	end
 	
+	--buff recast when changing map
+	function events.AfterLoadMap()
+		mawBuffApply()
+	end
 	--code to make buff work is elsewhere
 	
 	--tooltips
