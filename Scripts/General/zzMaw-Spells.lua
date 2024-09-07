@@ -2902,7 +2902,7 @@ if buffRework then
 		buffManaLock()
 	end
 	
-	function events.LoadMap(wasInGame)
+	function events.AfterLoadMap()
 		Timer(mawBuffApply, const.Minute/2, true)
 		Timer(buffManaLock, const.Minute/20) 
 	end
@@ -2932,10 +2932,6 @@ if buffRework then
 		end
 	end
 	
-	--buff recast when changing map
-	function events.AfterLoadMap()
-		mawBuffApply()
-	end
 	--code to make buff work is elsewhere
 	
 	--tooltips
