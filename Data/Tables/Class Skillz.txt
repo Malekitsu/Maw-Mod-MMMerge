@@ -7,7 +7,7 @@ Spear	E	M	M	M	=	=	=	=	=	=	=	=	=	=	=	=	M	M	G	G	M	M	E	E	E	E	E	M	M	M	E	M	G	G	=	=	=	
 Bow	M	M	G	G	E	M	M	M	M	G	=	=	E	E	E	E	E	E	M	M	E	E	N	N	N	N	E	E	E	E	M	M	G	G	E	M	M	M	E	M	N	N	N	N	N	N	N	N	N	N	M	N	N	E	E	E	E	E	E	E	E	E	N	N	N
 Mace	=	=	=	=	E	M	M	M	N	N	=	=	E	E	E	E	M	M	G	G	M	M	=	=	=	=	M	M	G	G	=	=	=	=	E	E	E	E	M	G	E	M	=	=	=	=	=	=	=	=	M	=	=	E	M	M	M	M	M	E	M	M	E	E	E
 Blaster	G	G	G	G	G	G	G	G	G	G	=	=	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	N	N	G	G	G	G	G	G	G	G	G	G	G	G	=	=	=
-Shield	=	=	=	=	E	M	M	M	E	E	=	=	E	E	E	E	M	M	G	G	=	=	=	=	=	=	M	M	G	G	E	E	E	E	N	N	N	N	E	E	M	M	=	=	=	=	=	=	=	=	M	=	=	M	M	M	=	=	=	E	E	E	=	=	=
+Shield	=	=	=	=	E	M	M	M	E	E	=	=	E	E	E	E	M	M	G	G	=	=	=	=	=	=	M	M	G	G	E	E	E	E	N	N	N	N	E	M	M	M	=	=	=	=	=	=	=	=	M	=	=	M	M	M	=	=	=	E	E	E	=	=	=
 Leather	M	M	M	M	E	E	E	E	M	M	=	=	E	E	E	E	E	E	E	E	E	E	M	M	M	M	E	E	E	E	M	M	M	M	M	M	G	G	M	G	M	M	E	M	E	M	M	M	N	N	E	M	E	E	E	E	E	E	E	E	M	M	E	E	M
 Chain	M	M	G	G	E	E	M	M	M	G	=	=	=	=	=	=	M	M	M	M	M	G	=	=	=	=	M	M	M	M	M	M	M	M	E	E	E	E	E	E	E	E	=	=	=	=	=	=	=	=	M	=	=	M	M	M	M	M	M	E	E	E	=	=	=
 Plate	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	M	M	G	G	E	E	=	=	=	=	M	M	G	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	M	M	M	M	M	G	=	=	=	=	=	=
@@ -32,11 +32,11 @@ Perception	M	M	G	G	E	E	E	E	M	M	M	G	E	E	E	E	E	M	M	M	M	G	E	E	E	E	E	M	M	M	M	M	M	M	M
 Regeneration	=	=	=	=	=	=	=	=	=	=	E	M	=	=	=	=	=	=	=	=	N	E	N	E	E	E	=	=	=	=	=	=	=	=	=	=	=	=	M	G	E	M	=	=	=	E	=	=	=	=	=	=	=	=	=	=	N	E	E	=	=	=	=	=	=
 DisarmTraps	N	E	M	M	N	N	N	N	M	G	N	N	N	N	N	N	N	N	E	E	M	M	N	E	M	M	N	N	N	N	E	E	E	E	M	M	G	G	N	N	E	E	N	N	N	N	N	N	N	N	N	N	N	N	N	N	N	N	E	E	E	E	E	E	M
 Dodging	E	E	E	E	=	=	=	=	E	E	M	G	=	=	=	=	E	E	E	E	=	=	M	M	G	G	N	N	N	N	E	E	E	E	M	M	M	M	=	=	E	E	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=
-Unarmed	N	N	N	N	=	=	=	=	=	=	M	G	=	=	=	=	E	E	E	E	E	E	M	M	G	G	N	N	N	N	N	N	N	N	E	E	E	E	E	E	N	N	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	E	M	M	=	=	=
-IdentifyMonster	N	N	N	N	M	G	G	G	N	N	M	M	E	E	E	E	E	E	E	E	N	N	E	E	E	E	M	M	G	G	M	M	G	G	N	N	N	N	E	E	M	G	M	M	M	M	M	M	N	N	G	M	M	N	N	N	E	E	E	M	M	G	M	M	G
+Unarmed	N	N	N	N	=	=	=	=	=	=	M	G	=	=	=	=	E	E	E	E	E	E	M	M	G	G	N	N	N	N	N	N	N	N	E	E	E	E	E	M	N	N	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	E	M	M	=	=	=
+IdentifyMonster	N	N	N	N	M	G	G	G	N	N	M	M	E	E	E	E	E	E	E	E	N	N	E	E	E	E	M	M	G	G	M	M	G	G	N	N	N	E	G	E	M	G	M	M	M	M	M	M	N	N	G	M	M	N	N	N	E	E	E	M	M	G	M	M	G
 Armsmaster	E	E	M	M	E	E	E	E	E	M	=	=	N	N	N	N	M	M	G	G	E	M	M	M	M	M	E	M	M	M	E	E	M	M	M	M	G	G	M	M	M	G	=	=	=	=	=	=	=	=	E	=	=	=	=	=	=	=	=	E	E	E	=	=	=
 Stealing	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	N	N	E	E	=	=	=	=	E	E	E	E	M	M	G	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=
-Alchemy	E	E	E	E	E	E	E	E	M	G	M	M	M	M	G	G	N	N	N	N	N	N	M	M	G	G	N	E	E	E	M	G	G	G	M	M	G	G	N	N	M	G	M	M	M	G	G	G	N	N	E	G	M	N	N	N	M	M	G	E	E	E	M	M	G
+Alchemy	E	E	E	E	E	E	E	E	M	G	M	M	M	M	G	G	N	N	N	N	N	N	M	M	G	G	N	E	E	E	M	G	G	G	M	M	G	G	E	G	M	G	M	M	M	G	G	G	N	N	E	G	M	N	N	N	M	M	G	E	E	E	M	M	G
 Learning	M	M	G	M	M	M	G	G	M	G	=	=	M	M	G	G	=	=	=	=	M	G	M	M	G	G	M	M	G	G	M	M	G	G	M	M	G	G	=	=	M	G	M	M	M	G	G	G	N	N	G	G	M	M	M	G	=	=	=	M	M	G	=	=	=
 Skill39	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=
 Skill40	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=
