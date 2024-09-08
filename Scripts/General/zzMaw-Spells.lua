@@ -2597,7 +2597,7 @@ if buffRework then
 	[58]={["Cost"]=60, ["Sound"]=15020,["PartyBuff"]=12},--mind res
 	[69]={["Cost"]=60, ["Sound"]=16020,["PartyBuff"]=1},--body res
 	[5]= {["Cost"]=120, ["Sound"]=10040,["PartyBuff"]=8},--haste
-	[8]= {["Cost"]=120, ["Sound"]=10070,["PartyBuff"]=10},--immolation
+	[8]= {["Cost"]=40, ["Sound"]=10070,["PartyBuff"]=10},--immolation
 	[17]={["Cost"]=75, ["Sound"]=11050,["PartyBuff"]=14},--shield
 	[28]={["Cost"]=150, ["Sound"]=10070,},--empower magic
 	[38]={["Cost"]=75, ["Sound"]=13040,["PartyBuff"]=15},--stoneskin
@@ -2612,7 +2612,7 @@ if buffRework then
 	[83]={["Cost"]=200,["Sound"]=17050,["PartyBuff"]=2},--day of the gods
 	[85]={["Cost"]=150,["Sound"]=17070,["MultiBuff"]={6,0,17,4,12,1}},--day of Protection
 	[86]={["Cost"]=300,["Sound"]=17080,["MultiBuff"]={8,14,15}, ["SingleBuff"]=4},--hour of power
-	[95]={["Cost"]=120,["Sound"]=18060,["SingleBuff"]=10},--pain reflection
+	[95]={["Cost"]=10,["Sound"]=18060,["SingleBuff"]=10},--pain reflection
 	}
 	utilitySpell={
 	[1]= {["Cost"]=5,  ["Sound"]=10000, ["PartyBuff"]=16},--torch
