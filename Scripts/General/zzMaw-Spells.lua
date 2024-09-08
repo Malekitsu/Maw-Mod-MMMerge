@@ -1850,18 +1850,26 @@ function ascension()
 				end
 			end
 			local capMastery=Skillz.MasteryLimit(pl,skill)
+			local tier=i%11==0 and 11 or i%11
 			local learnableSpells={{1,2,3,4},{5,6,7},{8,9,10},{11}}
-			local txt=StrColor(255,0,0,"\n\nCan't learn")
 			if not pl.Spells[i] then
-				for i=1,capMastery do
-					if table.find(learnableSpells[i],capMastery) then
+				local txt=StrColor(255,0,0,"\n\nCan't learn")
+				for k=1,capMastery do
+					if table.find(learnableSpells[k],tier) then
 						txt=StrColor(255,0,0,"\n\nNot Learned")
 					end
 				end
-			else 
-				txt=""
+				
+				if table.find(spells, i) then
+					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. txt
+				elseif healingSpells[i] then
+					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. txt
+				elseif buffSpell and (buffSpell[i] or utilitySpell[i]) then
+					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. txt
+				else
+					Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. txt
+				end
 			end
-			Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. txt
 		end
 	end
 end
