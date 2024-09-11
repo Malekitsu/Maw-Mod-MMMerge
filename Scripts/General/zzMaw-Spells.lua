@@ -1312,7 +1312,7 @@ function events.GameInitialized2()
 			[2] = {dmgAdd =8, diceMin = 1, diceMax = 1, },--fire bolt
 			[6] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--fireball
 			[7] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--fire spike, the only spell with damage depending on mastery, fix in events.calcspelldamage
-			[8] = {dmgAdd = 32, diceMin = 1, diceMax = 20, },--immolation
+			[8] = {dmgAdd = 10, diceMin = 1, diceMax = 30, },--immolation
 			[9] = {dmgAdd = 2, diceMin = 1, diceMax = 1, },--meteor shower
 			[10] = {dmgAdd = 12, diceMin = 1, diceMax = 7, },--inferno
 			[11] = {dmgAdd = 18, diceMin = 1, diceMax = 18, },--incinerate
