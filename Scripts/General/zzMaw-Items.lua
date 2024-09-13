@@ -555,6 +555,14 @@ function events.ItemGenerated(t)
 		--maxcharges Cap
 		t.Item.MaxCharges=math.min(maxChargesCap, t.Item.MaxCharges)
 		
+		--fix to resistances not to rolled be twice
+		local bonus1=t.Item.Bonus
+		local bonus2=math.floor(t.Item.Charges/1000)
+		while bonus1==bonus2 do
+			t.Item.Bonus=math.random(11,16)
+		end
+		
+		
 		--[[statistics
 		ancientDrops=ancientDrops or 0
 		primordialDrops=primordialDrops or 0
@@ -839,24 +847,12 @@ function events.BuildItemInformationBox(t)
 					end
 					local bonus=txt.Mod2
 					local bonus2=Game.ItemsTxt[t.Item.Number+lookup].Mod2
-					--attack/+damage
-					--if t.Item.MaxCharges <= 20 then
-						local bonusATK=bonus2*(t.Item.MaxCharges/30)
-						bonus=bonus+math.round(bonusATK)
-					--else
-					--	local bonusATK=(bonus2+bonus)*(t.Item.MaxCharges/20)
-					--	bonus=bonus+math.round(bonusATK)
-					--end
-					--dicesides
+					local bonusATK=bonus2*(t.Item.MaxCharges/30)
+					bonus=bonus+math.round(bonusATK)
 					local sides=txt.Mod1DiceSides
 					local sides2=Game.ItemsTxt[t.Item.Number+lookup].Mod1DiceSides
-					--if t.Item.MaxCharges <= 20 then
-						local sidesBonus=sides2*(t.Item.MaxCharges/30)
-						sides=sides+math.round(sidesBonus)
-					--else
-					--	local sidesBonus=(sides2+sides)*(t.Item.MaxCharges/20)
-					--	sides=sides+math.round(sidesBonus)
-					--end
+					local sidesBonus=sides2*(t.Item.MaxCharges/30)
+					sides=sides+math.round(sidesBonus)
 					t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " ..  txt.Mod1DiceCount .. "d" .. sides .. "+" .. bonus
 				end
 			end
@@ -865,11 +861,18 @@ function events.BuildItemInformationBox(t)
 			--add code to build enchant list
 			t.Enchantment=""
 			if t.Item.Bonus>0 then
-				t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. t.Item.BonusStrength
+				local power=t.Item.BonusStrength
+				if t.Item.Bonus>=11 and t.Item.Bonus<=16 then
+					power=math.round(power^0.6/50*1000)/10 .. "%"
+				end
+				t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. power
 			end
 			if t.Item.Charges>1000 then
 				local bonus=math.floor(t.Item.Charges/1000)
 				local strength=t.Item.Charges%1000
+				if bonus>=11 and bonus<=16 then
+					strength=math.round(strength^0.6/50*1000)/10 .. "%"
+				end
 				t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
 			elseif t.Item.Bonus~=0 and t.Item.BonusStrength~=0 then
 				if extraDescription then
@@ -2158,6 +2161,11 @@ function itemStats(index)
 	--used for armor skill	
 	shieldAC=0
 	armorAC=0
+	normalEnchantResistance=normalEnchantResistance or {}
+	normalEnchantResistance[index]={}
+	for i=11,16 do
+		normalEnchantResistance[index][i]=0
+	end
 	--iterate items and get bonuses
 	for it in pl:EnumActiveItems() do
 		--maxcharges fix for moon cloak
@@ -2198,8 +2206,10 @@ function itemStats(index)
 		--bolster mult
 		mult=1+it.MaxCharges/20
 		if it.Bonus>0 then 
-			if it.Bonus<=16 then
+			if it.Bonus<=10 then
 				tab[it.Bonus]=tab[it.Bonus]+it.BonusStrength
+			elseif it.Bonus<=16 then
+				normalEnchantResistance[index][it.Bonus]=math.max(normalEnchantResistance[index][it.Bonus], it.BonusStrength)		
 			else
 				local tabNumber=bonusBaseEnchantSkill[it.Bonus]+50
 				tab[tabNumber]=tab[tabNumber] or 0
@@ -2215,7 +2225,12 @@ function itemStats(index)
 			tab[84]=tab[84]+3
 		end		
 		if it.Charges>1000 then
-			tab[math.floor(it.Charges/1000)]=tab[math.floor(it.Charges/1000)]+it.Charges%1000
+			local bonus=math.floor(it.Charges/1000)
+			if bonus<=10 then
+				tab[math.floor(it.Charges/1000)]=tab[math.floor(it.Charges/1000)]+it.Charges%1000
+			else
+				normalEnchantResistance[index][bonus]=math.max(normalEnchantResistance[index][bonus], it.Charges%1000)	
+			end
 		end		
 		if it.Bonus2>0 then
 			bonusData = bonusEffects[it.Bonus2]
