@@ -2340,7 +2340,7 @@ local function r1(code, ...)
 end
 debug.setupvalue(oldDoDebug, oldLoadstringIndex, r1)
 
-function events.AfterLoadMap()
+function events.BeforeLoadMap()
 	if vars.ChallengeMode then
 		if storeTime then
 			Game.Time=storeTime
