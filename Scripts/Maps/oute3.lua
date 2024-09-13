@@ -117,7 +117,7 @@ end
 
 Game.MapEvtLines:RemoveEvent(104)
 evt.map[104] = function()
-	if vars.Mode~=4 then
+	if vars.Mode~=2 then
 		evt.MoveToMap{X = 12808, Y = 6832, Z = 64, Direction = 512, LookAngle = 0, SpeedZ = 0, HouseId = 0, Icon = 0, Name = "outb3.odm"}
 	else
 		evt.MoveToMap{X = -9477, Y = -13062, Z = 129, Direction = 0, LookAngle = 0, SpeedZ = 0, HouseId = 0, Icon = 0, Name = "outb3.odm"}
