@@ -939,7 +939,7 @@ end
 
 
 craftDropChances={
-		["gems"]=0.004,
+		["gems"]=0.006,
 		[1061]=0.0002,
 		[1062]=0.0002,
 		[1063]=0.001,
@@ -948,6 +948,20 @@ craftDropChances={
 		[1066]=0.0002,
 		[1067]=0.00004,
 	}
+	
+-- Function to generate normally distributed random numbers
+function normal_random(mean, stddev)
+    local u1 = math.random()
+    local u2 = math.random()
+    
+    -- Avoid taking log of zero
+    if u1 == 0 then u1 = 1e-10 end
+
+    local z0 = math.sqrt(-2 * math.log(u1)) * math.cos(2 * math.pi * u2)
+    return z0 * stddev + mean
+end
+
+	
 function events.MonsterKilled(mon)
 	if mon.Ally == 9999 or mon.NameId>300 then -- no drop from reanimated monsters
 		return
@@ -966,7 +980,7 @@ function events.MonsterKilled(mon)
 	baseCraftDrop=false
 	if math.random()<craftDropChances.gems*bonusRoll then
 		baseCraftDrop=true
-		craftStrength=mon.Level/25+(math.random(0,50)-25)/25+1
+		craftStrength = math.floor(normal_random(mon.Level^0.6/4+1, 2))
 		craftStrength=math.max(math.min(craftStrength,10),1)
 		crafMaterialNumber=1050+craftStrength
 	end	
