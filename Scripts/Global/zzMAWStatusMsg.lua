@@ -110,6 +110,9 @@ function events.CalcDamageToMonster(t)
 				if castedAoe then
 					msg=string.format("%s hits for a total of %s points!%s", name, msgTxt, critMessage)
 				end
+				if critMessage=="(CRIT!)" then
+					msg=StrColor(255,255,30,msg)
+				end
 				Game.ShowStatusText(msg)
 				
 				
