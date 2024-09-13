@@ -1164,6 +1164,17 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	local reduction=compute_damage(res/divider)
 	local res=1/reduction	
 	
+	--base enchants
+	currentItemRes=10000
+	for i=1,#resList do
+		local itemRes = normalEnchantResistance[id][resList[i]+1]
+		if itemRes<currentItemRes then
+			currentItemRes=itemRes
+		end
+	end
+	currentItemRes=1-currentItemRes^0.6/50
+	res=res*currentItemRes
+	
 	--randomize resistance
 	if res>0 and rand then
 		local roll=(math.random()+math.random())-1
