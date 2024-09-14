@@ -1758,7 +1758,7 @@ function events.GameInitialized2() --make it load later compared to other script
 					t.Player.HP=math.min(fullHP,t.Player.HP+heal)
 				end
 				--ranged
-				if gotVamp[data.Player:GetIndex()] and data.Object and data.Object.Spell==133 then
+				if gotBowVamp[data.Player:GetIndex()] and data.Object and data.Object.Spell==133 then
 					local fullHP=t.Player:GetFullHP()
 					t.Player.HP=math.min(fullHP,t.Player.HP+heal*0.5)
 				end
