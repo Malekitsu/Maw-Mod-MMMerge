@@ -25,7 +25,7 @@ end
 function events.UseMouseItem(t)
 	--override
 	local it=Mouse.Item
-	if it.Number<221 or it.Number>=300 then return end
+	if it.Number<221 or it.Number>=300 or it.Number==290 then return end
 	t.Allow=false
 	local pl=Party[t.PlayerSlot]
 	local index=pl:GetIndex()
@@ -726,6 +726,7 @@ for i=1,10 do
 		end
 	end
 end
+
 function events.GameInitialized2()
 	craftWaitTime=craftWaitTime or 0
 end
@@ -856,7 +857,7 @@ evt.PotionEffects[83] = function(IsDrunk, t, Power)
 end
 
 evt.PotionEffects[84] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) or (t.Number>=500 and t.Number<=542) or (t.Number>=1302 and t.Number<=1354) or (t.Number>=2020 and t.Number<=2049) then
 		Mouse.Item.Number=t.Number
 		Mouse.Item.Bonus=t.Bonus
 		Mouse.Item.BonusStrength=t.BonusStrength
