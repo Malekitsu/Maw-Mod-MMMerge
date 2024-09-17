@@ -555,9 +555,21 @@ function events.ItemGenerated(t)
 		--maxcharges Cap
 		t.Item.MaxCharges=math.min(maxChargesCap, t.Item.MaxCharges)
 		
+		--reduce chances for resistances
+		if t.Item.Bonus>=11 and t.Item.Bonus<=16 then
+			if math.random()<0.4 then
+				t.Item.Bonus=math.random(1,7)
+			end
+		end
+		if math.floor(t.Item.Charges/1000)>=11 and math.floor(t.Item.Charges/1000)<=16 then
+			if math.random()<0.4 then
+				t.Item.Charges=t.Item.Charges-math.floor(t.Item.Charges/1000)*1000+math.random(1,7)*1000
+			end
+		end
+		
 		--fix to resistances not to rolled be twice
 		local bonus2=math.floor(t.Item.Charges/1000)
-		while t.Item.Bonus==bonus2 do
+		while t.Item.Bonus>0 and t.Item.Bonus==bonus2 do
 			t.Item.Bonus=math.random(11,16)
 		end
 		
