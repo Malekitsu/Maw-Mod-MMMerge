@@ -1734,18 +1734,49 @@ function events.UseMouseItem(t)
 		map.RefillDays=0
 		Mouse.Item.Number=0
 		local fileName=string.sub(map.FileName, 1, -5)
+		
 		mapAffixList={it.BonusExpireTime, it.Bonus2, it.Charges%1000, math.round(it.Charges/1000), ["Power"]=it.MaxCharges}
+		
+		--monster density
+		local nAff=0
+		for i=1,4 do
+			if mapAffixList[i]>0 then
+				nAff=nAff+1
+			end
+		end
+		mult=1+it.MaxCharges*nAff/800
+		oldDensity1=map.Mon1Hi
+		oldDensity2=map.Mon2Hi
+		oldDensity3=map.Mon3Hi
+		map.Mon1Hi=math.round(map.Mon1Hi*mult)
+		map.Mon2Hi=math.round(map.Mon2Hi*mult)
+		map.Mon3Hi=math.round(map.Mon3Hi*mult)
+		debug.Message(dump(Game.MapStats[it.BonusStrength]))
 		blv(fileName)
 	end
 end
-
---restore reset time
-function events.AfterLoadMap()
-	if storeRefillDaysAfterMapUsage then
-		Game.MapStats[storeRefillDaysAfterMapUsage[1]].RefillDays=storeRefillDaysAfterMapUsage[2]
-		storeRefillDaysAfterMapUsage=nil
+--needed for chest/objects loot
+function events.BeforeLoadMap()
+	if mapAffixList then
+		mapvars.mapAffixes={mapAffixList[1],mapAffixList[2],mapAffixList[3],mapAffixList[4],["Power"]=mapAffixList.Power}
+	end
+end
+--needed to apply changes
+function events.LoadMap()
+	if mapAffixList then
 		mapvars.mapAffixes={mapAffixList[1],mapAffixList[2],mapAffixList[3],mapAffixList[4],["Power"]=mapAffixList.Power}
 		mapAffixList=nil
+	end
+end
+--restore
+function events.AfterLoadMap()
+	if storeRefillDaysAfterMapUsage then
+		local map=Game.MapStats[storeRefillDaysAfterMapUsage[1]]
+		map.RefillDays=storeRefillDaysAfterMapUsage[2]
+		map.Mon1Hi=oldDensity1
+		map.Mon2Hi=oldDensity2
+		map.Mon3Hi=oldDensity3
+		storeRefillDaysAfterMapUsage=nil
 	end
 end
 
@@ -1857,7 +1888,9 @@ totalMapAffixes=34
 function events.BuildItemInformationBox(t)
 	local it=t.Item
 	if it.Number==290 and t.Enchantment then
-		t.Enchantment="Map Level: " .. it.MaxCharges*10+20
+		local baseMap=mapLevels[Game.MapStats[it.BonusStrength].Name]
+		local baseLevel=math.round((baseMap.Low+baseMap.Mid+baseMap.High)/3)
+		t.Enchantment="Map Level: " .. it.MaxCharges*10+20+baseLevel
 		local power=0
 		if it.BonusExpireTime>0 then
 			power=power+1
@@ -1871,7 +1904,7 @@ function events.BuildItemInformationBox(t)
 				power=power+1
 			end
 		end
-		t.Enchantment=t.Enchantment .. StrColor(0, 127, 255,"\nIncreases Craft drop chances by " .. math.round(it.MaxCharges*power/4) .. "%\nIncreases item quality by " .. math.round(it.MaxCharges*power/2) .. "%\nIncreases monster density by " .. math.round(it.MaxCharges*power/6) .. "%")	
+		t.Enchantment=t.Enchantment .. StrColor(0, 127, 255,"\n+" .. math.round(it.MaxCharges*power/8*1.5) .. "% craft items drop chances "  .. "\n+" .. math.round(it.MaxCharges*power/4) .. "% item quality " .. "%\n+" .. math.round(it.MaxCharges*power/8) .. "% monster density")	
 	end
 	if it.Number==290 and t.Name then
 		t.Name=Game.MapStats[it.BonusStrength].Name .. " Map"
