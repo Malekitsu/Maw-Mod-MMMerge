@@ -1835,23 +1835,24 @@ function calculateAffixPower(n, p)
 	return power
 end
 
-function getMapAffixPower(n)
+function getMapAffixPower(n, power)
+	--for tooltips
+	if power then
+		return calculateAffixPower(n, power)
+	end
+	
     if not mapvars.mapAffixes then return false end
-    local id = table.find(mapvars.mapAffixes, n)
+    
+	local id = table.find(mapvars.mapAffixes, n)
     if type(id) == "number" then
-        local affix = mapvars.mapAffixes[id]
-        return calculateAffixPower(affix, mapvars.mapAffixes.Power)
+        return calculateAffixPower(n, mapvars.mapAffixes.Power)
     else 
         return false
     end
 end
 
+--map affixes
 
--- map affixes
-
--- healing reduced by %
--- players have a % chance to not be able to leech
--- buff effects are reduced by %
 totalMapAffixes=34
 function events.BuildItemInformationBox(t)
 	local it=t.Item
@@ -1870,7 +1871,7 @@ function events.BuildItemInformationBox(t)
 				power=power+1
 			end
 		end
-		t.Enchantment=t.Enchantment .. StrColor(0, 127, 255,"\nIncreases Item drop chances by " .. math.round(it.MaxCharges*power/4) .. "%\nIncreases item quality by " .. math.round(it.MaxCharges*power/2) .. "%\nIncreases monster density by " .. math.round(it.MaxCharges*power/6) .. "%")	
+		t.Enchantment=t.Enchantment .. StrColor(0, 127, 255,"\nIncreases Craft drop chances by " .. math.round(it.MaxCharges*power/4) .. "%\nIncreases item quality by " .. math.round(it.MaxCharges*power/2) .. "%\nIncreases monster density by " .. math.round(it.MaxCharges*power/6) .. "%")	
 	end
 	if it.Number==290 and t.Name then
 		t.Name=Game.MapStats[it.BonusStrength].Name .. " Map"
@@ -1880,40 +1881,40 @@ function events.BuildItemInformationBox(t)
 		local power=it.MaxCharges
 		mapAffixes={
 			[0]="",
-			[1]="Monsters deal " .. power .. "% increased damage",
-			[2]="Monsters have " .. power .. "% critical chance",
-			[3]="Monsters have " .. power .. "% chance to cast fireball",
-			[4]="Monsters have " .. power .. "% chance to cast dragon breath",
-			[5]="Monsters reflect " .. power .. "% of physical damage",
-			[6]="Monsters reflect " .. power .. "% of magic damage",
-			[7]="Monsters regenerate " .. power .. "%HP per second",
-			[8]="Monsters have " .. power .. "% chance to ignore status resistance",
-			[9]="Monsters have " .. power .. "% chance to summon a monster upon death",
-			[10]="Monsters deal " .. power .. "% of player hp as damage",
-			[11]="Monsters have " .. power .. "% increased movement speed",
-			[12]="Monsters resistances are increased by " .. power,
-			[13]="Monsters have " .. power .. "% extra chance to resist control effects",
-			[14]="Monsters have " .. power .. "% chance to deal energy damage",
-			[15]="Monsters have " .. power .. "% increased HP",
-			[16]="Boss density increased by " .. power .. "%",
-			[17]="Monsters have " .. power .. "% be an higher tier",
-			[18]="Bosses have " .. power .. "% increased HP and damage",
-			[19]="Monsters have " .. power .. "% chance to become a boss",
-			[20]="Players critical chance reduced by " .. power .. "%",
-			[21]="Players critical damage reduced by " .. power .. "%",
-			[22]="Players HP/SP regen reduced by " .. power .. "%",
-			[23]="Players physical damage reduced by " .. power .. "%",
-			[24]="Players magic damage reduced by " .. power .. "%",
-			[25]="Players movement speed reduced by " .. power .. "%",
-			[26]="Players attack speed reduced by " .. power .. "%",
-			[27]="Players spell recovery speed increased by " .. power .. "%",
-			[28]="Players armor reduced by " .. power .. "%",
-			[29]="Players resistances reduced by " .. power .. "%",
-			[30]="Players have a " .. power .. "% chance to miss attacks",
-			[31]="Healing reduced by " .. power .. "%",
-			[32]="Leech reduced by " .. power .. "%",
-			[33]="Buff effects reduced by " .. power .. "%",
-			[34]="Monsters have a " .. power .. "% chance to explode upon death",
+			[1]="Monsters deal " .. getMapAffixPower(1, power) .. "% increased damage",
+			[2]="Monsters have " .. getMapAffixPower(2, power) .. "% critical chance",
+			[3]="Monsters have " .. getMapAffixPower(3, power) .. "% chance to cast fireball",
+			[4]="Monsters have " .. getMapAffixPower(4, power) .. "% chance to cast dragon breath",
+			[5]="Monsters reflect " .. getMapAffixPower(5, power) .. "% of physical damage",
+			[6]="Monsters reflect " .. getMapAffixPower(6, power) .. "% of magic damage",
+			[7]="Monsters regenerate " .. getMapAffixPower(7, power) .. "%HP per second",
+			[8]="Monsters have " .. getMapAffixPower(8, power) .. "% chance to ignore status resistance",
+			[9]="Monsters have " .. getMapAffixPower(9, power) .. "% chance to summon a monster upon death",
+			[10]="Monsters deal " .. getMapAffixPower(10, power) .. "% of player hp as damage",
+			[11]="Monsters have " .. getMapAffixPower(11, power) .. "% increased movement speed",
+			[12]="Monsters resistances are increased by " .. getMapAffixPower(12, power),
+			[13]="Monsters have " .. getMapAffixPower(13, power) .. "% extra chance to resist control effects",
+			[14]="Monsters have " .. getMapAffixPower(14, power) .. "% chance to deal energy damage",
+			[15]="Monsters have " .. getMapAffixPower(15, power) .. "% increased HP",
+			[16]="Boss density increased by " .. getMapAffixPower(16, power) .. "%",
+			[17]="Monsters have " .. getMapAffixPower(17, power) .. "% be an higher tier",
+			[18]="Bosses have " .. getMapAffixPower(18, power) .. "% increased HP and damage",
+			[19]="Monsters have " .. getMapAffixPower(19, power) .. "% chance to become a boss",
+			[20]="Players critical chance reduced by " .. getMapAffixPower(20, power) .. "%",
+			[21]="Players critical damage reduced by " .. getMapAffixPower(21, power) .. "%",
+			[22]="Players HP/SP regen reduced by " .. getMapAffixPower(22, power) .. "%",
+			[23]="Players physical damage reduced by " .. getMapAffixPower(23, power) .. "%",
+			[24]="Players magic damage reduced by " .. getMapAffixPower(24, power) .. "%",
+			[25]="Players movement speed reduced by " .. getMapAffixPower(25, power) .. "%",
+			[26]="Players attack speed reduced by " .. getMapAffixPower(26, power) .. "%",
+			[27]="Players spell recovery speed increased by " .. getMapAffixPower(27, power) .. "%",
+			[28]="Players armor reduced by " .. getMapAffixPower(28, power) .. "%",
+			[29]="Players resistances reduced by " .. getMapAffixPower(29, power) .. "%",
+			[30]="Players have a " .. getMapAffixPower(30, power) .. "% chance to miss attacks",
+			[31]="Healing reduced by " .. getMapAffixPower(31, power) .. "%",
+			[32]="Leech reduced by " .. getMapAffixPower(32, power) .. "%",
+			[33]="Buff effects reduced by " .. getMapAffixPower(33, power) .. "%",
+			[34]="Monsters have a " .. getMapAffixPower(34, power) .. "% chance to explode upon death",
 		}
 		
 		local txt=""
