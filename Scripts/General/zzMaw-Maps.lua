@@ -1684,3 +1684,151 @@ function events.GameInitialized2()
 	end
 	
 end
+
+mapDungeons={16,17,18,19,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,54,55,56,57,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,101,104,105,106,108,109,110,111,133,134,135,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,186}
+
+-- Function to get a unique random affix
+local function getUniqueAffix()
+    local affix
+    repeat
+        affix = math.random(1, totalMapAffixes)
+    until not assignedAffixes[affix]  -- Repeat until an unassigned affix is found
+    assignedAffixes[affix] = true     -- Mark this affix as assigned
+    return affix
+end
+
+function events.MonsterKilled(mon)
+	if mon.NameId>300 then -- no drop from reanimated monsters
+		return
+	end
+	if mon.Level>100 and math.random()<0.001*mon.Level/100 then
+		assignedAffixes = {}
+		obj = SummonItem(290, mon.X, mon.Y, mon.Z + 100, 100)
+		obj.Item.BonusStrength=mapDungeons[math.random(1,#mapDungeons)]
+		if math.random()<1 then
+			obj.Item.Bonus2=getUniqueAffix()
+		end
+		if math.random()<0.6 then
+			obj.Item.Charges=getUniqueAffix()
+		end
+		if math.random()<0.5 then
+			obj.Item.Charges=obj.Item.Charges+getUniqueAffix()*1000
+		end
+		if math.random()<0.4 then
+			obj.Item.BonusExpireTime=getUniqueAffix()
+		end
+		obj.Item.MaxCharges=math.round(mon.Level/10)
+		
+	end
+end
+
+--map teleport
+function events.UseMouseItem(t)
+	local it=Mouse.Item
+	if it.Number==290 then
+		if Game.CurrentScreen~=0 then
+			Game:ExitHouseScreen()
+		end
+		local map=Game.MapStats[it.Bonus]
+		storeRefillDaysAfterMapUsage={it.Bonus, map.RefillDays}
+		map.RefillDays=0
+		Mouse.Item.Number=0
+		local fileName=string.sub(map.FileName, 1, -5)
+		blv(fileName)
+	end
+end
+
+--restore reset time
+function events.AfterLoadMap()
+	if storeRefillDaysAfterMapUsage then
+		Game.MapStats[storeRefillDaysAfterMapUsage[1]].RefillDays=storeRefillDaysAfterMapUsage[2]
+		storeRefillDaysAfterMapUsage=nil
+	end
+end
+
+-- map affixes
+
+-- healing reduced by %
+-- players have a % chance to not be able to leech
+-- buff effects are reduced by %
+totalMapAffixes=34
+function events.BuildItemInformationBox(t)
+	local it=t.Item
+	if it.Number==290 and t.Enchantment then
+		t.Enchantment="Map Level: " .. it.MaxCharges*10+20
+		local power=0
+		if it.BonusExpireTime>0 then
+			power=power+1
+		end
+		if it.Bonus2>0 then
+			power=power+1
+		end
+		if it.Charges>0 then
+			power=power+1
+			if it.Charges>=1000 then
+				power=power+1
+			end
+		end
+		t.Enchantment=t.Enchantment .. StrColor(0, 127, 255,"\nIncreases Item drop chances by " .. math.round(it.MaxCharges*power/4) .. "%\nIncreases item quality by " .. math.round(it.MaxCharges*power/2) .. "%\nIncreases monster density by " .. math.round(it.MaxCharges*power/6) .. "%")	
+	end
+	if it.Number==290 and t.Name then
+		t.Name=Game.MapStats[it.Bonus].Name .. " Map"
+	end
+	
+	if it.Number==290 and t.Description then
+		local power=it.MaxCharges
+		mapAffixes={
+			[0]="",
+			[1]="Monsters deal " .. power .. "% increased damage",
+			[2]="Monsters have " .. power .. "% critical chance",
+			[3]="Monsters have " .. power .. "% chance to cast fireball",
+			[4]="Monsters have " .. power .. "% chance to cast dragon breath",
+			[5]="Monsters reflect " .. power .. "% of physical damage",
+			[6]="Monsters reflect " .. power .. "% of magic damage",
+			[7]="Monsters regenerate " .. power .. "%HP per second",
+			[8]="Monsters have " .. power .. "% chance to ignore status resistance",
+			[9]="Monsters have " .. power .. "% chance to summon a monster upon death",
+			[10]="Monsters deal " .. power .. "% of player hp as damage",
+			[11]="Monsters have " .. power .. "% increased movement speed",
+			[12]="Monsters resistances are increased by " .. power,
+			[13]="Monsters have " .. power .. "% extra chance to resist control effects",
+			[14]="Monsters have " .. power .. "% chance to deal energy damage",
+			[15]="Monsters have " .. power .. "% chance to deal energy damage",
+			[16]="Boss density increased by " .. power .. "%",
+			[17]="Monsters have " .. power .. "% be an higher tier",
+			[18]="Bosses have " .. power .. "% increased HP and damage",
+			[19]="Monsters have " .. power .. "% chance to become a boss",
+			[20]="Players critical chance reduced by " .. power .. "%",
+			[21]="Players critical damage reduced by " .. power .. "%",
+			[22]="Players HP/SP regen reduced by " .. power .. "%",
+			[23]="Players physical damage reduced by " .. power .. "%",
+			[24]="Players magic damage reduced by " .. power .. "%",
+			[25]="Players movement speed reduced by " .. power .. "%",
+			[26]="Players attack speed reduced by " .. power .. "%",
+			[27]="Players spell recovery speed increased by " .. power .. "%",
+			[28]="Players armor reduced by " .. power .. "%",
+			[29]="Players resistances reduced by " .. power .. "%",
+			[30]="Players have a " .. power .. "% chance to miss attacks",
+			[31]="Healing reduced by " .. power .. "%",
+			[32]="Leech reduced by " .. power .. "%",
+			[33]="Buff effects reduced by " .. power .. "%",
+			[34]="Monsters have a " .. power .. "% chance to explode upon death",
+		}
+		
+		local txt=""
+		if it.BonusExpireTime>0 then
+			txt=mapAffixes[it.BonusExpireTime] .. "\n" .. txt
+		end
+		if it.Bonus2>0 then
+			txt=mapAffixes[it.Bonus2] .. "\n" .. txt
+		end
+		if it.Charges>0 then
+			txt=mapAffixes[it.Charges%1000] .. "\n" .. txt
+			if it.Charges>=1000 then
+				txt=mapAffixes[math.floor(it.Charges/1000)] .. "\n" .. txt
+			end
+		end
+		t.Description=StrColor(255,255,153,txt)
+		t.Description=t.Description .. "\n\nUsing this map will teleport you to the entrance.\n\nCODE STILL IN DEVELOPMENT, keep this map and wait for updates ;)"
+	end
+end
