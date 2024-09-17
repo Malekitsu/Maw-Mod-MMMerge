@@ -387,6 +387,9 @@ function recalculateMonsterTable()
 	vars.mapResetCount=vars.mapResetCount or {}
 	vars.mapResetCount[Map.Name]=vars.mapResetCount[Map.Name] or 0
 	local bonus=vars.mapResetCount[Map.Name]*20
+	if mapvars.mapAffixes then
+		bonus=mapvars.mapAffixes.Power*10+20
+	end
 	bolsterLevel=bolsterLevel+bonus
 	
 	bolsterLevel2=bolsterLevel --used for loot
@@ -857,7 +860,9 @@ function events.BeforeLoadMap()
 	if Game.BolsterAmount%50~=0 then
 		Game.BolsterAmount=100
 	end
-
+	
+	--mapping fix
+	if mapvars.mapAffixes then return end
 	--MAW
 	if Game.BolsterAmount<=100 then
 		for i=1,Game.MapStats.High do
