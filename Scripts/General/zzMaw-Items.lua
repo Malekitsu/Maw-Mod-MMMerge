@@ -128,8 +128,8 @@ function events.GameInitialized2()
 end
 
 --create enchant table
-encStrDown={1,1,3,6,9,12,15,18,21,24,28,32,36,40,44,48,52,56,60,64,70,76,90,100}
-encStrUp={3,5,8,12,16,20,24,29,34,38,42,48,52,56,60,65,70,75,80,85,90,100,110,120}
+encStrDown={1,1,3,6,9,12,15,18,21,24,28,32,36,40,44,48,52,56,60,64,70,76,80,84,88,92,96,100,104,108,112,116,120,124,128,132,136,140,144,148,152,156}
+encStrUp={3,5,8,12,16,20,24,29,34,38,42,48,52,56,60,65,70,75,80,85,90,100,105,110,115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,190,195,200}
 
 
 enc1Chance={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84}
@@ -229,6 +229,9 @@ function events.ItemGenerated(t)
 		vars.mapResetCount=vars.mapResetCount or {}
 		vars.mapResetCount[Map.Name]=vars.mapResetCount[Map.Name] or 0
 		local bonus=vars.mapResetCount[Map.Name]*20
+		if mapvars.mapAffixes then
+			bonus=mapvars.mapAffixes.Power*10+20
+		end
 		currentLevel=currentLevel+bonus
 		partyLevel=partyLevel+bonus
 		if Map.Name=="d42.blv" then
@@ -276,13 +279,20 @@ function events.ItemGenerated(t)
 		bonusCharges=(difficultyExtraPower-1)*20
 		cap1=50*((difficultyExtraPower-1)*2+1)
 		maxChargesCap=50*((difficultyExtraPower-1)*4+1)
+		if mapvars.mapAffixes then
+			cap1=cap1+100
+			maxChargesCap=maxChargesCap+100
+		end
 		t.Item.MaxCharges=math.floor(partyLevel/5+mapLevel/40)
 		--bolster boost
 		t.Item.MaxCharges=math.min(math.floor(t.Item.MaxCharges*difficultyExtraPower+bonusCharges),cap1)
 		
 		bonusCap=math.floor((difficultyExtraPower-1)*10)
+		if mapvars.mapAffixes then
+			bonusCap=bonusCap+math.min(math.max((mapvars.mapAffixes.Power-30+2)/2,0),20)  --cap at map level 700
+		end
 		cap2=14+bonusCap
-		partyLevel1=math.min(math.floor(partyLevel/18),cap2)
+		partyLevel1=math.min(math.floor((partyLevel+bonus)/18),cap2) 
 		--adjust loot Strength
 		ps1=t.Strength
 
@@ -296,7 +306,7 @@ function events.ItemGenerated(t)
 		if pseudoStr==1 then 
 			return 
 		end
-		pseudoStr=math.min(pseudoStr,20+bonusCap) --CAP CURRENTLY AT 20
+		pseudoStr=math.min(pseudoStr,20+bonusCap) --CAP CURRENTLY AT 20, 22 in doom,42 for mapping
 		roll1=math.random()
 		roll2=math.random()
 		rollSpc=math.random()
@@ -312,9 +322,9 @@ function events.ItemGenerated(t)
 			diffMult=1.8
 		end
 		--calculate chances
-		local p1=enc1Chance[pseudoStr]/100
-		local p2=enc2Chance[pseudoStr]/100
-		local p3=spcEncChance[pseudoStr]/100
+		local p1=enc1Chance[math.min(pseudoStr,#enc1Chance)]/100
+		local p2=enc2Chance[math.min(pseudoStr,#enc2Chance)]/100
+		local p3=spcEncChance[math.min(pseudoStr,#spcEncChance)]/100
 		
 		p1=p1^(1/diffMult)
 		p2=p2^(1/diffMult)
@@ -359,6 +369,16 @@ function events.ItemGenerated(t)
 		--ancient item
 		ancient=false
 		ancientChance=(p1*p2*p3)/4^(1/diffMult^0.5)
+		if mapvars.mapAffixes then
+			local nAff=0
+			for i=1,4 do
+				if mapvars.mapAffixes[i]>0 then
+					nAff=nAff+1
+				end
+			end
+			ancientChance=ancientChance*(1+mapvars.mapAffixes.Power*nAff/400)
+		end
+		
 		if bossLoot then
 			ancientChance=ancientChance*5
 			bossLoot=false
