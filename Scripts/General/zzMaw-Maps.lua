@@ -1729,11 +1729,12 @@ function events.UseMouseItem(t)
 		if Game.CurrentScreen~=0 then
 			Game:ExitHouseScreen()
 		end
-		local map=Game.MapStats[it.Bonus]
-		storeRefillDaysAfterMapUsage={it.Bonus, map.RefillDays}
+		local map=Game.MapStats[it.BonusStrength]
+		storeRefillDaysAfterMapUsage={it.BonusStrength, map.RefillDays}
 		map.RefillDays=0
 		Mouse.Item.Number=0
 		local fileName=string.sub(map.FileName, 1, -5)
+		mapAffixList={it.BonusExpireTime, it.Bonus2, it.Charges%1000, math.round(it.Charges/1000), ["Power"]=it.MaxCharges}
 		blv(fileName)
 	end
 end
@@ -1743,8 +1744,108 @@ function events.AfterLoadMap()
 	if storeRefillDaysAfterMapUsage then
 		Game.MapStats[storeRefillDaysAfterMapUsage[1]].RefillDays=storeRefillDaysAfterMapUsage[2]
 		storeRefillDaysAfterMapUsage=nil
+		mapvars.mapAffixes={mapAffixList[1],mapAffixList[2],mapAffixList[3],mapAffixList[4],["Power"]=mapAffixList.Power}
+		mapAffixList=nil
 	end
 end
+
+function calculateAffixPower(n, p)
+	local power=false
+    if n == 1 then
+         power=20+p*1.5
+    elseif n == 2 then
+		power=10+p*1
+	elseif n == 3 then
+		power=10+p*1
+	elseif n == 4 then
+		power=5+p*0.5
+	elseif n == 5 then
+		power=10+p*0.2
+	elseif n == 6 then
+		power=10+p*0.2
+	elseif n == 7 then
+		power=1+p*0.1
+	elseif n == 8 then
+		power=5+p*0.25
+	elseif n == 9 then
+		power=15+p*1
+	elseif n == 10 then
+		power=3+p*0.3
+	elseif n == 11 then
+		power=30+p*1
+	elseif n == 12 then
+		power=30+p*2
+	elseif n == 13 then
+		power=30+p*1
+	elseif n == 14 then
+		power=20+p*1
+	elseif n == 15 then
+		power=20+p*1.5
+	elseif n == 16 then
+		power=40+p*2
+	elseif n == 17 then
+		power=20+p*0.5
+	elseif n == 18 then
+		power=15+p*1
+	elseif n == 19 then
+		power=10+p*0.2
+	elseif n == 20 then
+		power=10+p*0.2
+	elseif n == 21 then
+		power=10+p*0.2
+	elseif n == 22 then
+		power=20+p
+	elseif n == 23 then
+		power=15+p*0.5
+	elseif n == 24 then
+		power=15+p*0.5
+	elseif n == 25 then
+		power=15+p*0.5
+	elseif n == 26 then
+		power=15+p*0.5
+	elseif n == 27 then
+		power=15+p*0.5
+	elseif n == 28 then
+		power=15+p*0.5
+	elseif n == 29 then
+		power=15+p*0.5
+	elseif n == 30 then
+		power=15+p*0.5
+	elseif n == 31 then
+		power=15+p*0.5
+	elseif n == 32 then
+		power=15+p*0.5
+	elseif n == 33 then
+		power=15+p*0.5
+	elseif n == 34 then
+		power=15+p*0.5
+    else
+        return false
+    end
+	--reductions can eventually go to 0, fix
+	local reductionAffix={13,21,22,23,24,25,26,27,28,29,30,31,32,33}
+	if table.find(reductionAffix,n) then
+		power=math.round((1-1/(power/100+1))*10000)/100
+	end
+	--fix for proc chance over 100
+	local procAffix={3,4,8,9,14,19,34}
+	if table.find(procAffix,n) then
+		power=math.min(power,100)
+	end
+	return power
+end
+
+function getMapAffixPower(n)
+    if not mapvars.mapAffixes then return false end
+    local id = table.find(mapvars.mapAffixes, n)
+    if type(id) == "number" then
+        local affix = mapvars.mapAffixes[id]
+        return calculateAffixPower(affix, mapvars.mapAffixes.Power)
+    else 
+        return false
+    end
+end
+
 
 -- map affixes
 
@@ -1772,7 +1873,7 @@ function events.BuildItemInformationBox(t)
 		t.Enchantment=t.Enchantment .. StrColor(0, 127, 255,"\nIncreases Item drop chances by " .. math.round(it.MaxCharges*power/4) .. "%\nIncreases item quality by " .. math.round(it.MaxCharges*power/2) .. "%\nIncreases monster density by " .. math.round(it.MaxCharges*power/6) .. "%")	
 	end
 	if it.Number==290 and t.Name then
-		t.Name=Game.MapStats[it.Bonus].Name .. " Map"
+		t.Name=Game.MapStats[it.BonusStrength].Name .. " Map"
 	end
 	
 	if it.Number==290 and t.Description then
@@ -1793,7 +1894,7 @@ function events.BuildItemInformationBox(t)
 			[12]="Monsters resistances are increased by " .. power,
 			[13]="Monsters have " .. power .. "% extra chance to resist control effects",
 			[14]="Monsters have " .. power .. "% chance to deal energy damage",
-			[15]="Monsters have " .. power .. "% chance to deal energy damage",
+			[15]="Monsters have " .. power .. "% increased HP",
 			[16]="Boss density increased by " .. power .. "%",
 			[17]="Monsters have " .. power .. "% be an higher tier",
 			[18]="Bosses have " .. power .. "% increased HP and damage",
