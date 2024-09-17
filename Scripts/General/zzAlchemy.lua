@@ -566,6 +566,15 @@ function events.MonsterKilled(mon)
 			chance=(m-2)/100
 		end
 	end
+	if mapvars.mapAffixes then
+		local nAff=0
+		for i=1,4 do
+			if mapvars.mapAffixes[i]>0 then
+				nAff=nAff+1
+			end
+		end
+		chance=chance*(1+mapvars.mapAffixes.Power*nAff/800*1.5)
+	end
 	if dropPossible and math.random()<chance then
 		-- check bolster level
 		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
