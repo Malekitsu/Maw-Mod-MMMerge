@@ -83,6 +83,13 @@ function getCritInfo(pl,dmgType)
 			totalCrit=totalCrit+bonus
 		end
 	end
+	if getMapAffixPower(20) then
+		totalCrit=totalCrit-getMapAffixPower(20)/100
+	end
+	if getMapAffixPower(21) then
+		critDamageMultiplier=(critDamageMultiplier-1)*(1-getMapAffixPower(21)/100)+1
+	end
+	
 	
 	local success=math.random()<totalCrit
 	
@@ -181,6 +188,9 @@ function getSpellDelay(pl,spell)
 		local stacks=vars.eleStacks[id]
 		local speedIncrease=1+stacks*0.1
 		delay=delay/speedIncrease
+	end
+	if getMapAffixPower(27) then
+		delay=delay/(getMapAffixPower(27)/100)
 	end
 	return delay
 end
@@ -633,7 +643,6 @@ end
 function events.CalcDamageToPlayer(t)
 	data=mawCustomMonObj or WhoHitPlayer()
 	pl=t.Player
-	
 	--dodging DODGE 
 	local dodging=0
 	local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Dodging))
@@ -700,7 +709,10 @@ function events.CalcDamageToPlayer(t)
 			end
 		end
 	end
-		
+	--mapping
+	if getMapAffixPower(14) and math.random()<getMapAffixPower(14) then
+		t.DamageKind=12
+	end
 	--carnage fix
 	if data and data.Player and data.Spell==133 then
 		t.Result=0
@@ -1115,7 +1127,9 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		local AC=pl:GetArmorClass()
 		local AC=pl:GetArmorClass()
 		local AC=pl:GetArmorClass()--multiple times to avoid chance to hit code to interfere with AC
-		
+		if getMapAffixPower(28) then
+			AC=AC*(1-getMapAffixPower(28)/100)
+		end
 		local divider=math.min(120+monLvl*0.75*bolster,300*bolster)
 		local reduction=compute_damage(AC/divider)
 		local damage=math.round(damage/reduction)
@@ -1174,7 +1188,9 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	end
 	currentItemRes=1-currentItemRes^0.6/50
 	res=res*currentItemRes
-	
+	if getMapAffixPower(29) then
+		res=res*(1-getMapAffixPower(29)/100)
+	end
 	--randomize resistance
 	if res>0 and rand then
 		local roll=(math.random()+math.random())-1
