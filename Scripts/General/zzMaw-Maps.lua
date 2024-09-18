@@ -1775,6 +1775,7 @@ function events.AfterLoadMap()
 		map.Mon1Hi=oldDensity1
 		map.Mon2Hi=oldDensity2
 		map.Mon3Hi=oldDensity3
+		Game.ShowStatusText("")
 		storeRefillDaysAfterMapUsage=nil
 	end
 end
