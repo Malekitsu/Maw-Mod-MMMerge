@@ -289,7 +289,7 @@ function events.ItemGenerated(t)
 		
 		bonusCap=math.floor((difficultyExtraPower-1)*10)
 		if mapvars.mapAffixes then
-			bonusCap=bonusCap+math.min(math.max((mapvars.mapAffixes.Power-30+2)/2,0),20)  --cap at map level 700
+			bonusCap=bonusCap+math.floor(math.min(math.max((mapvars.mapAffixes.Power-30+2)/2,0),20))  --cap at map level 700
 		end
 		cap2=14+bonusCap
 		partyLevel1=math.min(math.floor((partyLevel+bonus)/18),cap2) 
