@@ -1319,7 +1319,7 @@ function events.GameInitialized2()
 			[2] = {dmgAdd =8, diceMin = 1, diceMax = 1, },--fire bolt
 			[6] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--fireball
 			[7] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--fire spike, the only spell with damage depending on mastery, fix in events.calcspelldamage
-			[8] = {dmgAdd = 32, diceMin = 1, diceMax = 20, },--immolation
+			[8] = {dmgAdd = 10, diceMin = 1, diceMax = 30, },--immolation
 			[9] = {dmgAdd = 2, diceMin = 1, diceMax = 1, },--meteor shower
 			[10] = {dmgAdd = 12, diceMin = 1, diceMax = 7, },--inferno
 			[11] = {dmgAdd = 18, diceMin = 1, diceMax = 18, },--incinerate
@@ -2604,7 +2604,7 @@ if buffRework then
 	[58]={["Cost"]=60, ["Sound"]=15020,["PartyBuff"]=12},--mind res
 	[69]={["Cost"]=60, ["Sound"]=16020,["PartyBuff"]=1},--body res
 	[5]= {["Cost"]=120, ["Sound"]=10040,["PartyBuff"]=8},--haste
-	[8]= {["Cost"]=120, ["Sound"]=10070,["PartyBuff"]=10},--immolation
+	[8]= {["Cost"]=40, ["Sound"]=10070,["PartyBuff"]=10},--immolation
 	[17]={["Cost"]=75, ["Sound"]=11050,["PartyBuff"]=14},--shield
 	[28]={["Cost"]=150, ["Sound"]=10070,},--empower magic
 	[38]={["Cost"]=75, ["Sound"]=13040,["PartyBuff"]=15},--stoneskin
@@ -2619,7 +2619,7 @@ if buffRework then
 	[83]={["Cost"]=200,["Sound"]=17050,["PartyBuff"]=2},--day of the gods
 	[85]={["Cost"]=150,["Sound"]=17070,["MultiBuff"]={6,0,17,4,12,1}},--day of Protection
 	[86]={["Cost"]=300,["Sound"]=17080,["MultiBuff"]={8,14,15}, ["SingleBuff"]=4},--hour of power
-	[95]={["Cost"]=120,["Sound"]=18060,["SingleBuff"]=10},--pain reflection
+	[95]={["Cost"]=10,["Sound"]=18060,["SingleBuff"]=10},--pain reflection
 	}
 	utilitySpell={
 	[1]= {["Cost"]=5,  ["Sound"]=10000, ["PartyBuff"]=16},--torch
