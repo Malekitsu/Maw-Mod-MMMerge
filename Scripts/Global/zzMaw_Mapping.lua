@@ -32,12 +32,12 @@ function events.CalcDamageToMonster(t)
 	end
 	if t.Player and getMapAffixPower(5) and t.DamageKind==4 then
 		reflectedDamage=true
-		t.Player:DoDamage(t.Result*getMapAffixPower(5)/100,4) 
+		t.Player:DoDamage(t.Result*(1-getMapAffixPower(5)/100),4) 
 		reflectedDamage=false
 	end
 	if t.Player and getMapAffixPower(6) and t.DamageKind~=4 then
 		reflectedDamage=true
-		t.Player:DoDamage(t.Result*getMapAffixPower(6)/100,t.DamageKind) 
+		t.Player:DoDamage(t.Result*(1-getMapAffixPower(6)/100),t.DamageKind) 
 		reflectedDamage=false
 	end
 end
