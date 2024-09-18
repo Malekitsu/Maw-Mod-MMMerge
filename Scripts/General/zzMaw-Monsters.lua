@@ -263,8 +263,20 @@ function recalculateMawMonster()
 			end
 		end
 	end	
-	
-	
+	--mapping modifiers
+	for i=0, Map.Monsters.High do
+		local mon=Map.Monsters[i]
+		if getMapAffixPower(3) then
+			mon.Spell=6
+			mon.SpellChance=getMapAffixPower(3)
+			mon.SpellSkill=10
+		end
+		if getMapAffixPower(4) then
+			mon.Spell=97
+			mon.SpellChance=getMapAffixPower(4)
+			mon.SpellSkill=5
+		end
+	end
 end
 --refresh on difficulty change
 function events.Action(t)
@@ -503,6 +515,10 @@ function recalculateMonsterTable()
 		HPtable[i]=HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180)
 		--resistances 
 		bolsterRes=math.max(math.round((totalLevel[i]-basetable[i].Level)/10)*5,0)
+		--mapping
+		if getMapAffixPower(12) then
+			bolsterRes=bolsterRes+getMapAffixPower(12)
+		end
 		for v=0,10 do
 			if v~=5 then
 			mon.Resistances[v]=math.min(bolsterRes+basetable[i].Resistances[v],bolsterRes+200)
@@ -680,6 +696,11 @@ function recalculateMonsterTable()
 			local mon=Game.MonstersTxt[i]
 			local base=basetable[i]
 			mon.Attack2Chance=base.Attack2Chance
+		end
+	end
+	if getMapAffixPower(15) then
+		for i=1, 651 do
+			HPtable[i]=HPtable[i]*(1+getMapAffixPower(15)/100)
 		end
 	end
 end
@@ -1716,7 +1737,9 @@ function events.BuildMonsterInformationBox(t)
 	if vars.Mode==2 then
 		diff=2+math.round(totalLevel[mon.Id])/75
 	end
-	
+	if getMapAffixPower(1) then
+		diff=diff*(1+getMapAffixPower(1)/100)
+	end
 	--some statistics here, calculate the standard deviation of dices to get the range of which 95% will fall into
 	mean=mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*(mon.Attack1.DamageDiceSides+1)/2
 	range=(mon.Attack1.DamageDiceSides^2*mon.Attack1.DamageDiceCount/12)^0.5*1.96
@@ -1972,6 +1995,23 @@ function events.MonsterKilled(mon)
 					Game.EscMessage(string.format("Dungeon Completed!\nReset is possible again."))
 					mapvars.completed=true
 				end
+				if mapvars.mapAffixes then
+					evt.Add("Items", 290)
+					if math.random()<1 then
+						Mouse.Item.Bonus2=getUniqueAffix()
+					end
+					if math.random()<0.6 then
+						Mouse.Item.Charges=getUniqueAffix()
+					end
+					if math.random()<0.5 then
+						Mouse.Item.Charges=Mouse.Item.Charges+getUniqueAffix()*1000
+					end
+					if math.random()<0.4 then
+						Mouse.Item.BonusExpireTime=getUniqueAffix()
+					end
+					Mouse.Item.MaxCharges=math.round(mapvars.mapAffixes.Power+1)
+					Mouse.Item.BonusStrength=mapDungeons[math.random(1,#mapDungeons)]
+				end
 				return
 			else
 				mapLevel=mapLevel+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
@@ -2101,6 +2141,30 @@ function events.AfterLoadMap()
 			if vars.Mode==2 then
 				bossSpawns=math.ceil((Map.Monsters.Count-30)/60)
 			end
+			--mapping
+			if getMapAffixPower(16) then
+				bossSpawns=math.ceil(bossSpawns*(1+getMapAffixPower(16)/100))
+			end
+			if getMapAffixPower(17) then
+				for i=0, Map.Monsters.High do
+					local mon=Map.Monsters[i]
+					if Map.Monsters[i].Id%3~=0 and math.random()<getMapAffixPower(17)/100 then
+						Map.Monsters[i].Id=Map.Monsters[i].Id+1
+					end
+				end
+			end
+			if getMapAffixPower(19) then
+				local nameIndex=bossSpawns+1
+				for i=0,Map.Monsters.High do
+					local id=Map.Monsters[i].Id
+					if id%3~=0 and Game.MonstersTxt[id].AIType~=1 and Map.Monsters[i].NameId==0 and 	math.random()<getMapAffixPower(19)/100 and nameIndex<80 then
+						generateBoss(i,nameIndex)
+						nameIndex=nameIndex+1
+					end
+				end
+			end
+			
+			--end mapping code
 			for i=0,Map.Monsters.High do
 				local id=Map.Monsters[i].Id
 				if id%3==0 and Game.MonstersTxt[id].AIType~=1 and Map.Monsters[i].NameId==0 then
@@ -2128,6 +2192,9 @@ end
 function generateBoss(index,nameIndex)
 	mon=Map.Monsters[index]
 	HP=math.round(mon.FullHP*2*(1+mon.Level/80)*(1+math.random()))
+	if getMapAffixPower(18) then
+		HP=HP*(1+getMapAffixPower(18)/100)
+	end
 	hpOvercap=0
 	while HP>32500 do
 		HP=math.round(HP/2)
@@ -2173,6 +2240,9 @@ function generateBoss(index,nameIndex)
 	
 	mapvars.bossNames[mon.NameId]=Game.PlaceMonTxt[mon.NameId]
 	dmgMult=1.5+math.random()*0.5
+	if getMapAffixPower(18) then
+		dmgMult=dmgMult*(1+getMapAffixPower(18)/100)
+	end
 	atk1=mon.Attack1
 	atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult)
 	atk2=mon.Attack2
@@ -2543,6 +2613,15 @@ function events.LoadMap(wasInGame)
 	Timer(eliteRegen, const.Minute/20) 
 end
 
+function mappingRegen()
+	if getMapAffixPower(7) then
+		local regenAmount=mon.FullHitPoints*getMapAffixPower(7)/100
+		mon.HP=math.min(mon.HP+regenAmount, mon.FullHP)
+	end
+end
+function events.LoadMap(wasInGame)
+	Timer(mappingRegen, const.Minute/2) 
+end
 --fix for stucked in death animation monsters
 function events.MonsterKilled(mon)
 	mon.Z=mon.Z-1
