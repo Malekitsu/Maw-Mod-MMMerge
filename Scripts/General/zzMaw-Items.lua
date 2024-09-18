@@ -1782,8 +1782,11 @@ function events.GameInitialized2() --make it load later compared to other script
 	function events.CalcDamageToMonster(t)
 		local data=WhoHitMonster()
 		if data and data.Player then
+			local heal=t.Result*data.Player.LevelBase^0.6/t.Monster.Level*0.30
+			if getMapAffixPower(32) then
+				heal=heal*(1-getMapAffixPower(32)/100)
+			end
 			if t.DamageKind==4 then
-				local heal=t.Result*data.Player.LevelBase^0.6/t.Monster.Level*0.30
 				--melee
 				if gotVamp[data.Player:GetIndex()] and not data.Object then
 					local fullHP=t.Player:GetFullHP()
@@ -1799,8 +1802,7 @@ function events.GameInitialized2() --make it load later compared to other script
 					it=t.Player:GetActiveItem(i)
 					local fullHP=t.Player:GetFullHP()
 					if it and it.Bonus2==40 then
-						local heal=t.Result*data.Player.LevelBase^0.6/t.Monster.Level*0.15
-						t.Player.HP=math.min(fullHP,t.Player.HP+heal)
+						t.Player.HP=math.min(fullHP,t.Player.HP+heal*0.5)
 					end
 				end
 			end 
@@ -1809,7 +1811,7 @@ function events.GameInitialized2() --make it load later compared to other script
 			local race=Game.CharacterPortraits[pl.Face].Race
 			if race==const.Race.Vampire then
 				local fullHP=t.Player:GetFullHP()
-				heal=t.Result*data.Player.LevelBase^0.6/t.Monster.Level*0.075
+				local heal=heal/4
 				if pl.Class==40 or pl.Class==41 then
 					heal=heal*2
 				end
