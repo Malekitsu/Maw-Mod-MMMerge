@@ -687,11 +687,11 @@ function events.KeyDown(t)
     if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 103 then
         if t.Key == partyMultyBagSortKey then
 			if vars.SmallerPotionBottles then
-				for i=220, 299 do
+				for i=220, 289 do
 					itemSizeMap[i][2]=1
 				end	
 			else
-				for i=220, 299 do
+				for i=220, 289 do
 					itemSizeMap[i][2]=2
 				end	
 			end
@@ -1018,7 +1018,7 @@ itemSizeMap={
 	[287]={1,2},
 	[288]={1,2},
 	[289]={1,2},
-	[290]={1,2},
+	[290]={2,2},
 	[291]={2,2},
 	[292]={2,2},
 	[293]={2,2},
