@@ -3539,7 +3539,8 @@ function events.KeyDown(t)
         end
     end
 end
-
+--[[
 function events.Tick()
-	Mouse.Item.MaxCharges=math.min(Mouse.Item.MaxCharges, 100)
+	Mouse.Item.MaxCharges=math.min(Mouse.Item.MaxCharges, 200)
 end
+]]
