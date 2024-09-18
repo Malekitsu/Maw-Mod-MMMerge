@@ -1688,7 +1688,7 @@ end
 mapDungeons={16,17,18,19,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,54,55,56,57,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,101,104,105,106,108,109,110,111,133,134,135,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,186}
 
 -- Function to get a unique random affix
-local function getUniqueAffix()
+function getUniqueAffix()
     local affix
     repeat
         affix = math.random(1, totalMapAffixes)
@@ -1701,7 +1701,7 @@ function events.MonsterKilled(mon)
 	if mon.NameId>300 then -- no drop from reanimated monsters
 		return
 	end
-	if mon.Level>100 and math.random()<0.001*mon.Level/100 then
+	if totalLevel[mon.Id]>100 and math.random()<0.001*totalLevel[mon.Id]/100 then
 		assignedAffixes = {}
 		obj = SummonItem(290, mon.X, mon.Y, mon.Z + 100, 100)
 		obj.Item.BonusStrength=mapDungeons[math.random(1,#mapDungeons)]
@@ -1717,7 +1717,7 @@ function events.MonsterKilled(mon)
 		if math.random()<0.4 then
 			obj.Item.BonusExpireTime=getUniqueAffix()
 		end
-		obj.Item.MaxCharges=math.round(mon.Level/10)
+		obj.Item.MaxCharges=math.round(totalLevel[mon.Id]/10)
 		
 	end
 end
@@ -1751,7 +1751,6 @@ function events.UseMouseItem(t)
 		map.Mon1Hi=math.round(map.Mon1Hi*mult)
 		map.Mon2Hi=math.round(map.Mon2Hi*mult)
 		map.Mon3Hi=math.round(map.Mon3Hi*mult)
-		debug.Message(dump(Game.MapStats[it.BonusStrength]))
 		blv(fileName)
 	end
 end
@@ -1848,8 +1847,6 @@ function calculateAffixPower(n, p)
 		power=15+p*0.5
 	elseif n == 33 then
 		power=15+p*0.5
-	elseif n == 34 then
-		power=15+p*0.5
     else
         return false
     end
@@ -1884,7 +1881,7 @@ end
 
 --map affixes
 
-totalMapAffixes=34
+totalMapAffixes=33
 function events.BuildItemInformationBox(t)
 	local it=t.Item
 	if it.Number==290 and t.Enchantment then
@@ -1947,7 +1944,6 @@ function events.BuildItemInformationBox(t)
 			[31]="Healing reduced by " .. getMapAffixPower(31, power) .. "%",
 			[32]="Leech reduced by " .. getMapAffixPower(32, power) .. "%",
 			[33]="Buff effects reduced by " .. getMapAffixPower(33, power) .. "%",
-			[34]="Monsters have a " .. getMapAffixPower(34, power) .. "% chance to explode upon death",
 		}
 		
 		local txt=""
@@ -1964,6 +1960,6 @@ function events.BuildItemInformationBox(t)
 			end
 		end
 		t.Description=StrColor(255,255,153,txt)
-		t.Description=t.Description .. "\n\nUsing this map will teleport you to the entrance.\n\nCODE STILL IN DEVELOPMENT, keep this map and wait for updates ;)"
+		t.Description=t.Description .. "\nUsing this map will teleport you to the entrance."
 	end
 end
