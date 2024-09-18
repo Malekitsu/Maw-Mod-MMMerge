@@ -1728,7 +1728,7 @@ function events.BeforeNewGameAutosave()
 	end
 end
 
---fix maxcharges if someone is trying to equip on a player
+--[[fix maxcharges if someone is trying to equip on a player
 function events.Action(t)
 	if t.Action==133 and Game.freeProgression then
 		partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
@@ -1742,7 +1742,7 @@ function events.Action(t)
 		end
 	end
 end
-
+]]
 --REVERTED AS HIGHER DIFFICULTY WILL LOWER THE DAMAGE!
 --vampiric nerf
 gotVamp={}
