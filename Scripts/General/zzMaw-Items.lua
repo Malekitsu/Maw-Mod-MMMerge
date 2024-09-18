@@ -247,7 +247,7 @@ function events.ItemGenerated(t)
 		local name=Game.MapStats[Map.MapStatsIndex].Name
 		mapLevel=mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High
 		if Map.Name~="d42.blv" then
-			if not Game.freeProgression then
+			if not Game.freeProgression and not mapvars.mapAffixes then
 				partyLevel=(vars.MM8LVL+vars.MM7LVL+vars.MM6LVL)*0.75
 				if mapLevels[name] and mapLevels[name].Low~=0 and Game.HouseScreen~=2 and Game.HouseScreen~=95 then
 					partyLevel=mapLevel
