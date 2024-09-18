@@ -998,6 +998,9 @@ function MawRegen()
 	vars.lastRegenTime=Game.Time
 	--call is 20 times per minute, which is 12.8 
 	local timeMultiplier=(Game.TurnBased and timePassed/12.8) or 1
+	if getMapAffixPower(22) then
+		timeMultiplier=timeMultiplier*(1-getMapAffixPower(22)/100)
+	end
 	for i=0,Party.High do
 		pl=Party[i]
 		local Cond = pl:GetMainCondition()
