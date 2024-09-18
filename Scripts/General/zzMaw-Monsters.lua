@@ -1807,6 +1807,11 @@ function events.BuildMonsterInformationBox(t)
 				t.Resistances[1].Text=string.format("Fire\01200000	070" .. res)
 			end
 			hp=t.Monster.FullHP*2^math.floor(mon.Resistances[0]/1000)
+			if hp>=10000000 then
+				hp=math.round(hp/100000)/10 .. "M"
+			elseif hp>=100000 then
+				hp=math.round(hp/1000) .. "K"
+			end
 			t.HitPoints.Text=string.format("02016Hit Points0000000000	100" .. hp)
 		end
 	end
