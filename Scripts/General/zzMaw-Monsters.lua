@@ -2026,7 +2026,7 @@ function events.MonsterKilled(mon)
 					if math.random()<0.4 then
 						Mouse.Item.BonusExpireTime=getUniqueAffix()
 					end
-					Mouse.Item.MaxCharges=math.round(mapvars.mapAffixes.Power+1)
+					Mouse.Item.MaxCharges=math.round(mapvars.mapAffixes.Power+math.random(0,2)-1)
 					Mouse.Item.BonusStrength=mapDungeons[math.random(1,#mapDungeons)]
 				end
 				return
