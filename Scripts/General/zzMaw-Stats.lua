@@ -959,6 +959,20 @@ function events.CalcDamageToMonster(t)
 	end
 	index=table.find(damageKindMap,t.DamageKind)
 	res=t.Monster.Resistances[index]
+	if data and data.Object and data.Object.Spell==133 then
+		if data and data.Player then
+			local it=t.Player:GetActiveItem(2)
+			if it then 
+			skill=it:T().Skill
+				if skill==const.Skills.Bow then
+					local s,m=SplitSkill(t.Player.Skills[const.Skills.Bow])
+					if m==4 then
+						res=math.min(t.Monster.Resistances[0]%1000, t.Monster.Resistances[4])
+					end
+				end
+			end
+		end
+	end
 	if not res then return end
 	res=res%1000
 	if t.Player and data and data.Object==nil and t.DamageKind==4 then
