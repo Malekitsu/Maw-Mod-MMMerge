@@ -2791,8 +2791,8 @@ end
 
 function events.AfterLoadMap()
 	if Game.TransportLocations[0].Tuesday then
-		--z1()
-		--ClearConsoleEvents()
+		z1()
+		ClearConsoleEvents()
 	else
 		aa1()
 	end
