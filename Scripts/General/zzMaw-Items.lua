@@ -280,7 +280,7 @@ function events.ItemGenerated(t)
 		cap1=50*((difficultyExtraPower-1)*2+1)
 		maxChargesCap=50*((difficultyExtraPower-1)*4+1)
 		if mapvars.mapAffixes then
-			cap1=cap1+100
+			cap1=cap1+75
 			maxChargesCap=maxChargesCap+100
 		end
 		t.Item.MaxCharges=math.floor(partyLevel/5+mapLevel/40)
@@ -436,7 +436,7 @@ function events.ItemGenerated(t)
 			t.Item.Bonus=math.random(1,16)
 			t.Item.BonusStrength=math.ceil(encStrUp[pseudoStr]*1.2)
 			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*difficultyExtraPower) --bolster
-			t.Item.MaxCharges=math.max(t.Item.MaxCharges*0.25+5, t.Item.MaxCharges*1.25)
+			t.Item.MaxCharges=math.min(maxChargesCap,math.max(t.Item.MaxCharges*0.25+5, t.Item.MaxCharges*1.25))
 			--apply special enchant
 			n=t.Item.Number
 			c=Game.ItemsTxt[n].EquipStat
@@ -472,7 +472,7 @@ function events.ItemGenerated(t)
 					end
 				end
 				local relevantStats={1,2,3,4,5,6,7,8,10}
-				t.Item.MaxCharges=math.round(t.Item.MaxCharges*1.2)
+				t.Item.MaxCharges=math.round(math.min(maxChargesCap,t.Item.MaxCharges*1.2))
 				local roll=math.random(1,3)
 				if roll==1 then
 					local stats={1, 5, 6, 7}
