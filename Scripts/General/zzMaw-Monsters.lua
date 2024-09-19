@@ -645,7 +645,7 @@ function recalculateMonsterTable()
 				dmgMult2=math.min(math.max(currentBaseDamage/bBaseDamage,0.75),1.3)
 			end			
 			overflowMult=overflowMult or {}
-			overflowMult[i]={extraMult1*dmgMult1, extraMult2*dmgMult2}
+			overflowMult[i]={overflowMult[i][1]*dmgMult1, overflowMult[i][2]*dmgMult2}
 		end
 			
 	end
