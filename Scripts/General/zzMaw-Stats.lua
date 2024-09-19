@@ -336,7 +336,7 @@ function events.BuildStatInformationBox(t)
 		local s,m=SplitSkill(skill)
 
 		local regenEffect={[0]=0,3,4,6,6}
-		local hpRegen = math.round(FHP^0.5*s^1.5*((regenEffect[m])/25))
+		local hpRegen = math.round(FHP^0.5*s^1.75*((regenEffect[m])/35))
 		local HPregenItem=0
 		local bonusregen=0
 		for it in Party[i]:EnumActiveItems() do
@@ -685,6 +685,11 @@ function events.CalcDamageToPlayer(t)
 					end
 				end
 			end	
+		end
+		if nameIdMult and nameIdMult[data.Monster.NameId] and nameIdMult[data.Monster.NameId][data.MonsterAction+1] then
+			t.Damage=t.Damage*nameIdMult[data.Monster.NameId][data.MonsterAction+1]
+		elseif data.MonsterAction<=1 then
+			t.Damage=t.Damage*overflowMult[data.Monster.Id][data.MonsterAction+1]
 		end
 	end
 	
