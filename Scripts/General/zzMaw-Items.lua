@@ -229,11 +229,9 @@ function events.ItemGenerated(t)
 		vars.mapResetCount=vars.mapResetCount or {}
 		vars.mapResetCount[Map.Name]=vars.mapResetCount[Map.Name] or 0
 		local bonus=vars.mapResetCount[Map.Name]*20
-		if mapvars.mapAffixes then
-			bonus=mapvars.mapAffixes.Power*10+20
-		end
 		currentLevel=currentLevel+bonus
 		partyLevel=partyLevel+bonus
+		
 		if Map.Name=="d42.blv" then
 			currentLevel=monTbl[math.min((vars.highestArenaWave+1)*3,#monTbl)].Level*6
 			partyLevel=monTbl[math.min((vars.highestArenaWave+1)*3,#monTbl)].Level*6/1.5
@@ -247,7 +245,7 @@ function events.ItemGenerated(t)
 		local name=Game.MapStats[Map.MapStatsIndex].Name
 		mapLevel=mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High
 		if Map.Name~="d42.blv" then
-			if not Game.freeProgression and not mapvars.mapAffixes then
+			if not Game.freeProgression then
 				partyLevel=(vars.MM8LVL+vars.MM7LVL+vars.MM6LVL)*0.75
 				if mapLevels[name] and mapLevels[name].Low~=0 and Game.HouseScreen~=2 and Game.HouseScreen~=95 then
 					partyLevel=mapLevel
@@ -260,6 +258,12 @@ function events.ItemGenerated(t)
 				mapLevel=0
 			end
 		end
+		
+		if mapvars.mapAffixes then
+			currentLevel=mapvars.mapAffixes.Power*10+20
+			partyLevel=mapvars.mapAffixes.Power*10+20
+		end
+		
 		--difficulty settings
 		difficultyExtraPower=1
 		if Game.BolsterAmount>100 then
@@ -436,7 +440,7 @@ function events.ItemGenerated(t)
 			t.Item.Bonus=math.random(1,16)
 			t.Item.BonusStrength=math.ceil(encStrUp[pseudoStr]*1.2)
 			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*difficultyExtraPower) --bolster
-			t.Item.MaxCharges=math.min(maxChargesCap,math.max(t.Item.MaxCharges*0.25+5, t.Item.MaxCharges*1.25))
+			t.Item.MaxCharges=math.min(maxChargesCap,math.max(t.Item.MaxCharges+5, t.Item.MaxCharges*1.25), t.Item.MaxCharges+25)
 			--apply special enchant
 			n=t.Item.Number
 			c=Game.ItemsTxt[n].EquipStat
@@ -472,7 +476,7 @@ function events.ItemGenerated(t)
 					end
 				end
 				local relevantStats={1,2,3,4,5,6,7,8,10}
-				t.Item.MaxCharges=math.round(math.min(maxChargesCap,t.Item.MaxCharges*1.2))
+				t.Item.MaxCharges=math.round(math.min(maxChargesCap,t.Item.MaxCharges*1.2,t.Item.MaxCharges+25))
 				local roll=math.random(1,3)
 				if roll==1 then
 					local stats={1, 5, 6, 7}
