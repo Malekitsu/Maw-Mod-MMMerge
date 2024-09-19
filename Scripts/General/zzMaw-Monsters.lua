@@ -257,9 +257,11 @@ function recalculateMawMonster()
 				--damage
 				dmgMult=(mapvars.uniqueMonsterLevel[i]/9+1.15)*((mapvars.uniqueMonsterLevel[i]+2)/(oldLevel+2))*(1+(mapvars.uniqueMonsterLevel[i]/200))
 				atk1=mon.Attack1
-				atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount = calcDices(oldTable.Attack1.DamageAdd,oldTable.Attack1.DamageDiceSides,oldTable.Attack1.DamageDiceCount,dmgMult)
+				atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount, extraMult1 = calcDices(oldTable.Attack1.DamageAdd,oldTable.Attack1.DamageDiceSides,oldTable.Attack1.DamageDiceCount,dmgMult)
 				atk2=mon.Attack2
-				atk2.DamageAdd, atk2.DamageDiceSides, atk2.DamageDiceCount = calcDices(oldTable.Attack2.DamageAdd,oldTable.Attack2.DamageDiceSides,oldTable.Attack2.DamageDiceCount,dmgMult)
+				atk2.DamageAdd, atk2.DamageDiceSides, atk2.DamageDiceCount, extraMult2 = calcDices(oldTable.Attack2.DamageAdd,oldTable.Attack2.DamageDiceSides,oldTable.Attack2.DamageDiceCount,dmgMult)
+				nameIdMult=nameIdMult or {}
+				nameIdMult[mon.NameId]={extraMult1, extraMult2}
 			end
 		end
 	end	
@@ -606,9 +608,11 @@ function recalculateMonsterTable()
 		dmgMult=(levelMult/9+1.15)*(1+(levelMult/200))
 		--DAMAGE COMPUTATION
 		atk1=base.Attack1
-		mon.Attack1.DamageAdd, mon.Attack1.DamageDiceSides, mon.Attack1.DamageDiceCount = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult,bonusDamage)
+		mon.Attack1.DamageAdd, mon.Attack1.DamageDiceSides, mon.Attack1.DamageDiceCount, extraMult1 = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult,bonusDamage)
 		atk2=base.Attack2
-		mon.Attack2.DamageAdd, mon.Attack2.DamageDiceSides, mon.Attack2.DamageDiceCount = calcDices(atk2.DamageAdd,atk2.DamageDiceSides,atk2.DamageDiceCount,dmgMult,bonusDamage)
+		mon.Attack2.DamageAdd, mon.Attack2.DamageDiceSides, mon.Attack2.DamageDiceCount, extraMult2 = calcDices(atk2.DamageAdd,atk2.DamageDiceSides,atk2.DamageDiceCount,dmgMult,bonusDamage)
+		overflowMult=overflowMult or {}
+		overflowMult[i]={extraMult1, extraMult2}
 	end
 	--adjust damage if it's too similiar between monster type
 	if bolsterLevel>10 or Game.freeProgression==false then
@@ -629,19 +633,19 @@ function recalculateMonsterTable()
 			currentBaseDamage=atk1.DamageAdd+atk1.DamageDiceCount*(1+atk1.DamageDiceSides)/2
 			batck1=bMon.Attack1
 			bBaseDamage=batck1.DamageAdd+batck1.DamageDiceCount*(1+batck1.DamageDiceSides)/2
-			dmgMult=math.min(math.max(currentBaseDamage/bBaseDamage,0.75),1.3)
-			mon.Attack1.DamageAdd, mon.Attack1.DamageDiceSides, mon.Attack1.DamageDiceCount = calcDices(mon.Attack1.DamageAdd,mon.Attack1.DamageDiceSides,mon.Attack1.DamageDiceCount,dmgMult,bonusDamage)
+			dmgMult1=math.min(math.max(currentBaseDamage/bBaseDamage,0.75),1.3)
 			
 			atk2=base.Attack2
 			currentBaseDamage=atk2.DamageAdd+atk2.DamageDiceCount*(1+atk2.DamageDiceSides)/2
 			batck2=bMon.Attack2
 			bBaseDamage=batck2.DamageAdd+batck2.DamageDiceCount*(1+batck2.DamageDiceSides)/2
 			if currentBaseDamage==0 or bBaseDamage==0 then
-				dmgMult=1
+				dmgMult2=1
 			else
-				dmgMult=math.min(math.max(currentBaseDamage/bBaseDamage,0.75),1.3)
-			end
-			mon.Attack2.DamageAdd, mon.Attack2.DamageDiceSides, mon.Attack2.DamageDiceCount = calcDices(mon.Attack2.DamageAdd,mon.Attack2.DamageDiceSides,mon.Attack2.DamageDiceCount,dmgMult,bonusDamage)
+				dmgMult2=math.min(math.max(currentBaseDamage/bBaseDamage,0.75),1.3)
+			end			
+			overflowMult=overflowMult or {}
+			overflowMult[i]={extraMult1*dmgMult1, extraMult2*dmgMult2}
 		end
 			
 	end
@@ -1740,11 +1744,17 @@ function events.BuildMonsterInformationBox(t)
 	if getMapAffixPower(1) then
 		diff=diff*(1+getMapAffixPower(1)/100)
 	end
+	local extraMult={1,1}
+	if nameIdMult and nameIdMult[mon.NameId] and nameIdMult[mon.NameId] then
+		extraMult={nameIdMult[mon.NameId][1],nameIdMult[mon.NameId][2]}
+	else
+		extraMult={overflowMult[mon.Id][1],overflowMult[mon.Id][2]}
+	end
 	--some statistics here, calculate the standard deviation of dices to get the range of which 95% will fall into
 	mean=mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*(mon.Attack1.DamageDiceSides+1)/2
 	range=(mon.Attack1.DamageDiceSides^2*mon.Attack1.DamageDiceCount/12)^0.5*1.96
-	lowerLimit=math.round(math.max(mean-range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount)*diff)
-	upperLimit=math.round(math.min(mean+range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*mon.Attack1.DamageDiceSides)*diff)
+	lowerLimit=math.round(math.max(mean-range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount)*diff*extraMult[1])
+	upperLimit=math.round(math.min(mean+range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*mon.Attack1.DamageDiceSides)*diff*extraMult[1])
 	
 	text=string.format(table.find(const.Damage,mon.Attack1.Type))
 	if not baseDamageValue and Game.CurrentPlayer>=0 then
@@ -1756,8 +1766,8 @@ function events.BuildMonsterInformationBox(t)
 		if mon.Attack2Chance>0 and Game.CurrentPlayer>=0 then
 			mean=mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*(mon.Attack2.DamageDiceSides+1)/2
 			range=(mon.Attack2.DamageDiceSides^2*mon.Attack2.DamageDiceCount/12)^0.5*1.96
-			lowerLimit=math.round(math.max(mean-range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount)*diff)
-			upperLimit=math.round(math.min(mean+range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*mon.Attack2.DamageDiceSides)*diff)
+			lowerLimit=math.round(math.max(mean-range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount)*diff*extraMult[2])
+			upperLimit=math.round(math.min(mean+range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*mon.Attack2.DamageDiceSides)*diff*extraMult[2])
 			if not baseDamageValue then
 				lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack2.Type,lowerLimit,false,mon.Level))
 				upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack2.Type,upperLimit,false,mon.Level))
@@ -2249,10 +2259,9 @@ function generateBoss(index,nameIndex)
 	if getMapAffixPower(18) then
 		dmgMult=dmgMult*(1+getMapAffixPower(18)/100)
 	end
-	atk1=mon.Attack1
-	atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult)
-	atk2=mon.Attack2
-	atk2.DamageAdd, atk2.DamageDiceSides, atk2.DamageDiceCount = calcDices(atk2.DamageAdd,atk2.DamageDiceSides,atk2.DamageDiceCount,dmgMult)
+	nameIdMult=nameIdMult or {}
+	nameIdMult[mon.NameId]={overflowMult[mon.Id][1]*dmgMult, overflowMult[mon.Id][2]*dmgMult}
+	
 	local s, m=SplitSkill(mon.SpellSkill)
 	mon.SpellSkill=JoinSkill(s*dmgMult, m)
 end
@@ -2516,31 +2525,46 @@ function events.Tick()
 end
 
 
-function calcDices(add,sides,count, mult, bonusDamage)
-	local bonusDamage=bonusDamage or 0
-	local add=math.round((add+bonusDamage)*mult)
-	local sides=math.round(sides*mult^0.5)
-	local count=math.round(count*mult^0.5)
-	if add > 250 then
-		Overflow=add-250
-		add=250
-		sides=sides + (math.round(2*Overflow/count))
-	end
-	if sides > 250 then
-		Overflow = sides / 250
-		sides = 250
-		--checking for dice count overflow
-		count=math.round(count* Overflow)
-	end
-	if count > 250 then
-		Overflow = count / 250
-		count = 250
-		--checking for dice count overflow
-		sides=math.round(math.min(sides * Overflow,250))
-	end
-	
-	return add, sides, count
+function calcDices(add, sides, count, mult, bonusDamage)
+    local bonusDamage = bonusDamage or 0
+    -- Calculate uncapped values
+    local uncappedAdd = math.round((add + bonusDamage) * mult)
+    local uncappedSides = math.round(sides * mult^0.5)
+    local uncappedCount = math.round(count * mult^0.5)
+    
+    -- Initialize capped values
+    local cappedAdd = uncappedAdd
+    local cappedSides = uncappedSides
+    local cappedCount = uncappedCount
+    
+    -- Apply caps and adjust parameters
+    if cappedAdd > 250 then
+        local Overflow = cappedAdd - 250
+        cappedAdd = 250
+        cappedSides = cappedSides + math.round(2 * Overflow / cappedCount)
+    end
+    if cappedSides > 250 then
+        local Overflow = cappedSides / 250
+        cappedSides = 250
+        cappedCount = math.round(cappedCount * Overflow)
+    end
+    if cappedCount > 250 then
+        local Overflow = cappedCount / 250
+        cappedCount = 250
+        cappedSides = math.round(math.min(cappedSides * Overflow, 250))
+    end
+    
+    -- Compute expected damages
+    local uncappedDamage = uncappedCount * (uncappedSides + 1) / 2 + uncappedAdd
+    local cappedDamage = cappedCount * (cappedSides + 1) / 2 + cappedAdd
+    
+    -- Compute external multiplier
+    local externalMultiplier = uncappedDamage / cappedDamage
+    if externalMultiplier < 1 then externalMultiplier = 1 end
+    
+    return cappedAdd, cappedSides, cappedCount, externalMultiplier
 end
+
 
 --fix out of bound monsters
 function events.LoadMap(wasInGame)
