@@ -1777,55 +1777,7 @@ function events.ItemAdditionalDamage(t)
 		gotBowVamp[t.Player:GetIndex()]=false
 	end
 end
-
-function events.GameInitialized2() --make it load later compared to other scripts
-	function events.CalcDamageToMonster(t)
-		local data=WhoHitMonster()
-		if data and data.Player then
-			local heal=t.Result*data.Player.LevelBase^0.6/t.Monster.Level*0.30
-			if getMapAffixPower(32) then
-				heal=heal*(1-getMapAffixPower(32)/100)
-			end
-			if t.DamageKind==4 then
-				--melee
-				if gotVamp[data.Player:GetIndex()] and not data.Object then
-					local fullHP=t.Player:GetFullHP()
-					t.Player.HP=math.min(fullHP,t.Player.HP+heal)
-				end
-				--ranged
-				if gotBowVamp[data.Player:GetIndex()] and data.Object and data.Object.Spell==133 then
-					local fullHP=t.Player:GetFullHP()
-					t.Player.HP=math.min(fullHP,t.Player.HP+heal*0.5)
-				end
-			elseif data and data.Player then --spell leech
-				for i=1,2 do
-					it=t.Player:GetActiveItem(i)
-					local fullHP=t.Player:GetFullHP()
-					if it and it.Bonus2==40 then
-						t.Player.HP=math.min(fullHP,t.Player.HP+heal*0.5)
-					end
-				end
-			end 
-		
-			local pl=data.Player
-			local race=Game.CharacterPortraits[pl.Face].Race
-			if race==const.Race.Vampire then
-				local fullHP=t.Player:GetFullHP()
-				local heal=heal/4
-				if pl.Class==40 or pl.Class==41 then
-					heal=heal*2
-				end
-				if data.Object and data.Object then
-					heal=heal/2
-				end
-				heal=math.ceil(heal)
-				t.Player.HP=math.min(fullHP,t.Player.HP+heal)
-			end
-		end
-	end
-end
-
-			
+--leech calculation in zzMAWStatusMsg in scripts/global		
 
 --SHOW POWER/VITALITY CHANGE IN TOOLTIPS
 slotMap={
