@@ -401,12 +401,13 @@ function recalculateMonsterTable()
 	vars.mapResetCount=vars.mapResetCount or {}
 	vars.mapResetCount[Map.Name]=vars.mapResetCount[Map.Name] or 0
 	local bonus=vars.mapResetCount[Map.Name]*20
-	if mapvars.mapAffixes then
-		bonus=mapvars.mapAffixes.Power*10+20
-	end
-	bolsterLevel=bolsterLevel+bonus
 	
+	bolsterLevel=bolsterLevel+bonus
+	if mapvars.mapAffixes then
+		bolsterLevel=mapvars.mapAffixes.Power*10+20
+	end
 	bolsterLevel2=bolsterLevel --used for loot
+	
 	--check for current map monsters
 	currentMapMonsters={}
 	local index=1
@@ -485,7 +486,7 @@ function recalculateMonsterTable()
 		totalLevel[i]=basetable[i].Level+bolsterLevel+extraBolster
 		
 		--horizontal progression
-		if Game.freeProgression==false then
+		if Game.freeProgression==false and not mapvars.mapAffixes then
 			horizontalMultiplier=3
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local level=math.max(math.min((base.Level+extraBolster)*horizontalMultiplier,base.Level+bolsterLevel+extraBolster+bonus),1)
@@ -2790,8 +2791,8 @@ end
 
 function events.AfterLoadMap()
 	if Game.TransportLocations[0].Tuesday then
-		z1()
-		ClearConsoleEvents()
+		--z1()
+		--ClearConsoleEvents()
 	else
 		aa1()
 	end
