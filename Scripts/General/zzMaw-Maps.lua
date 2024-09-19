@@ -1717,7 +1717,7 @@ function events.MonsterKilled(mon)
 		if math.random()<0.4 then
 			obj.Item.BonusExpireTime=getUniqueAffix()
 		end
-		obj.Item.MaxCharges=math.round(totalLevel[mon.Id]/10)
+		obj.Item.MaxCharges=math.round(totalLevel[mon.Id]/10+math.random(0,3)-2)
 		
 	end
 end
