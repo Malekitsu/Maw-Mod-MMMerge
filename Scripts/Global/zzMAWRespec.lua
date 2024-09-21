@@ -51,6 +51,7 @@ function RespecSkills(npcID)
 	end
 	respecMastery(id)
 	local refund=0
+	local spentOnAlchemy=0
 	local p=Party[id]
 	for i=0, p.Skills.High do
 		local skill=SplitSkill(p.Skills[i])
@@ -89,6 +90,9 @@ function RespecSkills(npcID)
 				p.SkillPoints=p.SkillPoints+refund
 			end
 		end
+		if i == const.Skills.Alchemy and skill > 1 then
+			spentOnAlchemy = skill*(skill+1)/2-1
+		end
 	end
 	--custom skills
 	--cover
@@ -109,7 +113,14 @@ function RespecSkills(npcID)
 	if s>0 then
 		Skillz.set(p,52,1)
 	end
-	
+	-- retroactive fix for mercs
+	local shouldBeRefundedAmount = 0 - spentOnAlchemy
+	for i=2, p.LevelBase do
+		shouldBeRefundedAmount = shouldBeRefundedAmount + 4 + math.floor(i/10+1)
+	end
+	if p.SkillPoints < shouldBeRefundedAmount then
+		p.SkillPoints = shouldBeRefundedAmount
+	end
 	Message("Your skill points has been reset!")
 end
 
