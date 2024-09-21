@@ -190,7 +190,7 @@ function getSpellDelay(pl,spell)
 		delay=delay/speedIncrease
 	end
 	if getMapAffixPower(27) then
-		delay=delay/(getMapAffixPower(27)/100)
+		delay=delay/(1-getMapAffixPower(27)/100)
 	end
 	return delay
 end
