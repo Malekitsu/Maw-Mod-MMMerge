@@ -2435,7 +2435,7 @@ function events.BeforeLoadMap()
 	if vars.ChallengeMode then
 		if storeTime then
 			Game.Time=storeTime
-			storeTime=false
+			storeTime=false			
 		end
 		
 		for i=0, Game.TransportLocations.High do
@@ -2793,6 +2793,9 @@ function events.AfterLoadMap()
 	if Game.TransportLocations[0].Tuesday then
 		z1()
 		ClearConsoleEvents()
+		if Map:IsOutdoor() and Map.OutdoorLastRefillDay>math.ceil(Game.Time/const.Day) then
+			Map.OutdoorLastRefillDay=math.ceil(Game.Time/const.Day)
+		end
 	else
 		aa1()
 	end
