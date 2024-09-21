@@ -84,7 +84,7 @@ function events.Tick()
 end
 function events.GetAttackDelay(t)
 	if getMapAffixPower(26) then
-		t.Result=math.round(t.Result/(getMapAffixPower(26)/100))
+		t.Result=math.round(t.Result/(1-getMapAffixPower(26)/100))
 	end
 end
 
