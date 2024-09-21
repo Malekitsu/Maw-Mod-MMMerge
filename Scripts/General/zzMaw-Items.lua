@@ -780,37 +780,6 @@ function events.LoadMap(wasInGame)
 		end
 	end
 
---hp and sp regen
-	local function restoreHPEnchant() 
-		for _, pl in Party do 
-		HPregen=0
-		totHP=pl:GetFullHP()
-			for it in pl:EnumActiveItems() do
-				if it.Bonus2 == 37 or it.Bonus2==44 or it.Bonus2==50 or it.Bonus2==54 or it.Bonus2==66 then		
-					HPregen=math.max(HPregen+totHP*0.02,HPregen+1)	
-				end
-			end
-		HPregen=math.max(HPregen-1,0)
-		pl.HP=math.min(pl.HP+math.round(HPregen),totHP)
-		end 
-	end
-	Timer(restoreHPEnchant, const.Minute*5) 
-
-
-	local function restoreSPEnchant() 
-		for _, pl in Party do 
-		SPregen=0
-		totSP=pl:GetFullSP()
-			for it in pl:EnumActiveItems() do
-				if it.Bonus2 == 38 or it.Bonus2==47 or it.Bonus2==55 or it.Bonus2==66 then		
-					SPregen=math.max(SPregen+totSP*0.02,SPregen+1)
-				end
-			end
-		SPregen=math.max(SPregen-1,0)
-		pl.SP=math.min(pl.SP+math.round(SPregen),totSP)
-		end 
-	end
-	Timer(restoreSPEnchant, const.Minute*5) 
 end
 
 
@@ -3085,6 +3054,10 @@ artifactSkillBonus[2030] =	{	[const.Skills.Stealing] = 10,
 								[const.Skills.DisarmTraps] = 10}
 -- Hades
 artifactSkillBonus[2035] =	{	[const.Skills.DisarmTraps] = 10}
+
+--artifacts HP/SP regen
+artifactHpRegen={509,520,1337}
+artifactSpRegen={1334}
 
 --refresh stats
 function events.AfterLoadMap()
