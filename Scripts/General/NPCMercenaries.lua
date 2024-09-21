@@ -193,7 +193,10 @@ function GenerateMercenary(t) --RosterId, Class, Level, Skills, Items, Face, Joi
 	Level = Level or 5
 
 	local Char = Party.PlayersArray[RosterId]
-	local SkillPAmount = Level * 5 - 5
+	local SkillPAmount = 0;
+	for i=2, Level do
+		SkillPAmount = SkillPAmount + 4 + math.floor(i/10+1)
+	end
 
 	vars.LastMercenaryPortraits = vars.LastMercenaryPortraits or {Party[0].Face}
 	if not Face then
