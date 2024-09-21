@@ -992,6 +992,7 @@ lastHP={}
 lastSP={}
 waitHP={}
 waitSP={}
+
 function MawRegen()
 	--HP
 	vars.lastRegenTime=vars.lastRegenTime or Game.Time
@@ -1026,7 +1027,14 @@ function MawRegen()
 			end
 			local regenEffect={[0]=0,3,4,6,6}
 			FHP	= pl:GetFullHP()
-			regenHP[i] = regenHP[i] + (FHP^0.5*RegS^1.75*((regenEffect[RegM])/3500))* timeMultiplier * mult * gmMult
+			local regenAmount=FHP^0.5*RegS^1.75*(regenEffect[RegM]/3500)
+			for it in pl:EnumActiveItems() do
+				if it.Bonus2 == 37 or it.Bonus2==44 or it.Bonus2==50 or it.Bonus2==54 or it.Bonus2==66 or table.find(artifactHpRegen, it.Number) then		
+					regenAmount=regenAmount+FHP*0.02/100	
+				end
+			end
+			
+			regenHP[i] = regenHP[i] + regenAmount * timeMultiplier * mult * gmMult
 			--regeneration spell
 			Buff=pl.SpellBuffs[const.PlayerBuff.Regeneration]
 			
@@ -1073,12 +1081,20 @@ function MawRegen()
 				FSP=math.max(math.ceil(currentManaPool[i]),0)
 				
 			end
+			local SPREGEN = 0
 			if RegS > 50 then
-				regenSP[i] = regenSP[i] + (FSP^0.2*50^1.75*((RegM+5)/3500)*RegS/50 +0.02)* timeMultiplier*mult
+				SPREGEN = (FSP^0.2*50^1.75*((RegM+5)/3500)*RegS/50 +0.02)
 			elseif RegM > 0 then
-				regenSP[i] = regenSP[i] + (FSP^0.2*RegS^1.75*((RegM+5)/3500) +0.02)* timeMultiplier*mult
+				SPREGEN = (FSP^0.2*RegS^1.75*((RegM+5)/3500) +0.02)
 			end
 			
+			for it in pl:EnumActiveItems() do
+				if it.Bonus2 == 38 or it.Bonus2==47 or it.Bonus2==55 or it.Bonus2==66 or table.find(artifactSpRegen, it.Number) then	
+					SPREGEN=SPREGEN+FSP*0.02/100
+				end
+			end
+			
+			regenSP[i] = regenSP[i] + SPREGEN * timeMultiplier*mult
 			--meditation buff
 			if buffRework and vars.mawbuff[56] then
 				local s, m, level=getBuffSkill(56)
