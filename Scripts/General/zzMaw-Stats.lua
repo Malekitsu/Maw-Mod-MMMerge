@@ -762,8 +762,9 @@ function events.CalcDamageToPlayer(t)
 		else
 			levelMult=Game.MonstersTxt[i].Level
 		end
-		dmgMult=(levelMult/12+1.15)*((levelMult+10)/(oldLevel+10))*(1+(levelMult/200))
-		t.Damage=t.Result*dmgMult
+		local bonus=math.max((levelMult^0.88-BLevel[data.Monster.Id]^0.88),0)
+		dmgMult=(levelMult/9+1.15)*(1+(levelMult/200))
+		t.Damage=(t.Result+bonus)*dmgMult
 	end
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
 		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,false,data.Monster.Level) -- spell randomization is off
