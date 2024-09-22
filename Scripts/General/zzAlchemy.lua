@@ -875,12 +875,51 @@ end
 
 evt.PotionEffects[85] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+		local modified=false
 		if Game.ItemsTxt[t.Number].NotIdentifiedName==Game.ItemsTxt[t.Number+1].NotIdentifiedName then
 			t.Number=t.Number+1
 			Mouse.Item.Number=0
+			modified=true
 		else
-			return
+			if t:T().EquipStat<=2 then --weapons
+				local itemType=t:T().NotIdentifiedName
+				local basePower=(t:T().Mod1DiceCount*t:T().Mod1DiceSides+1)/2+t:T().Mod2
+				local upgradeItemId=false
+				local upgradePower=math.huge
+				for i=1, Game.ItemsTxt.High do
+					local it=Game.ItemsTxt[i]
+					local power=(it.Mod1DiceCount*it.Mod1DiceSides+1)/2+it.Mod2
+					if itemType==it.NotIdentifiedName and power>basePower and power<upgradePower then
+						upgradeItemId=i
+						upgradePower=power
+					end
+				end
+				if upgradeItemId then
+					t.Number=upgradeItemId
+					modified=true
+					Mouse.Item.Number=0
+				end
+			else --armors
+				local itemType=t:T().NotIdentifiedName
+				local basePower=t:T().Mod1DiceCount+t:T().Mod2
+				local upgradeItemId=false
+				local upgradePower=math.huge
+				for i=1, Game.ItemsTxt.High do
+					local it=Game.ItemsTxt[i]
+					local power=it.Mod1DiceCount+it.Mod2
+					if itemType==it.NotIdentifiedName and power>basePower and power<upgradePower then
+						upgradeItemId=i
+						upgradePower=power
+					end
+				end
+				if upgradeItemId then
+					t.Number=upgradeItemId
+					modified=true
+					Mouse.Item.Number=0
+				end
+			end
 		end
+		if not modified then return end
 		mem.u4[0x51E100] = 0x100 
 		t.Condition = t.Condition:Or(0x10)
 		evt.PlaySound(12070)
