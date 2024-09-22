@@ -677,9 +677,10 @@ local function upgradeGem(it, tier)
 	if table.find(twoHandedAxes, it.Number) then
 		mult=2
 	end
-	if it.BonusExpireTime==20 then
+	--[[if it.BonusExpireTime==20 then
 		mult=mult*2
 	end
+	]]
 	maxValue1=math.floor(maxValue1*mult)
 	maxValue2=math.floor(maxValue2*mult)
 	--pick the lowest one
