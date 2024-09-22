@@ -15,18 +15,13 @@ end
 
 function events.CalcDamageToMonster(t)
 	if t.Player and t.DamageKind==4 and getMapAffixPower(23) then
-		t.Result=t.Result*(getMapAffixPower(23)/100)
+		t.Result=t.Result*(1-getMapAffixPower(23)/100)
 	end
 	if t.Player and t.DamageKind~=4 and getMapAffixPower(24) then
-		t.Result=t.Result*(getMapAffixPower(24)/100)
+		t.Result=t.Result*(1-getMapAffixPower(24)/100)
 	end
 	if t.Player and getMapAffixPower(30) then
 		if math.random()<getMapAffixPower(30)/100 then
-			t.Result=0
-		end
-	end
-	if t.Player and getMapAffixPower(34) then
-		if math.random()<getMapAffixPower(34)/100 then
 			t.Result=0
 		end
 	end
