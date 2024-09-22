@@ -802,7 +802,7 @@ legendaryEffects={
 	[17]="Your hits will deal 2% of current monster HP health (1% for AoE, multi-hit spells and arrows)",
 	[18]="Reduce all damage taken by 10%",
 	[19]="Your weapon enchants now scales with the highest between might/int./pers.",
-	[20]="Base enchants on this items can be upgraded up to twice the cap value with crafting Gems",
+	[20]="Base enchants on this items are 50% stronger",
 	[21]="Increase melee damage by 5% for each enemy in the nearbies",
 	[22]="Reduces damage by 3% for each enemy in the nearbies",
 	[23]="Successfully covering an ally restores 3% of your HP",
@@ -866,6 +866,9 @@ function events.BuildItemInformationBox(t)
 			t.Enchantment=""
 			if t.Item.Bonus>0 then
 				local power=t.Item.BonusStrength
+				if t.Item.BonusExpireTime==20 then
+					power=math.ceil(power*1.5)
+				end
 				if t.Item.Bonus>=11 and t.Item.Bonus<=16 then
 					power=math.round(power^0.6/50*1000)/10 .. "%"
 				end
@@ -874,6 +877,9 @@ function events.BuildItemInformationBox(t)
 			if t.Item.Charges>1000 then
 				local bonus=math.floor(t.Item.Charges/1000)
 				local strength=t.Item.Charges%1000
+				if t.Item.BonusExpireTime==20 then
+					strength=math.ceil(strength*1.5)
+				end
 				if bonus>=11 and bonus<=16 then
 					strength=math.round(strength^0.6/50*1000)/10 .. "%"
 				end
@@ -2164,14 +2170,18 @@ function itemStats(index)
 		--bolster mult
 		mult=1+it.MaxCharges/20
 		if it.Bonus>0 then 
+			local power=it.BonusStrength
+			if it.BonusExpireTime==20 then
+				power=math.ceil(power*1.5)
+			end
 			if it.Bonus<=10 then
-				tab[it.Bonus]=tab[it.Bonus]+it.BonusStrength
+				tab[it.Bonus]=tab[it.Bonus]+power
 			elseif it.Bonus<=16 then
-				normalEnchantResistance[index][it.Bonus]=math.max(normalEnchantResistance[index][it.Bonus], it.BonusStrength)		
+				normalEnchantResistance[index][it.Bonus]=math.max(normalEnchantResistance[index][it.Bonus], power)		
 			else
 				local tabNumber=bonusBaseEnchantSkill[it.Bonus]+50
 				tab[tabNumber]=tab[tabNumber] or 0
-				tab[tabNumber]=tab[tabNumber]+it.BonusStrength
+				tab[tabNumber]=tab[tabNumber]+power
 				--tab[tabNumber]=math.max(tab[tabNumber] or 0, it.BonusStrength)
 			end
 		end
@@ -2184,10 +2194,14 @@ function itemStats(index)
 		end		
 		if it.Charges>1000 then
 			local bonus=math.floor(it.Charges/1000)
+			local power=it.Charges%1000
+			if it.BonusExpireTime==20 then
+				power=math.ceil(power*1.5)
+			end
 			if bonus<=10 then
-				tab[math.floor(it.Charges/1000)]=tab[math.floor(it.Charges/1000)]+it.Charges%1000
+				tab[math.floor(it.Charges/1000)]=tab[math.floor(it.Charges/1000)]+power
 			else
-				normalEnchantResistance[index][bonus]=math.max(normalEnchantResistance[index][bonus], it.Charges%1000)	
+				normalEnchantResistance[index][bonus]=math.max(normalEnchantResistance[index][bonus], power)	
 			end
 		end		
 		if it.Bonus2>0 then
