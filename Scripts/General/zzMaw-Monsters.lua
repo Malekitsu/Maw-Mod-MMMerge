@@ -1713,14 +1713,14 @@ function events.BuildMonsterInformationBox(t)
 	mon=Map.Monsters[Mouse:GetTarget().Index]
 	--show level Below HP
 	mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
+	local lvl=mon.Level
 	if t.IdentifiedHitPoints then
 		if mon.NameId==0 then
-			t.ArmorClass.Text=string.format("Level:          " .. math.round(totalLevel[mon.Id]) .. "\n" .. t.ArmorClass.Text)
+			lvl=math.round(totalLevel[mon.Id])
 		elseif mapvars.uniqueMonsterLevel[Mouse:GetTarget().Index] then
-			t.ArmorClass.Text=string.format("Level:          " .. math.round(mapvars.uniqueMonsterLevel[Mouse:GetTarget().Index]) .. "\n" .. t.ArmorClass.Text)
-		else
-			t.ArmorClass.Text=string.format("Level:          " .. mon.Level .. "\n" .. t.ArmorClass.Text)
+			lvl=math.round(mapvars.uniqueMonsterLevel[Mouse:GetTarget().Index])
 		end
+		t.ArmorClass.Text=string.format("Level:          " .. lvl .. "\n" .. t.ArmorClass.Text)
 	end
 	--difficulty multiplier
 	diff=Game.BolsterAmount/100 or 1
@@ -1793,17 +1793,21 @@ function events.BuildMonsterInformationBox(t)
 			else
 				levelMult=Game.MonstersTxt[i].Level
 			end
-			dmgMult=(levelMult/12+1.15)*((levelMult+10)/(oldLevel+10))*(1+(levelMult/200))
+			
+			
+			bonusDamage=math.max((lvl^0.88-BLevel[i]^0.88),0)
+			
+			dmgMult=(levelMult/9+1.15)*(1+(levelMult/200))
 			--damageType
 			damageType=spellToDamageKind[math.ceil(mon.Spell/11)]
 			if not damageType then
 				damageType=12
 			end
 			--calculate
-			mean=spell.DamageAdd+skill*(spell.DamageDiceSides+1)/2
+			mean=spell.DamageAdd+skill*(spell.DamageDiceSides+1)/2+bonusDamage
 			range=(spell.DamageDiceSides^2*skill/12)^0.5*1.96
-			lowerLimit=math.round(math.max(mean-range, spell.DamageAdd+skill)*dmgMult*diff)
-			upperLimit=math.round(math.min(mean+range, spell.DamageAdd+skill*spell.DamageDiceSides)*dmgMult*diff)
+			lowerLimit=math.round(math.max(mean-range, spell.DamageAdd+skill+bonusDamage)*dmgMult*diff)
+			upperLimit=math.round(math.min(mean+range, spell.DamageAdd+skill*spell.DamageDiceSides+bonusDamage)*dmgMult*diff)
 			if not baseDamageValue and Game.CurrentPlayer>=0 then
 				lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],damageType,lowerLimit,false,mon.Level))
 				upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],damageType,upperLimit,false,mon.Level))
@@ -2791,8 +2795,8 @@ end
 
 function events.AfterLoadMap()
 	if Game.TransportLocations[0].Tuesday then
-		z1()
-		ClearConsoleEvents()
+		--z1()
+		--ClearConsoleEvents()
 		if Map:IsOutdoor() and Map.OutdoorLastRefillDay>math.ceil(Game.Time/const.Day) then
 			Map.OutdoorLastRefillDay=math.ceil(Game.Time/const.Day)
 		end
