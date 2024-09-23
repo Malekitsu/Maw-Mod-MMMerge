@@ -399,7 +399,7 @@ function events.BuildStatInformationBox(t)
 			end
 		end
 		SPregenItem=SPregenItem
-		regen=math.ceil(fullSP*SPregenItem*0.01)+medRegen+bonusregen
+		regen=math.ceil(Party[i]:GetFullSP()*SPregenItem*0.01)+medRegen+bonusregen
 		t.Text=string.format("%s\n\nSpell point regen per second: %s",t.Text,StrColor(40,100,255,regen/10))
 	end
 	
