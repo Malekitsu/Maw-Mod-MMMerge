@@ -1078,7 +1078,7 @@ function MawRegen()
 			end
 			FSP	= pl:GetFullSP()
 			if buffRework and currentManaPool and currentManaPool[i] then
-				FSP=math.max(math.ceil(currentManaPool[i]),0)
+				FSP=math.max(math.ceil(FSP*(currentManaPool[i]/FSP)^0.5,0))
 				
 			end
 			local SPREGEN = 0
@@ -1090,7 +1090,7 @@ function MawRegen()
 			
 			for it in pl:EnumActiveItems() do
 				if it.Bonus2 == 38 or it.Bonus2==47 or it.Bonus2==55 or it.Bonus2==66 or table.find(artifactSpRegen, it.Number) then	
-					SPREGEN=SPREGEN+pl:GetFullSP()*0.02/100
+					SPREGEN=SPREGEN+FSP*0.02/100
 				end
 			end
 			
