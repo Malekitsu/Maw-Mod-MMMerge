@@ -1090,7 +1090,7 @@ function MawRegen()
 			
 			for it in pl:EnumActiveItems() do
 				if it.Bonus2 == 38 or it.Bonus2==47 or it.Bonus2==55 or it.Bonus2==66 or table.find(artifactSpRegen, it.Number) then	
-					SPREGEN=SPREGEN+FSP*0.02/100
+					SPREGEN=SPREGEN+pl:GetFullSP()*0.02/100
 				end
 			end
 			
