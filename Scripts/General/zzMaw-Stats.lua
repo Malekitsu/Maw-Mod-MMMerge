@@ -371,7 +371,7 @@ function events.BuildStatInformationBox(t)
 		local i=Game.CurrentPlayer
 		local fullSP=Party[i]:GetFullSP()
 		if buffRework and currentManaPool and currentManaPool[i] then
-			fullSP=currentManaPool[Game.CurrentPlayer]
+			fullSP=fullSP*(currentManaPool[Game.CurrentPlayer]/fullSP)^0.5
 		end
 		local skill=Party[i]:GetSkill(const.Skills.Meditation)
 		local s,m=SplitSkill(skill)
