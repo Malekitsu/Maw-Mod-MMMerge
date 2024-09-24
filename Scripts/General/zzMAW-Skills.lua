@@ -969,7 +969,7 @@ function events.Regeneration(t)
 	for i=0,Party.High do
 		v=Party[i]
 		ko = v.Eradicated or v.Dead or v.Stoned or v.Paralyzed or v.Unconscious or v.Asleep
-		r,m = SplitSkill(v.Skills[const.Skills.Repair])
+		r,m = SplitSkill(v:GetSkill(const.Skills.Repair))
 		if r*m>repair and (ko == 0) then
 			repair=r*m
 		end
