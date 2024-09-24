@@ -604,9 +604,17 @@ function events.GameInitialized2()
 end
 function events.BuildItemInformationBox(t)
 	if t.Item.Number>=1051 and t.Item.Number<=1060 then
+		if t.Name then
+			if t.Item.BonusStrength==1 then
+				t.Name=StrColor(178,255,255, "Ascended " .. t.Name) 
+			end
+		end
 		if t.Description then
 			local mult=math.max((Game.BolsterAmount-100)/1000+1,1)
 			local tier=(t.Item.Number-1050)*mult
+			if t.Item.BonusStrength==1 then
+				tier=tier+10*mult
+			end
 			local power = math.round((tier * 10) ^ 0.5)
 			local twoHanded = tier * 10 * 2
 			local bodyArmor = math.round(tier * 1.5 * 10)
@@ -711,6 +719,9 @@ for i=1,10 do
 		if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then			
 			if craftWaitTime>0 then return end
 			local tier=(Mouse.Item.Number-1050)
+			if Mouse.Item.BonusStrength==1 then
+				tier=tier+10
+			end
 			local enchanted=upgradeGem(t, tier)
 			if enchanted=="no enchants" then
 				Game.ShowStatusText("No enchants")
@@ -812,7 +823,7 @@ evt.PotionEffects[83] = function(IsDrunk, t, Power)
 		if t.BonusExpireTime>=10 and t.BonusExpireTime<1000 then
 			maxChargesCap=50*((difficultyExtraPower-1)*4+1)
 		end
-		
+		maxChargesCap=maxChargesCap+100 --mapping release
 		--if level requirement is over player level block it
 		local itemLevel=t.MaxCharges*5
 		local tot=0
@@ -1015,8 +1026,13 @@ function events.MonsterKilled(mon)
 	end
 	mon.Ally=9999
 	--level bonus
-	--partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-	bonusRoll=1+mon.Level/50
+	local lvl=mon.Level
+	if mon.NameId==0 then
+		lvl=math.round(totalLevel[mon.Id])
+	elseif mapvars.uniqueMonsterLevel[mon:GetIndex()] then
+		lvl=math.round(mapvars.uniqueMonsterLevel[mon:GetIndex()])
+	end
+	bonusRoll=math.min(1+lvl/60,5)
 	if mon.NameId>=220 and mon.NameId <300 then
 		bonusRoll=bonusRoll*10
 	end
@@ -1034,17 +1050,25 @@ function events.MonsterKilled(mon)
 		bonusRoll=bonusRoll*(1+mapvars.mapAffixes.Power*nAff/800*1.5)
 	end
 	--pick base craft material
-	baseCraftDrop=false
+	local baseCraftDrop=false
+	local ascendedGem=false
 	if math.random()<craftDropChances.gems*bonusRoll then
 		baseCraftDrop=true
-		craftStrength = math.floor(normal_random(mon.Level^0.6/4+1, 2))
-		craftStrength=math.max(math.min(craftStrength,10),1)
+		local craftStrength = math.floor(normal_random(math.max(lvl^0.6/4+1,lvl/40), 2))
+		craftStrength=math.max(math.min(craftStrength,20),1)
+		if craftStrength>10 then
+			craftStrength=craftStrength-10
+			ascendedGem=true
+		end
 		crafMaterialNumber=1050+craftStrength
 	end	
 	if baseCraftDrop then
 		obj = SummonItem(crafMaterialNumber, mon.X, mon.Y, mon.Z + 100, 100)
 		if obj then
 			obj.Item.Charges=1
+			if ascendedGem then
+				obj.Item.BonusStrength=1
+			end
 		end
 	end
 	--pick special drop
