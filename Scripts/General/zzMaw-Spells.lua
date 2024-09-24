@@ -902,14 +902,14 @@ function elementalBuffs()
 				pl.SpellBuffs[const.PlayerBuff.Preservation].ExpireTime=math.max(Game.Time+const.Minute*5, pl.SpellBuffs[const.PlayerBuff.Preservation].ExpireTime)
 			end
 		end
-	end
-	if Party.High==0 then
-		Party.SpellBuffs[19].ExpireTime=math.max(Game.Time+const.Hour, Party.SpellBuffs[19].ExpireTime)
-		Party.SpellBuffs[19].Power=math.max(10,Party.SpellBuffs[19].Power)
-		Party.SpellBuffs[19].Skill=math.max(2,Party.SpellBuffs[19].Skill)
-		Party.SpellBuffs[16].ExpireTime=math.max(Game.Time+const.Hour, Party.SpellBuffs[16].ExpireTime)
-		Party.SpellBuffs[16].Power=math.max(2,Party.SpellBuffs[16].Power)
-		Party.SpellBuffs[16].Skill=math.max(1,Party.SpellBuffs[16].Skill)
+		if Party.High==0 then
+			Party.SpellBuffs[19].ExpireTime=math.max(Game.Time+const.Hour, Party.SpellBuffs[19].ExpireTime)
+			Party.SpellBuffs[19].Power=math.max(10,Party.SpellBuffs[19].Power)
+			Party.SpellBuffs[19].Skill=math.max(2,Party.SpellBuffs[19].Skill)
+			Party.SpellBuffs[16].ExpireTime=math.max(Game.Time+const.Hour, Party.SpellBuffs[16].ExpireTime)
+			Party.SpellBuffs[16].Power=math.max(2,Party.SpellBuffs[16].Power)
+			Party.SpellBuffs[16].Skill=math.max(1,Party.SpellBuffs[16].Skill)
+		end
 	end
 end
 
@@ -2875,6 +2875,26 @@ if buffRework then
 				end
 			end
 		end
+		--vampire night preservation
+		for k=0, Party.High do
+			pl=Party[k]
+			local race=Game.CharacterPortraits[pl.Face].Race
+			if race==const.Race.Vampire then
+				local hour=Game.Time%const.Day/const.Hour
+				if (hour>21 or hour<5 or  Map.IndoorOrOutdoor==1) and Map.Name~="7d25.blv" then
+					pl.SpellBuffs[const.PlayerBuff.Preservation].ExpireTime=math.max(Game.Time+const.Minute*5, pl.SpellBuffs[const.PlayerBuff.Preservation].ExpireTime)
+				end
+			end
+		end
+		if Party.High==0 then
+			Party.SpellBuffs[19].ExpireTime=math.max(Game.Time+const.Hour, Party.SpellBuffs[19].ExpireTime)
+			Party.SpellBuffs[19].Power=math.max(10,Party.SpellBuffs[19].Power)
+			Party.SpellBuffs[19].Skill=math.max(2,Party.SpellBuffs[19].Skill)
+			Party.SpellBuffs[16].ExpireTime=math.max(Game.Time+const.Hour, Party.SpellBuffs[16].ExpireTime)
+			Party.SpellBuffs[16].Power=math.max(2,Party.SpellBuffs[16].Power)
+			Party.SpellBuffs[16].Skill=math.max(1,Party.SpellBuffs[16].Skill)
+		end
+		
 		mawRefresh("all")
 	end
 	
