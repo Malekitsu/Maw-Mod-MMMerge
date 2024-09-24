@@ -116,16 +116,6 @@ function sortInventory(all)
 		end
 		vars.alchemyPlayer=vars.alchemyPlayer or -1
 		table.sort(itemList, function(a, b)
-			-- Custom function to find index of an item in alchemyItemsOrder
-			local function getIndexInOrder(number)
-				for index, value in ipairs(alchemyItemsOrder) do
-					if value == number then
-						return index
-					end
-				end
-				return nil -- Return nil if the item is not found
-			end
-
 			-- Special sorting for items with number >= 220 and < 300
 			if vars.alchemyPlayer>=0 then
 				if (a["Number"] >= 220 and a["Number"] < 300) or (b["Number"] >= 220 and b["Number"] < 300) then
@@ -138,8 +128,14 @@ function sortInventory(all)
 				end
 
 				-- Sorting according to alchemyItemsOrder
-				local indexA = getIndexInOrder(a["Number"])
-				local indexB = getIndexInOrder(b["Number"])
+				local indexA = table.find(alchemyItemsOrder,a["Number"])
+				local indexB = table.find(alchemyItemsOrder,b["Number"])
+				if indexA and a.Number<=1060 and a.Number>1050 and a.BonusStrength==0 then
+					indexA=indexA+10
+				end
+				if indexB and b.Number<=1060 and b.Number>1050 and b.BonusStrength==0 then
+					indexB=indexB+10
+				end
 				if indexA and indexB then -- If both items are in the list
 					return indexA < indexB
 				elseif indexA or indexB then -- If only one item is in the list, it goes first
@@ -283,16 +279,6 @@ function sortMultibag()
 		end
 		vars.alchemyPlayer=vars.alchemyPlayer or -1
 		table.sort(itemList, function(a, b)
-			-- Custom function to find index of an item in alchemyItemsOrder
-			local function getIndexInOrder(number)
-				for index, value in ipairs(alchemyItemsOrder) do
-					if value == number then
-						return index
-					end
-				end
-				return nil -- Return nil if the item is not found
-			end
-
 			-- Special sorting for items with number >= 220 and < 300
 			if vars.alchemyPlayer>=0 then
 				if (a["Number"] >= 220 and a["Number"] < 300) or (b["Number"] >= 220 and b["Number"] < 300) then
@@ -305,8 +291,14 @@ function sortMultibag()
 				end
 
 				-- Sorting according to alchemyItemsOrder
-				local indexA = getIndexInOrder(a["Number"])
-				local indexB = getIndexInOrder(b["Number"])
+				local indexA = table.find(alchemyItemsOrder,a["Number"])
+				local indexB = table.find(alchemyItemsOrder,b["Number"])
+				if indexA and a.Number<=1060 and a.Number>1050 and a.BonusStrength==0 then
+					indexA=indexA+10
+				end
+				if indexB and b.Number<=1060 and b.Number>1050 and b.BonusStrength==0 then
+					indexB=indexB+10
+				end
 				if indexA and indexB then -- If both items are in the list
 					return indexA < indexB
 				elseif indexA or indexB then -- If only one item is in the list, it goes first
@@ -534,16 +526,6 @@ function gigaChadSort()
 	end
 	
 	table.sort(itemList, function(a, b)
-		-- Custom function to find index of an item in alchemyItemsOrder
-		local function getIndexInOrder(number)
-			for index, value in ipairs(alchemyItemsOrder) do
-				if value == number then
-					return index
-				end
-			end
-			return nil -- Return nil if the item is not found
-		end
-
 		-- Special sorting for items with number >= 220 and < 300
 		if vars.alchemyPlayer>=0 then
 			if (a["Number"] >= 220 and a["Number"] < 300) or (b["Number"] >= 220 and b["Number"] < 300) then
@@ -556,8 +538,14 @@ function gigaChadSort()
 			end
 
 			-- Sorting according to alchemyItemsOrder
-			local indexA = getIndexInOrder(a["Number"])
-			local indexB = getIndexInOrder(b["Number"])
+			local indexA = table.find(alchemyItemsOrder,a["Number"])
+			local indexB = table.find(alchemyItemsOrder,b["Number"])
+			if indexA and a.Number<=1060 and a.Number>1050 and a.BonusStrength==0 then
+				indexA=indexA+10
+			end
+			if indexB and b.Number<=1060 and b.Number>1050 and b.BonusStrength==0 then
+				indexB=indexB+10
+			end
 			if indexA and indexB then -- If both items are in the list
 				return indexA < indexB
 			elseif indexA or indexB then -- If only one item is in the list, it goes first
