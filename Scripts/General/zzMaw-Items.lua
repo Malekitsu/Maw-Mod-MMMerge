@@ -1075,7 +1075,7 @@ function events.GameInitialized2()
 	itemStatName[15] = StrColor(200, 200, 255, "Mind Resistance")
 	itemStatName[16] = StrColor(255, 192, 203, "Body Resistance")
 	itemStatName[17] = StrColor(255,255,153, "Alchemy skill")
-	itemStatName[18] = StrColor(255,255,153, "Stealing skill")
+	itemStatName[18] = StrColor(255,255,153, "Repair skill")
 	itemStatName[19] = StrColor(255,255,153, "Disarm skill")
 	itemStatName[20] = StrColor(255,255,153, "ID Item skill")
 	itemStatName[21] = StrColor(255,255,153, "ID Monster skill")
@@ -2093,7 +2093,7 @@ end
 
 local bonusBaseEnchantSkill={
 	[17]=const.Skills.Alchemy,
-	[18]=const.Skills.Stealing,
+	[18]=const.Skills.Repair,
 	[19]=const.Skills.DisarmTraps,
 	[20]=const.Skills.IdentifyItem,
 	[21]=const.Skills.IdentifyMonster,
