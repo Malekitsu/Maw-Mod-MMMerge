@@ -1346,7 +1346,7 @@ function events.Action(t)
 end
 ]]
 function events.Tick()
-	if Game.CurrentScreen==7 then
+	if Game.CurrentScreen==7 or Game.CurrentScreen==15 then
 		if Game.CurrentPlayer<0 or Game.CurrentPlayer>Party.High then return end
 		local pl=Party[Game.CurrentPlayer]
 		local race=Game.CharacterPortraits[Party[Game.CurrentPlayer].Face].Race
