@@ -844,10 +844,11 @@ function checkbonus(enchantNumber, playerIndex)
 	return skillBonus
 end
 
+sharedSkills={0,1,2,3,4,5,6,7,12,13,14,15,16,17,18,19,20,21,22,33}
 function events.Action(t)
 	if t.Action==121 then
 		vars.checkSoloMastery=true --makes skills to be automatically learned if solo
-		if t.Param>=12 and t.Param<=22 then
+		if table.find(sharedSkills, t.Param) then
 			t.Handled=false
 			pl=Party[Game.CurrentPlayer]
 			local currentCost=SplitSkill(pl.Skills[t.Param])+1
@@ -856,8 +857,8 @@ function events.Action(t)
 			end
 			--calculate actual cost
 			local n=1
-			for i=1,11 do
-				local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[11+i])
+			for i=1,#sharedSkills do
+				local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[sharedSkills[i]])
 				if s>=currentCost then
 					n=n+1
 				end
@@ -903,6 +904,90 @@ function events.Action(t)
 		]]
 	end
 end
+function events.LoadMap()
+	if not vars.weaponSkillRefunded then
+		vars.weaponSkillRefunded=true
+		for i=0, Party.High do
+			local p=Party[i]
+			if table.find(shamanClass, p.Class) or table.find(seraphClass, p.Class) or table.find(dkClass, p.Class) then
+				goto continue
+			end
+			refund1=0
+			refund2=0
+			for id=1,#sharedSkills do
+				local skill,mastery=p.Skills[sharedSkills[id]]
+				oldSkill=oldSkill or {}
+				oldSkill[sharedSkills[id]]=skill
+			end
+			--reset mastery
+			for i=1,#sharedSkills do
+				p.Skills[sharedSkills[i]]=SplitSkill(p.Skills[sharedSkills[i]])
+			end	
+			for id=1,#sharedSkills do
+				local skill=SplitSkill(p.Skills[sharedSkills[id]])
+				if sharedSkills[id]>=12 and sharedSkills[id]<=22 then
+					local lastSkill=2
+					while lastSkill>1 do
+						maxSkill=0
+						count=1	
+						for v=12,22 do
+							if p.Skills[v]>maxSkill then
+								maxSkill = p.Skills[v]
+								maxIndex=v
+								count=1
+							elseif p.Skills[v]==maxSkill then
+								count=count+1
+							end
+						end
+						lastSkill=maxSkill
+						if lastSkill>1 then
+							refund1=refund1+math.ceil(maxSkill/count)
+							p.Skills[maxIndex]=p.Skills[maxIndex]-1
+						end
+					end
+				else
+					refund1=refund1+math.max(skill*(skill+1)/2-1,0)
+				end
+			end
+			for id=1,#sharedSkills do
+				p.Skills[sharedSkills[id]]=oldSkill[sharedSkills[id]]
+			end
+			--reset mastery
+			for i=1,#sharedSkills do
+				p.Skills[sharedSkills[i]]=SplitSkill(p.Skills[sharedSkills[i]])
+			end	
+			--now do again with rework and calculate difference
+			for id=1,#sharedSkills do
+				local skill=SplitSkill(p.Skills[sharedSkills[id]])
+				local lastSkill=2
+				while lastSkill>1 do
+					maxSkill=0
+					count=1	
+					for v=1,#sharedSkills do
+						if p.Skills[sharedSkills[v]]>maxSkill then
+							maxSkill = p.Skills[sharedSkills[v]]
+							maxIndex=sharedSkills[v]
+							count=1
+						elseif p.Skills[sharedSkills[v]]==maxSkill then
+							count=count+1
+						end
+					end
+					lastSkill=maxSkill
+					if lastSkill>1 then
+						refund2=refund2+math.ceil(maxSkill/count)
+						p.Skills[maxIndex]=p.Skills[maxIndex]-1
+					end
+				end
+			end
+			for id=1,#sharedSkills do
+				p.Skills[sharedSkills[id]]=oldSkill[sharedSkills[id]]
+			end
+			p.SkillPoints=p.SkillPoints+(refund1-refund2)
+			::continue::
+		end
+	end
+end
+
 --plate&shield cover
 --change target
 function events.PlayerAttacked(t)
