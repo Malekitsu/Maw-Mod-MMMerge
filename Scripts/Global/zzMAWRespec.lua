@@ -53,19 +53,24 @@ function RespecSkills(npcID)
 	local refund=0
 	local spentOnAlchemy=0
 	local p=Party[id]
+	
+	local shared=sharedSkills
+	if table.find(shamanClass, p.Class) or table.find(seraphClass, p.Class) or table.find(dkClass, p.Class) then
+		shared={12,13,14,15,16,17,18,19,20,21,22}
+	end
 	for i=0, p.Skills.High do
 		local skill=SplitSkill(p.Skills[i])
 		if skill>1 and i~=const.Skills.Alchemy then
-			if i>=12 and i<=23 then
+			if table.find(sharedSkills, i) then
 				local lastSkill=2
 				--reset mastery
-				for i=12,20 do
+				for i=1,#sharedSkills do
 					p.Skills[i]=SplitSkill(p.Skills[i])
 				end	
 				while lastSkill>1 do
 					maxSkill=0
 					count=1	
-					for v=12,20 do
+					for v=1,#sharedSkills do
 						if p.Skills[v]>maxSkill then
 							maxSkill = p.Skills[v]
 							maxIndex=v
