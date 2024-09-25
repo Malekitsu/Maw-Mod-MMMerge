@@ -757,7 +757,7 @@ function events.PickCorpse(t)
 		end
 		local lvl=math.max(basetable[lvlID].Level, mapLevels[name].Low)
 		local originalValue=math.min(mon.TreasureItemPercent,50)
-		mon.TreasureItemPercent= math.ceil(mon.Level^0.5*(1+tier)*0.5 + originalValue*0.5)
+		mon.TreasureItemPercent= math.ceil(mon.Level^0.5*(1+tier)*0.5 + originalValue*0.3)
 		
 		if vars.Mode==2 then
 			mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.5)
@@ -1798,6 +1798,9 @@ function events.BuildMonsterInformationBox(t)
 			bonusDamage=math.max((lvl^0.88-BLevel[i]^0.88),0)
 			
 			dmgMult=(levelMult/9+1.15)*(1+(levelMult/200))
+			if spellId==6 or spellId==97 then
+				dmgMult=dmgMult/2
+			end
 			--damageType
 			damageType=spellToDamageKind[math.ceil(mon.Spell/11)]
 			if not damageType then
