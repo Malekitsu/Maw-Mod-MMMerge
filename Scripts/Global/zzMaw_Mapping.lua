@@ -42,12 +42,6 @@ function events.DoBadThingToPlayer(t)
 		Game.ShowStatusText("Resistance Ignored")
 	end
 end
-function events.MonsterKilled(mon)
-	if getMapAffixPower(9) and math.random()<getMapAffixPower(9)/100 then
-		pseudoSpawnpoint{monster = mon.Id,  x = mon.X, y = mon.Y, z = mon.Z, count = 1, powerChances = {55, 30, 15}, radius = 128, group = 2,}
-	end
-	
-end
 function events.Tick()
 	if getMapAffixPower(11) then
 		monLocation=monLocation or {}
