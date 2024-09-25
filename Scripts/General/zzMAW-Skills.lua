@@ -857,8 +857,12 @@ function events.Action(t)
 			end
 			--calculate actual cost
 			local n=1
-			for i=1,#sharedSkills do
-				local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[sharedSkills[i]])
+			local shared=sharedSkills
+			if table.find(shamanClass, pl.Class) or table.find(seraphClass, pl.Class) or table.find(dkClass, pl.Class) then
+				shared={12,13,14,15,16,17,18,19,20,21,22}
+			end
+			for i=1,#shared do
+				local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[shared[i]])
 				if s>=currentCost then
 					n=n+1
 				end
