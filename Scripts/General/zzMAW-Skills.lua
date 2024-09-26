@@ -844,7 +844,7 @@ function checkbonus(enchantNumber, playerIndex)
 	return skillBonus
 end
 
-sharedSkills={0,1,2,3,4,5,6,7,12,13,14,15,16,17,18,19,20,21,22,33}
+sharedSkills={0,1,2,3,4,5,6,7,12,13,14,15,16,17,18,19,20,21,22}
 function events.Action(t)
 	if t.Action==121 then
 		vars.checkSoloMastery=true --makes skills to be automatically learned if solo
