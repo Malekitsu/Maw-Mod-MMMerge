@@ -764,6 +764,9 @@ function events.CalcDamageToPlayer(t)
 		end
 		local bonus=math.max((levelMult^0.88-BLevel[data.Monster.Id]^0.88),0)
 		dmgMult=(levelMult/9+1.15)*(1+(levelMult/200))
+		if data.Object.Spell==6 or data.Object.Spell==97 then
+			dmgMult=dmgMult/2
+		end
 		t.Damage=(t.Result+bonus)*dmgMult
 	end
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
@@ -802,18 +805,18 @@ function events.CalcDamageToPlayer(t)
 	--Hard
 	if Game.BolsterAmount==150 then
 		if data and data.Monster then
-			t.Result=t.Result*(totalLevel[data.Monster.Id]/450+1.12)
+			t.Result=t.Result*(totalLevel[data.Monster.Id]/300+1.12)
 		end
 	end
 	--Hell
 	if Game.BolsterAmount==200 then
 		if data and data.Monster then
-			t.Result=t.Result*(totalLevel[data.Monster.Id]/300+1.25)
+			t.Result=t.Result*(totalLevel[data.Monster.Id]/200+1.25)
 		end
 	end
 	if Game.BolsterAmount==300 then
 		if data and data.Monster then
-			t.Result=t.Result*(totalLevel[data.Monster.Id]/150+1.5)
+			t.Result=t.Result*(totalLevel[data.Monster.Id]/100+1.5)
 		elseif ((t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1) then --drown and fall
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
@@ -850,7 +853,7 @@ function events.CalcDamageToPlayer(t)
 	end
 	if vars.Mode==2 then
 		if data and data.Monster then
-			t.Result=t.Result*(totalLevel[data.Monster.Id]/75+2)
+			t.Result=t.Result*(totalLevel[data.Monster.Id]/50+2)
 		elseif (t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1 then --drown and fall
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
