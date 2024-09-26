@@ -228,18 +228,18 @@ function recalculateMawMonster()
 				end
 				--Hard
 				if Game.BolsterAmount==150 then
-					hpMult=hpMult*1.4
+					hpMult=hpMult*1.5*(1+mapvars.uniqueMonsterLevel[i]/300)
 				end
 				--Hell
 				if Game.BolsterAmount==200 then
-					hpMult=hpMult*1.8
+					hpMult=hpMult*2*(1+mapvars.uniqueMonsterLevel[i]/200)
 				end
 				--Nightmare
 				if Game.BolsterAmount==300 then
-					hpMult=hpMult*3
+					hpMult=hpMult*2.5*(1+mapvars.uniqueMonsterLevel[i]/100)
 				end
 				if Game.BolsterAmount==600 then
-					hpMult=hpMult*3.33*(1+mapvars.uniqueMonsterLevel[i]/75)
+					hpMult=hpMult*3*(1+mapvars.uniqueMonsterLevel[i]/50)
 				end
 				HP=HP*hpMult
 				
@@ -575,18 +575,18 @@ function recalculateMonsterTable()
 		end
 		--Hard
 		if Game.BolsterAmount==150 then
-			hpMult=hpMult*1.4
+			hpMult=hpMult*1.5*(1+totalLevel[i]/300)
 		end
 		--Hell
 		if Game.BolsterAmount==200 then
-			hpMult=hpMult*1.8
+			hpMult=hpMult*2*(1+totalLevel[i]/200)
 		end
 		--Nightmare
 		if Game.BolsterAmount==300 then
-			hpMult=hpMult*3
+			hpMult=hpMult*2.5*(1+totalLevel[i]/100)
 		end
 		if Game.BolsterAmount==600 then
-			hpMult=hpMult*3.33*(1+totalLevel[i]/75)
+			hpMult=hpMult*3*(1+totalLevel[i]/50)
 		end
 		
 		HPtable[i]=HPtable[i]*hpMult
@@ -1731,16 +1731,16 @@ function events.BuildMonsterInformationBox(t)
 		diff=0.4
 	end
 	if Game.BolsterAmount==150 then
-		diff=1.12+math.round(totalLevel[mon.Id])/450
+		diff=1.12+math.round(totalLevel[mon.Id])/300
 	end
 	if Game.BolsterAmount==200 then
-		diff=1.25+math.round(totalLevel[mon.Id])/300
+		diff=1.25+math.round(totalLevel[mon.Id])/200
 	end
 	if Game.BolsterAmount==300 then
-		diff=1.5+math.round(totalLevel[mon.Id])/150
+		diff=1.5+math.round(totalLevel[mon.Id])/100
 	end
 	if vars.Mode==2 then
-		diff=2+math.round(totalLevel[mon.Id])/75
+		diff=2+math.round(totalLevel[mon.Id])/50
 	end
 	if getMapAffixPower(1) then
 		diff=diff*(1+getMapAffixPower(1)/100)
@@ -2798,8 +2798,8 @@ end
 
 function events.AfterLoadMap()
 	if Game.TransportLocations[0].Tuesday then
-		z1()
-		ClearConsoleEvents()
+		--z1()
+		--ClearConsoleEvents()
 		if Map:IsOutdoor() and Map.OutdoorLastRefillDay>math.ceil(Game.Time/const.Day) then
 			Map.OutdoorLastRefillDay=math.ceil(Game.Time/const.Day)
 		end
