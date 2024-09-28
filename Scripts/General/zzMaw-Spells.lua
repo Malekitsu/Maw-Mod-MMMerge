@@ -1626,7 +1626,8 @@ function ascension()
 				for i=1,4 do
 					Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m)
 					if elementalist then
-						Game.Spells[num]["SpellPoints" .. masteryName[i]]=(Game.Spells[num]["SpellPoints" .. masteryName[i]]+vars.eleStacks[id])*(1+vars.eleStacks[id]*0.075)
+						local baseCost=math.round((spellCost[num][masteryName[i]]+vars.eleStacks[id])*(1+s*0.125)*1.5^(ascensionLevel)*(1-0.125*m))
+						Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.round(baseCost*(1+vars.eleStacks[id]*0.075))
 					end
 				end
 			else
