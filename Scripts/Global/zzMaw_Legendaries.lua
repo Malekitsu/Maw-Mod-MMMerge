@@ -49,9 +49,39 @@ end
 
 --[11]="Killing a monster will recover you action time",
 function events.CalcDamageToMonster(t)
+	
 	local id=t.PlayerIndex
-	--[17]="Your hits will deal 1% of current monster HP health (0.4% for AoE, multi-hit spells and arrows)",
 	local data=WhoHitMonster()
+	
+	--weapon enchants	
+	local fireAuraDamage=0
+	local fireRes=t.Monster.Resistances[0]%1000
+	if data and not data.Object and t.DamageKind==4 then
+		for i=0,1 do
+			local it=data.Player:GetActiveItem(i)
+			local damage=calcFireAuraDamage(pl, it, fireRes)
+			if damage then
+				fireAuraDamage=fireAuraDamage+damage
+			end
+		end
+	elseif data.Object and data.Spell<133 and data.Spell>0 then --spells
+		for i=0,2 do
+			local it=data.Player:GetActiveItem(i)
+			local damage=calcFireAuraDamage(pl, it, fireRes)
+			if damage and damage>fireAuraDamage then
+				fireAuraDamage=damage
+			end
+		end
+	elseif data and data.Object and (data.Object.Spell==133 or data.Spell==135) then --bow/blasters
+		local it=data.Player:GetActiveItem(2)
+		local damage=calcFireAuraDamage(pl, it, fireRes)
+		if damage and damage>fireAuraDamage then
+			fireAuraDamage=damage
+		end
+	end
+	t.Result=t.Result+fireAuraDamage
+	
+	--[17]="Your hits will deal 1% of current monster HP health (0.4% for AoE, multi-hit spells and arrows)",
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 17) then
 		if t.Result>0 and ((data and data.Object==nil and t.DamageKind==4) or (data and data.Object)) then
 			local dmg=t.Monster.HP*0.02*2^(math.floor(t.Monster.Resistances[0]/1000))
