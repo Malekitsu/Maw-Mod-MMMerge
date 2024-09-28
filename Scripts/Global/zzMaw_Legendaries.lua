@@ -56,7 +56,7 @@ function events.CalcDamageToMonster(t)
 	--weapon enchants	
 	local fireAuraDamage=0
 	local fireRes=t.Monster.Resistances[0]%1000
-	if data and not data.Object and t.DamageKind==4 then
+	if data and data.Player and not data.Object and t.DamageKind==4 then
 		for i=0,1 do
 			local it=data.Player:GetActiveItem(i)
 			local damage=calcFireAuraDamage(pl, it, fireRes)
