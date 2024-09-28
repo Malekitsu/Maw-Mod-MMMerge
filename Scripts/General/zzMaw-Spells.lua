@@ -2606,6 +2606,7 @@ if buffRework then
 
 	buffSpell={
 	[3]= {["Cost"]=60, ["Sound"]=10020, ["PartyBuff"]=6},--fire res
+	[4]= {["Cost"]=90, ["Sound"]=10040,},				--fire aura
 	[14]={["Cost"]=60, ["Sound"]=11020,["PartyBuff"]=0},--air res
 	[25]={["Cost"]=60, ["Sound"]=12020,["PartyBuff"]=17},--water res
 	[36]={["Cost"]=60, ["Sound"]=13020,["PartyBuff"]=4},--earth res
@@ -2614,19 +2615,20 @@ if buffRework then
 	[5]= {["Cost"]=120, ["Sound"]=10040,["PartyBuff"]=8},--haste
 	[8]= {["Cost"]=40, ["Sound"]=10070,["PartyBuff"]=10},--immolation
 	[17]={["Cost"]=75, ["Sound"]=11050,["PartyBuff"]=14},--shield
-	[28]={["Cost"]=150, ["Sound"]=10070,},--empower magic
+	[28]={["Cost"]=150, ["Sound"]=10070,},				--empower magic
 	[38]={["Cost"]=75, ["Sound"]=13040,["PartyBuff"]=15},--stoneskin
 	[46]={["Cost"]=75, ["Sound"]=14010,["SingleBuff"]=1},--bless
 	[47]={["Cost"]=75, ["Sound"]=14020,["SingleBuff"]=4},--fate
 	[50]={["Cost"]=120, ["Sound"]=14050,["SingleBuff"]=11},--preservation
 	[51]={["Cost"]=120, ["Sound"]=14060,["PartyBuff"]=9},--Heroism
-	[56]={["Cost"]=120, ["Sound"]=15020,},--Meditation
+	[56]={["Cost"]=120, ["Sound"]=15020,},				--Meditation
 	[71]={["Cost"]=120, ["Sound"]=16040,["SingleBuff"]=12},--Regeneration
 	[73]={["Cost"]=75, ["Sound"]=16060,["SingleBuff"]=6},--Hammerhands
 	[75]={["Cost"]=180,["Sound"]=16080,["PartyBuff"]=13},--Protection from magic
 	[83]={["Cost"]=200,["Sound"]=17050,["PartyBuff"]=2},--day of the gods
 	[85]={["Cost"]=150,["Sound"]=17070,["MultiBuff"]={6,0,17,4,12,1}},--day of Protection
 	[86]={["Cost"]=300,["Sound"]=17080,["MultiBuff"]={8,14,15}, ["SingleBuff"]=4},--hour of power
+	[91]={["Cost"]=150,["Sound"]=18020,},				--vampiric aura
 	[95]={["Cost"]=10,["Sound"]=18060,["SingleBuff"]=10},--pain reflection
 	}
 	utilitySpell={
@@ -2638,7 +2640,7 @@ if buffRework then
 	[124]={["Cost"]=20, ["Sound"]=21020, ["PartyBuff"]=7},--fly
 	}
 
-	buffSpellList={1,3,12,14,21,25,27,28,36,56,58,69,5,8,17,38,46,47,50,51,71,73,75,83,85,86,95,124}
+	buffSpellList={1,3,4,12,14,21,25,27,28,36,56,58,69,5,8,17,38,46,47,50,51,71,73,75,83,85,86,91,95,124}
 	utilityBuffs={16,19,11,18}
 	
 	mawPartyBuffList={6,0,17,4,12,1,8,10,14,15,9,13,2,16,19,18}
@@ -2985,6 +2987,12 @@ if buffRework then
 		local bf=buffPower[id]
 		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Fire Resistance and Intellect by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
 		
+		--fire aura
+		local id=4
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = string.format("Causes your party weapons to burn with a magical fire, giving the weapons fire enchant, on top of any other enchants")
+		
 		--air resistance
 		local id=14
 		local sp=Game.SpellsTxt[id]
@@ -3112,6 +3120,13 @@ if buffRework then
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
 		sp.Description = string.format("Reserve a percentage of your mana.\nWhen a monster hits a character with Pain Reflection active, the monster takes damage equal to what it inflicted on the character.")
+		
+		--vampiric aura
+		local id=91
+		local sp=Game.SpellsTxt[id]
+		local bf=buffPower[id]
+		sp.Description = "Enchants party weapons with the Vampiric ability.  Damage inflicted on monsters will be given to the weapon's wielder as extra hit points, up to his or her normal hit point maximum."
+		sp.Name="Vampiric Aura"
 		
 		--Torch
 		local id=1
