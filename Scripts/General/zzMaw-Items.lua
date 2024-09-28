@@ -1558,8 +1558,8 @@ end
 --ARTIFACTS REWORK
 --------------------------------------
 --Increase Base Stats of weapons (handled in line 210)
-artWeap1h={500,501,502,503,504,506,507,508,509,510,512,523,524,526,527,528,529,538,539,542,1302,1303,1304,1305,1308,1310,1311,1312,1316,1319,1328,1329,1330,1333,1340,1342,1343,1344,1345,1353,1354,2020,2021,2023,2025,2035,2036,2037,2038,2040}
-artWeap2h={505,511,525,530,540,541,1309,1320,1351,2022,2024,2039}
+artWeap1h={500,501,502,503,504,506,507,508,509,510,512,523,524,526,527,528,529,538,539,542,1302,1303,1304,1305,1308,1310,1311,1312,1316,1319,1328,1329,1330,1333,1340,1342,1343,1344,1345,1353,1354,2020,2021,2023,2025,2035,2036,2037,2038,2040,1666,866}
+artWeap2h={505,511,525,530,540,541,1309,1320,1351,2022,2024,2039,1667,867}
 artArmors={513,514,515,516,517,518,520,522,533,534,1306,1307,1313,1314,1318,1321,1322,1323,1324,1327,1331,1332,1334,1335,1336,1337,1346,1349,1350,1352,2026,2027,2028,2030,2031,2041,2042,2043,2045,2046}
 
 function events.GameInitialized2()
@@ -1619,9 +1619,9 @@ end
 --------------------------------
 --ARTIFACTS BASE STATS SCALING--
 --------------------------------
-
+ancientWeapons={866,867,1666,1667}
 function events.BuildItemInformationBox(t)
-	if (t.Item.Number>=500 and t.Item.Number<=543) or (t.Item.Number>=1302 and t.Item.Number<=1354) or (t.Item.Number>=2020 and t.Item.Number<=2049) then 
+	if (t.Item.Number>=500 and t.Item.Number<=543) or (t.Item.Number>=1302 and t.Item.Number<=1354) or (t.Item.Number>=2020 and t.Item.Number<=2049) or table.find(ancientWeapons,t.Item.Number) then 
 		if t.Type then
 			local id=Game.CurrentPlayer
 			if id==-1 then
@@ -2083,7 +2083,7 @@ function events.GameInitialized2()
         if (txt[i].Skill >= 8 and txt[i].Skill <= 11) or txt[i].Skill == 40 then
             -- Armors
             referenceAC[i] = txt[i + lookup].Mod2 + txt[i + lookup].Mod1DiceCount
-        elseif txt[i].Skill <= 6 or txt[i].Skill==39 then
+        elseif txt[i].Skill <= 7 or txt[i].Skill==39 then
             -- Weapons
             referenceWeaponAttack[i] = txt[i + lookup].Mod2
             referenceWeaponSides[i] = txt[i + lookup].Mod1DiceSides
@@ -2228,7 +2228,7 @@ function itemStats(index)
 
 		
 		--weapons
-		if txt.Skill <= 6 or txt.Skill==39 then
+		if txt.Skill <= 7 or txt.Skill==39 then
 			local bonus = txt.Mod2
 			local bonus2 = referenceWeaponAttack[it.Number]
 			local bonusATK
