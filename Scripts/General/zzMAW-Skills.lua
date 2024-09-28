@@ -200,6 +200,10 @@ function events.GetAttackDelay(t)
 			local it=t.Player:GetActiveItem(i)
 			if it then
 				local skill=it:T().Skill
+				if skill==7 then
+					t.Result=40
+					return
+				end
 				if skill<8 then
 					speed[i]=getItemRecovery(it, t.Player.LevelBase)
 					if table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number) then
