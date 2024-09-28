@@ -25,7 +25,7 @@ end
 baseRecovery =
 {
 	[const.Skills.Bow] = 100,
-	[const.Skills.Blaster] = 50,
+	[const.Skills.Blaster] = 40,
 	[const.Skills.Staff] = 120,
 	[const.Skills.Axe] = 140,
 	[const.Skills.Sword] = 80,
