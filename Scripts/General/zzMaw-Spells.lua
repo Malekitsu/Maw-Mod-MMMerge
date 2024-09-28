@@ -1376,6 +1376,7 @@ function events.CalcSpellDamage(t)
 	local data=WhoHitMonster()
 	if data and data.Player then
 		local s,m = SplitSkill(data.Player.Skills[const.Skills.Learning])
+		local id=data.Player:GetIndex()
 		if table.find(elementalistClass, data.Player.Class) then
 			s=0
 			m=4
@@ -1384,12 +1385,14 @@ function events.CalcSpellDamage(t)
 				s=s+skill
 			end
 			s=s/4
-			local id=data.Player:GetIndex()
 			vars.eleStacks=vars.eleStacks or {}
 			vars.eleStacks[id]=vars.eleStacks[id] or 0
-			s=s+vars.eleStacks[id]
 		end
 		diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, t.Spell, data.Player:GetIndex())
+		if table.find(elementalistClass, data.Player.Class) then
+			diceMax=math.round(diceMax*(1+vars.eleStacks[id]*0.1))
+			damageAdd=math.round(damageAdd*(1+vars.eleStacks[id]*0.1))
+		end
 	end
 	--calculate
 	if t.Spell>1 and t.Spell<132 then
@@ -1602,7 +1605,10 @@ function ascension()
 		local level=pl.Skills[const.Skills.Learning]
 		lastLevel=level
 		local s,m = SplitSkill(level)
+		local elementalist=false
+		local id=pl:GetIndex()
 		if table.find(elementalistClass, pl.Class) then
+			elementalist=true
 			s=0
 			m=4
 			for i=12,15 do
@@ -1610,10 +1616,8 @@ function ascension()
 				s=s+skill
 			end
 			s=s/4
-			local id=pl:GetIndex()
 			vars.eleStacks=vars.eleStacks or {}
 			vars.eleStacks[id]=vars.eleStacks[id] or 0
-			s=s+vars.eleStacks[id]
 		end
 		for v=1,#spells do 
 			num=spells[v]
@@ -1621,6 +1625,9 @@ function ascension()
 			if ascensionLevel>=1 then
 				for i=1,4 do
 					Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m)
+					if elementalist then
+						Game.Spells[num]["SpellPoints" .. masteryName[i]]=(Game.Spells[num]["SpellPoints" .. masteryName[i]]+vars.eleStacks[id])*(1+vars.eleStacks[id]*0.075)
+					end
 				end
 			else
 				for i=1,4 do
