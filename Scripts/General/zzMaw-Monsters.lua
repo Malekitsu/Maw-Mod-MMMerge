@@ -2286,7 +2286,7 @@ function events.GameInitialized2() --to make the after all the other code
 			skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
 			if skill=="Summoner" then
 				if math.random()<0.4 or t.DamageKind==4 then
-					pseudoSpawnpoint{monster = math.ceil(mon.Id/3)*3-2, x = (Party.X+mon.X)/2, y = (Party.Y+mon.Y)/2, z = Party.Z, count = 1, powerChances = {75, 25, 0}, radius = 64, group = 1,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350}
+					pseudoSpawnpoint{monster = math.ceil(mon.Id/3)*3-2, x = (Party.X+mon.X)/2, y = (Party.Y+mon.Y)/2, z = Party.Z, count = 1, powerChances = {75, 25, 0}, radius = 64, group = 1,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
 				end
 			elseif skill=="Venomous" then
 				t.Player.Poison3=Game.Time
