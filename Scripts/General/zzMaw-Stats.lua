@@ -904,6 +904,8 @@ function events.Tick()
 		i=Game.CurrentPlayer 
 		if i==-1 then return end --prevent bug message
 		if buffRework then
+			currentManaPool[i]=currentManaPool[i] or 0
+			maxManaPool[i]=maxManaPool[i] or 0
 			local manaPool=math.round(currentManaPool[i]/maxManaPool[i]*1000)/10
 			Game.GlobalTxt[212]=StrColor(0,100,255,"Mana " .. manaPool .. "%")
 		end
