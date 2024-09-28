@@ -99,11 +99,11 @@ end
 function events.CalcDamageToMonster(t)
 	local data = WhoHitMonster()	
 	--luck/accuracy bonus
-	if data and data.Player and (t.DamageKind==4 or (data and data.Object and data.Object.Spell==133 and data.Object.Item and data.Object.Item.Bonus2==3 )) then
-		if data.Object==nil or data.Object.Spell==133 then
+	if data and data.Player and (t.DamageKind==4 or (data and data.Object and data.Object.Spell==133 and data.Object.Item and data.Object.Item.Bonus2==3 ) or (data and data.Spell==135)) then
+		if data.Object==nil or data.Object.Spell==133 or data.Spell==135 then
 			pl=t.Player
 			--OVERRIDE DAMAGE WITH MAW CALCULATION
-			if data.Object==nil then
+			if data.Object==nil or data.Spell==135 then
 				baseDamage=pl:GetMeleeDamageMin()
 				maxDamage=pl:GetMeleeDamageMax()
 				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
@@ -186,7 +186,7 @@ function getSpellDelay(pl,spell)
 		vars.eleStacks=vars.eleStacks or {}
 		vars.eleStacks[id]=vars.eleStacks[id] or 0
 		local stacks=vars.eleStacks[id]
-		local speedIncrease=1+stacks*0.1
+		local speedIncrease=1+stacks*0.05
 		delay=delay/speedIncrease
 	end
 	if getMapAffixPower(27) then
