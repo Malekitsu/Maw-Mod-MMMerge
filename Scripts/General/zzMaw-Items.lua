@@ -283,7 +283,7 @@ function events.ItemGenerated(t)
 		bonusCharges=(difficultyExtraPower-1)*20
 		cap1=50*((difficultyExtraPower-1)*2+1)
 		maxChargesCap=50*((difficultyExtraPower-1)*4+1)
-		if mapvars.mapAffixes then
+		if mapvars.mapAffixes or Map.Name~="d42.blv" then
 			cap1=cap1+75
 			maxChargesCap=maxChargesCap+100
 		end
@@ -294,6 +294,9 @@ function events.ItemGenerated(t)
 		bonusCap=math.floor((difficultyExtraPower-1)*10)
 		if mapvars.mapAffixes then
 			bonusCap=bonusCap+math.floor(math.min(math.max((mapvars.mapAffixes.Power-30+2)/2,0),20))  --cap at map level 700
+		end
+		if Map.Name~="d42.blv" then
+			bonusCap=bonusCap+20
 		end
 		cap2=14+bonusCap
 		partyLevel1=math.min(math.floor((partyLevel+bonus)/18),cap2) 
