@@ -740,15 +740,6 @@ function events.CalcDamageToPlayer(t)
 		t.Result=calcMawDamage(t.Player,t.DamageKind,damage,false,data.Player.LevelBase)
 		return
 	end
-	--fix for multiplayer
-	local REMOTE_OWNER_BIT = 0x800
-	local source = WhoHitPlayer()
-	if source then
-	local obj = source.Object
-		if obj and bit.And(obj.Bits, REMOTE_OWNER_BIT) > 0 then
-			return
-		end
-	end
 	
 	--apply Damage
 	--modify spell damage as it's not handled in maw-monsters
