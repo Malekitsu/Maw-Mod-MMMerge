@@ -52,7 +52,7 @@ skillAttack =
 	[const.Skills.Spear]	= {[0]=0, 1, 2, 2, 3,},
 	[const.Skills.Bow]		= {[0]=0, 3, 3, 3, 3,},
 	[const.Skills.Mace]		= {[0]=0, 1, 2, 2, 2,},
-	[const.Skills.Blaster]	= {[0]=0, 5, 10, 15, 20,},
+	[const.Skills.Blaster]	= {[0]=0, 1, 2, 3, 5,},
 	[const.Skills.Unarmed]	= {[0]=0, 2, 2, 3, 3,},
 }
 -- weapon skill recovery bonuses (by rank)
@@ -79,7 +79,7 @@ skillDamage =
 	[const.Skills.Spear]	= {[0]=0, 1, 2, 3, 3,},
 	[const.Skills.Bow]		= {[0]=0, 2, 4, 6, 8,},
 	[const.Skills.Mace]		= {[0]=0, 1, 2, 3, 3,},
-	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0,},
+	[const.Skills.Blaster]	= {[0]=0, 2, 4, 6, 8,},
 	[const.Skills.Unarmed]	= {[0]=0, 3, 4, 6, 8,},
 }
 -- weapon skill AC bonuses (by rank)
