@@ -1649,7 +1649,9 @@ function events.BuildItemInformationBox(t)
 				local itemLevel=artifactMult*100
 				baseSpeed=baseRecovery[skill] * (0.75+itemLevel/250)
 				baseSpeed=math.round(baseSpeed/10)/10
-				
+				if skill==7 then
+					baseSpeed=0.4
+				end
 				t.Type = t.Type .. "\nAttack Speed: " .. baseSpeed
 			end
 		end
@@ -1947,6 +1949,8 @@ function events.BuildItemInformationBox(t)
 			baseSpeed=baseRecovery[skill] * (0.75+itemLevel/250)
 			baseSpeed=math.round(baseSpeed/10)/10
 			
+			if skill==7 then return end --blaster fix
+			
 			t.Type = t.Type .. "\nAttack Speed: " .. baseSpeed
 		end
 	end
@@ -2229,6 +2233,12 @@ function itemStats(index)
 		
 		--weapons
 		if txt.Skill <= 7 or txt.Skill==39 then
+			
+			local mainWeapon=pl:GetActiveItem(1)
+			if not table.find(ancientWeapons, it.Number) and mainWeapon and mainWeapon:T().Skill==7 then
+				goto continue
+			end
+		
 			local bonus = txt.Mod2
 			local bonus2 = referenceWeaponAttack[it.Number]
 			local bonusATK
@@ -2316,13 +2326,15 @@ function itemStats(index)
 				local bonus=m2+m3+m4+m5+m1+m6+m7
 				armsDmg=armsDmg+bonus*mult
 			end
-			
 			--split armsmaster between main and offhand
 			local item=pl:GetActiveItem(0)
 			if item and skill ~= 5 and item:T().Skill~=8 then
 				if skill~=8 then
 					armsDmg=armsDmg/2
 				end
+			end
+			if skill==7 then
+				armsDmg=0
 			end
 			
 			local totBonus=armsDmg+add
@@ -2337,6 +2349,7 @@ function itemStats(index)
 				tab[46] = tab[46] + math.round(txt.Mod1DiceCount)+add
 				tab[47] = tab[47] + math.round(side)*txt.Mod1DiceCount+add
 			end
+			::continue::
 		end
 		
 		--skills
