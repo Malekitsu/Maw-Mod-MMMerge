@@ -1530,7 +1530,8 @@ function elementalistStacksDecay()
 			vars.eleTimer[id]=vars.eleTimer[id] or Game.Time
 			if Game.Time-vars.eleTimer[id]>const.Minute*2 then
 				vars.eleTimer[id]=Game.Time
-				vars.eleStacks[id]=math.max(math.floor(vars.eleStacks[id]*0.9),0)
+				vars.eleStacks[id]=0
+				--vars.eleStacks[id]=math.max(math.floor(vars.eleStacks[id]*0.9),0)
 			end
 		end	
 	end
