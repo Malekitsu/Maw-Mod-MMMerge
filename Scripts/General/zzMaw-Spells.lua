@@ -3144,3 +3144,26 @@ function events.GameInitialized2()
 		oldSpellTooltips[i]=Game.SpellsTxt[i].Description
 	end
 end
+
+function events.PlayerCastSpell(t)
+	if t.SpellId==const.Spells.SummonWisp then
+		local nMon=Map.Monsters.High
+		local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Light))
+		local maxSpawns=m*2-3
+		function events.Tick()
+			events.Remove("Tick",1)
+			if nMon==Map.Monsters.High then
+				local currentSummoned=0
+				for i=0, Map.Monsters.High do
+					local mon=Map.Monsters[i]
+					if mon.Id==99 and mon.HP>0 and mon.Ally==9999 then
+						currentSummoned=currentSummoned+1
+					end
+				end
+				if currentSummoned<maxSpawns then
+					pseudoSpawnpoint{monster = 97,  x = Party.X, y = Party.Y, z = Party.Z, count = 1, powerChances = {0, 0, 100}, radius = 256, group = 9999,transform = function(mon) mon.ShowOnMap = true mon.Hostile = false mon.Velocity=350 mon.Ally=9999 end}
+				end
+			end
+		end
+	end
+end
