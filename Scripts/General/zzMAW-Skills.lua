@@ -1150,7 +1150,7 @@ function MawRegen()
 	for i=0,Party.High do
 		pl=Party[i]
 		local Cond = pl:GetMainCondition()
-		if (Cond == 18 or Cond == 17 or Cond < 14) and pl.Insane==0 then
+		if (Cond == 18 or Cond == 17 or Cond < 14) and pl.Insane==0 and type(currentManaPool[i])=="number" then
 			lastSP[i]=lastSP[i] or pl.SP
 			waitSP[i]=waitSP[i] or 0
 			mult=1
