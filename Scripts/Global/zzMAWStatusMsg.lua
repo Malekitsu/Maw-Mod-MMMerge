@@ -44,6 +44,37 @@ function events.CalcDamageToMonster(t)
 				heal=math.ceil(heal)
 				t.Player.HP=math.min(fullHP,t.Player.HP+heal)
 			end
+			if buffRework and vars.mawbuff[91] then --vampiric weapon spell
+				if getBuffSkill(91)>0 then
+					heal=math.ceil(heal/2)
+					t.Player.HP=math.min(fullHP,t.Player.HP+heal)
+				end
+			end
+			local fireAuraDamage=0
+			local fireRes=t.Monster.Resistances[0]%1000
+			if data and not data.Object and t.DamageKind==4 then
+				for i=0,1 do
+					local it=t.Player:GetActiveItem(i)
+					local damage=calcFireAuraDamage(pl, it, fireRes)
+					fireAuraDamage=fireAuraDamage+damage
+				end
+			elseif data.Object and data.Spell<133 and data.Spell>0 then --spells
+				for i=0,2 do
+					local it=t.Player:GetActiveItem(i)
+					local damage=calcFireAuraDamage(pl, it, fireRes)
+					if damage and damage>fireAuraDamage then
+						fireAuraDamage=damage
+					end
+				end
+			elseif data and data.Object and (data.Object.Spell==133 or data.Spell==135) then --bow/blasters
+				local it=t.Player:GetActiveItem(2)
+				local damage=calcFireAuraDamage(pl, it, fireRes)
+				if damage>fireAuraDamage then
+					fireAuraDamage=damage
+				end
+			end
+			debug.Message(fireAuraDamage)
+			t.Result=t.Result+fireAuraDamage
 		end
 	end
 
