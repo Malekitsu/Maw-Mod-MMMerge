@@ -3551,11 +3551,11 @@ function events.BuildItemInformationBox(t)
 						end
 					end
 				end
-				if buffRework and vars.mawbuff[91] then --fire aura
-					local s, m, level=getBuffSkill(91)
-					if m>=1 then
-						t.Description=StrColor(255,255,153,"Vampiric Aura: damage done will restore player HP.\n\n") .. t.Description
-					end
+			end
+			if buffRework and vars.mawbuff[91] then --fire aura
+				local s, m, level=getBuffSkill(91)
+				if m>=1 then
+					t.Description=StrColor(255,255,153,"Vampiric Aura: damage done will restore player HP.\n\n") .. t.Description
 				end
 			end
 		end
