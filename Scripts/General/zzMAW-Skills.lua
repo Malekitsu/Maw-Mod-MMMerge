@@ -1223,6 +1223,7 @@ end
 function events.Tick()
 	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
 		--regeneration tooltip
+		if Game.CurrentPlayer<0 or Game.CurrentPlayer>Party.High then return end
 		pl=Party[Game.CurrentPlayer]
 		local FHP=pl:GetFullHP()
 		local s,m = SplitSkill(pl:GetSkill(30))
