@@ -1384,9 +1384,9 @@ enchantbonusdamage[13] = {10,10,["Type"]=8}
 enchantbonusdamage[14] = {24,24,["Type"]=8}
 enchantbonusdamage[15] = {48,48,["Type"]=8}
 enchantbonusdamage[46] = {40,80,["Type"]=0}
-
+fireAuraDamage={10,20,40,60,[0]=0}
 --calculate enchant damage
-function calcEnchantDamage(pl, enchant, maxcharges, resistance,rand)
+function calcEnchantDamage(pl, enchant, it, resistance,rand)
 	local ench=enchantbonusdamage[enchant]
 	if not ench then
 		return 0
@@ -1398,6 +1398,7 @@ function calcEnchantDamage(pl, enchant, maxcharges, resistance,rand)
 		damage=(ench[1]+ench[2])/2
 	end
 	local id=pl:GetIndex()
+	local mult=1
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
 		local str=pl:GetMight()
 		local int=pl:GetIntellect()
@@ -1406,7 +1407,7 @@ function calcEnchantDamage(pl, enchant, maxcharges, resistance,rand)
 		local mult=(1+bonusStat/1000)
 		damage=damage*mult
 	end
-	damage=damage*(1+maxcharges/20)
+	damage=damage*(1+it.MaxCharges/20)
 	damage = damage/2^(resistance%1000/100)
 	return damage
 end
@@ -1418,7 +1419,7 @@ function events.ItemAdditionalDamage(t)
 		local id=t.Player:GetIndex()
 		local index=table.find(damageKindMap,enchantbonusdamage[t.Item.Bonus2].Type)
 		local res=t.Monster.Resistances[index]
-		damage=calcEnchantDamage(t.Player, t.Item.Bonus2, t.Item.MaxCharges, res,true)
+		damage=calcEnchantDamage(t.Player, t.Item.Bonus2, t.Item, res,true)
 		local attackSpeedMult=getBaseAttackSpeed(t.Item)
 		t.Result=math.round(damage*attackSpeedMult)
 		return
@@ -3503,3 +3504,63 @@ function events.Tick()
 	Mouse.Item.MaxCharges=math.min(Mouse.Item.MaxCharges, 200)
 end
 ]]
+
+--vampiric aura and fire aura 
+fireAuraDamage={10,20,40,60,[0]=0}
+function calcFireAuraDamage(pl, it, res)
+	if buffRework and vars.mawbuff[4] then
+		local s, m, level=getBuffSkill(4)
+		local id=pl:GetIndex()
+		local mult=1+it.MaxCharges/20
+		if table.find(artWeap1h, it.Number) or table.find(artWeap2h, it.Number) then
+			mult=1+math.min(pl.LevelBase/3,3)
+		end
+		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
+			local str=pl:GetMight()
+			local int=pl:GetIntellect()
+			local pers=pl:GetPersonality()
+			local bonusStat=math.max(str,int,pers)
+			mult=mult*(1+bonusStat/1000)
+		end
+		if it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number)then
+			mult=mult*2
+		end
+		local damage=fireAuraDamage[m]*mult
+		local res=res or 0
+		local damage=damage/2^(res/100)
+		damage=math.round(damage*getBaseAttackSpeed(it))
+		return damage
+	else
+		return false
+	end
+end
+
+function events.BuildItemInformationBox(t)
+	if t.Item:T().EquipStat==0 or t.Item:T().EquipStat==1 or t.Item:T().EquipStat==2 then 
+		if t.Description then
+			if buffRework and vars.mawbuff[4] then --fire aura
+				if Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
+					local pl=Party[Game.CurrentPlayer]
+					local s, m, level=getBuffSkill(4)
+					if m>=1 then
+						local name={"Fire","Flame","Inferno","Hell",[0]=""}
+						local damage=calcFireAuraDamage(pl, t.Item, 0)
+						if damage then
+							local txt=string.format(name[m] .. " Aura: adds " .. damage .. " Damage to any attack\n\n")
+							t.Description=StrColor(255,255,153,txt) .. t.Description
+						end
+					end
+				end
+				if buffRework and vars.mawbuff[91] then --fire aura
+					local s, m, level=getBuffSkill(91)
+					if m>=1 then
+						t.Description=StrColor(255,255,153,"Vampiric Aura: damage done will restore player HP.\n\n") .. t.Description
+					end
+				end
+			end
+		end
+	end
+end	
+
+
+	
