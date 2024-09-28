@@ -1277,7 +1277,7 @@ function calcPowerVitality(pl)
 	for i=0,1 do 
 		local it=pl:GetActiveItem(i)
 		if it then
-			local dmg=calcEnchantDamage(pl, it.Bonus2, it.MaxCharges, 0, false)
+			local dmg=calcEnchantDamage(pl, it.Bonus2, it, 0, false)
 			enchantDamage=enchantDamage+dmg
 		end
 	end
@@ -1293,7 +1293,7 @@ function calcPowerVitality(pl)
 	local hitChance= (15+atk*2)/(30+atk*2+lvl)
 	local it=pl:GetActiveItem(2)
 	if it then
-		local dmg=calcEnchantDamage(pl, it.Bonus2, it.MaxCharges, 0, false)
+		local dmg=calcEnchantDamage(pl, it.Bonus2, it, 0, false)
 		enchantDamage=enchantDamage+dmg
 	end
 	local s,m=SplitSkill(pl.Skills[const.Skills.Bow])
