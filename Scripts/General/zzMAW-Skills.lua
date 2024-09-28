@@ -202,6 +202,7 @@ function events.GetAttackDelay(t)
 				local skill=it:T().Skill
 				if skill==7 then
 					t.Result=40
+					damageMultiplier[t.PlayerIndex]["Melee"]=0.4
 					return
 				end
 				if skill<8 then
