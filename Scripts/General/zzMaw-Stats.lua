@@ -229,29 +229,6 @@ function events.GetArmorClass(t)
 	end
 end
 
---intellect/personality
-function events.CalcSpellDamage(t)
-	if t.Spell==44 then
-		return 
-	end
-	local data = WhoHitMonster()
-	if data and data.Player and (data.Player.Class==10 or data.Player.Class==11 or table.find(dkClass, data.Player.Class)) then return end
-	if data and data.Player then
-		if data.Player.Class==10 or data.Player.Class==11 then return end --dragons scale off might
-		
-		local critChance, critMult, success=getCritInfo(data.Player,"spell")
-		
-		--int/pers scaling
-		local int=data.Player:GetIntellect()
-		local per=data.Player:GetPersonality()
-		local mult=math.max(int,per)/1000+1
-		t.Result=t.Result*mult
-		if success then
-			t.Result=t.Result*critMult
-			crit=true
-		end
-	end
-end
 
 
 --body building description
@@ -1226,7 +1203,7 @@ function events.Tick()
 		local i=Game.CurrentPlayer
 		if i<0 or i>Party.High then return end
 		local pl=Party[i]
-		DPS1, DPS2, DPS3, vitality=calcPowerVitality(pl)
+		DPS1, DPS2, DPS3, vitality=calcPowerVitality(pl, true)
 		--get spell and its damage
 		spellIndex = pl.AttackSpell==0 and pl.QuickSpell or pl.AttackSpell
 		
@@ -1249,7 +1226,7 @@ function events.GameInitialized2()
 	end
 end
 
-function calcPowerVitality(pl)
+function calcPowerVitality(pl, statsMenu)
 	local DPS1=0
 	local DPS2=0
 	local DPS3=0
@@ -1271,7 +1248,7 @@ function calcPowerVitality(pl)
 	local enchantDamage=0
 	for i=0,1 do 
 		local it=pl:GetActiveItem(i)
-		if it then
+		if it and it:T().EquipStat<=2 then
 			local dmg=calcEnchantDamage(pl, it, 0, false)
 			local dmg2=calcFireAuraDamage(pl, it, 0, false)
 			enchantDamage=enchantDamage+dmg+dmg2
@@ -1288,7 +1265,7 @@ function calcPowerVitality(pl)
 	local atk=pl:GetRangedAttack()
 	local hitChance= (15+atk*2)/(30+atk*2+lvl)
 	local it=pl:GetActiveItem(2)
-	if it then
+	if it and it:T().EquipStat<=2 then
 		local dmg=calcEnchantDamage(pl, it, 0, false)
 		local dmg2=calcFireAuraDamage(pl, it, 0, false)
 		enchantDamage=enchantDamage+dmg+dmg2
@@ -1312,16 +1289,7 @@ function calcPowerVitality(pl)
 			diceMin, diceMax, damageAdd = healingSpells[spellIndex].Scaling[mastery], healingSpells[spellIndex].Scaling[mastery], healingSpells[spellIndex].Base[mastery]
 		end
 		
-		for i=0,2 do 
-			local it=pl:GetActiveItem(i)
-			if it then
-				local dmg=calcEnchantDamage(pl, it, 0, false)
-				local dmg2=calcFireAuraDamage(pl, it, 0, false)
-				enchantDamage=enchantDamage+dmg+dmg2
-			end
-		end
-		power=damageAdd + skill*(diceMin+diceMax)/2+enchantDamage
-		
+		power=damageAdd + skill*(diceMin+diceMax)/2
 		intellect=pl:GetIntellect()	
 		personality=pl:GetPersonality()
 		bonus=math.max(intellect,personality)
@@ -1332,6 +1300,16 @@ function calcPowerVitality(pl)
 			critChance, critDamage=getCritInfo(pl, "spell")
 			power=power*(1+bonus/1000) 
 		end
+		
+		for i=0,2 do 
+			local it=pl:GetActiveItem(i)
+			if it and it:T().EquipStat<=2 then
+				local dmg=calcEnchantDamage(pl, it, 0, false)
+				local dmg2=calcFireAuraDamage(pl, it, 0, false)
+				enchantDamage=enchantDamage+dmg+dmg2
+			end
+		end
+		power=power+enchantDamage
 		haste=math.floor(pl:GetSpeed()/10)/100+1
 		delay=getSpellDelay(pl,spellIndex) or 100
 		DPS3=math.round(power*(1+critChance*(critDamage-1))/(delay/60))			
@@ -1377,6 +1355,23 @@ function calcPowerVitality(pl)
 	end
 	
 	vitality=math.round(fullHP/reduction)
+	if statsMenu then
+		if DPS1>9999999 then
+			DPS1=math.round(DPS1/1000000) .. "M"
+		elseif DPS1>9999 then
+			DPS1=math.round(DPS1/1000) .. "K"
+		end
+		if DPS2>9999999 then
+			DPS2=math.round(DPS2/1000000) .. "M"
+		elseif DPS2>9999 then
+			DPS2=math.round(DPS2/1000) .. "K"
+		end
+		if DPS3>9999999 then
+			DPS3=math.round(DPS3/1000000) .. "M"
+		elseif DPS3>9999 then
+			DPS3=math.round(DPS3/1000) .. "K"
+		end
+	end
 	return DPS1, DPS2, DPS3, vitality
 end
 
