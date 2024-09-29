@@ -67,9 +67,11 @@ function events.CalcDamageToMonster(t)
 	elseif data.Object and data.Spell<133 and data.Spell>0 then --spells
 		for i=0,2 do
 			local it=data.Player:GetActiveItem(i)
-			local damage=calcFireAuraDamage(pl, it, fireRes)
-			if damage and damage>fireAuraDamage then
-				fireAuraDamage=damage
+			if it then
+				local damage=calcFireAuraDamage(pl, it, fireRes)
+				if damage and damage>fireAuraDamage then
+					fireAuraDamage=damage
+				end
 			end
 		end
 	elseif data and data.Object and (data.Object.Spell==133 or data.Spell==135) then --bow/blasters
