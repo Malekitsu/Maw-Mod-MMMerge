@@ -140,8 +140,12 @@ function events.CalcDamageToMonster(t)
 		MSGdamage=MSGdamage or 0
 		MSGdamage=MSGdamage+math.ceil(t.Result)*divide
 		local msgTxt=MSGdamage
-		if msgTxt>99999 then
-			msgTxt=math.round(msgTxt/1000) .. "K"
+		if msgTxt>9999999999 then
+			msgTxt=StrColor(255,0,0,math.round(msgTxt/1000000) .. "B")
+		elseif msgTxt>9999999 then
+			msgTxt=StrColor(255,165,0,math.round(msgTxt/1000000) .. "M")
+		elseif msgTxt>9999 then
+			msgTxt=StrColor(255,255,30,math.round(msgTxt/1000) .. "K")
 		end
 		attackIsSpell=false
 		castedAoe=false
@@ -164,7 +168,7 @@ function events.CalcDamageToMonster(t)
 			shoot="inflicts"
 		end
 		if crit then
-			critMessage="(CRIT!)"
+			critMessage=StrColor(255,255,30,"(CRIT!)")
 		end
 		if t.Monster.NameId>0 then
 			monName=Game.PlaceMonTxt[t.Monster.NameId]
@@ -198,9 +202,6 @@ function events.CalcDamageToMonster(t)
 				end
 				if castedAoe then
 					msg=string.format("%s hits for a total of %s points!%s", name, msgTxt, critMessage)
-				end
-				if critMessage=="(CRIT!)" then
-					msg=StrColor(255,255,30,msg)
 				end
 				Game.ShowStatusText(msg)
 				
