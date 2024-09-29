@@ -3546,7 +3546,7 @@ function events.BuildItemInformationBox(t)
 						local name={"Fire","Flame","Inferno","Hell",[0]=""}
 						local damage=calcFireAuraDamage(pl, t.Item, 0)
 						if damage then
-							local txt=string.format(name[m] .. " Aura: adds " .. damage .. " Damage to any attack\n\n")
+							local txt=string.format(name[m] .. " Aura: adds " .. damage .. " Fire Damage to any attack\n\n")
 							t.Description=StrColor(255,255,153,txt) .. t.Description
 						end
 					end
