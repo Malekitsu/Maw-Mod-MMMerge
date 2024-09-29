@@ -686,8 +686,8 @@ function events.CalcDamageToPlayer(t)
 				end
 			end	
 		end
-		if nameIdMult and nameIdMult[data.Monster.NameId] and nameIdMult[data.Monster.NameId][data.MonsterAction+1] then
-			t.Damage=t.Damage*nameIdMult[data.Monster.NameId][data.MonsterAction+1]
+		if mapvars.nameIdMult and mapvars.nameIdMult[data.Monster.NameId] and mapvars.nameIdMult[data.Monster.NameId][data.MonsterAction+1] then
+			t.Damage=t.Damage*mapvars.nameIdMult[data.Monster.NameId][data.MonsterAction+1]
 		elseif data.MonsterAction<=1 then
 			t.Damage=t.Damage*overflowMult[data.Monster.Id][data.MonsterAction+1]
 		end
