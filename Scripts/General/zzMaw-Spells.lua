@@ -1523,16 +1523,14 @@ function events.CalcSpellDamage(t)
 	data=WhoHitMonster()
 	if data and data.Spell==44 then return end
 	if data and data.Player then
-		for i=1,2 do
+		for i=0,2 do
 			it=data.Player:GetActiveItem(i)
 			if it then
-				if spellbonusdamage[it.Bonus2] then
-					damage=calcEnchantDamage(data.Player, it, resistance, true)
-					if table.find(aoespells, t.Spell) then
-						damage=damage/2.5
-					end
-					t.Result = t.Result+damage
+				damage=calcEnchantDamage(data.Player, it, 0, true)+calcFireAuraDamage(pl, it, 0, false)
+				if table.find(aoespells, t.Spell) then
+					damage=damage/2.5
 				end
+				t.Result = t.Result+damage
 			end
 		end
 	end
