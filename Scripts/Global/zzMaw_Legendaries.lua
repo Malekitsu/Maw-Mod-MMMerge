@@ -59,9 +59,11 @@ function events.CalcDamageToMonster(t)
 	if data and not data.Object and t.DamageKind==4 then
 		for i=0,1 do
 			local it=data.Player:GetActiveItem(i)
-			local damage=calcFireAuraDamage(pl, it, fireRes)
-			if damage then
-				fireAuraDamage=fireAuraDamage+damage
+			if it then
+				local damage=calcFireAuraDamage(pl, it, fireRes)
+				if damage then
+					fireAuraDamage=fireAuraDamage+damage
+				end
 			end
 		end
 	elseif data.Object and data.Spell<133 and data.Spell>0 then --spells
