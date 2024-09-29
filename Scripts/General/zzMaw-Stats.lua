@@ -1272,8 +1272,9 @@ function calcPowerVitality(pl)
 	for i=0,1 do 
 		local it=pl:GetActiveItem(i)
 		if it then
-			local dmg=calcEnchantDamage(pl, it.Bonus2, it, 0, false)
-			enchantDamage=enchantDamage+dmg
+			local dmg=calcEnchantDamage(pl, it, 0, false)
+			local dmg2=calcFireAuraDamage(pl, it, 0, false)
+			enchantDamage=enchantDamage+dmg+dmg2
 		end
 	end
 	DPS1=math.round((dmg*(1+critChance*(critMult-1))+enchantDamage)/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Melee"])
@@ -1288,8 +1289,9 @@ function calcPowerVitality(pl)
 	local hitChance= (15+atk*2)/(30+atk*2+lvl)
 	local it=pl:GetActiveItem(2)
 	if it then
-		local dmg=calcEnchantDamage(pl, it.Bonus2, it, 0, false)
-		enchantDamage=enchantDamage+dmg
+		local dmg=calcEnchantDamage(pl, it, 0, false)
+		local dmg2=calcFireAuraDamage(pl, it, 0, false)
+		enchantDamage=enchantDamage+dmg+dmg2
 	end
 	local s,m=SplitSkill(pl.Skills[const.Skills.Bow])
 	if m>=3 then
@@ -1310,32 +1312,12 @@ function calcPowerVitality(pl)
 			diceMin, diceMax, damageAdd = healingSpells[spellIndex].Scaling[mastery], healingSpells[spellIndex].Scaling[mastery], healingSpells[spellIndex].Base[mastery]
 		end
 		
-		it=pl:GetActiveItem(1)
-		local enchantDamage=0
-		if it then
-			if spellbonusdamage[it.Bonus2] then
-				enchantDamage=(spellbonusdamage[it.Bonus2]["low"]+spellbonusdamage[it.Bonus2]["high"])/2
-				for i = 1, #aoespells do
-					if aoespells[i] == spellIndex then
-						enchantDamage=enchantDamage/2.5
-					end
-				end
-				if it.MaxCharges>0 then
-					if it.MaxCharges <= 20 then
-						mult=1+it.MaxCharges/20
-					else
-						mult=2+2*(it.MaxCharges-20)/20
-					end
-					enchantDamage=enchantDamage*mult
-				end
-				local id=pl:GetIndex()
-				if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
-					local str=pl:GetMight()
-					local int=pl:GetIntellect()
-					local pers=pl:GetPersonality()
-					local bonusStat=math.max(str,int,pers)
-					enchantDamage=enchantDamage*(1+bonusStat/1000)
-				end
+		for i=0,2 do 
+			local it=pl:GetActiveItem(i)
+			if it then
+				local dmg=calcEnchantDamage(pl, it, 0, false)
+				local dmg2=calcFireAuraDamage(pl, it, 0, false)
+				enchantDamage=enchantDamage+dmg+dmg2
 			end
 		end
 		power=damageAdd + skill*(diceMin+diceMax)/2+enchantDamage
