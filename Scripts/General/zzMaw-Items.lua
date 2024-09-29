@@ -313,7 +313,7 @@ function events.ItemGenerated(t)
 		if pseudoStr==1 then 
 			return 
 		end
-		pseudoStr=math.min(pseudoStr,20+bonusCap) --CAP CURRENTLY AT 20, 22 in doom,42 for mapping
+		pseudoStr=math.min(pseudoStr,20+bonusCap,#encStrUp, #encStrDown) --CAP CURRENTLY AT 20, 22 in doom,42 for mapping
 		roll1=math.random()
 		roll2=math.random()
 		rollSpc=math.random()
