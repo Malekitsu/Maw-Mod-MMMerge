@@ -260,8 +260,8 @@ function recalculateMawMonster()
 				atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount, extraMult1 = calcDices(oldTable.Attack1.DamageAdd,oldTable.Attack1.DamageDiceSides,oldTable.Attack1.DamageDiceCount,dmgMult)
 				atk2=mon.Attack2
 				atk2.DamageAdd, atk2.DamageDiceSides, atk2.DamageDiceCount, extraMult2 = calcDices(oldTable.Attack2.DamageAdd,oldTable.Attack2.DamageDiceSides,oldTable.Attack2.DamageDiceCount,dmgMult)
-				nameIdMult=nameIdMult or {}
-				nameIdMult[mon.NameId]={extraMult1, extraMult2}
+				mapvars.nameIdMult=mapvars.nameIdMult or {}
+				mapvars.nameIdMult[mon.NameId]={extraMult1, extraMult2}
 			end
 		end
 	end	
@@ -1746,8 +1746,8 @@ function events.BuildMonsterInformationBox(t)
 		diff=diff*(1+getMapAffixPower(1)/100)
 	end
 	local extraMult={1,1}
-	if nameIdMult and nameIdMult[mon.NameId] and nameIdMult[mon.NameId] then
-		extraMult={nameIdMult[mon.NameId][1],nameIdMult[mon.NameId][2]}
+	if mapvars.nameIdMult and mapvars.nameIdMult[mon.NameId] and mapvars.nameIdMult[mon.NameId] then
+		extraMult={mapvars.nameIdMult[mon.NameId][1],mapvars.nameIdMult[mon.NameId][2]}
 	else
 		extraMult={overflowMult[mon.Id][1],overflowMult[mon.Id][2]}
 	end
@@ -2267,8 +2267,8 @@ function generateBoss(index,nameIndex)
 	if getMapAffixPower(18) then
 		dmgMult=dmgMult*(1+getMapAffixPower(18)/100)
 	end
-	nameIdMult=nameIdMult or {}
-	nameIdMult[mon.NameId]={overflowMult[mon.Id][1]*dmgMult, overflowMult[mon.Id][2]*dmgMult}
+	mapvars.nameIdMult=mapvars.nameIdMult or {}
+	mapvars.nameIdMult[mon.NameId]={overflowMult[mon.Id][1]*dmgMult, overflowMult[mon.Id][2]*dmgMult}
 	
 	local s, m=SplitSkill(mon.SpellSkill)
 	mon.SpellSkill=JoinSkill(s*dmgMult, m)
@@ -2798,8 +2798,8 @@ end
 
 function events.AfterLoadMap()
 	if Game.TransportLocations[0].Tuesday then
-		z1()
-		ClearConsoleEvents()
+		--z1()
+		--ClearConsoleEvents()
 		if Map:IsOutdoor() and Map.OutdoorLastRefillDay>math.ceil(Game.Time/const.Day) then
 			Map.OutdoorLastRefillDay=math.ceil(Game.Time/const.Day)
 		end
