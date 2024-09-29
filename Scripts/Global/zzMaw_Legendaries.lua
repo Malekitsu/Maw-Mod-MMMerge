@@ -60,7 +60,7 @@ function events.CalcDamageToMonster(t)
 		for i=0,1 do
 			local it=data.Player:GetActiveItem(i)
 			if it then
-				local damage=calcFireAuraDamage(pl, it, fireRes)
+				local damage=calcFireAuraDamage(pl, it, fireRes, true)
 				if damage then
 					fireAuraDamage=fireAuraDamage+damage
 				end
@@ -70,7 +70,7 @@ function events.CalcDamageToMonster(t)
 		for i=0,2 do
 			local it=data.Player:GetActiveItem(i)
 			if it then
-				local damage=calcFireAuraDamage(pl, it, fireRes)
+				local damage=calcFireAuraDamage(pl, it, fireRes, true)
 				if damage and damage>fireAuraDamage then
 					fireAuraDamage=damage
 				end
@@ -78,7 +78,7 @@ function events.CalcDamageToMonster(t)
 		end
 	elseif data and data.Object and (data.Object.Spell==133 or data.Spell==135) then --bow/blasters
 		local it=data.Player:GetActiveItem(2)
-		local damage=calcFireAuraDamage(pl, it, fireRes)
+		local damage=calcFireAuraDamage(pl, it, fireRes, true)
 		if damage and damage>fireAuraDamage then
 			fireAuraDamage=damage
 		end
