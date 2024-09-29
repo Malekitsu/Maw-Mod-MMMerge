@@ -3543,9 +3543,9 @@ function calcFireAuraDamage(pl, it, res, speedMult)
 		local res=res or 0
 		local damage=damage/2^(res/100)
 		if speedMult then
-			damage=math.round(damage*getBaseAttackSpeed(it))
+			damage=damage*getBaseAttackSpeed(it)
 		end
-		return damage
+		return math.round(damage)
 	else
 		return 0
 	end
