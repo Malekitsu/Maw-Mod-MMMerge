@@ -1519,9 +1519,12 @@ spellbonusdamage[15] = {["low"]=48, ["high"]=48}
 spellbonusdamage[39] = {["low"]=40, ["high"]=80}
 
 aoespells = {6, 7, 8, 9, 10, 15, 22, 24, 32, 41, 43, 84, 93, 97, 98, 99, 123}
+
+
+--intellect/personality
 function events.CalcSpellDamage(t)
-	data=WhoHitMonster()
-	if data and data.Spell==44 then return end
+	--enchants
+	local data = WhoHitMonster()
 	if data and data.Player then
 		for i=0,2 do
 			it=data.Player:GetActiveItem(i)
@@ -1532,6 +1535,26 @@ function events.CalcSpellDamage(t)
 				end
 				t.Result = t.Result+damage
 			end
+		end
+	end
+	--int/crit scaling
+	if t.Spell==44 then
+		return 
+	end
+	if data and data.Player and (data.Player.Class==10 or data.Player.Class==11 or table.find(dkClass, data.Player.Class)) then return end
+	if data and data.Player then
+		if data.Player.Class==10 or data.Player.Class==11 then return end --dragons scale off might
+		
+		local critChance, critMult, success=getCritInfo(data.Player,"spell")
+		
+		--int/pers scaling
+		local int=data.Player:GetIntellect()
+		local per=data.Player:GetPersonality()
+		local mult=math.max(int,per)/1000+1
+		t.Result=t.Result*mult
+		if success then
+			t.Result=t.Result*critMult
+			crit=true
 		end
 	end
 end
