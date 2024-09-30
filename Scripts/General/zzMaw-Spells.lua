@@ -1529,7 +1529,7 @@ function events.CalcSpellDamage(t)
 		for i=0,2 do
 			it=data.Player:GetActiveItem(i)
 			if it then
-				damage=calcEnchantDamage(data.Player, it, 0, true)+calcFireAuraDamage(pl, it, 0, false)
+				damage=calcEnchantDamage(data.Player, it, 0, true, true, "damage")+calcFireAuraDamage(pl, it, 0, false, true, "damage")
 				if table.find(aoespells, t.Spell) then
 					damage=damage/2.5
 				end
