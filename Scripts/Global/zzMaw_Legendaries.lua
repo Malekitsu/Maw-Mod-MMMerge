@@ -60,7 +60,7 @@ function events.CalcDamageToMonster(t)
 		for i=0,1 do
 			local it=data.Player:GetActiveItem(i)
 			if it then
-				local damage=calcFireAuraDamage(pl, it, fireRes, true)
+				local damage=calcFireAuraDamage(pl, it, fireRes, true, false, "damage")
 				if damage then
 					fireAuraDamage=fireAuraDamage+damage
 				end
@@ -68,7 +68,7 @@ function events.CalcDamageToMonster(t)
 		end
 	elseif data and data.Object and (data.Object.Spell==133 or data.Spell==135) then --bow/blasters
 		local it=data.Player:GetActiveItem(2)
-		local damage=calcFireAuraDamage(pl, it, fireRes, true)
+		local damage=calcFireAuraDamage(pl, it, fireRes, true, false, "damage")
 		if damage and damage>fireAuraDamage then
 			fireAuraDamage=damage
 		end
@@ -101,21 +101,8 @@ function events.CalcDamageToMonster(t)
 	if t.Player then
 		--[14]="Critical chance over 100% increases total damage",
 		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 14) then
-			local luck=t.Player:GetLuck()
-			local daggerCritBonus=0
-			for v=0,1 do
-				local pl=t.Player
-				if pl:GetActiveItem(v) then
-					itSkill=pl:GetActiveItem(v):T().Skill
-					if itSkill==2 then
-						s,m=SplitSkill(pl:GetSkill(const.Skills.Dagger))
-						if m>2 then
-							daggerCritBonus=daggerCritBonus+0.025+0.005*s
-						end
-					end
-				end
-			end
-			t.Result=math.round(math.max(t.Result, t.Result*(luck/1500)+daggerCritBonus))
+			local critChance=getCritInfo(pl)
+			t.Result=math.round(t.Result*math.max(critChance,1))
 		end
 		--end of [14]
 		--[24]="killing a Monster Restores 10% of Health and Mana"
