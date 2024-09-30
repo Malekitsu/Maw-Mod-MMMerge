@@ -1035,7 +1035,7 @@ function events.PlayerAttacked(t)
 		covered=false
 		for i=0,#cover-1 do
 			if cover[i] then
-				local hp=Party[i].HP/Party[i]:GetFullHP()
+				local hp=Party[i].HP
 				if cover[i].Chance>math.random() and hp>lastMaxHp then
 					lastMaxHp=hp
 					coverPlayerIndex=i
