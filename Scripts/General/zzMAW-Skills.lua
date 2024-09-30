@@ -853,7 +853,11 @@ sharedSkills={0,1,2,3,4,5,6,7,12,13,14,15,16,17,18,19,20,21,22}
 function events.Action(t)
 	if t.Action==121 then
 		vars.checkSoloMastery=true --makes skills to be automatically learned if solo
-		if table.find(sharedSkills, t.Param) then
+		local shared=sharedSkills
+		if table.find(shamanClass, pl.Class) or table.find(seraphClass, pl.Class) or table.find(dkClass, pl.Class) then
+			shared={12,13,14,15,16,17,18,19,20,21,22}
+		end
+		if table.find(shared, t.Param) then
 			t.Handled=false
 			pl=Party[Game.CurrentPlayer]
 			local currentCost=SplitSkill(pl.Skills[t.Param])+1
@@ -862,10 +866,6 @@ function events.Action(t)
 			end
 			--calculate actual cost
 			local n=1
-			local shared=sharedSkills
-			if table.find(shamanClass, pl.Class) or table.find(seraphClass, pl.Class) or table.find(dkClass, pl.Class) then
-				shared={12,13,14,15,16,17,18,19,20,21,22}
-			end
 			for i=1,#shared do
 				local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[shared[i]])
 				if s>=currentCost then
