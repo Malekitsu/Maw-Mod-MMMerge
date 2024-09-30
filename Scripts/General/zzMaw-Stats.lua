@@ -35,6 +35,8 @@ function getCritInfo(pl,dmgType)
 		local personality=pl:GetPersonality()
 		local bonus=math.max(intellect,personality)
 		critDamageMultiplier=bonus*3/4000+1.25
+		--crit removed for healing
+		return 0, 0, false
 	else --physical
 		local accuracy=pl:GetAccuracy()
 		critDamageMultiplier=accuracy*2/1000+1.5
@@ -65,13 +67,6 @@ function getCritInfo(pl,dmgType)
 			end
 		end
 	end
-	--legendary bonus
-	local id=pl:GetIndex()
-	if vars.legendaries and table.find(vars.legendaries[id], 14) then
-		totalCrit=totalCrit+0.1
-	else
-		totalCrit=math.min(totalCrit,1)
-	end
 	
 	if buffRework then 
 		if pl.SpellBuffs[4].ExpireTime>=Game.Time then
@@ -90,6 +85,14 @@ function getCritInfo(pl,dmgType)
 		critDamageMultiplier=(critDamageMultiplier-1)*(1-getMapAffixPower(21)/100)+1
 	end
 	
+	
+	--legendary bonus
+	local id=pl:GetIndex()
+	if vars.legendaries and table.find(vars.legendaries[id], 14) then
+		totalCrit=totalCrit+0.1
+	else
+		totalCrit=math.min(totalCrit,1)
+	end
 	
 	local success=math.random()<totalCrit
 	
@@ -1249,12 +1252,12 @@ function calcPowerVitality(pl, statsMenu)
 	for i=0,1 do 
 		local it=pl:GetActiveItem(i)
 		if it and it:T().EquipStat<=2 then
-			local dmg=calcEnchantDamage(pl, it, 0, false)
-			local dmg2=calcFireAuraDamage(pl, it, 0, false)
-			enchantDamage=enchantDamage+dmg+dmg2
+			local dmg1=calcEnchantDamage(pl, it, 0, false, false, "power")
+			local dmg2=calcFireAuraDamage(pl, it, 0, false, false, "power")
+			enchantDamage=enchantDamage+dmg1+dmg2
 		end
 	end
-	DPS1=math.round((dmg*(1+critChance*(critMult-1))+enchantDamage)/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Melee"])
+	DPS1=math.round((dmg*(1+math.min(critChance,1)*(critMult-1))+enchantDamage)/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Melee"]*math.max(critChance,1))
 	
 	--RANGED
 	local low=pl:GetRangedDamageMin()
@@ -1266,15 +1269,15 @@ function calcPowerVitality(pl, statsMenu)
 	local hitChance= (15+atk*2)/(30+atk*2+lvl)
 	local it=pl:GetActiveItem(2)
 	if it and it:T().EquipStat<=2 then
-		local dmg=calcEnchantDamage(pl, it, 0, false)
-		local dmg2=calcFireAuraDamage(pl, it, 0, false)
+		local dmg=calcEnchantDamage(pl, it, 0, false, false, "power")
+		local dmg2=calcFireAuraDamage(pl, it, 0, false, false, "power")
 		enchantDamage=enchantDamage+dmg+dmg2
 	end
 	local s,m=SplitSkill(pl.Skills[const.Skills.Bow])
 	if m>=3 then
 		dmg=dmg*2
 	end
-	local DPS2=math.round((dmg*(1+critChance*(critMult-1))+enchantDamage)/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Ranged"])
+	local DPS2=math.round((dmg*(1+math.min(critChance,1)*(critMult-1))+enchantDamage)/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Ranged"]*math.max(critChance,1))
 	if spellPowers[spellIndex] or (healingSpells and healingSpells[spellIndex]) then 
 		--calculate damage
 		--skill
@@ -1304,15 +1307,15 @@ function calcPowerVitality(pl, statsMenu)
 		for i=0,2 do 
 			local it=pl:GetActiveItem(i)
 			if it and it:T().EquipStat<=2 then
-				local dmg=calcEnchantDamage(pl, it, 0, false)
-				local dmg2=calcFireAuraDamage(pl, it, 0, false)
+				local dmg=calcEnchantDamage(pl, it, 0, false, true, "power")
+				local dmg2=calcFireAuraDamage(pl, it, 0, false, true, "power")
 				enchantDamage=enchantDamage+dmg+dmg2
 			end
 		end
 		power=power+enchantDamage
 		haste=math.floor(pl:GetSpeed()/10)/100+1
 		delay=getSpellDelay(pl,spellIndex) or 100
-		DPS3=math.round(power*(1+critChance*(critDamage-1))/(delay/60))			
+		DPS3=math.round(power*(1+math.min(critChance,1)*(critDamage-1))/(delay/60)*math.max(critChance,1))			
 	end
 			
 	local fullHP=pl:GetFullHP()
