@@ -804,13 +804,14 @@ legendaryEffects={
 	[16]="Increases your resistances by 50%, up to you highest resistance",
 	[17]="Your hits will deal 2% of current monster HP health (1% for AoE, multi-hit spells and arrows)",
 	[18]="Reduce all damage taken by 10%",
-	[19]="Your weapon enchants now scales with the highest between might/int./pers.",
+	[19]="Your weapon enchants scale with the highest between might/int./pers.",
 	[20]="Base enchants on this items are 50% stronger",
 	[21]="Increase melee damage by 5% for each enemy in the nearbies",
 	[22]="Reduces damage by 3% for each enemy in the nearbies",
 	[23]="Successfully covering an ally restores 3% of your HP",
 	[24]="Killing a Monster Restores 10% of Health and Mana",
 	[25]="Increases spells ascension level by 1",
+	[26]="Your weapon enchants can deal critical damage",
 }
 
 function events.BuildItemInformationBox(t)
@@ -1393,12 +1394,13 @@ enchantbonusdamage[12] = {12,72,["Type"]=0}
 enchantbonusdamage[13] = {10,10,["Type"]=8}
 enchantbonusdamage[14] = {24,24,["Type"]=8}
 enchantbonusdamage[15] = {48,48,["Type"]=8}
+enchantbonusdamage[39] = {40,80,["Type"]=0}
 enchantbonusdamage[46] = {40,80,["Type"]=0}
 fireAuraDamage={10,20,40,60,[0]=0}
 --calculate enchant damage
-function calcEnchantDamage(pl, it, resistance,rand)
+function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType)
 	local ench=enchantbonusdamage[it.Bonus2]
-	if not ench then
+	if not ench or (it.Bonus2==39 and not isSpell) then
 		return 0
 	end
 	local damage=0
@@ -1414,9 +1416,22 @@ function calcEnchantDamage(pl, it, resistance,rand)
 		local int=pl:GetIntellect()
 		local pers=pl:GetPersonality()
 		local bonusStat=math.max(str,int,pers)
-		local mult=(1+bonusStat/1000)
-		damage=damage*mult
+		mult=(1+bonusStat/1000)
 	end
+	if calcType~="tooltip" and vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 26) then
+		if isSpell then 
+			critChance, critMult, success=getCritInfo(pl,"spell")
+		else
+			critChance, critMult, success=getCritInfo(pl)
+		end
+		if calcType=="damage" and success then
+			mult=mult*critMult
+		end
+		if calcType=="power" then
+			mult=mult*(1+math.min(critChance,1)*(critMult-1))
+		end
+	end
+	damage=damage*mult
 	if it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number) then
 		damage=damage*2
 	end
@@ -1432,7 +1447,7 @@ function events.ItemAdditionalDamage(t)
 		local id=t.Player:GetIndex()
 		local index=table.find(damageKindMap,enchantbonusdamage[t.Item.Bonus2].Type)
 		local res=t.Monster.Resistances[index]
-		damage=calcEnchantDamage(t.Player, t.Item, res, true)
+		damage=calcEnchantDamage(t.Player, t.Item, res, true, false, "damage")
 		local attackSpeedMult=getBaseAttackSpeed(t.Item)
 		t.Result=math.round(damage*attackSpeedMult)
 		return
@@ -3520,7 +3535,7 @@ end
 
 --vampiric aura and fire aura 
 fireAuraDamage={10,20,40,60,[0]=0}
-function calcFireAuraDamage(pl, it, res, speedMult)
+function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 	if buffRework and vars.mawbuff[4] then
 		if not it then return 0 end
 		local s, m, level=getBuffSkill(4)
@@ -3535,6 +3550,19 @@ function calcFireAuraDamage(pl, it, res, speedMult)
 			local pers=pl:GetPersonality()
 			local bonusStat=math.max(str,int,pers)
 			mult=mult*(1+bonusStat/1000)
+		end
+		if calcType~="tooltip" and vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 26) then
+			if isSpell then 
+				critChance, critMult, success=getCritInfo(pl,"spell")
+			else
+				critChance, critMult, success=getCritInfo(pl)
+			end
+			if calcType=="damage" and success then
+				mult=mult*critMult
+			end
+			if calcType=="power" then
+				mult=mult*(1+math.min(critChance,1)*(critMult-1))
+			end
 		end
 		if it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number)then
 			mult=mult*2
@@ -3560,7 +3588,7 @@ function events.BuildItemInformationBox(t)
 					local s, m, level=getBuffSkill(4)
 					if m>=1 then
 						local name={"Fire","Flame","Inferno","Hell",[0]=""}
-						local damage=calcFireAuraDamage(pl, t.Item, 0, false)
+						local damage=calcFireAuraDamage(pl, t.Item, 0, false, false, "tooltip")
 						if damage then
 							local txt=string.format(name[m] .. " Aura: adds " .. damage .. " Fire Damage to any attack\n\n")
 							t.Description=StrColor(255,255,153,txt) .. t.Description
