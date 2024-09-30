@@ -1312,6 +1312,9 @@ function calcPowerVitality(pl, statsMenu)
 				enchantDamage=enchantDamage+dmg+dmg2
 			end
 		end
+		if table.find(aoespells, spellIndex) then
+			enchantDamage=enchantDamage/2.5
+		end
 		power=power+enchantDamage
 		haste=math.floor(pl:GetSpeed()/10)/100+1
 		delay=getSpellDelay(pl,spellIndex) or 100
