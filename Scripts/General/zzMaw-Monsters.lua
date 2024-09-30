@@ -1820,11 +1820,22 @@ function events.BuildMonsterInformationBox(t)
 	end
 	if t.IdentifiedHitPoints then
 		if mon.Resistances[0]>=1000 then
-			res=mon.Resistances[0]%1000
+			local res=mon.Resistances
 			if t.IdentifiedResistances then
-				t.Resistances[1].Text=string.format("Fire\01200000	070" .. res)
+				t.Resistances[1].Text=string.format("Fire\01200000	070" .. res[0]%1000)
+				if resistanceRework then
+					t.Resistances[2].Text=string.format("Elec\01200000	070" .. res[1])
+					t.Resistances[3].Text=string.format("Cold\01200000	070" .. res[2])
+					t.Resistances[4].Text=string.format("Poison\01200000	070" .. res[10])
+					t.Resistances[5].Text=t.Resistances[10].Text
+					local magicRes=(res[3]+res[6]+res[7]+res[8]+res[9])/5
+					t.Resistances[4].Text=string.format("Magic\01200000	070" .. magicRes)
+					for i=6,10 do
+						t.Resistances[i].Text=""
+					end
+				end
 			end
-			hp=t.Monster.FullHP*2^math.floor(mon.Resistances[0]/1000)
+			hp=t.Monster.FullHP*2^math.floor(res[0]/1000)
 			if hp>=10000000 then
 				hp=math.round(hp/100000)/10 .. "M"
 			elseif hp>=100000 then
