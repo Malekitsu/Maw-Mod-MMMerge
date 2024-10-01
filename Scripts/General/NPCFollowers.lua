@@ -69,10 +69,15 @@ local function ToggleNPCPanel(State)
 	end
 	OpenFlwPnlBtn.IUpPtr, OpenFlwPnlBtn.IDwPtr = OpenFlwPnlBtn.IDwPtr, OpenFlwPnlBtn.IUpPtr
 
+	Game.Dll.UILayoutSetVarInt('NPCPanelOpen', NPCPanelOpen and 1 or 0)
 	Game.NeedRedraw = true
 end
 MF.ToggleNPCPanel = ToggleNPCPanel
 
+NPCFollowers.ToggleNPCPanel = ToggleNPCPanel
+NPCFollowers.NPCPanelOpen = function()
+	return NPCPanelOpen
+end
 local function RebuildFollowersTable()
 
 	local NewT = {}
