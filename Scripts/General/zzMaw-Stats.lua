@@ -250,13 +250,13 @@ function events.BuildStatInformationBox(t)
 		i=Game.CurrentPlayer
 		intellect=Party[i]:GetIntellect()
 		_,critDmg=getCritInfo(Party[i],"spell")
-		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing: %s%s\nHealing spells cannot crit",Game.StatsDescriptions[1],intellect/10,"%",critDmg*100-100,"%")
+		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage: %s%s\nHealing spells cannot crit",Game.StatsDescriptions[1],intellect/10,"%",critDmg*100-100,"%")
 	end
 	if t.Stat==2 then
 		i=Game.CurrentPlayer
 		personality=Party[i]:GetPersonality()
 		_,critDmg=getCritInfo(Party[i],"spell")
-		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage/healing bonus: %s%s\nHealing spells cannot crit",Game.StatsDescriptions[2],personality/10,"%",critDmg*100-100,"%")
+		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage: %s%s\nHealing spells cannot crit",Game.StatsDescriptions[2],personality/10,"%",critDmg*100-100,"%")
 	end
 	if t.Stat==3 then
 		i=Game.CurrentPlayer
