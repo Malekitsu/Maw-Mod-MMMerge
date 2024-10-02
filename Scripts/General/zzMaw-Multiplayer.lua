@@ -1,5 +1,7 @@
-function p()
-	debug.Message(dump(string.format(" x = " .. Party.X .. ", y = " .. Party.Y .. ", z = " .. Party.Z .. " "))) 
+--initialize events
+function events.MultiplayerInitialized()
+	Multiplayer.allow_remote_event("mawBuffs")
+	Multiplayer.allow_remote_event("MAWMapvarArrived")
 end
 
 function mawmapvarsend(name,value)
@@ -8,10 +10,10 @@ function mawmapvarsend(name,value)
 	maw["DataType"]="mapvar"
 	maw[1]=name
 	maw[2]=value
-	Multiplayer.broadcast_mapdata(maw)
+	Multiplayer.broadcast_mapdata(maw,"MAWMapvarArrived")
 end
 
-function events.MultiplayerUserdataArrived(t)
+function events.MAWMapvarArrived(t)
 	if t["DataType"]=="mapvar" then
 		mapvars[t[1]]=t[2]
 	end
@@ -34,27 +36,38 @@ function events.AfterLoadMap()
 end
 
 --share buffs
+
+
+
 function sendBuffs()
 	if Multiplayer then
-		local buffTable={["DataType"]="BuffShare"}
+		local buffTable={}
+		buffTable["DataType"]="mawBuffs"
 		buffTable["X"]=Party.X
 		buffTable["Y"]=Party.Y
 		buffTable["Z"]=Party.Z
 		buffTable["Time"]=Game.Time
-		buffTable["Buffs"]={}
 		for key, value in pairs(vars.mawbuff) do
-			buffTable["Buffs"][key]={getBuffSkill(key)}
+			if vars.mawbuff[key] and type(vars.mawbuff[key])=="number" then
+				buffTable[key]={}
+				buffTable[key][1],buffTable[key][2],buffTable[key][3]=getBuffSkill(key)
+			end
 		end
-		Multiplayer.broadcast_mapdata(buffTable)
+		Multiplayer.broadcast_mapdata(buffTable, "MAWMapvarArrived")
 	end
 end
 
-function events.MultiplayerUserdataArrived(t)
-	if t["DataType"]=="BuffShare" then
+function events.MAWMapvarArrived(t)
+	if t.DataType=="mawBuffs" then
+							
 		if Game.Time-t.Time<const.Hour and getDistance(t.X,t.Y,t.Z)<4048 then
-			buffs=t.Buffs
-			for key, value in pairs(buffs) do
-				vars.mawbuff[key]=buffs[key]
+			for key, value in pairs(t) do
+				if type(key)=="number" then
+					vars.mawbuff[key]={}
+					vars.mawbuff[key][1]=value[1]
+					vars.mawbuff[key][2]=value[2]
+					vars.mawbuff[key][3]=value[3]
+				end
 			end
 		end
 	end
