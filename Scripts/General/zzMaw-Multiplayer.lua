@@ -77,5 +77,7 @@ end
 
 
 function events.AfterLoadMap()
-	Timer(sendBuffs, const.Minute/2, true)
+	if buffRework then
+		Timer(sendBuffs, const.Minute/2, true)
+	end
 end
