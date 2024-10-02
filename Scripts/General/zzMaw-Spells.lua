@@ -2871,8 +2871,10 @@ if buffRework then
 						--if buffId~=7 or (not Party.EnemyDetectorYellow and not Party.EnemyDetectorRed and Map.IndoorOrOutdoor==2) then --fly
 						if type(vars.mawbuff[buff])=="string" then
 							Party.SpellBuffs[buffId].Caster=1 --crashes otherwise
-						else
+						elseif type(vars.mawbuff[buff])=="number" then
 							Party.SpellBuffs[buffId].Caster=vars.mawbuff[buff]+1
+						else
+							Party.SpellBuffs[buffId].Caster=1
 						end
 						Party.SpellBuffs[buffId].Bits=1 --allow fly
 						Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
@@ -2964,7 +2966,7 @@ if buffRework then
 	function getBuffSkill(spell)
 		local id=vars.mawbuff[spell]
 		if type(id)=="table" then
-			return id
+			return id[1], id[2], id[3]
 		end
 		if type(id)=="string" then
 			return 7,3,40
