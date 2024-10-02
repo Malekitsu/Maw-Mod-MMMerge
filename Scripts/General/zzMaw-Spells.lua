@@ -2761,7 +2761,7 @@ if buffRework then
 				for i=0,Party.High do
 					local sp=Party[i]:GetFullSP()
 					maxManaPool[i]=sp
-					currentManaPool[i]=sp
+					vars.currentManaPool[i]=sp
 				end
 			end
 
@@ -2773,7 +2773,7 @@ if buffRework then
 			
 			local cost=getBuffCost(pl, spellId)
 			
-			if currentManaPool[id]<cost then
+			if vars.currentManaPool[id]<cost then
 				Game.ShowStatusText("Not enough Mana")
 				return
 			end
@@ -2908,14 +2908,14 @@ if buffRework then
 	
 	function buffManaLock()
 		maxManaPool={}
-		currentManaPool={}
+		vars.currentManaPool={}
 		local partyIndexes={}
 		for i=0,Party.High do
 			local id=Party[i]:GetIndex()
 			partyIndexes[id]=i
 			local sp=Party[i]:GetFullSP()
 			maxManaPool[i]=sp
-			currentManaPool[i]=sp
+			vars.currentManaPool[i]=sp
 		end
 		for i=1, #buffSpellList do
 			local spell=buffSpellList[i]
@@ -2928,16 +2928,16 @@ if buffRework then
 						local s,m=SplitSkill(Skillz.get(pl,52))
 						local div=spScaling[pl.Class]+m/2
 						local percentageDecrease=(buffSpell[spell].Cost/div)*0.01
-						currentManaPool[id]=currentManaPool[id]-maxManaPool[id]*percentageDecrease
+						vars.currentManaPool[id]=vars.currentManaPool[id]-maxManaPool[id]*percentageDecrease
 					elseif utilitySpell[spell] then
 						local s,m=SplitSkill(Skillz.get(pl,52))
-						currentManaPool[id]=currentManaPool[id]-math.round(utilitySpell[spell].Cost*(1-m/10))
+						vars.currentManaPool[id]=vars.currentManaPool[id]-math.round(utilitySpell[spell].Cost*(1-m/10))
 					end
 				end
 			end
 		end
 		for i=0, Party.High do
-			Party[i].SP=math.min(math.ceil(currentManaPool[i]), Party[i].SP)
+			Party[i].SP=math.min(math.ceil(vars.currentManaPool[i]), Party[i].SP)
 		end
 	end
 	
