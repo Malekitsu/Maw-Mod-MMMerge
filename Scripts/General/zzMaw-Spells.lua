@@ -958,9 +958,9 @@ function getAscensionTier(skill,spellID, index)
 	if spelltier==0 then
 		spelltier=11
 	end
-	ascensionTier=math.min(math.floor(skill/11),9)
+	ascensionTier=math.min(math.floor(skill/11),4)
 	if skill>=110 then
-		ascensionTier=10
+		ascensionTier=5
 	elseif spelltier<=skill%11  then
 		ascensionTier=ascensionTier+1
 	end
