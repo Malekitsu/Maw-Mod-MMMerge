@@ -1155,7 +1155,7 @@ function MawRegen()
 	for i=0,Party.High do
 		pl=Party[i]
 		local Cond = pl:GetMainCondition()
-		if (Cond == 18 or Cond == 17 or Cond < 14) and pl.Insane==0 and type(currentManaPool[i])=="number" then
+		if (Cond == 18 or Cond == 17 or Cond < 14) and pl.Insane==0 and type(vars.currentManaPool[i])=="number" then
 			lastSP[i]=lastSP[i] or pl.SP
 			waitSP[i]=waitSP[i] or 0
 			mult=1
@@ -1171,8 +1171,8 @@ function MawRegen()
 				RegM=8
 			end
 			FSP	= pl:GetFullSP()
-			if FSP>0 and buffRework and currentManaPool and currentManaPool[i] then
-				FSP=math.max(math.ceil(FSP*(currentManaPool[i]/FSP)^0.5),0)
+			if FSP>0 and buffRework and vars.currentManaPool and vars.currentManaPool[i] then
+				FSP=math.max(math.ceil(FSP*(vars.currentManaPool[i]/FSP)^0.5),0)
 				
 			end
 			local SPREGEN = 0
@@ -1201,7 +1201,7 @@ function MawRegen()
 			elseif pl.Class==11 then
 				regenSP[i]=regenSP[i] + 0.5* timeMultiplier*mult
 			end
-			pl.SP = math.min(currentManaPool[i], pl.SP + math.floor(regenSP[i]))
+			pl.SP = math.min(vars.currentManaPool[i], pl.SP + math.floor(regenSP[i]))
 			regenSP[i]=regenSP[i]%1
 			lastSP[i]=pl.SP
 		end
@@ -1234,8 +1234,8 @@ function events.Tick()
 		Skillz.setDesc(30,1,txt)
 		--meditation tooltip
 		local FSP=pl:GetFullSP()
-		if buffRework and currentManaPool and currentManaPool[i] then
-			FSP=currentManaPool[Game.CurrentPlayer]
+		if buffRework and vars.currentManaPool and vars.currentManaPool[i] then
+			FSP=vars.currentManaPool[Game.CurrentPlayer]
 		end
 		local s,m = SplitSkill(pl:GetSkill(28))
 		if m==4 then
