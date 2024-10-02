@@ -2836,7 +2836,7 @@ if buffRework then
 			local buff=buffSpellList[i]
 			if vars.mawbuff[buff] then
 				local pl=GetPlayerFromIndex(vars.mawbuff[buff])
-				if (pl and pl:IsConscious()) or type(vars.mawbuff[buff])=="string" then
+				if (pl and pl:IsConscious()) or type(vars.mawbuff[buff])=="string" or type(vars.mawbuff[buff])=="table" then
 					if buff==75 then
 						Party.SpellBuffs[13].Power=4 --allow protection from magic to protect from death/eradicate
 						Party.SpellBuffs[13].Skill=4 --allow protection from magic to protect from death/eradicate
@@ -2963,6 +2963,9 @@ if buffRework then
 	
 	function getBuffSkill(spell)
 		local id=vars.mawbuff[spell]
+		if type(id)=="table" then
+			return id
+		end
 		if type(id)=="string" then
 			return 7,3,40
 		end
