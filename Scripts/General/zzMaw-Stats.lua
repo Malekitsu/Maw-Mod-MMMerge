@@ -621,8 +621,18 @@ end
 
 --reduce damage by %
 function events.CalcDamageToPlayer(t)
-	data=mawCustomMonObj or WhoHitPlayer()
-	pl=t.Player
+	local data=mawCustomMonObj or WhoHitPlayer()
+	local pl=t.Player
+	local lvl=0
+	if data and data.Monster then
+		local mon=data.Monster
+		lvl=mon.Level
+		if mon.NameId==0 then
+			lvl=math.round(totalLevel[mon.Id])
+		elseif mapvars.uniqueMonsterLevel[mon:GetIndex()] then
+			lvl=math.round(mapvars.uniqueMonsterLevel[mon:GetIndex()])
+		end
+	end
 	--dodging DODGE 
 	local dodging=0
 	local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Dodging))
@@ -741,9 +751,9 @@ function events.CalcDamageToPlayer(t)
 		t.Damage=(t.Result+bonus)*dmgMult
 	end
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
-		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,false,data.Monster.Level) -- spell randomization is off
+		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,false,lvl) -- spell randomization is off
 	elseif data and data.Monster then
-		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,false,data.Monster.Level)
+		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,false,lvl)
 	else
 		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true)
 	end
