@@ -350,8 +350,8 @@ function events.BuildStatInformationBox(t)
 	if t.Stat==8 then
 		local i=Game.CurrentPlayer
 		local fullSP=Party[i]:GetFullSP()
-		if buffRework and currentManaPool and currentManaPool[i] then
-			fullSP=fullSP*(currentManaPool[Game.CurrentPlayer]/fullSP)^0.5
+		if buffRework and vars.currentManaPool and vars.currentManaPool[i] then
+			fullSP=fullSP*(vars.currentManaPool[Game.CurrentPlayer]/fullSP)^0.5
 		end
 		local skill=Party[i]:GetSkill(const.Skills.Meditation)
 		local s,m=SplitSkill(skill)
@@ -865,8 +865,8 @@ function events.Action(t)
 	if buffRework then
 		if t.Action==94 then
 			local i=t.Param-1
-			if i>=0 and i<=Party.High and currentManaPool[i] then
-				local manaPool=math.round(currentManaPool[i]/maxManaPool[i]*1000)/10
+			if i>=0 and i<=Party.High and vars.currentManaPool[i] then
+				local manaPool=math.round(vars.currentManaPool[i]/maxManaPool[i]*1000)/10
 				Game.GlobalTxt[212]=StrColor(0,100,255,"Mana " .. manaPool .. "%")
 			end
 		end
@@ -877,9 +877,9 @@ function events.Tick()
 		i=Game.CurrentPlayer 
 		if i==-1 then return end --prevent bug message
 		if buffRework then
-			currentManaPool[i]=currentManaPool[i] or 1
+			vars.currentManaPool[i]=vars.currentManaPool[i] or 1
 			maxManaPool[i]=maxManaPool[i] or 1
-			local manaPool=math.round(currentManaPool[i]/maxManaPool[i]*1000)/10
+			local manaPool=math.round(vars.currentManaPool[i]/maxManaPool[i]*1000)/10
 			Game.GlobalTxt[212]=StrColor(0,100,255,"Mana " .. manaPool .. "%")
 		end
 		pl=Party[i]
