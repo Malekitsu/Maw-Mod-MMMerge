@@ -1214,18 +1214,18 @@ function checktext(MaxCharges,bonus2,it)
 	bonus2txt={
 		[1] =  " +" .. math.floor(bonusEffects[1].statModifier * mult) .. " to all Resistances.",
 		[2] = " +" .. math.floor(bonusEffects[2].statModifier * mult) .. " to all Seven Statistics.",
-		[4] ="Adds " .. math.floor(6*mult^2*attackSpeedMult*legDmgMult) .. "-" .. math.floor(8*mult^2*attackSpeedMult*legDmgMult) .. " points of Cold damage.",
-		[5] ="Adds " .. math.floor(18*mult^2*attackSpeedMult*legDmgMult) .. "-" .. math.floor(24*mult^2*attackSpeedMult*legDmgMult) .. " points of Cold damage.",
-		[6] ="Adds " .. math.floor(36*mult^2*attackSpeedMult*legDmgMult) .. "-" .. math.floor(48*mult^2*attackSpeedMult*legDmgMult) .. " points of Cold damage.",
-		[7] ="Adds " .. math.floor(4*mult^2*attackSpeedMult*legDmgMult) .. "-" .. math.floor(10*mult^2*attackSpeedMult*legDmgMult) .. " points of Electrical damage.",
-		[8] ="Adds " .. math.floor(12*mult^2*attackSpeedMult*legDmgMult) .. "-" .. math.floor(30*mult^2*attackSpeedMult*legDmgMult) .. " points of Electrical damage.",
-		[9] ="Adds " .. math.floor(24*mult^2*attackSpeedMult*legDmgMult) .. "-" .. math.floor(60*mult^2*attackSpeedMult*legDmgMult) .. " points of Electrical damage.",
-		[10] ="Adds " .. math.floor(2*mult^2*attackSpeedMult*legDmgMult) .. "-" .. math.floor(12*mult^2*attackSpeedMult*legDmgMult) .. " points of Fire damage.",
-		[11] ="Adds " .. math.floor(6*mult^2*attackSpeedMult*legDmgMult) .. "-" .. math.floor(36*mult^2*attackSpeedMult*legDmgMult) .. " points of Fire damage.",
-		[12] ="Adds " .. math.floor(12*mult^2*attackSpeedMult*legDmgMult) .. "-" .. math.floor(72*mult^2*attackSpeedMult*legDmgMult) .. " points of Fire damage.",
-		[13] ="Adds " .. math.floor(12*mult^2*attackSpeedMult*legDmgMult) .. " points of Body damage.",
-		[14] ="Adds " .. math.floor(24*mult^2*attackSpeedMult*legDmgMult) .. " points of Body damage.",
-		[15] ="Adds " .. math.floor(48*mult^2*attackSpeedMult*legDmgMult) .. " points of Body damage.",
+		[4] ="Adds " .. math.floor(6*mult^1.75*attackSpeedMult*legDmgMult) .. "-" .. math.floor(8*mult^1.75*attackSpeedMult*legDmgMult) .. " points of Cold damage.",
+		[5] ="Adds " .. math.floor(18*mult^1.75*attackSpeedMult*legDmgMult) .. "-" .. math.floor(24*mult^1.75*attackSpeedMult*legDmgMult) .. " points of Cold damage.",
+		[6] ="Adds " .. math.floor(36*mult^1.75*attackSpeedMult*legDmgMult) .. "-" .. math.floor(48*mult^1.75*attackSpeedMult*legDmgMult) .. " points of Cold damage.",
+		[7] ="Adds " .. math.floor(4*mult^1.75*attackSpeedMult*legDmgMult) .. "-" .. math.floor(10*mult^1.75*attackSpeedMult*legDmgMult) .. " points of Electrical damage.",
+		[8] ="Adds " .. math.floor(12*mult^1.75*attackSpeedMult*legDmgMult) .. "-" .. math.floor(30*mult^1.75*attackSpeedMult*legDmgMult) .. " points of Electrical damage.",
+		[9] ="Adds " .. math.floor(24*mult^1.75*attackSpeedMult*legDmgMult) .. "-" .. math.floor(60*mult^1.75*attackSpeedMult*legDmgMult) .. " points of Electrical damage.",
+		[10] ="Adds " .. math.floor(2*mult^1.75*attackSpeedMult*legDmgMult) .. "-" .. math.floor(12*mult^1.75*attackSpeedMult*legDmgMult) .. " points of Fire damage.",
+		[11] ="Adds " .. math.floor(6*mult^1.75*attackSpeedMult*legDmgMult) .. "-" .. math.floor(36*mult^1.75*attackSpeedMult*legDmgMult) .. " points of Fire damage.",
+		[12] ="Adds " .. math.floor(12*mult^1.75*attackSpeedMult*legDmgMult) .. "-" .. math.floor(72*mult^1.75*attackSpeedMult*legDmgMult) .. " points of Fire damage.",
+		[13] ="Adds " .. math.floor(12*mult^1.75*attackSpeedMult*legDmgMult) .. " points of Body damage.",
+		[14] ="Adds " .. math.floor(24*mult^1.75*attackSpeedMult*legDmgMult) .. " points of Body damage.",
+		[15] ="Adds " .. math.floor(48*mult^1.75*attackSpeedMult*legDmgMult) .. " points of Body damage.",
 		--spell enchants
 		[26] = "Air Magic Skill +" .. math.floor(MaxCharges/4)+5,
 		[27] = "Body Magic Skill +" .. math.floor(MaxCharges/4)+5,
@@ -1237,13 +1237,13 @@ function checktext(MaxCharges,bonus2,it)
 		[33] = "Spirit Magic Skill +" .. math.floor(MaxCharges/4)+5,
 		[34] = "Water Magic Skill +" .. math.floor(MaxCharges/4)+5,
 		--stats enchants
-		[39] = "Adds " .. math.floor(40*mult^2*attackSpeedMult*legDmgMult) .. "-" .. math.floor(80*mult^2*attackSpeedMult*legDmgMult) .. " to spell damage and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Intellect and personality.",
+		[39] = "Adds " .. math.floor(40*mult^1.75*attackSpeedMult*legDmgMult) .. "-" .. math.floor(80*mult^1.75*attackSpeedMult*legDmgMult) .. " to spell damage and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Intellect and personality.",
 		[40] = "Spells Drain Hit points from target and Increased Spell speed.(except when equipping off-hand).",
 		[42] = " +" .. math.floor(bonusEffects[42].statModifier * mult) .. " to Seven Stats, HP, SP, Armor, Resistances.",
 		[43] = " +" .. math.floor(bonusEffects[43].statModifier * mult) .. " to Endurance, Armor, Hit points.",
 		[44] = " +" .. math.floor(bonusEffects[44].statModifier * mult) .. " Hit points and Regenerate Hit points over time.",
 		[45] = " +" .. math.floor(bonusEffects[45].statModifier * mult) .. " Speed and Accuracy.",
-		[46] = "Adds " .. math.floor(40*mult^2*attackSpeedMult*legDmgMult) .. "-" .. math.floor(80*mult^2*attackSpeedMult*legDmgMult) .. " points of Fire damage to " .. weaponType .. " attacks and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Might.",
+		[46] = "Adds " .. math.floor(40*mult^1.75*attackSpeedMult*legDmgMult) .. "-" .. math.floor(80*mult^1.75*attackSpeedMult*legDmgMult) .. " points of Fire damage to " .. weaponType .. " attacks and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Might.",
 		[47] = " +" .. math.floor(bonusEffects[47].statModifier * mult) .. " Spell points and Regenerate Spell points over time.",
 		[48] = " +" .. math.floor(bonusEffects[48].statModifier[1] * mult) .. " Endurance and" .. " +" .. math.floor(bonusEffects[48].statModifier[2] * mult).. " Armor.",
 		[49] = " +" .. math.floor(bonusEffects[49].statModifier * mult) .. " Intellect and Luck.",
@@ -1435,7 +1435,7 @@ function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType)
 	if it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number) then
 		damage=damage*2
 	end
-	damage=damage*(1+it.MaxCharges/20)^2
+	damage=damage*(1+it.MaxCharges/20)^1.75
 	damage = damage/2^(resistance%1000/100)
 	return damage
 end
@@ -3540,9 +3540,9 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 		if not it or (it and it.Number==0) or (it and it:T().EquipStat>2) then return 0 end
 		local s, m, level=getBuffSkill(4)
 		local id=pl:GetIndex()
-		local mult=(1+it.MaxCharges/20)^2
+		local mult=(1+it.MaxCharges/20)^1.75
 		if table.find(artWeap1h, it.Number) or table.find(artWeap2h, it.Number) then
-			mult=1+math.min(pl.LevelBase/80,3)
+			mult=(1+artifactPowerMult(pl.LevelBase))^1.75
 		end
 		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
 			local str=pl:GetMight()
