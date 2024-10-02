@@ -1374,6 +1374,7 @@ function events.CalcSpellDamage(t)
 	diceMax=spellPowers[t.Spell].diceMax
 	damageAdd=spellPowers[t.Spell].dmgAdd
 	local data=WhoHitMonster()
+	local ascensionTier=0
 	if data and data.Player then
 		local s,m = SplitSkill(data.Player.Skills[const.Skills.Learning])
 		local id=data.Player:GetIndex()
@@ -1388,7 +1389,7 @@ function events.CalcSpellDamage(t)
 			vars.eleStacks=vars.eleStacks or {}
 			vars.eleStacks[id]=vars.eleStacks[id] or 0
 		end
-		diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, t.Spell, data.Player:GetIndex())
+		diceMin, diceMax, damageAdd, ascensionTier = ascendSpellDamage(s, m, t.Spell, data.Player:GetIndex())
 		if table.find(elementalistClass, data.Player.Class) then
 			diceMax=math.round(diceMax*(1+vars.eleStacks[id]*0.1))
 			damageAdd=math.round(damageAdd*(1+vars.eleStacks[id]*0.1))
@@ -1422,6 +1423,40 @@ function events.CalcSpellDamage(t)
 			t.Result=t.Result/3*7
 		end
 	end
+	
+	--int/crit/enchant scaling
+	if data and data.Player and (data.Player.Class==10 or data.Player.Class==11 or table.find(dkClass, data.Player.Class)) then return end
+	if data and data.Player then
+		if data.Player.Class==10 or data.Player.Class==11 then return end --dragons scale off might
+		
+		local critChance, critMult, success=getCritInfo(data.Player,"spell")
+		
+		--int/pers scaling
+		local int=data.Player:GetIntellect()
+		local per=data.Player:GetPersonality()
+		local mult=math.max(int,per)/1000+1
+		t.Result=t.Result*mult
+		if success then
+			t.Result=t.Result*critMult
+			crit=true
+		end
+	end
+	--enchants
+	if data and data.Player then
+		for i=0,2 do
+			local it=data.Player:GetActiveItem(i)
+			if it then
+				local dmg1=calcEnchantDamage(data.Player, it, 0, true, true, "damage")
+				local dmg2=calcFireAuraDamage(data.Player, it, 0, false, true, "damage")
+				damage=(dmg1+dmg2)*1.2^ascensionTier
+				if table.find(aoespells, t.Spell) then
+					damage=damage/2.5
+				end
+				t.Result = t.Result+damage
+			end
+		end
+	end
+	
 end
 
 --MASS DISTORSION Handled
@@ -1456,6 +1491,7 @@ function events.CalcDamageToMonster(t)
 		end
 		t.Result=t.Result/mult^0.5
 	end
+	
 end
 
 
@@ -1485,7 +1521,7 @@ function ascendSpellDamage(skill, mastery, spell, index)
 		--diceMax=diceMax*(1+0.15*(ascensionLevel+1)^2)*1.2^ascensionLevel
 	end
 	diceMin, diceMax, damageAdd = math.round(diceMin), math.round(diceMax), math.round(damageAdd)
-	return diceMin, diceMax, damageAdd
+	return diceMin, diceMax, damageAdd, ascensionLevel
 end
 
 function ascendSpellHealing(skill, mastery, spell, healM)
@@ -1519,45 +1555,6 @@ spellbonusdamage[15] = {["low"]=48, ["high"]=48}
 spellbonusdamage[39] = {["low"]=40, ["high"]=80}
 
 aoespells = {6, 7, 8, 9, 10, 15, 22, 24, 32, 41, 43, 84, 93, 97, 98, 99, 123}
-
-
---intellect/personality
-function events.CalcSpellDamage(t)
-	--enchants
-	local data = WhoHitMonster()
-	if data and data.Player then
-		for i=0,2 do
-			it=data.Player:GetActiveItem(i)
-			if it then
-				damage=calcEnchantDamage(data.Player, it, 0, true, true, "damage")+calcFireAuraDamage(pl, it, 0, false, true, "damage")
-				if table.find(aoespells, t.Spell) then
-					damage=damage/2.5
-				end
-				t.Result = t.Result+damage
-			end
-		end
-	end
-	--int/crit scaling
-	if t.Spell==44 then
-		return 
-	end
-	if data and data.Player and (data.Player.Class==10 or data.Player.Class==11 or table.find(dkClass, data.Player.Class)) then return end
-	if data and data.Player then
-		if data.Player.Class==10 or data.Player.Class==11 then return end --dragons scale off might
-		
-		local critChance, critMult, success=getCritInfo(data.Player,"spell")
-		
-		--int/pers scaling
-		local int=data.Player:GetIntellect()
-		local per=data.Player:GetPersonality()
-		local mult=math.max(int,per)/1000+1
-		t.Result=t.Result*mult
-		if success then
-			t.Result=t.Result*critMult
-			crit=true
-		end
-	end
-end
 
 --function for tooltips
 function dmgAddTooltip(skill, mastery, spell)
