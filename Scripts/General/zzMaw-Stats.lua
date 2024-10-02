@@ -1268,6 +1268,7 @@ function calcPowerVitality(pl, statsMenu)
 	local atk=pl:GetRangedAttack()
 	local hitChance= (15+atk*2)/(30+atk*2+lvl)
 	local it=pl:GetActiveItem(2)
+	enchantDamage=0
 	if it and it:T().EquipStat<=2 then
 		local dmg=calcEnchantDamage(pl, it, 0, false, false, "power")
 		local dmg2=calcFireAuraDamage(pl, it, 0, false, false, "power")
@@ -1287,7 +1288,7 @@ function calcPowerVitality(pl, statsMenu)
 		--SPELLS
 		local s, m = SplitSkill(pl.Skills[const.Skills.Learning])
 		if spellPowers[spellIndex] then
-			diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, spellIndex)
+			diceMin, diceMax, damageAdd, ascensionTier = ascendSpellDamage(s, m, spellIndex)
 		else
 			diceMin, diceMax, damageAdd = healingSpells[spellIndex].Scaling[mastery], healingSpells[spellIndex].Scaling[mastery], healingSpells[spellIndex].Base[mastery]
 		end
@@ -1303,7 +1304,7 @@ function calcPowerVitality(pl, statsMenu)
 			critChance, critDamage=getCritInfo(pl, "spell")
 			power=power*(1+bonus/1000) 
 		end
-		
+		enchantDamage=0
 		for i=0,2 do 
 			local it=pl:GetActiveItem(i)
 			if it and it:T().EquipStat<=2 then
@@ -1312,13 +1313,13 @@ function calcPowerVitality(pl, statsMenu)
 				enchantDamage=enchantDamage+dmg+dmg2
 			end
 		end
+		enchantDamage=enchantDamage*1.2^ascensionTier
 		if table.find(aoespells, spellIndex) then
 			enchantDamage=enchantDamage/2.5
 		end
-		power=power+enchantDamage
 		haste=math.floor(pl:GetSpeed()/10)/100+1
 		delay=getSpellDelay(pl,spellIndex) or 100
-		DPS3=math.round(power*(1+math.min(critChance,1)*(critDamage-1))/(delay/60)*math.max(critChance,1))			
+		DPS3=math.round((power*(1+math.min(critChance,1)*(critDamage-1))+enchantDamage)/(delay/60)*math.max(critChance,1))			
 	end
 			
 	local fullHP=pl:GetFullHP()
