@@ -19,10 +19,12 @@ function events.MAWMapvarArrived(t)
 	end
 end
 
+--[[
 function events.Tick()
 	Game.TurnBased=false
 	Game.TurnBasedPhase=0
 end
+]]
 
 function events.AfterLoadMap()
 	local prevHP={}
@@ -46,7 +48,7 @@ function sendBuffs()
 		buffTable["X"]=Party.X
 		buffTable["Y"]=Party.Y
 		buffTable["Z"]=Party.Z
-		buffTable["Time"]=Game.Time
+		buffTable["Time"]=Game.Time+const.Minute*5
 		for key, value in pairs(vars.mawbuff) do
 			if vars.mawbuff[key] and type(vars.mawbuff[key])=="number" then
 				buffTable[key]={}
@@ -59,14 +61,14 @@ end
 
 function events.MAWMapvarArrived(t)
 	if t.DataType=="mawBuffs" then
-							
-		if Game.Time-t.Time<const.Hour and getDistance(t.X,t.Y,t.Z)<4048 then
+		if getDistance(t.X,t.Y,t.Z)<4048 then
 			for key, value in pairs(t) do
 				if type(key)=="number" then
 					vars.mawbuff[key]={}
 					vars.mawbuff[key][1]=value[1]
 					vars.mawbuff[key][2]=value[2]
 					vars.mawbuff[key][3]=value[3]
+					vars.mawbuff[key][4]=t.Time
 				end
 			end
 		end
