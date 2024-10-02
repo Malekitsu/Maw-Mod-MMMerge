@@ -2735,8 +2735,8 @@ if buffRework then
 			percentageDecrease=(buffSpell[spellId].Cost/div)*0.01
 			local id=pl:GetIndex()
 			for i=0, Party.High do
-				if id==Party[i]:GetIndex() and maxManaPool[i] then
-					cost=maxManaPool[i]*percentageDecrease
+				if id==Party[i]:GetIndex() and vars.maxManaPool[i] then
+					cost=vars.maxManaPool[i]*percentageDecrease
 				end
 			end
 		elseif utilitySpell[spellId] then
@@ -2757,10 +2757,10 @@ if buffRework then
 			if id==-1 then return end
 			
 			pl=Party[id]
-			if not maxManaPool then
+			if not vars.maxManaPool then
 				for i=0,Party.High do
 					local sp=Party[i]:GetFullSP()
-					maxManaPool[i]=sp
+					vars.maxManaPool[i]=sp
 					vars.currentManaPool[i]=sp
 				end
 			end
@@ -2907,14 +2907,14 @@ if buffRework then
 	end
 	
 	function buffManaLock()
-		maxManaPool={}
+		vars.maxManaPool={}
 		vars.currentManaPool={}
 		local partyIndexes={}
 		for i=0,Party.High do
 			local id=Party[i]:GetIndex()
 			partyIndexes[id]=i
 			local sp=Party[i]:GetFullSP()
-			maxManaPool[i]=sp
+			vars.maxManaPool[i]=sp
 			vars.currentManaPool[i]=sp
 		end
 		for i=1, #buffSpellList do
@@ -2928,7 +2928,7 @@ if buffRework then
 						local s,m=SplitSkill(Skillz.get(pl,52))
 						local div=spScaling[pl.Class]+m/2
 						local percentageDecrease=(buffSpell[spell].Cost/div)*0.01
-						vars.currentManaPool[id]=vars.currentManaPool[id]-maxManaPool[id]*percentageDecrease
+						vars.currentManaPool[id]=vars.currentManaPool[id]-vars.maxManaPool[id]*percentageDecrease
 					elseif utilitySpell[spell] then
 						local s,m=SplitSkill(Skillz.get(pl,52))
 						vars.currentManaPool[id]=vars.currentManaPool[id]-math.round(utilitySpell[spell].Cost*(1-m/10))
