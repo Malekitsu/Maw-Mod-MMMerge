@@ -63,7 +63,7 @@ function events.MAWMapvarArrived(t)
 	if t.DataType=="mawBuffs" then
 		if getDistance(t.X,t.Y,t.Z)<10000 then
 			for key, value in pairs(t) do
-				if type(key)=="number" then
+				if not vars.mawbuff[key] and type(key)=="number" then
 					vars.mawbuff[key]={}
 					vars.mawbuff[key][1]=value[1]
 					vars.mawbuff[key][2]=value[2]
