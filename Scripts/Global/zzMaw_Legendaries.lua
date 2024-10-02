@@ -49,7 +49,6 @@ end
 
 --[11]="Killing a monster will recover you action time",
 function events.CalcDamageToMonster(t)
-	
 	local id=t.PlayerIndex
 	local data=WhoHitMonster()
 	if not data or not data.Player then return end
@@ -101,7 +100,7 @@ function events.CalcDamageToMonster(t)
 	if t.Player then
 		--[14]="Critical chance over 100% increases total damage",
 		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 14) then
-			local critChance=getCritInfo(pl)
+			local critChance=getCritInfo(t.Player)
 			t.Result=math.round(t.Result*math.max(critChance,1))
 		end
 		--end of [14]
@@ -143,6 +142,7 @@ function events.CalcDamageToMonster(t)
 			end
 		end
 	end
+	
 end
 
 function changePlayer(id)
