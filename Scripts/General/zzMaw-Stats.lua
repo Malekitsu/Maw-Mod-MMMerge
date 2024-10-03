@@ -1139,7 +1139,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		if getMapAffixPower(28) then
 			AC=AC*(1-getMapAffixPower(28)/100)
 		end
-		local divider=math.min(120+monLvl*0.75*bolster,300*bolster)
+		local divider=math.min(120+monLvl*0.75*bolster,600*bolster)
 		local reduction=compute_damage(AC/divider)
 		local damage=math.round(damage/reduction)
 		return damage
@@ -1185,7 +1185,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	if getMapAffixPower(29) then
 		res=res*(1-getMapAffixPower(29)/100)
 	end
-	local divider=math.min(60+monLvl*0.5*bolster,200*bolster)
+	local divider=math.min(60+monLvl*0.5*bolster,400*bolster)
 	local reduction=compute_damage(res/divider)
 	local res=1/reduction	
 	
@@ -1197,7 +1197,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 			currentItemRes=itemRes
 		end
 	end
-	currentItemRes=1-currentItemRes^0.6/50
+	currentItemRes=1/1.5^(currentItemRes^0.6/15)
 	res=res*currentItemRes
 	--randomize resistance
 	if res>0 and rand then
