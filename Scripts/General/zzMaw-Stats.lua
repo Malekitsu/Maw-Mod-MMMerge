@@ -201,20 +201,30 @@ end
 nextACToZero=0
 acNerf=0
 function events.PlayerAttacked(t)
-	if t.Attacker.MonsterAction==0 then
-		ac=t.Player:GetArmorClass()
-		if t.Attacker.Monster.Attack1.Type~=4 then
-			nextACToZero=2
-		elseif Game.BolsterAmount>100 then
-			acNerf=2
-			nerfAmount=math.min(Game.BolsterAmount,300)/100
+	if t.Attacker and t.Attacker.Monster then
+		local mon=t.Attacker.Monster
+		local lvl=mon.Level
+		if mon.NameId==0 then
+			lvl=math.round(totalLevel[mon.Id])
+		elseif mapvars.uniqueMonsterLevel[mon:GetIndex()] then
+			lvl=math.round(mapvars.uniqueMonsterLevel[mon:GetIndex()])
 		end
-	elseif t.Attacker.MonsterAction==1 then
-		if t.Attacker.Monster.Attack2.Type~=4 then
-			nextACToZero=2
-		elseif Game.BolsterAmount>100 then
-			acNerf=2
-			nerfAmount=math.min(Game.BolsterAmount,300)/100
+		nerfAmount=math.max(1,lvl/255)
+		if t.Attacker.MonsterAction==0 then
+			ac=t.Player:GetArmorClass()
+			if t.Attacker.Monster.Attack1.Type~=4 then
+				nextACToZero=2
+			elseif Game.BolsterAmount>100 then
+				acNerf=2
+				nerfAmount=nerfAmount*math.min(Game.BolsterAmount,300)/100
+			end
+		elseif t.Attacker.MonsterAction==1 then
+			if t.Attacker.Monster.Attack2.Type~=4 then
+				nextACToZero=2
+			elseif Game.BolsterAmount>100 then
+				acNerf=2
+				nerfAmount=nerfAmount*math.min(Game.BolsterAmount,300)/100
+			end
 		end
 	end
 end
@@ -414,9 +424,8 @@ function events.BuildStatInformationBox(t)
 		local fullHP=pl:GetFullHP()
 		--AC
 		local ac=pl:GetArmorClass()
-		local lvl=math.min(pl.LevelBase,200)
 		local acReduction=1-calcMawDamage(t.Player,4,10000)/10000
-		local lvl=math.min(pl.LevelBase, 255)
+		local lvl=pl.LevelBase
 		local ac=ac/(Game.BolsterAmount/100)
 		local blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 		local ACRed= 1 - (1-blockChance)*(1-acReduction)
@@ -735,16 +744,8 @@ function events.CalcDamageToPlayer(t)
 	--modify spell damage as it's not handled in maw-monsters
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
 		oldLevel=BLevel[data.Monster.Id]
-		local i=data.Monster.Id
-		if i%3==1 then
-			levelMult=Game.MonstersTxt[i+1].Level
-		elseif i%3==0 then
-			levelMult=Game.MonstersTxt[i-1].Level
-		else
-			levelMult=Game.MonstersTxt[i].Level
-		end
-		local bonus=math.max((levelMult^0.88-BLevel[data.Monster.Id]^0.88),0)
-		dmgMult=(levelMult/9+1.15)*(1+(levelMult/200))
+		local bonus=math.max((lvl^0.88-BLevel[data.Monster.Id]^0.88),0)
+		dmgMult=(lvl/9+1.15)*(1+(lvl/200))
 		if data.Object.Spell==6 or data.Object.Spell==97 then
 			dmgMult=dmgMult/2
 		end
@@ -1181,7 +1182,9 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		end
 		res=math.min(maxres,res*1.5)
 	end
-	
+	if getMapAffixPower(29) then
+		res=res*(1-getMapAffixPower(29)/100)
+	end
 	local divider=math.min(60+monLvl*0.5*bolster,200*bolster)
 	local reduction=compute_damage(res/divider)
 	local res=1/reduction	
@@ -1196,9 +1199,6 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	end
 	currentItemRes=1-currentItemRes^0.6/50
 	res=res*currentItemRes
-	if getMapAffixPower(29) then
-		res=res*(1-getMapAffixPower(29)/100)
-	end
 	--randomize resistance
 	if res>0 and rand then
 		local roll=(math.random()+math.random())-1
@@ -1335,9 +1335,8 @@ function calcPowerVitality(pl, statsMenu)
 	local fullHP=pl:GetFullHP()
 	--AC
 	local ac=pl:GetArmorClass()
-	local lvl=math.min(pl.LevelBase,200)
 	local acReduction=1-calcMawDamage(pl,4,10000)/10000
-	local lvl=math.min(pl.LevelBase, 255)
+	local lvl=pl.LevelBase
 	local ac=ac/(Game.BolsterAmount/100)
 	local blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 	local ACRed= 1 - (1-blockChance)*(1-acReduction)
