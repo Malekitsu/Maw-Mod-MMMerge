@@ -1046,7 +1046,7 @@ function events.PlayerAttacked(t)
 		if covered then
 			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Shield, t.PlayerSlot)
 			Party[coverPlayerIndex]:ShowFaceAnimation(14)
-			Game.ShowStatusText(Party[coverPlayerIndex].Name .. " cover " .. Party[t.PlayerSlot].Name)
+			--Game.ShowStatusText(Party[coverPlayerIndex].Name .. " cover " .. Party[t.PlayerSlot].Name)
 			t.PlayerSlot=coverPlayerIndex
 			local pl=Party[t.PlayerSlot]
 			local id=pl:GetIndex()
