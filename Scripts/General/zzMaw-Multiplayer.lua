@@ -27,13 +27,18 @@ end
 ]]
 
 function events.AfterLoadMap()
-	local prevHP={}
-	for i=0, Party.High do
-		prevHP[i]=Party[i].HP
-	end
-	Party.RestAndHeal()
-	for i=0, Party.High do
-		Party[i].HP=prevHP[i]
+	if Multiplayer and Multiplayer.in_game then
+		local prevHP={}
+		local prevSP={}
+		for i=0, Party.High do
+			prevHP[i]=Party[i].HP
+			prevSP[i]=Party[i].SP
+		end
+		Party.RestAndHeal()
+		for i=0, Party.High do
+			Party[i].HP=prevHP[i]
+			Party[i].SP=prevSP[i]
+		end
 	end
 end
 
@@ -42,7 +47,7 @@ end
 
 
 function sendBuffs()
-	if Multiplayer then
+	if Multiplayer and Multiplayer.in_game then
 		local buffTable={}
 		buffTable["DataType"]="mawBuffs"
 		buffTable["X"]=Party.X
