@@ -2529,7 +2529,7 @@ function itemStats(index)
 	fullHP=baseHP+tab[8]
 	Endurancebonus=fullHP*endurance/1000
 	BBBonus=fullHP*(1.02^s-1)
-	
+	enduranceXbb=((1+endurance/1000)*(1.02^s)-1)*fullHP
 	--used for stats
 	hpStatsMap=hpStatsMap or {}
 	hpStatsMap[id]={
@@ -2539,7 +2539,7 @@ function itemStats(index)
 		["totalBaseHP"]=math.round(Game.Classes.HPBase[pl.Class]+hpScaling*level),
 	}
 	
-	tab[8]=tab[8]+Endurancebonus+BBBonus+hpScaling*BBHP
+	tab[8]=tab[8]+enduranceXbb+hpScaling*BBHP
 	
 	--get bonus stats from skills
 	
