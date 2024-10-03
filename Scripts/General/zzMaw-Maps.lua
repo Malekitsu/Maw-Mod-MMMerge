@@ -1701,7 +1701,9 @@ function events.MonsterKilled(mon)
 	if mon.NameId>300 then -- no drop from reanimated monsters
 		return
 	end
-	if totalLevel[mon.Id]>100 and math.random()<0.001*totalLevel[mon.Id]/100 then
+	mapvars.mapsDropped=mapvars.mapsDropped or 0
+	if totalLevel[mon.Id]>100 and math.random()<0.001*mon.Level/100/(mapvars.mapsDropped+1) then
+		mapvars.mapsDropped=mapvars.mapsDropped+1
 		assignedAffixes = {}
 		obj = SummonItem(290, mon.X, mon.Y, mon.Z + 100, 100)
 		obj.Item.BonusStrength=mapDungeons[math.random(1,#mapDungeons)]
