@@ -1786,18 +1786,9 @@ function events.BuildMonsterInformationBox(t)
 			--get damage multiplier
 			oldLevel=BLevel[mon.Id]
 			local i=mon.Id
-			if i%3==1 then
-				levelMult=Game.MonstersTxt[i+1].Level
-			elseif i%3==0 then
-				levelMult=Game.MonstersTxt[i-1].Level
-			else
-				levelMult=Game.MonstersTxt[i].Level
-			end
-			
-			
 			bonusDamage=math.max((lvl^0.88-BLevel[i]^0.88),0)
 			
-			dmgMult=(levelMult/9+1.15)*(1+(levelMult/200))
+			dmgMult=(lvl/9+1.15)*(1+(lvl/200))
 			if spellId==6 or spellId==97 then
 				dmgMult=dmgMult/2
 			end
