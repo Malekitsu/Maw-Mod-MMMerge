@@ -968,13 +968,17 @@ function events.CalcDamageToMonster(t)
 	if t.Player and data and data.Object==nil and t.DamageKind==4 then
 		local it=t.Player:GetActiveItem(1)
 		if it then 
-			skill=it:T().Skill
+			local skill=it:T().Skill
 			if skill==const.Skills.Spear then
-				local s,m=SplitSkill(t.Player.Skills[const.Skills.Spear])
+				local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spear))
+				local id=t.Monster:GetIndex()
+				mapvars.originalResistance=mapvars.originalResistance or {}
+				mapvars.originalResistance[id]=mapvars.originalResistance[id] or t.Monster.Resistances[index]
+				
 				mult=damageMultiplier[t.PlayerIndex]["Melee"]
-				reduction=math.round(s*0.1*mult)
+				reduction=math.round(2+s*0.05*mult)
 				if m==4 then
-					t.Monster.Resistances[index]=t.Monster.Resistances[index]-math.min(res, reduction)
+					t.Monster.Resistances[index]=math.max(mapvars.originalResistance[id]-s,t.Monster.Resistances[index]-reduction)
 				end
 			end
 		end
