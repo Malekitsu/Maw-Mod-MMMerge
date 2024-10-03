@@ -874,7 +874,7 @@ function events.BuildItemInformationBox(t)
 					power=math.ceil(power*1.5)
 				end
 				if t.Item.Bonus>=11 and t.Item.Bonus<=16 then
-					power=math.round(power^0.6/50*1000)/10 .. "%"
+					power=math.round((1-1/1.5^(power^0.6/15))*1000)/10 .. "%"
 				end
 				t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. power
 			end
