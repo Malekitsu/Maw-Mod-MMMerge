@@ -24,7 +24,7 @@ end
 function events.CalcDamageToMonster(t)
 		local data=WhoHitMonster()
 		if data and data.Player then
-			local heal=t.Result^0.6
+			local heal=t.Result^0.7
 			local fullHP=data.Player:GetFullHP()
 			if getMapAffixPower(32) then
 				heal=heal*(1-getMapAffixPower(32)/100)
@@ -64,7 +64,7 @@ function events.CalcDamageToMonster(t)
 				t.Player.HP=math.min(fullHP,t.Player.HP+heal)
 			end
 			if buffRework and getBuffSkill(91)>0 then --vampiric aura buff
-				local heal=t.Result^0.6*0.5
+				local heal=t.Result^0.7*0.5
 				if getMapAffixPower(32) then
 					heal=heal*(1-getMapAffixPower(32)/100)
 				end
