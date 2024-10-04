@@ -43,23 +43,6 @@ function events.DoBadThingToPlayer(t)
 	end
 end
 function events.Tick()
-	if getMapAffixPower(11) then
-		monLocation=monLocation or {}
-		for i=1, Map.Monsters.High do
-			local mon=Map.Monsters[i]
-			if not monLocation[i] then
-				monLocation[i]={mon.X,mon.Y}
-			end
-			if math.abs(mon.X-monLocation[i][1])<100 and math.abs(mon.Y-monLocation[i][2])<100 then
-				mon.X=mon.X + (mon.X-monLocation[i][1])*getMapAffixPower(11)/100
-				mon.Y=mon.Y + (mon.Y-monLocation[i][2])*getMapAffixPower(11)/100
-			end
-			monLocation[i][1]=mon.X
-			monLocation[i][2]=mon.Y
-		end
-	end
-end
-function events.Tick()
 	if getMapAffixPower(25) then
 		vars.lastX=vars.lastX or Party.X
 		vars.lastY=vars.lastY or Party.Y
