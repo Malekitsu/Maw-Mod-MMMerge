@@ -369,10 +369,6 @@ function events.BuildStatInformationBox(t)
 			m=8
 		end
 		local medRegen = math.round(fullSP^0.2*s^1.75*(m+5)/35)+2
-		if s > 50 then
-		medRegen = math.round(fullSP^0.2*50^1.75*(m+5)/35)*s/50+2
-		end
-		
 		--meditation buff
 		if buffRework and vars.mawbuff[56] then
 			local s, m, level=getBuffSkill(56)
