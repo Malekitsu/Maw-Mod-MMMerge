@@ -19,6 +19,14 @@ BLevel={}
 		table.insert(BLevel,Game.MonstersTxt[(i*3)-1].Level)
 		table.insert(BLevel,Game.MonstersTxt[(i*3)-1].Level)
 	end
+	
+	--remove steal skill
+	for i=1,Game.MonstersTxt.High do
+		local txt=Game.MonstersTxt[i]
+		if txt.Bonus==20 then
+			txt.Bonus=17
+		end
+	end
 end
 --------------------------------------
 --UNIQUE MONSTERS BUFF
