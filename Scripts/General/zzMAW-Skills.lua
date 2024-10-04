@@ -2035,14 +2035,8 @@ function events.CalcDamageToMonster(t)
 			if m>=3 then
 				local mon=t.Monster
 				--get Level
-				mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
-				local lvl=mon.Level
 				local id=t.MonsterIndex
-				if mon.NameId==0 then
-					lvl=math.round(totalLevel[mon.Id])
-				elseif mapvars.uniqueMonsterLevel[id] then
-					lvl=mapvars.uniqueMonsterLevel[id]
-				end
+				local lvl=getMonsterLevel(mon)
 				--chance to paralyze
 				local chance=s/lvl^0.65*0.15*damageMultiplier[t.Player:GetIndex()].Melee/math.min(1+lvl/150,3)
 				local applyParalyze=applyParalyze or {}
