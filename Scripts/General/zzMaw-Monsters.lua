@@ -117,6 +117,10 @@ function recalculateMawMonster()
 					mon.Resistances[v]=	txt.Resistances[v]
 				end
 			end
+			if mapvars.spearDamageIncrease and mapvars.spearDamageIncrease[i] then
+				local reduction=calcSpearResReduction(mapvars.spearDamageIncrease[i])
+				mon.Resistances[4]=mon.Resistances[4]-reduction
+			end
 			local currentHPPercentage=mon.HP/mon.FullHitPoints
 			hp=HPtable[mon.Id]
 			hpOvercap=0
@@ -144,7 +148,7 @@ function recalculateMawMonster()
 	--store table
 	for i=0, Map.Monsters.High do
 		mon=Map.Monsters[i]
-		if  mon.NameId >=1 and mon.NameId<220 then
+		if  mon.NameId >=1 and mon.NameId<300 then
 			--store monster data
 			mapvars.oldUniqueMonsterTable=mapvars.oldUniqueMonsterTable or {}
 			if not mapvars.oldUniqueMonsterTable[i] then
@@ -196,7 +200,7 @@ function recalculateMawMonster()
 		--calculate average level for unique monsters
 		for i=0, Map.Monsters.High do
 			mon=Map.Monsters[i]
-			if  mon.NameId >=1 and mon.NameId<220 then
+			if  mon.NameId >=1 and mon.NameId<300 then
 				local oldTable=mapvars.oldUniqueMonsterTable[i]
 				--horizontal progression
 				if Game.freeProgression==false then
