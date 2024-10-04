@@ -881,7 +881,12 @@ function events.GameInitialized2()
 			m6=SplitSkill(data.Player.Skills[const.Skills.Mind])
 			m7=SplitSkill(data.Player.Skills[const.Skills.Body])
 			data.Player.SP=math.min(data.Player.SP+m6, data.Player:GetFullSP())
-			data.Player.HP=math.min((data.Player.HP+m7^1.33)+(m4/t.Monster.Level)*0.3*t.Result, data.Player:GetFullHP())
+			
+			
+			local FHP=pl:GetFullHP()
+			local hpRestore=math.round(FHP^0.5* m7^1.5/50)
+			local monLvl=getMonsterLevel(t.Monster)
+			data.Player.HP=math.min((data.Player.HP+hpRestore)+(m4/math.round(monLvl^0.7))*0.05, data.Player:GetFullHP())
 			local fireDamage=(m1^0.5/500)
 			if t.Monster.Resistances[0]>=1000 then
 				mult=2^math.floor(t.Monster.Resistances[0]/1000)
@@ -941,14 +946,15 @@ local function shamanSkills(isShaman, id)
 		local waterReduction=math.round(m3^1.33*mult)
 		txt=baseSchoolsTxt[14] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)"
 		Skillz.setDesc(14,1,txt)
-		local leech=math.round(m4/pl.LevelBase*10000*0.3)/100
-		txt=baseSchoolsTxt[15] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks heal by " .. leech .. "% of damage done (vs. same level monster, up to 255)" 
+		local leech=math.round(m4/math.round(pl.LevelBase)^0.7*5*100)/100
+		txt=baseSchoolsTxt[15] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks heal by " .. leech .. "% of your total HP (vs. same level monster)" 
 		Skillz.setDesc(15,1,txt)
 		txt=baseSchoolsTxt[16] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nIncreases melee damage by " .. m5 .. "%"
 		Skillz.setDesc(16,1,txt)
 		txt=baseSchoolsTxt[17] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks restore " .. m6 .. " Spell Points"
 		Skillz.setDesc(17,1,txt)
-		local hpRestore=math.round(m7^1.33)
+		local FHP=pl:GetFullHP()
+		local hpRestore=math.round(FHP^0.5* m7^1.5/50)
 		txt=baseSchoolsTxt[18] .. "\n\nIncreases melee damage by 1 per skill level and spell damage/healing by 0.5%" .. "\n\nMelee attacks restore " .. hpRestore .. " Hit Points"
 		Skillz.setDesc(18,1,txt)
 	else
@@ -1073,16 +1079,19 @@ function events.GameInitialized2()
 			if t.DamageKind==4 and table.find(dkClass, data.Player.Class) then
 				local pl=data.Player
 				local bloodS, bloodM=SplitSkill(pl.Skills[const.Skills.Body])
-				local heal=t.Result*(bloodS/t.Monster.Level)*0.3
+				local FHP=pl:GetFullHP()
+				local monLvl=getMonsterLevel(t.Monster)
+				local heal=FHP*(bloodS/math.round(monLvl^0.7))*0.05
 				--current active leech spell
 				vars.dkActiveAttackSpell=vars.dkActiveAttackSpell or {}
 				local id=pl:GetIndex()
 				leech=0
 				if vars.dkActiveAttackSpell and (vars.dkActiveAttackSpell[id]==68 or vars.dkActiveAttackSpell[id]==74) then
-					leech=bloodS^1.33 * (1+bloodM/4)
+					local FHP=pl:GetFullHP()
+					local leech=FHP^0.5* bloodS^1.5/70* (1+bloodM/4)
 					pl.SP=pl.SP-6
 					if vars.dkActiveAttackSpell[id]==74 then
-						leech=bloodS^1.33 * 4
+						leech=leech * 2
 						pl.SP=pl.SP-6
 					end
 				end
@@ -1275,7 +1284,9 @@ local function dkSkills(isDK, id)
 		
 		
 		local bloodS, bloodM=SplitSkill(pl.Skills[const.Skills.Body])
-		local leech=bloodS^1.33
+		
+		local FHP=pl:GetFullHP()
+		local leech=FHP^0.5* bloodS^1.5/70
 		Game.SpellsTxt[68].Name="Blood Leech"
 		Game.SpellsTxt[68].Description="Activating this spell imbues the knight body with blood, leeching life upon attacking at the cost of 6 spell points."
 		Game.SpellsTxt[68].Normal="Leeches " .. math.round(leech * 1.25) .. " Hit Points"
@@ -1319,8 +1330,8 @@ local function dkSkills(isDK, id)
 		local txt
 		txt="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and increases attack speed by 2% per skill point.\n"
 		Skillz.setDesc(14,1,txt)
-		leech=math.round(bloodS/math.min(pl.LevelBase,255)*10000*0.3)/100
-		txt="This skill is only available to death knights and reduces physical damage taken by 1% per skill point.\nAdditionally it will make your attacks to leech damage based on damage done.\n\nCurrent leech vs. same level monsters (up to 255): " .. leech .. "%\n"            
+		local leech=math.round(bloodS/math.round(pl.LevelBase^0.7)*5*100)/100
+		txt="This skill is only available to death knights and reduces physical damage taken by 1% per skill point.\nAdditionally it will make your attacks to leech damage based on your total HP.\n\nCurrent leech vs. same level monsters: " .. leech .. "%\n"            
 		Skillz.setDesc(18,1,txt)
 		txt="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and reduces magical damage taken by 1% per skill point.\n"	
 		Skillz.setDesc(20,1,txt)
