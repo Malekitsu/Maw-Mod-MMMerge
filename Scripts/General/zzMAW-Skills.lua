@@ -636,7 +636,6 @@ function events.GameInitialized2()
 	Game.SkillDesMaster[const.Skills.Mace]=string.format("%s chance to stun",Game.SkillDesMaster[const.Skills.Mace])
 	Game.SkillDesGM[const.Skills.Mace]=string.format("%s chance to paralyze",Game.SkillDesGM[const.Skills.Mace])
 	Game.SkillDesMaster[const.Skills.Spear]=string.format("%s can hold with 1 hand",Game.SkillDesMaster[const.Skills.Spear])
-	Game.SkillDesGM[const.Skills.Spear]=string.format("%s\n\t070Each attack reduces monster phys resistance by 2+0.05 per skill point, multiplied by your base weapon speed, up to a reduction equal to spear skill.",Game.SkillDesGM[const.Skills.Spear])
 	Game.SkillDesMaster[const.Skills.Staff]=string.format("%s 1%% to stun",Game.SkillDesMaster[const.Skills.Staff])
 	Game.SkillDesGM[const.Skills.Staff]=string.format("%s usable with Unarm.",Game.SkillDesGM[const.Skills.Staff])
 	Game.SkillDesMaster[const.Skills.Sword]=string.format("%s can dual wield",Game.SkillDesMaster[const.Skills.Sword])
@@ -654,7 +653,7 @@ function events.GameInitialized2()
 	Game.SkillDesMaster[const.Skills.Dodging]=string.format("%s usable with Leather Armor",Game.SkillDesGM[const.Skills.Dodging])
 	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Dodging])
 	--Game.SkillDesGM[const.Skills.Unarmed]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Unarmed])	
-	
+	baseSpearTooltip=Game.SkillDesGM[const.Skills.Spear]
 	maceGMtxt=Game.SkillDesGM[6] --used for mace tooltip
 end
 
@@ -1246,6 +1245,12 @@ function events.Tick()
 		end
 		txt= string.format("%s\n\nIncreases spell points based on SP per level and mastery\n\nCurrent SP Regeneration: %s\nNext Level Bonus: %s SP Regen\n",baseMedStr,StrColor(60,60,255,spRegen),StrColor(60,60,255,"+" .. spRegen2))
 		Skillz.setDesc(28,1,txt)
+		
+		--spear tooltip
+		local s,m=SplitSkill(pl:GetSkill(const.Skills.Spear))
+		local mult=damageMultiplier[pl:GetIndex()]["Melee"]
+		local damageIncrease=math.round((2+s*0.02)*mult*10)/10
+		Game.SkillDesGM[const.Skills.Spear]=string.format("%s\n\t070Each spear attack reduces physical resistance, increasing damage by: %s%%",baseSpearTooltip,damageIncrease)
 	end
 end
 
