@@ -106,7 +106,7 @@ function events.CalcDamageToMonster(t)
 		--end of [14]
 		--[24]="killing a Monster Restores 10% of Health and Mana"
 		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 24) then
-			local restoreHPLeg=true
+			restoreHPLeg=true
 			function events.Tick()
 				events.Remove("Tick", 1)
 				if restoreHPLeg then
