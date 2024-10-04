@@ -1476,12 +1476,7 @@ function events.CalcDamageToMonster(t)
 		mult=1
 		if massHPMULT[Game.BolsterAmount]=="doom" then
 			local mon=t.Monster
-			local lvl=mon.Level
-			if mon.NameId==0 then
-				lvl=totalLevel[mon.Id]
-			elseif mapvars.uniqueMonsterLevel[mon.MonsterIndex] then
-				lvl=math.round(mapvars.uniqueMonsterLevel[mon.MonsterIndex])
-			end
+			local lvl=getMonsterLevel(mon)
 			mult=3.33*(1+lvl/75)
 			if mon.NameId>=220 and mon.NameId<300 then
 				mult=mult*2*(1+mon.Level/80)
