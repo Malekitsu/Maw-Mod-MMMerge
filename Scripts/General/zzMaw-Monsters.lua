@@ -156,7 +156,7 @@ function recalculateMawMonster()
 	--store table
 	for i=0, Map.Monsters.High do
 		mon=Map.Monsters[i]
-		if  mon.NameId >=1 and mon.NameId<300 then
+		if  mon.NameId >=1 and mon.NameId<220 then
 			--store monster data
 			mapvars.oldUniqueMonsterTable=mapvars.oldUniqueMonsterTable or {}
 			if not mapvars.oldUniqueMonsterTable[i] then
@@ -208,7 +208,7 @@ function recalculateMawMonster()
 		--calculate average level for unique monsters
 		for i=0, Map.Monsters.High do
 			mon=Map.Monsters[i]
-			if  mon.NameId >=1 and mon.NameId<300 then
+			if  mon.NameId >=1 and mon.NameId<220 then
 				local oldTable=mapvars.oldUniqueMonsterTable[i]
 				--horizontal progression
 				if Game.freeProgression==false then
