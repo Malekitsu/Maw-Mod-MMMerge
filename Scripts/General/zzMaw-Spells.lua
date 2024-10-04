@@ -958,9 +958,9 @@ function getAscensionTier(skill,spellID, index)
 	if spelltier==0 then
 		spelltier=11
 	end
-	ascensionTier=math.min(math.floor(skill/11),4)
-	if skill>=55 then
-		ascensionTier=5
+	ascensionTier=math.min(math.floor(skill/11),6)
+	if skill>=77 then
+		ascensionTier=7
 	elseif spelltier<=skill%11  then
 		ascensionTier=ascensionTier+1
 	end
@@ -1620,10 +1620,10 @@ function ascension()
 			local ascensionLevel=getAscensionTier(s,num)
 			if ascensionLevel>=1 then
 				for i=1,4 do
-					Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m)
+					Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(spellCost[num][masteryName[i]]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m),65000)
 					if elementalist then
 						local baseCost=math.round((spellCost[num][masteryName[i]]+vars.eleStacks[id])*(1+s*0.125)*1.5^(ascensionLevel)*(1-0.125*m))
-						Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.round(baseCost*(1+vars.eleStacks[id]*0.075))
+						Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(math.round(baseCost*(1+vars.eleStacks[id]*0.075)),65000)
 					end
 				end
 			else
