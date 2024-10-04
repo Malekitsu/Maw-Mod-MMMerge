@@ -2543,8 +2543,26 @@ function events.Tick()
 			swiftLocation[i][2]=mon.Y
 		end
 	end
+	if getMapAffixPower(11) then
+		swiftLocation=swiftLocation or {}
+		for i=1, Map.Monsters.High do
+			local mon=Map.Monsters[i]
+			if not swiftLocation[i] then
+				swiftLocation[i]={mon.X,mon.Y}
+			end
+			if math.abs(mon.X-swiftLocation[i][1])<100 and math.abs(mon.Y-swiftLocation[i][2])<100 then
+				mon.X=mon.X + (mon.X-swiftLocation[i][1])*getMapAffixPower(11)/100
+				mon.Y=mon.Y + (mon.Y-swiftLocation[i][2])*getMapAffixPower(11)/100
+			end
+			swiftLocation[i][1]=mon.X
+			swiftLocation[i][2]=mon.Y
+		end
+	end
 end
-
+--remove on map load
+function events.LoadMap()
+	swiftLocation=nil
+end
 
 function calcDices(add, sides, count, mult, bonusDamage)
     local bonusDamage = bonusDamage or 0
