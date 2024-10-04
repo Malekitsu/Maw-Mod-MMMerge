@@ -203,12 +203,7 @@ acNerf=0
 function events.PlayerAttacked(t)
 	if t.Attacker and t.Attacker.Monster then
 		local mon=t.Attacker.Monster
-		local lvl=mon.Level
-		if mon.NameId==0 then
-			lvl=math.round(totalLevel[mon.Id])
-		elseif mapvars.uniqueMonsterLevel[mon:GetIndex()] then
-			lvl=math.round(mapvars.uniqueMonsterLevel[mon:GetIndex()])
-		end
+		local lvl=getMonsterLevel(mon)
 		nerfAmount=math.max(1,lvl/255)
 		if t.Attacker.MonsterAction==0 then
 			ac=t.Player:GetArmorClass()
@@ -631,12 +626,7 @@ function events.CalcDamageToPlayer(t)
 	local lvl=0
 	if data and data.Monster then
 		local mon=data.Monster
-		lvl=mon.Level
-		if mon.NameId==0 then
-			lvl=math.round(totalLevel[mon.Id])
-		elseif mapvars.uniqueMonsterLevel[mon:GetIndex()] then
-			lvl=math.round(mapvars.uniqueMonsterLevel[mon:GetIndex()])
-		end
+		lvl=getMonsterLevel(mon)
 	end
 	--dodging DODGE 
 	local dodging=0
