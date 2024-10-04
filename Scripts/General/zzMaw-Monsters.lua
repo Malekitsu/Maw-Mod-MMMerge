@@ -325,13 +325,7 @@ end
 function events.MonsterKillExp(t)
 	local partyLvl=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL+vars.MMMLVL
 	local mon=t.Monster
-	if mon.NameId==0 then
-		monLvl=math.round(totalLevel[mon.Id])
-	elseif mapvars.uniqueMonsterLevel[t.MonsterIndex] then
-		monLvl=mapvars.uniqueMonsterLevel[t.MonsterIndex]
-	else
-		monLvl=mon.Level
-	end
+	monLvl=getMonsterLevel(mon)
 	t.Handled=true
 	local partyCount=0
 	for i=0, Party.High do
@@ -1707,6 +1701,16 @@ local spellToDamageKind={
 	[0]=12,
 }
 
+function getMonsterLevel(mon)
+	local lvl=mon.Level
+	if mon.NameId==0 and totalLevel and totalLevel[mon.Id] then
+		lvl=math.round(totalLevel[mon.Id])
+	elseif mapvars.uniqueMonsterLevel and mapvars.uniqueMonsterLevel[mon:GetIndex()] then
+		lvl=math.round(mapvars.uniqueMonsterLevel[mon:GetIndex()])
+	end
+	return lvl
+end
+
 function events.BuildMonsterInformationBox(t)
 	lastMonsterNumber=lastMonsterNumber or Map.Monsters.High
 	if lastMonsterNumber~=Map.Monsters.High then
@@ -1717,13 +1721,8 @@ function events.BuildMonsterInformationBox(t)
 	mon=Map.Monsters[Mouse:GetTarget().Index]
 	--show level Below HP
 	mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
-	local lvl=mon.Level
+	local lvl=getMonsterLevel(mon)
 	if t.IdentifiedHitPoints then
-		if mon.NameId==0 then
-			lvl=math.round(totalLevel[mon.Id])
-		elseif mapvars.uniqueMonsterLevel[Mouse:GetTarget().Index] then
-			lvl=math.round(mapvars.uniqueMonsterLevel[Mouse:GetTarget().Index])
-		end
 		t.ArmorClass.Text=string.format("Level:          " .. lvl .. "\n" .. t.ArmorClass.Text)
 	end
 	--difficulty multiplier
