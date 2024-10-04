@@ -967,14 +967,17 @@ function events.CalcDamageToMonster(t)
 			local skill=it:T().Skill
 			if skill==const.Skills.Spear then
 				local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spear))
-				local id=t.Monster:GetIndex()
-				mapvars.originalResistance=mapvars.originalResistance or {}
-				mapvars.originalResistance[id]=mapvars.originalResistance[id] or t.Monster.Resistances[index]
-				
-				mult=damageMultiplier[t.PlayerIndex]["Melee"]
-				reduction=math.round(2+s*0.05*mult)
 				if m==4 then
-					t.Monster.Resistances[index]=math.max(mapvars.originalResistance[id]-s,t.Monster.Resistances[index]-reduction)
+					local id=t.Monster:GetIndex()
+					mapvars.originalResistance=mapvars.originalResistance or {}
+					mapvars.originalResistance[id]=mapvars.originalResistance[id] or t.Monster.Resistances[index]
+					mapvars.spearDamageIncrease=mapvars.spearDamageIncrease or {}
+					mapvars.spearDamageIncrease[id]=mapvars.spearDamageIncrease[id] or 0
+					local mult=damageMultiplier[t.PlayerIndex]["Melee"]
+					local damageIncrease=math.round(2+s*0.02)*mult
+					mapvars.spearDamageIncrease[id]=mapvars.spearDamageIncrease[id]+damageIncrease
+					local reduction=calcSpearResReduction(mapvars.spearDamageIncrease[id])
+					t.Monster.Resistances[index]=math.round(mapvars.originalResistance[id]-reduction)
 				end
 			end
 		end
@@ -983,6 +986,12 @@ function events.CalcDamageToMonster(t)
 	res=1-1/2^(res/100)
 
 	t.Result = t.Result * (1-res)
+end
+
+function calcSpearResReduction(y)
+    local log2 = math.log(1 + y / 100) / math.log(2)
+    local reduction = 100 * log2
+    return reduction
 end
 
 --stats breakpoints
