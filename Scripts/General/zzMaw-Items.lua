@@ -2465,12 +2465,9 @@ function itemStats(index)
 			if Party.SpellBuffs[buffList[i]].ExpireTime>=Game.Time then
 				local s, m, level=getBuffSkill(spellList[i])
 				buff=buffPower[spellList[i]].Base[m]+(level/2)*(1+buffPower[spellList[i]].Scaling[m]/100*s)
-				debug.Message(buff .. "  " .. buff2)
 				buff4=math.max(buff,buff2)
 				tab[i+10]=tab[i+10]+buff4
 			end
-			
-			debug.Message(buff .. "  " .. buff3)
 			statBuff=math.max(buff, buff3)
 			local tabID=spellStat[spellList[i]]
 			tab[tabID]=tab[tabID]+statBuff
