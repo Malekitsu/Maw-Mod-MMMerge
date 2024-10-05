@@ -2628,10 +2628,10 @@ if buffRework then
 	--[19]={["Cost"]=100,["Sound"]=11070, ["PartyBuff"]=11},--Invisibility
 	--[21]={["Cost"]=120,["Sound"]=11090, ["PartyBuff"]=7},--fly
 	[27]={["Cost"]=20, ["Sound"]=12040, ["PartyBuff"]=18},--water walk
-	[124]={["Cost"]=20, ["Sound"]=21020, ["PartyBuff"]=7},--fly
+	--[124]={["Cost"]=20, ["Sound"]=21020, ["PartyBuff"]=7},--fly
 	}
 
-	buffSpellList={1,3,4,12,14,21,25,27,28,36,56,58,69,5,8,17,38,46,47,50,51,71,73,75,83,85,86,91,95,124}
+	buffSpellList={1,3,4,12,14,21,25,27,28,36,56,58,69,5,8,17,38,46,47,50,51,71,73,75,83,85,86,91,95}
 	utilityBuffs={16,19,11,18}
 	
 	mawPartyBuffList={6,0,17,4,12,1,8,10,14,15,9,13,2,16,19,18}
