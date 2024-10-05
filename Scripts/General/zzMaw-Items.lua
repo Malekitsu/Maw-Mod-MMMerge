@@ -2456,18 +2456,21 @@ function itemStats(index)
 		local spellStat={[3]=2,[14]=6,[25]=7,[36]=4,[46]=5,[58]=3,[69]=1}
 		--resistances and stats
 		local s, m, level=getBuffSkill(85)
-		local buff2=buffPower[85].Base[m]+(level/2)*(1+buffPower[85].Scaling[m]/100*s)
+		local buff2=buffPower[85].Base[m]+(level/2)*(1+buffPower[85].Scaling[m]/100*s/1.5)
 		local s, m, level=getBuffSkill(83)
-		local buff3=buffPower[83].Base[m]+(level/2)*(1+buffPower[83].Scaling[m]/100*s)
+		local buff3=buffPower[83].Base[m]+(level/2)*(1+buffPower[83].Scaling[m]/100*s/1.5)
 		for i=1,6 do
 			local buff=0
 			local statBuff=0
 			if Party.SpellBuffs[buffList[i]].ExpireTime>=Game.Time then
 				local s, m, level=getBuffSkill(spellList[i])
 				buff=buffPower[spellList[i]].Base[m]+(level/2)*(1+buffPower[spellList[i]].Scaling[m]/100*s)
+				debug.Message(buff .. "  " .. buff2)
 				buff4=math.max(buff,buff2)
 				tab[i+10]=tab[i+10]+buff4
 			end
+			
+			debug.Message(buff .. "  " .. buff3)
 			statBuff=math.max(buff, buff3)
 			local tabID=spellStat[spellList[i]]
 			tab[tabID]=tab[tabID]+statBuff
