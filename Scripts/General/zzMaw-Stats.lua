@@ -894,13 +894,21 @@ function events.Tick()
 				resistances2[i]=resistances2[i] .. ".0"
 			end
 		end
-		
-		Game.GlobalTxt[87]=StrColor(255, 70, 70,    string.format("Fire\t            %s%s ",resistances2[10],"%")) .. string.format("%6s", resistances[10]) .. "\n\n\n\n\n\n\n\n\n"
-		Game.GlobalTxt[6]=StrColor(173, 216, 230,   string.format("Air\t            %s%s ",resistances2[11],"%")) .. string.format("%6s", resistances[11]) .. "\n\n\n\n\n\n\n\n\n"
-		Game.GlobalTxt[240]=StrColor(100, 180, 255, string.format("Water\t            %s%s ",resistances2[12],"%")) .. string.format("%6s", resistances[12]) .. "\n\n\n\n\n\n\n\n\n"
-		Game.GlobalTxt[70]=StrColor(153, 76, 0,     string.format("Earth\t            %s%s ",resistances2[13],"%")) .. string.format("%6s", resistances[13]) .. "\n\n\n\n\n\n\n\n\n"
-		Game.GlobalTxt[142]=StrColor(200, 200, 255, string.format("Mind\t            %s%s ",resistances2[14],"%")) .. string.format("%6s", resistances[14]) .. "\n\n\n\n\n\n\n\n\n"
-		Game.GlobalTxt[29]=StrColor(255, 192, 203,  string.format("Body\t            %s%s ",resistances2[15],"%"))	 .. string.format("%6s", resistances[15]) .. "\n\n\n\n\n\n\n\n\n"
+		local resistanceText={}
+		local id=pl:GetIndex()
+		for i=1,6 do
+			if normalEnchantResistance[id][10+i]>0 then
+				resistanceText[i]=StrColor(0,255,0,string.format("%6s", resistances[9+i]))
+			else
+				resistanceText[i]=string.format("%6s", resistances[9+i])
+			end
+		end
+		Game.GlobalTxt[87]=StrColor(255, 70, 70,    string.format("Fire\t            %s%s ",resistances2[10],"%")) .. resistanceText[1] .. "\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[6]=StrColor(173, 216, 230,   string.format("Air\t            %s%s ",resistances2[11],"%")) .. resistanceText[2] .. "\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[240]=StrColor(100, 180, 255, string.format("Water\t            %s%s ",resistances2[12],"%")) .. resistanceText[3] .. "\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[70]=StrColor(153, 76, 0,     string.format("Earth\t            %s%s ",resistances2[13],"%")) .. resistanceText[4] .. "\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[142]=StrColor(200, 200, 255, string.format("Mind\t            %s%s ",resistances2[14],"%")) .. resistanceText[5] .. "\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[29]=StrColor(255, 192, 203,  string.format("Body\t            %s%s ",resistances2[15],"%"))	 .. resistanceText[6] .. "\n\n\n\n\n\n\n\n\n"
 		statsChanged=true
 	elseif statsChanged and (Game.CurrentCharScreen~=100 or Game.CurrentScreen~=7) then
 		Game.GlobalTxt[87]="Fire"
