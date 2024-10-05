@@ -1684,7 +1684,7 @@ function ascension()
 			local ascensionLevel=getAscensionTier(s,spells[i])
 			if spells[i]~=44 then
 				if ascensionLevel>=1 then
-					if ascensionLevel==5 then
+					if ascensionLevel==8 then
 						ascensionLevel="max"
 					end
 					Game.SpellsTxt[spells[i]].Description=Game.SpellsTxt[spells[i]].Description .. "\n\nAscension level: " .. ascensionLevel
