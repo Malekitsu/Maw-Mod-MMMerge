@@ -207,12 +207,12 @@ function recalculateMawMonster()
 		mapvars.oldUniqueMonsterTable=mapvars.oldUniqueMonsterTable or {}
 		--calculate average level for unique monsters
 		for i=0, Map.Monsters.High do
-			mon=Map.Monsters[i]
+			local mon=Map.Monsters[i]
 			if  mon.NameId >=1 and mon.NameId<220 then
 				local oldTable=mapvars.oldUniqueMonsterTable[i]
 				--horizontal progression
 				if Game.freeProgression==false then
-					name=Game.MapStats[Map.MapStatsIndex].Name
+					local name=Game.MapStats[Map.MapStatsIndex].Name
 					if not horizontalMaps[name] then
 						partyLvl=oldTable.Level*2
 					end
@@ -274,9 +274,40 @@ function recalculateMawMonster()
 				atk2.DamageAdd, atk2.DamageDiceSides, atk2.DamageDiceCount, extraMult2 = calcDices(oldTable.Attack2.DamageAdd,oldTable.Attack2.DamageDiceSides,oldTable.Attack2.DamageDiceCount,dmgMult)
 				mapvars.nameIdMult=mapvars.nameIdMult or {}
 				mapvars.nameIdMult[mon.NameId]={extraMult1, extraMult2}
+			elseif mon.NameId>=220 and mon.NameId<300 then
+				local txt=Game.MonstersTxt[mon.Id]
+				local index=mon:GetIndex()
+				local atk1=mon.Attack1
+				local txtAtk1=txt.Attack1
+				atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount = txtAtk1.DamageAdd, txtAtk1.DamageDiceSides, txtAtk1.DamageDiceCount
+				local txt=Game.MonstersTxt[mon.Id]
+				local atk2=mon.Attack2
+				local txtAtk2=txt.Attack2
+				atk2.DamageAdd, atk2.DamageDiceSides, atk2.DamageDiceCount = txtAtk2.DamageAdd, txtAtk2.DamageDiceSides, txtAtk2.DamageDiceCount
+				local lvl=getMonsterLevel(mon)
+				local baseLvl=totalLevel[mon.Id]
+				if baseLvl<100 and (lvl<baseLvl*1.1 or lvl>baseLvl*1.3)  then
+					mapvars.uniqueMonsterLevel[index]=math.round(baseLvl*(1.1+math.random()*0.2))
+				elseif baseLvl<=100 and (lvl<baseLvl+10 or lvl>baseLvl+30) then
+					mapvars.uniqueMonsterLevel[index]=math.round(baseLvl+math.random()*20+10)
+				end
+				mon.Level=math.min(mapvars.uniqueMonsterLevel[index],255)
+				local totalHP=mon.HP*2^(math.floor(mon.Resistances[0]/1000))
+				local minHP=HPtable[mon.Id]*2*(1+txt.Level/80)
+				if totalHP<minHP or totalHP>minHP*2.01 then
+					HP=minHP*(1+math.random())while HP>32500 do
+					HP=math.round(HP/2)
+					hpOvercap=hpOvercap+1
+					end
+					mon.Resistances[0]=math.round(txt.Resistances[0]*5)/5%1000+1000*hpOvercap
+					local HPproportion=mon.HP/mon.FullHP
+					mon.FullHP=HP
+					mon.HP=mon.FullHP*HPproportion
+				end
 			end
 		end
 	end	
+	
 	--mapping modifiers
 	for i=0, Map.Monsters.High do
 		local mon=Map.Monsters[i]
