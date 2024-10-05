@@ -126,7 +126,7 @@ function respawnMonsters()
 		for i=0,#mapvars.monsterRespawns do
 			local mon=Map.Monsters[i]
 			local baseMon=mapvars.monsterRespawns[i]
-			if mon and baseMon and mon.AIState==const.AIState.Removed and baseMon.deathTime and Game.Time>baseMon.deathTime+const.Hour*5 then
+			if mon and baseMon and ((mon.AIState==const.AIState.Removed and baseMon.deathTime and Game.Time>baseMon.deathTime+const.Hour*5) or (baseMon.deathTime and Game.Time>baseMon.deathTime+const.Week)) then
 				mon.HP=mon.FullHP
 				mon.AIState=0
 				mon.X=baseMon.X
