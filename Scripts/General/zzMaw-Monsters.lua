@@ -291,21 +291,38 @@ function recalculateMawMonster()
 				local baseLvl=totalLevel[mon.Id]
 				if baseLvl<100 and (lvl<baseLvl*1.1 or lvl>baseLvl*1.3)  then
 					mapvars.uniqueMonsterLevel[index]=math.round(baseLvl*(1.1+math.random()*0.2))
-				elseif baseLvl<=100 and (lvl<baseLvl+10 or lvl>baseLvl+30) then
+				elseif baseLvl>=100 and (lvl<baseLvl+10 or lvl>baseLvl+30) then
 					mapvars.uniqueMonsterLevel[index]=math.round(baseLvl+math.random()*20+10)
 				end
 				mon.Level=math.min(mapvars.uniqueMonsterLevel[index],255)
 				local totalHP=mon.HP*2^(math.floor(mon.Resistances[0]/1000))
 				local minHP=HPtable[mon.Id]*2*(1+txt.Level/80)
 				if totalHP<minHP or totalHP>minHP*2.01 then
-					HP=minHP*(1+math.random())while HP>32500 do
-					HP=math.round(HP/2)
-					hpOvercap=hpOvercap+1
+					HP=minHP*(1+math.random())
+					local hpOvercap=0
+					while HP>32500 do
+						HP=math.round(HP/2)
+						hpOvercap=hpOvercap+1
 					end
 					mon.Resistances[0]=math.round(txt.Resistances[0]*5)/5%1000+1000*hpOvercap
 					local HPproportion=mon.HP/mon.FullHP
 					mon.FullHP=HP
 					mon.HP=mon.FullHP*HPproportion
+				end
+				local addMultiplier=false
+				if mapvars.nameIdMult and not mapvars.nameIdMult[mon.NameId] then
+					addMultiplier=true
+				end
+				if not mapvars.nameIdMult then
+					addMultiplier=true
+				end
+				if addMultiplier then
+					local dmgMult=1.5+math.random()*0.5
+					if getMapAffixPower(18) then
+						dmgMult=dmgMult*(1+getMapAffixPower(18)/100)
+					end
+					mapvars.nameIdMult=mapvars.nameIdMult or {}
+					mapvars.nameIdMult[mon.NameId]={overflowMult[mon.Id][1]*dmgMult, overflowMult[mon.Id][2]*dmgMult}
 				end
 			end
 		end
