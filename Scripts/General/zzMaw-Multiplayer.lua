@@ -1,7 +1,9 @@
 --initialize events
 function events.MultiplayerInitialized()
+	Multiplayer.VERSION = "MAW " .. Multiplayer.VERSION
 	Multiplayer.allow_remote_event("mawBuffs")
 	Multiplayer.allow_remote_event("MAWMapvarArrived")
+	Multiplayer.allow_remote_event("mawMultiPlayerData")
 end
 
 function mawmapvarsend(name,value)
@@ -84,5 +86,68 @@ end
 function events.AfterLoadMap()
 	if buffRework then
 		Timer(sendBuffs, const.Minute/2, true)
+	end
+end
+
+function events.mawMultiPlayerData(t)
+	Game.ShowStatusText(t.Message)
+end
+
+--Multiplayer.broadcast_questdata({Message = "Hello"}, "mawMultiPlayerData")
+function events.AfterLoadMap()
+	if vars.onlineMode and Map.IndoorOrOutdoor==2 then --outdoor, indoor directly reset map
+		if mapvars.monsterRespawns==nil then
+			mapvars.monsterRespawns={}
+			for i=0,Map.Monsters.High do
+				local mon=Map.Monsters[i]
+				if mon.AIState~=const.AIState.Invisible then --just to make sure not to spawn unintended monsters
+					mapvars.monsterRespawns[i]={["X"] = mon.X, ["Y"] = mon.Y, ["Z"] = mon.Z,["deathTime"]=false}
+				end
+			end
+		end
+	end
+end
+
+function events.MonsterKilled(mon)
+	if vars.onlineMode and Map.IndoorOrOutdoor==2 then
+		local id=mon:GetIndex()
+		if mapvars.monsterRespawns and mapvars.monsterRespawns[id] then
+			mapvars.monsterRespawns[id].deathTime=Game.Time
+		end
+	end
+end
+
+function respawnMonsters()
+	if vars.onlineMode and mapvars.monsterRespawns then
+		for i=0,#mapvars.monsterRespawns do
+			local mon=Map.Monsters[i]
+			local baseMon=mapvars.monsterRespawns[i]
+			if mon and baseMon and mon.AIState==const.AIState.Removed and baseMon.deathTime and Game.Time>baseMon.deathTime+const.Hour*5 then
+				mon.HP=mon.FullHP
+				mon.AIState=0
+				mon.X=baseMon.X
+				mon.Y=baseMon.Y
+				mon.Z=baseMon.Z
+				mon.Ally=0
+			end
+		end
+	end
+end
+
+--avoid spawn right after looting
+function events.PickCorpse(t)
+	if vars.onlineMode then
+		local mon=t.Monster
+		local id=mon:GetIndex()
+		if mapvars.monsterRespawns and mapvars.monsterRespawns[i] and mapvars.monsterRespawns[i].deathTime then
+			mapvars.monsterRespawns[i].deathTime=math.max(mapvars.monsterRespawns[i].deathTime, Game.Time+const.Hour*2)
+		end			
+	end
+end
+
+
+function events.LoadMap(wasInGame)
+	if vars.onlineMode then
+		Timer(respawnMonsters, const.Minute*30) 
 	end
 end
