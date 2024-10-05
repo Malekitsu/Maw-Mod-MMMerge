@@ -258,7 +258,9 @@ function events.ItemGenerated(t)
 				mapLevel=0
 			end
 		end
-		
+		if vars.onlineMode then
+			partyLevel=(mapLevel/3)^1.5
+		end
 		if mapvars.mapAffixes then
 			currentLevel=mapvars.mapAffixes.Power*10+20
 			partyLevel=mapvars.mapAffixes.Power*10+20
@@ -1810,15 +1812,15 @@ slotMap={
 
 
 function events.BuildItemInformationBox(t)
-	partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-	maxItemBolster=(partyLevel)/5+20
+	--partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+	--maxItemBolster=(partyLevel)/5+20
 	--failsafe
-	if Game.freeProgression and t.Item and t.Item.Charges==0 and t.Item.Bonus==0 and t.Item.Bonus2==0 and t.Item.MaxCharges>maxItemBolster then
-		if not Game.freeProgression then
-			maxItemBolster=maxItemBolster+10
-		end
-		t.Item.MaxCharges=math.round(partyLevel/5)
-	end
+	--if Game.freeProgression and t.Item and t.Item.Charges==0 and t.Item.Bonus==0 and t.Item.Bonus2==0 and t.Item.MaxCharges>maxItemBolster then
+	--	if not Game.freeProgression then
+	--		maxItemBolster=maxItemBolster+10
+	--	end
+	--	t.Item.MaxCharges=math.round(partyLevel/5)
+	--end
 	if t.Description then
 		if Game.CurrentPlayer==-1 then return end
 		local equipStat=t.Item:T().EquipStat
