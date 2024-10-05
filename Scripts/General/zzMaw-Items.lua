@@ -887,7 +887,7 @@ function events.BuildItemInformationBox(t)
 					strength=math.ceil(strength*1.5)
 				end
 				if bonus>=11 and bonus<=16 then
-					strength=math.round(strength^0.6/50*1000)/10 .. "%"
+					strength=math.round((1-1/1.5^(strength^0.6/15))*1000)/10 .. "%"
 				end
 				t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
 			elseif t.Item.Bonus~=0 and t.Item.BonusStrength~=0 then
