@@ -217,6 +217,9 @@ function recalculateMawMonster()
 						partyLvl=oldTable.Level*2
 					end
 				end
+				if vars.onlineMode then
+					partyLvl=mon.Level^1.5-mon.Level
+				end
 				--level increase 
 				oldLevel=oldTable.Level
 				mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
@@ -549,6 +552,15 @@ function recalculateMonsterTable()
 			mon.Level=math.min(totalLevel[i],255)
 		end
 		
+		--online
+		if vars.onlineMode then
+			bolsterLevel=mp.Mid^1.5
+			horizontalMultiplier=bolsterLevel/mp.Mid
+			flattener=(base.Level-LevelB)*horizontalMultiplier^0.7 --necessary to avoid making too much difference between monster tier
+			totalLevel[i]=math.max(base.Level*horizontalMultiplier-flattener+adjust*horizontalMultiplier^0.7, 5)
+			mon.Level=math.min(totalLevel[i],255)
+		end
+		
 		--HP
 		HPBolsterLevel=basetable[i].Level*(1+(0.1*(totalLevel[i]-basetable[i].Level)/100))+(totalLevel[i]-basetable[i].Level)*0.9
 		HPtable=HPtable or {}
@@ -653,7 +665,7 @@ function recalculateMonsterTable()
 		overflowMult[i]={extraMult1, extraMult2}
 	end
 	--adjust damage if it's too similiar between monster type
-	if bolsterLevel>10 or Game.freeProgression==false then
+	if bolsterLevel>10 or Game.freeProgression==false or vars.onlineMode then
 		for i=1, 651 do
 			mon=Game.MonstersTxt[i]
 			base=basetable[i]		
@@ -2085,6 +2097,9 @@ function events.MonsterKilled(mon)
 				mapLevel=mapLevel+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
 				if not Game.freeProgression then
 					mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)
+				end
+				if vars.onlineMode then
+					mapLevel=((mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)^1.5
 				end
 				local experience=math.ceil(m^0.7*(mapLevel*20+mapLevel^1.8)/3/1000)*1000
 				--bolster code
