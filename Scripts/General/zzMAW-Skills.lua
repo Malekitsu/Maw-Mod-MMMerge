@@ -1512,15 +1512,46 @@ end
 local learningRequirements={0,6,12,20}
 local learningRequirementsNormal={0,4,7,10}
 local horizontalSkills={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,27,28,32,33,38}
+--online
+local onlineLearningRequirements={0,12,30,50}
+local onlineCost={0,10000,40000,200000}
 function events.CanTeachSkillMastery(t)
-	if Game.freeProgression then return end -- only in horizontal mode
 	if t.Allow==false then return end --if failing for special requirements (stats, gold, already learned etc)
 	if not table.find(horizontalSkills, t.Skill) then return end
 	local masteries={"","n Expert", " Master", " GrandMaster"}
-	local skill=SplitSkill(Party[Game.CurrentPlayer].Skills[t.Skill])
-	if skill<learningRequirements[t.Mastery] then
-		t.Allow=false
-		t.Text="You need at least " .. learningRequirements[t.Mastery] .. " skill to become a" ..  masteries[t.Mastery]
+	
+	--online
+	if vars.onlineMode then
+		--calculate cost
+		local baseCost=onlineCost[t.Mastery]
+		local cost=baseCost
+		local id=Game.CurrentPlayer
+		local masteryToLearn=t.Mastery
+		if id>=0 and id<=Party.High then
+			local pl=Party[id]
+			for i=1,#horizontalSkills do
+				local s,m=SplitSkill(pl.Skills[horizontalSkills[i]])
+				if masteryToLearn>=m then
+					cost=cost+baseCost
+				end
+			end
+		end
+		t.Cost=cost
+		local skill=SplitSkill(Party[id].Skills[t.Skill])
+		if skill<onlineLearningRequirements[t.Mastery] or Party.Gold<cost then
+			t.Allow=false
+			t.Text="You need at least " .. onlineLearningRequirements[t.Mastery] .. " skill and " .. cost .. " gold to become a" ..  masteries[t.Mastery]
+		end
+		Message("To learn " .. Skillz.getName(t.Skill) .. " you need at least " .. onlineLearningRequirements[t.Mastery] .. " skill and " .. cost .. " gold.")
+		return
+	end
+	--horizontal mode
+	if not Game.freeProgression then
+		local skill=SplitSkill(Party[Game.CurrentPlayer].Skills[t.Skill])
+		if skill<learningRequirements[t.Mastery] then
+			t.Allow=false
+			t.Text="You need at least " .. learningRequirements[t.Mastery] .. " skill to become a" ..  masteries[t.Mastery]
+		end
 	end
 end
 --reset and store masteries for free progression
