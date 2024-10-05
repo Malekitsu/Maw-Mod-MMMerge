@@ -3118,7 +3118,7 @@ artifactSkillBonus[2035] =	{	[const.Skills.DisarmTraps] = 10}
 
 --artifacts HP/SP regen
 artifactHpRegen={509,520,1337}
-artifactSpRegen={1334}
+artifactSpRegen={513,1334}
 
 --refresh stats
 function events.AfterLoadMap()
