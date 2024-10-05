@@ -94,6 +94,10 @@ function events.mawMultiPlayerData(t)
 end
 
 --Multiplayer.broadcast_questdata({Message = "Hello"}, "mawMultiPlayerData")
+
+------------------------------
+--MONSTER RESPAWN FOR ONLINE--
+------------------------------
 function events.AfterLoadMap()
 	if vars.onlineMode and Map.IndoorOrOutdoor==2 then --outdoor, indoor directly reset map
 		if mapvars.monsterRespawns==nil then
@@ -129,6 +133,31 @@ function respawnMonsters()
 				mon.Y=baseMon.Y
 				mon.Z=baseMon.Z
 				mon.Ally=0
+				--remove bosses
+				if mon.NameId>=220 and mon.NameId<=300 then
+					if mapvars.uniqueMonsterLevel then
+						mapvars.uniqueMonsterLevel[i]=nil
+					end
+					if mapvars.bossNames then
+						mapvars.bossNames[mon.NameId]=nil
+						Game.PlaceMonTxt[mon.NameId]=tostring(mon.NameId)
+					end
+					mon.NameId=0
+				end
+				recalculateMawMonster()
+				--generate bosses
+				if mon.Id%3==0 and math.random()<0.2 then
+					local found=false
+					local freeNameIndex=1
+					while not found and freeNameIndex<80 do
+						if Game.PlaceMonTxt[freeNameIndex+220]==tostring(freeNameIndex+220) then
+							found=true
+							generateBoss(i,freeNameIndex)
+						else
+							freeNameIndex=freeNameIndex+1
+						end
+					end
+				end
 			end
 		end
 	end
