@@ -179,3 +179,48 @@ function events.LoadMap(wasInGame)
 		Timer(respawnMonsters, const.Minute*30) 
 	end
 end
+
+function events.CanSaveGame(t)
+	if vars.onlineMode then
+		t.Result=false
+	end
+end
+
+
+-------------
+--EXP SHARE--
+-------------
+function PlayersOnMap()
+	local count = 1
+	for k,v in pairs(Multiplayer.connector.clients) do
+		if v.map == Map.MapStatsIndex then
+			count = count + 1
+		end
+	end
+	return count
+end
+
+--share experience for monsters killed by summoned/resurrected Monsters
+function events.MonsterKilled(mon)
+	if Multiplayer and Multiplayer.in_game then
+		data=WhoHitMonster()
+		if (data and data.PlayerIndex) or (not data and getDistance(mon.X,mon.Y,mon.Z)<8000) or (data and data.Monster and data.Monster.Ally==9999) then
+			local consciousPlayers=0
+			for i=0, Party.High do
+				if Party[i]:IsConscious() then
+					consciousPlayers=consciousPlayers+1
+				end
+			end
+			local players=PlayersOnMap()
+			--divide for both, some bonus for multiplayer
+			consciousPlayers=consciousPlayers*(0.5+0.5*players)
+			for i=0, Party.High do
+				if Party[i]:IsConscious() then
+					Party[i].Experience=Party[i].Experience+mon.Exp/consciousPlayers
+					debug.Message(mon.Exp .. "  " .. consciousPlayers)
+				end
+			end
+		end
+	end
+end
+--Multiplayer.client_monsters()
