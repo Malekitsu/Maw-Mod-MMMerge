@@ -2892,8 +2892,8 @@ end
 
 function events.AfterLoadMap()
 	if Game.TransportLocations[0].Tuesday then
-		--z1()
-		--ClearConsoleEvents()
+		z1()
+		ClearConsoleEvents()
 		if Map:IsOutdoor() and Map.OutdoorLastRefillDay>math.ceil(Game.Time/const.Day) then
 			Map.OutdoorLastRefillDay=math.ceil(Game.Time/const.Day)
 		end
@@ -3136,6 +3136,9 @@ end
 
 --share experience for monsters killed by summoned/resurrected Monsters
 function events.MonsterKilled(mon)
+
+	if Multiplayer and Multiplayer.in_game then return end --handled in maw-multiplayer file
+
 	mapvars.monsterKilledList=mapvars.monsterKilledList or {}
 	local data=WhoHitMonster()
 	if data and data.Monster and data.Monster.Ally==9999 then
