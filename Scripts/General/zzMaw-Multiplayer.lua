@@ -201,14 +201,31 @@ function PlayersOnMap()
 end
 
 --share experience for monsters killed by summoned/resurrected Monsters
+function getDistances(x1,y1,z1,x2,y2,z2)
+	distance=((x1-x2)^2+(y1-y2)^2+(z1-z2)^2)^0.5
+	return distance
+end
+
 function events.MonsterKilled(mon)
 	if vars.onlineMode and Multiplayer and Multiplayer.in_game then
 		data=WhoHitMonster()
 		if (data and data.PlayerIndex) or (not data and getDistance(mon.X,mon.Y,mon.Z)<8000) or (data and data.Monster and data.Monster.Ally==9999) then
 			
 			local players=PlayersOnMap()
+			local nearbyPlayers=0
+			if players>1 then
+				local list=Multiplayer.client_monsters()
+				for i=1,#list do
+					local pl=Map.Monsters[list[i]]
+					if getDistances(pl.X,pl.Y,pl.Z,mon.X,mon.Y,mon.Z)<8000 then
+						nearbyPlayers=nearbyPlayers+1
+					end
+				end
+			end
+			
+			
 			--divide for both, some bonus for multiplayer
-			local nearbyPlayerMult=0.5+0.5*players
+			local nearbyPlayerMult=1+0.5*nearbyPlayers
 			local monLvl=getMonsterLevel(mon)
 			
 			local playerLevel=calcLevel(Party[0].Experience) --accounts for the cases which you want to level a low lvl character
@@ -216,7 +233,8 @@ function events.MonsterKilled(mon)
 			local multiplier2=1+(monLvl^0.5)-(playerLevel^0.5)
 			local mult=math.min(math.max(multiplier1,multiplier2),3)
 			mult=math.max(mult,0.25)
-			local experienceAwarded=mon.Exp*mult*2.5
+			
+			local experienceAwarded=mon.Exp*mult/nearbyPlayerMult*3
 						
 			if Party[0]:IsConscious() then
 				Party[0].Experience=Party[0].Experience+experienceAwarded
