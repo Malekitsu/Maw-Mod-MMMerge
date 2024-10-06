@@ -21,13 +21,6 @@ function events.MAWMapvarArrived(t)
 	end
 end
 
---[[
-function events.Tick()
-	Game.TurnBased=false
-	Game.TurnBasedPhase=0
-end
-]]
-
 function events.AfterLoadMap()
 	if Multiplayer and Multiplayer.in_game then
 		local prevHP={}
@@ -44,9 +37,9 @@ function events.AfterLoadMap()
 	end
 end
 
---share buffs
-
-
+--------------------------------
+--MAW BUFF REWORK BUFF SHARING--
+--------------------------------
 
 function sendBuffs()
 	if Multiplayer and Multiplayer.in_game then
@@ -98,6 +91,7 @@ end
 ------------------------------
 --MONSTER RESPAWN FOR ONLINE--
 ------------------------------
+
 function events.AfterLoadMap()
 	if vars.onlineMode and Map.IndoorOrOutdoor==2 then --outdoor, indoor directly reset map
 		if mapvars.monsterRespawns==nil then
@@ -108,6 +102,11 @@ function events.AfterLoadMap()
 					mapvars.monsterRespawns[i]={["X"] = mon.X, ["Y"] = mon.Y, ["Z"] = mon.Z,["deathTime"]=false}
 				end
 			end
+		end
+	end
+	if vars.onlineMode then
+		for i=1,Game.MapStats.High do
+			Game.MapStats[i].RefillDays=7
 		end
 	end
 end
