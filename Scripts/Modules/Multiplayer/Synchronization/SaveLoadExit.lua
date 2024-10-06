@@ -496,7 +496,8 @@ local function character_choice(PartyData)
 	if not PartyData then
 		return
 	end
-	return --maw fix, as quests are messed in this save
+	--maw fix, as quests are messed in this save
+	return 
 	return {
 		Name = StrColor(46,237,218, "(client save) ") .. StrColor(250,250,250) .. PartyData.player_name,
 		ClassId = PartyData.player_class_id,
@@ -615,7 +616,8 @@ local function request_host_saved_characters()
 		LogEvent("SAVE_LOAD", "Received no character data from server.")
 		return
 	end
-	return --MAW FIX, quests are messed here
+	--MAW FIX, quests are messed here
+	return 
 	local last_game = response.handler_result
 	return {
 		Name = StrColor(95,235,50, "(host save) ") .. StrColor(250,250,250) .. last_game.player_name,
