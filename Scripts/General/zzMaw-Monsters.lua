@@ -382,6 +382,14 @@ function events.LoadMap()
 end
 
 function events.MonsterKillExp(t)
+
+	--online handled in maw-multiplayer file
+	if vars.onlineMode then 
+		t.Handled=true
+		t.Exp=0
+		return
+	end 
+	
 	local partyLvl=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL+vars.MMMLVL
 	local mon=t.Monster
 	monLvl=getMonsterLevel(mon)
@@ -3137,7 +3145,7 @@ end
 --share experience for monsters killed by summoned/resurrected Monsters
 function events.MonsterKilled(mon)
 
-	if Multiplayer and Multiplayer.in_game then return end --handled in maw-multiplayer file
+	if vars.onlineMode then return end --handled in maw-multiplayer file
 
 	mapvars.monsterKilledList=mapvars.monsterKilledList or {}
 	local data=WhoHitMonster()
