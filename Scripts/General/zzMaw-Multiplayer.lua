@@ -202,25 +202,39 @@ end
 
 --share experience for monsters killed by summoned/resurrected Monsters
 function events.MonsterKilled(mon)
-	if Multiplayer and Multiplayer.in_game then
+	if vars.onlineMode and Multiplayer and Multiplayer.in_game then
 		data=WhoHitMonster()
 		if (data and data.PlayerIndex) or (not data and getDistance(mon.X,mon.Y,mon.Z)<8000) or (data and data.Monster and data.Monster.Ally==9999) then
-			local consciousPlayers=0
-			for i=0, Party.High do
-				if Party[i]:IsConscious() then
-					consciousPlayers=consciousPlayers+1
-				end
-			end
+			
 			local players=PlayersOnMap()
 			--divide for both, some bonus for multiplayer
-			consciousPlayers=consciousPlayers*(0.5+0.5*players)
-			for i=0, Party.High do
-				if Party[i]:IsConscious() then
-					Party[i].Experience=Party[i].Experience+mon.Exp/consciousPlayers
-					debug.Message(mon.Exp .. "  " .. consciousPlayers)
-				end
+			local nearbyPlayerMult=0.5+0.5*players
+			local monLvl=getMonsterLevel(mon)
+			
+			local playerLevel=calcLevel(Party[0].Experience) --accounts for the cases which you want to level a low lvl character
+			local multiplier1=((monLvl+10)/(playerLevel+5))^2
+			local multiplier2=1+(monLvl^0.5)-(playerLevel^0.5)
+			local mult=math.min(math.max(multiplier1,multiplier2),3)
+			mult=math.max(mult,0.25)
+			local experienceAwarded=mon.Exp*mult*2.5
+						
+			if Party[0]:IsConscious() then
+				Party[0].Experience=Party[0].Experience+experienceAwarded
+				debug.Message(mon.Exp)
 			end
 		end
 	end
 end
+
+function events.CalcDamageToMonster(t)
+	if vars.onlineMode then
+		if Party.High>0 or not Multiplayer.in_game then
+			t.Result=0
+			Message("Online mode requires connection and supports only 1 party member")
+		end
+	end
+end
+
+
+
 --Multiplayer.client_monsters()
