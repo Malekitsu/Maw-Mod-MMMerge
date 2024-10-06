@@ -497,7 +497,9 @@ local function character_choice(PartyData)
 		return
 	end
 	--maw fix, as quests are messed in this save
-	return 
+	if vars.onlineMode then
+		return
+	end
 	return {
 		Name = StrColor(46,237,218, "(client save) ") .. StrColor(250,250,250) .. PartyData.player_name,
 		ClassId = PartyData.player_class_id,
@@ -617,7 +619,9 @@ local function request_host_saved_characters()
 		return
 	end
 	--MAW FIX, quests are messed here
-	return 
+	if vars.onlineMode then
+		return
+	end
 	local last_game = response.handler_result
 	return {
 		Name = StrColor(95,235,50, "(host save) ") .. StrColor(250,250,250) .. last_game.player_name,
