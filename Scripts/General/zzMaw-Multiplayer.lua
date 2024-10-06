@@ -180,11 +180,13 @@ function events.LoadMap(wasInGame)
 	end
 end
 
+--[[
 function events.CanSaveGame(t)
-	if vars.onlineMode then
+	if vars and vars.onlineMode then
 		t.Result=false
 	end
 end
+]]
 
 
 -------------
