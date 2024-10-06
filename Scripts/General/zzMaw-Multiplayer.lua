@@ -238,7 +238,6 @@ function events.MonsterKilled(mon)
 						
 			if Party[0]:IsConscious() then
 				Party[0].Experience=Party[0].Experience+experienceAwarded
-				debug.Message(mon.Exp)
 			end
 		end
 	end
