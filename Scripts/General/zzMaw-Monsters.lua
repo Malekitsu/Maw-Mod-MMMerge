@@ -551,9 +551,9 @@ function recalculateMonsterTable()
 		totalLevel[i]=basetable[i].Level+bolsterLevel+extraBolster
 		
 		--horizontal progression
+		local name=Game.MapStats[Map.MapStatsIndex].Name
 		if Game.freeProgression==false and not mapvars.mapAffixes then
 			horizontalMultiplier=3
-			name=Game.MapStats[Map.MapStatsIndex].Name
 			local level=math.max(math.min((base.Level+extraBolster)*horizontalMultiplier,base.Level+bolsterLevel+extraBolster+bonus),1)
 			totalLevel[i]=level
 			mon.Level=math.min(totalLevel[i],255)
@@ -578,7 +578,7 @@ function recalculateMonsterTable()
 		end
 		
 		--online
-		if vars.onlineMode then
+		if vars.onlineMode and not onlineStartingMaps[name] then
 			bolsterLevel=mp.Mid^1.5
 			horizontalMultiplier=bolsterLevel/mp.Mid
 			flattener=(base.Level-LevelB)*horizontalMultiplier^0.7 --necessary to avoid making too much difference between monster tier
@@ -1074,6 +1074,12 @@ horizontalMaps={["Dagger Wound Island"] =true,
 				["New Sorpigal"]=true,
 				["Goblinwatch"]=true,
 				["Abandoned Temple"]=true,}
+				
+onlineStartingMaps={["Dagger Wound Island"] =true,
+				["Emerald Island"]=true,
+				["The Temple of the Moon"]=true,
+				["The Dragon's Lair"]=true,
+				["New Sorpigal"]=true,}
 --map levels
 mapLevels={
 --MM8
