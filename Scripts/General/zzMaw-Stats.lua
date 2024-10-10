@@ -1069,13 +1069,13 @@ function compute_damage(x)
     -- Loop through each step from 1 to the floor of x
     for i = 1, math.floor(x) do
         -- Multiply the damage by (2 - i*0.2)
-        damage = damage * math.max(2.2 - i * 0.1, 1.6)
+        damage = damage * math.max(2.2 - i * 0.1, 1.8)
     end
 
     -- If x is not an integer, handle the fractional part
     local fractional_part = x - math.floor(x)
     if fractional_part > 0 then
-        damage = damage * math.max(2.2 - (math.floor(x) + 1) * 0.1,1.6) ^ fractional_part
+        damage = damage * math.max(2.2 - (math.floor(x) + 1) * 0.1,1.8) ^ fractional_part
     end
 
     return damage
