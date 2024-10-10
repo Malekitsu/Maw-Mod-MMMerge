@@ -2907,8 +2907,8 @@ end
 
 function events.AfterLoadMap()
 	if Game.TransportLocations[0].Tuesday then
-		--z1()
-		--ClearConsoleEvents()
+		z1()
+		ClearConsoleEvents()
 		if Map:IsOutdoor() and Map.OutdoorLastRefillDay>math.ceil(Game.Time/const.Day) then
 			Map.OutdoorLastRefillDay=math.ceil(Game.Time/const.Day)
 		end
