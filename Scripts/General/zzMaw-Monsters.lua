@@ -603,7 +603,8 @@ function recalculateMonsterTable()
 		end
 		
 		--experience
-		local lvlBase=basetable[i].Level
+		local lvlBase=math.max(basetable[i].Level,totalLevel[i]/3) --added totalLevel/3 because of mapping
+		local lvlBase=math.min(lvlBase,120) 
 		mon.Experience = math.round((lvlBase*20+lvlBase^1.8)*totalLevel[i]/lvlBase)
 		if currentWorld==2 then
 			mon.Experience = math.min(mon.Experience*2, mon.Experience+1000)
@@ -2906,8 +2907,8 @@ end
 
 function events.AfterLoadMap()
 	if Game.TransportLocations[0].Tuesday then
-		z1()
-		ClearConsoleEvents()
+		--z1()
+		--ClearConsoleEvents()
 		if Map:IsOutdoor() and Map.OutdoorLastRefillDay>math.ceil(Game.Time/const.Day) then
 			Map.OutdoorLastRefillDay=math.ceil(Game.Time/const.Day)
 		end
