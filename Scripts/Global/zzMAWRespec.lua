@@ -61,21 +61,21 @@ function RespecSkills(npcID)
 	for i=0, p.Skills.High do
 		local skill=SplitSkill(p.Skills[i])
 		if skill>1 and i~=const.Skills.Alchemy then
-			if table.find(sharedSkills, i) then
+			if table.find(shared, i) then
 				local lastSkill=2
 				--reset mastery
-				for i=1,#sharedSkills do
-					p.Skills[i]=SplitSkill(p.Skills[i])
+				for j=1,#shared do
+					p.Skills[shared[j]]=SplitSkill(p.Skills[shared[j]])
 				end	
 				while lastSkill>1 do
 					maxSkill=0
 					count=1	
-					for v=1,#sharedSkills do
-						if p.Skills[v]>maxSkill then
-							maxSkill = p.Skills[v]
-							maxIndex=v
+					for v=1,#shared do
+						if p.Skills[shared[v]]>maxSkill then
+							maxSkill = p.Skills[shared[v]]
+							maxIndex=shared[v]
 							count=1
-						elseif p.Skills[v]==maxSkill then
+						elseif p.Skills[shared[v]]==maxSkill then
 							count=count+1
 						end
 					end
