@@ -172,6 +172,27 @@ function indexof(table, value)
 	return nil
 end
 		
+function pickLowestPartyMember()
+	-- Define the variables
+	local a={}
+	a[0]=2
+	a[1]=2
+	a[2]=2
+	a[3]=2
+	a[4]=2
+	for i=0,Party.High do
+		if Party[i].Dead==0 and Party[i].Eradicated==0 then
+			a[i] = Party[i].HP/Party[i]:GetFullHP()
+		end
+	end
+	local a, b, c, d, e= a[0], a[1], a[2], a[3], a[4] 
+	-- Find the maximum value and its position
+	local min_value = math.min(a, b, c, d, e)
+	local min_index = indexof({a, b, c, d, e}, min_value)
+	min_index = min_index - 1
+	return min_index
+end
+
 function events.CalcDamageToMonster(t)
 	local data = WhoHitMonster()
 		if data and data.Player and (data.Player.Class==55 or data.Player.Class==54 or data.Player.Class==53) and t.DamageKind==4 and data.Object==nil then
@@ -183,25 +204,6 @@ function events.CalcDamageToMonster(t)
 		spirit=data.Player:GetSkill(const.Skills.Spirit)
 		spiritS,spiritM=SplitSkill(spirit)
 		
-		
-		
-		-- Define the variables
-		a={}
-		a[0]=2
-		a[1]=2
-		a[2]=2
-		a[3]=2
-		a[4]=2
-		for i=0,Party.High do
-			if Party[i].Dead==0 and Party[i].Eradicated==0 then
-				a[i] = Party[i].HP/Party[i]:GetFullHP()
-			end
-		end
-		a, b, c, d, e= a[0], a[1], a[2], a[3], a[4] 
-		-- Find the maximum value and its position
-		min_value = math.min(a, b, c, d, e)
-		min_index = indexof({a, b, c, d, e}, min_value)
-		min_index = min_index - 1
 		--Calculate heal value and apply
 		levelBonus1=spiritM+math.floor(t.Player.LevelBase/100)
 		levelBonus2=bodyM+math.floor(t.Player.LevelBase/100)
@@ -215,11 +217,13 @@ function events.CalcDamageToMonster(t)
 			healValue=healValue*(1.5+personality*3/2000)
 		end
 		]]
+		
+		local healTarget=pickLowestPartyMember()
 		--apply heal
-		evt[min_index].Add("HP",healValue)		
+		evt[healTarget].Add("HP",healValue)		
 		--bug fix
-		if Party[min_index].HP>0 then
-		Party[min_index].Unconscious=0
+		if Party[healTarget].HP>0 then
+			Party[healTarget].Unconscious=0
 		end
 	end
 		
