@@ -1005,23 +1005,8 @@ function events.Action(t)
 			else
 				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
 			end
-			-- Define the variables
-			a={}
-			a[0]=2
-			a[1]=2
-			a[2]=2
-			a[3]=2
-			a[4]=2
-			for i=0,Party.High do
-				if Party[i].Dead==0 and Party[i].Eradicated==0 then
-					a[i] = Party[i].HP/Party[i]:GetFullHP()
-				end
-			end
-			a, b, c, d, e= a[0], a[1], a[2], a[3], a[4] 
-			-- Find the maximum value and its position
-			min_value = math.min(a, b, c, d, e)
-			min_index = indexof({a, b, c, d, e}, min_value)
-			min_index = min_index - 1
+
+			min_index = pickLowestPartyMember()
 			--apply heal
 			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
 			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, Party[min_index]:GetFullHP())	
@@ -1052,23 +1037,8 @@ function events.Action(t)
 			else
 				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
 			end
-			-- Define the variables
-			a={}
-			a[0]=2
-			a[1]=2
-			a[2]=2
-			a[3]=2
-			a[4]=2
-			for i=0,Party.High do
-				if Party[i].Dead==0 and Party[i].Eradicated==0 then
-					a[i] = Party[i].HP/Party[i]:GetFullHP()
-				end
-			end
-			a, b, c, d, e= a[0], a[1], a[2], a[3], a[4] 
-			-- Find the maximum value and its position
-			min_value = math.min(a, b, c, d, e)
-			min_index = indexof({a, b, c, d, e}, min_value)
-			min_index = min_index - 1
+
+			min_index = pickLowestPartyMember()
 			--apply heal
 			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
 			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, Party[min_index]:GetFullHP())	
@@ -1102,23 +1072,8 @@ function events.Action(t)
 			else
 				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
 			end
-			-- Define the variables
-			a={}
-			a[0]=2
-			a[1]=2
-			a[2]=2
-			a[3]=2
-			a[4]=2
-			for i=0,Party.High do
-				if Party[i].Dead==0 and Party[i].Eradicated==0 then
-					a[i] = Party[i].HP/Party[i]:GetFullHP()
-				end
-			end
-			a, b, c, d, e= a[0], a[1], a[2], a[3], a[4] 
-			-- Find the maximum value and its position
-			min_value = math.min(a, b, c, d, e)
-			min_index = indexof({a, b, c, d, e}, min_value)
-			min_index = min_index - 1
+
+			min_index = pickLowestPartyMember()
 			--apply heal
 			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
 			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, Party[min_index]:GetFullHP())
