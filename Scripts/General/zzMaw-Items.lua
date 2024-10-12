@@ -803,7 +803,9 @@ legendaryEffects={
 	[13]="Immunity to all status effects from monsters",
 	[14]="Crit chance increased by 10% and crit chance over 100% increases total damage",
 	[15]="Divine protection (instead of dying you go back to 25% HP, once every 5 minutes)",
-	[16]="Increases your resistances by 50%, up to you highest resistance",
+	
+	[16]="Increase the effect of resistances base enchants by 50%",
+	
 	[17]="Your hits will deal 2% of current monster HP health (1% for AoE, multi-hit spells and arrows)",
 	[18]="Reduce all damage taken by 10%",
 	[19]="Your weapon enchants scale with the highest between might/int./pers.",
@@ -814,6 +816,10 @@ legendaryEffects={
 	[24]="Killing a Monster Restores 10% of Health and Mana",
 	[25]="Increases spells ascension level by 1",
 	[26]="Your weapon enchants can deal critical damage",
+	
+	[27]="Whenever leeching takes you above full HP, it heals the most injured party member",
+	[28]="AC gained from armors is doubled",
+	[29]="Attacks reduce monster resistances by 1",
 }
 
 function events.BuildItemInformationBox(t)
@@ -876,6 +882,13 @@ function events.BuildItemInformationBox(t)
 					power=math.ceil(power*1.5)
 				end
 				if t.Item.Bonus>=11 and t.Item.Bonus<=16 then
+					local id=Game.CurrentPlayer
+					if id>=0 and id<Party.High then
+						local pl=Party[id]:GetIndex()
+						if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 16) then
+							power=power*1.5
+						end
+					end
 					power=math.round((1-1/1.5^(power^0.6/15))*1000)/10 .. "%"
 				end
 				t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. power
@@ -887,6 +900,13 @@ function events.BuildItemInformationBox(t)
 					strength=math.ceil(strength*1.5)
 				end
 				if bonus>=11 and bonus<=16 then
+					local id=Game.CurrentPlayer
+					if id>=0 and id<Party.High then
+						local pl=Party[id]:GetIndex()
+						if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 16) then
+							strength=strength*1.5
+						end
+					end
 					strength=math.round((1-1/1.5^(strength^0.6/15))*1000)/10 .. "%"
 				end
 				t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
