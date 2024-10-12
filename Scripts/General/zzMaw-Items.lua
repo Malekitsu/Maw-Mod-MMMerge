@@ -2692,7 +2692,7 @@ function itemStats(index)
 			local s,m=getBuffSkill(51)
 			heroismMult=(buffPower[51].Base[m]/100+buffPower[51].Scaling[m]*s/1000)
 		end
-		if pl.SpellBuffs[6].ExpireTime>=Game.Time then
+		if pl.SpellBuffs[6].ExpireTime>=Game.Time and unarmed then
 			local s,m=getBuffSkill(73)
 			unarmedMult=(buffPower[73].Base[m]/100+buffPower[73].Scaling[m]*s/1000)
 		end
