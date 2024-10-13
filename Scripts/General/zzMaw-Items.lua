@@ -2214,13 +2214,17 @@ function itemStats(index)
 				artifactMult=artifactPowerMult(pl.LevelBase, true)
 				acBonus=math.ceil(acBonus*artifactMult)
 			end
-
 			acBonus=math.round(acBonus*(1+mult))
+			
+			
 			--used later
 			if skill==8 then
 				shieldAC=shieldAC+acBonus
 			else
 				armorAC=armorAC+acBonus
+			end
+			if vars.legendaries and vars.legendaries[pl:GetIndex()] and table.find(vars.legendaries[pl:GetIndex()], 28) then
+				acBonus=acBonus*2
 			end
 			tab[10]=tab[10]+acBonus
 		end
