@@ -926,6 +926,13 @@ function events.PlayerCastSpell(t)
 			evt.Add("Items",332)
 		elseif t.SpellId==21 then
 			evt.Add("Items",320)
+			Party.SpellBuffs[7].Caster=50
+			Party.SpellBuffs[7].Skill=4
+			Party.SpellBuffs[7].Power=0
+			Party.SpellBuffs[7].ExpireTime=Game.Time+const.Hour*7
+			t.Handled=true
+			t.Player.RecoveryDelay=120
+			evt.PlaySound(11090)
 		end
 	end
 end
