@@ -957,8 +957,9 @@ function events.CalcDamageToMonster(t)
 			end
 		end
 	end
-	if not res then return end
+	if not res or t.Result==0 then return end
 	res=res%1000
+	--spear reduction
 	if t.Player and data and data.Object==nil and t.DamageKind==4 then
 		local it=t.Player:GetActiveItem(1)
 		if it then 
@@ -980,7 +981,22 @@ function events.CalcDamageToMonster(t)
 			end
 		end
 	end
-	
+	if t.Player and vars.legendaries and vars.legendaries[t.PlayerIndex] and table.find(vars.legendaries[t.PlayerIndex], 29) then
+		for i=0, 9 do
+			if i~=5 then
+				if i==4 then
+					local id=t.Monster:GetIndex()
+					if mapvars.originalResistance and mapvars.originalResistance[id] then
+						mapvars.originalResistance[id]=math.max(mapvars.originalResistance[id]-1,0)
+					else
+						t.Monster.Resistances[i]=math.max(t.Monster.Resistances[i]-1,0)
+					end
+				else
+					t.Monster.Resistances[i]=math.max(t.Monster.Resistances[i]-1,0)
+				end
+			end
+		end
+	end
 	res=1-1/2^(res/100)
 
 	t.Result = t.Result * (1-res)
