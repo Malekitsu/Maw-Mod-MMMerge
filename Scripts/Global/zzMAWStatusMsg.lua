@@ -29,23 +29,24 @@ function events.CalcDamageToMonster(t)
 			if getMapAffixPower(32) then
 				heal=heal*(1-getMapAffixPower(32)/100)
 			end
+			local totalHeal=0
 			if t.DamageKind==4 then
 				--melee
 				if gotVamp[data.Player:GetIndex()] and not data.Object then
-					t.Player.HP=math.min(fullHP,t.Player.HP+heal)
+					totalHeal=totalHeal+heal
 				end
 				--ranged
 				if gotBowVamp[data.Player:GetIndex()] and data.Object and data.Object.Spell==133 then
-					if table.find(aoespells, data.Object.Spell) then
-						heal=heal/2
-					end
-					t.Player.HP=math.min(fullHP,t.Player.HP+heal*0.5)
+					totalHeal=totalHeal+heal*0.5
 				end
 			elseif data and data.Player then --spell leech
-				for i=1,2 do
+				if data.Object and table.find(aoespells, data.Object.Spell) then
+					heal=heal/2
+				end
+				for i=0,2 do
 					it=t.Player:GetActiveItem(i)
 					if it and it.Bonus2==40 then
-						t.Player.HP=math.min(fullHP,t.Player.HP+heal*0.5)
+						totalHeal=totalHeal+heal*0.5
 					end
 				end
 			end 
@@ -60,8 +61,7 @@ function events.CalcDamageToMonster(t)
 				if data.Object and data.Object then
 					heal=heal/2
 				end
-				heal=math.ceil(heal)
-				t.Player.HP=math.min(fullHP,t.Player.HP+heal)
+				totalHeal=totalHeal+heal
 			end
 			if buffRework and getBuffSkill(91)>0 then --vampiric aura buff
 				local heal=t.Result^0.7*0.5
@@ -71,18 +71,25 @@ function events.CalcDamageToMonster(t)
 				if t.DamageKind==4 then
 					--melee
 					if not data.Object then
-						t.Player.HP=math.min(fullHP,t.Player.HP+heal)
+						totalHeal=totalHeal+heal
 					end
 					--ranged
 					if data.Object and data.Object.Spell==133 then
-						if table.find(aoespells, data.Object.Spell) then
-							heal=heal/2
-						end
-						t.Player.HP=math.min(fullHP,t.Player.HP+heal*0.5)
+						totalHeal=totalHeal+heal*0.5
 					end
 				elseif data and data.Player then --spell leech
-					t.Player.HP=math.min(fullHP,t.Player.HP+heal*0.5)
+					if data.Object and table.find(aoespells, data.Object.Spell) then
+						heal=heal/2
+					end
+					totalHeal=totalHeal+heal*0.5
 				end 
+			end
+			overHeal=t.Player.HP+totalHeal-fullHP
+			t.Player.HP=math.min(fullHP,t.Player.HP+totalHeal)
+			local id=t.PlayerIndex
+			if overHeal>0 and vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 27) then
+				local id=pickLowestPartyMember()
+				Party[id].HP=Party[id].HP+overHeal
 			end
 		end
 	end
