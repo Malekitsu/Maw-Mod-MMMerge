@@ -100,6 +100,7 @@ function events.UseMouseItem(t)
 		if it.Bonus>=55 then
 			Party.SpellBuffs[13].Skill=4
 		end
+		vars.magicResistancePotionExpire=Game.Time+const.Hour*6
 	end
 	
 	if itemImmunityMapping[it.Number] then 
