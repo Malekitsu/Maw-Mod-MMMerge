@@ -817,7 +817,7 @@ legendaryEffects={
 	[25]="Increases spells ascension level by 1",
 	[26]="Your weapon enchants can deal critical damage",
 	
-	[27]="Whenever leeching takes you above full HP, it heals the most injured party member",
+	[27]="Leech overhealing heals the most injured party member instead",
 	[28]="AC gained from armors is doubled",
 	[29]="Attacks reduce monster resistances by 1",
 }
