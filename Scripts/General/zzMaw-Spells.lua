@@ -2858,6 +2858,12 @@ if buffRework then
 			Party.SpellBuffs[16].Power=math.max(2,Party.SpellBuffs[16].Power)
 			Party.SpellBuffs[16].Skill=math.max(1,Party.SpellBuffs[16].Skill)
 		end
+		--magic potion fix
+		if vars.magicResistancePotionExpire and vars.magicResistancePotionExpire>Game.Time then
+			Party.SpellBuffs[13].ExpireTime=vars.magicResistancePotionExpire
+			Party.SpellBuffs[13].Power=4
+			Party.SpellBuffs[13].Skill=10
+		end
 		
 		mawRefresh("all")
 	end
