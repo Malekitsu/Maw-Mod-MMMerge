@@ -1067,6 +1067,7 @@ end
 
 --maps not to bolster in horizontal progression
 horizontalMaps={["Dagger Wound Island"] =true,
+				["The Abandoned Temple"] =true,
 				["Abandoned Temple"] =true,
 				["Emerald Island"]=true,
 				["The Temple of the Moon"]=true,
@@ -1546,7 +1547,7 @@ mapLevels={
 ["Goblinwatch"] = 
 {["Low"] = 4 , ["Mid"] = 4 , ["High"] = 6},
 
-["Abandoned Temple"] = 
+["The Abandoned Temple"] = 
 {["Low"] = 6 , ["Mid"] = 8 , ["High"] = 10},
 
 ["Shadow Guild Hideout"] = 
