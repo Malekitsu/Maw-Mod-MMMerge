@@ -931,8 +931,7 @@ function events.PlayerCastSpell(t)
 			Party.SpellBuffs[7].Power=0
 			Party.SpellBuffs[7].ExpireTime=Game.Time+const.Hour*7
 			t.Handled=true
-			t.Player.RecoveryDelay=120
-			evt.PlaySound(11090)
+			t.Player:SetRecoveryDelay(120)
 		end
 	end
 end
