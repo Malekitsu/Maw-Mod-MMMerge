@@ -67,7 +67,7 @@ skillRecovery =
 	[const.Skills.Bow]		= {[0]=0, 1, 2, 3, 5,},
 	[const.Skills.Mace]		= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0,},
-	[const.Skills.Unarmed]	= {[0]=0, 0, 1, 1, 2,},
+	[const.Skills.Unarmed]	= {[0]=0, 0, 1, 2, 2,},
 }
 
 skillDamage =
@@ -221,12 +221,9 @@ function events.GetAttackDelay(t)
 					end
 					
 					--unarmed working with staff GM
-					if skill==0 then
+					if skill==0 and m==4 then
 						local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Unarmed))
-						if m==4 then
-							local s,m=SplitSkill(t.Player.Skills[const.Skills.Unarmed])
-							bonusSpeed=bonusSpeed+skillRecovery[const.Skills.Unarmed][m]*s
-						end
+						bonusSpeed=bonusSpeed+skillRecovery[const.Skills.Unarmed][m]*s
 					end
 				end
 			elseif i==1 then
