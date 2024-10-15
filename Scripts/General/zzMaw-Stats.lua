@@ -982,7 +982,7 @@ function events.CalcDamageToMonster(t)
 		end
 	end
 	if t.Player and vars.legendaries and vars.legendaries[t.PlayerIndex] and table.find(vars.legendaries[t.PlayerIndex], 29) then
-		for i=0, 9 do
+		for i=0, 10 do
 			if i~=5 then
 				if i==4 then
 					local id=t.Monster:GetIndex()
