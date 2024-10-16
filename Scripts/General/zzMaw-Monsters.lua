@@ -769,6 +769,7 @@ function recalculateMonsterTable()
 				mon.Attack2.DamageDiceCount=math.ceil(mon.Attack1.DamageDiceCount/1.4)
 				mon.Attack2.DamageDiceSides=math.ceil(mon.Attack1.DamageDiceSides/1.4)
 				mon.Attack2.Missile=1
+				overflowMult[mon.Id][2]=overflowMult[mon.Id][1]
 			end
 		end
 	else --restore to previous
