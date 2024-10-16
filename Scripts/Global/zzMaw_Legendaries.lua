@@ -311,6 +311,19 @@ function events.CalcDamageToPlayer(t)
 			end
 		end
 	end
+	if Game.BolsterAmount>=300 then
+		function events.Tick()
+			events.Remove("Tick",1)
+			local fullHP=t.Player:GetFullHP()
+			local currentHP=t.Player.HP
+			if currentHP<-fullHP then
+				t.Player.Dead=1
+			end
+			if currentHP<-fullHP*2 then
+				t.Player.Eradicated=1
+			end
+		end
+	end
 end
 
 --[16]="Your highest resistance will always be used against non physical attacks",
