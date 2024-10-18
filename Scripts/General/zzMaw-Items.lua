@@ -2374,15 +2374,9 @@ function itemStats(index)
 			end
 			--SHAMAN
 			if table.find(shamanClass, pl.Class) then	
-				local m1=SplitSkill(pl.Skills[const.Skills.Fire])
-				local m2=SplitSkill(pl.Skills[const.Skills.Air])
-				local m3=SplitSkill(pl.Skills[const.Skills.Water])
-				local m4=SplitSkill(pl.Skills[const.Skills.Earth])
-				local m5=SplitSkill(pl.Skills[const.Skills.Spirit])
-				local m6=SplitSkill(pl.Skills[const.Skills.Mind])
-				local m7=SplitSkill(pl.Skills[const.Skills.Body])
-				local bonus=m2+m3+m4+m5+m1+m6+m7
-				armsDmg=armsDmg+bonus*mult
+local m4=SplitSkill(pl.Skills[const.Skills.Earth])
+
+                armsDmg=armsDmg+math.round(m4^2.5/(10+pl.LevelBase)*10)*mult
 			end
 			--split armsmaster between main and offhand
 			local item=pl:GetActiveItem(0)
