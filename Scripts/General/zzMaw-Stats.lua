@@ -1081,7 +1081,7 @@ buffToSpell={
 function compute_damage(x)
     -- Start with the base damage multiplier
     local damage = 1
-
+	x=math.max(x,0)
     -- Loop through each step from 1 to the floor of x
     for i = 1, math.floor(x) do
         -- Multiply the damage by (2 - i*0.2)
@@ -1093,7 +1093,7 @@ function compute_damage(x)
     if fractional_part > 0 then
         damage = damage * math.max(2.2 - (math.floor(x) + 1) * 0.1,1.8) ^ fractional_part
     end
-
+	
     return damage
 end
 
