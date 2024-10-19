@@ -205,8 +205,8 @@ function events.CalcDamageToMonster(t)
 		spiritS,spiritM=SplitSkill(spirit)
 		
 		--Calculate heal value and apply
-		levelBonus1=spiritM+math.floor(t.Player.LevelBase/100)
-		levelBonus2=bodyM+math.floor(t.Player.LevelBase/100)
+		levelBonus1=spiritM*2+math.floor(t.Player.LevelBase/20)
+		levelBonus2=bodyM*2+math.floor(t.Player.LevelBase/20)
 		healValue=(bodyS*levelBonus2+spiritS*levelBonus1)*damageMultiplier[t.PlayerIndex]["Melee"]
 		personality=data.Player:GetPersonality()
 		healValue=healValue*(1+personality/1000)
@@ -348,17 +348,17 @@ local function seraphSkills(isSeraph, id)
 		Skillz.setDesc(19,1,txt)
 		
 		--tooltips
-		Skillz.setDesc(16,2,"Increases healing by 1 per Skill point")
-		Skillz.setDesc(16,3,"Increases healing by 2 per Skill point")
-		Skillz.setDesc(16,4,"Increases healing by 3 per Skill point")
+		Skillz.setDesc(16,2,"Increases healing by 2 per Skill point")
+		Skillz.setDesc(16,3,"Increases healing by 4 per Skill point")
+		Skillz.setDesc(16,4,"Increases healing by 6 per Skill point")
 		
 		Skillz.setDesc(17,2,"Increases damage by 1 per Skill point")
 		Skillz.setDesc(17,3,"Increases damage by 2 per Skill point")
 		Skillz.setDesc(17,4,"Increases damage by 3 per Skill point")
 		
-		Skillz.setDesc(18,2,"Increases healing by 1 per Skill point")
-		Skillz.setDesc(18,3,"Increases healing by 2 per Skill point")
-		Skillz.setDesc(18,4,"Increases healing by 3 per Skill point")
+		Skillz.setDesc(18,2,"Increases healing by 2 per Skill point")
+		Skillz.setDesc(18,3,"Increases healing by 4 per Skill point")
+		Skillz.setDesc(18,4,"Increases healing by 6 per Skill point")
 		
 		Skillz.setDesc(19,2,"Increases damage by 1 per Skill point")
 		Skillz.setDesc(19,3,"Increases damage by 2 per Skill point")
