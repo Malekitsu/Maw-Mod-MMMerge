@@ -1322,12 +1322,12 @@ local function dkSkills(isDK, id)
 		Skillz.setName(18, "Blood")
 		Skillz.setName(20, "Unholy")
 		local txt
-		txt="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and increases attack speed by 2% per skill point.\n"
+		txt="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Expert, Master) and increases attack speed by 2% per skill point.\n"
 		Skillz.setDesc(14,1,txt)
 		local leech=math.round(bloodS/math.round(pl.LevelBase^0.7)*5*100)/100
 		txt="This skill is only available to death knights and reduces physical damage taken by 1% per skill point.\nAdditionally it will make your attacks to leech damage based on your total HP.\n\nCurrent leech vs. same level monsters: " .. leech .. "%\n"            
 		Skillz.setDesc(18,1,txt)
-		txt="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Master, Grandmaster) and reduces magical damage taken by 1% per skill point.\n"	
+		txt="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Expert, Master) and reduces magical damage taken by 1% per skill point.\n"	
 		Skillz.setDesc(20,1,txt)
 		Skillz.setDesc(14,5,"Effects vary per spell")
 		Skillz.setDesc(18,5,"Effects vary per spell")
