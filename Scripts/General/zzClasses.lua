@@ -868,7 +868,7 @@ function events.GameInitialized2()
 			m2=SplitSkill(t.Player.Skills[const.Skills.Air])
 			m3=SplitSkill(t.Player.Skills[const.Skills.Water])
 			mult=((math.max(Game.BolsterAmount, 100)/100)-1)/2+1
-			t.Result=math.max((t.Result-m3^2.25/(100+pl.LevelBase)*50*mult)*0.99^(1+m2^2/pl.LevelBase), t.Result*0.175)
+			t.Result=math.max((t.Result-m3^2.25/(100+pl.LevelBase)*50*mult)*0.99^(1+m2^2/pl.LevelBase*5), t.Result*0.175)
 		end
 	end
 	
@@ -932,7 +932,7 @@ local function shamanSkills(isShaman, id)
 		local fireDamage=math.round(m1/pl.LevelBase/15*10000)/100
 		txt=baseSchoolsTxt[12] .. "\n\nMelee attacks deal an extra " .. fireDamage .. "% of monster Hit points as fire damage"
 		Skillz.setDesc(12,1,txt)
-		local airReduction=100-math.round(0.99^(m2^1.1)*10000)/100
+		local airReduction=100-math.round(0.99^(m2^2/pl.LevelBase*5)*10000)/100
 		txt=baseSchoolsTxt[13] .. "\n\nReduce all damage taken by " .. airReduction .. " %"
 		Skillz.setDesc(13,1,txt)
 		mult=((math.max(Game.BolsterAmount, 100)/100)-1)/2+1
