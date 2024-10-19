@@ -308,7 +308,7 @@ function events.BuildStatInformationBox(t)
 		t.Text=string.format("%s\n\nCritical strike chance: %s%%",Game.StatsDescriptions[6],critChance)
 		daggerBonus=daggerCritBonus~=critChance
 		if daggerBonus then
-			t.Text=string.format("%s\n\nCritical strike chance: %s%%(%s%% with dagger\nHealing Spells cannot crit)",Game.StatsDescriptions[6],critChance, daggerCritBonus)
+			t.Text=string.format("%s\n\nCritical strike chance: %s%%(%s%% with dagger)",Game.StatsDescriptions[6],critChance, daggerCritBonus)
 		end
 	end
 	if t.Stat==7 then
