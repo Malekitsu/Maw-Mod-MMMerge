@@ -880,14 +880,14 @@ function events.GameInitialized2()
 			m7=SplitSkill(data.Player.Skills[const.Skills.Body])
 			data.Player.SP=math.min(data.Player.SP+m6^2/pl.LevelBase*25, data.Player:GetFullSP())
 			data.Player.HP=math.min((data.Player.HP+m7^2/(10+pl.LevelBase)*75), data.Player:GetFullHP())
-			local fireDamage=(m1^2/pl.LevelBase/15)
+			local fireDamage=(m1^2/pl.LevelBase/1500)
 			if t.Monster.Resistances[0]>=1000 then
 				mult=2^math.floor(t.Monster.Resistances[0]/1000)
 				fireDamage=fireDamage*mult
 			end
 			fireDamage=math.max(t.Monster.HP*fireDamage,m1)
 			fireRes=t.Monster.Resistances[0]%1000
-			fireDamage=fireDamage/2^(fireRes/100)
+			fireDamage=fireDamage/2^(fireRes/200)
 			t.Result=t.Result+fireDamage
 		end
 	end
@@ -929,7 +929,7 @@ local function shamanSkills(isShaman, id)
 		local m6=SplitSkill(pl.Skills[const.Skills.Mind])
 		local m7=SplitSkill(pl.Skills[const.Skills.Body])
 		local txt
-		local fireDamage=math.round(m1/pl.LevelBase/15*10000)/100
+		local fireDamage=math.round(m1/pl.LevelBase/1500*100)/100
 		txt=baseSchoolsTxt[12] .. "\n\nMelee attacks deal an extra " .. fireDamage .. "% of monster Hit points as fire damage"
 		Skillz.setDesc(12,1,txt)
 		local airReduction=100-math.round(0.99^(m2^2/pl.LevelBase*5)*10000)/100
