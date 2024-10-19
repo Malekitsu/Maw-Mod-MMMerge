@@ -940,7 +940,7 @@ local function shamanSkills(isShaman, id)
 		txt=baseSchoolsTxt[14] .. "\n\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)"
 		Skillz.setDesc(14,1,txt)
 		mult=((math.max(Game.BolsterAmount, 100)/100)-1)/2+1
-		local leech=math.round(m4^2/(10+pl.LevelBase)*10*mult)
+		local leech=math.round(m4^2/(10+pl.LevelBase)*20*mult)
 		txt=baseSchoolsTxt[15] .. "\n\nIncreases melee damage by ".. leech .. ""
 		Skillz.setDesc(15,1,txt)
 		local spelldh=math.round(m5^2/pl.LevelBase/6*100)
