@@ -662,7 +662,9 @@ function recalculateMonsterTable()
 		end
 		if Game.BolsterAmount==600 then
 			hpMult=hpMult*3*(1+totalLevel[i]/50)
-		end
+		end	
+		--crit nerf fix
+		hpMult=hpMult/math.min(math.max(0.3+totalLevel[i]/200,1),50/15) --50/15 is the amount needed to get 1% crit, now and before
 		
 		HPtable[i]=HPtable[i]*hpMult
 		--damage
