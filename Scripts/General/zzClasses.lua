@@ -868,7 +868,7 @@ function events.GameInitialized2()
 			m2=SplitSkill(t.Player.Skills[const.Skills.Air])
 			m3=SplitSkill(t.Player.Skills[const.Skills.Water])
 			mult=((math.max(Game.BolsterAmount, 100)/100)-1)/2+1
-			t.Result=math.max((t.Result-m3^2.25/(100+pl.LevelBase))*50*mult*0.99^(1+m2^2/pl.LevelBase), t.Result*0.175)
+			t.Result=math.max((t.Result-m3^2.25/(100+pl.LevelBase)*50*mult)*0.99^(1+m2^2/pl.LevelBase), t.Result*0.175)
 		end
 	end
 	
