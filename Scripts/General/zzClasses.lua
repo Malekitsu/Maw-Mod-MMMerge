@@ -880,7 +880,7 @@ function events.GameInitialized2()
 			m7=SplitSkill(data.Player.Skills[const.Skills.Body])
 			data.Player.SP=math.min(data.Player.SP+m6^2/pl.LevelBase*25, data.Player:GetFullSP())
 			data.Player.HP=math.min((data.Player.HP+m7^2/(10+pl.LevelBase)*75), data.Player:GetFullHP())
-			local fireDamage=(m1^2/pl.LevelBase^2/2)
+			local fireDamage=(m1^2/pl.LevelBase/100)
 			if t.Monster.Resistances[0]>=1000 then
 				mult=2^math.floor(t.Monster.Resistances[0]/1000)
 				fireDamage=fireDamage*mult
