@@ -939,8 +939,8 @@ local function shamanSkills(isShaman, id)
 		local waterReduction=math.round(m3^2.25/(100+pl.LevelBase)*50*mult)
 		txt=baseSchoolsTxt[14] .. "\n\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)"
 		Skillz.setDesc(14,1,txt)
-		local leech=math.round(m4^2.5/(10+pl.LevelBase)*10)
-		txt=baseSchoolsTxt[15] .. "\n\nIncreases melee damage by ".. leech .. ""
+		local armsmasterDamage=math.round(m4^2.65/(10+pl.LevelBase)*10)
+		txt=baseSchoolsTxt[15] .. "\n\nIncreases melee damage by ".. armsmasterDamage .. ""
 		Skillz.setDesc(15,1,txt)
 		local spelldh=math.round(m5^2/pl.LevelBase/6*100)
 		txt=baseSchoolsTxt[16] .. "\n\nIncreases spell damage/healing by " .. spelldh .. "%"
