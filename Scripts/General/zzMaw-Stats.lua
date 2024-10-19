@@ -21,9 +21,12 @@ function events.KeyDown(t)
     end
 end
 
-function getCritInfo(pl,dmgType)
+function getCritInfo(pl,dmgType,monLvl)
+	if not monLvl then
+		monLvl=pl.LevelBase
+	end
 	local luck=pl:GetLuck()
-	local totalCrit=luck/1500+0.05
+	local totalCrit=luck/math.min((500+monLvl*7.5),5000)+0.05
 	local critDamageMultiplier=1
 	if dmgType=="spell" then
 		local intellect=pl:GetIntellect()	
@@ -49,7 +52,7 @@ function getCritInfo(pl,dmgType)
 				if itSkill==2 then
 					s,m=SplitSkill(pl:GetSkill(const.Skills.Dagger))
 					if m>2 then
-						totalCrit=totalCrit+0.025+0.005*s
+						totalCrit=totalCrit+0.05+0.01*s/math.min(1+monLvl/200,4)
 					end
 				end
 			end
