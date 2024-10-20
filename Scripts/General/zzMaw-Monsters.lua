@@ -2114,7 +2114,7 @@ function events.MonsterKilled(mon)
 				vars.dungeonCompletedList[name]=true
 				if Game.CurrentScreen~=22 then
 					if vars.insanityMode then
-						Game.EscMessage(string.format("Dungeon Completed!")
+						Game.EscMessage(string.format("Dungeon Completed!"))
 					else
 						Game.EscMessage(string.format("Dungeon Completed!\nReset is possible again."))
 					end
@@ -2395,13 +2395,6 @@ function events.GameInitialized2() --to make the after all the other code
 				end
 			elseif skill=="Venomous" then
 				t.Player.Poison3=Game.Time
-			elseif skill=="Exploding" then
-				t.Result=t.Result/2
-				aoeDamage=t.Result/Party.Count
-				for i=0,Party.High do
-					Party[i].HP=Party[i].HP-aoeDamage
-					Party[i]:ShowFaceAnimation(24)
-				end
 			elseif skill=="Swapper" then	
 				Game.ShowStatusText("*Swap*")
 				Party.X, Party.Y, Party.Z, mon.X, mon.Y, mon.Z = mon.X, mon.Y, mon.Z, Party.X, Party.Y, Party.Z
