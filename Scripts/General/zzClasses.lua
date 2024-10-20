@@ -847,7 +847,7 @@ end
 --SHAMAN
 ---------------------------------------
 function events.GameInitialized2()
-	Game.ClassDescriptions[59] = "The Shaman is a mystical warrior whose knowledge of magic enhances his martial prowess.\nYou can check following values by checking magic schools description in skills menu.\n - Each point in Air will reduce damage a % pr rank reduced by level\n - Each point in Water will reduce damage by Skill^2^.5/(100+level) (increased depending on difficulty)\n - Each point in spirit will increase healing and spell damage by rank^2/level x 17%\n - Fire will deal around rank^2/level/15 of total monster HP as fire damage\n - Each point in Earth will increase melee damage by rank^2.5/(10+level) x 10 x difficulty\n - Each point in Body will heal by skill^2/(10+Level)*75\n - Each point in mind will restore skill^2/(10+Level)*25 mana"
+	Game.ClassDescriptions[59] = "The Shaman is a mystical warrior whose knowledge of magic enhances his martial prowess.\nYou can check following values by checking magic schools description in skills menu.\n - Each school will provide a unique bonus, the bonus will be based on skill rank ^2 divided by level. There is strength in diversifying as well as specialization\n - Each point in Air will reduce damage a % pr rank reduced by level\n - Each point in Water will reduce damage by a flat number, making water better for weaker enemies, or if your defenses are already strong\n - Each point in spirit will increase healing and spell damage by a %\n - Fire will deal a % of current monster HP as fire damage, partially piercing this resistance. The bosskiller.\n - Each point in Earth will increase melee damage by a flat amount\n - Each point in Body will heal by flat amount and increase healing spells by a %\n - Each point in mind will restore a flat amount of mana"
 end
 
 shamanClass={59, 60, 61}
@@ -943,13 +943,14 @@ local function shamanSkills(isShaman, id)
 		txt=baseSchoolsTxt[15] .. "\n\nIncreases melee damage by ".. armsmasterDamage .. ""
 		Skillz.setDesc(15,1,txt)
 		local spelldh=math.round(m5^2/pl.LevelBase/6*100)
-		txt=baseSchoolsTxt[16] .. "\n\nIncreases spell damage/healing by " .. spelldh .. "%"
+		txt=baseSchoolsTxt[16] .. "\n\nIncreases spell damage by " .. spelldh .. "%"
 		Skillz.setDesc(16,1,txt)
 		SPLEECH=math.round(m6^2/pl.LevelBase*25)
 		txt=baseSchoolsTxt[17] .. "\n\nMelee attacks restore " .. SPLEECH .. " Spell Points"
 		Skillz.setDesc(17,1,txt)
 		local hpRestore=math.round(m7^2/(10+pl.LevelBase)*75)
-		txt=baseSchoolsTxt[18] .. "\n\nMelee attacks restore " .. hpRestore .. " Hit Points"
+		local spelldhx=math.round(m7^2/pl.LevelBase/10*100)
+		txt=baseSchoolsTxt[18] .. "\n\nMelee attacks restore " .. hpRestore .. " Hit Points and healing spells by " .. spelldhx .. "%"
 		Skillz.setDesc(18,1,txt)
 	else
 		for i=12,18 do
