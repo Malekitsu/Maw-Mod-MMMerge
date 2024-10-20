@@ -663,6 +663,9 @@ function recalculateMonsterTable()
 		if Game.BolsterAmount==600 then
 			hpMult=hpMult*3*(1+totalLevel[i]/50)
 		end	
+		if vars.insanityMode then
+			hpMult=hpMult*(1.5+totalLevel[i]/100)
+		end
 		--crit nerf fix
 		hpMult=hpMult/math.min(math.max(0.3+totalLevel[i]/200,1),50/15) --50/15 is the amount needed to get 1% crit, now and before
 		
@@ -1821,16 +1824,19 @@ function events.BuildMonsterInformationBox(t)
 		diff=0.4
 	end
 	if Game.BolsterAmount==150 then
-		diff=1.12+math.round(totalLevel[mon.Id])/300
+		diff=1.12+math.round(lvl/300
 	end
 	if Game.BolsterAmount==200 then
-		diff=1.25+math.round(totalLevel[mon.Id])/200
+		diff=1.25+math.round(lvl/200
 	end
 	if Game.BolsterAmount==300 then
-		diff=1.5+math.round(totalLevel[mon.Id])/100
+		diff=1.5+math.round(lvl/100
 	end
 	if vars.Mode==2 then
-		diff=2+math.round(totalLevel[mon.Id])/50
+		diff=2+math.round(lvl/50
+	end
+	if vars.insanityMode then
+		diff=diff*(1.5+lvl/100)
 	end
 	if getMapAffixPower(1) then
 		diff=diff*(1+getMapAffixPower(1)/100)
