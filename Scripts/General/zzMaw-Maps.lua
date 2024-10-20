@@ -80,7 +80,7 @@ end
 function events.BeforeLoadMap()
 	if vars.insanityMode then
 		for i=1,Game.MapStats.High do
-			Game.MapStats[outSideMaps[i]].RefillDays=1000000000
+			Game.MapStats[i].RefillDays=1000000000
 		end
 	end
 end
