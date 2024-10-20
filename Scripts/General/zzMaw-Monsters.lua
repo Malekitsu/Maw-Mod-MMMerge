@@ -2925,6 +2925,10 @@ function events.AfterLoadMap()
 	else
 		aa1()
 	end
+	if vars.insanityMode then
+		z1()
+		ClearConsoleEvents()
+	end
 end
 
 function calculateDirection(x_m, y_m, x_p, y_p)
