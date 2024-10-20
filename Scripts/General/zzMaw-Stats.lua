@@ -859,7 +859,18 @@ function events.CalcDamageToPlayer(t)
 			local s,m=SplitSkill(t.Player.Skills[const.Skills.Perception])
 			damage=damage*math.min((11-m*2)/10,1)
 			t.Result=calcMawDamage(t.Player,t.DamageKind,damage)
-			debug.Message(t.Result)
+		end
+	end
+	if data and data.Monster and data.Monster.NameId>220 then
+		local mon=data.Monster
+		local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+		if skill=="Exploding" then
+			t.Result=t.Result/2
+			aoeDamage=t.Result/Party.Count
+			for i=0,Party.High do
+				Party[i].HP=Party[i].HP-aoeDamage
+				Party[i]:ShowFaceAnimation(24)
+			end
 		end
 	end
 end
@@ -1008,6 +1019,15 @@ function events.CalcDamageToMonster(t)
 
 	t.Result = t.Result * (1-res)
 end
+
+--spear reset stacks after kill
+function events.MonsterKilled(mon)
+	local id=mon:GetIndex()
+	if mapvars.spearDamageIncrease and mapvars.spearDamageIncrease[id] then
+		mapvars.spearDamageIncrease[id]=0
+	end
+end
+
 
 function calcSpearResReduction(y)
     local log2 = math.log(1 + y / 100) / math.log(2)
