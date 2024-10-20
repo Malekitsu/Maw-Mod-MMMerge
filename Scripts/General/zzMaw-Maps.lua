@@ -77,7 +77,13 @@ function events.GameInitialized2()
 		Game.MapStats[outSideMaps[i]].RefillDays=1000000000
 	end
 end
-
+function events.BeforeLoadMap()
+	if vars.insanityMode then
+		for i=1,Game.MapStats.High do
+			Game.MapStats[outSideMaps[i]].RefillDays=1000000000
+		end
+	end
+end
 --reset dungeons
 --store
 function events.GameInitialized2()
@@ -113,6 +119,9 @@ function events.AfterLoadMap()
 end
 
 function canResetDungeon(mapFileName)
+	if vars.insanityMode then
+		return false
+	end
 	for i=1,Game.MapStats.High do
 		if Game.MapStats[i].FileName==mapFileName then
 			local name=Game.MapStats[i].Name
