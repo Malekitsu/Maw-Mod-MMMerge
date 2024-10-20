@@ -1375,7 +1375,24 @@ function events.GameInitialized2()
 		baseTrainers[i]=math.max(baseTrainers[i], 10)
 	end
 end
-	
+
+function events.Action(t)
+	if vars.insanityMode then
+		function events.Tick()
+			if Game:GetCurrentHouse() then
+				local house=Game.Houses[Game:GetCurrentHouse()]
+				if house.Type==30 then
+					local id=Game.CurrentPlayer
+					if id>=0 and id<=Party.High then
+						local lvl=Party[id].LevelBase
+						house.Val=math.round(lvl^0.7)+4
+					end
+				end
+			end
+		end
+	end
+end
+
 function events.LoadMap()
 	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 	if currentWorld==4 then return end
@@ -1510,17 +1527,17 @@ local learningRequirements={0,6,12,20}
 local learningRequirementsNormal={0,4,7,10}
 local horizontalSkills={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,27,28,32,33,38}
 --online
-local onlineLearningRequirements={0,12,30,50}
-local onlineCost={0,10000,40000,200000}
+local insanityLearningRequirements={0,8,20,32}
+local insanityCost={0,10000,40000,200000}
 function events.CanTeachSkillMastery(t)
 	if t.Allow==false then return end --if failing for special requirements (stats, gold, already learned etc)
 	if not table.find(horizontalSkills, t.Skill) then return end
 	local masteries={"","n Expert", " Master", " GrandMaster"}
 	
 	--online
-	if vars.onlineMode then
+	if vars.insanityMode then
 		--calculate cost
-		local baseCost=onlineCost[t.Mastery]
+		local baseCost=insanityCost[t.Mastery]
 		local cost=baseCost
 		local id=Game.CurrentPlayer
 		local masteryToLearn=t.Mastery
@@ -1528,18 +1545,18 @@ function events.CanTeachSkillMastery(t)
 			local pl=Party[id]
 			for i=1,#horizontalSkills do
 				local s,m=SplitSkill(pl.Skills[horizontalSkills[i]])
-				if masteryToLearn>=m then
+				if m>=masteryToLearn then
 					cost=cost+baseCost
 				end
 			end
 		end
 		t.Cost=cost
 		local skill=SplitSkill(Party[id].Skills[t.Skill])
-		if skill<onlineLearningRequirements[t.Mastery] or Party.Gold<cost then
+		if skill<insanityLearningRequirements[t.Mastery] or Party.Gold<cost then
 			t.Allow=false
-			t.Text="You need at least " .. onlineLearningRequirements[t.Mastery] .. " skill and " .. cost .. " gold to become a" ..  masteries[t.Mastery]
+			t.Text="You need at least " .. insanityLearningRequirements[t.Mastery] .. " skill and " .. cost .. " gold to become a" ..  masteries[t.Mastery]
 		end
-		Message("To learn " .. Skillz.getName(t.Skill) .. " you need at least " .. onlineLearningRequirements[t.Mastery] .. " skill and " .. cost .. " gold.")
+		Message("To learn " .. Skillz.getName(t.Skill) .. " you need at least " .. insanityLearningRequirements[t.Mastery] .. " skill and " .. cost .. " gold.")
 		return
 	end
 	--horizontal mode
