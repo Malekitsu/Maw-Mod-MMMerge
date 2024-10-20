@@ -1290,7 +1290,7 @@ function events.GameInitialized2()
 			[22] = {dmgAdd = 5, diceMin = 1, diceMax = 1, },--starburst
 			[24] = {dmgAdd = 5, diceMin = 1, diceMax = 3, },--poison spray
 			[26] = {dmgAdd = 6, diceMin = 1, diceMax = 7, },--ice bolt
-			[29] = {dmgAdd = 2, diceMin = 1, diceMax = 14, },--acid burst
+			[29] = {dmgAdd = 4, diceMin = 1, diceMax = 14, },--acid burst
 			[32] = {dmgAdd = 6, diceMin = 1, diceMax = 6, },--ice blast
 			[37] = {dmgAdd = 8, diceMin = 1, diceMax = 5, },--deadly swarm
 			[39] = {dmgAdd = 7, diceMin = 1, diceMax = 7, },--blades
