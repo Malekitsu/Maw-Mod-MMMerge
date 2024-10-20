@@ -817,16 +817,16 @@ function events.CalcDamageToPlayer(t)
 			end
 			damage=(t.Damage+bonusDamage)*mult
 			local s,m=SplitSkill(t.Player.Skills[const.Skills.Perception])
-			if m==4 then
-				m=5
-			end
-			damage=damage* (10-m)/10
+			damage=damage*math.min((11-m*2)/10,1)
 			t.Result=math.min(calcMawDamage(t.Player,t.DamageKind,damage),mapLevel*10)
 		end
 	end
 	if vars.Mode==2 then
 		if data and data.Monster then
 			t.Result=t.Result*(totalLevel[data.Monster.Id]/50+2)
+			if vars.insanityMode then
+				t.Result=t.Result*(1.5+totalLevel[data.Monster.Id]/240)
+			end
 		elseif (t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1 then --drown and fall
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
@@ -844,20 +844,24 @@ function events.CalcDamageToPlayer(t)
 			else
 				mapLevel=mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High
 			end
-			--trap and objects multiplier
-			mult=(mapLevel/8+1)*4
-			if data and data.Object and data.Object.SpellType==15 then 
-				bonusDamage=mapLevel/12
-			else
-				bonusDamage=mapLevel/4
+			if mapvars.mapAffixes then
+				mapLevel=(mapvars.mapAffixes.Power+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)*10
 			end
-			damage=(t.Damage+bonusDamage)*mult
+			--trap and objects multiplier
+			local mult=(mapLevel/9+1.15)*(1+(mapLevel/200))*(mapLevel/50+2)
+			if vars.insanityMode then
+				mult=mult*(1.5+mapLevel/240)
+			end
+			local damage=mapLevel^0.88*mult
+			if data and data.Object and data.Object.SpellType==15 then 
+				damage=damage/3
+			end
 			local s,m=SplitSkill(t.Player.Skills[const.Skills.Perception])
-			damage=damage* (10-m)/10
-			t.Result=math.min(calcMawDamage(t.Player,t.DamageKind,damage),mapLevel*20)
+			damage=damage*math.min((11-m*2)/10,1)
+			t.Result=calcMawDamage(t.Player,t.DamageKind,damage)
+			debug.Message(t.Result)
 		end
 	end
-	
 end
 
 --TOOLTIPS
@@ -1104,6 +1108,9 @@ end
 function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	local monLvl=monLvl or pl.LevelBase
 	local bolster=(math.max(Game.BolsterAmount, 100)/100-1)/4+1
+	if vars.insanityMode then
+		bolster=3
+	end
 	local id=pl:GetIndex()
 	--[[currently using a different code
 	if buffRework then
