@@ -1054,6 +1054,15 @@ function events.BeforeLoadMap()
 			Game.MapStats[i].Mon3Dif=math.min(BackupMapStats[i].Mon3Dif+1,5)
 		end
 	end
+	if vars.insanityMode then
+		for i=1,Game.MapStats.High do
+			if Game.MapStats[i].Mon1Hi>1 then
+				Game.MapStats[i].Mon1Low=(Game.MapStats[i].Mon1Hi+BackupMapStats[i].Mon1Low)/2
+				Game.MapStats[i].Mon2Low=(Game.MapStats[i].Mon2Hi+BackupMapStats[i].Mon2Low)/2
+				Game.MapStats[i].Mon3Low=(Game.MapStats[i].Mon3Hi+BackupMapStats[i].Mon3Low)/2
+			end
+		end
+	end
 	
 	--individual map CHANGES-----
 	--hall under the hill
