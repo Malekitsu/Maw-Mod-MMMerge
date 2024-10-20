@@ -464,14 +464,22 @@ function events.ItemGenerated(t)
 			if vars.Mode==2 then
 				chance=chance*2
 			end
+			if vars.insanityMode then
+				chance=chance*1.5
+			end
 			--No legendary in shop
 			if Game.HouseScreen==2 or Game.HouseScreen==95 then
 				chance=0
 			end
 			if chance>=math.random() then
-				--roll legendary effect
-				local roll=math.random(11,#legendaryEffects)
-				t.Item.BonusExpireTime=roll
+				-- Initialize counts for each affix
+				vars.legendaryAffixDropped=vars.legendaryAffixDropped or {}
+				for i = 1, #legendaryEffects-10 do
+					vars.legendaryAffixDropped[i] = vars.legendaryAffixDropped[i] or 0
+				end
+				legendaryAffix=get_affix(vars.legendaryAffixDropped)
+				vars.legendaryAffixDropped[legendaryAffix]=vars.legendaryAffixDropped[legendaryAffix]+1
+				t.Item.BonusExpireTime=legendaryAffix+10
 				--adjust bonus 2 if enchant damage legendary
 				if t.Item.BonusExpireTime==19 then
 					if t.Item.Bonus2==40 then
@@ -616,6 +624,39 @@ function events.ItemGenerated(t)
 		end
 		]]
 	end
+end
+
+-- Function to get an affix based on the pity system
+function get_affix(counts)
+    local v = {}
+    local total = 0
+	local N=#counts
+    -- Calculate the weight for each affix
+    for i = 1, N do
+        v[i] = 1 / (N * (counts[i] + 1))
+        total = total + v[i]
+    end
+
+    -- Compute cumulative probabilities
+    local cumulative = {}
+    local cum_sum = 0
+    for i = 1, N do
+        cum_sum = cum_sum + v[i] / total
+        cumulative[i] = cum_sum
+    end
+
+    -- Generate a random number between 0 and 1
+    local r = math.random()
+
+    -- Find and return the affix corresponding to the random number
+    for i = 1, N do
+        if r <= cumulative[i] then
+            return i
+        end
+    end
+
+    -- Fallback in case of rounding errors
+    return N
 end
 
 --items stats multiplier:
