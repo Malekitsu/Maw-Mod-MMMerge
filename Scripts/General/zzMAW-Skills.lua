@@ -1312,9 +1312,9 @@ function events.GameInitialized2()
 	Game.SkillDesGM[const.Skills.Learning]= "Mana cost reduced by 50%"
 	
 	Game.SkillDesNormal[const.Skills.Perception]= "Reduces traps and lava damage by 10%."
-	Game.SkillDesExpert[const.Skills.Perception]= "Reduces traps and lava damage by 20%."
-	Game.SkillDesMaster[const.Skills.Perception]= "Reduces traps and lava damage by 30%."
-	Game.SkillDesGM[const.Skills.Perception]= "Reduces traps and lava damage by 50%."
+	Game.SkillDesExpert[const.Skills.Perception]= "Reduces traps and lava damage by 30%."
+	Game.SkillDesMaster[const.Skills.Perception]= "Reduces traps and lava damage by 50%."
+	Game.SkillDesGM[const.Skills.Perception]= "Reduces traps and lava damage by 70%."
 end
 
 
