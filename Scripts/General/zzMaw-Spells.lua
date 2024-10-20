@@ -1682,16 +1682,8 @@ function ascension()
 		end
 		--shaman modifier
 		if table.find(shamanClass, pl.Class) then
-			local m1,m2,m3,m4,m5,m6,m7,m8
-			m1=SplitSkill(pl.Skills[const.Skills.Fire])
-			m2=SplitSkill(pl.Skills[const.Skills.Air])
-			m3=SplitSkill(pl.Skills[const.Skills.Water])
-			m4=SplitSkill(pl.Skills[const.Skills.Earth])
-			m5=SplitSkill(pl.Skills[const.Skills.Spirit])
-			m6=SplitSkill(pl.Skills[const.Skills.Mind])
-			m7=SplitSkill(pl.Skills[const.Skills.Body])
-			m8=m2+m3+m4+m5+m1+m6+m7
-			local mult=1+m8/400
+			local m7=SplitSkill(pl.Skills[const.Skills.Body])
+			local mult=1+m7^2/pl.LevelBase/10
 			for i=1,5 do
 				for v=1,4 do
 					healingSpells[healingList[i]].Scaling[v]=math.round(healingSpells[healingList[i]].Scaling[v]*mult)
