@@ -1824,19 +1824,19 @@ function events.BuildMonsterInformationBox(t)
 		diff=0.4
 	end
 	if Game.BolsterAmount==150 then
-		diff=1.12+math.round(lvl/300
+		diff=1.12+math.round(lvl/300)
 	end
 	if Game.BolsterAmount==200 then
-		diff=1.25+math.round(lvl/200
+		diff=1.25+math.round(lvl/200)
 	end
 	if Game.BolsterAmount==300 then
-		diff=1.5+math.round(lvl/100
+		diff=1.5+math.round(lvl/100)
 	end
 	if vars.Mode==2 then
-		diff=2+math.round(lvl/50
+		diff=2+math.round(lvl/50)
 	end
 	if vars.insanityMode then
-		diff=diff*(1.5+lvl/100)
+		diff=diff*(1.5+lvl/240)
 	end
 	if getMapAffixPower(1) then
 		diff=diff*(1+getMapAffixPower(1)/100)
@@ -2113,7 +2113,11 @@ function events.MonsterKilled(mon)
 			if vars.dungeonCompletedList[name] then
 				vars.dungeonCompletedList[name]=true
 				if Game.CurrentScreen~=22 then
-					Game.EscMessage(string.format("Dungeon Completed!\nReset is possible again."))
+					if vars.insanityMode then
+						Game.EscMessage(string.format("Dungeon Completed!")
+					else
+						Game.EscMessage(string.format("Dungeon Completed!\nReset is possible again."))
+					end
 					mapvars.completed=true
 				end
 				if mapvars.mapAffixes then
