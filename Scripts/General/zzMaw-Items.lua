@@ -844,7 +844,7 @@ end
 ------------------------------------------
 legendaryEffects={
 	[11]="Killing a monster with a single-target attack will recover your action time",
-	[12]="When a base enchantment increases one of the stats-might, intellect, or personality-the two lesser stats will each receive a bonus equivalent to 75% of the value of the highest stat.",
+	[12]="When a base enchantment increases one of the stats -might, intellect, or personality- the two other stats will each receive a bonus equivalent to 75%",
 	[13]="Immunity to all status effects from monsters",
 	[14]="Crit chance increased by 10% and crit chance over 100% increases total damage",
 	[15]="Divine protection (instead of dying you go back to 25% HP, once every 5 minutes)",
@@ -2252,6 +2252,14 @@ function itemStats(index)
 	for i=11,16 do
 		normalEnchantResistance[index][i]=0
 	end
+	--iterate once for legendaries
+	vars.legendaries=vars.legendaries or {}
+	vars.legendaries[index]={}
+	for it in pl:EnumActiveItems() do
+		if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
+			table.insert(vars.legendaries[index], it.BonusExpireTime)
+		end
+	end
 	--iterate items and get bonuses
 	for it in pl:EnumActiveItems() do
 		--maxcharges fix for moon cloak
@@ -2308,6 +2316,19 @@ function itemStats(index)
 			end
 			if it.Bonus<=10 then
 				tab[it.Bonus]=tab[it.Bonus]+power
+				--legendary power 12
+				if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 12) then
+					if it.Bonus==1 then
+						tab[2]=tab[2]+power*0.75
+						tab[3]=tab[3]+power*0.75
+					elseif it.Bonus==2 then
+						tab[1]=tab[1]+power*0.75
+						tab[3]=tab[3]+power*0.75
+					elseif it.Bonus==3 then
+						tab[1]=tab[1]+power*0.75
+						tab[2]=tab[2]+power*0.75
+					end
+				end
 			elseif it.Bonus<=16 then
 				normalEnchantResistance[index][it.Bonus]=math.max(normalEnchantResistance[index][it.Bonus], power)		
 			else
