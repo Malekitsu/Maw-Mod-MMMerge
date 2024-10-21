@@ -243,7 +243,7 @@ function events.GetAttackDelay(t)
 		end
 		
 		local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Armsmaster))
-		if m==4 then
+		if m>=3 then
 			s=s*2
 		end
 		bonusSpeed=bonusSpeed+s
@@ -645,7 +645,7 @@ function events.GameInitialized2()
 	Game.SkillDesGM[const.Skills.Shield]=string.format("%s 15%% proj. damage reduction",Game.SkillDesGM[const.Skills.Shield])
 	Game.SkillDesNormal[const.Skills.Armsmaster]=string.format("Skills adds 1 dmg and 1%% speed")
 	Game.SkillDesExpert[const.Skills.Armsmaster]=string.format("Skills adds 2 dmg, 1 atk, 1%% speed")
-	Game.SkillDesMaster[const.Skills.Armsmaster]=string.format("Skills adds 3 dmg, 2 atk, 1%% speed")
+	Game.SkillDesMaster[const.Skills.Armsmaster]=string.format("Skills adds 3 dmg, 2 atk, 2%% speed")
 	Game.SkillDesGM[const.Skills.Armsmaster]=string.format("Skills adds 4 dmg, 2 atk, 2%% speed")
 	Game.SkillDesMaster[const.Skills.Dodging]=string.format("%s usable with Leather Armor",Game.SkillDesGM[const.Skills.Dodging])
 	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Dodging])
