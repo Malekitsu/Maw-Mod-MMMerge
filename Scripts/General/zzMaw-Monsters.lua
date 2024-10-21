@@ -1991,6 +1991,24 @@ function events.CanSaveGame(t)
 	end
 end
 
+function events.AfterLoadMap()
+	if vars.insanityMode then
+		if Map.IsIndoor() then
+			local maxFood=15+math.floor(Map.Monsters.High/25)
+			if Party.Food>maxFood then
+				vars.refundFood=Party.Food-maxFood
+				Party.Food=maxFood
+			end
+		end
+		if Map.IsOutdoor() then
+			if vars.refundFood then
+				Party.Food=Party.Food+vars.refundFood
+				vars.refundFood=false
+			end
+		end
+	end
+end
+
 function events.CanCastLloyd(t)
 	if Game.BolsterAmount~=300 and vars.Mode~=2 then return end
 	if Party.EnemyDetectorYellow or Party.EnemyDetectorRed then
