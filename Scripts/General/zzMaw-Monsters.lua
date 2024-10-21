@@ -2219,7 +2219,7 @@ function events.MonsterKilled(mon)
 					mapvars.monsterMap.cleared=true
 				end
 				if Game.CurrentScreen~=22 then
-					Game.EscMessage(string.format("Dungeon Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Material"))
+					Game.EscMessage(string.format("Map Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Material"))
 				end
 				return
 			end
