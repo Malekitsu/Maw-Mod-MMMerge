@@ -1691,7 +1691,43 @@ function events.GameInitialized2()
 	Game.ItemsTxt[117+id].Value= 100000
 	
 end
-
+function getBookTier(id)
+	if id>=400 and id<=498 then
+		local tier=(id-400)%11+1
+		return tier		
+	elseif id>=1202 and id<=1300 then
+		local tier=(id-1202)%11+1
+		return tier
+	elseif id>=1902 and id<=2018 then
+		local tier=(id-1902)%13+1
+		if tier>5 then
+			tier=tier-2
+		elseif tier>3 then
+			tier=tier-1
+		end
+		return tier
+	end
+end
+function events.CalcItemValue(t)
+	if vars.insanityMode then
+		local it=t.Item
+		if it:T().EquipStat==16 then
+			local tier=getBookTier(it.Number)
+			if Game.HouseScreen==2 or Game.HouseScreen==95 or (Game.HouseScreen>=110 and Game.HouseScreen<=118) then --shops
+				local mult=1
+				if tier==11 then
+					mult=20
+				elseif tier>=8 then
+					mult=10
+				elseif tier>=5 then
+					mult=5
+				end
+				local price=Game.ItemsTxt[it.Number].Value*mult
+				t.Value=price
+			end
+		end
+	end
+end
 --------------------------------------
 --ARTIFACTS REWORK
 --------------------------------------
