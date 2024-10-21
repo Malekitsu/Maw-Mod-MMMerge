@@ -660,21 +660,23 @@ local function upgradeGem(it, tier)
 	--base value
 	local maxValue1=tier*10
 	local maxValue2=maxValue1
-	--hp/sp value
-	if it.Bonus==8 or it.Bonus==9 then
-		maxValue1=math.floor(maxValue1*(2+maxValue1/50))
-		upgradeAmount1=upgradeAmount1^2+1
-	end
-	if bonus2==8 or bonus2==9 then
-		maxValue2=math.floor(maxValue2*(2+maxValue2/50))
-		upgradeAmount2=upgradeAmount2^2+1
-	end
-	--AC
-	if it.Bonus==10 then
-		maxValue1=math.floor(maxValue1*0.667)
-	end
-	if bonus2==10 then
-		maxValue2=math.floor(maxValue2*0.667)
+	if not vars.itemStatsFix then
+		--hp/sp value
+		if it.Bonus==8 or it.Bonus==9 then
+			maxValue1=math.floor(maxValue1*(2+maxValue1/50))
+			upgradeAmount1=upgradeAmount1^2+1
+		end
+		if bonus2==8 or bonus2==9 then
+			maxValue2=math.floor(maxValue2*(2+maxValue2/50))
+			upgradeAmount2=upgradeAmount2^2+1
+		end
+		--AC
+		if it.Bonus==10 then
+			maxValue1=math.floor(maxValue1*0.667)
+		end
+		if bonus2==10 then
+			maxValue2=math.floor(maxValue2*0.667)
+		end
 	end
 	--skills
 	if it.Bonus>=17 then
