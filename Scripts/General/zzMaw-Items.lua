@@ -149,6 +149,9 @@ function events.AfterLoadMap()
 				local it=Map.Chests[i].Items[k]
 				if table.find(goldId,it.Number) then
 					local goldType=(table.find(goldId,it.Number)-1)%3+1
+					if goldType==3 then
+						goldType=4
+					end
 					it.Bonus2=10*(mapLevel+bolsterLevel)*goldType*(0.66+math.random()*0.66)
 				end
 			end
