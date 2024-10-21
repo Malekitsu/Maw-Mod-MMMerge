@@ -1185,6 +1185,13 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	end
 	]]
 	--AC for phys
+	
+	
+	--[18]="Reduce all damage taken by 10%",
+	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 18) then
+		damage=damage*0.9
+	end	
+	
 	if damageKind==4 then 		
 		local AC=pl:GetArmorClass()
 		local AC=pl:GetArmorClass()
