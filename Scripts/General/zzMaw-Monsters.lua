@@ -1057,9 +1057,9 @@ function events.BeforeLoadMap()
 	if vars.insanityMode then
 		for i=1,Game.MapStats.High do
 			if Game.MapStats[i].Mon1Hi>1 then
-				Game.MapStats[i].Mon1Low=(Game.MapStats[i].Mon1Hi+BackupMapStats[i].Mon1Low)/2
-				Game.MapStats[i].Mon2Low=(Game.MapStats[i].Mon2Hi+BackupMapStats[i].Mon2Low)/2
-				Game.MapStats[i].Mon3Low=(Game.MapStats[i].Mon3Hi+BackupMapStats[i].Mon3Low)/2
+				Game.MapStats[i].Mon1Low=math.floor((Game.MapStats[i].Mon1Hi+BackupMapStats[i].Mon1Low)/2)
+				Game.MapStats[i].Mon2Low=math.floor((Game.MapStats[i].Mon2Hi+BackupMapStats[i].Mon2Low)/2)
+				Game.MapStats[i].Mon3Low=math.floor((Game.MapStats[i].Mon3Hi+BackupMapStats[i].Mon3Low)/2)
 			end
 		end
 	end
