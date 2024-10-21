@@ -164,11 +164,6 @@ function events.LoadMap(wasInGame)
 end
 function events.CalcDamageToPlayer(t)
 	local id=t.Player:GetIndex()
-	
-	--[18]="Reduce all damage taken by 10%",
-	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 18) then
-		t.Result=math.round(t.Result*0.9)
-	end	
 	--legendary [22]
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 22) then
 		local count=0
