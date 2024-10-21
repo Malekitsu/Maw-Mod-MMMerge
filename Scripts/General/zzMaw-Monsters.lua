@@ -3233,7 +3233,7 @@ function events.MonsterKilled(mon)
 		for i=1,4 do
 			local obj=generatedItemTable[i]
 			if obj and (table.find(removeItemList, obj.Item.Number) or (obj.Item:T().EquipStat==13 and obj.Item.Bonus==0))  then
-				if math.random()>0 then
+				if math.random()>0.2 then
 					obj.Type=0
 					obj.TypeIndex=0
 					obj.Item.Number=0
