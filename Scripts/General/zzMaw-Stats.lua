@@ -464,32 +464,7 @@ function events.BuildStatInformationBox(t)
 	
 	if t.Stat==16 then
 		local i=Game.CurrentPlayer
-		local low=Party[i]:GetMeleeDamageMin()
-		local high=Party[i]:GetMeleeDamageMax()
-		local might=Party[i]:GetMight()
-		local accuracy=Party[i]:GetAccuracy()
-		local luck=Party[i]:GetLuck()
-		local delay=Party[i]:GetAttackDelay()
-		local dmg=(low+high)/2
-		--hit chance
-		local atk=Party[i]:GetMeleeAttack()
-		local lvl=Party[i].LevelBase
-		local hitChance= (15+atk*2)/(30+atk*2+lvl)
-		local daggerCritBonus=0
-		for v=0,1 do
-			if Party[i]:GetActiveItem(v) then
-				itSkill=Party[i]:GetActiveItem(v):T().Skill
-				if itSkill==2 then
-					s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Dagger))
-					if m>2 then
-						daggerCritBonus=daggerCritBonus+0.025+0.005*s
-					end
-				end
-			end
-		end
 		--damage tracker
-		local DPS=math.round(dmg*(1+(0.05+daggerCritBonus+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/6000)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Melee"])/100
-		t.Text=string.format("%s\n\nDamage per second: %s",t.Text,StrColor(255,255,100,DPS))
 		vars.damageTrack=vars.damageTrack or {}
 		vars.damageTrack[Party[i]:GetIndex()]=vars.damageTrack[Party[i]:GetIndex()] or 0
 
@@ -535,23 +510,6 @@ function events.BuildStatInformationBox(t)
 	
 	if t.Stat==18 then
 		local i=Game.CurrentPlayer
-		local low=Party[i]:GetRangedDamageMin()
-		local high=Party[i]:GetRangedDamageMax()
-		local might=Party[i]:GetMight()
-		local accuracy=Party[i]:GetAccuracy()
-		local luck=Party[i]:GetLuck()
-		local delay=Party[i]:GetAttackDelay(true)
-		local dmg=(low+high)/2
-		--hit chance
-		local atk=Party[i]:GetRangedAttack()
-		local lvl=Party[i].LevelBase
-		local hitChance= (15+atk*2)/(30+atk*2+lvl)
-		local DPS=math.round(dmg*(1+(0.05+0.01*luck/15)*(0.5+0.001*accuracy*3))/(delay/6000)*hitChance*damageMultiplier[Party[i]:GetIndex()]["Ranged"])/100
-		local s,m=SplitSkill(Party[i].Skills[const.Skills.Bow])
-		if m>=3 then
-			DPS=DPS*2
-		end
-		t.Text=string.format("%s\n\nDamage per second: %s",t.Text,StrColor(255,255,100,DPS))
 		vars.damageTrackRanged=vars.damageTrackRanged or {}
 		vars.damageTrackRanged[Party[i]:GetIndex()]=vars.damageTrackRanged[Party[i]:GetIndex()] or 0
 
