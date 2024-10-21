@@ -1377,14 +1377,16 @@ function events.GameInitialized2()
 end
 
 function events.Action(t)
-	function events.Tick()
-		if Game:GetCurrentHouse() then
-			local house=Game.Houses[Game:GetCurrentHouse()]
-			if house.Type==30 then
-				local id=Game.CurrentPlayer
-				if id>=0 and id<=Party.High then
-					local lvl=Party[id].LevelBase
-					house.Val=math.round(lvl^0.7)+4
+	if vars.insanityMode then
+		function events.Tick()
+			if Game:GetCurrentHouse() then
+				local house=Game.Houses[Game:GetCurrentHouse()]
+				if house.Type==30 then
+					local id=Game.CurrentPlayer
+					if id>=0 and id<=Party.High then
+						local lvl=Party[id].LevelBase
+						house.Val=math.round(lvl^0.7)+4
+					end
 				end
 			end
 		end
