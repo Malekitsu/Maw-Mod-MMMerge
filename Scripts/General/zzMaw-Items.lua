@@ -1720,7 +1720,7 @@ function events.BuildItemInformationBox(t)
 		pattern = "(%d+)"
 		text=t.Description
 		t.Description = text:gsub(pattern, replaceNumber)
-		t.Description = t.Description .. "\n\nScale with player level, up to level 250."
+		t.Description = t.Description .. "\n\nScale with player level, up to level 550."
 	end
 end
 
