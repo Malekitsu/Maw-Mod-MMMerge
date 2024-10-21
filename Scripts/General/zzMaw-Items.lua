@@ -2878,10 +2878,12 @@ function itemStats(index)
 		end
 	end
 	local shamanSpiritMult=0
+	--[[
 	if table.find(shamanClass, pl.Class) then
 		local s=SplitSkill(pl.Skills[const.Skills.Spirit])
 		shamanSpiritMult=s/100
 	end
+	]]
 	tab[42]=tab[42]+(tab[42]+bonusDamage)*might/1000
 	tab[42]=tab[42]+(tab[42]+bonusDamage)*heroismMult 
 	tab[42]=tab[42]+(tab[42]+bonusDamage)*unarmedMult
