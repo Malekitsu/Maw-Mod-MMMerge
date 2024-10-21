@@ -1020,7 +1020,7 @@ function normal_random(mean, stddev)
     return z0 * stddev + mean
 end
 
-	
+local noCorpseMonsters={82,83,84,97,98,99,241,242,243,523,524,525,529,530,531,532,533,534,622,623,624,625,626,627}
 function events.MonsterKilled(mon)
 	if mon.Ally == 9999 or mon.NameId>300 then -- no drop from reanimated monsters
 		return
@@ -1062,6 +1062,10 @@ function events.MonsterKilled(mon)
 	local insanityMult=1
 	if vars.insanityMode then
 		insanityMult=2
+	end
+	--no corpse monster Buff
+	if table.find(noCorpseMonsters,mon.Id) then
+		bonusRoll=bonusRoll*3
 	end
 	if math.random()<craftDropChances.gems*bonusRoll*insanityMult then
 		baseCraftDrop=true
