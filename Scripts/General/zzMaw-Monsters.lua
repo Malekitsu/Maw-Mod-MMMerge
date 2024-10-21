@@ -2099,7 +2099,7 @@ end
 
 --check for dungeon clear
 function events.MonsterKilled(mon)
-	if Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.completed==nil then
+	if (Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.completed==nil) or (Map.IndoorOrOutdoor==2 and mapvars.completed==nil) then
 		if Map.Name=="d42.blv" then return end --arena
 		n=Map.Monsters.Count
 		m=1
@@ -2207,14 +2207,16 @@ function events.MonsterKilled(mon)
 				mapvars.completed=true
 				vars.dungeonCompletedList=vars.dungeonCompletedList or {}
 				vars.dungeonCompletedList[name]=true
-				mapvars.monsterMap.cleared=true
+				if mapvars.monsterMap then
+					mapvars.monsterMap.cleared=true
+				end
 				if Game.CurrentScreen~=22 then
 					Game.EscMessage(string.format("Dungeon Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Material"))
 				end
 				return
 			end
 		end
-		if mapvars.monsterMap.cleared==false and m/n>=0.65 and Game.BolsterAmount>=300 then
+		if mapvars.monsterMap and mapvars.monsterMap.cleared==false and m/n>=0.65 and Game.BolsterAmount>=300 then
 			mapvars.monsterMap.cleared=true
 			if Game.CurrentScreen~=22 then
 				Game.EscMessage("Monsters are weakened and can no longer resurrect")
