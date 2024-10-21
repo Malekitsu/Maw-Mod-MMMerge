@@ -2276,7 +2276,7 @@ function itemStats(index)
 						
 			local ac=txt.Mod1DiceCount+txt.Mod2
 			local acBonus=ac
-			if it.MaxCharges>0 then 
+			if it.MaxCharges>0 and not table.find(artArmors,it.Number) then 
 				local ac2=referenceAC[it.Number]
 				local maxCharges=it.MaxCharges
 				if vars.insanityMode then
