@@ -534,29 +534,33 @@ function events.ItemGenerated(t)
 		end
 		
 		--buff to hp and mana items
-		if t.Item.Bonus==8 or t.Item.Bonus==9 then
-			t.Item.BonusStrength=t.Item.BonusStrength*(2+t.Item.BonusStrength/50)
-		end
-		if math.floor(t.Item.Charges/1000)==8 or math.floor(t.Item.Charges/1000)==9 then
-			local power=t.Item.Charges%1000
-			power=power*(2+power/50) --cap is 999
-			if power >= 999 and t.Item.Bonus<17 then --swap base with charges
-				local bonus=t.Item.Bonus
-				local str=t.Item.BonusStrength
-				t.Item.Bonus=math.floor(t.Item.Charges/1000)
-				t.Item.BonusStrength=power
-				t.Item.Charges= bonus*1000+str
-			else 
-				t.Item.Charges=math.floor(t.Item.Charges/1000)*1000+power
+		if vars and not vars.itemStatsFix then
+			if t.Item.Bonus==8 or t.Item.Bonus==9 then
+				t.Item.BonusStrength=t.Item.BonusStrength*(2+t.Item.BonusStrength/50)
+			end
+			if math.floor(t.Item.Charges/1000)==8 or math.floor(t.Item.Charges/1000)==9 then
+				local power=t.Item.Charges%1000
+				power=power*(2+power/50) --cap is 999
+				if power >= 999 and t.Item.Bonus<17 then --swap base with charges
+					local bonus=t.Item.Bonus
+					local str=t.Item.BonusStrength
+					t.Item.Bonus=math.floor(t.Item.Charges/1000)
+					t.Item.BonusStrength=power
+					t.Item.Charges= bonus*1000+str
+				else 
+					t.Item.Charges=math.floor(t.Item.Charges/1000)*1000+power
+				end
+			end
+			--nerf to AC
+			if t.Item.Bonus==10 then
+				t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*0.667)
+			end
+			if math.floor(t.Item.Charges/1000)==10 then
+				t.Item.Charges=t.Item.Charges-math.floor(t.Item.Charges%1000*0.333)
 			end
 		end
-		--nerf to AC and skills
-		if t.Item.Bonus==10 then
-			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*0.667)
-		end
-		if math.floor(t.Item.Charges/1000)==10 then
-			t.Item.Charges=t.Item.Charges-math.floor(t.Item.Charges%1000*0.333)
-		end
+		
+		--nerf to skills
 		if t.Item.Bonus>=17 and t.Item.Bonus<=24 then
 			t.Item.BonusStrength=math.ceil(math.max(t.Item.BonusStrength^0.5,t.Item.BonusStrength/10))
 		end
@@ -601,13 +605,6 @@ function events.ItemGenerated(t)
 		if math.abs(t.Item.Charges%1000-t.Item.BonusStrength)<=1 then
 			t.Item.Charges=math.floor(t.Item.Charges/1000)*1000+t.Item.BonusStrength
 		end
-		--round above 100
-		if t.Item.BonusStrength>100 then
-			t.Item.BonusStrength=math.round(t.Item.BonusStrength/5)*5
-		end
-		if t.Item.Charges%1000>100 then
-			t.Item.Charges=math.min(math.round(t.Item.Charges%1000/5)*5,999)+math.floor(t.Item.Charges/1000)*1000
-		end
 		
 		--maxcharges Cap
 		t.Item.MaxCharges=math.min(maxChargesCap, t.Item.MaxCharges)
@@ -645,6 +642,10 @@ function events.ItemGenerated(t)
 		end
 		]]
 	end
+end
+
+function events.BeforeNewGameAutosave()
+	vars.itemStatsFix=true
 end
 
 -- Function to get an affix based on the pity system
@@ -952,6 +953,13 @@ function events.BuildItemInformationBox(t)
 			t.Enchantment=""
 			if t.Item.Bonus>0 then
 				local power=t.Item.BonusStrength
+				if vars.itemStatsFix then
+					if (t.Item.Bonus==8 or t.Item.Bonus==9) then
+						power=math.round(power*(2+power/50))
+					elseif t.Item.Bonus==10 then
+						power=math.round(power*0.667)
+					end
+				end
 				--insanity
 				if vars.insanityMode then
 					power=math.round(power*4/3)
@@ -974,6 +982,13 @@ function events.BuildItemInformationBox(t)
 			if t.Item.Charges>1000 then
 				local bonus=math.floor(t.Item.Charges/1000)
 				local strength=t.Item.Charges%1000
+				if vars.itemStatsFix then
+					if (bonus==8 or bonus==9) then
+						strength=math.round(strength*(2+strength/50))
+					elseif bonus==10 then
+						strength=math.round(strength*0.667)
+					end
+				end
 				--insanity
 				if vars.insanityMode then
 					strength=math.round(strength*4/3)
@@ -2365,6 +2380,13 @@ function itemStats(index)
 		
 		if it.Bonus>0 then 
 			local power=it.BonusStrength
+			if vars.itemStatsFix then
+				if (it.Bonus==8 or it.Bonus==9) then
+					power=math.round(power*(2+power/50))
+				elseif it.Bonus==10 then
+					power=math.round(power*0.667)
+				end
+			end
 			if vars.insanityMode then
 				power=power*4/3
 			end
@@ -2405,6 +2427,13 @@ function itemStats(index)
 		if it.Charges>1000 then
 			local bonus=math.floor(it.Charges/1000)
 			local power=it.Charges%1000
+			if vars.itemStatsFix then
+				if (bonus==8 or bonus==9) then
+					power=math.round(power*(2+power/50))
+				elseif bonus==10 then
+					power=math.round(power*0.667)
+				end
+			end
 			if vars.insanityMode then
 				power=power*4/3
 			end
