@@ -139,6 +139,23 @@ spcEncChance={5,10,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40}
 primordialWeapEnchants={39,40,41,46}
 primordialArmorEnchants={1,2,80}
 
+local goldId={187,188,189,197,198,199,999,1000,1001,1799,1800,1801}
+function events.AfterLoadMap()
+	if not mapvars.chestGoldFix then
+		local name=Game.MapStats[Map.MapStatsIndex].Name
+		local mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
+		for i=0,Map.Chests.High do
+			for k=1,Map.Chests[i].Items.High do
+				local it=Map.Chests[i].Items[k]
+				if table.find(goldId,it.Number) then
+					local goldType=(table.find(goldId,it.Number)-1)%3+1
+					it.Bonus2=10*(mapLevel+bolsterLevel)*goldType*(0.66+math.random()*0.66)
+				end
+			end
+		end
+		mapvars.chestGoldFix=true
+	end
+end
 
 function events.ItemGenerated(t)
 	--boss items forced
