@@ -3197,7 +3197,8 @@ function events.LeaveMap()
 	end
 end
 
---share experience for monsters killed by summoned/resurrected Monsters
+--share experience for monsters killed by summoned/resurrected Monsters and remove original drops
+local removeItemList={217, 632,633,640,654}
 function events.MonsterKilled(mon)
 
 	if vars.onlineMode then return end --handled in maw-multiplayer file
@@ -3222,4 +3223,23 @@ function events.MonsterKilled(mon)
 			end
 		end		
 	end
+	
+	--fix to items dropping too often
+	BeginGrabObjects()
+	function events.Tick()
+		events.Remove("Tick",1)
+		local generatedItemTable={}
+		generatedItemTable[1], generatedItemTable[2], generatedItemTable[3], generatedItemTable[4]=GrabObjects()
+		for i=1,4 do
+			local obj=generatedItemTable[i]
+			if obj and (table.find(removeItemList, obj.Item.Number) or (obj.Item:T().EquipStat==13 and obj.Item.Bonus==0))  then
+				if math.random()>0 then
+					obj.Type=0
+					obj.TypeIndex=0
+					obj.Item.Number=0
+				end
+			end
+		end
+	end
 end
+
