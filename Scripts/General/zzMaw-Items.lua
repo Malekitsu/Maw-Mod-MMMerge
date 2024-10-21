@@ -3423,7 +3423,7 @@ function artifactPowerMult(level, isAC)
 	local bol=math.max(Game.BolsterAmount, 100)
 	bol=(bol/100-1)/20+1
 	if vars.insanityMode then
-		bol=2
+		bol=bol*4/3
 	end
 	local mult=(math.min(level,550)/100+0.5)*bol
 	if isAC then
