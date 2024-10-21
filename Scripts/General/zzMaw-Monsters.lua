@@ -968,8 +968,6 @@ function events.BeforeLoadMap()
 		Game.BolsterAmount=100
 	end
 	
-	--mapping fix
-	if mapvars.mapAffixes then return end
 	--MAW
 	if Game.BolsterAmount<=100 then
 		for i=1,Game.MapStats.High do
@@ -1070,6 +1068,16 @@ function events.BeforeLoadMap()
 	Game.MapStats[96].Monster3Pic="Unicorn"
 	Game.MapStats[96].Mon3Low=1
 	Game.MapStats[96].Mon3Hi=3
+	
+	
+	--mapping fix
+	if mapMonsterDensity then
+		local map=Game.MapStats[mapMonsterDensity[1]]
+		map.Mon1Hi=math.round(map.Mon1Hi*mapMonsterDensity[2])
+		map.Mon2Hi=math.round(map.Mon2Hi*mapMonsterDensity[2])
+		map.Mon3Hi=math.round(map.Mon3Hi*mapMonsterDensity[2])
+		mapMonsterDensity=nil
+	end
 end
 
 --fix to monsters AI (zombies and ghouls)
