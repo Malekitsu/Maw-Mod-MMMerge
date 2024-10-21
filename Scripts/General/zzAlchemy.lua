@@ -1058,7 +1058,12 @@ function events.MonsterKilled(mon)
 	--pick base craft material
 	local baseCraftDrop=false
 	local ascendedGem=false
-	if math.random()<craftDropChances.gems*bonusRoll then
+	local gemChance=craftDropChances.gems
+	local insanityMult=1
+	if vars.insanityMode then
+		insanityMult=2
+	end
+	if math.random()<craftDropChances.gems*bonusRoll*insanityMult then
 		baseCraftDrop=true
 		local craftStrength = math.floor(normal_random(math.max(lvl^0.6/4+1,lvl/40), 2))
 		craftStrength=math.max(math.min(craftStrength,20),1)
@@ -1084,13 +1089,13 @@ function events.MonsterKilled(mon)
 	if math.random()<craftDropChances[1062]*bonusRoll then
 		obj = SummonItem(1062, mon.X, mon.Y, mon.Z + 100, 100)
 	end
-	if math.random()<craftDropChances[1063]*bonusRoll then
+	if math.random()<craftDropChances[1063]*bonusRoll*insanityMult then
 		obj = SummonItem(1063, mon.X, mon.Y, mon.Z + 100, 100)
 	end
-	if math.random()<craftDropChances[1064]*bonusRoll then
+	if math.random()<craftDropChances[1064]*bonusRoll*insanityMult then
 		obj = SummonItem(1064, mon.X, mon.Y, mon.Z + 100, 100)
 	end
-	if math.random()<craftDropChances[1065]*bonusRoll then
+	if math.random()<craftDropChances[1065]*bonusRoll*insanityMult then
 		obj = SummonItem(1065, mon.X, mon.Y, mon.Z + 100, 100)
 	end
 	if math.random()<craftDropChances[1066]*bonusRoll then
