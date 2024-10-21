@@ -1755,13 +1755,8 @@ function events.UseMouseItem(t)
 				nAff=nAff+1
 			end
 		end
-		mult=1+it.MaxCharges*nAff/800
-		oldDensity1=map.Mon1Hi
-		oldDensity2=map.Mon2Hi
-		oldDensity3=map.Mon3Hi
-		map.Mon1Hi=math.round(map.Mon1Hi*mult)
-		map.Mon2Hi=math.round(map.Mon2Hi*mult)
-		map.Mon3Hi=math.round(map.Mon3Hi*mult)
+		local mult=1+it.MaxCharges*nAff/300
+		mapMonsterDensity={it.BonusStrength,mult}
 		blv(fileName)
 	end
 end
@@ -1913,7 +1908,7 @@ function events.BuildItemInformationBox(t)
 				power=power+1
 			end
 		end
-		t.Enchantment=t.Enchantment .. StrColor(0, 127, 255,"\n+" .. math.round(it.MaxCharges*power/8*1.5) .. "% craft items drop chances "  .. "\n+" .. math.round(it.MaxCharges*power/4) .. "% item quality " .. "%\n+" .. math.round(it.MaxCharges*power/8) .. "% monster density")	
+		t.Enchantment=t.Enchantment .. StrColor(0, 127, 255,"\n+" .. math.round(it.MaxCharges*power/8*1.5) .. "% craft items drop chances "  .. "\n+" .. math.round(it.MaxCharges*power/4) .. "% item quality " .. "%\n+" .. math.round(it.MaxCharges*power/3) .. "% monster density")	
 	end
 	if it.Number==290 and t.Name then
 		t.Name=Game.MapStats[it.BonusStrength].Name .. " Map"
