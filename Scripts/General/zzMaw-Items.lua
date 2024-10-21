@@ -3425,9 +3425,9 @@ function artifactPowerMult(level, isAC)
 	if vars.insanityMode then
 		bol=2
 	end
-	local mult=math.min(level/100+0.5,6)*bol
+	local mult=(math.min(level,550)/100+0.5)*bol
 	if isAC then
-		mult=math.min(level/(250/1.5)+0.5,6)*bol
+		mult=(math.min(level,550)/(250/1.5)+0.5)*bol
 	end
 	return mult
 end
