@@ -29,23 +29,7 @@ function events.BuildItemInformationBox(t)
 		end
 	end
 end
---list legendaries
-function events.Action(t)
-	function events.Tick()
-		events.Remove("Tick", 1)
-		vars.legendaries={}
-		for i=0,Party.High do
-			local pl=Party[i]
-			local id=pl:GetIndex()
-			vars.legendaries[id]={}
-			for it in pl:EnumActiveItems() do
-				if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
-					table.insert(vars.legendaries[id], it.BonusExpireTime)
-				end
-			end
-		end
-	end
-end
+
 
 --[11]="Killing a monster will recover you action time",
 function events.CalcDamageToMonster(t)
@@ -155,53 +139,6 @@ function changePlayer(id)
 			if Party[i]:GetIndex()==id then
 				Game.CurrentPlayer=i
 				return
-			end
-		end
-	end
-end
-
---[12]="75% of base enchants increasing might, intellect or personality will increase the other 2 stats (highest one is picked)",
-function events.CalcStatBonusByItems(t)
-	if t.Stat==0 or t.Stat==1 or t.Stat==2 then
-		local pl=t.Player
-		local id=pl:GetIndex()
-		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 12) then
-			local str=0
-			local int=0
-			local per=0
-			for it in pl:EnumActiveItems() do
-				if it.Bonus==1 then
-					str=str+it.BonusStrength
-				elseif it.Bonus==2 then
-					int=int+it.BonusStrength
-				elseif it.Bonus==3 then
-					per=per+it.BonusStrength
-				end
-				if it.Charges>1000 then
-					local bonus=math.floor(it.Charges/1000)
-					if bonus==1 then
-						str=str+it.Charges%1000
-					elseif bonus==2 then
-						int=int+it.Charges%1000
-					elseif bonus==3 then
-						per=per+it.Charges%1000
-					end
-				end	
-			end
-			if str>int and str>per then
-				if t.Stat==1 or t.Stat==2 then
-					t.Result=t.Result+str*0.75
-				end
-			end
-			if int>str and int>per then
-				if t.Stat==0 or t.Stat==2 then
-					t.Result=t.Result+int*0.75
-				end
-			end
-			if per>str and per>int then
-				if t.Stat==0 or t.Stat==1 then
-					t.Result=t.Result+per*0.75
-				end
 			end
 		end
 	end
