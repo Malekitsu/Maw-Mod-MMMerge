@@ -626,10 +626,11 @@ function events.ItemGenerated(t)
 		
 		--fix to resistances not to rolled be twice
 		local bonus2=math.floor(t.Item.Charges/1000)
-		while t.Item.Bonus>0 and t.Item.Bonus==bonus2 do
-			t.Item.Bonus=math.random(11,16)
+		if t.Item.Bonus>=11 and t.Item.Bonus<=16 then
+			while t.Item.Bonus>0 and t.Item.Bonus==bonus2 do
+				t.Item.Bonus=math.random(11,16)
+			end
 		end
-		
 		
 		--[[statistics
 		ancientDrops=ancientDrops or 0
