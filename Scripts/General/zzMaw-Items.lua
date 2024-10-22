@@ -909,7 +909,7 @@ function events.BuildItemInformationBox(t)
 						local ac2=Game.ItemsTxt[t.Item.Number+lookup].Mod2+Game.ItemsTxt[t.Item.Number+lookup].Mod1DiceCount 
 						local maxCharges=t.Item.MaxCharges
 						if vars.insanityMode then
-							maxCharges=maxCharges*4/3
+							maxCharges=math.round(maxCharges*4/3)
 						end
 						local bonusAC=ac2*(maxCharges/40)
 						--if t.Item.MaxCharges <= 20 then
@@ -936,7 +936,7 @@ function events.BuildItemInformationBox(t)
 					local bonus2=Game.ItemsTxt[t.Item.Number+lookup].Mod2
 					local maxCharges=t.Item.MaxCharges
 					if vars.insanityMode then
-						maxCharges=maxCharges*4/3
+						maxCharges=math.round(maxCharges*4/3)
 					end
 					local bonusATK=bonus2*(maxCharges/30)
 					bonus=bonus+math.round(bonusATK)
@@ -1302,7 +1302,7 @@ bonusEffects = {
 function checktext(MaxCharges,bonus2,it)
 	--if MaxCharges <= 20 then
 	if vars.insanityMode then
-		MaxCharges=MaxCharges*4/3
+		MaxCharges=math.round(MaxCharges*4/3)
 	end
 	mult=1+MaxCharges/20
 	--else
@@ -2352,7 +2352,7 @@ function itemStats(index)
 				local ac2=referenceAC[it.Number]
 				local maxCharges=it.MaxCharges
 				if vars.insanityMode then
-					maxCharges=maxCharges*4/3
+					maxCharges=math.round(maxCharges*4/3)
 				end
 				local bonusAC=ac2*(maxCharges/40)
 				acBonus=ac+math.round(bonusAC)
@@ -2388,7 +2388,7 @@ function itemStats(index)
 				end
 			end
 			if vars.insanityMode then
-				power=power*4/3
+				power=math.round(power*4/3)
 			end
 			if it.BonusExpireTime==20 then
 				power=math.ceil(power*1.5)
@@ -2435,7 +2435,7 @@ function itemStats(index)
 				end
 			end
 			if vars.insanityMode then
-				power=power*4/3
+				power=math.round(power*4/3)
 			end
 			if it.BonusExpireTime==20 then
 				power=math.ceil(power*1.5)
@@ -2488,7 +2488,7 @@ function itemStats(index)
 			--bolster mult
 			maxCharges=it.MaxCharges
 			if vars.insanityMode then
-				maxCharges=maxCharges*4/3
+				maxCharges=math.round(maxCharges*4/3)
 			end
 			bonusATK = bonus2 * (maxCharges / 30)
 			
@@ -2597,7 +2597,7 @@ function itemStats(index)
 			tab[it.Bonus2]=tab[it.Bonus2] or 0
 			local maxCharges=it.MaxCharges
 			if vars.insanityMode then
-				maxCharges=maxCharges*4/3
+				maxCharges=math.round(maxCharges*4/3)
 			end
 			tab[it.Bonus2]=tab[it.Bonus2] + (5 +  math.floor(maxCharges/4))
 		end
