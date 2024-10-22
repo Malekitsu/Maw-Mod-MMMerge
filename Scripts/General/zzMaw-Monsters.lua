@@ -389,9 +389,16 @@ function events.MonsterKillExp(t)
 		t.Exp=0
 		return
 	end 
-	
 	local partyLvl=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL+vars.MMMLVL
 	local mon=t.Monster
+	
+	
+	if vars.insanityMode and mon.NameId>300 then 
+		t.Handled=true
+		t.Exp=0
+		return
+	end
+	
 	monLvl=getMonsterLevel(mon)
 	t.Handled=true
 	local partyCount=0
@@ -3243,3 +3250,11 @@ function events.MonsterKilled(mon)
 	end
 end
 
+function events.PickCorpse(t)
+	local mon=t.Monster
+	if vars.insanityMode and mon.NameId>300 then
+		mon.TreasureItemPercent=0
+		mon.TreasureDiceSides=0
+		mon.TreasureDiceCount=0
+	end
+end
