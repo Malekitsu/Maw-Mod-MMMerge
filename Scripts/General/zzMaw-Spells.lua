@@ -1123,6 +1123,9 @@ function getCCDiffMult(bolster)
 	if bolster==600 then 
 		diffMult=3
 	end
+	if vars.insanityMode then
+		diffMult=5
+	end
 	return diffMult
 end
 
