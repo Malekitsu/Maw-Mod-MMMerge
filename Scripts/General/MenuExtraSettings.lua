@@ -232,7 +232,7 @@ function events.GameInitialized2()
 	OnOffTumbler(ExSetScr, 95, 326, VarsToStore[4])
 	
 	-- Game mode
-	gameMode={[0]="Normal", [2]="Doom", [4]="Chal\nlenge", [6]="Online"}
+	gameMode={[0]="Normal", [2]="Doom", [4]="Road to\ninsanity",[6]="Speed\nrun" ,[8]="Online"}
 	Game.Mode = Game.Mode or 0
 	NumberRegulator(21, 530, 20, "Mode",
 		function(t, val)
@@ -241,13 +241,17 @@ function events.GameInitialized2()
 		function(val)
 			return gameMode[Game.Mode]
 		end,
-		Game.Mode, 0, 6, 2, 70)
+		Game.Mode, 0, 8, 2, 70)
 	--store value
 	function events.BeforeNewGameAutosave()
 		Game.Mode=Game.Mode or 1
 		vars.Mode=Game.Mode
 
 		if vars.Mode==4 then
+			vars.insanityMode=true
+			vars.Mode=2
+		end
+		if vars.Mode==6 then
 			vars.Mode=2
 			vars.ChallengeMode=true
 		end
@@ -257,7 +261,7 @@ function events.GameInitialized2()
 				Party[i].Experience=Party[i].Experience+10000/Party.Count
 			end
 		end
-		if vars.Mode==6 then
+		if vars.Mode==8 then
 			vars.ChallengeMode=true
 			vars.Mode=2 --doom
 			vars.onlineMode=true
