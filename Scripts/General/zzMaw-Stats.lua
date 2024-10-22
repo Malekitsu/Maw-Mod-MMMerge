@@ -968,7 +968,7 @@ function events.CalcDamageToMonster(t)
 						t.Monster.Resistances[i]=math.max(t.Monster.Resistances[i]-1,0)
 					end
 				else
-					t.Monster.Resistances[i]=math.max(t.Monster.Resistances[i]-1,0)
+					t.Monster.Resistances[i]=math.max(t.Monster.Resistances[i]%1000-1,0)+math.floor(t.Monster.Resistances[i]/1000)*1000
 				end
 			end
 		end
