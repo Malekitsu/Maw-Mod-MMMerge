@@ -1455,7 +1455,7 @@ function events.CalcDamageToMonster(t)
 		
 		local tier=spell%11==0 and 11 or spell%11
 		local learningBonus=tier^1.5 * t.Monster.Level^0.5
-		if table.find(aoespells,spell) then
+		if table.find(aoespells,spell) and spell~=15 and spell~=24 then
 			learningBonus=learningBonus/3
 		end
 		vars.elementalistSpells[pl:GetIndex()][school]=vars.elementalistSpells[pl:GetIndex()][school] + learningBonus
