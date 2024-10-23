@@ -1379,6 +1379,7 @@ end
 function events.Action(t)
 	if vars.insanityMode then
 		function events.Tick()
+			events.Remove("Tick",1)
 			if Game:GetCurrentHouse() then
 				local house=Game.Houses[Game:GetCurrentHouse()]
 				if house.Type==30 then
