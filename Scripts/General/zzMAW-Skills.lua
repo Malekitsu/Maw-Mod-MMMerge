@@ -1526,10 +1526,10 @@ end
 --HORIZONTAL SKILL PROGRESSION
 local learningRequirements={0,6,12,20}
 local learningRequirementsNormal={0,4,7,10}
-local horizontalSkills={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,27,28,32,33,38}
+local horizontalSkills={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,27,28,30,32,33,35,38}
 --online
 local insanityLearningRequirements={0,8,20,32}
-local insanityCost={0,10000,40000,200000}
+local insanityCost={0,10000,50000,250000}
 function events.CanTeachSkillMastery(t)
 	if t.Allow==false then return end --if failing for special requirements (stats, gold, already learned etc)
 	if not table.find(horizontalSkills, t.Skill) then return end
