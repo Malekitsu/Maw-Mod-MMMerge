@@ -803,7 +803,7 @@ function events.CalcDamageToPlayer(t)
 				mapLevel=mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High
 			end
 			if mapvars.mapAffixes then
-				mapLevel=(mapvars.mapAffixes.Power+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)*10
+				mapLevel=(mapvars.mapAffixes.Power*10+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)
 			end
 			--trap and objects multiplier
 			local mult=(mapLevel/9+1.15)*(1+(mapLevel/200))*(mapLevel/50+2)
