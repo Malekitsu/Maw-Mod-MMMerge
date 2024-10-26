@@ -623,6 +623,9 @@ function recalculateMonsterTable()
 		if vars.Mode==2 then
 			mon.Experience=mon.Experience/2
 		end
+		if vars.InsanitMode then
+			mon.Experience=mon.Experience*0.7
+		end
 	end
 	--CALCULATE DAMAGE AND HP
 	for i=1, 651 do
