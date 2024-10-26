@@ -1648,6 +1648,33 @@ function events.Action(t)
 	end
 end
 
+--show stacks
+function events.GameInitialized2()
+	elementalistStacks={}
+	for i=0,4 do
+		elementalistStacks[i]=CustomUI.CreateText{
+			Text = "",
+			Layer 	= 1,
+			Screen 	= 0,
+			X = 5+i*96, Y = 387
+		}
+	end
+end
+
+function events.Tick()
+	for i=0,Party.High do
+		local pl=Party[i]
+		if table.find(elementalistClass,pl.Class) then
+			local id=pl:GetIndex()
+			vars.eleStacks=vars.eleStacks or {}
+			vars.eleStacks[id]=vars.eleStacks[id] or 0
+			elementalistStacks[i].Text=string.format(vars.eleStacks[id])
+		else
+			elementalistStacks[i].Text=""
+		end
+	end
+end
+
 --[[test code
 function events.PlayerCastSpell(t)
 	if t.SpellId==2 then
