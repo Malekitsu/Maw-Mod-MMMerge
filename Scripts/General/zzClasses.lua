@@ -1438,8 +1438,8 @@ function events.CanLearnSpell(t)
 	end
 end
 
-spellRequirements={100,200,1000,2000,5000,10000,15000,25000,40000,60000,100000}
-
+spellRequirements={100,200,500,1500,5000,10000,20000,40000,80000,160000,320000}
+local masteryRequired={1,1,1,1,2,2,2,3,3,3,4}
 function events.CalcDamageToMonster(t)
 	if t.Monster.Hostile==false and t.Monster.ShowAsHostile==false then
 		return
@@ -1464,7 +1464,8 @@ function events.CalcDamageToMonster(t)
 			local spell2= school2+i
 			if pl.Spells[spell2]==false then
 				local tier=spell2%11==0 and 11 or spell2%11
-				if vars.elementalistSpells[pl:GetIndex()][school]>=spellRequirements[tier] then
+				local s,m=SplitSkill(pl:GetSkill(school))
+				if vars.elementalistSpells[pl:GetIndex()][school]>=spellRequirements[tier] and m>=masteryRequired[tier] then
 					pl.Spells[spell2]=true
 					Message("Learned " .. Game.SpellsTxt[spell2].Name)
 				end
@@ -1578,9 +1579,9 @@ function elementalistRandomizer(pl, spellType)
 			end
 		end
 	elseif spellType=="aoe" and Map.IsIndoor() then
-		for i=1,#aoeOut do
-			if pl.Spells[aoeOut[i]] then
-				table.insert(possibleSpells, aoeOut[i])
+		for i=1,#aoeIn do
+			if pl.Spells[aoeIn[i]] then
+				table.insert(possibleSpells, aoeIn[i])
 			end
 		end
 	elseif spellType=="aoe" then
