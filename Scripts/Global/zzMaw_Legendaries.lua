@@ -252,10 +252,10 @@ function events.CalcDamageToPlayer(t)
 			local fullHP=t.Player:GetFullHP()
 			local currentHP=t.Player.HP
 			if currentHP<-fullHP then
-				t.Player.Dead=1
+				t.Player.Dead=Game.Time
 			end
 			if currentHP<-fullHP*2 then
-				t.Player.Eradicated=1
+				t.Player.Eradicated=Game.Time
 			end
 		end
 	end
