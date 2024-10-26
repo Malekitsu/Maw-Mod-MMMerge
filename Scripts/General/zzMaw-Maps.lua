@@ -1729,7 +1729,9 @@ function events.MonsterKilled(mon)
 			obj.Item.BonusExpireTime=getUniqueAffix()
 		end
 		obj.Item.MaxCharges=math.round(totalLevel[mon.Id]/10-math.random(0,3))
-		
+		if vars.insanityMode then
+			obj.Item.MaxCharges=math.max(obj.Item.MaxCharges,30)
+		end
 	end
 end
 
