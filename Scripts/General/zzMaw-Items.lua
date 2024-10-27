@@ -176,7 +176,7 @@ function events.ItemGenerated(t)
 			end
 		end
 		math.randomseed(vars.SeedList[t.Item.Number])
-		vars.SeedList[t.Item.Number]=vars.SeedList[t.Item.Number]+math.random(1,1000)
+		vars.SeedList[t.Item.Number]=vars.SeedList[t.Item.Number]*1000000000+math.random(0,999999999)
 	end
 
 	if Map.MapStatsIndex==0 then
