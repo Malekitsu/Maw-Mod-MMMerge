@@ -105,6 +105,9 @@ end
 function events.AfterLoadMap()
 	for i=1,Game.MapStats.High do
 		Game.MapStats[i].RefillDays=dungeonResetList[i]
+		if vars.insanityMode then
+			Game.MapStats[i].RefillDays=1000000000
+		end
 	end
 	vars.dungeonCompletedList=vars.dungeonCompletedList or {}
 	for key, value in pairs(vars.dungeonCompletedList) do
