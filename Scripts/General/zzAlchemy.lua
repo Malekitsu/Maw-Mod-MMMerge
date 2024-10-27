@@ -617,11 +617,18 @@ function events.BuildItemInformationBox(t)
 				tier=tier+10*mult
 			end
 			local power = math.round((tier * 10) ^ 0.5)
+			
+			if vars.insanityMode then
+				power=math.floor(power*4/3)
+				tier=tier*4/3
+			end
+			
 			local twoHanded = tier * 10 * 2
 			local bodyArmor = math.round(tier * 1.5 * 10)
 			local helmEtc = math.round(tier * 1.25 * 10)
 			local rings = math.round(tier * 0.75 * 10)
-
+			
+			
 			t.Description = "A special Gem that allows to increase an item Enchant Strength (right-click on an item with a base enchant to use)\nLegendary items can get 20% more power.\n\nMax Power: " 
 			.. StrColor(255, 128, 0, tostring(tier * 10)) .. " (65% on AC)"
 			.. "\nBonus: " .. StrColor(255, 128, 0, tostring(power)) 
