@@ -350,6 +350,9 @@ function events.ItemGenerated(t)
 		if vars.Mode==2 then
 			diffMult=1.8
 		end
+		if vars.insanityMode then
+			diffMult=2
+		end
 		--calculate chances
 		local p1=enc1Chance[math.min(pseudoStr,#enc1Chance)]/100
 		local p2=enc2Chance[math.min(pseudoStr,#enc2Chance)]/100
@@ -482,10 +485,10 @@ function events.ItemGenerated(t)
 		if t.Item.BonusExpireTime==2 then
 			local chance=0.1
 			if vars.Mode==2 then
-				chance=chance*2
+				chance=0.2
 			end
 			if vars.insanityMode then
-				chance=chance*1.5
+				chance=0.25
 			end
 			--No legendary in shop
 			if Game.HouseScreen==2 or Game.HouseScreen==95 then
