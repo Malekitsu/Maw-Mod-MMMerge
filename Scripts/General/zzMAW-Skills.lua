@@ -1107,6 +1107,9 @@ function MawRegen()
 			else
 				mult=2
 			end
+			if (not Party.EnemyDetectorYellow and not Party.EnemyDetectorRed) then
+				mult=mult*4
+			end
 			--regeneration skill
 			local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Regeneration))
 			gmMult=1
@@ -1161,6 +1164,9 @@ function MawRegen()
 				waitSP[i]=waitSP[i]-timeMultiplier
 			else
 				mult=2
+			end
+			if (not Party.EnemyDetectorYellow and not Party.EnemyDetectorRed) then
+				mult=mult*4
 			end
 			local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Meditation))
 			if RegM==4 then
