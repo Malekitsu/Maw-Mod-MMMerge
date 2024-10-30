@@ -878,7 +878,7 @@ function events.GameInitialized2()
 			m1=SplitSkill(t.Player.Skills[const.Skills.Fire])
 			m6=SplitSkill(data.Player.Skills[const.Skills.Mind])
 			m7=SplitSkill(data.Player.Skills[const.Skills.Body])
-			data.Player.SP=math.min(data.Player.SP+m6^2.6/(10+pl.LevelBase)*5, data.Player:GetFullSP())
+			data.Player.SP=math.min(data.Player.SP+m6^2.6/(10+pl.LevelBase)*3, data.Player:GetFullSP())
 			data.Player.HP=math.min((data.Player.HP+m7^2.5/(20+pl.LevelBase)*15), data.Player:GetFullHP())
 			local fireDamage=(m1^2/(25+pl.LevelBase)^2)
 			if t.Monster.Resistances[0]>=1000 then
@@ -945,7 +945,7 @@ local function shamanSkills(isShaman, id)
 		local spelldh=math.round(m5^2/pl.LevelBase/6*100)
 		txt=baseSchoolsTxt[16] .. "\n\nIncreases spell damage by " .. spelldh .. "%"
 		Skillz.setDesc(16,1,txt)
-		SPLEECH=math.round(m6^2.6/(10+pl.LevelBase)*5)
+		SPLEECH=math.round(m6^2.6/(10+pl.LevelBase)*3)
 		txt=baseSchoolsTxt[17] .. "\n\nMelee attacks restore " .. SPLEECH .. " Spell Points"
 		Skillz.setDesc(17,1,txt)
 		local hpRestore=math.round(m7^2.5/(20+pl.LevelBase)*15)
