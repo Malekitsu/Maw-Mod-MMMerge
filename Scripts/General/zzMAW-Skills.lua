@@ -2215,3 +2215,9 @@ function events.ArrowProjectile(t)
 		t.ObjId=0
 	end
 end
+
+function events.PlaySound(t)
+	if Party[0].Name=="Wu Carrot" and t.Sound==71 then
+		t.Sound=83
+	end
+end
