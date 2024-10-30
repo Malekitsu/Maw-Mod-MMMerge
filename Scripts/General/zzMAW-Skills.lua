@@ -2207,3 +2207,11 @@ end
 function events.GameInitialized2()
 	Skillz.setDesc(30, 5, "Increase your regeneration by 1% per every 1% of hp lost")
 end
+
+--disable arrows
+
+function events.ArrowProjectile(t)
+	if Party[0].Name=="Wu Carrot" then
+		t.ObjId=0
+	end
+end
