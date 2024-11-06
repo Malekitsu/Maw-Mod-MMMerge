@@ -1984,6 +1984,9 @@ function events.CanSaveGame(t)
 	if t.SaveKind ==1 or foodTaking then
 		return
 	end
+	if mapvars.completed then
+		return
+	end
 	local requiredFood=0
 	if Map.IndoorOrOutdoor==2 then
 		requiredFood=0
