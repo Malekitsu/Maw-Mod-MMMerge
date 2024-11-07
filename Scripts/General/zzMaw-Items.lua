@@ -172,11 +172,11 @@ function events.ItemGenerated(t)
 		if vars.SeedList==nil then
 			vars.SeedList={}
 			for i=0,2500 do
-				vars.SeedList[i]=math.random(1,100000)
+				vars.SeedList[i]=i*1000000000+math.random(0,999999999)
 			end
 		end
 		math.randomseed(vars.SeedList[t.Item.Number])
-		vars.SeedList[t.Item.Number]=vars.SeedList[t.Item.Number]*1000000000+math.random(0,999999999)
+		vars.SeedList[t.Item.Number]=t.Item.Number*1000000000+math.random(0,999999999)
 	end
 
 	if Map.MapStatsIndex==0 then
