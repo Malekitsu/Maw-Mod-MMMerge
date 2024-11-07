@@ -1763,6 +1763,23 @@ function events.UseMouseItem(t)
 		local mult=1+it.MaxCharges*nAff/300
 		mapMonsterDensity={it.BonusStrength,mult}
 		blv(fileName)
+		local wait=10
+		function events.Tick()
+			if wait<=0 then
+				events.Remove("Tick",1)
+			else
+				wait=wait-1
+			end
+			for i=0,Map.Sprites.High do
+				if Map.Sprites[i].DecName=="Party Start" then
+					local start=Map.Sprites[i]
+					Party.X=start.X
+					Party.Y=start.Y
+					Party.Z=start.Z
+					Party.Direction=start.Direction
+				end	
+			end
+		end
 	end
 end
 --needed for chest/objects loot
