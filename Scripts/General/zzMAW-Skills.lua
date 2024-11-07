@@ -1552,7 +1552,7 @@ function events.CanTeachSkillMastery(t)
 			local pl=Party[id]
 			for i=1,#horizontalSkills do
 				local s,m=SplitSkill(pl.Skills[horizontalSkills[i]])
-				if m>=masteryToLearn then
+				if m>=masteryToLearn and s~=0 then
 					cost=cost+baseCost
 				end
 			end
