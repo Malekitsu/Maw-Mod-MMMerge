@@ -176,24 +176,27 @@ function changeBag(pl, bag)
 			while j<=138 and pl.Items[i+j].Number>0 do
 				j=j+1
 			end
-			
-			pl.Inventory[it.Location]=i+j
-			local inv=pl.Items[i+j]
-			inv["Bonus"]=it.Bonus
-			inv["Bonus2"]=it.Bonus2
-			inv["BonusExpireTime"]=it.BonusExpireTime
-			inv["BonusStrength"]=it.BonusStrength
-			inv["Broken"]=it.Broken
-			inv["Charges"]=it.Charges
-			inv["Condition"]=it.Condition 
-			inv["Hardened"]=it.Hardened
-			inv["Identified"]=it.Identified
-			inv["MaxCharges"]=it.MaxCharges
-			inv["Number"]=it.Number
-			inv["Owner"]=it.Owner
-			inv["Refundable"]=it.Refundable
-			inv["Stolen"]=it.Stolen
-			inv["TemporaryBonus"]=it.TemporaryBonus
+			if it and it.Location then
+				pl.Inventory[it.Location]=i+j
+				local inv=pl.Items[i+j]
+				inv["Bonus"]=it.Bonus
+				inv["Bonus2"]=it.Bonus2
+				inv["BonusExpireTime"]=it.BonusExpireTime
+				inv["BonusStrength"]=it.BonusStrength
+				inv["Broken"]=it.Broken
+				inv["Charges"]=it.Charges
+				inv["Condition"]=it.Condition 
+				inv["Hardened"]=it.Hardened
+				inv["Identified"]=it.Identified
+				inv["MaxCharges"]=it.MaxCharges
+				inv["Number"]=it.Number
+				inv["Owner"]=it.Owner
+				inv["Refundable"]=it.Refundable
+				inv["Stolen"]=it.Stolen
+				inv["TemporaryBonus"]=it.TemporaryBonus
+			else
+				debug.Message("One of the " .. pl.Name .. "'s item from the bag " .. bag .. " might have been corrupted, contact Malekith on discord (or in bug report in discord) and copy paste this message and the following ones.\nKeep in mind that corrupted item might have been just some 'random' unexpected value with no actual consequences, so if you don't notice anything missing, you can continue playing normally.\n\nItem data:\n" .. dump(it))
+			end
 		end
 		--remove empty spaces
 		for i=0,125 do
