@@ -613,24 +613,6 @@ function events.CalcDamageToPlayer(t)
 				damage=damage+math.random(1, atk.DamageDiceSides)
 			end
 			t.Damage=damage
-			if data and data.Object then
-				if data.Object.Spell==0 then
-					if pl:GetActiveItem(0) then
-						local n=pl:GetActiveItem(0).Number
-						if Game.ItemsTxt[n].Skill==const.Skills.Shield then --shield skill
-							s,m=SplitSkill(t.Player.Skills[const.Skills.Shield])
-							if m>=4 then
-								t.Damage=t.Damage*0.85
-							end
-						end
-					end
-					if not buffRework then
-						if pl.SpellBuffs[11].ExpireTime>Game.Time or Party.SpellBuffs[14].ExpireTime>Game.Time  then --shield buff
-							t.Damage=t.Damage*0.85
-						end
-					end
-				end
-			end	
 		end
 		if mapvars.nameIdMult and mapvars.nameIdMult[data.Monster.NameId] and mapvars.nameIdMult[data.Monster.NameId][data.MonsterAction+1] then
 			t.Damage=t.Damage*mapvars.nameIdMult[data.Monster.NameId][data.MonsterAction+1]
@@ -873,7 +855,7 @@ function events.Tick()
 		local resistanceText={}
 		local id=pl:GetIndex()
 		for i=1,6 do
-			if normalEnchantResistance[id][10+i]>0 then
+			if vars.normalEnchantResistance[id][10+i]>0 then
 				resistanceText[i]=StrColor(0,255,0,string.format("%6s", resistances[9+i]))
 			else
 				resistanceText[i]=string.format("%6s", resistances[9+i])
@@ -1090,58 +1072,6 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		bolster=3
 	end
 	local id=pl:GetIndex()
-	--[[currently using a different code
-	if buffRework then
-		local requiredBuffs=buffToResistance[damageKind]
-		local buffSpell=buffToSpell[damageKind]
-		
-		local buffing=true
-		local skill=0
-		local mastery=0
-		if requiredBuffs then
-			if type(requiredBuffs)=="table" then
-				skill=0
-				for i=1, #requiredBuffs do
-					local buffId=requiredBuffs[i]
-					local spell=buffSpell[i]
-					local s, m=getBuffSkill(spell)
-					skill=math.min(skill, s)
-					mastery=math.min(mastery, m)
-					if Party.SpellBuffs[buffId].ExpireTime<Game.Time then
-						buffing=false
-					end
-				end
-			else
-				local buffId=requiredBuffs
-				if Party.SpellBuffs[buffId].ExpireTime<Game.Time then
-					buffing=false
-				else
-					skill, mastery=getBuffSkill(buffSpell)
-				end
-			end
-		end
-		
-		local reduction=1-buffPower[3].Base[mastery]/100-buffPower[3].Scaling[mastery]*skill/1000
-		
-		local s2=getBuffSkill(85)
-		if s2>0 then
-			reduction2=1-buffPower[85].Base[mastery]/100-buffPower[85].Scaling[mastery]*skill/1000
-			reduction=math.min(reduction, reduction2)
-		end
-		
-		if buffing then 
-			damage=damage*reduction
-		elseif s2>0 then
-			damage=damage*reduction2
-		end
-		
-		if Party.SpellBuffs[14].ExpireTime>=Game.Time then
-			local skill=getBuffSkill(17)
-			damage=damage*(0.95-0.001*skill)
-		end
-		
-	end
-	]]
 	--AC for phys
 	
 	
@@ -1150,6 +1080,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		damage=damage*0.9
 	end	
 	
+	--PHYSICAL DAMAGE CALCULATION
 	if damageKind==4 then 		
 		local AC=pl:GetArmorClass()
 		local AC=pl:GetArmorClass()
@@ -1163,15 +1094,35 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		return damage
 	end
 	
+	--MAGIC DAMAGE CALCULATION
 	--shield buff
-	if buffRework and Party.SpellBuffs[14].ExpireTime>=Game.Time then
-		local s,m=getBuffSkill(17)
-		local s2,m2=getBuffSkill(86)
-		s=math.max(s,s2/1.5)
-		m=math.max(m,m2)
-		damage=damage*(0.9-0.002*s)
+	if buffRework then
+		if Party.SpellBuffs[14].ExpireTime>=Game.Time then
+			local s,m=getBuffSkill(17)
+			local s2,m2=getBuffSkill(86)
+			s=math.max(s,s2/1.5)
+			m=math.max(m,m2)
+			damage=damage*(0.9-0.002*s)
+		end
+	else
+		if pl.SpellBuffs[11].ExpireTime>Game.Time or Party.SpellBuffs[14].ExpireTime>Game.Time  then --shield buff
+			damage=damage*0.85
+		end
 	end
-			
+	--shield skill
+	if pl:GetActiveItem(0) then
+		local it=pl:GetActiveItem(0)
+		if it and it:T().Skill==const.Skills.Shield then --shield skill
+			s,m=SplitSkill(pl.Skills[const.Skills.Shield])
+			if m>=4 then
+				damage=damage*0.85
+			end
+		end
+	end
+	--enchant reduction
+	if vars.shieldEnchant and vars.shieldEnchant[id] then
+		damage=damage*0.85
+	end
 	
 	--get resistances
 	if not damageKindResistance[damageKind] then
@@ -1197,7 +1148,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	--base enchants
 	currentItemRes=10000
 	for i=1,#resList do
-		local itemRes = normalEnchantResistance[id][resList[i]+1]
+		local itemRes = vars.normalEnchantResistance[id][resList[i]+1]
 		if itemRes<currentItemRes then
 			currentItemRes=itemRes
 		end
