@@ -1526,7 +1526,7 @@ fireAuraDamage={10,20,40,60,[0]=0}
 --calculate enchant damage
 function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType)
 	local ench=enchantbonusdamage[it.Bonus2]
-	if not ench or (it.Bonus2==39 and not isSpell) then
+	if not ench or (it.Bonus2==39 and not isSpell) or (it.Bonus2==46 and isSpell) then
 		return 0
 	end
 	local damage=0
