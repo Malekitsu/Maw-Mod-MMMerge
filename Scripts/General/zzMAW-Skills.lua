@@ -1763,7 +1763,7 @@ function events.CanIdentifyMonster(t)
 	end
 end
 
-local partySharedSkills={24,25,26,31,34,37}
+local partySharedSkills={24,25,26,29,31,34,37}
 local skillRequirements={1,4,7,10}
 function events.Tick()
 	--give masteries to solo player
