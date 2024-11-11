@@ -784,7 +784,7 @@ function events.GameInitialized2()
 	Game.SpcItemsTxt[21].BonusStat="Sleep and Unconscious Immunity"
 	Game.SpcItemsTxt[22].BonusStat="Stone and premature ageing Immunity"
 	Game.SpcItemsTxt[24].BonusStat="Death and Eradication Immunity"
-	Game.SpcItemsTxt[36].BonusStat="Reduces Magic damage by 15%"
+	Game.SpcItemsTxt[35].BonusStat="Reduces Magic damage taken by 15%"
 end
 --------------------
 --STATUS REWORK (needs to stay after status immunity)
