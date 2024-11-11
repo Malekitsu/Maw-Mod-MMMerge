@@ -784,6 +784,7 @@ function events.GameInitialized2()
 	Game.SpcItemsTxt[21].BonusStat="Sleep and Unconscious Immunity"
 	Game.SpcItemsTxt[22].BonusStat="Stone and premature ageing Immunity"
 	Game.SpcItemsTxt[24].BonusStat="Death and Eradication Immunity"
+	Game.SpcItemsTxt[36].BonusStat="Reduces Magic damage by 15%"
 end
 --------------------
 --STATUS REWORK (needs to stay after status immunity)
@@ -2322,10 +2323,10 @@ function itemStats(index)
 	--used for armor skill	
 	shieldAC=0
 	armorAC=0
-	normalEnchantResistance=normalEnchantResistance or {}
-	normalEnchantResistance[index]={}
+	vars.normalEnchantResistance=vars.normalEnchantResistance or {}
+	vars.normalEnchantResistance[index]={}
 	for i=11,16 do
-		normalEnchantResistance[index][i]=0
+		vars.normalEnchantResistance[index][i]=0
 	end
 	--iterate once for legendaries
 	vars.legendaries=vars.legendaries or {}
@@ -2412,7 +2413,7 @@ function itemStats(index)
 					end
 				end
 			elseif it.Bonus<=16 then
-				normalEnchantResistance[index][it.Bonus]=math.max(normalEnchantResistance[index][it.Bonus], power)		
+				vars.normalEnchantResistance[index][it.Bonus]=math.max(vars.normalEnchantResistance[index][it.Bonus], power)		
 			else
 				local tabNumber=bonusBaseEnchantSkill[it.Bonus]+50
 				tab[tabNumber]=tab[tabNumber] or 0
@@ -2446,13 +2447,17 @@ function itemStats(index)
 			if bonus<=10 then
 				tab[math.floor(it.Charges/1000)]=tab[math.floor(it.Charges/1000)]+power
 			else
-				normalEnchantResistance[index][bonus]=math.max(normalEnchantResistance[index][bonus], power)	
+				vars.normalEnchantResistance[index][bonus]=math.max(vars.normalEnchantResistance[index][bonus], power)	
 			end
 		end		
 		--bolster mult
 		mult=1+it.MaxCharges/20
 		if vars.insanityMode then
 			mult=mult*4/3
+		end
+		if it.Bonus2==36 then
+			vars.shieldEnchant=vars.shieldEnchant or {}
+			vars.shieldEnchant[index]=true
 		end
 		if it.Bonus2>0 then
 			bonusData = bonusEffects[it.Bonus2]
