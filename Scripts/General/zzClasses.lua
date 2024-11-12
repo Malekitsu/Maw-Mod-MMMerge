@@ -870,7 +870,7 @@ function events.GameInitialized2()
 			m2=SplitSkill(t.Player.Skills[const.Skills.Air])
 			m3=SplitSkill(t.Player.Skills[const.Skills.Water])
 			mult=((math.max(Game.BolsterAmount, 100)/100)-1)/2+1
-			t.Result=math.max((t.Result-m3^2.25/(100+pl.LevelBase)*50*mult)*0.99^(1+m2^2/pl.LevelBase*5), t.Result*0.175)
+			t.Result=math.max((t.Result-m3^2.25/(100+pl.LevelBase)*50*mult+m3)*0.99^(1+m2^2/pl.LevelBase*5), t.Result*0.175)
 		end
 	end
 	
@@ -880,8 +880,8 @@ function events.GameInitialized2()
 			m1=SplitSkill(t.Player.Skills[const.Skills.Fire])
 			m6=SplitSkill(data.Player.Skills[const.Skills.Mind])
 			m7=SplitSkill(data.Player.Skills[const.Skills.Body])
-			data.Player.SP=math.min(data.Player.SP+m6^2/pl.LevelBase*25, data.Player:GetFullSP())
-			data.Player.HP=math.min((data.Player.HP+m7^2/(10+pl.LevelBase)*75), data.Player:GetFullHP())
+			data.Player.SP=math.min(data.Player.SP+m6^2/pl.LevelBase*25+m6, data.Player:GetFullSP())
+			data.Player.HP=math.min((data.Player.HP+m7^2/(10+pl.LevelBase)*75+m7), data.Player:GetFullHP())
 			local fireDamage=(m1^2/(25+pl.LevelBase)^2)
 			if t.Monster.Resistances[0]>=1000 then
 				mult=2^math.floor(t.Monster.Resistances[0]/1000)
@@ -938,19 +938,19 @@ local function shamanSkills(isShaman, id)
 		txt=baseSchoolsTxt[13] .. "\n\nReduce all damage taken by " .. airReduction .. " %"
 		Skillz.setDesc(13,1,txt)
 		mult=((math.max(Game.BolsterAmount, 100)/100)-1)/2+1
-		local waterReduction=math.round(m3^2.25/(100+pl.LevelBase)*50*mult)
+		local waterReduction=math.round(m3^2.25/(100+pl.LevelBase)*50*mult+m3)
 		txt=baseSchoolsTxt[14] .. "\n\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)"
 		Skillz.setDesc(14,1,txt)
-		local armsmasterDamage=math.round(m4^2.6/(10+pl.LevelBase)*10)
+		local armsmasterDamage=math.round(m4^2.6/(10+pl.LevelBase)*10+m4)
 		txt=baseSchoolsTxt[15] .. "\n\nIncreases melee damage by ".. armsmasterDamage .. ""
 		Skillz.setDesc(15,1,txt)
 		local spelldh=math.round(m5^2/pl.LevelBase/6*100)
 		txt=baseSchoolsTxt[16] .. "\n\nIncreases spell damage by " .. spelldh .. "%"
 		Skillz.setDesc(16,1,txt)
-		SPLEECH=math.round(m6^2/pl.LevelBase*25)
+		SPLEECH=math.round(m6^2/pl.LevelBase*25+m6)
 		txt=baseSchoolsTxt[17] .. "\n\nMelee attacks restore " .. SPLEECH .. " Spell Points"
 		Skillz.setDesc(17,1,txt)
-		local hpRestore=math.round(m7^2/(10+pl.LevelBase)*75)
+		local hpRestore=math.round(m7^2/(10+pl.LevelBase)*75+m7)
 		local spelldhx=math.round(m7^2/pl.LevelBase/10*100)
 		txt=baseSchoolsTxt[18] .. "\n\nMelee attacks restore " .. hpRestore .. " Hit Points and healing spells by " .. spelldhx .. "%"
 		Skillz.setDesc(18,1,txt)
