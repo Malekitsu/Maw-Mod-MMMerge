@@ -2805,7 +2805,7 @@ function itemStats(index)
 	
 	local s,m=SplitSkill(Skillz.get(pl,52))
 	if s>20 then
-		s=s+(s-20)*2
+		s=s+(s-20)
 	end
 	local enlightIncrease=totalMana*((m+1)/100*s)
 	tab[9]=tab[9]+enlightIncrease+manaScaling*s2*m2
