@@ -2051,7 +2051,9 @@ function events.GameInitialized2()
 		[const.Race.Minotaur]={
 			[const.Skills.Axe]=3,
 		},
-		[const.Race.Troll]={},
+		[const.Race.Troll]={
+			[const.Skills.Regeneration]=3,
+		},
 		[const.Race.Dragon]={},
 		[const.Race.Undead]={},
 		[const.Race.Elf]={
@@ -2059,7 +2061,7 @@ function events.GameInitialized2()
 			[const.Skills.Spear]=3,
 			[const.Skills.Meditation]=3,
 		},
-	[const.Race.DarkElf]={
+		[const.Race.DarkElf]={
 			[const.Skills.Bow]=3,
 			[const.Skills.Spear]=3,
 			[const.Skills.Meditation]=3,
@@ -2068,6 +2070,7 @@ function events.GameInitialized2()
 			[const.Skills.Sword]=3,
 			[const.Skills.Mace]=3,
 			[const.Skills.Dagger]=3,
+			[const.Skills.Leather]=3,
 		},
 		[const.Race.Dwarf]={
 			[const.Skills.Axe]=3,
@@ -2080,8 +2083,9 @@ function events.GameInitialized2()
 	function events.GetSkill(t)
 		local pl=t.Player
 		local race=Game.CharacterPortraits[pl.Face].Race
+		local baseSkill=SplitSkill(pl.Skills[t.Skill])
 		if MAWRacialSkills[race][t.Skill] then
-			t.Result=t.Result+ MAWRacialSkills[race][t.Skill]
+			t.Result=t.Result+ MAWRacialSkills[race][t.Skill] + math.floor(baseSkill/10)
 		end
 	end
 end
