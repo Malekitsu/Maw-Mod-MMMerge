@@ -191,7 +191,7 @@ function events.CalcDamageToPlayer(t)
 			slot=i
 		end
 	end
-	if s>0 and vars.manaShield[slot] then
+	if s>0 and vars.manaShield and vars.manaShield[slot] then
 		if m==4 then
 			m=100000
 		end
