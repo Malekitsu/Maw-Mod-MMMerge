@@ -406,7 +406,7 @@ function events.GameInitialized2()
 	Game.SpellsTxt[123].Description="This ability is an upgraded version of the normal Dragon breath weapon attack.  It acts much like a fireball, striking its target and exploding out to hit everything near it, except the explosion does much more damage than most fireballs."
 	Game.SpellsTxt[123].Expert="Deals damage equal to 70% of breath damage"
 	Game.SpellsTxt[123].Master="Deals damage equal to 85% of breath damage"
-	Game.SpellsTxt[123].GM=Deals damage equal to 100% of breath damage"
+	Game.SpellsTxt[123].GM="Deals damage equal to 100% of breath damage"
 	--mana cost
 	Game.Spells[123].SpellPointsNormal=25
 	Game.Spells[123].SpellPointsExpert=50
