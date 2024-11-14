@@ -2432,7 +2432,7 @@ function generateBoss(index,nameIndex)
 end
 
 --SKILLS
-SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Adamantite","Swapper","Regenerating","Puller","Leecher","Swift"} --defensives
+SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Adamantite","Swapper","Regenerating","Puller","Leecher","Swift","Fixator"} --defensives
 --to add: splitting
 --on attack skills
 function events.GameInitialized2() --to make the after all the other code
@@ -3098,6 +3098,7 @@ if restoreMM6Glory then
 					obj.Y=obj.Y+(Party.Y-obj.Y)/3
 					obj.Z=obj.Z+10
 					--cover code
+					
 					local list={}
 					for k=0,Party.High do
 						if Party[k]:IsConscious() then
@@ -3153,6 +3154,21 @@ if restoreMM6Glory then
 							evt[target].Add("HP", Party[target]:GetFullHP()*0.03)
 						end
 					end		
+					
+					local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+					if skill=="Fixator" then
+						local lowestHPId=-1
+						local lowestHP=math.huge
+						for i=0,Party.High do
+							local totHP=Party[i]:GetFullHP()
+							if Party[i]:IsConscious() and totHP<lowestHP then
+								lowestHP=totHP
+								lowestHPId=i
+							end
+						end
+						t.PlayerSlot=lowestHPId
+						return
+					end
 					
 					--apply damage
 					Party[target]:DoDamage(10000,mon.Attack1.Type)
