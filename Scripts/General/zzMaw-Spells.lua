@@ -3071,7 +3071,8 @@ if buffRework then
 		local id=75
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to affect the entire party at once, granting immunity to certain spells and monster abilities that cause debilitation conditions.  These are:  Poison, Disease, Stone, Paralyze, and Weak.\nThis effect remains active until deactivated or lose consciousness.")
+		sp.Description = string.format("Reserve a percentage of your mana to affect the entire party at once, granting immunity to certain spells and monster abilities that cause debilitation conditions.  These are:  Poison, Disease, Stone, Paralyze, Weak, Death and Eradicated.\nThis effect remains active until deactivated or lose consciousness.")
+
 		
 		--pain reflection
 		local id=95
