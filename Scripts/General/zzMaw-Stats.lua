@@ -689,7 +689,7 @@ function events.CalcDamageToPlayer(t)
 	end
 	if reflectedDamage then
 		reflectedDamage=false
-		t.Result=t.Result^0.85
+		t.Result=t.Result^0.9
 		return
 	end
 	--PAIN REFLECTION FIX
