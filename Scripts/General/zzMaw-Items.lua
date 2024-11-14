@@ -3811,6 +3811,8 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 		if it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number)then
 			mult=mult*2
 		end
+		local bol=Game.BolsterAmount
+		mult=mult*(400+bol)/1000
 		local damage=fireAuraDamage[m]*mult
 		local res=res or 0
 		local damage=damage/2^(res/100)
