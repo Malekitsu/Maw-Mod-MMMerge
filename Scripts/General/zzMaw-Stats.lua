@@ -1366,9 +1366,9 @@ function events.CalcStatBonusByItems(t)
 	if not (Res >= 10 and Res <= 15) then
 		return
 	end
-
+	
 	local Race = GetRace(t.Player, t.PlayerIndex)
-
+	local lvl=t.Player.Level
 	if Race == 6 and (Res == 15 or Res == 14) then -- Lich's immunities
 		t.Result = 65000
 		t.Player.Resistances[6].Base = 65000
@@ -1378,20 +1378,19 @@ function events.CalcStatBonusByItems(t)
 		t.Result = 65000
 		t.Player.Resistances[7].Base = 65000
 	
-	elseif (Race == 2 or Race == 7) and (Res == 10 or Res == 11) then
-		t.Result = t.Result+25
+	elseif (Race == 2 or Race == 7) and (Res == 10 or Res == 11 or Res == 12 or Res == 13) then -- elves
+		t.Result = t.Result+25 + lvl
 	
 	elseif Race == 4 and (Res == 12 or Res == 13) then -- Troll's Water and Earth resistance.
-		t.Result = t.Result + 25
+		t.Result = t.Result + 25 + lvl
 		
 	elseif Race == 8 and (Res == 11 or Res == 13) then -- Goblins's Air and Earth resistance.
-		t.Result = t.Result + 25
+		t.Result = t.Result + 25 + lvl
 
 	elseif Race == 9 and (Res == 13 or Res == 14) then -- Dwarf's Mind and Earth resistance.
-		t.Result = t.Result + 25
-
+		t.Result = t.Result + 25 + lvl
 	elseif Race == 5 and Res == 10 then -- Dragon's bonus
-		t.Result = t.Result + 100
+		t.Result = t.Result + 100 + math.floor(lvl*2)
 
 	end	
 	
