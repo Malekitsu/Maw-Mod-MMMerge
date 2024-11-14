@@ -1368,7 +1368,7 @@ function events.CalcStatBonusByItems(t)
 	end
 	
 	local Race = GetRace(t.Player, t.PlayerIndex)
-	local lvl=t.Player.Level
+	local lvl=t.Player.LevelBase
 	if Race == 6 and (Res == 15 or Res == 14) then -- Lich's immunities
 		t.Result = 65000
 		t.Player.Resistances[6].Base = 65000
