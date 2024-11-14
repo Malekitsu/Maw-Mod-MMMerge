@@ -1011,6 +1011,21 @@ function events.PlayerAttacked(t)
 				vars.covering[i]=true
 			end
 		end
+		
+		local skill = string.match(Game.PlaceMonTxt[t.Monster.NameId], "([^%s]+)")
+		if skill=="Fixator" then
+			local lowestHPId=-1
+			local lowestHP=math.huge
+			for i=0,Party.High do
+				local totHP=Party[i]:GetFullHP()
+				if Party[i]:IsConscious() and totHP<lowestHP then
+					lowestHP=totHP
+					lowestHPId=i
+				end
+			end
+			t.PlayerSlot=lowestHPId
+			return
+		end
 		cover={}
 		for i=0,Party.High do
 			local s, m= SplitSkill(Skillz.get(Party[i], 50))
