@@ -1012,7 +1012,7 @@ function events.PlayerAttacked(t)
 			end
 		end
 		
-		local skill = string.match(Game.PlaceMonTxt[t.Monster.NameId], "([^%s]+)")
+		local skill = string.match(Game.PlaceMonTxt[t.Attacker.NameId], "([^%s]+)")
 		if skill=="Fixator" then
 			local lowestHPId=-1
 			local lowestHP=math.huge
