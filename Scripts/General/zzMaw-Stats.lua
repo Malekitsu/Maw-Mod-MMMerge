@@ -378,6 +378,11 @@ function events.BuildStatInformationBox(t)
 		local bonusregen=0
 		for it in Party[i]:EnumActiveItems() do
 			if it.Bonus2 == 38 or it.Bonus2==47 or it.Bonus2==55 or it.Bonus2==66 then		
+				--SPregenItem=SPregenItem+1
+				--bonusregen=1
+				--such enchants now increase meditation instead
+			end
+			if table.find(artifactSpRegen, it.Number) then
 				SPregenItem=SPregenItem+1
 				bonusregen=1
 			end
