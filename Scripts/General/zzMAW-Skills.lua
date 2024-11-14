@@ -1177,10 +1177,16 @@ function MawRegen()
 				FSP=math.max(math.ceil(FSP*(vars.currentManaPool[i]/FSP)^0.5),0)
 				
 			end
+			
 			local SPREGEN = (FSP^0.25*RegS^1.75*((RegM+5)/5000) +0.02)
 			
 			for it in pl:EnumActiveItems() do
+				--[[special enchants now increase meditation
 				if it.Bonus2 == 38 or it.Bonus2==47 or it.Bonus2==55 or it.Bonus2==66 or table.find(artifactSpRegen, it.Number) then	
+					SPREGEN=SPREGEN+FSP*0.02/100
+				end
+				]]
+				if table.find(artifactSpRegen, it.Number) then	
 					SPREGEN=SPREGEN+FSP*0.02/100
 				end
 			end
