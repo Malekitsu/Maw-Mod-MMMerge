@@ -404,14 +404,14 @@ local dragonScales={
 function events.GameInitialized2()
 	--fire blast tooltip
 	Game.SpellsTxt[123].Description="This ability is an upgraded version of the normal Dragon breath weapon attack.  It acts much like a fireball, striking its target and exploding out to hit everything near it, except the explosion does much more damage than most fireballs."
-	Game.SpellsTxt[123].Expert="Deals damage equal to 80% of breath damage"
-	Game.SpellsTxt[123].Master="Deals damage equal to 100% of breath damage"
-	Game.SpellsTxt[123].GM="Increases Fire Blast damage by 1% per skill point"
+	Game.SpellsTxt[123].Expert="Deals damage equal to 70% of breath damage"
+	Game.SpellsTxt[123].Master="Deals damage equal to 85% of breath damage"
+	Game.SpellsTxt[123].GM=Deals damage equal to 100% of breath damage"
 	--mana cost
-	Game.Spells[123].SpellPointsNormal=10
-	Game.Spells[123].SpellPointsExpert=20
-	Game.Spells[123].SpellPointsMaster=30
-	Game.Spells[123].SpellPointsGM=40
+	Game.Spells[123].SpellPointsNormal=25
+	Game.Spells[123].SpellPointsExpert=50
+	Game.Spells[123].SpellPointsMaster=75
+	Game.Spells[123].SpellPointsGM=100
 	
 	Game.Classes.SPBase[10]=50
 	Game.Classes.SPFactor[10]=0
@@ -795,11 +795,11 @@ function events.GameInitialized2()
 				end
 				if data.Spell==123 then
 					local s,m=SplitSkill(t.Player.Skills[const.Skills.DragonAbility])
-					local mult=1
+					local mult=0.85
 					if m<=2 then
-						mult=0.8
+						mult=0.7
 					elseif m==4 then
-						mult=mult+s*0.01
+						mult=1
 					end
 					damage=damage*mult
 				end
