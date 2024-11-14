@@ -2786,7 +2786,7 @@ if buffRework then
 				local pl=GetPlayerFromIndex(vars.mawbuff[buff])
 				if (pl and pl:IsConscious()) or type(vars.mawbuff[buff])=="string" or type(vars.mawbuff[buff])=="table" then
 					if buff==75 then
-						Party.SpellBuffs[13].Power=4 --allow protection from magic to protect from death/eradicate
+						Party.SpellBuffs[13].Power=50 --allow protection from magic to protect from death/eradicate
 						Party.SpellBuffs[13].Skill=4 --allow protection from magic to protect from death/eradicate
 					end
 					if buff==85 then --day of protection
