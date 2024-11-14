@@ -1366,6 +1366,7 @@ function checktext(MaxCharges,bonus2,it)
 		[33] = "Spirit Magic Skill +" .. math.floor(MaxCharges/4)+5,
 		[34] = "Water Magic Skill +" .. math.floor(MaxCharges/4)+5,
 		--stats enchants
+		[38] = "Meditation Skill +" .. math.floor(MaxCharges*3/20)+3,
 		[39] = "Adds " .. math.floor(40*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(80*enchantDamageMult*attackSpeedMult*legDmgMult) .. " to spell damage and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Intellect and personality.",
 		[40] = "Spells Drain Hit points from target and Increased Spell speed.(except when equipping off-hand).",
 		[42] = " +" .. math.floor(bonusEffects[42].statModifier * mult) .. " to Seven Stats, HP, SP, Armor, Resistances.",
@@ -1373,7 +1374,7 @@ function checktext(MaxCharges,bonus2,it)
 		[44] = " +" .. math.floor(bonusEffects[44].statModifier * mult) .. " Hit points and Regenerate Hit points over time.",
 		[45] = " +" .. math.floor(bonusEffects[45].statModifier * mult) .. " Speed and Accuracy.",
 		[46] = "Adds " .. math.floor(40*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(80*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Fire damage to " .. weaponType .. " attacks and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Might.",
-		[47] = " +" .. math.floor(bonusEffects[47].statModifier * mult) .. " Spell points and Regenerate Spell points over time.",
+		[47] = " +" .. math.floor(bonusEffects[47].statModifier * mult) .. " Spell points and Meditation Skill +" .. math.floor(MaxCharges*3/20)+3,
 		[48] = " +" .. math.floor(bonusEffects[48].statModifier[1] * mult) .. " Endurance and" .. " +" .. math.floor(bonusEffects[48].statModifier[2] * mult).. " Armor.",
 		[49] = " +" .. math.floor(bonusEffects[49].statModifier * mult) .. " Intellect and Luck.",
 		[50] = " +" .. math.floor(bonusEffects[50].statModifier * mult) .. " Fire Resistance and Regenerate Hit points over time.",
@@ -1381,9 +1382,10 @@ function checktext(MaxCharges,bonus2,it)
 		[52] = " +" .. math.floor(bonusEffects[52].statModifier * mult) .. " Endurance and Accuracy.",
 		[53] = " +" .. math.floor(bonusEffects[53].statModifier * mult) .. " Might and Personality.",
 		[54] = " +" .. math.floor(bonusEffects[54].statModifier * mult) .. " Endurance and Regenerate Hit points over time.",
-		[55] = " +" .. math.floor(bonusEffects[55].statModifier * mult) .. " Luck and Regenerate Spell points over time.",
+		[55] = " +" .. math.floor(bonusEffects[55].statModifier * mult) .. " Luck and Meditation Skill +" .. math.floor(MaxCharges*3/20)+3,
 		[56] = " +" .. math.floor(bonusEffects[56].statModifier * mult) .. " Might and Endurance.",
 		[57] = " +" .. math.floor(bonusEffects[57].statModifier * mult) .. " Intellect and Personality.",
+		[66] = "Regenerates Hit Points and Meditation Skill +" .. math.floor(MaxCharges*3/20)+3,
 		--hybrids enchants 
 		[74] = " +" .. math.floor(bonusEffects[74].statModifier * mult) .. " Personality and Accuracy.",
 		[75] = " +" .. math.floor(bonusEffects[75].statModifier * mult) .. " Intellect and Might.",
@@ -2612,6 +2614,14 @@ function itemStats(index)
 			end
 			tab[it.Bonus2]=tab[it.Bonus2] + (5 +  math.floor(maxCharges/4))
 		end
+		if table.find(meditationBonusItemMap, it.Bonus2) then
+			local maxCharges=it.MaxCharges
+			if vars.insanityMode then
+				maxCharges=math.ceil(maxCharges*4/3)
+			end
+			tab[50+const.Skills.Meditation]=tab[50+const.Skills.Meditation] or 0
+			tab[50+const.Skills.Meditation]=tab[50+const.Skills.Meditation] + (3 +  math.floor(maxCharges/20*3))
+		end
 		--artifacts stats bonus
 		
 		if artifactStatsBonus[it.Number] then
@@ -2954,6 +2964,8 @@ equipSpellMap={
 	[31] = const.Skills.Light,
 	[28] = const.Skills.Dark,
 }
+
+meditationBonusItemMap={38,47,55,66}
 
 statMap={
 	[const.Stats.FireMagic]=30,
