@@ -2083,8 +2083,8 @@ function events.GameInitialized2()
 	function events.GetSkill(t)
 		local pl=t.Player
 		local race=Game.CharacterPortraits[pl.Face].Race
-		local baseSkill=SplitSkill(pl.Skills[t.Skill])
 		if MAWRacialSkills[race][t.Skill] then
+			local baseSkill=SplitSkill(pl.Skills[t.Skill])
 			t.Result=t.Result+ MAWRacialSkills[race][t.Skill] + math.floor(baseSkill/10)
 		end
 	end
