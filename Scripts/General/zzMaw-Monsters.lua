@@ -294,7 +294,9 @@ function recalculateMawMonster()
 				elseif baseLvl>=100 and (lvl<baseLvl+10 or lvl>baseLvl+30) then
 					mapvars.uniqueMonsterLevel[index]=math.round(baseLvl+math.random()*20+10)
 				end
-				mon.Level=math.min(mapvars.uniqueMonsterLevel[index],255)
+				if mapvars.uniqueMonsterLevel and mapvars.uniqueMonsterLevel[index] then
+					mon.Level=math.min(mapvars.uniqueMonsterLevel[index],255)
+				end
 				local totalHP=mon.HP*2^(math.floor(mon.Resistances[0]/1000))
 				local minHP=HPtable[mon.Id]*2*(1+txt.Level/80)
 				if totalHP<minHP or totalHP>minHP*2.01 then
