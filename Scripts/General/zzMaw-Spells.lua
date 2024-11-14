@@ -1324,7 +1324,7 @@ end
 function events.CalcSpellDamage(t)
 	--mass distorsion
 	if t.Spell == 44 then 
-		t.Result = math.min(t.HP*0.15+t.HP*t.Skill*0.005)
+		t.Result = math.min((t.HP*0.15+t.HP*t.Skill*0.005)*math.max(1, 
 		return
 	end
 	--check for spell tier
@@ -1436,11 +1436,13 @@ local massHPMULT={
 }
 function events.CalcDamageToMonster(t)
 	local data=WhoHitMonster()
-	if data and data.Player and data.Spell==44 then
-		mult=1
-		if massHPMULT[Game.BolsterAmount]=="doom" then
 			local mon=t.Monster
 			local lvl=getMonsterLevel(mon)
+	if data and data.Player and data.Spell==44 then
+		mult=1
+
+		if massHPMULT[Game.BolsterAmount]=="doom" then
+
 			mult=3.33*(1+lvl/75)
 			if mon.NameId>=220 and mon.NameId<300 then
 				mult=mult*2*(1+mon.Level/80)
@@ -1448,7 +1450,7 @@ function events.CalcDamageToMonster(t)
 		else
 			mult=massHPMULT[Game.BolsterAmount] or 1
 		end
-		t.Result=t.Result/mult^0.5
+		t.Result=t.Result/mult^0.5*math.max(1, (mon.Level/250)^2)
 	end
 	
 end
