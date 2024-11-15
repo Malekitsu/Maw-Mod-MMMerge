@@ -3166,7 +3166,7 @@ if restoreMM6Glory then
 								lowestHPId=i
 							end
 						end
-						t.PlayerSlot=lowestHPId
+						target=lowestHPId
 						return
 					end
 					
