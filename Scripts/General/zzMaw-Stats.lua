@@ -195,6 +195,9 @@ function getSpellDelay(pl,spell)
 		local speedIncrease=1+stacks*0.05
 		delay=delay/speedIncrease
 	end
+	if spell==123 then
+		delay=100
+	end
 	if getMapAffixPower(27) then
 		delay=delay/(1-getMapAffixPower(27)/100)
 	end
