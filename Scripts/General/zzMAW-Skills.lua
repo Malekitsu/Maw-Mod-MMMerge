@@ -1208,7 +1208,7 @@ function MawRegen()
 			
 			regenSP[i] = regenSP[i] + SPREGEN * timeMultiplier*mult
 			--meditation buff
-			if buffRework and vars.mawbuff[56] then
+			if buffRework and vars.mawbuff[56] and pl.Class~=10 and pl.Class~=11 then
 				local s, m, level=getBuffSkill(56)
 				local level=level^0.6
 				regenSP[i] = regenSP[i] + (FSP^0.25*level^1.75*((buffPower[56].Base[m])/15000) +0.1)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
