@@ -949,7 +949,7 @@ function events.CalcDamageToMonster(t)
 	end
 	if t.Player and vars.legendaries and vars.legendaries[t.PlayerIndex] and table.find(vars.legendaries[t.PlayerIndex], 29) then
 		if data and data.Object==nil and t.DamageKind~=4 then return end --disable for melee elemental damage
-		if table.find(aoespells, data.Spell) and math.random()>0.4 then return end
+		if data and table.find(aoespells, data.Spell) and math.random()>0.4 then return end
 		for i=0, 10 do
 			if i~=5 then
 				if i==4 then
