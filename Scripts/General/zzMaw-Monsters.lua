@@ -2447,6 +2447,8 @@ function events.GameInitialized2() --to make the after all the other code
 				end
 			elseif skill=="Venomous" then
 				t.Player.Poison3=Game.Time
+			elseif skill=="Fixator" then
+				t.Player.Weak=Game.Time
 			elseif skill=="Swapper" then	
 				Game.ShowStatusText("*Swap*")
 				Party.X, Party.Y, Party.Z, mon.X, mon.Y, mon.Z = mon.X, mon.Y, mon.Z, Party.X, Party.Y, Party.Z
