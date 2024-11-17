@@ -1612,7 +1612,9 @@ enchantList={
 	[32] = true ,
 	[33] = true ,
 	[34] = true ,
+	[38] = true ,
 	[46] = true ,
+	[66] = true ,
 	[74] = true ,
 	[75] = true ,
 	[76] = true ,
@@ -3811,8 +3813,7 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 		if it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number)then
 			mult=mult*2
 		end
-		local bol=Game.BolsterAmount
-		mult=mult*(400+bol)/1000
+		mult=mult*(400+Game.BolsterAmount)/1000
 		local damage=fireAuraDamage[m]*mult
 		local res=res or 0
 		local damage=damage/2^(res/100)
