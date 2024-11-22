@@ -449,6 +449,8 @@ function events.MonsterKillExp(t)
 	end
 	vars.EXPBEFORE = vars.EXPBEFORE + bolsterExp/5
 	vars.LVLBEFORE = calcLevel(vars.EXPBEFORE)
+	
+	vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
 end
 
 function events.LoadMap()
@@ -2214,6 +2216,7 @@ function events.MonsterKilled(mon)
 				end
 				vars.EXPBEFORE = vars.EXPBEFORE + bonusExp
 				vars.LVLBEFORE = calcLevel(vars.EXPBEFORE)
+				vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
 				--end
 				gold=math.ceil(experience^0.9/1000)*1000 
 				evt.ForPlayer(0)
