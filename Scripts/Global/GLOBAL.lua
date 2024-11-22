@@ -50,12 +50,43 @@ function events.EvtGlobal(i) -- happens after related global evt executed
 			end
 		end
 	end
+	vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
 	
 	local GoldReward = Party.Gold - LastStats.Gold
 	if GoldReward>0 and ExpRewards[0]>0 then
 		Party.Gold = Party.Gold + calculateGold(GoldReward)
 	end
 		
+end
+function events.LoadMap()
+	if not vars.lastPartyExperience then
+		vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
+	end
+end
+function events.EvtMap(i)
+	vars.lastPartyExperience=vars.lastPartyExperience
+	if Party[0]:GetIndex()==vars.lastPartyExperience[1] then --check if party member isn't changed
+		if Party[0].Experience>vars.lastPartyExperience[2] then --bolster
+			local expGained=Party[0].Experience-vars.lastPartyExperience[2]
+			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
+			local currentLVL=calcLevel(expGained + vars.EXPBEFORE)
+				
+			if currentWorld==1 then
+				vars.MM8LVL = vars.MM8LVL + currentLVL - vars.LVLBEFORE
+			elseif currentWorld==2 then
+				vars.MM7LVL = vars.MM7LVL + currentLVL - vars.LVLBEFORE
+			elseif currentWorld==3 then
+				vars.MM6LVL = vars.MM6LVL + currentLVL - vars.LVLBEFORE
+			elseif currentWorld==4 then
+				vars.MMMLVL = vars.MMMLVL + currentLVL - vars.LVLBEFORE
+			end
+			vars.EXPBEFORE = vars.EXPBEFORE + expGained
+			vars.LVLBEFORE = calcLevel(vars.EXPBEFORE)
+			vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
+		end
+	else --in case player 1 is changed
+		vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
+	end
 end
 
 
