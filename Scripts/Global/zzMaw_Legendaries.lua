@@ -306,6 +306,10 @@ function events.CalcDamageToPlayer(t)
 		function events.Tick()
 			events.Remove("Tick",1)
 			local fullHP=t.Player:GetFullHP()
+			local id=t.Player:GetIndex()
+			if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 30) then
+				fullHP=math.max(fullHP,t.Player:GetFullSP())
+			end
 			local currentHP=t.Player.HP
 			if currentHP<-fullHP then
 				t.Player.Dead=Game.Time
