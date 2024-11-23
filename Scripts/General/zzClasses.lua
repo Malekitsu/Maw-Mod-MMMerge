@@ -1562,7 +1562,7 @@ function events.CalcDamageToMonster(t)
 	end
 end
 
-singleTarget={2,11,18,20,26,37,39}
+singleTarget={2,11,18,20,26,29,37,39}
 shotGun={2,15,24,37}
 aoeIn={6,10,32,41}
 aoeOut={6,9,22,32,41,43}
