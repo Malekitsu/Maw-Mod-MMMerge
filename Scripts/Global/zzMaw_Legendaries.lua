@@ -204,7 +204,7 @@ function events.CalcDamageToPlayer(t)
 
 		-- Define thresholds and damage multipliers based on skill level
 		local thresholds = {
-			{skill = 4, hpThreshold = 0.05, damageMultiplier = 0},       -- Level 5: Negate over-threshold damage
+			{skill = 4, hpThreshold = 1, damageMultiplier = 0},       -- Level 5: Negate over-threshold damage
 			{skill = 3, hpThreshold = 0.125, damageMultiplier = 0.125},  -- Level 4: Reduce over-threshold damage to 1/8
 			{skill = 2, hpThreshold = 0.25, damageMultiplier = 0.25},    -- Level 3: Reduce over-threshold damage to 1/4
 			{skill = 1, hpThreshold = 0.5, damageMultiplier = 0.5},      -- Level 2: Reduce over-threshold damage to 1/2
