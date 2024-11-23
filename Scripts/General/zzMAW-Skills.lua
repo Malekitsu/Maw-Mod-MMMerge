@@ -1895,7 +1895,7 @@ function events.Tick()
 		if s > 50 then 
 			efficiency=math.round((1+50^1.5/125*4)*100)/100*s/50
 		end
-			Skillz.setDesc(51, 1, "Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n")
+			Skillz.setDesc(51, 1, "Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20 (8-20-30 in insanity mode).\n\nMastery increase its mana efficience.\n")
 		
 		local txt="Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n" .. "Current Damage reduction per Mana: " .. StrColor(178,255,255, efficiency) .. "\n\nPress M to enable/disable"
 		if vars.manaShield[index] then
@@ -1935,10 +1935,13 @@ function events.KeyDown(t)
 	end
 	
 end
-local coverRequirements={6,12,20}
 function events.Action(t)
 	if t.Action==121 then
 		if t.Param==50 then
+			local coverRequirements={6,12,20}
+			if vars.insanityMode then
+				coverRequirements={8,20,30}
+			end
 			local pl=Party[Game.CurrentPlayer]
 			local s,m=SplitSkill(Skillz.get(pl,50))
 			if s==30 then 
@@ -2177,7 +2180,7 @@ function events.GameInitialized2()
 	local manaSkill=51
 	Skillz.new_armor(manaSkill)
 	Skillz.setName(manaSkill, "Mana Shield")
-	Skillz.setDesc(manaSkill, 1, "Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n")
+	Skillz.setDesc(manaSkill, 1, "Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20 (8-20-32 in insanity mode).\n\nMastery increase its mana efficience.\n")
 	Skillz.setDesc(manaSkill, 2, "When below 50% HP reduces damage to 1/2")
 	Skillz.setDesc(manaSkill, 3, "When below 25% HP reduces damage to 1/4")
 	Skillz.setDesc(manaSkill, 4, "When below 12.5% HP reduces damage to 1/8")
@@ -2189,6 +2192,10 @@ local manaShieldRequirements={6,12,20}
 function events.Action(t)
 	if t.Action==121 then
 		if t.Param==51 then
+			local manaShieldRequirements={6,12,20}
+			if vars.insanityMode then
+				manaShieldRequirements={8,20,32}
+			end
 			local pl=Party[Game.CurrentPlayer]
 			local s,m=SplitSkill(Skillz.get(pl,51))
 			if pl.SkillPoints>s and manaShieldRequirements[m] and s+1>=manaShieldRequirements[m] and Skillz.MasteryLimit(pl,51)>m then
@@ -2205,7 +2212,7 @@ function events.GameInitialized2()
 	local Enlightenment=52
 	Skillz.new_magic(Enlightenment)
 	Skillz.setName(Enlightenment, "Enlightenment")
-	Skillz.setDesc(Enlightenment, 1, "Unlock the true potential of your mana reserves with Enlightenment, a transformative skill that increases your mana pool and reduces mana reserved by buffs, empowering you to cast more freely and frequently.\n\nThe cost of buffs is divided by the amount of mana you gain per level. As you reach higher mastery levels, the divisor increases, but your total mana pool remains the same.\n\nAny point past 20 increases mana by double the amount.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n")
+	Skillz.setDesc(Enlightenment, 1, "Unlock the true potential of your mana reserves with Enlightenment, a transformative skill that increases your mana pool and reduces mana reserved by buffs, empowering you to cast more freely and frequently.\n\nThe cost of buffs is divided by the amount of mana you gain per level. As you reach higher mastery levels, the divisor increases, but your total mana pool remains the same.\n\nAny point past 20 increases mana by double the amount.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20 (8-20-32 in insanity mode).\n")
 	Skillz.setDesc(Enlightenment, 2, "Mana is increased by 2% per skill level, cost divisor increased by 0.5")
 	Skillz.setDesc(Enlightenment, 3, "Mana is increased by 3% per skill level, cost divisor increased by 1")
 	Skillz.setDesc(Enlightenment, 4, "Mana is increased by 4% per skill level, cost divisor increased by 1.5")
@@ -2213,10 +2220,13 @@ function events.GameInitialized2()
 	Skillz.learn_at(Enlightenment, 3) --alchemy shop
 end
 
-local EnlightenmentRequirements={6,12,20}
 function events.Action(t)
 	if t.Action==121 then
 		if t.Param==52 then
+			local EnlightenmentRequirements={6,12,20}
+			if vars.insanityMode then
+				EnlightenmentRequirements={8,20,32}
+			end
 			local pl=Party[Game.CurrentPlayer]
 			local s,m=SplitSkill(Skillz.get(pl,52))
 			if pl.SkillPoints>s and EnlightenmentRequirements[m] and s+1>=EnlightenmentRequirements[m] and Skillz.MasteryLimit(pl,52)>m then
