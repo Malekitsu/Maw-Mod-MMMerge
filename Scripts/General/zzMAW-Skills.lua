@@ -2181,7 +2181,7 @@ function events.GameInitialized2()
 	Skillz.setDesc(manaSkill, 2, "When below 50% HP reduces damage to 1/2")
 	Skillz.setDesc(manaSkill, 3, "When below 25% HP reduces damage to 1/4")
 	Skillz.setDesc(manaSkill, 4, "When below 12.5% HP reduces damage to 1/8")
-	Skillz.setDesc(manaSkill, 5, "When below 5% HP negates all damage, as long as you have enough mana")
+	Skillz.setDesc(manaSkill, 5, "All damage is absorbed by mana")
 	Skillz.learn_at(manaSkill, 3) --alchemy shop
 end
 
