@@ -688,16 +688,21 @@ function doSharedLife(amount, spellQueueData)
 	spellQueueData = spellQueueData or {}
 	-- for each iteration, try to top up lowest HP deficit party member, increasing others' HP along the way
 	local function shouldParticipate(pl)
-		if pl.HP<0 then
-			return totalHP>0
+		if pl.Dead ~= 0 or pl.Eradicated ~= 0 or pl.Stoned ~= 0 then
+			return false
 		end
-		return pl.Dead == 0 and pl.Eradicated == 0 and pl.Stoned == 0 -- as in default code
+		if pl.HP<0 then
+			return totalHP+pl.HP>0
+		end
+		return true
 	end
 	
 	--calculate total HP
 	totalHP=0
 	for i=0,Party.High do
-		totalHP=totalHP+Party[i].HP
+		if Party[i].HP>0 then
+			totalHP=totalHP+Party[i].HP
+		end
 	end
 	
 	local activePlayers = {}
