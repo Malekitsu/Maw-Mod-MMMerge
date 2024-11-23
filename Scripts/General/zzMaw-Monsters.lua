@@ -2199,7 +2199,17 @@ function events.MonsterKilled(mon)
 				if vars.onlineMode then
 					mapLevel=((mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)^1.5
 				end
-				local experience=math.ceil(m^0.7*(mapLevel*20+mapLevel^1.8)/3/1000)*1000
+				local totalMonster=m
+				if Game.BolsterAmount==300 then
+					totalMonster=totalMonster*0.75
+				end
+				if Game.BolsterAmount==600 then
+					totalMonster=totalMonster/2
+				end
+				if vars.InsanitMode then
+					totalMonster=totalMonster*0.7
+				end
+				local experience=math.ceil(totalMonster^0.7*(mapLevel*20+mapLevel^1.8)/3/1000)*1000
 				--bolster code
 				bonusExp=experience
 				local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
