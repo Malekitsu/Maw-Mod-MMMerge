@@ -2225,7 +2225,7 @@ function events.Action(t)
 		if t.Param==52 then
 			local EnlightenmentRequirements={6,12,20}
 			if vars.insanityMode then
-				EnlightenmentRequirements={8,20,32}
+				--EnlightenmentRequirements={8,20,32}
 			end
 			local pl=Party[Game.CurrentPlayer]
 			local s,m=SplitSkill(Skillz.get(pl,52))
