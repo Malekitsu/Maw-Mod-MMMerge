@@ -2238,6 +2238,19 @@ function events.Action(t)
 	end
 end
 
+--RETALIATION
+function events.GameInitialized2()
+	local Retaliation=53
+	Skillz.new_armor(Retaliation)
+	Skillz.setName(Retaliation, "Retaliation")
+	Skillz.setDesc(Retaliation, 1, "After mastering the art of covering, you have become capable delivering deadly counter attacks to those who dare try harm your allies. Retaliation has a 10 + 1% per skill point chance to activate after successfully covering an ally.")
+	Skillz.setDesc(Retaliation, 2, "Your next attack deals 10 + 1% per skill point of your total HP as damage to the target")
+	Skillz.setDesc(Retaliation, 3, "Reduce recovery time by 30%")
+	Skillz.setDesc(Retaliation, 4, "Your next attack has a 25% chance to stun the enemy for 2 seconds")
+	Skillz.setDesc(Retaliation, 5, "Retaliation can stack, allowing for massive damage  in 1 single hit")
+end
+
+
 --regeneration for Troll
 function events.GameInitialized2()
 	Skillz.setDesc(30, 5, "Increase your regeneration by 1% per every 1% of hp lost")
