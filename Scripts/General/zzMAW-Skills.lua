@@ -1890,7 +1890,10 @@ function events.Tick()
 		end
 		local s= SplitSkill(Skillz.get(pl, 50))
 		local chance=math.min(10+s,40)
-		local txt="Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nGrants 10 plus 1% chance per skill point to Cover, up to 40%.\n\nCurrent cover chance: " .. chance .. "%\n\nPress P to enable/disable\n"
+		local txt="Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nGrants 10 plus 1% chance per skill point to Cover, up to 40%, however, something might happen once at max level....\n\nCurrent cover chance: " .. chance .. "%\n\nPress P to enable/disable\n"
+		if vars.insanityMode then
+			txt="Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nIf available, Expert, Master and Grandmaster is learned at skill 8-20-30.\n\nGrants 10 plus 1% chance per skill point to Cover, up to 40%, however, something might happen once at max level....\n\nCurrent cover chance: " .. chance .. "%\n\nPress P to enable/disable\n"
+		end
 		if vars.covering[index] then
 			txt=txt .. StrColor(0,255,0,"\nCurrently enabled\n")
 			Skillz.setDesc(50, 1, txt)
@@ -1914,6 +1917,9 @@ function events.Tick()
 			Skillz.setDesc(51, 1, "Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20 (8-20-30 in insanity mode).\n\nMastery increase its mana efficience.\n")
 		
 		local txt="Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n" .. "Current Damage reduction per Mana: " .. StrColor(178,255,255, efficiency) .. "\n\nPress M to enable/disable"
+		if vars.insanityMode then
+			txt="Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 8-20-32.\n\nMastery increase its mana efficience.\n" .. "Current Damage reduction per Mana: " .. StrColor(178,255,255, efficiency) .. "\n\nPress M to enable/disable"
+		end
 		if vars.manaShield[index] then
 			txt=txt .. StrColor(0,255,0,"\nCurrently enabled\n")
 			Skillz.setDesc(51, 1, txt)
