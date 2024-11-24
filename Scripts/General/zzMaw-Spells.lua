@@ -2550,9 +2550,9 @@ if buffRework then
 			spScaling[i]=Game.Classes.SPFactor[i]
 		end
 		--dk
-		spScaling[56]=2
-		spScaling[57]=4
-		spScaling[58]=6
+		spScaling[56]=3
+		spScaling[57]=6
+		spScaling[58]=9
 		spScaling[59]=1
 		spScaling[60]=1.5
 		spScaling[61]=2
