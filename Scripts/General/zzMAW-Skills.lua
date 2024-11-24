@@ -1914,7 +1914,7 @@ function events.Tick()
 		if s > 50 then 
 			efficiency=math.round((1+50^1.5/125*4)*100)/100*s/50
 		end
-			Skillz.setDesc(51, 1, "Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20 (8-20-30 in insanity mode).\n\nMastery increase its mana efficience.\n")
+			Skillz.setDesc(51, 1, "Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20 (8-20-32 in insanity mode).\n\nMastery increase its mana efficience.\n")
 		
 		local txt="Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n" .. "Current Damage reduction per Mana: " .. StrColor(178,255,255, efficiency) .. "\n\nPress M to enable/disable"
 		if vars.insanityMode then
