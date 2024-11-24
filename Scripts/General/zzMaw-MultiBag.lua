@@ -98,7 +98,10 @@ function events.Action(t)
 				end
 			end
 			--tab
-			local currentTab=math.ceil(vars.mawbags[id]["CurrentBag"]/100)
+			local currentTab=1
+			if vars and vars.mawbags and vars.mawbags[id] then
+				currentTab=math.ceil(vars.mawbags[id]["CurrentBag"]/100)
+			end
 			for i=1,5 do
 				if i==currentTab then
 					multibagButton[i+5].IUpSrc="SlChar" .. i .. "D"
