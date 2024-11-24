@@ -965,8 +965,34 @@ function events.CalcDamageToMonster(t)
 			end
 		end
 	end
+	--retaliation code
+	if t.Player then
+		local id=t.Player:GetIndex()
+		if vars.retaliation and vars.retaliation[id] and vars.retaliation[id]["Time"] and vars.retaliation[id].Time+const.Minute*5>Game.Time and vars.retaliation[id].Stacks>0 then
+			local pl=t.Player
+			local s,m=SplitSkill(Skillz.get(pl,53))
+			local fullHP=pl:GetFullHP()
+			local stacks=vars.retaliation[id].Stacks
+			if m<4 then
+				stacks=1
+			end
+			t.Result=fullHP*0.1*s*stacks
+			if 0.25*stacks>math.random() then
+				local stunDuration=const.Minute
+				if t.Monster.NameId>=220 and t.Monster.NameId<=300 then
+					stunDuration=stunDuration/2
+				end
+				t.Monster.SpellBuffs[6].ExpireTime=Game.Time+const.Minute
+			end
+			function events.Tick()
+				events.Remove("Tick",1)
+				pl.RecoveryDelay=pl.RecoveryDelay*(math.max(1-0.3*stacks,0))
+			end
+			vars.retaliation[id].Stacks=0
+		end
+	end
+	
 	res=1-1/2^(res/100)
-
 	t.Result = t.Result * (1-res)
 end
 
