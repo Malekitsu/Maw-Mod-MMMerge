@@ -3158,20 +3158,10 @@ if restoreMM6Glory then
 							end
 						end
 					end
-					if covered then
-						mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Shield, target)
-						Party[coverPlayerIndex]:ShowFaceAnimation(14)
-						Game.ShowStatusText(Party[coverPlayerIndex].Name .. " cover " .. Party[target].Name)
-						target=coverPlayerIndex
-						local pl=Party[target]
-						local id=pl:GetIndex()
-						if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 23) then
-							evt[target].Add("HP", Party[target]:GetFullHP()*0.03)
-						end
-					end		
 					
 					local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
 					if skill=="Fixator" then
+						covered=false
 						local lowestHPId=-1
 						local lowestHP=math.huge
 						for i=0,Party.High do
@@ -3182,8 +3172,30 @@ if restoreMM6Glory then
 							end
 						end
 						target=lowestHPId
-						return
 					end
+					
+					if covered then
+						mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Shield, target)
+						Party[coverPlayerIndex]:ShowFaceAnimation(14)
+						Game.ShowStatusText(Party[coverPlayerIndex].Name .. " cover " .. Party[target].Name)
+						target=coverPlayerIndex
+						local pl=Party[target]
+						local id=pl:GetIndex()
+						if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 23) then
+							evt[target].Add("HP", Party[target]:GetFullHP()*0.03)
+						end
+						
+						--retaliation code
+						local s,m=Skills.get(pl,53)
+						if s/100>=math.random() then
+							vars.retaliation=vars.retaliation or {}
+							vars.retaliation[id]=vars.retaliation[id] or 0
+							vars.retaliation[id]["Stacks"]=vars.retaliation[id]["Stacks"] or 0
+							vars.retaliation[id]["Time"]=vars.retaliation[id]["Time"] or Game.Time
+							vars.retaliation[id]["Stacks"]=vars.retaliation[id]["Stacks"]+1
+						end						
+					end		
+					
 					
 					--apply damage
 					Party[target]:DoDamage(10000,mon.Attack1.Type)
