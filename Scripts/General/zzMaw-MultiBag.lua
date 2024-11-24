@@ -1,4 +1,4 @@
-local count = 5
+local count = 10
 
 function events.KeyDown(t)
 	if t.Key==16 then
@@ -8,8 +8,12 @@ function events.KeyDown(t)
 		local id=Game.CurrentPlayer
 		if (id>=0 and id <=Party.High) then
 			local pl = Party[Game.CurrentPlayer]
-			if Party.High==0 or shiftPressed then
-				if t.Key>=49 and t.Key<=48+count then
+			if Party.High==0 and shiftPressed then
+				if t.Key>=49 and t.Key<=48+5 then
+					changeBag(pl , (t.Key-48)+5)
+				end
+			elseif Party.High==0 or shiftPressed then
+				if t.Key>=49 and t.Key<=48+5 then
 					changeBag(pl , t.Key-48)
 				end
 			end
@@ -24,16 +28,30 @@ end
 function events.GameInitialized2()
 	multibagButton={}
 	for i=1,count do
-		multibagButton[i]=CustomUI.CreateButton{
-		IconUp = "SlChar" .. i .. "U",
-		IconDown = "SlChar" .. i .. "D",
-		Screen = {7, 13, 15},
-		Layer = 1,
-		X =	455+i*30,
-		Y =	372,
-		Masked = true,
-		Action = function() changeBag(Party[Game.CurrentPlayer], i) end,
-		}
+		if i<=5 then
+			multibagButton[i]=CustomUI.CreateButton{
+			IconUp = "SlChar" .. i .. "U",
+			IconDown = "SlChar" .. i .. "D",
+			Screen = {7, 13, 15},
+			Layer = 1,
+			X =	455+i*30,
+			Y =	372,
+			Masked = true,
+			Action = function() changeBag(Party[Game.CurrentPlayer], i) end,
+			}
+		else
+			multibagButton[i]=CustomUI.CreateButton{
+			IconUp = "SlChar" .. i-5 .. "U",
+			IconDown = "SlChar" .. i-5 .. "D",
+			Screen = {7, 13, 15},
+			Layer = 1,
+			X =	455+(i-5)*30,
+			Y =	445,
+			Masked = true,
+			Action = function() changeBag(Party[Game.CurrentPlayer], i) end,
+			}
+
+		end
 	end
 	arcomageButtonFix=false
 end
@@ -49,6 +67,9 @@ function events.Action(t)
 				events.Remove("Tick", 1)
 				for i=1,count do
 					multibagButton[i].Y=372
+					if i>5 then
+						multibagButton[i].Y=445
+					end
 					arcomageButtonFix=false
 				end
 			end
@@ -64,13 +85,30 @@ function events.Action(t)
 			if not vars.mawbags[id] then
 				currentBag=1
 			else
-				currentBag=vars.mawbags[id].CurrentBag
+				currentBag=vars.mawbags[id].CurrentBag%5
+				if currentBag==0 then
+					currentBag=5
+				end				
 			end
 			for i=1,5 do
 				if i==currentBag then
 					multibagButton[i].IUpSrc="SlChar" .. i .. "D"
 				else
 					multibagButton[i].IUpSrc="SlChar" .. i .. "U"
+				end
+			end
+			--tab
+			local currentTab=math.ceil(vars.mawbags[id]["CurrentBag"]/5)
+			for i=1,5 do
+				if i==currentTab then
+					multibagButton[i+5].IUpSrc="SlChar" .. i .. "D"
+				else
+					multibagButton[i+5].IUpSrc="SlChar" .. i .. "U"
+				end
+				if Party.High>0 then
+					multibagButton[i+5].Active=false
+				else
+					multibagButton[i+5].Active=true
 				end
 			end
 		end
@@ -86,15 +124,35 @@ function changeBag(pl, bag)
 		vars.mawbags[id]={}
 		vars.mawbags[id]["CurrentBag"]=1
 	end
-	
-	for i=1,5 do
-		if i==bag then
-			multibagButton[i].IUpSrc="SlChar" .. i .. "D"
-		else
-			multibagButton[i].IUpSrc="SlChar" .. i .. "U"
+	local currentTab=math.ceil(vars.mawbags[id]["CurrentBag"]/5)
+	local currentBag=vars.mawbags[id]["CurrentBag"]%5
+	if currentBag==0 then
+		currentBag=5
+	end
+	--bags
+	if bag<=5 then
+		for i=1,5 do
+			if i==bag then
+				multibagButton[i].IUpSrc="SlChar" .. i .. "D"
+			else
+				multibagButton[i].IUpSrc="SlChar" .. i .. "U"
+			end
 		end
 	end
-	
+	if bag>5 then
+		bag=currentBag+(bag-6)*5
+	else
+		bag=bag+(currentTab-1)*5
+	end
+	--tab
+	local newCurrentTab=math.ceil(bag/5)
+	for i=1,5 do
+		if i==newCurrentTab then
+			multibagButton[i+5].IUpSrc="SlChar" .. i .. "D"
+		else
+			multibagButton[i+5].IUpSrc="SlChar" .. i .. "U"
+		end
+	end
 	--store current bag
 	local itemList={}
 	local removeList={}
