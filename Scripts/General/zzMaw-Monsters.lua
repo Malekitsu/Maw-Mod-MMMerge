@@ -3193,6 +3193,11 @@ if restoreMM6Glory then
 							vars.retaliation[id]["Stacks"]=vars.retaliation[id]["Stacks"] or 0
 							vars.retaliation[id]["Time"]=vars.retaliation[id]["Time"] or Game.Time
 							vars.retaliation[id]["Stacks"]=vars.retaliation[id]["Stacks"]+1
+							local cap=1
+							if m==4 then
+								cap=3
+							end
+							vars.retaliation[id]["Stacks"]=math.min(vars.retaliation[id]["Stacks"],cap)
 						end						
 					end		
 					
