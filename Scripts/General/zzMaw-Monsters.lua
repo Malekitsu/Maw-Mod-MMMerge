@@ -3186,7 +3186,7 @@ if restoreMM6Glory then
 						end
 						
 						--retaliation code
-						local s,m=Skills.get(pl,53)
+						local s,m=Skillz.get(pl,53)
 						if s/100>=math.random() then
 							vars.retaliation=vars.retaliation or {}
 							vars.retaliation[id]=vars.retaliation[id] or 0
