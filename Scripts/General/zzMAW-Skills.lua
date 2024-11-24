@@ -1039,7 +1039,6 @@ function events.PlayerAttacked(t)
 				cover[i]=false
 			end
 		end
-		
 		--roll once per player with player and pick the one with max hp
 		coverPlayerIndex=-1
 		lastMaxHp=0
@@ -1064,6 +1063,15 @@ function events.PlayerAttacked(t)
 			if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 23) then
 				evt[t.PlayerSlot].Add("HP", Party[t.PlayerSlot]:GetFullHP()*0.03)
 			end
+			--retaliation code
+			local s,m=Skillz.get(pl,53)
+			if s/100>=math.random() then
+				vars.retaliation=vars.retaliation or {}
+				vars.retaliation[id]=vars.retaliation[id] or {}
+				vars.retaliation[id]["Stacks"]=vars.retaliation[id]["Stacks"] or 0
+				vars.retaliation[id]["Time"]=Game.Time
+				vars.retaliation[id]["Stacks"]=vars.retaliation[id]["Stacks"]+1
+			end	
 		end
 	end
 end
@@ -1847,11 +1855,15 @@ function events.Tick()
 		local index=Game.CurrentPlayer
 		local pl=Party[index]
 		if index>=0 and index<=Party.High then
-			if Skillz.get(pl,50)>0 or Skillz.get(pl,51)>0 then
-				Game.GlobalTxt[143]="\nMisc"
-			else
-				Game.GlobalTxt[143]="Misc"
+			local skills={50,51,53}
+			local txt="Misc"
+			for i=1,#skills do
+				if Skillz.get(pl,skills[i])>0 then
+					txt="\n" .. txt
+				end
 			end
+			Game.GlobalTxt[143]=txt
+			
 			local noarmor=true
 			for i=8, 11 do
 				local s=pl.Skills[i]
@@ -2243,9 +2255,9 @@ function events.GameInitialized2()
 	local Retaliation=53
 	Skillz.new_armor(Retaliation)
 	Skillz.setName(Retaliation, "Retaliation")
-	Skillz.setDesc(Retaliation, 1, "After mastering the art of covering, you have become capable delivering deadly counter attacks to those who dare try harm your allies. Retaliation has a 10 + 1% per skill point chance to activate after successfully covering an ally.")
-	Skillz.setDesc(Retaliation, 2, "Your next attack deals additional damage equal to your full HP + 10% per skill point")
-	Skillz.setDesc(Retaliation, 3, "Reduce recovery time by 30%")
+	Skillz.setDesc(Retaliation, 1, "After mastering the art of covering, you have become capable delivering deadly counter attacks to those who dare try harm your allies. Retaliation has a 10 + 1% per skill point chance to activate after successfully covering an ally.\n")
+	Skillz.setDesc(Retaliation, 2, "Your next attack deals additional damage equal to 10% of your total HP per skill point")
+	Skillz.setDesc(Retaliation, 3, "Your next attack recovery time is reduced by 30%")
 	Skillz.setDesc(Retaliation, 4, "Your next attack has a 25% chance to stun the enemy for 2 seconds")
 	Skillz.setDesc(Retaliation, 5, "Retaliation can stack, allowing for massive damage  in 1 single hit")
 end
