@@ -683,8 +683,14 @@ function events.KeyDown(t)
 					itemSizeMap[i][2]=2
 				end	
 			end
-            gigaChadSort()
-            Game.ShowStatusText("All Party bags sorted")
+			if Party.High==0 then
+				sortMultibag()
+				local name=Party[Game.CurrentPlayer].Name
+				Game.ShowStatusText("All " .. name .. "'s bags sorted")
+			else
+				gigaChadSort()
+			    Game.ShowStatusText("All Party bags sorted")
+			end
 		end
 	end
 end
