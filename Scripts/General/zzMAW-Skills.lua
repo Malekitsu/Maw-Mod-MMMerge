@@ -1841,7 +1841,7 @@ function events.GameInitialized2()
 	local coverSkill=50
 	Skillz.new_armor(coverSkill)
 	Skillz.setName(coverSkill, "Cover")
-	Skillz.setDesc(coverSkill, 1, "Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nGrants 10 plus 1% chance per skill point to Cover an ally, up to 40%.\n\n\nPress P to enable/disable\n")
+	Skillz.setDesc(coverSkill, 1, "Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nGrants 10 plus 1% chance per skill point to Cover an ally, up to 40%, however, something might happen once at max level...\n\n\nPress P to enable/disable\n")
 	Skillz.setDesc(coverSkill, 2, "Allow use to Cover Physical damage\n")
 	Skillz.setDesc(coverSkill, 3, "Allow use to Cover Projectiles damage")
 	Skillz.setDesc(coverSkill, 4, "Allow use to Cover Spells damage")
@@ -1855,11 +1855,15 @@ function events.Tick()
 		local index=Game.CurrentPlayer
 		local pl=Party[index]
 		if index>=0 and index<=Party.High then
-			local skills={50,51,53}
+			local skills={50,53,51}
 			local txt="Misc"
 			for i=1,#skills do
 				if Skillz.get(pl,skills[i])>0 then
-					txt="\n" .. txt
+					if i~=3 or (not skills[1]) then
+						txt="\n" .. txt
+					end
+				else
+					skills[i]=false
 				end
 			end
 			Game.GlobalTxt[143]=txt
@@ -1956,9 +1960,22 @@ function events.Action(t)
 			end
 			local pl=Party[Game.CurrentPlayer]
 			local s,m=SplitSkill(Skillz.get(pl,50))
+			if s==29 and pl.SkillPoints>29 then
+				local s,m=SplitSkill(Skillz.get(pl,53))
+				if s==0 then
+					Skillz.set(pl,53,1)
+					Game.ShowStatusText("YOU LEARNED RETALIATION!!")
+				end
+			end
 			if s==30 then 
 				t.Handled=true
-				Game.ShowStatusText("This skill has reached its limit")
+				local s,m=SplitSkill(Skillz.get(pl,53))
+				if s==0 then
+					Skillz.set(pl,53,1)
+					Game.ShowStatusText("YOU LEARNED RETALIATION!!")
+				else
+					Game.ShowStatusText("This skill has reached its limit")
+				end
 			elseif s>30 then
 				t.Handled=true
 				while s>30 do
@@ -2255,13 +2272,38 @@ function events.GameInitialized2()
 	local Retaliation=53
 	Skillz.new_armor(Retaliation)
 	Skillz.setName(Retaliation, "Retaliation")
-	Skillz.setDesc(Retaliation, 1, "After mastering the art of covering, you have become capable delivering deadly counter attacks to those who dare try harm your allies. Retaliation has a 10 + 1% per skill point chance to activate after successfully covering an ally.\n")
+	Skillz.setDesc(Retaliation, 1, "After mastering the art of covering, you have become capable delivering deadly counter attacks to those who dare try harm your allies. Retaliation has a 1% per skill point chance to activate after successfully covering an ally.\n\nExpert, Master and Grandmaster are learned automatically at skill 12, 30 and 50.\n")
 	Skillz.setDesc(Retaliation, 2, "Your next attack deals additional damage equal to 10% of your total HP per skill point")
 	Skillz.setDesc(Retaliation, 3, "Your next attack recovery time is reduced by 30%")
 	Skillz.setDesc(Retaliation, 4, "Your next attack has a 25% chance to stun the enemy for 2 seconds")
-	Skillz.setDesc(Retaliation, 5, "Retaliation can stack, allowing for massive damage  in 1 single hit")
+	Skillz.setDesc(Retaliation, 5, "Retaliation can stack, allowing consume all the stacks in 1 single powerful hit")
 end
 
+function events.Action(t)
+	if t.Action==121 then
+		if t.Param==53 then
+			local retaliationRequirements={12,30,50}
+			local pl=Party[Game.CurrentPlayer]
+			local s,m=SplitSkill(Skillz.get(pl,53))
+			if s==50 then 
+				t.Handled=true
+				Game.ShowStatusText("This skill has reached its limit")
+			elseif s>50 then
+				t.Handled=true
+				while s>50 do
+					pl.SkillPoints=pl.SkillPoints+s
+					s=s-1
+				end
+				Skillz.set(pl,53,JoinSkill(s,m))
+			end
+			if pl.SkillPoints>s and retaliationRequirements[m] and s+1>=retaliationRequirements[m] and Skillz.MasteryLimit(pl,53)>m then
+				Skillz.set(pl,53,JoinSkill(s, m+1))
+			elseif retaliationRequirements[m] and s>=retaliationRequirements[m] and Skillz.MasteryLimit(pl,53)>m then
+				Skillz.set(pl,53,JoinSkill(s, m+1))
+			end
+		end
+	end
+end
 
 --regeneration for Troll
 function events.GameInitialized2()
