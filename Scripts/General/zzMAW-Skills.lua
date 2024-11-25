@@ -1933,7 +1933,7 @@ function events.Tick()
 			Skillz.setDesc(51, 1, txt)
 		end
 		
-		local powerMult, DPS2, DPS3, vitMult=calcPowerVitality(pl, true)
+		local powerMult, DPS2, DPS3, vitMult=calcPowerVitality(pl)
 		local vit=math.round(vitMult^0.35)
 		local power=math.round(powerMult^0.35)
 		local retS, m= SplitSkill(Skillz.get(pl, 53))
