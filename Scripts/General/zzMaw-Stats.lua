@@ -980,7 +980,6 @@ function events.CalcDamageToMonster(t)
 			local vit=math.round(vitMult^0.35)
 			local power=math.round(powerMult^0.35)
 			local totalRetDamage=power*vit*s*stacks
-			debug.Message(totalRetDamage)
 			t.Result=t.Result+totalRetDamage
 			
 			if 0.25*stacks>math.random() then
