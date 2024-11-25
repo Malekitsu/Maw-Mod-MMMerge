@@ -1044,7 +1044,7 @@ function events.MonsterKilled(mon)
 	local lvl=mon.Level
 	if mon.NameId==0 then
 		lvl=math.round(totalLevel[mon.Id])
-	elseif mapvars.uniqueMonsterLevel[mon:GetIndex()] then
+	elseif mapvars.uniqueMonsterLevel and mapvars.uniqueMonsterLevel[mon:GetIndex()] then
 		lvl=math.round(mapvars.uniqueMonsterLevel[mon:GetIndex()])
 	end
 	bonusRoll=math.min(1+lvl/60,5)
