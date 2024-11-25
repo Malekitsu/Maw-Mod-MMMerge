@@ -1933,6 +1933,12 @@ function events.Tick()
 			Skillz.setDesc(51, 1, txt)
 		end
 		
+		local powerMult, DPS2, DPS3, vitMult=calcPowerVitality(pl, true)
+		local vit=math.round(vitMult^0.35)
+		local power=math.round(powerMult^0.35)
+		local retS, m= SplitSkill(Skillz.get(pl, 53))
+		Skillz.setDesc(53, 1, "After mastering the art of covering, you have become capable delivering deadly counter attacks to those who dare try harm your allies. Retaliation has a 1% per skill point chance to activate after successfully covering an ally.\n\nExpert, Master and Grandmaster are learned automatically at skill 12, 30 and 50.\n\nDamage done depends on 2 coefficients, multiplied then by skill level:\n\nMelee Power coefficient: " .. StrColor(255,0,0, power) .. "\nVitality coefficient: " .. StrColor(255,0,0, vit) .. "\n\nTotal Damage: " .. StrColor(255,0,0, retS*vit*power) .. "\n\nBalancing power and vitality leads to the highest damage.\n")
+		
 	end
 end
 function events.KeyDown(t)
@@ -2284,10 +2290,10 @@ function events.GameInitialized2()
 	Skillz.new_armor(Retaliation)
 	Skillz.setName(Retaliation, "Retaliation")
 	Skillz.setDesc(Retaliation, 1, "After mastering the art of covering, you have become capable delivering deadly counter attacks to those who dare try harm your allies. Retaliation has a 1% per skill point chance to activate after successfully covering an ally.\n\nExpert, Master and Grandmaster are learned automatically at skill 12, 30 and 50.\n")
-	Skillz.setDesc(Retaliation, 2, "Your next attack deals additional damage equal to 10% of your total HP per skill point")
+	Skillz.setDesc(Retaliation, 2, "Your next attack deals additional damage, multiplied by skill level")
 	Skillz.setDesc(Retaliation, 3, "Your next attack recovery time is reduced by 30%")
 	Skillz.setDesc(Retaliation, 4, "Your next attack has a 25% chance to stun the enemy for 2 seconds")
-	Skillz.setDesc(Retaliation, 5, "Retaliation can stack, allowing consume all the stacks in 1 single powerful hit")
+	Skillz.setDesc(Retaliation, 5, "Retaliation can stack up to 3 times, allowing to consume all the stacks in 1 single powerful hit")
 end
 
 function events.Action(t)
