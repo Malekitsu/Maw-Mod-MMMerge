@@ -908,7 +908,7 @@ function events.CalcDamageToMonster(t)
 		end
 	end
 	index=table.find(damageKindMap,t.DamageKind)
-	res=t.Monster.Resistances[index]
+	local res=t.Monster.Resistances[index]
 	if data and data.Object and data.Object.Spell==133 then
 		if data and data.Player then
 			local it=t.Player:GetActiveItem(2)
@@ -976,7 +976,13 @@ function events.CalcDamageToMonster(t)
 			if m<4 then
 				stacks=1
 			end
-			t.Result=fullHP*0.1*s*stacks
+			local powerMult, DPS2, DPS3, vitMult=calcPowerVitality(pl, true)
+			local vit=math.round(vitMult^0.35)
+			local power=math.round(powerMult^0.35)
+			local totalRetDamage=power*vit*s*stacks
+			debug.Message(totalRetDamage)
+			t.Result=t.Result+totalRetDamage
+			
 			if 0.25*stacks>math.random() then
 				local stunDuration=const.Minute
 				if t.Monster.NameId>=220 and t.Monster.NameId<=300 then
