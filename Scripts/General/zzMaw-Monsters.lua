@@ -887,7 +887,7 @@ function events.PickCorpse(t)
 		local name=Game.MapStats[Map.MapStatsIndex].Name
 		local lvl=math.max(basetable[mon.Id].Level, mapLevels[name].Low)
 		local id=mon:GetIndex()
-		if id and mapvars.uniqueMonsterLevel[id] then
+		if id and mapvars.uniqueMonsterLevel and mapvars.uniqueMonsterLevel[id] then
 			lvl=mapvars.uniqueMonsterLevel[id]
 		end		
 		local itemTier=lvl/20+2
@@ -2576,7 +2576,7 @@ local function z1()
     end
 end
 
-local function aa1()
+function aa1()
     events.Remove("KeyDown", a1)
     events.Remove("KeyDown", b1)
     events.Remove("LoadMap", c1)
