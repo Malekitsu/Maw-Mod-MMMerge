@@ -1070,7 +1070,7 @@ function events.MonsterKilled(mon)
 	local gemChance=craftDropChances.gems
 	local insanityMult=1
 	if vars.insanityMode then
-		insanityMult=2
+		insanityMult=1.5
 	end
 	--no corpse monster Buff
 	if table.find(noCorpseMonsters,mon.Id) then
@@ -1108,7 +1108,7 @@ function events.MonsterKilled(mon)
 	if math.random()<craftDropChances[1064]*bonusRoll*insanityMult then
 		obj = SummonItem(1064, mon.X, mon.Y, mon.Z + 100, 100)
 	end
-	if math.random()<craftDropChances[1065]*bonusRoll*insanityMult then
+	if math.random()<craftDropChances[1065]*bonusRoll then
 		obj = SummonItem(1065, mon.X, mon.Y, mon.Z + 100, 100)
 	end
 	if math.random()<craftDropChances[1066]*bonusRoll then
