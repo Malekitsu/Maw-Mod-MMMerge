@@ -1715,10 +1715,22 @@ function events.MonsterKilled(mon)
 	end
 	mapvars.mapsDropped=mapvars.mapsDropped or 0
 	if totalLevel[mon.Id]>100 and math.random()<0.001*mon.Level/100/(mapvars.mapsDropped+1) then
-		mapvars.mapsDropped=mapvars.mapsDropped+1
 		assignedAffixes = {}
 		obj = SummonItem(290, mon.X, mon.Y, mon.Z + 100, 100)
-		obj.Item.BonusStrength=mapDungeons[math.random(1,#mapDungeons)]
+		possibleMaps={}
+		for i=1,#mapDungeons do
+			if vars.dungeonCompletedList[Game.MapStats[mapDungeons[i]].Name] then
+				table.insert(possibleMaps, mapDungeons[i])
+			end
+		end
+		if table.find(possibleMaps,mapDungeons[math.random(1,#mapDungeons)]) then
+			obj.Item.BonusStrength=possibleMaps[math.random(1,#possibleMaps)]
+			mapvars.mapsDropped=mapvars.mapsDropped+1
+		else
+			obj.Item.Number=0
+			obj.Type=0
+			obj.TypeIndex=0
+		end
 		if math.random()<1 then
 			obj.Item.Bonus2=getUniqueAffix()
 		end
