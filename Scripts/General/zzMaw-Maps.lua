@@ -1697,7 +1697,7 @@ function events.GameInitialized2()
 	
 end
 
-mapDungeons={16,17,19,21,22,23,24,25,26,27,28,29,30,31,32,33,34,36,37,38,40,41,42,43,44,45,46,47,48,49,51,52,54,55,56,57,75,76,77,78,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,101,104,105,106,108,109,110,111,133,134,135,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,186}
+mapDungeons={1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,19,21,22,23,24,25,26,27,28,29,30,31,32,33,34,36,37,38,40,41,42,43,44,45,46,47,48,49,51,52,54,55,56,57,62,63,64,65,66,67,68,69,70,71,72,73,75,76,77,78,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,101,104,105,106,108,109,110,111,133,134,135,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,186}
 
 -- Function to get a unique random affix
 function getUniqueAffix()
@@ -1764,7 +1764,21 @@ function events.UseMouseItem(t)
 		local fileName=string.sub(map.FileName, 1, -5)
 		
 		mapAffixList={it.BonusExpireTime, it.Bonus2, it.Charges%1000, math.round(it.Charges/1000), ["Power"]=it.MaxCharges}
-		
+		math.randomseed(it.BonusExpireTime+it.Bonus2*10^3+it.Charges*10^6+it.MaxCharges*10^9+it.BonusStrength*10^12)
+		local possibleMonsters={}
+		for i=1,215 do
+			local index=i*3-2
+			local mon=Game.MonstersTxt[index]
+			if mon.AIType~=1 then
+				table.insert(possibleMonsters,index)
+			end
+		end
+		local map=Game.MapStats[it.BonusStrength]
+		--randomize monsters
+		mappingMonsters={}
+		for i=1,3 do
+			table.insert(mappingMonsters,string.sub(Game.MonstersTxt[possibleMonsters[math.random(1,#possibleMonsters)]].Picture,1, -3))
+		end
 		--monster density
 		local nAff=0
 		for i=1,4 do
@@ -1774,7 +1788,11 @@ function events.UseMouseItem(t)
 		end
 		local mult=1+it.MaxCharges*nAff/300
 		mapMonsterDensity={it.BonusStrength,mult}
-		blv(fileName)
+		if string.sub(map.FileName,-3)=="blv" then
+			blv(fileName)
+		else
+			odm(fileName)
+		end
 		local wait=10
 		function events.Tick()
 			if wait<=0 then
@@ -1794,11 +1812,34 @@ function events.UseMouseItem(t)
 		end
 	end
 end
+--store map monsters
+function events.GameInitialized2()
+	baseSpawnMonsters={}
+	for i=1,Game.MapStats.High do
+		baseSpawnMonsters[i]={}
+		baseSpawnMonsters[i][1]=Game.MapStats[i].Monster1Pic
+		baseSpawnMonsters[i][2]=Game.MapStats[i].Monster2Pic
+		baseSpawnMonsters[i][3]=Game.MapStats[i].Monster3Pic
+	end
+end
+
 --needed for chest/objects loot
 function events.BeforeLoadMap()
 	if mapAffixList then
 		mapvars.mapAffixes={mapAffixList[1],mapAffixList[2],mapAffixList[3],mapAffixList[4],["Power"]=mapAffixList.Power}
 	end
+	local id=Map.MapStatsIndex
+	local map=Game.MapStats[id]
+	if mappingMonsters then
+		map.Monster1Pic=mappingMonsters[1]
+		map.Monster2Pic=mappingMonsters[2]
+		map.Monster3Pic=mappingMonsters[3]
+	else
+		map.Monster1Pic=baseSpawnMonsters[id][1]
+		map.Monster2Pic=baseSpawnMonsters[id][2]
+		map.Monster3Pic=baseSpawnMonsters[id][3]
+	end
+	mappingMonsters=nil
 end
 --needed to apply changes
 function events.LoadMap()
