@@ -1821,6 +1821,7 @@ function events.GameInitialized2()
 		baseSpawnMonsters[i][2]=Game.MapStats[i].Monster2Pic
 		baseSpawnMonsters[i][3]=Game.MapStats[i].Monster3Pic
 	end
+	Game.ItemsTxt[290].Name="Dimension Map"
 end
 
 --needed for chest/objects loot
