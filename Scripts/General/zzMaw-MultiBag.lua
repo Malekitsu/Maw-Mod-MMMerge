@@ -108,7 +108,7 @@ function events.Action(t)
 				else
 					multibagButton[i+5].IUpSrc="SlChar" .. i .. "U"
 				end
-				if Party.High>0 then
+				if Party.High>0 and Game.CurrentScreen==7 then
 					multibagButton[i+5].Active=false
 				else
 					multibagButton[i+5].Active=true
