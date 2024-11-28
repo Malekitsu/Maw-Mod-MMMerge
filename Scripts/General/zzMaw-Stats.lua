@@ -976,7 +976,7 @@ function events.CalcDamageToMonster(t)
 			if m<4 then
 				stacks=1
 			end
-			local powerMult, DPS2, DPS3, vitMult=calcPowerVitality(pl, true)
+			local powerMult, DPS2, DPS3, vitMult=calcPowerVitality(pl, false)
 			local vit=math.round(vitMult^0.35)
 			local power=math.round(powerMult^0.35)
 			local totalRetDamage=power*vit*s*stacks
