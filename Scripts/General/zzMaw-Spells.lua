@@ -975,7 +975,10 @@ function getAscensionTier(skill,spellID, index)
 	elseif spelltier<=skill%11  then
 		ascensionTier=ascensionTier+1
 	end
-	local id=index or Party[Game.CurrentPlayer]:GetIndex()
+	local id=index
+	if not id and Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
+		id=Party[Game.CurrentPlayer]:GetIndex()
+	end
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 25) then
 		ascensionTier=ascensionTier+1
 	end
