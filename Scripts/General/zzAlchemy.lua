@@ -840,8 +840,9 @@ evt.PotionEffects[83] = function(IsDrunk, t, Power)
 			maxChargesCap=50*((difficultyExtraPower-1)*4+1)
 		end
 		maxChargesCap=maxChargesCap+100 --mapping release
+		maxChargesCap=maxChargesCap/2
 		--if level requirement is over player level block it
-		local itemLevel=t.MaxCharges*5
+		local itemLevel=t.MaxCharges*10
 		local tot=0
 		local lvl=0
 		for i=1, 6 do
