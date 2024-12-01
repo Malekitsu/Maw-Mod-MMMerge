@@ -243,21 +243,21 @@ function recalculateMawMonster()
 				end
 				--Hard
 				if Game.BolsterAmount==150 then
-					hpMult=hpMult*1.5*(1+mapvars.uniqueMonsterLevel[i]/300)
+					hpMult=hpMult*(1.5+totalLevel[i]/900)
 				end
 				--Hell
 				if Game.BolsterAmount==200 then
-					hpMult=hpMult*2*(1+mapvars.uniqueMonsterLevel[i]/200)
+					hpMult=hpMult*(2+totalLevel[i]/600)
 				end
 				--Nightmare
 				if Game.BolsterAmount==300 then
-					hpMult=hpMult*2.5*(1+mapvars.uniqueMonsterLevel[i]/100)
+					hpMult=hpMult*(2.5+totalLevel[i]/450)
 				end
 				if Game.BolsterAmount==600 then
-					hpMult=hpMult*3*(1+mapvars.uniqueMonsterLevel[i]/50)
-				end
+					hpMult=hpMult*(3+totalLevel[i]/300)
+				end	
 				if vars.insanityMode then
-					hpMult=hpMult*(1.5+totalLevel[i]/100)
+					hpMult=hpMult*(1.5+totalLevel[i]/300)
 				end
 				HP=HP*hpMult
 				
@@ -667,21 +667,21 @@ function recalculateMonsterTable()
 		end
 		--Hard
 		if Game.BolsterAmount==150 then
-			hpMult=hpMult*1.5*(1+totalLevel[i]/300)
+			hpMult=hpMult*(1.5+totalLevel[i]/900)
 		end
 		--Hell
 		if Game.BolsterAmount==200 then
-			hpMult=hpMult*2*(1+totalLevel[i]/200)
+			hpMult=hpMult*(2+totalLevel[i]/600)
 		end
 		--Nightmare
 		if Game.BolsterAmount==300 then
-			hpMult=hpMult*2.5*(1+totalLevel[i]/100)
+			hpMult=hpMult*(2.5+totalLevel[i]/450)
 		end
 		if Game.BolsterAmount==600 then
-			hpMult=hpMult*3*(1+totalLevel[i]/50)
+			hpMult=hpMult*(3+totalLevel[i]/300)
 		end	
 		if vars.insanityMode then
-			hpMult=hpMult*(1.5+totalLevel[i]/100)
+			hpMult=hpMult*(1.5+totalLevel[i]/300)
 		end
 		--crit nerf fix
 		hpMult=hpMult/math.min(math.max(0.3+totalLevel[i]/200,1),50/15) --50/15 is the amount needed to get 1% crit, now and before
@@ -1858,19 +1858,19 @@ function events.BuildMonsterInformationBox(t)
 		diff=0.4
 	end
 	if Game.BolsterAmount==150 then
-		diff=1.12+math.round(lvl/300)
+		diff=1.12+math.round(lvl/600)
 	end
 	if Game.BolsterAmount==200 then
-		diff=1.25+math.round(lvl/200)
+		diff=1.25+math.round(lvl/400)
 	end
 	if Game.BolsterAmount==300 then
-		diff=1.5+math.round(lvl/100)
+		diff=1.5+math.round(lvl/300)
 	end
 	if vars.Mode==2 then
-		diff=2+math.round(lvl/50)
+		diff=2+math.round(lvl/200)
 	end
 	if vars.insanityMode then
-		diff=diff*(1.5+lvl/240)
+		diff=diff*(1.5+lvl/300)
 	end
 	if getMapAffixPower(1) then
 		diff=diff*(1+getMapAffixPower(1)/100)
