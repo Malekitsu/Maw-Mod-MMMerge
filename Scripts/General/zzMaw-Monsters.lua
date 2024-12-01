@@ -243,21 +243,21 @@ function recalculateMawMonster()
 				end
 				--Hard
 				if Game.BolsterAmount==150 then
-					hpMult=hpMult*(1.5+totalLevel[i]/900)
+					hpMult=hpMult*(1.5+HPBolsterLevel/900)
 				end
 				--Hell
 				if Game.BolsterAmount==200 then
-					hpMult=hpMult*(2+totalLevel[i]/600)
+					hpMult=hpMult*(2+HPBolsterLevel/600)
 				end
 				--Nightmare
 				if Game.BolsterAmount==300 then
-					hpMult=hpMult*(2.5+totalLevel[i]/450)
+					hpMult=hpMult*(2.5+HPBolsterLevel/450)
 				end
 				if Game.BolsterAmount==600 then
-					hpMult=hpMult*(3+totalLevel[i]/300)
+					hpMult=hpMult*(3+HPBolsterLevel/300)
 				end	
 				if vars.insanityMode then
-					hpMult=hpMult*(1.5+totalLevel[i]/300)
+					hpMult=hpMult*(1.5+HPBolsterLevel/300)
 				end
 				HP=HP*hpMult
 				
