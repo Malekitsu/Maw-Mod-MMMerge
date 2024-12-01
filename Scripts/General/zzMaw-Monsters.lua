@@ -256,6 +256,9 @@ function recalculateMawMonster()
 				if Game.BolsterAmount==600 then
 					hpMult=hpMult*3*(1+mapvars.uniqueMonsterLevel[i]/50)
 				end
+				if vars.insanityMode then
+					hpMult=hpMult*(1.5+totalLevel[i]/100)
+				end
 				HP=HP*hpMult
 				
 				hpOvercap=0
