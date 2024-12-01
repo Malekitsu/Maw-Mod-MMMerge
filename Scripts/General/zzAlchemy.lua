@@ -876,6 +876,10 @@ evt.PotionEffects[83] = function(IsDrunk, t, Power)
 			Game.ShowStatusText("Item power reached its limit")
 			return
 		end
+		local changeIncrease=4
+		if t.Item:T().EquipStat<=3 then
+			changeIncrease=2
+		end
 		t.MaxCharges=math.min(t.MaxCharges+4,maxChargesCap)
 		Mouse.Item.Number=0
 		mem.u4[0x51E100] = 0x100 
