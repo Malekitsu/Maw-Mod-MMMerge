@@ -622,13 +622,13 @@ function recalculateMonsterTable()
 		end
 		--true nightmare nerf
 		if Game.BolsterAmount==300 then
-			mon.Experience=mon.Experience*0.75
+			mon.Experience=mon.Experience*0.67
 		end
 		if vars.Mode==2 then
-			mon.Experience=mon.Experience/2
+			mon.Experience=mon.Experience*0.5
 		end
-		if vars.InsanitMode then
-			mon.Experience=mon.Experience*0.7
+		if vars.insanityMode then
+			mon.Experience=mon.Experience*0.8
 		end
 	end
 	--CALCULATE DAMAGE AND HP
@@ -1053,13 +1053,13 @@ function events.BeforeLoadMap()
 	if vars.Mode==2 then
 		for i=1,Game.MapStats.High do
 			if Game.MapStats[i].Mon1Hi>1 then
-				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+6
+				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+4
 			end 
 			if Game.MapStats[i].Mon2Hi>1 then
-				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+6
+				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+4
 			end 
 			if Game.MapStats[i].Mon3Hi>1 then
-				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+6
+				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+4
 			end 
 			Game.MapStats[i].Mon1Dif=math.min(BackupMapStats[i].Mon1Dif+1,5)
 			Game.MapStats[i].Mon2Dif=math.min(BackupMapStats[i].Mon2Dif+1,5)
@@ -1069,9 +1069,9 @@ function events.BeforeLoadMap()
 	if vars.insanityMode then
 		for i=1,Game.MapStats.High do
 			if Game.MapStats[i].Mon1Hi>1 then
-				Game.MapStats[i].Mon1Low=math.floor((Game.MapStats[i].Mon1Hi+BackupMapStats[i].Mon1Low)/2)
-				Game.MapStats[i].Mon2Low=math.floor((Game.MapStats[i].Mon2Hi+BackupMapStats[i].Mon2Low)/2)
-				Game.MapStats[i].Mon3Low=math.floor((Game.MapStats[i].Mon3Hi+BackupMapStats[i].Mon3Low)/2)
+				Game.MapStats[i].Mon1Low=3
+				Game.MapStats[i].Mon2Low=3
+				Game.MapStats[i].Mon3Low=3
 			end
 		end
 	end
@@ -2151,14 +2151,15 @@ function events.MonsterKilled(mon)
 		if m/n>=requiredRateo then
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
+			local bolster=0
 			if currentWorld==1 then
-				mapLevel=vars.MM6LVL+vars.MM7LVL
+				bolster=vars.MM6LVL+vars.MM7LVL
 			elseif currentWorld==2 then
-				mapLevel=vars.MM8LVL+vars.MM6LVL
+				bolster=vars.MM8LVL+vars.MM6LVL
 			elseif currentWorld==3 then
-				mapLevel=vars.MM8LVL+vars.MM7LVL
+				bolster=vars.MM8LVL+vars.MM7LVL
 			else 
-				mapLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+				bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
 			end
 			
 			vars.dungeonCompletedList=vars.dungeonCompletedList or {}
@@ -2192,24 +2193,24 @@ function events.MonsterKilled(mon)
 				end
 				return
 			else
-				mapLevel=mapLevel+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
+				mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
 				if not Game.freeProgression then
-					mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)
+					bolster=mapLevel*2
 				end
 				if vars.onlineMode then
-					mapLevel=((mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)^1.5
+					bolster=((mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)^1.5-mapLevel
 				end
 				local totalMonster=m
 				if Game.BolsterAmount==300 then
-					totalMonster=totalMonster*0.75
+					totalMonster=totalMonster*0.67
 				end
 				if Game.BolsterAmount==600 then
 					totalMonster=totalMonster/2
 				end
 				if vars.InsanitMode then
-					totalMonster=totalMonster*0.7
+					totalMonster=totalMonster*0.8
 				end
-				local experience=math.ceil(totalMonster^0.7*(mapLevel*20+mapLevel^1.8)/3/1000)*1000
+				local experience=math.ceil(totalMonster^0.7*(mapLevel*20+mapLevel^1.8)/3/1000)*1000*(bolster+mapLevel)/mapLevel
 				--bolster code
 				bonusExp=experience
 				local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
