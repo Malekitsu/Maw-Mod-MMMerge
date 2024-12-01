@@ -611,26 +611,25 @@ function events.BuildItemInformationBox(t)
 			end
 		end
 		if t.Description then
-			local mult=math.max((Game.BolsterAmount-100)/1000+1,1)
+			local mult=math.max((Game.BolsterAmount-100)/2000+1,1)
+			if vars.insanityMode then
+				mult=1.4
+			end
 			local tier=(t.Item.Number-1050)*mult
 			if t.Item.BonusStrength==1 then
 				tier=tier+10*mult
 			end
-			local power = math.round((tier * 10) ^ 0.5)
-			
-			if vars.insanityMode then
-				power=math.floor(power*4/3)
-				tier=tier*4/3
-			end
-			
-			local twoHanded = tier * 10 * 2
-			local bodyArmor = math.round(tier * 1.5 * 10)
-			local helmEtc = math.round(tier * 1.25 * 10)
-			local rings = math.round(tier * 0.75 * 10)
+			local power = 3
 			
 			
-			t.Description = "A special Gem that allows to increase an item Enchant Strength (right-click on an item with a base enchant to use)\nLegendary items can get 20% more power.\n\nMax Power: " 
-			.. StrColor(255, 128, 0, tostring(tier * 10)) .. " (65% on AC)"
+			local twoHanded = tier * 6 * 2
+			local bodyArmor = math.round(tier * 1.5 * 6)
+			local helmEtc = math.round(tier * 1.25 * 6)
+			local rings = math.round(tier * 0.75 * 6)
+			
+			
+			t.Description = "A special Gem that allows to increase an item Enchant Strength (right-click on an item with a base enchant to use)\nLegendary items can more Max power.\n\nMax Power: " 
+			.. StrColor(255, 128, 0, tostring(tier * 6)) .. " (65% on AC)"
 			.. "\nBonus: " .. StrColor(255, 128, 0, tostring(power)) 
 			.. "\n\nItem Modifier:\nTwo Handed Weapons: " .. StrColor(255, 128, 0, twoHanded)
 			.. "\nBody Armor: " .. StrColor(255, 128, 0, bodyArmor)
@@ -653,19 +652,26 @@ end
 local function upgradeGem(it, tier)
 	local enchanted=false
 	--bolster multiplier
-	local bolsterMult=math.max((Game.BolsterAmount-100)/1000+1,1)
-	local tier=tier*bolsterMult
-	if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
-		tier=tier*1.2
+	local bolsterMult=math.max((Game.BolsterAmount-100)/2000+1,1)
+	if vars.insanityMode then
+		bolsterMult=1.4
 	end
+	local tier=tier*bolsterMult
 	--2nd enchant value
 	local bonus2=math.floor(it.Charges/1000)
 	local bonus2Strength=it.Charges%1000
 	--upgrade amount
-	local upgradeAmount1=math.round((tier*10)^0.5)
+	local upgradeAmount1=3
 	local upgradeAmount2=upgradeAmount1
 	--base value
-	local maxValue1=tier*10
+	local maxValue1=math.round(tier*6)
+	
+	if it.BonusExpireTime==1 or it.BonusExpireTime==2 then
+		maxValue1=math.min(maxValue1+10,maxValue1*1.2)
+	end
+	if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
+		maxValue1=math.min(maxValue1+20,maxValue1*1.44)
+	end
 	local maxValue2=maxValue1
 	if not vars.itemStatsFix then
 		--hp/sp value
