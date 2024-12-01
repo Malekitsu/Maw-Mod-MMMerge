@@ -128,8 +128,8 @@ function events.GameInitialized2()
 end
 
 --create enchant table
-encStrDown={1,1,3,6,9,12,15,18,21,24,28,32,36,40,44,48,52,56,60,64,70,76,80,84,88,92,96,100,104,108,112,116,120,124,128,132,136,140,144,148,152,156}
-encStrUp={3,5,8,12,16,20,24,29,34,38,42,48,52,56,60,65,70,75,80,85,90,100,105,110,115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,190,195,200}
+encStrDown={2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,78,80,82,84}
+encStrUp={3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87,90,93,96,99,102,105,108,111,114,117,120,125,130}
 
 
 enc1Chance={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80}
@@ -256,11 +256,6 @@ function events.ItemGenerated(t)
 			currentLevel=monTbl[math.min((vars.highestArenaWave+1)*3,#monTbl)].Level*6
 			partyLevel=monTbl[math.min((vars.highestArenaWave+1)*3,#monTbl)].Level*6/1.5
 		end
-		--modify reagents
-		if reagentList[t.Item.Number] then
-			t.Item.Bonus=math.round(partyLevel/3)
-			return
-		end
 		
 		local name=Game.MapStats[Map.MapStatsIndex].Name
 		mapLevel=mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High
@@ -285,15 +280,19 @@ function events.ItemGenerated(t)
 			currentLevel=mapvars.mapAffixes.Power*10+20
 			partyLevel=mapvars.mapAffixes.Power*10+20
 		end
+		--modify reagents
+		if reagentList[t.Item.Number] then
+			t.Item.Bonus=math.round(partyLevel/3)
+			return
+		end
 		
 		--difficulty settings
 		difficultyExtraPower=1
 		if Game.BolsterAmount>100 then
 			difficultyExtraPower=(Game.BolsterAmount-100)/2000+1
 		end
-		local flatBonus=(difficultyExtraPower-1)*50
-		if math.random()<flatBonus%1 then
-			flatBonus=flatBonus+1
+		if vars.insanityMode then
+			difficultyExtraPower=1.4
 		end
 		--nerf shops if no exp in current world
 		--[[
@@ -350,9 +349,11 @@ function events.ItemGenerated(t)
 		if vars.Mode==2 then
 			diffMult=1.8
 		end
+		--[[nerf
 		if vars.insanityMode then
 			diffMult=2
 		end
+		]]
 		--calculate chances
 		local p1=enc1Chance[math.min(pseudoStr,#enc1Chance)]/100
 		local p2=enc2Chance[math.min(pseudoStr,#enc2Chance)]/100
@@ -419,11 +420,11 @@ function events.ItemGenerated(t)
 		ancientRoll=math.random()
 		if ancientRoll<=ancientChance then
 			ancient=true
-			t.Item.Charges=math.random(math.round(encStrUp[pseudoStr]+1),math.ceil(encStrUp[pseudoStr]*1.2))
+			t.Item.Charges=math.random(math.round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2, encStrUp[pseudoStr]+10))
 			t.Item.Charges=math.ceil(t.Item.Charges*difficultyExtraPower) --bolster
 			t.Item.Charges=t.Item.Charges+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.random(math.round(encStrUp[pseudoStr]+1),math.ceil(encStrUp[pseudoStr]*1.2))
+			t.Item.BonusStrength=math.random(math.round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
 			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*difficultyExtraPower) --bolster
 			power=2
 			chargesBonus=math.random(1,5)
@@ -462,11 +463,11 @@ function events.ItemGenerated(t)
 				t.Item.MaxCharges=t.Item.MaxCharges-chargesBonus
 			end
 			t.Item.BonusExpireTime=2
-			t.Item.Charges=math.ceil(encStrUp[pseudoStr]*1.2)
+			t.Item.Charges=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
 			t.Item.Charges=math.ceil(t.Item.Charges*difficultyExtraPower) --bolster
 			t.Item.Charges=math.round(t.Item.Charges+math.random(1,16)*1000)
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.ceil(encStrUp[pseudoStr]*1.2)
+			t.Item.BonusStrength=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
 			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*difficultyExtraPower) --bolster
 			t.Item.MaxCharges=math.min(maxChargesCap,math.max(t.Item.MaxCharges+5, t.Item.MaxCharges*1.25), t.Item.MaxCharges+25)
 			--apply special enchant
@@ -531,8 +532,8 @@ function events.ItemGenerated(t)
 					end
 				end
 				--increase stats
-				t.Item.Charges=math.ceil(math.min(t.Item.Charges%1000*0.2,999)+t.Item.Charges)
-				t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*1.2)
+				t.Item.Charges=math.min(math.ceil(math.min(t.Item.Charges%1000*0.2,999)+t.Item.Charges), t.Item.Charges+10)
+				t.Item.BonusStrength=math.min(math.ceil(t.Item.BonusStrength*1.2),t.Item.BonusStrength+10)
 			end
 		end
 		
@@ -913,9 +914,11 @@ function events.BuildItemInformationBox(t)
 						local ac=Game.ItemsTxt[t.Item.Number].Mod2+Game.ItemsTxt[t.Item.Number].Mod1DiceCount 
 						local ac2=Game.ItemsTxt[t.Item.Number+lookup].Mod2+Game.ItemsTxt[t.Item.Number+lookup].Mod1DiceCount 
 						local maxCharges=t.Item.MaxCharges
+						--[[
 						if vars.insanityMode then
 							maxCharges=math.ceil(maxCharges*4/3)
 						end
+						--]]
 						local bonusAC=ac2*(maxCharges/40)
 						--if t.Item.MaxCharges <= 20 then
 							ac=ac3+math.round(bonusAC)
@@ -940,9 +943,11 @@ function events.BuildItemInformationBox(t)
 					local bonus=txt.Mod2
 					local bonus2=Game.ItemsTxt[t.Item.Number+lookup].Mod2
 					local maxCharges=t.Item.MaxCharges
+					--[[
 					if vars.insanityMode then
 						maxCharges=math.ceil(maxCharges*4/3)
 					end
+					]]
 					local bonusATK=bonus2*(maxCharges/30)
 					bonus=bonus+math.round(bonusATK)
 					local sides=txt.Mod1DiceSides
@@ -965,10 +970,11 @@ function events.BuildItemInformationBox(t)
 						power=math.round(power*0.667)
 					end
 				end
-				--insanity
+				--[[insanity
 				if vars.insanityMode then
 					power=math.ceil(power*4/3)
 				end
+				]]
 				if t.Item.BonusExpireTime==20 then
 					power=math.ceil(power*1.5)
 				end
@@ -994,10 +1000,11 @@ function events.BuildItemInformationBox(t)
 						strength=math.round(strength*0.667)
 					end
 				end
-				--insanity
+				--[[insanity
 				if vars.insanityMode then
 					strength=math.ceil(strength*4/3)
 				end
+				]]				
 				if t.Item.BonusExpireTime==20 then
 					strength=math.ceil(strength*1.5)
 				end
@@ -1009,7 +1016,7 @@ function events.BuildItemInformationBox(t)
 							strength=strength*1.5
 						end
 					end
-					strength=math.round((1-1/1.5^(strength^0.6/15))*1000)/10 .. "%"
+					strength=math.round((1-1/1.5^(strength^0.6/10))*1000)/10 .. "%"
 				end
 				t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
 			elseif t.Item.Bonus~=0 and t.Item.BonusStrength~=0 then
@@ -1305,10 +1312,11 @@ bonusEffects = {
 
 --create dictionary with description list
 function checktext(MaxCharges,bonus2,it)
-	--if MaxCharges <= 20 then
+	--[[if MaxCharges <= 20 then
 	if vars.insanityMode then
 		MaxCharges=math.ceil(MaxCharges*4/3)
 	end
+	]]
 	mult=1+MaxCharges/20
 	--else
 	--	mult=2+2*(MaxCharges-20)/20
@@ -2363,9 +2371,11 @@ function itemStats(index)
 			if it.MaxCharges>0 and not table.find(artArmors,it.Number) then 
 				local ac2=referenceAC[it.Number]
 				local maxCharges=it.MaxCharges
+				--[[
 				if vars.insanityMode then
 					maxCharges=math.ceil(maxCharges*4/3)
 				end
+				]]
 				local bonusAC=ac2*(maxCharges/40)
 				acBonus=ac+math.round(bonusAC)
 			end
@@ -2399,9 +2409,11 @@ function itemStats(index)
 					power=math.round(power*0.667)
 				end
 			end
+			--[[
 			if vars.insanityMode then
 				power=math.ceil(power*4/3)
 			end
+			]]
 			if it.BonusExpireTime==20 then
 				power=math.ceil(power*1.5)
 			end
@@ -2446,9 +2458,11 @@ function itemStats(index)
 					power=math.round(power*0.667)
 				end
 			end
+			--[[
 			if vars.insanityMode then
 				power=math.ceil(power*4/3)
 			end
+			]]
 			if it.BonusExpireTime==20 then
 				power=math.ceil(power*1.5)
 			end
@@ -2460,9 +2474,11 @@ function itemStats(index)
 		end		
 		--bolster mult
 		mult=1+it.MaxCharges/20
+		--[[
 		if vars.insanityMode then
 			mult=mult*4/3
 		end
+		]]
 		if it.Bonus2==36 then
 			vars.shieldEnchant=vars.shieldEnchant or {}
 			vars.shieldEnchant[index]=true
@@ -2503,9 +2519,11 @@ function itemStats(index)
 			local bonusATK
 			--bolster mult
 			maxCharges=it.MaxCharges
+			--[[
 			if vars.insanityMode then
 				maxCharges=math.ceil(maxCharges*4/3)
 			end
+			]]
 			bonusATK = bonus2 * (maxCharges / 30)
 			
 			bonus = bonus + math.round(bonusATK)
@@ -2612,16 +2630,20 @@ function itemStats(index)
 		if equipSpellMap[it.Bonus2] then
 			tab[it.Bonus2]=tab[it.Bonus2] or 0
 			local maxCharges=it.MaxCharges
+			--[[
 			if vars.insanityMode then
 				maxCharges=math.ceil(maxCharges*4/3)
 			end
+			]]
 			tab[it.Bonus2]=tab[it.Bonus2] + (5 +  math.floor(maxCharges/4))
 		end
 		if table.find(meditationBonusItemMap, it.Bonus2) then
 			local maxCharges=it.MaxCharges
+			--[[
 			if vars.insanityMode then
 				maxCharges=math.ceil(maxCharges*4/3)
 			end
+			]]
 			tab[50+const.Skills.Meditation]=tab[50+const.Skills.Meditation] or 0
 			tab[50+const.Skills.Meditation]=tab[50+const.Skills.Meditation] + (3 +  math.floor(maxCharges/20*3))
 		end
@@ -3536,10 +3558,12 @@ end
 function artifactPowerMult(level, isAC)
 	local bol=math.max(Game.BolsterAmount, 100)
 	bol=(bol/100-1)/20+1
+	--[[
 	if vars.insanityMode then
 		bol=bol*4/3
 	end
-	local mult=(math.min(level,550)/100+0.5)*bol
+	]]
+	local mult=(math.min(level,550)/150+0.5)*bol
 	if isAC then
 		mult=(math.min(level,550)/(250/1.5)+0.5)*bol
 	end
@@ -3608,9 +3632,11 @@ function getBaseAttackSpeed(it)
 	end
 	if baseRecovery[skill] then
 		local maxCharges=it.MaxCharges
+		--[[
 		if vars.insanityMode then
 			maxCharges=maxCharges*4/3
 		end
+		]]
 		local itemLevel=maxCharges*5
 		local tot=0
 		local lvl=0
