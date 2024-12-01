@@ -726,18 +726,18 @@ function events.CalcDamageToPlayer(t)
 	--Hard
 	if Game.BolsterAmount==150 then
 		if data and data.Monster then
-			t.Result=t.Result*(totalLevel[data.Monster.Id]/300+1.12)
+			t.Result=t.Result*(totalLevel[data.Monster.Id]/600+1.12)
 		end
 	end
 	--Hell
 	if Game.BolsterAmount==200 then
 		if data and data.Monster then
-			t.Result=t.Result*(totalLevel[data.Monster.Id]/200+1.25)
+			t.Result=t.Result*(totalLevel[data.Monster.Id]/400+1.25)
 		end
 	end
 	if Game.BolsterAmount==300 then
 		if data and data.Monster then
-			t.Result=t.Result*(totalLevel[data.Monster.Id]/100+1.5)
+			t.Result=t.Result*(totalLevel[data.Monster.Id]/300+1.5)
 		elseif ((t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1) then --drown and fall
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
@@ -771,9 +771,9 @@ function events.CalcDamageToPlayer(t)
 	end
 	if vars.Mode==2 then
 		if data and data.Monster then
-			t.Result=t.Result*(totalLevel[data.Monster.Id]/50+2)
+			t.Result=t.Result*(totalLevel[data.Monster.Id]/200+2)
 			if vars.insanityMode then
-				t.Result=t.Result*(1.5+totalLevel[data.Monster.Id]/240)
+				t.Result=t.Result*(1.5+totalLevel[data.Monster.Id]/300)
 			end
 		elseif (t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1 then --drown and fall
 			name=Game.MapStats[Map.MapStatsIndex].Name
@@ -796,9 +796,9 @@ function events.CalcDamageToPlayer(t)
 				mapLevel=(mapvars.mapAffixes.Power*10+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)
 			end
 			--trap and objects multiplier
-			local mult=(mapLevel/9+1.15)*(1+(mapLevel/200))*(mapLevel/50+2)
+			local mult=(mapLevel/9+1.15)*(1+(mapLevel/200))*(mapLevel/200+2)
 			if vars.insanityMode then
-				mult=mult*(1.5+mapLevel/240)
+				mult=mult*(1.5+mapLevel/300)
 			end
 			local damage=mapLevel^0.88*mult
 			if data and data.Object and data.Object.SpellType==15 then 
@@ -1201,7 +1201,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		currentItemRes=currentItemRes*1.5
 	end
 	
-	currentItemRes=1/1.5^(currentItemRes^0.6/15)
+	currentItemRes=1/1.5^(currentItemRes^0.6/10)
 	res=res*currentItemRes
 	--randomize resistance
 	if res>0 and rand then
