@@ -420,11 +420,11 @@ function events.ItemGenerated(t)
 		ancientRoll=math.random()
 		if ancientRoll<=ancientChance then
 			ancient=true
-			t.Item.Charges=math.random(math.round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2, encStrUp[pseudoStr]+10))
+			t.Item.Charges=math.random(math.round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2, encStrUp[pseudoStr]+10)))
 			t.Item.Charges=math.ceil(t.Item.Charges*difficultyExtraPower) --bolster
 			t.Item.Charges=t.Item.Charges+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.random(math.round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
+			t.Item.BonusStrength=math.random(math.round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10))
 			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*difficultyExtraPower) --bolster
 			power=2
 			chargesBonus=math.random(1,5)
@@ -2842,9 +2842,6 @@ function itemStats(index)
 	totalMana=totalMana+manaScaling*effect+tab[9]
 	
 	local s,m=SplitSkill(Skillz.get(pl,52))
-	if s>20 then
-		s=20+(s-20)*2
-	end
 	local enlightIncrease=totalMana*((m+1)/100*s)
 	tab[9]=tab[9]+enlightIncrease+manaScaling*s2*m2
 	
