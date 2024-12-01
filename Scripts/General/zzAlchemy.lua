@@ -629,7 +629,7 @@ function events.BuildItemInformationBox(t)
 			
 			
 			t.Description = "A special Gem that allows to increase an item Enchant Strength (right-click on an item with a base enchant to use)\nLegendary items can more Max power.\n\nMax Power: " 
-			.. StrColor(255, 128, 0, tostring(tier * 6)) .. " (65% on AC)"
+			.. StrColor(255, 128, 0, tostring(math.round(tier * 6))) .. " (65% on AC)"
 			.. "\nBonus: " .. StrColor(255, 128, 0, tostring(power)) 
 			.. "\n\nItem Modifier:\nTwo Handed Weapons: " .. StrColor(255, 128, 0, twoHanded)
 			.. "\nBody Armor: " .. StrColor(255, 128, 0, bodyArmor)
