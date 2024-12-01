@@ -301,14 +301,17 @@ function events.ItemGenerated(t)
 		end
 		]]
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
-		bonusCharges=(difficultyExtraPower-1)*20
+		bonusCharges=(difficultyExtraPower-1)*10
 		cap1=50*((difficultyExtraPower-1)*2+1)
 		maxChargesCap=50*((difficultyExtraPower-1)*4+1)
 		if mapvars.mapAffixes or Map.Name~="d42.blv" then
 			cap1=cap1+75
 			maxChargesCap=maxChargesCap+100
 		end
-		t.Item.MaxCharges=math.floor(partyLevel/5+mapLevel/40)
+		--nerf
+		cap1=cap1/2
+		maxChargesCap=maxChargesCap/2
+		t.Item.MaxCharges=math.floor(partyLevel/10+mapLevel/80)
 		--bolster boost
 		t.Item.MaxCharges=math.min(math.floor(t.Item.MaxCharges*difficultyExtraPower+bonusCharges),cap1)
 		
@@ -469,7 +472,7 @@ function events.ItemGenerated(t)
 			t.Item.Bonus=math.random(1,16)
 			t.Item.BonusStrength=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
 			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*difficultyExtraPower) --bolster
-			t.Item.MaxCharges=math.min(maxChargesCap,math.max(t.Item.MaxCharges+5, t.Item.MaxCharges*1.25), t.Item.MaxCharges+25)
+			t.Item.MaxCharges=math.min(maxChargesCap,math.min(t.Item.MaxCharges+5, t.Item.MaxCharges*1.25), t.Item.MaxCharges+10)
 			--apply special enchant
 			n=t.Item.Number
 			c=Game.ItemsTxt[n].EquipStat
@@ -513,7 +516,7 @@ function events.ItemGenerated(t)
 					end
 				end
 				local relevantStats={1,2,3,4,5,6,7,8,10}
-				t.Item.MaxCharges=math.round(math.min(maxChargesCap,t.Item.MaxCharges*1.2,t.Item.MaxCharges+25))
+				t.Item.MaxCharges=math.round(math.min(maxChargesCap,t.Item.MaxCharges*1.2,t.Item.MaxCharges+10))
 				local roll=math.random(1,3)
 				if roll==1 then
 					local stats={1, 5, 6, 7}
@@ -2109,7 +2112,7 @@ function events.BuildItemInformationBox(t)
 			if t.Item.BonusExpireTime>10 and t.Item.BonusExpireTime<=100 then
 				maxCharges=math.floor(math.min(maxCharges/1.2,maxCharges-5))
 			end
-			local levelRequired=(maxCharges)*3+lvl/tot*2-12
+			local levelRequired=(maxCharges)*6+lvl/tot*2-12
 			if Game.BolsterAmount>=300 then
 				levelRequired=levelRequired-6
 			end
@@ -2148,7 +2151,7 @@ function events.BuildItemInformationBox(t)
 			skill=3
 		end
 		if t.Type and baseRecovery[skill] then
-			local itemLevel=t.Item.MaxCharges*5
+			local itemLevel=t.Item.MaxCharges*10
 			local tot=0
 			local lvl=0
 			for i=1, 6 do
@@ -3560,9 +3563,9 @@ function artifactPowerMult(level, isAC)
 		bol=bol*4/3
 	end
 	]]
-	local mult=(math.min(level,550)/150+0.5)*bol
+	local mult=(math.min(level,550)/300+0.5)*bol
 	if isAC then
-		mult=(math.min(level,550)/(250/1.5)+0.5)*bol
+		mult=(math.min(level,550)/(500/1.5)+0.5)*bol
 	end
 	return mult
 end
