@@ -857,7 +857,7 @@ evt.PotionEffects[83] = function(IsDrunk, t, Power)
 		if t.BonusExpireTime>10 and t.BonusExpireTime<=100 then
 			maxCharges=math.floor(math.min(maxCharges/1.2,maxCharges-5))
 		end
-		levelRequired=(maxCharges)*6+lvl/tot*2-12
+		levelRequired=(maxCharges)*6+lvl/tot*2-24
 		if Game.BolsterAmount>=300 then
 			levelRequired=levelRequired-6
 		end
