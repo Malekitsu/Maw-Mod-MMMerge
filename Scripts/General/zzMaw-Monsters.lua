@@ -420,15 +420,16 @@ function events.MonsterKillExp(t)
 			local playerLevel=math.min(calcLevel(Party[i].Experience),partyLvl) --accounts for the cases which you want to level a low lvl character
 			local multiplier1=((monLvl+10)/(playerLevel+5))^2
 			local multiplier2=1+(monLvl^0.5)-(playerLevel^0.5)
-			mult=math.min(math.max(multiplier1,multiplier2),partyLvl/2+5)
+			mult=math.min(math.max(multiplier1,multiplier2),10)
+			if mult<1 then
+				multiplier2=math.abs(multiplier2-1)
+				mult=math.min(math.min(multiplier1,1/multiplier2),0.1)
+			end
 			local experienceAwarded=experience*mult
 			Party[i].Experience=Party[i].Experience+experienceAwarded
 			
 			--calculate again based for bolster
 			playerLevel=partyLvl
-			multiplier1=((monLvl+10)/(playerLevel+5))^2
-			multiplier2=1+(monLvl^0.5)-(playerLevel^0.5)
-			mult=math.min(math.max(multiplier1,multiplier2),partyLvl/2+5)
 			bolsterExp=bolsterExp+experience*mult
 		end
 	end
