@@ -70,3 +70,16 @@ evt.Map[1001] = function()
 end
 
 Timer(evt.map[1001].last, const.Minute*5)
+
+
+if isRedone then
+	evt.hint[505] = evt.str[55]  -- "Erathia Portal"
+	evt.map[505] = function()
+		evt.ForPlayer(0)
+		if evt.Cmp("Inventory", 1472) then         -- "Erathia Portal"
+			evt.MoveToMap{X = -9853, Y = 8656, Z = -1024, Direction = 2047, LookAngle = 0, SpeedZ = 0, HouseId = 0, Icon = 0, Name = "7Out03.Odm"}
+		else
+			Game.ShowStatusText("You need a key to teleport to Erathia.")  -- "You need a key to teleport to Erathia."
+		end
+	end
+end
