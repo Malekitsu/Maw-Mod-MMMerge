@@ -698,6 +698,11 @@ function recalculateMonsterTable()
 		end
 		
 		bonusDamage=math.max((levelMult^0.88-LevelB^0.88),0)
+		local expectedDamage=3+totalLevel[i]^0.88
+		local currentDamage=(base.Attack1.DamageAdd+(base.Attack1.DamageDiceSides+1)*base.Attack1.DamageDiceCount/2)+bonusDamage
+		if currentDamage<expectedDamage then
+			bonusDamage=bonusDamage+expectedDamage-currentDamage
+		end
 		if bonusDamage>=20 then
 			levelMult=totalLevel[i]
 		end
