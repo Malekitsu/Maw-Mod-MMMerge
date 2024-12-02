@@ -416,6 +416,7 @@ function events.BuildStatInformationBox(t)
 		--get spell and its damage
 		DPS1, DPS2, DPS3, vitality=calcPowerVitality(pl)
 		local txt=string.format("Melee Power: %s\nRanged Power: %s\nSpell Power: %s",StrColor(255,0,0,DPS1),StrColor(200,200,0,DPS2),StrColor(50,50,220,DPS3))
+			
 		t.Text=string.format("%s\n%s",t.Text,txt)
 		
 	end
@@ -423,6 +424,7 @@ function events.BuildStatInformationBox(t)
 	if t.Stat==11 then
 		local i=Game.CurrentPlayer
 		local pl=Party[i]
+		local id=pl:GetIndex()
 		local fullHP=pl:GetFullHP()
 		--AC
 		local ac=pl:GetArmorClass()
@@ -450,7 +452,18 @@ function events.BuildStatInformationBox(t)
 		--calculation
 		local reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
 		vitality=math.round(fullHP/reduction)	
-		t.Text=string.format("%s\n\nVitality: %s",t.Text,StrColor(0,255,0,vitality))
+		
+		
+		--check and add equipped legendaries
+		local legTxt="Currently Active Legedendary effects:"
+		for i=1,#legendaryEffects-10 do
+			local legId=i+10
+			if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], legId) then
+				legTxt= legTxt .. StrColor(255,255,30,"\n\n - " .. legendaryEffects[legId])
+			end
+		end
+		
+		t.Text=string.format("%s\n\nVitality: %s",legTxt,StrColor(0,255,0,vitality))
 	end
 	
 	if t.Stat==13 or t.Stat==14 then
