@@ -137,3 +137,57 @@ evt.map[1888] = function()
 		evt.MoveToMap{3560, 7696, 544, 0, 0, 0, 0, 3, "out01.odm"}
 	end
 end
+if isRedone then
+	evt.hint[303] = evt.str[100]  -- ""
+	evt.map[303] = function()
+		evt.ForPlayer(0)
+		if evt.Cmp("Inventory", 1466) then         -- "Emerald Is. Teleportal Key"
+			evt.MoveToMap{X = 12409, Y = 4917, Z = -64, Direction = 1040, LookAngle = 0, SpeedZ = 0, HouseId = 0, Icon = 0, Name = "7Out01.Odm"}
+		else
+			Game.ShowStatusText("You need a key to teleport to Emerald Island.")  -- "You need a key to teleport to Emerald Island."
+		end
+	end
+	
+	evt.hint[304] = evt.str[100]  -- ""
+	evt.map[304] = function()
+		evt.ForPlayer(0)
+		if evt.Cmp("Inventory", 1470) then
+	       evt.MoveToMap{X = 17161, Y = -10827, Z = 0, Direction = 1024, LookAngle = 0, SpeedZ = 0, HouseId = 677, Icon = 4, Name = "Out09.odm"}         -- "Evenmorn Island"
+		else
+			Game.ShowStatusText("You need a key to teleport to Evenmorn Island.")  -- "You need a key to teleport to Evenmorn Island."
+		end
+	end
+	
+	evt.hint[217] = evt.str[3]  -- "Well"
+	evt.hint[305] = evt.str[19]  -- "Harmondale Teleportal Hub"
+	evt.map[305] = function()
+		evt.ForPlayer(0)
+		if evt.Cmp{"Inventory", Value = 1467} then         -- "Tatalia Teleportal Key"
+			evt.MoveToMap{X = 6604, Y = -8941, Z = 0, Direction = 1024, LookAngle = 0, SpeedZ = 0, HouseId = 677, Icon = 4, Name = "7Out13.odm"}         -- "Talalia"
+			goto _9
+		end
+		if evt.Cmp{"Inventory", Value = 1464} then         -- "Avlee Teleportal Key" "Faerie Key
+			goto _9
+		end
+		if evt.Cmp{"Inventory", Value = 1468} then         -- "Deja Teleportal Key"
+			goto _10
+		end
+		if evt.Cmp{"Inventory", Value = 1471} then         -- "Bracada Teleportal Key"
+			goto _11
+		end
+		if not evt.Cmp{"Inventory", Value = 1469} then         -- "Barrow Downs Key"
+			Game.ShowStatusText("You need a key to use this hub. Talk to Illene Farswell.")     -- "You need a key to use this hub. Talk to Illene Farswell!"
+			return
+		end
+	::_12::
+		evt.MoveToMap{X = -2283, Y = 5341, Z = 2240, Direction = 1024, LookAngle = 0, SpeedZ = 0, HouseId = 677, Icon = 4, Name = "Out11.odm"}         -- "Barrow Downs"
+		do return end
+	::_9::
+		evt.MoveToMap{X = 14414, Y = 12615, Z = 0, Direction = 768, LookAngle = 0, SpeedZ = 0, HouseId = 677, Icon = 4, Name = "Out14.odm"}         -- "Avlee"
+	::_10::
+		evt.MoveToMap{X = 4586, Y = -12681, Z = 0, Direction = 512, LookAngle = 0, SpeedZ = 0, HouseId = 677, Icon = 4, Name = "7Out05.odm"}         -- "Deyja"
+	::_11::
+		evt.MoveToMap{X = 8832, Y = 18267, Z = 0, Direction = 1536, LookAngle = 0, SpeedZ = 0, HouseId = 677, Icon = 4, Name = "7Out06.odm"}         -- "Bracada Desert"
+		goto _12
+	end
+end
