@@ -142,3 +142,8 @@ evt.map[261] = function()
 	end
 	evt.StatusText{Str = 24}         -- "You pray at the shrine."
 end
+
+if isRedone then
+	evt.HouseDoor(29, 560)  -- "Tarent Hovel"
+	evt.house[30] = 560  -- "Tarent Hovel"
+end
