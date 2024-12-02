@@ -709,7 +709,7 @@ function recalculateMonsterTable()
 		
 		mon.ArmorClass=base.ArmorClass*((levelMult+10)/(LevelB+10))
 		
-		dmgMult=(levelMult/9+1.15)*(1+(levelMult/200))
+		dmgMult=getMonsterDamage(levelMult,"baseMult")
 		--DAMAGE COMPUTATION
 		atk1=base.Attack1
 		mon.Attack1.DamageAdd, mon.Attack1.DamageDiceSides, mon.Attack1.DamageDiceCount, extraMult1 = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult,bonusDamage)
@@ -1856,28 +1856,7 @@ function events.BuildMonsterInformationBox(t)
 		t.ArmorClass.Text=string.format("Level:          " .. lvl .. "\n" .. t.ArmorClass.Text)
 	end
 	--difficulty multiplier
-	diff=Game.BolsterAmount/100 or 1
-	if diff==0.5 then
-		diff=0.7
-	end
-	if diff==0 then
-		diff=0.4
-	end
-	if Game.BolsterAmount==150 then
-		diff=1.12+math.round(lvl/600)
-	end
-	if Game.BolsterAmount==200 then
-		diff=1.25+math.round(lvl/400)
-	end
-	if Game.BolsterAmount==300 then
-		diff=1.5+math.round(lvl/300)
-	end
-	if vars.Mode==2 then
-		diff=2+math.round(lvl/200)
-	end
-	if vars.insanityMode then
-		diff=diff*(1.5+lvl/300)
-	end
+	local diff=getMonsterDamage(lvl,"diffMult")
 	if getMapAffixPower(1) then
 		diff=diff*(1+getMapAffixPower(1)/100)
 	end
@@ -1924,7 +1903,7 @@ function events.BuildMonsterInformationBox(t)
 			local i=mon.Id
 			bonusDamage=math.max((lvl^0.88-BLevel[i]^0.88),0)
 			
-			dmgMult=(lvl/9+1.15)*(1+(lvl/200))
+			dmgMult=getMonsterDamage(lvl,"baseMult")
 			if spellId==6 or spellId==97 then
 				dmgMult=dmgMult/2
 			end
@@ -3323,4 +3302,44 @@ function events.PickCorpse(t)
 		mon.TreasureDiceSides=0
 		mon.TreasureDiceCount=0
 	end
+end
+
+function getMonsterDamage(lvl,calcType)
+	local baseDamage=(3+lvl^0.88)
+	if calcType=="baseDamage" then
+		return baseDamage
+	end
+	local baseMult=(1.15+lvl/9)*(1+lvl/200)
+	if calcType=="baseMult" then
+		return baseMult
+	end
+	local diffMult=1
+	local bol=Game.BolsterAmount
+	if bol==0 then
+		diffMult=0.4
+	elseif bol==50 then
+		diffMult=0.7
+	elseif bol==100 then
+		diffMult=1
+	elseif bol==150 then
+		diffMult=lvl/600+1.12
+	elseif bol==200 then
+		diffMult=lvl/400+1.25
+	elseif bol==300 then
+		diffMult=lvl/300+1.5
+	elseif bol==600 then
+		diffMult=lvl/200+2
+	end
+	if vars.insanityMode then
+		diffMult=diffMult*(1.5+lvl/300)
+	end
+	if calcType=="diffMult" then
+		return diffMult
+	end
+	local totMult=baseMult*diffMult
+	if calcType=="totMult" then
+		return totMult
+	end
+	local totDamage=diffMult*baseDamage*diffMult
+	return totDamage
 end
