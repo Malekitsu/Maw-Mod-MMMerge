@@ -422,7 +422,7 @@ function events.MonsterKillExp(t)
 			local multiplier2=1+(monLvl^0.5)-(playerLevel^0.5)
 			mult=math.min(math.max(multiplier1,multiplier2),10)
 			if mult<1 then
-				multiplier2=math.abs(multiplier2-1)
+				multiplier2=1+(playerLevel^0.5)-(monLvl^0.5)
 				mult=math.min(math.min(multiplier1,1/multiplier2),0.1)
 			end
 			local experienceAwarded=experience*mult
