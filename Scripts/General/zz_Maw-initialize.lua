@@ -17,6 +17,9 @@ partyMultyBagSortKey=71
 AlchemyBagKey=69
 
 function events.GameInitialized2()
+	if Game.ItemsTxt[1466].Name=="Emerald Island" then
+		isRedone=true
+	end
 	for i=0,11 do
 		Skillz.setDesc(i,1,Skillz.getDesc(i,1) .. "\n")
 	end
