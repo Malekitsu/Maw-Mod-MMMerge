@@ -3340,6 +3340,6 @@ function getMonsterDamage(lvl,calcType)
 	if calcType=="totMult" then
 		return totMult
 	end
-	local totDamage=diffMult*baseDamage*diffMult
+	local totDamage=baseMult*baseDamage*diffMult
 	return totDamage
 end
