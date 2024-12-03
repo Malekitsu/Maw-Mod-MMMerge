@@ -869,8 +869,10 @@ function events.GameInitialized2()
 		if table.find(shamanClass, t.Player.Class) and t.Player.Unconscious==0 and t.Player.Dead==0 and t.Player.Eradicated==0  then
 			m2=SplitSkill(t.Player.Skills[const.Skills.Air])
 			m3=SplitSkill(t.Player.Skills[const.Skills.Water])
-			mult=((math.max(Game.BolsterAmount, 100)/100)-1)/2+1
-			t.Result=math.max((t.Result-m3^2.25/(100+pl.LevelBase)*50*mult+m3)*0.99^(1+m2^2/pl.LevelBase*5), t.Result*0.175)
+			local lvl=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
+			local reduction=getMonsterDamage(lvl^0.325*m3)^0.7
+			t.Result=math.max(t.Result-reduction, t.Result*0.25)
+			t.Result=t.Result*0.99^(1+m2^2/pl.LevelBase*5)
 		end
 	end
 	
@@ -938,7 +940,8 @@ local function shamanSkills(isShaman, id)
 		txt=baseSchoolsTxt[13] .. "\n\nReduce all damage taken by " .. airReduction .. " %"
 		Skillz.setDesc(13,1,txt)
 		mult=((math.max(Game.BolsterAmount, 100)/100)-1)/2+1
-		local waterReduction=math.round(m3^2.25/(100+pl.LevelBase)*50*mult+m3)
+		local lvl=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
+		local waterReduction=math.round(getMonsterDamage(lvl^0.325*m3)^0.7)
 		txt=baseSchoolsTxt[14] .. "\n\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)"
 		Skillz.setDesc(14,1,txt)
 		local armsmasterDamage=math.round(m4^2.6/(10+pl.LevelBase)*10+m4)
