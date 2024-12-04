@@ -80,7 +80,7 @@ skillDamage =
 	[const.Skills.Bow]		= {[0]=0, 2, 4, 6, 8,},
 	[const.Skills.Mace]		= {[0]=0, 1, 2, 3, 3,},
 	[const.Skills.Blaster]	= {[0]=0, 2, 4, 6, 8,},
-	[const.Skills.Unarmed]	= {[0]=0, 6, 8, 10, 12,},
+	[const.Skills.Unarmed]	= {[0]=0, 3, 4, 5, 6,},
 }
 -- weapon skill AC bonuses (by rank)
 
