@@ -144,6 +144,12 @@ twoHandedWeaponDamageBonusByMastery = {
 	[const.GM] = 4 
 }
 
+armsmasterSkill={
+	["Damage"]={0.5,1,1.5,2,[0]=0},
+	["Speed"]={0,1,2,2,[0]=0},
+	["Attack"]={1,1,2,3,[0]=0},
+}
+
 --all stats bonus are calculated in Maw Items, as this function only changes hp,sp,ac,attack and damage
 function events.CalcStatBonusBySkills(t)
 	t.Result=0
@@ -243,10 +249,7 @@ function events.GetAttackDelay(t)
 		end
 		
 		local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Armsmaster))
-		if m>=3 then
-			s=s*2
-		end
-		bonusSpeed=bonusSpeed+s
+		bonusSpeed=bonusSpeed+s*armsmasterSkill.Speed[m]
 	end
 	if table.find(dkClass, t.Player.Class) then
 		local s, m=SplitSkill(t.Player.Skills[const.Skills.Water])
@@ -643,10 +646,10 @@ function events.GameInitialized2()
 	Game.SkillDesGM[const.Skills.Plate]=string.format("%s rec. pen. elim.",Game.SkillDesGM[const.Skills.Plate])
 	Game.SkillDesExpert[const.Skills.Shield]=string.format("%s recovery penalty eliminated",Game.SkillDesExpert[const.Skills.Shield])
 	Game.SkillDesGM[const.Skills.Shield]=string.format("%s 15%% Magic damage reduction",Game.SkillDesGM[const.Skills.Shield])
-	Game.SkillDesNormal[const.Skills.Armsmaster]=string.format("Skills adds 1 dmg and 1%% speed")
-	Game.SkillDesExpert[const.Skills.Armsmaster]=string.format("Skills adds 2 dmg, 1 atk, 1%% speed")
-	Game.SkillDesMaster[const.Skills.Armsmaster]=string.format("Skills adds 3 dmg, 2 atk, 2%% speed")
-	Game.SkillDesGM[const.Skills.Armsmaster]=string.format("Skills adds 4 dmg, 2 atk, 2%% speed")
+	Game.SkillDesNormal[const.Skills.Armsmaster]=string.format("Skills adds " .. armsmasterSkill.Damage[1] .. " dmg and " .. armsmasterSkill.Attack[1] .. " atk")
+	Game.SkillDesExpert[const.Skills.Armsmaster]=string.format("Skills adds " .. armsmasterSkill.Damage[2] .. " dmg, " .. armsmasterSkill.Attack[2] .. " atk, " .. armsmasterSkill.Speed[2] .. "%% speed")
+	Game.SkillDesMaster[const.Skills.Armsmaster]=string.format("Skills adds " .. armsmasterSkill.Damage[3] .. " dmg, " .. armsmasterSkill.Attack[3] .. " atk, " .. armsmasterSkill.Speed[3] .. "%% speed")
+	Game.SkillDesGM[const.Skills.Armsmaster]=string.format("Skills adds " .. armsmasterSkill.Damage[4] .. " dmg, " .. armsmasterSkill.Damage[4] .. " atk, " .. armsmasterSkill.Speed[4] .. "%% speed")
 	Game.SkillDesMaster[const.Skills.Dodging]=string.format("%s usable with Leather Armor",Game.SkillDesGM[const.Skills.Dodging])
 	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Dodging])
 	--Game.SkillDesGM[const.Skills.Unarmed]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Unarmed])	
