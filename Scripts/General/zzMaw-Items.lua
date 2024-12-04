@@ -2575,7 +2575,7 @@ function itemStats(index)
 			
 			local side=sidesBonus*mult
 			local add=bonus*mult
-			local armsDmg=armsmasterDamage[m]*s*mult
+			local armsDmg=armsmasterSkill.Damage[m]*s*mult
 			
 			--substitute with unarmed if staff
 			if skill==0 then
@@ -2586,22 +2586,22 @@ function itemStats(index)
 			--make classes such as DK, SERAPH,SHAMAN to make their bonus work in a similar way as armsmaster
 			--DK
 			if table.find(dkClass, pl.Class) then	
-				local s1, m1=SplitSkill(pl.Skills[const.Skills.Water])
+				local s1, m1=SplitSkill(pl.Skills[const.Skills.Water]
 				local s2, m2=SplitSkill(pl.Skills[const.Skills.Dark])
-				local bonus=s1*math.min(m1, 3)+s2*math.min(m2, 3)
+				local bonus=s1*math.min(m1, 3)/2+s2*math.min(m2, 3)/2
 				armsDmg=armsDmg+bonus*mult
 			end
 			--SERAPHIM
 			if table.find(seraphClass, pl.Class) then	
 				local s1, m1=SplitSkill(pl.Skills[const.Skills.Mind])
 				local s2, m2=SplitSkill(pl.Skills[const.Skills.Light])
-				local bonus=s1*m1+s2*m2
+				local bonus=s1*m1/2+s2*m2/2
 				armsDmg=armsDmg+bonus*mult
 			end
 			--SHAMAN
 			if table.find(shamanClass, pl.Class) then	
-				local m4=SplitSkill(pl.Skills[const.Skills.Earth])
-                armsDmg=armsDmg+math.round(m4^2.6/(10+pl.LevelBase)*10+m4)*mult
+				local s4=SplitSkill(pl.Skills[const.Skills.Earth])
+                armsDmg=armsDmg+math.round((m4)^2.6/(10+pl.LevelBase)*10+m4)*mult/2
 			end
 			--split armsmaster between main and offhand
 			local item=pl:GetActiveItem(0)
@@ -2908,7 +2908,7 @@ function itemStats(index)
 	--armsmaster attack
 	local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
 	if m>0 then
-		tab[40]=tab[40]+armsmasterAttack[m]*s
+		tab[40]=tab[40]+armsmasterSkill.Attack[m]*s
 	end
 	--unarmed
 	local s,m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
@@ -2974,9 +2974,6 @@ function itemStats(index)
 	tab[47]=tab[47]+(tab[47]+bonusDamage)*might/1000
 	return tab
 end
-
-armsmasterAttack={[0]=0,0,1,2,2}
-armsmasterDamage={[0]=0,1,2,3,4}
 
 equipSpellMap={
 	[30] = const.Skills.Fire,
