@@ -604,7 +604,7 @@ function recalculateMonsterTable()
 		--HP
 		HPBolsterLevel=basetable[i].Level*(1+(0.1*(totalLevel[i]-basetable[i].Level)/100))+(totalLevel[i]-basetable[i].Level)*0.9
 		HPtable=HPtable or {}
-		HPtable[i]=HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180)
+		HPtable[i]=HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/360)
 		--resistances 
 		bolsterRes=math.max(math.round((totalLevel[i]-basetable[i].Level)/10)*5,0)
 		--mapping
@@ -668,18 +668,18 @@ function recalculateMonsterTable()
 		end
 		--Hard
 		if Game.BolsterAmount==150 then
-			hpMult=hpMult*(1.5+totalLevel[i]/900)
+			hpMult=hpMult*(1.25+totalLevel[i]/900)
 		end
 		--Hell
 		if Game.BolsterAmount==200 then
-			hpMult=hpMult*(2+totalLevel[i]/600)
+			hpMult=hpMult*(1.5+totalLevel[i]/600)
 		end
 		--Nightmare
 		if Game.BolsterAmount==300 then
-			hpMult=hpMult*(2.5+totalLevel[i]/450)
+			hpMult=hpMult*(1.75+totalLevel[i]/450)
 		end
 		if Game.BolsterAmount==600 then
-			hpMult=hpMult*(3+totalLevel[i]/300)
+			hpMult=hpMult*(2+totalLevel[i]/300)
 		end	
 		if vars.insanityMode then
 			hpMult=hpMult*(1.5+totalLevel[i]/300)
