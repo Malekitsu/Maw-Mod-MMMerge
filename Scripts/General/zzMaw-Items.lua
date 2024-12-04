@@ -2601,7 +2601,7 @@ function itemStats(index)
 			--SHAMAN
 			if table.find(shamanClass, pl.Class) then	
 				local s4=SplitSkill(pl.Skills[const.Skills.Earth])
-                armsDmg=armsDmg+math.round((m4)^2.6/(10+pl.LevelBase)*10+m4)*mult/2
+                armsDmg=armsDmg+math.round((s4)^2.6/(10+pl.LevelBase)*10+s4)*mult/2
 			end
 			--split armsmaster between main and offhand
 			local item=pl:GetActiveItem(0)
