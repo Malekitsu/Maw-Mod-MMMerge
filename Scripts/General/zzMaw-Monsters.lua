@@ -2198,7 +2198,7 @@ function events.MonsterKilled(mon)
 				if vars.InsanitMode then
 					totalMonster=totalMonster*0.8
 				end
-				local experience=math.ceil(totalMonster^0.7*(mapLevel*20+mapLevel^1.8)/3/1000)*1000*(bolster+mapLevel)/mapLevel
+				local experience=math.ceil(totalMonster^0.7*(mapLevel*20+mapLevel^1.8)/3*(bolster+mapLevel)/mapLevel/1000)*1000
 				--bolster code
 				bonusExp=experience
 				local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
@@ -3340,6 +3340,6 @@ function getMonsterDamage(lvl,calcType)
 	if calcType=="totMult" then
 		return totMult
 	end
-	local totDamage=baseMult*baseDamage*diffMult
+	local totDamage=baseDamage*baseMult*diffMult
 	return totDamage
 end
