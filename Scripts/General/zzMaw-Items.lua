@@ -2586,7 +2586,7 @@ function itemStats(index)
 			--make classes such as DK, SERAPH,SHAMAN to make their bonus work in a similar way as armsmaster
 			--DK
 			if table.find(dkClass, pl.Class) then	
-				local s1, m1=SplitSkill(pl.Skills[const.Skills.Water]
+				local s1, m1=SplitSkill(pl.Skills[const.Skills.Water])
 				local s2, m2=SplitSkill(pl.Skills[const.Skills.Dark])
 				local bonus=s1*math.min(m1, 3)/2+s2*math.min(m2, 3)/2
 				armsDmg=armsDmg+bonus*mult
