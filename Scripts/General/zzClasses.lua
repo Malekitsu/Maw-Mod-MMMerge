@@ -333,17 +333,14 @@ local function seraphSkills(isSeraph, id)
 		
 		local spiritHeal=math.round(spiritS*(spiritM*2+math.floor(pl.LevelBase/20))*damageMultiplier[pl:GetIndex()]["Melee"]*healMult)
 		local bodyHeal=math.round(bodyS*(bodyM*2+math.floor(pl.LevelBase/20))*damageMultiplier[pl:GetIndex()]["Melee"]*healMult)
-		local txt=baseSchoolsTxtSERAPH[16] .. "\n\nSeraphim healing upon attack increases depending on Spirit magic, scaling with personality(weapon speed multiplier applies).\nGets 1 bonus heal each 100 levels.\n\n" .. "Current heal from Spirit: " .. StrColor(0,255,0,spiritHeal) .. "\n"
+		local txt=baseSchoolsTxtSERAPH[16] .. "\n\nSeraphim healing upon attack increases depending on Spirit magic, scaling with personality(weapon speed multiplier applies).\nGets 1 bonus heal each 20 levels.\n\n" .. "Current heal from Spirit: " .. StrColor(0,255,0,spiritHeal) .. "\n"
 		Skillz.setDesc(16,1,txt)
-		local txt=baseSchoolsTxtSERAPH[18] .. "\n\nSeraphim healing upon attack increases depending on Body magic, scaling with personality(weapon speed multiplier applies).\nGets 1 bonus heal each 100 levels.\n\n" .. "Current heal from Body: " .. StrColor(0,255,0,bodyHeal) .. "\n"
+		local txt=baseSchoolsTxtSERAPH[18] .. "\n\nSeraphim healing upon attack increases depending on Body magic, scaling with personality(weapon speed multiplier applies).\nGets 1 bonus heal each 20 levels.\n\n" .. "Current heal from Body: " .. StrColor(0,255,0,bodyHeal) .. "\n"
 		Skillz.setDesc(18,1,txt)
 		
 		--damage tooltip
-		local lvlBonus=math.floor(pl.LevelBase/100)
-		local might=pl:GetMight()
-		local dmgMult=1+might/1000
-		local mindDMG=math.floor((mindS*(mindM+lvlBonus))*dmgMult)
-		local lightDMG=math.floor((lightS*(lightM+lvlBonus))*dmgMult)
+		local mindDMG=math.floor((mindS*(mindM))*dmgMult)/2
+		local lightDMG=math.floor((lightS*(lightM))*dmgMult)/2
 		local txt=baseSchoolsTxtSERAPH[16] .. "\n\nSeraphim damage upon attack increases depending on Mind magic, scaling with might(weapon speed multiplier applies).\n\n" .. "Current damage from Mind: " .. StrColor(255,0,0,mindDMG) .. "\n"
 		Skillz.setDesc(17,1,txt)
 		local txt=baseSchoolsTxtSERAPH[18] .. "\n\nSeraphim damage upon attack increases depending on Light magic, scaling with might(weapon speed multiplier applies).\n\n" .. "Current damage from Light: " .. StrColor(255,0,0,lightDMG) .. "\n"
@@ -354,18 +351,18 @@ local function seraphSkills(isSeraph, id)
 		Skillz.setDesc(16,3,"Increases healing by 4 per Skill point")
 		Skillz.setDesc(16,4,"Increases healing by 6 per Skill point")
 		
-		Skillz.setDesc(17,2,"Increases damage by 1 per Skill point")
-		Skillz.setDesc(17,3,"Increases damage by 2 per Skill point")
-		Skillz.setDesc(17,4,"Increases damage by 3 per Skill point")
+		Skillz.setDesc(17,2,"Increases damage by 0.5 per Skill point")
+		Skillz.setDesc(17,3,"Increases damage by 1 per Skill point")
+		Skillz.setDesc(17,4,"Increases damage by 1.5 per Skill point")
 		
 		Skillz.setDesc(18,2,"Increases healing by 2 per Skill point")
 		Skillz.setDesc(18,3,"Increases healing by 4 per Skill point")
 		Skillz.setDesc(18,4,"Increases healing by 6 per Skill point")
 		
-		Skillz.setDesc(19,2,"Increases damage by 1 per Skill point")
-		Skillz.setDesc(19,3,"Increases damage by 2 per Skill point")
-		Skillz.setDesc(19,4,"Increases damage by 3 per Skill point")
-		Skillz.setDesc(19,5,"Increases damage by 4 per Skill point")
+		Skillz.setDesc(19,2,"Increases damage by 0.5 per Skill point")
+		Skillz.setDesc(19,3,"Increases damage by 1 per Skill point")
+		Skillz.setDesc(19,4,"Increases damage by 1.5 per Skill point")
+		Skillz.setDesc(19,5,"Increases damage by 2 per Skill point")
 	else
 		for key, value in pairs(baseSchoolsTxtSERAPH) do
 			Skillz.setDesc(key,1,value .. "\n")
@@ -944,7 +941,7 @@ local function shamanSkills(isShaman, id)
 		local waterReduction=math.round(getMonsterDamage(lvl^0.325*m3)^0.7)
 		txt=baseSchoolsTxt[14] .. "\n\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)"
 		Skillz.setDesc(14,1,txt)
-		local armsmasterDamage=math.round(m4^2.6/(10+pl.LevelBase)*10+m4)
+		local armsmasterDamage=math.round(m4^2.6/(10+pl.LevelBase)*10+m4)/2
 		txt=baseSchoolsTxt[15] .. "\n\nIncreases melee damage by ".. armsmasterDamage .. ""
 		Skillz.setDesc(15,1,txt)
 		local spelldh=math.round(m5^2/pl.LevelBase/6*100)
@@ -1328,12 +1325,12 @@ local function dkSkills(isDK, id)
 		Skillz.setName(18, "Blood")
 		Skillz.setName(20, "Unholy")
 		local txt
-		txt="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Expert, Master) and increases attack speed by 2% per skill point.\n"
+		txt="This skill is only available to death knights and increases damage by 0.5-1-1.5 (at Novice, Expert, Master) and increases attack speed by 2% per skill point.\n"
 		Skillz.setDesc(14,1,txt)
 		local leech=math.round(bloodS/math.round(pl.LevelBase^0.7)*5*100)/100
 		txt="This skill is only available to death knights and reduces physical damage taken by 1% per skill point.\nAdditionally it will make your attacks to leech damage based on your total HP.\n\nCurrent leech vs. same level monsters: " .. leech .. "%\n"            
 		Skillz.setDesc(18,1,txt)
-		txt="This skill is only available to death knights and increases damage by 1-2-3 (at Novice, Expert, Master) and reduces magical damage taken by 1% per skill point.\n"	
+		txt="This skill is only available to death knights and increases damage by 0.5-1-1.5 (at Novice, Expert, Master) and reduces magical damage taken by 1% per skill point.\n"	
 		Skillz.setDesc(20,1,txt)
 		Skillz.setDesc(14,5,"Effects vary per spell")
 		Skillz.setDesc(18,5,"Effects vary per spell")
