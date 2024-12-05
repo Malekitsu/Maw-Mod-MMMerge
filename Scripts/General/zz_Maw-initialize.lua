@@ -8,6 +8,7 @@ Game.PatchOptions.FixMonstersBlockingShots=true
 buffRework=true
 restoreMM6Glory=true
 disableDamageOnFriendlyUnits=true
+disableHomingProjectiles=false
 
 --sorting buttons
 currentBagSortKey=82
