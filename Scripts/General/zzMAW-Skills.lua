@@ -331,6 +331,9 @@ function calculateAngle(vector1, vector2)
 end
 
 homingDegree=0.5
+if disableHomingProjectiles then
+	homingDegree=0
+end
 local function navigateMissile(object)
 
 	-- exclude some special non targeting spells
