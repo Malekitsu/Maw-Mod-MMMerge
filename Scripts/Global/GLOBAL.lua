@@ -58,13 +58,12 @@ function events.EvtGlobal(i) -- happens after related global evt executed
 	end
 		
 end
-function events.LoadMap()
+function events.Tick()
 	if not vars.lastPartyExperience then
 		vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
 	end
 end
 function events.EvtMap(i)
-	vars.lastPartyExperience=vars.lastPartyExperience
 	if Party[0]:GetIndex()==vars.lastPartyExperience[1] then --check if party member isn't changed
 		if Party[0].Experience>vars.lastPartyExperience[2] then --bolster
 			local expGained=Party[0].Experience-vars.lastPartyExperience[2]
