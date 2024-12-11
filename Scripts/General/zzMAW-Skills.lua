@@ -1214,7 +1214,7 @@ function MawRegen()
 				
 			end
 			
-			local SPREGEN = (FSP^0.25*RegS^1.75*((RegM+5)/5000) +0.02)
+			local SPREGEN = (FSP^0.25*RegS^1.4*((RegM+5)/5000) +0.02)
 			
 			for it in pl:EnumActiveItems() do
 				--[[special enchants now increase meditation
@@ -1232,7 +1232,7 @@ function MawRegen()
 			if buffRework and vars.mawbuff[56] and not table.find(classesWithNoMeditationRegen, pl.Class) then
 				local s, m, level=getBuffSkill(56)
 				local level=level^0.6
-				regenSP[i] = regenSP[i] + (FSP^0.25*level^1.75*((buffPower[56].Base[m])/15000) +0.1)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
+				regenSP[i] = regenSP[i] + (FSP^0.25*level^1.4*((buffPower[56].Base[m])/15000) +0.1)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
 			end
 			--dragon regen
 			if pl.Class==10 then
@@ -1266,8 +1266,8 @@ function events.Tick()
 		local FHP=pl:GetFullHP()
 		local s,m = SplitSkill(pl:GetSkill(30))
 		local regenEffect={[0]=0,3,4,6,6}
-		local hpRegen = math.round(FHP^0.5*s^1.75*((regenEffect[m])/35))/10
-		local hpRegen2 = math.round(FHP^0.5*(s+1)^1.75*((regenEffect[m])/35))/10
+		local hpRegen = math.round(FHP^0.5*s^1.4*((regenEffect[m])/35))/10
+		local hpRegen2 = math.round(FHP^0.5*(s+1)^1.4*((regenEffect[m])/35))/10
 		local txt = string.format("%s\n\nCurrent HP Regeneration: %s\nNext Level Bonus: %s HP Regen",baseRegStr,StrColor(0,255,0,hpRegen),StrColor(0,255,0,"+" .. hpRegen2-hpRegen))
 		Skillz.setDesc(30,1,txt)
 		--meditation tooltip
@@ -1279,8 +1279,8 @@ function events.Tick()
 		if m==4 then
 			m=8
 		end
-		local spRegen = (FSP^0.25*s^1.75*((m+5)/50)+2)/10
-		local spRegen2 = (FSP^0.25*(s+1)^1.75*((m+5)/50)+2)/10
+		local spRegen = (FSP^0.25*s^1.4*((m+5)/50)+2)/10
+		local spRegen2 = (FSP^0.25*(s+1)^1.4*((m+5)/50)+2)/10
 		local spRegen2 = math.round((spRegen2-spRegen)*100)/100
 		if spRegen>10 then
 			spRegen = math.round((spRegen)*10)/10
