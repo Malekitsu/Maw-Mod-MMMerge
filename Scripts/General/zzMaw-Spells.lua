@@ -1695,8 +1695,12 @@ function ascension()
 		end
 		--shaman modifier
 		if table.find(shamanClass, pl.Class) then
-			local m7=SplitSkill(pl.Skills[const.Skills.Body])
-			local mult=1+m7^2/pl.LevelBase/10
+			local s=0
+			for school=12,18 do
+				skill=SplitSkill(pl.Skills[school])
+				s=s+skill
+			end
+			local mult=1+s/400
 			for i=1,5 do
 				for v=1,4 do
 					healingSpells[healingList[i]].Scaling[v]=math.round(healingSpells[healingList[i]].Scaling[v]*mult)
