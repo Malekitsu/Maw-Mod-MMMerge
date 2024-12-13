@@ -71,6 +71,19 @@ function events.CalcDamageToMonster(t)
 			t.Result=t.Result+dmg
 		end
 	end
+	--shaman fire damage
+	if data and data.Player and table.find(shamanClass, data.Player.Class) and t.DamageKind==4 and data.Object==nil and t.Result>0 then	
+		local s1=SplitSkill(t.Player.Skills[const.Skills.Fire])
+		local fireDamage=s1*0.001
+		if t.Monster.Resistances[0]>=1000 then
+			mult=2^math.floor(t.Monster.Resistances[0]/1000)
+			fireDamage=fireDamage*mult
+		end
+		fireDamage=math.max(t.Monster.HP*fireDamage,s1)
+		fireRes=t.Monster.Resistances[0]%1000
+		fireDamage=fireDamage/2^(fireRes/100)
+		t.Result=t.Result+fireDamage
+	end
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 21) then
 		local mult=1
 		for i=0, Map.Monsters.High do
@@ -129,7 +142,20 @@ function events.CalcDamageToMonster(t)
 			end
 		end
 	end
-	
+	if data and data.Player and table.find(shamanClass, data.Player.Class)  then
+		if t.Result>0 and data and data.Object==nil and t.DamageKind==4 then
+			local s=SplitSkill(t.Player.Skills[const.Skills.Spirit])
+			t.Result=t.Result*(1+s*0.01)
+		elseif t.Result>0 and data and data.Object and data.Object.Spell>0 and data.Object.Spell<99 then
+			local s=0
+			for school=12,18 do
+				skill=SplitSkill(data.Player.Skills[school])
+				s=s+skill
+			end
+			local mult=1+s/200
+			t.Result=t.Result*mult
+		end
+	end
 end
 
 function changePlayer(id)
