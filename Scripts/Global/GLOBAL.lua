@@ -64,7 +64,7 @@ function events.Tick()
 	end
 end
 function events.EvtMap(i)
-	if Party[0]:GetIndex()==vars.lastPartyExperience[1] then --check if party member isn't changed
+	if vars.lastPartyExperience and Party[0]:GetIndex()==vars.lastPartyExperience[1] then --check if party member isn't changed
 		if Party[0].Experience>vars.lastPartyExperience[2] then --bolster
 			local expGained=Party[0].Experience-vars.lastPartyExperience[2]
 			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
