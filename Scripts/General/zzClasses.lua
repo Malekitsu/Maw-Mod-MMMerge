@@ -846,22 +846,12 @@ end
 --SHAMAN
 ---------------------------------------
 function events.GameInitialized2()
-	Game.ClassDescriptions[59] = "The Shaman is a mystical warrior whose knowledge of magic enhances his martial prowess.\nYou can check following values by checking magic schools description in skills menu.\n - Each school will provide a unique bonus, the bonus will be based on skill rank ^2 divided by level. There is strength in diversifying as well as specialization\n - Each point in Air will reduce damage a % pr rank reduced by level\n - Each point in Water will reduce damage by a flat number, making water better for weaker enemies, or if your defenses are already strong\n - Each point in spirit will increase healing and spell damage by a %\n - Fire will deal a % of current monster HP as fire damage, partially piercing this resistance. The bosskiller.\n - Each point in Earth will increase melee damage by a flat amount\n - Each point in Body will heal by flat amount and increase healing spells by a %\n - Each point in mind will restore a flat amount of mana"
+	Game.ClassDescriptions[59] = "The Shaman is a mystical warrior whose knowledge of magic enhances his martial prowess.\nYou can check following values by checking magic schools description in skills menu.\n - Each school will provide a unique bonus. There is strength in diversifying as well as specialization\n - Each point in Air will reduce damage a % pr rank reduced by level\n - Each point in Water will reduce damage by a flat number, making water better for weaker enemies, or if your defenses are already strong\n - Each point in spirit will increase healing and spell damage by a %\n - Fire will deal a % of current monster HP as fire damage, partially piercing this resistance. The bosskiller.\n - Each point in Earth will increase melee damage by a flat amount\n - Each point in Body will heal by flat amount\n - Each point in mind will restore a flat amount of mana"
 end
 
 shamanClass={59, 60, 61}
 
 function events.GameInitialized2()
-	function events.CalcSpellDamage(t)
-		local data = WhoHitMonster()
-		if data and data.Player and table.find(shamanClass, data.Player.Class)  then	
-
-			m5=SplitSkill(data.Player.Skills[const.Skills.Spirit])
-
-			t.Result =t.Result+t.Result*m5^2/pl.LevelBase/6
-		end
-	end
-
 	function events.CalcDamageToPlayer(t)
 		if table.find(shamanClass, t.Player.Class) and t.Player.Unconscious==0 and t.Player.Dead==0 and t.Player.Eradicated==0  then
 			m2=SplitSkill(t.Player.Skills[const.Skills.Air])
@@ -869,27 +859,21 @@ function events.GameInitialized2()
 			local lvl=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
 			local reduction=getMonsterDamage(lvl^0.325*m3)^0.7
 			t.Result=math.max(t.Result-reduction, t.Result*0.25)
-			t.Result=t.Result*0.99^(1+m2^2/pl.LevelBase*5)
+			t.Result=t.Result*0.99^m2
 		end
 	end
 	
 	function events.CalcDamageToMonster(t)	
 		local data = WhoHitMonster()
-		if data and data.Player and table.find(shamanClass, data.Player.Class) and t.DamageKind==4 and data.Object==nil then	
-			m1=SplitSkill(t.Player.Skills[const.Skills.Fire])
+		if data and data.Player and table.find(shamanClass, data.Player.Class) and t.DamageKind==4 and data.Object==nil and t.Result>0 then	
 			m6=SplitSkill(data.Player.Skills[const.Skills.Mind])
-			m7=SplitSkill(data.Player.Skills[const.Skills.Body])
-			data.Player.SP=math.min(data.Player.SP+m6^2/pl.LevelBase*25+m6, data.Player:GetFullSP())
-			data.Player.HP=math.min((data.Player.HP+m7^2/(10+pl.LevelBase)*75+m7), data.Player:GetFullHP())
-			local fireDamage=(m1^2/(25+pl.LevelBase)^2)
-			if t.Monster.Resistances[0]>=1000 then
-				mult=2^math.floor(t.Monster.Resistances[0]/1000)
-				fireDamage=fireDamage*mult
-			end
-			fireDamage=math.max(t.Monster.HP*fireDamage,m1)
-			fireRes=t.Monster.Resistances[0]%1000
-			fireDamage=fireDamage/2^(fireRes/200)
-			t.Result=t.Result+fireDamage
+			m7,bM=SplitSkill(data.Player.Skills[const.Skills.Body])
+			
+			local FHP=data.Player:GetFullHP()
+			local leech=math.round(FHP^0.5* m7^1.5/100 * (0.5+bM/2))
+			
+			data.Player.SP=math.min(data.Player.SP+m6^1.5, data.Player:GetFullSP())
+			data.Player.HP=math.min(data.Player.HP+leech, data.Player:GetFullHP())
 		end
 	end
 	--[[
@@ -925,34 +909,33 @@ local function shamanSkills(isShaman, id)
 		local m1=SplitSkill(pl.Skills[const.Skills.Fire])
 		local m2=SplitSkill(pl.Skills[const.Skills.Air])
 		local m3=SplitSkill(pl.Skills[const.Skills.Water])
-		local m4=SplitSkill(pl.Skills[const.Skills.Earth])
+		local m4, earthMastery=SplitSkill(pl.Skills[const.Skills.Earth])
 		local m5=SplitSkill(pl.Skills[const.Skills.Spirit])
 		local m6=SplitSkill(pl.Skills[const.Skills.Mind])
-		local m7=SplitSkill(pl.Skills[const.Skills.Body])
+		local m7, bodyMastery=SplitSkill(pl.Skills[const.Skills.Body])
 		local txt
-		local fireDamage=math.round(m1^2/(25+pl.LevelBase)^2*10000)/100
-		txt=baseSchoolsTxt[12] .. "\n\nMelee attacks deal an extra " .. fireDamage .. "% of monster Hit points as fire damage"
+		local fireDamage=m1/10
+		txt=baseSchoolsTxt[12] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nMelee attacks deal an extra " .. fireDamage .. "% of monster Hit points as fire damage"
 		Skillz.setDesc(12,1,txt)
-		local airReduction=100-math.round(0.99^(m2^2/pl.LevelBase*5)*10000)/100
-		txt=baseSchoolsTxt[13] .. "\n\nReduce all damage taken by " .. airReduction .. " %"
+		local airReduction=100-math.round(0.99^m2*100)
+		txt=baseSchoolsTxt[13] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nReduce all damage taken by " .. airReduction .. "%\n"
 		Skillz.setDesc(13,1,txt)
-		mult=((math.max(Game.BolsterAmount, 100)/100)-1)/2+1
 		local lvl=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
 		local waterReduction=math.round(getMonsterDamage(lvl^0.325*m3)^0.7)
-		txt=baseSchoolsTxt[14] .. "\n\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)"
+		txt=baseSchoolsTxt[14] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)\n"
 		Skillz.setDesc(14,1,txt)
-		local armsmasterDamage=math.round(m4^2.6/(10+pl.LevelBase)*10+m4)/2
-		txt=baseSchoolsTxt[15] .. "\n\nIncreases melee damage by ".. armsmasterDamage .. ""
+		local armsmasterDamage=earthMastery*m4
+		txt=baseSchoolsTxt[15] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nIncreases melee damage 1-2-3-4 (at N-E-M-GM) per Earth Magic Level\n"
 		Skillz.setDesc(15,1,txt)
-		local spelldh=math.round(m5^2/pl.LevelBase/6*100)
-		txt=baseSchoolsTxt[16] .. "\n\nIncreases spell damage by " .. spelldh .. "%"
+		local spelldh=m5
+		txt=baseSchoolsTxt[16] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nIncreases melee damage by " .. spelldh .. "%\n"
 		Skillz.setDesc(16,1,txt)
-		SPLEECH=math.round(m6^2/pl.LevelBase*25+m6)
-		txt=baseSchoolsTxt[17] .. "\n\nMelee attacks restore " .. SPLEECH .. " Spell Points"
+		SPLEECH=math.round(m6^1.5)
+		txt=baseSchoolsTxt[17] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nMelee attacks restore " .. SPLEECH .. " Spell Points\n"
 		Skillz.setDesc(17,1,txt)
-		local hpRestore=math.round(m7^2/(10+pl.LevelBase)*75+m7)
-		local spelldhx=math.round(m7^2/pl.LevelBase/10*100)
-		txt=baseSchoolsTxt[18] .. "\n\nMelee attacks restore " .. hpRestore .. " Hit Points and healing spells by " .. spelldhx .. "%"
+		local FHP=pl:GetFullHP()
+		local leech=math.round(FHP^0.5* m7^1.5/100 * (1+bodyMastery/2))
+		txt=baseSchoolsTxt[18] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nMelee attacks restore " .. leech .. " Hit Points\n"
 		Skillz.setDesc(18,1,txt)
 	else
 		for i=12,18 do
