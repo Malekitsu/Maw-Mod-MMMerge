@@ -870,7 +870,7 @@ function events.GameInitialized2()
 			m7,bM=SplitSkill(data.Player.Skills[const.Skills.Body])
 			
 			local FHP=data.Player:GetFullHP()
-			local leech=math.round(FHP^0.5* m7/10 * (0.5+bM/2))
+			local leech=math.max(math.round(FHP^0.5* m7^1.5/100 * (0.5+bM/2)), m7)
 			
 			data.Player.SP=math.min(data.Player.SP+m6^1.5, data.Player:GetFullSP())
 			data.Player.HP=math.min(data.Player.HP+leech, data.Player:GetFullHP())
@@ -934,7 +934,7 @@ local function shamanSkills(isShaman, id)
 		txt=baseSchoolsTxt[17] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nMelee attacks restore " .. SPLEECH .. " Spell Points\n"
 		Skillz.setDesc(17,1,txt)
 		local FHP=pl:GetFullHP()
-		local leech=math.round(FHP^0.5* m7^1.5/100 * (1+bodyMastery/2))
+		local leech=math.max(math.round(FHP^0.5* m7^1.5/100 * (1+bodyMastery/2)),m7)
 		txt=baseSchoolsTxt[18] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nMelee attacks restore " .. leech .. " Hit Points\n"
 		Skillz.setDesc(18,1,txt)
 	else
