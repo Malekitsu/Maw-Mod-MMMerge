@@ -1267,7 +1267,7 @@ function calcPowerVitality(pl, statsMenu)
 	DPS1=math.round((dmg*(1+math.min(critChance,1)*(critMult-1))+enchantDamage)/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Melee"]*math.max(critChance,1))
 	--shaman
 	if table.find(shamanClass, pl.Class) then
-		s=SplitSkill(pl.Skills[const.Skills.Spirit])
+		local s=SplitSkill(pl.Skills[const.Skills.Spirit])
 		DPS1=DPS1*(1+s/100)
 	end
 	
