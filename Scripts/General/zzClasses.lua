@@ -921,7 +921,7 @@ local function shamanSkills(isShaman, id)
 		txt=baseSchoolsTxt[13] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nReduce all damage taken by " .. airReduction .. "%\n"
 		Skillz.setDesc(13,1,txt)
 		local lvl=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
-		local waterReduction=math.round(getMonsterDamage(lvl^0.325*m3)^0.7)
+		local waterReduction=math.round(getMonsterDamage((lvl+1)^0.325*m3)^0.7)
 		txt=baseSchoolsTxt[14] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)\n"
 		Skillz.setDesc(14,1,txt)
 		local armsmasterDamage=earthMastery*m4
