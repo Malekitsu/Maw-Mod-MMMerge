@@ -143,10 +143,7 @@ function events.CalcDamageToMonster(t)
 		end
 	end
 	if data and data.Player and table.find(shamanClass, data.Player.Class)  then
-		if t.Result>0 and data and data.Object==nil and t.DamageKind==4 then
-			local s=SplitSkill(t.Player.Skills[const.Skills.Spirit])
-			t.Result=t.Result*(1+s*0.01)
-		elseif t.Result>0 and data and data.Object and data.Object.Spell>0 and data.Object.Spell<99 then
+		if t.Result>0 and data and data.Object and data.Object.Spell>0 and data.Object.Spell<99 then
 			local s=0
 			for school=12,18 do
 				skill=SplitSkill(data.Player.Skills[school])
