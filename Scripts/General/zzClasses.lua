@@ -870,7 +870,7 @@ function events.GameInitialized2()
 			m7,bM=SplitSkill(data.Player.Skills[const.Skills.Body])
 			
 			local FHP=data.Player:GetFullHP()
-			local leech=math.round(FHP^0.5* m7^1.5/100 * (0.5+bM/2))
+			local leech=math.round(FHP^0.5* m7/10 * (0.5+bM/2))
 			
 			data.Player.SP=math.min(data.Player.SP+m6^1.5, data.Player:GetFullSP())
 			data.Player.HP=math.min(data.Player.HP+leech, data.Player:GetFullHP())
