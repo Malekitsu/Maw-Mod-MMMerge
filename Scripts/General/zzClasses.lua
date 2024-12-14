@@ -857,7 +857,7 @@ function events.GameInitialized2()
 			m2=SplitSkill(t.Player.Skills[const.Skills.Air])
 			m3=SplitSkill(t.Player.Skills[const.Skills.Water])
 			local lvl=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
-			local reduction=getMonsterDamage(lvl^0.325*m3)^0.7
+			local reduction=getMonsterDamage((lvl+1)^0.325*m3)^0.7
 			t.Result=math.max(t.Result-reduction, t.Result*0.25)
 			t.Result=t.Result*0.99^m2
 		end
