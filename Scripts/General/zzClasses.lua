@@ -870,7 +870,7 @@ function events.GameInitialized2()
 			m7,bM=SplitSkill(data.Player.Skills[const.Skills.Body])
 			
 			local FHP=data.Player:GetFullHP()
-			local leech=math.max(math.round(FHP^0.5* m7^1.5/100 * (0.5+bM/2)), m7)
+			local leech=math.max(math.round(FHP^0.5* m7^1.5/70 * (0.5+bM/2)), m7)
 			
 			data.Player.SP=math.min(data.Player.SP+m6^1.5, data.Player:GetFullSP())
 			data.Player.HP=math.min(data.Player.HP+leech, data.Player:GetFullHP())
@@ -917,7 +917,7 @@ local function shamanSkills(isShaman, id)
 		local fireDamage=m1/10
 		txt=baseSchoolsTxt[12] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nMelee attacks deal an extra " .. fireDamage .. "% of monster Hit points as fire damage"
 		Skillz.setDesc(12,1,txt)
-		local airReduction=100-math.round(0.99^m2*100)
+		local airReduction=100-math.round(0.99^m2*10000)/100
 		txt=baseSchoolsTxt[13] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nReduce all damage taken by " .. airReduction .. "%\n"
 		Skillz.setDesc(13,1,txt)
 		local lvl=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
@@ -934,7 +934,7 @@ local function shamanSkills(isShaman, id)
 		txt=baseSchoolsTxt[17] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nMelee attacks restore " .. SPLEECH .. " Spell Points\n"
 		Skillz.setDesc(17,1,txt)
 		local FHP=pl:GetFullHP()
-		local leech=math.max(math.round(FHP^0.5* m7^1.5/100 * (1+bodyMastery/2)),m7)
+		local leech=math.max(math.round(FHP^0.5* m7^1.5/70 * (1+bodyMastery/2)),m7)
 		txt=baseSchoolsTxt[18] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nMelee attacks restore " .. leech .. " Hit Points\n"
 		Skillz.setDesc(18,1,txt)
 	else
