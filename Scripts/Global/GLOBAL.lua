@@ -59,9 +59,7 @@ function events.EvtGlobal(i) -- happens after related global evt executed
 		
 end
 function events.Tick()
-	if not vars.lastPartyExperience then
-		vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
-	end
+	vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
 end
 function events.EvtMap(i)
 	if vars.lastPartyExperience and Party[0]:GetIndex()==vars.lastPartyExperience[1] then --check if party member isn't changed
