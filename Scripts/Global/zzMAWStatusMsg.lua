@@ -24,8 +24,20 @@ end
 function events.CalcDamageToMonster(t)
 		local data=WhoHitMonster()
 		if data and data.Player then
-			local heal=t.Result^0.75
+			local mon=t.Monster
+			--pick B monster and heal amount
+			local id=mon.Id
+			if id%3==0 then
+				id=id-1
+			elseif id%3==1 then
+				id=id+1
+			end
+			local refHP=HPtable[id]
+			
 			local fullHP=data.Player:GetFullHP()
+			
+			local heal=t.Result/refHP*fullHP*0.1
+			
 			if getMapAffixPower(32) then
 				heal=heal*(1-getMapAffixPower(32)/100)
 			end
