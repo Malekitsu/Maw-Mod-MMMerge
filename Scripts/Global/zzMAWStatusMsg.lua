@@ -37,7 +37,11 @@ function events.CalcDamageToMonster(t)
 		local refHP=HPtable[id]
 		
 		local fullHP=pl:GetFullHP()
-		
+		local manaLeechLeg=false
+		if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 31) and not table.find(dkClass, pl.Class) and pl.Class~=10 and pl.Class~=11 then
+			fullHP=getMaxMana(pl)
+			manaLeechLeg=true
+		end
 		local heal=t.Result/refHP*fullHP*0.1
 		
 		if getMapAffixPower(32) then
@@ -95,7 +99,7 @@ function events.CalcDamageToMonster(t)
 			end 
 		end
 		local overHeal=0
-		if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 31) and not table.find(dkClass, pl.Class) then
+		if manaLeechLeg then
 			totalHeal=totalHeal/2
 			pl.SP=math.min(getMaxMana(pl),pl.SP+totalHeal)
 		else
