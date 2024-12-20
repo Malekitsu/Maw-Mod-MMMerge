@@ -871,8 +871,8 @@ function events.GameInitialized2()
 			
 			local FHP=data.Player:GetFullHP()
 			local leech=math.max(math.round(FHP^0.5* m7^1.5/70 * (0.5+bM/2)), m7)
-			
-			data.Player.SP=math.min(data.Player.SP+m6^1.5, data.Player:GetFullSP())
+			local maxSP=data.Player:GetFullSP()
+			data.Player.SP=math.min(data.Player.SP+m6^1.5, getMaxMana(data.Player))
 			data.Player.HP=math.min(data.Player.HP+leech, data.Player:GetFullHP())
 		end
 	end
@@ -1092,7 +1092,7 @@ function events.GameInitialized2()
 					if t.Result>t.Monster.HP then
 						regen=regen*1.5
 					end
-					pl.SP=math.min(pl:GetFullSP(), pl.SP+regen)
+					pl.SP=math.min(getMaxMana(pl), pl.SP+regen)
 				end
 			end
 			
