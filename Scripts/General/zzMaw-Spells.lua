@@ -2874,6 +2874,21 @@ if buffRework then
 			Party.SpellBuffs[13].Skill=10
 		end
 		
+		--shadow bosses
+		if mapvars.shadow then
+			for i=1, #mapvars.shadow do
+				if mapvars.shadow[i] then
+					local mon=Map.Monsters[mapvars.shadow[i]]
+					local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+					if skill == "Shadow" then
+						local distance=getDistance(mon.X,mon.Y,mon.Z)
+						if distance<2000 and mon.HP>0 and mon.AIState~=19 then
+							Party.SpellBuffs[const.PartyBuff.WizardEye].ExpireTime=0
+						end
+					end
+				end
+			end
+		end
 		mawRefresh("all")
 	end
 	
