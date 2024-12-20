@@ -1189,13 +1189,13 @@ mapLevels={
 {["Low"] = 85 , ["Mid"] = 90 , ["High"] = 90},
 
 ["Tutorial"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["Pirate Outpost"] = 
 {["Low"] = 45 , ["Mid"] = 51 , ["High"] = 51},
 
 ["Merchant House of Alvar"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["Escaton's Crystal"] = 
 {["Low"] = 70 , ["Mid"] = 80 , ["High"] = 90},
@@ -1249,7 +1249,7 @@ mapLevels={
 {["Low"] = 65 , ["Mid"] = 65 , ["High"] = 65},
 
 ["Tomb of Lord Brinne"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["Castle of Fire"] = 
 {["Low"] = 75 , ["Mid"] = 75 , ["High"] = 75},
@@ -1291,7 +1291,7 @@ mapLevels={
 {["Low"] = 20 , ["Mid"] = 22 , ["High"] = 24},
 
 ["Arena"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["Ancient Troll Home"] = 
 {["Low"] = 23 , ["Mid"] = 25 , ["High"] = 27},
@@ -1312,7 +1312,7 @@ mapLevels={
 {["Low"] = 35 , ["Mid"] = 60 , ["High"] = 85},
 
 ["NWC"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 
 --MM7
@@ -1521,7 +1521,7 @@ mapLevels={
 {["Low"] = 5 , ["Mid"] = 42.5 , ["High"] = 80},
 
 ["The Strange Temple"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["The Titans' Stronghold"] = 
 {["Low"] = 75 , ["Mid"] = 82.5 , ["High"] = 90},
@@ -1542,7 +1542,7 @@ mapLevels={
 {["Low"] = 100 , ["Mid"] = 100 , ["High"] = 100},
 
 ["The Arena"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 --MM6
 ["Sweet Water"] = 
@@ -1690,7 +1690,7 @@ mapLevels={
 {["Low"] = 65 , ["Mid"] = 66 , ["High"] = 90},
 
 ["Oracle of Enroth"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["Control Center"] = 
 {["Low"] = 90 , ["Mid"] = 90 , ["High"] = 90},
@@ -1699,52 +1699,52 @@ mapLevels={
 {["Low"] = 80 , ["Mid"] = 90 , ["High"] = 100},
 
 ["The Arena"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["Dragon's Lair"] = 
 {["Low"] = 90 , ["Mid"] = 90 , ["High"] = 90},
 
 ["pending"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["pending"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["pending"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["pending"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["pending"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["pending"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["pending"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["pending"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["pending"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["pending"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["pending"] = 
 {["Low"] = 40 , ["Mid"] = 50 , ["High"] = 50},
 
 ["pending"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["Devil Outpost"] = 
 {["Low"] = 56 , ["Mid"] = 56 , ["High"] = 56},
 
 ["New World Computing"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 ["The Breach"] = 
 {["Low"] = 100 , ["Mid"] = 110 , ["High"] = 120},
@@ -1756,7 +1756,7 @@ mapLevels={
 {["Low"] = 100 , ["Mid"] = 110 , ["High"] = 120},
 
 ["The Strange Temple"] = 
-{["Low"] = 0 , ["Mid"] = 0 , ["High"] = 0},
+{["Low"] = 1 , ["Mid"] = 1 , ["High"] = 1},
 
 }
 
@@ -2198,7 +2198,8 @@ function events.MonsterKilled(mon)
 				if vars.InsanitMode then
 					totalMonster=totalMonster*0.8
 				end
-				local experience=math.ceil(totalMonster^0.7*(mapLevel*20+mapLevel^1.8)/3*math.max((bolster+mapLevel)/mapLevel/1000)*1000,1)
+				mapLevel=math.max(mapLevel,1)
+				local experience=math.ceil(totalMonster^0.7*(mapLevel*20+mapLevel^1.8)/3*(bolster+mapLevel)/mapLevel/1000)*1000
 				--bolster code
 				bonusExp=experience
 				local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
