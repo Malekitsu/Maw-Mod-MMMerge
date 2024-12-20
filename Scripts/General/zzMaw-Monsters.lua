@@ -2417,6 +2417,12 @@ function generateBoss(index,nameIndex)
 			table.insert(mapvars.swift, index)
 		end
 	end
+	if skill="Shadow" then
+		mapvars.shadow=mapvars.swift or {}
+		if not table.find(mapvars.shadow, index) then
+			table.insert(mapvars.shadow, index)
+		end
+	end
 	mapvars.bossSkills=mapvars.bossSkills or {}
 	mapvars.bossSkills[mon.NameId]=mapvars.bossSkills[mon.NameId] or {}
 	table.insert(mapvars.bossSkills[mon.NameId],skill)
@@ -2636,9 +2642,9 @@ function leecher()
 				local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
 				if skill == "Leecher" then
 					local distance=getDistance(mon.X,mon.Y,mon.Z)
-					if distance<1500 and mon.HP>0 then
+					if distance<1500 and mon.HP>0 and mon.AIState~=19 then
 						leechmult=((1500-distance)/1500)^2
-						local timeMultiplier=Game.TurnBased and timePassed/12.8 or 1
+						local timeMultiplier=Game.TurnBased and timePassed/20 or 1 --was 12.8 instead of 20, nerfed
 						for i=0,Party.High do
 							local pl=Party[i]
 							if pl.HP>-20 then
