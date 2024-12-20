@@ -3163,3 +3163,23 @@ function events.PlayerCastSpell(t)
 		end
 	end
 end
+
+function getMaxMana(pl)
+	if buffRework and vars.currentManaPool then
+		local index=pl:GetIndex()
+		for i=0, Party.High do
+			local p=Party[i]
+			if p:GetIndex()==index then
+				if vars.currentManaPool[i] then
+					return vars.currentManaPool[i]
+				else
+					local sp=pl:GetFullSP()
+					return sp
+				end
+			end
+		end
+	else
+		local sp=pl:GetFullSP()
+		return sp
+	end	
+end
