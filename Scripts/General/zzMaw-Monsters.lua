@@ -2417,7 +2417,7 @@ function generateBoss(index,nameIndex)
 			table.insert(mapvars.swift, index)
 		end
 	end
-	if skill="Shadow" then
+	if skill=="Shadow" then
 		mapvars.shadow=mapvars.swift or {}
 		if not table.find(mapvars.shadow, index) then
 			table.insert(mapvars.shadow, index)
