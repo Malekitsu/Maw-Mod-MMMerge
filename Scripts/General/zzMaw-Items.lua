@@ -896,6 +896,7 @@ legendaryEffects={
 	[28]="AC gained from armors is doubled",
 	[29]="Each attack reduces monster resistances by 1",
 	[30]="Threshold HP to determine death/eradication depends on SP instead, if higher",
+	[31]="Leech restores Mana instead of HP, but at half effect",
 }
 
 function events.BuildItemInformationBox(t)
