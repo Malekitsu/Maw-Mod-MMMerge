@@ -38,7 +38,7 @@ function events.CalcDamageToMonster(t)
 		
 		local fullHP=pl:GetFullHP()
 		local manaLeechLeg=false
-		if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 31) and not table.find(dkClass, pl.Class) and pl.Class~=10 and pl.Class~=11 then
+		if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 31) then
 			fullHP=getMaxMana(pl)
 			manaLeechLeg=true
 		end
