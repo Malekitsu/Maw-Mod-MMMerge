@@ -3185,7 +3185,7 @@ if restoreMM6Glory then
 						local s,m=Skillz.get(pl,53)
 						if s/100>=math.random() then
 							vars.retaliation=vars.retaliation or {}
-							vars.retaliation[id]=vars.retaliation[id] or 0
+							vars.retaliation[id]=vars.retaliation[id] or {}
 							vars.retaliation[id]["Stacks"]=vars.retaliation[id]["Stacks"] or 0
 							vars.retaliation[id]["Time"]=vars.retaliation[id]["Time"] or Game.Time
 							vars.retaliation[id]["Stacks"]=vars.retaliation[id]["Stacks"]+1
