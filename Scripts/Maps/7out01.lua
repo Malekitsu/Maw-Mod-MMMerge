@@ -27,22 +27,14 @@ if isRedone then
 	evt.map[221] = function()
 		if evt.Cmp{"FireResBonus", Value = 50} then
 			Game.ShowStatusText ("Refreshing!")         -- "Refreshing!"
-		else        
-			evt.ForPlayer(0)
-			evt.Set("FireResBonus", 50)
-			evt.Add("Experience", 500)
-			evt.ForPlayer(1)
-			evt.Set("FireResBonus", 50)
-			evt.Add("Experience", 500)
-			evt.ForPlayer(2)
-			evt.Set("FireResBonus", 50)
-			evt.Add("Experience", 500)
-			evt.ForPlayer(3)
-			evt.Set("FireResBonus", 50)
-			evt.Add("Experience", 500)
-			evt.ForPlayer(4)
-			evt.Set("FireResBonus", 50)
-			evt.Add("Experience", 500)
+		else
+			for i=0, Party.High do
+				evt.ForPlayer(i)
+				evt.Set("FireResBonus", 50)
+				if not evt.Cmp{"AutonotesBits", Value = 258} then
+					evt.Add("Experience", 500)
+				end
+			end
 			Game.ShowStatusText("+50 Fire Resistance temporary.")          -- "+50 Fire Resistance temporary."
 			evt.Add{"AutonotesBits", Value = 258}         -- "50 points of temporary Fire resistance from the central town well on Emerald Island."
 		end
