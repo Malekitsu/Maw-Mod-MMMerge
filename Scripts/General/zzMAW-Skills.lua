@@ -1452,7 +1452,7 @@ function events.LoadMap()
 		end
 	end
 	for i=1,#trainingCenters[currentWorld] do
-		Game.HouseRules.Training[trainingCenters[currentWorld][i]].Quality=math.min(baseTrainers[trainingCenters[currentWorld][i]]+bolster,1000)
+		Game.HouseRules.Training[trainingCenters[currentWorld][i]].Quality=math.min(baseTrainers[trainingCenters[currentWorld][i]]+bolster+5,1000)
 	end
 end
 
