@@ -492,6 +492,9 @@ function events.ItemGenerated(t)
 		--legendary
 		if t.Item.BonusExpireTime==2 then
 			local chance=0.1
+			if austerity==true then
+				chance=0
+			end
 			if vars.Mode==2 then
 				chance=0.2
 			end
