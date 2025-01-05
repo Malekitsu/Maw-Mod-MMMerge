@@ -231,33 +231,36 @@ function recalculateMawMonster()
 				local HP=math.round(HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180))*HPRateo
 				hpMult=1
 				if Game.BolsterAmount==0 then
-					hpMult=hpMult*0.6
+					hpMult=hpMult*(0.6+HPBolsterLevel/600)
 				end
 				--normal
 				if Game.BolsterAmount==50 then
-					hpMult=hpMult*0.8
+					hpMult=hpMult*(0.8+HPBolsterLevel/550)
 				end
 				--MAW
 				if Game.BolsterAmount==100 then
-					hpMult=hpMult*1
+					hpMult=hpMult*(1+HPBolsterLevel/500)
 				end
 				--Hard
 				if Game.BolsterAmount==150 then
-					hpMult=hpMult*(1.5+HPBolsterLevel/900)
+					hpMult=hpMult*(1.5+HPBolsterLevel/450)
 				end
 				--Hell
 				if Game.BolsterAmount==200 then
-					hpMult=hpMult*(2+HPBolsterLevel/600)
+					hpMult=hpMult*(2+HPBolsterLevel/400)
 				end
 				--Nightmare
 				if Game.BolsterAmount==300 then
-					hpMult=hpMult*(2.5+HPBolsterLevel/450)
+					hpMult=hpMult*(2.5+HPBolsterLevel/350)
 				end
 				if Game.BolsterAmount==600 then
 					hpMult=hpMult*(3+HPBolsterLevel/300)
 				end	
 				if vars.insanityMode then
 					hpMult=hpMult*(1.5+HPBolsterLevel/300)
+				end
+				if austerity==true then
+				hpMult=((hpMult*3-math.min(2, hpMult*2))+1)
 				end
 				HP=HP*hpMult
 				
@@ -656,33 +659,36 @@ function recalculateMonsterTable()
 		end
 		--easy
 		if Game.BolsterAmount==0 then
-			hpMult=hpMult*0.6
+			hpMult=hpMult*(0.6+totalLevel[i]/600)
 		end
 		--normal
 		if Game.BolsterAmount==50 then
-			hpMult=hpMult*0.8
+			hpMult=hpMult*(0.8+totalLevel[i]/550)
 		end
 		--MAW
 		if Game.BolsterAmount==100 then
-			hpMult=hpMult*1
+			hpMult=hpMult*(1+totalLevel[i]/500)
 		end
 		--Hard
 		if Game.BolsterAmount==150 then
-			hpMult=hpMult*(1.25+totalLevel[i]/900)
+			hpMult=hpMult*(1.25+totalLevel[i]/450)
 		end
 		--Hell
 		if Game.BolsterAmount==200 then
-			hpMult=hpMult*(1.5+totalLevel[i]/600)
+			hpMult=hpMult*(1.5+totalLevel[i]/400)
 		end
 		--Nightmare
 		if Game.BolsterAmount==300 then
-			hpMult=hpMult*(1.75+totalLevel[i]/450)
+			hpMult=hpMult*(1.75+totalLevel[i]/350)
 		end
 		if Game.BolsterAmount==600 then
 			hpMult=hpMult*(2+totalLevel[i]/300)
 		end	
 		if vars.insanityMode then
 			hpMult=hpMult*(1.5+totalLevel[i]/300)
+		end
+		if austerity==true then
+		hpMult=((hpMult*3-math.min(2, hpMult*2))+1)
 		end
 		--crit nerf fix
 		hpMult=hpMult/math.min(math.max(0.3+totalLevel[i]/200,1),50/15) --50/15 is the amount needed to get 1% crit, now and before
@@ -2375,7 +2381,10 @@ end
 
 function generateBoss(index,nameIndex)
 	mon=Map.Monsters[index]
-	HP=math.round(mon.FullHP*2*(1+mon.Level/80)*(1+math.random()))
+	local hpmod=1
+	if austerity==true then
+	hpmod=4
+	HP=math.round(mon.FullHP*2*(1+mon.Level/80)*(1+math.random())/hpmod)
 	if getMapAffixPower(18) then
 		HP=HP*(1+getMapAffixPower(18)/100)
 	end
@@ -3323,15 +3332,15 @@ function getMonsterDamage(lvl,calcType)
 	local diffMult=1
 	local bol=Game.BolsterAmount
 	if bol==0 then
-		diffMult=0.4
+		diffMult=lvl/550+0.6
 	elseif bol==50 then
-		diffMult=0.7
+		diffMult=lvl/500+0.8
 	elseif bol==100 then
-		diffMult=1
+		diffMult=lvl/450+1
 	elseif bol==150 then
-		diffMult=lvl/600+1.12
+		diffMult=lvl/400+1.12
 	elseif bol==200 then
-		diffMult=lvl/400+1.25
+		diffMult=lvl/350+1.25
 	elseif bol==300 then
 		diffMult=lvl/300+1.5
 	elseif bol==600 then
@@ -3339,6 +3348,9 @@ function getMonsterDamage(lvl,calcType)
 	end
 	if vars.insanityMode then
 		diffMult=diffMult*(1.5+lvl/300)
+	end
+	if austerity==true then
+	diffMult=(diffMult*5-math.min(3, diffMult*3))^1.5
 	end
 	if calcType=="diffMult" then
 		return diffMult
