@@ -2902,7 +2902,7 @@ end
 --nerf to movement speed in doom
 function events.Tick()
 	if Game.TurnBased then
-		if vars.Mode==2 then
+		if vars.Mode==2 or austerity==true then
 			if Game.TurnBasedPhase==2 then
 				turnBaseStartPositionX, turnBaseStartPositionY = Party.X, Party.Y
 			elseif Game.TurnBasedPhase==3 then
