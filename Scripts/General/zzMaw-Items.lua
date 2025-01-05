@@ -281,8 +281,12 @@ function events.ItemGenerated(t)
 			partyLevel=mapvars.mapAffixes.Power*10+20
 		end
 		--modify reagents
+		local itmod=3
+		if austerity==true then
+		itmod=8
+		end
 		if reagentList[t.Item.Number] then
-			t.Item.Bonus=math.round(partyLevel/3)
+			t.Item.Bonus=math.round(partyLevel/itmod)
 			return
 		end
 		
