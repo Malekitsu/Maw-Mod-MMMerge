@@ -3351,7 +3351,7 @@ function getMonsterDamage(lvl,calcType)
 		diffMult=diffMult*(1.5+lvl/300)
 	end
 	if austerity==true then
-	diffMult=(diffMult*5-math.min(3, diffMult*3))^1.5
+	diffMult=(diffMult*5-math.min(3.5, diffMult*3.5))^1.5
 	end
 	if calcType=="diffMult" then
 		return diffMult
