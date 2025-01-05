@@ -2384,6 +2384,7 @@ function generateBoss(index,nameIndex)
 	local hpmod=1
 	if austerity==true then
 	hpmod=4
+	end
 	HP=math.round(mon.FullHP*2*(1+mon.Level/80)*(1+math.random())/hpmod)
 	if getMapAffixPower(18) then
 		HP=HP*(1+getMapAffixPower(18)/100)
