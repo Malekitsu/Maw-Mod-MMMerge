@@ -9,6 +9,7 @@ buffRework=true
 restoreMM6Glory=true
 disableDamageOnFriendlyUnits=true
 disableHomingProjectiles=false
+austerity=false
 
 --sorting buttons
 currentBagSortKey=82
