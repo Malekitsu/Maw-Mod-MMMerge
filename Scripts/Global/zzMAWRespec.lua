@@ -48,6 +48,13 @@ function RespecSkills(npcID)
 		return
 	else
 		Party.Gold=Party.Gold-goldRequired
+		if austerity == true then
+Party[0].Skills[const.Skills.IdentifyMonster] = JoinSkill(0, const.GM)
+Party[1].Skills[const.Skills.IdentifyMonster] = JoinSkill(0, const.GM)
+Party[2].Skills[const.Skills.IdentifyMonster] = JoinSkill(0, const.GM)
+Party[3].Skills[const.Skills.IdentifyMonster] = JoinSkill(0, const.GM)
+Party[4].Skills[const.Skills.IdentifyMonster] = JoinSkill(0, const.GM)
+end
 	end
 	respecMastery(id)
 	local refund=0
