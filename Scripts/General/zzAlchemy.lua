@@ -6,6 +6,30 @@ function events.GameInitialized2()
 	for i=264,299 do
 		Game.ItemsTxt[i].Name="Potion Deleted in MAW"
 	end
+	if austerity == true then
+	for i=232,237 do
+		Game.ItemsTxt[i].Name="Potion Deleted in Austerity"
+	end
+	for i=252,256 do
+		Game.ItemsTxt[i].Name="Potion Deleted in Austerity"
+	end
+	for i=261,263 do
+		Game.ItemsTxt[i].Name="Potion Deleted in Austerity"
+	end
+	for i=1783,1789 do
+		Game.ItemsTxt[i].Name="Potion Deleted in Austerity"
+	end
+end
+end
+
+function events.LoadMap()
+if austerity == true then
+Party[0].Skills[const.Skills.IdentifyMonster] = JoinSkill(10, const.GM)
+Party[1].Skills[const.Skills.IdentifyMonster] = JoinSkill(10, const.GM)
+Party[2].Skills[const.Skills.IdentifyMonster] = JoinSkill(10, const.GM)
+Party[3].Skills[const.Skills.IdentifyMonster] = JoinSkill(10, const.GM)
+Party[4].Skills[const.Skills.IdentifyMonster] = JoinSkill(10, const.GM)
+end
 end
 
 function events.LoadMap()
@@ -1086,6 +1110,9 @@ function events.MonsterKilled(mon)
 	--no corpse monster Buff
 	if table.find(noCorpseMonsters,mon.Id) then
 		bonusRoll=bonusRoll*3
+	end
+	if austerityc==true then
+	bonusRoll=0
 	end
 	if math.random()<craftDropChances.gems*bonusRoll*insanityMult then
 		baseCraftDrop=true
