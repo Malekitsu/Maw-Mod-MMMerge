@@ -1111,7 +1111,7 @@ function events.MonsterKilled(mon)
 	if table.find(noCorpseMonsters,mon.Id) then
 		bonusRoll=bonusRoll*3
 	end
-	if austerityc==true then
+	if austerity then
 	bonusRoll=0
 	end
 	if math.random()<craftDropChances.gems*bonusRoll*insanityMult then
