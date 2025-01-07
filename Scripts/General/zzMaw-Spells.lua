@@ -1135,6 +1135,9 @@ function getCCDiffMult(bolster)
 		diffMult=5
 	end
 	return diffMult
+	if austerity==true then
+	diffmult=diffMult*2.5
+	end
 end
 
 function events.Action(t)
@@ -1458,6 +1461,8 @@ function events.CalcDamageToMonster(t)
 		else
 			mult=massHPMULT[Game.BolsterAmount] or 1
 		end
+		if austerity==true then
+			mult=mult*4
 		t.Result=t.Result/mult^0.5*math.max(1, (mon.Level/250)^2)
 	end
 	
