@@ -1134,10 +1134,10 @@ function getCCDiffMult(bolster)
 	if vars.insanityMode then
 		diffMult=5
 	end
-	return diffMult
 	if austerity==true then
-	diffmult=diffMult*2.5
+	diffMult=diffMult*2.5
 	end
+	return diffMult
 end
 
 function events.Action(t)
@@ -1463,6 +1463,7 @@ function events.CalcDamageToMonster(t)
 		end
 		if austerity==true then
 			mult=mult*4
+		end
 		t.Result=t.Result/mult^0.5*math.max(1, (mon.Level/250)^2)
 	end
 	
