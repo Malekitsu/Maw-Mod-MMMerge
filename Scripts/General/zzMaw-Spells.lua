@@ -1208,6 +1208,9 @@ function events.PlayerCastSpell(t)
 				events.Remove("Tick", 1)
 			end
 			local mult=getCCDiffMult(Game.BolsterAmount) 
+				if austerity==true then
+				mult=mult*2.5
+				end
 			for i=0,Map.Monsters.High do
 				local mon=Map.Monsters[i]
 				mon.Level=level[i]
