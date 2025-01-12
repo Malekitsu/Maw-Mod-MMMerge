@@ -2899,6 +2899,7 @@ if buffRework then
 			end
 		end
 		mawRefresh("all")
+		buffManaLock()
 	end
 	
 	function buffManaLock()
@@ -2937,7 +2938,7 @@ if buffRework then
 	end
 	
 	function events.LoadMap()
-		buffManaLock()
+		mawBuffApply()
 	end
 	
 	function events.AfterLoadMap()
