@@ -3463,3 +3463,23 @@ function events.MonstersProcessed()
 		end
 	end
 end
+
+--translate mapLevels table
+function events.GameInitialized2()
+	engLocalizedMap={}
+	for i=0, Game.MapStats.High do
+		engLocalizedMap[i]=Game.MapStats[i].Name
+	end	
+end
+
+function events.BeforeLoadMap()
+	for i=1, #engLocalizedMap do
+		if mapLevels[engLocalizedMap[i]] then
+			local tab=mapLevels[engLocalizedMap[i]]
+			mapLevels[Game.MapStats[i].Name]={}
+			mapLevels[Game.MapStats[i].Name]["Low"]=tab.Low
+			mapLevels[Game.MapStats[i].Name]["Mid"]=tab.Mid
+			mapLevels[Game.MapStats[i].Name]["High"]=tab.High
+		end
+	end
+end
