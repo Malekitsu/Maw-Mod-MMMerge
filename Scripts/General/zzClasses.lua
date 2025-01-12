@@ -872,7 +872,7 @@ function events.GameInitialized2()
 			local FHP=data.Player:GetFullHP()
 			local leech=math.max(math.round(FHP^0.5* m7^1.5/70 * (0.5+bM/2)), m7)
 			local maxSP=data.Player:GetFullSP()
-			data.Player.SP=math.min(data.Player.SP+m6^1.5, getMaxMana(data.Player))
+			data.Player.SP=math.min(data.Player.SP+m6^1.25, getMaxMana(data.Player))
 			data.Player.HP=math.min(data.Player.HP+leech, data.Player:GetFullHP())
 		end
 	end
@@ -930,7 +930,7 @@ local function shamanSkills(isShaman, id)
 		local spelldh=m5
 		txt=baseSchoolsTxt[16] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nIncreases melee damage by " .. spelldh .. "%\n"
 		Skillz.setDesc(16,1,txt)
-		SPLEECH=math.round(m6^1.5)
+		SPLEECH=math.round(m6^1.25)
 		txt=baseSchoolsTxt[17] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nMelee attacks restore " .. SPLEECH .. " Spell Points\n"
 		Skillz.setDesc(17,1,txt)
 		local FHP=pl:GetFullHP()
