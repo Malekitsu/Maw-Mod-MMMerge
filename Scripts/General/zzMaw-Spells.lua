@@ -1111,7 +1111,7 @@ end
 --CC REWORK
 ----------------------------------------
 CCMAP={
-	[const.Spells.Stun]=	{["Duration"]=const.Minute,["ChanceMult"]=0.03, ["BaseCost"]=1, ["ScalingCost"]=10},
+	[const.Spells.Stun]=	{["Duration"]=const.Minute*2,["ChanceMult"]=0.01, ["BaseCost"]=1, ["ScalingCost"]=10},
 	[const.Spells.Slow]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.03, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Earth, ["DamageKind"]=const.Damage.Earth,["Debuff"]=const.MonsterBuff.Slow},
 	[60]=					{["Duration"]=const.Minute*7, ["ChanceMult"]=0.05, ["BaseCost"]=5, ["ScalingCost"]=4, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--Mind Charm, has no const value, due to dark elf one overwriting
 	[const.Spells.Charm]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.05, ["BaseCost"]=1, ["ScalingCost"]=4, ["School"]=const.Skills.DarkElfAbility, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--dark elf one
