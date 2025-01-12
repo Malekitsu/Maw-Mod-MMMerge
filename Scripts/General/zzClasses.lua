@@ -330,9 +330,9 @@ local function seraphSkills(isSeraph, id)
 		--heal tooltips
 		local pers=pl:GetPersonality()
 		local healMult=1+pers/1000
-		
-		local spiritHeal=math.round(spiritS*(spiritM*2+math.floor(pl.LevelBase/20))*damageMultiplier[pl:GetIndex()]["Melee"]*healMult)
-		local bodyHeal=math.round(bodyS*(bodyM*2+math.floor(pl.LevelBase/20))*damageMultiplier[pl:GetIndex()]["Melee"]*healMult)
+		local dmgMult=damageMultiplier[pl:GetIndex()]["Melee"]
+		local spiritHeal=math.round(spiritS*(spiritM*2+math.floor(pl.LevelBase/20))*dmgMult*healMult)
+		local bodyHeal=math.round(bodyS*(bodyM*2+math.floor(pl.LevelBase/20))*dmgMult*healMult)
 		local txt=baseSchoolsTxtSERAPH[16] .. "\n\nSeraphim healing upon attack increases depending on Spirit magic, scaling with personality(weapon speed multiplier applies).\nGets 1 bonus heal each 20 levels.\n\n" .. "Current heal from Spirit: " .. StrColor(0,255,0,spiritHeal) .. "\n"
 		Skillz.setDesc(16,1,txt)
 		local txt=baseSchoolsTxtSERAPH[18] .. "\n\nSeraphim healing upon attack increases depending on Body magic, scaling with personality(weapon speed multiplier applies).\nGets 1 bonus heal each 20 levels.\n\n" .. "Current heal from Body: " .. StrColor(0,255,0,bodyHeal) .. "\n"
