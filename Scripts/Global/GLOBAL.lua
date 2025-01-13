@@ -56,7 +56,9 @@ function events.EvtGlobal(i) -- happens after related global evt executed
 	if GoldReward>0 and ExpRewards[0]>0 then
 		Party.Gold = Party.Gold + calculateGold(GoldReward)
 	end
-		
+	for i=0, Party.High do
+		Party[i].Exp=math.min(Party[i].Exp, 2^32-3982296)
+	end
 end
 function events.Tick()
 	vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
@@ -82,7 +84,10 @@ function events.EvtMap(i)
 			vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
 		end
 	else --in case player 1 is changed
-		vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
+		vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}		
+		for i=0, Party.High do
+			Party[i].Exp=math.min(Party[i].Exp, 2^32-3982296)
+		end
 	end
 end
 
