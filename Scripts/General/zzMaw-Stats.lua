@@ -113,13 +113,13 @@ function events.CalcDamageToMonster(t)
 				baseDamage=pl:GetMeleeDamageMin()
 				maxDamage=pl:GetMeleeDamageMax()
 				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
-				damage=math.round(randomDamage/2)
+				damage=round(randomDamage/2)
 				dmgMult=damageMultiplier[data.Player:GetIndex()]["Melee"]
 			else --bow
 				baseDamage=pl:GetRangedDamageMin()
 				maxDamage=pl:GetRangedDamageMax()
 				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
-				damage=math.round(randomDamage/2)
+				damage=round(randomDamage/2)
 				dmgMult=damageMultiplier[data.Player:GetIndex()]["Ranged"]
 			end
 			
@@ -185,7 +185,7 @@ function getSpellDelay(pl,spell)
 		local s, m=getBuffSkill(5)
 		hasteDiv=1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]/1000*s
 	end
-	local delay=math.round(oldTable[spell][m]/(1+haste/100)*1.2^tier/hasteDiv)
+	local delay=round(oldTable[spell][m]/(1+haste/100)*1.2^tier/hasteDiv)
 	if table.find(elementalistClass, pl.Class) then
 		delay=delay*1.5
 		local id=pl:GetIndex()
@@ -309,8 +309,8 @@ function events.BuildStatInformationBox(t)
 	end
 	if t.Stat==6 then
 		i=Game.CurrentPlayer
-		local critChance=math.round(getCritInfo(Party[i], "ranged")*10000)/100
-		local daggerCritBonus=math.round(getCritInfo(Party[i])*10000)/100
+		local critChance=round(getCritInfo(Party[i], "ranged")*10000)/100
+		local daggerCritBonus=round(getCritInfo(Party[i])*10000)/100
 		t.Text=string.format("%s\n\nCritical strike chance: %s%%",Game.StatsDescriptions[6],critChance)
 		daggerBonus=daggerCritBonus~=critChance
 		if daggerBonus then
@@ -327,7 +327,7 @@ function events.BuildStatInformationBox(t)
 		local s,m=SplitSkill(skill)
 
 		local regenEffect={[0]=0,3,4,6,6}
-		local hpRegen = math.round(FHP^0.5*s^1.5*((regenEffect[m])/35))
+		local hpRegen = round(FHP^0.5*s^1.5*((regenEffect[m])/35))
 		local HPregenItem=0
 		local bonusregen=0
 		for it in Party[i]:EnumActiveItems() do
@@ -356,7 +356,7 @@ function events.BuildStatInformationBox(t)
 		
 		hpMap=hpStatsMap[index]
 		
-		t.Text=string.format("%s\n\nHP bonus from Endurance: %s\nHP bonus from Body building: %s\nHP bonus from items: %s\nBase HP: %s\n\n HP Regen per second: %s",t.Text,StrColor(0,255,0,hpMap.totalEnduranceBonus), StrColor(0,255,0,hpMap.totalBBBonus),StrColor(0,255,0,math.round(hpMap.totalhpFromItems)),StrColor(0,255,0,hpMap.totalBaseHP),StrColor(0,255,0,regen/10))
+		t.Text=string.format("%s\n\nHP bonus from Endurance: %s\nHP bonus from Body building: %s\nHP bonus from items: %s\nBase HP: %s\n\n HP Regen per second: %s",t.Text,StrColor(0,255,0,hpMap.totalEnduranceBonus), StrColor(0,255,0,hpMap.totalBBBonus),StrColor(0,255,0,round(hpMap.totalhpFromItems)),StrColor(0,255,0,hpMap.totalBaseHP),StrColor(0,255,0,regen/10))
 	end
 	if t.Stat==8 then
 		local i=Game.CurrentPlayer
@@ -369,12 +369,12 @@ function events.BuildStatInformationBox(t)
 		if m==4 then
 			m=8
 		end
-		local medRegen = math.round(fullSP^0.25*s^1.4*(m+5)/50)+2
+		local medRegen = round(fullSP^0.25*s^1.4*(m+5)/50)+2
 		--meditation buff
 		if buffRework and vars.mawbuff[56] then
 			local s, m, level=getBuffSkill(56)
 			local level=level^0.6
-			medRegen = medRegen + math.round((fullSP^0.25*level^1.4*((buffPower[56].Base[m])/150) +10)*(1+buffPower[56].Scaling[m]/100*s))
+			medRegen = medRegen + round((fullSP^0.25*level^1.4*((buffPower[56].Base[m])/150) +10)*(1+buffPower[56].Scaling[m]/100*s))
 		end
 		
 		local SPregenItem=0
@@ -405,8 +405,8 @@ function events.BuildStatInformationBox(t)
 			nerfAmount=Game.BolsterAmount/100
 			ac=ac/nerfAmount
 		end
-		blockChance= 100-math.round((5+lvl*2)/(10+lvl*2+ac)*10000)/100
-		totRed= 100-math.round((100-blockChance)*(100-acReduction))/100
+		blockChance= 100-round((5+lvl*2)/(10+lvl*2+ac)*10000)/100
+		totRed= 100-round((100-blockChance)*(100-acReduction))/100
 		t.Text=string.format("%s\n\nPhysical damage reduction from AC: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\nBlock chance vs same level monsters (up to 255): " .. StrColor(255,255,100,blockChance) .. StrColor(255,255,100,"%") .. "\n\nTotal average damage reduction: " .. StrColor(255,255,100,totRed) .. "%")
 	end
 	
@@ -425,35 +425,6 @@ function events.BuildStatInformationBox(t)
 		local i=Game.CurrentPlayer
 		local pl=Party[i]
 		local id=pl:GetIndex()
-		local fullHP=pl:GetFullHP()
-		--AC
-		local ac=pl:GetArmorClass()
-		local acReduction=1-calcMawDamage(t.Player,4,10000)/10000
-		local lvl=pl.LevelBase
-		local ac=ac/(Game.BolsterAmount/100)
-		local blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
-		local ACRed= 1 - (1-blockChance)*(1-acReduction)
-		--dodging
-		--local speed=pl:GetSpeed()
-		local dodging=0
-		local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Dodging))
-		if Mas == 4 then
-			dodging=Skill+10
-		end
-		--local speed=Party[i]:GetSpeed()
-		--local speedEffect=speed/10
-		local dodgeChance=0.995^(dodging)
-		local fullHP=fullHP/dodgeChance
-		--resistances
-		res={0,1,2,3,7,8,12}
-		for i=1,7 do 
-			res[i]=1-calcMawDamage(t.Player,res[i],10000)/10000
-		end
-		--calculation
-		local reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
-		vitality=math.round(fullHP/reduction)	
-		
-		
 		--check and add equipped legendaries
 		local legTxt="Currently Active Legedendary effects:"
 		for i=1,#legendaryEffects-10 do
@@ -463,7 +434,7 @@ function events.BuildStatInformationBox(t)
 			end
 		end
 		
-		t.Text=string.format("%s\n\nVitality: %s",legTxt,StrColor(0,255,0,vitality))
+		t.Text=legTxt
 	end
 	
 	if t.Stat==13 or t.Stat==14 then
@@ -473,13 +444,13 @@ function events.BuildStatInformationBox(t)
 		local bolsterLevel8=math.max(bolsterLevel8-4,0)
 		local bolsterLevel7=math.max(bolsterLevel7-4,0)
 		local bolsterLevel6=math.max(bolsterLevel6-4,0)
-		t.Text=t.Text .."\n\nLevels gained in MM6: " .. StrColor(255,255,153,math.round(vars.MM6LVL*100)/100) .. "\nLevels gained in MM7: " .. StrColor(255,255,153,math.round(vars.MM7LVL*100)/100) .. "\nLevels gained in MM8: " .. StrColor(255,255,153,math.round(vars.MM8LVL*100)/100) .. "\n\nBolster Level in MM6: " .. StrColor(255,255,153,math.round(bolsterLevel6)) .."\nBolster Level in MM7: " .. StrColor(255,255,153,math.round(bolsterLevel7)) .."\nBolster Level in MM8: " .. StrColor(255,255,153,math.round(bolsterLevel8))
+		t.Text=t.Text .."\n\nLevels gained in MM6: " .. StrColor(255,255,153,round(vars.MM6LVL*100)/100) .. "\nLevels gained in MM7: " .. StrColor(255,255,153,round(vars.MM7LVL*100)/100) .. "\nLevels gained in MM8: " .. StrColor(255,255,153,round(vars.MM8LVL*100)/100) .. "\n\nBolster Level in MM6: " .. StrColor(255,255,153,round(bolsterLevel6)) .."\nBolster Level in MM7: " .. StrColor(255,255,153,round(bolsterLevel7)) .."\nBolster Level in MM8: " .. StrColor(255,255,153,round(bolsterLevel8))
 	end
 	if t.Stat==15 then
 		local i=Game.CurrentPlayer
 		local atk=Party[i]:GetMeleeAttack()
 		local lvl=Party[i].LevelBase
-		local hitChance= math.round((15+atk*2)/(30+atk*2+lvl)*10000)/100
+		local hitChance= round((15+atk*2)/(30+atk*2+lvl)*10000)/100
 		t.Text=string.format("%s\n\nHit chance vs same level monster: %s%s",t.Text,StrColor(255,255,100,hitChance),StrColor(255,255,100,"%"))
 	end
 	
@@ -495,9 +466,9 @@ function events.BuildStatInformationBox(t)
 		mapvars.damageTrackRanged[Party[i]:GetIndex()]=mapvars.damageTrackRanged[Party[i]:GetIndex()] or 0
 
 		local damage= vars.damageTrack[Party[Game.CurrentPlayer]:GetIndex()] or 0
-		t.Text=string.format("%s\n\nTotal Damage done: %s",t.Text,StrColor(255,255,100,math.round(damage)))
+		t.Text=string.format("%s\n\nTotal Damage done: %s",t.Text,StrColor(255,255,100,round(damage)))
 		local damage= mapvars.damageTrack[Party[Game.CurrentPlayer]:GetIndex()] or 0
-		t.Text=string.format("%s\nDamage done in current map: %s",t.Text,StrColor(255,255,100,math.round(damage)))
+		t.Text=string.format("%s\nDamage done in current map: %s",t.Text,StrColor(255,255,100,round(damage)))
 
             	t.Text = string.format("%s\n\nMap percentage, Melee/Ranged/Total:", t.Text)
 		local total_map_damage_m = 0
@@ -513,9 +484,9 @@ function events.BuildStatInformationBox(t)
 
         for i = 0, Party.High do
             t.Text = string.format("%s\n %s\t %29s\t%32s %s\t%37s %s\t%42s", t.Text, Game.ClassNames[Party[i].Class],
-                math.round(100 * player_damage_m[i] / total_map_damage_m),'/', 
-                math.round(100 * player_damage_r[i] / total_map_damage_r),'/',
-                math.round(100 * (player_damage_m[i] + player_damage_r[i]) / (total_map_damage_m + total_map_damage_r)),' %')
+                round(100 * player_damage_m[i] / total_map_damage_m),'/', 
+                round(100 * player_damage_r[i] / total_map_damage_r),'/',
+                round(100 * (player_damage_m[i] + player_damage_r[i]) / (total_map_damage_m + total_map_damage_r)),' %')
         end
 	end
 	
@@ -525,7 +496,7 @@ function events.BuildStatInformationBox(t)
 		local i=Game.CurrentPlayer
 		local atk=Party[i]:GetRangedAttack()
 		local lvl=Party[i].LevelBase
-		local hitChance= math.round((15+atk*2)/(30+atk*2+lvl)*10000)/100
+		local hitChance= round((15+atk*2)/(30+atk*2+lvl)*10000)/100
 		t.Text=string.format("%s\n\nHit chance vs same level monster: %s%s",t.Text,StrColor(255,255,100,hitChance),StrColor(255,255,100,"%"))
 	end
 	
@@ -540,9 +511,9 @@ function events.BuildStatInformationBox(t)
 		mapvars.damageTrackRanged[Party[i]:GetIndex()]=mapvars.damageTrackRanged[Party[i]:GetIndex()] or 0
 
 		local damage= vars.damageTrackRanged[Party[Game.CurrentPlayer]:GetIndex()] or 0
-		t.Text=string.format("%s\n\nTotal Ranged Damage done: %s",t.Text,StrColor(255,255,100,math.round(damage)))
+		t.Text=string.format("%s\n\nTotal Ranged Damage done: %s",t.Text,StrColor(255,255,100,round(damage)))
 		local damage= mapvars.damageTrackRanged[Party[Game.CurrentPlayer]:GetIndex()] or 0
-		t.Text=string.format("%s\nRanged Damage done in current map: %s",t.Text,StrColor(255,255,100,math.round(damage)))
+		t.Text=string.format("%s\nRanged Damage done in current map: %s",t.Text,StrColor(255,255,100,round(damage)))
 
             	t.Text = string.format("%s\n\nMap percentage, Melee/Ranged/Total:", t.Text)
 		local total_map_damage_m = 0
@@ -558,9 +529,9 @@ function events.BuildStatInformationBox(t)
 
         for i = 0, Party.High do
             t.Text = string.format("%s\n %s\t %29s\t%32s %s\t%37s %s\t%42s", t.Text, Game.ClassNames[Party[i].Class],
-                math.round(100 * player_damage_m[i] / total_map_damage_m),'/', 
-                math.round(100 * player_damage_r[i] / total_map_damage_r),'/',
-                math.round(100 * (player_damage_m[i] + player_damage_r[i]) / (total_map_damage_m + total_map_damage_r)),' %')
+                round(100 * player_damage_m[i] / total_map_damage_m),'/', 
+                round(100 * player_damage_r[i] / total_map_damage_r),'/',
+                round(100 * (player_damage_m[i] + player_damage_r[i]) / (total_map_damage_m + total_map_damage_r)),' %')
         end
 
 
@@ -580,7 +551,7 @@ function events.Regeneration(t)
 					t.HP=t.HP+math.max(totHP*0.01-1,0)
 				end
 			end
-		t.HP=math.round(t.HP)
+		t.HP=round(t.HP)
 		--SP
 		totSP=Party[t.PlayerIndex]:GetFullSP()
 			for it in Party[t.PlayerIndex]:EnumActiveItems() do
@@ -588,7 +559,7 @@ function events.Regeneration(t)
 					t.SP=t.SP+math.max(totSP*0.01-1,0)
 				end
 			end
-		t.SP=math.round(t.SP)
+		t.SP=round(t.SP)
 	end
 end
 
@@ -822,7 +793,7 @@ function events.Action(t)
 		if t.Action==94 then
 			local i=t.Param-1
 			if i>=0 and i<=Party.High and vars.currentManaPool[i] then
-				local manaPool=math.round(vars.currentManaPool[i]/vars.maxManaPool[i]*1000)/10
+				local manaPool=round(vars.currentManaPool[i]/vars.maxManaPool[i]*1000)/10
 				Game.GlobalTxt[212]=StrColor(0,100,255,"Mana " .. manaPool .. "%")
 			end
 		end
@@ -835,7 +806,7 @@ function events.Tick()
 		if buffRework then
 			vars.currentManaPool[i]=vars.currentManaPool[i] or 1
 			vars.maxManaPool[i]=vars.maxManaPool[i] or 1
-			local manaPool=math.round(vars.currentManaPool[i]/vars.maxManaPool[i]*1000)/10
+			local manaPool=round(vars.currentManaPool[i]/vars.maxManaPool[i]*1000)/10
 			Game.GlobalTxt[212]=StrColor(0,100,255,"Mana " .. manaPool .. "%")
 		end
 		pl=Party[i]
@@ -847,8 +818,8 @@ function events.Tick()
 			if resistances[i]>=64000 then
 				resistances[i]="Immune"
 			end
-			resistances2[i]=100-math.max(math.round(calcMawDamage(pl,damageList[i-9],1000))/10, 0)
-			resistances2[i]=math.round(resistances2[i]*100)/100
+			resistances2[i]=100-math.max(round(calcMawDamage(pl,damageList[i-9],1000))/10, 0)
+			resistances2[i]=round(resistances2[i]*100)/100
 			if resistances2[i]%1==0 then
 				resistances2[i]=resistances2[i] .. ".0"
 			end
@@ -935,7 +906,7 @@ function events.CalcDamageToMonster(t)
 					local damageIncrease=(2+s*0.02)*mult
 					mapvars.spearDamageIncrease[id]=mapvars.spearDamageIncrease[id]+damageIncrease
 					local reduction=calcSpearResReduction(mapvars.spearDamageIncrease[id])
-					t.Monster.Resistances[index]=math.round(math.max(mapvars.originalResistance[id]-reduction,0))
+					t.Monster.Resistances[index]=round(math.max(mapvars.originalResistance[id]-reduction,0))
 				end
 			end
 		end
@@ -970,8 +941,8 @@ function events.CalcDamageToMonster(t)
 				stacks=1
 			end
 			local powerMult, DPS2, DPS3, vitMult=calcPowerVitality(pl, false)
-			local vit=math.round(vitMult^0.35)
-			local power=math.round(powerMult^0.35)
+			local vit=round(vitMult^0.35)
+			local power=round(powerMult^0.35)
 			local totalRetDamage=power*vit*s*stacks
 			t.Result=t.Result+totalRetDamage
 			
@@ -1124,7 +1095,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		end
 		local divider=math.min(120+monLvl*0.75*bolster,600*bolster)
 		local reduction=compute_damage(AC/divider)
-		local damage=math.round(damage/reduction)
+		local damage=round(damage/reduction)
 		return damage
 	end
 	
@@ -1160,7 +1131,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	
 	--get resistances
 	if not damageKindResistance[damageKind] then
-		local damage=math.round(damage)
+		local damage=round(damage)
 		return damage
 	end
 	local res=math.huge
@@ -1202,7 +1173,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		res=math.max(0, res+(math.min(res,1-res)*roll))
 	end
 	
-	local damage=math.round(damage*res)
+	local damage=round(damage*res)
 	return damage
 end
 
@@ -1264,7 +1235,7 @@ function calcPowerVitality(pl, statsMenu)
 			enchantDamage=enchantDamage+dmg1+dmg2
 		end
 	end
-	DPS1=math.round((dmg*(1+math.min(critChance,1)*(critMult-1))+enchantDamage)/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Melee"]*math.max(critChance,1))
+	DPS1=round((dmg*(1+math.min(critChance,1)*(critMult-1))+enchantDamage)/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Melee"]*math.max(critChance,1))
 	
 	--RANGED
 	local low=pl:GetRangedDamageMin()
@@ -1285,7 +1256,7 @@ function calcPowerVitality(pl, statsMenu)
 	if m>=3 then
 		dmg=dmg*2
 	end
-	local DPS2=math.round((dmg*(1+math.min(critChance,1)*(critMult-1))+enchantDamage)/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Ranged"]*math.max(critChance,1))
+	local DPS2=round((dmg*(1+math.min(critChance,1)*(critMult-1))+enchantDamage)/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Ranged"]*math.max(critChance,1))
 	if spellPowers[spellIndex] or (healingSpells and healingSpells[spellIndex]) then 
 		--calculate damage
 		--skill
@@ -1326,7 +1297,7 @@ function calcPowerVitality(pl, statsMenu)
 		end
 		haste=math.floor(pl:GetSpeed()/10)/100+1
 		delay=getSpellDelay(pl,spellIndex) or 100
-		DPS3=math.round((power*(1+math.min(critChance,1)*(critDamage-1))+enchantDamage)/(delay/60)*math.max(critChance,1))			
+		DPS3=round((power*(1+math.min(critChance,1)*(critDamage-1))+enchantDamage)/(delay/60)*math.max(critChance,1))			
 	end
 			
 	local fullHP=pl:GetFullHP()
@@ -1366,23 +1337,23 @@ function calcPowerVitality(pl, statsMenu)
 		local s2=SplitSkill(pl.Skills[const.Skills.Dark])
 		reduction=reduction*0.99^((s1+s2)/2)
 	end
-	vitality=fullHP/reduction
-	vitality=vitality-vitality%1
+	
+	vitality=round(fullHP/reduction)
 	if statsMenu then
 		if DPS1>9999999 then
-			DPS1=math.round(DPS1/1000000) .. "M"
+			DPS1=round(DPS1/1000000) .. "M"
 		elseif DPS1>9999 then
-			DPS1=math.round(DPS1/1000) .. "K"
+			DPS1=round(DPS1/1000) .. "K"
 		end
 		if DPS2>9999999 then
-			DPS2=math.round(DPS2/1000000) .. "M"
+			DPS2=round(DPS2/1000000) .. "M"
 		elseif DPS2>9999 then
-			DPS2=math.round(DPS2/1000) .. "K"
+			DPS2=round(DPS2/1000) .. "K"
 		end
 		if DPS3>9999999 then
-			DPS3=math.round(DPS3/1000000) .. "M"
+			DPS3=round(DPS3/1000000) .. "M"
 		elseif DPS3>9999 then
-			DPS3=math.round(DPS3/1000) .. "K"
+			DPS3=round(DPS3/1000) .. "K"
 		end
 	end
 	return DPS1, DPS2, DPS3, vitality
