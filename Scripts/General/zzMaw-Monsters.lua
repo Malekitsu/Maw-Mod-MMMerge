@@ -2118,6 +2118,13 @@ end
 
 --check for dungeon clear
 function events.MonsterKilled(mon)
+	checkMapCompletition()
+end
+
+function events.LoadMap(wasInGame)
+	Timer(checkMapCompletition, const.Minute*5) 
+end
+function checkMapCompletition()
 	if (Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.completed==nil) or (Map.IndoorOrOutdoor==2 and mapvars.completed==nil) then
 		if Map.Name=="d42.blv" then return end --arena
 		n=Map.Monsters.Count
@@ -2136,7 +2143,7 @@ function events.MonsterKilled(mon)
 			end
 		end
 		local requiredRateo=0.99^(math.floor(n/100))
-		mapvars.completition=math.round(m/n*100/requiredRateo)
+		mapvars.completition=math.min(math.round(m/n*100/requiredRateo),100)
 		completition.Text=string.format(mapvars.completition)
 		percentText.Text="%"
 		if completition.Text=="100" then
@@ -2256,6 +2263,7 @@ function events.MonsterKilled(mon)
 		end
 	end
 end
+	
 --ask confirmation and instructions for true nightmare mode
 function nightmare()
 	if vars.Mode==2 then
@@ -2294,6 +2302,7 @@ function nightmare()
 		Message("Greeting adventurer!\nYour journey is about to start, but first make sure to check the difficulty settings (ESC-->Controls-->Extra Settings(on the top)-->Bolstering Power)")
 	end
 end
+
 function events.LoadMap(wasInGame)
 	Timer(nightmare, const.Minute/4) 
 end
