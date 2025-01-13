@@ -255,6 +255,12 @@ function events.ItemGenerated(t)
 		if Map.Name=="d42.blv" then
 			currentLevel=monTbl[math.min((vars.highestArenaWave+1)*3,#monTbl)].Level*6
 			partyLevel=monTbl[math.min((vars.highestArenaWave+1)*3,#monTbl)].Level*6/1.5
+			if (vars.highestArenaWave+1)*3>#monTbl then
+				local diff=(vars.highestArenaWave+1)*3-#monTbl
+				local extraBoost=diff*3.5
+				currentLevel=currentLevel+extraBoost
+				partyLevel=partyLevel+extraBoost/1.5
+			end
 		end
 		
 		local name=Game.MapStats[Map.MapStatsIndex].Name
@@ -308,7 +314,7 @@ function events.ItemGenerated(t)
 		bonusCharges=(difficultyExtraPower-1)*10
 		cap1=50*((difficultyExtraPower-1)*2+1)
 		maxChargesCap=50*((difficultyExtraPower-1)*4+1)
-		if mapvars.mapAffixes or Map.Name~="d42.blv" then
+		if mapvars.mapAffixes or Map.Name=="d42.blv" then
 			cap1=cap1+75
 			maxChargesCap=maxChargesCap+100
 		end
@@ -323,7 +329,7 @@ function events.ItemGenerated(t)
 		if mapvars.mapAffixes then
 			bonusCap=bonusCap+math.floor(math.min(math.max((mapvars.mapAffixes.Power-30+2)/2,0),20))  --cap at map level 700
 		end
-		if Map.Name~="d42.blv" then
+		if Map.Name=="d42.blv" then
 			bonusCap=bonusCap+20
 		end
 		cap2=14+bonusCap
