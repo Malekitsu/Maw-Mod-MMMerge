@@ -1366,8 +1366,8 @@ function calcPowerVitality(pl, statsMenu)
 		local s2=SplitSkill(pl.Skills[const.Skills.Dark])
 		reduction=reduction*0.99^((s1+s2)/2)
 	end
-	
-	vitality=math.round(fullHP/reduction)
+	vitality=fullHP/reduction
+	vitality=vitality-vitality%1
 	if statsMenu then
 		if DPS1>9999999 then
 			DPS1=math.round(DPS1/1000000) .. "M"
