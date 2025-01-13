@@ -23,13 +23,11 @@ end
 end
 
 function events.LoadMap()
-if austerity == true then
-Party[0].Skills[const.Skills.IdentifyMonster] = JoinSkill(10, const.GM)
-Party[1].Skills[const.Skills.IdentifyMonster] = JoinSkill(10, const.GM)
-Party[2].Skills[const.Skills.IdentifyMonster] = JoinSkill(10, const.GM)
-Party[3].Skills[const.Skills.IdentifyMonster] = JoinSkill(10, const.GM)
-Party[4].Skills[const.Skills.IdentifyMonster] = JoinSkill(10, const.GM)
-end
+	if austerity == true then
+		for i=0, Party.High do
+			Party[i].Skills[const.Skills.IdentifyMonster] = JoinSkill(10, const.GM)
+		end
+	end
 end
 
 function events.LoadMap()
