@@ -538,7 +538,7 @@ function events.BuildStatInformationBox(t)
 	end
 	
 	if t.Stat>=19 and t.Stat<=24 then
-		t.Text=t.Text .. "\n\nDamage is reduced by an amount equal to % shown.\n\nLight resistance is equal to the lowest between Mind and Body resistances.\nDark resistance is equal to the lowest between elemental resistances\nEnergy resistance is equal to the lowest resistance"
+		t.Text=t.Text .. "\n\nDamage is reduced by an amount equal to % shown.\n\nLight resistance is equal to the lowest between Mind and Body resistances.\nDark resistance is equal to the lowest between elemental resistances.\nEnergy resistance is equal to the lowest resistance."
 	end
 end
 
