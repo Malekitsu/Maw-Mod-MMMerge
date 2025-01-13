@@ -458,6 +458,9 @@ function events.MonsterKillExp(t)
 	vars.LVLBEFORE = calcLevel(vars.EXPBEFORE)
 	
 	vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
+	for i=0, Party.High do
+		Party[i].Exp=math.min(Party[i].Exp, 2^32-3982296)
+	end
 end
 
 function events.LoadMap()
@@ -2247,6 +2250,9 @@ function checkMapCompletition()
 				experience=experience*5/Party.Count
 				for i=0,Party.High do
 					evt[i].Add{"Experience", Value = experience}
+				end
+				for i=0, Party.High do
+					Party[i].Exp=math.min(Party[i].Exp, 2^32-3982296)
 				end
 				mapvars.completed=true
 				vars.dungeonCompletedList=vars.dungeonCompletedList or {}
