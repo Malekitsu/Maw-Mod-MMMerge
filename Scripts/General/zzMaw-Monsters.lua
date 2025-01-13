@@ -596,7 +596,7 @@ function recalculateMonsterTable()
 			if (vars.highestArenaWave+1)*3>#monTbl then
 				local diff=(vars.highestArenaWave+1)*3-#monTbl
 				local extraBoost=diff*3.5
-				totalLevel[i]=totalLevel[i]+extraBoost
+				totalLevel[i]=totalLevel[i]+extraBoost+600
 			end
 		end
 		
