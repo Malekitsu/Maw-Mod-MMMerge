@@ -426,7 +426,7 @@ function events.BuildStatInformationBox(t)
 		local pl=Party[i]
 		local id=pl:GetIndex()
 		--check and add equipped legendaries
-		local legTxt="Currently Active Legedendary effects:"
+		local legTxt="Currently Active Legendary effects:"
 		for i=1,#legendaryEffects-10 do
 			local legId=i+10
 			if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], legId) then
