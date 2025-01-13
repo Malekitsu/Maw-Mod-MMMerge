@@ -125,7 +125,11 @@ function arenaSpawns()
 		end
 	end
 	
-	local spawn=monTbl[math.min(currentWave,#monTbl)].Index-1
+	local tableId=currentWave%#monTbl
+	if tableId==0 then
+		tableId=#monTbl
+	end
+	local spawn=monTbl[tableId].Index-1
 	
 	waveState=waveState or 1
 	
