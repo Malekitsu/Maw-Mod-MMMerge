@@ -593,6 +593,11 @@ function recalculateMonsterTable()
 			flattener=(base.Level-LevelB)*horizontalMultiplier*0.8 --necessary to avoid making too much difference between monster tier
 			totalLevel[i]=math.max(base.Level*horizontalMultiplier-flattener+adjust*2, 5)
 			mon.Level=math.min(totalLevel[i],255)
+			if (vars.highestArenaWave+1)*3>#monTbl then
+				local diff=(vars.highestArenaWave+1)*3-#monTbl
+				local extraBoost=diff*3.5
+				totalLevel[i]=totalLevel[i]+extraBoost
+			end
 		end
 		
 		--online
