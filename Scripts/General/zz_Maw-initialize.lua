@@ -27,6 +27,11 @@ function events.GameInitialized2()
 	end
 end
 
+--custom rounding function, as math.round is capped to 2^32
+function round(x)
+	x=x-x%1
+	return x
+end
 
 ---------------------------------
 --HERE IS THE KEYBIND LIST--
