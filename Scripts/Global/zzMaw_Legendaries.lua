@@ -76,7 +76,7 @@ function events.CalcDamageToMonster(t)
 		local s1=SplitSkill(t.Player.Skills[const.Skills.Fire])
 		local fireDamage=s1*0.001
 		if t.Monster.Resistances[0]>=1000 then
-			mult=2^math.floor(t.Monster.Resistances[0]/1000)
+			mult=2^t.Monster.Resistances[0]%1000
 			fireDamage=fireDamage*mult
 		end
 		fireDamage=math.max(t.Monster.HP*fireDamage,s1)
