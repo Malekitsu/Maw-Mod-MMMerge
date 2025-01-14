@@ -1156,7 +1156,7 @@ function MawRegen()
 			end
 			local regenEffect={[0]=0,3,4,6,6}
 			FHP	= pl:GetFullHP()
-			local regenAmount=FHP^0.5*RegS^1.75*(regenEffect[RegM]/3500)
+			local regenAmount=FHP^0.5*RegS^1.65*(regenEffect[RegM]/3500)
 			for it in pl:EnumActiveItems() do
 				if it.Bonus2 == 37 or it.Bonus2==44 or it.Bonus2==50 or it.Bonus2==54 or it.Bonus2==66 or table.find(artifactHpRegen, it.Number) then		
 					regenAmount=regenAmount+FHP*0.02/100	
@@ -1171,11 +1171,11 @@ function MawRegen()
 				if pl.SpellBuffs[12].ExpireTime>=Game.Time then
 					local s,m,level=getBuffSkill(71)
 					local skill=(level)^0.65*(1+s*buffPower[71].Base[m]/100)
-					regenHP[i] = regenHP[i] + (FHP^0.5*skill^1.3*(buffPower[71].Base[m]/10000))* timeMultiplier * mult -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
+					regenHP[i] = regenHP[i] + (FHP^0.5*skill^1.25*(buffPower[71].Base[m]/10000))* timeMultiplier * mult -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
 				end
 			elseif Buff.ExpireTime > Game.Time then
 				RegS, RegM = SplitSkill(Buff.Skill)
-				regenHP[i] = regenHP[i] + (FHP^0.5*RegS^1.3*((RegM+1)/10000))* timeMultiplier * mult -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
+				regenHP[i] = regenHP[i] + (FHP^0.5*RegS^1.25*((RegM+1)/10000))* timeMultiplier * mult -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
 			end
 			regenHP[i] = regenHP[i] 
 			pl.HP = math.min(FHP, pl.HP + math.floor(regenHP[i]))
