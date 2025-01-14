@@ -2747,7 +2747,7 @@ if buffRework then
 			
 			local cost=getBuffCost(pl, spellId)
 			
-			if vars.currentManaPool[id]<cost then
+			if vars.currentManaPool[id]<cost and not Game:GetCurrentHouse() then
 				Game.ShowStatusText("Not enough Mana")
 				return
 			end
@@ -2758,7 +2758,7 @@ if buffRework then
 			end
 			evt.PlaySound(sound)
 			local delay=getSpellDelay(pl,spellId)
-			if not delay then --this should apply only when donating in temples
+			if not delay or Game:GetCurrentHouse() then --this should apply only when donating in temples
 				vars.mawbuff[spellId]="Temple"
 			else
 				pl:SetRecoveryDelay(delay)
