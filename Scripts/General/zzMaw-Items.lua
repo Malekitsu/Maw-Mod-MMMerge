@@ -3685,7 +3685,7 @@ function events.CanWearItem(t)
 		if it.BonusExpireTime>10 and it.BonusExpireTime<=100 then
 			maxCharges=math.floor(math.min(maxCharges/1.2,maxCharges-5))
 		end
-		local levelRequired=(maxCharges)*3+lvl/tot*2-24
+		local levelRequired=(maxCharges)*6+lvl/tot*2-24
 		if Game.BolsterAmount>=300 then
 			levelRequired=levelRequired-6
 		end
