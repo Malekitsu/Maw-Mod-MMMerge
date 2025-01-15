@@ -48,9 +48,9 @@ function events.AfterLoadMap()
 			if v~=5 then
 				if v==0 and Map.Monsters[i].Resistances[v]<65000 then
 					hpMult=math.floor(Map.Monsters[i].Resistances[v]/1000)
-					Map.Monsters[i].Resistances[v]=math.min(bolsterRes+basetable[Map.Monsters[i].Id].Resistances[v],bolsterRes+200)+1000*hpMult	
+					Map.Monsters[i].Resistances[v]=math.min(bolsterRes+basetable[Map.Monsters[i].Id].Resistances[v],bolsterRes+200,999)+1000*hpMult	
 				else
-					Map.Monsters[i].Resistances[v]=math.min(bolsterRes+basetable[Map.Monsters[i].Id].Resistances[v],bolsterRes+200)
+					Map.Monsters[i].Resistances[v]=math.min(bolsterRes+basetable[Map.Monsters[i].Id].Resistances[v],bolsterRes+200,999)
 				end
 			end
 		end
@@ -624,7 +624,7 @@ function recalculateMonsterTable()
 		end
 		for v=0,10 do
 			if v~=5 then
-			mon.Resistances[v]=math.min(bolsterRes+basetable[i].Resistances[v],bolsterRes+200)
+				mon.Resistances[v]=math.min(bolsterRes+basetable[i].Resistances[v],bolsterRes+200,999)
 			end
 		end
 		
