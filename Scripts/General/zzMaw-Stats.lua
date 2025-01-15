@@ -833,24 +833,35 @@ function events.Tick()
 				resistanceText[i]=string.format("%6s", resistances[9+i])
 			end
 		end
-		Game.GlobalTxt[87]=StrColor(255, 70, 70,    string.format("Fire\t            %s%s ",resistances2[10],"%")) .. resistanceText[1] .. "\n\n\n\n\n\n\n\n\n"
-		Game.GlobalTxt[6]=StrColor(173, 216, 230,   string.format("Air\t            %s%s ",resistances2[11],"%")) .. resistanceText[2] .. "\n\n\n\n\n\n\n\n\n"
-		Game.GlobalTxt[240]=StrColor(100, 180, 255, string.format("Water\t            %s%s ",resistances2[12],"%")) .. resistanceText[3] .. "\n\n\n\n\n\n\n\n\n"
-		Game.GlobalTxt[70]=StrColor(153, 76, 0,     string.format("Earth\t            %s%s ",resistances2[13],"%")) .. resistanceText[4] .. "\n\n\n\n\n\n\n\n\n"
-		Game.GlobalTxt[142]=StrColor(200, 200, 255, string.format("Mind\t            %s%s ",resistances2[14],"%")) .. resistanceText[5] .. "\n\n\n\n\n\n\n\n\n"
-		Game.GlobalTxt[29]=StrColor(255, 192, 203,  string.format("Body\t            %s%s ",resistances2[15],"%"))	 .. resistanceText[6] .. "\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[87]=StrColor(255, 70, 70,    string.format(resListBackup[1] .. "\t            %s%s ",resistances2[10],"%")) .. resistanceText[1] .. "\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[6]=StrColor(173, 216, 230,   string.format(resListBackup[2] .. "\t            %s%s ",resistances2[11],"%")) .. resistanceText[2] .. "\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[240]=StrColor(100, 180, 255, string.format(resListBackup[3] .. "\t            %s%s ",resistances2[12],"%")) .. resistanceText[3] .. "\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[70]=StrColor(153, 76, 0,     string.format(resListBackup[4] .. "\t            %s%s ",resistances2[13],"%")) .. resistanceText[4] .. "\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[142]=StrColor(200, 200, 255, string.format(resListBackup[5] .. "\t            %s%s ",resistances2[14],"%")) .. resistanceText[5] .. "\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[29]=StrColor(255, 192, 203,  string.format(resListBackup[6] .. "\t            %s%s ",resistances2[15],"%"))	 .. resistanceText[6] .. "\n\n\n\n\n\n\n\n\n"
 		statsChanged=true
 	elseif statsChanged and (Game.CurrentCharScreen~=100 or Game.CurrentScreen~=7) then
-		Game.GlobalTxt[87]="Fire"
-		Game.GlobalTxt[6]="Air"
-		Game.GlobalTxt[240]="Water"
-		Game.GlobalTxt[70]="Earth"
-		Game.GlobalTxt[142]="Mind"
-		Game.GlobalTxt[29]="Body"
+		Game.GlobalTxt[87]=resListBackup[1]
+		Game.GlobalTxt[6]=resListBackup[2]
+		Game.GlobalTxt[240]=resListBackup[3]
+		Game.GlobalTxt[70]=resListBackup[4]
+		Game.GlobalTxt[142]=resListBackup[5]
+		Game.GlobalTxt[29]=resListBackup[6]
 		statsChanged=false
 	end
 end
 
+function events.BeforeLoadMap()
+	if not resListBackup then
+		resListBackup={}
+		resListBackup[1]=Game.GlobalTxt[87]
+		resListBackup[2]=Game.GlobalTxt[6]
+		resListBackup[3]=Game.GlobalTxt[240]
+		resListBackup[4]=Game.GlobalTxt[70]
+		resListBackup[5]=Game.GlobalTxt[142]
+		resListBackup[6]=Game.GlobalTxt[29]
+	end
+end
 
 damageKindMap={
 	[0]=const.Damage.Fire,
