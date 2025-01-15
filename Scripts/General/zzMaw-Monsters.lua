@@ -3029,6 +3029,14 @@ function calculateDirection(x_m, y_m, x_p, y_p)
     return direction
 end
 
+function events.AfterLoadMap()
+	if vars.insanityMode then
+		MAWBOLSTER[600]="Insane"
+	else
+		MAWBOLSTER[600]="Doom"
+	end
+end
+
 --[[reduce drops from gogs and wasps 
 local nerfDropList={201, 202, 217, 653, 654,}  
 function events.MonsterDropItem(t)
