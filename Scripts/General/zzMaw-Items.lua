@@ -756,16 +756,16 @@ end
 function events.GameInitialized2()
 	--menu stats
 	if ColouredStats==true then
-		Game.GlobalTxt[144]=StrColor(255,0,0,"Might")
-		Game.GlobalTxt[116]=StrColor(255,128,0,"Intellect")
-		Game.GlobalTxt[163]=StrColor(0,127,255,"Personality")
-		Game.GlobalTxt[75]=StrColor(0,255,0,"Endurance")
-		Game.GlobalTxt[1]=StrColor(255,255,0,"Accuracy")
-		Game.GlobalTxt[211]=StrColor(127,0,255,"Speed")
-		Game.GlobalTxt[136]=StrColor(255,255,255,"Luck")
-		Game.GlobalTxt[108]=StrColor(0,255,0,"Hit Points")
-		Game.GlobalTxt[212]=StrColor(0,100,255,"Mana")
-		Game.GlobalTxt[12]=StrColor(230,204,128,"Armor Class")
+		Game.GlobalTxt[144]=StrColor(255,0,0,Game.GlobalTxt[144])
+		Game.GlobalTxt[116]=StrColor(255,128,0,Game.GlobalTxt[116])
+		Game.GlobalTxt[163]=StrColor(0,127,255,Game.GlobalTxt[163])
+		Game.GlobalTxt[75]=StrColor(0,255,0,Game.GlobalTxt[75])
+		Game.GlobalTxt[1]=StrColor(255,255,0,Game.GlobalTxt[1])
+		Game.GlobalTxt[211]=StrColor(127,0,255,Game.GlobalTxt[211])
+		Game.GlobalTxt[136]=StrColor(255,255,255,Game.GlobalTxt[136])
+		Game.GlobalTxt[108]=StrColor(0,255,0,Game.GlobalTxt[108])
+		Game.GlobalTxt[212]=StrColor(0,100,255,Game.GlobalTxt[212])
+		Game.GlobalTxt[12]=StrColor(230,204,128,Game.GlobalTxt[12])
 	end
 end
 
