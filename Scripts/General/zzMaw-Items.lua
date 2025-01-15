@@ -3898,7 +3898,7 @@ function events.AfterLoadMap()
 			mapvars.chestFix=true
 			local name=Game.MapStats[Map.MapStatsIndex].Name
 			local mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
-			local lootLevel=math.min(math.floor(mapLevel/20)+1,6)
+			local lootLevel=math.max(math.min(math.floor(mapLevel/20)+1,6),2)
 			for k=0,Map.Chests.High do
 				for i=1,Map.Chests[k].Items.High do
 					local it=Map.Chests[k].Items[i]
@@ -3908,7 +3908,15 @@ function events.AfterLoadMap()
 						end
 					end
 				end
-			end			
+			end
+			for i=0,Map.Objects.High do
+				local it=Map.Objects[i].Item
+				if it.MaxCharges==0 then
+					if (it.Number>=1 and it.Number<=151) or (it.Number>=803 and it.Number<=936) or (it.Number>=1603 and it.Number<=1736) then
+						it:Randomize(lootLevel,it:T().EquipStat+1)
+					end
+				end
+			end
 		end
 	end
 end
