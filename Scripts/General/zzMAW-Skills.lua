@@ -2347,3 +2347,11 @@ function events.PlaySound(t)
 		t.Sound=83
 	end
 end
+
+function events.KeyDown(t)
+	lastUnstuck=lastUnstuck or 0
+	if Game.CurrentScreen==0 and t.Key==const.Keys.L and Game.Time>lastUnstuck then
+		Party.Z=Party.Z+100
+		lastUnstuck=Game.Time+const.Minute*5
+	end
+end
