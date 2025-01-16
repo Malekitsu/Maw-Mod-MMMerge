@@ -1177,7 +1177,19 @@ function MawRegen()
 				RegS, RegM = SplitSkill(Buff.Skill)
 				regenHP[i] = regenHP[i] + (FHP^0.5*RegS^1.25*((RegM+1)/10000))* timeMultiplier * mult -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
 			end
-			regenHP[i] = regenHP[i] 
+			
+			--recount
+			local id=pl:GetIndex()
+			local healingDone=math.min(FHP-pl.HP, math.floor(regenHP[i]))
+			if healingDone>0 and (Party.EnemyDetectorRed or Party.EnemyDetectorYellow) then
+				vars.regenerationHeal=vars.regenerationHeal or {}
+				vars.regenerationHeal[id]=vars.regenerationHeal[id] or 0
+				vars.regenerationHeal[id]=vars.regenerationHeal[id] + healingDone
+				mapvars.regenerationHeal=mapvars.regenerationHeal or {}
+				mapvars.regenerationHeal[id]=mapvars.regenerationHeal[id] or 0
+				mapvars.regenerationHeal[id]=mapvars.regenerationHeal[id] + healingDone
+			end
+			--actual heal
 			pl.HP = math.min(FHP, pl.HP + math.floor(regenHP[i]))
 			if pl.HP>0 then
 				pl.Unconscious=0
