@@ -196,18 +196,24 @@ end
 function events.CalcDamageToMonster(t)
 	local data = WhoHitMonster()
 		if data and data.Player and (data.Player.Class==55 or data.Player.Class==54 or data.Player.Class==53) and t.DamageKind==4 and data.Object==nil then
+		
+		local partyHP=0
+		for i=0,Party.High do
+			if Party[i].Dead==0 and Party[i].Eradicated==0 then
+				partyHP=partyHP+Party[i].HP
+			end
+		end
+		
 		--get body
 		body=data.Player:GetSkill(const.Skills.Body)
 		bodyS,bodyM=SplitSkill(body)
-
+		
 		--get spirit
 		spirit=data.Player:GetSkill(const.Skills.Spirit)
 		spiritS,spiritM=SplitSkill(spirit)
 		
 		--Calculate heal value and apply
-		levelBonus1=spiritM*2+math.floor(t.Player.LevelBase/20)
-		levelBonus2=bodyM*2+math.floor(t.Player.LevelBase/20)
-		healValue=(bodyS*levelBonus2+spiritS*levelBonus1)*damageMultiplier[t.PlayerIndex]["Melee"]
+		healValue=(bodyS^1.3*bodyM+spiritS^1.3*spiritM)*damageMultiplier[t.PlayerIndex]["Melee"]
 		personality=data.Player:GetPersonality()
 		healValue=healValue*(1+personality/1000)
 		--[[calculate crit
@@ -225,8 +231,23 @@ function events.CalcDamageToMonster(t)
 		if Party[healTarget].HP>0 then
 			Party[healTarget].Unconscious=0
 		end
+		local partyHP2=0
+		for i=0,Party.High do
+			if Party[i].Dead==0 and Party[i].Eradicated==0 then
+				partyHP2=partyHP2+Party[i].HP
+			end
+		end
+		if partyHP2>partyHP and (Party.EnemyDetectorRed or Party.EnemyDetectorYellow) then	
+			local healing=partyHP2-partyHP
+			local id=t.PlayerIndex
+			vars.healingDone=vars.healingDone or {}
+			vars.healingDone[id]=vars.healingDone[id] or 0
+			vars.healingDone[id]=vars.healingDone[id] + healing
+			mapvars.healingDone=mapvars.healingDone or {}
+			mapvars.healingDone[id]=mapvars.healingDone[id] or 0
+			mapvars.healingDone[id]=mapvars.healingDone[id] + healing
+		end
 	end
-		
 end
 
 --[[mind light increases melee damage
@@ -330,12 +351,12 @@ local function seraphSkills(isSeraph, id)
 		--heal tooltips
 		local pers=pl:GetPersonality()
 		local healMult=1+pers/1000
-		local dmgMult=damageMultiplier[pl:GetIndex()]["Melee"]
-		local spiritHeal=math.round(spiritS*(spiritM*2+math.floor(pl.LevelBase/20))*dmgMult*healMult)
-		local bodyHeal=math.round(bodyS*(bodyM*2+math.floor(pl.LevelBase/20))*dmgMult*healMult)
-		local txt=baseSchoolsTxtSERAPH[16] .. "\n\nSeraphim healing upon attack increases depending on Spirit magic, scaling with personality(weapon speed multiplier applies).\nGets 1 bonus heal each 20 levels.\n\n" .. "Current heal from Spirit: " .. StrColor(0,255,0,spiritHeal) .. "\n"
+		
+		local spiritHeal=math.round(spiritS^1.3*spiritM*damageMultiplier[pl:GetIndex()]["Melee"]*healMult)
+		local bodyHeal=math.round(bodyS^1.3*bodyM*damageMultiplier[pl:GetIndex()]["Melee"]*healMult)
+		local txt=baseSchoolsTxtSERAPH[16] .. "\n\nSeraphim healing upon attack increases depending on Spirit magic, scaling with personality(weapon speed multiplier applies).\n\n" .. "Current heal from Spirit: " .. StrColor(0,255,0,spiritHeal) .. "\n"
 		Skillz.setDesc(16,1,txt)
-		local txt=baseSchoolsTxtSERAPH[18] .. "\n\nSeraphim healing upon attack increases depending on Body magic, scaling with personality(weapon speed multiplier applies).\nGets 1 bonus heal each 20 levels.\n\n" .. "Current heal from Body: " .. StrColor(0,255,0,bodyHeal) .. "\n"
+		local txt=baseSchoolsTxtSERAPH[18] .. "\n\nSeraphim healing upon attack increases depending on Body magic, scaling with personality(weapon speed multiplier applies).\n\n" .. "Current heal from Body: " .. StrColor(0,255,0,bodyHeal) .. "\n"
 		Skillz.setDesc(18,1,txt)
 		
 		--damage tooltip
@@ -347,17 +368,20 @@ local function seraphSkills(isSeraph, id)
 		Skillz.setDesc(19,1,txt)
 		
 		--tooltips
-		Skillz.setDesc(16,2,"Increases healing by 2 per Skill point")
-		Skillz.setDesc(16,3,"Increases healing by 4 per Skill point")
-		Skillz.setDesc(16,4,"Increases healing by 6 per Skill point")
+		Skillz.setDesc(16,2,"Melee attacks heal on hit")
+		Skillz.setDesc(16,3,"Double healing effect")
+		Skillz.setDesc(16,4,"Triple healing effect")
+		Skillz.setDesc(16,5,"n/a")
 		
 		Skillz.setDesc(17,2,"Increases damage by 0.5 per Skill point")
 		Skillz.setDesc(17,3,"Increases damage by 1 per Skill point")
 		Skillz.setDesc(17,4,"Increases damage by 1.5 per Skill point")
+		Skillz.setDesc(17,5,"n/a")
 		
-		Skillz.setDesc(18,2,"Increases healing by 2 per Skill point")
-		Skillz.setDesc(18,3,"Increases healing by 4 per Skill point")
-		Skillz.setDesc(18,4,"Increases healing by 6 per Skill point")
+		Skillz.setDesc(18,2,"Melee attacks heal on hit")
+		Skillz.setDesc(18,3,"Double healing effect")
+		Skillz.setDesc(18,4,"Triple healing effect")
+		Skillz.setDesc(18,5,"n/a")
 		
 		Skillz.setDesc(19,2,"Increases damage by 0.5 per Skill point")
 		Skillz.setDesc(19,3,"Increases damage by 1 per Skill point")
