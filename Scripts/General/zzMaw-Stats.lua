@@ -502,7 +502,7 @@ function events.BuildStatInformationBox(t)
 		mapvars.healingDone[id]=mapvars.healingDone[id] or 0
 		
 		--show
-		t.Text = t.Text .. "\n\nHEALING RECOUNT:\nTotal Healing Done:" .. vars.healingDone[id] .. "\nTotal Regeneration Healing: " .. vars.regenerationHeal[id] .. "\nHealing Done in current Map:" .. mapvars.healingDone[id] .. "\nRegeneration Healing in current Map:" .. mapvars.regenerationHeal[id] .. "\n\nOnly healing done when monsters are in the nearbies is counted" 
+		t.Text = t.Text .. "\n\nHEALING RECOUNT:\nTotal Healing Done:  " .. vars.healingDone[id] .. "\nTotal Regen Healing: " .. vars.regenerationHeal[id] .. "\n\nHealing Done in current Map:  " .. mapvars.healingDone[id] .. "\nRegen Healing in current Map: " .. mapvars.regenerationHeal[id] .. "\n\nOnly healing done when monsters are in the nearbies is counted" 
 		
 	end
 	
