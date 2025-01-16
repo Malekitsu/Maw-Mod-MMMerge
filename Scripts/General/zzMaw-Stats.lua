@@ -327,7 +327,7 @@ function events.BuildStatInformationBox(t)
 		local s,m=SplitSkill(skill)
 
 		local regenEffect={[0]=0,3,4,6,6}
-		local hpRegen = round(FHP^0.5*s^1.5*((regenEffect[m])/35))
+		local hpRegen = round(FHP^0.5*s^1.65*((regenEffect[m])/35))
 		local HPregenItem=0
 		local bonusregen=0
 		for it in Party[i]:EnumActiveItems() do
