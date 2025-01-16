@@ -897,6 +897,18 @@ function events.GameInitialized2()
 			local leech=math.max(math.round(FHP^0.5* m7^1.5/70 * (0.5+bM/2)), m7)
 			local maxSP=data.Player:GetFullSP()
 			data.Player.SP=math.min(data.Player.SP+m6^1.25, getMaxMana(data.Player))
+			
+			local id=data.Player:GetIndex()
+			
+			local healing=math.min(data.Player:GetFullHP()-data.Player.HP, leech)
+			if healing>0 then
+				vars.leechDone=vars.leechDone or {}
+				vars.leechDone[id]=vars.leechDone[id] or 0
+				vars.leechDone[id]=vars.leechDone[id] + healing
+				mapvars.leechDone=mapvars.leechDone or {}
+				mapvars.leechDone[id]=mapvars.leechDone[id] or 0
+				mapvars.leechDone[id]=mapvars.leechDone[id] + healing
+			end
 			data.Player.HP=math.min(data.Player.HP+leech, data.Player:GetFullHP())
 		end
 	end
@@ -1099,6 +1111,19 @@ function events.GameInitialized2()
 						pl.SP=pl.SP-6
 					end
 				end
+				
+				local id=pl:GetIndex()
+			
+				local healing=math.min(pl:GetFullHP()-pl.HP, leech+heal)
+				if healing>0 then
+					vars.leechDone=vars.leechDone or {}
+					vars.leechDone[id]=vars.leechDone[id] or 0
+					vars.leechDone[id]=vars.leechDone[id] + healing
+					mapvars.leechDone=mapvars.leechDone or {}
+					mapvars.leechDone[id]=mapvars.leechDone[id] or 0
+					mapvars.leechDone[id]=mapvars.leechDone[id] + healing
+				end
+				
 				pl.HP=math.min(pl:GetFullHP(), pl.HP+heal+leech)
 				
 				--dark grasp
