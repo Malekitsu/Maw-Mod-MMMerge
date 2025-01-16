@@ -709,6 +709,14 @@ end
 
 -- TODO: test very negative amounts (like -50000), they asserted previously
 function doSharedLife(amount, spellQueueData)
+	local partyHP=0
+	for i=0,Party.High do
+		if Party[i].Dead==0 and Party[i].Eradicated==0 then
+			partyHP=partyHP+Party[i].HP
+		end
+	end
+	
+	
 	spellQueueData = spellQueueData or {}
 	-- for each iteration, try to top up lowest HP deficit party member, increasing others' HP along the way
 	local function shouldParticipate(pl)
@@ -818,6 +826,26 @@ function doSharedLife(amount, spellQueueData)
 		end
 		if pl.HP ~= pl:GetFullHP() then
 			everyoneFull = false
+		end
+	end
+	
+	local partyHP2=0
+	for i=0,Party.High do
+		if Party[i].Dead==0 and Party[i].Eradicated==0 then
+			partyHP2=partyHP2+Party[i].HP
+		end
+	end
+	if id>=0 and id<=Party.High then
+		id=Party[id]:GetIndex()
+		if partyHP2>partyHP and (Party.EnemyDetectorRed or Party.EnemyDetectorYellow) then	
+			local healing=partyHP2-partyHP
+			local id=pl:GetIndex()
+			vars.healingDone=vars.healingDone or {}
+			vars.healingDone[id]=vars.healingDone[id] or 0
+			vars.healingDone[id]=vars.healingDone[id] + healing
+			mapvars.healingDone=mapvars.healingDone or {}
+			mapvars.healingDone[id]=mapvars.healingDone[id] or 0
+			mapvars.healingDone[id]=mapvars.healingDone[id] + healing
 		end
 	end
 	--assert((pool == result) or everyoneFull, format("Pool %d, result %d, everyoneFull: %s", pool, result, everyoneFull))
