@@ -326,7 +326,7 @@ function events.BuildStatInformationBox(t)
 		local skill=Party[i]:GetSkill(const.Skills.Regeneration)
 		local s,m=SplitSkill(skill)
 
-		local regenEffect={[0]=0,3,4,6,6}
+		local regenEffect={[0]=0,2,4,6,6}
 		local hpRegen = round(FHP^0.5*s^1.65*((regenEffect[m])/35))+s*10
 		local HPregenItem=0
 		local bonusregen=0
