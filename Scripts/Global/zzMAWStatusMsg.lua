@@ -24,6 +24,12 @@ end
 function events.CalcDamageToMonster(t)
 	local data=WhoHitMonster()
 	if data and data.Player then
+		local partyHP=0
+		for i=0,Party.High do
+			if Party[i].Dead==0 and Party[i].Eradicated==0 then
+				partyHP=partyHP+Party[i].HP
+			end
+		end
 		local pl=data.Player
 		local index=pl:GetIndex()
 		local mon=t.Monster
@@ -111,6 +117,22 @@ function events.CalcDamageToMonster(t)
 		if overHeal>0 and vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 27) then
 			local id=pickLowestPartyMember()
 			Party[id].HP=Party[id].HP+overHeal
+		end
+		local partyHP2=0
+		for i=0,Party.High do
+			if Party[i].Dead==0 and Party[i].Eradicated==0 then
+				partyHP2=partyHP2+Party[i].HP
+			end
+		end
+		if partyHP2>partyHP and (Party.EnemyDetectorRed or Party.EnemyDetectorYellow) then	
+			local healing=partyHP2-partyHP
+			local id=pl:GetIndex()
+			vars.leechDone=vars.leechDone or {}
+			vars.leechDone[id]=vars.leechDone[id] or 0
+			vars.leechDone[id]=vars.leechDone[id] + healing
+			mapvars.leechDone=mapvars.leechDone or {}
+			mapvars.leechDone[id]=mapvars.leechDone[id] or 0
+			mapvars.leechDone[id]=mapvars.leechDone[id] + healing
 		end
 	end
 end
