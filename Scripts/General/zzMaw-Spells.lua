@@ -106,6 +106,13 @@ function events.PlayerCastSpell(t)
 		mawRefresh("all")
 	end
 	
+	local partyHP=0
+	for i=0,Party.High do
+		if Party[i].Dead==0 and Party[i].Eradicated==0 then
+			partyHP=partyHP+Party[i].HP
+		end
+	end
+	
 	local currentPl=Game.CurrentPlayer
 	for i=0,Party.High do
 		if Party[i]:GetIndex()==t.PlayerIndex then
@@ -561,6 +568,23 @@ function events.PlayerCastSpell(t)
 			applyHoP(t.RemoteData[1], t.RemoteData[2])
 		end
 	end
+	
+	local partyHP2=0
+	for i=0,Party.High do
+		if Party[i].Dead==0 and Party[i].Eradicated==0 then
+			partyHP2=partyHP2+Party[i].HP
+		end
+	end
+	if partyHP2>partyHP and (Party.EnemyDetectorRed or Party.EnemyDetectorYellow) then	
+		local healing=partyHP2-partyHP
+		local id=t.PlayerIndex
+		vars.healingDone=vars.healingDone or {}
+		vars.healingDone[id]=vars.healingDone[id] or 0
+		vars.healingDone[id]=vars.healingDone[id] + healing
+		mapvars.healingDone=mapvars.healingDone or {}
+		mapvars.healingDone[id]=mapvars.healingDone[id] or 0
+		mapvars.healingDone[id]=mapvars.healingDone[id] + healing
+	end
 end
 
 ------------------------------------------------------
@@ -1000,6 +1024,14 @@ function events.Action(t)
 		--spellCast=ExtraQuickSpells.SpellSlots[pl:GetIndex()][1] might turn useful later
 		
 		if table.find(dkClass, Party[Game.CurrentPlayer].Class) then return end
+		
+		local partyHP=0
+		for i=0,Party.High do
+			if Party[i].Dead==0 and Party[i].Eradicated==0 then
+				partyHP=partyHP+Party[i].HP
+			end
+		end
+		
 		if spellCast==68 and pl.RecoveryDelay==0 then
 			local sp=healingSpells[68]
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
@@ -1103,8 +1135,25 @@ function events.Action(t)
 			pl.Expression=40
 			Party.SpellBuffs[11].ExpireTime=0 --invisibility
 		end
+		local partyHP2=0
+		for i=0,Party.High do
+			if Party[i].Dead==0 and Party[i].Eradicated==0 then
+				partyHP2=partyHP2+Party[i].HP
+			end
+		end
+		if partyHP2>partyHP and (Party.EnemyDetectorRed or Party.EnemyDetectorYellow) then	
+			local healing=partyHP2-partyHP
+			local id=pl:GetIndex()
+			vars.healingDone=vars.healingDone or {}
+			vars.healingDone[id]=vars.healingDone[id] or 0
+			vars.healingDone[id]=vars.healingDone[id] + healing
+			mapvars.healingDone=mapvars.healingDone or {}
+			mapvars.healingDone[id]=mapvars.healingDone[id] or 0
+			mapvars.healingDone[id]=mapvars.healingDone[id] + healing
+		end
 	end
 end
+
 
 
 ----------------------------------------
