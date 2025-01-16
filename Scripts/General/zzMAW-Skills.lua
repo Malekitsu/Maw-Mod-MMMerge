@@ -1265,7 +1265,7 @@ function events.Tick()
 		pl=Party[Game.CurrentPlayer]
 		local FHP=pl:GetFullHP()
 		local s,m = SplitSkill(pl:GetSkill(30))
-		local regenEffect={[0]=0,3,4,6,6}
+		local regenEffect={[0]=0,2,4,6,6}
 		local hpRegen = math.round(FHP^0.5*s^1.65*((regenEffect[m])/35))/10+s
 		local hpRegen2 = math.round(FHP^0.5*(s+1)^1.65*((regenEffect[m])/35))/10+(s+1)
 		local txt = string.format("%s\n\nCurrent HP Regeneration: %s\nNext Level Bonus: %s HP Regen",baseRegStr,StrColor(0,255,0,hpRegen),StrColor(0,255,0,"+" .. hpRegen2-hpRegen))
