@@ -29,7 +29,11 @@ end
 
 --custom rounding function, as math.round is capped to 2^32
 function round(x)
-	x=x-x%1
+	if x%1>=0.5 then
+		x=x-x%1+1
+	else
+		x=x-x%1
+	end
 	return x
 end
 
