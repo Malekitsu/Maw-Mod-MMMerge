@@ -488,6 +488,22 @@ function events.BuildStatInformationBox(t)
                 round(100 * player_damage_r[i] / total_map_damage_r),'/',
                 round(100 * (player_damage_m[i] + player_damage_r[i]) / (total_map_damage_m + total_map_damage_r)),' %')
         end
+		
+		--HEALING RECOUNT
+		local id=Party[i]:GetIndex()
+		--initialize
+		vars.regenerationHeal=vars.regenerationHeal or {}
+		vars.regenerationHeal[id]=vars.regenerationHeal[id] or 0
+		mapvars.regenerationHeal=mapvars.regenerationHeal or {}
+		mapvars.regenerationHeal[id]=mapvars.regenerationHeal[id] or 0
+		vars.healingDone=vars.healingDone or {}
+		vars.healingDone[id]=vars.healingDone[id] or 0
+		mapvars.healingDone=mapvars.healingDone or {}
+		mapvars.healingDone[id]=mapvars.healingDone[id] or 0
+		
+		--show
+		t.Text = t.Text .. "\n\nHEALING RECOUNT:\nTotal Healing Done:" .. vars.healingDone[id] .. "\nTotal Regeneration Healing: " .. vars.regenerationHeal[id] .. "\nHealing Done in current Map:" .. mapvars.healingDone[id] .. "\nRegeneration Healing in current Map:" .. mapvars.regenerationHeal[id] .. "\n\nOnly healing done when monsters are in the nearbies is counted" 
+		
 	end
 	
 	
