@@ -1154,9 +1154,9 @@ function MawRegen()
 				local percentage=pl.HP/tot
 				gmMult=math.min(1+(1-percentage)^2,5)
 			end
-			local regenEffect={[0]=0,3,4,6,6}
+			local regenEffect={[0]=0,2,4,6,6}
 			FHP	= pl:GetFullHP()
-			local regenAmount=FHP^0.5*RegS^1.65*(regenEffect[RegM]/3500)
+			local regenAmount=FHP^0.5*RegS^1.65*(regenEffect[RegM]/3500)+RegS/10
 			for it in pl:EnumActiveItems() do
 				if it.Bonus2 == 37 or it.Bonus2==44 or it.Bonus2==50 or it.Bonus2==54 or it.Bonus2==66 or table.find(artifactHpRegen, it.Number) then		
 					regenAmount=regenAmount+FHP*0.02/100	
@@ -1266,8 +1266,8 @@ function events.Tick()
 		local FHP=pl:GetFullHP()
 		local s,m = SplitSkill(pl:GetSkill(30))
 		local regenEffect={[0]=0,3,4,6,6}
-		local hpRegen = math.round(FHP^0.5*s^1.65*((regenEffect[m])/35))/10
-		local hpRegen2 = math.round(FHP^0.5*(s+1)^1.65*((regenEffect[m])/35))/10
+		local hpRegen = math.round(FHP^0.5*s^1.65*((regenEffect[m])/35))/10+s
+		local hpRegen2 = math.round(FHP^0.5*(s+1)^1.65*((regenEffect[m])/35))/10+(s+1)
 		local txt = string.format("%s\n\nCurrent HP Regeneration: %s\nNext Level Bonus: %s HP Regen",baseRegStr,StrColor(0,255,0,hpRegen),StrColor(0,255,0,"+" .. hpRegen2-hpRegen))
 		Skillz.setDesc(30,1,txt)
 		--meditation tooltip
