@@ -1114,7 +1114,7 @@ function events.GameInitialized2()
 				
 				local id=pl:GetIndex()
 			
-				local healing=math.min(pl:GetFullHP()-pl.HP, leech+heal)
+				local healing=math.min(pl:GetFullHP()-pl.HP, math.round(leech+heal))
 				if healing>0 then
 					vars.leechDone=vars.leechDone or {}
 					vars.leechDone[id]=vars.leechDone[id] or 0
