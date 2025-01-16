@@ -460,49 +460,82 @@ function events.BuildStatInformationBox(t)
 		vars.damageTrack=vars.damageTrack or {}
 		vars.damageTrack[Party[i]:GetIndex()]=vars.damageTrack[Party[i]:GetIndex()] or 0
 
-		mapvars.damageTrack=mapvars.damageTrack or {}
-		mapvars.damageTrack[Party[i]:GetIndex()]=mapvars.damageTrack[Party[i]:GetIndex()] or 0
-		mapvars.damageTrackRanged=mapvars.damageTrackRanged or {}
-		mapvars.damageTrackRanged[Party[i]:GetIndex()]=mapvars.damageTrackRanged[Party[i]:GetIndex()] or 0
-
+		vars.damageTrack=vars.damageTrack or {}
+		vars.damageTrack[Party[i]:GetIndex()]=vars.damageTrack[Party[i]:GetIndex()] or 0
+		vars.damageTrackRanged=vars.damageTrackRanged or {}
+		vars.damageTrackRanged[Party[i]:GetIndex()]=vars.damageTrackRanged[Party[i]:GetIndex()] or 0
+				
 		local damage= vars.damageTrack[Party[Game.CurrentPlayer]:GetIndex()] or 0
-		t.Text=string.format("%s\n\nTotal Damage done: %s",t.Text,StrColor(255,255,100,round(damage)))
-		local damage= mapvars.damageTrack[Party[Game.CurrentPlayer]:GetIndex()] or 0
-		t.Text=string.format("%s\nDamage done in current map: %s",t.Text,StrColor(255,255,100,round(damage)))
+		t.Text=string.format("%s\n\nTOTAL DAMAGE RECOUNT\nTotal Damage done: %s",t.Text,StrColor(255,255,100,round(damage)))
+		local damage= vars.damageTrackRanged[Party[Game.CurrentPlayer]:GetIndex()] or 0
+		t.Text=string.format("%s\nTotal Ranged Damage done: %s",t.Text,StrColor(255,255,100,round(damage)))
 
-            	t.Text = string.format("%s\n\nMap percentage, Melee/Ranged/Total:", t.Text)
+        t.Text = string.format("%s\n\nTotal percentage, Melee/Ranged/Total:", t.Text)
 		local total_map_damage_m = 0
 		local total_map_damage_r = 0                
 		local player_damage_m = {}
 		local player_damage_r = {}
-        	for i = 0, Party.High do
-            		player_damage_m[i] = (mapvars.damageTrack[Party[i]:GetIndex()] or 0)
-            		player_damage_r[i] = (mapvars.damageTrackRanged[Party[i]:GetIndex()] or 0)
-            		total_map_damage_m = total_map_damage_m + player_damage_m[i]
-            		total_map_damage_r = total_map_damage_r + player_damage_r[i]
-        	end
-
+		for i = 0, Party.High do
+			player_damage_m[i] = (vars.damageTrack[Party[i]:GetIndex()] or 0)
+			player_damage_r[i] = (vars.damageTrackRanged[Party[i]:GetIndex()] or 0)
+			total_map_damage_m = total_map_damage_m + player_damage_m[i]
+			total_map_damage_r = total_map_damage_r + player_damage_r[i]
+		end
+		
+		total_map_damage_m=math.max(total_map_damage_m,1)
+		total_map_damage_r=math.max(total_map_damage_r,1)
         for i = 0, Party.High do
-            t.Text = string.format("%s\n %s\t %29s\t%32s %s\t%37s %s\t%42s", t.Text, Game.ClassNames[Party[i].Class],
-                round(100 * player_damage_m[i] / total_map_damage_m),'/', 
-                round(100 * player_damage_r[i] / total_map_damage_r),'/',
-                round(100 * (player_damage_m[i] + player_damage_r[i]) / (total_map_damage_m + total_map_damage_r)),' %')
+            t.Text = string.format("%s\n %s\t %29s\t%32s %s\t%37s %s\t%42s", t.Text, Party[i].Name,
+			round(100 * player_damage_m[i] / total_map_damage_m),'/', 
+			round(100 * player_damage_r[i] / total_map_damage_r),'/',
+			round(100 * (player_damage_m[i] + player_damage_r[i]) / (total_map_damage_m + total_map_damage_r)),' %')
         end
 		
 		--HEALING RECOUNT
-		local id=Party[i]:GetIndex()
-		--initialize
-		vars.regenerationHeal=vars.regenerationHeal or {}
-		vars.regenerationHeal[id]=vars.regenerationHeal[id] or 0
-		mapvars.regenerationHeal=mapvars.regenerationHeal or {}
-		mapvars.regenerationHeal[id]=mapvars.regenerationHeal[id] or 0
-		vars.healingDone=vars.healingDone or {}
-		vars.healingDone[id]=vars.healingDone[id] or 0
-		mapvars.healingDone=mapvars.healingDone or {}
-		mapvars.healingDone[id]=mapvars.healingDone[id] or 0
-		
+		for i=0,Party.High do
+			local id=Party[i]:GetIndex()
+			--initialize
+			vars.regenerationHeal=vars.regenerationHeal or {}
+			vars.regenerationHeal[id]=vars.regenerationHeal[id] or 0
+			
+			vars.healingDone=vars.healingDone or {}
+			vars.healingDone[id]=vars.healingDone[id] or 0
+			
+			vars.leechDone=vars.leechDone or {}
+			vars.leechDone[id]=vars.leechDone[id] or 0
+		end
+		local id=Party[Game.CurrentPlayer]:GetIndex()
 		--show
-		t.Text = t.Text .. "\n\nHEALING RECOUNT:\nTotal Healing Done:  " .. vars.healingDone[id] .. "\nTotal Regen Healing: " .. vars.regenerationHeal[id] .. "\n\nHealing Done in current Map:  " .. mapvars.healingDone[id] .. "\nRegen Healing in current Map: " .. mapvars.regenerationHeal[id] .. "\n\nOnly healing done when monsters are in the nearbies is counted" 
+		t.Text = t.Text .. "\n\nTOTAL HEALING RECOUNT:\nTotal Healing Done:  " .. StrColor(0,255,0,vars.healingDone[id]) .. "\nTotal Regen Healing: " .. StrColor(0,255,0,vars.regenerationHeal[id]) .. "\nTotal Leech Healing: " .. StrColor(0,255,0,vars.leechDone[id])
+		
+		--matrix
+		t.Text = t.Text .. "\n\nTotal percentage, Heal/Regen/Leech/Total:"
+
+		--totals
+		local tot1=0
+		local tot2=0
+		local tot3=0
+		for i=0,Party.High do
+			local id=Party[i]:GetIndex()
+			tot1=tot1+vars.healingDone[id]
+			tot2=tot2+vars.regenerationHeal[id]
+			tot3=tot3+vars.leechDone[id]
+		end
+		tot1=math.max(tot1,1)
+		tot2=math.max(tot2,1)
+		tot3=math.max(tot3,1)
+		local tot4=tot1+tot2+tot3
+		
+        for i = 0, Party.High do
+			local id=Party[i]:GetIndex()
+            t.Text = string.format("%s\n %s\t %29s\t%32s %s\t%37s %s\t%42s %s\t%47s", t.Text, Party[i].Name,
+			round(100 * vars.healingDone[id] / tot1),'/', 
+			round(100 * vars.regenerationHeal[id] / tot2),'/',
+			round(100 * vars.leechDone[id] / tot3),'/',
+			round(100 * (vars.healingDone[id]+vars.regenerationHeal[id]+vars.leechDone[id]) / tot4),' %')
+        end
+		
+		t.Text = t.Text .. "\n\nOnly healing done when monsters are in the nearbies is counted" 
 		
 	end
 	
@@ -518,16 +551,16 @@ function events.BuildStatInformationBox(t)
 	
 	if t.Stat==18 then
 		local i=Game.CurrentPlayer
-		vars.damageTrackRanged=vars.damageTrackRanged or {}
-		vars.damageTrackRanged[Party[i]:GetIndex()]=vars.damageTrackRanged[Party[i]:GetIndex()] or 0
+		mapvars.damageTrackRanged=mapvars.damageTrackRanged or {}
+		mapvars.damageTrackRanged[Party[i]:GetIndex()]=mapvars.damageTrackRanged[Party[i]:GetIndex()] or 0
 
 		mapvars.damageTrack=mapvars.damageTrack or {}
 		mapvars.damageTrack[Party[i]:GetIndex()]=mapvars.damageTrack[Party[i]:GetIndex()] or 0
 		mapvars.damageTrackRanged=mapvars.damageTrackRanged or {}
 		mapvars.damageTrackRanged[Party[i]:GetIndex()]=mapvars.damageTrackRanged[Party[i]:GetIndex()] or 0
 
-		local damage= vars.damageTrackRanged[Party[Game.CurrentPlayer]:GetIndex()] or 0
-		t.Text=string.format("%s\n\nTotal Ranged Damage done: %s",t.Text,StrColor(255,255,100,round(damage)))
+		local damage= mapvars.damageTrack[Party[Game.CurrentPlayer]:GetIndex()] or 0
+		t.Text=string.format("%s\n\nCURRENT MAP DAMAGE RECOUNT\nMelee Damage done in current map: %s",t.Text,StrColor(255,255,100,round(damage)))
 		local damage= mapvars.damageTrackRanged[Party[Game.CurrentPlayer]:GetIndex()] or 0
 		t.Text=string.format("%s\nRanged Damage done in current map: %s",t.Text,StrColor(255,255,100,round(damage)))
 
@@ -536,21 +569,67 @@ function events.BuildStatInformationBox(t)
 		local total_map_damage_r = 0                
 		local player_damage_m = {}
 		local player_damage_r = {}
-        	for i = 0, Party.High do
-				player_damage_m[i] = (mapvars.damageTrack[Party[i]:GetIndex()] or 0)
-				player_damage_r[i] = (mapvars.damageTrackRanged[Party[i]:GetIndex()] or 0)
-				total_map_damage_m = total_map_damage_m + player_damage_m[i]
-				total_map_damage_r = total_map_damage_r + player_damage_r[i]
-        	end
-
+		for i = 0, Party.High do
+			player_damage_m[i] = (mapvars.damageTrack[Party[i]:GetIndex()] or 0)
+			player_damage_r[i] = (mapvars.damageTrackRanged[Party[i]:GetIndex()] or 0)
+			total_map_damage_m = total_map_damage_m + player_damage_m[i]
+			total_map_damage_r = total_map_damage_r + player_damage_r[i]
+		end
+		
+		total_map_damage_m=math.max(total_map_damage_m,1)
+		total_map_damage_r=math.max(total_map_damage_r,1)
         for i = 0, Party.High do
-            t.Text = string.format("%s\n %s\t %29s\t%32s %s\t%37s %s\t%42s", t.Text, Game.ClassNames[Party[i].Class],
-                round(100 * player_damage_m[i] / total_map_damage_m),'/', 
-                round(100 * player_damage_r[i] / total_map_damage_r),'/',
-                round(100 * (player_damage_m[i] + player_damage_r[i]) / (total_map_damage_m + total_map_damage_r)),' %')
+            t.Text = string.format("%s\n %s\t %29s\t%32s %s\t%37s %s\t%42s", t.Text, Party[i].Name,
+			round(100 * player_damage_m[i] / total_map_damage_m),'/', 
+			round(100 * player_damage_r[i] / total_map_damage_r),'/',
+			round(100 * (player_damage_m[i] + player_damage_r[i]) / (total_map_damage_m + total_map_damage_r)),' %')
         end
+		
+		
+		--HEALING RECOUNT
+		for i=0,Party.High do
+			local id=Party[i]:GetIndex()
+			--initialize
+			mapvars.regenerationHeal=mapvars.regenerationHeal or {}
+			mapvars.regenerationHeal[id]=mapvars.regenerationHeal[id] or 0
+			
+			mapvars.healingDone=mapvars.healingDone or {}
+			mapvars.healingDone[id]=mapvars.healingDone[id] or 0
+			
+			mapvars.leechDone=mapvars.leechDone or {}
+			mapvars.leechDone[id]=mapvars.leechDone[id] or 0
+		end
+		local id=Party[Game.CurrentPlayer]:GetIndex()
+		--show
+		t.Text = t.Text .. "\n\nCURRENT MAP HEALING RECOUNT:\nHealing Done in current Map:  " .. StrColor(0,255,0,mapvars.healingDone[id]) .. "\nRegen Healing in current Map: " .. StrColor(0,255,0,mapvars.regenerationHeal[id]) .. "\nLeech Healing in current Map: " .. StrColor(0,255,0,mapvars.leechDone[id])
+		
+		--matrix
+		t.Text = t.Text .. "\n\nMap percentage, Heal/Regen/Leech/Total:"
 
-
+		--totals
+		local tot1=0
+		local tot2=0
+		local tot3=0
+		for i=0,Party.High do
+			local id=Party[i]:GetIndex()
+			tot1=tot1+mapvars.healingDone[id]
+			tot2=tot2+mapvars.regenerationHeal[id]
+			tot3=tot3+mapvars.leechDone[id]
+		end
+		tot1=math.max(tot1,1)
+		tot2=math.max(tot2,1)
+		tot3=math.max(tot3,1)
+		local tot4=tot1+tot2+tot3
+		
+        for i = 0, Party.High do
+			local id=Party[i]:GetIndex()
+            t.Text = string.format("%s\n %s\t %29s\t%32s %s\t%37s %s\t%42s %s\t%47s", t.Text, Party[i].Name,
+			round(100 * mapvars.healingDone[id] / tot1),'/', 
+			round(100 * mapvars.regenerationHeal[id] / tot2),'/',
+			round(100 * mapvars.leechDone[id] / tot3),'/',
+			round(100 * (mapvars.healingDone[id]+mapvars.regenerationHeal[id]+mapvars.leechDone[id]) / tot4),' %')
+        end
+		t.Text = t.Text .. "\n\nOnly healing done when monsters are in the nearbies is counted" 
 	end
 	
 	if t.Stat>=19 and t.Stat<=24 then
