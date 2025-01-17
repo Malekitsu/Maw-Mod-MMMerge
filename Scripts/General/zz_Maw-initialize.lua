@@ -37,6 +37,48 @@ function round(x)
 	return x
 end
 
+function shortenNumber(number, significantDigits, color)
+    if significantDigits < 1 then
+        error("Il numero di cifre significative deve essere almeno 1")
+    end
+
+    local suffix = ""
+    local divisor = 1
+
+    if math.abs(number) >= 10^(9+math.max(0,significantDigits-3)) then
+        suffix = "B"
+        divisor = 1e9
+    elseif math.abs(number) >= 10^(6+math.max(0,significantDigits-3)) then
+        suffix = "M"
+        divisor = 1e6
+    elseif math.abs(number) >= 10^(3+math.max(0,significantDigits-3)) then
+        suffix = "K"
+        divisor = 1e3
+    end
+
+    -- Calcola il valore accorciato
+    local shortened = math.round(number / divisor)
+
+	if color then
+		if suffix == "K" then
+			local txt=StrColor(255,255,30,tostring(shortened) .. suffix)
+			return txt
+		end
+		if suffix == "M" then
+			local txt=StrColor(255,165,0,tostring(shortened) .. suffix)
+			return txt
+		end
+		if suffix == "B" then
+			local txt=StrColor(255,0,0,tostring(shortened) .. suffix)
+			return txt
+		end
+	end
+	
+    return tostring(shortened) .. suffix
+end
+
+
+
 ---------------------------------
 --HERE IS THE KEYBIND LIST--
 ---------------------------------
