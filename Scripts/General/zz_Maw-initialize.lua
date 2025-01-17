@@ -56,8 +56,7 @@ function shortenNumber(number, significantDigits, color)
         divisor = 1e3
     end
 
-    local shortened = math.round(number / divisor)
-
+    local shortened = round(number / divisor)
 	if color then
 		if suffix == "K" then
 			local txt=StrColor(255,255,30,tostring(shortened) .. suffix)
