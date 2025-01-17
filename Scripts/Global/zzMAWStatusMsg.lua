@@ -190,13 +190,7 @@ function events.CalcDamageToMonster(t)
 		MSGdamage=MSGdamage or 0
 		MSGdamage=MSGdamage+math.ceil(t.Result)*divide
 		local msgTxt=MSGdamage
-		if msgTxt>9999999999 then
-			msgTxt=StrColor(255,0,0,math.round(msgTxt/1000000) .. "B")
-		elseif msgTxt>9999999 then
-			msgTxt=StrColor(255,165,0,math.round(msgTxt/1000000) .. "M")
-		elseif msgTxt>9999 then
-			msgTxt=StrColor(255,255,30,math.round(msgTxt/1000) .. "K")
-		end
+		msgTxt=shortenNumber(msgTxt, 4, true)
 		attackIsSpell=false
 		castedAoe=false
 		shoot="hits"
