@@ -1862,7 +1862,9 @@ function events.BuildMonsterInformationBox(t)
 		recalculateMawMonster()
 	end
 	--mon = t.Monster
-	mon=Map.Monsters[Mouse:GetTarget().Index]
+	local id=Mouse:GetTarget().Index
+	if id>Map.Monsters.High then return end
+	local mon=Map.Monsters[id]
 	--show level Below HP
 	mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
 	local lvl=getMonsterLevel(mon)
