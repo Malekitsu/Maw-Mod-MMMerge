@@ -86,19 +86,19 @@ function events.UseMouseItem(t)
 	end
 	--healing potion
 	if it.Number==222 then
-		heal=math.round(it.Bonus^1.4+10)
+		heal=round(it.Bonus^1.4+10)
 		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
 	--mana potion
 	elseif it.Number==223 then
-		spRestore=math.round(it.Bonus^1.4*2/3+10)
+		spRestore=round(it.Bonus^1.4*2/3+10)
 		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
 	end
 	if it.Number==247 then
-		heal=math.round(it.Bonus^1.4*1.5+20)
+		heal=round(it.Bonus^1.4*1.5+20)
 		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
 	--mana potion
 	elseif it.Number==248 then
-		spRestore=math.round(it.Bonus^1.4+20)
+		spRestore=round(it.Bonus^1.4+20)
 		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
 	end
 	--Regen
@@ -154,11 +154,11 @@ function events.UseMouseItem(t)
 			if type(buff)=="table" then
 				for i=1,#buff do
 					buffID=itemBuffMapping[it.Number][i]
-					pl.SpellBuffs[buffID].Power=math.round(pl.SpellBuffs[buffID].Power/2)
+					pl.SpellBuffs[buffID].Power=round(pl.SpellBuffs[buffID].Power/2)
 					pl.SpellBuffs[buffID].Skill=0
 				end
 			else
-				pl.SpellBuffs[buff].Power=math.round(pl.SpellBuffs[buff].Power/2)
+				pl.SpellBuffs[buff].Power=round(pl.SpellBuffs[buff].Power/2)
 				pl.SpellBuffs[buff].Skill=0
 			end
 		end
@@ -356,19 +356,19 @@ function events.BuildItemInformationBox(t)
 		t.Description="This potion has been removed"
 	end
 	if t.Item.Number==222 then
-		t.Description=StrColor(255,255,153,"Heals " .. math.round(t.Item.Bonus^1.4)+10 .. " Hit Points") .. "\n" .. t.Description
+		t.Description=StrColor(255,255,153,"Heals " .. round(t.Item.Bonus^1.4)+10 .. " Hit Points") .. "\n" .. t.Description
 	end
 	if t.Item.Number==223 then
-		t.Description=StrColor(255,255,153,"Restores " .. math.round(t.Item.Bonus^1.4*2/3)+10 .. " Spell Points") .. "\n" .. t.Description
+		t.Description=StrColor(255,255,153,"Restores " .. round(t.Item.Bonus^1.4*2/3)+10 .. " Spell Points") .. "\n" .. t.Description
 	end
 	if t.Item.Number==232 then
 		t.Description="Grants " .. StrColor(0,0,200,math.ceil(t.Item.Bonus^0.5/1.5) + 1) .. " bonus to Meditation skill for 6 hours."
 	end
 	if t.Item.Number==247 then
-		t.Description=StrColor(255,255,153,"Heals " .. math.round(t.Item.Bonus^1.4*1.5)+20 .. " Hit Points") .. "\n" .. t.Description
+		t.Description=StrColor(255,255,153,"Heals " .. round(t.Item.Bonus^1.4*1.5)+20 .. " Hit Points") .. "\n" .. t.Description
 	end
 	if t.Item.Number==248 then
-		t.Description=StrColor(255,255,153,"Restores " .. math.round(t.Item.Bonus^1.4)+20 .. " Spell Points") .. "\n" .. t.Description
+		t.Description=StrColor(255,255,153,"Restores " .. round(t.Item.Bonus^1.4)+20 .. " Spell Points") .. "\n" .. t.Description
 	end
 	if t.Item.Number==259 then
 		local id=Game.CurrentPlayer
@@ -378,7 +378,7 @@ function events.BuildItemInformationBox(t)
 		index=Party[id]:GetIndex()
 		vars.expPot=vars.expPot or {}
 		vars.expPot[index]=vars.expPot[index] or 0
-		local percent=math.round(vars.expPot[index]/(pl.Exp-vars.expPot[index])*10000)/100
+		local percent=round(vars.expPot[index]/(pl.Exp-vars.expPot[index])*10000)/100
 		if percent<25 then
 			str=StrColor(0,255,0,percent .. "%")
 		else
@@ -549,7 +549,7 @@ end
 
 function events.BuildItemInformationBox(t)
 	if reagentList[t.Item.Number] then
-		local bonus=math.round(reagentList[t.Item.Number] *((t.Item.Bonus*0.25)/20+1)+t.Item.Bonus*0.75)
+		local bonus=round(reagentList[t.Item.Number] *((t.Item.Bonus*0.25)/20+1)+t.Item.Bonus*0.75)
 		t.Enchantment="Power: " .. bonus
 	end
 end
@@ -603,12 +603,12 @@ function events.MonsterKilled(mon)
 		end
 		--determine level
 		local lvl=basetable[mon.Id].Level
-		tier=math.round(math.min(math.max((lvl/20)*(math.random()/2+1.75),1),5))
+		tier=round(math.min(math.max((lvl/20)*(math.random()/2+1.75),1),5))
 		roll=math.random(1,#reagentDropTable[tier])
 		reagent=reagentDropTable[tier][roll]	
 		obj = SummonItem(reagent, mon.X, mon.Y, mon.Z + 100, 100)
 		if obj then
-			obj.Item.Bonus=math.round(partyLevel/3)
+			obj.Item.Bonus=round(partyLevel/3)
 		end
 	end
 end
@@ -645,13 +645,13 @@ function events.BuildItemInformationBox(t)
 			
 			
 			local twoHanded = tier * 6 * 2
-			local bodyArmor = math.round(tier * 1.5 * 6)
-			local helmEtc = math.round(tier * 1.25 * 6)
-			local rings = math.round(tier * 0.75 * 6)
+			local bodyArmor = round(tier * 1.5 * 6)
+			local helmEtc = round(tier * 1.25 * 6)
+			local rings = round(tier * 0.75 * 6)
 			
 			
 			t.Description = "A special Gem that allows to increase an item Enchant Strength (right-click on an item with a base enchant to use)\nLegendary items can more Max power.\n\nMax Power: " 
-			.. StrColor(255, 128, 0, tostring(math.round(tier * 6))) .. " (65% on AC)"
+			.. StrColor(255, 128, 0, tostring(round(tier * 6))) .. " (65% on AC)"
 			.. "\nBonus: " .. StrColor(255, 128, 0, tostring(power)) 
 			.. "\n\nItem Modifier:\nTwo Handed Weapons: " .. StrColor(255, 128, 0, twoHanded)
 			.. "\nBody Armor: " .. StrColor(255, 128, 0, bodyArmor)
@@ -686,7 +686,7 @@ local function upgradeGem(it, tier)
 	local upgradeAmount1=3
 	local upgradeAmount2=upgradeAmount1
 	--base value
-	local maxValue1=math.round(tier*6)
+	local maxValue1=round(tier*6)
 	
 	if it.BonusExpireTime==1 or it.BonusExpireTime==2 then
 		maxValue1=math.min(maxValue1+10,maxValue1*1.2)
@@ -715,7 +715,7 @@ local function upgradeGem(it, tier)
 	end
 	--skills
 	if it.Bonus>=17 then
-		maxValue1=math.floor(math.max((tier*10)^0.5, math.round(tier)))
+		maxValue1=math.floor(math.max((tier*10)^0.5, round(tier)))
 		upgradeAmount1=1
 	end
 	--item slot multiplier and legendary multiplier
@@ -842,7 +842,7 @@ evt.PotionEffects[82] = function(IsDrunk, t, Power)
 			local slotMult=slotMult[t:T().EquipStat] or 1
 			cap=math.min(cap*slotMult,999)
 			
-			t.Charges=stat*1000+math.min(math.round(power*(1+0.25*math.random())),cap)
+			t.Charges=stat*1000+math.min(round(power*(1+0.25*math.random())),cap)
 			Mouse.Item.Number=0
 			mem.u4[0x51E100] = 0x100 
 			t.Condition = t.Condition:Or(0x10)
@@ -871,7 +871,7 @@ evt.PotionEffects[83] = function(IsDrunk, t, Power)
 			tot=tot+t:T().ChanceByLevel[i]
 			lvl=lvl+t:T().ChanceByLevel[i]*i
 		end
-		itemLevel=itemLevel+math.round(lvl/tot*18-17)
+		itemLevel=itemLevel+round(lvl/tot*18-17)
 		local maxCharges=t.MaxCharges
 		if t.BonusExpireTime>0 and t.BonusExpireTime<=2 then
 			maxCharges=math.floor(math.min(maxCharges/1.2,maxCharges-5))
@@ -1076,9 +1076,9 @@ function events.MonsterKilled(mon)
 	--level bonus
 	local lvl=mon.Level
 	if mon.NameId==0 then
-		lvl=math.round(totalLevel[mon.Id])
+		lvl=round(totalLevel[mon.Id])
 	elseif mapvars.uniqueMonsterLevel and mapvars.uniqueMonsterLevel[mon:GetIndex()] then
-		lvl=math.round(mapvars.uniqueMonsterLevel[mon:GetIndex()])
+		lvl=round(mapvars.uniqueMonsterLevel[mon:GetIndex()])
 	end
 	bonusRoll=math.min(1+lvl/60,5)
 	if mon.NameId>=220 and mon.NameId <300 then
