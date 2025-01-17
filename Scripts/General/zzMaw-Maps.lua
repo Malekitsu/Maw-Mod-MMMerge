@@ -1847,6 +1847,10 @@ function events.LoadMap()
 	if mapAffixList then
 		mapvars.mapAffixes={mapAffixList[1],mapAffixList[2],mapAffixList[3],mapAffixList[4],["Power"]=mapAffixList.Power}
 		mapAffixList=nil
+		for i=0,Map.Monsters.High do
+			Map.Monsters[i].Hostile=true
+			Map.Monsters[i].ShowAsHostile=true
+		end
 	end
 end
 --restore
