@@ -1743,7 +1743,7 @@ function events.MonsterKilled(mon)
 		if math.random()<0.4 then
 			obj.Item.BonusExpireTime=getUniqueAffix()
 		end
-		obj.Item.MaxCharges=math.round(totalLevel[mon.Id]/10-math.random(0,3))
+		obj.Item.MaxCharges=round(totalLevel[mon.Id]/10-math.random(0,3))
 		if vars.insanityMode then
 			obj.Item.MaxCharges=math.max(obj.Item.MaxCharges,30)
 		end
@@ -1763,7 +1763,7 @@ function events.UseMouseItem(t)
 		Mouse.Item.Number=0
 		local fileName=string.sub(map.FileName, 1, -5)
 		
-		mapAffixList={it.BonusExpireTime, it.Bonus2, it.Charges%1000, math.round(it.Charges/1000), ["Power"]=it.MaxCharges}
+		mapAffixList={it.BonusExpireTime, it.Bonus2, it.Charges%1000, round(it.Charges/1000), ["Power"]=it.MaxCharges}
 		math.randomseed(it.BonusExpireTime+it.Bonus2*10^3+it.Charges*10^6+it.MaxCharges*10^9+it.BonusStrength*10^12)
 		local possibleMonsters={}
 		for i=1,215 do
@@ -1940,7 +1940,7 @@ function calculateAffixPower(n, p)
 	--reductions can eventually go to 0, fix
 	local reductionAffix={13,21,22,23,24,25,26,27,28,29,30,31,32,33}
 	if table.find(reductionAffix,n) then
-		power=math.round((1-1/(power/100+1))*10000)/100
+		power=round((1-1/(power/100+1))*10000)/100
 	end
 	--fix for proc chance over 100
 	local procAffix={3,4,8,9,14,19,34}
@@ -1973,7 +1973,7 @@ function events.BuildItemInformationBox(t)
 	local it=t.Item
 	if it.Number==290 and t.Enchantment then
 		local baseMap=mapLevels[Game.MapStats[it.BonusStrength].Name]
-		local baseLevel=math.round((baseMap.Low+baseMap.Mid+baseMap.High)/3)
+		local baseLevel=round((baseMap.Low+baseMap.Mid+baseMap.High)/3)
 		t.Enchantment="Map Level: " .. it.MaxCharges*10+20+baseLevel
 		local power=0
 		if it.BonusExpireTime>0 then
@@ -1988,7 +1988,7 @@ function events.BuildItemInformationBox(t)
 				power=power+1
 			end
 		end
-		t.Enchantment=t.Enchantment .. StrColor(0, 127, 255,"\n+" .. math.round(it.MaxCharges*power/8*1.5) .. "% craft items drop chances "  .. "\n+" .. math.round(it.MaxCharges*power/4) .. "% item quality " .. "%\n+" .. math.round(it.MaxCharges*power/3) .. "% monster density")	
+		t.Enchantment=t.Enchantment .. StrColor(0, 127, 255,"\n+" .. round(it.MaxCharges*power/8*1.5) .. "% craft items drop chances "  .. "\n+" .. round(it.MaxCharges*power/4) .. "% item quality " .. "%\n+" .. round(it.MaxCharges*power/3) .. "% monster density")	
 	end
 	if it.Number==290 and t.Name then
 		t.Name=Game.MapStats[it.BonusStrength].Name .. " Map"
