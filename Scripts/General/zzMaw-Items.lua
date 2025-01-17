@@ -292,7 +292,7 @@ function events.ItemGenerated(t)
 		itmod=8
 		end
 		if reagentList[t.Item.Number] then
-			t.Item.Bonus=math.round(partyLevel/itmod)
+			t.Item.Bonus=round(partyLevel/itmod)
 			return
 		end
 		
@@ -307,7 +307,7 @@ function events.ItemGenerated(t)
 		--nerf shops if no exp in current world
 		--[[
 		if (Game.HouseScreen==2 or Game.HouseScreen==95) and Game.freeProgression then 
-			partyLevel=math.round(partyLevel*(math.min(partyLevel/160 + currentLevel/80,1)))
+			partyLevel=round(partyLevel*(math.min(partyLevel/160 + currentLevel/80,1)))
 		end
 		]]
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
@@ -401,7 +401,7 @@ function events.ItemGenerated(t)
 			--[[ no skill bonuses
 			if math.random(1,10)==10 then
 				t.Item.Charges=math.random(17,24)*1000
-				t.Item.Charges=t.Item.Charges+math.round(math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])^0.5)
+				t.Item.Charges=t.Item.Charges+round(math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])^0.5)
 			end
 			]]
 		end
@@ -433,11 +433,11 @@ function events.ItemGenerated(t)
 		ancientRoll=math.random()
 		if ancientRoll<=ancientChance then
 			ancient=true
-			t.Item.Charges=math.random(math.round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2, encStrUp[pseudoStr]+10)))
+			t.Item.Charges=math.random(round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2, encStrUp[pseudoStr]+10)))
 			t.Item.Charges=math.ceil(t.Item.Charges*difficultyExtraPower) --bolster
 			t.Item.Charges=t.Item.Charges+math.random(1,16)*1000
 			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.random(math.round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10))
+			t.Item.BonusStrength=math.random(round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10))
 			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*difficultyExtraPower) --bolster
 			power=2
 			chargesBonus=math.random(1,5)
@@ -478,7 +478,7 @@ function events.ItemGenerated(t)
 			t.Item.BonusExpireTime=2
 			t.Item.Charges=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
 			t.Item.Charges=math.ceil(t.Item.Charges*difficultyExtraPower) --bolster
-			t.Item.Charges=math.round(t.Item.Charges+math.random(1,16)*1000)
+			t.Item.Charges=round(t.Item.Charges+math.random(1,16)*1000)
 			t.Item.Bonus=math.random(1,16)
 			t.Item.BonusStrength=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
 			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*difficultyExtraPower) --bolster
@@ -529,7 +529,7 @@ function events.ItemGenerated(t)
 					end
 				end
 				local relevantStats={1,2,3,4,5,6,7,8,10}
-				t.Item.MaxCharges=math.round(math.min(maxChargesCap,t.Item.MaxCharges*1.2,t.Item.MaxCharges+10))
+				t.Item.MaxCharges=round(math.min(maxChargesCap,t.Item.MaxCharges*1.2,t.Item.MaxCharges+10))
 				local roll=math.random(1,3)
 				if roll==1 then
 					local stats={1, 5, 6, 7}
@@ -938,10 +938,10 @@ function events.BuildItemInformationBox(t)
 						--]]
 						local bonusAC=ac2*(maxCharges/40)
 						--if t.Item.MaxCharges <= 20 then
-							ac=ac3+math.round(bonusAC)
+							ac=ac3+round(bonusAC)
 						--else
 						--	local bonusAC=(ac+ac2)*(t.Item.MaxCharges/20)
-						--	ac=ac3+math.round(bonusAC)
+						--	ac=ac3+round(bonusAC)
 						--end		
 						t.BasicStat= "Armor: +" .. ac
 					end
@@ -966,11 +966,11 @@ function events.BuildItemInformationBox(t)
 					end
 					]]
 					local bonusATK=bonus2*(maxCharges/30)
-					bonus=bonus+math.round(bonusATK)
+					bonus=bonus+round(bonusATK)
 					local sides=txt.Mod1DiceSides
 					local sides2=Game.ItemsTxt[t.Item.Number+lookup].Mod1DiceSides
 					local sidesBonus=sides2*(maxCharges/30)
-					sides=sides+math.round(sidesBonus)
+					sides=sides+round(sidesBonus)
 					t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " ..  txt.Mod1DiceCount .. "d" .. sides .. "+" .. bonus
 				end
 			end
@@ -982,9 +982,9 @@ function events.BuildItemInformationBox(t)
 				local power=t.Item.BonusStrength
 				if vars.itemStatsFix then
 					if (t.Item.Bonus==8 or t.Item.Bonus==9) then
-						power=math.round(power*(2+power/50))
+						power=round(power*(2+power/50))
 					elseif t.Item.Bonus==10 then
-						power=math.round(power*0.667)
+						power=round(power*0.667)
 					end
 				end
 				--[[insanity
@@ -1003,7 +1003,7 @@ function events.BuildItemInformationBox(t)
 							power=power*1.5
 						end
 					end
-					power=math.round((1-1/1.5^(power^0.6/15))*1000)/10 .. "%"
+					power=round((1-1/1.5^(power^0.6/15))*1000)/10 .. "%"
 				end
 				t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. power
 			end
@@ -1012,9 +1012,9 @@ function events.BuildItemInformationBox(t)
 				local strength=t.Item.Charges%1000
 				if vars.itemStatsFix then
 					if (bonus==8 or bonus==9) then
-						strength=math.round(strength*(2+strength/50))
+						strength=round(strength*(2+strength/50))
 					elseif bonus==10 then
-						strength=math.round(strength*0.667)
+						strength=round(strength*0.667)
 					end
 				end
 				--[[insanity
@@ -1033,7 +1033,7 @@ function events.BuildItemInformationBox(t)
 							strength=strength*1.5
 						end
 					end
-					strength=math.round((1-1/1.5^(strength^0.6/10))*1000)/10 .. "%"
+					strength=round((1-1/1.5^(strength^0.6/10))*1000)/10 .. "%"
 				end
 				t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
 			elseif t.Item.Bonus~=0 and t.Item.BonusStrength~=0 then
@@ -1057,7 +1057,7 @@ function events.BuildItemInformationBox(t)
 					local slotMult=slotMult[t.Item:T().EquipStat] or 1
 					cap=math.min(cap*slotMult,999)
 					
-					charges=stat*1000+math.min(math.round(power*(1+0.25*math.random())),cap)
+					charges=stat*1000+math.min(round(power*(1+0.25*math.random())),cap)
 					
 					local bonus=math.floor(charges/1000)
 					local strength=charges%1000
@@ -1146,7 +1146,7 @@ function events.BuildItemInformationBox(t)
 							end
 						end
 					end
-					local red=math.round((1-0.97^count)*10000)/100
+					local red=round((1-0.97^count)*10000)/100
 					legText=legText .. "\nCurrent Reduction: " .. red .. "%"
 				end
 				t.Description = StrColor(255,255,30,legText) .. "\n\n" .. t.Description
@@ -1432,7 +1432,7 @@ function events.CalcItemValue(t)
 		--base value
 		basePrice=Game.ItemsTxt[t.Item.Number].Value
 		if reagentList[t.Item.Number] then
-			local bonus=math.round(reagentList[t.Item.Number] *((t.Item.Bonus*0.75)/20+1)+t.Item.Bonus*0.75)
+			local bonus=round(reagentList[t.Item.Number] *((t.Item.Bonus*0.75)/20+1)+t.Item.Bonus*0.75)
 			t.Enchantment="Power: " .. bonus
 			t.Value=bonus*10
 			return
@@ -1500,13 +1500,13 @@ function events.CalcItemValue(t)
 			end
 		end	
 		if t.Value>200000  then
-			t.Value=math.round(t.Value/1000)*1000
+			t.Value=round(t.Value/1000)*1000
 		elseif t.Value>50000  then
-			t.Value=math.round(t.Value/500)*500	
+			t.Value=round(t.Value/500)*500	
 		elseif t.Value>1000  then
-			t.Value=math.round(t.Value/100)*100
+			t.Value=round(t.Value/100)*100
 		elseif t.Value>100 then
-			t.Value=math.round(t.Value/10)*10
+			t.Value=round(t.Value/10)*10
 		end
 	end
 	--add reagents price
@@ -1606,13 +1606,13 @@ function events.ItemAdditionalDamage(t)
 		local res=t.Monster.Resistances[index]
 		damage=calcEnchantDamage(t.Player, t.Item, res, true, false, "damage")
 		local attackSpeedMult=getBaseAttackSpeed(t.Item)
-		t.Result=math.round(damage*attackSpeedMult)
+		t.Result=round(damage*attackSpeedMult)
 		return
 	end
 
 	--attack speed bonus, for other enchants
 	local attackSpeedMult=getBaseAttackSpeed(t.Item)
-	t.Result=math.round(t.Result*attackSpeedMult)
+	t.Result=round(t.Result*attackSpeedMult)
 end
 
 --weaponenchants and ring enchants checker
@@ -1816,8 +1816,8 @@ require("string")
 function artifactTextBuilder(n,lvl)
 	lvl=math.min(lvl/80,2.5)
 	artifactTxt={
-		[2023]= "Heavy, yet seemingly light as a feather in skilled hands, Excalibur confers great might upon its wielder.  Opponents do not easily walk away from blows struck by this legendary weapon.  (Special Powers:  +" .. math.round(30*lvl) .. " Might)",
-		[2024]= "Traditionally carried by the High Druid, but lost during struggles over religious doctrine, Merlin acts as a reservoir of spell power the wielder can draw upon at any time.  Merlin is enchanted with swiftness, and rains blows upon enemies much faster than an ordinary staff. (Special Powers:  Swiftness and +" .. math.round(40*lvl) .. " Spell Points)",
+		[2023]= "Heavy, yet seemingly light as a feather in skilled hands, Excalibur confers great might upon its wielder.  Opponents do not easily walk away from blows struck by this legendary weapon.  (Special Powers:  +" .. round(30*lvl) .. " Might)",
+		[2024]= "Traditionally carried by the High Druid, but lost during struggles over religious doctrine, Merlin acts as a reservoir of spell power the wielder can draw upon at any time.  Merlin is enchanted with swiftness, and rains blows upon enemies much faster than an ordinary staff. (Special Powers:  Swiftness and +" .. round(40*lvl) .. " Spell Points)",
 	}
 	
 	return artifactTxt[n]
@@ -1838,7 +1838,7 @@ function replaceNumber(match)
 	lvl=artifactPowerMult(lvl)
     num = tonumber(match)
     if num then
-        return tostring(math.round(num * lvl))
+        return tostring(round(num * lvl))
     end
     return match
 end
@@ -1875,7 +1875,7 @@ function events.BuildItemInformationBox(t)
 			if baseRecovery[skill] then
 				local itemLevel=artifactMult*100
 				baseSpeed=baseRecovery[skill] * (0.75+itemLevel/250)
-				baseSpeed=math.round(baseSpeed/10)/10
+				baseSpeed=round(baseSpeed/10)/10
 				if skill==7 then
 					baseSpeed=0.4
 				end
@@ -1946,7 +1946,7 @@ function events.Action(t)
 		end
 		--failsafe
 		if Mouse.Item and Mouse.Item.Charges==0 and Mouse.Item.Bonus==0 and Mouse.Item.Bonus2==0 and Mouse.Item.MaxCharges>maxItemBolster then
-			Mouse.Item.MaxCharges=math.round(partyLevel/5)
+			Mouse.Item.MaxCharges=round(partyLevel/5)
 		end
 	end
 end
@@ -2012,7 +2012,7 @@ function events.BuildItemInformationBox(t)
 	--	if not Game.freeProgression then
 	--		maxItemBolster=maxItemBolster+10
 	--	end
-	--	t.Item.MaxCharges=math.round(partyLevel/5)
+	--	t.Item.MaxCharges=round(partyLevel/5)
 	--end
 	if t.Description then
 		if Game.CurrentPlayer==-1 then return end
@@ -2072,8 +2072,8 @@ function events.BuildItemInformationBox(t)
 			mawRefresh(playerIndex)
 			
 			local newDPS1, newDPS2, newDPS3, newVitality=calcPowerVitality(pl)
-			local increaseDPSPercent=math.round(math.max(newDPS1, newDPS2, newDPS3)/math.max(oldDPS1, oldDPS2, oldDPS3)*10000-10000)/100
-			local increaseVitalityPercent=math.round(newVitality/oldVitality*10000-10000)/100
+			local increaseDPSPercent=round(math.max(newDPS1, newDPS2, newDPS3)/math.max(oldDPS1, oldDPS2, oldDPS3)*10000-10000)/100
+			local increaseVitalityPercent=round(newVitality/oldVitality*10000-10000)/100
 			if increaseDPSPercent<0 then
 				t.Description = t.Description .. "\n\n" .. "Power: " .. StrColor(255,0,0,increaseDPSPercent .. "%")
 			elseif increaseDPSPercent>0 then
@@ -2117,7 +2117,7 @@ function events.BuildItemInformationBox(t)
 				tot=tot+t.Item:T().ChanceByLevel[i]
 				lvl=lvl+t.Item:T().ChanceByLevel[i]*i
 			end
-			itemLevel=itemLevel+math.round(lvl/tot*18-17)
+			itemLevel=itemLevel+round(lvl/tot*18-17)
 			--t.Description = t.Description .. "\n\nItem Level: " .. itemLevel
 			local maxCharges=t.Item.MaxCharges
 			if t.Item.BonusExpireTime>0 and t.Item.BonusExpireTime<=2 then
@@ -2172,9 +2172,9 @@ function events.BuildItemInformationBox(t)
 				tot=tot+t.Item:T().ChanceByLevel[i]
 				lvl=lvl+t.Item:T().ChanceByLevel[i]*i
 			end
-			itemLevel=itemLevel+math.round(lvl/tot*18-17)
+			itemLevel=itemLevel+round(lvl/tot*18-17)
 			baseSpeed=baseRecovery[skill] * (0.75+itemLevel/250)
-			baseSpeed=math.round(baseSpeed/10)/10
+			baseSpeed=round(baseSpeed/10)/10
 			
 			if skill==7 then return end --blaster fix
 			
@@ -2240,10 +2240,10 @@ function getNewArmor(it)
 				local ac2=Game.ItemsTxt[n+lookup].Mod2+Game.ItemsTxt[n+lookup].Mod1DiceCount 
 				local bonusAC=ac2*(charges/20)
 				if charges <= 20 then
-					ac3=ac3+math.round(bonusAC)
+					ac3=ac3+round(bonusAC)
 				else
 					local bonusAC=(ac+ac2)*(charges/20)
-					ac3=ac3+math.round(bonusAC)
+					ac3=ac3+round(bonusAC)
 				end				
 			end
 		end
@@ -2394,14 +2394,14 @@ function itemStats(index)
 				end
 				]]
 				local bonusAC=ac2*(maxCharges/40)
-				acBonus=ac+math.round(bonusAC)
+				acBonus=ac+round(bonusAC)
 			end
 			--artifacts
 			if table.find(artArmors,it.Number) then 
 				artifactMult=artifactPowerMult(pl.LevelBase, true)
 				acBonus=math.ceil(acBonus*artifactMult)
 			end
-			acBonus=math.round(acBonus*(1+mult))
+			acBonus=round(acBonus*(1+mult))
 			
 			
 			--used later
@@ -2421,9 +2421,9 @@ function itemStats(index)
 			local power=it.BonusStrength
 			if vars.itemStatsFix then
 				if (it.Bonus==8 or it.Bonus==9) then
-					power=math.round(power*(2+power/50))
+					power=round(power*(2+power/50))
 				elseif it.Bonus==10 then
-					power=math.round(power*0.667)
+					power=round(power*0.667)
 				end
 			end
 			--[[
@@ -2470,9 +2470,9 @@ function itemStats(index)
 			local power=it.Charges%1000
 			if vars.itemStatsFix then
 				if (bonus==8 or bonus==9) then
-					power=math.round(power*(2+power/50))
+					power=round(power*(2+power/50))
 				elseif bonus==10 then
-					power=math.round(power*0.667)
+					power=round(power*0.667)
 				end
 			end
 			--[[
@@ -2512,9 +2512,9 @@ function itemStats(index)
 						if bonusData.bonusValues[i] then
 							 modifier = bonusData.statModifier
 							if type(modifier) == "table" then
-								tab[bonusData.bonusValues[i]] = math.round(tab[bonusData.bonusValues[i]] + modifier[i] * mult)
+								tab[bonusData.bonusValues[i]] = round(tab[bonusData.bonusValues[i]] + modifier[i] * mult)
 							else
-								tab[bonusData.bonusValues[i]] = math.round(tab[bonusData.bonusValues[i]] + modifier * mult)
+								tab[bonusData.bonusValues[i]] = round(tab[bonusData.bonusValues[i]] + modifier * mult)
 							end
 						end
 					end
@@ -2543,7 +2543,7 @@ function itemStats(index)
 			]]
 			bonusATK = bonus2 * (maxCharges / 30)
 			
-			bonus = bonus + math.round(bonusATK)
+			bonus = bonus + round(bonusATK)
 
 			local sides = txt.Mod1DiceSides
 			local sides2 = referenceWeaponSides[it.Number]
@@ -2551,7 +2551,7 @@ function itemStats(index)
 			
 			sidesBonus = sides2 * (maxCharges / 30)
 			
-			sidesBonus = sides + math.round(sidesBonus)
+			sidesBonus = sides + round(sidesBonus)
 			
 			if table.find(artWeap1h,it.Number) or table.find(artWeap2h,it.Number) then 
 				if txt.EquipStat<=1 then
@@ -2630,15 +2630,15 @@ function itemStats(index)
 			
 			local totBonus=armsDmg+add
 			if skill ~= 5 then
-				tab[40] = tab[40] + math.round(bonus)
-				tab[41] = tab[41] + math.round(bonus)
-				tab[42] = tab[42] + txt.Mod1DiceCount+math.round(totBonus)
-				tab[43] = tab[43] + math.round(side)*txt.Mod1DiceCount+math.round(totBonus)
+				tab[40] = tab[40] + round(bonus)
+				tab[41] = tab[41] + round(bonus)
+				tab[42] = tab[42] + txt.Mod1DiceCount+round(totBonus)
+				tab[43] = tab[43] + round(side)*txt.Mod1DiceCount+round(totBonus)
 			else
-				tab[44] = tab[44] + math.round(bonus)
-				tab[45] = tab[45] + math.round(bonus)
-				tab[46] = tab[46] + math.round(txt.Mod1DiceCount)+add
-				tab[47] = tab[47] + math.round(side)*txt.Mod1DiceCount+add
+				tab[44] = tab[44] + round(bonus)
+				tab[45] = tab[45] + round(bonus)
+				tab[46] = tab[46] + round(txt.Mod1DiceCount)+add
+				tab[47] = tab[47] + round(side)*txt.Mod1DiceCount+add
 			end
 			::continue::
 		end
@@ -2677,7 +2677,7 @@ function itemStats(index)
 			artifactMult=artifactPowerMult(pl.LevelBase)
 			for key,value in pairs(artifactSkillBonus[it.Number]) do
 				tab[key+50]=tab[key+50] or 0
-				tab[key+50]=tab[key+50]+math.round(value*artifactMult)
+				tab[key+50]=tab[key+50]+round(value*artifactMult)
 			end
 		end
 	end	
@@ -2708,12 +2708,12 @@ function itemStats(index)
 	local shieldMult=(skillItemAC[const.Skills.Shield][m]*s/100)
 	local shieldResMult=(skillItemRes[const.Skills.Shield][m]*s/100)
 	
-	itemArmorClassBonus1=math.round(armorAC*armorMult)
-	itemArmorClassBonus2=math.round(shieldAC*shieldMult)
+	itemArmorClassBonus1=round(armorAC*armorMult)
+	itemArmorClassBonus2=round(shieldAC*shieldMult)
 	tab[10]=tab[10]+itemArmorClassBonus1+itemArmorClassBonus2
 	
-	itemResistanceBonus1=math.round(armorAC*armorResMult) 
-	itemResistanceBonus2=math.round(shieldAC*shieldResMult)
+	itemResistanceBonus1=round(armorAC*armorResMult) 
+	itemResistanceBonus2=round(shieldAC*shieldResMult)
 	
 	for i=11,16 do
 		tab[i]=tab[i]+itemResistanceBonus1+itemResistanceBonus2
@@ -2808,10 +2808,10 @@ function itemStats(index)
 	--used for stats
 	hpStatsMap=hpStatsMap or {}
 	hpStatsMap[id]={
-		["totalhpFromItems"]=math.round(tab[8]),
-		["totalEnduranceBonus"]=math.round(Endurancebonus+endEff*hpScaling),
-		["totalBBBonus"]=math.round(BBBonus+s*m*hpScaling),
-		["totalBaseHP"]=math.round(Game.Classes.HPBase[pl.Class]+hpScaling*level),
+		["totalhpFromItems"]=round(tab[8]),
+		["totalEnduranceBonus"]=round(Endurancebonus+endEff*hpScaling),
+		["totalBBBonus"]=round(BBBonus+s*m*hpScaling),
+		["totalBaseHP"]=round(Game.Classes.HPBase[pl.Class]+hpScaling*level),
 	}
 	
 	tab[8]=tab[8]+enduranceXbb+hpScaling*BBHP
@@ -3655,9 +3655,9 @@ function getBaseAttackSpeed(it)
 			tot=tot+it:T().ChanceByLevel[i]
 			lvl=lvl+it:T().ChanceByLevel[i]*i
 		end
-		itemLevel=itemLevel+math.round(lvl/tot*18-17)
+		itemLevel=itemLevel+round(lvl/tot*18-17)
 		baseSpeed=baseRecovery[skill] * (0.75+itemLevel/200)
-		baseSpeed=math.round(baseSpeed/10)/10
+		baseSpeed=round(baseSpeed/10)/10
 		return baseSpeed
 	end
 	return 1
@@ -3677,7 +3677,7 @@ function events.CanWearItem(t)
 			tot=tot+it:T().ChanceByLevel[i]
 			lvl=lvl+it:T().ChanceByLevel[i]*i
 		end
-		itemLevel=itemLevel+math.round(lvl/tot*18-17)
+		itemLevel=itemLevel+round(lvl/tot*18-17)
 		local maxCharges=it.MaxCharges
 		if it.BonusExpireTime>0 and it.BonusExpireTime<=2 then
 			maxCharges=math.floor(math.min(maxCharges/1.2,maxCharges-5))
@@ -3858,7 +3858,7 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 		if speedMult then
 			damage=damage*getBaseAttackSpeed(it)
 		end
-		return math.round(damage)
+		return round(damage)
 	else
 		return 0
 	end
@@ -3893,7 +3893,7 @@ end
 
 
 function events.AfterLoadMap()
-	if isRedone and Map.Name~="7d28.blv" then
+	if isRedone then
 		if not mapvars.chestFix then
 			mapvars.chestFix=true
 			local name=Game.MapStats[Map.MapStatsIndex].Name
