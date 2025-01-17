@@ -2133,6 +2133,11 @@ function events.LoadMap(wasInGame)
 	Timer(checkMapCompletition, const.Minute*5) 
 end
 function checkMapCompletition()
+	--retroactive fix, can remove this code after a while
+	if mapvars.completed and mapvars.monsterMap then
+		mapvars.monsterMap.cleared=true
+	end
+
 	if (Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.completed==nil) or (Map.IndoorOrOutdoor==2 and mapvars.completed==nil) then
 		if Map.Name=="d42.blv" then return end --arena
 		n=Map.Monsters.Count
