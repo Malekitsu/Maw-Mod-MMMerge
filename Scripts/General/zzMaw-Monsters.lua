@@ -2200,6 +2200,9 @@ function checkMapCompletition()
 					Mouse.Item.MaxCharges=math.round(mapvars.mapAffixes.Power+math.random(0,2)-1)
 					Mouse.Item.BonusStrength=mapDungeons[math.random(1,#mapDungeons)]
 				end
+				if mapvars.monsterMap then
+					mapvars.monsterMap.cleared=true
+				end
 				return
 			else
 				mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
