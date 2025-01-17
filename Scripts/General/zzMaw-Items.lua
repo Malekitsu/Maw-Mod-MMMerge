@@ -3893,7 +3893,7 @@ end
 
 
 function events.AfterLoadMap()
-	if isRedone then
+	if isRedone and Map.Name~="7d28.blv" then
 		if not mapvars.chestFix then
 			mapvars.chestFix=true
 			local name=Game.MapStats[Map.MapStatsIndex].Name
