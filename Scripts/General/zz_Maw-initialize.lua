@@ -39,7 +39,7 @@ end
 
 function shortenNumber(number, significantDigits, color)
     if significantDigits < 1 then
-        error("Il numero di cifre significative deve essere almeno 1")
+        error("Number of digits needs to be at least 1")
     end
 
     local suffix = ""
@@ -56,7 +56,6 @@ function shortenNumber(number, significantDigits, color)
         divisor = 1e3
     end
 
-    -- Calcola il valore accorciato
     local shortened = math.round(number / divisor)
 
 	if color then
