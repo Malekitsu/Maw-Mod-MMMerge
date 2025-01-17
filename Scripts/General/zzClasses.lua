@@ -352,8 +352,8 @@ local function seraphSkills(isSeraph, id)
 		local pers=pl:GetPersonality()
 		local healMult=1+pers/1000
 		
-		local spiritHeal=math.round(spiritS^1.3*spiritM*damageMultiplier[pl:GetIndex()]["Melee"]*healMult)
-		local bodyHeal=math.round(bodyS^1.3*bodyM*damageMultiplier[pl:GetIndex()]["Melee"]*healMult)
+		local spiritHeal=round(spiritS^1.3*spiritM*damageMultiplier[pl:GetIndex()]["Melee"]*healMult)
+		local bodyHeal=round(bodyS^1.3*bodyM*damageMultiplier[pl:GetIndex()]["Melee"]*healMult)
 		local txt=baseSchoolsTxtSERAPH[16] .. "\n\nSeraphim healing upon attack increases depending on Spirit magic, scaling with personality(weapon speed multiplier applies).\n\n" .. "Current heal from Spirit: " .. StrColor(0,255,0,spiritHeal) .. "\n"
 		Skillz.setDesc(16,1,txt)
 		local txt=baseSchoolsTxtSERAPH[18] .. "\n\nSeraphim healing upon attack increases depending on Body magic, scaling with personality(weapon speed multiplier applies).\n\n" .. "Current heal from Body: " .. StrColor(0,255,0,bodyHeal) .. "\n"
@@ -452,14 +452,14 @@ function events.GameInitialized2()
 			t.Result=bonus
 			local might=t.Player:GetMight()
 
-			t.Result=math.round(bonus*(1+might/1000))
+			t.Result=round(bonus*(1+might/1000))
 			
 		elseif t.Stat==28 then --max damage
 			local pl=t.Player
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
 			local bonus= (dragonFang.Damage[m]+1) * s + t.Player.LevelBase +10
 			local might=t.Player:GetMight()
-			t.Result=math.round(bonus*(1+might/1000))
+			t.Result=round(bonus*(1+might/1000))
 			
 		elseif t.Stat==25 then --attack
 			local pl=t.Player
@@ -480,7 +480,7 @@ function events.GameInitialized2()
 			else
 				mightEffect=math.floor((might-13)/2)
 			end
-			t.Result=math.round((bonus+mightEffect)*(1+might/1000))
+			t.Result=round((bonus+mightEffect)*(1+might/1000))
 			
 		elseif t.Stat==32 then --max damage
 			local pl=t.Player
@@ -493,7 +493,7 @@ function events.GameInitialized2()
 			else
 				mightEffect=math.floor((might-13)/2)
 			end
-			t.Result=math.round((bonus+mightEffect)*(1+might/1000))
+			t.Result=round((bonus+mightEffect)*(1+might/1000))
 		
 		--AC
 		elseif t.Stat==9 then
@@ -650,7 +650,7 @@ function events.Tick()
 			end
 			
 			local baseDamage=dragonFang.Damage[fangM]*fang+might
-			local damage=math.round(baseDamage*(1+speed/100)*(1+mightBase/1000))
+			local damage=round(baseDamage*(1+speed/100)*(1+mightBase/1000))
 				
 			local txt="Dragons can use their fangs to deal atrocious damage to enemies.\n\nWhenever this skill is below dragon skill it will push monsters away\nThis skill converts attack speed directly into damage.\n\nCurrent Damage:  " .. StrColor(255,0,0,damage) .. "\n------------------------------------------------------------\n          Attack| Speed| Dmg"
 			Skillz.setDesc(33,1,txt)
@@ -682,7 +682,7 @@ function dragonSkill(dragon, index)
 		end
 		
 		local baseDamage=dragonFang.Damage[fangM]*fang+might
-		local damage=math.round(baseDamage*(1+speed/100)*(1+mightBase/1000))
+		local damage=round(baseDamage*(1+speed/100)*(1+mightBase/1000))
 		
 		local txt="Dragons can use their fangs to deal atrocious damage to enemies.\n\nWhenever this skill is below dragon skill it will push monsters away\nThis skill converts attack speed directly into damage.\n\nCurrent Damage:  " .. StrColor(255,0,0,damage) .. "\n------------------------------------------------------------\n          Attack| Dmg|"
 		Skillz.setDesc(33,1,txt)
@@ -759,7 +759,7 @@ function events.GameInitialized2()
 				end
 				
 				local baseDamage=dragonFang.Damage[fangM]*fang+might
-				local damage=math.round(baseDamage*(1+speed/100)*(1+mightBase/1000))
+				local damage=round(baseDamage*(1+speed/100)*(1+mightBase/1000))
 				
 				--check by damage type
 				index=table.find(damageKindMap,t.DamageKind)
@@ -803,7 +803,7 @@ function events.GameInitialized2()
 				--breath
 				local breath, breathM = SplitSkill(pl:GetSkill(const.Skills.DragonAbility))
 				local baseDamage=dragonBreath.Damage[breathM]*breath+might
-				local damage=math.round(baseDamage*(1+speed/100)*(1+mightBase/1000))
+				local damage=round(baseDamage*(1+speed/100)*(1+mightBase/1000))
 				
 				luck=data.Player:GetLuck()/1.5
 				critDamage=data.Player:GetAccuracy()*3/1000
@@ -894,7 +894,7 @@ function events.GameInitialized2()
 			m7,bM=SplitSkill(data.Player.Skills[const.Skills.Body])
 			
 			local FHP=data.Player:GetFullHP()
-			local leech=math.max(math.round(FHP^0.5* m7^1.5/70 * (0.5+bM/2)), m7)
+			local leech=math.max(round(FHP^0.5* m7^1.5/70 * (0.5+bM/2)), m7)
 			local maxSP=data.Player:GetFullSP()
 			data.Player.SP=math.min(data.Player.SP+m6^1.25, getMaxMana(data.Player))
 			
@@ -953,11 +953,11 @@ local function shamanSkills(isShaman, id)
 		local fireDamage=m1/10
 		txt=baseSchoolsTxt[12] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nMelee attacks deal an extra " .. fireDamage .. "% of monster Hit points as fire damage"
 		Skillz.setDesc(12,1,txt)
-		local airReduction=100-math.round(0.99^m2*10000)/100
+		local airReduction=100-round(0.99^m2*10000)/100
 		txt=baseSchoolsTxt[13] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nReduce all damage taken by " .. airReduction .. "%\n"
 		Skillz.setDesc(13,1,txt)
 		local lvl=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
-		local waterReduction=math.round(getMonsterDamage((lvl+1)^0.325*m3)^0.7)
+		local waterReduction=round(getMonsterDamage((lvl+1)^0.325*m3)^0.7)
 		txt=baseSchoolsTxt[14] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)\n"
 		Skillz.setDesc(14,1,txt)
 		local armsmasterDamage=earthMastery*m4
@@ -966,11 +966,11 @@ local function shamanSkills(isShaman, id)
 		local spelldh=m5
 		txt=baseSchoolsTxt[16] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nIncreases melee damage by " .. spelldh .. "%\n"
 		Skillz.setDesc(16,1,txt)
-		SPLEECH=math.round(m6^1.25)
+		SPLEECH=round(m6^1.25)
 		txt=baseSchoolsTxt[17] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nMelee attacks restore " .. SPLEECH .. " Spell Points\n"
 		Skillz.setDesc(17,1,txt)
 		local FHP=pl:GetFullHP()
-		local leech=math.max(math.round(FHP^0.5* m7^1.5/70 * (1+bodyMastery/2)),m7)
+		local leech=math.max(round(FHP^0.5* m7^1.5/70 * (1+bodyMastery/2)),m7)
 		txt=baseSchoolsTxt[18] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nMelee attacks restore " .. leech .. " Hit Points\n"
 		Skillz.setDesc(18,1,txt)
 	else
@@ -1054,7 +1054,7 @@ function events.GameInitialized2()
 				baseDamage=pl:GetMeleeDamageMin()
 				maxDamage=pl:GetMeleeDamageMax()
 				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
-				damage=math.round(randomDamage/2)
+				damage=round(randomDamage/2)
 				local res=t.Monster.Resistances[t.DamageKind] or t.Monster.Resistances[4]
 				damage=damage/2^(res/100)
 				local mult=damageMultiplier[t.PlayerIndex]["Melee"]
@@ -1097,7 +1097,7 @@ function events.GameInitialized2()
 				local bloodS, bloodM=SplitSkill(pl.Skills[const.Skills.Body])
 				local FHP=pl:GetFullHP()
 				local monLvl=getMonsterLevel(t.Monster)
-				local heal=FHP*(bloodS/math.round(monLvl^0.7))*0.05
+				local heal=FHP*(bloodS/round(monLvl^0.7))*0.05
 				--current active leech spell
 				vars.dkActiveAttackSpell=vars.dkActiveAttackSpell or {}
 				local id=pl:GetIndex()
@@ -1114,7 +1114,7 @@ function events.GameInitialized2()
 				
 				local id=pl:GetIndex()
 			
-				local healing=math.min(pl:GetFullHP()-pl.HP, math.round(leech+heal))
+				local healing=math.min(pl:GetFullHP()-pl.HP, round(leech+heal))
 				if healing>0 then
 					vars.leechDone=vars.leechDone or {}
 					vars.leechDone[id]=vars.leechDone[id] or 0
@@ -1318,15 +1318,15 @@ local function dkSkills(isDK, id)
 		local leech=FHP^0.5* bloodS^1.5/70
 		Game.SpellsTxt[68].Name="Blood Leech"
 		Game.SpellsTxt[68].Description="Activating this spell imbues the knight body with blood, leeching life upon attacking at the cost of 6 spell points."
-		Game.SpellsTxt[68].Normal="Leeches " .. math.round(leech * 1.25) .. " Hit Points"
-		Game.SpellsTxt[68].Expert="Leeches " .. math.round(leech * 1.5) .. " Hit Points"
-		Game.SpellsTxt[68].Master="Leeches " .. math.round(leech * 1.75) .. " Hit Points"
-		Game.SpellsTxt[68].GM="Leeches " .. math.round(leech * 2) .. " Hit Points"
+		Game.SpellsTxt[68].Normal="Leeches " .. round(leech * 1.25) .. " Hit Points"
+		Game.SpellsTxt[68].Expert="Leeches " .. round(leech * 1.5) .. " Hit Points"
+		Game.SpellsTxt[68].Master="Leeches " .. round(leech * 1.75) .. " Hit Points"
+		Game.SpellsTxt[68].GM="Leeches " .. round(leech * 2) .. " Hit Points"
 		
 		Game.SpellsTxt[74].Name="Superior Blood Leech"
 		Game.SpellsTxt[74].Description="Activating this spell imbues the knight essence with blood, leeching a superior amount of life upon attacking at the cost of 12 spell points."
 		Game.SpellsTxt[74].Master="n/a"
-		Game.SpellsTxt[74].GM="Leeches " .. math.round(leech * 4) .. " Hit Points"
+		Game.SpellsTxt[74].GM="Leeches " .. round(leech * 4) .. " Hit Points"
 		
 		Game.SpellsTxt[76].Name="Asphyxiate"
 		Game.SpellsTxt[76].Description="Asphyxiate the target deal damage equal to 120% and making him unable to act for 2 seconds"
@@ -1359,7 +1359,7 @@ local function dkSkills(isDK, id)
 		local txt
 		txt="This skill is only available to death knights and increases damage by 0.5-1-1.5 (at Novice, Expert, Master) and increases attack speed by 2% per skill point.\n"
 		Skillz.setDesc(14,1,txt)
-		local leech=math.round(bloodS/math.round(pl.LevelBase^0.7)*5*100)/100
+		local leech=round(bloodS/round(pl.LevelBase^0.7)*5*100)/100
 		txt="This skill is only available to death knights and reduces physical damage taken by 1% per skill point.\nAdditionally it will make your attacks to leech damage based on your total HP.\n\nCurrent leech vs. same level monsters: " .. leech .. "%\n"            
 		Skillz.setDesc(18,1,txt)
 		txt="This skill is only available to death knights and increases damage by 0.5-1-1.5 (at Novice, Expert, Master) and reduces magical damage taken by 1% per skill point.\n"	
