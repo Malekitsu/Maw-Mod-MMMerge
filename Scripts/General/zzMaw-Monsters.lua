@@ -43,7 +43,7 @@ function events.AfterLoadMap()
 			Map.Monsters[i].SpellSkill=Map.Monsters[i].SpellSkill%64
 		end
 		--resistances 
-		bolsterRes=math.max(math.round((Map.Monsters[i].Level-basetable[Map.Monsters[i].Id].Level)/2),0)
+		bolsterRes=math.max(round((Map.Monsters[i].Level-basetable[Map.Monsters[i].Id].Level)/2),0)
 		for v=0,10 do
 			if v~=5 then
 				if v==0 and Map.Monsters[i].Resistances[v]<65000 then
@@ -133,7 +133,7 @@ function recalculateMawMonster()
 			hp=HPtable[mon.Id]
 			hpOvercap=0
 			while hp>32500 do
-				hp=math.round(hp/2)
+				hp=round(hp/2)
 				hpOvercap=hpOvercap+1
 			end
 			mon.Resistances[0]=mon.Resistances[0]%1000+hpOvercap*1000
@@ -228,7 +228,7 @@ function recalculateMawMonster()
 				--HP calculated based on previous HP rapported to the previous level
 				HPRateo=oldTable.FullHP/(oldLevel*(oldLevel/10+3))
 				HPBolsterLevel=oldLevel*(1+(0.75*partyLvl/100))+partyLvl*0.75
-				local HP=math.round(HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180))*HPRateo
+				local HP=round(HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180))*HPRateo
 				hpMult=1
 				if Game.BolsterAmount==0 then
 					hpMult=hpMult*(0.6+HPBolsterLevel/600)
@@ -266,7 +266,7 @@ function recalculateMawMonster()
 				
 				hpOvercap=0
 				while HP>32500 do
-					HP=math.round(HP/2)
+					HP=round(HP/2)
 					hpOvercap=hpOvercap+1
 				end
 				
@@ -296,9 +296,9 @@ function recalculateMawMonster()
 				local lvl=getMonsterLevel(mon)
 				local baseLvl=totalLevel[mon.Id]
 				if baseLvl<100 and (lvl<baseLvl*1.1 or lvl>baseLvl*1.3)  then
-					mapvars.uniqueMonsterLevel[index]=math.round(baseLvl*(1.1+math.random()*0.2))
+					mapvars.uniqueMonsterLevel[index]=round(baseLvl*(1.1+math.random()*0.2))
 				elseif baseLvl>=100 and (lvl<baseLvl+10 or lvl>baseLvl+30) then
-					mapvars.uniqueMonsterLevel[index]=math.round(baseLvl+math.random()*20+10)
+					mapvars.uniqueMonsterLevel[index]=round(baseLvl+math.random()*20+10)
 				end
 				if mapvars.uniqueMonsterLevel and mapvars.uniqueMonsterLevel[index] then
 					mon.Level=math.min(mapvars.uniqueMonsterLevel[index],255)
@@ -309,10 +309,10 @@ function recalculateMawMonster()
 					HP=minHP*(1+math.random())
 					local hpOvercap=0
 					while HP>32500 do
-						HP=math.round(HP/2)
+						HP=round(HP/2)
 						hpOvercap=hpOvercap+1
 					end
-					mon.Resistances[0]=math.round(txt.Resistances[0]*5)/5%1000+1000*hpOvercap
+					mon.Resistances[0]=round(txt.Resistances[0]*5)/5%1000+1000*hpOvercap
 					local HPproportion=mon.HP/mon.FullHP
 					mon.FullHP=HP
 					mon.HP=mon.FullHP*HPproportion
@@ -617,7 +617,7 @@ function recalculateMonsterTable()
 		HPtable=HPtable or {}
 		HPtable[i]=HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/360)
 		--resistances 
-		bolsterRes=math.max(math.round((totalLevel[i]-basetable[i].Level)/10)*5,0)
+		bolsterRes=math.max(round((totalLevel[i]-basetable[i].Level)/10)*5,0)
 		--mapping
 		if getMapAffixPower(12) then
 			bolsterRes=bolsterRes+getMapAffixPower(12)
@@ -631,7 +631,7 @@ function recalculateMonsterTable()
 		--experience
 		local lvlBase=math.max(basetable[i].Level,totalLevel[i]/3) --added totalLevel/3 because of mapping
 		local lvlBase=math.min(lvlBase,120) 
-		mon.Experience = math.round((lvlBase*20+lvlBase^1.8)*totalLevel[i]/lvlBase)
+		mon.Experience = round((lvlBase*20+lvlBase^1.8)*totalLevel[i]/lvlBase)
 		if currentWorld==2 then
 			mon.Experience = math.min(mon.Experience*2, mon.Experience+1000)
 		end
@@ -781,15 +781,15 @@ function recalculateMonsterTable()
 		hpOvercap=0
 		actualHP=HPtable[i]
 		while actualHP>32500 do
-			actualHP=math.round(actualHP/2)
+			actualHP=round(actualHP/2)
 			hpOvercap=hpOvercap+1
 		end
 		mon.Resistances[0]=mon.Resistances[0]%1000+hpOvercap*1000
 		mon.HP=actualHP
 		mon.FullHP=actualHP
 		if mon.FullHP>1000 then
-			mon.FullHP=math.round(mon.FullHP/10)*10
-			mon.HP=math.round(mon.HP/10)*10
+			mon.FullHP=round(mon.FullHP/10)*10
+			mon.HP=round(mon.HP/10)*10
 		end
 	end
 	
@@ -878,9 +878,9 @@ function events.PickCorpse(t)
 		mon.TreasureItemPercent= math.ceil(mon.Level^0.5*(1+tier)*0.5 + originalValue*0.3)
 		
 		if vars.Mode==2 then
-			mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.5)
+			mon.TreasureItemPercent=round(mon.TreasureItemPercent*0.5)
 		elseif Game.BolsterAmount==300 then
-			mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*0.75)
+			mon.TreasureItemPercent=round(mon.TreasureItemPercent*0.75)
 		end
 		
 		local itemTier=(lvl+10*tier)/20
@@ -890,7 +890,7 @@ function events.PickCorpse(t)
 		itemTier=math.floor(itemTier)
 		mon.TreasureItemLevel=math.max(math.min(itemTier,6),1)
 		if  itemTier<=0 then
-			mon.TreasureItemPercent=math.round(mon.TreasureItemPercent*2^(itemTier-1))
+			mon.TreasureItemPercent=round(mon.TreasureItemPercent*2^(itemTier-1))
 		end
 		if math.random()<0.7 then
 			mon.TreasureItemType=0
@@ -902,8 +902,8 @@ function events.PickCorpse(t)
 	--special for bosses and resurrected
 	
 	if mon.NameId>300 then
-		mon.TreasureItemPercent=math.round(mon.TreasureItemPercent/4)
-		mon.TreasureDiceSides=math.max(math.round(mon.TreasureDiceSides/4),1)
+		mon.TreasureItemPercent=round(mon.TreasureItemPercent/4)
+		mon.TreasureDiceSides=math.max(round(mon.TreasureDiceSides/4),1)
 	elseif mon.NameId>220 then
 		mon.TreasureItemPercent=100
 		--item tier
@@ -1110,9 +1110,9 @@ function events.BeforeLoadMap()
 	--mapping fix
 	if mapMonsterDensity then
 		local map=Game.MapStats[mapMonsterDensity[1]]
-		map.Mon1Hi=math.round(map.Mon1Hi*mapMonsterDensity[2])
-		map.Mon2Hi=math.round(map.Mon2Hi*mapMonsterDensity[2])
-		map.Mon3Hi=math.round(map.Mon3Hi*mapMonsterDensity[2])
+		map.Mon1Hi=round(map.Mon1Hi*mapMonsterDensity[2])
+		map.Mon2Hi=round(map.Mon2Hi*mapMonsterDensity[2])
+		map.Mon3Hi=round(map.Mon3Hi*mapMonsterDensity[2])
 		mapMonsterDensity=nil
 	end
 end
@@ -1848,9 +1848,9 @@ local spellToDamageKind={
 function getMonsterLevel(mon)
 	local lvl=mon.Level
 	if mon.NameId==0 and totalLevel and totalLevel[mon.Id] then
-		lvl=math.round(totalLevel[mon.Id])
+		lvl=round(totalLevel[mon.Id])
 	elseif mapvars.uniqueMonsterLevel and mapvars.uniqueMonsterLevel[mon:GetIndex()] then
-		lvl=math.round(mapvars.uniqueMonsterLevel[mon:GetIndex()])
+		lvl=round(mapvars.uniqueMonsterLevel[mon:GetIndex()])
 	end
 	return lvl
 end
@@ -1883,13 +1883,13 @@ function events.BuildMonsterInformationBox(t)
 	--some statistics here, calculate the standard deviation of dices to get the range of which 95% will fall into
 	mean=mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*(mon.Attack1.DamageDiceSides+1)/2
 	range=(mon.Attack1.DamageDiceSides^2*mon.Attack1.DamageDiceCount/12)^0.5*1.96
-	lowerLimit=math.round(math.max(mean-range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount)*diff*extraMult[1])
-	upperLimit=math.round(math.min(mean+range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*mon.Attack1.DamageDiceSides)*diff*extraMult[1])
+	lowerLimit=round(math.max(mean-range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount)*diff*extraMult[1])
+	upperLimit=round(math.min(mean+range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*mon.Attack1.DamageDiceSides)*diff*extraMult[1])
 	
 	text=string.format(table.find(const.Damage,mon.Attack1.Type))
 	if not baseDamageValue and Game.CurrentPlayer>=0 then
-		lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit,false,lvl))
-		upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit,false,lvl))
+		lowerLimit=round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit,false,lvl))
+		upperLimit=round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit,false,lvl))
 	end
 	lowerLimit=shortenNumber(lowerLimit, 4, true)
 	upperLimit=shortenNumber(upperLimit, 4, true)
@@ -1898,11 +1898,11 @@ function events.BuildMonsterInformationBox(t)
 		if mon.Attack2Chance>0 and Game.CurrentPlayer>=0 then
 			mean=mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*(mon.Attack2.DamageDiceSides+1)/2
 			range=(mon.Attack2.DamageDiceSides^2*mon.Attack2.DamageDiceCount/12)^0.5*1.96
-			lowerLimit=math.round(math.max(mean-range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount)*diff*extraMult[2])
-			upperLimit=math.round(math.min(mean+range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*mon.Attack2.DamageDiceSides)*diff*extraMult[2])
+			lowerLimit=round(math.max(mean-range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount)*diff*extraMult[2])
+			upperLimit=round(math.min(mean+range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*mon.Attack2.DamageDiceSides)*diff*extraMult[2])
 			if not baseDamageValue then
-				lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack2.Type,lowerLimit,false,lvl))
-				upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack2.Type,upperLimit,false,lvl))
+				lowerLimit=round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack2.Type,lowerLimit,false,lvl))
+				upperLimit=round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack2.Type,upperLimit,false,lvl))
 			end
 			text=string.format(table.find(const.Damage,mon.Attack2.Type))
 			lowerLimit=shortenNumber(lowerLimit, 4, true)
@@ -1932,11 +1932,11 @@ function events.BuildMonsterInformationBox(t)
 			--calculate
 			mean=spell.DamageAdd+skill*(spell.DamageDiceSides+1)/2+bonusDamage
 			range=(spell.DamageDiceSides^2*skill/12)^0.5*1.96
-			lowerLimit=math.round(math.max(mean-range, spell.DamageAdd+skill+bonusDamage)*dmgMult*diff)
-			upperLimit=math.round(math.min(mean+range, spell.DamageAdd+skill*spell.DamageDiceSides+bonusDamage)*dmgMult*diff)
+			lowerLimit=round(math.max(mean-range, spell.DamageAdd+skill+bonusDamage)*dmgMult*diff)
+			upperLimit=round(math.min(mean+range, spell.DamageAdd+skill*spell.DamageDiceSides+bonusDamage)*dmgMult*diff)
 			if not baseDamageValue and Game.CurrentPlayer>=0 then
-				lowerLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],damageType,lowerLimit,false,lvl))
-				upperLimit=math.round(calcMawDamage(Party[Game.CurrentPlayer],damageType,upperLimit,false,lvl))
+				lowerLimit=round(calcMawDamage(Party[Game.CurrentPlayer],damageType,lowerLimit,false,lvl))
+				upperLimit=round(calcMawDamage(Party[Game.CurrentPlayer],damageType,upperLimit,false,lvl))
 			end
 			lowerLimit=shortenNumber(lowerLimit, 4, true)
 			upperLimit=shortenNumber(upperLimit, 4, true)
@@ -2092,8 +2092,8 @@ function events.LeaveMap()
 				mon.NameId=mon.Id+300
 				mon.Ally=old.Ally or 0
 				if mon.AIState==const.AIState.Removed then
-					mon.TreasureItemPercent=0 --math.round(old.item/4)
-					mon.TreasureDiceSides=0 --math.round(old.gold/4)
+					mon.TreasureItemPercent=0 --round(old.item/4)
+					mon.TreasureDiceSides=0 --round(old.gold/4)
 					mapvars.MonsterSeed[i] = Game.RandSeed
 					for i = 1, 30 do
 						Game.Rand()
@@ -2157,7 +2157,7 @@ function checkMapCompletition()
 			end
 		end
 		local requiredRateo=0.99^(math.floor(n/100))
-		mapvars.completition=math.min(math.round(m/n*100/requiredRateo),100)
+		mapvars.completition=math.min(round(m/n*100/requiredRateo),100)
 		completition.Text=string.format(mapvars.completition)
 		percentText.Text="%"
 		if completition.Text=="100" then
@@ -2203,7 +2203,7 @@ function checkMapCompletition()
 					if math.random()<0.4 then
 						Mouse.Item.BonusExpireTime=getUniqueAffix()
 					end
-					Mouse.Item.MaxCharges=math.round(mapvars.mapAffixes.Power+math.random(0,2)-1)
+					Mouse.Item.MaxCharges=round(mapvars.mapAffixes.Power+math.random(0,2)-1)
 					Mouse.Item.BonusStrength=mapDungeons[math.random(1,#mapDungeons)]
 				end
 				if mapvars.monsterMap then
@@ -2414,13 +2414,13 @@ function generateBoss(index,nameIndex)
 	if austerity==true then
 	hpmod=4
 	end
-	HP=math.round(mon.FullHP*2*(1+mon.Level/80)*(1+math.random())/hpmod)
+	HP=round(mon.FullHP*2*(1+mon.Level/80)*(1+math.random())/hpmod)
 	if getMapAffixPower(18) then
 		HP=HP*(1+getMapAffixPower(18)/100)
 	end
 	hpOvercap=0
 	while HP>32500 do
-		HP=math.round(HP/2)
+		HP=round(HP/2)
 		hpOvercap=hpOvercap+1
 	end
 	mon.Resistances[0]=mon.Resistances[0]+1000*hpOvercap
@@ -2430,9 +2430,9 @@ function generateBoss(index,nameIndex)
 	mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
 	local lvl=totalLevel[mon.Id] or mon.Level
 	if lvl>100 then
-		mapvars.uniqueMonsterLevel[index]=math.round(lvl+math.random()*20+10)
+		mapvars.uniqueMonsterLevel[index]=round(lvl+math.random()*20+10)
 	else
-		mapvars.uniqueMonsterLevel[index]=math.round(lvl*(1.1+math.random()*0.2))
+		mapvars.uniqueMonsterLevel[index]=round(lvl*(1.1+math.random()*0.2))
 	end
 	mon.Level=math.min(mapvars.uniqueMonsterLevel[index],255)
 	mon.TreasureDiceCount=(mon.Level*100)^0.5
@@ -2532,7 +2532,7 @@ function events.GameInitialized2() --to make the after all the other code
 						reflectedDamage=false
 					end
 				elseif skill=="Adamantite" then
-					t.Result=math.round(math.max(t.Result-t.Monster.Level^1.15*4,t.Result/4))
+					t.Result=round(math.max(t.Result-t.Monster.Level^1.15*4,t.Result/4))
 				elseif skill=="Swapper" then
 					for i=0,Map.Monsters.High do
 						mon=Map.Monsters[i]
@@ -2754,9 +2754,9 @@ end
 function calcDices(add, sides, count, mult, bonusDamage)
     local bonusDamage = bonusDamage or 0
     -- Calculate uncapped values
-    local uncappedAdd = math.round((add + bonusDamage) * mult)
-    local uncappedSides = math.round(sides * mult^0.5)
-    local uncappedCount = math.round(count * mult^0.5)
+    local uncappedAdd = round((add + bonusDamage) * mult)
+    local uncappedSides = round(sides * mult^0.5)
+    local uncappedCount = round(count * mult^0.5)
     
     -- Initialize capped values
     local cappedAdd = uncappedAdd
@@ -2767,17 +2767,17 @@ function calcDices(add, sides, count, mult, bonusDamage)
     if cappedAdd > 250 then
         local Overflow = cappedAdd - 250
         cappedAdd = 250
-        cappedSides = cappedSides + math.round(2 * Overflow / cappedCount)
+        cappedSides = cappedSides + round(2 * Overflow / cappedCount)
     end
     if cappedSides > 250 then
         local Overflow = cappedSides / 250
         cappedSides = 250
-        cappedCount = math.round(cappedCount * Overflow)
+        cappedCount = round(cappedCount * Overflow)
     end
     if cappedCount > 250 then
         local Overflow = cappedCount / 250
         cappedCount = 250
-        cappedSides = math.round(math.min(cappedSides * Overflow, 250))
+        cappedSides = round(math.min(cappedSides * Overflow, 250))
     end
     
     -- Compute expected damages
@@ -2909,7 +2909,7 @@ end
 
 
 function events.MonsterSpriteScale(t)
-	if Map.Monsters[math.round(t.MonsterIndex)].NameId>220 and Map.Monsters[math.round(t.MonsterIndex)].NameId<300 then
+	if Map.Monsters[round(t.MonsterIndex)].NameId>220 and Map.Monsters[round(t.MonsterIndex)].NameId<300 then
 		if Map.IndoorOrOutdoor==1 then
 			t.Scale=t.Scale*1.4
 		else
