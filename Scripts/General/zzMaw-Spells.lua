@@ -1,6 +1,6 @@
 local u1, u2, u4, i1, i2, i4 = mem.u1, mem.u2, mem.u4, mem.i1, mem.i2, mem.i4
 local hook, autohook, autohook2, asmpatch = mem.hook, mem.autohook, mem.autohook2, mem.asmpatch
-local max, min, floor, ceil, round, random = math.max, math.min, math.floor, math.ceil, math.round, math.random
+local max, min, floor, ceil, round, random = math.max, math.min, math.floor, math.ceil, round, math.random
 local format = string.format
 local MS = Merge.ModSettings
 
@@ -159,14 +159,14 @@ function events.PlayerCastSpell(t)
 			
 			totHeal=baseHeal*mult
 			if gotCrit then
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
+				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points(crit)"))
 			else
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
+				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points"))
 			end
 		end
 		--end of healing calculation
 		if t.TargetKind == 3 then
-			t.MultiplayerData[1]=math.round(totHeal) --total heal
+			t.MultiplayerData[1]=round(totHeal) --total heal
 			t.MultiplayerData[2]=gotCrit --crit 
 		elseif t.TargetKind == 4 and t.RemoteData then
 			local healData = t.RemoteData
@@ -186,7 +186,7 @@ function events.PlayerCastSpell(t)
 				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[1] .. " hit points"))
 			end
 		elseif t.TargetKind == 4 and not t.RemoteData then
-			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+math.round(totHeal),Party[t.TargetId]:GetFullHP())
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+round(totHeal),Party[t.TargetId]:GetFullHP())
 			if Party[t.TargetId].HP>0 then
 				Party[t.TargetId].Unconscious=0
 			end
@@ -231,14 +231,14 @@ function events.PlayerCastSpell(t)
 			totHeal=baseHeal*mult
 
 			if gotCrit then
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
+				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points(crit)"))
 			else
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
+				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points"))
 			end
 		end
 		--end of healing calculation
 		if t.TargetKind == 3 then
-			t.MultiplayerData[1]=math.round(totHeal) --total heal
+			t.MultiplayerData[1]=round(totHeal) --total heal
 			t.MultiplayerData[2]=gotCrit --crit 
 			return
 		elseif t.TargetKind == 4 and t.RemoteData then
@@ -263,10 +263,10 @@ function events.PlayerCastSpell(t)
 				local hp=Party[t.TargetId].HP
 				function events.Tick() 
 					events.Remove("Tick", 1)
-					Party[t.TargetId].HP=math.max(hp+math.round(totHeal), 1)
+					Party[t.TargetId].HP=math.max(hp+round(totHeal), 1)
 				end
 			else
-				Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+math.round(totHeal),Party[t.TargetId]:GetFullHP())
+				Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+round(totHeal),Party[t.TargetId]:GetFullHP())
 				if Party[t.TargetId].HP>0 then
 					Party[t.TargetId].Unconscious=0
 				end
@@ -289,18 +289,18 @@ function events.PlayerCastSpell(t)
 
 			--remove base heal
 			tooltipHeal=totHeal
-			totHeal=math.round(totHeal-(5+(m+1)*s))
+			totHeal=round(totHeal-(5+(m+1)*s))
 			if gotCrit then
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(tooltipHeal) .. " Hit points(crit)"))
+				Game.ShowStatusText(string.format("You Heal for " .. round(tooltipHeal) .. " Hit points(crit)"))
 			else
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(tooltipHeal) .. " Hit points"))
+				Game.ShowStatusText(string.format("You Heal for " .. round(tooltipHeal) .. " Hit points"))
 			end
 		end
 		--end of healing calculation
 		if t.TargetKind == 3 and t.MultiplayerData then
-			t.MultiplayerData[1]=math.round(totHeal) --bonus heal
+			t.MultiplayerData[1]=round(totHeal) --bonus heal
 			t.MultiplayerData[2]=gotCrit --crit 
-			t.MultiplayerData[3]=math.round(tooltipHeal) --total heal
+			t.MultiplayerData[3]=round(tooltipHeal) --total heal
 			return
 		elseif t.TargetKind == 4 and t.RemoteData then
 			local healData = t.RemoteData
@@ -320,7 +320,7 @@ function events.PlayerCastSpell(t)
 				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[3] .. " hit points"))
 			end
 		elseif t.TargetKind == 4 and not t.RemoteData then
-			Party[t.TargetId].HP=Party[t.TargetId].HP+math.round(totHeal)
+			Party[t.TargetId].HP=Party[t.TargetId].HP+round(totHeal)
 			if Party[t.TargetId].HP>0 then
 				Party[t.TargetId].Unconscious=0
 			end
@@ -361,14 +361,14 @@ function events.PlayerCastSpell(t)
 			totHeal=baseHeal*mult
 
 			if gotCrit then
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
+				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points(crit)"))
 			else
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
+				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points"))
 			end
 		end
 		--end of healing calculation
 		if t.TargetKind == 3 then
-			t.MultiplayerData[1]=math.round(totHeal) --total heal
+			t.MultiplayerData[1]=round(totHeal) --total heal
 			t.MultiplayerData[2]=gotCrit --crit 
 			return
 		elseif t.TargetKind == 4 and t.RemoteData then
@@ -389,7 +389,7 @@ function events.PlayerCastSpell(t)
 				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[1] .. " hit points"))
 			end
 		elseif t.TargetKind == 4 and not t.RemoteData then
-			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+math.round(totHeal),Party[t.TargetId]:GetFullHP())
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+round(totHeal),Party[t.TargetId]:GetFullHP())
 			if Party[t.TargetId].HP>0 then
 				Party[t.TargetId].Unconscious=0
 			end
@@ -420,11 +420,11 @@ function events.PlayerCastSpell(t)
 
 			--remove base heal
 			tooltipHeal=totHeal
-			totHeal=math.round(totHeal-(10+5*s))
+			totHeal=round(totHeal-(10+5*s))
 			if gotCrit then
-				Game.ShowStatusText(string.format("You Heal the Party for " .. math.round(tooltipHeal) .. " Hit points(crit)"))
+				Game.ShowStatusText(string.format("You Heal the Party for " .. round(tooltipHeal) .. " Hit points(crit)"))
 			else
-				Game.ShowStatusText(string.format("You Heal the Party for " .. math.round(tooltipHeal) .. " Hit points"))
+				Game.ShowStatusText(string.format("You Heal the Party for " .. round(tooltipHeal) .. " Hit points"))
 			end
 		end
 		--end of healing calculation
@@ -436,9 +436,9 @@ function events.PlayerCastSpell(t)
 				end
 			end
 			if t.MultiplayerData then
-				t.MultiplayerData[1]=math.round(totHeal) --bonus heal
+				t.MultiplayerData[1]=round(totHeal) --bonus heal
 				t.MultiplayerData[2]=gotCrit --crit 
-				t.MultiplayerData[3]=math.round(tooltipHeal) --total heal
+				t.MultiplayerData[3]=round(tooltipHeal) --total heal
 			end
 		elseif t.RemoteData then
 			local healData = t.RemoteData
@@ -768,9 +768,9 @@ function doSharedLife(amount, spellQueueData)
 		totHeal=baseHeal*mult
 
 		if gotCrit then
-			Game.ShowStatusText(string.format("Shared Life heals for " .. math.round(totHeal*2) .. " Hit points(crit)"))
+			Game.ShowStatusText(string.format("Shared Life heals for " .. round(totHeal*2) .. " Hit points(crit)"))
 		else
-			Game.ShowStatusText(string.format("Shared Life heals for " .. math.round(totHeal*2) .. " Hit points"))
+			Game.ShowStatusText(string.format("Shared Life heals for " .. round(totHeal*2) .. " Hit points"))
 		end
 		amount=amount+totHeal-healingAmount
 		
@@ -1075,9 +1075,9 @@ function events.Action(t)
 			totHeal=baseHeal*mult
 			
 			if gotCrit then
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
+				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points(crit)"))
 			else
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
+				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points"))
 			end
 
 			min_index = pickLowestPartyMember()
@@ -1107,9 +1107,9 @@ function events.Action(t)
 			
 			totHeal=baseHeal*mult
 			if gotCrit then
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
+				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points(crit)"))
 			else
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
+				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points"))
 			end
 
 			min_index = pickLowestPartyMember()
@@ -1142,9 +1142,9 @@ function events.Action(t)
 			
 			totHeal=baseHeal*mult
 			if gotCrit then
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points(crit)"))
+				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points(crit)"))
 			else
-				Game.ShowStatusText(string.format("You Heal for " .. math.round(totHeal) .. " Hit points"))
+				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points"))
 			end
 
 			min_index = pickLowestPartyMember()
@@ -1225,7 +1225,7 @@ function events.Action(t)
 		local lvl=Party[id].LevelBase
 		local baseCost=value.BaseCost
 		local scalingCost=value.ScalingCost
-		local cost=math.round((baseCost+(lvl/scalingCost/3))*(1+mult)) --edit here to change mana cost
+		local cost=round((baseCost+(lvl/scalingCost/3))*(1+mult)) --edit here to change mana cost
 		Game.Spells[key]["SpellPointsNormal"]=cost
 		Game.Spells[key]["SpellPointsExpert"]=cost
 		Game.Spells[key]["SpellPointsMaster"]=cost
@@ -1341,7 +1341,7 @@ function calcEffectChance(lvl, res, skill, chance, mon)
 	totRes=lvl/4+res
 	mult=(1+skill*chance)
 	newRes=(totRes+30)/mult-30
-	newLevel=math.max(math.round(newRes*4),0)
+	newLevel=math.max(round(newRes*4),0)
 	--nerfed cc effects on bosses
 	if mon.NameId>=220 and mon.NameId<300 then
 		newLevel=newLevel*2
@@ -1446,8 +1446,8 @@ function events.CalcSpellDamage(t)
 		end
 		diceMin, diceMax, damageAdd, ascensionTier = ascendSpellDamage(s, m, t.Spell, data.Player:GetIndex())
 		if table.find(elementalistClass, data.Player.Class) then
-			diceMax=math.round(diceMax*(1+vars.eleStacks[id]*0.1))
-			damageAdd=math.round(damageAdd*(1+vars.eleStacks[id]*0.1))
+			diceMax=round(diceMax*(1+vars.eleStacks[id]*0.1))
+			damageAdd=round(damageAdd*(1+vars.eleStacks[id]*0.1))
 		end
 	end
 	--calculate
@@ -1575,7 +1575,7 @@ function ascendSpellDamage(skill, mastery, spell, index)
 		--damageAdd=damageAdd*(1+skill*0.1 )*(ascensionLevel+1)^2*1.2^ascensionLevel
 		--diceMax=diceMax*(1+0.15*(ascensionLevel+1)^2)*1.2^ascensionLevel
 	end
-	diceMin, diceMax, damageAdd = math.round(diceMin), math.round(diceMax), math.round(damageAdd)
+	diceMin, diceMax, damageAdd = round(diceMin), round(diceMax), round(damageAdd)
 	return diceMin, diceMax, damageAdd, ascensionLevel
 end
 
@@ -1586,7 +1586,7 @@ function ascendSpellHealing(skill, mastery, spell, healM)
 	if ascensionLevel>0 then
 		scaling=scaling * (1+0.01 * skill * ascensionLevel)*1.2^ascensionLevel
 		base=base*(1+skill*0.1 * ascensionLevel)*1.4^ascensionLevel
-		scaling, base = math.round(scaling), math.round(base)
+		scaling, base = round(scaling), round(base)
 	end
 	return scaling, base
 end
@@ -1677,8 +1677,8 @@ function ascension()
 				for i=1,4 do
 					Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(spellCost[num][masteryName[i]]*(1+s*0.125)*1.5^(ascensionLevel)*(1-0.125*m),65000)
 					if elementalist then
-						local baseCost=math.round((spellCost[num][masteryName[i]]+vars.eleStacks[id])*(1+s*0.125)*1.5^(ascensionLevel)*(1-0.125*m))
-						Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(math.round(baseCost*(1+vars.eleStacks[id]*0.075)),65000)
+						local baseCost=round((spellCost[num][masteryName[i]]+vars.eleStacks[id])*(1+s*0.125)*1.5^(ascensionLevel)*(1-0.125*m))
+						Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(round(baseCost*(1+vars.eleStacks[id]*0.075)),65000)
 					end
 				end
 			else
@@ -1697,8 +1697,8 @@ function ascension()
 		--fire spikes fix
 		Game.SpellsTxt[7].Description="Drops a Fire Spike on the ground that waits for a creature to get near it before exploding.  Fire Spikes last until you leave the map or they are triggered."
 		Game.SpellsTxt[7].Expert=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",diceMaxTooltip(s, m,7))
-		Game.SpellsTxt[7].Master=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",math.round(diceMaxTooltip(s, m,7)/6*8))
-		Game.SpellsTxt[7].GM=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",math.round(diceMaxTooltip(s, m,7)/6*10))
+		Game.SpellsTxt[7].Master=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",round(diceMaxTooltip(s, m,7)/6*8))
+		Game.SpellsTxt[7].GM=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",round(diceMaxTooltip(s, m,7)/6*10))
 		----------------------------------------
 		
 		Game.SpellsTxt[8].Description=string.format("Reserve a mana percentage to surround your characters with a very hot fire that is only harmful to others.  The spell will deliver %s points of damage plus 1-%s per point of skill to all nearby monsters for as long as they remain in the area of effect.",dmgAddTooltip(s, m,8),diceMaxTooltip(s, m,8))
@@ -1737,8 +1737,8 @@ function ascension()
 		
 		Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,103),diceMaxTooltip(s, m,103))
 		Game.SpellsTxt[111].Description=string.format("Lifedrain allows the vampire to damage his or her target and simultaneously heal based on the damage done in the Lifedrain.  This ability does %s points of damage plus 1-%s points of damage per skill.",dmgAddTooltip(s, m,111),diceMaxTooltip(s, m,111))
-		Game.SpellsTxt[111].Master=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*5),math.round(diceMaxTooltip(s, m,111)/3*5))
-		Game.SpellsTxt[111].GM=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(s, m,111)/3*7),math.round(diceMaxTooltip(s, m,111)/3*7))
+		Game.SpellsTxt[111].Master=string.format("Damage %s points plus 1-%s per point of skill",round(dmgAddTooltip(s, m,111)/3*5),round(diceMaxTooltip(s, m,111)/3*5))
+		Game.SpellsTxt[111].GM=string.format("Damage %s points plus 1-%s per point of skill",round(dmgAddTooltip(s, m,111)/3*7),round(diceMaxTooltip(s, m,111)/3*7))
 		
 		for i=1, #spells do
 			local ascensionLevel=getAscensionTier(s,spells[i])
@@ -1774,7 +1774,7 @@ function ascension()
 			end
 			if ascensionLevel>=1 then
 				for v=1,4 do
-					healingSpells[healingList[i]].Cost[v]=math.round(healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m))
+					healingSpells[healingList[i]].Cost[v]=round(healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m))
 					healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
 				end
 			end
@@ -1789,8 +1789,8 @@ function ascension()
 			local mult=1+s/400
 			for i=1,5 do
 				for v=1,4 do
-					healingSpells[healingList[i]].Scaling[v]=math.round(healingSpells[healingList[i]].Scaling[v]*mult)
-					healingSpells[healingList[i]].Base[v]=math.round(healingSpells[healingList[i]].Base[v]*mult)
+					healingSpells[healingList[i]].Scaling[v]=round(healingSpells[healingList[i]].Scaling[v]*mult)
+					healingSpells[healingList[i]].Base[v]=round(healingSpells[healingList[i]].Base[v]*mult)
 				end
 			end
 		end
@@ -1851,7 +1851,7 @@ function ascension()
 				local sp=buffSpellList[i]
 				if buffSpell[sp] then
 					local cost, percent=getBuffCost(pl, sp)
-					percent=math.round(percent*10000)/100
+					percent=round(percent*10000)/100
 					local txt=StrColor(255,0,0,"\nNot Active")
 					if vars.mawbuff[sp] then
 						for j=0, Party.High do
@@ -1867,7 +1867,7 @@ function ascension()
 					end
 				elseif utilitySpell[sp] then
 					local cost, percent=getBuffCost(pl, sp)
-					cost=math.round(cost)
+					cost=round(cost)
 					local txt=StrColor(255,0,0,"\nNot Active")
 					if vars.mawbuff[sp] then
 						for j=0, Party.High do
@@ -2077,11 +2077,11 @@ function events.GameInitialized2()
 			end
 			local theoreticalDamage80=manaCost^0.6*1.4
 			--scale new values according to original differences
-			local dmgAdd80=math.round(theoreticalDamage80*dmgAddProportion)
+			local dmgAdd80=round(theoreticalDamage80*dmgAddProportion)
 			if spellPowers[i].diceMax==spellPowers[i].diceMin then
-				diceMax80=math.round(theoreticalDamage80*diceMaxProportion)
+				diceMax80=round(theoreticalDamage80*diceMaxProportion)
 			else
-				diceMax80=math.round(theoreticalDamage80*(diceMaxProportion)*2)+1
+				diceMax80=round(theoreticalDamage80*(diceMaxProportion)*2)+1
 			end
 			spellPowers80[i]={dmgAdd = dmgAdd80, diceMin = 1, diceMax = diceMax80,}
 			----------
@@ -2104,11 +2104,11 @@ function events.GameInitialized2()
 			end
 			local theoreticalDamage160=manaCost^0.5*2.5
 			--scale new values according to original differences
-			local dmgAdd160=math.round(theoreticalDamage160*dmgAddProportion)
+			local dmgAdd160=round(theoreticalDamage160*dmgAddProportion)
 			if spellPowers[i].diceMax==spellPowers[i].diceMin then
-				diceMax160=math.round(theoreticalDamage160*diceMaxProportion)
+				diceMax160=round(theoreticalDamage160*diceMaxProportion)
 			else
-				diceMax160=math.round(theoreticalDamage160*(diceMaxProportion)*2)+1
+				diceMax160=round(theoreticalDamage160*(diceMaxProportion)*2)+1
 			end
 			spellPowers160[i]={dmgAdd = dmgAdd160, diceMin = 1, diceMax = diceMax160,}
 		end
@@ -2472,8 +2472,8 @@ function events.Tick()
 			Game.SpellsTxt[6].Description=string.format("Fires a ball of fire at a single target. When it hits, the ball explodes damaging all those nearby, including your characters if they're too close.  Fireball does 1-%s points of damage per point of skill in Fire Magic.",diceMaxTooltip(level,6))
 			--fire spikes fix
 			Game.SpellsTxt[7].Expert=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",diceMaxTooltip(level,7))
-			Game.SpellsTxt[7].Master=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",math.round(diceMaxTooltip(level,7)/6*8))
-			Game.SpellsTxt[7].GM=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",math.round(diceMaxTooltip(level,7)/6*10))
+			Game.SpellsTxt[7].Master=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",round(diceMaxTooltip(level,7)/6*8))
+			Game.SpellsTxt[7].GM=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",round(diceMaxTooltip(level,7)/6*10))
 			----------------------------------------
 			
 			Game.SpellsTxt[8].Description=string.format("Surrounds your characters with a very hot fire that is only harmful to others.  The spell will deliver 1-%s points of damage per point of skill to all nearby monsters for as long as they remain in the area of effect.",diceMaxTooltip(level,8))
@@ -2511,11 +2511,11 @@ function events.Tick()
 			
 			Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is 1-%s per point of skill.",diceMaxTooltip(level,103))
 			Game.SpellsTxt[111].Description=string.format("Lifedrain allows the vampire to damage his or her target and simultaneously heal based on the damage done in the Lifedrain.  This ability does %s points of damage plus 1-%s points of damage per skill.",dmgAddTooltip(level,111),diceMaxTooltip(level,111))
-			Game.SpellsTxt[111].Master=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(level,111)/3*4),math.round(diceMaxTooltip(level,111)/3*4))
-			Game.SpellsTxt[111].GM=string.format("Damage %s points plus 1-%s per point of skill",math.round(dmgAddTooltip(level,111)/3*5),math.round(diceMaxTooltip(level,111)/3*5))
+			Game.SpellsTxt[111].Master=string.format("Damage %s points plus 1-%s per point of skill",round(dmgAddTooltip(level,111)/3*4),round(diceMaxTooltip(level,111)/3*4))
+			Game.SpellsTxt[111].GM=string.format("Damage %s points plus 1-%s per point of skill",round(dmgAddTooltip(level,111)/3*5),round(diceMaxTooltip(level,111)/3*5))
 			Game.SpellsTxt[123].Expert=string.format("Damage %s points plus 1-%s points per point of skill",dmgAddTooltip(level,123),diceMaxTooltip(level,123))
-			Game.SpellsTxt[123].Master=string.format("Damage %s points plus 1-%s points per point of skill",math.round(dmgAddTooltip(level,123)/10*11),math.round(diceMaxTooltip(level,123)/10*11))
-			Game.SpellsTxt[123].GM=string.format("Damage %s points plus 1-%s points per point of skill",math.round(dmgAddTooltip(level,123)/10*12),math.round(diceMaxTooltip(level,123)/10*12))
+			Game.SpellsTxt[123].Master=string.format("Damage %s points plus 1-%s points per point of skill",round(dmgAddTooltip(level,123)/10*11),round(diceMaxTooltip(level,123)/10*11))
+			Game.SpellsTxt[123].GM=string.format("Damage %s points plus 1-%s points per point of skill",round(dmgAddTooltip(level,123)/10*12),round(diceMaxTooltip(level,123)/10*12))
 			
 			--remove curse
 			Game.SpellsTxt[49].Master="8 Mana cost: \ncures 24 + 4 HP per point of skill\n1 day limit\n"
@@ -2791,7 +2791,7 @@ if buffRework then
 				end
 			end
 		elseif utilitySpell[spellId] then
-			cost=math.round(utilitySpell[spellId].Cost)
+			cost=round(utilitySpell[spellId].Cost)
 		end	
 		return cost, percentageDecrease
 	end
@@ -3004,7 +3004,7 @@ if buffRework then
 						vars.currentManaPool[id]=vars.currentManaPool[id]-vars.maxManaPool[id]*percentageDecrease
 					elseif utilitySpell[spell] then
 						local s,m=SplitSkill(Skillz.get(pl,52))
-						vars.currentManaPool[id]=vars.currentManaPool[id]-math.round(utilitySpell[spell].Cost*(1-m/10))
+						vars.currentManaPool[id]=vars.currentManaPool[id]-round(utilitySpell[spell].Cost*(1-m/10))
 					end
 				end
 			end
