@@ -164,7 +164,7 @@ function getItemRecovery(it, playerLevel)
 	if (it.Number>=500 and it.Number<=543) or (it.Number>=1302 and it.Number<=1354) or (it.Number>=2020 and it.Number<=2049) then 
 		itemLevel=artifactPowerMult(playerLevel)*100
 		baseSpeed=baseRecovery[skill] * (0.75+itemLevel/250)
-		baseSpeed=math.round(baseSpeed/10)*10
+		baseSpeed=round(baseSpeed/10)*10
 	elseif baseRecovery[skill] then
 		local tot=0
 		local lvl=0
@@ -172,9 +172,9 @@ function getItemRecovery(it, playerLevel)
 			tot=tot+it:T().ChanceByLevel[i]
 			lvl=lvl+it:T().ChanceByLevel[i]*i
 		end
-		itemLevel=math.round(lvl/tot*18-17)+it.MaxCharges*5
+		itemLevel=round(lvl/tot*18-17)+it.MaxCharges*5
 		baseSpeed=baseRecovery[skill] * (0.75+itemLevel/250)
-		baseSpeed=math.round(baseSpeed/10)*10
+		baseSpeed=round(baseSpeed/10)*10
 	end
 	return baseSpeed
 end
@@ -776,7 +776,7 @@ function events.KeyDown(t)
 			end
 			if heal then
 				Party[0].Items[index].Number=0
-				local healAmount=math.round(bonus^1.4)+10
+				local healAmount=round(bonus^1.4)+10
 				evt.Add("HP",healAmount)
 				vars.healthPotionCooldown=15
 				Game.ShowStatusText(string.format("Health Potion heals for %s hit points",healAmount))
@@ -818,7 +818,7 @@ function events.KeyDown(t)
 			end
 			if heal then
 				Party[0].Items[index].Number=0
-				local spAmount=math.round(bonus^1.4*2/3)+10
+				local spAmount=round(bonus^1.4*2/3)+10
 				evt.Add("SP",20+bonus*2)
 				vars.manaPotionCooldown=15
 				Game.ShowStatusText(string.format("Mana Potion restores %s mana",spAmount))
@@ -1278,8 +1278,8 @@ function events.Tick()
 		local FHP=pl:GetFullHP()
 		local s,m = SplitSkill(pl:GetSkill(30))
 		local regenEffect={[0]=0,2,4,6,6}
-		local hpRegen = math.round(FHP^0.5*s^1.65*((regenEffect[m])/35))/10+s
-		local hpRegen2 = math.round(FHP^0.5*(s+1)^1.65*((regenEffect[m])/35))/10+(s+1)
+		local hpRegen = round(FHP^0.5*s^1.65*((regenEffect[m])/35))/10+s
+		local hpRegen2 = round(FHP^0.5*(s+1)^1.65*((regenEffect[m])/35))/10+(s+1)
 		local txt = string.format("%s\n\nCurrent HP Regeneration: %s\nNext Level Bonus: %s HP Regen",baseRegStr,StrColor(0,255,0,hpRegen),StrColor(0,255,0,"+" .. hpRegen2-hpRegen))
 		Skillz.setDesc(30,1,txt)
 		--meditation tooltip
@@ -1293,11 +1293,11 @@ function events.Tick()
 		end
 		local spRegen = (FSP^0.25*s^1.4*((m+5)/50)+2)/10
 		local spRegen2 = (FSP^0.25*(s+1)^1.4*((m+5)/50)+2)/10
-		local spRegen2 = math.round((spRegen2-spRegen)*100)/100
+		local spRegen2 = round((spRegen2-spRegen)*100)/100
 		if spRegen>10 then
-			spRegen = math.round((spRegen)*10)/10
+			spRegen = round((spRegen)*10)/10
 		else
-			spRegen = math.round((spRegen)*100)/100
+			spRegen = round((spRegen)*100)/100
 		end
 		txt= string.format("%s\n\nIncreases spell points based on SP per level and mastery\n\nCurrent SP Regeneration: %s\nNext Level Bonus: %s SP Regen\n",baseMedStr,StrColor(60,60,255,spRegen),StrColor(60,60,255,"+" .. spRegen2))
 		Skillz.setDesc(28,1,txt)
@@ -1305,7 +1305,7 @@ function events.Tick()
 		--spear tooltip
 		local s,m=SplitSkill(pl:GetSkill(const.Skills.Spear))
 		local mult=damageMultiplier[pl:GetIndex()]["Melee"]
-		local damageIncrease=math.round((2+s*0.02)*mult*10)/10
+		local damageIncrease=round((2+s*0.02)*mult*10)/10
 		Game.SkillDesGM[const.Skills.Spear]=string.format("%s\n\t070Each spear attack reduces physical resistance, increasing damage by: %s%%",baseSpearTooltip,damageIncrease)
 	end
 end
@@ -1445,7 +1445,7 @@ function events.Action(t)
 					local id=Game.CurrentPlayer
 					if id>=0 and id<=Party.High then
 						local lvl=Party[id].LevelBase
-						house.Val=math.round(lvl^0.7)+4
+						house.Val=round(lvl^0.7)+4
 					end
 				end
 			end
@@ -1934,9 +1934,9 @@ function events.Tick()
 			end
 		end
 		local s, m= SplitSkill(Skillz.get(pl, 51))
-		local efficiency=math.round((1+s^1.4/125*4)*100)/100
+		local efficiency=round((1+s^1.4/125*4)*100)/100
 		if s > 50 then 
-			efficiency=math.round((1+50^1.4/125*4)*100)/100*s/50
+			efficiency=round((1+50^1.4/125*4)*100)/100*s/50
 		end
 			Skillz.setDesc(51, 1, "Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20 (8-20-32 in insanity mode).\n\nMastery increase its mana efficience.\n")
 		
@@ -1953,8 +1953,8 @@ function events.Tick()
 		end
 		
 		local powerMult, DPS2, DPS3, vitMult=calcPowerVitality(pl)
-		local vit=math.round(vitMult^0.35)
-		local power=math.round(powerMult^0.35)
+		local vit=round(vitMult^0.35)
+		local power=round(powerMult^0.35)
 		local retS, m= SplitSkill(Skillz.get(pl, 53))
 		Skillz.setDesc(53, 1, "After mastering the art of covering, you have become capable delivering deadly counter attacks to those who dare try harm your allies. Retaliation has a 1% per skill point chance to activate after successfully covering an ally.\n\nExpert, Master and Grandmaster are learned automatically at skill 12, 30 and 50.\n\nDamage done depends on 2 coefficients, multiplied then by skill level:\n\nMelee Power coefficient: " .. StrColor(255,0,0, power) .. "\nVitality coefficient: " .. StrColor(255,0,0, vit) .. "\n\nTotal Damage: " .. StrColor(255,0,0, retS*vit*power) .. "\n\nBalancing power and vitality leads to the highest damage.\n")
 		
@@ -2228,7 +2228,7 @@ function events.Action(t)
 			Skillz.setDesc(6,5,maceGMtxt)
 			if m<3 then return end
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Mace))
-			local chance=math.round(s/pl.LevelBase^0.65*1500*damageMultiplier[pl:GetIndex()].Melee/math.min(1+pl.LevelBase/150,3))/100
+			local chance=round(s/pl.LevelBase^0.65*1500*damageMultiplier[pl:GetIndex()].Melee/math.min(1+pl.LevelBase/150,3))/100
 			local txt="\n\n"
 			if m==3 then
 				txt=txt .. "Chance to Stun: " .. chance .. "%"
