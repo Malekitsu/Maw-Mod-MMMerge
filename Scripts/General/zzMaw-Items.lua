@@ -814,6 +814,9 @@ function events.LoadMap(wasInGame)
 		if vars.insanityMode then
 			mult=mult*2
 		end
+		if Party.High==0 then
+			mult=mult/2
+		end
 		for i = 0, Party.High do
 			if Party[i].Poison3>0 then
 				if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
