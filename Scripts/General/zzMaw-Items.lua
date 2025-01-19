@@ -186,8 +186,8 @@ function events.ItemGenerated(t)
 		return
 	end
 	--spawn crafting materials in misc shops, substituting recipes
-	if (Game.HouseScreen==2 or Game.HouseScreen==95) then
-		id=Game:GetCurrentHouse()
+	if (Game.HouseScreen==2 or Game.HouseScreen==95) and not austerity then
+		local id=Game:GetCurrentHouse()
 		if (t.Item:T().EquipStat>=12 and math.random()<0.05 or t.Item:T().EquipStat==19) and id<=110 then 
 			t.Item.Bonus=0
 			t.Item.BonusStrength=0
@@ -289,7 +289,7 @@ function events.ItemGenerated(t)
 		--modify reagents
 		local itmod=3
 		if austerity==true then
-		itmod=8
+			itmod=8
 		end
 		if reagentList[t.Item.Number] then
 			t.Item.Bonus=round(partyLevel/itmod)
