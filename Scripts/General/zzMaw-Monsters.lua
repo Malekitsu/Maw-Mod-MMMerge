@@ -295,6 +295,7 @@ function recalculateMawMonster()
 				atk2.DamageAdd, atk2.DamageDiceSides, atk2.DamageDiceCount = txtAtk2.DamageAdd, txtAtk2.DamageDiceSides, txtAtk2.DamageDiceCount
 				local lvl=getMonsterLevel(mon)
 				local baseLvl=totalLevel[mon.Id]
+				mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
 				if baseLvl<100 and (lvl<baseLvl*1.1 or lvl>baseLvl*1.3)  then
 					mapvars.uniqueMonsterLevel[index]=round(baseLvl*(1.1+math.random()*0.2))
 				elseif baseLvl>=100 and (lvl<baseLvl+10 or lvl>baseLvl+30) then
