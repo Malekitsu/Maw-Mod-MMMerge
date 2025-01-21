@@ -2160,7 +2160,13 @@ function checkMapCompletition()
 			end
 		end
 		local requiredRateo=0.99^(math.floor(n/100))
+		if vars.insanityMode and not mapvars.monsterMap then
+			requiredRateo=1
+		end
 		mapvars.completition=math.min(round(m/n*100/requiredRateo),100)
+		if mapvars.completed then
+			mapvars.completition=100
+		end
 		completition.Text=string.format(mapvars.completition)
 		percentText.Text="%"
 		if completition.Text=="100" then
