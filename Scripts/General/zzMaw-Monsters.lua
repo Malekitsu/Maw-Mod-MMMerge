@@ -430,7 +430,7 @@ function events.MonsterKillExp(t)
 				mult=math.min(math.min(multiplier1,1/multiplier2),0.1)
 			end
 			local experienceAwarded=experience*mult
-			Party[i].Experience=Party[i].Experience+experienceAwarded
+			Party[i].Experience=math.min(Party[i].Experience+experienceAwarded, 2^32-3982296)
 			
 			--calculate again based for bolster
 			playerLevel=partyLvl
@@ -2270,10 +2270,7 @@ function checkMapCompletition(killed)
 				end
 				experience=experience*5/Party.Count
 				for i=0,Party.High do
-					evt[i].Add{"Experience", Value = experience}
-				end
-				for i=0, Party.High do
-					Party[i].Exp=math.min(Party[i].Exp, 2^32-3982296)
+					Party[i].Experience=math.min(Party[i].Experience+experience, 2^32-3982296)
 				end
 				mapvars.completed=true
 				vars.dungeonCompletedList=vars.dungeonCompletedList or {}
