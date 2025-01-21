@@ -710,8 +710,12 @@ slotMult={2,1.25,1.5,1,1.25,1,1,1.25,1.25,0.75,1,[0]=1	}
 ----------------------
 function events.GameInitialized2()
 --Weapon upscaler 
-	for i=1,2199 do
-		if (i>=1 and i<=83) or (i>=803 and i<=865) or (i>=1603 and i<=1665) then
+	local limit=2200
+	if isRedone then
+		limit=2205
+	end
+    for i = 1, limit do
+		if (i>=1 and i<=83) or (i>=803 and i<=865) or (i>=1603 and i<=1665) and i>=2201 then
 			
 			upTierDifference=0
 			downTierDifference=0
@@ -2306,8 +2310,13 @@ function events.GameInitialized2()
     referenceAC = {}
     referenceWeaponAttack = {}
     referenceWeaponSides = {}
-
-    for i = 0, 2199 do
+	
+	local limit=2199
+	if isRedone then
+		limit=2204
+	end
+	
+    for i = 0, limit do
         local txt = Game.ItemsTxt
         local lookup = 0
         while txt[i].NotIdentifiedName == txt[i + lookup + 1].NotIdentifiedName do
