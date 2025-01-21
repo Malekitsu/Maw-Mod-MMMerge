@@ -2356,6 +2356,7 @@ function itemStats(index)
 	for i=1,50 do
 		tab[i]=0
 	end
+	local gotShieldEnchant=false
 	--used for armor skill	
 	shieldAC=0
 	armorAC=0
@@ -2500,8 +2501,7 @@ function itemStats(index)
 		end
 		]]
 		if it.Bonus2==36 then
-			vars.shieldEnchant=vars.shieldEnchant or {}
-			vars.shieldEnchant[index]=true
+			gotShieldEnchant=true
 		end
 		if it.Bonus2>0 then
 			bonusData = bonusEffects[it.Bonus2]
@@ -2684,6 +2684,10 @@ function itemStats(index)
 			end
 		end
 	end	
+	
+	--special enchant
+	vars.shieldEnchant=vars.shieldEnchant or {}
+	vars.shieldEnchant[index]=gotShieldEnchant
 	
 	--bless
 	if buffRework then
