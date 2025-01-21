@@ -2322,8 +2322,8 @@ function events.GameInitialized2()
 	if isRedone then
 		local txt = Game.ItemsTxt[2205]
 		for i=1,5 do
-			referenceWeaponAttack[i+2000] = txt.Mod2
-			referenceWeaponSides[i+2000] = txt.Mod1DiceSides
+			referenceWeaponAttack[i+2200] = txt.Mod2
+			referenceWeaponSides[i+2200] = txt.Mod1DiceSides
 		end
 	end
 end
