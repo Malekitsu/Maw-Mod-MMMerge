@@ -1564,6 +1564,19 @@ function events.Tick()
 	end
 end
 
+function events.CanWearItem(t)
+	local race=Game.CharacterPortraits[Party[t.PlayerId].Face].Race
+	if race==const.Race.Minotaur then
+		local id=Mouse.Item.Number
+		if table.find(oneHandedAxes, id) or table.find(twoHandedAxes, id) then
+			return
+		end
+		if Mouse.Item:T().Skill==2 then
+			t.Available=false
+		end
+	end
+end
+
 --list of 2h axes and 1h axe
 function events.GameInitialized2()
 	oneHandedAxes={}
