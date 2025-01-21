@@ -29,7 +29,7 @@ function events.EvtGlobal(i) -- happens after related global evt executed
 			ExpRewards[i] = Party[i].Exp - Exp
 			if ExpRewards[i]>0 then
 				bonusExp=calculateExp(ExpRewards[i])
-				Party[i].Exp = Party[i].Exp + bonusExp
+				math.min(Party[i].Experience+bonusExp, 2^32-3982296)
 				
 				--bolster code
 				bonusExp=(bonusExp+ExpRewards[i])/5
@@ -55,9 +55,6 @@ function events.EvtGlobal(i) -- happens after related global evt executed
 	local GoldReward = Party.Gold - LastStats.Gold
 	if GoldReward>0 and ExpRewards[0]>0 then
 		Party.Gold = Party.Gold + calculateGold(GoldReward)
-	end
-	for i=0, Party.High do
-		Party[i].Exp=math.min(Party[i].Exp, 2^32-3982296)
 	end
 end
 function events.Tick()
