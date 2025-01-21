@@ -2307,7 +2307,7 @@ function events.GameInitialized2()
     referenceWeaponAttack = {}
     referenceWeaponSides = {}
 
-    for i = 0, Game.ItemsTxt.High - 1 do
+    for i = 0, 2200 do
         local txt = Game.ItemsTxt
         local lookup = 0
         while txt[i].NotIdentifiedName == txt[i + lookup + 1].NotIdentifiedName do
