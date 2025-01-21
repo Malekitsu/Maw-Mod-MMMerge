@@ -704,17 +704,12 @@ end
 --items stats multiplier:
 slotMult={2,1.25,1.5,1,1.25,1,1,1.25,1.25,0.75,1,[0]=1	}
 
-
 ----------------------
 --weapon rework
 ----------------------
 function events.GameInitialized2()
 --Weapon upscaler 
-	local limit=2200
-	if isRedone then
-		limit=2205
-	end
-    for i = 1, limit do
+    for i = 1, 2199 do
 		if (i>=1 and i<=83) or (i>=803 and i<=865) or (i>=1603 and i<=1665) and i>=2201 then
 			
 			upTierDifference=0
@@ -727,17 +722,17 @@ function events.GameInitialized2()
 			end
 			currentDamage = (Game.ItemsTxt[i].Mod1DiceCount *Game.ItemsTxt[i]. Mod1DiceSides + 1)/2+Game.ItemsTxt[i].Mod2 
 
-				for v=1,4 do
-					if Game.ItemsTxt[i].NotIdentifiedName==Game.ItemsTxt[i+v].NotIdentifiedName then
-					upTierDifference=upTierDifference+1
-					end
-					if Game.ItemsTxt[i].NotIdentifiedName==Game.ItemsTxt[math.max(i-v,0)].NotIdentifiedName then
-					downTierDifference=downTierDifference+1
-					downDamage = (Game.ItemsTxt[i-v].Mod1DiceCount *Game.ItemsTxt[i-v]. Mod1DiceSides + 1)/2+Game.ItemsTxt[i-v].Mod2
-					elseif downTierDifference==0 then
-							downDamage = currentDamage
-					end
+			for v=1,4 do
+				if Game.ItemsTxt[i].NotIdentifiedName==Game.ItemsTxt[i+v].NotIdentifiedName then
+				upTierDifference=upTierDifference+1
 				end
+				if Game.ItemsTxt[i].NotIdentifiedName==Game.ItemsTxt[math.max(i-v,0)].NotIdentifiedName then
+				downTierDifference=downTierDifference+1
+				downDamage = (Game.ItemsTxt[i-v].Mod1DiceCount *Game.ItemsTxt[i-v]. Mod1DiceSides + 1)/2+Game.ItemsTxt[i-v].Mod2
+				elseif downTierDifference==0 then
+						downDamage = currentDamage
+				end
+			end
 
 			--calculate expected value
 			tierRange=upTierDifference+downTierDifference+1
@@ -747,14 +742,11 @@ function events.GameInitialized2()
 			Game.ItemsTxt[i].Mod2=expectedDamageIncrease/2
 
 		elseif Game.ItemsTxt[i].Skill==8 then
-	--increase shield value
+			--increase shield value
 			Game.ItemsTxt[i].Mod2=Game.ItemsTxt[i].Mod2*2+Game.ItemsTxt[i].Mod1DiceCount  
 		end
-	end	
+	end
 end
-
-
-
 
 --change tooltip
 function events.GameInitialized2()
@@ -2311,12 +2303,7 @@ function events.GameInitialized2()
     referenceWeaponAttack = {}
     referenceWeaponSides = {}
 	
-	local limit=2199
-	if isRedone then
-		limit=2204
-	end
-	
-    for i = 0, limit do
+    for i = 0, 2199 do
         local txt = Game.ItemsTxt
         local lookup = 0
         while txt[i].NotIdentifiedName == txt[i + lookup + 1].NotIdentifiedName do
