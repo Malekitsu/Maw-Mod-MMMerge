@@ -1716,7 +1716,9 @@ function events.Action(t)
 			end
 			if vars.oldPlayerMasteries and vars.oldPlayerMasteries[id] then
 				if m<4 and vars.oldPlayerMasteries[id][t.Param]>m then
-					if Game.freeProgression or not table.find(horizontalSkills, t.Param) then
+					if vars.insanityMode and table.find(horizontalSkills, t.Param) then
+						requirements={0,8,20,32}
+					elseif Game.freeProgression or not table.find(horizontalSkills, t.Param) then
 						requirements={0,4,7,10}
 					else
 						requirements={0,6,12,20}
