@@ -144,6 +144,6 @@ evt.map[261] = function()
 end
 
 if isRedone then
-	evt.HouseDoor(29, 560)  -- "Tarent Hovel"
+	evt.HouseDoor(30, 560)  -- "Tarent Hovel"
 	evt.house[30] = 560  -- "Tarent Hovel"
 end
