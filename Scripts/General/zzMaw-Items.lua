@@ -730,7 +730,7 @@ function events.GameInitialized2()
 				downTierDifference=downTierDifference+1
 				downDamage = (Game.ItemsTxt[i-v].Mod1DiceCount *Game.ItemsTxt[i-v]. Mod1DiceSides + 1)/2+Game.ItemsTxt[i-v].Mod2
 				elseif downTierDifference==0 then
-						downDamage = currentDamage
+					downDamage = currentDamage
 				end
 			end
 
@@ -2319,7 +2319,7 @@ function events.GameInitialized2()
             referenceWeaponSides[i] = txt[i + lookup].Mod1DiceSides
         end
     end
-	if isRedone then
+	if isRedone and Game.ItemsTxt.High>2200 then
 		local txt = Game.ItemsTxt[2205]
 		for i=1,5 do
 			referenceWeaponAttack[i+2200] = txt.Mod2
