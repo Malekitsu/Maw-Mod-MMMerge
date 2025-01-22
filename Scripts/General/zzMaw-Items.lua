@@ -710,7 +710,7 @@ slotMult={2,1.25,1.5,1,1.25,1,1,1.25,1.25,0.75,1,[0]=1	}
 function events.GameInitialized2()
 --Weapon upscaler 
     for i = 1, 2199 do
-		if (i>=1 and i<=83) or (i>=803 and i<=865) or (i>=1603 and i<=1665) and i>=2201 then
+		if (i>=1 and i<=83) or (i>=803 and i<=865) or (i>=1603 and i<=1665) or i>=2201 then
 			
 			upTierDifference=0
 			downTierDifference=0
