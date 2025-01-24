@@ -305,7 +305,11 @@ function recalculateMawMonster()
 					mon.Level=math.min(mapvars.uniqueMonsterLevel[index],255)
 				end
 				local totalHP=mon.HP*2^(math.floor(mon.Resistances[0]/1000))
-				local minHP=HPtable[mon.Id]*2*(1+txt.Level/80)
+				local hpmodd=1
+				if austerity==true then
+					hpmodd=10
+				end
+				local minHP=HPtable[mon.Id]*2*(1+txt.Level/80/hpmodd)
 				if totalHP<minHP or totalHP>minHP*2.01 then
 					HP=minHP*(1+math.random())
 					local hpOvercap=0
@@ -2423,7 +2427,7 @@ function generateBoss(index,nameIndex)
 	if austerity==true then
 	hpmod=4
 	end
-	HP=round(mon.FullHP*2*(1+mon.Level/80)*(1+math.random())/hpmod)
+	HP=round(mon.FullHP*2*(1+mon.Level/80/hpmod^2)*(1+math.random())/hpmod)
 	if getMapAffixPower(18) then
 		HP=HP*(1+getMapAffixPower(18)/100)
 	end
