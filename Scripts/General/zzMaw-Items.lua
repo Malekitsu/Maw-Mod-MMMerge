@@ -2707,6 +2707,8 @@ function itemStats(index)
 	local armorResMult=0
 	local shieldMult=0
 	local shieldResMult=0
+	local bodyS=0
+	local bodyM=0
 	local it=pl:GetActiveItem(3)
 	if it then
 		bodyArmorSkill=it:T().Skill
