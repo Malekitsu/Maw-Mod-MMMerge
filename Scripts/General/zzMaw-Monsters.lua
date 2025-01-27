@@ -2134,13 +2134,15 @@ end
 
 --check for dungeon clear
 function events.MonsterKilled(mon)
+	monsterKilled=true
 	checkMapCompletition(true)
+	monsterKilled=false
 end
 
 function events.LoadMap(wasInGame)
 	Timer(checkMapCompletition, const.Minute*5) 
 end
-function checkMapCompletition(killed)
+function checkMapCompletition()
 	--retroactive fix, can remove this code after a while
 	if mapvars.completed and mapvars.monsterMap then
 		mapvars.monsterMap.cleared=true
@@ -2149,8 +2151,8 @@ function checkMapCompletition(killed)
 	if (Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.completed==nil) or (Map.IndoorOrOutdoor==2 and mapvars.completed==nil) then
 		if Map.Name=="d42.blv" then return end --arena
 		n=Map.Monsters.Count
-		local m=0
-		if killed then
+		m=0
+		if monsterKilled then
 			m=m+1
 		end
 		--[[if mon.NameId>220 and mon.NameId<300 then
