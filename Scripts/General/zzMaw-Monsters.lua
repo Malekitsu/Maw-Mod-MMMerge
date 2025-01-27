@@ -260,7 +260,7 @@ function recalculateMawMonster()
 					hpMult=hpMult*(1.5+HPBolsterLevel/300)
 				end
 				if austerity==true then
-				hpMult=((hpMult*3-math.min(2, hpMult*2))+1)
+					hpMult=((hpMult*3-math.min(2, hpMult*2))+1)
 				end
 				HP=HP*hpMult
 				
@@ -305,13 +305,13 @@ function recalculateMawMonster()
 					mon.Level=math.min(mapvars.uniqueMonsterLevel[index],255)
 				end
 				local totalHP=mon.HP*2^(math.floor(mon.Resistances[0]/1000))
-				local hpmodd=1
+				local austerityMod=1
 				if austerity==true then
-					hpmodd=10
+					austerityMod=4
 				end
-				local minHP=HPtable[mon.Id]*2*(1+txt.Level/80/hpmodd)
-				if totalHP<minHP or totalHP>minHP*2.01 then
-					HP=minHP*(1+math.random())
+				local minHP=HPtable[mon.Id]*2*(1+txt.Level/80/austerityMod)
+				if totalHP<minHP or totalHP>minHP*(1+1.01/austerityMod) then
+					HP=minHP*(1+math.random()/austerityMod)
 					local hpOvercap=0
 					while HP>32500 do
 						HP=round(HP/2)
@@ -701,7 +701,7 @@ function recalculateMonsterTable()
 			hpMult=hpMult*(1.5+totalLevel[i]/300)
 		end
 		if austerity==true then
-		hpMult=((hpMult*3-math.min(2, hpMult*2))+1)
+			hpMult=((hpMult*3-math.min(2, hpMult*2))+1)
 		end
 		--crit nerf fix
 		hpMult=hpMult/math.min(math.max(0.3+totalLevel[i]/200,1),50/15) --50/15 is the amount needed to get 1% crit, now and before
@@ -2425,11 +2425,11 @@ end
 
 function generateBoss(index,nameIndex)
 	mon=Map.Monsters[index]
-	local hpmod=1
+	local austerityMod=1
 	if austerity==true then
-	hpmod=4
+		austerityMod=4
 	end
-	HP=round(mon.FullHP*2*(1+mon.Level/80/hpmod^2)*(1+math.random())/hpmod)
+	HP=round(mon.FullHP*2*(1+mon.Level/80/austerityMod)*(1+math.random()/austerityMod))
 	if getMapAffixPower(18) then
 		HP=HP*(1+getMapAffixPower(18)/100)
 	end
