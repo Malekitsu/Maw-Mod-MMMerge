@@ -209,7 +209,7 @@ function recalculateMawMonster()
 		for i=0, Map.Monsters.High do
 			local mon=Map.Monsters[i]
 			if  mon.NameId >=1 and mon.NameId<220 then
-				local oldTable=mapvars.oldUniqueMonsterTable[i] or mon.Level
+				local oldTable=mapvars.oldUniqueMonsterTable[i] 
 				--horizontal progression
 				if Game.freeProgression==false then
 					local name=Game.MapStats[Map.MapStatsIndex].Name
@@ -221,9 +221,9 @@ function recalculateMawMonster()
 					partyLvl=mon.Level^1.5-mon.Level
 				end
 				--level increase 
-				oldLevel=oldTable.Level
+				oldLevel=oldTable.Level or mon.Level
 				mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
-				mapvars.uniqueMonsterLevel[i]=oldTable.Level+partyLvl
+				mapvars.uniqueMonsterLevel[i]=oldLevel+partyLvl
 				mon.Level=math.min(mapvars.uniqueMonsterLevel[i],255)
 				--HP calculated based on previous HP rapported to the previous level
 				HPRateo=oldTable.FullHP/(oldLevel*(oldLevel/10+3))
