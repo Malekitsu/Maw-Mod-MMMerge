@@ -1270,7 +1270,7 @@ function events.GameInitialized2()
 	for key, value in pairs(DKSpellList) do
 		for i=1,#DKSpellList[key] do
 			local spellID=DKSpellList[key][i]
-			if spellID~=71 or vars.MAWSETTINGS.buffRework=="ON" then
+			if spellID~=71 then
 				spellDesc[spellID]={}
 				spellDesc[spellID]["Name"]=Game.SpellsTxt[value[i]].Name
 				spellDesc[spellID]["Description"]=Game.SpellsTxt[value[i]].Description
@@ -1378,10 +1378,7 @@ local function dkSkills(isDK, id)
 		Skillz.setName(14, "Water Magic")
 		Skillz.setName(18, "Body Magic")
 		Skillz.setName(20, "Dark Magic")
-		if not vars.MAWSETTINGS.buffRework=="ON" then
-			Skillz.setDesc(14,5,"Grants 3 Luck to all party per skill point")
-			Skillz.setDesc(18,5,"Grants 3 Might to all party per skill point")
-		end
+		adjustSpellTooltips()
 	end
 end
 
