@@ -77,7 +77,7 @@ end
 
 
 function events.AfterLoadMap()
-	if buffRework then
+	if vars.MAWSETTINGS.buffRework=="ON" then
 		Timer(sendBuffs, const.Minute/2, true)
 	end
 end
