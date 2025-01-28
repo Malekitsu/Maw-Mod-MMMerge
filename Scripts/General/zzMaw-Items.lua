@@ -2693,7 +2693,7 @@ function itemStats(index)
 	vars.shieldEnchant[index]=gotShieldEnchant
 	
 	--bless
-	if buffRework then
+	if vars.MAWSETTINGS.buffRework=="ON" then
 		if pl.SpellBuffs[1].ExpireTime>=Game.Time then
 			local s,m, level=getBuffSkill(46)
 			local blessBonus=buffPower[46].Base[m]+level*0.25*(1+buffPower[46].Scaling[m]*s/100)
@@ -2735,7 +2735,7 @@ function itemStats(index)
 	--end of items
 	--------------
 	--buffs
-	if buffRework then
+	if vars.MAWSETTINGS.buffRework=="ON" then
 		local buffList={6,0,17,4,12,1}
 		local spellList={3,14,25,36,58,69}
 		local spellStat={[3]=2,[14]=6,[25]=7,[36]=4,[46]=5,[58]=3,[69]=1}
@@ -2950,7 +2950,7 @@ function itemStats(index)
 		end
 	end
 	local buff=pl.SpellBuffs[6]
-	if buff.ExpireTime>Game.Time and not buffRework then --hammerhand buff
+	if buff.ExpireTime>Game.Time and not vars.MAWSETTINGS.buffRework=="ON" then --hammerhand buff
 		tab[41]=tab[41]+buff.Power
 		tab[42]=tab[42]+buff.Power
 		tab[43]=tab[43]+buff.Power
@@ -2968,7 +2968,7 @@ function itemStats(index)
 	local bonusDamage=mightEffect+Party.SpellBuffs[const.PartyBuff.Heroism].Power
 	local heroismMult=0
 	local unarmedMult=0
-	if buffRework then 
+	if vars.MAWSETTINGS.buffRework=="ON" then 
 		bonusDamage=mightEffect
 		if Party.SpellBuffs[9].ExpireTime>=Game.Time then
 			local s,m=getBuffSkill(51)
@@ -3832,7 +3832,7 @@ end
 --vampiric aura and fire aura 
 fireAuraDamage={10,20,40,60,[0]=0}
 function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
-	if buffRework and vars.mawbuff[4] then
+	if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[4] then
 		if not it or (it and it.Number==0) or (it and it:T().EquipStat>2) then return 0 end
 		local s, m, level=getBuffSkill(4)
 		local id=pl:GetIndex()
@@ -3879,7 +3879,7 @@ end
 function events.BuildItemInformationBox(t)
 	if t.Item:T().EquipStat==0 or t.Item:T().EquipStat==1 or t.Item:T().EquipStat==2 then 
 		if t.Description then
-			if buffRework and vars.mawbuff[4] then --fire aura
+			if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[4] then --fire aura
 				if Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
 					local pl=Party[Game.CurrentPlayer]
 					local s, m, level=getBuffSkill(4)
@@ -3893,7 +3893,7 @@ function events.BuildItemInformationBox(t)
 					end
 				end
 			end
-			if buffRework and vars.mawbuff[91] then --fire aura
+			if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[91] then --fire aura
 				local s, m, level=getBuffSkill(91)
 				if m>=1 then
 					t.Description=StrColor(255,255,153,"Vampiric Aura: damage done will restore player HP.\n\n") .. t.Description
