@@ -716,6 +716,9 @@ function events.ItemGenerated(t)
 			itemPower=7
 		end
 		
+		vars.MAWSETTINGS=vars.MAWSETTINGS or {}
+		vars.MAWSETTINGS.lootFilter=vars.MAWSETTINGS.lootFilter or "OFF"
+		
 		local filter=vars.MAWSETTINGS.lootFilter
 
 		local tierList={"Common", "Uncom.", "Rare", "Epic", "Ancient", "Primordial", "Legendary", [0]="OFF"}
