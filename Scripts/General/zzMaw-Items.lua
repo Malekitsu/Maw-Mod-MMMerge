@@ -158,6 +158,43 @@ function events.AfterLoadMap()
 		end
 		mapvars.chestGoldFix=true
 	end
+	
+	for i=0,Map.Chests.High do
+		for k=1,Map.Chests[i].Items.High do
+			local it=Map.Chests[i].Items[k]
+			if (it.Number>=1 and it.Number<=151) or (it.Number>=803 and it.Number<=936) or (it.Number>=1603 and it.Number<=1736) then
+				local itemPower=1
+				if it.Bonus>0 then
+					itemPower=itemPower+1
+				end
+				if it.Bonus2>0 then
+					itemPower=itemPower+1
+				end
+				if it.Charges>1000 then
+					itemPower=itemPower+1
+				end
+				if it.BonusExpireTime==1 then
+					itemPower=5
+				elseif it.BonusExpireTime==2 then
+					itemPower=6
+				elseif it.BonusExpireTime>10 and it.BonusExpireTime<100 then
+					itemPower=7
+				end
+				
+				local filter=vars.MAWSETTINGS.lootFilter
+				
+				local tierList={"Common", "Uncom.", "Rare", "Epic", "Ancient", "Primordial", "Legendary", [0]="OFF"}
+				local filterPower=table.find(tierList, filter)
+				local itemID=it.Number
+				if itemPower<=filterPower then
+					local goldId={1799,999,187,1800,1000,188,1801,1001,189}
+					local itemGold=getItemValue(it, true)
+					it.Number=goldId[math.min((itemPower)*2-math.random(0,1),9)]
+					it.Bonus2=itemGold
+				end
+			end
+		end
+	end
 end
 
 function events.ItemGenerated(t)
@@ -661,6 +698,42 @@ function events.ItemGenerated(t)
 			legendaryDrops=legendaryDrops+1
 		end
 		]]
+		local itemPower=1
+		if t.Item.Bonus>0 then
+			itemPower=itemPower+1
+		end
+		if t.Item.Bonus2>0 then
+			itemPower=itemPower+1
+		end
+		if t.Item.Charges>1000 then
+			itemPower=itemPower+1
+		end
+		if t.Item.BonusExpireTime==1 then
+			itemPower=5
+		elseif t.Item.BonusExpireTime==2 then
+			itemPower=6
+		elseif t.Item.BonusExpireTime>10 and t.Item.BonusExpireTime<100 then
+			itemPower=7
+		end
+		
+		local filter=vars.MAWSETTINGS.lootFilter
+
+		local tierList={"Common", "Uncom.", "Rare", "Epic", "Ancient", "Primordial", "Legendary", [0]="OFF"}
+		local filterPower=table.find(tierList, filter)
+		local itemID=t.Item.Number
+		if itemPower<=filterPower then
+			if lootFromMonster then
+				lootFromMonster=false
+				local itemGold=getItemValue(t.Item, true)
+				t.Item.Number=0
+				function events.Tick()
+					events.Remove("Tick",1)
+					goldGained=Party.Gold-goldBeforeLoot
+					Party.Gold=Party.Gold+itemGold
+					Game.ShowStatusText("You found " .. itemGold+goldGained .. " gold! (" .. tierList[itemPower] .. " " .. Game.ItemsTxt[itemID].NotIdentifiedName .. " filtered)")
+				end
+			end
+		end
 	end
 end
 
@@ -1436,35 +1509,46 @@ function events.CalcItemValue(t)
 			t.Value=bonus*10
 			return
 		end
+		t.Value=getItemValue(t.Item)
+	end
+	--add reagents price
+	if Game.HouseScreen==2 or Game.HouseScreen==95 then
+		if reagentPrices[t.Item.Number] then
+			t.Value=reagentPrices[t.Item.Number]
+		end
+	end
+end
+
+function getItemValue(it, lootFilter)
+	if it.Number<=151 or (it.Number>=803 and it.Number<=936) or (it.Number>=1603 and it.Number<=1736) then
+		--base value
+		basePrice=Game.ItemsTxt[it.Number].Value
 		--add enchant price
-		bonus1=t.Item.BonusStrength*100
-		if t.Item.Bonus==8 or t.Item.Bonus==9 then
-			bonus1=5*((2*t.Item.BonusStrength+100)^0.5-10)*100
-		elseif t.Item.Bonus==10 then
+		bonus1=it.BonusStrength*100
+		if it.Bonus==8 or it.Bonus==9 then
+			bonus1=5*((2*it.BonusStrength+100)^0.5-10)*100
+		elseif it.Bonus==10 then
 			bonus1=bonus1*2
-		elseif t.Item.Bonus>16 and t.Item.Bonus<=24 then
+		elseif it.Bonus>16 and it.Bonus<=24 then
 			bonus1=(bonus1/100)^2*100
 		end
 		
-		bonus2=(t.Item.Charges%1000)*100
-		bonus2Type=math.floor(t.Item.Charges/1000)
+		bonus2=(it.Charges%1000)*100
+		bonus2Type=math.floor(it.Charges/1000)
 		if bonus2Type==8 or bonus2Type==9 then
 			bonus2=5*((2*bonus2+100)^0.5-10)
 		elseif bonus2Type==10 then
 			bonus2=bonus2*2
 		end
 		
-		MaxCharges=t.Item.MaxCharges
-		--if MaxCharges <= 20 then
-			mult=1+MaxCharges/20
-		--else
-		--	mult=2+2*(MaxCharges-20)/20
-		--end
+		MaxCharges=it.MaxCharges
+		
+		mult=1+MaxCharges/20
 		
 		basePrice=basePrice*mult
-		if t.Item.Bonus2>0 and t.Item.BonusExpireTime<Game.Time then
-			special=Game.SpcItemsTxt[t.Item.Bonus2-1].Value
-			if bonusEffects[t.Item.Bonus2]~=nil then
+		if it.Bonus2>0 and it.Bonus2<=Game.SpcItemsTxt.high and it.BonusExpireTime<Game.Time then
+			special=Game.SpcItemsTxt[it.Bonus2-1].Value
+			if bonusEffects[it.Bonus2]~=nil then
 				special=special*mult
 			end
 			if special<11 then
@@ -1473,45 +1557,47 @@ function events.CalcItemValue(t)
 				basePrice=basePrice+special
 			end
 		end
-		t.Value=basePrice+bonus1+bonus2
-		if t.Item.BonusExpireTime>10 and t.Item.BonusExpireTime<1000 then
-			t.Value=t.Value*2.5
+		local value=basePrice+bonus1+bonus2
+		if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
+			value=value*2.5
 		end
-		if Game.HouseScreen==3 or Game.HouseScreen==94 then
-			t.Value=t.Value*0.4
+		if Game.HouseScreen==3 or Game.HouseScreen==94 or lootFilter then
+			value=value*0.4
 		end
 		if Game.HouseScreen==2 or Game.HouseScreen==95 then
 			count=0
-			if t.Item.Bonus>0 then
+			if it.Bonus>0 then
 				count=count+1
 			end
-			if t.Item.Charges>1000 then
+			if it.Charges>1000 then
 				count=count+1
 			end
-			if t.Item.Bonus2>0 then
+			if it.Bonus2>0 then
 				count=count+1
 			end
-			if t.Item.BonusExpireTime>0 and t.Item.BonusExpireTime<3 then
-				count=count+t.Item.BonusExpireTime
+			if it.BonusExpireTime>0 and it.BonusExpireTime<3 then
+				count=count+it.BonusExpireTime
 			end	
 			if count>0 then
-				t.Value=t.Value^(1+count*0.08)
+				value=value^(1+count*0.08)
 			end
 		end	
-		if t.Value>200000  then
-			t.Value=round(t.Value/1000)*1000
-		elseif t.Value>50000  then
-			t.Value=round(t.Value/500)*500	
-		elseif t.Value>1000  then
-			t.Value=round(t.Value/100)*100
-		elseif t.Value>100 then
-			t.Value=round(t.Value/10)*10
+		if value>200000  then
+			value=round(value/1000)*1000
+		elseif value>50000  then
+			value=round(value/500)*500	
+		elseif value>1000  then
+			value=round(value/100)*100
+		elseif value>100 then
+			value=round(value/10)*10
 		end
+		return value
 	end
 	--add reagents price
 	if Game.HouseScreen==2 or Game.HouseScreen==95 then
-		if reagentPrices[t.Item.Number] then
-			t.Value=reagentPrices[t.Item.Number]
+		if reagentPrices[it.Number] then
+			value=reagentPrices[it.Number]
+			return value
 		end
 	end
 end
