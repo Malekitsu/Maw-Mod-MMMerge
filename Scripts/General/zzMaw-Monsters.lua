@@ -925,6 +925,13 @@ function events.PickCorpse(t)
 		mon.TreasureItemLevel=math.max(math.min(itemTier,6),2)
 		bossLoot=true
 	end
+	--loot filter code
+	goldBeforeLoot=Party.Gold
+	lootFromMonster=true
+	function events.Tick()
+		events.Remove("Tick",1)
+		lootFromMonster=false
+	end
 end
 -----------------------------
 -----MAP MONSTER CHANGES-----
