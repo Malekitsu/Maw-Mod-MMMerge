@@ -3093,207 +3093,205 @@ end
 -------------------
 --MM6 PROJECTILES--
 -------------------
-if restoreMM6Glory then
-	transform={
-			[500]=734,
-			[505]=739,
-			[510]=712,
-			[515]=732,
-			[535]=740,
-			[540]=737,
-			[555]=736,
-			[1010]=712
-	}
-	explosions={
-			[734]=723,
-			[739]=721,
-			[712]=711,
-			[732]=718,
-			[740]=715,
-			[737]=719,
-			[736]=722,
-	}
-	transformedList={734,739,712,732,740,737,736}
+local transform={
+		[500]=734,
+		[505]=739,
+		[510]=712,
+		[515]=732,
+		[535]=740,
+		[540]=737,
+		[555]=736,
+		[1010]=712
+}
+local explosions={
+		[734]=723,
+		[739]=721,
+		[712]=711,
+		[732]=718,
+		[740]=715,
+		[737]=719,
+		[736]=722,
+}
+local transformedList={734,739,712,732,740,737,736}
 
-	function events.Tick()
-		for i=0, Map.Objects.High do
-			local obj=Map.Objects[i]
-			if transform[obj.Type] and obj.Owner%8==3 then
-				obj.Type=transform[obj.Type]
-				obj.TypeIndex=obj.Type-160
-				obj.LightMultiplier=0
-			end		
-		end
+function events.Tick()
+	if vars.MAWSETTINGS.restoreProjectiles=="OFF" then return end
+	for i=0, Map.Objects.High do
+		local obj=Map.Objects[i]
+		if transform[obj.Type] and obj.Owner%8==3 then
+			obj.Type=transform[obj.Type]
+			obj.TypeIndex=obj.Type-160
+			obj.LightMultiplier=0
+		end		
 	end
-
-	function events.Tick()
-		if Game.Paused then return end
-		for i=0, Map.Objects.High do
-			local obj=Map.Objects[i]
-			lastLocation=lastLocation or {}
-			lastLocation[i]=lastLocation[i] or {math.huge,math.huge}
-			local dist=getDistance(obj.X,obj.Y,obj.Z)
-			if table.find(transformedList, obj.Type) and (dist<160 or (obj.X==lastLocation[i][1] and obj.Y==lastLocation[i][2])) then
-				obj.Type=explosions[obj.Type]
-				obj.TypeIndex=obj.Type-160
-				obj.VelocityX=0
-				obj.VelocityY=0
-				obj.VelocityZ=0
-				obj.Velocity[1]=0
-				obj.Velocity[2]=0
-				obj.Velocity[0]=0
-				obj.Age=0
-				lastLocation[i]={math.huge,math.huge}
-				--get data
+	
+	if Game.Paused then return end
+	
+	for i=0, Map.Objects.High do
+		local obj=Map.Objects[i]
+		lastLocation=lastLocation or {}
+		lastLocation[i]=lastLocation[i] or {math.huge,math.huge}
+		local dist=getDistance(obj.X,obj.Y,obj.Z)
+		if table.find(transformedList, obj.Type) and (dist<160 or (obj.X==lastLocation[i][1] and obj.Y==lastLocation[i][2])) then
+			obj.Type=explosions[obj.Type]
+			obj.TypeIndex=obj.Type-160
+			obj.VelocityX=0
+			obj.VelocityY=0
+			obj.VelocityZ=0
+			obj.Velocity[1]=0
+			obj.Velocity[2]=0
+			obj.Velocity[0]=0
+			obj.Age=0
+			lastLocation[i]={math.huge,math.huge}
+			--get data
+			local id=math.floor(obj.Owner/8)
+			if dist<200 then
+				--calculate damage
 				local id=math.floor(obj.Owner/8)
-				if dist<200 then
-					--calculate damage
-					local id=math.floor(obj.Owner/8)
-					local mon=Map.Monsters[math.floor(obj.Owner/8)]
-					local action=0
-					if mon.Attack1.Missile==0 and mon.Attack2.Missile>0 then
-						action=1
+				local mon=Map.Monsters[math.floor(obj.Owner/8)]
+				local action=0
+				if mon.Attack1.Missile==0 and mon.Attack2.Missile>0 then
+					action=1
+				end
+				if obj.Spell~=0 then
+					action=2
+				end
+				mawCustomMonObj={["Monster"]=mon, 
+								["Object"]=obj,
+								["MonsterAction"]=action,
+								["MonsterIndex"]=id,
+								["ObjectIndex"]=i,
+								["Spell"]=obj.Spell,
+								["SpellMastery"]=obj.SpellMastery,
+								["SpellSkill"]=obj.SpellSkill,
+								}
+				
+				obj.X=obj.X+(Party.X-obj.X)/3
+				obj.Y=obj.Y+(Party.Y-obj.Y)/3
+				obj.Z=obj.Z+10
+				--cover code
+				
+				local list={}
+				for k=0,Party.High do
+					if Party[k]:IsConscious() then
+						table.insert(list,k)
 					end
-					if obj.Spell~=0 then
-						action=2
- 					end
-					mawCustomMonObj={["Monster"]=mon, 
-									["Object"]=obj,
-									["MonsterAction"]=action,
-									["MonsterIndex"]=id,
-									["ObjectIndex"]=i,
-									["Spell"]=obj.Spell,
-									["SpellMastery"]=obj.SpellMastery,
-									["SpellSkill"]=obj.SpellSkill,
-									}
-					
-					obj.X=obj.X+(Party.X-obj.X)/3
-					obj.Y=obj.Y+(Party.Y-obj.Y)/3
-					obj.Z=obj.Z+10
-					--cover code
-					
-					local list={}
-					for k=0,Party.High do
-						if Party[k]:IsConscious() then
-							table.insert(list,k)
+				end
+				
+				local target=math.random(1,#list)
+				target=list[target] or 0
+				local masteryRequired=2
+				if not vars.covering then
+					vars.covering={}
+					for i=0,4 do
+						vars.covering[i]=true
+					end
+				end
+				cover={}
+				for i=0,Party.High do
+					local s, m= SplitSkill(Skillz.get(Party[i], 50))
+					if s>0 and vars.covering[i] and m>=masteryRequired and i~=target then
+						cover[i]={["Chance"]=1-(0.99^s-0.05),["Mastery"]= m}
+						if coverBonus[i] then
+							cover[i].Chance=cover[i].Chance+0.3
+							coverBonus[i]=false
+						end
+					else
+						cover[i]=false
+					end
+				end
+				
+				--roll once per player with player and pick the one with max hp
+				coverPlayerIndex=-1
+				lastMaxHp=0
+				covered=false
+				for i=0,#cover-1 do
+					if cover[i] then
+						local hp=Party[i].HP/Party[i]:GetFullHP()
+						if cover[i].Chance>math.random() and hp>lastMaxHp then
+							lastMaxHp=hp
+							coverPlayerIndex=i
+							covered=true
 						end
 					end
-					
-					local target=math.random(1,#list)
-					target=list[target] or 0
-					local masteryRequired=2
-					if not vars.covering then
-						vars.covering={}
-						for i=0,4 do
-							vars.covering[i]=true
-						end
-					end
-					cover={}
-					for i=0,Party.High do
-						local s, m= SplitSkill(Skillz.get(Party[i], 50))
-						if s>0 and vars.covering[i] and m>=masteryRequired and i~=target then
-							cover[i]={["Chance"]=1-(0.99^s-0.05),["Mastery"]= m}
-							if coverBonus[i] then
-								cover[i].Chance=cover[i].Chance+0.3
-								coverBonus[i]=false
-							end
-						else
-							cover[i]=false
-						end
-					end
-					
-					--roll once per player with player and pick the one with max hp
-					coverPlayerIndex=-1
-					lastMaxHp=0
+				end
+				
+				local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+				if skill=="Fixator" then
 					covered=false
-					for i=0,#cover-1 do
-						if cover[i] then
-							local hp=Party[i].HP/Party[i]:GetFullHP()
-							if cover[i].Chance>math.random() and hp>lastMaxHp then
-								lastMaxHp=hp
-								coverPlayerIndex=i
-								covered=true
-							end
+					local lowestHPId=-1
+					local lowestHP=math.huge
+					for i=0,Party.High do
+						local totHP=Party[i]:GetFullHP()
+						if Party[i]:IsConscious() and totHP<lowestHP then
+							lowestHP=totHP
+							lowestHPId=i
 						end
 					end
-					
-					local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
-					if skill=="Fixator" then
-						covered=false
-						local lowestHPId=-1
-						local lowestHP=math.huge
-						for i=0,Party.High do
-							local totHP=Party[i]:GetFullHP()
-							if Party[i]:IsConscious() and totHP<lowestHP then
-								lowestHP=totHP
-								lowestHPId=i
-							end
-						end
-						target=lowestHPId
-					end
-					
-					if covered then
-						mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Shield, target)
-						Party[coverPlayerIndex]:ShowFaceAnimation(14)
-						Game.ShowStatusText(Party[coverPlayerIndex].Name .. " cover " .. Party[target].Name)
-						target=coverPlayerIndex
-						local pl=Party[target]
-						local id=pl:GetIndex()
-						if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 23) then
-							evt[target].Add("HP", Party[target]:GetFullHP()*0.03)
-						end
-						
-						--retaliation code
-						local s,m=Skillz.get(pl,53)
-						if s/100>=math.random() then
-							vars.retaliation=vars.retaliation or {}
-							vars.retaliation[id]=vars.retaliation[id] or {}
-							vars.retaliation[id]["Stacks"]=vars.retaliation[id]["Stacks"] or 0
-							vars.retaliation[id]["Time"]=vars.retaliation[id]["Time"] or Game.Time
-							vars.retaliation[id]["Stacks"]=vars.retaliation[id]["Stacks"]+1
-							local cap=1
-							if m==4 then
-								cap=3
-							end
-							vars.retaliation[id]["Stacks"]=math.min(vars.retaliation[id]["Stacks"],cap)
-						end						
-					end		
-					
-					
-					--apply damage
-					Party[target]:DoDamage(10000,mon.Attack1.Type)
-					mawCustomMonObj=false
+					target=lowestHPId
 				end
-			else
-				lastLocation[i]={obj.X, obj.Y}
-			end
-			
-			--MAKE GM BOW SHOOTING FIRE ARROW
-			if obj.Type==545 and obj.Owner%8==4 then
-				local id=math.floor(obj.Owner/8)
-				for j=0, Party.High do
-					if Party[j]:GetIndex()==id then
-						local pl=Party[j]
-						local s,m=SplitSkill(pl.Skills[const.Skills.Bow])
+				
+				if covered then
+					mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Shield, target)
+					Party[coverPlayerIndex]:ShowFaceAnimation(14)
+					Game.ShowStatusText(Party[coverPlayerIndex].Name .. " cover " .. Party[target].Name)
+					target=coverPlayerIndex
+					local pl=Party[target]
+					local id=pl:GetIndex()
+					if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 23) then
+						evt[target].Add("HP", Party[target]:GetFullHP()*0.03)
+					end
+					
+					--retaliation code
+					local s,m=Skillz.get(pl,53)
+					if s/100>=math.random() then
+						vars.retaliation=vars.retaliation or {}
+						vars.retaliation[id]=vars.retaliation[id] or {}
+						vars.retaliation[id]["Stacks"]=vars.retaliation[id]["Stacks"] or 0
+						vars.retaliation[id]["Time"]=vars.retaliation[id]["Time"] or Game.Time
+						vars.retaliation[id]["Stacks"]=vars.retaliation[id]["Stacks"]+1
+						local cap=1
 						if m==4 then
-							obj.Type=550
-							obj.TypeIndex=427
+							cap=3
 						end
+						vars.retaliation[id]["Stacks"]=math.min(vars.retaliation[id]["Stacks"],cap)
+					end						
+				end		
+				
+				
+				--apply damage
+				Party[target]:DoDamage(10000,mon.Attack1.Type)
+				mawCustomMonObj=false
+			end
+		else
+			lastLocation[i]={obj.X, obj.Y}
+		end
+		
+		--MAKE GM BOW SHOOTING FIRE ARROW
+		if obj.Type==545 and obj.Owner%8==4 then
+			local id=math.floor(obj.Owner/8)
+			for j=0, Party.High do
+				if Party[j]:GetIndex()==id then
+					local pl=Party[j]
+					local s,m=SplitSkill(pl.Skills[const.Skills.Bow])
+					if m==4 then
+						obj.Type=550
+						obj.TypeIndex=427
 					end
 				end
 			end
 		end
 	end
-	--[[
-	function events.GameInitialized2()
-		for i=540, 558 do
-			if Game.ObjListBin[i].Speed==0 then
-				Game.ObjListBin[i].LifeTime=80 --for some stupid reason if I don't do this explosions don't disappear
-			end
-		end 
-	end
-	]]
 end
+--[[
+function events.GameInitialized2()
+	for i=540, 558 do
+		if Game.ObjListBin[i].Speed==0 then
+			Game.ObjListBin[i].LifeTime=80 --for some stupid reason if I don't do this explosions don't disappear
+		end
+	end 
+end
+]]
 
 function events.GameInitialized2()
 	baseTransportTable={}
@@ -3403,7 +3401,7 @@ function getMonsterDamage(lvl,calcType)
 		diffMult=diffMult*(1.5+lvl/300)
 	end
 	if austerity==true then
-	diffMult=(diffMult*5-math.min(3.5, diffMult*3.5))^1.5
+		diffMult=(diffMult*5-math.min(3.5, diffMult*3.5))^1.5
 	end
 	if calcType=="diffMult" then
 		return diffMult
