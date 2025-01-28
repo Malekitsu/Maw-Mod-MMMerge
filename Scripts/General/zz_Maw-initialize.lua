@@ -5,10 +5,6 @@ chargeKey=69
 healthPotionKey=71
 manaPotionKey=86
 Game.PatchOptions.FixMonstersBlockingShots=true
-buffRework=true
-restoreMM6Glory=true
-disableDamageOnFriendlyUnits=true
-disableHomingProjectiles=false
 austerity=false
 
 --sorting buttons
@@ -341,13 +337,14 @@ local function CustomSwitch(Screen, X, Y, Condition, Header, Parent, Field, Opti
     return Option
 end
 
-mawSettings={
+local mawSettings={
 	buffRework="ON",
 	restoreProjectiles="ON",
 	homingProjectiles="ON",
 	friendlyDamage="OFF",
 	lootFilter="OFF",
 }
+local defaultSettings=mawSettings
 
 function events.MultiplayerInitialized()
     local ScreenId = 111
@@ -364,7 +361,7 @@ function events.MultiplayerInitialized()
     createSwitch(260, "Homing Projectiles", "homingProjectiles", {"ON","OFF"})
     createSwitch(300, "Damage on Friendly Units", "friendlyDamage", {"ON","OFF"})
     createSwitch(340, "Loot Filter", "lootFilter", {"OFF","Common", "Uncom.", "Rare", "Epic"})
-
+	
     function events.OpenExtraSettingsMenu()
         for _, v in pairs(mawSettingsButton) do
             if v.Update then
@@ -377,8 +374,42 @@ end
 function events.Action(t)
 	if t.Action==113 then
 		vars.MAWSETTINGS=vars.MAWSETTINGS or {}
+		
+		local buffRework
+		if vars.MAWSETTINGS.buffRework=="ON" then
+			buffRework=true
+		else
+			buffRework=false
+		end
+		
 		for key,value in pairs(mawSettings) do
 			vars.MAWSETTINGS[key]=value
 		end
+		
+		if buffRework and vars.MAWSETTINGS.buffRework=="OFF" or not buffRework and vars.MAWSETTINGS.buffRework=="ON" then
+			adjustSpellTooltips()	
+		end
+	end
+end
+
+function events.LoadMap()
+	vars.MAWSETTINGS=vars.MAWSETTINGS or {}
+	
+	local buffRework
+	if vars.MAWSETTINGS.buffRework=="ON" then
+		buffRework=true
+	else
+		buffRework=false
+	end
+	
+	for key,value in pairs(defaultSettings) do
+		vars.MAWSETTINGS[key]=vars.MAWSETTINGS[key] or value
+	end
+	for key,value in pairs(vars.MAWSETTINGS) do
+		mawSettings[key]=vars.MAWSETTINGS[key]
+	end
+	
+	if buffRework and vars.MAWSETTINGS.buffRework=="OFF" or not buffRework and vars.MAWSETTINGS.buffRework=="ON" then
+		adjustSpellTooltips()	
 	end
 end
