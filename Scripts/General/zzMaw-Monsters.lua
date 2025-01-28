@@ -155,11 +155,11 @@ function recalculateMawMonster()
 	--unique monsters
 	--store table
 	for i=0, Map.Monsters.High do
-		mon=Map.Monsters[i]
+		local mon=Map.Monsters[i]
 		if  mon.NameId >=1 and mon.NameId<220 then
 			--store monster data
 			mapvars.oldUniqueMonsterTable=mapvars.oldUniqueMonsterTable or {}
-			if not mapvars.oldUniqueMonsterTable[i] then
+			if not mapvars.oldUniqueMonsterTable[i] or type(mapvars.oldUniqueMonsterTable[i])~="table" then
 				mapvars.oldUniqueMonsterTable[i]={}
 				--store older relevant info
 				mapvars.oldUniqueMonsterTable[i].ArmorClass=mon.ArmorClass
@@ -184,8 +184,6 @@ function recalculateMawMonster()
 				for v=0,10 do 
 					if v~=5 then
 						mapvars.oldUniqueMonsterTable[i].Resistances[v]=mon.Resistances[v]
-						else
-						mapvars.oldUniqueMonsterTable[i].Resistances[v]=0
 					end
 				end
 			end
@@ -221,7 +219,7 @@ function recalculateMawMonster()
 					partyLvl=mon.Level^1.5-mon.Level
 				end
 				--level increase 
-				oldLevel=oldTable.Level or mon.Level
+				local oldLevel=oldTable.Level
 				mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
 				mapvars.uniqueMonsterLevel[i]=oldLevel+partyLvl
 				mon.Level=math.min(mapvars.uniqueMonsterLevel[i],255)
