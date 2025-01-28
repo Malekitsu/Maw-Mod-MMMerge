@@ -265,7 +265,7 @@ function events.GetAttackDelay(t)
 		speedEffect=math.floor(speed/10)
 	end
 	bonusSpeed=bonusSpeed+speedEffect
-	if t.Player.SpellBuffs[const.PlayerBuff.Haste].ExpireTime>Game.Time or (not buffRework and Party.SpellBuffs[const.PartyBuff.Haste].ExpireTime>Game.Time) then
+	if t.Player.SpellBuffs[const.PlayerBuff.Haste].ExpireTime>Game.Time or (not vars.MAWSETTINGS.buffRework=="ON" and Party.SpellBuffs[const.PartyBuff.Haste].ExpireTime>Game.Time) then
 		bonusSpeed=bonusSpeed+20
 	end
 	
@@ -305,7 +305,7 @@ function events.GetAttackDelay(t)
 	delayMult=1+delay/100
 	t.Result=t.Result*delayMult
 	
-	if buffRework then
+	if vars.MAWSETTINGS.buffRework=="ON" then
 		local hasteMult=1
 		if Party.SpellBuffs[8].ExpireTime>=Game.Time then
 			local s, m=getBuffSkill(5)
@@ -1168,7 +1168,7 @@ function MawRegen()
 			--regeneration spell
 			Buff=pl.SpellBuffs[const.PlayerBuff.Regeneration]
 			
-			if buffRework then 
+			if vars.MAWSETTINGS.buffRework=="ON" then 
 				if pl.SpellBuffs[12].ExpireTime>=Game.Time then
 					local s,m,level=getBuffSkill(71)
 					local skill=(level)^0.65*(1+s*buffPower[71].Base[m]/100)
@@ -1203,7 +1203,7 @@ function MawRegen()
 	for i=0,Party.High do
 		pl=Party[i]
 		local Cond = pl:GetMainCondition()
-		if (Cond == 18 or Cond == 17 or Cond < 14) and pl.Insane==0 and (not buffRework or type(vars.currentManaPool[i])=="number") then
+		if (Cond == 18 or Cond == 17 or Cond < 14) and pl.Insane==0 and (not vars.MAWSETTINGS.buffRework=="ON" or type(vars.currentManaPool[i])=="number") then
 			lastSP[i]=lastSP[i] or pl.SP
 			waitSP[i]=waitSP[i] or 0
 			mult=1
@@ -1222,7 +1222,7 @@ function MawRegen()
 				RegM=8
 			end
 			FSP	= pl:GetFullSP()
-			if FSP>0 and buffRework and vars.currentManaPool and vars.currentManaPool[i] then
+			if FSP>0 and vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[i] then
 				FSP=math.max(math.ceil(FSP*(vars.currentManaPool[i]/FSP)^0.5),0)
 				
 			end
@@ -1242,7 +1242,7 @@ function MawRegen()
 			
 			regenSP[i] = regenSP[i] + SPREGEN * timeMultiplier*mult
 			--meditation buff
-			if buffRework and vars.mawbuff[56] and not table.find(classesWithNoMeditationRegen, pl.Class) then
+			if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[56] and not table.find(classesWithNoMeditationRegen, pl.Class) then
 				local s, m, level=getBuffSkill(56)
 				local level=level^0.6
 				regenSP[i] = regenSP[i] + (FSP^0.25*level^1.4*((buffPower[56].Base[m])/15000) +0.1)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
@@ -1285,7 +1285,7 @@ function events.Tick()
 		Skillz.setDesc(30,1,txt)
 		--meditation tooltip
 		local FSP=pl:GetFullSP()
-		if buffRework and vars.currentManaPool and vars.currentManaPool[i] then
+		if vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[i] then
 			FSP=vars.currentManaPool[Game.CurrentPlayer]
 		end
 		local s,m = SplitSkill(pl:GetSkill(28))
