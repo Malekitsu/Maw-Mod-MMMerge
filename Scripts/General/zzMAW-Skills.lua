@@ -330,10 +330,6 @@ function calculateAngle(vector1, vector2)
     return angleDegrees
 end
 
-homingDegree=0.5
-if disableHomingProjectiles then
-	homingDegree=0
-end
 local function navigateMissile(object)
 
 	-- exclude some special non targeting spells
@@ -372,6 +368,11 @@ local function navigateMissile(object)
 	
 	-- process only missiles between party and monster
 	-- target position
+	
+	local homingDegree=0.5
+	if vars.MAWSETTINGS.homingProjectiles=="ON" then
+		homingDegree=0
+	end
 	local targetPosition
 	if ownerKind == const.ObjectRefKind.Party and targetKind == const.ObjectRefKind.Monster then
 		local mapMonster = Map.Monsters[targetIndex]
