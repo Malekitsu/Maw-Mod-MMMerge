@@ -262,3 +262,123 @@ NONAME= 252
 PA1= 253	
 OEM_CLEAR= 254
 ]]
+
+
+
+local TextCounter = 0
+local function SimpleText(Screen, Text, X, Y, Font, Condition, Action, AlignLeft, Layer)
+	TextCounter = TextCounter + 1
+
+	if AlignLeft == nil then
+		AlignLeft = true
+	end
+
+	return CustomUI.CreateText{
+		Key = "MUI_" .. tostring(TextCounter),
+		Text = Text,
+		Font = Font or Game.Arrus_fnt,
+		X = X, Y = Y,
+		ColorStd = 0xFFFF,
+		ColorMouseOver = Action and 0xe664 or 0xFFFF,
+		Layer = Layer or 1,
+		Screen = Screen,
+		AlignLeft = AlignLeft,
+		Condition = Condition,
+		Action = Action
+	}
+end
+local function CustomSwitch(Screen, X, Y, Condition, Header, Parent, Field, Options)
+    local Option = {
+        ValueSource = {Parent = Parent, Field = Field},
+        Options = Options or {"Option 1", "Option 2"},
+    }
+
+    -- Handles switching between options
+    local function Handler(self, side)
+        local src = self.ValueSource
+        local currentIndex = nil
+
+        -- Find the current index of the value
+        for i, v in ipairs(self.Options) do
+            if v == src.Parent[src.Field] then
+                currentIndex = i
+                break
+            end
+        end
+
+        -- Calculate the next index based on direction (-1 for left, +1 for right)
+        currentIndex = (currentIndex or 1) + side
+        if currentIndex < 1 then currentIndex = #self.Options end
+        if currentIndex > #self.Options then currentIndex = 1 end
+
+        -- Update the value in the parent and UI
+        src.Parent[src.Field] = self.Options[currentIndex]
+        self.Value.Text = " " .. self.Options[currentIndex] .. " "
+        self.Value:UpdateSize()
+    end
+
+    -- Updates the UI element to reflect the current value
+    local function Update(self)
+        local src = self.ValueSource
+        local val = src.Parent[src.Field]
+        self.Value.Text = " " .. tostring(val) .. " "
+    end
+
+    -- Create the UI elements
+    Option.Header = SimpleText(Screen, Header, X, Y, nil, Condition)
+
+    Option.Left = SimpleText(Screen, "<",
+        400 , Y, nil, Condition, function() Handler(Option, -1) end, false)
+
+    Option.Value = SimpleText(Screen, " " .. tostring(Parent[Field]) .. " ",
+        450, Y, nil, Condition, nil, false)
+
+    Option.Right = SimpleText(Screen, ">",
+        520, Y, nil, Condition, function() Handler(Option, 1) end, false)
+
+    Option.Update = Update
+
+    return Option
+end
+
+mawSettings={
+	buffRework="ON",
+	restoreProjectiles="ON",
+	homingProjectiles="ON",
+	friendlyDamage="OFF",
+	lootFilter="OFF",
+}
+
+function events.MultiplayerInitialized()
+    local ScreenId = 111
+	local mawSettingsButton={}
+    local function createSwitch(Y, Header, Field, Options)
+        mawSettingsButton[#mawSettingsButton + 1] = CustomSwitch(ScreenId, 120, Y, nil,
+            StrColor(255, 255, 150) .. Header .. StrColor(255, 255, 255),
+            mawSettings, Field, Options)
+    end
+
+    -- Define switches
+    createSwitch(180, "Buff Rework", "buffRework", {"ON","OFF"})
+    createSwitch(220, "M&M6 Projectiles", "restoreProjectiles", {"ON","OFF"})
+    createSwitch(260, "Homing Projectiles", "homingProjectiles", {"ON","OFF"})
+    createSwitch(300, "Damage on Friendly Units", "friendlyDamage", {"ON","OFF"})
+    createSwitch(340, "Loot Filter", "lootFilter", {"OFF","Common", "Uncom.", "Rare", "Epic"})
+
+    function events.OpenExtraSettingsMenu()
+        for _, v in pairs(mawSettingsButton) do
+            if v.Update then
+                v:Update()
+            end
+        end
+    end
+end
+
+function events.Action(t)
+	if t.Action==113 then
+		vars.MAWSETTINGS=vars.MAWSETTINGS or {}
+		for key,value in pairs(mawSettings) do
+			vars.MAWSETTINGS[key]=value
+		end
+	end
+end
