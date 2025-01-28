@@ -2761,7 +2761,7 @@ function events.Action(t)
 end
 
 function events.PlayerCastSpell(t)
-	if buffSpell[t.SpellId] or utilitySpell[t.SpellId] and vars.MAWSETTINGS.buffRework=="ON" then
+	if (buffSpell[t.SpellId] or utilitySpell[t.SpellId]) and vars.MAWSETTINGS.buffRework=="ON" then
 		--fix scrolls and pedestals
 		if t.TargetKind==4 or t.IsSpellScroll then
 			vars.mawbuff[t.SpellId]=Map.Name
