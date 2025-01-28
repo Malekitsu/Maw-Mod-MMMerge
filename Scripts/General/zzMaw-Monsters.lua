@@ -209,7 +209,7 @@ function recalculateMawMonster()
 		for i=0, Map.Monsters.High do
 			local mon=Map.Monsters[i]
 			if  mon.NameId >=1 and mon.NameId<220 then
-				local oldTable=mapvars.oldUniqueMonsterTable[i]
+				local oldTable=mapvars.oldUniqueMonsterTable[i] or mon.Level
 				--horizontal progression
 				if Game.freeProgression==false then
 					local name=Game.MapStats[Map.MapStatsIndex].Name
