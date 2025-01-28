@@ -71,7 +71,7 @@ function getCritInfo(pl,dmgType,monLvl)
 		end
 	end
 	
-	if buffRework then 
+	if vars.MAWSETTINGS.buffRework=="ON" then 
 		if pl.SpellBuffs[4].ExpireTime>=Game.Time then
 			local s,m=getBuffSkill(47)
 			local s2,m2=getBuffSkill(86)
@@ -181,7 +181,7 @@ function getSpellDelay(pl,spell)
 	
 	--haste buff
 	local hasteDiv=1
-	if buffRework and Party.SpellBuffs[8].ExpireTime>=Game.Time then
+	if vars.MAWSETTINGS.buffRework=="ON" and Party.SpellBuffs[8].ExpireTime>=Game.Time then
 		local s, m=getBuffSkill(5)
 		hasteDiv=1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]/1000*s
 	end
@@ -341,7 +341,7 @@ function events.BuildStatInformationBox(t)
 		
 		Buff=Party[i].SpellBuffs[const.PlayerBuff.Regeneration]
 		
-		if buffRework then
+		if vars.MAWSETTINGS.buffRework=="ON" then
 			if pl.SpellBuffs[12].ExpireTime>=Game.Time then
 				local s,m,level=getBuffSkill(71)
 				local skill=(level)^0.65*(1+s*buffPower[71].Base[m]/100)
@@ -361,7 +361,7 @@ function events.BuildStatInformationBox(t)
 	if t.Stat==8 then
 		local i=Game.CurrentPlayer
 		local fullSP=Party[i]:GetFullSP()
-		if buffRework and vars.currentManaPool and vars.currentManaPool[i] then
+		if vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[i] then
 			fullSP=fullSP*(vars.currentManaPool[Game.CurrentPlayer]/fullSP)^0.5
 		end
 		local skill=Party[i]:GetSkill(const.Skills.Meditation)
@@ -371,7 +371,7 @@ function events.BuildStatInformationBox(t)
 		end
 		local medRegen = round(fullSP^0.25*s^1.4*(m+5)/50)+2
 		--meditation buff
-		if buffRework and vars.mawbuff[56] then
+		if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[56] then
 			local s, m, level=getBuffSkill(56)
 			local level=level^0.6
 			medRegen = medRegen + round((fullSP^0.25*level^1.4*((buffPower[56].Base[m])/150) +10)*(1+buffPower[56].Scaling[m]/100*s))
@@ -884,7 +884,7 @@ end
 
 --TOOLTIPS
 function events.Action(t)
-	if buffRework then
+	if vars.MAWSETTINGS.buffRework=="ON" then
 		if t.Action==94 then
 			local i=t.Param-1
 			if i>=0 and i<=Party.High and vars.currentManaPool[i] and vars.maxManaPool[i]>0 then
@@ -898,7 +898,7 @@ function events.Tick()
 	if Game.CurrentCharScreen==100 and Game.CurrentScreen==7 then
 		i=Game.CurrentPlayer 
 		if i==-1 then return end --prevent bug message
-		if buffRework and vars.maxManaPool[i]>0 then
+		if vars.MAWSETTINGS.buffRework=="ON" and vars.maxManaPool[i]>0 then
 			vars.currentManaPool[i]=vars.currentManaPool[i] or 1
 			vars.maxManaPool[i]=vars.maxManaPool[i] or 1
 			local manaPool=round(vars.currentManaPool[i]/vars.maxManaPool[i]*1000)/10
@@ -1208,7 +1208,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	
 	--MAGIC DAMAGE CALCULATION
 	--shield buff
-	if buffRework then
+	if vars.MAWSETTINGS.buffRework=="ON" then
 		if Party.SpellBuffs[14].ExpireTime>=Game.Time then
 			local s,m=getBuffSkill(17)
 			local s2,m2=getBuffSkill(86)
