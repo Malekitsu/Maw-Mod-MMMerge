@@ -83,7 +83,7 @@ function events.CalcDamageToMonster(t)
 			end
 			totalHeal=totalHeal+heal
 		end
-		if buffRework and getBuffSkill(91)>0 then --vampiric aura buff
+		if vars.MAWSETTINGS.buffRework=="ON" and getBuffSkill(91)>0 then --vampiric aura buff
 			local heal=t.Result^0.75*0.5
 			if getMapAffixPower(32) then
 				heal=heal*(1-getMapAffixPower(32)/100)
