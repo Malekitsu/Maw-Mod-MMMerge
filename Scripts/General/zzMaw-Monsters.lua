@@ -2941,11 +2941,9 @@ function events.MonsterSpriteScale(t)
 end
 
 function events.BeforeLoadMap()
-	if vars.Mode==2 then
-		for i=1, Game.MonstersTxt.High do
-			if Game.MonstersTxt[i].AIType~=1 then
-				Game.MonstersTxt[i].AIType=0
-			end
+	for i=1, Game.MonstersTxt.High do
+		if Game.MonstersTxt[i].AIType~=1 then
+			Game.MonstersTxt[i].AIType=0
 		end
 	end
 end
