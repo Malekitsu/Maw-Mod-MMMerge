@@ -438,11 +438,11 @@ function events.MultiplayerInitialized()
 			StrColor(255,255,150) .. Header .. StrColor(255,255,255),
 			Multipliers, Field, 0.05, 0.05, 5)
 	end
-	regulator(190, "Health points ", "HP")
-	regulator(220, "Armor class   ", "AC")
-	regulator(250, "Damage        ", "MaxDamage")
-	regulator(280, "Hit chance    ", "PlayerAC")
-	regulator(310, "Movement speed", "MoveSpeed")
+	--regulator(190, "Health points ", "HP")
+	--regulator(220, "Armor class   ", "AC")
+	--regulator(250, "Damage        ", "MaxDamage")
+	--regulator(280, "Hit chance    ", "PlayerAC")
+	--regulator(310, "Movement speed", "MoveSpeed")
 
 	function events.OpenExtraSettingsMenu()
 		for _, v in pairs(Elements) do
