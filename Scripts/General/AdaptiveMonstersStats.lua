@@ -431,7 +431,7 @@ end
 
 -- UI - like this, untill multiplayer UI utils are moved to general scripts
 function events.MultiplayerInitialized()
-	local ScreenId = CustomUI.NewSettingsPage("BolsterFineTuning", "Bolster multipliers", "ExSetScr2")
+	local ScreenId = CustomUI.NewSettingsPage("BolsterFineTuning", "MAW SETTINGS", "ExSetScr2")
 	local Elements = {}
 	local function regulator(Y, Header, Field)
 		Elements[#Elements + 1] = Multiplayer.utils.UI.CustomNumeric(ScreenId, 120, Y, nil,
