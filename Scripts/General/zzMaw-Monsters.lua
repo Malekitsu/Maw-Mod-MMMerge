@@ -145,10 +145,8 @@ function recalculateMawMonster()
 			mon.Attack2Chance=txt.Attack2Chance
 			mon.Experience=txt.Experience
 		end
-		if vars.Mode==2 then
-			if mon.AIType~=1 then
-				mon.AIType=0
-			end
+		if mon.AIType~=1 then
+			mon.AIType=0
 		end
 	end
 	
