@@ -696,7 +696,7 @@ function events.KeyDown(t)
 end
 
 function events.CanSaveGame(t)
-	if not corruptWarningGiven and vars.mawbags then
+	if not corruptWarningGiven and vars and vars.mawbags then
 		local brokenBags = 0
 		local brokenItems = 0
 		local bugFound = false
@@ -5178,10 +5178,5 @@ if isRedone then
 		[2198]={1,1},
 		[2199]={1,2},
 		[2200]={2,1},
-		[2201]={1,5},
-		[2202]={2,5},
-		[2203]={2,5},
-		[2204]={1,7},
-		[2205]={2,7},
 	}
 end
