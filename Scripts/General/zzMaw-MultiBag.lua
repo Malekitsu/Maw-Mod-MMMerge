@@ -229,6 +229,10 @@ function changeBag(pl, bag)
 	else
 		local bags=vars.mawbags[id][bag]
 		local j=0
+		if isnan(bags) then
+			bags={}
+			debug.Message(pl.Name .. "'s bag number " .. bag .. " is corrupted. Bag has been resetted, otherwise game will crash. If you have a previous save you might want to load hope the bag is not broken there.")
+		end
 		for i=1,#bags do
 			local it=bags[i]
 			local inv
@@ -494,4 +498,8 @@ function events.Action(t)
 			end	
 		end
 	end
+end
+
+function isnan(x)
+    return x ~= x
 end
