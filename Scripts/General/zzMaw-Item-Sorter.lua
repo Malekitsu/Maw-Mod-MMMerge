@@ -695,6 +695,57 @@ function events.KeyDown(t)
 	end
 end
 
+function events.CanSaveGame(t)
+	if not corruptWarningGiven and vars.mawbags then
+		local brokenBags = 0
+		local brokenItems = 0
+		local bugFound = false
+		local txt = ""
+
+		for i = 0, Party.High do
+			local pl = Party[i]
+			local id = pl:GetIndex()
+			local bags = vars.mawbags[id]
+
+			if bags then
+				for key, value in pairs(bags) do
+					if isnan(value) then
+						brokenBags = brokenBags + 1
+						txt = txt .. "\n" .. pl.Name .. " - Corrupted bag #" .. key
+						bugFound = true
+					elseif type(value)=="table" then
+						for bag, item in pairs(value) do
+							if isnan(item) then
+								brokenItems = brokenItems + 1
+								txt = txt .. "\n" .. pl.Name .. " - Corrupted item #" .. bag .. " in bag #" .. key
+								bugFound = true
+							end
+						end
+					end
+				end
+			end
+		end
+
+		if bugFound then
+			txt = txt .. "\n\nSummary:\n" ..
+				  "Total corrupted bags: " .. brokenBags .. "\n" ..
+				  "Total corrupted items: " .. brokenItems
+			if t.SaveKind ==1 then
+				txt="WARNING!!!\n\nDURING THE AUTOSAVE, CORRUPTED ITEMS/BAGS HAVE BEEN DETECTED! Either load a previous save, where items/bags are not corrupted, or properly check your bags, and if no item/bag is missing you can keep playing (not recommended). \nDown below a list of corrupted items:\n\n" .. txt
+			else
+				txt="WARNING!!!\n\nSAVE HAVE BEEN STOPPED DUE TO CORRUPTED ITEMS/BAGS! Either load a previous save, where items/bags are not corrupted, or properly check your bags, and if no item/bag is missing you can save again (this time no warning will be given). \nDown below a list of corrupted items:\n\n" .. txt
+				t.Result=false
+			end
+			debug.Message(txt)
+			corruptWarningGiven=true
+		end
+	end
+end
+function events.LoadMap()
+	corruptWarningGiven=false
+end
+
+
 
 -- Define the alchemyItemsOrder list for reference in sorting
 alchemyItemsOrder = {
