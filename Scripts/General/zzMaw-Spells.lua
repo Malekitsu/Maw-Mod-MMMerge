@@ -1843,6 +1843,8 @@ function ascension()
 			haste=haste+20
 		end
 		
+		adjustSpellTooltips()
+		
 		if vars.MAWSETTINGS.buffRework=="ON" then
 			for i=1, #buffSpellList do
 				local sp=buffSpellList[i]
@@ -1857,11 +1859,7 @@ function ascension()
 							end
 						end
 					end
-					if sp==8 then --immolate exception
-						Game.SpellsTxt[sp].Description=Game.SpellsTxt[sp].Description .. "\n\nMana Reserved: " .. StrColor(0,100,255,percent .. "%" .. txt)
-					else
-						Game.SpellsTxt[sp].Description=oldSpellTooltips[sp] .. "\n\nMana Reserved: " .. StrColor(0,100,255,percent .. "%" .. txt)
-					end
+					Game.SpellsTxt[sp].Description=Game.SpellsTxt[sp].Description .. "\n\nMana Reserved: " .. StrColor(0,100,255,percent .. "%" .. txt)
 				elseif utilitySpell[sp] then
 					local cost, percent=getBuffCost(pl, sp)
 					cost=round(cost)
