@@ -2711,7 +2711,7 @@ buffPower={ --values are inteneded as % and /1000 for scaling
 }
 
 function events.LoadMap()
-	if vars.MAWSETTINGS.buffRework=="OFF" then return end
+	if vars.MAWSETTINGS and vars.MAWSETTINGS.buffRework=="OFF" then return end
 	if not vars.mawbuff then
 		vars.mawbuff={}
 		for i=1,#buffSpellList do
