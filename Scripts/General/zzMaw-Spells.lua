@@ -1394,9 +1394,9 @@ function events.GameInitialized2()
 			[70] = {dmgAdd = 4, diceMin = 1, diceMax = 4, },--harm
 			[76] = {dmgAdd = 20, diceMin = 1, diceMax = 5, },--flying fist
 			[78] = {dmgAdd = 12, diceMin = 1, diceMax = 2, },--light bolt
-			[79] = {dmgAdd = 12, diceMin = 1, diceMax = 8, },--destroy undead
-			[84] = {dmgAdd = 25, diceMin = 2, diceMax = 5, },--prismatic light
-			[87] = {dmgAdd = 50, diceMin = 1, diceMax = 50, },--sunray
+			[79] = {dmgAdd = 45, diceMin = 1, diceMax = 45, },--destroy undead
+			[84] = {dmgAdd = 30, diceMin = 2, diceMax = 6, },--prismatic light
+			[87] = {dmgAdd = 60, diceMin = 1, diceMax = 60, },--sunray
 			[90] = {dmgAdd = 15, diceMin = 1, diceMax = 9, },--toxic cloud
 			[93] = {dmgAdd = 0, diceMin = 1, diceMax = 7, },--shrapmetal
 			[97] = {dmgAdd = 0, diceMin = 1, diceMax = 28, },--dragon breath
