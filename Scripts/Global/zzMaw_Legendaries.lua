@@ -204,106 +204,9 @@ function events.CalcDamageToPlayer(t)
 	--------------------
 	--MANA SHIELD CODE--
 	--------------------
-	-- Get the player and their skill levels
+	
 	local pl = t.Player
-	local s, m = SplitSkill(Skillz.get(pl, 51))  -- s: skill level, m: mastery level
-	local id = t.PlayerIndex
-
-	-- Find the player's slot in the party
-	local slot = -1
-	for i = 0, Party.High do
-		if Party[i]:GetIndex() == id then
-			slot = i
-			break
-		end
-	end
-
-	-- Check if the Mana Shield is active for this player
-	if s > 0 and vars.manaShield and vars.manaShield[slot] then
-		local currentHP = pl.HP
-		local totalHP = pl:GetFullHP()
-		local damage = t.Result
-		local mana = pl.SP
-
-		-- Define thresholds and damage multipliers based on skill level
-		local thresholds = {
-			{skill = 4, hpThreshold = 1, damageMultiplier = 0},       -- Level 5: Negate over-threshold damage
-			{skill = 3, hpThreshold = 0.125, damageMultiplier = 0.125},  -- Level 4: Reduce over-threshold damage to 1/8
-			{skill = 2, hpThreshold = 0.25, damageMultiplier = 0.25},    -- Level 3: Reduce over-threshold damage to 1/4
-			{skill = 1, hpThreshold = 0.5, damageMultiplier = 0.5},      -- Level 2: Reduce over-threshold damage to 1/2
-		}
-
-		-- Find the applicable threshold for the player's skill level
-		local applicableThreshold = nil
-		for _, thresholdData in ipairs(thresholds) do
-			if m >= thresholdData.skill then
-				applicableThreshold = thresholdData
-				break
-			end
-		end
-
-		if applicableThreshold then
-			local thresholdHP = totalHP * applicableThreshold.hpThreshold
-
-			-- Calculate the HP after taking full damage
-			local hpAfterDamage = currentHP - damage
-
-			-- Determine if damage reduction is needed
-			if hpAfterDamage < thresholdHP then
-				-- Amount of damage that would reduce HP below threshold
-				local overkillDamage = math.max(currentHP - thresholdHP, 0)
-				overkillDamage = damage - overkillDamage
-
-				-- Ensure overkillDamage is not negative
-				overkillDamage = math.max(overkillDamage, 0)
-
-				-- Apply damage multiplier to overkillDamage
-				local reducedOverkillDamage = overkillDamage * applicableThreshold.damageMultiplier
-
-				-- Total damage taken is unreduced damage plus reduced overkill damage
-				local unreducedDamage = damage - overkillDamage
-				local totalDamageTaken = unreducedDamage + reducedOverkillDamage
-
-				-- Calculate the damage reduction achieved
-				local damageReduced = damage - totalDamageTaken
-
-				-- Calculate mana efficiency based on skill and mastery levels
-				local manaEfficiency = (1 + s^1.5 / 125 * 4)
-				if s > 50 then
-					manaEfficiency = (1 + 50^1.5 / 125 * 4) * s / 50
-				end
-
-				-- Adjust mana efficiency for mastery levels (Expert, Master, Grandmaster)
-				local masteryBonus = 1 + (m - 1) * 0.1  -- Each mastery level increases efficiency by 10%
-				manaEfficiency = manaEfficiency * masteryBonus
-
-				-- Calculate the mana cost for the damage reduction
-				local manaCost = damageReduced / manaEfficiency
-
-				-- Check if the player has enough mana to cover the cost
-				if mana >= manaCost then
-					-- Player has enough mana; apply full damage reduction
-					pl.SP = mana - manaCost
-					t.Result = totalDamageTaken
-				else
-					-- Not enough mana; scale the damage reduction proportionally
-					local manaAvailableRatio = mana / manaCost
-					local actualDamageReduced = damageReduced * manaAvailableRatio
-					pl.SP = 0
-					t.Result = damage - actualDamageReduced
-				end
-
-				--[[ Optional: Debug messages to trace calculations
-				debug.Message("Original Damage: " .. damage)
-				debug.Message("Damage Reduced: " .. (damage - t.Result))
-				debug.Message("Final Damage Taken: " .. t.Result)
-				debug.Message("Mana Used: " .. (mana - pl.SP))
-				]]
-			end
-		end
-	end
-
-		
+	t.Result = calcManaShield(pl, t.Result)
 	
 	
 	---------------------
@@ -352,3 +255,38 @@ end
 
 --[19]="Your weapon enchants now scales with the highest between might/int./pers.",
 --inside calcspelldamage in maw spells and all across the code for tooltips
+
+function calcManaShield(pl, damage)
+	-- Get the player and their skill levels
+	local s, m = SplitSkill(Skillz.get(pl, 51))
+	local slot = 0
+	local id = pl:GetIndex()
+	for i = 0, Party.High do
+		if Party[i]:GetIndex() == id then
+			slot = i
+			break
+		end
+	end
+
+	-- Check if the Mana Shield is active for this player
+	if s > 0 and vars.manaShield and vars.manaShield[slot] then
+		local currentHP = pl.HP
+		local totalHP = pl:GetFullHP()
+		local mana = pl.SP
+
+		-- Define thresholds and damage multipliers based on skill level
+		local reduction = {0.25, 0.5, 0.75, 1, [0]=0}
+		-- Calculate mana efficiency based on skill and mastery levels
+		local manaEfficiency = (1 + s^1.5 / 125 * 4)
+		if s > 50 then
+			manaEfficiency = (1 + 50^1.5 / 125 * 4) * s / 50
+		end
+		absorbDamage=damage*reduction[m]
+		manaCost = math.round(absorbDamage/manaEfficiency)
+		absorbDamage = math.min(absorbDamage,(mana*manaEfficiency))
+		damage = math.round(damage - absorbDamage)
+		pl.SP = math.max(pl.SP-manaCost, 0)
+	end
+	
+	return damage
+end
