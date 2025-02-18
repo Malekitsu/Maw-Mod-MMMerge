@@ -29,7 +29,7 @@ function events.EvtGlobal(i) -- happens after related global evt executed
 			ExpRewards[i] = Party[i].Exp - Exp
 			if ExpRewards[i]>0 then
 				bonusExp=calculateExp(ExpRewards[i])
-				math.min(Party[i].Experience+bonusExp, 2^32-3982296)
+				Party[i].Experience=math.min(Party[i].Experience+bonusExp, 2^32-3982296)
 				
 				--bolster code
 				bonusExp=(bonusExp+ExpRewards[i])/5
