@@ -3416,21 +3416,22 @@ function getMonsterDamage(lvl,calcType)
 end
 
 function events.MonstersProcessed()
-	if not Game.TurnBased then
+	if not Game.TurnBased and Map.IsIndoor() then
 		for i=0,Map.Monsters.High do
 			local mon=Map.Monsters[i]
 			if mon.AIState==0 and mon.ShowOnMap and getDistance(mon.X,mon.Y,mon.Z)<350 then
-				local midZ=math.max(mon.Z+Party.Z)+50
+				local midZ=(mon.Z+Party.Z)/2+50
 				local distanceX=mon.X-Party.X
 				local distanceY=mon.Y-Party.Y
 				local requiresHandling=false
-				local i=0
-				while not requiresHandling or i<9 do
-					i=i+1
-					local x=Party.X+distanceX*(0.1*i)
-					local y=Party.Y+distanceY*(0.1*i)
+				local j=0
+				while not requiresHandling and j<9 do
+					j=j+1
+					local x=Party.X+distanceX*(0.1*j)
+					local y=Party.Y+distanceY*(0.1*j)
 					if Map.RoomFromPoint(x, y, midZ) == 0 then
 						requiresHandling=true
+						debug.Message(string.format("%s  %s  %s ", x,y,midZ))
 					end
 				end
 				
