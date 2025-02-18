@@ -3431,7 +3431,6 @@ function events.MonstersProcessed()
 					local y=Party.Y+distanceY*(0.1*j)
 					if Map.RoomFromPoint(x, y, midZ) == 0 then
 						requiresHandling=true
-						debug.Message(string.format("%s  %s  %s ", x,y,midZ))
 					end
 				end
 				
