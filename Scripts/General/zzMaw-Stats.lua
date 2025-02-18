@@ -875,7 +875,8 @@ function events.CalcDamageToPlayer(t)
 			t.Result=t.Result/2
 			aoeDamage=t.Result/Party.Count
 			for i=0,Party.High do
-				Party[i].HP=Party[i].HP-aoeDamage
+				local damage = calcManaShield(Party[i], aoeDamage)
+				Party[i].HP=Party[i].HP-damage
 				Party[i]:ShowFaceAnimation(24)
 			end
 		end
