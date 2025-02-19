@@ -159,41 +159,44 @@ function events.AfterLoadMap()
 		mapvars.chestGoldFix=true
 	end
 	
-	for i=0,Map.Chests.High do
-		for k=1,Map.Chests[i].Items.High do
-			local it=Map.Chests[i].Items[k]
-			if (it.Number>=1 and it.Number<=151) or (it.Number>=803 and it.Number<=936) or (it.Number>=1603 and it.Number<=1736) then
-				local itemPower=1
-				if it.Bonus>0 then
-					itemPower=itemPower+1
-				end
-				if it.Bonus2>0 then
-					itemPower=itemPower+1
-				end
-				if it.Charges>1000 then
-					itemPower=itemPower+1
-				end
-				if it.BonusExpireTime==1 then
-					itemPower=5
-				elseif it.BonusExpireTime==2 then
-					itemPower=6
-				elseif it.BonusExpireTime>10 and it.BonusExpireTime<100 then
-					itemPower=7
-				end
-				
-				local filter=vars.MAWSETTINGS.lootFilter
-				
-				local tierList={"Common", "Uncom.", "Rare", "Epic", "Ancient", "Primordial", "Legendary", [0]="OFF"}
-				local filterPower=table.find(tierList, filter)
-				local itemID=it.Number
-				if itemPower<=filterPower then
-					local goldId={1799,999,187,1800,1000,188,1801,1001,189}
-					local itemGold=getItemValue(it, true)
-					it.Number=goldId[math.min((itemPower)*2-math.random(0,1),9)]
-					it.Bonus2=itemGold
+	if not mapvars.lootFiltered then
+		for i=0,Map.Chests.High do
+			for k=1,Map.Chests[i].Items.High do
+				local it=Map.Chests[i].Items[k]
+				if (it.Number>=1 and it.Number<=151) or (it.Number>=803 and it.Number<=936) or (it.Number>=1603 and it.Number<=1736) then
+					local itemPower=1
+					if it.Bonus>0 then
+						itemPower=itemPower+1
+					end
+					if it.Bonus2>0 then
+						itemPower=itemPower+1
+					end
+					if it.Charges>1000 then
+						itemPower=itemPower+1
+					end
+					if it.BonusExpireTime==1 then
+						itemPower=5
+					elseif it.BonusExpireTime==2 then
+						itemPower=6
+					elseif it.BonusExpireTime>10 and it.BonusExpireTime<100 then
+						itemPower=7
+					end
+					
+					local filter=vars.MAWSETTINGS.lootFilter
+					
+					local tierList={"Common", "Uncom.", "Rare", "Epic", "Ancient", "Primordial", "Legendary", [0]="OFF"}
+					local filterPower=table.find(tierList, filter)
+					local itemID=it.Number
+					if itemPower<=filterPower then
+						local goldId={1799,999,187,1800,1000,188,1801,1001,189}
+						local itemGold=getItemValue(it, true)
+						it.Number=goldId[math.min((itemPower)*2-math.random(0,1),9)]
+						it.Bonus2=itemGold
+					end
 				end
 			end
 		end
+		mapvars.lootFiltered = true
 	end
 end
 
