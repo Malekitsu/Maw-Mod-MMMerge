@@ -2813,21 +2813,21 @@ function itemStats(index)
 	local shieldResMult=(skillItemRes[const.Skills.Shield][m]*s/100)
 	
 	itemArmorClassBonus1=math.round(armorAC*armorMult)
-	if armorAC>=1 then
+	if armorAC>=1 and austerity then
 		itemArmorClassBonus1=math.max(itemArmorClassBonus1,math.round(bodyS*bodyM)*2)
 	end
 	itemArmorClassBonus2=math.round(shieldAC*shieldMult)
-	if shieldAC>=1 then
+	if shieldAC>=1 and austerity then
 		itemArmorClassBonus2=math.max(itemArmorClassBonus2,math.round(s*m)*2)
 	end
 	tab[10]=tab[10]+itemArmorClassBonus1+itemArmorClassBonus2
 	
 	itemResistanceBonus1=math.round(armorAC*armorResMult)
-	if armorAC>=1 then
+	if armorAC>=1 and austerity then
 		itemResistanceBonus1=math.max(itemResistanceBonus1,math.round(bodyS*bodyM)*2)
 	end
 	itemResistanceBonus2=math.round(shieldAC*shieldResMult)
-	if shieldAC>=1 then
+	if shieldAC>=1 and austerity then
 		itemResistanceBonus2=math.max(itemResistanceBonus2,math.round(s*m)*2)
 	end
 	
