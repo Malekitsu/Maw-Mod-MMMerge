@@ -2812,12 +2812,24 @@ function itemStats(index)
 	local shieldMult=(skillItemAC[const.Skills.Shield][m]*s/100)
 	local shieldResMult=(skillItemRes[const.Skills.Shield][m]*s/100)
 	
-	itemArmorClassBonus1=math.max(math.round(armorAC*armorMult),math.round(bodyS*bodyM)*2)
-	itemArmorClassBonus2=math.max(math.round(shieldAC*shieldMult),math.round(s*m*2))
+	itemArmorClassBonus1=math.round(armorAC*armorMult)
+	if armorAC>=1 then
+		itemArmorClassBonus1=math.max(itemArmorClassBonus1,math.round(bodyS*bodyM)*2)
+	end
+	itemArmorClassBonus2=math.round(shieldAC*shieldMult)
+	if shieldAC>=1 then
+		itemArmorClassBonus2=math.max(itemArmorClassBonus2,math.round(s*m)*2)
+	end
 	tab[10]=tab[10]+itemArmorClassBonus1+itemArmorClassBonus2
 	
-	itemResistanceBonus1=math.max(math.round(armorAC*armorResMult),bodyS*bodyM*2)
-	itemResistanceBonus2=math.max(math.round(shieldAC*shieldResMult),s*m*2)
+	itemResistanceBonus1=math.round(armorAC*armorResMult)
+	if armorAC>=1 then
+		itemResistanceBonus1=math.max(itemResistanceBonus1,math.round(bodyS*bodyM)*2)
+	end
+	itemResistanceBonus2=math.round(shieldAC*shieldResMult)
+	if shieldAC>=1 then
+		itemResistanceBonus2=math.max(itemResistanceBonus2,math.round(s*m)*2)
+	end
 	
 	for i=11,16 do
 		tab[i]=tab[i]+itemResistanceBonus1+itemResistanceBonus2
