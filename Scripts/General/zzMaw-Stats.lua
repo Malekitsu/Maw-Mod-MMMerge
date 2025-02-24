@@ -318,45 +318,14 @@ function events.BuildStatInformationBox(t)
 		end
 	end
 	if t.Stat==7 then
-		local index=Game.CurrentPlayer
-		level=Party[index]:GetLevel()
-		--hp regen calculation
 		local i=Game.CurrentPlayer
-		local FHP=Party[i]:GetFullHP()
-		local skill=Party[i]:GetSkill(const.Skills.Regeneration)
-		local s,m=SplitSkill(skill)
-
-		local regenEffect={[0]=0,2,4,6,6}
-		local hpRegen = round(FHP^0.5*s^1.65*((regenEffect[m])/35))+s*10
-		local HPregenItem=0
-		local bonusregen=0
-		for it in Party[i]:EnumActiveItems() do
-			if it.Bonus2 == 37 or it.Bonus2==44 or it.Bonus2==50 or it.Bonus2==54 or it.Bonus2==66 then	
-				HPregenItem=HPregenItem+1
-				bonusregen=1
-			end
-		end
+		local pl=Party[i]
 		HPregenItem=HPregenItem
-		regen=math.ceil(FHP*HPregenItem*0.02)+hpRegen+bonusregen
-		
-		Buff=Party[i].SpellBuffs[const.PlayerBuff.Regeneration]
-		
-		if vars.MAWSETTINGS.buffRework=="ON" then
-			if pl.SpellBuffs[12].ExpireTime>=Game.Time then
-				local s,m,level=getBuffSkill(71)
-				local skill=(level)^0.65*(1+s*buffPower[71].Base[m]/100)
-				regen = regen + math.ceil(FHP^0.5*skill^1.3*(buffPower[71].Base[m]/100)) -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
-			end
-		else
-			if Buff.ExpireTime > Game.Time then
-				RegS, RegM = SplitSkill(Buff.Skill)
-				regen = math.ceil(regen + FHP^0.5*RegS^1.3*((RegM+1)/100)) 
-			end
-		end
+		regen=math.round(getBuffHealthRegen(pl)*10)/10
 		
 		hpMap=hpStatsMap[index]
 		
-		t.Text=string.format("%s\n\nHP bonus from Endurance: %s\nHP bonus from Body building: %s\nHP bonus from items: %s\nBase HP: %s\n\n HP Regen per second: %s",t.Text,StrColor(0,255,0,hpMap.totalEnduranceBonus), StrColor(0,255,0,hpMap.totalBBBonus),StrColor(0,255,0,round(hpMap.totalhpFromItems)),StrColor(0,255,0,hpMap.totalBaseHP),StrColor(0,255,0,regen/10))
+		t.Text=string.format("%s\n\nHP bonus from Endurance: %s\nHP bonus from Body building: %s\nHP bonus from items: %s\nBase HP: %s\n\n HP Regen per second: %s",t.Text,StrColor(0,255,0,hpMap.totalEnduranceBonus), StrColor(0,255,0,hpMap.totalBBBonus),StrColor(0,255,0,round(hpMap.totalhpFromItems)),StrColor(0,255,0,hpMap.totalBaseHP),StrColor(0,255,0,regen))
 	end
 	if t.Stat==8 then
 		local i=Game.CurrentPlayer
