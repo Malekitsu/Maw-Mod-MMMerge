@@ -1141,6 +1141,7 @@ function getBuffHealthRegen(pl)
 		end
 	end
 	
+	local Buff=pl.SpellBuffs[const.PlayerBuff.Regeneration]
 	if vars.MAWSETTINGS.buffRework=="ON" then 
 		if pl.SpellBuffs[12].ExpireTime>=Game.Time then
 			-- buff
