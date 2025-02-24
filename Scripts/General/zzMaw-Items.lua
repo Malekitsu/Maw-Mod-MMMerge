@@ -3570,6 +3570,14 @@ shopArmors={31,32,33,34,5}
 function refreshItems()
 	id=Game:GetCurrentHouse()
 	if id==nil or id>=110 then return end
+	if isRedone then
+		if id>35 then
+			id=id+2
+		end
+		if id>75 then
+			id=id+2
+		end
+	end
 	if Game.HouseScreen==2 then
 		h=Game.ShopItems[id]
 	elseif Game.HouseScreen==95 then
@@ -3658,6 +3666,14 @@ function mawStoreShop()
 		return
 	end
 	if id>133 then return end
+	if isRedone then
+		if id>35 then
+			id=id+2
+		end
+		if id>75 then
+			id=id+2
+		end
+	end
 	--check item types to determine what shop is this
 	h=Game.ShopSpecialItems[id]
 	s=Game.ShopItems[id]
