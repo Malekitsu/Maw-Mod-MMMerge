@@ -56,6 +56,16 @@ function events.UseMouseItem(t)
 	local currentPlayer=Game.CurrentPlayer
 	vars.buffToIgnore=vars.buffToIgnore or {}
 	vars.buffToIgnore[t.PlayerSlot]=vars.buffToIgnore[t.PlayerSlot] or {}
+	
+	local bonusDuration=0
+	for i=0,Party.High do
+		local s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Alchemy))
+		if m==4 then
+			bonusDuration = math.max(bonusDuration, const.Minute * 6 * s)
+		end
+	end
+	local potionDuration = const.Hour*6 + bonusDuration
+	
 	if delay==0 then
 		action=t.PlayerSlot
 	else
@@ -106,32 +116,32 @@ function events.UseMouseItem(t)
 	--Regen
 	if it.Number==233 then
 		Buff=pl.SpellBuffs[const.PlayerBuff.Regeneration]
-		Buff.ExpireTime = Game.Time+const.Hour*6
+		Buff.ExpireTime = Game.Time+potionDuration
 		Buff.Skill=JoinSkill(it.Bonus/2,4)
-		vars.buffToIgnore[t.PlayerSlot][const.PlayerBuff.Regeneration]=Game.Time+const.Hour*6
+		vars.buffToIgnore[t.PlayerSlot][const.PlayerBuff.Regeneration]=Game.Time+potionDuration
 	end
 	--mana regen
 	if it.Number==232 then
 		vars.bonusMeditation=vars.bonusMeditation or {}
-		vars.bonusMeditation[index]={Game.Time+const.Hour*6, math.ceil(it.Bonus^0.5/1.5) + 1}
+		vars.bonusMeditation[index]={Game.Time+potionDuration, math.ceil(it.Bonus^0.5/1.5) + 1}
 	end
 	------------------------
 	--STATUS IMMUNITY POTIONS--
 	------------------------
 	if it.Number==237 then
-		Party.SpellBuffs[13].ExpireTime=Game.Time+const.Hour*6
+		Party.SpellBuffs[13].ExpireTime=Game.Time+potionDuration
 		Party.SpellBuffs[13].Power=5+math.floor(it.Bonus/10)
 		Party.SpellBuffs[13].Skill=3
 		if it.Bonus>=55 then
 			Party.SpellBuffs[13].Skill=4
 		end
-		vars.magicResistancePotionExpire=Game.Time+const.Hour*6
+		vars.magicResistancePotionExpire=Game.Time+potionDuration
 	end
 	
 	if itemImmunityMapping[it.Number] then 
 		for i=1,#itemImmunityMapping[it.Number] do
 			local txt=itemImmunityMapping[it.Number][i]
-			vars.PlayerAlchemyBuffs[index][txt]=Game.Time+Const.Hour*6
+			vars.PlayerAlchemyBuffs[index][txt]=Game.Time+potionDuration
 			pl[itemImmunityMapping[it.Number][i]]=0
 		end
 	end
@@ -144,15 +154,15 @@ function events.UseMouseItem(t)
 			for i=1,#buff do
 				buffID=itemBuffMapping[it.Number][i]
 				pl.SpellBuffs[buffID].Power=it.Bonus+10
-				pl.SpellBuffs[buffID].ExpireTime=Game.Time+const.Hour*6
+				pl.SpellBuffs[buffID].ExpireTime=Game.Time+potionDuration
 				pl.SpellBuffs[buffID].Skill=0
-				vars.buffToIgnore[t.PlayerSlot][buffID]=Game.Time+const.Hour*6
+				vars.buffToIgnore[t.PlayerSlot][buffID]=Game.Time+potionDuration
 			end
 		else
 			pl.SpellBuffs[buff].Power=it.Bonus+10
-			pl.SpellBuffs[buff].ExpireTime=Game.Time+const.Hour*6
+			pl.SpellBuffs[buff].ExpireTime=Game.Time+potionDuration
 			pl.SpellBuffs[buff].Skill=0
-			vars.buffToIgnore[t.PlayerSlot][buff]=Game.Time+const.Hour*6
+			vars.buffToIgnore[t.PlayerSlot][buff]=Game.Time+potionDuration
 		end
 		--half effect for bless, heroism and stoneskin
 		if (it.Number<=234 and it.Number~=229) or it.Number==245 or  it.Number==251 then
@@ -628,7 +638,7 @@ function events.GameInitialized2()
 	Skillz.setDesc(const.Skills.Alchemy,1,Skillz.getDesc(const.Skills.Alchemy,1) .. "\n\nMaster will grant 1% to drop random reagents from Monsters.\nAt GM this chance is doubled.")
 	Game.SkillDesMaster[const.Skills.Alchemy]="Allows to make white potions. Power when mixing will be increased to 1.5 per skill point."
 	Game.SkillDesMaster[const.Skills.Alchemy]="Allows to make white potions. Power when mixing will be increased to 1.5 per skill point."
-	Game.SkillDesGM[const.Skills.Alchemy]="Allows to make black potions. Power when mixing will be increased to 2 per skill point."
+	Game.SkillDesGM[const.Skills.Alchemy]="Allows to make black potions. Power when mixing will be increased to 2 and increases potion duration by 6 Minutes per skill point."
 end
 function events.BuildItemInformationBox(t)
 	if t.Item.Number>=1051 and t.Item.Number<=1060 then
