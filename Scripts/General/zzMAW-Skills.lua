@@ -1126,12 +1126,6 @@ function getBuffHealthRegen(pl)
 	
 	--regeneration skill
 	local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Regeneration))
-	gmMult=1
-	if RegM==4 then
-		local tot=pl:GetFullHP()
-		local percentage=pl.HP/tot
-		gmMult=math.min(1+(1-percentage)^2,5)
-	end
 	local regenEffect={[0]=0,2,4,6,6}
 	FHP	= pl:GetFullHP()
 	regen=regen + FHP^0.5*RegS^1.65*(regenEffect[RegM]/350)+RegS
