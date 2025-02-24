@@ -54,6 +54,8 @@ function events.UseMouseItem(t)
 	local delay=pl.RecoveryDelay
 	local action=-1
 	local currentPlayer=Game.CurrentPlayer
+	vars.buffToIgnore=vars.buffToIgnore or {}
+	vars.buffToIgnore[t.PlayerSlot]=vars.buffToIgnore[t.PlayerSlot] or {}
 	if delay==0 then
 		action=t.PlayerSlot
 	else
@@ -86,19 +88,19 @@ function events.UseMouseItem(t)
 	end
 	--healing potion
 	if it.Number==222 then
-		heal=round(it.Bonus^1.4+10)
+		heal=round(it.Bonus^1.75+10)
 		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
 	--mana potion
 	elseif it.Number==223 then
-		spRestore=round(it.Bonus^1.4*2/3+10)
+		spRestore=round(it.Bonus^1.6*2/3+10)
 		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
 	end
 	if it.Number==247 then
-		heal=round(it.Bonus^1.4*1.5+20)
+		heal=round(it.Bonus^1.75*1.5+50)
 		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
 	--mana potion
 	elseif it.Number==248 then
-		spRestore=round(it.Bonus^1.4+20)
+		spRestore=round(it.Bonus^1.6+50)
 		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
 	end
 	--Regen
@@ -106,6 +108,7 @@ function events.UseMouseItem(t)
 		Buff=pl.SpellBuffs[const.PlayerBuff.Regeneration]
 		Buff.ExpireTime = Game.Time+const.Hour*6
 		Buff.Skill=JoinSkill(it.Bonus/2,4)
+		vars.buffToIgnore[t.PlayerSlot][const.PlayerBuff.Regeneration]=Game.Time+const.Hour*6
 	end
 	--mana regen
 	if it.Number==232 then
@@ -143,11 +146,13 @@ function events.UseMouseItem(t)
 				pl.SpellBuffs[buffID].Power=it.Bonus+10
 				pl.SpellBuffs[buffID].ExpireTime=Game.Time+const.Hour*6
 				pl.SpellBuffs[buffID].Skill=0
+				vars.buffToIgnore[t.PlayerSlot][buffID]=Game.Time+const.Hour*6
 			end
 		else
 			pl.SpellBuffs[buff].Power=it.Bonus+10
 			pl.SpellBuffs[buff].ExpireTime=Game.Time+const.Hour*6
 			pl.SpellBuffs[buff].Skill=0
+			vars.buffToIgnore[t.PlayerSlot][buff]=Game.Time+const.Hour*6
 		end
 		--half effect for bless, heroism and stoneskin
 		if (it.Number<=234 and it.Number~=229) or it.Number==245 or  it.Number==251 then
@@ -199,11 +204,11 @@ function events.UseMouseItem(t)
 	--age potions
 	if it.Number==258 then
 		pl.BirthYear=1172-60+math.floor(Game.Time/const.Year)
-		Party[0].AgeBonus=0
+		pl.AgeBonus=0
 	end
 	if it.Number==260 then
 		pl.BirthYear=1172-20+math.floor(Game.Time/const.Year)
-		Party[0].AgeBonus=0
+		pl.AgeBonus=0
 	end
 	
 	--exp potion
@@ -1070,7 +1075,7 @@ function events.MonsterKilled(mon)
 	mon.Ally=9999
 	
 	if getMapAffixPower(9) and math.random()<getMapAffixPower(9)/100 then
-		pseudoSpawnpoint{monster = mon.Id,  x = mon.X, y = mon.Y, z = mon.Z, count = 1, powerChances = {55, 30, 15}, radius = 128, group = 2,transform = function(mon) mon.Ally = 0 mon.Hostile=true mon.ShowAsHostile=true end}
+		pseudoSpawnpoint{monster = mon.Id,  x = mon.X, y = mon.Y, z = mon.Z, count = 1, powerChances = {55, 30, 15}, radius = 128, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
 	end
 	
 	--level bonus
@@ -1110,7 +1115,7 @@ function events.MonsterKilled(mon)
 		bonusRoll=bonusRoll*3
 	end
 	if austerity then
-	bonusRoll=0
+		bonusRoll=0
 	end
 	if math.random()<craftDropChances.gems*bonusRoll*insanityMult then
 		baseCraftDrop=true
