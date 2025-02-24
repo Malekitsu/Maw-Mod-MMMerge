@@ -1188,7 +1188,7 @@ function MawRegen()
 				mult=mult*4
 			end
 		
-			local regen=getBuffHealthRegen(pl)/10 --/10 because it's called 10 times per second
+			local regen=getBuffHealthRegen(pl)/10 * timeMultiplier * mult --/10 because it's called 10 times per second
 			regenHP[i] = regenHP[i] + regen
 			local FHP=pl:GetFullHP()
 			--recount
