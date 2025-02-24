@@ -1120,6 +1120,46 @@ waitHP={}
 waitSP={}
 local classesWithNoMeditationRegen={10,11,56,57,58}
 
+function getBuffHealthRegen(pl)
+	local regen=0
+	local FHP = pl:GetFullHP()
+	
+	--regeneration skill
+	local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Regeneration))
+	gmMult=1
+	if RegM==4 then
+		local tot=pl:GetFullHP()
+		local percentage=pl.HP/tot
+		gmMult=math.min(1+(1-percentage)^2,5)
+	end
+	local regenEffect={[0]=0,2,4,6,6}
+	FHP	= pl:GetFullHP()
+	regen=regen + FHP^0.5*RegS^1.65*(regenEffect[RegM]/350)+RegS
+	for it in pl:EnumActiveItems() do
+		if it.Bonus2 == 37 or it.Bonus2==44 or it.Bonus2==50 or it.Bonus2==54 or it.Bonus2==66 or table.find(artifactHpRegen, it.Number) then		
+			regen=regen+FHP*0.02/10	
+		end
+	end
+	
+	if vars.MAWSETTINGS.buffRework=="ON" then 
+		if pl.SpellBuffs[12].ExpireTime>=Game.Time then
+			-- buff
+			local s,m,level=getBuffSkill(71)
+			local skill=(level)^0.65*(1+s*buffPower[71].Base[m]/100)
+			local regen1 = FHP^0.5*skill^1.25*(buffPower[71].Base[m]/1000)
+			--potion
+			RegS, RegM = SplitSkill(Buff.Skill)
+			local regen2 = FHP^0.5*RegS^1.25*((RegM+1)/1000)
+			
+			regen=math.max(regen1, regen2)
+		end
+	elseif Buff.ExpireTime > Game.Time then
+		RegS, RegM = SplitSkill(Buff.Skill)
+		regen = FHP^0.5*RegS^1.25*((RegM+1)/1000)
+	end
+	return regen
+end
+
 function MawRegen()
 	--HP
 	vars.lastRegenTime=vars.lastRegenTime or Game.Time
@@ -1147,38 +1187,10 @@ function MawRegen()
 			if (not Party.EnemyDetectorYellow and not Party.EnemyDetectorRed) then
 				mult=mult*4
 			end
-			--regeneration skill
-			local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Regeneration))
-			gmMult=1
-			if RegM==4 then
-				local tot=pl:GetFullHP()
-				local percentage=pl.HP/tot
-				gmMult=math.min(1+(1-percentage)^2,5)
-			end
-			local regenEffect={[0]=0,2,4,6,6}
-			FHP	= pl:GetFullHP()
-			local regenAmount=FHP^0.5*RegS^1.65*(regenEffect[RegM]/3500)+RegS/10
-			for it in pl:EnumActiveItems() do
-				if it.Bonus2 == 37 or it.Bonus2==44 or it.Bonus2==50 or it.Bonus2==54 or it.Bonus2==66 or table.find(artifactHpRegen, it.Number) then		
-					regenAmount=regenAmount+FHP*0.02/100	
-				end
-			end
-			
-			regenHP[i] = regenHP[i] + regenAmount * timeMultiplier * mult * gmMult
-			--regeneration spell
-			Buff=pl.SpellBuffs[const.PlayerBuff.Regeneration]
-			
-			if vars.MAWSETTINGS.buffRework=="ON" then 
-				if pl.SpellBuffs[12].ExpireTime>=Game.Time then
-					local s,m,level=getBuffSkill(71)
-					local skill=(level)^0.65*(1+s*buffPower[71].Base[m]/100)
-					regenHP[i] = regenHP[i] + (FHP^0.5*skill^1.25*(buffPower[71].Base[m]/10000))* timeMultiplier * mult -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
-				end
-			elseif Buff.ExpireTime > Game.Time then
-				RegS, RegM = SplitSkill(Buff.Skill)
-				regenHP[i] = regenHP[i] + (FHP^0.5*RegS^1.25*((RegM+1)/10000))* timeMultiplier * mult -- around 1/4 of regen compared to skill, considering that of body enchants give around skill*2
-			end
-			
+		
+			local regen=getBuffHealthRegen(pl)/10 --/10 because it's called 10 times per second
+			regenHP[i] = regenHP[i] + regen
+			local FHP=pl:GetFullHP()
 			--recount
 			local id=pl:GetIndex()
 			local healingDone=math.min(FHP-pl.HP, math.floor(regenHP[i]))
