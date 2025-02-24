@@ -222,7 +222,7 @@ function events.GetAttackDelay(t)
 							bonusSpeed=bonusSpeed+skillRecovery[skill][m]*s
 						end
 					end	
-					if it.Bonus2==41 or it.Bonus==59 then
+					if it.Bonus2==41 or it.Bonus2==59 then
 						bonusSpeed=bonusSpeed+20
 					end
 					
