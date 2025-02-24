@@ -657,7 +657,7 @@ function events.GameInitialized2()
 	Game.SkillDesMaster[const.Skills.Dodging]=string.format("%s usable with Leather Armor",Game.SkillDesGM[const.Skills.Dodging])
 	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Dodging])
 	--Game.SkillDesGM[const.Skills.Unarmed]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Unarmed])	
-	Skillz.setDesc(35,1,"Armsmaster skill represents the warrior's tricks of the trade, enhancing your proficiency with all weapons—except staves.\nThis skill allows you to strike faster, execute smoother attacks, and deal more powerful blows.\n\nDamage added by armsmaster skill scales with your weapon skill, amplifying its impact as you grow more adept.\n")
+	Skillz.setDesc(35,1,"Armsmaster skill represents the warrior's tricks of the trade, enhancing your proficiency with all weapons-except staves.\nThis skill allows you to strike faster, execute smoother attacks, and deal more powerful blows.\n\nDamage added by armsmaster skill scales with your weapon skill, amplifying its impact as you grow more adept.\n")
 	baseSpearTooltip=Game.SkillDesGM[const.Skills.Spear]
 	maceGMtxt=Game.SkillDesGM[6] --used for mace tooltip
 end
