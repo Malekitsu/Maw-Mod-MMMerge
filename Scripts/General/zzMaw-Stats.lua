@@ -323,7 +323,7 @@ function events.BuildStatInformationBox(t)
 		HPregenItem=HPregenItem
 		regen=math.round(getBuffHealthRegen(pl)*10)/10
 		
-		hpMap=hpStatsMap[index]
+		hpMap=hpStatsMap[i]
 		
 		t.Text=string.format("%s\n\nHP bonus from Endurance: %s\nHP bonus from Body building: %s\nHP bonus from items: %s\nBase HP: %s\n\n HP Regen per second: %s",t.Text,StrColor(0,255,0,hpMap.totalEnduranceBonus), StrColor(0,255,0,hpMap.totalBBBonus),StrColor(0,255,0,round(hpMap.totalhpFromItems)),StrColor(0,255,0,hpMap.totalBaseHP),StrColor(0,255,0,regen))
 	end
