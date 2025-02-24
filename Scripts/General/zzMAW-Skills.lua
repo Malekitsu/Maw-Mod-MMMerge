@@ -1152,11 +1152,11 @@ function getBuffHealthRegen(pl)
 			RegS, RegM = SplitSkill(Buff.Skill)
 			local regen2 = FHP^0.5*RegS^1.25*((RegM+1)/1000)
 			
-			regen=math.max(regen1, regen2)
+			regen=regen+math.max(regen1, regen2)
 		end
 	elseif Buff.ExpireTime > Game.Time then
 		RegS, RegM = SplitSkill(Buff.Skill)
-		regen = FHP^0.5*RegS^1.25*((RegM+1)/1000)
+		regen = regen+FHP^0.5*RegS^1.25*((RegM+1)/1000)
 	end
 	return regen
 end
