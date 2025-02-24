@@ -2874,7 +2874,11 @@ function mawBuffApply()
 		]]
 		for k=1,#mawSingleBuffList do
 			local id=mawSingleBuffList[k]
-			pl.SpellBuffs[id].ExpireTime=0
+			if vars.buffToIgnore and vars.buffToIgnore[j] and vars.buffToIgnore[j][id] and vars.buffToIgnore[j][id]>Game.Time then
+				pl.SpellBuffs[id].ExpireTime=vars.buffToIgnore[j][id]
+			else
+				pl.SpellBuffs[id].ExpireTime=0
+			end
 		end
 	end
 	for i=1, #buffSpellList do
