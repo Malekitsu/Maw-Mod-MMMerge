@@ -126,9 +126,9 @@ function events.CalcDamageToMonster(t)
 			t.Result=damage*dmgMult
 			
 			if data.Object and data.Object.Spell==133 then
-				critChance, critMult, success=getCritInfo(pl,true)
+				critChance, critMult, success=getCritInfo(pl,true,getMonsterLevel(t.Monster))
 			else
-				critChance, critMult, success=getCritInfo(pl)
+				critChance, critMult, success=getCritInfo(pl,false,getMonsterLevel(t.Monster))
 			end
 			
 			if success then
@@ -308,9 +308,13 @@ function events.BuildStatInformationBox(t)
 		t.Text=string.format("%s\n\nMelee Haste:   %s%%\nRanged Haste: %s%%\nSpell Haste:   %s%%",t.Text,meleeHaste,bowHaste,spellSpeedEffect)
 	end
 	if t.Stat==6 then
-		i=Game.CurrentPlayer
-		local critChance=round(getCritInfo(Party[i], "ranged")*10000)/100
-		local daggerCritBonus=round(getCritInfo(Party[i])*10000)/100
+		local i=Game.CurrentPlayer
+		local lvl=Party[i].LevelBase
+		if Party.High==0 then
+			lvl=calcLevel(Party[0].Experience/5)
+		end
+		local critChance=round(getCritInfo(Party[i], "ranged",lvl)*10000)/100
+		local daggerCritBonus=round(getCritInfo(Party[i],false,lvl)*10000)/100
 		t.Text=string.format("%s\n\nCritical strike chance: %s%%",Game.StatsDescriptions[6],critChance)
 		daggerBonus=daggerCritBonus~=critChance
 		if daggerBonus then
@@ -1302,7 +1306,10 @@ function calcPowerVitality(pl, statsMenu)
 	local atk=pl:GetMeleeAttack()
 	local lvl=pl.LevelBase
 	local hitChance= (15+atk*2)/(30+atk*2+lvl)
-	local critChance, critMult=getCritInfo(pl)
+	if Party.High==0 then
+		lvl=calcLevel(Party[0].Experience/5)
+	end
+	local critChance, critMult=getCritInfo(pl,false,lvl)
 	local enchantDamage=0
 	for i=0,1 do 
 		local it=pl:GetActiveItem(i)
@@ -1356,7 +1363,7 @@ function calcPowerVitality(pl, statsMenu)
 			critChance, critDamage=getCritInfo(pl, "heal")
 			power=power*(1+bonus/2000) 
 		else
-			critChance, critDamage=getCritInfo(pl, "spell")
+			critChance, critDamage=getCritInfo(pl, "spell",lvl)
 			power=power*(1+bonus/1000) 
 		end
 		enchantDamage=0
