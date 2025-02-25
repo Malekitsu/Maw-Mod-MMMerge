@@ -100,7 +100,7 @@ function events.CalcDamageToMonster(t)
 	if t.Player then
 		--[14]="Critical chance over 100% increases total damage",
 		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 14) then
-			local critChance=getCritInfo(t.Player)
+			local critChance=getCritInfo(t.Player,false,getMonsterLevel(t.Monster))
 			t.Result=math.round(t.Result*math.max(critChance,1))
 		end
 		--end of [14]
