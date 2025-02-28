@@ -2380,6 +2380,16 @@ function events.GetSkill(t)
 	if plItemsStats[t.PlayerIndex] and plItemsStats[t.PlayerIndex][t.Skill+50] then
 		bonus = bonus+plItemsStats[t.PlayerIndex][t.Skill+50]
 	end
+	for it in t.Player:EnumActiveItems() do
+		if artifactSpellBonus[it.Number] then
+			for i=1,#artifactSpellBonus[it.Number] do
+				if t.Skill==artifactSpellBonus[it.Number][i] then
+					local baseSkill=SplitSkill(t.Player.Skills[t.Skill])
+					bonus = bonus + baseSkill * 0.5
+				end
+			end
+		end
+	end
 	if t.Skill<=38 then
 		t.Result=bonus+t.Player.Skills[t.Skill]
 		--cap the skill up to double the base amount
@@ -2752,6 +2762,7 @@ function itemStats(index)
 			]]
 			tab[it.Bonus2]=tab[it.Bonus2] + (5 +  math.floor(maxCharges/4))
 		end
+		
 		if table.find(meditationBonusItemMap, it.Bonus2) then
 			local maxCharges=it.MaxCharges
 			--[[
@@ -3506,6 +3517,44 @@ artifactSkillBonus[2035] =	{	[const.Skills.DisarmTraps] = 10}
 --artifacts HP/SP regen
 artifactHpRegen={509,520,1131,1337}
 artifactSpRegen={513,1131,1334}
+
+--artifact spells
+artifactSpellBonus={}
+-- Eclipse
+artifactSpellBonus[516] =	{16, 18, 17}
+-- Crown of final Dominion
+artifactSpellBonus[521] =	{20}
+-- Staff of Elements
+artifactSpellBonus[530] =	{12, 13, 14, 15}
+-- Staff of Elements
+artifactSpellBonus[535] =	{14}
+-- Seven League Boots
+artifactSpellBonus[1314] =	{14}
+-- Ruler's ring
+artifactSpellBonus[1315] =	{17, 20}
+-- Ethric's Staff
+artifactSpellBonus[1317] =	{20}
+-- Glory shield
+artifactSpellBonus[1321] =	{16}
+-- Taledon's Helm
+artifactSpellBonus[1323] = {19}
+-- Phynaxian Crown
+artifactSpellBonus[1325] = {12}
+-- Justice
+artifactSpellBonus[1329] =	{17, 18}
+-- Mekorig's hammer
+artifactSpellBonus[1330] =	{16}
+-- Ghost ring
+artifactSpellBonus[1347] =	{16}
+--faerie ring
+artifactSpellBonus[1348] =	{13}
+-- Guinevere
+artifactSpellBonus[2032] =	{19, 20}
+-- Igraine
+artifactSpellBonus[2033] =	{16, 18, 17}
+-- Morgan
+artifactSpellBonus[2034] =	{12, 13, 14, 15}
+
 
 --refresh stats
 function events.AfterLoadMap()
