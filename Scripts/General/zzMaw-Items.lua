@@ -3526,7 +3526,7 @@ artifactSpellBonus[516] =	{16, 18, 17}
 artifactSpellBonus[521] =	{20}
 -- Staff of Elements
 artifactSpellBonus[530] =	{12, 13, 14, 15}
--- Staff of Elements
+-- Ring of Fusion
 artifactSpellBonus[535] =	{14}
 -- Seven League Boots
 artifactSpellBonus[1314] =	{14}
