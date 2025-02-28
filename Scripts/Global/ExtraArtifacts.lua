@@ -142,26 +142,7 @@ function events.CalcStatBonusByItems(t)
 	end
 end
 ]]
--- Skill bonuses
 
-function events.GetSkill(t)
-	local PLT = PlayerEffects[t.Player]
-	if PLT then
-		local Skill, Mas = SplitSkill(t.Result)
-		if t.Skill>=12 and t.Skill<=20 then
-			local s,m=SplitSkill(t.Player.Skills[t.Skill])
-			Skill = Skill + math.min((PLT.Skills[t.Skill] or 0),s*0.5)
-		else
-			Skill = Skill + math.floor((PLT.Skills[t.Skill] or 0)*math.max(math.min(t.Player.LevelBase/100,2.5),0.5))
-		end
-		if t.Skill<=38 then --cap at 2x
-			local s,m=SplitSkill(t.Player.Skills[t.Skill])
-			t.Result=JoinSkill(math.min(Skill,s*2),m)
-		end
-	elseif Game.CurrentScreen == AdvInnScreen or PlayerInParty(t.PlayerIndex) then
-		StoreEffects(t.Player)
-	end
-end
 
 -- Buffs and extra effects
 
