@@ -1733,9 +1733,9 @@ function ascension()
 		Game.SpellsTxt[99].Description=string.format("This horrible spell sucks the life from all creatures in sight, friend or enemy.  Souldrinker then transfers that life to your party in much the same fashion as Shared Life.  Damage (and healing) is %s + 1-%s per point of skill.",dmgAddTooltip(s, m,99),diceMaxTooltip(s, m,99))
 		
 		Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,103),diceMaxTooltip(s, m,103))
-		Game.SpellsTxt[111].Description=string.format("Lifedrain allows the vampire to damage his or her target and simultaneously heal based on the damage done in the Lifedrain.  This ability does %s points of damage plus 1-%s points of damage per skill.",dmgAddTooltip(s, m,111),diceMaxTooltip(s, m,111))
-		Game.SpellsTxt[111].Master=string.format("Damage %s points plus 1-%s per point of skill",round(dmgAddTooltip(s, m,111)/3*5),round(diceMaxTooltip(s, m,111)/3*5))
-		Game.SpellsTxt[111].GM=string.format("Damage %s points plus 1-%s per point of skill",round(dmgAddTooltip(s, m,111)/3*7),round(diceMaxTooltip(s, m,111)/3*7))
+		Game.SpellsTxt[111].Description=string.format("Lifedrain allows the vampire to damage his or her target and simultaneously heal based on the damage done in the Lifedrain.  This ability does 1-%s points of damage per skill.",diceMaxTooltip(s, m,111))
+		Game.SpellsTxt[111].Master=string.format("Damage 1-%s per point of skill",round(diceMaxTooltip(s, m,111)/3*5))
+		Game.SpellsTxt[111].GM=string.format("Damage 1-%s per point of skill",round(diceMaxTooltip(s, m,111)/3*7))
 		
 		for i=1, #spells do
 			local ascensionLevel=getAscensionTier(s,spells[i])
