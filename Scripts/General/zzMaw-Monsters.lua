@@ -3222,7 +3222,7 @@ function events.Tick()
 				local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
 				if skill=="Fixator" then
 					covered=false
-					local lowestHPId=-1
+					local lowestHPId=0
 					local lowestHP=math.huge
 					for i=0,Party.High do
 						local totHP=Party[i]:GetFullHP()
