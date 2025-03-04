@@ -153,11 +153,11 @@ function recalculateMawMonster()
 	--unique monsters
 	--store table
 	for i=0, Map.Monsters.High do
-		local mon=Map.Monsters[i]
+		mon=Map.Monsters[i]
 		if  mon.NameId >=1 and mon.NameId<220 then
 			--store monster data
 			mapvars.oldUniqueMonsterTable=mapvars.oldUniqueMonsterTable or {}
-			if not mapvars.oldUniqueMonsterTable[i] or type(mapvars.oldUniqueMonsterTable[i])~="table" then
+			if not mapvars.oldUniqueMonsterTable[i] then
 				mapvars.oldUniqueMonsterTable[i]={}
 				--store older relevant info
 				mapvars.oldUniqueMonsterTable[i].ArmorClass=mon.ArmorClass
@@ -182,6 +182,8 @@ function recalculateMawMonster()
 				for v=0,10 do 
 					if v~=5 then
 						mapvars.oldUniqueMonsterTable[i].Resistances[v]=mon.Resistances[v]
+						else
+						mapvars.oldUniqueMonsterTable[i].Resistances[v]=0
 					end
 				end
 			end
@@ -205,7 +207,7 @@ function recalculateMawMonster()
 		for i=0, Map.Monsters.High do
 			local mon=Map.Monsters[i]
 			if  mon.NameId >=1 and mon.NameId<220 then
-				local oldTable=mapvars.oldUniqueMonsterTable[i] 
+				local oldTable=mapvars.oldUniqueMonsterTable[i]
 				--horizontal progression
 				if Game.freeProgression==false then
 					local name=Game.MapStats[Map.MapStatsIndex].Name
@@ -217,9 +219,9 @@ function recalculateMawMonster()
 					partyLvl=mon.Level^1.5-mon.Level
 				end
 				--level increase 
-				local oldLevel=oldTable.Level
+				oldLevel=oldTable.Level
 				mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
-				mapvars.uniqueMonsterLevel[i]=oldLevel+partyLvl
+				mapvars.uniqueMonsterLevel[i]=oldTable.Level+partyLvl
 				mon.Level=math.min(mapvars.uniqueMonsterLevel[i],255)
 				--HP calculated based on previous HP rapported to the previous level
 				HPRateo=oldTable.FullHP/(oldLevel*(oldLevel/10+3))
