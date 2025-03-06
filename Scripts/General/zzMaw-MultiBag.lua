@@ -79,48 +79,53 @@ function events.Action(t)
 			end
 		end
 	end
-	--keep the button pushed effect
-	function events.Tick()
-		events.Remove("Tick", 1)
-		if Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
-			local pl=Party[Game.CurrentPlayer]
-			local id=pl:GetIndex()
-			vars.mawbags=vars.mawbags or {}
-			if not vars.mawbags[id] then
-				currentBag=1
+end
+
+--keep the button pushed effect
+function events.Tick()
+	if Game.CurrentScreen ~= 7 then
+		for i=6,10 do
+			multibagButton[i].Active=false
+		end
+	end
+	if Game.CurrentScreen == 7 and Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
+		local pl=Party[Game.CurrentPlayer]
+		local id=pl:GetIndex()
+		vars.mawbags=vars.mawbags or {}
+		if not vars.mawbags[id] then
+			currentBag=1
+		else
+			currentBag=vars.mawbags[id].CurrentBag%5
+			if currentBag==0 then
+				currentBag=5
+			end				
+		end
+		for i=1,5 do
+			if i==currentBag then
+				multibagButton[i].IUpSrc="SlChar" .. i .. "D"
 			else
-				currentBag=vars.mawbags[id].CurrentBag%5
-				if currentBag==0 then
-					currentBag=5
-				end				
-			end
-			for i=1,5 do
-				if i==currentBag then
-					multibagButton[i].IUpSrc="SlChar" .. i .. "D"
-				else
-					multibagButton[i].IUpSrc="SlChar" .. i .. "U"
-				end
-			end
-			--tab
-			local currentTab=1
-			if vars and vars.mawbags and vars.mawbags[id] then
-				currentTab=math.ceil(vars.mawbags[id]["CurrentBag"]/100)
-			end
-			for i=1,5 do
-				if i==currentTab then
-					multibagButton[i+5].IUpSrc="SlChar" .. i .. "D"
-				else
-					multibagButton[i+5].IUpSrc="SlChar" .. i .. "U"
-				end
-				if Party.High==0 and Game.CurrentScreen==7 then
-					multibagButton[i+5].Active=true
-				else
-					multibagButton[i+5].Active=false
-				end
+				multibagButton[i].IUpSrc="SlChar" .. i .. "U"
 			end
 		end
-	end	
-end
+		--tab
+		local currentTab=1
+		if vars and vars.mawbags and vars.mawbags[id] then
+			currentTab=math.ceil(vars.mawbags[id]["CurrentBag"]/100)
+		end
+		for i=1,5 do
+			if i==currentTab then
+				multibagButton[i+5].IUpSrc="SlChar" .. i .. "D"
+			else
+				multibagButton[i+5].IUpSrc="SlChar" .. i .. "U"
+			end
+			if Party.High==0 and Game.CurrentScreen==7 then
+				multibagButton[i+5].Active=true
+			else
+				multibagButton[i+5].Active=false
+			end
+		end
+	end
+end	
 
 
 --multiple inventory code
@@ -233,10 +238,6 @@ function changeBag(pl, bag)
 	else
 		local bags=vars.mawbags[id][bag]
 		local j=0
-		if isnan(bags) then
-			bags={}
-			debug.Message(pl.Name .. "'s bag number " .. bag .. " is corrupted. Bag has been resetted, otherwise game will crash. If you have a previous save you might want to load hope the bag is not broken there.")
-		end
 		for i=1,#bags do
 			local it=bags[i]
 			local inv
@@ -502,8 +503,4 @@ function events.Action(t)
 			end	
 		end
 	end
-end
-
-function isnan(x)
-    return x ~= x
 end
