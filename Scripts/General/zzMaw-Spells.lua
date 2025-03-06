@@ -2951,7 +2951,7 @@ function mawBuffApply()
 		Party.SpellBuffs[19].Power=math.max(10,Party.SpellBuffs[19].Power)
 		Party.SpellBuffs[19].Skill=math.max(2,Party.SpellBuffs[19].Skill)
 		Party.SpellBuffs[16].ExpireTime=math.max(Game.Time+const.Hour, Party.SpellBuffs[16].ExpireTime)
-		Party.SpellBuffs[16].Power=math.max(2,Party.SpellBuffs[16].Power)
+		Party.SpellBuffs[16].Power=math.max(3,Party.SpellBuffs[16].Power)
 		Party.SpellBuffs[16].Skill=math.max(1,Party.SpellBuffs[16].Skill)
 	end
 	--magic potion fix
