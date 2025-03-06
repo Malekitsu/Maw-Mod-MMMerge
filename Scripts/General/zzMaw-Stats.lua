@@ -1356,6 +1356,13 @@ function calcPowerVitality(pl, statsMenu)
 		end
 		
 		power=damageAdd + skill*(diceMin+diceMax)/2
+		if spellIndex==111 then
+			if mastery==3 then
+				power=power/3*5
+			elseif mastery==4 then
+				power=power/3*7
+			end
+		end
 		intellect=pl:GetIntellect()	
 		personality=pl:GetPersonality()
 		bonus=math.max(intellect,personality)
