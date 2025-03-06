@@ -128,6 +128,7 @@ function events.Tick()
 end	
 
 
+
 --multiple inventory code
 function changeBag(pl, bag)
 	local id=pl:GetIndex()
@@ -238,6 +239,10 @@ function changeBag(pl, bag)
 	else
 		local bags=vars.mawbags[id][bag]
 		local j=0
+		if isnan(bags) then
+			bags={}
+			debug.Message(pl.Name .. "'s bag number " .. bag .. " is corrupted. Bag has been resetted, otherwise game will crash. If you have a previous save you might want to load hope the bag is not broken there.")
+		end
 		for i=1,#bags do
 			local it=bags[i]
 			local inv
@@ -369,13 +374,13 @@ function sortMultiBag(pl)
 				return indexA ~= nil
 			end
 		end
-		
+
 		-- Original sorting logic
 		if a["size"] == b["size"] then
 			-- When sizes are equal, compare by skill
 			local skillA = Game.ItemsTxt[a["Number"]].Skill
 			local skillB = Game.ItemsTxt[b["Number"]].Skill
-			
+
 			if skillA == skillB then
 				-- If skills are also equal, then sort by item number
 				return a["Number"] < b["Number"]
@@ -503,4 +508,8 @@ function events.Action(t)
 			end	
 		end
 	end
+end
+
+function isnan(x)
+    return x ~= x
 end
