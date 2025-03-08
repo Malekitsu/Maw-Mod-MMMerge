@@ -1714,7 +1714,7 @@ function events.MonsterKilled(mon)
 		return
 	end
 	mapvars.mapsDropped=mapvars.mapsDropped or 0
-	if totalLevel[mon.Id]>100 and math.random()<0.001*mon.Level/100/(mapvars.mapsDropped+1) then
+	if getMonsterLevel(mon)>100 and math.random()<0.001*mon.Level/100/(mapvars.mapsDropped+1) then
 		assignedAffixes = {}
 		obj = SummonItem(290, mon.X, mon.Y, mon.Z + 100, 100)
 		possibleMaps={}
