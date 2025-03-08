@@ -1081,7 +1081,7 @@ function events.BuildItemInformationBox(t)
 							power=power*1.5
 						end
 					end
-					power=round((1-1/1.5^(power^0.6/15))*1000)/10 .. "%"
+					power=round((1-1/1.5^(power^0.6/10))*1000)/10 .. "%"
 				end
 				t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. power
 			end
