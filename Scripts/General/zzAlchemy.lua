@@ -918,7 +918,7 @@ evt.PotionEffects[83] = function(IsDrunk, t, Power)
 		if t:T().EquipStat<=3 then
 			changeIncrease=2
 		end
-		t.MaxCharges=math.min(t.MaxCharges+4,maxChargesCap)
+		t.MaxCharges=math.min(t.MaxCharges+changeIncrease,maxChargesCap)
 		Mouse.Item.Number=0
 		mem.u4[0x51E100] = 0x100 
 		t.Condition = t.Condition:Or(0x10)
