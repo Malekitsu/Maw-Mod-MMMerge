@@ -2931,7 +2931,11 @@ function mawBuffApply()
 				end	
 			end
 			if vars.mawbuff[8] then
-				Party.SpellBuffs[10].Caster=vars.mawbuff[8]+1
+				if type(vars.mawbuff[8])=="string" then
+					Party.SpellBuffs[10].Caster=1
+				else
+					Party.SpellBuffs[10].Caster=vars.mawbuff[8]+1
+				end
 			end
 		end
 	end
