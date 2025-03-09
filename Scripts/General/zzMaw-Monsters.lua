@@ -1536,7 +1536,7 @@ mapLevels={
 {["Low"] = 65 , ["Mid"] = 69 , ["High"] = 85},
 
 ["Tunnels to Eeofol"] = 
-{["Low"] = 60 , ["Mid"] = 70 , ["High"] = 80},
+{["Low"] = 60 , ["Mid"] = 70 , ["High"] = 70},
 
 ["The Land of the Giants"] = 
 {["Low"] = 70 , ["Mid"] = 75 , ["High"] = 90},
