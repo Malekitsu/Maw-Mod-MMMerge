@@ -3119,6 +3119,7 @@ local transformedList={734,739,712,732,740,737,736}
 
 function events.Tick()
 	if vars.MAWSETTINGS.restoreProjectiles=="OFF" then return end
+	if Multiplyer and Multiplayer.in_game then return end
 	for i=0, Map.Objects.High do
 		local obj=Map.Objects[i]
 		if transform[obj.Type] and obj.Owner%8==3 then
