@@ -232,7 +232,7 @@ function events.GameInitialized2()
 	OnOffTumbler(ExSetScr, 95, 326, VarsToStore[4])
 	
 	-- Game mode
-	gameMode={[0]="Normal", [2]="Doom", [4]="Road to\ninsanity",[6]="Speed\nrun" ,[8]="Online"}
+	gameMode={[0]="Normal", [2]="Doom", [4]="Road to\ninsanity",[6]=" Austerity",[8]="Speed\nrun" }
 	Game.Mode = Game.Mode or 0
 	NumberRegulator(21, 530, 20, "Mode",
 		function(t, val)
@@ -251,7 +251,7 @@ function events.GameInitialized2()
 			vars.insanityMode=true
 			vars.Mode=2
 		end
-		if vars.Mode==6 then
+		if vars.Mode==8 then
 			vars.Mode=2
 			vars.ChallengeMode=true
 		end
@@ -261,11 +261,16 @@ function events.GameInitialized2()
 				Party[i].Experience=Party[i].Experience+10000/Party.Count
 			end
 		end
+		if vars.Mode==6 then
+			vars.AusterityMode=true
+		end
+		--[[ removed, as it's buggy and take too much work compared to the demand for it
 		if vars.Mode==8 then
 			vars.ChallengeMode=true
 			vars.Mode=2 --doom
 			vars.onlineMode=true
 		end
+		]]
 	end
 	function events.Action(t)
 		if t.Action==132 or t.Action==124 then
