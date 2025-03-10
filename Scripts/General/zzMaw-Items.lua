@@ -136,6 +136,26 @@ enc1Chance={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80}
 enc2Chance={20,30,35,40,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60}
 spcEncChance={5,10,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40}
 
+function events.BeforeLoadMap()
+	if vars.AusterityMode then
+		encStrDown={1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 19, 20, 21, 22, 23, 24, 25}
+		encStrUp={3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60}
+
+
+		enc1Chance = {20, 20, 21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26, 27, 27, 28, 28, 29, 29}
+		enc2Chance = {10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19}
+		spcEncChance = {40, 40, 41, 41, 42, 42, 43, 43, 44, 44, 45, 45, 46, 46, 47, 47, 48, 48, 49, 49}
+	else
+		encStrDown={2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,78,80,82,84}
+		encStrUp={3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87,90,93,96,99,102,105,108,111,114,117,120,125,130}
+
+
+		enc1Chance={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80}
+		enc2Chance={20,30,35,40,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60}
+		spcEncChance={5,10,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40}
+	end
+end
+
 primordialWeapEnchants={39,40,41,46}
 primordialArmorEnchants={1,2,80}
 
@@ -226,7 +246,7 @@ function events.ItemGenerated(t)
 		return
 	end
 	--spawn crafting materials in misc shops, substituting recipes
-	if (Game.HouseScreen==2 or Game.HouseScreen==95) and not austerity then
+	if (Game.HouseScreen==2 or Game.HouseScreen==95) and not vars.AusterityMode then
 		local id=Game:GetCurrentHouse()
 		if (t.Item:T().EquipStat>=12 and math.random()<0.05 or t.Item:T().EquipStat==19) and id<=110 then 
 			t.Item.Bonus=0
@@ -328,7 +348,7 @@ function events.ItemGenerated(t)
 		end
 		--modify reagents
 		local itmod=3
-		if austerity==true then
+		if vars.AusterityMode then
 			itmod=8
 		end
 		if reagentList[t.Item.Number] then
@@ -538,7 +558,7 @@ function events.ItemGenerated(t)
 		--legendary
 		if t.Item.BonusExpireTime==2 then
 			local chance=0.1
-			if austerity==true then
+			if vars.AusterityMode then
 				chance=0
 			end
 			if vars.Mode==2 then
@@ -2824,21 +2844,21 @@ function itemStats(index)
 	local shieldResMult=(skillItemRes[const.Skills.Shield][m]*s/100)
 	
 	itemArmorClassBonus1=math.round(armorAC*armorMult)
-	if armorAC>=1 and austerity then
+	if armorAC>=1 and vars.AusterityMode then
 		itemArmorClassBonus1=math.max(itemArmorClassBonus1,math.round(bodyS*bodyM)*2)
 	end
 	itemArmorClassBonus2=math.round(shieldAC*shieldMult)
-	if shieldAC>=1 and austerity then
+	if shieldAC>=1 and vars.AusterityMode then
 		itemArmorClassBonus2=math.max(itemArmorClassBonus2,math.round(s*m)*2)
 	end
 	tab[10]=tab[10]+itemArmorClassBonus1+itemArmorClassBonus2
 	
 	itemResistanceBonus1=math.round(armorAC*armorResMult)
-	if armorAC>=1 and austerity then
+	if armorAC>=1 and vars.AusterityMode then
 		itemResistanceBonus1=math.max(itemResistanceBonus1,math.round(bodyS*bodyM)*2)
 	end
 	itemResistanceBonus2=math.round(shieldAC*shieldResMult)
-	if shieldAC>=1 and austerity then
+	if shieldAC>=1 and vars.AusterityMode then
 		itemResistanceBonus2=math.max(itemResistanceBonus2,math.round(s*m)*2)
 	end
 	
