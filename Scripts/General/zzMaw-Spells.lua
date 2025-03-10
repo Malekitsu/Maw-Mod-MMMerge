@@ -3312,17 +3312,3 @@ function getMaxMana(pl)
 		return sp
 	end	
 end
-
-function events.PlayerCastSpell(t)
-	if t.SpellId==33 and t.IsSpellScroll and Party.High==0 then
-		local pl=Party[0]
-		s,m=SplitSkill(pl.Skills[const.Skills.Water])
-		if s==0 and m==0 then
-			pl.Skills[const.Skills.Water]=JoinSkill(0,4)
-			function events.Tick()
-				events.Remove("Tick",1)
-				pl.Skills[const.Skills.Water]=JoinSkill(s,m)
-			end
-		end
-	end
-end
