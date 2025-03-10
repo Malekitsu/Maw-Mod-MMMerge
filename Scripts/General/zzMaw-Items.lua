@@ -1085,11 +1085,9 @@ function events.BuildItemInformationBox(t)
 						power=round(power*0.667)
 					end
 				end
-				--[[insanity
-				if vars.insanityMode then
-					power=math.ceil(power*4/3)
+				if t.Item:T().Skill==40 and t.Item:T().Mod2==0 then
+					power=math.ceil(power*1.5)
 				end
-				]]
 				if t.Item.BonusExpireTime==20 then
 					power=math.ceil(power*1.5)
 				end
@@ -1115,11 +1113,9 @@ function events.BuildItemInformationBox(t)
 						strength=round(strength*0.667)
 					end
 				end
-				--[[insanity
-				if vars.insanityMode then
-					strength=math.ceil(strength*4/3)
-				end
-				]]				
+				if t.Item:T().Skill==40 and t.Item:T().Mod2==0 then
+					strength=math.ceil(strength*1.5)
+				end				
 				if t.Item.BonusExpireTime==20 then
 					strength=math.ceil(strength*1.5)
 				end
@@ -2563,6 +2559,9 @@ function itemStats(index)
 			if it.BonusExpireTime==20 then
 				power=math.ceil(power*1.5)
 			end
+			if it:T().Skill==40 and it:T().Mod2==0 then
+				power=math.ceil(power*1.5)
+			end
 			if it.Bonus<=10 then
 				tab[it.Bonus]=tab[it.Bonus]+power
 				--legendary power 12
@@ -2612,8 +2611,24 @@ function itemStats(index)
 			if it.BonusExpireTime==20 then
 				power=math.ceil(power*1.5)
 			end
+			if it:T().Skill==40 and it:T().Mod2==0 then
+				power=math.ceil(power*1.5)
+			end
 			if bonus<=10 then
 				tab[math.floor(it.Charges/1000)]=tab[math.floor(it.Charges/1000)]+power
+				--legendary power 12
+				if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 12) then
+					if it.Bonus==1 then
+						tab[2]=tab[2]+power*0.75
+						tab[3]=tab[3]+power*0.75
+					elseif it.Bonus==2 then
+						tab[1]=tab[1]+power*0.75
+						tab[3]=tab[3]+power*0.75
+					elseif it.Bonus==3 then
+						tab[1]=tab[1]+power*0.75
+						tab[2]=tab[2]+power*0.75
+					end
+				end
 			else
 				vars.normalEnchantResistance[index][bonus]=math.max(vars.normalEnchantResistance[index][bonus], power)	
 			end
