@@ -1,4 +1,8 @@
 function events.GameInitialized2()
+	storePotionsNames={}
+	for i=232,263 do
+		storePotionsNames[i]=Game.ItemsTxt[i].Picture
+	end
 	for i=252, 263 do
 		Game.ItemsTxt[i].Picture="item182"
 	end
@@ -6,24 +10,27 @@ function events.GameInitialized2()
 	for i=264,299 do
 		Game.ItemsTxt[i].Name="Potion Deleted in MAW"
 	end
-	if austerity == true then
-	for i=232,237 do
-		Game.ItemsTxt[i].Name="Potion Deleted in Austerity"
-	end
-	for i=252,256 do
-		Game.ItemsTxt[i].Name="Potion Deleted in Austerity"
-	end
-	for i=261,263 do
-		Game.ItemsTxt[i].Name="Potion Deleted in Austerity"
-	end
-	for i=1783,1789 do
-		Game.ItemsTxt[i].Name="Potion Deleted in Austerity"
-	end
 end
+function events.LoadMap()
+	if vars.AusterityMode then
+		for i=232,237 do
+			Game.ItemsTxt[i].Name="Potion Deleted in Austerity"
+		end
+		for i=252,256 do
+			Game.ItemsTxt[i].Name="Potion Deleted in Austerity"
+		end
+		for i=261,263 do
+			Game.ItemsTxt[i].Name="Potion Deleted in Austerity"
+		end
+	else
+		for i=232,263 do
+			Game.ItemsTxt[i].Picture=storePotionsNames[i]
+		end
+	end
 end
 
 function events.LoadMap()
-	if austerity == true then
+	if vars.AusterityMode == true then
 		for i=0, Party.High do
 			Party[i].Skills[const.Skills.IdentifyMonster] = JoinSkill(10, const.GM)
 		end
@@ -1124,7 +1131,7 @@ function events.MonsterKilled(mon)
 	if table.find(noCorpseMonsters,mon.Id) then
 		bonusRoll=bonusRoll*3
 	end
-	if austerity then
+	if vars.AusterityMode then
 		bonusRoll=0
 	end
 	if math.random()<craftDropChances.gems*bonusRoll*insanityMult then
@@ -1178,3 +1185,5 @@ function events.GameInitialized2()
 	Game.ItemsTxt[1062].Notes="This Hourglass allows to add a second base enchant to any equipment that has 1 base and a special enchant\n(right-click on an item with a base enchant to use)"
 	Game.ItemsTxt[1067].Notes="Oracle's Orb is a mysterious and powerful artifact, a large, purple orb with a haunting face suspended within its core. This enigmatic relic is known for storing legendary abilities upon items it enchants.\n\n Adds the following legendary power to an item:"
 end
+
+
