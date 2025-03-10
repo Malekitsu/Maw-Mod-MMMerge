@@ -1289,6 +1289,10 @@ function events.PlayerCastSpell(t)
 				local mon=Map.Monsters[i]
 				mon.Level=level[i]
 				mon.Resistances[cc.DamageKind]=resistance[i]
+				local duration=cc.Duration
+				if Party.High==0 then
+					duration=duration*2
+				end
 				if type(cc.Debuff)=="table" then
 					for v =1,4 do 
 						local debuff=mon.SpellBuffs[cc.Debuff[v]]
