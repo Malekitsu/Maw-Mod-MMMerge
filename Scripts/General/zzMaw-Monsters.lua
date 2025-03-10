@@ -257,7 +257,7 @@ function recalculateMawMonster()
 				if vars.insanityMode then
 					hpMult=hpMult*(1.5+HPBolsterLevel/300)
 				end
-				if austerity==true then
+				if vars.AusterityMode then
 					hpMult=((hpMult*3-math.min(2, hpMult*2))+1)
 				end
 				HP=HP*hpMult
@@ -304,7 +304,7 @@ function recalculateMawMonster()
 				end
 				local totalHP=mon.HP*2^(math.floor(mon.Resistances[0]/1000))
 				local austerityMod=1
-				if austerity==true then
+				if vars.AusterityMode then
 					austerityMod=4
 				end
 				local minHP=HPtable[mon.Id]*2*(1+txt.Level/80/austerityMod)
@@ -698,7 +698,7 @@ function recalculateMonsterTable()
 		if vars.insanityMode then
 			hpMult=hpMult*(1.5+totalLevel[i]/300)
 		end
-		if austerity==true then
+		if vars.AusterityMode==true then
 			hpMult=((hpMult*3-math.min(2, hpMult*2))+1)
 		end
 		--crit nerf fix
@@ -2431,7 +2431,7 @@ end
 function generateBoss(index,nameIndex)
 	mon=Map.Monsters[index]
 	local austerityMod=1
-	if austerity==true then
+	if vars.AusterityMode then
 		austerityMod=4
 	end
 	HP=round(mon.FullHP*2*(1+mon.Level/80/austerityMod)*(1+math.random()/austerityMod))
@@ -2949,7 +2949,7 @@ end
 --nerf to movement speed in doom
 function events.Tick()
 	if Game.TurnBased then
-		if vars.Mode==2 or austerity==true then
+		if vars.Mode==2 or vars.AusterityMode then
 			if Game.TurnBasedPhase==2 then
 				turnBaseStartPositionX, turnBaseStartPositionY = Party.X, Party.Y
 			elseif Game.TurnBasedPhase==3 then
@@ -3404,8 +3404,8 @@ function getMonsterDamage(lvl,calcType)
 	if vars.insanityMode then
 		diffMult=diffMult*(1.5+lvl/300)
 	end
-	if austerity==true then
-		diffMult=(diffMult*5-math.min(3.5, diffMult*3.5))^1.5
+	if vars.AusterityMode then
+		diffMult=(diffMult*5-math.min(3.5, diffMult*3.5))^1.25
 	end
 	if calcType=="diffMult" then
 		return diffMult
