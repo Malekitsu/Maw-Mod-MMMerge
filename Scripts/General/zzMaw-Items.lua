@@ -1085,7 +1085,7 @@ function events.BuildItemInformationBox(t)
 						power=round(power*0.667)
 					end
 				end
-				if t.Item:T().Skill==40 and t.Item:T().Mod2==0 then
+				if t.Item:T().EquipStat==5 and t.Item:T().Mod2==0 then
 					power=math.ceil(power*1.5)
 				end
 				if t.Item.BonusExpireTime==20 then
@@ -1113,7 +1113,7 @@ function events.BuildItemInformationBox(t)
 						strength=round(strength*0.667)
 					end
 				end
-				if t.Item:T().Skill==40 and t.Item:T().Mod2==0 then
+				if t.Item:T().EquipStat==5 and t.Item:T().Mod2==0 then
 					strength=math.ceil(strength*1.5)
 				end				
 				if t.Item.BonusExpireTime==20 then
@@ -2502,7 +2502,7 @@ function itemStats(index)
 		end
 		
 		local txt=it:T()
-		if (txt.Skill>=8 and txt.Skill<=11) or (txt.Skill==40 and txt.EquipStat~=12) then --AC from items
+		if (txt.Skill>=8 and txt.Skill<=11) or (txt.EquipStat==5 and txt.EquipStat~=12) then --AC from items
 			local mult=0
 			local resMult=0
 			local skill=it:T().Skill
@@ -2559,7 +2559,7 @@ function itemStats(index)
 			if it.BonusExpireTime==20 then
 				power=math.ceil(power*1.5)
 			end
-			if it:T().Skill==40 and it:T().Mod2==0 then
+			if it:T().EquipStat==5 and it:T().Mod2==0 then
 				power=math.ceil(power*1.5)
 			end
 			if it.Bonus<=10 then
@@ -2611,7 +2611,7 @@ function itemStats(index)
 			if it.BonusExpireTime==20 then
 				power=math.ceil(power*1.5)
 			end
-			if it:T().Skill==40 and it:T().Mod2==0 then
+			if it:T().EquipStat==5 and it:T().Mod2==0 then
 				power=math.ceil(power*1.5)
 			end
 			if bonus<=10 then
