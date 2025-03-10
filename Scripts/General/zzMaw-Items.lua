@@ -2502,7 +2502,7 @@ function itemStats(index)
 		end
 		
 		local txt=it:T()
-		if (txt.Skill>=8 and txt.Skill<=11) or (txt.EquipStat==5 and txt.EquipStat~=12) then --AC from items
+		if (txt.Skill>=8 and txt.Skill<=11) or (txt.Skill==40 and txt.EquipStat~=12) then --AC from items
 			local mult=0
 			local resMult=0
 			local skill=it:T().Skill
