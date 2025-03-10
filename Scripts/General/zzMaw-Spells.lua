@@ -873,7 +873,7 @@ end)
 --removes fly when attacking, except in certain maps
 flyAllowedMaps={"elema.odm","elemf.odm","elemw.odm","out12.odm","outa1.odm","outa2.odm","outa3.odm","outb2.odm","outb3.odm","out05.odm"}
 function events.CalcDamageToMonster(t)
-	if Game.BolsterAmount>100 or austerity==true then
+	if Game.BolsterAmount>100 or vars.AusterityMode then
 		if table.find(flyAllowedMaps,Map.Name) then 
 			return
 		end
@@ -1208,7 +1208,7 @@ function getCCDiffMult(bolster)
 	if vars.insanityMode then
 		diffMult=5
 	end
-	if austerity==true then
+	if vars.AusterityMode then
 	diffMult=diffMult*2.5
 	end
 	return diffMult
@@ -1282,7 +1282,7 @@ function events.PlayerCastSpell(t)
 				events.Remove("Tick", 1)
 			end
 			local mult=getCCDiffMult(Game.BolsterAmount) 
-				if austerity==true then
+				if vars.AusterityMode then
 				mult=mult*2.5
 				end
 			for i=0,Map.Monsters.High do
@@ -1538,7 +1538,7 @@ function events.CalcDamageToMonster(t)
 		else
 			mult=massHPMULT[Game.BolsterAmount] or 1
 		end
-		if austerity==true then
+		if vars.AusterityMode then
 			mult=mult*4
 		end
 		t.Result=t.Result/mult^0.5*math.max(1, (mon.Level/250)^2)
