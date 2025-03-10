@@ -1388,7 +1388,7 @@ function events.GameInitialized2()
 			[41] = {dmgAdd = 8, diceMin = 1, diceMax = 8, },--rock blast
 			[43] = {dmgAdd = 0, diceMin = 1, diceMax = 2, },--death blossom
 			[44] = {dmgAdd = 15, diceMin = 0.5, diceMax = 0.5, },--mass distorsion, nerfed
-			[52] = {dmgAdd = 10, diceMin = 2, diceMax = 8, },--spirit lash
+			[52] = {dmgAdd = 20, diceMin = 2, diceMax = 16, },--spirit lash
 			[59] = {dmgAdd = 12, diceMin = 1, diceMax = 6, },--mind blast
 			[65] = {dmgAdd = 25, diceMin = 1, diceMax = 25, },--psychic shock
 			[70] = {dmgAdd = 4, diceMin = 1, diceMax = 4, },--harm
@@ -3311,4 +3311,18 @@ function getMaxMana(pl)
 		local sp=pl:GetFullSP()
 		return sp
 	end	
+end
+
+function events.PlayerCastSpell(t)
+	if t.SpellId==33 and t.IsSpellScroll and Party.High==0 then
+		local pl=Party[0]
+		s,m=SplitSkill(pl.Skills[const.Skills.Water])
+		if s==0 and m==0 then
+			pl.Skills[const.Skills.Water]=JoinSkill(0,4)
+			function events.Tick()
+				events.Remove("Tick",1)
+				pl.Skills[const.Skills.Water]=JoinSkill(s,m)
+			end
+		end
+	end
 end
