@@ -1,7 +1,7 @@
 function events.GameInitialized2()
 	storePotionsNames={}
 	for i=232,263 do
-		storePotionsNames[i]=Game.ItemsTxt[i].Picture
+		storePotionsNames[i]=Game.ItemsTxt[i].Name
 	end
 	for i=252, 263 do
 		Game.ItemsTxt[i].Picture="item182"
@@ -24,7 +24,7 @@ function events.LoadMap()
 		end
 	else
 		for i=232,263 do
-			Game.ItemsTxt[i].Picture=storePotionsNames[i]
+			Game.ItemsTxt[i].Name=storePotionsNames[i]
 		end
 	end
 end
