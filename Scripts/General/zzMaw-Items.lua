@@ -3990,7 +3990,7 @@ end
 
 --convert gems, from lower to highest
 --NAMES
-local craftingNames={"Moonstone", "Topaz", "Amethyst", "Amber", "Purple Topaz", "Ruby", "Sunstone", "Emerald", "Sapphire", "Diamond"}
+local craftingNames={"Moonstone", "Topaz", "Amethyst", "Amber", "Purple Topaz", "Ruby", "Sunstone", "Emerald", "Sapphire", "Diamond","Ascended Moonstone", "Ascended Topaz", "Ascended Amethyst", "Ascended Amber", "Ascended Purple Topaz", "Ascended Ruby", "Ascended Sunstone", "Ascended Emerald", "Ascended Sapphire", "Ascended Diamond"}
 function events.KeyDown(t)
 	if t.Key ~=85 then
 		gemUpgrading=false
@@ -3998,26 +3998,71 @@ function events.KeyDown(t)
     if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 103 then
 		if t.Key ==85 and gemUpgrading then
 			gemUpgrading=false
-			for i=1,9 do
+			for i=1,19 do
 				local id=1050+i
-				if evt.CheckItemsCount{MinItemIndex = id, MaxItemIndex = id, Count = 3} then
-					evt.Subtract("Items",id)
-					evt.Subtract("Items",id)
-					evt.Subtract("Items",id)
-					evt.Add("Items",id+1)
-					Game.ShowStatusText(string.format("%s created", craftingNames[i+1]))
-					return
+				local bonusStrength=0
+				if i>10 then
+					id=1050+i-10
+					bonusStrength=1
+				end
+				local gemsFound=0
+				for j=0,Party.High do
+					local pl=Party[j]
+					for k=1,pl.Items.High do
+						if pl.Items[k].Number==id and pl.Items[k].BonusStrength==bonusStrength then
+							gemsFound=gemsFound+1
+						end
+					end
+				end
+				
+				if gemsFound>=3 then
+					local gemsRemoved=0
+					for j=0,Party.High do
+						local pl=Party[j]
+						for k=1,pl.Items.High do
+							if pl.Items[k].Number==id and pl.Items[k].BonusStrength==bonusStrength then
+								pl.Items[k].Number=0
+								gemsRemoved=gemsRemoved+1
+								if gemsRemoved==3 then
+									id=id+1
+									if id>1060 then
+										id=id-10
+										bonusStrength=1
+									end
+									evt.Add("Items",id)
+									Mouse.Item.BonusStrength=bonusStrength
+									Game.ShowStatusText(string.format("%s created", craftingNames[i+1]))
+									return
+								end
+							end
+						end
+					end
 				end
 			end
+			
 			Game.ShowStatusText("No gem to upgrade")
 			return
 		end
 		
         if t.Key == 85 then -- "u" key
             gemUpgrading=true
-            for i=1,9 do
+            for i=1,19 do
 				local id=1050+i
-				if evt.CheckItemsCount{MinItemIndex = id, MaxItemIndex = id, Count = 3} then
+				local bonusStrength=0
+				if i>10 then
+					id=1050+i-10
+					bonusStrength=1
+				end
+				local gemsFound=0
+				for j=0,Party.High do
+					local pl=Party[j]
+					for k=1,pl.Items.High do
+						if pl.Items[k].Number==id and pl.Items[k].BonusStrength==bonusStrength then
+							gemsFound=gemsFound+1
+						end
+					end
+				end
+				if gemsFound>=3 then
 					Game.ShowStatusText(string.format("Convert %s into %s? (U)",craftingNames[i], craftingNames[i+1]))
 					return
 				end
