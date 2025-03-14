@@ -2274,10 +2274,12 @@ function checkMapCompletition()
 				gold=math.ceil(experience^0.9/1000)*1000 
 				evt.ForPlayer(0)
 				evt.Add{"Gold", Value = gold}
-				evt.Add("Items",math.min(1050+math.ceil(mapLevel/25+0.5),1060))
-				evt.Add("Items",math.min(1050+math.ceil(mapLevel/25+0.5),1060))
-				if m>250 and mapLevel>90 then
-					evt.Add("Items", 1063)
+				if not vars.AusterityMode then
+					evt.Add("Items",math.min(1050+math.ceil(mapLevel/25+0.5),1060))
+					evt.Add("Items",math.min(1050+math.ceil(mapLevel/25+0.5),1060))
+					if m>250 and mapLevel>90 then
+						evt.Add("Items", 1063)
+					end
 				end
 				experience=experience*5/Party.Count
 				for i=0,Party.High do
