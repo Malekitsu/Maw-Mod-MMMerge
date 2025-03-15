@@ -2502,7 +2502,7 @@ function generateBoss(index,nameIndex)
 end
 
 --SKILLS
-SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Adamantite","Swapper","Regenerating","Puller","Leecher","Swift","Fixator","Shadow"} --defensives
+SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Adamantite","Swapper","Regenerating","Puller","Leecher","Swift","Fixator","Shadow","Plagueborn"} --defensives
 --to add: splitting
 --on attack skills
 function events.GameInitialized2() --to make the after all the other code
@@ -2517,6 +2517,8 @@ function events.GameInitialized2() --to make the after all the other code
 				end
 			elseif skill=="Venomous" then
 				t.Player.Poison3=Game.Time
+			elseif skill=="Plagueborn" then
+				t.Player.Disease3=Game.Time
 			elseif skill=="Fixator" then
 				t.Player.Weak=Game.Time
 			elseif skill=="Swapper" then	
