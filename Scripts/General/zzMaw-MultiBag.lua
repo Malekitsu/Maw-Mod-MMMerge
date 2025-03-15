@@ -88,7 +88,7 @@ function events.Tick()
 			multibagButton[i].Active=false
 		end
 	end
-	if Game.CurrentScreen == 7 and Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
+	if (Game.CurrentScreen == 7 or Game.CurrentScreen==13) and Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
 		local pl=Party[Game.CurrentPlayer]
 		local id=pl:GetIndex()
 		vars.mawbags=vars.mawbags or {}
