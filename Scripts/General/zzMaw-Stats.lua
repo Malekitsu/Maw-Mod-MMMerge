@@ -841,6 +841,13 @@ function events.CalcDamageToPlayer(t)
 			t.Result=calcMawDamage(t.Player,t.DamageKind,damage)
 		end
 	end
+	if t.Player.Disease3>0 then
+		t.Result=t.Result*2
+	elseif t.Player.Disease2>0 then
+		t.Result=t.Result*1.5
+	elseif t.Player.Disease1>0 then
+		t.Result=t.Result*1.25
+	end
 	if data and data.Monster and data.Monster.NameId>220 then
 		local mon=data.Monster
 		local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
