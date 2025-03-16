@@ -401,6 +401,9 @@ function events.ItemGenerated(t)
 		if bossLoot then
 			pseudoStr=pseudoStr+1
 		end
+		if OmnipotentLoot then
+			pseudoStr=pseudoStr+1
+		end
 		if math.random(1,18)<partyLevel1%18 then
 			pseudoStr=pseudoStr+1
 		end
@@ -488,7 +491,7 @@ function events.ItemGenerated(t)
 		end
 	
 		ancientRoll=math.random()
-		if ancientRoll<=ancientChance then
+		if ancientRoll<=ancientChance or OmnipotentLoot then
 			ancient=true
 			t.Item.Charges=math.random(round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2, encStrUp[pseudoStr]+10)))
 			t.Item.Charges=math.ceil(t.Item.Charges*difficultyExtraPower) --bolster
@@ -528,7 +531,7 @@ function events.ItemGenerated(t)
 		--primordial item
 		primordial=math.random()
 		primordialChance=ancientChance/4^(1/diffMult^0.5)
-		if primordial<=primordialChance then
+		if primordial<=primordialChance or OmnipotentLoot then
 			if ancient then
 				t.Item.MaxCharges=t.Item.MaxCharges-chargesBonus
 			end
@@ -568,7 +571,7 @@ function events.ItemGenerated(t)
 			if Game.HouseScreen==2 or Game.HouseScreen==95 then
 				chance=0
 			end
-			if chance>=math.random() then
+			if chance>=math.random() or OmnipotentLoot then
 				-- Initialize counts for each affix
 				vars.legendaryAffixDropped=vars.legendaryAffixDropped or {}
 				for i = 1, #legendaryEffects-10 do
@@ -609,7 +612,7 @@ function events.ItemGenerated(t)
 				t.Item.BonusStrength=math.min(math.ceil(t.Item.BonusStrength*1.2),t.Item.BonusStrength+10)
 			end
 		end
-		
+		OmnipotentLoot=false
 		--buff to hp and mana items
 		if vars and not vars.itemStatsFix then
 			if t.Item.Bonus==8 or t.Item.Bonus==9 then
