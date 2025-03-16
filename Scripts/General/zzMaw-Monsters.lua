@@ -933,6 +933,11 @@ function events.PickCorpse(t)
 		end
 		mon.TreasureItemLevel=math.max(math.min(itemTier,6),2)
 		bossLoot=true
+		local monsterSkill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+		if monsterSkill=="Omnipotent" then
+			OmnipotentLoot=true
+		end
+
 	end
 	--loot filter code
 	goldBeforeLoot=Party.Gold
@@ -2435,13 +2440,16 @@ function events.AfterLoadMap()
 		end
 	end
 	if mapvars.bossNames then
+		for i=1,79 do
+			Game.PlaceMonTxt[i+220]=i+220
+		end
 		for key, value in pairs(mapvars.bossNames) do
 			Game.PlaceMonTxt[key]=value
 		end
 	end
 end
 
-function generateBoss(index,nameIndex,generatedByBroodlord)
+function generateBoss(index,nameIndex,skillType)
 	mon=Map.Monsters[index]
 	local austerityMod=1
 	if vars.AusterityMode then
@@ -2479,26 +2487,36 @@ function generateBoss(index,nameIndex,generatedByBroodlord)
 	mon.NameId=220+nameIndex
 	mapvars.bossNames=mapvars.bossNames or {}
 	mapvars.bossSkillList=mapvars.SkillList or {}
-	skill=SkillList[math.random(1,#SkillList)]
-	if math.random()<0.01 and not generatedByBroodlord then
-		skill="Broodlord"
-		mon.Resistances[0]=mon.Resistances[0]+1000
-		dmgMult=dmgMult*1.5
+	
+	if not skillType then
+		skill=SkillList[math.random(1,#SkillList)]
+		if math.random()<0.01 and not generatedByBroodlord then
+			skill="Broodlord"
+			mon.Resistances[0]=mon.Resistances[0]+1000
+			dmgMult=dmgMult*1.5
+		end
+		if generatedByBroodlord then
+			skill="Broodling"
+		end
+		if math.random()<0.001 then
+			skill="Omnipotent"
+			dmgMult=dmgMult*2
+			mon.Resistances[0]=mon.Resistances[0]+2000
+		end
+	else 
+		skill=skillType
 	end
-	if generatedByBroodlord then
-		skill="Broodling"
-	end
-	if skill=="Leecher" then
+	if skill=="Leecher" or skill=="Omnipotent" then
 		mapvars.leecher=mapvars.leecher or {}
 		table.insert(mapvars.leecher, index)
 	end
-	if skill=="Swift" then
+	if skill=="Swift" or skill=="Omnipotent" then
 		mapvars.swift=mapvars.swift or {}
 		if not table.find(mapvars.swift, index) then
 			table.insert(mapvars.swift, index)
 		end
 	end
-	if skill=="Shadow" then
+	if skill=="Shadow" or skill=="Omnipotent" then
 		mapvars.shadow=mapvars.swift or {}
 		if not table.find(mapvars.shadow, index) then
 			table.insert(mapvars.shadow, index)
@@ -2548,6 +2566,20 @@ function events.GameInitialized2() --to make the after all the other code
 				local direction=calculateDirection(Party.X, Party.Y,mon.X,mon.Y)
 				evt.Jump{Direction = direction, ZAngle = 128, Speed = 1000}
 			end
+			
+			if skill=="Omnipotent" then
+				if math.random()<0.4 or t.DamageKind==4 then
+					pseudoSpawnpoint{monster = math.ceil(mon.Id/3)*3-2, x = (Party.X+mon.X)/2, y = (Party.Y+mon.Y)/2, z = Party.Z, count = 1, powerChances = {75, 25, 0}, radius = 64, group = 1,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
+				end
+				t.Player.Poison3=Game.Time
+				t.Player.Disease3=Game.Time
+				t.Player.Weak=Game.Time
+				Game.ShowStatusText("*Swap*")
+				Party.X, Party.Y, Party.Z, mon.X, mon.Y, mon.Z = mon.X, mon.Y, mon.Z, Party.X, Party.Y, Party.Z
+				Party.Direction, mon.Direction=mon.Direction, Party.Direction
+				local direction=calculateDirection(Party.X, Party.Y,mon.X,mon.Y)
+				evt.Jump{Direction = direction, ZAngle = 128, Speed = 1000}
+			end
 		end
 	end
 
@@ -2562,21 +2594,24 @@ function events.GameInitialized2() --to make the after all the other code
 					end
 				end
 				skill = string.match(Game.PlaceMonTxt[t.Monster.NameId], "([^%s]+)")
-				if skill=="Thorn" then
+				if skill=="Thorn" or skill=="Omnipotent" then
 					if t.DamageKind==4 then
 						reflectedDamage=true
 						Party[index]:DoDamage(t.Result,4)
 						reflectedDamage=false
 					end
-				elseif skill=="Reflecting" then
+				end
+				if skill=="Reflecting" or skill=="Omnipotent" then
 					if t.DamageKind~=4 then
 						reflectedDamage=true
 						Party[index]:DoDamage(t.Result,t.DamageKind) 
 						reflectedDamage=false
 					end
-				elseif skill=="Adamantite" then
+				end
+				if skill=="Adamantite" or skill=="Omnipotent" then
 					t.Result=round(math.max(t.Result-t.Monster.Level^1.15*4,t.Result/4))
-				elseif skill=="Swapper" then
+				end
+				if skill=="Swapper" or skill=="Omnipotent" then
 					for i=0,Map.Monsters.High do
 						mon=Map.Monsters[i]
 						if mon.HP>0 and mon.AIState==const.AIState.Active and mon.ShowOnMap and mon.ShowAsHostile and (mon.NameId<220 or mon.NameId>300) then
@@ -2585,7 +2620,8 @@ function events.GameInitialized2() --to make the after all the other code
 							mon.X, mon.Y, mon.Z, t.Monster.X, t.Monster.Y, t.Monster.Z = t.Monster.X, t.Monster.Y, t.Monster.Z, mon.X, mon.Y, mon.Z
 						end
 					end
-				elseif skill=="Regenerating" then
+				end
+				if skill=="Regenerating" or skill=="Omnipotent" then
 					id=t.Monster:GetIndex()
 					mapvars.regenerating=mapvars.regenerating or {}
 					mapvars.regenerating[id] = mapvars.regenerating[id] or 0
@@ -2957,6 +2993,10 @@ function events.MonsterSpriteScale(t)
 			t.Scale=t.Scale*1.4
 		else
 			t.Scale=t.Scale*2
+		end
+		local monsterSkill = string.match(Game.PlaceMonTxt[Map.Monsters[round(t.MonsterIndex)].NameId], "([^%s]+)")
+		if monsterSkill=="Omnipotent" then
+			t.Scale=(t.Scale-1)*2+t.Scale
 		end
 	end
 end
@@ -3390,7 +3430,21 @@ function events.MonsterKilled(mon)
 	
 	local killedMonster=mon
 	local monsterSkill = string.match(Game.PlaceMonTxt[killedMonster.NameId], "([^%s]+)")
-	if monsterSkill=="Broodlord" or monsterSkill=="Broodling" then
+	if monsterSkill=="Omnipotent" then
+		for i=1,#SkillList do
+			pseudoSpawnpoint{monster = killedMonster.Id,  x = killedMonster.X, y = killedMonster.Y, z = killedMonster.Z, count = 1, powerChances = {0,0,100}, radius = 512, group = 2,transform = function(spawnedMon) spawnedMon.ShowOnMap = true spawnedMon.Hostile = true spawnedMon.Velocity=350 bossId=spawnedMon:GetIndex() end}
+			local index=1
+			local notFound=true
+			while index<80 and notFound do
+				if Game.PlaceMonTxt[index+220]==string.format("%s",index+220) then
+					generateBoss(bossId,index,SkillList[i])
+					notFound=false
+				end
+				index=index+1
+			end
+		end
+	end
+	if monsterSkill=="Broodlord" or monsterSkill=="Broodling" or monsterSkill=="Omnipotent" then
 		for i=1,3 do
 			local location=monsterSpawnLocation[math.random(1,#monsterSpawnLocation)]
 			local powerChance={0, 0, 100}
@@ -3408,7 +3462,7 @@ function events.MonsterKilled(mon)
 			local notFound=true
 			while index<80 and notFound do
 				if Game.PlaceMonTxt[index+220]==string.format("%s",index+220) then
-					generateBoss(bossId,index,true)
+					generateBoss(bossId,index,"Broodling")
 					notFound=false
 				end
 				index=index+1
