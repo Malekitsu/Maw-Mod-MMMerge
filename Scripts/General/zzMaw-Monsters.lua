@@ -909,6 +909,17 @@ function events.PickCorpse(t)
 		mon.TreasureDiceSides=math.max(round(mon.TreasureDiceSides/4),1)
 	elseif mon.NameId>220 then
 		mon.TreasureItemPercent=100
+		local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+		if skill=="Broodling" then
+			if mon.Id%3==0 then
+				mon.TreasureItemPercent=30
+			elseif mon.Id%3==2 then
+				mon.TreasureItemPercent=10
+			elseif mon.Id%3==1 then
+				mon.TreasureItemPercent=4
+			end
+		end
+		
 		--item tier
 		local name=Game.MapStats[Map.MapStatsIndex].Name
 		local lvl=math.max(basetable[mon.Id].Level, mapLevels[name].Low)
@@ -2430,7 +2441,7 @@ function events.AfterLoadMap()
 	end
 end
 
-function generateBoss(index,nameIndex)
+function generateBoss(index,nameIndex,generatedByBroodlord)
 	mon=Map.Monsters[index]
 	local austerityMod=1
 	if vars.AusterityMode then
@@ -2463,11 +2474,20 @@ function generateBoss(index,nameIndex)
 	mon.TreasureItemType=math.random(1,12)
 	mon.TreasureItemLevel=math.min(mon.TreasureItemLevel+1, 6)
 	
+	dmgMult=1.5+math.random()*0.5
 	--name and skills
 	mon.NameId=220+nameIndex
 	mapvars.bossNames=mapvars.bossNames or {}
 	mapvars.bossSkillList=mapvars.SkillList or {}
 	skill=SkillList[math.random(1,#SkillList)]
+	if math.random()<0.01 and not generatedByBroodlord then
+		skill="Broodlord"
+		mon.Resistances[0]=mon.Resistances[0]+1000
+		dmgMult=dmgMult*1.5
+	end
+	if generatedByBroodlord then
+		skill="Broodling"
+	end
 	if skill=="Leecher" then
 		mapvars.leecher=mapvars.leecher or {}
 		table.insert(mapvars.leecher, index)
@@ -2490,7 +2510,6 @@ function generateBoss(index,nameIndex)
 	Game.PlaceMonTxt[mon.NameId]=string.format(skill .. " " .. Game.MonstersTxt[mon.Id].Name)
 	
 	mapvars.bossNames[mon.NameId]=Game.PlaceMonTxt[mon.NameId]
-	dmgMult=1.5+math.random()*0.5
 	if getMapAffixPower(18) then
 		dmgMult=dmgMult*(1+getMapAffixPower(18)/100)
 	end
@@ -3365,6 +3384,34 @@ function events.MonsterKilled(mon)
 					obj.TypeIndex=0
 					obj.Item.Number=0
 				end
+			end
+		end
+	end
+	
+	local killedMonster=mon
+	local monsterSkill = string.match(Game.PlaceMonTxt[killedMonster.NameId], "([^%s]+)")
+	if monsterSkill=="Broodlord" or monsterSkill=="Broodling" then
+		for i=1,3 do
+			local location=monsterSpawnLocation[math.random(1,#monsterSpawnLocation)]
+			local powerChance={0, 0, 100}
+			if monsterSkill=="Broodling" then
+				if killedMonster.Id%3==0 then
+					powerChance={0, 100, 0}
+				elseif killedMonster.Id%3==2 then
+					powerChance={100, 0, 0}
+				else 
+					return
+				end
+			end
+			pseudoSpawnpoint{monster = killedMonster.Id,  x = killedMonster.X, y = killedMonster.Y, z = killedMonster.Z, count = 1, powerChances = powerChance, radius = 256, group = 2,transform = function(spawnedMon) spawnedMon.ShowOnMap = true spawnedMon.Hostile = true spawnedMon.Velocity=350 bossId=spawnedMon:GetIndex() end}
+			local index=1
+			local notFound=true
+			while index<80 and notFound do
+				if Game.PlaceMonTxt[index+220]==string.format("%s",index+220) then
+					generateBoss(bossId,index,true)
+					notFound=false
+				end
+				index=index+1
 			end
 		end
 	end
