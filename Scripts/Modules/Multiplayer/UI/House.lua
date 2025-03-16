@@ -34,7 +34,7 @@ local function show_clients_in_house(info)
 		ShowTextRight("Other players in house:", baseX + 76, baseY - (count - 1) * lineHeight - 20)
 	end
 end
---[[
+
 function events.BGInterfaceUpd()
 	if Game.CurrentScreen ~= const.Screens.House then
 		return
@@ -57,4 +57,4 @@ function events.BGInterfaceUpd()
 		show_clients_in_house(info)
 	end	
 end
-]]
+
