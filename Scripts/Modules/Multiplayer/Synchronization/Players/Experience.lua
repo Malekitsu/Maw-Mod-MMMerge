@@ -1,4 +1,3 @@
---[[
 local events = Multiplayer.events
 local u1, u2, u4, r4, i4, mstr, mcopy, toptr = mem.u1, mem.u2, mem.u4, mem.r4, mem.i4, mem.string, mem.copy, mem.topointer
 local item_to_bin, bin_to_item = Multiplayer.utils.item_to_bin, Multiplayer.utils.bin_to_item
@@ -117,4 +116,3 @@ function events.ClickNPCTopic(i)
 		events.Once("EvtGlobal", check_diff)
 	end
 end
-]]
