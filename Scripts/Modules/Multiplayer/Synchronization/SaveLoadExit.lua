@@ -168,7 +168,7 @@ local function prep_game_data()
 		vars = {},
 		game_id = Multiplayer.GameId()
 	}
-	--[[
+
 	for i, v in Game.NPC do
 		u2[sendbuff + i*2] = v.House
 	end
@@ -178,7 +178,7 @@ local function prep_game_data()
 	for i, v in Game.NPC do
 		result.npc_topics[i] = mmt_dump(v.Events)
 	end
-	]]
+
 	local bin_vars = {"Quests","History","MercenariesProps","BountyHunt","GotArtifact","NextArtifactsRefill","WonChallenges","Quest_DragonHatchling","Quest_SavingGoobers","Quest_CrossContinents"}
 	for k, v in pairs(bin_vars) do
 		result.vars[v] = vars[v]
@@ -207,13 +207,13 @@ local function process_game_data(game_data, apply_position)
 			vars[k] = v
 		end
 	end
-	--[[
+
 	if apply_position then
 		Party.X = game_data.X
 		Party.Y = game_data.Y
 		Party.Z = game_data.Z
 	end
-	]]
+
 	local npc_locs = toptr(game_data.npc_locs)
 	for i, v in Game.NPC do
 		v.House = u2[npc_locs + i*2]
@@ -496,10 +496,7 @@ local function character_choice(PartyData)
 	if not PartyData then
 		return
 	end
-	--maw fix, as quests are messed in this save
-	if vars.onlineMode then
-		return
-	end
+
 	return {
 		Name = StrColor(46,237,218, "(client save) ") .. StrColor(250,250,250) .. PartyData.player_name,
 		ClassId = PartyData.player_class_id,
@@ -618,10 +615,7 @@ local function request_host_saved_characters()
 		LogEvent("SAVE_LOAD", "Received no character data from server.")
 		return
 	end
-	--MAW FIX, quests are messed here
-	if vars.onlineMode then
-		return
-	end
+
 	local last_game = response.handler_result
 	return {
 		Name = StrColor(95,235,50, "(host save) ") .. StrColor(250,250,250) .. last_game.player_name,
