@@ -339,9 +339,10 @@ function events.ItemGenerated(t)
 				mapLevel=0
 			end
 		end
-		if vars.onlineMode then
+		--[[if vars.onlineMode then
 			partyLevel=(mapLevel/3)^1.5
 		end
+		]]
 		if mapvars.mapAffixes then
 			currentLevel=mapvars.mapAffixes.Power*10+20
 			partyLevel=mapvars.mapAffixes.Power*10+20
