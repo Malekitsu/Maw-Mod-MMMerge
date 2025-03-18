@@ -20,7 +20,7 @@ function events.MAWMapvarArrived(t)
 		mapvars[t[1]]=t[2]
 	end
 end
-
+--[[
 function events.AfterLoadMap()
 	if Multiplayer and Multiplayer.in_game then
 		local prevHP={}
@@ -188,7 +188,7 @@ function events.CanSaveGame(t)
 end
 ]]
 
-
+--[[
 -------------
 --EXP SHARE--
 -------------
@@ -218,7 +218,7 @@ function events.MonsterKilled(mon)
 			if players>1 then
 				local list=Multiplayer.client_monsters()
 				for i=1,#list do
-					local pl=Map.Monsters[list[i]]
+					local pl=Map.Monsters[list[i]] --[[
 					if getDistances(pl.X,pl.Y,pl.Z,mon.X,mon.Y,mon.Z)<8000 then
 						nearbyPlayers=nearbyPlayers+1
 					end
@@ -257,3 +257,4 @@ end
 
 
 --Multiplayer.client_monsters()
+]]
