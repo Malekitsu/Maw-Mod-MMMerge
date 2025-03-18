@@ -850,7 +850,7 @@ function events.CalcDamageToPlayer(t)
 		DiseaseDamage = 1.25
 	end
 	if Party.High==0 then
-		DiseaseDamage = (DiseaseDamage-1)/2 + DiseaseDamage
+		DiseaseDamage = (DiseaseDamage-1)/2 + 1
 	end
 	t.Result = t.Result * DiseaseDamage
 	if data and data.Monster and data.Monster.NameId>220 then
