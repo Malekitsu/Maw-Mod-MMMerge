@@ -141,7 +141,8 @@ end
 resetTxt="The dungeon has already been cleared, but you have the option to reset it and attempt it once more with even harder monsters. Please note that no completion rewards will be given for this reset. Would you like to proceed with resetting the dungeon? (yes/no)"
 local possibleAnswers={"yes", "Yes", "YES", " yes", " Yes", " YES"} 
 function resetMap(dungeonId)
-	if canResetDungeon(dungeonId) and not vars.resetDungeon and not questionAsked and not vars.onlineMode then
+	--if canResetDungeon(dungeonId) and not vars.resetDungeon and not questionAsked and not vars.onlineMode then
+	if canResetDungeon(dungeonId) and not vars.resetDungeon and not questionAsked then
 		local answer=Question(resetTxt)
 		questionAsked=true
 		if table.find(possibleAnswers, answer) then 
