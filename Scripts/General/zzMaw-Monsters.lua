@@ -395,11 +395,12 @@ end
 function events.MonsterKillExp(t)
 
 	--online handled in maw-multiplayer file
-	if vars.onlineMode then 
+	--[[if vars.onlineMode then 
 		t.Handled=true
 		t.Exp=0
 		return
 	end 
+	]]
 	local partyLvl=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL+vars.MMMLVL
 	local mon=t.Monster
 	
@@ -606,7 +607,7 @@ function recalculateMonsterTable()
 			end
 		end
 		
-		--online
+		--[[online
 		if vars.onlineMode and not onlineStartingMaps[name] then
 			bolsterLevel=mp.Mid^1.5
 			horizontalMultiplier=bolsterLevel/mp.Mid
@@ -614,6 +615,7 @@ function recalculateMonsterTable()
 			totalLevel[i]=math.max(base.Level*horizontalMultiplier-flattener+adjust*horizontalMultiplier^0.7, 5)
 			mon.Level=math.min(totalLevel[i],255)
 		end
+		]]
 		
 		--HP
 		HPBolsterLevel=basetable[i].Level*(1+(0.1*(totalLevel[i]-basetable[i].Level)/100))+(totalLevel[i]-basetable[i].Level)*0.9
@@ -736,7 +738,8 @@ function recalculateMonsterTable()
 		overflowMult[i]={extraMult1, extraMult2}
 	end
 	--adjust damage if it's too similiar between monster type
-	if bolsterLevel>10 or Game.freeProgression==false or vars.onlineMode then
+	--if bolsterLevel>10 or Game.freeProgression==false or vars.onlineMode then
+	if bolsterLevel>10 or Game.freeProgression==false then
 		for i=1, 651 do
 			mon=Game.MonstersTxt[i]
 			base=basetable[i]		
@@ -2254,9 +2257,10 @@ function checkMapCompletition()
 				if not Game.freeProgression then
 					bolster=mapLevel*2
 				end
-				if vars.onlineMode then
+				--[[if vars.onlineMode then
 					bolster=((mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)^1.5-mapLevel
 				end
+				]]
 				local totalMonster=m
 				if Game.BolsterAmount==300 then
 					totalMonster=totalMonster*0.67
@@ -3387,7 +3391,7 @@ end
 local removeItemList={217, 632,633,640,654}
 function events.MonsterKilled(mon)
 
-	if vars.onlineMode then return end --handled in maw-multiplayer file
+	--if vars.onlineMode then return end --handled in maw-multiplayer file
 
 	mapvars.monsterKilledList=mapvars.monsterKilledList or {}
 	local data=WhoHitMonster()
