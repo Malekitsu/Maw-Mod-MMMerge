@@ -139,3 +139,349 @@ evt.global[1888] = function()
 		evt.MoveToMap{3560, 7696, 544, 0, 0, 0, 0, 3, "out01.odm"}
 	end
 end
+
+
+--QUEST FIX
+local questRemoveList={207,571,572,573,574,575, 181, 203, 212,234,246}
+for i=1,#questRemoveList do
+	Game.GlobalEvtLines:RemoveEvent(questRemoveList[i])
+end
+evt.global[181] = function()
+	if not evt.CheckItemsCount{MinItemIndex = 200, MaxItemIndex = 204, Count = 4} then         -- "Widowsweep Berries"..."Phoenix Feather"
+		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
+Return when you have them all." ]]
+	elseif not evt.CheckItemsCount{MinItemIndex = 205, MaxItemIndex = 209, Count = 2} then         -- "Phima Root"..."Dragon Turtle Fang"
+		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
+Return when you have them all." ]]
+	elseif evt.CheckItemsCount{MinItemIndex = 210, MaxItemIndex = 214, Count = 1} then         -- "Poppy Pod"..."Unicorn Horn"
+		evt.SetMessage{Str = 626}         --[[ "The ingredients!
+Thank you!
+Take this as a reward!" ]]
+		evt.RemoveItems{MinItemIndex = 200, MaxItemIndex = 204, Count = 4}         -- "Widowsweep Berries"..."Phoenix Feather"
+		evt.RemoveItems{MinItemIndex = 205, MaxItemIndex = 209, Count = 2}         -- "Phima Root"..."Dragon Turtle Fang"
+		evt.RemoveItems{MinItemIndex = 210, MaxItemIndex = 214, Count = 1}         -- "Poppy Pod"..."Unicorn Horn"
+		evt.Subtract{"QBits", Value = 113}         -- "Bring Thistle on the Dagger Wound Islands the basic ingredients for a potion of Pure Speed."
+		evt.Add{"QBits", Value = 114}         -- returned ingredients for a potion of Pure Speed
+		evt.Add{"Inventory", Value = 254}         -- "Pure Speed"
+		evt.ForPlayer("All")
+		evt.Add{"Experience", Value = 1000}
+		evt.SetNPCTopic{NPC = 68, Index = 2, Event = 0}         -- "Thistle"
+	else
+		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
+Return when you have them all." ]]
+	end
+end
+
+evt.global[203] = function()
+	if not evt.CheckItemsCount{MinItemIndex = 200, MaxItemIndex = 204, Count = 2} then         -- "Widowsweep Berries"..."Phoenix Feather"
+		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
+Return when you have them all." ]]
+	elseif not evt.CheckItemsCount{MinItemIndex = 205, MaxItemIndex = 209, Count = 3} then         -- "Phima Root"..."Dragon Turtle Fang"
+		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
+Return when you have them all." ]]
+	elseif evt.CheckItemsCount{MinItemIndex = 210, MaxItemIndex = 214, Count = 3} then         -- "Poppy Pod"..."Unicorn Horn"
+		evt.SetMessage{Str = 648}         --[[ "Excellent!
+With this I can brew another Potion of Pure Luck.
+Take this potion as your reward!" ]]
+		evt.RemoveItems{MinItemIndex = 200, MaxItemIndex = 204, Count = 2}         -- "Widowsweep Berries"..."Phoenix Feather"
+		evt.RemoveItems{MinItemIndex = 205, MaxItemIndex = 209, Count = 3}         -- "Phima Root"..."Dragon Turtle Fang"
+		evt.RemoveItems{MinItemIndex = 210, MaxItemIndex = 214, Count = 3}         -- "Poppy Pod"..."Unicorn Horn"
+		evt.Subtract{"QBits", Value = 115}         -- "Bring Rihansi in Alvar the basic ingredients for a potion of Pure Luck."
+		evt.Add{"QBits", Value = 116}         -- returned ingredients for a potion of Pure Luck
+		evt.Add{"Inventory", Value = 254}         -- "Pure Luck"
+		evt.ForPlayer("All")
+		evt.Add{"Experience", Value = 5000}
+		evt.SetNPCTopic{NPC = 74, Index = 2, Event = 0}         -- "Rihansi"
+	else
+		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
+Return when you have them all." ]]
+	end
+end
+
+evt.global[212] = function()
+	if not evt.CheckItemsCount{MinItemIndex = 200, MaxItemIndex = 204, Count = 2} then         -- "Widowsweep Berries"..."Phoenix Feather"
+		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
+Return when you have them all." ]]
+	elseif not evt.CheckItemsCount{MinItemIndex = 205, MaxItemIndex = 209, Count = 4} then         -- "Phima Root"..."Dragon Turtle Fang"
+		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
+Return when you have them all." ]]
+	elseif evt.CheckItemsCount{MinItemIndex = 210, MaxItemIndex = 214, Count = 1} then         -- "Poppy Pod"..."Unicorn Horn"
+		evt.SetMessage{Str = 648}         --[[ "Excellent!
+With this I can brew another Potion of Pure Luck.
+Take this potion as your reward!" ]]
+		evt.RemoveItems{MinItemIndex = 200, MaxItemIndex = 204, Count = 2}         -- "Widowsweep Berries"..."Phoenix Feather"
+		evt.RemoveItems{MinItemIndex = 205, MaxItemIndex = 209, Count = 4}         -- "Phima Root"..."Dragon Turtle Fang"
+		evt.RemoveItems{MinItemIndex = 210, MaxItemIndex = 214, Count = 1}         -- "Poppy Pod"..."Unicorn Horn"
+		evt.Subtract{"QBits", Value = 121}         -- "Bring Talion in the Ironsand Desert the basic ingredients for a potion of Pure Endurance."
+		evt.Add{"QBits", Value = 122}         -- returned ingredients for a potion of Pure Endurance
+		evt.Add{"Inventory", Value = 254}         -- "Pure Endurance"
+		evt.ForPlayer("All")
+		evt.Add{"Experience", Value = 5000}
+		evt.SetNPCTopic{NPC = 78, Index = 2, Event = 0}         -- "Talion"
+	else
+		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
+Return when you have them all." ]]
+	end
+end
+
+evt.global[234] = function()
+	if not evt.CheckItemsCount{MinItemIndex = 200, MaxItemIndex = 204, Count = 1} then         -- "Widowsweep Berries"..."Phoenix Feather"
+		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
+Return when you have them all." ]]
+	elseif not evt.CheckItemsCount{MinItemIndex = 205, MaxItemIndex = 209, Count = 2} then         -- "Phima Root"..."Dragon Turtle Fang"
+		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
+Return when you have them all." ]]
+	elseif evt.CheckItemsCount{MinItemIndex = 210, MaxItemIndex = 214, Count = 4} then         -- "Poppy Pod"..."Unicorn Horn"
+		evt.SetMessage{Str = 679}         --[[ "You have returned with the ingredients, holding up you end of the bargain.
+Here is your Potion of Pure Intellect." ]]
+		evt.RemoveItems{MinItemIndex = 200, MaxItemIndex = 204, Count = 1}         -- "Widowsweep Berries"..."Phoenix Feather"
+		evt.RemoveItems{MinItemIndex = 205, MaxItemIndex = 209, Count = 2}         -- "Phima Root"..."Dragon Turtle Fang"
+		evt.RemoveItems{MinItemIndex = 210, MaxItemIndex = 214, Count = 4}         -- "Poppy Pod"..."Unicorn Horn"
+		evt.Subtract{"QBits", Value = 123}         -- "Bring Kelvin in Shadowspire the basic ingredients for a potion of Pure Intellect."
+		evt.Add{"QBits", Value = 124}         -- returned ingredients for a potion of Pure Intellect
+		evt.Add{"Inventory", Value = 253}         -- "Pure Intellect"
+		evt.ForPlayer("All")
+		evt.Add{"Experience", Value = 5000}
+		evt.SetNPCTopic{NPC = 83, Index = 2, Event = 0}         -- "Kelvin"
+	else
+		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
+Return when you have them all." ]]
+	end
+end
+
+evt.global[246] = function()
+	if not evt.CheckItemsCount{MinItemIndex = 200, MaxItemIndex = 204, Count = 2} then         -- "Widowsweep Berries"..."Phoenix Feather"
+		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
+Return when you have them all." ]]
+	elseif not evt.CheckItemsCount{MinItemIndex = 205, MaxItemIndex = 209, Count = 1} then         -- "Phima Root"..."Dragon Turtle Fang"
+		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
+Return when you have them all." ]]
+	elseif evt.CheckItemsCount{MinItemIndex = 210, MaxItemIndex = 214, Count = 4} then         -- "Poppy Pod"..."Unicorn Horn"
+		evt.SetMessage{Str = 691}         -- "Ah, the right ingredients always do the trick! Here is your potion."
+		evt.RemoveItems{MinItemIndex = 200, MaxItemIndex = 204, Count = 2}         -- "Widowsweep Berries"..."Phoenix Feather"
+		evt.RemoveItems{MinItemIndex = 205, MaxItemIndex = 209, Count = 1}         -- "Phima Root"..."Dragon Turtle Fang"
+		evt.RemoveItems{MinItemIndex = 210, MaxItemIndex = 214, Count = 4}         -- "Poppy Pod"..."Unicorn Horn"
+		evt.Subtract{"QBits", Value = 133}         -- returned ingredients for a potion of Pure Accuracy
+		evt.Add{"QBits", Value = 134}         -- Gave Gem of Restoration to Blazen Stormlance
+		evt.Add{"Inventory", Value = 252}         -- "Pure Accuracy"
+		evt.ForPlayer("All")
+		evt.Add{"Experience", Value = 5000}
+		evt.SetNPCTopic{NPC = 77, Index = 2, Event = 0}         -- "Galvinus"
+	else
+		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
+Return when you have them all." ]]
+	end
+end
+
+evt.global[207] = function()
+	evt.SetMessage{Str = 652}         --[[ "The survivors in this region need Potions of Fire Resistance!
+With them we can survive until a place is found for us to move to!
+Take these potions!
+Unfortunately they are all I have!
+Deliver them to the six southernmost houses that remain standing in the village of Rust!" ]]
+	evt.Add{"QBits", Value = 142}         -- "Deliver Fire Resistance Potions to the six southernmost houses of Rust.  Return to Hobert in Rust."
+	evt.Add{"Inventory", Value = 249}         -- "Fire Resistance"
+	evt.Add{"Inventory", Value = 249}         -- "Fire Resistance"
+	evt.Add{"Inventory", Value = 249}         -- "Fire Resistance"
+	evt.SetNPCTopic{NPC = 84, Index = 1, Event = 208}         -- "Pole" : "Not enough potions?"
+end-- "Fire Resistance Potion"
+
+evt.global[571] = function()
+	if evt.Cmp{"QBits", Value = 149} then         -- Southern houses of Rust all have Potions of Fire Resistance.
+		evt.SetMessage{Str = 654}         --[[ "You have at least pushed our demise away for a time, but a new home needs to be found for us!
+Thank you for delivering the Potions of Fire Resistance!" ]]
+		return
+	end
+	if evt.Cmp{"QBits", Value = 143} then         -- Delivered potion to house 1
+		evt.SetMessage{Str = 763}         -- "Thanks for the potion!"
+	else
+		evt.ForPlayer("All")
+		if not evt.Cmp{"Inventory", Value = 249} then         -- "Fire Resistance"
+			evt.SetMessage{Str = 762}         --[[ "I an defenseless against the onslaught of the sea of fire!
+I need a Potion of Fire Resistance!" ]]
+			return
+		end
+		evt.Subtract{"Inventory", Value = 249}         -- "Fire Resistance"
+		evt.Add{"QBits", Value = 143}         -- Delivered potion to house 1
+		evt.ForPlayer("All")
+		evt.Add{"Experience", Value = 1000}
+	end
+	if evt.Cmp{"QBits", Value = 144} then         -- Delivered potion to house 2
+		if evt.Cmp{"QBits", Value = 145} then         -- Delivered potion to house 3
+			if evt.Cmp{"QBits", Value = 146} then         -- Delivered potion to house 4
+				if evt.Cmp{"QBits", Value = 147} then         -- Delivered potion to house 5
+					if evt.Cmp{"QBits", Value = 148} then         -- Delivered potion to house 6
+						evt.ForPlayer("All")
+						evt.Add{"Experience", Value = 7500}
+						evt.SetMessage{Str = 764}         --[[ "Thanks for providing Potions of Fire Resistance to the southernmost houses here in Rust.
+Perhaps we can survive until a new home can be found for us!" ]]
+						evt.Add{"QBits", Value = 149}         -- Southern houses of Rust all have Potions of Fire Resistance.
+						return
+					end
+				end
+			end
+		end
+	end
+	evt.SetMessage{Str = 761}         --[[ "Thanks for the potion, but others in the area are without protection!
+Be sure to deliver a potion to them as well!" ]]
+end
+
+evt.global[572] = function()
+	if evt.Cmp{"QBits", Value = 149} then         -- Southern houses of Rust all have Potions of Fire Resistance.
+		evt.SetMessage{Str = 654}         --[[ "You have at least pushed our demise away for a time, but a new home needs to be found for us!
+Thank you for delivering the Potions of Fire Resistance!" ]]
+		return
+	end
+	if evt.Cmp{"QBits", Value = 144} then         -- Delivered potion to house 2
+		evt.SetMessage{Str = 763}         -- "Thanks for the potion!"
+	else
+		evt.ForPlayer("All")
+		if not evt.Cmp{"Inventory", Value = 249} then         -- "Fire Resistance"
+			evt.SetMessage{Str = 762}         --[[ "I an defenseless against the onslaught of the sea of fire!
+I need a Potion of Fire Resistance!" ]]
+			return
+		end
+		evt.Subtract{"Inventory", Value = 249}         -- "Fire Resistance"
+		evt.Add{"QBits", Value = 144}         -- Delivered potion to house 2
+		evt.ForPlayer("All")
+		evt.Add{"Experience", Value = 1000}
+	end
+	if evt.Cmp{"QBits", Value = 143} then         -- Delivered potion to house 1
+		if evt.Cmp{"QBits", Value = 145} then         -- Delivered potion to house 3
+			if evt.Cmp{"QBits", Value = 146} then         -- Delivered potion to house 4
+				if evt.Cmp{"QBits", Value = 147} then         -- Delivered potion to house 5
+					if evt.Cmp{"QBits", Value = 148} then         -- Delivered potion to house 6
+						evt.ForPlayer("All")
+						evt.Add{"Experience", Value = 1500}
+						evt.SetMessage{Str = 764}         --[[ "Thanks for providing Potions of Fire Resistance to the southernmost houses here in Rust.
+Perhaps we can survive until a new home can be found for us!" ]]
+						evt.Add{"QBits", Value = 149}         -- Southern houses of Rust all have Potions of Fire Resistance.
+						return
+					end
+				end
+			end
+		end
+	end
+	evt.SetMessage{Str = 761}         --[[ "Thanks for the potion, but others in the area are without protection!
+Be sure to deliver a potion to them as well!" ]]
+end
+
+evt.global[573] = function()
+	if evt.Cmp{"QBits", Value = 149} then         -- Southern houses of Rust all have Potions of Fire Resistance.
+		evt.SetMessage{Str = 654}         --[[ "You have at least pushed our demise away for a time, but a new home needs to be found for us!
+Thank you for delivering the Potions of Fire Resistance!" ]]
+		return
+	end
+	if evt.Cmp{"QBits", Value = 145} then         -- Delivered potion to house 3
+		evt.SetMessage{Str = 763}         -- "Thanks for the potion!"
+	else
+		evt.ForPlayer("All")
+		if not evt.Cmp{"Inventory", Value = 249} then         -- "Fire Resistance"
+			evt.SetMessage{Str = 762}         --[[ "I an defenseless against the onslaught of the sea of fire!
+I need a Potion of Fire Resistance!" ]]
+			return
+		end
+		evt.Subtract{"Inventory", Value = 249}         -- "Fire Resistance"
+		evt.Add{"QBits", Value = 145}         -- Delivered potion to house 3
+		evt.ForPlayer("All")
+		evt.Add{"Experience", Value = 1000}
+	end
+	if evt.Cmp{"QBits", Value = 143} then         -- Delivered potion to house 1
+		if evt.Cmp{"QBits", Value = 144} then         -- Delivered potion to house 2
+			if evt.Cmp{"QBits", Value = 146} then         -- Delivered potion to house 4
+				if evt.Cmp{"QBits", Value = 147} then         -- Delivered potion to house 5
+					if evt.Cmp{"QBits", Value = 148} then         -- Delivered potion to house 6
+						evt.ForPlayer("All")
+						evt.Add{"Experience", Value = 1500}
+						evt.SetMessage{Str = 764}         --[[ "Thanks for providing Potions of Fire Resistance to the southernmost houses here in Rust.
+Perhaps we can survive until a new home can be found for us!" ]]
+						evt.Add{"QBits", Value = 149}         -- Southern houses of Rust all have Potions of Fire Resistance.
+						return
+					end
+				end
+			end
+		end
+	end
+	evt.SetMessage{Str = 761}         --[[ "Thanks for the potion, but others in the area are without protection!
+Be sure to deliver a potion to them as well!" ]]
+end
+
+evt.global[574] = function()
+	if evt.Cmp{"QBits", Value = 149} then         -- Southern houses of Rust all have Potions of Fire Resistance.
+		evt.SetMessage{Str = 654}         --[[ "You have at least pushed our demise away for a time, but a new home needs to be found for us!
+Thank you for delivering the Potions of Fire Resistance!" ]]
+		return
+	end
+	if evt.Cmp{"QBits", Value = 146} then         -- Delivered potion to house 4
+		evt.SetMessage{Str = 763}         -- "Thanks for the potion!"
+	else
+		evt.ForPlayer("All")
+		if not evt.Cmp{"Inventory", Value = 249} then         -- "Fire Resistance"
+			evt.SetMessage{Str = 762}         --[[ "I an defenseless against the onslaught of the sea of fire!
+I need a Potion of Fire Resistance!" ]]
+			return
+		end
+		evt.Subtract{"Inventory", Value = 249}         -- "Fire Resistance"
+		evt.Add{"QBits", Value = 146}         -- Delivered potion to house 4
+		evt.ForPlayer("All")
+		evt.Add{"Experience", Value = 1000}
+	end
+	if evt.Cmp{"QBits", Value = 143} then         -- Delivered potion to house 1
+		if evt.Cmp{"QBits", Value = 144} then         -- Delivered potion to house 2
+			if evt.Cmp{"QBits", Value = 145} then         -- Delivered potion to house 3
+				if evt.Cmp{"QBits", Value = 147} then         -- Delivered potion to house 5
+					if evt.Cmp{"QBits", Value = 148} then         -- Delivered potion to house 6
+						evt.ForPlayer("All")
+						evt.Add{"Experience", Value = 1500}
+						evt.SetMessage{Str = 764}         --[[ "Thanks for providing Potions of Fire Resistance to the southernmost houses here in Rust.
+Perhaps we can survive until a new home can be found for us!" ]]
+						evt.Add{"QBits", Value = 149}         -- Southern houses of Rust all have Potions of Fire Resistance.
+						return
+					end
+				end
+			end
+		end
+	end
+	evt.SetMessage{Str = 761}         --[[ "Thanks for the potion, but others in the area are without protection!
+Be sure to deliver a potion to them as well!" ]]
+end
+
+evt.global[575] = function()
+	if evt.Cmp{"QBits", Value = 149} then         -- Southern houses of Rust all have Potions of Fire Resistance.
+		evt.SetMessage{Str = 654}         --[[ "You have at least pushed our demise away for a time, but a new home needs to be found for us!
+Thank you for delivering the Potions of Fire Resistance!" ]]
+		return
+	end
+	if evt.Cmp{"QBits", Value = 147} then         -- Delivered potion to house 5
+		evt.SetMessage{Str = 763}         -- "Thanks for the potion!"
+	else
+		evt.ForPlayer("All")
+		if not evt.Cmp{"Inventory", Value = 249} then         -- "Fire Resistance"
+			evt.SetMessage{Str = 762}         --[[ "I an defenseless against the onslaught of the sea of fire!
+I need a Potion of Fire Resistance!" ]]
+			return
+		end
+		evt.Subtract{"Inventory", Value = 249}         -- "Fire Resistance"
+		evt.Add{"QBits", Value = 147}         -- Delivered potion to house 5
+		evt.ForPlayer("All")
+		evt.Add{"Experience", Value = 1000}
+	end
+	if evt.Cmp{"QBits", Value = 143} then         -- Delivered potion to house 1
+		if evt.Cmp{"QBits", Value = 144} then         -- Delivered potion to house 2
+			if evt.Cmp{"QBits", Value = 145} then         -- Delivered potion to house 3
+				if evt.Cmp{"QBits", Value = 146} then         -- Delivered potion to house 4
+					if evt.Cmp{"QBits", Value = 148} then         -- Delivered potion to house 6
+						evt.ForPlayer("All")
+						evt.Add{"Experience", Value = 1500}
+						evt.SetMessage{Str = 764}         --[[ "Thanks for providing Potions of Fire Resistance to the southernmost houses here in Rust.
+Perhaps we can survive until a new home can be found for us!" ]]
+						evt.Add{"QBits", Value = 149}         -- Southern houses of Rust all have Potions of Fire Resistance.
+						return
+					end
+				end
+			end
+		end
+	end
+	evt.SetMessage{Str = 761}         --[[ "Thanks for the potion, but others in the area are without protection!
+Be sure to deliver a potion to them as well!" ]]
+end
