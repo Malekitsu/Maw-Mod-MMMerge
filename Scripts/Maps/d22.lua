@@ -12,7 +12,7 @@ end
 Game.MapEvtLines:RemoveEvent(5)
 evt.hint[5] = evt.str[100]  -- ""
 evt.map[5] = function()  -- function events.LoadMap()
-	if evt.Cmp{"QBits", Value = 19} then         -- Allied with Necromancers Guild. Steal Nightshade Brazier done.
+	if (evt.Cmp{"QBits", Value = 19} or mapvars.mapAffixes) then         -- Allied with Necromancers Guild. Steal Nightshade Brazier done.
 		goto _9
 	end
 	if evt.Cmp{"QBits", Value = 230} then         -- You have Pissed off the clerics
@@ -24,7 +24,7 @@ evt.map[5] = function()  -- function events.LoadMap()
 		evt.Subtract{"QBits", Value = 230}         -- You have Pissed off the clerics
 	end
 ::_11::
-	if evt.Cmp{"QBits", Value = 28} then         -- "Bring the Nightshade Brazier to the Necromancers' Guild leader, Sandro. The Brazier is in the Temple of the Sun."
+	if evt.Cmp{"QBits", Value = 28} or mapvars.mapAffixes then         -- "Bring the Nightshade Brazier to the Necromancers' Guild leader, Sandro. The Brazier is in the Temple of the Sun."
 		evt.SetFacetBit{Id = 5, Bit = const.FacetBits.IsSecret, On = true}
 		return
 	end
@@ -40,7 +40,7 @@ events.LoadMap = evt.map[5].last
 Game.MapEvtLines:RemoveEvent(452)
 evt.hint[452] = "test"
 evt.map[452] = function()
-	if evt.Cmp{"QBits", Value = 28} then         -- "Bring the Nightshade Brazier to the Necromancers' Guild leader, Sandro. The Brazier is in the Temple of the Sun."
+	if evt.Cmp{"QBits", Value = 28} or mapvars.mapAffixes then         -- "Bring the Nightshade Brazier to the Necromancers' Guild leader, Sandro. The Brazier is in the Temple of the Sun."
 		evt.SetDoorState{Id = 1, State = 0}
 	end
 end
