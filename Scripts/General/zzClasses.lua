@@ -434,7 +434,7 @@ function events.GameInitialized2()
 	Game.Spells[123].SpellPointsMaster=60
 	Game.Spells[123].SpellPointsGM=80
 	
-	Game.Classes.SPBase[10]=50
+	Game.Classes.SPBase[10]=60
 	Game.Classes.SPFactor[10]=0
 	Game.Classes.SPStats[10]=3
 	Game.Classes.SPBase[11]=120
