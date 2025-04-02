@@ -2962,6 +2962,15 @@ function mawBuffApply()
 		Party.SpellBuffs[16].Power=math.max(3,Party.SpellBuffs[16].Power)
 		Party.SpellBuffs[16].Skill=math.max(1,Party.SpellBuffs[16].Skill)
 	end
+	
+	for i=1,#vars.NPCFollowers do
+		if Game.NPC[vars.NPCFollowers[i]].Profession==38 then
+			Party.SpellBuffs[19].ExpireTime=math.max(Game.Time+const.Hour, Party.SpellBuffs[19].ExpireTime)
+			Party.SpellBuffs[19].Power=math.max(10,Party.SpellBuffs[19].Power)
+			Party.SpellBuffs[19].Skill=math.max(2,Party.SpellBuffs[19].Skill)
+		end
+	end
+	
 	--magic potion fix
 	if vars.magicResistancePotionExpire and vars.magicResistancePotionExpire>Game.Time then
 		Party.SpellBuffs[13].ExpireTime=vars.magicResistancePotionExpire
