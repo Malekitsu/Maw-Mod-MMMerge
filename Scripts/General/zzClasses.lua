@@ -1534,8 +1534,8 @@ function events.PlayerCastSpell(t)
 	if table.find(elementalistClass, t.Player.Class) and (table.find(eleOffSpellsOut, t.SpellId) or table.find(eleOffSpellsIn, t.SpellId)) and vars.elementalistSpellBinds then
 		local pl=t.Player
 		local index=t.PlayerIndex
+		local spell=t.SpellId
 		for i=1,6 do
-			local spell=t.SpellId
 			if i<=4 and ExtraQuickSpells.SpellSlots then
 				if ExtraQuickSpells.SpellSlots[index][i]==spell then
 					ExtraQuickSpells.SpellSlots[index][i]=elementalistRandomizer(pl, vars.elementalistSpellBinds[index][i])
@@ -1550,11 +1550,11 @@ function events.PlayerCastSpell(t)
 				end
 			end
 		end
+		vars.eleTimer[index]=Game.Time+math.max(getSpellDelay(pl,spell)*2, 128)
 		vars.eleStacks=vars.eleStacks or {}
 		vars.eleStacks[index]=vars.eleStacks[index] or 0
 		vars.eleStacks[index]=vars.eleStacks[index]+1
 		vars.eleTimer=vars.eleTimer or {}
-		vars.eleTimer[index]=Game.Time
 	end
 end
 
@@ -1567,8 +1567,8 @@ function elementalistStacksDecay()
 			vars.eleStacks[id]=vars.eleStacks[id] or 0
 			vars.eleTimer=vars.eleTimer or {}
 			vars.eleTimer[id]=vars.eleTimer[id] or Game.Time
-			if Game.Time-vars.eleTimer[id]>const.Minute*2 then
-				vars.eleTimer[id]=Game.Time
+			if Game.Time>vars.eleTimer[id] then
+				vars.eleTimer[id]=Game.Time+const.Minute/2
 				vars.eleStacks[id]=math.max(math.floor(vars.eleStacks[id]*0.5),0)
 			end
 		end	
