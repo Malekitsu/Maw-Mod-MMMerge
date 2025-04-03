@@ -164,7 +164,7 @@ end
 
 
 --QUEST FIX
-local questRemoveList={207,571,572,573,574,575, 181, 203, 212,234,246}
+local questRemoveList={207,571,572,573,574,575,576, 181, 203, 212,234,246}
 for i=1,#questRemoveList do
 	Game.GlobalEvtLines:RemoveEvent(questRemoveList[i])
 end
@@ -493,6 +493,46 @@ I need a Potion of Fire Resistance!" ]]
 			if evt.Cmp{"QBits", Value = 145} then         -- Delivered potion to house 3
 				if evt.Cmp{"QBits", Value = 146} then         -- Delivered potion to house 4
 					if evt.Cmp{"QBits", Value = 148} then         -- Delivered potion to house 6
+						evt.ForPlayer("All")
+						evt.Add{"Experience", Value = 1500}
+						evt.SetMessage{Str = 764}         --[[ "Thanks for providing Potions of Fire Resistance to the southernmost houses here in Rust.
+Perhaps we can survive until a new home can be found for us!" ]]
+						evt.Add{"QBits", Value = 149}         -- Southern houses of Rust all have Potions of Fire Resistance.
+						return
+					end
+				end
+			end
+		end
+	end
+	evt.SetMessage{Str = 761}         --[[ "Thanks for the potion, but others in the area are without protection!
+Be sure to deliver a potion to them as well!" ]]
+end
+
+evt.global[576] = function()
+	if evt.Cmp{"QBits", Value = 149} then         -- Southern houses of Rust all have Potions of Fire Resistance.
+		evt.SetMessage{Str = 654}         --[[ "You have at least pushed our demise away for a time, but a new home needs to be found for us!
+Thank you for delivering the Potions of Fire Resistance!" ]]
+		return
+	end
+	if evt.Cmp{"QBits", Value = 148} then         -- Delivered potion to house 6
+		evt.SetMessage{Str = 763}         -- "Thanks for the potion!"
+	else
+		evt.ForPlayer("All")
+		if not evt.Cmp{"Inventory", Value = 249} then         -- "Fire Resistance"
+			evt.SetMessage{Str = 762}         --[[ "I an defenseless against the onslaught of the sea of fire!
+I need a Potion of Fire Resistance!" ]]
+			return
+		end
+		evt.Subtract{"Inventory", Value = 249}         -- "Fire Resistance"
+		evt.Add{"QBits", Value = 148}         -- Delivered potion to house 6
+		evt.ForPlayer("All")
+		evt.Add{"Experience", Value = 1000}
+	end
+	if evt.Cmp{"QBits", Value = 143} then         -- Delivered potion to house 1
+		if evt.Cmp{"QBits", Value = 144} then         -- Delivered potion to house 2
+			if evt.Cmp{"QBits", Value = 145} then         -- Delivered potion to house 3
+				if evt.Cmp{"QBits", Value = 146} then         -- Delivered potion to house 4
+					if evt.Cmp{"QBits", Value = 147} then         -- Delivered potion to house 5
 						evt.ForPlayer("All")
 						evt.Add{"Experience", Value = 1500}
 						evt.SetMessage{Str = 764}         --[[ "Thanks for providing Potions of Fire Resistance to the southernmost houses here in Rust.
