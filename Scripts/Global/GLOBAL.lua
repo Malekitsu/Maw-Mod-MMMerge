@@ -15,6 +15,28 @@ function events.ClickNPCTopic(i) -- happens just before global evt execution
 	end
 end
 
+function events.Action(t)
+	if t.Action==405 then
+		local pl=Party[Game.CurrentPlayer]
+		if calcExp(pl.LevelBase)>pl.Experience then
+			local lvl=pl.LevelBase
+			local ex=pl.Experience
+			pl.LevelBase=1
+			pl.Experience=0
+			function events.Tick()
+				events.Remove("Tick",1)
+				pl.LevelBase=lvl
+				pl.Experience=ex
+				itemStats(Party[0])
+				mawRefresh("all")
+				mawRefresh("all")
+			end
+		end
+	end
+end
+
+
+
 function events.EvtGlobal(i) -- happens after related global evt executed
 	if i ~= LastTopic then
 		return
