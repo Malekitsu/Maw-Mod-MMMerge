@@ -1530,7 +1530,7 @@ function events.PlayerCastSpell(t)
 				end
 			end
 		end
-		vars.eleTimer[index]=Game.Time+math.max(getSpellDelay(pl,spell)*2, 128)
+		vars.eleTimer[index]=Game.Time+math.max(getSpellDelay(pl,spell)*4, 128)
 		vars.eleStacks=vars.eleStacks or {}
 		vars.eleStacks[index]=vars.eleStacks[index] or 0
 		vars.eleStacks[index]=vars.eleStacks[index]+1
@@ -1556,7 +1556,7 @@ function elementalistStacksDecay()
 end
 
 function events.AfterLoadMap()
-	Timer(elementalistStacksDecay, const.Minute*1.5, true)
+	Timer(elementalistStacksDecay, const.Minute*0.05, true)
 end
 
 function events.CalcDamageToMonster(t)
