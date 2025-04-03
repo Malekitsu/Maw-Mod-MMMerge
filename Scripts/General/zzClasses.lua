@@ -1383,26 +1383,6 @@ local function dkSkills(isDK, id)
 end
 
 
-function checkSkills(id)
-	shamanSkills(false, id)
-	dkSkills(false, id)
-	seraphSkills(false, id)
-	if id>=0 and id<=Party.High then
-		local class=Party[id].Class
-		if table.find(shamanClass, class) then
-			shamanSkills(true, id)
-			return
-		end
-		if table.find(dkClass, class) then
-			dkSkills(true, id)
-			return
-		end
-		if table.find(seraphClass, class) then
-			seraphSkills(true, id)
-			return
-		end
-	end
-end
 --add tooltips
 function events.Action(t)
 	function events.Tick() 
@@ -1470,7 +1450,7 @@ function events.CanLearnSpell(t)
 	end
 end
 
-spellRequirements={100,200,500,1500,5000,10000,20000,40000,80000,160000,320000}
+spellRequirements={0,0,500,1500,5000,10000,20000,40000,80000,160000,320000}
 local masteryRequired={1,1,1,1,2,2,2,3,3,3,4}
 function events.CalcDamageToMonster(t)
 	if t.Monster.Hostile==false and t.Monster.ShowAsHostile==false then
@@ -1707,6 +1687,66 @@ function events.Tick()
 	end
 end
 
+local function elementalistSkills(isElementalist, id)
+	if isElementalist then
+		local pl=Party[id]
+		vars.elementalistSpells=vars.elementalistSpells or {}
+		vars.elementalistSpells[pl:GetIndex()]=vars.elementalistSpells[pl:GetIndex()] or {}
+		for i=12,15 do
+			vars.elementalistSpells[pl:GetIndex()][i]=vars.elementalistSpells[pl:GetIndex()][i] or 0
+		end
+	
+		local list = vars.elementalistSpells[pl:GetIndex()]
+		for i=12,15 do
+			local progression=list[i]
+			local currentTier=0
+			for j=1,#spellRequirements do
+				if progression>=spellRequirements[j] then
+					currentTier=j
+				end
+			end
+			if currentTier<11 then
+				local low=spellRequirements[currentTier]
+				local high=spellRequirements[currentTier+1]
+				local percentageProgression=math.floor((progression-low)/(high-low)*10000)/100
+				Skillz.setDesc(i,5,"Effects vary per spell\n\nElementalists learn new spells with practice instead of books.\n\nProgress toward learning " .. Game.SpellsTxt[(i-12)*11+currentTier+1].Name .. ": " .. percentageProgression .."%")
+			else
+				Skillz.setDesc(i,5,"Effects vary per spell\n\nElementalists learn new spells with practice instead of books.\n\nAll the available spells of this school have been learned.")
+			end
+		end
+	else
+		for i=12,15 do
+			Skillz.setDesc(i,5,"Effects vary per spell")		
+		end
+	end
+end
+
+
+function checkSkills(id)
+	shamanSkills(false, id)
+	dkSkills(false, id)
+	seraphSkills(false, id)
+	elementalistSkills(false, id)
+	if id>=0 and id<=Party.High then
+		local class=Party[id].Class
+		if table.find(shamanClass, class) then
+			shamanSkills(true, id)
+			return
+		end
+		if table.find(dkClass, class) then
+			dkSkills(true, id)
+			return
+		end
+		if table.find(seraphClass, class) then
+			seraphSkills(true, id)
+			return
+		end
+		if table.find(elementalistClass, class) then
+			elementalistSkills(true, id)
+			return
+		end
+	end
+end
 --[[test code
 function events.PlayerCastSpell(t)
 	if t.SpellId==2 then
