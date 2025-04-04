@@ -1988,7 +1988,6 @@ function events.BuildItemInformationBox(t)
 				end
 				local playerLevel=pl.LevelBase
 				t.Type = t.Type .. "\nAttack Speed: " .. getItemRecovery(t.Item, playerLevel)/100
-				debug.Message(getItemRecovery(t.Item, playerLevel)/100)
 			end
 		end
 	end
