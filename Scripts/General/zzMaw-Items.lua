@@ -4091,7 +4091,7 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 		local res=res or 0
 		local damage=damage/2^(res/100)
 		if speedMult then
-			damage=damage*getBaseAttackSpeed(it)
+			damage=damage*getItemRecovery(it, pl.LevelBase)
 		end
 		return round(damage)
 	else
