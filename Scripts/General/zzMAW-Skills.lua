@@ -161,9 +161,9 @@ function getItemRecovery(it, playerLevel)
 		skill=3
 	end
 	local baseSpeed=100
-	if (it.Number>=500 and it.Number<=543) or (it.Number>=1302 and it.Number<=1354) or (it.Number>=2020 and it.Number<=2049) then 
-		itemLevel=artifactPowerMult(playerLevel)*100
-		baseSpeed=baseRecovery[skill] * (0.75+itemLevel/250)
+	if table.find(artWeap1h,it.Number) or table.find(artWeap2h,it.Number) then 
+		itemLevel=playerLevel
+		baseSpeed=baseRecovery[skill] * (0.75+playerLevel/250)
 		baseSpeed=round(baseSpeed/10)*10
 	elseif baseRecovery[skill] then
 		local tot=0
