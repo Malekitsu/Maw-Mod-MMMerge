@@ -1713,13 +1713,13 @@ function events.ItemAdditionalDamage(t)
 		local index=table.find(damageKindMap,enchantbonusdamage[t.Item.Bonus2].Type)
 		local res=t.Monster.Resistances[index]
 		damage=calcEnchantDamage(t.Player, t.Item, res, true, false, "damage")
-		local attackSpeedMult=getBaseAttackSpeed(t.Item)
+		local attackSpeedMult=getItemRecovery(t.Item, t.Player.LevelBase)
 		t.Result=round(damage*attackSpeedMult)
 		return
 	end
 
 	--attack speed bonus, for other enchants
-	local attackSpeedMult=getBaseAttackSpeed(t.Item)
+	local attackSpeedMult=getItemRecovery(t.Item, t.Player.LevelBase)
 	t.Result=round(t.Result*attackSpeedMult)
 end
 
@@ -1981,13 +1981,13 @@ function events.BuildItemInformationBox(t)
 				skill=3
 			end
 			if baseRecovery[skill] then
-				local itemLevel=artifactMult*100
-				baseSpeed=baseRecovery[skill] * (0.75+itemLevel/250)
-				baseSpeed=round(baseSpeed/10)/10
-				if skill==7 then
-					baseSpeed=0.4
+				local pl=Party[0]
+				local id=Game.CurrentPlayer
+				if id>0 and id<Party.High then
+					pl=Party[id]
 				end
-				t.Type = t.Type .. "\nAttack Speed: " .. baseSpeed
+				local playerLevel=pl.LevelBase
+				t.Type = t.Type .. "\nAttack Speed: " .. getItemRecovery(t.Item, playerLevel)/100
 			end
 		end
 	end
@@ -3851,33 +3851,6 @@ function events.CalcStatBonusByItems(t)
 			t.Player.SpellBuffs[stat1].Power=0
 		end
 	end
-end
-
-function getBaseAttackSpeed(it)
-	local skill=it:T().Skill
-	if table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number) then
-		skill=3
-	end
-	if baseRecovery[skill] then
-		local maxCharges=it.MaxCharges
-		--[[
-		if vars.insanityMode then
-			maxCharges=maxCharges*4/3
-		end
-		]]
-		local itemLevel=maxCharges*5
-		local tot=0
-		local lvl=0
-		for i=1, 6 do
-			tot=tot+it:T().ChanceByLevel[i]
-			lvl=lvl+it:T().ChanceByLevel[i]*i
-		end
-		itemLevel=itemLevel+round(lvl/tot*18-17)
-		baseSpeed=baseRecovery[skill] * (0.75+itemLevel/200)
-		baseSpeed=round(baseSpeed/10)/10
-		return baseSpeed
-	end
-	return 1
 end
 
 --items have an item level requirement
