@@ -1713,13 +1713,13 @@ function events.ItemAdditionalDamage(t)
 		local index=table.find(damageKindMap,enchantbonusdamage[t.Item.Bonus2].Type)
 		local res=t.Monster.Resistances[index]
 		damage=calcEnchantDamage(t.Player, t.Item, res, true, false, "damage")
-		local attackSpeedMult=getItemRecovery(t.Item, t.Player.LevelBase)
+		local attackSpeedMult=getItemRecovery(t.Item, t.Player.LevelBase)/100
 		t.Result=round(damage*attackSpeedMult)
 		return
 	end
 
 	--attack speed bonus, for other enchants
-	local attackSpeedMult=getItemRecovery(t.Item, t.Player.LevelBase)
+	local attackSpeedMult=getItemRecovery(t.Item, t.Player.LevelBase)/100
 	t.Result=round(t.Result*attackSpeedMult)
 end
 
@@ -1988,6 +1988,7 @@ function events.BuildItemInformationBox(t)
 				end
 				local playerLevel=pl.LevelBase
 				t.Type = t.Type .. "\nAttack Speed: " .. getItemRecovery(t.Item, playerLevel)/100
+				debug.Message(getItemRecovery(t.Item, playerLevel)/100)
 			end
 		end
 	end
@@ -2273,20 +2274,7 @@ function events.BuildItemInformationBox(t)
 			skill=3
 		end
 		if t.Type and baseRecovery[skill] then
-			local itemLevel=t.Item.MaxCharges*10
-			local tot=0
-			local lvl=0
-			for i=1, 6 do
-				tot=tot+t.Item:T().ChanceByLevel[i]
-				lvl=lvl+t.Item:T().ChanceByLevel[i]*i
-			end
-			itemLevel=itemLevel+round(lvl/tot*18-17)
-			baseSpeed=baseRecovery[skill] * (0.75+itemLevel/250)
-			baseSpeed=round(baseSpeed/10)/10
-			
-			if skill==7 then return end --blaster fix
-			
-			t.Type = t.Type .. "\nAttack Speed: " .. baseSpeed
+			t.Type = t.Type .. "\nAttack Speed: " .. getItemRecovery(t.Item, 0)/100
 		end
 	end
 end
@@ -4091,7 +4079,7 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 		local res=res or 0
 		local damage=damage/2^(res/100)
 		if speedMult then
-			damage=damage*getItemRecovery(it, pl.LevelBase)
+			damage=damage*getItemRecovery(it, pl.LevelBase)/100
 		end
 		return round(damage)
 	else
