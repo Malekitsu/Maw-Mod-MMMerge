@@ -1760,13 +1760,22 @@ function events.GetMerchantTotalSkill(t)
 	local maxMerchantSkill=0
 	for i=0, Party.High do
 		local s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Merchant))
-		if s*m>maxMerchantSkill then
+		local tot = s*m
+		local glamour=Party[i].SpellBuffs[24]
+		if glamour.ExpireTime>=Game.Time then
+			tot = tot + glamour.Skill*glamour.Power
+			if glamour.Skill==4 then
+				tot=100
+			end
+		end
+		if tot>maxMerchantSkill then
 			if m==4 then
 				maxMerchantSkill=100
 			else
-				maxMerchantSkill=s*m
+				maxMerchantSkill=tot
 			end
-		end		
+		end
+			
 	end
 	t.Result=7+maxMerchantSkill
 end
