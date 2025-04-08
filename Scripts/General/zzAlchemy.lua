@@ -1085,6 +1085,7 @@ function normal_random(mean, stddev)
 end
 
 local noCorpseMonsters={82,83,84,97,98,99,241,242,243,523,524,525,529,530,531,532,533,534,622,623,624,625,626,627}
+local waterMonsters={244,245,246,625,626,627}
 function events.MonsterKilled(mon)
 	if mon.Ally == 9999 or mon.NameId>300 then -- no drop from reanimated monsters
 		return
@@ -1154,26 +1155,14 @@ function events.MonsterKilled(mon)
 		end
 	end
 	--pick special drop
-	if math.random()<craftDropChances[1061]*bonusRoll then
-		obj = SummonItem(1061, mon.X, mon.Y, mon.Z + 100, 100)
-	end
-	if math.random()<craftDropChances[1062]*bonusRoll then
-		obj = SummonItem(1062, mon.X, mon.Y, mon.Z + 100, 100)
-	end
-	if math.random()<craftDropChances[1063]*bonusRoll*insanityMult then
-		obj = SummonItem(1063, mon.X, mon.Y, mon.Z + 100, 100)
-	end
-	if math.random()<craftDropChances[1064]*bonusRoll*insanityMult then
-		obj = SummonItem(1064, mon.X, mon.Y, mon.Z + 100, 100)
-	end
-	if math.random()<craftDropChances[1065]*bonusRoll then
-		obj = SummonItem(1065, mon.X, mon.Y, mon.Z + 100, 100)
-	end
-	if math.random()<craftDropChances[1066]*bonusRoll then
-		obj = SummonItem(1066, mon.X, mon.Y, mon.Z + 100, 100)
-	end
-	if math.random()<craftDropChances[1067]*bonusRoll then
-		obj = SummonItem(1067, mon.X, mon.Y, mon.Z + 100, 100)
+	for i=1061,1067 do
+		if math.random()<craftDropChances[i]*bonusRoll then
+			if table.find(waterMonsters, mon.Id) then
+				evt.Add("Items", i)
+			else
+				obj = SummonItem(i, mon.X, mon.Y, mon.Z + 100, 100)
+			end
+		end
 	end
 	
 end
