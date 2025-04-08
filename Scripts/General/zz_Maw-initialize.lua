@@ -5,6 +5,7 @@ chargeKey=69
 healthPotionKey=71
 manaPotionKey=86
 Game.PatchOptions.FixMonstersBlockingShots=true
+higherLootPowerRange=true
 
 --sorting buttons
 currentBagSortKey=82
