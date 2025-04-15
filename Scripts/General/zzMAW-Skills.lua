@@ -185,6 +185,10 @@ function events.GetAttackDelay(t)
 	bonusSpeed=0
 	count=0
 	currentSpeed=0
+	
+	damageMultiplier=damageMultiplier or {}
+	damageMultiplier[t.PlayerIndex]=damageMultiplier[t.PlayerIndex] or {}
+	
 	if t.Ranged then
 		local it=t.Player:GetActiveItem(2)
 		if it then
@@ -269,8 +273,6 @@ function events.GetAttackDelay(t)
 		bonusSpeed=bonusSpeed+20
 	end
 	
-	damageMultiplier=damageMultiplier or {}
-	damageMultiplier[t.PlayerIndex]=damageMultiplier[t.PlayerIndex] or {}
 	
 	if t.Ranged then
 		damageMultiplier[t.PlayerIndex]["Ranged"]=1*baseSpeed/100
