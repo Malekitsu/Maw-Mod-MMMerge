@@ -360,8 +360,8 @@ local function seraphSkills(isSeraph, id)
 		Skillz.setDesc(18,1,txt)
 		
 		--damage tooltip
-		local mindDMG=math.floor((mindS*mindM/2)
-		local lightDMG=math.floor(lightS*lightM/2)
+		local mindDMG=mindS*mindM/2
+		local lightDMG=lightS*lightM/2
 		local txt=baseSchoolsTxtSERAPH[16] .. "\n\nSeraphim damage upon attack increases depending on Mind magic, scaling with might(weapon speed multiplier applies).\n\n" .. "Current damage from Mind: " .. StrColor(255,0,0,mindDMG) .. "\n"
 		Skillz.setDesc(17,1,txt)
 		local txt=baseSchoolsTxtSERAPH[18] .. "\n\nSeraphim damage upon attack increases depending on Light magic, scaling with might(weapon speed multiplier applies).\n\n" .. "Current damage from Light: " .. StrColor(255,0,0,lightDMG) .. "\n"
