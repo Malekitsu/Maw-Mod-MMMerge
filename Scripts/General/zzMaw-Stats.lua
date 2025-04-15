@@ -165,7 +165,7 @@ end
 
 function getSpellDelay(pl,spell)
 	local s,m=SplitSkill(pl.Skills[math.ceil(spell/11)+11])
-	if m==0 then return end
+	if m==0 then return 150 end
 	local haste=math.floor(pl:GetSpeed()/10)
 	for i=1,2 do
 		local it=pl:GetActiveItem(i)
