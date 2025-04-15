@@ -1246,6 +1246,9 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	--base enchants
 	currentItemRes=10000
 	for i=1,#resList do
+		vars.normalEnchantResistance=vars.normalEnchantResistance or {}
+		vars.normalEnchantResistance[id]=vars.normalEnchantResistance[id] or {}
+		vars.normalEnchantResistance[id][resList[i]+1]=vars.normalEnchantResistance[id][resList[i]+1] or 0
 		local itemRes = vars.normalEnchantResistance[id][resList[i]+1]
 		if itemRes<currentItemRes then
 			currentItemRes=itemRes
