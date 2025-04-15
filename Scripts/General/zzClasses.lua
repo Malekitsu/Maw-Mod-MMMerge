@@ -1530,6 +1530,7 @@ function events.PlayerCastSpell(t)
 				end
 			end
 		end
+		vars.eleTimer=vars.eleTimer or {}
 		vars.eleTimer[index]=Game.Time+math.max(getSpellDelay(pl,spell)*4, 128)
 		vars.eleStacks=vars.eleStacks or {}
 		vars.eleStacks[index]=vars.eleStacks[index] or 0
