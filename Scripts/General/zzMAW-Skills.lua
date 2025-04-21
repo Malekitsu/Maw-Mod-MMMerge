@@ -318,6 +318,11 @@ function events.GetAttackDelay(t)
 		end
 		t.Result=t.Result/hasteMult
 	end
+	if t.Ranged then
+		if disableBow then 
+			t.Result=0 return
+		end
+	end
 end
 
 function calculateAngle(vector1, vector2)
@@ -2382,7 +2387,7 @@ end
 --disable arrows
 
 function events.ArrowProjectile(t)
-	if Party[0].Name=="Wu Carrot" then
+	if disableBow then
 		t.ObjId=0
 	end
 end
