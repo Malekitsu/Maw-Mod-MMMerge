@@ -189,7 +189,7 @@ function events.GetAttackDelay(t)
 	damageMultiplier=damageMultiplier or {}
 	damageMultiplier[t.PlayerIndex]=damageMultiplier[t.PlayerIndex] or {}
 	
-	if t.Ranged and not disableBow then
+	if t.Ranged then
 		local it=t.Player:GetActiveItem(2)
 		if it then
 			local skill=it:T().Skill
@@ -274,7 +274,7 @@ function events.GetAttackDelay(t)
 	end
 	
 	
-	if t.Ranged and not disableBow then
+	if t.Ranged then
 		damageMultiplier[t.PlayerIndex]["Ranged"]=1*baseSpeed/100
 		damageMultiplier[t.PlayerIndex]["bonusSpeedRanged"]=bonusSpeed
 		damageMultiplier[t.PlayerIndex]["baseSpeedRanged"]=baseSpeed
