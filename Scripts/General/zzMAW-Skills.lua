@@ -189,7 +189,7 @@ function events.GetAttackDelay(t)
 	damageMultiplier=damageMultiplier or {}
 	damageMultiplier[t.PlayerIndex]=damageMultiplier[t.PlayerIndex] or {}
 	
-	if t.Ranged then
+	if t.Ranged and not disableBow then
 		local it=t.Player:GetActiveItem(2)
 		if it then
 			local skill=it:T().Skill
@@ -274,7 +274,7 @@ function events.GetAttackDelay(t)
 	end
 	
 	
-	if t.Ranged then
+	if t.Ranged and not disableBow then
 		damageMultiplier[t.PlayerIndex]["Ranged"]=1*baseSpeed/100
 		damageMultiplier[t.PlayerIndex]["bonusSpeedRanged"]=bonusSpeed
 		damageMultiplier[t.PlayerIndex]["baseSpeedRanged"]=baseSpeed
@@ -317,11 +317,6 @@ function events.GetAttackDelay(t)
 			hasteMult=math.max(1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]*s/1000, hasteMult)
 		end
 		t.Result=t.Result/hasteMult
-	end
-	if t.Ranged then
-		if disableBow then 
-			t.Result=0 return
-		end
 	end
 end
 
