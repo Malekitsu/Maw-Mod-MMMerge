@@ -3189,7 +3189,7 @@ function events.Tick()
 	if Multiplyer and Multiplayer.in_game then return end
 	for i=0, Map.Objects.High do
 		local obj=Map.Objects[i]
-		if transform[obj.Type] and obj.Owner%8==3 then
+		if transform[obj.Type] and obj.Owner%8==3 and obj.Spell==0 then
 			obj.Type=transform[obj.Type]
 			obj.TypeIndex=obj.Type-160
 			obj.LightMultiplier=0
@@ -3203,7 +3203,7 @@ function events.Tick()
 		lastLocation=lastLocation or {}
 		lastLocation[i]=lastLocation[i] or {math.huge,math.huge}
 		local dist=getDistance(obj.X,obj.Y,obj.Z)
-		if table.find(transformedList, obj.Type) and (dist<160 or (obj.X==lastLocation[i][1] and obj.Y==lastLocation[i][2])) then
+		if table.find(transformedList, obj.Type) and (dist<160 or (obj.X==lastLocation[i][1] and obj.Y==lastLocation[i][2])) and obj.Spell==0 then
 			obj.Type=explosions[obj.Type]
 			obj.TypeIndex=obj.Type-160
 			obj.VelocityX=0
