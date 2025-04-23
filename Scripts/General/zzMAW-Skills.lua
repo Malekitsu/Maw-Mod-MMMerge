@@ -273,6 +273,10 @@ function events.GetAttackDelay(t)
 		bonusSpeed=bonusSpeed+20
 	end
 	
+	if t.Ranged and disableBow then --mostly for tooltip
+		baseSpeed=100
+		bonusSpeed=0
+	end
 	
 	if t.Ranged then
 		damageMultiplier[t.PlayerIndex]["Ranged"]=1*baseSpeed/100
@@ -317,6 +321,10 @@ function events.GetAttackDelay(t)
 			hasteMult=math.max(1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]*s/1000, hasteMult)
 		end
 		t.Result=t.Result/hasteMult
+	end
+	
+	if t.Ranged and disableBow then --makes melee attack delay instead of bow
+		t.Result=t.Player:GetAttackDelay()
 	end
 end
 
@@ -2388,7 +2396,7 @@ function events.ArrowProjectile(t)
 end
 
 function events.PlaySound(t)
-	if Party[0].Name=="Wu Carrot" and t.Sound==71 then
+	if disableBow and t.Sound==71 then
 		t.Sound=83
 	end
 end
