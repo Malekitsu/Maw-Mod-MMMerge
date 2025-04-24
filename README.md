@@ -21,8 +21,8 @@ Viktor, Hagnak, ArkTolei, MR___TJ, Spazzledorf, Torkvato, LiGx, Mercs/Zan Team.
 - download MM8 from GOG
 - following 3 files needs to be copied into MM8 folder in that exact order.
   - download MMMerge here: https://1drv.ms/u/s!AklOx6zaOmQgbHB1-Avia15ruaI?e=H4IcBJ 
+  - download Patch here: https://gitlab.com/letr.rod/mmmerge/-/archive/Rodril_nightly_build/mmmerge-Rodril_nightly_build.zip
   - download Multiplayer here: https://gitlab.com/letr.rod/mmmerge/-/archive/multiplayer/mmmerge-multiplayer.zip
-  - download Patch here: https://drive.google.com/file/d/1IwF-MADHqpXOjHwOzYJxLcoUKh1Q4gXb/view
   - download MAW MMMerge here: https://github.com/Malekitsu/Maw-Mod-MMMerge/archive/refs/heads/main.zip
 - put MM8 folder into desktop
 - set mm8.exe into Windows Service pack 2 (or 3) compatibility mode.
