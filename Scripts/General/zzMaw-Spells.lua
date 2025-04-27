@@ -983,6 +983,7 @@ function events.PlayerCastSpell(t)
 			Party.SpellBuffs[7].Caster=50
 			Party.SpellBuffs[7].Skill=4
 			Party.SpellBuffs[7].Power=0
+			Party.SpellBuffs[7].Bits=1
 			Party.SpellBuffs[7].ExpireTime=Game.Time+const.Hour*7
 			t.Handled=true
 			t.Player:SetRecoveryDelay(120)
