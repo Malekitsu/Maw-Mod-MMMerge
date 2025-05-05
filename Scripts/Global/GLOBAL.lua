@@ -164,7 +164,7 @@ end
 
 
 --QUEST FIX
-local questRemoveList={207,571,572,573,574,575,576, 181, 203, 212,234,246}
+local questRemoveList={207,571,572,573,574,575,576, 181, 203, 212,234,246,1442,1443,1444,1445,1446,1447}
 for i=1,#questRemoveList do
 	Game.GlobalEvtLines:RemoveEvent(questRemoveList[i])
 end
@@ -546,4 +546,256 @@ Perhaps we can survive until a new home can be found for us!" ]]
 	end
 	evt.SetMessage{Str = 761}         --[[ "Thanks for the potion, but others in the area are without protection!
 Be sure to deliver a potion to them as well!" ]]
+end
+
+-- "Trade Pyramid for Armor"
+evt.global[1442] = function()
+	mapvars.circusLootStrong=mapvars.circusLootStrong or 0
+	if mapvars.circusLootStrong>=10 then
+		Message("We have no more items to trade for pyramids")
+		return
+	end
+	evt.ForPlayer(0)
+	if evt.Cmp{"Inventory", Value = 2092} then         -- "Golden Pyramid"
+		evt.Subtract{"Inventory", Value = 2092}         -- "Golden Pyramid"
+		evt.GiveItem{Strength = 6, Type = const.ItemType.Armor_, Id = 0}
+		evt.SetMessage{Str = 2138}         -- "Great to do business with you, here's your armor!"
+		mapvars.circusLootStrong=mapvars.circusLootStrong+1
+		return
+	end
+	evt.ForPlayer(1)
+	if evt.Cmp{"Inventory", Value = 2092} then         -- "Golden Pyramid"
+		evt.Subtract{"Inventory", Value = 2092}         -- "Golden Pyramid"
+		evt.GiveItem{Strength = 6, Type = const.ItemType.Armor_, Id = 0}
+		evt.SetMessage{Str = 2138}         -- "Great to do business with you, here's your armor!"
+		mapvars.circusLootStrong=mapvars.circusLootStrong+1
+		return
+	end
+	evt.ForPlayer(2)
+	if evt.Cmp{"Inventory", Value = 2092} then         -- "Golden Pyramid"
+		evt.Subtract{"Inventory", Value = 2092}         -- "Golden Pyramid"
+		evt.GiveItem{Strength = 6, Type = const.ItemType.Armor_, Id = 0}
+		evt.SetMessage{Str = 2138}         -- "Great to do business with you, here's your armor!"
+		mapvars.circusLootStrong=mapvars.circusLootStrong+1
+		return
+	end
+	evt.ForPlayer(3)
+	if evt.Cmp{"Inventory", Value = 2092} then         -- "Golden Pyramid"
+		evt.Subtract{"Inventory", Value = 2092}         -- "Golden Pyramid"
+		evt.GiveItem{Strength = 6, Type = const.ItemType.Armor_, Id = 0}
+		evt.SetMessage{Str = 2138}         -- "Great to do business with you, here's your armor!"
+		mapvars.circusLootStrong=mapvars.circusLootStrong+1
+	else
+		evt.SetMessage{Str = 2140}         -- "I'm afraid you don't have a golden pyramid, so I can't make a deal with you."
+	end
+end
+
+-- "Trade Pyramid for Weapon"
+evt.global[1443] = function()
+	mapvars.circusLootStrong=mapvars.circusLootStrong or 0
+	if mapvars.circusLootStrong>=10 then
+		Message("We have no more items to trade for pyramids")
+		return
+	end
+	evt.ForPlayer(0)
+	if evt.Cmp{"Inventory", Value = 2092} then         -- "Golden Pyramid"
+		evt.Subtract{"Inventory", Value = 2092}         -- "Golden Pyramid"
+		evt.GiveItem{Strength = 6, Type = const.ItemType.Weapon_, Id = 0}
+		evt.SetMessage{Str = 2142}         -- "Great to do business with you, here's your weapon!"
+		mapvars.circusLootStrong=mapvars.circusLootStrong+1
+		return
+	end
+	evt.ForPlayer(1)
+	if evt.Cmp{"Inventory", Value = 2092} then         -- "Golden Pyramid"
+		evt.Subtract{"Inventory", Value = 2092}         -- "Golden Pyramid"
+		evt.GiveItem{Strength = 6, Type = const.ItemType.Weapon_, Id = 0}
+		evt.SetMessage{Str = 2142}         -- "Great to do business with you, here's your weapon!"
+		mapvars.circusLootStrong=mapvars.circusLootStrong+1
+		return
+	end
+	evt.ForPlayer(2)
+	if evt.Cmp{"Inventory", Value = 2092} then         -- "Golden Pyramid"
+		evt.Subtract{"Inventory", Value = 2092}         -- "Golden Pyramid"
+		evt.GiveItem{Strength = 6, Type = const.ItemType.Weapon_, Id = 0}
+		evt.SetMessage{Str = 2142}         -- "Great to do business with you, here's your weapon!"
+		mapvars.circusLootStrong=mapvars.circusLootStrong+1
+		return
+	end
+	evt.ForPlayer(3)
+	if evt.Cmp{"Inventory", Value = 2092} then         -- "Golden Pyramid"
+		evt.Subtract{"Inventory", Value = 2092}         -- "Golden Pyramid"
+		evt.GiveItem{Strength = 6, Type = const.ItemType.Weapon_, Id = 0}
+		evt.SetMessage{Str = 2142}         -- "Great to do business with you, here's your weapon!"
+		mapvars.circusLootStrong=mapvars.circusLootStrong+1
+	else
+		evt.SetMessage{Str = 2140}         -- "I'm afraid you don't have a golden pyramid, so I can't make a deal with you."
+	end
+end
+
+-- "Trade Pyramid for Accessory"
+evt.global[1444] = function()
+	mapvars.circusLootStrong=mapvars.circusLootStrong or 0
+	if mapvars.circusLootStrong>=10 then
+		Message("We have no more items to trade for pyramids")
+		return
+	end
+	evt.ForPlayer(0)
+	if evt.Cmp{"Inventory", Value = 2092} then         -- "Golden Pyramid"
+		evt.Subtract{"Inventory", Value = 2092}         -- "Golden Pyramid"
+		evt.GiveItem{Strength = 6, Type = const.ItemType.Misc, Id = 0}
+		evt.SetMessage{Str = 2143}         -- "Great to do business with you, here's your accessory!"
+		mapvars.circusLootStrong=mapvars.circusLootStrong+1
+		return
+	end
+	evt.ForPlayer(1)
+	if evt.Cmp{"Inventory", Value = 2092} then         -- "Golden Pyramid"
+		evt.Subtract{"Inventory", Value = 2092}         -- "Golden Pyramid"
+		evt.GiveItem{Strength = 6, Type = const.ItemType.Misc, Id = 0}
+		evt.SetMessage{Str = 2143}         -- "Great to do business with you, here's your accessory!"
+		mapvars.circusLootStrong=mapvars.circusLootStrong+1
+		return
+	end
+	evt.ForPlayer(2)
+	if evt.Cmp{"Inventory", Value = 2092} then         -- "Golden Pyramid"
+		evt.Subtract{"Inventory", Value = 2092}         -- "Golden Pyramid"
+		evt.GiveItem{Strength = 6, Type = const.ItemType.Misc, Id = 0}
+		evt.SetMessage{Str = 2143}         -- "Great to do business with you, here's your accessory!"
+		mapvars.circusLootStrong=mapvars.circusLootStrong+1
+		return
+	end
+	evt.ForPlayer(3)
+	if evt.Cmp{"Inventory", Value = 2092} then         -- "Golden Pyramid"
+		evt.Subtract{"Inventory", Value = 2092}         -- "Golden Pyramid"
+		evt.GiveItem{Strength = 6, Type = const.ItemType.Misc, Id = 0}
+		evt.SetMessage{Str = 2143}         -- "Great to do business with you, here's your accessory!"
+		mapvars.circusLootStrong=mapvars.circusLootStrong+1
+	else
+		evt.SetMessage{Str = 2140}         -- "I'm afraid you don't have a golden pyramid, so I can't make a deal with you."
+	end
+end
+
+-- "Trade Keg for Armor"
+evt.global[1445] = function()
+	mapvars.circusLootWeak=mapvars.circusLootWeak or 0
+	if mapvars.circusLootWeak>=10 then
+		Message("We have no more items to trade for kegs")
+		return
+	end
+	evt.ForPlayer(0)
+	if evt.Cmp{"Inventory", Value = 2093} then         -- "Keg of Wine"
+		evt.Subtract{"Inventory", Value = 2093}         -- "Keg of Wine"
+		evt.GiveItem{Strength = 4, Type = const.ItemType.Armor_, Id = 0}
+		evt.SetMessage{Str = 2138}         -- "Great to do business with you, here's your armor!"
+		mapvars.circusLootWeak=mapvars.circusLootWeak+1
+		return
+	end
+	evt.ForPlayer(1)
+	if evt.Cmp{"Inventory", Value = 2093} then         -- "Keg of Wine"
+		evt.Subtract{"Inventory", Value = 2093}         -- "Keg of Wine"
+		evt.GiveItem{Strength = 4, Type = const.ItemType.Armor_, Id = 0}
+		evt.SetMessage{Str = 2138}         -- "Great to do business with you, here's your armor!"
+		mapvars.circusLootWeak=mapvars.circusLootWeak+1
+		return
+	end
+	evt.ForPlayer(2)
+	if evt.Cmp{"Inventory", Value = 2093} then         -- "Keg of Wine"
+		evt.Subtract{"Inventory", Value = 2093}         -- "Keg of Wine"
+		evt.GiveItem{Strength = 4, Type = const.ItemType.Armor_, Id = 0}
+		evt.SetMessage{Str = 2138}         -- "Great to do business with you, here's your armor!"
+		mapvars.circusLootWeak=mapvars.circusLootWeak+1
+		return
+	end
+	evt.ForPlayer(3)
+	if evt.Cmp{"Inventory", Value = 2093} then         -- "Keg of Wine"
+		evt.Subtract{"Inventory", Value = 2093}         -- "Keg of Wine"
+		evt.GiveItem{Strength = 4, Type = const.ItemType.Armor_, Id = 0}
+		evt.SetMessage{Str = 2138}         -- "Great to do business with you, here's your armor!"
+		mapvars.circusLootWeak=mapvars.circusLootWeak+1
+	else
+		evt.SetMessage{Str = 2141}         -- "You don't have a keg of wine to trade!"
+	end
+end
+
+-- "Trade Keg for Weapon"
+evt.global[1446] = function()
+	mapvars.circusLootWeak=mapvars.circusLootWeak or 0
+	if mapvars.circusLootWeak>=10 then
+		Message("We have no more items to trade for kegs")
+		return
+	end
+	evt.ForPlayer(0)
+	if evt.Cmp{"Inventory", Value = 2093} then         -- "Keg of Wine"
+		evt.Subtract{"Inventory", Value = 2093}         -- "Keg of Wine"
+		evt.GiveItem{Strength = 4, Type = const.ItemType.Weapon_, Id = 0}
+		evt.SetMessage{Str = 2142}         -- "Great to do business with you, here's your weapon!"
+		mapvars.circusLootWeak=mapvars.circusLootWeak+1
+		return
+	end
+	evt.ForPlayer(1)
+	if evt.Cmp{"Inventory", Value = 2093} then         -- "Keg of Wine"
+		evt.Subtract{"Inventory", Value = 2093}         -- "Keg of Wine"
+		evt.GiveItem{Strength = 4, Type = const.ItemType.Weapon_, Id = 0}
+		evt.SetMessage{Str = 2142}         -- "Great to do business with you, here's your weapon!"
+		mapvars.circusLootWeak=mapvars.circusLootWeak+1
+		return
+	end
+	evt.ForPlayer(2)
+	if evt.Cmp{"Inventory", Value = 2093} then         -- "Keg of Wine"
+		evt.Subtract{"Inventory", Value = 2093}         -- "Keg of Wine"
+		evt.GiveItem{Strength = 4, Type = const.ItemType.Weapon_, Id = 0}
+		evt.SetMessage{Str = 2142}         -- "Great to do business with you, here's your weapon!"
+		mapvars.circusLootWeak=mapvars.circusLootWeak+1
+		return
+	end
+	evt.ForPlayer(3)
+	if evt.Cmp{"Inventory", Value = 2093} then         -- "Keg of Wine"
+		evt.Subtract{"Inventory", Value = 2093}         -- "Keg of Wine"
+		evt.GiveItem{Strength = 4, Type = const.ItemType.Weapon_, Id = 0}
+		evt.SetMessage{Str = 2142}         -- "Great to do business with you, here's your weapon!"
+		mapvars.circusLootWeak=mapvars.circusLootWeak+1
+	else
+		evt.SetMessage{Str = 2141}         -- "You don't have a keg of wine to trade!"
+	end
+end
+
+-- "Trade Keg for Accessory"
+evt.global[1447] = function()
+	mapvars.circusLootWeak=mapvars.circusLootWeak or 0
+	if mapvars.circusLootWeak>=10 then
+		Message("We have no more items to trade for kegs")
+		return
+	end
+	evt.ForPlayer(0)
+	if evt.Cmp{"Inventory", Value = 2093} then         -- "Keg of Wine"
+		evt.Subtract{"Inventory", Value = 2093}         -- "Keg of Wine"
+		evt.GiveItem{Strength = 4, Type = const.ItemType.Misc, Id = 0}
+		evt.SetMessage{Str = 2143}         -- "Great to do business with you, here's your accessory!"
+		mapvars.circusLootWeak=mapvars.circusLootWeak+1
+		return
+	end
+	evt.ForPlayer(1)
+	if evt.Cmp{"Inventory", Value = 2093} then         -- "Keg of Wine"
+		evt.Subtract{"Inventory", Value = 2093}         -- "Keg of Wine"
+		evt.GiveItem{Strength = 4, Type = const.ItemType.Misc, Id = 0}
+		evt.SetMessage{Str = 2143}         -- "Great to do business with you, here's your accessory!"
+		mapvars.circusLootWeak=mapvars.circusLootWeak+1
+		return
+	end
+	evt.ForPlayer(2)
+	if evt.Cmp{"Inventory", Value = 2093} then         -- "Keg of Wine"
+		evt.Subtract{"Inventory", Value = 2093}         -- "Keg of Wine"
+		evt.GiveItem{Strength = 4, Type = const.ItemType.Misc, Id = 0}
+		evt.SetMessage{Str = 2143}         -- "Great to do business with you, here's your accessory!"
+		mapvars.circusLootWeak=mapvars.circusLootWeak+1
+		return
+	end
+	evt.ForPlayer(3)
+	if evt.Cmp{"Inventory", Value = 2093} then         -- "Keg of Wine"
+		evt.Subtract{"Inventory", Value = 2093}         -- "Keg of Wine"
+		evt.GiveItem{Strength = 4, Type = const.ItemType.Misc, Id = 0}
+		evt.SetMessage{Str = 2143}         -- "Great to do business with you, here's your accessory!"
+		mapvars.circusLootWeak=mapvars.circusLootWeak+1
+	else
+		evt.SetMessage{Str = 2141}         -- "You don't have a keg of wine to trade!"
+	end
 end
