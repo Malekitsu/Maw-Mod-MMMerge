@@ -409,8 +409,8 @@ end
 ----------------------------------
 local dragonFang={
 	["Attack"]={2,3,4,5,[0]=0},
-	["Damage"]={4,5,6,8,[0]=0},
-	["Speed"]={0,0,1,2,[0]=0},
+	["Damage"]={4,6,8,10,[0]=0},
+	--["Speed"]={0,0,1,2,[0]=0},
 }
 local dragonBreath={
 	--["Attack"]={0,0,0,0,[0]=0},
@@ -449,18 +449,33 @@ function events.GameInitialized2()
 		if t.Stat==27 then --min damage
 			local pl=t.Player
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.Unarmed)) 
-			local bonus= (dragonFang.Damage[m]-1) * s + t.Player.LevelBase +10
-			t.Result=bonus
 			local might=t.Player:GetMight()
-
-			t.Result=round(bonus*(1+might/1000))
+			if might>=25 then
+				mightEffect=math.floor(might/5)
+			else
+				mightEffect=math.floor((might-13)/2)
+			end
+			
+			local speed=pl:GetSpeed()/1000
+			
+			local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (math.min(t.Player.LevelBase,600) * 2 +30) 
+			t.Result=round((bonus*(1+might/1000)*(1+speed)+(mightEffect*might/1000))*0.75)
 			
 		elseif t.Stat==28 then --max damage
 			local pl=t.Player
-			local s, m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
-			local bonus= (dragonFang.Damage[m]+1) * s + t.Player.LevelBase +10
+			local s, m = SplitSkill(pl:GetSkill(const.Skills.Unarmed)) 
 			local might=t.Player:GetMight()
-			t.Result=round(bonus*(1+might/1000))
+			if might>=25 then
+				mightEffect=math.floor(might/5)
+			else
+				mightEffect=math.floor((might-13)/2)
+			end
+			
+			local speed=pl:GetSpeed()/1000
+			
+			local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (math.min(t.Player.LevelBase,600) * 2 +30)
+			
+			t.Result=round((bonus*(1+might/1000)*(1+speed)+(mightEffect*might/1000))*1.25)
 			
 		elseif t.Stat==25 then --attack
 			local pl=t.Player
@@ -480,16 +495,10 @@ function events.GameInitialized2()
 			else
 				mightEffect=math.floor((might-13)/2)
 			end
-			local speed=pl:GetSpeed()
-			if speed>=25 then
-				speed=math.floor(speed/5)
-			else
-				speed=math.floor((speed-13)/2)
-			end
-			speed=speed/2
+			local speed=pl:GetSpeed()/1000
 			
 			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(pl.LevelBase,600)) + mightEffect
-			local damage=round(baseDamage*(1+speed/100)*(1+might/1000)*0.75)
+			local damage=round(baseDamage*(1+speed)*(1+might/1000)*0.75)
 			
 			t.Result=damage
 			
@@ -503,16 +512,10 @@ function events.GameInitialized2()
 			else
 				mightEffect=math.floor((might-13)/2)
 			end
-			local speed=pl:GetSpeed()
-			if speed>=25 then
-				speed=math.floor(speed/5)
-			else
-				speed=math.floor((speed-13)/2)
-			end
-			speed=speed/2
+			local speed=pl:GetSpeed()/1000
 			
 			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(pl.LevelBase,600)) + mightEffect
-			local damage=round(baseDamage*(1+speed/100)*(1+might/1000)*1.25)
+			local damage=round(baseDamage*(1+speed)*(1+might/1000)*1.25)
 			
 			t.Result=damage
 		
@@ -546,7 +549,7 @@ function events.GameInitialized2()
 	--skill text
 	normal=""
 	normal=string.format("%s      %s|",normal,dragonFang.Attack[1])
-	normal=string.format("%s      %s|",normal,dragonFang.Speed[1])
+	--normal=string.format("%s      %s|",normal,dragonFang.Speed[1])
 	normal=string.format("%s     %s|",normal,dragonFang.Damage[1])
 	fangsNormal=normal
 	normal=""
@@ -556,7 +559,7 @@ function events.GameInitialized2()
 	
 	expert=""
 	expert=string.format("%s      %s|",expert,dragonFang.Attack[2])
-	expert=string.format("%s      %s|",expert,dragonFang.Speed[2])
+	--expert=string.format("%s      %s|",expert,dragonFang.Speed[2])
 	expert=string.format("%s     %s|",expert,dragonFang.Damage[2])
 	fangsExpert=expert
 	expert=""
@@ -566,7 +569,7 @@ function events.GameInitialized2()
 	
 	master=""
 	master=string.format("%s      %s|",master,dragonFang.Attack[3])
-	master=string.format("%s      %s|",master,dragonFang.Speed[3])
+	--master=string.format("%s      %s|",master,dragonFang.Speed[3])
 	master=string.format("%s     %s|",master,dragonFang.Damage[3])
 	fangsMaster=master
 	master=""
@@ -576,7 +579,7 @@ function events.GameInitialized2()
 	
 	gm=""
 	gm=string.format("%s      %s|",gm,dragonFang.Attack[4])
-	gm=string.format("%s      %s|",gm,dragonFang.Speed[4])
+	--gm=string.format("%s      %s|",gm,dragonFang.Speed[4])
 	gm=string.format("%s     %s|",gm,dragonFang.Damage[4])
 	fangsGM=gm
 	gm=""
@@ -644,69 +647,13 @@ function events.Action(t)
 	end
 end
 
---show damage in real time
-function events.Tick() 
-	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
-		i=Game.CurrentPlayer 
-		if i==-1 then return end 
-		local pl=Party[i]
-		race=Game.CharacterPortraits[pl.Face].Race
-		if race==const.Race.Dragon then
-			Skillz.setName(33, "Fangs")
-			local fang, fangM = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
-			--increase damage based on speed
-			local speed=pl:GetSpeed()
-			if speed>=25 then
-				speed=math.floor(speed/5)
-			else
-				speed=math.floor((speed-13)/2)
-			end
-			speed=speed+dragonFang.Speed[fangM]*fang
-			--increase damage based on might
-			local mightBase=pl:GetMight()
-			local might
-			if mightBase>=25 then
-				might=math.floor(mightBase/5)
-			else
-				might=math.floor((mightBase-13)/2)
-			end
-			
-			local baseDamage=dragonFang.Damage[fangM]*fang+might
-			local damage=round(baseDamage*(1+speed/100)*(1+mightBase/1000))
-				
-			local txt="Dragons can use their fangs to deal atrocious damage to enemies.\n\nWhenever this skill is below dragon skill it will push monsters away\nThis skill converts attack speed directly into damage.\n\nCurrent Damage:  " .. StrColor(255,0,0,damage) .. "\n------------------------------------------------------------\n          Attack| Speed| Dmg"
-			Skillz.setDesc(33,1,txt)
-		end
-	end
- end
-
 function dragonSkill(dragon, index)	
 	if dragon then
 		if index==-1 then return end
 		pl=Party[index]
 		Skillz.setName(33, "Fangs")
-		local fang, fangM = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
-		--increase damage based on speed
-		local speed=pl:GetSpeed()
-		if speed>=25 then
-			speed=math.floor(speed/5)
-		else
-			speed=math.floor((speed-13)/2)
-		end
-		speed=speed+dragonFang.Speed[fangM]*fang
-		--increase damage based on might
-		local mightBase=pl:GetMight()
-		local might
-		if mightBase>=25 then
-			might=math.floor(mightBase/5)
-		else
-			might=math.floor((mightBase-13)/2)
-		end
-		
-		local baseDamage=dragonFang.Damage[fangM]*fang+might
-		local damage=round(baseDamage*(1+speed/100)*(1+mightBase/1000))
-		
-		local txt="Dragons can use their fangs to deal atrocious damage to enemies.\n\nWhenever this skill is below dragon skill it will push monsters away\nThis skill converts attack speed directly into damage.\n\nCurrent Damage:  " .. StrColor(255,0,0,damage) .. "\n------------------------------------------------------------\n          Attack| Dmg|"
+
+		local txt="Dragons can use their fangs to deal atrocious damage to enemies. Damage is 30 + 2 per level (up to level 600). Fang skill increases this amount by a percentage based on mastery and skill level.\n\nWhenever this skill is below dragon skill it will push monsters away\nThis skill converts attack speed directly into damage.\n" .. "\n------------------------------------------------------------\n            Attack| Dmg|"
 		Skillz.setDesc(33,1,txt)
 		Game.SkillDesNormal[33]=fangsNormal
 		Game.SkillDesExpert[33]=fangsExpert
@@ -768,57 +715,30 @@ function events.GameInitialized2()
 					mult=fang/t.Monster.Level^0.75
 					table.insert(push,{["directionX"]=x, ["directionY"]=y, ["duration"]=60*mult^0.5, ["totalDuration"]=60*mult^0.5, ["totalForce"]=800*mult, ["currentForce"]=800*mult, ["id"]=t.MonsterIndex})
 				end
-				--increase damage based on speed
-				local speed=pl:GetSpeed()
-				if speed>=25 then
-					speed=math.floor(speed/5)
-				else
-					speed=math.floor((speed-13)/2)
-				end
-				local fang, fangM = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
-				speed=speed+dragonFang.Speed[fangM]*fang
-				--increase damage based on might
-				local mightBase=pl:GetMight()
-				local might
-				if mightBase>=25 then
-					might=math.floor(mightBase/5)
-				else
-					might=math.floor((mightBase-13)/2)
-				end
 				
-				local baseDamage=dragonFang.Damage[fangM]*fang+might
-				local damage=round(baseDamage*(1+speed/100)*(1+mightBase/1000))
+				local low=pl:GetMeleeDamageMin()
+				local high=pl:GetMeleeDamageMax()
+				local randomDamage=math.random(low, high) + math.random(low, high)
+				local damage=round(randomDamage/2)
 				
 				--check by damage type
 				index=table.find(damageKindMap,t.DamageKind)
 				res=t.Monster.Resistances[index]
 				if not res then return end
-				res=1-1/2^(res%1000/100)
-				luck=data.Player:GetLuck()/1.5
-				critDamage=data.Player:GetAccuracy()*3/1000
-				critChance=50+luck
-				roll=math.random(1, 1000)
-				crit=false
-				if roll <= critChance then
-					damage=damage*(1.5+critDamage)
-					crit=true
+				critChance, critMult, crit=getCritInfo(pl,false,getMonsterLevel(t.Monster))
+				if crit then
+					damage=damage*critMult
 				end
 				if pl.Class==10 then
-					pl.SP=math.min(pl.SP+10, 50)
+					pl.SP=math.min(pl.SP+10, 60)
 				elseif pl.Class==11 then
-					pl.SP=math.min(pl.SP+20, 100)
+					pl.SP=math.min(pl.SP+20, 120)
 				end
 				--apply Damage
-				t.Result = damage * (1-res)
+				t.Result = damage /2^(res%1000/100)
 			elseif t.DamageKind==50 or data.Spell==123 then
 				--increase damage based on speed
-				local speed=pl:GetSpeed()
-				if speed>=25 then
-					speed=math.floor(speed/5)
-				else
-					speed=math.floor((speed-13)/2)
-				end
-				speed=speed/2
+				local speed=pl:GetSpeed()/1000
 				--increase damage based on might
 				local mightBase=pl:GetMight()
 				local might
@@ -831,7 +751,7 @@ function events.GameInitialized2()
 				--breath
 				local breathS, breathM = SplitSkill(pl:GetSkill(const.Skills.DragonAbility))
 				local baseDamage=(1 + dragonBreath.Damage[breathM] * breathS / 100) * (20 + 2 * math.min(pl.LevelBase,600)) +might
-				local damage=round(baseDamage*(1+speed/100)*(1+mightBase/1000))
+				local damage=round(baseDamage*(1+speed)*(1+mightBase/1000))
 				
 				critChance, critMult, crit=getCritInfo(pl,false,getMonsterLevel(t.Monster))
 				if crit then
