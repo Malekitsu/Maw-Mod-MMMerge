@@ -75,14 +75,14 @@ evt.PotionEffects[18] = function(IsDrunk, t, Power)
 				t.Bonus=math.random(1,16)
 			end
 			
-			t.BonusStrength=Mouse.Item.Bonus/2
+			t.BonusStrength=math.min(Mouse.Item.Bonus/3,200)
 			--buff to hp and mana items
 			if t.Bonus==8 or t.Bonus==9 then
 				t.BonusStrength=t.BonusStrength*(2+t.BonusStrength/50)
 			end
 			--nerf to AC
 			if t.Bonus==10 then
-				t.BonusStrength=math.ceil(t.BonusStrength/2)
+				t.BonusStrength=math.ceil(t.BonusStrength*0.65)
 			end
 			-- buff to 2h weapons enchants
 			local mult=slotMult[t:T().EquipStat]
