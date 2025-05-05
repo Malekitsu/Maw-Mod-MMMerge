@@ -441,6 +441,7 @@ function events.GameInitialized2()
 	Game.Classes.SPFactor[11]=0
 	Game.Classes.SPStats[11]=3
 	
+	Skillz.setDesc(23,1,"Dragons are powerful creatures with innate abilities.\nLike the racial abilities of Dark Elves and Vampires, Dragon abilities are cast like spells, but are acquired like skills. Dragons begin able to cast Fear, the gain a second breath weapon, Flight and Wing Bugget at expert, master and grandmaster rankings.\n\nBreath damage is 20 + 2 per level (up to level 600) and total damage is increased by " .. dragonBreath.Damage[1] .. "-" .. dragonBreath.Damage[2] .. "-" .. dragonBreath.Damage[3] .. "-" .. dragonBreath.Damage[4] .. "% at novice, expert, master and grandmaster rankings per point of skill in Dragon Ability.\n"  )
 	
 	function events.CalcStatBonusByItems(t)
 		if Game.CharacterPortraits[t.Player.Face].Race~=const.Race.Dragon then return end
@@ -487,7 +488,7 @@ function events.GameInitialized2()
 			end
 			speed=speed/2
 			
-			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * pl.LevelBase) + mightEffect
+			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(pl.LevelBase,600)) + mightEffect
 			local damage=round(baseDamage*(1+speed/100)*(1+might/1000)*0.75)
 			
 			t.Result=damage
@@ -510,7 +511,7 @@ function events.GameInitialized2()
 			end
 			speed=speed/2
 			
-			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * pl.LevelBase) + mightEffect
+			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(pl.LevelBase,600)) + mightEffect
 			local damage=round(baseDamage*(1+speed/100)*(1+might/1000)*1.25)
 			
 			t.Result=damage
@@ -520,13 +521,13 @@ function events.GameInitialized2()
 			local pl=t.Player
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.Dodging))
 			local oldDodge=skillAC[const.Skills.Dodging][m] or 0
-			local bonus= (1 + dragonScales.AC[m]/100 * s) * (math.floor(math.min(pl.LevelBase,600))+40) - (s * oldDodge)
+			local bonus= (1 + dragonScales.AC[m]/100 * s) * (math.min(pl.LevelBase,600)+40) - (s * oldDodge)
 			t.Result=t.Result+bonus
 		elseif t.Stat>=10 and t.Stat<=15 then
 			local pl=t.Player
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.Dodging))
 			local oldDodge=skillAC[const.Skills.Dodging][m] or 0
-			local bonus= (dragonScales.AC[m]/100 * s) * (math.floor(math.min(pl.LevelBase,600))+40)
+			local bonus= (dragonScales.AC[m]/100 * s) * (math.min(pl.LevelBase,600)+40)
 			t.Result=t.Result+bonus
 		end
 		
@@ -829,7 +830,7 @@ function events.GameInitialized2()
 				
 				--breath
 				local breathS, breathM = SplitSkill(pl:GetSkill(const.Skills.DragonAbility))
-				local baseDamage=(1 + dragonBreath.Damage[breathM] * breathS / 100) * (20 + 2 * pl.LevelBase) +might
+				local baseDamage=(1 + dragonBreath.Damage[breathM] * breathS / 100) * (20 + 2 * math.min(pl.LevelBase,600)) +might
 				local damage=round(baseDamage*(1+speed/100)*(1+mightBase/1000))
 				
 				critChance, critMult, crit=getCritInfo(pl,false,getMonsterLevel(t.Monster))
