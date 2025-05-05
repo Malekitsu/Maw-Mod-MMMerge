@@ -441,7 +441,7 @@ function events.GameInitialized2()
 	Game.Classes.SPFactor[11]=0
 	Game.Classes.SPStats[11]=3
 	
-	Skillz.setDesc(23,1,"Dragons are powerful creatures with innate abilities.\nLike the racial abilities of Dark Elves and Vampires, Dragon abilities are cast like spells, but are acquired like skills. Dragons begin able to cast Fear, the gain a second breath weapon, Flight and Wing Bugget at expert, master and grandmaster rankings.\n\nBreath damage is 20 + 2 per level (up to level 600) and total damage is increased by " .. dragonBreath.Damage[1] .. "-" .. dragonBreath.Damage[2] .. "-" .. dragonBreath.Damage[3] .. "-" .. dragonBreath.Damage[4] .. "% at novice, expert, master and grandmaster rankings per point of skill in Dragon Ability.\nAttack speed does not make the breath faster, but increases its damage instead."  )
+	Skillz.setDesc(23,1,"Dragons are powerful creatures with innate abilities.\nLike the racial abilities of Dark Elves and Vampires, Dragon abilities are cast like spells, but are acquired like skills. Dragons begin able to cast Fear, the gain a second breath weapon, Flight and Wing Bugget at expert, master and grandmaster rankings.\n\nBreath damage is 20 + 2 per level (up to level 600) and total damage is increased by " .. dragonBreath.Damage[1] .. "-" .. dragonBreath.Damage[2] .. "-" .. dragonBreath.Damage[3] .. "-" .. dragonBreath.Damage[4] .. "% at novice, expert, master and grandmaster rankings per point of skill in Dragon Ability.\nEach point in the skill increases damage and increases recovery time by 3%."  )
 	
 	function events.CalcStatBonusByItems(t)
 		if Game.CharacterPortraits[t.Player.Face].Race~=const.Race.Dragon then return end
@@ -456,10 +456,9 @@ function events.GameInitialized2()
 				mightEffect=math.floor((might-13)/2)
 			end
 			
-			local speed=pl:GetSpeed()/1000
 			
 			local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (math.min(t.Player.LevelBase,600) * 2 +30) 
-			t.Result=round((bonus*(1+might/1000)*(1+speed)+(mightEffect*might/1000))*0.75)
+			t.Result=round((bonus*(1+might/1000)+(mightEffect*might/1000))*0.75*pl:GetAttackDelay()/100)
 			
 		elseif t.Stat==28 then --max damage
 			local pl=t.Player
@@ -471,11 +470,10 @@ function events.GameInitialized2()
 				mightEffect=math.floor((might-13)/2)
 			end
 			
-			local speed=pl:GetSpeed()/1000
 			
 			local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (math.min(t.Player.LevelBase,600) * 2 +30)
 			
-			t.Result=round((bonus*(1+might/1000)*(1+speed)+(mightEffect*might/1000))*1.25)
+			t.Result=round((bonus*(1+might/1000)+(mightEffect*might/1000))*1.25*pl:GetAttackDelay()/100)
 			
 		elseif t.Stat==25 then --attack
 			local pl=t.Player
@@ -495,10 +493,9 @@ function events.GameInitialized2()
 			else
 				mightEffect=math.floor((might-13)/2)
 			end
-			local speed=pl:GetSpeed()/1000
 			
 			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(pl.LevelBase,600)) + mightEffect
-			local damage=round(baseDamage*(1+speed)*(1+might/1000)*0.75)
+			local damage=round(baseDamage*(1+might/1000)*0.75*pl:GetAttackDelay(true)/100)
 			
 			t.Result=damage
 			
@@ -512,10 +509,9 @@ function events.GameInitialized2()
 			else
 				mightEffect=math.floor((might-13)/2)
 			end
-			local speed=pl:GetSpeed()/1000
 			
 			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(pl.LevelBase,600)) + mightEffect
-			local damage=round(baseDamage*(1+speed)*(1+might/1000)*1.25)
+			local damage=round(baseDamage*(1+might/1000)*1.25*pl:GetAttackDelay(true)/100)
 			
 			t.Result=damage
 		
@@ -542,7 +538,13 @@ function events.GameInitialized2()
 	
 	function events.GetAttackDelay(t)
 		if Game.CharacterPortraits[t.Player.Face].Race==const.Race.Dragon then
-			t.Result=100
+			if t.Ranged then
+				local s, m = SplitSkill(pl:GetSkill(const.Skills.DragonAbility))
+				t.Result=t.Result * (1+0.03*s)
+			else
+				local s, m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
+				t.Result=t.Result * (1+0.03*s)
+			end
 		end	
 	end
 	
@@ -653,7 +655,7 @@ function dragonSkill(dragon, index)
 		pl=Party[index]
 		Skillz.setName(33, "Fangs")
 
-		local txt="Dragons can use their fangs to deal atrocious damage to enemies. Damage is 30 + 2 per level (up to level 600). Fang skill increases this amount by a percentage based on mastery and skill level.\n\nWhenever this skill is below dragon skill it will push monsters away\nThis skill converts attack speed directly into damage.\n" .. "\n------------------------------------------------------------\n            Attack| Dmg|"
+		local txt="Dragons can use their fangs to deal atrocious damage to enemies. Damage is 30 + 2 per level (up to level 600). Fang skill increases this amount by a percentage based on mastery and skill level.\n\nWhenever this skill is below dragon skill it will push monsters away\nEach point in the skill increases damage and increases recovery time by 3%.\n" .. "\n------------------------------------------------------------\n            Attack| Dmg|"
 		Skillz.setDesc(33,1,txt)
 		Game.SkillDesNormal[33]=fangsNormal
 		Game.SkillDesExpert[33]=fangsExpert
@@ -679,9 +681,9 @@ function dragonSkill(dragon, index)
 			end
 			
 		end
-		Game.GlobalTxt[53] = "Damage\n\n\n\n\n\n\n\n\n\n\n\n"
-		Game.GlobalTxt[18] = "Attack         +" .. pl:GetMeleeAttack() .. "\n                 " .. pl:GetMeleeDamageMin() .. "-" .. pl:GetMeleeDamageMax() .. "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-		Game.GlobalTxt[203]="Shoot         +" .. pl:GetRangedAttack() .. "\n                 " .. pl:GetRangedDamageMin() .. "-" .. pl:GetRangedDamageMax() .. "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[53] = "Damage\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[18] = "Attack         +" .. pl:GetMeleeAttack() .. "\n                 " .. pl:GetMeleeDamageMin() .. "-" .. pl:GetMeleeDamageMax() .. "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[203]="Shoot         +" .. pl:GetRangedAttack() .. "\n                 " .. pl:GetRangedDamageMin() .. "-" .. pl:GetRangedDamageMax() .. "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
 	else
 		Game.GlobalTxt[18]="Attack"
 		Game.GlobalTxt[53]="Damage"
