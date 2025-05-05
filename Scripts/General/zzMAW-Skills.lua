@@ -236,7 +236,7 @@ function events.GetAttackDelay(t)
 						bonusSpeed=bonusSpeed+skillRecovery[const.Skills.Unarmed][m]*s
 					end
 				end
-			elseif i==1 then
+			elseif i==1 and Game.CharacterPortraits[pl.Face].Race~=const.Race.Dragon then
 				local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Unarmed))
 				bonusSpeed=bonusSpeed+skillRecovery[const.Skills.Unarmed][m]*s
 			end
