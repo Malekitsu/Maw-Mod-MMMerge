@@ -414,7 +414,7 @@ local dragonFang={
 }
 local dragonBreath={
 	--["Attack"]={0,0,0,0,[0]=0},
-	["Damage"]={3,4,5,6,[0]=0},
+	["Damage"]={4,5,6,8,[0]=0},
 	--["Speed"]={0,0,1,1,[0]=0},
 }
 local dragonScales={
@@ -472,7 +472,6 @@ function events.GameInitialized2()
 		if t.Stat==31 then --min damage
 			local pl=t.Player
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.DragonAbility))
-			local bonus= (dragonBreath.Damage[m]-1) * s
 			local might=t.Player:GetMight()
 			local mightEffect
 			if might>=25 then
@@ -480,12 +479,22 @@ function events.GameInitialized2()
 			else
 				mightEffect=math.floor((might-13)/2)
 			end
-			t.Result=round((bonus+mightEffect)*(1+might/1000))
+			local speed=pl:GetSpeed()
+			if speed>=25 then
+				speed=math.floor(speed/5)
+			else
+				speed=math.floor((speed-13)/2)
+			end
+			speed=speed/2
+			
+			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * pl.LevelBase) + mightEffect
+			local damage=round(baseDamage*(1+speed/100)*(1+might/1000)*0.75)
+			
+			t.Result=damage
 			
 		elseif t.Stat==32 then --max damage
 			local pl=t.Player
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.DragonAbility))
-			local bonus= (dragonBreath.Damage[m]+1) * s
 			local might=t.Player:GetMight()
 			local mightEffect
 			if might>=25 then
@@ -493,7 +502,18 @@ function events.GameInitialized2()
 			else
 				mightEffect=math.floor((might-13)/2)
 			end
-			t.Result=round((bonus+mightEffect)*(1+might/1000))
+			local speed=pl:GetSpeed()
+			if speed>=25 then
+				speed=math.floor(speed/5)
+			else
+				speed=math.floor((speed-13)/2)
+			end
+			speed=speed/2
+			
+			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * pl.LevelBase) + mightEffect
+			local damage=round(baseDamage*(1+speed/100)*(1+might/1000)*1.25)
+			
+			t.Result=damage
 		
 		--AC
 		elseif t.Stat==9 then
@@ -711,7 +731,13 @@ function dragonSkill(dragon, index)
 			end
 			
 		end
+		Game.GlobalTxt[53] = "Damage\n\n\n\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[18] = "Attack         +" .. pl:GetMeleeAttack() .. "\n                 " .. pl:GetMeleeDamageMin() .. "-" .. pl:GetMeleeDamageMax() .. "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+		Game.GlobalTxt[203]="Shoot         +" .. pl:GetRangedAttack() .. "\n                 " .. pl:GetRangedDamageMin() .. "-" .. pl:GetRangedDamageMax() .. "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
 	else
+		Game.GlobalTxt[18]="Attack"
+		Game.GlobalTxt[53]="Damage"
+		Game.GlobalTxt[203]="Shoot"
 		Skillz.setName(33,"Unarmed")
 		Skillz.setDesc(33,1,unarmedText)
 		Game.SkillDesNormal[33]=unarmedTextN
@@ -802,18 +828,13 @@ function events.GameInitialized2()
 				end
 				
 				--breath
-				local breath, breathM = SplitSkill(pl:GetSkill(const.Skills.DragonAbility))
-				local baseDamage=dragonBreath.Damage[breathM]*breath+might
+				local breathS, breathM = SplitSkill(pl:GetSkill(const.Skills.DragonAbility))
+				local baseDamage=(1 + dragonBreath.Damage[breathM] * breathS / 100) * (20 + 2 * pl.LevelBase) +might
 				local damage=round(baseDamage*(1+speed/100)*(1+mightBase/1000))
 				
-				luck=data.Player:GetLuck()/1.5
-				critDamage=data.Player:GetAccuracy()*3/1000
-				critChance=50+luck
-				roll=math.random(1, 1000)
-				crit=false
-				if roll <= critChance then
-					damage=damage*(1.5+critDamage)
-					crit=true
+				critChance, critMult, crit=getCritInfo(pl,false,getMonsterLevel(t.Monster))
+				if crit then
+					damage=damage*critMult
 				end
 				if data.Spell==123 then
 					local s,m=SplitSkill(t.Player.Skills[const.Skills.DragonAbility])
@@ -827,6 +848,17 @@ function events.GameInitialized2()
 				end
 				--randomize
 				damage=damage*0.75+(damage*math.random()*0.25)+(damage*math.random()*0.25)
+				--resistance
+				if t.Monster then
+					local res=10000
+					local mon=t.Monster
+					for i=0,10 do
+						if mon.Resistances[i] and mon.Resistances[i]<res then
+							res=mon.Resistances[i]
+						end
+					end
+					damage = damage/2^(res/100)
+				end
 				--apply Damage
 				t.Result = damage
 			end
