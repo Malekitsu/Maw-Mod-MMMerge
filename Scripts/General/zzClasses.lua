@@ -776,8 +776,8 @@ function events.GameInitialized2()
 					local res=10000
 					local mon=t.Monster
 					for i=0,10 do
-						if mon.Resistances[i] and mon.Resistances[i]<res then
-							res=mon.Resistances[i]
+						if mon.Resistances[i] and mon.Resistances[i]%1000<res then
+							res=mon.Resistances[i]%1000
 						end
 					end
 					damage = damage/2^(res/100)
