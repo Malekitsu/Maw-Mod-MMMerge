@@ -649,6 +649,20 @@ function events.Action(t)
 	end
 end
 
+function events.Tick()
+	if Game.CurrentScreen==7 then
+		local current=Game.CurrentPlayer
+		if current>=0 and current<=Party.High then
+			local race=Game.CharacterPortraits[Party[Game.CurrentPlayer].Face].Race
+			if race==const.Race.Dragon then
+				dragonSkill(true, Game.CurrentPlayer)
+			else
+				dragonSkill(false)
+			end
+		end
+	end
+end
+
 function dragonSkill(dragon, index)	
 	if dragon then
 		if index==-1 then return end
