@@ -418,8 +418,8 @@ local dragonBreath={
 	--["Speed"]={0,0,1,1,[0]=0},
 }
 local dragonScales={
-	["AC"]={2,3,4,5,[0]=0},
-	["Resistances"]={2,3,4,5,[0]=0},
+	["AC"]={2,3,3,4,[0]=0},
+	["Resistances"]={1,1,2,3,[0]=0},
 }
 
 function events.GameInitialized2()
@@ -500,12 +500,13 @@ function events.GameInitialized2()
 			local pl=t.Player
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.Dodging))
 			local oldDodge=skillAC[const.Skills.Dodging][m] or 0
-			local bonus= (dragonScales.AC[m]-oldDodge) * s + pl.LevelBase
+			local bonus= (1 + dragonScales.AC[m]/100 * s) * (math.floor(math.min(pl.LevelBase,600))+40) - (s * oldDodge)
 			t.Result=t.Result+bonus
 		elseif t.Stat>=10 and t.Stat<=15 then
 			local pl=t.Player
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.Dodging))
-			local bonus= (dragonScales.Resistances[m]) * s
+			local oldDodge=skillAC[const.Skills.Dodging][m] or 0
+			local bonus= (dragonScales.AC[m]/100 * s) * (math.floor(math.min(pl.LevelBase,600))+40)
 			t.Result=t.Result+bonus
 		end
 		
@@ -691,7 +692,7 @@ function dragonSkill(dragon, index)
 		Game.SkillDesMaster[33]=fangsMaster
 		Game.SkillDesGM[33]=fangsGM
 		Skillz.setName(32,"Scales")
-		txt="Dragons scales are hard enough to work as natural armor, allowing to block and reduce incoming damage\n\n------------------------------------------------------------\n          AC| Res"
+		txt="Dragons scales are hard enough to work as natural armor, gaining naturally 40 + 1 AC per level (up to level 600).\nScales further enhance their thoughness and resistance to magical damage, increasing the thoughness by a percentage.\n\n------------------------------------------------------------\n          AC%| Res%"
 		Skillz.setDesc(32,1,txt)
 		Game.SkillDesNormal[32]=scalesNormal
 		Game.SkillDesExpert[32]=scalesExpert
