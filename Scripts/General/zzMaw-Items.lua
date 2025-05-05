@@ -256,39 +256,33 @@ function events.ItemGenerated(t)
 	--spawn crafting materials in misc shops, substituting recipes
 	if (Game.HouseScreen==2 or Game.HouseScreen==95) and not vars.AusterityMode then
 		local id=Game:GetCurrentHouse()
-		if (t.Item:T().EquipStat>=12 and math.random()<0.05 or t.Item:T().EquipStat==19) and id<=110 then 
+		if (t.Item:T().EquipStat>=12 and math.random()<0.1 or t.Item:T().EquipStat==19) and id<=110 then 
 			t.Item.Bonus=0
 			t.Item.BonusStrength=0
 			t.Item.Bonus2=0
 			t.Item.Charges=0
 			t.Item.MaxCharges=0
-			roll=math.random(1,1000)/math.min(((Party.Gold+1)/1000000),10)
-			if roll<=2 then
-				t.Item.Number=1064
-				return
-			elseif roll<=7 then
-				t.Item.Number=1061
-				return
-			elseif roll<=12 then
-				t.Item.Number=1062
-				return
-			elseif roll<=15 then
-				t.Item.Number=1065
-				return
-			elseif roll<=35 then
-				t.Item.Number=1063
-				return
-			else
-				partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-				reagentLevel=math.floor(partyLevel/25)
-				if math.random()<0.05 then
-					reagentLevel=reagentLevel+2
-				elseif math.random()<0.25 then
-					reagentLevel=reagentLevel+1
+			local chances={7,7,20,2,5,7,3}
+			local highestChance=1000
+			for i=1,#chances do
+				local roll=math.random(1,1000)/math.min(((Party.Gold+1)/1000000),20)
+				if chances[i]>=roll and chances[i]<highestChance then
+					t.Item.Number=1060+i
+					highestChance=chances[i]
 				end
-				t.Item.Number=1051+math.min(reagentLevel,9)
+			end
+			if highestChance<1000 then
 				return
 			end
+			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+			reagentLevel=math.floor(partyLevel/25)
+			if math.random()<0.05 then
+				reagentLevel=reagentLevel+2
+			elseif math.random()<0.25 then
+				reagentLevel=reagentLevel+1
+			end
+			t.Item.Number=1051+math.min(reagentLevel,9)
+			return
 		end
 	end
 	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) or reagentList[t.Item.Number] then
@@ -1664,6 +1658,8 @@ reagentPrices={
 	[1063] = 325000,
 	[1064] = 6668999,
 	[1065] = 2000000,
+	[1066] = 1000000,
+	[1067] = 3000000,
 }
 --modify weapon enchant damage
 
@@ -1830,6 +1826,8 @@ function events.GameInitialized2()
 	Game.ItemsTxt[1063].Value=15000
 	Game.ItemsTxt[1064].Value=100000
 	Game.ItemsTxt[1065].Value=60000
+	Game.ItemsTxt[1066].Value=25000
+	Game.ItemsTxt[1067].Value=80000
 	
 	for i=0,8 do
 		for j=1,11 do
