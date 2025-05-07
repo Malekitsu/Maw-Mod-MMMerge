@@ -603,6 +603,20 @@ end
 
 
 function events.LoadMap()
+	if not vars.dragonMeditationRemoved then
+		for i=0,Party.High do
+			local pl=Party[i]
+			if Game.CharacterPortraits[pl.Face].Race==const.Race.Dragon and (pl.Class==10 or pl.Class==11) then
+				local s,m = SplitSkill(pl.Skills[const.Skills.Meditation])
+				while s>1 do
+					pl.SkillPoints=pl.SkillPoints+s
+					s=s-1
+				end
+				pl.Skills[const.Skills.Meditation]=0
+			end
+		end
+		vars.dragonMeditationRemoved=true
+	end
 	if not unarmedText then
 		unarmedText=Skillz.getDesc(33,1)
 		unarmedTextN=Game.SkillDesNormal[33]
