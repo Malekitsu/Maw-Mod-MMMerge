@@ -2494,7 +2494,14 @@ function generateBoss(index,nameIndex,skillType)
 	
 	if not skillType then
 		skill=SkillList[math.random(1,#SkillList)]
-		if math.random()<0.01 and not generatedByBroodlord then
+		local chanceMult=1
+		if vars.Mode==2 then
+			chanceMult = 2
+		end
+		if vars.insanityMode then
+			chanceMult = 3
+		end
+		if math.random()<0.01*chanceMult and not generatedByBroodlord then
 			skill="Broodlord"
 			mon.Resistances[0]=mon.Resistances[0]+1000
 			dmgMult=dmgMult*1.5
@@ -2502,7 +2509,7 @@ function generateBoss(index,nameIndex,skillType)
 		if generatedByBroodlord then
 			skill="Broodling"
 		end
-		if math.random()<0.001 then
+		if math.random()<0.001*chanceMult then
 			skill="Omnipotent"
 			dmgMult=dmgMult*2
 			mon.Resistances[0]=mon.Resistances[0]+2000
@@ -2548,7 +2555,7 @@ SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Adamantite","
 --on attack skills
 function events.GameInitialized2() --to make the after all the other code
 	function events.CalcDamageToPlayer(t)
-		data=mawCustomMonObj or WhoHitPlayer()
+		local data=mawCustomMonObj or WhoHitPlayer()
 		if data and data.Monster and data.Monster.NameId>220 then
 			mon=data.Monster
 			skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
@@ -2762,7 +2769,7 @@ function leecher()
 			if mapvars.leecher[i] then
 				local mon=Map.Monsters[mapvars.leecher[i]]
 				local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
-				if skill == "Leecher" then
+				if skill == "Leecher" or skill == "Omnipotent" then
 					local distance=getDistance(mon.X,mon.Y,mon.Z)
 					if distance<1500 and mon.HP>0 and mon.AIState~=19 then
 						leechmult=((1500-distance)/1500)^2
@@ -2799,18 +2806,17 @@ function events.Tick()
 		for i=1, #mapvars.swift do
 			mon=Map.Monsters[mapvars.swift[i]]
 			skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
-			if skill~="Swift" then
-				return
+			if skill=="Swift" or skill == "Omnipotent" then
+				if not swiftLocation[i] then
+					swiftLocation[i]={mon.X,mon.Y}
+				end
+				if math.abs(mon.X-swiftLocation[i][1])<100 and math.abs(mon.Y-swiftLocation[i][2])<100 then
+					mon.X=mon.X + (mon.X-swiftLocation[i][1])
+					mon.Y=mon.Y + (mon.Y-swiftLocation[i][2])
+				end
+				swiftLocation[i][1]=mon.X
+				swiftLocation[i][2]=mon.Y
 			end
-			if not swiftLocation[i] then
-				swiftLocation[i]={mon.X,mon.Y}
-			end
-			if math.abs(mon.X-swiftLocation[i][1])<100 and math.abs(mon.Y-swiftLocation[i][2])<100 then
-				mon.X=mon.X + (mon.X-swiftLocation[i][1])
-				mon.Y=mon.Y + (mon.Y-swiftLocation[i][2])
-			end
-			swiftLocation[i][1]=mon.X
-			swiftLocation[i][2]=mon.Y
 		end
 	end
 	if getMapAffixPower(11) then
