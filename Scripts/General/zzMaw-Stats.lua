@@ -196,7 +196,7 @@ function getSpellDelay(pl,spell)
 		delay=delay/speedIncrease
 	end
 	if spell==123 then
-		delay=100
+		delay=round(pl:GetAttackDelay(true)*1.5)
 	end
 	if getMapAffixPower(27) then
 		delay=delay/(1-getMapAffixPower(27)/100)
