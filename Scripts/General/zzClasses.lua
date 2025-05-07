@@ -431,8 +431,8 @@ function events.GameInitialized2()
 	--mana cost
 	Game.Spells[123].SpellPointsNormal=25
 	Game.Spells[123].SpellPointsExpert=40
-	Game.Spells[123].SpellPointsMaster=60
-	Game.Spells[123].SpellPointsGM=80
+	Game.Spells[123].SpellPointsMaster=50
+	Game.Spells[123].SpellPointsGM=60
 	
 	Game.Classes.SPBase[10]=60
 	Game.Classes.SPFactor[10]=0
