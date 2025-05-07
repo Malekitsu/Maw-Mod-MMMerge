@@ -540,7 +540,7 @@ function events.GameInitialized2()
 		if Game.CharacterPortraits[t.Player.Face].Race==const.Race.Dragon then
 			if useBreathCooldown then
 				local s, m = SplitSkill(pl:GetSkill(const.Skills.DragonAbility))
-				t.Result=1
+				t.Result=t.Result * (1+0.03*s)
 				useBreathCooldown=false
 			else
 				local s, m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
