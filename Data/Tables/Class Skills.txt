@@ -27,7 +27,7 @@ IdentifyItem	M	M	G	G	B	B	B	B	M	M	M	G	E	E	E	E	B	E	E	E	B	B	E	M	M	M	E	M	M	M	B	B	E	E
 Merchant	E	E	E	E	M	M	G	G	M	G	E	E	E	E	E	E	E	E	E	E	E	E	B	B	B	B	E	E	E	E	M	M	M	M	M	M	M	M	B	B	E	E	B	B	B	B	B	B	B	B	G	B	B	M	M	G	E	E	M	E	E	E	E	E	E
 Repair	E	E	M	M	E	E	E	E	E	E	B	B	B	B	B	B	M	M	G	G	B	B	B	B	B	B	M	M	G	G	B	B	E	E	B	B	B	B	M	M	B	B	E	E	E	M	M	M	B	B	E	M	E	E	E	E	M	M	G	E	M	M	B	B	B
 Bodybuilding	E	M	M	M	B	E	E	E	E	E	M	M	B	B	B	B	M	M	M	M	M	M	M	M	G	G	M	M	M	M	E	M	M	M	E	E	E	E	M	G	E	M	B	B	B	B	B	B	B	-	E	B	-	E	M	M	M	M	M	E	E	E	B	B	B
-Meditation	E	M	M	M	M	M	M	M	E	-	-	M	M	M	G	G	-	-	-	-	E	M	-	-	-	-	E	E	M	M	E	M	M	M	-	E	M	M	-	-	B	E	M	M	M	M	M	G	-	-	M	M	M	E	M	M	-	-	-	M	M	M	M	M	G
+Meditation	E	M	M	M	M	M	M	M	E	M	-	-	M	M	G	G	-	-	-	-	E	M	-	-	-	-	E	E	M	M	E	M	M	M	-	E	M	M	-	-	B	E	M	M	M	M	M	G	-	-	M	M	M	E	M	M	-	-	-	M	M	M	M	M	G
 Perception	M	M	G	G	E	E	E	E	M	M	M	G	E	E	E	E	E	M	M	M	M	G	E	E	E	E	E	M	M	M	M	M	M	M	M	M	M	M	B	E	E	E	E	E	E	E	E	E	B	B	E	E	E	M	M	G	E	M	M	E	E	E	B	B	B
 Regeneration	-	-	-	-	-	-	-	-	-	-	E	E	-	-	-	-	-	-	-	-	B	E	B	E	E	E	-	-	-	-	-	-	-	-	-	-	-	-	M	G	E	M	-	-	-	E	-	-	-	-	-	-	-	-	-	-	B	E	E	-	-	-	-	-	-
 DisarmTraps	B	E	M	M	B	B	B	B	M	G	B	B	B	B	B	B	B	B	E	E	M	M	B	E	M	M	B	B	B	B	E	E	E	E	M	M	G	G	B	B	E	E	B	B	B	B	B	B	B	B	B	B	B	B	B	B	B	B	E	E	E	E	E	E	M
