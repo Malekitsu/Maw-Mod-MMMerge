@@ -3646,3 +3646,19 @@ function events.BeforeLoadMap()
 		end
 	end
 end
+
+function events.CalcDamageToMonster(t)
+	if Map.IsIndoor() and vars.Mode==2 then
+		for i=0, Map.Monsters.High do
+			local mon = Map.Monsters[i]
+			if getDistances(t.Monster, mon)<256 then
+				mon.ShowOnMap = true
+			end
+		end
+	end
+end
+
+function getDistances(unit1,unit2)
+	distance=((unit1.X-unit2.X)^2+(unit1.Y-unit2.Y)^2+(unit1.Z-unit2.Z)^2)^0.5
+	return distance
+end
