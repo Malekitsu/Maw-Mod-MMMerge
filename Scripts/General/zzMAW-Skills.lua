@@ -378,11 +378,7 @@ local function navigateMissile(object)
 	
 	-- process only missiles between party and monster
 	-- target position
-	
 	local homingDegree=0.5
-	if vars.MAWSETTINGS.homingProjectiles=="ON" then
-		homingDegree=0
-	end
 	local targetPosition
 	if ownerKind == const.ObjectRefKind.Party and targetKind == const.ObjectRefKind.Monster then
 		local mapMonster = Map.Monsters[targetIndex]
@@ -436,11 +432,9 @@ local function navigateMissile(object)
 end
 
 -- game tick related functionality
-local homingProjectiles = true
 function events.Tick()
-
 	-- navigateMissiles
-	if homingProjectiles then
+	if vars.MAWSETTINGS.homingProjectiles == "ON" then
 		for objectIndex = 0,Map.Objects.high do
 			local object =  Map.Objects[objectIndex]
 			navigateMissile(object)
