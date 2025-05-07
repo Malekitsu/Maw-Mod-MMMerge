@@ -707,6 +707,7 @@ function dragonSkill(dragon, index)
 		else
 			Game.GlobalTxt[18]="Attack"
 			Game.GlobalTxt[53]="Damage"
+			Game.GlobalTxt[203]="Shoot"
 		end
 	else
 		Game.GlobalTxt[18]="Attack"
