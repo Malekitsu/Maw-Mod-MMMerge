@@ -695,9 +695,14 @@ function dragonSkill(dragon, index)
 			end
 			
 		end
-		Game.GlobalTxt[53] = "Damage\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-		Game.GlobalTxt[18] = "Attack         +" .. pl:GetMeleeAttack() .. "\n                 " .. pl:GetMeleeDamageMin() .. "-" .. pl:GetMeleeDamageMax() .. "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-		Game.GlobalTxt[203]="Shoot         +" .. pl:GetRangedAttack() .. "\n                 " .. pl:GetRangedDamageMin() .. "-" .. pl:GetRangedDamageMax() .. "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+		if Game.CurrentCharScreen==100 then
+			Game.GlobalTxt[53] = "Damage\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+			Game.GlobalTxt[18] = "Attack         +" .. pl:GetMeleeAttack() .. "\n                 " .. pl:GetMeleeDamageMin() .. "-" .. pl:GetMeleeDamageMax() .. "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+			Game.GlobalTxt[203]="Shoot         +" .. pl:GetRangedAttack() .. "\n                 " .. pl:GetRangedDamageMin() .. "-" .. pl:GetRangedDamageMax() .. "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+		else
+			Game.GlobalTxt[18]="Attack"
+			Game.GlobalTxt[53]="Damage"
+		end
 	else
 		Game.GlobalTxt[18]="Attack"
 		Game.GlobalTxt[53]="Damage"
