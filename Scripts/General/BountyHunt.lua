@@ -9,14 +9,14 @@ end
 
 local function HuntText(MonId)
 	local text = Game.NPCText[133]:replace("%lu", tostring(RewardByMon(MonId)))
-	return text:format(StrColor(255,255,150, Game.MonstersTxt[MonId].Name))
+	return text:format(StrColor(255,255,150, Game.PlaceMonTxt[299]))
 end
 BountyHuntFunctions.HuntText = HuntText
 
 local function RewardText(MonId)
 	local Reward = RewardByMon(MonId)
 	local text = Game.NPCText[134]:replace("%lu", Reward)
-	return text:format(Game.MonstersTxt[MonId].Name, Reward)
+	return text:format(Game.PlaceMonTxt[299], Reward)
 end
 BountyHuntFunctions.RewardText = RewardText
 
@@ -194,7 +194,7 @@ local function SetCurrentHunt()
 			end
 			i=i+1
 		end
-		pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = math.random(5,10), powerChances = {70, 30, 0}, radius = 256, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 index=mon:GetIndex() end}
+		pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = math.random(15,45), powerChances = {55, 30, 15}, radius = 1024, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 index=mon:GetIndex() end}
 		
 		-- Make monster berserk to encourage it to fight everything around (peasants, guards, player)
 		--local MonBuff = mon.SpellBuffs[const.MonsterBuff.Berserk]
@@ -214,7 +214,7 @@ BountyHuntFunctions.SetCurrentHunt = SetCurrentHunt
 function events.MonsterKilled(Monster, MonsterIndex, _, killer)
 	if vars.BountyHunt and killer and killer.Player then
 		for MapName, Entry in pairs(vars.BountyHunt) do
-			if not Entry.Done and Game.Month == Entry.Month and Entry.MonId == Monster.Id then
+			if not Entry.Done and Game.Month == Entry.Month and Entry.MonId == Monster.Id and Monster.NameId==299 then
 				Entry.Done = true
 				events.Call("BountyHuntEliminated", MapName, Entry, Monster)
 			end
