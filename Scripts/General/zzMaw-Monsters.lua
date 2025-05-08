@@ -805,7 +805,7 @@ function recalculateMonsterTable()
 	
 	--add ranged attack
 	local startingMaps={"out01.odm","out02.odm","7out01.odm","7out02.odm","oute3.odm","outd3.odm"}
-	if Map.IsOutdoor() and not table.find(startingMaps, Map.Name) and Game.BolsterAmount>=200 then
+	if (Map.IsOutdoor() and not table.find(startingMaps, Map.Name) and Game.BolsterAmount>=200) or mapvars.mawBounty then
 		for i=1, 651 do
 			local mon=Game.MonstersTxt[i]
 			local base=basetable[i]
