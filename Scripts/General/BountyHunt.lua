@@ -166,15 +166,18 @@ local function SetCurrentHunt()
 
 		vars.BountyHunt[Map.Name] = t.Entry
 		
-		--MAW FIX, not sure why it's always on Handled=true, as it prevents monster to spawn
+		--MAW FIX, not sure why it's always on Handled=true, as it prevents monster to spawn, it's probably to keep vanilla behaviour
 		Handled=false
 		if Handled then
 			return t.Text or HuntText(t.Entry.MonId)
 		end
-
+		
 		-- Summon monster
 		local MonId = t.Entry.MonId
 		local X, Y, Z = BountyHuntFunctions.NewBHSpawnPoint()
+		
+		mapvars.mawBounty=math.max((vars.MM6LVL+vars.MM7LVL+vars.MM8LVL-30),0)
+		recalculateMonsterTable()
 		mon=pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = 1, powerChances = {0, 0, 100}, radius = 256, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 index=mon:GetIndex() end}
 		generateBoss(index,79)
 		local setNote=true
@@ -230,12 +233,20 @@ jmp absolute 0x4bb3f0]])
 mem.asmpatch(0x4bae73, "jmp absolute " .. NewCode)
 
 mem.hook(NewCode, function(d)
+	if not mapvars.completed then
+		Message("You need to clear the area COMPLETELY first")
+		return
+	end	
 	BountyText = BountyHuntFunctions.SetCurrentHunt()
 	mem.u4[0xffd410] = mem.topointer(BountyText)
 end)
 
 -- Make MM8 bounty hunt same as MM7 and MM6 now
 mem.hook(0x4b080e, function(d)
+	if not mapvars.completed then
+		Message("You need to clear the area COMPLETELY first")
+		return
+	end	
 	BountyText = BountyHuntFunctions.SetCurrentHunt()
 	Message(BountyText)
 end)
