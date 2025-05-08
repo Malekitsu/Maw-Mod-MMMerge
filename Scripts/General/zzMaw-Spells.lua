@@ -2694,24 +2694,24 @@ mawPartyBuffIgnore={16,19,11,18,10}
 mawSingleBuffList={1,4,11,12,6,10}
 
 buffPower={ --values are inteneded as % and /1000 for scaling, values are updated in global/maw mapping file
-	[3]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--fire res  
-	[14]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--air res
-	[25]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--water res
-	[36]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--earth res
-	[58]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--mind res
-	[69]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--body res
+	[3]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},--fire res  
+	[14]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},--air res
+	[25]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},--water res
+	[36]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},--earth res
+	[58]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},--mind res
+	[69]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},--body res
 	[5]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--haste
 	[17]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--shield
 	[28]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--Empower Magic
 	[38]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},--stoneskin
-	[46]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--bless, acc bonus is calculated by using fire res bonus
+	[46]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},--bless, acc bonus is calculated by using fire res bonus
 	[47]= {["Base"]={[0]=0,5,5,5,5}, ["Scaling"]={[0]=0,1,1,1,1}},--fate
 	[51]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--Heroism
 	[56]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--Meditation
 	[71]= {["Base"]={[0]=0,5,5,5,5}, ["Scaling"]={[0]=0,2,2,2,2}},--Regeneration (check code before changing, fomula is complex)
 	[73]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--Hammerhands
-	[83]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--day of the gods
-	[85]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--day of Protection
+	[83]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,1.5,1.5,1.5,1.5}},--day of the gods
+	[85]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},--day of Protection
 	[86]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--hour of power (formulas don't use this values, but takes skill and divide by 1.5)
 }
 
@@ -3088,7 +3088,7 @@ function adjustSpellTooltips()
 		local id=3
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Fire Resistance and Intellect by %s.\nYou get an additional 1 point for every 4 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Fire Resistance and Intellect by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
 		
 		--fire aura
 		local id=4
@@ -3100,37 +3100,37 @@ function adjustSpellTooltips()
 		local id=14
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Air Resistance and Speed by %s.\nYou get an additional 1 point for every 4 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Air Resistance and Speed by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
 		
 		--water resistance
 		local id=25
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Water Resistance and Luck by %s.\nYou get an additional 1 point for every 4 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Water Resistance and Luck by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
 		
 		--earth res
 		local id=36
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Earth Resistance and Endurance by %s.\nYou get an additional 1 point for every 4 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Earth Resistance and Endurance by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
 		
 		--mind res
 		local id=58
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Mind Resistance and Personality by %s.\nYou get an additional 1 point for every 4 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Mind Resistance and Personality by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
 		
 		--body res
 		local id=69
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Body Resistance and Might by %s.\nYou get an additional 1 point for every 4 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Body Resistance and Might by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
 		
 		--Bless
 		local id=46
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Attack and Accuracy.\nThe enhancement equals a flat %s plus an additional 1 point for every 4 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Attack and Accuracy.\nThe enhancement equals a flat %s plus an additional 1 point for every 2 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
 		
 		--Haste
 		local id=5
@@ -3148,7 +3148,7 @@ function adjustSpellTooltips()
 		local id=38
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Armor Class by %s.\nYou get an additional 1 point for every 4 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1])
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Armor Class by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1],bf.Scaling[1])
 		
 		--Empower Magic
 		local id=28
