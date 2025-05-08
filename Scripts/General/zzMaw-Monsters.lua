@@ -3010,7 +3010,7 @@ function events.MonsterSpriteScale(t)
 		end
 		local monsterSkill = string.match(Game.PlaceMonTxt[Map.Monsters[round(t.MonsterIndex)].NameId], "([^%s]+)")
 		if monsterSkill=="Omnipotent" then
-			t.Scale=(t.Scale-1)*2+t.Scale
+			t.Scale=(t.Scale-1)*1.5+t.Scale
 		end
 	end
 end
