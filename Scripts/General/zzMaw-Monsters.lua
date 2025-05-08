@@ -608,7 +608,7 @@ function recalculateMonsterTable()
 		end
 		
 		if mapvars.mawBounty then
-			totalLevel[i]=totalLevel[i]+mapvars.mawBounty
+			totalLevel[i]=base.Level+mapvars.mawBounty
 		end
 		
 		--[[online
