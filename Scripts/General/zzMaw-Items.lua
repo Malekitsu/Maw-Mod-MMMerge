@@ -2246,6 +2246,7 @@ function events.BuildItemInformationBox(t)
 				tot=tot+t.Item:T().ChanceByLevel[i]
 				lvl=lvl+t.Item:T().ChanceByLevel[i]*i
 			end
+			tot = math.max(tot,1)
 			itemLevel=itemLevel+round(lvl/tot*18-17)
 			--t.Description = t.Description .. "\n\nItem Level: " .. itemLevel
 			local maxCharges=t.Item.MaxCharges
@@ -2843,7 +2844,7 @@ function itemStats(index)
 	if vars.MAWSETTINGS.buffRework=="ON" then
 		if pl.SpellBuffs[1].ExpireTime>=Game.Time then
 			local s,m, level=getBuffSkill(46)
-			local blessBonus=buffPower[46].Base[m]+level*0.25*(1+buffPower[46].Scaling[m]*s/100)
+			local blessBonus=(buffPower[46].Base[m]+level/4)*(1+buffPower[46].Scaling[m]*s/100)
 			tab[40] = tab[40] + blessBonus
 			tab[44] = tab[44] + blessBonus
 		end
@@ -2900,15 +2901,15 @@ function itemStats(index)
 		local spellStat={[3]=2,[14]=6,[25]=7,[36]=4,[46]=5,[58]=3,[69]=1}
 		--resistances and stats
 		local s, m, level=getBuffSkill(85)
-		local buff2=buffPower[85].Base[m]+(level/4)*(1+buffPower[85].Scaling[m]/100*s/1.5)
+		local buff2=(buffPower[85].Base[m]+level/2)+(1+buffPower[85].Scaling[m]/100*s/1.5)
 		local s, m, level=getBuffSkill(83)
-		local buff3=buffPower[83].Base[m]+(level/4)*(1+buffPower[83].Scaling[m]/100*s/1.5)
+		local buff3=(buffPower[83].Base[m]+level/2)+(1+buffPower[83].Scaling[m]/100*s/1.5)
 		for i=1,6 do
 			local buff=0
 			local statBuff=0
 			if Party.SpellBuffs[buffList[i]].ExpireTime>=Game.Time then
 				local s, m, level=getBuffSkill(spellList[i])
-				buff=buffPower[spellList[i]].Base[m]+(level/4)*(1+buffPower[spellList[i]].Scaling[m]/100*s)
+				buff=(buffPower[spellList[i]].Base[m]+level/2)*(1+buffPower[spellList[i]].Scaling[m]/100*s)
 				buff4=math.max(buff,buff2)
 				tab[i+10]=tab[i+10]+buff4
 			end
@@ -2921,7 +2922,7 @@ function itemStats(index)
 		local buff=0
 		if pl.SpellBuffs[1].ExpireTime>=Game.Time then
 			local s, m, level=getBuffSkill(46)
-			buff=buffPower[3].Base[m]+(level/4)*(1+buffPower[3].Scaling[m]/100*s)
+			buff=(buffPower[3].Base[m]+level/2)*(1+buffPower[3].Scaling[m]/100*s)
 		end
 		accBonus=math.max(buff3, buff)
 		tab[5]=tab[5]+accBonus
@@ -2932,7 +2933,7 @@ function itemStats(index)
 			s=math.max(s,s2/1.5)
 			m=math.max(m,m2)
 			level=math.max(level,level2)
-			acBonus=buffPower[38].Base[m]+(level/4)*(1+buffPower[38].Scaling[m]/100*s)
+			acBonus=(buffPower[38].Base[m]+level/2)*(1+buffPower[38].Scaling[m]/100*s)
 			tab[10]=tab[10]+acBonus
 		end
 	end
@@ -3875,6 +3876,7 @@ function events.CanWearItem(t)
 			tot=tot+it:T().ChanceByLevel[i]
 			lvl=lvl+it:T().ChanceByLevel[i]*i
 		end
+		tot = math.max(tot,1)
 		itemLevel=itemLevel+round(lvl/tot*18-17)
 		local maxCharges=it.MaxCharges
 		if it.BonusExpireTime>0 and it.BonusExpireTime<=2 then
@@ -4124,7 +4126,7 @@ function events.BuildItemInformationBox(t)
 					end
 				end
 			end
-			if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[91] then --fire aura
+			if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[91] then --vampiric aura
 				local s, m, level=getBuffSkill(91)
 				if m>=1 then
 					t.Description=StrColor(255,255,153,"Vampiric Aura: damage done will restore player HP.\n\n") .. t.Description
