@@ -607,6 +607,10 @@ function recalculateMonsterTable()
 			end
 		end
 		
+		if mapvars.mawBounty then
+			totalLevel[i]=totalLevel[i]+mapvars.mawBounty
+		end
+		
 		--[[online
 		if vars.onlineMode and not onlineStartingMaps[name] then
 			bolsterLevel=mp.Mid^1.5
