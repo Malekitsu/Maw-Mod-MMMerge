@@ -176,7 +176,7 @@ local function SetCurrentHunt()
 		local MonId = t.Entry.MonId
 		local X, Y, Z = BountyHuntFunctions.NewBHSpawnPoint()
 		mon=pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = 1, powerChances = {0, 0, 100}, radius = 256, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 index=mon:GetIndex() end}
-		generateBoss(index,299)
+		generateBoss(index,79)
 		local setNote=true
 		local i=0
 		while setNote or i>Map.Notes.High do
