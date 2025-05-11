@@ -132,6 +132,9 @@ local function NumberRegulator(Screen, X, Y, VarName, OnChange, ReprFunc, Init, 
 		IconMouseOver 	= "ar_rt_ht",
 		Action = function(t)
 			Game.PlaySound(23)
+			if type(Regulator.Value) == "boolean" then
+				Regulator.Value = 0
+			end
 			Regulator.Value = math.min(Regulator.Value + Regulator.Step, Regulator.Max)
 			Regulator:OnChange(Regulator.Value)
 			Regulator.Text.Text = Regulator.Repr(Regulator.Value)
