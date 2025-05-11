@@ -159,7 +159,7 @@ local function SetCurrentHunt()
 
 		-- Create entry in list of bounty hunts.
 		local t = {MapName = Map.Name, Handled = false}
-		local id=Mons[random(1, #monTbl)]
+		local id=random(1, #monTbl)
 		monsterId=monTbl[id].Index
 		t.Entry = NewEntry(Game.Month, monsterId, false, false)
 		events.Call("BountyHuntGeneration", t)
