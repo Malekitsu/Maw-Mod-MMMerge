@@ -200,7 +200,7 @@ local function SetCurrentHunt()
 			end
 			i=i+1
 		end
-		pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = math.random(15,45), powerChances = {55, 30, 15}, radius = 1024, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 index=mon:GetIndex() end}
+		pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = math.random(5,15), powerChances = {55, 30, 15}, radius = 1024, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 index=mon:GetIndex() end}
 		
 		-- Make monster berserk to encourage it to fight everything around (peasants, guards, player)
 		--local MonBuff = mon.SpellBuffs[const.MonsterBuff.Berserk]
