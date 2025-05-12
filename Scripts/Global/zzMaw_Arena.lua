@@ -153,7 +153,7 @@ function arenaSpawns()
 	if waveState==6 then
 		bossSpawned=bossSpawned or 0
 		bossSpawned=bossSpawned+1
-		generateBoss(bossId,bossSpawned)
+		generateBoss(bossId)
 	end
 	waitNextWave=1
 	waveState=waveState+1
