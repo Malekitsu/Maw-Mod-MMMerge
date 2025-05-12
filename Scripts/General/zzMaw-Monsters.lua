@@ -2419,12 +2419,10 @@ function events.AfterLoadMap()
 				end
 			end
 			if getMapAffixPower(19) then
-				local nameIndex=bossSpawns+1
 				for i=0,Map.Monsters.High do
 					local id=Map.Monsters[i].Id
-					if id%3~=0 and Game.MonstersTxt[id].AIType~=1 and Map.Monsters[i].NameId==0 and 	math.random()<getMapAffixPower(19)/100 and nameIndex<80 then
-						generateBoss(i,nameIndex)
-						nameIndex=nameIndex+1
+					if id%3~=0 and Game.MonstersTxt[id].AIType~=1 and Map.Monsters[i].NameId==0 and math.random()<getMapAffixPower(19)/100 and nameIndex<80 then
+						generateBoss(i)
 					end
 				end
 			end
@@ -2440,7 +2438,7 @@ function events.AfterLoadMap()
 				for v=1,bossSpawns do
 					if #possibleMonsters>0 then
 						index=math.random(1, #possibleMonsters)
-						generateBoss(possibleMonsters[index],v)
+						generateBoss(possibleMonsters[index])
 						table.remove(possibleMonsters,index)
 					end
 				end
@@ -2458,7 +2456,29 @@ function events.AfterLoadMap()
 end
 
 function generateBoss(index,nameIndex,skillType)
+	--clean up name Index
+	if not nameIndex then
+		for i=0,Map.Monsters.High do
+			local mon=Map.Monsters[i]
+			if mon.NameId>=220 and mon.NameId<300 and mon.AIState == 11 then
+				Game.PlaceMonTxt[mon.NameId]=string.format("%s", mon.NameId)
+			end
+		end
+		--search for a free spot
+		nameIndex=220
+		local search=true
+		while search and nameIndex<300 do
+			if Game.PlaceMonTxt[nameIndex]==string.format("%s", nameIndex) then
+				search=false
+			else
+				nameIndex=nameIndex+1
+			end
+		end
+	end
+	
 	mon=Map.Monsters[index]
+	mon.NameId=nameIndex
+	
 	local austerityMod=1
 	if vars.AusterityMode then
 		austerityMod=4
@@ -2492,7 +2512,6 @@ function generateBoss(index,nameIndex,skillType)
 	
 	dmgMult=1.5+math.random()*0.5
 	--name and skills
-	mon.NameId=220+nameIndex
 	mapvars.bossNames=mapvars.bossNames or {}
 	mapvars.bossSkillList=mapvars.SkillList or {}
 	
@@ -3447,15 +3466,7 @@ function events.MonsterKilled(mon)
 	if monsterSkill=="Omnipotent" then
 		for i=1,#SkillList do
 			pseudoSpawnpoint{monster = killedMonster.Id,  x = killedMonster.X, y = killedMonster.Y, z = killedMonster.Z, count = 1, powerChances = {0,0,100}, radius = 512, group = 2,transform = function(spawnedMon) spawnedMon.ShowOnMap = true spawnedMon.Hostile = true spawnedMon.Velocity=350 bossId=spawnedMon:GetIndex() end}
-			local index=1
-			local notFound=true
-			while index<80 and notFound do
-				if Game.PlaceMonTxt[index+220]==string.format("%s",index+220) then
-					generateBoss(bossId,index,SkillList[i])
-					notFound=false
-				end
-				index=index+1
-			end
+			generateBoss(bossId,false,SkillList[i])
 		end
 	end
 	if monsterSkill=="Broodlord" or monsterSkill=="Broodling" or monsterSkill=="Omnipotent" then
@@ -3472,15 +3483,7 @@ function events.MonsterKilled(mon)
 				end
 			end
 			pseudoSpawnpoint{monster = killedMonster.Id,  x = killedMonster.X, y = killedMonster.Y, z = killedMonster.Z, count = 1, powerChances = powerChance, radius = 256, group = 2,transform = function(spawnedMon) spawnedMon.ShowOnMap = true spawnedMon.Hostile = true spawnedMon.Velocity=350 bossId=spawnedMon:GetIndex() end}
-			local index=1
-			local notFound=true
-			while index<80 and notFound do
-				if Game.PlaceMonTxt[index+220]==string.format("%s",index+220) then
-					generateBoss(bossId,index,"Broodling")
-					notFound=false
-				end
-				index=index+1
-			end
+			generateBoss(bossId,false,"Broodling")
 		end
 	end
 end
