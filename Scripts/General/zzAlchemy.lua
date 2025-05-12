@@ -315,7 +315,7 @@ itemImmunityMapping = {
 	[226] = {"Cursed","Paralyzed"},
 	[227] = {"Afraid","Insane"},
 	[239] = {"Stoned"},
-	[246] = {"Weak","Asleep","Disease1","Disease2","Disease3","Poison1","Poison2","Poison3","Cursed","Paralyzed","Afraid","Insane","Stoned"}
+	[246] = {"Weak","Asleep","Disease1","Disease2","Disease3","Poison1","Poison2","Poison3","Cursed","Paralyzed","Afraid","Insane","Stoned","Unconscious"}
 }
 
 
@@ -450,7 +450,7 @@ potionText={
 	[243] = "Adds a random tier 2 elemental damage enchant to a weapon\nRequire 40 power to work.\n",
 	[244] = "Adds 'of Swiftness' property to a non-magic weapon.\nRequire 40 power to work.\n",
 	[245] = "Provides Haste+Heroism+Bless.",
-	[246] = "Removes and prevents all conditions except Dead and Eradicated for 6 hours.\nRequire 40 power to work.\n",
+	[246] = "Removes and prevents all conditions, except Dead and Eradication, for 6 hours.\nRequire 40 power to work.\n",
 	[247] = "Heals based on the potion's power of hit points.",
 	[248] = "Restores based on the potion's power of spell points.",
 	[249] = "Increases temporary Fire, Air, Water and Earth resistance. (Dark)",
