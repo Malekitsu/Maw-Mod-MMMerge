@@ -1507,7 +1507,3 @@ function events.GetSkill(t)
 		setUnarmedToZero=setUnarmedToZero-1
 	end
 end
-
-function events.CalcDamageToPlayer(t)
-	Game.ShowStatusText(t.Result)
-end
