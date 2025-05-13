@@ -2637,8 +2637,12 @@ function events.GameInitialized2() --to make the after all the other code
 				end
 				if skill=="Reflecting" or skill=="Omnipotent" then
 					if t.DamageKind~=4 then
+						local damageKind = t.DamageKind
+						if damageKind==50 then --transform dragon damage into energy
+							damageKind = 12
+						end
 						reflectedDamage=true
-						Party[index]:DoDamage(t.Result,t.DamageKind) 
+						Party[index]:DoDamage(t.Result,damageKind) 
 						reflectedDamage=false
 					end
 				end
