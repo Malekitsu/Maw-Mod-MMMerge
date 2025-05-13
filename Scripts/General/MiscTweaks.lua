@@ -596,13 +596,14 @@
 		end
 	end
 
-	-- Repair unarmed skill dodge chance
+	--[[ Repair unarmed skill dodge chance
 	function events.GetArmorClass(t)
 		local Skill, Mas = SplitSkill(t.Player:GetSkill(UNARMED))
 		if Mas == 4 and math.random(1,100) < Skill then
 			t.AC = 10000
 		end
 	end
+	]]
 
 	-- Fix Dragon's AC and Dmg bonuses by skill
 	mem.IgnoreProtection(true)
