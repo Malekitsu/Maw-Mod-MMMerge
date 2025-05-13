@@ -235,11 +235,8 @@ function events.GetArmorClass(t)
 		t.AC=0
 		nextACToZero=nextACToZero-1
 	elseif acNerf>0 then
-		t.AC=t.AC/nerfAmount
+		t.AC=math.round(t.AC/nerfAmount)
 		acNerf=acNerf-1
-	end
-	if t.AC==10000 then
-		t.AC=ac
 	end
 end
 
@@ -811,6 +808,7 @@ function events.CalcDamageToPlayer(t)
 		end
 	end
 	if vars.Mode==2 then
+	
 		if data and data.Monster then
 			t.Result=t.Result*getMonsterDamage(lvl,"diffMult")
 		elseif (t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1 then --drown and fall
@@ -859,7 +857,7 @@ function events.CalcDamageToPlayer(t)
 	if data and data.Monster and data.Monster.NameId>220 then
 		local mon=data.Monster
 		local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
-		if skill=="Exploding" then
+		if skill=="Exploding" or skill=="Omnipotent" then
 			t.Result=t.Result/2
 			aoeDamage=t.Result/Party.Count
 			for i=0,Party.High do
@@ -1184,8 +1182,10 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	--PHYSICAL DAMAGE CALCULATION
 	if damageKind==4 then 		
 		local AC=pl:GetArmorClass()
-		local AC=pl:GetArmorClass()
-		local AC=pl:GetArmorClass()--multiple times to avoid chance to hit code to interfere with AC
+		AC=pl:GetArmorClass()
+		AC=pl:GetArmorClass()
+		AC=pl:GetArmorClass()
+		AC=pl:GetArmorClass()--multiple times to avoid chance to hit code to interfere with AC
 		if getMapAffixPower(28) then
 			AC=AC*(1-getMapAffixPower(28)/100)
 		end
@@ -1497,3 +1497,17 @@ function events.CalcStatBonusByItems(t)
 	
 end
 
+function events.PlayerAttacked(t)
+	setUnarmedToZero=2
+end
+
+function events.GetSkill(t)
+	if t.Skill==33 and setUnarmedToZero and setUnarmedToZero>0 then
+		t.Result=0
+		setUnarmedToZero=setUnarmedToZero-1
+	end
+end
+
+function events.CalcDamageToPlayer(t)
+	Game.ShowStatusText(t.Result)
+end
