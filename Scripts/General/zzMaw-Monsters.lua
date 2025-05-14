@@ -2458,14 +2458,20 @@ end
 function generateBoss(index,nameIndex,skillType)
 	--clean up name Index
 	if not nameIndex then
+		local nameIdList={}
 		for i=0,Map.Monsters.High do
 			local mon=Map.Monsters[i]
-			if mon.NameId>=220 and mon.NameId<300 and mon.AIState == 11 then
-				Game.PlaceMonTxt[mon.NameId]=string.format("%s", mon.NameId)
+			if mon.NameId>=221 and mon.NameId<300 and mon.AIState ~= 11 then
+				table.insert(nameIdList, mon.NameId)
+			end
+		end
+		for i=221,299 do
+			if not table.find(nameIdList, i) then
+				Game.PlaceMonTxt[i]=string.format("%s", i)
 			end
 		end
 		--search for a free spot
-		nameIndex=220
+		nameIndex=221
 		local search=true
 		while search and nameIndex<300 do
 			if Game.PlaceMonTxt[nameIndex]==string.format("%s", nameIndex) then
@@ -2513,7 +2519,6 @@ function generateBoss(index,nameIndex,skillType)
 	dmgMult=1.5+math.random()*0.5
 	--name and skills
 	mapvars.bossNames=mapvars.bossNames or {}
-	mapvars.bossSkillList=mapvars.SkillList or {}
 	
 	if not skillType then
 		skill=SkillList[math.random(1,#SkillList)]
@@ -2556,10 +2561,18 @@ function generateBoss(index,nameIndex,skillType)
 			table.insert(mapvars.shadow, index)
 		end
 	end
-	mapvars.bossSkills=mapvars.bossSkills or {}
-	mapvars.bossSkills[mon.NameId]=mapvars.bossSkills[mon.NameId] or {}
-	table.insert(mapvars.bossSkills[mon.NameId],skill)
-	Game.PlaceMonTxt[mon.NameId]=string.format(skill .. " " .. Game.MonstersTxt[mon.Id].Name)
+	
+	local name=string.format(skill .. " " .. Game.MonstersTxt[mon.Id].Name)
+	local nameDetected=false
+	for i=221,299 do 
+		if Game.PlaceMonTxt[i] == name then
+			mon.NameId=i
+			nameDetected=true
+		end
+	end
+	if not nameDetected then
+		Game.PlaceMonTxt[mon.NameId]=name
+	end
 	
 	mapvars.bossNames[mon.NameId]=Game.PlaceMonTxt[mon.NameId]
 	if getMapAffixPower(18) then
@@ -3431,7 +3444,7 @@ function events.MonsterKilled(mon)
 		generatedItemTable[1], generatedItemTable[2], generatedItemTable[3], generatedItemTable[4]=GrabObjects()
 		for i=1,4 do
 			local obj=generatedItemTable[i]
-			if obj and (table.find(removeItemList, obj.Item.Number) or (obj.Item:T().EquipStat==13 and obj.Item.Bonus==0))  then
+			if obj and obj.Item.Number<=2200 and (table.find(removeItemList, obj.Item.Number) or (obj.Item:T().EquipStat==13 and obj.Item.Bonus==0))  then
 				if math.random()>0.2 then
 					obj.Type=0
 					obj.TypeIndex=0
