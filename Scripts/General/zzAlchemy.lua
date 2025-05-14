@@ -356,6 +356,11 @@ function events.DoBadThingToPlayer(t)
 				t.Allow=false
 				Game.ShowStatusText("Paralysis Immunity")
 			end 
+		elseif t.Thing==13 then
+			if vars.PlayerAlchemyBuffs[t.Player:GetIndex()]["Unconscious"]>Game.Time then
+				t.Allow=false
+				Game.ShowStatusText("Unconscious Immunity")
+			end 
 		elseif t.Thing==15 then
 			if vars.PlayerAlchemyBuffs[t.Player:GetIndex()]["Stoned"]>Game.Time then
 				t.Allow=false
@@ -365,7 +370,7 @@ function events.DoBadThingToPlayer(t)
 			if vars.PlayerAlchemyBuffs[t.Player:GetIndex()]["Afraid"]>Game.Time then
 				t.Allow=false
 				Game.ShowStatusText("Fear Immunity")
-			end 
+			end
 		end
 	end
 end
