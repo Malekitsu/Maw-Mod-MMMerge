@@ -3443,6 +3443,8 @@ function events.MonsterKilled(mon)
 	
 	if mon.Ally==9999 then return end
 	
+	mon.Ally=9999
+	
 	local data=WhoHitMonster()
 	if data and data.Monster and data.Monster.Ally==9999 then
 		local consciousPlayers=0
@@ -3485,7 +3487,6 @@ function events.MonsterKilled(mon)
 	end
 	
 	
-	mon.Ally=9999
 end
 
 function events.PickCorpse(t)
