@@ -2239,44 +2239,9 @@ end
 function events.BuildItemInformationBox(t)
 	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then 
 		if t.Description then
-			local itemLevel=t.Item.MaxCharges*5
-			local tot=0
-			local lvl=0
-			for i=1, 6 do
-				tot=tot+t.Item:T().ChanceByLevel[i]
-				lvl=lvl+t.Item:T().ChanceByLevel[i]*i
-			end
-			tot = math.max(tot,1)
-			itemLevel=itemLevel+round(lvl/tot*18-17)
-			--t.Description = t.Description .. "\n\nItem Level: " .. itemLevel
-			local maxCharges=t.Item.MaxCharges
-			if t.Item.BonusExpireTime>0 and t.Item.BonusExpireTime<=2 then
-				maxCharges=math.floor(math.min(maxCharges/1.2,maxCharges-5))
-			end
-			if t.Item.BonusExpireTime>10 and t.Item.BonusExpireTime<=100 then
-				maxCharges=math.floor(math.min(maxCharges/1.2,maxCharges-5))
-			end
-			local levelRequired=(maxCharges)*6+lvl/tot*2-24
-			if Game.BolsterAmount>=300 then
-				levelRequired=levelRequired-6
-			end
-			if vars.Mode==2 then
-				levelRequired=levelRequired-3
-			end
-			local enchants=3
-			if t.Item.Bonus>0 then
-				enchants=enchants+1
-			end
-			if t.Item.Bonus2>0 then
-				enchants=enchants+1
-			end
-			if t.Item.Charges>1000 then
-				enchants=enchants+1
-			end
-			levelRequired=math.max(1,math.floor(levelRequired*enchants/6))
+			
+			local levelRequired=GetLevelRquirement(t.Item)
 			local txt="\n\nLevel Required: " .. levelRequired 
-			--local txt="" --not shown when can equip
-			--check if equippable
 			local id=Game.CurrentPlayer
 			if id<0 or id>Party.High then
 				id=0
@@ -3869,44 +3834,9 @@ function events.CanWearItem(t)
 		t.Available=false
 	end
 	if it.Number<=151 or (it.Number>=803 and it.Number<=936) or (it.Number>=1603 and it.Number<=1736) then 
-		local itemLevel=it.MaxCharges*5
-		local tot=0
-		local lvl=0
-		for i=1, 6 do
-			tot=tot+it:T().ChanceByLevel[i]
-			lvl=lvl+it:T().ChanceByLevel[i]*i
-		end
-		tot = math.max(tot,1)
-		itemLevel=itemLevel+round(lvl/tot*18-17)
-		local maxCharges=it.MaxCharges
-		if it.BonusExpireTime>0 and it.BonusExpireTime<=2 then
-			maxCharges=math.floor(math.min(maxCharges/1.2,maxCharges-5))
-		end
-		if it.BonusExpireTime>10 and it.BonusExpireTime<=100 then
-			maxCharges=math.floor(math.min(maxCharges/1.2,maxCharges-5))
-		end
-		local levelRequired=(maxCharges)*6+lvl/tot*2-24
-		if Game.BolsterAmount>=300 then
-			levelRequired=levelRequired-6
-		end
-		if vars.Mode==2 then
-			levelRequired=levelRequired-3
-		end
-		local enchants=3
-		if it.Bonus>0 then
-			enchants=enchants+1
-		end
-		if it.Bonus2>0 then
-			enchants=enchants+1
-		end
-		if it.Charges>1000 then
-			enchants=enchants+1
-		end
-		levelRequired=levelRequired*enchants/6
-		levelRequired=math.max(1,math.floor(levelRequired))
 		--check if equippable
 		local plLvl=Party[t.PlayerId].LevelBase
-		if plLvl<levelRequired then
+		if plLvl<GetLevelRquirement(t.Item) then
 			t.Available=false
 		end
 	end	
@@ -4167,3 +4097,93 @@ function events.AfterLoadMap()
 end
 
 	
+function GetLevelRquirement(it)
+	local itemType = it:T().EquipStat
+	if itemType>11 then
+		return 0 
+	end
+	
+	local difficultyExtraPower=1
+	if Game.BolsterAmount>100 then
+		difficultyExtraPower=(Game.BolsterAmount-100)/2000+1
+	end
+	if vars.insanityMode then
+		difficultyExtraPower=1.4
+	end
+	
+	local tot=0
+	local lvl=0
+	for i=1, 6 do
+		tot=tot+it:T().ChanceByLevel[i]
+		lvl=lvl+it:T().ChanceByLevel[i]*i
+	end
+	tot = math.max(tot,1)
+	local maxCharges=it.MaxCharges
+	if it.BonusExpireTime>0 and it.BonusExpireTime<=2 then
+		maxCharges=math.floor(math.max(maxCharges/1.2,maxCharges-5))
+	end
+	if it.BonusExpireTime>10 and it.BonusExpireTime<=100 then
+		maxCharges=math.floor(math.max(maxCharges/1.2,maxCharges-10))
+	end
+	
+	local baseLevel=(maxCharges)*4+lvl/tot*2
+	
+	local specialEnchantLevel = 0
+	if it.Bonus2>0 then
+		local lvl = (Game.SpcItemsTxt[it.Bonus2-1].Lvl + 1) * (2 + it.MaxCharges)
+	end
+	
+	local bonusStrength=it.BonusStrength
+	if it.Bonus>=17 then
+		bonusStrength = math.min(bonusStrength^2, bonusStrength*10)
+	end
+	local bonusLevel=math.round(bonusStrength * 4 / difficultyExtraPower/slotMult[it:T().EquipStat])
+	local chargesLevel=math.round((it.Charges%1000) * 4 / difficultyExtraPower/slotMult[it:T().EquipStat])
+	
+	local enchants=4
+	if it.Bonus>0 then 
+		enchants = enchants + 1
+	end
+	if it.Charges>1000 then
+		enchants=enchants+1
+	end
+	if it.Bonus2>0 then
+		enchants=enchants+1
+	end
+	if it.BonusExpireTime>10 then
+		enchants=enchants+1
+	end
+	
+	local weight = equipSlotWeights[itemType]
+	local levelRequired=(baseLevel*weight[1]+bonusLevel*weight[2]+chargesLevel*weight[3]+specialEnchantLevel*weight[4])
+	
+	
+	
+	levelRequired=math.max(1,math.floor(levelRequired-10))
+	
+	if Game.BolsterAmount>=300 then
+		levelRequired=levelRequired-6
+	end
+	if vars.Mode==2 then
+		levelRequired=levelRequired-3
+	end
+	
+	levelRequired=math.max(1,math.floor(levelRequired))
+	
+	return levelRequired
+end
+
+equipSlotWeights = {
+	[0] = {0.55,0.15,0.15,0.15}, --2h weapon
+	[1] = {0.55,0.15,0.15,0.15}, --1h weapon
+	[2] = {0.55,0.15,0.15,0.15}, --bow
+	[3] = {0.4,0.2,0.2,0.2}, --chest
+	[4] = {0.4,0.2,0.2,0.2}, --shield
+	[5] = {0.25,0.25,0.25,0.25},  
+	[6] = {0.25,0.25,0.25,0.25},   
+	[7] = {0.25,0.25,0.25,0.25},  
+	[8] = {0.25,0.25,0.25,0.25},    
+	[9] = {0.25,0.25,0.25,0.25},   
+	[10] = {0,0.3,0.3,0.3}, --ring
+	[11] = {0,0.3,0.3,0.3}, --amulet
+}
