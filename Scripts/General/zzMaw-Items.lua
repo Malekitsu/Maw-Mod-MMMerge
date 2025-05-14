@@ -3829,14 +3829,14 @@ end
 
 --items have an item level requirement
 function events.CanWearItem(t)
-	it=Mouse.Item
+	local it=Mouse.Item
 	if vars.Mode==2 and not it.Identified then
 		t.Available=false
 	end
 	if it.Number<=151 or (it.Number>=803 and it.Number<=936) or (it.Number>=1603 and it.Number<=1736) then 
 		--check if equippable
 		local plLvl=Party[t.PlayerId].LevelBase
-		if plLvl<GetLevelRquirement(t.Item) then
+		if plLvl<GetLevelRquirement(it) then
 			t.Available=false
 		end
 	end	
