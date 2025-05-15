@@ -889,32 +889,10 @@ evt.PotionEffects[83] = function(IsDrunk, t, Power)
 		end
 		maxChargesCap=maxChargesCap+100 --mapping release
 		maxChargesCap=maxChargesCap/2
-		--if level requirement is over player level block it
-		local itemLevel=t.MaxCharges*10
-		local tot=0
-		local lvl=0
-		for i=1, 6 do
-			tot=tot+t:T().ChanceByLevel[i]
-			lvl=lvl+t:T().ChanceByLevel[i]*i
-		end
-		itemLevel=itemLevel+round(lvl/tot*18-17)
-		local maxCharges=t.MaxCharges
-		if t.BonusExpireTime>0 and t.BonusExpireTime<=2 then
-			maxCharges=math.floor(math.min(maxCharges/1.2,maxCharges-5))
-		end
-		if t.BonusExpireTime>10 and t.BonusExpireTime<=100 then
-			maxCharges=math.floor(math.min(maxCharges/1.2,maxCharges-5))
-		end
-		levelRequired=(maxCharges)*6+lvl/tot*2-24
-		if Game.BolsterAmount>=300 then
-			levelRequired=levelRequired-6
-		end
-		if vars.Mode==2 then
-			levelRequired=levelRequired-3
-		end
-		levelRequired=math.max(1,math.floor(levelRequired))
+
+		local levelRequired=GetLevelRquirement(t)
 		--check if equippable
-		plLvl=Party[Game.CurrentPlayer].LevelBase
+		local plLvl=Party[Game.CurrentPlayer].LevelBase
 		if plLvl<levelRequired then
 			Game.ShowStatusText("Your level is too low (Level " .. levelRequired .. " required)")
 			return
