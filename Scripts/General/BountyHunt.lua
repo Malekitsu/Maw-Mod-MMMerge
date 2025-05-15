@@ -4,11 +4,14 @@ BountyHuntFunctions = {}
 local BountyText = ""
 
 local function RewardByMon(MonId)
-	return Game.MonstersTxt[MonId].Level * 100
+	return (round(basetable[MonId].Level + vars.MM6LVL + vars.MM7LVL+ vars.MM8LVL)) * 100 
 end
 
 local function HuntText(MonId)
 	local text = Game.NPCText[133]:replace("%lu", tostring(RewardByMon(MonId)))
+	if Game.PlaceMonTxt[299]=="299" then
+		return text:format(StrColor(255,255,150, "different area"))
+	end
 	return text:format(StrColor(255,255,150, Game.PlaceMonTxt[299]))
 end
 BountyHuntFunctions.HuntText = HuntText
@@ -123,7 +126,14 @@ local function SetCurrentHunt()
 	local random = math.random
 	local BountyText
 	local Entry = vars.BountyHunt[Map.Name]
-
+	
+	if vars.insanityMode then
+		for key, value in pairs(vars.BountyHunt) do 
+			if vars.BountyHunt[key].Month==Game.Month then
+				return HuntText(vars.BountyHunt[key].MonId)
+			end
+		end
+	end
 	if not BountyExpired(Entry) then
 		-- If bounty hunt quest have already been chosen for this month.
 		MonId = Entry.MonId
@@ -201,7 +211,7 @@ local function SetCurrentHunt()
 			i=i+1
 		end
 		pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = math.random(5,15), powerChances = {55, 30, 15}, radius = 1024, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 index=mon:GetIndex() end}
-		
+		recalculateMawMonster()
 		-- Make monster berserk to encourage it to fight everything around (peasants, guards, player)
 		--local MonBuff = mon.SpellBuffs[const.MonsterBuff.Berserk]
 		--MonBuff.ExpireTime = Game.Time + const.Month
