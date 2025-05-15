@@ -1015,7 +1015,9 @@ local function Init()
 		if not source or not source.Monster then
 			return
 		end
-
+		if player_slot<0 or player_slot>Party.High then
+			return
+		end
 		local t = {
 			Monster = source.Monster,
 			MonsterIndex = source.MonsterIndex,
