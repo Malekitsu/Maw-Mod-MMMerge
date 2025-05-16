@@ -4130,15 +4130,15 @@ function GetLevelRquirement(it)
 	
 	local specialEnchantLevel = 0
 	if it.Bonus2>0 then
-		local lvl = (Game.SpcItemsTxt[it.Bonus2-1].Lvl + 1) * (2 + it.MaxCharges)
+		specialEnchantLevel = (Game.SpcItemsTxt[it.Bonus2-1].Lvl + 1) * (2 + maxCharges)
 	end
 	
 	local bonusStrength=it.BonusStrength
 	if it.Bonus>=17 then
 		bonusStrength = math.min(bonusStrength^2, bonusStrength*10)
 	end
-	local bonusLevel=math.round(bonusStrength * 4 / difficultyExtraPower/slotMult[it:T().EquipStat])
-	local chargesLevel=math.round((it.Charges%1000) * 4 / difficultyExtraPower/slotMult[it:T().EquipStat])
+	local bonusLevel=math.round(bonusStrength * 3 / difficultyExtraPower/slotMult[it:T().EquipStat])
+	local chargesLevel=math.round((it.Charges%1000) * 3 / difficultyExtraPower/slotMult[it:T().EquipStat])
 	
 	local enchants=4
 	if it.Bonus>0 then 
