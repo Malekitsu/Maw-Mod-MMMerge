@@ -4110,7 +4110,7 @@ function GetLevelRquirement(it)
 	if vars.insanityMode then
 		difficultyExtraPower=1.4
 	end
-	
+	local bonusBasePower=(difficultyExtraPower-1)*10
 	local tot=0
 	local lvl=0
 	for i=1, 6 do
@@ -4118,7 +4118,7 @@ function GetLevelRquirement(it)
 		lvl=lvl+it:T().ChanceByLevel[i]*i
 	end
 	tot = math.max(tot,1)
-	local maxCharges=it.MaxCharges
+	local maxCharges=math.round(it.MaxCharges/difficultyExtraPower)
 	if it.BonusExpireTime>0 and it.BonusExpireTime<=2 then
 		maxCharges=math.floor(math.max(maxCharges/1.2,maxCharges-5))
 	end
@@ -4126,7 +4126,7 @@ function GetLevelRquirement(it)
 		maxCharges=math.floor(math.max(maxCharges/1.2,maxCharges-10))
 	end
 	
-	local baseLevel=(maxCharges)*4+lvl/tot*2
+	local baseLevel=(maxCharges)*5+lvl/tot*2
 	
 	local specialEnchantLevel = 0
 	if it.Bonus2>0 then
