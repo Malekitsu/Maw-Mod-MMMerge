@@ -129,7 +129,7 @@ local function SetCurrentHunt()
 	
 	if vars.insanityMode then
 		for key, value in pairs(vars.BountyHunt) do 
-			if vars.BountyHunt[key].Month==Game.Month then
+			if vars.BountyHunt[key].Month==Game.Month and vars.BountyHunt[key].Done==false then
 				return HuntText(vars.BountyHunt[key].MonId)
 			end
 		end
