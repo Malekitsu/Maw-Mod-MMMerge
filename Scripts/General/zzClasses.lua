@@ -1833,3 +1833,9 @@ end
 --not casting for more than 5 seconds will reset stacks
 --each spell is categorized between single, AoE or shotgun.
 --each spell can have multiple categories
+
+--minotaur hp fix
+function events.GameInitialized2()
+	Game.Classes.HPFactor[const.Class.Minotaur]=6
+	Game.Classes.HPFactor[const.Class.MinotaurLord]=12
+end
