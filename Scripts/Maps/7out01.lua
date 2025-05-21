@@ -1,6 +1,6 @@
 if isRedone then
 	-- Remove arcomage from Emerald Island's taverns
-
+	Map.Monsters[20].NameId=0
 	function events.DrawShopTopics(t)
 		if t.HouseType == const.HouseType.Tavern then
 			t.Handled = true
