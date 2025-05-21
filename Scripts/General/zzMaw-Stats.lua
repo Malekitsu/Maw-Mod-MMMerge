@@ -672,6 +672,7 @@ function events.CalcDamageToPlayer(t)
 			for i=1,atk.DamageDiceCount do
 				damage=damage+math.random(1, atk.DamageDiceSides)
 			end
+			t.DamageKind=atk.Type
 			t.Damage=damage
 		end
 		if mapvars.nameIdMult and mapvars.nameIdMult[data.Monster.NameId] and mapvars.nameIdMult[data.Monster.NameId][data.MonsterAction+1] then
@@ -711,7 +712,6 @@ function events.CalcDamageToPlayer(t)
 		t.Result=0
 		return
 	end
-	
 	--properly calculate friendly fire damage
 	if data and data.Player and data.Spell and data.Spell<133 and data.Spell>0 then	
 		local s,m = SplitSkill(data.Player.Skills[const.Skills.Learning])
@@ -733,12 +733,12 @@ function events.CalcDamageToPlayer(t)
 	--modify spell damage as it's not handled in maw-monsters
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
 		oldLevel=BLevel[data.Monster.Id]
-		local bonus=math.max((lvl^0.88-BLevel[data.Monster.Id]^0.88),0)
-		dmgMult=getMonsterDamage(lvl,"diffMult")
+		local bonus=math.max((lvl^0.88-oldLevel^0.88),0)
+		dmgMult=getMonsterDamage(lvl,"baseMult")
 		if data.Object.Spell==6 or data.Object.Spell==97 then
 			dmgMult=dmgMult/2
 		end
-		t.Damage=(t.Result+bonus)*dmgMult
+		t.Damage=(t.Damage+bonus)*dmgMult
 	end
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
 		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,false,lvl) -- spell randomization is off
