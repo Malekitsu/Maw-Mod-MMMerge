@@ -538,13 +538,23 @@ function events.GameInitialized2()
 			local pl=t.Player
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.Dodging))
 			local oldDodge=skillAC[const.Skills.Dodging][m] or 0
-			local bonus= (1 + dragonScales.AC[m]/100 * s) * (math.min(pl.LevelBase,600)+40) - (s * oldDodge)
+			
+			local lvl=pl.LevelBase
+			if pl.LevelBase/bolster>1.2 then
+				lvl=math.min(pl.LevelBase/2,bolster)
+			end
+			local bonus= (1 + dragonScales.AC[m]/100 * s) * (math.min(lvl,600)+40) - (s * oldDodge)
 			t.Result=t.Result+bonus
 		elseif t.Stat>=10 and t.Stat<=15 then
 			local pl=t.Player
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.Dodging))
 			local oldDodge=skillAC[const.Skills.Dodging][m] or 0
-			local bonus= (dragonScales.AC[m]/100 * s) * (math.min(pl.LevelBase,600)+40)
+			
+			local lvl=pl.LevelBase
+			if pl.LevelBase/bolster>1.2 then
+				lvl=math.min(pl.LevelBase/2,bolster)
+			end
+			local bonus= (dragonScales.AC[m]/100 * s) * (math.min(lvl,600)+40)
 			t.Result=t.Result+bonus
 		end
 		
