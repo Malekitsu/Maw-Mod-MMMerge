@@ -2401,6 +2401,15 @@ function events.AfterLoadMap()
 	if Game.BolsterAmount>=100 then
 		if not mapvars.bossGenerated or not mapvars.bossNames then
 			mapvars.bossGenerated=true
+			--REDONE FIX, REMOVE MONSTERS WITH UNINTENDED NAME ID
+			if redone then
+				for i=0, Map.Monsters.High do
+					local mon=Map.Monsters[i]
+					if mon.NameId>220 then
+						mon.NameId=0
+					end
+				end
+			end
 			possibleMonsters={}
 			bossSpawns=math.ceil((Map.Monsters.Count-30)/150)
 			if vars.Mode==2 then
