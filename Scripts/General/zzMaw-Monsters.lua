@@ -3689,3 +3689,17 @@ function getDistances(unit1,unit2)
 	distance=((unit1.X-unit2.X)^2+(unit1.Y-unit2.Y)^2+(unit1.Z-unit2.Z)^2)^0.5
 	return distance
 end
+
+--redone bounty hunt quest partial fix
+function events.LoadMap()
+	if isRedone then
+		for i=0,Game.NPC.High do
+			npc=Game.NPC[i]
+			for j=0,3 do
+				if npc.Events[j]==1712 then
+				npc.Events[j]=579
+				end
+			end
+		end
+	end
+end
