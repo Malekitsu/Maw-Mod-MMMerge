@@ -414,7 +414,7 @@ local dragonFang={
 }
 local dragonBreath={
 	--["Attack"]={0,0,0,0,[0]=0},
-	["Damage"]={4,5,6,8,[0]=0},
+	["Damage"]={3,4,5,6,[0]=0},
 	--["Speed"]={0,0,1,1,[0]=0},
 }
 local dragonScales={
@@ -455,9 +455,12 @@ function events.GameInitialized2()
 			else
 				mightEffect=math.floor((might-13)/2)
 			end
-			
-			
-			local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (math.min(t.Player.LevelBase,600) * 2 +30) 
+			local bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL+1
+			local lvl=pl.LevelBase
+			if pl.LevelBase/bolster>1.2 then
+				lvl=math.min(pl.LevelBase/2,bolster)
+			end
+			local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (math.min(lvl,600) * 2 +30) 
 			t.Result=round((bonus*(1+might/1000)+(mightEffect*might/1000))*0.75*(1+0.03*s))
 			
 		elseif t.Stat==28 then --max damage
@@ -471,7 +474,12 @@ function events.GameInitialized2()
 			end
 			
 			
-			local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (math.min(t.Player.LevelBase,600) * 2 +30)
+			local bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL+1
+			local lvl=pl.LevelBase
+			if pl.LevelBase/bolster>1.2 then
+				lvl=math.min(pl.LevelBase/2,bolster)
+			end
+			local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (math.min(lvl,600) * 2 +30)
 			
 			t.Result=round((bonus*(1+might/1000)+(mightEffect*might/1000))*1.25*(1+0.03*s))
 			
@@ -494,7 +502,12 @@ function events.GameInitialized2()
 				mightEffect=math.floor((might-13)/2)
 			end
 			
-			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(pl.LevelBase,600)) + mightEffect
+			local bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL+1
+			local lvl=pl.LevelBase
+			if pl.LevelBase/bolster>1.2 then
+				lvl=math.min(pl.LevelBase/2,bolster)
+			end
+			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(lvl,600)) + mightEffect
 			local damage=round(baseDamage*(1+might/1000)*0.75*(1+0.03*s))
 			
 			t.Result=damage
@@ -510,7 +523,12 @@ function events.GameInitialized2()
 				mightEffect=math.floor((might-13)/2)
 			end
 			
-			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(pl.LevelBase,600)) + mightEffect
+			local bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL+1
+			local lvl=pl.LevelBase
+			if pl.LevelBase/bolster>1.2 then
+				lvl=math.min(pl.LevelBase/2,bolster)
+			end
+			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(lvl,600)) + mightEffect
 			local damage=round(baseDamage*(1+might/1000)*1.25*(1+0.03*s))
 			
 			t.Result=damage
