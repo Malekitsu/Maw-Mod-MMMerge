@@ -2402,7 +2402,7 @@ function events.AfterLoadMap()
 		if not mapvars.bossGenerated or not mapvars.bossNames then
 			mapvars.bossGenerated=true
 			--REDONE FIX, REMOVE MONSTERS WITH UNINTENDED NAME ID
-			if redone then
+			if isRedone then
 				for i=0, Map.Monsters.High do
 					local mon=Map.Monsters[i]
 					if mon.NameId>220 then
@@ -2572,16 +2572,7 @@ function generateBoss(index,nameIndex,skillType)
 	end
 	
 	local name=string.format(skill .. " " .. Game.MonstersTxt[mon.Id].Name)
-	local nameDetected=false
-	for i=221,299 do 
-		if Game.PlaceMonTxt[i] == name then
-			mon.NameId=i
-			nameDetected=true
-		end
-	end
-	if not nameDetected then
-		Game.PlaceMonTxt[mon.NameId]=name
-	end
+	Game.PlaceMonTxt[mon.NameId]=name
 	
 	mapvars.bossNames[mon.NameId]=Game.PlaceMonTxt[mon.NameId]
 	if getMapAffixPower(18) then
