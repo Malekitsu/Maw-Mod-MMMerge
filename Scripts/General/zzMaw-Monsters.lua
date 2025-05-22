@@ -3690,14 +3690,14 @@ function getDistances(unit1,unit2)
 	return distance
 end
 
---redone bounty hunt quest partial fix
-function events.LoadMap()
+--redone retroactive fix
+function events.AfterLoadMap()
 	if isRedone then
-		for i=0,Game.NPC.High do
-			npc=Game.NPC[i]
-			for j=0,3 do
-				if npc.Events[j]==1712 then
-				npc.Events[j]=579
+		for i=0,Map.Monsters.High do
+			local mon=Map.Monsters[i]
+			if mon.NameId>=221 and mon.NameId<300 and mon.AIState ~= 11 then
+				if Game.PlaceMonTxt[mon.NameId]==string.format("%s", mon.NameId) then
+					mon.NameId=0
 				end
 			end
 		end
