@@ -539,6 +539,7 @@ function events.GameInitialized2()
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.Dodging))
 			local oldDodge=skillAC[const.Skills.Dodging][m] or 0
 			
+			local bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL+1
 			local lvl=pl.LevelBase
 			if pl.LevelBase/bolster>1.2 then
 				lvl=math.min(pl.LevelBase/2,bolster)
@@ -550,6 +551,7 @@ function events.GameInitialized2()
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.Dodging))
 			local oldDodge=skillAC[const.Skills.Dodging][m] or 0
 			
+			local bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL+1
 			local lvl=pl.LevelBase
 			if pl.LevelBase/bolster>1.2 then
 				lvl=math.min(pl.LevelBase/2,bolster)
