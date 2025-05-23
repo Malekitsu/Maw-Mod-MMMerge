@@ -7,6 +7,7 @@ manaPotionKey=86
 Game.PatchOptions.FixMonstersBlockingShots=true
 higherLootPowerRange=true
 disableBow=false
+enableAllTrainers=true
 
 --sorting buttons
 currentBagSortKey=82
