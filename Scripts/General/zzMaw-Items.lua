@@ -1583,26 +1583,23 @@ function getItemValue(it, lootFilter)
 		
 		MaxCharges=it.MaxCharges
 		
-		mult=1+MaxCharges/20
+		mult=MaxCharges/20
 		
-		basePrice=basePrice*mult
+		basePriceBonus=basePrice*mult
 		if it.Bonus2>0 and it.Bonus2<=Game.SpcItemsTxt.high and it.BonusExpireTime<Game.Time then
 			special=Game.SpcItemsTxt[it.Bonus2-1].Value
 			if bonusEffects[it.Bonus2]~=nil then
 				special=special*mult
 			end
 			if special<11 then
-				basePrice=basePrice*special
+				basePriceBonus=basePriceBonus*special
 			else
-				basePrice=basePrice+special
+				basePriceBonus=basePriceBonus+special
 			end
 		end
-		local value=basePrice+bonus1+bonus2
+		local value=basePrice+(basePriceBonus+bonus1+bonus2)*0.4
 		if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
 			value=value*2.5
-		end
-		if Game.HouseScreen==3 or Game.HouseScreen==94 or lootFilter then
-			value=value*0.4
 		end
 		if Game.HouseScreen==2 or Game.HouseScreen==95 then
 			count=0
