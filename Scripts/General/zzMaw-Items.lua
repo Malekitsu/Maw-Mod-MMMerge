@@ -1602,6 +1602,7 @@ function getItemValue(it, lootFilter)
 			value=value*2.5
 		end
 		if Game.HouseScreen==2 or Game.HouseScreen==95 then
+			value=value*2
 			count=0
 			if it.Bonus>0 then
 				count=count+1
