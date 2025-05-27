@@ -1597,12 +1597,11 @@ function getItemValue(it, lootFilter)
 				basePriceBonus=basePriceBonus+special
 			end
 		end
-		local value=basePrice+(basePriceBonus+bonus1+bonus2)*0.4
+		local value=basePrice+(basePriceBonus+bonus1+bonus2)
 		if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
 			value=value*2.5
 		end
 		if Game.HouseScreen==2 or Game.HouseScreen==95 then
-			value=value*2
 			count=0
 			if it.Bonus>0 then
 				count=count+1
@@ -1619,6 +1618,8 @@ function getItemValue(it, lootFilter)
 			if count>0 then
 				value=value^(1+count*0.08)
 			end
+		else
+			value=value*0.4
 		end	
 		if value>200000  then
 			value=round(value/1000)*1000
