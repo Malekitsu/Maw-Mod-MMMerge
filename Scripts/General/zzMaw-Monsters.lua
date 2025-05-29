@@ -3703,3 +3703,17 @@ function events.AfterLoadMap()
 		end
 	end
 end
+
+--redone bounty hunt quest partial fix
+function events.LoadMap()
+	if isRedone then
+		for i=0,Game.NPC.High do
+			npc=Game.NPC[i]
+			for j=0,3 do
+				if npc.Events[j]==1712 then
+				npc.Events[j]=579
+				end
+			end
+		end
+	end
+end
