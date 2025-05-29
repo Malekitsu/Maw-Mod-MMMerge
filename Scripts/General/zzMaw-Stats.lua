@@ -980,7 +980,8 @@ function events.CalcDamageToMonster(t)
 			end
 		end
 	end
-	if not res or t.Result==0 then return end
+	if t.Result==0 then return end
+	if not res then res=0 end
 	res=res%1000
 	--spear reduction
 	if t.Player and data and data.Object==nil and t.DamageKind==4 then
