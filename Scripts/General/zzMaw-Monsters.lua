@@ -2430,7 +2430,7 @@ function events.AfterLoadMap()
 			if getMapAffixPower(19) then
 				for i=0,Map.Monsters.High do
 					local id=Map.Monsters[i].Id
-					if id%3~=0 and Game.MonstersTxt[id].AIType~=1 and Map.Monsters[i].NameId==0 and math.random()<getMapAffixPower(19)/100 and nameIndex<80 then
+					if id%3~=0 and Game.MonstersTxt[id].AIType~=1 and Map.Monsters[i].NameId==0 and math.random()<getMapAffixPower(19)/100 then
 						generateBoss(i)
 					end
 				end
