@@ -631,6 +631,10 @@ end
 painReflectionHit=false
 --fix for pain reflection:
 function events.CalcDamageToMonster(t)
+	if reflecting then
+		reflecting=false
+		return
+	end
 	if t.Monster.SpellBuffs[19].ExpireTime>=Game.Time then
 		painReflectionHit=true
 	end
@@ -758,7 +762,9 @@ function events.CalcDamageToPlayer(t)
 		t.Result=t.Result^0.85
 		return
 	end
-	
+	if pl.SpellBuffs[10].ExpireTime>Game.Time then
+		reflecting=true
+	end
 	--add difficulty related damage
 	if Game.BolsterAmount%50~=0 then
 		Game.BolsterAmount=100
@@ -842,6 +848,7 @@ function events.CalcDamageToPlayer(t)
 			t.Result=calcMawDamage(t.Player,t.DamageKind,damage)
 		end
 	end
+	
 	local DiseaseDamage = 1
 	if t.Player.Disease3>0 then
 		DiseaseDamage = 2
