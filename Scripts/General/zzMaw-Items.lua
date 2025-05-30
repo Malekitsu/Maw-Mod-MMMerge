@@ -2592,13 +2592,13 @@ function itemStats(index)
 				tab[math.floor(it.Charges/1000)]=tab[math.floor(it.Charges/1000)]+power
 				--legendary power 12
 				if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 12) then
-					if it.Bonus==1 then
+					if bonus==1 then
 						tab[2]=tab[2]+power*0.75
 						tab[3]=tab[3]+power*0.75
-					elseif it.Bonus==2 then
+					elseif bonus==2 then
 						tab[1]=tab[1]+power*0.75
 						tab[3]=tab[3]+power*0.75
-					elseif it.Bonus==3 then
+					elseif bonus==3 then
 						tab[1]=tab[1]+power*0.75
 						tab[2]=tab[2]+power*0.75
 					end
