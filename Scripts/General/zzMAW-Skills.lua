@@ -2020,7 +2020,23 @@ function events.KeyDown(t)
 			end
 		end
 	end
-	
+	if t.Key==const.Keys.R then
+		if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
+			local pl=Party[Game.CurrentPlayer]
+			local id=pl:GetIndex()
+			if table.find(elementalistClass, Party[Game.CurrentPlayer].Class) then
+				if vars.disableRotation and vars.disableRotation[id] then
+					vars.disableRotation[id]=false
+					Game.ShowStatusText("Elementalist Rotation Enabled")
+				else
+					vars.disableRotation=vars.disableRotation or {}
+					vars.disableRotation[id]=true
+					Game.ShowStatusText("Elementalist Rotation Disabled")
+				end
+				checkSkills(Game.CurrentPlayer)
+			end
+		end
+	end
 end
 function events.Action(t)
 	if t.Action==121 then
