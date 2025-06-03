@@ -1062,7 +1062,9 @@ function events.Action(t)
 			local sp=healingSpells[68]
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
 			local cost=Game.Spells[68]["SpellPoints" .. masteryName[m]]
-			if pl.SP<cost then return end
+			if pl.SP<cost then 
+				DoGameAction(23,0,0)
+			end
 			t.Handled=true
 			pl.SP=pl.SP-cost
 
@@ -1096,7 +1098,9 @@ function events.Action(t)
 			local sp=healingSpells[74]
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
 			local cost=Game.Spells[74]["SpellPoints" .. masteryName[m]]
-			if pl.SP<cost then return end
+			if pl.SP<cost then 
+				DoGameAction(23,0,0)
+			end
 			t.Handled=true
 			pl.SP=pl.SP-cost
 			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
@@ -1131,7 +1135,9 @@ function events.Action(t)
 			local sp=healingSpells[49]
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Spirit))
 			local cost=Game.Spells[49]["SpellPoints" .. masteryName[m]]
-			if pl.SP<cost then return end
+			if pl.SP<cost then 
+				DoGameAction(23,0,0)
+			end
 			t.Handled=true
 			pl.SP=pl.SP-cost
 			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
