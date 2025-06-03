@@ -1480,7 +1480,10 @@ function events.CalcDamageToMonster(t)
 		vars.elementalistSpells[pl:GetIndex()][school]=vars.elementalistSpells[pl:GetIndex()][school] or 0
 		
 		local tier=spell%11==0 and 11 or spell%11
-		local learningBonus=tier^1.5 * t.Monster.Level^0.5 * Party.Count^0.5
+		local learningBonus=tier^1.5 * t.Monster.Level^0.5
+		if not vars.insanityMode then
+			learningBonus = learningBonus * Party.Count^0.5
+		end
 		if table.find(aoespells,spell) and spell~=15 and spell~=24 then
 			learningBonus=learningBonus/3
 		end
@@ -1525,6 +1528,9 @@ end
 
 
 function events.PlayerCastSpell(t)
+	if vars.disableRotation and vars.disableRotation[t.PlayerIndex] then
+		return
+	end
 	if table.find(elementalistClass, t.Player.Class) and (table.find(eleOffSpellsOut, t.SpellId) or table.find(eleOffSpellsIn, t.SpellId)) and vars.elementalistSpellBinds then
 		local pl=t.Player
 		local index=t.PlayerIndex
@@ -1712,6 +1718,11 @@ local function elementalistSkills(isElementalist, id)
 		end
 	
 		local list = vars.elementalistSpells[pl:GetIndex()]
+		local enableDisableText = StrColor(0,255,0, "Enabled")
+		if vars.disableRotation and vars.disableRotation[pl:GetIndex()] then
+			enableDisableText = StrColor(255,0,0, "Disabled")
+		end
+		local rotationText = StrColor(0,0,0,"Elementalist offensive spells, when casted randomly, grant elementalist stacks, which increase spell damage, speed and cost.\nPress R to enable/disable random rotation.\nCurrently ") .. enableDisableText .. "\n\n"
 		for i=12,15 do
 			local progression=list[i]
 			local currentTier=0
@@ -1724,9 +1735,9 @@ local function elementalistSkills(isElementalist, id)
 				local low=spellRequirements[currentTier]
 				local high=spellRequirements[currentTier+1]
 				local percentageProgression=math.floor((progression-low)/(high-low)*10000)/100
-				Skillz.setDesc(i,5,"Effects vary per spell\n\nElementalists learn new spells with practice instead of books.\n\nProgress toward learning " .. Game.SpellsTxt[(i-12)*11+currentTier+1].Name .. ": " .. percentageProgression .."%")
+				Skillz.setDesc(i,5, "Effects vary per spell \n\n" .. rotationText .. "Elementalists learn new spells with practice instead of books.\n\nProgress toward learning " .. Game.SpellsTxt[(i-12)*11+currentTier+1].Name .. ": " .. percentageProgression .."%")
 			else
-				Skillz.setDesc(i,5,"Effects vary per spell\n\nElementalists learn new spells with practice instead of books.\n\nAll the available spells of this school have been learned.")
+				Skillz.setDesc(i,5, "Effects vary per spell \n\n" .. rotationText .. "Elementalists learn new spells with practice instead of books.\n\nAll the available spells of this school have been learned.")
 			end
 		end
 	else
