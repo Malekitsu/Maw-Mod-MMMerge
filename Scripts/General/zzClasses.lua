@@ -1453,7 +1453,7 @@ end
 elementalistClass={62,63,64}
 
 function events.GameInitialized2()
-	Game.ClassDescriptions[62] = "The Elementalist is the caster with the highest mana pool, who learns spells not from the book, but from casting spells of the same elemental school. He can’t learn Ascension, but his ascension level is directly tied to the sum of the school levels divided by 4. Baseline spell recovery time is 50% higher; however, when he casts Magic, he gains stacks, which increase:\n\nSpell Damage: 10% per stack\nSpell Recovery Speed: 5% per stack\nMana Cost: 1 + 7.5% of the total.\n\nAfter a few seconds without casting, the stacks decay by 50%. Dealing damage with a bow, melee weapon, or from the spellbook will break concentration, instantly resetting all stacks.\n\nSpells are cast randomly but divided into three categories: Single Target, Area of Effect, and Shotgun. Depending on the chosen quick-cast spell, the rotation is adjusted accordingly. For example, setting Fireball as a quick-cast spell will automatically prioritize AoE spells."
+	Game.ClassDescriptions[62] = "The Elementalist is the caster with the highest mana pool, who learns spells not from the book, but from casting spells of the same elemental school. He can't learn Ascension, but his ascension level is directly tied to the sum of the school levels divided by 4. Baseline spell recovery time is 50% higher; however, when he casts Magic, he gains stacks, which increase:\n\nSpell Damage: 10% per stack\nSpell Recovery Speed: 5% per stack\nMana Cost: 1 + 7.5% of the total.\n\nAfter a few seconds without casting, the stacks decay by 50%. Dealing damage with a bow, melee weapon, or from the spellbook will break concentration, instantly resetting all stacks.\n\nSpells are cast randomly but divided into three categories: Single Target, Area of Effect, and Shotgun. Depending on the chosen quick-cast spell, the rotation is adjusted accordingly. For example, setting Fireball as a quick-cast spell will automatically prioritize AoE spells."
 	Game.Classes.HPFactor[63]=2.5
 end
 
@@ -1771,6 +1771,10 @@ function checkSkills(id)
 			elementalistSkills(true, id)
 			return
 		end
+		if table.find(assassinClass, class) then
+			assassinSkills(true,id)
+			return			
+		end
 	end
 end
 --[[test code
@@ -1880,3 +1884,173 @@ function events.GameInitialized2()
 	Game.Classes.HPFactor[const.Class.Minotaur]=6
 	Game.Classes.HPFactor[const.Class.MinotaurLord]=12
 end
+
+------------
+--ASSASSIN--
+------------
+
+assassinClass={const.Class.Thief,const.Class.Rogue,const.Class.Assassin,const.Class.Spy}
+
+function events.GameInitialized2()
+	baseSchoolsTxtAssassin={}
+	for i=1,5 do
+		baseSchoolsTxtAssassin[i]={[12]=Skillz.getDesc(12,i), [13]=Skillz.getDesc(13,i), [14]=Skillz.getDesc(14,i), [15]=Skillz.getDesc(15,i)}
+	end	
+	
+	Game.Classes.HPFactor[const.Class.Thief]=2
+	Game.Classes.HPFactor[const.Class.Rogue]=3
+	Game.Classes.HPFactor[const.Class.Assassin]=4
+	Game.Classes.HPFactor[const.Class.Spy]=4
+	
+	Game.Classes.HPBase[const.Class.Thief]=25
+	Game.Classes.HPBase[const.Class.Rogue]=25
+	Game.Classes.HPBase[const.Class.Assassin]=25
+	Game.Classes.HPBase[const.Class.Spy]=25
+	
+	Game.Classes.SPBase[const.Class.Thief]=90
+	Game.Classes.SPBase[const.Class.Rogue]=100
+	Game.Classes.SPBase[const.Class.Assassin]=110
+	Game.Classes.SPBase[const.Class.Spy]=110	
+	
+	Game.Classes.SPFactor[const.Class.Thief]=0
+	Game.Classes.SPFactor[const.Class.Rogue]=0
+	Game.Classes.SPFactor[const.Class.Assassin]=0
+	Game.Classes.SPFactor[const.Class.Spy]=0
+	
+	Game.Classes.SPStats[const.Class.Thief]=1
+	Game.Classes.SPStats[const.Class.Rogue]=1
+	Game.Classes.SPStats[const.Class.Assassin]=1
+	Game.Classes.SPStats[const.Class.Spy]=1
+	
+	function events.CalcStatBonusByItems(t)
+		if t.Stat==const.Stats.SpellPoints and table.find(assassinClass, t.Player.Class) then
+			local pl=t.Player
+			local s,m=SplitSkill(pl:GetSkill(const.Skills.Earth))
+			t.Result=m*10
+		end
+	end	
+end
+
+
+function assassinationDamage(pl,mon,obj)
+	local id=pl:GetIndex()
+	local s,m=SplitSkill(pl:GetSkill(const.Skills.Fire))
+	local restoreChance=0.1+s*0.01
+	local manaCost=50-m*5
+	if obj then
+		restoreChance=restoreChance/2
+		manaCost=manaCost/2
+	end
+	if restoreChance>math.random() then
+		pl.SP=math.min(pl:GetFullSP(),pl.SP+15)
+	end
+	function events.Tick()
+		events.Remove("Tick", 1)
+		if mon.HP<=0 then
+			s,m=SplitSkill(pl:GetSkill(const.Skills.Air))
+			local fullSP=pl:GetFullSP()
+			pl.SP=math.min(fullSP, pl.SP+(1+m)*5)
+		end
+	end
+	vars.assassinDamage=vars.assassinDamage or {}
+	vars.assassinDamage[id]=vars.assassinDamage[id] or 0
+	if pl.SP>=manaCost then
+		local damage=vars.assassinDamage[id]
+		local monsters=0
+		for i=0,Map.Monsters.High do
+			local mapMon=Map.Monsters[i]
+			if mapMon.AIState~=11 and mapMon.AIState~=5 and getDistances(mon,mapMon)<384 then
+				monsters=monsters+1
+			end
+		end
+		local damageMult=math.min(0.8,(monsters-1)*0.2)
+		if obj then
+			damage=damage/2
+		end
+		pl.SP=pl.SP-manaCost
+		
+		damage=damage*damageMult
+		return damage
+	end
+	return vars.assassinDamage[id]
+end
+
+function assassinSkills(isAssassin, id)
+	if isAssassin then
+		local pl=Party[id]
+		for key, value in pairs(DKManaCost) do
+			for i=1,4 do
+				Game.Spells[key]["SpellPoints" .. masteryName[i]]=value
+			end
+		end
+		--skill names and desc
+		
+		Skillz.setName(12, "Combat")
+		Skillz.setName(13, "Subtlety")
+		Skillz.setName(14, "Poisons")
+		Skillz.setName(15, "Assassination")
+		
+		Skillz.setDesc(12,1,"Combat is the skill that allows you to endure prolonged fights by enhancing your energy recovery.\n\nEach attack has a base 10% chance, plus 1% per skill point, to restore 15 energy.\n\n");
+		Skillz.setDesc(13,1,"Subtlety manipulates the boundary between life and death, granting you energy upon killing enemies and increasing your chance to evade.\n\nEach incoming attack has a base 5% chance, plus 0.05% per skill point, to be dodged.\n\n");
+		Skillz.setDesc(14,1,"Poisoning is the art of mastering toxins through self-experimentation, transforming suffering into vitality. Higher skill levels increase your energy regeneration.\n\nEach attack deals bonus water damage equal to 0.1% of the target's HP per skill point.\n\n");
+		Skillz.setDesc(15,1,"Assassination focuses on eliminating isolated targets before they react. Each skill point increases your damage by 4-6-8-10, reduced by 20% for each nearby enemy (up to 4 enemies).\n\nHigher levels also grant more starting energy, ideal for high burst damage in short engagements.\n\n");
+
+		
+		Skillz.setDesc(12,2,"Melee attack costs 45 energy")
+		Skillz.setDesc(13,2,"Killing a monster restores 10 energy")
+		Skillz.setDesc(14,2,"You regenerate 10 energy per second")
+		Skillz.setDesc(15,2,"Increases your maximum energy by 10")
+		
+		Skillz.setDesc(12,3,"Melee attack costs 40 energy")
+		Skillz.setDesc(13,3,"Killing a monster restores 15 energy")
+		Skillz.setDesc(14,3,"You regenerate 12 energy per second")
+		Skillz.setDesc(15,3,"Increases your maximum energy by 20")
+		
+		Skillz.setDesc(12,4,"Melee attack costs 35 energy")
+		Skillz.setDesc(13,4,"Killing a monster restores 20 energy")
+		Skillz.setDesc(14,4,"You regenerate 14 energy per second")
+		Skillz.setDesc(15,4,"Increases your maximum energy by 30")
+		
+		Skillz.setDesc(12,5,"Melee attack costs 30 energy")
+		Skillz.setDesc(13,5,"Killing a monster restores 25 energy")
+		Skillz.setDesc(14,5,"You regenerate 16 energy per second")
+		Skillz.setDesc(15,5,"Increases your maximum energy by 40")
+	else
+		for i=1,5 do
+			for key, value in pairs(baseSchoolsTxtAssassin[i]) do
+				Skillz.setDesc(key,i,value)
+			end
+		end
+		Skillz.setName(12, "Fire Magic")
+		Skillz.setName(13, "Air Magic")
+		Skillz.setName(14, "Water Magic")
+		Skillz.setName(15, "Earth Magic")
+		adjustSpellTooltips()
+	end
+end
+function events.CanLearnSpell(t)
+	if table.find(assassinClass, t.Player.Class) then
+		t.NeedMastery = 5
+	end
+end
+function events.Action(t)
+	if t.Action==105 and Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
+		pl=Party[Game.CurrentPlayer]
+		if table.find(assassinClass, pl.Class) then
+			for i=1,99 do
+				pl.Spells[i]=false
+			end
+		end
+	end
+end
+--[[spells
+fire spike fire aura fireball haste
+invisibility chain lightning jump shield
+poison spray, town portal, lloyd, acid burst
+stun stoneskin blades mass distorsion
+
+combat - attack speed on skill
+subtlety - i0.5% chance to dodge an incoming attack
+poison - %HP water damage on energy attack
+assassination - adds flat damage (scaling with weapon skill) on isolated targets on skill (damage decreases depending on the number of targets in the nearby)
+]]
