@@ -7,9 +7,9 @@ Spear	E	M	M	M	=	=	=	=	=	=	=	=	=	=	=	=	M	M	G	G	M	M	E	E	E	E	E	M	M	M	E	M	G	G	=	=	=	
 Bow	M	M	G	G	E	M	M	M	M	G	=	=	E	E	E	E	E	E	M	M	E	E	N	N	N	N	E	E	E	E	M	M	G	G	E	M	M	M	E	M	N	N	N	N	N	N	N	N	N	N	M	N	N	E	E	E	E	E	E	E	E	E	N	N	N
 Mace	=	=	=	=	E	M	M	M	N	N	=	=	E	E	E	E	M	M	G	G	M	M	=	=	=	=	M	M	G	G	=	=	=	=	E	E	M	M	M	G	E	M	=	=	=	=	=	=	=	=	M	=	=	E	M	M	M	M	M	E	M	M	E	E	E
 Blaster	G	G	G	G	G	G	G	G	G	G	=	=	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	N	N	G	G	G	G	G	G	G	G	G	G	G	G	=	=	=
-Shield	=	=	=	=	E	M	M	M	E	E	=	=	E	E	E	E	M	M	G	G	=	=	=	=	=	=	M	M	G	G	E	E	E	E	=	=	=	N	E	M	M	M	=	=	=	=	=	=	=	=	M	=	=	M	M	M	=	=	=	E	E	E	=	=	=
+Shield	=	=	=	=	E	M	M	M	E	E	=	=	E	E	E	E	M	M	G	G	=	=	=	=	=	=	M	M	G	G	E	E	E	E	=	=	=	=	E	M	M	M	=	=	=	=	=	=	=	=	M	=	=	M	M	M	=	=	=	E	E	E	=	=	=
 Leather	M	M	M	M	E	E	E	E	M	M	=	=	E	E	E	E	E	E	E	E	E	E	M	M	M	M	E	E	E	E	M	M	M	M	M	M	G	G	M	G	M	M	E	M	E	M	M	M	N	N	E	M	E	E	E	E	E	E	E	E	M	M	E	E	M
-Chain	M	M	G	G	E	E	M	M	M	G	=	=	=	=	=	=	M	M	M	M	M	G	=	=	=	=	M	M	M	M	M	M	M	M	E	E	M	E	E	E	E	E	=	=	=	=	=	=	=	=	M	=	=	M	M	M	M	M	M	E	E	E	=	=	=
+Chain	M	M	G	G	E	E	M	M	M	G	=	=	=	=	=	=	M	M	M	M	M	G	=	=	=	=	M	M	M	M	M	M	M	M	E	E	M	M	E	E	E	E	=	=	=	=	=	=	=	=	M	=	=	M	M	M	M	M	M	E	E	E	=	=	=
 Plate	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	M	M	G	G	E	E	=	=	=	=	M	M	G	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	M	M	M	M	M	G	=	=	=	=	=	=
 Fire	E	M	G	G	=	=	=	=	E	M	=	=	E	M	G	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	E	E	M	M	E	M	G	G	=	=	=	=	E	M	M	G	G	G	=	=	=	G	G	=	=	=	=	=	=	E	M	G	M	M	G
 Air	E	M	G	G	=	=	=	=	E	M	=	=	E	M	G	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	E	E	M	M	E	M	G	G	=	=	=	=	E	M	M	G	G	G	=	=	=	G	G	=	=	=	=	=	=	E	M	G	M	M	G
