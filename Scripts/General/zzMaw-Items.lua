@@ -2734,6 +2734,22 @@ function itemStats(index)
 				local s,m=SplitSkill(pl.Skills[const.Skills.Earth])
                 armsDmg=armsDmg+s*m
 			end
+			if table.find(assassinClass,pl.Class) then
+				local s,m=SplitSkill(pl.Skills[const.Skills.Earth])
+                armsDmg=armsDmg+s*(2+m*2)
+				
+				--needed to reduce damage when target is not isolated
+				vars.assassinDamage=vars.assassinDamage or {}
+				vars.assassinDamage[pl:GetIndex()]=armsDmg
+				if vars.MAWSETTINGS.buffRework=="ON" then 
+					if Party.SpellBuffs[9].ExpireTime>=Game.Time then
+						local s,m=getBuffSkill(51)
+						heroismMult=(buffPower[51].Base[m]/100+buffPower[51].Scaling[m]*s/1000)
+						vars.assassinDamage[pl:GetIndex()]=vars.assassinDamage[pl:GetIndex()]*(1+heroismMult)
+					end
+				end
+				
+			end
 			--split armsmaster between main and offhand
 			local item=pl:GetActiveItem(0)
 			if item and skill ~= 5 and item:T().Skill~=8 then
