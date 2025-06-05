@@ -643,7 +643,13 @@ end
 --Tooltips and mana cost fix--
 ------------------------------
 function events.GameInitialized2()
---Day of Protection
+	Game.SpellsTxt[18].Name="Chain Lightning"
+	Game.Spells[18].Delay[3]=100
+	Game.Spells[18].Delay[4]=100
+	Game.SpellsTxt[18].Expert="Spell hits up to 2 times"
+	Game.SpellsTxt[18].Master="Spell hits up to 3 times"
+	Game.SpellsTxt[18].GM="Spell hits up to 4 times"
+
 	--Invisibility
 	Game.SpellsTxt[19].Master="Duration 15+1.5 minutes per point of skill"
 	Game.SpellsTxt[19].GM="Duration 30+3 minutes per point of skill"
@@ -1373,6 +1379,11 @@ function events.GameInitialized2()
 	spellCost[111][masteryName[3]]=10
 	spellCost[111][masteryName[4]]=15
 	
+	--chain lighning
+	spellCost[18][masteryName[3]]=20
+	spellCost[18][masteryName[4]]=30
+	
+	
 	spells={2,6,7,8,9,10,11,15,18,20,22,24,26,29,32,37,39,41,43,44,52,59,65,70,76,78,79,84,87,90,93,97,98,99,103,111,123}
 	lastIndex=-1 --used later
 
@@ -1387,7 +1398,7 @@ function events.GameInitialized2()
 			[10] = {dmgAdd = 12, diceMin = 1, diceMax = 7, },--inferno
 			[11] = {dmgAdd = 19, diceMin = 1, diceMax = 21, },--incinerate
 			[15] = {dmgAdd = 0, diceMin = 1, diceMax = 4, },--sparks
-			[18] = {dmgAdd = 13, diceMin = 1, diceMax = 8, },--lightning bolt
+			[18] = {dmgAdd = 12, diceMin = 1, diceMax = 8, },--lightning bolt
 			[20] = {dmgAdd = 20, diceMin = 1, diceMax = 12, },--implosion
 			[22] = {dmgAdd = 5, diceMin = 1, diceMax = 1, },--starburst
 			[24] = {dmgAdd = 5, diceMin = 1, diceMax = 3, },--poison spray
@@ -1714,7 +1725,7 @@ function ascension()
 		Game.SpellsTxt[10].Description=string.format("Inferno burns all monsters in sight when cast, excluding your characters.  One or two castings can clear out a room of weak or moderately powerful creatures. Each monster takes %s points of damage plus %s per point of skill in Fire Magic.  This spell only works indoors.",dmgAddTooltip(s, m,10),diceMaxTooltip(s, m,10))
 		Game.SpellsTxt[11].Description=string.format("Among the strongest direct damage spells available, Incinerate inflicts massive damage on a single target.  Only the strongest of monsters can expect to survive this spell.  Damage is %s points plus 1-%s per point of skill in Fire Magic.",dmgAddTooltip(s, m,11),diceMaxTooltip(s, m,11))
 		Game.SpellsTxt[15].Description=string.format("Sparks fires small balls of lightning into the world that bounce around until they hit something or dissipate. It is hard to tell where they will go, so this spell is best used in a room crowded with small monsters. Each spark does 1-%s per point of skill in Air Magic.",diceMaxTooltip(s, m,15))
-		Game.SpellsTxt[18].Description=string.format("Lightning Bolt discharges electricity from the caster's hand to a single target.  It always hits and does %s points plus 1-%s points of damage per point of skill in Air Magic.",dmgAddTooltip(s, m,18),diceMaxTooltip(s, m,18))
+		Game.SpellsTxt[18].Description=string.format("Lightning Bolt discharges electricity from the caster's hand to a single target.  It always hits and does %s points plus 1-%s points of damage per point of skill in Air Magic.\n\nThe spell then arcs to a second target, hitting it as well.",dmgAddTooltip(s, m,18),diceMaxTooltip(s, m,18))
 		Game.SpellsTxt[20].Description=string.format("Implosion is a nasty spell that affects a single target by destroying the air around it, causing a sudden inrush from the surrounding air, a thunderclap, and %s points plus 1-%s points of damage per point of skill in Air Magic.",dmgAddTooltip(s, m,20),diceMaxTooltip(s, m,20))
 		Game.SpellsTxt[22].Description=string.format("Calls stars from the heavens to smite and burn your enemies.  Twenty stars are called, and the damage for each star is %s points plus %s per point of skill in Air Magic. Try not to get caught in the blast! This spell only works outdoors.",dmgAddTooltip(s, m,22),diceMaxTooltip(s, m,22))
 		Game.SpellsTxt[24].Description=string.format("Sprays poison at monsters directly in front of your characters.  Damage is low, but few monsters have resistance to Water Magic, so it usually works.  Each shot does %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,24),diceMaxTooltip(s, m,24))
@@ -3337,4 +3348,61 @@ function getMaxMana(pl)
 		local sp=pl:GetFullSP()
 		return sp
 	end	
+end
+
+
+function events.CalcDamageToMonster(t)
+	local data = WhoHitMonster()
+	if data.Object then
+		if data.Object.Spell==18 and data.Object.SpellMastery>1 then
+			monsterIndex=getClosestMonsterInRange(t.Monster,768)
+			if monsterIndex~=nil then
+				BeginGrabObjects()
+				Game.SummonObjects(2060,t.Monster.X,t.Monster.Y,t.Monster.Z+100,0,1)
+				local obj=GrabObjects()
+				if not obj then return end
+				local index=data.Player:GetIndex()
+				local id=0
+				for i=0, Party.High do
+					if Party[i]:GetIndex()==index then
+						id=i
+					end
+				end
+				local skill=Party[id].Skills[const.Skills.Air]
+				local s, m = SplitSkill(skill)
+				obj.Spell=18
+				obj.SpellLevel=m
+				obj.SpellMastery=data.Object.SpellMastery-1
+				obj.SpellSkill=s
+				obj.SpellType=18
+				obj.TypeIndex=455
+				obj.Owner=index*8+4
+				obj.Visible=true
+				obj.Velocity[0]=3000
+				obj.Velocity[1]=3000
+				obj.Velocity[2]=3000
+				obj.Target=3+8*monsterIndex
+			end
+		end
+	end
+end
+
+--set reference coord and desired range
+function getClosestMonsterInRange(mon,range)
+	local X,Y,Z=mon.X,mon.Y,mon.Z
+	local closestMonster = nil
+	local closestDistance = math.huge
+	for i=0,Map.Monsters.high do
+		distance=range+1
+		local X2, Y2, Z2 = XYZ(Map.Monsters[i])
+		if Map.Monsters[i].HP>0 then
+			distance=((X-X2)^2+(Y-Y2)^2+(Z-Z2)^2)^0.5
+		end
+		if distance <= range and distance < closestDistance and i~=mon:GetIndex() then
+			closestMonster = i
+			closestDistance = distance
+		end
+	end
+	--will return as monster index
+	return closestMonster
 end
