@@ -1264,6 +1264,10 @@ function MawRegen()
 			elseif pl.Class==11 then
 				regenSP[i]=regenSP[i] + 0.5* timeMultiplier*mult
 			end
+			if table.find(assassinClass, pl.Class) then
+				local s,m=SplitSkill(pl:GetSkill(const.Skills.Water))
+				regenSP[i]=regenSP[i]+ (1+m*0.2) * timeMultiplier
+			end
 			pl.SP = math.min(vars.currentManaPool[i], pl.SP + math.floor(regenSP[i]))
 			regenSP[i]=regenSP[i]%1
 			lastSP[i]=pl.SP
