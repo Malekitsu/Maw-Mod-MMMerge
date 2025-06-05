@@ -666,6 +666,10 @@ function events.CalcDamageToPlayer(t)
 	if Game.CharacterPortraits[pl.Face].Race==const.Race.Dragon then
 		dodgeChance=0
 	end
+	if table.find(assassinClass,pl.Class) then
+		local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Air))
+		dodgeChance=1-0.995^Skill+0.05
+	end
 	roll=math.random()
 	if roll<=dodgeChance then
 		t.Result=0
