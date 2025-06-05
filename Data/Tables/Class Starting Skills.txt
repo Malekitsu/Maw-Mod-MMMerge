@@ -11,10 +11,10 @@ Shield	-	-	C	C	-	-	-	-	C	C	-	-	-	C	C	-	-	-	-	-	C	-	-	-	-	-	C	-	-	-	-	-
 Leather	C	C	C	C	C	-	C	C	F	F	C	C	C	C	C	C	C	F	F	C	C	C	C	C	F	C	C	-	-	C	F	C
 Chain	-	-	-	-	-	-	-	-	C	C	C	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	C	-	-	-	-	-
 Plate	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	F	F	-	-	-
-Fire	C	C	-	-	C	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	F	C	C	-	-	-	-	-	-	-	F
-Air	F	F	-	-	C	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	C	C	C	-	-	-	-	-	-	-	C
-Water	C	C	-	-	-	-	C	C	-	-	-	-	-	-	-	-	-	-	-	-	-	C	C	C	-	-	-	C	C	C	-	C
-Earth	-	-	-	-	-	-	F	F	-	-	-	-	-	-	-	-	-	-	-	-	-	C	-	-	-	-	-	-	-	F	-	C
+Fire	C	C	-	-	C	-	-	-	-	-	-	-	-	-	-	-	-	F	-	-	-	F	C	C	-	-	-	-	-	-	-	F
+Air	F	F	-	-	C	-	-	-	-	-	-	-	-	-	-	-	-	F	-	-	-	C	C	C	-	-	-	-	-	-	-	C
+Water	C	C	-	-	-	-	C	C	-	-	-	-	-	-	-	-	-	F	-	-	-	C	C	C	-	-	-	C	C	C	-	C
+Earth	-	-	-	-	-	-	F	F	-	-	-	-	-	-	-	-	-	F	-	-	-	C	-	-	-	-	-	-	-	F	-	C
 Spirit	-	-	C	C	-	-	C	C	-	-	F	-	-	F	F	-	-	-	-	-	-	-	-	-	-	-	C	-	-	C	-	-
 Mind	-	-	C	C	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	C	-	-	-	-	-	-	-	-	-	-	-
 Body	-	-	F	F	-	-	C	C	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	C	C	C	-	-
@@ -31,7 +31,7 @@ Meditation	-	-	C	C	-	-	C	C	-	-	-	-	-	-	-	-	-	-	-	-	-	-	C	C	-	-	C	-	-	C	-	-
 Perception	C	C	C	C	C	C	C	C	C	C	C	C	C	-	-	F	F	C	C	-	-	-	-	-	F	C	-	F	F	C	F	-
 Regeneration	-	-	-	-	-	C	-	-	-	-	-	-	-	-	-	-	-	-	-	F	C	-	-	-	-	-	-	C	C	-	-	-
 DisarmTraps	-	-	-	-	C	-	-	-	-	-	C	-	-	-	-	C	C	C	C	-	C	-	-	-	-	-	-	-	-	-	-	-
-Dodging	-	-	-	-	-	-	-	-	-	-	-	F	F	-	-	C	C	C	C	-	-	-	-	-	-	-	-	-	-	-	-	-
+Dodging	-	-	-	-	-	-	-	-	-	-	-	F	F	-	-	C	C	-	C	-	-	-	-	-	-	-	-	-	-	-	-	-
 Unarmed	-	-	-	-	-	-	-	-	-	-	-	F	F	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
 IdentifyMonster	-	-	-	-	-	C	-	-	-	-	-	C	C	-	-	C	C	-	-	C	C	C	C	C	-	-	-	-	-	-	-	C
 Armsmaster	C	C	-	-	-	-	-	-	C	C	C	C	C	C	C	C	C	-	-	C	-	-	-	-	-	-	-	C	C	-	-	-
