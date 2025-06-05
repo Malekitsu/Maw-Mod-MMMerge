@@ -3250,6 +3250,10 @@ function events.Tick()
 		lastLocation[i]=lastLocation[i] or {math.huge,math.huge}
 		local dist=getDistance(obj.X,obj.Y,obj.Z)
 		if table.find(transformedList, obj.Type) and (dist<170 or (obj.X==lastLocation[i][1] and obj.Y==lastLocation[i][2])) and obj.Spell==0 then
+			local triggeredByPlayer=false
+			if dist<170 then
+				triggeredByPlayer=true
+			end
 			obj.Type=explosions[obj.Type]
 			obj.TypeIndex=obj.Type-160
 			obj.VelocityX=0
@@ -3262,7 +3266,7 @@ function events.Tick()
 			lastLocation[i]={math.huge,math.huge}
 			--get data
 			local id=math.floor(obj.Owner/8)
-			if dist<230 then
+			if triggeredByPlayer then
 				--calculate damage
 				local id=math.floor(obj.Owner/8)
 				local mon=Map.Monsters[math.floor(obj.Owner/8)]
