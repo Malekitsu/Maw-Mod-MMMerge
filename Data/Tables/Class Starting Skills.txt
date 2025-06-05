@@ -8,9 +8,9 @@ Bow	F	F	-	-	F	-	-	-	C	C	-	-	-	-	-	C	C	C	C	C	-	-	-	-	C	C	-	C	C	-	C	-
 Mace	-	-	F	F	-	-	C	C	-	-	C	-	-	F	F	-	-	-	-	F	-	-	-	-	-	-	-	-	-	C	-	-
 Blaster	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
 Shield	-	-	C	C	-	-	-	-	C	C	-	-	-	C	C	-	-	-	-	-	C	-	-	-	-	-	C	-	-	-	-	-
-Leather	C	C	C	C	C	-	C	C	F	F	C	C	C	C	C	C	C	F	F	C	C	C	C	C	F	C	C	-	-	C	F	C
+Leather	C	C	C	C	C	-	C	C	-	F	C	C	C	-	C	C	C	F	F	C	C	C	C	C	F	C	-	-	-	C	F	C
 Chain	-	-	-	-	-	-	-	-	C	C	C	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	C	-	-	-	-	-
-Plate	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	F	F	-	-	-
+Plate	-	-	-	-	-	-	-	-	F	-	-	-	-	C	-	-	-	-	-	-	-	-	-	-	-	-	C	F	F	-	-	-
 Fire	C	C	-	-	C	-	-	-	-	-	-	-	-	-	-	-	-	F	-	-	-	F	C	C	-	-	-	-	-	-	-	F
 Air	F	F	-	-	C	-	-	-	-	-	-	-	-	-	-	-	-	F	-	-	-	C	C	C	-	-	-	-	-	-	-	C
 Water	C	C	-	-	-	-	C	C	-	-	-	-	-	-	-	-	-	F	-	-	-	C	C	C	-	-	-	C	C	C	-	C
