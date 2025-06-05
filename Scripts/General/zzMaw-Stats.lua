@@ -123,6 +123,12 @@ function events.CalcDamageToMonster(t)
 				dmgMult=damageMultiplier[data.Player:GetIndex()]["Ranged"]
 			end
 			
+			if table.find(assassinClass,pl.Class) then --needed for assassin class, it also procs the energy restore
+				isolatedDamageReduction=assassinationDamage(pl,t.Monster,data.Object) --must be subtracted
+				damage=damage-isolatedDamageReduction
+			end
+			
+			
 			t.Result=damage*dmgMult
 			
 			if data.Object and data.Object.Spell==133 then
