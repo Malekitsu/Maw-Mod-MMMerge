@@ -3353,7 +3353,7 @@ end
 
 function events.CalcDamageToMonster(t)
 	local data = WhoHitMonster()
-	if data.Object then
+	if data and data.Object then
 		if data.Object.Spell==18 and data.Object.SpellMastery>1 then
 			monsterIndex=getClosestMonsterInRange(t.Monster,768)
 			if monsterIndex~=nil then
