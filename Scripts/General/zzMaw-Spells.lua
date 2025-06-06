@@ -3392,15 +3392,25 @@ function getClosestMonsterInRange(mon,range)
 	local X,Y,Z=mon.X,mon.Y,mon.Z
 	local closestMonster = nil
 	local closestDistance = math.huge
+	local ignoreList={mon:GetIndex()}
+	if Multiplayer and Multiplayer.in_game then
+		local playerList=Multiplayer.client_monsters()
+		for key,value in pairs(playerList) do
+			table.insert(ignoreList, value)
+		end
+	end
+	dump(Multiplayer.client_monsters())
 	for i=0,Map.Monsters.high do
 		distance=range+1
 		local X2, Y2, Z2 = XYZ(Map.Monsters[i])
 		if Map.Monsters[i].HP>0 then
 			distance=((X-X2)^2+(Y-Y2)^2+(Z-Z2)^2)^0.5
 		end
-		if distance <= range and distance < closestDistance and i~=mon:GetIndex() then
-			closestMonster = i
-			closestDistance = distance
+		if distance <= range and distance < closestDistance then
+			if not table.find(ignoreList,i) then
+				closestMonster = i
+				closestDistance = distance
+			end
 		end
 	end
 	--will return as monster index
