@@ -788,7 +788,7 @@
 	end)
 
 
-	-- Random music for mm6 maps
+	--[[ Random music for mm6 maps
 	do
 		local grasslands = {37,38,39}
 		local dungeons = {41,42,43}
@@ -820,7 +820,7 @@
 
 		Game.MapMusicSets = MapMusicSets
 	end
-
+	]]
 	-- fix UI break on outdoor NPC question screen, when pressing spacebar
 	function events.Action(t)
 		if t.Action == 113 and Game.CurrentScreen == 4 and mem.u4[0x5CCCE4] == 1 and mem.u4[0x6C8DDC] == 1 then
