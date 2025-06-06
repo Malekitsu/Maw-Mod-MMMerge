@@ -3399,7 +3399,6 @@ function getClosestMonsterInRange(mon,range)
 			table.insert(ignoreList, value)
 		end
 	end
-	dump(Multiplayer.client_monsters())
 	for i=0,Map.Monsters.high do
 		distance=range+1
 		local X2, Y2, Z2 = XYZ(Map.Monsters[i])
