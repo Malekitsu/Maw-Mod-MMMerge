@@ -1073,12 +1073,11 @@ function events.GameInitialized2()
 				damage=damage/2^(res/100)
 				local mult=damageMultiplier[t.PlayerIndex]["Melee"]
 				t.Result=damage*mult
-				luck=pl:GetLuck()/1.5
-				critDamage=pl:GetAccuracy()*3/1000
-				critChance=50+luck
-				roll=math.random(1, 1000)
-				if roll <= critChance then
-					t.Result=t.Result*(1.5+critDamage)
+				
+				critChance, critMult, success=getCritInfo(pl,false,getMonsterLevel(t.Monster))
+				
+				if success then
+					t.Result=t.Result*critMult
 					crit=true
 				end
 				if pl.Weak>0 then
@@ -1392,7 +1391,6 @@ local function dkSkills(isDK, id)
 		Skillz.setName(14, "Water Magic")
 		Skillz.setName(18, "Body Magic")
 		Skillz.setName(20, "Dark Magic")
-		adjustSpellTooltips()
 	end
 end
 
@@ -1410,20 +1408,10 @@ end
 
 function events.Action(t)
 	if t.Action==114 then
-		local class=Party[Game.CurrentPlayer].Class
-		if table.find(dkClass, class) then
-			dkSkills(true, Game.CurrentPlayer)
-		else
-			dkSkills(false)
-		end
+		checkSkills(Game.CurrentPlayer)
 	end
 	if t.Action==110 then
-		local class=Party[t.Param-1].Class
-		if table.find(dkClass, class) then
-			dkSkills(true, t.Param-1)
-		else
-			dkSkills(false)
-		end
+		checkSkills(t.Param-1)
 	elseif t.Action==176 then
 		local current=Game.CurrentPlayer
 		local maxParty=Game.Party.High
@@ -1434,12 +1422,7 @@ function events.Action(t)
 			end
 			local pl=Party[newSelected]
 			if pl.Dead==0 and pl.Stoned==0 and pl.Paralyzed==0 and pl.Eradicated==0 and pl.Asleep==0 and pl.Unconscious==0 then
-				local class=pl.Class
-				if table.find(dkClass, class) then
-					dkSkills(true, newSelected)
-				else
-					dkSkills(false, newSelected)
-				end
+				checkSkills(newSelected)
 			end
 		end
 	end
@@ -1753,6 +1736,8 @@ function checkSkills(id)
 	dkSkills(false, id)
 	seraphSkills(false, id)
 	elementalistSkills(false, id)
+	assassinSkills(false)
+	adjustSpellTooltips()
 	if id>=0 and id<=Party.High then
 		local class=Party[id].Class
 		if table.find(shamanClass, class) then
@@ -1772,7 +1757,7 @@ function checkSkills(id)
 			return
 		end
 		if table.find(assassinClass, class) then
-			assassinSkills(true,id)
+			assassinSkills(true)
 			return			
 		end
 	end
@@ -1895,32 +1880,22 @@ function events.GameInitialized2()
 	baseSchoolsTxtAssassin={}
 	for i=1,5 do
 		baseSchoolsTxtAssassin[i]={[12]=Skillz.getDesc(12,i), [13]=Skillz.getDesc(13,i), [14]=Skillz.getDesc(14,i), [15]=Skillz.getDesc(15,i)}
-	end	
-	
-	Game.Classes.HPFactor[const.Class.Thief]=2
-	Game.Classes.HPFactor[const.Class.Rogue]=3
-	Game.Classes.HPFactor[const.Class.Assassin]=4
-	Game.Classes.HPFactor[const.Class.Spy]=4
-	
-	Game.Classes.HPBase[const.Class.Thief]=25
-	Game.Classes.HPBase[const.Class.Rogue]=25
-	Game.Classes.HPBase[const.Class.Assassin]=25
-	Game.Classes.HPBase[const.Class.Spy]=25
-	
-	Game.Classes.SPBase[const.Class.Thief]=90
-	Game.Classes.SPBase[const.Class.Rogue]=100
-	Game.Classes.SPBase[const.Class.Assassin]=110
-	Game.Classes.SPBase[const.Class.Spy]=110	
-	
-	Game.Classes.SPFactor[const.Class.Thief]=0
-	Game.Classes.SPFactor[const.Class.Rogue]=0
-	Game.Classes.SPFactor[const.Class.Assassin]=0
-	Game.Classes.SPFactor[const.Class.Spy]=0
-	
-	Game.Classes.SPStats[const.Class.Thief]=1
-	Game.Classes.SPStats[const.Class.Rogue]=1
-	Game.Classes.SPStats[const.Class.Assassin]=1
-	Game.Classes.SPStats[const.Class.Spy]=1
+	end
+
+	spellDesc2={}
+	for key, value in pairs(assassinSpellList) do
+		for i=1,#assassinSpellList[key] do
+			local spellID=assassinSpellList[key][i]
+			spellDesc2[spellID]={}
+			spellDesc2[spellID]["Name"]=Game.SpellsTxt[value[i]].Name
+			spellDesc2[spellID]["Description"]=Game.SpellsTxt[value[i]].Description
+			spellDesc2[spellID]["Normal"]=Game.SpellsTxt[value[i]].Normal
+			spellDesc2[spellID]["Expert"]=Game.SpellsTxt[value[i]].Expert
+			spellDesc2[spellID]["Master"]=Game.SpellsTxt[value[i]].Master
+			spellDesc2[spellID]["GM"]=Game.SpellsTxt[value[i]].GM
+		end
+	end
+
 	
 	function events.CalcStatBonusByItems(t)
 		if t.Stat==const.Stats.SpellPoints and table.find(assassinClass, t.Player.Class) then
@@ -1929,6 +1904,42 @@ function events.GameInitialized2()
 			t.Result=m*10
 		end
 	end	
+	
+		
+
+	function events.CalcDamageToMonster(t)
+		local data = WhoHitMonster()
+		if data and data.Player and table.find(assassinClass, data.Player.Class) then
+			local pl=data.Player
+			if data.Object and data.Object.Spell>0 and data.Object.Spell<=99 then
+				local baseDamage=pl:GetMeleeDamageMin()
+				local maxDamage=pl:GetMeleeDamageMax()
+				local randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
+				local damage=round(randomDamage/2)
+				local res=t.Monster.Resistances[t.DamageKind] or t.Monster.Resistances[4]
+				damage=damage/2^(res/100)
+				local mult=damageMultiplier[t.PlayerIndex]["Melee"]
+				t.Result=damage*mult
+				
+				local critChance, critMult, success=getCritInfo(pl,false,getMonsterLevel(t.Monster))
+				if success then
+					t.Result=t.Result*critMult
+					crit=true
+				end
+				
+				if pl.Weak>0 then
+					t.Result=t.Result*0.5
+				end
+				local isolatedDamageReduction=assassinationDamage(pl,t.Monster,data.Object) --must be subtracted
+				t.Result=t.Result-isolatedDamageReduction
+				
+				if assassinSpells.DamageMult then
+					t.Result=t.Result*assassinSpells.DamageMult
+				end
+			end
+		end
+	end
+	
 end
 
 
@@ -1972,15 +1983,14 @@ function assassinationDamage(pl,mon,obj)
 		damage=damage*damageMult
 		return damage
 	end
-	return vars.assassinDamage[id]
+	return vars.assassinDamage[id]	
 end
 
-function assassinSkills(isAssassin, id)
+function assassinSkills(isAssassin)
 	if isAssassin then
-		local pl=Party[id]
-		for key, value in pairs(DKManaCost) do
+		for key, value in pairs(assassinSpells) do
 			for i=1,4 do
-				Game.Spells[key]["SpellPoints" .. masteryName[i]]=value
+				Game.Spells[key]["SpellPoints" .. masteryName[i]]=assassinSpells[key].Cost
 			end
 		end
 		--skill names and desc
@@ -2015,17 +2025,30 @@ function assassinSkills(isAssassin, id)
 		Skillz.setDesc(13,5,"Killing a monster restores 25 energy")
 		Skillz.setDesc(14,5,"You regenerate 16 energy per second")
 		Skillz.setDesc(15,5,"Increases your maximum energy by 40")
+		
+		
+		Game.SpellsTxt[68].Name="Blood Leech"
+		Game.SpellsTxt[68].Description="Activating this spell imbues the knight body with blood, leeching life upon attacking at the cost of 6 spell points."
+		Game.SpellsTxt[68].Normal=""
+		Game.SpellsTxt[68].Expert=" Points"
+		Game.SpellsTxt[68].Master=""
+		Game.SpellsTxt[68].GM="Points"
+		
 	else
 		for i=1,5 do
 			for key, value in pairs(baseSchoolsTxtAssassin[i]) do
 				Skillz.setDesc(key,i,value)
 			end
 		end
+		for key, value in pairs(spellDesc2) do
+			for key2, value2 in pairs(value) do
+				Game.SpellsTxt[key][key2]=value2
+			end
+		end
 		Skillz.setName(12, "Fire Magic")
 		Skillz.setName(13, "Air Magic")
 		Skillz.setName(14, "Water Magic")
 		Skillz.setName(15, "Earth Magic")
-		adjustSpellTooltips()
 	end
 end
 function events.CanLearnSpell(t)
@@ -2033,16 +2056,77 @@ function events.CanLearnSpell(t)
 		t.NeedMastery = 5
 	end
 end
+
+function events.GameInitialized2()
+	local sp=const.Spells
+	assassinSpells={
+		[sp.TorchLight]={["Cost"]=1,["StackCost"]=0,["DamageMult"]=0,},
+		[sp.FireAura]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
+		[sp.Haste]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
+		[sp.Fireball]={["Cost"]=0,["StackCost"]=5,["DamageMult"]=0.5,},
+		[sp.FireSpike]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=1.3,},
+		
+		[sp.WizardEye]={["Cost"]=1,["StackCost"]=0,["DamageMult"]=0,},
+		[sp.Jump]={["Cost"]=5,["StackCost"]=0,["DamageMult"]=0,},
+		[sp.Shield]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
+		[sp.LightningBolt]={["Cost"]=0,["StackCost"]=5,["DamageMult"]=1,},
+		[sp.Invisibility]={["Cost"]=15,["StackCost"]=0,["DamageMult"]=0,},
+		[sp.Fly]={["Cost"]=25,["StackCost"]=0,["DamageMult"]=0,},
+		
+		[sp.PoisonSpray]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=0.25,},
+		[sp.WaterWalk]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
+		[sp.AcidBurst]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=1,},
+		[sp.TownPortal]={["Cost"]=20,["StackCost"]=0,["DamageMult"]=0,},
+		[sp.LloydsBeacon]={["Cost"]=30,["StackCost"]=0,["DamageMult"]=0,},
+		
+		[sp.Stun]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=0.6,},
+		[sp.StoneSkin]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
+		[sp.Blades]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=1.5},
+		[sp.Telekinesis]={["Cost"]=0,["StackCost"]=5,["DamageMult"]=0.4,},
+		[sp.MassDistortion]={["Cost"]=0,["StackCost"]=4,["DamageMult"]=2,},
+	}				
+end
+
+assassinSpellList={
+	[const.Skills.Fire]={1, 4, 5, 6, 7},
+	[const.Skills.Air]={12, 17, 16, 18, 19, 21},
+	[const.Skills.Water]={24, 27, 29, 31, 33},
+	[const.Skills.Earth]={34, 38, 39, 42, 44},
+}
+
 function events.Action(t)
 	if t.Action==105 and Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
+		
 		pl=Party[Game.CurrentPlayer]
 		if table.find(assassinClass, pl.Class) then
 			for i=1,99 do
 				pl.Spells[i]=false
 			end
+			local s1, m1=SplitSkill(pl.Skills[const.Skills.Fire])
+			local s2, m2=SplitSkill(pl.Skills[const.Skills.Air])
+			local s3, m3=SplitSkill(pl.Skills[const.Skills.Water])
+			local s4, m4=SplitSkill(pl.Skills[const.Skills.Earth])
+			m1=m1+1
+			m2=m2+2
+			m3=m3+1
+			m4=m4+1
+			for i=1, m1 do
+				pl.Spells[assassinSpellList[const.Skills.Fire][i]]=true
+			end
+			for i=1, m2 do
+				pl.Spells[assassinSpellList[const.Skills.Air][i]]=true
+			end
+			for i=1, m3 do
+				pl.Spells[assassinSpellList[const.Skills.Water][i]]=true
+			end
+			for i=1, m4 do
+				pl.Spells[assassinSpellList[const.Skills.Earth][i]]=true
+			end
 		end
 	end
 end
+
+--CastQuickSpell(0,6)
 --[[spells
 fire spike fire aura fireball haste
 invisibility chain lightning jump shield
