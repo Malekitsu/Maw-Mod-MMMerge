@@ -1671,7 +1671,7 @@ function ascension()
 	end
 	if index>=0 and index<=Party.High then
 		local pl=Party[index]
-		if table.find(dkClass, pl.Class) then return end --necessary to make dk tooltips work
+		if table.find(dkClass, pl.Class) or table.find(assassinClass, pl.Class) then return end --necessary to make dk tooltips work
 		local level=pl.Skills[const.Skills.Learning]
 		lastLevel=level
 		local s,m = SplitSkill(level)
