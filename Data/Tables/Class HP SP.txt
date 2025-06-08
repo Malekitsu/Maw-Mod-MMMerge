@@ -33,7 +33,7 @@ Ranger	30	4	5	1	IP
 Hunter	30	5	5	2	IP
 BountyHunter	30	6	5	3	IP
 RangerLord	30	6	5	3	IP
-Thief	25	2	90	0	-
+Thief	25	2	90	0	I
 Rogue	25	3	100	0	I
 Assassin	25	4	110	0	I
 Spy	25	6	5	2	I
