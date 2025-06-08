@@ -252,7 +252,6 @@ function events.CalcDamageToMonster(t)
 				
 				
 				if calls>0 then
-					calls=calls-1
 					if t.Result==0 then
 						calls=0
 					end
@@ -271,4 +270,9 @@ function events.CalcDamageToMonster(t)
 	if t.Result>32500 then
 		t.Result=32500
 	end
+end
+
+calls=0
+function events.Tick()
+	calls=math.max(calls-1,0)
 end
