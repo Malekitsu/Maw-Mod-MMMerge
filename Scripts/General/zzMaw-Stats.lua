@@ -114,6 +114,12 @@ function events.CalcDamageToMonster(t)
 				maxDamage=pl:GetMeleeDamageMax()
 				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
 				damage=round(randomDamage/2)
+				
+				if table.find(assassinClass,pl.Class) then --needed for assassin class, it also procs the energy restore
+					isolatedDamageReduction=assassinationDamage(pl,t.Monster,data.Object) --must be subtracted
+					damage=damage-isolatedDamageReduction
+				end
+				
 				dmgMult=damageMultiplier[data.Player:GetIndex()]["Melee"]
 			else --bow
 				baseDamage=pl:GetRangedDamageMin()
@@ -121,12 +127,9 @@ function events.CalcDamageToMonster(t)
 				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
 				damage=round(randomDamage/2)
 				dmgMult=damageMultiplier[data.Player:GetIndex()]["Ranged"]
+				assassinationDamage(pl,t.Monster,data.Object)--required to trigger skill point
 			end
 			
-			if table.find(assassinClass,pl.Class) then --needed for assassin class, it also procs the energy restore
-				isolatedDamageReduction=assassinationDamage(pl,t.Monster,data.Object) --must be subtracted
-				damage=damage-isolatedDamageReduction
-			end
 			
 			
 			t.Result=damage*dmgMult
@@ -170,6 +173,9 @@ function events.PlayerCastSpell(t)
 end
 
 function getSpellDelay(pl,spell)
+	if table.find(assassinClass, pl.Class) then
+		return GetAssassinSpellDelay(pl,spell)
+	end
 	local s,m=SplitSkill(pl.Skills[math.ceil(spell/11)+11])
 	if m==0 then return 150 end
 	local haste=math.floor(pl:GetSpeed()/10)
