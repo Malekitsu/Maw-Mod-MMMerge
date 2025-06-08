@@ -1970,10 +1970,13 @@ function assassinationDamage(pl,mon,obj)
 			s,m=SplitSkill(pl:GetSkill(const.Skills.Air))
 			local fullSP=pl:GetFullSP()
 			pl.SP=math.min(fullSP, pl.SP+(1+m)*5)
+			vars.assassinStacks[id]=math.min(vars.assassinStacks[id]+1,5)
 		end
 	end
 	if pl.SP>=manaCost and mon.ShowAsHostile then
-		vars.assassinStacks[id]=math.min(vars.assassinStacks[id]+1,5)
+		if obj==nil or obj.Spell==0 or obj.Spell>100 then
+			vars.assassinStacks[id]=math.min(vars.assassinStacks[id]+1,5)
+		end
 		local damage=vars.assassinDamage[id]
 		local monsters=0
 		for i=0,Map.Monsters.High do
