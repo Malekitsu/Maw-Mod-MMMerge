@@ -1296,9 +1296,9 @@ function events.GameInitialized2()
 	end
 end
 
-local function dkSkills(isDK, id)
+function dkSkills(isDK, id)
 	if isDK then
-		pl=Party[id]
+		local pl=Party[id]
 		for key, value in pairs(DKManaCost) do
 			for i=1,4 do
 				Game.Spells[key]["SpellPoints" .. masteryName[i]]=value
@@ -1945,9 +1945,18 @@ end
 
 function assassinationDamage(pl,mon,obj)
 	local id=pl:GetIndex()
+	vars.assassinDamage=vars.assassinDamage or {}
+	vars.assassinDamage[id]=vars.assassinDamage[id] or 0
+	
 	local s,m=SplitSkill(pl:GetSkill(const.Skills.Fire))
 	local restoreChance=0.1+s*0.01
 	local manaCost=50-m*5
+	
+	if obj and obj.Spell>0 and obj.Spell<100 then
+		restoreChance=0
+		manaCost=0
+	end
+	
 	if obj then
 		restoreChance=restoreChance/2
 		manaCost=manaCost/2
@@ -1963,9 +1972,8 @@ function assassinationDamage(pl,mon,obj)
 			pl.SP=math.min(fullSP, pl.SP+(1+m)*5)
 		end
 	end
-	vars.assassinDamage=vars.assassinDamage or {}
-	vars.assassinDamage[id]=vars.assassinDamage[id] or 0
-	if pl.SP>=manaCost then
+	if pl.SP>=manaCost and mon.ShowAsHostile then
+		vars.assassinStacks[id]=math.min(vars.assassinStacks[id]+1,5)
 		local damage=vars.assassinDamage[id]
 		local monsters=0
 		for i=0,Map.Monsters.High do
@@ -2026,13 +2034,24 @@ function assassinSkills(isAssassin)
 		Skillz.setDesc(14,5,"You regenerate 16 energy per second")
 		Skillz.setDesc(15,5,"Increases your maximum energy by 40")
 		
+		Game.SpellsTxt[6].Description=string.format("Fires a ball of fire at a single target. When it hits, the ball explodes damaging all those nearby, including your characters if they're too close.  Fireball does %s%% of a melee attack damage.",assassinSpells[6].DamageMult*100)
+		Game.SpellsTxt[7].Description=string.format("Drops a Fire Spike on the ground that waits for a creature to get near it before exploding.  Fire Spikes last until you leave the map or they are triggered. Fire Spike does %s%% of a melee attack damage.",assassinSpells[7].DamageMult*100)
+		Game.SpellsTxt[18].Description=string.format("Lightning Bolt discharges electricity from the caster's hand to a single target.  It always hits and does %s%% of a melee attack damage.\n\nThe spell then arcs to a second target, hitting it as well.",assassinSpells[18].DamageMult*100)
+		Game.SpellsTxt[24].Description=string.format("Sprays poison at monsters directly in front of your characters.  Damage is low, but few monsters have resistance to Water Magic, so it usually works.  Each shot does %s%% of a melee attack damage.",assassinSpells[24].DamageMult*100)
+		Game.SpellsTxt[29].Description=string.format("Acid burst squirts a jet of extremely caustic acid at a single victim.  It always hits and does %s%% of a melee attack damage.",assassinSpells[29].DamageMult*100)
+		Game.SpellsTxt[34].Description=string.format("Slaps a monster with magical force, forcing it to recover from the stun spell before it can do anything else.  Stun also knocks monsters back a little, giving you a chance to get away while the getting is good.  The greater your skill in Earth Magic, the greater the effect of the spell. Stun does %s%% of a melee attack damage.",assassinSpells[34].DamageMult*100)
+		Game.SpellsTxt[39].Description=string.format("Fires a rotating, razor-thin metal blade at a single monster.  The blade does %s%% of a melee attack damage.\n\nBlades is the only spell capable to deal Physical damage.",assassinSpells[39].DamageMult*100)
+		Game.SpellsTxt[44].Description=string.format("Increases the weight of a single target enormously for an instant, causing internal damage equal to %s%% of a melee attack damage.",assassinSpells[44].DamageMult*100)
 		
-		Game.SpellsTxt[68].Name="Blood Leech"
-		Game.SpellsTxt[68].Description="Activating this spell imbues the knight body with blood, leeching life upon attacking at the cost of 6 spell points."
-		Game.SpellsTxt[68].Normal=""
-		Game.SpellsTxt[68].Expert=" Points"
-		Game.SpellsTxt[68].Master=""
-		Game.SpellsTxt[68].GM="Points"
+		Game.SpellsTxt[18].Expert="Spell hits up to 2 times"
+		Game.SpellsTxt[18].Master="Spell hits up to 3 times"
+		Game.SpellsTxt[18].GM="Spell hits up to 4 times"
+		
+		for key, value in pairs(assassinSpells) do
+			if assassinSpells[key].StackCost>0 then
+				Game.SpellsTxt[key].Description=Game.SpellsTxt[key].Description .. "\n\nThis Ability requires " .. assassinSpells[key].StackCost .. " Combo Points to be casted."
+			end
+		end
 		
 	else
 		for i=1,5 do
@@ -2082,7 +2101,7 @@ function events.GameInitialized2()
 		[sp.Stun]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=0.6,},
 		[sp.StoneSkin]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
 		[sp.Blades]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=1.5},
-		[sp.Telekinesis]={["Cost"]=0,["StackCost"]=5,["DamageMult"]=0.4,},
+		[sp.Telekinesis]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
 		[sp.MassDistortion]={["Cost"]=0,["StackCost"]=4,["DamageMult"]=2,},
 	}				
 end
@@ -2126,6 +2145,51 @@ function events.Action(t)
 	end
 end
 
+--show stacks
+function events.GameInitialized2()
+	assassinStacks={}
+	for i=0,4 do
+		assassinStacks[i]=CustomUI.CreateText{
+			Text = "",
+			Layer 	= 1,
+			Screen 	= 0,
+			X = 5+i*96, Y = 387
+		}
+	end
+end
+
+function events.Tick()
+	for i=0,Party.High do
+		local pl=Party[i]
+		if table.find(assassinClass,pl.Class) then
+			local id=pl:GetIndex()
+			vars.assassinStacks=vars.assassinStacks or {}
+			vars.assassinStacks[id]=vars.assassinStacks[id] or 0
+			assassinStacks[i].Text=string.format(vars.assassinStacks[id])
+		else
+			assassinStacks[i].Text=""
+		end
+	end
+end
+
+function events.PlayerCastSpell(t)
+	local pl=t.Player
+	if table.find(assassinClass,pl.Class) then
+		if assassinSpells[t.SpellId] and assassinSpells[t.SpellId].StackCost>0 then 
+			local id=pl:GetIndex()
+			if vars.assassinStacks[id]<assassinSpells[t.SpellId].StackCost then
+				t.Handled=true
+				DoGameAction(23,0,0)
+			else
+				vars.assassinStacks[id]=vars.assassinStacks[id]-assassinSpells[t.SpellId].StackCost
+			end
+		end
+	end
+end
+--spells speed depends on weapon
+function GetAssassinSpellDelay(pl,spell)
+	return pl:GetAttackDelay()*2
+end
 --CastQuickSpell(0,6)
 --[[spells
 fire spike fire aura fireball haste
