@@ -2720,6 +2720,10 @@ function events.GameInitialized2()
 	spScaling[59]=1
 	spScaling[60]=1.5
 	spScaling[61]=2
+	spScaling[const.Class.Thief]=7.5
+	spScaling[const.Class.Rogue]=7.5
+	spScaling[const.Class.Assassin]=7.5
+	spScaling[const.Class.Spy]=7.5
 end
 
 buffSpell={
