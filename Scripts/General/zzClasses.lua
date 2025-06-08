@@ -1974,7 +1974,9 @@ function assassinationDamage(pl,mon,obj)
 		end
 	end
 	if pl.SP>=manaCost and mon.ShowAsHostile then
-		if obj==nil or obj.Spell==0 or obj.Spell>100 then
+		if obj and obj.Spell>100 then
+			vars.assassinStacks[id]=math.min(vars.assassinStacks[id]+0.5,5)--arrow nerf
+		elseif not obj then
 			vars.assassinStacks[id]=math.min(vars.assassinStacks[id]+1,5)
 		end
 		local damage=vars.assassinDamage[id]
@@ -2168,7 +2170,7 @@ function events.Tick()
 			local id=pl:GetIndex()
 			vars.assassinStacks=vars.assassinStacks or {}
 			vars.assassinStacks[id]=vars.assassinStacks[id] or 0
-			assassinStacks[i].Text=string.format(vars.assassinStacks[id])
+			assassinStacks[i].Text=string.format(math.floor(vars.assassinStacks[id]))
 		else
 			assassinStacks[i].Text=""
 		end
