@@ -2269,6 +2269,16 @@ function events.CalcDamageToMonster(t)
 	end
 end
 
+--remove stun if monster is Dead
+function events.CalcDamageToMonster(t)
+	local mon=t.Monster
+	function events.Tick()
+		events.Remove("Tick",1)
+		if mon.HP==0 then
+			mon.SpellBuffs[6].ExpireTime=0
+		end
+	end
+end
 
 function events.Action(t)
 	function events.Tick()
