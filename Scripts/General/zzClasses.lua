@@ -1953,6 +1953,8 @@ function assassinationDamage(pl,mon,obj)
 	local id=pl:GetIndex()
 	vars.assassinDamage=vars.assassinDamage or {}
 	vars.assassinDamage[id]=vars.assassinDamage[id] or 0
+	vars.assassinStacks=vars.assassinStacks or {}
+	vars.assassinStacks[id]=vars.assassinStacks[id] or 0
 	
 	local s,m=SplitSkill(pl:GetSkill(const.Skills.Fire))
 	local restoreChance=0.1+s*0.01
