@@ -1041,7 +1041,7 @@ function getAscensionTier(skill,spellID, index)
 	return ascensionTier
 end
 
-masteryName={"Normal", "Expert", "Master", "GM"}
+masteryName={"Normal", "Expert", "Master", "GM",[0]="Normal"}
 function events.Action(t)
 	if t.Action==25 and autoTargetHeals then
 		ascension()
@@ -1426,7 +1426,7 @@ function events.GameInitialized2()
 			[99] = {dmgAdd = 25, diceMin = 1, diceMax = 5, },--souldrinker
 			[103] = {dmgAdd = 46, diceMin = 1, diceMax = 28, },--darkfire bolt
 			[111] = {dmgAdd = 0, diceMin = 1, diceMax = 22, },--lifedrain scales with mastery, fixed in calcspelldamage
-			[123] = {dmgAdd = 0, diceMin = 1, diceMax = 25, },--scales with breath damage
+			--[123] = {dmgAdd = 0, diceMin = 1, diceMax = 25, },--special scaling, calculate in zzClasses
 		}
 end
 
@@ -1655,6 +1655,48 @@ function events.Action(t)
 		events.Remove("Tick", 1)
 		ascension()
 	end
+--[[	if t.Action==25 then
+		ascension()
+		local id=Game.CurrentPlayer
+		if id>=0 and id<=Party.High then
+			local pl=Party[id]
+			local spellCast=0
+			if t.Param==0 then
+				spellCast=pl.QuickSpell
+			elseif t.Param==1 then
+				spellCast=pl.AttackSpell
+			end
+			local s,m=SplitSkill(pl.Skills[11+math.ceil(spellCast/11)])
+			if pl.SP<Game.Spells[spellCast]["SpellPoints" .. masteryName[m] ] then
+				--DoGameAction(23,0,0)
+				t.Handled=true
+				debug.Message(t.Action)
+			else
+				Game.ShowStatusText(id .. "  " .. spellCast .. "  " ..Game.Spells[spellCast]["SpellPoints" .. masteryName[m] ])
+			end
+		end
+	end
+	]]
+end
+
+function events.Tick()
+	if Game.CurrentPlayer==-1 then
+		lastAscension=lastAscension or -1
+		local playerToAscend=-1
+		local lowestDelay=math.huge
+		for i=0,Party.High do
+			local pl=Party[i]
+			local delay=pl.RecoveryDelay
+			if delay<lowestDelay then
+				lowestDelay=delay
+				playerToAscend=i
+			end
+		end
+		if playerToAscend~=lastAscension then
+			ascension(playerToAscend)
+			lastAscension=playerToAscend
+		end
+	end
 end
 
 -----------------------
@@ -1664,14 +1706,25 @@ healingSpellList={const.Spells.RemoveCurse,const.Spells.Resurrection,const.Spell
 
 
 
-function ascension()
-	index=Game.CurrentPlayer
+function ascension(customIndex)
+	local index=customIndex or Game.CurrentPlayer 
 	if index> Party.High then
 		Game.CurrentPlayer=0
-	end
+	end 
 	if index>=0 and index<=Party.High then
 		local pl=Party[index]
-		if table.find(dkClass, pl.Class) or table.find(assassinClass, pl.Class) then return end --necessary to make dk tooltips work
+		
+		--necessary to make dk/assassin tooltips work
+		if table.find(dkClass, pl.Class) then
+			dkSkills(true, index)
+			return
+		end
+		if table.find(assassinClass, pl.Class) then 
+			assassinSkills(true)
+			return
+		end
+		
+		
 		local level=pl.Skills[const.Skills.Learning]
 		lastLevel=level
 		local s,m = SplitSkill(level)
