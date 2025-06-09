@@ -229,7 +229,7 @@ function events.CalcDamageToMonster(t)
 			msg=string.format("%s inflicts %s points killing %s!", name, msgTxt, monName)
 		end
 		calls=calls or 0
-		calls=calls+1
+		calls=math.min(calls+1,2)
 		if calls>=2 and attackIsSpell then
 			castedAoe=true
 		end
