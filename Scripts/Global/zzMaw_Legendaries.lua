@@ -245,7 +245,7 @@ function events.CalcDamageToPlayer(t)
 			if currentHP<-fullHP*2 then
 				t.Player.Eradicated=Game.Time
 			end
-			if vars.insanityMode and currentHP<-fullHP*10 and Party.Count>1 then
+			if vars.insanityMode and enableDisintegrate and currentHP<-fullHP*10 and Party.Count>1 then
 				local index=t.Player:GetIndex()
 				for i=0,Party.High do
 					if Party[i]:GetIndex()==index then
