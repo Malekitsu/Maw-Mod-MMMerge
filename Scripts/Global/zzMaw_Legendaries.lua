@@ -249,6 +249,7 @@ function events.CalcDamageToPlayer(t)
 				local index=t.Player:GetIndex()
 				for i=0,Party.High do
 					if Party[i]:GetIndex()==index then
+						Game.PlaySound(4833+pl.Voice*100)
 						DismissCharacter(i)
 						Game.ShowStatusText("Disintegrated")
 						return
