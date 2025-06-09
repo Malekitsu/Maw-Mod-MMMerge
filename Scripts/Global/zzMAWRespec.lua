@@ -62,7 +62,7 @@ function RespecSkills(npcID)
 	local p=Party[id]
 	
 	local shared=sharedSkills
-	if table.find(shamanClass, p.Class) or table.find(seraphClass, p.Class) or table.find(dkClass, p.Class) then
+	if table.find(shamanClass, p.Class) or table.find(seraphClass, p.Class) or table.find(dkClass, p.Class) or table.find(assassinClass, pl.Class) then
 		shared={12,13,14,15,16,17,18,19,20,21,22}
 	end
 	for i=0, p.Skills.High do
