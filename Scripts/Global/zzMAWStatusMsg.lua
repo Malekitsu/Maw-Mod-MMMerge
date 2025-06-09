@@ -229,12 +229,13 @@ function events.CalcDamageToMonster(t)
 			msg=string.format("%s inflicts %s points killing %s!", name, msgTxt, monName)
 		end
 		calls=calls or 0
-		calls=math.min(calls+1,2)
+		calls=calls+1
 		if calls>=2 and attackIsSpell then
 			castedAoe=true
 		end
 		local id=t.MonsterIndex
 		function events.Tick()
+			events.Remove("Tick", 1)
 			if id<=Map.Monsters.High and MSGdamage>0 then
 				if shoot=="shoots" then
 				msg=string.format("%s shoots %s for %s points!%s", name, monName, msgTxt, critMessage)
@@ -251,12 +252,12 @@ function events.CalcDamageToMonster(t)
 				
 				
 				if calls>0 then
+					calls=calls-1
 					if t.Result==0 then
 						calls=0
 					end
 				end
 				if calls==0 then
-					events.Remove("Tick", 1)
 					MSGdamage=0
 				end
 			end
@@ -269,13 +270,5 @@ function events.CalcDamageToMonster(t)
 	end
 	if t.Result>32500 then
 		t.Result=32500
-	end
-end
-
-calls=0
-function events.Tick()
-	calls=math.max(calls-1,0)
-	if calls==0 then
-		MSGdamage=0
 	end
 end
