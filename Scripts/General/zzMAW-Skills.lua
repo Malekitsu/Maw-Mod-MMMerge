@@ -862,7 +862,7 @@ function events.Action(t)
 	if t.Action==121 then
 		vars.checkSoloMastery=true --makes skills to be automatically learned if solo
 		local shared=sharedSkills
-		if table.find(shamanClass, pl.Class) or table.find(seraphClass, pl.Class) or table.find(dkClass, pl.Class) then
+		if table.find(shamanClass, pl.Class) or table.find(seraphClass, pl.Class) or table.find(dkClass, pl.Class) or table.find(assassinClass, pl.Class) then
 			shared={12,13,14,15,16,17,18,19,20,21,22}
 		end
 		if table.find(shared, t.Param) then
