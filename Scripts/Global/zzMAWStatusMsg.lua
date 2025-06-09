@@ -235,7 +235,6 @@ function events.CalcDamageToMonster(t)
 		end
 		local id=t.MonsterIndex
 		function events.Tick()
-			events.Remove("Tick", 1)
 			if id<=Map.Monsters.High and MSGdamage>0 then
 				if shoot=="shoots" then
 				msg=string.format("%s shoots %s for %s points!%s", name, monName, msgTxt, critMessage)
@@ -257,6 +256,7 @@ function events.CalcDamageToMonster(t)
 					end
 				end
 				if calls==0 then
+					events.Remove("Tick", 1)
 					MSGdamage=0
 				end
 			end
@@ -275,4 +275,7 @@ end
 calls=0
 function events.Tick()
 	calls=math.max(calls-1,0)
+	if calls==0 then
+		MSGdamage=0
+	end
 end
