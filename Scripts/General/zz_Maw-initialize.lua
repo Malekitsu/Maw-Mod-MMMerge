@@ -8,6 +8,7 @@ Game.PatchOptions.FixMonstersBlockingShots=true
 higherLootPowerRange=true
 disableBow=false
 enableAllTrainers=true
+enableDisintegrate=true
 
 --sorting buttons
 currentBagSortKey=82
