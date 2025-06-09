@@ -33,6 +33,7 @@ end
 
 --[11]="Killing a monster will recover you action time",
 function events.CalcDamageToMonster(t)
+
 	local id=t.PlayerIndex
 	local data=WhoHitMonster()
 	if not data or not data.Player then return end
@@ -153,6 +154,7 @@ function events.CalcDamageToMonster(t)
 			t.Result=t.Result*mult
 		end
 	end
+	
 end
 
 function changePlayer(id)
@@ -242,6 +244,16 @@ function events.CalcDamageToPlayer(t)
 			end
 			if currentHP<-fullHP*2 then
 				t.Player.Eradicated=Game.Time
+			end
+			if vars.insanityMode and currentHP<-fullHP*10 and Party.Count>1 then
+				local index=t.Player:GetIndex()
+				for i=0,Party.High do
+					if Party[i]:GetIndex()==index then
+						DismissCharacter(i)
+						Game.ShowStatusText("Disintegrated")
+						return
+					end
+				end
 			end
 		end
 	end
