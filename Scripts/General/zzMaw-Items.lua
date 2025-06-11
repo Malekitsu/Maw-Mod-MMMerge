@@ -4152,22 +4152,20 @@ function GetLevelRquirement(it)
 	if it.Bonus>=17 then
 		bonusStrength = math.min(bonusStrength^2, bonusStrength*10)
 	end
-	local bonusLevel=math.round(bonusStrength * 3 / difficultyExtraPower/slotMult[it:T().EquipStat])
-	local chargesLevel=math.round((it.Charges%1000) * 3 / difficultyExtraPower/slotMult[it:T().EquipStat])
 	
-	local enchants=4
-	if it.Bonus>0 then 
-		enchants = enchants + 1
+	local chargesPower=it.Charges%1000
+	
+	if it.BonusExpireTime>0 and it.BonusExpireTime<=2 then
+		bonusStrength=math.floor(math.max(bonusStrength/1.2,bonusStrength-5))
+		chargesPower=math.floor(math.max(chargesPower/1.2,chargesPower-5))
 	end
-	if it.Charges>1000 then
-		enchants=enchants+1
+	if it.BonusExpireTime>10 and it.BonusExpireTime<=100 then
+		bonusStrength=math.floor(math.max(bonusStrength/1.2,bonusStrength-10))
+		chargesPower=math.floor(math.max(chargesPower/1.2,chargesPower-10))
 	end
-	if it.Bonus2>0 then
-		enchants=enchants+1
-	end
-	if it.BonusExpireTime>10 then
-		enchants=enchants+1
-	end
+	
+	local bonusLevel=math.round(bonusStrength * 3 / difficultyExtraPower/slotMult[it:T().EquipStat])
+	local chargesLevel=math.round((chargesPower%1000) * 3 / difficultyExtraPower/slotMult[it:T().EquipStat])
 	
 	local weight = equipSlotWeights[itemType]
 	local levelRequired=(baseLevel*weight[1]+bonusLevel*weight[2]+chargesLevel*weight[3]+specialEnchantLevel*weight[4])
