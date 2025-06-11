@@ -4164,8 +4164,13 @@ function GetLevelRquirement(it)
 		chargesPower=math.floor(math.max(chargesPower/1.2,chargesPower-10))
 	end
 	
-	local bonusLevel=math.round(bonusStrength * 3 / difficultyExtraPower/slotMult[it:T().EquipStat])
-	local chargesLevel=math.round((chargesPower%1000) * 3 / difficultyExtraPower/slotMult[it:T().EquipStat])
+	local equipStat=it:T().EquipStat
+	if table.find(twoHandedAxes, it.Number) then
+		equipStat=1
+	end
+	
+	local bonusLevel=math.round(bonusStrength * 3 / difficultyExtraPower/slotMult[equipStat])
+	local chargesLevel=math.round((chargesPower%1000) * 3 / difficultyExtraPower/slotMult[equipStat])
 	
 	local weight = equipSlotWeights[itemType]
 	local levelRequired=(baseLevel*weight[1]+bonusLevel*weight[2]+chargesLevel*weight[3]+specialEnchantLevel*weight[4])
