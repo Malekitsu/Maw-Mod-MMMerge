@@ -172,7 +172,7 @@ function events.CalcDamageToMonster(t)
 			mapvars.damageTrack[data.Player:GetIndex()] = mapvars.damageTrack[data.Player:GetIndex()] + damage
 		end
 		if ShowDamage then
-			ShowDamage(data.Player, damage, crit, data.Object)
+			ShowDamage(data.Player, damage, crit, data.Object, t.Monster)
 		end
 		
 	end
