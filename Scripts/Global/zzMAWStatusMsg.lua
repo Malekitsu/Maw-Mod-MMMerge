@@ -171,7 +171,12 @@ function events.CalcDamageToMonster(t)
 			mapvars.damageTrack[data.Player:GetIndex()]=mapvars.damageTrack[data.Player:GetIndex()] or 0
 			mapvars.damageTrack[data.Player:GetIndex()] = mapvars.damageTrack[data.Player:GetIndex()] + damage
 		end
+		if ShowDamage then
+			ShowDamage(data.Player, damage, crit, data.Object)
+		end
+		
 	end
+	
 	
 	divide=1
 	if data and data.Spell==44 then
