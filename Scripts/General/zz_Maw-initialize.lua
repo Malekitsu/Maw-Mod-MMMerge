@@ -9,6 +9,7 @@ higherLootPowerRange=true
 disableBow=false
 enableAllTrainers=true
 enableDisintegrate=true
+disableCompletitionMessage=false
 
 --sorting buttons
 currentBagSortKey=82
