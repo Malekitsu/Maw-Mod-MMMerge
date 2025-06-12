@@ -2228,9 +2228,17 @@ function checkMapCompletition()
 				vars.dungeonCompletedList[name]=true
 				if Game.CurrentScreen~=22 then
 					if vars.insanityMode then
-						Game.EscMessage(string.format("Dungeon Completed!"))
+						if disableCompletitionMessage then
+							Game.ShowStatusText("Dungeon Completed!")
+						else
+							Game.EscMessage(string.format("Dungeon Completed!"))
+						end
 					else
-						Game.EscMessage(string.format("Dungeon Completed!\nReset is possible again."))
+						if disableCompletitionMessage then
+							Game.ShowStatusText("Dungeon Completed!\nReset is possible again.")
+						else
+							Game.EscMessage(string.format("Dungeon Completed!\nReset is possible again."))
+						end
 					end
 					mapvars.completed=true
 				end
@@ -2316,7 +2324,11 @@ function checkMapCompletition()
 					mapvars.monsterMap.cleared=true
 				end
 				if Game.CurrentScreen~=22 then
-					Game.EscMessage(string.format("Map Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Material"))
+					if disableCompletitionMessage then
+						Game.ShowStatusText("Map Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Material")
+					else
+						Game.EscMessage(string.format("Map Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Material"))
+					end
 				end
 				return
 			end
@@ -2324,7 +2336,11 @@ function checkMapCompletition()
 		if mapvars.monsterMap and mapvars.monsterMap.cleared==false and m/n>=0.65 and Game.BolsterAmount>=300 then
 			mapvars.monsterMap.cleared=true
 			if Game.CurrentScreen~=22 then
-				Game.EscMessage("Monsters are weakened and can no longer resurrect")
+				if disableCompletitionMessage then
+					Game.ShowStatusText("Monsters are weakened and can no longer resurrect")
+				else
+					Game.EscMessage(string.format("Monsters are weakened and can no longer resurrect"))
+				end
 			end
 		end
 	end
