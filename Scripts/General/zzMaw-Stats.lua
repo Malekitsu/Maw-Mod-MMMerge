@@ -127,7 +127,9 @@ function events.CalcDamageToMonster(t)
 				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
 				damage=round(randomDamage/2)
 				dmgMult=damageMultiplier[data.Player:GetIndex()]["Ranged"]
-				assassinationDamage(pl,t.Monster,data.Object)--required to trigger skill point
+				if table.find(assassinClass,pl.Class) then
+					assassinationDamage(pl,t.Monster,data.Object)--required to trigger skill point
+				end
 			end
 			
 			
