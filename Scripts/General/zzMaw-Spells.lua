@@ -114,6 +114,7 @@ function events.PlayerCastSpell(t)
 	end
 	
 	local currentPl=Game.CurrentPlayer
+	if table.find(assassinClass, t.Player.Class) then return end
 	for i=0,Party.High do
 		if Party[i]:GetIndex()==t.PlayerIndex then
 			Game.CurrentPlayer=i
