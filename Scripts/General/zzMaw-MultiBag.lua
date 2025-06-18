@@ -14,7 +14,7 @@ function events.KeyDown(t)
 				end
 			elseif Party.High==0 or shiftPressed then
 				if t.Key>=49 and t.Key<=48+5 then
-					if t.Key==49 and Mouse.Item.Number~=0 then
+					if Party.High==0 and t.Key==49 and Mouse.Item.Number~=0 then
 						return
 					else
 						changeBag(pl , t.Key-48)
