@@ -1937,7 +1937,11 @@ function ascension(customIndex)
 							end
 						end
 					end
-					Game.SpellsTxt[sp].Description=Game.SpellsTxt[sp].Description .. "\n\nMana Reserved: " .. StrColor(0,100,255,percent .. "%" .. txt)
+					if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 32) then
+						Game.SpellsTxt[sp].Description=Game.SpellsTxt[sp].Description .. "\n\nHealth Reserved: " .. StrColor(0,255,0,percent .. "%" .. txt)
+					else
+						Game.SpellsTxt[sp].Description=Game.SpellsTxt[sp].Description .. "\n\nMana Reserved: " .. StrColor(0,100,255,percent .. "%" .. txt)
+					end					
 				elseif utilitySpell[sp] then
 					local cost, percent=getBuffCost(pl, sp)
 					cost=round(cost)
@@ -1949,7 +1953,11 @@ function ascension(customIndex)
 							end
 						end
 					end
-					Game.SpellsTxt[sp].Description=oldSpellTooltips[sp] .. "\n\nMana Reserved: " .. cost .. txt
+					if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 32) then
+						Game.SpellsTxt[sp].Description=oldSpellTooltips[sp] .. "\n\nHealth Reserved: " .. StrColor(0,255,0,cost .. txt)
+					else
+						Game.SpellsTxt[sp].Description=oldSpellTooltips[sp] .. "\n\nMana Reserved: " .. StrColor(0,100,255,cost .. txt)
+					end			
 				end
 				for v=1,4 do
 					if buffSpell[sp] then
