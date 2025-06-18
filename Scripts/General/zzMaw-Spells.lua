@@ -2867,10 +2867,13 @@ function getBuffCost(pl, spellId)
 	local cost=0
 	local percentageDecrease=0
 	if buffSpell[spellId] then
+		local id=pl:GetIndex()
 		local s,m=SplitSkill(Skillz.get(pl,52))
 		local div=spScaling[pl.Class]+m/2
+		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 32) then 
+			div=hpScalings[pl.Class]+m/2
+		end
 		percentageDecrease=(buffSpell[spellId].Cost/div)*0.01
-		local id=pl:GetIndex()
 		for i=0, Party.High do
 			if id==Party[i]:GetIndex() and vars.maxManaPool[i] then
 				cost=vars.maxManaPool[i]*percentageDecrease
@@ -2893,12 +2896,16 @@ function mawBuffCast(pl, index, spellId)
 		end
 		if id==-1 then return end
 		
-		pl=Party[id]
+		local pl=Party[id]
 		if not vars.maxManaPool then
 			for i=0,Party.High do
 				local sp=Party[i]:GetFullSP()
 				vars.maxManaPool[i]=sp
 				vars.currentManaPool[i]=sp
+				
+				local hp=Party[i]:GetFullHP()
+				vars.maxHPPool[i]=hp
+				vars.currentHPPool[i]=hp
 			end
 		end
 
@@ -2910,7 +2917,12 @@ function mawBuffCast(pl, index, spellId)
 		
 		local cost=getBuffCost(pl, spellId)
 		
-		if vars.currentManaPool[id]<cost and not Game:GetCurrentHouse() then
+		if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 32) then --reserve HP instead
+			if vars.currentHPPool[id]<cost and not Game:GetCurrentHouse() then
+				Game.ShowStatusText("Not enough Hit Points")
+				return
+			end
+		elseif vars.currentManaPool[id]<cost and not Game:GetCurrentHouse() then
 			Game.ShowStatusText("Not enough Mana")
 			return
 		end
