@@ -2115,7 +2115,7 @@ function events.GameInitialized2()
 		[sp.StoneSkin]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
 		[sp.Blades]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=3},
 		[sp.Telekinesis]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
-		[sp.MassDistortion]={["Cost"]=0,["StackCost"]=4,["DamageMult"]4,},
+		[sp.MassDistortion]={["Cost"]=0,["StackCost"]=4,["DamageMult"]=4,},
 	}				
 end
 
