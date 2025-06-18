@@ -3106,6 +3106,9 @@ function buffManaLock()
 		end
 	end
 	for i=0, Party.High do
+		if table.find(assassinClass,Party[i].Class) or table.find(dkClass,Party[i].Class) then
+			vars.currentManaPool[i]=vars.maxManaPool[i]
+		end
 		Party[i].SP=math.min(math.ceil(vars.currentManaPool[i]), Party[i].SP)
 	end
 end
