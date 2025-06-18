@@ -182,7 +182,7 @@ function pickLowestPartyMember()
 	a[4]=2
 	for i=0,Party.High do
 		if Party[i].Dead==0 and Party[i].Eradicated==0 then
-			a[i] = Party[i].HP/Party[i]:GetFullHP()
+			a[i] = Party[i].HP/GetMaxHP(Party[i])
 		end
 	end
 	local a, b, c, d, e= a[0], a[1], a[2], a[3], a[4] 
