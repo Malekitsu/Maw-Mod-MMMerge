@@ -2095,27 +2095,27 @@ function events.GameInitialized2()
 		[sp.TorchLight]={["Cost"]=1,["StackCost"]=0,["DamageMult"]=0,},
 		[sp.FireAura]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
 		[sp.Haste]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
-		[sp.Fireball]={["Cost"]=0,["StackCost"]=5,["DamageMult"]=0.5,},
-		[sp.FireSpike]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=1.3,},
+		[sp.Fireball]={["Cost"]=0,["StackCost"]=5,["DamageMult"]=1,},
+		[sp.FireSpike]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=2.5,},
 		
 		[sp.WizardEye]={["Cost"]=1,["StackCost"]=0,["DamageMult"]=0,},
 		[sp.Jump]={["Cost"]=5,["StackCost"]=0,["DamageMult"]=0,},
 		[sp.Shield]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
-		[sp.LightningBolt]={["Cost"]=0,["StackCost"]=5,["DamageMult"]=1,},
+		[sp.LightningBolt]={["Cost"]=0,["StackCost"]=5,["DamageMult"]=1.5,},
 		[sp.Invisibility]={["Cost"]=15,["StackCost"]=0,["DamageMult"]=0,},
 		[sp.Fly]={["Cost"]=25,["StackCost"]=0,["DamageMult"]=0,},
 		
-		[sp.PoisonSpray]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=0.25,},
+		[sp.PoisonSpray]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=0.75,},
 		[sp.WaterWalk]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
-		[sp.AcidBurst]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=1,},
+		[sp.AcidBurst]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=3,},
 		[sp.TownPortal]={["Cost"]=20,["StackCost"]=0,["DamageMult"]=0,},
 		[sp.LloydsBeacon]={["Cost"]=30,["StackCost"]=0,["DamageMult"]=0,},
 		
-		[sp.Stun]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=0.6,},
+		[sp.Stun]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=1.5,},
 		[sp.StoneSkin]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
-		[sp.Blades]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=1.5},
+		[sp.Blades]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=3},
 		[sp.Telekinesis]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
-		[sp.MassDistortion]={["Cost"]=0,["StackCost"]=4,["DamageMult"]=2,},
+		[sp.MassDistortion]={["Cost"]=0,["StackCost"]=4,["DamageMult"]4,},
 	}				
 end
 
