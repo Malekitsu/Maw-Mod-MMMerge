@@ -902,6 +902,16 @@ function events.Action(t)
 			if i>=0 and i<=Party.High and vars.currentManaPool[i] and vars.maxManaPool[i]>0 then
 				local manaPool=round(vars.currentManaPool[i]/vars.maxManaPool[i]*1000)/10
 				Game.GlobalTxt[212]=StrColor(0,100,255,"Mana " .. manaPool .. "%")
+				if manaPool==100 then
+					Game.GlobalTxt[212]=StrColor(0,100,255,"Mana")
+				end
+			end
+			if i>=0 and i<=Party.High and vars.currentHPPool[i] and vars.maxHPPool[i]>0 then
+				local hpPool=round(vars.currentHPPool[i]/vars.maxHPPool[i]*1000)/10
+				Game.GlobalTxt[108]=StrColor(0,255, 0,"HP " .. hpPool .. "%")
+				if hpPool==100 then
+					Game.GlobalTxt[108]=StrColor(0,255, 0,"Hit Points")
+				end
 			end
 		end
 	end
@@ -911,11 +921,21 @@ function events.Tick()
 		i=Game.CurrentPlayer 
 		if i==-1 then return end --prevent bug message
 		if vars.MAWSETTINGS.buffRework=="ON" and vars.maxManaPool[i]>0 then
-			vars.currentManaPool[i]=vars.currentManaPool[i] or 1
-			vars.maxManaPool[i]=vars.maxManaPool[i] or 1
 			local manaPool=round(vars.currentManaPool[i]/vars.maxManaPool[i]*1000)/10
 			Game.GlobalTxt[212]=StrColor(0,100,255,"Mana " .. manaPool .. "%")
+			if manaPool==100 then
+				Game.GlobalTxt[212]=StrColor(0,100,255,"Mana")
+			end
 		end
+		
+		if vars.MAWSETTINGS.buffRework=="ON" and vars.maxHPPool[i]>0 then
+			local hpPool=round(vars.currentHPPool[i]/vars.maxHPPool[i]*1000)/10
+			Game.GlobalTxt[108]=StrColor(0,255, 0,"HP " .. hpPool .. "%")
+			if hpPool==100 then
+				Game.GlobalTxt[108]=StrColor(0,255, 0,"Hit Points")
+			end
+		end
+		
 		pl=Party[i]
 		local resistances={}
 		local resistances2={}
