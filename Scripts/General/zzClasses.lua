@@ -2029,22 +2029,22 @@ function assassinSkills(isAssassin)
 		
 		Skillz.setDesc(12,2,"Melee attack costs 45 energy")
 		Skillz.setDesc(13,2,"Killing a monster restores 10 energy")
-		Skillz.setDesc(14,2,"You regenerate 10 energy per second")
+		Skillz.setDesc(14,2,"You regenerate 8 energy per second")
 		Skillz.setDesc(15,2,"Increases your maximum energy by 10")
 		
 		Skillz.setDesc(12,3,"Melee attack costs 40 energy")
 		Skillz.setDesc(13,3,"Killing a monster restores 15 energy")
-		Skillz.setDesc(14,3,"You regenerate 12 energy per second")
+		Skillz.setDesc(14,3,"You regenerate 10 energy per second")
 		Skillz.setDesc(15,3,"Increases your maximum energy by 20")
 		
 		Skillz.setDesc(12,4,"Melee attack costs 35 energy")
 		Skillz.setDesc(13,4,"Killing a monster restores 20 energy")
-		Skillz.setDesc(14,4,"You regenerate 14 energy per second")
+		Skillz.setDesc(14,4,"You regenerate 12 energy per second")
 		Skillz.setDesc(15,4,"Increases your maximum energy by 30")
 		
 		Skillz.setDesc(12,5,"Melee attack costs 30 energy")
 		Skillz.setDesc(13,5,"Killing a monster restores 25 energy")
-		Skillz.setDesc(14,5,"You regenerate 16 energy per second")
+		Skillz.setDesc(14,5,"You regenerate 14 energy per second")
 		Skillz.setDesc(15,5,"Increases your maximum energy by 40")
 		
 		Game.SpellsTxt[6].Description=string.format("Fires a ball of fire at a single target. When it hits, the ball explodes damaging all those nearby, including your characters if they're too close.  Fireball does %s%% of a melee attack damage.",assassinSpells[6].DamageMult*100)
