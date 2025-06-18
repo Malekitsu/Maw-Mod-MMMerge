@@ -1026,6 +1026,7 @@ legendaryEffects={
 	[29]="Each attack reduces monster resistances by 1",
 	[30]="Threshold HP to determine death/eradication depends on SP instead, if higher",
 	[31]="Leech restores Mana instead of HP, but at half effect",
+	[32]="Buffs reserve Hit Points instead of Mana and Hit Point coefficient is used instead.\nEnlightenment bonus still apply.",
 }
 
 function events.BuildItemInformationBox(t)
