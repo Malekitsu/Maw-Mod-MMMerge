@@ -173,7 +173,7 @@ function events.PlayerCastSpell(t)
 			local healData = t.RemoteData
 			local name = Multiplayer.client_name(t.RemoteData.client_id)
 
-			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+healData[1],Party[t.TargetId]:GetFullHP())
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+healData[1],GetMaxHP(Party[t.TargetId]))
 			if Party[t.TargetId].HP>0 then
 				Party[t.TargetId].Unconscious=0
 			end
@@ -187,7 +187,7 @@ function events.PlayerCastSpell(t)
 				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[1] .. " hit points"))
 			end
 		elseif t.TargetKind == 4 and not t.RemoteData then
-			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+round(totHeal),Party[t.TargetId]:GetFullHP())
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+round(totHeal),GetMaxHP(Party[t.TargetId]))
 			if Party[t.TargetId].HP>0 then
 				Party[t.TargetId].Unconscious=0
 			end
@@ -246,7 +246,7 @@ function events.PlayerCastSpell(t)
 			local healData = t.RemoteData
 			local name = Multiplayer.client_name(t.RemoteData.client_id)
 
-			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+healData[1],Party[t.TargetId]:GetFullHP())
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+healData[1],GetMaxHP(Party[t.TargetId]))
 			if Party[t.TargetId].HP>0 then
 				Party[t.TargetId].Unconscious=0
 			end
@@ -267,7 +267,7 @@ function events.PlayerCastSpell(t)
 					Party[t.TargetId].HP=math.max(hp+round(totHeal), 1)
 				end
 			else
-				Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+round(totHeal),Party[t.TargetId]:GetFullHP())
+				Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+round(totHeal),GetMaxHP(Party[t.TargetId]))
 				if Party[t.TargetId].HP>0 then
 					Party[t.TargetId].Unconscious=0
 				end
@@ -376,7 +376,7 @@ function events.PlayerCastSpell(t)
 			local healData = t.RemoteData
 			local name = Multiplayer.client_name(t.RemoteData.client_id)
 
-			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+healData[1],Party[t.TargetId]:GetFullHP())
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+healData[1],GetMaxHP(Party[t.TargetId]))
 			if Party[t.TargetId].HP>0 then
 				Party[t.TargetId].Unconscious=0
 			end
@@ -390,7 +390,7 @@ function events.PlayerCastSpell(t)
 				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[1] .. " hit points"))
 			end
 		elseif t.TargetKind == 4 and not t.RemoteData then
-			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+round(totHeal),Party[t.TargetId]:GetFullHP())
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+round(totHeal),GetMaxHP(Party[t.TargetId]))
 			if Party[t.TargetId].HP>0 then
 				Party[t.TargetId].Unconscious=0
 			end
@@ -707,7 +707,7 @@ end
 -- shared life overflow fix
 function randomizeHP()
 	for i, pl in Party do
-		pl.HP = random(1, pl:GetFullHP())
+		pl.HP = random(1, GetMaxHP(pl))
 	end
 end
 
@@ -783,7 +783,7 @@ function doSharedLife(amount, spellQueueData)
 	for i, pl in Party do
 		if shouldParticipate(pl) then
 			table.insert(activePlayers, pl)
-			fullHPs[pl:GetIndex()] = pl:GetFullHP()
+			fullHPs[pl:GetIndex()] = GetMaxHP(pl)
 			amount = amount + pl.HP
 			pl.HP = 0
 		end
@@ -828,7 +828,7 @@ function doSharedLife(amount, spellQueueData)
 		if pl.HP > 0 then
 			pl.Unconscious = 0
 		end
-		if pl.HP ~= pl:GetFullHP() then
+		if pl.HP ~= GetMaxHP(pl) then
 			everyoneFull = false
 		end
 	end
@@ -1090,7 +1090,7 @@ function events.Action(t)
 			min_index = pickLowestPartyMember()
 			--apply heal
 			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
-			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, Party[min_index]:GetFullHP())	
+			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, GetMaxHP(Party[min_index]))	
 			--bug fix
 			if Party[min_index].HP>0 then
 			Party[min_index].Unconscious=0
@@ -1124,7 +1124,7 @@ function events.Action(t)
 			min_index = pickLowestPartyMember()
 			--apply heal
 			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
-			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, Party[min_index]:GetFullHP())	
+			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, GetMaxHP(Party[min_index]))	
 			--bug fix
 			if Party[min_index].HP>0 then
 			Party[min_index].Unconscious=0
@@ -1161,7 +1161,7 @@ function events.Action(t)
 			min_index = pickLowestPartyMember()
 			--apply heal
 			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
-			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, Party[min_index]:GetFullHP())
+			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, GetMaxHP(Party[min_index]))
 			--bug fix
 			if Party[min_index].HP>0 then
 			Party[min_index].Unconscious=0
@@ -2714,13 +2714,20 @@ function events.GameInitialized2()
 	for i=0,Game.Classes.SPFactor.High do
 		spScaling[i]=Game.Classes.SPFactor[i]
 	end
+	hpScalings={}
+	for i=0,Game.Classes.HPFactor.High do
+		hpScalings[i]=Game.Classes.HPFactor[i]
+	end
+	
 	--dk
 	spScaling[56]=3
 	spScaling[57]=6
 	spScaling[58]=9
+	--shaman
 	spScaling[59]=1
 	spScaling[60]=1.5
 	spScaling[61]=2
+	--assassin
 	spScaling[const.Class.Thief]=7.5
 	spScaling[const.Class.Rogue]=7.5
 	spScaling[const.Class.Assassin]=7.5
@@ -3078,6 +3085,8 @@ end
 function buffManaLock()
 	vars.maxManaPool={}
 	vars.currentManaPool={}
+	vars.maxHPPool={}
+	vars.currentHPPool={}
 	local partyIndexes={}
 	for i=0,Party.High do
 		local id=Party[i]:GetIndex()
@@ -3085,22 +3094,35 @@ function buffManaLock()
 		local sp=Party[i]:GetFullSP()
 		vars.maxManaPool[i]=sp
 		vars.currentManaPool[i]=sp
+		--hp
+		local hp=Party[i]:GetFullHP()
+		vars.maxHPPool[i]=hp
+		vars.currentHPPool[i]=hp
 	end
 	for i=1, #buffSpellList do
 		local spell=buffSpellList[i]
 		if vars.mawbuff[spell] then
-			local id=partyIndexes[vars.mawbuff[spell]]
+			local index=vars.mawbuff[spell]
+			local id=partyIndexes[index]
 			if id then
 				local pl=Party[id]
-				
-				if buffSpell[spell] then
-					local s,m=SplitSkill(Skillz.get(pl,52))
-					local div=spScaling[pl.Class]+m/2
-					local percentageDecrease=(buffSpell[spell].Cost/div)*0.01
-					vars.currentManaPool[id]=vars.currentManaPool[id]-vars.maxManaPool[id]*percentageDecrease
-				elseif utilitySpell[spell] then
-					local s,m=SplitSkill(Skillz.get(pl,52))
-					vars.currentManaPool[id]=vars.currentManaPool[id]-round(utilitySpell[spell].Cost*(1-m/10))
+				local s,m=SplitSkill(Skillz.get(pl,52))
+				if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 32) then --reserve HP instead
+					if buffSpell[spell] then
+						local div=hpScalings[pl.Class]+m/2
+						local percentageDecrease=(buffSpell[spell].Cost/div)*0.01
+						vars.currentHPPool[id]=vars.currentHPPool[id]-vars.maxHPPool[id]*percentageDecrease
+					elseif utilitySpell[spell] then
+						vars.currentHPPool[id]=vars.currentHPPool[id]-round(utilitySpell[spell].Cost*(1-m/10))
+					end
+				else
+					if buffSpell[spell] then
+						local div=spScaling[pl.Class]+m/2
+						local percentageDecrease=(buffSpell[spell].Cost/div)*0.01
+						vars.currentManaPool[id]=vars.currentManaPool[id]-vars.maxManaPool[id]*percentageDecrease
+					elseif utilitySpell[spell] then
+						vars.currentManaPool[id]=vars.currentManaPool[id]-round(utilitySpell[spell].Cost*(1-m/10))
+					end
 				end
 			end
 		end
@@ -3110,6 +3132,7 @@ function buffManaLock()
 			vars.currentManaPool[i]=vars.maxManaPool[i]
 		end
 		Party[i].SP=math.min(math.ceil(vars.currentManaPool[i]), Party[i].SP)
+		Party[i].HP=math.min(math.ceil(vars.currentHPPool[i]), Party[i].HP)
 	end
 end
 	
