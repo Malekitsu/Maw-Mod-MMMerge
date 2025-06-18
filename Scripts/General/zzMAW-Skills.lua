@@ -1029,7 +1029,7 @@ function events.PlayerAttacked(t)
 			local lowestHPId=-1
 			local lowestHP=math.huge
 			for i=0,Party.High do
-				local totHP=Party[i]:GetFullHP()
+				local totHP=GetMaxHP(Party[i])
 				if Party[i]:IsConscious() and totHP<lowestHP then
 					lowestHP=totHP
 					lowestHPId=i
@@ -1073,7 +1073,7 @@ function events.PlayerAttacked(t)
 			local pl=Party[t.PlayerSlot]
 			local id=pl:GetIndex()
 			if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 23) then
-				evt[t.PlayerSlot].Add("HP", Party[t.PlayerSlot]:GetFullHP()*0.03)
+				evt[t.PlayerSlot].Add("HP", GetMaxHP(Party[t.PlayerSlot])*0.03)
 			end
 			--retaliation code
 			local s,m=Skillz.get(pl,53)
@@ -1126,12 +1126,11 @@ local classesWithNoMeditationRegen={10,11,56,57,58}
 
 function getBuffHealthRegen(pl)
 	local regen=0
-	local FHP = pl:GetFullHP()
+	local FHP = GetMaxHP(pl)
 	
 	--regeneration skill
 	local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Regeneration))
 	local regenEffect={[0]=0,2,4,6,6}
-	FHP	= pl:GetFullHP()
 	regen=regen + FHP^0.5*RegS^1.65*(regenEffect[RegM]/350)+RegS
 	for it in pl:EnumActiveItems() do
 		if it.Bonus2 == 37 or it.Bonus2==44 or it.Bonus2==50 or it.Bonus2==54 or it.Bonus2==66 or table.find(artifactHpRegen, it.Number) then		
@@ -1189,7 +1188,7 @@ function MawRegen()
 		
 			local regen=getBuffHealthRegen(pl)/10 * timeMultiplier * mult --/10 because it's called 10 times per second
 			regenHP[i] = regenHP[i] + regen
-			local FHP=pl:GetFullHP()
+			local FHP=GetMaxHP(pl)
 			--recount
 			local id=pl:GetIndex()
 			local healingDone=math.min(FHP-pl.HP, math.floor(regenHP[i]))
@@ -1291,7 +1290,7 @@ function events.Tick()
 		--regeneration tooltip
 		if Game.CurrentPlayer<0 or Game.CurrentPlayer>Party.High then return end
 		pl=Party[Game.CurrentPlayer]
-		local FHP=pl:GetFullHP()
+		local FHP=GetMaxHP(pl)
 		local s,m = SplitSkill(pl:GetSkill(30))
 		local regenEffect={[0]=0,2,4,6,6}
 		local hpRegen = round(FHP^0.5*s^1.65*((regenEffect[m])/35))/10+s
