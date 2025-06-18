@@ -75,7 +75,19 @@ function shortenNumber(number, significantDigits, color)
     return tostring(shortened) .. suffix
 end
 
-
+function GetMaxHP(pl)
+	if vars.currentHPPool then
+		local id=pl:GetIndex()
+		for i=0, Party.High do
+			if Party[i]:GetIndex()==id then
+				if vars.currentHPPool[i] then
+					return vars.currentHPPool[i]
+				end
+			end
+		end
+	end	
+	return pl:GetFullHP()
+end
 
 ---------------------------------
 --HERE IS THE KEYBIND LIST--
@@ -117,7 +129,7 @@ PGUP= 33
 PRIOR= 33	
 NEXT= 34	
 PGDN= 34	
-END= 35	
+end= 35	
 HOME= 36	
 LEFT= 37	
 UP= 38	
