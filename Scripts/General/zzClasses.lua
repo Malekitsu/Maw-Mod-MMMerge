@@ -1757,7 +1757,7 @@ function checkSkills(id)
 			return
 		end
 		if table.find(assassinClass, class) then
-			assassinSkills(true)
+			assassinSkills(true, Party[id])
 			return			
 		end
 	end
@@ -2007,11 +2007,20 @@ function assassinationDamage(pl,mon,obj)
 	return vars.assassinDamage[id]	
 end
 
-function assassinSkills(isAssassin)
+function assassinSkills(isAssassin, pl)
 	if isAssassin then
-		for key, value in pairs(assassinSpells) do
-			for i=1,4 do
-				Game.Spells[key]["SpellPoints" .. masteryName[i]]=assassinSpells[key].Cost
+		if pl then
+			for key, value in pairs(assassinSpells) do
+				local id=pl:GetIndex()
+				if vars.assassinStacks[id]<assassinSpells[key].StackCost then
+					for i=1,4 do
+						Game.Spells[key]["SpellPoints" .. masteryName[i]]=1000
+					end
+				else
+					for i=1,4 do
+						Game.Spells[key]["SpellPoints" .. masteryName[i]]=assassinSpells[key].Cost
+					end
+				end
 			end
 		end
 		--skill names and desc
