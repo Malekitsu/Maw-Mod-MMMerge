@@ -1721,7 +1721,7 @@ function ascension(customIndex)
 			return
 		end
 		if table.find(assassinClass, pl.Class) then 
-			assassinSkills(true)
+			assassinSkills(true, pl)
 			return
 		end
 		
