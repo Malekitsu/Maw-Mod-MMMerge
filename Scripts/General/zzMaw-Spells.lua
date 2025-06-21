@@ -1833,12 +1833,12 @@ function ascension(customIndex)
 		--Healing Spells
 		-----------------------
 		healingSpells={
-			[const.Spells.RemoveCurse]=    {["Cost"]={0,5,10,20,[0]=0}, ["Base"]={0,10,15,25,[0]=0}, ["Scaling"]={0,3,4,5}},
+			[const.Spells.RemoveCurse]=    {["Cost"]={0,5,10,20,[0]=0}, ["Base"]={0,10,20,30,[0]=0}, ["Scaling"]={0,4,6,8}},
 			[const.Spells.SharedLife]=    {["Cost"]={0,0,25,40,[0]=0}, ["Base"]={0,0,0,0,[0]=0}, ["Scaling"]={0,0,7,9}},
-            [const.Spells.Resurrection]={["Cost"]={0,0,0,100,[0]=0}, ["Base"]={0,0,0,100,[0]=0}, ["Scaling"]={0,0,0,14}},
-            [const.Spells.Heal]=        {["Cost"]={2,4,6,8,[0]=0}, ["Base"]={4,6,8,10,[0]=0}, ["Scaling"]={1,2,3,4}},
-            [const.Spells.CureDisease]=    {["Cost"]={0,0,15,25,[0]=0}, ["Base"]={0,0,15,25,[0]=0}, ["Scaling"]={0,0,5,7}},
-            [const.Spells.PowerCure]=    {["Cost"]={0,0,0,30,[0]=0}, ["Base"]={0,0,0,10,[0]=0}, ["Scaling"]={0,0,0,3}}
+            [const.Spells.Resurrection]={["Cost"]={0,0,0,100,[0]=0}, ["Base"]={0,0,0,150,[0]=0}, ["Scaling"]={0,0,0,21}},
+            [const.Spells.Heal]=        {["Cost"]={2,4,6,8,[0]=0}, ["Base"]={4,8,12,16,[0]=0}, ["Scaling"]={2,3,4,6}},
+            [const.Spells.CureDisease]=    {["Cost"]={0,0,15,25,[0]=0}, ["Base"]={0,0,25,40,[0]=0}, ["Scaling"]={0,0,7,10}},
+            [const.Spells.PowerCure]=    {["Cost"]={0,0,0,30,[0]=0}, ["Base"]={0,0,0,15,[0]=0}, ["Scaling"]={0,0,0,4}}
 		}
 		for i=1, 6 do
 			local ascensionLevel=getAscensionTier(s,healingList[i])
