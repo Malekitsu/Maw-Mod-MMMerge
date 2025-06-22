@@ -3781,9 +3781,9 @@ function artifactPowerMult(level, isAC)
 		bol=bol*4/3
 	end
 	]]
-	local mult=(math.min(level,550)/300+0.5)*bol
+	local mult=(math.min(level,550)/200+0.75)*bol
 	if isAC then
-		mult=(math.min(level,550)/(500/1.5)+0.5)*bol
+		mult=(math.min(level,550)/(500)+0.75)*bol
 	end
 	return mult
 end
