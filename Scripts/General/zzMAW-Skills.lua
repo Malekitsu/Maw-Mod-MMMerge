@@ -1229,7 +1229,7 @@ function MawRegen()
 			end
 			local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Meditation))
 			if RegM==4 then
-				RegM=8
+				RegM=5
 			end
 			FSP	= pl:GetFullSP()
 			if FSP>0 and vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[i] then
@@ -1237,7 +1237,7 @@ function MawRegen()
 				
 			end
 			
-			local SPREGEN = (FSP^0.25*RegS^1.4*((RegM+5)/5000) +0.02)
+			local SPREGEN = (FSP^0.25*RegS^1.4*((RegM+1)/2000) +0.02)
 			
 			for it in pl:EnumActiveItems() do
 				--[[special enchants now increase meditation
@@ -1255,7 +1255,7 @@ function MawRegen()
 			if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[56] and not table.find(classesWithNoMeditationRegen, pl.Class) then
 				local s, m, level=getBuffSkill(56)
 				local level=level^0.6
-				regenSP[i] = regenSP[i] + (FSP^0.25*level^1.4*((buffPower[56].Base[m])/15000) +0.1)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
+				regenSP[i] = regenSP[i] + (FSP^0.25*level^1.4*((buffPower[56].Base[m])/10000) +0.1)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
 			end
 			--dragon regen
 			if pl.Class==10 then
