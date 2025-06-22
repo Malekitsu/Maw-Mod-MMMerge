@@ -351,14 +351,14 @@ function events.BuildStatInformationBox(t)
 		local skill=Party[i]:GetSkill(const.Skills.Meditation)
 		local s,m=SplitSkill(skill)
 		if m==4 then
-			m=8
+			m=5
 		end
-		local medRegen = round(fullSP^0.25*s^1.4*(m+5)/50)+2
+		local medRegen = round(fullSP^0.25*s^1.4*(m+1)/20)+2
 		--meditation buff
 		if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[56] then
 			local s, m, level=getBuffSkill(56)
 			local level=level^0.6
-			medRegen = medRegen + round((fullSP^0.25*level^1.4*((buffPower[56].Base[m])/150) +10)*(1+buffPower[56].Scaling[m]/100*s))
+			medRegen = medRegen + round((fullSP^0.25*level^1.4*((buffPower[56].Base[m])/100) +10)*(1+buffPower[56].Scaling[m]/100*s))
 		end
 		
 		local SPregenItem=0
