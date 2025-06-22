@@ -1304,10 +1304,10 @@ function events.Tick()
 		end
 		local s,m = SplitSkill(pl:GetSkill(28))
 		if m==4 then
-			m=8
+			m=5
 		end
-		local spRegen = (FSP^0.25*s^1.4*((m+5)/50)+2)/10
-		local spRegen2 = (FSP^0.25*(s+1)^1.4*((m+5)/50)+2)/10
+		local spRegen = (FSP^0.25*s^1.4*((m+1)/20)+2)/10
+		local spRegen2 = (FSP^0.25*(s+1)^1.4*((m+1)/20)+2)/10
 		local spRegen2 = round((spRegen2-spRegen)*100)/100
 		if spRegen>10 then
 			spRegen = round((spRegen)*10)/10
