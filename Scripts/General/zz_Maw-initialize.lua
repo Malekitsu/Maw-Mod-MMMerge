@@ -76,7 +76,7 @@ function shortenNumber(number, significantDigits, color)
 end
 
 function GetMaxHP(pl)
-	if vars.currentHPPool then
+	if vars.MAWSETTINGS.buffRework=="ON" and vars.currentHPPool then
 		local id=pl:GetIndex()
 		for i=0, Party.High do
 			if Party[i]:GetIndex()==id then
