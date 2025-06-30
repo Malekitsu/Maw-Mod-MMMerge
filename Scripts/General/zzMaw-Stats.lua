@@ -658,6 +658,9 @@ end
 --reduce damage by %
 function events.CalcDamageToPlayer(t)
 	local data=mawCustomMonObj or WhoHitPlayer()
+	if reflectedDamage then
+		data=nil
+	end
 	local pl=t.Player
 	local lvl=0
 	if data and data.Monster then
