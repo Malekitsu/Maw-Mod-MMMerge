@@ -1395,7 +1395,7 @@ function dkSkills(isDK, id)
 end
 
 
---add tooltips
+--[[add tooltips
 function events.Action(t)
 	function events.Tick() 
 		local id=Game.CurrentPlayer
@@ -1405,6 +1405,7 @@ function events.Action(t)
 		end
 	end
 end
+moved into ascension tick event, as it was causing some mana cost issues]]
 
 function events.Action(t)
 	if t.Action==114 then
@@ -1732,6 +1733,7 @@ end
 
 
 function checkSkills(id)
+	lastCheckSkill=id
 	shamanSkills(false, id)
 	dkSkills(false, id)
 	seraphSkills(false, id)
