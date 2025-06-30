@@ -1941,8 +1941,8 @@ function events.GameInitialized2()
 					t.Result=t.Result*0.5
 				end
 				
-				if assassinSpells.DamageMult then
-					t.Result=t.Result*assassinSpells.DamageMult
+				if assassinSpells[data.Object.Spell].DamageMult then
+					t.Result=t.Result*assassinSpells[data.Object.Spell].DamageMult
 				end
 			end
 		end
