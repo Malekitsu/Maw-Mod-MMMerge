@@ -1069,6 +1069,16 @@ function events.GameInitialized2()
 				maxDamage=pl:GetMeleeDamageMax()
 				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
 				damage=round(randomDamage/2)
+				
+				for i=0,1 do
+					local it=pl:GetActiveItem(i)
+					if it then
+						local damage1=calcFireAuraDamage(pl, it, 0, true, false, "damage")
+						local damage2=calcEnchantDamage(pl, it, 0, true, false, "damage")
+						damage=damage+damage1+damage2
+					end
+				end
+				
 				local res=t.Monster.Resistances[t.DamageKind] or t.Monster.Resistances[4]
 				damage=damage/2^(res/100)
 				local mult=damageMultiplier[t.PlayerIndex]["Melee"]
@@ -1921,6 +1931,16 @@ function events.GameInitialized2()
 				
 				local isolatedDamageReduction=assassinationDamage(pl,t.Monster,data.Object) --must be subtracted
 				damage=damage-isolatedDamageReduction
+				
+				
+				for i=0,1 do
+					local it=pl:GetActiveItem(i)
+					if it then
+						local damage1=calcFireAuraDamage(pl, it, 0, true, false, "damage")
+						local damage2=calcEnchantDamage(pl, it, 0, true, false, "damage")
+						damage=damage+damage1+damage2
+					end
+				end
 				
 				local res=t.Monster.Resistances[t.DamageKind] or t.Monster.Resistances[4]
 				damage=damage/2^(res/100)
