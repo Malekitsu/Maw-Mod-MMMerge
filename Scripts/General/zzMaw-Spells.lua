@@ -1681,10 +1681,13 @@ function events.Action(t)
 end
 
 function events.Tick()
+	lastAscension=lastAscension or -1
+	lastCheckSkill=lastCheckSkill or -1
+	local playerToAscend=-1
+	local lowestDelay=math.huge
+	playerToAscend=Game.CurrentPlayer
+	if playerToAscend>Party.High then return end
 	if Game.CurrentPlayer==-1 then
-		lastAscension=lastAscension or -1
-		local playerToAscend=-1
-		local lowestDelay=math.huge
 		for i=0,Party.High do
 			local pl=Party[i]
 			local delay=pl.RecoveryDelay
@@ -1693,10 +1696,13 @@ function events.Tick()
 				playerToAscend=i
 			end
 		end
-		if playerToAscend~=lastAscension then
-			ascension(playerToAscend)
-			lastAscension=playerToAscend
-		end
+	end
+	if playerToAscend~=lastAscension then
+		ascension(playerToAscend)
+		lastAscension=playerToAscend
+	end
+	if playerToAscend~=lastCheckSkill then
+		checkSkills(playerToAscend)
 	end
 end
 
