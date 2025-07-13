@@ -422,13 +422,13 @@ function events.BuildStatInformationBox(t)
 	end
 	
 	if t.Stat==13 or t.Stat==14 then
-		local bolsterLevel8=vars.MM7LVL+vars.MM6LVL
-		local bolsterLevel7=vars.MM8LVL+vars.MM6LVL
-		local bolsterLevel6=vars.MM8LVL+vars.MM7LVL
+		local bolsterLevel8=getPartyLevel(1)
+		local bolsterLevel7=getPartyLevel(2)
+		local bolsterLevel6=getPartyLevel(3)
 		local bolsterLevel8=math.max(bolsterLevel8-4,0)
 		local bolsterLevel7=math.max(bolsterLevel7-4,0)
 		local bolsterLevel6=math.max(bolsterLevel6-4,0)
-		t.Text=t.Text .."\n\nLevels gained in MM6: " .. StrColor(255,255,153,round(vars.MM6LVL*100)/100) .. "\nLevels gained in MM7: " .. StrColor(255,255,153,round(vars.MM7LVL*100)/100) .. "\nLevels gained in MM8: " .. StrColor(255,255,153,round(vars.MM8LVL*100)/100) .. "\n\nBolster Level in MM6: " .. StrColor(255,255,153,round(bolsterLevel6)) .."\nBolster Level in MM7: " .. StrColor(255,255,153,round(bolsterLevel7)) .."\nBolster Level in MM8: " .. StrColor(255,255,153,round(bolsterLevel8))
+		t.Text=t.Text .."\n\nLevels gained in MM6: " .. StrColor(255,255,153,round(vars.MMLVL[3]*100)/100) .. "\nLevels gained in MM7: " .. StrColor(255,255,153,round(vars.MMLVL[2]*100)/100) .. "\nLevels gained in MM8: " .. StrColor(255,255,153,round(vars.MMLVL[1]*100)/100) .. "\n\nBolster Level in MM6: " .. StrColor(255,255,153,round(bolsterLevel6)) .."\nBolster Level in MM7: " .. StrColor(255,255,153,round(bolsterLevel7)) .."\nBolster Level in MM8: " .. StrColor(255,255,153,round(bolsterLevel8))
 	end
 	if t.Stat==15 then
 		local i=Game.CurrentPlayer
@@ -805,16 +805,7 @@ function events.CalcDamageToPlayer(t)
 			t.Result=t.Result*getMonsterDamage(lvl,"diffMult")
 		elseif ((t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1) then --drown and fall
 			name=Game.MapStats[Map.MapStatsIndex].Name
-			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
-			if currentWorld==1 then
-				bolster=vars.MM6LVL+vars.MM7LVL
-			elseif currentWorld==2 then
-				bolster=vars.MM8LVL+vars.MM6LVL
-			elseif currentWorld==3 then
-				bolster=vars.MM8LVL+vars.MM7LVL
-			else 
-				bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-			end
+			local bolster=getPartyLevel()
 			if vars.freeProgression then
 				mapLevel=bolster+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
 			else
@@ -840,16 +831,7 @@ function events.CalcDamageToPlayer(t)
 			t.Result=t.Result*getMonsterDamage(lvl,"diffMult")
 		elseif (t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1 then --drown and fall
 			name=Game.MapStats[Map.MapStatsIndex].Name
-			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
-			if currentWorld==1 then
-				bolster=vars.MM6LVL+vars.MM7LVL
-			elseif currentWorld==2 then
-				bolster=vars.MM8LVL+vars.MM6LVL
-			elseif currentWorld==3 then
-				bolster=vars.MM8LVL+vars.MM7LVL
-			else 
-				bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-			end
+			local bolster=getPartyLevel()
 			if vars.freeProgression then
 				mapLevel=bolster+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
 			else

@@ -3,14 +3,11 @@
 ----------------------------------------------------
 --function to calculate the level you are (float number) give x amount of experience
 function calcLevel(x)
-	local level=((500+(250000+2000*x)^0.5)/1000)
-	return level
+	return (25+(5*x+625)^0.5)/50
 end 
 function calcExp(lvl)
-	local lvl=lvl-1
-	local EXP=lvl*(lvl+1)*500
-	return EXP
-end 
+	return lvl*(lvl-1)*500
+end
 
 function events.GameInitialized2()
 BLevel={}
@@ -191,16 +188,7 @@ function recalculateMawMonster()
 	end
 	if mapvars.boosted==nil then --needed for retrocompatibility, otherwise unique monsters from old saves gets bosted again
 		--calculate party experience
-		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
-		if currentWorld==1 then
-			partyLvl=vars.MM7LVL+vars.MM6LVL
-		elseif currentWorld==2 then
-			partyLvl=vars.MM8LVL+vars.MM6LVL
-		elseif currentWorld==3 then
-			partyLvl=vars.MM8LVL+vars.MM7LVL
-		elseif currentWorld==4 then
-			partyLvl=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
-		end
+		local partyLvl=getPartyLevel()
 		
 		mapvars.oldUniqueMonsterTable=mapvars.oldUniqueMonsterTable or {}
 		--calculate average level for unique monsters
@@ -379,17 +367,59 @@ end
 
 --MONSTER BOLSTERING
 function events.BeforeNewGameAutosave()
-vars.UNKNOWNEXP=0
-vars.LVLBEFORE=0
-vars.EXPBEFORE=0
-vars.MM6LVL=0
-vars.MM7LVL=0
-vars.MM8LVL=0
-vars.MMMLVL=0
+	vars.MMLVL = {0, 0, 0, 0}
+	vars.EXPBEFORE = 0
+	vars.LVLBEFORE = 0
 end
 
-function events.LoadMap()
-	vars.EXPBEFORE=vars.EXPBEFORE or calcExp(vars.LVLBEFORE or 1) --for working retroactively
+function events.BeforeLoadMap(wasInGame)
+	if not wasInGame then
+		-- migrate from old saves lacking EXPBEFORE
+		vars.EXPBEFORE = vars.EXPBEFORE or calcExp(vars.LVLBEFORE or 1)
+		if  not vars.MMLVL then
+			-- migrate to refactored MMLVL
+			vars.MMLVL = {vars.MM8LVL, vars.MM7LVL, vars.MM6LVL, vars.MMMLVL}
+			vars.MM8LVL = nil
+			vars.MM7LVL = nil
+			vars.MM6LVL = nil
+			vars.MMMLVL = nil
+		end
+	end
+end
+
+function addBolsterExp(experience)
+	local currentWorld = TownPortalControls.MapOfContinent(Map.MapStatsIndex)
+	vars.EXPBEFORE = vars.EXPBEFORE + experience
+	local currentLvl = calcLevel(vars.EXPBEFORE)
+	vars.MMLVL[currentWorld] = vars.MMLVL[currentWorld] + currentLvl - vars.LVLBEFORE
+	vars.LVLBEFORE = currentLvl
+end
+
+function getTotalLevel()
+	local result = 0
+	for i=1,4 do
+		result = result + vars.MMLVL[i]
+	end
+	return result
+end
+
+function getTotalExp()
+	return calcExp(getTotalLevel()+1)
+end
+
+function getPartyLevel(currentWorld)
+	currentWorld = currentWorld or TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+	local result = 0
+	for i=1,3 do
+		if currentWorld ~= i then
+			result = result + vars.MMLVL[i]
+		end
+	end
+	return result
+end
+
+function getPartyExp(currentWorld)
+	return calcExp(getPartyLevel(currentWorld)+1)
 end
 
 function events.MonsterKillExp(t)
@@ -401,7 +431,7 @@ function events.MonsterKillExp(t)
 		return
 	end 
 	]]
-	local partyLvl=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL+vars.MMMLVL
+	local partyLvl=getTotalLevel()
 	local mon=t.Monster
 	
 	
@@ -446,20 +476,7 @@ function events.MonsterKillExp(t)
 		return
 	end
 	
-	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
-	local currentLVL=calcLevel(bolsterExp/5 + vars.EXPBEFORE)
-		
-	if currentWorld==1 then
-		vars.MM8LVL = vars.MM8LVL + currentLVL - vars.LVLBEFORE
-	elseif currentWorld==2 then
-		vars.MM7LVL = vars.MM7LVL + currentLVL - vars.LVLBEFORE
-	elseif currentWorld==3 then
-		vars.MM6LVL = vars.MM6LVL + currentLVL - vars.LVLBEFORE
-	elseif currentWorld==4 then
-		vars.MMMLVL = vars.MMMLVL + currentLVL - vars.LVLBEFORE
-	end
-	vars.EXPBEFORE = vars.EXPBEFORE + bolsterExp/5
-	vars.LVLBEFORE = calcLevel(vars.EXPBEFORE)
+	addBolsterExp(bolsterExp/5)
 	
 	vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
 	for i=0, Party.High do
@@ -475,16 +492,7 @@ end
 
 function recalculateMonsterTable()
 	--calculate party experience
-	currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
-	if currentWorld==1 then
-		bolsterLevel=vars.MM7LVL+vars.MM6LVL
-	elseif currentWorld==2 then
-		bolsterLevel=vars.MM8LVL+vars.MM6LVL
-	elseif currentWorld==3 then
-		bolsterLevel=vars.MM8LVL+vars.MM7LVL
-	elseif currentWorld==4 then
-		bolsterLevel=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
-	end
+	bolsterLevel=getPartyLevel()
 	bolsterLevel=math.max(bolsterLevel-4,0)
 	
 	--add a bonus in case dungeon is resetted
@@ -2211,17 +2219,7 @@ function checkMapCompletition()
 		end
 		if m/n>=requiredRateo then
 			name=Game.MapStats[Map.MapStatsIndex].Name
-			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
-			local bolster=0
-			if currentWorld==1 then
-				bolster=vars.MM6LVL+vars.MM7LVL
-			elseif currentWorld==2 then
-				bolster=vars.MM8LVL+vars.MM6LVL
-			elseif currentWorld==3 then
-				bolster=vars.MM8LVL+vars.MM7LVL
-			else 
-				bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-			end
+			local bolster=getPartyLevel()
 			
 			vars.dungeonCompletedList=vars.dungeonCompletedList or {}
 			if vars.dungeonCompletedList[name] then
@@ -2286,21 +2284,7 @@ function checkMapCompletition()
 				mapLevel=math.max(mapLevel,1)
 				local experience=math.ceil(totalMonster^0.7*(mapLevel*20+mapLevel^1.8)/3*(bolster+mapLevel)/mapLevel/1000)*1000
 				--bolster code
-				bonusExp=experience
-				local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
-				local currentLVL=calcLevel(bonusExp + vars.EXPBEFORE)
-					
-				if currentWorld==1 then
-					vars.MM8LVL = vars.MM8LVL + currentLVL - vars.LVLBEFORE
-				elseif currentWorld==2 then
-					vars.MM7LVL = vars.MM7LVL + currentLVL - vars.LVLBEFORE
-				elseif currentWorld==3 then
-					vars.MM6LVL = vars.MM6LVL + currentLVL - vars.LVLBEFORE
-				elseif currentWorld==4 then
-					vars.MMMLVL = vars.MMMLVL + currentLVL - vars.LVLBEFORE
-				end
-				vars.EXPBEFORE = vars.EXPBEFORE + bonusExp
-				vars.LVLBEFORE = calcLevel(vars.EXPBEFORE)
+				addBolsterExp(experience)
 				vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
 				--end
 				gold=math.ceil(experience^0.9/1000)*1000 

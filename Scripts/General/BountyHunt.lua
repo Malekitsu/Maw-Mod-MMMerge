@@ -4,7 +4,7 @@ BountyHuntFunctions = {}
 local BountyText = ""
 
 local function RewardByMon(MonId)
-	return (round(basetable[MonId].Level + vars.MM6LVL + vars.MM7LVL+ vars.MM8LVL)) * 100 
+	return round(basetable[MonId].Level + getPartyLevel(4)) * 100 
 end
 
 local function HuntText(MonId)
@@ -186,7 +186,7 @@ local function SetCurrentHunt()
 		local MonId = t.Entry.MonId
 		local X, Y, Z = BountyHuntFunctions.NewBHSpawnPoint()
 		
-		mapvars.mawBounty=math.max((vars.MM6LVL+vars.MM7LVL+vars.MM8LVL-BLevel[MonId]/1.5),0)
+		mapvars.mawBounty=math.max((getPartyLevel(4)-BLevel[MonId]/1.5),0)
 		recalculateMonsterTable()
 		mon=pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = 1, powerChances = {0, 0, 100}, radius = 256, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 index=mon:GetIndex() end}
 		generateBoss(index,299)
