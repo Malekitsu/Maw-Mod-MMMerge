@@ -60,7 +60,7 @@ function events.CalcDamageToMonster(t)
 				totalHeal=totalHeal+heal
 			end
 			--ranged
-			if gotBowVamp[index] and data.Object and data.Object.Spell==133 then
+			if gotBowVamp[index] and data.Object and (data.Object.Spell==133 or data.Object.Spell==39) then
 				totalHeal=totalHeal+heal*0.5
 			end
 		else
@@ -94,7 +94,7 @@ function events.CalcDamageToMonster(t)
 					totalHeal=totalHeal+heal
 				end
 				--ranged
-				if data.Object and data.Object.Spell==133 then
+				if data.Object and (data.Object.Spell==133 or data.Object.Spell==39) then
 					totalHeal=totalHeal+heal*0.5
 				end
 			elseif data and data.Player then --spell leech
