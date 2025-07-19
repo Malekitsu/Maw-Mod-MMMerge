@@ -2143,20 +2143,15 @@ completition=CustomUI.CreateText{
 		Text = "",
 		Layer 	= 1,
 		Screen 	= 0,
-		X = 495, Y = 375}
-percentText=CustomUI.CreateText{
-		Text = "",
-		Layer 	= 1,
-		Screen 	= 0,
-		X = 513, Y = 375}
+		AlignLeft = true,
+		Width = 50, Height = 16,
+		X = 500, Y = 377}
 
 function events.LoadMap()
 	if mapvars.completition then
-		completition.Text=string.format(mapvars.completition)
-		percentText.Text="%"
+		completition.Text=string.format(mapvars.completition) .. "%"
 	else
 		completition.Text=""
-		percentText.Text=""
 	end
 end
 
@@ -2200,15 +2195,11 @@ function checkMapCompletition()
 		if vars.insanityMode and not mapvars.monsterMap then
 			requiredRateo=1
 		end
-		mapvars.completition=math.min(round(m/n*100/requiredRateo),100)
+		mapvars.completition=math.min(round(m/n*1000/requiredRateo)/10,100)
 		if mapvars.completed then
 			mapvars.completition=100
 		end
-		completition.Text=string.format(mapvars.completition)
-		percentText.Text="%"
-		if completition.Text=="100" then
-			percentText.Text=" %"
-		end
+		completition.Text=string.format(mapvars.completition) .. "%"
 		if m/n>=requiredRateo then
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
