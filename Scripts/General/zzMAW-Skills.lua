@@ -2214,6 +2214,15 @@ end
 
 --fix cover when starting new Game
 function events.BeforeNewGameAutosave()
+	vars.needToFixCover=true
+end
+
+function events.BeforeLoadMap(wasInGame)
+	if wasInGame or vars.needToFixCover == nil then
+		return
+	end
+	vars.needToFixCover=nil
+
 	for i=0,Party.PlayersArray.High do
 		pl=Party.PlayersArray[i]
 		Skillz.set(pl,50,0)
