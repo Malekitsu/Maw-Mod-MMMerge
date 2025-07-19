@@ -455,7 +455,7 @@ function events.GameInitialized2()
 			else
 				mightEffect=math.floor((might-13)/2)
 			end
-			local bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL+1
+			local bolster=getPartyLevel(4)+1
 			local lvl=pl.LevelBase
 			if pl.LevelBase/bolster>1.2 then
 				lvl=math.min(pl.LevelBase/2,bolster)
@@ -474,7 +474,7 @@ function events.GameInitialized2()
 			end
 			
 			
-			local bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL+1
+			local bolster=getPartyLevel(4)+1
 			local lvl=pl.LevelBase
 			if pl.LevelBase/bolster>1.2 then
 				lvl=math.min(pl.LevelBase/2,bolster)
@@ -502,7 +502,7 @@ function events.GameInitialized2()
 				mightEffect=math.floor((might-13)/2)
 			end
 			
-			local bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL+1
+			local bolster=getPartyLevel(4)+1
 			local lvl=pl.LevelBase
 			if pl.LevelBase/bolster>1.2 then
 				lvl=math.min(pl.LevelBase/2,bolster)
@@ -523,7 +523,7 @@ function events.GameInitialized2()
 				mightEffect=math.floor((might-13)/2)
 			end
 			
-			local bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL+1
+			local bolster=getPartyLevel(4)+1
 			local lvl=pl.LevelBase
 			if pl.LevelBase/bolster>1.2 then
 				lvl=math.min(pl.LevelBase/2,bolster)
@@ -539,7 +539,7 @@ function events.GameInitialized2()
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.Dodging))
 			local oldDodge=skillAC[const.Skills.Dodging][m] or 0
 			
-			local bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL+1
+			local bolster=getPartyLevel(4)+1
 			local lvl=pl.LevelBase
 			if pl.LevelBase/bolster>1.2 then
 				lvl=math.min(pl.LevelBase/2,bolster)
@@ -551,7 +551,7 @@ function events.GameInitialized2()
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.Dodging))
 			local oldDodge=skillAC[const.Skills.Dodging][m] or 0
 			
-			local bolster=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL+1
+			local bolster=getPartyLevel(4)+1
 			local lvl=pl.LevelBase
 			if pl.LevelBase/bolster>1.2 then
 				lvl=math.min(pl.LevelBase/2,bolster)
@@ -894,7 +894,7 @@ function events.GameInitialized2()
 		if table.find(shamanClass, t.Player.Class) and t.Player.Unconscious==0 and t.Player.Dead==0 and t.Player.Eradicated==0  then
 			m2=SplitSkill(t.Player.Skills[const.Skills.Air])
 			m3=SplitSkill(t.Player.Skills[const.Skills.Water])
-			local lvl=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
+			local lvl=getPartyLevel(4)
 			local reduction=getMonsterDamage((lvl+1)^0.325*m3)^0.7
 			t.Result=math.max(t.Result-reduction, t.Result*0.25)
 			t.Result=t.Result*0.99^m2
@@ -970,7 +970,7 @@ local function shamanSkills(isShaman, id)
 		local airReduction=100-round(0.99^m2*10000)/100
 		txt=baseSchoolsTxt[13] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nReduce all damage taken by " .. airReduction .. "%\n"
 		Skillz.setDesc(13,1,txt)
-		local lvl=vars.MM6LVL+vars.MM7LVL+vars.MM8LVL
+		local lvl=getPartyLevel(4)
 		local waterReduction=round(getMonsterDamage((lvl+1)^0.325*m3)^0.7)
 		txt=baseSchoolsTxt[14] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)\n"
 		Skillz.setDesc(14,1,txt)

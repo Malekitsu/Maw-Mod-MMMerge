@@ -1420,11 +1420,20 @@ function events.LoadMap()
 		Game.NPC[1177].EventB=1418
 	end
 end
+
 --training centers bolster
+function events.BeforeNewGameAutosave()
+	vars.trainings = {0, 0, 0}
+end
+
+function events.BeforeLoadMap(wasInGame)
+	if not wasInGame then
+		vars.trainings = vars.trainings or {vars.MMLVL[1], vars.MMLVL[2], vars.MMLVL[3]}
+	end
+end
 
 function events.CalcTrainingTime(t)
 	if Game.CurrentPlayer==0 then
-		vars.trainings=vars.trainings or {0,0,0}
 		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
 		vars.trainings[currentWorld]=vars.trainings[currentWorld]+1
 	end	
@@ -1472,7 +1481,6 @@ function events.LoadMap()
 	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 	if currentWorld==4 then return end
 	local bolster=0
-	vars.trainings=vars.trainings or {vars.MM8LVL,vars.MM7LVL,vars.MM6LVL}
 	for i=1,3 do 
 		if i~=currentWorld then
 			bolster=bolster+vars.trainings[i]

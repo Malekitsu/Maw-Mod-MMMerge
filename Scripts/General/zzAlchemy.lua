@@ -588,17 +588,8 @@ function events.ItemGenerated(t)
 	end
 	if reagentList[t.Item.Number] then
 		t.Handled=true
-		--calculate party level
-		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
-		if currentWorld==1 then
-			partyLevel=vars.MM7LVL+vars.MM6LVL
-		elseif currentWorld==2 then
-			partyLevel=vars.MM8LVL+vars.MM6LVL
-		elseif currentWorld==3 then
-			partyLevel=vars.MM8LVL+vars.MM7LVL
-		end
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
-		t.Item.Bonus=math.min(math.floor(partyLevel/5),255)
+		t.Item.Bonus=math.min(math.floor(getPartyLevel()/5),255)
 	end
 end
 
@@ -607,7 +598,7 @@ function events.MonsterKilled(mon)
 	if mon.Ally == 9999 then -- no drop from reanimated monsters
 		return
 	end
-	dropPossible=false
+	local dropPossible=false
 	for i=0,Party.High do
 		s,m = SplitSkill(Party[i].Skills[const.Skills.Alchemy])
 		if m>=3 then
@@ -616,25 +607,14 @@ function events.MonsterKilled(mon)
 		end
 	end
 	if dropPossible and math.random()<chance then
-		-- check bolster level
-		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
-		if currentWorld==1 then
-			partyLevel=vars.MM7LVL+vars.MM6LVL
-		elseif currentWorld==2 then
-			partyLevel=vars.MM8LVL+vars.MM6LVL
-		elseif currentWorld==3 then
-			partyLevel=vars.MM8LVL+vars.MM7LVL
-		elseif currentWorld==4 then
-			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-		end
 		--determine level
 		local lvl=basetable[mon.Id].Level
-		tier=round(math.min(math.max((lvl/20)*(math.random()/2+1.75),1),5))
-		roll=math.random(1,#reagentDropTable[tier])
-		reagent=reagentDropTable[tier][roll]	
-		obj = SummonItem(reagent, mon.X, mon.Y, mon.Z + 100, 100)
+		local tier=round(math.min(math.max((lvl/20)*(math.random()/2+1.75),1),5))
+		local roll=math.random(1,#reagentDropTable[tier])
+		local reagent=reagentDropTable[tier][roll]	
+		local obj = SummonItem(reagent, mon.X, mon.Y, mon.Z + 100, 100)
 		if obj then
-			obj.Item.Bonus=round(partyLevel/3)
+			obj.Item.Bonus=round(getPartyLevel()/3)
 		end
 	end
 end
