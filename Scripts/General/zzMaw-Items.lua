@@ -3,17 +3,11 @@ function events.GenerateItem(t)
 	Handled = true
 	--[[calculate party experience
 	if Map.MapStatsIndex==0 then return end
-	currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
 	if currentWorld==4 then
 		return
 	end
-	if currentWorld==1 then
-		partyLevelItemGen=vars.MM8LVL
-	elseif currentWorld==2 then
-		partyLevelItemGen=vars.MM7LVL
-	elseif currentWorld==3 then
-		partyLevelItemGen=vars.MM6LVL
-	end
+	local partyLevelItemGen=vars.MMLVL[currentWorld]
 
 	--nerf items in shops is strong if low level
 	if Game.freeProgression then
@@ -274,8 +268,8 @@ function events.ItemGenerated(t)
 			if highestChance<1000 then
 				return
 			end
-			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-			reagentLevel=math.floor(partyLevel/25)
+			local partyLevel=getPartyLevel(4)
+			local reagentLevel=math.floor(partyLevel/25)
 			if math.random()<0.05 then
 				reagentLevel=reagentLevel+2
 			elseif math.random()<0.25 then
@@ -293,20 +287,9 @@ function events.ItemGenerated(t)
 		t.Item.Bonus2=0
 		t.Item.BonusStrength=0
 		--calculate party level
-		currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
-		if currentWorld==1 then
-			partyLevel=vars.MM7LVL+vars.MM6LVL
-			currentLevel=vars.MM8LVL
-		elseif currentWorld==2 then
-			partyLevel=vars.MM8LVL+vars.MM6LVL
-			currentLevel=vars.MM7LVL
-		elseif currentWorld==3 then
-			partyLevel=vars.MM8LVL+vars.MM7LVL
-			currentLevel=vars.MM6LVL
-		elseif currentWorld==4 then
-			partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
-			currentLevel=vars.MMMLVL
-		end
+		local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
+		local currentLevel=vars.MMLVL[currentWorld]
+ 		local partyLevel=getPartyLevel()
 		
 		vars.mapResetCount=vars.mapResetCount or {}
 		vars.mapResetCount[Map.Name]=vars.mapResetCount[Map.Name] or 0
@@ -329,7 +312,7 @@ function events.ItemGenerated(t)
 		mapLevel=mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High
 		if Map.Name~="d42.blv" then
 			if not Game.freeProgression then
-				partyLevel=(vars.MM8LVL+vars.MM7LVL+vars.MM6LVL)*0.75
+				partyLevel=getPartyLevel(4)*0.75
 				if mapLevels[name] and mapLevels[name].Low~=0 and Game.HouseScreen~=2 and Game.HouseScreen~=95 then
 					partyLevel=mapLevel
 					mapLevel=0
@@ -2076,7 +2059,7 @@ end
 --[[fix maxcharges if someone is trying to equip on a player
 function events.Action(t)
 	if t.Action==133 and Game.freeProgression then
-		partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+		partyLevel=getPartyLevel(4)
 		maxItemBolster=(partyLevel)/5+20
 		if not Game.freeProgression then
 			maxItemBolster=maxItemBolster+10
@@ -2142,7 +2125,7 @@ slotMap={
 
 
 function events.BuildItemInformationBox(t)
-	--partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL
+	--partyLevel=getPartyLevel()
 	--maxItemBolster=(partyLevel)/5+20
 	--failsafe
 	--if Game.freeProgression and t.Item and t.Item.Charges==0 and t.Item.Bonus==0 and t.Item.Bonus2==0 and t.Item.MaxCharges>maxItemBolster then
@@ -3669,17 +3652,8 @@ function refreshItems()
 		return
 	end
 	
-	currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
-	if currentWorld==1 then
-		currentLevel=vars.MM8LVL
-	elseif currentWorld==2 then
-		currentLevel=vars.MM7LVL
-	elseif currentWorld==3 then
-		currentLevel=vars.MM6LVL
-	elseif currentWorld==4 then
-		currentLevel=vars.MMMLVL
-	end
-	partyLevel=vars.MM8LVL+vars.MM7LVL+vars.MM6LVL-math.min(currentLevel/2, 54)
+	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
+	local partyLevel=getPartyLevel(4)-math.min(vars.MMLVL[currentWorld]/2, 54)
 	--cap
 	difficultyExtraPower=math.max((Game.BolsterAmount-100)/2000+1,1)
 	cap2=14+ math.floor((difficultyExtraPower-1)*10)
