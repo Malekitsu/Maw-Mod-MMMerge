@@ -2152,7 +2152,7 @@ completition=CustomUI.CreateText{
 		Layer 	= 1,
 		Screen 	= 0,
 		AlignLeft = true,
-		Width = 50, Height = 16,
+		Width = 60, Height = 16,
 		X = 500, Y = 377}
 
 function events.LoadMap()
