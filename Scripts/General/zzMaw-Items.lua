@@ -2053,6 +2053,14 @@ end
 ------------------------------------------------------------------
 function events.BeforeNewGameAutosave()
 	vars.hirelingFix=true
+	vars.needToFixMaxCharges=true
+end
+
+function events.BeforeLoadMap(wasInGame)
+	if wasInGame or vars.needToFixMaxCharges == nil then
+		return
+	end
+	vars.needToFixMaxCharges=nil
 	for i=0,Party.High do
 		for j=1, Party[0].Items.High do
 			Party[i].Items[j].MaxCharges=0

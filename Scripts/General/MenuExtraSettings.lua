@@ -259,10 +259,7 @@ function events.GameInitialized2()
 			vars.ChallengeMode=true
 		end
 		if vars.Mode==2 then
-			Party.Gold=5000
-			for i=0,Party.High do
-				Party[i].Experience=Party[i].Experience+10000/Party.Count
-			end
+			vars.DoomPartyNeedInit=true
 		end
 		if vars.Mode==6 then
 			vars.AusterityMode=true
@@ -274,6 +271,18 @@ function events.GameInitialized2()
 			vars.onlineMode=true
 		end
 		]]
+	end
+	function events.BeforeLoadMap(wasInGame)
+		if wasInGame or vars.DoomPartyNeedInit == nil then
+			return
+		end
+		vars.DoomPartyNeedInit = nil
+
+
+		Party.Gold=5000
+		for i=0,Party.High do
+			Party[i].Experience=Party[i].Experience+10000/Party.Count
+		end
 	end
 	function events.Action(t)
 		if t.Action==132 or t.Action==124 then
@@ -327,11 +336,14 @@ function events.GameInitialized2()
 		coroutine.resume(coroutine.create(f), Text)
 	end
 
-	function events.LoadMapScripts(WasInGame)
+	function events.BeforeLoadMap(WasInGame)
 		if not WasInGame then
 			vars.ExtraSettings = vars.ExtraSettings or {}
 			local ExSet = vars.ExtraSettings
 
+			if type(ExSet.Mode) ~= "number" then
+				ExSet.Mode = vars.Mode
+			end
 			ExSet.BolsterAmount = ExSet.BolsterAmount or 100
 			if ExSet.ImprovedPathfinding == nil then
 				ExSet.ImprovedPathfinding = true
