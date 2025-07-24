@@ -166,11 +166,7 @@ function arenaSpawns()
 	local n=3
 	local m=(3-wavesToSpawn)+(waveState-1)/6
 	local percent=math.round(m/n*100)
-	completition.Text=string.format(percent)
-	percentText.Text="%"
-	if completition.Text=="100" then
-		percentText.Text=" %"
-	end
+	completition.Text=string.format(percent) .. "%"
 end
 
 function events.PickCorpse(t)
