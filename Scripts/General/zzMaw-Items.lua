@@ -3657,8 +3657,8 @@ function refreshItems()
 	--cap
 	difficultyExtraPower=math.max((Game.BolsterAmount-100)/2000+1,1)
 	cap2=14+ math.floor((difficultyExtraPower-1)*10)
-
 	--calculate power
+	local currentLevel=vars.MMLVL[currentWorld]
 	strength=math.floor(currentLevel/18)+2
 	strength=math.min(strength,5)
 	partyLevel1=math.min(math.floor(partyLevel/18),cap2)
