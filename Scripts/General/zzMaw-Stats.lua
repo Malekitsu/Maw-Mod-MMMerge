@@ -1439,7 +1439,8 @@ function calcPowerVitality(pl, statsMenu)
 		delay=getSpellDelay(pl,spellIndex) or 100
 		DPS3=round((power*(1+math.min(critChance,1)*(critDamage-1))+enchantDamage)/(delay/60)*math.max(critChance,1))			
 	end
-			
+	
+	buffManaLock()
 	local fullHP=GetMaxHP(pl)
 	local id=pl:GetIndex()
 	for i=0,Party.High do
