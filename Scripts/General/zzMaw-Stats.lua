@@ -1440,7 +1440,21 @@ function calcPowerVitality(pl, statsMenu)
 		DPS3=round((power*(1+math.min(critChance,1)*(critDamage-1))+enchantDamage)/(delay/60)*math.max(critChance,1))			
 	end
 			
-	local fullHP=pl:GetFullHP()
+	local fullHP=GetMaxHP(pl)
+	local id=pl:GetIndex()
+	for i=0,Party.High do
+		if Party[i]:GetIndex()==id then
+			if vars.manaShield[i] then
+				local sp=getMaxMana(pl)
+				local s, m= SplitSkill(Skillz.get(pl, 51))
+				local efficiency=round((1+s^1.4/125*4)*100)/100
+				if s > 50 then 
+					efficiency=round((1+50^1.4/125*4)*100)/100*s/50
+				end
+				fullHP=fullHP+sp*efficiency
+			end
+		end
+	end
 	--AC
 	local ac=pl:GetArmorClass()
 	local acReduction=1-calcMawDamage(pl,4,10000)/10000
