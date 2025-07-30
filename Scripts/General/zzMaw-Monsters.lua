@@ -8,6 +8,8 @@ function bolsteredLevel(floor, levels)
 		return floor + levels
 	end
 	local top = floor + levels
+	--vanilla-curve units on purpose: a calcExp-diffed climb would inflate bolsters
+	--below 100 (the mod's early steps are shallower than vanilla's)
 	local oldExpClimbed = 500*(top*(top-1) - floor*(floor-1))
 	return calcLevel(calcExp(floor) + oldExpClimbed)
 end

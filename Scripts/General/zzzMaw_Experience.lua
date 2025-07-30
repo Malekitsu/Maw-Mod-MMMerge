@@ -4,51 +4,70 @@
 --Everything in the mod that turns experience into a level -- bolster, party level,
 --item level, the engine hooks below -- goes through calcExp / calcLevel, so this is
 --the one place the curve is edited.
-local function expStep(lvl)
-	return 1000*lvl*math.max(1 + (lvl-100)*0.005, 1)
-end
+--Curve: vanilla 500*L*(L-1) through EXP_RAMP_LEVEL, then each step picks up the
+--(1 + (L-EXP_RAMP_LEVEL)*EXP_RAMP) ramp. Both pieces have closed forms, so calcExp and
+--calcLevel are exact (RAMP_OFFSET joins the cubic branch onto vanilla at the branch level).
+do
+	local EXP_RAMP_LEVEL = 100
+	--per-level ramp rate past EXP_RAMP_LEVEL
+	local EXP_RAMP = 0.005
+	--calcLevel's cubic branch needs a nonnegative discriminant: (3L+1)^2*r^2 - 6(5L-1)*r + 9 <= 0, i.e. roughly L*r in [1/3, 3]
+	assert((3*EXP_RAMP_LEVEL+1)*(3*EXP_RAMP_LEVEL+1)*EXP_RAMP*EXP_RAMP - 6*(5*EXP_RAMP_LEVEL-1)*EXP_RAMP + 9 <= 0,
+	  "EXP_RAMP_LEVEL*EXP_RAMP outside ~[1/3,3]: calcLevel would go NaN just past the ramp level")
 
-local MAX_TABLE_LEVEL = 2000
-local expRequired = {[1] = 0}
-for lvl = 2, MAX_TABLE_LEVEL do
-	expRequired[lvl] = expRequired[lvl-1] + expStep(lvl-1)
-end
+	local RC = 500*EXP_RAMP/3
+	local RAMP3 = 3*EXP_RAMP_LEVEL
+	local RAMP3P1 = RAMP3+1
+	--adds back the ramp summed below the branch level, for continuity
+	local RAMP_OFFSET = 500*EXP_RAMP*EXP_RAMP_LEVEL*(EXP_RAMP_LEVEL*EXP_RAMP_LEVEL-1)/3
 
-function calcLevel(x)
-	if x <= 0 then
-		return 1
-	end
-	local top = expRequired[MAX_TABLE_LEVEL]
-	if x >= top then --past the table: extrapolate with the last step
-		return MAX_TABLE_LEVEL + (x - top)/expStep(MAX_TABLE_LEVEL)
-	end
-	local lo, hi = 1, MAX_TABLE_LEVEL --binary search: biggest lo with expRequired[lo] <= x
-	while hi - lo > 1 do
-		local mid = math.floor((lo + hi)/2)
-		if expRequired[mid] <= x then
-			lo = mid
-		else
-			hi = mid
+	function calcExp(lvl)
+		if lvl <= 1 then
+			return 0
 		end
+		local vanilla = 500*lvl*(lvl-1)
+		if lvl <= EXP_RAMP_LEVEL then
+			return vanilla
+		end
+		--vanilla plus sum_{k=EXP_RAMP_LEVEL+1}^{lvl-1} EXP_RAMP*1000*k*(k-EXP_RAMP_LEVEL)
+		return vanilla + EXP_RAMP*vanilla*(2*lvl-RAMP3P1)/3 + RAMP_OFFSET
 	end
-	return lo + (x - expRequired[lo])/expStep(lo)
-end
-function calcExp(lvl)
-	if lvl <= 1 then
-		return 0
+
+	--calcLevel solves calcExp(L) = x: quadratic inverse below VANILLA_TOP, depressed cubic
+	--above; coefficients derived from the constants so the pair cannot desync.
+	local A = 2*RC
+	local B = 500-(RAMP3+3)*RC
+	local C = -500+RAMP3P1*RC
+	local CUBIC_SHIFT = B/(3*A)
+	local COA = C/A
+	local CUBIC_P = COA - B*B/(3*A*A)
+	local VANILLA_TOP = calcExp(EXP_RAMP_LEVEL)
+	--the x-independent parts of the depressed-cubic solve, hoisted out of calcLevel
+	local M = B/A
+	local Q_BASE = 2*M*M*M/27 - M*COA/3
+	local NEG_C3_27 = -CUBIC_P*CUBIC_P*CUBIC_P/27
+
+	function calcLevel(x)
+		if x <= 0 then
+			return 1
+		end
+		if x <= VANILLA_TOP then
+			return (1 + math.sqrt(1 + x/125))/2
+		end
+		local u = ((x-RAMP_OFFSET)/A - Q_BASE)/2
+		--nonnegative discriminant: guarded by the assert above
+		local d = math.sqrt(u*u - NEG_C3_27)
+		local s = u+d
+		--(NEG_C3_27/s) == u-d: the quotient avoids cancellation at big x
+		return s^(1/3) + (NEG_C3_27/s)^(1/3) - CUBIC_SHIFT
 	end
-	if lvl >= MAX_TABLE_LEVEL then
-		return expRequired[MAX_TABLE_LEVEL] + (lvl - MAX_TABLE_LEVEL)*expStep(MAX_TABLE_LEVEL)
-	end
-	local base = math.floor(lvl)
-	return expRequired[base] + (lvl - base)*expStep(base)
 end
 
 ----------------------------------------------------
 --Engine level-up check
 ----------------------------------------------------
 --The engine holds its own hardcoded copy of the curve (vanilla 500*L*(L-1)), which the
---table above stops matching past level 100. These hooks make it ask calcExp instead, so
+--curve above stops matching past level 100. These hooks make it ask calcExp instead, so
 --the trainer and the mod agree on one curve.
 --
 --Two engine sites hold the formula:
