@@ -1886,7 +1886,7 @@ end
 --ASSASSIN--
 ------------
 
-assassinClass={const.Class.Thief,const.Class.Rogue,const.Class.Assassin}
+assassinClass={const.Class.Thief,const.Class.Rogue,const.Class.Assassin,const.Class.Spy}
 
 function events.GameInitialized2()
 	baseSchoolsTxtAssassin={}
