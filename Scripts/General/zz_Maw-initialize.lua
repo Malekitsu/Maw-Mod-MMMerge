@@ -1,15 +1,38 @@
 --MAW SETTING HERE
-autoTargetHeals=true
+
+--makes your healing spells to automatically target with lowest % HP
+autoTargetHeals=true 
+
+--stats menu has more colours
 ColouredStats=true
+
+--a charge ability usable by knights only when SOLO (default is "E")
 chargeKey=69
+
+--quickly consumes a red potion from your current inventory (default is "G")
 healthPotionKey=71
+
+--quickly consumes a blue potion from your current inventory (default is "V")
 manaPotionKey=86
-Game.PatchOptions.FixMonstersBlockingShots=true
+
+--normally loot enchants ranges from 2 to 3 per enchant tier (so for example tier 20 goes between 40 and 60). Leaving this on will make enchants go between 1 to 100, making you find the strongest possible items in the game.
 higherLootPowerRange=true
+
+--useful for a melee only challenge
 disableBow=false
+
+--you can find regeneration, unarmed and all the trainers that weren't previously available in all continents in some houses
 enableAllTrainers=true
+
+--in insanity only, taking too much damage disintegrates your character (you can still get them back at the Adventurer's Inn)
 enableDisintegrate=true
+
+--recommended to set this on for online play. Making this on will disable the message that informs you when monsters are no longer resurrecting and when you complete the dungeon. You still get the reward.
 disableCompletitionMessage=false
+
+--needed to fix some weird bug, don't touch this
+Game.PatchOptions.FixMonstersBlockingShots=true
+
 
 --sorting buttons
 currentBagSortKey=82
