@@ -866,7 +866,7 @@ function events.PickCorpse(t)
 	--calculate gold
 	mon=t.Monster
 	--calculate bolster
-	lvl=BLevel[mon.Id]
+	lvl=BLevel[mon.Id] or mon.Level
 	gold=mon.TreasureDiceCount*(mon.TreasureDiceSides+1)/2
 	newGold=(bolsterLevel2+lvl)*7.5
 	local tier=2
