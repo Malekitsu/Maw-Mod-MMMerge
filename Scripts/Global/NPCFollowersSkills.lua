@@ -187,7 +187,7 @@ end
 local GoldFindBonuses = {}
 local function CountGoldBonus()
 	local res = 0
-	if not vars.NPCFollowers then return end
+	vars.NPCFollowers=vars.NPCFollowers or {}
 	for k,v in pairs(vars.NPCFollowers) do
 		local Bonus = GoldFindBonuses[Game.NPC[v].Profession]
 		if Bonus then
