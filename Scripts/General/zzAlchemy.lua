@@ -657,7 +657,7 @@ function events.BuildItemInformationBox(t)
 			
 			
 			t.Description = "A special Gem that allows to increase an item Enchant Strength (right-click on an item with a base enchant to use)\nAncient, Primordial and Legendary items have increased Max power.\n\nMax Power: " 
-			.. StrColor(255, 128, 0, tostring(round(tier * 6))) .. " (65% on AC)"
+			.. StrColor(255, 128, 0, tostring(round(tier * 6))) --.. " (65% on AC)"
 			.. "\nBonus: " .. StrColor(255, 128, 0, tostring(power)) 
 			.. "\n\nItem Modifier:\nTwo Handed Weapons: " .. StrColor(255, 128, 0, twoHanded)
 			.. "\nBody Armor: " .. StrColor(255, 128, 0, bodyArmor)
@@ -713,10 +713,10 @@ local function upgradeGem(it, tier)
 		end
 		--AC
 		if it.Bonus==10 then
-			maxValue1=math.floor(maxValue1*0.667)
+			--maxValue1=math.floor(maxValue1*0.667)
 		end
 		if bonus2==10 then
-			maxValue2=math.floor(maxValue2*0.667)
+			--maxValue2=math.floor(maxValue2*0.667)
 		end
 	end
 	--skills
