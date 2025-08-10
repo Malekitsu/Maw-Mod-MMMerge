@@ -2563,7 +2563,7 @@ function itemStats(index)
 				if (it.Bonus==8 or it.Bonus==9) then
 					power=round(power*(2+power/50))
 				elseif it.Bonus==10 then
-					power=round(power*0.667)
+					--power=round(power*0.667)
 				end
 			end
 			--[[
@@ -2615,7 +2615,7 @@ function itemStats(index)
 				if (bonus==8 or bonus==9) then
 					power=round(power*(2+power/50))
 				elseif bonus==10 then
-					power=round(power*0.667)
+					--power=round(power*0.667)
 				end
 			end
 			--[[
