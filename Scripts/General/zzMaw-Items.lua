@@ -281,11 +281,12 @@ function events.ItemGenerated(t)
 	end
 	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) or reagentList[t.Item.Number] then
 		t.Handled=true
+		local it=t.Item
 		--reset enchants
-		t.Item.BonusExpireTime=0
-		t.Item.Bonus=0
-		t.Item.Bonus2=0
-		t.Item.BonusStrength=0
+		it.BonusExpireTime=0
+		it.Bonus=0
+		it.Bonus2=0
+		it.BonusStrength=0
 		--calculate party level
 		local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 		local currentLevel=vars.MMLVL[currentWorld]
@@ -337,8 +338,8 @@ function events.ItemGenerated(t)
 		if vars.AusterityMode then
 			itmod=8
 		end
-		if reagentList[t.Item.Number] then
-			t.Item.Bonus=round(partyLevel/itmod)
+		if reagentList[it.Number] then
+			it.Bonus=round(partyLevel/itmod)
 			return
 		end
 		
@@ -367,9 +368,9 @@ function events.ItemGenerated(t)
 		--nerf
 		cap1=cap1/2
 		maxChargesCap=maxChargesCap/2
-		t.Item.MaxCharges=math.floor(partyLevel/10+mapLevel/80)
+		it.MaxCharges=math.floor(partyLevel/10+mapLevel/80)
 		--bolster boost
-		t.Item.MaxCharges=math.min(math.floor(t.Item.MaxCharges*difficultyExtraPower+bonusCharges),cap1)
+		it.MaxCharges=math.min(math.floor(it.MaxCharges*difficultyExtraPower+bonusCharges),cap1)
 		
 		bonusCap=math.floor((difficultyExtraPower-1)*10)
 		if mapvars.mapAffixes then
@@ -423,39 +424,39 @@ function events.ItemGenerated(t)
 		p3=p3^(1/diffMult)
 		
 		if p1>roll1 then
-			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
+			it.Bonus=math.random(1,16)
+			it.BonusStrength=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
 			--bolster
-			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*difficultyExtraPower)
+			it.BonusStrength=math.ceil(it.BonusStrength*difficultyExtraPower)
 			if math.random(1,10)==10 then
-				t.Item.Bonus=math.random(17,24)
-				local skill=t.Item:T().Skill
-				if (skill==10 or skill==11) and t.Item.Bonus==23 then
-					t.Item.Bonus=22
-				elseif (skill<=7 and skill>0) and t.Item.Bonus==24 then
-					t.Item.Bonus=22
+				it.Bonus=math.random(17,24)
+				local skill=it:T().Skill
+				if (skill==10 or skill==11) and it.Bonus==23 then
+					it.Bonus=22
+				elseif (skill<=7 and skill>0) and it.Bonus==24 then
+					it.Bonus=22
 				end
 			end
 		end
 		--apply enchant2
 		if p2>roll2 then
-			t.Item.Charges=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
+			it.Charges=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
 			--bolster
-			t.Item.Charges=math.ceil(t.Item.Charges*difficultyExtraPower)
+			it.Charges=math.ceil(it.Charges*difficultyExtraPower)
 			--bonus type
-			t.Item.Charges=t.Item.Charges+math.random(1,16)*1000
+			it.Charges=it.Charges+math.random(1,16)*1000
 			--[[ no skill bonuses
 			if math.random(1,10)==10 then
-				t.Item.Charges=math.random(17,24)*1000
-				t.Item.Charges=t.Item.Charges+round(math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])^0.5)
+				it.Charges=math.random(17,24)*1000
+				it.Charges=it.Charges+round(math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])^0.5)
 			end
 			]]
 		end
 		--make it standard bonus if no standard bonus
-		if t.Item.Bonus==0 then
-			t.Item.Bonus=math.floor(t.Item.Charges/1000)
-			t.Item.BonusStrength=t.Item.Charges%1000
-			t.Item.Charges=0
+		if it.Bonus==0 then
+			it.Bonus=math.floor(it.Charges/1000)
+			it.BonusStrength=it.Charges%1000
+			it.Charges=0
 		end
 				
 		--ancient item
@@ -479,20 +480,20 @@ function events.ItemGenerated(t)
 		ancientRoll=math.random()
 		if ancientRoll<=ancientChance or OmnipotentLoot then
 			ancient=true
-			t.Item.Charges=math.random(round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2, encStrUp[pseudoStr]+10)))
-			t.Item.Charges=math.ceil(t.Item.Charges*difficultyExtraPower) --bolster
-			t.Item.Charges=t.Item.Charges+math.random(1,16)*1000
-			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.random(round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10))
-			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*difficultyExtraPower) --bolster
+			it.Charges=math.random(round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2, encStrUp[pseudoStr]+10)))
+			it.Charges=math.ceil(it.Charges*difficultyExtraPower) --bolster
+			it.Charges=it.Charges+math.random(1,16)*1000
+			it.Bonus=math.random(1,16)
+			it.BonusStrength=math.random(round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10))
+			it.BonusStrength=math.ceil(it.BonusStrength*difficultyExtraPower) --bolster
 			power=2
 			chargesBonus=math.random(1,5)
-			t.Item.MaxCharges=t.Item.MaxCharges+chargesBonus
-			t.Item.BonusExpireTime=1
+			it.MaxCharges=it.MaxCharges+chargesBonus
+			it.BonusExpireTime=1
 		end
 		--apply special enchant
 		if p3>rollSpc or ancient then
-			n=t.Item.Number
+			n=it.Number
 			c=Game.ItemsTxt[n].EquipStat
 			if c<12 then
 				power=ps1+power
@@ -502,7 +503,7 @@ function events.ItemGenerated(t)
 				tot=0
 				for i=0,Game.SpcItemsTxt.High do
 					if roll<=tot then
-						t.Item.Bonus2=i
+						it.Bonus2=i
 						goto continue
 					elseif table.find(enchants[power], Game.SpcItemsTxt[i].Lvl) then
 						tot=tot+Game.SpcItemsTxt[i].ChanceForSlot[c]
@@ -519,30 +520,30 @@ function events.ItemGenerated(t)
 		primordialChance=ancientChance/4^(1/diffMult^0.5)
 		if primordial<=primordialChance or OmnipotentLoot then
 			if ancient then
-				t.Item.MaxCharges=t.Item.MaxCharges-chargesBonus
+				it.MaxCharges=it.MaxCharges-chargesBonus
 			end
-			t.Item.BonusExpireTime=2
-			t.Item.Charges=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
-			t.Item.Charges=math.ceil(t.Item.Charges*difficultyExtraPower) --bolster
-			t.Item.Charges=round(t.Item.Charges+math.random(1,16)*1000)
-			t.Item.Bonus=math.random(1,16)
-			t.Item.BonusStrength=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
-			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*difficultyExtraPower) --bolster
-			t.Item.MaxCharges=math.min(maxChargesCap,math.min(t.Item.MaxCharges+5, t.Item.MaxCharges*1.25), t.Item.MaxCharges+10)
+			it.BonusExpireTime=2
+			it.Charges=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
+			it.Charges=math.ceil(it.Charges*difficultyExtraPower) --bolster
+			it.Charges=round(it.Charges+math.random(1,16)*1000)
+			it.Bonus=math.random(1,16)
+			it.BonusStrength=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
+			it.BonusStrength=math.ceil(it.BonusStrength*difficultyExtraPower) --bolster
+			it.MaxCharges=math.min(maxChargesCap,math.min(it.MaxCharges+5, it.MaxCharges*1.25), it.MaxCharges+10)
 			--apply special enchant
-			n=t.Item.Number
+			n=it.Number
 			c=Game.ItemsTxt[n].EquipStat
 			if c<=2 then
 				roll=math.random(1,#primordialWeapEnchants)
-				t.Item.Bonus2=primordialWeapEnchants[roll]
+				it.Bonus2=primordialWeapEnchants[roll]
 			else
 				roll=math.random(1,#primordialArmorEnchants)
-				t.Item.Bonus2=primordialArmorEnchants[roll]
+				it.Bonus2=primordialArmorEnchants[roll]
 			end
 		end			
 		
 		--legendary
-		if t.Item.BonusExpireTime==2 then
+		if it.BonusExpireTime==2 then
 			local chance=0.1
 			if vars.AusterityMode then
 				chance=0
@@ -565,133 +566,139 @@ function events.ItemGenerated(t)
 				end
 				legendaryAffix=get_affix(vars.legendaryAffixDropped)
 				vars.legendaryAffixDropped[legendaryAffix]=vars.legendaryAffixDropped[legendaryAffix]+1
-				t.Item.BonusExpireTime=legendaryAffix+10
+				it.BonusExpireTime=legendaryAffix+10
 				--adjust bonus 2 if enchant damage legendary
-				if t.Item.BonusExpireTime==19 then
-					if t.Item.Bonus2==40 then
-						t.Item.Bonus2=39
-					elseif t.Item.Bonus2==41 then
-						t.Item.Bonus2=46
+				if it.BonusExpireTime==19 then
+					if it.Bonus2==40 then
+						it.Bonus2=39
+					elseif it.Bonus2==41 then
+						it.Bonus2=46
 					end
 				end
 				local relevantStats={1,2,3,4,5,6,7,8,10}
-				t.Item.MaxCharges=round(math.min(maxChargesCap,t.Item.MaxCharges*1.2,t.Item.MaxCharges+10))
+				it.MaxCharges=round(math.min(maxChargesCap,it.MaxCharges*1.2,it.MaxCharges+10))
 				local roll=math.random(1,3)
 				if roll==1 then
 					local stats={1, 5, 6, 7}
-					t.Item.Bonus=stats[math.random(1,4)]
-					t.Item.Charges=t.Item.Charges%1000+stats[math.random(1,4)]*1000
+					it.Bonus=stats[math.random(1,4)]
+					it.Charges=it.Charges%1000+stats[math.random(1,4)]*1000
 				elseif roll==2 then
 					local stats={4, 6, 8, 10}
-					t.Item.Bonus=stats[math.random(1,4)]
-					t.Item.Charges=t.Item.Charges%1000+stats[math.random(1,4)]*1000
+					it.Bonus=stats[math.random(1,4)]
+					it.Charges=it.Charges%1000+stats[math.random(1,4)]*1000
 				elseif roll==3 then
 					local stats={2, 3, 4, 6, 7}
-					t.Item.Bonus=stats[math.random(1,5)]
-					t.Item.Charges=t.Item.Charges%1000+stats[math.random(1,5)]*1000
-					if (t.Item.Bonus==2 and math.floor(t.Item.Charges/1000)==3) or (t.Item.Bonus==2 and math.floor(t.Item.Charges/1000)==3) then
-						t.Item.Bonus=math.floor(t.Item.Charges/1000)
+					it.Bonus=stats[math.random(1,5)]
+					it.Charges=it.Charges%1000+stats[math.random(1,5)]*1000
+					if (it.Bonus==2 and math.floor(it.Charges/1000)==3) or (it.Bonus==2 and math.floor(it.Charges/1000)==3) then
+						it.Bonus=math.floor(it.Charges/1000)
 					end
 				end
 				--increase stats
-				t.Item.Charges=math.min(math.ceil(math.min(t.Item.Charges%1000*0.2,999)+t.Item.Charges), t.Item.Charges+10)
-				t.Item.BonusStrength=math.min(math.ceil(t.Item.BonusStrength*1.2),t.Item.BonusStrength+10)
+				it.Charges=math.min(math.ceil(math.min(it.Charges%1000*0.2,999)+it.Charges), it.Charges+10)
+				it.BonusStrength=math.min(math.ceil(it.BonusStrength*1.2),it.BonusStrength+10)
+			end
+		end
+		
+		if it.BonusExpireTime>10 and it.BonusExpireTime<100 then
+			if math.random()<0.1 then
+				it.BonusExpireTime=it.BonusExpireTime+100
 			end
 		end
 		OmnipotentLoot=false
 		--buff to hp and mana items
 		if vars and not vars.itemStatsFix then
-			if t.Item.Bonus==8 or t.Item.Bonus==9 then
-				t.Item.BonusStrength=t.Item.BonusStrength*(2+t.Item.BonusStrength/50)
+			if it.Bonus==8 or it.Bonus==9 then
+				it.BonusStrength=it.BonusStrength*(2+it.BonusStrength/50)
 			end
-			if math.floor(t.Item.Charges/1000)==8 or math.floor(t.Item.Charges/1000)==9 then
-				local power=t.Item.Charges%1000
+			if math.floor(it.Charges/1000)==8 or math.floor(it.Charges/1000)==9 then
+				local power=it.Charges%1000
 				power=power*(2+power/50) --cap is 999
-				if power >= 999 and t.Item.Bonus<17 then --swap base with charges
-					local bonus=t.Item.Bonus
-					local str=t.Item.BonusStrength
-					t.Item.Bonus=math.floor(t.Item.Charges/1000)
-					t.Item.BonusStrength=power
-					t.Item.Charges= bonus*1000+str
+				if power >= 999 and it.Bonus<17 then --swap base with charges
+					local bonus=it.Bonus
+					local str=it.BonusStrength
+					it.Bonus=math.floor(it.Charges/1000)
+					it.BonusStrength=power
+					it.Charges= bonus*1000+str
 				else 
-					t.Item.Charges=math.floor(t.Item.Charges/1000)*1000+power
+					it.Charges=math.floor(it.Charges/1000)*1000+power
 				end
 			end
 			--nerf to AC
-			if t.Item.Bonus==10 then
-				t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*0.667)
+			if it.Bonus==10 then
+				it.BonusStrength=math.ceil(it.BonusStrength*0.667)
 			end
-			if math.floor(t.Item.Charges/1000)==10 then
-				t.Item.Charges=t.Item.Charges-math.floor(t.Item.Charges%1000*0.333)
+			if math.floor(it.Charges/1000)==10 then
+				it.Charges=it.Charges-math.floor(it.Charges%1000*0.333)
 			end
 		end
 		
 		--nerf to skills
-		if t.Item.Bonus>=17 and t.Item.Bonus<=24 then
-			t.Item.BonusStrength=math.ceil(math.max(t.Item.BonusStrength^0.5,t.Item.BonusStrength/10))
+		if it.Bonus>=17 and it.Bonus<=24 then
+			it.BonusStrength=math.ceil(math.max(it.BonusStrength^0.5,it.BonusStrength/10))
 		end
 		-- buff to 2h weapons enchants
-		local mult=slotMult[t.Item:T().EquipStat]
+		local mult=slotMult[it:T().EquipStat]
 		if mult then
-			t.Item.BonusStrength=math.ceil(t.Item.BonusStrength*mult)
-			local bonus=math.ceil(t.Item.Charges%1000*(mult-1))
-			bonus=t.Item.Charges%1000
+			it.BonusStrength=math.ceil(it.BonusStrength*mult)
+			local bonus=math.ceil(it.Charges%1000*(mult-1))
+			bonus=it.Charges%1000
 			bonus=math.min(bonus*mult,999) --cap is 999
-			t.Item.Charges=math.floor(t.Item.Charges/1000)*1000+bonus
+			it.Charges=math.floor(it.Charges/1000)*1000+bonus
 		end
 		--check if int/pers or might/accuracy item to change special enchant
 		local melee=0
 		local caster=0
-		if t.Item.Bonus2==39 or t.Item.Bonus2==40 or t.Item.Bonus2==41 or t.Item.Bonus2==46 then
-			if t.Item.Bonus==1 or t.Item.Bonus==5 then
+		if it.Bonus2==39 or it.Bonus2==40 or it.Bonus2==41 or it.Bonus2==46 then
+			if it.Bonus==1 or it.Bonus==5 then
 				melee=melee+1
-			elseif t.Item.Bonus==2 or t.Item.Bonus==3 then
+			elseif it.Bonus==2 or it.Bonus==3 then
 				caster=caster+1
 			end
-			local bonus=math.floor(t.Item.Charges/1000)
+			local bonus=math.floor(it.Charges/1000)
 			if bonus==1 or bonus==5 then
 				melee=melee+1
 			elseif bonus==2 or bonus==3 then
 				caster=caster+1
 			end
 			if melee>caster then
-				if t.Item.Bonus2==39 then
-					t.Item.Bonus2=46
-				elseif t.Item.Bonus2==40 then
-					t.Item.Bonus2=41
+				if it.Bonus2==39 then
+					it.Bonus2=46
+				elseif it.Bonus2==40 then
+					it.Bonus2=41
 				end
 			elseif caster>melee then
-				if t.Item.Bonus2==46 then
-					t.Item.Bonus2=39
-				elseif t.Item.Bonus2==41 then
-					t.Item.Bonus2=40
+				if it.Bonus2==46 then
+					it.Bonus2=39
+				elseif it.Bonus2==41 then
+					it.Bonus2=40
 				end
 			end
 		end
-		if math.abs(t.Item.Charges%1000-t.Item.BonusStrength)<=1 then
-			t.Item.Charges=math.floor(t.Item.Charges/1000)*1000+t.Item.BonusStrength
+		if math.abs(it.Charges%1000-it.BonusStrength)<=1 then
+			it.Charges=math.floor(it.Charges/1000)*1000+it.BonusStrength
 		end
 		
 		--maxcharges Cap
-		t.Item.MaxCharges=math.min(maxChargesCap, t.Item.MaxCharges)
+		it.MaxCharges=math.min(maxChargesCap, it.MaxCharges)
 		
 		--reduce chances for resistances
-		if t.Item.Bonus>=11 and t.Item.Bonus<=16 then
+		if it.Bonus>=11 and it.Bonus<=16 then
 			if math.random()<0.4 then
-				t.Item.Bonus=math.random(1,7)
+				it.Bonus=math.random(1,7)
 			end
 		end
-		if math.floor(t.Item.Charges/1000)>=11 and math.floor(t.Item.Charges/1000)<=16 then
+		if math.floor(it.Charges/1000)>=11 and math.floor(it.Charges/1000)<=16 then
 			if math.random()<0.4 then
-				t.Item.Charges=t.Item.Charges-math.floor(t.Item.Charges/1000)*1000+math.random(1,7)*1000
+				it.Charges=it.Charges-math.floor(it.Charges/1000)*1000+math.random(1,7)*1000
 			end
 		end
 		
 		--fix to resistances not to rolled be twice
-		local bonus2=math.floor(t.Item.Charges/1000)
-		if t.Item.Bonus>=11 and t.Item.Bonus<=16 then
-			while t.Item.Bonus>0 and t.Item.Bonus==bonus2 do
-				t.Item.Bonus=math.random(11,16)
+		local bonus2=math.floor(it.Charges/1000)
+		if it.Bonus>=11 and it.Bonus<=16 then
+			while it.Bonus>0 and it.Bonus==bonus2 do
+				it.Bonus=math.random(11,16)
 			end
 		end
 		
@@ -699,29 +706,29 @@ function events.ItemGenerated(t)
 		ancientDrops=ancientDrops or 0
 		primordialDrops=primordialDrops or 0
 		legendaryDrops=legendaryDrops or 0
-		if t.Item.BonusExpireTime==1 then
+		if it.BonusExpireTime==1 then
 			ancientDrops=ancientDrops+1
-		elseif t.Item.BonusExpireTime==2 then
+		elseif it.BonusExpireTime==2 then
 			primordialDrops=primordialDrops+1
-		elseif t.Item.BonusExpireTime>=10 and t.Item.BonusExpireTime<=30 then
+		elseif it.BonusExpireTime>=10 and it.BonusExpireTime<=30 then
 			legendaryDrops=legendaryDrops+1
 		end
 		]]
 		local itemPower=1
-		if t.Item.Bonus>0 then
+		if it.Bonus>0 then
 			itemPower=itemPower+1
 		end
-		if t.Item.Bonus2>0 then
+		if it.Bonus2>0 then
 			itemPower=itemPower+1
 		end
-		if t.Item.Charges>1000 then
+		if it.Charges>1000 then
 			itemPower=itemPower+1
 		end
-		if t.Item.BonusExpireTime==1 then
+		if it.BonusExpireTime==1 then
 			itemPower=5
-		elseif t.Item.BonusExpireTime==2 then
+		elseif it.BonusExpireTime==2 then
 			itemPower=6
-		elseif t.Item.BonusExpireTime>10 and t.Item.BonusExpireTime<100 then
+		elseif it.BonusExpireTime>10 and it.BonusExpireTime<100 then
 			itemPower=7
 		end
 		
@@ -732,12 +739,12 @@ function events.ItemGenerated(t)
 
 		local tierList={"Common", "Uncom.", "Rare", "Epic", "Ancient", "Primordial", "Legendary", [0]="OFF"}
 		local filterPower=table.find(tierList, filter)
-		local itemID=t.Item.Number
+		local itemID=it.Number
 		if itemPower<=filterPower then
 			if lootFromMonster then
 				lootFromMonster=false
-				local itemGold=getItemValue(t.Item, true)
-				t.Item.Number=0
+				local itemGold=getItemValue(it, true)
+				it.Number=0
 				function events.Tick()
 					events.Remove("Tick",1)
 					goldGained=Party.Gold-goldBeforeLoot
@@ -748,18 +755,21 @@ function events.ItemGenerated(t)
 		end
 		if higherLootPowerRange then
 			local minValue=0
-			local itemType=t.Item.BonusExpireTime
+			local itemType=it.BonusExpireTime
 			if itemType==1 then
 				minValue=0.3
 			elseif itemType==2 then
 				minValue=0.3
 			elseif itemType>=10 and itemType<100 then
 				minValue=0.3
+			elseif itemType>=100 and itemType<200 then
+				it.MaxCharges=math.min(it.MaxCharges*1.5,255)
+				return
 			end
 			
-			t.Item.BonusStrength=math.random(1+t.Item.BonusStrength*minValue,t.Item.BonusStrength)
-			t.Item.MaxCharges=math.min(math.random(1+t.Item.MaxCharges*minValue,t.Item.MaxCharges*1.5),255)
-			t.Item.Charges=t.Item.Charges-t.Item.Charges%1000+math.random(1+t.Item.Charges%1000*minValue,t.Item.Charges%1000)
+			it.BonusStrength=math.random(1+it.BonusStrength*minValue,it.BonusStrength)
+			it.MaxCharges=math.min(math.random(1+it.MaxCharges*minValue,it.MaxCharges*1.5),255)
+			it.Charges=it.Charges-it.Charges%1000+math.random(1+it.Charges%1000*minValue,it.Charges%1000)
 		end
 	end
 end
@@ -1012,10 +1022,43 @@ legendaryEffects={
 	[32]="Buffs reserve Hit Points instead of Mana and Hit Point coefficient is used instead.\nEnlightenment bonus still apply.",
 }
 
+function updateCelestialItem(it,pl)
+	if it.BonusExpireTime>=100 and it.BonusExpireTime<200 then
+		if not pl then
+			local id=Game.CurrentPlayer
+			if id<0 or id>Party.High then
+				id=0
+			end
+			pl=Party[id]
+		end
+		local lvl=pl.LevelBase
+		local tier=math.min(pl.LevelBase/20+6,50)
+		local mult=4
+		if vars.Mode==2 then
+			mult=6
+		end
+		if vars.insanityMode then
+			mult=8
+		end
+		if it.Bonus>0 and it.BonusStrength>0 then
+			it.BonusStrength=math.round(tier*mult)
+		end
+		if it.Charges>1000 then
+			it.Charges=math.floor(it.Charges/1000)*1000+math.min(math.round(tier*mult),999)
+		end
+		it.MaxCharges=math.min(math.round(tier*mult/2),200)
+	end
+end
+
 function events.BuildItemInformationBox(t)
 	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then 
+
+		local it=t.Item
 		if t.Type then
 			t.Type = t.Type
+			
+			updateCelestialItem(it)
+			
 			--add code to increase base stats based on bolster enchant
 			--ARMORS
 			if t.Item.MaxCharges>0 then
@@ -1090,7 +1133,7 @@ function events.BuildItemInformationBox(t)
 				if t.Item:T().EquipStat==5 and t.Item:T().Mod2==0 then
 					power=math.ceil(power*1.5)
 				end
-				if t.Item.BonusExpireTime==20 then
+				if t.Item.BonusExpireTime%100==20 then
 					power=math.ceil(power*1.5)
 				end
 				if t.Item.Bonus>=11 and t.Item.Bonus<=16 then
@@ -1118,7 +1161,7 @@ function events.BuildItemInformationBox(t)
 				if t.Item:T().EquipStat==5 and t.Item:T().Mod2==0 then
 					strength=math.ceil(strength*1.5)
 				end				
-				if t.Item.BonusExpireTime==20 then
+				if t.Item.BonusExpireTime%100==20 then
 					strength=math.ceil(strength*1.5)
 				end
 				if bonus>=11 and bonus<=16 then
@@ -1206,6 +1249,8 @@ function events.BuildItemInformationBox(t)
 				t.Name=StrColor(255,128,0,"Ancient " .. t.Name)
 			elseif t.Item.BonusExpireTime==2 then
 				t.Name=StrColor(255,0,0,"Primordial " .. t.Name)
+			elseif t.Item.BonusExpireTime>=100 and t.Item.BonusExpireTime<=200 then
+				t.Name=StrColor(120, 240, 255,"Celestial " .. t.Name)
 			elseif legendaryEffects[t.Item.BonusExpireTime] then
 				t.Name=StrColor(255,255,30,"Legendary " .. t.Name)
 			elseif bonus==3 then
@@ -1218,9 +1263,9 @@ function events.BuildItemInformationBox(t)
 				t.Name=StrColor(255,255,255,t.Name)
 			end
 		elseif t.Description then
-			if legendaryEffects[t.Item.BonusExpireTime]then
-				local legText=legendaryEffects[t.Item.BonusExpireTime]
-				if t.Item.BonusExpireTime==21 then
+			if legendaryEffects[t.Item.BonusExpireTime%100]then
+				local legText=legendaryEffects[t.Item.BonusExpireTime%100]
+				if t.Item.BonusExpireTime%100==21 then
 					local count=0
 					for i=0, Map.Monsters.High do
 						if Map.Monsters[i].Active then
@@ -1232,7 +1277,7 @@ function events.BuildItemInformationBox(t)
 					end
 					local dmg=count*5
 					legText=legText .. "\nCurrent bonus Damage: " .. dmg .. "%"
-				elseif t.Item.BonusExpireTime==22 then
+				elseif t.Item.BonusExpireTime%100==22 then
 					local count=0
 					for i=0, Map.Monsters.High do
 						if Map.Monsters[i].Active then
@@ -2241,6 +2286,9 @@ function events.BuildItemInformationBox(t)
 			if plLvl<levelRequired then
 				txt=StrColor(255,0,0,txt)
 			end
+			if t.Item.BonusExpireTime>100 and t.Item.BonusExpireTime<200 then
+				txt=StrColor(120, 240, 255,"\n\nCelestial Items cannot be upgraded with crafting Gems or Cubes, but scale with player level, up to level 600.")
+			end
 			t.Description = t.Description .. txt
 			
 		end	
@@ -2457,11 +2505,12 @@ function itemStats(index)
 	vars.legendaries[index]={}
 	for it in pl:EnumActiveItems() do
 		if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
-			table.insert(vars.legendaries[index], it.BonusExpireTime)
+			table.insert(vars.legendaries[index], it.BonusExpireTime%100)
 		end
 	end
 	--iterate items and get bonuses
 	for it in pl:EnumActiveItems() do
+		updateCelestialItem(it,pl)
 		--maxcharges fix for moon cloak
 		if it.Number==1349 or it.Number==1350 then
 			it.MaxCharges=0
@@ -2522,7 +2571,7 @@ function itemStats(index)
 				power=math.ceil(power*4/3)
 			end
 			]]
-			if it.BonusExpireTime==20 then
+			if it.BonusExpireTime%100==20 then
 				power=math.ceil(power*1.5)
 			end
 			if it:T().EquipStat==5 and it:T().Mod2==0 then
@@ -2574,7 +2623,7 @@ function itemStats(index)
 				power=math.ceil(power*4/3)
 			end
 			]]
-			if it.BonusExpireTime==20 then
+			if it.BonusExpireTime%100==20 then
 				power=math.ceil(power*1.5)
 			end
 			if it:T().EquipStat==5 and it:T().Mod2==0 then
@@ -4100,7 +4149,9 @@ function GetLevelRquirement(it)
 	if itemType>11 then
 		return 0 
 	end
-	
+	if it.BonusExpireTime>=100 and it.BonusExpireTime<=200 then
+		return 1
+	end
 	local difficultyExtraPower=1
 	if Game.BolsterAmount>100 then
 		difficultyExtraPower=(Game.BolsterAmount-100)/2000+1
