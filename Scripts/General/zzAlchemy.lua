@@ -761,7 +761,7 @@ end
 for i=1,10 do
 	evt.PotionEffects[70+i] = function(IsDrunk, t, Power)
 		if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then			
-			if craftWaitTime>0 then return end
+			if craftWaitTime>0 or t.BonusExpireTime>100 then return end
 			local tier=(Mouse.Item.Number-1050)
 			if Mouse.Item.BonusStrength==1 then
 				tier=tier+10
@@ -850,6 +850,7 @@ end
 
 evt.PotionEffects[83] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+		if t.BonusExpireTime>=100 and t.BonusExpireTime<200 then return end
 		local difficultyExtraPower=1
 		if Game.BolsterAmount>100 then
 			difficultyExtraPower=(Game.BolsterAmount-100)/2000+1
@@ -998,9 +999,15 @@ evt.PotionEffects[87] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
 		if craftWaitTime>0 then return end
 		craftingItemUsed=true
-		if (t.BonusExpireTime>=10 and t.BonusExpireTime<1000) then
+		if (t.BonusExpireTime>=100 and t.BonusExpireTime<1000 and Mouse.Item.BonusStrength==0) then
+			Mouse.Item.BonusStrength=t.BonusExpireTime%100
+			t.BonusExpireTime=100
+		elseif (t.BonusExpireTime>=10 and t.BonusExpireTime<1000 and Mouse.Item.BonusStrength==0) then
 			Mouse.Item.BonusStrength=t.BonusExpireTime
 			t.BonusExpireTime=2
+		elseif Mouse.Item.BonusStrength>=10 and Mouse.Item.BonusStrength<1000 and t.BonusExpireTime==100 then
+			t.BonusExpireTime=Mouse.Item.BonusStrength+100
+			Mouse.Item.Number=0
 		elseif Mouse.Item.BonusStrength>=10 and Mouse.Item.BonusStrength<1000 then
 			t.BonusExpireTime=Mouse.Item.BonusStrength
 			Mouse.Item.Number=0
