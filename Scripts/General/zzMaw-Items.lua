@@ -626,7 +626,7 @@ function events.ItemGenerated(t)
 			end
 			--nerf to AC
 			if it.Bonus==10 then
-				it.BonusStrength=math.ceil(it.BonusStrength*0.667)
+				--it.BonusStrength=math.ceil(it.BonusStrength*0.667)
 			end
 			if math.floor(it.Charges/1000)==10 then
 				it.Charges=it.Charges-math.floor(it.Charges%1000*0.333)
@@ -1127,7 +1127,7 @@ function events.BuildItemInformationBox(t)
 					if (t.Item.Bonus==8 or t.Item.Bonus==9) then
 						power=round(power*(2+power/50))
 					elseif t.Item.Bonus==10 then
-						power=round(power*0.667)
+						--power=round(power*0.667)
 					end
 				end
 				if t.Item:T().EquipStat==5 and t.Item:T().Mod2==0 then
@@ -1155,7 +1155,7 @@ function events.BuildItemInformationBox(t)
 					if (bonus==8 or bonus==9) then
 						strength=round(strength*(2+strength/50))
 					elseif bonus==10 then
-						strength=round(strength*0.667)
+						--strength=round(strength*0.667)
 					end
 				end
 				if t.Item:T().EquipStat==5 and t.Item:T().Mod2==0 then
@@ -1191,7 +1191,7 @@ function events.BuildItemInformationBox(t)
 					if stat==8 or stat==9 then
 						power=power*(2+power/50)
 					elseif stat==10 then
-						power=power*0.667
+						--power=power*0.667
 					end
 					local slotMult=slotMult[t.Item:T().EquipStat] or 1
 					cap=math.min(cap*slotMult,999)
