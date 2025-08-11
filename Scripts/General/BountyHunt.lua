@@ -7,19 +7,29 @@ local function RewardByMon(MonId)
 	return round(basetable[MonId].Level + getPartyLevel(4)) * 100 
 end
 
-local function HuntText(MonId)
+local function HuntText(MonId, MonName, MapFileName)
 	local text = Game.NPCText[133]:replace("%lu", tostring(RewardByMon(MonId)))
-	if Game.PlaceMonTxt[299]=="299" then
-		return text:format(StrColor(255,255,150, "different area"))
+	local MapName
+	for _, MapStats in pairs(Game.MapStats) do
+		if type(MapStats) == "table" and MapStats.FileName == MapFileName then
+			MapName = MapStats.Name
+		end
 	end
-	return text:format(StrColor(255,255,150, Game.PlaceMonTxt[299]))
+	local function Yellow(x)
+		return StrColor(255, 255, 150, x)
+	end
+	local contents = Yellow(MonName or "monster")
+	if MapName then
+		contents = contents .. " in " .. Yellow(MapName)
+	end
+	return text:format(contents)
 end
 BountyHuntFunctions.HuntText = HuntText
 
-local function RewardText(MonId)
+local function RewardText(MonId, MonName)
 	local Reward = RewardByMon(MonId)
 	local text = Game.NPCText[134]:replace("%lu", Reward)
-	return text:format(Game.PlaceMonTxt[299], Reward)
+	return text:format(MonName, Reward)
 end
 BountyHuntFunctions.RewardText = RewardText
 
@@ -28,12 +38,22 @@ local function ClaimedText()
 end
 BountyHuntFunctions.ClaimedText = ClaimedText
 
-local function NewEntry(Month, MonId, Done, Claimed)
+local function FindNextNoteIndex()
+	for i=0,Map.Notes.High do
+		local Note = Map.Notes[i]
+		if not Note.Active then
+			return i
+		end
+	end
+end
+
+local function NewEntry(Month, MonId, Done, Claimed, NoteIndex)
 	return {
 		Month = Month or 0,
 		MonId = MonId or 0,
 		Done = Done or false,
-		Claimed = Claimed or false
+		Claimed = Claimed or false,
+		NoteIndex = NoteIndex or FindNextNoteIndex()
 	}
 end
 BountyHuntFunctions.NewEntry = NewEntry
@@ -128,27 +148,29 @@ local function SetCurrentHunt()
 	local Entry = vars.BountyHunt[Map.Name]
 	
 	if vars.insanityMode then
-		for key, value in pairs(vars.BountyHunt) do 
-			if vars.BountyHunt[key].Month==Game.Month and vars.BountyHunt[key].Done==false then
-				return HuntText(vars.BountyHunt[key].MonId)
+		for key, value in pairs(vars.BountyHunt) do
+			if key ~= Map.Name and value.Month==Game.Month and value.Done==false then
+				return HuntText(value.MonId, value.MonName, key)
 			end
 		end
 	end
+
 	if not BountyExpired(Entry) then
 		-- If bounty hunt quest have already been chosen for this month.
-		MonId = Entry.MonId
+		local MonId = Entry.MonId
 		if not MonId then
 			vars.BountyHunt[Map.Name] = nil
 			BountyHuntFunctions.SetCurrentHunt()
 			return
 		end
 
+		local MonName = Entry.MonName or Game.PlaceMonTxt[299] -- compatibility with old saves
 		if Entry.Done then
 			if Entry.Claimed then
 				BountyText = ClaimedText()
 			else
 				local Reward = RewardByMon(MonId)
-				BountyText = RewardText(MonId)
+				BountyText = RewardText(MonId, MonName)
 
 				for i,v in Party do
 					v.Awards[44] = true
@@ -160,9 +182,12 @@ local function SetCurrentHunt()
 				events.Call("BountyHuntRewardClaimed", Map.Name, Reward)
 			end
 		else
-			BountyText = HuntText(MonId)
+			BountyText = HuntText(MonId, MonName)
 		end
 
+	elseif not mapvars.completed then
+		-- If map hasn't yet been cleared, don't give out a new bounty
+		BountyText = "You need to clear the area COMPLETELY first."
 	else
 		-- Choose monster for new hunt.
 		local Mons = BountyHuntFunctions.MonstersForBountyHunt()
@@ -170,47 +195,37 @@ local function SetCurrentHunt()
 		-- Create entry in list of bounty hunts.
 		local t = {MapName = Map.Name, Handled = false}
 		local id=random(1, #monTbl)
-		monsterId=monTbl[id].Index
-		t.Entry = NewEntry(Game.Month, monsterId, false, false)
+		local monsterId=monTbl[id].Index
+		t.Entry = NewEntry(Game.Month, monsterId, false, false, Entry and Entry.NoteIndex)
+		Entry = t.Entry
 		events.Call("BountyHuntGeneration", t)
 
-		vars.BountyHunt[Map.Name] = t.Entry
-		
-		--MAW FIX, not sure why it's always on Handled=true, as it prevents monster to spawn, it's probably to keep vanilla behaviour
-		Handled=false
-		if Handled then
-			return t.Text or HuntText(t.Entry.MonId)
-		end
+		vars.BountyHunt[Map.Name] = Entry
 		
 		-- Summon monster
-		local MonId = t.Entry.MonId
+		local MonId = Entry.MonId
 		local X, Y, Z = BountyHuntFunctions.NewBHSpawnPoint()
 		
 		mapvars.mawBounty=math.max((getPartyLevel(4)-BLevel[MonId]/1.5),0)
 		recalculateMonsterTable()
-		mon=pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = 1, powerChances = {0, 0, 100}, radius = 256, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 index=mon:GetIndex() end}
-		generateBoss(index,299)
-		
-		local monsterSkill = string.match(Game.PlaceMonTxt[299], "([^%s]+)")
+		local Hunt = pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = 1, powerChances = {0, 0, 100}, radius = 256, group = 2,transform = function(mon) mon.Hostile = true mon.ShowAsHostile = true mon.Velocity=350 end}[1]
+		generateBoss(Hunt:GetIndex())
+		Entry.MonName = Game.PlaceMonTxt[Hunt.NameId]
+
+		local monsterSkill = string.match(Entry.MonName, "([^%s]+)")
 		if monsterSkill=="Omnipotent" then
-			pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = math.random(100,200), powerChances = {55, 30, 15}, radius = 2048, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 index=mon:GetIndex() end}
+			pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = math.random(100,200), powerChances = {55, 30, 15}, radius = 2048, group = 2,transform = function(mon) mon.Hostile = true mon.ShowAsHostile=true mon.Velocity=350 end}
 		end
-		
-		local setNote=true
-		local i=0
-		while setNote or i>Map.Notes.High do
-			local note=Map.Notes[i]
-			if not note.Active then
-				note.Active=true
-				note.Id=9999
-				note.X=X
-				note.Y=Y
-				note.Text="Bounty"
-				setNote=false
-			end
-			i=i+1
+		local Note=Map.Notes[Entry.NoteIndex]
+		if Note then
+			Note.Active=true
+			Note.Id=9999
+			Note.X=X
+			Note.Y=Y
+			Note.Text="Bounty"
 		end
-		pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = math.random(5,15), powerChances = {55, 30, 15}, radius = 1024, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 index=mon:GetIndex() end}
+
+		pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = math.random(5,15), powerChances = {55, 30, 15}, radius = 1024, group = 2,transform = function(mon) mon.Hostile = true mon.ShowAsHostile = true mon.Velocity=350 end}
 		recalculateMawMonster()
 		-- Make monster berserk to encourage it to fight everything around (peasants, guards, player)
 		--local MonBuff = mon.SpellBuffs[const.MonsterBuff.Berserk]
@@ -219,8 +234,8 @@ local function SetCurrentHunt()
 		--MonBuff.Skill = 4
 		--MonBuff.Caster = 49
 
-		events.Call("NewBountyHuntCreated", Map.Name, vars.BountyHunt[Map.Name], mon)
-		BountyText = HuntText(MonId)
+		events.Call("NewBountyHuntCreated", Map.Name, Entry, mon)
+		BountyText = HuntText(Entry.MonId, Entry.MonName)
 	end
 
 	return BountyText
@@ -228,13 +243,25 @@ end
 BountyHuntFunctions.SetCurrentHunt = SetCurrentHunt
 
 function events.MonsterKilled(Monster, MonsterIndex, _, killer)
-	if vars.BountyHunt and killer and killer.Player then
-		for MapName, Entry in pairs(vars.BountyHunt) do
-			if not Entry.Done and Game.Month == Entry.Month and Entry.MonId == Monster.Id and Monster.NameId==299 then
-				Entry.Done = true
-				events.Call("BountyHuntEliminated", MapName, Entry, Monster)
-			end
-		end
+	if not (killer and killer.Player) then
+		return
+	end
+	local Entry = vars.BountyHunt and vars.BountyHunt[Map.Name]
+	if not Entry then
+		return
+	end
+	local MonName = Entry.MonName or Game.PlaceMonTxt[299] -- compatibility with old saves
+	if MonName ~= Game.PlaceMonTxt[Monster.NameId] then
+		return
+	end
+	local Note = Map.Notes[Entry.NoteIndex]
+	if Note then
+		Note.Active = false
+	end
+	Entry.NoteIndex = nil
+	if not Entry.Done and Game.Month == Entry.Month then
+		Entry.Done = true
+		events.Call("BountyHuntEliminated", Map.Name, Entry, Monster)
 	end
 end
 
@@ -249,20 +276,12 @@ jmp absolute 0x4bb3f0]])
 mem.asmpatch(0x4bae73, "jmp absolute " .. NewCode)
 
 mem.hook(NewCode, function(d)
-	if not mapvars.completed then
-		Message("You need to clear the area COMPLETELY first")
-		return
-	end	
 	BountyText = BountyHuntFunctions.SetCurrentHunt()
 	mem.u4[0xffd410] = mem.topointer(BountyText)
 end)
 
 -- Make MM8 bounty hunt same as MM7 and MM6 now
 mem.hook(0x4b080e, function(d)
-	if not mapvars.completed then
-		Message("You need to clear the area COMPLETELY first")
-		return
-	end	
 	BountyText = BountyHuntFunctions.SetCurrentHunt()
 	Message(BountyText)
 end)
