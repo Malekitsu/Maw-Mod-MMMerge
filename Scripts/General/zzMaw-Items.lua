@@ -1033,20 +1033,21 @@ function updateCelestialItem(it,pl)
 		end
 		local lvl=pl.LevelBase
 		local tier=math.min(pl.LevelBase/20+6,50)
-		local mult=4
+		local mult=3
 		if vars.Mode==2 then
-			mult=6
+			mult=4
 		end
 		if vars.insanityMode then
-			mult=8
+			mult=5
 		end
+		local slotMultiplier=slotMult[it:T().EquipStat] or 1
 		if it.Bonus>0 and it.BonusStrength>0 then
-			it.BonusStrength=math.round(tier*mult)
+			it.BonusStrength=math.round(tier*mult*slotMultiplier)
 		end
 		if it.Charges>1000 then
-			it.Charges=math.floor(it.Charges/1000)*1000+math.min(math.round(tier*mult),999)
+			it.Charges=math.floor(it.Charges/1000)*1000+math.min(math.round(tier*mult*slotMultiplier),999)
 		end
-		it.MaxCharges=math.min(math.round(tier*mult/2),200)
+		it.MaxCharges=math.min(math.round(tier*mult*0.8),200)
 	end
 end
 
