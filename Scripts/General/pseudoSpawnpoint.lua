@@ -104,6 +104,7 @@ function pseudoSpawnpoint(monster, x, y, z, count, powerChances, radius, group, 
 		local mon = SummonMonster(class * 3 - 2 + power, x, y, z, true) -- true means monster has treasure
 		-- set group
 		mon.Group = t.group or 255
+		mon.NPC_ID = t.npc_id or 0
 		-- perform transform if it is set
 		if t.transform and type(t.transform) == "function" then
 			t.transform(mon)
