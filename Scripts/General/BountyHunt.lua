@@ -208,13 +208,13 @@ local function SetCurrentHunt()
 		
 		mapvars.mawBounty=math.max((getPartyLevel(4)-BLevel[MonId]/1.5),0)
 		recalculateMonsterTable()
-		local Hunt = pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = 1, powerChances = {0, 0, 100}, radius = 256, group = 2,transform = function(mon) mon.Hostile = true mon.ShowAsHostile = true mon.Velocity=350 end}[1]
+		local Hunt = pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = 1, powerChances = {0, 0, 100}, radius = 256, group = 2,transform = function(mon) mon.NPC_ID = 0 mon.Hostile = true mon.ShowAsHostile = true mon.Velocity=350 end}[1]
 		generateBoss(Hunt:GetIndex())
 		Entry.MonName = Game.PlaceMonTxt[Hunt.NameId]
 
 		local monsterSkill = string.match(Entry.MonName, "([^%s]+)")
 		if monsterSkill=="Omnipotent" then
-			pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = math.random(100,200), powerChances = {55, 30, 15}, radius = 2048, group = 2,transform = function(mon) mon.Hostile = true mon.ShowAsHostile=true mon.Velocity=350 end}
+			pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = math.random(100,200), powerChances = {55, 30, 15}, radius = 2048, group = 2,transform = function(mon) mon.NPC_ID = 0 mon.Hostile = true mon.ShowAsHostile=true mon.Velocity=350 end}
 		end
 		local Note=Map.Notes[Entry.NoteIndex]
 		if Note then
@@ -225,7 +225,7 @@ local function SetCurrentHunt()
 			Note.Text="Bounty"
 		end
 
-		pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = math.random(5,15), powerChances = {55, 30, 15}, radius = 1024, group = 2,transform = function(mon) mon.Hostile = true mon.ShowAsHostile = true mon.Velocity=350 end}
+		pseudoSpawnpoint{monster = MonId,  x = X, y = Y, z = Z, count = math.random(5,15), powerChances = {55, 30, 15}, radius = 1024, group = 2,transform = function(mon) mon.NPC_ID = 0 mon.Hostile = true mon.ShowAsHostile = true mon.Velocity=350 end}
 		recalculateMawMonster()
 		-- Make monster berserk to encourage it to fight everything around (peasants, guards, player)
 		--local MonBuff = mon.SpellBuffs[const.MonsterBuff.Berserk]
