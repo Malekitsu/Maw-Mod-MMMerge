@@ -243,9 +243,6 @@ end
 BountyHuntFunctions.SetCurrentHunt = SetCurrentHunt
 
 function events.MonsterKilled(Monster, MonsterIndex, _, killer)
-	if not (killer and killer.Player) then
-		return
-	end
 	local Entry = vars.BountyHunt and vars.BountyHunt[Map.Name]
 	if not Entry then
 		return
@@ -259,6 +256,10 @@ function events.MonsterKilled(Monster, MonsterIndex, _, killer)
 		Note.Active = false
 	end
 	Entry.NoteIndex = nil
+	if not (killer and killer.Player) then
+		vars.BountyHunt[Map.Name] = nil
+		return
+	end
 	if not Entry.Done and Game.Month == Entry.Month then
 		Entry.Done = true
 		events.Call("BountyHuntEliminated", Map.Name, Entry, Monster)
