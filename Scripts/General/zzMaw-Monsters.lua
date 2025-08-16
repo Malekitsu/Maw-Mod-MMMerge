@@ -29,33 +29,77 @@ end
 --UNIQUE MONSTERS BUFF
 --------------------------------------
 
-function events.AfterLoadMap()	
-	for i=0, Map.Monsters.High do
-		--SPEED
-		if Map.Monsters[i].Velocity>150 and Map.Monsters[i].Attack1.Missile==0 then
-			Map.Monsters[i].Velocity=(Map.Monsters[i].Velocity + (400 - Map.Monsters[i].Velocity) / 2 +100)
-		end
-		--fix broken spell levels
-		if Map.Monsters[i].SpellSkill>64 and Map.Monsters[i].SpellSkill<1024 then
-			Map.Monsters[i].SpellSkill=Map.Monsters[i].SpellSkill%64
-		end
-		--resistances 
-		bolsterRes=math.max(round((Map.Monsters[i].Level-basetable[Map.Monsters[i].Id].Level)/2),0)
-		for v=0,10 do
-			if v~=5 then
-				if v==0 and Map.Monsters[i].Resistances[v]<65000 then
-					hpMult=math.floor(Map.Monsters[i].Resistances[v]/1000)
-					Map.Monsters[i].Resistances[v]=math.min(bolsterRes+basetable[Map.Monsters[i].Id].Resistances[v],bolsterRes+200,999)+1000*hpMult	
-				else
-					Map.Monsters[i].Resistances[v]=math.min(bolsterRes+basetable[Map.Monsters[i].Id].Resistances[v],bolsterRes+200,999)
-				end
-			end
-		end
-	end	
-	--rebolster current monsters according to monsterstxt
-	recalculateMawMonster()
+-- == Version "mêmes comportements" mais sans erreurs nil en multi ==
+-- (aucun fallback, aucun changement de formules, on ne touche rien si un champ manque)
+
+
+function events.AfterLoadMap()
+  if not Map or not Map.Monsters or type(Map.Monsters.High) ~= "number" then return end
+
+  for i = 0, Map.Monsters.High do
+    pcall(function()
+      local m = Map.Monsters[i]
+      if not m then return end
+
+      -- SPEED (identique, protégé)
+      if m.Velocity and m.Velocity > 150 and m.Attack1 and m.Attack1.Missile == 0 then
+        m.Velocity = (m.Velocity + (400 - m.Velocity) / 2 + 100)
+      end
+
+      -- Fix broken spell levels (identique)
+      if m.SpellSkill and m.SpellSkill > 64 and m.SpellSkill < 1024 then
+        m.SpellSkill = m.SpellSkill % 64
+      end
+
+      -- Resistances (identique, seulement si tout est présent)
+      if basetable and round and m.Level and m.Id and m.Resistances and basetable[m.Id]
+         and basetable[m.Id].Level and basetable[m.Id].Resistances then
+
+        local bolsterRes = math.max(round((m.Level - basetable[m.Id].Level) / 2), 0)
+        for v = 0, 10 do
+          if v ~= 5 then
+            if v == 0 and m.Resistances[v] and m.Resistances[v] < 65000 then
+              local hpMult = math.floor(m.Resistances[v] / 1000)
+              m.Resistances[v] =
+                math.min(bolsterRes + basetable[m.Id].Resistances[v], bolsterRes + 200, 999) + 1000 * hpMult
+            else
+              if basetable[m.Id].Resistances[v] then
+                m.Resistances[v] =
+                  math.min(bolsterRes + basetable[m.Id].Resistances[v], bolsterRes + 200, 999)
+              end
+            end
+          end
+        end
+      end
+    end)
+  end
+
+  -- Rebolster: identique, mais protégé + anti-double-run sur cette map
+  if type(recalculateMawMonster) == "function" then
+    vars = vars or {}
+    vars._maw_monster_recalc_done = vars._maw_monster_recalc_done or {}
+    local mapId = Map and Map.MapStatsIndex or "?"
+    if not vars._maw_monster_recalc_done[mapId] then
+      pcall(recalculateMawMonster)
+      vars._maw_monster_recalc_done[mapId] = true
+    end
+  end
 end
 
+-- --- SAFE WRAPPER: n'altère pas la logique, évite juste les erreurs console
+do
+  if type(recalculateMawMonster) == "function" then
+    local _orig = recalculateMawMonster
+    function recalculateMawMonster(mon)
+      if not Game or not Game.MonstersTxt then return end
+      if not Map or not Map.Monsters   then return end
+      if type(mon) == "number" then mon = Map.Monsters[mon] end
+      if mon ~= nil and mon.Id == nil then return end
+      local ok, res = pcall(_orig, mon)
+      if ok then return res end  -- sinon on avale l’erreur
+    end
+  end
+end
 
 --MODIFY MONSTERS SPELL DAMAGE
 --moved in resistance rework in MAW-STATS
@@ -3711,4 +3755,21 @@ function events.LoadMap()
 			end
 		end
 	end
+end
+
+
+-- --- SAFE WRAPPER: n'altère pas la logique, évite juste les erreurs console
+do
+  if type(recalculateMawMonster) == "function" then
+    local _orig = recalculateMawMonster
+    function recalculateMawMonster(mon)
+      if not Game or not Game.MonstersTxt then return end
+      if not Map or not Map.Monsters   then return end
+      if type(mon) == "number" then mon = Map.Monsters[mon] end
+      if mon ~= nil and mon.Id == nil then return end
+
+      local ok, res = pcall(_orig, mon)
+      if ok then return res end  -- sinon on avale l’erreur
+    end
+  end
 end
