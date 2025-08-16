@@ -1032,7 +1032,7 @@ function updateCelestialItem(it,pl)
 			pl=Party[id]
 		end
 		local lvl=pl.LevelBase
-		local tier=math.min(pl.LevelBase/20+6,50)
+		local tier=math.min(pl.LevelBase/11+5,60)
 		local mult=3
 		if vars.Mode==2 then
 			mult=4
@@ -1040,14 +1040,13 @@ function updateCelestialItem(it,pl)
 		if vars.insanityMode then
 			mult=5
 		end
-		local slotMultiplier=slotMult[it:T().EquipStat] or 1
 		if it.Bonus>0 and it.BonusStrength>0 then
-			it.BonusStrength=math.round(tier*mult*slotMultiplier)
+			it.BonusStrength=math.round(tier*mult)
 		end
 		if it.Charges>1000 then
-			it.Charges=math.floor(it.Charges/1000)*1000+math.min(math.round(tier*mult*slotMultiplier),999)
+			it.Charges=math.floor(it.Charges/1000)*1000+math.min(math.round(tier*mult),999)
 		end
-		it.MaxCharges=math.min(math.round(tier*mult*0.8),200)
+		it.MaxCharges=math.min(math.round(tier*mult*0.8),180)
 	end
 end
 
@@ -3565,7 +3564,7 @@ artifactSkillBonus[1313] =	{	[const.Skills.Unarmed] = 10,
 -- Ethric's Staff
 artifactSkillBonus[1317] =	{	[const.Skills.Meditation] = 8}
 -- Hareck's Leather
-artifactSkillBonus[1318] =	{	[const.Skills.DisarmTraps] = 5,
+artifactSkillBonus[1318] =	{	[const.Skills.Dagger] = 5,
 								[const.Skills.Unarmed] = 5,}
 -- Old Nick
 artifactSkillBonus[1319] =	{	[const.Skills.DisarmTraps] = 5}
@@ -3576,7 +3575,7 @@ artifactSkillBonus[1324] = {	[const.Skills.Learning] = 15}
 -- Ania Selving
 artifactSkillBonus[1328] =	{	[const.Skills.Bow] = 5}
 -- Pendragon
-artifactSkillBonus[2030] =	{	[const.Skills.Stealing] = 10,
+artifactSkillBonus[2030] =	{	[const.Skills.Dagger] = 5,
 								[const.Skills.DisarmTraps] = 10}
 -- Hades
 artifactSkillBonus[2035] =	{	[const.Skills.DisarmTraps] = 10}
