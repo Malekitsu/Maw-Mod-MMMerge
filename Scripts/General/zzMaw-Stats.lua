@@ -1,160 +1,205 @@
-function events.KeyDown(t)
-    if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 100 then
-        if t.Key == 82 then -- "r" key
-            Game.ShowStatusText(string.format("Map data reset, press Y to continue..."))
-            map_data_reset_confirmation = 1;
-        end
+-- ne pas créer de globales ni de tables à l'avance
+map_data_reset_confirmation = map_data_reset_confirmation or 0
 
-        if (t.Key ~= 89) and (t.Key ~= 82) and (map_data_reset_confirmation == 1) then -- not "y" key
-            map_data_reset_confirmation = 0; -- aborting reset without confirmation
-        end
-
-        if t.Key == 89 and (map_data_reset_confirmation == 1) then -- "y" key
-            Game.ShowStatusText(string.format("Current map data reset."))
-            map_data_reset_confirmation = 0;
-            local i
-            for i = 0, Party.High do
-                mapvars.damageTrack[Party[i]:GetIndex()] = 0 -- melee
-                mapvars.damageTrackRanged[Party[i]:GetIndex()] = 0 -- ranged
-            end
-        end
+-- --- SAFETY SHIM: ne change pas l'équilibrage
+if not rawget(_G, "safeGetMonsterLevel") then
+  function safeGetMonsterLevel(mon)
+    if type(getMonsterLevel) == "function" then
+      return getMonsterLevel(mon)  -- logique d'origine
     end
+    return (mon and mon.Level) or 0  -- fallback neutre
+  end
 end
 
-function getCritInfo(pl,dmgType,monLvl)
-	if not monLvl then
-		monLvl=pl.LevelBase
-	end
-	local luck=pl:GetLuck()
-	local totalCrit=luck/math.min((500+monLvl*7.5),5000)+0.05
-	local critDamageMultiplier=1
-	if dmgType=="spell" then
-		local intellect=pl:GetIntellect()	
-		local personality=pl:GetPersonality()
-		local bonus=math.max(intellect,personality)
-		critDamageMultiplier=bonus/2000+1.5
-	elseif dmgType=="heal" then
-		local intellect=pl:GetIntellect()	
-		local personality=pl:GetPersonality()
-		local bonus=math.max(intellect,personality)
-		critDamageMultiplier=bonus*3/4000+1.25
-		--crit removed for healing
-		return 0, 0, false
-	else --physical
-		local accuracy=pl:GetAccuracy()
-		critDamageMultiplier=accuracy*2/1000+1.5
-	end
-	--dagger bonus
-	if not dmgType then
-		for i=0,1 do
-			if pl:GetActiveItem(i) then
-				local itSkill=pl:GetActiveItem(i):T().Skill
-				if itSkill==2 then
-					s,m=SplitSkill(pl:GetSkill(const.Skills.Dagger))
-					if m>2 then
-						totalCrit=totalCrit+0.05+0.01*s/math.min(1+monLvl/200,4)
-					end
-				end
-			end
-		end
-	end
-	--axe bonus
-	if not dmgType then
-		local it=pl:GetActiveItem(1)
-		if it then	
-			if table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number) then
-				local s,m=SplitSkill(pl:GetSkill(const.Skills.Axe))
-				if m==4 then
-					critDamageMultiplier=critDamageMultiplier+0.03*s
-				end
-			end
-		end
-	end
-	
-	if vars.MAWSETTINGS.buffRework=="ON" then 
-		if pl.SpellBuffs[4].ExpireTime>=Game.Time then
-			local s,m=getBuffSkill(47)
-			local s2,m2=getBuffSkill(86)
-			s=math.max(s,s2/1.5)
-			m=math.max(m,m2)
-			local bonus=buffPower[47].Base[m]/100+buffPower[47].Scaling[m]*s/1000
-			totalCrit=totalCrit+bonus
-		end
-	end
-	if getMapAffixPower(20) then
-		totalCrit=totalCrit-getMapAffixPower(20)/100
-	end
-	if getMapAffixPower(21) then
-		critDamageMultiplier=(critDamageMultiplier-1)*(1-getMapAffixPower(21)/100)+1
-	end
-	
-	
-	--legendary bonus
-	local id=pl:GetIndex()
-	if vars.legendaries and table.find(vars.legendaries[id], 14) then
-		totalCrit=totalCrit+0.1
-	else
-		totalCrit=math.min(totalCrit,1)
-	end
-	
-	local success=math.random()<totalCrit
-	
-	return totalCrit, critDamageMultiplier, success
+local function ensureDamageTrackIfMapvars()
+  if not mapvars then return false end
+  mapvars.damageTrack       = mapvars.damageTrack       or {}
+  mapvars.damageTrackRanged = mapvars.damageTrackRanged or {}
+  return true
 end
+
+function events.KeyDown(t)
+  if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 100 then
+    if t.Key == 82 then -- "R"
+      Game.ShowStatusText("Map data reset, press Y to continue...")
+      map_data_reset_confirmation = 1
+    end
+
+    if (t.Key ~= 89) and (t.Key ~= 82) and (map_data_reset_confirmation == 1) then
+      map_data_reset_confirmation = 0
+    end
+
+    if t.Key == 89 and (map_data_reset_confirmation == 1) then -- "Y"
+      map_data_reset_confirmation = 0
+      pcall(function()
+        if ensureDamageTrackIfMapvars() and Party and Party.High then
+          for i = 0, Party.High do
+            local p = Party[i]
+            if p and p.GetIndex then
+              local idx = p:GetIndex()
+              mapvars.damageTrack[idx] = 0
+              mapvars.damageTrackRanged[idx] = 0
+            end
+          end
+        end
+      end)
+      Game.ShowStatusText("Current map data reset.")
+    end
+  end
+end
+
+
+
+function getCritInfo(pl, dmgType, monLvl)
+  if not pl then return 0, 1, false end
+  monLvl = monLvl or pl.LevelBase or 0
+
+  local luck = pl.GetLuck and pl:GetLuck() or 0
+  local totalCrit = luck / math.min((500 + monLvl*7.5), 5000) + 0.05
+  local critDamageMultiplier = 1
+
+  if dmgType == "spell" then
+    local intellect = pl.GetIntellect and pl:GetIntellect() or 0
+    local personality = pl.GetPersonality and pl:GetPersonality() or 0
+    local bonus = math.max(intellect, personality)
+    critDamageMultiplier = bonus/2000 + 1.5
+  elseif dmgType == "heal" then
+    local intellect = pl.GetIntellect and pl:GetIntellect() or 0
+    local personality = pl.GetPersonality and pl:GetPersonality() or 0
+    local bonus = math.max(intellect, personality)
+    critDamageMultiplier = bonus*3/4000 + 1.25
+    return 0, 0, false
+  else
+    local accuracy = pl.GetAccuracy and pl:GetAccuracy() or 0
+    critDamageMultiplier = accuracy*2/1000 + 1.5
+  end
+
+  -- dagger bonus
+  if not dmgType then
+    for i = 0, 1 do
+      local it = pl:GetActiveItem(i)
+      if it then
+        local itSkill = it:T().Skill
+        if itSkill == 2 then
+          local s, m = SplitSkill(pl:GetSkill(const.Skills.Dagger))
+          if m > 2 then
+            totalCrit = totalCrit + 0.05 + 0.01*s / math.min(1 + monLvl/200, 4)
+          end
+        end
+      end
+    end
+  end
+
+  -- axe bonus
+  if not dmgType then
+    local it = pl:GetActiveItem(1)
+    if it and (table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number)) then
+      local s, m = SplitSkill(pl:GetSkill(const.Skills.Axe))
+      if m == 4 then
+        critDamageMultiplier = critDamageMultiplier + 0.03*s
+      end
+    end
+  end
+
+  -- Fate / HoP (buff rework)
+  if vars.MAWSETTINGS == nil or vars.MAWSETTINGS.buffRework == "ON" then
+    if pl.SpellBuffs and pl.SpellBuffs[4] and pl.SpellBuffs[4].ExpireTime >= Game.Time then
+      local s, m  = getBuffSkill(47)
+      local s2, m2 = getBuffSkill(86)
+      s = math.max(s, s2/1.5)
+      m = math.max(m, m2)
+      if buffPower and buffPower[47] and buffPower[47].Base and buffPower[47].Scaling then
+        local bonus = (buffPower[47].Base[m] or 0)/100 + (buffPower[47].Scaling[m] or 0)*s/1000
+        totalCrit = totalCrit + bonus
+      end
+    end
+  end
+
+  if getMapAffixPower then
+    if getMapAffixPower(20) then totalCrit = totalCrit - getMapAffixPower(20)/100 end
+    if getMapAffixPower(21) then
+      critDamageMultiplier = (critDamageMultiplier - 1) * (1 - getMapAffixPower(21)/100) + 1
+    end
+  end
+
+  local id = pl:GetIndex()
+  if not (vars.legendaries and table.find(vars.legendaries[id], 14)) then
+    totalCrit = math.min(totalCrit, 1)
+  end
+
+  local success = math.random() < totalCrit
+  return totalCrit, critDamageMultiplier, success
+end
+
+local SERVICE_CASTER = (Multiplayer and Multiplayer.SERVICE_CASTER) or 49
 
 function events.CalcDamageToMonster(t)
-	local data = WhoHitMonster()	
-	--luck/accuracy bonus
-	if data and data.Player and (t.DamageKind==4 or (data and data.Object and data.Object.Spell==133 and data.Object.Item and data.Object.Item.Bonus2==3 ) or (data and data.Spell==135)) then
-		if data.Object==nil or data.Object.Spell==133 or data.Spell==135 then
-			pl=t.Player
-			--OVERRIDE DAMAGE WITH MAW CALCULATION
-			if data.Object==nil or data.Spell==135 then
-				baseDamage=pl:GetMeleeDamageMin()
-				maxDamage=pl:GetMeleeDamageMax()
-				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
-				damage=round(randomDamage/2)
-				
-				if table.find(assassinClass,pl.Class) then --needed for assassin class, it also procs the energy restore
-					isolatedDamageReduction=assassinationDamage(pl,t.Monster,data.Object) --must be subtracted
-					damage=damage-isolatedDamageReduction
-				end
-				
-				dmgMult=damageMultiplier[data.Player:GetIndex()]["Melee"]
-			else --bow
-				baseDamage=pl:GetRangedDamageMin()
-				maxDamage=pl:GetRangedDamageMax()
-				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
-				damage=round(randomDamage/2)
-				dmgMult=damageMultiplier[data.Player:GetIndex()]["Ranged"]
-				if table.find(assassinClass,pl.Class) then
-					assassinationDamage(pl,t.Monster,data.Object)--required to trigger skill point
-				end
-			end
-			
-			
-			
-			t.Result=damage*dmgMult
-			
-			if data.Object and data.Object.Spell==133 then
-				critChance, critMult, success=getCritInfo(pl,true,getMonsterLevel(t.Monster))
-			else
-				critChance, critMult, success=getCritInfo(pl,false,getMonsterLevel(t.Monster))
-			end
-			
-			if success then
-				t.Result=t.Result*critMult
-				crit=true
-			end
-			if data.Player.Weak>0 then
-				t.Result=t.Result*0.5
-			end
-			if data and data.Object and data.Object.Spell==133 and data.Object.Item and data.Object.Item.Bonus2==3 then
-				t.Result=t.Result*0.25
-			end
-		end
-	end
+  local data = WhoHitMonster()
+  if not (data and data.Player and (t.DamageKind == 4
+    or (data.Object and data.Object.Spell == 133 and data.Object.Item and data.Object.Item.Bonus2 == 3)
+    or data.Spell == 135)) then
+    return
+  end
+
+  local pl = t.Player
+  if not pl then return end
+
+  local idx = data.Player:GetIndex()
+  if idx == SERVICE_CASTER or (not evt.IsPlayerInParty or not evt.IsPlayerInParty(idx)) then
+    return
+  end
+
+  if not damageMultiplier or not damageMultiplier[idx] then
+    return
+  end
+
+  local dmgMult
+  local baseDamage, maxDamage, randomDamage, damage
+  if (data.Object == nil) or (data.Spell == 135) then
+    baseDamage   = pl:GetMeleeDamageMin()
+    maxDamage    = pl:GetMeleeDamageMax()
+    randomDamage = math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
+    damage       = round(randomDamage/2)
+
+    if table.find(assassinClass, pl.Class) and assassinationDamage then
+      local isolatedDamageReduction = assassinationDamage(pl, t.Monster, data.Object)
+      damage = damage - (isolatedDamageReduction or 0)
+    end
+
+    dmgMult = damageMultiplier[idx]["Melee"]
+  else
+    baseDamage   = pl:GetRangedDamageMin()
+    maxDamage    = pl:GetRangedDamageMax()
+    randomDamage = math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
+    damage       = round(randomDamage/2)
+
+    dmgMult = damageMultiplier[idx]["Ranged"]
+    if table.find(assassinClass, pl.Class) and assassinationDamage then
+      assassinationDamage(pl, t.Monster, data.Object)
+    end
+  end
+
+  t.Result = damage * (dmgMult or 1)
+
+  local critChance, critMult, success
+  if data.Object and data.Object.Spell == 133 then
+    critChance, critMult, success = getCritInfo(pl, "spell", safeGetMonsterLevel(t.Monster))
+  else
+    critChance, critMult, success = getCritInfo(pl, false, safeGetMonsterLevel(t.Monster))
+  end
+  if success then
+    t.Result = t.Result * critMult
+  end
+
+  if data.Player.Weak and data.Player.Weak > 0 then
+    t.Result = t.Result * 0.5
+  end
+  if data.Object and data.Object.Spell == 133 and data.Object.Item and data.Object.Item.Bonus2 == 3 then
+    t.Result = t.Result * 0.25
+  end
 end
+
+
 
 --speed
 --SPEED WILL NOW REDUCE RECOVERY TIME
