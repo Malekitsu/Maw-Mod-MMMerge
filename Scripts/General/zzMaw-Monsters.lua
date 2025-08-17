@@ -2207,6 +2207,12 @@ function events.LoadMap()
 	end
 end
 
+function events.ExitMapAction(t)
+	if t.Action == const.ExitMapAction.MainMenu then
+		completition.Text=""
+	end
+end
+
 --check for dungeon clear
 function events.MonsterKilled(mon)
 	monsterKilled=true
