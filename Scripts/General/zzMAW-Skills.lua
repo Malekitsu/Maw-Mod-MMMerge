@@ -1690,6 +1690,7 @@ function events.CanTeachSkillMastery(t)
 	end
 
 	if not cost then return end
+	t.Cost=cost
 	if Party.Gold<cost then
 		t.Allow=false
 		t.Text=Game.NPCText[125]
