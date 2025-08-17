@@ -1,4 +1,7 @@
 -- ==== Buff share — BY RAFIKI59
+-- ==== + mawmapvarsend compat + N-players owner-aware + OFF sync
+-- ==== + multi-only blockSpells + SOLO: purge remote-only
+-- ==== + WEAK fix béton (burst) + fenêtre de protection post-death synchronisée
 
 ------------------------------------------------------------
 -- ÉTAT / HELPERS
@@ -8,6 +11,7 @@ local function ensure_state()
   vars.MAWSETTINGS = vars.MAWSETTINGS or {}
   if type(vars.MAWSETTINGS.buffRadius) ~= "number" then vars.MAWSETTINGS.buffRadius = 20000 end
   vars.MAWSETTINGS.blockSpells = vars.MAWSETTINGS.blockSpells or {}   -- ex: vars.MAWSETTINGS.blockSpells[IMMOLATION_ID]=true
+  vars.MAWSETTINGS.blockSpells[8] = true
 
   vars.mawbuff            = vars.mawbuff            or {}  -- [id] = true/1 (flag local) ou {s,m,l} (valeur plate)
   vars._maw_last_sent     = vars._maw_last_sent     or {}  -- [id]=true (envoyé au tick précédent)
@@ -16,10 +20,58 @@ local function ensure_state()
   vars.maw_remote_values  = vars.maw_remote_values  or {}  -- [id] = { [sender]={s,m,l}, ... }
 end
 
+-- === Compat maps: mawmapvarsend shim ===
+if not rawget(_G, "mawmapvarsend") then
+  local function __senderId()
+    return (Multiplayer and Multiplayer.player_id) or "host"
+  end
+  function mawmapvarsend(key, val)
+    -- maj locale immédiate (solo & host)
+    mapvars = mapvars or {}
+    mapvars[key] = val
+    -- diffusion réseau si en multi
+    if Multiplayer and Multiplayer.in_game then
+      -- on s'assure que l'event est autorisé (idempotent)
+      if Multiplayer.allow_remote_event then
+        Multiplayer.allow_remote_event("MAWMapvarArrived")
+      end
+      local x = (Party and Party.X) or 0
+      local y = (Party and Party.Y) or 0
+      local z = (Party and Party.Z) or 0
+      Multiplayer.broadcast_mapdata(
+        { DataType = "mapvar", [1] = key, [2] = val,
+          X = x, Y = y, Z = z, sender = __senderId() },
+        "MAWMapvarArrived"
+      )
+    end
+  end
+end
+
 local function isReworkOn()
   local s = vars and vars.MAWSETTINGS and vars.MAWSETTINGS.buffRework
   if s == true or s == 1 then return true end
   return type(s)=="string" and s:lower()=="on"
+end
+
+------------------------------------------------------------
+-- SAFETY SHIMS (anti-crash globaux) - FOR DOOM MODE
+------------------------------------------------------------
+do
+  -- Wrapper global de mawBuffApply: évite que l'event loop meure
+  if type(rawget(_G, "mawBuffApply")) == "function" and not _G.__MAW_WRAP_APPLY then
+    local __orig_mawBuffApply = mawBuffApply
+    _G.__MAW_WRAP_APPLY = true
+    function mawBuffApply(...)
+      local ok, res = pcall(__orig_mawBuffApply, ...)
+      if not ok then
+        -- journalisation douce; évite la tempête de logs
+        if Game and Game.ShowStatusText then Game.ShowStatusText("MAW: apply (safe)") end
+        -- on n'échoue pas: on laisse les timers/handlers continuer
+        return nil
+      end
+      return res
+    end
+  end
 end
 
 local function inMulti()
@@ -71,49 +123,129 @@ local function remote_effective(id)
 end
 
 ------------------------------------------------------------
--- WEAK FIX (ultra-robuste)
+-- WEAK FIX (ultra-robuste) + résout le cache 'nil' trop tôt
 ------------------------------------------------------------
-local __MAW_WEAK_IDX = false
-local function __maw_find_weak_idx()
-  if __MAW_WEAK_IDX ~= false then return __MAW_WEAK_IDX end
-  local idx
+-- Ne JAMAIS cacher 'nil' : on ne retient que les index valides.
+local __MAW_WEAK_IDX = nil
+
+local function __maw_try_detect_weak_idx()
+  -- 1) Const si dispo
   if const and const.Condition then
-    idx = const.Condition.Weak or idx
-    if not idx then
-      for k,v in pairs(const.Condition) do
-        if type(k)=="string" and k:lower()=="weak" and type(v)=="number" then idx=v; break end
+    if type(const.Condition.Weak) == "number" then return const.Condition.Weak end
+    for k, v in pairs(const.Condition) do
+      if type(k) == "string" and type(v) == "number" and k:lower() == "weak" then
+        return v
       end
     end
   end
-  if not idx and Game and Game.ConditionTxt then
-    local hi = (Game.ConditionTxt.High or 20)
-    for i=0, hi do
+  -- 2) Table texte (localisée) si dispo
+  if Game and Game.ConditionTxt then
+    local hi = Game.ConditionTxt.High or 32
+    for i = 0, hi do
       local t = Game.ConditionTxt[i]
-      if t and type(t.Name)=="string" and t.Name:lower():find("weak") then idx=i; break end
+      if t and type(t.Name) == "string" then
+        local name = t.Name:lower()
+        -- mots-clés multi-langues (FR/EN/DE/ES…)
+        if name:find("weak") or name:find("faib") or name:find("schwach")
+           or name:find("débil") or name:find("debil") then
+          return i
+        end
+      end
     end
   end
-  __MAW_WEAK_IDX = idx or nil
+  -- 3) Rien trouvé (encore trop tôt)
+  return nil
+end
+
+local function __maw_refresh_weak_index()
+  if not __MAW_WEAK_IDX then
+    local idx = __maw_try_detect_weak_idx()
+    if idx then __MAW_WEAK_IDX = idx end
+  end
   return __MAW_WEAK_IDX
+end
+
+local function __maw_find_weak_idx()
+  -- Recalcule tant qu’on n’a pas une valeur valide
+  return __maw_refresh_weak_index()
 end
 
 local function MAW_ClearWeakAll()
   local idx = __maw_find_weak_idx()
-  if not (idx and Party and type(Party.High)=="number") then return end
-  for i=0, Party.High do
+  if not Party or type(Party.High) ~= "number" then return end
+
+  for i = 0, Party.High do
     local p = Party[i]
-    if p and p.Conditions then p.Conditions[idx] = 0 end
+    if p then
+      -- timestamp Weak (beaucoup de scripts font p.Weak = Game.Time)
+      if p.Weak then p.Weak = 0 end
+      -- drapeau condition si on a l’index
+      if idx and p.Conditions then p.Conditions[idx] = 0 end
+      -- Filet de secours : si idx inconnu, on tente un sweep conditionnel localisé
+      if (not idx) and p.Conditions and Game and Game.ConditionTxt then
+        local hi = Game.ConditionTxt.High or 32
+        for j = 0, hi do
+          local t = Game.ConditionTxt[j]
+          if t and type(t.Name) == "string" then
+            local name = t.Name:lower()
+            if name:find("weak") or name:find("faib") or name:find("schwach")
+               or name:find("débil") or name:find("debil") then
+              p.Conditions[j] = 0
+            end
+          end
+        end
+      end
+    end
   end
 end
 
+
+-- --- fenêtre temps: protège contre les ré-applies "spammy"
+local function __maw_now() return (Game and Game.Time) or 0 end
+
+local function __maw_protect_active()
+  return vars and vars._maw_weak_protect_until and ((Game and Game.Time) or 0) < vars._maw_weak_protect_until
+end
+
+-- Neutralise les re-applies Weak pendant la fenêtre de protection
+function events.CalcDamageToPlayer(t)
+  if vars and vars._maw_weak_protect_until and ((Game and Game.Time) or 0) < vars._maw_weak_protect_until then
+    if t and t.Player then
+      if t.Player.Weak and t.Player.Weak ~= 0 then t.Player.Weak = 0 end
+      local idx = __maw_find_weak_idx()
+      if idx and t.Player.Conditions then t.Player.Conditions[idx] = 0 end
+    end
+  end
+end
+
+
+-- --- burst + protect combinés
 local function MAW_PrimeWeakClears(n)
   ensure_state()
   n = math.max(tonumber(n) or 0, 0)
   vars._maw_clear_weak_ticks = n
 end
 
-function MAW_ClearWeakNow(times)  -- appel manuel si besoin
+function MAW_ClearWeakNow(times)
   MAW_PrimeWeakClears(times or 15)
   MAW_ClearWeakAll()
+end
+
+-- --- réseau: broadcast d’un ordre weak (prime/clear/protect)
+local function __maw_broadcast_weak(msg)
+  if not (Multiplayer and Multiplayer.in_game) then return end
+  if Multiplayer.allow_remote_event then Multiplayer.allow_remote_event("MAWMapvarArrived") end
+  local payload = {
+    DataType = "mawWeak",
+    action   = msg.action,     -- "prime", "clear", "protect"
+    ticks    = msg.ticks,      -- nb de ticks pour prime
+    seconds  = msg.seconds,    -- durée fenêtre protect
+    X = (Party and Party.X) or 0,
+    Y = (Party and Party.Y) or 0,
+    Z = (Party and Party.Z) or 0,
+    sender = (Multiplayer and Multiplayer.player_id) or "host"
+  }
+  Multiplayer.broadcast_mapdata(payload, "MAWMapvarArrived")
 end
 
 ------------------------------------------------------------
@@ -137,10 +269,35 @@ local function purge_remote_buffs_keep_local()
 end
 
 ------------------------------------------------------------
--- RÉCEPTION (ON / OFF) — N-players owner-aware + blockSpells
+-- RÉCEPTION (ON / OFF) — N-players owner-aware + blockSpells + WEAK net
 ------------------------------------------------------------
 function events.MAWMapvarArrived(t)
-  if t.DataType == "mapvar" then mapvars[t[1]] = t[2]; return end
+  if not t or type(t) ~= "table" then return end
+
+  -- 0) mapvar passthrough
+  if t.DataType == "mapvar" then
+    mapvars = mapvars or {}
+    mapvars[t[1]] = t[2]
+    return
+  end
+
+-- 0bis) WEAK network control
+if t.DataType == "mawWeak" then
+  if t.action == "clear" then
+    MAW_ClearWeakAll()
+    return
+  elseif t.action == "prime" then
+    MAW_PrimeWeakClears(tonumber(t.ticks) or 15)
+    MAW_ClearWeakAll()
+    return
+  elseif t.action == "protect" then
+    local secs = tonumber(t.seconds) or 30
+    MAW_StartWeakProtect(secs)   -- démarre aussi le micro-timer
+    return
+  end
+end
+
+  -- 1) Buffs
   if (t.DataType ~= "mawBuffs") and (t.DataType ~= "mawBuffsOff") then return end
   if not isReworkOn() then return end
   ensure_state()
@@ -314,7 +471,7 @@ local function block_forbidden_spells_in_multi()
 end
 
 ------------------------------------------------------------
--- TIMERS / EVENTS — base V1 + OFF sync + purges remote en solo + WEAK prime
+-- TIMERS / EVENTS — OFF sync + solo purge + WEAK prime + protect réseau
 ------------------------------------------------------------
 local timersArmed = false
 local function armTimerIfReady()
@@ -326,6 +483,11 @@ end
 
 function events.Tick()
   ensure_state()
+
+  -- protection post-mort: force-clear tant que la fenêtre est ouverte
+  if vars._maw_weak_protect_until and __maw_now() < vars._maw_weak_protect_until then
+    MAW_ClearWeakAll()
+  end
 
   -- weak fix après gros saut de temps
   vars._maw_last_time = vars._maw_last_time or NOW()
@@ -355,6 +517,7 @@ function events.LoadMap()
   vars._maw_last_sent = {}
   if not inMulti() then purge_remote_buffs_keep_local() end
   MAW_PrimeWeakClears(15)
+  __maw_refresh_weak_index()
 end
 
 function events.GameLoaded()
@@ -363,6 +526,7 @@ function events.GameLoaded()
   vars._maw_last_sent = {}
   if not inMulti() then purge_remote_buffs_keep_local() end
   MAW_PrimeWeakClears(15)
+  __maw_refresh_weak_index()
 end
 
 function events.MultiplayerInitialized()
@@ -374,9 +538,10 @@ function events.MultiplayerInitialized()
   Multiplayer.allow_remote_event("mawMultiPlayerData")
   armTimerIfReady()
   MAW_PrimeWeakClears(15)
+  __maw_refresh_weak_index()
 end
 
--- GameOver / DeathMenu: purge remote (garde flags locaux) + weak fix
+-- GameOver / DeathMenu: purge remote (garde flags locaux) + weak fix + protect réseau
 local function purge_remote_only_and_weak()
   ensure_state()
   local changed=false
@@ -393,10 +558,16 @@ end
 
 function events.GameOver()
   purge_remote_only_and_weak()
-  MAW_PrimeWeakClears(15)
+  MAW_PrimeWeakClears(20)
+  MAW_StartWeakProtect(30)
+  __maw_broadcast_weak{ action="prime", ticks=20 }
+  __maw_broadcast_weak{ action="protect", seconds=30 }
 end
 
 function events.DeathMenu()
   purge_remote_only_and_weak()
-  MAW_PrimeWeakClears(15)
+  MAW_PrimeWeakClears(20)
+  MAW_StartWeakProtect(30)
+  __maw_broadcast_weak{ action="prime", ticks=20 }
+  __maw_broadcast_weak{ action="protect", seconds=30 }
 end
