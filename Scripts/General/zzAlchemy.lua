@@ -1057,7 +1057,7 @@ function events.MonsterKilled(mon)
 	
 	--level bonus
 	local lvl=mon.Level
-	if mon.NameId==0 then
+	if mon.NameId==0 and totalLevel[mon.Id] then
 		lvl=round(totalLevel[mon.Id])
 	elseif mapvars.uniqueMonsterLevel and mapvars.uniqueMonsterLevel[mon:GetIndex()] then
 		lvl=round(mapvars.uniqueMonsterLevel[mon:GetIndex()])
