@@ -1646,20 +1646,14 @@ end
 
 function events.AfterPopulateNPCDialog(t)
 	if t.DlgKind ~= "TeachSkill" then return end
-	local index = t.NPC.EventA
-	if not index or index < 300 then return end
-
-	local skill = (index-300):div(3)
+	local skill = Game.HouseActionInfo
 	if not table.find(horizontalSkills, skill) then return end
-	local skillM = index-3*skill-298
-	local message=Game.NPCText[index]
+	local skillM = Game.HouseTeachMastery
+
+	local message=Game.NPCText[298+3*skill+skillM]
 	local function printMessage(player)
 		local req,cost=getReqAndCost(skillM, player)
-		if cost then
-			Message(message:gsub("%d+", "%%d", 2):format(req, cost))
-		elseif req then
-			Message(message:gsub("%d+", "%%d", 1):format(req))
-		end
+		Message(message:gsub("%d+", |contents| contents==tostring(learningRequirementsNormal[skillM]) and req or cost or contents))
 	end
 	local function charChanged(t)
 		if t.Action~=110 then return end
@@ -1695,7 +1689,7 @@ function events.CanTeachSkillMastery(t)
 		t.Allow=false
 		t.Text=Game.NPCText[125]
 	else
-		t.Text=t.Text:gsub("%d+", "%%d", 1):format(cost)
+		t.Text=t.Text:gsub("%d+", "%%d"):format(cost)
 	end
 end
 --reset and store masteries for free progression
