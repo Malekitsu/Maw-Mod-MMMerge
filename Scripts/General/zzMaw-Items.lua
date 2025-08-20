@@ -2185,6 +2185,8 @@ function events.BuildItemInformationBox(t)
 		if equipStat<=11 then 
 			local i=Game.CurrentPlayer
 			local pl=Party[i]
+			local hp=pl.HP
+			local sp=pl.SP
 			local playerIndex=pl:GetIndex()
 			local oldDPS1, oldDPS2, oldDPS3, oldVitality=calcPowerVitality(pl)
 			--substitute item
@@ -2268,6 +2270,9 @@ function events.BuildItemInformationBox(t)
 			it.TemporaryBonus=itemBackup["TemporaryBonus"]
 			mawRefresh(playerIndex)
 			mawRefresh(playerIndex)
+			--restore hp
+			pl.HP=hp
+			pl.SP=sp
 		end
 	end
 end
