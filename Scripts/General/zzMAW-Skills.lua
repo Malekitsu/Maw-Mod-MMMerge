@@ -783,6 +783,9 @@ function events.KeyDown(t)
 				Party[0].Items[index].Number=0
 				local healAmount=round(bonus^1.4)+10
 				evt.Add("HP",healAmount)
+				if Party[0].HP>=0 then
+					Party[0].Unconscious=0
+				end
 				vars.healthPotionCooldown=15
 				Game.ShowStatusText(string.format("Health Potion heals for %s hit points",healAmount))
 			end
