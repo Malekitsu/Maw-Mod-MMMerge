@@ -113,7 +113,7 @@ evt.Map[1001] = function()
 		pseudoSpawnpoint{monster = 271,  x = 9765, y = 2500, z = 122  , count = 1, powerChances = {60, 30, 10}, radius = 64, group = 1}
 		mapvars.spawn=mapvars.spawn+1
 		mawmapvarsend("spawn",mapvars.spawn)
-		if spawn==10 then 
+		if mapvars.spawn>=10 then 
 			mapvars.fortclear=true
 		end
 	end
