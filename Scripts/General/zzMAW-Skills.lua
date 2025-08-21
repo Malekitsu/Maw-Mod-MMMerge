@@ -447,7 +447,7 @@ end
 ------------------------
 function events.GameInitialized2()
 	Skillz.setDesc(6,1,Skillz.getDesc(6,1) .. "\nThe paralyze effect lasts for 5 seconds on regular monsters and 2 seconds on bosses. The stun effect lasts for half the duration of the paralyze effect. The chances of successfully applying these effects depend on the skill level and the monster's level.\n")
-	Skillz.setDesc(0,1,Skillz.getDesc(0,1) .. "\nThis skill increases the damage gained from weapon by a percentage when equipping a staff.\nAt Grandmaster can combine staff and unarmed skill, increasing its damage with staff skill at half effect.\n\nResistance bonus from staff skill apply to the entire party.\n")
+	Skillz.setDesc(0,1,Skillz.getDesc(0,1) .. "\nThis skill increases the damage gained from weapon by a percentage when equipping a staff.\nAt Grandmaster can combine staff and unarmed skill, increasing its damage with staff skill at half effect.\n\nEach point of mastery will grant a point to all resistances to ALL party.\n")
 	Skillz.setDesc(1,1,Skillz.getDesc(1,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping a sword.\n")
 	Skillz.setDesc(2,1,Skillz.getDesc(2,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping a dagger.\nCrit chance will get lower as monsters grow stronger, up to level 600.")
 	Skillz.setDesc(3,1,Skillz.getDesc(3,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping an axe.\n")
@@ -783,9 +783,6 @@ function events.KeyDown(t)
 				Party[0].Items[index].Number=0
 				local healAmount=round(bonus^1.4)+10
 				evt.Add("HP",healAmount)
-				if Party[0].HP>=0 then
-					Party[0].Unconscious=0
-				end
 				vars.healthPotionCooldown=15
 				Game.ShowStatusText(string.format("Health Potion heals for %s hit points",healAmount))
 			end
@@ -1628,71 +1625,43 @@ local horizontalSkills={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,
 --online
 local insanityLearningRequirements={0,8,20,32}
 local insanityCost={0,10000,50000,250000}
-
-local function getReqAndCost(mastery, player)
+function events.CanTeachSkillMastery(t)
+	if t.Allow==false then return end --if failing for special requirements (stats, gold, already learned etc)
+	if not table.find(horizontalSkills, t.Skill) then return end
+	local masteries={"","n Expert", " Master", " GrandMaster"}
+	
+	--online
 	if vars.insanityMode then
-		local baseCost=insanityCost[mastery]
+		--calculate cost
+		local baseCost=insanityCost[t.Mastery]
 		local cost=baseCost
-		for _, skillId in pairs(horizontalSkills) do
-			local s,m=SplitSkill(Party[player or Game.CurrentPlayer].Skills[skillId])
-			if m>=mastery and s~=0 then
-				cost=cost+baseCost
+		local id=Game.CurrentPlayer
+		local masteryToLearn=t.Mastery
+		if id>=0 and id<=Party.High then
+			local pl=Party[id]
+			for i=1,#horizontalSkills do
+				local s,m=SplitSkill(pl.Skills[horizontalSkills[i]])
+				if m>=masteryToLearn and s~=0 then
+					cost=cost+baseCost
+				end
 			end
 		end
-		return insanityLearningRequirements[mastery],cost
-	elseif not Game.freeProgression then
-		return learningRequirements[mastery],nil
-	else
-		return nil,nil
-	end
-end
-
-function events.AfterPopulateNPCDialog(t)
-	if t.DlgKind ~= "TeachSkill" then return end
-	local skill = Game.HouseActionInfo
-	if not table.find(horizontalSkills, skill) then return end
-	local skillM = Game.HouseTeachMastery
-
-	local message=Game.NPCText[298+3*skill+skillM]
-	local function printMessage(player)
-		local req,cost=getReqAndCost(skillM, player)
-		Message(message:gsub("%d+", |contents| contents==tostring(learningRequirementsNormal[skillM]) and req or cost or contents))
-	end
-	local function charChanged(t)
-		if t.Action~=110 then return end
-		printMessage(t.Param-1)
-	end
-	events.Action=charChanged
-	local function clearMessage(t)
-		if t.Action~=113 then return end
-		events.Remove("Action", clearMessage)
-		events.Remove("Action", charChanged)
-	end
-	events.Action=clearMessage
-	printMessage()
-end
-function events.CanTeachSkillMastery(t)
-	if not table.find(horizontalSkills, t.Skill) then return end
-
-	if not t.Allow then return end
-
-	local req,cost = getReqAndCost(t.Mastery)
-
-	if not req then return end
-	local skill=SplitSkill(Party[Game.CurrentPlayer].Skills[t.Skill])
-	if skill<req then
-		t.Allow=false
-		t.Text=Game.NPCText[128]
+		t.Cost=cost
+		local skill=SplitSkill(Party[id].Skills[t.Skill])
+		if skill<insanityLearningRequirements[t.Mastery] or Party.Gold<cost then
+			t.Allow=false
+			t.Text="You need at least " .. insanityLearningRequirements[t.Mastery] .. " skill and " .. cost .. " gold to become a" ..  masteries[t.Mastery]
+		end
+		Message("To learn " .. Skillz.getName(t.Skill) .. " you need at least " .. insanityLearningRequirements[t.Mastery] .. " skill and " .. cost .. " gold.")
 		return
 	end
-
-	if not cost then return end
-	t.Cost=cost
-	if Party.Gold<cost then
-		t.Allow=false
-		t.Text=Game.NPCText[125]
-	else
-		t.Text=t.Text:gsub("%d+", "%%d"):format(cost)
+	--horizontal mode
+	if not Game.freeProgression then
+		local skill=SplitSkill(Party[Game.CurrentPlayer].Skills[t.Skill])
+		if skill<learningRequirements[t.Mastery] then
+			t.Allow=false
+			t.Text="You need at least " .. learningRequirements[t.Mastery] .. " skill to become a" ..  masteries[t.Mastery]
+		end
 	end
 end
 --reset and store masteries for free progression
@@ -2481,3 +2450,73 @@ function events.KeyDown(t)
 		end
 	end
 end
+
+-- === MAW HOTFIX: sécuriser la globale `pl` pour éviter "attempt to index global 'pl' (a nil value)" ===
+do
+  -- fabrique un "dummy player" inoffensif si on n'a personne sous la main
+  local __MAW_DUMMY_PL = setmetatable({}, {
+    __index = function(self, k)
+      if k == "GetIndex"   then return function() return 0 end end
+      if k == "IsConscious" then return function() return true end end
+      -- valeurs neutres pour tous les autres champs utilisés ailleurs
+      return 0
+    end
+  })
+
+  local function __maw_pick_any_party_member()
+    if Party and type(Party.High) == "number" then
+      for i = 0, Party.High do
+        if Party[i] then return Party[i] end
+      end
+    end
+    return nil
+  end
+
+  -- initialise `pl` au chargement si elle est absente
+  if rawget(_G, "pl") == nil or type(pl) ~= "table" then
+    pl = __maw_pick_any_party_member() or __MAW_DUMMY_PL
+  end
+
+  -- gardes simples pour réalimenter `pl` quand un contexte joueur est connu
+  function events.GameLoaded()
+    if not pl or type(pl) ~= "table" then
+      pl = __maw_pick_any_party_member() or __MAW_DUMMY_PL
+    end
+  end
+
+  function events.LoadMap()
+    if not pl or type(pl) ~= "table" then
+      pl = __maw_pick_any_party_member() or __MAW_DUMMY_PL
+    end
+  end
+
+  -- certains hooks passent le joueur ou son index
+  function events.Action(t)
+    if not t then return end
+    if t.Player then
+      pl = t.Player
+    elseif t.Param2 and Party then
+      pl = Party[t.Param2] or pl or __MAW_DUMMY_PL
+    elseif not pl then
+      pl = __maw_pick_any_party_member() or __MAW_DUMMY_PL
+    end
+  end
+
+  function events.PlayerCastSpell(t)
+    if t and t.Player then
+      pl = t.Player
+    elseif t and t.PlayerIndex and Party then
+      pl = Party[t.PlayerIndex] or pl or __MAW_DUMMY_PL
+    elseif not pl then
+      pl = __maw_pick_any_party_member() or __MAW_DUMMY_PL
+    end
+  end
+
+  -- filet de sécu périodique: si `pl` saute, on le remplace
+  function events.Tick()
+    if not pl or type(pl) ~= "table" then
+      pl = __maw_pick_any_party_member() or __MAW_DUMMY_PL
+    end
+  end
+end
+
