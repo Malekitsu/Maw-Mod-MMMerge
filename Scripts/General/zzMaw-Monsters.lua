@@ -86,21 +86,6 @@ function events.AfterLoadMap()
   end
 end
 
--- --- SAFE WRAPPER: n'altère pas la logique, évite juste les erreurs console
-do
-  if type(recalculateMawMonster) == "function" then
-    local _orig = recalculateMawMonster
-    function recalculateMawMonster(mon)
-      if not Game or not Game.MonstersTxt then return end
-      if not Map or not Map.Monsters   then return end
-      if type(mon) == "number" then mon = Map.Monsters[mon] end
-      if mon ~= nil and mon.Id == nil then return end
-      local ok, res = pcall(_orig, mon)
-      if ok then return res end  -- sinon on avale l’erreur
-    end
-  end
-end
-
 --MODIFY MONSTERS SPELL DAMAGE
 --moved in resistance rework in MAW-STATS
 
@@ -2360,13 +2345,13 @@ function checkMapCompletition()
 		end
 		if mapvars.monsterMap and mapvars.monsterMap.cleared==false and m/n>=0.65 and Game.BolsterAmount>=300 then
 			mapvars.monsterMap.cleared=true
-			if Game.CurrentScreen~=22 then
-				if disableCompletitionMessage then
-					Game.ShowStatusText("Monsters are weakened and can no longer resurrect")
-				else
-					Game.EscMessage(string.format("Monsters are weakened and can no longer resurrect"))
-				end
-			end
+		 	if Game.CurrentScreen~=22 then
+		 		if disableCompletitionMessage then
+		 			Game.ShowStatusText("Monsters are weakened and can no longer resurrect")
+		 		else
+		 			Game.EscMessage(string.format("Monsters are weakened and can no longer resurrect"))
+		 		end
+		 	end
 		end
 	end
 end
@@ -2841,85 +2826,150 @@ function events.BeforeLoadMap()
 end
 
 
---regenerating skill
-amountHP={0,0,0,0,[0]=0}
-amountSP={0,0,0,0,[0]=0}
-function leecher()
-	if mapvars.leecher then
-		for i=1, #mapvars.leecher do
-			if mapvars.leecher[i] then
-				local mon=Map.Monsters[mapvars.leecher[i]]
-				local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
-				if skill == "Leecher" or skill == "Omnipotent" then
-					local distance=getDistance(mon.X,mon.Y,mon.Z)
-					if distance<1500 and mon.HP>0 and mon.AIState~=19 then
-						leechmult=((1500-distance)/1500)^2
-						local timeMultiplier=Game.TurnBased and 4 or 1 --was 12.8 instead of 20, nerfed
-						for i=0,Party.High do
-							local pl=Party[i]
-							if pl.HP>-20 then
-								local drainHP=pl:GetFullHP()*leechmult*0.05*timeMultiplier
-								amountHP[i]=amountHP[i]+drainHP
-								pl.HP=pl.HP - math.floor(amountHP[i])
-								amountHP[i]=amountHP[i]%1
-							end
-							if pl.SP>-20 then
-								local drainSP=pl.SP*leechmult*0.05*timeMultiplier
-								amountSP[i]=amountSP[i]+drainSP
-								pl.SP=pl.SP -math.floor(amountSP[i])
-								amountSP[i]=amountSP[i]%1
-							end
-						end
-					end
-				end
-			end
-		end
-	end
+-- =========================
+-- Helpers bornes & lecture
+-- =========================
+local function inRangeMonIdx(id)
+  return type(id) == "number" and id >= 0 and id <= (Map and Map.Monsters and Map.Monsters.High or -1)
 end
 
+local function inRangeTxt(id, arr)
+  if type(id) ~= "number" or not arr then return false end
+  local hi = (arr.High ~= nil) and arr.High or (#arr - 1)
+  return id >= 0 and id <= (hi or -1)
+end
+
+local function SafeSkillFromPlaceMon(mon)
+  if not mon then return nil end
+  local nameId = mon.NameId
+  if inRangeTxt(nameId, Game.PlaceMonTxt) then
+    local entry = Game.PlaceMonTxt[nameId]
+    if entry then
+      local s = string.match(entry, "([^%s]+)")
+      return s
+    end
+  end
+  return nil
+end
+
+local function Clamp01(x)
+  if not x then return 0 end
+  if x < 0 then return 0 elseif x > 1 then return 1 end
+  return x
+end
+
+-- =========================
+-- Regenerating / Leecher
+-- =========================
+amountHP = amountHP or { [0] = 0, 0, 0, 0, 0 }
+amountSP = amountSP or { [0] = 0, 0, 0, 0, 0 }
+
+local function leecher()
+  local L = mapvars and mapvars.leecher
+  if type(L) ~= "table" then return end
+
+  for idx = 1, #L do
+    local mid = L[idx]
+    if inRangeMonIdx(mid) then
+      local mon = Map.Monsters[mid]
+      if mon then
+        local skill = SafeSkillFromPlaceMon(mon)
+        if skill == "Leecher" or skill == "Omnipotent" then
+          local distance = getDistance(mon.X or 0, mon.Y or 0, mon.Z or 0)
+          if (distance or 1e9) < 1500 and (mon.HP or 0) > 0 and mon.AIState ~= 19 then
+            local leechmult = Clamp01(((1500 - distance) / 1500) ^ 2)
+            local timeMultiplier = Game.TurnBased and 4 or 1  -- nerf conservé
+            for pi = 0, Party.High do
+              local pl = Party[pi]
+              if pl then
+                if (pl.HP or 0) > -20 then
+                  local drainHP = (pl.GetFullHP and pl:GetFullHP() or (pl.HP or 0)) * leechmult * 0.05 * timeMultiplier
+                  amountHP[pi] = (amountHP[pi] or 0) + (drainHP or 0)
+                  local take = math.floor(amountHP[pi] or 0)
+                  if take ~= 0 then
+                    pl.HP = (pl.HP or 0) - take
+                    amountHP[pi] = (amountHP[pi] or 0) % 1
+                  end
+                end
+                if (pl.SP or 0) > -20 then
+                  local drainSPbase = (pl.SP or 0)  -- si tu préfères le full SP: pl:GetFullSP()
+                  local drainSP = drainSPbase * leechmult * 0.05 * timeMultiplier
+                  amountSP[pi] = (amountSP[pi] or 0) + (drainSP or 0)
+                  local takeSP = math.floor(amountSP[pi] or 0)
+                  if takeSP ~= 0 then
+                    pl.SP = (pl.SP or 0) - takeSP
+                    amountSP[pi] = (amountSP[pi] or 0) % 1
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+end
+
+-- Un SEUL handler LoadMap qui fait les 2 jobs (timer + reset swift)
 function events.LoadMap(wasInGame)
-	Timer(leecher, const.Minute/4) 
+  swiftLocation = nil
+  Timer(leecher, const.Minute / 4)
 end
---swift
+
+-- =========================
+-- Swift (mob affixe/skill)
+-- =========================
 function events.Tick()
-	if mapvars.swift then
-		swiftLocation=swiftLocation or {}
-		for i=1, #mapvars.swift do
-			mon=Map.Monsters[mapvars.swift[i]]
-			skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
-			if skill=="Swift" or skill == "Omnipotent" then
-				if not swiftLocation[i] then
-					swiftLocation[i]={mon.X,mon.Y}
-				end
-				if math.abs(mon.X-swiftLocation[i][1])<100 and math.abs(mon.Y-swiftLocation[i][2])<100 then
-					mon.X=mon.X + (mon.X-swiftLocation[i][1])
-					mon.Y=mon.Y + (mon.Y-swiftLocation[i][2])
-				end
-				swiftLocation[i][1]=mon.X
-				swiftLocation[i][2]=mon.Y
-			end
-		end
-	end
-	if getMapAffixPower(11) then
-		swiftLocation=swiftLocation or {}
-		for i=1, Map.Monsters.High do
-			local mon=Map.Monsters[i]
-			if not swiftLocation[i] then
-				swiftLocation[i]={mon.X,mon.Y}
-			end
-			if math.abs(mon.X-swiftLocation[i][1])<100 and math.abs(mon.Y-swiftLocation[i][2])<100 then
-				mon.X=mon.X + (mon.X-swiftLocation[i][1])*getMapAffixPower(11)/100
-				mon.Y=mon.Y + (mon.Y-swiftLocation[i][2])*getMapAffixPower(11)/100
-			end
-			swiftLocation[i][1]=mon.X
-			swiftLocation[i][2]=mon.Y
-		end
-	end
+  -- Swift via liste mapvars.swift
+  if mapvars and mapvars.swift then
+    swiftLocation = swiftLocation or {}
+    for idx = 1, #mapvars.swift do
+      local mid = mapvars.swift[idx]
+      if inRangeMonIdx(mid) then
+        local mon = Map.Monsters[mid]
+        if mon then
+          local skill = SafeSkillFromPlaceMon(mon)
+          if skill == "Swift" or skill == "Omnipotent" then
+            local key = mid  -- clé stable par MonsterID
+            local loc = swiftLocation[key]
+            if not loc then
+              loc = { mon.X or 0, mon.Y or 0 }
+              swiftLocation[key] = loc
+            end
+            if math.abs((mon.X or 0) - loc[1]) < 100 and math.abs((mon.Y or 0) - loc[2]) < 100 then
+              mon.X = (mon.X or 0) + ((mon.X or 0) - loc[1])
+              mon.Y = (mon.Y or 0) + ((mon.Y or 0) - loc[2])
+            end
+            loc[1], loc[2] = mon.X or 0, mon.Y or 0
+          end
+        end
+      end
+    end
+  end
+
+  -- Swift via affixe de carte (id 11)
+  local aff = getMapAffixPower and getMapAffixPower(11)
+  if aff and aff ~= 0 then
+    swiftLocation = swiftLocation or {}
+    for i = 0, (Map.Monsters and Map.Monsters.High or -1) do
+      local mon = Map.Monsters[i]
+      if mon then
+        local loc = swiftLocation[i]
+        if not loc then
+          loc = { mon.X or 0, mon.Y or 0 }
+          swiftLocation[i] = loc
+        end
+        if math.abs((mon.X or 0) - loc[1]) < 100 and math.abs((mon.Y or 0) - loc[2]) < 100 then
+          local k = (aff or 0) / 100
+          mon.X = (mon.X or 0) + ((mon.X or 0) - loc[1]) * k
+          mon.Y = (mon.Y or 0) + ((mon.Y or 0) - loc[2]) * k
+        end
+        loc[1], loc[2] = mon.X or 0, mon.Y or 0
+      end
+    end
+  end
 end
---remove on map load
-function events.LoadMap()
-	swiftLocation=nil
-end
+
 
 function calcDices(add, sides, count, mult, bonusDamage)
     local bonusDamage = bonusDamage or 0
@@ -3763,7 +3813,6 @@ function events.LoadMap()
 	end
 end
 
-
 -- --- SAFE WRAPPER: n'altère pas la logique, évite juste les erreurs console
 do
   if type(recalculateMawMonster) == "function" then
@@ -3779,3 +3828,4 @@ do
     end
   end
 end
+
