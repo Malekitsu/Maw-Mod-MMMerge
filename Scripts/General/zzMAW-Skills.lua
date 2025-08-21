@@ -2527,7 +2527,11 @@ do
     if t.Player then
       pl = t.Player
     elseif t.Param2 and Party then
-      pl = Party[t.Param2] or pl or __MAW_DUMMY_PL
+      if t.Param2>=0 and t.Param2<=Party.High then
+		pl = Party[t.Param2] 
+		else
+			pl = pl or __MAW_DUMMY_PL
+		end
     elseif not pl then
       pl = __maw_pick_any_party_member() or __MAW_DUMMY_PL
     end
