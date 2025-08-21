@@ -406,57 +406,88 @@ function events.PlayerCastSpell(t)
 			t.Skill=math.min(t.Skill,10)
 		end
 	end
-	
-	--power cure
-	if t.SpellId==77 then
-		if not t.RemoteData then
-			local sp=healingSpells[77]
-			t.Skill=0
-			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
-			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
+-- power cure
+if t.SpellId == 77 then
+  local totHeal, tooltipHeal, gotCrit = 0, 0, false
 
-			local mult, gotCrit=getHealSpellMultiPlier(t.Player)
-			
-			totHeal=baseHeal*mult
+  if not t.RemoteData then
+    -- === calcul local ===
+    local sp = healingSpells and healingSpells[77] or nil
+    t.Skill = 0
 
-			--remove base heal
-			tooltipHeal=totHeal
-			totHeal=round(totHeal-(10+5*s))
-			if gotCrit then
-				Game.ShowStatusText(string.format("You Heal the Party for " .. round(tooltipHeal) .. " Hit points(crit)"))
-			else
-				Game.ShowStatusText(string.format("You Heal the Party for " .. round(tooltipHeal) .. " Hit points"))
-			end
-		end
-		--end of healing calculation
-		if not t.RemoteData then
-			for i=0,Party.High do
-				Party[i].HP=Party[i].HP+totHeal
-				if Party[t.TargetId].HP>0 then
-					Party[t.TargetId].Unconscious=0
-				end
-			end
-			if t.MultiplayerData then
-				t.MultiplayerData[1]=round(totHeal) --bonus heal
-				t.MultiplayerData[2]=gotCrit --crit 
-				t.MultiplayerData[3]=round(tooltipHeal) --total heal
-			end
-		elseif t.RemoteData then
-			local healData = t.RemoteData
-			local name = Multiplayer.client_name(t.RemoteData.client_id)
-			for i=0,Party.High do
-				Party[i].HP=Party[i].HP+healData[1]
-				if Party[t.TargetId].HP>0 then
-					Party[t.TargetId].Unconscious=0
-				end
-			end
-			if	healData[2] then
-				Game.ShowStatusText(string.format(name .. " heals the Party for " .. healData[3] .. " hit points"))
-			else
-				Game.ShowStatusText(string.format(name .. " heals the Party for " .. healData[3] .. " hit points(crit)"))
-			end
-		end
-	end
+    local bodySkill = (t.Player and t.Player.GetSkill and t.Player:GetSkill(const.Skills.Body)) or 0
+    local s, m = SplitSkill(bodySkill or 0)
+    s = s or 0
+    m = m or 1
+
+    local base = (sp and sp.Base and sp.Base[m]) or 0
+    local scale = (sp and sp.Scaling and sp.Scaling[m]) or 0
+    local baseHeal = base + scale * s
+
+    local multFn = (type(getHealSpellMultiPlier) == "function") and getHealSpellMultiPlier or function() return 1, false end
+    local mult; mult, gotCrit = multFn(t.Player)
+
+    local rawTotal = (baseHeal or 0) * (mult or 1)
+    tooltipHeal = round(rawTotal or 0)
+
+    -- retire le "base heal" pour rester aligné avec ton tooltip
+    totHeal = round((rawTotal or 0) - (10 + 5 * s))
+    if totHeal < 0 then totHeal = 0 end
+
+    if gotCrit then
+      Game.ShowStatusText("You heal the party for " .. tooltipHeal .. " hit points (crit)")
+    else
+      Game.ShowStatusText("You heal the party for " .. tooltipHeal .. " hit points")
+    end
+  end
+
+  -- === application du soin ===
+  if not t.RemoteData then
+    local applyHeal = tonumber(totHeal) or 0
+    if applyHeal ~= 0 then
+      for i = 0, Party.High do
+        -- Optionnel: clamp au max HP si dispo
+        local newHP = (Party[i].HP or 0) + applyHeal
+        Party[i].HP = newHP
+      end
+    end
+    local tgt = t.TargetId
+    if tgt and Party[tgt] and (Party[tgt].HP or 0) > 0 then
+      Party[tgt].Unconscious = 0
+    end
+
+    if t.MultiplayerData then
+      t.MultiplayerData[1] = round(applyHeal)       -- bonus heal appliqué
+      t.MultiplayerData[2] = gotCrit               -- crit bool
+      t.MultiplayerData[3] = round(tooltipHeal)    -- heal total affiché
+    end
+
+  else
+    -- === branche Remote ===
+    local healData = t.RemoteData or {}
+    local applyHeal = tonumber(healData[1]) or 0
+    local crit = not not healData[2]
+    local shown = tonumber(healData[3]) or applyHeal
+
+    if applyHeal ~= 0 then
+      for i = 0, Party.High do
+        Party[i].HP = (Party[i].HP or 0) + applyHeal
+      end
+    end
+    local tgt = t.TargetId
+    if tgt and Party[tgt] and (Party[tgt].HP or 0) > 0 then
+      Party[tgt].Unconscious = 0
+    end
+
+    local name = (Multiplayer and Multiplayer.client_name and Multiplayer.client_name(healData.client_id)) or "Ally"
+    if crit then
+      Game.ShowStatusText(name .. " heals the party for " .. shown .. " hit points (crit)")
+    else
+      Game.ShowStatusText(name .. " heals the party for " .. shown .. " hit points")
+    end
+  end
+end
+
 	
 	--Day of the Gods
 	if t.SpellId==83 then
@@ -2721,8 +2752,11 @@ end
 ]]
 
 ---------------
---BUFF REWORK--
----------------	
+-- BUFF REWORK (MAW SPELL)
+-- SOLO : spéciaux sans TTL (comportement original)
+-- MULTI : spéciaux avec TTL (Temple/Scroll/Piédestal)
+---------------
+
 function events.GameInitialized2()
 	spScaling={}
 	for i=0,Game.Classes.SPFactor.High do
@@ -2732,7 +2766,7 @@ function events.GameInitialized2()
 	for i=0,Game.Classes.HPFactor.High do
 		hpScalings[i]=Game.Classes.HPFactor[i]
 	end
-	
+
 	--dk
 	spScaling[56]=3
 	spScaling[57]=6
@@ -2746,42 +2780,56 @@ function events.GameInitialized2()
 	spScaling[const.Class.Rogue]=7.5
 	spScaling[const.Class.Assassin]=7.5
 	spScaling[const.Class.Spy]=7.5
+
+	-- === TTL par défaut pour buffs spéciaux (Temple / Scroll / Piédestal)
+	vars = vars or {}
+	vars.MAWSETTINGS = vars.MAWSETTINGS or {}
+	if vars.MAWSETTINGS.templeBuffTTL == nil then
+		vars.MAWSETTINGS.templeBuffTTL = const.Hour           -- 1h temple (MULTI)
+	end
+	if vars.MAWSETTINGS.scrollBuffTTL == nil then
+		vars.MAWSETTINGS.scrollBuffTTL  = const.Minute*15     -- 15min scroll/piedestal (MULTI)
+	end
+
+	-- map OFF local
+	vars._maw_local_off = vars._maw_local_off or {}
 end
 
+-- === Tables d’origine ===
 buffSpell={
 [3]= {["Cost"]=60, ["Sound"]=10020, ["PartyBuff"]=6},--fire res
-[4]= {["Cost"]=90, ["Sound"]=10040,},				--fire aura
-[14]={["Cost"]=60, ["Sound"]=11020,["PartyBuff"]=0},--air res
+[4]= {["Cost"]=90, ["Sound"]=10040,},                --fire aura
+[14]={["Cost"]=60, ["Sound"]=11020,["PartyBuff"]=0}, --air res
 [25]={["Cost"]=60, ["Sound"]=12020,["PartyBuff"]=17},--water res
-[36]={["Cost"]=60, ["Sound"]=13020,["PartyBuff"]=4},--earth res
+[36]={["Cost"]=60, ["Sound"]=13020,["PartyBuff"]=4}, --earth res
 [58]={["Cost"]=60, ["Sound"]=15020,["PartyBuff"]=12},--mind res
-[69]={["Cost"]=60, ["Sound"]=16020,["PartyBuff"]=1},--body res
-[5]= {["Cost"]=120, ["Sound"]=10040,["PartyBuff"]=8},--haste
+[69]={["Cost"]=60, ["Sound"]=16020,["PartyBuff"]=1}, --body res
+[5]= {["Cost"]=120,["Sound"]=10040,["PartyBuff"]=8}, --haste
 [8]= {["Cost"]=40, ["Sound"]=10070,["PartyBuff"]=10},--immolation
 [17]={["Cost"]=75, ["Sound"]=11050,["PartyBuff"]=14},--shield
-[28]={["Cost"]=150, ["Sound"]=10070,},				--empower magic
+[28]={["Cost"]=150,["Sound"]=10070,},                --empower magic
 [38]={["Cost"]=75, ["Sound"]=13040,["PartyBuff"]=15},--stoneskin
 [46]={["Cost"]=75, ["Sound"]=14010,["SingleBuff"]=1},--bless
 [47]={["Cost"]=75, ["Sound"]=14020,["SingleBuff"]=4},--fate
-[50]={["Cost"]=120, ["Sound"]=14050,["SingleBuff"]=11},--preservation
-[51]={["Cost"]=120, ["Sound"]=14060,["PartyBuff"]=9},--Heroism
-[56]={["Cost"]=120, ["Sound"]=15020,},				--Meditation
-[71]={["Cost"]=120, ["Sound"]=16040,["SingleBuff"]=12},--Regeneration
+[50]={["Cost"]=120,["Sound"]=14050,["SingleBuff"]=11},--preservation
+[51]={["Cost"]=120,["Sound"]=14060,["PartyBuff"]=9}, --Heroism
+[56]={["Cost"]=120,["Sound"]=15020,},                --Meditation
+[71]={["Cost"]=120,["Sound"]=16040,["SingleBuff"]=12},--Regeneration
 [73]={["Cost"]=75, ["Sound"]=16060,["SingleBuff"]=6},--Hammerhands
 [75]={["Cost"]=180,["Sound"]=16080,["PartyBuff"]=13},--Protection from magic
-[83]={["Cost"]=200,["Sound"]=17050,["PartyBuff"]=2},--day of the gods
+[83]={["Cost"]=200,["Sound"]=17050,["PartyBuff"]=2}, --day of the gods
 [85]={["Cost"]=150,["Sound"]=17070,["MultiBuff"]={6,0,17,4,12,1}},--day of Protection
 [86]={["Cost"]=300,["Sound"]=17080,["MultiBuff"]={8,14,15}, ["SingleBuff"]=4},--hour of power
-[91]={["Cost"]=150,["Sound"]=18020,},				--vampiric aura
-[95]={["Cost"]=10,["Sound"]=18060,["SingleBuff"]=10},--pain reflection
+[91]={["Cost"]=150,["Sound"]=18020,},               --vampiric aura
+[95]={["Cost"]=10, ["Sound"]=18060,["SingleBuff"]=10},--pain reflection
 }
 utilitySpell={
-[1]= {["Cost"]=5,  ["Sound"]=10000, ["PartyBuff"]=16},--torch
-[12]={["Cost"]=5,  ["Sound"]=11000, ["PartyBuff"]=19},--wizard eye
---[19]={["Cost"]=100,["Sound"]=11070, ["PartyBuff"]=11},--Invisibility
---[21]={["Cost"]=120,["Sound"]=11090, ["PartyBuff"]=7},--fly
-[27]={["Cost"]=20, ["Sound"]=12040, ["PartyBuff"]=18},--water walk
---[124]={["Cost"]=20, ["Sound"]=21020, ["PartyBuff"]=7},--fly
+[1]= {["Cost"]=5,  ["Sound"]=10000,["PartyBuff"]=16},--torch
+[12]={["Cost"]=5,  ["Sound"]=11000,["PartyBuff"]=19},--wizard eye
+--[19]={["Cost"]=100,["Sound"]=11070,["PartyBuff"]=11},--Invisibility
+--[21]={["Cost"]=120,["Sound"]=11090,["PartyBuff"]=7}, --fly
+[27]={["Cost"]=20, ["Sound"]=12040,["PartyBuff"]=18},--water walk
+--[124]={["Cost"]=20,["Sound"]=21020,["PartyBuff"]=7}, --fly
 }
 
 buffSpellList={1,3,4,12,14,21,25,27,28,36,56,58,69,5,8,17,38,46,47,50,51,71,73,75,83,85,86,91,95}
@@ -2791,36 +2839,84 @@ mawPartyBuffList={6,0,17,4,12,1,8,10,14,15,9,13,2,16,19,18}
 mawPartyBuffIgnore={16,19,11,18,10}
 mawSingleBuffList={1,4,11,12,6,10}
 
-buffPower={ --values are inteneded as % and /1000 for scaling, values are updated in global/maw mapping file
-	[3]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},--fire res  
-	[14]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},--air res
-	[25]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},--water res
-	[36]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},--earth res
-	[58]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},--mind res
-	[69]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},--body res
-	[5]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--haste
-	[17]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--shield
-	[28]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--Empower Magic
-	[38]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},--stoneskin
-	[46]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},--bless, acc bonus is calculated by using fire res bonus
-	[47]= {["Base"]={[0]=0,5,5,5,5}, ["Scaling"]={[0]=0,1,1,1,1}},--fate
-	[51]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--Heroism
-	[56]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--Meditation
-	[71]= {["Base"]={[0]=0,5,5,5,5}, ["Scaling"]={[0]=0,2,2,2,2}},--Regeneration (check code before changing, fomula is complex)
-	[73]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},--Hammerhands
-	[83]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,1.5,1.5,1.5,1.5}},--day of the gods
-	[85]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},--day of Protection
-	[86]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},--hour of power (formulas don't use this values, but takes skill and divide by 1.5)
+buffPower={
+	[3]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},
+	[14]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},
+	[25]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},
+	[36]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},
+	[58]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},
+	[69]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},
+	[5]=  {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},
+	[17]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},
+	[28]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},
+	[38]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},
+	[46]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},
+	[47]= {["Base"]={[0]=0,5,5,5,5},    ["Scaling"]={[0]=0,1,1,1,1}},
+	[51]= {["Base"]={[0]=0,15,15,15,15},["Scaling"]={[0]=0,3,3,3,3}},
+	[56]= {["Base"]={[0]=0,10,10,10,10},["Scaling"]={[0]=0,2,2,2,2}},
+	[71]= {["Base"]={[0]=0,5,5,5,5},    ["Scaling"]={[0]=0,2,2,2,2}},
+	[73]= {["Base"]={[0]=0,15,15,15,15},["Scaling"]={[0]=0,3,3,3,3}},
+	[83]= {["Base"]={[0]=0,20,20,20,20},["Scaling"]={[0]=0,1.5,1.5,1.5,1.5}},
+	[85]= {["Base"]={[0]=0,20,20,20,20},["Scaling"]={[0]=0,2,2,2,2}},
+	[86]= {["Base"]={[0]=0,10,10,10,10},["Scaling"]={[0]=0,2,2,2,2}},
 }
 
+-- =================================================================================
+-- Spéciaux (Temple/Scroll/Piédestal) : SOLO vs MULTI
+-- =================================================================================
+local function __is_special_source(v) return type(v)=="string" end
+local function __is_temple(v) return v=="Temple" end
+local function __special_ttl_for(v)
+	if __is_temple(v) then
+		return (vars.MAWSETTINGS and vars.MAWSETTINGS.templeBuffTTL) or const.Hour
+	end
+	return (vars.MAWSETTINGS and vars.MAWSETTINGS.scrollBuffTTL) or (const.Minute*15)
+end
+local function __ensure_expire_map()
+	vars.maw_special_expire = vars.maw_special_expire or {}
+	return vars.maw_special_expire
+end
+
+-- SOLO vs MULTI
+local function inMulti()
+	return Multiplayer and Multiplayer.in_game and true or false
+end
+local function special_use_ttl()
+	-- On utilise le TTL uniquement en MULTI et si le rework n'est pas OFF
+	return inMulti() and (not vars.MAWSETTINGS or vars.MAWSETTINGS.buffRework ~= "OFF")
+end
+
+-- NE PAS renouveler auto quand expiré (on écrit une fois)
+local function __ensure_special_expire(buff)
+	if not special_use_ttl() then return nil end  -- SOLO => pas de TTL
+	local exmap = __ensure_expire_map()
+	local src = vars.mawbuff and vars.mawbuff[buff]
+	if not __is_special_source(src) then return nil end
+	local ex = exmap[buff]
+	if not ex then
+		ex = Game.Time + __special_ttl_for(src)
+		exmap[buff] = ex
+	end
+	return ex
+end
+local function __get_special_expire(buff)
+	local exmap = __ensure_expire_map()
+	return exmap[buff]
+end
+local function __clear_special_expire(buff)
+	local exmap = __ensure_expire_map()
+	exmap[buff] = nil
+end
+
+-- === Gestion Load / Leave et purge des spéciaux ===
 function events.LoadMap()
 	if vars.MAWSETTINGS and vars.MAWSETTINGS.buffRework=="OFF" then return end
 	if not vars.mawbuff then
 		vars.mawbuff={}
 		for i=1,#buffSpellList do
-			vars.mawbuff[buffSpellList[i]]=false		
+			vars.mawbuff[buffSpellList[i]]=false
 		end
-	end	
+	end
 	--remove buffs from pedestal/scrolls if going into another outside map
 	if Map.IsOutdoor() then
 		for i=1, #buffSpellList do
@@ -2828,44 +2924,56 @@ function events.LoadMap()
 			if vars.mawbuff[buff] then
 				if type(vars.mawbuff[buff])=="string" and vars.mawbuff[buff]~=Map.Name and vars.mawbuff[buff]~="Temple" then
 					vars.mawbuff[buff]=false
+					__clear_special_expire(buff)
 				end
 			end
 		end
 	end
-	--remove temples even indoor
+	--remove temples even indoor (flag LeaveMap)
 	for i=1, #buffSpellList do
 		if removeTempleBuffs then
 			local buff=buffSpellList[i]
-			if vars.mawbuff[buff] then
-				if vars.mawbuff[buff]=="Temple" then
-					vars.mawbuff[buff]=false
-				end
+			if vars.mawbuff[buff] and vars.mawbuff[buff]=="Temple" then
+				vars.mawbuff[buff]=false
+				__clear_special_expire(buff)
 			end
 		end
 	end
 	removeTempleBuffs=false
-end
-	
-function events.LeaveMap()
+
+	-- ré-appliquer l’état rework si actif
 	if vars.MAWSETTINGS.buffRework=="ON" then
+		mawBuffApply()
+	end
+end
+
+function events.LeaveMap()
+	if vars.MAWSETTINGS and vars.MAWSETTINGS.buffRework=="ON" then
 		removeTempleBuffs=true
 	end
 end
-	
+
+-- interception Action & Cast (pose TTL sur spéciaux en MULTI)
 function events.Action(t)
 	if t.Action==142 and (buffSpell[t.Param] or utilitySpell[t.Param]) and vars.MAWSETTINGS.buffRework=="ON" then
 		t.Handled=true
 		local pl=Party[t.Param2]
 		local id=pl:GetIndex()
 		mawBuffCast(pl, id, t.Param)
-	end		
+	end
 end
 
 function events.PlayerCastSpell(t)
 	if (buffSpell[t.SpellId] or utilitySpell[t.SpellId]) and vars.MAWSETTINGS.buffRework=="ON" then
-		--fix scrolls and pedestals
+		-- Scrolls & Pedestals
 		if t.TargetKind==4 or t.IsSpellScroll then
 			vars.mawbuff[t.SpellId]=Map.Name
+			do
+				if special_use_ttl() and type(vars.mawbuff[t.SpellId])=="string" then
+					local exmap = __ensure_expire_map()
+					exmap[t.SpellId] = Game.Time + __special_ttl_for(vars.mawbuff[t.SpellId])
+				end
+			end
 			function events.Tick()
 				events.Remove("Tick",1)
 				mawBuffApply()
@@ -2876,7 +2984,7 @@ function events.PlayerCastSpell(t)
 		end
 	end
 end
-	
+
 function getBuffCost(pl, spellId)
 	local cost=0
 	local percentageDecrease=0
@@ -2884,7 +2992,7 @@ function getBuffCost(pl, spellId)
 		local id=pl:GetIndex()
 		local s,m=SplitSkill(Skillz.get(pl,52))
 		local div=spScaling[pl.Class]+m/2
-		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 32) then 
+		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 32) then
 			div=hpScalings[pl.Class]+m/2
 		end
 		percentageDecrease=(buffSpell[spellId].Cost/div)*0.01
@@ -2895,10 +3003,10 @@ function getBuffCost(pl, spellId)
 		end
 	elseif utilitySpell[spellId] then
 		cost=round(utilitySpell[spellId].Cost)
-	end	
+	end
 	return cost, percentageDecrease
 end
-	
+
 --maw manual buff cast
 function mawBuffCast(pl, index, spellId)
 	if vars.mawbuff[spellId]~=index then --cast buff
@@ -2909,28 +3017,32 @@ function mawBuffCast(pl, index, spellId)
 			end
 		end
 		if id==-1 then return end
-		
+
 		local pl=Party[id]
 		if not vars.maxManaPool then
+			vars.maxManaPool={}
+			vars.currentManaPool={}
+			vars.maxHPPool={}
+			vars.currentHPPool={}
 			for i=0,Party.High do
 				local sp=Party[i]:GetFullSP()
 				vars.maxManaPool[i]=sp
 				vars.currentManaPool[i]=sp
-				
 				local hp=Party[i]:GetFullHP()
 				vars.maxHPPool[i]=hp
 				vars.currentHPPool[i]=hp
 			end
 		end
 
+		local sound
 		if buffSpell[spellId] then
 			sound=buffSpell[spellId].Sound
 		elseif utilitySpell[spellId] then
 			sound=utilitySpell[spellId].Sound
-		end	
-		
+		end
+
 		local cost=getBuffCost(pl, spellId)
-		
+
 		if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 32) then --reserve HP instead
 			if vars.currentHPPool[id]<cost and not Game:GetCurrentHouse() then
 				Game.ShowStatusText("Not enough Hit Points")
@@ -2940,27 +3052,39 @@ function mawBuffCast(pl, index, spellId)
 			Game.ShowStatusText("Not enough Mana")
 			return
 		end
-		
+
 		vars.mawbuff[spellId]=index
+		-- clear override OFF si on rebuff
+		vars._maw_local_off[spellId] = nil
+
 		for i=0, Party.High do
 			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), spellId, i)
 		end
 		evt.PlaySound(sound)
 		local delay=getSpellDelay(pl,spellId)
-		if not delay or Game:GetCurrentHouse() then --this should apply only when donating in temples
+		if not delay or Game:GetCurrentHouse() then --donation en Temple
 			vars.mawbuff[spellId]="Temple"
+			do
+				if special_use_ttl() then
+					local exmap = __ensure_expire_map()
+					exmap[spellId] = Game.Time + __special_ttl_for("Temple")
+				end
+			end
 		else
 			pl:SetRecoveryDelay(delay)
 		end
-		--pl.SP=pl.SP-cost
-		
-		function events.Tick() 
+
+		function events.Tick()
 			events.Remove("Tick", 1)
 			mawBuffApply()
 		end
 	else
+		-- === DEBUFF local : pose un override OFF de 90s pour ignorer les retours distants
 		vars.mawbuff[spellId]=false
-		function events.Tick() 
+		__clear_special_expire(spellId)
+		vars._maw_local_off[spellId] = Game.Time + const.Minute + const.Second*30
+
+		function events.Tick()
 			events.Remove("Tick", 1)
 			mawBuffApply()
 			Game.ShowStatusText("Buff Disabled")
@@ -2969,6 +3093,7 @@ function mawBuffCast(pl, index, spellId)
 end
 
 function mawBuffApply()
+	-- reset party buffs de base
 	for i=1, #mawPartyBuffList do
 		local id=mawPartyBuffList[i]
 		Party.SpellBuffs[id].ExpireTime=0
@@ -2979,14 +3104,10 @@ function mawBuffApply()
 	end
 	local s, m=getBuffSkill(1)
 	Party.SpellBuffs[16].Power=m+1
+
+	-- reset single buffs de base (sauf exceptions)
 	for j=0, Party.High do
 		local pl=Party[j]
-		--[[for i=0, pl.SpellBuffs.High do
-			pl.SpellBuffs[i].ExpireTime=0
-			pl.SpellBuffs[i].Power=0
-			pl.SpellBuffs[i].Skill=0
-		end
-		]]
 		for k=1,#mawSingleBuffList do
 			local id=mawSingleBuffList[k]
 			if vars.buffToIgnore and vars.buffToIgnore[j] and vars.buffToIgnore[j][id] and vars.buffToIgnore[j][id]>Game.Time then
@@ -2996,54 +3117,81 @@ function mawBuffApply()
 			end
 		end
 	end
+
 	for i=1, #buffSpellList do
 		local buff=buffSpellList[i]
 		if vars.mawbuff[buff] then
-			local pl=GetPlayerFromIndex(vars.mawbuff[buff])
-			if (pl and pl:IsConscious()) or type(vars.mawbuff[buff])=="string" or type(vars.mawbuff[buff])=="table" then
-				if buff==75 then
-					Party.SpellBuffs[13].Power=50 --allow protection from magic to protect from death/eradicate
-					Party.SpellBuffs[13].Skill=4 --allow protection from magic to protect from death/eradicate
-				end
-				if buff==85 then --day of protection
-					for i=1, #buffSpell[buff].MultiBuff do
-						local buffId=buffSpell[buff].MultiBuff[i]
-						Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
+			-- si override OFF actif, on n’applique pas
+			if vars._maw_local_off[buff] and Game.Time < vars._maw_local_off[buff] then
+				goto skip_apply_this_buff
+			end
+
+			-- déterminer expiration cible
+			local isSpecial = (type(vars.mawbuff[buff])=="string")
+			local expireTarget
+			if isSpecial then
+				if special_use_ttl() then
+					-- MULTI: TTL spécial
+					local ex = __ensure_special_expire(buff)
+					-- si le TTL existe ET qu'il est dépassé, couper
+					if ex and Game.Time >= ex then
+						vars.mawbuff[buff]=false
+						__clear_special_expire(buff)
+						goto skip_apply_this_buff
+					else
+						expireTarget = ex or (Game.Time + const.Hour) -- fallback sécurité
 					end
-				elseif buff==86 then --hour of power
-					for i=1, #buffSpell[buff].MultiBuff do
-						local buffId=buffSpell[buff].MultiBuff[i]
-						Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
+				else
+					-- SOLO: comportement original => longue durée
+					expireTarget = Game.Time + const.Week
+				end
+			else
+				expireTarget = Game.Time + const.Week
+			end
+
+			local pl=GetPlayerFromIndex(vars.mawbuff[buff])
+			if (pl and pl:IsConscious()) or isSpecial or type(vars.mawbuff[buff])=="table" then
+				if buff==75 then
+					Party.SpellBuffs[13].Power=50
+					Party.SpellBuffs[13].Skill=4
+				end
+				if buff==85 then
+					for i2=1, #buffSpell[buff].MultiBuff do
+						local buffId=buffSpell[buff].MultiBuff[i2]
+						Party.SpellBuffs[buffId].ExpireTime=math.max(Party.SpellBuffs[buffId].ExpireTime, expireTarget)
+					end
+				elseif buff==86 then
+					for i2=1, #buffSpell[buff].MultiBuff do
+						local buffId=buffSpell[buff].MultiBuff[i2]
+						Party.SpellBuffs[buffId].ExpireTime=math.max(Party.SpellBuffs[buffId].ExpireTime, expireTarget)
 					end
 					local buffId=buffSpell[buff].SingleBuff
-					for i=0, Party.High do
-						Party[i].SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
+					for j2=0, Party.High do
+						Party[j2].SpellBuffs[buffId].ExpireTime=math.max(Party[j2].SpellBuffs[buffId].ExpireTime, expireTarget)
 					end
 				elseif buffSpell[buff] and buffSpell[buff].PartyBuff then
 					local buffId=buffSpell[buff].PartyBuff
-					Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
+					Party.SpellBuffs[buffId].ExpireTime=math.max(Party.SpellBuffs[buffId].ExpireTime, expireTarget)
 					if buffId==8 then
-						Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
+						Party.SpellBuffs[buffId].ExpireTime=math.max(Party.SpellBuffs[buffId].ExpireTime, expireTarget)
 					end
 				elseif buffSpell[buff] and buffSpell[buff].SingleBuff then
 					local buffId=buffSpell[buff].SingleBuff
-					for i=0, Party.High do
-						Party[i].SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
+					for j2=0, Party.High do
+						Party[j2].SpellBuffs[buffId].ExpireTime=math.max(Party[j2].SpellBuffs[buffId].ExpireTime, expireTarget)
 					end
 				elseif utilitySpell[buff] and utilitySpell[buff].PartyBuff then
 					local buffId=utilitySpell[buff].PartyBuff
-					--if buffId~=7 or (not Party.EnemyDetectorYellow and not Party.EnemyDetectorRed and Map.IndoorOrOutdoor==2) then --fly
 					if type(vars.mawbuff[buff])=="string" then
-						Party.SpellBuffs[buffId].Caster=1 --crashes otherwise
+						Party.SpellBuffs[buffId].Caster=1
 					elseif type(vars.mawbuff[buff])=="number" then
 						Party.SpellBuffs[buffId].Caster=vars.mawbuff[buff]+1
 					else
 						Party.SpellBuffs[buffId].Caster=1
 					end
-					Party.SpellBuffs[buffId].Bits=1 --allow fly
-					Party.SpellBuffs[buffId].ExpireTime=Game.Time+const.Week
-					--end
-				end	
+					Party.SpellBuffs[buffId].Bits=1
+					Party.SpellBuffs[buffId].ExpireTime=math.max(Party.SpellBuffs[buffId].ExpireTime, expireTarget)
+				end
 			end
 			if vars.mawbuff[8] then
 				if type(vars.mawbuff[8])=="string" then
@@ -3053,10 +3201,12 @@ function mawBuffApply()
 				end
 			end
 		end
+		::skip_apply_this_buff::
 	end
+
 	--vampire night preservation
 	for k=0, Party.High do
-		pl=Party[k]
+		local pl=Party[k]
 		local race=Game.CharacterPortraits[pl.Face].Race
 		if race==const.Race.Vampire then
 			local hour=Game.Time%const.Day/const.Hour
@@ -3073,7 +3223,7 @@ function mawBuffApply()
 		Party.SpellBuffs[16].Power=math.max(3,Party.SpellBuffs[16].Power)
 		Party.SpellBuffs[16].Skill=math.max(1,Party.SpellBuffs[16].Skill)
 	end
-	
+
 	for i=1,#vars.NPCFollowers do
 		if Game.NPC[vars.NPCFollowers[i]].Profession==38 then
 			Party.SpellBuffs[19].ExpireTime=math.max(Game.Time+const.Hour, Party.SpellBuffs[19].ExpireTime)
@@ -3081,14 +3231,14 @@ function mawBuffApply()
 			Party.SpellBuffs[19].Skill=math.max(2,Party.SpellBuffs[19].Skill)
 		end
 	end
-	
+
 	--magic potion fix
 	if vars.magicResistancePotionExpire and vars.magicResistancePotionExpire>Game.Time then
 		Party.SpellBuffs[13].ExpireTime=vars.magicResistancePotionExpire
 		Party.SpellBuffs[13].Power=4
 		Party.SpellBuffs[13].Skill=10
 	end
-	
+
 	--shadow bosses
 	if mapvars.shadow then
 		for i=1, #mapvars.shadow do
@@ -3107,7 +3257,7 @@ function mawBuffApply()
 	mawRefresh("all")
 	buffManaLock()
 end
-	
+
 function buffManaLock()
 	vars.maxManaPool={}
 	vars.currentManaPool={}
@@ -3120,7 +3270,6 @@ function buffManaLock()
 		local sp=Party[i]:GetFullSP()
 		vars.maxManaPool[i]=sp
 		vars.currentManaPool[i]=sp
-		--hp
 		local hp=Party[i]:GetFullHP()
 		vars.maxHPPool[i]=hp
 		vars.currentHPPool[i]=hp
@@ -3133,7 +3282,7 @@ function buffManaLock()
 			if id then
 				local pl=Party[id]
 				local s,m=SplitSkill(Skillz.get(pl,52))
-				if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 32) then --reserve HP instead
+				if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 32) then
 					if buffSpell[spell] then
 						local div=hpScalings[pl.Class]+m/2
 						local percentageDecrease=(buffSpell[spell].Cost/div)*0.01
@@ -3158,40 +3307,40 @@ function buffManaLock()
 			vars.currentManaPool[i]=vars.maxManaPool[i]
 			vars.currentHPPool[i]=vars.maxHPPool[i]
 		end
-		Party[i].SP=math.min(math.ceil(vars.currentManaPool[i]), Party[i].SP)
-		Party[i].HP=math.min(math.ceil(vars.currentHPPool[i]), Party[i].HP)
-	end
-end
-	
-function events.LoadMap()
-	if vars.MAWSETTINGS.buffRework=="ON" then
-		mawBuffApply()
+		Party[i].SP = math.min(math.ceil(vars.currentManaPool[i]), Party[i].SP)
+		Party[i].HP = math.min(math.ceil(vars.currentHPPool[i]), Party[i].HP)
 	end
 end
 
 function events.AfterLoadMap()
-	if vars.MAWSETTINGS.buffRework=="ON" then
+	if vars.MAWSETTINGS and vars.MAWSETTINGS.buffRework=="ON" then
+		-- ré-applique périodiquement (préexistant dans ton mod)
 		Timer(mawBuffApply, const.Minute/2, true)
-		Timer(buffManaLock, const.Minute/20) 
+		Timer(buffManaLock, const.Minute/20)
 	end
 end
-	
+
 function GetPlayerFromIndex(index)
 	for i=0,Party.High do
-		player=Party[i]
+		local player=Party[i]
 		if player:GetIndex()==index then
 			return player
 		end
 	end
 	return false
 end
-	
+
+-- NOTE:
+--  - si vars.mawbuff[spell] est un {s,m,l} (table), on retourne tel quel
+--  - si c’est un "string" (Temple/Map.Name) on retourne une valeur >0 pour l’appliquer localement,
+--    mais le MULTI côté client filtre ces spéciaux pour éviter la re-diffusion.
 function getBuffSkill(spell)
 	local id=vars.mawbuff[spell]
 	if type(id)=="table" then
 		return id[1], id[2], id[3]
 	end
 	if type(id)=="string" then
+		-- spécial (Temple/Scroll/Piédestal) : applique localement
 		return 7,3,40
 	end
 	local player=GetPlayerFromIndex(id)
@@ -3208,6 +3357,7 @@ function getBuffSkill(spell)
 		return 0,0,0
 	end
 end
+
 	
 	--code to make buff work is elsewhere
 
