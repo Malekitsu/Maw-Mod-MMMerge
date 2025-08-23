@@ -1174,7 +1174,9 @@ function events.BuildItemInformationBox(t)
 					end
 					strength=round((1-1/1.5^(strength^0.6/10))*1000)/10 .. "%"
 				end
-				t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
+				if itemStatName[bonus] then
+					t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
+				end
 			elseif t.Item.Bonus~=0 and t.Item.BonusStrength~=0 then
 				if extraDescription then
 					math.randomseed(t.Item.Number*10000+t.Item.MaxCharges*1000+t.Item.Bonus*100+t.Item.BonusStrength*10+t.Item.Charges)
