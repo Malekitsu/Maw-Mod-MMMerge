@@ -1,4 +1,11 @@
 -- ==== Buff share — BY RAFIKI59
+-- ==== + mawmapvarsend compat + N-players owner-aware + OFF sync
+-- ==== + multi-only blockSpells + SOLO: purge remote-only
+-- ==== + WEAK fix béton (burst) + fenêtre de protection post-death synchronisée (canal dédié)
+-- ==== + SANS Timer() : cadence Tick résiliente aux resync/rewind
+-- ==== + TimeSync guard réseau + HP-FLOOR d’urgence (respawn/resync) + anti “no-sleep”
+-- ==== + Clamp dégâts + remontée PV au Tick (si baisse hors pipeline)
+-- ==== + Pulse d’envoi après respawn + boost d’envoi
 
 ------------------------------------------------------------
 -- ÉTAT / HELPERS
@@ -16,8 +23,6 @@ local function ensure_state()
   vars.mawbuff_remote     = vars.mawbuff_remote     or {}
   vars.maw_remote_owners  = vars.maw_remote_owners  or {}
   vars.maw_remote_values  = vars.maw_remote_values  or {}
-
-  -- OFF local (débuff manuel protégé)
   vars._maw_local_off     = vars._maw_local_off     or {}
 
   -- Horloge & cadence
@@ -37,12 +42,32 @@ local function ensure_state()
   vars._maw_weak_protect_until = vars._maw_weak_protect_until or 0
   vars._maw_clear_weak_ticks   = vars._maw_clear_weak_ticks or 0
 
-  -- Compte morts host
+  -- Compte morts host (longues périodes)
   vars._maw_host_death_count   = vars._maw_host_death_count or 0
+end
 
-  -- Anti-fantômes : epoch et derniers epochs reçus par sender
-  vars._maw_epoch              = vars._maw_epoch or 1
-  vars._maw_sender_epoch       = vars._maw_sender_epoch or {}
+-- === Compat maps: mawmapvarsend shim ===
+if not rawget(_G, "mawmapvarsend") then
+  local function __senderId()
+    return (Multiplayer and Multiplayer.player_id) or "host"
+  end
+  function mawmapvarsend(key, val)
+    mapvars = mapvars or {}
+    mapvars[key] = val
+    if Multiplayer and Multiplayer.in_game then
+      if Multiplayer.allow_remote_event then
+        Multiplayer.allow_remote_event("MAWMapvarArrived")
+      end
+      local x = (Party and Party.X) or 0
+      local y = (Party and Party.Y) or 0
+      local z = (Party and Party.Z) or 0
+      Multiplayer.broadcast_mapdata(
+        { DataType = "mapvar", [1] = key, [2] = val,
+          X = x, Y = y, Z = z, sender = __senderId() },
+        "MAWMapvarArrived"
+      )
+    end
+  end
 end
 
 local function isReworkOn()
@@ -59,6 +84,24 @@ local function isHost()
   if type(Multiplayer.player_id)=="string" then return Multiplayer.player_id == "host" end
   if type(Multiplayer.player_id)=="number" then return Multiplayer.player_id == 0 end
   return false
+end
+
+------------------------------------------------------------
+-- SAFETY SHIMS
+------------------------------------------------------------
+do
+  if type(rawget(_G, "mawBuffApply")) == "function" and not _G.__MAW_WRAP_APPLY then
+    local __orig_mawBuffApply = mawBuffApply
+    _G.__MAW_WRAP_APPLY = true
+    function mawBuffApply(...)
+      local ok, res = pcall(__orig_mawBuffApply, ...)
+      if not ok then
+        if Game and Game.ShowStatusText then Game.ShowStatusText("MAW: apply (safe)") end
+        return nil
+      end
+      return res
+    end
+  end
 end
 
 local function inMulti() return (Multiplayer and Multiplayer.in_game) and true or false end
@@ -97,16 +140,8 @@ local function remote_effective(id)
 end
 
 ------------------------------------------------------------
--- HOTFIX RSMem: safe getBuffSkill + highs autodétectés
+-- HOTFIX RSMem: highs autodétectés pour NUKE
 ------------------------------------------------------------
-local function safe_getBuffSkill(id)
-  if type(getBuffSkill) ~= "function" then return 0,0,0 end
-  local ok, s, m, l = pcall(getBuffSkill, id)
-  if not ok then return 0,0,0 end
-  s = tonumber(s) or 0; m = tonumber(m) or 0; l = tonumber(l) or 0
-  return s, m, l
-end
-
 local function detect_partybuff_high_fallback()
   local declared = (Party and Party.SpellBuffs and type(Party.SpellBuffs.High)=="number") and Party.SpellBuffs.High
                 or ((const and const.PartyBuff and type(const.PartyBuff.High)=="number") and const.PartyBuff.High)
@@ -137,109 +172,6 @@ local function detect_playerbuff_high_fallback()
     if i > 256 then break end
   end
   return (last >= 0) and last or 0
-end
-
--- Compat maps: mawmapvarsend shim
-if not rawget(_G, "mawmapvarsend") then
-  local function __senderId()
-    return (Multiplayer and Multiplayer.player_id) or "host"
-  end
-  function mawmapvarsend(key, val)
-    mapvars = mapvars or {}
-    mapvars[key] = val
-    if Multiplayer and Multiplayer.in_game then
-      if Multiplayer.allow_remote_event then
-        Multiplayer.allow_remote_event("MAWMapvarArrived")
-      end
-      local x = (Party and Party.X) or 0
-      local y = (Party and Party.Y) or 0
-      local z = (Party and Party.Z) or 0
-      Multiplayer.broadcast_mapdata(
-        { DataType = "mapvar", [1] = key, [2] = val,
-          X = x, Y = y, Z = z, sender = __senderId(), epoch = vars._maw_epoch or 1 },
-        "MAWMapvarArrived"
-      )
-    end
-  end
-end
-
-------------------------------------------------------------
--- SAFETY SHIMS
-------------------------------------------------------------
-do
-  if type(rawget(_G, "mawBuffApply")) == "function" and not _G.__MAW_WRAP_APPLY then
-    local __orig_mawBuffApply = mawBuffApply
-    _G.__MAW_WRAP_APPLY = true
-    function mawBuffApply(...)
-      local ok, res = pcall(__orig_mawBuffApply, ...)
-      if not ok then
-        if Game and Game.ShowStatusText then Game.ShowStatusText("MAW: apply (safe)") end
-        return nil
-      end
-      return res
-    end
-  end
-end
-
--- OFF local actif ?
-local function local_off_active(id)
-  local until_ = vars._maw_local_off and vars._maw_local_off[id]
-  return until_ and (NOW() < until_)
-end
-
--- Reprise propriété locale d’un buff
-local function __take_local_ownership(id)
-  ensure_state()
-  if vars.maw_remote_owners and vars.maw_remote_owners[id] then vars.maw_remote_owners[id] = nil end
-  if vars.maw_remote_values and vars.maw_remote_values[id] then vars.maw_remote_values[id] = nil end
-  if vars.mawbuff_remote and vars.mawbuff_remote[id] then vars.mawbuff_remote[id] = nil end
-end
-
--- Strip moteur des buffs purement distants (anti “fantômes”)
-local function __strip_engine_remote()
-  ensure_state()
-  local removed = false
-  local function nuke_partybuff(id)
-    if Party and Party.SpellBuffs then
-      local ok,b = pcall(function() return Party.SpellBuffs[id] end)
-      if ok and b then
-        b.ExpireTime = 0
-        if b.Power  ~= nil then b.Power  = 0 end
-        if b.Skill  ~= nil then b.Skill  = 0 end
-        if b.Caster ~= nil then b.Caster = 0 end
-        if b.Bits   ~= nil then b.Bits   = 0 end
-      end
-    end
-  end
-  local function nuke_playerbuff_allplayers(id)
-    if Party and type(Party.High)=="number" then
-      for i=0,Party.High do
-        local pl = Party[i]
-        if pl and pl.SpellBuffs then
-          local ok,b = pcall(function() return pl.SpellBuffs[id] end)
-          if ok and b then
-            b.ExpireTime = 0
-            if b.Power  ~= nil then b.Power  = 0 end
-            if b.Skill  ~= nil then b.Skill  = 0 end
-            if b.Caster ~= nil then b.Caster = 0 end
-            if b.Bits   ~= nil then b.Bits   = 0 end
-          end
-        end
-      end
-    end
-  end
-
-  if vars.maw_remote_owners then
-    for id, owners in pairs(vars.maw_remote_owners) do
-      local localFlag = vars.mawbuff and (vars.mawbuff[id] ~= nil and (type(vars.mawbuff[id])=="number" or vars.mawbuff[id]==true or type(vars.mawbuff[id])=="table"))
-      if not localFlag then
-        if type(mawRemoveBuff)=="function" then pcall(mawRemoveBuff, id) end
-        nuke_partybuff(id); nuke_playerbuff_allplayers(id)
-        removed = true
-      end
-    end
-  end
-  if removed and type(mawBuffApply)=="function" then pcall(mawBuffApply) end
 end
 
 ------------------------------------------------------------
@@ -406,47 +338,18 @@ local function purge_remote_buffs_keep_local()
 end
 
 ------------------------------------------------------------
--- RÉCEPTION BUFFS (ON/OFF + HELLO + EPOCH)
+-- RÉCEPTION BUFFS (ON/OFF)
 ------------------------------------------------------------
 function events.MAWMapvarArrived(t)
   if not t or type(t) ~= "table" then return end
-
-  -- Handshake: un joueur vient de (re)joindre → renvoyer nos buffs tout de suite
-  if t.DataType == "mawHello" then
-    ensure_state()
-    vars._maw_resend_boost_until = NOW() + 6*SEC
-    vars._maw_last_sent = {}
-    pcall(sendBuffs)
-    return
-  end
-
   if t.DataType == "mapvar" then
     mapvars = mapvars or {}
     mapvars[t[1]] = t[2]
     return
   end
-
   if (t.DataType ~= "mawBuffs") and (t.DataType ~= "mawBuffsOff") then return end
   if not isReworkOn() then return end
   ensure_state()
-
-  -- Anti-paquets obsolètes (epoch)
-  local sender = tostring(t.sender or "?")
-  local tepoch = tonumber(t.epoch or 0) or 0
-  local lastEpoch = vars._maw_sender_epoch[sender] or 0
-  if tepoch < lastEpoch then
-    return
-  elseif tepoch > lastEpoch then
-    vars._maw_sender_epoch[sender] = tepoch
-    for id, owners in pairs(vars.maw_remote_owners or {}) do
-      if owners and owners[sender] then owners[sender] = nil end
-    end
-    if vars.maw_remote_values then
-      for id, perSender in pairs(vars.maw_remote_values) do
-        if perSender then perSender[sender] = nil end
-      end
-    end
-  end
 
   if not (t.X and t.Y and t.Z) then return end
   local dx,dy,dz = (Party.X or 0)-t.X, (Party.Y or 0)-t.Y, (Party.Z or 0)-t.Z
@@ -454,40 +357,31 @@ function events.MAWMapvarArrived(t)
   if dist > (vars.MAWSETTINGS.buffRadius or BASE_RADIUS) then return end
 
   local BLOCK  = vars.MAWSETTINGS.blockSpells or {}
+  local sender = tostring(t.sender or "?")
   local dtype  = t.DataType
   local changed=false
 
   if dtype == "mawBuffs" then
     for id, payload in pairs(t) do
       if type(id)=="number" and type(payload)=="table" and not BLOCK[id] then
-        if local_off_active(id) then
-          local owners = vars.maw_remote_owners[id] or {}
-          owners[sender] = true
-          vars.maw_remote_owners[id] = owners
-          local perSender = vars.maw_remote_values[id] or {}
-          perSender[sender] = { tonumber(payload[1]) or 0, tonumber(payload[2]) or 0, tonumber(payload[3]) or 0 }
-          vars.maw_remote_values[id] = perSender
-          vars.mawbuff_remote[id] = true
-        else
-          local owners = vars.maw_remote_owners[id] or {}
-          owners[sender] = true
-          vars.maw_remote_owners[id] = owners
+        local owners = vars.maw_remote_owners[id] or {}
+        owners[sender] = true
+        vars.maw_remote_owners[id] = owners
 
-          local perSender = vars.maw_remote_values[id] or {}
-          perSender[sender] = { tonumber(payload[1]) or 0, tonumber(payload[2]) or 0, tonumber(payload[3]) or 0 }
-          vars.maw_remote_values[id] = perSender
+        local perSender = vars.maw_remote_values[id] or {}
+        perSender[sender] = { tonumber(payload[1]) or 0, tonumber(payload[2]) or 0, tonumber(payload[3]) or 0 }
+        vars.maw_remote_values[id] = perSender
 
-          local eff = remote_effective(id)
-          local v = vars.mawbuff[id]
-          if not (type(v)=="number" or v==true) then
-            local old = vars.mawbuff[id]
-            if (type(old)~="table") or (old[1]~=eff[1] or old[2]~=eff[2] or old[3]~=eff[3]) then
-              vars.mawbuff[id] = { eff[1], eff[2], eff[3] }
-              changed = true
-            end
+        local eff = remote_effective(id)
+        local v = vars.mawbuff[id]
+        if not (type(v)=="number" or v==true) then
+          local old = vars.mawbuff[id]
+          if (type(old)~="table") or (old[1]~=eff[1] or old[2]~=eff[2] or old[3]~=eff[3]) then
+            vars.mawbuff[id] = { eff[1], eff[2], eff[3] }
+            changed = true
           end
-          vars.mawbuff_remote[id] = true
         end
+        vars.mawbuff_remote[id] = true
       end
     end
   else
@@ -526,6 +420,30 @@ function events.MAWMapvarArrived(t)
   if changed and type(mawBuffApply)=="function" then pcall(mawBuffApply) end
 end
 
+-- WEAK — canal dédié
+function events.mawWeakEvt(t)
+  if not t or t.DataType ~= "mawWeak" then return end
+  if t.action == "clear" then
+    MAW_ClearWeakAll()
+  elseif t.action == "prime" then
+    vars._maw_clear_weak_ticks = math.max(vars._maw_clear_weak_ticks or 0, tonumber(t.ticks) or 15)
+    MAW_ClearWeakAll()
+  elseif t.action == "protect" then
+    MAW_StartWeakProtect(tonumber(t.seconds) or 30)
+  end
+end
+
+-- TimeSync guard réseau
+function events.mawTimeSync(t)
+  ensure_state()
+  vars._maw_sync_guard_until = math.max(vars._maw_sync_guard_until or 0, NOW() + (tonumber(t.guard) or 8))
+  vars._maw_resend_boost_until = NOW() + 6*SEC
+  if Party and Party.Food ~= nil and Party.Food < 3 then Party.Food = 3 end
+end
+
+function events.mawHostDown(t) ensure_state(); vars._maw_resend_boost_until = NOW() + 6*SEC end
+function events.mawClientDown(t) ensure_state(); vars._maw_resend_boost_until = NOW() + 6*SEC end
+
 ------------------------------------------------------------
 -- ENVOI (ON/OFF) — cadence Tick
 ------------------------------------------------------------
@@ -534,85 +452,62 @@ local function sendBuffs()
   ensure_state()
   if not Party then return end
 
-  local payload_on  = { DataType="mawBuffs",    X=Party.X, Y=Party.Y, Z=Party.Z, sender=senderId(), epoch=vars._maw_epoch or 1 }
-  local payload_off = { DataType="mawBuffsOff", X=Party.X, Y=Party.Y, Z=Party.Z, sender=senderId(), epoch=vars._maw_epoch or 1 }
+  local payload_on  = { DataType="mawBuffs",    X=Party.X, Y=Party.Y, Z=Party.Z, sender=senderId() }
+  local payload_off = { DataType="mawBuffsOff", X=Party.X, Y=Party.Y, Z=Party.Z, sender=senderId() }
 
   local BLOCK = vars.MAWSETTINGS.blockSpells or {}
   local current = {}
   local hasOn, hasOff = false, false
-  local iAmHost = isHost()
 
-  -- Phase 1 : depuis vars.mawbuff (prioritaire)
+  -- cas local explicite
   for id, v in pairs(vars.mawbuff) do
     if type(id)=="number" and not BLOCK[id] then
-      if local_off_active(id) then
-        -- OFF local => pas de ON
-      else
-        if (type(v)=="string") and (not iAmHost) then
-          -- skip spéciaux côté client
-        else
-          local owners = vars.maw_remote_owners[id]
-          local isRemote = owners and next(owners)~=nil
-          local s,m,l = 0,0,0
-          local localActive=false
+      local owners = vars.maw_remote_owners[id]
+      local isRemote = owners and next(owners)~=nil
+      local s,m,l = 0,0,0
+      local localActive=false
 
-          if (type(v)=="number" and v~=0) or v==true then
-            localActive = true
-            s,m,l = safe_getBuffSkill(id)
-          elseif type(v)=="table" and not isRemote then
-            localActive = true
-            s = tonumber(v[1]) or 0; m = tonumber(v[2]) or 0; l = tonumber(v[3]) or 0
-            if (s+m+l)==0 then s,m,l = safe_getBuffSkill(id) end
-          elseif type(v)=="string" and iAmHost then
-            s,m,l = safe_getBuffSkill(id)
-            if sum3(s,m,l) > 0 then localActive = true end
-          end
+      if (type(v)=="number" and v~=0) or v==true then
+        localActive = true
+        if type(getBuffSkill)=="function" then s,m,l = getBuffSkill(id) end
+      elseif type(v)=="table" and not isRemote then
+        localActive = true
+        s = tonumber(v[1]) or 0; m = tonumber(v[2]) or 0; l = tonumber(v[3]) or 0
+        if (s+m+l)==0 and type(getBuffSkill)=="function" then s,m,l = getBuffSkill(id) end
+      end
 
-          if localActive and sum3(s,m,l)>0 then
-            __take_local_ownership(id)
-            payload_on[id] = { s,m,l }
-            current[id] = true
-            hasOn = true
-          end
-        end
+      if localActive and (s+m+l)>0 then
+        payload_on[id] = { s,m,l }
+        current[id] = true
+        hasOn = true
       end
     end
   end
 
-  -- Phase 2 : scan moteur (complément)
+  -- fallback: scanner les sorts actifs
   if type(getBuffSkill)=="function" then
     local maxId = maxSpellId()
     for id=1,maxId do
       if not BLOCK[id] and not current[id] then
-        if local_off_active(id) then
-          -- OFF local => ne rien envoyer
-        elseif (vars.mawbuff and type(vars.mawbuff[id])=="string" and not iAmHost) then
-          -- skip spéciaux côté client
-        else
-          local s,m,l = safe_getBuffSkill(id)
-          local gs = { tonumber(s) or 0, tonumber(m) or 0, tonumber(l) or 0 }
-          if sum3(gs[1],gs[2],gs[3]) > 0 then
-            local owners = vars.maw_remote_owners[id]
-            local eff = remote_effective(id)
-            if (not owners or next(owners)==nil) or lex_gt(gs, eff) then
-              payload_on[id] = { gs[1], gs[2], gs[3] }
-              __take_local_ownership(id)
-              current[id] = true
-              hasOn = true
-              if vars.mawbuff[id] == nil then vars.mawbuff[id] = 1 end
-            end
+        local s,m,l = getBuffSkill(id)
+        local gs = { tonumber(s) or 0, tonumber(m) or 0, tonumber(l) or 0 }
+        if (gs[1]+gs[2]+gs[3]) > 0 then
+          local owners = vars.maw_remote_owners[id]
+          local eff = remote_effective(id)
+          if (not owners or next(owners)==nil) or lex_gt(gs, eff) then
+            payload_on[id] = { gs[1], gs[2], gs[3] }
+            current[id] = true
+            hasOn = true
+            if vars.mawbuff[id] == nil then vars.mawbuff[id] = 1 end
           end
         end
       end
     end
   end
 
-  -- OFF pour tout ce qu’on n’a plus (ou OFF local)
+  -- OFF = ce qu’on avait envoyé au tick-1 mais plus actif
   for id,_ in pairs(vars._maw_last_sent or {}) do
-    if not current[id] and not BLOCK[id] then
-      payload_off[id] = 1
-      hasOff = true
-    end
+    if not current[id] and not BLOCK[id] then payload_off[id] = 1; hasOff = true end
   end
 
   if hasOn  then Multiplayer.broadcast_mapdata(payload_on,  "MAWMapvarArrived") end
@@ -629,7 +524,7 @@ local function block_forbidden_spells_in_multi()
   if type(getBuffSkill)~="function" then return end
   for id,blocked in pairs(BLOCK) do
     if blocked then
-      local s,m,l = safe_getBuffSkill(id)
+      local s,m,l = getBuffSkill(id)
       if sum3(s,m,l) > 0 then
         if type(mawRemoveBuff)=="function" then pcall(mawRemoveBuff, id) end
         if vars.mawbuff then vars.mawbuff[id] = nil end
@@ -647,17 +542,8 @@ end
 local function __broadcast_timesync_guard(sec)
   if Multiplayer and Multiplayer.in_game and Multiplayer.allow_remote_event then
     Multiplayer.allow_remote_event("mawTimeSync")
-    Multiplayer.broadcast_mapdata({ DataType="mawTimeSync", guard=sec or 8, sender=senderId(), epoch=vars._maw_epoch or 1 }, "mawTimeSync")
+    Multiplayer.broadcast_mapdata({ DataType="mawTimeSync", guard=sec or 8, sender=senderId() }, "mawTimeSync")
   end
-end
-
-local function __bump_epoch(reason)
-  ensure_state()
-  vars._maw_epoch = (vars._maw_epoch or 1) + 1
-  vars._maw_last_sent = {}
-  vars._maw_resend_boost_until = NOW() + 6*SEC
-  __strip_engine_remote()
-  __broadcast_timesync_guard(8)
 end
 
 function events.Tick()
@@ -668,24 +554,27 @@ function events.Tick()
   local lastClock = vars._maw_clock_last or now
   local delta = now - lastClock
   if delta < -0.5*SEC or delta > (12*3600) then
-    __bump_epoch("rewind")
     vars._maw_next_send_time = now + SEC
+    vars._maw_last_sent = {}
     vars._maw_sync_guard_until = now + 10
+    vars._maw_resend_boost_until = now + 6*SEC
+    __broadcast_timesync_guard(10)
     __begin_hp_guard(10)
   end
   vars._maw_clock_last = now
 
-  -- Protect WEAK (burst)
+  -- Protect WEAK
   if vars._maw_weak_protect_until > 0 and now < vars._maw_weak_protect_until then
     MAW_ClearWeakAll()
   end
 
-  -- Grand skip (jours) → hard refresh
+  -- Grand skip (jours)
   vars._maw_last_time = vars._maw_last_time or now
   if (now - vars._maw_last_time) > (DAY*6) then
-    __bump_epoch("dayskip")
+    vars._maw_last_sent = {}
     vars._maw_sync_guard_until = now + 10
     vars._maw_clear_weak_ticks = math.max(vars._maw_clear_weak_ticks or 0, 14)
+    __broadcast_timesync_guard(10)
     __begin_hp_guard(10)
   end
   vars._maw_last_time = now
@@ -716,9 +605,6 @@ function events.Tick()
   -- Blocage sorts interdits
   block_forbidden_spells_in_multi()
 
-  -- Strip moteur des buffs purement distants (entretien anti-fantômes)
-  __strip_engine_remote()
-
   -- Cadence d’envoi sans Timer
   if not inMulti() or not isReworkOn() then return end
   if now < (START_DELAY or 0) then return end
@@ -729,57 +615,26 @@ function events.Tick()
 end
 
 ------------------------------------------------------------
--- LOAD / GAMELOADED / INIT / JOIN
+-- LOAD / GAMELOADED / INIT
 ------------------------------------------------------------
-local function __force_reshare_buffs(pulse_sec, instant)
-  ensure_state()
-  vars._maw_last_sent = {}
-  vars._maw_next_send_time = 0
-  vars._maw_resend_boost_until = NOW() + (pulse_sec or 6)*SEC
-  if instant then pcall(sendBuffs) end
-end
-
-local function __send_hello()
-  if Multiplayer and Multiplayer.in_game and Multiplayer.allow_remote_event then
-    Multiplayer.allow_remote_event("MAWMapvarArrived")
-    Multiplayer.allow_remote_event("mawHello")
-    Multiplayer.broadcast_mapdata({
-      DataType="mawHello",
-      sender=senderId(),
-      epoch=vars._maw_epoch or 1,
-      X=(Party and Party.X) or 0, Y=(Party and Party.Y) or 0, Z=(Party and Party.Z) or 0
-    }, "MAWMapvarArrived")
-  end
-end
-
 function events.LoadMap()
   ensure_state()
-  __bump_epoch("loadmap")
+  vars._maw_last_sent = {}
+  vars._maw_next_send_time = NOW() + 0.5*SEC
   if not inMulti() then purge_remote_buffs_keep_local() end
   vars._maw_clear_weak_ticks = math.max(vars._maw_clear_weak_ticks or 0, 12)
   __refresh_condition_indices()
   __begin_hp_guard(8)
-  __strip_engine_remote()
-
-  if inMulti() and isReworkOn() then
-    __force_reshare_buffs(6, true)
-    __send_hello()
-  end
 end
 
 function events.GameLoaded()
   ensure_state()
-  __bump_epoch("gameloaded")
+  vars._maw_last_sent = {}
+  vars._maw_next_send_time = NOW() + 0.5*SEC
   if not inMulti() then purge_remote_buffs_keep_local() end
   vars._maw_clear_weak_ticks = math.max(vars._maw_clear_weak_ticks or 0, 12)
   __refresh_condition_indices()
   __begin_hp_guard(8)
-  __strip_engine_remote()
-
-  if inMulti() and isReworkOn() then
-    __force_reshare_buffs(6, true)
-    __send_hello()
-  end
 end
 
 function events.MultiplayerInitialized()
@@ -793,53 +648,33 @@ function events.MultiplayerInitialized()
     Multiplayer.allow_remote_event("mawTimeSync")
     Multiplayer.allow_remote_event("mawHostDown")
     Multiplayer.allow_remote_event("mawClientDown")
-    Multiplayer.allow_remote_event("mawHello")
   end
-  __bump_epoch("mpinit")
-  __strip_engine_remote()
-  if inMulti() and isReworkOn() then
-    __force_reshare_buffs(8, true)
-    __send_hello()
-  end
-end
-
-if rawget(events, "MultiplayerPlayerJoined") then
-  function events.MultiplayerPlayerJoined(t)
-    ensure_state()
-    if inMulti() and isReworkOn() then
-      __force_reshare_buffs(8, true)
-      __send_hello()
-      __broadcast_timesync_guard(8)
-    end
-  end
+  vars._maw_next_send_time = NOW() + 0.5*SEC
+  vars._maw_clear_weak_ticks = math.max(vars._maw_clear_weak_ticks or 0, 12)
+  __refresh_condition_indices()
 end
 
 ------------------------------------------------------------
--- SÉQUENCES DE MORT → guards + pulses + anti-fantômes
+-- SÉQUENCES DE MORT → guards + pulses
 ------------------------------------------------------------
 local function __notify(which)
   if Multiplayer and Multiplayer.in_game and Multiplayer.allow_remote_event then
     Multiplayer.allow_remote_event(which)
-    Multiplayer.broadcast_mapdata({ DataType=which, sender=senderId(), epoch=vars._maw_epoch or 1 }, which)
+    Multiplayer.broadcast_mapdata({ DataType=which, sender=senderId() }, which)
   end
 end
 
 local function __after_death_resend_pulse()
   ensure_state()
-  __bump_epoch("death")
-  __force_reshare_buffs(6, true)
+  vars._maw_last_sent = {}
+  vars._maw_next_send_time = 0
+  vars._maw_resend_boost_until = NOW() + 6*SEC
   __begin_hp_guard(12)
-  __strip_engine_remote()
 end
 
 function events.GameOver()
   ensure_state()
-  if isHost() then
-    vars._maw_host_death_count = (vars._maw_host_death_count or 0) + 1
-    __notify("mawHostDown")
-  else
-    __notify("mawClientDown")
-  end
+  if isHost() then vars._maw_host_death_count = (vars._maw_host_death_count or 0) + 1; __notify("mawHostDown") else __notify("mawClientDown") end
   vars._maw_clear_weak_ticks = math.max(vars._maw_clear_weak_ticks or 0, 20)
   MAW_StartWeakProtect(30)
   __after_death_resend_pulse()
@@ -847,52 +682,14 @@ end
 
 function events.DeathMenu()
   ensure_state()
-  if isHost() then
-    vars._maw_host_death_count = (vars._maw_host_death_count or 0) + 1
-    __notify("mawHostDown")
-  else
-    __notify("mawClientDown")
-  end
+  if isHost() then vars._maw_host_death_count = (vars._maw_host_death_count or 0) + 1; __notify("mawHostDown") else __notify("mawClientDown") end
   vars._maw_clear_weak_ticks = math.max(vars._maw_clear_weak_ticks or 0, 20)
   MAW_StartWeakProtect(30)
   __after_death_resend_pulse()
 end
 
 ------------------------------------------------------------
--- WEAK — canal dédié + TimeSync
-------------------------------------------------------------
-function events.mawWeakEvt(t)
-  if not t then return end
-  if t.DataType ~= "mawWeak" then return end
-  local tepoch = tonumber(t.epoch or 0) or 0
-  if tepoch > 0 and tepoch < (vars._maw_sender_epoch[tostring(t.sender or "?")] or 0) then return end
-
-  if t.action == "clear" then
-    MAW_ClearWeakAll()
-  elseif t.action == "prime" then
-    vars._maw_clear_weak_ticks = math.max(vars._maw_clear_weak_ticks or 0, tonumber(t.ticks) or 15)
-    MAW_ClearWeakAll()
-  elseif t.action == "protect" then
-    MAW_StartWeakProtect(tonumber(t.seconds) or 30)
-  end
-end
-
-function events.mawTimeSync(t)
-  ensure_state()
-  local tepoch = tonumber(t.epoch or 0) or 0
-  local snd = tostring(t.sender or "?")
-  if tepoch > 0 and tepoch < (vars._maw_sender_epoch[snd] or 0) then return end
-
-  vars._maw_sync_guard_until = math.max(vars._maw_sync_guard_until or 0, NOW() + (tonumber(t.guard) or 8))
-  vars._maw_resend_boost_until = NOW() + 6*SEC
-  if Party and Party.Food ~= nil and Party.Food < 3 then Party.Food = 3 end
-end
-
-function events.mawHostDown(t) ensure_state(); vars._maw_resend_boost_until = NOW() + 6*SEC end
-function events.mawClientDown(t) ensure_state(); vars._maw_resend_boost_until = NOW() + 6*SEC end
-
-------------------------------------------------------------
--- MEGA NUKE + EPOCH (SAFE)
+-- MEGA NUKE (SAFE, sans epoch)
 ------------------------------------------------------------
 function MAW_NUKE_ALL_BUFFS(broadcast)
   broadcast = (broadcast ~= false)
@@ -900,8 +697,7 @@ function MAW_NUKE_ALL_BUFFS(broadcast)
   vars = vars or {}
   ensure_state()
 
-  __bump_epoch("nuke")
-
+  -- 1) État local → OFF
   vars.mawbuff             = vars.mawbuff or {}
   for k in pairs(vars.mawbuff) do vars.mawbuff[k] = false end
   vars.maw_special_expire  = {}
@@ -910,11 +706,6 @@ function MAW_NUKE_ALL_BUFFS(broadcast)
   vars.maw_remote_values   = {}
   vars.maw_remote_owners   = {}
   vars._maw_last_sent      = {}
-
-  local function get_high_safe(arr, fallback)
-    if arr and type(arr.High) == "number" then return arr.High end
-    return fallback or 0
-  end
 
   -- 2) Couper tous les PartyBuffs (bornes autodétectées)
   if Party and Party.SpellBuffs then
@@ -959,7 +750,7 @@ function MAW_NUKE_ALL_BUFFS(broadcast)
   -- 5) Ré-application propre
   if type(mawBuffApply) == "function" then pcall(mawBuffApply) end
 
-  -- 6) Sync OFF réseau
+  -- 6) Sync OFF réseau (sans epoch)
   if broadcast and Multiplayer and Multiplayer.in_game and Multiplayer.allow_remote_event then
     local payload_off = {
       DataType = "mawBuffsOff",
@@ -967,7 +758,6 @@ function MAW_NUKE_ALL_BUFFS(broadcast)
       Y = (Party and Party.Y) or 0,
       Z = (Party and Party.Z) or 0,
       sender = (Multiplayer.player_id or "host"),
-      epoch = vars._maw_epoch or 1
     }
     if vars._maw_last_sent then
       for id,_ in pairs(vars._maw_last_sent) do payload_off[id] = 1 end
@@ -979,7 +769,7 @@ function MAW_NUKE_ALL_BUFFS(broadcast)
     Multiplayer.broadcast_mapdata(payload_off, "MAWMapvarArrived")
   end
 
-  if Game and Game.ShowStatusText then Game.ShowStatusText("MAW: ALL BUFFS NUKED (SAFE EPOCH)") end
+  if Game and Game.ShowStatusText then Game.ShowStatusText("MAW: ALL BUFFS NUKED (SAFE)") end
 end
 
 -- Raccourci pratique
