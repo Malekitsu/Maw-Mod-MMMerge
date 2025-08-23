@@ -428,70 +428,99 @@ end
 function events.MultiplayerInitialized()
 	Multiplayer.allow_remote_event("bolsterEvt")
 end
+
 function events.bolsterEvt(t)
-	if t.DataType=="bolster" and t.value then
-		vars.MultiplayerBolsterLevels=vars.MultiplayerBolsterLevels or {}
-		for i=1,3 do
-			vars.MultiplayerBolsterLevels[i] = t.value[i]
-		end
-	end
-	local lvl=vars.MultiplayerBolsterLevels[1]+vars.MultiplayerBolsterLevels[2]+vars.MultiplayerBolsterLevels[3]
-	debug.Message(lvl)
+  if t.DataType == "bolster" then
+    vars.MultiplayerBolsterLevels = {
+      t.v1 or 0,
+      t.v2 or 0,
+      t.v3 or 0,
+      t.v4 or 0
+    }
+    -- optional debug
+    debug.Message(("%d %d %d %d"):format(
+      vars.MultiplayerBolsterLevels[1],
+      vars.MultiplayerBolsterLevels[2],
+      vars.MultiplayerBolsterLevels[3],
+      vars.MultiplayerBolsterLevels[4]
+    ))
+  end
 end
 
+function getTotalLevel()
+  if Multiplayer and Multiplayer.in_game then
+    if not Multiplayer.im_host() and vars.MultiplayerBolsterLevels then
+      local lvl = 0
+      for i = 1, 4 do
+        lvl = lvl + (vars.MultiplayerBolsterLevels[i] or 0)
+      end
+      return lvl
+    end
+  end
 
-function getTotalLevel() 
-	if Multiplayer and Multiplayer.in_game then
-		if not Multiplayer.im_host() and vars.MultiplayerBolsterLevels then
-			local lvl=0
-			for i=1,3 do
-				lvl = lvl + vars.MultiplayerBolsterLevels[i]
-			end
-			return lvl
-		end
-	end
-	local result = 0
-	for i=1,4 do
-		result = result + vars.MMLVL[i]
-	end
-	
-	if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
-		Multiplayer.broadcast_mapdata({ DataType="bolster", value=vars.MMLVL }, "bolsterEvt")
-	end
-	
-	return result
+  local result = 0
+  for i = 1, 4 do
+    result = result + (vars.MMLVL[i] or 0)
+  end
+
+  if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
+    local v = vars.MMLVL or {0,0,0,0}
+    Multiplayer.broadcast_mapdata({
+      DataType = "bolster",
+      v1 = v[1] or 0,
+      v2 = v[2] or 0,
+      v3 = v[3] or 0,
+      v4 = v[4] or 0
+    }, "bolsterEvt")
+  end
+
+  return result
 end
+
 
 function getTotalExp()
 	return calcExp(getTotalLevel()+1)
 end
 
 function getPartyLevel(currentWorld)
-	currentWorld = currentWorld or TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
-	if Multiplayer and Multiplayer.in_game then
-		if not Multiplayer.im_host() and vars.MultiplayerBolsterLevels then
-			local lvl=0
-			for i=1,3 do
-				if currentWorld ~= i then
-					lvl = lvl + vars.MultiplayerBolsterLevels[i]
-				end
-			end
-			return lvl
-		end
-	end
-	local result = 0
-	for i=1,3 do
-		if currentWorld ~= i then
-			result = result + vars.MMLVL[i]
-		end
-	end
-	
-	if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
-		Multiplayer.broadcast_mapdata({ DataType="bolster", value=vars.MMLVL }, "bolsterEvt")
-	end
-	
-	return result
+  currentWorld = currentWorld or TownPortalControls.MapOfContinent(Map.MapStatsIndex)
+
+  -- client: use received levels
+  if Multiplayer and Multiplayer.in_game then
+    if not Multiplayer.im_host() and vars.MultiplayerBolsterLevels then
+      local lvl = 0
+      for i = 1, 4 do
+        if i ~= currentWorld then
+          lvl = lvl + (vars.MultiplayerBolsterLevels[i] or 0)
+        end
+      end
+      return lvl
+    end
+  end
+
+  -- host or SP: use local levels
+  local v = vars.MMLVL or {0,0,0,0}
+  local result = 0
+  for i = 1, 4 do
+    if i ~= currentWorld then
+      result = result + (v[i] or 0)
+    end
+  end
+
+  -- host: broadcast 4 scalars (not a table) for reliability
+  if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
+    Multiplayer.broadcast_mapdata({
+      DataType = "bolster",
+      v1 = v[1] or 0,
+      v2 = v[2] or 0,
+      v3 = v[3] or 0,
+      v4 = v[4] or 0
+    }, "bolsterEvt")
+  end
+
+  return result
 end
+
 
 function getPartyExp(currentWorld)
 	return calcExp(getPartyLevel(currentWorld)+1)
