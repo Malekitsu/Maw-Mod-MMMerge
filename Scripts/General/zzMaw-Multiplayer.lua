@@ -783,3 +783,48 @@ end
 
 -- Raccourci pratique
 function NUKE() MAW_NUKE_ALL_BUFFS(true) end
+
+
+
+--multiplayer bolster code
+function events.MultiplayerInitialized()
+	Multiplayer.allow_remote_event("bolsterEvt")
+end
+function events.bolsterEvt(t)
+	vars.MultiplayerBolsterLevels=vars.MultiplayerBolsterLevels or {}
+	vars.MultiplayerBolsterLevels[t.DataType] = t.value
+end
+function ShareBolster()
+	if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
+		for i=1,4 do
+			local lvl=vars.MMLVL[i]
+			Multiplayer.broadcast_mapdata({ DataType=i, value=lvl }, "bolsterEvt")
+		end
+	end
+end
+
+--share boss name table
+--[[user send map data to the host
+function events.MultiplayerInitialized()
+	Multiplayer.allow_remote_event("bossTable")
+end
+function events.AfterLoadMap()
+	if Multiplayer and Multiplayer.in_game and not Multiplayer.im_host() then
+		local bossTable=mapvars.bossNames
+		Multiplayer.broadcast_mapdata({ DataType=Map.Name, value=bossTable }, "bossTable")
+	end
+end
+
+function events.bossTable(t)
+	if t.DataType=="SendToHost" then
+		
+	end
+
+	for i=1,79 do
+		Game.PlaceMonTxt[i+220]=i+220
+	end
+	for key, value in pairs(t.value) do
+		Game.PlaceMonTxt[key]=value
+	end
+end
+]]
