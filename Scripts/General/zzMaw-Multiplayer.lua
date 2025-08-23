@@ -7,6 +7,15 @@
 -- ==== + Clamp dégâts + remontée PV au Tick (si baisse hors pipeline)
 -- ==== + Pulse d’envoi après respawn + boost d’envoi
 
+
+function PlayersInGame()
+	local count = 1
+	for k,v in pairs(Multiplayer.connector.clients) do
+		count = count + 1
+	end
+	return count
+end
+
 ------------------------------------------------------------
 -- ÉTAT / HELPERS
 ------------------------------------------------------------
@@ -85,7 +94,6 @@ local function isHost()
 	if type(Multiplayer.player_id)=="number" then return Multiplayer.player_id == 0 end
 	return false
 end
-
 ------------------------------------------------------------
 -- SAFETY SHIMS
 ------------------------------------------------------------
