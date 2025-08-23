@@ -792,33 +792,36 @@ function events.MultiplayerInitialized()
 end
 function events.bolsterEvt(t)
 	vars.MultiplayerBolsterLevels=vars.MultiplayerBolsterLevels or {}
-	vars.MultiplayerBolsterLevels[t.DataType] = t.value
+	vars.MultiplayerBolsterLevels[t.DataType] = t.value/100
 end
 function ShareBolster()
 	if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
 		for i=1,4 do
-			local lvl=vars.MMLVL[i]
+			local lvl=round(vars.MMLVL[i]*100)
 			Multiplayer.broadcast_mapdata({ DataType=i, value=lvl }, "bolsterEvt")
 		end
 	end
 end
 
---share boss name table
---[[user send map data to the host
+--[[share boss name table
+--user send map data to the host
 function events.MultiplayerInitialized()
-	Multiplayer.allow_remote_event("bossTable")
+	Multiplayer.allow_remote_event("sendBossToHost")
 end
 function events.AfterLoadMap()
 	if Multiplayer and Multiplayer.in_game and not Multiplayer.im_host() then
 		local bossTable=mapvars.bossNames
-		Multiplayer.broadcast_mapdata({ DataType=Map.Name, value=bossTable }, "bossTable")
+		Multiplayer.broadcast_mapdata({ DataType=Map.Name, value=bossTable }, "sendBossToHost")
 	end
 end
 
-function events.bossTable(t)
-	if t.DataType=="SendToHost" then
-		
+function events.sendBossToHost(t)
+	vars.OnlineMapBosses=vars.OnlineMapBosses or {}
+	if not vars.OnlineMapBosses[t.DataType]
+		vars.OnlineMapBosses=t.value
 	end
+end
+
 
 	for i=1,79 do
 		Game.PlaceMonTxt[i+220]=i+220
@@ -826,5 +829,5 @@ function events.bossTable(t)
 	for key, value in pairs(t.value) do
 		Game.PlaceMonTxt[key]=value
 	end
-end
-]]
+	
+	]]
