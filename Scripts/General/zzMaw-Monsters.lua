@@ -432,10 +432,10 @@ end
 function events.bolsterEvt(t)
   if t.DataType == "bolster" then
     vars.MultiplayerBolsterLevels = {
-      t.v1 or 0,
-      t.v2 or 0,
-      t.v3 or 0,
-      t.v4 or 0
+      t.v1,
+      t.v2,
+      t.v3,
+      t.v4
     }
     -- optional debug
     debug.Message(("%d %d %d %d"):format(
@@ -467,11 +467,18 @@ function getTotalLevel()
     local v = vars.MMLVL or {0,0,0,0}
     Multiplayer.broadcast_mapdata({
       DataType = "bolster",
-      v1 = v[1] or 0,
-      v2 = v[2] or 0,
-      v3 = v[3] or 0,
-      v4 = v[4] or 0
+      v1 = v[1],
+      v2 = v[2],
+      v3 = v[3],
+      v4 = v[4]
     }, "bolsterEvt")
+	    debug.Message(("%d %d %d %d"):format(
+      v[1],
+      v[2],
+      v[3],
+      v[4]
+    ))
+	
   end
 
   return result
@@ -511,13 +518,18 @@ function getPartyLevel(currentWorld)
   if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
     Multiplayer.broadcast_mapdata({
       DataType = "bolster",
-      v1 = v[1] or 0,
-      v2 = v[2] or 0,
-      v3 = v[3] or 0,
-      v4 = v[4] or 0
+      v1 = v[1],
+      v2 = v[2],
+      v3 = v[3],
+      v4 = v[4]
     }, "bolsterEvt")
   end
-
+debug.Message(("%d %d %d %d"):format(
+      v[1],
+      v[2],
+      v[3],
+      v[4]
+    )
   return result
 end
 
