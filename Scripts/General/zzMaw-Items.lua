@@ -2180,20 +2180,18 @@ function events.BuildItemInformationBox(t)
 	--	t.Item.MaxCharges=round(partyLevel/5)
 	--end
 	if t.Description then
-		if Game.CurrentPlayer==-1 then return end
+		local i=Game.CurrentPlayer
+		if i==-1 or i>Party.High then return end
 		local equipStat=t.Item:T().EquipStat
 		if equipStat<=11 then 
-			local i=Game.CurrentPlayer
 			local pl=Party[i]
 			local hp=pl.HP
 			local sp=pl.SP
+			local maxHP=vars.currentHPPool[i]
 			local playerIndex=pl:GetIndex()
 			local oldDPS1, oldDPS2, oldDPS3, oldVitality=calcPowerVitality(pl)
 			--substitute item
 			local slot=slotMap[equipStat]
-			local i=0
-			local found=false
-			local index=0
 			local itemBackup={}
 			local it=pl:GetActiveItem(slot)
 			if it then
@@ -2273,6 +2271,10 @@ function events.BuildItemInformationBox(t)
 			--restore hp
 			pl.HP=hp
 			pl.SP=sp
+			if t.Item.BonusExpireTime%100==32 then
+				buffManaLock()
+			end
+			vars.currentHPPool[i]=maxHP
 		end
 	end
 end
