@@ -455,7 +455,7 @@ function getTotalLevel()
 		result = result + vars.MMLVL[i]
 	end
 	
-	if Multiplayer and Multiplayer.Multiplayer.in_game and Multiplayer.im_host() then
+	if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
 		Multiplayer.broadcast_mapdata({ DataType="bolster", value=vars.MMLVL }, "bolsterEvt")
 	end
 	
