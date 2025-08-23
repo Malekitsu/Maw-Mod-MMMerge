@@ -23,7 +23,6 @@ local function MulAddKillExp(Amount, monLvl)
 		return
 	end
 	
-	debug.Message(monLvl)
 	local partyCount=0
 	for i=0, Party.High do
 		if Party[i].Dead==0 and Party[i].Eradicated==0 then
