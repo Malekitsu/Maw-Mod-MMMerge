@@ -13,7 +13,7 @@ local function PlayersOnMap()
 end
 
 local function MulAddKillExp(Amount, monLvl)
-	local avg = math.ceil(Amount / PlayersOnMap())
+	local avg = math.ceil(Amount / PlayersInGame())
 	
 	--maw code
 	local partyLvl=getTotalLevel()
@@ -103,7 +103,7 @@ local packets = {
 			MulAddKillExp(amount, monLevel)
 		end,
 		check_delivery = true,
-		same_map_only = true
+		same_map_only = false
 	}
 }
 Multiplayer.utils.init_packets(packets)
