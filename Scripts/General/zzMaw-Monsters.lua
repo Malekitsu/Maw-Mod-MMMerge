@@ -424,11 +424,41 @@ function addBolsterExp(experience)
 	vars.LVLBEFORE = currentLvl
 end
 
-function getTotalLevel()
+--multiplayer bolster code
+function events.MultiplayerInitialized()
+	Multiplayer.allow_remote_event("bolsterEvt")
+end
+function events.bolsterEvt(t)
+	if t.DataType=="bolster" and t.value then
+		vars.MultiplayerBolsterLevels=vars.MultiplayerBolsterLevels or {}
+		for i=1,3 do
+			vars.MultiplayerBolsterLevels[i] = t.value[i]
+		end
+	end
+	local lvl=vars.MultiplayerBolsterLevels[1]+vars.MultiplayerBolsterLevels[2]+vars.MultiplayerBolsterLevels[3]
+	debug.Message(lvl)
+end
+
+
+function getTotalLevel() 
+	if Multiplayer and Multiplayer.in_game then
+		if not Multiplayer.im_host() and vars.MultiplayerBolsterLevels then
+			local lvl=0
+			for i=1,3 do
+				lvl = lvl + vars.MultiplayerBolsterLevels[i]
+			end
+			return lvl
+		end
+	end
 	local result = 0
 	for i=1,4 do
 		result = result + vars.MMLVL[i]
 	end
+	
+	if Multiplayer and Multiplayer.Multiplayer.in_game and Multiplayer.im_host() then
+		Multiplayer.broadcast_mapdata({ DataType="bolster", value=vars.MMLVL }, "bolsterEvt")
+	end
+	
 	return result
 end
 
@@ -438,12 +468,28 @@ end
 
 function getPartyLevel(currentWorld)
 	currentWorld = currentWorld or TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
+	if Multiplayer and Multiplayer.in_game then
+		if not Multiplayer.im_host() and vars.MultiplayerBolsterLevels then
+			local lvl=0
+			for i=1,3 do
+				if currentWorld ~= i then
+					lvl = lvl + vars.MultiplayerBolsterLevels[i]
+				end
+			end
+			return lvl
+		end
+	end
 	local result = 0
 	for i=1,3 do
 		if currentWorld ~= i then
 			result = result + vars.MMLVL[i]
 		end
 	end
+	
+	if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
+		Multiplayer.broadcast_mapdata({ DataType="bolster", value=vars.MMLVL }, "bolsterEvt")
+	end
+	
 	return result
 end
 
@@ -460,6 +506,12 @@ function events.MonsterKillExp(t)
 		return
 	end 
 	]]
+	
+	if Multiplayer and Multiplayer.in_game then
+		t.Exp=0
+		return
+	end
+	
 	local partyLvl=getTotalLevel()
 	local mon=t.Monster
 	
@@ -3554,7 +3606,7 @@ function events.MonsterKilled(mon)
 	mon.Ally=9999
 	
 	local data=WhoHitMonster()
-	if data and data.Monster and data.Monster.Ally==9999 then
+	if data and data.Monster and data.Monster.Ally==9999 and Multiplayer and not Multiplayer.in_game then
 		local consciousPlayers=0
 		for i=0, Party.High do
 			if Party[i]:IsConscious() then
