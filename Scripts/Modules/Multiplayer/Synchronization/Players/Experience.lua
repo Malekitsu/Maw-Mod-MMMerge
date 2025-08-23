@@ -12,9 +12,58 @@ local function PlayersOnMap()
 	return count
 end
 
-local function MulAddKillExp(Amount)
+local function MulAddKillExp(Amount, monLvl)
 	local avg = math.ceil(Amount / PlayersOnMap())
-	Party.AddKillExp(avg)
+	
+	--maw code
+	local partyLvl=getTotalLevel()
+	
+	
+	if vars.insanityMode and mon.NameId>300 then 
+		return
+	end
+	
+	debug.Message(monLvl)
+	local partyCount=0
+	for i=0, Party.High do
+		if Party[i].Dead==0 and Party[i].Eradicated==0 then
+			partyCount=partyCount+1
+		end
+	end
+	partyCount=math.max(1,partyCount)
+	local experience=avg/partyCount
+	local bolsterExp=0
+	for i=0, Party.High do
+		if Party[i].Dead==0 and Party[i].Eradicated==0 then
+			local playerLevel=math.min(calcLevel(Party[i].Experience),partyLvl) --accounts for the cases which you want to level a low lvl character
+			local multiplier1=((monLvl+10)/(playerLevel+5))^2
+			local multiplier2=1+(monLvl^0.5)-(playerLevel^0.5)
+			mult=math.min(math.max(multiplier1,multiplier2),3)
+			if mult<1 then
+				multiplier2=1+(playerLevel^0.5)-(monLvl^0.5)
+				mult=math.min(math.min(multiplier1,1/multiplier2),1/3)
+			end
+			local experienceAwarded=experience*mult
+			Party[i].Experience=math.min(Party[i].Experience+experienceAwarded, 2^32-3982296)
+			
+			--calculate again based for bolster
+			playerLevel=partyLvl
+			bolsterExp=bolsterExp+experience*mult
+		end
+	end
+	
+	--no bolster from arena
+	if Map.Name=="d42.blv" then
+		return
+	end
+	
+	addBolsterExp(bolsterExp/5)
+	
+	vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
+	for i=0, Party.High do
+		Party[i].Exp=math.min(Party[i].Exp, 2^32-3982296)
+	end
+	
 end
 Multiplayer.AddKillExp = MulAddKillExp
 
@@ -44,10 +93,15 @@ local packets = {
 	},
 
 	kill_monster_exp = {
-		bulb = Multiplayer.utils.num_to_hexstr,
+		-- was: bulb = Multiplayer.utils.num_to_hexstr,
+		bulb = function(amount, monLevel)
+			return item_to_bin({amount, monLevel})
+		end,
 		handler = function(bin_string, metadata)
-			local amount = i4[toptr(bin_string)]
-			MulAddKillExp(amount)
+			-- was: local amount = i4[toptr(bin_string)]; MulAddKillExp(amount)
+			local t = bin_to_item(toptr(bin_string))
+			local amount, monLevel = t[1], t[2]
+			MulAddKillExp(amount, monLevel)
 		end,
 		check_delivery = true,
 		same_map_only = true
@@ -65,10 +119,10 @@ end
 
 function events.MonsterKilled(mon, monId, _, killer)
 	if last_hit_by_player[monId] then
-		Multiplayer.broadcast(packets.kill_monster_exp:prep(mon.Experience), cond_same_map)
+		Multiplayer.broadcast(packets.kill_monster_exp:prep(mon.Experience, mon.Level), cond_same_map)
 		
 		-- override experience gain by player-killer
-		MulAddKillExp(mon.Experience)
+		MulAddKillExp(mon.Experience, getMonsterLevel(mon))
 		mon.Experience = 0
 	end
 end
