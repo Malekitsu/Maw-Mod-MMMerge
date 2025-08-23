@@ -19,6 +19,13 @@ local function getPartyIndex(player)
 	end
 end
 
+function events.KeyDown(t)
+	if Game.CurrentScreen==8 and t.Key==removeBuffsKey then
+		vars.mawbuff={}
+		Game.ShowStatusText("All buffs have been removed")
+	end
+end
+
 local function getSpellQueueData(spellQueuePtr, targetPtr)
 	-- find active queue slot
 	local i, foundNpc = 0 -- might be the case where there is only npc spell in queue, which makes my code error with "no active spell queue slot found"
