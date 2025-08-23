@@ -424,15 +424,6 @@ function addBolsterExp(experience)
 	vars.LVLBEFORE = currentLvl
 end
 
---multiplayer bolster code
-function events.MultiplayerInitialized()
-	Multiplayer.allow_remote_event("bolsterEvt")
-end
-function events.bolsterEvt(t)
-	vars.MultiplayerBolsterLevels=vars.MultiplayerBolsterLevels or {}
-	vars.MultiplayerBolsterLevels[t.DataType] = t.value
-end
-
 
 function getTotalLevel() 
 	if Multiplayer and Multiplayer.in_game then
@@ -449,12 +440,7 @@ function getTotalLevel()
 		result = result + vars.MMLVL[i]
 	end
 	
-	if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
-		for i=1,4 do
-			local lvl=vars.MMLVL[i]
-			Multiplayer.broadcast_mapdata({ DataType=i, value=lvl }, "bolsterEvt")
-		end
-	end
+	ShareBolster()
 	
 	return result
 end
@@ -483,11 +469,7 @@ function getPartyLevel(currentWorld)
 		end
 	end
 	
-	if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
-		for i=1,4 do
-			Multiplayer.broadcast_mapdata({ DataType=i, value=vars.MMLVL[i] }, "bolsterEvt")
-		end
-	end
+	ShareBolster()
 	
 	return result
 end
