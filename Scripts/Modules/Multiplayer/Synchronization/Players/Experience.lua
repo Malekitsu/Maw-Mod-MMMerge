@@ -13,7 +13,7 @@ local function PlayersOnMap()
 end
 
 local function MulAddKillExp(Amount, monLvl)
-	local avg = math.ceil(Amount / PlayersInGame())
+	local avg = math.ceil(Amount / math.min(PlayersInGame(),5))
 	
 	--maw code
 	local partyLvl=getTotalLevel()
@@ -33,22 +33,20 @@ local function MulAddKillExp(Amount, monLvl)
 	local experience=avg/partyCount
 	local bolsterExp=0
 	for i=0, Party.High do
-		if Party[i].Dead==0 and Party[i].Eradicated==0 then
-			local playerLevel=math.min(calcLevel(Party[i].Experience),partyLvl) --accounts for the cases which you want to level a low lvl character
-			local multiplier1=((monLvl+10)/(playerLevel+5))^2
-			local multiplier2=1+(monLvl^0.5)-(playerLevel^0.5)
-			mult=math.min(math.max(multiplier1,multiplier2),3)
-			if mult<1 then
-				multiplier2=1+(playerLevel^0.5)-(monLvl^0.5)
-				mult=math.min(math.min(multiplier1,1/multiplier2),1/3)
-			end
-			local experienceAwarded=experience*mult
-			Party[i].Experience=math.min(Party[i].Experience+experienceAwarded, 2^32-3982296)
-			
-			--calculate again based for bolster
-			playerLevel=partyLvl
-			bolsterExp=bolsterExp+experience*mult
+		local playerLevel=math.min(calcLevel(Party[i].Experience),partyLvl) --accounts for the cases which you want to level a low lvl character
+		local multiplier1=((monLvl+10)/(playerLevel+5))^2
+		local multiplier2=1+(monLvl^0.5)-(playerLevel^0.5)
+		mult=math.min(math.max(multiplier1,multiplier2),3)
+		if mult<1 then
+			multiplier2=1+(playerLevel^0.5)-(monLvl^0.5)
+			mult=math.min(math.min(multiplier1,1/multiplier2),1/3)
 		end
+		local experienceAwarded=experience*mult
+		Party[i].Experience=math.min(Party[i].Experience+experienceAwarded, 2^32-3982296)
+		
+		--calculate again based for bolster
+		playerLevel=partyLvl
+		bolsterExp=bolsterExp+experience*mult
 	end
 	
 	--no bolster from arena
