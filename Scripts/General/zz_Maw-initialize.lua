@@ -6,6 +6,9 @@ autoTargetHeals=true
 --stats menu has more colours
 ColouredStats=true
 
+--remove all buffs, when the spellbook is open
+removeBuffsKey=82
+
 --a charge ability usable by knights only when SOLO (default is "E")
 chargeKey=69
 
