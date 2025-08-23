@@ -60,7 +60,7 @@ local function MulAddKillExp(Amount, monLvl)
 	for i=0, Party.High do
 		Party[i].Exp=math.min(Party[i].Exp, 2^32-3982296)
 	end
-	
+	ShareBolster()
 end
 Multiplayer.AddKillExp = MulAddKillExp
 
