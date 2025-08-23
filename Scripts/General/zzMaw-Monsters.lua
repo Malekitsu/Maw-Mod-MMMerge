@@ -529,7 +529,7 @@ debug.Message(("%d %d %d %d"):format(
       v[2],
       v[3],
       v[4]
-    )
+    ))
   return result
 end
 
