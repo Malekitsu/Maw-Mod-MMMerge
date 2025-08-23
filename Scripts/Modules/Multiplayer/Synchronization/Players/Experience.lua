@@ -54,7 +54,7 @@ local function MulAddKillExp(Amount, monLvl)
 		return
 	end
 	
-	addBolsterExp(bolsterExp/5)
+	addBolsterExp(bolsterExp)
 	
 	vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
 	for i=0, Party.High do
@@ -82,6 +82,7 @@ local packets = {
 			for _, pl in Party do
 				pl.Experience = pl.Experience + t[1]
 			end
+			addBolsterExp(t[1])
 			evt.All.Add{"Experience", 0}
 			Game.ShowStatusText(msg, 6)
 		end,
