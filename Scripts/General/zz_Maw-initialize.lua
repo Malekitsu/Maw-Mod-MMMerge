@@ -104,7 +104,7 @@ function GetMaxHP(pl)
 		for i=0, Party.High do
 			if Party[i]:GetIndex()==id then
 				if vars.currentHPPool[i] then
-					return round(vars.currentHPPool[i])
+					return math.max(round(vars.currentHPPool[i]), 1)
 				end
 			end
 		end
