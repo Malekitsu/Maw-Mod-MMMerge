@@ -2454,195 +2454,222 @@ has 1 to 4 extra mini bosses
 teleport behind party
 ]]
 
-
+-- === AFTER LOAD MAP (host génère; clients ne génèrent pas) ===
 function events.AfterLoadMap()
-	--if Map.IndoorOrOutdoor==1 or vars.Mode==2 then
-	if Game.BolsterAmount>=100 then
-		if not mapvars.bossGenerated or not mapvars.bossNames then
-			mapvars.bossGenerated=true
-			--REDONE FIX, REMOVE MONSTERS WITH UNINTENDED NAME ID
-			if isRedone then
-				for i=0, Map.Monsters.High do
-					local mon=Map.Monsters[i]
-					if mon.NameId>220 then
-						mon.NameId=0
-					end
-				end
-			end
-			possibleMonsters={}
-			bossSpawns=math.ceil((Map.Monsters.Count-30)/150)
-			if vars.Mode==2 then
-				bossSpawns=math.ceil((Map.Monsters.Count-30)/60)
-			end
-			--mapping
-			if getMapAffixPower(16) then
-				bossSpawns=math.ceil(bossSpawns*(1+getMapAffixPower(16)/100))
-			end
-			if getMapAffixPower(17) then
-				for i=0, Map.Monsters.High do
-					local mon=Map.Monsters[i]
-					if Map.Monsters[i].Id%3~=0 and math.random()<getMapAffixPower(17)/100 then
-						Map.Monsters[i].Id=Map.Monsters[i].Id+1
-					end
-				end
-			end
-			if getMapAffixPower(19) then
-				for i=0,Map.Monsters.High do
-					local id=Map.Monsters[i].Id
-					if id%3~=0 and Game.MonstersTxt[id].AIType~=1 and Map.Monsters[i].NameId==0 and math.random()<getMapAffixPower(19)/100 then
-						generateBoss(i)
-					end
-				end
-			end
-			
-			--end mapping code
-			for i=0,Map.Monsters.High do
-				local id=Map.Monsters[i].Id
-				if id%3==0 and Game.MonstersTxt[id].AIType~=1 and Map.Monsters[i].NameId==0 then
-					table.insert(possibleMonsters,i)
-				end
-			end
-			if bossSpawns>0 then
-				for v=1,bossSpawns do
-					if #possibleMonsters>0 then
-						index=math.random(1, #possibleMonsters)
-						generateBoss(possibleMonsters[index])
-						table.remove(possibleMonsters,index)
-					end
-				end
-			end
-		end
-	end
-	if mapvars.bossNames then
-		for i=1,79 do
-			Game.PlaceMonTxt[i+220]=i+220
-		end
-		for key, value in pairs(mapvars.bossNames) do
-			Game.PlaceMonTxt[key]=value
-		end
-	end
+  local IN_MULTI  = Multiplayer and Multiplayer.in_game
+  local IS_HOST   = IN_MULTI and Multiplayer.im_host and Multiplayer.im_host()
+
+  -- Clients multi : bloquent la génération locale, le module zzBossSync demandera un snapshot.
+  if IN_MULTI and not IS_HOST then
+    mapvars = mapvars or {}
+    mapvars.bossGenerated = true
+  end
+
+  if Game.BolsterAmount >= 100 then
+    -- HOST UNIQUEMENT : génère si pas déjà fait
+    if (not IN_MULTI) or IS_HOST then
+      if not mapvars.bossGenerated or not mapvars.bossNames then
+        mapvars.bossGenerated = true
+
+        -- (redone) purge des NameId invalides
+        if isRedone then
+          for i = 0, Map.Monsters.High do
+            local mon = Map.Monsters[i]
+            if mon.NameId > 220 then
+              mon.NameId = 0
+            end
+          end
+        end
+
+        possibleMonsters = {}
+        bossSpawns = math.ceil((Map.Monsters.Count - 30) / 150)
+        if vars.Mode == 2 then
+          bossSpawns = math.ceil((Map.Monsters.Count - 30) / 60)
+        end
+
+        -- mapping / affixes
+        if getMapAffixPower(16) then
+          bossSpawns = math.ceil(bossSpawns * (1 + getMapAffixPower(16) / 100))
+        end
+        if getMapAffixPower(17) then
+          for i = 0, Map.Monsters.High do
+            if Map.Monsters[i].Id % 3 ~= 0 and math.random() < getMapAffixPower(17) / 100 then
+              Map.Monsters[i].Id = Map.Monsters[i].Id + 1
+            end
+          end
+        end
+        if getMapAffixPower(19) then
+          for i = 0, Map.Monsters.High do
+            local id = Map.Monsters[i].Id
+            if id % 3 ~= 0 and Game.MonstersTxt[id].AIType ~= 1 and Map.Monsters[i].NameId == 0 and math.random() < getMapAffixPower(19) / 100 then
+              generateBoss(i)
+            end
+          end
+        end
+
+        -- candidates
+        for i = 0, Map.Monsters.High do
+          local id = Map.Monsters[i].Id
+          if id % 3 == 0 and Game.MonstersTxt[id].AIType ~= 1 and Map.Monsters[i].NameId == 0 then
+            table.insert(possibleMonsters, i)
+          end
+        end
+
+        -- spawn bosses
+        if bossSpawns > 0 then
+          for v = 1, bossSpawns do
+            if #possibleMonsters > 0 then
+              local index = math.random(1, #possibleMonsters)
+              generateBoss(possibleMonsters[index])
+              table.remove(possibleMonsters, index)
+            end
+          end
+        end
+      end
+    end
+  end
+
+  -- Applique les noms si on a une table (host & clients)
+  if mapvars.bossNames then
+    for i = 1, 79 do
+      Game.PlaceMonTxt[i + 220] = i + 220
+    end
+    for key, value in pairs(mapvars.bossNames) do
+      Game.PlaceMonTxt[key] = value
+    end
+  end
+
+  -- Si host en multi, broadcast “snapshot” (nom + affectations)
+  if IN_MULTI and IS_HOST then
+    if type(BossSync_BroadcastSnapshot) == "function" then
+      BossSync_BroadcastSnapshot()
+    end
+  end
 end
 
-function generateBoss(index,nameIndex,skillType)
-	--clean up name Index
-	if not nameIndex then
-		local nameIdList={}
-		for i=0,Map.Monsters.High do
-			local mon=Map.Monsters[i]
-			if mon.NameId>=221 and mon.NameId<300 and mon.AIState ~= 11 then
-				table.insert(nameIdList, mon.NameId)
-			end
-		end
-		for i=221,299 do
-			if not table.find(nameIdList, i) then
-				Game.PlaceMonTxt[i]=string.format("%s", i)
-			end
-		end
-		--search for a free spot
-		nameIndex=221
-		local search=true
-		while search and nameIndex<300 do
-			if Game.PlaceMonTxt[nameIndex]==string.format("%s", nameIndex) then
-				search=false
-			else
-				nameIndex=nameIndex+1
-			end
-		end
-	end
-	
-	mon=Map.Monsters[index]
-	mon.NameId=nameIndex
-	
-	local austerityMod=1
-	if vars.AusterityMode then
-		austerityMod=4
-	end
-	HP=round(mon.FullHP*2*(1+mon.Level/80/austerityMod)*(1+math.random()/austerityMod))
-	if getMapAffixPower(18) then
-		HP=HP*(1+getMapAffixPower(18)/100)
-	end
-	hpOvercap=0
-	while HP>32500 do
-		HP=round(HP/2)
-		hpOvercap=hpOvercap+1
-	end
-	mon.Resistances[0]=mon.Resistances[0]+1000*hpOvercap
-	mon.FullHP=HP
-	mon.HP=mon.FullHP
-	mon.Exp=mon.Exp*5
-	mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
-	local lvl=totalLevel[mon.Id] or mon.Level
-	if lvl>100 then
-		mapvars.uniqueMonsterLevel[index]=round(lvl+math.random()*20+10)
-	else
-		mapvars.uniqueMonsterLevel[index]=round(lvl*(1.1+math.random()*0.2))
-	end
-	mon.Level=math.min(mapvars.uniqueMonsterLevel[index],255)
-	mon.TreasureDiceCount=(mon.Level*100)^0.5
-	mon.TreasureDiceSides=(mon.Level*100)^0.5
-	mon.TreasureItemPercent=100
-	mon.TreasureItemType=math.random(1,12)
-	mon.TreasureItemLevel=math.min(mon.TreasureItemLevel+1, 6)
-	
-	dmgMult=1.5+math.random()*0.5
-	--name and skills
-	mapvars.bossNames=mapvars.bossNames or {}
-	
-	if not skillType then
-		skill=SkillList[math.random(1,#SkillList)]
-		local chanceMult=1
-		if vars.Mode==2 then
-			chanceMult = 2
-		end
-		if vars.insanityMode then
-			chanceMult = 3
-		end
-		if math.random()<0.01*chanceMult and not generatedByBroodlord then
-			skill="Broodlord"
-			mon.Resistances[0]=mon.Resistances[0]+1000
-			dmgMult=dmgMult*1.5
-		end
-		if generatedByBroodlord then
-			skill="Broodling"
-		end
-		if math.random()<0.001*chanceMult then
-			skill="Omnipotent"
-			dmgMult=dmgMult*2
-			mon.Resistances[0]=mon.Resistances[0]+2000
-		end
-	else 
-		skill=skillType
-	end
-	if skill=="Leecher" or skill=="Omnipotent" then
-		mapvars.leecher=mapvars.leecher or {}
-		table.insert(mapvars.leecher, index)
-	end
-	if skill=="Swift" or skill=="Omnipotent" then
-		mapvars.swift=mapvars.swift or {}
-		if not table.find(mapvars.swift, index) then
-			table.insert(mapvars.swift, index)
-		end
-	end
-	if skill=="Shadow" or skill=="Omnipotent" then
-		mapvars.shadow=mapvars.swift or {}
-		if not table.find(mapvars.shadow, index) then
-			table.insert(mapvars.shadow, index)
-		end
-	end
-	
-	local name=string.format(skill .. " " .. Game.MonstersTxt[mon.Id].Name)
-	Game.PlaceMonTxt[mon.NameId]=name
-	
-	mapvars.bossNames[mon.NameId]=Game.PlaceMonTxt[mon.NameId]
-	if getMapAffixPower(18) then
-		dmgMult=dmgMult*(1+getMapAffixPower(18)/100)
-	end
-	mapvars.nameIdMult=mapvars.nameIdMult or {}
-	mapvars.nameIdMult[mon.NameId]={overflowMult[mon.Id][1]*dmgMult, overflowMult[mon.Id][2]*dmgMult}
-	
-	local s, m=SplitSkill(mon.SpellSkill)
-	mon.SpellSkill=JoinSkill(s*dmgMult, m)
+-- === GENERATE BOSS (remplit bossNames + bossSet) ===
+function generateBoss(index, nameIndex, skillType)
+  mapvars = mapvars or {}
+  mapvars.bossNames = mapvars.bossNames or {}
+  mapvars.bossSet   = mapvars.bossSet   or {}   -- <== NOUVEAU : affectations {index, NameId}
+
+  -- réserver une case NameId si non fournie
+  if not nameIndex then
+    local nameIdList = {}
+    for i = 0, Map.Monsters.High do
+      local mon = Map.Monsters[i]
+      if mon.NameId >= 221 and mon.NameId < 300 and mon.AIState ~= 11 then
+        table.insert(nameIdList, mon.NameId)
+      end
+    end
+    for i = 221, 299 do
+      if not table.find(nameIdList, i) then
+        Game.PlaceMonTxt[i] = string.format("%s", i)
+      end
+    end
+    nameIndex = 221
+    while nameIndex < 300 do
+      if Game.PlaceMonTxt[nameIndex] == string.format("%s", nameIndex) then
+        break
+      end
+      nameIndex = nameIndex + 1
+    end
+  end
+
+  local mon = Map.Monsters[index]
+  mon.NameId = nameIndex
+
+  local austerityMod = vars.AusterityMode and 4 or 1
+  local HP = round(mon.FullHP * 2 * (1 + mon.Level / 80 / austerityMod) * (1 + math.random() / austerityMod))
+  if getMapAffixPower(18) then
+    HP = HP * (1 + getMapAffixPower(18) / 100)
+  end
+  local hpOvercap = 0
+  while HP > 32500 do
+    HP = round(HP / 2)
+    hpOvercap = hpOvercap + 1
+  end
+  mon.Resistances[0] = mon.Resistances[0] + 1000 * hpOvercap
+  mon.FullHP = HP
+  mon.HP = mon.FullHP
+  mon.Exp = mon.Exp * 5
+
+  mapvars.uniqueMonsterLevel = mapvars.uniqueMonsterLevel or {}
+  local lvl = totalLevel[mon.Id] or mon.Level
+  if lvl > 100 then
+    mapvars.uniqueMonsterLevel[index] = round(lvl + math.random() * 20 + 10)
+  else
+    mapvars.uniqueMonsterLevel[index] = round(lvl * (1.1 + math.random() * 0.2))
+  end
+  mon.Level = math.min(mapvars.uniqueMonsterLevel[index], 255)
+  mon.TreasureDiceCount  = (mon.Level * 100) ^ 0.5
+  mon.TreasureDiceSides  = (mon.Level * 100) ^ 0.5
+  mon.TreasureItemPercent = 100
+  mon.TreasureItemType    = math.random(1, 12)
+  mon.TreasureItemLevel   = math.min(mon.TreasureItemLevel + 1, 6)
+
+  local dmgMult = 1.5 + math.random() * 0.5
+
+  -- skill / nom
+  local skill
+  if not skillType then
+    local chanceMult = 1
+    if vars.Mode == 2 then chanceMult = 2 end
+    if vars.insanityMode then chanceMult = 3 end
+
+    skill = SkillList[math.random(1, #SkillList)]
+    if math.random() < 0.01 * chanceMult and not generatedByBroodlord then
+      skill = "Broodlord"
+      mon.Resistances[0] = mon.Resistances[0] + 1000
+      dmgMult = dmgMult * 1.5
+    end
+    if generatedByBroodlord then
+      skill = "Broodling"
+    end
+    if math.random() < 0.001 * chanceMult then
+      skill = "Omnipotent"
+      dmgMult = dmgMult * 2
+      mon.Resistances[0] = mon.Resistances[0] + 2000
+    end
+  else
+    skill = skillType
+  end
+
+  if skill == "Leecher" or skill == "Omnipotent" then
+    mapvars.leecher = mapvars.leecher or {}
+    table.insert(mapvars.leecher, index)
+  end
+  if skill == "Swift" or skill == "Omnipotent" then
+    mapvars.swift = mapvars.swift or {}
+    if not table.find(mapvars.swift, index) then
+      table.insert(mapvars.swift, index)
+    end
+  end
+  if skill == "Shadow" or skill == "Omnipotent" then
+    mapvars.shadow = mapvars.shadow or {}
+    if not table.find(mapvars.shadow, index) then
+      table.insert(mapvars.shadow, index)
+    end
+  end
+
+  local name = string.format(skill .. " " .. Game.MonstersTxt[mon.Id].Name)
+  Game.PlaceMonTxt[mon.NameId] = name
+
+  mapvars.bossNames[mon.NameId] = Game.PlaceMonTxt[mon.NameId]
+  if getMapAffixPower(18) then
+    dmgMult = dmgMult * (1 + getMapAffixPower(18) / 100)
+  end
+
+  mapvars.nameIdMult = mapvars.nameIdMult or {}
+  mapvars.nameIdMult[mon.NameId] = { overflowMult[mon.Id][1] * dmgMult, overflowMult[mon.Id][2] * dmgMult }
+
+  local s, m = SplitSkill(mon.SpellSkill)
+  mon.SpellSkill = JoinSkill(s * dmgMult, m)
+
+  -- === NOUVEAU : mémorise l’affectation index -> NameId pour broadcast aux clients
+  table.insert(mapvars.bossSet, { index, mon.NameId })
 end
+
 
 --SKILLS
 SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Adamantite","Swapper","Regenerating","Puller","Leecher","Swift","Fixator","Shadow","Plagueborn"} --defensives
