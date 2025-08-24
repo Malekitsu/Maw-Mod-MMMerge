@@ -238,6 +238,8 @@ end
 -- HP FLOOR GUARD (respawn/resync) + anti “pas dormi”
 ------------------------------------------------------------
 local function __begin_hp_guard(seconds)
+	return
+	--[[
 	ensure_state()
 	local dur = math.max(tonumber(seconds) or 8, 0)
 	local until_ = NOW() + dur
@@ -252,7 +254,7 @@ local function __begin_hp_guard(seconds)
 			if p then
 				vars._maw_hp_floor_abs[i]	 = math.max(0, p.HP or 0)
 				local r = 0
-				if (p.HPMax or 0) > 0 then r = (p.HP or 0) / (p.HPMax or 1) end
+				if (GetMaxHP(p) or 0) > 0 then r = (p.HP or 0) / (GetMaxHP(p) or 1) end
 				if r ~= r then r = 0 end
 				vars._maw_hp_floor_ratio[i] = math.max(0, math.min(1, r))
 				vars._maw_hp_last[i]				= math.max(0, p.HP or 0)
@@ -260,6 +262,7 @@ local function __begin_hp_guard(seconds)
 		end
 	end
 	if Party and Party.Food ~= nil and Party.Food < 3 then Party.Food = 3 end
+	]]
 end
 
 local function __guard_active()
@@ -595,14 +598,14 @@ function events.Tick()
 	end
 	__purge_bad_conditions_during_guard()
 
-	-- HP FLOOR ENFORCER
+	--[[ HP FLOOR ENFORCER
 	if __guard_active() and Party and type(Party.High)=="number" then
 		for i=0,Party.High do
 			local p = Party[i]
 			if p then
 				local floorAbs	 = vars._maw_hp_floor_abs[i] or p.HP
 				local ratio			= vars._maw_hp_floor_ratio[i] or 0
-				local floorRatio = (p.HPMax and p.HPMax>0) and math.floor(p.HPMax*ratio + 0.5) or 0
+				local floorRatio = (GetMaxHP(p) and GetMaxHP(p)>0) and math.floor(GetMaxHP(p)*ratio + 0.5) or 0
 				local last			 = vars._maw_hp_last[i] or p.HP
 				local minHP			= math.max(floorAbs, floorRatio, last or 0)
 				if p.HP < minHP then p.HP = minHP end
@@ -610,7 +613,8 @@ function events.Tick()
 			end
 		end
 	end
-
+	]]
+	
 	-- Blocage sorts interdits
 	block_forbidden_spells_in_multi()
 
