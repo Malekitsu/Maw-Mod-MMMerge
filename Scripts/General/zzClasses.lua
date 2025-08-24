@@ -155,7 +155,7 @@ end
 --SERAPHIM
 ----------------------------------------------------------------------
 function events.GameInitialized2()
-	Game.ClassDescriptions[53]="Seraphim is a divine warrior, blessed by the gods with otherworldly powers that set him apart from mortal fighters. His origins are shrouded in mystery, but it is said that he was chosen by the divine to carry out their will on the mortal plane. Some whisper that he was born from the union of a mortal and an angel, while others believe that he was created by the gods themselves. Regardless of his origins, there is no denying the power that Seraphim wields, and his presence on the battlefield is a testament to the will of the divine.\n\nProficiency in Plate, Sword, Mace, and Shield (can't dual wield)\n3 HP and 1 mana points gained per level\n\nAbilities:\n\nGods Wrath: Attacks deal extra magic damage based on Light skill (2 damage added per point in Light and Mind)\n\nHoly Strikes: Attacking will heal the most injured party member based on Body skill (2 points per point in Body and Spirit)\n\nDivine Protection: converts 25% of mana into self-healing when facing lethal attacks (2 healing per mana spent), 5 minutes cooldown."
+	Game.ClassDescriptions[53]="Seraphim is a divine warrior, blessed by the gods with otherworldly powers that set him apart from mortal fighters. His origins are shrouded in mystery, but it is said that he was chosen by the divine to carry out their will on the mortal plane. Some whisper that he was born from the union of a mortal and an angel, while others believe that he was created by the gods themselves. Regardless of his origins, there is no denying the power that Seraphim wields, and his presence on the battlefield is a testament to the will of the divine.\n\nProficiency in Plate, Sword, Mace, and Shield (can't dual wield)\n3 HP and 1 mana points gained per level\n\nAbilities:\n\nGods Wrath: Attacks deal extra magic damage based on Light skill (2 damage added per point in Light and Mind)\n\nHoly Strikes: Attacking will heal the most injured party member based on Body skill (2 points per point in Body and Spirit)\n\nDivine Protection: self-heals by 25% of your HP when facing lethal attacks, 5 minutes cooldown."
 end
 
 --class ID
@@ -291,22 +291,16 @@ function events.GameInitialized2()
 				vars.divineProtectionCooldown[t.PlayerIndex]=0
 			end		
 			if t.Result>=t.Player.HP and Game.Time>vars.divineProtectionCooldown[t.PlayerIndex] then
-				totMana=t.Player:GetFullSP()
-				currentMana=t.Player.SP
-				treshold=totMana/4
-				if currentMana>=treshold then
-					t.Player.SP=t.Player.SP-(totMana/4)
 					--calculate healing
-					heal=totMana*2
-					for i=0,Party.High do
-						if Party[i]:GetIndex()==t.PlayerIndex then
-							evt[i].Add("HP",heal)
-						end
+				heal=round(GetMaxHP(t.Player)*0.25)
+				for i=0,Party.High do
+					if Party[i]:GetIndex()==t.PlayerIndex then
+						evt[i].Add("HP",heal)
 					end
-					vars.divineProtectionCooldown[t.PlayerIndex] = Game.Time + const.Minute * 150
-					Game.ShowStatusText("Divine Protection saves you from lethal damage")
-					t.Result=math.min(t.Result, t.Player.HP-1)
 				end
+				vars.divineProtectionCooldown[t.PlayerIndex] = Game.Time + const.Minute * 150
+				Game.ShowStatusText("Divine Protection saves you from lethal damage")
+				t.Result=math.min(t.Result, t.Player.HP-1)
 			end	
 		end
 	end
