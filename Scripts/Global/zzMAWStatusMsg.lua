@@ -48,7 +48,8 @@ function events.CalcDamageToMonster(t)
 			fullHP=getMaxMana(pl)
 			manaLeechLeg=true
 		end
-		local heal=t.Result/refHP*fullHP*0.1
+		local baselineHeal=t.Result/refHP*fullHP --basically dealing 100% of monster B HP as damage heals you by 100%
+		local heal=baselineHeal*0.1
 		
 		if getMapAffixPower(32) then
 			heal=heal*(1-getMapAffixPower(32)/100)
@@ -63,28 +64,33 @@ function events.CalcDamageToMonster(t)
 			if gotBowVamp[index] and data.Object and (data.Object.Spell==133 or data.Object.Spell==39) then
 				totalHeal=totalHeal+heal*0.5
 			end
-		else
+		end
+		if t.DamageKind~=4 or (data and data.Object and data.Object.Spell==39) then
+			local magicLeech=false
 			for i=0,2 do
 				it=pl:GetActiveItem(i)
 				if it and it.Bonus2==40 then
-					totalHeal=totalHeal+heal*0.5
+					magicLeech=true
 				end
+			end
+			if magicLeech then
+				totalHeal=totalHeal+heal*0.5
 			end
 		end 
 	
 		local race=Game.CharacterPortraits[pl.Face].Race
 		if race==const.Race.Vampire then
-			local heal=t.Result^0.75*0.25
+			local vampireHeal=heal*0.5
 			if pl.Class==40 or pl.Class==41 then
-				heal=heal*2
+				vampireHeal=vampireHeal*2
 			end
 			if data.Object and data.Object then
-				heal=heal/2
+				vampireHeal=vampireHeal/2
 			end
-			totalHeal=totalHeal+heal
+			totalHeal=totalHeal+vampireHeal
 		end
 		if vars.MAWSETTINGS.buffRework=="ON" and getBuffSkill(91)>0 then --vampiric aura buff
-			local heal=t.Result^0.75*0.5
+			local heal=heal*0.5
 			if getMapAffixPower(32) then
 				heal=heal*(1-getMapAffixPower(32)/100)
 			end
