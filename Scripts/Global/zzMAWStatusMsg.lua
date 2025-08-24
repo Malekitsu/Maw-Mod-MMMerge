@@ -120,7 +120,6 @@ function events.CalcDamageToMonster(t)
 			pl.HP=math.min(fullHP,pl.HP+totalHeal)
 		end
 
-		pl.HP=math.min(fullHP,pl.HP+totalHeal)
 		if overHeal>0 and vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 27) then
 			local id=pickLowestPartyMember()
 			Party[id].HP=Party[id].HP+overHeal
