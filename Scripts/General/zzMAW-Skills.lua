@@ -1955,6 +1955,7 @@ end
 function events.Tick()
 	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
 		local index=Game.CurrentPlayer
+		if index<0 or index>Party.High then return end
 		local pl=Party[index]
 		if index>=0 and index<=Party.High then
 			local skills={50,53,51}
