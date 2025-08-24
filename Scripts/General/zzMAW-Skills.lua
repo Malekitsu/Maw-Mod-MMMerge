@@ -1276,7 +1276,7 @@ function MawRegen()
 		end
 	end
 end
-function events.LoadMap(wasInGame)
+function events.AfterLoadMap()
 	Timer(MawRegen, const.Minute/20) 
 end
 
