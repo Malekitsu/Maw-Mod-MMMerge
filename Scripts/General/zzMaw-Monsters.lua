@@ -2356,7 +2356,11 @@ function checkMapCompletition()
 						evt.Add("Items", 1063)
 					end
 				end
-				experience=experience*5/Party.Count
+				if Multiplayer and Multiplayer.in_game then
+					experience=(experience /Party.Count) / math.min(PlayersInGame(),5)
+				else
+					experience=experience*5/Party.Count
+				end
 				for i=0,Party.High do
 					Party[i].Experience=math.min(Party[i].Experience+experience, 2^32-3982296)
 				end
