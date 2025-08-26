@@ -189,6 +189,7 @@ function events.CalcDamageToMonster(t)
   end
   if success then
     t.Result = t.Result * critMult
+	crit=true
   end
 
   if data.Player.Weak and data.Player.Weak > 0 then
