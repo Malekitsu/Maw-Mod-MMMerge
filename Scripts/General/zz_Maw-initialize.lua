@@ -33,6 +33,9 @@ enableDisintegrate=true
 --recommended to set this on for online play. Making this on will disable the message that informs you when monsters are no longer resurrecting and when you complete the dungeon. You still get the reward.
 disableCompletitionMessage=false
 
+-- ONLINE remove travel time, training time and coaches/ships always taking everywhere possible
+onlineQualityOfLifeFeatures=true
+
 --needed to fix some weird bug, don't touch this
 Game.PatchOptions.FixMonstersBlockingShots=true
 
