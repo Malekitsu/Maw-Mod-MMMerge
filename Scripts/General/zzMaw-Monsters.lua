@@ -2921,7 +2921,7 @@ end
 amountHP = amountHP or { [0] = 0, 0, 0, 0, 0 }
 amountSP = amountSP or { [0] = 0, 0, 0, 0, 0 }
 
-local function leecher()
+function leecher()
   local L = mapvars and mapvars.leecher
   if type(L) ~= "table" then return end
 
@@ -3069,49 +3069,46 @@ end
 
 
 --fix out of bound monsters
-function events.LoadMap(wasInGame)
-	function checkOutOfBound()
-		if Map.IndoorOrOutdoor==2 then
-			for i=0, Map.Monsters.High do
-				monster=Map.Monsters[i]
-				-- Check and adjust X coordinate
-				if monster.X > 22528 then
-					monster.X = 22400
-				elseif monster.X < -22528 then
-					monster.X = -22400
-				end
-
-				-- Check and adjust Y coordinate
-				if monster.Y > 22528 then
-					monster.Y = 22400
-				elseif monster.Y < -22528 then
-					monster.Y = -22400
-				end
+function checkOutOfBound()
+	if Map.IndoorOrOutdoor==2 then
+		for i=0, Map.Monsters.High do
+			monster=Map.Monsters[i]
+			-- Check and adjust X coordinate
+			if monster.X > 22528 then
+				monster.X = 22400
+			elseif monster.X < -22528 then
+				monster.X = -22400
 			end
-		elseif Map.IsIndoor() then
-			mapvars.monsterX=mapvars.monsterX or {}
-			mapvars.monsterY=mapvars.monsterY or {}
-			mapvars.monsterZ=mapvars.monsterZ or {}
-			for i=0, Map.Monsters.High do
-				mon=Map.Monsters[i]
-				mapvars.monsterX[i]=mapvars.monsterX[i] or mon.X
-				mapvars.monsterY[i]=mapvars.monsterY[i] or mon.Y
-				mapvars.monsterZ[i]=mapvars.monsterZ[i] or mon.Z
-				if Map.RoomFromPoint(XYZ(mon)) == 0 then 
-					mon.X, mon.Y, mon.Z= mapvars.monsterX[i], mapvars.monsterY[i], mapvars.monsterZ[i]
-					--fix in case starting location is bugged
-					if Map.RoomFromPoint(XYZ(mon)) == 0 then
-						for i=0, Map.Monsters.High do
-							if Map.RoomFromPoint(XYZ(Map.Monsters[i])) > 0 then
-								mon.X, mon.Y, mon.Z= Map.Monsters[i].X, Map.Monsters[i].Y, Map.Monsters[i].Z
-							end
+
+			-- Check and adjust Y coordinate
+			if monster.Y > 22528 then
+				monster.Y = 22400
+			elseif monster.Y < -22528 then
+				monster.Y = -22400
+			end
+		end
+	elseif Map.IsIndoor() then
+		mapvars.monsterX=mapvars.monsterX or {}
+		mapvars.monsterY=mapvars.monsterY or {}
+		mapvars.monsterZ=mapvars.monsterZ or {}
+		for i=0, Map.Monsters.High do
+			mon=Map.Monsters[i]
+			mapvars.monsterX[i]=mapvars.monsterX[i] or mon.X
+			mapvars.monsterY[i]=mapvars.monsterY[i] or mon.Y
+			mapvars.monsterZ[i]=mapvars.monsterZ[i] or mon.Z
+			if Map.RoomFromPoint(XYZ(mon)) == 0 then 
+				mon.X, mon.Y, mon.Z= mapvars.monsterX[i], mapvars.monsterY[i], mapvars.monsterZ[i]
+				--fix in case starting location is bugged
+				if Map.RoomFromPoint(XYZ(mon)) == 0 then
+					for i=0, Map.Monsters.High do
+						if Map.RoomFromPoint(XYZ(Map.Monsters[i])) > 0 then
+							mon.X, mon.Y, mon.Z= Map.Monsters[i].X, Map.Monsters[i].Y, Map.Monsters[i].Z
 						end
 					end
 				end
 			end
 		end
 	end
-
 end
 function events.LeaveMap()
 	mapvars.monsterX=nil
