@@ -191,16 +191,5 @@ MawAddTimer("nightmare", 0.5, nightmare)
 MawAddTimer("elementalBuffs", 1, elementalBuffs)
 
 MawAddTimer("mawBuffApply", 0.5, mawBuffApply)
-MawAddTimer("buffManaLock", 0.1, buffManaLock)
-
-function events.AfterLoadMap()
-	Timer(elementalBuffs, TimerPeriod, true)
-end
-
-
-function events.AfterLoadMap()
-	if vars.MAWSETTINGS and vars.MAWSETTINGS.buffRework=="ON" then
-		Timer(mawBuffApply, const.Minute/2, true)
-		Timer(buffManaLock, const.Minute/20)
-	end
-end
+MawAddTimer("elementalistStacksDecay", 0.1, elementalistStacksDecay)
+MawAddTimer("poisonTimer", 1, poisonTimer)
