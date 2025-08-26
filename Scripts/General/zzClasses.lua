@@ -1564,9 +1564,6 @@ function elementalistStacksDecay()
 	end
 end
 
-function events.AfterLoadMap()
-	Timer(elementalistStacksDecay, const.Minute*0.05, true)
-end
 
 function events.CalcDamageToMonster(t)
 	local data=WhoHitMonster()
