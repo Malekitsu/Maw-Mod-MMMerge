@@ -945,7 +945,6 @@ function events.GameInitialized2()
 end
 
 --WHEN GM ELEMENTAL BUFFS WILL BE GRANTED PASSIVELY
-TimerPeriod=const.Minute/2
 schools={12,13,14,15,17,18}
 buffsOrdered = {6, 0, 17, 4, 12, 1}
 schoolToBuff={
@@ -1010,10 +1009,6 @@ function elementalBuffs()
 			Party.SpellBuffs[16].Skill=math.max(1,Party.SpellBuffs[16].Skill)
 		end
 	end
-end
-
-function events.AfterLoadMap()
-	Timer(elementalBuffs, TimerPeriod, true)
 end
 
 --let town portal scroll to be reused if solo
@@ -3100,6 +3095,7 @@ function mawBuffCast(pl, index, spellId)
 end
 
 function mawBuffApply()
+	if vars.MAWSETTINGS and vars.MAWSETTINGS.buffRework=="OFF" then return end
 	-- reset party buffs de base
 	for i=1, #mawPartyBuffList do
 		local id=mawPartyBuffList[i]
@@ -3266,6 +3262,7 @@ function mawBuffApply()
 end
 
 function buffManaLock()
+	if vars.MAWSETTINGS and vars.MAWSETTINGS.buffRework=="OFF" then return end
 	vars.maxManaPool={}
 	vars.currentManaPool={}
 	vars.maxHPPool={}
@@ -3316,14 +3313,6 @@ function buffManaLock()
 		end
 		Party[i].SP = math.min(math.ceil(vars.currentManaPool[i]), Party[i].SP)
 		Party[i].HP = math.min(math.ceil(vars.currentHPPool[i]), Party[i].HP)
-	end
-end
-
-function events.AfterLoadMap()
-	if vars.MAWSETTINGS and vars.MAWSETTINGS.buffRework=="ON" then
-		-- ré-applique périodiquement (préexistant dans ton mod)
-		Timer(mawBuffApply, const.Minute/2, true)
-		Timer(buffManaLock, const.Minute/20)
 	end
 end
 
