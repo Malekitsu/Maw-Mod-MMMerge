@@ -914,63 +914,6 @@ end
 --------------------
 
 function events.LoadMap(wasInGame)
-	local function poisonTimer() 
-		vars.poisonTime=vars.poisonTime or {}
-		local mult=Game.BolsterAmount/100
-		if vars.insanityMode then
-			mult=mult*2
-		end
-		if Party.High==0 then
-			mult=mult/2
-		end
-		for i = 0, Party.High do
-			if Party[i].Poison3>0 then
-				if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
-					vars.poisonTime[i]=20
-				end
-				if vars.poisonTime[i]>0 then
-					vars.poisonTime[i]=vars.poisonTime[i]-1
-				end
-				if vars.poisonTime[i]==0 then			
-					Party[i].Poison3=0
-					Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
-				else
-					Party[i].HP=Party[i].HP-math.ceil(Party[i]:GetFullHP()*0.01)*mult
-				end 
-			else if Party[i].Poison2>0 then
-					if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
-						vars.poisonTime[i]=20
-					end
-					if vars.poisonTime[i]>0 then
-						vars.poisonTime[i]=vars.poisonTime[i]-1
-					end
-					if vars.poisonTime[i]==0 then			
-						Party[i].Poison2=0
-						Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
-					else
-						Party[i].HP=Party[i].HP-math.ceil(Party[i]:GetFullHP()*0.005)*mult
-					end 
-				else if Party[i].Poison1>0 then
-						if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
-							vars.poisonTime[i]=20
-						end
-						if vars.poisonTime[i]>0 then
-							vars.poisonTime[i]=vars.poisonTime[i]-1
-						end
-						if vars.poisonTime[i]==0 then			
-							Party[i].Poison1=0
-							Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
-						else
-							Party[i].HP=Party[i].HP-math.ceil(Party[i]:GetFullHP()*0.0025)*mult
-						end 
-					else 
-						vars.poisonTime[i]=0
-					end
-				end
-			end
-		end
-	end
-
 	function events.DoBadThingToPlayer(t)
 		if (t.Thing==6 or t.Thing==7 or t.Thing==8) and t.Allow then
 			if vars.poisonTime[t.PlayerIndex]==nil or vars.poisonTime[t.PlayerIndex]==0 then
@@ -980,16 +923,69 @@ function events.LoadMap(wasInGame)
 			end
 		end
 	end
-
 end
-
-
-
 --carnage fix tooltip
 function events.GameInitialized2()
 	Game.SpcItemsTxt[2].BonusStat="Explosive Impact! (half damage)"
 end
 
+
+function poisonTimer() 
+	vars.poisonTime=vars.poisonTime or {}
+	local mult=Game.BolsterAmount/100
+	if vars.insanityMode then
+		mult=mult*2
+	end
+	if Party.High==0 then
+		mult=mult/2
+	end
+	for i = 0, Party.High do
+		if Party[i].Poison3>0 then
+			if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
+				vars.poisonTime[i]=20
+			end
+			if vars.poisonTime[i]>0 then
+				vars.poisonTime[i]=vars.poisonTime[i]-1
+			end
+			if vars.poisonTime[i]==0 then			
+				Party[i].Poison3=0
+				Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
+			else
+				Party[i].HP=Party[i].HP-math.ceil(Party[i]:GetFullHP()*0.01)*mult
+			end 
+		else if Party[i].Poison2>0 then
+				if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
+					vars.poisonTime[i]=20
+				end
+				if vars.poisonTime[i]>0 then
+					vars.poisonTime[i]=vars.poisonTime[i]-1
+				end
+				if vars.poisonTime[i]==0 then			
+					Party[i].Poison2=0
+					Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
+				else
+					Party[i].HP=Party[i].HP-math.ceil(Party[i]:GetFullHP()*0.005)*mult
+				end 
+			else if Party[i].Poison1>0 then
+					if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
+						vars.poisonTime[i]=20
+					end
+					if vars.poisonTime[i]>0 then
+						vars.poisonTime[i]=vars.poisonTime[i]-1
+					end
+					if vars.poisonTime[i]==0 then			
+						Party[i].Poison1=0
+						Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
+					else
+						Party[i].HP=Party[i].HP-math.ceil(Party[i]:GetFullHP()*0.0025)*mult
+					end 
+				else 
+					vars.poisonTime[i]=0
+				end
+			end
+		end
+	end
+end
 ------------------------------------------
 --TOOLTIPS--
 ------------------------------------------
