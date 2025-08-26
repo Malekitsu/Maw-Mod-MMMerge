@@ -202,12 +202,13 @@ local MawTimers = {}
 
 -- add a periodic task
 function MawAddTimer(name, interval, fn)
+  assert(type(fn) == "function", "MawAddTimer('"..tostring(name).."'): fn must be a function, got "..type(fn))
   MawTimers[name] = { interval = interval, acc = 0, fn = fn, enabled = true }
 end
 
 -- optional helpers
 function MawEnableTimer(name, enabled)
-	local t = MawTimers[name]; if t then t.enabled = (enabled ~= false) end
+  local t = MawTimers[name]; if t then t.enabled = (enabled ~= false) end
 end
 
 function MawRemoveTimer(name) MawTimers[name] = nil end
@@ -216,30 +217,29 @@ function MawResetTimer(name) local t=MawTimers[name]; if t then t.acc = 0 end en
 
 -- call this every frame with seconds since last frame
 function MawTimer(dt)
-	if not dt or dt <= 0 then return end
-	for _, t in pairs(MawTimers) do
-		if t.enabled then
-			t.acc = t.acc + dt
-			if t.acc >= t.interval then
-				t.fn(t.acc)   -- extra arg is fine; zero-arg callbacks ignore it
-				t.acc = 0
-			end
-		end
-	end
+  if not dt or dt <= 0 then return end
+  for _, t in pairs(MawTimers) do
+    if t.enabled then
+      t.acc = t.acc + dt
+      if t.acc >= t.interval then
+        local fn = t.fn
+        if fn then fn(t.acc) end   -- minimal guard: skip if fn is nil
+        t.acc = 0
+      end
+    end
+  end
 end
 
--- register your timer (runs every 0.5s)
+-- register your timers (make sure these functions are defined BEFORE this point)
 MawAddTimer("horizontalModeMasteries", 0.5, horizontalModeMasteries)
-MawAddTimer("MawRegen", 0.1, function(elapsed) MawRegen(elapsed) end) 
+MawAddTimer("MawRegen", 0.1, function(elapsed) MawRegen(elapsed) end)
 MawAddTimer("leecher", 0.5, leecher)
 MawAddTimer("checkOutOfBound", 2, checkOutOfBound)
 MawAddTimer("eliteRegen", 0.1, eliteRegen)
 MawAddTimer("mappingRegen", 1, mappingRegen)
-MawAddTimer("checkMapCompletition", 10, checkMapCompletition)
+MawAddTimer("checkMapCompletition", 10, checkMapCompletition) -- double-check this name/spelling
 MawAddTimer("nightmare", 0.5, nightmare)
-
 MawAddTimer("elementalBuffs", 1, elementalBuffs)
-
 MawAddTimer("mawBuffApply", 0.5, mawBuffApply)
 MawAddTimer("elementalistStacksDecay", 0.1, elementalistStacksDecay)
 MawAddTimer("poisonTimer", 1, poisonTimer)
