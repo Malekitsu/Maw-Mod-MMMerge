@@ -2238,9 +2238,7 @@ function events.MonsterKilled(mon)
 	monsterKilled=false
 end
 
-function events.LoadMap(wasInGame)
-	Timer(checkMapCompletition, const.Minute*5) 
-end
+
 function checkMapCompletition()
 	--retroactive fix, can remove this code after a while
 	if mapvars.completed and mapvars.monsterMap then
@@ -2356,7 +2354,7 @@ function checkMapCompletition()
 						evt.Add("Items", 1063)
 					end
 				end
-					experience=experience*5/Party.Count
+				experience=experience*5/Party.Count
 				if Multiplayer and Multiplayer.in_game then
 					experience=experience / math.min(PlayersInGame(),5)
 				end
@@ -2429,10 +2427,6 @@ function nightmare()
 		vars.introduction=true
 		Message("Greeting adventurer!\nYour journey is about to start, but first make sure to check the difficulty settings (ESC-->Controls-->Extra Settings(on the top)-->Bolstering Power)")
 	end
-end
-
-function events.LoadMap(wasInGame)
-	Timer(nightmare, const.Minute/4) 
 end
 
 --[[dungeon entrance level 
@@ -2976,7 +2970,6 @@ end
 -- Un SEUL handler LoadMap qui fait les 2 jobs (timer + reset swift)
 function events.LoadMap(wasInGame)
   swiftLocation = nil
-  Timer(leecher, const.Minute / 4)
 end
 
 -- =========================
@@ -3119,7 +3112,6 @@ function events.LoadMap(wasInGame)
 		end
 	end
 
-	Timer(checkOutOfBound, const.Minute) 
 end
 function events.LeaveMap()
 	mapvars.monsterX=nil
@@ -3148,19 +3140,13 @@ function eliteRegen()
 	end
 end
 
-function events.LoadMap(wasInGame)
-	Timer(eliteRegen, const.Minute/20) 
-end
-
 function mappingRegen()
 	if getMapAffixPower(7) then
 		local regenAmount=mon.FullHitPoints*getMapAffixPower(7)/100
 		mon.HP=math.min(mon.HP+regenAmount, mon.FullHP)
 	end
 end
-function events.LoadMap(wasInGame)
-	Timer(mappingRegen, const.Minute/2) 
-end
+
 --fix for stucked in death animation monsters
 function events.MonsterKilled(mon)
 	mon.Z=mon.Z-1
