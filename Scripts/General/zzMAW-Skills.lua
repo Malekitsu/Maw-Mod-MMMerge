@@ -735,13 +735,12 @@ function events.LoadMap(wasInGame)
 	vars.chargeCooldown=vars.chargeCooldown or 25
 	lastCharge=vars.chargeCooldown
 	charge=false
-	Timer(chargeTimer, const.Minute/2) 
 end
 function chargeTimer() 
-		if vars.chargeCooldown>0 then
-			vars.chargeCooldown=vars.chargeCooldown-1
-		end
+	if vars.chargeCooldown>0 then
+		vars.chargeCooldown=vars.chargeCooldown-1
 	end
+end
 --movement
 function events.Tick()
 	if Multiplayer and Multiplayer.client_monsters()[0] and checkCharge and checkCharge>=0 then
@@ -1161,13 +1160,9 @@ function getBuffHealthRegen(pl)
 	return regen
 end
 
-function MawRegen()
+function MawRegen(timePassed)
 	--HP
-	vars.lastRegenTime=vars.lastRegenTime or Game.Time
-	timePassed=Game.Time-vars.lastRegenTime
-	vars.lastRegenTime=Game.Time
-	--call is 20 times per minute, which is 12.8 
-	local timeMultiplier=(Game.TurnBased and timePassed/12.8) or 1
+	local timeMultiplier=(Game.TurnBased and timePassed) or 1
 	if getMapAffixPower(22) then
 		timeMultiplier=timeMultiplier*(1-getMapAffixPower(22)/100)
 	end
@@ -1275,9 +1270,6 @@ function MawRegen()
 			lastSP[i]=pl.SP
 		end
 	end
-end
-function events.AfterLoadMap()
-	Timer(MawRegen, const.Minute/20) 
 end
 
 
@@ -1705,7 +1697,7 @@ function horizontalModeMasteries()
 		vars.freeProgression=false
 		vars.storedMasteries=vars.storedMasteries or {}
 		for i=0,Party.PlayersArray.High do
-			pl=Party.PlayersArray[i]
+			local pl=Party.PlayersArray[i]
 			vars.storedMasteries[i]=vars.storedMasteries[i] or {}
 			for v=0,23 do 
 				local s,m = SplitSkill(pl.Skills[v])
@@ -1720,7 +1712,7 @@ function horizontalModeMasteries()
 	end
 	if Game.freeProgression and vars.storedMasteries then
 		for i=0,Party.PlayersArray.High do
-			pl=Party.PlayersArray[i]
+			local pl=Party.PlayersArray[i]
 			vars.storedMasteries[i]=vars.storedMasteries[i] or {}
 			for v=0,23 do
 				if vars.storedMasteries[i][v] then
@@ -1734,9 +1726,7 @@ function horizontalModeMasteries()
 end
 
 
-function events.LoadMap(wasInGame)
-	Timer(horizontalModeMasteries, const.Minute/4) 
-end
+
 function events.Action(t)
 	horizontalModeMasteries()
 end
