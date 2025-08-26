@@ -1265,7 +1265,12 @@ function MawRegen(timePassed)
 				local s,m=SplitSkill(pl:GetSkill(const.Skills.Water))
 				regenSP[i]=regenSP[i]+ (0.6+m*0.2) * timeMultiplier
 			end
-			pl.SP = math.min(FSP, pl.SP + math.floor(regenSP[i]))
+			local playersSP = math.min(FSP, pl.SP + math.floor(regenSP[i]))
+			if vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[i] then
+				pl.SP = math.min(vars.currentManaPool[i], playersSP)
+			else
+				pl.SP=playersSP
+			end
 			regenSP[i]=regenSP[i]%1
 			lastSP[i]=pl.SP
 		end
