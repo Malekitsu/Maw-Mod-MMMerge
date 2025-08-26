@@ -126,6 +126,7 @@ function events.Tick()
 	if not onlineQualityOfLifeFeatures then return end
 	if not isMultiplayerActive and Multiplayer and Multiplayer.in_game then
 		isMultiplayerActive=true
+		vars.ChallengeMode=true
 		if storeTime then
 			Game.Time=storeTime
 			storeTime=false			
@@ -149,6 +150,7 @@ function events.Tick()
 	end
 	if isMultiplayerActive and Multiplayer and not Multiplayer.in_game then
 		isMultiplayerActive=false
+		vars.ChallengeMode=false
 		for i=0, Game.TransportLocations.High do
 			local tran=Game.TransportLocations[i]
 			tran.Monday=baseTransportTable[i][1]
