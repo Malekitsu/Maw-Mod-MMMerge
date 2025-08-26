@@ -181,3 +181,26 @@ end
 -- register your timer (runs every 0.5s)
 MawAddTimer("horizontalModeMasteries", 0.5, horizontalModeMasteries)
 MawAddTimer("MawRegen", 0.1, function(elapsed) MawRegen(elapsed) end) 
+MawAddTimer("leecher", 0.5, leecher)
+MawAddTimer("checkOutOfBound", 2, checkOutOfBound)
+MawAddTimer("eliteRegen", 0.1, eliteRegen)
+MawAddTimer("mappingRegen", 1, mappingRegen)
+MawAddTimer("checkMapCompletition", 10, checkMapCompletition)
+MawAddTimer("nightmare", 0.5, nightmare)
+
+MawAddTimer("elementalBuffs", 1, elementalBuffs)
+
+MawAddTimer("mawBuffApply", 0.5, mawBuffApply)
+MawAddTimer("buffManaLock", 0.1, buffManaLock)
+
+function events.AfterLoadMap()
+	Timer(elementalBuffs, TimerPeriod, true)
+end
+
+
+function events.AfterLoadMap()
+	if vars.MAWSETTINGS and vars.MAWSETTINGS.buffRework=="ON" then
+		Timer(mawBuffApply, const.Minute/2, true)
+		Timer(buffManaLock, const.Minute/20)
+	end
+end
