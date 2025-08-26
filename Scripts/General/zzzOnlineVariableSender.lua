@@ -121,6 +121,56 @@ function events.MultiplayerInitialized()
 	end
 end
 
+local isMultiplayerActive=false
+function events.Tick()
+	if not onlineQualityOfLifeFeatures then return end
+	if not isMultiplayerActive and Multiplayer and Multiplayer.in_game then
+		isMultiplayerActive=true
+		if storeTime then
+			Game.Time=storeTime
+			storeTime=false			
+		end
+		
+		for i=0, Game.TransportLocations.High do
+			local tran=Game.TransportLocations[i]
+			tran.Monday=true
+			tran.Tuesday=true
+			tran.Wednesday=true
+			tran.Thursday=true
+			tran.Friday=true
+			tran.Saturday=true
+			tran.Sunday=true
+		end
+		for i =0,Game.Houses.High do
+			Game.Houses[i].OpenHour=0
+			Game.Houses[i].CloseHour=0
+		end
+		Game.NPC[1177].EventB=0
+	end
+	if isMultiplayerActive and Multiplayer and not Multiplayer.in_game then
+		isMultiplayerActive=false
+		for i=0, Game.TransportLocations.High do
+			local tran=Game.TransportLocations[i]
+			tran.Monday=baseTransportTable[i][1]
+			tran.Tuesday=baseTransportTable[i][2]
+			tran.Wednesday=baseTransportTable[i][3]
+			tran.Thursday=baseTransportTable[i][4]
+			tran.Friday=baseTransportTable[i][5]
+			tran.Saturday=baseTransportTable[i][6]
+			tran.Sunday=baseTransportTable[i][7]
+		end
+		for i =0,Game.Houses.High do
+			Game.Houses[i].OpenHour=baseOpenTimes[i]
+			Game.Houses[i].CloseHour=baseCloseTimes[i]
+		end
+		Game.NPC[1177].EventB=1418
+	end
+end
+function events.CalcTrainingTime(t)
+	if Multiplayer and Multiplayer.in_game then
+		t.Time=0
+	end
+end
 function events.BeforeLoadMap()
 	vars.StoredMapvars=vars.StoredMapvars or {}
 	
