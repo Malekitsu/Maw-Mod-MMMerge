@@ -143,6 +143,7 @@ function events.MultiplayerInitialized()
 		data.Party.X=Party.X
 		data.Party.Y=Party.Y
 		data.Party.Z=Party.Z
+		data.Party.High=Party.High
 		data.Party.Map=Map.Name
 		for i=0,Party.High do
 			local pl=Party[i]
@@ -160,7 +161,6 @@ function events.MultiplayerInitialized()
 			data.Party[i].FSP=FSP
 			data.Party[i].Dead=pl.Dead
 			data.Party[i].Eradicated=pl.Eradicated
-			data.Party[i].High=Party.High
 		end
 		data.dataType="healthManaInfo"
 		data.senderId=myId
