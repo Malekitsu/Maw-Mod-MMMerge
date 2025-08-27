@@ -239,6 +239,7 @@ function events.CalcDamageToMonster(t)
 			mapvars.healingDone=mapvars.healingDone or {}
 			mapvars.healingDone[id]=mapvars.healingDone[id] or 0
 			mapvars.healingDone[id]=mapvars.healingDone[id] + healing
+			return
 		end
 		
 		--apply heal
