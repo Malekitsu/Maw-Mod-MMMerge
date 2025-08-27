@@ -2451,82 +2451,78 @@ has 1 to 4 extra mini bosses
 teleport behind party
 ]]
 
--- === AFTER LOAD MAP (host génère; clients ne génèrent pas) ===
+-- === AFTER LOAD MAP (host generates; clients do not generate) ===
 function events.AfterLoadMap()
   local IN_MULTI  = Multiplayer and Multiplayer.in_game
   local IS_HOST   = IN_MULTI and Multiplayer.im_host and Multiplayer.im_host()
 
-  -- Clients multi : bloquent la génération locale, le module zzBossSync demandera un snapshot.
+  -- Multi-client: block local generation; the zzBossSync module will request a snapshot.
   if IN_MULTI and not IS_HOST then
     mapvars = mapvars or {}
     mapvars.bossGenerated = true
   end
 
   if Game.BolsterAmount >= 100 then
-    -- HOST UNIQUEMENT : génère si pas déjà fait
-    if (not IN_MULTI) or IS_HOST then
-      if not mapvars.bossGenerated or not mapvars.bossNames then
-        mapvars.bossGenerated = true
+-- HOST ONLY: generates if not already done (or table is empty)
+if (not IN_MULTI) or IS_HOST then
+  local names_empty = (type(mapvars.bossNames)=="table" and next(mapvars.bossNames)==nil)
+  if (not mapvars.bossGenerated) or (mapvars.bossNames == nil) or names_empty then
+    mapvars.bossGenerated = true
+    mapvars.bossNames = {}      -- on repart propre
+    mapvars.bossSet   = {}
 
-        -- (redone) purge des NameId invalides
-        if isRedone then
-          for i = 0, Map.Monsters.High do
-            local mon = Map.Monsters[i]
-            if mon.NameId > 220 then
-              mon.NameId = 0
-            end
-          end
-        end
+    -- (redone) purge invalid NameIds
+    if isRedone then
+      for i = 0, Map.Monsters.High do
+        local mon = Map.Monsters[i]
+        if mon.NameId > 220 then mon.NameId = 0 end
+      end
+    end
 
-        possibleMonsters = {}
-        bossSpawns = math.ceil((Map.Monsters.Count - 30) / 150)
-        if vars.Mode == 2 then
-          bossSpawns = math.ceil((Map.Monsters.Count - 30) / 60)
-        end
+    local possibleMonsters = {}
+    local bossSpawns = math.ceil((Map.Monsters.Count - 30) / 150)
+    if vars.Mode == 2 then bossSpawns = math.ceil((Map.Monsters.Count - 30) / 60) end
 
-        -- mapping / affixes
-        if getMapAffixPower(16) then
-          bossSpawns = math.ceil(bossSpawns * (1 + getMapAffixPower(16) / 100))
+    if getMapAffixPower(16) then
+      bossSpawns = math.ceil(bossSpawns * (1 + getMapAffixPower(16) / 100))
+    end
+    if getMapAffixPower(17) then
+      for i = 0, Map.Monsters.High do
+        if Map.Monsters[i].Id % 3 ~= 0 and math.random() < getMapAffixPower(17) / 100 then
+          Map.Monsters[i].Id = Map.Monsters[i].Id + 1
         end
-        if getMapAffixPower(17) then
-          for i = 0, Map.Monsters.High do
-            if Map.Monsters[i].Id % 3 ~= 0 and math.random() < getMapAffixPower(17) / 100 then
-              Map.Monsters[i].Id = Map.Monsters[i].Id + 1
-            end
-          end
+      end
+    end
+    if getMapAffixPower(19) then
+      for i = 0, Map.Monsters.High do
+        local id = Map.Monsters[i].Id
+        if id % 3 ~= 0 and Game.MonstersTxt[id].AIType ~= 1 and Map.Monsters[i].NameId == 0 and math.random() < getMapAffixPower(19) / 100 then
+          generateBoss(i)
         end
-        if getMapAffixPower(19) then
-          for i = 0, Map.Monsters.High do
-            local id = Map.Monsters[i].Id
-            if id % 3 ~= 0 and Game.MonstersTxt[id].AIType ~= 1 and Map.Monsters[i].NameId == 0 and math.random() < getMapAffixPower(19) / 100 then
-              generateBoss(i)
-            end
-          end
-        end
+      end
+    end
 
-        -- candidates
-        for i = 0, Map.Monsters.High do
-          local id = Map.Monsters[i].Id
-          if id % 3 == 0 and Game.MonstersTxt[id].AIType ~= 1 and Map.Monsters[i].NameId == 0 then
-            table.insert(possibleMonsters, i)
-          end
-        end
+    for i = 0, Map.Monsters.High do
+      local id = Map.Monsters[i].Id
+      if id % 3 == 0 and Game.MonstersTxt[id].AIType ~= 1 and Map.Monsters[i].NameId == 0 then
+        table.insert(possibleMonsters, i)
+      end
+    end
 
-        -- spawn bosses
-        if bossSpawns > 0 then
-          for v = 1, bossSpawns do
-            if #possibleMonsters > 0 then
-              local index = math.random(1, #possibleMonsters)
-              generateBoss(possibleMonsters[index])
-              table.remove(possibleMonsters, index)
-            end
-          end
+    if bossSpawns > 0 then
+      for v = 1, bossSpawns do
+        if #possibleMonsters > 0 then
+          local index = math.random(1, #possibleMonsters)
+          generateBoss(possibleMonsters[index])
+          table.remove(possibleMonsters, index)
         end
       end
     end
   end
+end
+  end
 
-  -- Applique les noms si on a une table (host & clients)
+  -- Applies names if there is a table (host & clients)
   if mapvars.bossNames then
     for i = 1, 79 do
       Game.PlaceMonTxt[i + 220] = i + 220
@@ -2536,7 +2532,7 @@ function events.AfterLoadMap()
     end
   end
 
-  -- Si host en multi, broadcast “snapshot” (nom + affectations)
+  -- If host in multi, snapshot broadcast (name + assignments)
   if IN_MULTI and IS_HOST then
     if type(BossSync_BroadcastSnapshot) == "function" then
       BossSync_BroadcastSnapshot()
@@ -2664,7 +2660,7 @@ function generateBoss(index, nameIndex, skillType)
   mon.SpellSkill = JoinSkill(s * dmgMult, m)
 
   -- === NOUVEAU : mémorise l’affectation index -> NameId pour broadcast aux clients
-  table.insert(mapvars.bossSet, { index, mon.NameId })
+  table.insert(mapvars.bossSet, { index, mon.NameId, mon.Id })
 end
 
 
