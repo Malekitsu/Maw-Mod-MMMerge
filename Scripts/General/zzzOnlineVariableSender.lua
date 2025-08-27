@@ -168,12 +168,12 @@ function events.MultiplayerInitialized()
 	end
 	function ShareHealthData()
 		local hostParty={}
-		hostParty.Party={}
-		hostParty.Party.X=Party.X
-		hostParty.Party.Y=Party.Y
-		hostParty.Party.Z=Party.Z
-		hostParty.Party.High=Party.High
-		hostParty.Party.Map=Map.Name
+		hostParty={}
+		hostParty.X=Party.X
+		hostParty.Y=Party.Y
+		hostParty.Z=Party.Z
+		hostParty.High=Party.High
+		hostParty.Map=Map.Name
 		for i=0,Party.High do
 			local pl=Party[i]
 			local FHP=GetMaxHP(pl)
@@ -183,13 +183,13 @@ function events.MultiplayerInitialized()
 			else
 				FSP	= pl:GetFullSP()
 			end
-			hostParty.Party[i]={}
-			hostParty.Party[i].HP=pl.HP
-			hostParty.Party[i].FHP=FHP
-			hostParty.Party[i].SP=pl.SP
-			hostParty.Party[i].FSP=FSP
-			hostParty.Party[i].Dead=pl.Dead
-			hostParty.Party[i].Eradicated=pl.Eradicated
+			hostParty[i]={}
+			hostParty[i].HP=pl.HP
+			hostParty[i].FHP=FHP
+			hostParty[i].SP=pl.SP
+			hostParty[i].FSP=FSP
+			hostParty[i].Dead=pl.Dead
+			hostParty[i].Eradicated=pl.Eradicated
 		end
 		vars.online.partyHealthMana.Parties[0]=hostParty
 		local data=vars.online.partyHealthMana
