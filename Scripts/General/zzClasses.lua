@@ -190,7 +190,7 @@ function pickLowestPartyMember()
 	local min_value = math.min(a, b, c, d, e)
 	local min_index = indexof({a, b, c, d, e}, min_value)
 	min_index = min_index - 1
-	return min_index
+	return min_index, min_value
 end
 
 function events.CalcDamageToMonster(t)
@@ -212,19 +212,34 @@ function events.CalcDamageToMonster(t)
 		spirit=data.Player:GetSkill(const.Skills.Spirit)
 		spiritS,spiritM=SplitSkill(spirit)
 		
+		if bodyS==0 and spiritS==0 then return end
+		
 		--Calculate heal value and apply
 		healValue=(bodyS^1.3*bodyM+spiritS^1.3*spiritM)*damageMultiplier[t.PlayerIndex]["Melee"]
 		personality=data.Player:GetPersonality()
 		healValue=healValue*(1+personality/1000)
-		--[[calculate crit
-		critchance=data.Player:GetLuck()/15*10+50
-		roll=math.random(1,1000)
-		if roll<critchance then
-			healValue=healValue*(1.5+personality*3/2000)
-		end
-		]]
 		
-		local healTarget=pickLowestPartyMember()
+		local healTarget, lowestHealthPercentage=pickLowestPartyMember()
+		
+		local percent, partyId, playerId=OnlineLowestHealthPercentage()
+		
+		if percent<lowestHealthPercentage then
+			SendHeal(partyId, playerId, healValue, data.Player.Name)
+			
+			local hp=vars.online.partyHealthMana.Parties[partyId][playerId].HP
+			local fhp=vars.online.partyHealthMana.Parties[partyId][playerId].FHP
+			
+			local healing=math.min(healValue, fhp-hp)
+			
+			local id=t.PlayerIndex
+			vars.healingDone=vars.healingDone or {}
+			vars.healingDone[id]=vars.healingDone[id] or 0
+			vars.healingDone[id]=vars.healingDone[id] + healing
+			mapvars.healingDone=mapvars.healingDone or {}
+			mapvars.healingDone[id]=mapvars.healingDone[id] or 0
+			mapvars.healingDone[id]=mapvars.healingDone[id] + healing
+		end
+		
 		--apply heal
 		evt[healTarget].Add("HP",healValue)		
 		--bug fix
