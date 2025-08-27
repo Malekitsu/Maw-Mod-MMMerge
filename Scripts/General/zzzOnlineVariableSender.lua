@@ -168,6 +168,26 @@ function events.Tick()
 		Game.NPC[1177].EventB=1418
 	end
 end
+
+--show health when dead
+function events.Tick()
+	if not Multiplayer or not Multiplayer.in_game then return end
+	for i=0,Party.High do
+		if Party[i]:IsConscious() then
+			return
+		end
+	end
+	local pl=Party[0]
+	local maxHP=GetMaxHP(pl)
+	local FSP=0
+	if vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[0] then
+		FSP = vars.currentManaPool[0]
+	else
+		FSP	= pl:GetFullSP()
+	end
+	Game.ShowStatusText(StrColor(0,255,0,"Health: " .. Party[0].HP .. "/" .. round(maxHP)) .. StrColor(50,50,255,"  Mana: " .. Party[0].SP .. "/" .. round(FSP)))	
+end
+
 function events.CalcTrainingTime(t)
 	if Multiplayer and Multiplayer.in_game then
 		t.Time=0
