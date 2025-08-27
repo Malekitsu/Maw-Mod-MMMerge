@@ -3196,6 +3196,8 @@ end
 function events.Tick()
 	if Game.TurnBased then
 		if vars.Mode==2 or vars.AusterityMode then
+			turnBaseStartPositionX=turnBaseStartPositionX or Party.X
+			turnBaseStartPositionY=turnBaseStartPositionX or Party.Y
 			if Game.TurnBasedPhase==2 then
 				turnBaseStartPositionX, turnBaseStartPositionY = Party.X, Party.Y
 			elseif Game.TurnBasedPhase==3 then
