@@ -751,7 +751,7 @@ function events.CalcDamageToPlayer(t)
 			t.Damage=damage
 		end
 		if mapvars.nameIdMult and mapvars.nameIdMult[data.Monster.NameId] and mapvars.nameIdMult[data.Monster.NameId][data.MonsterAction+1] then
-			t.Damage=t.Damage*mapvars.nameIdMult[data.Monster.NameId][data.MonsterAction+1]
+			t.Damage=t.Damage*(math.max(mapvars.nameIdMult[data.Monster.NameId][data.MonsterAction+1],1)) --temporary fix
 		elseif data.MonsterAction<=1 then
 			t.Damage=t.Damage*overflowMult[data.Monster.Id][data.MonsterAction+1]
 		end
