@@ -192,6 +192,11 @@ function events.MultiplayerInitialized()
 			hostParty[i].Eradicated=pl.Eradicated
 		end
 		vars.online.partyHealthMana.Parties[0]=hostParty
+		for key, value in pairs(vars.online.partyHealthMana.Parties) do
+			if not Multiplayer.connector.clients[key] then
+				vars.online.partyHealthMana.Parties[key]=nil
+			end
+		end
 		local data=vars.online.partyHealthMana
 		data.dataType="healthManaInfo"
 		BroadcastToAllClients(data)
