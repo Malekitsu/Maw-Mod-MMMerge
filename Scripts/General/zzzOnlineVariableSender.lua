@@ -10,6 +10,29 @@ function events.MultiplayerInitialized()
 
 			handler = function(bin_string, metadata)
 				local t = bin_to_item(toptr(bin_string))
+				local host=Multiplayer.im_host()
+				
+				if t.dataType=="healthManaInfo" and host then
+					vars.online.partyHealthMana.Parties[t.senderId]=t.Parties
+				elseif t.dataType=="healthManaInfo" then
+					vars.online.partyHealthMana.Parties=t.Parties
+				end
+				
+				if t.dataType=="heal" then
+					local id=t.PartyId
+					if id<0 or id>Party.High then
+						id=0
+					end
+					local pl=Party[id]
+					pl.HP=math.min(GetMaxHP(pl), pl.HP+t.Amount)
+					mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, id)
+					evt.PlaySound(16010)
+					Game.ShowStatusText(t.HealerName .. " heals you for " .. t.Amount .. " Hit Points")
+				end
+				
+				--debug.Message(dump(t))
+				
+				
 				return --[[
 				if t.dataType=="ShareMapvarsToHost" and Multiplayer.im_host() then 
 					if not vars.StoredMapvars[t.MapName] then
@@ -32,22 +55,27 @@ function events.MultiplayerInitialized()
 	Multiplayer.utils.init_packets(mawPackets)
 	
 	function SendToHost(tbl)
-		if Multiplayer and Multiplayer.in_game and Multiplayer.packets and mawPackets.send_table then
+		if Multiplayer and Multiplayer.in_game and Multiplayer.packets then
 			Multiplayer.add_to_send_queue(0, mawPackets.send_table:prep(tbl))
 		end
 	end
 
-	function BroadcastToClients(tbl)
+	function BroadcastToAllClients(tbl)
 		if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
 			Multiplayer.broadcast(mawPackets.send_table:prep(tbl),nil)
 		end
 	end
-
+	
+	function broadcastToClient(tbl, clientId)
+		if Multiplayer and Multiplayer.in_game then
+			Multiplayer.add_to_send_queue(clientId, mawPackets.send_table:prep(tbl))
+		end
+	end
 
 	--maw code
 	function ShareMapvarsList()
 		if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
-			BroadcastToClients({dataType="ShareMapvarsToClients", Variables=vars.StoredMapvars}) 	
+			BroadcastToAllClients({dataType="ShareMapvarsToClients", Variables=vars.StoredMapvars}) 	
 		end
 	end
 	
@@ -90,34 +118,66 @@ function events.MultiplayerInitialized()
 			connectedPlayers=currentPlayers
 		end
 	end
+	
+	--SHARE PARTY INFO BETWEEN PLAYERS
 	local healthUpdateTimer=10
-	local playerUpdateTimer=300
 	local hpTimer=0
-	local plTimer=0
 	function events.Tick()
 		hpTimer=hpTimer+1
-		plTimer=plTimer+1
 		
 		if hpTimer>=healthUpdateTimer then
 			hpTimer=0
 			if Multiplayer and Multiplayer.in_game then
 				if Multiplayer.im_host() then
-					--ShareHealthData()
+					ShareHealthData()
 				else
-					--ShareHealthData()
+					SendHealthData()
 				end
 			end
 		end
-		if plTimer>=playerUpdateTimer then
-			plTimer=0
-			if Multiplayer and Multiplayer.in_game then
-				if Multiplayer.im_host() then
-					--SendPartyData()
-				else
-					--SendPartyData()
-				end
+	end
+	function SendHealthData()
+		local myId=Multiplayer.my_id
+		local data={}
+		data.Party={}
+		data.Party.X=Party.X
+		data.Party.Y=Party.Y
+		data.Party.Z=Party.Z
+		data.Party.Map=Map.Name
+		for i=0,Party.High do
+			local pl=Party[i]
+			local FHP=GetMaxHP(pl)
+			local FSP=0
+			if vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[i] then
+				FSP = vars.currentManaPool[i]
+			else
+				FSP	= pl:GetFullSP()
 			end
+			data.Party[i]={}
+			data.Party[i].HP=pl.HP
+			data.Party[i].FHP=FHP
+			data.Party[i].SP=pl.SP
+			data.Party[i].FSP=FSP
+			data.Party[i].Dead=pl.Dead
+			data.Party[i].Eradicated=pl.Eradicated
+			data.Party[i].High=Party.High
 		end
+		data.dataType="healthManaInfo"
+		data.senderId=myId
+		SendToHost(data)
+	end
+	function ShareHealthData()
+		local data=vars.online.partyHealthMana
+		data.dataType="healthManaInfo"
+		BroadcastToAllClients(data)
+	end
+	function SendHeal(clientId, partyId, amount, healerName)
+		local data={}
+		data.dataType="heal"
+		data.PartyId=partyId
+		data.Amount=amount
+		data.HealerName=healerName
+		broadcastToClient(data, clientId)
 	end
 end
 
@@ -197,7 +257,9 @@ function events.BeforeLoadMap()
 	vars.StoredMapvars=vars.StoredMapvars or {}
 	
 	vars.online=vars.online or {}
-	vars.online.party=vars.online.party or {}
+	
+	vars.online.partyHealthMana={}
+	vars.online.partyHealthMana.Parties={}
 end
 
 --fix for timer events, specially online
@@ -265,3 +327,26 @@ MawAddTimer("elementalBuffs", 1, elementalBuffs)
 MawAddTimer("mawBuffApply", 0.5, mawBuffApply)
 MawAddTimer("elementalistStacksDecay", 0.1, elementalistStacksDecay)
 MawAddTimer("poisonTimer", 1, poisonTimer)
+
+
+function OnlineLowestHealthPercentage()
+	local lowestPercentage=3
+	local LPpartyId=-1
+	local LPplayerId=-1
+	if Multiplayer and Multiplayer.in_game then
+		players={}
+		for PartyId, party in pairs(vars.online.partyHealthMana.Parties) do
+			if party.Map==Map.Name and getDistance(party.X, party.Y, party.Z)<4000 then
+				for i=0, party.High do
+					local percentage=party[i].HP/party[i].FHP
+					if percentage<lowestPercentage then
+						lowestPercentage=percentage
+						LPpartyId=PartyId
+						LPplayerId=i
+					end
+				end
+			end
+		end
+	end
+	return lowestPercentage, LPpartyId, LPplayerId
+end
