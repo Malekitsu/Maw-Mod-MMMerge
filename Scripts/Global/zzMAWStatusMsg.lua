@@ -104,9 +104,6 @@ function events.CalcDamageToMonster(t)
 					totalHeal=totalHeal+heal*0.5
 				end
 			elseif data and data.Player then --spell leech
-				if data.Object and table.find(aoespells, data.Object.Spell) then
-					heal=heal/2
-				end
 				totalHeal=totalHeal+heal*0.5
 			end 
 		end
@@ -121,8 +118,13 @@ function events.CalcDamageToMonster(t)
 		end
 
 		if overHeal>0 and vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 27) then
-			local id=pickLowestPartyMember()
-			Party[id].HP=Party[id].HP+overHeal
+			local id, lowestHealthPercentage=pickLowestPartyMember()
+			local percent, partyId, playerId=OnlineLowestHealthPercentage()
+			if percent<lowestHealthPercentage then
+				SendHeal(partyId, playerId, overHeal, pl.Name)
+			else
+				Party[id].HP=Party[id].HP+overHeal
+			end
 		end
 		local partyHP2=0
 		for i=0,Party.High do
