@@ -218,7 +218,7 @@ function events.CalcDamageToMonster(t)
 		--Calculate heal value and apply
 		healValue=(bodyS^1.3*bodyM+spiritS^1.3*spiritM)*damageMultiplier[t.PlayerIndex]["Melee"]
 		personality=data.Player:GetPersonality()
-		healValue=healValue*(1+personality/1000)
+		healValue=round(healValue*(1+personality/1000))
 		
 		local healTarget, lowestHealthPercentage=pickLowestPartyMember()
 		
