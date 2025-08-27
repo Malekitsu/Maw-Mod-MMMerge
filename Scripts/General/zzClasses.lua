@@ -194,6 +194,7 @@ function pickLowestPartyMember()
 end
 
 function events.CalcDamageToMonster(t)
+	if t.Result==0 then return end
 	local data = WhoHitMonster()
 		if data and data.Player and (data.Player.Class==55 or data.Player.Class==54 or data.Player.Class==53) and t.DamageKind==4 and data.Object==nil then
 		
