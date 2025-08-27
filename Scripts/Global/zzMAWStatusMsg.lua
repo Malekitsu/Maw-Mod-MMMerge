@@ -113,7 +113,7 @@ function events.CalcDamageToMonster(t)
 			pl.SP=math.min(getMaxMana(pl),pl.SP+totalHeal)
 			return
 		else
-			overHeal=pl.HP+totalHeal-fullHP
+			overHeal=round(pl.HP+totalHeal-fullHP)
 			pl.HP=math.min(fullHP,pl.HP+totalHeal)
 		end
 
