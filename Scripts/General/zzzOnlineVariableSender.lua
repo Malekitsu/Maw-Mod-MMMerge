@@ -13,31 +13,6 @@ function events.MultiplayerInitialized()
 				local host=Multiplayer.im_host()
 				
 				if t.dataType=="healthManaInfo" and host then
-					local data={}
-					data.Party={}
-					data.Party.X=Party.X
-					data.Party.Y=Party.Y
-					data.Party.Z=Party.Z
-					data.Party.High=Party.High
-					data.Party.Map=Map.Name
-					for i=0,Party.High do
-						local pl=Party[i]
-						local FHP=GetMaxHP(pl)
-						local FSP=0
-						if vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[i] then
-							FSP = vars.currentManaPool[i]
-						else
-							FSP	= pl:GetFullSP()
-						end
-						data.Party[i]={}
-						data.Party[i].HP=pl.HP
-						data.Party[i].FHP=FHP
-						data.Party[i].SP=pl.SP
-						data.Party[i].FSP=FSP
-						data.Party[i].Dead=pl.Dead
-						data.Party[i].Eradicated=pl.Eradicated
-					end
-					vars.online.partyHealthMana.Parties[0]=data
 					vars.online.partyHealthMana.Parties[t.senderId] = t.Party
 				else
 					vars.online.partyHealthMana.Parties = t.Parties or {}
@@ -192,6 +167,31 @@ function events.MultiplayerInitialized()
 		SendToHost(data)
 	end
 	function ShareHealthData()
+		local hostParty={}
+		hostParty.Party={}
+		hostParty.Party.X=Party.X
+		hostParty.Party.Y=Party.Y
+		hostParty.Party.Z=Party.Z
+		hostParty.Party.High=Party.High
+		hostParty.Party.Map=Map.Name
+		for i=0,Party.High do
+			local pl=Party[i]
+			local FHP=GetMaxHP(pl)
+			local FSP=0
+			if vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[i] then
+				FSP = vars.currentManaPool[i]
+			else
+				FSP	= pl:GetFullSP()
+			end
+			hostParty.Party[i]={}
+			hostParty.Party[i].HP=pl.HP
+			hostParty.Party[i].FHP=FHP
+			hostParty.Party[i].SP=pl.SP
+			hostParty.Party[i].FSP=FSP
+			hostParty.Party[i].Dead=pl.Dead
+			hostParty.Party[i].Eradicated=pl.Eradicated
+		end
+		vars.online.partyHealthMana.Parties[0]=hostParty
 		local data=vars.online.partyHealthMana
 		data.dataType="healthManaInfo"
 		BroadcastToAllClients(data)
