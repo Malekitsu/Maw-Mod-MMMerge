@@ -13,9 +13,9 @@ function events.MultiplayerInitialized()
 				local host=Multiplayer.im_host()
 				
 				if t.dataType=="healthManaInfo" and host then
-					vars.online.partyHealthMana.Parties[t.senderId]=t.Parties
-				elseif t.dataType=="healthManaInfo" then
-					vars.online.partyHealthMana.Parties=t.Parties
+					vars.online.partyHealthMana.Parties[t.senderId] = t.Party
+				else
+					vars.online.partyHealthMana.Parties = t.Parties or {}
 				end
 				
 				if t.dataType=="heal" then
