@@ -2648,7 +2648,7 @@ function itemStats(index)
 						tab[2]=tab[2]+power*0.75
 					end
 				end
-			else
+			elseif vars.normalEnchantResistance and vars.normalEnchantResistance[index] and vars.normalEnchantResistance[index][bonus] then
 				vars.normalEnchantResistance[index][bonus]=math.max(vars.normalEnchantResistance[index][bonus], power)	
 			end
 		end		
