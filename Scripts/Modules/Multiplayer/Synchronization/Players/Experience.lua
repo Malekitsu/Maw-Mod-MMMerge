@@ -12,16 +12,10 @@ local function PlayersOnMap()
 	return count
 end
 
-local function MulAddKillExp(Amount, monLvl, monId)
+local function MulAddKillExp(Amount, monLvl)
 	local avg = math.ceil(Amount / math.min(PlayersInGame(),5))
-	
 	--maw code
 	local partyLvl=getTotalLevel()
-	
-	
-	if vars.insanityMode and monId>300 then 
-		return
-	end
 	
 	local partyCount=0
 	for i=0, Party.High do
@@ -99,7 +93,7 @@ local packets = {
 			-- was: local amount = i4[toptr(bin_string)]; MulAddKillExp(amount)
 			local t = bin_to_item(toptr(bin_string))
 			local amount, monLevel = t[1], t[2]
-			MulAddKillExp(amount, monLevel, monId)
+			MulAddKillExp(amount, monLevel)
 		end,
 		check_delivery = true,
 		same_map_only = false
@@ -120,7 +114,11 @@ function events.MonsterKilled(mon, monId, _, killer)
 		Multiplayer.broadcast(packets.kill_monster_exp:prep(mon.Experience, mon.Level), cond_same_map)
 		
 		-- override experience gain by player-killer
-		MulAddKillExp(mon.Experience, getMonsterLevel(mon), mon.NameId)
+		if vars.insanityMode and monId>300 then 
+			mon.Experience = 0
+			return
+		end
+		MulAddKillExp(mon.Experience, getMonsterLevel(mon))
 		mon.Experience = 0
 	end
 end
