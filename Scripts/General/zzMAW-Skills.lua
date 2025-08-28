@@ -1044,7 +1044,7 @@ function events.PlayerAttacked(t)
 		for i=0,Party.High do
 			local s, m= SplitSkill(Skillz.get(Party[i], 50))
 			if s>0 and vars.covering[i] and m>=masteryRequired and i~=t.PlayerSlot then
-				cover[i]={["Chance"]=math.min(0.1+s*0.01,40),["Mastery"]= m}
+				cover[i]={["Chance"]=math.min(0.1+s*0.01,0.40),["Mastery"]= m}
 				if coverBonus[i] then
 					cover[i].Chance=cover[i].Chance+0.15
 					coverBonus[i]=false
@@ -1057,7 +1057,7 @@ function events.PlayerAttacked(t)
 		coverPlayerIndex=-1
 		lastMaxHp=0
 		covered=false
-		for i=0,#cover-1 do
+		for i=0,#cover do
 			if cover[i] then
 				local hp=Party[i].HP
 				if cover[i].Chance>math.random() and hp>lastMaxHp then
