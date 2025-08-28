@@ -127,7 +127,7 @@ local ShowPlayers = CustomUI.CreateText{
 				end
 				if mon then
 					table.insert(texts, ("%s: x:%d, y:%d"):format(name, mon.X, mon.Y))
-				elseif client.map then
+				elseif client.map and client.map>=0 and client.map<=207 then
 					table.insert(texts, ("%s: %s"):format(name, Game.MapStats[client.map].Name))
 				end
 			end
