@@ -1026,7 +1026,11 @@ function updateCelestialItem(it,pl)
 			end
 			pl=Party[id]
 		end
-		local slotMult=slotMult[it:T().EquipStat] or 1
+		local equipStat=it:T().EquipStat
+		if table.find(twoHandedAxes, it.Number) then
+			equipStat=1
+		end
+		local slotMult=slotMult[equipStat] or 1
 		local lvl=pl.LevelBase
 		local tier=math.min(pl.LevelBase/11+5,60)
 		local mult=3
@@ -1134,9 +1138,9 @@ function events.BuildItemInformationBox(t)
 				end
 				if t.Item.Bonus>=11 and t.Item.Bonus<=16 then
 					local id=Game.CurrentPlayer
-					if id>=0 and id<Party.High then
-						local pl=Party[id]:GetIndex()
-						if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 16) then
+					if id>=0 and id<=Party.High then
+						local index=Party[id]:GetIndex()
+						if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 16) then
 							power=power*1.5
 						end
 					end
@@ -1162,9 +1166,9 @@ function events.BuildItemInformationBox(t)
 				end
 				if bonus>=11 and bonus<=16 then
 					local id=Game.CurrentPlayer
-					if id>=0 and id<Party.High then
-						local pl=Party[id]:GetIndex()
-						if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 16) then
+					if id>=0 and id<=Party.High then
+						local index=Party[id]:GetIndex()
+						if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 16) then
 							strength=strength*1.5
 						end
 					end
@@ -2927,9 +2931,9 @@ function itemStats(index)
 		local spellStat={[3]=2,[14]=6,[25]=7,[36]=4,[46]=5,[58]=3,[69]=1}
 		--resistances and stats
 		local s, m, level=getBuffSkill(85)
-		local buff2=(buffPower[85].Base[m]+level/2)+(1+buffPower[85].Scaling[m]/100*s/1.5)
+		local buff2=(buffPower[85].Base[m]+level/2)*(1+buffPower[85].Scaling[m]/100*s/1.5)
 		local s, m, level=getBuffSkill(83)
-		local buff3=(buffPower[83].Base[m]+level/2)+(1+buffPower[83].Scaling[m]/100*s/1.5)
+		local buff3=(buffPower[83].Base[m]+level/2)*(1+buffPower[83].Scaling[m]/100*s/1.5)
 		for i=1,6 do
 			local buff=0
 			local statBuff=0
