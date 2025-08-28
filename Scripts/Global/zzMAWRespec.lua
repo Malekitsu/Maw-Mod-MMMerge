@@ -107,24 +107,14 @@ function RespecSkills(npcID)
 		end
 	end
 	--custom skills
-	--cover
-	local s=SplitSkill(Skillz.get(p,50))
-	p.SkillPoints=p.SkillPoints+ math.max(s*(s+1)/2-1,0)
-	if s>0 then
-		Skillz.set(p,50,1)
+	for i=50,53 do
+	local s=SplitSkill(Skillz.get(p,i))
+		p.SkillPoints=p.SkillPoints+ math.max(s*(s+1)/2-1,0)
+		if s>0 then
+			Skillz.set(p,i,1)
+		end
 	end
-	--mana shield
-	local s=SplitSkill(Skillz.get(p,51))
-	p.SkillPoints=p.SkillPoints+ math.max(s*(s+1)/2-1,0)
-	if s>0 then
-		Skillz.set(p,51,1)
-	end
-	--enlight
-	local s=SplitSkill(Skillz.get(p,52))
-	p.SkillPoints=p.SkillPoints+ math.max(s*(s+1)/2-1,0)
-	if s>0 then
-		Skillz.set(p,52,1)
-	end
+	
 	-- retroactive fix for mercs
 	local shouldBeRefundedAmount = 0 - spentOnAlchemy
 	for i=2, p.LevelBase do
