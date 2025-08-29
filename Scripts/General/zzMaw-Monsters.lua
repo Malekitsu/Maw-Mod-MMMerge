@@ -232,7 +232,7 @@ function recalculateMawMonster()
 						partyLvl=oldTable.Level*2
 					end
 				end
-				if vars.onlineMode then
+				if vars.madnessMode then
 					partyLvl=mon.Level^1.5-mon.Level
 				end
 				--level increase 
@@ -374,7 +374,13 @@ end
 --refresh on difficulty change
 function events.Action(t)
 	if t.Action==113 then
-		if vars.trueNightmare and Game.BolsterAmount~=300 and vars.Mode~=2 then
+		if vars.madnessMode then
+			Game.BolsterAmount=600
+			vars.freeProgression=false
+			Game.freeProgression=false
+			recalculateMonsterTable()
+			recalculateMawMonster()
+		elseif vars.trueNightmare and Game.BolsterAmount~=300 and vars.Mode~=2 then
 			Game.BolsterAmount=300
 			recalculateMonsterTable()
 			recalculateMawMonster()
@@ -390,6 +396,27 @@ function events.Action(t)
 	lastMonsterNumber=lastMonsterNumber or Map.Monsters.High
 	if lastMonsterNumber~=Map.Monsters.High then
 		lastMonsterNumber=Map.Monsters.High
+		recalculateMawMonster()
+	end
+end
+
+function events.AfterLoadMap()
+	if vars.madnessMode then
+		Game.BolsterAmount=600
+		vars.freeProgression=false
+		Game.freeProgression=false
+		recalculateMonsterTable()
+		recalculateMawMonster()
+	elseif vars.trueNightmare and Game.BolsterAmount~=300 and vars.Mode~=2 then
+		Game.BolsterAmount=300
+		recalculateMonsterTable()
+		recalculateMawMonster()
+	elseif vars.Mode==2 then
+		Game.BolsterAmount=600
+		recalculateMonsterTable()
+		recalculateMawMonster()
+	else 
+		recalculateMonsterTable()
 		recalculateMawMonster()
 	end
 end
@@ -681,15 +708,14 @@ function recalculateMonsterTable()
 			totalLevel[i]=base.Level+mapvars.mawBounty
 		end
 		
-		--[[online
-		if vars.onlineMode and not onlineStartingMaps[name] then
+		--online
+		if vars.madnessMode and not onlineStartingMaps[name] then
 			bolsterLevel=mp.Mid^1.5
 			horizontalMultiplier=bolsterLevel/mp.Mid
 			flattener=(base.Level-LevelB)*horizontalMultiplier^0.7 --necessary to avoid making too much difference between monster tier
 			totalLevel[i]=math.max(base.Level*horizontalMultiplier-flattener+adjust*horizontalMultiplier^0.7, 5)
 			mon.Level=math.min(totalLevel[i],255)
 		end
-		]]
 		
 		--HP
 		HPBolsterLevel=basetable[i].Level*(1+(0.1*(totalLevel[i]-basetable[i].Level)/100))+(totalLevel[i]-basetable[i].Level)*0.9
@@ -2324,10 +2350,10 @@ function checkMapCompletition()
 				if not Game.freeProgression then
 					bolster=mapLevel*2
 				end
-				--[[if vars.onlineMode then
+				if vars.madnessMode then
 					bolster=((mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)^1.5-mapLevel
 				end
-				]]
+			
 				local totalMonster=m
 				if Game.BolsterAmount==300 then
 					totalMonster=totalMonster*0.67
@@ -3307,7 +3333,9 @@ function calculateDirection(x_m, y_m, x_p, y_p)
 end
 
 function events.AfterLoadMap()
-	if vars.insanityMode then
+	if vars.madnessMode then
+		MAWBOLSTER[600]="Mad."
+	elseif vars.insanityMode then
 		MAWBOLSTER[600]="Insane"
 	else
 		MAWBOLSTER[600]="Doom"
