@@ -224,7 +224,7 @@ function events.CalcDamageToMonster(t)
 		
 		local percent, partyId, playerId=OnlineLowestHealthPercentage()
 		
-		if percent<lowestHealthPercentage then
+		if lowestHealthPercentage<0.25 and percent<lowestHealthPercentage then
 			SendHeal(partyId, playerId, healValue, data.Player.Name)
 			
 			local hp=vars.online.partyHealthMana.Parties[partyId][playerId].HP
