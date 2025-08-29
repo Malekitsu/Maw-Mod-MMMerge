@@ -227,10 +227,11 @@ function getSpellDelay(pl,spell)
 	local s,m=SplitSkill(pl.Skills[math.ceil(spell/11)+11])
 	if m==0 then return 150 end
 	local haste=math.floor(pl:GetSpeed()/10)
-	for i=1,2 do
+	local enchantMult=1
+	for i=0,2 do
 		local it=pl:GetActiveItem(i)
 		if it and it.Bonus2==40 then
-			haste=haste+20
+			enchantMult=enchantMult+0.1
 		end
 	end
 	local tier=0
@@ -245,7 +246,7 @@ function getSpellDelay(pl,spell)
 		local s, m=getBuffSkill(5)
 		hasteDiv=1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]/1000*s
 	end
-	local delay=round(oldTable[spell][m]/(1+haste/100)*1.2^tier/hasteDiv)
+	local delay=round(oldTable[spell][m]/(1+haste/100)*1.2^tier/hasteDiv/enchantMult)
 	if table.find(elementalistClass, pl.Class) then
 		delay=delay*1.5
 		local id=pl:GetIndex()
