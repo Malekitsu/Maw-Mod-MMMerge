@@ -235,9 +235,9 @@ function events.GameInitialized2()
 	OnOffTumbler(ExSetScr, 95, 326, VarsToStore[4])
 	
 	-- Game mode
-	gameMode={[0]="Normal", [2]="Doom", [4]="Road to\ninsanity",[6]=" Austerity",[8]="Speed\nrun" }
+	gameMode={[0]="Normal", [2]="Doom", [4]="Road to\ninsanity",[6]="Beyond\nMadness",[8]=" Austerity" }
 	Game.Mode = Game.Mode or 0
-	NumberRegulator(21, 530, 20, "Mode",
+	NumberRegulator(21, 520, 20, "Mode",
 		function(t, val)
 			Game.Mode = val
 		end,
@@ -254,23 +254,20 @@ function events.GameInitialized2()
 			vars.insanityMode=true
 			vars.Mode=2
 		end
-		if vars.Mode==8 then
-			vars.Mode=2
-			vars.ChallengeMode=true
-		end
 		if vars.Mode==2 then
 			vars.DoomPartyNeedInit=true
 		end
-		if vars.Mode==6 then
+		if vars.Mode==8 then
 			vars.AusterityMode=true
 		end
-		--[[ removed, as it's buggy and take too much work compared to the demand for it
-		if vars.Mode==8 then
-			vars.ChallengeMode=true
-			vars.Mode=2 --doom
-			vars.onlineMode=true
+		if vars.Mode==6 then
+			vars.Mode=2
+			vars.insanityMode=true
+			vars.madnessMode=true
+			vars.freeProgression=false
+			Game.freeProgression=false
+			vars.DoomPartyNeedInit=true
 		end
-		]]
 	end
 	function events.BeforeLoadMap(wasInGame)
 		if wasInGame or vars.DoomPartyNeedInit == nil then
@@ -278,6 +275,14 @@ function events.GameInitialized2()
 		end
 		vars.DoomPartyNeedInit = nil
 
+		if vars.madnessMode then
+			vars.Mode=2
+			vars.insanityMode=true
+			vars.madnessMode=true
+			vars.freeProgression=false
+			Game.freeProgression=false
+			vars.DoomPartyNeedInit=true
+		end
 
 		Party.Gold=5000
 		for i=0,Party.High do
