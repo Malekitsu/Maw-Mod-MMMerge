@@ -2134,7 +2134,7 @@ function events.Action(t)
 		end
 		if t.Param==51 then
 			local pl=Party[Game.CurrentPlayer]
-			local s,m=SplitSkill(Skillz.get(pl,50))
+			local s,m=SplitSkill(Skillz.get(pl,51))
 			if s>=32 then 
 				t.Handled=true
 				local s,m=SplitSkill(Skillz.get(pl,51))
@@ -2146,7 +2146,7 @@ end
 function events.LoadMap()
 	for i=0,Party.High do
 		local pl=Party[i]
-		local s,m=SplitSkill(Skillz.get(pl,50))
+		local s,m=SplitSkill(Skillz.get(pl,51))
 		if s>32 then 
 			for i=33,s do
 				pl.SkillPoints=pl.SkillPoints+i
