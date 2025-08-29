@@ -185,7 +185,7 @@ function events.GetAttackDelay(t)
 	bonusSpeed=0
 	count=0
 	currentSpeed=0
-	
+	local swiftnessMultiplier=1
 	damageMultiplier=damageMultiplier or {}
 	damageMultiplier[t.PlayerIndex]=damageMultiplier[t.PlayerIndex] or {}
 	
@@ -201,7 +201,7 @@ function events.GetAttackDelay(t)
 				bonusSpeed=skillRecovery[skill][m]*s
 			end
 			if it.Bonus2==41 or it.Bonus2==59 then
-				bonusSpeed=bonusSpeed+20
+				swiftnessMultiplier=swiftnessMultiplier+0.3
 			end
 		end
 	else
@@ -227,7 +227,12 @@ function events.GetAttackDelay(t)
 						end
 					end	
 					if it.Bonus2==41 or it.Bonus2==59 then
-						bonusSpeed=bonusSpeed+20
+						local equipStat=GetItemEquipStat(it)
+						if equipStat==1 then
+							swiftnessMultiplier=swiftnessMultiplier+0.3
+						else
+							swiftnessMultiplier=swiftnessMultiplier+0.15
+						end
 					end
 					
 					--unarmed working with staff GM
@@ -288,7 +293,7 @@ function events.GetAttackDelay(t)
 		damageMultiplier[t.PlayerIndex]["baseSpeedMelee"]=baseSpeed
 	end
 	bonusSpeedMult=(100+bonusSpeed)/100
-	t.Result=baseSpeed/bonusSpeedMult
+	t.Result=baseSpeed/bonusSpeedMult/swiftnessMultiplier
 	
 	--slow depending on item
 	delay=0
