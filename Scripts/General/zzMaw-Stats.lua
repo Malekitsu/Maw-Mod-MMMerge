@@ -1226,6 +1226,7 @@ buffToSpell={
 	[12] = {58,69,3,14,25,36},
 }
 
+--[[UNUSED
 function compute_damage(x)
     -- Start with the base damage multiplier
     local damage = 1
@@ -1244,7 +1245,7 @@ function compute_damage(x)
 	
     return damage
 end
-
+]]
 
 function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	local monLvl=monLvl or pl.LevelBase
@@ -1272,7 +1273,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 			AC=AC*(1-getMapAffixPower(28)/100)
 		end
 		local divider=math.min(120+monLvl*0.75*bolster,600*bolster)
-		local reduction=compute_damage(AC/divider)
+		local reduction=AC/divider+1
 		local damage=round(damage/reduction)
 		return damage
 	end
@@ -1325,7 +1326,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		res=res*(1-getMapAffixPower(29)/100)
 	end
 	local divider=math.min(60+monLvl*0.5*bolster,400*bolster)
-	local reduction=compute_damage(res/divider)
+	local reduction=res/divider+1
 	local res=1/reduction	
 	
 	--base enchants
@@ -1346,7 +1347,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		currentItemRes=currentItemRes*1.5
 	end
 	
-	currentItemRes=1/1.5^(currentItemRes^0.6/10)
+	currentItemRes=1/(currentItemRes/50+1)
 	res=res*currentItemRes
 	--randomize resistance
 	if res>0 and rand then
