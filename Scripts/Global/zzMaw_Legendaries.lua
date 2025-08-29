@@ -294,7 +294,7 @@ function calcManaShield(pl, damage)
 		if s > 50 then
 			manaEfficiency = (1 + 50^1.5 / 125 * 4) * s / 50
 		end
-		efficiency=math.min(efficiency,5)
+		manaEfficiency=math.min(manaEfficiency,5)
 		absorbDamage=damage*reduction[m]
 		manaCost = round(absorbDamage/manaEfficiency)
 		absorbDamage = math.min(absorbDamage,(mana*manaEfficiency))
