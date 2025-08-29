@@ -4248,3 +4248,19 @@ equipSlotWeights = {
 	[10] = {0,0.3,0.3,0.3}, --ring
 	[11] = {0,0.3,0.3,0.3}, --amulet
 }
+
+function GetItemEquipStat(it)
+	if type(it)=="table" then
+		itemId=it.Number
+	else
+		itemId=it
+	end
+	if itemId<=0 or itemId>Game.ItemsTxt.High then
+		return -1
+	end
+	local equipStat=Game.ItemsTxt[itemId].EquipStat
+	if table.find(twoHandedAxes, itemId) then
+		equipStat=1
+	end
+	return equipStat
+end
