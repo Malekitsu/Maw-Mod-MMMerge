@@ -526,6 +526,7 @@ function events.ItemGenerated(t)
 			it.Charges=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
 			it.Charges=math.ceil(it.Charges*difficultyExtraPower) --bolster
 			it.Charges=round(it.Charges+math.random(1,16)*1000)
+			
 			it.Bonus=math.random(1,16)
 			it.BonusStrength=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
 			it.BonusStrength=math.ceil(it.BonusStrength*difficultyExtraPower) --bolster
@@ -580,16 +581,25 @@ function events.ItemGenerated(t)
 				local roll=math.random(1,3)
 				if roll==1 then
 					local stats={1, 5, 6, 7}
+					if GetItemEquipStat(it)==10 then
+						stats={1, 5, 6, 7, 11, 12, 13, 14, 15, 16}
+					end
 					it.Bonus=stats[math.random(1,4)]
-					it.Charges=it.Charges%1000+stats[math.random(1,4)]*1000
+					it.Charges=it.Charges%1000+stats[math.random(1,#stats)]*1000
 				elseif roll==2 then
 					local stats={4, 6, 8, 10}
+					if GetItemEquipStat(it)==10 then
+						stats={1, 5, 6, 7, 11, 12, 13, 14, 15, 16}
+					end
 					it.Bonus=stats[math.random(1,4)]
-					it.Charges=it.Charges%1000+stats[math.random(1,4)]*1000
+					it.Charges=it.Charges%1000+stats[math.random(1,#stats)]*1000
 				elseif roll==3 then
 					local stats={2, 3, 4, 6, 7}
+					if GetItemEquipStat(it)==10 then
+						stats={1, 5, 6, 7, 11, 12, 13, 14, 15, 16}
+					end
 					it.Bonus=stats[math.random(1,5)]
-					it.Charges=it.Charges%1000+stats[math.random(1,5)]*1000
+					it.Charges=it.Charges%1000+stats[math.random(1,#stats)]*1000
 					if (it.Bonus==2 and math.floor(it.Charges/1000)==3) or (it.Bonus==2 and math.floor(it.Charges/1000)==3) then
 						it.Bonus=math.floor(it.Charges/1000)
 					end
@@ -609,11 +619,11 @@ function events.ItemGenerated(t)
 		--buff to hp and mana items
 		if vars and not vars.itemStatsFix then
 			if it.Bonus==8 or it.Bonus==9 then
-				it.BonusStrength=it.BonusStrength*(2+it.BonusStrength/50)
+				it.BonusStrength=it.BonusStrength*(2+math.min(it.BonusStrength/50,4))
 			end
 			if math.floor(it.Charges/1000)==8 or math.floor(it.Charges/1000)==9 then
 				local power=it.Charges%1000
-				power=power*(2+power/50) --cap is 999
+				power=power*(2+math.min(power/50,4)) --cap is 999
 				if power >= 999 and it.Bonus<17 then --swap base with charges
 					local bonus=it.Bonus
 					local str=it.BonusStrength
@@ -683,9 +693,9 @@ function events.ItemGenerated(t)
 		it.MaxCharges=math.min(maxChargesCap, it.MaxCharges)
 		
 		--reduce chances for resistances
-		if it.Bonus>=11 and it.Bonus<=16 then
-			if math.random()<0.4 then
-				it.Bonus=math.random(1,7)
+		if GetItemEquipStat(it)~=10 and it.Bonus>=11 and it.Bonus<=16 then
+			if math.random() then
+				it.Bonus=math.random(1,10)
 			end
 		end
 		if math.floor(it.Charges/1000)>=11 and math.floor(it.Charges/1000)<=16 then
@@ -1125,7 +1135,7 @@ function events.BuildItemInformationBox(t)
 				local power=t.Item.BonusStrength
 				if vars.itemStatsFix then
 					if (t.Item.Bonus==8 or t.Item.Bonus==9) then
-						power=round(power*(2+power/50))
+						power=round(power*(2+math.min(power/50,4)))
 					elseif t.Item.Bonus==10 then
 						--power=round(power*0.667)
 					end
@@ -1144,7 +1154,7 @@ function events.BuildItemInformationBox(t)
 							power=power*1.5
 						end
 					end
-					power=round((1-1/1.5^(power^0.6/10))*1000)/10 .. "%"
+					power=round((1-1/(power/50+1))*1000)/10 .. "%"
 				end
 				t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. power
 			end
@@ -1153,7 +1163,7 @@ function events.BuildItemInformationBox(t)
 				local strength=t.Item.Charges%1000
 				if vars.itemStatsFix then
 					if (bonus==8 or bonus==9) then
-						strength=round(strength*(2+strength/50))
+						strength=round(strength*(2+math.min(strength/50,4)))
 					elseif bonus==10 then
 						--strength=round(strength*0.667)
 					end
@@ -1172,7 +1182,7 @@ function events.BuildItemInformationBox(t)
 							strength=strength*1.5
 						end
 					end
-					strength=round((1-1/1.5^(strength^0.6/10))*1000)/10 .. "%"
+					strength=round((1-1/(strength/50+1))*1000)/10 .. "%"
 				end
 				if itemStatName[bonus] then
 					t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
@@ -1189,9 +1199,12 @@ function events.BuildItemInformationBox(t)
 					elseif t.Item.Bonus==10 then
 						power=power*1.5
 					end
-					local stat=math.random(1,16)
+					local stat=math.random(1,10)
+					if GetItemEquipStat(t.Item)==10 then
+						stat=math.random(1,16)
+					end
 					if stat==8 or stat==9 then
-						power=power*(2+power/50)
+						power=power*(2+math.min(power/50,4))
 					elseif stat==10 then
 						--power=power*0.667
 					end
@@ -1202,6 +1215,9 @@ function events.BuildItemInformationBox(t)
 					
 					local bonus=math.floor(charges/1000)
 					local strength=charges%1000
+					if stat>=11 and stat<=16 then
+						strength=round((1-1/(charges%1000/50+1))*1000)/10
+					end
 					txt=baseStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
 					t.Enchantment = StrColor(100,100,100, txt)
 					vars.extraShown=true
@@ -2570,7 +2586,7 @@ function itemStats(index)
 			local power=it.BonusStrength
 			if vars.itemStatsFix then
 				if (it.Bonus==8 or it.Bonus==9) then
-					power=round(power*(2+power/50))
+					power=round(power*(2+math.min(power/50,4)))
 				elseif it.Bonus==10 then
 					--power=round(power*0.667)
 				end
@@ -2622,7 +2638,7 @@ function itemStats(index)
 			local power=it.Charges%1000
 			if vars.itemStatsFix then
 				if (bonus==8 or bonus==9) then
-					power=round(power*(2+power/50))
+					power=round(power*(2+math.min(power/50,4)))
 				elseif bonus==10 then
 					--power=round(power*0.667)
 				end
@@ -3006,7 +3022,7 @@ function itemStats(index)
 	fullHP=baseHP+tab[8]
 	Endurancebonus=fullHP*endurance/1000
 	BBBonus=fullHP*(1.02^s-1)
-	enduranceXbb=((1+endurance/1000)*(1.02^s)-1)*fullHP
+	enduranceXbb=((1+endurance/1000)*(1+((m+1)*0.01)*s)-1)*fullHP
 	--used for stats
 	hpStatsMap=hpStatsMap or {}
 	hpStatsMap[id]={
