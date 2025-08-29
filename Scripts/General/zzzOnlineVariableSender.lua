@@ -369,11 +369,13 @@ function OnlineLowestHealthPercentage()
 		for PartyId, party in pairs(vars.online.partyHealthMana.Parties) do
 			if party.Map==Map.Name and getDistance(party.X, party.Y, party.Z)<4000 then
 				for i=0, party.High do
-					local percentage=party[i].HP/party[i].FHP
-					if percentage<lowestPercentage then
-						lowestPercentage=percentage
-						LPpartyId=PartyId
-						LPplayerId=i
+					if party[i].Dead==0 and party[i].Eradicated==0 then
+						local percentage=party[i].HP/party[i].FHP
+						if percentage<lowestPercentage then
+							lowestPercentage=percentage
+							LPpartyId=PartyId
+							LPplayerId=i
+						end
 					end
 				end
 			end
@@ -381,3 +383,8 @@ function OnlineLowestHealthPercentage()
 	end
 	return lowestPercentage, LPpartyId, LPplayerId
 end
+
+--[[
+		mon:SetId(mon.Id)
+		mon:LoadFramesAndSounds()
+		]]
