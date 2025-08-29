@@ -233,7 +233,9 @@ function recalculateMawMonster()
 					end
 				end
 				if vars.madnessMode then
-					partyLvl=mon.Level^1.5-mon.Level
+					if not onlineStartingMaps(Game.MapStats[Map.MapStatsIndex].Name) then
+						partyLvl=mon.Level^1.5-mon.Level
+					end
 				end
 				--level increase 
 				oldLevel=oldTable.Level
