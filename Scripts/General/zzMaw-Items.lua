@@ -140,8 +140,8 @@ function events.BeforeLoadMap()
 		enc2Chance = {10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19}
 		spcEncChance = {40, 40, 41, 41, 42, 42, 43, 43, 44, 44, 45, 45, 46, 46, 47, 47, 48, 48, 49, 49}
 	elseif higherLootPowerRange then
-		encStrDown={5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,190,195,200,210,220}
-		encStrUp={5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,190,195,200,210,220}
+		encStrDown={5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,190,195,200,205,210,215,220,225,230,235,240,245,250,255,260,265,270,275,280,285,290,295,300,310,320}
+		encStrUp={5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,190,195,200,205,210,215,220,225,230,235,240,245,250,255,260,265,270,275,280,285,290,295,300,310,320}
 
 
 		enc1Chance={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80}
@@ -325,10 +325,10 @@ function events.ItemGenerated(t)
 				mapLevel=0
 			end
 		end
-		--[[if vars.onlineMode then
-			partyLevel=(mapLevel/3)^1.5
+		if vars.madnessMode then
+			partyLevel=((mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)^1.5
+			mapLevel=0
 		end
-		]]
 		if mapvars.mapAffixes then
 			currentLevel=mapvars.mapAffixes.Power*10+20
 			partyLevel=mapvars.mapAffixes.Power*10+20
@@ -368,6 +368,10 @@ function events.ItemGenerated(t)
 		--nerf
 		cap1=cap1/2
 		maxChargesCap=maxChargesCap/2
+		
+		if vars.madnessMode then
+			maxChargesCap=200
+		end
 		it.MaxCharges=math.floor(partyLevel/10+mapLevel/80)
 		--bolster boost
 		it.MaxCharges=math.min(math.floor(it.MaxCharges*difficultyExtraPower+bonusCharges),cap1)
@@ -380,6 +384,10 @@ function events.ItemGenerated(t)
 			bonusCap=bonusCap+20
 		end
 		cap2=14+bonusCap
+		if vars.madnessMode then
+			cap2=54
+			bonusCap=42
+		end
 		partyLevel1=math.min(math.floor((partyLevel+bonus)/18),cap2) 
 		--adjust loot Strength
 		ps1=t.Strength
@@ -1043,6 +1051,9 @@ function updateCelestialItem(it,pl)
 		local slotMult=slotMult[equipStat] or 1
 		local lvl=pl.LevelBase
 		local tier=math.min(pl.LevelBase/11+5,60)
+		if vars.madnessMode then
+			tier=math.min(math.min(pl.LevelBase,1000)/11+5,90)
+		end
 		local mult=3
 		if vars.Mode==2 then
 			mult=4
@@ -2316,6 +2327,9 @@ function events.BuildItemInformationBox(t)
 			end
 			if t.Item.BonusExpireTime>100 and t.Item.BonusExpireTime<200 then
 				txt=StrColor(120, 240, 255,"\n\nCelestial Items cannot be upgraded with crafting Gems or Cubes, but scale with player level, up to level 600.")
+				if vars.madnessMode then
+					txt=StrColor(120, 240, 255,"\n\nCelestial Items cannot be upgraded with crafting Gems or Cubes, but scale with player level, up to level 1000.")
+				end
 			end
 			t.Description = t.Description .. txt
 			
