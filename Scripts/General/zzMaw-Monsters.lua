@@ -709,7 +709,7 @@ function recalculateMonsterTable()
 		end
 		
 		--online
-		if vars.madnessMode and not onlineStartingMaps[name] then
+		if vars.madnessMode and not onlineStartingMaps[name] and not mapvars.mapAffixes then
 			bolsterLevel=mp.Mid^1.5
 			horizontalMultiplier=bolsterLevel/mp.Mid
 			flattener=(base.Level-LevelB)*horizontalMultiplier^0.7 --necessary to avoid making too much difference between monster tier
