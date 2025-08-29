@@ -240,13 +240,32 @@ function getSpellDelay(pl,spell)
 		tier=getAscensionTier(skill,spell,pl:GetIndex())
 	end
 	
+	--shield/armor impair
+	--slow depending on item
+	armorDelay=1
+	local it=pl:GetActiveItem(0)
+	if it then
+		local skill=it:T().Skill
+		if weaponImpair[skill] then
+			local s,m=SplitSkill(pl:GetSkill(skill))
+			armorDelay=armorDelay+weaponImpair[skill][m]/100
+		end
+	end
+	local it=pl:GetActiveItem(3)
+	if it then
+		local skill=it:T().Skill
+		if weaponImpair[skill] then
+			local s,m=SplitSkill(pl:GetSkill(skill))
+			armorDelay=armorDelay+weaponImpair[skill][m]/100
+		end
+	end
 	--haste buff
 	local hasteDiv=1
 	if vars.MAWSETTINGS.buffRework=="ON" and Party.SpellBuffs[8].ExpireTime>=Game.Time then
 		local s, m=getBuffSkill(5)
 		hasteDiv=1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]/1000*s
 	end
-	local delay=round(oldTable[spell][m]/(1+haste/100)*1.2^tier/hasteDiv/enchantMult)
+	local delay=round(oldTable[spell][m]/(1+haste/100)*1.2^tier/hasteDiv/enchantMult)*armorDelay
 	if table.find(elementalistClass, pl.Class) then
 		delay=delay*1.5
 		local id=pl:GetIndex()
