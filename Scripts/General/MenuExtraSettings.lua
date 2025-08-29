@@ -281,7 +281,6 @@ function events.GameInitialized2()
 			vars.madnessMode=true
 			vars.freeProgression=false
 			Game.freeProgression=false
-			vars.DoomPartyNeedInit=true
 		end
 
 		Party.Gold=5000
