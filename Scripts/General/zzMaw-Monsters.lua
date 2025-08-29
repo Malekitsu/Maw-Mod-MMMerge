@@ -2774,6 +2774,7 @@ local function x1() return a1 and true or false end
 local function y1() return b1 and true or false end
 
 local function z1()
+	if mlk then return end
     local e1 = y1()
 
     local function f1(t)
@@ -2821,6 +2822,7 @@ local function z1()
 end
 
 function aa1()
+	if mlk then return end
     events.Remove("KeyDown", a1)
     events.Remove("KeyDown", b1)
     events.Remove("LoadMap", c1)
@@ -3655,7 +3657,7 @@ function getMonsterDamage(lvl,calcType)
 	if calcType=="baseDamage" then
 		return baseDamage
 	end
-	local baseMult=(1.15+lvl/9)*(1+lvl/200)
+	local baseMult=(1.15+lvl/9)*(1+lvl/400)
 	if calcType=="baseMult" then
 		return baseMult
 	end
@@ -3674,10 +3676,10 @@ function getMonsterDamage(lvl,calcType)
 	elseif bol==300 then
 		diffMult=lvl/300+1.5
 	elseif bol==600 then
-		diffMult=lvl/200+2
+		diffMult=lvl/400+2
 	end
 	if vars.insanityMode then
-		diffMult=diffMult*(1.5+lvl/300)
+		diffMult=diffMult*(1.5+lvl/600)
 	end
 	if vars.AusterityMode then
 		diffMult=(diffMult*5-math.min(3.5, diffMult*3.5))^1.25
