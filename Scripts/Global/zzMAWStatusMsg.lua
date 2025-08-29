@@ -23,7 +23,7 @@ end
 --leech moved here, to make sure it takes all the damage modifiers
 function events.CalcDamageToMonster(t)
 	local data=WhoHitMonster()
-	if data and data.Player then
+	if data and data.Player and t.Result>0 then
 		local partyHP=0
 		for i=0,Party.High do
 			if Party[i].Dead==0 and Party[i].Eradicated==0 then
@@ -42,7 +42,7 @@ function events.CalcDamageToMonster(t)
 		end
 		local refHP=HPtable[id]
 		
-		local fullHP=pl:GetFullHP()
+		local fullHP=GetMaxHP(pl)
 		local manaLeechLeg=false
 		if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 31) then
 			fullHP=getMaxMana(pl)
@@ -116,14 +116,13 @@ function events.CalcDamageToMonster(t)
 			overHeal=round(pl.HP+totalHeal-fullHP)
 			pl.HP=math.min(fullHP,pl.HP+totalHeal)
 		end
-
 		if overHeal>0 and vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 27) then
 			local id, lowestHealthPercentage=pickLowestPartyMember()
 			local percent, partyId, playerId=OnlineLowestHealthPercentage()
 			if percent<lowestHealthPercentage then
 				SendHeal(partyId, playerId, overHeal, pl.Name)
 			else
-				Party[id].HP=Party[id].HP+overHeal
+				Party[id].HP=math.min(Party[id].HP+overHeal, fullHP)
 			end
 		end
 		local partyHP2=0
