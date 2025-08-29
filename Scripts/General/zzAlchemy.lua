@@ -837,6 +837,9 @@ evt.PotionEffects[82] = function(IsDrunk, t, Power)
 			local stat=math.random(1,10)
 			if GetItemEquipStat(t)==10 then
 				stat=math.random(1,16)
+				if stat>10 and stat==t.Bonus then
+					stat=math.random(1,10)
+				end
 			end
 			local slotMult=slotMult[t:T().EquipStat] or 1
 			cap=math.min(cap*slotMult,999)
