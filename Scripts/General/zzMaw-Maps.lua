@@ -2083,7 +2083,7 @@ function events.LeaveMap()
 		end
 		for i=0, Map.Chests.High do
 			local chest=Map.Chests[i]
-			for j=0, chest.Items.High do
+			for j=1, chest.Items.High do
 				if chest.Items[j]==290 then
 					chest.Items[j]=0
 					vars.ownedMaps=vars.ownedMaps-1
