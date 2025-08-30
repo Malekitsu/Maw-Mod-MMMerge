@@ -3246,12 +3246,13 @@ function events.Tick()
 	if Game.TurnBased then
 		if vars.Mode==2 or vars.AusterityMode then
 			turnBaseStartPositionX=turnBaseStartPositionX or Party.X
-			turnBaseStartPositionY=turnBaseStartPositionX or Party.Y
+			turnBaseStartPositionY=turnBaseStartPositionY or Party.Y
 			if Game.TurnBasedPhase==2 then
 				turnBaseStartPositionX, turnBaseStartPositionY = Party.X, Party.Y
 			elseif Game.TurnBasedPhase==3 then
 				local dist=getDistance(turnBaseStartPositionX, turnBaseStartPositionY, Party.Z)
 				if dist>370 then
+					debug.Message(turnBaseStartPositionX .. "  " .. turnBaseStartPositionY)
 					Game.TurnBasedPhase=1
 				end
 			end
