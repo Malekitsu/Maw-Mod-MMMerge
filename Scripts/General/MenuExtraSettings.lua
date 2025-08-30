@@ -281,6 +281,17 @@ function events.GameInitialized2()
 			vars.madnessMode=true
 			vars.freeProgression=false
 			Game.freeProgression=false
+			for i=0, Party.PlayersArray.High do
+				local pl=Party.PlayersArray[i]
+				pl.LevelBase=1
+				pl.Experience=0
+				pl.SkillPoints=0
+				for j=0,38 do
+					if pl.Skills[j]>0 then
+						pl.Skills[j]=1
+					end
+				end
+			end
 		end
 
 		Party.Gold=5000
