@@ -1294,7 +1294,25 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		local divider=math.min(120+monLvl*0.75*bolster,600*bolster)
 		local reduction=AC/divider+1
 		local damage=round(damage/reduction)
+		
+		--dk/shaman
+		if table.find(shamanClass, pl.Class) then
+			local s,m=SplitSkill(pl.Skills[const.Skills.Air])
+			damage=damage/(1+0.01*s)
+		elseif table.find(dkClass, pl.Class) then
+			local s,m=SplitSkill(pl.Skills[const.Skills.Body])
+			damage=damage/(1+0.01*s)
+		end
 		return damage
+	end
+	
+	
+	if table.find(shamanClass, pl.Class) then
+		local s,m=SplitSkill(pl.Skills[const.Skills.Air])
+		damage=damage/(1+0.01*s)
+	elseif table.find(dkClass, pl.Class) then
+		local s,m=SplitSkill(pl.Skills[const.Skills.Dark])
+		damage=damage/(1+0.01*s)
 	end
 	
 	--MAGIC DAMAGE CALCULATION
@@ -1575,16 +1593,6 @@ function calcPowerVitality(pl, statsMenu)
 	
 	--calculation
 	local reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
-	
-	--dk/shaman bonus
-	if table.find(shamanClass, pl.Class) then
-		local s=SplitSkill(pl.Skills[const.Skills.Air])
-		reduction=reduction*0.99^s
-	elseif table.find(dkClass, pl.Class) then
-		local s1=SplitSkill(pl.Skills[const.Skills.Body])
-		local s2=SplitSkill(pl.Skills[const.Skills.Dark])
-		reduction=reduction*0.99^((s1+s2)/2)
-	end
 	
 	vitality=round(fullHP/reduction)
 	if statsMenu then
