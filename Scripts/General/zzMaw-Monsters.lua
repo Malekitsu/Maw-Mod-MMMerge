@@ -523,8 +523,9 @@ function events.MonsterKillExp(t)
 	end
 	if vars.madnessMode then 
 		if mapvars.mawBounty or Map.Name=="zarena.blv" or Map.Name=="d42.blv" or Map.Name=="7d05.blv" then
-		t.Exp=0
-		return
+			t.Exp=0
+			return
+		end
 	end
 	local partyLvl=getTotalLevel()
 	local mon=t.Monster
