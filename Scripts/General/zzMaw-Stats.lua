@@ -1303,6 +1303,10 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 			local s,m=SplitSkill(pl.Skills[const.Skills.Body])
 			damage=damage/(1+0.01*s)
 		end
+		--enchant reduction
+		if vars.shieldEnchant and vars.shieldEnchant[id] then
+			damage=damage*0.85
+		end
 		return damage
 	end
 	
@@ -1339,10 +1343,6 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 				damage=damage*0.85
 			end
 		end
-	end
-	--enchant reduction
-	if vars.shieldEnchant and vars.shieldEnchant[id] then
-		damage=damage*0.85
 	end
 	
 	--get resistances
