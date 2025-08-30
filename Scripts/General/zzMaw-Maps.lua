@@ -1715,7 +1715,14 @@ function events.MonsterKilled(mon)
 		return
 	end
 	mapvars.mapsDropped=mapvars.mapsDropped or 0
-	if getMonsterLevel(mon)>100 and math.random()<0.001*mon.Level/100/(mapvars.mapsDropped+1) then
+	local chances=0.001
+	local levelRequired=100
+	if vars.madnessMode then
+		if vars.ownedMaps>=3 then
+			return
+		end
+	end
+	if getMonsterLevel(mon)>levelRequired and math.random()<chances*mon.Level/100/(mapvars.mapsDropped+1) then
 		assignedAffixes = {}
 		obj = SummonItem(290, mon.X, mon.Y, mon.Z + 100, 100)
 		possibleMaps={}
@@ -1727,6 +1734,9 @@ function events.MonsterKilled(mon)
 		if table.find(possibleMaps,mapDungeons[math.random(1,#mapDungeons)]) then
 			obj.Item.BonusStrength=possibleMaps[math.random(1,#possibleMaps)]
 			mapvars.mapsDropped=mapvars.mapsDropped+1
+			if vars.madnessMode then
+				vars.ownedMaps=vars.ownedMaps+1
+			end
 		else
 			obj.Item.Number=0
 			obj.Type=0
@@ -1745,7 +1755,7 @@ function events.MonsterKilled(mon)
 			obj.Item.BonusExpireTime=getUniqueAffix()
 		end
 		obj.Item.MaxCharges=round(totalLevel[mon.Id]/10-math.random(0,3))
-		if vars.insanityMode then
+		if vars.insanityMode and not vars.madnessMode then
 			obj.Item.MaxCharges=math.max(obj.Item.MaxCharges,30)
 		end
 	end
@@ -2049,5 +2059,69 @@ function events.BuildItemInformationBox(t)
 		end
 		t.Description=StrColor(255,255,153,txt)
 		t.Description=t.Description .. "\nUsing this map will teleport you to the entrance."
+	end
+end
+
+function events.LoadMap()
+	if vars.madnessMode then
+		vars.ownedMaps=vars.ownedMaps or 0
+		vars.ownedMaps=math.max(vars.ownedMaps,0)
+	end
+end
+
+--remove dropped maps
+function events.LeaveMap()
+	if vars.madnessMode then
+		for i=0, Map.Objects.High do
+			local obj=Map.Objects[i]
+			if obj.Item and obj.Item.Number==290 then
+				obj.Type=0
+				obj.TypeIndex=0
+				obj.Item.Number=0
+				vars.ownedMaps=vars.ownedMaps-1
+			end
+		end
+		for i=0, Map.Chests.High do
+			local chest=Map.Chests[i]
+			for j=0, chest.Items.High do
+				if chest.Items[j]==290 then
+					chest.Items[j]=0
+					vars.ownedMaps=vars.ownedMaps-1
+				end
+			end
+		end
+	end
+end
+
+function events.Action(t)
+	if t.Action==14 and vars.madnessMode then
+		BeginGrabObjects()
+		checkForMapDropped=true
+		function events.Tick()
+			if checkForMapDropped then
+				events.Remove("Tick",1)
+				local obj=GrabObjects()
+				if obj and obj.Item.Number==290 then
+					local it=obj.Item
+					evt.Add("Items", 290)
+					Mouse.Item.Bonus=it.Bonus
+					Mouse.Item.Charges=it.Charges
+					Mouse.Item.MaxCharges=it.MaxCharges
+					Mouse.Item.Bonus2=it.Bonus2
+					Mouse.Item.BonusStrength=it.BonusStrength
+					Mouse.Item.BonusExpireTime=it.BonusExpireTime
+					obj.Item.Number=0
+					obj.Type=0
+					obj.TypeIndex=0
+				end
+			end
+		end
+	end
+end
+
+
+function events.Action(t)
+	if (t.Action==23 or t.Action==25) and vars.madnessMode then
+		checkForMapDropped=false
 	end
 end
