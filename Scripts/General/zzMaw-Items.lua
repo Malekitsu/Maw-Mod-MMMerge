@@ -1165,7 +1165,7 @@ function events.BuildItemInformationBox(t)
 							power=power*1.5
 						end
 					end
-					power=round((1-1/(power/50+1))*1000)/10 .. "%"
+					power=round((1-1/(power/100+1))*1000)/10 .. "%"
 				end
 				t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. power
 			end
@@ -1193,7 +1193,7 @@ function events.BuildItemInformationBox(t)
 							strength=strength*1.5
 						end
 					end
-					strength=round((1-1/(strength/50+1))*1000)/10 .. "%"
+					strength=round((1-1/(strength/100+1))*1000)/10 .. "%"
 				end
 				if itemStatName[bonus] then
 					t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
@@ -1230,7 +1230,7 @@ function events.BuildItemInformationBox(t)
 					local bonus=math.floor(charges/1000)
 					local strength=charges%1000
 					if stat>=11 and stat<=16 then
-						strength=round((1-1/(charges%1000/50+1))*1000)/10
+						strength=round((1-1/(charges%1000/100+1))*1000)/10
 					end
 					txt=baseStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
 					t.Enchantment = StrColor(100,100,100, txt)
