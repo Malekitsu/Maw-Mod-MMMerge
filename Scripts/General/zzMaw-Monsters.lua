@@ -2247,7 +2247,15 @@ completition=CustomUI.CreateText{
 
 function events.LoadMap()
 	if mapvars.completition then
-		completition.Text=string.format(mapvars.completition) .. "%"
+		local text=mapvars.completition .. "%"
+		if mapvars.monsterMap and mapvars.monsterMap.cleared then
+			txt=StrColor(255,255,0,text)
+		elseif mapvars.completed then
+			txt=StrColor(0,255,0,text)
+		else
+			txt=StrColor(255,0,0,text)
+		end
+		completition.Text=txt
 	else
 		completition.Text=""
 	end
@@ -2301,7 +2309,18 @@ function checkMapCompletition()
 		if mapvars.completed then
 			mapvars.completition=100
 		end
-		completition.Text=string.format(mapvars.completition) .. "%"
+		local completed={0,255,0}
+		local mid={255,255,0}
+		local start={255,0,0}
+		local text=mapvars.completition .. "%"
+		if mapvars.monsterMap and mapvars.monsterMap.cleared then
+			txt=StrColor(255,255,0,text)
+		elseif mapvars.completed then
+			txt=StrColor(0,255,0,text)
+		else
+			txt=StrColor(255,0,0,text)
+		end
+		completition.Text=txt
 		if m/n>=requiredRateo then
 			name=Game.MapStats[Map.MapStatsIndex].Name
 			local bolster=getPartyLevel()
