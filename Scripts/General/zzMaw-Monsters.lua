@@ -300,7 +300,6 @@ function recalculateMawMonster()
 				atk2.DamageAdd, atk2.DamageDiceSides, atk2.DamageDiceCount, extraMult2 = calcDices(oldTable.Attack2.DamageAdd,oldTable.Attack2.DamageDiceSides,oldTable.Attack2.DamageDiceCount,dmgMult)
 				mapvars.nameIdMult=mapvars.nameIdMult or {}
 				mapvars.nameIdMult[mon.NameId]={extraMult1, extraMult2}
-				debug.Message(i)
 			elseif mon.NameId>=220 and mon.NameId<300 then
 				local txt=Game.MonstersTxt[mon.Id]
 				local index=mon:GetIndex()
