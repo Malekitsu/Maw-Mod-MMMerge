@@ -903,12 +903,10 @@ shamanClass={59, 60, 61}
 function events.GameInitialized2()
 	function events.CalcDamageToPlayer(t)
 		if table.find(shamanClass, t.Player.Class) and t.Player.Unconscious==0 and t.Player.Dead==0 and t.Player.Eradicated==0  then
-			m2=SplitSkill(t.Player.Skills[const.Skills.Air])
 			m3=SplitSkill(t.Player.Skills[const.Skills.Water])
 			local lvl=getPartyLevel(4)
 			local reduction=getMonsterDamage((lvl+1)^0.325*m3)^0.7
 			t.Result=math.max(t.Result-reduction, t.Result*0.25)
-			t.Result=t.Result*0.99^m2
 		end
 	end
 	
@@ -1199,19 +1197,6 @@ function events.GameInitialized2()
 		end
 	end
 	
-	function events.CalcDamageToPlayer(t) --body reduces phys damage, unholy magic damage
-		if table.find(dkClass, t.Player.Class) then
-			if t.DamageKind==4 then
-				local s, m=SplitSkill(t.Player.Skills[const.Skills.Body])
-				t.Result=t.Result*0.99^s
-			else
-				local s, m=SplitSkill(t.Player.Skills[const.Skills.Dark])
-				t.Result=t.Result*0.99^s
-			end			
-		end
-	end
-	
-		
 	function events.Action(t)
 		if (t.Action==142 and t.Param==68) or (t.Action==142 and t.Param==74) or (t.Action==142 and t.Param==96) then
 			if table.find(dkClass, Party[Game.CurrentPlayer].Class) then
