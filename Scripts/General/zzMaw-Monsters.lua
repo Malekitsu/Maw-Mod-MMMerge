@@ -1,5 +1,5 @@
 ----------------------------------------------------
---Empower Monsters
+--Empower Monsters--
 ----------------------------------------------------
 --function to calculate the level you are (float number) give x amount of experience
 function calcLevel(x)
@@ -4133,3 +4133,4 @@ function events.PickCorpse(t)
 		end
 	end
 end
+
