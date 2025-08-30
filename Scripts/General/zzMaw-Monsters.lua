@@ -233,9 +233,9 @@ function recalculateMawMonster()
 					end
 				end
 				if vars.madnessMode then
-					if not onlineStartingMaps(Game.MapStats[Map.MapStatsIndex].Name) then
-						partyLvl=mon.Level^1.5-mon.Level
-					end
+					--if not onlineStartingMaps(Game.MapStats[Map.MapStatsIndex].Name) then
+						partyLvl=oldTable.Level^1.5
+					--end
 				end
 				--level increase 
 				oldLevel=oldTable.Level
@@ -300,6 +300,7 @@ function recalculateMawMonster()
 				atk2.DamageAdd, atk2.DamageDiceSides, atk2.DamageDiceCount, extraMult2 = calcDices(oldTable.Attack2.DamageAdd,oldTable.Attack2.DamageDiceSides,oldTable.Attack2.DamageDiceCount,dmgMult)
 				mapvars.nameIdMult=mapvars.nameIdMult or {}
 				mapvars.nameIdMult[mon.NameId]={extraMult1, extraMult2}
+				debug.Message(i)
 			elseif mon.NameId>=220 and mon.NameId<300 then
 				local txt=Game.MonstersTxt[mon.Id]
 				local index=mon:GetIndex()
@@ -1272,7 +1273,8 @@ onlineStartingMaps={["Dagger Wound Island"] =true,
 				["Emerald Island"]=true,
 				["The Temple of the Moon"]=true,
 				["The Dragon's Lair"]=true,
-				["New Sorpigal"]=true,}
+				["New Sorpigal"]=true,
+				["Abandoned Temple"] =true,}
 --map levels
 mapLevels={
 --MM8
@@ -2372,7 +2374,7 @@ function checkMapCompletition()
 					bolster=mapLevel*2
 				end
 				if vars.madnessMode then
-					bolster=((mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)^1.5-mapLevel
+					bolster=((mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)^1.5
 				end
 			
 				local totalMonster=m
