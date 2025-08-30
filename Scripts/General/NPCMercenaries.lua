@@ -149,7 +149,6 @@ end
 NPCFollowers.SetJoinEvent = SetJoinEvent
 
 function GenerateMercenary(t) --RosterId, Class, Level, Skills, Items, Face, JoinText, Condition
-
 	local RosterId, Class, Level, Skills, Items, Face, JoinText, Condition
 	if type(t) == "table" then
 		RosterId, Class, Level, Skills, Items, Face, JoinText, Condition = t.RosterId, t.Class, t.Level, t.Skills, t.Items, t.Face, t.JoinText, t.Condition
@@ -568,6 +567,7 @@ function events.DismissCharacter(t)
 end
 
 local function HaveFreeMerc()
+	if vars.madnessMode then return end
 
 	local MercProps
 	for k,v in pairs(NPCMercenaries) do
@@ -648,6 +648,7 @@ NPCFollowers.DefineClassBySkills = DefineClassBySkills
 
 local LastClass = {}
 local function RefillMercenaries()
+	if vars.madnessMode then return end
 	mapvars.LastMercsRefill = Game.Month
 
 	local CurClass
@@ -703,6 +704,7 @@ local function RefillMercenaries()
 end
 
 function events.LoadMap(WasInGame)
+	if vars.madnessMode then return end
 	TownPortalControls.CheckSwitch()
 
 	if not WasInGame then
@@ -742,6 +744,7 @@ function events.LoadMap(WasInGame)
 end
 
 function events.ContinentChange3()
+	if vars.madnessMode then return end
 	local CurContinent = TownPortalControls.GetCurrentSwitch()
 	for k,v in pairs(vars.MercenariesProps) do
 		if not MercenariesQBits[k] then
