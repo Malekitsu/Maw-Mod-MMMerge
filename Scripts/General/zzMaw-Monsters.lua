@@ -521,7 +521,11 @@ function events.MonsterKillExp(t)
 		t.Exp=0
 		return
 	end
-	
+	if vars.madnessMode then 
+		if mapvars.mawBounty or Map.Name=="zarena.blv" or Map.Name=="d42.blv" or Map.Name=="7d05.blv" then
+		t.Exp=0
+		return
+	end
 	local partyLvl=getTotalLevel()
 	local mon=t.Monster
 	
@@ -3925,3 +3929,14 @@ do
   end
 end
 
+
+function events.PickCorpse(t)
+	if vars.madnessMode then 
+		if mapvars.mawBounty or Map.Name=="zarena.blv" or Map.Name=="d42.blv" or Map.Name=="7d05.blv" then
+			local mon=t.Monster
+			mon.TreasureItemPercent=0
+			mon.TreasureDiceCount=0
+			mon.TreasureDiceSides=0
+		end
+	end
+end
