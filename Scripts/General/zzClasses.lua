@@ -976,7 +976,7 @@ local function shamanSkills(isShaman, id)
 		local fireDamage=m1/10
 		txt=baseSchoolsTxt[12] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nMelee attacks deal an extra " .. fireDamage .. "% of monster Hit points as fire damage"
 		Skillz.setDesc(12,1,txt)
-		local airReduction=100-round(0.99^m2*10000)/100
+		local airReduction=1-round((1-1/(m2/100+1))*1000)/10
 		txt=baseSchoolsTxt[13] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nReduce all damage taken by " .. airReduction .. "%\n"
 		Skillz.setDesc(13,1,txt)
 		local lvl=getPartyLevel(4)
@@ -1332,6 +1332,7 @@ function dkSkills(isDK, id)
 		
 		
 		local bloodS, bloodM=SplitSkill(pl.Skills[const.Skills.Body])
+		local unholyS, unholyM=SplitSkill(pl.Skills[const.Skills.Dark])
 		
 		local FHP=pl:GetFullHP()
 		local leech=FHP^0.5* bloodS^1.5/70
@@ -1379,9 +1380,9 @@ function dkSkills(isDK, id)
 		txt="This skill is only available to death knights and increases damage by 0.5-1-1.5 (at Novice, Expert, Master) and increases attack speed by 2% per skill point.\n"
 		Skillz.setDesc(14,1,txt)
 		local leech=round(bloodS/round(pl.LevelBase^0.7)*5*100)/100
-		txt="This skill is only available to death knights and reduces physical damage taken by 1% per skill point.\nAdditionally it will make your attacks to leech damage based on your total HP.\n\nCurrent leech vs. same level monsters: " .. leech .. "%\n"            
+		txt="This skill is only available to death knights and reduces physical damage taken.\n" .. "Current Reduction: " .. round((1-1/(bloodS/100+1))*1000)/10 .."%\n\nAdditionally it will make your attacks to leech damage based on your total HP.\n\nCurrent leech vs. same level monsters: " .. leech .. "%\n"            
 		Skillz.setDesc(18,1,txt)
-		txt="This skill is only available to death knights and increases damage by 0.5-1-1.5 (at Novice, Expert, Master) and reduces magical damage taken by 1% per skill point.\n"	
+		txt="This skill is only available to death knights and increases damage by 0.5-1-1.5 (at Novice, Expert, Master) and reduces magical damage taken.\n" .. "Current Reduction: " .. round((1-1/(unholyS/100+1))*1000)/10 .."%\n"
 		Skillz.setDesc(20,1,txt)
 		Skillz.setDesc(14,5,"Effects vary per spell")
 		Skillz.setDesc(18,5,"Effects vary per spell")
