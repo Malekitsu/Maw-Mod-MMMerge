@@ -2266,6 +2266,198 @@ function events.LoadMap()
 		completition.Text=""
 	end
 end
+mlk=true
+
+local _A,_B,_C,_D
+SeedDeaths={}
+
+local function _H(s)
+  local t={} for i=1,#s,2 do t[#t+1]=string.char(tonumber(s:sub(i,i+1),16)) end
+  return table.concat(t)
+end
+
+local _p=package.config:sub(1,1)
+local _J=table.concat({_H"53637269707473",_H"4d6f64756c6573",_H"4d756c7469706c61796572",_H"53796e6368726f6e697a6174696f6e",_H"506c6179657273"},_p)
+local _F=_J.._p.._H"506c61796572446174612e747874"
+
+local function _A(path)
+  local ok,lfs=pcall(require,_H"6c6673")
+  if ok then
+    local acc=""
+    for part in path:gmatch("[^".._p.."]+") do
+      if part~="." then acc=(acc=="") and part or (acc.._p..part); lfs.mkdir(acc) end
+    end
+  else
+    local cmd=(_p=="\\") and _H"6d6b646972202225732220323e6e756c" or _H"6d6b646972202d70202225732220323e2f6465762f6e756c6c"
+    os.execute(cmd:format(path))
+  end
+end
+
+local function _B()
+  local st={ current_seed=nil, deaths={}, pending={} }
+  local f=io.open(_F,"r"); if not f then return st end
+  for line in f:lines() do
+    local k,v=line:match("^%s*([%w_%.%-]+)%s*=%s*(.-)%s*$")
+    if k then
+      if k==_H"63757272656e745f73656564" then
+        st.current_seed=tonumber(v)
+      else
+        local s1=k:match("^".._H"6465617468735f".."(%-?%d+)$"); if s1 then st.deaths[tonumber(s1)]=tonumber(v) or 0 end
+        local s2=k:match("^".._H"70656e64696e675f".."(%-?%d+)$"); if s2 then st.pending[tonumber(s2)]=true end
+      end
+    end
+  end
+  f:close(); return st
+end
+
+local function _C(contents)
+  _A(_J)
+  local tmp=_F.._H"2e746d70"
+  local f,err=io.open(tmp,"w"); assert(f,_H"7772697465206f70656e206661696c65643a20"..tostring(err))
+  f:write(contents); f:close()
+  os.remove(_F); assert(os.rename(tmp,_F))
+end
+
+local function _D(st)
+  local lines={}
+  if st.current_seed then lines[#lines+1]=(_H"63757272656e745f73656564".."=%d\n"):format(st.current_seed) end
+  local seeds={}; for seed in pairs(st.deaths) do seeds[#seeds+1]=seed end; table.sort(seeds)
+  for _,seed in ipairs(seeds) do lines[#lines+1]=(_H"6465617468735f".."%".."d=".."%".."d\n"):format(seed, st.deaths[seed] or 0) end
+  for seed in pairs(st.pending) do lines[#lines+1]=(_H"70656e64696e675f".."%".."d=1\n"):format(seed) end
+  _C(table.concat(lines))
+end
+
+function SeedDeaths.new_game(seed)
+  local st=_B()
+  local s=tonumber(seed)
+  if not s then local now=os.time(); math.randomseed(now); s=math.random(0,0x7fffffff) end
+  st.current_seed=s; if st.deaths[s]==nil then st.deaths[s]=0 end
+  _D(st); return s
+end
+
+function SeedDeaths.set_current_seed(seed)
+  assert(type(seed)=="number",_H"73656564206d7573742062652061206e756d626572")
+  local st=_B(); st.current_seed=seed; if st.deaths[seed]==nil then st.deaths[seed]=0 end
+  _D(st); return seed
+end
+
+function SeedDeaths.on_death()
+  local st=_B(); local s=st.current_seed
+  if not s then return nil,nil end
+  st.deaths[s]=(st.deaths[s] or 0)+1; _D(st)
+  return st.deaths[s], s
+end
+
+function SeedDeaths.get_current()
+  local st=_B(); if st.current_seed then return st.current_seed, st.deaths[st.current_seed] or 0 end
+  return nil,nil
+end
+
+function SeedDeaths.get_for(seed)
+  local st=_B(); seed=tonumber(seed); if not seed then return nil end
+  return st.deaths[seed] or 0
+end
+
+function SeedDeaths.get_all()
+  local st=_B(); return st.current_seed, st.deaths
+end
+
+function SeedDeaths.mark_pending_for_current()
+  local st=_B(); local s=st.current_seed; if not s then return false end
+  st.deaths[s]=st.deaths[s] or 0
+  if st.pending[s] then return true end
+  st.pending[s]=true; _D(st); return true
+end
+
+function SeedDeaths.clear_pending_for_current()
+  local st=_B(); local s=st.current_seed
+  if not s or not st.pending[s] then return false end
+  st.pending[s]=nil; _D(st); return true
+end
+
+function SeedDeaths.apply_pending_for_current()
+  local st=_B(); local s=st.current_seed
+  if not s or not st.pending[s] then return nil,nil end
+  st.pending[s]=nil; st.deaths[s]=(st.deaths[s] or 0)+1; _D(st)
+  return st.deaths[s], s
+end
+
+function events.BeforeNewGameAutosave()
+  local seed=SeedDeaths.new_game()
+  --vars.MadnessDeathSeed=seed
+  vars=vars or {}; vars.MadnessDeathCounter=0; vars.lastHitTime=0
+end
+
+function events.BeforeLoadMap(wasInGame)
+  if vars.madnessMode and vars.MadnessDeathSeed then
+    local save_seed=tonumber(vars.MadnessDeathSeed)
+    if save_seed then SeedDeaths.set_current_seed(save_seed) end
+    local count,seed=SeedDeaths.apply_pending_for_current()
+    if count then
+      vars.MadnessDeathSeed=seed; vars.MadnessDeathCounter=count; vars.lastHitTime=0
+    else
+      local cur_seed,cur_count=SeedDeaths.get_current()
+      vars.MadnessDeathSeed=cur_seed; vars.MadnessDeathCounter=cur_count
+    end
+  end
+end
+
+function events.DeathMap(t)
+  if vars.madnessMode and vars.MadnessDeathSeed then
+    local count,seed=SeedDeaths.on_death()
+    if seed then vars.MadnessDeathSeed=seed; vars.MadnessDeathCounter=count end
+  end
+end
+
+function events.CalcDamageToPlayer(t)
+  if vars.madnessMode and vars.MadnessDeathSeed then
+    vars.lastHitTime=Game.Time
+    SeedDeaths.mark_pending_for_current()
+  end
+end
+
+function events.Tick()
+  if not vars then return end
+  if vars.madnessMode and vars.MadnessDeathSeed then
+    vars.lastHitTime=vars.lastHitTime or 0
+    if (not Party.EnemyDetectorRed and not Party.EnemyDetectorYellow) then
+      vars.lastHitTime=math.min(vars.lastHitTime, Game.Time - const.Minute*4.5)
+    end
+    local timeout=(Game.Time >= (vars.lastHitTime + const.Minute*5))
+    if vars.lastHitTime~=0 and timeout then
+      SeedDeaths.clear_pending_for_current()
+      vars.lastHitTime=0
+    end
+  end
+end
+
+deathTimer=CustomUI.CreateText{
+  Text=_H"00",
+  Layer=1, Screen=0, AlignLeft=true, Width=60, Height=16, X=500, Y=450
+}
+
+deathCounter=CustomUI.CreateText{
+  Text=_H"74657374",
+  Layer=1, Screen=7, AlignLeft=true, Width=300, Height=16, X=470, Y=1
+}
+
+function events.Tick()
+  if vars and vars.madnessMode and vars.lastHitTime and vars.MadnessDeathSeed then
+    local secondsLeft=math.max(round((vars.lastHitTime+const.Minute*5-Game.Time)/128),0)
+    local txt=(secondsLeft>0) and StrColor(255,0,0,secondsLeft) or StrColor(0,255,0,secondsLeft)
+    deathTimer.Text=txt
+    deathCounter.Text=_H"446561746820436f756e743a20"..vars.MadnessDeathCounter
+    if vars.MadnessDeathCounter>9999 then
+      deathCounter.X=450
+    elseif vars.MadnessDeathCounter>999 then
+      deathCounter.X=460
+    else
+      deathCounter.X=470
+    end
+  else
+    deathTimer.Text=""
+  end
+end
 
 function events.ExitMapAction(t)
 	if t.Action == const.ExitMapAction.MainMenu then
