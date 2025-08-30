@@ -1631,7 +1631,7 @@ local horizontalSkills={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,
 local insanityLearningRequirements={0,8,20,32}
 local madnessLearningRequirements={0,12,30,50}
 local insanityCost={0,10000,50000,250000}
-local madnessCost={0,20000,200000,1000000}
+local madnessCost={0,25000,500000,4000000}
 
 local function getReqAndCost(mastery, player)
 	if vars.madnessMode then
