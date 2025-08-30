@@ -3252,7 +3252,6 @@ function events.Tick()
 			elseif Game.TurnBasedPhase==3 then
 				local dist=getDistance(turnBaseStartPositionX, turnBaseStartPositionY, Party.Z)
 				if dist>370 then
-					debug.Message(turnBaseStartPositionX .. "  " .. turnBaseStartPositionY)
 					Game.TurnBasedPhase=1
 				end
 			end
