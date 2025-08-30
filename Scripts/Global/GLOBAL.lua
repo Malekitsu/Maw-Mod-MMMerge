@@ -87,6 +87,9 @@ end
 function calculateExp(experience)
 	--calculate party level
 	local partyLevel=getPartyLevel()
+	if vars.madnessMode then
+		partyLevel=getTotalLevel()
+	end
 	return experience*(1+partyLevel/100)+500*partyLevel - experience
 end
 function calculateGold(gold)
