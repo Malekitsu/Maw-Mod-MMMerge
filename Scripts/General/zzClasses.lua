@@ -1136,7 +1136,7 @@ function events.GameInitialized2()
 				leech=0
 				if vars.dkActiveAttackSpell and (vars.dkActiveAttackSpell[id]==68 or vars.dkActiveAttackSpell[id]==74) then
 					local FHP=pl:GetFullHP()
-					local leech=FHP^0.5* bloodS^1.5/70* (1+bloodM/4)
+					local leech=math.max(FHP^0.5* bloodS^1.5/70* (1+bloodM/4), bloodS*2)
 					pl.SP=pl.SP-6
 					if vars.dkActiveAttackSpell[id]==74 then
 						leech=leech * 2
@@ -1335,7 +1335,7 @@ function dkSkills(isDK, id)
 		local unholyS, unholyM=SplitSkill(pl.Skills[const.Skills.Dark])
 		
 		local FHP=pl:GetFullHP()
-		local leech=FHP^0.5* bloodS^1.5/70
+		local leech=math.max(FHP^0.5* bloodS^1.5/70, bloodS*2)
 		Game.SpellsTxt[68].Name="Blood Leech"
 		Game.SpellsTxt[68].Description="Activating this spell imbues the knight body with blood, leeching life upon attacking at the cost of 6 spell points."
 		Game.SpellsTxt[68].Normal="Leeches " .. round(leech * 1.25) .. " Hit Points"
