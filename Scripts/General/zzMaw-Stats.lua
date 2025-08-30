@@ -1366,7 +1366,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		currentItemRes=currentItemRes*1.5
 	end
 	
-	currentItemRes=1/(currentItemRes/50+1)
+	currentItemRes=1/(currentItemRes/100+1)
 	res=res*currentItemRes
 	--randomize resistance
 	if res>0 and rand then
