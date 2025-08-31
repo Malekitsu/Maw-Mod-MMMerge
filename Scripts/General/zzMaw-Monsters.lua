@@ -2405,7 +2405,7 @@ function events.LoadMap()
 	end
 end
 function events.LeaveMap()
-	if Game.BolsterAmount~=300 and vars.Mode~=2 then return end
+	if (Game.BolsterAmount~=300 or Game.BolsterAmount~=600) and vars.Mode~=2 then return end
 	if Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.monsterMap.cleared==false then
 		if Map.Monsters.Count==0 then return end
 		for i=0,#mapvars.monsterMap do
@@ -2684,7 +2684,7 @@ function events.Tick()
 end
 
 function events.Action(t)
-	if vars.madnessMode and showDeathCounterthen then
+	if vars.madnessMode and showDeathCounter then
 		if t.Action==82 then
 			SeedDeaths.apply_pending_for_current()
 		end
