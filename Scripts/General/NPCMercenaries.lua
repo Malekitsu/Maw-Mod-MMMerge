@@ -544,6 +544,7 @@ end
 
 function events.DismissCharacter(t)
 
+	if vars.madnessMode then return end
 	local CurMerc = Party.PlayersIndexes[t.PlayerId]
 	local CurProps = vars.MercenariesProps[CurMerc]
 	local CurCont = TownPortalControls.GetCurrentSwitch()
