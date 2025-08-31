@@ -46,11 +46,16 @@ function events.EvtGlobal(i) -- happens after related global evt executed
 	-- calculate differencies and recalculate rewards
 	
 	local ExpRewards = {}
+	
+	local partyLevel=getPartyLevel()
+	if vars.madnessMode then
+		partyLevel=getTotalLevel()*3
+	end
 	for i, Exp in pairs(LastStats.Exp) do
 		if i < Party.count then
 			ExpRewards[i] = Party[i].Exp - Exp
 			if ExpRewards[i]>0 then
-				local bonusExp=calculateExp(ExpRewards[i])
+				local bonusExp=calculateExp(ExpRewards[i], partyLevel)
 				Party[i].Experience=math.min(Party[i].Experience+bonusExp, 2^32-3982296)
 				
 				--bolster code
@@ -84,9 +89,7 @@ function events.EvtMap(i)
 end
 
 
-function calculateExp(experience)
-	--calculate party level
-	local partyLevel=getPartyLevel()
+function calculateExp(experience, partyLevel)
 	return experience*(1+partyLevel/100)+500*partyLevel - experience
 end
 function calculateGold(gold)
