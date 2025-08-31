@@ -706,14 +706,10 @@ function events.ItemGenerated(t)
 		
 		--reduce chances for resistances
 		if GetItemEquipStat(it)~=10 and it.Bonus>=11 and it.Bonus<=16 then
-			if math.random() then
-				it.Bonus=math.random(1,10)
-			end
+			it.Bonus=math.random(1,10)
 		end
 		if math.floor(it.Charges/1000)>=11 and math.floor(it.Charges/1000)<=16 then
-			if math.random()<0.4 then
-				it.Charges=it.Charges-math.floor(it.Charges/1000)*1000+math.random(1,7)*1000
-			end
+			it.Charges=it.Charges-math.floor(it.Charges/1000)*1000+math.random(1,10)*1000
 		end
 		
 		--fix to resistances not to rolled be twice
