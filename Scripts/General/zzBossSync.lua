@@ -69,7 +69,7 @@ local function client_purge_all_boss_marks()
   if not (Map and Map.Monsters) then return end
   for i = 0, Map.Monsters.High do
     local mon = Map.Monsters[i]
-    if mon and (mon.NameId or 0) >= 221 then
+    if mon and (mon.NameId or 0) >= 221 and mon.NameId<=300 then
       mon.NameId = 0
     end
   end
@@ -84,7 +84,7 @@ local function client_purge_except_set(list)
   end
   for i = 0, Map.Monsters.High do
     local mon = Map.Monsters[i]
-    if mon and (mon.NameId or 0) >= 221 and not keep[i] then
+    if mon and (mon.NameId or 0) >= 221 and mon.NameId<=300 and not keep[i] then
       mon.NameId = 0
     end
   end
