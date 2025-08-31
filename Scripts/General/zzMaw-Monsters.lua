@@ -2444,10 +2444,10 @@ completition=CustomUI.CreateText{
 function events.LoadMap()
 	if mapvars.completition then
 		local text=mapvars.completition .. "%"
-		if mapvars.monsterMap and mapvars.monsterMap.cleared then
-			txt=StrColor(255,255,0,text)
-		elseif mapvars.completed then
+		if mapvars.completed then
 			txt=StrColor(0,255,0,text)
+		elseif (mapvars.monsterMap and mapvars.monsterMap.cleared) or not Map.IsIndoor() then
+			txt=StrColor(255,255,0,text)
 		else
 			txt=StrColor(255,0,0,text)
 		end
@@ -2737,14 +2737,11 @@ function checkMapCompletition()
 		if mapvars.completed then
 			mapvars.completition=100
 		end
-		local completed={0,255,0}
-		local mid={255,255,0}
-		local start={255,0,0}
 		local text=mapvars.completition .. "%"
-		if mapvars.monsterMap and mapvars.monsterMap.cleared then
-			txt=StrColor(255,255,0,text)
-		elseif mapvars.completed then
+		if mapvars.completed then
 			txt=StrColor(0,255,0,text)
+		elseif (mapvars.monsterMap and mapvars.monsterMap.cleared) or not Map.IsIndoor() then
+			txt=StrColor(255,255,0,text)
 		else
 			txt=StrColor(255,0,0,text)
 		end
