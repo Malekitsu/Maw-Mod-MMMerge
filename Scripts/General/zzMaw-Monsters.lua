@@ -2469,6 +2469,30 @@ local _p=package.config:sub(1,1)
 local _J=table.concat({_H"53637269707473",_H"4d6f64756c6573",_H"4d756c7469706c61796572",_H"53796e6368726f6e697a6174696f6e",_H"506c6179657273"},_p)
 local _F=_J.._p.._H"506c61796572446174612e747874"
 
+-- one-time dir + write dedupe
+local dir_ready = false
+local _last_written = nil
+
+local function ensure_dir_once()
+  if dir_ready then return end
+  local ok, lfs = pcall(require, "lfs")
+  if ok then
+    local mode = lfs.attributes(_J, "mode")
+    if mode ~= "directory" then _A(_J) end
+  else
+    -- try exactly once; silence output; avoid doing this repeatedly
+    local cmd = (_p == "\\")
+      and ('cmd /c mkdir "%s" >nul 2>nul'):format(_J)
+      or  ('mkdir -p "%s" 2>/dev/null'):format(_J)
+    os.execute(cmd)
+  end
+  dir_ready = true
+end
+
+function events.GameInitialized2()
+  ensure_dir_once()
+end
+
 local function _A(path)
   local ok,lfs=pcall(require,_H"6c6673")
   if ok then
@@ -2499,12 +2523,17 @@ local function _B()
   f:close(); return st
 end
 
+-- atomic write (use ensure_dir_once + dedupe)
 local function _C(contents)
-  _A(_J)
-  local tmp=_F.._H"2e746d70"
-  local f,err=io.open(tmp,"w"); assert(f,_H"7772697465206f70656e206661696c65643a20"..tostring(err))
+  ensure_dir_once()
+  if contents == _last_written then return end  -- skip identical writes
+  local tmp = _F .. _H"2e746d70"
+  local f, err = io.open(tmp, "w")
+  assert(f, _H"7772697465206f70656e206661696c65643a20"..tostring(err))
   f:write(contents); f:close()
-  os.remove(_F); assert(os.rename(tmp,_F))
+  os.remove(_F)               -- ignore error if missing
+  assert(os.rename(tmp, _F))  -- commit
+  _last_written = contents
 end
 
 local function _D(st)
