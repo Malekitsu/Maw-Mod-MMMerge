@@ -2666,7 +2666,7 @@ deathCounter=CustomUI.CreateText{
 
 function events.Tick()
   if vars and vars.madnessMode and vars.lastHitTime and vars.MadnessDeathSeed and showDeathCounter then
-    local secondsLeft=math.max(round((vars.lastHitTime+const.Minute*5-Game.Time)/128),0)
+    local secondsLeft=math.max(math.ceil((vars.lastHitTime+const.Minute*5-Game.Time)/128),0)
     local txt=(secondsLeft>0) and StrColor(255,0,0,secondsLeft) or StrColor(0,255,0,secondsLeft)
     deathTimer.Text=txt
     deathCounter.Text=_H"446561746820436f756e743a20"..vars.MadnessDeathCounter
