@@ -1,5 +1,5 @@
 ----------------------------------------------------
---Empower Monsters--
+--Empower Monsters
 ----------------------------------------------------
 --function to calculate the level you are (float number) give x amount of experience
 function calcLevel(x)
@@ -717,7 +717,11 @@ function recalculateMonsterTable()
 		
 		--online
 		if vars.madnessMode and not onlineStartingMaps[name] and not mapvars.mapAffixes then
-			bolsterLevel=mp.Mid^1.5
+			if madnessMapLevels[name] then
+				bolsterLevel=madnessMapLevels[name]
+			else
+				bolsterLevel=mean^1.5+10
+			end
 			horizontalMultiplier=bolsterLevel/mp.Mid
 			flattener=(base.Level-LevelB)*horizontalMultiplier^0.7 --necessary to avoid making too much difference between monster tier
 			totalLevel[i]=math.max(base.Level*horizontalMultiplier-flattener+adjust*horizontalMultiplier^0.7, 5)
@@ -1277,8 +1281,7 @@ onlineStartingMaps={["Dagger Wound Island"] =true,
 				["Emerald Island"]=true,
 				["The Temple of the Moon"]=true,
 				["The Dragon's Lair"]=true,
-				["New Sorpigal"]=true,
-				["Abandoned Temple"] =true,}
+				["New Sorpigal"]=true,}
 --map levels
 mapLevels={
 --MM8
@@ -1911,6 +1914,189 @@ mapLevels={
 
 }
 
+madnessMapLevels = {
+  ["Emerald Island"] = 5,
+  ["Dagger Wound Island"] = 6,
+  ["New Sorpigal"] = 6,
+  ["The Temple of the Moon"] = 6,
+  ["Goblinwatch"] = 20,
+  ["Misty Islands"] = 21,
+  ["Castle Ironfist"] = 22,
+  ["Castle Harmondale"] = 23,
+  ["The Abandoned Temple"] = 23,
+  ["Abandoned Temple"] = 25,
+  ["Temple of the Fist"] = 26,
+  ["Temple of Tsantsa"] = 32,
+  ["Bootleg Bay"] = 33,
+  ["Free Haven Sewer"] = 36,
+  ["Silver Helm Outpost"] = 38,
+  ["Harmondale"] = 39,
+  ["The Barrow Downs"] = 49,
+  ["Hall of the Fire Lord"] = 49,
+  ["Smuggler's Cove"] = 51,
+  ["Dire Wolf Den"] = 52,
+  ["Ravenshore"] = 58,
+  ["Troll Tomb"] = 64,
+  ["White Cliff Cave"] = 64,
+  ["The Bandit Caves"] = 64,
+  ["Deyja"] = 64,
+  ["Chapel of Eep"] = 68,
+  ["The Haunted Mansion"] = 68,
+  ["Barrow IV"] = 76,
+  ["Barrow V"] = 76,
+  ["Barrow XII"] = 76,
+  ["Barrow II"] = 76,
+  ["Barrow XI"] = 76,
+  ["Barrow XV"] = 76,
+  ["Barrow I"] = 76,
+  ["Barrow III"] = 76,
+  ["Barrow VI"] = 76,
+  ["Barrow VIII"] = 76,
+  ["Barrow XIV"] = 76,
+  ["Barrow IX"] = 76,
+  ["Barrow X"] = 76,
+  ["Barrow XII"] = 76,
+  ["Barrow IV"] = 76,
+  ["Barrow V"] = 76,
+  ["Barrow VII"] = 76,
+  ["The Hall under the Hill"] = 76,
+  ["Wasp Nest"] = 76,
+  ["Zokarr's Tomb"] = 76,
+  ["The Erathian Sewers"] = 80,
+  ["Stone City"] = 80,
+  ["Frozen Highlands"] = 81,
+  ["The Tidewater Caverns"] = 87,
+  ["Erathia"] = 89,
+  ["The Dragon's Lair"] = 89,
+  ["Temple of the Sun"] = 99,
+  ["Dragoons' Caverns"] = 99,
+  ["The Tularean Forest"] = 99,
+  ["Dragoons' Caverns"] = 99,
+  ["The Tularean Forest"] = 99,
+  ["Temple of the Sun"] = 99,
+  ["Temple of the Sun"] = 99,
+  ["Dark Dwarf Compound"] = 103,
+  ["Church of Eep"] = 108,
+  ["Icewind Keep"] = 110,
+  ["The Red Dwarf Mines"] = 110,
+  ["Grand Temple of Eep"] = 115,
+  ["Mire of the Damned"] = 118,
+  ["Avlee"] = 123,
+  ["Ancient Troll Home"] = 125,
+  ["Alvar"] = 138,
+  ["Ironsand Desert"] = 138,
+  ["Evenmorn Island"] = 140,
+  ["Grand Temple of the Sun"] = 148,
+  ["Murmurwoods"] = 151,
+  ["Temple of the Moon"] = 151,
+  ["Barbarian Fortress"] = 162,
+  ["The Bracada Desert"] = 162,
+  ["Dragoons' Keep"] = 164,
+  ["Ravage Roaming"] = 167,
+  ["Eel Infested Waters"] = 178,
+  ["Silver Cove"] = 177,
+  ["The Monolith"] = 175,
+  ["Grand Temple of the Moon"] = 173,
+  ["Snergle's Caverns"] = 185,
+  ["Shadow Guild"] = 187,
+  ["Fort Riverstride"] = 190,
+  ["Nighon Tunnels"] = 190,
+  ["Castle Navan"] = 192,
+  ["Naga Vault"] = 198,
+  ["Snergle's Iron Mines"] = 201,
+  ["Necromancers' Guild"] = 204,
+  ["Uplifted Library"] = 207,
+  ["Shadowspire"] = 216,
+  ["The Crypt of Korbu"] = 216,
+  ["Corlagon's Estate"] = 222,
+  ["Tomb of Ethric the Mad"] = 222,
+  ["The Hall of the Pit"] = 228,
+  ["Silver Helm Stronghold"] = 240,
+  ["Castle Gryphonheart"] = 244,
+  ["Chain of Fire"] = 253,
+  ["Dragon Hunter's Camp"] = 253,
+  ["Lair of the Wolf"] = 253,
+  ["The Small House"] = 277,
+  ["Gharik's Forge"] = 279,
+  ["Agar's Laboratory"] = 285,
+  ["Lord Markham's Manor"] = 292,
+  ["The Temple of Baa"] = 292,
+  ["Garrote Gorge"] = 295,
+  ["Blackshire"] = 299,
+  ["The School of Sorcery"] = 302,
+  ["William Setag's Tower"] = 317,
+  ["Watchtower 6"] = 319,
+  ["Balthazar Lair"] = 322,
+  ["The Wine Cellar"] = 326,
+  ["Castle Alamos"] = 333,
+  ["Pirate Outpost"] = 343,
+  ["Regna"] = 354,
+  ["Temple of the Light"] = 354,
+  ["The Mercenary Guild"] = 364,
+  ["Druid Circle"] = 368,
+  ["Warlord's Fortress"] = 368,
+  ["The Pit"] = 382,
+  ["Pirate Stronghold"] = 389,
+  ["Small Sub Pen"] = 389,
+  ["Temple of the Dark"] = 389,
+  ["The Walls of Mist"] = 393,
+  ["Kriegspire"] = 404,
+  ["Abandoned Pirate Keep"] = 408,
+  ["Clanker's Laboratory"] = 408,
+  ["Passage Under Regna"] = 408,
+  ["Wromthrax's Cave"] = 408,
+  ["The Breeding Zone"] = 412,
+  ["Hermit's Isle"] = 412,
+  ["Devil Outpost"] = 419,
+  ["Castle Gloaming"] = 434,
+  ["Dragon Cave"] = 465,
+  ["Old Loeb's Cave"] = 465,
+  ["Ilsingore's Cave"] = 465,
+  ["Yaardrake's Cave"] = 465,
+  ["Superior Temple of Baa"] = 465,
+  ["Castle Lambent"] = 484,
+  ["Plane of Air"] = 492,
+  ["Thunderfist Mountain"] = 524,
+  ["Plane of Water"] = 524,
+  ["Castle of Air"] = 524,
+  ["Tunnels to Eeofol"] = 544,
+  ["Dragonsand"] = 544,
+  ["The Hidden Tomb"] = 555,
+  ["Temple of the Snake"] = 555,
+  ["Castle Kriegspire"] = 573,
+  ["Plane of Fire"] = 586,
+  ["Shoals"] = 586,
+  ["War Camp"] = 586,
+  ["Caves of the Dragon Riders"] = 586,
+  ["Castle Darkmoor"] = 586,
+  ["Supreme Temple of Baa"] = 607,
+  ["Mount Nighon"] = 624,
+  ["Paradise Valley"] = 628,
+  ["Tomb of VARN"] = 632,
+  ["Plane of Earth"] = 650,
+  ["Castle of Fire"] = 650,
+  ["The Land of the Giants"] = 693,
+  ["Escaton's Crystal"] = 716,
+  ["The Titans' Stronghold"] = 749,
+  ["The Maze"] = 756,
+  ["Colony Zod"] = 784,
+  ["Sweet Water"] = 784,
+  ["Plane Between Planes"] = 830,
+  ["Control Center"] = 854,
+  ["Dragon's Lair"] = 854,
+  ["Escaton's Palace"] = 854,
+  ["The Dragon Caves"] = 854,
+  ["Prison of the Lord of Air"] = 878,
+  ["Prison of the Lord of Earth"] = 878,
+  ["Prison of the Lord of Fire"] = 878,
+  ["Prison of the Lord of Water"] = 878,
+  ["The Hive"] = 950,
+  ["The Lincoln"] = 1000,
+  ["Basement of the Breach"] = 1100,
+  ["The Breach"] = 1100,
+}
+
+
 --[[
 mapLevels={}
 text=""
@@ -2384,7 +2570,7 @@ end
 
 function events.BeforeNewGameAutosave()
   local seed=SeedDeaths.new_game()
-  --vars.MadnessDeathSeed=seed
+  vars.MadnessDeathSeed=seed
   vars=vars or {}; vars.MadnessDeathCounter=0; vars.lastHitTime=0
 end
 
@@ -2637,6 +2823,10 @@ end
 	
 --ask confirmation and instructions for true nightmare mode
 function nightmare()
+	if vars.madnessMode and not vars.introduction then
+		vars.introduction=true
+		Message("Beyond Madness - A word of warning.\n\nNo bolster here (except on starting maps).\n\nQuest timing matters:\n- Finish early: immediate power now, less XP.\n- Finish late: bigger XP later, no early power.\n\nIf pure Madness wasn't enough for you, you're in the right place.")
+	end
 	if vars.Mode==2 then
 		if Game.BolsterAmount~=600 then
 			Game.BolsterAmount=600
@@ -4133,4 +4323,3 @@ function events.PickCorpse(t)
 		end
 	end
 end
-
