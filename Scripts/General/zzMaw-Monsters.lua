@@ -2654,6 +2654,12 @@ function events.Tick()
   end
 end
 
+function events.Action(t)
+	if t.Action==82 then
+		SeedDeaths.apply_pending_for_current()
+	end
+end
+
 function events.ExitMapAction(t)
 	if t.Action == const.ExitMapAction.MainMenu then
 		completition.Text=""
