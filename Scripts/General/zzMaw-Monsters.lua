@@ -2599,7 +2599,10 @@ function events.DeathMap(t)
     if seed then vars.MadnessDeathSeed=seed; vars.MadnessDeathCounter=count end
   end
 end
-
+function events.LeaveMap()
+	vars.lastHitTime=0
+	SeedDeaths.clear_pending_for_current()
+end
 function events.CalcDamageToPlayer(t)
   if vars.madnessMode and vars.MadnessDeathSeed then
     vars.lastHitTime=Game.Time
