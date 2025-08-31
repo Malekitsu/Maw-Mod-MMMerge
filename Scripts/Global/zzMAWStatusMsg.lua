@@ -200,7 +200,7 @@ function events.CalcDamageToMonster(t)
 			end
 		end
 		MSGdamage=MSGdamage or 0
-		MSGdamage=MSGdamage+math.ceil(t.Result)*divide
+		MSGdamage=MSGdamage+math.ceil(t.Result*divide)
 		local msgTxt=MSGdamage
 		msgTxt=shortenNumber(msgTxt, 4, true)
 		attackIsSpell=false
@@ -279,6 +279,7 @@ function events.CalcDamageToMonster(t)
 	if id>=0 and id<=Party.High then
 		checkSkills(id)
 	end
+	t.Result=math.ceil(t.Result)
 	if t.Result>32500 then
 		t.Result=32500
 	end
