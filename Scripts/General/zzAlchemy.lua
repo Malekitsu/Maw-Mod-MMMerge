@@ -1007,10 +1007,10 @@ evt.PotionEffects[87] = function(IsDrunk, t, Power)
 		if (t.BonusExpireTime>=100 and t.BonusExpireTime<1000 and Mouse.Item.BonusStrength==0) then
 			Mouse.Item.BonusStrength=t.BonusExpireTime%100
 			t.BonusExpireTime=100
-		elseif (t.BonusExpireTime>=10 and t.BonusExpireTime<1000 and Mouse.Item.BonusStrength==0) then
+		elseif (t.BonusExpireTime>=10 and t.BonusExpireTime<100 and Mouse.Item.BonusStrength==0) then
 			Mouse.Item.BonusStrength=t.BonusExpireTime
 			t.BonusExpireTime=2
-		elseif Mouse.Item.BonusStrength>=10 and Mouse.Item.BonusStrength<1000 and t.BonusExpireTime==100 then
+		elseif Mouse.Item.BonusStrength>=10 and Mouse.Item.BonusStrength<1000 and t.BonusExpireTime>=100 then
 			t.BonusExpireTime=Mouse.Item.BonusStrength+100
 			Mouse.Item.Number=0
 		elseif Mouse.Item.BonusStrength>=10 and Mouse.Item.BonusStrength<1000 then
