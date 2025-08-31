@@ -2644,6 +2644,7 @@ function events.Tick()
     end
   else
     deathTimer.Text=""
+    deathCounter.Text=""
   end
 end
 
