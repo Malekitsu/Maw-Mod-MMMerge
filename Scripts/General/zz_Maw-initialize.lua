@@ -36,6 +36,9 @@ disableCompletitionMessage=false
 -- ONLINE remove travel time, training time and coaches/ships always taking everywhere possible
 onlineQualityOfLifeFeatures=true
 
+-- Beyond Madness only, death counter is shown
+showDeathCounter=true
+
 --needed to fix some weird bug, don't touch this
 Game.PatchOptions.FixMonstersBlockingShots=true
 
