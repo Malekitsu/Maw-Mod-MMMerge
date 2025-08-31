@@ -326,7 +326,11 @@ function events.ItemGenerated(t)
 			end
 		end
 		if vars.madnessMode then
-			partyLevel=((mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)^1.5
+			if madnessMapLevels[name] then
+				partyLevel=madnessMapLevels[name]
+			else
+				partyLevel=((mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)^1.5
+			end
 			mapLevel=0
 		end
 		if mapvars.mapAffixes then
@@ -1654,6 +1658,9 @@ function getItemValue(it, lootFilter)
 			end
 			if special<11 then
 				basePriceBonus=basePriceBonus*special
+				if special==10 then
+					basePriceBonus=basePriceBonus*2.5
+				end
 			else
 				basePriceBonus=basePriceBonus+special
 			end
