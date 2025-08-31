@@ -324,7 +324,7 @@ end
 
 --body building description
 function events.GameInitialized2()
-	txt=Skillz.getDesc(27,1) .. "\n\nHit Points are also increased 2% per skill point (multiplicative)"
+	txt=Skillz.getDesc(27,1) .. "\n\nHit Points are also increased 2-3-4-5% per skill point, depending on mastery."
 	Skillz.setDesc(27,1,txt)
 end
 
