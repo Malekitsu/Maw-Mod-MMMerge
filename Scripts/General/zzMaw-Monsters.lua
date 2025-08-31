@@ -2020,6 +2020,7 @@ madnessMapLevels = {
   ["Dragon Hunter's Camp"] = 253,
   ["Lair of the Wolf"] = 253,
   ["Celeste"] = 265,
+  ["Cyclops Larder"] = 272,
   ["The Small House"] = 277,
   ["Gharik's Forge"] = 279,
   ["Agar's Laboratory"] = 285,
