@@ -1023,7 +1023,7 @@ function events.PickCorpse(t)
 	if mon.NameId>300 then
 		mon.TreasureItemPercent=round(mon.TreasureItemPercent/4)
 		mon.TreasureDiceSides=math.max(round(mon.TreasureDiceSides/4),1)
-	elseif mon.NameId>220 then
+	elseif mon.NameId>220 or mon.NameId==160 then
 		mon.TreasureItemPercent=100
 		local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
 		if skill=="Broodling" then
