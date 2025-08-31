@@ -2684,18 +2684,19 @@ function events.Tick()
 end
 
 function events.Action(t)
-	if not vars.madnessMode then return end
-	if t.Action==82 then
-		SeedDeaths.apply_pending_for_current()
-	end
-	if t.Action==125 or t.Action==132 then
-		if vars.lastHitTime and vars.lastHitTime~=0 and loadWarning then
-			t.Handled=true
-			Game.ShowStatusText("Loading now will count as death, are you sure to proceed?")
+	if vars.madnessMode and showDeathCounterthen then
+		if t.Action==82 then
+			SeedDeaths.apply_pending_for_current()
 		end
-		loadWarning=false
-	else
-		loadWarning=true
+		if t.Action==125 or t.Action==132 then
+			if vars.lastHitTime and vars.lastHitTime~=0 and loadWarning then
+				t.Handled=true
+				Game.ShowStatusText("Loading now will count as death, are you sure to proceed?")
+			end
+			loadWarning=false
+		else
+			loadWarning=true
+		end
 	end
 end
 
