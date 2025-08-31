@@ -2456,7 +2456,6 @@ function events.LoadMap()
 		completition.Text=""
 	end
 end
-mlk=true
 
 local _A,_B,_C,_D
 SeedDeaths={}
