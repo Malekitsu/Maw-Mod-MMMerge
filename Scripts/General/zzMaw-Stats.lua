@@ -1288,6 +1288,9 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		AC=pl:GetArmorClass()
 		AC=pl:GetArmorClass()
 		AC=pl:GetArmorClass()--multiple times to avoid chance to hit code to interfere with AC
+		if AC>=65000 then
+			return 0
+		end		
 		if getMapAffixPower(28) then
 			AC=AC*(1-getMapAffixPower(28)/100)
 		end
@@ -1358,7 +1361,9 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 			res=playerRes
 		end
 	end
-	
+	if res>=65000 then
+		return 0
+	end		
 	if getMapAffixPower(29) then
 		res=res*(1-getMapAffixPower(29)/100)
 	end
