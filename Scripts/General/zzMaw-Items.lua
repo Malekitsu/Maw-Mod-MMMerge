@@ -1427,7 +1427,7 @@ function events.GameInitialized2()
 		[15]="Mind Resistance",
 		[16]="Body Resistance",
 		[17]="Alchemy skill",
-		[18]="Stealing skill",
+		[18]="Repair skill",
 		[19]="Disarm skill",
 		[20]="ID Item skill",
 		[21]="ID Monster skill",
