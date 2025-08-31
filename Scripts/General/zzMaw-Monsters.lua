@@ -2877,7 +2877,7 @@ end
 function nightmare()
 	if vars.madnessMode and not vars.introduction then
 		vars.introduction=true
-		Message("Beyond Madness - a word of warning.\n\nNo bolster here (except on starting maps).\n\nQuest timing matters:\n- Finish early: immediate power now, less XP.\n- Finish late: bigger XP later, no early power.\n\nRun-wide tracking:\n- On the character screen, you'll see a death counter shared across all saves of this run.\n- On the map, a red counter appears after you take damage and clears when no monsters are nearby.\n- Loading or leaving the game while that counter is red counts as a death.\n\nIf pure Madness wasn't enough for you, you're in the right place.")
+		Message("Beyond Madness - a word of warning.\n\nNo bolster here (except on starting maps).\n\nQuest timing matters:\n- Finish early: immediate power now, less XP.\n- Finish late: bigger XP later, no early power.\n\nRun-wide tracking:\n- On the character screen, you'll see a death counter shared across all saves of this run.\n- On the map, a red counter appears after you take damage and clears when no monsters are nearby.\n- Loading or leaving the game while that counter is red counts as a death.\n\nIf Insanity wasn't enough for you, you're in the right place.")
 
 	end
 	if vars.Mode==2 then
