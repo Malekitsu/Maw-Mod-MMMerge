@@ -2594,6 +2594,8 @@ end
 function events.DeathMap(t)
   if vars.madnessMode and vars.MadnessDeathSeed then
     local count,seed=SeedDeaths.on_death()
+	vars.lastHitTime=0
+	SeedDeaths.clear_pending_for_current()
     if seed then vars.MadnessDeathSeed=seed; vars.MadnessDeathCounter=count end
   end
 end
