@@ -3031,33 +3031,35 @@ function itemStats(index)
 	local endurance=tab[4]+pl.EnduranceBase+pl.EnduranceBonus+Party.SpellBuffs[2].Power
 	local endEff
 	if endurance<=21 then
-		endEff=(endurance-13)/2
+		endEff=math.floor((endurance-13)/2)
 	else
 		endEff=math.floor(endurance/5)
 	end
 	
-	local s,m=SplitSkill(pl:GetSkill(const.Skills.Bodybuilding))	
+	local s,m=SplitSkill(pl:GetSkill(const.Skills.Bodybuilding))
+	local m2=m	
 	if m==4 then
-		m=5
+		m2=5
 	end
-	BBHP=s*m
+	BBHP=s*m2
 	level=pl.LevelBonus+pl.LevelBase
 	hpScaling=Game.Classes.HPFactor[pl.Class]
 	baseHP=Game.Classes.HPBase[pl.Class]+hpScaling*(level+endEff+BBHP)
-	fullHP=baseHP+tab[8]
-	Endurancebonus=fullHP*endurance/1000
-	BBBonus=fullHP*(1.02^s-1)
-	enduranceXbb=((1+endurance/1000)*(1+((m+1)*0.01)*s)-1)*fullHP
+	fullHP1=baseHP+tab[8]
+	Endurancebonus=fullHP1*endurance/1000
+	fullHP2=fullHP1+Endurancebonus
+	BBBonus=fullHP2*((m+1)*0.01*s)
+	bbEndBonus=fullHP2+BBBonus-fullHP1
 	--used for stats
 	hpStatsMap=hpStatsMap or {}
 	hpStatsMap[id]={
 		["totalhpFromItems"]=round(tab[8]),
 		["totalEnduranceBonus"]=round(Endurancebonus+endEff*hpScaling),
-		["totalBBBonus"]=round(BBBonus+s*m*hpScaling),
+		["totalBBBonus"]=round(BBBonus+s*m2*hpScaling),
 		["totalBaseHP"]=round(Game.Classes.HPBase[pl.Class]+hpScaling*level),
 	}
 	
-	tab[8]=tab[8]+enduranceXbb+hpScaling*BBHP
+	tab[8]=tab[8]+bbEndBonus
 	
 	--get bonus stats from skills
 	
