@@ -154,6 +154,8 @@ end
 ----------------------------------------------------------------------
 --SERAPHIM
 ----------------------------------------------------------------------
+
+
 function events.GameInitialized2()
 	Game.ClassDescriptions[53]="Seraphim is a divine warrior, blessed by the gods with otherworldly powers that set him apart from mortal fighters. His origins are shrouded in mystery, but it is said that he was chosen by the divine to carry out their will on the mortal plane. Some whisper that he was born from the union of a mortal and an angel, while others believe that he was created by the gods themselves. Regardless of his origins, there is no denying the power that Seraphim wields, and his presence on the battlefield is a testament to the will of the divine.\n\nProficiency in Plate, Sword, Mace, and Shield (can't dual wield)\n3 HP and 1 mana points gained per level\n\nAbilities:\n\nGods Wrath: Attacks deal extra magic damage based on Light skill (2 damage added per point in Light and Mind)\n\nHoly Strikes: Attacking will heal the most injured party member based on Body skill (2 points per point in Body and Spirit)\n\nDivine Protection: self-heals by 25% of your HP when facing lethal attacks, 5 minutes cooldown."
 end
@@ -161,6 +163,59 @@ end
 --class ID
 seraphClass={53,54,55}
 
+--2h swords in 1h
+function events.Action(t)
+	if t.Action==133 then
+		local id=Game.CurrentPlayer
+		if i<0 or id>=Party.High then
+			Game.CurrentPlayer=0
+			id=0
+		end
+		local pl=Party[i]
+		if table.find(seraphClass, pl.Class) then
+			local it=Mouse.Item
+			if it then
+				local txt=it:T()
+				if txt.EquipStat==1 and txt.Skill==1 then
+					local s,m=SplitSkill(pl.Skills[const.Skills.Sword])
+					if m>=3 then
+						txt.EquipStat=0
+						pl.Skills[const.Skills.Sword]=JoinSkill(s,1)
+						function events.Tick()
+							events.Remove("Tick",1)
+							pl.Skills[const.Skills.Sword]=JoinSkill(s,m)
+							txt.EquipStat=1
+						end
+					end
+				elseif txt.EquipStat==4 and txt.Skill==8 then
+					local weapon=pl:GetActiveItem(1,true)
+					if weapon then
+						local txt=weapon:T()
+						if txt.EquipStat==1 and txt.Skill==1 then
+							txt.EquipStat=0
+							function events.Tick()
+								events.Remove("Tick",1)
+								txt.EquipStat=1
+							end
+						end
+					end
+				end
+			end
+			local weapon=pl:GetActiveItem(1,true)
+			local shield=pl:GetActiveItem(0,true)
+			if weapon and shield then
+				local txt=weapon:T()
+				if txt.EquipStat==1 and txt.Skill==1 then
+					txt.EquipStat=0
+					function events.Tick()
+						events.Remove("Tick",1)
+						txt.EquipStat=1
+					end
+				end
+			end
+		end
+	end
+end
 --body magic will increase healing done on attack
 --bunch of code for healing most injured player
 function indexof(table, value)
