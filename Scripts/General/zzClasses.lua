@@ -427,7 +427,8 @@ local function seraphSkills(isSeraph, id)
 		local lightDMG=lightS*lightM
 		local txt=baseSchoolsTxtSERAPH[17] .. "\n\nSeraphim damage upon attack increases depending on Mind magic, scaling with might(weapon speed and weapon damage multiplier applies).\n\n" .. "Current damage from Mind: " .. StrColor(255,0,0,mindDMG) .. "\n"
 		Skillz.setDesc(17,1,txt)
-		local txt=baseSchoolsTxtSERAPH[19] .. "\n\nSeraphim attack speed increases depending on Light magic.\n"
+		local txt = baseSchoolsTxtSERAPH[19]
+		.. StrColor(255,255,30,"\n\nLight Magic quickens the Seraphim's strikes, increasing attack speed.\n\nIts radiance lightens the blade so much that even a two-handed sword can be wielded in one hand, freeing the off hand for a shield.\n")
 		Skillz.setDesc(19,1,txt)
 		
 		--tooltips
