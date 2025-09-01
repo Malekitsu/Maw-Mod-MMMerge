@@ -49,7 +49,7 @@ function events.EvtGlobal(i) -- happens after related global evt executed
 	
 	local partyLevel=getPartyLevel()
 	if vars.madnessMode then
-		partyLevel=getTotalLevel()*3
+		partyLevel=getTotalLevel()
 	end
 	for i, Exp in pairs(LastStats.Exp) do
 		if i < Party.count then
