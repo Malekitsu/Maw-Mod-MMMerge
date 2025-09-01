@@ -45,26 +45,31 @@ Timer(evt.map[1000].last, const.Minute*5)
 evt.Map[1001] = function()
 	local i=math.round(Game.Time/const.Day)
 	if mapvars.ambush[i] and mapvars.spawnCount>0 and (Game.Time%const.Day>const.Hour*22 or Game.Time%const.Day<const.Hour*4) then
-		if mapvars.firstSpawn then
-			pseudoSpawnpoint{monster = 427,  x = Party.X, y = Party.Y, Z = 0, count = 5, powerChances = {50, 35, 15}, radius = 4000, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
-			pseudoSpawnpoint{monster = 427,  x = Party.X+4000, y = Party.Y+4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 1160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
-			pseudoSpawnpoint{monster = 427,  x = Party.X+4000, y = Party.Y-4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 1160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
-			pseudoSpawnpoint{monster = 427,  x = Party.X-4000, y = Party.Y+4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 1160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
-			pseudoSpawnpoint{monster = 427,  x = Party.X-4000, y = Party.Y-4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 1160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
-			pseudoSpawnpoint{monster = 427,  x = Party.X, y = Party.Y+4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 1160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
-			pseudoSpawnpoint{monster = 427,  x = Party.X+4000, y = Party.Y, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 1160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
-			pseudoSpawnpoint{monster = 427,  x = Party.X-4000, y = Party.Y, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 1160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
-			pseudoSpawnpoint{monster = 427,  x = Party.X, y = Party.Y-4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 1160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
+		local function transform(mon)
+			mon.Hostile = true
+			mon.ShowAsHostile = true
+			mon.Velocity=350
 		end
-		pseudoSpawnpoint{monster = 427,  x = Party.X, y = Party.Y, Z = 0, count = 3, powerChances = {50, 35, 15}, radius = 4000, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
-		pseudoSpawnpoint{monster = 427,  x = Party.X+4000, y = Party.Y+4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 4160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
-		pseudoSpawnpoint{monster = 427,  x = Party.X+4000, y = Party.Y-4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 4160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
-		pseudoSpawnpoint{monster = 427,  x = Party.X-4000, y = Party.Y+4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 4160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
-		pseudoSpawnpoint{monster = 427,  x = Party.X-4000, y = Party.Y-4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 4160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
-		pseudoSpawnpoint{monster = 427,  x = Party.X, y = Party.Y+4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 4160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
-		pseudoSpawnpoint{monster = 427,  x = Party.X+4000, y = Party.Y, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 4160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
-		pseudoSpawnpoint{monster = 427,  x = Party.X-4000, y = Party.Y, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 4160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
-		pseudoSpawnpoint{monster = 427,  x = Party.X, y = Party.Y-4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 4160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
+		if mapvars.firstSpawn then
+			pseudoSpawnpoint{monster = 427,  x = Party.X, y = Party.Y, Z = 0, count = 5, powerChances = {50, 35, 15}, radius = 4000, group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 427,  x = Party.X+4000, y = Party.Y+4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 1160, group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 427,  x = Party.X+4000, y = Party.Y-4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 1160, group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 427,  x = Party.X-4000, y = Party.Y+4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 1160, group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 427,  x = Party.X-4000, y = Party.Y-4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 1160, group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 427,  x = Party.X, y = Party.Y+4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 1160, group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 427,  x = Party.X+4000, y = Party.Y, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 1160, group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 427,  x = Party.X-4000, y = Party.Y, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 1160, group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 427,  x = Party.X, y = Party.Y-4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 1160, group = 2,transform = transform}
+		end
+		pseudoSpawnpoint{monster = 427,  x = Party.X, y = Party.Y, Z = 0, count = 3, powerChances = {50, 35, 15}, radius = 4000, group = 2,transform = transform}
+		pseudoSpawnpoint{monster = 427,  x = Party.X+4000, y = Party.Y+4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 4160, group = 2,transform = transform}
+		pseudoSpawnpoint{monster = 427,  x = Party.X+4000, y = Party.Y-4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 4160, group = 2,transform = transform}
+		pseudoSpawnpoint{monster = 427,  x = Party.X-4000, y = Party.Y+4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 4160, group = 2,transform = transform}
+		pseudoSpawnpoint{monster = 427,  x = Party.X-4000, y = Party.Y-4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 4160, group = 2,transform = transform}
+		pseudoSpawnpoint{monster = 427,  x = Party.X, y = Party.Y+4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 4160, group = 2,transform = transform}
+		pseudoSpawnpoint{monster = 427,  x = Party.X+4000, y = Party.Y, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 4160, group = 2,transform = transform}
+		pseudoSpawnpoint{monster = 427,  x = Party.X-4000, y = Party.Y, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 4160, group = 2,transform = transform}
+		pseudoSpawnpoint{monster = 427,  x = Party.X, y = Party.Y-4000, Z = 0, count = 1, powerChances = {50, 35, 15}, radius = 4160, group = 2,transform = transform}
 		mapvars.spawnCount=mapvars.spawnCount-1
 	end
 end

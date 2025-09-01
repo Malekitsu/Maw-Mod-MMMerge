@@ -148,7 +148,7 @@ function arenaSpawns()
 
 	for i=1,wave[waveState].N do
 		local location=monsterSpawnLocation[math.random(1,#monsterSpawnLocation)]
-		pseudoSpawnpoint{monster = spawn,  x = location[1], y = location[2], z = 1, count = 1, powerChances = {wave[waveState].p1, wave[waveState].p2, wave[waveState].p3}, radius = 256, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 bossId=mon:GetIndex() end}
+		pseudoSpawnpoint{monster = spawn,  x = location[1], y = location[2], z = 1, count = 1, powerChances = {wave[waveState].p1, wave[waveState].p2, wave[waveState].p3}, radius = 256, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.ShowAsHostile = true mon.Velocity=350 bossId=mon:GetIndex() end}
 	end
 	if waveState==6 then
 		bossSpawned=bossSpawned or 0
