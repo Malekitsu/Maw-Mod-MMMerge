@@ -1098,6 +1098,9 @@ function events.CalcDamageToMonster(t)
 					mapvars.spearDamageIncrease[id]=mapvars.spearDamageIncrease[id] or 0
 					local mult=damageMultiplier[t.PlayerIndex]["Melee"]
 					local damageIncrease=(2+s*0.02)*mult
+					if it:T().EquipStat==1 then
+						damageIncrease=damageIncrease*1.5
+					end
 					mapvars.spearDamageIncrease[id]=mapvars.spearDamageIncrease[id]+damageIncrease
 					local reduction=calcSpearResReduction(mapvars.spearDamageIncrease[id])
 					t.Monster.Resistances[index]=round(math.max(mapvars.originalResistance[id]-reduction,0))
