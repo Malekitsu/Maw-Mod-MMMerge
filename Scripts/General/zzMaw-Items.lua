@@ -2816,8 +2816,7 @@ function itemStats(index)
 			--SERAPHIM
 			if table.find(seraphClass, pl.Class) then	
 				local s1, m1=SplitSkill(pl:GetSkill(const.Skills.Mind))
-				local s2, m2=SplitSkill(pl:GetSkill(const.Skills.Light))
-				local bonus=s1*m1+s2*m2
+				local bonus=s1*(m1+1)
 				armsDmg=armsDmg+bonus*mult
 			end
 			--SHAMAN
