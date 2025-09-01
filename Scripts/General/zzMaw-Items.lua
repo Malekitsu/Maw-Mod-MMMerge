@@ -850,7 +850,7 @@ function events.GameInitialized2()
 			downDamage=0
 			--set goal damage for weapons (end game weapon damage)
 			goalDamage=35
-			if Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Axe" or Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Sword" or Game.ItemsTxt[i].Skill==0 then
+			if Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Axe" or Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Sword" or Game.ItemsTxt[i].NotIdentifiedName == "Halberd" or Game.ItemsTxt[i].Skill==0 then
 				goalDamage=goalDamage*2
 			end
 			currentDamage = (Game.ItemsTxt[i].Mod1DiceCount *Game.ItemsTxt[i]. Mod1DiceSides + 1)/2+Game.ItemsTxt[i].Mod2 
