@@ -23,3 +23,62 @@ do
 	mem.autohook2(0x43D02E, scaleHook(true))
 	mem.autohook2(0x43D04D, scaleHook(true))
 end
+
+
+-- make strafe speed always half of forward speed
+--   currently strafe speed is always half of forward walking speed
+--   this doubles running strafe speed
+--   this quadruples flying running strafe speed
+do
+	local hooks = HookManager()
+	do
+		local function asmpatch(p, code, size)
+			-- workaround for the fact that mem.asmpatch doesn't currently handle
+			-- the case when GetInstructionSize(p) < GetHookSize(p) correctly
+			local size1 = mem.GetInstructionSize(p)
+			local size2 = size or mem.GetHookSize(p)
+			if size1 < size2 then
+				mem.nop(p, size1)
+			end
+			return mem.asmhook(p, code, size2)
+		end
+		local function patch(p, code)
+			return hooks.AddEx(true, asmpatch, p, code)
+		end
+
+
+
+		local code = [[
+			test byte ptr [0xb21730], 0x2
+			jnz @f
+			sar eax, 0x1
+		@@:
+		]]
+
+		patch(0x471a15, code)
+		patch(0x471a45, code)
+		patch(0x471a84, code)
+		patch(0x471ab4, code)
+
+		code = [[
+			test byte ptr [0xb21730], 0x2
+			jnz @running
+			sar eax, 0x1
+			jmp @f
+		@running:
+			cmp dword ptr [0xb215a4], 0x0
+			jz @f
+			shl eax, 0x1
+		@@:
+		]]
+
+		patch(0x472cea, code)
+		patch(0x472d18, code)
+		patch(0x472d59, code)
+		patch(0x472d87, code)
+	end
+
+	function events.GameInitialized1()
+		hooks.Switch(fasterStrafing)
+	end
+end
