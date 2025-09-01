@@ -45,26 +45,31 @@ if isRedone then
 		evt.ForPlayer(0)
 		if not vars.cameBackToEmeraldIsland and evt.Cmp{"Awards", Value = 3} then         -- Return to EI
 			vars.cameBackToEmeraldIsland=true
-			pseudoSpawnpoint{monster = 205, x = 3244,y = 9265,Z = 900,count = 10,powerChances = {100,0,0},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
-			pseudoSpawnpoint{monster = 205,x = 3244,y = 9265,Z = 900,count = 10,powerChances = {100,0,0},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
-			pseudoSpawnpoint{monster = 205,x = 4406,y = 8851,Z = 900,count = 2,powerChances = {0,0,100},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
-			pseudoSpawnpoint{monster = 205,x = 500,y = 8191,Z = 700,count = 8,powerChances = {100,0,0},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
-			pseudoSpawnpoint{monster = 205,x = 5893,y = 8379,Z = 400,count = 8,powerChances = {100,0,0},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
-			pseudoSpawnpoint{monster = 205,x = 6758,y = 8856,Z = 0,count = 10,powerChances = {100,0,0},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
-			pseudoSpawnpoint{monster = 205,x = 7738,y = 7005,Z = 0,count = 2,powerChances = {0,0,100},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
-			pseudoSpawnpoint{monster = 205,x = 8402,y = 7527,Z = 0,count = 6,powerChances = {100,0,0},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
-			pseudoSpawnpoint{monster = 205,x = 9881,y = 7481,Z = 0,count = 5,powerChances = {0,100,0},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
-			pseudoSpawnpoint{monster = 205,x = 11039,y = 7117,Z = 0,count = 4,powerChances = {0,100,0},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
-			pseudoSpawnpoint{monster = 205,x = 12360,y = 6764,Z = 0,count = 7,powerChances = {100,0,0},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
-			pseudoSpawnpoint{monster = 205,x = 13389,y = 6797,Z = 0,count = 4,powerChances = {0,100,0},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
-			pseudoSpawnpoint{monster = 205,x = 14777,y = 6911,Z = 0,count = 2,powerChances = {0,0,100},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
-			pseudoSpawnpoint{monster = 205,x = 12560,y = 5717,Z = 0,count = 7,powerChances = {100,0,0},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
-			pseudoSpawnpoint{monster = 205,x = 12438,y = 4787,Z = 170,count = 5,powerChances = {100,0,0},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
-			pseudoSpawnpoint{monster = 205,x = 12481,y = 3299,Z = 0,count = 2,powerChances = {0,0,100},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
-			pseudoSpawnpoint{monster = 205,x = 12674,y = 2105,Z = 0,count = 7,powerChances = {100,0,0},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
-			pseudoSpawnpoint{monster = 205,x = 11248,y = 2852,Z = 0,count = 4,powerChances = {0,100,0},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
-			pseudoSpawnpoint{monster = 205,x = 9585,y = 5015,Z = 0,count = 6,powerChances = {100,0,0},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
-			pseudoSpawnpoint{monster = 205,x = 12205,y = 4919,Z = 170,count = 3,powerChances = {100,0,0},radius = 512,group = 2,transform = function(mon) mon.ShowOnMap = true; mon.Hostile = true; mon.Velocity = 350; end}
+			local function transform(mon)
+				mon.Hostile = true
+				mon.ShowAsHostile = true
+				mon.Velocity=350
+			end
+			pseudoSpawnpoint{monster = 205, x = 3244,y = 9265,Z = 900,count = 10,powerChances = {100,0,0},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 3244,y = 9265,Z = 900,count = 10,powerChances = {100,0,0},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 4406,y = 8851,Z = 900,count = 2,powerChances = {0,0,100},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 500,y = 8191,Z = 700,count = 8,powerChances = {100,0,0},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 5893,y = 8379,Z = 400,count = 8,powerChances = {100,0,0},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 6758,y = 8856,Z = 0,count = 10,powerChances = {100,0,0},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 7738,y = 7005,Z = 0,count = 2,powerChances = {0,0,100},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 8402,y = 7527,Z = 0,count = 6,powerChances = {100,0,0},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 9881,y = 7481,Z = 0,count = 5,powerChances = {0,100,0},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 11039,y = 7117,Z = 0,count = 4,powerChances = {0,100,0},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 12360,y = 6764,Z = 0,count = 7,powerChances = {100,0,0},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 13389,y = 6797,Z = 0,count = 4,powerChances = {0,100,0},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 14777,y = 6911,Z = 0,count = 2,powerChances = {0,0,100},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 12560,y = 5717,Z = 0,count = 7,powerChances = {100,0,0},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 12438,y = 4787,Z = 170,count = 5,powerChances = {100,0,0},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 12481,y = 3299,Z = 0,count = 2,powerChances = {0,0,100},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 12674,y = 2105,Z = 0,count = 7,powerChances = {100,0,0},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 11248,y = 2852,Z = 0,count = 4,powerChances = {0,100,0},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 9585,y = 5015,Z = 0,count = 6,powerChances = {100,0,0},radius = 512,group = 2,transform = transform}
+			pseudoSpawnpoint{monster = 205,x = 12205,y = 4919,Z = 170,count = 3,powerChances = {100,0,0},radius = 512,group = 2,transform = transform}
 
 			evt.SpeakNPC{NPC = 1184}        -- "Cristalyn"
 		end

@@ -84,11 +84,11 @@ function survivalSpawns()
 		local currentWaveCompletition=(currentWave%waveLength)/waveLength
 		local count=math.floor(currentWaveCompletition*5)
 		local spawnPower=math.round(currentWaveCompletition*100)
-		pseudoSpawnpoint{monster = spawn,  x = Party.X+x, y = Party.Y+y, Z = 0, count = count, powerChances = {50, 35, 15}, radius = 1160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
+		pseudoSpawnpoint{monster = spawn,  x = Party.X+x, y = Party.Y+y, Z = 0, count = count, powerChances = {50, 35, 15}, radius = 1160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.ShowAsHostile = true mon.Velocity=350 end}
 		goldCollectedSurvival=Party.Gold
 		--elite every end of wave
 		if currentWaveCompletition==0 then
-			pseudoSpawnpoint{monster = spawn,  x = Party.X+x, y = Party.Y+y, Z = 0, count = 1, powerChances = {0, 0, 100}, radius = 1160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
+			pseudoSpawnpoint{monster = spawn,  x = Party.X+x, y = Party.Y+y, Z = 0, count = 1, powerChances = {0, 0, 100}, radius = 1160, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.ShowAsHostile = true mon.Velocity=350 end}
 			id=Map.Monsters.High
 			generateBoss(id,monsterType)
 			frequency=300

@@ -1061,7 +1061,7 @@ function events.MonsterKilled(mon)
 		end
 	end
 	if getMapAffixPower(9) and math.random()<getMapAffixPower(9)/100 then
-		pseudoSpawnpoint{monster = mon.Id,  x = mon.X, y = mon.Y, z = mon.Z, count = 1, powerChances = {55, 30, 15}, radius = 128, group = 2,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
+		pseudoSpawnpoint{monster = mon.Id,  x = mon.X, y = mon.Y, z = mon.Z, count = 1, powerChances = {55, 30, 15}, radius = 128, group = 2,transform = function(mon) mon.Hostile = true mon.ShowAsHostile = true mon.Velocity=350 end}
 	end
 	
 	--level bonus

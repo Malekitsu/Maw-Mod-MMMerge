@@ -3165,7 +3165,7 @@ function events.GameInitialized2() --to make the after all the other code
 			skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
 			if skill=="Summoner" then
 				if math.random()<0.4 or t.DamageKind==4 then
-					pseudoSpawnpoint{monster = math.ceil(mon.Id/3)*3-2, x = (Party.X+mon.X)/2, y = (Party.Y+mon.Y)/2, z = Party.Z, count = 1, powerChances = {75, 25, 0}, radius = 64, group = 1,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
+					pseudoSpawnpoint{monster = math.ceil(mon.Id/3)*3-2, x = (Party.X+mon.X)/2, y = (Party.Y+mon.Y)/2, z = Party.Z, count = 1, powerChances = {75, 25, 0}, radius = 64, group = 1,transform = function(mon) mon.Hostile = true mon.ShowAsHostile = true mon.Velocity=350 end}
 				end
 			elseif skill=="Venomous" then
 				t.Player.Poison3=Game.Time
@@ -3184,7 +3184,7 @@ function events.GameInitialized2() --to make the after all the other code
 			
 			if skill=="Omnipotent" then
 				if math.random()<0.4 or t.DamageKind==4 then
-					pseudoSpawnpoint{monster = math.ceil(mon.Id/3)*3-2, x = (Party.X+mon.X)/2, y = (Party.Y+mon.Y)/2, z = Party.Z, count = 1, powerChances = {75, 25, 0}, radius = 64, group = 1,transform = function(mon) mon.ShowOnMap = true mon.Hostile = true mon.Velocity=350 end}
+					pseudoSpawnpoint{monster = math.ceil(mon.Id/3)*3-2, x = (Party.X+mon.X)/2, y = (Party.Y+mon.Y)/2, z = Party.Z, count = 1, powerChances = {75, 25, 0}, radius = 64, group = 1,transform = function(mon) mon.Hostile = true mon.ShowAsHostile = true mon.Velocity=350 end}
 				end
 				t.Player.Poison3=Game.Time
 				t.Player.Disease3=Game.Time
@@ -4109,7 +4109,7 @@ function events.MonsterKilled(mon)
 	local monsterSkill = string.match(Game.PlaceMonTxt[killedMonster.NameId], "([^%s]+)")
 	if monsterSkill=="Omnipotent" then
 		for i=1,#SkillList do
-			pseudoSpawnpoint{monster = killedMonster.Id,  x = killedMonster.X, y = killedMonster.Y, z = killedMonster.Z, count = 1, powerChances = {0,0,100}, radius = 512, group = 2,transform = function(spawnedMon) spawnedMon.ShowOnMap = true spawnedMon.Hostile = true spawnedMon.Velocity=350 bossId=spawnedMon:GetIndex() end}
+			pseudoSpawnpoint{monster = killedMonster.Id,  x = killedMonster.X, y = killedMonster.Y, z = killedMonster.Z, count = 1, powerChances = {0,0,100}, radius = 512, group = 2,transform = function(spawnedMon) spawnedMon.Hostile = true spawnedMon.ShowAsHostile = true spawnedMon.Velocity=350 bossId=spawnedMon:GetIndex() end}
 			generateBoss(bossId,false,SkillList[i])
 		end
 	end
@@ -4126,7 +4126,7 @@ function events.MonsterKilled(mon)
 					return
 				end
 			end
-			pseudoSpawnpoint{monster = killedMonster.Id,  x = killedMonster.X, y = killedMonster.Y, z = killedMonster.Z, count = 1, powerChances = powerChance, radius = 256, group = 2,transform = function(spawnedMon) spawnedMon.ShowOnMap = true spawnedMon.Hostile = true spawnedMon.Velocity=350 bossId=spawnedMon:GetIndex() end}
+			pseudoSpawnpoint{monster = killedMonster.Id,  x = killedMonster.X, y = killedMonster.Y, z = killedMonster.Z, count = 1, powerChances = powerChance, radius = 256, group = 2,transform = function(spawnedMon) spawnedMon.Hostile = true spawnedMon.ShowAsHostile = true spawnedMon.Velocity=350 bossId=spawnedMon:GetIndex() end}
 			generateBoss(bossId,false,"Broodling")
 		end
 	end
