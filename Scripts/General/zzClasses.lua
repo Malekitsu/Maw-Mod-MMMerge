@@ -206,17 +206,12 @@ function events.CalcDamageToMonster(t)
 		end
 		
 		--get body
-		body=data.Player:GetSkill(const.Skills.Body)
-		bodyS,bodyM=SplitSkill(body)
-		
-		--get spirit
-		spirit=data.Player:GetSkill(const.Skills.Spirit)
-		spiritS,spiritM=SplitSkill(spirit)
+		bodyS,bodyM=SplitSkill(data.Player.Skills[const.Skills.Body])
 		
 		if bodyS==0 and spiritS==0 then return end
 		
 		--Calculate heal value and apply
-		healValue=(bodyS^1.3*bodyM+spiritS^1.3*spiritM)*damageMultiplier[t.PlayerIndex]["Melee"]
+		healValue=(bodyS^1.3*bodyM)*damageMultiplier[t.PlayerIndex]["Melee"]
 		personality=data.Player:GetPersonality()
 		healValue=round(healValue*(1+personality/1000))
 		
@@ -363,30 +358,32 @@ local function seraphSkills(isSeraph, id)
 		local pers=pl:GetPersonality()
 		local healMult=1+pers/1000
 		
-		local spiritHeal=round(spiritS^1.3*spiritM*damageMultiplier[pl:GetIndex()]["Melee"]*healMult)
-		local bodyHeal=round(bodyS^1.3*bodyM*damageMultiplier[pl:GetIndex()]["Melee"]*healMult)
-		local txt=baseSchoolsTxtSERAPH[16] .. "\n\nSeraphim healing upon attack increases depending on Spirit magic, scaling with personality(weapon speed multiplier applies).\n\n" .. "Current heal from Spirit: " .. StrColor(0,255,0,spiritHeal) .. "\n"
+		local lvl=getTotalLevel()
+		local spiritReduction=round(getMonsterDamage((lvl+1)^0.325*spiritS)^0.7)
+		local txt = baseSchoolsTxtSERAPH[16] .. "\n\nSeraph Spirit strengthens the Seraph's resolve, shrugging off light hits and softening heavy blows\n" .. "Damage reduction: " .. StrColor(0,255,0,spiritReduction) .. " (applied after resistances)\n"
 		Skillz.setDesc(16,1,txt)
+		
+		local bodyHeal=round(bodyS^1.3*bodyM*damageMultiplier[pl:GetIndex()]["Melee"]*healMult)
 		local txt=baseSchoolsTxtSERAPH[18] .. "\n\nSeraphim healing upon attack increases depending on Body magic, scaling with personality(weapon speed multiplier applies).\n\n" .. "Current heal from Body: " .. StrColor(0,255,0,bodyHeal) .. "\n"
 		Skillz.setDesc(18,1,txt)
 		
 		--damage tooltip
 		local mindDMG=mindS*mindM
 		local lightDMG=lightS*lightM
-		local txt=baseSchoolsTxtSERAPH[16] .. "\n\nSeraphim damage upon attack increases depending on Mind magic, scaling with might(weapon speed and weapon damage multiplier applies).\n\n" .. "Current damage from Mind: " .. StrColor(255,0,0,mindDMG) .. "\n"
+		local txt=baseSchoolsTxtSERAPH[17] .. "\n\nSeraphim damage upon attack increases depending on Mind magic, scaling with might(weapon speed and weapon damage multiplier applies).\n\n" .. "Current damage from Mind: " .. StrColor(255,0,0,mindDMG) .. "\n"
 		Skillz.setDesc(17,1,txt)
-		local txt=baseSchoolsTxtSERAPH[18] .. "\n\nSeraphim damage upon attack increases depending on Light magic, scaling with might(weapon speed and weapon damage multiplier applies).\n\n" .. "Current damage from Light: " .. StrColor(255,0,0,lightDMG) .. "\n"
+		local txt=baseSchoolsTxtSERAPH[19] .. "\n\nSeraphim attack speed increases depending on Light magic.\n"
 		Skillz.setDesc(19,1,txt)
 		
 		--tooltips
-		Skillz.setDesc(16,2,"Melee attacks heal on hit")
-		Skillz.setDesc(16,3,"Double healing effect")
-		Skillz.setDesc(16,4,"Triple healing effect")
-		Skillz.setDesc(16,5,"n/a")
+		--Skillz.setDesc(16,2,"Melee attacks heal on hit")
+		--Skillz.setDesc(16,3,"Double healing effect")
+		--Skillz.setDesc(16,4,"Triple healing effect")
+		--Skillz.setDesc(16,5,"n/a")
 		
-		Skillz.setDesc(17,2,"Increases damage by 0.5 per Skill point")
-		Skillz.setDesc(17,3,"Increases damage by 1 per Skill point")
-		Skillz.setDesc(17,4,"Increases damage by 1.5 per Skill point")
+		Skillz.setDesc(17,2,"Increases damage by 2 per Skill point")
+		Skillz.setDesc(17,3,"Increases damage by 3 per Skill point")
+		Skillz.setDesc(17,4,"Increases damage by 4 per Skill point")
 		Skillz.setDesc(17,5,"n/a")
 		
 		Skillz.setDesc(18,2,"Melee attacks heal on hit")
@@ -394,10 +391,10 @@ local function seraphSkills(isSeraph, id)
 		Skillz.setDesc(18,4,"Triple healing effect")
 		Skillz.setDesc(18,5,"n/a")
 		
-		Skillz.setDesc(19,2,"Increases damage by 0.5 per Skill point")
-		Skillz.setDesc(19,3,"Increases damage by 1 per Skill point")
-		Skillz.setDesc(19,4,"Increases damage by 1.5 per Skill point")
-		Skillz.setDesc(19,5,"Increases damage by 2 per Skill point")
+		Skillz.setDesc(19,2,"Increased Attack speed by 1% per Skill")
+		Skillz.setDesc(19,3,"Increased Attack speed by 2% per Skill")
+		Skillz.setDesc(19,4,"Increased Attack speed by 3% per Skill")
+		Skillz.setDesc(19,5,"Increased Attack speed by 4% per Skill")
 	else
 		for key, value in pairs(baseSchoolsTxtSERAPH) do
 			Skillz.setDesc(key,1,value .. "\n")
@@ -901,15 +898,6 @@ end
 shamanClass={59, 60, 61}
 
 function events.GameInitialized2()
-	function events.CalcDamageToPlayer(t)
-		if table.find(shamanClass, t.Player.Class) and t.Player.Unconscious==0 and t.Player.Dead==0 and t.Player.Eradicated==0  then
-			m3=SplitSkill(t.Player.Skills[const.Skills.Water])
-			local lvl=getPartyLevel(4)
-			local reduction=getMonsterDamage((lvl+1)^0.325*m3)^0.7
-			t.Result=math.max(t.Result-reduction, t.Result*0.25)
-		end
-	end
-	
 	function events.CalcDamageToMonster(t)	
 		local data = WhoHitMonster()
 		if data and data.Player and table.find(shamanClass, data.Player.Class) and t.DamageKind==4 and data.Object==nil and t.Result>0 then	
