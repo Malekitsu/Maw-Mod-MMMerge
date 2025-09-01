@@ -1326,7 +1326,13 @@ function events.Tick()
 		local s,m=SplitSkill(pl:GetSkill(const.Skills.Spear))
 		local mult=damageMultiplier[pl:GetIndex()]["Melee"]
 		local damageIncrease=round((2+s*0.02)*mult*10)/10
-		Game.SkillDesGM[const.Skills.Spear]=string.format("%s\n\t070Each spear attack reduces physical resistance, increasing damage by: %s%%",baseSpearTooltip,damageIncrease)
+		local it=pl:GetActiveItem(1)
+		if it then
+			if it:T().Skill==4 and it:T().EquipStat==1 then
+				damageIncrease=damageIncrease*1.5
+			end
+		end
+		Game.SkillDesGM[const.Skills.Spear]=string.format("%s\n\t070Each spear attack reduces physical resistance, increasing damage by: %s%%\nIncreased by 50%% with Halberds",baseSpearTooltip,damageIncrease)
 	end
 end
 
