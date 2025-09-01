@@ -836,6 +836,11 @@ slotMult={2,1.25,1.5,1,1.25,1,1,1.25,1.25,0.75,1,[0]=1	}
 --weapon rework
 ----------------------
 function events.GameInitialized2()
+	--converts halberds
+	local halberds={46,47,48,49,50,507,838,839,840,1638,1639,1640}
+	for i=1,#halberds do
+		Game.ItemsTxt[i].EquipStat=1
+	end
 --Weapon upscaler 
     for i = 1, 2199 do
 		if (i>=1 and i<=83) or (i>=803 and i<=865) or (i>=1603 and i<=1665) or i>=2201 then
