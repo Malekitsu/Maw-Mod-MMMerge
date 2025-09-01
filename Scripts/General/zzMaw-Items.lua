@@ -839,7 +839,7 @@ function events.GameInitialized2()
 	--converts halberds
 	local halberds={46,47,48,49,50,507,838,839,840,1638,1639,1640}
 	for i=1,#halberds do
-		Game.ItemsTxt[i].EquipStat=1
+		Game.ItemsTxt[halberds[i]].EquipStat=1
 	end
 --Weapon upscaler 
     for i = 1, 2199 do
