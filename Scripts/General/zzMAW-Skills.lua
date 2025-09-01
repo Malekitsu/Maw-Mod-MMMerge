@@ -264,6 +264,10 @@ function events.GetAttackDelay(t)
 		local s, m=SplitSkill(t.Player.Skills[const.Skills.Water])
 		bonusSpeed=bonusSpeed+s*2
 	end
+	if table.find(seraphClass, t.Player.Class) then
+		local s, m=SplitSkill(t.Player.Skills[const.Skills.Light])
+		bonusSpeed=bonusSpeed+s*m
+	end
 	if baseSpeed==0 then
 		baseSpeed=100
 	end
