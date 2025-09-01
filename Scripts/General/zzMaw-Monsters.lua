@@ -2723,8 +2723,8 @@ function checkMapCompletition()
 
 	if (Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.completed==nil) or (Map.IndoorOrOutdoor==2 and mapvars.completed==nil) then
 		if Map.Name=="d42.blv" then return end --arena
-		n=Map.Monsters.Count
-		m=0
+		local n=Map.Monsters.Count
+		local m=0
 		if monsterKilled then
 			m=m+1
 		end
@@ -2734,10 +2734,9 @@ function checkMapCompletition()
 		]]
 		for i=0,Map.Monsters.High do
 			monster=Map.Monsters[i]
-			if monster.AIState==4 or monster.AIState==5 or monster.AIState==11 or monster.AIState==16 or monster.AIState==17 or monster.AIState==19 or monster.NameId>300 then
+			if monster.AIState==4 or monster.AIState==5 or monster.AIState==11 or monster.AIState==16 or monster.AIState==17 or monster.NameId>300 then
 				m=m+1
-			end
-			if not monster.Hostile and not monster.ShowAsHostile and monster.ShowOnMap then
+			elseif monster:IsAgainst() == 0 or monster.AIState==19 then
 				n=n-1
 			end
 		end
@@ -2750,6 +2749,7 @@ function checkMapCompletition()
 			mapvars.completition=100
 		end
 		local text=mapvars.completition .. "%"
+		local txt
 		if mapvars.completed then
 			txt=StrColor(0,255,0,text)
 		elseif (mapvars.monsterMap and mapvars.monsterMap.cleared) or not Map.IsIndoor() then
@@ -2759,7 +2759,7 @@ function checkMapCompletition()
 		end
 		completition.Text=txt
 		if m/n>=requiredRateo then
-			name=Game.MapStats[Map.MapStatsIndex].Name
+			local name=Game.MapStats[Map.MapStatsIndex].Name
 			local bolster=getPartyLevel()
 			
 			vars.dungeonCompletedList=vars.dungeonCompletedList or {}
@@ -2783,7 +2783,7 @@ function checkMapCompletition()
 				end
 				if mapvars.mapAffixes then
 					evt.Add("Items", 290)
-					assignedAffixes = {}
+					local assignedAffixes = {}
 					if math.random()<1 then
 						Mouse.Item.Bonus2=getUniqueAffix()
 					end
@@ -2804,14 +2804,14 @@ function checkMapCompletition()
 				end
 				return
 			else
-				mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
+				local mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
 				if not Game.freeProgression then
 					bolster=mapLevel*2
 				end
 				if vars.madnessMode then
 					bolster=((mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)^1.5
 				end
-			
+
 				local totalMonster=m
 				if Game.BolsterAmount==300 then
 					totalMonster=totalMonster*0.67
@@ -2819,7 +2819,7 @@ function checkMapCompletition()
 				if Game.BolsterAmount==600 then
 					totalMonster=totalMonster/2
 				end
-				if vars.InsanitMode then
+				if vars.insanityMode then
 					totalMonster=totalMonster*0.8
 				end
 				mapLevel=math.max(mapLevel,1)
@@ -2828,7 +2828,7 @@ function checkMapCompletition()
 				addBolsterExp(experience)
 				vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
 				--end
-				gold=math.ceil(experience^0.9/1000)*1000 
+				local gold=math.ceil(experience^0.9/1000)*1000 
 				evt.ForPlayer(0)
 				evt.Add{"Gold", Value = gold}
 				if not vars.AusterityMode then
