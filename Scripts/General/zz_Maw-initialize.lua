@@ -40,7 +40,7 @@ onlineQualityOfLifeFeatures=true
 showDeathCounter=true
 
 -- Faster strafing speed
-fasterStrafing=false
+fasterStrafing=true
 
 --needed to fix some weird bug, don't touch this
 Game.PatchOptions.FixMonstersBlockingShots=true
@@ -464,3 +464,4 @@ function events.LoadMap()
 		adjustSpellTooltips()	
 	end
 end
+
