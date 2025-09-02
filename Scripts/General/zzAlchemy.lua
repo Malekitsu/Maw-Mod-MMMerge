@@ -404,7 +404,7 @@ function events.BuildItemInformationBox(t)
 		index=Party[id]:GetIndex()
 		vars.expPot=vars.expPot or {}
 		vars.expPot[index]=vars.expPot[index] or 0
-		local percent=round(vars.expPot[index]/(pl.Exp-vars.expPot[index])*10000)/100
+		local percent=round(vars.expPot[index]/(Party[id].Exp-vars.expPot[index])*10000)/100
 		if percent<25 then
 			str=StrColor(0,255,0,percent .. "%")
 		else
