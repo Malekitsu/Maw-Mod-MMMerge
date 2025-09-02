@@ -82,3 +82,35 @@ do
 		hooks.Switch(fasterStrafing)
 	end
 end
+
+
+--backup, just in case
+--[[ make moving backwards always the same speed as moving forwards
+--   this was aready the case when walking and flying, so this only adjusts running while on the ground
+do
+	local hooks = HookManager()
+	do
+		local code = [[
+			shl eax, 0x1
+		]]
+		hooks.asmhook(0x471c2f, code)
+		hooks.asmhook(0x471c64, code)
+
+		code = [[
+			cmp dword ptr [ebp - 0x38], 0x0
+			jz @shift
+			cmp dword ptr [ebp - 0x60], 0x0
+			jz @f
+		@shift:
+			shl eax, 0x1
+		@@:
+		]]
+		hooks.asmhook(0x473044, code)
+		hooks.asmhook(0x473078, code)
+	end
+
+	function events.GameInitialized1()
+		hooks.Switch(fasterStrafing)
+	end
+end
+]]
