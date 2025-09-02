@@ -87,7 +87,7 @@ skillDamage =
 skillAC =
 {
 	[const.Skills.Staff]	= {[0]=0, 2, 3, 4, 6,},
-	[const.Skills.Sword]	= {[0]=0, 0, 0, 0, 1,},
+	[const.Skills.Sword]	= {[0]=0, 0, 0, 1, 2,},
 	[const.Skills.Dagger]	= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Axe]		= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Spear]	= {[0]=0, 4, 6, 8, 10,},
