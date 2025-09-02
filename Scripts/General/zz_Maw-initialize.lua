@@ -39,9 +39,6 @@ onlineQualityOfLifeFeatures=true
 -- Beyond Madness only, death counter is shown
 showDeathCounter=true
 
--- Faster strafing speed
-fasterStrafing=true
-
 --needed to fix some weird bug, don't touch this
 Game.PatchOptions.FixMonstersBlockingShots=true
 
@@ -465,3 +462,23 @@ function events.LoadMap()
 	end
 end
 
+
+--fix for inv+exit bug
+local preventAction=false
+function events.Action(t)
+	if preventAction then
+		t.Handled=true
+		function events.Tick() --just in case
+			events.Remove("Tick",1)
+			preventAction=false
+		end
+		return
+	end
+	if t.Action==168 then
+		preventAction=true
+		function events.Tick()
+			events.Remove("Tick",1)
+			preventAction=false
+		end
+	end
+end
