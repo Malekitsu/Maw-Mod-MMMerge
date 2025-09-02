@@ -339,12 +339,12 @@ function events.CalcDamageToMonster(t)
 						axeCount=axeCount+1
 					elseif table.find(twoHandedAxes, it.Number) then
 						axeCount=axeCount+1
-						axeDamageNerf=axeDamageMult-0.15
+						axeDamageMult=axeDamageMult-0.15
 					end
 				end
 			end
 			if axeCount==2 then
-				t.Result=t.Result*axeDamageNerf
+				t.Result=t.Result*axeDamageMult
 			end
 		end
 	end
