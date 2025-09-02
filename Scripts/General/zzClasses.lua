@@ -266,7 +266,7 @@ function events.CalcDamageToMonster(t)
 		if bodyS==0 and spiritS==0 then return end
 		
 		--Calculate heal value and apply
-		healValue=(bodyS^1.3*bodyM)*damageMultiplier[t.PlayerIndex]["Melee"]
+		healValue=(bodyS^1.3*bodyM*2)*damageMultiplier[t.PlayerIndex]["Melee"]
 		personality=data.Player:GetPersonality()
 		healValue=round(healValue*(1+personality/1000))
 		
@@ -418,7 +418,7 @@ local function seraphSkills(isSeraph, id)
 		local txt = baseSchoolsTxtSERAPH[16] .. "\n\nSeraph Spirit strengthens the Seraph's resolve, shrugging off light hits and softening heavy blows\n" .. "Damage reduction: " .. StrColor(0,255,0,spiritReduction) .. " (applied after resistances)\n"
 		Skillz.setDesc(16,1,txt)
 		
-		local bodyHeal=round(bodyS^1.3*bodyM*damageMultiplier[pl:GetIndex()]["Melee"]*healMult)
+		local bodyHeal=round(bodyS^1.3*bodyM*damageMultiplier[pl:GetIndex()]["Melee"]*healMult*2)
 		local txt=baseSchoolsTxtSERAPH[18] .. "\n\nSeraphim healing upon attack increases depending on Body magic, scaling with personality(weapon speed multiplier applies).\n\n" .. "Current heal from Body: " .. StrColor(0,255,0,bodyHeal) .. "\n"
 		Skillz.setDesc(18,1,txt)
 		
