@@ -462,6 +462,8 @@ local function onTick()
 end
 
 local function onKeyDown(t)
+  return
+  --[[
   if t.Key ~= const.Keys.F9 then return end
   t.Key = 0
   if Keys.IsPressed(const.Keys.CTRL) then
@@ -476,6 +478,7 @@ local function onKeyDown(t)
     local slow = Keys.IsPressed(const.Keys.SHIFT)
     dumpBosses({ slow = slow })
   end
+  ]]
 end
 
 local function onAfterLoadMap()
