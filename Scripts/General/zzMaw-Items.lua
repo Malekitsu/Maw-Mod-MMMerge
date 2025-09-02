@@ -3209,7 +3209,7 @@ function itemStats(index)
 				local bonusATK = bonus2 * (it.MaxCharges / 30)
 				
 				local bonusBase = bonus + round(bonusATK)
-				local bonusAC = round(skillAC[skill][m]*bonusBase/100*s) + bonusBase
+				local bonusAC = round(skillAC[skill][m]*bonusBase/100*s)
 				local bonusRes = round(skillResistance[skill][m]*bonusBase/100*s)
 				tab[10]=tab[10]+bonusAC
 				if skill~=0 then
