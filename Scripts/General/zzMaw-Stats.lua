@@ -1478,12 +1478,12 @@ function calcPowerVitality(pl, statsMenu)
 					axeCount=axeCount+1
 				elseif table.find(twoHandedAxes, it.Number) then
 					axeCount=axeCount+1
-					axeDamageNerf=axeDamageMult-0.15
+					axeDamageMult=axeDamageMult-0.15
 				end
 			end
 		end
 		if axeCount==2 then
-			DPS1=round(DPS1*axeDamageNerf)
+			DPS1=round(DPS1*axeDamageMult)
 		end
 	end
 	--RANGED
