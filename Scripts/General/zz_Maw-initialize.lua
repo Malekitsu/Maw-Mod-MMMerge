@@ -468,3 +468,23 @@ function events.LoadMap()
 	end
 end
 
+
+--fix for inv+exit bug
+local preventAction=false
+function events.Action(t)
+	if preventAction then
+		t.Handled=true
+		function events.Tick() --just in case
+			events.Remove("Tick",1)
+			preventAction=false
+		end
+		return
+	end
+	if t.Action==168 then
+		preventAction=true
+		function events.Tick()
+			events.Remove("Tick",1)
+			preventAction=false
+		end
+	end
+end

@@ -1718,6 +1718,7 @@ function events.MonsterKilled(mon)
 	local chances=0.001
 	local levelRequired=100
 	if vars.madnessMode then
+		levelRequired=70
 		if vars.ownedMaps>=3 then
 			return
 		end

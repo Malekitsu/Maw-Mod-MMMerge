@@ -4276,7 +4276,7 @@ function GetLevelRquirement(it)
 	end
 	
 	local equipStat=it:T().EquipStat
-	if table.find(twoHandedAxes, it.Number) then
+	if table.find(twoHandedAxes, it.Number) or table.find(twoHandedSwords, it.Number) then
 		equipStat=1
 	end
 	
