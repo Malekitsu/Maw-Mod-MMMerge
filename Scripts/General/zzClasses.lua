@@ -164,6 +164,15 @@ end
 seraphClass={53,54,55}
 
 --2h swords in 1h
+function events.GameInitialized2()
+	twoHandedSwords={}
+	for i=1,Game.ItemsTxt.High do
+		local it=Game.ItemsTxt[i]
+		if it.Skill==1 and it.EquipStat==1 then
+			table.insert(twoHandedSwords, i)
+		end
+	end
+end
 function events.Action(t)
 	if t.Action==133 then
 		local id=Game.CurrentPlayer
