@@ -39,6 +39,9 @@ onlineQualityOfLifeFeatures=true
 -- Beyond Madness only, death counter is shown
 showDeathCounter=true
 
+-- Faster strafing speed
+fasterStrafing=false
+
 --needed to fix some weird bug, don't touch this
 Game.PatchOptions.FixMonstersBlockingShots=true
 
