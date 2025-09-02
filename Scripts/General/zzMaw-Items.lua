@@ -2816,8 +2816,8 @@ function itemStats(index)
 			--SERAPHIM
 			if table.find(seraphClass, pl.Class) then	
 				local s1, m1=SplitSkill(pl:GetSkill(const.Skills.Mind))
-				local bonus=s1*(m1+1)
-				armsDmg=armsDmg+bonus*mult
+				local mindBonus=s1*(m1+1)
+				armsDmg=armsDmg+mindBonus*mult
 			end
 			--SHAMAN
 			if table.find(shamanClass, pl.Class) then	
@@ -3122,14 +3122,6 @@ function itemStats(index)
 			end
 			local s,m = SplitSkill(pl:GetSkill(skill))
 			
-			if skillAC[skill] and skillAC[skill][m] then
-				tab[10]=tab[10]+skillAC[skill][m]*s
-			end
-			if skillResistance[skill] and skillResistance[skill][m] and skill~=0 then --staff exception
-				for v=11,16 do
-					tab[v]=tab[v]+skillResistance[skill][m]*s
-				end
-			end
 			if skillAttack[skill] and skillAttack[skill][m] then
 				if i~=2 then
 					tab[40]=tab[40]+skillAttack[skill][m]*s
@@ -3148,21 +3140,6 @@ function itemStats(index)
 		end
 	end
 	
-	--staff party buff
-	local staffResistance=0
-	for i=0, Party.High do
-		local item=Party[i]:GetActiveItem(1)
-		if item then
-			local skill=item:T().Skill
-			if skill==0 then
-				local s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Staff))
-				staffResistance=staffResistance+skillResistance[skill][m]*s
-			end
-		end
-	end
-	for v=11,16 do
-		tab[v]=tab[v]+staffResistance
-	end
 	--armsmaster attack
 	local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
 	if m>0 then
@@ -3217,7 +3194,55 @@ function itemStats(index)
 		local s=SplitSkill(pl.Skills[const.Skills.Spirit])
 		shamanSpiritMult=s/100
 	end
-
+	
+	--weapon AC adding as a %, not flat
+	for j=0,1 do
+		local it=pl:GetActiveItem(j)
+		if it then
+			local txt=it:T()
+			local skill=txt.Skill
+			if skillAC[skill] or skillResistance[skill] then
+				local s,m=SplitSkill(pl:GetSkill(skill))
+				local bonus = txt.Mod2
+				local bonus2 = referenceWeaponAttack[it.Number]
+				local bonusATK = bonus2 * (it.MaxCharges / 30)
+				
+				local bonusBase = bonus + round(bonusATK)
+				local bonusAC = round(skillAC[skill][m]*bonusBase/100*s) + bonusBase
+				local bonusRes = round(skillResistance[skill][m]*bonusBase/100*s) + bonusBase
+				tab[10]=tab[10]+bonusAC
+				if skill~=0 then
+					for v=11,16 do
+						tab[v]=tab[v]+bonusRes
+					end
+				end
+			end
+		end
+	end
+	
+	--staff party buff
+	local bonusRes=0
+	for i=0, Party.High do
+		local it=Party[i]:GetActiveItem(1)
+		if it then
+			local txt=it:T()
+			local skill=txt.Skill
+			if skill==0 then
+				local s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Staff))
+				
+				local bonus = txt.Mod2
+				local bonus2 = referenceWeaponAttack[it.Number]
+				local bonusATK = bonus2 * (it.MaxCharges / 30)
+				
+				local bonusBase = bonus + round(bonusATK)
+				bonusRes = bonusRes + round(skillResistance[skill][m]*bonusBase/100*s) + bonusBase
+			end
+		end
+	end
+	for v=11,16 do
+		tab[v]=tab[v]+bonusRes
+	end
+	
 	tab[42]=tab[42]+(tab[42]+bonusDamage)*might/1000
 	tab[42]=tab[42]+(tab[42]+bonusDamage)*heroismMult 
 	tab[42]=tab[42]+(tab[42]+bonusDamage)*unarmedMult
