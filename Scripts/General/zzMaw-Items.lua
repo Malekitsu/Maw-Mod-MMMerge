@@ -3203,13 +3203,14 @@ function itemStats(index)
 			local skill=txt.Skill
 			if skillAC[skill] or skillResistance[skill] then
 				local s,m=SplitSkill(pl:GetSkill(skill))
+				s=s+10
 				local bonus = txt.Mod2
 				local bonus2 = referenceWeaponAttack[it.Number]
 				local bonusATK = bonus2 * (it.MaxCharges / 30)
 				
 				local bonusBase = bonus + round(bonusATK)
 				local bonusAC = round(skillAC[skill][m]*bonusBase/100*s) + bonusBase
-				local bonusRes = round(skillResistance[skill][m]*bonusBase/100*s) + bonusBase
+				local bonusRes = round(skillResistance[skill][m]*bonusBase/100*s)
 				tab[10]=tab[10]+bonusAC
 				if skill~=0 then
 					for v=11,16 do
@@ -3229,13 +3230,13 @@ function itemStats(index)
 			local skill=txt.Skill
 			if skill==0 then
 				local s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Staff))
-				
+				s=s+10
 				local bonus = txt.Mod2
 				local bonus2 = referenceWeaponAttack[it.Number]
 				local bonusATK = bonus2 * (it.MaxCharges / 30)
 				
 				local bonusBase = bonus + round(bonusATK)
-				bonusRes = bonusRes + round(skillResistance[skill][m]*bonusBase/100*s) + bonusBase
+				bonusRes = bonusRes + round(skillResistance[skill][m]*bonusBase/100*s) 
 			end
 		end
 	end
