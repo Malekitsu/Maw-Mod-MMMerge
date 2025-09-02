@@ -167,7 +167,7 @@ seraphClass={53,54,55}
 function events.Action(t)
 	if t.Action==133 then
 		local id=Game.CurrentPlayer
-		if i<0 or id>=Party.High then
+		if id<0 or id>Party.High then
 			Game.CurrentPlayer=0
 			id=0
 		end
