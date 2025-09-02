@@ -1,30 +1,29 @@
-local u1, u2, u4, i1, i2, i4 = mem.u1, mem.u2, mem.u4, mem.i1, mem.i2, mem.i4
-local hook, autohook, autohook2, asmpatch = mem.hook, mem.autohook, mem.autohook2, mem.asmpatch
-local max, min, round, random = math.max, math.min, math.round, math.random
-local format = string.format
 
-local function getSFTItem(p)
-	local i = (p - Game.SFTBin.Frames["?ptr"]) / Game.SFTBin.Frames[0]["?size"]
-	return Game.SFTBin.Frames[i]
-end
-
--- cosmetic change: some monsters (mainly bosses) can be larger
-local scaleHook = function(indoor)
-	return function(d)
-		local t = {Scale = d.eax, Frame = getSFTItem(d.ebx)}
-		t.MonsterIndex, t.Monster = internal.GetMonster(indoor and d.edi or (d.edi - 0x9A))
-		events.call("MonsterSpriteScale", t)
-		d.eax = t.Scale
+do
+	local function getSFTItem(p)
+		local i = (p - Game.SFTBin.Frames["?ptr"]) / Game.SFTBin.Frames[0]["?size"]
+		return Game.SFTBin.Frames[i]
 	end
+
+	-- cosmetic change: some monsters (mainly bosses) can be larger
+	local scaleHook = function(indoor)
+		return function(d)
+			local t = {Scale = d.eax, Frame = getSFTItem(d.ebx)}
+			t.MonsterIndex, t.Monster = internal.GetMonster(indoor and d.edi or (d.edi - 0x9A))
+			events.call("MonsterSpriteScale", t)
+			d.eax = t.Scale
+		end
+	end
+
+	-- outdoor
+	mem.autohook2(0x47AC26, scaleHook())
+	mem.autohook2(0x47AC46, scaleHook())
+
+	-- indoor
+	mem.autohook2(0x43D02E, scaleHook(true))
+	mem.autohook2(0x43D04D, scaleHook(true))
 end
 
--- outdoor
-autohook2(0x47AC26, scaleHook())
-autohook2(0x47AC46, scaleHook())
-
--- indoor
-autohook2(0x43D02E, scaleHook(true))
-autohook2(0x43D04D, scaleHook(true))
 
 -- make strafe speed always half of forward speed
 --   currently strafe speed is always half of forward walking speed
@@ -84,9 +83,10 @@ do
 	end
 end
 
+
 -- make moving backwards always the same speed as moving forwards
 --   this was aready the case when walking and flying, so this only adjusts running while on the ground
-do
+if false then
 	local hooks = HookManager()
 	do
 		local code = [[
@@ -113,5 +113,40 @@ do
 	end
 end
 
--- Faster strafing speed
-fasterStrafing=true
+do
+	local hooks = HookManager()
+	do
+		local code = [[
+			sar eax, 0x1
+		]]
+		hooks.asmhook(0x471ae9, code)
+		hooks.asmhook(0x471b86, code)
+
+		hooks.asmhook(0x472e1f, code)
+		hooks.asmhook(0x472e53, code)
+
+		code = [[
+			cmp dword ptr [ebp - 0x38], 0x0
+			jz @f
+			cmp dword ptr [ebp - 0x60], 0x0
+			jnz @f
+			sar eax, 0x1
+		@@:
+		]]
+
+		hooks.asmhook(0x473044, code)
+		hooks.asmhook(0x473078, code)
+
+		-- handle flying
+		hooks.AddMem(0x472ffa, 1)
+		hooks.AddMem(0x473031, 1)
+		mem.IgnoreProtection(true)
+		mem.u1[0x472ffa] = 0x1
+		mem.u1[0x473031] = 0x1
+		mem.IgnoreProtection(false)
+	end
+
+	function events.GameInitialized1()
+		hooks.Switch(slowerBackpedaling)
+	end
+end
