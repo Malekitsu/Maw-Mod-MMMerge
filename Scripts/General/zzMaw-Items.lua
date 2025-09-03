@@ -3196,6 +3196,12 @@ function itemStats(index)
 	end
 	
 	--weapon AC adding as a %, not flat
+	--vampiric code
+	lifeLeech=lifeLeech or {}
+	lifeLeech[index]=lifeLeech[index] or {}
+	lifeLeech[index]["Melee"]=0
+	lifeLeech[index]["Ranged"]=0
+	lifeLeech[index]["Spell"]=0
 	for j=0,2 do
 		local it=pl:GetActiveItem(j)
 		if it then
@@ -3218,13 +3224,7 @@ function itemStats(index)
 					end
 				end
 			end
-			--vampiric code
-			lifeLeech=lifeLeech or {}
-			lifeLeech[index]=lifeLeech[index] or {}
-			lifeLeech[index]["Melee"]=0
-			lifeLeech[index]["Ranged"]=0
-			lifeLeech[index]["Spell"]=0
-			if it.Bonus2==16 or it.Bonus==41 then
+			if it.Bonus2==16 or it.Bonus2==41 then
 				if j~=2 then
 					lifeLeech[index]["Melee"]=0.1
 				else
