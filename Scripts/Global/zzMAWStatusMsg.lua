@@ -75,7 +75,7 @@ function events.CalcDamageToMonster(t)
 		end
 		--spells
 		local spell=data.Spell
-		if spell>0 and spell<132 then
+		if spell and spell>0 and spell<132 then
 			totalHeal=baselineHeal*lifeLeech[index].Spell
 			
 			local recovery=getSpellDelay(pl,data.Spell)
