@@ -78,7 +78,7 @@ function events.CalcDamageToMonster(t)
 		if spell and spell>0 and spell<132 then
 			totalHeal=baselineHeal*lifeLeech[index].Spell
 			
-			local recovery=getSpellDelay(pl,data.Spell)
+			local recovery=getSpellDelay(pl,spell)
 			minLeech=fullHP*lifeLeech[index].Spell/5*recovery/100
 			if table.find(aoespells, spell) then
 				minLeech=minLeech/2.5
