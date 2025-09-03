@@ -54,24 +54,42 @@ function events.CalcDamageToMonster(t)
 			heal=heal*(1-getMapAffixPower(32)/100)
 		end
 		local totalHeal=0
-		
+		local minLeech=0
 		if not lifeLeech or not lifeLeech[index] then return end
 		
 		if t.DamageKind==4 then
 			--melee
 			if not data.Object then
 				totalHeal=baselineHeal*lifeLeech[index].Melee
+				
+				local recovery=pl:GetAttackDelay()
+				minLeech=fullHP*lifeLeech[index].Melee/5*recovery/100
 			end
 			--ranged
 			if data.Object and (data.Object.Spell==133 or data.Object.Spell==39) then
 				totalHeal=baselineHeal*lifeLeech[index].Ranged
+				
+				local recovery=pl:GetAttackDelay(true)
+				minLeech=fullHP*lifeLeech[index].Ranged/5*recovery/100
 			end
 		end
 		--spells
 		if t.DamageKind~=4 or (data and data.Object and data.Object.Spell==39) then
 			totalHeal=baselineHeal*lifeLeech[index].Spell
+			
+			local spell=data.Object.Spell
+			local recovery=getSpellDelay(pl,data.Object.Spell)
+			minLeech=fullHP*lifeLeech[index].Spell/5*recovery/100
+			if table.find(aoespells, spell) then
+				minLeech=minLeech/2.5
+			end
+			if spell==9 or spell==22 or spell==43 then
+				minLeech=minLeech/4
+			end
 		end 
-	
+		
+		totalHeal=math.ceil(math.max(totalHeal, minLeech))
+		
 		local overHeal=0
 		if manaLeechLeg then
 			totalHeal=totalHeal/2
