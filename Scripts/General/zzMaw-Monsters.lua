@@ -2832,7 +2832,7 @@ function checkMapCompletition()
 					bolster=mapLevel*2
 				end
 				if vars.madnessMode then
-					bolster=((mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)^1.5
+					bolster=madnessMapLevels[name]-mapLevel
 				end
 
 				local totalMonster=m
@@ -2855,10 +2855,13 @@ function checkMapCompletition()
 				evt.ForPlayer(0)
 				evt.Add{"Gold", Value = gold}
 				if not vars.AusterityMode then
-					evt.Add("Items",math.min(1050+math.ceil(mapLevel/25+0.5),1060))
-					evt.Add("Items",math.min(1050+math.ceil(mapLevel/25+0.5),1060))
-					if m>250 and mapLevel>90 then
-						evt.Add("Items", 1063)
+					local gemTier=math.ceil((mapLevel+bolster)/25+0.5),10)
+					evt.Add("Items",1050+gemTier)
+					evt.Add("Items",1050+gemTier)
+					if gemTier>10 then
+						for i=1, math.floor(gemTier/10) do
+							evt.Add("Items", 1063)
+						end
 					end
 				end
 				experience=experience*5/Party.Count
