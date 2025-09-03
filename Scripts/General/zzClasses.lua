@@ -1029,7 +1029,7 @@ local function shamanSkills(isShaman, id)
 		local fireDamage=m1/10
 		txt=baseSchoolsTxt[12] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nMelee attacks deal an extra " .. fireDamage .. "% of monster Hit points as fire damage"
 		Skillz.setDesc(12,1,txt)
-		local airReduction=1-round((1-1/(m2/100+1))*1000)/10
+		local airReduction=round((1-1/(m2/100+1))*1000)/10
 		txt=baseSchoolsTxt[13] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nReduce all damage taken by " .. airReduction .. "%\n"
 		Skillz.setDesc(13,1,txt)
 		local lvl=getPartyLevel(4)
