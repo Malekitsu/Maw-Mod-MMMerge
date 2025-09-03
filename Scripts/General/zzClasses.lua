@@ -180,7 +180,7 @@ function events.Action(t)
 			Game.CurrentPlayer=0
 			id=0
 		end
-		local pl=Party[i]
+		local pl=Party[id]
 		if table.find(seraphClass, pl.Class) then
 			local it=Mouse.Item
 			if it then
