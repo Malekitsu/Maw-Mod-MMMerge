@@ -57,6 +57,7 @@ function events.CalcDamageToMonster(t)
 		local minLeech=0
 		if not lifeLeech or not lifeLeech[index] then return end
 		
+		local isArrow=false
 		if t.DamageKind==4 then
 			--melee
 			if not data.Object then
@@ -66,7 +67,8 @@ function events.CalcDamageToMonster(t)
 				minLeech=fullHP*lifeLeech[index].Melee/5*recovery/100
 			end
 			--ranged
-			if data.Object and (data.Object.Spell==133 or data.Object.Spell==39) then
+			if data.Object and data.Object.Spell==133 then
+				isArrow=true
 				totalHeal=baselineHeal*lifeLeech[index].Ranged
 				
 				local recovery=pl:GetAttackDelay(true)
@@ -74,11 +76,11 @@ function events.CalcDamageToMonster(t)
 			end
 		end
 		--spells
-		if t.DamageKind~=4 or (data and data.Object and data.Object.Spell==39) then
+		if not isArrow and (t.DamageKind~=4 or (data and data.Spell==39)) then
 			totalHeal=baselineHeal*lifeLeech[index].Spell
 			
-			local spell=data.Object.Spell
-			local recovery=getSpellDelay(pl,data.Object.Spell)
+			local spell=data.Spell
+			local recovery=getSpellDelay(pl,data.Spell)
 			minLeech=fullHP*lifeLeech[index].Spell/5*recovery/100
 			if table.find(aoespells, spell) then
 				minLeech=minLeech/2.5
