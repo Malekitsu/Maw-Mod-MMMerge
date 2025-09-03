@@ -1962,7 +1962,6 @@ madnessMapLevels = {
   ["Barrow V"] = 76,
   ["Barrow VII"] = 76,
   ["The Hall under the Hill"] = 76,
-  ["Wasp Nest"] = 76,
   ["Zokarr's Tomb"] = 76,
   ["The Erathian Sewers"] = 80,
   ["Stone City"] = 80,
@@ -1989,6 +1988,7 @@ madnessMapLevels = {
   ["Alvar"] = 138,
   ["Ironsand Desert"] = 138,
   ["Evenmorn Island"] = 140,
+  ["Wasp Nest"] = 144,
   ["Grand Temple of the Sun"] = 148,
   ["Murmurwoods"] = 151,
   ["Temple of the Moon"] = 151,
@@ -3720,7 +3720,7 @@ function events.AfterLoadMap()
 				local mon=Map.Monsters[i]
 				local chance=mon.Level^0.5*2/100
 				if chance>math.random() and (mon.NameId==0 or mon.NameId>=220) then
-					local level=(vars.freeProgression and mon.Level) or mon.Level*2
+					local level = mon.Level
 					local possibleBuffs={6,7,8,2,23}
 					if level>=15 then
 						table.insert(possibleBuffs,1)
