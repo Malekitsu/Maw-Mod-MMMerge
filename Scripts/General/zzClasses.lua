@@ -185,16 +185,14 @@ function events.Action(t)
 			local it=Mouse.Item
 			if it then
 				local txt=it:T()
+				local s,m=SplitSkill(pl.Skills[const.Skills.Sword])
 				if txt.EquipStat==1 and txt.Skill==1 then
-					local s,m=SplitSkill(pl.Skills[const.Skills.Sword])
-					if m>=3 then
-						txt.EquipStat=0
-						pl.Skills[const.Skills.Sword]=JoinSkill(s,1)
-						function events.Tick()
-							events.Remove("Tick",1)
-							pl.Skills[const.Skills.Sword]=JoinSkill(s,m)
-							txt.EquipStat=1
-						end
+					txt.EquipStat=0
+					pl.Skills[const.Skills.Sword]=JoinSkill(s,1)
+					function events.Tick()
+						events.Remove("Tick",1)
+						pl.Skills[const.Skills.Sword]=JoinSkill(s,m)
+						txt.EquipStat=1
 					end
 				elseif txt.EquipStat==4 and txt.Skill==8 then
 					local weapon=pl:GetActiveItem(1,true)
