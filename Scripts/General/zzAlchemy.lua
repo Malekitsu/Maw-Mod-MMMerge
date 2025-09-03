@@ -643,6 +643,9 @@ function events.BuildItemInformationBox(t)
 			if vars.insanityMode then
 				mult=1.4
 			end
+			if vars.madnessMode then
+				mult=2
+			end
 			local tier=(t.Item.Number-1050)*mult
 			if t.Item.BonusStrength==1 then
 				tier=tier+10*mult
@@ -683,6 +686,9 @@ local function upgradeGem(it, tier)
 	local bolsterMult=math.max((Game.BolsterAmount-100)/2000+1,1)
 	if vars.insanityMode then
 		bolsterMult=1.4
+	end
+	if vars.madnessMode then
+		bolsterMult=2
 	end
 	local tier=tier*bolsterMult
 	--2nd enchant value
