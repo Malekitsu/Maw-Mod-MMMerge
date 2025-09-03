@@ -3196,7 +3196,7 @@ function itemStats(index)
 	end
 	
 	--weapon AC adding as a %, not flat
-	for j=0,1 do
+	for j=0,2 do
 		local it=pl:GetActiveItem(j)
 		if it then
 			local txt=it:T()
@@ -3217,6 +3217,37 @@ function itemStats(index)
 						tab[v]=tab[v]+bonusRes
 					end
 				end
+			end
+			--vampiric code
+			lifeLeech=lifeLeech or {}
+			lifeLeech[index]=lifeLeech[index] or {}
+			lifeLeech[index]["Melee"]=0
+			lifeLeech[index]["Ranged"]=0
+			lifeLeech[index]["Spell"]=0
+			if it.Bonus2==16 or it.Bonus==41 then
+				if j~=2 then
+					lifeLeech[index]["Melee"]=0.1
+				else
+					lifeLeech[index]["Ranged"]=0.05
+				end
+			elseif it.Bonus2==40 then
+				lifeLeech[index]["Spell"]=0.1
+			end
+			
+			if vars.MAWSETTINGS.buffRework=="ON" and getBuffSkill(91)>0 then
+				lifeLeech[index]["Melee"]=lifeLeech[index]["Melee"]+0.05
+				lifeLeech[index]["Ranged"]=lifeLeech[index]["Ranged"]+0.025
+				lifeLeech[index]["Spell"]=lifeLeech[index]["Spell"]+0.025
+			end
+			local race=Game.CharacterPortraits[pl.Face].Race
+			if race==const.Race.Vampire then
+				local mult=1
+				if pl.Class==40 or pl.Class==41 then
+					mult=2
+				end
+				lifeLeech[index]["Melee"]=lifeLeech[index]["Melee"]+0.05*mult
+				lifeLeech[index]["Ranged"]=lifeLeech[index]["Ranged"]+0.025*mult
+				lifeLeech[index]["Spell"]=lifeLeech[index]["Spell"]+0.025*mult
 			end
 		end
 	end
