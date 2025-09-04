@@ -707,6 +707,19 @@ function recalculateMonsterTable()
 			end
 		end
 		
+		
+		--madness
+		if vars.madnessMode and not madnessStartingMaps[name] and not mapvars.mapAffixes then
+			local baseLevel=madnessMapLevels[name]
+			local withinMapDifference=(baseMapLevel-mean)*2
+			local tierModifier=(base.Level-LevelB)*2
+			local level=baseLevel+withinMapDifference+tierModifier
+			
+			totalLevel[i]=math.max(level, 5)
+			mon.Level=math.min(totalLevel[i],255)
+			
+		end
+		
 		--arena
 		if Map.Name=="d42.blv" then
 			horizontalMultiplier=6
@@ -723,18 +736,6 @@ function recalculateMonsterTable()
 		
 		if mapvars.mawBounty then
 			totalLevel[i]=base.Level+mapvars.mawBounty
-		end
-		
-		--madness
-		if vars.madnessMode and not madnessStartingMaps[name] and not mapvars.mapAffixes then
-			local baseLevel=madnessMapLevels[name]
-			local withinMapDifference=(baseMapLevel-mean)*2
-			local tierModifier=(base.Level-LevelB)*2
-			local level=baseLevel+withinMapDifference+tierModifier
-			
-			totalLevel[i]=math.max(level, 5)
-			mon.Level=math.min(totalLevel[i],255)
-			
 		end
 		
 		--HP
