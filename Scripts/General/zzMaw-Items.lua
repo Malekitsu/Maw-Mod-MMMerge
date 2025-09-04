@@ -2795,8 +2795,8 @@ function itemStats(index)
 				mult=(1+s2*skillDamage[skill][m2]/100)
 			end
 			
-			local side=math.max(sidesBonus*mult,sidesBonus+s2*m2)
-			local add=math.max(bonus*mult,bonus+s2*m2)
+			local side=math.max(sidesBonus*mult)
+			local add=math.max(bonus*mult)
 			local armsDmg=armsmasterSkill.Damage[m]*s*mult
 			
 			--substitute with unarmed if staff
