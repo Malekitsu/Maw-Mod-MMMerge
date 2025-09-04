@@ -226,15 +226,15 @@ function recalculateMawMonster()
 			if  mon.NameId >=1 and mon.NameId<220 then
 				local oldTable=mapvars.oldUniqueMonsterTable[i]
 				--horizontal progression
+				local name=Game.MapStats[Map.MapStatsIndex].Name
 				if Game.freeProgression==false then
-					local name=Game.MapStats[Map.MapStatsIndex].Name
 					if not horizontalMaps[name] then
 						partyLvl=oldTable.Level*2
 					end
 				end
 				if vars.madnessMode then
-					if not onlineStartingMaps[Game.MapStats[Map.MapStatsIndex].Name] then
-						partyLvl=oldTable.Level^1.5
+					if not madnessStartingMaps[name] and madnessMapLevels[name] then
+						partyLvl=madnessMapLevels[name]+mapLevels[name].High-mapLevels[name].Low
 					else 
 						partyLvl=oldTable.Level*2
 					end
@@ -655,19 +655,27 @@ function recalculateMonsterTable()
 		
 		local mean=(mp.Low+mp.Mid+mp.High)/3
 		local adjust=0
+		local baseMapLevel=0
+		local adjustMult=1.5
+		if vars.madnessMode then
+			adjustMult=1
+		end
 		--scale map monsters
 		if #currentMapMonsters>0 then 
 			for j=1, #currentMapMonsters do
 				if math.abs(i-currentMapMonsters[j])<=1 then
 					if j==1 then
+						baseMapLevel=mp.Low
 						extraBolster=mp.Low-LevelB
-						adjust=(mean-mp.Low)*1.5
+						adjust=(mean-mp.Low)*adjustMult
 					elseif j==2 and #currentMapMonsters==3 then
+						baseMapLevel=mp.Mid
 						extraBolster=mp.Mid-LevelB
-						adjust=(mean-mp.Mid)*1.5
+						adjust=(mean-mp.Mid)*adjustMult
 					elseif (j==2 and #currentMapMonsters==2) or j==3 then
+						baseMapLevel=mp.High
 						extraBolster=mp.High-LevelB
-						adjust=(mean-mp.High)*1.5
+						adjust=(mean-mp.High)*adjustMult
 					end
 				end
 			end
@@ -717,17 +725,16 @@ function recalculateMonsterTable()
 			totalLevel[i]=base.Level+mapvars.mawBounty
 		end
 		
-		--online
-		if vars.madnessMode and not onlineStartingMaps[name] and not mapvars.mapAffixes then
-			if madnessMapLevels[name] then
-				bolsterLevel=madnessMapLevels[name]
-			else
-				bolsterLevel=mean^1.5+10
-			end
-			horizontalMultiplier=bolsterLevel/mean
-			flattener=(base.Level-LevelB)*horizontalMultiplier^(1/1.5) --necessary to avoid making too much difference between monster tier
-			totalLevel[i]=math.max(base.Level*horizontalMultiplier-flattener+(adjust/1.5)*(horizontalMultiplier)^(1/1.2), 5)
+		--madness
+		if vars.madnessMode and not madnessStartingMaps[name] and not mapvars.mapAffixes then
+			local baseLevel=madnessMapLevels[name]
+			local withinMapDifference=(baseMapLevel-mean)*2
+			local tierModifier=(base.Level-LevelB)*2
+			local level=baseLevel+withinMapDifference+tierModifier
+			
+			totalLevel[i]=math.max(level, 5)
 			mon.Level=math.min(totalLevel[i],255)
+			
 		end
 		
 		--HP
@@ -1279,7 +1286,7 @@ horizontalMaps={["Dagger Wound Island"] =true,
 				["Goblinwatch"]=true,
 				["Abandoned Temple"]=true,}
 				
-onlineStartingMaps={["Dagger Wound Island"] =true,
+madnessStartingMaps={["Dagger Wound Island"] =true,
 				["Emerald Island"]=true,
 				["The Temple of the Moon"]=true,
 				["The Dragon's Lair"]=true,
@@ -1920,7 +1927,7 @@ local mm6MapProgression={
 --MM6
   ["New Sorpigal"] = 1,
   ["Goblinwatch"] = 4,
-  ["Abandoned Temple"] = 5,
+  ["The Abandoned Temple"] = 5,
   ["Castle Ironfist"] = 6,
   ["Shadow Guild Hideout"] = 7,
   ["Misty Islands"] = 8,
@@ -2052,7 +2059,7 @@ local mm7MapProgression={
 local mm8MapProgression={
   --MM8
   ["Dagger Wound Island"] = 1,
-  ["The Abandoned Temple"] = 4,
+  ["Abandoned Temple"] = 4,
   ["Ravenshore"] = 5,
   ["Dire Wolf Den"] = 6,
   ["Smuggler's Cove"] = 7,
