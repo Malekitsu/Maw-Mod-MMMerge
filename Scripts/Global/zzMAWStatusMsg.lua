@@ -51,7 +51,7 @@ function events.CalcDamageToMonster(t)
 		local baselineHeal=t.Result/refHP*fullHP --basically dealing 100% of monster B HP as damage heals you by 100%
 		
 		if getMapAffixPower(32) then
-			heal=heal*(1-getMapAffixPower(32)/100)
+			baselineHeal=baselineHeal*(1-getMapAffixPower(32)/100)
 		end
 		local totalHeal=0
 		local minLeech=0
@@ -87,7 +87,6 @@ function events.CalcDamageToMonster(t)
 				minLeech=minLeech/4
 			end
 		end 
-		
 		totalHeal=math.ceil(math.max(totalHeal, minLeech))
 		
 		local overHeal=0
