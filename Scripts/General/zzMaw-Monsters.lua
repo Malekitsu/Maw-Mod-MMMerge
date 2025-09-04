@@ -234,7 +234,7 @@ function recalculateMawMonster()
 				end
 				if vars.madnessMode then
 					if not madnessStartingMaps[name] and madnessMapLevels[name] then
-						partyLvl=madnessMapLevels[name]+mapLevels[name].High-mapLevels[name].Low
+						partyLvl=madnessMapLevels[name]+(mapLevels[name].High-mapLevels[name].Mid)*2-oldTable.Level
 					else 
 						partyLvl=oldTable.Level*2
 					end
