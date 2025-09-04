@@ -2814,7 +2814,7 @@ function checkMapCompletition()
 				end
 				if mapvars.mapAffixes then
 					evt.Add("Items", 290)
-					local assignedAffixes = {}
+					assignedAffixes = {}
 					if math.random()<1 then
 						Mouse.Item.Bonus2=getUniqueAffix()
 					end
