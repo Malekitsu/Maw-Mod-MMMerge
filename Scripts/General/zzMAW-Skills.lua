@@ -1468,7 +1468,7 @@ function events.GameInitialized2()
 	for i=1,29 do
 		baseTrainers[i]=Game.HouseRules.Training[i].Quality
 		if baseTrainers[i]==-1 then
-			baseTrainers[i]=3000
+			baseTrainers[i]=2750
 		end
 		baseTrainers[i]=math.max(baseTrainers[i], 10)
 	end
@@ -1502,7 +1502,10 @@ function events.LoadMap()
 		end
 	end
 	for i=1,#trainingCenters[currentWorld] do
-		Game.HouseRules.Training[trainingCenters[currentWorld][i]].Quality=math.min(baseTrainers[trainingCenters[currentWorld][i]]+bolster+5,3000)
+		Game.HouseRules.Training[trainingCenters[currentWorld][i]].Quality=math.min(baseTrainers[trainingCenters[currentWorld][i]]+bolster+5,2750)
+		if vars.madnessMode then
+			Game.HouseRules.Training[trainingCenters[currentWorld][i]].Quality=round(baseTrainers[trainingCenters[currentWorld][i]]^1.5/10)*10
+		end
 	end
 end
 
