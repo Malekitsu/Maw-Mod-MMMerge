@@ -321,31 +321,3 @@ function calcManaShield(pl, damage)
 	
 	return damage
 end
-
-
---minotaur nerf
-function events.CalcDamageToMonster(t)
-	local data=WhoHitMonster()
-	if not data or not data.Player then return end
-	if not data.Object and t.DamageKind==4 then
-		local pl=data.Player
-		for i=0,1 do
-			local axeCount=0
-			local axeDamageMult=1
-			for i=0,1 do
-				local it=pl:GetActiveItem(i)
-				if it then
-					if table.find(oneHandedAxes, it.Number) then
-						axeCount=axeCount+1
-					elseif table.find(twoHandedAxes, it.Number) then
-						axeCount=axeCount+1
-						axeDamageMult=axeDamageMult-0.15
-					end
-				end
-			end
-			if axeCount==2 then
-				t.Result=t.Result*axeDamageMult
-			end
-		end
-	end
-end
