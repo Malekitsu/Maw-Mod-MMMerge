@@ -1647,12 +1647,13 @@ local insanityCost={0,10000,50000,250000}
 local madnessCost={0,25000,500000,2000000}
 
 local function getReqAndCost(mastery, player)
+	local pl=Party[player or Game.CurrentPlayer]
 	if vars.madnessMode then
 		local baseCost=madnessCost[mastery]
 		local cost=baseCost
 		for _, skillId in pairs(horizontalSkills) do
-			local s,m=SplitSkill(Party[player or Game.CurrentPlayer].Skills[skillId])
-			if m>=mastery and s~=0 then
+			local s,m=SplitSkill(pl.Skills[skillId])
+			if (m>=mastery and s~=0) or (vars.oldPlayerMasteries and vars.oldPlayerMasteries[pl:GetIndex()] and vars.oldPlayerMasteries[pl:GetIndex()][skillId]-1>=m) then
 				cost=cost+baseCost
 			end
 		end
@@ -1661,8 +1662,8 @@ local function getReqAndCost(mastery, player)
 		local baseCost=insanityCost[mastery]
 		local cost=baseCost
 		for _, skillId in pairs(horizontalSkills) do
-			local s,m=SplitSkill(Party[player or Game.CurrentPlayer].Skills[skillId])
-			if m>=mastery and s~=0 then
+			local s,m=SplitSkill(pl.Skills[skillId])
+			if m>=mastery and s~=0 or (vars.oldPlayerMasteries and vars.oldPlayerMasteries[pl:GetIndex()] and vars.oldPlayerMasteries[pl:GetIndex()][skillId]-1>=m) then
 				cost=cost+baseCost
 			end
 		end
