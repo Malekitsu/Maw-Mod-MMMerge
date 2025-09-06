@@ -732,76 +732,49 @@ function events.CalcDamageToPlayer(t)
 		data=nil
 	end
 	local pl=t.Player
-	local lvl=0
-	if data and data.Monster then
-		local mon=data.Monster
-		lvl=getMonsterLevel(mon)
+	
+	if reflectedDamage then
+		reflectedDamage=false
+		t.Result=t.Result^0.9
+		return
 	end
-	--dodging DODGE 
-	local dodging=0
-	local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Dodging))
-	if Mas == 4 then
-		dodging=Skill+10
+	--PAIN REFLECTION FIX
+	if painReflectionHit then
+		painReflectionHit=false
+		t.Result=t.Result^0.85
+		return
 	end
-	dodgeChance=1-0.995^(dodging)
-	if Game.CharacterPortraits[pl.Face].Race==const.Race.Dragon then
-		dodgeChance=0
+	if pl.SpellBuffs[10].ExpireTime>Game.Time then
+		reflecting=true
 	end
-	if table.find(assassinClass,pl.Class) then
-		local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Air))
-		dodgeChance=1-0.995^Skill+0.05
-	end
-	roll=math.random()
-	if roll<=dodgeChance then
-		t.Result=0
-		evt.FaceExpression{Player = t.PlayerIndex, Frame = 33}
+	
+	if not (data) or not (data and data.Monster) then
+		if (t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1 then --drown and fall
+			local name=Game.MapStats[Map.MapStatsIndex].Name
+			local bolster=getPartyLevel()
+			local mapLevel=mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High
+			if vars.madnessMode then
+				mapLevel=madnessMapLevels[name]
+			elseif vars.freeProgression then
+				mapLevel=bolster+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
+			end
+			if mapvars.mapAffixes then
+				mapLevel=(mapvars.mapAffixes.Power*10+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)
+			end
+			--trap and objects multiplier
+			local damage=getMonsterDamage(false, mapLevel)
+			
+			if data and data.Object and data.Object.SpellType==15 then 
+				damage=damage/3
+			end
+			local s,m=SplitSkill(t.Player.Skills[const.Skills.Perception])
+			damage=damage*math.min((11-m*2)/10,1)
+			t.Result=calcMawDamage(t.Player,t.DamageKind,damage)
+		end
+		
 		return
 	end
 	
-	if t.Damage==0 and t.Result==0 then return end
-	--works for attack 1 and 2
-	if data and data.Monster then --manually recalculate monster damage
-		if data.MonsterAction<=1 then
-			local atk=data.Monster["Attack" .. data.MonsterAction+1]
-			local damage=atk.DamageAdd
-			for i=1,atk.DamageDiceCount do
-				damage=damage+math.random(1, atk.DamageDiceSides)
-			end
-			t.DamageKind=atk.Type
-			t.Damage=damage
-		end
-		if mapvars.nameIdMult and mapvars.nameIdMult[data.Monster.NameId] and mapvars.nameIdMult[data.Monster.NameId][data.MonsterAction+1] then
-			t.Damage=t.Damage*(math.max(mapvars.nameIdMult[data.Monster.NameId][data.MonsterAction+1],1)) --temporary fix
-		elseif data.MonsterAction<=1 then
-			t.Damage=t.Damage*overflowMult[data.Monster.Id][data.MonsterAction+1]
-		end
-	end
-	
-	if t.DamageKind==4 and pl.SpellBuffs[26].ExpireTime>Game.Time then --mistform 
-		t.Damage=t.Damage*0.25
-	end
-	if t.Monster and t.Monster.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime>=Game.Time then
-		t.Damage=t.Damage/2
-	end
-	--recalculate spells damage
-	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
-		local skill=SplitSkill(data.Monster.SpellSkill)
-		damage=Game.Spells[data.Object.Spell].DamageAdd
-		if skill>0 then
-			for i=1,skill do 
-				damage=damage+math.random(1,Game.Spells[data.Object.Spell].DamageDiceSides)
-			end
-			t.Result=damage
-			t.Damage=damage
-			if t.DamageKind==4 then
-				t.DamageKind=3
-			end
-		end
-	end
-	--mapping
-	if getMapAffixPower(14) and math.random()<getMapAffixPower(14) then
-		t.DamageKind=12
-	end
 	--carnage fix
 	if data and data.Player and data.Spell==133 then
 		t.Result=0
@@ -824,102 +797,89 @@ function events.CalcDamageToPlayer(t)
 		return
 	end
 	
+	local mon=data.Monster
+	local lvl=getMonsterLevel(mon)
+
+	--dodging DODGE 
+	local dodging=0
+	local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Dodging))
+	if Mas == 4 then
+		dodging=Skill+10
+	end
+	local dodgeChance=1-0.995^(dodging)
+	if Game.CharacterPortraits[pl.Face].Race==const.Race.Dragon then
+		dodgeChance=0
+	end
+	if table.find(assassinClass,pl.Class) then
+		local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Air))
+		dodgeChance=1-0.995^Skill+0.05
+	end
+	roll=math.random()
+	if roll<=dodgeChance then
+		t.Result=0
+		evt.FaceExpression{Player = t.PlayerIndex, Frame = 33}
+		return
+	end
+	
+	local damage=getMonsterDamage(mon)
+	--works for attack 1 and 2
+	if data.MonsterAction==1 then
+		local atk1=mon["Attack1"]
+		local damage1=atk1.DamageAdd
+		for i=1,atk1.DamageDiceCount do
+			damage1=damage1+(atk1.DamageDiceSides+1)/2
+		end
+		local atk2=mon["Attack2"]
+		local damage2=atk2.DamageAdd
+		for i=1,atk2.DamageDiceCount do
+			damage2=damage2+(atk2.DamageDiceSides+1)/2
+		end
+		local mult=damage2/damage1
+		
+		t.DamageKind=atk2.Type
+		t.Damage=damage*mult
+	elseif data.MonsterAction==0 then
+		local atk=mon["Attack1"]
+		t.DamageKind=atk.Type
+		t.Damage=damage
+		
+	end
+	
+	if t.Damage==0 and t.Result==0 then return end
+
+	if t.DamageKind==4 and pl.SpellBuffs[26].ExpireTime>Game.Time then --mistform 
+		t.Damage=t.Damage*0.25
+	end
+
+	--mapping
+	if getMapAffixPower(14) and math.random()<getMapAffixPower(14) then
+		t.DamageKind=12
+	end
+	
 	--apply Damage
 	--modify spell damage as it's not handled in maw-monsters
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
-		oldLevel=BLevel[data.Monster.Id]
-		local bonus=math.max((lvl^0.88-oldLevel^0.88),0)
-		dmgMult=getMonsterDamage(lvl,"baseMult")
-		if data.Object.Spell==6 or data.Object.Spell==97 then
-			dmgMult=dmgMult/2
+		local damage=getMonsterDamage(mon)
+		if monsterSpellMultiplierList[data.Object.Spell] then
+			damage=damage*monsterSpellMultiplierList[data.Object.Spell]
 		end
-		t.Damage=(t.Damage+bonus)*dmgMult
+		t.Damage=damage
 	end
+	t.Damage=round(t.Damage)
+	--randomize
+	local roll=(math.random(75,125)+math.random(75,125))/200
+	t.Damage=t.Damage*roll
+	
+	if t.Monster and t.Monster.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime>=Game.Time then
+		t.Damage=t.Damage/2
+	end
+	
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
 		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,false,lvl) -- spell randomization is off
 	elseif data and data.Monster then
 		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,false,lvl)
 	else
 		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true)
-	end
-	if reflectedDamage then
-		reflectedDamage=false
-		t.Result=t.Result^0.9
-		return
-	end
-	--PAIN REFLECTION FIX
-	if painReflectionHit then
-		painReflectionHit=false
-		t.Result=t.Result^0.85
-		return
-	end
-	if pl.SpellBuffs[10].ExpireTime>Game.Time then
-		reflecting=true
-	end
-	--add difficulty related damage
-	if Game.BolsterAmount%50~=0 then
-		Game.BolsterAmount=100
-	end
-	local lvl=false
-	if data and data.Monster then
-		lvl=getMonsterLevel(data.Monster)
-	end
-	--Check for any difficulty
-	if Game.BolsterAmount<=200 then
-		if data and data.Monster then
-			t.Result=t.Result*getMonsterDamage(lvl,"diffMult")
-		end
-	end
-	if Game.BolsterAmount==300 then
-		if data and data.Monster then
-			t.Result=t.Result*getMonsterDamage(lvl,"diffMult")
-		elseif ((t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1) then --drown and fall
-			name=Game.MapStats[Map.MapStatsIndex].Name
-			local bolster=getPartyLevel()
-			if vars.freeProgression then
-				mapLevel=bolster+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
-			else
-				mapLevel=mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High
-			end
-			
-			--trap and objects multiplier
-			mult=(mapLevel/20+1)*3
-			if data and data.Object and data.Object.SpellType==15 then 
-				bonusDamage=mapLevel/24
-			else
-				bonusDamage=mapLevel/8
-			end
-			damage=(t.Damage+bonusDamage)*mult
-			local s,m=SplitSkill(t.Player.Skills[const.Skills.Perception])
-			damage=damage*math.min((11-m*2)/10,1)
-			t.Result=math.min(calcMawDamage(t.Player,t.DamageKind,damage),mapLevel*10)
-		end
-	end
-	if vars.Mode==2 then
-	
-		if data and data.Monster then
-			t.Result=t.Result*getMonsterDamage(lvl,"diffMult")
-		elseif (t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1 then --drown and fall
-			name=Game.MapStats[Map.MapStatsIndex].Name
-			local bolster=getPartyLevel()
-			if vars.freeProgression then
-				mapLevel=bolster+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
-			else
-				mapLevel=mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High
-			end
-			if mapvars.mapAffixes then
-				mapLevel=(mapvars.mapAffixes.Power*10+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)
-			end
-			--trap and objects multiplier
-			local damage=getMonsterDamage(mapLevel)
-			
-			if data and data.Object and data.Object.SpellType==15 then 
-				damage=damage/3
-			end
-			local s,m=SplitSkill(t.Player.Skills[const.Skills.Perception])
-			damage=damage*math.min((11-m*2)/10,1)
-			t.Result=calcMawDamage(t.Player,t.DamageKind,damage)
-		end
 	end
 	
 	local DiseaseDamage = 1
@@ -1297,7 +1257,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		if getMapAffixPower(28) then
 			AC=AC*(1-getMapAffixPower(28)/100)
 		end
-		local divider=math.min(120+monLvl*0.75*bolster,600*bolster)
+		local divider=math.min(90+monLvl*0.75*bolster,600*bolster)
 		local reduction=AC/divider+1
 		local damage=round(damage/reduction)
 		
@@ -1467,6 +1427,7 @@ function calcPowerVitality(pl, statsMenu)
 	end
 	DPS1=round((dmg*(1+math.min(critChance,1)*(critMult-1))+enchantDamage)/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Melee"]*math.max(critChance,1))
 	
+
 	--RANGED
 	local low=pl:GetRangedDamageMin()
 	local high=pl:GetRangedDamageMax()
@@ -1640,3 +1601,149 @@ function events.GetSkill(t)
 		setUnarmedToZero=setUnarmedToZero-1
 	end
 end
+
+--average
+function GetPlayerExtimatedVitality(lvl)
+	local baseHP=25
+	local baseScaling=3
+	local endScaling=9
+	local maxPromotionLevel=250
+	if vars.madnessMode then
+		maxPromotionLevel=500
+	end
+	local scalingHP=math.min((endScaling-baseScaling)*lvl/maxPromotionLevel,endScaling-baseScaling)+baseScaling
+	local health=baseHP+scalingHP*(lvl)
+	
+	
+	local statsPerLevel=2
+	if vars.insanityMode then
+		statsPerLevel=5
+	elseif vars.Mode==2 then
+		statsPerLevel=4
+	elseif Game.BolsterAmount==300 then
+		statsPerLevel=3
+	elseif Game.BolsterAmount==200 then
+		statsPerLevel=2.5
+	elseif Game.BolsterAmount==150 then
+		statsPerLevel=2
+	end
+	
+	local levelCap=700
+	if vars.madnessMode then
+		levelCap=1050
+	end
+	local levelMult=math.min(lvl/levelCap,1)
+	
+	local extimatedEndurance=statsPerLevel*lvl
+	
+	local healthPower=statsPerLevel*lvl/10
+	local extimatedHealthBonus=healthPower*math.min(1+healthPower/50,5)*4	
+	
+	local enduranceEffect=math.floor(extimatedEndurance/5)
+	local skill=lvl^0.7
+	local masterLearned=12
+	if vars.madnessMode then
+		masterLearned=30
+	elseif vars.insanityMode then
+		masterLearned=20
+	end
+	local bbMasteryBonus=math.min(1+skill/masterLearned*2,3) --use master as a reference
+	local bbPercentBonus=bbMasteryBonus+1
+	health=health+(enduranceEffect+bbMasteryBonus)*scalingHP+extimatedHealthBonus
+	
+	health=health*(1+bbPercentBonus*skill/100)*(1+extimatedEndurance/1000)
+	
+	local armorClass=statsPerLevel*lvl
+	
+	local bolster=1
+	if vars.insanityMode then
+		bolster=3
+	end
+	
+	local bolster=(math.max(Game.BolsterAmount, 100)/100-1)/4+1
+	if vars.insanityMode then
+		bolster=3
+	end
+	
+	local divider=math.min(90+lvl*0.75*bolster,600*bolster)
+	local armorReduction=armorClass/divider+1
+	local blockAC=armorClass/math.max(Game.BolsterAmount/100,1)
+	local blockChanceVitMultiplier= 1/((5+lvl*2)/(10+lvl*2+blockAC))
+	local totalArmorReduction=armorReduction*blockChanceVitMultiplier
+	
+	local resistances=armorClass*2/3
+	
+	local divider=math.min(60+lvl*0.75*bolster,400*bolster)
+	local resReduction=resistances/divider+1
+	local shieldBuff=math.max((1-0.006*lvl^0.65),0.7) --starts with no shield gradually into max res at ~400 lvl
+	resReduction=resReduction/shieldBuff
+	local power=statsPerLevel*lvl/12 
+	
+	local ringReduction=(power/100+1)
+	resReduction=resReduction*ringReduction
+	
+	local averageReduction=(totalArmorReduction+resReduction)/2
+	
+	local vitality=health*averageReduction
+	
+	return vitality, totalArmorReduction, resReduction, averageReduction , health
+	
+end
+
+function getMonsterDamage(mon, level)
+	local hitToKill={20,15,10,8,7,6,5,4.5,4}
+	if mon then
+		local id=mon.Id
+		if id%3==1 then
+			id=id+1
+		elseif id%3==0 then
+			id=id-1
+		end
+		level=mon and totalLevel[id] or level
+	end
+	local vitality=GetPlayerExtimatedVitality(level)
+	local hits=hitToKill[3] --baseline MAW
+	if vars.madnessMode then
+		hits=hitToKill[9]
+	elseif vars.insanityMode then
+		hits=hitToKill[8]
+	elseif vars.Mode==2 then
+		hits=hitToKill[7]
+	elseif Game.BolsterAmount==300 then
+		hits=hitToKill[6]
+	elseif Game.BolsterAmount==200 then
+		hits=hitToKill[5]
+	elseif Game.BolsterAmount==150 then
+		hits=hitToKill[4]
+	elseif Game.BolsterAmount==100 then
+		hits=hitToKill[3]
+	elseif Game.BolsterAmount==70 then
+		hits=hitToKill[2]
+	elseif Game.BolsterAmount==40 then
+		hits=hitToKill[1]
+	end
+	local damage=vitality/hits
+	
+	if not mon then
+		return damage
+	end
+	
+	if mon.Id%3==1 then
+		damage=damage*0.66
+	elseif mon.Id%3==0 then
+		damage=damage*1.5
+	end
+	if mon.NameId>=220 and mon.NameId<=300 then
+		if mapvars.nameIdMult and mapvars.nameIdMult[mon:GetIndex()] then
+			damage=damage*mapvars.nameIdMult[mon:GetIndex()]
+		end
+	end
+	return damage
+end
+
+
+--[[
+for i=1,1000 do
+	print(round(getMonsterDamage(i)/GetPlayerExtimatedVitality(i)*100)/100)
+end
+]]
