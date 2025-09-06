@@ -302,7 +302,7 @@ function calcManaShield(pl, damage)
 	if s > 0 and vars.manaShield and vars.manaShield[slot] then
 		local currentHP = pl.HP
 		local totalHP = pl:GetFullHP()
-		local pl.SP=pl.SP-getMaxMana(pl)*0.05
+		pl.SP=pl.SP-getMaxMana(pl)*0.05
 		local restoreMana=math.min(getMaxMana(pl)*0.05,getMaxMana(pl)*0.05+pl.SP)
 		local mana = pl.SP
 
