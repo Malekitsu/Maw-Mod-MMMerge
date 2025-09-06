@@ -1156,7 +1156,7 @@ function events.BuildItemInformationBox(t)
 				if vars.itemStatsFix then
 					if (t.Item.Bonus==8 or t.Item.Bonus==9) then
 						local mult=GetSlotMult(it)
-						power=round(power*(1+math.min(power/50/mult,4)))
+						power=round(power*(1+math.min(power/50/mult,5)))
 					elseif t.Item.Bonus==10 then
 						--power=round(power*0.667)
 					end
@@ -1185,7 +1185,7 @@ function events.BuildItemInformationBox(t)
 				if vars.itemStatsFix then
 					if (bonus==8 or bonus==9) then
 						local mult=GetSlotMult(it)
-						strength=round(strength*(1+math.min(strength/50/mult,4)))
+						strength=round(strength*(1+math.min(strength/50/mult,5)))
 					elseif bonus==10 then
 						--strength=round(strength*0.667)
 					end
@@ -1230,7 +1230,7 @@ function events.BuildItemInformationBox(t)
 					end
 					if stat==8 or stat==9 then
 						GetSlotMult(t.Item)
-						power=power*(1+math.min(power/50/mult,4))
+						power=power*(1+math.min(power/50/mult,5))
 					elseif stat==10 then
 						--power=power*0.667
 					end
@@ -2619,7 +2619,7 @@ function itemStats(index)
 			if vars.itemStatsFix then
 				if (it.Bonus==8 or it.Bonus==9) then
 					local mult=GetSlotMult(it)
-					power=round(power*(1+math.min(power/50/mult,4)))
+					power=round(power*(1+math.min(power/50/mult,5)))
 				elseif it.Bonus==10 then
 					--power=round(power*0.667)
 				end
@@ -2672,7 +2672,7 @@ function itemStats(index)
 			if vars.itemStatsFix then
 				if (bonus==8 or bonus==9) then
 					local mult=GetSlotMult(it)
-					power=round(power*(1+math.min(power/50/mult,4)))
+					power=round(power*(1+math.min(power/50/mult,5)))
 				elseif bonus==10 then
 					--power=round(power*0.667)
 				end
