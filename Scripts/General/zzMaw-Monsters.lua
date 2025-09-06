@@ -293,15 +293,7 @@ function recalculateMawMonster()
 				local HPproportion=mon.HP/mon.FullHP
 				mon.FullHP=HP
 				mon.HP=mon.FullHP*HPproportion
-				
-				--damage
-				dmgMult=(mapvars.uniqueMonsterLevel[i]/9+1.15)*((mapvars.uniqueMonsterLevel[i]+2)/(oldLevel+2))*(1+(mapvars.uniqueMonsterLevel[i]/200))
-				atk1=mon.Attack1
-				atk1.DamageAdd, atk1.DamageDiceSides, atk1.DamageDiceCount, extraMult1 = calcDices(oldTable.Attack1.DamageAdd,oldTable.Attack1.DamageDiceSides,oldTable.Attack1.DamageDiceCount,dmgMult)
-				atk2=mon.Attack2
-				atk2.DamageAdd, atk2.DamageDiceSides, atk2.DamageDiceCount, extraMult2 = calcDices(oldTable.Attack2.DamageAdd,oldTable.Attack2.DamageDiceSides,oldTable.Attack2.DamageDiceCount,dmgMult)
-				mapvars.nameIdMult=mapvars.nameIdMult or {}
-				mapvars.nameIdMult[mon.NameId]={extraMult1, extraMult2}
+
 			elseif mon.NameId>=220 and mon.NameId<300 then
 				local txt=Game.MonstersTxt[mon.Id]
 				local index=mon:GetIndex()
@@ -341,20 +333,13 @@ function recalculateMawMonster()
 					mon.FullHP=HP
 					mon.HP=mon.FullHP*HPproportion
 				end
-				local addMultiplier=false
 				if mapvars.nameIdMult and not mapvars.nameIdMult[mon.NameId] then
-					addMultiplier=true
-				end
-				if not mapvars.nameIdMult then
-					addMultiplier=true
-				end
-				if addMultiplier then
 					local dmgMult=1.5+math.random()*0.5
 					if getMapAffixPower(18) then
 						dmgMult=dmgMult*(1+getMapAffixPower(18)/100)
 					end
 					mapvars.nameIdMult=mapvars.nameIdMult or {}
-					mapvars.nameIdMult[mon.NameId]={overflowMult[mon.Id][1]*dmgMult, overflowMult[mon.Id][2]*dmgMult}
+					mapvars.nameIdMult[mon.NameId]=dmgMult
 				end
 			end
 		end
@@ -710,7 +695,7 @@ function recalculateMonsterTable()
 		
 		--madness
 		if vars.madnessMode and not madnessStartingMaps[name] and not mapvars.mapAffixes then
-			local baseLevel=madnessMapLevels[name]
+			local baseLevel=madnessMapLevels[name] or 0
 			local withinMapDifference=(baseMapLevel-mean)*2
 			local tierModifier=(base.Level-LevelB)*2
 			local level=baseLevel+withinMapDifference+tierModifier
@@ -848,15 +833,6 @@ function recalculateMonsterTable()
 		end
 		
 		mon.ArmorClass=base.ArmorClass*((levelMult+10)/(LevelB+10))
-		
-		dmgMult=getMonsterDamage(levelMult,"baseMult")
-		--DAMAGE COMPUTATION
-		atk1=base.Attack1
-		mon.Attack1.DamageAdd, mon.Attack1.DamageDiceSides, mon.Attack1.DamageDiceCount, extraMult1 = calcDices(atk1.DamageAdd,atk1.DamageDiceSides,atk1.DamageDiceCount,dmgMult,bonusDamage)
-		atk2=base.Attack2
-		mon.Attack2.DamageAdd, mon.Attack2.DamageDiceSides, mon.Attack2.DamageDiceCount, extraMult2 = calcDices(atk2.DamageAdd,atk2.DamageDiceSides,atk2.DamageDiceCount,dmgMult,bonusDamage)
-		overflowMult=overflowMult or {}
-		overflowMult[i]={extraMult1, extraMult2}
 	end
 	--adjust damage if it's too similiar between monster type
 	--if bolsterLevel>10 or Game.freeProgression==false or vars.onlineMode then
@@ -889,8 +865,6 @@ function recalculateMonsterTable()
 			else
 				dmgMult2=math.min(math.max(currentBaseDamage/bBaseDamage,0.75),1.3)
 			end			
-			overflowMult=overflowMult or {}
-			overflowMult[i]={overflowMult[i][1]*dmgMult1, overflowMult[i][2]*dmgMult2}
 		end
 			
 	end
@@ -938,7 +912,6 @@ function recalculateMonsterTable()
 				mon.Attack2.DamageDiceCount=math.ceil(mon.Attack1.DamageDiceCount/1.4)
 				mon.Attack2.DamageDiceSides=math.ceil(mon.Attack1.DamageDiceSides/1.4)
 				mon.Attack2.Missile=1
-				overflowMult[mon.Id][2]=overflowMult[mon.Id][1]
 			end
 		end
 	else --restore to previous
@@ -2214,6 +2187,33 @@ function getMonsterLevel(mon)
 	return lvl
 end
 
+function events.GameInitialized2()
+	monsterSpellMultiplierList={
+		[const.Spells.FireBolt]=0.75,
+		[const.Spells.LightningBolt]=0.95,
+		[const.Spells.PoisonSpray]=0.5,
+		[const.Spells.Fireball]=0.5,
+		[const.Spells.LightBolt]=1.1,
+		[const.Spells.Incinerate]=1.35,
+		[const.Spells.AcidBurst]=1.15,
+		[const.Spells.IceBlast]=1.2,
+		[const.Spells.Blades]=1.1,
+		[const.Spells.RockBlast]=0.6,
+		[const.Spells.Sparks]=0.5,
+		[const.Spells.Implosion]=0.8,
+		[const.Spells.MassDistortion]=0.4,
+		[const.Spells.Shrapmetal]=0.4,
+		[const.Spells.MindBlast]=0.8,
+		[const.Spells.IceBlast]=0.75,
+		[const.Spells.DragonBreath]=0.7,
+		[const.Spells.Harm]=0.75,
+		[const.Spells.ToxicCloud]=1.15,
+		[const.Spells.PsychicShock]=1.25,
+		[const.Spells.MeteorShower]=0.3,
+		[const.Spells.DeadlySwarm]=0.85,
+	}
+end
+
 function events.BuildMonsterInformationBox(t)
 	lastMonsterNumber=lastMonsterNumber or Map.Monsters.High
 	if lastMonsterNumber~=Map.Monsters.High then
@@ -2231,21 +2231,16 @@ function events.BuildMonsterInformationBox(t)
 		t.ArmorClass.Text=string.format("Level:          " .. lvl .. "\n" .. t.ArmorClass.Text)
 	end
 	--difficulty multiplier
-	local diff=getMonsterDamage(lvl,"diffMult")
+	local damage=getMonsterDamage(mon)
 	if getMapAffixPower(1) then
 		diff=diff*(1+getMapAffixPower(1)/100)
 	end
-	local extraMult={1,1}
-	if mapvars.nameIdMult and mapvars.nameIdMult[mon.NameId] and mapvars.nameIdMult[mon.NameId] then
-		extraMult={mapvars.nameIdMult[mon.NameId][1],mapvars.nameIdMult[mon.NameId][2]}
-	else
-		extraMult={overflowMult[mon.Id][1],overflowMult[mon.Id][2]}
-	end
+	
 	--some statistics here, calculate the standard deviation of dices to get the range of which 95% will fall into
-	mean=mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*(mon.Attack1.DamageDiceSides+1)/2
-	range=(mon.Attack1.DamageDiceSides^2*mon.Attack1.DamageDiceCount/12)^0.5*1.96
-	lowerLimit=round(math.max(mean-range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount)*diff*extraMult[1])
-	upperLimit=round(math.min(mean+range, mon.Attack1.DamageAdd+mon.Attack1.DamageDiceCount*mon.Attack1.DamageDiceSides)*diff*extraMult[1])
+	mean=damage
+	range=((damage*1.25-damage*0.75)^2/12/2)^0.5*1.96
+	lowerLimit=round(math.max(mean-range, damage*0.75))
+	upperLimit=round(math.min(mean+range, damage*1.25))
 	
 	text=string.format(table.find(const.Damage,mon.Attack1.Type))
 	if not baseDamageValue and Game.CurrentPlayer>=0 then
@@ -2257,11 +2252,13 @@ function events.BuildMonsterInformationBox(t)
 	if t.IdentifiedDamage or t.IdentifiedAttack then
 		t.Damage.Text=string.format("Attack 00000	050" .. lowerLimit .. "-" .. upperLimit .. " " .. text)
 		if mon.Attack2Chance>0 and Game.CurrentPlayer>=0 then
-			mean=mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*(mon.Attack2.DamageDiceSides+1)/2
-			range=(mon.Attack2.DamageDiceSides^2*mon.Attack2.DamageDiceCount/12)^0.5*1.96
-			lowerLimit=round(math.max(mean-range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount)*diff*extraMult[2])
-			upperLimit=round(math.min(mean+range, mon.Attack2.DamageAdd+mon.Attack2.DamageDiceCount*mon.Attack2.DamageDiceSides)*diff*extraMult[2])
-			if not baseDamageValue then
+			mean=damage
+			range=((damage*1.25-damage*0.75)^2*2/12)^0.5*1.96
+			lowerLimit=round(math.max(mean-range, damage*0.75))
+			upperLimit=round(math.min(mean+range, damage*1.25))
+			
+			text=string.format(table.find(const.Damage,mon.Attack1.Type))
+			if not baseDamageValue and Game.CurrentPlayer>=0 then
 				lowerLimit=round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack2.Type,lowerLimit,false,lvl))
 				upperLimit=round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack2.Type,upperLimit,false,lvl))
 			end
@@ -2277,13 +2274,8 @@ function events.BuildMonsterInformationBox(t)
 			name=Game.SpellsTxt[spellId].Name
 			skill=SplitSkill(mon.SpellSkill)
 			--get damage multiplier
-			oldLevel=BLevel[mon.Id]
-			local i=mon.Id
-			bonusDamage=math.max((lvl^0.88-BLevel[i]^0.88),0)
-			
-			dmgMult=getMonsterDamage(lvl,"baseMult")
-			if spellId==6 or spellId==97 then
-				dmgMult=dmgMult/2
+			if monsterSpellMultiplierList[spellId] then
+				damage=damage*monsterSpellMultiplierList[spellId]
 			end
 			--damageType
 			damageType=spellToDamageKind[math.ceil(mon.Spell/11)]
@@ -2291,10 +2283,10 @@ function events.BuildMonsterInformationBox(t)
 				damageType=12
 			end
 			--calculate
-			mean=spell.DamageAdd+skill*(spell.DamageDiceSides+1)/2+bonusDamage
-			range=(spell.DamageDiceSides^2*skill/12)^0.5*1.96
-			lowerLimit=round(math.max(mean-range, spell.DamageAdd+skill+bonusDamage)*dmgMult*diff)
-			upperLimit=round(math.min(mean+range, spell.DamageAdd+skill*spell.DamageDiceSides+bonusDamage)*dmgMult*diff)
+			mean=damage
+			range=((damage*1.25-damage*0.75)^2/2/12)^0.5*1.96
+			lowerLimit=round(math.max(mean-range, damage*0.75))
+			upperLimit=round(math.min(mean+range, damage*1.25))
 			if not baseDamageValue and Game.CurrentPlayer>=0 then
 				lowerLimit=round(calcMawDamage(Party[Game.CurrentPlayer],damageType,lowerLimit,false,lvl))
 				upperLimit=round(calcMawDamage(Party[Game.CurrentPlayer],damageType,upperLimit,false,lvl))
@@ -3195,7 +3187,7 @@ function generateBoss(index, nameIndex, skillType)
   end
 
   mapvars.nameIdMult = mapvars.nameIdMult or {}
-  mapvars.nameIdMult[mon.NameId] = { overflowMult[mon.Id][1] * dmgMult, overflowMult[mon.Id][2] * dmgMult }
+  mapvars.nameIdMult[mon.NameId] = dmgMult
 
   local s, m = SplitSkill(mon.SpellSkill)
   mon.SpellSkill = JoinSkill(s * dmgMult, m)
@@ -3565,7 +3557,7 @@ function events.Tick()
   end
 end
 
-
+--[[
 function calcDices(add, sides, count, mult, bonusDamage)
     local bonusDamage = bonusDamage or 0
     -- Calculate uncapped values
@@ -3605,7 +3597,7 @@ function calcDices(add, sides, count, mult, bonusDamage)
     
     return cappedAdd, cappedSides, cappedCount, externalMultiplier
 end
-
+]]
 
 --fix out of bound monsters
 function checkOutOfBound()
@@ -4195,7 +4187,8 @@ function events.PickCorpse(t)
 	end
 end
 
-function getMonsterDamage(lvl,calcType)
+--[[
+function getMonsterDamage(lvl,calcType) --NO LONGER USED
 	local baseDamage=(3+lvl^0.88)
 	if calcType=="baseDamage" then
 		return baseDamage
@@ -4237,6 +4230,7 @@ function getMonsterDamage(lvl,calcType)
 	local totDamage=baseDamage*baseMult*diffMult
 	return totDamage
 end
+]]
 
 function events.MonstersProcessed()
 	if not Game.TurnBased and Map.IsIndoor() then
@@ -4426,6 +4420,17 @@ function events.PickCorpse(t)
 			mon.TreasureItemPercent=0
 			mon.TreasureDiceCount=0
 			mon.TreasureDiceSides=0
+		end
+	end
+end
+
+--retroactive Fix
+function events.BeforeLoadMap()
+	if mapvars.nameIdMult then
+		for key, value in pairs(mapvars.nameIdMult) do
+			if type(mapvars.nameIdMult[key])=="table" then
+				mapvars.nameIdMult[key]=mapvars.nameIdMult[key][1]
+			end
 		end
 	end
 end
