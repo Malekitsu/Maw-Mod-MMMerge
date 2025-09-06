@@ -302,8 +302,6 @@ function calcManaShield(pl, damage)
 	if s > 0 and vars.manaShield and vars.manaShield[slot] then
 		local currentHP = pl.HP
 		local totalHP = pl:GetFullHP()
-		pl.SP=pl.SP-getMaxMana(pl)*0.05
-		local restoreMana=math.min(getMaxMana(pl)*0.05,getMaxMana(pl)*0.05+pl.SP)
 		local mana = pl.SP
 
 		-- Define thresholds and damage multipliers based on skill level
@@ -319,8 +317,9 @@ function calcManaShield(pl, damage)
 		absorbDamage = math.min(absorbDamage,(mana*manaEfficiency))
 		damage = round(damage - absorbDamage)
 		pl.SP = math.max(pl.SP-manaCost, 0)
-		pl.SP = round(pl.SP+restoreMana)
 	end
 	
 	return damage
 end
+
+
