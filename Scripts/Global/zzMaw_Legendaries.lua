@@ -209,14 +209,14 @@ function events.CalcDamageToPlayer(t)
 	if table.find(shamanClass, pl.Class) and pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0  then
 		m3=SplitSkill(t.Player.Skills[const.Skills.Water])
 		local lvl=getTotalLevel()
-		local reduction=getMonsterDamage((lvl+1)^0.325*m3)^0.7
+		local reduction=getMonsterDamage(false,(lvl+1)^0.325*m3)^0.7
 		t.Result=math.max(t.Result-reduction, t.Result*0.25)
 	end
 	--shaman/seraph code
 	if table.find(seraphClass, pl.Class) and pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0  then
 		m3=SplitSkill(pl.Skills[const.Skills.Spirit])
 		local lvl=getTotalLevel()
-		local reduction=getMonsterDamage((lvl+1)^0.325*m3)^0.7
+		local reduction=getMonsterDamage(false,(lvl+1)^0.325*m3)^0.7
 		t.Result=math.max(t.Result-reduction, t.Result*0.25)
 	end
 	
