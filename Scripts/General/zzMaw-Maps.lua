@@ -1755,7 +1755,7 @@ function events.MonsterKilled(mon)
 		if math.random()<0.4 then
 			obj.Item.BonusExpireTime=getUniqueAffix()
 		end
-		obj.Item.MaxCharges=round(totalLevel[mon.Id]/10-math.random(0,3))
+		obj.Item.MaxCharges=round(getMonsterLevel(mon)/10-math.random(0,3))
 		if vars.insanityMode and not vars.madnessMode then
 			obj.Item.MaxCharges=math.max(obj.Item.MaxCharges,30)
 		end
@@ -1804,6 +1804,9 @@ function events.UseMouseItem(t)
 			blv(fileName)
 		else
 			odm(fileName)
+		end
+		if vars.madnessMode then
+			vars.ownedMaps=vars.ownedMaps-1
 		end
 		local wait=10
 		function events.Tick()
