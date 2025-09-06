@@ -421,7 +421,7 @@ local function seraphSkills(isSeraph, id)
 		local healMult=1+pers/1000
 		
 		local lvl=getTotalLevel()
-		local spiritReduction=round(getMonsterDamage((lvl+1)^0.325*spiritS)^0.7)
+		local spiritReduction=round(getMonsterDamage(false,(lvl+1)^0.325*spiritS)^0.7)
 		local txt = baseSchoolsTxtSERAPH[16] .. "\n\nSeraph Spirit strengthens the Seraph's resolve, shrugging off light hits and softening heavy blows\n" .. "Damage reduction: " .. StrColor(0,255,0,spiritReduction) .. " (applied after resistances)\n"
 		Skillz.setDesc(16,1,txt)
 		
@@ -1031,7 +1031,7 @@ local function shamanSkills(isShaman, id)
 		txt=baseSchoolsTxt[13] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nReduce all damage taken by " .. airReduction .. "%\n"
 		Skillz.setDesc(13,1,txt)
 		local lvl=getPartyLevel(4)
-		local waterReduction=round(getMonsterDamage((lvl+1)^0.325*m3)^0.7)
+		local waterReduction=round(getMonsterDamage(false,(lvl+1)^0.325*m3)^0.7)
 		txt=baseSchoolsTxt[14] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)\n"
 		Skillz.setDesc(14,1,txt)
 		local armsmasterDamage=earthMastery*m4
