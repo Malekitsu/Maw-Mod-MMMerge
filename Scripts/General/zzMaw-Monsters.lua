@@ -2814,7 +2814,19 @@ function checkMapCompletition()
 				end
 				if mapvars.mapAffixes then
 					evt.Add("Items", 290)
-					assignedAffixes = {}
+					assignedAffixes = {} --don't make it local
+					
+					local possibleMaps={}
+					for i=1,#mapDungeons do
+						if vars.dungeonCompletedList[Game.MapStats[mapDungeons[i]].Name] then
+							table.insert(possibleMaps, mapDungeons[i])
+						end
+					end
+					mapvars.mapsDropped=mapvars.mapsDropped+1
+					if vars.madnessMode then
+						vars.ownedMaps=vars.ownedMaps+1
+					end
+					Mouse.Item.BonusStrength=possibleMaps[math.random(1,#possibleMaps)]
 					if math.random()<1 then
 						Mouse.Item.Bonus2=getUniqueAffix()
 					end
@@ -2827,8 +2839,13 @@ function checkMapCompletition()
 					if math.random()<0.4 then
 						Mouse.Item.BonusExpireTime=getUniqueAffix()
 					end
+					possibleMaps={}
+					for i=1,#mapDungeons do
+						if vars.dungeonCompletedList[Game.MapStats[mapDungeons[i]].Name] then
+							table.insert(possibleMaps, mapDungeons[i])
+						end
+					end
 					Mouse.Item.MaxCharges=round(mapvars.mapAffixes.Power+math.random(0,2)-1)
-					Mouse.Item.BonusStrength=mapDungeons[math.random(1,#mapDungeons)]
 				end
 				if mapvars.monsterMap then
 					mapvars.monsterMap.cleared=true
