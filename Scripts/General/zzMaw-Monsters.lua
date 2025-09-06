@@ -2880,13 +2880,14 @@ function checkMapCompletition()
 				evt.ForPlayer(0)
 				evt.Add{"Gold", Value = gold}
 				if not vars.AusterityMode then
-					local gemTier=math.ceil(((mapLevel+bolster)/25+0.5),10)
-					evt.Add("Items",1050+gemTier)
-					evt.Add("Items",1050+gemTier)
+					local gemTier=math.ceil((mapLevel+bolster)/25+0.5)
 					if gemTier>10 then
 						for i=1, math.floor(gemTier/10) do
 							evt.Add("Items", 1063)
 						end
+					else
+						evt.Add("Items",1050+gemTier)
+						evt.Add("Items",1050+gemTier)
 					end
 				end
 				experience=experience*5/Party.Count
