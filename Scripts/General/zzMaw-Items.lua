@@ -631,7 +631,7 @@ function events.ItemGenerated(t)
 		--buff to hp and mana items
 		if vars and not vars.itemStatsFix then
 			if it.Bonus==8 or it.Bonus==9 then
-				it.BonusStrength=it.BonusStrength*(2+math.min(it.BonusStrength/50,4))
+				it.BonusStrength=it.BonusStrength*(1+math.min(it.BonusStrength/50,4))
 			end
 			if math.floor(it.Charges/1000)==8 or math.floor(it.Charges/1000)==9 then
 				local power=it.Charges%1000
@@ -1072,7 +1072,11 @@ function updateCelestialItem(it,pl)
 		if it.Charges>1000 then
 			it.Charges=math.floor(it.Charges/1000)*1000+math.min(math.round(tier*mult*slotMult),999)
 		end
-		it.MaxCharges=math.min(math.round(tier*mult*0.8),180)
+		local cap=180 
+		if vars.madnessMode then
+			cap=240
+		end
+		it.MaxCharges=math.min(math.round(tier*mult*0.8),cap)
 	end
 end
 
@@ -1151,7 +1155,8 @@ function events.BuildItemInformationBox(t)
 				local power=t.Item.BonusStrength
 				if vars.itemStatsFix then
 					if (t.Item.Bonus==8 or t.Item.Bonus==9) then
-						power=round(power*(2+math.min(power/50,4)))
+						local mult=GetSlotMult(it)
+						power=round(power*(1+math.min(power/50/mult,4)))
 					elseif t.Item.Bonus==10 then
 						--power=round(power*0.667)
 					end
@@ -1179,7 +1184,8 @@ function events.BuildItemInformationBox(t)
 				local strength=t.Item.Charges%1000
 				if vars.itemStatsFix then
 					if (bonus==8 or bonus==9) then
-						strength=round(strength*(2+math.min(strength/50,4)))
+						local mult=GetSlotMult(it)
+						strength=round(strength*(1+math.min(strength/50/mult,4)))
 					elseif bonus==10 then
 						--strength=round(strength*0.667)
 					end
@@ -1223,7 +1229,8 @@ function events.BuildItemInformationBox(t)
 						end
 					end
 					if stat==8 or stat==9 then
-						power=power*(2+math.min(power/50,4))
+						GetSlotMult(t.Item)
+						power=power*(1+math.min(power/50/mult,4))
 					elseif stat==10 then
 						--power=power*0.667
 					end
@@ -2611,7 +2618,8 @@ function itemStats(index)
 			local power=it.BonusStrength
 			if vars.itemStatsFix then
 				if (it.Bonus==8 or it.Bonus==9) then
-					power=round(power*(2+math.min(power/50,4)))
+					local mult=GetSlotMult(it)
+					power=round(power*(1+math.min(power/50/mult,4)))
 				elseif it.Bonus==10 then
 					--power=round(power*0.667)
 				end
@@ -2663,7 +2671,8 @@ function itemStats(index)
 			local power=it.Charges%1000
 			if vars.itemStatsFix then
 				if (bonus==8 or bonus==9) then
-					power=round(power*(2+math.min(power/50,4)))
+					local mult=GetSlotMult(it)
+					power=round(power*(1+math.min(power/50/mult,4)))
 				elseif bonus==10 then
 					--power=round(power*0.667)
 				end
@@ -4382,4 +4391,25 @@ function GetItemEquipStat(it)
 		equipStat=1
 	end
 	return equipStat
+end
+
+
+function GetSlotMult(it)
+	if type(it)=="table" then
+		itemId=it.Number
+	else
+		itemId=it
+	end
+	if itemId<=0 or itemId>Game.ItemsTxt.High then
+		return 1
+	end
+	local equipStat=Game.ItemsTxt[itemId].EquipStat
+	if table.find(twoHandedAxes, it.Number) then
+		equipStat=1
+	end
+	local slotMult=slotMult[equipStat] or 1
+	if equipStat==5 and Game.ItemsTxt[itemId].Mod2==0 then
+		slotMult=slotMult*1.5
+	end
+	return slotMult
 end
