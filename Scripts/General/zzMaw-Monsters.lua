@@ -2191,7 +2191,7 @@ function events.BuildMonsterInformationBox(t)
 	--difficulty multiplier
 	local damage=getMonsterDamage(mon)
 	if getMapAffixPower(1) then
-		diff=diff*(1+getMapAffixPower(1)/100)
+		damage=damage*(1+getMapAffixPower(1)/100)
 	end
 	
 	--some statistics here, calculate the standard deviation of dices to get the range of which 95% will fall into
