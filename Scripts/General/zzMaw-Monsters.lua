@@ -156,7 +156,7 @@ function recalculateMawMonster()
 				mon.Resistances[4]=mon.Resistances[4]-reduction
 			end
 			local currentHPPercentage=mon.HP/mon.FullHitPoints
-			hp=HPtable[mon.Id]
+			local hp=round(getMonsterHealth(mon))
 			hpOvercap=0
 			while hp>32500 do
 				hp=round(hp/2)
@@ -320,27 +320,16 @@ function recalculateMawMonster()
 				if vars.AusterityMode then
 					austerityMod=4
 				end
-				local minHP=HPtable[mon.Id]*2*(1+txt.Level/80/austerityMod)
-				if totalHP<minHP or totalHP>minHP*(1+1.01/austerityMod) then
-					HP=minHP*(1+math.random()/austerityMod)
-					local hpOvercap=0
-					while HP>32500 do
-						HP=round(HP/2)
-						hpOvercap=hpOvercap+1
-					end
-					mon.Resistances[0]=round(txt.Resistances[0]*5)/5%1000+1000*hpOvercap
-					local HPproportion=mon.HP/mon.FullHP
-					mon.FullHP=HP
-					mon.HP=mon.FullHP*HPproportion
+				local HP=getMonsterHealth(mon)
+				local hpOvercap=0
+				while HP>32500 do
+					HP=round(HP/2)
+					hpOvercap=hpOvercap+1
 				end
-				if mapvars.nameIdMult and not mapvars.nameIdMult[mon.NameId] then
-					local dmgMult=1.5+math.random()*0.5
-					if getMapAffixPower(18) then
-						dmgMult=dmgMult*(1+getMapAffixPower(18)/100)
-					end
-					mapvars.nameIdMult=mapvars.nameIdMult or {}
-					mapvars.nameIdMult[mon.NameId]=dmgMult
-				end
+				mon.Resistances[0]=round(txt.Resistances[0]*5)/5%1000+1000*hpOvercap
+				local HPproportion=mon.HP/mon.FullHP
+				mon.FullHP=HP
+				mon.HP=mon.FullHP*HPproportion
 			end
 		end
 	end	
@@ -836,38 +825,7 @@ function recalculateMonsterTable()
 	end
 	--adjust damage if it's too similiar between monster type
 	--if bolsterLevel>10 or Game.freeProgression==false or vars.onlineMode then
-	if bolsterLevel>10 or Game.freeProgression==false then
-		for i=1, 651 do
-			mon=Game.MonstersTxt[i]
-			base=basetable[i]		
-			LevelB=BLevel[i]
-			
-			if i%3==1 then
-				bMon=basetable[i+1]
-			elseif i%3==0 then
-				bMon=basetable[i-1]
-			else
-				bMon=basetable[i]
-			end
-			bonusDamage=0
-			atk1=base.Attack1
-			currentBaseDamage=atk1.DamageAdd+atk1.DamageDiceCount*(1+atk1.DamageDiceSides)/2
-			batck1=bMon.Attack1
-			bBaseDamage=batck1.DamageAdd+batck1.DamageDiceCount*(1+batck1.DamageDiceSides)/2
-			dmgMult1=math.min(math.max(currentBaseDamage/bBaseDamage,0.75),1.3)
-			
-			atk2=base.Attack2
-			currentBaseDamage=atk2.DamageAdd+atk2.DamageDiceCount*(1+atk2.DamageDiceSides)/2
-			batck2=bMon.Attack2
-			bBaseDamage=batck2.DamageAdd+batck2.DamageDiceCount*(1+batck2.DamageDiceSides)/2
-			if currentBaseDamage==0 or bBaseDamage==0 then
-				dmgMult2=1
-			else
-				dmgMult2=math.min(math.max(currentBaseDamage/bBaseDamage,0.75),1.3)
-			end			
-		end
-			
-	end
+	
 		
 	for i=1, 651 do
 		local mon=Game.MonstersTxt[i]
@@ -3075,125 +3033,117 @@ end
 
 -- === GENERATE BOSS (remplit bossNames + bossSet) ===
 function generateBoss(index, nameIndex, skillType)
-  mapvars = mapvars or {}
-  mapvars.bossNames = mapvars.bossNames or {}
-  mapvars.bossSet   = mapvars.bossSet   or {}   -- <== NOUVEAU : affectations {index, NameId}
+	if not nameIndex then
+		local nameIdList = {}
+		for i = 0, Map.Monsters.High do
+			local mon = Map.Monsters[i]
+			if mon.NameId >= 220 and mon.NameId < 300 and mon.AIState ~= 11 then
+				table.insert(nameIdList, mon.NameId)
+			end
+		end
+		for i = 221, 299 do
+			if not table.find(nameIdList, i) then
+				Game.PlaceMonTxt[i] = string.format("%s", i)
+			end
+		end
+		nameIndex = 221
+		while nameIndex < 300 do
+			if Game.PlaceMonTxt[nameIndex] == string.format("%s", nameIndex) then
+				break
+			end
+			nameIndex = nameIndex + 1
+		end
+	end
 
-  -- réserver une case NameId si non fournie
-  if not nameIndex then
-    local nameIdList = {}
-    for i = 0, Map.Monsters.High do
-      local mon = Map.Monsters[i]
-      if mon.NameId >= 221 and mon.NameId < 300 and mon.AIState ~= 11 then
-        table.insert(nameIdList, mon.NameId)
-      end
-    end
-    for i = 221, 299 do
-      if not table.find(nameIdList, i) then
-        Game.PlaceMonTxt[i] = string.format("%s", i)
-      end
-    end
-    nameIndex = 221
-    while nameIndex < 300 do
-      if Game.PlaceMonTxt[nameIndex] == string.format("%s", nameIndex) then
-        break
-      end
-      nameIndex = nameIndex + 1
-    end
-  end
+	local mon = Map.Monsters[index]
+	mon.NameId = nameIndex
 
-  local mon = Map.Monsters[index]
-  mon.NameId = nameIndex
 
-  local austerityMod = vars.AusterityMode and 4 or 1
-  local HP = round(mon.FullHP * 2 * (1 + mon.Level / 80 / austerityMod) * (1 + math.random() / austerityMod))
-  if getMapAffixPower(18) then
-    HP = HP * (1 + getMapAffixPower(18) / 100)
-  end
-  local hpOvercap = 0
-  while HP > 32500 do
-    HP = round(HP / 2)
-    hpOvercap = hpOvercap + 1
-  end
-  mon.Resistances[0] = mon.Resistances[0] + 1000 * hpOvercap
-  mon.FullHP = HP
-  mon.HP = mon.FullHP
-  mon.Exp = mon.Exp * 5
+	local lvl = totalLevel[mon.Id] or mon.Level
+	if lvl > 100 then
+		lvl = round(lvl + math.random() * 20 + 10)
+	else
+		lvl = round(lvl * (1.1 + math.random() * 0.2))
+	end
+	mon.Level = math.min(lvl, 255)
+	
 
-  mapvars.uniqueMonsterLevel = mapvars.uniqueMonsterLevel or {}
-  local lvl = totalLevel[mon.Id] or mon.Level
-  if lvl > 100 then
-    mapvars.uniqueMonsterLevel[index] = round(lvl + math.random() * 20 + 10)
-  else
-    mapvars.uniqueMonsterLevel[index] = round(lvl * (1.1 + math.random() * 0.2))
-  end
-  mon.Level = math.min(mapvars.uniqueMonsterLevel[index], 255)
-  mon.TreasureDiceCount  = (mon.Level * 100) ^ 0.5
-  mon.TreasureDiceSides  = (mon.Level * 100) ^ 0.5
-  mon.TreasureItemPercent = 100
-  mon.TreasureItemType    = math.random(1, 12)
-  mon.TreasureItemLevel   = math.min(mon.TreasureItemLevel + 1, 6)
+	local austerityMod = vars.AusterityMode and 4 or 1
+	local hpMult= 2 * (1 + lvl / 100 / austerityMod) * (1 + math.random() / austerityMod)
+	if getMapAffixPower(18) then
+		hpMult = hpMult * (1 + getMapAffixPower(18) / 100)
+	end
+	mon.Exp = mon.Exp * 5
 
-  local dmgMult = 1.5 + math.random() * 0.5
+	mon.TreasureDiceCount	= (mon.Level * 100) ^ 0.5
+	mon.TreasureDiceSides	= (mon.Level * 100) ^ 0.5
+	mon.TreasureItemPercent = 100
+	mon.TreasureItemType		= math.random(1, 12)
+	mon.TreasureItemLevel	 = math.min(mon.TreasureItemLevel + 1, 6)
 
-  -- skill / nom
-  local skill
-  if not skillType then
-    local chanceMult = 1
-    if vars.Mode == 2 then chanceMult = 2 end
-    if vars.insanityMode then chanceMult = 3 end
+	local dmgMult = 1.5 + math.random() * 0.5
 
-    skill = SkillList[math.random(1, #SkillList)]
-    if math.random() < 0.01 * chanceMult and not generatedByBroodlord then
-      skill = "Broodlord"
-      mon.Resistances[0] = mon.Resistances[0] + 1000
-      dmgMult = dmgMult * 1.5
-    end
-    if generatedByBroodlord then
-      skill = "Broodling"
-    end
-    if math.random() < 0.001 * chanceMult then
-      skill = "Omnipotent"
-      dmgMult = dmgMult * 2
-      mon.Resistances[0] = mon.Resistances[0] + 2000
-    end
-  else
-    skill = skillType
-  end
+	-- skill / nom
+	local skill=skillType
+	if not skill then
+		local chanceMult = 1
+		if vars.Mode == 2 then chanceMult = 2 end
+		if vars.insanityMode then chanceMult = 3 end
 
-  if skill == "Leecher" or skill == "Omnipotent" then
-    mapvars.leecher = mapvars.leecher or {}
-    table.insert(mapvars.leecher, index)
-  end
-  if skill == "Swift" or skill == "Omnipotent" then
-    mapvars.swift = mapvars.swift or {}
-    if not table.find(mapvars.swift, index) then
-      table.insert(mapvars.swift, index)
-    end
-  end
-  if skill == "Shadow" or skill == "Omnipotent" then
-    mapvars.shadow = mapvars.shadow or {}
-    if not table.find(mapvars.shadow, index) then
-      table.insert(mapvars.shadow, index)
-    end
-  end
+		skill = SkillList[math.random(1, #SkillList)]
+		if math.random() < 0.01 * chanceMult and not generatedByBroodlord then
+			skill = "Broodlord"
+			mon.Resistances[0] = mon.Resistances[0] + 1000
+			hpMult=hpMult*2
+			dmgMult = dmgMult * 1.5
+		end
+		if generatedByBroodlord then
+			skill = "Broodling"
+		end
+		if math.random() < 0.001 * chanceMult then
+			skill = "Omnipotent"
+			dmgMult = dmgMult * 2
+			mon.Resistances[0] = mon.Resistances[0] + 2000
+			hpMult=hpMult*4
+		end
+	end
 
-  local name = string.format(skill .. " " .. Game.MonstersTxt[mon.Id].Name)
-  Game.PlaceMonTxt[mon.NameId] = name
+	local name = string.format(skill .. " " .. Game.MonstersTxt[mon.Id].Name)
+	Game.PlaceMonTxt[mon.NameId] = name
 
-  mapvars.bossNames[mon.NameId] = Game.PlaceMonTxt[mon.NameId]
-  if getMapAffixPower(18) then
-    dmgMult = dmgMult * (1 + getMapAffixPower(18) / 100)
-  end
+	if getMapAffixPower(18) then
+		dmgMult = dmgMult * (1 + getMapAffixPower(18) / 100)
+	end
 
-  mapvars.nameIdMult = mapvars.nameIdMult or {}
-  mapvars.nameIdMult[mon.NameId] = dmgMult
+	local s, m = SplitSkill(mon.SpellSkill)
+	mon.SpellSkill = JoinSkill(s * dmgMult, m)
 
-  local s, m = SplitSkill(mon.SpellSkill)
-  mon.SpellSkill = JoinSkill(s * dmgMult, m)
-
-  -- === NOUVEAU : mémorise l’affectation index -> NameId pour broadcast aux clients
-  table.insert(mapvars.bossSet, { index, mon.NameId, mon.Id })
+	--store better boss data
+	mapvars.bossData = mapvars.bossData or {}
+	mapvars.bossData[index]={["Name"]=name,
+	["NameId"]=mon.NameId,
+	["Level"]=lvl,
+	["DamageMult"]=dmgMult,
+	["HealthMult"]=hpMult,
+	["Skills"]=skill, 
+	}
+	
+	-- Calculate health using the centralized getMonsterHealth function
+	local HP = round(getMonsterHealth(mon, lvl))
+	local hpOvercap = 0
+	while HP > 32500 do
+		HP = round(HP / 2)
+		hpOvercap = hpOvercap + 1
+	end
+	mon.Resistances[0] = mon.Resistances[0] + 1000 * hpOvercap
+	mon.FullHP = HP
+	mon.HP = mon.FullHP
+	
+	-- Maintain compatibility with boss sync system
+	mapvars.bossNames = mapvars.bossNames or {}
+	mapvars.bossSet = mapvars.bossSet or {}
+	mapvars.bossNames[mon.NameId] = name
+	table.insert(mapvars.bossSet, {index, mon.NameId, mon.Id})
 end
 
 
@@ -3204,7 +3154,7 @@ SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Adamantite","
 function events.GameInitialized2() --to make the after all the other code
 	function events.CalcDamageToPlayer(t)
 		local data=mawCustomMonObj or WhoHitPlayer()
-		if data and data.Monster and data.Monster.NameId>220 then
+		if data and data.Monster and data.Monster.NameId>=220 and data.Monster.NameId<300 then
 			mon=data.Monster
 			skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
 			if skill=="Summoner" then
@@ -3244,7 +3194,7 @@ function events.GameInitialized2() --to make the after all the other code
 
 	--on damage taken
 	function events.CalcDamageToMonster(t)
-		if t.Monster.NameId>220 then
+		if t.Monster.NameId>=220 and t.Monster.NameId<300 then
 			if t.Player then
 				local id=t.Player:GetIndex()
 				for i=0,Party.High do
@@ -3453,15 +3403,13 @@ amountHP = amountHP or { [0] = 0, 0, 0, 0, 0 }
 amountSP = amountSP or { [0] = 0, 0, 0, 0, 0 }
 
 function leecher()
-  local L = mapvars and mapvars.leecher
-  if type(L) ~= "table" then return end
+  if not mapvars or not mapvars.bossData then return end
 
-  for idx = 1, #L do
-    local mid = L[idx]
+  for mid = 0, Map.Monsters.High do
     if inRangeMonIdx(mid) then
       local mon = Map.Monsters[mid]
-      if mon then
-        local skill = SafeSkillFromPlaceMon(mon)
+      if mon and mapvars.bossData[mid] then
+        local skill = mapvars.bossData[mid].Skills
         if skill == "Leecher" or skill == "Omnipotent" then
           local distance = getDistance(mon.X or 0, mon.Y or 0, mon.Z or 0)
           if (distance or 1e9) < 1500 and (mon.HP or 0) > 0 and mon.AIState ~= 19 then
@@ -3507,15 +3455,14 @@ end
 -- Swift (mob affixe/skill)
 -- =========================
 function events.Tick()
-  -- Swift via liste mapvars.swift
-  if mapvars and mapvars.swift then
+  -- Swift via boss data
+  if mapvars and mapvars.bossData then
     swiftLocation = swiftLocation or {}
-    for idx = 1, #mapvars.swift do
-      local mid = mapvars.swift[idx]
+    for mid = 0, Map.Monsters.High do
       if inRangeMonIdx(mid) then
         local mon = Map.Monsters[mid]
-        if mon then
-          local skill = SafeSkillFromPlaceMon(mon)
+        if mon and mapvars.bossData[mid] then
+          local skill = mapvars.bossData[mid].Skills
           if skill == "Swift" or skill == "Omnipotent" then
             local key = mid  -- clé stable par MonsterID
             local loc = swiftLocation[key]
@@ -3706,7 +3653,7 @@ end
 
 
 function events.MonsterSpriteScale(t)
-	if Map.Monsters[round(t.MonsterIndex)].NameId>220 and Map.Monsters[round(t.MonsterIndex)].NameId<300 then
+	if Map.Monsters[round(t.MonsterIndex)].NameId>=220 and Map.Monsters[round(t.MonsterIndex)].NameId<300 then
 		if Map.IndoorOrOutdoor==1 then
 			t.Scale=t.Scale*1.4
 		else
@@ -4373,7 +4320,7 @@ function events.AfterLoadMap()
 	if isRedone then
 		for i=0,Map.Monsters.High do
 			local mon=Map.Monsters[i]
-			if mon.NameId>=221 and mon.NameId<300 and mon.AIState ~= 11 then
+			if mon.NameId>=220 and mon.NameId<300 and mon.AIState ~= 11 then
 				if Game.PlaceMonTxt[mon.NameId]==string.format("%s", mon.NameId) then
 					mon.NameId=0
 				end
@@ -4420,17 +4367,6 @@ function events.PickCorpse(t)
 			mon.TreasureItemPercent=0
 			mon.TreasureDiceCount=0
 			mon.TreasureDiceSides=0
-		end
-	end
-end
-
---retroactive Fix
-function events.BeforeLoadMap()
-	if mapvars.nameIdMult then
-		for key, value in pairs(mapvars.nameIdMult) do
-			if type(mapvars.nameIdMult[key])=="table" then
-				mapvars.nameIdMult[key]=mapvars.nameIdMult[key][1]
-			end
 		end
 	end
 end
