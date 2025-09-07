@@ -2148,6 +2148,7 @@ function events.Action(t)
 				Skillz.set(pl,50,JoinSkill(s, m+1))
 			end
 		end
+		--[[ CAP REMOVED
 		if t.Param==51 then
 			local pl=Party[Game.CurrentPlayer]
 			local s,m=SplitSkill(Skillz.get(pl,51))
@@ -2157,8 +2158,10 @@ function events.Action(t)
 				Game.ShowStatusText("This skill has reached its limit")
 			end
 		end
+		]]
 	end
 end
+--[[
 function events.LoadMap()
 	for i=0,Party.High do
 		local pl=Party[i]
@@ -2171,6 +2174,7 @@ function events.LoadMap()
 		end
 	end
 end
+]]
 coverBonus={}
 function events.CalcDamageToMonster(t)
 	data = WhoHitMonster()	
