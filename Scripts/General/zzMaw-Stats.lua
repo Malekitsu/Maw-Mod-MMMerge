@@ -748,6 +748,23 @@ function events.CalcDamageToPlayer(t)
 		reflecting=true
 	end
 	
+	--properly calculate friendly fire damage
+	if data and data.Player and data.Spell and data.Spell<133 and data.Spell>0 then	
+		local s,m = SplitSkill(data.Player.Skills[const.Skills.Learning])
+		local diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, data.Spell,data.Player:GetIndex())
+		local damage=damageAdd
+		for i=1, data.SpellSkill do
+			damage=damage+math.random(diceMin,diceMax)
+		end
+		local distance=getDistance(data.Object.X,data.Object.Y,data.Object.Z)/512
+		local damageMult=math.max(1-distance, 0)
+		damage=damage*damageMult
+		
+		--no crit nor intellect buff
+		t.Result=calcMawDamage(t.Player,t.DamageKind,damage,false,data.Player.LevelBase)
+		return
+	end
+	
 	if not (data) or not (data and data.Monster) then
 		if (t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1 then --drown and fall
 			local name=Game.MapStats[Map.MapStatsIndex].Name
@@ -760,6 +777,9 @@ function events.CalcDamageToPlayer(t)
 			end
 			if mapvars.mapAffixes then
 				mapLevel=(mapvars.mapAffixes.Power*10+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)
+			end
+			if not mapLevel then
+				mapLevel=getTotalLevel()
 			end
 			--trap and objects multiplier
 			local damage=getMonsterDamage(false, mapLevel)
@@ -778,22 +798,6 @@ function events.CalcDamageToPlayer(t)
 	--carnage fix
 	if data and data.Player and data.Spell==133 then
 		t.Result=0
-		return
-	end
-	--properly calculate friendly fire damage
-	if data and data.Player and data.Spell and data.Spell<133 and data.Spell>0 then	
-		local s,m = SplitSkill(data.Player.Skills[const.Skills.Learning])
-		local diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, data.Spell,data.Player:GetIndex())
-		local damage=damageAdd
-		for i=1, data.SpellSkill do
-			damage=damage+math.random(diceMin,diceMax)
-		end
-		local distance=getDistance(data.Object.X,data.Object.Y,data.Object.Z)/512
-		local damageMult=math.max(1-distance, 0)
-		damage=damage*damageMult
-		
-		--no crit nor intellect buff
-		t.Result=calcMawDamage(t.Player,t.DamageKind,damage,false,data.Player.LevelBase)
 		return
 	end
 	
