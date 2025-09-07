@@ -449,7 +449,7 @@ function events.BuildStatInformationBox(t)
 		i=Game.CurrentPlayer
 		ac=Party[i]:GetArmorClass()
 		local lvl=math.min(Party[i].LevelBase,200)
-		local acReduction=100-calcMawDamage(Party[i],4,10000)/100
+		local acReduction=round((100-calcMawDamage(Party[i],4,10000)/100)*100)/100
 		lvl=math.min(Party[i].LevelBase, 255)
 		if Game.BolsterAmount>100 then
 			nerfAmount=Game.BolsterAmount/100
@@ -457,7 +457,7 @@ function events.BuildStatInformationBox(t)
 		end
 		blockChance= 100-round((5+lvl*2)/(10+lvl*2+ac)*10000)/100
 		totRed= 100-round((100-blockChance)*(100-acReduction))/100
-		t.Text=string.format("%s\n\nPhysical damage reduction from AC: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\nBlock chance vs same level monsters (up to 255): " .. StrColor(255,255,100,blockChance) .. StrColor(255,255,100,"%") .. "\n\nTotal average damage reduction: " .. StrColor(255,255,100,totRed) .. "%")
+		t.Text=string.format("%s\n\nPhysical damage reduction: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\nBlock chance vs same level monsters (up to 255): " .. StrColor(255,255,100,blockChance) .. StrColor(255,255,100,"%") .. "\n\nTotal average damage reduction: " .. StrColor(255,255,100,totRed) .. "%")
 	end
 	
 	if t.Stat==5234672 then
@@ -1695,7 +1695,7 @@ function getPlayerExtimatedVitality(lvl)
 end
 
 function getMonsterDamage(mon, level)
-	local hitToKill={20,15,10,8,7,6,5,4.5,4}
+	local hitToKill={14,10,7,6.5,6,5.5,5,4,3.2}
 	if mon then
 		local id=mon.Id
 		if id%3==1 then
