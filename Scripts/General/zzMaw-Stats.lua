@@ -735,7 +735,7 @@ function events.CalcDamageToPlayer(t)
 	
 	if reflectedDamage then
 		reflectedDamage=false
-		t.Result=t.Result^0.9
+		t.Result=t.Result^0.85
 		return
 	end
 	--PAIN REFLECTION FIX
@@ -1603,7 +1603,7 @@ function events.GetSkill(t)
 end
 
 --average
-function GetPlayerExtimatedVitality(lvl)
+function getPlayerExtimatedVitality(lvl)
 	local baseHP=25
 	local baseScaling=3
 	local endScaling=9
@@ -1639,7 +1639,7 @@ function GetPlayerExtimatedVitality(lvl)
 	local healthPower=statsPerLevel*lvl/10
 	local extimatedHealthBonus=healthPower*math.min(1+healthPower/50,5)*4	
 	
-	local enduranceEffect=math.floor(extimatedEndurance/5)
+	local enduranceEffect=extimatedEndurance/5
 	local skill=lvl^0.7
 	local masterLearned=12
 	if vars.madnessMode then
@@ -1701,7 +1701,7 @@ function getMonsterDamage(mon, level)
 		end
 		level=mon and totalLevel[id] or level
 	end
-	local vitality=GetPlayerExtimatedVitality(level)
+	local vitality=getPlayerExtimatedVitality(level)
 	local hits=hitToKill[3] --baseline MAW
 	if vars.madnessMode then
 		hits=hitToKill[9]
@@ -1733,14 +1733,164 @@ function getMonsterDamage(mon, level)
 	elseif mon.Id%3==0 then
 		damage=damage*1.5
 	end
+	local index=mon:GetIndex()
 	if mon.NameId>=220 and mon.NameId<=300 then
-		if mapvars.nameIdMult and mapvars.nameIdMult[mon:GetIndex()] then
-			damage=damage*mapvars.nameIdMult[mon:GetIndex()]
+		mapvars.bossData=mapvars.bossData or {}
+		if not mapvars.bossData[index] then
+			generateBoss(index)
 		end
+		damage=damage*mapvars.bossData[index].DamageMult
 	end
 	return damage
 end
 
+function getPlayerEstimatedPower(lvl)
+	local baseDamage=5
+	local twoHandedSwordDamagePerLevel=0.5
+	
+	local skill=lvl^0.7
+	
+	local statsPerLevel=2
+	if vars.insanityMode then
+		statsPerLevel=5
+	elseif vars.Mode==2 then
+		statsPerLevel=4
+	elseif Game.BolsterAmount==300 then
+		statsPerLevel=3
+	elseif Game.BolsterAmount==200 then
+		statsPerLevel=2.5
+	elseif Game.BolsterAmount==150 then
+		statsPerLevel=2
+	end
+		
+	local masterLearned=12
+	if vars.madnessMode then
+		masterLearned=30
+	elseif vars.insanityMode then
+		masterLearned=20
+	end
+	local armsMasterDamage=math.min(0.5+skill/masterLearned,2) --use gm as a reference
+	
+	local baseDamage=twoHandedSwordDamagePerLevel*lvl+armsMasterDamage*skill
+	
+	local swordMultiplier=armsMasterDamage*2*skill/100
+	
+	local damage=baseDamage*(1+swordMultiplier)+baseDamage
+	
+	local might=statsPerLevel*lvl
+	local mightEffect=might/5
+	
+	local heroismBuff=math.min((1+0.006*lvl^0.65),1.3)
+	
+	damage=(damage+mightEffect)*heroismBuff*(1+might/1000)
+	
+	local speedEffect=(mightEffect/2)/1000
+	local weaponSpeed=math.min(1+skill/masterLearned*2,3)*skill/100
+	local armsMasterSpeed=math.min(1+skill/masterLearned,2)*skill/100
+	local hasteBuff=math.min((1+0.004*lvl^0.65),1.2)
+	local haste=(1+speedEffect+weaponSpeed+armsMasterSpeed)*hasteBuff
+	
+	damage=damage*haste
+	
+	local luck=might
+	local accuracy=might
+	local critChance=0.05+(luck/math.min(500+lvl*7.5,5000))+0.1*math.min(lvl/300,1) --assume crit enchant at lvl 500
+	local extraMult=1
+	if critChance>1 then
+		extraMult=critChance
+	end
+	local critChance=math.min(critChance,1)
+	local critDamage=(0.5+luck/500)
+	
+	damage=damage*(1+critChance*critDamage*extraMult)
+	
+	local extimatedEnchantMultiplier=1.25 + math.min((lvl/666),0.75)
+	
+	damage=damage*extimatedEnchantMultiplier+baseDamage
+	
+	return damage
+end
+
+function getMonsterHealth(mon, level)
+	local hitToKillMonster={0.75,1,1.5,1.75,2,2.5,3,3.5,4}
+	if mon then
+		local id=mon.Id
+		if id%3==1 then
+			id=id+1
+		elseif id%3==0 then
+			id=id-1
+		end
+		level=mon and totalLevel[id] or level
+	end
+	local health=getPlayerEstimatedPower(level)
+	local hits=hitToKillMonster[3] --baseline MAW
+	if vars.madnessMode then
+		hits=hitToKillMonster[9]
+	elseif vars.insanityMode then
+		hits=hitToKillMonster[8]
+	elseif vars.Mode==2 then
+		hits=hitToKillMonster[7]
+	elseif Game.BolsterAmount==300 then
+		hits=hitToKillMonster[6]
+	elseif Game.BolsterAmount==200 then
+		hits=hitToKillMonster[5]
+	elseif Game.BolsterAmount==150 then
+		hits=hitToKillMonster[4]
+	elseif Game.BolsterAmount==100 then
+		hits=hitToKillMonster[3]
+	elseif Game.BolsterAmount==70 then
+		hits=hitToKillMonster[2]
+	elseif Game.BolsterAmount==40 then
+		hits=hitToKillMonster[1]
+	end
+	
+	health=health*hits
+	
+	if not mon then
+		return health
+	end	
+	
+	local id=mon.Id
+	if id%3==1 then
+		local rateo=basetable[id].FullHP/basetable[id+1].FullHP
+		health=health*rateo
+	elseif id%3==0 then
+		local rateo=basetable[id].FullHP/basetable[id-1].FullHP
+		health=health*rateo
+	end
+	
+	local index=mon:GetIndex()
+	if mon.NameId>=220 and mon.NameId<=300 then
+		mapvars.bossData=mapvars.bossData or {}
+		if not mapvars.bossData[index] then
+			generateBoss(index)
+		end
+		health=health*mapvars.bossData[index].HealthMult
+	end
+	
+	return health
+end
+
+--[[
+for i=1,1000 do
+	HPtable=i*(i/10+3)*2*(1+i/360)
+	if Game.BolsterAmount==600 then
+		hpMult=(2+i/300)
+	end	
+	if vars.insanityMode then
+		hpMult=hpMult*(1.5+i/300)
+	end		
+	
+	hpMult=hpMult/math.min(math.max(0.3+totalLevel[i]/200,1),50/15) --50/15 is the amount needed to get 1% crit, now and before
+
+	HPtable=HPtable*hpMult
+	
+	res=i/2
+	HPtable=HPtable*2^(res/(100))
+	
+	print(round(HPtable/GetPlayerEstimatedPower(i)*100)/100)
+end
+]]
 
 --[[
 for i=1,1000 do
