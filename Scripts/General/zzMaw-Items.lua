@@ -1549,7 +1549,7 @@ function checktext(MaxCharges,bonus2,it)
 	end
 	
 	--damage multiplier
-	local enchantDamageMult=math.max((0.5+MaxCharges/20)^1.75,0.5)
+	local enchantDamageMult=math.max((0.5+MaxCharges/20)^1.5,0.5)
 	
 	bonus2txt={
 		[1] =  " +" .. math.floor(bonusEffects[1].statModifier * mult) .. " to all Resistances.",
@@ -1794,7 +1794,7 @@ function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType)
 	if it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number) then
 		damage=damage*2
 	end
-	damage=math.max(damage*(0.5+it.MaxCharges/20)^1.75,0.5)
+	damage=math.max(damage*(0.5+it.MaxCharges/20)^1.5,0.5)
 	damage = damage/2^(resistance%1000/100)
 	return damage
 end
@@ -4183,9 +4183,9 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 		if not it or (it and it.Number==0) or (it and it:T().EquipStat>2) then return 0 end
 		local s, m, level=getBuffSkill(4)
 		local id=pl:GetIndex()
-		local mult=math.max((0.5+it.MaxCharges/20)^1.75,0.5)
+		local mult=math.max((0.5+it.MaxCharges/20)^1.5,0.5)
 		if table.find(artWeap1h, it.Number) or table.find(artWeap2h, it.Number) then
-			mult=(1+artifactPowerMult(pl.LevelBase))^1.75
+			mult=(1+artifactPowerMult(pl.LevelBase))^1.5
 		end
 		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
 			local str=pl:GetMight()
@@ -4404,7 +4404,7 @@ function GetSlotMult(it)
 		return 1
 	end
 	local equipStat=Game.ItemsTxt[itemId].EquipStat
-	if table.find(twoHandedAxes, it.Number) then
+	if table.find(twoHandedAxes, itemId) then
 		equipStat=1
 	end
 	local slotMult=slotMult[equipStat] or 1
