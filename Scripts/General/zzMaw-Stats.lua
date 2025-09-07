@@ -1816,7 +1816,7 @@ function getPlayerEstimatedPower(lvl)
 end
 
 function getMonsterHealth(mon, level)
-	local hitToKillMonster={0.75,1,1.5,1.75,2,2.5,3,3.5,4}
+	local hitToKillMonster={1,1.5,2,2.5,3,3.5,4,4.5,5}
 	if mon then
 		local id=mon.Id
 		if id%3==1 then
