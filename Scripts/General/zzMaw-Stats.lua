@@ -343,8 +343,8 @@ function events.BuildStatInformationBox(t)
 		-- Calculate spell cost reduction percentage
 		local level = Party[i].LevelBase
 		local personalityDivisor = 10 + (level - 1) * 90 / 999
-		local spellCostReduction = personality / personalityDivisor
-		t.Text=string.format("%s\n\nBonus healing: %s%s\n\nSpell cost reduction: %s%s\n\nIncrease the mana by 2 levels worth of mana per 5 skill points",Game.StatsDescriptions[2],Party[i]:GetPersonality()/10,"%",round(spellCostReduction*10)/10,"%")
+		local spellCostReduction = round((1-getPersonalityManaCostReduction(Party[i]))*1000)/10
+		t.Text=string.format("%s\n\nBonus healing: %s%s\n\nSpell cost reduction: %s%s\n\nIncrease the mana by 2 levels worth of mana per 5 skill points",Game.StatsDescriptions[2],Party[i]:GetPersonality()/10,"%",spellCostReduction,"%")
 	end
 	if t.Stat==3 then
 		i=Game.CurrentPlayer
