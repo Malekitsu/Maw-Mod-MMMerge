@@ -1015,7 +1015,7 @@ end
 ------------------------------------------
 legendaryEffects={
 	[11]="Killing a monster with a single-target attack will recover your action time",
-	[12]="When a base enchantment increases one of the stats -might, intellect, or personality- the two other stats will each receive a bonus equivalent to 75%",
+	[12]="Might and accuracy enchantments give 40% bonus to intellect and personality. Intellect and personality enchantments give 40% bonus to might and accuracy",
 	[13]="Immunity to all status effects from monsters",
 	[14]="Crit chance increased by 10% and crit chance over 100% increases total damage",
 	[15]="Divine protection (instead of dying you go back to 25% HP, once every 5 minutes)",
@@ -2642,15 +2642,12 @@ function itemStats(index)
 				tab[it.Bonus]=tab[it.Bonus]+power
 				--legendary power 12
 				if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 12) then
-					if it.Bonus==1 then
-						tab[2]=tab[2]+power*0.75
-						tab[3]=tab[3]+power*0.75
-					elseif it.Bonus==2 then
-						tab[1]=tab[1]+power*0.75
-						tab[3]=tab[3]+power*0.75
-					elseif it.Bonus==3 then
-						tab[1]=tab[1]+power*0.75
-						tab[2]=tab[2]+power*0.75
+					if it.Bonus==1 or it.Bonus==5 then -- might or accuracy
+						tab[2]=tab[2]+power*0.4 -- intellect
+						tab[3]=tab[3]+power*0.4 -- personality
+					elseif it.Bonus==2 or it.Bonus==3 then -- intellect or personality
+						tab[1]=tab[1]+power*0.4 -- might
+						tab[5]=tab[5]+power*0.4 -- accuracy
 					end
 				end
 			elseif it.Bonus<=16 then
@@ -2695,15 +2692,12 @@ function itemStats(index)
 				tab[math.floor(it.Charges/1000)]=tab[math.floor(it.Charges/1000)]+power
 				--legendary power 12
 				if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 12) then
-					if bonus==1 then
-						tab[2]=tab[2]+power*0.75
-						tab[3]=tab[3]+power*0.75
-					elseif bonus==2 then
-						tab[1]=tab[1]+power*0.75
-						tab[3]=tab[3]+power*0.75
-					elseif bonus==3 then
-						tab[1]=tab[1]+power*0.75
-						tab[2]=tab[2]+power*0.75
+					if bonus==1 or bonus==5 then -- might or accuracy
+						tab[2]=tab[2]+power*0.4 -- intellect
+						tab[3]=tab[3]+power*0.4 -- personality
+					elseif bonus==2 or bonus==3 then -- intellect or personality
+						tab[1]=tab[1]+power*0.4 -- might
+						tab[5]=tab[5]+power*0.4 -- accuracy
 					end
 				end
 			elseif vars.normalEnchantResistance and vars.normalEnchantResistance[index] and vars.normalEnchantResistance[index][bonus] then
