@@ -60,14 +60,10 @@ function getCritInfo(pl, dmgType, monLvl)
 
   if dmgType == "spell" then
     local intellect = pl.GetIntellect and pl:GetIntellect() or 0
-    local personality = pl.GetPersonality and pl:GetPersonality() or 0
-    local bonus = math.max(intellect, personality)
-    critDamageMultiplier = bonus/2000 + 1.5
+    critDamageMultiplier = intellect/2000 + 1.5
   elseif dmgType == "heal" then
     local intellect = pl.GetIntellect and pl:GetIntellect() or 0
-    local personality = pl.GetPersonality and pl:GetPersonality() or 0
-    local bonus = math.max(intellect, personality)
-    critDamageMultiplier = bonus*3/4000 + 1.25
+    critDamageMultiplier = intellect*3/4000 + 1.25
     return 0, 0, false
   else
     local accuracy = pl.GetAccuracy and pl:GetAccuracy() or 0
@@ -338,13 +334,17 @@ function events.BuildStatInformationBox(t)
 		i=Game.CurrentPlayer
 		intellect=Party[i]:GetIntellect()
 		_,critDmg=getCritInfo(Party[i],"spell")
-		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage: %s%s\nHealing spells cannot crit",Game.StatsDescriptions[1],intellect/10,"%",critDmg*100-100,"%")
+		t.Text=string.format("%s\n\nBonus magic damage: %s%s\n\nCritical spell strike damage: %s%s",Game.StatsDescriptions[1],intellect/10,"%",critDmg*100-100,"%")
 	end
 	if t.Stat==2 then
 		i=Game.CurrentPlayer
 		personality=Party[i]:GetPersonality()
 		_,critDmg=getCritInfo(Party[i],"spell")
-		t.Text=string.format("%s\n\nBonus magic damage/healing: %s%s\n\nCritical spell strike damage: %s%s\nHealing spells cannot crit",Game.StatsDescriptions[2],personality/10,"%",critDmg*100-100,"%")
+		-- Calculate spell cost reduction percentage
+		local level = Party[i].LevelBase
+		local personalityDivisor = 10 + (level - 1) * 90 / 999
+		local spellCostReduction = personality / personalityDivisor
+		t.Text=string.format("%s\n\nBonus healing: %s%s\n\nSpell cost reduction: %s%s\n\nIncrease the mana by 2 levels worth of mana per 5 skill points",Game.StatsDescriptions[2],Party[i]:GetPersonality()/10,"%",round(spellCostReduction*10)/10,"%")
 	end
 	if t.Stat==3 then
 		i=Game.CurrentPlayer
@@ -1476,13 +1476,12 @@ function calcPowerVitality(pl, statsMenu)
 		end
 		intellect=pl:GetIntellect()	
 		personality=pl:GetPersonality()
-		bonus=math.max(intellect,personality)
 		if healingSpells and healingSpells[spellIndex] then
 			critChance, critDamage=getCritInfo(pl, "heal")
-			power=power*(1+bonus/2000) 
+			power=power*(1+personality/1000)  -- Personality affects healing
 		else
 			critChance, critDamage=getCritInfo(pl, "spell",lvl)
-			power=power*(1+bonus/1000) 
+			power=power*(1+intellect/1000)   -- Intellect affects spell damage
 		end
 		enchantDamage=0
 		for i=0,2 do 
