@@ -1220,7 +1220,7 @@ function events.BuildItemInformationBox(t)
 					if t.Item.Bonus==8 or t.Bonus==9 then
 						power=math.floor((-100+(100^2+power*200)^0.5)/2)
 					elseif t.Item.Bonus==10 then
-						power=power*1.5
+						--power=power*1.5
 					end
 					local stat=math.random(1,10)
 					if GetItemEquipStat(t.Item)==10 then
