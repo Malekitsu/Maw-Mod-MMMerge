@@ -3096,36 +3096,13 @@ function itemStats(index)
 	
 	--enlighnenment
 	local manaScaling=Game.Classes.SPFactor[pl.Class]
-	local manaType=Game.Classes.SPStats[pl.Class]
 	local totalMana=manaScaling*pl.LevelBase+Game.Classes.SPBase[pl.Class]
 	local effect=0
-	if manaType==1 then
-		local stat=pl:GetIntellect()
-		if stat<=21 then
-			effect=effect+math.floor((stat-13)/2)
-		else
-			effect=effect+math.floor(stat/5)
-		end
-	elseif manaType==2 then
-		local stat=pl:GetPersonality()
-		if stat<=21 then
-			effect=effect+math.floor((stat-13)/2)
-		else
-			effect=effect+math.floor(stat/5)
-		end
-	elseif manaType==3 then
-		local stat=pl:GetIntellect()
-		if stat<=21 then
-			effect=effect+math.floor((stat-13)/2)
-		else
-			effect=effect+math.floor(stat/5)
-		end
-		local stat=pl:GetPersonality()
-		if stat<=21 then
-			effect=effect+math.floor((stat-13)/2)
-		else
-			effect=effect+math.floor(stat/5)
-		end
+	local stat=pl:GetPersonality()
+	if stat<=21 then
+		effect=effect+math.floor((stat-13)/2)*2  -- Double personality effect
+	else
+		effect=effect+math.floor(stat/5)*2  -- Double personality effect
 	end
 	local s2,m2=SplitSkill(pl:GetSkill(const.Skills.Meditation))
 	if m2==4 then
@@ -3136,7 +3113,7 @@ function itemStats(index)
 	
 	local s,m=SplitSkill(Skillz.get(pl,52))
 	local enlightIncrease=totalMana*((m+1)/100*s)
-	tab[9]=tab[9]+enlightIncrease+manaScaling*s2*m2
+	tab[9]=tab[9]+enlightIncrease+manaScaling*s2*m2+manaScaling*effect --personality counts twice
 	
 	for i=0,3 do 
 		local item=pl:GetActiveItem(i)
@@ -4415,4 +4392,12 @@ function GetSlotMult(it)
 		slotMult=slotMult*1.5
 	end
 	return slotMult
+end
+
+function events.GameInitialized2()
+	for i=0, Game.Classes.SPStats.High do
+		if Game.Classes.SPStats[i]>0 then
+			Game.Classes.SPStats[i]=2
+		end
+	end
 end
