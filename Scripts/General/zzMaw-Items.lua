@@ -3094,20 +3094,20 @@ function itemStats(index)
 	local effect=0
 	local stat=pl:GetPersonality()
 	if stat<=21 then
-		effect=effect+math.floor((stat-13)/2)*2  -- Double personality effect
+		effect=effect+math.floor((stat-13)/2) 
 	else
-		effect=effect+math.floor(stat/5)*2  -- Double personality effect
+		effect=effect+math.floor(stat/5) 
 	end
 	local s2,m2=SplitSkill(pl:GetSkill(const.Skills.Meditation))
 	if m2==4 then
 		m2=5
 	end
-	effect=effect+s2*m2
-	totalMana=totalMana+manaScaling*effect+tab[9]
+	totalEffect=effect*2+s2*m2
+	totalMana=totalMana+manaScaling*totalEffect+tab[9]
 	
 	local s,m=SplitSkill(Skillz.get(pl,52))
 	local enlightIncrease=totalMana*((m+1)/100*s)
-	tab[9]=tab[9]+enlightIncrease+manaScaling*s2*m2+manaScaling*effect --personality counts twice
+	tab[9]=tab[9]+enlightIncrease+manaScaling*effect
 	
 	for i=0,3 do 
 		local item=pl:GetActiveItem(i)
