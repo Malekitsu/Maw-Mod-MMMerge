@@ -1233,7 +1233,7 @@ CCMAP={
 	[const.Spells.Slow]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.03, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Earth, ["DamageKind"]=const.Damage.Earth,["Debuff"]=const.MonsterBuff.Slow},
 	[60]=					{["Duration"]=const.Minute*7, ["ChanceMult"]=0.05, ["BaseCost"]=5, ["ScalingCost"]=4, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--Mind Charm, has no const value, due to dark elf one overwriting
 	[const.Spells.Charm]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.05, ["BaseCost"]=1, ["ScalingCost"]=4, ["School"]=const.Skills.DarkElfAbility, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--dark elf one
-	[const.Spells.Berserk]=	{["Duration"]=const.Minute*2, ["ChanceMult"]=0.02, ["BaseCost"]=1, ["ScalingCost"]=1.5, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Berserk},
+	[const.Spells.Berserk]=	{["Duration"]=const.Minute*3, ["ChanceMult"]=0.02, ["BaseCost"]=1, ["ScalingCost"]=1.5, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Berserk},
 	[const.Spells.MassFear]={["Duration"]=const.Minute*5, ["ChanceMult"]=0.1, ["BaseCost"]=1, ["ScalingCost"]=0.5, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Fear},
 	[const.Spells.Fear]=	{["Duration"]=const.Minute*3, ["ChanceMult"]=0.005, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Fear},
 	[const.Spells.Enslave]=	{["Duration"]=const.Minute*4, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=1.5, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Enslave},
@@ -1262,15 +1262,18 @@ function events.Action(t)
 	local id=Game.CurrentPlayer
 	if id<0 or id>Party.High then return end
 	local mult=getCCDiffMult(Game.BolsterAmount)
+	-- Apply personality mana cost reduction
+	local personalityReduction = getPersonalityManaCostReduction(Party[id])
 	for key, value in pairs(CCMAP) do
 		local lvl=Party[id].LevelBase
 		local baseCost=value.BaseCost
 		local scalingCost=value.ScalingCost
 		local cost=round((baseCost+(lvl/scalingCost/3))*(1+mult)) --edit here to change mana cost
-		Game.Spells[key]["SpellPointsNormal"]=cost
-		Game.Spells[key]["SpellPointsExpert"]=cost
-		Game.Spells[key]["SpellPointsMaster"]=cost
-		Game.Spells[key]["SpellPointsGM"]=cost
+		local finalCost = math.ceil(cost * personalityReduction)
+		Game.Spells[key]["SpellPointsNormal"]=finalCost
+		Game.Spells[key]["SpellPointsExpert"]=finalCost
+		Game.Spells[key]["SpellPointsMaster"]=finalCost
+		Game.Spells[key]["SpellPointsGM"]=finalCost
 	end
 	--dragon fix
 	Game.Spells[122]["SpellPointsNormal"]=15
