@@ -244,44 +244,11 @@ function recalculateMawMonster()
 				mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
 				mapvars.uniqueMonsterLevel[i]=oldTable.Level+partyLvl
 				mon.Level=math.min(mapvars.uniqueMonsterLevel[i],255)
-				--HP calculated based on previous HP rapported to the previous level
-				HPRateo=oldTable.FullHP/(oldLevel*(oldLevel/10+3))
-				HPBolsterLevel=oldLevel*(1+(0.75*partyLvl/100))+partyLvl*0.75
-				local HP=round(HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180))*HPRateo
-				hpMult=1
-				if Game.BolsterAmount==0 then
-					hpMult=hpMult*(0.6+HPBolsterLevel/600)
-				end
-				--normal
-				if Game.BolsterAmount==50 then
-					hpMult=hpMult*(0.8+HPBolsterLevel/550)
-				end
-				--MAW
-				if Game.BolsterAmount==100 then
-					hpMult=hpMult*(1+HPBolsterLevel/500)
-				end
-				--Hard
-				if Game.BolsterAmount==150 then
-					hpMult=hpMult*(1.5+HPBolsterLevel/450)
-				end
-				--Hell
-				if Game.BolsterAmount==200 then
-					hpMult=hpMult*(2+HPBolsterLevel/400)
-				end
-				--Nightmare
-				if Game.BolsterAmount==300 then
-					hpMult=hpMult*(2.5+HPBolsterLevel/350)
-				end
-				if Game.BolsterAmount==600 then
-					hpMult=hpMult*(3+HPBolsterLevel/300)
-				end	
-				if vars.insanityMode then
-					hpMult=hpMult*(1.5+HPBolsterLevel/300)
-				end
-				if vars.AusterityMode then
-					hpMult=((hpMult*3-math.min(2, hpMult*2))+1)
-				end
-				HP=HP*hpMult
+				--HP calculated using the proper getMonsterHealth function
+				local HP=round(getMonsterHealth(mon))
+				--store in HPtable for reference
+				HPtable=HPtable or {}
+				HPtable[mon.Id]=HP
 				
 				hpOvercap=0
 				while HP>32500 do
@@ -320,7 +287,10 @@ function recalculateMawMonster()
 				if vars.AusterityMode then
 					austerityMod=4
 				end
-				local HP=getMonsterHealth(mon)
+				local HP=round(getMonsterHealth(mon))
+				--store in HPtable for reference
+				HPtable=HPtable or {}
+				HPtable[mon.Id]=HP
 				local hpOvercap=0
 				while HP>32500 do
 					HP=round(HP/2)
@@ -718,10 +688,11 @@ function recalculateMonsterTable()
 			totalLevel[i]=base.Level+mapvars.mawBounty
 		end
 		
-		--HP
-		HPBolsterLevel=basetable[i].Level*(1+(0.1*(totalLevel[i]-basetable[i].Level)/100))+(totalLevel[i]-basetable[i].Level)*0.9
+		--HP - use getMonsterHealth function and store in HPtable
 		HPtable=HPtable or {}
-		HPtable[i]=HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/360)
+		--Create a mock monster object to pass the correct ID and level
+		local mockMon = {Id = i, Level = totalLevel[i]}
+		HPtable[i] = getMonsterHealth(mockMon, totalLevel[i])
 		--resistances 
 		bolsterRes=math.max(round((totalLevel[i]-basetable[i].Level)/10)*5,0)
 		--mapping
