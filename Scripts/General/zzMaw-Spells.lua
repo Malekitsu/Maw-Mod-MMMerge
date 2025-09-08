@@ -85,10 +85,9 @@ function getHealSpellMultiPlier(pl)
 	if success then
 		mult=critMult
 	end
-	--int/pers bonus
+	--personality bonus for healing only
 	local persBonus=pl:GetPersonality()
-	local intBonus=pl:GetIntellect()
-	local statBonus=math.max(persBonus,intBonus)/1000
+	local statBonus=persBonus/1000
 	mult=mult*(1+statBonus)
 	if getMapAffixPower(31) then
 		mult=mult*(1-getMapAffixPower(31)/100)
@@ -1111,9 +1110,7 @@ function events.Action(t)
 			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
 			
 			local mult, gotCrit=getHealSpellMultiPlier(pl)
-			
 			totHeal=baseHeal*mult
-			
 			if gotCrit then
 				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points(crit)"))
 			else
@@ -1744,7 +1741,20 @@ end
 -----------------------
 healingSpellList={const.Spells.RemoveCurse,const.Spells.Resurrection,const.Spells.Heal,const.Spells.CureDisease,const.Spells.PowerCure}
 
-
+-- Calculate personality-based mana cost reduction
+function getPersonalityManaCostReduction(pl)
+	local personality = pl:GetPersonality()
+	local level = pl.LevelBase
+	
+	-- At level 1: 1% reduction per 10 personality points
+	-- At level 1000: 1% reduction per 100 personality points
+	-- Personality divisor scales from 10 to 100 based on level
+	local personalityDivisor = 10 + (level - 1) * 90 / 999
+	local reductionPercent = personality / personalityDivisor
+	
+	-- Convert to multiplier (e.g., 20% reduction = 0.8 multiplier)
+	return 1 - (reductionPercent / 100)
+end
 
 function ascension(customIndex)
 	local index=customIndex or Game.CurrentPlayer 
@@ -1782,20 +1792,24 @@ function ascension(customIndex)
 			vars.eleStacks=vars.eleStacks or {}
 			vars.eleStacks[id]=vars.eleStacks[id] or 0
 		end
+		-- Apply personality mana cost reduction
+		local personalityReduction = getPersonalityManaCostReduction(pl)
+		
 		for v=1,#spells do 
 			num=spells[v]
 			local ascensionLevel=getAscensionTier(s,num)
 			if ascensionLevel>=1 or elementalist then
 				for i=1,4 do
-					Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(spellCost[num][masteryName[i]]*(1+s*0.125)*1.5^(ascensionLevel)*(1-0.125*m),65000)
+					local baseCost = spellCost[num][masteryName[i]]*(1+s*0.125)*1.5^(ascensionLevel)*(1-0.125*m)
+					Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(math.ceil(baseCost * personalityReduction), 65000)
 					if elementalist then
 						local baseCost=round((spellCost[num][masteryName[i]]+vars.eleStacks[id])*(1+s*0.125)*1.5^(ascensionLevel)*(1-0.125*m))
-						Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(round(baseCost*(1+vars.eleStacks[id]*0.075)),65000)
+						Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(round(math.ceil(baseCost*(1+vars.eleStacks[id]*0.075) * personalityReduction)),65000)
 					end
 				end
 			else
 				for i=1,4 do
-					Game.Spells[num]["SpellPoints" .. masteryName[i]]=spellCost[num][masteryName[i]]
+					Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.ceil(spellCost[num][masteryName[i]] * personalityReduction)
 				end
 			end
 			if num==44 then	
@@ -1888,8 +1902,13 @@ function ascension(customIndex)
 			end
 			if ascensionLevel>=1 then
 				for v=1,4 do
-					healingSpells[healingList[i]].Cost[v]=round(healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m))
+					local baseCost = healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m)
+					healingSpells[healingList[i]].Cost[v]=round(math.ceil(baseCost * personalityReduction))
 					healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
+				end
+			else
+				for v=1,4 do
+					healingSpells[healingList[i]].Cost[v]=math.ceil(healingSpells[healingList[i]].Cost[v] * personalityReduction)
 				end
 			end
 		end
@@ -1910,30 +1929,30 @@ function ascension(customIndex)
 		end
 		--remove curse
 		local sp=healingSpells[49]
-		Game.Spells[49]["SpellPointsExpert"]=sp.Cost[2]
-		Game.Spells[49]["SpellPointsMaster"]=sp.Cost[3]
-		Game.Spells[49]["SpellPointsGM"]=sp.Cost[4]
+		Game.Spells[49]["SpellPointsExpert"]=math.ceil(sp.Cost[2] * personalityReduction)
+		Game.Spells[49]["SpellPointsMaster"]=math.ceil(sp.Cost[3] * personalityReduction)
+		Game.Spells[49]["SpellPointsGM"]=math.ceil(sp.Cost[4] * personalityReduction)
 		Game.SpellsTxt[49].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[3], sp.Base[3], sp.Scaling[3])
 		Game.SpellsTxt[49].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[4], sp.Base[4], sp.Scaling[4])
 
 		--shared life
 		local sp=healingSpells[54]
-		Game.Spells[54]["SpellPointsMaster"]=sp.Cost[3]
-		Game.Spells[54]["SpellPointsGM"]=sp.Cost[4]
+		Game.Spells[54]["SpellPointsMaster"]=math.ceil(sp.Cost[3] * personalityReduction)
+		Game.Spells[54]["SpellPointsGM"]=math.ceil(sp.Cost[4] * personalityReduction)
 		Game.SpellsTxt[54].Master=string.format("Adds %s + %s HP per point of skill to the pool", sp.Base[3], sp.Scaling[3])
 		Game.SpellsTxt[54].GM=string.format("Adds %s + %s HP per point of skill to the pool", sp.Base[4], sp.Scaling[4])
 		
 		--resurrection
 		local sp=healingSpells[55]
-		Game.Spells[55]["SpellPointsGM"]=sp.Cost[4]
+		Game.Spells[55]["SpellPointsGM"]=math.ceil(sp.Cost[4] * personalityReduction)
 		Game.SpellsTxt[55].GM=string.format("Cures %s + %s HP per point of skill", sp.Base[4], sp.Scaling[4])
 		
 		--heal
 		local sp=healingSpells[68]
-		Game.Spells[68]["SpellPointsNormal"]=sp.Cost[1]
-		Game.Spells[68]["SpellPointsExpert"]=sp.Cost[2]
-		Game.Spells[68]["SpellPointsMaster"]=sp.Cost[3]
-		Game.Spells[68]["SpellPointsGM"]=sp.Cost[4]
+		Game.Spells[68]["SpellPointsNormal"]=math.ceil(sp.Cost[1] * personalityReduction)
+		Game.Spells[68]["SpellPointsExpert"]=math.ceil(sp.Cost[2] * personalityReduction)
+		Game.Spells[68]["SpellPointsMaster"]=math.ceil(sp.Cost[3] * personalityReduction)
+		Game.Spells[68]["SpellPointsGM"]=math.ceil(sp.Cost[4] * personalityReduction)
 		Game.SpellsTxt[68].Normal=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[1], sp.Base[1], sp.Scaling[1])
 		Game.SpellsTxt[68].Expert=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[2], sp.Base[2], sp.Scaling[2])
 		Game.SpellsTxt[68].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[3], sp.Base[3], sp.Scaling[3])
@@ -1941,14 +1960,14 @@ function ascension(customIndex)
 		
 		--greater heal
 		local sp=healingSpells[74]
-		Game.Spells[74]["SpellPointsMaster"]=sp.Cost[3]
-		Game.Spells[74]["SpellPointsGM"]=sp.Cost[4]
+		Game.Spells[74]["SpellPointsMaster"]=math.ceil(sp.Cost[3] * personalityReduction)
+		Game.Spells[74]["SpellPointsGM"]=math.ceil(sp.Cost[4] * personalityReduction)
 		Game.SpellsTxt[74].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[3], sp.Base[3], sp.Scaling[3])
 		Game.SpellsTxt[74].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\nno limit\n",sp.Cost[4], sp.Base[4], sp.Scaling[4])
 		
 		--power heal
 		local sp=healingSpells[77]
-		Game.Spells[77]["SpellPointsGM"]=sp.Cost[4]
+		Game.Spells[77]["SpellPointsGM"]=math.ceil(sp.Cost[4] * personalityReduction)
 		Game.SpellsTxt[77].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[4], sp.Base[4], sp.Scaling[4])
 		
 		--ADD CAST RECOVERY TIME 
