@@ -1244,7 +1244,7 @@ function MawRegen(timePassed)
 				
 			end
 			
-			local SPREGEN = (FSP^0.25*RegS^1.4*((RegM+1)/2000) +0.02)
+			local SPREGEN = (FSP^0.35*RegS^1.4*((RegM+1)/2000) +0.02)
 			
 			for it in pl:EnumActiveItems() do
 				--[[special enchants now increase meditation
@@ -1262,7 +1262,7 @@ function MawRegen(timePassed)
 			if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[56] and not table.find(classesWithNoMeditationRegen, pl.Class) then
 				local s, m, level=getBuffSkill(56)
 				local level=level^0.6
-				regenSP[i] = regenSP[i] + (FSP^0.25*level^1.4*((buffPower[56].Base[m])/10000) +0.1)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
+				regenSP[i] = regenSP[i] + (FSP^0.35*level^1.4*((buffPower[56].Base[m])/10000) +0.1)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
 			end
 			--dragon regen
 			if pl.Class==10 then
@@ -1315,8 +1315,8 @@ function events.Tick()
 		if m==4 then
 			m=5
 		end
-		local spRegen = (FSP^0.25*s^1.4*((m+1)/20)+2)/10
-		local spRegen2 = (FSP^0.25*(s+1)^1.4*((m+1)/20)+2)/10
+		local spRegen = (FSP^0.35*s^1.4*((m+1)/20)+2)/10
+		local spRegen2 = (FSP^0.35*(s+1)^1.4*((m+1)/20)+2)/10
 		local spRegen2 = round((spRegen2-spRegen)*100)/100
 		if spRegen>10 then
 			spRegen = round((spRegen)*10)/10
