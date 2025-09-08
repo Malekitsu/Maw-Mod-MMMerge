@@ -1775,7 +1775,7 @@ function getPlayerEstimatedPower(lvl)
 	end
 	local armsMasterDamage=math.min(0.5+skill/masterLearned,2) --use gm as a reference
 	
-	local baseDamage=twoHandedSwordDamagePerLevel*lvl+armsMasterDamage*skill
+	local baseDamage=twoHandedSwordDamagePerLevel*lvl+armsMasterDamage*skill+baseDamage
 	
 	local swordMultiplier=armsMasterDamage*2*skill/100
 	
@@ -1808,9 +1808,10 @@ function getPlayerEstimatedPower(lvl)
 	
 	damage=damage*(1+critChance*critDamage*extraMult)
 	
+	local extimatedHitChance=0.8
 	local extimatedEnchantMultiplier=1.25 + math.min((lvl/666),0.75)
 	
-	damage=damage*extimatedEnchantMultiplier+baseDamage
+	damage=damage*extimatedEnchantMultiplier*extimatedHitChance
 	
 	return damage
 end
