@@ -419,12 +419,12 @@ function events.BuildStatInformationBox(t)
 		if m==4 then
 			m=5
 		end
-		local medRegen = round(fullSP^0.25*s^1.4*(m+1)/20)+2
+		local medRegen = round(fullSP^0.35*s^1.4*(m+1)/20)+2
 		--meditation buff
 		if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[56] then
 			local s, m, level=getBuffSkill(56)
 			local level=level^0.6
-			medRegen = medRegen + round((fullSP^0.25*level^1.4*((buffPower[56].Base[m])/100) +10)*(1+buffPower[56].Scaling[m]/100*s))
+			medRegen = medRegen + round((fullSP^0.35*level^1.4*((buffPower[56].Base[m])/100) +10)*(1+buffPower[56].Scaling[m]/100*s))
 		end
 		
 		local SPregenItem=0
@@ -1867,6 +1867,11 @@ function getMonsterHealth(mon, level)
 	--account for resistances
 	health=health/2^(math.min(totalLevel[id]/2/100,1000)) --approx
 	
+	-- Check if monster has GetIndex method (real monster vs mock object)
+	if not mon.GetIndex then
+		return health
+	end
+	
 	local index=mon:GetIndex()
 	if mon.NameId>=220 and mon.NameId<=300 then
 		mapvars.bossData=mapvars.bossData or {}
@@ -1879,7 +1884,7 @@ function getMonsterHealth(mon, level)
 	return health
 end
 
---[[
+--[[ test code, don't touch
 for i=1,1000 do
 	HPtable=i*(i/10+3)*2*(1+i/360)
 	if Game.BolsterAmount==600 then
