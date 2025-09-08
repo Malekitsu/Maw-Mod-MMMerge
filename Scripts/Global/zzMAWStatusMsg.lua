@@ -104,7 +104,7 @@ function events.CalcDamageToMonster(t)
 			if percent<lowestHealthPercentage then
 				SendHeal(partyId, playerId, overHeal, pl.Name)
 			else
-				Party[id].HP=math.min(Party[id].HP+overHeal, fullHP)
+				Party[id].HP=math.min(Party[id].HP+overHeal, GetMaxHP(Party[id]))
 			end
 		end
 		local partyHP2=0
