@@ -1260,8 +1260,10 @@ function events.BuildItemInformationBox(t)
 				math.randomseed(vars.enchantSeedList[t.Item.Number]+t.Item.MaxCharges)
 				if math.random(1,10)==1 then
 					bonus=math.random(17,24)
-				else
+				elseif GetItemEquipStat(t.Item)==10 then
 					bonus=math.random(1,16)
+				else
+					bonus=math.random(1,10)
 				end
 				txt=baseStatName[bonus] .. " +X"
 				t.Enchantment = StrColor(100,100,100, txt)
