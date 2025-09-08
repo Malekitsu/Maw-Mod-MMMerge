@@ -3673,3 +3673,24 @@ function getClosestMonsterInRange(mon,range)
 	--will return as monster index
 	return closestMonster
 end
+
+function events.KeyDown(t)
+	if Game.CurrentScreen==8 and t.Key==const.Keys.TAB then
+		local id=Game.CurrentPlayer
+		if id<0 or id>Party.High then return end
+		local pl=Party[i]
+		local tabs={}
+		for i=12,23 do
+			if pl.Skills[i]>0 then
+				table.insert(tabs,i-12)
+			end
+		end
+		local currentTab=pl.SpellBookPage
+		local nextIndexTab=table.find(tabs, currentTab)+1
+		local book=tabs[nextIndexTab]
+		if not table.find(tabs,book) then
+			book=tabs[1]
+		end
+		DoGameAction(87,book,0)
+	end
+end
