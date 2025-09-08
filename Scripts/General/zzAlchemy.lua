@@ -139,7 +139,7 @@ function events.UseMouseItem(t)
 		Party.SpellBuffs[13].ExpireTime=Game.Time+potionDuration
 		Party.SpellBuffs[13].Power=5+math.floor(it.Bonus/10)
 		Party.SpellBuffs[13].Skill=3
-		if it.Bonus>=55 then
+		if it.Bonus>=50 then
 			Party.SpellBuffs[13].Skill=4
 		end
 		vars.magicResistancePotionExpire=Game.Time+potionDuration
@@ -201,7 +201,7 @@ function events.UseMouseItem(t)
 			end
 		end
 		--effect
-		local power=math.min(math.floor(it.Bonus/55),3)*20
+		local power=math.min(math.floor(it.Bonus/50),3)*20
 		if it.Number==261 or it.Number==262 then
 			power=power*1.5
 		end
@@ -282,7 +282,7 @@ potionPowerRequirement={
 	[235]=20,
 	[239]=20,
 	[246]=40,
-	[256]=55,
+	[256]=50,
 }
 blackPermanentBuffs={
 	[252]={"MightBase","AccuracyBase"},
@@ -446,7 +446,7 @@ potionText={
 	[234] = "Increases Armor Class  by 5+(0.5 x Power) for 6 Hours",
 	[235] = "Prevents drowning damage for 6 hours.\nRequire 20 power to work.\n",
 	[236] = "Increases item's roughness, making it more resistant to breaking.\n",
-	[237] = "Grant 5 +1 per 10 potion power charges of Magic Protection (as the spell) for 6 hours.\nFrom 55 power on will protect also from death and eradication.\n",
+	[237] = "Grant 5 +1 per 10 potion power charges of Magic Protection (as the spell) for 6 hours.\nFrom 50 power on will protect also from death and eradication.\n",
 	[238] = "Grant 1 enchant to an unenchanted item, based on potion Power.\nRequire at least 20 power to work.\n",
 	[239] = "Cures and prevent Stoned condition for 6 hours.\nRequire 20 power to work.\n",
 	[240] = "Temporarily increases by 10+(1 x Power) Might and Accuracy for 6 hours.",
@@ -461,17 +461,17 @@ potionText={
 	[249] = "Increases temporary Fire, Air, Water and Earth resistance. (Dark)",
 	[250] = "Increases temporary Mind and Body resistance. (Light)",
 	[251] = "Provides Shield+Stone Skin+Preservation.",
-	[252] = "Adds 20/40/60 to permanent Might and Accuracy.\nRequire 55 power per step to work.\n",
-	[253] = "Adds 20/40/60 to permanent Intellect and Wisdom.\nRequire 55 power per step to work.\n",
-	[254] = "Adds 20/40/60 to permanent Endurance, Speed and Luck.\nRequire 55 power per step to work.\n",
-	[255] = "Adds a random tier 3 elemental damage enchant to a weapon.\nRequire 55 power to work.\n",
-	[256] = "Adds 'of Darkness' property to a non-magic weapon.\nRequire 100 power to work.\n",
+	[252] = "Permanently adds 20 per 50 potion power to permanent Might and Accuracy.\n",
+	[253] = "Permanently adds 20 per 50 potion power to permanent Intellect and Wisdom.\n",
+	[254] = "Permanently adds 20 per 50 potion power to permanent Endurance, Speed and Luck.\n",
+	[255] = "Permanently adds a random tier 3 elemental damage enchant to a weapon.\nRequire 50 power to work.\n",
+	[256] = "Permanently adds 'of Darkness' property to a non-magic weapon.\nRequire 100 power to work.\n",
 	[257] = "Increases all Seven Statistics temporarily by 10+(1 x Power) for 6 hours.",
-	[258] = "Fix caracter age at 60.\nRequire 55 power to work.\n",
+	[258] = "Fix caracter age at 60.\nRequire 50 power to work.\n",
 	[259] = "Grant 500 Experience point per Power to the player.",
-	[260] = "Fix caracter age at 20.\nRequire 55 power to work.\n",
-	[261] = "Permanently adds 30/60/90 to Fire, Air, Water and Earth Resistance, single-use.\nRequire 55 power per step to work.\n",
-	[262] = "Permanently adds 30/60/90 to Mind and Body Resistance, single-use.\nRequire 55 power per step to work.\n",
+	[260] = "Fix caracter age at 20.\nRequire 50 power to work.\n",
+	[261] = "Permanently adds 30 per 50 potion power to Fire, Air, Water and Earth Resistance, single-use.\nRequire 50 power per step to work.\n",
+	[262] = "Permanently adds 30 per 50 potion power to Mind and Body Resistance, single-use.\nRequire 50 power per step to work.\n",
 	[263] = "Increases all resistances temporarily by 10+ (1 x Power) for 6 hours.",
 }
 
@@ -627,7 +627,6 @@ reagentDropTable[4]={203,208,213,218,1005,1010,1015,1020}
 reagentDropTable[5]={204,209,214,219,1006,1011,1016,1021}
 function events.GameInitialized2()
 	Skillz.setDesc(const.Skills.Alchemy,1,Skillz.getDesc(const.Skills.Alchemy,1) .. "\n\nMaster will grant 1% to drop random reagents from Monsters.\nAt GM this chance is doubled.")
-	Game.SkillDesMaster[const.Skills.Alchemy]="Allows to make white potions. Power when mixing will be increased to 1.5 per skill point."
 	Game.SkillDesMaster[const.Skills.Alchemy]="Allows to make white potions. Power when mixing will be increased to 1.5 per skill point."
 	Game.SkillDesGM[const.Skills.Alchemy]="Allows to make black potions. Power when mixing will be increased to 2 and increases potion duration by 6 Minutes per skill point."
 end
