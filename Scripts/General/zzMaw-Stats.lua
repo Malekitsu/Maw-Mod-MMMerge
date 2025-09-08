@@ -1863,6 +1863,9 @@ function getMonsterHealth(mon, level)
 		health=health*rateo
 	end
 	
+	--account for resistances
+	health=health/2^(math.min(totalLevel[id]/2/100,1000)) --approx
+	
 	local index=mon:GetIndex()
 	if mon.NameId>=220 and mon.NameId<=300 then
 		mapvars.bossData=mapvars.bossData or {}
