@@ -343,7 +343,8 @@ function events.ItemGenerated(t)
 			itmod=8
 		end
 		if reagentList[it.Number] then
-			it.Bonus=round(partyLevel/itmod)
+			local bonus=math.min(partyLevel, getTotalLevel())
+			it.Bonus=round(bonus/itmod)
 			return
 		end
 		
