@@ -1695,7 +1695,7 @@ function getPlayerExtimatedVitality(lvl)
 end
 
 function getMonsterDamage(mon, level)
-	local hitToKill={14,10,7,6.5,6,5.5,5,4,3.2}
+	local hitToKill={14,10,7,6.5,6,5.5,5,4.5,4}
 	if mon then
 		local id=mon.Id
 		if id%3==1 then
