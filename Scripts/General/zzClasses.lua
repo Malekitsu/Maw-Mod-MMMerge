@@ -259,7 +259,7 @@ function events.CalcDamageToMonster(t)
 	if t.Result==0 then return end
 	local data = WhoHitMonster()
 		if data and data.Player and (data.Player.Class==55 or data.Player.Class==54 or data.Player.Class==53) and t.DamageKind==4 and data.Object==nil then
-		
+		local pl=data.Player
 		local partyHP=0
 		for i=0,Party.High do
 			if Party[i].Dead==0 and Party[i].Eradicated==0 then
@@ -268,21 +268,23 @@ function events.CalcDamageToMonster(t)
 		end
 		
 		--get body
-		bodyS,bodyM=SplitSkill(data.Player.Skills[const.Skills.Body])
+		bodyS,bodyM=SplitSkill(pl.Skills[const.Skills.Body])
 		
 		if bodyS==0 and spiritS==0 then return end
 		
 		--Calculate heal value and apply
 		healValue=(bodyS^1.3*bodyM*2)*damageMultiplier[t.PlayerIndex]["Melee"]
-		personality=data.Player:GetPersonality()
+		personality=pl:GetPersonality()
 		healValue=round(healValue*(1+personality/1000))
+		
+		if pl.HP/GetMaxHP(pl)<0.25 then return end --don't share healing if struggling
 		
 		local healTarget, lowestHealthPercentage=pickLowestPartyMember()
 		
 		local percent, partyId, playerId=OnlineLowestHealthPercentage()
 		
 		if lowestHealthPercentage>0.25 and percent<lowestHealthPercentage then
-			SendHeal(partyId, playerId, healValue, data.Player.Name)
+			SendHeal(partyId, playerId, healValue, pl.Name)
 			
 			local hp=vars.online.partyHealthMana.Parties[partyId][playerId].HP
 			local fhp=vars.online.partyHealthMana.Parties[partyId][playerId].FHP
