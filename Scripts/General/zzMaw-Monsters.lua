@@ -544,11 +544,6 @@ function recalculateMonsterTable()
 	
 	bolsterLevel=bolsterLevel+bonus
 	
-	local name=Game.MapStats[Map.MapStatsIndex].Name
-	if vars.madnessMode and madnessMapLevels[name] then
-		bolsterLevel=madnessMapLevels[name]
-	end	
-	
 	if mapvars.mapAffixes then
 		bolsterLevel=mapvars.mapAffixes.Power*10+20
 	end
@@ -658,7 +653,12 @@ function recalculateMonsterTable()
 			end
 		end
 		
-		
+		--madness, used to calculate gold
+		local name=Game.MapStats[Map.MapStatsIndex].Name
+		if vars.madnessMode and madnessMapLevels[name] then
+			bolsterLevel=madnessMapLevels[name]
+		end	
+	
 		--madness
 		if vars.madnessMode and not madnessStartingMaps[name] and not mapvars.mapAffixes then
 			local baseLevel=madnessMapLevels[name] or 0
