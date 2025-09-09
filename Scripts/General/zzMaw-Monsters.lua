@@ -3072,10 +3072,10 @@ function generateBoss(index, nameIndex, skillType)
 		local mapSeed = getMapSeedForBossAffixes()
 		if mapSeed and vars.madnessMode then
 			-- Seeded boss generation
-			skill = getSeededSkillForBoss(index, mapSeed)
+			skill = getSeededSkillForBoss(mapSeed)
 			
 			-- Check for pity-protected special bosses
-			local specialSkill, specialHpMult, specialDmgMult = checkPityProtectedBoss(index, mapSeed, chanceMult, generatedByBroodlord)
+			local specialSkill, specialHpMult, specialDmgMult = checkPityProtectedBoss(mapSeed, chanceMult, generatedByBroodlord)
 			
 			if specialSkill then
 				skill = specialSkill
@@ -3186,13 +3186,18 @@ function getMapSeedForBossAffixes()
 	return baseSeed + mapSeed
 end
 
-function getSeededSkillForBoss(bossIndex, seed)
+function getSeededSkillForBoss(seed)
 	if not seed then
 		return nil -- No seeding, use random
 	end
 	
-	-- Create deterministic "random" number based on seed and boss index
-	local combinedSeed = seed + bossIndex * 31
+	-- Initialize boss counter if not exists
+	if not vars.totalBossesSpawned then
+		vars.totalBossesSpawned = 0
+	end
+	
+	-- Create deterministic "random" number based on seed and persistent boss counter
+	local combinedSeed = seed + vars.totalBossesSpawned * 31
 	local pseudoRandom = (combinedSeed * 9301 + 49297) % 233280
 	local normalizedRandom = pseudoRandom / 233280
 	
@@ -3201,9 +3206,14 @@ function getSeededSkillForBoss(bossIndex, seed)
 	return SkillList[skillIndex]
 end
 
-function getSeededSpecialBossChance(bossIndex, seed, chanceType)
+function getSeededSpecialBossChance(seed, chanceType)
 	if not seed then
 		return nil -- No seeding, use random
+	end
+	
+	-- Initialize boss counter if not exists
+	if not vars.totalBossesSpawned then
+		vars.totalBossesSpawned = 0
 	end
 	
 	-- Different offset for different chance types
@@ -3214,7 +3224,7 @@ function getSeededSpecialBossChance(bossIndex, seed, chanceType)
 		offset = 456
 	end
 	
-	local combinedSeed = seed + bossIndex * 31 + offset
+	local combinedSeed = seed + vars.totalBossesSpawned * 31 + offset
 	local pseudoRandom = (combinedSeed * 9301 + 49297) % 233280
 	return pseudoRandom / 233280
 end
@@ -3230,15 +3240,15 @@ function getPityAdjustedChance(baseChance, pityCounter)
 	return baseChance * (1 + pityCounter * 0.05)
 end
 
-function checkPityProtectedBoss(bossIndex, seed, chanceMult, generatedByBroodlord)
+function checkPityProtectedBoss(seed, chanceMult, generatedByBroodlord)
 	if not vars.insanityMode then
 		return nil, nil, nil -- No pity protection outside insanityMode
 	end
 	
 	initializePityProtection()
 	
-	local broodlordChance = getSeededSpecialBossChance(bossIndex, seed, "broodlord")
-	local omnipotentChance = getSeededSpecialBossChance(bossIndex, seed, "omnipotent")
+	local broodlordChance = getSeededSpecialBossChance(seed, "broodlord")
+	local omnipotentChance = getSeededSpecialBossChance(seed, "omnipotent")
 	
 	-- Apply pity protection
 	local pityBroodlordChance = getPityAdjustedChance(0.01 * chanceMult, vars.broodlordPityCounter)
