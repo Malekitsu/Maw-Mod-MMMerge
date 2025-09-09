@@ -543,14 +543,15 @@ function recalculateMonsterTable()
 	local bonus=vars.mapResetCount[Map.Name]*20
 	
 	bolsterLevel=bolsterLevel+bonus
-	if mapvars.mapAffixes then
-		bolsterLevel=mapvars.mapAffixes.Power*10+20
-	end
 	
 	local name=Game.MapStats[Map.MapStatsIndex].Name
 	if vars.madnessMode and madnessMapLevels[name] then
 		bolsterLevel=madnessMapLevels[name]
 	end	
+	
+	if mapvars.mapAffixes then
+		bolsterLevel=mapvars.mapAffixes.Power*10+20
+	end
 	
 	bolsterLevel2=bolsterLevel --used for loot
 	
