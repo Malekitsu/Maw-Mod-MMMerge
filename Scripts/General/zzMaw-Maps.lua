@@ -1715,6 +1715,7 @@ function events.MonsterKilled(mon)
 		return
 	end
 	mapvars.mapsDropped=mapvars.mapsDropped or 0
+	vars.mapDropFailures=mapvars.mapDropFailures or 0
 	local chances=0.001
 	local levelRequired=100
 	if vars.madnessMode then
@@ -1723,7 +1724,35 @@ function events.MonsterKilled(mon)
 			return
 		end
 	end
-	if getMonsterLevel(mon)>levelRequired and math.random()<chances*mon.Level/100/(mapvars.mapsDropped+1) then
+	
+	-- Seeded map drop calculation
+	local dropChance = chances * mon.Level / 100 / (mapvars.mapsDropped + 1)
+	
+	-- Apply pity protection - increase chance by 10% per failed attempt
+	local pityMultiplier = 1 + (vars.mapDropFailures * 0.1)
+	dropChance = dropChance * pityMultiplier
+	
+	-- Use seeded random if available, otherwise fallback to regular random
+	local rollValue
+	if vars.seed and mapvars.MonsterSeed then
+		local monsterIndex = mon:GetIndex()
+		if monsterIndex and mapvars.MonsterSeed[monsterIndex] then
+			-- Use monster-specific seed for deterministic drop calculation
+			local dropSeed = mapvars.MonsterSeed[monsterIndex] + 1337 -- Offset for map drops
+			math.randomseed(dropSeed)
+			rollValue = math.random()
+			-- Additional randomization for item properties
+			for i = 1, 3 do
+				math.random()
+			end
+		else
+			rollValue = math.random()
+		end
+	else
+		rollValue = math.random()
+	end
+	
+	if getMonsterLevel(mon)>levelRequired and rollValue < dropChance then
 		assignedAffixes = {}
 		obj = SummonItem(290, mon.X, mon.Y, mon.Z + 100, 100)
 		possibleMaps={}
@@ -1735,6 +1764,7 @@ function events.MonsterKilled(mon)
 		if table.find(possibleMaps,mapDungeons[math.random(1,#mapDungeons)]) then
 			obj.Item.BonusStrength=possibleMaps[math.random(1,#possibleMaps)]
 			mapvars.mapsDropped=mapvars.mapsDropped+1
+			vars.mapDropFailures=0 -- Reset pity counter on successful drop
 			if vars.madnessMode then
 				vars.ownedMaps=vars.ownedMaps+1
 			end
@@ -1758,6 +1788,11 @@ function events.MonsterKilled(mon)
 		obj.Item.MaxCharges=round(getMonsterLevel(mon)/10-math.random(0,3))
 		if vars.insanityMode and not vars.madnessMode then
 			obj.Item.MaxCharges=math.max(obj.Item.MaxCharges,30)
+		end
+	else
+		-- Increment pity counter only if monster level was high enough for drop attempt
+		if getMonsterLevel(mon) > levelRequired then
+			vars.mapDropFailures = vars.mapDropFailures + 1
 		end
 	end
 end
