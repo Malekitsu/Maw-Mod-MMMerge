@@ -45,12 +45,41 @@ end
 function events.LoadMap()
 	--if Game.BolsterAmount~=300 then return end
 	if not mapvars.MonsterSeed then
+		-- Generate or use existing global seed
+		if not vars.seed then
+			vars.seed = os.time()
+		end
+		
+		-- Create map-specific seed variation
+		local mapName = Map.Name or "default"
+		local mapSeed = vars.seed
+		for i = 1, #mapName do
+			mapSeed = mapSeed + string.byte(mapName, i) * i * 13
+		end
+		
+		-- Add map index if available
+		if Map.MapStatsIndex then
+			mapSeed = mapSeed + Map.MapStatsIndex * 47
+		end
+		
+		-- Set the combined seed
+		Game.RandSeed = mapSeed
+		math.randomseed(mapSeed)
+		
 		mapvars.MonsterSeed={}
 		for i = 0, Map.Monsters.Limit - 1 do
-			mapvars.MonsterSeed[i] = Game.RandSeed
-			for i = 1, 30 do
+			-- Generate enough variation for each monster
+			local monsterSeed = Game.RandSeed + i * 97
+			Game.RandSeed = monsterSeed
+			math.randomseed(monsterSeed)
+			
+			-- Additional randomization to ensure all combinations possible
+			for j = 1, 50 + (i % 20) do
 				Game.Rand()
+				math.random()
 			end
+			
+			mapvars.MonsterSeed[i] = Game.RandSeed
 		end
 	end
 end
@@ -559,21 +588,32 @@ function events.ItemGenerated(t)
 		
 		--legendary
 		if it.BonusExpireTime==2 then
-			local chance=0.1
+			-- Initialize pity protection
+			vars.legendaryPityCounter = vars.legendaryPityCounter or 0
+			
+			-- Reduced base chances (roughly 50% of original)
+			local baseChance=0.05
 			if vars.AusterityMode then
-				chance=0
+				baseChance=0
 			end
 			if vars.Mode==2 then
-				chance=0.2
+				baseChance=0.1
 			end
 			if vars.insanityMode then
-				chance=0.25
+				baseChance=0.125
 			end
 			--No legendary in shop
 			if Game.HouseScreen==2 or Game.HouseScreen==95 then
-				chance=0
+				baseChance=0
 			end
+			
+			-- Apply pity protection (5% increase per failed attempt)
+			local pityChance = baseChance * (1 + vars.legendaryPityCounter * 0.05)
+			local chance = math.min(pityChance, 1.0) -- Cap at 100%
+			
 			if chance>=math.random() or OmnipotentLoot then
+				-- Reset pity counter on successful drop
+				vars.legendaryPityCounter = 0
 				-- Initialize counts for each affix
 				vars.legendaryAffixDropped=vars.legendaryAffixDropped or {}
 				for i = 1, #legendaryEffects-10 do
@@ -621,12 +661,30 @@ function events.ItemGenerated(t)
 				--increase stats
 				it.Charges=math.min(math.ceil(math.min(it.Charges%1000*0.2,999)+it.Charges), it.Charges+10)
 				it.BonusStrength=math.min(math.ceil(it.BonusStrength*1.2),it.BonusStrength+10)
+			elseif baseChance > 0 then
+				-- Only increment pity counter if legendaries are enabled but roll failed
+				vars.legendaryPityCounter = vars.legendaryPityCounter + 1
 			end
 		end
-		
+		--celestial
 		if it.BonusExpireTime>10 and it.BonusExpireTime<100 then
-			if math.random()<0.1 then
+			-- Initialize pity protection
+			vars.celestialPityCounter = vars.celestialPityCounter or 0
+			
+			-- Reduced base chance (50% of original)
+			local baseChance = 0.05
+			
+			-- Apply pity protection (5% increase per failed attempt)
+			local pityChance = baseChance * (1 + vars.celestialPityCounter * 0.05)
+			local chance = math.min(pityChance, 1.0) -- Cap at 100%
+			
+			if math.random()<chance then
 				it.BonusExpireTime=it.BonusExpireTime+100
+				-- Reset pity counter on successful drop
+				vars.celestialPityCounter = 0
+			else
+				-- Increment pity counter on failed celestial drop
+				vars.celestialPityCounter = vars.celestialPityCounter + 1
 			end
 		end
 		OmnipotentLoot=false
