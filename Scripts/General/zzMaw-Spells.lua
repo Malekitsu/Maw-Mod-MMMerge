@@ -3265,15 +3265,14 @@ function mawBuffApply()
 	end
 
 	--shadow bosses
-	if mapvars.shadow then
-		for i=1, #mapvars.shadow do
-			if mapvars.shadow[i] then
-				local mon=Map.Monsters[mapvars.shadow[i]]
-				local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
-				if skill == "Shadow" or skill == "Omnipotent" then
-					local distance=getDistance(mon.X,mon.Y,mon.Z)
-					if distance<2000 and mon.HP>0 and mon.AIState~=19 then
-						Party.SpellBuffs[const.PartyBuff.WizardEye].ExpireTime=0
+	if mapvars.bossData then
+		for index, bossInfo in pairs(mapvars.bossData) do
+			if bossInfo.Skills == "Shadow" or bossInfo.Skills == "Omnipotent" then
+				local mon = Map.Monsters[index]
+				if mon then
+					local distance = getDistance(mon.X, mon.Y, mon.Z)
+					if distance < 2000 and mon.HP > 0 and mon.AIState ~= 19 then
+						Party.SpellBuffs[const.PartyBuff.WizardEye].ExpireTime = 0
 					end
 				end
 			end
