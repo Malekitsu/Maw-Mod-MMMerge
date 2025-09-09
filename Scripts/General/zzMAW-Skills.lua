@@ -1261,7 +1261,7 @@ function MawRegen(timePassed)
 			--meditation buff
 			if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[56] and not table.find(classesWithNoMeditationRegen, pl.Class) then
 				local s, m, level=getBuffSkill(56)
-				local level=level^0.6
+				local level=level^0.65
 				regenSP[i] = regenSP[i] + (FSP^0.35*level^1.4*((buffPower[56].Base[m])/10000) +0.1)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
 			end
 			--dragon regen
