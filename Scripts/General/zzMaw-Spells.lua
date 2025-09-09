@@ -3699,7 +3699,7 @@ function events.KeyDown(t)
 	if Game.CurrentScreen==8 and t.Key==const.Keys.TAB then
 		local id=Game.CurrentPlayer
 		if id<0 or id>Party.High then return end
-		local pl=Party[i]
+		local pl=Party[id]
 		local tabs={}
 		for i=12,23 do
 			if pl.Skills[i]>0 then
