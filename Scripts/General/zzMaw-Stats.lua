@@ -423,7 +423,7 @@ function events.BuildStatInformationBox(t)
 		--meditation buff
 		if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[56] then
 			local s, m, level=getBuffSkill(56)
-			local level=level^0.6
+			local level=level^0.65
 			medRegen = medRegen + round((fullSP^0.35*level^1.4*((buffPower[56].Base[m])/100) +10)*(1+buffPower[56].Scaling[m]/100*s))
 		end
 		
@@ -440,7 +440,6 @@ function events.BuildStatInformationBox(t)
 				bonusregen=1
 			end
 		end
-		SPregenItem=SPregenItem
 		regen=math.ceil(Party[i]:GetFullSP()*SPregenItem*0.01)+medRegen+bonusregen
 		t.Text=string.format("%s\n\nSpell point regen per second: %s",t.Text,StrColor(40,100,255,regen/10))
 	end
