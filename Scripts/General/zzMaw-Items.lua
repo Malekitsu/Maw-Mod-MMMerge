@@ -223,6 +223,7 @@ function events.AfterLoadMap()
 end
 
 function events.ItemGenerated(t)
+	if Game.CurrentScreen==16 or Game.CurrentScreen==21 then return end
 	--boss items forced
 	if bossLoot then
 		if not (t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736)) then
