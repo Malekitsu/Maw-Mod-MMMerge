@@ -3164,7 +3164,11 @@ function getMapSeedForBossAffixes()
 		return nil
 	end
 	
-	local baseSeed = vars.MawBossSeed or 0
+	-- Generate or use existing boss seed
+	if not vars.MawBossSeed then
+		vars.MawBossSeed = os.time()
+	end
+	local baseSeed = vars.MawBossSeed
 	
 	-- Add map-specific variation
 	local mapName = Map.Name or "default"
