@@ -192,9 +192,13 @@ primordialArmorEnchants={1,2,80}
 
 local goldId={187,188,189,197,198,199,999,1000,1001,1799,1800,1801}
 function events.AfterLoadMap()
+	Sleep(1)
 	if not mapvars.chestGoldFix then
 		local name=Game.MapStats[Map.MapStatsIndex].Name
 		local mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
+		if vars.madnessMode and madnessMapLevels[name] then
+			bolsterLevel=madnessMapLevels[name]
+		end	
 		for i=0,Map.Chests.High do
 			for k=1,Map.Chests[i].Items.High do
 				local it=Map.Chests[i].Items[k]
