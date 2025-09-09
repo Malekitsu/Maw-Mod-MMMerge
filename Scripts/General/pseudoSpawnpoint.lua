@@ -45,6 +45,28 @@ function pseudoSpawnpoint(monster, x, y, z, count, powerChances, radius, group, 
 	end
 	
 	local summoned = {} -- will hold summoned monsters to return
+	
+	-- Apply seeding for deterministic monster spawning in madness/insanity mode
+	if vars.seed then
+		-- Create seed based on spawn parameters for consistency
+		local spawnSeed = vars.seed + (t.monster or 1) * 73 + (t.x or 0) + (t.y or 0) * 19 + (t.z or 0) * 31
+		
+		-- Add map-specific variation
+		local mapName = Map.Name or "default"
+		for i = 1, #mapName do
+			spawnSeed = spawnSeed + string.byte(mapName, i) * i * 7
+		end
+		
+		Game.RandSeed = spawnSeed
+		math.randomseed(spawnSeed)
+		
+		-- Additional randomization for spawn parameters
+		for j = 1, 10 do
+			Game.Rand()
+			math.random()
+		end
+	end
+	
 	for i = 1, toCreate do
 		if Map.Monsters.Count >= Map.Monsters.Limit - 20 then
 			return summoned
