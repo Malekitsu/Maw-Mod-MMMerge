@@ -344,7 +344,7 @@ function events.BuildStatInformationBox(t)
 		local level = Party[i].LevelBase
 		local personalityDivisor = 10 + (level - 1) * 90 / 999
 		local spellCostReduction = round((1-getPersonalityManaCostReduction(Party[i]))*1000)/10
-		t.Text=string.format("%s\n\nBonus healing: %s%s\n\nSpell cost reduction: %s%s\n\nIncrease the mana by 2 levels worth of mana per 5 skill points",Game.StatsDescriptions[2],Party[i]:GetPersonality()/10,"%",spellCostReduction,"%")
+		t.Text=string.format("%s\n\nBonus healing: %s%s\n\nSpell cost reduction: %s%s\n\nIncrease the mana by 2 levels worth of mana per 5 personality",Game.StatsDescriptions[2],Party[i]:GetPersonality()/10,"%",spellCostReduction,"%")
 	end
 	if t.Stat==3 then
 		i=Game.CurrentPlayer
