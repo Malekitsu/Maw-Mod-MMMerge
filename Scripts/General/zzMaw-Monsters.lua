@@ -2509,13 +2509,23 @@ function SeedDeaths.new_game(seed)
   local st=_B()
   local s=tonumber(seed)
   if not s then local now=os.time(); math.randomseed(now); s=math.random(0,0x7fffffff) end
-  st.current_seed=s; if st.deaths[s]==nil then st.deaths[s]=0 end
+  st.current_seed=s
+  if st.deaths[s]==nil then
+    -- Use existing death count from vars if available (for save portability)
+    local existingDeathCount = (vars and vars.MadnessDeathCounter) or 0
+    st.deaths[s] = existingDeathCount
+  end
   _D(st); return s
 end
 
 function SeedDeaths.set_current_seed(seed)
   assert(type(seed)=="number",_H"73656564206d7573742062652061206e756d626572")
-  local st=_B(); st.current_seed=seed; if st.deaths[seed]==nil then st.deaths[seed]=0 end
+  local st=_B(); st.current_seed=seed
+  if st.deaths[seed]==nil then
+    -- Use existing death count from vars if available (for save portability)
+    local existingDeathCount = (vars and vars.MadnessDeathCounter) or 0
+    st.deaths[seed] = existingDeathCount
+  end
   _D(st); return seed
 end
 
