@@ -3068,21 +3068,49 @@ function generateBoss(index, nameIndex, skillType)
 		if vars.Mode == 2 then chanceMult = 2 end
 		if vars.insanityMode then chanceMult = 3 end
 
-		skill = SkillList[math.random(1, #SkillList)]
-		if math.random() < 0.01 * chanceMult and not generatedByBroodlord then
-			skill = "Broodlord"
-			mon.Resistances[0] = mon.Resistances[0] + 1000
-			hpMult=hpMult*2
-			dmgMult = dmgMult * 1.5
-		end
-		if generatedByBroodlord then
-			skill = "Broodling"
-		end
-		if math.random() < 0.001 * chanceMult then
-			skill = "Omnipotent"
-			dmgMult = dmgMult * 2
-			mon.Resistances[0] = mon.Resistances[0] + 2000
-			hpMult=hpMult*4
+		-- Use seeded generation in madnessMode
+		local mapSeed = getMapSeedForBossAffixes()
+		if mapSeed and vars.madnessMode then
+			-- Seeded boss generation
+			skill = getSeededSkillForBoss(index, mapSeed)
+			
+			-- Check for pity-protected special bosses
+			local specialSkill, specialHpMult, specialDmgMult = checkPityProtectedBoss(index, mapSeed, chanceMult, generatedByBroodlord)
+			
+			if specialSkill then
+				skill = specialSkill
+				hpMult = hpMult * specialHpMult
+				dmgMult = dmgMult * specialDmgMult
+				
+				-- Apply resistance bonuses
+				if skill == "Broodlord" then
+					mon.Resistances[0] = mon.Resistances[0] + 1000
+				elseif skill == "Omnipotent" then
+					mon.Resistances[0] = mon.Resistances[0] + 2000
+				end
+			end
+			
+			if generatedByBroodlord then
+				skill = "Broodling"
+			end
+		else
+			-- Random generation (original behavior)
+			skill = SkillList[math.random(1, #SkillList)]
+			if math.random() < 0.01 * chanceMult and not generatedByBroodlord then
+				skill = "Broodlord"
+				mon.Resistances[0] = mon.Resistances[0] + 1000
+				hpMult=hpMult*2
+				dmgMult = dmgMult * 1.5
+			end
+			if generatedByBroodlord then
+				skill = "Broodling"
+			end
+			if math.random() < 0.001 * chanceMult then
+				skill = "Omnipotent"
+				dmgMult = dmgMult * 2
+				mon.Resistances[0] = mon.Resistances[0] + 2000
+				hpMult=hpMult*4
+			end
 		end
 	end
 
@@ -3129,6 +3157,115 @@ end
 SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Adamantite","Swapper","Regenerating","Puller","Leecher","Swift","Fixator","Shadow","Plagueborn"} --defensives
 --to add: splitting
 --on attack skills
+
+--BOSS AFFIX SEEDING (insanityMode only)
+function getMapSeedForBossAffixes()
+	if not vars.insanityMode then
+		return nil
+	end
+	
+	local baseSeed = vars.MawBossSeed or 0
+	
+	-- Add map-specific variation
+	local mapName = Map.Name or "default"
+	local mapSeed = 0
+	for i = 1, #mapName do
+		mapSeed = mapSeed + string.byte(mapName, i) * i
+	end
+	
+	-- Add map index if available
+	if Map.MapStatsIndex then
+		mapSeed = mapSeed + Map.MapStatsIndex * 7
+	end
+	
+	-- Combine both seeds
+	return baseSeed + mapSeed
+end
+
+function getSeededSkillForBoss(bossIndex, seed)
+	if not seed then
+		return nil -- No seeding, use random
+	end
+	
+	-- Create deterministic "random" number based on seed and boss index
+	local combinedSeed = seed + bossIndex * 31
+	local pseudoRandom = (combinedSeed * 9301 + 49297) % 233280
+	local normalizedRandom = pseudoRandom / 233280
+	
+	-- Determine skill based on seeded random
+	local skillIndex = math.floor(normalizedRandom * #SkillList) + 1
+	return SkillList[skillIndex]
+end
+
+function getSeededSpecialBossChance(bossIndex, seed, chanceType)
+	if not seed then
+		return nil -- No seeding, use random
+	end
+	
+	-- Different offset for different chance types
+	local offset = 0
+	if chanceType == "broodlord" then
+		offset = 123
+	elseif chanceType == "omnipotent" then
+		offset = 456
+	end
+	
+	local combinedSeed = seed + bossIndex * 31 + offset
+	local pseudoRandom = (combinedSeed * 9301 + 49297) % 233280
+	return pseudoRandom / 233280
+end
+
+-- Pity protection for special bosses (insanityMode only)
+function initializePityProtection()
+	vars.broodlordPityCounter = vars.broodlordPityCounter or 0
+	vars.omnipotentPityCounter = vars.omnipotentPityCounter or 0
+end
+
+function getPityAdjustedChance(baseChance, pityCounter)
+	-- Each failed roll increases chance by 5% relative amount
+	return baseChance * (1 + pityCounter * 0.05)
+end
+
+function checkPityProtectedBoss(bossIndex, seed, chanceMult, generatedByBroodlord)
+	if not vars.insanityMode then
+		return nil, nil, nil -- No pity protection outside insanityMode
+	end
+	
+	initializePityProtection()
+	
+	local broodlordChance = getSeededSpecialBossChance(bossIndex, seed, "broodlord")
+	local omnipotentChance = getSeededSpecialBossChance(bossIndex, seed, "omnipotent")
+	
+	-- Apply pity protection
+	local pityBroodlordChance = getPityAdjustedChance(0.01 * chanceMult, vars.broodlordPityCounter)
+	local pityOmnipotentChance = getPityAdjustedChance(0.001 * chanceMult, vars.omnipotentPityCounter)
+	
+	local skill = nil
+	local hpMult = 1
+	local dmgMult = 1
+	
+	-- Check for Broodlord (higher priority)
+	if broodlordChance < pityBroodlordChance and not generatedByBroodlord then
+		skill = "Broodlord"
+		hpMult = 2
+		dmgMult = 1.5
+		vars.broodlordPityCounter = 0 -- Reset counter on success
+	else
+		vars.broodlordPityCounter = vars.broodlordPityCounter + 1 -- Increment on failure
+	end
+	
+	-- Check for Omnipotent (only if not Broodlord)
+	if not skill and omnipotentChance < pityOmnipotentChance then
+		skill = "Omnipotent"
+		hpMult = 4
+		dmgMult = 2
+		vars.omnipotentPityCounter = 0 -- Reset counter on success
+	elseif not skill then
+		vars.omnipotentPityCounter = vars.omnipotentPityCounter + 1 -- Increment on failure
+	end
+	
+	return skill, hpMult, dmgMult
+end
 function events.GameInitialized2() --to make the after all the other code
 	function events.CalcDamageToPlayer(t)
 		local data=mawCustomMonObj or WhoHitPlayer()
