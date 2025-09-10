@@ -1138,14 +1138,28 @@ function events.MonsterKilled(mon)
 			end
 		end
 	end
-	--pick special drop
+	--pick special drop with pity protection
 	for i=1061,1067 do
-		if math.random()<craftDropChances[i]*bonusRoll then
+		-- Initialize pity counter for this crafting material
+		vars.craftPityCounters = vars.craftPityCounters or {}
+		vars.craftPityCounters[i] = vars.craftPityCounters[i] or 0
+		
+		-- Apply pity protection using new pity system
+		local baseChance = craftDropChances[i] * bonusRoll
+		local pityAdjustedChance = pity_chance(baseChance, vars.craftPityCounters[i])
+		
+		if math.random() < pityAdjustedChance then
+			-- Reset pity counter on successful drop
+			vars.craftPityCounters[i] = 0
+			
 			if table.find(waterMonsters, mon.Id) then
 				evt.Add("Items", i)
 			else
 				obj = SummonItem(i, mon.X, mon.Y, mon.Z + 100, 100)
 			end
+		else
+			-- Increment pity counter on failed drop
+			vars.craftPityCounters[i] = vars.craftPityCounters[i] + 1
 		end
 	end
 	
