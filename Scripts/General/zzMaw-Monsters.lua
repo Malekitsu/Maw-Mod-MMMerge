@@ -3252,8 +3252,8 @@ function initializePityProtection()
 end
 
 function getPityAdjustedChance(baseChance, pityCounter)
-	-- Each failed roll increases chance by 5% relative amount
-	return baseChance * (1 + pityCounter * 0.05)
+	-- Use the new pity system
+	return pity_chance(baseChance, pityCounter)
 end
 
 function checkPityProtectedBoss(seed, chanceMult, generatedByBroodlord)
@@ -3266,9 +3266,9 @@ function checkPityProtectedBoss(seed, chanceMult, generatedByBroodlord)
 	local broodlordChance = getSeededSpecialBossChance(seed, "broodlord")
 	local omnipotentChance = getSeededSpecialBossChance(seed, "omnipotent")
 	
-	-- Apply pity protection
-	local pityBroodlordChance = getPityAdjustedChance(0.01 * chanceMult, vars.broodlordPityCounter)
-	local pityOmnipotentChance = getPityAdjustedChance(0.001 * chanceMult, vars.omnipotentPityCounter)
+	-- Apply pity protection using new pity system
+	local pityBroodlordChance = pity_chance(0.01 * chanceMult, vars.broodlordPityCounter)
+	local pityOmnipotentChance = pity_chance(0.001 * chanceMult, vars.omnipotentPityCounter)
 	
 	local skill = nil
 	local hpMult = 1
