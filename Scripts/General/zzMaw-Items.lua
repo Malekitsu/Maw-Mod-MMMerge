@@ -26,91 +26,281 @@ function events.GenerateItem(t)
 	]]
 end
 
+-- Function to get and advance monster type seed
+local function getMonsterSeed(monsterId)
+	-- Initialize global seed if needed
+	if not vars.seed then
+		vars.seed = os.time()
+	end
+	
+	-- Initialize monster counters if needed
+	vars.monsterCounters = vars.monsterCounters or {}
+	vars.monsterSeeds = vars.monsterSeeds or {}
+	
+	-- Initialize this monster type if first encounter
+	if not vars.monsterCounters[monsterId] then
+		vars.monsterCounters[monsterId] = 0
+		-- Create initial seed for this monster type based on global seed + monster ID
+		vars.monsterSeeds[monsterId] = vars.seed + (monsterId * 1009)
+	end
+	
+	-- Get current seed for this monster type
+	local currentSeed = vars.monsterSeeds[monsterId]
+	
+	-- Advance counter and generate next seed deterministically
+	vars.monsterCounters[monsterId] = vars.monsterCounters[monsterId] + 1
+	
+	-- Generate next seed using linear congruential generator formula
+	-- Using constants from Numerical Recipes: a=1664525, c=1013904223, m=2^32
+	vars.monsterSeeds[monsterId] = (vars.monsterSeeds[monsterId] * 1664525 + 1013904223) % 4294967296
+	
+	return currentSeed
+end
+
+-- Function to get boss loot seed based on global seed, map, and boss spawn count
+local function getBossLootSeed(mon)
+	-- Initialize global seed if needed
+	if not vars.seed then
+		vars.seed = os.time()
+	end
+	
+	-- Initialize boss counter for this map
+	mapvars.bossSpawnCount = mapvars.bossSpawnCount or 0
+	
+	-- Increment boss spawn count for this map
+	mapvars.bossSpawnCount = mapvars.bossSpawnCount + 1
+	
+	-- Create deterministic map hash
+	local mapName = Map.Name or "default"
+	local mapHash = 0
+	for i = 1, #mapName do
+		mapHash = mapHash + string.byte(mapName, i) * i * 31
+	end
+	
+	-- Add map index if available
+	if Map.MapStatsIndex then
+		mapHash = mapHash + Map.MapStatsIndex * 97
+	end
+	
+	-- Create boss seed based on: global seed + map hash + boss spawn count + monster ID
+	local bossLootSeed = vars.seed + mapHash + (mapvars.bossSpawnCount * 1337) + (mon.Id * 2003)
+	
+	-- Ensure seed is positive and within reasonable range
+	bossLootSeed = math.abs(bossLootSeed) % 2147483647
+	
+	return bossLootSeed
+end
+
 function events.PickCorpse(t)
 	--if Game.BolsterAmount~=300 then return end
-	Game.RandSeed=mapvars.MonsterSeed[t.MonsterIndex]
-	function events.Tick() 
-		events.Remove("Tick", 1)
-		mapvars.MonsterSeed[t.MonsterIndex]=Game.RandSeed
+	local monster = Map.Monsters[t.MonsterIndex]
+	if monster then
+		-- Check if this is a boss monster (NameId 220-299)
+		local isBoss = monster.NameId >= 220 and monster.NameId < 300
+		
+		-- Apply deterministic seeding first
+		if isBoss then
+			-- Use boss loot seeding for all modes
+			local seed = getBossLootSeed(monster)
+			Game.RandSeed = seed
+			math.randomseed(seed)
+		elseif vars.insanityMode then
+			-- Use new deterministic monster-type seeding for insanity mode
+			local seed = getMonsterSeed(monster.Id)
+			Game.RandSeed = seed
+			math.randomseed(seed)
+		else
+			-- Use old position-based seeding for other modes
+			Game.RandSeed = mapvars.MonsterSeed[t.MonsterIndex]
+			math.randomseed(mapvars.MonsterSeed[t.MonsterIndex])
+		end
+		
+		-- Now perform loot calculations (merged from zzMaw-Monsters.lua)
+		local mon = monster
+		
+		-- Calculate gold
+		local lvl = BLevel[mon.Id] or mon.Level
+		local gold = mon.TreasureDiceCount * (mon.TreasureDiceSides + 1) / 2
+		local newGold = (bolsterLevel2 + lvl) * 7.5
+		local tier = 2
+		
+		if mon.Id % 3 == 1 then
+			newGold = newGold / 2
+			tier = 1
+		elseif mon.Id % 3 == 0 then
+			newGold = newGold * 2
+			tier = 3
+		end
+		
+		if gold > 0 and newGold > gold then
+			local goldMult = (bolsterLevel2 + lvl)^1.5 / (lvl)^1.5
+			mon.TreasureDiceCount = math.min(newGold^0.5, 255)
+			mon.TreasureDiceSides = math.min(newGold^0.5, 255)
+		end
+		
+		-- Calculate loot chances and quality
+		if mon.Item == 0 and (mon.NameId < 220 or mon.NameId > 300) then
+			local name = Game.MapStats[Map.MapStatsIndex].Name
+			local lvlID = mon.Id
+			if tier == 1 then
+				lvlID = mon.Id + 1
+			elseif tier == 3 then
+				lvlID = mon.Id - 1
+			end
+			local lvl = math.max(basetable[lvlID].Level, mapLevels[name].Low)
+			local originalValue = math.min(mon.TreasureItemPercent, 50)
+			mon.TreasureItemPercent = math.ceil(mon.Level^0.5 * (1 + tier) * 0.5 + originalValue * 0.3)
+			
+			if vars.Mode == 2 then
+				mon.TreasureItemPercent = round(mon.TreasureItemPercent * 0.5)
+			elseif Game.BolsterAmount == 300 then
+				mon.TreasureItemPercent = round(mon.TreasureItemPercent * 0.75)
+			end
+			
+			local itemTier = (lvl + 10 * tier) / 20
+			if itemTier % 20 / 20 > math.random() then
+				itemTier = itemTier + 1
+			end
+			itemTier = math.floor(itemTier)
+			mon.TreasureItemLevel = math.max(math.min(itemTier, 6), 1)
+			if itemTier <= 0 then
+				mon.TreasureItemPercent = round(mon.TreasureItemPercent * 2^(itemTier - 1))
+			end
+			if math.random() < 0.7 then
+				mon.TreasureItemType = 0
+			end
+		end
+		
+		-- Special handling for bosses and resurrected
+		if mon.NameId > 300 then
+			mon.TreasureItemPercent = round(mon.TreasureItemPercent / 4)
+			mon.TreasureDiceSides = math.max(round(mon.TreasureDiceSides / 4), 1)
+		elseif mon.NameId > 220 or mon.NameId == 160 then
+			mon.TreasureItemPercent = 100
+			local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+			if skill == "Broodling" then
+				if mon.Id % 3 == 0 then
+					mon.TreasureItemPercent = 30
+				elseif mon.Id % 3 == 2 then
+					mon.TreasureItemPercent = 10
+				elseif mon.Id % 3 == 1 then
+					mon.TreasureItemPercent = 4
+				end
+			end
+			
+			-- Item tier for bosses
+			local name = Game.MapStats[Map.MapStatsIndex].Name
+			local lvl = math.max(basetable[mon.Id].Level, mapLevels[name].Low)
+			local id = mon:GetIndex()
+			if id and mapvars.uniqueMonsterLevel and mapvars.uniqueMonsterLevel[id] then
+				lvl = mapvars.uniqueMonsterLevel[id]
+			end
+			local itemTier = lvl / 20 + 2
+			if itemTier % 15 / 15 > math.random() then
+				itemTier = itemTier + 1
+			end
+			mon.TreasureItemLevel = math.max(math.min(itemTier, 6), 2)
+			bossLoot = true
+			local monsterSkill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+			if monsterSkill == "Omnipotent" then
+				OmnipotentLoot = true
+			end
+		end
+		
+		-- Loot filter code
+		goldBeforeLoot = Party.Gold
+		lootFromMonster = true
+		
+		-- Handle seed state after loot calculations
+		function events.Tick()
+			events.Remove("Tick", 1)
+			lootFromMonster = false
+			-- Update seed for non-insanity mode if needed
+			if not vars.insanityMode and not isBoss then
+				mapvars.MonsterSeed[t.MonsterIndex] = Game.RandSeed
+			end
+		end
 	end
 end
+
 function events.CastTelepathy(t)
 	--if Game.BolsterAmount~=300 then return end
-	Game.RandSeed=mapvars.MonsterSeed[t.MonsterIndex]
-	function events.Tick() 
-		events.Remove("Tick", 1)
-		mapvars.MonsterSeed[t.MonsterIndex]=Game.RandSeed
+	local monster = Map.Monsters[t.MonsterIndex]
+	if monster then
+		-- Check if this is a boss monster (NameId 220-299)
+		local isBoss = monster.NameId >= 220 and monster.NameId < 300
+		
+		if isBoss then
+			-- Use boss loot seeding for all modes
+			local seed = getBossLootSeed(monster)
+			Game.RandSeed = seed
+			function events.Tick() 
+				events.Remove("Tick", 1)
+			end
+		elseif vars.insanityMode then
+			-- Use new deterministic monster-type seeding for insanity mode
+			local seed = getMonsterSeed(monster.Id)
+			Game.RandSeed = seed
+			function events.Tick() 
+				events.Remove("Tick", 1)
+			end
+		else
+			-- Use old position-based seeding for other modes
+			Game.RandSeed = mapvars.MonsterSeed[t.MonsterIndex]
+			function events.Tick() 
+				events.Remove("Tick", 1)
+				mapvars.MonsterSeed[t.MonsterIndex] = Game.RandSeed
+			end
+		end
 	end
 end
 function events.LoadMap()
 	--if Game.BolsterAmount~=300 then return end
-	if not mapvars.MonsterSeed then
-		-- Generate or use existing global seed
-		if not vars.seed then
-			vars.seed = os.time()
-		end
-		
-		-- Create map-specific seed variation
-		local mapName = Map.Name or "default"
-		local mapSeed = vars.seed
-		for i = 1, #mapName do
-			mapSeed = mapSeed + string.byte(mapName, i) * i * 13
-		end
-		
-		-- Add map index if available
-		if Map.MapStatsIndex then
-			mapSeed = mapSeed + Map.MapStatsIndex * 47
-		end
-		
-		-- Set the combined seed
-		Game.RandSeed = mapSeed
-		math.randomseed(mapSeed)
-		
-		mapvars.MonsterSeed={}
-		for i = 0, Map.Monsters.Limit - 1 do
-			-- Generate enough variation for each monster
-			local monsterSeed = Game.RandSeed + i * 97
-			Game.RandSeed = monsterSeed
-			math.randomseed(monsterSeed)
-			
-			-- Additional randomization to ensure all combinations possible
-			for j = 1, 50 + (i % 20) do
-				Game.Rand()
-				math.random()
+	if not vars.insanityMode then
+		-- Use old seeding system for non-insanity modes
+		if not mapvars.MonsterSeed then
+			-- Generate or use existing global seed
+			if not vars.seed then
+				vars.seed = os.time()
 			end
 			
-			mapvars.MonsterSeed[i] = Game.RandSeed
-		end
-	end
-end
---[[
-local function NeedSeed()
-	local t = mapvars.MonsterSeed
-	if not t then
-		t = {}
-		mapvars.MonsterSeed = t
-		for i = 0, Map.Monsters.Limit - 1 do
-			t[i] = Game.RandSeed
-			for i = 1, 30 do
-				Game.Rand()
+			-- Create map-specific seed variation
+			local mapName = Map.Name or "default"
+			local mapSeed = vars.seed
+			for i = 1, #mapName do
+				mapSeed = mapSeed + string.byte(mapName, i) * i * 13
+			end
+			
+			-- Add map index if available
+			if Map.MapStatsIndex then
+				mapSeed = mapSeed + Map.MapStatsIndex * 47
+			end
+			
+			-- Set the combined seed
+			Game.RandSeed = mapSeed
+			math.randomseed(mapSeed)
+			
+			mapvars.MonsterSeed = {}
+			for i = 0, Map.Monsters.High do
+				local monster = Map.Monsters[i]
+				if monster then
+					-- Generate enough variation for each monster
+					local monsterSeed = Game.RandSeed + i * 97
+					Game.RandSeed = monsterSeed
+					math.randomseed(monsterSeed)
+					
+					-- Additional randomization to ensure all combinations possible
+					for j = 1, 50 + (i % 20) do
+						Game.Rand()
+						math.random()
+					end
+					
+					mapvars.MonsterSeed[i] = Game.RandSeed
+				end
 			end
 		end
 	end
-	return t
 end
-
-events.LoadMap = NeedSeed
-
-local function f(t)
-	local seed = NeedSeed()
-	Game.RandSeed = seed[t.MonsterIndex]
-	t.CallDefault()
-	seed[t.MonsterIndex] = Game.RandSeed
-end
-
-events.PickCorpse = f
-events.CastTelepathy = f
-]]
 --create tables to calculate special enchant
 function events.GameInitialized2()
 	Game.ItemsTxt[67].NotIdentifiedName="Mace"
