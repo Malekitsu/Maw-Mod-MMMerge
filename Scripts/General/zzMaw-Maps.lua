@@ -1728,9 +1728,8 @@ function events.MonsterKilled(mon)
 	-- Seeded map drop calculation
 	local dropChance = chances * mon.Level / 100 / (mapvars.mapsDropped + 1)
 	
-	-- Apply pity protection - increase chance by 10% per failed attempt
-	local pityMultiplier = 1 + (vars.mapDropFailures * 0.1)
-	dropChance = dropChance * pityMultiplier
+	-- Apply pity protection using new pity system
+	dropChance = pity_chance(dropChance, vars.mapDropFailures)
 	
 	-- Use seeded random if available, otherwise fallback to regular random
 	local rollValue
