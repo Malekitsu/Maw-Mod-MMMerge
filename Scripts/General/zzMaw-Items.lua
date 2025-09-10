@@ -611,9 +611,8 @@ function events.ItemGenerated(t)
 				baseChance=0
 			end
 			
-			-- Apply pity protection (5% increase per failed attempt)
-			local pityChance = baseChance * (1 + vars.legendaryPityCounter * 0.05)
-			local chance = math.min(pityChance, 1.0) -- Cap at 100%
+			-- Apply pity protection using new pity system
+			local chance = pity_chance(baseChance, vars.legendaryPityCounter)
 			
 			if chance>=math.random() or OmnipotentLoot then
 				-- Reset pity counter on successful drop
@@ -678,9 +677,8 @@ function events.ItemGenerated(t)
 			-- Reduced base chance (50% of original)
 			local baseChance = 0.05
 			
-			-- Apply pity protection (5% increase per failed attempt)
-			local pityChance = baseChance * (1 + vars.celestialPityCounter * 0.05)
-			local chance = math.min(pityChance, 1.0) -- Cap at 100%
+			-- Apply pity protection using new pity system
+			local chance = pity_chance(baseChance, vars.celestialPityCounter)
 			
 			if math.random()<chance then
 				it.BonusExpireTime=it.BonusExpireTime+100
@@ -4457,4 +4455,67 @@ function events.GameInitialized2()
 			Game.Classes.SPStats[i]=2
 		end
 	end
+end
+
+---------------------------
+--PITY SYSTEM CALCULATION--
+---------------------------
+-- Compute effective drops/kill for sequence p_k = s * u_k(k), capped at 1
+local function effective_rate(u_k, s)
+  local S, EK, k = 1.0, 0.0, 0
+  while true do
+    EK = EK + S
+    local pk = s * u_k(k)
+    if pk > 1 then pk = 1 end
+    local survive = 1 - pk
+    if survive <= 0 then break end
+    S = S * survive
+    if S < 1e-15 or k > 10000 then break end
+    k = k + 1
+  end
+  return 1.0 / EK
+end
+
+-- Find s so that the long-run effective rate equals the base p
+local function scale_for_constant_expectation(p, u_k)
+  local lo, hi = 0.0, 1.0
+  for _ = 1, 40 do
+    local mid = 0.5 * (lo + hi)
+    local r = effective_rate(u_k, mid)
+    if r > p then hi = mid else lo = mid end
+  end
+  return 0.5 * (lo + hi)
+end
+
+-- Optional tiny cache so we don't recompute s(p,a) every call
+local _scale_cache = {}
+local function _cache_key(p, a)
+  local pr = math.floor(p * 1e9 + 0.5)  -- quantize to 1e-9
+  local ar = math.floor(a * 1e6 + 0.5)  -- quantize to 1e-6
+  return pr .. ":" .. ar
+end
+
+-- Returns the pity-adjusted chance for base p, failures k, and slope a (default 0.1)
+function pity_chance(p, k, a)
+  a = (a == nil) and 0.1 or a
+  k = (k and k >= 0) and k or 0
+  if p <= 0 then return 0 end
+  if p >= 1 then return 1 end
+
+  -- linear unscaled pity shape u_k = p * (1 + a*k)
+  local function u_k(idx) return p * (1 + a * idx) end
+
+  -- get or compute scale s so that expectation stays constant
+  local key = _cache_key(p, a)
+  local s = _scale_cache[key]
+  if not s then
+    s = scale_for_constant_expectation(p, u_k)
+    _scale_cache[key] = s
+  end
+
+  -- pity-adjusted chance for this failure count
+  local pk = s * u_k(k)
+  if pk > 1 then pk = 1 end
+  if pk < 0 then pk = 0 end
+  return pk
 end
