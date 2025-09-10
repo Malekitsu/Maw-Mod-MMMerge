@@ -1066,14 +1066,23 @@ function events.MonsterKilled(mon)
 		end
 	end
 	
-	-- Apply monster-specific seeding for deterministic drops
-	local monsterIndex = mon:GetIndex()
-	if mapvars.MonsterSeed and mapvars.MonsterSeed[monsterIndex] then
-		Game.RandSeed = mapvars.MonsterSeed[monsterIndex]
-		math.randomseed(mapvars.MonsterSeed[monsterIndex])
-		function events.Tick() 
-			events.Remove("Tick", 1)
-			mapvars.MonsterSeed[monsterIndex] = Game.RandSeed
+	-- Apply seeding for deterministic drops (use same system as loot drops)
+	if vars.insanityMode then
+		-- Use the same deterministic monster-type seeding as loot drops
+		-- This ensures crafting drops use the same seed sequence as regular loot
+		local seed = getMonsterSeed(mon.Id)
+		Game.RandSeed = seed
+		math.randomseed(seed)
+	else
+		-- Use old position-based seeding for other modes
+		local monsterIndex = mon:GetIndex()
+		if mapvars.MonsterSeed and mapvars.MonsterSeed[monsterIndex] then
+			Game.RandSeed = mapvars.MonsterSeed[monsterIndex]
+			math.randomseed(mapvars.MonsterSeed[monsterIndex])
+			function events.Tick() 
+				events.Remove("Tick", 1)
+				mapvars.MonsterSeed[monsterIndex] = Game.RandSeed
+			end
 		end
 	end
 	if getMapAffixPower(9) and math.random()<getMapAffixPower(9)/100 then
