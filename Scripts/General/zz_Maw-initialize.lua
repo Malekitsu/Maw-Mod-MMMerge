@@ -1,136 +1,47 @@
---MAW SETTING HERE
+-- MAW Settings Loader
+-- This script loads settings from the external MAWSettings.lua file
 
---makes your healing spells to automatically target with lowest % HP
-autoTargetHeals=true 
+local function createDefaultSettingsFile(settingsPath)
+    local defaultSettings = [[-- MAW Settings Configuration File
+-- This file stores all configurable settings for the Might and Magic 8 ONLINE mod
+-- Edit these values to customize your gameplay experience
 
---stats menu has more colours
-ColouredStats=true
-
---remove all buffs, when the spellbook is open
-removeBuffsKey=82
-
---a charge ability usable by knights only when SOLO (default is "E")
-chargeKey=69
-
---quickly consumes a red potion from your current inventory (default is "G")
-healthPotionKey=71
-
---quickly consumes a blue potion from your current inventory (default is "V")
-manaPotionKey=86
-
---normally loot enchants ranges from 2 to 3 per enchant tier (so for example tier 20 goes between 40 and 60). Leaving this on will make enchants go between 1 to 100, making you find the strongest possible items in the game.
-higherLootPowerRange=true
-
---useful for a melee only challenge
-disableBow=false
-
---you can find regeneration, unarmed and all the trainers that weren't previously available in all continents in some houses
-enableAllTrainers=true
-
---in insanity only, taking too much damage disintegrates your character (you can still get them back at the Adventurer's Inn)
-enableDisintegrate=true
-
---recommended to set this on for online play. Making this on will disable the message that informs you when monsters are no longer resurrecting and when you complete the dungeon. You still get the reward.
-disableCompletitionMessage=false
-
--- ONLINE remove travel time, training time and coaches/ships always taking everywhere possible
-onlineQualityOfLifeFeatures=true
-
--- Beyond Madness only, death counter is shown
-showDeathCounter=true
-
--- Faster strafing speed
-fasterStrafing=true
-
--- Slower backpedaling speed
-slowerBackpedaling=true
-
---needed to fix some weird bug, don't touch this
-Game.PatchOptions.FixMonstersBlockingShots=true
-
-
---sorting buttons
-currentBagSortKey=82
-partyBagSortKey=84
-multiBagSortKey=67
-partyMultyBagSortKey=71
-AlchemyBagKey=69
-
-function events.GameInitialized2()
-	if Game.ItemsTxt[1466].Name=="Emerald Island" then
-		isRedone=true
-	end
-	for i=0,11 do
-		Skillz.setDesc(i,1,Skillz.getDesc(i,1) .. "\n")
-	end
-end
-
---custom rounding function, as math.round is capped to 2^32
-function round(x)
-	if x%1>=0.5 then
-		x=x-x%1+1
-	else
-		x=x-x%1
-	end
-	return x
-end
-
-function shortenNumber(number, significantDigits, color)
-    if significantDigits < 1 then
-        error("Number of digits needs to be at least 1")
-    end
-
-    local suffix = ""
-    local divisor = 1
-
-    if math.abs(number) >= 10^(9+math.max(0,significantDigits-3)) then
-        suffix = "B"
-        divisor = 1e9
-    elseif math.abs(number) >= 10^(6+math.max(0,significantDigits-3)) then
-        suffix = "M"
-        divisor = 1e6
-    elseif math.abs(number) >= 10^(3+math.max(0,significantDigits-3)) then
-        suffix = "K"
-        divisor = 1e3
-    end
-
-    local shortened = round(number / divisor)
-	if color then
-		if suffix == "K" then
-			local txt=StrColor(255,255,30,tostring(shortened) .. suffix)
-			return txt
-		end
-		if suffix == "M" then
-			local txt=StrColor(255,165,0,tostring(shortened) .. suffix)
-			return txt
-		end
-		if suffix == "B" then
-			local txt=StrColor(255,0,0,tostring(shortened) .. suffix)
-			return txt
-		end
-	end
-	
-    return tostring(shortened) .. suffix
-end
-
-function GetMaxHP(pl)
-	if vars.MAWSETTINGS.buffRework=="ON" and vars.currentHPPool then
-		local id=pl:GetIndex()
-		for i=0, Party.High do
-			if Party[i]:GetIndex()==id then
-				if vars.currentHPPool[i] then
-					return math.max(round(vars.currentHPPool[i]), 1)
-				end
-			end
-		end
-	end	
-	return pl:GetFullHP()
-end
-
----------------------------------
+return {
+    -- Healing and Combat
+    autoTargetHeals = true,             -- makes your healing spells automatically target with lowest % HP
+    disableBow = false,                 -- useful for a melee only challenge
+    enableDisintegrate = true,          -- in insanery only, taking too much damage disintegrates your character
+    
+    -- User Interface
+    ColouredStats = true,               -- stats menu has more colours
+    showDeathCounter = true,            -- Beyond Madness only, death counter is shown
+    disableCompletitionMessage = false, -- disable completion messages (recommended for online play)
+    
+    -- Hotkeys
+    removeBuffsKey = 82,                -- remove all buffs when spellbook is open (default: R)
+    chargeKey = 69,                     -- charge ability for knights when solo (default: E)  
+    healthPotionKey = 71,               -- quickly consume red potion (default: G)
+    manaPotionKey = 86,                 -- quickly consume blue potion (default: V)
+    
+    -- Sorting Hotkeys
+    currentBagSortKey = 82,             -- sort current bag (default: R)
+    partyBagSortKey = 84,               -- sort party bag (default: T)
+    multiBagSortKey = 67,               -- sort multiple bags (default: C)
+    partyMultyBagSortKey = 71,          -- sort party multiple bags (default: G)
+    AlchemyBagKey = 69,                 -- alchemy bag key (default: E)
+    
+    -- Gameplay Features
+    higherLootPowerRange = true,        -- enchants range from 1-100 instead of tier-based ranges
+    enableAllTrainers = true,           -- find trainers that weren't previously available in all continents
+    onlineQualityOfLifeFeatures = true, -- remove travel/training time, coaches/ships always available
+    
+    -- Movement
+    fasterStrafing = true,              -- faster strafing speed
+    slowerBackpedaling = true,          -- slower backpedaling speed
+}
+----------------------------
 --HERE IS THE KEYBIND LIST--
----------------------------------
---[[
+----------------------------
 LBUTTON= 1	
 RBUTTON= 2	
 CANCEL= 3	
@@ -310,10 +221,178 @@ PLAY= 250
 ZOOM= 251	
 NONAME= 252	
 PA1= 253	
-OEM_CLEAR= 254
+OEM_CLEAR= 254	
 ]]
+    
+    local file = io.open(settingsPath, "w")
+    if file then
+        file:write(defaultSettings)
+        file:close()
+        print("Created default MAWSettings.lua file")
+        return true
+    else
+        print("Error: Could not create MAWSettings.lua file")
+        return false
+    end
+end
 
+local function loadMAWSettings()
+    local settingsPath = "MAWSettings.lua"
+    
+    -- Try to load existing settings file
+    local settingsFile = io.open(settingsPath, "r")
+    if settingsFile then
+        settingsFile:close()
+        print("Loading MAW settings from " .. settingsPath)
+        
+        -- Load the settings using dofile
+        local success, settings = pcall(dofile, settingsPath)
+        if success and type(settings) == "table" then
+            return settings
+        else
+            print("Error loading settings file, creating new one...")
+        end
+    else
+        print("MAWSettings.lua not found, creating default file...")
+    end
+    
+    -- Create default file if loading failed or file doesn't exist
+    if createDefaultSettingsFile(settingsPath) then
+        local success, settings = pcall(dofile, settingsPath)
+        if success and type(settings) == "table" then
+            return settings
+        end
+    end
+    
+    -- Fallback to hardcoded defaults if all else fails
+    print("Using fallback default settings")
+    return {
+        autoTargetHeals = true,
+        ColouredStats = true,
+        removeBuffsKey = 82,
+        chargeKey = 69,
+        healthPotionKey = 71,
+        manaPotionKey = 86,
+        higherLootPowerRange = true,
+        disableBow = false,
+        enableAllTrainers = true,
+        enableDisintegrate = true,
+        disableCompletitionMessage = false,
+        onlineQualityOfLifeFeatures = true,
+        showDeathCounter = true,
+        fasterStrafing = true,
+        slowerBackpedaling = true,
+        currentBagSortKey = 82,
+        partyBagSortKey = 84,
+        multiBagSortKey = 67,
+        partyMultyBagSortKey = 71,
+        AlchemyBagKey = 69
+    }
+end
 
+-- Load settings and assign to global variables
+local mawSettings = loadMAWSettings()
+
+-- Assign settings to global variables for compatibility
+autoTargetHeals = mawSettings.autoTargetHeals
+ColouredStats = mawSettings.ColouredStats
+removeBuffsKey = mawSettings.removeBuffsKey
+chargeKey = mawSettings.chargeKey
+healthPotionKey = mawSettings.healthPotionKey
+manaPotionKey = mawSettings.manaPotionKey
+higherLootPowerRange = mawSettings.higherLootPowerRange
+disableBow = mawSettings.disableBow
+enableAllTrainers = mawSettings.enableAllTrainers
+enableDisintegrate = mawSettings.enableDisintegrate
+disableCompletitionMessage = mawSettings.disableCompletitionMessage
+onlineQualityOfLifeFeatures = mawSettings.onlineQualityOfLifeFeatures
+showDeathCounter = mawSettings.showDeathCounter
+fasterStrafing = mawSettings.fasterStrafing
+slowerBackpedaling = mawSettings.slowerBackpedaling
+currentBagSortKey = mawSettings.currentBagSortKey
+partyBagSortKey = mawSettings.partyBagSortKey
+multiBagSortKey = mawSettings.multiBagSortKey
+partyMultyBagSortKey = mawSettings.partyMultyBagSortKey
+AlchemyBagKey = mawSettings.AlchemyBagKey
+
+-- Store settings in vars for access by other scripts
+function events.LoadMap()
+	vars.MAWINITSETTINGS = mawSettings
+end
+
+--needed to fix some weird bug, don't touch this
+Game.PatchOptions.FixMonstersBlockingShots=true
+
+function events.GameInitialized2()
+	if Game.ItemsTxt[1466].Name=="Emerald Island" then
+		isRedone=true
+	end
+	for i=0,11 do
+		Skillz.setDesc(i,1,Skillz.getDesc(i,1) .. "\n")
+	end
+end
+
+--custom rounding function, as math.round is capped to 2^32
+function round(x)
+	if x%1>=0.5 then
+		x=x-x%1+1
+	else
+		x=x-x%1
+	end
+	return x
+end
+
+function shortenNumber(number, significantDigits, color)
+    if significantDigits < 1 then
+        error("Number of digits needs to be at least 1")
+    end
+
+    local suffix = ""
+    local divisor = 1
+
+    if math.abs(number) >= 10^(9+math.max(0,significantDigits-3)) then
+        suffix = "B"
+        divisor = 1e9
+    elseif math.abs(number) >= 10^(6+math.max(0,significantDigits-3)) then
+        suffix = "M"
+        divisor = 1e6
+    elseif math.abs(number) >= 10^(3+math.max(0,significantDigits-3)) then
+        suffix = "K"
+        divisor = 1e3
+    end
+
+    local shortened = round(number / divisor)
+	if color then
+		if suffix == "K" then
+			local txt=StrColor(255,255,30,tostring(shortened) .. suffix)
+			return txt
+		end
+		if suffix == "M" then
+			local txt=StrColor(255,165,0,tostring(shortened) .. suffix)
+			return txt
+		end
+		if suffix == "B" then
+			local txt=StrColor(255,0,0,tostring(shortened) .. suffix)
+			return txt
+		end
+	end
+	
+    return tostring(shortened) .. suffix
+end
+
+function GetMaxHP(pl)
+	if vars.MAWSETTINGS.buffRework=="ON" and vars.currentHPPool then
+		local id=pl:GetIndex()
+		for i=0, Party.High do
+			if Party[i]:GetIndex()==id then
+				if vars.currentHPPool[i] then
+					return math.max(round(vars.currentHPPool[i]), 1)
+				end
+			end
+		end
+	end	
+	return pl:GetFullHP()
+end
 
 local TextCounter = 0
 local function SimpleText(Screen, Text, X, Y, Font, Condition, Action, AlignLeft, Layer)
