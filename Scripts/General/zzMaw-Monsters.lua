@@ -881,106 +881,7 @@ function events.LoadMap()
 end
 
 --LOOT FIX
-function events.PickCorpse(t)
-	--calculate gold
-	mon=t.Monster
-	--calculate bolster
-	lvl=BLevel[mon.Id] or mon.Level
-	gold=mon.TreasureDiceCount*(mon.TreasureDiceSides+1)/2
-	newGold=(bolsterLevel2+lvl)*7.5
-	local tier=2
-	if mon.Id%3==1 then
-		newGold=newGold/2
-		tier=1
-	elseif mon.Id%3==0 then
-		newGold=newGold*2
-		tier=3
-	end
-	if gold>0 and newGold>gold then
-		goldMult=(bolsterLevel2+lvl)^1.5/(lvl)^1.5
-		mon.TreasureDiceCount=math.min(newGold^0.5,255)
-		mon.TreasureDiceSides=math.min(newGold^0.5,255)
-	end
-	--calculate loot chances and quality
-	if mon.Item==0 and (mon.NameId<220 or mon.NameId>300) then
-		local name=Game.MapStats[Map.MapStatsIndex].Name
-		local lvlID=mon.Id
-		if tier==1 then
-			lvlID=mon.Id+1
-		elseif tier==3 then
-			lvlID=mon.Id-1
-		end
-		local lvl=math.max(basetable[lvlID].Level, mapLevels[name].Low)
-		local originalValue=math.min(mon.TreasureItemPercent,50)
-		mon.TreasureItemPercent= math.ceil(mon.Level^0.5*(1+tier)*0.5 + originalValue*0.3)
-		
-		if vars.Mode==2 then
-			mon.TreasureItemPercent=round(mon.TreasureItemPercent*0.5)
-		elseif Game.BolsterAmount==300 then
-			mon.TreasureItemPercent=round(mon.TreasureItemPercent*0.75)
-		end
-		
-		local itemTier=(lvl+10*tier)/20
-		if itemTier%20/20>math.random() then
-			itemTier=itemTier+1
-		end
-		itemTier=math.floor(itemTier)
-		mon.TreasureItemLevel=math.max(math.min(itemTier,6),1)
-		if  itemTier<=0 then
-			mon.TreasureItemPercent=round(mon.TreasureItemPercent*2^(itemTier-1))
-		end
-		if math.random()<0.7 then
-			mon.TreasureItemType=0
-		end
-	end
-	
-	
-	
-	--special for bosses and resurrected
-	
-	if mon.NameId>300 then
-		mon.TreasureItemPercent=round(mon.TreasureItemPercent/4)
-		mon.TreasureDiceSides=math.max(round(mon.TreasureDiceSides/4),1)
-	elseif mon.NameId>220 or mon.NameId==160 then
-		mon.TreasureItemPercent=100
-		local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
-		if skill=="Broodling" then
-			if mon.Id%3==0 then
-				mon.TreasureItemPercent=30
-			elseif mon.Id%3==2 then
-				mon.TreasureItemPercent=10
-			elseif mon.Id%3==1 then
-				mon.TreasureItemPercent=4
-			end
-		end
-		
-		--item tier
-		local name=Game.MapStats[Map.MapStatsIndex].Name
-		local lvl=math.max(basetable[mon.Id].Level, mapLevels[name].Low)
-		local id=mon:GetIndex()
-		if id and mapvars.uniqueMonsterLevel and mapvars.uniqueMonsterLevel[id] then
-			lvl=mapvars.uniqueMonsterLevel[id]
-		end		
-		local itemTier=lvl/20+2
-		if itemTier%15/15>math.random() then
-			itemTier=itemTier+1
-		end
-		mon.TreasureItemLevel=math.max(math.min(itemTier,6),2)
-		bossLoot=true
-		local monsterSkill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
-		if monsterSkill=="Omnipotent" then
-			OmnipotentLoot=true
-		end
-
-	end
-	--loot filter code
-	goldBeforeLoot=Party.Gold
-	lootFromMonster=true
-	function events.Tick()
-		events.Remove("Tick",1)
-		lootFromMonster=false
-	end
-end
+-- PickCorpse function moved to zzMaw-Items.lua to integrate with deterministic seeding system
 -----------------------------
 -----MAP MONSTER CHANGES-----
 -----------------------------
@@ -3266,7 +3167,7 @@ function checkPityProtectedBoss(seed, chanceMult, generatedByBroodlord)
 	local broodlordChance = getSeededSpecialBossChance(seed, "broodlord")
 	local omnipotentChance = getSeededSpecialBossChance(seed, "omnipotent")
 	
-	-- Apply pity protection using new pity system
+	-- Apply pity protection using new pity system (insanity mode only)
 	local pityBroodlordChance = pity_chance(0.01 * chanceMult, vars.broodlordPityCounter)
 	local pityOmnipotentChance = pity_chance(0.001 * chanceMult, vars.omnipotentPityCounter)
 	
