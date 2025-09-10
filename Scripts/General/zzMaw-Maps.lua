@@ -1807,7 +1807,6 @@ function events.UseMouseItem(t)
 		local map=Game.MapStats[it.BonusStrength]
 		storeRefillDaysAfterMapUsage={it.BonusStrength, map.RefillDays}
 		map.RefillDays=0
-		Mouse.Item.Number=0
 		local fileName=string.sub(map.FileName, 1, -5)
 		
 		mapAffixList={it.BonusExpireTime, it.Bonus2, it.Charges%1000, round(it.Charges/1000), ["Power"]=it.MaxCharges}
@@ -1843,6 +1842,7 @@ function events.UseMouseItem(t)
 		if vars.madnessMode then
 			vars.ownedMaps=vars.ownedMaps-1
 		end
+		Mouse.Item.Number=0
 		local wait=10
 		function events.Tick()
 			if wait<=0 then
