@@ -26,8 +26,8 @@ function events.GenerateItem(t)
 	]]
 end
 
--- Function to get and advance monster type seed
-local function getMonsterSeed(monsterId)
+-- Function to get and advance monster type seed (global for use across scripts)
+function getMonsterSeed(monsterId)
 	-- Initialize global seed if needed
 	if not vars.seed then
 		vars.seed = os.time()
