@@ -1943,6 +1943,9 @@ end
 
 madnessMapLevels["Basement of the Breach"] = 1100
 madnessMapLevels["The Breach"] = 1100
+madnessMapLevels["The Arena"] = 1
+madnessMapLevels["Pending"] = 1
+madnessMapLevels["NWC"] = 1
 
 --[[
 mapLevels={}
