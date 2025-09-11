@@ -47,3 +47,5 @@ evt.map[463] = function()  -- Timer(<function>, 10*const.Minute)
 		evt.SummonMonsters{TypeIndexInMapStats = 1, Level = 2, Count = 3, X = -1256, Y = 5296, Z = 241, NPCGroup = 13, unk = 0}         -- ""
 	end
 end
+
+Timer(evt.map[463].last, 10*const.Minute)
