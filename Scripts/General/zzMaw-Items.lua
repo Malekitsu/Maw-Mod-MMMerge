@@ -62,7 +62,7 @@ local function getBossLootSeed(mon)
 	-- Initialize global seed if needed
 	if not vars.seed then
 		vars.seed = os.time()
-	end	
+	end
 	-- Create deterministic map hash
 	local mapName = Map.Name or "default"
 	local mapHash = 0
@@ -74,9 +74,12 @@ local function getBossLootSeed(mon)
 	if Map.MapStatsIndex then
 		mapHash = mapHash + Map.MapStatsIndex * 97
 	end
-	
+	local index=mon:GetIndex()
+	mapvars.BossSeed = mapvars.BossSeed or {}
+	mapvars.BossSeed[index] = mapvars.BossSeed[index] or 0
 	-- Create boss seed based on: global seed + map hash + boss spawn count + monster ID
-	local bossLootSeed = vars.seed + mapHash + (mon:GetIndex() * 1337) + (mon.Id * 2003)
+	local bossLootSeed = vars.seed + mapHash + (index * 1337) + (mon.Id * 2003) + mapvars.BossSeed[index]
+	mapvars.BossSeed[index] = mapvars.BossSeed[index]+1
 	
 	-- Ensure seed is positive and within reasonable range
 	bossLootSeed = math.abs(bossLootSeed) % 2147483647
