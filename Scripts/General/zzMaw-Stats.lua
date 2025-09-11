@@ -343,7 +343,7 @@ function events.BuildStatInformationBox(t)
 		-- Calculate spell cost reduction percentage
 		local level = Party[i].LevelBase
 		local spellCostReduction = round((1-getPersonalityManaCostReduction(Party[i]))*1000)/10
-		local healingBonus = round(personality/(1000+level*3)*1000)/10
+		local healingBonus = round(personality/math.min(1000+level*3, 4000)*1000)/10
 		t.Text=string.format("%s\n\nBonus healing: %s%s\n\nSpell cost reduction: %s%s\n\nIncrease the mana by 2 levels worth of mana per 5 personality",Game.StatsDescriptions[2],healingBonus,"%",spellCostReduction,"%")
 	end
 	if t.Stat==3 then
@@ -1478,7 +1478,7 @@ function calcPowerVitality(pl, statsMenu)
 		if healingSpells and healingSpells[spellIndex] then
 			critChance, critDamage=getCritInfo(pl, "heal")
 			local level = pl.LevelBase
-			power=power*(1+personality/(1000+level*3))  -- Personality affects healing
+			power=power*(1+personality/math.min(1000+level*3, 4000))  -- Personality affects healing
 		else
 			critChance, critDamage=getCritInfo(pl, "spell",lvl)
 			power=power*(1+intellect/1000)   -- Intellect affects spell damage
@@ -1983,7 +1983,7 @@ function getBodyHealing(lvl, spellId, mastery)
 	end
 	
 	local personality = statsPerLevel * lvl
-	local personalityBonus = personality / (1000+lvl*3)
+	local personalityBonus = personality / math.min(1000+level*3, 4000)
 	healingAmount = healingAmount * (1 + personalityBonus)
 
 	return healingAmount
