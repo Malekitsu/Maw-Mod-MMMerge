@@ -86,7 +86,7 @@ skillDamage =
 
 skillAC =
 {
-	[const.Skills.Staff]	= {[0]=0, 2, 3, 4, 6,},
+	[const.Skills.Staff]	= {[0]=0, 2, 3, 3, 4,},
 	[const.Skills.Sword]	= {[0]=0, 0, 0, 1, 2,},
 	[const.Skills.Dagger]	= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Axe]		= {[0]=0, 0, 0, 0, 0,},
@@ -104,7 +104,7 @@ skillAC =
 }
 skillResistance =
 {
-	[const.Skills.Staff]	= {[0]=0, 2, 3, 4, 6},
+	[const.Skills.Staff]	= {[0]=0, 2, 2, 3, 4},
 	[const.Skills.Sword]	= {[0]=0, 0, 0, 0, 0},
 	[const.Skills.Dagger]	= {[0]=0, 0, 0, 0, 0},
 	[const.Skills.Axe]		= {[0]=0, 0, 0, 0, 0},
