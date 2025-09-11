@@ -88,7 +88,7 @@ function getHealSpellMultiPlier(pl)
 	--personality bonus for healing only
 	local persBonus=pl:GetPersonality()
 	local level = pl.LevelBase
-	local statBonus=persBonus/(1000+level*3)
+	local statBonus=persBonus/math.min(1000+level*3, 4000)
 	mult=mult*(1+statBonus)
 	if getMapAffixPower(31) then
 		mult=mult*(1-getMapAffixPower(31)/100)
