@@ -87,7 +87,8 @@ function getHealSpellMultiPlier(pl)
 	end
 	--personality bonus for healing only
 	local persBonus=pl:GetPersonality()
-	local statBonus=persBonus/1000
+	local level = pl.LevelBase
+	local statBonus=persBonus/(1000+level*3)
 	mult=mult*(1+statBonus)
 	if getMapAffixPower(31) then
 		mult=mult*(1-getMapAffixPower(31)/100)
@@ -1749,14 +1750,9 @@ function getPersonalityManaCostReduction(pl)
 	local personality = pl:GetPersonality()
 	local level = pl.LevelBase
 	
-	-- At level 1: 1% reduction per 10 personality points
-	-- At level 1000: 1% reduction per 100 personality points
-	-- Personality divisor scales from 10 to 100 based on level
-	local personalityDivisor = 10 + (level - 1) * 90 / 999
+	local personalityDivisor = 10 + (level - 1) * 90 / 1000
 	local reductionPercent = personality / personalityDivisor
-	
-	-- Convert to multiplier (e.g., 20% reduction = 0.8 multiplier)
-	return 1 - (reductionPercent / 100)
+	return (0.99^reductionPercent)
 end
 
 function ascension(customIndex)
@@ -1888,14 +1884,25 @@ function ascension(customIndex)
 		-----------------------
 		--Healing Spells
 		-----------------------
-		healingSpells={
-			[const.Spells.RemoveCurse]=    {["Cost"]={0,5,10,20,[0]=0}, ["Base"]={0,10,20,30,[0]=0}, ["Scaling"]={0,4,6,8}},
+		if vars.insanityMode then
+			healingSpells={
+			[const.Spells.RemoveCurse]=    {["Cost"]={0,15,30,60,[0]=0}, ["Base"]={0,20,40,60,[0]=0}, ["Scaling"]={0,8,12,16}},
 			[const.Spells.SharedLife]=    {["Cost"]={0,0,25,40,[0]=0}, ["Base"]={0,0,0,0,[0]=0}, ["Scaling"]={0,0,7,9}},
-            [const.Spells.Resurrection]={["Cost"]={0,0,0,100,[0]=0}, ["Base"]={0,0,0,150,[0]=0}, ["Scaling"]={0,0,0,21}},
-            [const.Spells.Heal]=        {["Cost"]={2,4,6,8,[0]=0}, ["Base"]={4,8,12,16,[0]=0}, ["Scaling"]={2,3,4,6}},
-            [const.Spells.CureDisease]=    {["Cost"]={0,0,15,25,[0]=0}, ["Base"]={0,0,25,40,[0]=0}, ["Scaling"]={0,0,7,10}},
-            [const.Spells.PowerCure]=    {["Cost"]={0,0,0,30,[0]=0}, ["Base"]={0,0,0,15,[0]=0}, ["Scaling"]={0,0,0,4}}
+            [const.Spells.Resurrection]={["Cost"]={0,0,0,300,[0]=0}, ["Base"]={0,0,0,450,[0]=0}, ["Scaling"]={0,0,0,50}},
+            [const.Spells.Heal]=        {["Cost"]={6,15,24,40,[0]=0}, ["Base"]={12,24,36,48,[0]=0}, ["Scaling"]={6,9,12,15}},
+            [const.Spells.CureDisease]=    {["Cost"]={0,0,45,100,[0]=0}, ["Base"]={0,0,50,100,[0]=0}, ["Scaling"]={0,0,16,25}},
+            [const.Spells.PowerCure]=    {["Cost"]={0,0,0,150,[0]=0}, ["Base"]={0,0,0,50,[0]=0}, ["Scaling"]={0,0,0,12}}
 		}
+		else
+			healingSpells={
+				[const.Spells.RemoveCurse]=    {["Cost"]={0,5,10,20,[0]=0}, ["Base"]={0,10,20,30,[0]=0}, ["Scaling"]={0,4,6,8}},
+				[const.Spells.SharedLife]=    {["Cost"]={0,0,25,40,[0]=0}, ["Base"]={0,0,0,0,[0]=0}, ["Scaling"]={0,0,7,9}},
+				[const.Spells.Resurrection]={["Cost"]={0,0,0,100,[0]=0}, ["Base"]={0,0,0,150,[0]=0}, ["Scaling"]={0,0,0,21}},
+				[const.Spells.Heal]=        {["Cost"]={2,4,6,8,[0]=0}, ["Base"]={4,8,12,16,[0]=0}, ["Scaling"]={2,3,4,6}},
+				[const.Spells.CureDisease]=    {["Cost"]={0,0,15,25,[0]=0}, ["Base"]={0,0,25,40,[0]=0}, ["Scaling"]={0,0,7,10}},
+				[const.Spells.PowerCure]=    {["Cost"]={0,0,0,30,[0]=0}, ["Base"]={0,0,0,15,[0]=0}, ["Scaling"]={0,0,0,4}}
+			}
+		end
 		for i=1, 6 do
 			local ascensionLevel=getAscensionTier(s,healingList[i])
 			if ascensionLevel>=1 then
@@ -1906,12 +1913,12 @@ function ascension(customIndex)
 			if ascensionLevel>=1 then
 				for v=1,4 do
 					local baseCost = healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m)
-					healingSpells[healingList[i]].Cost[v]=round(math.ceil(baseCost * personalityReduction))
+					healingSpells[healingList[i]].Cost[v]=math.min(round(math.ceil(baseCost * personalityReduction)), 65000)
 					healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
 				end
 			else
 				for v=1,4 do
-					healingSpells[healingList[i]].Cost[v]=math.ceil(healingSpells[healingList[i]].Cost[v] * personalityReduction)
+					healingSpells[healingList[i]].Cost[v]=math.min(math.ceil(healingSpells[healingList[i]].Cost[v] * personalityReduction), 65000)
 				end
 			end
 		end
