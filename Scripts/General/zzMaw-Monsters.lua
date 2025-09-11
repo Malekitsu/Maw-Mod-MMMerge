@@ -32,6 +32,15 @@ end
 -- == Version "mêmes comportements" mais sans erreurs nil en multi ==
 -- (aucun fallback, aucun changement de formules, on ne touche rien si un champ manque)
 
+-- Helper function to get list of player-controlled monsters in multiplayer
+local function getPlayerControlledMonsters()
+	if not (Multiplayer and Multiplayer.in_game) then
+		return {}
+	end
+	-- Use Multiplayer.client_monsters() to get player-controlled monster indices
+	local clientMonsters = Multiplayer.client_monsters()
+	return clientMonsters or {}
+end
 
 function events.AfterLoadMap()
   if not Map or not Map.Monsters or type(Map.Monsters.High) ~= "number" then return end
@@ -2273,24 +2282,32 @@ function events.LeaveMap()
 	if (Game.BolsterAmount~=300 or Game.BolsterAmount~=600) and vars.Mode~=2 then return end
 	if Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.monsterMap.cleared==false then
 		if Map.Monsters.Count==0 then return end
+		-- Get list of player-controlled monsters once
+		local playerControlledMonsters = getPlayerControlledMonsters()
+		
 		for i=0,#mapvars.monsterMap do
 			mon=Map.Monsters[i]
 			old=mapvars.monsterMap[i]
-			if mon and old and old.respawn and (mon.AIState==const.AIState.Removed or mon.AIState==const.AIState.Dead) then --no unique monsters respawn
-				mon.HP=mon.FullHP
-				mon.X, mon.Y, mon.Z=old.x, old.y, old.z 
-				mon.AIState=0
-				mon.Exp=old.exp or mon.Exp
-				mon.Exp=mon.Exp/4
-				mon.ShowOnMap=false
-				mon.NameId=mon.Id+300
-				mon.Ally=old.Ally or 0
-				if mon.AIState==const.AIState.Removed then
-					mon.TreasureItemPercent=0 --round(old.item/4)
-					mon.TreasureDiceSides=0 --round(old.gold/4)
-					mapvars.MonsterSeed[i] = Game.RandSeed
-					for i = 1, 30 do
-						Game.Rand()
+			-- Skip player-controlled monsters in multiplayer
+			if mon and table.find(playerControlledMonsters, i) then
+				-- Do not respawn player-controlled monsters
+			else
+				if mon and old and old.respawn and (mon.AIState==const.AIState.Removed or mon.AIState==const.AIState.Dead) then --no unique monsters respawn
+					mon.HP=mon.FullHP
+					mon.X, mon.Y, mon.Z=old.x, old.y, old.z 
+					mon.AIState=0
+					mon.Exp=old.exp or mon.Exp
+					mon.Exp=mon.Exp/4
+					mon.ShowOnMap=false
+					mon.NameId=mon.Id+300
+					mon.Ally=old.Ally or 0
+					if mon.AIState==const.AIState.Removed then
+						mon.TreasureItemPercent=0 --round(old.item/4)
+						mon.TreasureDiceSides=0 --round(old.gold/4)
+						mapvars.MonsterSeed[i] = Game.RandSeed
+						for i = 1, 30 do
+							Game.Rand()
+						end
 					end
 				end
 			end
@@ -2606,9 +2623,16 @@ function checkMapCompletition()
 			m=15
 		end
 		]]
+		-- Get list of player-controlled monsters once
+		local playerControlledMonsters = getPlayerControlledMonsters()
+		
 		for i=0,Map.Monsters.High do
 			monster=Map.Monsters[i]
-			if monster.AIState==4 or monster.AIState==5 or monster.AIState==11 or monster.AIState==16 or monster.AIState==17 or monster.NameId>300 then
+			-- Skip player-controlled monsters in multiplayer
+			if monster and table.find(playerControlledMonsters, i) then
+				-- Exclude from total count
+				n=n-1
+			elseif monster.AIState==4 or monster.AIState==5 or monster.AIState==11 or monster.AIState==16 or monster.AIState==17 or monster.NameId>300 then
 				m=m+1
 			elseif monster:IsAgainst() == 0 or monster.AIState==19 then
 				n=n-1
