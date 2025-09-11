@@ -1171,7 +1171,7 @@ end
 
 function MawRegen(timePassed)
 	--HP
-	local timeMultiplier=(Game.TurnBased and timePassed) or 1
+	local timeMultiplier=timePassed*10 
 	if getMapAffixPower(22) then
 		timeMultiplier=timeMultiplier*(1-getMapAffixPower(22)/100)
 	end
