@@ -19,7 +19,7 @@ evt.map[463] = function()  -- Timer(<function>, 10*const.Minute)
 		return
 	end
 	mapvars.piratesSpawned=mapvars.piratesSpawned or 0
-	if mapvars.piratesSpawned>25 then return end
+	if vars.insanityMode and mapvars.piratesSpawned>25 then return end
 	if evt.CheckMonstersKilled{CheckType = 1, Id = 10, Count = 0, InvisibleAsDead = 1} then
 		evt.SummonMonsters{TypeIndexInMapStats = 2, Level = 2, Count = 3, X = 776, Y = -66192, Z = 0, NPCGroup = 10, unk = 0}         -- ""
 		evt.SummonMonsters{TypeIndexInMapStats = 2, Level = 2, Count = 3, X = 0, Y = -5608, Z = 0, NPCGroup = 10, unk = 0}         -- ""
