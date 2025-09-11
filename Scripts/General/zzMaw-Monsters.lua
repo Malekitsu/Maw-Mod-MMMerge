@@ -3063,13 +3063,10 @@ function generateBoss(index, nameIndex, skillType)
 	-- Maintain compatibility with boss sync system
 	mapvars.bossNames = mapvars.bossNames or {}
 	mapvars.bossSet = mapvars.bossSet or {}
-	mapvars.bossNames[mon.NameId] = name
+	mapvars.bossNames[mon.NameId] = Name
 	table.insert(mapvars.bossSet, {index, mon.NameId, mon.Id})
-	
 	-- Increment boss counter for seeding (after successful boss creation)
-	if vars.seed then
-		vars.totalBossesSpawned = (vars.totalBossesSpawned or 0) + 1
-	end
+	vars.totalBossesSpawned = (vars.totalBossesSpawned or 0) + 1
 end
 
 
