@@ -1149,6 +1149,12 @@ function events.MonsterKilled(mon)
 	end
 	--pick special drop with pity protection
 	for i=1061,1067 do
+		-- Advance seed for each crafting item to get different rolls
+		local currentSeed = Game.RandSeed
+		local newSeed = (currentSeed * 1664525 + 1013904223) % 4294967296
+		Game.RandSeed = newSeed
+		math.randomseed(newSeed)
+		
 		-- Initialize pity counter for this crafting material
 		vars.craftPityCounters = vars.craftPityCounters or {}
 		vars.craftPityCounters[i] = vars.craftPityCounters[i] or 0
