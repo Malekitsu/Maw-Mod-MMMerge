@@ -342,9 +342,9 @@ function events.BuildStatInformationBox(t)
 		_,critDmg=getCritInfo(Party[i],"spell")
 		-- Calculate spell cost reduction percentage
 		local level = Party[i].LevelBase
-		local personalityDivisor = 10 + (level - 1) * 90 / 999
 		local spellCostReduction = round((1-getPersonalityManaCostReduction(Party[i]))*1000)/10
-		t.Text=string.format("%s\n\nBonus healing: %s%s\n\nSpell cost reduction: %s%s\n\nIncrease the mana by 2 levels worth of mana per 5 personality",Game.StatsDescriptions[2],Party[i]:GetPersonality()/10,"%",spellCostReduction,"%")
+		local healingBonus = round(personality/(1000+level*3)*1000)/10
+		t.Text=string.format("%s\n\nBonus healing: %s%s\n\nSpell cost reduction: %s%s\n\nIncrease the mana by 2 levels worth of mana per 5 personality",Game.StatsDescriptions[2],healingBonus,"%",spellCostReduction,"%")
 	end
 	if t.Stat==3 then
 		i=Game.CurrentPlayer
@@ -1477,7 +1477,8 @@ function calcPowerVitality(pl, statsMenu)
 		personality=pl:GetPersonality()
 		if healingSpells and healingSpells[spellIndex] then
 			critChance, critDamage=getCritInfo(pl, "heal")
-			power=power*(1+personality/1000)  -- Personality affects healing
+			local level = pl.LevelBase
+			power=power*(1+personality/(1000+level*3))  -- Personality affects healing
 		else
 			critChance, critDamage=getCritInfo(pl, "spell",lvl)
 			power=power*(1+intellect/1000)   -- Intellect affects spell damage
@@ -1605,7 +1606,7 @@ function events.GetSkill(t)
 end
 
 --average
-function getPlayerExtimatedVitality(lvl)
+function getPlayerExtimatedVitality(lvl, healthOnly)
 	local baseHP=25
 	local baseScaling=3
 	local endScaling=9
@@ -1655,6 +1656,11 @@ function getPlayerExtimatedVitality(lvl)
 	
 	health=health*(1+bbPercentBonus*skill/100)*(1+extimatedEndurance/1000)
 	
+	-- Return just health if requested
+	if healthOnly then
+		return health
+	end
+	
 	local armorClass=statsPerLevel*lvl
 	
 	local bolster=1
@@ -1690,6 +1696,10 @@ function getPlayerExtimatedVitality(lvl)
 	
 	return vitality, totalArmorReduction, resReduction, averageReduction , health
 	
+end
+function getPlayerExtimatedHealth(lvl)
+	local health=getPlayerExtimatedVitality(lvl,true)
+	return health
 end
 
 function getMonsterDamage(mon, level)
@@ -1863,7 +1873,7 @@ function getMonsterHealth(mon, level)
 	end
 	
 	--account for resistances
-	health=health/2^(math.min(totalLevel[id]/2/100,1000)) --approx
+	health=health/2^(math.min(totalLevel[id]/2/100,10)) --approx
 	
 	-- Check if monster has GetIndex method (real monster vs mock object)
 	if not mon.GetIndex then
@@ -1908,3 +1918,166 @@ for i=1,1000 do
 	print(round(getMonsterDamage(i)/GetPlayerExtimatedVitality(i)*100)/100)
 end
 ]]
+
+--I need to compute what's the expected healing amount
+-- to do so I need to first get the expected health, then having a coefficient
+--let's compute first body current expected healing
+function getBodyHealing(lvl, spellId, mastery)
+	local health=getPlayerExtimatedHealth(lvl)
+	
+	-- Skills equal to level^0.675 for both body and ascension (Learning)
+	local skill = lvl^0.675
+	local bodySkill = skill
+	local learningSkill = skill	
+		
+	local masteries={0,4,7,10}
+	if vars.madnessMode then
+		masteries={0,12,30,50}
+	elseif vars.insanityMode then
+		masteries={0,8,20,32}
+	end
+
+	if not mastery then
+		mastery = masteryPerLevel(lvl)
+	end
+	-- Use appropriate healing spell based on mastery level
+	local baseHeal=0
+	local scaling=0
+	if not spellId then
+		if mastery <= 2 then
+			-- Use Heal spell for mastery 1-2
+			spellId = const.Spells.Heal
+			baseHeal = healingSpells[const.Spells.Heal].Base[mastery]
+			scaling = healingSpells[const.Spells.Heal].Scaling[mastery]
+		else
+			-- Use Greater Heal (CureDisease) for mastery 3-4
+			spellId = const.Spells.CureDisease
+			baseHeal = healingSpells[const.Spells.CureDisease].Base[mastery]
+			scaling = healingSpells[const.Spells.CureDisease].Scaling[mastery]
+		end
+	else
+		baseHeal = healingSpells[spellId].Base[mastery]
+		scaling = healingSpells[spellId].Scaling[mastery]
+	end
+	local statsPerLevel=2
+	if vars.insanityMode then
+		statsPerLevel=5
+	elseif vars.Mode==2 then
+		statsPerLevel=4
+	elseif Game.BolsterAmount==300 then
+		statsPerLevel=3
+	elseif Game.BolsterAmount==200 then
+		statsPerLevel=2.5
+	elseif Game.BolsterAmount==150 then
+		statsPerLevel=2
+	end
+
+	-- Calculate base healing amount
+	local healingAmount = baseHeal + scaling * bodySkill
+	
+	local ascensionTier = math.min(math.floor(learningSkill / 11), 8)  -- Rough ascension tier estimation
+	if ascensionTier > 0 then
+		local newScaling = scaling * (1 + 0.01 * learningSkill * ascensionTier) * (1.2^ascensionTier)
+		local newBase = baseHeal * (1 + learningSkill * 0.1 * ascensionTier) * (1.4^ascensionTier)
+		healingAmount = newBase + newScaling * bodySkill
+	end
+	
+	local personality = statsPerLevel * lvl
+	local personalityBonus = personality / (1000+lvl*3)
+	healingAmount = healingAmount * (1 + personalityBonus)
+
+	return healingAmount
+end
+
+--[[ to test
+for i=1,100 do
+	local heal=getBodyHealing(i*10)
+	local health=getPlayerExtimatedHealth(i*10)
+	local rateo=round(heal/health*100)/100
+	print(rateo)
+end
+]]
+
+function GetHealParams(id)
+	local base, scaling = healingSpells[id].Base[1], healingSpells[id].Scaling[1]
+	
+	-- Collect actual levels for each mastery
+	local masteryLevels = {{}, {}, {}, {}}
+	for j=1,1000 do
+		local mastery = masteryPerLevel(j)
+		table.insert(masteryLevels[mastery], j)
+	end
+	
+	local averageRatios = {}
+	for i=1,4 do
+		local totalRatio = 0
+		local count = 0
+		local levelList = masteryLevels[i]
+		
+		-- If mastery has 50+ levels, print averages for every 50 levels
+		if #levelList >= 50 then
+			local segmentCount = math.floor(#levelList / 50)
+			for segment = 1, segmentCount do
+				local segmentStart = (segment - 1) * 50 + 1
+				local segmentEnd = math.min(segment * 50, #levelList)
+				local segmentTotal = 0
+				local segmentSize = segmentEnd - segmentStart + 1
+				
+				for idx = segmentStart, segmentEnd do
+					local k = levelList[idx]
+					local base, scaling = healingSpells[id].Base[masteryPerLevel(k)], healingSpells[id].Scaling[masteryPerLevel(k)]
+					local heal = getBodyHealing(k, id, masteryPerLevel(k))
+					local health = getPlayerExtimatedHealth(k)
+					local rateo = round(heal/health*100)/100
+					segmentTotal = segmentTotal + rateo
+				end
+				
+				if segmentSize > 0 then
+					local segmentAverage = round(segmentTotal / segmentSize * 100) / 100
+					local actualStartLevel = levelList[segmentStart]
+					local actualEndLevel = levelList[segmentEnd]
+					print("Mastery " .. i .. " levels " .. actualStartLevel .. "-" .. actualEndLevel .. ": " .. segmentAverage)
+				end
+			end
+		end	
+		
+		-- Calculate overall average for the mastery
+		for _, k in ipairs(levelList) do
+			local base, scaling = healingSpells[id].Base[masteryPerLevel(k)], healingSpells[id].Scaling[masteryPerLevel(k)]
+			local heal=getBodyHealing(k, id, masteryPerLevel(k))
+			local health=getPlayerExtimatedHealth(k)
+			local rateo=round(heal/health*100)/100
+			totalRatio = totalRatio + rateo
+			count = count + 1
+		end
+		if count > 0 then
+			averageRatios[i] = round(totalRatio / count*100)/100
+		else
+			averageRatios[i] = 0
+		end
+		print(averageRatios[i])
+	end
+
+	return base, scaling
+end
+
+function masteryPerLevel(lvl)
+	local S = lvl ^ 0.675
+	local th = masteryThresholds()
+	local m = 1
+	for i = 4, 1, -1 do
+	  if S >= th[i] then m = i; break end
+	end
+	return m
+end
+
+function masteryThresholds()
+	if vars.madnessMode then
+	  return {0, 12, 30, 50}
+	elseif vars.insanityMode then
+	  return {0, 8, 20, 32}
+	else
+	  return {0, 4, 7, 10}
+	end
+end
+  
