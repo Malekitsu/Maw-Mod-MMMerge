@@ -504,7 +504,6 @@ function events.MonsterKillExp(t)
 				multiplier2=1+(playerLevel^0.5)-(monLvl^0.5)
 				mult=math.max(math.max(multiplier1,1/multiplier2),1/3)
 			end
-			debug.Message(mult .. "  " .. multiplier1 .. "  " .. multiplier2 .. "  " .. playerLevel .. "  " .. monLvl )
 			local experienceAwarded=experience*mult
 			Party[i].Experience=math.min(Party[i].Experience+experienceAwarded, 2^32-3982296)
 			
