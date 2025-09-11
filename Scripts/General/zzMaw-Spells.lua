@@ -3722,3 +3722,36 @@ function events.KeyDown(t)
 		DoGameAction(87,book,0)
 	end
 end
+
+local invisBooks={418, 1220, 1924}
+local starburstBooks={421, 1223, 1927}
+local booksPic={"item210","7item192","book4"}
+local booksPicGM={"item209","7item193","book5"}
+function events.LoadMap()
+	if vars.insanityMode then
+		for i=1,3 do
+			Game.ItemsTxt[invisBooks[i]].Picture=booksPicGM[i]
+			Game.ItemsTxt[starburstBooks[i]].Picture=booksPic[i]
+		end
+		Game.SpellsTxt[19].Master="n/a"
+		Game.SpellsTxt[22].Master="This spell is as good as it will ever get!"
+	else
+		for i=1,3 do
+			Game.ItemsTxt[invisBooks[i]].Picture=booksPic[i]
+			Game.ItemsTxt[starburstBooks[i]].Picture=booksPicGM[i]
+			Game.SpellsTxt[19].Master="Duration 15+1.5 minutes per point of skill"
+			Game.SpellsTxt[22].Master="n/a"
+		end
+	end
+end
+
+function events.CanLearnSpell(t)
+	if vars.insanityMode then
+		if t.Spell==const.Spells.Invisibility then
+			t.NeedMastery = 4
+		elseif t.Spell==const.Spells.Starburst then
+			t.NeedMastery = 3
+		end
+	end
+end
+
