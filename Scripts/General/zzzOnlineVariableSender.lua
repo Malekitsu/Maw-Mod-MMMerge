@@ -1,40 +1,6 @@
--- Time constants for timer system
-local second=256/60
-local minute=256
-local hour=15360
-local day=368640
-local week=2580480
-local month=10321920
-local year=123863040
-
 function events.MultiplayerInitialized()
 	local item_to_bin, bin_to_item = Multiplayer.utils.item_to_bin, Multiplayer.utils.bin_to_item
 	local toptr = mem.topointer
-
-	-- Make debug system globally accessible
-	DEBUG_SYNC = false -- Global for console access
-	syncStats = {      -- Global for console access
-		healthUpdates = 0,
-		mapvarsSync = 0,
-		clientRequests = 0,
-		burstBroadcasts = 0,
-		packetsSent = 0,
-		packetsReceived = 0
-	}
-
-	function DebugLog(category, message)
-		if DEBUG_SYNC then
-			print(string.format("[SYNC-%s] %s: %s", category, os.date("%H:%M:%S"), message))
-		end
-	end
-
-	function LogSyncStats()
-		if DEBUG_SYNC then
-			DebugLog("STATS", string.format("Health:%d Mapvars:%d Requests:%d Bursts:%d Sent:%d Recv:%d", 
-				syncStats.healthUpdates, syncStats.mapvarsSync, syncStats.clientRequests, 
-				syncStats.burstBroadcasts, syncStats.packetsSent, syncStats.packetsReceived))
-		end
-	end
 
 	mawPackets = {
 		send_table = {
@@ -45,18 +11,11 @@ function events.MultiplayerInitialized()
 			handler = function(bin_string, metadata)
 				local t = bin_to_item(toptr(bin_string))
 				local host=Multiplayer.im_host()
-				syncStats.packetsReceived = syncStats.packetsReceived + 1
 				
 				if t.dataType=="healthManaInfo" and host then
 					vars.online.partyHealthMana.Parties[t.senderId] = t.Party
-					syncStats.healthUpdates = syncStats.healthUpdates + 1
-					DebugLog("HEALTH", string.format("Received health data from client %s", tostring(t.senderId)))
 				else
 					vars.online.partyHealthMana.Parties = t.Parties or {}
-					if t.dataType=="healthManaInfo" then
-						syncStats.healthUpdates = syncStats.healthUpdates + 1
-						DebugLog("HEALTH", "Received health broadcast from host")
-					end
 				end
 				
 				if t.dataType=="heal" then
@@ -69,48 +28,23 @@ function events.MultiplayerInitialized()
 					mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, id)
 					evt.PlaySound(16010)
 					Game.ShowStatusText(t.HealerName .. " heals you for " .. t.Amount .. " Hit Points")
-					DebugLog("HEAL", string.format("%s healed player %d for %d HP", t.HealerName, id, t.Amount))
 				end
 				
 				--debug.Message(dump(t))
 				
-				-- ShareMapvars synchronization system
+				
+				return --[[
 				if t.dataType=="ShareMapvarsToHost" and Multiplayer.im_host() then 
-					vars.StoredMapvars = vars.StoredMapvars or {}
 					if not vars.StoredMapvars[t.MapName] then
 						vars.StoredMapvars[t.MapName]=t.Variables
-						syncStats.mapvarsSync = syncStats.mapvarsSync + 1
-						DebugLog("MAPVARS", string.format("Host received mapvars for map: %s", t.MapName))
 					end
 				elseif t.dataType=="ShareMapvarsToClients" and not Multiplayer.im_host() then
-					vars.StoredMapvars = vars.StoredMapvars or {}
-					local mapsUpdated = 0
-					for mapName, variables in pairs(t.Variables) do
-						if not vars.StoredMapvars[mapName] then
-							vars.StoredMapvars[mapName] = variables
-							mapsUpdated = mapsUpdated + 1
-						else
-							-- Merge with existing data, prioritizing existing values
-							for key, value in pairs(variables) do
-								if vars.StoredMapvars[mapName][key] == nil then
-									vars.StoredMapvars[mapName][key] = value
-								end
-							end
-							mapsUpdated = mapsUpdated + 1
-						end
-					end
-					syncStats.mapvarsSync = syncStats.mapvarsSync + mapsUpdated
-					DebugLog("MAPVARS", string.format("Client received mapvars for %d maps from host", mapsUpdated))
-				elseif t.dataType=="RequestMapvarsSnapshot" and Multiplayer.im_host() then
-					ShareMapvarsList()
-					HostBurst_Start(4, 0.6) -- Burst broadcast for reliability
-					syncStats.clientRequests = syncStats.clientRequests + 1
-					DebugLog("REQUEST", "Client requested mapvars snapshot - sending burst broadcast")
+					vars.StoredMapvars=t.Variables
 				elseif t.dataType=="characterInfo" then
-					vars.online.partyHealthMana.CharacterInfo = t.CharacterInfo
-					DebugLog("CHAR", "Received character info update")
+					vars.online.party[t.Id]=t.Playerinfo
 				end
-				vars.online.party[t.Id]=t.Playerinfo
+				
+				]]
 			end,
 			
 			check_delivery = true,
@@ -123,16 +57,12 @@ function events.MultiplayerInitialized()
 	function SendToHost(tbl)
 		if Multiplayer and Multiplayer.in_game and Multiplayer.packets then
 			Multiplayer.add_to_send_queue(0, mawPackets.send_table:prep(tbl))
-			syncStats.packetsSent = syncStats.packetsSent + 1
-			DebugLog("SEND", string.format("Sent %s to host", tbl.dataType or "unknown"))
 		end
 	end
 
 	function BroadcastToAllClients(tbl)
 		if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
 			Multiplayer.broadcast(mawPackets.send_table:prep(tbl),nil)
-			syncStats.packetsSent = syncStats.packetsSent + 1
-			DebugLog("BROADCAST", string.format("Broadcast %s to all clients", tbl.dataType or "unknown"))
 		end
 	end
 	
@@ -142,34 +72,14 @@ function events.MultiplayerInitialized()
 		end
 	end
 
-	--maw code with robust networking from zzBossSync
-	local SEC = (const and const.Second) or 1
-	local function NOW() return (Game and Game.Time) or 0 end
-	
-	-- Burst broadcasting system for reliability
-	local _burst_until, _burst_next = 0, 0
-	local function HostBurst_Start(secs, period)
-		_burst_until = NOW() + (secs or 4)*SEC
-		_burst_next = 0
-		_burst_period = math.max((period or 0.6)*SEC, 0.2*SEC)
-	end
-	
+	--maw code
 	function ShareMapvarsList()
 		if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
-			BroadcastToAllClients({dataType="ShareMapvarsToClients", Variables=vars.StoredMapvars})
-			local mapCount = vars.StoredMapvars and table.maxn(vars.StoredMapvars) or 0
-			DebugLog("BROADCAST", string.format("Sharing mapvars for %d maps to all clients", mapCount))
+			BroadcastToAllClients({dataType="ShareMapvarsToClients", Variables=vars.StoredMapvars}) 	
 		end
 	end
 	
-	-- Client request system - clients can request mapvars from host
-	local function requestMapvarsSnapshot()
-		if not (Multiplayer and Multiplayer.in_game) or (Multiplayer and Multiplayer.im_host and Multiplayer.im_host()) then return end
-		SendToHost({dataType="RequestMapvarsSnapshot", map = (Map and Map.Name) or "", sender = "client"})
-	end
-	
 	function events.BeforeLoadMap()
-		vars.StoredMapvars = vars.StoredMapvars or {}
 		if not mapvars.bossGenerated and vars.StoredMapvars[Map.Name] then
 			mapvars=vars.StoredMapvars[Map.Name]
 			vars.StoredMapvars[Map.Name]=nil
@@ -178,30 +88,14 @@ function events.MultiplayerInitialized()
 		end
 	end
 	function events.AfterLoadMap()
-		vars.StoredMapvars = vars.StoredMapvars or {}
 		if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
 			vars.StoredMapvars[Map.Name]=mapvars
 			ShareMapvarsList()
-			HostBurst_Start(4, 0.6) -- Burst broadcast for reliability
 		end
-		if Multiplayer and Multiplayer.in_game and not Multiplayer.im_host() then
-			if shareData and mapvars and mapvars.bossGenerated then
-				SendToHost({dataType="ShareMapvarsToHost", MapName=Map.Name, Variables=mapvars})
-			end
-			-- Clients request mapvars snapshot from host
-			requestMapvarsSnapshot()
+		if Multiplayer and Multiplayer.in_game and not Multiplayer.im_host() and shareData and mapvars.bossGenerated then
+			SendToHost({dataType="ShareMapvarsToHost", MapName=Map.Name, Variables=mapvars})
 		end
 		shareData=false
-	end
-	
-	-- When a client joins, host sends mapvars with burst retry
-	function events.ClientJoined(client)
-		if Multiplayer and Multiplayer.im_host and Multiplayer.im_host() then
-			if vars.StoredMapvars and next(vars.StoredMapvars) then
-				ShareMapvarsList()
-				HostBurst_Start(5, 0.6) -- Burst when client joins
-			end
-		end
 	end
 	
 	function PlayersOnMap()
@@ -214,7 +108,34 @@ function events.MultiplayerInitialized()
 		return count
 	end
 	
-	-- Health sharing functions
+	function events.Tick()
+		connectedPlayers=connectedPlayers or 1
+		if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
+			local currentPlayers=PlayersOnMap()
+			if currentPlayers>connectedPlayers then
+				ShareMapvarsList()
+			end
+			connectedPlayers=currentPlayers
+		end
+	end
+	
+	--SHARE PARTY INFO BETWEEN PLAYERS
+	local healthUpdateTimer=10
+	local hpTimer=0
+	function events.Tick()
+		hpTimer=hpTimer+1
+		
+		if hpTimer>=healthUpdateTimer then
+			hpTimer=0
+			if Multiplayer and Multiplayer.in_game then
+				if Multiplayer.im_host() then
+					ShareHealthData()
+				else
+					SendHealthData()
+				end
+			end
+		end
+	end
 	function SendHealthData()
 		local myId=Multiplayer.my_id
 		local data={}
@@ -245,7 +166,6 @@ function events.MultiplayerInitialized()
 		data.senderId=myId
 		SendToHost(data)
 	end
-
 	function ShareHealthData()
 		--clear disconnected
 		for key, value in pairs(vars.online.partyHealthMana.Parties) do
@@ -254,6 +174,7 @@ function events.MultiplayerInitialized()
 			end
 		end
 		local hostParty={}
+		hostParty={}
 		hostParty.X=Party.X
 		hostParty.Y=Party.Y
 		hostParty.Z=Party.Z
@@ -281,7 +202,6 @@ function events.MultiplayerInitialized()
 		data.dataType="healthManaInfo"
 		BroadcastToAllClients(data)
 	end
-
 	function SendHeal(clientId, partyId, amount, healerName)
 		local data={}
 		data.dataType="heal"
@@ -290,259 +210,107 @@ function events.MultiplayerInitialized()
 		data.HealerName=healerName
 		broadcastToClient(data, clientId)
 	end
-	
-	--SHARE PARTY INFO BETWEEN PLAYERS
-	local healthUpdateTimer=60  -- Reduced from 10 to 60 (1 second instead of 6 times/sec)
-	local hpTimer=0
-	local lastHealthState = {}
-	
-	local function hasHealthChanged()
-		local currentState = {}
-		for i=0,Party.High do
-			local pl=Party[i]
-			currentState[i] = {
-				HP = pl.HP,
-				SP = pl.SP,
-				Dead = pl.Dead,
-				Eradicated = pl.Eradicated
-			}
-		end
-		
-		-- Compare with last state
-		for i=0,Party.High do
-			local last = lastHealthState[i]
-			local current = currentState[i]
-			if not last or 
-			   last.HP ~= current.HP or 
-			   last.SP ~= current.SP or 
-			   last.Dead ~= current.Dead or 
-			   last.Eradicated ~= current.Eradicated then
-				lastHealthState = currentState
-				return true
-			end
-		end
-		return false
-	end
-	
-	-- Consolidated tick handler
-	function events.Tick()
-		if not onlineQualityOfLifeFeatures then return end
-		
-		hpTimer=hpTimer+1
-		
-		-- Health data sharing (reduced frequency + change detection)
-		if hpTimer>=healthUpdateTimer then
-			hpTimer=0
-			if Multiplayer and Multiplayer.in_game and hasHealthChanged() then
-				if Multiplayer.im_host() then
-					ShareHealthData()
-				else
-					SendHealthData()
-				end
-			end
-		end
-		
-		-- Player count monitoring (reduced frequency)
-		if hpTimer % 30 == 0 then -- Check every 0.5 seconds instead of every tick
-			connectedPlayers=connectedPlayers or 1
-			if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
-				local currentPlayers=PlayersOnMap()
-				if currentPlayers>connectedPlayers then
-					ShareMapvarsList()
-				end
-				connectedPlayers=currentPlayers
-			end
-		end
-		
-		-- Multiplayer state management
-		if not isMultiplayerActive and Multiplayer and Multiplayer.in_game then
-			isMultiplayerActive=true
-			vars.ChallengeMode=true
-			if storeTime then
-				Game.Time=storeTime
-				storeTime=false			
-			end
-			
-			for i=0, Game.TransportLocations.High do
-				local tran=Game.TransportLocations[i]
-				tran.Monday=true
-				tran.Tuesday=true
-				tran.Wednesday=true
-				tran.Thursday=true
-				tran.Friday=true
-				tran.Saturday=true
-				tran.Sunday=true
-			end
-			for i =0,Game.Houses.High do
-				Game.Houses[i].OpenHour=0
-				Game.Houses[i].CloseHour=0
-			end
-			Game.NPC[1177].EventB=0
-		end
-		if isMultiplayerActive and Multiplayer and not Multiplayer.in_game then
-			isMultiplayerActive=false
-			vars.ChallengeMode=false
-			for i=0, Game.TransportLocations.High do
-				local tran=Game.TransportLocations[i]
-				tran.Monday=baseTransportTable[i][1]
-				tran.Tuesday=baseTransportTable[i][2]
-				tran.Wednesday=baseTransportTable[i][3]
-				tran.Thursday=baseTransportTable[i][4]
-				tran.Friday=baseTransportTable[i][5]
-				tran.Saturday=baseTransportTable[i][6]
-				tran.Sunday=baseTransportTable[i][7]
-			end
-			for i =0,Game.Houses.High do
-				Game.Houses[i].OpenHour=baseOpenTimes[i]
-				Game.Houses[i].CloseHour=baseCloseTimes[i]
-			end
-			Game.NPC[1177].EventB=1418
-		end
-		
-		-- Dead party health display (reduced frequency)
-		if Multiplayer and Multiplayer.in_game and hpTimer % 60 == 0 then -- Every second instead of every tick
-			local allDead = true
-			for i=0,Party.High do
-				if Party[i]:IsConscious() then
-					allDead = false
-					break
-				end
-			end
-			if allDead then
-				local pl=Party[0]
-				local maxHP=GetMaxHP(pl)
-				local FSP=0
-				if vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[0] then
-					FSP = vars.currentManaPool[0]
-				else
-					FSP	= pl:GetFullSP()
-				end
-				Game.ShowStatusText(StrColor(0,255,0,"Health: " .. Party[0].HP .. "/" .. round(maxHP)) .. StrColor(50,50,255,"  Mana: " .. Party[0].SP .. "/" .. round(FSP)))	
-			end
-		end
-		
-		-- Timer system
-		vars.LastTime=vars.LastTime or Game.Time
-		local timePassed=Game.Time-vars.LastTime
-		if timePassed<0 or timePassed>hour then
-			timePassed=0
-		end
-		local irlSeconds=timePassed/128
-		MawTimer(irlSeconds)
-		vars.LastTime=Game.Time
-		
-		-- Burst broadcasting system for reliable mapvars sync (from zzBossSync)
-		local now = NOW()
-		if Multiplayer and Multiplayer.in_game and Multiplayer.im_host and Multiplayer.im_host() and _burst_until and now < _burst_until then
-			if now >= (_burst_next or 0) then
-				_burst_next = now + (_burst_period or 0.6*SEC)
-				ShareMapvarsList()
-				syncStats.burstBroadcasts = syncStats.burstBroadcasts + 1
-				DebugLog("BURST", string.format("Burst broadcast %d (remaining: %.1fs)", syncStats.burstBroadcasts, (_burst_until - now) / SEC))
-			end
-		end
-		
-		-- Log stats periodically (every 30 seconds)
-		if hpTimer % 1800 == 0 then  -- 30 seconds at 60fps
-			LogSyncStats()
-		end
-	end
 end
 
--- Missing variable declarations
 local isMultiplayerActive=false
-local connectedPlayers=1
-local shareData=false
-local storeTime=false
-local baseTransportTable={}
-local baseOpenTimes={}  
-local baseCloseTimes={}
-
-
--- Validation functions for testing
-local function ValidateMapvarsSync()
-	if not Multiplayer or not Multiplayer.in_game then 
-		return false, "Not in multiplayer game"
+function events.Tick()
+	if not onlineQualityOfLifeFeatures then return end
+	if not isMultiplayerActive and Multiplayer and Multiplayer.in_game then
+		isMultiplayerActive=true
+		vars.ChallengeMode=true
+		if storeTime then
+			Game.Time=storeTime
+			storeTime=false			
+		end
+		
+		for i=0, Game.TransportLocations.High do
+			local tran=Game.TransportLocations[i]
+			tran.Monday=true
+			tran.Tuesday=true
+			tran.Wednesday=true
+			tran.Thursday=true
+			tran.Friday=true
+			tran.Saturday=true
+			tran.Sunday=true
+		end
+		for i =0,Game.Houses.High do
+			Game.Houses[i].OpenHour=0
+			Game.Houses[i].CloseHour=0
+		end
+		Game.NPC[1177].EventB=0
 	end
-	
-	if not vars.StoredMapvars then
-		return false, "StoredMapvars not initialized"
+	if isMultiplayerActive and Multiplayer and not Multiplayer.in_game then
+		isMultiplayerActive=false
+		vars.ChallengeMode=false
+		for i=0, Game.TransportLocations.High do
+			local tran=Game.TransportLocations[i]
+			tran.Monday=baseTransportTable[i][1]
+			tran.Tuesday=baseTransportTable[i][2]
+			tran.Wednesday=baseTransportTable[i][3]
+			tran.Thursday=baseTransportTable[i][4]
+			tran.Friday=baseTransportTable[i][5]
+			tran.Saturday=baseTransportTable[i][6]
+			tran.Sunday=baseTransportTable[i][7]
+		end
+		for i =0,Game.Houses.High do
+			Game.Houses[i].OpenHour=baseOpenTimes[i]
+			Game.Houses[i].CloseHour=baseCloseTimes[i]
+		end
+		Game.NPC[1177].EventB=1418
 	end
-	
-	if Multiplayer.im_host() and not next(vars.StoredMapvars) then
-		return false, "Host has no stored mapvars"
-	end
-	
-	return true, "Mapvars sync appears functional"
 end
 
-local function ValidateHealthSync()
-	if not vars.online or not vars.online.partyHealthMana then
-		return false, "Health sync not initialized"
+--show health when dead
+function events.Tick()
+	if not Multiplayer or not Multiplayer.in_game then return end
+	for i=0,Party.High do
+		if Party[i]:IsConscious() then
+			return
+		end
 	end
-	
-	local parties = vars.online.partyHealthMana.Parties
-	if not parties then
-		return false, "No party health data"
-	end
-	
-	local count = 0
-	for k,v in pairs(parties) do
-		count = count + 1
-	end
-	
-	return true, string.format("Health sync active with %d parties", count)
-end
-
--- Console commands for testing and debugging
-function EnableSyncDebug()
-	DEBUG_SYNC = true
-	print("Sync debugging enabled. Use DisableSyncDebug() to turn off.")
-	LogSyncStats()
-end
-
-function DisableSyncDebug()
-	DEBUG_SYNC = false
-	print("Sync debugging disabled.")
-end
-
-function TestSyncSystems()
-	print("=== Multiplayer Sync System Status ===")
-	
-	local mapOk, mapMsg = ValidateMapvarsSync()
-	print("Mapvars Sync: " .. (mapOk and "✓ " or "✗ ") .. mapMsg)
-	
-	local healthOk, healthMsg = ValidateHealthSync()
-	print("Health Sync: " .. (healthOk and "✓ " or "✗ ") .. healthMsg)
-	
-	if Multiplayer and Multiplayer.in_game then
-		print("Multiplayer Status: ✓ In multiplayer game")
-		print("Role: " .. (Multiplayer.im_host() and "Host" or "Client"))
-		print("Players on map: " .. PlayersOnMap())
+	local pl=Party[0]
+	local maxHP=GetMaxHP(pl)
+	local FSP=0
+	if vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[0] then
+		FSP = vars.currentManaPool[0]
 	else
-		print("Multiplayer Status: ✗ Not in multiplayer")
+		FSP	= pl:GetFullSP()
 	end
-	
-	LogSyncStats()
-	print("===================================")
-end
-
-function ResetSyncStats()
-	syncStats = {
-		healthUpdates = 0,
-		mapvarsSync = 0,
-		clientRequests = 0,
-		burstBroadcasts = 0,
-		packetsSent = 0,
-		packetsReceived = 0
-	}
-	print("Sync statistics reset.")
+	Game.ShowStatusText(StrColor(0,255,0,"Health: " .. Party[0].HP .. "/" .. round(maxHP)) .. StrColor(50,50,255,"  Mana: " .. Party[0].SP .. "/" .. round(FSP)))	
 end
 
 function events.CalcTrainingTime(t)
 	if Multiplayer and Multiplayer.in_game then
 		t.Time=0
 	end
+end
+function events.BeforeLoadMap()
+	vars.StoredMapvars=vars.StoredMapvars or {}
+	
+	vars.online=vars.online or {}
+	
+	vars.online.partyHealthMana={}
+	vars.online.partyHealthMana.Parties={}
+end
+
+--fix for timer events, specially online
+local second=256/60
+local minute=256
+local hour=15360
+local day=368640
+local week=2580480
+local month=10321920
+local year=123863040
+
+function events.Tick()
+	vars.LastTime=vars.LastTime or Game.Time
+	local timePassed=Game.Time-vars.LastTime
+	if timePassed<0 or timePassed>hour then
+		timePassed=0
+	end
+	local irlSeconds=timePassed/128
+	MawTimer(irlSeconds)
+	vars.LastTime=Game.Time
 end
 
 local MawTimers = {}
