@@ -1539,8 +1539,12 @@ function events.CalcDamageToMonster(t)
 				local tier=spell2%11==0 and 11 or spell2%11
 				local s,m=SplitSkill(pl:GetSkill(school))
 				if vars.elementalistSpells[pl:GetIndex()][school]>=spellRequirements[tier] and m>=masteryRequired[tier] then
-					pl.Spells[spell2]=true
-					Message("Learned " .. Game.SpellsTxt[spell2].Name)
+					if vars.insanityMode and spell2==19 and m<4 then
+						pl.Spells[spell2]=false
+					else
+						pl.Spells[spell2]=true
+						Message("Learned " .. Game.SpellsTxt[spell2].Name)
+					end
 				end
 			end
 		end		
