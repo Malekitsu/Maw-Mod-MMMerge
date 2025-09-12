@@ -1774,6 +1774,9 @@ function getPlayerEstimatedPower(lvl)
 	elseif Game.BolsterAmount==150 then
 		statsPerLevel=2
 	end
+	if vars.AusterityMode then
+		statsPerLevel=1
+	end
 		
 	local masterLearned=12
 	if vars.madnessMode then
