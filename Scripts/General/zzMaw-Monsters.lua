@@ -703,7 +703,7 @@ function recalculateMonsterTable()
 		HPtable=HPtable or {}
 		--Create a mock monster object to pass the correct ID and level
 		local mockMon = {Id = i, Level = totalLevel[i]}
-		HPtable[i] = getMonsterHealth(mockMon, totalLevel[i])
+		HPtable[i] = round(getMonsterHealth(mockMon, totalLevel[i]))
 		--resistances 
 		bolsterRes=math.max(round((totalLevel[i]-basetable[i].Level)/10)*5,0)
 		--mapping
@@ -733,98 +733,11 @@ function recalculateMonsterTable()
 		if vars.insanityMode then
 			mon.Experience=mon.Experience*0.8
 		end
+		mon.ArmorClass=base.ArmorClass*((totalLevel[i]+10)/(LevelB+10))
 	end
-	--CALCULATE DAMAGE AND HP
-	for i=1, 651 do
-		mon=Game.MonstersTxt[i]
-		base=basetable[i]		
-		LevelB=BLevel[i]
-		
-		--ADJUST HP
-		hpMult=1
-		if i%3==1 then
-			lvl=totalLevel[i+2]
-			if totalLevel[i]*2<=lvl then
-				hpMult=hpMult+lvl/(totalLevel[i]*5)
-			end
-		elseif i%3==2 then
-			lvl=totalLevel[i+1]
-			if totalLevel[i-1]*2<=lvl then
-				hpMult=hpMult+lvl/(totalLevel[i]*5)
-			end
-		end
-		--easy
-		if Game.BolsterAmount==0 then
-			hpMult=hpMult*(0.6+totalLevel[i]/600)
-		end
-		--normal
-		if Game.BolsterAmount==50 then
-			hpMult=hpMult*(0.8+totalLevel[i]/550)
-		end
-		--MAW
-		if Game.BolsterAmount==100 then
-			hpMult=hpMult*(1+totalLevel[i]/500)
-		end
-		--Hard
-		if Game.BolsterAmount==150 then
-			hpMult=hpMult*(1.25+totalLevel[i]/450)
-		end
-		--Hell
-		if Game.BolsterAmount==200 then
-			hpMult=hpMult*(1.5+totalLevel[i]/400)
-		end
-		--Nightmare
-		if Game.BolsterAmount==300 then
-			hpMult=hpMult*(1.75+totalLevel[i]/350)
-		end
-		if Game.BolsterAmount==600 then
-			hpMult=hpMult*(2+totalLevel[i]/300)
-		end	
-		if vars.insanityMode then
-			hpMult=hpMult*(1.5+totalLevel[i]/300)
-		end
-		if vars.AusterityMode==true then
-			hpMult=((hpMult*3-math.min(2, hpMult*2))+1)
-		end
-		--crit nerf fix
-		hpMult=hpMult/math.min(math.max(0.3+totalLevel[i]/200,1),50/15) --50/15 is the amount needed to get 1% crit, now and before
-		
-		HPtable[i]=HPtable[i]*hpMult
-		--damage
-		if i%3==1 then
-			levelMult=totalLevel[i+1]
-		elseif i%3==0 then
-			levelMult=totalLevel[i-1]
-		else
-			levelMult=totalLevel[i]
-		end
-		
-		bonusDamage=math.max((levelMult^0.88-LevelB^0.88),0)
-		local expectedDamage=3+totalLevel[i]^0.88
-		local currentDamage=(base.Attack1.DamageAdd+(base.Attack1.DamageDiceSides+1)*base.Attack1.DamageDiceCount/2)+bonusDamage
-		if currentDamage<expectedDamage then
-			bonusDamage=bonusDamage+expectedDamage-currentDamage
-		end
-		if bonusDamage>=20 then
-			levelMult=totalLevel[i]
-		end
-		
-		mon.ArmorClass=base.ArmorClass*((levelMult+10)/(LevelB+10))
-	end
-	--adjust damage if it's too similiar between monster type
-	--if bolsterLevel>10 or Game.freeProgression==false or vars.onlineMode then
 	
-		
 	for i=1, 651 do
 		local mon=Game.MonstersTxt[i]
-		--calculate level scaling
-		if i%3==1 then
-			local rateo=basetable[i].FullHP/basetable[i+1].FullHP
-			HPtable[i]=HPtable[i+1]*rateo
-		elseif i%3==0 then
-			local rateo=basetable[i].FullHP/basetable[i-1].FullHP
-			HPtable[i]=HPtable[i-1]*rateo
-		end
 		hpOvercap=0
 		actualHP=HPtable[i]
 		while actualHP>32500 do
@@ -874,6 +787,8 @@ function recalculateMonsterTable()
 	end
 end
 
+
+--[[ calculated differently now
 function events.LoadMap()
 	--DRAGON BREATH FIX
 	for i=1, 651 do
@@ -888,6 +803,7 @@ function events.LoadMap()
 	end
 	
 end
+]]
 
 --LOOT FIX
 -- PickCorpse function moved to zzMaw-Items.lua to integrate with deterministic seeding system
@@ -3091,6 +3007,11 @@ function generateBoss(index, nameIndex, skillType)
 	table.insert(mapvars.bossSet, {index, mon.NameId, mon.Id})
 	-- Increment boss counter for seeding (after successful boss creation)
 	vars.totalBossesSpawned = (vars.totalBossesSpawned or 0) + 1
+	
+	-- Generate and assign loot seed for this boss
+	if generateBossLootSeed then
+		generateBossLootSeed(index, mon.Id)
+	end
 end
 
 
