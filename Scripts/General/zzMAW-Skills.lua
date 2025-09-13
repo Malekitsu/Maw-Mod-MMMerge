@@ -1653,7 +1653,7 @@ local function getReqAndCost(mastery, player)
 		local cost=baseCost
 		for _, skillId in pairs(horizontalSkills) do
 			local s,m=SplitSkill(pl.Skills[skillId])
-			if (m>=mastery and s~=0) or (vars.oldPlayerMasteries and vars.oldPlayerMasteries[pl:GetIndex()] and vars.oldPlayerMasteries[pl:GetIndex()][skillId]-1>=m) then
+			if (m>=mastery and s~=0) or (vars.oldPlayerMasteries and vars.oldPlayerMasteries[pl:GetIndex()] and vars.oldPlayerMasteries[pl:GetIndex()][skillId]-1>m) then
 				cost=cost+baseCost
 			end
 		end
@@ -1663,7 +1663,7 @@ local function getReqAndCost(mastery, player)
 		local cost=baseCost
 		for _, skillId in pairs(horizontalSkills) do
 			local s,m=SplitSkill(pl.Skills[skillId])
-			if m>=mastery and s~=0 or (vars.oldPlayerMasteries and vars.oldPlayerMasteries[pl:GetIndex()] and vars.oldPlayerMasteries[pl:GetIndex()][skillId]-1>=m) then
+			if m>=mastery and s~=0 or (vars.oldPlayerMasteries and vars.oldPlayerMasteries[pl:GetIndex()] and vars.oldPlayerMasteries[pl:GetIndex()][skillId]-1>m) then
 				cost=cost+baseCost
 			end
 		end
