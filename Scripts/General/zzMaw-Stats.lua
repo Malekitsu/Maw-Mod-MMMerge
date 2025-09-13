@@ -1867,13 +1867,14 @@ function getMonsterHealth(mon, level)
 	end	
 	
 	local id=mon.Id
+	local rateo=1
 	if id%3==1 then
-		local rateo=basetable[id].FullHP/basetable[id+1].FullHP
-		health=health*rateo
+		rateo=basetable[id].FullHP/basetable[id+1].FullHP
 	elseif id%3==0 then
-		local rateo=basetable[id].FullHP/basetable[id-1].FullHP
-		health=health*rateo
+		rateo=basetable[id].FullHP/basetable[id-1].FullHP
 	end
+	rateo=math.max(0.6,math.min(rateo,1.8))
+	health=health*rateo
 	
 	--account for resistances
 	health=health/2^(math.min(totalLevel[id]/2/100,10)) --approx
