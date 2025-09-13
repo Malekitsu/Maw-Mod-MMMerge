@@ -514,7 +514,7 @@ function events.GameInitialized2()
 	Game.Classes.SPFactor[11]=0
 	Game.Classes.SPStats[11]=3
 	
-	Skillz.setDesc(23,1,"Dragons are powerful creatures with innate abilities.\nLike the racial abilities of Dark Elves and Vampires, Dragon abilities are cast like spells, but are acquired like skills. Dragons begin able to cast Fear, the gain a second breath weapon, Flight and Wing Bugget at expert, master and grandmaster rankings.\n\nBreath damage is 20 + 2 per level (up to level 600) and total damage is increased by " .. dragonBreath.Damage[1] .. "-" .. dragonBreath.Damage[2] .. "-" .. dragonBreath.Damage[3] .. "-" .. dragonBreath.Damage[4] .. "% at novice, expert, master and grandmaster rankings per point of skill in Dragon Ability.\nEach point in the skill increases damage and increases recovery time by 3%."  )
+	Skillz.setDesc(23,1,"Dragons are powerful creatures with innate abilities.\nLike the racial abilities of Dark Elves and Vampires, Dragon abilities are cast like spells, but are acquired like skills. Dragons begin able to cast Fear, the gain a second breath weapon, Flight and Wing Bugget at expert, master and grandmaster rankings.\n\nBreath damage is 20 + 2 per level (up to level 600, or 900 in madness) and total damage is increased by " .. dragonBreath.Damage[1] .. "-" .. dragonBreath.Damage[2] .. "-" .. dragonBreath.Damage[3] .. "-" .. dragonBreath.Damage[4] .. "% at novice, expert, master and grandmaster rankings per point of skill in Dragon Ability.\nEach point in the skill increases damage and increases recovery time by 3%."  )
 	
 	function events.CalcStatBonusByItems(t)
 		if Game.CharacterPortraits[t.Player.Face].Race~=const.Race.Dragon then return end
@@ -533,7 +533,11 @@ function events.GameInitialized2()
 			if pl.LevelBase/bolster>1.2 then
 				lvl=math.min(pl.LevelBase/2,bolster)
 			end
-			local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (math.min(lvl,600) * 2 +30) 
+			local cap=600
+			if vars.madnessMode then
+				cap=900
+			end
+			local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (math.min(lvl,cap) * 2 +30) 
 			t.Result=round((bonus*(1+might/1000)+(mightEffect*might/1000))*0.75*(1+0.03*s))
 			
 		elseif t.Stat==28 then --max damage
@@ -552,7 +556,11 @@ function events.GameInitialized2()
 			if pl.LevelBase/bolster>1.2 then
 				lvl=math.min(pl.LevelBase/2,bolster)
 			end
-			local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (math.min(lvl,600) * 2 +30)
+			local cap=600
+			if vars.madnessMode then
+				cap=900
+			end
+			local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (math.min(lvl,cap) * 2 +30)
 			
 			t.Result=round((bonus*(1+might/1000)+(mightEffect*might/1000))*1.25*(1+0.03*s))
 			
@@ -580,7 +588,11 @@ function events.GameInitialized2()
 			if pl.LevelBase/bolster>1.2 then
 				lvl=math.min(pl.LevelBase/2,bolster)
 			end
-			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(lvl,600)) + mightEffect
+			local cap=600
+			if vars.madnessMode then
+				cap=900
+			end
+			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(lvl,cap)) + mightEffect
 			local damage=round(baseDamage*(1+might/1000)*0.75*(1+0.03*s))
 			
 			t.Result=damage
@@ -601,7 +613,12 @@ function events.GameInitialized2()
 			if pl.LevelBase/bolster>1.2 then
 				lvl=math.min(pl.LevelBase/2,bolster)
 			end
-			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(lvl,600)) + mightEffect
+			
+			local cap=600
+			if vars.madnessMode then
+				cap=900
+			end
+			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(lvl,cap)) + mightEffect
 			local damage=round(baseDamage*(1+might/1000)*1.25*(1+0.03*s))
 			
 			t.Result=damage
@@ -617,7 +634,11 @@ function events.GameInitialized2()
 			if pl.LevelBase/bolster>1.2 then
 				lvl=math.min(pl.LevelBase/2,bolster)
 			end
-			local bonus= (1 + dragonScales.AC[m]/100 * s) * (math.min(lvl,600)+40) - (s * oldDodge)
+			local cap=600
+			if vars.madnessMode then
+				cap=900
+			end
+			local bonus= (1 + dragonScales.AC[m]/100 * s) * (math.min(lvl,cap)+40) - (s * oldDodge)
 			t.Result=t.Result+bonus
 		elseif t.Stat>=10 and t.Stat<=15 then
 			local pl=t.Player
@@ -629,7 +650,11 @@ function events.GameInitialized2()
 			if pl.LevelBase/bolster>1.2 then
 				lvl=math.min(pl.LevelBase/2,bolster)
 			end
-			local bonus= (dragonScales.AC[m]/100 * s) * (math.min(lvl,600)+40)
+			local cap=600
+			if vars.madnessMode then
+				cap=900
+			end
+			local bonus= (dragonScales.AC[m]/100 * s) * (math.min(lvl,cap)+40)
 			t.Result=t.Result+bonus
 		end
 		
