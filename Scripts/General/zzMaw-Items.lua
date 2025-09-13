@@ -3234,6 +3234,12 @@ function itemStats(index)
 		tab[i]=tab[i]+itemResistanceBonus1+itemResistanceBonus2
 	end
 	
+	--dragon
+	if Game.CharacterPortraits[pl.Face].Race==const.Race.Dragon then
+		for i=1,16 do
+			tab[i]=tab[i]*3
+		end
+	end
 	--------------
 	--end of items
 	--------------
@@ -3278,12 +3284,6 @@ function itemStats(index)
 			level=math.max(level,level2)
 			acBonus=(buffPower[38].Base[m]+level/2)*(1+buffPower[38].Scaling[m]/100*s)
 			tab[10]=tab[10]+acBonus
-		end
-	end
-	--dragon
-	if Game.CharacterPortraits[pl.Face].Race==const.Race.Dragon then
-		for i=1,16 do
-			tab[i]=tab[i]*3
 		end
 	end
 	--add luck to resistances
