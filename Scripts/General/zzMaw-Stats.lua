@@ -1321,42 +1321,52 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	end
 	local res=math.huge
 	local resList=damageKindResistance[damageKind]
-	for i=1,#resList do
-		local playerRes = pl:GetResistance(resList[i])
-		if playerRes<res then
-			res=playerRes
-		end
-	end
-	if res>=65000 then
-		return 0
-	end		
-	if getMapAffixPower(29) then
-		res=res*(1-getMapAffixPower(29)/100)
-	end
-	local divider=math.min(60+monLvl*0.5*bolster,400*bolster)
-	local reduction=res/divider+1
-	local res=1/reduction	
 	
-	--base enchants
-	currentItemRes=10000
+	-- Initialize enchant resistance table
+	vars.normalEnchantResistance=vars.normalEnchantResistance or {}
+	vars.normalEnchantResistance[id]=vars.normalEnchantResistance[id] or {}
+	
+	-- Find the resistance type that provides the highest effective protection
+	local bestEffectiveRes = 0
+	local baseRes=0
 	for i=1,#resList do
-		vars.normalEnchantResistance=vars.normalEnchantResistance or {}
-		vars.normalEnchantResistance[id]=vars.normalEnchantResistance[id] or {}
+		baseRes = pl:GetResistance(resList[i])
+		
+		-- Get item enchant resistance for this resistance type
 		vars.normalEnchantResistance[id][resList[i]+1]=vars.normalEnchantResistance[id][resList[i]+1] or 0
 		local itemRes = vars.normalEnchantResistance[id][resList[i]+1]
-		if itemRes<currentItemRes then
-			currentItemRes=itemRes
+		
+		-- Apply legendary power 16 to item resistance
+		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 16) then
+			itemRes=itemRes*1.5
+		end
+		
+		-- Calculate total resistance for this type (base resistance with item enchant multiplier)
+		local itemResMultiplier = 1/(itemRes/100+1)
+		local totalRes = baseRes 
+		
+		-- Apply map affix reduction if present
+		if getMapAffixPower(29) then
+			totalRes=totalRes*(1-getMapAffixPower(29)/100)
+		end
+		
+		-- Calculate the effective resistance using the proper formula
+		local divider=math.min(60+monLvl*0.5*bolster,400*bolster)
+		local reduction=totalRes/divider+1
+		local effectiveRes=1/reduction* itemResMultiplier
+		
+		-- Keep track of the highest effective resistance (best protection)
+		if effectiveRes > bestEffectiveRes then
+			bestEffectiveRes = effectiveRes
 		end
 	end
 	
-	
-	--LEGENDARY POWER 16
-	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 16) then
-		currentItemRes=currentItemRes*1.5
+	-- Skip if this resistance is immune
+	if baseRes>=65000 then
+		return 0
 	end
-	
-	currentItemRes=1/(currentItemRes/100+1)
-	res=res*currentItemRes
+
+	local res = bestEffectiveRes
 	--randomize resistance
 	if res>0 and rand then
 		local roll=(math.random()+math.random())-1
@@ -1862,9 +1872,13 @@ function getMonsterHealth(mon, level)
 	
 	health=health*hits
 	
+	--account for resistances
+	health=health/2^(math.min(level/2/100,10)) --approx
+	
 	if not mon then
 		return health
 	end	
+	
 	
 	local id=mon.Id
 	local rateo=1
@@ -1875,9 +1889,6 @@ function getMonsterHealth(mon, level)
 	end
 	rateo=math.max(0.6,math.min(rateo,1.8))
 	health=health*rateo
-	
-	--account for resistances
-	health=health/2^(math.min(totalLevel[id]/2/100,10)) --approx
 	
 	-- Check if monster has GetIndex method (real monster vs mock object)
 	if not mon.GetIndex then
@@ -2084,4 +2095,3 @@ function masteryThresholds()
 	  return {0, 4, 7, 10}
 	end
 end
-  
