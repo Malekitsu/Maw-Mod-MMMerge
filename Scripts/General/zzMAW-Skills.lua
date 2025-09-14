@@ -2387,8 +2387,8 @@ function events.Action(t)
 			itemStats(index)
 			--base descriptions
 			Skillz.setDesc(6,5,maceGMtxt)
-			if m<3 then return end
 			local s,m=SplitSkill(pl:GetSkill(const.Skills.Mace))
+			if m<3 then return end
 			local chance=round(s/pl.LevelBase^0.65*1500*damageMultiplier[pl:GetIndex()].Melee/math.min(1+pl.LevelBase/150,3))/100
 			local txt="\n\n"
 			if m==3 then
