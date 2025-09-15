@@ -486,7 +486,7 @@ function events.MonsterKillExp(t)
 		return
 	end
 	
-	monLvl=getMonsterLevel(mon)
+	local monLvl=getMonsterLevel(mon)
 	t.Handled=true
 	local partyCount=0
 	for i=0, Party.High do
@@ -495,11 +495,22 @@ function events.MonsterKillExp(t)
 		end
 	end
 	partyCount=math.max(1,partyCount)
-	local experience=t.Exp/partyCount
+	
 	local bolsterExp=0
+	local id=mon.Id
+
+	--reset experience
+	local lvlBase=math.max(basetable[id].Level,totalLevel[id]/3) --added totalLevel/3 because of mapping
+	local lvlBase=math.min(lvlBase,120) 
+	local experience = round((lvlBase*20+lvlBase^1.8)*totalLevel[id]/lvlBase/partyCount)
+	
+	local monHealth=getMonsterHealth(mon)
+	local monDamage=getMonsterDamage(mon)
+	
 	for i=0, Party.High do
 		if Party[i].Dead==0 and Party[i].Eradicated==0 then
 			local playerLevel=math.min(calcLevel(Party[i].Experience),partyLvl) --accounts for the cases which you want to level a low lvl character
+			--[[
 			local multiplier1=((monLvl+10)/(playerLevel+5))^2
 			local multiplier2=1+(monLvl^0.5)-(playerLevel^0.5)
 			mult=math.min(math.max(multiplier1,multiplier2),3)
@@ -507,7 +518,18 @@ function events.MonsterKillExp(t)
 				multiplier2=1+(playerLevel^0.5)-(monLvl^0.5)
 				mult=math.max(math.max(multiplier1,1/multiplier2),1/3)
 			end
+			]]
+			local healthRateo=monHealth/getMonsterHealth(false,playerLevel)
+			--local damageRateo=monDamage/getMonsterDamage(false,playerLevel)
+			local mult=healthRateo --*damageRateo
+			
+			
+			if mon.NameId>=220 then
+				mult=mult*2
+			end
+			
 			local experienceAwarded=experience*mult
+			--debug.Message(mult .. "  " .. experienceAwarded)
 			Party[i].Experience=math.min(Party[i].Experience+experienceAwarded, 2^32-3982296)
 			
 			--calculate again based for bolster
