@@ -2715,7 +2715,6 @@ function checkMapCompletition()
 						Game.EscMessage(string.format("Map Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Material"))
 					end
 				end
-				debug.Message(experience)
 				return
 			end
 		end
