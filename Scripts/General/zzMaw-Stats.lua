@@ -820,7 +820,17 @@ function events.CalcDamageToPlayer(t)
 	roll=math.random()
 	if roll<=dodgeChance then
 		t.Result=0
-		evt.FaceExpression{Player = t.PlayerIndex, Frame = 33}
+		-- Use the same player that performed the dodge calculation
+		local index = -1
+		for i = 0, Party.High do
+			if Party[i]:GetIndex() == t.PlayerIndex then
+				index = i
+				break
+			end
+		end
+		if index >= 0 then
+			evt.FaceExpression{Player = index, Frame = 33}
+		end
 		return
 	end
 	
