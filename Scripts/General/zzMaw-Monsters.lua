@@ -255,9 +255,6 @@ function recalculateMawMonster()
 				mon.Level=math.min(mapvars.uniqueMonsterLevel[i],255)
 				--HP calculated using the proper getMonsterHealth function
 				local HP=round(getMonsterHealth(mon))
-				--store in HPtable for reference
-				HPtable=HPtable or {}
-				HPtable[mon.Id]=HP
 				
 				hpOvercap=0
 				while HP>32500 do
@@ -297,9 +294,6 @@ function recalculateMawMonster()
 					austerityMod=4
 				end
 				local HP=round(getMonsterHealth(mon))
-				--store in HPtable for reference
-				HPtable=HPtable or {}
-				HPtable[mon.Id]=HP
 				local hpOvercap=0
 				while HP>32500 do
 					HP=round(HP/2)
@@ -1945,10 +1939,13 @@ local spellToDamageKind={
 
 function getMonsterLevel(mon)
 	local lvl=mon.Level
+	local id=mon:GetIndex()
 	if mon.NameId==0 and totalLevel and totalLevel[mon.Id] then
 		lvl=round(totalLevel[mon.Id])
-	elseif mapvars.uniqueMonsterLevel and mapvars.uniqueMonsterLevel[mon:GetIndex()] then
-		lvl=round(mapvars.uniqueMonsterLevel[mon:GetIndex()])
+	elseif mapvars.uniqueMonsterLevel and mapvars.uniqueMonsterLevel[id] then
+		lvl=round(mapvars.uniqueMonsterLevel[id])
+	elseif mapvars.bossData and mapvars.bossData[id] then
+		lvl=mapvars.bossData[id].Level
 	end
 	return lvl
 end
@@ -2640,7 +2637,7 @@ function checkMapCompletition()
 					bolster=mapLevel*2
 				end
 				if vars.madnessMode then
-					bolster=madnessMapLevels[name]-mapLevel
+					bolster=madnessMapLevels[name]
 				end
 
 				local totalMonster=m
@@ -2655,9 +2652,13 @@ function checkMapCompletition()
 				end
 				mapLevel=math.max(mapLevel,1)
 				local experience=math.ceil(totalMonster^0.7*(mapLevel*20+mapLevel^1.8)/3*(bolster+mapLevel)/mapLevel/1000)*1000
+				if vars.madnessMode then
+					experience=math.ceil(totalMonster^0.7*(bolster*20+bolster^1.8)/3/1000)*1000
+				end
 				--bolster code
 				addBolsterExp(experience)
 				vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
+				debug.Message(experience .. "  " .. totalMonster .. "  " .. mapLevel .. "  " .. bolster)
 				--end
 				local gold=math.ceil(experience^0.9/1000)*1000 
 				evt.ForPlayer(0)
@@ -2693,6 +2694,7 @@ function checkMapCompletition()
 						Game.EscMessage(string.format("Map Completed! You gain " .. experience .. " Exp, " .. gold .. " Gold and a Crafting Material"))
 					end
 				end
+				debug.Message(experience)
 				return
 			end
 		end
@@ -2936,13 +2938,6 @@ function generateBoss(index, nameIndex, skillType)
 				skill = specialSkill
 				hpMult = hpMult * specialHpMult
 				dmgMult = dmgMult * specialDmgMult
-				
-				-- Apply resistance bonuses
-				if skill == "Broodlord" then
-					mon.Resistances[0] = mon.Resistances[0] + 1000
-				elseif skill == "Omnipotent" then
-					mon.Resistances[0] = mon.Resistances[0] + 2000
-				end
 			end
 			
 			if generatedByBroodlord then
@@ -2953,7 +2948,6 @@ function generateBoss(index, nameIndex, skillType)
 			skill = SkillList[math.random(1, #SkillList)]
 			if math.random() < 0.01 * chanceMult and not generatedByBroodlord then
 				skill = "Broodlord"
-				mon.Resistances[0] = mon.Resistances[0] + 1000
 				hpMult=hpMult*2
 				dmgMult = dmgMult * 1.5
 			end
@@ -2963,7 +2957,6 @@ function generateBoss(index, nameIndex, skillType)
 			if math.random() < 0.001 * chanceMult then
 				skill = "Omnipotent"
 				dmgMult = dmgMult * 2
-				mon.Resistances[0] = mon.Resistances[0] + 2000
 				hpMult=hpMult*4
 			end
 		end
@@ -2996,7 +2989,7 @@ function generateBoss(index, nameIndex, skillType)
 		HP = round(HP / 2)
 		hpOvercap = hpOvercap + 1
 	end
-	mon.Resistances[0] = mon.Resistances[0] + 1000 * hpOvercap
+	mon.Resistances[0] = mon.Resistances[0]%1000 + 1000 * hpOvercap
 	mon.FullHP = HP
 	mon.HP = mon.FullHP
 	
