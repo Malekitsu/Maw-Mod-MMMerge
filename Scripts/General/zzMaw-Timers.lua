@@ -62,7 +62,7 @@ function MawResetTimer(name) local t = MawTimers[name]; if t then t.acc = 0 end 
 
 -- call this every frame with seconds since last frame
 function MawTimer(dt)
-  local MAX_STEPS = 10  -- safety cap to avoid infinite loops
+  local MAX_STEPS = 20  -- safety cap to avoid infinite loops
 
   for _, t in pairs(MawTimers) do
     if t.enabled then
@@ -91,3 +91,4 @@ MawAddTimer("elementalBuffs", 1, elementalBuffs)
 MawAddTimer("mawBuffApply", 0.5, mawBuffApply)
 MawAddTimer("elementalistStacksDecay", 0.1, elementalistStacksDecay)
 MawAddTimer("poisonTimer", 1, poisonTimer)
+
