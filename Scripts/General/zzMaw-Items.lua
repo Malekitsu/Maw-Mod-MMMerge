@@ -107,6 +107,28 @@ function events.PickCorpse(t)
 			math.randomseed(seed)
 		else
 			-- Use old position-based seeding for other modes
+			-- Check if seed exists for this monster, if not create one
+			if not mapvars.MonsterSeed or not mapvars.MonsterSeed[t.MonsterIndex] then
+				-- Initialize mapvars.MonsterSeed if it doesn't exist
+				mapvars.MonsterSeed = mapvars.MonsterSeed or {}
+				
+				-- Create deterministic seed for this monster
+				local mapName = Map.Name or "default"
+				local mapSeed = vars.seed
+				for i = 1, #mapName do
+					mapSeed = mapSeed + string.byte(mapName, i) * i * 13
+				end
+				
+				-- Add map index if available
+				if Map.MapStatsIndex then
+					mapSeed = mapSeed + Map.MapStatsIndex * 47
+				end
+				
+				-- Generate seed for this specific monster
+				local monsterSeed = mapSeed + t.MonsterIndex * 97
+				mapvars.MonsterSeed[t.MonsterIndex] = monsterSeed
+			end
+			
 			Game.RandSeed = mapvars.MonsterSeed[t.MonsterIndex]
 			math.randomseed(mapvars.MonsterSeed[t.MonsterIndex])
 		end
