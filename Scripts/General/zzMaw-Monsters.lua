@@ -2680,7 +2680,6 @@ function checkMapCompletition()
 				--bolster code
 				addBolsterExp(experience)
 				vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
-				debug.Message(experience .. "  " .. totalMonster .. "  " .. mapLevel .. "  " .. bolster)
 				--end
 				local gold=math.ceil(experience^0.9/1000)*1000 
 				evt.ForPlayer(0)
