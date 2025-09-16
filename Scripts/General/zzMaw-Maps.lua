@@ -1715,7 +1715,7 @@ function events.MonsterKilled(mon)
 		return
 	end
 	mapvars.mapsDropped=mapvars.mapsDropped or 0
-	vars.mapDropFailures=mapvars.mapDropFailures or 0
+	vars.mapDropFailures=vars.mapDropFailures or 0
 	local chances=0.001
 	local levelRequired=100
 	if vars.madnessMode then
@@ -1750,8 +1750,7 @@ function events.MonsterKilled(mon)
 	else
 		rollValue = math.random()
 	end
-	
-	if getMonsterLevel(mon)>levelRequired and rollValue < dropChance then
+	if getMonsterLevel(mon)>=levelRequired and rollValue < dropChance then
 		assignedAffixes = {}
 		obj = SummonItem(290, mon.X, mon.Y, mon.Z + 100, 100)
 		possibleMaps={}
@@ -1788,11 +1787,8 @@ function events.MonsterKilled(mon)
 		if vars.insanityMode and not vars.madnessMode then
 			obj.Item.MaxCharges=math.max(obj.Item.MaxCharges,30)
 		end
-	else
-		-- Increment pity counter only if monster level was high enough for drop attempt
-		if getMonsterLevel(mon) > levelRequired then
-			vars.mapDropFailures = vars.mapDropFailures + 1
-		end
+	elseif getMonsterLevel(mon) >= levelRequired then
+		vars.mapDropFailures = vars.mapDropFailures + 1
 	end
 end
 
