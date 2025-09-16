@@ -10,10 +10,11 @@ local function trandom(t)
 	return t[math.random(#t)]
 end
 
+-- by default now: vanilla classes and peasants for all continents + MAW classes in Enroth
 local ClassTypesByContinent = {
-	[1] = {2, 3, 6, 7, 12, 13, 15}, 		-- Jadam
-	[2] = {1, 2, 5, 6, 8, 9, 10, 11, 14}, 	-- Antagrich
-	[3] = {1, 2, 5, 6, 8, 9, 10, 11, 14}  	-- Enroth
+	[1] = {2, 3, 4, 6, 7, 12, 13, 15, 16}, 		-- Jadam
+	[2] = {1, 2, 5, 6, 8, 9, 10, 11, 14, 16}, 	-- Antagrich
+	[3] = {1, 2, 5, 6, 9, 14, 16, 17, 18, 19, 20}  	-- Enroth
 }
 
 local MercenariesQBits = {
@@ -247,8 +248,9 @@ function GenerateMercenary(t) --RosterId, Class, Level, Skills, Items, Face, Joi
 	for i,v in Char.Skills do
 		Char.Skills[i] = 0
 	end
-
-	for i, v in Game.ClassKinds.StartingSkills[math.floor(Class / 2)] do
+	
+	-- Master of Elements fix
+	for i, v in Game.ClassKinds.StartingSkills[math.min(math.floor(Class / 2), 31)] do
 		if v == 2 then
 			Char.Skills[i] = 1
 		end
@@ -517,13 +519,26 @@ function events.GameInitialized2()
 		ClassTypes[k] = v.Kind
 	end
 
+	-- Normalize ClassStages: convert sparse step-indexed tables into dense arrays
+	for kind, tbl in pairs(ClassStages) do
+		local keys = {}
+		for idx,_ in pairs(tbl) do table.insert(keys, idx) end
+		table.sort(keys)
+		local dense = {}
+		for _, idx in ipairs(keys) do table.insert(dense, tbl[idx]) end
+		ClassStages[kind] = dense
+	end
+
 	if Game.CharSelection then
-		local ClassByCont = Game.CharSelection.ClassesByContinent
-		ClassTypesByContinent = {}
-		for kR,vR in pairs(ClassByCont) do
-			ClassTypesByContinent[kR] = {}
-			for kL,vL in pairs(vR) do
-				ClassTypesByContinent[kR][kL] = ClassTypes[vL]
+		-- Only auto-build ClassTypesByContinent if it wasn't defined manually above.
+		if not next(ClassTypesByContinent) then
+			local ClassByCont = Game.CharSelection.ClassesByContinent
+			ClassTypesByContinent = {}
+			for kR,vR in pairs(ClassByCont) do
+				ClassTypesByContinent[kR] = {}
+				for kL,vL in pairs(vR) do
+					ClassTypesByContinent[kR][kL] = ClassTypes[vL]
+				end
 			end
 		end
 	end
@@ -655,6 +670,9 @@ local function RefillMercenaries()
 	local CurClass
 	local NeedNewMerc, CurNPC, CurMerc = HaveFreeMerc()
 
+	-- main bugfix, continent check works now
+	local CurContinent = TownPortalControls.GetCurrentSwitch()
+
 	if NeedNewMerc then
 		if evt.IsPlayerInParty(CurMerc) or (vars.NPCFollowers and table.find(vars.NPCFollowers, CurNPC)) then
 			return
@@ -670,7 +688,8 @@ local function RefillMercenaries()
 		MercProps.LastRefill 	= Game.Time
 		Party.QBits[MercenariesQBits[CurMerc] or (CurMerc + 400)] = false
 
-		CurClass = ClassTypesByContinent[CurContinent] or {2, 6, 14}
+		-- default list of Knight, Cleric, Sorcerer removed
+		CurClass = ClassTypesByContinent[CurContinent]
 		if #CurClass > #LastClass then
 			for k,v in pairs(LastClass) do
 				local i = table.find(CurClass, v)
@@ -681,9 +700,9 @@ local function RefillMercenaries()
 		end
 
 		local MaxClass = table.find(ClassStages[ClassTypes[Party[0].Class]], Party[0].Class) or 1
+
 		CurClass = ClassStages[trandom(CurClass)]
 		CurClass = CurClass[math.random(1, math.min(MaxClass, #CurClass))]
-
 		if not CurClass then
 			local Allowed = {}
 			for _, v in pairs(AllowedClasses) do
@@ -694,7 +713,8 @@ local function RefillMercenaries()
 			CurClass = trandom(Allowed) or const.Class.Peasant
 		end
 
-		table.insert(LastClass, 1, CurClass)
+	        -- store the kind (not the class ID) so removal from CurClass works
+        	table.insert(LastClass, 1, ClassTypes[CurClass])
 		if #LastClass > 5 then
 			table.remove(LastClass)
 		end
