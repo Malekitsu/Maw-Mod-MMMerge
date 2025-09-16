@@ -2647,7 +2647,7 @@ function checkMapCompletition()
 							table.insert(possibleMaps, mapDungeons[i])
 						end
 					end
-					Mouse.Item.MaxCharges=round(mapvars.mapAffixes.Power+math.random(0,2)-1)
+					Mouse.Item.MaxCharges=math.min(round(mapvars.mapAffixes.Power+1),255)
 				end
 				if mapvars.monsterMap then
 					mapvars.monsterMap.cleared=true
