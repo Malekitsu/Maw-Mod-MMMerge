@@ -407,6 +407,9 @@ function events.AfterLoadMap()
 		if vars.madnessMode and madnessMapLevels[name] then
 			bolsterLevel=madnessMapLevels[name]
 		end	
+		if mapvars.mapAffixes then
+			bolsterLevel=mapvars.mapAffixes.Power*10+20
+		end
 		for i=0,Map.Chests.High do
 			for k=1,Map.Chests[i].Items.High do
 				local it=Map.Chests[i].Items[k]
