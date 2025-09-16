@@ -1018,6 +1018,8 @@ function events.PlayerCastSpell(t)
 			evt.Add("Items",330)
 		elseif t.SpellId==33 then
 			evt.Add("Items",332)
+		elseif t.SpellId==16 then
+			evt.Add("Items",315)
 		elseif t.SpellId==21 then
 			evt.Add("Items",320)
 			Party.SpellBuffs[7].Caster=50
