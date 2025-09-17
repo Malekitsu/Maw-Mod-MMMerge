@@ -488,6 +488,10 @@ function events.MonsterKillExp(t)
 	
 	local monLvl=getMonsterLevel(mon)
 	t.Handled=true
+
+	local bolsterExp=0
+	
+	
 	local partyCount=0
 	for i=0, Party.High do
 		if Party[i].Dead==0 and Party[i].Eradicated==0 then
@@ -495,14 +499,7 @@ function events.MonsterKillExp(t)
 		end
 	end
 	partyCount=math.max(1,partyCount)
-	
-	local bolsterExp=0
-	local id=mon.Id
-
-	--reset experience
-	local lvlBase=math.max(basetable[id].Level,totalLevel[id]/3) --added totalLevel/3 because of mapping
-	local lvlBase=math.min(lvlBase,120) 
-	local experience = round((lvlBase*20+lvlBase^1.8)*totalLevel[id]/lvlBase/partyCount)
+	local experience=round(t.Exp/partyCount)
 	
 	local monHealth=getMonsterHealth(mon)
 	local monDamage=getMonsterDamage(mon)
@@ -4081,9 +4078,21 @@ function events.MonsterKilled(mon)
 		end
 	end
 	
-	if mon.Ally==9999 then return end
+	if mon.Ally==9999 then 
+		mon.Experience=0
+		return 
+	end
 	
 	mon.Ally=9999
+	
+	local bolsterExp=0
+	local id=mon.Id
+
+	--reset experience
+	local lvlBase=math.max(basetable[id].Level,totalLevel[id]/3) --added totalLevel/3 because of mapping
+	local lvlBase=math.min(lvlBase,120) 
+	mon.Experience = round((lvlBase*20+lvlBase^1.8)*totalLevel[id]/lvlBase)
+	
 	
 	local data=WhoHitMonster()
 	if data and data.Monster and data.Monster.Ally==9999 and Multiplayer and not Multiplayer.in_game then
