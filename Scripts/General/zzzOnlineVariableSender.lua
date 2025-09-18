@@ -34,12 +34,13 @@ if not _G.StrColor then
     return string.format("\x1B%c%c%c%s", clamp(r,0,255),clamp(g,0,255),clamp(b,0,255), s or "")
   end
 end
-
+--[[
 function GetMaxHP(pl)
   if not pl then return 1 end
   if pl.GetFullHP then return math.max(1, pl:GetFullHP()) end
   return math.max(1, pl.HP or 1)
 end
+]]
 
 local function getDistance(x, y, z)
   local dx, dy, dz = (Party.X - (x or 0)), (Party.Y - (y or 0)), (Party.Z - (z or 0))
