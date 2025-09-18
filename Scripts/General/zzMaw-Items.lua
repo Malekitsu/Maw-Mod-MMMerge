@@ -444,7 +444,7 @@ function events.AfterLoadMap()
 						itemPower=5
 					elseif it.BonusExpireTime==2 then
 						itemPower=6
-					elseif it.BonusExpireTime>10 and it.BonusExpireTime<100 then
+					elseif it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
 						itemPower=7
 					end
 					
