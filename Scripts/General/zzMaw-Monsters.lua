@@ -500,7 +500,6 @@ function events.MonsterKillExp(t)
 	end
 	partyCount=math.max(1,partyCount)
 	local experience=round(t.Exp/partyCount)
-	
 	local monHealth=getMonsterHealth(mon)
 	local monDamage=getMonsterDamage(mon)
 	
@@ -519,13 +518,11 @@ function events.MonsterKillExp(t)
 			local healthRateo=monHealth/getMonsterHealth(false,playerLevel)
 			--local damageRateo=monDamage/getMonsterDamage(false,playerLevel)
 			local mult=healthRateo --*damageRateo
-			
-			
-			if mon.NameId>=220 then
-				mult=mult*2
-			end
-			
+						
 			local experienceAwarded=experience*mult
+			
+			
+			debug.Message(experience .. "  " .. experienceAwarded .. "  " .. monHealth .. "  " .. getMonsterHealth(false,playerLevel) .. "  " .. mult)
 			--debug.Message(mult .. "  " .. experienceAwarded)
 			Party[i].Experience=math.min(Party[i].Experience+experienceAwarded, 2^32-3982296)
 			
