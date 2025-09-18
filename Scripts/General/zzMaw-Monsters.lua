@@ -2949,8 +2949,10 @@ function generateBoss(index, nameIndex, skillType)
 			skill = getSeededSkillForBoss(mapSeed)
 			
 			-- Check for pity-protected special bosses
-			local specialSkill, specialHpMult, specialDmgMult = checkPityProtectedBoss(mapSeed, chanceMult, generatedByBroodlord)
-			
+			local specialSkill, specialHpMult, specialDmgMult
+			if Map.Name~="d42.blv" and not mapvars.completed then
+				specialSkill, specialHpMult, specialDmgMult = checkPityProtectedBoss(mapSeed, chanceMult, generatedByBroodlord)
+			end
 			if specialSkill then
 				skill = specialSkill
 				hpMult = hpMult * specialHpMult
