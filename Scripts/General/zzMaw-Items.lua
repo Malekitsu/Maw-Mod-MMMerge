@@ -2923,7 +2923,7 @@ function itemStats(index)
 					end
 				end
 			elseif it.Bonus<=16 then
-				vars.normalEnchantResistance[index][it.Bonus]=math.max(vars.normalEnchantResistance[index][it.Bonus], power)		
+				vars.normalEnchantResistance[index][it.Bonus]=math.max(vars.normalEnchantResistance[index][it.Bonus], power+10)		
 			else
 				local tabNumber=bonusBaseEnchantSkill[it.Bonus]+50
 				tab[tabNumber]=tab[tabNumber] or 0
