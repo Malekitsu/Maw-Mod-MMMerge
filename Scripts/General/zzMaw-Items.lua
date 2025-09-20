@@ -882,21 +882,16 @@ function events.ItemGenerated(t)
 		end
 		--celestial
 		if it.BonusExpireTime>10 and it.BonusExpireTime<100 then
-			-- Initialize pity protection
 			vars.celestialPityCounter = vars.celestialPityCounter or 0
 			
-			-- Reduced base chance (50% of original)
-			local baseChance = 0.05
+			local baseChance = 0.1
 			
-			-- Apply pity protection using new pity system
 			local chance = pity_chance(baseChance, vars.celestialPityCounter)
 			
 			if math.random()<chance then
 				it.BonusExpireTime=it.BonusExpireTime+100
-				-- Reset pity counter on successful drop
 				vars.celestialPityCounter = 0
 			else
-				-- Increment pity counter on failed celestial drop
 				vars.celestialPityCounter = vars.celestialPityCounter + 1
 			end
 		end
