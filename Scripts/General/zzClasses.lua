@@ -823,7 +823,7 @@ function dragonSkill(dragon, index)
 		Game.SkillDesMaster[33]=fangsMaster
 		Game.SkillDesGM[33]=fangsGM
 		Skillz.setName(32,"Scales")
-		txt="Dragons scales are hard enough to work as natural armor, gaining naturally 40 + 1 AC per level (up to level 600).\nScales further enhance their thoughness and resistance to magical damage, increasing the thoughness by a percentage.\n\n------------------------------------------------------------\n          AC%| Res%"
+		txt="Dragons scales are hard enough to work as natural armor, gaining naturally 40 + 1 AC per level (up to level 600).\nScales further enhance their toughness and resistance to magical damage, increasing the thoughness by a percentage.\n\n------------------------------------------------------------\n          AC%| Res%"
 		Skillz.setDesc(32,1,txt)
 		Game.SkillDesNormal[32]=scalesNormal
 		Game.SkillDesExpert[32]=scalesExpert
