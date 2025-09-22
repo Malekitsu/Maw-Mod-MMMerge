@@ -772,6 +772,7 @@ function events.CalcDamageToPlayer(t)
 	
 	if not (data) or not (data and data.Monster) then
 		if (t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1 then --drown and fall
+			--[[
 			local name=Game.MapStats[Map.MapStatsIndex].Name
 			local bolster=getPartyLevel()
 			local mapLevel=mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High
@@ -786,6 +787,8 @@ function events.CalcDamageToPlayer(t)
 			if not mapLevel then
 				mapLevel=getTotalLevel()
 			end
+			]]
+			mapLevel=getTotalLevel()
 			--trap and objects multiplier
 			local damage=getMonsterDamage(false, mapLevel)
 			
