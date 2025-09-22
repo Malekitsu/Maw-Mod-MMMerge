@@ -98,33 +98,37 @@ function getCritInfo(pl, dmgType, monLvl)
   end
 
   -- Fate / HoP (buff rework)
-  if vars.MAWSETTINGS == nil or vars.MAWSETTINGS.buffRework == "ON" then
-    if pl.SpellBuffs and pl.SpellBuffs[4] and pl.SpellBuffs[4].ExpireTime >= Game.Time then
-      local s, m  = getBuffSkill(47)
-      local s2, m2 = getBuffSkill(86)
-      s = math.max(s, s2/1.5)
-      m = math.max(m, m2)
-      if buffPower and buffPower[47] and buffPower[47].Base and buffPower[47].Scaling then
-        local bonus = (buffPower[47].Base[m] or 0)/100 + (buffPower[47].Scaling[m] or 0)*s/1000
-        totalCrit = totalCrit + bonus
-      end
+    if vars.MAWSETTINGS == nil or vars.MAWSETTINGS.buffRework == "ON" then
+        if pl.SpellBuffs and pl.SpellBuffs[4] and pl.SpellBuffs[4].ExpireTime >= Game.Time then
+			local s, m  = getBuffSkill(47)
+			local s2, m2 = getBuffSkill(86)
+			s = math.max(s, s2/1.5)
+			m = math.max(m, m2)
+			if buffPower and buffPower[47] and buffPower[47].Base and buffPower[47].Scaling then
+				local bonus = (buffPower[47].Base[m] or 0)/100 + (buffPower[47].Scaling[m] or 0)*s/1000
+				totalCrit = totalCrit + bonus
+            end
+        end
     end
-  end
 
-  if getMapAffixPower then
-    if getMapAffixPower(20) then totalCrit = totalCrit - getMapAffixPower(20)/100 end
-    if getMapAffixPower(21) then
-      critDamageMultiplier = (critDamageMultiplier - 1) * (1 - getMapAffixPower(21)/100) + 1
+    if getMapAffixPower then
+        if getMapAffixPower(20) then 
+			totalCrit = totalCrit - getMapAffixPower(20)/100 
+	    end
+        if getMapAffixPower(21) then
+			critDamageMultiplier = (critDamageMultiplier - 1) * (1 - getMapAffixPower(21)/100) + 1
+        end
     end
-  end
 
-  local id = pl:GetIndex()
-  if not (vars.legendaries and table.find(vars.legendaries[id], 14)) then
-    totalCrit = math.min(totalCrit, 1)
-  end
+    local id = pl:GetIndex()
+    if not (vars.legendaries and table.find(vars.legendaries[id], 14)) then
+      totalCrit = math.min(totalCrit, 1)
+    else
+	  totalCrit=totalCrit+0.1
+    end
 
-  local success = math.random() < totalCrit
-  return totalCrit, critDamageMultiplier, success
+    local success = math.random() < totalCrit
+    return totalCrit, critDamageMultiplier, success
 end
 
 local SERVICE_CASTER = (Multiplayer and Multiplayer.SERVICE_CASTER) or 49
