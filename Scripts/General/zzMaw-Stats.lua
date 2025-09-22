@@ -750,7 +750,9 @@ function events.CalcDamageToPlayer(t)
 	if pl.SpellBuffs[10].ExpireTime>Game.Time then
 		reflecting=true
 	end
-	
+	if data and data.Player and data.Spell and data.Spell==133 then
+		return
+	end
 	--properly calculate friendly fire damage
 	if data and data.Player and data.Spell and data.Spell<133 and data.Spell>0 then	
 		local s,m = SplitSkill(data.Player.Skills[const.Skills.Learning])
