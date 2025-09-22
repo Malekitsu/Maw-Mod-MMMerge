@@ -1630,7 +1630,7 @@ function events.GetSkill(t)
 end
 
 --average
-function getPlayerExtimatedVitality(lvl, healthOnly)
+function getPlayerEstimatedVitality(lvl, healthOnly)
 	local baseHP=25
 	local baseScaling=3
 	local endScaling=9
@@ -1722,7 +1722,7 @@ function getPlayerExtimatedVitality(lvl, healthOnly)
 	
 end
 function getPlayerExtimatedHealth(lvl)
-	local health=getPlayerExtimatedVitality(lvl,true)
+	local health=getPlayerEstimatedVitality(lvl,true)
 	return health
 end
 
@@ -1737,7 +1737,7 @@ function getMonsterDamage(mon, level)
 		end
 		level=mon and totalLevel[id] or level
 	end
-	local vitality=getPlayerExtimatedVitality(level)
+	local vitality=getPlayerEstimatedVitality(level)
 	local hits=hitToKill[3] --baseline MAW
 	if vars.madnessMode then
 		hits=hitToKill[9]
@@ -1944,7 +1944,7 @@ end
 
 --[[
 for i=1,1000 do
-	print(round(getMonsterDamage(i)/GetPlayerExtimatedVitality(i)*100)/100)
+	print(round(getMonsterDamage(i)/getPlayerEstimatedVitality(i)*100)/100)
 end
 ]]
 
