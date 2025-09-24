@@ -277,7 +277,7 @@ function events.CalcDamageToMonster(t)
 		personality=pl:GetPersonality()
 		healValue=round(healValue*(1+personality/1000))
 		
-		if pl.HP/GetMaxHP(pl)<0.25 then return end --don't share healing if struggling
+		--if pl.HP/GetMaxHP(pl)<0.25 then return end --don't share healing if struggling
 		
 		local healTarget, lowestHealthPercentage=pickLowestPartyMember()
 		
@@ -2322,3 +2322,4 @@ subtlety - i0.5% chance to dodge an incoming attack
 poison - %HP water damage on energy attack
 assassination - adds flat damage (scaling with weapon skill) on isolated targets on skill (damage decreases depending on the number of targets in the nearby)
 ]]
+
