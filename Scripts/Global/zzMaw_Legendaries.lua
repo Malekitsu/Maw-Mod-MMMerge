@@ -85,6 +85,19 @@ function events.CalcDamageToMonster(t)
 		fireDamage=fireDamage/2^(fireRes/100)
 		t.Result=t.Result+fireDamage
 	end
+	--same for assassin
+	if data and data.Player and table.find(assassinClass, data.Player.Class) and t.DamageKind==4 and data.Object==nil and t.Result>0 then	
+		local s1=SplitSkill(t.Player.Skills[const.Skills.Water])
+		local waterDamage=s1*0.001
+		if t.Monster.Resistances[0]>=1000 then
+			mult=2^math.floor(t.Monster.Resistances[0]/1000)
+			waterDamage=waterDamage*mult
+		end
+		waterDamage=math.max(t.Monster.HP*waterDamage,s1)
+		waterRes=t.Monster.Resistances[2]%1000
+		waterDamage=waterDamage/2^(waterRes/100)
+		t.Result=t.Result+waterDamage
+	end
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 21) then
 		local mult=1
 		for i=0, Map.Monsters.High do
