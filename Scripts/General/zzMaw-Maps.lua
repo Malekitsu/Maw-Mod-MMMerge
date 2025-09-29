@@ -1893,8 +1893,9 @@ function events.LoadMap()
 		mapvars.mapAffixes={mapAffixList[1],mapAffixList[2],mapAffixList[3],mapAffixList[4],["Power"]=mapAffixList.Power}
 		mapAffixList=nil
 		for i=0,Map.Monsters.High do
-			Map.Monsters[i].Hostile=true
-			Map.Monsters[i].ShowAsHostile=true
+			--Map.Monsters[i].Hostile=true
+			--Map.Monsters[i].ShowAsHostile=true
+			--removed, hopefully there aren't many friendly npcs spawning 
 		end
 	end
 end
