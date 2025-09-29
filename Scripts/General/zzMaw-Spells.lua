@@ -226,7 +226,16 @@ function events.PlayerCastSpell(t)
 			end
 		end
 	end
-	
+	--raise dead removes erad at GM
+	if t.SpellId == 53 then
+		if t.TargetKind == 4 and not t.RemoteData then
+			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
+			if m==4 then
+				Party[t.TargetId].Dead=0
+				Party[t.TargetId].Eradicated=0
+			end
+		end
+	end
 	--resurrection
 	if t.SpellId == 55 then
 		if not t.RemoteData then
@@ -271,7 +280,7 @@ function events.PlayerCastSpell(t)
 				local hp=Party[t.TargetId].HP
 				function events.Tick() 
 					events.Remove("Tick", 1)
-					Party[t.TargetId].HP=math.max(hp+round(totHeal), 1)
+					Party[t.TargetId].HP=math.max(hp+round(totHeal), round(totHeal))
 				end
 			else
 				Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+round(totHeal),GetMaxHP(Party[t.TargetId]))
@@ -1953,6 +1962,10 @@ function ascension(customIndex)
 		Game.Spells[54]["SpellPointsGM"]=math.ceil(sp.Cost[4] * personalityReduction)
 		Game.SpellsTxt[54].Master=string.format("Adds %s + %s HP per point of skill to the pool", sp.Base[3], sp.Scaling[3])
 		Game.SpellsTxt[54].GM=string.format("Adds %s + %s HP per point of skill to the pool", sp.Base[4], sp.Scaling[4])
+		
+		--raise dead
+		local sp=healingSpells[53]
+		Game.SpellsTxt[53].GM="Removes Death and Eradication with no time limit"
 		
 		--resurrection
 		local sp=healingSpells[55]
