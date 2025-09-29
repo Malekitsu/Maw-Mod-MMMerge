@@ -1792,6 +1792,28 @@ function events.MonsterKilled(mon)
 	end
 end
 
+local possibleMonstersIn={7,10,13,16,31,34,37,40,52,55,73,76,79,82,85,88,91,
+						94,100,103,106,109,112,115,118,121,124,127,130,133,
+						139,142,148,151,154,157,160,169,172,175,181,184,187,
+						193,196,202,205,208,211,214,217,220,226,229,232,235,
+						238,241,244,253,256,259,262,265,268,271,274,277,280,
+						283,286,289,292,295,298,301,304,307,310,388,391,397,
+						400,403,406,409,412,415,418,421,424,427,448,451,454,
+						457,475,478,481,484,487,490,493,496,499,502,505,511,
+						517,520,523,526,529,532,535,538,541,544,547,550,553,
+						556,559,562,565,568,571,574,580,583,586,589,592,601,
+						604,610,613,619,622,628,631,634,637,640,643}
+local possibleMonstersOut={7,10,13,16,31,34,37,40,52,55,70,73,76,79,82,85,88,91,
+						94,100,103,106,109,112,115,118,121,124,127,130,133,136,
+						139,142,148,151,154,157,160,163,169,172,175,181,184,187,190,
+						193,196,202,205,208,211,214,217,220,223,226,229,232,235,
+						238,241,244,253,256,259,262,265,268,271,274,277,280,
+						283,286,289,292,295,298,301,304,307,310,388,391,394,397,
+						400,403,406,409,412,415,418,421,424,427,448,451,454,
+						457,460,475,478,481,484,487,490,493,496,499,502,505,508,511,514,
+						517,520,523,526,529,532,535,538,541,544,547,550,553,
+						556,559,562,565,568,571,574,580,583,586,589,592,601,
+						604,610,613,619,622,628,631,634,637,640,643}
 --map teleport
 function events.UseMouseItem(t)
 	local it=Mouse.Item
@@ -1806,19 +1828,17 @@ function events.UseMouseItem(t)
 		
 		mapAffixList={it.BonusExpireTime, it.Bonus2, it.Charges%1000, round(it.Charges/1000), ["Power"]=it.MaxCharges}
 		math.randomseed(it.BonusExpireTime+it.Bonus2*10^3+it.Charges*10^6+it.MaxCharges*10^9+it.BonusStrength*10^12)
-		local possibleMonsters={}
-		for i=1,215 do
-			local index=i*3-2
-			local mon=Game.MonstersTxt[index]
-			if mon.AIType~=1 then
-				table.insert(possibleMonsters,index)
-			end
-		end
-		local map=Game.MapStats[it.BonusStrength]
+
 		--randomize monsters
 		mappingMonsters={}
-		for i=1,3 do
-			table.insert(mappingMonsters,string.sub(Game.MonstersTxt[possibleMonsters[math.random(1,#possibleMonsters)]].Picture,1, -3))
+		if string.sub(map.FileName,-3)=="blv" then
+			for i=1,3 do
+				table.insert(mappingMonsters,string.sub(Game.MonstersTxt[possibleMonstersIn[math.random(1,#possibleMonstersIn)]].Picture,1, -3))
+			end
+		else
+			for i=1,3 do
+				table.insert(mappingMonsters,string.sub(Game.MonstersTxt[possibleMonstersOut[math.random(1,#possibleMonstersOut)]].Picture,1, -3))
+			end
 		end
 		--monster density
 		local nAff=0
