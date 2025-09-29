@@ -3757,3 +3757,33 @@ function events.CanLearnSpell(t)
 	end
 end
 
+
+function events.GameInitialized2()
+	baseSchoolsTxtAssassin={}
+	for i=1,5 do
+		baseSchoolsTxtAssassin[i]={[12]=Skillz.getDesc(12,i), [13]=Skillz.getDesc(13,i), [14]=Skillz.getDesc(14,i), [15]=Skillz.getDesc(15,i)}
+	end
+
+	spellDesc2={}
+	for key, value in pairs(assassinSpellList) do
+		for i=1,#assassinSpellList[key] do
+			local spellID=assassinSpellList[key][i]
+			spellDesc2[spellID]={}
+			spellDesc2[spellID]["Name"]=Game.SpellsTxt[value[i]].Name
+			spellDesc2[spellID]["Description"]=Game.SpellsTxt[value[i]].Description
+			spellDesc2[spellID]["Normal"]=Game.SpellsTxt[value[i]].Normal
+			spellDesc2[spellID]["Expert"]=Game.SpellsTxt[value[i]].Expert
+			spellDesc2[spellID]["Master"]=Game.SpellsTxt[value[i]].Master
+			spellDesc2[spellID]["GM"]=Game.SpellsTxt[value[i]].GM
+		end
+	end
+
+	
+	function events.CalcStatBonusByItems(t)
+		if t.Stat==const.Stats.SpellPoints and table.find(assassinClass, t.Player.Class) then
+			local pl=t.Player
+			local s,m=SplitSkill(pl:GetSkill(const.Skills.Earth))
+			t.Result=m*10
+		end
+	end	
+end
