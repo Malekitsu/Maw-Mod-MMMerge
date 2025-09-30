@@ -201,7 +201,7 @@ function events.UseMouseItem(t)
 			end
 		end
 		--effect
-		local power=math.min(math.floor(it.Bonus/50),3)*20
+		local power=math.min(math.floor(it.Bonus/50))*20
 		if it.Number==261 or it.Number==262 then
 			power=power*1.5
 		end
