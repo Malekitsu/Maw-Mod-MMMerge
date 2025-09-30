@@ -259,11 +259,18 @@ function getSpellDelay(pl,spell)
 			armorDelay=armorDelay+weaponImpair[skill][m]/100
 		end
 	end
-	--haste buff
+
+	
 	local hasteDiv=1
-	if vars.MAWSETTINGS.buffRework=="ON" and Party.SpellBuffs[8].ExpireTime>=Game.Time then
-		local s, m=getBuffSkill(5)
-		hasteDiv=1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]/1000*s
+	if vars.MAWSETTINGS.buffRework=="ON" then
+		local hasteMult=1
+		if Party.SpellBuffs[8].ExpireTime>=Game.Time then
+			local s, m=getBuffSkill(5)
+			local s2,m2=getBuffSkill(86)
+			s=math.max(s,s2/1.5)
+			m=math.max(m,m2)
+			hasteDiv=math.max(1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]*s/1000, hasteDiv)
+		end
 	end
 	local delay=round(oldTable[spell][m]/(1+haste/100)*1.2^tier/hasteDiv/enchantMult)*armorDelay
 	if table.find(elementalistClass, pl.Class) then
