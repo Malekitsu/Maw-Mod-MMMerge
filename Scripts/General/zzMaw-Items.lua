@@ -3108,7 +3108,7 @@ function itemStats(index)
 			end
 			--SERAPHIM
 			if table.find(seraphClass, pl.Class) then	
-				local s1, m1=SplitSkill(pl:GetSkill(const.Skills.Mind))
+				local s1, m1=SplitSkill(pl.Skills[const.Skills.Mind])
 				local mindBonus=s1*(m1+1)
 				armsDmg=armsDmg+mindBonus*mult
 			end
