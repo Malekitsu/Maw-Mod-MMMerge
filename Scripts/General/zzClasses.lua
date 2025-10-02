@@ -411,10 +411,10 @@ local function seraphSkills(isSeraph, id)
 	if isSeraph then
 		pl=Party[id]
 		
-		local spiritS, spiritM=SplitSkill(pl:GetSkill(const.Skills.Spirit))
-		local mindS, mindM=SplitSkill(pl:GetSkill(const.Skills.Mind))
-		local bodyS, bodyM=SplitSkill(pl:GetSkill(const.Skills.Body))
-		local lightS, lightM=SplitSkill(pl:GetSkill(const.Skills.Light))
+		local spiritS, spiritM=SplitSkill(pl.Skills[const.Skills.Spirit])
+		local mindS, mindM=SplitSkill(pl.Skills[const.Skills.Mind])
+		local bodyS, bodyM=SplitSkill(pl.Skills[const.Skills.Body])
+		local lightS, lightM=SplitSkill(pl.Skills[const.Skills.Light])
 				
 		--heal tooltips
 		local pers=pl:GetPersonality()
@@ -1817,7 +1817,6 @@ end
 
 
 function checkSkills(id)
-	lastCheckSkill=id
 	shamanSkills(false, id)
 	dkSkills(false, id)
 	seraphSkills(false, id)
