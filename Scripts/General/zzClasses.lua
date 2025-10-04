@@ -2096,7 +2096,7 @@ function assassinSkills(isAssassin, pl)
 		Skillz.setName(15, "Assassination")
 		
 		Skillz.setDesc(12,1,"Combat is the skill that allows you to endure prolonged fights by enhancing your energy recovery.\n\nEach attack has a base 10% chance, plus 1% per skill point, to restore 15 energy.\n\n");
-		Skillz.setDesc(13,1,"Subtlety manipulates the boundary between life and death, granting you energy upon killing enemies and increasing your chance to evade.\n\nEach incoming attack has a base 5% chance, plus 0.05% per skill point, to be dodged.\n\n");
+		Skillz.setDesc(13,1,"Subtlety manipulates the boundary between life and death, granting you energy upon killing enemies and increasing your chance to evade.\n\nEach incoming attack has a base 5% chance, plus 0.5% per skill point, to be dodged.\n\n");
 		Skillz.setDesc(14,1,"Poisoning is the art of mastering toxins through self-experimentation, transforming suffering into vitality. Higher skill levels increase your energy regeneration.\n\nEach attack deals bonus water damage equal to 0.1% of the target's HP per skill point.\n\n");
 		Skillz.setDesc(15,1,"Assassination focuses on eliminating isolated targets before they react. Attacks that spend energy or spells, have your damage increased by 4-6-8-10 per skill point, reduced by 20% for each target's nearby enemy (up to 4 enemies).\nSuch attacks also grant 1 combo point, allowing the assassin to cast offensive spells.\nBow has 50% chance and energy cost.\n\nHigher levels also grant more starting energy, ideal for high burst damage in short engagements.\n\n");
 
