@@ -3736,8 +3736,14 @@ end
 
 local invisBooks={418, 1220, 1924}
 local starburstBooks={421, 1223, 1927}
-local booksPic={"item210","7item192","book4"}
-local booksPicGM={"item209","7item193","book5"}
+
+local booksPic={"sbair3","sbair3","sbair3"}
+local booksPicGM={"sbair4","sbair4","sbair4"}
+if disableSpellBookRework then
+	booksPic={"item210","7item192","book4"}
+    booksPicGM={"item209","7item193","book5"}
+end
+
 function events.LoadMap()
 	if vars.insanityMode then
 		for i=1,3 do
@@ -3796,3 +3802,38 @@ function events.GameInitialized2()
 		end
 	end	
 end
+
+local bookStart={400,1202,1902}
+local names={"fire","air","water","earth","spirit","mind","body","light","dark"}
+function events.GameInitialized2()
+	if disableSpellBookRework then return end
+	local txt=Game.ItemsTxt
+	for i=1, 9 do
+		local increaser=(i-1)*11
+		local mm6increaser=(i-1)*13
+		local name="sb" .. names[i]
+		for j=0,10 do
+			local m=1
+			if j>=10 then
+				m=4
+			elseif j>6 then
+				m=3
+			elseif j>3 then
+				m=2
+			end
+			txt[bookStart[1]+j+increaser].Picture=name .. m
+			txt[bookStart[2]+j+increaser].Picture=name .. m
+			if j==5 then
+				txt[bookStart[3]+j+mm6increaser+2].Picture=name .. 2
+				txt[bookStart[3]+j+mm6increaser+1].Picture=name .. 2
+				txt[bookStart[3]+j+mm6increaser].Picture=name .. 1
+				txt[bookStart[3]+j+mm6increaser-1].Picture=name .. 1
+			elseif j>5 then
+				txt[bookStart[3]+j+2+mm6increaser].Picture=name .. m
+			else
+				txt[bookStart[3]+j+mm6increaser].Picture=name .. m
+			end
+		end
+	end
+end
+			
