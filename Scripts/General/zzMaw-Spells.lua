@@ -3040,7 +3040,11 @@ function getBuffCost(pl, spellId)
 		percentageDecrease=(buffSpell[spellId].Cost/div)*0.01
 		for i=0, Party.High do
 			if id==Party[i]:GetIndex() and vars.maxManaPool[i] then
-				cost=vars.maxManaPool[i]*percentageDecrease
+				if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 32) then
+					cost=vars.maxHPPool[i]*percentageDecrease
+				else
+					cost=vars.maxManaPool[i]*percentageDecrease
+				end
 			end
 		end
 	elseif utilitySpell[spellId] then
