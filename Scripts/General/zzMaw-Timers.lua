@@ -11,7 +11,7 @@ local year   = 123863040
 
 -- Timer driver: robust against time rollbacks, but no ticking when paused
 local FALLBACK_DT = 1/60   -- used ONLY when time goes backwards (<0)
-local MAX_DT      = 0.25   -- cap to avoid huge bursts
+local MAX_DT      = 2   -- cap to avoid huge bursts
 
 function events.Tick()
   vars = vars or {}
@@ -35,7 +35,9 @@ function events.Tick()
   end
 
   if dt > 0 then
-    if dt > MAX_DT then dt = MAX_DT end
+    if dt > MAX_DT then 
+		dt = MAX_DT 
+	end
     MawTimer(dt)
   end
 
