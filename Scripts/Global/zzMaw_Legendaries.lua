@@ -218,18 +218,20 @@ function events.CalcDamageToPlayer(t)
 	
 	local pl = t.Player
 	
-	--shaman/seraph code
+	--shaman code
 	if table.find(shamanClass, pl.Class) and pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0  then
 		m3=SplitSkill(t.Player.Skills[const.Skills.Water])
 		local lvl=getTotalLevel()
-		local reduction=getMonsterDamage(false,(lvl+1)^0.325*m3)^0.7
+		local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
+		local spiritReduction=round(getMonsterDamage(false,(lvl+1))*(m3/lvl^0.65)/avgRed/2*0.99^(lvl^0.65)) --on average 1/2 of a B monster
 		t.Result=math.max(t.Result-reduction, t.Result*0.25)
 	end
-	--shaman/seraph code
+	--seraph code
 	if table.find(seraphClass, pl.Class) and pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0  then
 		m3=SplitSkill(pl.Skills[const.Skills.Spirit])
 		local lvl=getTotalLevel()
-		local reduction=getMonsterDamage(false,(lvl+1)^0.325*m3)^0.7
+		local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
+		local spiritReduction=round(getMonsterDamage(false,(lvl+1))*(m3/lvl^0.65)/avgRed/2) --on average 1/2 of a B monster
 		t.Result=math.max(t.Result-reduction, t.Result*0.25)
 	end
 	
