@@ -2102,6 +2102,7 @@ function events.BuildMonsterInformationBox(t)
 		if effectNames[mon.Bonus] then
 			t.EffectsHeader.Text=t.EffectsHeader.Text .. string.format("\n\n\t15 ") .. effectNames[mon.Bonus]
 		end
+		t.EffectsHeader.Text=t.EffectsHeader.Text .. "\n\n\n\nExperience: " .. mon.Experience/Party.count
 	end
 end
 
