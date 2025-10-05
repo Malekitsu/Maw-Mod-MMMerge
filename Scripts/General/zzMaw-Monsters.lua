@@ -521,6 +521,8 @@ function events.MonsterKillExp(t)
 			local mult=healthRateo --*damageRateo
 						
 			local experienceAwarded=experience*mult
+			local lvl=Party[i].LevelBase
+			experienceAwarded=math.min((lvl+1)*1000, experienceAwarded)
 			--debug.Message(mult .. "  " .. experienceAwarded)
 			Party[i].Experience=math.min(Party[i].Experience+experienceAwarded, 2^32-3982296)
 			
