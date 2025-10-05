@@ -1647,6 +1647,10 @@ function events.BuildItemInformationBox(t)
 				end
 			end
 		end
+		if extraDescription and t.Description then
+			local txt=t.Description .. "\n\nItem Bonus Power: " .. t.Item.MaxCharges*5
+			t.Description = StrColor(100,100,100, txt)
+		end
 	end
 end
 
@@ -2956,7 +2960,7 @@ function itemStats(index)
 				power=math.ceil(power*1.5)
 			end
 			if bonus<=10 then
-				tab[math.floor(it.Charges/1000)]=tab[math.floor(it.Charges/1000)]+power
+				tab[bonus]=tab[bonus]+power
 				--legendary power 12
 				if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 12) then
 					if bonus==1 or bonus==5 then -- might or accuracy
