@@ -1648,7 +1648,7 @@ function events.BuildItemInformationBox(t)
 			end
 		end
 		if extraDescription and t.Description then
-			local txt=t.Description .. "\n\nItem Bonus Power: " .. t.Item.MaxCharges*5
+			local txt=t.Description .. "\n\nItem Bonus Power: " .. t.Item.MaxCharges
 			t.Description = StrColor(100,100,100, txt)
 		end
 	end
