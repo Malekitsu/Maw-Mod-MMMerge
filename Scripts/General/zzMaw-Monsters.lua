@@ -502,7 +502,7 @@ function events.MonsterKillExp(t)
 	local experience=round(t.Exp/partyCount)
 	
 	local monHealth=getMonsterHealth(mon)
-	local monDamage=getMonsterDamage(mon)
+	--local monDamage=getMonsterDamage(mon)
 	
 	for i=0, Party.High do
 		if Party[i].Dead==0 and Party[i].Eradicated==0 then
@@ -730,6 +730,7 @@ function recalculateMonsterTable()
 		local lvlBase=math.max(basetable[i].Level,totalLevel[i]/3) --added totalLevel/3 because of mapping
 		local lvlBase=math.min(lvlBase,120) 
 		mon.Experience = round((lvlBase*20+lvlBase^1.8)*totalLevel[i]/lvlBase)
+		
 		if currentWorld==2 then
 			mon.Experience = math.min(mon.Experience*2, mon.Experience+1000)
 		end
@@ -2102,7 +2103,21 @@ function events.BuildMonsterInformationBox(t)
 		if effectNames[mon.Bonus] then
 			t.EffectsHeader.Text=t.EffectsHeader.Text .. string.format("\n\n\t15 ") .. effectNames[mon.Bonus]
 		end
-		t.EffectsHeader.Text=t.EffectsHeader.Text .. "\n\n\n\nExperience: " .. mon.Experience/Party.count
+		local partyLvl=getTotalLevel()
+		local experience=mon.Experience/Party.count
+		local id=Game.CurrentPlayer
+		if id<0 or id>Party.High then
+			id=0
+		end
+		local pl=Party[id]
+		local playerLevel=math.min(calcLevel(pl.Experience),partyLvl) 
+		local healthRateo=getMonsterHealth(mon)/getMonsterHealth(false,playerLevel)
+		local mult=healthRateo
+					
+		local experienceAwarded=experience*mult
+		local lvl=pl.LevelBase
+		experienceAwarded=round(math.min((lvl+1)*1000, experienceAwarded))
+		t.EffectsHeader.Text=t.EffectsHeader.Text .. "\n\n\n\nExperience: " .. experienceAwarded
 	end
 end
 
@@ -4085,14 +4100,26 @@ function events.MonsterKilled(mon)
 	
 	mon.Ally=9999
 	
-	local bolsterExp=0
 	local id=mon.Id
 
 	--reset experience
 	local lvlBase=math.max(basetable[id].Level,totalLevel[id]/3) --added totalLevel/3 because of mapping
 	local lvlBase=math.min(lvlBase,120) 
 	mon.Experience = round((lvlBase*20+lvlBase^1.8)*totalLevel[id]/lvlBase)
-	
+			
+	if currentWorld==2 then
+		mon.Experience = math.min(mon.Experience*2, mon.Experience+1000)
+	end
+	--true nightmare nerf
+	if Game.BolsterAmount==300 then
+		mon.Experience=mon.Experience*0.67
+	end
+	if vars.Mode==2 then
+		mon.Experience=mon.Experience*0.5
+	end
+	if vars.insanityMode then
+		mon.Experience=mon.Experience*0.8
+	end
 	
 	local data=WhoHitMonster()
 	if data and data.Monster and data.Monster.Ally==9999 and Multiplayer and not Multiplayer.in_game then
