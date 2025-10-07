@@ -1992,7 +1992,7 @@ function events.GameInitialized2()
 				end
 				
 				local res=t.Monster.Resistances[t.DamageKind] or t.Monster.Resistances[4]
-				damage=damage/2^(res/100)
+				damage=damage/2^(res%1000/100)
 				
 				
 				local mult=damageMultiplier[t.PlayerIndex]["Melee"]
