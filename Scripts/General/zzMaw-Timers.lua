@@ -65,7 +65,9 @@ function MawResetTimer(name) local t = MawTimers[name]; if t then t.acc = 0 end 
 -- call this every frame with seconds since last frame
 function MawTimer(dt)
   local MAX_STEPS = 20  -- safety cap to avoid infinite loops
-
+  if Game.TurnBasedPhase==0 then
+	MAX_STEPS = 2
+  end
   for _, t in pairs(MawTimers) do
     if t.enabled then
       t.acc = t.acc + dt
