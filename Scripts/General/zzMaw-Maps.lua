@@ -1721,7 +1721,7 @@ function events.MonsterKilled(mon)
 	if vars.madnessMode then
 		levelRequired=70
 		if vars.ownedMaps>=3 then
-			return
+			--return disabled, as maps are no longer easily farmable
 		end
 	end
 	
