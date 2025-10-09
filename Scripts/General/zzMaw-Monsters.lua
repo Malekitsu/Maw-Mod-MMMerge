@@ -4443,3 +4443,16 @@ function events.PickCorpse(t)
 		end
 	end
 end
+
+
+function events.CalcDamageToMonster(t)
+	local data=WhoHitMonster()
+	if data and data.Monster then
+		local mon=data.Monster
+		local damage=getMonsterDamage(mon)/3 --1/3 of damage
+		local res=t.Monster.Resistances[4]%1000
+		local damage=round(damage/2^(res/100))
+		t.Result=damage
+		Game.ShowStatusText(t.Result)
+	end
+end
