@@ -1161,11 +1161,16 @@ function events.GameInitialized2()
 				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
 				damage=round(randomDamage/2)
 				
+				critChance, critMult, success=getCritInfo(pl,false,getMonsterLevel(t.Monster))
+				if success then
+					damage=damage*critMult
+					crit=true
+				end
 				for i=0,1 do
 					local it=pl:GetActiveItem(i)
 					if it then
-						local damage1=calcFireAuraDamage(pl, it, 0, true, false, "damage")
-						local damage2=calcEnchantDamage(pl, it, 0, true, false, "damage")
+						local damage1=calcFireAuraDamage(pl, it, 0, false, false, "damage")
+						local damage2=calcEnchantDamage(pl, it, 0, false, false, "damage")
 						damage=damage+damage1+damage2
 					end
 				end
@@ -1175,12 +1180,6 @@ function events.GameInitialized2()
 				local mult=damageMultiplier[t.PlayerIndex]["Melee"]
 				t.Result=damage*mult
 				
-				critChance, critMult, success=getCritInfo(pl,false,getMonsterLevel(t.Monster))
-				
-				if success then
-					t.Result=t.Result*critMult
-					crit=true
-				end
 				if pl.Weak>0 then
 					t.Result=t.Result*0.5
 				end
@@ -1981,29 +1980,23 @@ function events.GameInitialized2()
 				local isolatedDamageReduction=assassinationDamage(pl,t.Monster,data.Object) --must be subtracted
 				damage=damage-isolatedDamageReduction
 				
+				critChance, critMult, success=getCritInfo(pl,false,getMonsterLevel(t.Monster))
+				if success then
+					damage=damage*critMult
+					crit=true
+				end
 				
 				for i=0,1 do
 					local it=pl:GetActiveItem(i)
 					if it then
-						local damage1=calcFireAuraDamage(pl, it, 0, true, false, "damage")
-						local damage2=calcEnchantDamage(pl, it, 0, true, false, "damage")
+						local damage1=calcFireAuraDamage(pl, it, 0, false, false, "damage")
+						local damage2=calcEnchantDamage(pl, it, 0, false, false, "damage")
 						damage=damage+damage1+damage2
 					end
 				end
 				
 				local res=t.Monster.Resistances[t.DamageKind] or t.Monster.Resistances[4]
 				damage=damage/2^(res%1000/100)
-				
-				
-				local mult=damageMultiplier[t.PlayerIndex]["Melee"]
-				t.Result=damage*mult
-				
-				
-				local critChance, critMult, success=getCritInfo(pl,false,getMonsterLevel(t.Monster))
-				if success then
-					t.Result=t.Result*critMult
-					crit=true
-				end
 				
 				t.Result=t.Result
 				if pl.Weak>0 then
