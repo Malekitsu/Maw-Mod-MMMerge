@@ -2963,7 +2963,7 @@ function generateBoss(index, nameIndex, skillType)
 	
 
 	local austerityMod = vars.AusterityMode and 4 or 1
-	local hpMult= 2 * (1 + lvl / 100 / austerityMod) * (1 + math.random() / austerityMod)
+	local hpMult= 2 * (0.75 + mon.Level / 85 / austerityMod) * (1 + math.random() / austerityMod)
 	if getMapAffixPower(18) then
 		hpMult = hpMult * (1 + getMapAffixPower(18) / 100)
 	end
