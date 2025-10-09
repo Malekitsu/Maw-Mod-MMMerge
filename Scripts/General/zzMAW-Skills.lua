@@ -2614,7 +2614,7 @@ function events.LoadMap()
 	local requirement=GetArmsmasterSupremeRequirement()
 	local descTxt=descTxt .. "\nKnights can learn up to a Supreme level, which is learned automatically at skill level " .. requirement .. ".\n"
 	Skillz.setDesc(35,1,descTxt)
-	local txt="Skills adds 3 dmg, 2 atk, 2% speed\nEach 10 points in armsmaster increase all the melee weapon skills by 1"
+	local txt="Skills adds 3 dmg, 3 atk, 2% speed\nEach 10 points in armsmaster increase all the melee weapon skills by 1"
 	Skillz.setDesc(35,6,txt)
 end
 
