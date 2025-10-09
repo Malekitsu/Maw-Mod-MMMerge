@@ -613,8 +613,20 @@ function events.MonsterKilled(mon)
 		local roll=math.random(1,#reagentDropTable[tier])
 		local reagent=reagentDropTable[tier][roll]	
 		local obj = SummonItem(reagent, mon.X, mon.Y, mon.Z + 100, 100)
+		local alchemyPower=0
+		for i=0,Party.High do
+			local s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Alchemy))
+			local power=s*m/2
+			if power>alchemyPower then
+				alchemyPower=power
+			end
+		end
 		if obj then
 			obj.Item.Bonus=round(getPartyLevel()/3)
+			if obj.Item.Bonus+alchemyPower>200 then
+				obj.Item.Number=math.random(221,224)
+				obj.Item.Bonus=round(obj.Item.Bonus+alchemyPower)
+			end
 		end
 	end
 end
