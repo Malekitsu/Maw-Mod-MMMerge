@@ -2671,3 +2671,16 @@ function events.GetSkill(t)
 		end
 	end
 end
+
+function events.LoadMap()
+	if not vars.BBFIX then
+		vars.BBFIX=true
+		for i=0,Party.PlayersArray.High do
+			local pl=Party.PlayersArray[i]
+			local id=const.Skills.Bodybuilding
+			local limit=Skillz.MasteryLimit(pl, id)
+			local s,m=SplitSkill(pl.Skills[id])
+			pl.Skills[id]=JoinSkill(s,math.min(m,limit))
+		end
+	end
+end
