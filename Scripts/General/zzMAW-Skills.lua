@@ -145,9 +145,9 @@ twoHandedWeaponDamageBonusByMastery = {
 }
 
 armsmasterSkill={
-	["Damage"]={0.5,1,1.5,2,[0]=0},
-	["Speed"]={0,1,2,2,[0]=0},
-	["Attack"]={1,1,2,3,[0]=0},
+	["Damage"]={0.5,1,1.5,2,3,[0]=0},
+	["Speed"]={0,1,2,2,2,[0]=0},
+	["Attack"]={1,1,2,3,3,[0]=0},
 }
 
 --all stats bonus are calculated in Maw Items, as this function only changes hp,sp,ac,attack and damage
@@ -666,7 +666,7 @@ function events.GameInitialized2()
 	Game.SkillDesNormal[const.Skills.Armsmaster]=string.format("Skills adds " .. armsmasterSkill.Damage[1] .. " dmg and " .. armsmasterSkill.Attack[1] .. " atk")
 	Game.SkillDesExpert[const.Skills.Armsmaster]=string.format("Skills adds " .. armsmasterSkill.Damage[2] .. " dmg, " .. armsmasterSkill.Attack[2] .. " atk, " .. armsmasterSkill.Speed[2] .. "%% speed")
 	Game.SkillDesMaster[const.Skills.Armsmaster]=string.format("Skills adds " .. armsmasterSkill.Damage[3] .. " dmg, " .. armsmasterSkill.Attack[3] .. " atk, " .. armsmasterSkill.Speed[3] .. "%% speed")
-	Game.SkillDesGM[const.Skills.Armsmaster]=string.format("Skills adds " .. armsmasterSkill.Damage[4] .. " dmg, " .. armsmasterSkill.Damage[4] .. " atk, " .. armsmasterSkill.Speed[4] .. "%% speed")
+	Game.SkillDesGM[const.Skills.Armsmaster]=string.format("Skills adds " .. armsmasterSkill.Damage[4] .. " dmg, " .. armsmasterSkill.Attack[4] .. " atk, " .. armsmasterSkill.Speed[4] .. "%% speed")
 	Game.SkillDesMaster[const.Skills.Dodging]=string.format("%s usable with Leather Armor",Game.SkillDesGM[const.Skills.Dodging])
 	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Dodging])
 	--Game.SkillDesGM[const.Skills.Unarmed]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Unarmed])	
