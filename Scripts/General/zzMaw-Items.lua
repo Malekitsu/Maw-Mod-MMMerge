@@ -2073,24 +2073,6 @@ function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType)
 	return damage
 end
 
-function events.ItemAdditionalDamage(t)
-	--empower enchants
-	local damage=0
-	if enchantbonusdamage[t.Item.Bonus2] then
-		local id=t.Player:GetIndex()
-		local index=table.find(damageKindMap,enchantbonusdamage[t.Item.Bonus2].Type)
-		local res=t.Monster.Resistances[index]
-		damage=calcEnchantDamage(t.Player, t.Item, res, true, false, "damage")
-		local attackSpeedMult=getItemRecovery(t.Item, t.Player.LevelBase)/100
-		t.Result=round(damage*attackSpeedMult)
-		return
-	end
-
-	--attack speed bonus, for other enchants
-	local attackSpeedMult=getItemRecovery(t.Item, t.Player.LevelBase)/100
-	t.Result=round(t.Result*attackSpeedMult)
-end
-
 --weaponenchants and ring enchants checker
 enchantList={
 	[4] = true ,
