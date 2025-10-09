@@ -31,14 +31,30 @@ function events.BuildItemInformationBox(t)
 end
 
 
+function events.ItemAdditionalDamage(t)
+	--empower enchants
+	local damage=0
+	if enchantbonusdamage[t.Item.Bonus2] then
+		local id=t.Player:GetIndex()
+		local index=table.find(damageKindMap,enchantbonusdamage[t.Item.Bonus2].Type)
+		local res=t.Monster.Resistances[index]%1000
+		damage=calcEnchantDamage(t.Player, t.Item, res, true, false, "damage")
+		local attackSpeedMult=getItemRecovery(t.Item, t.Player.LevelBase)/100
+		t.Result=round(damage*attackSpeedMult)
+		return
+	end
+	t.Result=0
+end
 --[11]="Killing a monster will recover you action time",
 function events.CalcDamageToMonster(t)
-
+	if t.Result==0 then return end
 	local id=t.PlayerIndex
 	local data=WhoHitMonster()
 	if not data or not data.Player then return end
+	local pl=data.Player
 	--weapon enchants	
 	local fireAuraDamage=0
+	local enchantDamage=0
 	local fireRes=t.Monster.Resistances[0]%1000
 	if data and not data.Object and t.DamageKind==4 then
 		for i=0,1 do
@@ -48,6 +64,15 @@ function events.CalcDamageToMonster(t)
 				if damage then
 					fireAuraDamage=fireAuraDamage+damage
 				end
+				
+				if enchantbonusdamage[it.Bonus2] then
+					local id=table.find(damageKindMap,enchantbonusdamage[it.Bonus2].Type)
+					local res=t.Monster.Resistances[id]%1000
+					local dmg=calcEnchantDamage(pl, it, res, true, false, "damage")
+					if damage then
+						enchantDamage=enchantDamage+dmg
+					end
+				end 
 			end
 		end
 	elseif data and data.Object and (data.Object.Spell==133 or data.Spell==135) then --bow/blasters
@@ -56,8 +81,16 @@ function events.CalcDamageToMonster(t)
 		if damage and damage>fireAuraDamage then
 			fireAuraDamage=damage
 		end
+		if enchantbonusdamage[it.Bonus2] then
+			local id=table.find(damageKindMap,enchantbonusdamage[it.Bonus2].Type)
+			local res=t.Monster.Resistances[id]%1000
+			local dmg=calcEnchantDamage(pl, it, res, true, false, "damage")
+			if damage then
+				enchantDamage=enchantDamage+dmg
+			end
+		end 
 	end
-	t.Result=t.Result+fireAuraDamage
+	t.Result=t.Result+fireAuraDamage+enchantDamage
 	
 	--[17]="Your hits will deal 1% of current monster HP health (0.4% for AoE, multi-hit spells and arrows)",
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 17) then
