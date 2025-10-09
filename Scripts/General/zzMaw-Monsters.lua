@@ -2712,7 +2712,10 @@ function checkMapCompletition()
 				mapLevel=math.max(mapLevel,1)
 				local experience=math.ceil(totalMonster^0.7*(mapLevel*20+mapLevel^1.8)/3*(bolster+mapLevel)/mapLevel/1000)*1000
 				if vars.madnessMode then
-					experience=math.ceil(totalMonster^0.7*(bolster*20+bolster^1.8)/3/1000)*1000*3
+					experience=math.ceil(totalMonster^0.7*(bolster*20+bolster^1.8)/3/1000)*1000
+					if not mapvars.mapAffixes then
+						experience=experience*3
+					end
 				end
 				--bolster code
 				addBolsterExp(experience)
