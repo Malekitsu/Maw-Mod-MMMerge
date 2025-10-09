@@ -1631,7 +1631,7 @@ function ascendSpellDamage(skill, mastery, spell, index)
 	damageAdd=spellPowers[spell].dmgAdd*empowerMult
 	if vars.madnessMode and table.find(aoespells,spell) then
 		diceMax=diceMax*2/3
-		damageAdd=diceMax*2/3
+		damageAdd=damageAdd*2/3
 	end
 	local ascensionLevel=getAscensionTier(skill,spell,index)
 	if ascensionLevel>0 then
