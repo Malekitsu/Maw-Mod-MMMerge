@@ -1571,6 +1571,9 @@ function events.CalcSpellDamage(t)
 				damage=(dmg1+dmg2)*1.2^ascensionTier
 				if table.find(aoespells, t.Spell) then
 					damage=damage/2.5
+					if vars.madnessMode then
+						damage=damage*0.7
+					end
 				end
 				t.Result = t.Result+damage
 			end
