@@ -2137,9 +2137,8 @@ function events.BuildMonsterInformationBox(t)
 		local pl=Party[id]
 		local playerLevel=math.min(calcLevel(pl.Experience),partyLvl) 
 		local healthRateo=getMonsterHealth(mon)/getMonsterHealth(false,playerLevel)
-		local mult=healthRateo
 					
-		local experienceAwarded=experience*mult
+		local experienceAwarded=experience*healthRateo
 		local lvl=pl.LevelBase
 		experienceAwarded=round(math.min((lvl+1)*1000, experienceAwarded))
 		t.EffectsHeader.Text=t.EffectsHeader.Text .. "\n\n\n\nExperience: " .. experienceAwarded
@@ -2968,7 +2967,6 @@ function generateBoss(index, nameIndex, skillType)
 	if getMapAffixPower(18) then
 		hpMult = hpMult * (1 + getMapAffixPower(18) / 100)
 	end
-	mon.Exp = mon.Exp * 5
 
 	mon.TreasureDiceCount	= (mon.Level * 100) ^ 0.5
 	mon.TreasureDiceSides	= (mon.Level * 100) ^ 0.5
