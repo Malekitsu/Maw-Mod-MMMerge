@@ -82,6 +82,9 @@ function events.CalcDamageToMonster(t)
 			minLeech=fullHP*lifeLeech[index].Spell/5*recovery/100
 			if table.find(aoespells, spell) then
 				minLeech=minLeech/2.5
+				if vars.madnessMode then
+					minLeech=minLeech*0.7
+				end
 			end
 			if spell==9 or spell==22 or spell==43 then
 				minLeech=minLeech/4
