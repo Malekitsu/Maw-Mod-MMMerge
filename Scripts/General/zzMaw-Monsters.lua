@@ -744,6 +744,9 @@ function recalculateMonsterTable()
 		if vars.insanityMode then
 			mon.Experience=mon.Experience*0.8
 		end
+		if vars.madnessMode then
+			mon.Experience=mon.Experience*1.5
+		end
 		mon.ArmorClass=base.ArmorClass*((totalLevel[i]+10)/(LevelB+10))
 	end
 	
@@ -993,6 +996,28 @@ function events.BeforeLoadMap()
 				Game.MapStats[i].Mon2Low=3
 				Game.MapStats[i].Mon3Low=3
 			end
+		end
+	end
+	if vars.madnessMode then
+		for i=1,Game.MapStats.High do
+			if Game.MapStats[i].Mon1Hi>1 then
+				Game.MapStats[i].Mon1Low=5
+			end
+			if Game.MapStats[i].Mon2Hi>1 then
+				Game.MapStats[i].Mon2Low=5
+			end
+			if Game.MapStats[i].Mon3Hi>1 then
+				Game.MapStats[i].Mon3Low=5
+			end
+			if Game.MapStats[i].Mon1Hi>1 then
+				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+6
+			end 
+			if Game.MapStats[i].Mon2Hi>1 then
+				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+6
+			end 
+			if Game.MapStats[i].Mon3Hi>1 then
+				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+6
+			end 
 		end
 	end
 	
@@ -2606,7 +2631,7 @@ function checkMapCompletition()
 			local bolster=getPartyLevel()
 			
 			vars.dungeonCompletedList=vars.dungeonCompletedList or {}
-			if vars.dungeonCompletedList[name] then
+			if vars.dungeonCompletedList[name] and not vars.madnessMode then
 				vars.dungeonCompletedList[name]=true
 				if Game.CurrentScreen~=22 then
 					if vars.insanityMode then
@@ -2685,7 +2710,7 @@ function checkMapCompletition()
 				mapLevel=math.max(mapLevel,1)
 				local experience=math.ceil(totalMonster^0.7*(mapLevel*20+mapLevel^1.8)/3*(bolster+mapLevel)/mapLevel/1000)*1000
 				if vars.madnessMode then
-					experience=math.ceil(totalMonster^0.7*(bolster*20+bolster^1.8)/3/1000)*1000
+					experience=math.ceil(totalMonster^0.7*(bolster*20+bolster^1.8)/3/1000)*1000*3
 				end
 				--bolster code
 				addBolsterExp(experience)
@@ -4119,6 +4144,9 @@ function events.MonsterKilled(mon)
 	end
 	if vars.insanityMode then
 		mon.Experience=mon.Experience*0.8
+	end
+	if vars.madnessMode then
+		mon.Experience=mon.Experience*1.5
 	end
 	
 	local data=WhoHitMonster()
