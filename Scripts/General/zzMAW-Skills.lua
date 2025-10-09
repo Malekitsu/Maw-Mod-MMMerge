@@ -2604,3 +2604,70 @@ do
     end
   end
 end
+
+local armsmasterDesc=false
+function events.LoadMap()
+	if not armsmasterDesc then
+		armsmasterDesc=Skillz.getDesc(35,1,txt)
+	end
+	local descTxt=armsmasterDesc
+	local requirement=GetArmsmasterSupremeRequirement()
+	local descTxt=descTxt .. "\nKnights can learn up to a Supreme level, which is learned automatically at skill level " .. requirement .. ".\n"
+	Skillz.setDesc(35,1,descTxt)
+	local txt="Skills adds 3 dmg, 2 atk, 2% speed\nEach 10 points in armsmaster increase all the melee weapon skills by 1"
+	Skillz.setDesc(35,6,txt)
+end
+
+function GetArmsmasterSupremeRequirement()
+	local requirement=30
+	if vars.madnessMode then
+		requirement=70
+	elseif vars.insanityMode then
+		requirement=50
+	end
+	return requirement
+end
+
+function events.Action(t)
+	if t.Action==121 then
+		if t.Param==35 then
+			local id=Game.CurrentPlayer
+			
+			if id<0 or id>Party.High then
+				return
+			end
+			local pl=Party[id]
+			local class=pl.Class
+			if class<16 or class>19 then --knights only
+				return
+			end
+			
+			local requirement=GetArmsmasterSupremeRequirement()
+			
+			local s,m=SplitSkill(Skillz.get(pl,35))
+			if pl.SkillPoints>s and s+1==requirement then
+				Game.ShowStatusText("SUPREME UNLOCKED!!!")
+				evt[id].Add("HP", 0) --graphic
+			end
+		end
+	end
+end
+
+local meleeSkills={0,1,2,3,4,6}
+function events.GetSkill(t)
+	if table.find(meleeSkills, t.Skill) then
+		local pl=t.Player
+		local class=pl.Class
+		if class<16 or class>19 then --knights only
+			return
+		end
+		
+		local requirement=GetArmsmasterSupremeRequirement()
+		
+		local s,m=SplitSkill(Skillz.get(pl,35))
+		local s2,m2=SplitSkill(Skillz.get(pl,t.Skill))
+		if s>=requirement then
+			t.Result=JoinSkill(math.min(s2*2, s2+math.floor(s/10)),m2)
+		end
+	end
+end
