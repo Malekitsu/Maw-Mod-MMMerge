@@ -3,7 +3,7 @@ Staff	E	M	M	M	N	N	N	N	=	=	=	=	E	M	M	M	E	E	G	G	M	M	M	M	G	G	E	M	M	M	E	E	E	E	=	=	=	
 Sword	E	M	M	M	=	=	=	=	M	M	=	=	=	=	=	=	M	M	G	G	E	M	E	E	E	E	M	M	M	M	E	M	M	M	M	M	M	M	M	G	M	M	=	=	=	=	=	=	=	=	=	=	=	M	M	G	M	M	G	=	=	=	=	=	=
 Dagger	M	M	G	G	=	=	=	=	M	M	=	=	M	M	M	M	E	E	E	E	E	E	E	E	E	E	E	E	E	E	E	E	E	E	M	M	G	G	E	E	M	G	E	M	E	M	M	M	=	=	=	M	E	=	=	=	=	=	=	E	M	M	E	E	E
 Axe	E	M	M	M	=	=	=	=	=	=	=	=	=	=	=	=	E	E	G	G	M	G	=	=	=	=	E	M	M	M	E	M	G	G	=	=	=	=	M	M	E	E	=	=	=	=	=	=	=	=	=	=	=	E	E	E	M	M	G	E	M	M	=	=	=
-Spear	E	M	M	M	=	=	=	=	=	=	=	=	=	=	=	=	M	M	G	G	M	M	E	E	E	E	E	M	M	M	E	M	G	G	=	=	=	=	E	M	=	=	=	=	=	=	=	=	=	=	=	=	=	M	M	G	=	=	=	E	M	M	=	=	=
+Spear	E	M	M	M	=	=	=	=	E	M	=	=	=	=	=	=	M	M	G	G	M	M	E	E	E	E	E	M	M	M	E	M	G	G	=	=	=	=	E	M	=	=	=	=	=	=	=	=	=	=	=	=	=	M	M	G	=	=	=	E	M	M	=	=	=
 Bow	M	M	G	G	E	M	M	M	M	G	=	=	E	E	E	E	E	E	M	M	E	E	N	N	N	N	E	E	E	E	M	M	G	G	E	M	M	M	E	M	N	N	N	N	N	N	N	N	N	N	M	N	N	E	E	E	E	E	E	E	E	E	N	N	N
 Mace	=	=	=	=	E	M	M	M	N	N	=	=	E	E	E	E	M	M	G	G	M	M	=	=	=	=	M	M	G	G	=	=	=	=	E	E	M	M	M	G	E	M	=	=	=	=	=	=	=	=	M	=	=	E	M	M	M	M	M	E	M	M	E	E	E
 Blaster	G	G	G	G	G	G	G	G	G	G	=	=	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	G	N	N	G	G	G	G	G	G	G	G	G	G	G	G	=	=	=
