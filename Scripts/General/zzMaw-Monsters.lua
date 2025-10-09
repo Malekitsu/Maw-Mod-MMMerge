@@ -2696,7 +2696,9 @@ function checkMapCompletition()
 				if vars.madnessMode then
 					bolster=madnessMapLevels[name]
 				end
-
+				if mapvars.mapAffixes then
+					bolster=mapvars.mapAffixes.Power*10
+				end
 				local totalMonster=m
 				if Game.BolsterAmount==300 then
 					totalMonster=totalMonster*0.67
