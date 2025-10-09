@@ -181,12 +181,8 @@ function events.CalcDamageToMonster(t)
 
   t.Result = damage * (dmgMult or 1)
 
-  local critChance, critMult, success
-  if data.Object and data.Object.Spell == 133 then
-    critChance, critMult, success = getCritInfo(pl, "spell", safeGetMonsterLevel(t.Monster))
-  else
-    critChance, critMult, success = getCritInfo(pl, false, safeGetMonsterLevel(t.Monster))
-  end
+
+  local critChance, critMult, success = getCritInfo(pl, false, safeGetMonsterLevel(t.Monster))
   if success then
     t.Result = t.Result * critMult
 	crit=true
@@ -1148,8 +1144,8 @@ function events.CalcDamageToMonster(t)
 		end
 	end
 	
-	res=1-1/2^(res/100)
-	t.Result = t.Result * (1-res)
+	res=2^(res/100)
+	t.Result = t.Result / res
 end
 
 --spear reset stacks after kill
