@@ -3054,6 +3054,11 @@ function itemStats(index)
 			
 			--armsmaster
 			local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
+			local requirement=GetArmsmasterSupremeRequirement()
+			if pl.Class>=16 and pl.Class<=19 and s>=requirement then
+				m=5
+			end
+		
 			--weapon 
 			local s2,m2=SplitSkill(pl:GetSkill(skill))
 			
