@@ -4453,6 +4453,5 @@ function events.CalcDamageToMonster(t)
 		local res=t.Monster.Resistances[4]%1000
 		local damage=round(damage/2^(res/100))
 		t.Result=damage
-		Game.ShowStatusText(t.Result)
 	end
 end
