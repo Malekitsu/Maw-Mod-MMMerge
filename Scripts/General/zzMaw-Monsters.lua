@@ -2722,7 +2722,7 @@ function checkMapCompletition()
 				--end
 				local gold=math.ceil(experience^0.9/1000)*1000 
 				if vars.madnessMode then
-					gold=experience
+					gold=round(experience/3*1000)/1000
 				end
 				evt.ForPlayer(0)
 				evt.Add{"Gold", Value = gold}
