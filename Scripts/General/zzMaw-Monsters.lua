@@ -2721,6 +2721,9 @@ function checkMapCompletition()
 				vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
 				--end
 				local gold=math.ceil(experience^0.9/1000)*1000 
+				if vars.madnessMode then
+					gold=experience
+				end
 				evt.ForPlayer(0)
 				evt.Add{"Gold", Value = gold}
 				if not vars.AusterityMode then
