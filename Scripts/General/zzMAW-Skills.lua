@@ -2664,7 +2664,7 @@ function events.GetSkill(t)
 		
 		local requirement=GetArmsmasterSupremeRequirement()
 		
-		local s,m=SplitSkill(Skillz.get(pl,35))
+		local s,m=SplitSkill(pl:GetSkill(35))
 		local s2,m2=SplitSkill(Skillz.get(pl,t.Skill))
 		if s>=requirement then
 			t.Result=JoinSkill(math.min(s2*2, s2+math.floor(s/10)),m2)
