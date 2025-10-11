@@ -1298,6 +1298,11 @@ function events.GameInitialized2()
 	for i=1041, 1068 do
 		Game.ItemsTxt[i].NotIdentifiedName="Crafting Item"
 	end
+	for i=1,10 do
+		Game.ItemsTxt[1040+i].SpriteIndex=141+i
+		Game.ItemsTxt[1050+i].SpriteIndex=141+i
+	end
+	Game.ItemsTxt[1068].SpriteIndex=411
 end
 
 
