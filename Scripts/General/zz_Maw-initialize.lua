@@ -16,6 +16,7 @@ return {
     ColouredStats = true,               -- stats menu has more colours
     showDeathCounter = true,            -- Beyond Madness only, death counter is shown
     disableCompletitionMessage = false, -- disable completion messages (recommended for online play)
+	disableSpellBookRework = false      -- disable the new book skin
     
     -- Hotkeys
     removeBuffsKey = 82,                -- remove all buffs when spellbook is open (default: R)
@@ -469,7 +470,7 @@ function events.MultiplayerInitialized()
     createSwitch(220, "M&M6 Projectiles", "restoreProjectiles", {"ON","OFF"})
     createSwitch(260, "Homing Projectiles", "homingProjectiles", {"ON","OFF"})
     createSwitch(300, "Damage on Friendly Units", "friendlyDamage", {"ON","OFF"})
-    createSwitch(340, "Loot Filter", "lootFilter", {"OFF","Common", "Uncom.", "Rare", "Epic"})
+    createSwitch(340, "Loot Filter", "lootFilter", {"OFF","Common", "Uncom.", "Rare", "Epic","Ancient","Primordial"})
 	
     function events.OpenExtraSettingsMenu()
         for _, v in pairs(mawSettingsButton) do
