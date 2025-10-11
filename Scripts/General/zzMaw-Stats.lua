@@ -291,9 +291,9 @@ nextACToZero=0
 acNerf=0
 function events.PlayerAttacked(t)
 	if t.Attacker and t.Attacker.Monster then
-		local mon=t.Attacker.Monster
+		mon=t.Attacker.Monster --don't set local
 		local lvl=getMonsterLevel(mon)
-		nerfAmount=math.max(1,lvl/255)
+		nerfAmount=math.max(1,lvl/255) --don't set local
 		if t.Attacker.MonsterAction==0 then
 			ac=t.Player:GetArmorClass()
 			if t.Attacker.Monster.Attack1.Type~=4 then
@@ -318,7 +318,8 @@ function events.GetArmorClass(t)
 		t.AC=0
 		nextACToZero=nextACToZero-1
 	elseif acNerf>0 then
-		local hit=CalcHitOrMiss(monLvl, t.AC/nerfAmount)
+		local lvl=getMonsterLevel(mon)
+		local hit=CalcHitOrMiss(lvl, t.AC/nerfAmount)
 		if hit then
 			t.AC=0
 		else
