@@ -4377,12 +4377,8 @@ function events.KeyDown(t)
         if t.Key == 85 then -- "u" key
             gemUpgrading=true
             for i=1,19 do
-				local id=1050+i
+				local id=1040+i
 				local bonusStrength=0
-				if i>10 then
-					id=1050+i-10
-					bonusStrength=1
-				end
 				local gemsFound=0
 				for j=0,Party.High do
 					local pl=Party[j]
