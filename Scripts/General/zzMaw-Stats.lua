@@ -293,7 +293,7 @@ function events.PlayerAttacked(t)
 	if t.Attacker and t.Attacker.Monster then
 		local mon=t.Attacker.Monster
 		local lvl=getMonsterLevel(mon)
-		nerfAmount=math.max(1,lvl/255)
+		local nerfAmount=math.max(1,lvl/255)
 		if t.Attacker.MonsterAction==0 then
 			ac=t.Player:GetArmorClass()
 			if t.Attacker.Monster.Attack1.Type~=4 then
@@ -318,12 +318,24 @@ function events.GetArmorClass(t)
 		t.AC=0
 		nextACToZero=nextACToZero-1
 	elseif acNerf>0 then
-		t.AC=math.round(t.AC/nerfAmount)
+		local hit=CalcHitOrMiss(monLvl, t.AC/nerfAmount)
+		if hit then
+			t.AC=0
+		else
+			t.AC=64000
+		end
 		acNerf=acNerf-1
 	end
 end
 
-
+function CalcHitOrMiss(monLvl, AC)
+	local hitChance=(5+monLvl*2)/(10+monLvl*2+AC)
+	if hitChance<math.random() then
+		return false
+	else
+		return true
+	end
+end
 
 --body building description
 function events.GameInitialized2()
@@ -453,17 +465,17 @@ function events.BuildStatInformationBox(t)
 	
 	if t.Stat==9 then
 		i=Game.CurrentPlayer
-		ac=Party[i]:GetArmorClass()
-		local lvl=math.min(Party[i].LevelBase,200)
+		local ac=Party[i]:GetArmorClass()
 		local acReduction=round((100-calcMawDamage(Party[i],4,10000)/100)*100)/100
-		lvl=math.min(Party[i].LevelBase, 255)
+		local lvl=math.min(Party[i].LevelBase)
+		local nerfAmount=math.max(1,lvl/255)
 		if Game.BolsterAmount>100 then
 			nerfAmount=Game.BolsterAmount/100
 			ac=ac/nerfAmount
 		end
 		blockChance= 100-round((5+lvl*2)/(10+lvl*2+ac)*10000)/100
 		totRed= 100-round((100-blockChance)*(100-acReduction))/100
-		t.Text=string.format("%s\n\nPhysical damage reduction: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\nBlock chance vs same level monsters (up to 255): " .. StrColor(255,255,100,blockChance) .. StrColor(255,255,100,"%") .. "\n\nTotal average damage reduction: " .. StrColor(255,255,100,totRed) .. "%")
+		t.Text=string.format("%s\n\nPhysical damage reduction: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\nBlock chance vs same level monsters: " .. StrColor(255,255,100,blockChance) .. StrColor(255,255,100,"%") .. "\n\nTotal average damage reduction: " .. StrColor(255,255,100,totRed) .. "%")
 	end
 	
 	if t.Stat==5234672 then
@@ -1275,10 +1287,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		AC=pl:GetArmorClass()
 		AC=pl:GetArmorClass()
 		AC=pl:GetArmorClass()
-		AC=pl:GetArmorClass()--multiple times to avoid chance to hit code to interfere with AC
-		if AC>=65000 then
-			return 0
-		end		
+		AC=pl:GetArmorClass()
 		if getMapAffixPower(28) then
 			AC=AC*(1-getMapAffixPower(28)/100)
 		end
@@ -1556,7 +1565,8 @@ function calcPowerVitality(pl, statsMenu)
 	local ac=pl:GetArmorClass()
 	local acReduction=1-calcMawDamage(pl,4,10000)/10000
 	local lvl=pl.LevelBase
-	local ac=ac/(Game.BolsterAmount/100)
+	local nerfAmount=math.max(1,lvl/255)
+	local ac=ac/(Game.BolsterAmount/100*nerfAmount)
 	local blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
 	local ACRed= 1 - (1-blockChance)*(1-acReduction)
 	--dodging
