@@ -1720,7 +1720,8 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 	
 	local divider=math.min(90+lvl*0.75*bolster,600*bolster)
 	local armorReduction=armorClass/divider+1
-	local blockAC=armorClass/math.max(Game.BolsterAmount/100,1)
+	local nerfAmount=math.max(1,lvl/255)
+	local blockAC=armorClass/(math.max(Game.BolsterAmount/100,1)*nerfAmount)
 	local blockChanceVitMultiplier= 1/((5+lvl*2)/(10+lvl*2+blockAC))
 	local totalArmorReduction=armorReduction*blockChanceVitMultiplier
 	
