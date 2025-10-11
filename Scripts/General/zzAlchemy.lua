@@ -1295,7 +1295,9 @@ function events.GameInitialized2()
 		txt[i+1040].Name=descNames[i]
 	end
 	txt[1068].Name="Celestial Orb"
-	Game.ItemsTxt[1068].NotIdentifiedName="Crafting Item"
+	for i=1041, 1068 do
+		Game.ItemsTxt[i].NotIdentifiedName="Crafting Item"
+	end
 end
 
 
