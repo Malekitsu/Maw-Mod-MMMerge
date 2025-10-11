@@ -643,12 +643,14 @@ function events.GameInitialized2()
 	Game.SkillDesGM[const.Skills.Alchemy]="Allows to make black potions. Power when mixing will be increased to 2 and increases potion duration by 6 Minutes per skill point."
 end
 function events.BuildItemInformationBox(t)
-	if t.Item.Number>=1051 and t.Item.Number<=1060 then
+	if t.Item.Number>=1041 and t.Item.Number<=1060 then
+		--[[
 		if t.Name then
 			if t.Item.BonusStrength==1 then
 				t.Name=StrColor(178,255,255, "Ascended " .. t.Name) 
 			end
 		end
+		]]
 		if t.Description then
 			local mult=math.max((Game.BolsterAmount-100)/2000+1,1)
 			if vars.insanityMode then
@@ -657,12 +659,8 @@ function events.BuildItemInformationBox(t)
 			if vars.madnessMode then
 				mult=2
 			end
-			local tier=(t.Item.Number-1050)*mult
-			if t.Item.BonusStrength==1 then
-				tier=tier+10*mult
-			end
+			local tier=(t.Item.Number-1040)*mult
 			local power = 3
-			
 			
 			local twoHanded = tier * 6 * 2
 			local bodyArmor = round(tier * 1.5 * 6)
@@ -687,6 +685,14 @@ function events.BuildItemInformationBox(t)
 				t.Description="Oracle's Orb is a mysterious and powerful artifact, a large, purple orb with a haunting face suspended within its core. This enigmatic relic is known for storing legendary abilities upon items it enchants.\n\nAdds the following legendary power to an item:"
 			end
 			t.Description = t.Description .. "\n\n" .. StrColor(255,255,30,legendaryEffects[t.Item.BonusStrength])
+		end
+	end
+	if t.Item.Number==1068 then
+		if t.Description then				
+			t.Description="\nThe Celestial Orb allows the transfer of celestial essence from one item to another, preserving the divine property while freeing the original item of its blessing.\n\n(right-click on a celestial item to extract its power charging the Celestial orb, then right-click on a non celestial item to transfer its power.)"
+			if t.Item.BonusStrength==1 then
+				t.Description = t.Description .. "\n\n" .. StrColor(120, 240, 255,"Celestial orb is charged and it's ready to grant celestial powers to any non-Artifact Equipment")
+			end
 		end
 	end
 end
@@ -775,14 +781,18 @@ local function upgradeGem(it, tier)
 	return enchanted
 end
 
-for i=1,10 do
+for i=1,20 do
 	evt.PotionEffects[70+i] = function(IsDrunk, t, Power)
 		if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then			
 			if craftWaitTime>0 or t.BonusExpireTime>100 then return end
-			local tier=(Mouse.Item.Number-1050)
-			if Mouse.Item.BonusStrength==1 then
-				tier=tier+10
+			local levelRequired=GetLevelRquirement(t)
+			--check if equippable
+			local plLvl=Party[Game.CurrentPlayer].LevelBase
+			if plLvl<levelRequired then
+				Game.ShowStatusText("Your level is too low (Level " .. levelRequired .. " required)")
+				return
 			end
+			local tier=(Mouse.Item.Number-1040)
 			local enchanted=upgradeGem(t, tier)
 			if enchanted=="no enchants" then
 				Game.ShowStatusText("No enchants")
@@ -813,7 +823,7 @@ function events.Tick()
 	end
 end
 
-evt.PotionEffects[81] = function(IsDrunk, t, Power)
+evt.PotionEffects[91] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
 		if t.Bonus2~=0 then 
 			return
@@ -843,7 +853,7 @@ evt.PotionEffects[81] = function(IsDrunk, t, Power)
 	end
 end
 
-evt.PotionEffects[82] = function(IsDrunk, t, Power)
+evt.PotionEffects[92] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
 		if t.Bonus>0 and t.BonusStrength>0 and t.Charges<=1000 then 
 			math.randomseed(t.Number*10000+t.MaxCharges*1000+t.Bonus*100+t.BonusStrength*10+t.Charges)
@@ -870,7 +880,7 @@ evt.PotionEffects[82] = function(IsDrunk, t, Power)
 	end
 end
 
-evt.PotionEffects[83] = function(IsDrunk, t, Power)
+evt.PotionEffects[93] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
 		if t.BonusExpireTime>=100 and t.BonusExpireTime<200 then return end
 		local difficultyExtraPower=1
@@ -913,7 +923,7 @@ evt.PotionEffects[83] = function(IsDrunk, t, Power)
 	end
 end
 
-evt.PotionEffects[84] = function(IsDrunk, t, Power)
+evt.PotionEffects[94] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) or (t.Number>=500 and t.Number<=542) or (t.Number>=1302 and t.Number<=1354) or (t.Number>=2020 and t.Number<=2049) then
 		Mouse.Item.Number=t.Number
 		Mouse.Item.Bonus=t.Bonus
@@ -929,7 +939,7 @@ evt.PotionEffects[84] = function(IsDrunk, t, Power)
 	end
 end
 
-evt.PotionEffects[85] = function(IsDrunk, t, Power)
+evt.PotionEffects[95] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
 		local modified=false
 		if Game.ItemsTxt[t.Number].NotIdentifiedName==Game.ItemsTxt[t.Number+1].NotIdentifiedName then
@@ -989,7 +999,7 @@ evt.PotionEffects[85] = function(IsDrunk, t, Power)
 	end
 end
 
-evt.PotionEffects[86] = function(IsDrunk, t, Power)
+evt.PotionEffects[96] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
 		if t.Bonus==0 and t.Charges<=1000 and t.Bonus2==0 then
 			return 
@@ -1021,7 +1031,7 @@ evt.PotionEffects[86] = function(IsDrunk, t, Power)
 	end
 end
 
-evt.PotionEffects[87] = function(IsDrunk, t, Power)
+evt.PotionEffects[97] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
 		if craftWaitTime>0 then return end
 		craftingItemUsed=true
@@ -1046,6 +1056,26 @@ evt.PotionEffects[87] = function(IsDrunk, t, Power)
 	end
 end
 
+evt.PotionEffects[98] = function(IsDrunk, t, Power)
+	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+		if craftWaitTime>0 then return end
+		craftingItemUsed=true
+		if Mouse.Item.BonusStrength==1 and t.BonusExpireTime<100 then
+			t.BonusExpireTime=t.BonusExpireTime+100
+			Mouse.Item.Number=0
+		elseif Mouse.Item.BonusStrength==0 and t.BonusExpireTime>=100 then
+			t.BonusExpireTime=t.BonusExpireTime-100
+			Mouse.Item.BonusStrength=1
+		else
+			Game.ShowStatusText("Invalid Item")
+			return
+		end
+		mem.u4[0x51E100] = 0x100 
+		t.Condition = t.Condition:Or(0x10)
+		evt.PlaySound(12070)
+	end
+end
+
 
 craftDropChances={
 		["gems"]=0.006,
@@ -1056,6 +1086,7 @@ craftDropChances={
 		[1065]=0.00025,
 		[1066]=0.0002,
 		[1067]=0.00004,
+		[1068]=0.00001,
 	}
 	
 -- Function to generate normally distributed random numbers
@@ -1113,8 +1144,9 @@ function events.MonsterKilled(mon)
 		lvl=round(mapvars.uniqueMonsterLevel[mon:GetIndex()])
 	end
 	bonusRoll=math.min(1+lvl/60,5)
+	local extraRoll=1
 	if mon.NameId>=220 and mon.NameId <300 then
-		bonusRoll=bonusRoll*10
+		extraRoll=extraRoll*10
 	end
 	if Multiplayer and Multiplayer.client_monsters()[0] then
 		bonusRoll=bonusRoll/(1+#Multiplayer.client_monsters())
@@ -1127,7 +1159,7 @@ function events.MonsterKilled(mon)
 				nAff=nAff+1
 			end
 		end
-		bonusRoll=bonusRoll*(1+mapvars.mapAffixes.Power*nAff/800*1.5)
+		extraRoll=extraRoll*(1+mapvars.mapAffixes.Power*nAff/800*1.5)
 	end
 	--pick base craft material
 	local baseCraftDrop=false
@@ -1139,20 +1171,17 @@ function events.MonsterKilled(mon)
 	end
 	--no corpse monster Buff
 	if table.find(noCorpseMonsters,mon.Id) then
-		bonusRoll=bonusRoll*3
+		extraRoll=extraRoll*3
 	end
 	if vars.AusterityMode then
 		bonusRoll=0
 	end
+	bonusRoll=bonusRoll*extraRoll
 	if math.random()<craftDropChances.gems*bonusRoll*insanityMult then
 		baseCraftDrop=true
 		local craftStrength = math.floor(normal_random(math.max(lvl^0.6/4+1,lvl/40), 2))
 		craftStrength=math.max(math.min(craftStrength,20),1)
-		if craftStrength>10 then
-			craftStrength=craftStrength-10
-			ascendedGem=true
-		end
-		crafMaterialNumber=1050+craftStrength
+		crafMaterialNumber=1040+craftStrength
 	end	
 	if baseCraftDrop then
 		obj = SummonItem(crafMaterialNumber, mon.X, mon.Y, mon.Z + 100, 100)
@@ -1164,7 +1193,7 @@ function events.MonsterKilled(mon)
 		end
 	end
 	--pick special drop with pity protection
-	for i=1061,1067 do
+	for i=1061,1068 do
 		-- Advance seed for each crafting item to get different rolls
 		local currentSeed = Game.RandSeed
 		local newSeed = (currentSeed * 1664525 + 1013904223) % 4294967296
@@ -1190,18 +1219,83 @@ function events.MonsterKilled(mon)
 			end
 		else
 			-- Increment pity counter on failed drop
-			vars.craftPityCounters[i] = vars.craftPityCounters[i] + 1
+			vars.craftPityCounters[i] = vars.craftPityCounters[i] + round(extraRoll)
 		end
 	end
 	
 end
 
-
+local names={"vCraft1",
+"vCraft2",
+"vCraft3",
+"vCraft4",
+"vCraft5",
+"vCraft6",
+"vCraft7",
+"vCraft8",
+"vCraft9",
+"vCraft10",
+"vCraft1Asc",
+"vCraft2Asc",
+"vCraft3Asc",
+"vCraft4Asc",
+"vCraft5Asc",
+"vCraft6Asc",
+"vCraft7Asc",
+"vCraft8Asc",
+"vCraft9Asc",
+"vCraft10Asc",
+"vEye1",
+"vHour1",
+"vCraft11",
+"vMirror",
+"vCraft12",
+"vCraft13",
+"vEternal2",
+"vEternal1"}
+local descNames={
+    "Lunar Shard",
+    "Fire Topaz",
+    "Amethyst Chunk",
+    "Amber Droplet",
+    "Royal Amethyst",
+    "Gemcutter's Ruby",
+    "Solarstone",
+    "Erudite Crystal",
+    "Erathian Sapphire",
+    "Queen's Diamond",
+    "Ascended Lunar Shard",
+    "Ascended Fire Topaz",
+    "Ascended Amethyst Chunk",
+    "Ascended Amber Droplet",
+    "Ascended Royal Amethyst",
+    "Ascended Gemcutter's Ruby",
+    "Ascended Solarstone",
+    "Ascended Erudite Crystal",
+    "Ascended Erathian Sapphire",
+    "Ascended Queen's Diamond",
+    "Eye of Void",
+    "Creator's Hourglass",
+    "Pandora's Cube",
+    "Archibald's Mirror",
+    "Emerald of Power",
+    "Pearl of Memory",
+    "Celestial Orb",
+    "Orb of Creation"
+}
 function events.GameInitialized2()
 	--special crafting items
-	Game.ItemsTxt[1061].Notes="This Eye allows to add a Special enchant to any equipment that has already 2 base enchants\n(right-click on an item with a base enchant to use)"
-	Game.ItemsTxt[1062].Notes="This Hourglass allows to add a second base enchant to any equipment that has 1 base and a special enchant\n(right-click on an item with a base enchant to use)"
-	Game.ItemsTxt[1067].Notes="Oracle's Orb is a mysterious and powerful artifact, a large, purple orb with a haunting face suspended within its core. This enigmatic relic is known for storing legendary abilities upon items it enchants.\n\n Adds the following legendary power to an item:"
+	local txt=Game.ItemsTxt
+	txt[1061].Notes="This Eye allows to add a Special enchant to any equipment that has already 2 base enchants\n(right-click on an item with a base enchant to use)"
+	txt[1062].Notes="This Hourglass allows to add a second base enchant to any equipment that has 1 base and a special enchant\n(right-click on an item with a base enchant to use)"
+	txt[1066].Notes="The Pearl of Memory is a mystical item valued for its power to erase one random enchant from any enchanted item."
+	txt[1067].Notes="Oracle's Orb is a mysterious and powerful artifact, a large, purple orb with a haunting face suspended within its core. This enigmatic relic is known for storing legendary abilities upon items it enchants.\n\n Adds the following legendary power to an item:"
+	for i=1, #names do
+		txt[i+1040].Picture=names[i]
+		txt[i+1040].Name=descNames[i]
+	end
+	txt[1068].Name="Celestial Orb"
+	Game.ItemsTxt[1068].NotIdentifiedName="Crafting Item"
 end
 
 
