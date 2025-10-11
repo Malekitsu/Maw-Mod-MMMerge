@@ -293,7 +293,7 @@ function events.PlayerAttacked(t)
 	if t.Attacker and t.Attacker.Monster then
 		local mon=t.Attacker.Monster
 		local lvl=getMonsterLevel(mon)
-		local nerfAmount=math.max(1,lvl/255)
+		nerfAmount=math.max(1,lvl/255)
 		if t.Attacker.MonsterAction==0 then
 			ac=t.Player:GetArmorClass()
 			if t.Attacker.Monster.Attack1.Type~=4 then
