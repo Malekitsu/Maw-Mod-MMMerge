@@ -70,22 +70,35 @@ Pot Id	Item Id	Required mastery	Drinkable	Usable	Notes
 68	288	4	-	-	Pure Mind Resistance
 69	289	4	-	-	Pure Body Resistance
 70	290	3	-	-	Protection from Magic
-71	1051	0	-	x	Moonstone
-72	1052	0	-	x	Topaz
-73	1053	0	-	x	Amethyst
-74	1054	0	-	x	Emerald
-75	1055	0	-	x	Purple Topaz
-76	1056	0	-	x	Ruby
-77	1057	0	-	x	Sunstone
-78	1058	0	-	x	Emerald
-79	1059	0	-	x	Sapphire
-80	1060	0	-	x	Diamond
-81	1061	0	-	x	The Third Eye
-82	1062	0	-	x	Hourglass of Time
-83	1063	0	-	x	Control Cube
-84	1064	0	-	x	Enchanted Amulet
-85	1065	0	-	x	Emerald
-86	1066	0	-	x	Enchanted Amulet
-87	1067	0	-	x	Enchanted Amulet
-88	1068	0	-	x	Enchanted Amulet
-89	1069	0	-	x	Enchanted Amulet
+71	1041	0	-	x	Moonstone
+72	1042	0	-	x	Topaz
+73	1043	0	-	x	Amethyst
+74	1044	0	-	x	Emerald
+75	1045	0	-	x	Purple Topaz
+76	1046	0	-	x	Ruby
+77	1047	0	-	x	Sunstone
+78	1048	0	-	x	Emerald
+79	1049	0	-	x	Sapphire
+80	1050	0	-	x	Diamond
+81	1051	0	-	x	Moonstone
+82	1052	0	-	x	Topaz
+83	1053	0	-	x	Amethyst
+84	1054	0	-	x	Emerald
+85	1055	0	-	x	Purple Topaz
+86	1056	0	-	x	Ruby
+87	1057	0	-	x	Sunstone
+88	1058	0	-	x	Emerald
+89	1059	0	-	x	Sapphire
+90	1060	0	-	x	Diamond
+91	1061	0	-	x	The Third Eye
+92	1062	0	-	x	Hourglass of Time
+93	1063	0	-	x	Control Cube
+94	1064	0	-	x	Enchanted Amulet
+95	1065	0	-	x	Emerald
+96	1066	0	-	x	Enchanted Amulet
+97	1067	0	-	x	Enchanted Amulet
+98	1068	0	-	x	Enchanted Amulet
+99	1069	0	-	x	Enchanted Amulet
+100	1067	0	-	x	Enchanted Amulet
+101	1068	0	-	x	Enchanted Amulet
+102	1069	0	-	x	Enchanted Amulet
