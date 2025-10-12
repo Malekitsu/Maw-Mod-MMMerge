@@ -2149,8 +2149,8 @@ function events.GameInitialized2()
 	Game.ItemsTxt[1275].Name="Greater Heal"
 	Game.ItemsTxt[1989].Name="Greater Heal"
 	--add crafting material price
-	for i=1,10 do
-		Game.ItemsTxt[1050+i].Value=i*1000
+	for i=1,20 do
+		Game.ItemsTxt[1040+i].Value=i*1000
 	end
 	Game.ItemsTxt[1061].Value=30000
 	Game.ItemsTxt[1062].Value=20000
@@ -2159,6 +2159,7 @@ function events.GameInitialized2()
 	Game.ItemsTxt[1065].Value=60000
 	Game.ItemsTxt[1066].Value=25000
 	Game.ItemsTxt[1067].Value=80000
+	Game.ItemsTxt[1068].Value=200000
 	
 	for i=0,8 do
 		for j=1,11 do
