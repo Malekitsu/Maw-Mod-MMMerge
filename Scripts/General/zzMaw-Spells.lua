@@ -758,152 +758,186 @@ function randomizeHP()
 	end
 end
 
--- TODO: test very negative amounts (like -50000), they asserted previously
-function doSharedLife(amount, spellQueueData)
-	local partyHP=0
-	for i=0,Party.High do
-		if Party[i].Dead==0 and Party[i].Eradicated==0 then
-			partyHP=partyHP+Party[i].HP
-		end
-	end
-	
-	
-	spellQueueData = spellQueueData or {}
-	-- for each iteration, try to top up lowest HP deficit party member, increasing others' HP along the way
-	local function shouldParticipate(pl)
-		if pl.Dead ~= 0 or pl.Eradicated ~= 0 or pl.Stoned ~= 0 then
-			return false
-		end
-		if pl.HP<0 then
-			return totalHP+pl.HP>0
-		end
-		return true
-	end
-	
-	--calculate total HP
-	totalHP=0
-	for i=0,Party.High do
-		if Party[i].HP>0 then
-			totalHP=totalHP+Party[i].HP
-		end
-	end
-	
-	local activePlayers = {}
-	local fullHPs = {}
-	amount = amount or 0
-	
-	--skill scaling
-	local id=Game.CurrentPlayer
-	if id>=0 and id<=Party.High then
-		local pl=Party[id]
 
-		local s,m
-		if spellQueueData.FromScroll then
-			s,m = spellQueueData.Skill, spellQueueData.Mastery
-		else -- could simply always use table data if it's provided, but this code gets player by CurrentPlayer, not by queue data, so leaving it for now to not change behavior unintentionally
-			s,m = SplitSkill(pl:GetSkill(const.Skills.Spirit))
-		end
-		local healingAmount=0
-		--remove base bonus
-		if m==3 then
-			healingAmount=healingAmount-s*3
-		elseif m==4 then
-			healingAmount=healingAmount-s*4
-		end
-		
-		local sp=healingSpells[54]
-		local baseHeal=sp.Base[m]+sp.Scaling[m]*s/2
-		
-		local mult, gotCrit=getHealSpellMultiPlier(pl)
-		
-		totHeal=baseHeal*mult
-
-		if gotCrit then
-			Game.ShowStatusText(string.format("Shared Life heals for " .. round(totHeal*2) .. " Hit points(crit)"))
-		else
-			Game.ShowStatusText(string.format("Shared Life heals for " .. round(totHeal*2) .. " Hit points"))
-		end
-		amount=amount+totHeal-healingAmount
-		
+local function shouldParticipate(pl)
+	if pl.Dead ~= 0 or pl.Eradicated ~= 0 or pl.Stoned ~= 0 then
+		return false
 	end
-	
-	for i, pl in Party do
-		if shouldParticipate(pl) then
-			table.insert(activePlayers, pl)
-			fullHPs[pl:GetIndex()] = GetMaxHP(pl)
-			amount = amount + pl.HP
-			pl.HP = 0
-		end
+	if pl.HP<=0 then
+		return false
 	end
-	local affectedPlayers = table.copy(activePlayers)
-	local pool = amount
-	local steps = 0
-	while amount > 0 and #activePlayers > 0 do
-		steps = steps + 1
-		local minDeficit = math.huge
-		for i, pl in ipairs(activePlayers) do
-			local def = fullHPs[pl:GetIndex()] - pl.HP
-			if def > 0 then
-				minDeficit = min(minDeficit, def)
-			end
-		end
-
-		local part = minDeficit
-		if minDeficit * #activePlayers > amount then
-			part = amount:div(#activePlayers)
-		end
-
-		amount = amount - part * #activePlayers
-
-		local newPlayers = {}
-		for i, pl in ipairs(activePlayers) do
-			pl.HP = pl.HP + part
-			if part == 0 and amount > 0 then
-				pl.HP = pl.HP + 1
-				amount = amount - 1
-			end
-			if pl.HP ~= fullHPs[pl:GetIndex()] then
-				table.insert(newPlayers, pl)
-			end
-		end
-		activePlayers = newPlayers
-	end
-	local result = 0
-	local everyoneFull = true
-	for i, pl in ipairs(affectedPlayers) do
-		result = result + pl.HP
-		if pl.HP > 0 then
-			pl.Unconscious = 0
-		end
-		if pl.HP ~= GetMaxHP(pl) then
-			everyoneFull = false
-		end
-	end
-	
-	local partyHP2=0
-	for i=0,Party.High do
-		if Party[i].Dead==0 and Party[i].Eradicated==0 then
-			partyHP2=partyHP2+Party[i].HP
-		end
-	end
-	if id>=0 and id<=Party.High then
-		id=Party[id]:GetIndex()
-		if partyHP2>partyHP and (Party.EnemyDetectorRed or Party.EnemyDetectorYellow) then	
-			local healing=partyHP2-partyHP
-			local id=pl:GetIndex()
-			vars.healingDone=vars.healingDone or {}
-			vars.healingDone[id]=vars.healingDone[id] or 0
-			vars.healingDone[id]=vars.healingDone[id] + healing
-			mapvars.healingDone=mapvars.healingDone or {}
-			mapvars.healingDone[id]=mapvars.healingDone[id] or 0
-			mapvars.healingDone[id]=mapvars.healingDone[id] + healing
-		end
-	end
-	--assert((pool == result) or everyoneFull, format("Pool %d, result %d, everyoneFull: %s", pool, result, everyoneFull))
-	--printf("Steps: %d", steps)
-	return affectedPlayers
-	--debug.Message(format("%d HP left", amount))
+	return true
 end
+local function canParticipate(pl)
+	if pl.Dead ~= 0 or pl.Eradicated ~= 0 or pl.Stoned ~= 0 then
+		return false
+	end
+	return true
+end
+
+function doSharedLife(amount, spellQueueData)
+	-- Calculate initial party HP for statistics tracking
+	local initialPartyHP=0
+	for i=0,Party.High do
+		if canParticipate(Party[i]) then
+			initialPartyHP=initialPartyHP+Party[i].HP
+		end
+	end
+	
+	local pl=spellQueueData.Caster
+	local castedByPlayer=false
+	local s,m
+	if spellQueueData.FromScroll then
+		s,m = spellQueueData.Skill, spellQueueData.Mastery
+		castedByPlayer=false
+	else -- could simply always use table data if it's provided, but this code gets player by CurrentPlayer, not by queue data, so leaving it for now to not change behavior unintentionally
+		s,m = SplitSkill(pl:GetSkill(const.Skills.Spirit))
+		castedByPlayer=true
+	end
+	local totHeal=healingSpells[54].Base[m]+healingSpells[54].Scaling[m]*s/2
+	local gotCrit=false
+	local mult=1
+	if castedByPlayer then
+		mult, gotCrit=getHealSpellMultiPlier(pl)
+		totHeal=totHeal*mult
+	end		
+	if m==3 then
+		totHeal=totHeal-s*3
+	elseif m==4 then
+		totHeal=totHeal-s*4
+	end
+	totHeal=math.max(totHeal, 0)
+	
+	if gotCrit then
+		Game.ShowStatusText(string.format("Shared Life heals for " .. round(totHeal) .. " Hit points(crit)"))
+	else
+		Game.ShowStatusText(string.format("Shared Life heals for " .. round(totHeal) .. " Hit points"))
+	end
+	--calculate total HP and determine which players can safely participate
+	local fullHPs = {}	
+	local sortedParty = {}
+	for i=0,Party.High do
+		if canParticipate(Party[i]) then
+			table.insert(sortedParty, {player=Party[i], index=i, hp=Party[i].HP})
+		end
+		fullHPs[i]=GetMaxHP(Party[i])
+	end
+	-- Sort from highest to lowest HP
+	table.sort(sortedParty, function(a, b) return a.hp > b.hp end)
+	
+	-- Add players from highest to lowest, stop if total would go below 0
+	local participatingPlayers = {}
+	local totalHP = totHeal
+	for i, entry in ipairs(sortedParty) do
+		local potentialTotal = totalHP + entry.hp
+		if potentialTotal >= 0 then
+			table.insert(participatingPlayers, entry)
+			totalHP = potentialTotal
+		else
+			-- Stop adding players to prevent game over
+			break
+		end
+	end
+
+	local healToDistribute = totalHP
+	
+	-- Set participating players' HP to 0 and prepare for redistribution
+	for i, entry in ipairs(participatingPlayers) do
+		entry.player.HP = 0
+	end
+	
+	-- Distribute healing to participating players with overhealing redistribution
+	if #participatingPlayers > 0 then
+		local remaining = healToDistribute
+		local maxIterations = 1000 -- Safety limit to prevent infinite loops
+		local iterations = 0
+		
+		while remaining > 0 and iterations < maxIterations do
+			iterations = iterations + 1
+			local activePlayers = {}
+			local minDeficit = math.huge
+			
+			-- Find players who still need healing
+			for i, entry in ipairs(participatingPlayers) do
+				local maxHP = fullHPs[entry.index]
+				local deficit = maxHP - entry.player.HP
+				if deficit > 0 then
+					table.insert(activePlayers, entry)
+					minDeficit = math.min(minDeficit, deficit)
+				end
+			end
+			
+			-- All players at full HP, stop
+			if #activePlayers == 0 then break end
+			
+			-- Calculate how much to give each player this iteration
+			local portion = math.min(minDeficit, math.floor(remaining / #activePlayers))
+			if portion == 0 and remaining > 0 then
+				portion = 1
+			end
+			
+			-- Distribute the portion, collecting any overheal
+			local distributed = 0
+			for i, entry in ipairs(activePlayers) do
+				local maxHP = fullHPs[entry.index]
+				local deficit = maxHP - entry.player.HP
+				local toGive = math.min(portion, deficit, remaining - distributed)
+				
+				if toGive > 0 then
+					entry.player.HP = entry.player.HP + toGive
+					distributed = distributed + toGive
+					
+					-- If player is now at full HP, any excess goes to others
+					if entry.player.HP >= maxHP then
+						entry.player.HP = maxHP
+					end
+				end
+			end
+			
+			remaining = remaining - distributed
+			
+			if distributed == 0 then break end
+		end
+	end
+	
+	-- Wake up unconscious players who now have positive HP
+	for i, entry in ipairs(participatingPlayers) do
+		if entry.player.HP > 0 then
+			entry.player.Unconscious = 0
+		end
+	end
+	
+	-- Calculate final party HP and track actual healing done for statistics
+	local finalPartyHP=0
+	for i=0,Party.High do
+		if canParticipate(Party[i]) then
+			finalPartyHP=finalPartyHP+Party[i].HP
+		end
+	end
+	
+	if castedByPlayer then
+		if (Party.EnemyDetectorRed or Party.EnemyDetectorYellow) then	
+			local actualHealing=finalPartyHP-initialPartyHP
+			if actualHealing > 0 then
+				local id=pl:GetIndex()
+				vars.healingDone=vars.healingDone or {}
+				vars.healingDone[id]=vars.healingDone[id] or 0
+				vars.healingDone[id]=vars.healingDone[id] + actualHealing
+				mapvars.healingDone=mapvars.healingDone or {}
+				mapvars.healingDone[id]=mapvars.healingDone[id] or 0
+				mapvars.healingDone[id]=mapvars.healingDone[id] + actualHealing
+			end
+		end
+	end
+	
+	-- Return list of affected player objects
+	local affectedPlayers = {}
+	for i, entry in ipairs(participatingPlayers) do
+		table.insert(affectedPlayers, entry.player)
+	end
+	return affectedPlayers
+end
+
 
 -- replace shared life code with my own
 autohook(0x42A171, function(d)
