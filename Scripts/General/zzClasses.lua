@@ -1120,12 +1120,12 @@ local DKManaCost={
 }
 
 local DKDamageMult={
-	[26]=0.8,
-	[29]=1.2,
-	[32]=0.5,
-	[74]=1.2,
-	[90]=1,
-	[97]=0.4,
+	[26]={1,1,1.2,1.2},
+	[29]={1.5,1.5,1.5,2},
+	[32]={0.75,0.75,0.75,0.75},
+	[76]={1.1,1.1,1.1,1.4},
+	[90]={1,1.3,1.3,1.3},
+	[97]={0.6,0.6,0.6,0.6},
 }
 
 --spells
@@ -1391,24 +1391,31 @@ function dkSkills(isDK, id)
 				Game.Spells[key]["SpellPoints" .. masteryName[i]]=value
 			end
 		end
+		
+		-- Spell 26: Icy Touch
+		local mult26 = DKDamageMult[26]
 		Game.SpellsTxt[26].Name="Icy Touch"
-		Game.SpellsTxt[26].Description="This spell is exclusive to Death Knights and deals damage equal to 80% of current weapon damage."
-		Game.SpellsTxt[26].Normal="No additional effects"
+		Game.SpellsTxt[26].Description="This spell is exclusive to Death Knights and deals damage equal to " .. (mult26[1]*100) .. "% of current weapon damage."
+		Game.SpellsTxt[26].Normal="Deals damage equal to " .. (mult26[1]*100) .. "% of Melee damage"
 		Game.SpellsTxt[26].Expert="Monster slows by 1/2 of speed"
-		Game.SpellsTxt[26].Master="Increases total damage by 1% per spell skill"
+		Game.SpellsTxt[26].Master="Damage Increased to " .. (mult26[3]*100) .. "%"
 		Game.SpellsTxt[26].GM="Monster slows by 1/4 of speed"
 		
+		-- Spell 29: Frostbite
+		local mult29 = DKDamageMult[29]
 		Game.SpellsTxt[29].Name="Frostbite"
-		Game.SpellsTxt[29].Description="This is the strongest single damage spell available to death knights and deals damage equal to 120% of current weapon damage."
+		Game.SpellsTxt[29].Description="This is the strongest single damage spell available to death knights and deals damage equal to " .. (mult29[1]*100) .. "% of current weapon damage."
 		Game.SpellsTxt[29].Expert="n/a"
-		Game.SpellsTxt[29].Master="No additional effects"
-		Game.SpellsTxt[29].GM="Increases total damage by 1% per spell skill"
+		Game.SpellsTxt[29].Master="Deals damage equal to " .. (mult29[3]*100) .. "% of Melee damage"
+		Game.SpellsTxt[29].GM="Deals damage equal to " .. (mult29[4]*100) .. "% of Melee damage"
 		
+		-- Spell 32: Ice Bomb
+		local mult32 = DKDamageMult[32]
 		Game.SpellsTxt[32].Name="Ice Bomb"
-		Game.SpellsTxt[32].Description="Throw an ice bomb that shatters upon hitting something, most effective versus big foes or multiple enemies.\nDeals damage equal to 50% of current weapon damage."
+		Game.SpellsTxt[32].Description="Throw an ice bomb that shatters upon hitting something, most effective versus big foes or multiple enemies.\nDeals damage equal to " .. (mult32[1]*100) .. "% of current weapon damage."
 		Game.SpellsTxt[32].Expert="n/a"
 		Game.SpellsTxt[32].Master="n/a"
-		Game.SpellsTxt[32].GM="Increases total damage by 1% per spell skill"
+		Game.SpellsTxt[32].GM="Each hit deals damage equal to " .. (mult32[4]*100) .. "% of Melee damage"
 		
 		
 		
@@ -1424,21 +1431,26 @@ function dkSkills(isDK, id)
 		Game.SpellsTxt[68].Master="Leeches " .. round(leech * 1.75) .. " Hit Points"
 		Game.SpellsTxt[68].GM="Leeches " .. round(leech * 2) .. " Hit Points"
 		
+		-- Spell 74: Superior Blood Leech
 		Game.SpellsTxt[74].Name="Superior Blood Leech"
 		Game.SpellsTxt[74].Description="Activating this spell imbues the knight essence with blood, leeching a superior amount of life upon attacking at the cost of 12 spell points."
 		Game.SpellsTxt[74].Master="n/a"
 		Game.SpellsTxt[74].GM="Leeches " .. round(leech * 4) .. " Hit Points"
 		
+		-- Spell 76: Asphyxiate (no entry in DKDamageMult, but description mentions 110% and 140%)
+		local mult76= DKDamageMult[76]
 		Game.SpellsTxt[76].Name="Asphyxiate"
-		Game.SpellsTxt[76].Description="Asphyxiate the target deal damage equal to 120% and making him unable to act for 2 seconds"
+		Game.SpellsTxt[76].Description="Asphyxiate the target deal damage equal to " .. (mult76[3]*100) .. "% and making him unable to act for 2 seconds"
 		Game.SpellsTxt[76].Master="No additional effects"
-		Game.SpellsTxt[76].GM="Damage increased to 200%"
+		Game.SpellsTxt[76].GM="Damage increased to " .. (mult76[4]*100) .. "%"
 		
+		-- Spell 90: Death Coil
+		local mult90 = DKDamageMult[90]
 		Game.SpellsTxt[90].Name="Death Coil"
-		Game.SpellsTxt[90].Description="A deadly spell capable to heal the caster upon hitting the target by an amount equal to the unholy skill bonus. Deals damage equal to 100% of the base weapon damage"
+		Game.SpellsTxt[90].Description="A deadly spell capable to heal the caster upon hitting the target by an amount equal to the unholy skill bonus. Deals damage equal to " .. (mult90[1]*100) .. "% of the base weapon damage"
 		Game.SpellsTxt[90].Expert="No additional effects"
-		Game.SpellsTxt[90].Master="Heal increased by 50%"
-		Game.SpellsTxt[90].GM="Heal increased by 100%"
+		Game.SpellsTxt[90].Master="Damage increased to " .. (mult90[3]*100) .. "%"
+		Game.SpellsTxt[90].GM="Damage increased to " .. (mult90[4]*100) .. "%"
 		
 		Game.SpellsTxt[96].Name="Death Grasp"
 		Game.SpellsTxt[96].Description="Activating this spell imbues the knight body with dark powers, empairing oppenents powers (damage halved) upon attacking 15 spell points."
@@ -1446,11 +1458,13 @@ function dkSkills(isDK, id)
 		Game.SpellsTxt[96].Master="No additional effects"
 		Game.SpellsTxt[96].GM="Monster looses the ability to deal ranged damage"
 		
+		-- Spell 97: Death Breath
+		local mult97 = DKDamageMult[97]
 		Game.SpellsTxt[97].Name="Death Breath"
-		Game.SpellsTxt[97].Description="A lethal explosion dealing huge damage to all monsters in the area. Can be used safely also in close combat.\nDeals damage equal to 40% of weapon damage"
+		Game.SpellsTxt[97].Description="A lethal explosion dealing huge damage to all monsters in the area. Can be used safely also in close combat.\nDeals damage equal to " .. (mult97[1]*100) .. "% of weapon damage"
 		Game.SpellsTxt[97].Expert="n/a"
 		Game.SpellsTxt[97].Master="n/a"
-		Game.SpellsTxt[97].GM="Increases total damage by 1% per spell skill"
+		Game.SpellsTxt[97].GM="This spell is as good as it will ever be!"
 		
 		--skill names and desc
 		
