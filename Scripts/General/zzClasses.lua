@@ -1176,7 +1176,7 @@ function events.GameInitialized2()
 				end
 				
 				local res=t.Monster.Resistances[t.DamageKind] or t.Monster.Resistances[4]
-				damage=damage/2^(res/100)
+				damage=damage/2^(res%1000/100)
 				local mult=damageMultiplier[t.PlayerIndex]["Melee"]
 				t.Result=damage*mult
 				
@@ -1997,8 +1997,9 @@ function events.GameInitialized2()
 				
 				local res=t.Monster.Resistances[t.DamageKind] or t.Monster.Resistances[4]
 				damage=damage/2^(res%1000/100)
+				local mult=damageMultiplier[t.PlayerIndex]["Melee"]
+				t.Result=damage*mult
 				
-				t.Result=t.Result
 				if pl.Weak>0 then
 					t.Result=t.Result*0.5
 				end
