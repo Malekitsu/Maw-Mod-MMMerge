@@ -1120,12 +1120,12 @@ local DKManaCost={
 }
 
 local DKDamageMult={
-	[26]={1,1,1.2,1.2},
-	[29]={1.5,1.5,1.5,2},
-	[32]={0.75,0.75,0.75,0.75},
-	[76]={1.1,1.1,1.1,1.4},
-	[90]={1,1.3,1.3,1.3},
-	[97]={0.6,0.6,0.6,0.6},
+	[26]={1,1,1.2,1.2,["Skill"]=14},
+	[29]={1.5,1.5,1.5,2,["Skill"]=14},
+	[32]={0.75,0.75,0.75,0.75,["Skill"]=14},
+	[76]={1.1,1.1,1.1,1.4,["Skill"]=18},
+	[90]={1,1.3,1.3,1.3,["Skill"]=20},
+	[97]={0.6,0.6,0.6,0.6,["Skill"]=20},
 }
 
 --spells
@@ -1185,23 +1185,10 @@ function events.GameInitialized2()
 				end
 				
 				--add spell modifier
-				if data.Object.Spell==26 or data.Object.Spell==29 then
-					local s,m=SplitSkill(pl.Skills[const.Skills.Water])
-					if m>=3 then
-						t.Result=t.Result*(1+s/100)
-					end
-				elseif data.Object.Spell==97 then
-					local s,m=SplitSkill(pl.Skills[const.Skills.Dark])
-					t.Result=t.Result*(1+s/100)
-				end
-				if DKDamageMult[data.Object.Spell] then
-					t.Result=t.Result*DKDamageMult[data.Object.Spell]
-					if data.Object.Spell==76 then
-						local s,m=SplitSkill(pl.Skills[const.Skills.Body])
-						if m==4 then
-							t.Result=t.Result/3*4
-						end
-					end
+				local spell=data.Object.Spell
+				if DKDamageMult[spell] then
+					local s,m=SplitSkill(pl.Skills[DKDamageMult[spell].Skill])
+					t.Result=t.Result*DKDamageMult[spell][m]
 				end
 			end
 			--life leech
