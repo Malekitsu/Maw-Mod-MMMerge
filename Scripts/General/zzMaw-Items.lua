@@ -658,7 +658,7 @@ function events.ItemGenerated(t)
 		roll2=math.random()
 		rollSpc=math.random()
 		power=0
-		lootMultiplier
+		
 		if bossLoot then
 			roll1=roll1/2
 			roll2=roll1/2
