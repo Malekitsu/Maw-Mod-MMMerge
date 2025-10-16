@@ -3881,4 +3881,13 @@ function events.GameInitialized2()
 		end
 	end
 end
-			
+
+function events.CanCastTownPortal(t)
+	if vars.madnessMode and (Party.EnemyDetectorYellow or Party.EnemyDetectorRed) then
+		t.CanCast=false
+		function events.Tick() 
+			events.Remove("Tick", 1)
+			Game.ShowStatusText("Madness is not a place for cowards")
+		end
+	end
+end
