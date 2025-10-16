@@ -141,7 +141,7 @@ function events.CalcDamageToMonster(t)
 				end
 			end
 		end
-		t.Result=t.Result*mult
+		t.Result=t.Result*math.min(mult,2)
 	end
 	--end of [17]
 	if t.Player then
@@ -246,7 +246,7 @@ function events.CalcDamageToPlayer(t)
 				end
 			end
 		end
-		t.Result=t.Result*0.97^count
+		t.Result=t.Result*math.max(0.97^count,0.5)
 	end
 	
 	local pl = t.Player
