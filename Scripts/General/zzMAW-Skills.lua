@@ -2044,7 +2044,7 @@ function events.Tick()
 		local s, m= SplitSkill(Skillz.get(pl, 51))
 		local efficiency=round((1+s^1.4/60)*100)/100
 		if s > 50 then 
-			efficiency=round((1+50^1.4/60)*100)/100*s/50
+			efficiency=round((1+50^1.4/60)*100*s/50)/100
 		end
 		local txt="Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n" .. "Current Damage reduction per Mana: " .. StrColor(178,255,255, efficiency) .. "\n\nPress M to enable/disable"
 		if vars.insanityMode then
