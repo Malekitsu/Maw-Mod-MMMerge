@@ -1148,6 +1148,14 @@ function events.MonsterKilled(mon)
 	if mon.NameId>=220 and mon.NameId <300 then
 		extraRoll=extraRoll*10
 	end
+	local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+	if skill=="Broodling" then
+		local tier=(mon.Id-1)%3+1
+		extraRoll=extraRoll/(5-tier)
+	end
+	--densityMult
+	local densityMult=GetDensityMultiplier(mon.Id)
+	extraRoll=extraRoll*densityMult
 	if Multiplayer and Multiplayer.client_monsters()[0] then
 		bonusRoll=bonusRoll/(1+#Multiplayer.client_monsters())
 	end
