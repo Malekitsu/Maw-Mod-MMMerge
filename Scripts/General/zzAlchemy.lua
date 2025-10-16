@@ -1192,12 +1192,10 @@ function events.MonsterKilled(mon)
 		crafMaterialNumber=1040+craftStrength
 	end	
 	if baseCraftDrop then
-		obj = SummonItem(crafMaterialNumber, mon.X, mon.Y, mon.Z + 100, 100)
-		if obj then
-			obj.Item.Charges=1
-			if ascendedGem then
-				obj.Item.BonusStrength=1
-			end
+		if table.find(waterMonsters, mon.Id) then
+			evt.Add("Items", crafMaterialNumber)
+		else
+			obj = SummonItem(crafMaterialNumber, mon.X, mon.Y, mon.Z + 100, 100)
 		end
 	end
 	--pick special drop with pity protection
