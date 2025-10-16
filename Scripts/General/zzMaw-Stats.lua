@@ -1970,7 +1970,7 @@ function GetDensityMultiplier(id)
 	local baseLevel=BLevel[id]
 	local newDensity=math.max(density-math.floor(baseLevel/divisor),1)
 	local mult=density/newDensity
-	health=health*mult
+	return mult
 end
 
 --[[ test code, don't touch
