@@ -2713,7 +2713,9 @@ function checkMapCompletition()
 				if vars.madnessMode then
 					experience=math.ceil(totalMonster^0.7*(bolster*20+bolster^1.8)/3/1000)*1000
 					if not mapvars.mapAffixes then
-						experience=experience*3
+						experience=experience*2
+					else
+						experience=experience*0.5
 					end
 				end
 				--bolster code
