@@ -3882,7 +3882,7 @@ function events.GameInitialized2()
 			end
 		end
 	end
-	--[[
+	
 	--unidentified books
 	txt[971].Picture="sbfireu"
 	txt[972].Picture="sbairu"
@@ -3893,13 +3893,52 @@ function events.GameInitialized2()
 	txt[977].Picture="sbbodyu"
 	txt[978].Picture="sblightu"
 	txt[979].Picture="sbdarku"
-	]]
+	txt[971].Name="Fire Magic Book"
+	txt[972].Name="Air Magic Book"
+	txt[973].Name="Water Magic Book"
+	txt[974].Name="Earth Magic Book"
+	txt[975].Name="Spirit Magic Book"
+	txt[976].Name="Mind Magic Book"
+	txt[977].Name="Body Magic Book"
+	txt[978].Name="Light Magic Book"
+	txt[979].Name="Dark Magic Book"
+	txt[971].Notes="A scorched grimoire that radiates gentle heat; a heat-seal brands the cover, and the pages grow too hot to hold unless you're versed in Fire."
+	txt[972].Notes="Feather-light pages hum with static; a whirling air-sigil scatters the lines to the wind, settling only for one trained in Air."
+	txt[973].Notes="Damp vellum where ink ripples like tides; a water-ward dissolves every character into droplets unless a Water adept calls them back."
+	txt[974].Notes="Heavy as quarried rock, grit packed in the spine; a stone-seal weighs the script down, rising into legible relief for those attuned to Earth."
+	txt[975].Notes="A calm glow lingers between the leaves; a spirit-binding sigil veils the prayers, and they fade to silence without skill in Spirit."
+	txt[976].Notes="Margins of tight glyphs that reorder themselves; a thought-lock scrambles the text into riddles unless a Mind disciple aligns it."
+	txt[977].Notes="Thick, herb-scented vellum warm to the pulse; a vigor-ward stiffens the pages, relaxing only for the steady hands of Body practitioners."
+	txt[978].Notes="A pale radiance seeps through the cover; a sun-seal flares too bright to read, dimming into clarity for those trained in Light."
+	txt[979].Notes="Ink like pooled night that drinks the torchglow; a shadow-ward devours the lines, revealing them only to readers skilled in Dark."
+
+
 end
---[[
+
+local mastery={"Novice","Expert","Master","Grandmaster"}
 function events.BuildItemInformationBox(t)
 	local it=t.Item
 	if it.Number>=971 and it.Number<980 then
-		it.Number=it.BonusStrength
+		local identify=Game.ItemsTxt[it.BonusStrength].IdRepSt
+		local m=1
+		if identify>=15 then
+			m=4
+		elseif identify>=10 then
+			m=3
+		elseif identify>=5 then
+			m=2
+		end
+		local id=Game.CurrentPlayer
+		if id<0 or id>Party.High then return end
+		local pl=Party[Game.CurrentPlayer]
+		local s2,m2=SplitSkill(pl.Skills[t.Item.Number-959])
+		if m2>=m then
+			it.Number=it.BonusStrength
+		end
+		if t.Description then
+			local name=Skillz.getName(t.Item.Number-959)
+			t.Description=t.Description .. StrColor(255,0,0, "\n\nYou need at least " .. mastery[m] .. " skill in " ..  name .. " to open the book")
+		end
 	end
 end
 
@@ -3921,7 +3960,7 @@ function events.ItemGenerated(t)
 		it.Number=970+school
 	end
 end
-]]
+
 function events.CanCastTownPortal(t)
 	if vars.madnessMode and (Party.EnemyDetectorYellow or Party.EnemyDetectorRed) then
 		t.CanCast=false
@@ -3931,4 +3970,3 @@ function events.CanCastTownPortal(t)
 		end
 	end
 end
-
