@@ -1292,7 +1292,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		if getMapAffixPower(28) then
 			AC=AC*(1-getMapAffixPower(28)/100)
 		end
-		local divider=math.min(90+monLvl*0.75*bolster,600*bolster)
+		local divider=math.min(90+monLvl*0.25*bolster)
 		local reduction=AC/divider+1
 		local damage=round(damage/reduction)
 		
@@ -1383,7 +1383,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		end
 		
 		-- Calculate the effective resistance using the proper formula
-		local divider=math.min(60+monLvl*0.5*bolster,400*bolster)
+		local divider=math.min(60+monLvl*0.5*bolster)
 		local reduction=totalRes/divider+1
 		local effectiveRes=1/reduction* itemResMultiplier
 		
@@ -1719,7 +1719,7 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 		bolster=3
 	end
 	
-	local divider=math.min(90+lvl*0.75*bolster,600*bolster)
+	local divider=math.min(90+lvl*0.25*bolster)
 	local armorReduction=armorClass/divider+1
 	local nerfAmount=math.max(1,lvl/255)
 	local blockAC=armorClass/(math.max(Game.BolsterAmount/100,1)*nerfAmount)
@@ -1728,7 +1728,7 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 	
 	local resistances=armorClass*2/3
 	
-	local divider=math.min(60+lvl*0.75*bolster,400*bolster)
+	local divider=math.min(60+lvl*0.5*bolster)
 	local resReduction=resistances/divider+1
 	local shieldBuff=math.max((1-0.006*lvl^0.65),0.7) --starts with no shield gradually into max res at ~400 lvl
 	resReduction=resReduction/shieldBuff
