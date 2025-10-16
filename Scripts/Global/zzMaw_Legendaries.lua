@@ -264,7 +264,7 @@ function events.CalcDamageToPlayer(t)
 		m3=SplitSkill(pl.Skills[const.Skills.Spirit])
 		local lvl=getTotalLevel()
 		local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
-		local reduction=round(getMonsterDamage(false,(lvl+1))*(m3/lvl^0.65)/avgRed/2) --on average 1/2 of a B monster
+		local reduction=round(getMonsterDamage(false,(lvl+1))*(m3/lvl^0.65)/avgRed/2*0.99^(lvl^0.65)) --on average 1/2 of a B monster
 		t.Result=math.max(t.Result-reduction, t.Result*0.25)
 	end
 	
