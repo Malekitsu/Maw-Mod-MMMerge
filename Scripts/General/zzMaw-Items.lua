@@ -1598,7 +1598,7 @@ function events.BuildItemInformationBox(t)
 							end
 						end
 					end
-					local dmg=count*5
+					local dmg=math.min(count*5,100)
 					legText=legText .. "\nCurrent bonus Damage: " .. dmg .. "%"
 				elseif t.Item.BonusExpireTime%100==22 then
 					local count=0
@@ -1610,7 +1610,7 @@ function events.BuildItemInformationBox(t)
 							end
 						end
 					end
-					local red=round((1-0.97^count)*10000)/100
+					local red=round(math.min(1-0.97^count,0.5)*10000)/100
 					legText=legText .. "\nCurrent Reduction: " .. red .. "%"
 				end
 				t.Description = StrColor(255,255,30,legText) .. "\n\n" .. t.Description
