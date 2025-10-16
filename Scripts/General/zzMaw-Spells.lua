@@ -3943,6 +3943,7 @@ function events.BuildItemInformationBox(t)
 end
 
 function events.ItemGenerated(t)
+	if disableSpellBookRework then return end
 	local it=t.Item
 	if (it.Number>=400 and it.Number<=498) then
 		it.BonusStrength=it.Number
