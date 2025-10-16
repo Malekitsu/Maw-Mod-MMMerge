@@ -1154,7 +1154,11 @@ function events.GameInitialized2()
 		local data = WhoHitMonster()
 		if data and data.Player and table.find(dkClass, data.Player.Class) then
 			local pl=data.Player
-			if data.Object and data.Object.Spell>0 and data.Object.Spell<=99 then
+			local spell=0
+			if data and data.Object.Spell then
+				spell=data.Object.Spell
+			end
+			if DKDamageMult[spell] then
 				--add physical damage to spells
 				baseDamage=pl:GetMeleeDamageMin()
 				maxDamage=pl:GetMeleeDamageMax()
@@ -1185,7 +1189,6 @@ function events.GameInitialized2()
 				end
 				
 				--add spell modifier
-				local spell=data.Object.Spell
 				if DKDamageMult[spell] then
 					local s,m=SplitSkill(pl.Skills[DKDamageMult[spell].Skill])
 					t.Result=t.Result*DKDamageMult[spell][m]
@@ -1972,7 +1975,11 @@ function events.GameInitialized2()
 		local data = WhoHitMonster()
 		if data and data.Player and table.find(assassinClass, data.Player.Class) then
 			local pl=data.Player
-			if data.Object and data.Object.Spell>0 and data.Object.Spell<=99 then
+			local spell=0
+			if data and data.Object.Spell then
+				spell=data.Object.Spell
+			end
+			if assassinSpells[spell] then
 				local baseDamage=pl:GetMeleeDamageMin()
 				local maxDamage=pl:GetMeleeDamageMax()
 				local randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
@@ -2005,7 +2012,7 @@ function events.GameInitialized2()
 					t.Result=t.Result*0.5
 				end
 				
-				if assassinSpells[data.Object.Spell].DamageMult then
+				if assassinSpells[spell].DamageMult then
 					t.Result=t.Result*assassinSpells[data.Object.Spell].DamageMult
 				end
 			end
