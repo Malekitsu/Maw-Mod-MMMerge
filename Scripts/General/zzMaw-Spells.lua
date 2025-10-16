@@ -3854,6 +3854,8 @@ function events.GameInitialized2()
 	if disableSpellBookRework then return end
 	local txt=Game.ItemsTxt
 	for i=1, 9 do
+		txt[970+i].NotIdentifiedName="Book"
+		
 		local increaser=(i-1)*11
 		local mm6increaser=(i-1)*13
 		local name="sb" .. names[i]
@@ -3879,6 +3881,44 @@ function events.GameInitialized2()
 				txt[bookStart[3]+j+mm6increaser].Picture=name .. m
 			end
 		end
+	end
+	
+	--unidentified books
+	txt[971].Picture="sbfireu"
+	txt[972].Picture="sbairu"
+	txt[973].Picture="sbwateru"
+	txt[974].Picture="sbearthu"
+	txt[975].Picture="sbspiritu"
+	txt[976].Picture="sbmindu"
+	txt[977].Picture="sbbodyu"
+	txt[978].Picture="sblightu"
+	txt[979].Picture="sbdarku"
+	
+end
+
+function events.BuildItemInformationBox(t)
+	local it=t.Item
+	if it.Number>=971 and it.Number<980 then
+		it.Number=it.BonusStrength
+	end
+end
+
+function events.ItemGenerated(t)
+	local it=t.Item
+	if (it.Number>=400 and it.Number<=498) then
+		it.BonusStrength=it.Number
+		local school=math.ceil((it.Number-399)/11)
+		it.Number=970+school
+	end
+	if (it.Number>=1202 and it.Number<=1300) then
+		it.BonusStrength=it.Number
+		local school=math.ceil((it.Number-1201)/11)
+		it.Number=970+school
+	end
+	if (it.Number>=1902 and it.Number<=2018) then
+		it.BonusStrength=it.Number
+		local school=math.ceil((it.Number-1901)/13)
+		it.Number=970+school
 	end
 end
 
