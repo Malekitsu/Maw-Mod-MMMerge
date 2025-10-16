@@ -1890,7 +1890,6 @@ function getMonsterHealth(mon, level)
 		end
 		level=mon and totalLevel[id] or level
 	end
-	hitToKillMonster=hitToKillMonster*(1+level/1000)
 	local health=getPlayerEstimatedPower(level)
 	local hits=hitToKillMonster[3] --baseline MAW
 	if vars.madnessMode then
@@ -1912,6 +1911,7 @@ function getMonsterHealth(mon, level)
 	elseif Game.BolsterAmount==40 then
 		hits=hitToKillMonster[1]
 	end
+	hits=hits*(1+level/1000)
 	
 	health=health*hits
 	
