@@ -1801,6 +1801,10 @@ function getMonsterDamage(mon, level)
 		end
 		damage=damage*mapvars.bossData[index].DamageMult
 	end
+	
+	--buff based on density
+	damage=damage*GetDensityMultiplier(mon.Id)
+	
 	return damage
 end
 
@@ -1942,7 +1946,30 @@ function getMonsterHealth(mon, level)
 		health=health*mapvars.bossData[index].HealthMult
 	end
 	
+	--buff based on density
+	health=health*GetDensityMultiplier(mon.Id)
+	
 	return health
+end
+
+function GetDensityMultiplier(id)
+	if vars.madnessMode then
+		density=7
+		divisor=10*2
+	elseif vars.insanityMode then
+		density=5
+		divisor=14*2
+	elseif vars.Mode==2 then
+		density=4
+		divisor=18*2
+	else 
+		return 1
+	end
+	
+	local baseLevel=BLevel[id]
+	local newDensity=math.max(density-math.floor(baseLevel/divisor),1)
+	local mult=density/newDensity
+	health=health*mult
 end
 
 --[[ test code, don't touch
