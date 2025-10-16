@@ -3882,7 +3882,7 @@ function events.GameInitialized2()
 			end
 		end
 	end
-	
+	--[[
 	--unidentified books
 	txt[971].Picture="sbfireu"
 	txt[972].Picture="sbairu"
@@ -3893,9 +3893,9 @@ function events.GameInitialized2()
 	txt[977].Picture="sbbodyu"
 	txt[978].Picture="sblightu"
 	txt[979].Picture="sbdarku"
-	
+	]]
 end
-
+--[[
 function events.BuildItemInformationBox(t)
 	local it=t.Item
 	if it.Number>=971 and it.Number<980 then
@@ -3921,7 +3921,7 @@ function events.ItemGenerated(t)
 		it.Number=970+school
 	end
 end
-
+]]
 function events.CanCastTownPortal(t)
 	if vars.madnessMode and (Party.EnemyDetectorYellow or Party.EnemyDetectorRed) then
 		t.CanCast=false
@@ -3931,3 +3931,4 @@ function events.CanCastTownPortal(t)
 		end
 	end
 end
+
