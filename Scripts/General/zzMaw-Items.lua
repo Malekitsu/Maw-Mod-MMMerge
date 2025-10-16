@@ -189,10 +189,11 @@ function events.PickCorpse(t)
 			end
 		end
 		
+		local densityMultiplier=GetDensityMultiplier(mon.Id)
 		-- Special handling for bosses and resurrected
 		if mon.NameId > 300 then
-			mon.TreasureItemPercent = round(mon.TreasureItemPercent / 4)
-			mon.TreasureDiceSides = math.max(round(mon.TreasureDiceSides / 4), 1)
+			mon.TreasureItemPercent = round(mon.TreasureItemPercent / 4*densityMultiplier^0.5)
+			mon.TreasureDiceSides = math.max(round(mon.TreasureDiceSides / 4*densityMultiplier^0.5), 1)
 		elseif mon.NameId > 220 or mon.NameId == 160 then
 			mon.TreasureItemPercent = 100
 			local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
@@ -228,7 +229,7 @@ function events.PickCorpse(t)
 		-- Loot filter code
 		goldBeforeLoot = Party.Gold
 		lootFromMonster = true
-		
+		lootMultiplier=densityMultiplier
 		-- Handle seed state after loot calculations
 		function events.Tick()
 			events.Remove("Tick", 1)
@@ -657,6 +658,7 @@ function events.ItemGenerated(t)
 		roll2=math.random()
 		rollSpc=math.random()
 		power=0
+		lootMultiplier
 		if bossLoot then
 			roll1=roll1/2
 			roll2=roll1/2
@@ -801,6 +803,8 @@ function events.ItemGenerated(t)
 			end
 		end			
 		
+		--loot multiplier
+		lootMultiplier=lootMultiplier or 1
 		--legendary
 		if it.BonusExpireTime==2 then
 			-- Initialize pity protection
@@ -821,7 +825,7 @@ function events.ItemGenerated(t)
 			if Game.HouseScreen==2 or Game.HouseScreen==95 then
 				baseChance=0
 			end
-			
+			baseChance=baseChance*lootMultiplier^0.5
 			-- Apply pity protection using new pity system
 			local chance = pity_chance(baseChance, vars.legendaryPityCounter)
 			
@@ -877,14 +881,14 @@ function events.ItemGenerated(t)
 				it.BonusStrength=math.min(math.ceil(it.BonusStrength*1.2),it.BonusStrength+10)
 			elseif baseChance > 0 then
 				-- Only increment pity counter if legendaries are enabled but roll failed
-				vars.legendaryPityCounter = vars.legendaryPityCounter + 1
+				vars.legendaryPityCounter = vars.legendaryPityCounter + lootMultiplier
 			end
 		end
 		--celestial
 		if it.BonusExpireTime>10 and it.BonusExpireTime<100 then
 			vars.celestialPityCounter = vars.celestialPityCounter or 0
 			
-			local baseChance = 0.1
+			local baseChance = 0.1 * lootMultiplier^0.5
 			
 			local chance = pity_chance(baseChance, vars.celestialPityCounter)
 			
@@ -892,9 +896,11 @@ function events.ItemGenerated(t)
 				it.BonusExpireTime=it.BonusExpireTime+100
 				vars.celestialPityCounter = 0
 			else
-				vars.celestialPityCounter = vars.celestialPityCounter + 1
+				vars.celestialPityCounter = vars.celestialPityCounter + lootMultiplier
 			end
 		end
+		lootMultiplier=1 --reset
+		
 		OmnipotentLoot=false
 		--buff to hp and mana items
 		if vars and not vars.itemStatsFix then
