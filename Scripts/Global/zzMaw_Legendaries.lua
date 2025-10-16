@@ -355,11 +355,10 @@ function calcManaShield(pl, damage)
 		-- Define thresholds and damage multipliers based on skill level
 		local reduction = {0.25, 0.5, 0.75, 1, [0]=0}
 		-- Calculate mana efficiency based on skill and mastery levels
-		local manaEfficiency = (1 + s^1.5 / 125 * 4)
+		local manaEfficiency = (1 + s^1.5 / 60)
 		if s > 50 then
-			manaEfficiency = (1 + 50^1.5 / 125 * 4) * s / 50
+			manaEfficiency = (1 + 50^1.5 / 60) * s / 50
 		end
-		manaEfficiency=math.min(manaEfficiency,5)
 		absorbDamage=damage*reduction[m]
 		manaCost = round(absorbDamage/manaEfficiency)
 		absorbDamage = math.min(absorbDamage,(mana*manaEfficiency))
