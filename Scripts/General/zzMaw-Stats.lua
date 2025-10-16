@@ -284,6 +284,7 @@ function getSpellDelay(pl,spell)
 	if getMapAffixPower(27) then
 		delay=delay/(1-getMapAffixPower(27)/100)
 	end
+	delay=round(delay)
 	return delay
 end
 --remove AC from hit calculation and unarmed code from misctweaks
@@ -1554,9 +1555,9 @@ function calcPowerVitality(pl, statsMenu)
 			if vars.manaShield and vars.manaShield[i] then
 				local sp=getMaxMana(pl)
 				local s, m= SplitSkill(Skillz.get(pl, 51))
-				local efficiency=round((1+s^1.4/125*4)*100)/100
+				local efficiency=round((1+s^1.4/60)*100)/100
 				if s > 50 then 
-					efficiency=round((1+50^1.4/125*4)*100)/100*s/50
+					efficiency=round((1+50^1.4/60)*100)/100*s/50
 				end
 				fullHP=fullHP+sp*efficiency
 			end
