@@ -1281,7 +1281,7 @@ end
 --TOOLTIPS--
 ------------------------------------------
 legendaryEffects={
-	[11]="Killing a monster with a single-target attack will recover your action time",
+	[11]="Killing a monster with a single-target attack halves the recovery time",
 	[12]="Might and accuracy enchantments give 40% bonus to intellect and personality. Intellect and personality enchantments give 40% bonus to might and accuracy",
 	[13]="Immunity to all status effects from monsters",
 	[14]="Crit chance increased by 10% and crit chance over 100% increases total damage",
