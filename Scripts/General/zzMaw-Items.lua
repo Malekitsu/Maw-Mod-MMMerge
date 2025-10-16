@@ -1336,6 +1336,9 @@ function updateCelestialItem(it,pl)
 		end
 		if it.Bonus>0 and it.BonusStrength>0 then
 			it.BonusStrength=math.round(tier*mult*slotMult)
+			if it.Bonus>=17 then
+				it.BonusStrength=math.round(it.BonusStrength/10)
+			end
 		end
 		if it.Charges>1000 then
 			it.Charges=math.floor(it.Charges/1000)*1000+math.min(math.round(tier*mult*slotMult),999)
