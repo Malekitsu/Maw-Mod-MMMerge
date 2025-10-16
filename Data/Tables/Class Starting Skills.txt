@@ -4,7 +4,7 @@ Sword	C	C	-	-	C	-	-	-	F	F	-	C	C	C	C	C	C	C	C	C	C	-	-	-	-	-	F	C	C	-	-	-
 Dagger	-	-	-	-	C	-	F	F	-	-	-	C	C	C	C	C	C	F	F	-	F	C	C	C	-	-	-	-	-	F	-	C
 Axe	C	C	-	-	-	-	-	-	C	C	F	-	-	C	C	F	F	-	-	C	C	-	-	-	-	-	-	F	F	-	-	-
 Spear	C	C	-	-	-	-	-	-	C	C	C	C	C	-	-	-	-	-	-	-	-	-	-	-	-	-	C	-	-	-	-	-
-Bow	F	F	-	-	F	-	-	-	C	C	-	-	-	-	-	C	C	C	C	C	-	-	-	-	C	C	-	C	C	-	C	-
+Bow	F	F	-	-	F	-	-	-	C	C	-	-	-	-	-	F	C	C	C	C	-	-	-	-	C	C	-	C	C	-	C	-
 Mace	-	-	F	F	-	-	C	C	-	-	C	-	-	F	F	-	-	-	-	F	-	-	-	-	-	-	-	-	-	C	-	-
 Blaster	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
 Shield	-	-	C	C	-	-	-	-	C	C	-	-	-	C	C	-	-	-	-	-	C	-	-	-	-	-	C	-	-	-	-	-
@@ -28,7 +28,7 @@ Merchant	-	-	C	C	C	-	-	-	-	-	-	-	-	C	C	-	-	C	C	-	-	C	-	-	-	-	C	C	C	-	-	C
 Repair	-	-	-	-	-	-	-	-	C	C	-	-	-	C	C	-	-	-	-	C	-	-	-	-	-	-	C	C	C	-	-	-
 Bodybuilding	-	-	-	-	-	F	-	-	C	C	C	C	C	C	C	C	C	-	-	C	-	-	-	-	-	-	C	C	C	-	-	-
 Meditation	-	-	C	C	-	-	C	C	-	-	-	-	-	-	-	-	-	-	-	-	-	-	C	C	-	-	C	-	-	C	-	-
-Perception	C	C	C	C	C	C	C	C	C	C	C	C	C	-	-	F	F	C	C	-	-	-	-	-	F	C	-	F	F	C	F	-
+Perception	C	C	C	C	C	C	C	C	C	C	C	C	C	-	-	C	F	C	C	-	-	-	-	-	F	C	-	F	F	C	F	-
 Regeneration	-	-	-	-	-	C	-	-	-	-	-	-	-	-	-	-	-	-	-	F	C	-	-	-	-	-	-	C	C	-	-	-
 DisarmTraps	-	-	-	-	C	-	-	-	-	-	C	-	-	-	-	C	C	C	C	-	C	-	-	-	-	-	-	-	-	-	-	-
 Dodging	-	-	-	-	-	-	-	-	-	-	-	F	F	-	-	C	C	-	C	-	-	-	-	-	-	-	-	-	-	-	-	-
