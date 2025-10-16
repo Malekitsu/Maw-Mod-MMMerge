@@ -181,7 +181,7 @@ function events.CalcDamageToMonster(t)
 						reduceRecovery=false
 						if t.Monster.HP<=0 then
 							reduceRecovery=false
-							t.Player.RecoveryDelay=t.Player.RecoveryDelay/4
+							t.Player.RecoveryDelay=t.Player.RecoveryDelay/2
 							--changePlayer(id)
 						end
 					end
