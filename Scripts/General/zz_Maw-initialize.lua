@@ -16,7 +16,7 @@ return {
     ColouredStats = true,               -- stats menu has more colours
     showDeathCounter = true,            -- Beyond Madness only, death counter is shown
     disableCompletitionMessage = false, -- disable completion messages (recommended for online play)
-	disableSpellBookRework = false      -- disable the new book skin
+	disableSpellBookRework = false,      -- disable the new book skin
     
     -- Hotkeys
     removeBuffsKey = 82,                -- remove all buffs when spellbook is open (default: R)
@@ -291,6 +291,7 @@ partyBagSortKey = mawSettings.partyBagSortKey
 multiBagSortKey = mawSettings.multiBagSortKey
 partyMultyBagSortKey = mawSettings.partyMultyBagSortKey
 AlchemyBagKey = mawSettings.AlchemyBagKey
+disableSpellBookRework = mawSettings.disableSpellBookRework
 
 -- Store settings in vars for access by other scripts
 function events.LoadMap()
