@@ -1155,7 +1155,7 @@ function events.GameInitialized2()
 		if data and data.Player and table.find(dkClass, data.Player.Class) then
 			local pl=data.Player
 			local spell=0
-			if data and data.Object.Spell then
+			if data and data.Object and data.Object.Spell then
 				spell=data.Object.Spell
 			end
 			if DKDamageMult[spell] then
@@ -1976,7 +1976,7 @@ function events.GameInitialized2()
 		if data and data.Player and table.find(assassinClass, data.Player.Class) then
 			local pl=data.Player
 			local spell=0
-			if data and data.Object.Spell then
+			if data and data.Object and data.Object.Spell then
 				spell=data.Object.Spell
 			end
 			if assassinSpells[spell] then
