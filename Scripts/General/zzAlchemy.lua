@@ -1086,7 +1086,7 @@ craftDropChances={
 		[1065]=0.00025,
 		[1066]=0.0002,
 		[1067]=0.00004,
-		[1068]=0.00001,
+		[1068]=0.0000025,
 	}
 	
 -- Function to generate normally distributed random numbers
@@ -1300,7 +1300,6 @@ function events.GameInitialized2()
 		txt[i+1040].Picture=names[i]
 		txt[i+1040].Name=descNames[i]
 	end
-	txt[1068].Name="Celestial Orb"
 	for i=1041, 1068 do
 		Game.ItemsTxt[i].NotIdentifiedName="Crafting Item"
 	end
