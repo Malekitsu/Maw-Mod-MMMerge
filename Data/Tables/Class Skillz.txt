@@ -1,8 +1,8 @@
 	Archer	WarriorMage	MasterArcher	Sniper	Cleric	Priest	PriestLight	PriestDark	DarkElf	Patriarch	Dragon	GreatWyrm	Druid	GreatDruid	Warlock	ArchDruid	Knight	Cavalier	BlackKnight	Champion	Minotaur	MinotaurLord	Monk	Initiate	Master	Ninja	Paladin	Crusader	Hero	Villain	Ranger	Hunter	BountyHunter	RangerLord	Thief	Rogue	Assassin	Spy	Troll	WarTroll	Vampire	Nosferatu	Sorcerer	Wizard	Necromancer	Lich	ArchMage	Dark Archmage	Peasant	n/u	High Priest	Master Wizard	n/u	Seraphim	Angel	Archangel	Death Knight	Death Lord	Lich King	Shaman	Sekhem	Marabou	Elementalist	Elemental Adept	Master of Elements
-Staff	E	M	M	M	N	N	N	N	=	=	=	=	E	M	M	M	E	E	G	G	M	M	M	M	G	G	E	M	M	M	E	E	E	E	=	=	=	=	M	G	E	M	M	M	M	M	M	M	=	=	N	M	M	E	E	E	=	=	=	E	M	M	E	E	M
+Staff	E	M	M	M	N	N	N	N	=	=	=	=	E	M	M	M	M	M	G	G	M	M	M	M	G	G	E	M	M	M	E	E	E	E	=	=	=	=	M	G	E	M	M	M	M	M	M	M	=	=	N	M	M	E	E	E	=	=	=	E	M	M	E	E	M
 Sword	E	M	M	M	=	=	=	=	M	M	=	=	=	=	=	=	M	M	G	G	E	M	E	E	E	E	M	M	M	M	E	M	M	M	M	M	M	M	M	G	M	M	=	=	=	=	=	=	=	=	=	=	=	M	M	G	M	M	G	=	=	=	=	=	=
 Dagger	M	M	G	G	=	=	=	=	M	M	=	=	M	M	M	M	E	E	E	E	E	E	E	E	E	E	E	E	E	E	E	E	E	E	M	M	G	G	E	E	M	G	E	M	E	M	M	M	=	=	=	M	E	=	=	=	=	=	=	E	M	M	E	E	E
-Axe	E	M	M	M	=	=	=	=	=	=	=	=	=	=	=	=	E	E	G	G	M	G	=	=	=	=	E	M	M	M	E	M	G	G	=	=	=	=	M	M	E	E	=	=	=	=	=	=	=	=	=	=	=	E	E	E	M	M	G	E	M	M	=	=	=
+Axe	E	M	M	M	=	=	=	=	=	=	=	=	=	=	=	=	M	M	G	G	M	G	=	=	=	=	E	M	M	M	E	M	G	G	=	=	=	=	M	M	E	E	=	=	=	=	=	=	=	=	=	=	=	E	E	E	M	M	G	E	M	M	=	=	=
 Spear	E	M	M	M	=	=	=	=	E	M	=	=	=	=	=	=	M	M	G	G	M	M	E	E	E	E	E	M	M	M	E	M	G	G	=	=	=	=	E	M	=	=	=	=	=	=	=	=	=	=	=	=	=	M	M	G	=	=	=	E	M	M	=	=	=
 Bow	M	M	G	G	E	M	M	M	M	G	=	=	E	E	E	E	E	E	M	M	E	E	N	N	N	N	E	E	E	E	M	M	G	G	E	M	M	M	E	M	N	N	N	N	N	N	N	N	N	N	M	N	N	E	E	E	E	E	E	E	E	E	N	N	N
 Mace	=	=	=	=	E	M	M	M	N	N	=	=	E	E	E	E	M	M	G	G	M	M	=	=	=	=	M	M	G	G	=	=	=	=	E	E	M	M	M	G	E	M	=	=	=	=	=	=	=	=	M	=	=	E	M	M	M	M	M	E	M	M	E	E	E
