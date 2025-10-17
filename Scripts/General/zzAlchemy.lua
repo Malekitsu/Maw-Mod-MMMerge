@@ -1286,8 +1286,8 @@ local descNames={
     "Archibald's Mirror",
     "Emerald of Power",
     "Pearl of Memory",
+    "Orb of Creation",
     "Celestial Orb",
-    "Orb of Creation"
 }
 function events.GameInitialized2()
 	--special crafting items
