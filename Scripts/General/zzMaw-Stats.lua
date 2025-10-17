@@ -1539,7 +1539,7 @@ function calcPowerVitality(pl, statsMenu)
 		if table.find(aoespells, spellIndex) then
 			enchantDamage=enchantDamage/2.5
 			if vars.madnessMode then
-				enchantDamage=enchantDamage*0.7
+				--enchantDamage=enchantDamage*0.7
 			end
 		end
 		haste=math.floor(pl:GetSpeed()/10)/100+1
