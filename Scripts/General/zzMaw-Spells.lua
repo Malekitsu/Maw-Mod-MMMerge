@@ -1606,7 +1606,7 @@ function events.CalcSpellDamage(t)
 				if table.find(aoespells, t.Spell) then
 					damage=damage/2.5
 					if vars.madnessMode then
-						damage=damage*0.7
+						--damage=damage*0.7
 					end
 				end
 				t.Result = t.Result+damage
@@ -1664,8 +1664,8 @@ function ascendSpellDamage(skill, mastery, spell, index)
 	diceMax=spellPowers[spell].diceMax*empowerMult
 	damageAdd=spellPowers[spell].dmgAdd*empowerMult
 	if vars.madnessMode and table.find(aoespells,spell) then
-		diceMax=diceMax*2/3
-		damageAdd=damageAdd*2/3
+		--diceMax=diceMax*2/3
+		--damageAdd=damageAdd*2/3
 	end
 	local ascensionLevel=getAscensionTier(skill,spell,index)
 	if ascensionLevel>0 then
