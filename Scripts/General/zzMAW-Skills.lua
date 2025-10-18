@@ -1133,7 +1133,7 @@ lastHP={}
 lastSP={}
 waitHP={}
 waitSP={}
-local classesWithNoMeditationRegen={10,11,56,57,58}
+local classesWithNoMeditationRegen={10,11,34,35,36,37,56,57,58}
 
 function getBuffHealthRegen(pl)
 	local regen=0
