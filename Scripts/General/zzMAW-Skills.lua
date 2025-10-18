@@ -2644,7 +2644,7 @@ function events.Action(t)
 			
 			local requirement=GetArmsmasterSupremeRequirement()
 			
-			local s,m=SplitSkill(Skillz.get(pl,35))
+			local s,m=SplitSkill(pl.Skills[35])
 			if pl.SkillPoints>s and s+1==requirement then
 				Game.ShowStatusText("SUPREME UNLOCKED!!!")
 				evt[id].Add("HP", 0) --graphic
@@ -2665,8 +2665,9 @@ function events.GetSkill(t)
 		local requirement=GetArmsmasterSupremeRequirement()
 		
 		local s,m=SplitSkill(pl:GetSkill(35))
+		local requirementS=SplitSkill(pl.Skills[35])
 		local s2,m2=SplitSkill(Skillz.get(pl,t.Skill))
-		if s>=requirement then
+		if requirementS>=requirement then
 			t.Result=JoinSkill(math.min(s2*2, s2+math.floor(s/10)),m2)
 		end
 	end
