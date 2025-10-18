@@ -3944,6 +3944,7 @@ end
 
 function events.ItemGenerated(t)
 	if disableSpellBookRework then return end
+	if Game.HouseScreen==2 or Game.HouseScreen==95 then return end
 	local it=t.Item
 	if (it.Number>=400 and it.Number<=498) then
 		it.BonusStrength=it.Number
