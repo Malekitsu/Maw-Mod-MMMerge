@@ -2057,6 +2057,12 @@ function assassinationDamage(pl,mon,obj)
 	if pl.SP>=manaCost and mon.ShowAsHostile then
 		if obj and obj.Spell>100 then
 			vars.assassinStacks[id]=math.min(vars.assassinStacks[id]+0.5,5)--arrow nerf
+			vars.AttackSpeedStack=vars.AttackSpeedStack or {}
+			vars.AttackSpeedStack[id]=vars.AttackSpeedStack[id] or 0
+			vars.AttackSpeedStack[id]=math.min(vars.AttackSpeedStack[id] + 0.5, 5)
+			vars.AttackSpeedStackDecay=vars.AttackSpeedStackDecay or {}
+			vars.AttackSpeedStackDecay[id]=vars.AttackSpeedStackDecay[id] or {}
+			vars.AttackSpeedStackDecay[id]=Game.Time+const.Minute*4
 		elseif not obj then
 			vars.assassinStacks[id]=math.min(vars.assassinStacks[id]+1,5)
 			vars.AttackSpeedStack=vars.AttackSpeedStack or {}
