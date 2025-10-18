@@ -64,7 +64,8 @@ function events.AfterLoadMap()
       if basetable and round and m.Level and m.Id and m.Resistances and basetable[m.Id]
          and basetable[m.Id].Level and basetable[m.Id].Resistances then
 
-        local bolsterRes = math.max(round((m.Level - basetable[m.Id].Level) / 2), 0)
+		local level=getMonsterLevel(m)
+        local bolsterRes = math.max(round((level - basetable[m.Id].Level) / 2), 0)
         for v = 0, 10 do
           if v ~= 5 then
             if v == 0 and m.Resistances[v] and m.Resistances[v] < 65000 then
