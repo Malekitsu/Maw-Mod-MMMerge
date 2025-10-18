@@ -846,7 +846,7 @@ function events.CalcDamageToPlayer(t)
 	end
 	]]
 	roll=math.random()
-	if roll<=dodgeChance then
+	if roll>dodgeChance then
 		t.Result=0
 		-- Use the same player that performed the dodge calculation
 		local index = -1
