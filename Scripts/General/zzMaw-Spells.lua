@@ -231,6 +231,7 @@ function events.PlayerCastSpell(t)
 		if t.TargetKind == 4 and not t.RemoteData then
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
 			if m==4 then
+				Party[t.TargetId].Unconscious=0
 				Party[t.TargetId].Dead=0
 				Party[t.TargetId].Eradicated=0
 				Party[t.TargetId].HP=math.max(Party[t.TargetId].HP,1)
