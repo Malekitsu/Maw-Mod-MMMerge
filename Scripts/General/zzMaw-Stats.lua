@@ -835,7 +835,7 @@ function events.CalcDamageToPlayer(t)
 	if Mas == 4 then
 		dodging=Skill+10
 	end
-	local dodgeChance=1/(1+dodging/150)
+	local dodgeChance=1-1/(1+dodging/150)
 	if Game.CharacterPortraits[pl.Face].Race==const.Race.Dragon then
 		dodgeChance=0
 	end
@@ -846,7 +846,7 @@ function events.CalcDamageToPlayer(t)
 	end
 	]]
 	roll=math.random()
-	if roll>dodgeChance then
+	if dodgeChance>=roll then
 		t.Result=0
 		-- Use the same player that performed the dodge calculation
 		local index = -1
