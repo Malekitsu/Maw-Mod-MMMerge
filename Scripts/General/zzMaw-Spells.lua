@@ -233,6 +233,7 @@ function events.PlayerCastSpell(t)
 			if m==4 then
 				Party[t.TargetId].Dead=0
 				Party[t.TargetId].Eradicated=0
+				Party[t.TargetId].HP=math.max(Party[t.TargetId].HP,1)
 			end
 		end
 	end
