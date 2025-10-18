@@ -268,6 +268,14 @@ function events.GetAttackDelay(t)
 		local s, m=SplitSkill(t.Player.Skills[const.Skills.Light])
 		bonusSpeed=bonusSpeed+s*m
 	end
+	if table.find(assassinClass, t.Player.Class) then
+		local id=t.Player:GetIndex()
+		if vars.AttackSpeedStackDecay and vars.AttackSpeedStackDecay[id]>=Game.Time then
+			local s, m=SplitSkill(t.Player.Skills[const.Skills.Air])
+			bonusSpeed=bonusSpeed+s*vars.AttackSpeedStack[id]
+		end
+	end
+	
 	if baseSpeed==0 then
 		baseSpeed=100
 	end
