@@ -31,7 +31,7 @@ Meditation	E	M	M	M	M	M	M	M	E	M	-	-	M	M	G	G	-	-	-	-	E	M	-	-	-	-	E	E	M	M	E	M	M	M	-
 Perception	M	M	G	G	E	E	E	E	M	M	M	G	E	E	E	E	E	M	M	M	M	G	E	E	E	E	E	M	M	M	M	M	M	M	M	M	M	M	B	E	E	E	E	E	E	E	E	E	B	B	E	E	E	M	M	G	E	M	M	E	E	E	B	B	B
 Regeneration	-	-	-	-	-	-	-	-	-	-	E	E	-	-	-	-	-	-	-	-	B	E	B	E	E	E	-	-	-	-	-	-	-	-	-	-	-	-	M	G	E	M	-	-	-	E	-	-	-	-	-	-	-	-	-	-	B	E	E	-	-	-	-	-	-
 DisarmTraps	B	E	M	M	B	B	B	B	M	G	B	B	B	B	B	B	B	B	E	E	M	M	B	E	M	M	B	B	B	B	E	E	E	E	M	M	G	G	B	B	E	E	B	B	B	B	B	B	B	B	B	B	B	B	B	B	B	B	E	E	E	E	E	E	M
-Dodging	E	E	E	E	-	-	-	-	E	E	-	-	-	-	-	-	E	E	E	E	-	-	M	M	G	G	B	B	B	B	E	E	E	E	M	M	M	M	-	-	E	E	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+Dodging	E	E	E	E	-	-	-	-	E	E	-	-	-	-	-	-	E	E	E	E	-	-	M	M	G	G	B	B	B	B	E	E	E	E	M	M	G	G	-	-	E	E	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
 Unarmed	B	B	B	B	-	-	-	-	-	-	-	-	-	-	-	-	E	E	E	E	E	E	M	M	G	G	B	B	B	B	B	B	B	B	E	E	E	E	E	E	B	B	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	E	M	M	-	-	-
 IdentifyMonster	B	B	B	B	M	G	G	G	B	B	M	M	E	E	E	E	E	E	E	E	B	B	E	E	E	E	B	B	B	B	M	M	G	G	B	B	B	B	E	E	M	G	M	M	M	M	M	M	B	B	E	M	M	B	B	B	E	E	E	M	M	G	M	M	G
 Armsmaster	E	E	M	M	E	E	E	E	E	E	-	-	B	B	B	B	M	M	G	G	-	-	M	M	M	M	E	M	M	M	E	E	E	E	M	M	G	G	M	M	M	G	-	-	-	-	-	-	-	-	B	-	-	-	-	-	-	-	-	E	E	E	-	-	-

@@ -31,7 +31,7 @@ Meditation	E	M	M	M	M	M	G	G	E	G	=	=	M	M	G	G	=	=	=	=	E	M	E	M	G	G	E	E	M	M	E	M	M	M	=
 Perception	M	M	G	G	E	E	E	E	M	M	M	G	E	E	E	E	E	M	M	M	M	G	E	E	E	E	E	M	M	M	M	M	M	M	M	M	M	M	N	E	E	E	E	E	E	E	E	E	N	N	E	E	E	M	M	G	E	M	M	E	E	E	N	N	N
 Regeneration	=	=	=	=	=	=	=	=	=	=	E	M	=	=	=	=	=	=	=	=	N	E	N	E	E	E	=	=	=	=	=	=	=	=	=	=	=	=	M	G	M	G	=	=	=	E	=	=	=	=	=	=	=	=	=	=	N	E	E	=	=	=	=	=	=
 DisarmTraps	N	E	M	M	N	N	N	N	M	G	N	N	N	N	N	N	E	M	M	M	M	M	N	E	M	M	N	N	N	N	E	E	E	E	M	M	G	G	N	N	E	E	N	N	N	N	N	N	N	N	N	N	N	M	M	G	N	N	E	E	E	E	E	E	M
-Dodging	E	E	E	E	=	=	=	=	E	E	M	G	=	=	=	=	E	E	E	E	=	=	M	M	G	G	N	N	N	N	E	E	E	E	=	=	=	=	=	=	E	E	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=
+Dodging	E	E	E	E	=	=	=	=	E	E	M	G	=	=	=	=	E	E	E	E	=	=	M	M	G	G	N	N	N	N	E	E	E	E	E	M	G	G	=	=	E	E	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=
 Unarmed	N	N	N	N	=	=	=	=	=	=	M	G	=	=	=	=	E	E	E	E	E	E	M	M	G	G	N	N	N	N	N	N	N	N	E	E	E	E	E	M	N	N	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	E	M	M	=	=	=
 IdentifyMonster	N	N	N	N	M	G	G	G	N	N	M	M	E	E	E	E	E	E	E	E	N	N	E	E	E	E	M	M	G	G	M	M	G	G	N	N	E	E	E	E	M	G	M	M	M	M	M	M	N	N	G	M	M	N	N	N	E	E	E	M	M	G	M	M	G
 Armsmaster	E	E	M	M	E	E	E	E	E	M	=	=	N	N	N	N	M	G	S	S	E	M	M	M	M	M	E	M	M	M	E	E	M	M	=	=	=	=	M	M	M	G	=	=	=	=	=	=	=	=	E	=	=	=	=	=	=	=	=	E	E	E	=	=	=
