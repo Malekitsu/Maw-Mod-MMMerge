@@ -387,7 +387,7 @@ function events.BuildStatInformationBox(t)
 		Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Dodging))
 		if Mas == 4 and Game.CharacterPortraits[pl.Face].Race~=const.Race.Dragon then
 			dodging=Skill+10
-			dodgeChance=1/(1+dodging/150)
+			dodgeChance=1-1/(1+dodging/150)
 			t.Text=string.format("%s\n\nDodge chance: %s%%",Game.StatsDescriptions[5],math.floor(dodgeChance*1000)/10)
 		end
 		--spell haste
