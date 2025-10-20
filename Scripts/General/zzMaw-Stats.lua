@@ -1598,10 +1598,10 @@ function calcPowerVitality(pl, statsMenu)
 	
 	vitality=round(fullHP/reduction)
 	if statsMenu then
-		DPS1=shortenNumber(DPS1, 4)
-		DPS2=shortenNumber(DPS2, 4)
-		DPS3=shortenNumber(DPS3, 4)
-		vitality=shortenNumber(vitality, 6)
+		DPS1=shortenNumber(DPS1, 3)
+		DPS2=shortenNumber(DPS2, 3)
+		DPS3=shortenNumber(DPS3, 3)
+		vitality=shortenNumber(vitality, 3)
 	end
 	return DPS1, DPS2, DPS3, vitality
 end
