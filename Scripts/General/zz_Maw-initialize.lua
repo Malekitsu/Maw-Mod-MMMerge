@@ -319,7 +319,7 @@ function round(x)
 	end
 	return x
 end
-
+--[[
 function shortenNumber(number, significantDigits, color)
     if significantDigits < 1 then
         error("Number of digits needs to be at least 1")
@@ -357,6 +357,83 @@ function shortenNumber(number, significantDigits, color)
 	
     return tostring(shortened) .. suffix
 end
+]]
+function shortenNumber(number, significantDigits, color)
+    if significantDigits < 1 then
+        error("Number of digits needs to be at least 1")
+    end
+
+    -- helpers
+    local function roundTo(x, decimals)
+        local p = 10 ^ (decimals or 0)
+        if x >= 0 then return math.floor(x * p + 0.5) / p
+        else return math.ceil(x * p - 0.5) / p end
+    end
+    local function intDigits(x)
+        x = math.floor(math.abs(x))
+        if x == 0 then return 1 end
+        local d = 0
+        while x > 0 do x = math.floor(x / 10); d = d + 1 end
+        return d
+    end
+    local function fmtTrim(x)
+        -- stringify and trim trailing zeros in decimals (and trailing dot)
+        local s = string.format("%.10f", x)  -- enough precision buffer
+        s = s:gsub("(%..-)[0]*$", "%1"):gsub("%.$", "")
+        -- also trim superfluous extra decimals if we had fewer
+        return s
+    end
+
+    local absn = math.abs(number)
+    local suffix, divisor = "", 1
+    if absn >= 1e9 then
+        suffix, divisor = "B", 1e9
+    elseif absn >= 1e6 then
+        suffix, divisor = "M", 1e6
+    elseif absn >= 1e3 then
+        suffix, divisor = "K", 1e3
+    end
+
+    local val = number / divisor
+
+    -- if no suffix, keep it simple: integers only, no padding
+    if divisor == 1 then
+        local shortened = tostring(math.floor(val + (val>=0 and 0.5 or -0.5)))
+        return shortened
+    end
+
+    -- with suffix: choose decimals so that intDigits + decimals >= significantDigits
+    local id = intDigits(val)
+    local decimals = math.max(0, significantDigits - id)
+
+    -- round to that many decimals
+    local rounded = roundTo(val, decimals)
+
+    -- if rounding bumps us to 1000, carry to next suffix
+    if rounded >= 1000 and suffix ~= "B" then
+        rounded = rounded / 1000
+        if suffix == "K" then suffix = "M"
+        elseif suffix == "M" then suffix = "B" end
+        -- recompute digits/decimals for new scale
+        id = intDigits(rounded)
+        decimals = math.max(0, significantDigits - id)
+        rounded = roundTo(rounded, decimals)
+    end
+
+    local numStr = fmtTrim(string.format("%." .. decimals .. "f", rounded))  -- trim trailing zeros
+
+    if color then
+        if suffix == "K" then
+            return StrColor(255,255,30, numStr .. suffix)
+        elseif suffix == "M" then
+            return StrColor(255,165,0, numStr .. suffix)
+        elseif suffix == "B" then
+            return StrColor(255,0,0, numStr .. suffix)
+        end
+    end
+    return numStr .. suffix
+end
+
 
 function GetMaxHP(pl)
 	if vars.MAWSETTINGS.buffRework=="ON" and vars.currentHPPool then
