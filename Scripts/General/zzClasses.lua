@@ -2215,7 +2215,7 @@ end
 
 assassinSpellList={
 	[const.Skills.Fire]={1, 4, 5, 6, 7},
-	[const.Skills.Air]={12, 17, 16, 18, 19, 21},
+	[const.Skills.Air]={12, 17, 16, 18, 21, 19},
 	[const.Skills.Water]={24, 27, 29, 31, 33},
 	[const.Skills.Earth]={34, 38, 39, 42, 44},
 }
