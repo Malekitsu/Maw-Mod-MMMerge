@@ -32,7 +32,7 @@ end
 
 
 function events.ItemAdditionalDamage(t)
-	--empower enchants
+	--[[empower enchants HANDLED IN THE FUNCTION BELOW
 	local damage=0
 	if enchantbonusdamage[t.Item.Bonus2] then
 		local id=t.Player:GetIndex()
@@ -43,6 +43,7 @@ function events.ItemAdditionalDamage(t)
 		t.Result=round(damage*attackSpeedMult)
 		return
 	end
+	]]
 	t.Result=0
 end
 --[11]="Killing a monster will recover you action time",
@@ -65,7 +66,7 @@ function events.CalcDamageToMonster(t)
 					fireAuraDamage=fireAuraDamage+damage
 				end
 				
-				if enchantbonusdamage[it.Bonus2] then
+				if it and enchantbonusdamage[it.Bonus2] then
 					local id=table.find(damageKindMap,enchantbonusdamage[it.Bonus2].Type)
 					local res=t.Monster.Resistances[id]%1000
 					local dmg=calcEnchantDamage(pl, it, res, true, false, "damage")
@@ -81,7 +82,7 @@ function events.CalcDamageToMonster(t)
 		if damage and damage>fireAuraDamage then
 			fireAuraDamage=damage
 		end
-		if enchantbonusdamage[it.Bonus2] then
+		if it and enchantbonusdamage[it.Bonus2] then
 			local id=table.find(damageKindMap,enchantbonusdamage[it.Bonus2].Type)
 			local res=t.Monster.Resistances[id]%1000
 			local dmg=calcEnchantDamage(pl, it, res, true, false, "damage")
