@@ -3974,3 +3974,44 @@ function events.CanCastTownPortal(t)
 		end
 	end
 end
+
+--target closest enemy if there are no monster in the mouse
+
+function events.PlayerCastSpell(t)
+	BeginGrabObjects()
+	local targetSpell=t.SpellId
+	if Mouse:GetTarget().Kind==3 then return end --monster in the mouse
+	function events.Tick()
+		events.Remove("Tick",1)
+		local obj=GrabObjects()
+		if not obj then 
+			--debug.Message("No Object")
+			return 
+		end
+		if obj.Spell~=targetSpell then 
+			--debug.Message("Wrong Object")
+			--debug.Message(dump(obj))
+			return 
+		end
+		local MonList = Game.GetMonstersInSight()
+		local closestEnemyDistance=math.huge
+		local changeTarget=false
+		local target=-1
+		local ai=const.AIState
+		for i=1,#MonList do
+			local tar=MonList[i]
+			local mon=Map.Monsters[tar]
+			if mon.AIState~=ai.Dead and mon.AIState~=ai.Invisible and mon.AIState~=ai.Removed and mon.ShowAsHostile and mon.Hostile then 
+				local distance=getDistanceToMonster(mon)
+				if distance<closestEnemyDistance then
+					changeTarget=true
+					target=tar
+					closestEnemyDistance=distance
+				end
+			end
+		end
+		if changeTarget then
+			obj.Target=3+target*8
+		end
+	end		
+end
