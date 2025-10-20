@@ -1444,17 +1444,52 @@ function events.BuildItemInformationBox(t)
 				if t.Item.BonusExpireTime%100==20 then
 					power=math.ceil(power*1.5)
 				end
+				local resLegendary=false
 				if t.Item.Bonus>=11 and t.Item.Bonus<=16 then
 					local id=Game.CurrentPlayer
 					if id>=0 and id<=Party.High then
 						local index=Party[id]:GetIndex()
 						if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 16) then
 							power=power*1.5
+							resLegendary=true
 						end
 					end
 					power=round((1-1/((power+10)/100+1))*1000)/10 .. "%"
 				end
-				t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. power
+				if extraDescription then
+					local it=t.Item
+					local bolsterMult=math.max((Game.BolsterAmount-100)/2000+1,1)
+					if vars.insanityMode then
+						bolsterMult=1.4
+					end
+					if vars.madnessMode then
+						bolsterMult=2
+					end
+					local maxValue=120 * bolsterMult
+					if it.BonusExpireTime==1 or it.BonusExpireTime==2 then
+						maxValue=math.min(maxValue+10,maxValue*1.2)
+					end
+					if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
+						maxValue=math.min(maxValue+20,maxValue*1.44)
+					end
+					if it.BonusExpireTime%100==20 then
+						maxValue=maxValue*1.5
+					end
+					local mult=slotMult[it:T().EquipStat] or 1
+					if table.find(twoHandedAxes, it.Number) then
+						mult=2
+					end
+					maxValue=round(maxValue*mult)
+					if t.Item.Bonus>=11 and t.Item.Bonus<=16 then
+						if resLegendary then
+							maxValue=maxValue*1.5
+						end
+						maxValue=round((1-1/((maxValue+10)/100+1))*1000)/10 .. "%"
+					end
+					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. power .. StrColor(100,100,100, " / " .. maxValue)
+				else
+					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. power
+				end
 			end
 			if t.Item.Charges>1000 then
 				local bonus=math.floor(t.Item.Charges/1000)
@@ -1473,18 +1508,53 @@ function events.BuildItemInformationBox(t)
 				if t.Item.BonusExpireTime%100==20 then
 					strength=math.ceil(strength*1.5)
 				end
+				local resLegendary=false
 				if bonus>=11 and bonus<=16 then
 					local id=Game.CurrentPlayer
 					if id>=0 and id<=Party.High then
 						local index=Party[id]:GetIndex()
 						if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 16) then
 							strength=strength*1.5
+							resLegendary=true
 						end
 					end
 					strength=round((1-1/((strength+10)/100+1))*1000)/10 .. "%"
 				end
 				if itemStatName[bonus] then
-					t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
+					if extraDescription then
+						local it=t.Item
+						local bolsterMult=math.max((Game.BolsterAmount-100)/2000+1,1)
+						if vars.insanityMode then
+							bolsterMult=1.4
+						end
+						if vars.madnessMode then
+							bolsterMult=2
+						end
+						local maxValue=120 * bolsterMult
+						if it.BonusExpireTime==1 or it.BonusExpireTime==2 then
+							maxValue=math.min(maxValue+10,maxValue*1.2)
+						end
+						if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
+							maxValue=math.min(maxValue+20,maxValue*1.44)
+						end
+						if it.BonusExpireTime%100==20 then
+							maxValue=maxValue*1.5
+						end
+						local mult=slotMult[it:T().EquipStat] or 1
+						if table.find(twoHandedAxes, it.Number) then
+							mult=2
+						end
+						maxValue=round(maxValue*mult)
+						if bonus>=11 and bonus<=16 then
+							if resLegendary then
+								maxValue=maxValue*1.5
+							end
+							maxValue=round((1-1/((maxValue+10)/100+1))*1000)/10 .. "%"
+						end
+						t.Enchantment = itemStatName[bonus] .. " +" .. strength .. StrColor(100,100,100, " / " .. maxValue) .. "\n" .. t.Enchantment
+					else
+						t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
+					end
 				end
 			elseif t.Item.Bonus~=0 and t.Item.BonusStrength~=0 then
 				if extraDescription then
@@ -1657,8 +1727,8 @@ function events.BuildItemInformationBox(t)
 			end
 		end
 		if extraDescription and t.Description then
-			local txt=t.Description .. "\n\nItem Bonus Power: " .. t.Item.MaxCharges
-			t.Description = StrColor(100,100,100, txt)
+			local txt="\n\nItem Bonus Power: " .. t.Item.MaxCharges
+			t.Description =t.Description .. StrColor(100,100,100, txt)
 		end
 	end
 end
