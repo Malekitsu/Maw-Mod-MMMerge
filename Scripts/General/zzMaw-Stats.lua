@@ -911,7 +911,7 @@ function events.CalcDamageToPlayer(t)
 	local roll=(math.random(75,125)+math.random(75,125))/200
 	t.Damage=t.Damage*roll
 	
-	if t.Monster and t.Monster.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime>=Game.Time then
+	if mon and mon.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime>=Game.Time then
 		t.Damage=t.Damage/2
 	end
 	
