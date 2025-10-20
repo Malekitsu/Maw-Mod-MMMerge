@@ -387,7 +387,7 @@ function events.BuildStatInformationBox(t)
 		Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Dodging))
 		if Mas == 4 and Game.CharacterPortraits[pl.Face].Race~=const.Race.Dragon then
 			dodging=Skill+10
-			dodgeChance=1-1/(1+dodging/150)
+			dodgeChance=1-1/(1+dodging/200)
 			t.Text=string.format("%s\n\nDodge chance: %s%%",Game.StatsDescriptions[5],math.floor(dodgeChance*1000)/10)
 		end
 		--spell haste
@@ -835,7 +835,7 @@ function events.CalcDamageToPlayer(t)
 	if Mas == 4 then
 		dodging=Skill+10
 	end
-	local dodgeChance=1-1/(1+dodging/150)
+	local dodgeChance=1-1/(1+dodging/200)
 	if Game.CharacterPortraits[pl.Face].Race==const.Race.Dragon then
 		dodgeChance=0
 	end
@@ -1582,7 +1582,7 @@ function calcPowerVitality(pl, statsMenu)
 	end
 	--local speed=pl:GetSpeed()
 	--local speedEffect=speed/10
-	local dodgeChance=1/(1+dodging/150)
+	local dodgeChance=1/(1+dodging/200)
 	if Game.CharacterPortraits[pl.Face].Race==const.Race.Dragon then
 		dodgeChance = 1
 	end
