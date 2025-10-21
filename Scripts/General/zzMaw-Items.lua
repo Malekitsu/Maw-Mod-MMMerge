@@ -4731,32 +4731,76 @@ function events.GameInitialized2()
 	end
 end
 
+
 ---------------------------
 --PITY SYSTEM CALCULATION--
 ---------------------------
+-- Tunables
+local SURV_TOL   = 1e-12          -- stop when survival prob < this
+local BISECT_ITR = 30             -- bisection iterations (30 is plenty)
+local TINY_P     = 1e-4           -- threshold to use asymptotic
+local MAX_K_CAP  = 5e6            -- hard safety cap so we don't loop forever
+
 -- Compute effective drops/kill for sequence p_k = s * u_k(k), capped at 1
-local function effective_rate(u_k, s)
-  local S, EK, k = 1.0, 0.0, 0
+local function effective_rate(u_k, s, p_base)
+  -- choose an adaptive upper bound: ~c/p is usually enough
+  local max_k = math.min(MAX_K_CAP, math.max(10000, math.floor(20.0 / p_base)))
+
+  -- accumulate survival in log-space for stability when S gets tiny
+  local logS, EK, k = 0.0, 0.0, 0
   while true do
-    EK = EK + S
+    -- S = exp(logS); add S to EK
+    EK = EK + math.exp(logS)
+
     local pk = s * u_k(k)
-    if pk > 1 then pk = 1 end
-    local survive = 1 - pk
-    if survive <= 0 then break end
-    S = S * survive
-    if S < 1e-15 or k > 10000 then break end
+    if pk >= 1 then
+      break
+    end
+
+    -- update survival: logS += log1p(-pk)
+    -- (use stable log1p if available, otherwise approximation)
+    local step = math.log(1 - pk)
+    logS = logS + step
+
+    -- termination criteria
+    if logS < math.log(SURV_TOL) then break end  -- survival tiny enough
+    if k >= max_k then break end
+
     k = k + 1
   end
   return 1.0 / EK
 end
 
+-- Asymptotic scale for tiny p (linear pity shape)
+local function tiny_p_scale(p, a)
+  -- s ≈ 1 / (1 + a/(2p)), clamp to [0,1]
+  local s = 1.0 / (1.0 + (a / (2.0 * p)))
+  if s < 0 then s = 0 end
+  if s > 1 then s = 1 end
+  return s
+end
+
 -- Find s so that the long-run effective rate equals the base p
-local function scale_for_constant_expectation(p, u_k)
-  local lo, hi = 0.0, 1.0
-  for _ = 1, 40 do
+local function scale_for_constant_expectation(p, u_k, a)
+  -- start from a good guess for tiny p to avoid massive loops
+  local lo, hi
+  if p <= TINY_P then
+    local s0 = tiny_p_scale(p, a)
+    -- bracket around s0
+    lo = 0.5 * s0
+    hi = math.min(1.0, s0 * 1.5 + 1e-9)
+  else
+    lo, hi = 0.0, 1.0
+  end
+
+  for _ = 1, BISECT_ITR do
     local mid = 0.5 * (lo + hi)
-    local r = effective_rate(u_k, mid)
-    if r > p then hi = mid else lo = mid end
+    local r = effective_rate(u_k, mid, p)
+    if r > p then
+      hi = mid
+    else
+      lo = mid
+    end
   end
   return 0.5 * (lo + hi)
 end
@@ -4783,7 +4827,7 @@ function pity_chance(p, k, a)
   local key = _cache_key(p, a)
   local s = _scale_cache[key]
   if not s then
-    s = scale_for_constant_expectation(p, u_k)
+    s = scale_for_constant_expectation(p, u_k, a)
     _scale_cache[key] = s
   end
 
