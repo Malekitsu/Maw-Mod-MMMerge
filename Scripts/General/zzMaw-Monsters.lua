@@ -2738,11 +2738,12 @@ function checkMapCompletition()
 				return
 			else
 				local mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
+				local bolster=0
 				if not Game.freeProgression then
 					bolster=mapLevel*2
 				end
 				if vars.madnessMode then
-					bolster=madnessMapLevels[name]
+					bolster=madnessMapLevels[name] or 0
 				end
 				if mapvars.mapAffixes then
 					bolster=mapvars.mapAffixes.Power*10
@@ -2773,7 +2774,7 @@ function checkMapCompletition()
 				--end
 				local gold=math.ceil(experience^0.9/1000)*1000 
 				if vars.madnessMode then
-					gold=round(experience/3*1000)/1000
+					gold=round(experience/3/1000)*1000
 				end
 				evt.ForPlayer(0)
 				evt.Add{"Gold", Value = gold}
