@@ -3998,15 +3998,18 @@ function events.PlayerCastSpell(t)
 		local changeTarget=false
 		local target=-1
 		local ai=const.AIState
+		local lim = Map.Monsters.High
 		for i=1,#MonList do
 			local tar=MonList[i]
-			local mon=Map.Monsters[tar]
-			if mon.AIState~=ai.Dead and mon.AIState~=ai.Invisible and mon.AIState~=ai.Removed and mon.ShowAsHostile and mon.Hostile then 
-				local distance=getDistanceToMonster(mon)
-				if distance<closestEnemyDistance then
-					changeTarget=true
-					target=tar
-					closestEnemyDistance=distance
+			if tar<=lim then
+				local mon=Map.Monsters[tar]
+				if  mon.AIState~=ai.Dead and mon.AIState~=ai.Invisible and mon.AIState~=ai.Removed and mon.ShowAsHostile and mon.Hostile then 
+					local distance=getDistanceToMonster(mon)
+					if distance<closestEnemyDistance then
+						changeTarget=true
+						target=tar
+						closestEnemyDistance=distance
+					end
 				end
 			end
 		end
