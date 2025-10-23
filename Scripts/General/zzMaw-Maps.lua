@@ -1857,7 +1857,7 @@ function events.UseMouseItem(t)
 				nAff=nAff+1
 			end
 		end
-		local mult=1+it.MaxCharges*nAff/300
+		local mult=1+(it.MaxCharges*nAff+nAff*20)/300
 		mapMonsterDensity={it.BonusStrength,mult}
 		if string.sub(map.FileName,-3)=="blv" then
 			blv(fileName)
@@ -2064,7 +2064,7 @@ function events.BuildItemInformationBox(t)
 				power=power+1
 			end
 		end
-		t.Enchantment=t.Enchantment .. StrColor(0, 127, 255,"\n+" .. round(it.MaxCharges*power/8*1.5) .. "% craft items drop chances "  .. "\n+" .. round(it.MaxCharges*power/4) .. "% item quality " .. "%\n+" .. round(it.MaxCharges*power/3) .. "% monster density")	
+		t.Enchantment=t.Enchantment .. StrColor(0, 127, 255,"\n+" .. round((it.MaxCharges*power+power*20)/8*1.5) .. "% craft items drop chances "  .. "\n+" .. round((it.MaxCharges*power+power*20)/4) .. "% item quality " .. "%\n+" .. round((it.MaxCharges*power+power*20)/3) .. "% monster density")	
 	end
 	if it.Number==290 and t.Name then
 		t.Name=Game.MapStats[it.BonusStrength].Name .. " Map"
