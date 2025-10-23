@@ -51,84 +51,88 @@ end
 
 
 function getCritInfo(pl, dmgType, monLvl)
-  if not pl then return 0, 1, false end
-  monLvl = monLvl or pl.LevelBase or 0
+	if not pl then return 0, 1, false end
+	monLvl = monLvl or pl.LevelBase or 0
 
-  local luck = pl.GetLuck and pl:GetLuck() or 0
-  local totalCrit = luck / math.min((500 + monLvl*7.5), 5000) + 0.05
-  local critDamageMultiplier = 1
+	local luck = pl.GetLuck and pl:GetLuck() or 0
+	local totalCrit = luck / math.min((500 + monLvl*7.5), 5000) + 0.05
+	local critDamageMultiplier = 1
+	
+	local diminishingValue=math.min(100+monLvl*1.4,1000)
+	if vars.madnessMode then
+		diminishingLevel=math.min(100+monLvl*1.4,1500)
+	end
+	if dmgType == "spell" then
+		local intellect = pl.GetIntellect and pl:GetIntellect() or 0
+		critDamageMultiplier = intellect/(diminishingLevel*4) + 1.5
+	elseif dmgType == "heal" then
+		--local intellect = pl.GetIntellect and pl:GetIntellect() or 0
+		--critDamageMultiplier = intellect*3/4000 + 1.25
+		return 0, 0, false
+	else
+		local accuracy = pl.GetAccuracy and pl:GetAccuracy() or 0
+		critDamageMultiplier = accuracy/(diminishingLevel) + 1.5
+	end
+	critDamageMultiplier=round(critDamageMultiplier*100)/100
+	-- dagger bonus
+	if not dmgType then
+		for i = 0, 1 do
+			local it = pl:GetActiveItem(i)
+			if it then
+				local itSkill = it:T().Skill
+				if itSkill == 2 then
+					local s, m = SplitSkill(pl:GetSkill(const.Skills.Dagger))
+					if m > 2 then
+						totalCrit = totalCrit + 0.05 + 0.01*s / math.min(1 + monLvl/200, 4)
+					end
+				end
+			end
+		end
+	end
 
-  if dmgType == "spell" then
-    local intellect = pl.GetIntellect and pl:GetIntellect() or 0
-    critDamageMultiplier = intellect/2000 + 1.5
-  elseif dmgType == "heal" then
-    local intellect = pl.GetIntellect and pl:GetIntellect() or 0
-    critDamageMultiplier = intellect*3/4000 + 1.25
-    return 0, 0, false
-  else
-    local accuracy = pl.GetAccuracy and pl:GetAccuracy() or 0
-    critDamageMultiplier = accuracy*2/1000 + 1.5
-  end
+	-- axe bonus
+	if not dmgType then
+		local it = pl:GetActiveItem(1)
+		if it and (table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number)) then
+			local s, m = SplitSkill(pl:GetSkill(const.Skills.Axe))
+			if m == 4 then
+				critDamageMultiplier = critDamageMultiplier + 0.01*s
+			end
+		end
+	end
 
-  -- dagger bonus
-  if not dmgType then
-    for i = 0, 1 do
-      local it = pl:GetActiveItem(i)
-      if it then
-        local itSkill = it:T().Skill
-        if itSkill == 2 then
-          local s, m = SplitSkill(pl:GetSkill(const.Skills.Dagger))
-          if m > 2 then
-            totalCrit = totalCrit + 0.05 + 0.01*s / math.min(1 + monLvl/200, 4)
-          end
-        end
-      end
-    end
-  end
-
-  -- axe bonus
-  if not dmgType then
-    local it = pl:GetActiveItem(1)
-    if it and (table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number)) then
-      local s, m = SplitSkill(pl:GetSkill(const.Skills.Axe))
-      if m == 4 then
-        critDamageMultiplier = critDamageMultiplier + 0.03*s
-      end
-    end
-  end
-
-  -- Fate / HoP (buff rework)
-    if vars.MAWSETTINGS == nil or vars.MAWSETTINGS.buffRework == "ON" then
-        if pl.SpellBuffs and pl.SpellBuffs[4] and pl.SpellBuffs[4].ExpireTime >= Game.Time then
-			local s, m  = getBuffSkill(47)
+	-- Fate / HoP (buff rework)
+	if vars.MAWSETTINGS == nil or vars.MAWSETTINGS.buffRework == "ON" then
+		if pl.SpellBuffs and pl.SpellBuffs[4] and pl.SpellBuffs[4].ExpireTime >= Game.Time then
+			local s, m	= getBuffSkill(47)
 			local s2, m2 = getBuffSkill(86)
 			s = math.max(s, s2/1.5)
 			m = math.max(m, m2)
 			if buffPower and buffPower[47] and buffPower[47].Base and buffPower[47].Scaling then
 				local bonus = (buffPower[47].Base[m] or 0)/100 + (buffPower[47].Scaling[m] or 0)*s/1000
 				totalCrit = totalCrit + bonus
-            end
-        end
-    end
+			end
+		end
+	end
 
-    if getMapAffixPower then
-        if getMapAffixPower(20) then 
+	if getMapAffixPower then
+		if getMapAffixPower(20) then 
 			totalCrit = totalCrit - getMapAffixPower(20)/100 
-	    end
-        if getMapAffixPower(21) then
+		end
+		if getMapAffixPower(21) then
 			critDamageMultiplier = (critDamageMultiplier - 1) * (1 - getMapAffixPower(21)/100) + 1
-        end
-    end
+		end
+	end
 
-    local id = pl:GetIndex()
-    if not (vars.legendaries and table.find(vars.legendaries[id], 14)) then
-      totalCrit = math.min(totalCrit, 1)
-    else
-	  totalCrit=totalCrit+0.1
-    end
+	local id = pl:GetIndex()
+	if not (vars.legendaries and table.find(vars.legendaries[id], 14)) then
+		totalCrit = math.min(totalCrit, 1)
+	else
+		totalCrit=totalCrit+0.1
+	end
 
-    local success = math.random() < totalCrit
-    return totalCrit, critDamageMultiplier, success
+	local success = math.random() < totalCrit
+	return totalCrit, critDamageMultiplier, success
 end
 
 local SERVICE_CASTER = (Multiplayer and Multiplayer.SERVICE_CASTER) or 49
@@ -1284,7 +1288,16 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 18) then
 		damage=damage*0.9
 	end	
-	
+	--shield skill
+	if pl:GetActiveItem(0) then
+		local it=pl:GetActiveItem(0)
+		if it and it:T().Skill==const.Skills.Shield then --shield skill
+			s,m=SplitSkill(pl.Skills[const.Skills.Shield])
+			if m>=4 then
+				damage=damage*0.85
+			end
+		end
+	end
 	--PHYSICAL DAMAGE CALCULATION
 	if damageKind==4 then 		
 		local AC=pl:GetArmorClass()
@@ -1862,7 +1875,12 @@ function getPlayerEstimatedPower(lvl)
 	
 	local luck=might
 	local accuracy=might
-	local critChance=0.05+(luck/math.min(500+lvl*7.5,5000))+0.1*math.min(lvl/300,1) --assume crit enchant at lvl 500
+	
+	local diminishingValue=math.min(100+lvl*1.4,1000)
+	if vars.madnessMode then
+		diminishingLevel=math.min(100+lvl*1.4,1500)
+	end
+	local critChance=0.05+(luck/diminishingLevel)+0.1*math.min(lvl/300,1) --assume crit enchant at lvl 500
 	local extraMult=1
 	if critChance>1 then
 		extraMult=critChance
