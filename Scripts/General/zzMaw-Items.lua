@@ -729,7 +729,7 @@ function events.ItemGenerated(t)
 					nAff=nAff+1
 				end
 			end
-			ancientChance=ancientChance*(1+mapvars.mapAffixes.Power*nAff/400)
+			ancientChance=ancientChance*(1+(mapvars.mapAffixes.Power*nAff+nAff*20)/400)
 		end
 		
 		if bossLoot then
