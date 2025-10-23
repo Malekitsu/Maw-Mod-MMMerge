@@ -1771,18 +1771,21 @@ function events.MonsterKilled(mon)
 			obj.Type=0
 			obj.TypeIndex=0
 		end
-		if math.random()<1 then
-			obj.Item.Bonus2=getUniqueAffix()
+		obj.Item.Bonus2=getUniqueAffix()
+		obj.Item.Charges=getUniqueAffix()
+		obj.Item.Charges=obj.Item.Charges+getUniqueAffix()*1000
+		obj.Item.BonusExpireTime=getUniqueAffix()
+		
+		local roll=math.random()
+		local bonus=1
+		if roll<=0.1 then
+			bonus=4
+		elseif roll<0.3 then
+			bonus=3
+		elseif bonus<=0.6 then
+			bonus=2
 		end
-		if math.random()<0.6 then
-			obj.Item.Charges=getUniqueAffix()
-		end
-		if math.random()<0.5 then
-			obj.Item.Charges=obj.Item.Charges+getUniqueAffix()*1000
-		end
-		if math.random()<0.4 then
-			obj.Item.BonusExpireTime=getUniqueAffix()
-		end
+		
 		obj.Item.MaxCharges=round(getMonsterLevel(mon)/10-math.random(0,3))
 		if vars.insanityMode and not vars.madnessMode then
 			obj.Item.MaxCharges=math.max(obj.Item.MaxCharges,30)
@@ -1825,8 +1828,15 @@ function events.UseMouseItem(t)
 		storeRefillDaysAfterMapUsage={it.BonusStrength, map.RefillDays}
 		map.RefillDays=0
 		local fileName=string.sub(map.FileName, 1, -5)
-		
-		mapAffixList={it.BonusExpireTime, it.Bonus2, it.Charges%1000, round(it.Charges/1000), ["Power"]=it.MaxCharges}
+		local affixes=it.Bonus
+		if affixes==0 then
+			affixes=4
+		end
+		mapAffixList={	it.BonusExpireTime, 
+						it.Bonus2 and affixes>=2 or 0, 
+						it.Charges%1000 and affixes>=3 or 0, 
+						round(it.Charges/1000) and affixes>=4 or 0, 
+						["Power"]=it.MaxCharges}
 		math.randomseed(it.BonusExpireTime+it.Bonus2*10^3+it.Charges*10^6+it.MaxCharges*10^9+it.BonusStrength*10^12)
 
 		--randomize monsters
@@ -1935,7 +1945,7 @@ end
 function calculateAffixPower(n, p)
 	local power=false
     if n == 1 then
-         power=20+p*1.5
+         power=20+p*0.5
     elseif n == 2 then
 		power=10+p*1
 	elseif n == 3 then
@@ -1943,7 +1953,7 @@ function calculateAffixPower(n, p)
 	elseif n == 4 then
 		power=5+p*0.5
 	elseif n == 5 then
-		power=7+p*0.1
+		power=7+p*1
 	elseif n == 6 then
 		power=7+p*0.1
 	elseif n == 7 then
@@ -2100,20 +2110,37 @@ function events.BuildItemInformationBox(t)
 		}
 		
 		local txt=""
-		if it.BonusExpireTime>0 then
-			txt=mapAffixes[it.BonusExpireTime] .. "\n" .. txt
-		end
-		if it.Bonus2>0 then
-			txt=mapAffixes[it.Bonus2] .. "\n" .. txt
+		local bonus=it.Bonus
+		if bonus==0 then
+			bonus=4
 		end
 		if it.Charges>0 then
-			txt=mapAffixes[it.Charges%1000] .. "\n" .. txt
 			if it.Charges>=1000 then
-				txt=mapAffixes[math.floor(it.Charges/1000)] .. "\n" .. txt
+				if bonus>=4 then
+					txt=StrColor(255,255,153,"- " .. mapAffixes[math.floor(it.Charges/1000)]) .. "\n\n" .. txt
+				else
+					txt=StrColor(100,100,100,"- " .. mapAffixes[math.floor(it.Charges/1000)]) .. "\n\n" .. txt
+				end
+			end
+			if it.Charges%1000>0 then
+				if bonus>=3 then
+					txt=StrColor(255,255,153,"- " .. mapAffixes[it.Charges%1000]) .. "\n\n" .. txt
+				else
+					txt=StrColor(100,100,100,"- " .. mapAffixes[it.Charges%1000]) .. "\n\n" .. txt
+				end
 			end
 		end
-		t.Description=StrColor(255,255,153,txt)
-		t.Description=t.Description .. "\nUsing this map will teleport you to the entrance."
+		if it.Bonus2>0 then
+			if bonus>=2 then
+				txt=StrColor(255,255,153,"- " .. mapAffixes[it.Bonus2]) .. "\n\n" .. txt
+			else
+				txt=StrColor(100,100,100,"- " .. mapAffixes[it.Bonus2]) .. "\n\n" .. txt
+			end
+		end
+		if it.BonusExpireTime>0 then
+			txt=StrColor(255,255,153,"- " .. mapAffixes[it.BonusExpireTime]) .. "\n\n" .. txt
+		end
+		t.Description="\n" .. txt .. "Creator's Hourglass and Eye of the void can be used to unlock new affixes, Pandora's Cube to change the Map and emerald of power to increase the map Level.\nUsing this map will teleport you to the entrance."
 	end
 end
 
