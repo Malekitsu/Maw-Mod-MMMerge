@@ -1725,9 +1725,19 @@ function events.MonsterKilled(mon)
 		end
 	end
 	
+	possibleMaps={}
+	for i=1,#mapDungeons do
+		if vars.dungeonCompletedList[Game.MapStats[mapDungeons[i]].Name] then
+			table.insert(possibleMaps, mapDungeons[i])
+		end
+	end
+	
+	
 	-- Seeded map drop calculation
 	local densityMult = GetDensityMultiplier(mon.Id)
 	local dropChance = chances * mon.Level / 100 / (mapvars.mapsDropped + 1) * densityMult
+	local dropChance=dropChance*#possibleMaps/#mapDungeons
+	
 	-- Apply pity protection using new pity system
 	dropChance = pity_chance(dropChance, vars.mapDropFailures)
 	
@@ -1753,24 +1763,9 @@ function events.MonsterKilled(mon)
 	if getMonsterLevel(mon)>=levelRequired and rollValue < dropChance then
 		assignedAffixes = {}
 		obj = SummonItem(290, mon.X, mon.Y, mon.Z + 100, 100)
-		possibleMaps={}
-		for i=1,#mapDungeons do
-			if vars.dungeonCompletedList[Game.MapStats[mapDungeons[i]].Name] then
-				table.insert(possibleMaps, mapDungeons[i])
-			end
-		end
-		if table.find(possibleMaps,mapDungeons[math.random(1,#mapDungeons)]) then
-			obj.Item.BonusStrength=possibleMaps[math.random(1,#possibleMaps)]
-			mapvars.mapsDropped=mapvars.mapsDropped+1
-			vars.mapDropFailures=0 -- Reset pity counter on successful drop
-			if vars.madnessMode then
-				vars.ownedMaps=vars.ownedMaps+1
-			end
-		else
-			obj.Item.Number=0
-			obj.Type=0
-			obj.TypeIndex=0
-		end
+		obj.Item.BonusStrength=possibleMaps[math.random(1,#possibleMaps)]
+		mapvars.mapsDropped=mapvars.mapsDropped+1
+		vars.mapDropFailures=0
 		obj.Item.Bonus2=getUniqueAffix()
 		obj.Item.Charges=getUniqueAffix()
 		obj.Item.Charges=obj.Item.Charges+getUniqueAffix()*1000
@@ -1833,9 +1828,9 @@ function events.UseMouseItem(t)
 			affixes=4
 		end
 		mapAffixList={	it.BonusExpireTime, 
-						it.Bonus2 and affixes>=2 or 0, 
-						it.Charges%1000 and affixes>=3 or 0, 
-						round(it.Charges/1000) and affixes>=4 or 0, 
+						affixes>=2 and it.Bonus2 or 0, 
+						affixes>=3 and it.Charges%1000 or 0, 
+						affixes>=4 and round(it.Charges/1000) or 0, 
 						["Power"]=it.MaxCharges}
 		math.randomseed(it.BonusExpireTime+it.Bonus2*10^3+it.Charges*10^6+it.MaxCharges*10^9+it.BonusStrength*10^12)
 
