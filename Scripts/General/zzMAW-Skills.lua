@@ -270,9 +270,13 @@ function events.GetAttackDelay(t)
 	end
 	if table.find(assassinClass, t.Player.Class) then
 		local id=t.Player:GetIndex()
-		if vars.AttackSpeedStackDecay and vars.AttackSpeedStackDecay[id]>=Game.Time then
-			local s, m=SplitSkill(t.Player.Skills[const.Skills.Air])
-			bonusSpeed=bonusSpeed+s*vars.AttackSpeedStack[id]
+		if vars.AttackSpeedStackDecay and vars.AttackSpeedStackDecay[id] then
+			if vars.AttackSpeedStackDecay[id]>=Game.Time then
+				local s, m=SplitSkill(t.Player.Skills[const.Skills.Air])
+				bonusSpeed=bonusSpeed+s*vars.AttackSpeedStack[id]
+			else
+				vars.AttackSpeedStack[id]=0
+			end
 		end
 	end
 	
