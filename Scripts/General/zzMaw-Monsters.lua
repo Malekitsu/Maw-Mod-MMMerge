@@ -2101,8 +2101,8 @@ function events.BuildMonsterInformationBox(t)
 		lowerLimit=round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,lowerLimit,false,lvl))
 		upperLimit=round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack1.Type,upperLimit,false,lvl))
 	end
-	lowerLimit=shortenNumber(lowerLimit, 4, true)
-	upperLimit=shortenNumber(upperLimit, 4, true)
+	lowerLimit=shortenNumber(lowerLimit, 3, true)
+	upperLimit=shortenNumber(upperLimit, 3, true)
 	if t.IdentifiedDamage or t.IdentifiedAttack then
 		t.Damage.Text=string.format("Attack 00000	050" .. lowerLimit .. "-" .. upperLimit .. " " .. text)
 		if mon.Attack2Chance>0 and Game.CurrentPlayer>=0 then
@@ -2117,8 +2117,8 @@ function events.BuildMonsterInformationBox(t)
 				upperLimit=round(calcMawDamage(Party[Game.CurrentPlayer],mon.Attack2.Type,upperLimit,false,lvl))
 			end
 			text=string.format(table.find(const.Damage,mon.Attack2.Type))
-			lowerLimit=shortenNumber(lowerLimit, 4, true)
-			upperLimit=shortenNumber(upperLimit, 4, true)
+			lowerLimit=shortenNumber(lowerLimit, 3, true)
+			upperLimit=shortenNumber(upperLimit, 3, true)
 			t.Damage.Text=string.format(t.Damage.Text .. "\n" .. lowerLimit .. "-" .. upperLimit .. " " .. text)
 		end
 		--spell
@@ -2145,8 +2145,8 @@ function events.BuildMonsterInformationBox(t)
 				lowerLimit=round(calcMawDamage(Party[Game.CurrentPlayer],damageType,lowerLimit,false,lvl))
 				upperLimit=round(calcMawDamage(Party[Game.CurrentPlayer],damageType,upperLimit,false,lvl))
 			end
-			lowerLimit=shortenNumber(lowerLimit, 4, true)
-			upperLimit=shortenNumber(upperLimit, 4, true)
+			lowerLimit=shortenNumber(lowerLimit, 3, true)
+			upperLimit=shortenNumber(upperLimit, 3, true)
 			t.SpellFirst.Text=string.format("Spell00000	040" .. name .. " " .. lowerLimit .. "-" .. upperLimit)
 		end
 	end
@@ -2168,7 +2168,7 @@ function events.BuildMonsterInformationBox(t)
 				end
 			end
 			hp=t.Monster.FullHP*2^math.floor(res[0]/1000)
-			hp=shortenNumber(hp, 5)
+			hp=shortenNumber(hp, 4)
 			t.HitPoints.Text=string.format("02016Hit Points0000000000	100" .. hp)
 		end
 	end
