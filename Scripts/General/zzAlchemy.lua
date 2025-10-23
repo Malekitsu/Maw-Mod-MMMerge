@@ -1120,20 +1120,18 @@ function events.BuildItemInformationBox(t)
 				craftUsed=true
 			end
 		elseif id==1063 then
+			math.randomseed(it.BonusStrength+it.Bonus2*1000+it.Charges+1000000)
 			local possibleMaps={}
 			for i=1,#mapDungeons do
-				if vars.dungeonCompletedList[Game.MapStats[mapDungeons[i]].Name] then
-					table.insert(possibleMaps, mapDungeons[i])
+				local id=mapDungeons[i]
+				if id~=it.BonusStrength then
+					if vars.dungeonCompletedList[Game.MapStats[mapDungeons[i]].Name] then
+						table.insert(possibleMaps, mapDungeons[i])
+					end
 				end
 			end
-			local pos=table.find(possibleMaps, it.BonusStrength)
-			if pos then
-				pos=pos+1
-			else
-				return
-			end
-			it.BonusStrength=possibleMaps[pos] or possibleMaps[1]
-				craftUsed=true
+			it.BonusStrength=possibleMaps[math.random(1,#possibleMaps)]
+			craftUsed=true
 		elseif id==1065 then
 			if it.MaxCharges<255 then
 				it.MaxCharges=math.min(it.MaxCharges+5,255)
