@@ -58,10 +58,11 @@ function getCritInfo(pl, dmgType, monLvl)
 	local totalCrit = luck / math.min((500 + monLvl*7.5), 5000) + 0.05
 	local critDamageMultiplier = 1
 	
-	local diminishingLevel=math.min(100+monLvl*1.4,1000)
+	local cap=1000
 	if vars.madnessMode then
-		diminishingLevel=math.min(100+monLvl*1.4,1500)
+		cap=1500
 	end
+	local diminishingLevel=math.min(100+monLvl*1.4,cap)
 	if dmgType == "spell" then
 		local intellect = pl.GetIntellect and pl:GetIntellect() or 0
 		critDamageMultiplier = intellect/(diminishingLevel*4) + 1.5
@@ -96,7 +97,7 @@ function getCritInfo(pl, dmgType, monLvl)
 		if it and (table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number)) then
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.Axe))
 			if m == 4 then
-				critDamageMultiplier = critDamageMultiplier + 0.01*s
+				critDamageMultiplier = critDamageMultiplier + math.min(0.01* cap / diminishingLevel, 0.05) *s
 			end
 		end
 	end
