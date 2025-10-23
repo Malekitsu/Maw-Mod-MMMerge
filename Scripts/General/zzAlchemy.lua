@@ -1239,7 +1239,7 @@ function events.MonsterKilled(mon)
 				nAff=nAff+1
 			end
 		end
-		extraRoll=extraRoll*(1+mapvars.mapAffixes.Power*nAff/800*1.5)
+		extraRoll=extraRoll*(1+(mapvars.mapAffixes.Power*nAff+nAff*20)/800*1.5)
 	end
 	--pick base craft material
 	local baseCraftDrop=false
