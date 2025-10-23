@@ -1103,6 +1103,51 @@ evt.PotionEffects[98] = function(IsDrunk, t, Power)
 	end
 end
 
+--manually use crafting items on maps
+function events.BuildItemInformationBox(t)
+	local it=t.Item
+	if it.Number==290 then
+		local id=Mouse.Item.Number
+		local craftUsed=false
+		if id==1061 then
+			if it.Bonus>0 and it.Bonus<4 then
+				it.Bonus=it.Bonus+1
+				craftUsed=true
+			end
+		elseif id==1062 then
+			if it.Bonus>0 and it.Bonus<4 then
+				it.Bonus=it.Bonus+1
+				craftUsed=true
+			end
+		elseif id==1063 then
+			local possibleMaps={}
+			for i=1,#mapDungeons do
+				if vars.dungeonCompletedList[Game.MapStats[mapDungeons[i]].Name] then
+					table.insert(possibleMaps, mapDungeons[i])
+				end
+			end
+			local pos=table.find(possibleMaps, it.BonusStrength)
+			if pos then
+				pos=pos+1
+			else
+				return
+			end
+			it.BonusStrength=possibleMaps[pos] or possibleMaps[1]
+				craftUsed=true
+		elseif id==1065 then
+			if it.MaxCharges<255 then
+				it.MaxCharges=math.min(it.MaxCharges+5,255)
+				craftUsed=true
+			end
+		end
+		if craftUsed then
+			Mouse.Item.Number=0
+			mem.u4[0x51E100] = 0x100 
+			it.Condition = it.Condition:Or(0x10)
+			evt.PlaySound(12070)
+		end
+	end
+end
 
 craftDropChances={
 		["gems"]=0.006,
