@@ -215,6 +215,19 @@ function events.UseMouseItem(t)
 				return
 			end
 		end
+		--retroactive fix
+		for key, value in pairs(vars.BlackPotions[index]) do
+			if type(key)=="string" then
+				if pl[key]<255 then
+					pl[key]=math.max(0, pl[key]-value)
+				else
+					pl[key]=math.max(100, pl[key]-value)
+				end
+				local stat=retroActiveFix[key]
+				vars.BlackPotions[index][stat]=value
+				vars.BlackPotions[index][key]=nil
+			end
+		end
 	end	
 	
 	--age potions
@@ -289,6 +302,21 @@ blackPermanentBuffs={
 	[254]={4,6,7},
 	[261]={11,12,13,14},
 	[262]={15,16},
+}
+retroActiveFix={
+	["MightBase"]=1,
+	["IntellectBase"]=2,
+	["PersonalityBase"]=3,
+	["EnduranceBase"]=4,
+	["AccuracyBase"]=5,
+	["SpeedBase"]=6,
+	["LuckBase"]=7,
+	["FireResistanceBase"]=11,
+	["AirResistanceBase"]=12,
+	["WaterResistanceBase"]=13,
+	["EarthResistanceBase"]=14,
+	["MindResistanceBase"]=15,
+	["BodyResistanceBase"]=16,
 }
 itemBuffMapping = {
 	[228] = 7,	 --haste
