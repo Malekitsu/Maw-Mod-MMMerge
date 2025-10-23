@@ -825,9 +825,9 @@ function events.ItemGenerated(t)
 			if Game.HouseScreen==2 or Game.HouseScreen==95 then
 				baseChance=0
 			end
-			baseChance=baseChance*lootMultiplier^0.5
-			-- Apply pity protection using new pity system
 			local chance = pity_chance(baseChance, vars.legendaryPityCounter)
+			chance=chance*lootMultiplier^0.5
+			-- Apply pity protection using new pity system
 			
 			if chance>=math.random() or OmnipotentLoot then
 				-- Reset pity counter on successful drop
@@ -887,10 +887,10 @@ function events.ItemGenerated(t)
 		--celestial
 		if it.BonusExpireTime>10 and it.BonusExpireTime<100 then
 			vars.celestialPityCounter = vars.celestialPityCounter or 0
-			
-			local baseChance = 0.1 * lootMultiplier^0.5
-			
+			local baseChance=0.1
 			local chance = pity_chance(baseChance, vars.celestialPityCounter)
+			chance = chance * lootMultiplier^0.5
+			
 			
 			if math.random()<chance then
 				it.BonusExpireTime=it.BonusExpireTime+100
