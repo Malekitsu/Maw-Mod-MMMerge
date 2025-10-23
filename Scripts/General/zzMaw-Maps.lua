@@ -1734,13 +1734,15 @@ function events.MonsterKilled(mon)
 	
 	
 	-- Apply pity protection using new pity system
-	local dropChance = pity_chance(chances, vars.mapDropFailures)
+	local dropChance=chances*#possibleMaps/#mapDungeons
+	dropChance = pity_chance(dropChance, vars.mapDropFailures)
 	
 	-- Seeded map drop calculation
-	local densityMult = GetDensityMultiplier(mon.Id)
-	dropChance = dropChance * mon.Level / 100 / (mapvars.mapsDropped + 1) * densityMult
-	dropChance=dropChance*#possibleMaps/#mapDungeons
-	
+	local mult = GetDensityMultiplier(mon.Id)
+	if mon.NameId>=220 and mon.NameId<=300 then
+		mult=mult*10
+	end
+	dropChance = chances * mon.Level / 100 / (mapvars.mapsDropped + 1) * mult
 	
 	-- Use seeded random if available, otherwise fallback to regular random
 	local rollValue
@@ -1787,7 +1789,7 @@ function events.MonsterKilled(mon)
 			obj.Item.MaxCharges=math.max(obj.Item.MaxCharges,30)
 		end
 	elseif getMonsterLevel(mon) >= levelRequired then
-		vars.mapDropFailures = vars.mapDropFailures + densityMult
+		vars.mapDropFailures = vars.mapDropFailures + mult
 	end
 end
 
