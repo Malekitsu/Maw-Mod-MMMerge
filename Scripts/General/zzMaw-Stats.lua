@@ -1876,7 +1876,7 @@ function getPlayerEstimatedPower(lvl)
 	local luck=might
 	local accuracy=might
 	
-	local diminishingValue=math.min(100+lvl*1.4,1000)
+	local diminishingLevel=math.min(100+lvl*1.4,1000)
 	if vars.madnessMode then
 		diminishingLevel=math.min(100+lvl*1.4,1500)
 	end
