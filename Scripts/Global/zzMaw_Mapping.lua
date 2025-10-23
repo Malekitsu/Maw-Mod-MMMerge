@@ -43,7 +43,7 @@ function events.DoBadThingToPlayer(t)
 	end
 end
 function events.Tick()
-	if getMapAffixPower(25) then
+	if getMapAffixPower(25) and (Party.EnemyDetectorYellow or Party.EnemyDetectorRed) then
 		vars.lastX=vars.lastX or Party.X
 		vars.lastY=vars.lastY or Party.Y
 		push1=(Party.X-vars.lastX)
