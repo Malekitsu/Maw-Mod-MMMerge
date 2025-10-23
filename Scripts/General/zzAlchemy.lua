@@ -207,9 +207,8 @@ function events.UseMouseItem(t)
 		end
 		for i=1,#blackPermanentBuffs[it.Number] do
 			local stat=blackPermanentBuffs[it.Number][i]
+			vars.BlackPotions[index][stat]=vars.BlackPotions[index][stat] or 0
 			if power>vars.BlackPotions[index][stat] then
-				local buff=power-vars.BlackPotions[index][stat]
-				pl[stat]=pl[stat]+buff
 				vars.BlackPotions[index][stat]=power
 			else
 				Game.ShowStatusText("Can't benefit anymore")
@@ -285,11 +284,11 @@ potionPowerRequirement={
 	[256]=50,
 }
 blackPermanentBuffs={
-	[252]={"MightBase","AccuracyBase"},
-	[253]={"IntellectBase","PersonalityBase"},
-	[254]={"EnduranceBase","SpeedBase","LuckBase"},
-	[261]={"FireResistanceBase","AirResistanceBase","WaterResistanceBase","EarthResistanceBase"},
-	[262]={"MindResistanceBase","BodyResistanceBase"},
+	[252]={1,5},
+	[253]={2,3},
+	[254]={4,6,7},
+	[261]={11,12,13,14},
+	[262]={15,16},
 }
 itemBuffMapping = {
 	[228] = 7,	 --haste
