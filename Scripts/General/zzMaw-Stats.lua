@@ -1880,13 +1880,13 @@ function getPlayerEstimatedPower(lvl)
 	if vars.madnessMode then
 		diminishingLevel=math.min(100+lvl*1.4,1500)
 	end
-	local critChance=0.05+(luck/diminishingLevel)+0.1*math.min(lvl/300,1) --assume crit enchant at lvl 500
+	local critChance=0.05+(luck/math.min(500+lvl*7.5,5000))+0.1*math.min(lvl/300,1) --assume crit enchant at lvl 500
 	local extraMult=1
 	if critChance>1 then
 		extraMult=critChance
 	end
 	local critChance=math.min(critChance,1)
-	local critDamage=(0.5+luck/500)
+	local critDamage=(0.5+accuracy/diminishingLevel)
 	
 	damage=damage*(1+critChance*critDamage*extraMult)
 	
