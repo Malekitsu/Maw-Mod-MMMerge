@@ -1741,6 +1741,12 @@ function events.MonsterKilled(mon)
 	local mult = GetDensityMultiplier(mon.Id)
 	if mon.NameId>=220 and mon.NameId<=300 then
 		mult=mult*10
+		
+		local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+		if skill=="Broodling" then
+			local tier=(mon.Id-1)%3+1
+			mult=mult/(5-tier)
+		end
 	end
 	dropChance = chances * mon.Level / 100 / (mapvars.mapsDropped + 1) * mult
 	
