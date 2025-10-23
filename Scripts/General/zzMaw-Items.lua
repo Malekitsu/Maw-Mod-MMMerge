@@ -3119,14 +3119,18 @@ function itemStats(index)
 			
 			--armsmaster
 			local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
-			local s2,m2 = SplitSkill(pl.Skills[const.Skills.Armsmaster])
 			local requirement=GetArmsmasterSupremeRequirement()
-			if pl.Class>=16 and pl.Class<=19 and s2>=requirement and m==4 then
+			if pl.Class>=16 and pl.Class<=19 and s>=requirement and m==4 then
 				m=5
 			end
 		
 			--weapon 
 			local s2,m2=SplitSkill(pl:GetSkill(skill))
+			
+			--bow
+			if skill==5 then
+				bonus=bonus+s2
+			end
 			
 			if skill==0 then
 				if m2==4 then
@@ -3142,6 +3146,8 @@ function itemStats(index)
 			if skillDamage[skill] then
 				mult=(1+s2*skillDamage[skill][m2]/100)
 			end
+			
+			
 			
 			local side=math.max(sidesBonus*mult)
 			local add=math.max(bonus*mult)
