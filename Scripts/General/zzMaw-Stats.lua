@@ -58,7 +58,7 @@ function getCritInfo(pl, dmgType, monLvl)
 	local totalCrit = luck / math.min((500 + monLvl*7.5), 5000) + 0.05
 	local critDamageMultiplier = 1
 	
-	local diminishingValue=math.min(100+monLvl*1.4,1000)
+	local diminishingLevel=math.min(100+monLvl*1.4,1000)
 	if vars.madnessMode then
 		diminishingLevel=math.min(100+monLvl*1.4,1500)
 	end
