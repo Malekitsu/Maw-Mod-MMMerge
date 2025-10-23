@@ -4419,12 +4419,8 @@ function events.KeyDown(t)
 		if t.Key ==85 and gemUpgrading then
 			gemUpgrading=false
 			for i=1,19 do
-				local id=1050+i
+				local id=1040+i
 				local bonusStrength=0
-				if i>10 then
-					id=1050+i-10
-					bonusStrength=1
-				end
 				local gemsFound=0
 				for j=0,Party.High do
 					local pl=Party[j]
@@ -4445,10 +4441,6 @@ function events.KeyDown(t)
 								gemsRemoved=gemsRemoved+1
 								if gemsRemoved==3 then
 									id=id+1
-									if id>1060 then
-										id=id-10
-										bonusStrength=1
-									end
 									evt.Add("Items",id)
 									Mouse.Item.BonusStrength=bonusStrength
 									Game.ShowStatusText(string.format("%s created", craftingNames[i+1]))
