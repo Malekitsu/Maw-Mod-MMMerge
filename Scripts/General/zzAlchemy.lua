@@ -1207,12 +1207,8 @@ function events.MonsterKilled(mon)
 	end
 	
 	--level bonus
-	local lvl=mon.Level
-	if mon.NameId==0 and totalLevel[mon.Id] then
-		lvl=round(totalLevel[mon.Id])
-	elseif mapvars.uniqueMonsterLevel and mapvars.uniqueMonsterLevel[mon:GetIndex()] then
-		lvl=round(mapvars.uniqueMonsterLevel[mon:GetIndex()])
-	end
+	local lvl=getMonsterLevel(mon)
+	
 	bonusRoll=(lvl/10)^0.5
 	local extraRoll=1
 	if mon.NameId>=220 and mon.NameId <300 then
@@ -1281,9 +1277,8 @@ function events.MonsterKilled(mon)
 		vars.craftPityCounters[i] = vars.craftPityCounters[i] or 0
 		
 		-- Apply pity protection using new pity system
-		local baseChance = craftDropChances[i] * bonusRoll
-		local pityAdjustedChance = pity_chance(baseChance, vars.craftPityCounters[i])
-		
+		local pityAdjustedChance = pity_chance(craftDropChances[i], vars.craftPityCounters[i])
+		local pityAdjustedChance = pityAdjustedChance * bonusRoll
 		if math.random() < pityAdjustedChance then
 			-- Reset pity counter on successful drop
 			vars.craftPityCounters[i] = 0
@@ -1295,7 +1290,7 @@ function events.MonsterKilled(mon)
 			end
 		else
 			-- Increment pity counter on failed drop
-			vars.craftPityCounters[i] = vars.craftPityCounters[i] + round(extraRoll)
+			vars.craftPityCounters[i] = vars.craftPityCounters[i] + round(bonusRoll)
 		end
 	end
 	
