@@ -4735,6 +4735,7 @@ end
 ---------------------------
 --PITY SYSTEM CALCULATION--
 ---------------------------
+--[[
 -- Tunables
 local SURV_TOL   = 1e-12          -- stop when survival prob < this
 local BISECT_ITR = 30             -- bisection iterations (30 is plenty)
@@ -4836,4 +4837,32 @@ function pity_chance(p, k, a)
   if pk > 1 then pk = 1 end
   if pk < 0 then pk = 0 end
   return pk
+end
+
+NEW ONE
+succ={}
+chance=0.1
+pity=0
+for i=1,100000 do
+	roll=math.random()
+	win=chance^(1.8-chance*pity)  1.8 is close to the real mean
+	if win>=roll then
+		table.insert(succ, pity)
+		pity=0
+	else
+		pity=pity+1
+	end
+end
+sum=0
+for i=1,#succ do
+	sum=sum+succ[i]
+end
+mean=sum/#succ
+print(mean)
+
+]]
+
+function pity_chance(chance, failures)
+	local successChance=chance^(1.8-chance*failures)
+	return successChance
 end
