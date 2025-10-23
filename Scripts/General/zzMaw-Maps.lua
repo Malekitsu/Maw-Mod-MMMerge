@@ -2056,17 +2056,21 @@ function events.BuildItemInformationBox(t)
 		local baseLevel=round((baseMap.Low+baseMap.Mid+baseMap.High)/3)
 		t.Enchantment="Map Level: " .. it.MaxCharges*10+20+baseLevel
 		local power=0
-		if it.BonusExpireTime>0 then
-			power=power+1
-		end
-		if it.Bonus2>0 then
-			power=power+1
-		end
-		if it.Charges>0 then
-			power=power+1
-			if it.Charges>=1000 then
+		if it.Bonus==0 then
+			if it.BonusExpireTime>0 then
 				power=power+1
 			end
+			if it.Bonus2>0 then
+				power=power+1
+			end
+			if it.Charges>0 then
+				power=power+1
+				if it.Charges>=1000 then
+					power=power+1
+				end
+			end
+		else
+			power=it.Bonus
 		end
 		t.Enchantment=t.Enchantment .. StrColor(0, 127, 255,"\n+" .. round((it.MaxCharges*power+power*20)/8*1.5) .. "% craft items drop chances "  .. "\n+" .. round((it.MaxCharges*power+power*20)/4) .. "% item quality " .. "%\n+" .. round((it.MaxCharges*power+power*20)/3) .. "% monster density")	
 	end
