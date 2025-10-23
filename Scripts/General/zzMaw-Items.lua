@@ -2792,6 +2792,9 @@ function events.CalcStatBonusByItems(t)
 	if statMap[t.Stat] then
 		t.Result=plItemsStats[t.PlayerIndex][statMap[t.Stat]]
 	end
+	if vars.BlackPotions and vars.BlackPotions[t.PlayerIndex] and vars.BlackPotions[t.PlayerIndex][t.Stat+1] then
+		t.Result=t.Result+vars.BlackPotions[t.PlayerIndex][t.Stat+1]
+	end
 end
 
 --get artifacts Skills
