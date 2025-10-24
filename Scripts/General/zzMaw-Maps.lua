@@ -1718,7 +1718,7 @@ function events.MonsterKilled(mon)
 	vars.mapDropFailures=vars.mapDropFailures or 0
 	local chances=0.001
 	if vars.madnessMode then
-		chances=chance*1.5
+		chances=chances*1.5
 		if mapvars.mapAffixes then
 			local map=mapLevels[Game.MapStats[Map.MapStatsIndex].Name]
 			local level=mapvars.mapAffixes.Power*10+round((map.Low+map.Mid+map.High)/3)+20
