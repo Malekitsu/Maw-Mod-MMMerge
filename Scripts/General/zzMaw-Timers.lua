@@ -95,4 +95,5 @@ MawAddTimer("elementalBuffs", 1, elementalBuffs)
 MawAddTimer("mawBuffApply", 0.5, mawBuffApply)
 MawAddTimer("elementalistStacksDecay", 0.1, elementalistStacksDecay)
 MawAddTimer("poisonTimer", 1, poisonTimer)
+MawAddTimer("chargeTimer", 1, chargeTimer)
 
