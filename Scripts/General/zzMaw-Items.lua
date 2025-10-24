@@ -4864,6 +4864,6 @@ print(mean)
 ]]
 
 function pity_chance(chance, failures)
-	local successChance=chance^(1.45-chance*failures)
+	local successChance=chance^(1.45-chance*failures*0.5)
 	return successChance
 end
