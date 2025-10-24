@@ -2778,7 +2778,16 @@ function checkMapCompletition()
 				end
 				evt.ForPlayer(0)
 				evt.Add{"Gold", Value = gold}
-				if not vars.AusterityMode then
+				if mapvars.mapAffixes then
+					local rewards={1063,1061,1062,1065,[0]=0}
+					local nAff=0
+					for i=1,4 do
+						if mapvars.mapAffixes[i]>0 then
+							nAff=nAff+1
+						end
+					end
+					evt.Add("Items",rewards[nAff])
+				elseif not vars.AusterityMode then
 					local gemTier=math.ceil((mapLevel+bolster)/25+0.5)
 					if gemTier>20 then
 						for i=1, math.floor(gemTier/10) do
