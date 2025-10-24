@@ -1760,7 +1760,7 @@ function events.MonsterKilled(mon)
 			mult=mult/(5-tier)
 		end
 	end
-	dropChance = chances * mon.Level / 100 / (mapvars.mapsDropped + 1) * mult
+	dropChance = dropChance * mon.Level / 100 / (mapvars.mapsDropped + 1) * mult
 	
 	-- Use seeded random if available, otherwise fallback to regular random
 	local rollValue
