@@ -1104,6 +1104,7 @@ evt.PotionEffects[98] = function(IsDrunk, t, Power)
 end
 
 --manually use crafting items on maps
+local overworldMaps={1,2,3,4,5,6,7,8,9,10,11,12,13,14,62,63,64,65,66,67,68,69,70,71,72,73,74,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151}
 function events.BuildItemInformationBox(t)
 	local it=t.Item
 	if it.Number==290 then
@@ -1120,13 +1121,19 @@ function events.BuildItemInformationBox(t)
 				craftUsed=true
 			end
 		elseif id==1063 then
+			local outside=false
+			if table.find(overworldMaps,it.BonusStrength) then
+				outside=true
+			end
 			math.randomseed(it.BonusStrength+it.Bonus2*1000+it.Charges+1000000)
 			local possibleMaps={}
 			for i=1,#mapDungeons do
 				local id=mapDungeons[i]
 				if id~=it.BonusStrength then
-					if vars.dungeonCompletedList[Game.MapStats[mapDungeons[i]].Name] then
-						table.insert(possibleMaps, mapDungeons[i])
+					if (outside and table.find(overworldMaps,id)) or (not outside and not table.find(overworldMaps,id)) then
+						if vars.dungeonCompletedList[Game.MapStats[mapDungeons[i]].Name] then
+							table.insert(possibleMaps, mapDungeons[i])
+						end
 					end
 				end
 			end
