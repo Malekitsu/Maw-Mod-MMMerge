@@ -1789,7 +1789,7 @@ function events.MonsterKilled(mon)
 		elseif bonus<=0.6 then
 			bonus=2
 		end
-		
+		obj.Item.Bonus=bonus
 		obj.Item.MaxCharges=round(getMonsterLevel(mon)/10-math.random(0,3))
 		if vars.insanityMode and not vars.madnessMode then
 			obj.Item.MaxCharges=math.max(obj.Item.MaxCharges,30)
