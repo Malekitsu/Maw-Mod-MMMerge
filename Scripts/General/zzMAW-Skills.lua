@@ -222,7 +222,7 @@ function events.GetAttackDelay(t)
 					end
 					local s,m = SplitSkill(t.Player:GetSkill(skill))
 					if skillRecovery[skill] and skillRecovery[skill][m] then
-						if skill~=3 or i~=0 then
+						if not table.find(twoHandedAxes, it.Number) or i~=0 then
 							bonusSpeed=bonusSpeed+skillRecovery[skill][m]*s
 						end
 					end	
@@ -1561,6 +1561,7 @@ function events.Action(t)
 	end
 end
 ]]
+--[[
 function events.Tick()
 	if Game.CurrentScreen==7 or Game.CurrentScreen==15 then
 		if Game.CurrentPlayer<0 or Game.CurrentPlayer>Party.High then return end
@@ -1570,33 +1571,33 @@ function events.Tick()
 			local s,m = SplitSkill(pl.Skills[3])
 			if m>=2 then
 				for i=1,#oneHandedAxes do
-					txt=Game.ItemsTxt[oneHandedAxes[i]]
+					txt=Game.ItemsTxt[oneHandedAxes[i] ]
 					txt.Skill=2
 					txt.EquipStat=0
 				end
 				for i=1,#twoHandedAxes do
-					txt=Game.ItemsTxt[twoHandedAxes[i]]
+					txt=Game.ItemsTxt[twoHandedAxes[i] ]
 					txt.Skill=3
 					txt.EquipStat=0
 				end
 			end
 			if m>=3 then
 				for i=1,#twoHandedAxes do
-					txt=Game.ItemsTxt[twoHandedAxes[i]]
+					txt=Game.ItemsTxt[twoHandedAxes[i] ]
 					txt.Skill=2
 					txt.EquipStat=0
 				end
 			end
-			pl.Skills[2]=1024
+			local daggerSkill=pl.Skills[2]=1024
 			minotaurDetected=true
 		elseif race~=const.Race.Minotaur and minotaurDetected then
 			for i=1,#oneHandedAxes do
-				txt=Game.ItemsTxt[oneHandedAxes[i]]
+				txt=Game.ItemsTxt[oneHandedAxes[i] ]
 				txt.Skill=3
 				txt.EquipStat=0
 			end
 			for i=1,#twoHandedAxes do
-				txt=Game.ItemsTxt[twoHandedAxes[i]]
+				txt=Game.ItemsTxt[twoHandedAxes[i] ]
 				txt.Skill=3
 				txt.EquipStat=1
 			end
@@ -1604,12 +1605,12 @@ function events.Tick()
 		end
 	elseif minotaurDetected then
 		for i=1,#oneHandedAxes do
-			txt=Game.ItemsTxt[oneHandedAxes[i]]
+			txt=Game.ItemsTxt[oneHandedAxes[i] ]
 			txt.Skill=3
 			txt.EquipStat=0
 		end
 		for i=1,#twoHandedAxes do
-			txt=Game.ItemsTxt[twoHandedAxes[i]]
+			txt=Game.ItemsTxt[twoHandedAxes[i] ]
 			txt.Skill=3
 			txt.EquipStat=1
 		end
@@ -1629,7 +1630,7 @@ function events.CanWearItem(t)
 		end
 	end
 end
-
+]]
 --list of 2h axes and 1h axe
 function events.GameInitialized2()
 	oneHandedAxes={}
@@ -2695,5 +2696,120 @@ function events.LoadMap()
 			local s,m=SplitSkill(pl.Skills[id])
 			pl.Skills[id]=JoinSkill(s,math.min(m,limit))
 		end
+	end
+end
+
+--dwarf with double 1h axes
+function events.Action(t)
+	if t.Action==133 then
+		local id=Game.CurrentPlayer
+		if id<0 or id>Party.High then
+			Game.CurrentPlayer=0
+			id=0
+		end
+		local pl=Party[id]
+		local race=Game.CharacterPortraits[pl.Face].Race
+		if race==const.Race.Dwarf then
+			local it=Mouse.Item
+			if it then
+				local txt=it:T()
+				local s,m=SplitSkill(pl.Skills[const.Skills.Dagger])
+				if table.find(oneHandedAxes, it.Number) then
+					pl.Skills[const.Skills.Dagger]=JoinSkill(s,2)
+					function events.Tick()
+						events.Remove("Tick",1)
+						pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
+					end
+				end
+			end
+		elseif race==const.Race.Minotaur then
+			local it=Mouse.Item
+			if it then
+				local txt=it:T()
+				local s,m=SplitSkill(pl.Skills[2])--dagger
+				local s2,m2=SplitSkill(pl.Skills[3])--axe
+				if table.find(oneHandedAxes, it.Number) then
+					if m2>=2 then
+						pl.Skills[const.Skills.Dagger]=JoinSkill(2,2)
+						function events.Tick()
+							events.Remove("Tick",1)
+							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
+						end
+					else
+						pl.Skills[const.Skills.Dagger]=JoinSkill(1,1)
+						function events.Tick()
+							events.Remove("Tick",1)
+							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
+						end
+					end
+				elseif table.find(twoHandedAxes,it.Number) then
+					if m2>=3 then
+						pl.Skills[const.Skills.Dagger]=JoinSkill(2,2)
+						function events.Tick()
+							events.Remove("Tick",1)
+							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
+						end
+					else
+						pl.Skills[const.Skills.Dagger]=JoinSkill(1,1)
+						function events.Tick()
+							events.Remove("Tick",1)
+							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+local lastPlayer=-1
+function events.Tick()
+	if Game.CurrentScreen==7 or Game.CurrentScreen==15 then
+		local currentPlayer=Game.CurrentPlayer
+		if lastPlayer==currentPlayer then return end
+		lastPlayer=currentPlayer
+		if currentPlayer<0 or currentPlayer>Party.High then return end
+		
+		local pl=Party[currentPlayer]
+		local race=Game.CharacterPortraits[Party[currentPlayer].Face].Race
+		if race==const.Race.Dwarf then
+			for i=1,#oneHandedAxes do
+				txt=Game.ItemsTxt[oneHandedAxes[i]]
+				txt.Skill=2
+				txt.EquipStat=0
+			end
+			for i=1,#twoHandedAxes do
+				txt=Game.ItemsTxt[twoHandedAxes[i]]
+				txt.Skill=3
+				txt.EquipStat=1
+			end
+			lastRace=race
+		elseif race==const.Race.Minotaur then
+			for i=1,#oneHandedAxes do
+				txt=Game.ItemsTxt[oneHandedAxes[i]]
+				txt.Skill=2
+				txt.EquipStat=0
+			end
+			for i=1,#twoHandedAxes do
+				txt=Game.ItemsTxt[twoHandedAxes[i]]
+				txt.Skill=2
+				txt.EquipStat=0
+			end
+			lastRace=race
+		else
+			for i=1,#oneHandedAxes do
+				txt=Game.ItemsTxt[oneHandedAxes[i]]
+				txt.Skill=3
+				txt.EquipStat=0
+			end
+			for i=1,#twoHandedAxes do
+				txt=Game.ItemsTxt[twoHandedAxes[i]]
+				txt.Skill=3
+				txt.EquipStat=1
+			end
+			lastRace=race
+		end
+	else
+		lastPlayer=-1
 	end
 end
