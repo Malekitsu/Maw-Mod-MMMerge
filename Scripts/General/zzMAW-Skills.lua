@@ -2714,11 +2714,20 @@ function events.Action(t)
 			if it then
 				local txt=it:T()
 				local s,m=SplitSkill(pl.Skills[const.Skills.Dagger])
+				local s2,m2=SplitSkill(pl.Skills[3])--axe
 				if table.find(oneHandedAxes, it.Number) then
-					pl.Skills[const.Skills.Dagger]=JoinSkill(s,2)
-					function events.Tick()
-						events.Remove("Tick",1)
-						pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
+					if m2>=2 then
+						pl.Skills[const.Skills.Dagger]=JoinSkill(2,2)
+						function events.Tick()
+							events.Remove("Tick",1)
+							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
+						end
+					else
+						pl.Skills[const.Skills.Dagger]=JoinSkill(1,1)
+						function events.Tick()
+							events.Remove("Tick",1)
+							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
+						end
 					end
 				end
 			end
