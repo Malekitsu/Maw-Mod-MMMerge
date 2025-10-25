@@ -3914,7 +3914,10 @@ function events.GameInitialized2()
 	txt[977].Notes="Thick, herb-scented vellum warm to the pulse; a vigor-ward stiffens the pages, relaxing only for the steady hands of Body practitioners."
 	txt[978].Notes="A pale radiance seeps through the cover; a sun-seal flares too bright to read, dimming into clarity for those trained in Light."
 	txt[979].Notes="Ink like pooled night that drinks the torchglow; a shadow-ward devours the lines, revealing them only to readers skilled in Dark."
-
+	
+	for i=971, 979 do
+		Game.ItemsTxt[i].SpriteIndex=78
+	end
 
 end
 
