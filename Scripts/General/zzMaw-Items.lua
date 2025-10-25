@@ -521,7 +521,7 @@ function events.ItemGenerated(t)
 			elseif math.random()<0.25 then
 				reagentLevel=reagentLevel+1
 			end
-			t.Item.Number=1051+math.min(reagentLevel,9)
+			t.Item.Number=1041+math.min(reagentLevel,19)
 			return
 		end
 	end
