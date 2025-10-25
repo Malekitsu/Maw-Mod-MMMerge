@@ -2278,6 +2278,7 @@ function events.GameInitialized2()
 		[const.Race.Troll]={
 			[const.Skills.Regeneration]=3,
 			[const.Skills.Mace]=3,
+			[const.Skills.Staff]=3,
 		},
 		[const.Race.Dragon]={},
 		[const.Race.Undead]={},
