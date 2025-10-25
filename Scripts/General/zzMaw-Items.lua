@@ -2389,7 +2389,11 @@ function events.BuildItemInformationBox(t)
 		pattern = "(%d+)"
 		text=t.Description
 		t.Description = text:gsub(pattern, replaceNumber)
-		t.Description = t.Description .. "\n\nScale with player level, up to level 550."
+		local txt="\n\nScale with player level, up to level 550."
+		if vars.madnessMode then
+			txt="\n\nScale with player level, up to level 900."
+		end
+		t.Description = t.Description .. txt
 	end
 end
 
@@ -4291,9 +4295,13 @@ function artifactPowerMult(level, isAC)
 		bol=bol*4/3
 	end
 	]]
-	local mult=(math.min(level,550)/200+0.75)*bol
+	local cap=550
+	if vars.madnessMode then
+		cap=900
+	end
+	local mult=(math.min(level,cap)/200+0.75)*bol
 	if isAC then
-		mult=(math.min(level,550)/(250)+0.75)*bol
+		mult=(math.min(level,cap)/(250)+0.75)*bol
 	end
 	return mult
 end
