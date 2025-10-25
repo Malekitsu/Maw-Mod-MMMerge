@@ -1992,6 +1992,7 @@ function ascension(customIndex)
 		Game.Spells[49]["SpellPointsExpert"]=math.ceil(sp.Cost[2] * personalityReduction)
 		Game.Spells[49]["SpellPointsMaster"]=math.ceil(sp.Cost[3] * personalityReduction)
 		Game.Spells[49]["SpellPointsGM"]=math.ceil(sp.Cost[4] * personalityReduction)
+		Game.SpellsTxt[49].Expert=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[2], sp.Base[2], sp.Scaling[2])
 		Game.SpellsTxt[49].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[3], sp.Base[3], sp.Scaling[3])
 		Game.SpellsTxt[49].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[4], sp.Base[4], sp.Scaling[4])
 
