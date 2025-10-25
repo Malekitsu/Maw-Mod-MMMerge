@@ -1485,6 +1485,11 @@ function events.BuildItemInformationBox(t)
 							maxValue=maxValue*1.5
 						end
 						maxValue=round((1-1/((maxValue+10)/100+1))*1000)/10 .. "%"
+					elseif t.Item.Bonus==8 or t.Item.Bonus==9 then
+						local mult=GetSlotMult(t.Item)
+						maxValue=round(maxValue*(1+math.min(maxValue/50/mult,5)))
+					elseif t.Item.Bonus>=17 then
+						maxValue=round(maxValue/10)
 					end
 					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. power .. StrColor(100,100,100, " / " .. maxValue)
 				else
@@ -1550,6 +1555,11 @@ function events.BuildItemInformationBox(t)
 								maxValue=maxValue*1.5
 							end
 							maxValue=round((1-1/((maxValue+10)/100+1))*1000)/10 .. "%"
+						elseif bonus==8 or bonus==9 then
+							local mult=GetSlotMult(t.Item)
+							maxValue=round(maxValue*(1+math.min(maxValue/50/mult,5)))
+						elseif bonus>=17 then
+							maxValue=round(maxValue/10)
 						end
 						t.Enchantment = itemStatName[bonus] .. " +" .. strength .. StrColor(100,100,100, " / " .. maxValue) .. "\n" .. t.Enchantment
 					else
