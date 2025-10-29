@@ -1124,7 +1124,7 @@ local DKDamageMult={
 	[29]={1.5,1.5,1.5,2,["Skill"]=14},
 	[32]={0.75,0.75,0.75,0.75,["Skill"]=14},
 	[76]={1.1,1.1,1.1,1.4,["Skill"]=18},
-	[90]={1,1.3,1.3,1.3,["Skill"]=20},
+	[90]={1,1,1,1.2,["Skill"]=20},
 	[97]={0.6,0.6,0.6,0.6,["Skill"]=20},
 }
 
@@ -1250,11 +1250,7 @@ function events.GameInitialized2()
 			
 			--spell effect
 			if data and data.Object then
-				if data.Object.Spell==90 then --toxic cloud
-					local s, m=SplitSkill(pl.Skills[const.Skills.Body])
-					local leech=t.Result*(s/t.Monster.Level)*0.3 * (1+(m-2)/2)
-					pl.HP=math.min(pl:GetFullHP(), pl.HP+leech)
-				elseif data.Object.Spell==26 then --ice bolt
+				if data.Object.Spell==26 then
 					local s,m=SplitSkill(pl.Skills[const.Skills.Water])
 					if m>=2 then
 						local power=math.floor(m/2)*2
@@ -1437,9 +1433,10 @@ function dkSkills(isDK, id)
 		-- Spell 90: Death Coil
 		local mult90 = DKDamageMult[90]
 		Game.SpellsTxt[90].Name="Death Coil"
-		Game.SpellsTxt[90].Description="A deadly spell capable to heal the caster upon hitting the target by an amount equal to the unholy skill bonus. Deals damage equal to " .. (mult90[1]*100) .. "% of the base weapon damage"
-		Game.SpellsTxt[90].Expert="No additional effects"
-		Game.SpellsTxt[90].Master="Damage increased to " .. (mult90[3]*100) .. "%"
+		Game.SpellsTxt[90].Description="A deadly spell capable to heal the caster upon hitting the target by an amount equal to double the Life leech enchant. Deals damage equal to " .. (mult90[1]*100) .. "% of the base weapon damage"
+		Game.SpellsTxt[90].Normal="N/A"
+		Game.SpellsTxt[90].Expert="Deals damage equal to " .. (mult90[2]*100) .. "%"
+		Game.SpellsTxt[90].Master="Leech amount increased by 50%"
 		Game.SpellsTxt[90].GM="Damage increased to " .. (mult90[4]*100) .. "%"
 		
 		Game.SpellsTxt[96].Name="Death Grasp"
