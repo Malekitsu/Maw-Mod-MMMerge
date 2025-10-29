@@ -42,10 +42,10 @@ function events.CalcDamageToMonster(t)
 		end
 		local refHP=HPtable[id]
 		
-		local fullHP=GetMaxHP(pl)
+		local fullHP=GetMaxHP(pl) or 0 --if player is disintegrated
 		local manaLeechLeg=false
 		if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 31) then
-			fullHP=getMaxMana(pl)
+			fullHP=getMaxMana(pl) or 0
 			manaLeechLeg=true
 		end
 		local baselineHeal=t.Result/refHP*fullHP --basically dealing 100% of monster B HP as damage heals you by 100%
@@ -82,14 +82,21 @@ function events.CalcDamageToMonster(t)
 			minLeech=fullHP*lifeLeech[index].Spell/5*recovery/100
 			if table.find(aoespells, spell) then
 				minLeech=minLeech/2.5
-				if vars.madnessMode then
-					minLeech=minLeech*0.7
-				end
 			end
 			if spell==9 or spell==22 or spell==43 then
 				minLeech=minLeech/4
 			end
 		end 
+		
+		--dk death coil
+		if spell and spell==90 and table.find(dkClass, pl.Class) then
+			local s,m=SplitSkill(pl.Skills[20])
+			local mult=1
+			if m==3 then
+				mult=1.5
+			end
+			totalHeal=totalHeal+baselineHeal*0.2*mult
+		end
 		totalHeal=math.ceil(math.max(totalHeal, minLeech))
 		
 		local overHeal=0
