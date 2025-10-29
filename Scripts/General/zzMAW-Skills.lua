@@ -1183,6 +1183,7 @@ end
 
 function MawRegen(timePassed)
 	--HP
+	timePassed=math.max(timePassed,0)
 	local timeMultiplier=timePassed*10 
 	if getMapAffixPower(22) then
 		timeMultiplier=timeMultiplier*(1-getMapAffixPower(22)/100)
