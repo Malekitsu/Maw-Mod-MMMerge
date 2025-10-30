@@ -2687,6 +2687,12 @@ function events.GetSkill(t)
 			t.Result=JoinSkill(math.min(s2*2, s2+math.floor(s/10)),m2)
 		end
 	end
+	if t.Skill==const.Skills.Learning then
+		local index=t.Player:GetIndex()
+		if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 25) then
+			t.Result=t.Result+10
+		end
+	end
 end
 
 function events.LoadMap()
