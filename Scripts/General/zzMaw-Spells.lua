@@ -1811,7 +1811,7 @@ function ascension(customIndex)
 		for v=1,#spells do 
 			num=spells[v]
 			for i=1,4 do
-				local baseCost = spellCost[num][masteryName[i]]*(1+s*0.125)*1.035^(s)*(1-0.125*m)
+				local baseCost = spellCost[num][masteryName[i]]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
 				Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(math.ceil(baseCost * personalityReduction), 65000)
 				if elementalist then
 					local baseCost=round((spellCost[num][masteryName[i]]+vars.eleStacks[id])*(1+s*0.125)*1.04^(s)*(1-0.125*m))
