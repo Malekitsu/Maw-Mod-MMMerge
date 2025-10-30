@@ -1303,7 +1303,7 @@ legendaryEffects={
 	[22]="Reduces damage by 3% for each enemy in the nearbies",
 	[23]="Successfully covering an ally restores 3% of your HP",
 	[24]="Killing a Monster Restores 10% of Health and Mana",
-	[25]="Increases spells ascension level by 1",
+	[25]="Increases Ascension Skill level by 10",
 	[26]="Your weapon enchants can deal critical damage",
 	
 	[27]="Leech overhealing heals the most injured party member instead",
