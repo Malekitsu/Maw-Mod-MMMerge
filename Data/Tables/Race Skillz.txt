@@ -27,7 +27,7 @@ IdentifyItem	+	=	=	=	=	=	=	=	=	=	=
 Merchant	+	=	=	=	=	=	=	=	=	=	=
 Repair	+	=	=	=	=	=	=	=	=	=	=
 Bodybuilding	=	=	=	=	=	=	=	=	=	=	=
-Meditation	=	E	E	=	=	=	=	=	=	=	=
+Meditation	=	=	=	=	=	=	=	=	=	=	=
 Perception	+	=	=	=	=	=	=	=	=	=	=
 Regeneration	=	=	=	=	+	=	=	=	=	=	=
 DisarmTraps	+	=	=	=	=	=	=	=	=	=	=
