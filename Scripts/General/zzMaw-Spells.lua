@@ -1102,27 +1102,6 @@ function events.CanLearnSpell(t)
 end
 ]]
 
---ascension tier 
-function getAscensionTier(skill,spellID, index)
-	local spelltier=spellID%11
-	if spelltier==0 then
-		spelltier=11
-	end
-	ascensionTier=math.min(math.floor(skill/11),6)
-	if skill>=77 then
-		ascensionTier=7
-	elseif spelltier<=skill%11  then
-		ascensionTier=ascensionTier+1
-	end
-	local id=index
-	if not id and Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
-		id=Party[Game.CurrentPlayer]:GetIndex()
-	end
-	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 25) then
-		ascensionTier=ascensionTier+1
-	end
-	return ascensionTier
-end
 
 masteryName={"Normal", "Expert", "Master", "GM",[0]="Normal"}
 function events.Action(t)
@@ -1532,22 +1511,22 @@ function events.CalcSpellDamage(t)
 	diceMax=spellPowers[t.Spell].diceMax
 	damageAdd=spellPowers[t.Spell].dmgAdd
 	local data=WhoHitMonster()
-	local ascensionTier=0
+	local ascensionSkill=0
 	if data and data.Player then
-		local s,m = SplitSkill(data.Player.Skills[const.Skills.Learning])
+		local ascensionSkill,m = SplitSkill(data.Player.Skills[const.Skills.Learning])
 		local id=data.Player:GetIndex()
 		if table.find(elementalistClass, data.Player.Class) then
-			s=0
+			ascensionSkill=0
 			m=4
 			for i=12,15 do
 				local skill = SplitSkill(data.Player.Skills[i])
-				s=s+skill
+				ascensionSkill=ascensionSkill+skill
 			end
-			s=s/4
+			ascensionSkill=ascensionSkill/4
 			vars.eleStacks=vars.eleStacks or {}
 			vars.eleStacks[id]=vars.eleStacks[id] or 0
 		end
-		diceMin, diceMax, damageAdd, ascensionTier = ascendSpellDamage(s, m, t.Spell, data.Player:GetIndex())
+		diceMin, diceMax, damageAdd = ascendSpellDamage(ascensionSkill, m, t.Spell, data.Player:GetIndex())
 		if table.find(elementalistClass, data.Player.Class) then
 			diceMax=round(diceMax*(1+vars.eleStacks[id]*0.1))
 			damageAdd=round(damageAdd*(1+vars.eleStacks[id]*0.1))
@@ -1606,7 +1585,7 @@ function events.CalcSpellDamage(t)
 			if it then
 				local dmg1=calcEnchantDamage(data.Player, it, 0, true, true, "damage")
 				local dmg2=calcFireAuraDamage(data.Player, it, 0, false, true, "damage")
-				damage=(dmg1+dmg2)*1.2^ascensionTier
+				damage=(dmg1+dmg2)*1.02^ascensionSkill
 				if table.find(aoespells, t.Spell) then
 					damage=damage/2.5
 					if vars.madnessMode then
@@ -1667,37 +1646,20 @@ function ascendSpellDamage(skill, mastery, spell, index)
 	diceMin=spellPowers[spell].diceMin*empowerMult
 	diceMax=spellPowers[spell].diceMax*empowerMult
 	damageAdd=spellPowers[spell].dmgAdd*empowerMult
-	if vars.madnessMode and table.find(aoespells,spell) then
-		--diceMax=diceMax*2/3
-		--damageAdd=damageAdd*2/3
-	end
-	local ascensionLevel=getAscensionTier(skill,spell,index)
-	if ascensionLevel>0 then
-		-- old formula
-		--diceMax=diceMax * (1+0.04 * skill * ascensionLevel)
-		--damageAdd=damageAdd*(1+skill * (ascensionLevel+1) / 8)
-		--diceMax=diceMax * (1+0.05 * skill * (ascensionLevel+1))
-		--damageAdd=damageAdd*(1+skill^2 / 45 * (ascensionLevel+1)^2)
+	
+	diceMax=diceMax * (1+0.075 * skill)*1.03^skill
+	damageAdd=damageAdd*(1+0.05*skill^2)*1.03^skill
 		
-		damageAdd=damageAdd*(1+skill*0.05)*(ascensionLevel+0.75)^2 *1.2^ascensionLevel
-		diceMax=diceMax * (1+0.015 * skill * (ascensionLevel+1)) *1.2^ascensionLevel
-		
-		--damageAdd=damageAdd*(1+skill*0.1 )*(ascensionLevel+1)^2*1.2^ascensionLevel
-		--diceMax=diceMax*(1+0.15*(ascensionLevel+1)^2)*1.2^ascensionLevel
-	end
 	diceMin, diceMax, damageAdd = round(diceMin), round(diceMax), round(damageAdd)
-	return diceMin, diceMax, damageAdd, ascensionLevel
+	return diceMin, diceMax, damageAdd
 end
 
 function ascendSpellHealing(skill, mastery, spell, healM)
 	base=healingSpells[spell].Base[healM]
 	scaling=healingSpells[spell].Scaling[healM]
-	local ascensionLevel=getAscensionTier(skill,spell)
-	if ascensionLevel>0 then
-		scaling=scaling * (1+0.01 * skill * ascensionLevel)*1.2^ascensionLevel
-		base=base*(1+skill*0.1 * ascensionLevel)*1.4^ascensionLevel
-		scaling, base = round(scaling), round(base)
-	end
+	scaling=scaling * (1+0.05 * skill)*1.025^skill
+	base=base*(1 + 0.03 * skill^2)*1.025^skill
+	scaling, base = round(scaling), round(base)
 	return scaling, base
 end
 
@@ -1802,7 +1764,7 @@ function getPersonalityManaCostReduction(pl)
 	local personality = pl:GetPersonality()
 	local level = pl.LevelBase
 	
-	local personalityDivisor = 10 + (level - 1) * 90 / 1000
+	local personalityDivisor = 10 + (level) * 65 / 1000
 	local reductionPercent = personality / personalityDivisor
 	return (0.99^reductionPercent)
 end
@@ -1848,19 +1810,12 @@ function ascension(customIndex)
 		
 		for v=1,#spells do 
 			num=spells[v]
-			local ascensionLevel=getAscensionTier(s,num)
-			if ascensionLevel>=1 or elementalist then
-				for i=1,4 do
-					local baseCost = spellCost[num][masteryName[i]]*(1+s*0.125)*1.5^(ascensionLevel)*(1-0.125*m)
-					Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(math.ceil(baseCost * personalityReduction), 65000)
-					if elementalist then
-						local baseCost=round((spellCost[num][masteryName[i]]+vars.eleStacks[id])*(1+s*0.125)*1.5^(ascensionLevel)*(1-0.125*m))
-						Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(round(math.ceil(baseCost*(1+vars.eleStacks[id]*0.075) * personalityReduction)),65000)
-					end
-				end
-			else
-				for i=1,4 do
-					Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.ceil(spellCost[num][masteryName[i]] * personalityReduction)
+			for i=1,4 do
+				local baseCost = spellCost[num][masteryName[i]]*(1+s*0.125)*1.035^(s)*(1-0.125*m)
+				Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(math.ceil(baseCost * personalityReduction), 65000)
+				if elementalist then
+					local baseCost=round((spellCost[num][masteryName[i]]+vars.eleStacks[id])*(1+s*0.125)*1.04^(s)*(1-0.125*m))
+					Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(round(math.ceil(baseCost*(1+vars.eleStacks[id]*0.075) * personalityReduction)),65000)
 				end
 			end
 			if num==44 then	
@@ -1919,20 +1874,6 @@ function ascension(customIndex)
 		Game.SpellsTxt[111].GM=string.format("Damage 1-%s per point of skill",round(diceMaxTooltip(s, m,111)/3*7))
 		Game.SpellsTxt[123].Description="This ability is an upgraded version of the normal Dragon breath weapon attack.  It acts much like a fireball, striking its target and exploding out to hit everything near it, except the explosion does much more damage than most fireballs."
 		
-		for i=1, #spells do
-			local ascensionLevel=getAscensionTier(s,spells[i])
-			if spells[i]~=44 then
-				if ascensionLevel>=1 then
-					if ascensionLevel==8 then
-						ascensionLevel="max"
-					end
-					Game.SpellsTxt[spells[i]].Description=Game.SpellsTxt[spells[i]].Description .. "\n\nAscension level: " .. ascensionLevel
-				else
-					Game.SpellsTxt[spells[i]].Description=Game.SpellsTxt[spells[i]].Description .. "\n\nNot Ascended"
-				end
-			end
-		end
-		
 		-----------------------
 		--Healing Spells
 		-----------------------
@@ -1956,23 +1897,14 @@ function ascension(customIndex)
 			}
 		end
 		for i=1, 6 do
-			local ascensionLevel=getAscensionTier(s,healingList[i])
-			if ascensionLevel>=1 then
-				Game.SpellsTxt[healingList[i]].Description=baseHealTooltip[healingList[i]] .. "\n\nAscension level: " .. ascensionLevel
-			else
-				Game.SpellsTxt[healingList[i]].Description=baseHealTooltip[healingList[i]] .. "\n\nNot Ascended"
+			for v=1,4 do
+				local baseCost = healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
+				healingSpells[healingList[i]].Cost[v]=math.min(round(math.ceil(baseCost)), 65000)
+				healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
 			end
-			if ascensionLevel>=1 then
-				for v=1,4 do
-					local baseCost = healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.8^(ascensionLevel)*(1-0.125*m)
-					healingSpells[healingList[i]].Cost[v]=math.min(round(math.ceil(baseCost * personalityReduction)), 65000)
-					healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
-				end
-			else
-				for v=1,4 do
-					healingSpells[healingList[i]].Cost[v]=math.min(math.ceil(healingSpells[healingList[i]].Cost[v] * personalityReduction), 65000)
-				end
-			end
+		end
+		for i=1, 6 do
+			Game.SpellsTxt[healingList[i]].Description=baseHealTooltip[healingList[i]]
 		end
 		--shaman modifier
 		if table.find(shamanClass, pl.Class) then
@@ -1991,17 +1923,17 @@ function ascension(customIndex)
 		end
 		--remove curse
 		local sp=healingSpells[49]
-		Game.Spells[49]["SpellPointsExpert"]=math.ceil(sp.Cost[2] * personalityReduction)
-		Game.Spells[49]["SpellPointsMaster"]=math.ceil(sp.Cost[3] * personalityReduction)
-		Game.Spells[49]["SpellPointsGM"]=math.ceil(sp.Cost[4] * personalityReduction)
+		Game.Spells[49]["SpellPointsExpert"]=math.ceil(sp.Cost[2])
+		Game.Spells[49]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
+		Game.Spells[49]["SpellPointsGM"]=math.ceil(sp.Cost[4])
 		Game.SpellsTxt[49].Expert=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[2], sp.Base[2], sp.Scaling[2])
 		Game.SpellsTxt[49].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[3], sp.Base[3], sp.Scaling[3])
 		Game.SpellsTxt[49].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[4], sp.Base[4], sp.Scaling[4])
 
 		--shared life
 		local sp=healingSpells[54]
-		Game.Spells[54]["SpellPointsMaster"]=math.ceil(sp.Cost[3] * personalityReduction)
-		Game.Spells[54]["SpellPointsGM"]=math.ceil(sp.Cost[4] * personalityReduction)
+		Game.Spells[54]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
+		Game.Spells[54]["SpellPointsGM"]=math.ceil(sp.Cost[4])
 		Game.SpellsTxt[54].Master=string.format("Adds %s + %s HP per point of skill to the pool", sp.Base[3], sp.Scaling[3])
 		Game.SpellsTxt[54].GM=string.format("Adds %s + %s HP per point of skill to the pool", sp.Base[4], sp.Scaling[4])
 		
@@ -2011,15 +1943,15 @@ function ascension(customIndex)
 		
 		--resurrection
 		local sp=healingSpells[55]
-		Game.Spells[55]["SpellPointsGM"]=math.ceil(sp.Cost[4] * personalityReduction)
+		Game.Spells[55]["SpellPointsGM"]=math.ceil(sp.Cost[4])
 		Game.SpellsTxt[55].GM=string.format("Cures %s + %s HP per point of skill", sp.Base[4], sp.Scaling[4])
 		
 		--heal
 		local sp=healingSpells[68]
-		Game.Spells[68]["SpellPointsNormal"]=math.ceil(sp.Cost[1] * personalityReduction)
-		Game.Spells[68]["SpellPointsExpert"]=math.ceil(sp.Cost[2] * personalityReduction)
-		Game.Spells[68]["SpellPointsMaster"]=math.ceil(sp.Cost[3] * personalityReduction)
-		Game.Spells[68]["SpellPointsGM"]=math.ceil(sp.Cost[4] * personalityReduction)
+		Game.Spells[68]["SpellPointsNormal"]=math.ceil(sp.Cost[1])
+		Game.Spells[68]["SpellPointsExpert"]=math.ceil(sp.Cost[2])
+		Game.Spells[68]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
+		Game.Spells[68]["SpellPointsGM"]=math.ceil(sp.Cost[4])
 		Game.SpellsTxt[68].Normal=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[1], sp.Base[1], sp.Scaling[1])
 		Game.SpellsTxt[68].Expert=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[2], sp.Base[2], sp.Scaling[2])
 		Game.SpellsTxt[68].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[3], sp.Base[3], sp.Scaling[3])
@@ -2027,14 +1959,14 @@ function ascension(customIndex)
 		
 		--greater heal
 		local sp=healingSpells[74]
-		Game.Spells[74]["SpellPointsMaster"]=math.ceil(sp.Cost[3] * personalityReduction)
-		Game.Spells[74]["SpellPointsGM"]=math.ceil(sp.Cost[4] * personalityReduction)
+		Game.Spells[74]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
+		Game.Spells[74]["SpellPointsGM"]=math.ceil(sp.Cost[4])
 		Game.SpellsTxt[74].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[3], sp.Base[3], sp.Scaling[3])
 		Game.SpellsTxt[74].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\nno limit\n",sp.Cost[4], sp.Base[4], sp.Scaling[4])
 		
 		--power heal
 		local sp=healingSpells[77]
-		Game.Spells[77]["SpellPointsGM"]=math.ceil(sp.Cost[4] * personalityReduction)
+		Game.Spells[77]["SpellPointsGM"]=math.ceil(sp.Cost[4])
 		Game.SpellsTxt[77].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[4], sp.Base[4], sp.Scaling[4])
 		
 		--ADD CAST RECOVERY TIME 
@@ -2141,703 +2073,6 @@ function ascension(customIndex)
 		end
 	end
 end
-
-
---[[
-OLD ASCENSION
-mass fear; 40 mana , 6 secs, skill/2 first cast
-slow 12 sec duration, skill first cast
-paralyze 6 sec, skill x 2 first cast
-shrink ray 3 sec duration, skill/2 first cas
-berserk 6 sec, skill x 2 first cast
-enslave 6 sec, skill x 2 first cast
-
-	MonsterBuff = {
-		ArmorHalved = 21,
-		Berserk = 8,
-		Bless = 16,
-		Charm = 1,
-		DamageHalved = 23,
-		DayOfProtection = 12,
-		Enslave = 11,
-		Fate = 10,
-		Fear = 4,
-		Hammerhands = 20,
-		Haste = 18,
-		Heroism = 17,
-		HourOfPower = 13,
-		MassDistortion = 9,
-		MeleeOnly = 22,
-		Mistform = 25,
-		Null = 0,
-		PainReflection = 19,
-		Paralyze = 6,
-		Shield = 14,
-		ShrinkingRay = 3,
-		Slow = 7,
-		StoneSkin = 15,
-		Stoned = 5,
-		Summoned = 2,
-		Wander = 24
-	},
-]]
-
-
---[[old ascendance, from level 80 every 8 levels, no skills involved
-
-
-------------------------------
-------MANA COST CHANGE--------
-------------------------------
-
---spell cost increase dictionary
-function events.GameInitialized2()
-	spellCostNormal={}
-	spellCostExpert={}
-	spellCostMaster={}
-	spellCostGM={}
-	for i=1,132 do
-		spellCostNormal[i] = Game.Spells[i]["SpellPointsNormal"]
-		spellCostExpert[i] = Game.Spells[i]["SpellPointsExpert"]
-		spellCostMaster[i] = Game.Spells[i]["SpellPointsMaster"]
-		spellCostGM[i] = Game.Spells[i]["SpellPointsGM"]
-	end
-	--vampire
-	spellCostMaster[111]=8
-	spellCostGM[111]=10
-	
-	ascendanceCost={11,14,17,20,35,50,65,80,95,110,125,[0]=125}
-	ascendanceCost2={25,30,35,40,70,100,140,180,220,260,300,[0]=300}
-	spells={2,6,7,8,9,10,11,15,18,20,22,24,26,29,32,37,39,41,43,44,52,59,65,70,76,78,79,84,87,90,93,97,98,99,103,111,123}
-	lastIndex=-1 --used later
-
-	--if you change diceMin or values that are 0 remember to update the tooltip manually 
-	spellPowers =
-		{
-			[2] = {dmgAdd =8, diceMin = 1, diceMax = 1, },--fire bolt
-			[6] = {dmgAdd = 0, diceMin = 1, diceMax = 11, },--fireball
-			[7] = {dmgAdd = 17, diceMin = 1, diceMax = 4, },--fire spike, the only spell with damage depending on mastery, fix in events.calcspelldamage
-			[8] = {dmgAdd = 16, diceMin = 1, diceMax = 10, },--immolation
-			[9] = {dmgAdd = 8, diceMin = 1, diceMax = 1, },--meteor shower
-			[10] = {dmgAdd = 12, diceMin = 1, diceMax = 7, },--inferno
-			[11] = {dmgAdd = 18, diceMin = 1, diceMax = 18, },--incinerate
-			[15] = {dmgAdd = 6, diceMin = 1, diceMax = 2, },--sparks
-			[18] = {dmgAdd = 13, diceMin = 1, diceMax = 8, },--lightning bolt
-			[20] = {dmgAdd = 20, diceMin = 1, diceMax = 12, },--implosion
-			[22] = {dmgAdd = 20, diceMin = 1, diceMax = 1, },--starburst
-			[24] = {dmgAdd = 5, diceMin = 1, diceMax = 2, },--poison spray
-			[26] = {dmgAdd = 6, diceMin = 1, diceMax = 6, },--ice bolt
-			[29] = {dmgAdd = 2, diceMin = 1, diceMax = 12, },--acid burst
-			[32] = {dmgAdd = 5, diceMin = 1, diceMax = 5, },--ice blast
-			[37] = {dmgAdd = 5, diceMin = 1, diceMax = 5, },--deadly swarm
-			[39] = {dmgAdd = 7, diceMin = 1, diceMax = 7, },--blades
-			[41] = {dmgAdd = 8, diceMin = 1, diceMax = 8, },--rock blast
-			[43] = {dmgAdd = 0, diceMin = 1, diceMax = 12, },--death blossom
-			[44] = {dmgAdd = 15, diceMin = 0.5, diceMax = 0.5, },--mass distorsion, nerfed
-			[52] = {dmgAdd = 10, diceMin = 2, diceMax = 8, },--spirit lash
-			[59] = {dmgAdd = 16, diceMin = 1, diceMax = 3, },--mind blast
-			[65] = {dmgAdd = 25, diceMin = 1, diceMax = 25, },--psychic shock
-			[70] = {dmgAdd = 4, diceMin = 1, diceMax = 4, },--harm
-			[76] = {dmgAdd = 20, diceMin = 1, diceMax = 5, },--flying fist
-			[78] = {dmgAdd = 12, diceMin = 1, diceMax = 2, },--light bolt
-			[79] = {dmgAdd = 12, diceMin = 1, diceMax = 8, },--destroy undead
-			[84] = {dmgAdd = 25, diceMin = 2, diceMax = 2, },--prismatic light
-			[87] = {dmgAdd = 50, diceMin = 1, diceMax = 50, },--sunray
-			[90] = {dmgAdd = 15, diceMin = 1, diceMax = 9, },--toxic cloud
-			[93] = {dmgAdd = 0, diceMin = 1, diceMax = 8, },--shrapmetal
-			[97] = {dmgAdd = 0, diceMin = 1, diceMax = 18, },--dragon breath
-			[98] = {dmgAdd = 50, diceMin = 1, diceMax = 1, },--armageddon
-			[99] = {dmgAdd = 25, diceMin = 1, diceMax = 5, },--souldrinker
-			[103] = {dmgAdd = 46, diceMin = 1, diceMax = 28, },--darkfire bolt
-			[111] = {dmgAdd = 18, diceMin = 1, diceMax = 6, },--lifedrain scales with mastery, fixed in calcspelldamage
-			[123] = {dmgAdd = 0, diceMin = 1, diceMax = 25, },--flame blast scales with mastery, fixed in calcspelldamage
-		}
-
-	--calculate table for spells from level 100
-	spellPowers80={}
-	spellPowers160={}
-	for i =1,132 do
-		if spellPowers[i] then
-			--calculate damage assuming formula is manacost^0.7
-			local theoreticalDamage=spellCostGM[i]^0.7
-			local dmgAddProportion=spellPowers[i].dmgAdd/theoreticalDamage
-			if spellPowers[i].diceMax==spellPowers[i].diceMin then
-				diceMaxProportion=spellPowers[i].diceMax/theoreticalDamage
-			else
-				diceMaxProportion=((spellPowers[i].diceMax+1)/2)/theoreticalDamage
-			end
-			--get new mana cost and calculate theoretical Damage for level 80+
-			local manaCost=ascendanceCost[i%11]
-			if i>77 and i<100 then
-				manaCost=manaCost+100
-			end
-			--exception for racial spells
-			if i==103 then 
-				manaCost=100
-			end
-			if i==111 then 
-				manaCost=15
-			end
-			if i==123 then 
-				manaCost=60
-			end
-			local theoreticalDamage80=manaCost^0.6*1.4
-			--scale new values according to original differences
-			local dmgAdd80=round(theoreticalDamage80*dmgAddProportion)
-			if spellPowers[i].diceMax==spellPowers[i].diceMin then
-				diceMax80=round(theoreticalDamage80*diceMaxProportion)
-			else
-				diceMax80=round(theoreticalDamage80*(diceMaxProportion)*2)+1
-			end
-			spellPowers80[i]={dmgAdd = dmgAdd80, diceMin = 1, diceMax = diceMax80,}
-			----------
-			--do the same, but for level 160
-			----------
-			--get new mana cost and calculate theoretical Damage for level 80+
-			local manaCost=ascendanceCost2[i%11]
-			if i>77 and i<100 then
-				manaCost=manaCost+200
-			end
-			--exception for racial spells
-			if i==103 then 
-				manaCost=200
-			end
-			if i==111 then 
-				manaCost=25
-			end
-			if i==123 then 
-				manaCost=120
-			end
-			local theoreticalDamage160=manaCost^0.5*2.5
-			--scale new values according to original differences
-			local dmgAdd160=round(theoreticalDamage160*dmgAddProportion)
-			if spellPowers[i].diceMax==spellPowers[i].diceMin then
-				diceMax160=round(theoreticalDamage160*diceMaxProportion)
-			else
-				diceMax160=round(theoreticalDamage160*(diceMaxProportion)*2)+1
-			end
-			spellPowers160[i]={dmgAdd = dmgAdd160, diceMin = 1, diceMax = diceMax160,}
-		end
-	end
-	spellPowers160[44]={dmgAdd = 15, diceMin = 0.5, diceMax = 0.5}
-	spellPowers80[44]={dmgAdd = 15, diceMin = 0.5, diceMax = 0.5}
-end
-
---calculate spell Damage
-function events.CalcSpellDamage(t)
-	--mass distorsion
-	if t.Spell == 44 then 
-		t.Result = t.HP*0.15+t.HP*t.Skill*0.005
-		return
-	end
-	--check for spell tier
-	local spellTier=t.Spell%11
-	if spellTier==0 then
-		spellTier=11
-	end
-	--take damage info
-	if spellPowers[t.Spell]==nil then return end
-	diceMin=spellPowers[t.Spell].diceMin
-	diceMax=spellPowers[t.Spell].diceMax
-	damageAdd=spellPowers[t.Spell].dmgAdd
-	local data=WhoHitMonster()
-	if data and data.Player then
-	--calculate if level is>treshold to check for lvl 100 spells
-		--vampiric ascends 20 levels later
-		local extraRequiredLevels=0
-		if t.Spell==111 then
-		--	extraRequiredLevels=20
-		end
-		if data.Player.LevelBase>=spellTier*8+152+extraRequiredLevels then
-			diceMin=spellPowers160[t.Spell].diceMin
-			diceMax=spellPowers160[t.Spell].diceMax
-			damageAdd=spellPowers160[t.Spell].dmgAdd
-		elseif data.Player.LevelBase>=spellTier*8+72+extraRequiredLevels then
-			diceMin=spellPowers80[t.Spell].diceMin
-			diceMax=spellPowers80[t.Spell].diceMax
-			damageAdd=spellPowers80[t.Spell].dmgAdd
-		end	
-	end
-	--calculate
-	if t.Spell>1 and t.Spell<132 then
-		if diceMin~=diceMax then --roll dices
-			damage=0
-			for i=1,t.Skill do
-				damage=damage+math.random(diceMin,diceMax)
-			end
-			t.Result=damageAdd+damage
-		else
-			t.Result=damageAdd+spellPowers[t.Spell].diceMax*t.Skill
-		end
-	end
-	
-	--fix for mastery scaling spells
-	if t.Spell == 7 then  -- fire spike
-		if t.Mastery==3 then
-			t.Result=t.Result/6*8
-		elseif t.Mastery==4 then
-			t.Result=t.Result/6*10
-		end
-	end
-	if t.Spell == 111 then  -- lifedrain
-		if t.Mastery==3 then
-			t.Result=t.Result/3*4
-		elseif t.Mastery==4 then
-			t.Result=t.Result/3*5
-		end
-	end
-	if t.Spell == 123 then  -- flame blast
-		if t.Mastery==3 then
-			t.Result=t.Result/10*11
-		elseif t.Mastery==4 then
-			t.Result=t.Result/10*12
-		end
-	end
-end
-
---add enchant damage
-
-
-spellbonusdamage={}
-spellbonusdamage[4] = {["low"]=6, ["high"]=8}
-spellbonusdamage[5] = {["low"]=18, ["high"]=24}
-spellbonusdamage[6] = {["low"]=36, ["high"]=48}
-spellbonusdamage[7] = {["low"]=4, ["high"]=10}
-spellbonusdamage[8] = {["low"]=12, ["high"]=30}
-spellbonusdamage[9] = {["low"]=24, ["high"]=60}
-spellbonusdamage[10] = {["low"]=2, ["high"]=12}
-spellbonusdamage[11] = {["low"]=6, ["high"]=36}
-spellbonusdamage[12] = {["low"]=12, ["high"]=72}
-spellbonusdamage[13] = {["low"]=12, ["high"]=12}
-spellbonusdamage[14] = {["low"]=24, ["high"]=24}
-spellbonusdamage[15] = {["low"]=48, ["high"]=48}
-
-aoespells = {6, 7, 8, 9, 10, 15, 22, 26, 32, 41, 43, 84, 92, 97, 98, 99, 123}
-function events.CalcSpellDamage(t)
-data=WhoHitMonster()
-	if data and data.Player then
-		it=data.Player:GetActiveItem(1)
-		if it then
-			if spellbonusdamage[it.Bonus2] then
-				damage=math.random(spellbonusdamage[it.Bonus2]["low"],spellbonusdamage[it.Bonus2]["high"])
-				for i = 1, #aoespells do
-					if aoespells[i] == t.Spell then
-						damage=damage/2.5
-					end
-				end
-				if it.MaxCharges>0 then
-					if it.MaxCharges <= 20 then
-						mult=1+it.MaxCharges/20
-					else
-						mult=2+2*(it.MaxCharges-20)/20
-					end
-					damage=damage*mult
-				end
-				t.Result = t.Result+damage
-			end
-		end
-	end
-end
-
---function for tooltips
-function dmgAddTooltip(level,spellIndex)
-	--exception for racials
-	if spellIndex==104 then 
-		if level>=240 then
-			local dmgAdd=spellPowers160[spellIndex].dmgAdd
-			return dmgAdd
-		elseif level>=160 then
-			local dmgAdd=spellPowers80[spellIndex].dmgAdd
-			return dmgAdd
-		else 
-			local dmgAdd=spellPowers[spellIndex].dmgAdd
-			return dmgAdd
-		end
-		return
-	end
-	if spellIndex==111 then 
-		if level>=180 then
-			local dmgAdd=spellPowers160[spellIndex].dmgAdd
-			return dmgAdd
-		elseif level>=100 then
-			local dmgAdd=spellPowers80[spellIndex].dmgAdd
-			return dmgAdd
-		else 
-			local dmgAdd=spellPowers[spellIndex].dmgAdd
-			return dmgAdd
-		end
-		return
-	end
-	if spellIndex==123 then 
-		if level>=200 then
-			local dmgAdd=spellPowers160[spellIndex].dmgAdd
-			return dmgAdd
-		elseif level>=120 then
-			local dmgAdd=spellPowers80[spellIndex].dmgAdd
-			return dmgAdd
-		else 
-			local dmgAdd=spellPowers[spellIndex].dmgAdd
-			return dmgAdd
-		end
-		return
-	end
-	--check for index to see if to show normal or ascended spells
-	local index=spellIndex%11
-	if index==0 then
-		index=11
-	end
-	if level>=index*8+152 then
-		local dmgAdd=spellPowers160[spellIndex].dmgAdd
-		return dmgAdd
-	elseif level>=index*8+72 then
-		local dmgAdd=spellPowers80[spellIndex].dmgAdd
-		return dmgAdd
-	else 
-		local dmgAdd=spellPowers[spellIndex].dmgAdd
-		return dmgAdd
-	end
-end
-
-function diceMaxTooltip(level,spellIndex)
-	--exception for racials
-	if spellIndex==104 then 
-		if level>=240 then
-			local diceMax=spellPowers160[spellIndex].diceMax
-			return diceMax
-		elseif level>=160 then
-			local diceMax=spellPowers80[spellIndex].diceMax
-			return diceMax
-		else 
-			local diceMax=spellPowers[spellIndex].diceMax
-			return diceMax
-		end
-	end
-	if spellIndex==111 then 
-		if level>=180 then
-			local diceMax=spellPowers160[spellIndex].diceMax
-			return diceMax
-		elseif level>=100 then
-			local diceMax=spellPowers80[spellIndex].diceMax
-			return diceMax
-		else 
-			local diceMax=spellPowers[spellIndex].diceMax
-			return diceMax
-		end
-	end
-	if spellIndex==123 then 
-		if level>=200 then
-			local diceMax=spellPowers160[spellIndex].diceMax
-			return diceMax
-		elseif level>=120 then
-			local diceMax=spellPowers80[spellIndex].diceMax
-			return diceMax
-		else 
-			local diceMax=spellPowers[spellIndex].diceMax
-			return diceMax
-		end
-	end
-	--check for index to see if to show normal or ascended spells
-	local index=spellIndex%11
-	if index==0 then
-		index=11
-	end
-	if level>=index*8+152 then
-		local diceMax=spellPowers160[spellIndex].diceMax
-		return diceMax
-	elseif level>=index*8+72 then
-		local diceMax=spellPowers80[spellIndex].diceMax
-		return diceMax
-	else 
-		local diceMax=spellPowers[spellIndex].diceMax
-		return diceMax
-	end
-end
-
---adjust mana cost and tooltips	
-function events.Tick()
-	index=Game.CurrentPlayer
-	if index> Party.High then
-		Game.CurrentPlayer=0
-	end
-	if index>=0 and index<=Party.High then
-		local level=Party[index].LevelBase
-		if lastIndex~=index or lastLevel~=level then
-			lastIndex=index
-			lastLevel=level
-			for _, num in ipairs(spells) do 
-				--check for level
-				if num%11==0 then
-					num2=11
-				else
-					num2=num%11
-				end
-				if num<100 then
-					local check2=(num2)*8+152
-					local check=(num2)*8+72
-					if level>=check2 then
-						if num>77 then --increase light and dark cost
-							Game.Spells[num]["SpellPointsNormal"] = ascendanceCost2[num2]+100
-							Game.Spells[num]["SpellPointsExpert"] = ascendanceCost2[num2]+100
-							Game.Spells[num]["SpellPointsMaster"] = ascendanceCost2[num2]+100
-							Game.Spells[num]["SpellPointsGM"] = ascendanceCost2[num2]+100
-						else
-							Game.Spells[num]["SpellPointsNormal"] = ascendanceCost2[num2]
-							Game.Spells[num]["SpellPointsExpert"] = ascendanceCost2[num2]
-							Game.Spells[num]["SpellPointsMaster"] = ascendanceCost2[num2]
-							Game.Spells[num]["SpellPointsGM"] = ascendanceCost2[num2]
-						end
-					elseif level>=check then
-						if num>77 then --increase light and dark cost
-							Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[num2]+50
-							Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[num2]+50
-							Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[num2]+50
-							Game.Spells[num]["SpellPointsGM"] = ascendanceCost[num2]+50
-						else
-							Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[num2]
-							Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[num2]
-							Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[num2]
-							Game.Spells[num]["SpellPointsGM"] = ascendanceCost[num2]
-						end
-					else
-						Game.Spells[num]["SpellPointsNormal"]=spellCostNormal[num]
-						Game.Spells[num]["SpellPointsExpert"]=spellCostExpert[num]
-						Game.Spells[num]["SpellPointsMaster"]=spellCostMaster[num] 
-						Game.Spells[num]["SpellPointsGM"]=spellCostGM[num]	
-					end	
-				end				
-				--cost exception for racials
-				if num==103 then
-					local check2=240
-					local check=160
-					if level>=check2 then
-						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost2[11]
-						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost2[11]
-						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost2[11]
-						Game.Spells[num]["SpellPointsGM"] = ascendanceCost2[11]
-					elseif level>=check then
-						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[11]
-						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[11]
-						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[11]
-						Game.Spells[num]["SpellPointsGM"] = ascendanceCost[11]
-					else
-						Game.Spells[num]["SpellPointsNormal"]=spellCostNormal[num]
-						Game.Spells[num]["SpellPointsExpert"]=spellCostExpert[num]
-						Game.Spells[num]["SpellPointsMaster"]=spellCostMaster[num] 
-						Game.Spells[num]["SpellPointsGM"]=spellCostGM[num]	
-					end	
-				end	
-				if num==111 then
-					local check2=180
-					local check=100
-					if level>=check2 then
-						Game.Spells[num]["SpellPointsNormal"] = 20
-						Game.Spells[num]["SpellPointsExpert"] = 20
-						Game.Spells[num]["SpellPointsMaster"] = 20
-						Game.Spells[num]["SpellPointsGM"] = 25
-					elseif level>=check then
-						Game.Spells[num]["SpellPointsNormal"] = 10
-						Game.Spells[num]["SpellPointsExpert"] = 10
-						Game.Spells[num]["SpellPointsMaster"] = 15
-						Game.Spells[num]["SpellPointsGM"] = 15
-					else
-						Game.Spells[num]["SpellPointsNormal"]=spellCostNormal[num]
-						Game.Spells[num]["SpellPointsExpert"]=spellCostExpert[num]
-						Game.Spells[num]["SpellPointsMaster"]=spellCostMaster[num] 
-						Game.Spells[num]["SpellPointsGM"]=spellCostGM[num]	
-					end	
-				end	
-				if num==123 then
-					local check2=200
-					local check=120
-					if level>=check2 then
-						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost2[8]
-						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost2[8]
-						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost2[8]
-						Game.Spells[num]["SpellPointsGM"] = ascendanceCost2[8]
-					elseif level>=check then
-						Game.Spells[num]["SpellPointsNormal"] = ascendanceCost[8]
-						Game.Spells[num]["SpellPointsExpert"] = ascendanceCost[8]
-						Game.Spells[num]["SpellPointsMaster"] = ascendanceCost[8]
-						Game.Spells[num]["SpellPointsGM"] = ascendanceCost[8]
-					else
-						Game.Spells[num]["SpellPointsNormal"]=spellCostNormal[num]
-						Game.Spells[num]["SpellPointsExpert"]=spellCostExpert[num]
-						Game.Spells[num]["SpellPointsMaster"]=spellCostMaster[num] 
-						Game.Spells[num]["SpellPointsGM"]=spellCostGM[num]	
-					end	
-				end
-				if num==44 then	
-						Game.Spells[num]["SpellPointsGM"]=level^1.6/12.5
-				end	
-			end	
-			
-			
-				
-			--change tooltips according to ascended damage
-			Game.SpellsTxt[2].Description=string.format("Launches a burst of fire at a single target.  Damage is %s+1-%s points of damage per point of skill in Fire Magic.   Firebolt is safe, effective and has a low casting cost.",dmgAddTooltip(level,2),diceMaxTooltip(level,2))
-			Game.SpellsTxt[6].Description=string.format("Fires a ball of fire at a single target. When it hits, the ball explodes damaging all those nearby, including your characters if they're too close.  Fireball does 1-%s points of damage per point of skill in Fire Magic.",diceMaxTooltip(level,6))
-			--fire spikes fix
-			Game.SpellsTxt[7].Expert=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",diceMaxTooltip(level,7))
-			Game.SpellsTxt[7].Master=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",round(diceMaxTooltip(level,7)/6*8))
-			Game.SpellsTxt[7].GM=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",round(diceMaxTooltip(level,7)/6*10))
-			----------------------------------------
-			
-			Game.SpellsTxt[8].Description=string.format("Surrounds your characters with a very hot fire that is only harmful to others.  The spell will deliver 1-%s points of damage per point of skill to all nearby monsters for as long as they remain in the area of effect.",diceMaxTooltip(level,8))
-			Game.SpellsTxt[9].Description=string.format("Summons flaming rocks from the sky which fall in a large radius surrounding your chosen target.  Try not to be near the victim when you use this spell.  A single meteor does %s points of damage plus %s per point of skill in Fire Magic.  This spell only works outdoors.",dmgAddTooltip(level,9),diceMaxTooltip(level,9))
-			Game.SpellsTxt[10].Description=string.format("Inferno burns all monsters in sight when cast, excluding your characters.  One or two castings can clear out a room of weak or moderately powerful creatures. Each monster takes %s points of damage plus %s per point of skill in Fire Magic.  This spell only works indoors.",dmgAddTooltip(level,10),diceMaxTooltip(level,10))
-			Game.SpellsTxt[11].Description=string.format("Among the strongest direct damage spells available, Incinerate inflicts massive damage on a single target.  Only the strongest of monsters can expect to survive this spell.  Damage is %s points plus 1-%s per point of skill in Fire Magic.",dmgAddTooltip(level,11),diceMaxTooltip(level,11))
-			Game.SpellsTxt[15].Description=string.format("Sparks fires small balls of lightning into the world that bounce around until they hit something or dissipate. It is hard to tell where they will go, so this spell is best used in a room crowded with small monsters. Each spark does %s points plus %s per point of skill in Air Magic.",dmgAddTooltip(level,15),diceMaxTooltip(level,15))
-			Game.SpellsTxt[18].Description=string.format("Lightning Bolt discharges electricity from the caster's hand to a single target.  It always hits and does %s + 1-%s points of damage per point of skill in Air Magic.",dmgAddTooltip(level,18),diceMaxTooltip(level,18))
-			Game.SpellsTxt[20].Description=string.format("Implosion is a nasty spell that affects a single target by destroying the air around it, causing a sudden inrush from the surrounding air, a thunderclap, and %s points plus 1-%s points of damage per point of skill in Air Magic.",dmgAddTooltip(level,20),diceMaxTooltip(level,20))
-			Game.SpellsTxt[22].Description=string.format("Calls stars from the heavens to smite and burn your enemies.  Twenty stars are called, and the damage for each star is %s points plus %s per point of skill in Air Magic. Try not to get caught in the blast! This spell only works outdoors.",dmgAddTooltip(level,22),diceMaxTooltip(level,22))
-			Game.SpellsTxt[24].Description=string.format("Sprays poison at monsters directly in front of your characters.  Damage is low, but few monsters have resistance to Water Magic, so it usually works.  Each shot does %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(level,24),diceMaxTooltip(level,24))
-			Game.SpellsTxt[26].Description=string.format("Fires a bolt of ice at a single target.  The missile does %s + 1-%s points of damage per point of skill in Water Magic.",dmgAddTooltip(level,26),diceMaxTooltip(level,26))
-			Game.SpellsTxt[29].Description=string.format("Acid burst squirts a jet of extremely caustic acid at a single victim.  It always hits and does %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(level,29),diceMaxTooltip(level,29))
-			Game.SpellsTxt[32].Description=string.format("Fires a ball of ice in the direction the caster is facing.  The ball will shatter when it hits something, launching 7 shards of ice in all directions except the caster's.  The shards will ricochet until they strike a creature or melt.  Each shard does %s points of damage plus 1-%s per point of skill in Water Magic.",dmgAddTooltip(level,32),diceMaxTooltip(level,32))
-			Game.SpellsTxt[37].Description=string.format("Summons a swarm of biting, stinging insects to bedevil a single target.  The swarm does %s points of damage plus 1-%s per point of skill in Earth Magic.",dmgAddTooltip(level,37),diceMaxTooltip(level,37))
-			Game.SpellsTxt[39].Description=string.format("Fires a rotating, razor-thin metal blade at a single monster.  The blade does 1-%s points of damage per point of skill in Earth Magic.",diceMaxTooltip(level,39))
-			Game.SpellsTxt[41].Description=string.format("Releases a magical stone into the world that will explode when it comes into contact with a creature or enough time passes.  The rock will bounce and roll until it finds a resting spot, so be careful not to be caught in the blast.  The explosion causes %s points of damage plus 1-%s points of damage per point of skill in Earth Magic.",dmgAddTooltip(level,41),diceMaxTooltip(level,41))
-			Game.SpellsTxt[43].Description=string.format("Launches a magical stone which bursts in air, sending shards of explosive earth raining to the ground.  The damage is 1-%s per point of skill in Earth Magic for each shard.  This spell can only be used outdoors.",diceMaxTooltip(level,43))
-			Game.SpellsTxt[44].Description=string.format("Increases the weight of a single target enormously for an instant, causing internal damage equal to %s%% of the monster's hit points plus another %s%% per point of skill in Earth Magic.  The bigger they are, the harder they fall.",dmgAddTooltip(level,44),diceMaxTooltip(level,44))
-			Game.SpellsTxt[52].Description=string.format("This spell weakens the link between a target's body and soul, causing %s + 2-%s points of damage per point of skill in Spirit Magic to all monsters near the caster.",dmgAddTooltip(level,52),diceMaxTooltip(level,52))
-			Game.SpellsTxt[59].Description=string.format("Fires a bolt of mental force which damages a single target's nervous system.  Mind Blast does %s points of damage plus 1-%s per point of skill in Mind Magic.",dmgAddTooltip(level,59),diceMaxTooltip(level,59))
-			Game.SpellsTxt[65].Description=string.format("Similar to Mind Blast, Psychic Shock targets a single creature with mind damaging magic--only it has a much greater effect.  Psychic Shock does %s points of damage plus 1-%s per point of skill in Mind Magic.",dmgAddTooltip(level,65),diceMaxTooltip(level,65))
-			Game.SpellsTxt[70].Description=string.format("Directly inflicts magical damage upon a single creature.  Harm does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(level,70),diceMaxTooltip(level,70))
-			Game.SpellsTxt[76].Description=string.format("Flying Fist throws a heavy magical force at a single opponent that does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(level,76),diceMaxTooltip(level,76))
-			Game.SpellsTxt[76].Description=string.format("Flying Fist throws a heavy magical force at a single opponent that does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(level,76),diceMaxTooltip(level,76))
-			Game.SpellsTxt[78].Description=string.format("Fires a bolt of light at a single target that does %s + 1-%s points of damage per point of skill in light magic.  Damage vs. Undead is doubled.",dmgAddTooltip(level,78),diceMaxTooltip(level,78))
-			Game.SpellsTxt[79].Description=string.format("Calls upon the power of heaven to undo the evil magic that extends the lives of the undead, inflicting %s points of damage plus 1-%s per point of skill in Light Magic upon a single, unlucky target.  This spell only works on the undead.",dmgAddTooltip(level,79),diceMaxTooltip(level,79))
-			Game.SpellsTxt[84].Description=string.format("Inflicts %s points of damage plus %s per point of skill in Light Magic on all creatures in sight.  This spell can only be cast indoors.",dmgAddTooltip(level,84),diceMaxTooltip(level,84))
-			Game.SpellsTxt[87].Description=string.format("Sunray is the second most devastating damage spell in the game. It does %s points of damage plus 1-%s points per point of skill in Light Magic, by concentrating the light of the sun on one unfortunate creature. It only works outdoors during the day.",dmgAddTooltip(level,87),diceMaxTooltip(level,87))
-			Game.SpellsTxt[90].Description=string.format("A poisonous cloud of noxious gases is formed in front of the caster and moves slowly away from your characters.  The cloud does %s points of damage plus 1-%s per point of skill in Dark Magic and lasts until something runs into it.",dmgAddTooltip(level,90),diceMaxTooltip(level,90))
-			Game.SpellsTxt[93].Description=string.format("Fires a blast of hot, jagged metal in front of the caster, striking any creature that gets in the way.  Each piece inflicts 1-%s points of damage per point of skill in Dark Magic.",diceMaxTooltip(level,93))
-			Game.SpellsTxt[97].Description=string.format("Dragon Breath empowers the caster to exhale a cloud of toxic vapors that targets a single monster and damage all creatures nearby, doing 1-%s points of damage per point of skill in Dark Magic.",diceMaxTooltip(level,97))
-			Game.SpellsTxt[98].Description=string.format("This spell is the town killer. Armageddon inflicts %s points of damage plus %s point of damage for every point of Dark skill your character has to every creature on the map, including all your characters. It can only be cast three times per day and only outdoors.",dmgAddTooltip(level,98),diceMaxTooltip(level,98))
-			Game.SpellsTxt[99].Description=string.format("This horrible spell sucks the life from all creatures in sight, friend or enemy.  Souldrinker then transfers that life to your party in much the same fashion as Shared Life.  Damage (and healing) is %s + 1-%s per point of skill.",dmgAddTooltip(level,99),diceMaxTooltip(level,99))
-			
-			Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is 1-%s per point of skill.",diceMaxTooltip(level,103))
-			Game.SpellsTxt[111].Description=string.format("Lifedrain allows the vampire to damage his or her target and simultaneously heal based on the damage done in the Lifedrain.  This ability does %s points of damage plus 1-%s points of damage per skill.",dmgAddTooltip(level,111),diceMaxTooltip(level,111))
-			Game.SpellsTxt[111].Master=string.format("Damage %s points plus 1-%s per point of skill",round(dmgAddTooltip(level,111)/3*4),round(diceMaxTooltip(level,111)/3*4))
-			Game.SpellsTxt[111].GM=string.format("Damage %s points plus 1-%s per point of skill",round(dmgAddTooltip(level,111)/3*5),round(diceMaxTooltip(level,111)/3*5))
-			Game.SpellsTxt[123].Expert=string.format("Damage %s points plus 1-%s points per point of skill",dmgAddTooltip(level,123),diceMaxTooltip(level,123))
-			Game.SpellsTxt[123].Master=string.format("Damage %s points plus 1-%s points per point of skill",round(dmgAddTooltip(level,123)/10*11),round(diceMaxTooltip(level,123)/10*11))
-			Game.SpellsTxt[123].GM=string.format("Damage %s points plus 1-%s points per point of skill",round(dmgAddTooltip(level,123)/10*12),round(diceMaxTooltip(level,123)/10*12))
-			
-			--remove curse
-			Game.SpellsTxt[49].Master="8 Mana cost: \ncures 24 + 4 HP per point of skill\n1 day limit\n"
-			Game.SpellsTxt[49].GM="16 Mana cost: \ncures 36 + 6 HP per point of skill\nno limit\n"
-			Game.Spells[49]["SpellPointsExpert"]=5
-			Game.Spells[49]["SpellPointsMaster"]=8
-			Game.Spells[49]["SpellPointsGM"]=16
-			--Remove curse matrix
-			curseBase={0,12,24,36}
-			curseScaling={0,2,4,6}
-			if level>=120 then
-				Game.SpellsTxt[49].Master="16 Mana cost: \ncures 36 + 6 HP per point of skill\n1 day limit\n"
-				Game.SpellsTxt[49].GM="32 Mana cost: \ncures 72 + 9 HP per point of skill\nno limit\n"
-				Game.Spells[49]["SpellPointsMaster"]=16
-				Game.Spells[49]["SpellPointsGM"]=32
-				curseBase={0,12,36,72}
-				curseScaling={0,2,6,9}
-			end
-			if level>=200 then
-				Game.SpellsTxt[49].Master="32 Mana cost: \ncures 72 + 9 HP per point of skill\n1 day limit\n"
-				Game.SpellsTxt[49].GM="64 Mana cost: \ncures 150 + 13 HP per point of skill\nno limit\n"
-				Game.Spells[49]["SpellPointsMaster"]=32
-				Game.Spells[49]["SpellPointsGM"]=64
-				curseBase={0,12,72,150}
-				curseScaling={0,2,9,14}
-			end
-				
-			--resurrection
-			Game.Spells[55]["SpellPointsGM"]=200
-			resurrectionBase={0,0,0,200}
-			resurrectionScaling={0,0,0,20}
-			Game.SpellsTxt[55].GM="Cures 200 + 20 HP per point of skill"
-			if level>=160 then
-				Game.SpellsTxt[55].GM="Cures 400 + 30 HP per point of skill"
-				Game.Spells[55]["SpellPointsGM"]=400
-				resurrectionBase={0,0,0,400}
-				resurrectionScaling={0,0,0,30}
-			end
-			if level>=240 then
-				Game.SpellsTxt[55].GM="Cures 800 + 45 HP per point of skill"
-				Game.Spells[55]["SpellPointsGM"]=800
-				resurrectionBase={0,0,0,800}
-				resurrectionScaling={0,0,0,45}
-			end
-			
-			--heal
-			Game.Spells[68]["SpellPointsNormal"]=3
-			Game.Spells[68]["SpellPointsExpert"]=5
-			Game.Spells[68]["SpellPointsMaster"]=8
-			Game.Spells[68]["SpellPointsGM"]=12
-			lesserHealBase={5,10,15,20}
-			lesserHealScaling={2,3,4,5}
-			Game.SpellsTxt[68].Master="8 Mana cost: \ncures 15 + 4 HP per point of skill"
-			Game.SpellsTxt[68].GM="12 Mana cost: \ncures 20 + 5 HP per point of skill"
-			
-			if level>=88 then
-				Game.SpellsTxt[68].Master="10 Mana cost: \ncures 30 + 5 HP per point of skill"
-				Game.SpellsTxt[68].GM="15 Mana cost: \ncures 50 + 7 HP per point of skill"
-				Game.Spells[68]["SpellPointsMaster"]=10
-				Game.Spells[68]["SpellPointsGM"]=15
-				lesserHealBase={5,10,30,50}
-				lesserHealScaling={2,3,5,7}
-			end
-			if level>=168 then
-				Game.SpellsTxt[68].Master="20 Mana cost: \ncures 60 + 8 HP per point of skill"
-				Game.SpellsTxt[68].GM="30 Mana cost: \ncures 100 + 12 HP per point of skill"
-				Game.Spells[68]["SpellPointsMaster"]=20
-				Game.Spells[68]["SpellPointsGM"]=30
-				lesserHealBase={5,10,60,100}
-				lesserHealScaling={2,3,8,12}
-			end
-			
-			--greater heal
-			Game.Spells[74]["SpellPointsMaster"]=15
-			Game.Spells[74]["SpellPointsGM"]=25
-			Game.SpellsTxt[74].Master="15 Mana cost: \ncures 25 + 6 HP per point of skill\n1 day limit\n"
-			Game.SpellsTxt[74].GM="25 Mana cost: \ncures 40 + 9 HP per point of skill\nno limit\n"
-			greaterHealBase={0,0,25,40}
-			greaterHealScaling={0,0,6,9}
-			if level>=136 then
-				Game.SpellsTxt[74].Master="35 Mana cost: \ncures 50 + 10 HP per point of skill\n1 day limit\n"
-				Game.SpellsTxt[74].GM="50 Mana cost: \ncures 75 + 13 HP per point of skill\nno limit\n"
-				Game.Spells[74]["SpellPointsMaster"]=35
-				Game.Spells[74]["SpellPointsGM"]=50
-				greaterHealBase={0,12,50,75}
-				greaterHealScaling={0,2,10,13}
-			end
-			if level>=216 then
-				Game.SpellsTxt[74].Master="90 Mana cost: \ncures 100 + 18 HP per point of skill\n1 day limit\n"
-				Game.SpellsTxt[74].GM="125 Mana cost: \ncures 160 + 25 HP per point of skill\nno limit\n"
-				Game.Spells[74]["SpellPointsMaster"]=90
-				Game.Spells[74]["SpellPointsGM"]=125
-				greaterHealBase={0,12,100,160}
-				greaterHealScaling={0,2,18,25}
-			end
-			
-			Game.Spells[77]["SpellPointsGM"]=30
-			powerHealBase = 10
-			powerHealScaling = 3
-			Game.SpellsTxt[77].GM="This spell is as good as it will ever get! Or not..."
-			if level>=160 then
-				Game.Spells[77]["SpellPointsGM"]=60
-				powerHealBase = 30
-				powerHealScaling = 5
-				Game.SpellsTxt[77].GM="Cures all party members by 30 plus 5 per point of skill"
-			end
-			if level>=240 then
-				Game.Spells[77]["SpellPointsGM"]=90
-				powerHealBase = 50
-				powerHealScaling = 7
-				Game.SpellsTxt[77].GM="Cures all party members by 50 plus 7 per point of skill"
-			end
-		end
-	end
-end
-]]
 
 ---------------
 -- BUFF REWORK (MAW SPELL)
