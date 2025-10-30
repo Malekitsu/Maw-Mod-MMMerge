@@ -1074,6 +1074,8 @@ function events.PlayerCastSpell(t)
 			Party.SpellBuffs[7].ExpireTime=Game.Time+const.Hour*7
 			t.Handled=true
 			t.Player:SetRecoveryDelay(120)
+		elseif t.SpellId==27 then
+			evt.Add("Items",326)
 		end
 	end
 end
