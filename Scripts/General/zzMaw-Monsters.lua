@@ -729,7 +729,7 @@ function recalculateMonsterTable()
 		
 		--experience
 		local lvlBase=math.max(basetable[i].Level,totalLevel[i]/3) --added totalLevel/3 because of mapping
-		local lvlBase=math.min(lvlBase,120) 
+		local lvlBase=math.min(lvlBase,100) 
 		mon.Experience = round((lvlBase*20+lvlBase^1.8)*totalLevel[i]/lvlBase)
 		
 		if currentWorld==2 then
@@ -2759,6 +2759,7 @@ function checkMapCompletition()
 					totalMonster=totalMonster*0.8
 				end
 				mapLevel=math.max(mapLevel,1)
+				mapLevel=math.min(mapLevel,100)
 				local experience=math.ceil(totalMonster^0.7*(mapLevel*20+mapLevel^1.8)/3*(bolster+mapLevel)/mapLevel/1000)*1000
 				if vars.madnessMode then
 					experience=math.ceil(totalMonster^0.7*(bolster*20+bolster^1.8)/3/1000)*1000
@@ -4201,7 +4202,7 @@ function events.MonsterKilled(mon)
 
 	--reset experience
 	local lvlBase=math.max(basetable[id].Level,totalLevel[id]/3) --added totalLevel/3 because of mapping
-	local lvlBase=math.min(lvlBase,120) 
+	local lvlBase=math.min(lvlBase,100) 
 	mon.Experience = round((lvlBase*20+lvlBase^1.8)*totalLevel[id]/lvlBase)
 			
 	if currentWorld==2 then
