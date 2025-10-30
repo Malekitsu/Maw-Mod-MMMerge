@@ -1666,6 +1666,9 @@ function events.BuildItemInformationBox(t)
 				t.Name=StrColor(255,255,255,t.Name)
 			end
 		elseif t.Description then
+			if t.Item.BonusExpireTime>=10 and t.Item.BonusExpireTime<1000 then
+				t.Description=""
+			end
 			if legendaryEffects[t.Item.BonusExpireTime%100]then
 				local legText=legendaryEffects[t.Item.BonusExpireTime%100]
 				if t.Item.BonusExpireTime%100==21 then
