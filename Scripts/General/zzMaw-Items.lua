@@ -1696,7 +1696,7 @@ function events.BuildItemInformationBox(t)
 					local red=round(math.min(1-0.97^count,0.5)*10000)/100
 					legText=legText .. "\nCurrent Reduction: " .. red .. "%"
 				end
-				t.Description = StrColor(255,255,30,legText) .. "\n\n" .. t.Description
+				t.Description = StrColor(255,255,30,legText) .. t.Description
 			end
 			if t.Item.Bonus2>0 then	
 				if (t.Item.MaxCharges>=0 and bonusEffects[t.Item.Bonus2]~= nil) or enchantList[t.Item.Bonus2] then
