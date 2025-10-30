@@ -3517,11 +3517,11 @@ amountSP = amountSP or { [0] = 0, 0, 0, 0, 0 }
 function leecher()
   if not mapvars or not mapvars.bossData then return end
 
-  for mid = 0, Map.Monsters.High do
+  for mid, bossData in pairs(mapvars.bossData) do
     if inRangeMonIdx(mid) then
       local mon = Map.Monsters[mid]
-      if mon and mapvars.bossData[mid] then
-        local skill = mapvars.bossData[mid].Skills
+      if mon then
+        local skill = bossData.Skills
         if skill == "Leecher" or skill == "Omnipotent" then
           local distance = getDistance(mon.X or 0, mon.Y or 0, mon.Z or 0)
           if (distance or 1e9) < 1500 and (mon.HP or 0) > 0 and mon.AIState ~= 19 then
@@ -4268,6 +4268,12 @@ function events.PickCorpse(t)
 	local index=t.MonsterIndex
 	if mapvars.bossData and mapvars.bossData[index] then
 		mapvars.bossData[index]=nil
+	end
+	function events.Tick()
+		event.Remove("Tick", 1)
+		if mon.AIState==11 then
+			mon.NameId=0
+		end
 	end
 	--remove boss data
 	
