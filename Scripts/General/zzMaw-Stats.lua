@@ -236,7 +236,7 @@ function getSpellDelay(pl,spell)
 		end
 	end
 	local ascensionSkill=0
-	local skill=SplitSkill(pl.Skills[const.Skills.Learning])
+	local skill=SplitSkill(pl:GetSkill(const.Skills.Learning))
 	if table.find(spells, spell) or (healingSpells and healingSpells[spell]) then
 		ascensionSkill=skill
 	end
@@ -777,7 +777,7 @@ function events.CalcDamageToPlayer(t)
 	end
 	--properly calculate friendly fire damage
 	if data and data.Player and data.Spell and data.Spell<133 and data.Spell>0 then	
-		local s,m = SplitSkill(data.Player.Skills[const.Skills.Learning])
+		local s,m = SplitSkill(data.Player:GetSkill(const.Skills.Learning))
 		local diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, data.Spell,data.Player:GetIndex())
 		local damage=damageAdd
 		for i=1, data.SpellSkill do
@@ -1517,7 +1517,7 @@ function calcPowerVitality(pl, statsMenu)
 		skill, mastery=SplitSkill(pl:GetSkill(skillType))
 		local mastery=math.max(1,mastery)
 		--SPELLS
-		local ascensionSkill, m = SplitSkill(pl.Skills[const.Skills.Learning])
+		local ascensionSkill, m = SplitSkill(pl:GetSkill(const.Skills.Learning))
 		if spellPowers[spellIndex] then
 			diceMin, diceMax, damageAdd = ascendSpellDamage(ascensionSkill, m, spellIndex)
 		else
