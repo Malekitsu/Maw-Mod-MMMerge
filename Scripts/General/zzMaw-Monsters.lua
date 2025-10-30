@@ -4270,7 +4270,7 @@ function events.PickCorpse(t)
 		mapvars.bossData[index]=nil
 	end
 	function events.Tick()
-		event.Remove("Tick", 1)
+		events.Remove("Tick", 1)
 		if mon.AIState==11 then
 			mon.NameId=0
 		end
