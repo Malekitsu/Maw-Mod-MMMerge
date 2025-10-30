@@ -2307,7 +2307,7 @@ function events.LeaveMap()
 			mon=Map.Monsters[i]
 			old=mapvars.monsterMap[i]
 			-- Skip player-controlled monsters in multiplayer
-			if mon and table.find(playerControlledMonsters, i) then
+			if mon and table.find(playerControlledMonsters, i) or (mon and mon.NameId>=220 and mon.NameId<=300) then
 				-- Do not respawn player-controlled monsters
 			else
 				if mon and old and old.respawn and (mon.AIState==const.AIState.Removed or mon.AIState==const.AIState.Dead) then --no unique monsters respawn
@@ -2768,10 +2768,6 @@ function checkMapCompletition()
 						experience=experience*0.5
 					end
 				end
-				--bolster code
-				addBolsterExp(experience)
-				vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
-				--end
 				local gold=math.ceil(experience^0.9/1000)*1000 
 				if vars.madnessMode then
 					gold=round(experience/3/1000)*1000
@@ -2798,6 +2794,10 @@ function checkMapCompletition()
 						evt.Add("Items",1040+gemTier)
 					end
 				end
+				--bolster code
+				addBolsterExp(experience)
+				vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
+				--end
 				experience=experience*5/Party.Count
 				if Multiplayer and Multiplayer.in_game then
 					experience=experience / math.min(PlayersInGame(),5)
