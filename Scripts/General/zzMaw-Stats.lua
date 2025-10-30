@@ -235,10 +235,10 @@ function getSpellDelay(pl,spell)
 			enchantMult=enchantMult+0.1
 		end
 	end
-	local tier=0
+	local ascensionSkill=0
 	local skill=SplitSkill(pl.Skills[const.Skills.Learning])
 	if table.find(spells, spell) or (healingSpells and healingSpells[spell]) then
-		tier=getAscensionTier(skill,spell,pl:GetIndex())
+		ascensionSkill=skill
 	end
 	
 	--shield/armor impair
@@ -273,7 +273,7 @@ function getSpellDelay(pl,spell)
 			hasteDiv=math.max(1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]*s/1000, hasteDiv)
 		end
 	end
-	local delay=round(oldTable[spell][m]/(1+haste/100)*1.2^tier/hasteDiv/enchantMult)*armorDelay
+	local delay=round(oldTable[spell][m]/(1+haste/100)*1.02^ascensionSkill/hasteDiv/enchantMult)*armorDelay
 	if table.find(elementalistClass, pl.Class) then
 		delay=delay*1.5
 		local id=pl:GetIndex()
@@ -1517,9 +1517,9 @@ function calcPowerVitality(pl, statsMenu)
 		skill, mastery=SplitSkill(pl:GetSkill(skillType))
 		local mastery=math.max(1,mastery)
 		--SPELLS
-		local s, m = SplitSkill(pl.Skills[const.Skills.Learning])
+		local ascensionSkill, m = SplitSkill(pl.Skills[const.Skills.Learning])
 		if spellPowers[spellIndex] then
-			diceMin, diceMax, damageAdd, ascensionTier = ascendSpellDamage(s, m, spellIndex)
+			diceMin, diceMax, damageAdd = ascendSpellDamage(ascensionSkill, m, spellIndex)
 		else
 			diceMin, diceMax, damageAdd = healingSpells[spellIndex].Scaling[mastery], healingSpells[spellIndex].Scaling[mastery], healingSpells[spellIndex].Base[mastery]
 		end
@@ -1551,7 +1551,7 @@ function calcPowerVitality(pl, statsMenu)
 				enchantDamage=enchantDamage+dmg+dmg2
 			end
 		end
-		enchantDamage=enchantDamage*1.2^ascensionTier
+		enchantDamage=enchantDamage*1.02^ascensionSkill
 		if table.find(aoespells, spellIndex) then
 			enchantDamage=enchantDamage/2.5
 			if vars.madnessMode then
