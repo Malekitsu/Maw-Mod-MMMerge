@@ -4272,6 +4272,12 @@ function events.PickCorpse(t)
 		mon.TreasureDiceSides=0
 		mon.TreasureDiceCount=0
 	end
+	local index=t.MonsterIndex
+	if mapvars.bossData and mapvars.bossData[index] then
+		mapvars.bossData[index]=nil
+	end
+	--remove boss data
+	
 end
 
 --[[
