@@ -3524,7 +3524,7 @@ function leecher()
         local skill = bossData.Skills
         if skill == "Leecher" or skill == "Omnipotent" then
           local distance = getDistance(mon.X or 0, mon.Y or 0, mon.Z or 0)
-          if (distance or 1e9) < 1500 and (mon.HP or 0) > 0 and mon.AIState ~= 19 then
+          if (distance or 1e9) < 1500 and (mon.HP or 0) > 0 and mon.AIState ~= 19 and mon.AIState~=11 and mon.AIState~=5 then
             local leechmult = Clamp01(((1500 - distance) / 1500) ^ 2)
             local timeMultiplier = Game.TurnBased and 4 or 1  -- nerf conservé
             for pi = 0, Party.High do
@@ -4525,5 +4525,34 @@ function events.CalcDamageToMonster(t)
 		local res=t.Monster.Resistances[4]%1000
 		local damage=round(damage/2^(res/100))
 		t.Result=damage
+	end
+end
+
+
+function events.KeyDown(t)
+	if t.Key==const.Keys.K then
+		local count=0
+		for i=0, Map.Monsters.High do
+			local mon=Map.Monsters[i]
+			if mon.AIState==5 and count<30 then
+				mon.X=Party.X
+				mon.Y=Party.Y
+				mon.Z=Party.Z
+				count=count+1
+			end
+		end
+		local objCount=0
+		for i=0,Map.Objects.High do
+		local obj=Map.Objects[i]
+			if obj.Item.Number>1040 and obj.Item.Number<1070 then
+				if objCount<30 then
+					obj.X=Party.X
+					obj.Y=Party.Y
+					obj.Z=Party.Z
+					objCount=objCount+1
+				end
+			end
+		end
+		Game.ShowStatusText("Teleported " .. count .. " monsters and " .. objCount .. " crafting items")
 	end
 end
