@@ -1513,7 +1513,7 @@ function events.CalcSpellDamage(t)
 	local data=WhoHitMonster()
 	local ascensionSkill=0
 	if data and data.Player then
-		local ascensionSkill,m = SplitSkill(data.Player.Skills[const.Skills.Learning])
+		local ascensionSkill,m = SplitSkill(data.Player:GetSkill(const.Skills.Learning))
 		local id=data.Player:GetIndex()
 		if table.find(elementalistClass, data.Player.Class) then
 			ascensionSkill=0
@@ -1788,7 +1788,7 @@ function ascension(customIndex)
 		end
 		
 		
-		local level=pl.Skills[const.Skills.Learning]
+		local level=pl:GetSkill(const.Skills.Learning)
 		lastLevel=level
 		local s,m = SplitSkill(level)
 		local elementalist=false
