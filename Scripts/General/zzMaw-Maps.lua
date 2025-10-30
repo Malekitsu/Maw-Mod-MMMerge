@@ -1977,7 +1977,7 @@ function calculateAffixPower(n, p)
 	elseif n == 8 then
 		power=5+p*0.25
 	elseif n == 9 then
-		power=15+p*0.5
+		power=15+p*0.2
 	elseif n == 10 then
 		power=3+p*0.3
 	elseif n == 11 then
@@ -1991,13 +1991,13 @@ function calculateAffixPower(n, p)
 	elseif n == 15 then
 		power=20+p*1.5
 	elseif n == 16 then
-		power=40+p*2
+		power=30+p*0.5
 	elseif n == 17 then
 		power=20+p*0.5
 	elseif n == 18 then
 		power=15+p*1
 	elseif n == 19 then
-		power=10+p*0.2
+		power=4+p*0.05
 	elseif n == 20 then
 		power=10+p*0.2
 	elseif n == 21 then
