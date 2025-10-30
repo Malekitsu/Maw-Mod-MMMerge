@@ -3908,18 +3908,12 @@ function events.AfterLoadMap()
 	end
 end
 
---[[reduce drops from gogs and wasps 
-local nerfDropList={201, 202, 217, 653, 654,}  
+--reduce some drops
 function events.MonsterDropItem(t)
-	if table.find(nerfDropList, t.ItemId) then
-		if math.random()<0 then
-			t.Handled=true
-			t.ItemId=0
-			return
-		end
-	end	
+	if math.random()<0.8 then
+		t.Handled=true
+	end
 end
-not working]]
 
 --[[
 mmLevels={}
