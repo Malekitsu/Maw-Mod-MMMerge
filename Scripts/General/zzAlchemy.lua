@@ -245,7 +245,10 @@ function events.UseMouseItem(t)
 		local experience=it.Bonus*500
 		vars.expPot=vars.expPot or {}
 		vars.expPot[index]=vars.expPot[index] or 0
-		if vars.expPot[index]/(pl.Exp-vars.expPot[index])<0.25 then
+		local baseExp=(pl.Exp-vars.expPot[index])
+		local baseLevel=calcLevel(baseExp)
+		local currentLevel=calcLevel(pl.Exp)
+		if vars.expPot[index]/(pl.Exp-vars.expPot[index])<0.25 and currentLevel-baseLevel<50 then
 			pl.Exp=pl.Exp+experience
 			vars.expPot[index]=vars.expPot[index]+experience
 		else
@@ -437,7 +440,12 @@ function events.BuildItemInformationBox(t)
 		else
 			str=StrColor(255,0,0,percent .. "%")
 		end
-		t.Description=t.Description .. "\n\nCan benefit only if experience gained this way is less than 25% of base experience\nCurrent amount: " .. str
+		
+		local baseExp=(pl.Exp-vars.expPot[index])
+		local baseLevel=calcLevel(baseExp)
+		local currentLevel=calcLevel(pl.Exp)
+		local levelDiff=round(currentLevel-baseLevel)
+		t.Description=t.Description .. "\n\nCan benefit only if experience gained this way is less than 25% of base experience and level gained are less than 50\nCurrent amount: " .. str .. "\nLevels: " .. levelDiff
 	end
 		
 	if table.find(potionUsingCharges,t.Item.Number) then
