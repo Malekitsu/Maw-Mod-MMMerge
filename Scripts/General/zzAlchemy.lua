@@ -669,7 +669,7 @@ function events.MonsterKilled(mon)
 		end
 	end
 	if dropPossible and m==4 then
-		local chance=0.001
+		local chance=0.002
 		if chance>math.random() then
 			local obj = SummonItem(1069, mon.X, mon.Y, mon.Z + 100, 100)
 			obj.Item.BonusStrength=math.min(s+10, 100)
