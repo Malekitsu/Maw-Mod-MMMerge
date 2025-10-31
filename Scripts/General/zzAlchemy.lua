@@ -634,11 +634,15 @@ function events.MonsterKilled(mon)
 		return
 	end
 	local dropPossible=false
+	local chance=0
+	local s=0
+	local m=0
 	for i=0,Party.High do
-		s,m = SplitSkill(Party[i].Skills[const.Skills.Alchemy])
-		if m>=3 then
+		s1,m1 = SplitSkill(Party[i].Skills[const.Skills.Alchemy])
+		if m1>=3 then
 			dropPossible=true
-			chance=(m-2)/100
+			m=math.max(m,m1)
+			chance=math.max(chance,(m1-2)/100)
 		end
 	end
 	if dropPossible and math.random()<chance then
@@ -666,8 +670,10 @@ function events.MonsterKilled(mon)
 	end
 	if dropPossible and m==4 then
 		local chance=0.001
-		local obj = SummonItem(1069, mon.X, mon.Y, mon.Z + 100, 100)
-		obj.BonusStrength=math.min(s+10, 100)
+		if chance>math.random() then
+			local obj = SummonItem(1069, mon.X, mon.Y, mon.Z + 100, 100)
+			obj.Item.BonusStrength=math.min(s+10, 100)
+		end
 	end
 end
 
