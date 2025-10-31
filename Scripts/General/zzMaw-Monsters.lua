@@ -745,9 +745,6 @@ function recalculateMonsterTable()
 		if vars.insanityMode then
 			mon.Experience=mon.Experience*0.8
 		end
-		if vars.madnessMode then
-			mon.Experience=mon.Experience*1.5
-		end
 		mon.ArmorClass=base.ArmorClass*((totalLevel[i]+10)/(LevelB+10))
 	end
 	
