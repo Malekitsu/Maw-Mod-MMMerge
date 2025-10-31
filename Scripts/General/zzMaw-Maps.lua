@@ -1969,9 +1969,9 @@ function calculateAffixPower(n, p)
 	elseif n == 4 then
 		power=5+p*0.5
 	elseif n == 5 then
-		power=7+p*1
+		power=7+p*0.15
 	elseif n == 6 then
-		power=7+p*0.1
+		power=7+p*0.15
 	elseif n == 7 then
 		power=1+p*0.1
 	elseif n == 8 then
