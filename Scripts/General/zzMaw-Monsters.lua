@@ -4528,9 +4528,9 @@ function events.CalcDamageToMonster(t)
 	end
 end
 
-
+local teleportKey=teleportDeadMonstersAndCraftingKey or 75 --K as default
 function events.KeyDown(t)
-	if t.Key==const.Keys.K then
+	if t.Key==teleportKey then
 		local count=0
 		for i=0, Map.Monsters.High do
 			local mon=Map.Monsters[i]
