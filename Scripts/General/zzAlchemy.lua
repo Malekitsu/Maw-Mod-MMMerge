@@ -656,6 +656,11 @@ function events.MonsterKilled(mon)
 			end
 		end
 	end
+	if dropPossible and m==4 then
+		local chance=0.001
+		local obj = SummonItem(1069, mon.X, mon.Y, mon.Z + 100, 100)
+		local obj.BonusStrength=s
+	end
 end
 
 reagentDropTable={}
@@ -720,6 +725,11 @@ function events.BuildItemInformationBox(t)
 			if t.Item.BonusStrength==1 then
 				t.Description = t.Description .. "\n\n" .. StrColor(120, 240, 255,"Celestial orb is charged and it's ready to grant celestial powers to any non-Artifact Equipment")
 			end
+		end
+	end
+	if t.Item.Number==1069 then
+		if t.Description then				
+			t.Description=t.Description .. StrColor(255,255,30, "\n\nIncreases Charges by " .. t.Item.BonusStrength)
 		end
 	end
 end
@@ -1105,10 +1115,17 @@ end
 
 --manually use crafting items on maps
 local overworldMaps={1,2,3,4,5,6,7,8,9,10,11,12,13,14,62,63,64,65,66,67,68,69,70,71,72,73,74,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151}
+
 function events.BuildItemInformationBox(t)
-	local it=t.Item
+	if Mouse.Item then
+		UseItem(t.Item, Mouse.Item)
+	end
+end
+
+local chargePotions={245, 251, 257, 263}
+function UseItem(it, usedIt)
 	if it.Number==290 then
-		local id=Mouse.Item.Number
+		local id=usedIt.Number
 		local craftUsed=false
 		if id==1061 then
 			if it.Bonus>0 and it.Bonus<4 then
@@ -1151,6 +1168,13 @@ function events.BuildItemInformationBox(t)
 			it.Condition = it.Condition:Or(0x10)
 			evt.PlaySound(12070)
 		end
+	end
+	
+	if usedIt.Number==1069 and table.find(chargePotions, it.Number) then
+		local baseCharges=it.Charges==0 and 6 or it.Charges
+		it.Charges=baseCharges+usedIt.BonusStrength
+		Mouse.Item.Number=0
+		evt.PlaySound(12070)
 	end
 end
 
@@ -1380,6 +1404,14 @@ function events.GameInitialized2()
 		Game.ItemsTxt[1050+i].SpriteIndex=141+i
 	end
 	Game.ItemsTxt[1068].SpriteIndex=411
+	
+	--potion
+	Game.ItemsTxt[1069].Name="Endless Potion"
+	Game.ItemsTxt[1069].NotIdentifiedName="Potion Bottle"
+	Game.ItemsTxt[1069].Notes="This items allows to increase the number of charges of Champion's, Paladin's, Divine Blessing and Divine Resistance potions."
+	Game.ItemsTxt[1069].Picture="item280"
+	Game.ItemsTxt[1069].Skill=40
+	Game.ItemsTxt[1069].SpriteIndex=130
 end
 
 
