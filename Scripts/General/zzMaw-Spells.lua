@@ -1899,7 +1899,7 @@ function ascension(customIndex)
 		for i=1, 6 do
 			for v=1,4 do
 				local baseCost = healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
-				healingSpells[healingList[i]].Cost[v]=math.min(round(math.ceil(baseCost)), 65000)
+				healingSpells[healingList[i]].Cost[v]=math.min(round(baseCost*personalityReduction), 65000)
 				healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
 			end
 		end
