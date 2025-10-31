@@ -4552,6 +4552,12 @@ function events.KeyDown(t)
 				end
 			end
 		end
-		Game.ShowStatusText("Teleported " .. count .. " monsters and " .. objCount .. " crafting items")
+		if objCount == 0 then
+			Game.ShowStatusText("Teleported " .. count .. " monsters")
+		elseif count == 0 then
+			Game.ShowStatusText("Teleported " .. objCount .. " crafting items")
+		else
+			Game.ShowStatusText("Teleported " .. count .. " monsters and " .. objCount .. " crafting items")
+		end
 	end
 end
