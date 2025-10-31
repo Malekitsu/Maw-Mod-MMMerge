@@ -672,7 +672,7 @@ reagentDropTable[5]={204,209,214,219,1006,1011,1016,1021}
 function events.GameInitialized2()
 	Skillz.setDesc(const.Skills.Alchemy,1,Skillz.getDesc(const.Skills.Alchemy,1) .. "\n\nMaster will grant 1% to drop random reagents from Monsters.\nAt GM this chance is doubled.")
 	Game.SkillDesMaster[const.Skills.Alchemy]="Allows to make white potions. Power when mixing will be increased to 1.5 per skill point."
-	Game.SkillDesGM[const.Skills.Alchemy]="Allows to make black potions. Power when mixing will be increased to 2 and increases potion duration by 6 Minutes per skill point."
+	Game.SkillDesGM[const.Skills.Alchemy]="Allows to make black potions. Power when mixing will be increased to 2 and increases potion duration by 6 Minutes per skill point. Allows the Endless potion to be dropped by monsters, which power is determined by Alchemy level."
 end
 function events.BuildItemInformationBox(t)
 	if t.Item.Number>=1041 and t.Item.Number<=1060 then
