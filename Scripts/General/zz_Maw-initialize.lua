@@ -35,6 +35,7 @@ return {
     higherLootPowerRange = true,        -- enchants range from 1-100 instead of tier-based ranges
     enableAllTrainers = true,           -- find trainers that weren't previously available in all continents
     onlineQualityOfLifeFeatures = true, -- remove travel/training time, coaches/ships always available
+	teleportDeadMonstersAndCraftingKey = 75, -- teleports up to 30 monsters and 30 crafting items to the player location
     
     -- Movement
     fasterStrafing = true,              -- faster strafing speed
@@ -292,6 +293,7 @@ multiBagSortKey = mawSettings.multiBagSortKey
 partyMultyBagSortKey = mawSettings.partyMultyBagSortKey
 AlchemyBagKey = mawSettings.AlchemyBagKey
 disableSpellBookRework = mawSettings.disableSpellBookRework
+teleportDeadMonstersAndCraftingKey = mawSettings.teleportDeadMonstersAndCraftingKey
 
 -- Store settings in vars for access by other scripts
 function events.LoadMap()
