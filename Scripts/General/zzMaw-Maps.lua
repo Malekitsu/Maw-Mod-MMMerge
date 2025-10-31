@@ -1688,10 +1688,10 @@ function events.GameInitialized2()
 			Level = monsterOrderTable[index]
 		}
 	end
-	
+	local removeList={462, 579}
 	for i=1,651 do
 		i=652-i
-		if Game.MonstersTxt[monTbl[i].Index].AIType==1 or monTbl[i].Index%3~=0 then
+		if Game.MonstersTxt[monTbl[i].Index].AIType==1 or monTbl[i].Index%3~=0 or table.find(removeList, monTbl[i].Index) then
 			table.remove(monTbl, i)
 		end
 	end
