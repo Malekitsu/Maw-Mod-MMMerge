@@ -638,7 +638,8 @@ function events.MonsterKilled(mon)
 	local s=0
 	local m=0
 	for i=0,Party.High do
-		s1,m1 = SplitSkill(Party[i].Skills[const.Skills.Alchemy])
+		s1,m1 = SplitSkill(Party[i]:GetSkill(const.Skills.Alchemy))
+		s=math.max(s1,s)
 		if m1>=3 then
 			dropPossible=true
 			m=math.max(m,m1)
@@ -653,12 +654,9 @@ function events.MonsterKilled(mon)
 		local reagent=reagentDropTable[tier][roll]	
 		local obj = SummonItem(reagent, mon.X, mon.Y, mon.Z + 100, 100)
 		local alchemyPower=0
-		for i=0,Party.High do
-			local s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Alchemy))
-			local power=s*m/2
-			if power>alchemyPower then
-				alchemyPower=power
-			end
+		local power=s*m/2
+		if power>alchemyPower then
+			alchemyPower=power
 		end
 		if obj then
 			obj.Item.Bonus=round(getPartyLevel()/3)
