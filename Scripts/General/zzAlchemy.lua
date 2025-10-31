@@ -922,9 +922,9 @@ evt.PotionEffects[93] = function(IsDrunk, t, Power)
 		maxChargesCap=maxChargesCap/2
 
 		if vars.madnessMode then
-			maxChargesCap=maxChargesCap*1.5
+			maxChargesCap=150
 		end
-		
+		maxChargesCap=round(maxChargesCap)
 		local levelRequired=GetLevelRquirement(t)
 		--check if equippable
 		local plLvl=Party[Game.CurrentPlayer].LevelBase
