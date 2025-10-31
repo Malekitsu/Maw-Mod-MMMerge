@@ -2764,7 +2764,9 @@ function checkMapCompletition()
 				if vars.madnessMode then
 					experience=math.ceil(totalMonster^0.7*(bolster*20+bolster^1.8)/3/1000)*1000
 					if not mapvars.mapAffixes then
-						experience=experience*3
+						experience=experience*2
+					else
+						experience=experience/2
 					end
 				end
 				local gold=math.ceil(experience^0.9/1000)*1000 
@@ -4209,9 +4211,6 @@ function events.MonsterKilled(mon)
 	end
 	if vars.insanityMode then
 		mon.Experience=mon.Experience*0.8
-	end
-	if vars.madnessMode then
-		mon.Experience=mon.Experience*1.5
 	end
 	
 	local data=WhoHitMonster()
