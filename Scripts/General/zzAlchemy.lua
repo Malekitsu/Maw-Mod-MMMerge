@@ -659,7 +659,7 @@ function events.MonsterKilled(mon)
 	if dropPossible and m==4 then
 		local chance=0.001
 		local obj = SummonItem(1069, mon.X, mon.Y, mon.Z + 100, 100)
-		local obj.BonusStrength=s
+		local obj.BonusStrength=s+10
 	end
 end
 
