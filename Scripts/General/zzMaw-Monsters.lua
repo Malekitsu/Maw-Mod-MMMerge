@@ -4540,7 +4540,7 @@ function events.KeyDown(t)
 		local objCount=0
 		for i=0,Map.Objects.High do
 		local obj=Map.Objects[i]
-			if obj.Item.Number>1040 and obj.Item.Number<1070 then
+			if obj.Item.Number>1040 and obj.Item.Number<1070 or obj.Item.Number==290 then
 				if objCount<30 then
 					obj.X=Party.X
 					obj.Y=Party.Y
