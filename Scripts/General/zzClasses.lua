@@ -2011,6 +2011,10 @@ function events.GameInitialized2()
 				
 				if assassinSpells[spell].DamageMult then
 					t.Result=t.Result*assassinSpells[data.Object.Spell].DamageMult
+					if spell==44 then
+						local res=t.Monster.Resistances[3]%1000
+						t.Result=t.Result/2^(res/100)
+					end
 				end
 			end
 		end
