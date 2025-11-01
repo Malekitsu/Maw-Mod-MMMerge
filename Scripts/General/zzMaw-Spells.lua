@@ -1229,7 +1229,8 @@ function events.Action(t)
 			local haste=math.floor(pl:GetSpeed()/10)
 			local delay=getSpellDelay(pl,spellCast)
 			pl:SetRecoveryDelay(delay)
-			evt.PlaySound(14040)
+			--evt.PlaySound(14040) set to heal, sound is annoying
+			evt.PlaySound(16010)
 			pl.Expression=40
 			Party.SpellBuffs[11].ExpireTime=0 --invisibility
 		end
