@@ -1134,7 +1134,7 @@ function events.BuildItemInformationBox(t)
 	end
 end
 
-local chargePotions={245, 251, 257, 263}
+local chargePotions={231, 232, 233, 237, 245, 251, 257, 263}
 function UseItem(it, usedIt)
 	if it.Number==290 then
 		local id=usedIt.Number
@@ -1420,7 +1420,7 @@ function events.GameInitialized2()
 	--potion
 	Game.ItemsTxt[1069].Name="Endless Potion"
 	Game.ItemsTxt[1069].NotIdentifiedName="Potion Bottle"
-	Game.ItemsTxt[1069].Notes="This items allows to increase the number of charges of Champion's, Paladin's, Divine Blessing and Divine Resistance potions."
+	Game.ItemsTxt[1069].Notes="This items allows to increase the number of charges of Protection, Meditation, Regeneration, Magic Protection, Champion's, Paladin's, Divine Blessing and Divine Resistance potions."
 	Game.ItemsTxt[1069].Picture="item280"
 	Game.ItemsTxt[1069].Skill=40
 	Game.ItemsTxt[1069].SpriteIndex=130
