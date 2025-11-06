@@ -1104,6 +1104,78 @@ end
 
 
 masteryName={"Normal", "Expert", "Master", "GM",[0]="Normal"}
+
+function processAutoTargetHeal(spellId, pl, skillType, soundId, removeConditionFunc)
+	local sp=healingSpells[spellId]
+	local s,m=SplitSkill(pl:GetSkill(skillType))
+	local cost=Game.Spells[spellId]["SpellPoints" .. masteryName[m]]
+	if pl.SP<cost then 
+		DoGameAction(23,0,0)
+		return
+	end
+	
+	local baseHeal=sp.Base[m]+sp.Scaling[m]*s
+	local mult, gotCrit=getHealSpellMultiPlier(pl)
+	totHeal=baseHeal*mult
+	
+	-- Show status message
+	if gotCrit then
+		Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points(crit)"))
+	else
+		Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points"))
+	end
+
+	min_index = pickLowestPartyMember()
+	
+	-- Calculate overheal
+	local hpBefore = Party[min_index].HP
+	local maxHP = GetMaxHP(Party[min_index])
+	local missingHP = maxHP - hpBefore
+	local overheal = math.max(0, totHeal - missingHP)
+	
+	-- Deduct mana
+	pl.SP=pl.SP-cost
+	
+	-- Apply heal
+	mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
+	Party[min_index].HP=math.min(Party[min_index].HP+totHeal, maxHP)
+	
+	-- Bug fix
+	if Party[min_index].HP>0 then
+		Party[min_index].Unconscious=0
+	end
+	
+	-- Remove specific conditions (if provided)
+	if removeConditionFunc then
+		removeConditionFunc(min_index)
+	end
+	
+	-- [34] Overhealing refunds mana
+	local overhealPercent = 0
+	local id = pl:GetIndex()
+	if overheal > 0 and vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 34) then
+		overhealPercent = overheal / totHeal
+		local manaRefund = math.floor(cost * overhealPercent)
+		pl.SP = pl.SP + manaRefund
+	end
+	
+	-- Calculate and apply recovery delay
+	local delay=getSpellDelay(pl,spellId)
+	-- [35] Overhealing reduces recovery time equal to half overhealing amount
+	if overheal > 0 and vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 35) then
+		if overhealPercent == 0 then
+			overhealPercent = overheal / totHeal
+		end
+		delay = math.floor(delay * (1 - (overhealPercent / 2)))
+	end
+	pl:SetRecoveryDelay(delay)
+	
+	-- Effects
+	evt.PlaySound(soundId)
+	pl.Expression=40
+	Party.SpellBuffs[11].ExpireTime=0 --invisibility
+end
+
 function events.Action(t)
 	if t.Action==25 and autoTargetHeals then
 		ascension()
@@ -1126,113 +1198,28 @@ function events.Action(t)
 			end
 		end
 		
-		if spellCast==68 and pl.RecoveryDelay==0 then
-			local sp=healingSpells[68]
-			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
-			local cost=Game.Spells[68]["SpellPoints" .. masteryName[m]]
-			if pl.SP<cost then 
-				DoGameAction(23,0,0)
-			end
+		if spellCast==55 and pl.RecoveryDelay==0 then
 			t.Handled=true
-			pl.SP=pl.SP-cost
-
-			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
-			
-			local mult, gotCrit=getHealSpellMultiPlier(pl)
-			totHeal=baseHeal*mult
-			if gotCrit then
-				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points(crit)"))
-			else
-				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points"))
-			end
-
-			min_index = pickLowestPartyMember()
-			--apply heal
-			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
-			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, GetMaxHP(Party[min_index]))	
-			--bug fix
-			if Party[min_index].HP>0 then
-			Party[min_index].Unconscious=0
-			end
-			local haste=math.floor(pl:GetSpeed()/10)
-			local delay=getSpellDelay(pl,spellCast)
-			pl:SetRecoveryDelay(delay)
-			evt.PlaySound(16010)
-			pl.Expression=40
-			Party.SpellBuffs[11].ExpireTime=0 --invisibility
+			Party[idx].HP=math.max(Party[idx].HP,1)
+			processAutoTargetHeal(74, pl, const.Skills.Body, 16070, function(idx)
+				Party[idx].Dead=0
+				Party[idx].Eradicated=0
+			end)
+		elseif spellCast==68 and pl.RecoveryDelay==0 then
+			t.Handled=true
+			processAutoTargetHeal(68, pl, const.Skills.Body, 16010)
 		elseif spellCast==74 and pl.RecoveryDelay==0 then
-			local sp=healingSpells[74]
-			local s,m=SplitSkill(pl:GetSkill(const.Skills.Body))
-			local cost=Game.Spells[74]["SpellPoints" .. masteryName[m]]
-			if pl.SP<cost then 
-				DoGameAction(23,0,0)
-			end
 			t.Handled=true
-			pl.SP=pl.SP-cost
-			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
-			
-			local mult, gotCrit=getHealSpellMultiPlier(pl)
-			
-			totHeal=baseHeal*mult
-			if gotCrit then
-				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points(crit)"))
-			else
-				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points"))
-			end
-
-			min_index = pickLowestPartyMember()
-			--apply heal
-			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
-			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, GetMaxHP(Party[min_index]))	
-			--bug fix
-			if Party[min_index].HP>0 then
-			Party[min_index].Unconscious=0
-			end
-			Party[min_index].Disease1=0
-			Party[min_index].Disease2=0
-			Party[min_index].Disease3=0
-			local haste=math.floor(pl:GetSpeed()/10)
-			local delay=getSpellDelay(pl,spellCast)
-			pl:SetRecoveryDelay(delay)
-			evt.PlaySound(16070)
-			pl.Expression=40
-			Party.SpellBuffs[11].ExpireTime=0 --invisibility
+			processAutoTargetHeal(74, pl, const.Skills.Body, 16070, function(idx)
+				Party[idx].Disease1=0
+				Party[idx].Disease2=0
+				Party[idx].Disease3=0
+			end)
 		elseif spellCast==49 and pl.RecoveryDelay==0 then
-			local sp=healingSpells[49]
-			local s,m=SplitSkill(pl:GetSkill(const.Skills.Spirit))
-			local cost=Game.Spells[49]["SpellPoints" .. masteryName[m]]
-			if pl.SP<cost then 
-				DoGameAction(23,0,0)
-			end
 			t.Handled=true
-			pl.SP=pl.SP-cost
-			local baseHeal=sp.Base[m]+sp.Scaling[m]*s
-			
-			local mult, gotCrit=getHealSpellMultiPlier(pl)
-			
-			totHeal=baseHeal*mult
-			if gotCrit then
-				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points(crit)"))
-			else
-				Game.ShowStatusText(string.format("You Heal for " .. round(totHeal) .. " Hit points"))
-			end
-
-			min_index = pickLowestPartyMember()
-			--apply heal
-			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Heal, min_index)
-			Party[min_index].HP=math.min(Party[min_index].HP+totHeal, GetMaxHP(Party[min_index]))
-			--bug fix
-			if Party[min_index].HP>0 then
-			Party[min_index].Unconscious=0
-			end
-			Party[min_index].Cursed=0
-			local haste=math.floor(pl:GetSpeed()/10)
-			local delay=getSpellDelay(pl,spellCast)
-			pl:SetRecoveryDelay(delay)
-			--evt.PlaySound(14040) set to heal, sound is annoying
-			evt.PlaySound(16010)
-			pl.Expression=40
-			Party.SpellBuffs[11].ExpireTime=0 --invisibility
+			processAutoTargetHeal(49, pl, const.Skills.Spirit, 16010, function(idx)
+				Party[idx].Cursed=0
+			end)
 		end
 		local partyHP2=0
 		for i=0,Party.High do
