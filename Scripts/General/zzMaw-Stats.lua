@@ -1693,6 +1693,9 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 	elseif Game.BolsterAmount==150 then
 		statsPerLevel=2
 	end
+	if vars.AusterityMode then
+		statsPerLevel=1
+	end
 	
 	local levelCap=700
 	if vars.madnessMode then
