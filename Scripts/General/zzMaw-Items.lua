@@ -1312,6 +1312,9 @@ legendaryEffects={
 	[30]="Threshold HP to determine death/eradication depends on SP instead, if higher",
 	[31]="Leech restores Mana instead of HP, but at half effect",
 	[32]="Buffs reserve Hit Points instead of Mana and Hit Point coefficient is used instead.\nEnlightenment bonus still apply.",
+	[33]="Increase Melee weapon skill by 10",
+	[34]="Overhealing refunds mana",
+	[35]="Overhealing reduces recovery time equal to half overhealing amount",
 }
 
 function updateCelestialItem(it,pl)
