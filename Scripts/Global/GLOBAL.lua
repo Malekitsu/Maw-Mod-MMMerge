@@ -755,3 +755,9 @@ evt.global[1447] = function()
 		evt.SetMessage{Str = 2141}         -- "You don't have a keg of wine to trade!"
 	end
 end
+
+if vars.Mode==2 then
+	evt.MoveNPC{1109, 0}
+	evt.MoveNPC{1165, 0}
+	evt.MoveNPC{1166, 0}
+end
