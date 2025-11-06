@@ -3181,24 +3181,22 @@ function itemStats(index)
 			local armsDmg=armsmasterSkill.Damage[m]*s*mult
 			
 			--mino nerf
+			local axeCount=0
+			local axeDamageMult=1
 			for k=0,1 do
-				local axeCount=0
-				local axeDamageMult=1
-				for k=0,1 do
-					local it=pl:GetActiveItem(k)
-					if it then
-						if table.find(oneHandedAxes, it.Number) then
-							axeCount=axeCount+1
-						elseif table.find(twoHandedAxes, it.Number) then
-							axeCount=axeCount+1
-							axeDamageMult=axeDamageMult-0.15
-						end
+				local it=pl:GetActiveItem(k)
+				if it then
+					if table.find(oneHandedAxes, it.Number) then
+						axeCount=axeCount+1
+					elseif table.find(twoHandedAxes, it.Number) then
+						axeCount=axeCount+1
+						axeDamageMult=axeDamageMult-0.1
 					end
 				end
-				if axeCount==2 then
-					side=side*axeDamageMult
-					add=add*axeDamageMult
-				end
+			end
+			if axeCount==2 then
+				side=side*axeDamageMult
+				add=add*axeDamageMult
 			end
 			--substitute with unarmed if staff
 			if skill==0 then
