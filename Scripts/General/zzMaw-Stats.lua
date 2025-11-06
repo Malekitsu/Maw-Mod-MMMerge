@@ -1694,7 +1694,7 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 		statsPerLevel=2
 	end
 	if vars.AusterityMode then
-		statsPerLevel=1
+		statsPerLevel=statsPerLevel/1.5
 	end
 	
 	local levelCap=700
@@ -1845,7 +1845,7 @@ function getPlayerEstimatedPower(lvl)
 		statsPerLevel=2
 	end
 	if vars.AusterityMode then
-		statsPerLevel=1
+		statsPerLevel=statsPerLevel/1.5
 	end
 		
 	local masterLearned=12
