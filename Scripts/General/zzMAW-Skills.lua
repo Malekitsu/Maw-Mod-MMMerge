@@ -1155,6 +1155,11 @@ function getBuffHealthRegen(pl)
 	local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Regeneration))
 	local regenEffect={[0]=0,2,4,6,6}
 	regen=regen + FHP^0.5*RegS^1.65*(regenEffect[RegM]/350)+RegS
+	if RegM==4 then
+		local hpRateo=pl.HP/FHP
+		regen=regen*(1+math.min((1-hpRateo)^2,4))
+	end
+	
 	for it in pl:EnumActiveItems() do
 		if it.Bonus2 == 37 or it.Bonus2==44 or it.Bonus2==50 or it.Bonus2==54 or it.Bonus2==66 or table.find(artifactHpRegen, it.Number) then		
 			regen=regen+FHP*0.02/10	
@@ -2671,6 +2676,12 @@ end
 
 local meleeSkills={0,1,2,3,4,6}
 function events.GetSkill(t)
+	if table.find(meleeSkills, t.Skill) then
+		local index=t.Player:GetIndex()
+		if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 33) then
+			t.Result=t.Result+10
+		end
+	end
 	if table.find(meleeSkills, t.Skill) then
 		local pl=t.Player
 		local class=pl.Class
