@@ -1156,8 +1156,8 @@ function getBuffHealthRegen(pl)
 	local regenEffect={[0]=0,2,4,6,6}
 	regen=regen + FHP^0.5*RegS^1.65*(regenEffect[RegM]/350)+RegS
 	if RegM==4 then
-		local hpRateo=pl.HP/FHP
-		regen=regen*(1+math.min((1-hpRateo)^2,4))
+		local hpRateo=math.max(pl.HP/FHP, -1)
+		regen=regen*(1+(1-hpRateo)^2)
 	end
 	
 	for it in pl:EnumActiveItems() do
