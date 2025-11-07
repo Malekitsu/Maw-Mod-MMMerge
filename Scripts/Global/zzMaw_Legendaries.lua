@@ -19,16 +19,6 @@ local legendaryEffects={
 function getDistanceToMonster(monster)
 	return math.sqrt((Party.X - monster.X) * (Party.X - monster.X) + (Party.Y - monster.Y) * (Party.Y - monster.Y)) - monster.BodyRadius
 end
---give legendary effect if dropped prior this file inclusion
-function events.BuildItemInformationBox(t)
-	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then 
-		if t.Item.BonusExpireTime==3 then
-			math.randomseed(t.Item.Number)
-			local roll=math.random(11,#legendaryEffects)
-			t.Item.BonusExpireTime=roll
-		end
-	end
-end
 
 
 function events.ItemAdditionalDamage(t)
@@ -53,13 +43,14 @@ function events.CalcDamageToMonster(t)
 	local data=WhoHitMonster()
 	if not data or not data.Player then return end
 	local pl=data.Player
+	local mon=t.Monster
 	--weapon enchants	
 	local fireAuraDamage=0
 	local enchantDamage=0
-	local fireRes=t.Monster.Resistances[0]%1000
+	local fireRes=mon.Resistances[0]%1000
 	if data and not data.Object and t.DamageKind==4 then
 		for i=0,1 do
-			local it=data.Player:GetActiveItem(i)
+			local it=pl:GetActiveItem(i)
 			if it then
 				local damage=calcFireAuraDamage(pl, it, fireRes, true, false, "damage")
 				if damage then
@@ -68,7 +59,7 @@ function events.CalcDamageToMonster(t)
 				
 				if it and enchantbonusdamage[it.Bonus2] then
 					local id=table.find(damageKindMap,enchantbonusdamage[it.Bonus2].Type)
-					local res=t.Monster.Resistances[id]%1000
+					local res=mon.Resistances[id]%1000
 					local dmg=calcEnchantDamage(pl, it, res, true, false, "damage")
 					if damage then
 						enchantDamage=enchantDamage+dmg
@@ -77,14 +68,14 @@ function events.CalcDamageToMonster(t)
 			end
 		end
 	elseif data and data.Object and (data.Object.Spell==133 or data.Spell==135) then --bow/blasters
-		local it=data.Player:GetActiveItem(2)
+		local it=pl:GetActiveItem(2)
 		local damage=calcFireAuraDamage(pl, it, fireRes, true, false, "damage")
 		if damage and damage>fireAuraDamage then
 			fireAuraDamage=damage
 		end
 		if it and enchantbonusdamage[it.Bonus2] then
 			local id=table.find(damageKindMap,enchantbonusdamage[it.Bonus2].Type)
-			local res=t.Monster.Resistances[id]%1000
+			local res=mon.Resistances[id]%1000
 			local dmg=calcEnchantDamage(pl, it, res, true, false, "damage")
 			if damage then
 				enchantDamage=enchantDamage+dmg
@@ -96,9 +87,9 @@ function events.CalcDamageToMonster(t)
 	--[17]="Your hits will deal 1% of current monster HP health (0.4% for AoE, multi-hit spells and arrows)",
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 17) then
 		if t.Result>0 and ((data and data.Object==nil and t.DamageKind==4) or (data and data.Object)) then
-			local dmg=t.Monster.HP*0.02*2^(math.floor(t.Monster.Resistances[0]/1000))
+			local dmg=mon.HP*0.02*2^(math.floor(mon.Resistances[0]/1000))
 			if data and data.Spell and data.Spell==44 then
-				dmg=t.Monster.HP*0.02
+				dmg=mon.HP*0.02
 			end
 			if (data and data.Object and data.Object.Spell and table.find(aoespells, data.Object.Spell)) or (data and data.Object and data.Object.Spell==133) then
 				dmg=dmg*0.5
@@ -107,28 +98,28 @@ function events.CalcDamageToMonster(t)
 		end
 	end
 	--shaman fire damage
-	if data and data.Player and table.find(shamanClass, data.Player.Class) and t.DamageKind==4 and data.Object==nil and t.Result>0 then	
-		local s1=SplitSkill(t.Player.Skills[const.Skills.Fire])
+	if table.find(shamanClass, pl.Class) and t.DamageKind==4 and data.Object==nil and t.Result>0 then	
+		local s1=SplitSkill(pl.Skills[const.Skills.Fire])
 		local fireDamage=s1*0.001
-		if t.Monster.Resistances[0]>=1000 then
-			mult=2^math.floor(t.Monster.Resistances[0]/1000)
+		if mon.Resistances[0]>=1000 then
+			mult=2^math.floor(mon.Resistances[0]/1000)
 			fireDamage=fireDamage*mult
 		end
-		fireDamage=math.max(t.Monster.HP*fireDamage,s1)
-		fireRes=t.Monster.Resistances[0]%1000
+		fireDamage=math.max(mon.HP*fireDamage,s1)
+		fireRes=mon.Resistances[0]%1000
 		fireDamage=fireDamage/2^(fireRes/100)
 		t.Result=t.Result+fireDamage
 	end
 	--same for assassin
-	if data and data.Player and table.find(assassinClass, data.Player.Class) and t.DamageKind==4 and data.Object==nil and t.Result>0 then	
-		local s1=SplitSkill(t.Player.Skills[const.Skills.Water])
+	if data and pl and table.find(assassinClass, pl.Class) and t.DamageKind==4 and data.Object==nil and t.Result>0 then	
+		local s1=SplitSkill(pl.Skills[const.Skills.Water])
 		local waterDamage=s1*0.001
-		if t.Monster.Resistances[0]>=1000 then
-			mult=2^math.floor(t.Monster.Resistances[0]/1000)
+		if mon.Resistances[0]>=1000 then
+			mult=2^math.floor(mon.Resistances[0]/1000)
 			waterDamage=waterDamage*mult
 		end
-		waterDamage=math.max(t.Monster.HP*waterDamage,s1)
-		waterRes=t.Monster.Resistances[2]%1000
+		waterDamage=math.max(mon.HP*waterDamage,s1)
+		waterRes=mon.Resistances[2]%1000
 		waterDamage=waterDamage/2^(waterRes/100)
 		t.Result=t.Result+waterDamage
 	end
@@ -145,56 +136,54 @@ function events.CalcDamageToMonster(t)
 		t.Result=t.Result*math.min(mult,2)
 	end
 	--end of [17]
-	if t.Player then
-		--[14]="Critical chance over 100% increases total damage",
-		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 14) then
-			local critChance=getCritInfo(t.Player,false,getMonsterLevel(t.Monster))
-			t.Result=math.round(t.Result*math.max(critChance,1))
-		end
-		--end of [14]
-		--[24]="killing a Monster Restores 10% of Health and Mana"
-		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 24) then
-			--restoreHPLeg=true
-			function events.Tick()
-				events.Remove("Tick", 1)
-				if restoreHPLeg then
-					--restoreHPLeg=false
-					if t.Monster.HP<=0 then
-						local fullHP=t.Player:GetFullHP()
-						local fullSP=t.Player:GetFullSP()
-						t.Player.HP=math.min(fullHP, t.Player.HP+fullHP*0.1)
-						t.Player.SP=math.min(fullSP, t.Player.SP+fullSP*0.1)
-					end
+	--[14]="Critical chance over 100% increases total damage",
+	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 14) then
+		local critChance=getCritInfo(pl,false,getMonsterLevel(mon))
+		t.Result=math.round(t.Result*math.max(critChance,1))
+	end
+	--end of [14]
+	--[24]="killing a Monster Restores 10% of Health and Mana"
+	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 24) then
+		--restoreHPLeg=true
+		function events.Tick()
+			events.Remove("Tick", 1)
+			if restoreHPLeg then
+				--restoreHPLeg=false
+				if mon.HP<=0 then
+					local fullHP=pl:GetFullHP()
+					local fullSP=pl:GetFullSP()
+					pl.HP=math.min(fullHP, pl.HP+fullHP*0.1)
+					pl.SP=math.min(fullSP, pl.SP+fullSP*0.1)
 				end
 			end
 		end
-		--end of 24
-		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 11) then
-			data=WhoHitMonster()
-			--no aoe spells
-			if (data and data.Object and table.find(aoespells,data.Object.Spell)) or (data and data.Spell==133) then
-				return
-			else
-				reduceRecovery=true
-				function events.Tick()
-					events.Remove("Tick", 1)
-					if reduceRecovery then
+	end
+	--end of 24
+	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 11) then
+		data=WhoHitMonster()
+		--no aoe spells
+		if (data and data.Object and table.find(aoespells,data.Object.Spell)) or (data and data.Spell==133) then
+			return
+		else
+			reduceRecovery=true
+			function events.Tick()
+				events.Remove("Tick", 1)
+				if reduceRecovery then
+					reduceRecovery=false
+					if mon.HP<=0 then
 						reduceRecovery=false
-						if t.Monster.HP<=0 then
-							reduceRecovery=false
-							t.Player.RecoveryDelay=t.Player.RecoveryDelay/2
-							--changePlayer(id)
-						end
+						pl.RecoveryDelay=pl.RecoveryDelay/2
+						--changePlayer(id)
 					end
 				end
 			end
 		end
 	end
-	if data and data.Player and table.find(shamanClass, data.Player.Class)  then
+	if table.find(shamanClass, pl.Class)  then
 		if t.Result>0 and data and data.Object and data.Object.Spell>0 and data.Object.Spell<99 then
 			local s=0
 			for school=12,18 do
-				skill=SplitSkill(data.Player.Skills[school])
+				skill=SplitSkill(pl.Skills[school])
 				s=s+skill
 			end
 			local mult=1+s/200
