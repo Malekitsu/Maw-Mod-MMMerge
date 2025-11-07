@@ -1770,6 +1770,8 @@ end
 
 function getMonsterDamage(mon, level)
 	local hitToKill={14,10,7,6.5,6,5.5,5,4.5,4}
+	local hitToKillAusterity={14,10,7,6.5,6,5.5,5,4.5,4}
+	
 	if mon then
 		local id=mon.Id
 		if id%3==1 then
@@ -1780,26 +1782,13 @@ function getMonsterDamage(mon, level)
 		level=mon and totalLevel[id] or level
 	end
 	local vitality=getPlayerEstimatedVitality(level)
-	local hits=hitToKill[3] --baseline MAW
-	if vars.madnessMode then
-		hits=hitToKill[9]
-	elseif vars.insanityMode then
-		hits=hitToKill[8]
-	elseif vars.Mode==2 then
-		hits=hitToKill[7]
-	elseif Game.BolsterAmount==300 then
-		hits=hitToKill[6]
-	elseif Game.BolsterAmount==200 then
-		hits=hitToKill[5]
-	elseif Game.BolsterAmount==150 then
-		hits=hitToKill[4]
-	elseif Game.BolsterAmount==100 then
-		hits=hitToKill[3]
-	elseif Game.BolsterAmount==70 then
-		hits=hitToKill[2]
-	elseif Game.BolsterAmount==40 then
-		hits=hitToKill[1]
+
+	local difficulty=GetDifficulty()
+	local hits=hitToKill[difficulty]
+	if vars.AusterityMode then
+		hits=hitToKillAusterity[difficulty]
 	end
+
 	local damage=vitality/hits
 	
 	if not mon then
@@ -1904,6 +1893,7 @@ end
 
 function getMonsterHealth(mon, level)
 	local hitToKillMonster={1,1.5,2,2.5,3,3.5,4,4.5,5}
+	local hitToKillMonsterAusterity={1,1.5,2,2.5,3,3.5,4,4.5,5}
 	if mon then
 		local id=mon.Id
 		if id%3==1 then
@@ -1914,26 +1904,15 @@ function getMonsterHealth(mon, level)
 		level=mon and totalLevel[id] or level
 	end
 	local health=getPlayerEstimatedPower(level)
-	local hits=hitToKillMonster[3] --baseline MAW
-	if vars.madnessMode then
-		hits=hitToKillMonster[9]
-	elseif vars.insanityMode then
-		hits=hitToKillMonster[8]
-	elseif vars.Mode==2 then
-		hits=hitToKillMonster[7]
-	elseif Game.BolsterAmount==300 then
-		hits=hitToKillMonster[6]
-	elseif Game.BolsterAmount==200 then
-		hits=hitToKillMonster[5]
-	elseif Game.BolsterAmount==150 then
-		hits=hitToKillMonster[4]
-	elseif Game.BolsterAmount==100 then
-		hits=hitToKillMonster[3]
-	elseif Game.BolsterAmount==70 then
-		hits=hitToKillMonster[2]
-	elseif Game.BolsterAmount==40 then
-		hits=hitToKillMonster[1]
+
+	local difficulty=GetDifficulty()
+
+	local hits=hitToKillMonster[difficulty] --baseline MAW
+
+	if vars.AusterityMode then
+		hits=hitToKillMonsterAusterity[difficulty]
 	end
+	
 	hits=hits*(1+level/1000)
 	
 	health=health*hits
@@ -2183,4 +2162,28 @@ function masteryThresholds()
 	else
 	  return {0, 4, 7, 10}
 	end
+end
+
+function GetDifficulty()
+	local difficulty=3 --baseline
+	if vars.madnessMode then
+		difficulty=9
+	elseif vars.insanityMode then
+		difficulty=8
+	elseif vars.Mode==2 then
+		difficulty=7
+	elseif Game.BolsterAmount==300 then
+		difficulty=6
+	elseif Game.BolsterAmount==200 then
+		difficulty=5
+	elseif Game.BolsterAmount==150 then
+		difficulty=4
+	elseif Game.BolsterAmount==100 then
+		difficulty=3
+	elseif Game.BolsterAmount==70 then
+		difficulty=2
+	elseif Game.BolsterAmount==40 then
+		difficulty=1
+	end
+	return difficulty
 end
