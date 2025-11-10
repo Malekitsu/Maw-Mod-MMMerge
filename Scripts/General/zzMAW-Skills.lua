@@ -299,17 +299,8 @@ function events.GetAttackDelay(t)
 		bonusSpeed=0
 	end
 	
-	if t.Ranged then
-		damageMultiplier[t.PlayerIndex]["Ranged"]=1*baseSpeed/100
-		damageMultiplier[t.PlayerIndex]["bonusSpeedRanged"]=bonusSpeed
-		damageMultiplier[t.PlayerIndex]["baseSpeedRanged"]=baseSpeed
-	else
-		damageMultiplier[t.PlayerIndex]["Melee"]=1*baseSpeed/100
-		damageMultiplier[t.PlayerIndex]["bonusSpeedMelee"]=bonusSpeed
-		damageMultiplier[t.PlayerIndex]["baseSpeedMelee"]=baseSpeed
-	end
 	bonusSpeedMult=(100+bonusSpeed)/100
-	t.Result=baseSpeed/bonusSpeedMult/swiftnessMultiplier
+	local totalSpeed=1/bonusSpeedMult/swiftnessMultiplier
 	
 	--slow depending on item
 	delay=0
@@ -330,7 +321,7 @@ function events.GetAttackDelay(t)
 		end
 	end
 	delayMult=1+delay/100
-	t.Result=t.Result*delayMult
+	totalSpeed=totalSpeed*delayMult
 	
 	if vars.MAWSETTINGS.buffRework=="ON" then
 		local hasteMult=1
@@ -341,7 +332,21 @@ function events.GetAttackDelay(t)
 			m=math.max(m,m2)
 			hasteMult=math.max(1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]*s/1000, hasteMult)
 		end
-		t.Result=t.Result/hasteMult
+		totalSpeed=totalSpeed/hasteMult
+	end
+	
+	local speedBefore=round(100*totalSpeed)
+	local totalSpeed=round(baseSpeed*totalSpeed)
+	t.Result=totalSpeed
+	
+	if t.Ranged then
+		damageMultiplier[t.PlayerIndex]["Ranged"]=totalSpeed/speedBefore
+		damageMultiplier[t.PlayerIndex]["bonusSpeedRanged"]=bonusSpeed
+		damageMultiplier[t.PlayerIndex]["baseSpeedRanged"]=baseSpeed
+	else
+		damageMultiplier[t.PlayerIndex]["Melee"]=totalSpeed/speedBefore
+		damageMultiplier[t.PlayerIndex]["bonusSpeedMelee"]=bonusSpeed
+		damageMultiplier[t.PlayerIndex]["baseSpeedMelee"]=baseSpeed
 	end
 	
 	if t.Ranged and disableBow then --makes melee attack delay instead of bow
