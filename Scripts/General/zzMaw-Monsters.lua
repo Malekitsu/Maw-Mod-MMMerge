@@ -553,9 +553,13 @@ end
 
 
 function recalculateMonsterTable()
+				local austerityMod=1
+				if vars.AusterityMode then
+					austerityMod=4
+				end
 	--calculate party experience
 	bolsterLevel=getPartyLevel()
-	bolsterLevel=math.max(bolsterLevel-4,0)
+	bolsterLevel=math.max((bolsterLevel-4)^(0.995+austerityMod/200),0)
 	
 	--add a bonus in case dungeon is resetted
 	vars.mapResetCount=vars.mapResetCount or {}
@@ -4558,3 +4562,4 @@ function events.KeyDown(t)
 		end
 	end
 end
+
