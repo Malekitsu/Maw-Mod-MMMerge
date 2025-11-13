@@ -285,6 +285,25 @@ function events.CalcDamageToPlayer(t)
 			end
 		end
 	end
+	--seraphim
+	if table.find(seraphClass, pl.Class) and pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0 then
+		if vars.divineProtectionCooldown[t.PlayerIndex]==nil then
+			vars.divineProtectionCooldown[t.PlayerIndex]=0
+		end		
+		if t.Result>=pl.HP and Game.Time>vars.divineProtectionCooldown[t.PlayerIndex] then
+				--calculate healing
+			heal=round(GetMaxHP(pl)*0.25)
+			for i=0,Party.High do
+				if Party[i]:GetIndex()==t.PlayerIndex then
+					evt[i].Add("HP",heal)
+				end
+			end
+			vars.divineProtectionCooldown[t.PlayerIndex] = Game.Time + const.Minute * 150
+			Game.ShowStatusText("Divine Protection saves you from lethal damage")
+			t.Result=math.min(t.Result, pl.HP-1)
+		end	
+	end
+	
 	if Game.BolsterAmount>=300 then
 		function events.Tick()
 			events.Remove("Tick",1)
