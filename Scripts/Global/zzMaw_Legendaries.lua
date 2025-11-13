@@ -243,7 +243,7 @@ function events.CalcDamageToPlayer(t)
 	
 	--shaman code
 	if table.find(shamanClass, pl.Class) and pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0  then
-		m3=SplitSkill(t.Player.Skills[const.Skills.Water])
+		m3=SplitSkill(pl.Skills[const.Skills.Water])
 		local lvl=getTotalLevel()
 		local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
 		local reduction=round(getMonsterDamage(false,(lvl+1))*(m3/lvl^0.65)/avgRed/2*0.99^(lvl^0.65)) --on average 1/2 of a B monster
@@ -268,18 +268,18 @@ function events.CalcDamageToPlayer(t)
 	
 	---------------------
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 15) then
-		if t.Player.Unconscious==0 and t.Player.Dead==0 and t.Player.Eradicated==0 then
-			if vars.legendaryProtectionCooldown[t.PlayerIndex]==nil then
-				vars.legendaryProtectionCooldown[t.PlayerIndex]=0
+		if pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0 then
+			if vars.legendaryProtectionCooldown[id]==nil then
+				vars.legendaryProtectionCooldown[id]=0
 			end		
-			if t.Result>=t.Player.HP and Game.Time>vars.legendaryProtectionCooldown[t.PlayerIndex] then
+			if t.Result>=pl.HP and Game.Time>vars.legendaryProtectionCooldown[id] then
 				--calculate healing
 				for i=0,Party.High do
-					if Party[i]:GetIndex()==t.PlayerIndex then
+					if Party[i]:GetIndex()==id then
 						Party[i].HP=Party[i]:GetFullHP()/4
 					end
 				end
-				vars.legendaryProtectionCooldown[t.PlayerIndex] = Game.Time + const.Minute * 150
+				vars.legendaryProtectionCooldown[id] = Game.Time + const.Minute * 150
 				Game.ShowStatusText("Legendary power saves you from lethal damage")
 				t.Result=0
 			end
@@ -287,18 +287,18 @@ function events.CalcDamageToPlayer(t)
 	end
 	--seraphim
 	if table.find(seraphClass, pl.Class) and pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0 then
-		if vars.divineProtectionCooldown[t.PlayerIndex]==nil then
-			vars.divineProtectionCooldown[t.PlayerIndex]=0
+		if vars.divineProtectionCooldown[id]==nil then
+			vars.divineProtectionCooldown[id]=0
 		end		
-		if t.Result>=pl.HP and Game.Time>vars.divineProtectionCooldown[t.PlayerIndex] then
+		if t.Result>=pl.HP and Game.Time>vars.divineProtectionCooldown[id] then
 				--calculate healing
 			heal=round(GetMaxHP(pl)*0.25)
 			for i=0,Party.High do
-				if Party[i]:GetIndex()==t.PlayerIndex then
+				if Party[i]:GetIndex()==id then
 					evt[i].Add("HP",heal)
 				end
 			end
-			vars.divineProtectionCooldown[t.PlayerIndex] = Game.Time + const.Minute * 150
+			vars.divineProtectionCooldown[id] = Game.Time + const.Minute * 150
 			Game.ShowStatusText("Divine Protection saves you from lethal damage")
 			t.Result=math.min(t.Result, pl.HP-1)
 		end	
@@ -307,22 +307,21 @@ function events.CalcDamageToPlayer(t)
 	if Game.BolsterAmount>=300 then
 		function events.Tick()
 			events.Remove("Tick",1)
-			local fullHP=t.Player:GetFullHP()
-			local id=t.Player:GetIndex()
+			local fullHP=pl:GetFullHP()
+			local id=pl:GetIndex()
 			if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 30) then
-				fullHP=math.max(fullHP,t.Player:GetFullSP())
+				fullHP=math.max(fullHP,pl:GetFullSP())
 			end
-			local currentHP=t.Player.HP
+			local currentHP=pl.HP
 			if currentHP<-fullHP then
-				t.Player.Dead=Game.Time
+				pl.Dead=Game.Time
 			end
 			if currentHP<-fullHP*2 then
-				t.Player.Eradicated=Game.Time
+				pl.Eradicated=Game.Time
 			end
 			if vars.insanityMode and enableDisintegrate and currentHP<-fullHP*10 and Party.Count>1 then
-				local index=t.Player:GetIndex()
 				for i=0,Party.High do
-					if Party[i]:GetIndex()==index then
+					if Party[i]:GetIndex()==id then
 						Game.PlaySound(4833+pl.Voice*100)
 						DismissCharacter(i)
 						Game.ShowStatusText("Disintegrated")
