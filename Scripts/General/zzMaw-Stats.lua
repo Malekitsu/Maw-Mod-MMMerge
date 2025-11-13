@@ -1694,7 +1694,7 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 		statsPerLevel=2
 	end
 	if vars.AusterityMode then
-		statsPerLevel=statsPerLevel/1.5
+		statsPerLevel=statsPerLevel+Game.BolsterAmount/100
 	end
 	
 	local levelCap=700
@@ -1770,7 +1770,7 @@ end
 
 function getMonsterDamage(mon, level)
 	local hitToKill={14,10,7,6.5,6,5.5,5,4.5,4}
-	local hitToKillAusterity={14,10,7,6.5,6,5.5,5,4.5,4}
+	local hitToKillAusterity={15,10,5,4,3,2.5,2,1.5,1}
 	
 	if mon then
 		local id=mon.Id
@@ -1834,7 +1834,7 @@ function getPlayerEstimatedPower(lvl)
 		statsPerLevel=2
 	end
 	if vars.AusterityMode then
-		statsPerLevel=statsPerLevel/1.5
+		statsPerLevel=statsPerLevel+Game.BolsterAmount/100
 	end
 		
 	local masterLearned=12
@@ -1893,7 +1893,7 @@ end
 
 function getMonsterHealth(mon, level)
 	local hitToKillMonster={1,1.5,2,2.5,3,3.5,4,4.5,5}
-	local hitToKillMonsterAusterity={1,1.5,2,2.5,3,3.5,4,4.5,5}
+	local hitToKillMonsterAusterity={1,2,4,5,6,7,8,9,9.5}
 	if mon then
 		local id=mon.Id
 		if id%3==1 then
@@ -2187,3 +2187,4 @@ function GetDifficulty()
 	end
 	return difficulty
 end
+
