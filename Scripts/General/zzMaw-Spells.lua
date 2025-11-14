@@ -2997,9 +2997,14 @@ function events.KeyDown(t)
 				table.insert(tabs,i-12)
 			end
 		end
+        local firstTab=next(tabs)
+        --if no spells known, do nothing
+        if firstTab==nil then return end
 		local currentTab=pl.SpellBookPage
-		local nextIndexTab=table.find(tabs, currentTab)+1
-		local book=tabs[nextIndexTab]
+        local currentIndexTab=table.find(tabs, currentTab)
+        --check if spell page is already selected on valid page, set as first available page if not
+        if currentIndexTab==nil then currentIndexTab=firstTab end
+		local book=tabs[currentIndexTab+1]
 		if not table.find(tabs,book) then
 			book=tabs[1]
 		end
