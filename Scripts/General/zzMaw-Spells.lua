@@ -1571,7 +1571,7 @@ function events.CalcSpellDamage(t)
 			if it then
 				local dmg1=calcEnchantDamage(data.Player, it, 0, true, true, "damage")
 				local dmg2=calcFireAuraDamage(data.Player, it, 0, false, true, "damage")
-				damage=(dmg1+dmg2)*1.02^ascensionSkill
+				damage=(dmg1+dmg2)*1.015^ascensionSkill
 				if table.find(aoespells, t.Spell) then
 					damage=damage/2.5
 					if vars.madnessMode then
@@ -1633,8 +1633,8 @@ function ascendSpellDamage(skill, mastery, spell, index)
 	diceMax=spellPowers[spell].diceMax*empowerMult
 	damageAdd=spellPowers[spell].dmgAdd*empowerMult
 	
-	diceMax=diceMax * (1+0.075 * skill)*1.03^skill
-	damageAdd=damageAdd*(1+0.05*skill^2)*1.03^skill
+	diceMax=diceMax * (1+0.075 * skill)*1.025^skill
+	damageAdd=damageAdd*(1+0.05*skill^2)*1.025^skill
 		
 	diceMin, diceMax, damageAdd = round(diceMin), round(diceMax), round(damageAdd)
 	return diceMin, diceMax, damageAdd
@@ -1643,8 +1643,8 @@ end
 function ascendSpellHealing(skill, mastery, spell, healM)
 	base=healingSpells[spell].Base[healM]
 	scaling=healingSpells[spell].Scaling[healM]
-	scaling=scaling * (1+0.05 * skill)*1.025^skill
-	base=base*(1 + 0.03 * skill^2)*1.025^skill
+	scaling=scaling * (1+0.05 * skill)*1.02^skill
+	base=base*(1 + 0.03 * skill^2)*1.02^skill
 	scaling, base = round(scaling), round(base)
 	return scaling, base
 end
