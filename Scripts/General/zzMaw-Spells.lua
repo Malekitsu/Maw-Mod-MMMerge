@@ -694,8 +694,6 @@ end
 ------------------------------
 function events.GameInitialized2()
 	Game.SpellsTxt[18].Name="Chain Lightning"
-	Game.Spells[18].Delay[3]=100
-	Game.Spells[18].Delay[4]=100
 	Game.SpellsTxt[18].Expert="Spell hits up to 2 times"
 	Game.SpellsTxt[18].Master="Spell hits up to 3 times"
 	Game.SpellsTxt[18].GM="Spell hits up to 4 times"
@@ -1451,7 +1449,7 @@ function events.GameInitialized2()
 			[15] = {dmgAdd = 0, diceMin = 1, diceMax = 4, },--sparks
 			[18] = {dmgAdd = 12, diceMin = 1, diceMax = 8, },--lightning bolt
 			[20] = {dmgAdd = 20, diceMin = 1, diceMax = 12, },--implosion
-			[22] = {dmgAdd = 5, diceMin = 1, diceMax = 1, },--starburst
+			[22] = {dmgAdd = 7, diceMin = 1, diceMax = 1, },--starburst
 			[24] = {dmgAdd = 5, diceMin = 1, diceMax = 3, },--poison spray
 			[26] = {dmgAdd = 6, diceMin = 1, diceMax = 7, },--ice bolt
 			[29] = {dmgAdd = 4, diceMin = 1, diceMax = 14, },--acid burst
@@ -1459,7 +1457,7 @@ function events.GameInitialized2()
 			[37] = {dmgAdd = 8, diceMin = 1, diceMax = 5, },--deadly swarm
 			[39] = {dmgAdd = 7, diceMin = 1, diceMax = 7, },--blades
 			[41] = {dmgAdd = 8, diceMin = 1, diceMax = 8, },--rock blast
-			[43] = {dmgAdd = 0, diceMin = 1, diceMax = 2, },--death blossom
+			[43] = {dmgAdd = 4, diceMin = 1, diceMax = 2, },--death blossom
 			[44] = {dmgAdd = 15, diceMin = 0.5, diceMax = 0.5, },--mass distorsion, nerfed
 			[52] = {dmgAdd = 20, diceMin = 2, diceMax = 16, },--spirit lash
 			[59] = {dmgAdd = 12, diceMin = 1, diceMax = 6, },--mind blast
