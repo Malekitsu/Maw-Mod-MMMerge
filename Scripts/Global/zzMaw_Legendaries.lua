@@ -1,21 +1,3 @@
---[[
-local legendaryEffects={
-	[11]="Killing a monster will recover you action time",
-	[12]="75% of base enchants increasing might, intellect or personality will increase the other 2 stats (highest one is picked)",
-	[13]="Immunity to all status effects from monsters",
-	[14]="Critical chance over 100% increases total damage",
-	[15]="Divine protection (instead of dying you go back to 25% HP, once every 5 minutes)",
-	[16]="Your highest resistance will always be used against non physical attacks",
-	[17]="Your hits will deal 1% of total monster HP health (0.4% for AoE, multi-hit spells and arrows)",
-	[18]="Reduce all damage taken by 10%",
-	[19]="Your weapon enchants now scales with the highest between might/int./pers.",
-	[20]="Base enchants on this items can be upgraded up to twice the cap value with crafting items",
-	[21]="Increase melee damage by 5% for each enemy in the nearbies"
-	[22]="Reduces damage by 3% for each enemy in the nearbies"
-}
-
-
-]]
 function getDistanceToMonster(monster)
 	return math.sqrt((Party.X - monster.X) * (Party.X - monster.X) + (Party.Y - monster.Y) * (Party.Y - monster.Y)) - monster.BodyRadius
 end
@@ -265,7 +247,6 @@ function events.CalcDamageToPlayer(t)
 	
 	t.Result = calcManaShield(pl, t.Result)
 	
-	
 	---------------------
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 15) then
 		if pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0 then
@@ -369,10 +350,9 @@ function calcManaShield(pl, damage)
 		local absorbDamage=damage*reduction[m]
 		local manaCost = round(absorbDamage/manaEfficiency)
 		absorbDamage = math.min(absorbDamage,(mana*manaEfficiency))
-		local damage = round(damage - absorbDamage)
+		damage = round(damage - absorbDamage)
 		pl.SP = math.max(pl.SP-manaCost, 0)
 	end
-	
 	return damage
 end
 
@@ -383,9 +363,9 @@ function manaShieldManaEfficiency(pl, skill)
 	if skill>1024 then
 		skill=SplitSkill(skill)
 	end
-	local manaEfficiency = (1 + skill^1.5 / 60)
+	local manaEfficiency = (1 + skill^1.4 / 60)
 	if skill > 50 then
-		manaEfficiency = (1 + 50^1.5 / 60) * skill / 50
+		manaEfficiency = (1 + 50^1.4 / 60) * skill / 50
 	end
 	return manaEfficiency
 end
