@@ -311,6 +311,7 @@ function events.CalcDamageToPlayer(t)
 			local id=pl:GetIndex()
 			if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 30) then
 				fullHP=math.max(fullHP,pl:GetFullSP())
+				fullHP=fullHP*manaShieldManaEfficiency(pl)
 			end
 			local currentHP=pl.HP
 			if currentHP<-fullHP then
@@ -363,18 +364,44 @@ function calcManaShield(pl, damage)
 		-- Define thresholds and damage multipliers based on skill level
 		local reduction = {0.25, 0.5, 0.75, 1, [0]=0}
 		-- Calculate mana efficiency based on skill and mastery levels
-		local manaEfficiency = (1 + s^1.5 / 60)
-		if s > 50 then
-			manaEfficiency = (1 + 50^1.5 / 60) * s / 50
-		end
-		absorbDamage=damage*reduction[m]
-		manaCost = round(absorbDamage/manaEfficiency)
+		local manaEfficiency = manaShieldManaEfficiency(false, s)
+		local absorbDamage=damage*reduction[m]
+		local manaCost = round(absorbDamage/manaEfficiency)
 		absorbDamage = math.min(absorbDamage,(mana*manaEfficiency))
-		damage = round(damage - absorbDamage)
+		local damage = round(damage - absorbDamage)
 		pl.SP = math.max(pl.SP-manaCost, 0)
 	end
 	
 	return damage
 end
 
+function manaShieldManaEfficiency(pl, skill)
+	if pl then
+		skill=SplitSkill(Skillz.get(pl, 51))
+	end
+	if skill>1024 then
+		skill=SplitSkill(skill)
+	end
+	local manaEfficiency = (1 + skill^1.5 / 60)
+	if skill > 50 then
+		manaEfficiency = (1 + 50^1.5 / 60) * skill / 50
+	end
+	return manaEfficiency
+end
 
+--[[
+local x=0
+local y=0
+local z=0
+function GetTraveledDistance()
+	local dist=getDistance(x,y,z)
+	dist=math.round(dist*100)/100
+	x=Party.X
+	y=Party.Y
+	z=Party.Z
+	Game.ShowStatusText(dist)
+end
+function events.AfterLoadMap()
+Timer(GetTraveledDistance, const.Minute/2)
+end
+]]
