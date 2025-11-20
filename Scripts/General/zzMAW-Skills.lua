@@ -78,7 +78,7 @@ skillDamage =
 	[const.Skills.Axe]		= {[0]=0, 2, 3, 4, 4,},
 	[const.Skills.Spear]	= {[0]=0, 1, 2, 3, 3,},
 	[const.Skills.Bow]		= {[0]=0, 2, 4, 6, 8,},
-	[const.Skills.Mace]		= {[0]=0, 1, 2, 3, 3,},
+	[const.Skills.Mace]		= {[0]=0, 2, 3, 3, 4,},
 	[const.Skills.Blaster]	= {[0]=0, 2, 4, 6, 8,},
 	[const.Skills.Unarmed]	= {[0]=0, 3, 4, 5, 6,},
 }
