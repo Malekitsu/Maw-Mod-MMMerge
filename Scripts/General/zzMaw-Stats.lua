@@ -273,7 +273,7 @@ function getSpellDelay(pl,spell)
 			hasteDiv=math.max(1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]*s/1000, hasteDiv)
 		end
 	end
-	local delay=round(oldTable[spell][m]/(1+haste/100)*1.02^ascensionSkill/hasteDiv/enchantMult)*armorDelay
+	local delay=round(oldTable[spell][m]/(1+haste/100)*1.015^ascensionSkill/hasteDiv/enchantMult)*armorDelay
 	if table.find(elementalistClass, pl.Class) then
 		delay=delay*1.5
 		local id=pl:GetIndex()
