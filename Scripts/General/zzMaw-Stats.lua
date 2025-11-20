@@ -360,7 +360,8 @@ function events.BuildStatInformationBox(t)
 		i=Game.CurrentPlayer
 		intellect=Party[i]:GetIntellect()
 		_,critDmg=getCritInfo(Party[i],"spell")
-		t.Text=string.format("%s\n\nBonus magic damage: %s%s\n\nCritical spell strike damage: %s%s",Game.StatsDescriptions[1],intellect/10,"%",critDmg*100-100,"%")
+		local baseText="Intellect represents a character's ability to reason and understand complex, abstract concepts.\nSpell Damage and Spell Critical Damage are based on Intellect."
+		t.Text=string.format("%s\n\nBonus magic damage: %s%s\n\nCritical spell strike damage: %s%s",baseText,intellect/10,"%",critDmg*100-100,"%")
 	end
 	if t.Stat==2 then
 		i=Game.CurrentPlayer
@@ -370,7 +371,8 @@ function events.BuildStatInformationBox(t)
 		local level = Party[i].LevelBase
 		local spellCostReduction = round((1-getPersonalityManaCostReduction(Party[i]))*1000)/10
 		local healingBonus = round(personality/math.min(1000+level*3, 4000)*1000)/10
-		t.Text=string.format("%s\n\nBonus healing: %s%s\n\nSpell cost reduction: %s%s\n\nIncrease the mana by 2 levels worth of mana per 5 personality",Game.StatsDescriptions[2],healingBonus,"%",spellCostReduction,"%")
+		local baseText="Personality represents both a character's strength of will and personal charm. Maximum spell points, Mana cost and Healing Power are based on Personality."
+		t.Text=string.format("%s\n\nBonus healing: %s%s\n\nSpell cost reduction: %s%s\n\nIncrease the mana by 2 levels worth of mana per 5 personality",baseText,healingBonus,"%",spellCostReduction,"%")
 	end
 	if t.Stat==3 then
 		i=Game.CurrentPlayer
@@ -2187,4 +2189,3 @@ function GetDifficulty()
 	end
 	return difficulty
 end
-
