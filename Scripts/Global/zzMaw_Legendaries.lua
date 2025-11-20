@@ -316,6 +316,7 @@ function events.CalcDamageToPlayer(t)
 			local currentHP=pl.HP
 			if currentHP<-fullHP then
 				pl.Dead=Game.Time
+				pl.SP=0
 			end
 			if currentHP<-fullHP*2 then
 				pl.Eradicated=Game.Time
