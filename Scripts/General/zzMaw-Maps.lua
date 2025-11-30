@@ -2172,6 +2172,7 @@ function events.LoadMap()
 end
 
 --remove dropped maps
+--[[ NO LONGER NEEDED
 function events.LeaveMap()
 	if vars.madnessMode then
 		for i=0, Map.Objects.High do
@@ -2194,7 +2195,7 @@ function events.LeaveMap()
 		end
 	end
 end
-
+]]
 function events.Action(t)
 	if t.Action==14 and vars.madnessMode then
 		BeginGrabObjects()
