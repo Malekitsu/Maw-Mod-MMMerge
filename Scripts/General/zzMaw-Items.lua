@@ -4764,6 +4764,20 @@ function events.GameInitialized2()
 	end
 end
 
+function GetItemSkill(it)
+	local itemId
+	if type(it)=="table" then
+		itemId=it.Number
+	else
+		itemId=it
+	end
+	if table.find(twoHandedAxes, itemId) or table.find(oneHandedAxes, itemId) then
+		return 3
+	else
+		return Game.ItemsTxt[itemId].Skill
+	end
+end
+
 
 ---------------------------
 --PITY SYSTEM CALCULATION--
