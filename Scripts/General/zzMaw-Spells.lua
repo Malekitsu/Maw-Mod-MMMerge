@@ -1473,8 +1473,10 @@ function events.GameInitialized2()
 			[97] = {dmgAdd = 0, diceMin = 1, diceMax = 28, },--dragon breath
 			[98] = {dmgAdd = 50, diceMin = 1, diceMax = 1, },--armageddon
 			[99] = {dmgAdd = 25, diceMin = 1, diceMax = 5, },--souldrinker
+			[201] = {dmgAdd = 25, diceMin = 1, diceMax = 5, },--souldrinker, needed for LEECH FIX
 			[103] = {dmgAdd = 46, diceMin = 1, diceMax = 28, },--darkfire bolt
 			[111] = {dmgAdd = 0, diceMin = 1, diceMax = 22, },--lifedrain scales with mastery, fixed in calcspelldamage
+			[200] = {dmgAdd = 0, diceMin = 1, diceMax = 22, },--lifedrain scales with mastery, fixed in calcspelldamage, needed for LEECH FIX
 			[123] = {dmgAdd = 0, diceMin = 1, diceMax = 25, },--special scaling, calculate in zzClasses
 		}
 end
@@ -1519,7 +1521,7 @@ function events.CalcSpellDamage(t)
 		end
 	end
 	--calculate
-	if t.Spell>1 and t.Spell<132 then
+	if t.Spell>1 and t.Spell<132 or t.Spell==200 or t.Spell==201 then
 		if diceMin~=diceMax then --roll dices
 			damage=0
 			for i=1,t.Skill do
@@ -1539,7 +1541,7 @@ function events.CalcSpellDamage(t)
 			t.Result=t.Result/6*10
 		end
 	end
-	if t.Spell == 111 then  -- lifedrain
+	if t.Spell == 200 then  -- lifedrain
 		if t.Mastery==3 then
 			t.Result=t.Result/3*5
 		elseif t.Mastery==4 then
@@ -3252,4 +3254,13 @@ function events.PlayerCastSpell(t)
 end
 
 
-
+function events.MonsterAttacked(t)
+	data=WhoHitMonster()
+	if data.Spell==111 then
+		data.Spell=200
+		data.Object.Spell=200
+	elseif data.Spell==99 then
+		data.Spell=201
+		data.Object.Spell=201
+	end
+end
