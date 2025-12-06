@@ -1237,20 +1237,21 @@ function poisonTimer()
 		mult=mult/2
 	end
 	for i = 0, Party.High do
-		if Party[i].Poison3>0 then
-			if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
-				vars.poisonTime[i]=20
-			end
-			if vars.poisonTime[i]>0 then
-				vars.poisonTime[i]=vars.poisonTime[i]-1
-			end
-			if vars.poisonTime[i]==0 then			
-				Party[i].Poison3=0
-				Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
-			else
-				Party[i].HP=Party[i].HP-math.ceil(Party[i]:GetFullHP()*0.01)*mult
-			end 
-		else if Party[i].Poison2>0 then
+		if Party[i].HP>=1 then
+			if Party[i].Poison3>0 then
+				if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
+					vars.poisonTime[i]=20
+				end
+				if vars.poisonTime[i]>0 then
+					vars.poisonTime[i]=vars.poisonTime[i]-1
+				end
+				if vars.poisonTime[i]==0 then			
+					Party[i].Poison3=0
+					Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
+				else
+					Party[i].HP=math.max(Party[i].HP-math.ceil(Party[i]:GetFullHP()*0.01)*mult,1)
+				end 
+			elseif Party[i].Poison2>0 then
 				if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
 					vars.poisonTime[i]=20
 				end
@@ -1261,24 +1262,23 @@ function poisonTimer()
 					Party[i].Poison2=0
 					Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
 				else
-					Party[i].HP=Party[i].HP-math.ceil(Party[i]:GetFullHP()*0.005)*mult
+					Party[i].HP=math.max(Party[i].HP-math.ceil(Party[i]:GetFullHP()*0.005)*mult,1)
 				end 
-			else if Party[i].Poison1>0 then
-					if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
-						vars.poisonTime[i]=20
-					end
-					if vars.poisonTime[i]>0 then
-						vars.poisonTime[i]=vars.poisonTime[i]-1
-					end
-					if vars.poisonTime[i]==0 then			
-						Party[i].Poison1=0
-						Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
-					else
-						Party[i].HP=Party[i].HP-math.ceil(Party[i]:GetFullHP()*0.0025)*mult
-					end 
-				else 
-					vars.poisonTime[i]=0
+			elseif Party[i].Poison1>0 then
+				if vars.poisonTime[i]==nil or vars.poisonTime[i]==0 then
+					vars.poisonTime[i]=20
 				end
+				if vars.poisonTime[i]>0 then
+					vars.poisonTime[i]=vars.poisonTime[i]-1
+				end
+				if vars.poisonTime[i]==0 then			
+					Party[i].Poison1=0
+					Game.ShowStatusText(string.format("%s's poison effect expired",Party[i].Name))
+				else
+					Party[i].HP=math.max(Party[i].HP-math.ceil(Party[i]:GetFullHP()*0.0025)*mult,1)
+				end 
+			else 
+				vars.poisonTime[i]=0
 			end
 		end
 	end
