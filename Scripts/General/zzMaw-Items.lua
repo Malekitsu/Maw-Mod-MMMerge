@@ -4790,8 +4790,8 @@ function events.LoadMap()
 		for i=0, Map.Chests.High do
 			local chest=Map.Chests[i]
 			for j=1, chest.Items.High do
-				if chest.Items[j]>=264 and chest.Items[j]<=289 then
-					chest.Items[j]=math.random(252, 263)
+				if chest.Items[j].Number>=264 and chest.Items[j].Number<=289 then
+					chest.Items[j].Number=math.random(252, 263)
 				end
 			end
 		end
