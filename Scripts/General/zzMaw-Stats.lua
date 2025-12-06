@@ -1072,6 +1072,11 @@ function events.CalcDamageToMonster(t)
 			t.DamageKind=const.Damage.Phys
 		end
 	end
+	--fix for vampire Lifedrain and Souldrinker
+	if data and data.Object and (data.Object.Spell==200 or data.Object.Spell==201) then
+		t.DamageKind=const.Damage.Dark
+	end
+	
 	index=table.find(damageKindMap,t.DamageKind)
 	local res=t.Monster.Resistances[index]
 	if data and data.Object and data.Object.Spell==133 then
