@@ -3532,22 +3532,22 @@ function leecher()
             for pi = 0, Party.High do
               local pl = Party[pi]
               if pl then
-                if (pl.HP or 0) > -20 then
+                if (pl.HP or 0) >= 1 then
                   local drainHP = (pl.GetFullHP and pl:GetFullHP() or (pl.HP or 0)) * leechmult * 0.05 * timeMultiplier
                   amountHP[pi] = (amountHP[pi] or 0) + (drainHP or 0)
                   local take = math.floor(amountHP[pi] or 0)
                   if take ~= 0 then
-                    pl.HP = (pl.HP or 0) - take
+                    pl.HP = math.max((pl.HP or 0) - take,1)
                     amountHP[pi] = (amountHP[pi] or 0) % 1
                   end
                 end
-                if (pl.SP or 0) > -20 then
+                if (pl.SP or 0) >= 0 then
                   local drainSPbase = (pl.SP or 0)  -- si tu préfères le full SP: pl:GetFullSP()
                   local drainSP = drainSPbase * leechmult * 0.05 * timeMultiplier
                   amountSP[pi] = (amountSP[pi] or 0) + (drainSP or 0)
                   local takeSP = math.floor(amountSP[pi] or 0)
                   if takeSP ~= 0 then
-                    pl.SP = (pl.SP or 0) - takeSP
+                    pl.SP = math.max((pl.SP or 0) - takeSP,0)
                     amountSP[pi] = (amountSP[pi] or 0) % 1
                   end
                 end
