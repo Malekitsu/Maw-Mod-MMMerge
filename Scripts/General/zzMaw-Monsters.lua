@@ -3569,20 +3569,19 @@ end
 -- Swift (mob affixe/skill)
 -- =========================
 function events.Tick()
-  -- Swift via boss data
+  -- Swift via boss data (iterate only bossData keys, not all monsters)
   if mapvars and mapvars.bossData then
     swiftLocation = swiftLocation or {}
-    for mid = 0, Map.Monsters.High do
-      if inRangeMonIdx(mid) then
-        local mon = Map.Monsters[mid]
-        if mon and mapvars.bossData[mid] then
-          local skill = mapvars.bossData[mid].Skills
-          if skill == "Swift" or skill == "Omnipotent" then
-            local key = mid  -- clé stable par MonsterID
-            local loc = swiftLocation[key]
+    for mid, data in pairs(mapvars.bossData) do
+      local skill = data.Skills
+      if skill == "Swift" or skill == "Omnipotent" then
+        if inRangeMonIdx(mid) then
+          local mon = Map.Monsters[mid]
+          if mon then
+            local loc = swiftLocation[mid]
             if not loc then
               loc = { mon.X or 0, mon.Y or 0 }
-              swiftLocation[key] = loc
+              swiftLocation[mid] = loc
             end
             if math.abs((mon.X or 0) - loc[1]) < 100 and math.abs((mon.Y or 0) - loc[2]) < 100 then
               mon.X = (mon.X or 0) + ((mon.X or 0) - loc[1])
