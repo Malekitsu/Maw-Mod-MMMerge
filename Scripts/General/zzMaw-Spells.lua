@@ -1301,6 +1301,9 @@ end
 function events.GameInitialized2()
 	for key, value in pairs(CCMAP) do
 		local duration=value.Duration/const.Minute*2
+					if Party.High==0 then
+					duration=duration*3
+				end
 		local bonus=value.ChanceMult*100
 		Game.SpellsTxt[key].Description=Game.SpellsTxt[key].Description .. "\n\nDuration: " .. duration .. " seconds" .. "\nBonus Hit chance per skill level: " .. bonus .. "%"
 	end
@@ -1353,7 +1356,7 @@ function events.PlayerCastSpell(t)
 				mon.Resistances[cc.DamageKind]=resistance[i]
 				local duration=cc.Duration
 				if Party.High==0 then
-					duration=duration*2
+					duration=duration*3
 				end
 				if type(cc.Debuff)=="table" then
 					for v =1,4 do 
@@ -3264,3 +3267,4 @@ function events.MonsterAttacked(t)
 		data.Object.Spell=201
 	end
 end
+
