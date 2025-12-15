@@ -36,7 +36,7 @@ Unarmed	=	=	=	=	=	M	=	=	=	=	=
 IdentifyMonster	+	=	=	=	=	=	=	=	=	=	=
 Armsmaster	=	=	=	=	=	=	=	=	=	=	=
 Stealing	=	=	=	=	=	=	=	=	=	=	=
-Alchemy	=	=	=	=	=	=	=	=	=	=	=
+Alchemy	+	=	=	=	=	=	=	=	=	=	=
 Learning	=	=	=	=	=	=	=	=	=	=	=
 Skill39	=	=	=	=	=	=	=	=	=	=	=
 Skill40	=	=	=	=	=	=	=	=	=	=	=
