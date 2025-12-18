@@ -1661,43 +1661,46 @@ end
 
 
 --HORIZONTAL SKILL PROGRESSION
-local learningRequirements={0,6,12,20}
 local learningRequirementsNormal={0,4,7,10}
+local learningRequirements={0,6,12,20}
 local horizontalSkills={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,27,28,30,32,33,35,38}
 --online
 local insanityLearningRequirements={0,8,20,32}
 local madnessLearningRequirements={0,12,30,50}
+local normalCosts={0,1000,4000,20000}
 local insanityCost={0,10000,50000,250000}
 local madnessCost={0,25000,500000,2000000}
 
 local function getReqAndCost(mastery, player)
-	local pl=Party[player or Game.CurrentPlayer]
+	local pl = Party[player or Game.CurrentPlayer]
+	
+	local baseCost, requirements
 	if vars.madnessMode then
-		local baseCost=madnessCost[mastery]
-		local cost=baseCost
-		for _, skillId in pairs(horizontalSkills) do
-			local s,m=SplitSkill(pl.Skills[skillId])
-			if (m>=mastery and s~=0) or (vars.oldPlayerMasteries and vars.oldPlayerMasteries[pl:GetIndex()] and vars.oldPlayerMasteries[pl:GetIndex()][skillId]-1>m) then
-				--debug.Message(m .. "  " .. vars.oldPlayerMasteries[pl:GetIndex()][skillId] .. "  " .. skillId)
-				cost=cost+baseCost
-			end
-		end
-		return madnessLearningRequirements[mastery],cost
+		baseCost = madnessCost[mastery]
+		requirements = madnessLearningRequirements[mastery]
 	elseif vars.insanityMode then
-		local baseCost=insanityCost[mastery]
-		local cost=baseCost
-		for _, skillId in pairs(horizontalSkills) do
-			local s,m=SplitSkill(pl.Skills[skillId])
-			if m>=mastery and s~=0 or (vars.oldPlayerMasteries and vars.oldPlayerMasteries[pl:GetIndex()] and vars.oldPlayerMasteries[pl:GetIndex()][skillId]-1>m) then
-				cost=cost+baseCost
-			end
-		end
-		return insanityLearningRequirements[mastery],cost
+		baseCost = insanityCost[mastery]
+		requirements = insanityLearningRequirements[mastery]
 	elseif not Game.freeProgression then
-		return learningRequirements[mastery],nil
+		baseCost = normalCosts[mastery]
+		requirements = learningRequirements[mastery]
 	else
-		return nil,nil
+		baseCost = normalCosts[mastery]
+		requirements = learningRequirementsNormal[mastery]
 	end
+	
+	local cost = baseCost
+	local playerIndex = pl:GetIndex()
+	local oldMasteries = vars.oldPlayerMasteries and vars.oldPlayerMasteries[playerIndex]
+	
+	for _, skillId in pairs(horizontalSkills) do
+		local s, m = SplitSkill(pl.Skills[skillId])
+		if (m >= mastery and s ~= 0) or (oldMasteries and oldMasteries[skillId] - 1 > m) then
+			cost = cost + baseCost
+		end
+	end
+	
+	return requirements, cost
 end
 
 function events.AfterPopulateNPCDialog(t)
