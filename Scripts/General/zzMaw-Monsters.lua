@@ -901,6 +901,11 @@ function events.GameInitialized2()
 end
 --BackupMapStats = deepcopy(Game.MapStats)
 function events.BeforeLoadMap()
+	if vars.RandomizerMode and not mapMonsterDensity then return end
+	AdjustMonsterDensity()
+end
+
+function AdjustMonsterDensity()
 	--add difficulty related damage
 	if Game.BolsterAmount%50~=0 then
 		Game.BolsterAmount=100
