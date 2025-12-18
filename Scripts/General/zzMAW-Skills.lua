@@ -1525,7 +1525,7 @@ function events.LoadMap()
 		end
 	end
 	for i=1,#trainingCenters[currentWorld] do
-		Game.HouseRules.Training[trainingCenters[currentWorld][i]].Quality=math.min(baseTrainers[trainingCenters[currentWorld][i]]+bolster+5,2750)
+		Game.HouseRules.Training[trainingCenters[currentWorld][i]].Quality=round(baseTrainers[trainingCenters[currentWorld][i]]^1.5/20)*10
 		if vars.madnessMode then
 			Game.HouseRules.Training[trainingCenters[currentWorld][i]].Quality=round(baseTrainers[trainingCenters[currentWorld][i]]^1.5/10)*10
 		end
@@ -1668,6 +1668,7 @@ local horizontalSkills={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,
 local insanityLearningRequirements={0,8,20,32}
 local madnessLearningRequirements={0,12,30,50}
 local normalCosts={0,1000,4000,20000}
+local doomCosts={0,2000,10000,50000}
 local insanityCost={0,10000,50000,250000}
 local madnessCost={0,25000,500000,2000000}
 
@@ -1681,6 +1682,9 @@ local function getReqAndCost(mastery, player)
 	elseif vars.insanityMode then
 		baseCost = insanityCost[mastery]
 		requirements = insanityLearningRequirements[mastery]
+	elseif not vars.Mode==2 then
+		baseCost = doomCosts[mastery]
+		requirements = learningRequirements[mastery]
 	elseif not Game.freeProgression then
 		baseCost = normalCosts[mastery]
 		requirements = learningRequirements[mastery]
