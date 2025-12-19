@@ -105,7 +105,6 @@ local originalMapInfo={}
 local needsRestore=false
 local disallowedMaps={53,61,132,200,206,207,}
 function events.BeforeLoadMap()
-	vars.RandomizerMode=true --externalize this
 	if vars.RandomizerMode then
 		if not vars.MonsterShuffleList then
 			SetMonsterDensity()
