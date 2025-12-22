@@ -2601,6 +2601,7 @@ function events.BuildItemInformationBox(t)
 			local hp=pl.HP
 			local sp=pl.SP
 			local maxHP=vars.currentHPPool[i]
+			local maxSP=vars.currentManaPool[i]
 			local playerIndex=pl:GetIndex()
 			local oldDPS1, oldDPS2, oldDPS3, oldVitality=calcPowerVitality(pl)
 			--substitute item
@@ -2688,6 +2689,7 @@ function events.BuildItemInformationBox(t)
 				buffManaLock()
 			end
 			vars.currentHPPool[i]=maxHP
+			vars.currentManaPool[i]=maxSP
 		end
 	end
 end
