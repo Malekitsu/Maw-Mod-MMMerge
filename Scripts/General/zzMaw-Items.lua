@@ -1295,7 +1295,7 @@ legendaryEffects={
 	
 	[16]="Increase the effect of resistances base enchants by 50%",
 	
-	[17]="Your hits will deal 2% of current monster HP health (1% for AoE, multi-hit spells and arrows)",
+	[17]="Your hits deal 2% of current monster HP as physical damage (1% for AoE, multi-hit spells and arrows).\nDamage is increased by weapon base attack speed or Ascensions for spells.",
 	[18]="Reduce all damage taken by 10%",
 	[19]="Your weapon enchants scale with the highest between might/int./pers.",
 	[20]="Base enchants on this items are 50% stronger",
