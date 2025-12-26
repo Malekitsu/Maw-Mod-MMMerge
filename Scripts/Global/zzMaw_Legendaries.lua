@@ -81,8 +81,12 @@ function events.CalcDamageToMonster(t)
 			elseif data and data.Object and data.Object.Spell==133 then
 				dmg=dmg*damageMultiplier[id]["Ranged"]
 			elseif data and data.Object and data.Object.Spell>0 then
-				local s,m = SplitSkill(pl:GetSkill(const.Skills.Learning))
-				dmg=dmg*1.015^s
+				if  table.find(dkClass, pl.Class) or table.find(dkClass, pl.Class) or table.find(assassinClass, pl.Class)
+					dmg=dmg*damageMultiplier[id]["Melee"]
+				else
+					local s,m = SplitSkill(pl:GetSkill(const.Skills.Learning))
+					dmg=dmg*1.015^s
+				end
 			end
 			debug.Message(dmg)
 			t.Result=t.Result+dmg
