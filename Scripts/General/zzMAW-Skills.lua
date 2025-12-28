@@ -290,7 +290,7 @@ function events.GetAttackDelay(t)
 		speedEffect=math.floor(speed/10)
 	end
 	bonusSpeed=bonusSpeed+speedEffect
-	if t.Player.SpellBuffs[const.PlayerBuff.Haste].ExpireTime>Game.Time or (not vars.MAWSETTINGS.buffRework=="ON" and Party.SpellBuffs[const.PartyBuff.Haste].ExpireTime>Game.Time) then
+	if not vars.MAWSETTINGS.buffRework=="ON" and (t.Player.SpellBuffs[const.PlayerBuff.Haste].ExpireTime>Game.Time or Party.SpellBuffs[const.PartyBuff.Haste].ExpireTime>Game.Time) then
 		bonusSpeed=bonusSpeed+20
 	end
 	
@@ -325,11 +325,17 @@ function events.GetAttackDelay(t)
 	
 	if vars.MAWSETTINGS.buffRework=="ON" then
 		local hasteMult=1
-		if Party.SpellBuffs[8].ExpireTime>=Game.Time then
+		if Party.SpellBuffs[8].ExpireTime>=Game.Time or pl.SpellBuffs[const.PlayerBuff.Haste].ExpireTime>Game.Time then
 			local s, m=getBuffSkill(5)
 			local s2,m2=getBuffSkill(86)
-			s=math.max(s,s2/1.5)
-			m=math.max(m,m2)
+			local s3=0
+			local m3=0
+			if t.Player.SpellBuffs[const.PlayerBuff.Haste].ExpireTime>Game.Time then
+				s3=25
+				m3=3
+			end
+			s=math.max(s,s2/1.5,s3)
+			m=math.max(m,m2,m3)
 			hasteMult=math.max(1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]*s/1000, hasteMult)
 		end
 		totalSpeed=totalSpeed/hasteMult
