@@ -139,7 +139,7 @@ function events.CalcDamageToMonster(t)
 		--restoreHPLeg=true
 		function events.Tick()
 			events.Remove("Tick", 1)
-			if restoreHPLeg then
+			--if restoreHPLeg then
 				--restoreHPLeg=false
 				if mon.HP<=0 then
 					local fullHP=pl:GetFullHP()
@@ -147,7 +147,7 @@ function events.CalcDamageToMonster(t)
 					pl.HP=math.min(fullHP, pl.HP+fullHP*0.1)
 					pl.SP=math.min(fullSP, pl.SP+fullSP*0.1)
 				end
-			end
+			--end
 		end
 	end
 	--end of 24
