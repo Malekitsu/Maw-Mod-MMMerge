@@ -805,8 +805,8 @@ local function upgradeGem(it, tier)
 		mult=mult*2
 	end
 	]]
-	maxValue1=math.floor(maxValue1*mult)
-	maxValue2=math.floor(maxValue2*mult)
+	maxValue1=math.round(maxValue1*mult)
+	maxValue2=math.round(maxValue2*mult)
 	--pick the lowest one
 	local bonus1percent=it.BonusStrength/maxValue1
 	local bonus2percent=bonus2Strength/maxValue2
