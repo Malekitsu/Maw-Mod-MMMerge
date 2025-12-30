@@ -519,7 +519,7 @@ function events.GameInitialized2()
 				speedDelay=0.015
 			end
 			local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (math.min(lvl,cap) * 2 +30) 
-			t.Result=round((bonus*(1+might/1000)+(mightEffect*might/1000))*0.75*(1+0.03*speedDelay))
+			t.Result=round((bonus*(1+might/1000)+(mightEffect*might/1000))*0.75*(1+s*speedDelay))
 			
 		elseif t.Stat==28 then --max damage
 			local pl=t.Player
@@ -547,7 +547,7 @@ function events.GameInitialized2()
 			if Party.High==0 then
 				speedDelay=0.015
 			end
-			t.Result=round((bonus*(1+might/1000)+(mightEffect*might/1000))*1.25*(1+0.03*speedDelay))
+			t.Result=round((bonus*(1+might/1000)+(mightEffect*might/1000))*1.25*(1+s*speedDelay))
 			
 		elseif t.Stat==25 then --attack
 			local pl=t.Player
@@ -582,7 +582,7 @@ function events.GameInitialized2()
 				speedDelay=0.015
 			end
 			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(lvl,cap)) + mightEffect
-			local damage=round(baseDamage*(1+might/1000)*0.75*(1+0.03*speedDelay))
+			local damage=round(baseDamage*(1+might/1000)*0.75*(1+s*speedDelay))
 			
 			t.Result=damage
 			
@@ -612,7 +612,7 @@ function events.GameInitialized2()
 				speedDelay=0.015
 			end
 			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(lvl,cap)) + mightEffect
-			local damage=round(baseDamage*(1+might/1000)*1.25*(1+0.03*speedDelay))
+			local damage=round(baseDamage*(1+might/1000)*1.25*(1+s*speedDelay))
 			
 			t.Result=damage
 		
