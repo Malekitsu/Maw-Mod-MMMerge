@@ -87,6 +87,14 @@ local function getBossLootSeed(mon)
 	return bossLootSeed
 end
 
+function IsEnchantableItem(it)
+	local num = it.Number
+	if num == 866 or num == 867 or num == 1666 or num == 1667 then
+		return false
+	end
+	return num <= 151 or (num >= 803 and num <= 936) or (num >= 1603 and num <= 1736)
+end
+
 function events.PickCorpse(t)
 	--if Game.BolsterAmount~=300 then return end
 	local monster = Map.Monsters[t.MonsterIndex]
@@ -471,7 +479,7 @@ function events.ItemGenerated(t)
 	if Game.CurrentScreen==16 or Game.CurrentScreen==21 then return end
 	--boss items forced
 	if bossLoot then
-		if not (t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736)) then
+		if not IsEnchantableItem(t.Item) then
 			t.Item:Randomize(t.Strength, 0)
 			return
 		end
@@ -525,7 +533,7 @@ function events.ItemGenerated(t)
 			return
 		end
 	end
-	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) or reagentList[t.Item.Number] then
+	if IsEnchantableItem(t.Item) or reagentList[t.Item.Number] then
 		t.Handled=true
 		local it=t.Item
 		--reset enchants
@@ -1361,7 +1369,7 @@ function updateCelestialItem(it,pl)
 end
 
 function events.BuildItemInformationBox(t)
-	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then 
+	if IsEnchantableItem(t.Item) then 
 
 		local it=t.Item
 		if t.Type then
@@ -1982,7 +1990,7 @@ end
 
 --calculate price
 function events.CalcItemValue(t)
-	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then
+	if IsEnchantableItem(t.Item) then
 		--base value
 		basePrice=Game.ItemsTxt[t.Item.Number].Value
 		if reagentList[t.Item.Number] then
@@ -2002,7 +2010,7 @@ function events.CalcItemValue(t)
 end
 
 function getItemValue(it, lootFilter)
-	if it.Number<=151 or (it.Number>=803 and it.Number<=936) or (it.Number>=1603 and it.Number<=1736) then
+	if IsEnchantableItem(it) then
 		--base value
 		basePrice=Game.ItemsTxt[it.Number].Value
 		--add enchant price
@@ -2695,7 +2703,7 @@ function events.BuildItemInformationBox(t)
 end
 --item level
 function events.BuildItemInformationBox(t)
-	if t.Item.Number<=151 or (t.Item.Number>=803 and t.Item.Number<=936) or (t.Item.Number>=1603 and t.Item.Number<=1736) then 
+	if IsEnchantableItem(t.Item) then 
 		if t.Description then
 			
 			local levelRequired=GetLevelRquirement(t.Item)
@@ -4373,7 +4381,7 @@ function events.CanWearItem(t)
 	if vars.Mode==2 and not it.Identified then
 		t.Available=false
 	end
-	if it.Number<=151 or (it.Number>=803 and it.Number<=936) or (it.Number>=1603 and it.Number<=1736) then 
+	if IsEnchantableItem(it) then 
 		--check if equippable
 		local plLvl=Party[t.PlayerId].LevelBase
 		if plLvl<GetLevelRquirement(it) then
