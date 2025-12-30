@@ -514,8 +514,12 @@ function events.GameInitialized2()
 			if vars.madnessMode then
 				cap=900
 			end
+			local speedDelay=0.03
+			if Party.High==0 then
+				speedDelay=0.015
+			end
 			local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (math.min(lvl,cap) * 2 +30) 
-			t.Result=round((bonus*(1+might/1000)+(mightEffect*might/1000))*0.75*(1+0.03*s))
+			t.Result=round((bonus*(1+might/1000)+(mightEffect*might/1000))*0.75*(1+0.03*speedDelay))
 			
 		elseif t.Stat==28 then --max damage
 			local pl=t.Player
@@ -539,7 +543,11 @@ function events.GameInitialized2()
 			end
 			local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (math.min(lvl,cap) * 2 +30)
 			
-			t.Result=round((bonus*(1+might/1000)+(mightEffect*might/1000))*1.25*(1+0.03*s))
+			local speedDelay=0.03
+			if Party.High==0 then
+				speedDelay=0.015
+			end
+			t.Result=round((bonus*(1+might/1000)+(mightEffect*might/1000))*1.25*(1+0.03*speedDelay))
 			
 		elseif t.Stat==25 then --attack
 			local pl=t.Player
@@ -569,8 +577,12 @@ function events.GameInitialized2()
 			if vars.madnessMode then
 				cap=900
 			end
+			local speedDelay=0.03
+			if Party.High==0 then
+				speedDelay=0.015
+			end
 			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(lvl,cap)) + mightEffect
-			local damage=round(baseDamage*(1+might/1000)*0.75*(1+0.03*s))
+			local damage=round(baseDamage*(1+might/1000)*0.75*(1+0.03*speedDelay))
 			
 			t.Result=damage
 			
@@ -595,8 +607,12 @@ function events.GameInitialized2()
 			if vars.madnessMode then
 				cap=900
 			end
+			local speedDelay=0.03
+			if Party.High==0 then
+				speedDelay=0.015
+			end
 			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(lvl,cap)) + mightEffect
-			local damage=round(baseDamage*(1+might/1000)*1.25*(1+0.03*s))
+			local damage=round(baseDamage*(1+might/1000)*1.25*(1+0.03*speedDelay))
 			
 			t.Result=damage
 		
@@ -645,11 +661,19 @@ function events.GameInitialized2()
 		if Game.CharacterPortraits[t.Player.Face].Race==const.Race.Dragon then
 			if useBreathCooldown or t.Ranged then
 				local s, m = SplitSkill(t.Player:GetSkill(const.Skills.DragonAbility))
-				t.Result=t.Result * (1+0.03*s)
+				if Party.High==0 then
+					t.Result=t.Result * (1+0.015*s)
+				else
+					t.Result=t.Result * (1+0.03*s)
+				end
 				useBreathCooldown=false
 			else
 				local s, m = SplitSkill(t.Player:GetSkill(const.Skills.Unarmed))
-				t.Result=t.Result * (1+0.03*s)
+				if Party.High==0 then
+					t.Result=t.Result * (1+0.015*s)
+				else
+					t.Result=t.Result * (1+0.03*s)
+				end
 			end
 		end	
 	end
