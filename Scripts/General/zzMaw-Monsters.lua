@@ -712,7 +712,7 @@ function recalculateMonsterTable()
 		if mapvars.mawBounty then
 			totalLevel[i]=base.Level+mapvars.mawBounty
 		end
-		
+		totalLevel[i]=round(math.max(totalLevel[i],1))
 		--HP - use getMonsterHealth function and store in HPtable
 		HPtable=HPtable or {}
 		--Create a mock monster object to pass the correct ID and level
