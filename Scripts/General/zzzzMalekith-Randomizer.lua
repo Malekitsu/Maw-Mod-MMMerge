@@ -104,6 +104,15 @@ end
 local originalMapInfo={}
 local needsRestore=false
 local disallowedMaps={53,61,132,200,206,207,}
+function events.LoadMap()
+	if vars.RandomizerFixed then return end
+	for i=1,#vars.MonsterShuffleList do
+		if vars.MonsterShuffleList[i].Pic="DemonQueen" then
+			vars.MonsterShuffleList[i].Pic="DemonFly"
+		end
+	end
+	vars.RandomizerFixed=true
+end
 function events.BeforeLoadMap()
 	if vars.RandomizerMode then
 		if not vars.MonsterShuffleList then
@@ -118,7 +127,7 @@ function events.BeforeLoadMap()
 					if m.Monster2Pic ~= "0" then
 						monsterPool[#monsterPool + 1] = {Pic = m.Monster2Pic, Dif = m.Mon2Dif, Hi = m.Mon2Hi, Low = m.Mon2Low}
 					end
-					if m.Monster3Pic ~= "0" then
+					if m.Monster3Pic ~= "0" and  m.Monster3Pic ~= "DemonQueen" then
 						monsterPool[#monsterPool + 1] = {Pic = m.Monster3Pic, Dif = m.Mon3Dif, Hi = m.Mon3Hi, Low = m.Mon3Low}
 					end
 				end
