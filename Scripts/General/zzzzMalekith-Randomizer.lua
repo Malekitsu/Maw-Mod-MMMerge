@@ -106,6 +106,7 @@ local needsRestore=false
 local disallowedMaps={53,61,132,200,206,207,}
 function events.LoadMap()
 	if vars.RandomizerFixed then return end
+	if not vars.MonsterShuffleList then return end
 	for i=1,#vars.MonsterShuffleList do
 		if vars.MonsterShuffleList[i].Pic=="DemonQueen" then
 			vars.MonsterShuffleList[i].Pic="DemonFly"
