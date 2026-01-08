@@ -1107,10 +1107,6 @@ function processAutoTargetHeal(spellId, pl, skillType, soundId, removeConditionF
 	local sp=healingSpells[spellId]
 	local s,m=SplitSkill(pl:GetSkill(skillType))
 	local cost=Game.Spells[spellId]["SpellPoints" .. masteryName[m]]
-	if pl.SP<cost then 
-		DoGameAction(23,0,0)
-		return
-	end
 	
 	local baseHeal=sp.Base[m]+sp.Scaling[m]*s
 	local mult, gotCrit=getHealSpellMultiPlier(pl)
@@ -1174,8 +1170,24 @@ function processAutoTargetHeal(spellId, pl, skillType, soundId, removeConditionF
 	Party.SpellBuffs[11].ExpireTime=0 --invisibility
 end
 
+local notEnoughManaShown = false
+
+local function checkManaForSpell(pl, spellId, skillType)
+	local s,m=SplitSkill(pl:GetSkill(skillType))
+	local cost=Game.Spells[spellId]["SpellPoints" .. masteryName[m]]
+	if pl.SP<cost then
+		if not notEnoughManaShown then
+			notEnoughManaShown = true
+			DoGameAction(23,0,0)
+		end
+		return false
+	end
+	return true
+end
+
 function events.Action(t)
 	if t.Action==25 and autoTargetHeals then
+		notEnoughManaShown = false
 		ascension()
 		if Game.CurrentPlayer<0 or Game.CurrentPlayer>Party.High then return end
 		local pl=Party[Game.CurrentPlayer]
@@ -1197,6 +1209,7 @@ function events.Action(t)
 		end
 		
 		if spellCast==55 and pl.RecoveryDelay==0 then
+			if not checkManaForSpell(pl, 74, const.Skills.Body) then return end
 			t.Handled=true
 			Party[idx].HP=math.max(Party[idx].HP,1)
 			processAutoTargetHeal(74, pl, const.Skills.Body, 16070, function(idx)
@@ -1204,9 +1217,11 @@ function events.Action(t)
 				Party[idx].Eradicated=0
 			end)
 		elseif spellCast==68 and pl.RecoveryDelay==0 then
+			if not checkManaForSpell(pl, 68, const.Skills.Body) then return end
 			t.Handled=true
 			processAutoTargetHeal(68, pl, const.Skills.Body, 16010)
 		elseif spellCast==74 and pl.RecoveryDelay==0 then
+			if not checkManaForSpell(pl, 74, const.Skills.Body) then return end
 			t.Handled=true
 			processAutoTargetHeal(74, pl, const.Skills.Body, 16070, function(idx)
 				Party[idx].Disease1=0
@@ -1214,6 +1229,7 @@ function events.Action(t)
 				Party[idx].Disease3=0
 			end)
 		elseif spellCast==49 and pl.RecoveryDelay==0 then
+			if not checkManaForSpell(pl, 49, const.Skills.Spirit) then return end
 			t.Handled=true
 			processAutoTargetHeal(49, pl, const.Skills.Spirit, 16010, function(idx)
 				Party[idx].Cursed=0
@@ -1301,9 +1317,6 @@ end
 function events.GameInitialized2()
 	for key, value in pairs(CCMAP) do
 		local duration=value.Duration/const.Minute*2
-					if Party.High==0 then
-					duration=duration*3
-				end
 		local bonus=value.ChanceMult*100
 		Game.SpellsTxt[key].Description=Game.SpellsTxt[key].Description .. "\n\nDuration: " .. duration .. " seconds" .. "\nBonus Hit chance per skill level: " .. bonus .. "%"
 	end
@@ -3267,4 +3280,3 @@ function events.MonsterAttacked(t)
 		data.Object.Spell=201
 	end
 end
-
