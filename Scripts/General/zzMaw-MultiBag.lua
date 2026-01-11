@@ -297,6 +297,39 @@ function changeBag(pl, bag)
 			end
 		end	
 	end
+	--store mouse item
+	local mouseItem = {}
+	local it = Mouse.Item
+	mouseItem = {} 
+	mouseItem["Bonus"]=it.Bonus
+	mouseItem["Bonus2"]=it.Bonus2
+	mouseItem["BonusExpireTime"]=it.BonusExpireTime
+	mouseItem["BonusStrength"]=it.BonusStrength
+	mouseItem["Broken"]=it.Broken
+	mouseItem["Charges"]=it.Charges
+	mouseItem["Condition"]=it.Condition 
+	mouseItem["Hardened"]=it.Hardened
+	mouseItem["Identified"]=it.Identified
+	mouseItem["MaxCharges"]=it.MaxCharges
+	mouseItem["Number"]=it.Number
+	mouseItem["Refundable"]=it.Refundable
+	mouseItem["Stolen"]=it.Stolen
+	mouseItem["TemporaryBonus"]=it.TemporaryBonus
+	DoGameAction(110,Game.CurrentPlayer+1,0)
+	Mouse.Item.Bonus = mouseItem.Bonus
+	Mouse.Item.Bonus2 = mouseItem.Bonus2
+	Mouse.Item.BonusExpireTime = mouseItem.BonusExpireTime
+	Mouse.Item.BonusStrength = mouseItem.BonusStrength
+	Mouse.Item.Broken = mouseItem.Broken
+	Mouse.Item.Charges = mouseItem.Charges
+	Mouse.Item.Condition = mouseItem.Condition
+	Mouse.Item.Hardened = mouseItem.Hardened
+	Mouse.Item.Identified = mouseItem.Identified
+	Mouse.Item.MaxCharges = mouseItem.MaxCharges
+	Mouse.Item.Number = mouseItem.Number
+	Mouse.Item.Refundable = mouseItem.Refundable
+	Mouse.Item.Stolen = mouseItem.Stolen
+	Mouse.Item.TemporaryBonus = mouseItem.TemporaryBonus
 end
 
 --remove buttons when tooltip is on the bottom right
