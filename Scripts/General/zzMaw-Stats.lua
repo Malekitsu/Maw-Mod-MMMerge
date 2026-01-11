@@ -1390,6 +1390,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	
 	-- Find the resistance type that provides the highest effective protection
 	local bestEffectiveRes = 0
+	local effectiveBaseRes=0
 	local baseRes=0
 	for i=1,#resList do
 		baseRes = pl:GetResistance(resList[i])
@@ -1420,11 +1421,12 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		-- Keep track of the highest effective resistance (best protection)
 		if effectiveRes > bestEffectiveRes then
 			bestEffectiveRes = effectiveRes
+			effectiveBaseRes = baseRes
 		end
 	end
 	
 	-- Skip if this resistance is immune
-	if bestEffectiveRes>=65000 then
+	if effectiveBaseRes>=65000 then
 		return 0
 	end
 
