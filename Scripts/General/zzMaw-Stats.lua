@@ -1424,7 +1424,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	end
 	
 	-- Skip if this resistance is immune
-	if baseRes>=65000 then
+	if bestEffectiveRes>=65000 then
 		return 0
 	end
 
