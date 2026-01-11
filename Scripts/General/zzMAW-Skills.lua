@@ -1321,7 +1321,7 @@ end
 function events.GameInitialized2()
 	baseRegStr=	Skillz.getDesc(30,1)
 	baseMedStr=	Skillz.getDesc(28,1)
-	
+	baseAscStr= "Increases spell damage and healing at the expense of higher mana cost and cast time."
 end
 function events.Tick()
 	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
@@ -1354,6 +1354,26 @@ function events.Tick()
 		end
 		txt= string.format("%s\n\nIncreases spell points based on SP per level and mastery\n\nCurrent SP Regeneration: %s\nNext Level Bonus: %s SP Regen\n",baseMedStr,StrColor(60,60,255,spRegen),StrColor(60,60,255,"+" .. spRegen2))
 		Skillz.setDesc(28,1,txt)
+		
+		--ascension tooltip
+		local s,m = SplitSkill(pl:GetSkill(const.Skills.Learning))
+		local dmgMult = shortenNumber(round(((1+0.075*s)*1.025^s - 1)*100),3)
+		local dmgBaseMult = shortenNumber(round(((1+0.05*s^2)*1.025^s - 1)*100),3)
+		local healMult = shortenNumber(round(((1+0.05*s)*1.02^s - 1)*100),3)
+		local healBaseMult = shortenNumber(round(((1+0.03*s^2)*1.02^s - 1)*100),3)
+		local masteryReduction = (1 - m * 0.125)
+		local manaMult = shortenNumber(round(((1+0.125*s)*1.04^s - 1) * masteryReduction *100),3)
+		local castMult = shortenNumber(round((1.015^s-1)*100),3)
+		txt = string.format("%s\n\nCurrent bonuses at skill %s:\n- Damage base: %s\n- Damage scaling: %s\n\n- Healing base: %s\n- Healing scaling: %s\n\n- Mana cost: %s\n- Cast time: %s\n",
+			baseAscStr, 
+			StrColor(255,255,100,s),
+			StrColor(0,255,0,"+"..dmgBaseMult.."%"),
+			StrColor(0,255,0,"+"..dmgMult.."%"),
+			StrColor(0,255,0,"+"..healBaseMult.."%"),
+			StrColor(0,255,0,"+"..healMult.."%"),
+			StrColor(255,100,100,"+"..manaMult.."%"),
+			StrColor(255,100,100,"+"..castMult.."%"))
+		Skillz.setDesc(const.Skills.Learning,1,txt)
 		
 		--spear tooltip
 		local s,m=SplitSkill(pl:GetSkill(const.Skills.Spear))
@@ -1421,8 +1441,7 @@ function events.LoadMap()
 end
 
 function events.GameInitialized2()
-	local txt="Increases spell damage at the expense of higher mana. Each skill level boosts the corresponding tier's spells, up to Tier 11 (e.g., Incinerate, Starburst). Spells can be ascended seven times, culminating at skill level 77. This skill affects all magic schools, enabling up to three enhancements per spell (ascended damage amount shown in spell tooltip). \n\nLevel up to unlock the full destructive or healing potential of your magic, balancing higher damage with greater mana expenditure.\n\nEach ascension tier increases cast time.\n"
-	Skillz.setDesc(const.Skills.Learning,1,txt)
+	Skillz.setDesc(const.Skills.Learning,1,"Increases spell damage and healing at the expense of higher mana cost and cast time.\n")
 	Skillz.setName(const.Skills.Learning, "Ascension")
 	Game.SkillDesNormal[const.Skills.Learning]= "Mana cost reduced by 12.5%."
 	Game.SkillDesExpert[const.Skills.Learning]= "Mana cost reduced by 25%"
