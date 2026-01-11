@@ -2564,7 +2564,16 @@ function events.GameInitialized2()
 end
 
 --disable arrows
-
+function events.GameInitialized2()
+	if disableBow then
+		for i=0, Game.CharacterPortraits.High do
+			local por = Game.CharacterPortraits[i]
+			if por.Race == const.Race.Dragon then
+				por.DefAttackR = 0
+			end
+		end
+	end
+end
 function events.ArrowProjectile(t)
 	if disableBow then
 		t.ObjId=0
