@@ -1751,7 +1751,22 @@ function events.BuildItemInformationBox(t)
 			end
 		end
 		if extraDescription and t.Description then
-			local txt="\n\nItem Bonus Power: " .. t.Item.MaxCharges
+			local difficultyExtraPower=1
+			if Game.BolsterAmount>100 then
+				difficultyExtraPower=(Game.BolsterAmount-100)/2000+1
+			end
+			local maxChargesCap=50*((difficultyExtraPower-1)*2+1)
+			if t.Item.BonusExpireTime>=10 and t.Item.BonusExpireTime<1000 then
+				maxChargesCap=50*((difficultyExtraPower-1)*4+1)
+			end
+			maxChargesCap=maxChargesCap+100 --mapping release
+			maxChargesCap=maxChargesCap/2
+
+			if vars.madnessMode then
+				maxChargesCap=150
+			end
+			maxChargesCap=round(maxChargesCap)
+			local txt="\n\nItem Bonus Power: " .. t.Item.MaxCharges .. "/" .. maxChargesCap
 			t.Description =t.Description .. StrColor(100,100,100, txt)
 		end
 	end
