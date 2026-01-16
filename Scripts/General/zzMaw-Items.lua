@@ -4467,7 +4467,7 @@ end
 
 --convert gems, from lower to highest
 --NAMES
-local craftingNames={"Moonstone", "Topaz", "Amethyst", "Amber", "Purple Topaz", "Ruby", "Sunstone", "Emerald", "Sapphire", "Diamond","Ascended Moonstone", "Ascended Topaz", "Ascended Amethyst", "Ascended Amber", "Ascended Purple Topaz", "Ascended Ruby", "Ascended Sunstone", "Ascended Emerald", "Ascended Sapphire", "Ascended Diamond"}
+local craftingNames={"Lunar Shard", "Fire Topaz", "Amethyst Chunk", "Amber Droplet", "Royal Amethyst", "Gemcutter's Ruby", "Solarstone", "Erudite Crystal", "Erathian Sapphire", "Queen's Diamond","Ascended Lunar Shard", "Ascended Topaz", "Ascended Amethyst", "Ascended Amber", "Ascended Purple Amethyst", "Ascended Ruby", "Ascended Solarstone", "Ascended Amber Droplet", "Ascended Sapphire", "Ascended Diamond"}
 function events.KeyDown(t)
 	if t.Key ~=85 then
 		gemUpgrading=false
