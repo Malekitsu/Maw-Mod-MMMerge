@@ -4809,19 +4809,17 @@ end
 
 --reroll potions
 function events.LoadMap()
-	if vars.madnessMode then
-		for i=0, Map.Objects.High do
-			local obj=Map.Objects[i]
-			if obj.Item and obj.Item.Number>=264 and obj.Item.Number<=289 then
-				obj.Item.Number=math.random(252, 263)
-			end
+	for i=0, Map.Objects.High do
+		local obj=Map.Objects[i]
+		if obj.Item and obj.Item.Number>=264 and obj.Item.Number<=289 then
+			obj.Item.Number=math.random(252, 263)
 		end
-		for i=0, Map.Chests.High do
-			local chest=Map.Chests[i]
-			for j=1, chest.Items.High do
-				if chest.Items[j].Number>=264 and chest.Items[j].Number<=289 then
-					chest.Items[j].Number=math.random(252, 263)
-				end
+	end
+	for i=0, Map.Chests.High do
+		local chest=Map.Chests[i]
+		for j=1, chest.Items.High do
+			if chest.Items[j].Number>=264 and chest.Items[j].Number<=289 then
+				chest.Items[j].Number=math.random(252, 263)
 			end
 		end
 	end
