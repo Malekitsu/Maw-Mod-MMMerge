@@ -1,6 +1,7 @@
 --MOVE TRAINERS CODE
 --ALL CREDITS TO RAPHAEL/ZAPHAEL, thanks ;)
-
+--Game:GetCurrentHouse()
+--GetCurrentNPC()
 
 -- Data table ­– one row per ODM, each row is a list of {npcId, houseId}
 local npcMovesByMap = {
@@ -26,7 +27,7 @@ local npcMovesByMap = {
   ["7out13.odm"]  = { {216,319},{172,319},{175,319},{178,319}, },
 
   ["out02.odm"] = {
-    {530,304},{533,304},{176,597},
+    {530,304},{533,304},{176,889},
   },
 
   ["out03.odm"] = { {175,516},{177,517}, },
