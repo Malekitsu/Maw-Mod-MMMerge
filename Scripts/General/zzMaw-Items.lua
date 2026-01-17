@@ -839,7 +839,9 @@ function events.ItemGenerated(t)
 			
 			if chance>=math.random() or OmnipotentLoot then
 				-- Reset pity counter on successful drop
-				vars.legendaryPityCounter = 0
+				if not OmnipotentLoot then
+					vars.legendaryPityCounter = 0
+				end
 				-- Initialize counts for each affix
 				vars.legendaryAffixDropped=vars.legendaryAffixDropped or {}
 				for i = 1, #legendaryEffects-10 do
@@ -900,9 +902,11 @@ function events.ItemGenerated(t)
 			chance = chance * lootMultiplier^0.5
 			
 			
-			if math.random()<chance then
+			if math.random()<chance or OmnipotentLoot then
 				it.BonusExpireTime=it.BonusExpireTime+100
-				vars.celestialPityCounter = 0
+				if not OmnipotentLoot then
+					vars.celestialPityCounter = 0
+				end
 			else
 				vars.celestialPityCounter = vars.celestialPityCounter + lootMultiplier
 			end
