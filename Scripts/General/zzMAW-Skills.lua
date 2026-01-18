@@ -1707,7 +1707,7 @@ local function getReqAndCost(mastery, player)
 	elseif vars.insanityMode then
 		baseCost = insanityCost[mastery]
 		requirements = insanityLearningRequirements[mastery]
-	elseif not vars.Mode==2 then
+	elseif vars.Mode==2 then
 		baseCost = doomCosts[mastery]
 		requirements = learningRequirements[mastery]
 	elseif not Game.freeProgression then
