@@ -159,7 +159,7 @@ function events.BeforeLoadMap()
 					m.Mon2Low = vars.MonsterShuffleList[idx].Low
 					idx = idx + 1
 				end
-				if originalMapInfo[i].Monster3Pic ~= "0" then
+				if originalMapInfo[i].Monster3Pic ~= "0" and  originalMapInfo[i].Monster3Pic ~= "DemonQueen"  then
 					m.Monster3Pic = vars.MonsterShuffleList[idx].Pic
 					m.Mon3Dif = vars.MonsterShuffleList[idx].Dif
 					m.Mon3Hi = vars.MonsterShuffleList[idx].Hi
