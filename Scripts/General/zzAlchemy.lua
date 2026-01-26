@@ -269,7 +269,9 @@ function events.UseMouseItem(t)
 	else
 		Mouse.Item.Number=0
 	end	
-	Party[action]:SetRecoveryDelay(60)
+	if Party.EnemyDetectorRed or Party.EnemyDetectorYellow then
+		Party[action]:SetRecoveryDelay(60)
+	end
 	pl:ShowFaceAnimation(36)
 	evt.PlaySound(143)
 	--restore to previous player to avoid inventory issues
