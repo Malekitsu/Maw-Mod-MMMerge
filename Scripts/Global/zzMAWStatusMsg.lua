@@ -113,6 +113,9 @@ function events.CalcDamageToMonster(t)
 		if manaLeechLeg then
 			totalHeal=totalHeal/2
 			pl.SP=math.min(getMaxMana(pl),pl.SP+totalHeal)
+			totalHeal=totalHeal/fullHP --remove mana portion
+			fullHP=GetMaxHP(pl) 
+			totalHeal=fullHP*totalHeal --add life portion
 		end
 		overHeal=round(pl.HP+totalHeal-fullHP)
 		pl.HP=math.min(fullHP,pl.HP+totalHeal)
