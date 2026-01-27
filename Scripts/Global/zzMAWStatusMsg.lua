@@ -113,11 +113,9 @@ function events.CalcDamageToMonster(t)
 		if manaLeechLeg then
 			totalHeal=totalHeal/2
 			pl.SP=math.min(getMaxMana(pl),pl.SP+totalHeal)
-			return
-		else
-			overHeal=round(pl.HP+totalHeal-fullHP)
-			pl.HP=math.min(fullHP,pl.HP+totalHeal)
 		end
+		overHeal=round(pl.HP+totalHeal-fullHP)
+		pl.HP=math.min(fullHP,pl.HP+totalHeal)
 		if overHeal>0 and vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 27) then
 			local id, lowestHealthPercentage=pickLowestPartyMember()
 			local percent, partyId, playerId=OnlineLowestHealthPercentage()
