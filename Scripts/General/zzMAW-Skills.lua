@@ -1724,7 +1724,7 @@ local function getReqAndCost(mastery, player)
 	
 	for _, skillId in pairs(horizontalSkills) do
 		local s, m = SplitSkill(pl.Skills[skillId])
-		if (m >= mastery and s ~= 0) or (oldMasteries and oldMasteries[skillId] - 1 > m) then
+		if (m >= mastery and s ~= 0) or (oldMasteries and oldMasteries[skillId] - 1 > mastery) then
 			cost = cost + baseCost
 		end
 	end
