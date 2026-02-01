@@ -748,7 +748,7 @@ function events.ItemGenerated(t)
 		ancientRoll=math.random()
 		if ancientRoll<=ancientChance or OmnipotentLoot then
 			ancient=true
-			it.Charges=math.random(round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2, encStrUp[pseudoStr]+10)))
+			it.Charges=math.random(round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10))
 			it.Charges=math.ceil(it.Charges*difficultyExtraPower) --bolster
 			it.Charges=it.Charges+math.random(1,16)*1000
 			it.Bonus=math.random(1,16)
