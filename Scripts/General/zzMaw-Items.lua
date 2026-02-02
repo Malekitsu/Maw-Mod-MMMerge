@@ -4998,3 +4998,20 @@ function pity_chance(chance, failures)
 	local successChance=chance^(1.45-chance*failures*0.5)
 	return successChance
 end
+
+--remove artifacts
+function events.AfterLoadMap()
+	for k=0,Map.Chests.High do
+		for i=1,Map.Chests[k].Items.High do
+			local it=Map.Chests[k].Items[i]
+			if it.MaxCharges==0 then
+				if table.find(artWeap1h, it.Number) or table.find(artWeap2h, it.Number) or table.find(artArmors, it.Number) then
+					if it:T().Value>=20000 then
+						bossLoot = true
+						it:Randomize(6,0)
+					end
+				end
+			end
+		end
+	end
+end
