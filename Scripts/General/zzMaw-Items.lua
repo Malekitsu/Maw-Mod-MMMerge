@@ -1375,9 +1375,13 @@ function updateCelestialItem(it,pl)
 		end
 		local slotMult=slotMult[equipStat] or 1
 		local lvl=pl.LevelBase
-		local tier=math.min(pl.LevelBase/11+5,60)
+		local lvl2=getTotalLevel()
+		if lvl>lvl2*1.2 then
+			lvl=lvl2*1.2
+		end
+		local tier=math.min(lvl/11+5,60)
 		if vars.madnessMode then
-			tier=math.min(math.min(pl.LevelBase,1000)/11+5,90)
+			tier=math.min(math.min(lvl,1000)/11+5,90)
 		end
 		local mult=3
 		if vars.Mode==2 then
