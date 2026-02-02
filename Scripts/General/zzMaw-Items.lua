@@ -5006,7 +5006,7 @@ function events.AfterLoadMap()
 			local it=Map.Chests[k].Items[i]
 			if it.MaxCharges==0 then
 				if table.find(artWeap1h, it.Number) or table.find(artWeap2h, it.Number) or table.find(artArmors, it.Number) then
-					if it:T().Value>=20000 then
+					if it:T().Value>=20000 and it.BonusStrength==0 then
 						bossLoot = true
 						it:Randomize(6,0)
 					end
