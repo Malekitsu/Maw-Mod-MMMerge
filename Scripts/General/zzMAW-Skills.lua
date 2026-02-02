@@ -735,14 +735,16 @@ function events.KeyDown(t)
 						evt.FaceExpression{Player = "All", Frame = 46}
 						Game.ShowStatusText(string.format("%s casts Charge stunning the enemy",Party[0].Name))
 						mon.SpellBuffs[6].Skill=4
+						local chargeCC = {Debuff = const.MonsterBuff.Paralyze}
 						if class==16 then
 							duration=const.Minute*1.5
-							mon.SpellBuffs[6].ExpireTime=Game.Time+duration
 						elseif class==17 then
 							duration=const.Minute*2
-							mon.SpellBuffs[6].ExpireTime=Game.Time+duration
 						else
 							duration=const.Minute*2.5
+						end
+						duration = calcDebuffDuration(mon, chargeCC, duration)
+						if duration > 0 then
 							mon.SpellBuffs[6].ExpireTime=Game.Time+duration
 						end
 						local vel=mon.Velocity
@@ -2376,6 +2378,7 @@ function events.BeforeLoadMap(wasInGame)
 end
 
 --mace stun
+local maceStunCC = {Debuff = const.MonsterBuff.Paralyze}
 function events.CalcDamageToMonster(t)
 	if t.Player then
 		local it=t.Player:GetActiveItem(1)
@@ -2397,17 +2400,19 @@ function events.CalcDamageToMonster(t)
 				local duration=0
 				if chance>math.random() then
 					applyParalyze[id]=true
-					duration=const.Minute*2.5
+					duration=const.Minute*3
 					if mon.NameId>220 and mon.NameId<300 then
-						duration=duration/2.5
+						duration=duration/2
 					end
 					if m==3 then
 						duration=duration/2
 					end
+					-- Apply diminishing returns
+					duration = calcDebuffDuration(mon, maceStunCC, duration)
 				end
 				function events.Tick()
 					events.Remove("Tick",1)
-					if applyParalyze[id] then
+					if applyParalyze[id] and duration > 0 then
 						if mon.HP~=0 then
 							mon.SpellBuffs[6].ExpireTime=Game.Time+duration
 						end
