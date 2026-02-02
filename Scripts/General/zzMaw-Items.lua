@@ -526,7 +526,8 @@ function events.ItemGenerated(t)
 			vars.artifactPity[rolledIndex] = vars.artifactPity[rolledIndex] + 1
 			t.Item.Number = allArtifacts[rolledIndex]
 			local level = round(getTotalLevel())
-			t.Item.BonusStrength = math.min(math.max(level,1), 1000)
+			t.Item.BonusExpireTime = math.min(math.max(level,1), 1000)
+			debug.Message(t.Item.BonusExpireTime)
 		else
 			vars.artifactRollPity = vars.artifactRollPity + lootMultiplier
 		end
@@ -2489,14 +2490,14 @@ function events.BuildItemInformationBox(t)
 			if id==-1 then
 				id=0
 			end
-			local artifactMult=artifactPowerMult(Party[id].LevelBase, true, t.Item.BonusStrength)
+			local artifactMult=artifactPowerMult(Party[id].LevelBase, true, t.Item.BonusExpireTime)
 			local txt=Game.ItemsTxt[t.Item.Number]
 			local ac=math.ceil((txt.Mod2+txt.Mod1DiceCount)*artifactMult)
 			if ac>0 then 			
 				t.BasicStat= "Armor: +" .. ac
 			end
 			--WEAPONS
-			artifactMult=artifactPowerMult(Party[id].LevelBase, false, t.Item.BonusStrength)
+			artifactMult=artifactPowerMult(Party[id].LevelBase, false, t.Item.BonusExpireTime)
 			local equipStat=txt.EquipStat
 			if equipStat<=2 then
 				local bonus=math.ceil(txt.Mod2*artifactMult)
@@ -3031,7 +3032,7 @@ function itemStats(index)
 			end
 			--artifacts
 			if table.find(artArmors,it.Number) then 
-				artifactMult=artifactPowerMult(pl.LevelBase, true, it.BonusStrength)
+				artifactMult=artifactPowerMult(pl.LevelBase, true, it.BonusExpireTime)
 				acBonus=math.ceil(acBonus*artifactMult)
 			end
 			acBonus=round(acBonus*(1+mult))
@@ -3202,7 +3203,7 @@ function itemStats(index)
 			
 			if table.find(artWeap1h,it.Number) or table.find(artWeap2h,it.Number) then 
 				if txt.EquipStat<=1 then
-					artifactMult=artifactPowerMult(pl.LevelBase, false, it.BonusStrength)
+					artifactMult=artifactPowerMult(pl.LevelBase, false, it.BonusExpireTime)
 					bonus=math.ceil(txt.Mod2*artifactMult)
 					sidesBonus=math.ceil(txt.Mod1DiceSides*artifactMult)
 				end
@@ -3360,14 +3361,14 @@ function itemStats(index)
 		--artifacts stats bonus
 		
 		if artifactStatsBonus[it.Number] then
-			artifactMult=artifactPowerMult(pl.LevelBase, false, it.BonusStrength)
+			artifactMult=artifactPowerMult(pl.LevelBase, false, it.BonusExpireTime)
 			for key,value in pairs(artifactStatsBonus[it.Number]) do
 				tab[key+1]=tab[key+1]+value*artifactMult
 			end
 		end
 		--artifacts skill bonuses
 		if artifactSkillBonus[it.Number] then
-			artifactMult=artifactPowerMult(pl.LevelBase, false, it.BonusStrength)
+			artifactMult=artifactPowerMult(pl.LevelBase, false, it.BonusExpireTime)
 			for key,value in pairs(artifactSkillBonus[it.Number]) do
 				tab[key+50]=tab[key+50] or 0
 				tab[key+50]=tab[key+50]+round(value*artifactMult)
@@ -4600,7 +4601,7 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 		local id=pl:GetIndex()
 		local mult=math.max((0.5+it.MaxCharges/20)^1.5,0.5)
 		if table.find(artWeap1h, it.Number) or table.find(artWeap2h, it.Number) then
-			mult=(1+artifactPowerMult(pl.LevelBase, false, it.BonusStrength))^1.5
+			mult=(1+artifactPowerMult(pl.LevelBase, false, it.BonusExpireTime))^1.5
 		end
 		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
 			local str=pl:GetMight()
