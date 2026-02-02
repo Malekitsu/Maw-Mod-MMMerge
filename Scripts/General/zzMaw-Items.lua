@@ -4767,7 +4767,9 @@ function GetLevelRquirement(it)
 	if vars.Mode==2 then
 		levelRequired=levelRequired-3
 	end
-	
+	if vars.insanityMode then
+		levelRequired=levelRequired-3
+	end
 	levelRequired=math.max(1,math.floor(levelRequired))
 	
 	return levelRequired
@@ -5010,6 +5012,22 @@ function events.AfterLoadMap()
 						bossLoot = true
 						it:Randomize(6,0)
 					end
+				end
+			end
+		end
+	end
+	if vars.Mode==2 and not vars.StartingItemFix then
+		vars.StartingItemFix=true
+		local extraPower=5
+		if vars.insanityMode then
+			extraPower=10
+		end
+		for i=0,Party.PlayersArray.High do
+			local pl=Party.PlayersArray[i]
+			for k=1,138 do
+				local it=pl.Items[k]
+				if it.MaxCharges==0 then
+					it.MaxCharges=extraPower
 				end
 			end
 		end
