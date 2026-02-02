@@ -4372,6 +4372,9 @@ function artifactPowerMult(level, isAC, customLevel)
 	if vars.madnessMode then
 		cap=900
 	end
+	if customLevel>=1 then
+		cap=1500
+	end
 	local mult=(math.min(level,cap)/200+0.75)*bol
 	if isAC then
 		mult=(math.min(level,cap)/(250)+0.75)*bol
