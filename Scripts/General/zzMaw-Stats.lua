@@ -239,6 +239,14 @@ function getSpellDelay(pl,spell)
 	local skill=SplitSkill(pl:GetSkill(const.Skills.Learning))
 	if table.find(spells, spell) or (healingSpells and healingSpells[spell]) then
 		ascensionSkill=skill
+		if table.find(elementalistClass, pl.Class) then
+			ascensionSkill=0
+			for i=12, 15 do
+				local s,m=SplitSkill(pl.Skills[i])
+				ascensionSkill=ascensionSkill+s/4
+			end
+			ascensionSkill=math.floor(ascensionSkill)
+		end
 	end
 	
 	--shield/armor impair
