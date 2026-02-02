@@ -5030,7 +5030,7 @@ function events.AfterLoadMap()
 			local pl=Party.PlayersArray[i]
 			for k=1,138 do
 				local it=pl.Items[k]
-				if it.MaxCharges==0 then
+				if IsEnchantableItem(it) and it.MaxCharges==0 then
 					it.MaxCharges=extraPower
 				end
 			end
