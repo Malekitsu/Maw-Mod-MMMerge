@@ -528,7 +528,7 @@ function events.ItemGenerated(t)
 			vars.artifactPity[rolledIndex] = vars.artifactPity[rolledIndex] + 1
 			t.Item.Number = allArtifacts[rolledIndex]
 			local level = round(getTotalLevel())
-			t.Item.BonusStrength = math.max(level,1)
+			t.Item.BonusStrength = math.min(math.max(level,1), 1000)
 		else
 			local pityAdd = lootMultiplier or 1
 			vars.artifactRollPity = vars.artifactRollPity + pityAdd
@@ -2455,7 +2455,7 @@ function events.BuildItemInformationBox(t)
 		require("string")
 		pattern = "(%d+)"
 		text=t.Description
-		t.Description = text:gsub(pattern, replaceNumber)
+		t.Description = text:gsub(pattern, function(match) return replaceNumber(match, t.Item.BonusStrength) end)
 		local txt="\n\nScale with player level, up to level 550."
 		if vars.madnessMode then
 			txt="\n\nScale with player level, up to level 900."
@@ -2467,9 +2467,9 @@ function events.BuildItemInformationBox(t)
 	end
 end
 
-function replaceNumber(match)
+function replaceNumber(match, bonusStrength)
 	lvl=Party[Game.CurrentPlayer].LevelBase
-	lvl=artifactPowerMult(lvl, false, t.Item.BonusStrength)
+	lvl=artifactPowerMult(lvl, false, bonusStrength)
     num = tonumber(match)
     if num then
         return tostring(round(num * lvl))
