@@ -933,7 +933,7 @@ function events.CalcDamageToPlayer(t)
 	t.Damage=t.Damage*roll
 	
 	if mon and mon.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime>=Game.Time then
-		t.Damage=t.Damage/2
+		t.Damage=t.Damage*0.75
 	end
 	
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
