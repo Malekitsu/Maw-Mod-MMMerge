@@ -1766,7 +1766,7 @@ healingSpellList={const.Spells.RemoveCurse,const.Spells.Resurrection,const.Spell
 -- Calculate personality-based mana cost reduction
 function getPersonalityManaCostReduction(pl)
 	local personality = pl:GetPersonality()
-	local level = pl.LevelBase
+	local level = math.min(getTotalLevel(),1000)
 	
 	local personalityDivisor = 10 + (level) * 65 / 1000
 	local reductionPercent = personality / personalityDivisor
