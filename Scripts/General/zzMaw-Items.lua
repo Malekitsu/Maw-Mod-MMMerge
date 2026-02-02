@@ -509,7 +509,7 @@ function events.ItemGenerated(t)
 	-- Build combined artifact list and initialize pity counters
 	lootMultiplier = lootMultiplier or 1
 	if Game.HouseScreen~=2 and Game.HouseScreen~=95 and IsEnchantableItem(t.Item) then
-		local artifactChance = 0.0025 * lootMultiplier
+		local artifactChance = 0.005 * lootMultiplier
 		vars.artifactRollPity = vars.artifactRollPity or 0
 		local chance = pity_chance(artifactChance, vars.artifactRollPity)
 		if math.random() < chance then
