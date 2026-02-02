@@ -2457,13 +2457,13 @@ function events.BuildItemInformationBox(t)
 		require("string")
 		pattern = "(%d+)"
 		text=t.Description
-		t.Description = text:gsub(pattern, function(match) return replaceNumber(match, t.Item.BonusStrength) end)
+		t.Description = text:gsub(pattern, function(match) return replaceNumber(match, t.Item.BonusExpireTime) end)
 		local txt="\n\nScale with player level, up to level 550."
 		if vars.madnessMode then
 			txt="\n\nScale with player level, up to level 900."
 		end
-		if t.Item.BonusStrength>=1 then
-			txt=StrColor(120, 240, 255,"\n\nArtifact Level: " .. t.Item.BonusStrength)
+		if t.Item.BonusExpireTime>=1 then
+			txt=StrColor(120, 240, 255,"\n\nArtifact Level: " .. t.Item.BonusExpireTime)
 		end
 		t.Description = t.Description .. txt
 	end
