@@ -3028,6 +3028,7 @@ function events.KeyDown(t)
 	end
 end
 
+--[[
 local invisBooks={418, 1220, 1924}
 local starburstBooks={421, 1223, 1927}
 
@@ -3041,21 +3042,22 @@ end
 function events.LoadMap()
 	if vars.insanityMode then
 		for i=1,3 do
-			Game.ItemsTxt[invisBooks[i]].Picture=booksPicGM[i]
-			Game.ItemsTxt[starburstBooks[i]].Picture=booksPic[i]
+			Game.ItemsTxt[invisBooks[i] ].Picture=booksPicGM[i]
+			Game.ItemsTxt[starburstBooks[i] ].Picture=booksPic[i]
 		end
 		Game.SpellsTxt[19].Master="n/a"
 		Game.SpellsTxt[22].Master="This spell is as good as it will ever get!"
 	else
 		for i=1,3 do
-			Game.ItemsTxt[invisBooks[i]].Picture=booksPic[i]
-			Game.ItemsTxt[starburstBooks[i]].Picture=booksPicGM[i]
+			Game.ItemsTxt[invisBooks[i] ].Picture=booksPic[i]
+			Game.ItemsTxt[starburstBooks[i] ].Picture=booksPicGM[i]
 			Game.SpellsTxt[19].Master="Duration 15+1.5 minutes per point of skill"
 			Game.SpellsTxt[22].Master="n/a"
 		end
 	end
 end
-
+]]
+--[[
 function events.CanLearnSpell(t)
 	if vars.insanityMode then
 		if t.Spell==const.Spells.Invisibility then
@@ -3065,6 +3067,7 @@ function events.CanLearnSpell(t)
 		end
 	end
 end
+]]
 
 
 function events.GameInitialized2()
@@ -3278,5 +3281,73 @@ function events.MonsterAttacked(t)
 	elseif data.Spell==99 then
 		data.Spell=201
 		data.Object.Spell=201
+	end
+end
+
+--[[
+ironman code
+function events.PartyDies(t)
+	t.Handled=true
+	local gold=Party.Gold
+	local continentId=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
+	function events.Tick()
+		events.Remove("Tick",1)
+		local lvl1=vars.MMLVL[1]
+		local lvl2=vars.MMLVL[2]
+		local lvl3=vars.MMLVL[3]
+		local lvl4=vars.MMLVL[4]
+		--local MapsToStart = {"out01.odm", "7out01.odm", "oute3.odm", "oute3.odm"}
+		for i=0,Party.High do
+			local pl=Party[i]
+			for j=0,pl.Conditions.High do
+				pl.Conditions[j]=0
+			end
+			pl.HP=GetMaxHP(pl)
+			pl.SP=getMaxMana(pl)
+		end
+		--ForceStartNewGame(MapsToStart[continentId], true)
+		ForceStartNewGame("oute3.odm", true)
+		Party.Gold=gold
+		vars.MMLVL[1]=lvl1
+		vars.MMLVL[2]=lvl2
+		vars.MMLVL[3]=lvl3
+		vars.MMLVL[4]=lvl4
+	end
+end
+
+-- player's death
+local i1, u1, u2, u4, r4, i4, mstr, mcopy, toptr = mem.i1, mem.u1, mem.u2, mem.u4, mem.r4, mem.i4, mem.string, mem.copy, mem.topointer
+
+local code_backup = {}
+local hook_code = {}
+
+local std_events = events
+function mulhook(addr, backup_size, htype, f)
+	local hookf = htype == 2 and mem.autohook2 or mem.autohook
+
+	mem.IgnoreProtection(true)
+	code_backup[addr] = mstr(addr, backup_size, true)
+	hookf(addr, f)
+	hook_code[addr] = mstr(addr, backup_size, true)
+	mem.IgnoreProtection(false)
+end
+mulhook(0x4614d4, 6, 2, function(d)
+	local t = {Handled = false}
+	events.call("PartyDies", t)
+	if t.Handled then
+		d:push(0x461856)
+		return true
+	end
+end)
+
+]]
+
+function events.Tick()
+	if vars.insanityMode then
+		if Party.SpellBuffs[11].ExpireTime>=Game.Time then
+			if Party.EnemyDetectorRed then
+				Party.SpellBuffs[11].ExpireTime=0
+			end
+		end
 	end
 end
