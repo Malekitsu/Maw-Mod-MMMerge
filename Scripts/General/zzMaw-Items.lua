@@ -2469,7 +2469,7 @@ end
 
 function replaceNumber(match)
 	lvl=Party[Game.CurrentPlayer].LevelBase
-	lvl=artifactPowerMult(lvl)
+	lvl=artifactPowerMult(lvl, false, t.Item.BonusStrength)
     num = tonumber(match)
     if num then
         return tostring(round(num * lvl))
@@ -4358,7 +4358,7 @@ end
 
 --maw artifact scaling calculation
 function artifactPowerMult(level, isAC, customLevel)
-	if customLevel then
+	if customLevel>=1 then
 		level = math.max(customLevel * 1.5, customLevel + 50)
 	end
 	local bol=math.max(Game.BolsterAmount, 100)
