@@ -501,10 +501,7 @@ function events.ItemGenerated(t)
 	if Map.MapStatsIndex==0 then
 		return 
 	end
-
-	if table.find(artWeap1h, t.Item.Number) or table.find(artWeap2h, t.Item.Number) or table.find(artArmors, t.Item.Number) then
-		t.Item:Randomize(t.Strength, 0)
-	end
+	
 	if t.Strength==7 then
 		return
 	end
@@ -2461,7 +2458,7 @@ function events.BuildItemInformationBox(t)
 			txt="\n\nScale with player level, up to level 900."
 		end
 		if t.Item.BonusStrength>=1 then
-			txt="\n\nArtifact Level: " .. t.Item.BonusStrength
+			txt=StrColor(120, 240, 255,"\n\nArtifact Level: " .. t.Item.BonusStrength)
 		end
 		t.Description = t.Description .. txt
 	end
