@@ -1260,21 +1260,46 @@ end
 --CC REWORK
 ----------------------------------------
 CCMAP={
-	[const.Spells.Stun]=	{["Duration"]=const.Minute*2,["ChanceMult"]=0.01, ["BaseCost"]=1, ["ScalingCost"]=10},
+	[const.Spells.Stun]=	{["Duration"]=const.Minute*2.5,["ChanceMult"]=0.01, ["BaseCost"]=1, ["ScalingCost"]=10},
 	[const.Spells.Slow]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.03, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Earth, ["DamageKind"]=const.Damage.Earth,["Debuff"]=const.MonsterBuff.Slow},
-	[60]=					{["Duration"]=const.Minute*7, ["ChanceMult"]=0.05, ["BaseCost"]=5, ["ScalingCost"]=4, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--Mind Charm, has no const value, due to dark elf one overwriting
-	[const.Spells.Charm]=	{["Duration"]=const.Minute*12, ["ChanceMult"]=0.05, ["BaseCost"]=1, ["ScalingCost"]=4, ["School"]=const.Skills.DarkElfAbility, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--dark elf one
-	[const.Spells.Berserk]=	{["Duration"]=const.Minute*3, ["ChanceMult"]=0.04, ["BaseCost"]=1, ["ScalingCost"]=1.5, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Berserk},
-	[const.Spells.MassFear]={["Duration"]=const.Minute*5, ["ChanceMult"]=0.1, ["BaseCost"]=1, ["ScalingCost"]=0.5, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Fear},
-	[const.Spells.Fear]=	{["Duration"]=const.Minute*3, ["ChanceMult"]=0.005, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Fear},
-	[const.Spells.Enslave]=	{["Duration"]=const.Minute*4, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=1, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Enslave},
+	[60]=					{["Duration"]=const.Minute*10, ["ChanceMult"]=0.05, ["BaseCost"]=5, ["ScalingCost"]=4, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--Mind Charm, has no const value, due to dark elf one overwriting
+	[const.Spells.Charm]=	{["Duration"]=const.Minute*10, ["ChanceMult"]=0.05, ["BaseCost"]=1, ["ScalingCost"]=4, ["School"]=const.Skills.DarkElfAbility, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Charm},--dark elf one
+	[const.Spells.Berserk]=	{["Duration"]=const.Minute*4.5, ["ChanceMult"]=0.04, ["BaseCost"]=1, ["ScalingCost"]=1.5, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Berserk},
+	[const.Spells.MassFear]={["Duration"]=const.Minute*4, ["ChanceMult"]=0.1, ["BaseCost"]=1, ["ScalingCost"]=0.5, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Fear},
+	[const.Spells.Fear]=	{["Duration"]=const.Minute*4, ["ChanceMult"]=0.005, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Fear},
+	[const.Spells.Enslave]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=1, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Enslave},
 	[const.Spells.Paralyze]={["Duration"]=const.Minute*4, ["ChanceMult"]=0.04, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Light, ["DamageKind"]=const.Damage.Light,["Debuff"]=const.MonsterBuff.Paralyze},	
-[const.Spells.ShrinkingRay]={["Duration"]=const.Minute*4, ["ChanceMult"]=0.01, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark,["Debuff"]=const.MonsterBuff.ShrinkingRay},
-[const.Spells.DarkGrasp]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]={const.MonsterBuff.ArmorHalved, const.MonsterBuff.Slow, const.MonsterBuff.DamageHalved, const.MonsterBuff.MeleeOnly}},																									
-	[const.Spells.TurnUndead]={["Duration"]=const.Minute*5, ["ChanceMult"]=0.005, ["BaseCost"]=1, ["ScalingCost"]=0.5, ["School"]=const.Skills.Spirit, ["DamageKind"]=const.Damage.Spirit, ["Debuff"]=const.MonsterBuff.Fear},	
-	[const.Spells.ControlUndead]={["Duration"]=const.Minute*4, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=1.5, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]=const.MonsterBuff.Enslave},
+[const.Spells.ShrinkingRay]={["Duration"]=const.Minute*6, ["ChanceMult"]=0.01, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark,["Debuff"]=const.MonsterBuff.ShrinkingRay},
+[const.Spells.DarkGrasp]=	{["Duration"]=const.Minute*10, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]={const.MonsterBuff.ArmorHalved, const.MonsterBuff.Slow, const.MonsterBuff.DamageHalved, const.MonsterBuff.MeleeOnly}},																									
+	[const.Spells.TurnUndead]={["Duration"]=const.Minute*6, ["ChanceMult"]=0.005, ["BaseCost"]=1, ["ScalingCost"]=0.5, ["School"]=const.Skills.Spirit, ["DamageKind"]=const.Damage.Spirit, ["Debuff"]=const.MonsterBuff.Fear},	
+	[const.Spells.ControlUndead]={["Duration"]=const.Minute*10, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=1.5, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]=const.MonsterBuff.Enslave},
 }
-
+--[[
+function events.PlayerCastSpell(t)
+	if CCMAP[t.SpellId] then
+		t.Handled=true
+		
+		if t.SpellId==66 then
+			local mon=Map.Monsters[Mouse:GetTarget().Index]
+			BeginGrabObjects()
+			Game.SummonObjects(497, mon.X,mon.Y,mon.Z+100, 0,1)
+			local obj=GrabObjects()
+			if obj then
+				obj.Spell=66
+				obj.SpellLevel=0
+				obj.SpellMastery=0
+				obj.SpellSkill=0
+				obj.SpellType=66
+				obj.TypeIndex=497
+				obj.Owner=4
+				obj.Visible=true
+				obj.Target=3
+				obj.AttachToHead=true
+			end
+		end
+	end
+end
+]]
 function getCCDiffMult(bolster)
 	local diffMult=math.max(((bolster-100)/200)+1,1)
 	if bolster==600 then 
@@ -1317,8 +1342,7 @@ end
 function events.GameInitialized2()
 	for key, value in pairs(CCMAP) do
 		local duration=value.Duration/const.Minute*2
-		local bonus=value.ChanceMult*100
-		Game.SpellsTxt[key].Description=Game.SpellsTxt[key].Description .. "\n\nDuration: " .. duration .. " seconds" .. "\nBonus Hit chance per skill level: " .. bonus .. "%"
+		Game.SpellsTxt[key].Description=Game.SpellsTxt[key].Description .. "\n\nDuration: " .. duration .. " seconds"
 	end
 end
 
@@ -1327,6 +1351,7 @@ function events.PlayerCastSpell(t)
 		if t.SpellId==const.Spells.Stun then return end --stun is handled differently
 		local resistance={}
 		local level={}
+		local prevExpireTime={} -- Record current debuff ExpireTime before cast
 		local cc=CCMAP[t.SpellId]
 		for i=0,Map.Monsters.High do
 			local mon=Map.Monsters[i]
@@ -1334,10 +1359,21 @@ function events.PlayerCastSpell(t)
 			local lvl=mon.Level
 				resistance[i]=res
 				level[i]=lvl
+			-- Record current ExpireTime
+			if type(cc.Debuff)=="table" then
+				prevExpireTime[i]=mon.SpellBuffs[cc.Debuff[1]].ExpireTime
+			else
+				prevExpireTime[i]=mon.SpellBuffs[cc.Debuff].ExpireTime
+			end
 			local s,m=SplitSkill(t.Player:GetSkill(cc.School))
 			local newLevel=calcEffectChance(lvl, res, s, cc.ChanceMult, mon)
 			local hit=math.max(0.15,(30/(30+newLevel/4)))
-			if hit>math.random() then
+			-- Pre-check if debuff duration would be > 0 (without recording history)
+			local preDuration = cc.Duration
+			if Party.High==0 then preDuration = preDuration*3 end
+			local wouldApply = checkDebuffDuration(mon, cc, preDuration) > 0
+			--if hit>math.random() then
+			if wouldApply then
 				mon.Resistances[cc.DamageKind]=0
 				mon.Level=0
 				--Game.ShowStatusText("Hit" .. "  " .. hit)
@@ -1367,22 +1403,148 @@ function events.PlayerCastSpell(t)
 				local mon=Map.Monsters[i]
 				mon.Level=level[i]
 				mon.Resistances[cc.DamageKind]=resistance[i]
-				local duration=cc.Duration
-				if Party.High==0 then
-					duration=duration*3
-				end
+				-- Check if ExpireTime changed (monster was affected by this spell)
+				local currentExpireTime
 				if type(cc.Debuff)=="table" then
-					for v =1,4 do 
-						local debuff=mon.SpellBuffs[cc.Debuff[v]]
-						debuff.ExpireTime=math.min(debuff.ExpireTime, Game.Time+cc.Duration/(1+mult*0))
-					end
+					currentExpireTime=mon.SpellBuffs[cc.Debuff[1]].ExpireTime
 				else
-					local debuff=mon.SpellBuffs[cc.Debuff]
-					debuff.ExpireTime=math.min(debuff.ExpireTime, Game.Time+cc.Duration/(1+mult*0))
+					currentExpireTime=mon.SpellBuffs[cc.Debuff].ExpireTime
+				end
+				if currentExpireTime > prevExpireTime[i] then
+					-- Monster was affected, apply diminishing returns
+					local duration=cc.Duration
+					if Party.High==0 then
+						--duration=duration*3
+					end
+					local finalDuration = calcDebuffDuration(mon, cc, duration)
+					if type(cc.Debuff)=="table" then
+						for v =1,#cc.Debuff do 
+							mon.SpellBuffs[cc.Debuff[v]].ExpireTime=math.min(mon.SpellBuffs[cc.Debuff[v]].ExpireTime, Game.Time+finalDuration)
+						end
+					else
+						mon.SpellBuffs[cc.Debuff].ExpireTime=math.min(mon.SpellBuffs[cc.Debuff].ExpireTime, Game.Time+finalDuration)
+					end
 				end
 			end
 		end
 	end
+end
+
+-- Debuff Groups for diminishing returns
+-- Group 1: Slow/Damage reduction
+-- Group 2: Fear/Charm/Control
+-- Group 3: Stuns
+function events.GameInitialized2()
+	debuffGroups = {
+	[const.MonsterBuff.Slow] = 1,
+	[const.MonsterBuff.ArmorHalved] = 1,
+	[const.MonsterBuff.DamageHalved] = 1,
+	[const.MonsterBuff.MeleeOnly] = 1,
+	[const.MonsterBuff.ShrinkingRay] = 1,
+	[const.MonsterBuff.Fear] = 2,
+	[const.MonsterBuff.Charm] = 2,
+	[const.MonsterBuff.Berserk] = 2,
+	[const.MonsterBuff.Enslave] = 2,
+	[const.MonsterBuff.Paralyze] = 3,
+}
+end
+
+-- Tracks CC history per monster: ccHistory[monsterIndex][group] = {{startTime, endTime}, ...} 
+local CC_WINDOW = 10 * const.Minute -- 30 seconds in game time
+function events.LoadMap()
+	mapvars.ccHistory = mapvars.ccHistory or {}
+end
+function events.LeaveMap()
+	mapvars.ccHistory=nil
+end
+function getMonsterCCRatio(monsterIndex, group)
+	if not mapvars.ccHistory[monsterIndex] or not mapvars.ccHistory[monsterIndex][group] then
+		return 0
+	end
+	local now = Game.Time
+	local windowStart = now - CC_WINDOW
+	local totalCCTime = 0
+	local history = mapvars.ccHistory[monsterIndex][group]
+	-- Clean old entries and calculate CC time in window
+	local newHistory = {}
+	for i, entry in ipairs(history) do
+		local startTime = math.max(entry.startTime, windowStart)
+		local endTime = math.min(entry.endTime, now)
+		if endTime > windowStart then
+			totalCCTime = totalCCTime + math.max(0, endTime - startTime)
+			if entry.endTime > windowStart then
+				table.insert(newHistory, entry)
+			end
+		end
+	end
+	mapvars.ccHistory[monsterIndex][group] = newHistory
+	return totalCCTime / CC_WINDOW
+end
+
+-- Get duration multiplier based on CC ratio thresholds
+local function getCCDurationMult(ccRatio)
+	if ccRatio >= 0.6 then
+		return 0
+	elseif ccRatio >= 0.45 then
+		return 0.25   
+	elseif ccRatio >= 0.3 then
+		return 0.5 
+	elseif ccRatio >= 0.15 then
+		return 0.75  
+	else
+		return 1 
+	end
+end
+
+-- Check-only version: calculates duration WITHOUT recording history
+function checkDebuffDuration(monster, cc, duration)
+	local monsterIndex = monster:GetIndex()
+	local debuffList = cc.Debuff
+	if type(debuffList) ~= "table" then
+		debuffList = {debuffList}
+	end
+	
+	local group = debuffGroups[debuffList[1]] or 1
+	if group==1 then
+		return duration
+	end
+	local ccRatio = getMonsterCCRatio(monsterIndex, group)
+	return duration * getCCDurationMult(ccRatio)
+end
+
+-- Full version: calculates duration AND records history
+function calcDebuffDuration(monster, cc, duration)
+	local monsterIndex = monster:GetIndex()
+	local debuffList = cc.Debuff
+	if type(debuffList) ~= "table" then
+		debuffList = {debuffList}
+	end
+	
+	-- Find which group this CC belongs to
+	local group = debuffGroups[debuffList[1]] or 1
+	if group==1 then
+		return duration
+	end
+	-- Calculate diminishing returns based on CC ratio
+	local ccRatio = getMonsterCCRatio(monsterIndex, group)
+	local durationMult = getCCDurationMult(ccRatio)
+	
+	-- If immune, return 0 without recording
+	if durationMult == 0 then
+		return 0
+	end
+	
+	local finalDuration = duration * durationMult
+	
+	-- Record this CC application
+	mapvars.ccHistory[monsterIndex] = mapvars.ccHistory[monsterIndex] or {}
+	mapvars.ccHistory[monsterIndex][group] = mapvars.ccHistory[monsterIndex][group] or {}
+	table.insert(mapvars.ccHistory[monsterIndex][group], {
+		startTime = Game.Time,
+		endTime = Game.Time + finalDuration
+	})
+	
+	return finalDuration
 end
 
 --stun code
