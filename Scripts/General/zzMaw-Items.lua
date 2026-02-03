@@ -527,7 +527,6 @@ function events.ItemGenerated(t)
 			t.Item.Number = allArtifacts[rolledIndex]
 			local level = round(getTotalLevel())
 			t.Item.BonusExpireTime = math.min(math.max(level,1), 1000)
-			debug.Message(t.Item.BonusExpireTime)
 		else
 			vars.artifactRollPity = vars.artifactRollPity + lootMultiplier
 		end
