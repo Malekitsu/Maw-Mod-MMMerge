@@ -237,7 +237,7 @@ function getSpellDelay(pl,spell)
 	end
 	local ascensionSkill=0
 	local skill=SplitSkill(pl:GetSkill(const.Skills.Learning))
-	if table.find(spells, spell) or (healingSpells and healingSpells[spell]) then
+	if table.find(spells, spell) or (healingSpells and healingSpells[spell]) or CCMAP[spell] then
 		ascensionSkill=skill
 		if table.find(elementalistClass, pl.Class) then
 			ascensionSkill=0
@@ -249,6 +249,7 @@ function getSpellDelay(pl,spell)
 		end
 	end
 	
+
 	--shield/armor impair
 	--slow depending on item
 	armorDelay=1
@@ -269,6 +270,13 @@ function getSpellDelay(pl,spell)
 		end
 	end
 
+	if CCMAP[spell] then
+		local school=math.ceil(spell/11)+11
+		local s,m=SplitSkill(pl:GetSkill(school))
+		local speedMultiplier=1.015^(ascensionSkill-s)
+		local delay=round(oldTable[spell][m]*speedMultiplier)
+		return delay
+	end
 	
 	local hasteDiv=1
 	if vars.MAWSETTINGS.buffRework=="ON" then
