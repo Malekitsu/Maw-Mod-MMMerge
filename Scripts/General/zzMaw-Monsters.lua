@@ -2195,7 +2195,32 @@ function events.BuildMonsterInformationBox(t)
 		local experienceAwarded=experience*healthRateo
 		local lvl=pl.LevelBase
 		experienceAwarded=round(math.min((lvl+1)*1000, experienceAwarded))
-		t.EffectsHeader.Text=t.EffectsHeader.Text .. "\n\n\n\nExperience: " .. experienceAwarded
+		t.EffectsHeader.Text=t.EffectsHeader.Text .. "\n\n\n\nExperience: " .. experienceAwarded .. "\nCurrent Health: " .. round(mon.HP*2^(mon.Resistances[0]/1000))
+		
+		-- Display active debuffs
+		local debuffNames = {
+			[const.MonsterBuff.Slow] = "Slow",
+			[const.MonsterBuff.Charm] = "Charm",
+			[const.MonsterBuff.Berserk] = "Berserk",
+			[const.MonsterBuff.Fear] = "Fear",
+			[const.MonsterBuff.Enslave] = "Enslave",
+			[const.MonsterBuff.Paralyze] = "Paralyze",
+			[const.MonsterBuff.ShrinkingRay] = "Shrinking",
+			[const.MonsterBuff.ArmorHalved] = "Armor Halved",
+			[const.MonsterBuff.DamageHalved] = "Damage Halved",
+			[const.MonsterBuff.MeleeOnly] = "Melee Only",
+		}
+		local activeDebuffs = ""
+		for buffId, buffName in pairs(debuffNames) do
+			local buff = mon.SpellBuffs[buffId]
+			if buff.ExpireTime > Game.Time then
+				local remaining = math.ceil((buff.ExpireTime - Game.Time) / const.Minute * 2)
+				activeDebuffs = activeDebuffs .. "\n" .. buffName .. ": " .. remaining .. "s"
+			end
+		end
+		if activeDebuffs ~= "" then
+			t.EffectsHeader.Text = t.EffectsHeader.Text .. "\n" .. StrColor(255,200,0, "Debuffs:" .. activeDebuffs)
+		end
 	end
 end
 
