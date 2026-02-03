@@ -1270,7 +1270,7 @@ function events.GameInitialized2()
 					end
 				elseif data.Object.Spell==76 then
 					local paraCC = {Debuff = const.MonsterBuff.Paralyze}
-					local paraDuration = calcDebuffDuration(t.Monster, paraCC, const.Minute*1.5)
+					local paraDuration = calcDebuffDuration(t.Monster, paraCC, const.Minute*2)
 					if paraDuration > 0 then
 						t.Monster.SpellBuffs[const.MonsterBuff.Paralyze].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.Paralyze].ExpireTime, Game.Time+paraDuration)
 					end
@@ -1441,7 +1441,7 @@ function dkSkills(isDK, id)
 		-- Spell 76: Asphyxiate (no entry in DKDamageMult, but description mentions 110% and 140%)
 		local mult76= DKDamageMult[76]
 		Game.SpellsTxt[76].Name="Asphyxiate"
-		Game.SpellsTxt[76].Description="Asphyxiate the target deal damage equal to " .. (mult76[3]*100) .. "% and making him unable to act for 3 seconds"
+		Game.SpellsTxt[76].Description="Asphyxiate the target deal damage equal to " .. (mult76[3]*100) .. "% and making him unable to act for 4 seconds"
 		Game.SpellsTxt[76].Master="No additional effects"
 		Game.SpellsTxt[76].GM="Damage increased to " .. (mult76[4]*100) .. "%"
 		
