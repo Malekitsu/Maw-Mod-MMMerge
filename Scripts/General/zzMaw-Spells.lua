@@ -1410,7 +1410,7 @@ function events.PlayerCastSpell(t)
 					local duration=cc.Duration * masteryMult
 					if t.SpellId~=122 then
 						local ascension = SplitSkill(t.Player:GetSkill(const.Skills.Learning))
-						duration=duration*1.015^ascension/(resistance[i]/100)
+						duration=duration*1.015^ascension/(1+resistance[i]/100)
 					end
 					if Party.High==0 then
 						duration=duration*2
@@ -2242,8 +2242,8 @@ function ascension(customIndex)
 					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. speed
 				elseif healingSpells[i] then
 					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. speed
-				elseif CCMAP[i] then
-					Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. "\n\nControl Spell duration is reduced by monster resistances; below is the duration against " .. round(pl.LevelBase/2) .. " resistance. Control duration against bosses is halved.\n\nRecovery time: " .. speed
+				elseif CCMAP[i] and i~=122 then
+					Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. "\n\nControl Spell duration is reduced by monster resistances but increased by Ascension; Recovery time is reduced by Spell Skill. Duration shown is against " .. round(pl.LevelBase/2) .. " resistance. Control duration against bosses is halved.\n\nRecovery time: " .. speed
 				elseif buffSpell and (buffSpell[i] or utilitySpell[i]) then
 					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. oldTable[i][magicM]
 				else
