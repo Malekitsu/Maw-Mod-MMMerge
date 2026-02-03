@@ -1315,6 +1315,7 @@ function getCCDiffMult(bolster)
 end
 
 function events.Action(t)
+	--[[
 	local id=Game.CurrentPlayer
 	if id<0 or id>Party.High then return end
 	local mult=getCCDiffMult(Game.BolsterAmount)
@@ -1331,19 +1332,12 @@ function events.Action(t)
 		Game.Spells[key]["SpellPointsMaster"]=finalCost
 		Game.Spells[key]["SpellPointsGM"]=finalCost
 	end
+]]
 	--dragon fix
 	Game.Spells[122]["SpellPointsNormal"]=15
 	Game.Spells[122]["SpellPointsExpert"]=15
 	Game.Spells[122]["SpellPointsMaster"]=25
 	Game.Spells[122]["SpellPointsGM"]=30
-end
-
---Tooltips
-function events.GameInitialized2()
-	for key, value in pairs(CCMAP) do
-		local duration=value.Duration/const.Minute*2
-		Game.SpellsTxt[key].Description=Game.SpellsTxt[key].Description .. "\n\nDuration: " .. duration .. " seconds"
-	end
 end
 
 function events.PlayerCastSpell(t)
@@ -1412,9 +1406,12 @@ function events.PlayerCastSpell(t)
 				end
 				if currentExpireTime > prevExpireTime[i] then
 					-- Monster was affected, apply diminishing returns
-					local duration=cc.Duration
+					local masteryMult = ({0.5, 0.65, 0.8, 1})[math.max(1,m)]
+					local duration=cc.Duration * masteryMult
+					local ascension = SplitSkill(t.Player:GetSkill(const.Skills.Learning))
+					duration=duration*1.015^ascension/(resistance[i]/100)
 					if Party.High==0 then
-						--duration=duration*3
+						duration=duration*2
 					end
 					local finalDuration = calcDebuffDuration(mon, cc, duration)
 					if type(cc.Debuff)=="table" then
@@ -1544,6 +1541,9 @@ function calcDebuffDuration(monster, cc, duration)
 		endTime = Game.Time + finalDuration
 	})
 	
+	if mon.NameId>=220 and mon.NameId<300 then
+		return finalDuration/2
+	end
 	return finalDuration
 end
 
@@ -1935,6 +1935,37 @@ function getPersonalityManaCostReduction(pl)
 	return (0.99^reductionPercent)
 end
 
+function AscendCCSpells(pl,s,m,personalityReduction)
+	local mult=getCCDiffMult(Game.BolsterAmount)
+	local lvl=pl.LevelBase
+	
+	for key, value in pairs(CCMAP) do
+		if key~=122 then
+			for i=1,4 do
+				local baseCost = spellCost[key][masteryName[i]]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
+				local finalCost=math.min(math.ceil(baseCost * personalityReduction), 65000)
+				Game.Spells[key]["SpellPoints" .. masteryName[i]]=finalCost
+			end
+			
+			local baseDuration=value.Duration/const.Minute*2
+			local school=math.ceil(key/11)+11
+			local spellS, spellM = SplitSkill(pl.Skills[school])
+			local masteryMult = ({0.5, 0.65, 0.8, 1})[math.max(1,spellM)]
+			local ascendedDuration=baseDuration * masteryMult * 1.015^(s) / (lvl/200)
+			
+			-- Update N/E/M/GM descriptions with duration at each mastery
+			local durN = baseDuration * ({0.5, 0.65, 0.8, 1})[1] * 1.015^(s) / (lvl/200)
+			local durE = baseDuration * ({0.5, 0.65, 0.8, 1})[2] * 1.015^(s) / (lvl/200)
+			local durM = baseDuration * ({0.5, 0.65, 0.8, 1})[3] * 1.015^(s) / (lvl/200)
+			local durGM = baseDuration * ({0.5, 0.65, 0.8, 1})[4] * 1.015^(s) / (lvl/200)
+			Game.SpellsTxt[key].Normal = string.format("Duration: %.1f seconds", durN)
+			Game.SpellsTxt[key].Expert = string.format("Duration: %.1f seconds", durE)
+			Game.SpellsTxt[key].Master = string.format("Duration: %.1f seconds", durM)
+			Game.SpellsTxt[key].GM = string.format("Duration: %.1f seconds", durGM)
+		end
+	end
+end
+
 function ascension(customIndex)
 	local index=customIndex or Game.CurrentPlayer 
 	if index> Party.High then
@@ -1973,7 +2004,7 @@ function ascension(customIndex)
 		end
 		-- Apply personality mana cost reduction
 		local personalityReduction = getPersonalityManaCostReduction(pl)
-		
+
 		for v=1,#spells do 
 			num=spells[v]
 			for i=1,4 do
@@ -2209,6 +2240,8 @@ function ascension(customIndex)
 					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. speed
 				elseif healingSpells[i] then
 					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. speed
+				elseif CCMAP[i] then
+					Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. "\n\nControl Spell duration is reduced by monster resistances; below is the duration against " .. round(pl.LevelBase/2) .. " resistance. Control duration against bosses is halved.\n\nRecovery time: " .. speed
 				elseif buffSpell and (buffSpell[i] or utilitySpell[i]) then
 					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. oldTable[i][magicM]
 				else
@@ -2237,6 +2270,8 @@ function ascension(customIndex)
 				end
 			end
 		end
+
+		AscendCCSpells(pl,s,m,personalityReduction)
 	end
 end
 
