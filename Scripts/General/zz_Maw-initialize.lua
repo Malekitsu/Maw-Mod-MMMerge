@@ -627,7 +627,18 @@ end
 
 function events.KeyDown(t)
     if(t.Key==79) then --O
-      disableBow= not disableBow
-      Game.ShowStatusText("Disable Bow: " .. (disableBow and "ON" or "OFF"))
+        disableBow= not disableBow
+        Game.ShowStatusText("Disable Bow: " .. (disableBow and "ON" or "OFF"))
+        
+        local dragonAttackRanged=137
+        if disableBow then
+            dragonAttackRanged=0
+        end
+		for i=0, Game.CharacterPortraits.High do
+			local por = Game.CharacterPortraits[i]
+			if por.Race == const.Race.Dragon then
+				por.DefAttackR = dragonAttackRanged
+			end
+		end
     end
 end
