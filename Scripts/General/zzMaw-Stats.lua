@@ -225,6 +225,9 @@ function getSpellDelay(pl,spell)
 	if table.find(assassinClass, pl.Class) then
 		return GetAssassinSpellDelay(pl,spell)
 	end
+
+	if spell==122 then return 120 end
+
 	local s,m=SplitSkill(pl.Skills[math.ceil(spell/11)+11])
 	if m==0 then return 150 end
 	local haste=math.floor(pl:GetSpeed()/10)
