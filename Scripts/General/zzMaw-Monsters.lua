@@ -2195,7 +2195,7 @@ function events.BuildMonsterInformationBox(t)
 		local experienceAwarded=experience*healthRateo
 		local lvl=pl.LevelBase
 		experienceAwarded=round(math.min((lvl+1)*1000, experienceAwarded))
-		t.EffectsHeader.Text=t.EffectsHeader.Text .. "\n\n\n\nExperience: " .. experienceAwarded .. "\nCurrent Health: " .. round(mon.HP*2^(mon.Resistances[0]/1000))
+		t.EffectsHeader.Text=t.EffectsHeader.Text .. "\n\nExperience: " .. experienceAwarded .. "\n\nCurrent Health: " .. shortenNumber(round(mon.HP*2^(mon.Resistances[0]/1000)), 4)
 		
 		-- Display active debuffs
 		local debuffNames = {
@@ -2219,7 +2219,7 @@ function events.BuildMonsterInformationBox(t)
 			end
 		end
 		if activeDebuffs ~= "" then
-			t.EffectsHeader.Text = t.EffectsHeader.Text .. "\n" .. StrColor(255,200,0, "Debuffs:" .. activeDebuffs)
+			t.EffectsHeader.Text = t.EffectsHeader.Text .. "\n\n" .. StrColor(255,200,0, "Debuffs:" .. activeDebuffs)
 		end
 	end
 end
