@@ -2401,9 +2401,6 @@ function events.CalcDamageToMonster(t)
 				if chance>math.random() then
 					applyParalyze[id]=true
 					duration=const.Minute*3
-					if mon.NameId>220 and mon.NameId<300 then
-						duration=duration/2
-					end
 					if m==3 then
 						duration=duration/2
 					end
