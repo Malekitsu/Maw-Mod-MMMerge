@@ -624,3 +624,12 @@ function events.Action(t)
 		end
 	end
 end
+
+function events.KeyDown(t)
+    if(t.Key==79) then --O
+      disableBow=disableBow==false or false
+      if disableBow then
+        Game.ShowStatusText("Disable Bow: " .. (disableBow and "ON" or "OFF"))
+      end
+    end
+end
