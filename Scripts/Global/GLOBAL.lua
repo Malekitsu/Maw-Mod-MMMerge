@@ -13,6 +13,7 @@ function events.ClickNPCTopic(i) -- happens just before global evt execution
 	for i,v in Party do
 		LastStats.Exp[i] = v.Exp
 	end
+	mouseItemBeforeClick=Mouse.Item.Number
 end
 
 function events.Action(t)
@@ -35,7 +36,18 @@ function events.Action(t)
 	end
 end
 
-
+local tradeItems={643,644,645,646,647,648,649,650,651,1494,1495,1946,1497,1498,1499}
+function events.EvtGlobal(i)
+	if vars.insanityMode then
+		local mouseItemAfterClick=Mouse.Item.Number
+		if mouseItemBeforeClick~=mouseItemAfterClick then
+			if table.find(tradeItems, mouseItemAfterClick) and Game.CurrentScreen==13 then
+				local npc=GetCurrentNPC()
+				Game.NPC[npc].EventA=0
+			end
+		end
+	end
+end
 
 function events.EvtGlobal(i) -- happens after related global evt executed
 	if i ~= LastTopic then
