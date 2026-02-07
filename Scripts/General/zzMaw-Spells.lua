@@ -1815,8 +1815,8 @@ function ascendSpellDamage(skill, mastery, spell, index)
 	diceMax=spellPowers[spell].diceMax*empowerMult
 	damageAdd=spellPowers[spell].dmgAdd*empowerMult
 	
-	diceMax=diceMax * (1+0.075 * skill)*1.025^skill
-	damageAdd=damageAdd*(1+0.05*skill^2)*1.025^skill
+	diceMax=diceMax * (1+0.09 * skill)*1.025^skill
+	damageAdd=damageAdd*(1+0.04*skill^2)*1.025^skill
 		
 	diceMin, diceMax, damageAdd = round(diceMin), round(diceMax), round(damageAdd)
 	return diceMin, diceMax, damageAdd
