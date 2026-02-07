@@ -2738,9 +2738,9 @@ function events.GetSkill(t)
 		
 		local s,m=SplitSkill(pl:GetSkill(35))
 		local requirementS=SplitSkill(pl.Skills[35])
-		local s2,m2=SplitSkill(Skillz.get(pl,t.Skill))
+		local s2,m2=SplitSkill(pl.Skills[t.Skill])
 		if requirementS>=requirement and m==4 then
-			t.Result=JoinSkill(math.min(s2*2, s2+math.floor(s/10)),m2)
+			t.Result=math.min(t.Result + math.floor(s/10), JoinSkill(s2*2,m2))
 		end
 	end
 	if t.Skill==const.Skills.Learning then
