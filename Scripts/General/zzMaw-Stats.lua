@@ -1761,7 +1761,7 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 		return health
 	end
 	
-	local armorClass=statsPerLevel*lvl
+	local armorClass=statsPerLevel*lvl*1.5
 	
 	local bolster=1
 	if vars.insanityMode then
@@ -1791,8 +1791,10 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 	resReduction=resReduction*ringReduction
 	
 	local averageReduction=(totalArmorReduction+resReduction)/2
+
+	local extimatedLegendaryPower=1+0.001*lvl
 	
-	local vitality=health*averageReduction
+	local vitality=health*averageReduction*extimatedLegendaryPower
 	
 	return vitality, totalArmorReduction, resReduction, averageReduction , health
 	
@@ -1919,8 +1921,8 @@ function getPlayerEstimatedPower(lvl)
 	
 	local extimatedHitChance=0.8
 	local extimatedEnchantMultiplier=1.25 + math.min((lvl/666),0.75)
-	
-	damage=damage*extimatedEnchantMultiplier*extimatedHitChance
+	local extimatedLegendaryPower=1+0.002*lvl
+	damage=damage*extimatedEnchantMultiplier*extimatedHitChance*extimatedLegendaryPower
 	
 	return damage
 end
@@ -2006,7 +2008,7 @@ function GetDensityMultiplier(id)
 	local baseLevel=BLevel[id]
 	local newDensity=math.max(density-math.floor(baseLevel/divisor),1)
 	local mult=density/newDensity
-	return mult
+	return mult^0.5
 end
 
 --[[ test code, don't touch
