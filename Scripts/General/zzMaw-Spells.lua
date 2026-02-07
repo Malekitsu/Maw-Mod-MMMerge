@@ -1825,8 +1825,8 @@ end
 function ascendSpellHealing(skill, mastery, spell, healM)
 	base=healingSpells[spell].Base[healM]
 	scaling=healingSpells[spell].Scaling[healM]
-	scaling=scaling * (1+0.05 * skill)*1.02^skill
-	base=base*(1 + 0.03 * skill^2)*1.02^skill
+	scaling=scaling * (1+0.06 * skill)*1.02^skill
+	base=base*(1 + 0.025 * skill^2)*1.02^skill
 	scaling, base = round(scaling), round(base)
 	return scaling, base
 end
