@@ -3444,6 +3444,7 @@ function itemStats(index)
 	--end of items
 	--------------
 	--buffs
+	local enduranceStatBuff=0
 	if vars.MAWSETTINGS.buffRework=="ON" then
 		local buffList={6,0,17,4,12,1}
 		local spellList={3,14,25,36,58,69}
@@ -3463,6 +3464,9 @@ function itemStats(index)
 				tab[i+10]=tab[i+10]+buff4
 			end
 			statBuff=math.max(buff, buff3)
+			if i==4 then
+				enduranceStatBuff=buff3
+			end
 			local tabID=spellStat[spellList[i]]
 			tab[tabID]=tab[tabID]+statBuff
 		end
@@ -3500,7 +3504,11 @@ function itemStats(index)
 		tab[i]=tab[i]+luck -- -penalty
 	end	
 	--BB HP INCREASE
-	local endurance=tab[4]+pl.EnduranceBase+pl.EnduranceBonus+Party.SpellBuffs[2].Power
+	local buffBonus=math.max(Party.SpellBuffs[2].Power,pl.SpellBuffs[16].Power)
+	if enduranceStatBuff>Party.SpellBuffs[2].Power and enduranceStatBuff>pl.SpellBuffs[16].Power then
+		buffBonus=0
+	end
+	local endurance=tab[4]+pl.EnduranceBase+pl.EnduranceBonus+buffBonus
 	local endEff
 	if endurance<=21 then
 		endEff=math.floor((endurance-13)/2)
