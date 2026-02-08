@@ -3295,11 +3295,11 @@ function itemStats(index)
 			--SHAMAN
 			if table.find(shamanClass, pl.Class) then	
 				local s,m=SplitSkill(pl.Skills[const.Skills.Earth])
-                armsDmg=armsDmg+s*m
+                armsDmg=armsDmg+s*m*mult
 			end
 			if table.find(assassinClass,pl.Class) then
 				local s,m=SplitSkill(pl.Skills[const.Skills.Earth])
-                armsDmg=armsDmg+s*(2+m*2)
+                armsDmg=armsDmg+s*(2+m*2)*mult
 				
 				--needed to reduce damage when target is not isolated
 				vars.assassinDamage=vars.assassinDamage or {}
