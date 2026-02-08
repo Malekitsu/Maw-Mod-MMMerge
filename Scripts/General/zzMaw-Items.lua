@@ -515,15 +515,15 @@ function events.ItemGenerated(t)
 		if math.random() < chance then
 			vars.artifactRollPity = 0
 			local allArtifacts = {}
-			for _, v in ipairs(artWeap1h) do allArtifacts[#allArtifacts + 1] = v end
-			for _, v in ipairs(artWeap2h) do allArtifacts[#allArtifacts + 1] = v end
-			for _, v in ipairs(artArmors) do allArtifacts[#allArtifacts + 1] = v end
-			vars.artifactPity = vars.artifactPity or {}
-			for i = 1, #allArtifacts do
-				vars.artifactPity[i] = vars.artifactPity[i] or 0
+			for _, v in ipairs(mawArtifacts) do 
+				allArtifacts[#allArtifacts + 1] = v 
 			end
-			local rolledIndex = get_affix(vars.artifactPity)
-			vars.artifactPity[rolledIndex] = vars.artifactPity[rolledIndex] + 1
+			vars.artPity = vars.artPity or {}
+			for i = 1, #allArtifacts do
+				vars.artPity[i] = vars.artPity[i] or 0
+			end
+			local rolledIndex = get_affix(vars.artPity)
+			vars.artPity[rolledIndex] = vars.artPity[rolledIndex] + 1
 			t.Item.Number = allArtifacts[rolledIndex]
 			local level = round(getTotalLevel())
 			t.Item.BonusExpireTime = math.min(math.max(level,1), 1000)
@@ -5010,12 +5010,13 @@ function pity_chance(chance, failures)
 end
 
 --remove artifacts
+mawArtifacts={500,501,502,503,504,505,506,507,508,509,510,511,512,513,514,515,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,523,533,534,535,536,537,542,1302,1303,1304,1305,1306,1307,1308,1309,1310,1311,1312,1313,1314,1315,1316,1317,1318,1319,1320,1321,1322,1323,1324,1325,1326,1327,1328,1329,1330,1331,1332,1333,1334,1335,1336,1337,1338,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040,2041,2042,2043,2044,2045,2046,2047,2048,2049}
 function events.AfterLoadMap()
 	for k=0,Map.Chests.High do
 		for i=1,Map.Chests[k].Items.High do
 			local it=Map.Chests[k].Items[i]
 			if it.MaxCharges==0 then
-				if table.find(artWeap1h, it.Number) or table.find(artWeap2h, it.Number) or table.find(artArmors, it.Number) then
+				if table.find(mawArtifacts, it.Number) then
 					if it:T().Value>=20000 and it.BonusStrength==0 then
 						bossLoot = true
 						it:Randomize(6,0)
