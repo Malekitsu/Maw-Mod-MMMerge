@@ -2059,6 +2059,9 @@ function events.CalcItemValue(t)
 		end
 		t.Value=getItemValue(t.Item)
 	end
+	if t.Item.Number>=971 and t.Item.Number<=979 then
+		t.Value=Game.ItemsTxt[t.Item.BonusStrength].Value
+	end
 	--add reagents price
 	if Game.HouseScreen==2 or Game.HouseScreen==95 then
 		if reagentPrices[t.Item.Number] then
