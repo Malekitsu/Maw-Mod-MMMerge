@@ -2305,3 +2305,14 @@ subtlety - i0.5% chance to dodge an incoming attack
 poison - %HP water damage on energy attack
 assassination - adds flat damage (scaling with weapon skill) on isolated targets on skill (damage decreases depending on the number of targets in the nearby)
 ]]
+function events.BeforeLoadMap()
+	if not vars.LichFix then
+		for i=0, Party.High do
+			local pl=Party[i]
+			if pl.Class==const.Class.Lich and pl.LevelBase==1 then
+				pl.Class=const.Class.Necromancer
+			end
+		end
+		vars.LichFix=true
+	end
+end
