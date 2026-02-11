@@ -1036,30 +1036,30 @@ local function shamanSkills(isShaman, id)
 		local m7, bodyMastery=SplitSkill(pl.Skills[const.Skills.Body])
 		local txt
 		local fireDamage=m1/10
-		txt=baseSchoolsTxt[12] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nMelee attacks deal an extra " .. fireDamage .. "% of monster Hit points as fire damage"
+		txt=baseSchoolsTxt[12] .. "\n\nEvery 7 Skill level adds 1 level into ascension.\nMelee attacks deal an extra " .. fireDamage .. "% of monster Hit points as fire damage."
 		Skillz.setDesc(12,1,txt)
 		local airReduction=round((1-1/(m2/100+1))*1000)/10
-		txt=baseSchoolsTxt[13] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nReduce all damage taken by " .. airReduction .. "%\n"
+		txt=baseSchoolsTxt[13] .. "\n\nEvery 7 Skill level adds 1 level into ascension.\nReduce all damage taken by " .. airReduction .. "%\n"
 		Skillz.setDesc(13,1,txt)
 		local lvl=getPartyLevel(4)
 		
 		local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
 		local waterReduction=round(getMonsterDamage(false,(lvl+1))*(m3/lvl^0.65)/avgRed*0.99^(lvl^0.65)/2) --on average 1/2 of a B monster
 		 --waterReduction=round(getMonsterDamage(false,(lvl+1)^0.325*m3)^0.7)
-		txt=baseSchoolsTxt[14] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)\n"
+		txt=baseSchoolsTxt[14] .. "\n\nEvery 7 Skill level adds 1 level into ascension.\nReduce all damage taken by " .. waterReduction .. "(calculated after resistances)\n"
 		Skillz.setDesc(14,1,txt)
 		local armsmasterDamage=earthMastery*m4
-		txt=baseSchoolsTxt[15] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nIncreases melee damage 1-2-3-4 (at N-E-M-GM) per Earth Magic Level\n"
+		txt=baseSchoolsTxt[15] .. "\n\nEvery 7 Skill level adds 1 level into ascension.\nIncreases melee damage 1-2-3-4 (at N-E-M-GM) per Earth Magic Level\n"
 		Skillz.setDesc(15,1,txt)
 		local spelldh=m5
-		txt=baseSchoolsTxt[16] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nIncreases melee damage by " .. spelldh .. "%\n"
+		txt=baseSchoolsTxt[16] .. "\n\nEvery 7 Skill level adds 1 level into ascension.\nIncreases melee damage by " .. spelldh .. "%\n"
 		Skillz.setDesc(16,1,txt)
 		SPLEECH=round(m6^1.25)
-		txt=baseSchoolsTxt[17] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nMelee attacks restore " .. SPLEECH .. " Spell Points\n"
+		txt=baseSchoolsTxt[17] .. "\n\nEvery 7 Skill level adds 1 level into ascension.\nMelee attacks restore " .. SPLEECH .. " Spell Points\n"
 		Skillz.setDesc(17,1,txt)
 		local FHP=pl:GetFullHP()
 		local leech=math.max(round(FHP^0.5* m7^1.5/70 * (1+bodyMastery/2)),m7)
-		txt=baseSchoolsTxt[18] .. "\n\nEach Skill point increases total spell damage by 0.5% and healing by 0.25%\nMelee attacks restore " .. leech .. " Hit Points\n"
+		txt=baseSchoolsTxt[18] .. "\n\nEvery 7 Skill level adds 1 level into ascension.\nMelee attacks restore " .. leech .. " Hit Points\n"
 		Skillz.setDesc(18,1,txt)
 	else
 		for i=12,18 do
