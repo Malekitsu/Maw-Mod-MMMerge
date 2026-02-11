@@ -775,7 +775,19 @@ function events.CalcDamageToMonster(t)
 		painReflectionHit=true
 	end
 end
-
+--mistform
+function events.PlayerAttacked(t)
+	if restoringMistformTime then return end
+	restoringMistformTime=true
+	local pl=t.Player
+	lastMistformTime=pl.SpellBuffs[26].ExpireTime
+	pl.SpellBuffs[26].ExpireTime=0
+	function events.Tick()
+		events.Remove("Tick",1)
+		pl.SpellBuffs[26].ExpireTime=lastMistformTime
+		restoringMistformTime=false
+	end
+end
 
 --reduce damage by %
 function events.CalcDamageToPlayer(t)
@@ -920,7 +932,7 @@ function events.CalcDamageToPlayer(t)
 	
 	if t.Damage==0 and t.Result==0 then return end
 
-	if t.DamageKind==4 and pl.SpellBuffs[26].ExpireTime>Game.Time then --mistform 
+	if t.DamageKind==4 and restoringMistformTime then --mistform 
 		t.Damage=t.Damage*0.25
 	end
 
