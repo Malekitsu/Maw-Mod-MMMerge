@@ -2005,7 +2005,6 @@ function ascension(customIndex)
 			vars.eleStacks[id]=vars.eleStacks[id] or 0
 		end
 		if table.find(shamanClass, pl.Class) then
-			elementalist=true
 			s=0
 			m=4
 			for i=12,18 do
