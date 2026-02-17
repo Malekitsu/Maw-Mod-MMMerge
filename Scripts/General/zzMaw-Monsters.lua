@@ -4438,6 +4438,9 @@ function events.MonstersProcessed()
 						if not calls or calls<0 then
 							events.Remove("Tick",1)	
 						end
+						if mon:GetIndex()>Map.Monsters.High then
+							return
+						end
 						local midX=(mon.X+Party.X)/2
 						local midY=(mon.Y+Party.Y)/2
 						local midZ=(mon.Z+Party.Z)/2
