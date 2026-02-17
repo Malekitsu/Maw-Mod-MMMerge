@@ -1942,28 +1942,33 @@ function AscendCCSpells(pl,s,m,personalityReduction)
 	local lvl=pl.LevelBase
 	
 	for key, value in pairs(CCMAP) do
-		if key~=122 then
-			for i=1,4 do
-				local baseCost = spellCost[key][masteryName[i]]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
-				local finalCost=math.min(math.ceil(baseCost * personalityReduction), 65000)
-				Game.Spells[key]["SpellPoints" .. masteryName[i]]=finalCost
-			end
-			
-			local baseDuration=value.Duration/const.Minute*2
-			local school=math.ceil(key/11)+11
-			local spellS, spellM = SplitSkill(pl.Skills[school])
-			local masteryMult = ({0.5, 0.65, 0.8, 1})[math.max(1,spellM)]
-			local ascendedDuration=baseDuration * masteryMult * 1.015^(s) / (lvl/200)
-			
-			-- Update N/E/M/GM descriptions with duration at each mastery
-			local durN = baseDuration * ({0.5, 0.65, 0.8, 1})[1] * 1.015^(s) / (lvl/200)
-			local durE = baseDuration * ({0.5, 0.65, 0.8, 1})[2] * 1.015^(s) / (lvl/200)
-			local durM = baseDuration * ({0.5, 0.65, 0.8, 1})[3] * 1.015^(s) / (lvl/200)
-			local durGM = baseDuration * ({0.5, 0.65, 0.8, 1})[4] * 1.015^(s) / (lvl/200)
-			Game.SpellsTxt[key].Normal = string.format("Duration: %.1f seconds", durN)
-			Game.SpellsTxt[key].Expert = string.format("Duration: %.1f seconds", durE)
-			Game.SpellsTxt[key].Master = string.format("Duration: %.1f seconds", durM)
-			Game.SpellsTxt[key].GM = string.format("Duration: %.1f seconds", durGM)
+		for i=1,4 do
+			local baseCost = spellCost[key][masteryName[i]]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
+			local finalCost=math.min(math.ceil(baseCost * personalityReduction), 65000)
+			Game.Spells[key]["SpellPoints" .. masteryName[i]]=finalCost
+		end
+		
+		local baseDuration=value.Duration/const.Minute*2
+		local school=math.ceil(key/11)+11
+		local spellS, spellM = SplitSkill(pl.Skills[school])
+		local masteryMult = ({0.5, 0.65, 0.8, 1})[math.max(1,spellM)]
+		local ascendedDuration=baseDuration * masteryMult * 1.015^(s) / (lvl/200)
+		
+		-- Update N/E/M/GM descriptions with duration at each mastery
+		local durN = baseDuration * ({0.5, 0.65, 0.8, 1})[1] * 1.015^(s) / (lvl/200)
+		local durE = baseDuration * ({0.5, 0.65, 0.8, 1})[2] * 1.015^(s) / (lvl/200)
+		local durM = baseDuration * ({0.5, 0.65, 0.8, 1})[3] * 1.015^(s) / (lvl/200)
+		local durGM = baseDuration * ({0.5, 0.65, 0.8, 1})[4] * 1.015^(s) / (lvl/200)
+		Game.SpellsTxt[key].Normal = string.format("Duration: %.1f seconds", durN)
+		Game.SpellsTxt[key].Expert = string.format("Duration: %.1f seconds", durE)
+		Game.SpellsTxt[key].Master = string.format("Duration: %.1f seconds", durM)
+		Game.SpellsTxt[key].GM = string.format("Duration: %.1f seconds", durGM)
+	
+		if key==122 then
+			Game.Spells[key]["SpellPointsNormal"]=15
+			Game.Spells[key]["SpellPointsExpert"]=15
+			Game.Spells[key]["SpellPointsMaster"]=25
+			Game.Spells[key]["SpellPointsGM"]=30
 		end
 	end
 end
