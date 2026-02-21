@@ -150,10 +150,11 @@ function events.CalcDamageToMonster(t)
   if not pl then return end
 
   local idx = data.Player:GetIndex()
+  --[[
   if idx == SERVICE_CASTER or (not evt.IsPlayerInParty or not evt.IsPlayerInParty(idx)) then
     return
   end
-
+]]
   if not damageMultiplier or not damageMultiplier[idx] then
     return
   end
