@@ -959,7 +959,7 @@ end)
 
 
 --removes fly when attacking, except in certain maps
-flyAllowedMaps={"elema.odm","elemf.odm","elemw.odm","out12.odm","outa1.odm","outa2.odm","outa3.odm","outb2.odm","outb3.odm","out05.odm"}
+flyAllowedMaps={"elema.odm","elemf.odm","elemw.odm","out12.odm","outa1.odm","outa2.odm","outa3.odm","outb2.odm","outb3.odm","out05.odm", "out07.odm"}
 function events.CalcDamageToMonster(t)
 	if Game.BolsterAmount>100 or vars.AusterityMode then
 		if table.find(flyAllowedMaps,Map.Name) then 
