@@ -1,0 +1,95 @@
+name: Update Class Skills Matrix
+
+on:
+  push:
+    paths:
+      - 'Data/Tables/Class Skillz.txt'
+      - '.github/workflows/update-matrix.yml'
+      - '.github/scripts/generate_matrix.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-matrix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Generate Class Skills Matrix
+        run: |
+          python .github/scripts/generate_matrix.py
+
+      - name: Move HTML file to MAW_Guidebook
+        run: |
+          # Create if not exists
+          mkdir -p MAW_Guidebook
+          # Move the HTML file to the MAW_Guidebook directory
+          if [ -f "Class-Skills-Matrix.html" ]; then
+            mv Class-Skills-Matrix.html MAW_Guidebook/
+            echo "✅ Moved HTML file to MAW_Guidebook/"
+          else
+            echo "⚠️ HTML file not found, skipping move"
+          fi
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Add the HTML file in MAW_Guidebook
+          git add MAW_Guidebook/Class-Skills-Matrix.html
+          
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update Class Skills Matrix in MAW_Guidebook [skip ci]"
+            git push
+            echo "✅ Changes committed and pushed to repository"
+          fi
+
+      - name: Checkout Wiki
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}.wiki
+          path: wiki
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Copy generated files to Wiki
+        run: |
+          cp Class-Skills-Matrix.md wiki/
+
+      - name: Update Home page
+        run: |
+          cd wiki
+          echo "# Welcome to the Class Skills Wiki" > Home.md
+          echo "" >> Home.md
+          echo "## 📚 Available Resources" >> Home.md
+          echo "" >> Home.md
+          echo "- 📄 [Markdown Table](Class-Skills-Matrix) - Clean, simple view" >> Home.md
+          echo "- 🎨 [Interactive HTML Table](https://github.com/${{ github.repository }}/blob/main/MAW_Guidebook/Class-Skills-Matrix.html) - Filter, search, and export" >> Home.md
+          echo "" >> Home.md
+          echo "---" >> Home.md
+          echo "" >> Home.md
+          echo "*Last updated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')*" >> Home.md
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git add .
+            git commit -m "Update Class Skills Matrix from main repository"
+            git push
+          fi
