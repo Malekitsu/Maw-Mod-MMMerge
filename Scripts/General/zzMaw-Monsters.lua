@@ -1602,7 +1602,7 @@ mapLevels={
 {["Low"] = 10 , ["Mid"] = 12 , ["High"] = 12},
 
 ["Shadow Guild"] = 
-{["Low"] = 12 , ["Mid"] = 20 , ["High"] = 66},
+{["Low"] = 12 , ["Mid"] = 20 , ["High"] = 30},
 
 ["Snergle's Iron Mines"] = 
 {["Low"] = 30 , ["Mid"] = 33 , ["High"] = 40},
