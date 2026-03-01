@@ -2070,6 +2070,7 @@ function events.GameInitialized2()
 		[const.Spells.PsychicShock]=1.25,
 		[const.Spells.MeteorShower]=0.3,
 		[const.Spells.DeadlySwarm]=0.85,
+		[const.Spells.SpiritLash]=0.65,
 	}
 end
 
