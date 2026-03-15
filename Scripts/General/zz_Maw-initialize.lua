@@ -626,9 +626,13 @@ function events.Action(t)
 end
 
 function events.KeyDown(t)
-    if(t.Key==79) then --O
+    if(t.Key==79) and Game.CurrentScreen==0 then --O
         disableBow= not disableBow
-        Game.ShowStatusText("Disable Bow: " .. (disableBow and "ON" or "OFF"))
+		if disableBow then
+			Game.ShowStatusText("Bow Disabled")
+		else
+			Game.ShowStatusText("Bow Enabled")
+		end
         
         local dragonAttackRanged=137
         if disableBow then
