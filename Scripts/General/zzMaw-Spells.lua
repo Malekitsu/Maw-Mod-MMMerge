@@ -194,10 +194,13 @@ function events.PlayerCastSpell(t)
 				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[1] .. " hit points"))
 			end
 		elseif t.TargetKind == 4 and not t.RemoteData then
-			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+round(totHeal),GetMaxHP(Party[t.TargetId]))
+			local maxHP = GetMaxHP(Party[t.TargetId])
+			local overheal = math.max(0, round(totHeal) - (maxHP - Party[t.TargetId].HP))
+			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+round(totHeal),maxHP)
 			if Party[t.TargetId].HP>0 then
 				Party[t.TargetId].Unconscious=0
 			end
+			processHealLegendaries(t.Player, 49, const.Skills.Spirit, round(totHeal), overheal, true)
 		end
 	end
 	
@@ -278,6 +281,8 @@ function events.PlayerCastSpell(t)
 				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[1] .. " hit points"))
 			end
 		elseif t.TargetKind == 4 and not t.RemoteData then
+			local maxHP = GetMaxHP(Party[t.TargetId])
+			local overheal = math.max(0, round(totHeal) - (maxHP - Party[t.TargetId].HP))
 			if Party[t.TargetId].Dead>0 or Party[t.TargetId].Eradicated>0 then
 				local hp=Party[t.TargetId].HP
 				function events.Tick() 
@@ -285,14 +290,14 @@ function events.PlayerCastSpell(t)
 					Party[t.TargetId].HP=math.max(hp+round(totHeal), round(totHeal))
 				end
 			else
-				Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+round(totHeal),GetMaxHP(Party[t.TargetId]))
+				Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+round(totHeal),maxHP)
 				if Party[t.TargetId].HP>0 then
 					Party[t.TargetId].Unconscious=0
 				end
 			end
+			processHealLegendaries(t.Player, 55, const.Skills.Spirit, round(totHeal), overheal, true)
 		end
 	end
-	
 	
 	--lesser heal
 	if t.SpellId == 68 then
@@ -339,10 +344,13 @@ function events.PlayerCastSpell(t)
 				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[3] .. " hit points"))
 			end
 		elseif t.TargetKind == 4 and not t.RemoteData then
+			local maxHP = GetMaxHP(Party[t.TargetId])
+			local overheal = math.max(0, round(totHeal) - (maxHP - Party[t.TargetId].HP))
 			Party[t.TargetId].HP=Party[t.TargetId].HP+round(totHeal)
 			if Party[t.TargetId].HP>0 then
 				Party[t.TargetId].Unconscious=0
 			end
+			processHealLegendaries(t.Player, 68, const.Skills.Body, round(totHeal), overheal, true)
 		end
 	end
 	
@@ -408,10 +416,14 @@ function events.PlayerCastSpell(t)
 				Game.ShowStatusText(string.format(name .. " heals " .. Party[t.TargetId].Name .. " for " .. healData[1] .. " hit points"))
 			end
 		elseif t.TargetKind == 4 and not t.RemoteData then
-			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+round(totHeal),GetMaxHP(Party[t.TargetId]))
+			local maxHP = GetMaxHP(Party[t.TargetId])
+			local actualHeal = math.min(round(totHeal), maxHP - Party[t.TargetId].HP)
+			local overheal = round(totHeal) - actualHeal
+			Party[t.TargetId].HP = Party[t.TargetId].HP + actualHeal
 			if Party[t.TargetId].HP>0 then
 				Party[t.TargetId].Unconscious=0
 			end
+			processHealLegendaries(t.Player, 74, const.Skills.Body, round(totHeal), overheal, true)
 		end
 	end
 	
@@ -462,17 +474,20 @@ if t.SpellId == 77 then
   -- === application du soin ===
   if not t.RemoteData then
     local applyHeal = tonumber(totHeal) or 0
+    local totalOverheal = 0
     if applyHeal ~= 0 then
       for i = 0, Party.High do
-        -- Optionnel: clamp au max HP si dispo
-        local newHP = (Party[i].HP or 0) + applyHeal
-        Party[i].HP = newHP
+        local maxHP = GetMaxHP(Party[i])
+        local overhealI = math.max(0, applyHeal - (maxHP - Party[i].HP))
+        totalOverheal = totalOverheal + overhealI
+        Party[i].HP = math.min(Party[i].HP + applyHeal, maxHP)
       end
     end
     local tgt = t.TargetId
     if tgt and Party[tgt] and (Party[tgt].HP or 0) > 0 then
       Party[tgt].Unconscious = 0
     end
+    processHealLegendaries(t.Player, 77, const.Skills.Body, applyHeal * (Party.High + 1), totalOverheal)
 
     if t.MultiplayerData then
       t.MultiplayerData[1] = round(applyHeal)       -- bonus heal appliqué
@@ -1102,6 +1117,40 @@ end
 
 
 masteryName={"Normal", "Expert", "Master", "GM",[0]="Normal"}
+
+function processHealLegendaries(pl, spellId, skillType, totHeal, overheal, tickDelay)
+	if totHeal <= 0 or overheal <= 0 then return end
+	local id = pl:GetIndex()
+	if not (vars.legendaries and vars.legendaries[id]) then return end
+	
+	local hasL34 = table.find(vars.legendaries[id], 34)
+	local hasL35 = table.find(vars.legendaries[id], 35)
+	if not hasL34 and not hasL35 then return end
+	
+	local s, m = SplitSkill(pl:GetSkill(skillType))
+	local cost = Game.Spells[spellId]["SpellPoints" .. masteryName[m]]
+	local overhealPercent = overheal / totHeal
+	
+	-- [34] Overhealing refunds mana
+	if hasL34 then
+		local manaRefund = math.floor(cost * overhealPercent)
+		pl.SP = pl.SP + manaRefund
+	end
+	
+	-- [35] Overhealing reduces recovery time equal to half overhealing amount
+	if hasL35 then
+		local delay = getSpellDelay(pl, spellId)
+		delay = math.floor(delay * (1 - (overhealPercent / 2)))
+		if tickDelay then
+			function events.Tick()
+				events.Remove("Tick", 1)
+				pl.RecoveryDelay = delay
+			end
+			return
+		end
+		pl:SetRecoveryDelay(delay)
+	end
+end
 
 function processAutoTargetHeal(spellId, pl, skillType, soundId, removeConditionFunc)
 	local sp=healingSpells[spellId]
