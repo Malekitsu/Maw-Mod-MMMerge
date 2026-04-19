@@ -536,38 +536,67 @@ function events.ItemGenerated(t)
 		end
 	end	
 
-	--spawn crafting materials in misc shops, substituting recipes
-	if (Game.HouseScreen==2 or Game.HouseScreen==95) and not vars.AusterityMode then
-		local id=Game:GetCurrentHouse()
-		if (t.Item:T().EquipStat>=12 and math.random()<0.1 or t.Item:T().EquipStat==19) and id<=110 then 
-			t.Item.Bonus=0
-			t.Item.BonusStrength=0
-			t.Item.Bonus2=0
-			t.Item.Charges=0
-			t.Item.MaxCharges=0
-			local chances={7,7,20,2,5,7,3}
-			local highestChance=1000
-			for i=1,#chances do
-				local roll=math.random(1,1000)/math.min(((Party.Gold+1)/1000000),20)
-				if chances[i]>=roll and chances[i]<highestChance then
-					t.Item.Number=1060+i
-					highestChance=chances[i]
+	-- spawn crafting materials in misc shops, substituting recipes
+	if (Game.HouseScreen == 2 or Game.HouseScreen == 95) and not vars.AusterityMode then
+		local id = Game:GetCurrentHouse()
+		local stat = t.Item:T().EquipStat
+
+		if (stat >= 12 and math.random() < 0.3 or stat == 19) and id <= 110 then
+			-- reset item
+			t.Item.Bonus = 0
+			t.Item.BonusStrength = 0
+			t.Item.Bonus2 = 0
+			t.Item.Charges = 0
+			t.Item.MaxCharges = 0
+
+			local lootTable = {
+				{id = 1061, weight = 7},
+				{id = 1062, weight = 7},
+				{id = 1063, weight = 15},
+				{id = 1064, weight = 2},
+				{id = 1065, weight = 5},
+				{id = 1066, weight = 7},
+				{id = 1067, weight = 3},
+			}
+
+			local gold = Party.Gold
+			local successChance = math.min((gold / 20000000)^0.7, 1)
+			if math.random() < successChance then
+				-- SUCCESS: roll from loot table
+
+				local totalWeight = 0
+				for i = 1, #lootTable do
+					totalWeight = totalWeight + lootTable[i].weight
+				end
+
+				local roll = math.random() * totalWeight
+				local cumulative = 0
+
+				for i = 1, #lootTable do
+					cumulative = cumulative + lootTable[i].weight
+					if roll <= cumulative then
+						t.Item.Number = lootTable[i].id
+						return
+					end
 				end
 			end
-			if highestChance<1000 then
-				return
+
+			-- fallback: reagent
+			local partyLevel = getPartyLevel(4)
+			local reagentLevel = math.floor(partyLevel / 25)
+
+			local r = math.random()
+			if r < 0.05 then
+				reagentLevel = reagentLevel + 2
+			elseif r < 0.30 then
+				reagentLevel = reagentLevel + 1
 			end
-			local partyLevel=getPartyLevel(4)
-			local reagentLevel=math.floor(partyLevel/25)
-			if math.random()<0.05 then
-				reagentLevel=reagentLevel+2
-			elseif math.random()<0.25 then
-				reagentLevel=reagentLevel+1
-			end
-			t.Item.Number=1041+math.min(reagentLevel,19)
+
+			t.Item.Number = 1041 + math.min(reagentLevel, 19)
 			return
 		end
 	end
+	
 	if IsEnchantableItem(t.Item) or reagentList[t.Item.Number] then
 		t.Handled=true
 		local it=t.Item
