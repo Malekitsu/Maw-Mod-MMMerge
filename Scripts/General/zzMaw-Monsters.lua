@@ -1484,7 +1484,7 @@ mapLevels={
 {["Low"] = 42 , ["Mid"] = 48 , ["High"] = 60},
 
 ["The Breeding Zone"] = 
-{["Low"] = 44 , ["Mid"] = 52 , ["High"] = 70},
+{["Low"] = 44 , ["Mid"] = 52 , ["High"] = 64},
 
 ["Castle Lambent"] = 
 {["Low"] = 55 , ["Mid"] = 55 , ["High"] = 75},
