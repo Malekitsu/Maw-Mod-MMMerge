@@ -3149,6 +3149,7 @@ end
 
 --store older Tooltips, need to be after any tooltip change
 function events.GameInitialized2()
+	adjustSpellTooltips()
 	oldSpellTooltips={}
 	for i=1,132 do
 		oldSpellTooltips[i]=Game.SpellsTxt[i].Description
