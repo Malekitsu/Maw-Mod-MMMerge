@@ -1891,3 +1891,12 @@ Scripts/Structs/nuovo 4.txt
 Scripts/Structs/RemoveHouseRulesLimits.lua
 Scripts/Structs/RemoveItemsLimits.lua
 Scripts/Structs/zProjectileFix.lua
+ExeMods/MMExtension.dll
+ExeMods/MMExtension/FASM License.TXT
+ExeMods/MMExtension/FASM.DLL
+ExeMods/MMExtension/lua51.dll
+ExeMods/MMExtension/MMEditorDlg.dll
+ExeMods/MMExtension/MMExtCore.dll
+ExeMods/MMExtension/MMExtDialogs.dll
+ExeMods/MMPathfinder.dll
+ExeMods/soloud_x86.dll
