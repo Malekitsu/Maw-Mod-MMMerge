@@ -1194,3 +1194,414 @@ unins000.dat
 unins000.exe
 unins000.ini
 unins000.msg
+Data/00 add.icons.lod
+Data/00 patch.bitmaps.lod
+Data/00 patch.icons.lod
+Data/01 water.bitmaps.lwd
+Data/03 LocalizeTables.txt
+Data/Additional UI/6UI.EnglishD.lod
+Data/Additional UI/6UI.icons.lod
+Data/Additional UI/6UI.icons.UI.lod
+Data/Additional UI/7UI.icons.lod
+Data/Additional UI/7UI.icons.UI.lod
+Data/Additional UI/alchemy.icons.lod
+Data/Additional UI/alchemy.sprites.lod
+Data/bitmaps.lod
+Data/BlockMaps/7out01.bin
+Data/BlockMaps/7out02.bin
+Data/BlockMaps/7out03.bin
+Data/BlockMaps/7out04.bin
+Data/BlockMaps/7out05.bin
+Data/BlockMaps/7out06.bin
+Data/BlockMaps/7out13.bin
+Data/BlockMaps/7out15.bin
+Data/BlockMaps/bralvar.bin
+Data/BlockMaps/breach.bin
+Data/BlockMaps/elema.bin
+Data/BlockMaps/elemf.bin
+Data/BlockMaps/elemw.bin
+Data/BlockMaps/out01.bin
+Data/BlockMaps/out02.bin
+Data/BlockMaps/out03.bin
+Data/BlockMaps/out04.bin
+Data/BlockMaps/out05.bin
+Data/BlockMaps/out06.bin
+Data/BlockMaps/out07.bin
+Data/BlockMaps/out08.bin
+Data/BlockMaps/out09.bin
+Data/BlockMaps/out10.bin
+Data/BlockMaps/out11.bin
+Data/BlockMaps/out12.bin
+Data/BlockMaps/out13.bin
+Data/BlockMaps/out14.bin
+Data/BlockMaps/out15.bin
+Data/BlockMaps/outa1.bin
+Data/BlockMaps/outa2.bin
+Data/BlockMaps/outa3.bin
+Data/BlockMaps/outb1.bin
+Data/BlockMaps/outb2.bin
+Data/BlockMaps/outb3.bin
+Data/BlockMaps/outc1.bin
+Data/BlockMaps/outc2.bin
+Data/BlockMaps/outc3.bin
+Data/BlockMaps/outd1.bin
+Data/BlockMaps/outd2.bin
+Data/BlockMaps/outd3.bin
+Data/BlockMaps/oute1.bin
+Data/BlockMaps/oute2.bin
+Data/BlockMaps/oute3.bin
+Data/BlockMaps/pbp.bin
+Data/breach.games.lod
+Data/breach.sprites.lod
+Data/d3dbitmap.hwl
+Data/d3dsprite.hwl
+Data/dwarves.icons.lod
+Data/editor.bitmaps.lod
+Data/editor.icons.lod
+Data/editor.sprites.lod
+Data/EnglishD.lod
+Data/EnglishT.lod
+Data/games.lod
+Data/Games/7d33.blv
+Data/Games/7d33.dlv
+Data/Games/7out02.ddm
+Data/Games/7out02.odm
+Data/Games/d04.blv
+Data/Games/d04.dlv
+Data/Games/d08.blv
+Data/Games/d08.dlv
+Data/Games/d12.blv
+Data/Games/d12.dlv
+Data/Games/d18.blv
+Data/Games/d18.dlv
+Data/Games/d42.blv
+Data/Games/d42.dlv
+Data/Games/elemf.ddm
+Data/Games/elemf.odm
+Data/Games/mdt09.blv
+Data/Games/mdt09.dlv
+Data/Games/out02.ddm
+Data/Games/out02.odm
+Data/Games/out05.ddm
+Data/Games/out05.odm
+Data/Games/oute3.ddm
+Data/Games/oute3.odm
+Data/icons.lod
+Data/icons.UI.lod
+Data/mapstats.txt
+Data/Might_and_Magic_MAW_Mod_Class_Skillz.pdf
+Data/mm6.bitmaps.lod
+Data/mm6.D.lod
+Data/mm6.EnglishT.lod
+Data/mm6.games.lod
+Data/mm6.icons.lod
+Data/mm6.sprites.lod
+Data/mm6.T.lod
+Data/mm7.bitmaps.lod
+Data/mm7.D.lod
+Data/mm7.EnglishT.lod
+Data/mm7.games.lod
+Data/mm7.icons.lod
+Data/mm7.sprites.lod
+Data/mm7.T.lod
+Data/mm8.bitmaps.lod
+Data/mm8.D.lod
+Data/mm8.games.lod
+Data/mm8.icons.lod
+Data/mmmerge.bitmaps.lod
+Data/mmmerge.D.lod
+Data/mmmerge.icons.lod
+Data/mmmerge.sprites.lod
+Data/mmmerge.sprites.lod Backup/bar1sta0.mmrawdata
+Data/mmmerge.T - Copia.lod s
+Data/mmmerge.T.lod
+Data/MouseCursorShooter.bmp
+Data/MouseCursorShooterHD.bmp
+Data/MouseLookCursor.bmp
+Data/MouseLookCursorHD.bmp
+Data/Multiplayer.icons.lod
+Data/multiplayer.UI.txt
+Data/new.lod
+Data/numeric.icons.lod
+Data/patch.EnglishD.lod
+Data/patch.icons.lod
+Data/patch.icons.lod Backup/2hmace2.bmp
+Data/patch.icons.UI.lod
+Data/patch.sprites - Copia.lod Backup/leafs01.mmrawdata
+Data/patch.sprites - Copia.lod Backup/leafs02.mmrawdata
+Data/patch.sprites - Copia.lod Backup/leafs03.mmrawdata
+Data/patch.sprites - Copia.lod Backup/leafs04.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_25.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_26.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_27.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_28.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_29.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_30.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_31.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_32.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_33.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_34.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_35.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_36.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_37.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_38.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_39.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_40.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_41.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_42.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_43.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_44.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_45.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_46.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_47.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_48.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_49.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Rn1_50.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_050.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_051.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_052.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_053.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_054.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_055.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_056.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_057.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_058.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_059.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_060.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_061.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_062.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_063.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_064.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_065.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_066.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_067.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_068.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_069.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_070.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_071.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_072.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_073.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_074.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_075.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_076.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_077.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_078.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_079.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_080.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_081.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_082.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_083.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_084.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_085.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_086.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_087.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_088.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_089.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_090.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_091.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_092.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_093.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_094.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_095.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_096.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_097.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_098.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_099.mmrawdata
+Data/patch.sprites - Copia.lod Backup/Sn1_100.mmrawdata
+Data/patch.sprites.lod
+Data/patch.UI.txt
+Data/select.icons.lod
+Data/sprites.lod
+Data/sprites.lod Backup/ARROWA0.mmrawdata
+Data/sprites.lod Backup/ARROWA1.mmrawdata
+Data/sprites.lod Backup/ARROWA2.mmrawdata
+Data/sprites.lod Backup/ARROWA3.mmrawdata
+Data/sprites.lod Backup/ARROWA4.mmrawdata
+Data/sprites.lod Backup/ARROWA5.mmrawdata
+Data/sprites.lod Backup/sp41b10.mmrawdata
+Data/sprites.lod Backup/sp41b20.mmrawdata
+Data/sprites.lod Backup/sp41b30.mmrawdata
+Data/sprites.lod Backup/sp41b40.mmrawdata
+Data/sprites.lod Backup/sp41b50.mmrawdata
+Data/sprites.lod Backup/sp41b60.mmrawdata
+Data/sprites.lod Backup/sp41b70.mmrawdata
+Data/sprites.lod Backup/sp41b80.mmrawdata
+Data/SwordSwings.sprites.lod
+Data/Tables/Additional UI.txt
+Data/Tables/Bolster - formulas.txt
+Data/Tables/Bolster - maps.txt
+Data/Tables/Bolster - monsters.txt
+Data/Tables/Character doll types.txt
+Data/Tables/Character selection.txt
+Data/Tables/Character voices.txt
+Data/Tables/Chest.txt
+Data/Tables/Class Skills - Copia.txt
+Data/Tables/Class Skills KS.txt
+Data/Tables/Complex item pictures offsets.txt
+Data/Tables/Continent settings.txt
+Data/Tables/DecList.txt
+Data/Tables/House exits.txt
+Data/Tables/House Movies.txt
+Data/Tables/HW water textures.txt
+Data/Tables/IFT.txt
+Data/Tables/MonList.txt
+Data/Tables/MonPortraits.txt
+Data/Tables/Monster Kinds.txt
+Data/Tables/News topics - area.txt
+Data/Tables/News topics - continent.txt
+Data/Tables/News topics - profession.txt
+Data/Tables/NPC BTB.txt
+Data/Tables/NPC names.txt
+Data/Tables/NPC professions.txt
+Data/Tables/Outdoor travels.txt
+Data/Tables/Overlay.txt
+Data/Tables/PFT.txt
+Data/Tables/Race Skills BACKUP.txt
+Data/Tables/Reagent settings.txt
+Data/Tables/Sounds.txt
+Data/Tables/Teacher autonotes.txt
+Data/Tables/Teacher topics.txt
+Data/Tables/TFT.txt
+Data/Tables/Tile.txt
+Data/Tables/Tile2.txt
+Data/Tables/Tile3.txt
+Data/Tables/Town Portal.txt
+Data/Tables/TownPortalSwitch.txt
+Data/Tables/Transport Index.txt
+Data/Tables/Transport Locations.txt
+Data/UI.txt
+Data/zMaw.games.lod Backup/7out02.ddm
+Data/zMaw.games.lod Backup/7out02.odm
+Data/zMaw.games.lod Backup/d04.blv
+Data/zMaw.games.lod Backup/d04.dlv
+Data/zMaw.games.lod Backup/d05.blv
+Data/zMaw.games.lod Backup/d05.dlv
+Data/zMaw.games.lod Backup/d06.blv
+Data/zMaw.games.lod Backup/d12.blv
+Data/zMaw.games.lod Backup/d12.dlv
+Data/zMaw.games.lod Backup/d18.blv
+Data/zMaw.games.lod Backup/d18.dlv
+Data/zMaw.games.lod Backup/mdt09.blv
+Data/zMaw.games.lod Backup/mdt09.dlv
+Data/zMaw.games.lod Backup/out01.ddm
+Data/zMaw.games.lod Backup/out01.odm
+Data/zMaw.games.lod Backup/out02.ddm
+Data/zMaw.games.lod Backup/out02.odm
+Data/zMaw.games.lod Backup/out05.ddm
+Data/zMaw.games.lod Backup/out05.odm
+Data/zMaw.games.lod Backup/out08.ddm
+Data/zMaw.games.lod Backup/out08.odm
+Data/zMaw.games.lod Backup/oute3.ddm
+Data/zMaw.games.lod Backup/oute3.odm
+Data/zMaw.icons.lod Backup/2hmace2
+Data/zMaw.icons.lod Backup/2hmace2.bmp
+Data/zMaw.icons.lod Backup/6ar_up_dn.bmp
+Data/zMaw.icons.lod Backup/6plate1v2.bmp
+Data/zMaw.icons.lod Backup/6plate1v2a.bmp
+Data/zMaw.icons.lod Backup/6plate2v2.bmp
+Data/zMaw.icons.lod Backup/6plate2v2a.bmp
+Data/zMaw.icons.lod Backup/6plate3v2.bmp
+Data/zMaw.icons.lod Backup/6plate3v2a.bmp
+Data/zMaw.icons.lod Backup/6plate4v2.bmp
+Data/zMaw.icons.lod Backup/6plate4v2a.bmp
+Data/zMaw.icons.lod Backup/6plate5v2.bmp
+Data/zMaw.icons.lod Backup/6plate5v2a.bmp
+Data/zMaw.icons.lod Backup/7item078v2.bmp
+Data/zMaw.icons.lod Backup/7item078v2a.bmp
+Data/zMaw.icons.lod Backup/7item100.bmp
+Data/zMaw.icons.lod Backup/7item100v1.bmp
+Data/zMaw.icons.lod Backup/7item100v2.bmp
+Data/zMaw.icons.lod Backup/7item100v3.bmp
+Data/zMaw.icons.lod Backup/7item100v4.bmp
+Data/zMaw.icons.lod Backup/7item100v5.bmp
+Data/zMaw.icons.lod Backup/7item101v1.bmp
+Data/zMaw.icons.lod Backup/7item101v2.bmp
+Data/zMaw.icons.lod Backup/7item101v3.bmp
+Data/zMaw.icons.lod Backup/7item101v4.bmp
+Data/zMaw.icons.lod Backup/7item101v5.bmp
+Data/zMaw.icons.lod Backup/7item102v1.bmp
+Data/zMaw.icons.lod Backup/7item102v2.bmp
+Data/zMaw.icons.lod Backup/7item102v3.bmp
+Data/zMaw.icons.lod Backup/7item102v4.bmp
+Data/zMaw.icons.lod Backup/7item102v5.bmp
+Data/zMaw.icons.lod Backup/7item103v1.bmp
+Data/zMaw.icons.lod Backup/7item103v2.bmp
+Data/zMaw.icons.lod Backup/7item103v3.bmp
+Data/zMaw.icons.lod Backup/7item103v4.bmp
+Data/zMaw.icons.lod Backup/7item103v5.bmp
+Data/zMaw.icons.lod Backup/7item104v1.bmp
+Data/zMaw.icons.lod Backup/7item104v2.bmp
+Data/zMaw.icons.lod Backup/7item104v3.bmp
+Data/zMaw.icons.lod Backup/7item104v4.bmp
+Data/zMaw.icons.lod Backup/7item104v5.bmp
+Data/zMaw.icons.lod Backup/7item236v2.bmp
+Data/zMaw.icons.lod Backup/7item236v2a.bmp
+Data/zMaw.icons.lod Backup/7item324v3.bmp
+Data/zMaw.icons.lod Backup/7item324v4.bmp
+Data/zMaw.icons.lod Backup/belt1av1.bmp
+Data/zMaw.icons.lod Backup/belt1av2.bmp
+Data/zMaw.icons.lod Backup/belt1av3.bmp
+Data/zMaw.icons.lod Backup/belt1av4.bmp
+Data/zMaw.icons.lod Backup/belt1av5.bmp
+Data/zMaw.icons.lod Backup/belt2av1.bmp
+Data/zMaw.icons.lod Backup/belt2av2.bmp
+Data/zMaw.icons.lod Backup/belt2av3.bmp
+Data/zMaw.icons.lod Backup/belt2av4.bmp
+Data/zMaw.icons.lod Backup/belt2av5.bmp
+Data/zMaw.icons.lod Backup/belt3av1.bmp
+Data/zMaw.icons.lod Backup/belt3av2.bmp
+Data/zMaw.icons.lod Backup/belt3av3.bmp
+Data/zMaw.icons.lod Backup/belt3av4.bmp
+Data/zMaw.icons.lod Backup/belt3av5.bmp
+Data/zMaw.icons.lod Backup/belt4av1.bmp
+Data/zMaw.icons.lod Backup/belt4av2.bmp
+Data/zMaw.icons.lod Backup/belt4av3.bmp
+Data/zMaw.icons.lod Backup/belt4av4.bmp
+Data/zMaw.icons.lod Backup/belt4av5.bmp
+Data/zMaw.icons.lod Backup/belt5av1.bmp
+Data/zMaw.icons.lod Backup/belt5av2.bmp
+Data/zMaw.icons.lod Backup/belt5av3.bmp
+Data/zMaw.icons.lod Backup/belt5av4.bmp
+Data/zMaw.icons.lod Backup/belt5av5.bmp
+Data/zMaw.icons.lod Backup/dzfembod.bmp
+Data/zMaw.icons.lod Backup/dzfemLHd.bmp
+Data/zMaw.icons.lod Backup/dzfemLHo.bmp
+Data/zMaw.icons.lod Backup/dzfemLHu.bmp
+Data/zMaw.icons.lod Backup/dzfemrhb.bmp
+Data/zMaw.icons.lod Backup/dzfemRHd.bmp
+Data/zMaw.icons.lod Backup/dzfemRHu.bmp
+Data/zMaw.icons.lod Backup/dzmalbod.bmp
+Data/zMaw.icons.lod Backup/dzmallhd.bmp
+Data/zMaw.icons.lod Backup/dzmallho.bmp
+Data/zMaw.icons.lod Backup/dzmallhu.bmp
+Data/zMaw.icons.lod Backup/dzmalrhb.bmp
+Data/zMaw.icons.lod Backup/dzmalrhd.bmp
+Data/zMaw.icons.lod Backup/dzmalrhu.bmp
+Data/zMaw.icons.lod Backup/item117v3.bmp
+Data/zMaw.icons.lod Backup/item117v4.bmp
+Data/zMaw.icons.lod Backup/item118v3.bmp
+Data/zMaw.icons.lod Backup/item118v4.bmp
+Data/zMaw.icons.lod Backup/item119v3.bmp
+Data/zMaw.icons.lod Backup/item119v4.bmp
+Data/zMaw.icons.lod Backup/item120v3.bmp
+Data/zMaw.icons.lod Backup/item120v4.bmp
+Data/zMaw.icons.lod Backup/item121v3.bmp
+Data/zMaw.icons.lod Backup/item121v4.bmp
+Data/zMaw.icons.lod Backup/item259v3.bmp
+Data/zMaw.icons.lod Backup/item259v4.bmp
+Data/zMaw.icons.lod Backup/LMinbod.bmp
+Data/zMaw.icons.lod Backup/LMinlhd.bmp
+Data/zMaw.icons.lod Backup/LMinlho.bmp
+Data/zMaw.icons.lod Backup/LMinlhu.bmp
+Data/zMaw.icons.lod Backup/tab2a.bmp
+Data/zMaw.icons.lod Backup/tab2b.bmp
+Data/zMaw.T.lod Backup/2DEvents.txt
+Data/zMaw.T.lod Backup/class.txt
+Data/zMaw.T.lod Backup/ITEMS.txt
+Data/zMaw.T.lod Backup/mapstats.txt
+Data/zMaw.T.lod Backup/MONSTERS.txt
+Data/zMaw.T.lod Backup/Placemon.txt
+Data/zMaw.T.lod Backup/POTION.TXT
+Data/zMaw.T.lod Backup/POTNOTES.TXT
+Data/zMaw.T.lod Backup/rnditems.txt
+Data/zMaw.T.lod Backup/SPCITEMS.TXT
