@@ -176,6 +176,9 @@ function getItemRecovery(it, playerLevel)
 		baseSpeed=baseRecovery[skill] * (0.75+itemLevel/250)
 		baseSpeed=round(baseSpeed/10)*10
 	end
+	if it:T().EquipStat==1 then
+		baseSpeed=round(baseSpeed*1.25/10)*10
+	end
 	return baseSpeed
 end
 
