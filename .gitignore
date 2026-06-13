@@ -1605,3 +1605,289 @@ Data/zMaw.T.lod Backup/POTION.TXT
 Data/zMaw.T.lod Backup/POTNOTES.TXT
 Data/zMaw.T.lod Backup/rnditems.txt
 Data/zMaw.T.lod Backup/SPCITEMS.TXT
+Scripts/Core/Common.lua
+Scripts/Core/ConstAndBits.lua
+Scripts/Core/Debug.lua
+Scripts/Core/dump.lua
+Scripts/Core/ErrorFunction.lua
+Scripts/Core/EventsList.lua
+Scripts/Core/evt.lua
+Scripts/Core/evtdeco.lua
+Scripts/Core/main.lua
+Scripts/Core/mobdebug.lua
+Scripts/Core/npc.lua
+Scripts/Core/offsets.lua
+Scripts/Core/RSFunctions.lua
+Scripts/Core/RSMem.lua
+Scripts/Core/RSNoGlobals.lua
+Scripts/Core/RSParseLua.lua
+Scripts/Core/RSPersist.lua
+Scripts/Core/RSPreprocessHook.lua
+Scripts/Core/ShortFunctions.lua
+Scripts/Core/socket.lua
+Scripts/Core/timers.lua
+Scripts/General/10_Continents.lua
+Scripts/General/1_TownPortalSwitch.lua
+Scripts/General/2_OutdoorTravels.lua
+Scripts/General/Additional UI.lua
+Scripts/General/Build MMExtension.lua
+Scripts/General/CouncilAppearance.lua
+Scripts/General/DataTables.lua
+Scripts/General/DebugConsoleKey.lua
+Scripts/General/Editor Lods.lua
+Scripts/General/ExtEvt.lua
+Scripts/General/ExtraQuickSpells.lua
+Scripts/General/FindHelper.lua
+Scripts/General/History.lua
+Scripts/General/LocalizeTables.lua
+Scripts/General/MenuChooseCharacter.lua
+Scripts/General/MenuChooseContinent.lua
+Scripts/General/MenuControls.lua
+Scripts/General/MonsterItems.lua
+Scripts/General/Multiplayer.lua
+Scripts/General/NPCNewsTopics.lua
+Scripts/General/NPCTeacherAutonotes.lua
+Scripts/General/PaletteMul.lua
+Scripts/General/required ASM.txt
+Scripts/General/Stealing.lua
+Scripts/General/SwitchGold.lua
+Scripts/General/SwordSwing.lua
+Scripts/General/SYNC_SYSTEM_README.md
+Scripts/General/UsableItems.lua
+Scripts/General/VisibleGauntletsRefactored.lua
+Scripts/General/Weather.lua
+Scripts/General/Z_debugConsoleDisabler.txt
+Scripts/General/ZombiePlayers.lua
+Scripts/General/zzMaw-Statistics.lua
+Scripts/General/zzzzMALEKITH.lua
+Scripts/Global/__visible_monsters_overlay.lua
+Scripts/Global/Convert Blv.lua
+Scripts/Global/Debug Editor.lua
+Scripts/Global/Editor Base.lua
+Scripts/Global/Editor BSP.lua
+Scripts/Global/Editor Console.lua
+Scripts/Global/Editor Data.lua
+Scripts/Global/Editor Export.lua
+Scripts/Global/Editor Ground.lua
+Scripts/Global/Editor GUI.lua
+Scripts/Global/Editor Import.lua
+Scripts/Global/Editor Navigate.lua
+Scripts/Global/Editor Odm Data.lua
+Scripts/Global/Editor Odm Read.lua
+Scripts/Global/Editor Outdoor Infinite View.lua
+Scripts/Global/Editor Props.lua
+Scripts/Global/Editor Read Data.lua
+Scripts/Global/ExtraPotions.lua
+Scripts/Global/GodMode.lua
+Scripts/Global/MonsterPathfinding.lua
+Scripts/Global/OutdoorAnimObjects.lua
+Scripts/Global/PromotionTopics.lua
+Scripts/Global/Quest_CrossContinents.lua
+Scripts/Global/Quest_DragonHatchling.lua
+Scripts/Global/Quest_EnrothDarkArts.lua
+Scripts/Global/Quest_EnrothGrandmasters.lua
+Scripts/Global/Reputation.lua
+Scripts/Global/StdQuestsFollowers.lua
+Scripts/Global/StdQuestsFunctions.lua
+Scripts/Global/TownPortalSwitches.lua
+Scripts/Global/zzEVENT EDITOR.lua
+Scripts/Help/About.txt
+Scripts/Help/help.lua
+Scripts/Help/HelpParse.lua
+Scripts/Help/HelpTOC.lua
+Scripts/Help/HelpWrite.lua
+Scripts/Help/lua52html.lua
+Scripts/Help/MMExtHTML.htm
+Scripts/Help/MMExtRefStart.htm
+Scripts/Help/MMExtRefTemplate.htm
+Scripts/Help/RunHelp.lua
+Scripts/Include/Include My Scripts.lua
+Scripts/Include/Keep Console Log.lua
+Scripts/Maps.rar
+Scripts/Maps/6d02.lua
+Scripts/Maps/6d03.lua
+Scripts/Maps/6d07.lua
+Scripts/Maps/6d08.lua
+Scripts/Maps/6d13.lua
+Scripts/Maps/6t3.lua
+Scripts/Maps/6t7.lua
+Scripts/Maps/6t8.lua
+Scripts/Maps/7d05.lua
+Scripts/Maps/7d08.lua
+Scripts/Maps/7d23.lua
+Scripts/Maps/7d25.lua
+Scripts/Maps/7d27.lua
+Scripts/Maps/7d30.lua
+Scripts/Maps/7d36.lua
+Scripts/Maps/7nwc.lua
+Scripts/Maps/7out03.lua
+Scripts/Maps/7out04.lua
+Scripts/Maps/7out13.lua
+Scripts/Maps/7out15.lua
+Scripts/Maps/BrAlvar.lua
+Scripts/Maps/Breach.lua
+Scripts/Maps/cd1.lua
+Scripts/Maps/cd2.lua
+Scripts/Maps/cd3.lua
+Scripts/Maps/d03.lua
+Scripts/Maps/d06.lua
+Scripts/Maps/d24.lua
+Scripts/Maps/d34.lua
+Scripts/Maps/d38.lua
+Scripts/Maps/d39.lua
+Scripts/Maps/d42.lua
+Scripts/Maps/hive.lua
+Scripts/Maps/mdt15.lua
+Scripts/Maps/oracle.lua
+Scripts/Maps/out04.lua
+Scripts/Maps/out05.lua
+Scripts/Maps/out06.lua
+Scripts/Maps/out07.lua
+Scripts/Maps/out09.lua
+Scripts/Maps/out11.lua
+Scripts/Maps/out12.lua
+Scripts/Maps/out13.lua
+Scripts/Maps/out14.lua
+Scripts/Maps/outa2.lua
+Scripts/Maps/outa3.lua
+Scripts/Maps/pbp.lua
+Scripts/Maps/sci-fi.lua
+Scripts/Maps/sewer.lua
+Scripts/Modules/Arcomage.lua
+Scripts/Modules/Build Files List.lua
+Scripts/Modules/Faces.lua
+Scripts/Modules/json.lua
+Scripts/Modules/KeepLogs.lua
+Scripts/Modules/Multiplayer/Hooks.lua
+Scripts/Modules/Multiplayer/Lobby servers.txt
+Scripts/Modules/Multiplayer/Network/BasePacket.lua
+Scripts/Modules/Multiplayer/Network/Binary.lua
+Scripts/Modules/Multiplayer/Network/Connector.lua
+Scripts/Modules/Multiplayer/Network/IncomingPacket.lua
+Scripts/Modules/Multiplayer/Network/Lobby.lua
+Scripts/Modules/Multiplayer/Network/Lobby/Connection.lua
+Scripts/Modules/Multiplayer/Network/Lobby/Handlers.lua
+Scripts/Modules/Multiplayer/Network/Lobby/HostsLists.lua
+Scripts/Modules/Multiplayer/Network/Lobby/Messages.lua
+Scripts/Modules/Multiplayer/Network/LogsSender.lua
+Scripts/Modules/Multiplayer/Network/MMCompressor.lua
+Scripts/Modules/Multiplayer/Network/OutgoingPacket.lua
+Scripts/Modules/Multiplayer/Network/Receiver.lua
+Scripts/Modules/Multiplayer/Network/Relay.lua
+Scripts/Modules/Multiplayer/Network/Sender.lua
+Scripts/Modules/Multiplayer/Network/Statistics.lua
+Scripts/Modules/Multiplayer/Network/STUN.lua
+Scripts/Modules/Multiplayer/Network/UDPPuncher.lua
+Scripts/Modules/Multiplayer/Packets.lua
+Scripts/Modules/Multiplayer/SessionId.lua
+Scripts/Modules/Multiplayer/STUN servers.txt
+Scripts/Modules/Multiplayer/Synchronization/ArcomageWins.lua
+Scripts/Modules/Multiplayer/Synchronization/BankGold.lua
+Scripts/Modules/Multiplayer/Synchronization/Chests.lua
+Scripts/Modules/Multiplayer/Synchronization/Doors.lua
+Scripts/Modules/Multiplayer/Synchronization/Evt.lua
+Scripts/Modules/Multiplayer/Synchronization/MapLoad.lua
+Scripts/Modules/Multiplayer/Synchronization/Mapvars.lua
+Scripts/Modules/Multiplayer/Synchronization/Monsters.lua
+Scripts/Modules/Multiplayer/Synchronization/Monsters/Actions.lua
+Scripts/Modules/Multiplayer/Synchronization/Monsters/Arena.lua
+Scripts/Modules/Multiplayer/Synchronization/Monsters/Bolster.lua
+Scripts/Modules/Multiplayer/Synchronization/Monsters/BountyHunt.lua
+Scripts/Modules/Multiplayer/Synchronization/Monsters/CorpsePickup.lua
+Scripts/Modules/Multiplayer/Synchronization/Monsters/DamageReceived.lua
+Scripts/Modules/Multiplayer/Synchronization/Monsters/Stats.lua
+Scripts/Modules/Multiplayer/Synchronization/Objects.lua
+Scripts/Modules/Multiplayer/Synchronization/Players.lua
+Scripts/Modules/Multiplayer/Synchronization/Players/Color.lua
+Scripts/Modules/Multiplayer/Synchronization/Players/ItemSounds.lua
+Scripts/Modules/Multiplayer/Synchronization/Players/Monster.lua
+Scripts/Modules/Multiplayer/Synchronization/Players/PlayerData.txt
+Scripts/Modules/Multiplayer/Synchronization/Players/Position.lua
+Scripts/Modules/Multiplayer/Synchronization/Players/Stats.lua
+Scripts/Modules/Multiplayer/Synchronization/Players/StepSounds.lua
+Scripts/Modules/Multiplayer/Synchronization/Quests.lua
+Scripts/Modules/Multiplayer/Synchronization/QuestsSpecial.lua
+Scripts/Modules/Multiplayer/Synchronization/RestScreen.lua
+Scripts/Modules/Multiplayer/Synchronization/Shops.lua
+Scripts/Modules/Multiplayer/Synchronization/Spells.lua
+Scripts/Modules/Multiplayer/Synchronization/Sprites.lua
+Scripts/Modules/Multiplayer/Synchronization/Time.lua
+Scripts/Modules/Multiplayer/Synchronization/TurnBased.lua
+Scripts/Modules/Multiplayer/Synchronization/Weather.lua
+Scripts/Modules/Multiplayer/Synchronization/zMawVariables.lua
+Scripts/Modules/Multiplayer/UI.lua
+Scripts/Modules/Multiplayer/UI/Chat.lua
+Scripts/Modules/Multiplayer/UI/ChooseCharacter.lua
+Scripts/Modules/Multiplayer/UI/ClientsTable.lua
+Scripts/Modules/Multiplayer/UI/FriendlyFire.lua
+Scripts/Modules/Multiplayer/UI/GoldDrop.lua
+Scripts/Modules/Multiplayer/UI/Keybinds.lua
+Scripts/Modules/Multiplayer/UI/Lobby.lua
+Scripts/Modules/Multiplayer/UI/Menu.lua
+Scripts/Modules/Multiplayer/UI/MergeSettingsMenu.lua
+Scripts/Modules/Multiplayer/UI/Network.lua
+Scripts/Modules/Multiplayer/UI/RemotePlayers.lua
+Scripts/Modules/Multiplayer/UI/Settings.lua
+Scripts/Modules/Multiplayer/UI/Spellbook.lua
+Scripts/Modules/Multiplayer/UI/UtilsUI.lua
+Scripts/Modules/Multiplayer/Utils.lua
+Scripts/Modules/MultiplayerMain.lua
+Scripts/Modules/PaperDoll.lua
+Scripts/Modules/PathfinderAsm.lua
+Scripts/Modules/PathfinderDll.lua
+Scripts/Modules/RSParse.lua
+Scripts/Modules/RSTemplates.lua
+Scripts/Modules/Snow.lua
+Scripts/Multiplayer description.htm
+Scripts/Structs/00 structs.lua
+Scripts/Structs/01 common structs.lua
+Scripts/Structs/02 Increase Facets Limit.lua
+Scripts/Structs/10_MergeSettings.lua
+Scripts/Structs/15_MergeLog.lua
+Scripts/Structs/After/00 Mem Functions.lua
+Scripts/Structs/After/Backup.lua
+Scripts/Structs/After/DataTablesSupport.lua
+Scripts/Structs/After/Dialogs.lua
+Scripts/Structs/After/Draw.lua
+Scripts/Structs/After/FrameLimiter.lua
+Scripts/Structs/After/Functions.lua
+Scripts/Structs/After/GlobalEventsNewHandler.lua
+Scripts/Structs/After/HardcodedTopicFunctions.lua
+Scripts/Structs/After/HWWater.lua
+Scripts/Structs/After/InterfaceManager.lua
+Scripts/Structs/After/InterfaceManager.lua.off
+Scripts/Structs/After/LocalizationAndQuests.lua
+Scripts/Structs/After/MM8 Blaster.lua
+Scripts/Structs/After/MoveModel.asm
+Scripts/Structs/After/Palettes.lua
+Scripts/Structs/After/Remove2DEventsLimit.lua
+Scripts/Structs/After/RemoveAutonotesLimit.lua
+Scripts/Structs/After/RemoveAwardsLimits.lua
+Scripts/Structs/After/RemoveClassLimits.lua
+Scripts/Structs/After/RemoveHostileTxtLimit.lua
+Scripts/Structs/After/RemoveHouseMoviesLimit.lua
+Scripts/Structs/After/RemoveIndoorLimits.lua
+Scripts/Structs/After/RemoveMapMonstersLimits.lua
+Scripts/Structs/After/RemoveMapStatsLimit.lua
+Scripts/Structs/After/RemoveMonPortraitsLimits.lua
+Scripts/Structs/After/RemoveMonstersAndPlacemonLimits.lua
+Scripts/Structs/After/RemoveNPCProfLimit.lua
+Scripts/Structs/After/RemoveNPCTablesLimits.lua
+Scripts/Structs/After/RemoveOutdoorLimits.lua
+Scripts/Structs/After/RemovePartyLimits.lua
+Scripts/Structs/After/RemovePlaceMonLimits.lua
+Scripts/Structs/After/RemoveQBitsAndABitsLimits.lua
+Scripts/Structs/After/RemoveQuestsLimits.lua
+Scripts/Structs/After/RemoveShopLimits.lua
+Scripts/Structs/After/RemoveSkillBonusLimits.lua
+Scripts/Structs/After/RemoveSpritesToDrawLimit.lua
+Scripts/Structs/After/RemoveTransitionLimits.lua
+Scripts/Structs/After/RemoveTravelLocationsLimits.lua
+Scripts/Structs/After/Spells.lua
+Scripts/Structs/After/Text Tables.lua
+Scripts/Structs/CharacterOutfits.lua
+Scripts/Structs/GlobalTxt.lua
+Scripts/Structs/nuovo 4.txt
+Scripts/Structs/RemoveHouseRulesLimits.lua
+Scripts/Structs/RemoveItemsLimits.lua
+Scripts/Structs/zProjectileFix.lua
