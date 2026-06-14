@@ -164,8 +164,7 @@ function events.EvtMap(evtId)
 	if evtId>=20000 then
 		previousStats=previousStats or {}
 		local event=evtId
-		function events.Tick()
-			events.Remove("Tick", 1)
+		RunNextTick(function()
 			k=0
 			found=false
 			for i=0, Party.High do
@@ -182,7 +181,7 @@ function events.EvtMap(evtId)
 				vars.usedBarrels[Map.Name]=vars.usedBarrels[Map.Name] or {}
 				table.insert(vars.usedBarrels[Map.Name], event)
 			end
-		end
+		end)
 	end
 end
 function events.AfterLoadMap()

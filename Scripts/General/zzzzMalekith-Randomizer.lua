@@ -81,8 +81,7 @@ end
 function events.Action(t)
 	if not vars.RandomizerMode then return end
 	if t.Action==404 or t.Action==14 then
-		function events.Tick()
-			events.Remove("Tick",1)
+		RunNextTick(function()
 			for idx, itemId in ipairs(vars.OriginalItemOrder) do
 				if not table.find(vars.ItemFound, itemId) and evt.Cmp{"Inventory", Value = itemId} then
 					vars.ItemFound[#vars.ItemFound + 1] = itemId
@@ -96,7 +95,7 @@ function events.Action(t)
 				vars.ItemFound[#vars.ItemFound + 1] = vars.Randomizer[pos]
 				Mouse.Item.Number = vars.Randomizer[pos]
 			end
-		end
+		end)
 	end
 end
 

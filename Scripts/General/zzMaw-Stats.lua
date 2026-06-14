@@ -783,11 +783,10 @@ function events.PlayerAttacked(t)
 	local pl=t.Player
 	lastMistformTime=pl.SpellBuffs[26].ExpireTime
 	pl.SpellBuffs[26].ExpireTime=0
-	function events.Tick()
-		events.Remove("Tick",1)
+	RunNextTick(function()
 		pl.SpellBuffs[26].ExpireTime=lastMistformTime
 		restoringMistformTime=false
-	end
+	end)
 end
 
 --reduce damage by %
@@ -1202,10 +1201,9 @@ function events.CalcDamageToMonster(t)
 				end
 				t.Monster.SpellBuffs[6].ExpireTime=Game.Time+const.Minute
 			end
-			function events.Tick()
-				events.Remove("Tick",1)
+			RunNextTick(function()
 				pl.RecoveryDelay=pl.RecoveryDelay*(math.max(1-0.3*stacks,0))
-			end
+			end)
 			vars.retaliation[id].Stacks=0
 		end
 	end

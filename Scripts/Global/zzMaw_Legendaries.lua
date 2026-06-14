@@ -140,8 +140,7 @@ function events.CalcDamageToMonster(t)
 	--[24]="killing a Monster Restores 10% of Health and Mana"
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 24) then
 		--restoreHPLeg=true
-		function events.Tick()
-			events.Remove("Tick", 1)
+		RunNextTick(function()
 			--if restoreHPLeg then
 				--restoreHPLeg=false
 				if mon.HP<=0 then
@@ -151,7 +150,7 @@ function events.CalcDamageToMonster(t)
 					pl.SP=math.min(fullSP, pl.SP+fullSP*0.1)
 				end
 			--end
-		end
+		end)
 	end
 	--end of 24
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 11) then
@@ -161,8 +160,7 @@ function events.CalcDamageToMonster(t)
 			return
 		else
 			reduceRecovery=true
-			function events.Tick()
-				events.Remove("Tick", 1)
+			RunNextTick(function()
 				if reduceRecovery then
 					reduceRecovery=false
 					if mon.HP<=0 then
@@ -171,7 +169,7 @@ function events.CalcDamageToMonster(t)
 						--changePlayer(id)
 					end
 				end
-			end
+			end)
 		end
 	end
 	if table.find(shamanClass, pl.Class)  then
@@ -189,15 +187,14 @@ function events.CalcDamageToMonster(t)
 end
 
 function changePlayer(id)
-	function events.Tick()
-		events.Remove("Tick", 1)
+	RunNextTick(function()
 		for i=0, Party.High do
 			if Party[i]:GetIndex()==id then
 				Game.CurrentPlayer=i
 				return
 			end
 		end
-	end
+	end)
 end
 
 --[13]="Immunity to all status effects from monsters",
@@ -299,8 +296,7 @@ function events.CalcDamageToPlayer(t)
 	end
 	
 	if Game.BolsterAmount>=300 then
-		function events.Tick()
-			events.Remove("Tick",1)
+		RunNextTick(function()
 			local fullHP=pl:GetFullHP()
 			local id=pl:GetIndex()
 			if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 30) then
@@ -325,7 +321,7 @@ function events.CalcDamageToPlayer(t)
 					end
 				end
 			end
-		end
+		end)
 	end
 end
 

@@ -24,14 +24,13 @@ function events.Action(t)
 			local ex=pl.Experience
 			pl.LevelBase=1
 			pl.Experience=0
-			function events.Tick()
-				events.Remove("Tick",1)
+			RunNextTick(function()
 				pl.LevelBase=lvl
 				pl.Experience=ex
 				itemStats(Party[0])
 				mawRefresh("all")
 				mawRefresh("all")
-			end
+			end)
 		end
 	end
 end

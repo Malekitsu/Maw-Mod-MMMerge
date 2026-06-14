@@ -2264,10 +2264,9 @@ function events.CanSaveGame(t)
 	elseif t.Result==true then
 		Party.Food=Party.Food-requiredFood
 		foodTaking=true
-		function events.Tick()
-			events.Remove("Tick",1)
+		RunNextTick(function()
 			foodTaking=false
-		end
+		end)
 	end
 end
 
@@ -3384,12 +3383,11 @@ function events.GameInitialized2() --to make the after all the other code
 					mapvars.regenerating=mapvars.regenerating or {}
 					mapvars.regenerating[id] = mapvars.regenerating[id] or 0
 					mapvars.regenerating[id] = mapvars.regenerating[id] + 1
-					function events.Tick()
-						events.Remove("Tick", 1)
+					RunNextTick(function()
 						if t.Monster.HP<=0 then
 							mapvars.regenerating[id]=-1
 						end
-					end
+					end)
 				end
 			end
 		end
@@ -4199,8 +4197,7 @@ local removeItemList={217, 632,633,640,654}
 function events.MonsterKilled(mon)
 	--fix to items dropping too often
 	BeginGrabObjects()
-	function events.Tick()
-		events.Remove("Tick",1)
+	RunNextTick(function()
 		local generatedItemTable={}
 		generatedItemTable[1], generatedItemTable[2], generatedItemTable[3], generatedItemTable[4]=GrabObjects()
 		for i=1,4 do
@@ -4213,7 +4210,7 @@ function events.MonsterKilled(mon)
 				end
 			end
 		end
-	end
+	end)
 	
 	if mon.Ally==9999 then 
 		mon.Experience=0
@@ -4298,12 +4295,11 @@ function events.PickCorpse(t)
 	if mapvars.bossData and mapvars.bossData[index] then
 		mapvars.bossData[index]=nil
 	end
-	function events.Tick()
-		events.Remove("Tick", 1)
+	RunNextTick(function()
 		if mon.AIState==11 then
 			mon.NameId=0
 		end
-	end
+	end)
 	--remove boss data
 	
 end

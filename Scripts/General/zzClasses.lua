@@ -189,21 +189,19 @@ function events.Action(t)
 				if txt.EquipStat==1 and txt.Skill==1 then
 					txt.EquipStat=0
 					pl.Skills[const.Skills.Sword]=JoinSkill(s,1)
-					function events.Tick()
-						events.Remove("Tick",1)
+					RunNextTick(function()
 						pl.Skills[const.Skills.Sword]=JoinSkill(s,m)
 						txt.EquipStat=1
-					end
+					end)
 				elseif txt.EquipStat==4 and txt.Skill==8 then
 					local weapon=pl:GetActiveItem(1,true)
 					if weapon then
 						local txt=weapon:T()
 						if txt.EquipStat==1 and txt.Skill==1 then
 							txt.EquipStat=0
-							function events.Tick()
-								events.Remove("Tick",1)
+							RunNextTick(function()
 								txt.EquipStat=1
-							end
+							end)
 						end
 					end
 				end
@@ -214,10 +212,9 @@ function events.Action(t)
 				local txt=weapon:T()
 				if txt.EquipStat==1 and txt.Skill==1 then
 					txt.EquipStat=0
-					function events.Tick()
-						events.Remove("Tick",1)
+					RunNextTick(function()
 						txt.EquipStat=1
-					end
+					end)
 				end
 			end
 		end
@@ -1852,8 +1849,7 @@ end
 function events.PlayerCastSpell(t)
 	if t.SpellId==2 then
 		BeginGrabObjects()
-		function events.Tick()
-			events.Remove("Tick",1)
+		RunNextTick(function()
 			obj1=GrabObjects()
 			
 			--calculate velocity
@@ -1933,7 +1929,7 @@ function events.PlayerCastSpell(t)
 				obj2.Y=obj1.Y
 				obj2.Z=obj1.Z
 			end
-		end
+		end)
 	end
 end
 --getDistance(obj1.X,obj1.Y,obj1.Z,obj2.X,obj2.Y,obj2.Z,)
@@ -2041,15 +2037,14 @@ function assassinationDamage(pl,mon,obj)
 	if restoreChance>math.random() then
 		pl.SP=math.min(pl:GetFullSP(),pl.SP+15)
 	end
-	function events.Tick()
-		events.Remove("Tick", 1)
+	RunNextTick(function()
 		if mon.HP<=0 then
 			s,m=SplitSkill(pl:GetSkill(const.Skills.Air))
 			local fullSP=pl:GetFullSP()
 			pl.SP=math.min(fullSP, pl.SP+(1+m)*5)
 			vars.assassinStacks[id]=math.min(vars.assassinStacks[id]+1,5)
 		end
-	end
+	end)
 	if pl.SP>=manaCost and mon.ShowAsHostile then
 		if obj and obj.Spell>100 then
 			vars.assassinStacks[id]=math.min(vars.assassinStacks[id]+0.5,5)--arrow nerf

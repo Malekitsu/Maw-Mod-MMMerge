@@ -579,8 +579,7 @@ end
 
 --now do same for armors
 function events.Action(t)
-	function events.Tick()
-		events.Remove("Tick", 1)
+	RunNextTick(function()
 		if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
 			local i=Game.CurrentPlayer
 			if i<0 or i>Party.High then return end
@@ -615,7 +614,7 @@ function events.Action(t)
 				Skillz.setDesc(i,1,string.format(Skillz.getDesc(i,1) .. baseString))
 			end
 		end
-	end
+	end)
 end
 		
 	
@@ -1529,8 +1528,7 @@ end
 
 function events.Action(t)
 	if vars.insanityMode then
-		function events.Tick()
-			events.Remove("Tick",1)
+		RunNextTick(function()
 			if Game:GetCurrentHouse() then
 				local house=Game.Houses[Game:GetCurrentHouse()]
 				if house.Type==30 then
@@ -1541,7 +1539,7 @@ function events.Action(t)
 					end
 				end
 			end
-		end
+		end)
 	end
 end
 
@@ -1580,10 +1578,9 @@ function events.Action(t)
 						pl.Skills[const.Skills.Dagger]=JoinSkill(s,2)
 					end
 					txt.Skill=2
-					function events.Tick() 
-						events.Remove("Tick", 1)
+					RunNextTick(function()
 						txt.Skill=3
-					end
+					end)
 				elseif txt.EquipStat==1 and m>=3 then
 					local s,m = SplitSkill(pl.Skills[const.Skills.Dagger])
 					if m<2 then
@@ -1591,11 +1588,10 @@ function events.Action(t)
 					end
 					txt.Skill=2
 					txt.EquipStat=0
-					function events.Tick() 
-						events.Remove("Tick", 1)
+					RunNextTick(function()
 						txt.Skill=3
 						txt.EquipStat=1
-					end
+					end)
 				end
 			end
 		end
@@ -2409,8 +2405,7 @@ function events.CalcDamageToMonster(t)
 					-- Apply diminishing returns
 					duration = calcDebuffDuration(mon, maceStunCC, duration)
 				end
-				function events.Tick()
-					events.Remove("Tick",1)
+				RunNextTick(function()
 					if applyParalyze[id] and duration > 0 then
 						if mon.HP~=0 then
 							mon.SpellBuffs[6].ExpireTime=Game.Time+duration
@@ -2419,7 +2414,7 @@ function events.CalcDamageToMonster(t)
 					else
 						mon.SpellBuffs[6].ExpireTime=previousDuration
 					end
-				end
+				end)
 			end
 		end
 	end
@@ -2428,17 +2423,15 @@ end
 --remove stun if monster is Dead
 function events.CalcDamageToMonster(t)
 	local mon=t.Monster
-	function events.Tick()
-		events.Remove("Tick",1)
+	RunNextTick(function()
 		if mon.HP==0 then
 			mon.SpellBuffs[6].ExpireTime=0
 		end
-	end
+	end)
 end
 
 function events.Action(t)
-	function events.Tick()
-		events.Remove("Tick", 1)
+	RunNextTick(function()
 		if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
 			local i=Game.CurrentPlayer
 			if i<0 or i>Party.High then return end
@@ -2458,7 +2451,7 @@ function events.Action(t)
 			end
 			Skillz.setDesc(6,5,maceGMtxt .. StrColor(0,0,0,txt))
 		end
-	end
+	end)
 end
 
 --mana shield
@@ -2785,16 +2778,14 @@ function events.Action(t)
 				if table.find(oneHandedAxes, it.Number) then
 					if m2>=2 then
 						pl.Skills[const.Skills.Dagger]=JoinSkill(2,2)
-						function events.Tick()
-							events.Remove("Tick",1)
+						RunNextTick(function()
 							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
-						end
+						end)
 					else
 						pl.Skills[const.Skills.Dagger]=JoinSkill(1,1)
-						function events.Tick()
-							events.Remove("Tick",1)
+						RunNextTick(function()
 							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
-						end
+						end)
 					end
 				end
 			end
@@ -2807,30 +2798,26 @@ function events.Action(t)
 				if table.find(oneHandedAxes, it.Number) then
 					if m2>=2 then
 						pl.Skills[const.Skills.Dagger]=JoinSkill(2,2)
-						function events.Tick()
-							events.Remove("Tick",1)
+						RunNextTick(function()
 							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
-						end
+						end)
 					else
 						pl.Skills[const.Skills.Dagger]=JoinSkill(1,1)
-						function events.Tick()
-							events.Remove("Tick",1)
+						RunNextTick(function()
 							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
-						end
+						end)
 					end
 				elseif table.find(twoHandedAxes,it.Number) then
 					if m2>=3 then
 						pl.Skills[const.Skills.Dagger]=JoinSkill(2,2)
-						function events.Tick()
-							events.Remove("Tick",1)
+						RunNextTick(function()
 							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
-						end
+						end)
 					else
 						pl.Skills[const.Skills.Dagger]=JoinSkill(1,1)
-						function events.Tick()
-							events.Remove("Tick",1)
+						RunNextTick(function()
 							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
-						end
+						end)
 					end
 				end
 			end

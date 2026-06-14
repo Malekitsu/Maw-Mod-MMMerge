@@ -275,12 +275,11 @@ function events.UseMouseItem(t)
 	pl:ShowFaceAnimation(36)
 	evt.PlaySound(143)
 	--restore to previous player to avoid inventory issues
-	function events.Tick()
-		events.Remove("Tick", 1)
+	RunNextTick(function()
 		if Game.CurrentScreen~=0 then
 			Game.CurrentPlayer=currentPlayer
 		end
-	end
+	end)
 end
 
 function events.GameInitialized2()
@@ -1241,10 +1240,9 @@ function events.MonsterKilled(mon)
 		if mapvars.MonsterSeed and mapvars.MonsterSeed[monsterIndex] then
 			Game.RandSeed = mapvars.MonsterSeed[monsterIndex]
 			math.randomseed(mapvars.MonsterSeed[monsterIndex])
-			function events.Tick() 
-				events.Remove("Tick", 1)
+			RunNextTick(function()
 				mapvars.MonsterSeed[monsterIndex] = Game.RandSeed
-			end
+			end)
 		end
 	end
 	if getMapAffixPower(9) and math.random()<getMapAffixPower(9)/100 then

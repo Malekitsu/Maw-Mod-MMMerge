@@ -336,10 +336,9 @@ end
 function events.BuildItemInformationBox(t)
 	for i=1,5 do
 		multibagButton[i].Active=false
-		function events.Tick()
-			events.Remove("Tick", 1)
+		RunNextTick(function()
 			multibagButton[i].Active=true
-		end
+		end)
 	end
 end
 

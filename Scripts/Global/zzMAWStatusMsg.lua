@@ -248,8 +248,7 @@ function events.CalcDamageToMonster(t)
 			castedAoe=true
 		end
 		local id=t.MonsterIndex
-		function events.Tick()
-			events.Remove("Tick", 1)
+		RunNextTick(function()
 			if id<=Map.Monsters.High and MSGdamage>0 then
 				if shoot=="shoots" then
 				msg=string.format("%s shoots %s for %s points!%s", name, monName, msgTxt, critMessage)
@@ -275,7 +274,7 @@ function events.CalcDamageToMonster(t)
 					MSGdamage=0
 				end
 			end
-		end
+		end)
 	end
 	--restore tooltips
 	local id=Game.CurrentPlayer

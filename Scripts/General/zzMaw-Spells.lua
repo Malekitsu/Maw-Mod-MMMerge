@@ -108,10 +108,9 @@ local hopList = {8, 9, 14, 15}
 function events.PlayerCastSpell(t)
 	--refresh everyone before and after casting
 	mawRefresh(t.PlayerIndex)
-	function events.Tick() 
-		events.Remove("Tick", 1)
+	RunNextTick(function()
 		mawRefresh("all")
-	end
+	end)
 	
 	local partyHP=0
 	for i=0,Party.High do
@@ -142,11 +141,10 @@ function events.PlayerCastSpell(t)
 			return
 		end
 		if not t.RemoteData then
-			function events.Tick() 
-				events.Remove("Tick", 1)
+			RunNextTick(function()
 				invisCasted={true,t.Skill,t.Mastery}
 				mawBuffs()
-			end
+			end)
 			if t.MultiplayerData then
 				t.MultiplayerData[1]=invisCasted
 			end
@@ -285,10 +283,9 @@ function events.PlayerCastSpell(t)
 			local overheal = math.max(0, round(totHeal) - (maxHP - Party[t.TargetId].HP))
 			if Party[t.TargetId].Dead>0 or Party[t.TargetId].Eradicated>0 then
 				local hp=Party[t.TargetId].HP
-				function events.Tick() 
-					events.Remove("Tick", 1)
+				RunNextTick(function()
 					Party[t.TargetId].HP=math.max(hp+round(totHeal), round(totHeal))
-				end
+				end)
 			else
 				Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+round(totHeal),maxHP)
 				if Party[t.TargetId].HP>0 then
@@ -357,14 +354,13 @@ function events.PlayerCastSpell(t)
 	--REGENERATION
 	if t.SpellId==71 and not vars.MAWSETTINGS.buffRework=="ON" then
 		if not t.RemoteData then
-			function events.Tick() 
-				events.Remove("Tick", 1)
+			RunNextTick(function()
 				regenerationCasted={true,t.Skill,t.Mastery}
 				for i=0, Party.High do
 					mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Regeneration, i)
 				end
 				mawBuffs()
-			end
+			end)
 			if t.MultiplayerData then
 				t.MultiplayerData[1]=regenerationCasted
 			end
@@ -525,11 +521,10 @@ end
 	--Day of the Gods
 	if t.SpellId==83 then
 		if not t.RemoteData then
-			function events.Tick() 
-				events.Remove("Tick", 1)
+			RunNextTick(function()
 				DoGCasted={true,t.Skill,t.Mastery}
 				mawBuffs()
-			end
+			end)
 			if t.MultiplayerData then
 				t.MultiplayerData[1]=DoGCasted
 			end
@@ -547,12 +542,11 @@ end
 			t.Skill=1
 			local s,m = SplitSkill(t.Player:GetSkill(protectionSpells[t.SpellId][2]))
 			local power=s*math.min(m,3)
-			function events.Tick()
-				events.Remove("Tick", 1)
+			RunNextTick(function()
 				Party.SpellBuffs[buffId].Power = power
 				Party.SpellBuffs[buffId].Skill = t.Mastery
 				Party.SpellBuffs[buffId].ExpireTime = Game.Time+const.Hour*s
-			end
+			end)
 			if t.MultiplayerData then
 				t.MultiplayerData[1]=power
 				t.MultiplayerData[2]=Game.Time+const.Hour*s
@@ -567,11 +561,10 @@ end
 	--day of the gods
 	if t.SpellId==85 then
 		if not t.RemoteData then
-			function events.Tick() 
-				events.Remove("Tick", 1)
+			RunNextTick(function()
 				DoPCasted={true,t.Skill,t.Mastery}
 				mawBuffs()
-			end
+			end)
 			if t.MultiplayerData then
 				t.MultiplayerData[1]=DoPCasted
 			end
@@ -1142,10 +1135,9 @@ function processHealLegendaries(pl, spellId, skillType, totHeal, overheal, tickD
 		local delay = getSpellDelay(pl, spellId)
 		delay = math.floor(delay * (1 - (overhealPercent / 2)))
 		if tickDelay then
-			function events.Tick()
-				events.Remove("Tick", 1)
+			RunNextTick(function()
 				pl.RecoveryDelay = delay
-			end
+			end)
 			return
 		end
 		pl:SetRecoveryDelay(delay)
@@ -1620,11 +1612,10 @@ function events.CalcDamageToMonster(t)
 		else
 			mon.Resistances[const.Damage.Earth]=65000
 		end
-		function events.Tick() 
-			events.Remove("Tick", 1)
+		RunNextTick(function()
 			mon.Level=lvl
 			mon.Resistances[const.Skills.Earth]=res
-		end
+		end)
 	end
 end
 
@@ -1921,10 +1912,9 @@ function events.GameInitialized2()
 end
 --adjust mana cost and tooltips	
 function events.Action(t)
-	function events.Tick() 
-		events.Remove("Tick", 1)
+	RunNextTick(function()
 		ascension()
-	end
+	end)
 --[[	if t.Action==25 then
 		ascension()
 		local id=Game.CurrentPlayer
@@ -2563,10 +2553,9 @@ function events.PlayerCastSpell(t)
 					exmap[t.SpellId] = Game.Time + __special_ttl_for(vars.mawbuff[t.SpellId])
 				end
 			end
-			function events.Tick()
-				events.Remove("Tick",1)
+			RunNextTick(function()
 				mawBuffApply()
-			end
+			end)
 		else
 			t.Handled=true
 			mawBuffCast(t.Player, t.PlayerIndex, t.SpellId)
@@ -2667,21 +2656,19 @@ function mawBuffCast(pl, index, spellId)
 			pl:SetRecoveryDelay(delay)
 		end
 
-		function events.Tick()
-			events.Remove("Tick", 1)
+		RunNextTick(function()
 			mawBuffApply()
-		end
+		end)
 	else
 		-- === DEBUFF local : pose un override OFF de 90s pour ignorer les retours distants
 		vars.mawbuff[spellId]=false
 		__clear_special_expire(spellId)
 		vars._maw_local_off[spellId] = Game.Time + const.Minute + const.Second*30
 
-		function events.Tick()
-			events.Remove("Tick", 1)
+		RunNextTick(function()
 			mawBuffApply()
 			Game.ShowStatusText("Buff Disabled")
-		end
+		end)
 	end
 end
 
@@ -3161,8 +3148,7 @@ function events.PlayerCastSpell(t)
 		local nMon=Map.Monsters.High
 		local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Light))
 		local maxSpawns=m*2-3
-		function events.Tick()
-			events.Remove("Tick",1)
+		RunNextTick(function()
 			if nMon==Map.Monsters.High then
 				local currentSummoned=0
 				for i=0, Map.Monsters.High do
@@ -3175,7 +3161,7 @@ function events.PlayerCastSpell(t)
 					pseudoSpawnpoint{monster = 97,  x = Party.X, y = Party.Y, z = Party.Z, count = 1, powerChances = {0, 0, 100}, radius = 256, group = 9999,transform = function(mon) mon.ShowOnMap = true mon.Hostile = false mon.Velocity=350 mon.Ally=9999 end}
 				end
 			end
-		end
+		end)
 	end
 end
 
@@ -3484,10 +3470,9 @@ end
 function events.CanCastTownPortal(t)
 	if vars.madnessMode and (Party.EnemyDetectorYellow or Party.EnemyDetectorRed) then
 		t.CanCast=false
-		function events.Tick() 
-			events.Remove("Tick", 1)
+		RunNextTick(function()
 			Game.ShowStatusText("Madness is not a place for cowards")
-		end
+		end)
 	end
 end
 
@@ -3497,8 +3482,7 @@ function events.PlayerCastSpell(t)
 	BeginGrabObjects()
 	local targetSpell=t.SpellId
 	if Mouse:GetTarget().Kind==3 then return end --monster in the mouse
-	function events.Tick()
-		events.Remove("Tick",1)
+	RunNextTick(function()
 		local obj=GrabObjects()
 		if not obj then 
 			--debug.Message("No Object")
@@ -3532,7 +3516,7 @@ function events.PlayerCastSpell(t)
 		if changeTarget then
 			obj.Target=3+target*8
 		end
-	end		
+	end)
 end
 
 
@@ -3553,8 +3537,7 @@ function events.PartyDies(t)
 	t.Handled=true
 	local gold=Party.Gold
 	local continentId=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
-	function events.Tick()
-		events.Remove("Tick",1)
+	RunNextTick(function()
 		local lvl1=vars.MMLVL[1]
 		local lvl2=vars.MMLVL[2]
 		local lvl3=vars.MMLVL[3]
@@ -3575,7 +3558,7 @@ function events.PartyDies(t)
 		vars.MMLVL[2]=lvl2
 		vars.MMLVL[3]=lvl3
 		vars.MMLVL[4]=lvl4
-	end
+	end)
 end
 
 -- player's death

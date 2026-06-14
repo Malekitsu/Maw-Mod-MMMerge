@@ -242,14 +242,13 @@ function events.PickCorpse(t)
 		lootFromMonster = true
 		lootMultiplier=densityMultiplier
 		-- Handle seed state after loot calculations
-		function events.Tick()
-			events.Remove("Tick", 1)
+		RunNextTick(function()
 			lootFromMonster = false
 			-- Update seed for non-insanity mode if needed
 			if not vars.insanityMode and not isBoss then
 				mapvars.MonsterSeed[t.MonsterIndex] = Game.RandSeed
 			end
-		end
+		end)
 	end
 end
 
@@ -264,23 +263,20 @@ function events.CastTelepathy(t)
 			-- Use boss loot seeding for all modes
 			local seed = getBossLootSeed(monster)
 			Game.RandSeed = seed
-			function events.Tick() 
-				events.Remove("Tick", 1)
-			end
+			RunNextTick(function()
+			end)
 		elseif vars.insanityMode then
 			-- Use new deterministic monster-type seeding for insanity mode
 			local seed = getMonsterSeed(monster.Id)
 			Game.RandSeed = seed
-			function events.Tick() 
-				events.Remove("Tick", 1)
-			end
+			RunNextTick(function()
+			end)
 		else
 			-- Use old position-based seeding for other modes
 			Game.RandSeed = mapvars.MonsterSeed[t.MonsterIndex]
-			function events.Tick() 
-				events.Remove("Tick", 1)
+			RunNextTick(function()
 				mapvars.MonsterSeed[t.MonsterIndex] = Game.RandSeed
-			end
+			end)
 		end
 	end
 end
@@ -1113,12 +1109,11 @@ function events.ItemGenerated(t)
 				lootFromMonster=false
 				local itemGold=getItemValue(it, true)
 				it.Number=0
-				function events.Tick()
-					events.Remove("Tick",1)
+				RunNextTick(function()
 					goldGained=Party.Gold-goldBeforeLoot
 					Party.Gold=Party.Gold+itemGold
 					Game.ShowStatusText("You found " .. itemGold+goldGained .. " gold! (" .. tierList[itemPower] .. " " .. Game.ItemsTxt[itemID].NotIdentifiedName .. " filtered)")
-				end
+				end)
 			end
 		end
 		if higherLootPowerRange then
@@ -4228,18 +4223,16 @@ function events.Action(t)
 	--if t.Action==110 or t.Action==115 or t.Action==133 then
 		if Game.CurrentPlayer==-1 or Game.CurrentPlayer>Party.High then return end
 		local id=Party[Game.CurrentPlayer]:GetIndex()
-		function events.Tick() 
-			events.Remove("Tick", 1)
+		RunNextTick(function()
 			mawRefresh(id)
 			mawRefresh(id) --fixes some skill not being accounted on the first go this could be optimized, but it doesn't affects performance
-		end
+		end)
 	--end
 end
 function events.CalcDamageToPlayer(t)
-	function events.Tick() 
-		events.Remove("Tick", 1)
+	RunNextTick(function()
 		mawRefresh(t.PlayerIndex)
-	end
+	end)
 end
 function mawRefresh(i)
 	if i=="all" then
