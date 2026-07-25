@@ -445,7 +445,7 @@ function events.AfterLoadMap()
 					if it.Bonus2>0 then
 						itemPower=itemPower+1
 					end
-					if it.Charges>1000 then
+					if HasEnc2(it) then
 						itemPower=itemPower+1
 					end
 					if it.BonusExpireTime==1 then
@@ -768,11 +768,11 @@ function events.ItemGenerated(t)
 		end
 		--apply enchant2
 		if p2>roll2 then
-			it.Charges=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
+			local enc2Strength=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
 			--bolster
-			it.Charges=math.ceil(it.Charges*difficultyExtraPower)
+			enc2Strength=math.ceil(enc2Strength*difficultyExtraPower)
 			--bonus type
-			it.Charges=it.Charges+math.random(1,16)*1000
+			SetEnc2(it,math.random(1,16),enc2Strength)
 			--[[ no skill bonuses
 			if math.random(1,10)==10 then
 				it.Charges=math.random(17,24)*1000
@@ -782,8 +782,7 @@ function events.ItemGenerated(t)
 		end
 		--make it standard bonus if no standard bonus
 		if it.Bonus==0 then
-			it.Bonus=math.floor(it.Charges/1000)
-			it.BonusStrength=it.Charges%1000
+			it.Bonus,it.BonusStrength=GetEnc2(it)
 			it.Charges=0
 		end
 				
@@ -808,9 +807,9 @@ function events.ItemGenerated(t)
 		ancientRoll=math.random()
 		if ancientRoll<=ancientChance or OmnipotentLoot then
 			ancient=true
-			it.Charges=math.random(round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10))
-			it.Charges=math.ceil(it.Charges*difficultyExtraPower) --bolster
-			it.Charges=it.Charges+math.random(1,16)*1000
+			local enc2Strength=math.random(round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10))
+			enc2Strength=math.ceil(enc2Strength*difficultyExtraPower) --bolster
+			SetEnc2(it,math.random(1,16),enc2Strength)
 			it.Bonus=math.random(1,16)
 			it.BonusStrength=math.random(round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10))
 			it.BonusStrength=math.ceil(it.BonusStrength*difficultyExtraPower) --bolster
@@ -851,9 +850,9 @@ function events.ItemGenerated(t)
 				it.MaxCharges=it.MaxCharges-chargesBonus
 			end
 			it.BonusExpireTime=2
-			it.Charges=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
-			it.Charges=math.ceil(it.Charges*difficultyExtraPower) --bolster
-			it.Charges=round(it.Charges+math.random(1,16)*1000)
+			local enc2Strength=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
+			enc2Strength=math.ceil(enc2Strength*difficultyExtraPower) --bolster
+			SetEnc2(it,math.random(1,16),enc2Strength)
 			
 			it.Bonus=math.random(1,16)
 			it.BonusStrength=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
@@ -927,27 +926,28 @@ function events.ItemGenerated(t)
 						stats={1, 5, 6, 7, 11, 12, 13, 14, 15, 16}
 					end
 					it.Bonus=stats[math.random(1,4)]
-					it.Charges=it.Charges%1000+stats[math.random(1,#stats)]*1000
+					SetEnc2Type(it,stats[math.random(1,#stats)])
 				elseif roll==2 then
 					local stats={4, 6, 8, 10}
 					if GetItemEquipStat(it)==10 then
 						stats={1, 5, 6, 7, 11, 12, 13, 14, 15, 16}
 					end
 					it.Bonus=stats[math.random(1,4)]
-					it.Charges=it.Charges%1000+stats[math.random(1,#stats)]*1000
+					SetEnc2Type(it,stats[math.random(1,#stats)])
 				elseif roll==3 then
 					local stats={2, 3, 4, 6, 7}
 					if GetItemEquipStat(it)==10 then
 						stats={1, 5, 6, 7, 11, 12, 13, 14, 15, 16}
 					end
 					it.Bonus=stats[math.random(1,5)]
-					it.Charges=it.Charges%1000+stats[math.random(1,#stats)]*1000
-					if (it.Bonus==2 and math.floor(it.Charges/1000)==3) or (it.Bonus==2 and math.floor(it.Charges/1000)==3) then
-						it.Bonus=math.floor(it.Charges/1000)
+					SetEnc2Type(it,stats[math.random(1,#stats)])
+					if it.Bonus==2 and GetEnc2Type(it)==3 then
+						it.Bonus=GetEnc2Type(it)
 					end
 				end
 				--increase stats
-				it.Charges=math.min(math.ceil(math.min(it.Charges%1000*0.2,999)+it.Charges), it.Charges+10)
+				local enc2Type,enc2Strength=GetEnc2(it)
+				SetEnc2(it,enc2Type,enc2Strength+math.min(math.ceil(enc2Strength*0.2),10))
 				it.BonusStrength=math.min(math.ceil(it.BonusStrength*1.2),it.BonusStrength+10)
 			elseif baseChance > 0 then
 				-- Only increment pity counter if legendaries are enabled but roll failed
@@ -979,25 +979,27 @@ function events.ItemGenerated(t)
 			if it.Bonus==8 or it.Bonus==9 then
 				it.BonusStrength=it.BonusStrength*(1+math.min(it.BonusStrength/50,4))
 			end
-			if math.floor(it.Charges/1000)==8 or math.floor(it.Charges/1000)==9 then
-				local power=it.Charges%1000
+			local hpType,hpPower=GetEnc2(it)
+			if hpType==8 or hpType==9 then
+				local power=hpPower
 				power=power*(2+math.min(power/50,4)) --cap is 999
 				if power >= 999 and it.Bonus<17 then --swap base with charges
 					local bonus=it.Bonus
 					local str=it.BonusStrength
-					it.Bonus=math.floor(it.Charges/1000)
+					it.Bonus=hpType
 					it.BonusStrength=power
-					it.Charges= bonus*1000+str
-				else 
-					it.Charges=math.floor(it.Charges/1000)*1000+power
+					SetEnc2(it,bonus,str)
+				else
+					SetEnc2(it,hpType,power)
 				end
 			end
 			--nerf to AC
 			if it.Bonus==10 then
 				--it.BonusStrength=math.ceil(it.BonusStrength*0.667)
 			end
-			if math.floor(it.Charges/1000)==10 then
-				it.Charges=it.Charges-math.floor(it.Charges%1000*0.333)
+			local acType,acPower=GetEnc2(it)
+			if acType==10 then
+				SetEnc2(it,acType,acPower-math.floor(acPower*0.333))
 			end
 		end
 		
@@ -1009,10 +1011,9 @@ function events.ItemGenerated(t)
 		local mult=slotMult[it:T().EquipStat]
 		if mult then
 			it.BonusStrength=math.ceil(it.BonusStrength*mult)
-			local bonus=math.ceil(it.Charges%1000*(mult-1))
-			bonus=it.Charges%1000
-			bonus=math.min(bonus*mult,999) --cap is 999
-			it.Charges=math.floor(it.Charges/1000)*1000+bonus
+			local enc2Type,enc2Power=GetEnc2(it)
+			enc2Power=math.min(enc2Power*mult,999) --cap is 999
+			SetEnc2(it,enc2Type,enc2Power)
 		end
 		--check if int/pers or might/accuracy item to change special enchant
 		local melee=0
@@ -1023,7 +1024,7 @@ function events.ItemGenerated(t)
 			elseif it.Bonus==2 or it.Bonus==3 then
 				caster=caster+1
 			end
-			local bonus=math.floor(it.Charges/1000)
+			local bonus=GetEnc2Type(it)
 			if bonus==1 or bonus==5 then
 				melee=melee+1
 			elseif bonus==2 or bonus==3 then
@@ -1043,8 +1044,9 @@ function events.ItemGenerated(t)
 				end
 			end
 		end
-		if math.abs(it.Charges%1000-it.BonusStrength)<=1 then
-			it.Charges=math.floor(it.Charges/1000)*1000+it.BonusStrength
+		local syncType,syncPower=GetEnc2(it)
+		if math.abs(syncPower-it.BonusStrength)<=1 then
+			SetEnc2(it,syncType,it.BonusStrength)
 		end
 		
 		--maxcharges Cap
@@ -1054,12 +1056,13 @@ function events.ItemGenerated(t)
 		if GetItemEquipStat(it)~=10 and it.Bonus>=11 and it.Bonus<=16 then
 			it.Bonus=math.random(1,10)
 		end
-		if math.floor(it.Charges/1000)>=11 and math.floor(it.Charges/1000)<=16 then
-			it.Charges=it.Charges-math.floor(it.Charges/1000)*1000+math.random(1,10)*1000
+		local resType=GetEnc2Type(it)
+		if resType>=11 and resType<=16 then
+			SetEnc2Type(it,math.random(1,10))
 		end
-		
+
 		--fix to resistances not to rolled be twice
-		local bonus2=math.floor(it.Charges/1000)
+		local bonus2=GetEnc2Type(it)
 		if it.Bonus>=11 and it.Bonus<=16 then
 			while it.Bonus>0 and it.Bonus==bonus2 do
 				it.Bonus=math.random(11,16)
@@ -1085,7 +1088,7 @@ function events.ItemGenerated(t)
 		if it.Bonus2>0 then
 			itemPower=itemPower+1
 		end
-		if it.Charges>1000 then
+		if HasEnc2(it) then
 			itemPower=itemPower+1
 		end
 		if it.BonusExpireTime==1 then
@@ -1132,7 +1135,8 @@ function events.ItemGenerated(t)
 			
 			it.BonusStrength=math.random(1+it.BonusStrength*minValue,it.BonusStrength)
 			it.MaxCharges=math.min(math.random(1+it.MaxCharges*minValue,it.MaxCharges*1.5),255)
-			it.Charges=it.Charges-it.Charges%1000+math.random(1+it.Charges%1000*minValue,it.Charges%1000)
+			local rollType,rollPower=GetEnc2(it)
+			SetEnc2(it,rollType,math.random(1+rollPower*minValue,rollPower))
 		end
 	end
 end
@@ -1424,8 +1428,8 @@ function updateCelestialItem(it,pl)
 				it.BonusStrength=math.round(it.BonusStrength/10)
 			end
 		end
-		if it.Charges>1000 then
-			it.Charges=math.floor(it.Charges/1000)*1000+math.min(math.round(tier*mult*slotMult),999)
+		if HasEnc2(it) then
+			SetEnc2Strength(it,math.min(math.round(tier*mult*slotMult),999))
 		end
 		local cap=180 
 		if vars.madnessMode then
@@ -1574,9 +1578,8 @@ function events.BuildItemInformationBox(t)
 					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. power
 				end
 			end
-			if t.Item.Charges>1000 then
-				local bonus=math.floor(t.Item.Charges/1000)
-				local strength=t.Item.Charges%1000
+			if HasEnc2(t.Item) then
+				local bonus,strength=GetEnc2(t.Item)
 				if vars.itemStatsFix then
 					if (bonus==8 or bonus==9) then
 						local mult=GetSlotMult(it)
@@ -1684,7 +1687,7 @@ function events.BuildItemInformationBox(t)
 					vars.extraShown=true
 				end
 			end
-			if t.Item.Bonus==0 and t.Item.Bonus2==0 and t.Item.Charges<1000 and extraDescription then
+			if t.Item.Bonus==0 and t.Item.Bonus2==0 and not HasEnc2(t.Item) and extraDescription then
 				if vars.enchantSeedList==nil then
 				vars.enchantSeedList={}
 					for i=0,2500 do
@@ -1723,7 +1726,7 @@ function events.BuildItemInformationBox(t)
 			if t.Item.Bonus2>0 then
 				bonus=bonus+1
 			end
-			if t.Item.Charges>1000 then
+			if HasEnc2(t.Item) then
 				bonus=bonus+1
 			end
 			if t.Item.BonusExpireTime==1 then
@@ -2108,8 +2111,9 @@ function getItemValue(it, lootFilter)
 			bonus1=(bonus1/100)^2*100
 		end
 		
-		bonus2=(it.Charges%1000)*100
-		bonus2Type=math.floor(it.Charges/1000)
+		local enc2Strength
+		bonus2Type,enc2Strength=GetEnc2(it)
+		bonus2=enc2Strength*100
 		if bonus2Type==8 or bonus2Type==9 then
 			bonus2=5*((2*bonus2+100)^0.5-10)
 		elseif bonus2Type==10 then
@@ -2144,7 +2148,7 @@ function getItemValue(it, lootFilter)
 			if it.Bonus>0 then
 				count=count+1
 			end
-			if it.Charges>1000 then
+			if HasEnc2(it) then
 				count=count+1
 			end
 			if it.Bonus2>0 then
@@ -2827,6 +2831,7 @@ end
 
 function calculateStatsAdd(item, stats)
 	statValue={}
+	local enc2Type,enc2Strength=GetEnc2(item)
 	for i=1,#stats do
 		statValue[i]=0
 		--bonus1
@@ -2834,8 +2839,8 @@ function calculateStatsAdd(item, stats)
 			statValue[i]=statValue[i]+item.BonusStrength
 		end
 		--bonus2
-		if math.floor(item.Charges/1000)==stats[i] then
-			statValue[i]=statValue[i]+item.Charges%1000
+		if enc2Type==stats[i] then
+			statValue[i]=statValue[i]+enc2Strength
 		end
 		--bonus special
 		--maxcharges mult
@@ -3130,9 +3135,8 @@ function itemStats(index)
 			tab[84]=tab[84] or 0
 			tab[84]=tab[84]+3
 		end		
-		if it.Charges>1000 then
-			local bonus=math.floor(it.Charges/1000)
-			local power=it.Charges%1000
+		if HasEnc2(it) then
+			local bonus,power=GetEnc2(it)
 			if vars.itemStatsFix then
 				if (bonus==8 or bonus==9) then
 					local mult=GetSlotMult(it)
@@ -4776,7 +4780,7 @@ function GetLevelRquirement(it)
 		bonusStrength = math.min(bonusStrength^2, bonusStrength*10)
 	end
 	
-	local chargesPower=it.Charges%1000
+	local chargesPower=GetEnc2Strength(it)
 	
 	if it.BonusExpireTime>0 and it.BonusExpireTime<=2 then
 		bonusStrength=math.floor(math.max(bonusStrength/1.2,bonusStrength-5))

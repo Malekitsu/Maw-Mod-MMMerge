@@ -759,8 +759,7 @@ local function upgradeGem(it, tier)
 	end
 	local tier=tier*bolsterMult
 	--2nd enchant value
-	local bonus2=math.floor(it.Charges/1000)
-	local bonus2Strength=it.Charges%1000
+	local bonus2,bonus2Strength=GetEnc2(it)
 	--upgrade amount
 	local upgradeAmount1=3
 	local upgradeAmount2=upgradeAmount1
@@ -814,10 +813,10 @@ local function upgradeGem(it, tier)
 	if it.Bonus==0 then
 		bonus1percent=math.huge
 	end
-	if it.Charges<1000 then
+	if not HasEnc2(it) then
 		bonus2percent=math.huge
 	end
-	if it.Bonus==0 and it.Charges<1000 then
+	if it.Bonus==0 and not HasEnc2(it) then
 		return "no enchants"
 	end
 	--apply enchant
@@ -826,7 +825,7 @@ local function upgradeGem(it, tier)
 		it.BonusStrength=math.min(it.BonusStrength+upgradeAmount1,maxValue1)
 	elseif bonus2percent<=bonus1percent and bonus2Strength<maxValue2 and bonus2Strength<999 then --currently capped at 999
 		enchanted=true
-		it.Charges=bonus2*1000+math.min(bonus2Strength+upgradeAmount2,maxValue2,999)
+		SetEnc2(it,bonus2,math.min(bonus2Strength+upgradeAmount2,maxValue2,999))
 	end
 	return enchanted
 end
@@ -905,7 +904,7 @@ end
 
 evt.PotionEffects[92] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
-		if t.Bonus>0 and t.BonusStrength>0 and t.Charges<=1000 then 
+		if t.Bonus>0 and t.BonusStrength>0 and not HasEnc2(t) then
 			math.randomseed(t.Number*10000+t.MaxCharges*1000+t.Bonus*100+t.BonusStrength*10+t.Charges)
 			
 			local mult=math.max((Game.BolsterAmount-100)/1000+1,1)
@@ -921,7 +920,7 @@ evt.PotionEffects[92] = function(IsDrunk, t, Power)
 			local slotMult=slotMult[t:T().EquipStat] or 1
 			cap=math.min(cap*slotMult,999)
 			
-			t.Charges=stat*1000+math.min(round(power*(1+0.25*math.random())),cap)
+			SetEnc2(t,stat,math.min(round(power*(1+0.25*math.random())),cap))
 			Mouse.Item.Number=0
 			mem.u4[0x51E100] = 0x100 
 			t.Condition = t.Condition:Or(0x10)
@@ -1051,8 +1050,8 @@ end
 
 evt.PotionEffects[96] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
-		if t.Bonus==0 and t.Charges<=1000 and t.Bonus2==0 then
-			return 
+		if t.Bonus==0 and not HasEnc2(t) and t.Bonus2==0 then
+			return
 		end
 		local done=false
 		while not done do
@@ -1060,13 +1059,12 @@ evt.PotionEffects[96] = function(IsDrunk, t, Power)
 			if roll==1 and t.Bonus~=0 then
 				t.Bonus=0
 				t.BonusStrength=0
-				if t.Charges>1000 then
-					t.Bonus=math.floor(t.Charges/1000)
-					t.BonusStrength=t.Charges%1000
+				if HasEnc2(t) then
+					t.Bonus,t.BonusStrength=GetEnc2(t)
 					t.Charges=0
 				end
 				done=true
-			elseif roll==2 and t.Charges>1000 then
+			elseif roll==2 and HasEnc2(t) then
 				t.Charges=0
 				done=true
 			elseif roll==3 and t.Bonus2~=0 then

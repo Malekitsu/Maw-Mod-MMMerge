@@ -347,7 +347,7 @@ function GenerateMercenary(t) --RosterId, Class, Level, Skills, Items, Face, Joi
 			if item then
 				item:Randomize(ItemQuality, type)
 				item.BonusExpireTime=0
-				if item.Bonus2>0 and item.Charges>1000 then 
+				if item.Bonus2>0 and HasEnc2(item) then
 					if math.random()<0.5 then
 						item.Bonus2=0
 					else

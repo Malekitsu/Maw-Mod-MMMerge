@@ -61,7 +61,7 @@ evt.PotionEffects[24] = function(IsDrunk, t, Power)
 end
 evt.PotionEffects[18] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
-		if t.Bonus2==0 and t.Bonus==0 and t.Charges<1000 then
+		if t.Bonus2==0 and t.Bonus==0 and not HasEnc2(t) then
 			if vars.enchantSeedList==nil then
 				vars.enchantSeedList={}
 				for i=0,2500 do
