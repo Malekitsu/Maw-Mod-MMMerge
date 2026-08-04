@@ -173,7 +173,7 @@ function events.CalcDamageToMonster(t)
 		end
 	end
 	if table.find(shamanClass, pl.Class)  then
-		if t.Result>0 and data and data.Object and data.Object.Spell>0 and data.Object.Spell<99 then
+		if t.Result>0 and data and data.Object and data.Object.Spell>0 and data.Object.Spell<99 and data.Object.Spell~=44 then
 			local s=0
 			for school=12,18 do
 				skill=SplitSkill(pl.Skills[school])
