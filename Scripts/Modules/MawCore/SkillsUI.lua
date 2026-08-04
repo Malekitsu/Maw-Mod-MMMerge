@@ -106,6 +106,7 @@ function SkillsUI.start()
 	local A = Engine.Addr
 	local I = Skills.internal
 	local getRaw = I.getRaw
+	local OFFSET = 0x7F000000	-- the DLL's "menu_skill_offset" topic encoding
 
 	---------------------------------------------------------------- helpers
 
@@ -187,11 +188,20 @@ function SkillsUI.start()
 	Engine.writePtr(0x601B0C, mem.u4[mNameArr + 2 * 4])	-- Expert
 	Engine.writePtr(0x6015C8, mem.u4[mNameArr + 4 * 4])	-- Grand
 
-	local unnamed = Engine.alloc(16)
-	local un = "Unnamed Skill"
-	for j = 1, #un do
-		mem.u1[unnamed + j - 1] = un:byte(j)
+	local function mkcstr(s)
+		local p = Engine.alloc(#s + 1)
+		for j = 1, #s do
+			mem.u1[p + j - 1] = s:byte(j)
+		end
+		return p
 	end
+	-- TEMP: distinct fallback per site group, so an "Unnamed" on screen
+	-- identifies which read produced it; unify back to one string after
+	local unnamed = mkcstr("Unnamed Skill L")	-- char-screen list rows
+	local unnamedT1 = mkcstr("Unnamed Skill T1")	-- learn list name 1
+	local unnamedT2 = mkcstr("Unnamed Skill T2")	-- learn list name 2
+	local unnamedH1 = mkcstr("Unnamed Skill H1")	-- hint name 0x41770D
+	local unnamedH2 = mkcstr("Unnamed Skill H2")	-- hint title 0x416B8A
 
 	------------------------------------------------- category table relocation
 
@@ -482,23 +492,32 @@ function SkillsUI.start()
 	hintTail(0x4172C1, true, "SkillzUIHintTailBonus")
 	hintTail(0x4174DD, false, "SkillzUIHintTail")
 
-	-- name reads in the two skill-hint text builders (extended ids read past
-	-- the 39-entry engine array; this is where "(null)"/"Unnamed" came from).
-	-- 0x41770D: mov ecx, [esi*4+names] (skill in esi)
-	Engine.asmpatch("SkillzUIHintName1", "Skillz port: skill hint name",
-		0x41770D, string.format([[
+	-- 0x417708, 12 bytes: the hover-hint title. The call to the hint-text
+	-- builder (0x4171E0) returns with esi CLOBBERED to the player pointer,
+	-- because the tail hooks inside it (ours, like the DLL's) skip the
+	-- original epilogue that restored esi. The DLL therefore hooked HERE --
+	-- before the call -- guarding the skill id across it; same fix.
+	Engine.asmpatch("SkillzUIHintName1",
+		"Skillz port: hover hint title, skill id guarded across text build",
+		0x417708, string.format([[
+		push edx
+		push esi
+		mov eax, 0x4171E0
+		call eax
+		pop esi
 		mov ecx, [0x%X + esi*4]
 		test ecx, ecx
-		jnz ht_ok
+		jnz hv_ok
 		cmp esi, %d
-		jae ht_un
+		jae hv_un
 		mov ecx, [0x%X + esi*4]
 		test ecx, ecx
-		jnz ht_ok
-	ht_un:
+		jnz hv_ok
+	hv_un:
 		mov ecx, 0x%X
-	ht_ok:
-	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamed), 7)
+	hv_ok:
+		pop edx
+	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamedH1), 12)
 
 	-- 0x416B8A: mov edi, [eax*4+names] -- the right-click hint WINDOW title
 	-- (skill id from [ebp-4]; the sibling read at 0x416B3F is the
@@ -516,17 +535,14 @@ function SkillsUI.start()
 	hw_un:
 		mov edi, 0x%X
 	hw_ok:
-	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamed), 7)
+	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamedH2), 7)
 
 	------------------------------------------------- house Learn-Skills dialog
 	-- The Instructor/shop "learn skill" list. Topic encoding follows the
 	-- DLL: 0x7F000000 + skill id ("menu_skill_offset"), because 36+id (the
 	-- engine's scheme) collides with real house commands for ids >= 39.
-	-- ALL learn topics are re-encoded in PopulateLearnSkillsDialog below, so
-	-- the display/click patches see one uniform encoding -- exactly the
-	-- runtime state the DLL produced by replacing the topic builder.
-
-	local OFFSET = 0x7F000000
+	-- Extended topics are OFFSET-encoded; base topics keep the engine's 36+id
+	-- (mixed encoding, tolerant decode in the gates).
 
 	local function playerByPtr(ptr)
 		for i = 0, Party.High do
@@ -538,10 +554,18 @@ function SkillsUI.start()
 	end
 
 	-- a class/mastery gate that must consult the Lua-parsed tables: asm stub
-	-- with a mem.hook that sets eax = MasteryLimit (dialog-time, no perf cost)
+	-- with a mem.hook that sets eax = MasteryLimit (dialog-time, no perf cost).
+	-- Topic encoding is MIXED: base skills keep the engine's 36+id, only the
+	-- extended extras use OFFSET+id -- so the decode is tolerant of both.
 	local function luaGate(name, why, addr, size, jmpBack, subReg, skillReg, playerReg)
 		local code = Engine.asmproc(string.format([[
+			cmp %s, 0x%X
+			jge lg_ext
+			sub %s, 0x24
+			jmp lg_id
+		lg_ext:
 			sub %s, 0x%X
+		lg_id:
 			nop
 			nop
 			nop
@@ -549,9 +573,10 @@ function SkillsUI.start()
 			nop
 			cmp eax, 0
 			jmp absolute 0x%X
-		]], subReg, OFFSET, jmpBack))
+		]], subReg, OFFSET, subReg, subReg, OFFSET, jmpBack))
 		Engine.asmpatch(name, why, addr, ("jmp absolute 0x%X"):format(code), size)
-		mem.hook(code + 6, function(d)
+		-- decode block above is 19 bytes: cmp(6) jge(2) sub(3) jmp(2) sub(6)
+		mem.hook(code + 19, function(d)
 			local ok, lim = pcall(function()
 				return MawCore.Skills.API.MasteryLimit(
 					playerByPtr(d[playerReg]), d[skillReg])
@@ -614,7 +639,7 @@ function SkillsUI.start()
 	ln1_un:
 		mov edx, 0x%X
 	ln1_ok:
-	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamed), 7)
+	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamedT1), 7)
 	Engine.asmpatch("SkillzUILearnName2", "Skillz port: learn topic name 2",
 		0x4B3406, string.format([[
 		push eax
@@ -631,7 +656,7 @@ function SkillsUI.start()
 		mov ebx, 0x%X
 	ln2_ok:
 		pop eax
-	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamed), 7)
+	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamedT2), 7)
 
 	-- click routing ranges: extended topics take the skill path, per the DLL
 	-- (which also deliberately dropped the engine's ==0x5E special case)
@@ -695,15 +720,12 @@ function SkillsUI.start()
 		pop eax
 	]], getPtr), 7)
 
-	-- topic injection: re-encode every entry to the DLL scheme and append
-	-- the extras recorded by Skillz.learn_at (zzMAW-Skills: Cover at
-	-- Training halls, Mana Shield/Enlightenment at Magic shops)
+	-- topic injection: base entries stay engine-encoded; only the extras
+	-- recorded by Skillz.learn_at are appended, OFFSET-encoded (the event's
+	-- core adds 36 to every entry, hence the -36 here). zzMAW-Skills data:
+	-- Cover at Training halls, Mana Shield/Enlightenment at Magic shops.
 	function events.PopulateLearnSkillsDialog(t)
 		local r = t.Result
-		for i = 1, #r do
-			local v = r[i]
-			r[i] = OFFSET - 36 + (const.Skills[v] or v)
-		end
 		for _, id in ipairs(Skills.ShopSkills[t.PicType] or {}) do
 			if id >= OLD_COUNT then
 				r[#r + 1] = OFFSET - 36 + id
