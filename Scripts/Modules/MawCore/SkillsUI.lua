@@ -264,8 +264,17 @@ function SkillsUI.start()
 	end
 
 	------------------------------------------------- list row mastery pushes
-	-- original 9 bytes: mov esi, [ebp-0x20] + push of the engine mastery name
-	-- (player local at [ebp-0x48], skill at [ebp-0x20])
+	-- original: push of the engine mastery name (6 bytes), then
+	-- mov esi, [ebp-0x20] at +6 (player local at [ebp-0x48], skill at [ebp-0x20]).
+	--
+	-- SIZE MUST BE 6, NOT 9: one mastery branch per category list jumps
+	-- straight to the mov at +6 (e.g. the Expert branch's `jmp 0x4198F4` in
+	-- the misc list). Patching 9 bytes swallowed that jump target into nop
+	-- padding, so on that branch esi kept a stale value (31) and every such
+	-- row was drawn with SkillNames[31] = "Disarm Trap". The DLL's 5-byte
+	-- hooks never covered the mov, which is why it only broke in the port.
+	-- The shim loads esi itself for the mastery call; the engine reloads it
+	-- right after the trampoline returns, which is redundant but harmless.
 
 	local masteryShim = string.format([[
 		mov esi, [ss:ebp - 0x20]
@@ -280,7 +289,7 @@ function SkillsUI.start()
 	]], masteryOf, mNameArr)
 	for n, addr in ipairs({0x418DFE, 0x4191AB, 0x41954B, 0x4198EE}) do
 		Engine.asmpatch("SkillzUIMastery" .. n, "Skillz port: mastery name push",
-			addr, masteryShim, 9)
+			addr, masteryShim, 6)
 	end
 
 	------------------------------------------------- skill point spending
