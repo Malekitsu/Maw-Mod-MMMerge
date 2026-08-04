@@ -136,7 +136,6 @@ function getCritInfo(pl, dmgType, monLvl)
 	return totalCrit, critDamageMultiplier, success
 end
 
-local SERVICE_CASTER = (Multiplayer and Multiplayer.SERVICE_CASTER) or 49
 
 -- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 

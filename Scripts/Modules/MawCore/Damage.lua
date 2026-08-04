@@ -47,6 +47,40 @@ local function rollDice(lo, hi)
 	return round((math.random(lo, hi) + math.random(lo, hi))/2)
 end
 
+-- the standard resistance mitigation: halved per 100 res (callers pass the
+-- already-%1000-reduced value where the bolster thousands must be stripped)
+local function resDivide(damage, res)
+	return damage / 2^(res/100)
+end
+
+-- per-player stat tracking, mirrored in vars (save-wide) and mapvars (per map)
+local function track(name, id, amount)
+	vars[name] = vars[name] or {}
+	vars[name][id] = (vars[name][id] or 0) + amount
+	mapvars[name] = mapvars[name] or {}
+	mapvars[name][id] = (mapvars[name][id] or 0) + amount
+end
+
+-- total HP of the party members that are alive
+local function partyHPSum()
+	local sum = 0
+	for i = 0, Party.High do
+		if Party[i].Dead == 0 and Party[i].Eradicated == 0 then
+			sum = sum + Party[i].HP
+		end
+	end
+	return sum
+end
+
+-- party slot (0..Party.High) for a player index, or nil if not in the party
+local function slotByIndex(id)
+	for i = 0, Party.High do
+		if Party[i]:GetIndex() == id then
+			return i
+		end
+	end
+end
+
 -- context -- the first stage: resolve the attack context once per hit.
 -- WhoHitMonster() is stable for the whole event, so every stage reads t.Hit
 -- instead of calling it again (the bodies' `data` locals now alias t.Hit).
@@ -72,18 +106,11 @@ local function stage_seraphOnHitHeal(t)
 	local data = t.Hit
 		if data and data.Player and (data.Player.Class==55 or data.Player.Class==54 or data.Player.Class==53) and t.DamageKind==4 and data.Object==nil then
 		local pl=data.Player
-		local partyHP=0
-		for i=0,Party.High do
-			if Party[i].Dead==0 and Party[i].Eradicated==0 then
-				partyHP=partyHP+Party[i].HP
-			end
-		end
-		
+		local partyHP=partyHPSum()
+
 		--get body
 		bodyS,bodyM=SplitSkill(pl.Skills[const.Skills.Body])
-		
-		if bodyS==0 and spiritS==0 then return end
-		
+
 		--Calculate heal value and apply
 		healValue=(bodyS^1.3*bodyM*2)*damageMultiplier[t.PlayerIndex]["Melee"]
 		personality=pl:GetPersonality()
@@ -101,13 +128,7 @@ local function stage_seraphOnHitHeal(t)
 			
 			local healing=math.min(healValue, fhp-hp)
 			
-			local id=t.PlayerIndex
-			vars.healingDone=vars.healingDone or {}
-			vars.healingDone[id]=vars.healingDone[id] or 0
-			vars.healingDone[id]=vars.healingDone[id] + healing
-			mapvars.healingDone=mapvars.healingDone or {}
-			mapvars.healingDone[id]=mapvars.healingDone[id] or 0
-			mapvars.healingDone[id]=mapvars.healingDone[id] + healing
+			track("healingDone", t.PlayerIndex, healing)
 			return
 		end
 		
@@ -117,21 +138,9 @@ local function stage_seraphOnHitHeal(t)
 		if Party[healTarget].HP>0 then
 			Party[healTarget].Unconscious=0
 		end
-		local partyHP2=0
-		for i=0,Party.High do
-			if Party[i].Dead==0 and Party[i].Eradicated==0 then
-				partyHP2=partyHP2+Party[i].HP
-			end
-		end
-		if partyHP2>partyHP and (Party.EnemyDetectorRed or Party.EnemyDetectorYellow) then	
-			local healing=partyHP2-partyHP
-			local id=t.PlayerIndex
-			vars.healingDone=vars.healingDone or {}
-			vars.healingDone[id]=vars.healingDone[id] or 0
-			vars.healingDone[id]=vars.healingDone[id] + healing
-			mapvars.healingDone=mapvars.healingDone or {}
-			mapvars.healingDone[id]=mapvars.healingDone[id] or 0
-			mapvars.healingDone[id]=mapvars.healingDone[id] + healing
+		local partyHP2=partyHPSum()
+		if partyHP2>partyHP and (Party.EnemyDetectorRed or Party.EnemyDetectorYellow) then
+			track("healingDone", t.PlayerIndex, partyHP2-partyHP)
 		end
 	end
 end
@@ -242,7 +251,7 @@ local function stage_monsterVsMonster(t)
 		local mon=data.Monster
 		local damage=getMonsterDamage(mon)/3 --1/3 of damage
 		local res=t.Monster.Resistances[4]%1000
-		local damage=round(damage/2^(res/100))
+		local damage=round(resDivide(damage, res))
 		t.Result=damage
 	end
 end
@@ -255,11 +264,9 @@ local function stage_coverFlag(t)
 		if data.Object==nil then
 			local s, m=SplitSkill(Skillz.get(data.Player,50))
 			if m>=4 then
-				for i=0, Party.High do
-					if Party[i]:GetIndex()==t.PlayerIndex then
-						coverBonus[i]=true
-						return
-					end
+				local slot=slotByIndex(t.PlayerIndex)
+				if slot then
+					coverBonus[slot]=true
 				end
 			end
 		end
@@ -421,12 +428,7 @@ local function stage_sparksChain(t)
 				local obj=GrabObjects()
 				if not obj then return end
 				local index=data.Player:GetIndex()
-				local id=0
-				for i=0, Party.High do
-					if Party[i]:GetIndex()==index then
-						id=i
-					end
-				end
+				local id=slotByIndex(index) or 0
 				local skill=Party[id].Skills[const.Skills.Air]
 				local s, m = SplitSkill(skill)
 				obj.Spell=18
@@ -463,11 +465,6 @@ local function stage_weaponRecompute(t)
   if not pl then return end
 
   local idx = data.Player:GetIndex()
-  --[[
-  if idx == SERVICE_CASTER or (not evt.IsPlayerInParty or not evt.IsPlayerInParty(idx)) then
-    return
-  end
-]]
   if not damageMultiplier or not damageMultiplier[idx] then
     return
   end
@@ -635,8 +632,7 @@ local function stage_resAndRetaliation(t)
 		end
 	end
 	
-	res=2^(res/100)
-	t.Result = t.Result / res
+	t.Result = resDivide(t.Result, res)
 end
 
 
@@ -681,7 +677,7 @@ local function stage_dragonAttack(t)
 				pl.SP=math.min(pl.SP+20, 120)
 			end
 			--apply Damage
-			t.Result = damage /2^(res%1000/100)
+			t.Result = resDivide(damage, res%1000)
 		elseif t.DamageKind==50 or data.Spell==123 then
 			local low=pl:GetRangedDamageMin()
 			local high=pl:GetRangedDamageMax()
@@ -712,7 +708,7 @@ local function stage_dragonAttack(t)
 						res=mon.Resistances[i]%1000
 					end
 				end
-				damage = damage/2^(res/100)
+				damage = resDivide(damage, res)
 			end
 			--apply Damage
 			t.Result = damage
@@ -736,12 +732,7 @@ local function stage_shamanOnHit(t)
 		
 		local healing=math.min(data.Player:GetFullHP()-data.Player.HP, leech)
 		if healing>0 then
-			vars.leechDone=vars.leechDone or {}
-			vars.leechDone[id]=vars.leechDone[id] or 0
-			vars.leechDone[id]=vars.leechDone[id] + healing
-			mapvars.leechDone=mapvars.leechDone or {}
-			mapvars.leechDone[id]=mapvars.leechDone[id] or 0
-			mapvars.leechDone[id]=mapvars.leechDone[id] + healing
+			track("leechDone", id, healing)
 		end
 		data.Player.HP=math.min(data.Player.HP+leech, data.Player:GetFullHP())
 	end
@@ -779,7 +770,7 @@ local function stage_dkAttack(t)
 			end
 			
 			local res=t.Monster.Resistances[t.DamageKind] or t.Monster.Resistances[4]
-			damage=damage/2^(res%1000/100)
+			damage=resDivide(damage, res%1000)
 			local mult=damageMultiplier[t.PlayerIndex]["Melee"]
 			t.Result=damage*mult
 			
@@ -818,12 +809,7 @@ local function stage_dkAttack(t)
 		
 			local healing=math.min(pl:GetFullHP()-pl.HP, round(leech+heal))
 			if healing>0 then
-				vars.leechDone=vars.leechDone or {}
-				vars.leechDone[id]=vars.leechDone[id] or 0
-				vars.leechDone[id]=vars.leechDone[id] + healing
-				mapvars.leechDone=mapvars.leechDone or {}
-				mapvars.leechDone[id]=mapvars.leechDone[id] or 0
-				mapvars.leechDone[id]=mapvars.leechDone[id] + healing
+				track("leechDone", id, healing)
 			end
 			
 			pl.HP=math.min(pl:GetFullHP(), pl.HP+heal+leech)
@@ -909,7 +895,7 @@ local function stage_assassinAttack(t)
 			end
 			
 			local res=t.Monster.Resistances[t.DamageKind] or t.Monster.Resistances[4]
-			damage=damage/2^(res%1000/100)
+			damage=resDivide(damage, res%1000)
 			local mult=damageMultiplier[t.PlayerIndex]["Melee"]
 			t.Result=damage*mult
 			
@@ -921,7 +907,7 @@ local function stage_assassinAttack(t)
 				t.Result=t.Result*assassinSpells[data.Object.Spell].DamageMult
 				if spell==44 then
 					local res=t.Monster.Resistances[3]%1000
-					t.Result=t.Result/2^(res/100)
+					t.Result=resDivide(t.Result, res)
 				end
 			end
 		end
@@ -933,12 +919,7 @@ end
 local function stage_bossAffixes(t)
 	if t.Monster.NameId>=220 and t.Monster.NameId<300 then
 		if t.Player then
-			local id=t.Player:GetIndex()
-			for i=0,Party.High do
-				if Party[i]:GetIndex()==id then
-					index=i
-				end
-			end
+			index=slotByIndex(t.Player:GetIndex())
 			skill = string.match(Game.PlaceMonTxt[t.Monster.NameId], "([^%s]+)")
 			if skill=="Thorn" or skill=="Omnipotent" then
 				if t.DamageKind==4 then
@@ -1061,7 +1042,7 @@ local function stage_legendaries(t)
 			elseif data and data.Object and data.Object.Spell==133 then
 				dmg=dmg*damageMultiplier[id]["Ranged"]
 			elseif data and data.Object and data.Object.Spell>0 then
-				if  table.find(dkClass, pl.Class) or table.find(dkClass, pl.Class) or table.find(assassinClass, pl.Class) then
+				if  table.find(dkClass, pl.Class) or table.find(assassinClass, pl.Class) then
 					dmg=dmg*damageMultiplier[id]["Melee"]
 				else
 					local s,m = SplitSkill(pl:GetSkill(const.Skills.Learning))
@@ -1081,7 +1062,7 @@ local function stage_legendaries(t)
 		end
 		fireDamage=math.max(mon.HP*fireDamage,s1)
 		fireRes=mon.Resistances[0]%1000
-		fireDamage=fireDamage/2^(fireRes/100)
+		fireDamage=resDivide(fireDamage, fireRes)
 		t.Result=t.Result+fireDamage
 	end
 	--same for assassin
@@ -1094,7 +1075,7 @@ local function stage_legendaries(t)
 		end
 		waterDamage=math.max(mon.HP*waterDamage,s1)
 		waterRes=mon.Resistances[2]%1000
-		waterDamage=waterDamage/2^(waterRes/100)
+		waterDamage=resDivide(waterDamage, waterRes)
 		t.Result=t.Result+waterDamage
 	end
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 21) then
@@ -1216,12 +1197,7 @@ end
 local function stage_leech(t)
 	local data=t.Hit
 	if data and data.Player and t.Result>0 then
-		local partyHP=0
-		for i=0,Party.High do
-			if Party[i].Dead==0 and Party[i].Eradicated==0 then
-				partyHP=partyHP+Party[i].HP
-			end
-		end
+		local partyHP=partyHPSum()
 		local pl=data.Player
 		local index=pl:GetIndex()
 		local mon=t.Monster
@@ -1321,21 +1297,9 @@ local function stage_leech(t)
 				Party[id].HP=math.min(Party[id].HP+overHeal, GetMaxHP(Party[id]))
 			end
 		end
-		local partyHP2=0
-		for i=0,Party.High do
-			if Party[i].Dead==0 and Party[i].Eradicated==0 then
-				partyHP2=partyHP2+Party[i].HP
-			end
-		end
-		if partyHP2>partyHP and (Party.EnemyDetectorRed or Party.EnemyDetectorYellow) then	
-			local healing=partyHP2-partyHP
-			local id=pl:GetIndex()
-			vars.leechDone=vars.leechDone or {}
-			vars.leechDone[id]=vars.leechDone[id] or 0
-			vars.leechDone[id]=vars.leechDone[id] + healing
-			mapvars.leechDone=mapvars.leechDone or {}
-			mapvars.leechDone[id]=mapvars.leechDone[id] or 0
-			mapvars.leechDone[id]=mapvars.leechDone[id] + healing
+		local partyHP2=partyHPSum()
+		if partyHP2>partyHP and (Party.EnemyDetectorRed or Party.EnemyDetectorYellow) then
+			track("leechDone", pl:GetIndex(), partyHP2-partyHP)
 		end
 	end
 end
@@ -1357,19 +1321,9 @@ local function stage_trackAndClamp(t)
 		end
 		
 		if data.Object then
-			vars.damageTrackRanged=vars.damageTrackRanged or {}
-			vars.damageTrackRanged[data.Player:GetIndex()]=vars.damageTrackRanged[data.Player:GetIndex()] or 0
-			vars.damageTrackRanged[data.Player:GetIndex()] = vars.damageTrackRanged[data.Player:GetIndex()] + damage
-			mapvars.damageTrackRanged=mapvars.damageTrackRanged or {}
-			mapvars.damageTrackRanged[data.Player:GetIndex()]=mapvars.damageTrackRanged[data.Player:GetIndex()] or 0
-			mapvars.damageTrackRanged[data.Player:GetIndex()] = mapvars.damageTrackRanged[data.Player:GetIndex()] + damage
+			track("damageTrackRanged", data.Player:GetIndex(), damage)
 		else
-			vars.damageTrack=vars.damageTrack or {}
-			vars.damageTrack[data.Player:GetIndex()]=vars.damageTrack[data.Player:GetIndex()] or 0
-			vars.damageTrack[data.Player:GetIndex()] = vars.damageTrack[data.Player:GetIndex()] + damage
-			mapvars.damageTrack=mapvars.damageTrack or {}
-			mapvars.damageTrack[data.Player:GetIndex()]=mapvars.damageTrack[data.Player:GetIndex()] or 0
-			mapvars.damageTrack[data.Player:GetIndex()] = mapvars.damageTrack[data.Player:GetIndex()] + damage
+			track("damageTrack", data.Player:GetIndex(), damage)
 		end
 		if ShowDamage then
 			ShowDamage(data.Player, damage, crit, data.Object, t.Monster)
@@ -1388,10 +1342,9 @@ local function stage_trackAndClamp(t)
 		t.Result=t.Result/divide
 	end
 	if data and data.Player then
-		for i=0, Party.High do
-			if Party[i]:GetIndex()==t.PlayerIndex then
-				checkSkills(i) --to use the correct spell name
-			end
+		local slot=slotByIndex(t.PlayerIndex)
+		if slot then
+			checkSkills(slot) --to use the correct spell name
 		end
 		MSGdamage=MSGdamage or 0
 		MSGdamage=MSGdamage+math.ceil(t.Result*divide)
@@ -1400,7 +1353,6 @@ local function stage_trackAndClamp(t)
 		attackIsSpell=false
 		castedAoe=false
 		shoot="hits"
-		kill=""
 		critMessage= ""
 		if data.Object then 
 			if data.Object.SpellType>1 and data.Object.SpellType<133 then
@@ -1414,7 +1366,6 @@ local function stage_trackAndClamp(t)
 			name=t.Player.Name
 		end
 		if t.Result>t.Monster.HP then
-			kill="killing"
 			shoot="inflicts"
 		end
 		if crit then
