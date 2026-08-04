@@ -13,29 +13,7 @@ function events.CalcDamageToPlayer(t)
 	end
 end
 
-function events.CalcDamageToMonster(t)
-	if t.Player and t.DamageKind==4 and getMapAffixPower(23) then
-		t.Result=t.Result*(1-getMapAffixPower(23)/100)
-	end
-	if t.Player and t.DamageKind~=4 and getMapAffixPower(24) then
-		t.Result=t.Result*(1-getMapAffixPower(24)/100)
-	end
-	if t.Player and getMapAffixPower(30) then
-		if math.random()<getMapAffixPower(30)/100 then
-			t.Result=0
-		end
-	end
-	if t.Player and getMapAffixPower(5) and t.DamageKind==4 then
-		reflectedDamage=true
-		t.Player:DoDamage(t.Result*(1-getMapAffixPower(5)/100),4) 
-		reflectedDamage=false
-	end
-	if t.Player and getMapAffixPower(6) and t.DamageKind~=4 then
-		reflectedDamage=true
-		t.Player:DoDamage(t.Result*(1-getMapAffixPower(6)/100),t.DamageKind) 
-		reflectedDamage=false
-	end
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 function events.DoBadThingToPlayer(t)
 	if t.Allow==false and getMapAffixPower(8) and math.random()<getMapAffixPower(8)/100 then
 		t.Allow=true

@@ -252,74 +252,7 @@ function pickLowestPartyMember()
 	return min_index, min_value
 end
 
-function events.CalcDamageToMonster(t)
-	if t.Result==0 then return end
-	local data = WhoHitMonster()
-		if data and data.Player and (data.Player.Class==55 or data.Player.Class==54 or data.Player.Class==53) and t.DamageKind==4 and data.Object==nil then
-		local pl=data.Player
-		local partyHP=0
-		for i=0,Party.High do
-			if Party[i].Dead==0 and Party[i].Eradicated==0 then
-				partyHP=partyHP+Party[i].HP
-			end
-		end
-		
-		--get body
-		bodyS,bodyM=SplitSkill(pl.Skills[const.Skills.Body])
-		
-		if bodyS==0 and spiritS==0 then return end
-		
-		--Calculate heal value and apply
-		healValue=(bodyS^1.3*bodyM*2)*damageMultiplier[t.PlayerIndex]["Melee"]
-		personality=pl:GetPersonality()
-		healValue=round(healValue*(1+personality/1000))
-
-		local healTarget, lowestHealthPercentage=pickLowestPartyMember()
-		
-		local percent, partyId, playerId=OnlineLowestHealthPercentage()
-		
-		if lowestHealthPercentage>0.25 and percent<lowestHealthPercentage then
-			SendHeal(partyId, playerId, healValue, pl.Name)
-			
-			local hp=vars.online.partyHealthMana.Parties[partyId][playerId].HP
-			local fhp=vars.online.partyHealthMana.Parties[partyId][playerId].FHP
-			
-			local healing=math.min(healValue, fhp-hp)
-			
-			local id=t.PlayerIndex
-			vars.healingDone=vars.healingDone or {}
-			vars.healingDone[id]=vars.healingDone[id] or 0
-			vars.healingDone[id]=vars.healingDone[id] + healing
-			mapvars.healingDone=mapvars.healingDone or {}
-			mapvars.healingDone[id]=mapvars.healingDone[id] or 0
-			mapvars.healingDone[id]=mapvars.healingDone[id] + healing
-			return
-		end
-		
-		--apply heal
-		evt[healTarget].Add("HP",healValue)		
-		--bug fix
-		if Party[healTarget].HP>0 then
-			Party[healTarget].Unconscious=0
-		end
-		local partyHP2=0
-		for i=0,Party.High do
-			if Party[i].Dead==0 and Party[i].Eradicated==0 then
-				partyHP2=partyHP2+Party[i].HP
-			end
-		end
-		if partyHP2>partyHP and (Party.EnemyDetectorRed or Party.EnemyDetectorYellow) then	
-			local healing=partyHP2-partyHP
-			local id=t.PlayerIndex
-			vars.healingDone=vars.healingDone or {}
-			vars.healingDone[id]=vars.healingDone[id] or 0
-			vars.healingDone[id]=vars.healingDone[id] + healing
-			mapvars.healingDone=mapvars.healingDone or {}
-			mapvars.healingDone[id]=mapvars.healingDone[id] or 0
-			mapvars.healingDone[id]=mapvars.healingDone[id] + healing
-		end
-	end
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 --[[mind light increases melee damage
 
@@ -353,21 +286,7 @@ function events.LoadMap(wasInGame)
 	end
 end
 
----deactivate offhand weapon
-function events.CalcDamageToMonster(t)
-	if t.Player and (t.Player.Class==55 or t.Player.Class==54 or t.Player.Class==53) then
-		data=WhoHitMonster()
-		if data and data.Player then
-			item=data.Player:GetActiveItem(0)
-		end
-		if item~=nil then
-			if item:T().Skill==1 then
-				t.Result=0
-				Message("Seraphim aren't able to dual wield")
-			end
-		end
-	end
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 --skill tooltips
 --tooltips
@@ -852,78 +771,7 @@ function dragonSkill(dragon, index)
 end
 
 function events.GameInitialized2()
-	function events.CalcDamageToMonster(t)
-		data=WhoHitMonster()
-		if data and data.Player and Game.CharacterPortraits[data.Player.Face].Race==const.Race.Dragon then
-			local pl=data.Player
-			if data.Object==nil then
-				local breath = SplitSkill(data.Player:GetSkill(const.Skills.DragonAbility))
-				local fang, fangM = SplitSkill(data.Player:GetSkill(const.Skills.Unarmed))
-				if breath>=fang then
-					local x, y = directionToUnitVector(Party.Direction)
-					push=push or {}
-					mult=fang/t.Monster.Level^0.75
-					table.insert(push,{["directionX"]=x, ["directionY"]=y, ["duration"]=60*mult^0.5, ["totalDuration"]=60*mult^0.5, ["totalForce"]=800*mult, ["currentForce"]=800*mult, ["id"]=t.MonsterIndex})
-				end
-				
-				local low=pl:GetMeleeDamageMin()
-				local high=pl:GetMeleeDamageMax()
-				local randomDamage=math.random(low, high) + math.random(low, high)
-				local damage=round(randomDamage/2)
-				
-				--check by damage type
-				index=table.find(damageKindMap,t.DamageKind)
-				res=t.Monster.Resistances[index]
-				if not res then return end
-				critChance, critMult, crit=getCritInfo(pl,false,getMonsterLevel(t.Monster))
-				if crit then
-					damage=damage*critMult
-				end
-				if pl.Class==10 then
-					pl.SP=math.min(pl.SP+10, 60)
-				elseif pl.Class==11 then
-					pl.SP=math.min(pl.SP+20, 120)
-				end
-				--apply Damage
-				t.Result = damage /2^(res%1000/100)
-			elseif t.DamageKind==50 or data.Spell==123 then
-				local low=pl:GetRangedDamageMin()
-				local high=pl:GetRangedDamageMax()
-				local randomDamage=math.random(low, high) + math.random(low, high)
-				local damage=round(randomDamage/2)
-				
-				critChance, critMult, crit=getCritInfo(pl,false,getMonsterLevel(t.Monster))
-				if crit then
-					damage=damage*critMult
-				end
-				if data.Spell==123 then
-					local s,m=SplitSkill(t.Player.Skills[const.Skills.DragonAbility])
-					local mult=0.85
-					if m<=2 then
-						mult=0.7
-					elseif m==4 then
-						mult=1
-					end
-					damage=damage*mult
-				end
-				--randomize
-				damage=damage*0.75+(damage*math.random()*0.25)+(damage*math.random()*0.25)
-				--resistance
-				if t.Monster then
-					local res=10000
-					local mon=t.Monster
-					for i=0,10 do
-						if mon.Resistances[i] and mon.Resistances[i]%1000<res then
-							res=mon.Resistances[i]%1000
-						end
-					end
-					damage = damage/2^(res/100)
-				end
-				--apply Damage
-				t.Result = damage
-			end
-		end
-	end
+	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 end
 
 -- Function to convert party direction to radians
@@ -969,31 +817,7 @@ end
 shamanClass={59, 60, 61}
 
 function events.GameInitialized2()
-	function events.CalcDamageToMonster(t)	
-		local data = WhoHitMonster()
-		if data and data.Player and table.find(shamanClass, data.Player.Class) and t.DamageKind==4 and data.Object==nil and t.Result>0 then	
-			m6=SplitSkill(data.Player.Skills[const.Skills.Mind])
-			m7,bM=SplitSkill(data.Player.Skills[const.Skills.Body])
-			
-			local FHP=data.Player:GetFullHP()
-			local leech=math.max(round(FHP^0.5* m7^1.5/70 * (0.5+bM/2)), m7)
-			local maxSP=data.Player:GetFullSP()
-			data.Player.SP=math.min(data.Player.SP+m6^1.25, getMaxMana(data.Player))
-			
-			local id=data.Player:GetIndex()
-			
-			local healing=math.min(data.Player:GetFullHP()-data.Player.HP, leech)
-			if healing>0 then
-				vars.leechDone=vars.leechDone or {}
-				vars.leechDone[id]=vars.leechDone[id] or 0
-				vars.leechDone[id]=vars.leechDone[id] + healing
-				mapvars.leechDone=mapvars.leechDone or {}
-				mapvars.leechDone[id]=mapvars.leechDone[id] or 0
-				mapvars.leechDone[id]=mapvars.leechDone[id] + healing
-			end
-			data.Player.HP=math.min(data.Player.HP+leech, data.Player:GetFullHP())
-		end
-	end
+	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 	--[[
 	function events.CalcStatBonusByItems(t)
 		if t.Stat==const.Stats.MeleeDamageMax or t.Stat==const.Stats.MeleeDamageMin then
@@ -1099,7 +923,8 @@ local DKManaCost={
 	[97]=100,
 }
 
-local DKDamageMult={
+-- global since the damage pipeline migration (DAMAGE_PIPELINE.md)
+DKDamageMult={
 	[26]={1,1,1.2,1.2,["Skill"]=14},
 	[29]={1.5,1.5,1.5,2,["Skill"]=14},
 	[32]={0.75,0.75,0.75,0.75,["Skill"]=14},
@@ -1130,131 +955,7 @@ function events.GameInitialized2()
 		end
 	end	
 	--body leech damage
-	function events.CalcDamageToMonster(t)
-		local data = WhoHitMonster()
-		if data and data.Player and table.find(dkClass, data.Player.Class) then
-			local pl=data.Player
-			local spell=0
-			if data and data.Object and data.Object.Spell then
-				spell=data.Object.Spell
-			end
-			if DKDamageMult[spell] then
-				--add physical damage to spells
-				baseDamage=pl:GetMeleeDamageMin()
-				maxDamage=pl:GetMeleeDamageMax()
-				randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
-				damage=round(randomDamage/2)
-				
-				critChance, critMult, success=getCritInfo(pl,false,getMonsterLevel(t.Monster))
-				if success then
-					damage=damage*critMult
-					crit=true
-				end
-				for i=0,1 do
-					local it=pl:GetActiveItem(i)
-					if it then
-						local damage1=calcFireAuraDamage(pl, it, 0, false, false, "damage")
-						local damage2=calcEnchantDamage(pl, it, 0, false, false, "damage")
-						damage=damage+damage1+damage2
-					end
-				end
-				
-				local res=t.Monster.Resistances[t.DamageKind] or t.Monster.Resistances[4]
-				damage=damage/2^(res%1000/100)
-				local mult=damageMultiplier[t.PlayerIndex]["Melee"]
-				t.Result=damage*mult
-				
-				if pl.Weak>0 then
-					t.Result=t.Result*0.5
-				end
-				
-				--add spell modifier
-				if DKDamageMult[spell] then
-					local s,m=SplitSkill(pl.Skills[DKDamageMult[spell].Skill])
-					t.Result=t.Result*DKDamageMult[spell][m]
-				end
-			end
-			--life leech
-			if t.DamageKind==4 and table.find(dkClass, data.Player.Class) then
-				local pl=data.Player
-				local bloodS, bloodM=SplitSkill(pl.Skills[const.Skills.Body])
-				local FHP=pl:GetFullHP()
-				local monLvl=getMonsterLevel(t.Monster)
-				local heal=FHP*(bloodS/round(monLvl^0.7))*0.05
-				--current active leech spell
-				vars.dkActiveAttackSpell=vars.dkActiveAttackSpell or {}
-				local id=pl:GetIndex()
-				leech=0
-				if vars.dkActiveAttackSpell and (vars.dkActiveAttackSpell[id]==68 or vars.dkActiveAttackSpell[id]==74) then
-					local FHP=pl:GetFullHP()
-					local leech=math.max(FHP^0.5* bloodS^1.5/70* (1+bloodM/4), bloodS*2)
-					pl.SP=pl.SP-6
-					if vars.dkActiveAttackSpell[id]==74 then
-						leech=leech * 2
-						pl.SP=pl.SP-6
-					end
-				end
-				
-				local id=pl:GetIndex()
-			
-				local healing=math.min(pl:GetFullHP()-pl.HP, round(leech+heal))
-				if healing>0 then
-					vars.leechDone=vars.leechDone or {}
-					vars.leechDone[id]=vars.leechDone[id] or 0
-					vars.leechDone[id]=vars.leechDone[id] + healing
-					mapvars.leechDone=mapvars.leechDone or {}
-					mapvars.leechDone[id]=mapvars.leechDone[id] or 0
-					mapvars.leechDone[id]=mapvars.leechDone[id] + healing
-				end
-				
-				pl.HP=math.min(pl:GetFullHP(), pl.HP+heal+leech)
-				
-				--dark grasp
-				if vars.dkActiveAttackSpell and vars.dkActiveAttackSpell[id]==96 then
-					pl.SP=pl.SP-15
-					local darkGraspCC = {Debuff = const.MonsterBuff.DamageHalved}
-					local graspDuration = calcDebuffDuration(t.Monster, darkGraspCC, const.Minute)
-					if graspDuration > 0 then
-						t.Monster.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime, Game.Time+graspDuration)
-						local s, m=SplitSkill(pl.Skills[const.Skills.Dark])
-						if m==4 then
-							t.Monster.SpellBuffs[const.MonsterBuff.MeleeOnly].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.MeleeOnly].ExpireTime, Game.Time+graspDuration)
-						end
-					end
-				end
-				--restore SP
-				if t.DamageKind==4 then
-					local regen=spRegen[pl.Class]
-					if t.Result>t.Monster.HP then
-						regen=regen*1.5
-					end
-					pl.SP=math.min(getMaxMana(pl), pl.SP+regen)
-				end
-			end
-			
-			--spell effect
-			if data and data.Object then
-				if data.Object.Spell==26 then
-					local s,m=SplitSkill(pl.Skills[const.Skills.Water])
-					if m>=2 then
-						local power=math.floor(m/2)*2
-						local slowCC = {Debuff = const.MonsterBuff.Slow}
-						local slowDuration = calcDebuffDuration(t.Monster, slowCC, const.Minute)
-						if slowDuration > 0 then
-							t.Monster.SpellBuffs[const.MonsterBuff.Slow].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.Slow].ExpireTime, Game.Time+slowDuration)
-							t.Monster.SpellBuffs[const.MonsterBuff.Slow].Power=power
-						end
-					end
-				elseif data.Object.Spell==76 then
-					local paraCC = {Debuff = const.MonsterBuff.Paralyze}
-					local paraDuration = calcDebuffDuration(t.Monster, paraCC, const.Minute*2)
-					if paraDuration > 0 then
-						t.Monster.SpellBuffs[const.MonsterBuff.Paralyze].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.Paralyze].ExpireTime, Game.Time+paraDuration)
-					end
-				end
-			end
-		end
-	end
+	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 	
 	function events.Action(t)
 		if (t.Action==142 and t.Param==68) or (t.Action==142 and t.Param==74) or (t.Action==142 and t.Param==96) then
@@ -1530,47 +1231,7 @@ function events.CanLearnSpell(t)
 end
 
 spellRequirements={0,0,500,1500,5000,10000,20000,40000,80000,160000,320000}
-local masteryRequired={1,1,1,1,2,2,2,3,3,3,4}
-function events.CalcDamageToMonster(t)
-	if t.Monster.Hostile==false and t.Monster.ShowAsHostile==false then
-		return
-	end
-	local data=WhoHitMonster()
-	if data and data.Player and data.Object and table.find(elementalistClass, data.Player.Class) and data.Object.Spell<45 and data.Object.Spell>0 then
-		local pl=data.Player
-		local spell=data.Object.Spell
-		local school=math.ceil(spell/11)+11
-		vars.elementalistSpells=vars.elementalistSpells or {}
-		vars.elementalistSpells[pl:GetIndex()]=vars.elementalistSpells[pl:GetIndex()] or {}
-		vars.elementalistSpells[pl:GetIndex()][school]=vars.elementalistSpells[pl:GetIndex()][school] or 0
-		
-		local tier=spell%11==0 and 11 or spell%11
-		local learningBonus=tier^1.5 * t.Monster.Level^0.5
-		if not vars.insanityMode then
-			learningBonus = learningBonus * Party.Count^0.5
-		end
-		if table.find(aoespells,spell) and spell~=15 and spell~=24 then
-			learningBonus=learningBonus/3
-		end
-		vars.elementalistSpells[pl:GetIndex()][school]=vars.elementalistSpells[pl:GetIndex()][school] + learningBonus
-		school2=(school-12)*11
-		for i=1,11 do
-			local spell2= school2+i
-			if pl.Spells[spell2]==false then
-				local tier=spell2%11==0 and 11 or spell2%11
-				local s,m=SplitSkill(pl:GetSkill(school))
-				if vars.elementalistSpells[pl:GetIndex()][school]>=spellRequirements[tier] and m>=masteryRequired[tier] then
-					if vars.insanityMode and spell2==19 and m<4 then
-						pl.Spells[spell2]=false
-					else
-						pl.Spells[spell2]=true
-						Message("Learned " .. Game.SpellsTxt[spell2].Name)
-					end
-				end
-			end
-		end		
-	end
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 eleOffSpellsOut={2,6,7,9,11,
 				15,18,20,22,
@@ -1646,17 +1307,7 @@ function elementalistStacksDecay()
 end
 
 
-function events.CalcDamageToMonster(t)
-	local data=WhoHitMonster()
-	if data and data.Player and (not data.Object or data.Object.Spell==133) then
-		local pl=data.Player
-		if table.find(elementalistClass, pl.Class) then
-			local id=pl:GetIndex()
-			vars.eleStacks=vars.eleStacks or {}
-			vars.eleStacks[id]=0
-		end
-	end
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 singleTarget={2,11,20,26,29,37,39}
 shotGun={2,15,24,37}
@@ -1959,57 +1610,7 @@ end
 assassinClass={const.Class.Thief,const.Class.Rogue,const.Class.Assassin,const.Class.Spy}
 
 function events.GameInitialized2()
-	function events.CalcDamageToMonster(t)
-		local data = WhoHitMonster()
-		if data and data.Player and table.find(assassinClass, data.Player.Class) then
-			local pl=data.Player
-			local spell=0
-			if data and data.Object and data.Object.Spell then
-				spell=data.Object.Spell
-			end
-			if assassinSpells[spell] then
-				local baseDamage=pl:GetMeleeDamageMin()
-				local maxDamage=pl:GetMeleeDamageMax()
-				local randomDamage=math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
-				local damage=round(randomDamage/2)
-				
-				local isolatedDamageReduction=assassinationDamage(pl,t.Monster,data.Object) --must be subtracted
-				damage=damage-isolatedDamageReduction
-				
-				critChance, critMult, success=getCritInfo(pl,false,getMonsterLevel(t.Monster))
-				if success then
-					damage=damage*critMult
-					crit=true
-				end
-				
-				for i=0,1 do
-					local it=pl:GetActiveItem(i)
-					if it then
-						local damage1=calcFireAuraDamage(pl, it, 0, false, false, "damage")
-						local damage2=calcEnchantDamage(pl, it, 0, false, false, "damage")
-						damage=damage+damage1+damage2
-					end
-				end
-				
-				local res=t.Monster.Resistances[t.DamageKind] or t.Monster.Resistances[4]
-				damage=damage/2^(res%1000/100)
-				local mult=damageMultiplier[t.PlayerIndex]["Melee"]
-				t.Result=damage*mult
-				
-				if pl.Weak>0 then
-					t.Result=t.Result*0.5
-				end
-				
-				if assassinSpells[spell].DamageMult then
-					t.Result=t.Result*assassinSpells[data.Object.Spell].DamageMult
-					if spell==44 then
-						local res=t.Monster.Resistances[3]%1000
-						t.Result=t.Result/2^(res/100)
-					end
-				end
-			end
-		end
-	end
+	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 	
 end
 

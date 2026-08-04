@@ -2245,22 +2245,7 @@ function events.LoadMap()
 end
 ]]
 coverBonus={}
-function events.CalcDamageToMonster(t)
-	data = WhoHitMonster()	
-	if data and data.Player and t.DamageKind==4 then
-		if data.Object==nil then
-			local s, m=SplitSkill(Skillz.get(data.Player,50))
-			if m>=4 then
-				for i=0, Party.High do
-					if Party[i]:GetIndex()==t.PlayerIndex then
-						coverBonus[i]=true
-						return
-					end
-				end
-			end
-		end
-	end
-end	
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 		
 function events.CanIdentifyItem(t)
@@ -2390,60 +2375,9 @@ function events.BeforeLoadMap(wasInGame)
 	end
 end
 
---mace stun
-local maceStunCC = {Debuff = const.MonsterBuff.Paralyze}
-function events.CalcDamageToMonster(t)
-	if t.Player then
-		local it=t.Player:GetActiveItem(1)
-		if not it then return end
-		local skill=it:T().Skill
-		local data=WhoHitMonster()
-		if skill==6 and t.DamageKind==4 and data and data.Object==nil then
-			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Mace))
-			if m>=3 then
-				local mon=t.Monster
-				--get Level
-				local id=t.MonsterIndex
-				local lvl=getMonsterLevel(mon)
-				--chance to paralyze
-				local chance=s/lvl^0.65*0.15*damageMultiplier[t.Player:GetIndex()].Melee/math.min(1+lvl/150,3)
-				local applyParalyze=applyParalyze or {}
-				applyParalyze[id]=false
-				local previousDuration=mon.SpellBuffs[6].ExpireTime
-				local duration=0
-				if chance>math.random() then
-					applyParalyze[id]=true
-					duration=const.Minute*3
-					if m==3 then
-						duration=duration/2
-					end
-					-- Apply diminishing returns
-					duration = calcDebuffDuration(mon, maceStunCC, duration)
-				end
-				RunNextTick(function()
-					if applyParalyze[id] and duration > 0 then
-						if mon.HP~=0 then
-							mon.SpellBuffs[6].ExpireTime=Game.Time+duration
-						end
-						applyParalyze[id]=false
-					else
-						mon.SpellBuffs[6].ExpireTime=previousDuration
-					end
-				end)
-			end
-		end
-	end
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
---remove stun if monster is Dead
-function events.CalcDamageToMonster(t)
-	local mon=t.Monster
-	RunNextTick(function()
-		if mon.HP==0 then
-			mon.SpellBuffs[6].ExpireTime=0
-		end
-	end)
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 function events.Action(t)
 	RunNextTick(function()

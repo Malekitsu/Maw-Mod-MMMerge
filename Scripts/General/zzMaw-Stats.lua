@@ -138,69 +138,7 @@ end
 
 local SERVICE_CASTER = (Multiplayer and Multiplayer.SERVICE_CASTER) or 49
 
-function events.CalcDamageToMonster(t)
-  local data = WhoHitMonster()
-  if not (data and data.Player and (t.DamageKind == 4
-    or (data.Object and data.Object.Spell == 133 and data.Object.Item and data.Object.Item.Bonus2 == 3)
-    or data.Spell == 135)) then
-    return
-  end
-
-  local pl = t.Player
-  if not pl then return end
-
-  local idx = data.Player:GetIndex()
-  --[[
-  if idx == SERVICE_CASTER or (not evt.IsPlayerInParty or not evt.IsPlayerInParty(idx)) then
-    return
-  end
-]]
-  if not damageMultiplier or not damageMultiplier[idx] then
-    return
-  end
-
-  local dmgMult
-  local baseDamage, maxDamage, randomDamage, damage
-  if (data.Object == nil) or (data.Spell == 135) then
-    baseDamage   = pl:GetMeleeDamageMin()
-    maxDamage    = pl:GetMeleeDamageMax()
-    randomDamage = math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
-    damage       = round(randomDamage/2)
-
-    if table.find(assassinClass, pl.Class) and assassinationDamage then
-      local isolatedDamageReduction = assassinationDamage(pl, t.Monster, data.Object)
-      damage = damage - (isolatedDamageReduction or 0)
-    end
-
-    dmgMult = damageMultiplier[idx]["Melee"]
-  else
-    baseDamage   = pl:GetRangedDamageMin()
-    maxDamage    = pl:GetRangedDamageMax()
-    randomDamage = math.random(baseDamage, maxDamage) + math.random(baseDamage, maxDamage)
-    damage       = round(randomDamage/2)
-
-    dmgMult = damageMultiplier[idx]["Ranged"]
-    if table.find(assassinClass, pl.Class) and assassinationDamage then
-      assassinationDamage(pl, t.Monster, data.Object)
-    end
-  end
-
-  t.Result = damage * (dmgMult or 1)
-
-
-  local critChance, critMult, success = getCritInfo(pl, false, safeGetMonsterLevel(t.Monster))
-  if success then
-    t.Result = t.Result * critMult
-	crit=true
-  end
-
-  if data.Player.Weak and data.Player.Weak > 0 then
-    t.Result = t.Result * 0.5
-  end
-  if data.Object and data.Object.Spell == 133 and data.Object.Item and data.Object.Item.Bonus2 == 3 then
-    t.Result = t.Result * 0.25
-  end
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 
 
@@ -766,16 +704,7 @@ function events.Regeneration(t)
 end
 
 painReflectionHit=false
---fix for pain reflection:
-function events.CalcDamageToMonster(t)
-	if reflecting then
-		reflecting=false
-		return
-	end
-	if t.Monster.SpellBuffs[19].ExpireTime>=Game.Time then
-		painReflectionHit=true
-	end
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 --mistform
 function events.PlayerAttacked(t)
 	if restoringMistformTime then return end
@@ -1102,115 +1031,7 @@ damageKindMap={
 	[9]=const.Damage.Light,
 	[10]=const.Damage.Dark,
 }
-function events.CalcDamageToMonster(t)
-	local data=WhoHitMonster()
-	if data and data.Player and data.Spell then
-		if data.Spell==const.Spells.Blades then
-			t.DamageKind=const.Damage.Phys
-		end
-	end
-	--fix for vampire Lifedrain and Souldrinker
-	if data and data.Object and (data.Object.Spell==200 or data.Object.Spell==201) then
-		t.DamageKind=const.Damage.Dark
-	end
-	
-	index=table.find(damageKindMap,t.DamageKind)
-	local res=t.Monster.Resistances[index]
-	if data and data.Object and data.Object.Spell==133 then
-		if data and data.Player then
-			local it=t.Player:GetActiveItem(2)
-			if it then 
-			skill=it:T().Skill
-				if skill==const.Skills.Bow then
-					local s,m=SplitSkill(t.Player.Skills[const.Skills.Bow])
-					if m==4 then
-						res=math.min(t.Monster.Resistances[0]%1000, t.Monster.Resistances[4])
-					end
-				end
-			end
-		end
-	end
-	if t.Result==0 then return end
-	if not res then res=0 end
-	res=res%1000
-	--spear reduction
-	if t.Player and data and data.Object==nil and t.DamageKind==4 then
-		local it=t.Player:GetActiveItem(1)
-		if it then 
-			local skill=it:T().Skill
-			if skill==const.Skills.Spear then
-				local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spear))
-				if m==4 then
-					local id=t.Monster:GetIndex()
-					mapvars.originalResistance=mapvars.originalResistance or {}
-					mapvars.originalResistance[id]=mapvars.originalResistance[id] or t.Monster.Resistances[index]
-					mapvars.spearDamageIncrease=mapvars.spearDamageIncrease or {}
-					mapvars.spearDamageIncrease[id]=mapvars.spearDamageIncrease[id] or 0
-					local mult=damageMultiplier[t.PlayerIndex]["Melee"]
-					local damageIncrease=(2+s*0.02)*mult
-					if it:T().EquipStat==1 then
-						damageIncrease=damageIncrease*1.5
-					end
-					mapvars.spearDamageIncrease[id]=mapvars.spearDamageIncrease[id]+damageIncrease
-					local reduction=calcSpearResReduction(mapvars.spearDamageIncrease[id])
-					t.Monster.Resistances[index]=round(math.max(mapvars.originalResistance[id]-reduction,0))
-				end
-			end
-		end
-	end
-	if t.Player and vars.legendaries and vars.legendaries[t.PlayerIndex] and table.find(vars.legendaries[t.PlayerIndex], 29) then
-		if data and data.Object==nil and t.DamageKind~=4 then goto continue end --disable for melee elemental damage
-		if data and table.find(aoespells, data.Spell) and math.random()>0.4 then goto continue end
-		for i=0, 10 do
-			if i~=5 then
-				if i==4 then
-					local id=t.Monster:GetIndex()
-					if mapvars.originalResistance and mapvars.originalResistance[id] then
-						mapvars.originalResistance[id]=math.max(mapvars.originalResistance[id]-1,0)
-					else
-						t.Monster.Resistances[i]=math.max(t.Monster.Resistances[i]-1,0)
-					end
-				else
-					t.Monster.Resistances[i]=math.max(t.Monster.Resistances[i]%1000-1,0)+math.floor(t.Monster.Resistances[i]/1000)*1000
-				end
-			end
-		end
-	end
-	::continue::
-	--retaliation code
-	if t.Player then
-		local id=t.Player:GetIndex()
-		if vars.retaliation and vars.retaliation[id] and vars.retaliation[id]["Time"] and vars.retaliation[id].Time+const.Minute*5>Game.Time and vars.retaliation[id].Stacks>0 then
-			local pl=t.Player
-			local s,m=SplitSkill(Skillz.get(pl,53))
-			local fullHP=pl:GetFullHP()
-			local stacks=vars.retaliation[id].Stacks
-			if m<4 then
-				stacks=1
-			end
-			local powerMult, DPS2, DPS3, vitMult=calcPowerVitality(pl, false)
-			local vit=round(vitMult^0.35)
-			local power=round(powerMult^0.35)
-			local totalRetDamage=power*vit*s*stacks
-			t.Result=t.Result+totalRetDamage
-			
-			if 0.25*stacks>math.random() then
-				local stunDuration=const.Minute
-				if t.Monster.NameId>=220 and t.Monster.NameId<=300 then
-					stunDuration=stunDuration/2
-				end
-				t.Monster.SpellBuffs[6].ExpireTime=Game.Time+const.Minute
-			end
-			RunNextTick(function()
-				pl.RecoveryDelay=pl.RecoveryDelay*(math.max(1-0.3*stacks,0))
-			end)
-			vars.retaliation[id].Stacks=0
-		end
-	end
-	
-	res=2^(res/100)
-	t.Result = t.Result / res
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 --spear reset stacks after kill
 function events.MonsterKilled(mon)

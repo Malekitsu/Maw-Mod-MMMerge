@@ -970,19 +970,7 @@ mem.nop(0x426CD3, 6)
 
 --removes fly when attacking, except in certain maps
 flyAllowedMaps={"elema.odm","elemf.odm","elemw.odm","out12.odm","outa1.odm","outa2.odm","outa3.odm","outb2.odm","outb3.odm","out05.odm", "out07.odm"}
-function events.CalcDamageToMonster(t)
-	if Game.BolsterAmount>100 or vars.AusterityMode then
-		if table.find(flyAllowedMaps,Map.Name) then 
-			return
-		end
-		data=WhoHitMonster()
-		flyTime=Party.SpellBuffs[7].ExpireTime
-		if data and data.Player and flyTime>Game.Time then
-			Party.SpellBuffs[5].ExpireTime=flyTime
-			Party.SpellBuffs[7].ExpireTime=0
-		end
-	end
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 function events.LoadMap()
 	if table.find(flyAllowedMaps,Map.Name) then 
@@ -1592,34 +1580,7 @@ function calcDebuffDuration(monster, cc, duration)
 	return finalDuration
 end
 
---stun code
-function events.CalcDamageToMonster(t)
-	local data=WhoHitMonster()
-	if data and data.Player and data.Object and data.Object.Spell==34 then
-		local cc=CCMAP[const.Spells.Stun]
-		local mon=t.Monster
-		local oldResistance=mon.Resistances[const.Damage.Earth]
-		local res=mon.Resistances[const.Damage.Earth]
-		local lvl=mon.Level
-		local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Earth))
-		local newLevel=calcEffectChance(lvl, res, s, cc.ChanceMult, mon)
-		local hit=(30/(30+newLevel/4))
-		--mapping
-		if getMapAffixPower(13) then
-			hit=hit*(1-getMapAffixPower(13)/100)
-		end
-		if hit>math.random() then
-			mon.Resistances[const.Damage.Earth]=0
-			mon.Level=0
-		else
-			mon.Resistances[const.Damage.Earth]=65000
-		end
-		RunNextTick(function()
-			mon.Level=lvl
-			mon.Resistances[const.Skills.Earth]=res
-		end)
-	end
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 
 function calcEffectChance(lvl, res, skill, chance, mon)
@@ -1809,40 +1770,7 @@ function events.CalcSpellDamage(t)
 	
 end
 
---MASS DISTORSION Handled
---needs separate code to account for all scenario
-local massHPMULT={
-	[0]=1,
-	[50]=1,
-	[100]=1,
-	[150]=1.4,
-	[200]=1.8,
-	[300]=3,
-	[600]="doom",
-}
-function events.CalcDamageToMonster(t)
-	local data=WhoHitMonster()
-			local mon=t.Monster
-			local lvl=getMonsterLevel(mon)
-	if data and data.Player and data.Spell==44 then
-		mult=1
-
-		if massHPMULT[Game.BolsterAmount]=="doom" then
-
-			mult=3.33*(1+lvl/75)
-			if mon.NameId>=220 and mon.NameId<300 then
-				mult=mult*2*(1+mon.Level/80)
-			end
-		else
-			mult=massHPMULT[Game.BolsterAmount] or 1
-		end
-		if vars.AusterityMode then
-			mult=mult*4
-		end
-		t.Result=t.Result/mult^0.5*math.max(1, (mon.Level/250)^2)
-	end
-	
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 
 function ascendSpellDamage(skill, mastery, spell, index)
@@ -3188,41 +3116,7 @@ function getMaxMana(pl)
 end
 
 
-function events.CalcDamageToMonster(t)
-	local data = WhoHitMonster()
-	if data and data.Object and data.Player then
-		if data.Object.Spell==18 and data.Object.SpellMastery>1 then
-			monsterIndex=getClosestMonsterInRange(t.Monster,768)
-			if monsterIndex~=nil then
-				BeginGrabObjects()
-				Game.SummonObjects(2060,t.Monster.X,t.Monster.Y,t.Monster.Z+100,0,1)
-				local obj=GrabObjects()
-				if not obj then return end
-				local index=data.Player:GetIndex()
-				local id=0
-				for i=0, Party.High do
-					if Party[i]:GetIndex()==index then
-						id=i
-					end
-				end
-				local skill=Party[id].Skills[const.Skills.Air]
-				local s, m = SplitSkill(skill)
-				obj.Spell=18
-				obj.SpellLevel=m
-				obj.SpellMastery=data.Object.SpellMastery-1
-				obj.SpellSkill=s
-				obj.SpellType=18
-				obj.TypeIndex=455
-				obj.Owner=index*8+4
-				obj.Visible=true
-				obj.Velocity[0]=3000
-				obj.Velocity[1]=3000
-				obj.Velocity[2]=3000
-				obj.Target=3+8*monsterIndex
-			end
-		end
-	end
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 --set reference coord and desired range
 function getClosestMonsterInRange(mon,range)

@@ -2232,10 +2232,7 @@ function events.LoadMap()
 	Game.UseMonsterBolster=false
 end
 
---disable base monster Resistances
-function events.CalcDamageToMonster(t)
-	t.Result=t.Damage
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 --TRUE NIGHTMARE MODE
 function events.CanSaveGame(t)
@@ -3336,62 +3333,7 @@ function events.GameInitialized2() --to make the after all the other code
 		end
 	end
 
-	--on damage taken
-	function events.CalcDamageToMonster(t)
-		if t.Monster.NameId>=220 and t.Monster.NameId<300 then
-			if t.Player then
-				local id=t.Player:GetIndex()
-				for i=0,Party.High do
-					if Party[i]:GetIndex()==id then
-						index=i
-					end
-				end
-				skill = string.match(Game.PlaceMonTxt[t.Monster.NameId], "([^%s]+)")
-				if skill=="Thorn" or skill=="Omnipotent" then
-					if t.DamageKind==4 then
-						reflectedDamage=true
-						Party[index]:DoDamage(t.Result,4)
-						reflectedDamage=false
-					end
-				end
-				if skill=="Reflecting" or skill=="Omnipotent" then
-					if t.DamageKind~=4 then
-						local damageKind = t.DamageKind
-						if damageKind==50 then --transform dragon damage into energy
-							damageKind = 12
-						end
-						reflectedDamage=true
-						Party[index]:DoDamage(t.Result,damageKind) 
-						reflectedDamage=false
-					end
-				end
-				if skill=="Adamantite" or skill=="Omnipotent" then
-					t.Result=round(math.max(t.Result-t.Monster.Level^1.15*4,t.Result/4))
-				end
-				if skill=="Swapper" or skill=="Omnipotent" then
-					for i=0,Map.Monsters.High do
-						mon=Map.Monsters[i]
-						if mon.HP>0 and mon.AIState==const.AIState.Active and mon.ShowOnMap and mon.ShowAsHostile and (mon.NameId<220 or mon.NameId>300) then
-							t.Result=0
-							Game.ShowStatusText("*Swap*")
-							mon.X, mon.Y, mon.Z, t.Monster.X, t.Monster.Y, t.Monster.Z = t.Monster.X, t.Monster.Y, t.Monster.Z, mon.X, mon.Y, mon.Z
-						end
-					end
-				end
-				if skill=="Regenerating" or skill=="Omnipotent" then
-					id=t.Monster:GetIndex()
-					mapvars.regenerating=mapvars.regenerating or {}
-					mapvars.regenerating[id] = mapvars.regenerating[id] or 0
-					mapvars.regenerating[id] = mapvars.regenerating[id] + 1
-					RunNextTick(function()
-						if t.Monster.HP<=0 then
-							mapvars.regenerating[id]=-1
-						end
-					end)
-				end
-			end
-		end
-	end
+	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 end
 --leecher drain
 local a1, b1, c1, d1
@@ -4472,16 +4414,7 @@ function events.BeforeLoadMap()
 	end
 end
 
-function events.CalcDamageToMonster(t)
-	if Map.IsIndoor() and vars.Mode==2 then
-		for i=0, Map.Monsters.High do
-			local mon = Map.Monsters[i]
-			if getDistances(t.Monster, mon)<256 then
-				mon.ShowOnMap = true
-			end
-		end
-	end
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 function getDistances(unit1,unit2)
 	distance=((unit1.X-unit2.X)^2+(unit1.Y-unit2.Y)^2+(unit1.Z-unit2.Z)^2)^0.5
@@ -4545,16 +4478,7 @@ function events.PickCorpse(t)
 end
 
 
-function events.CalcDamageToMonster(t)
-	local data=WhoHitMonster()
-	if data and data.Monster then
-		local mon=data.Monster
-		local damage=getMonsterDamage(mon)/3 --1/3 of damage
-		local res=t.Monster.Resistances[4]%1000
-		local damage=round(damage/2^(res/100))
-		t.Result=damage
-	end
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 local teleportKey=teleportDeadMonstersAndCraftingKey or 75 --K as default
 function events.KeyDown(t)

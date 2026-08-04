@@ -1,4 +1,5 @@
-local survivalMaps={
+-- survivalMaps is global since the damage pipeline migration (DAMAGE_PIPELINE.md)
+survivalMaps={
 	["7out01.odm"]=1, -- emerald isle
 }
 --[[survival mode
@@ -313,11 +314,7 @@ function events.GameInitialized2()
 			t.Result=0
 		end
 	end
-	function events.CalcDamageToMonster(t)
-		if not survivalMaps[Map.Name] and vars.SuvivalMode then
-			t.Result=0
-		end
-	end
+	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 	function events.CanOpenChest(t)
 		if not survivalMaps[Map.Name] and vars.SuvivalMode then
 			t.CanOpenChest=false
