@@ -40,10 +40,31 @@ local function rollDice(lo, hi)
 	return round((math.random(lo, hi) + math.random(lo, hi))/2)
 end
 
--- the standard resistance mitigation: halved per 100 res (callers pass the
--- already-%1000-reduced value where the bolster thousands must be stripped)
+-- the standard resistance mitigation: halved per 100 effective res. Raw
+-- resistance values may carry the bolster HP-inflation as thousands (see
+-- bolsterMult); they are stripped here, so callers pass res raw.
 local function resDivide(damage, res)
-	return damage / 2^(res/100)
+	return damage / 2^((res % 1000)/100)
+end
+
+-- monsters with bolster-inflated HP carry the inflation exponent as
+-- thousands in Resistances[0]; damage aimed at their HP pool scales back up
+local function bolsterMult(mon)
+	return 2^math.floor(mon.Resistances[0]/1000)
+end
+
+-- legendary perks are stored per player index in vars.legendaries
+local function hasLegendary(id, n)
+	return hasLegendary(id,n)
+end
+
+-- map affix n, when present, cuts a value by its power%
+local function affixCut(value, n)
+	local p = getMapAffixPower(n)
+	if p then
+		return value*(1-p/100)
+	end
+	return value
 end
 
 -- per-player stat tracking, mirrored in vars (save-wide) and mapvars (per map)
@@ -237,8 +258,7 @@ local function stage_monsterVsMonster(t)
 	if data and data.Monster then
 		local mon=data.Monster
 		local damage=getMonsterDamage(mon)/3 --1/3 of damage
-		local res=t.Monster.Resistances[4]%1000
-		local damage=round(resDivide(damage, res))
+		local damage=round(resDivide(damage, t.Monster.Resistances[4]))
 		t.Result=damage
 	end
 end
@@ -348,9 +368,7 @@ local function stage_stunSpellPrime(t)
 		local newLevel=calcEffectChance(lvl, res, s, cc.ChanceMult, mon)
 		local hit=(30/(30+newLevel/4))
 		--mapping
-		if getMapAffixPower(13) then
-			hit=hit*(1-getMapAffixPower(13)/100)
-		end
+		hit=affixCut(hit, 13)
 		if hit>math.random() then
 			mon.Resistances[const.Damage.Earth]=0
 			mon.Level=0
@@ -542,7 +560,6 @@ local function stage_resAndRetaliation(t)
 	end
 	if t.Result==0 then return end
 	if not res then res=0 end
-	res=res%1000
 	--spear reduction
 	if t.Player and data and data.Object==nil and t.DamageKind==4 then
 		local it=t.Player:GetActiveItem(1)
@@ -568,7 +585,7 @@ local function stage_resAndRetaliation(t)
 			end
 		end
 	end
-	if t.Player and vars.legendaries and vars.legendaries[t.PlayerIndex] and table.find(vars.legendaries[t.PlayerIndex], 29) then
+	if t.Player and hasLegendary(t.PlayerIndex, 29) then
 		if data and data.Object==nil and t.DamageKind~=4 then goto continue end --disable for melee elemental damage
 		if data and table.find(aoespells, data.Spell) and math.random()>0.4 then goto continue end
 		for i=0, 10 do
@@ -659,7 +676,7 @@ local function stage_dragonAttack(t)
 				pl.SP=math.min(pl.SP+20, 120)
 			end
 			--apply Damage
-			t.Result = resDivide(damage, res%1000)
+			t.Result = resDivide(damage, res)
 		elseif t.DamageKind==50 or data.Spell==123 then
 			local low=pl:GetRangedDamageMin()
 			local high=pl:GetRangedDamageMax()
@@ -752,7 +769,7 @@ local function stage_dkAttack(t)
 			end
 			
 			local res=t.Monster.Resistances[t.DamageKind] or t.Monster.Resistances[4]
-			damage=resDivide(damage, res%1000)
+			damage=resDivide(damage, res)
 			local mult=damageMultiplier[t.PlayerIndex]["Melee"]
 			t.Result=damage*mult
 			
@@ -877,7 +894,7 @@ local function stage_assassinAttack(t)
 			end
 			
 			local res=t.Monster.Resistances[t.DamageKind] or t.Monster.Resistances[4]
-			damage=resDivide(damage, res%1000)
+			damage=resDivide(damage, res)
 			local mult=damageMultiplier[t.PlayerIndex]["Melee"]
 			t.Result=damage*mult
 			
@@ -888,8 +905,7 @@ local function stage_assassinAttack(t)
 			if assassinSpells[spell].DamageMult then
 				t.Result=t.Result*assassinSpells[data.Object.Spell].DamageMult
 				if spell==44 then
-					local res=t.Monster.Resistances[3]%1000
-					t.Result=resDivide(t.Result, res)
+					t.Result=resDivide(t.Result, t.Monster.Resistances[3])
 				end
 			end
 		end
@@ -1009,9 +1025,9 @@ local function stage_legendaries(t)
 	t.Result=t.Result+fireAuraDamage+enchantDamage
 	
 	--[17]="Your hits will deal 1% of current monster HP health (0.4% for AoE, multi-hit spells and arrows)",
-	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 17) then
+	if hasLegendary(id,17) then
 		if t.Result>0 and ((data and data.Object==nil and t.DamageKind==4) or (data and data.Object)) then
-			local dmg=mon.HP*0.02*2^(math.floor(mon.Resistances[0]/1000))
+			local dmg=mon.HP*0.02*bolsterMult(mon)
 			if data and data.Object and data.Object.Spell==44 then
 				dmg=mon.HP*0.02
 			end
@@ -1037,30 +1053,20 @@ local function stage_legendaries(t)
 	--shaman fire damage
 	if table.find(shamanClass, pl.Class) and t.DamageKind==4 and data.Object==nil and t.Result>0 then	
 		local s1=SplitSkill(pl.Skills[const.Skills.Fire])
-		local fireDamage=s1*0.001
-		if mon.Resistances[0]>=1000 then
-			mult=2^math.floor(mon.Resistances[0]/1000)
-			fireDamage=fireDamage*mult
-		end
+		local fireDamage=s1*0.001*bolsterMult(mon)
 		fireDamage=math.max(mon.HP*fireDamage,s1)
-		fireRes=mon.Resistances[0]%1000
-		fireDamage=resDivide(fireDamage, fireRes)
+		fireDamage=resDivide(fireDamage, mon.Resistances[0])
 		t.Result=t.Result+fireDamage
 	end
 	--same for assassin
 	if data and pl and table.find(assassinClass, pl.Class) and t.DamageKind==4 and data.Object==nil and t.Result>0 then	
 		local s1=SplitSkill(pl.Skills[const.Skills.Water])
-		local waterDamage=s1*0.001
-		if mon.Resistances[0]>=1000 then
-			mult=2^math.floor(mon.Resistances[0]/1000)
-			waterDamage=waterDamage*mult
-		end
+		local waterDamage=s1*0.001*bolsterMult(mon)
 		waterDamage=math.max(mon.HP*waterDamage,s1)
-		waterRes=mon.Resistances[2]%1000
-		waterDamage=resDivide(waterDamage, waterRes)
+		waterDamage=resDivide(waterDamage, mon.Resistances[2])
 		t.Result=t.Result+waterDamage
 	end
-	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 21) then
+	if hasLegendary(id,21) then
 		local mult=1
 		for i=0, Map.Monsters.High do
 			if Map.Monsters[i].Active then
@@ -1074,13 +1080,13 @@ local function stage_legendaries(t)
 	end
 	--end of [17]
 	--[14]="Critical chance over 100% increases total damage",
-	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 14) then
+	if hasLegendary(id,14) then
 		local critChance=getCritInfo(pl,false,getMonsterLevel(mon))
 		t.Result=math.round(t.Result*math.max(critChance,1))
 	end
 	--end of [14]
 	--[24]="killing a Monster Restores 10% of Health and Mana"
-	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 24) then
+	if hasLegendary(id,24) then
 		--restoreHPLeg=true
 		RunNextTick(function()
 			--if restoreHPLeg then
@@ -1095,7 +1101,7 @@ local function stage_legendaries(t)
 		end)
 	end
 	--end of 24
-	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 11) then
+	if hasLegendary(id,11) then
 		data=t.Hit
 		--no aoe spells
 		if (data and data.Object and table.find(aoespells,data.Object.Spell)) or (data and data.Spell==133) then
@@ -1130,11 +1136,11 @@ end
 
 -- from Scripts/Global/zzMaw_Mapping.lua:16 -- map affix damage mults/miss/reflect
 local function stage_mapAffixes(t)
-	if t.Player and t.DamageKind==4 and getMapAffixPower(23) then
-		t.Result=t.Result*(1-getMapAffixPower(23)/100)
+	if t.Player and t.DamageKind==4 then
+		t.Result=affixCut(t.Result, 23)
 	end
-	if t.Player and t.DamageKind~=4 and getMapAffixPower(24) then
-		t.Result=t.Result*(1-getMapAffixPower(24)/100)
+	if t.Player and t.DamageKind~=4 then
+		t.Result=affixCut(t.Result, 24)
 	end
 	if t.Player and getMapAffixPower(30) then
 		if math.random()<getMapAffixPower(30)/100 then
@@ -1143,12 +1149,12 @@ local function stage_mapAffixes(t)
 	end
 	if t.Player and getMapAffixPower(5) and t.DamageKind==4 then
 		reflectedDamage=true
-		t.Player:DoDamage(t.Result*(1-getMapAffixPower(5)/100),4) 
+		t.Player:DoDamage(affixCut(t.Result, 5),4)
 		reflectedDamage=false
 	end
 	if t.Player and getMapAffixPower(6) and t.DamageKind~=4 then
 		reflectedDamage=true
-		t.Player:DoDamage(t.Result*(1-getMapAffixPower(6)/100),t.DamageKind) 
+		t.Player:DoDamage(affixCut(t.Result, 6),t.DamageKind)
 		reflectedDamage=false
 	end
 end
@@ -1194,15 +1200,13 @@ local function stage_leech(t)
 		
 		local fullHP=GetMaxHP(pl) or 0 --if player is disintegrated
 		local manaLeechLeg=false
-		if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 31) then
+		if hasLegendary(index,31) then
 			fullHP=getMaxMana(pl) or 0
 			manaLeechLeg=true
 		end
 		local baselineHeal=t.Result/refHP*fullHP --basically dealing 100% of monster B HP as damage heals you by 100%
 		
-		if getMapAffixPower(32) then
-			baselineHeal=baselineHeal*(1-getMapAffixPower(32)/100)
-		end
+		baselineHeal=affixCut(baselineHeal, 32)
 		local totalHeal=0
 		local minLeech=0
 		if not lifeLeech or not lifeLeech[index] then return end
@@ -1270,7 +1274,7 @@ local function stage_leech(t)
 		end
 		overHeal=round(pl.HP+totalHeal-fullHP)
 		pl.HP=math.min(fullHP,pl.HP+totalHeal)
-		if overHeal>0 and vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 27) then
+		if overHeal>0 and hasLegendary(index,27) then
 			local id, lowestHealthPercentage=pickLowestPartyMember()
 			local percent, partyId, playerId=OnlineLowestHealthPercentage()
 			if percent<lowestHealthPercentage then
@@ -1297,9 +1301,7 @@ local function stage_trackAndClamp(t)
 	if data and data.Player then
 		local damage=t.Result
 		if data.Spell==44 then
-			if t.Monster.Resistances[0]>=1000 then
-				damage=damage*2^math.floor(t.Monster.Resistances[0]/1000)
-			end
+			damage=damage*bolsterMult(t.Monster)
 		end
 		
 		if data.Object then
@@ -1314,13 +1316,8 @@ local function stage_trackAndClamp(t)
 	end
 	
 	
-	divide=1
-	if data and data.Spell==44 then
-		if t.Monster.Resistances[0]>=1000 then
-			divide=2^math.floor(t.Monster.Resistances[0]/1000)
-		end
-	elseif t.Monster.Resistances[0]>=1000 then
-		divide=2^math.floor(t.Monster.Resistances[0]/1000)
+	divide=bolsterMult(t.Monster)
+	if not (data and data.Spell==44) then
 		t.Result=t.Result/divide
 	end
 	if data and data.Player then
