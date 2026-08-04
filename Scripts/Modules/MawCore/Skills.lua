@@ -755,11 +755,10 @@ function Skills.start()
 		A.PlayerStride, PLAYERS, SKILL_ROW, OLD_COUNT, block))
 
 	-- name pointer array for all 128 skills, read by the SkillsUI asm shims.
-	-- Base-skill entries stay NULL on purpose: every shim then falls back to
-	-- the engine's LIVE name array. Snapshotting the engine pointers here went
-	-- stale when Merge re-pointed them on save load (symptom: several base
-	-- skills all displaying the same wrong name). setName still fills entries
-	-- when a skill is renamed, which overrides the fallback.
+	-- Base-skill entries stay NULL on purpose: the shims then fall back to
+	-- the engine's LIVE name array (Merge re-points those per save load, so a
+	-- snapshot would go stale). setName fills an entry when a skill is
+	-- renamed, which overrides the fallback.
 	namePtrs = Engine.alloc(NEW_COUNT * 4)
 
 	-- internals for the SkillsUI module (stage 2)

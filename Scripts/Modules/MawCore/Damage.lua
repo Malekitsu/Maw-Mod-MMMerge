@@ -1,36 +1,29 @@
 -- Damage.lua -- the CalcDamageToMonster pipeline (see DAMAGE_PIPELINE.md).
 --
--- Phase 1 of the migration: legacy handlers move here VERBATIM, one stage per
--- handler, in their original execution order (the tier model is documented in
--- DAMAGE_PIPELINE.md). The clean phase structure (context/gates/base/../clamp)
--- comes in phase 2, once everything lives in this file.
+-- Every stage is a former legacy event handler, kept close to verbatim and
+-- run in the legacy registration order (the tier markers below). The event
+-- handler itself is registered per playthrough by
+-- Scripts/Global/zzzzzMaw_Damage.lua: Global scripts re-register on every
+-- save load, always appending last, so the pipeline runs after every legacy
+-- handler (map scripts still run after it). The four Multiplayer sync
+-- handlers register in GameInitialized2 and run before the pipeline.
 --
--- The event handler itself is registered per playthrough by
--- Scripts/Global/zzzzzMaw_Damage.lua: Global scripts re-register on every save
--- load, always appending after the remaining legacy Global handlers, so the
--- pipeline runs last among mod handlers (map scripts still run after it, as
--- they always did).
+-- Deliberate differences from the legacy chain:
+--   * "friendly-fire-zero" runs before "leech": zeroed hits must not heal.
+--   * "seraph-dual-wield" sits after the recompute stages so its zero sticks;
+--     long-term it becomes a canEquip restriction instead.
+--   * the "context" stage resolves WhoHitMonster() once into t.Hit (stable
+--     for the whole event); the weapon rolls share rollDice().
 --
--- Approved deviations from verbatim (user, 2026-08-04):
---   * "friendly-fire-zero" (split out of zzMAWStatusMsg:151) runs BEFORE
---     "leech": zeroed friendly hits no longer heal through leech.
---   * (queued for the tier-1 batch) the Seraph dual-wield zero must actually
---     stick; long-term it becomes a canEquip restriction instead.
+-- Stage bodies still call legacy globals (damageMultiplier, lifeLeech,
+-- HPtable, getCritInfo, checkSkills, ...) on purpose. Cross-stage globals:
+-- `crit` (set by the recompute/class stages, read by track-and-clamp; never
+-- reset to false -- legacy behavior kept), `divide`, `coverBonus`, the
+-- reflect flags.
 --
--- Stage bodies call legacy globals (damageMultiplier, lifeLeech, HPtable,
--- getCritInfo, checkSkills, ...) on purpose -- those migrate in later passes.
---
--- Phase 2 (2026-08-04, order-preserving consolidation): stage bodies are no
--- longer strictly byte-verbatim -- two mechanical rewrites were applied:
---   * every `... = WhoHitMonster()` became `... = t.Hit`, resolved once by the
---     new "context" stage (WhoHitMonster is stable for the whole event);
---   * the six duplicated two-dice weapon rolls became rollDice(lo, hi).
--- Physical re-bucketing into the phase taxonomy is deliberately NOT done:
--- each such move changes execution order and needs its own equivalence
--- argument. The [phase] tags on the stage list mark where each stage would
--- land. Cross-stage globals still in use: `crit` (set by the recompute/class
--- stages, read by track-and-clamp; note it is never reset to false -- legacy
--- behavior kept), `divide`, `coverBonus`, the reflect flags.
+-- Physical re-bucketing into the [phase] taxonomy tagged on the stage list
+-- is deliberately deferred: each move changes execution order and needs its
+-- own equivalence argument (DAMAGE_PIPELINE.md).
 
 local Damage = {}
 MawCore.Damage = Damage
@@ -39,7 +32,7 @@ MawCore.Damage = Damage
 local REMOTE_OWNER_BIT = 0x800
 
 -- ===========================================================================
--- Shared helpers (phase 2) -- one source for ideas duplicated across stages.
+-- Shared helpers -- one source for ideas duplicated across stages.
 -- ===========================================================================
 
 -- the mod's standard weapon damage roll: average of two dice
@@ -83,21 +76,16 @@ end
 
 -- context -- the first stage: resolve the attack context once per hit.
 -- WhoHitMonster() is stable for the whole event, so every stage reads t.Hit
--- instead of calling it again (the bodies' `data` locals now alias t.Hit).
+-- instead of calling it again (the bodies' `data` locals alias t.Hit).
 local function stage_context(t)
 	t.Hit = WhoHitMonster()
 end
 
 -- ===========================================================================
--- Stage bodies, byte-verbatim from the legacy files (source noted per stage).
+-- Stage bodies, near-verbatim from the legacy files (source noted per stage).
 -- ===========================================================================
 
--- --- Tier 1 (General file-scope) -- migrated 2026-08-04, batch 3 -----------
--- The earliest-registered handlers (General file load order, case-insensitive
--- alphabetical). With this batch the whole chain lives in the pipeline; the
--- four Multiplayer sync handlers are the only mod handlers left running BEFORE
--- it (they used to run after this tier -- solo play is unaffected, MP damage
--- sync is descoped; see DAMAGE_PIPELINE.md).
+-- --- Tier 1: was General file-scope (loaded alphabetically) ----------------
 
 -- from Scripts/General/zzClasses.lua:255 -- Seraph melee on-hit heal to the
 -- lowest party member (online-aware), healing-done tracking
@@ -145,10 +133,9 @@ local function stage_seraphOnHitHeal(t)
 	end
 end
 
--- from Scripts/General/zzClasses.lua:357 -- Seraph dual-wield ban. Registered
--- as the "seraph-dual-wield" stage AFTER res-and-retaliation (approved fix:
--- legacy load order let later handlers overwrite this zero, so the ban never
--- worked; long-term it becomes a canEquip restriction instead)
+-- from Scripts/General/zzClasses.lua:357 -- Seraph dual-wield ban; its stage
+-- runs after res-and-retaliation so the zero sticks (long-term this becomes
+-- a canEquip restriction instead)
 local function stage_seraphDualWield(t)
 	if t.Player and (t.Player.Class==55 or t.Player.Class==54 or t.Player.Class==53) then
 		data=t.Hit
@@ -164,9 +151,9 @@ local function stage_seraphDualWield(t)
 	end
 end
 
--- from Scripts/General/zzClasses.lua:1534 (original numbering) -- Elementalist
--- learn-by-casting progression (spellRequirements stays global in zzClasses,
--- the tooltip code reads it too; the masteryRequired local moved along)
+-- from Scripts/General/zzClasses.lua:1534 -- Elementalist learn-by-casting
+-- progression (spellRequirements stays in zzClasses -- its tooltip code
+-- reads it too)
 local masteryRequired={1,1,1,1,2,2,2,3,3,3,4}
 local function stage_elementalistLearning(t)
 	if t.Monster.Hostile==false and t.Monster.ShowAsHostile==false then
@@ -209,8 +196,8 @@ local function stage_elementalistLearning(t)
 	end
 end
 
--- from Scripts/General/zzClasses.lua:1649 (original numbering) -- Elementalist:
--- melee/arrow hits reset concentration stacks
+-- from Scripts/General/zzClasses.lua:1649 -- Elementalist: melee/arrow hits
+-- reset concentration stacks
 local function stage_elementalistStackReset(t)
 	local data=t.Hit
 	if data and data.Player and (not data.Object or data.Object.Spell==133) then
@@ -273,8 +260,7 @@ local function stage_coverFlag(t)
 	end
 end
 
--- from Scripts/General/zzMAW-Skills.lua:2393-2436 -- mace M/GM stun/paralyze
--- roll (the maceStunCC local moved along -- it had no other consumer)
+-- from Scripts/General/zzMAW-Skills.lua:2393-2436 -- mace M/GM stun/paralyze roll
 --mace stun
 local maceStunCC = {Debuff = const.MonsterBuff.Paralyze}
 local function stage_maceStun(t)
@@ -379,7 +365,7 @@ local function stage_stunSpellPrime(t)
 end
 
 -- from Scripts/General/zzMaw-Spells.lua:1812-1845 -- Mass Distortion rebalance
--- by bolster tier (the massHPMULT local moved along -- no other consumer)
+-- by bolster tier
 --MASS DISTORSION Handled
 --needs separate code to account for all scenario
 local massHPMULT={
@@ -636,11 +622,7 @@ local function stage_resAndRetaliation(t)
 end
 
 
--- --- Tier 2 (GameInitialized2-registered) -- migrated 2026-08-04, batch 2 ---
--- These ran after every tier-1 (General file-scope) handler and before Global.
--- The four Multiplayer sync handlers of the same tier stay in place, so they
--- keep running before the pipeline, exactly as they always did.
--- Bodies verbatim minus one leading tab (they were nested in their wrappers).
+-- --- Tier 2: was GameInitialized2-registered -------------------------------
 
 -- from Scripts/General/zzClasses.lua:855 -- Dragon full damage replacement:
 -- melee (fang knockback, SP gain for classes 10/11, own res division) and
@@ -740,7 +722,7 @@ end
 
 -- from Scripts/General/zzClasses.lua:1133 -- Death Knight: spell-melee damage
 -- replacement (DKDamageMult spells), Body leech, dark grasp, on-hit SP regen,
--- slow/paralyze spell effects. DKDamageMult was made global for this move.
+-- slow/paralyze spell effects
 local function stage_dkAttack(t)
 	local data = t.Hit
 	if data and data.Player and table.find(dkClass, data.Player.Class) then
@@ -967,15 +949,15 @@ local function stage_bossAffixes(t)
 	end
 end
 
--- from Scripts/General/zzMaw-Survival.lua:316 -- survival mode: zero all damage
--- outside survival maps. survivalMaps was made global for this move.
+-- from Scripts/General/zzMaw-Survival.lua:316 -- survival mode: zero all
+-- damage outside survival maps
 local function stage_survivalGate(t)
 	if not survivalMaps[Map.Name] and vars.SuvivalMode then
 		t.Result=0
 	end
 end
 
--- --- Tier 3 (Global) -- migrated 2026-08-04, batch 1 ------------------------
+-- --- Tier 3: was Global file-scope (re-registered per save load) -----------
 
 -- from Scripts/Global/zzMaw_Legendaries.lua:22 -- enchant/fire-aura flat adds,
 -- legendaries 17/21/14/24/11, shaman fire + assassin water adds, shaman spell mult
@@ -1182,8 +1164,8 @@ local function stage_remoteOwnerZero(t)
 	end
 end
 
--- from Scripts/Global/zzMAWStatusMsg.lua:151 (first lines, split out so it runs
--- before leech -- approved deviation)
+-- from Scripts/Global/zzMAWStatusMsg.lua:151 (first lines, split out so it
+-- runs before leech)
 local function stage_friendlyFireZero(t)
 	-- disable damage on friendly units
 	if vars.MAWSETTINGS.friendlyDamage=="OFF" and t.Player and t.Monster and t.Monster.Hostile==false and t.Monster.ShowAsHostile==false then
@@ -1430,13 +1412,12 @@ local function stage_trackAndClamp(t)
 end
 
 -- ===========================================================================
--- The pipeline. Stage order IS the damage formula -- grow this list at the
--- front as earlier tiers migrate (see DAMAGE_PIPELINE.md "Migration strategy").
+-- The pipeline. Stage order IS the damage formula.
 -- ===========================================================================
 
 local pipe = MawCore.Pipeline.new("DamageToMonster", {
-	"context",				-- phase 2: resolve t.Hit once
-	-- tier 1 (General file-scope) -- migrated 2026-08-04 (batch 3)
+	"context",				-- resolve t.Hit once
+	-- tier 1: was General file-scope
 	"seraph-on-hit-heal",		-- [reactions]
 	"elementalist-learning",	-- [reactions]
 	"elementalist-stack-reset",	-- [reactions]
@@ -1453,20 +1434,19 @@ local pipe = MawCore.Pipeline.new("DamageToMonster", {
 	"weapon-recompute",			-- [base] THE melee/ranged replacement
 	"pain-reflection-flag",		-- [reactions]
 	"res-and-retaliation",		-- [resistance] final / 2^(res/100)
-	"seraph-dual-wield",	-- [gates] was first in tier 1 (zzClasses:357); moved after
-							-- the base recompute so its zero actually sticks (approved fix)
-	-- tier 2 (GameInitialized2) -- migrated 2026-08-04 (batch 2)
+	"seraph-dual-wield",	-- [gates] after the recompute so its zero sticks
+	-- tier 2: was GameInitialized2-registered
 	"dragon-attack",			-- [base] class override
 	"shaman-on-hit",			-- [reactions]
 	"dk-attack",				-- [base] class override
 	"assassin-attack",			-- [base] class override
 	"boss-affixes",				-- [reactions]
 	"survival-gate",			-- [gates]
-	-- tier 3 (Global) -- migrated 2026-08-04 (batch 1)
+	-- tier 3: was Global file-scope
 	"legendaries",				-- [additive/mult] post-res on purpose
 	"map-affixes",				-- [mult/gates]
 	"remote-owner-zero",		-- [gates]
-	"friendly-fire-zero",	-- [gates] ahead of leech on purpose (approved deviation)
+	"friendly-fire-zero",	-- [gates] ahead of leech: zeroed hits must not heal
 	"leech",					-- [reactions]
 	"track-and-clamp",			-- [clamp]
 })

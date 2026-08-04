@@ -264,17 +264,11 @@ function SkillsUI.start()
 	end
 
 	------------------------------------------------- list row mastery pushes
-	-- original: push of the engine mastery name (6 bytes), then
-	-- mov esi, [ebp-0x20] at +6 (player local at [ebp-0x48], skill at [ebp-0x20]).
-	--
-	-- SIZE MUST BE 6, NOT 9: one mastery branch per category list jumps
-	-- straight to the mov at +6 (e.g. the Expert branch's `jmp 0x4198F4` in
-	-- the misc list). Patching 9 bytes swallowed that jump target into nop
-	-- padding, so on that branch esi kept a stale value (31) and every such
-	-- row was drawn with SkillNames[31] = "Disarm Trap". The DLL's 5-byte
-	-- hooks never covered the mov, which is why it only broke in the port.
-	-- The shim loads esi itself for the mastery call; the engine reloads it
-	-- right after the trampoline returns, which is redundant but harmless.
+	-- original: push of the engine mastery name, 6 bytes (player local at
+	-- [ebp-0x48], skill at [ebp-0x20]). Patch EXACTLY those 6 bytes: the
+	-- engine's mov esi,[ebp-0x20] at +6 is a jump target (the other mastery
+	-- branches of each list jump straight to it). The shim loads esi itself;
+	-- the engine's reload after the trampoline is redundant but harmless.
 
 	local masteryShim = string.format([[
 		mov esi, [ss:ebp - 0x20]
@@ -646,11 +640,8 @@ function SkillsUI.start()
 		pop eax
 	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamed), 7)
 
-	-- SHOP learn-skill list (weapon/armor/magic/alchemy shops draw their learn
-	-- topics in a separate engine function from the training hall one above;
-	-- the DLL hooked it at 0x4B3F56/0x4B3F70/0x4B3F7A + 0x4B404B/0x4B4065/
-	-- 0x4B4075 and the first port missed all six -- an extended topic reaching
-	-- the unguarded 0x4FDD18 class-table read at 0x4B3F64 crashed the game).
+	-- SHOP learn-skill list: weapon/armor/magic/alchemy shops draw their learn
+	-- topics in a separate engine function from the training hall one above.
 	-- Same three patterns as the training hall: class gate, known check, name.
 
 	-- first variant: topic already in esi (loaded at 0x4B3F53); the replaced
