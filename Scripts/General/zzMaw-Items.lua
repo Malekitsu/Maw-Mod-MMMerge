@@ -3470,6 +3470,12 @@ function itemStats(index)
 		for i=1,16 do
 			tab[i]=tab[i]*3
 		end
+		if tab[82] then
+			tab[82]=tab[82]*3
+		end
+		if tab[83] then
+			tab[83]=tab[83]*3
+		end
 	end
 	--------------
 	--end of items
