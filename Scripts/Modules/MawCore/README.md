@@ -28,7 +28,8 @@ Load order inside the core is the `MawCore.ModuleOrder` list in
 |---|---|
 | `Engine.lua` | the Tier-4 boundary: **only file allowed to use `mem.*`, raw addresses, struct offsets**; named address table + patch ledger |
 | `Fixes.lua` | port of `MAW_Fixes.dll` (skill-hint format, recovery floor 30→1, mm8.ini fix) so the DLL could be deleted |
-| `Skills.lua` | port of `Skillz.dll` (stage 1: storage, engine GetSkill, bonus clamp, persistence, tables) — **inert while `ExeMods/Skillz.dll` exists** |
+| `Skills.lua` | port of `Skillz.dll`, stage 1: storage, engine GetSkill, bonus clamp, persistence, mastery tables, full `Skillz.*` API + legacy DLL bridge — **bridges to the DLL if `ExeMods/Skillz.dll` exists** |
+| `SkillsUI.lua` | `Skillz.dll` stage 2: char-screen rows for extended skills, Lua-built skill hints, house Learn-Skills integration (see `SKILLZ_PORT.md` engineering notes) |
 | `Pipeline.lua` | ordered named-stage chains — the replacement for N anonymous event handlers (damage will be the first pipeline) |
 | `Scheduler.lua` | one `events.Tick`; named tasks at real-time intervals (game-time stays with MMExtension's `Timer`/`RefillTimer`) |
 | `ItemFields.lua` | the item struct registry — the save format, with its two hazards documented |

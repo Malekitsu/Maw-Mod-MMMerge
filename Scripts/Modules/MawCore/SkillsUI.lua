@@ -1,4 +1,4 @@
--- SkillsUI.lua -- Skillz.dll port, stage 2: the character screen.
+﻿-- SkillsUI.lua -- Skillz.dll port, stage 2: the character screen.
 --
 -- Makes extended skills (39..127) appear and behave on the skill screen the
 -- way the DLL did it, by the DLL's own mechanism:
@@ -195,32 +195,9 @@ function SkillsUI.start()
 		end
 		return p
 	end
-	-- TEMP: distinct fallback per site group, so an "Unnamed" on screen
-	-- identifies which read produced it; unify back to one string after
-	local unnamed = mkcstr("Unnamed Skill L")	-- char-screen list rows
-	local unnamedT1 = mkcstr("Unnamed Skill T1")	-- learn list name 1
-	local unnamedT2 = mkcstr("Unnamed Skill T2")	-- learn list name 2
-	local unnamedH1 = mkcstr("Unnamed Skill H1")	-- hint name 0x41770D
-	local unnamedH2 = mkcstr("Unnamed Skill H2")	-- hint title 0x416B8A
+	local unnamed = mkcstr("Unnamed Skill")
 
-	------------------------------------------------- category table relocation
-
-	local function makeCat(name, ids, startRefs, endRefs)
-		local addr = Engine.alloc(129 * 4)
-		for i = 0, 128 do
-			mem.i4[addr + i * 4] = -1
-		end
-		for i, id in ipairs(ids) do
-			mem.i4[addr + (i - 1) * 4] = id
-		end
-		cat[name] = {addr = addr, count = #ids, startRefs = startRefs, endRefs = endRefs}
-		for _, ref in ipairs(startRefs) do
-			Engine.writePtr(ref, addr)
-		end
-		for _, ref in ipairs(endRefs) do
-			Engine.writePtr(ref, addr + #ids * 4)
-		end
-	end
+	------------------------------------------------- category tables
 
 	uiActive = true
 
@@ -517,7 +494,7 @@ function SkillsUI.start()
 		mov ecx, 0x%X
 	hv_ok:
 		pop edx
-	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamedH1), 12)
+	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamed), 12)
 
 	-- 0x416B8A: mov edi, [eax*4+names] -- the right-click hint WINDOW title
 	-- (skill id from [ebp-4]; the sibling read at 0x416B3F is the
@@ -535,7 +512,7 @@ function SkillsUI.start()
 	hw_un:
 		mov edi, 0x%X
 	hw_ok:
-	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamedH2), 7)
+	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamed), 7)
 
 	------------------------------------------------- house Learn-Skills dialog
 	-- The Instructor/shop "learn skill" list. Topic encoding follows the
@@ -639,7 +616,7 @@ function SkillsUI.start()
 	ln1_un:
 		mov edx, 0x%X
 	ln1_ok:
-	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamedT1), 7)
+	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamed), 7)
 	Engine.asmpatch("SkillzUILearnName2", "Skillz port: learn topic name 2",
 		0x4B3406, string.format([[
 		push eax
@@ -656,7 +633,7 @@ function SkillsUI.start()
 		mov ebx, 0x%X
 	ln2_ok:
 		pop eax
-	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamedT2), 7)
+	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamed), 7)
 
 	-- click routing ranges: extended topics take the skill path, per the DLL
 	-- (which also deliberately dropped the engine's ==0x5E special case)
