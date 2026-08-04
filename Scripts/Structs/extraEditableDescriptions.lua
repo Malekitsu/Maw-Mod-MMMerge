@@ -193,6 +193,9 @@ autohook2(0x41D40E, function(d)
     local t = prepareTableItem(d, rows)
     itemTooltipEvent(t)
     processNewTexts(t, rows)
+    -- TEMPORARY: opt-in hook for Scripts/Global/zzzMaw_TooltipProbe.lua, which is
+    -- locating the stack slot holding this function's Dlg. Remove both when done.
+    if MawTooltipProbe then MawTooltipProbe(d, "A-textbuild", t) end
 end)
 
 local hooks = HookManager{addresses = dynamicTextRowAddresses}
@@ -255,6 +258,7 @@ hook(code, function(d)
     itemTooltipEvent(t)
     processNewTexts(t, rows)
     d.edi = getAddrByIndex(INDEX_DESCRIPTION)
+    if MawTooltipProbe then MawTooltipProbe(d, "B-description", t) end
 end)
 
 autohook(0x41D4BD, function(d)
@@ -277,6 +281,7 @@ end)
 
 autohook(0x41D60C, function(d)
     d.eax = getAddrByIndex(INDEX_NAME)
+    if MawTooltipProbe then MawTooltipProbe(d, "C-final", nil) end
 end)
 
 function randomStr(chars, len)
