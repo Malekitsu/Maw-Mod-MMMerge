@@ -166,15 +166,8 @@ function recalculateMawMonster()
 				mon.Resistances[4]=mon.Resistances[4]-reduction
 			end
 			local currentHPPercentage=mon.HP/mon.FullHitPoints
-			local hp=round(getMonsterHealth(mon))
-			hpOvercap=0
-			while hp>32500 do
-				hp=round(hp/2)
-				hpOvercap=hpOvercap+1
-			end
-			mon.Resistances[0]=mon.Resistances[0]%1000+hpOvercap*1000
-			mon.FullHitPoints=hp
-			mon.HP=mon.FullHitPoints*currentHPPercentage
+			mon.Resistances[0]=mon.Resistances[0]%1000
+			MawSetMonsterHP(mon, getMonsterHealth(mon), currentHPPercentage)
 			mon.Attack1.DamageAdd, mon.Attack1.DamageDiceSides, mon.Attack1.DamageDiceCount = txt.Attack1.DamageAdd, txt.Attack1.DamageDiceSides, txt.Attack1.DamageDiceCount
 			mon.Attack2.DamageAdd, mon.Attack2.DamageDiceSides, mon.Attack2.DamageDiceCount = txt.Attack2.DamageAdd, txt.Attack2.DamageDiceSides, txt.Attack2.DamageDiceCount
 			mon.Level=txt.Level
@@ -255,18 +248,9 @@ function recalculateMawMonster()
 				mapvars.uniqueMonsterLevel[i]=oldTable.Level+partyLvl
 				mon.Level=math.min(mapvars.uniqueMonsterLevel[i],255)
 				--HP calculated using the proper getMonsterHealth function
-				local HP=round(getMonsterHealth(mon))
-				
-				hpOvercap=0
-				while HP>32500 do
-					HP=round(HP/2)
-					hpOvercap=hpOvercap+1
-				end
-				
-				mon.Resistances[0]=mon.Resistances[0]%1000+hpOvercap*1000
+				mon.Resistances[0]=mon.Resistances[0]%1000
 				local HPproportion=mon.HP/mon.FullHP
-				mon.FullHP=HP
-				mon.HP=mon.FullHP*HPproportion
+				MawSetMonsterHP(mon, getMonsterHealth(mon), HPproportion)
 
 			elseif mon.NameId>=220 and mon.NameId<300 then
 				local txt=Game.MonstersTxt[mon.Id]
@@ -294,16 +278,9 @@ function recalculateMawMonster()
 				if vars.AusterityMode then
 					austerityMod=4
 				end
-				local HP=round(getMonsterHealth(mon))
-				local hpOvercap=0
-				while HP>32500 do
-					HP=round(HP/2)
-					hpOvercap=hpOvercap+1
-				end
-				mon.Resistances[0]=round(txt.Resistances[0]*5)/5%1000+1000*hpOvercap
+				mon.Resistances[0]=round(txt.Resistances[0]*5)/5%1000
 				local HPproportion=mon.HP/mon.FullHP
-				mon.FullHP=HP
-				mon.HP=mon.FullHP*HPproportion
+				MawSetMonsterHP(mon, getMonsterHealth(mon), HPproportion)
 			end
 		end
 	end	
@@ -751,21 +728,17 @@ function recalculateMonsterTable()
 		mon.ArmorClass=base.ArmorClass*((totalLevel[i]+10)/(LevelB+10))
 	end
 	
+	-- templates hold a capped proxy HP; the real pool is registered per map
+	-- monster through MawSetMonsterHP at the recalc sites (MawCore.MonsterHP)
 	for i=1, 651 do
 		local mon=Game.MonstersTxt[i]
-		hpOvercap=0
-		actualHP=HPtable[i]
-		while actualHP>32500 do
-			actualHP=round(actualHP/2)
-			hpOvercap=hpOvercap+1
+		mon.Resistances[0]=mon.Resistances[0]%1000
+		local hp=math.min(round(HPtable[i]), 32000)
+		if hp>1000 then
+			hp=round(hp/10)*10
 		end
-		mon.Resistances[0]=mon.Resistances[0]%1000+hpOvercap*1000
-		mon.HP=actualHP
-		mon.FullHP=actualHP
-		if mon.FullHP>1000 then
-			mon.FullHP=round(mon.FullHP/10)*10
-			mon.HP=round(mon.HP/10)*10
-		end
+		mon.HP=hp
+		mon.FullHP=hp
 	end
 	
 	--add ranged attack
@@ -2084,6 +2057,13 @@ function events.BuildMonsterInformationBox(t)
 	local id=Mouse:GetTarget().Index
 	if id>Map.Monsters.High then return end
 	local mon=Map.Monsters[id]
+	--real HP for monsters over the engine cap (MawCore.MonsterHP ledger)
+	if t.IdentifiedHitPoints and MawCore and MawCore.MonsterHP then
+		local cur=MawCore.MonsterHP.current(mon)
+		if cur~=mon.HP then
+			t.HitPoints.Text="Hit Points \t100" .. shortenNumber(round(cur), 3, true)
+		end
+	end
 	--show level Below HP
 	mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
 	local lvl=getMonsterLevel(mon)
@@ -3140,15 +3120,8 @@ function generateBoss(index, nameIndex, skillType)
 	}
 	
 	-- Calculate health using the centralized getMonsterHealth function
-	local HP = round(getMonsterHealth(mon, lvl))
-	local hpOvercap = 0
-	while HP > 32500 do
-		HP = round(HP / 2)
-		hpOvercap = hpOvercap + 1
-	end
-	mon.Resistances[0] = mon.Resistances[0]%1000 + 1000 * hpOvercap
-	mon.FullHP = HP
-	mon.HP = mon.FullHP
+	mon.Resistances[0] = mon.Resistances[0]%1000
+	MawSetMonsterHP(mon, getMonsterHealth(mon, lvl))
 	
 	-- Maintain compatibility with boss sync system
 	mapvars.bossNames = mapvars.bossNames or {}

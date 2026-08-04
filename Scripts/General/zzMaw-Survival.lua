@@ -289,18 +289,15 @@ function survivalMonsterTable(currentMapLevel)
 			--HPtable[i]=(HPtable[i]*0.3+HPtable[i-1]*(basetable[i].FullHP/basetable[i-1].FullHP))/1.3
 		end
 		
-		hpOvercap=0
-		while HPtable[i]>32500 do
-			HPtable[i]=math.round(HPtable[i]/2)
-			hpOvercap=hpOvercap+1
+		-- template proxy HP is capped; real pools are ledgered per map monster
+		-- through MawSetMonsterHP (MawCore.MonsterHP). HPtable keeps real values.
+		mon.Resistances[0]=mon.Resistances[0]%1000
+		local hp=math.min(math.round(HPtable[i]), 32000)
+		if hp>1000 then
+			hp=math.round(hp/10)*10
 		end
-		mon.Resistances[0]=mon.Resistances[0]+hpOvercap*1000
-		mon.HP=HPtable[i]
-		mon.FullHP=HPtable[i]
-		if mon.FullHP>1000 then
-			mon.FullHP=math.round(mon.FullHP/10)*10
-			mon.HP=math.round(mon.HP/10)*10
-		end
+		mon.HP=hp
+		mon.FullHP=hp
 		--fixes for survival
 		mon.AIType=0
 		mon.MoveType=math.min(mon.MoveType,1)

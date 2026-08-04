@@ -40,22 +40,17 @@ local function rollDice(lo, hi)
 	return round((math.random(lo, hi) + math.random(lo, hi))/2)
 end
 
--- the standard resistance mitigation: halved per 100 effective res. Raw
--- resistance values may carry the bolster HP-inflation as thousands (see
--- bolsterMult); they are stripped here, so callers pass res raw.
+-- the standard resistance mitigation: halved per 100 effective res.
+-- Resistance is taken mod 1000 on purpose: some effects park marker values
+-- in the thousands (e.g. the stun spell writes 65000, relying on %1000 -> 0).
 local function resDivide(damage, res)
 	return damage / 2^((res % 1000)/100)
 end
 
--- monsters with bolster-inflated HP carry the inflation exponent as
--- thousands in Resistances[0]; damage aimed at their HP pool scales back up
-local function bolsterMult(mon)
-	return 2^math.floor(mon.Resistances[0]/1000)
-end
-
 -- legendary perks are stored per player index in vars.legendaries
 local function hasLegendary(id, n)
-	return hasLegendary(id,n)
+	return vars.legendaries and vars.legendaries[id] ~= nil
+		and table.find(vars.legendaries[id], n)
 end
 
 -- map affix n, when present, cuts a value by its power%
@@ -829,7 +824,7 @@ local function stage_dkAttack(t)
 			--restore SP
 			if t.DamageKind==4 then
 				local regen=spRegen[pl.Class]
-				if t.Result>t.Monster.HP then
+				if damage>MawCore.MonsterHP.current(t.Monster) then
 					regen=regen*1.5
 				end
 				pl.SP=math.min(getMaxMana(pl), pl.SP+regen)
@@ -1027,7 +1022,7 @@ local function stage_legendaries(t)
 	--[17]="Your hits will deal 1% of current monster HP health (0.4% for AoE, multi-hit spells and arrows)",
 	if hasLegendary(id,17) then
 		if t.Result>0 and ((data and data.Object==nil and t.DamageKind==4) or (data and data.Object)) then
-			local dmg=mon.HP*0.02*bolsterMult(mon)
+			local dmg=MawCore.MonsterHP.current(mon)*0.02
 			if data and data.Object and data.Object.Spell==44 then
 				dmg=mon.HP*0.02
 			end
@@ -1053,16 +1048,16 @@ local function stage_legendaries(t)
 	--shaman fire damage
 	if table.find(shamanClass, pl.Class) and t.DamageKind==4 and data.Object==nil and t.Result>0 then	
 		local s1=SplitSkill(pl.Skills[const.Skills.Fire])
-		local fireDamage=s1*0.001*bolsterMult(mon)
-		fireDamage=math.max(mon.HP*fireDamage,s1)
+		local fireDamage=s1*0.001
+		fireDamage=math.max(MawCore.MonsterHP.current(mon)*fireDamage,s1)
 		fireDamage=resDivide(fireDamage, mon.Resistances[0])
 		t.Result=t.Result+fireDamage
 	end
 	--same for assassin
 	if data and pl and table.find(assassinClass, pl.Class) and t.DamageKind==4 and data.Object==nil and t.Result>0 then	
 		local s1=SplitSkill(pl.Skills[const.Skills.Water])
-		local waterDamage=s1*0.001*bolsterMult(mon)
-		waterDamage=math.max(mon.HP*waterDamage,s1)
+		local waterDamage=s1*0.001
+		waterDamage=math.max(MawCore.MonsterHP.current(mon)*waterDamage,s1)
 		waterDamage=resDivide(waterDamage, mon.Resistances[2])
 		t.Result=t.Result+waterDamage
 	end
@@ -1291,17 +1286,18 @@ local function stage_leech(t)
 end
 
 -- from Scripts/Global/zzMAWStatusMsg.lua:151 (rest) -- damage tracking vars,
--- ShowDamage status message, bolster HP-inflation divide, ceil + 32500 cap
+-- ShowDamage status message, HP-overcap divide, ceil + 32500 cap
 local function stage_trackAndClamp(t)
 	if t.Result==0 then return end
-	
+
 	local data=t.Hit
-	
+	local damage=0
+
 	--recount
 	if data and data.Player then
-		local damage=t.Result
+		damage=t.Result
 		if data.Spell==44 then
-			damage=damage*bolsterMult(t.Monster)
+			damage=damage*MawCore.MonsterHP.scale(t.Monster)
 		end
 		
 		if data.Object then
@@ -1316,17 +1312,13 @@ local function stage_trackAndClamp(t)
 	end
 	
 	
-	divide=bolsterMult(t.Monster)
-	if not (data and data.Spell==44) then
-		t.Result=t.Result/divide
-	end
 	if data and data.Player then
 		local slot=slotByIndex(t.PlayerIndex)
 		if slot then
 			checkSkills(slot) --to use the correct spell name
 		end
 		MSGdamage=MSGdamage or 0
-		MSGdamage=MSGdamage+math.ceil(t.Result*divide)
+		MSGdamage=MSGdamage+math.ceil(damage)
 		local msgTxt=MSGdamage
 		msgTxt=shortenNumber(msgTxt, 4, true)
 		attackIsSpell=false
@@ -1344,7 +1336,7 @@ local function stage_trackAndClamp(t)
 		else
 			name=t.Player.Name
 		end
-		if t.Result>t.Monster.HP then
+		if damage>MawCore.MonsterHP.current(t.Monster) then
 			shoot="inflicts"
 		end
 		if crit then
@@ -1360,7 +1352,7 @@ local function stage_trackAndClamp(t)
 		else
 			msg=string.format("%s hits %s for %s points!", name, msgTxt, monName)
 		end
-		if t.Result>t.Monster.HP then
+		if damage>MawCore.MonsterHP.current(t.Monster) then
 			msg=string.format("%s inflicts %s points killing %s!", name, msgTxt, monName)
 		end
 		calls=calls or 0
@@ -1402,6 +1394,15 @@ local function stage_trackAndClamp(t)
 	if id>=0 and id<=Party.High then
 		checkSkills(id)
 	end
+end
+
+-- ledger damage application for monsters over the engine HP cap (the module
+-- owns the logic; see MawCore/MonsterHP.lua)
+local function stage_monsterHP(t)
+	MawCore.MonsterHP.stage(t)
+end
+
+local function stage_finalClamp(t)
 	t.Result=math.ceil(t.Result)
 	if t.Result>32500 then
 		t.Result=32500
@@ -1445,7 +1446,9 @@ local pipe = MawCore.Pipeline.new("DamageToMonster", {
 	"remote-owner-zero",		-- [gates]
 	"friendly-fire-zero",	-- [gates] ahead of leech: zeroed hits must not heal
 	"leech",					-- [reactions]
-	"track-and-clamp",			-- [clamp]
+	"track-and-clamp",			-- [reactions] tracking + status message
+	"monster-hp",				-- [clamp] real-HP ledger, proxy conversion
+	"final-clamp",				-- [clamp] ceil + 32500 cap
 })
 
 pipe:on("context",           "MawCore",              stage_context)
@@ -1478,6 +1481,8 @@ pipe:on("remote-owner-zero", "zzMAWStatusMsg:2",     stage_remoteOwnerZero)
 pipe:on("friendly-fire-zero","zzMAWStatusMsg:151a",  stage_friendlyFireZero)
 pipe:on("leech",             "zzMAWStatusMsg:24",    stage_leech)
 pipe:on("track-and-clamp",   "zzMAWStatusMsg:151",   stage_trackAndClamp)
+pipe:on("monster-hp",        "MawCore",              stage_monsterHP)
+pipe:on("final-clamp",       "MawCore",              stage_finalClamp)
 
 Damage.pipe = pipe
 

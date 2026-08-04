@@ -46,6 +46,7 @@ MawCore.ModuleOrder = {
 	"Save",			-- per-save namespace + clean-break version stamp
 	"Skills",		-- Skillz.dll port (inert while the DLL is present)
 	"SkillsUI",		-- Skillz.dll port stage 2: character screen
+	"MonsterHP",	-- real monster HP beyond the engine's 16-bit field
 	"Damage",		-- CalcDamageToMonster pipeline (DAMAGE_PIPELINE.md)
 }
 
