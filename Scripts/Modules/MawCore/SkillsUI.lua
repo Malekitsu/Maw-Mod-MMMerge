@@ -534,8 +534,10 @@ function SkillsUI.start()
 	-- with a mem.hook that sets eax = MasteryLimit (dialog-time, no perf cost).
 	-- Topic encoding is MIXED: base skills keep the engine's 36+id, only the
 	-- extended extras use OFFSET+id -- so the decode is tolerant of both.
-	local function luaGate(name, why, addr, size, jmpBack, subReg, skillReg, playerReg)
-		local code = Engine.asmproc(string.format([[
+	-- prefix/prefixSize: optional asm replayed before the decode, for sites
+	-- where the replaced range itself loads the player or the topic param.
+	local function luaGate(name, why, addr, size, jmpBack, subReg, skillReg, playerReg, prefix, prefixSize)
+		local code = Engine.asmproc((prefix or "") .. string.format([[
 			cmp %s, 0x%X
 			jge lg_ext
 			sub %s, 0x24
@@ -553,7 +555,7 @@ function SkillsUI.start()
 		]], subReg, OFFSET, subReg, subReg, OFFSET, jmpBack))
 		Engine.asmpatch(name, why, addr, ("jmp absolute 0x%X"):format(code), size)
 		-- decode block above is 19 bytes: cmp(6) jge(2) sub(3) jmp(2) sub(6)
-		mem.hook(code + 19, function(d)
+		mem.hook(code + 19 + (prefixSize or 0), function(d)
 			local ok, lim = pcall(function()
 				return MawCore.Skills.API.MasteryLimit(
 					playerByPtr(d[playerReg]), d[skillReg])
@@ -632,6 +634,86 @@ function SkillsUI.start()
 	ln2_un:
 		mov ebx, 0x%X
 	ln2_ok:
+		pop eax
+	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamed), 7)
+
+	-- SHOP learn-skill list (weapon/armor/magic/alchemy shops draw their learn
+	-- topics in a separate engine function from the training hall one above;
+	-- the DLL hooked it at 0x4B3F56/0x4B3F70/0x4B3F7A + 0x4B404B/0x4B4065/
+	-- 0x4B4075 and the first port missed all six -- an extended topic reaching
+	-- the unguarded 0x4FDD18 class-table read at 0x4B3F64 crashed the game).
+	-- Same three patterns as the training hall: class gate, known check, name.
+
+	-- first variant: topic already in esi (loaded at 0x4B3F53); the replaced
+	-- range starts with the engine's own player load, replayed as the prefix
+	luaGate("SkillzUIShopGate1", "Skillz port: shop learn list class gate",
+		0x4B3F56, 21, 0x4B3F6B, "esi", "esi", "ecx",
+		"mov ecx, [ebp-0x14]\n", 3)
+	-- second variant: the topic read [esi+0x24] is inside the replaced range;
+	-- ecx already holds the player (loaded at 0x4B4046)
+	luaGate("SkillzUIShopGate2", "Skillz port: shop learn list class gate 2",
+		0x4B404B, 21, 0x4B4060, "edi", "edi", "ecx",
+		"mov edi, [esi+0x24]\n", 3)
+
+	-- known checks (player=eax; skill already in esi / moved from edi)
+	Engine.asmpatch("SkillzUIShopKnown1", "Skillz port: shop learn known check",
+		0x4B3F70, string.format([[
+		push eax
+		push ecx
+		push esi
+		mov ecx, eax
+		mov eax, 0x%X
+		call eax
+		pop esi
+		pop ecx
+		test eax, eax
+		pop eax
+	]], getRaw), 8)
+	Engine.asmpatch("SkillzUIShopKnown2", "Skillz port: shop learn known check 2",
+		0x4B4065, string.format([[
+		push eax
+		push ecx
+		push esi
+		mov ecx, eax
+		mov esi, edi
+		mov eax, 0x%X
+		call eax
+		pop esi
+		pop ecx
+		test eax, eax
+		pop eax
+	]], getRaw), 8)
+
+	-- topic names
+	Engine.asmpatch("SkillzUIShopName1", "Skillz port: shop learn topic name",
+		0x4B3F7A, string.format([[
+		mov edx, [0x%X + esi*4]
+		test edx, edx
+		jnz sh1_ok
+		cmp esi, %d
+		jae sh1_un
+		mov edx, [0x%X + esi*4]
+		test edx, edx
+		jnz sh1_ok
+	sh1_un:
+		mov edx, 0x%X
+	sh1_ok:
+	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamed), 7)
+	Engine.asmpatch("SkillzUIShopName2", "Skillz port: shop learn topic name 2",
+		0x4B4075, string.format([[
+		push eax
+		mov eax, edi
+		mov edi, [0x%X + eax*4]
+		test edi, edi
+		jnz sh2_ok
+		cmp eax, %d
+		jae sh2_un
+		mov edi, [0x%X + eax*4]
+		test edi, edi
+		jnz sh2_ok
+	sh2_un:
+		mov edi, 0x%X
+	sh2_ok:
 		pop eax
 	]], I.namePtrs, OLD_COUNT, A.SkillNamePtrArray, unnamed), 7)
 
