@@ -1319,7 +1319,14 @@ function MawRegen(timePassed)
 	end
 end
 
-
+function getDragonRegenLeech(pl, targetLevel)
+	if not pl then return 0 end
+	if Game.CharacterPortraits[pl.Face].Race~=const.Race.Dragon then return 0 end
+	local regen=SplitSkill(pl:GetSkill(const.Skills.Regeneration))
+	if regen<=0 then return 0 end
+	local lvl=math.max(targetLevel or pl.LevelBase,1)
+	return regen/lvl^0.675*0.05
+end
 
 --DINAMIC SKILL TOOLTIP
 function events.GameInitialized2()
@@ -1338,6 +1345,14 @@ function events.Tick()
 		local hpRegen = round(FHP^0.5*s^1.65*((regenEffect[m])/35))/10+s
 		local hpRegen2 = round(FHP^0.5*(s+1)^1.65*((regenEffect[m])/35))/10+(s+1)
 		local txt = string.format("%s\n\nCurrent HP Regeneration: %s\nNext Level Bonus: %s HP Regen",baseRegStr,StrColor(0,255,0,hpRegen),StrColor(0,255,0,"+" .. hpRegen2-hpRegen))
+		--dragon melee leech, shown only for dragons
+		local leech=getDragonRegenLeech(pl)
+		if leech>0 then
+			local leechNext=leech*(s+1)/s
+			txt = txt .. string.format("\n\nMelee Life Leech vs equal level: %s\nNext Level Bonus: %s\n(lower against higher level monsters)",
+				StrColor(255,80,80,round(leech*1000)/10 .. "%"),
+				StrColor(255,80,80,"+" .. round((leechNext-leech)*1000)/10 .. "%\n"))
+		end
 		Skillz.setDesc(30,1,txt)
 		--meditation tooltip
 		local FSP=pl:GetFullSP()

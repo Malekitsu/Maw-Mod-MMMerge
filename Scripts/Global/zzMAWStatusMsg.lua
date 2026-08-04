@@ -60,10 +60,11 @@ function events.CalcDamageToMonster(t)
 		if t.DamageKind==4 then
 			--melee
 			if not data.Object then
-				totalHeal=baselineHeal*lifeLeech[index].Melee
-				
+				local meleeLeech=lifeLeech[index].Melee+getDragonRegenLeech(pl, getMonsterLevel(mon))
+				totalHeal=baselineHeal*meleeLeech
+
 				local recovery=pl:GetAttackDelay()
-				minLeech=fullHP*lifeLeech[index].Melee/5*recovery/100
+				minLeech=fullHP*meleeLeech/5*recovery/100
 			end
 			--ranged
 			if data.Object and data.Object.Spell==133 then
