@@ -759,9 +759,15 @@ mawTick_LabelWatch=function()
 	end
 	if labelPokes>0 then
 		labelPokes=labelPokes-1
-		MawCore.Scheduler.now("stats/pool-labels")
-		MawCore.Scheduler.now("stats/power-labels")
-		MawCore.Scheduler.now("classes/dragon-charscreen")
+		local now=MawCore.Scheduler.now
+		now("stats/pool-labels")
+		now("stats/power-labels")
+		now("classes/dragon-charscreen")
+		--poke-only tasks (interval -1): they run ONLY from here, on the same
+		--signals -- player, screen, char tab, mouse-held item
+		now("skills/misc-skills-ui")
+		now("skills/dwarf-axes")
+		now("alchemy/reagent-power")
 	end
 end
 

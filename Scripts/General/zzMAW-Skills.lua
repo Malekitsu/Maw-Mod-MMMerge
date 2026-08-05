@@ -2661,7 +2661,7 @@ function events.GameInitialized2()
 	every("skills/homing-projectiles", 0, mawTick_HomingProjectiles)
 	every("skills/charge-movement", 0, mawTick_ChargeMovement)
 	every("skills/solo-mastery", 1000, mawTick_SoloMastery)
-	every("skills/misc-skills-ui", 100, mawTick_MiscSkillsUI)
+	every("skills/misc-skills-ui", -1, mawTick_MiscSkillsUI)	--poked by stats/label-watch
 	every("skills/pl-fallback", 1000, mawTick_PlFallback)
-	every("skills/dwarf-axes", 100, mawTick_DwarfAxes)
+	every("skills/dwarf-axes", -1, mawTick_DwarfAxes)	--poked by stats/label-watch
 end

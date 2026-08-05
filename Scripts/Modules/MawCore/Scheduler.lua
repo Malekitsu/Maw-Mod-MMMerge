@@ -24,6 +24,8 @@ local tasks = {}	-- array; execution order = registration order
 
 -- Scheduler.every("buffDecay", 500, fn)	-- at most once per 500ms of real time
 -- Scheduler.every("crosshair", 0, fn)		-- every frame; use sparingly
+-- Scheduler.every("reskill", -1, fn)		-- poke-only: runs once at startup,
+--											-- then only via Scheduler.now(id)
 function Scheduler.every(id, ms, fn)
 	assert(type(fn) == "function",
 		("scheduler: task %s registered without a function"):format(id))
@@ -60,8 +62,9 @@ end
 function Scheduler.describe()
 	local out = {"scheduler tasks:"}
 	for _, t in ipairs(tasks) do
-		out[#out + 1] = ("  %-24s every %s"):format(
-			t.id, t.ms == 0 and "frame" or (t.ms .. "ms"))
+		out[#out + 1] = ("  %-24s %s"):format(
+			t.id, t.ms < 0 and "on poke only"
+				or (t.ms == 0 and "every frame" or ("every " .. t.ms .. "ms")))
 	end
 	if #tasks == 0 then
 		out[#out + 1] = "  (none)"
@@ -79,7 +82,13 @@ function Scheduler.start()
 			frame[i] = t
 		end
 		for _, t in ipairs(frame) do
-			if not t.removed and (t.ms == 0 or now - t.last >= t.ms) then
+			local due
+			if t.ms < 0 then
+				due = t.last == 0	-- poke-only: Scheduler.now resets last
+			else
+				due = t.ms == 0 or now - t.last >= t.ms
+			end
+			if not t.removed and due then
 				t.last = now
 				t.fn()
 			end

@@ -1304,6 +1304,6 @@ end
 --General file. In-game: print(MawCore.Scheduler.describe())
 function events.GameInitialized2()
 	local every=MawCore.Scheduler.every
-	every("alchemy/reagent-power", 100, mawTick_ReagentPower)
+	every("alchemy/reagent-power", -1, mawTick_ReagentPower)	--poked by stats/label-watch
 	every("alchemy/craft-cooldown", 0, mawTick_CraftCooldown)
 end
