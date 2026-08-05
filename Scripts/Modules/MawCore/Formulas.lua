@@ -15,16 +15,16 @@
 --     curved by the mod in zzMaw-Stats' events.GetStatisticEffect (>=25 ->
 --     floor(stat/5)). Call it directly; the hand-rolled inline copies of
 --     the curve were replaced with calls to it.
---   * resDivide(damage, res) (zzMaw-Stats) -- the standard damage divisor.
---     Formulas.reductionPercent below is its display twin.
+-- NOTE: monster resistances use a different curve entirely -- resDivide in
+-- Damage.lua is damage/2^(res/100), not the (1+power/100) divisor below.
 
 local Formulas = {}
 MawCore.Formulas = Formulas
 
--- The % shown for the standard "divide by (1 + power/100)" damage reduction
--- (resDivide, shaman Air / DK Body / DK Dark reductions, resistance
--- enchants, map reduction affixes). decimals = 2 for two shown digits,
--- anything else means the usual one.
+-- The % shown for the "divide by (1 + power/100)" damage reduction (shaman
+-- Air / DK Body / DK Dark class reductions, resistance-enchant displays,
+-- map reduction affixes). decimals = 2 for two shown digits, anything else
+-- means the usual one.
 function Formulas.reductionPercent(power, decimals)
 	local f = decimals == 2 and 100 or 10
 	local fraction = 1 - 1/(power/100 + 1)
@@ -77,4 +77,57 @@ end
 -- fullHP=100 to show it as a % of full HP vs same-level monsters.
 function Formulas.dkPassiveLeech(fullHP, s, monsterLevel)
 	return fullHP * (s/round(monsterLevel^0.7)) * 0.05
+end
+
+-- Regeneration BUFF/potion: HP per second for the buff's stored skill.
+-- Effect: both branches of getBuffHealthRegen (zzMAW-Skills); the
+-- buffRework spell variant beside it scales differently and stays inline.
+function Formulas.hpRegenBuffPerSec(fullHP, s, m)
+	return fullHP^0.5 * s^1.25 * ((m+1)/1000)
+end
+
+-- Assassin passive: energy (SP) per second from Water magic mastery m.
+-- Effect: MawRegen's SP loop (zzMAW-Skills; per tick = this /10);
+-- display: the Poisoning skill mastery rows.
+function Formulas.assassinEnergyPerSec(m)
+	return (0.6 + m*0.2) * 10
+end
+
+------------------------------------------------------------------------
+-- Item "bonus power" (MaxCharges) scaling. Effect sites live in itemStats
+-- (zzMaw-Items collect* helpers); display sites in checktext / the artifact
+-- stat preview (zzMaw-Items) and the item tooltips (MawCore/Tooltip.lua).
+------------------------------------------------------------------------
+
+-- Special-enchant (Bonus2) stat multiplier.
+function Formulas.chargesStatMult(charges)
+	return 1 + charges/20
+end
+
+-- Enchant weapon-damage scaling curve. Call sites clamp: the tooltip and
+-- fire aura clamp the multiplier at 0.5, calcEnchantDamage clamps the
+-- damage result instead.
+function Formulas.chargesDamageScale(charges)
+	return (0.5 + charges/20)^1.5
+end
+
+-- Spell-school skill bonus from school enchants (GetSkill slots 26-34).
+function Formulas.chargesSchoolSkill(charges)
+	return math.floor(charges/4) + 5
+end
+
+-- Meditation skill bonus from meditation-granting special enchants.
+function Formulas.chargesMeditationSkill(charges)
+	return math.floor(charges*3/20) + 3
+end
+
+-- Armor AC growth: the reference (top-tier sibling) AC scaled by charges.
+function Formulas.chargesArmorAC(referenceAC, charges)
+	return referenceAC * (charges/40)
+end
+
+-- Weapon attack / dice-sides growth: the reference stat scaled by charges
+-- (also the staff attack bonus feeding party resistances).
+function Formulas.chargesWeaponBonus(reference, charges)
+	return reference * (charges/30)
 end

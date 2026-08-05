@@ -1152,13 +1152,13 @@ function getBuffHealthRegen(pl)
 			local regen1 = FHP^0.5*skill^1.25*(buffPower[71].Base[m]/1000)
 			--potion
 			RegS, RegM = SplitSkill(Buff.Skill)
-			local regen2 = FHP^0.5*RegS^1.25*((RegM+1)/1000)
-			
+			local regen2 = MawCore.Formulas.hpRegenBuffPerSec(FHP, RegS, RegM)
+
 			regen=regen+math.max(regen1, regen2)
 		end
 	elseif Buff.ExpireTime > Game.Time then
 		RegS, RegM = SplitSkill(Buff.Skill)
-		regen = regen+FHP^0.5*RegS^1.25*((RegM+1)/1000)
+		regen = regen+MawCore.Formulas.hpRegenBuffPerSec(FHP, RegS, RegM)
 	end
 	return regen
 end
@@ -1264,7 +1264,7 @@ function MawRegen(timePassed)
 			end
 			if table.find(assassinClass, pl.Class) then
 				local s,m=SplitSkill(pl:GetSkill(const.Skills.Water))
-				regenSP[i]=regenSP[i]+ (0.6+m*0.2) * timeMultiplier
+				regenSP[i]=regenSP[i]+ MawCore.Formulas.assassinEnergyPerSec(m)/10 * timeMultiplier
 			end
 			local playersSP = math.min(FSP, pl.SP + math.floor(regenSP[i]))
 			if vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[i] then

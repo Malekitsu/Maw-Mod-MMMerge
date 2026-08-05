@@ -1957,77 +1957,24 @@ function events.AfterLoadMap()
 	end
 end
 
+--affix id -> {base, scale}: power = base + mapLevel*scale
+local affixPowerTable={
+	[1]={20,0.5},	[2]={10,1},		[3]={10,1},		[4]={5,0.5},
+	[5]={7,0.15},	[6]={7,0.15},	[7]={1,0.1},	[8]={5,0.25},
+	[9]={15,0.2},	[10]={5,0.1},	[11]={30,1},	[12]={30,2},
+	[13]={30,1},	[14]={20,1},	[15]={20,1.5},	[16]={30,0.5},
+	[17]={20,0.5},	[18]={15,1},	[19]={4,0.05},	[20]={10,0.2},
+	[21]={10,0.2},	[22]={20,1},	[23]={15,0.5},	[24]={15,0.5},
+	[25]={15,0.5},	[26]={15,0.5},	[27]={15,0.5},	[28]={15,0.5},
+	[29]={15,0.5},	[30]={15,0.5},	[31]={15,0.5},	[32]={15,0.5},
+	[33]={15,0.5},
+}
 function calculateAffixPower(n, p)
-	local power=false
-    if n == 1 then
-         power=20+p*0.5
-    elseif n == 2 then
-		power=10+p*1
-	elseif n == 3 then
-		power=10+p*1
-	elseif n == 4 then
-		power=5+p*0.5
-	elseif n == 5 then
-		power=7+p*0.15
-	elseif n == 6 then
-		power=7+p*0.15
-	elseif n == 7 then
-		power=1+p*0.1
-	elseif n == 8 then
-		power=5+p*0.25
-	elseif n == 9 then
-		power=15+p*0.2
-	elseif n == 10 then
-		power=5+p*0.1
-	elseif n == 11 then
-		power=30+p*1
-	elseif n == 12 then
-		power=30+p*2
-	elseif n == 13 then
-		power=30+p*1
-	elseif n == 14 then
-		power=20+p*1
-	elseif n == 15 then
-		power=20+p*1.5
-	elseif n == 16 then
-		power=30+p*0.5
-	elseif n == 17 then
-		power=20+p*0.5
-	elseif n == 18 then
-		power=15+p*1
-	elseif n == 19 then
-		power=4+p*0.05
-	elseif n == 20 then
-		power=10+p*0.2
-	elseif n == 21 then
-		power=10+p*0.2
-	elseif n == 22 then
-		power=20+p
-	elseif n == 23 then
-		power=15+p*0.5
-	elseif n == 24 then
-		power=15+p*0.5
-	elseif n == 25 then
-		power=15+p*0.5
-	elseif n == 26 then
-		power=15+p*0.5
-	elseif n == 27 then
-		power=15+p*0.5
-	elseif n == 28 then
-		power=15+p*0.5
-	elseif n == 29 then
-		power=15+p*0.5
-	elseif n == 30 then
-		power=15+p*0.5
-	elseif n == 31 then
-		power=15+p*0.5
-	elseif n == 32 then
-		power=15+p*0.5
-	elseif n == 33 then
-		power=15+p*0.5
-    else
-        return false
-    end
+	local affix=affixPowerTable[n]
+	if not affix then
+		return false
+	end
+	local power=affix[1]+p*affix[2]
 	--reductions can eventually go to 0, fix
 	local reductionAffix={13,21,22,23,24,25,26,27,28,29,30,31,32,33}
 	if table.find(reductionAffix,n) then

@@ -260,7 +260,7 @@ local function tooltipEnchantStats(t)
 							maxCharges=math.ceil(maxCharges*4/3)
 						end
 						--]]
-						local bonusAC=ac2*(maxCharges/40)
+						local bonusAC=Formulas.chargesArmorAC(ac2, maxCharges)
 						--if t.Item.MaxCharges <= 20 then
 							ac=ac3+round(bonusAC)
 						--else
@@ -289,11 +289,11 @@ local function tooltipEnchantStats(t)
 						maxCharges=math.ceil(maxCharges*4/3)
 					end
 					]]
-					local bonusATK=bonus2*(maxCharges/30)
+					local bonusATK=Formulas.chargesWeaponBonus(bonus2, maxCharges)
 					bonus=bonus+round(bonusATK)
 					local sides=txt.Mod1DiceSides
 					local sides2=Game.ItemsTxt[t.Item.Number+lookup].Mod1DiceSides
-					local sidesBonus=sides2*(maxCharges/30)
+					local sidesBonus=Formulas.chargesWeaponBonus(sides2, maxCharges)
 					sides=sides+round(sidesBonus)
 					t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " ..  txt.Mod1DiceCount .. "d" .. sides .. "+" .. bonus
 				end
@@ -472,7 +472,8 @@ local function tooltipEnchantStats(t)
 					local bonus=math.floor(charges/1000)
 					local strength=charges%1000
 					if stat>=11 and stat<=16 then
-						strength=Formulas.reductionPercent((charges+10)%1000) .. "%"
+						--second enchants grant the raw strength, no +10 (collectEnchant)
+						strength=Formulas.reductionPercent(strength) .. "%"
 					end
 					txt=baseStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
 					t.Enchantment = StrColor(100,100,100, txt)

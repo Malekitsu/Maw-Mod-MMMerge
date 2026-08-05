@@ -1580,7 +1580,7 @@ function checktext(MaxCharges,bonus2,it)
 		MaxCharges=math.ceil(MaxCharges*4/3)
 	end
 	]]
-	mult=1+MaxCharges/20
+	mult=MawCore.Formulas.chargesStatMult(MaxCharges)
 	--else
 	--	mult=2+2*(MaxCharges-20)/20
 	--end
@@ -1610,7 +1610,7 @@ function checktext(MaxCharges,bonus2,it)
 	end
 	
 	--damage multiplier
-	local enchantDamageMult=math.max((0.5+MaxCharges/20)^1.5,0.5)
+	local enchantDamageMult=math.max(MawCore.Formulas.chargesDamageScale(MaxCharges),0.5)
 	
 	bonus2txt={
 		[1] =  " +" .. math.floor(bonusEffects[1].statModifier * mult) .. " to all Resistances.",
@@ -1628,17 +1628,17 @@ function checktext(MaxCharges,bonus2,it)
 		[14] ="Adds " .. math.floor(24*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Body damage.",
 		[15] ="Adds " .. math.floor(48*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Body damage.",
 		--spell enchants
-		[26] = "Air Magic Skill +" .. math.floor(MaxCharges/4)+5,
-		[27] = "Body Magic Skill +" .. math.floor(MaxCharges/4)+5,
-		[28] = "Dark Magic Skill +" .. math.floor(MaxCharges/4)+5,
-		[29] = "Earth Magic Skill +" .. math.floor(MaxCharges/4)+5,
-		[30] = "Fire Magic Skill +" .. math.floor(MaxCharges/4)+5,
-		[31] = "Light Magic Skill +" .. math.floor(MaxCharges/4)+5,
-		[32] = "Mind Magic Skill +" .. math.floor(MaxCharges/4)+5,
-		[33] = "Spirit Magic Skill +" .. math.floor(MaxCharges/4)+5,
-		[34] = "Water Magic Skill +" .. math.floor(MaxCharges/4)+5,
+		[26] = "Air Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
+		[27] = "Body Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
+		[28] = "Dark Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
+		[29] = "Earth Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
+		[30] = "Fire Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
+		[31] = "Light Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
+		[32] = "Mind Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
+		[33] = "Spirit Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
+		[34] = "Water Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
 		--stats enchants
-		[38] = "Meditation Skill +" .. math.floor(MaxCharges*3/20)+3,
+		[38] = "Meditation Skill +" .. MawCore.Formulas.chargesMeditationSkill(MaxCharges),
 		[39] = "Adds " .. math.floor(40*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(80*enchantDamageMult*attackSpeedMult*legDmgMult) .. " to spell damage and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Intellect and personality.",
 		[40] = "Spells Drain Hit points from target and Increased Spell speed.(except when equipping off-hand).",
 		[42] = " +" .. math.floor(bonusEffects[42].statModifier * mult) .. " to Seven Stats, HP, SP, Armor, Resistances.",
@@ -1646,7 +1646,7 @@ function checktext(MaxCharges,bonus2,it)
 		[44] = " +" .. math.floor(bonusEffects[44].statModifier * mult) .. " Hit points and Regenerate Hit points over time.",
 		[45] = " +" .. math.floor(bonusEffects[45].statModifier * mult) .. " Speed and Accuracy.",
 		[46] = "Adds " .. math.floor(40*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(80*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Fire damage to " .. weaponType .. " attacks and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Might.",
-		[47] = " +" .. math.floor(bonusEffects[47].statModifier * mult) .. " Spell points and Meditation Skill +" .. math.floor(MaxCharges*3/20)+3,
+		[47] = " +" .. math.floor(bonusEffects[47].statModifier * mult) .. " Spell points and Meditation Skill +" .. MawCore.Formulas.chargesMeditationSkill(MaxCharges),
 		[48] = " +" .. math.floor(bonusEffects[48].statModifier[1] * mult) .. " Endurance and" .. " +" .. math.floor(bonusEffects[48].statModifier[2] * mult).. " Armor.",
 		[49] = " +" .. math.floor(bonusEffects[49].statModifier * mult) .. " Intellect and Luck.",
 		[50] = " +" .. math.floor(bonusEffects[50].statModifier * mult) .. " Fire Resistance and Regenerate Hit points over time.",
@@ -1654,10 +1654,10 @@ function checktext(MaxCharges,bonus2,it)
 		[52] = " +" .. math.floor(bonusEffects[52].statModifier * mult) .. " Endurance and Accuracy.",
 		[53] = " +" .. math.floor(bonusEffects[53].statModifier * mult) .. " Might and Personality.",
 		[54] = " +" .. math.floor(bonusEffects[54].statModifier * mult) .. " Endurance and Regenerate Hit points over time.",
-		[55] = " +" .. math.floor(bonusEffects[55].statModifier * mult) .. " Luck and Meditation Skill +" .. math.floor(MaxCharges*3/20)+3,
+		[55] = " +" .. math.floor(bonusEffects[55].statModifier * mult) .. " Luck and Meditation Skill +" .. MawCore.Formulas.chargesMeditationSkill(MaxCharges),
 		[56] = " +" .. math.floor(bonusEffects[56].statModifier * mult) .. " Might and Endurance.",
 		[57] = " +" .. math.floor(bonusEffects[57].statModifier * mult) .. " Intellect and Personality.",
-		[66] = "Regenerates Hit Points and Meditation Skill +" .. math.floor(MaxCharges*3/20)+3,
+		[66] = "Regenerates Hit Points and Meditation Skill +" .. MawCore.Formulas.chargesMeditationSkill(MaxCharges),
 		--hybrids enchants 
 		[74] = " +" .. math.floor(bonusEffects[74].statModifier * mult) .. " Personality and Accuracy.",
 		[75] = " +" .. math.floor(bonusEffects[75].statModifier * mult) .. " Intellect and Might.",
@@ -1869,7 +1869,7 @@ function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType)
 	if it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number) then
 		damage=damage*2
 	end
-	damage=math.max(damage*(0.5+it.MaxCharges/20)^1.5,0.5)
+	damage=math.max(damage*MawCore.Formulas.chargesDamageScale(it.MaxCharges),0.5)
 	damage = damage/2^(resistance%1000/100)
 	return damage
 end
@@ -2251,7 +2251,7 @@ function calculateStatsAdd(item, stats)
 		--maxcharges mult
 		MaxCharges=item.MaxCharges
 		--if MaxCharges <= 20 then
-			mult=1+MaxCharges/20
+			mult=MawCore.Formulas.chargesStatMult(MaxCharges)
 		--else
 		--	mult=2+2*(MaxCharges-20)/20
 		--end
@@ -2276,34 +2276,6 @@ function calculateStatsAdd(item, stats)
 	return statValue
 end
 
-function getNewArmor(it)
-	local txt=it:T()
-	local charges=it.MaxCharges
-	if txt.EquipStat>=3 and txt.EquipStat<=9 then
-		local ac3=txt.Mod2+txt.Mod1DiceCount
-		local n=it.Number
-		if charges>0 then
-			if ac3>0 then
-				local lookup=0
-				while txt.NotIdentifiedName==Game.ItemsTxt[n+lookup+1].NotIdentifiedName do 
-					lookup=lookup+1
-				end
-				local ac=txt.Mod2+txt.Mod1DiceCount 
-				local ac2=Game.ItemsTxt[n+lookup].Mod2+Game.ItemsTxt[n+lookup].Mod1DiceCount 
-				local bonusAC=ac2*(charges/20)
-				if charges <= 20 then
-					ac3=ac3+round(bonusAC)
-				else
-					local bonusAC=(ac+ac2)*(charges/20)
-					ac3=ac3+round(bonusAC)
-				end				
-			end
-		end
-		return ac3	
-	else
-		return 0
-	end
-end
 
 
 
@@ -2452,7 +2424,7 @@ local function collectArmorAC(pl, index, it, txt, tab)
 	local ac=txt.Mod1DiceCount+txt.Mod2
 	local acBonus=ac
 	if it.MaxCharges>0 and not artArmorsSet[it.Number] then
-		acBonus=ac+round(referenceAC[it.Number]*(it.MaxCharges/40))
+		acBonus=ac+round(MawCore.Formulas.chargesArmorAC(referenceAC[it.Number], it.MaxCharges))
 	end
 	--artifacts
 	if artArmorsSet[it.Number] then
@@ -2522,7 +2494,7 @@ local function collectEquipEffects(it, tab)
 	if it.Bonus2>0 then
 		local bonusData=bonusEffects[it.Bonus2]
 		if bonusData then
-			local mult=1+it.MaxCharges/20 --bolster mult
+			local mult=MawCore.Formulas.chargesStatMult(it.MaxCharges) --bolster mult
 			if bonusData.bonusRange then
 				for i=bonusData.bonusRange[1], bonusData.bonusRange[2] do
 					tab[i]=tab[i]+bonusData.statModifier*mult
@@ -2543,11 +2515,11 @@ local function collectEquipEffects(it, tab)
 	end
 	--equipment spell-school bonuses (slots 26-34, read by events.GetSkill)
 	if equipSpellMap[it.Bonus2] then
-		tab[it.Bonus2]=(tab[it.Bonus2] or 0)+(5+math.floor(it.MaxCharges/4))
+		tab[it.Bonus2]=(tab[it.Bonus2] or 0)+MawCore.Formulas.chargesSchoolSkill(it.MaxCharges)
 	end
 	if meditationBonusItemSet[it.Bonus2] then
 		local slot=50+const.Skills.Meditation
-		tab[slot]=(tab[slot] or 0)+(3+math.floor(it.MaxCharges/20*3))
+		tab[slot]=(tab[slot] or 0)+MawCore.Formulas.chargesMeditationSkill(it.MaxCharges)
 	end
 end
 
@@ -2968,7 +2940,7 @@ local function addWeaponACRes(pl, index, tab)
 				s=s+10
 				local bonus = txt.Mod2
 				local bonus2 = referenceWeaponAttack[it.Number]
-				local bonusATK = bonus2 * (it.MaxCharges / 30)
+				local bonusATK = MawCore.Formulas.chargesWeaponBonus(bonus2, it.MaxCharges)
 
 				local bonusBase = bonus + round(bonusATK)
 				local bonusAC = round(skillAC[skill][m]*bonusBase/100*s)
@@ -3022,7 +2994,7 @@ local function addStaffPartyRes(tab)
 				s=s+10
 				local bonus = txt.Mod2
 				local bonus2 = referenceWeaponAttack[it.Number]
-				local bonusATK = bonus2 * (it.MaxCharges / 30)
+				local bonusATK = MawCore.Formulas.chargesWeaponBonus(bonus2, it.MaxCharges)
 
 				local bonusBase = bonus + round(bonusATK)
 				bonusRes = bonusRes + round(skillResistance[skill][m]*bonusBase/100*s)
@@ -4026,7 +3998,7 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 		if not it or (it and it.Number==0) or (it and it:T().EquipStat>2) then return 0 end
 		local s, m, level=getBuffSkill(4)
 		local id=pl:GetIndex()
-		local mult=math.max((0.5+it.MaxCharges/20)^1.5,0.5)
+		local mult=math.max(MawCore.Formulas.chargesDamageScale(it.MaxCharges),0.5)
 		if table.find(artWeap1h, it.Number) or table.find(artWeap2h, it.Number) then
 			mult=(1+artifactPowerMult(pl.LevelBase, false, it.BonusExpireTime))^1.5
 		end

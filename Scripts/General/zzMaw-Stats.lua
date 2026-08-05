@@ -717,6 +717,20 @@ function events.PlayerAttacked(t)
 	end)
 end
 
+--shaman Air / DK class damage reduction: divide by (1+skill/100), once for
+--the physical path (DK uses Body) and once for the magical path (DK uses
+--Dark); the % shown in tooltips is MawCore.Formulas.reductionPercent
+local function classDamageReduction(pl, damage, dkSkill)
+	if table.find(shamanClass, pl.Class) then
+		local s=SplitSkill(pl.Skills[const.Skills.Air])
+		damage=damage/(1+0.01*s)
+	elseif table.find(dkClass, pl.Class) then
+		local s=SplitSkill(pl.Skills[dkSkill])
+		damage=damage/(1+0.01*s)
+	end
+	return damage
+end
+
 --reduce damage by %
 function events.CalcDamageToPlayer(t)
 	local data=mawCustomMonObj or WhoHitPlayer()
@@ -1177,13 +1191,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		local damage=round(damage/reduction)
 		
 		--dk/shaman
-		if table.find(shamanClass, pl.Class) then
-			local s,m=SplitSkill(pl.Skills[const.Skills.Air])
-			damage=damage/(1+0.01*s)
-		elseif table.find(dkClass, pl.Class) then
-			local s,m=SplitSkill(pl.Skills[const.Skills.Body])
-			damage=damage/(1+0.01*s)
-		end
+		damage=classDamageReduction(pl, damage, const.Skills.Body)
 		--enchant reduction
 		if vars.shieldEnchant and vars.shieldEnchant[id] then
 			damage=damage*0.85
@@ -1192,14 +1200,8 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	end
 	
 	
-	if table.find(shamanClass, pl.Class) then
-		local s,m=SplitSkill(pl.Skills[const.Skills.Air])
-		damage=damage/(1+0.01*s)
-	elseif table.find(dkClass, pl.Class) then
-		local s,m=SplitSkill(pl.Skills[const.Skills.Dark])
-		damage=damage/(1+0.01*s)
-	end
-	
+	damage=classDamageReduction(pl, damage, const.Skills.Dark)
+
 	--MAGIC DAMAGE CALCULATION
 	--shield buff
 	if vars.MAWSETTINGS.buffRework=="ON" then

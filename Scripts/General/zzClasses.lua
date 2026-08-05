@@ -432,47 +432,16 @@ function events.GameInitialized2()
 			useBreathCooldown=true
 		end
 	end
-	--skill text
-	normal=""
-	normal=string.format("%s      %s|",normal,dragonFang.Attack[1])
-	--normal=string.format("%s      %s|",normal,dragonFang.Speed[1])
-	normal=string.format("%s     %s|",normal,dragonFang.Damage[1])
-	fangsNormal=normal
-	normal=""
-	normal=string.format("%s  %s|",normal,dragonScales.AC[1])
-	normal=string.format("%s    %s",normal,dragonScales.Resistances[1])
-	scalesNormal=normal
-	
-	expert=""
-	expert=string.format("%s      %s|",expert,dragonFang.Attack[2])
-	--expert=string.format("%s      %s|",expert,dragonFang.Speed[2])
-	expert=string.format("%s     %s|",expert,dragonFang.Damage[2])
-	fangsExpert=expert
-	expert=""
-	expert=string.format("%s  %s|",expert,dragonScales.AC[2])
-	expert=string.format("%s    %s",expert,dragonScales.Resistances[2])
-	scalesExpert=expert
-	
-	master=""
-	master=string.format("%s      %s|",master,dragonFang.Attack[3])
-	--master=string.format("%s      %s|",master,dragonFang.Speed[3])
-	master=string.format("%s     %s|",master,dragonFang.Damage[3])
-	fangsMaster=master
-	master=""
-	master=string.format("%s  %s|",master,dragonScales.AC[3])
-	master=string.format("%s    %s",master,dragonScales.Resistances[3])
-	scalesMaster=master
-	
-	gm=""
-	gm=string.format("%s      %s|",gm,dragonFang.Attack[4])
-	--gm=string.format("%s      %s|",gm,dragonFang.Speed[4])
-	gm=string.format("%s     %s|",gm,dragonFang.Damage[4])
-	fangsGM=gm
-	gm=""
-	gm=string.format("%s  %s|",gm,dragonScales.AC[4])
-	gm=string.format("%s    %s",gm,dragonScales.Resistances[4])
-	scalesGM=gm
-	
+	--skill text: one row per mastery from the dragonFang/dragonScales tables
+	local function fangRow(m)
+		return string.format("      %s|     %s|",dragonFang.Attack[m],dragonFang.Damage[m])
+	end
+	local function scaleRow(m)
+		return string.format("  %s|    %s",dragonScales.AC[m],dragonScales.Resistances[m])
+	end
+	fangsNormal,fangsExpert,fangsMaster,fangsGM=fangRow(1),fangRow(2),fangRow(3),fangRow(4)
+	scalesNormal,scalesExpert,scalesMaster,scalesGM=scaleRow(1),scaleRow(2),scaleRow(3),scaleRow(4)
+
 	--make fangs and scales learnable
 	Game.Classes.Skills[10][32]=3
 	Game.Classes.Skills[10][33]=3
