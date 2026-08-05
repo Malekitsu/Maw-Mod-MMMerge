@@ -33,6 +33,19 @@ function Scheduler.every(id, ms, fn)
 	tasks[#tasks + 1] = {id = id, ms = ms, fn = fn, last = 0}
 end
 
+-- Force a task to run on the next frame regardless of its interval -- for
+-- "refresh immediately on this event" pokes (e.g. char-screen labels on
+-- character switch) without giving up the task's slow steady cadence.
+function Scheduler.now(id)
+	for _, t in ipairs(tasks) do
+		if t.id == id then
+			t.last = 0
+			return true
+		end
+	end
+	return false
+end
+
 function Scheduler.remove(id)
 	for i, t in ipairs(tasks) do
 		if t.id == id then

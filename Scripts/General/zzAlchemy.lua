@@ -1299,12 +1299,11 @@ function events.GameInitialized2()
 	Game.ItemsTxt[1069].SpriteIndex=130
 end
 
---Tick handlers above now run as named MawCore scheduler tasks, all at 0ms
---(= every frame, exactly as before -- slowing tasks down is a later tuning
---pass). Registered at GameInitialized2 because MawCore loads after every
+--Tick handlers above now run as named MawCore scheduler tasks (interval in
+--ms; 0 = every frame). Registered at GameInitialized2 because MawCore loads after every
 --General file. In-game: print(MawCore.Scheduler.describe())
 function events.GameInitialized2()
 	local every=MawCore.Scheduler.every
-	every("alchemy/reagent-power", 0, mawTick_ReagentPower)
+	every("alchemy/reagent-power", 100, mawTick_ReagentPower)
 	every("alchemy/craft-cooldown", 0, mawTick_CraftCooldown)
 end

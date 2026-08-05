@@ -2653,16 +2653,15 @@ function mawTick_DwarfAxes()
 	end
 end
 
---Tick handlers above now run as named MawCore scheduler tasks, all at 0ms
---(= every frame, exactly as before -- slowing tasks down is a later tuning
---pass). Registered at GameInitialized2 because MawCore loads after every
+--Tick handlers above now run as named MawCore scheduler tasks (interval in
+--ms; 0 = every frame). Registered at GameInitialized2 because MawCore loads after every
 --General file. In-game: print(MawCore.Scheduler.describe())
 function events.GameInitialized2()
 	local every=MawCore.Scheduler.every
 	every("skills/homing-projectiles", 0, mawTick_HomingProjectiles)
 	every("skills/charge-movement", 0, mawTick_ChargeMovement)
-	every("skills/solo-mastery", 0, mawTick_SoloMastery)
-	every("skills/misc-skills-ui", 0, mawTick_MiscSkillsUI)
-	every("skills/pl-fallback", 0, mawTick_PlFallback)
-	every("skills/dwarf-axes", 0, mawTick_DwarfAxes)
+	every("skills/solo-mastery", 1000, mawTick_SoloMastery)
+	every("skills/misc-skills-ui", 100, mawTick_MiscSkillsUI)
+	every("skills/pl-fallback", 1000, mawTick_PlFallback)
+	every("skills/dwarf-axes", 100, mawTick_DwarfAxes)
 end

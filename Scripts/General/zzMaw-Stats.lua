@@ -734,6 +734,37 @@ end
 --reduce damage by %
 -- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
+--the stat-page label tasks run throttled; this every-frame watcher (three
+--field reads) pokes them the moment the selected player, the screen, or the
+--mouse-held item changes -- the last one catches every equip/unequip, since
+--the item always passes over the cursor
+local lastLabelPlayer, lastLabelScreen, lastLabelCharScreen, labelPokes = nil, nil, nil, 0
+local lmNum, lmBonus, lmStr, lmB2, lmChg, lmMax, lmExp, lmCond
+mawTick_LabelWatch=function()
+	local mi=Mouse.Item
+	local changed = Game.CurrentPlayer~=lastLabelPlayer
+		or Game.CurrentScreen~=lastLabelScreen
+		or Game.CurrentCharScreen~=lastLabelCharScreen
+		or mi.Number~=lmNum or mi.Bonus~=lmBonus or mi.BonusStrength~=lmStr
+		or mi.Bonus2~=lmB2 or mi.Charges~=lmChg or mi.MaxCharges~=lmMax
+		or mi.BonusExpireTime~=lmExp or mi.Condition~=lmCond
+	if changed then
+		--two poke frames: the deferred itemStats refresh (mawRefresh via
+		--RunNextTick) may land a frame behind the first poke
+		labelPokes=2
+		lastLabelPlayer, lastLabelScreen = Game.CurrentPlayer, Game.CurrentScreen
+		lastLabelCharScreen = Game.CurrentCharScreen
+		lmNum, lmBonus, lmStr, lmB2 = mi.Number, mi.Bonus, mi.BonusStrength, mi.Bonus2
+		lmChg, lmMax, lmExp, lmCond = mi.Charges, mi.MaxCharges, mi.BonusExpireTime, mi.Condition
+	end
+	if labelPokes>0 then
+		labelPokes=labelPokes-1
+		MawCore.Scheduler.now("stats/pool-labels")
+		MawCore.Scheduler.now("stats/power-labels")
+		MawCore.Scheduler.now("classes/dragon-charscreen")
+	end
+end
+
 --TOOLTIPS
 function events.Action(t)
 	if vars.MAWSETTINGS.buffRework=="ON" then
@@ -1855,12 +1886,12 @@ function GetDifficulty()
 	return difficulty
 end
 
---Tick handlers above now run as named MawCore scheduler tasks, all at 0ms
---(= every frame, exactly as before -- slowing tasks down is a later tuning
---pass). Registered at GameInitialized2 because MawCore loads after every
+--Tick handlers above now run as named MawCore scheduler tasks (interval in
+--ms; 0 = every frame). Registered at GameInitialized2 because MawCore loads after every
 --General file. In-game: print(MawCore.Scheduler.describe())
 function events.GameInitialized2()
 	local every=MawCore.Scheduler.every
-	every("stats/pool-labels", 0, mawTick_PoolLabels)
-	every("stats/power-labels", 0, mawTick_PowerLabels)
+	every("stats/label-watch", 0, mawTick_LabelWatch)
+	every("stats/pool-labels", 250, mawTick_PoolLabels)
+	every("stats/power-labels", 250, mawTick_PowerLabels)
 end

@@ -547,11 +547,10 @@ function isnan(x)
     return x ~= x
 end
 
---Tick handlers above now run as named MawCore scheduler tasks, all at 0ms
---(= every frame, exactly as before -- slowing tasks down is a later tuning
---pass). Registered at GameInitialized2 because MawCore loads after every
+--Tick handlers above now run as named MawCore scheduler tasks (interval in
+--ms; 0 = every frame). Registered at GameInitialized2 because MawCore loads after every
 --General file. In-game: print(MawCore.Scheduler.describe())
 function events.GameInitialized2()
 	local every=MawCore.Scheduler.every
-	every("multibag/buttons", 0, mawTick_MultibagButtons)
+	every("multibag/buttons", 100, mawTick_MultibagButtons)
 end
