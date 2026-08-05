@@ -577,45 +577,7 @@ function events.GameInitialized2()
 	end
 end
 
---now do same for armors
-function events.Action(t)
-	RunNextTick(function()
-		if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
-			local i=Game.CurrentPlayer
-			if i<0 or i>Party.High then return end
-			local pl=Party[i]
-			local index=pl:GetIndex()
-			itemStats(index)
-			--base descriptions
-			Skillz.setDesc(8,1,"Shield skill provides great defense against both physical and magical attacks.\n\nShield Skill boosts the AC and Resistances gained from your Shield  by a percent amount.")
-			Skillz.setDesc(9,1,"Leather armor is the lightest armor a character can wear.  While leather provides less protection than chain or plate armor, it also slows your character down the least.\n\nLeather Armor Skill boosts the AC and Resistances gained by ALL armors when equipping a Leather Armor by a percent amount.")
-			Skillz.setDesc(10,1,"Chain armor is the medium armor type.  It provides more protection than leather and less than plate, but it also slows your character down more than leather.\n\nChain Armor Skill boosts the AC and Resistances gained by ALL armors when equipping a Chain Armor by a percent amount.")
-			Skillz.setDesc(11,1,"Plate armor is the heaviest armor type.  It provides the most protection, but it slows your character down more than leather or chain.\n\nPlate Armor Skill boosts the AC and Resistances gained by ALL armors when equipping a Plate Armor by a percent amount.")
-			local it=pl:GetActiveItem(3)
-			if it then
-				local skill=it:T().Skill
-				Skillz.setDesc(skill,1,string.format(Skillz.getDesc(skill,1) .. "\n\nCurrent AC from items: " .. StrColor(255,255,100,armorAC) .. "\n"))
-				Skillz.setDesc(skill,1,string.format(Skillz.getDesc(skill,1) .. "Bonus AC: " .. StrColor(255,255,100,itemArmorClassBonus1) .. "\n"))
-				Skillz.setDesc(skill,1,string.format(Skillz.getDesc(skill,1) .. "Bonus Resistances: " .. StrColor(255,255,100,itemResistanceBonus1) .. "\n"))
-			end
-			local it=pl:GetActiveItem(0)
-			if it then
-				local skill=it:T().Skill
-				if skill==8 then
-					Skillz.setDesc(skill,1,string.format(Skillz.getDesc(skill,1) .. "\n\nBonus AC: " .. StrColor(255,255,100,itemArmorClassBonus2) .. "\n"))
-					Skillz.setDesc(skill,1,string.format(Skillz.getDesc(skill,1) .. "Bonus Resistances: " .. StrColor(255,255,100,itemResistanceBonus2) .. "\n"))
-				end	
-			end
-			
-			baseString="\n------------------------------------------------------------\n         "
-			baseString=string.format("%s\t075AC|",baseString)
-			baseString=string.format("%s Res\t000",baseString)
-			for i=8,11 do
-				Skillz.setDesc(i,1,string.format(Skillz.getDesc(i,1) .. baseString))
-			end
-		end
-	end)
-end
+-- armor skill tooltips (8-11) moved to Scripts/Modules/MawCore/SkillTooltip.lua (SKILL_TOOLTIPS.md)
 		
 	
 function events.GameInitialized2()
@@ -696,6 +658,7 @@ function events.GameInitialized2()
 	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Dodging])
 	--Game.SkillDesGM[const.Skills.Unarmed]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Unarmed])	
 	Skillz.setDesc(35,1,"Armsmaster skill represents the warrior's tricks of the trade, enhancing your proficiency with all weapons-except staves.\nThis skill allows you to strike faster, execute smoother attacks, and deal more powerful blows.\n\nDamage added by armsmaster skill scales with your weapon skill, amplifying its impact as you grow more adept.\n")
+	Skillz.setDesc(35,6,"Skills adds 3 dmg, 3 atk, 2% speed\nEach 10 points in armsmaster increase all the melee weapon skills by 1")
 	baseSpearTooltip=Game.SkillDesGM[const.Skills.Spear]
 	maceGMtxt=Game.SkillDesGM[6] --used for mace tooltip
 end
@@ -1334,79 +1297,10 @@ function events.GameInitialized2()
 	baseMedStr=	Skillz.getDesc(28,1)
 	baseAscStr= "Increases spell damage and healing at the expense of higher mana cost and cast time."
 end
-function events.Tick()
-	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
-		--regeneration tooltip
-		if Game.CurrentPlayer<0 or Game.CurrentPlayer>Party.High then return end
-		pl=Party[Game.CurrentPlayer]
-		local FHP=GetMaxHP(pl)
-		local s,m = SplitSkill(pl:GetSkill(30))
-		local regenEffect={[0]=0,2,4,6,6}
-		local hpRegen = round(FHP^0.5*s^1.65*((regenEffect[m])/35))/10+s
-		local hpRegen2 = round(FHP^0.5*(s+1)^1.65*((regenEffect[m])/35))/10+(s+1)
-		local txt = string.format("%s\n\nCurrent HP Regeneration: %s\nNext Level Bonus: %s HP Regen",baseRegStr,StrColor(0,255,0,hpRegen),StrColor(0,255,0,"+" .. hpRegen2-hpRegen))
-		--dragon melee leech, shown only for dragons
-		local leech=getDragonRegenLeech(pl)
-		if leech>0 then
-			local leechNext=leech*(s+1)/s
-			txt = txt .. string.format("\n\nMelee Life Leech vs equal level: %s\nNext Level Bonus: %s\n(lower against higher level monsters)",
-				StrColor(255,80,80,round(leech*1000)/10 .. "%"),
-				StrColor(255,80,80,"+" .. round((leechNext-leech)*1000)/10 .. "%\n"))
-		end
-		Skillz.setDesc(30,1,txt)
-		--meditation tooltip
-		local FSP=pl:GetFullSP()
-		if vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[i] then
-			FSP=vars.currentManaPool[Game.CurrentPlayer]
-		end
-		local s,m = SplitSkill(pl:GetSkill(28))
-		if m==4 then
-			m=5
-		end
-		local spRegen = (FSP^0.35*s^1.4*((m+1)/20)+2)/10
-		local spRegen2 = (FSP^0.35*(s+1)^1.4*((m+1)/20)+2)/10
-		local spRegen2 = round((spRegen2-spRegen)*100)/100
-		if spRegen>10 then
-			spRegen = round((spRegen)*10)/10
-		else
-			spRegen = round((spRegen)*100)/100
-		end
-		txt= string.format("%s\n\nIncreases spell points based on SP per level and mastery\n\nCurrent SP Regeneration: %s\nNext Level Bonus: %s SP Regen\n",baseMedStr,StrColor(60,60,255,spRegen),StrColor(60,60,255,"+" .. spRegen2))
-		Skillz.setDesc(28,1,txt)
-		
-		--ascension tooltip
-		local s,m = SplitSkill(pl:GetSkill(const.Skills.Learning))
-		local dmgMult = shortenNumber(round(((1+0.075*s)*1.025^s - 1)*100),3)
-		local dmgBaseMult = shortenNumber(round(((1+0.05*s^2)*1.025^s - 1)*100),3)
-		local healMult = shortenNumber(round(((1+0.05*s)*1.02^s - 1)*100),3)
-		local healBaseMult = shortenNumber(round(((1+0.03*s^2)*1.02^s - 1)*100),3)
-		local masteryReduction = (1 - m * 0.125)
-		local manaMult = shortenNumber(round(((1+0.125*s)*1.04^s - 1) * masteryReduction *100),3)
-		local castMult = shortenNumber(round((1.015^s-1)*100),3)
-		txt = string.format("%s\n\nCurrent bonuses at skill %s:\n- Damage base: %s\n- Damage scaling: %s\n\n- Healing base: %s\n- Healing scaling: %s\n\n- Mana cost: %s\n- Cast time: %s\n",
-			baseAscStr, 
-			StrColor(255,255,100,s),
-			StrColor(0,255,0,"+"..dmgBaseMult.."%"),
-			StrColor(0,255,0,"+"..dmgMult.."%"),
-			StrColor(0,255,0,"+"..healBaseMult.."%"),
-			StrColor(0,255,0,"+"..healMult.."%"),
-			StrColor(255,100,100,"+"..manaMult.."%"),
-			StrColor(255,100,100,"+"..castMult.."%"))
-		Skillz.setDesc(const.Skills.Learning,1,txt)
-		
-		--spear tooltip
-		local s,m=SplitSkill(pl:GetSkill(const.Skills.Spear))
-		local mult=damageMultiplier[pl:GetIndex()]["Melee"]
-		local damageIncrease=round((2+s*0.02)*mult*10)/10
-		local it=pl:GetActiveItem(1)
-		if it then
-			if it:T().Skill==4 and it:T().EquipStat==1 then
-				damageIncrease=damageIncrease*1.5
-			end
-		end
-		Game.SkillDesGM[const.Skills.Spear]=string.format("%s\n\t070Each spear attack reduces physical resistance, increasing damage by: %s%%\nIncreased by 50%% with Halberds",baseSpearTooltip,damageIncrease)
-	end
-end
+-- regeneration / meditation / ascension / spear GM tooltips moved to
+-- Scripts/Modules/MawCore/SkillTooltip.lua (SKILL_TOOLTIPS.md); the base
+-- strings captured above (baseRegStr, baseMedStr, baseAscStr) stay here --
+-- capture timing relative to other GameInitialized2 appends is part of the text
 
 function events.LoadMap()
 	if vars.hirelingFix then
@@ -2092,46 +1986,14 @@ function events.Tick()
 				vars.covering[i]=true
 			end
 		end
-		local s= SplitSkill(Skillz.get(pl, 50))
-		local chance=math.min(10+s,40)
-		local txt="Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nGrants 10 plus 1% chance per skill point to Cover, up to 40%, however, something might happen once at max level....\n\nCurrent cover chance: " .. chance .. "%\n\nPress P to enable/disable\n"
-		if vars.insanityMode then
-			txt="Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nIf available, Expert, Master and Grandmaster is learned at skill 8-20-30.\n\nGrants 10 plus 1% chance per skill point to Cover, up to 40%, however, something might happen once at max level....\n\nCurrent cover chance: " .. chance .. "%\n\nPress P to enable/disable\n"
-		end
-		if vars.covering[index] then
-			txt=txt .. StrColor(0,255,0,"\nCurrently enabled\n")
-			Skillz.setDesc(50, 1, txt)
-		else
-			txt=txt .. StrColor(255,0,0,"\nCurrently disabled\n")
-			Skillz.setDesc(50, 1, txt)
-		end
-		
-		--MANA SHIELD
 		if not vars.manaShield then
 			vars.manaShield={}
 			for i=0,4 do
 				vars.manaShield[i]=true
 			end
 		end
-		local s, m= SplitSkill(Skillz.get(pl, 51))
-		local efficiency=round(manaShieldManaEfficiency(false, s)*100)/100
-		local txt="Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n" .. "Current Damage reduction per Mana: " .. StrColor(178,255,255, efficiency) .. "\n\nPress M to enable/disable"
-		if vars.insanityMode then
-			txt="Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 8-20-32.\n\nMastery increase its mana efficience.\n" .. "Current Damage reduction per Mana: " .. StrColor(178,255,255, efficiency) .. "\n\nPress M to enable/disable"
-		end
-		if vars.manaShield[index] then
-			txt=txt .. StrColor(0,255,0,"\nCurrently enabled\n")
-			Skillz.setDesc(51, 1, txt)
-		else
-			txt=txt .. StrColor(255,0,0,"\nCurrently disabled\n")
-			Skillz.setDesc(51, 1, txt)
-		end
-		
-		local powerMult, DPS2, DPS3, vitMult=calcPowerVitality(pl)
-		local vit=round(vitMult^0.35)
-		local power=round(powerMult^0.35)
-		local retS, m= SplitSkill(Skillz.get(pl, 53))
-		Skillz.setDesc(53, 1, "After mastering the art of covering, you have become capable delivering deadly counter attacks to those who dare try harm your allies. Retaliation has a 1% per skill point chance to activate after successfully covering an ally.\n\nExpert, Master and Grandmaster are learned automatically at skill 12, 30 and 50.\n\nDamage done depends on 2 coefficients, multiplied then by skill level:\n\nMelee Power coefficient: " .. StrColor(255,0,0, power) .. "\nVitality coefficient: " .. StrColor(255,0,0, vit) .. "\n\nTotal Damage: " .. StrColor(255,0,0, retS*vit*power) .. "\n\nBalancing power and vitality leads to the highest damage.\n")
+		-- cover / mana shield / retaliation tooltip text moved to
+		-- Scripts/Modules/MawCore/SkillTooltip.lua (SKILL_TOOLTIPS.md)
 		
 	end
 end
@@ -2379,29 +2241,7 @@ end
 
 -- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
-function events.Action(t)
-	RunNextTick(function()
-		if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
-			local i=Game.CurrentPlayer
-			if i<0 or i>Party.High then return end
-			local pl=Party[i]
-			local index=pl:GetIndex()
-			itemStats(index)
-			--base descriptions
-			Skillz.setDesc(6,5,maceGMtxt)
-			local s,m=SplitSkill(pl:GetSkill(const.Skills.Mace))
-			if m<3 then return end
-			local chance=round(s/pl.LevelBase^0.65*1500*damageMultiplier[pl:GetIndex()].Melee/math.min(1+pl.LevelBase/150,3))/100
-			local txt="\n\n"
-			if m==3 then
-				txt=txt .. "Chance to Stun: " .. chance .. "%"
-			elseif m==4 then
-				txt=txt .. "Chance to Paralyze: " .. chance .. "%"
-			end
-			Skillz.setDesc(6,5,maceGMtxt .. StrColor(0,0,0,txt))
-		end
-	end)
-end
+-- mace GM stun/paralyze tooltip moved to Scripts/Modules/MawCore/SkillTooltip.lua (SKILL_TOOLTIPS.md)
 
 --mana shield
 function events.GameInitialized2()
@@ -2615,18 +2455,9 @@ do
   end
 end
 
-local armsmasterDesc=false
-function events.LoadMap()
-	if not armsmasterDesc then
-		armsmasterDesc=Skillz.getDesc(35,1,txt)
-	end
-	local descTxt=armsmasterDesc
-	local requirement=GetArmsmasterSupremeRequirement()
-	local descTxt=descTxt .. "\nKnights can learn up to a Supreme level, which is learned automatically at skill level " .. requirement .. ".\n"
-	Skillz.setDesc(35,1,descTxt)
-	local txt="Skills adds 3 dmg, 3 atk, 2% speed\nEach 10 points in armsmaster increase all the melee weapon skills by 1"
-	Skillz.setDesc(35,6,txt)
-end
+-- armsmaster supreme-requirement tooltip moved to Scripts/Modules/MawCore/SkillTooltip.lua
+-- (SKILL_TOOLTIPS.md); the static Supreme row (35/6) is set in the armsmaster
+-- GameInitialized2 above
 
 function GetArmsmasterSupremeRequirement()
 	local requirement=30

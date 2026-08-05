@@ -168,11 +168,9 @@ function SkillsUI.start()
 		retn
 	]], getRaw))
 
-	-- mastery names: "", Novice, Expert, Master, Grand, Supreme, Ultimate,
-	-- Ascended, Deity -- plus the engine's own four name slots redirected,
-	-- exactly as the DLL's refresh_mastery_names did
-	local mNames = {"", "Novice", "Expert", "Master", "Grand",
-		"Supreme", "Ultimate", "Ascended", "Deity"}
+	-- mastery names (source: SkillTooltip.masteryNames) -- the engine's own
+	-- four name slots redirected, exactly as the DLL's refresh_mastery_names did
+	local mNames = MawCore.SkillTooltip.masteryNames
 	local mNameArr = Engine.alloc(9 * 4)
 	for i = 0, 8 do
 		local s = mNames[i + 1]
@@ -402,37 +400,7 @@ function SkillsUI.start()
 
 	local function writeHint(playerPtr, skillId, withBonus)
 		local pl = Party[math.max(Game.CurrentPlayer, 0)]
-		local race = Game.CharacterPortraits[pl.Face].Race
-		local clas = pl.Class
-		local Skillz = _G.Skillz
-		local s = {Skillz.getDesc(skillId, 1), " \n"}
-		for part = 2, 20 do
-			local txt = Skillz.getDesc(skillId, part)
-			local mn = mNames[part]	-- part 2 -> Novice, 3 -> Expert, ...
-			if not txt or txt == "" or not mn or mn == "" then
-				break
-			end
-			local m = part - 1
-			local r, g, b = 255, 0, 0
-			if MawCore.Skills.API.MasteryTable_get(race, clas, skillId) >= m then
-				r, g, b = 255, 255, 255
-			elseif MawCore.Skills.API.MasteryTable_get(race,
-					MawCore.Skills.nextClass(clas), skillId) >= m then
-				r, g, b = 255, 255, 0
-			end
-			s[#s + 1] = StrColor(r, g, b,
-				string.format("%s:\t%03d%s\t000\n", mn, 72, txt))
-		end
-		if withBonus then
-			-- buffed value via the MMExt-bound method (safe calling convention)
-			local raw = Skillz.get(pl, skillId)
-			local buffed = pl:GetSkill(skillId)
-			local diff = bit.band(buffed, 0x3FF) - bit.band(raw, 0x3FF)
-			if diff ~= 0 then
-				s[#s + 1] = string.format("\n\n Bonus: %s%d", diff > 0 and "+" or "", diff)
-			end
-		end
-		local text = table.concat(s)
+		local text = MawCore.SkillTooltip.getTooltipText(pl, skillId, withBonus)
 		if #text > HINT_CAP - 1 then
 			text = text:sub(1, HINT_CAP - 1)
 		end

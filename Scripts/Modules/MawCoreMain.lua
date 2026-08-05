@@ -45,6 +45,7 @@ MawCore.ModuleOrder = {
 	"Tooltip",		-- item tooltip section registry
 	"Save",			-- per-save namespace + clean-break version stamp
 	"Skills",		-- Skillz.dll port (inert while the DLL is present)
+	"SkillTooltip",	-- per-player skill tooltip text (SKILL_TOOLTIPS.md)
 	"SkillsUI",		-- Skillz.dll port stage 2: character screen
 	"MonsterHP",	-- real monster HP beyond the engine's 16-bit field
 	"Damage",		-- CalcDamageToMonster pipeline (DAMAGE_PIPELINE.md)

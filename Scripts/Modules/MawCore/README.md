@@ -29,8 +29,11 @@ Load order inside the core is the `MawCore.ModuleOrder` list in
 | `Engine.lua` | the Tier-4 boundary: **only file allowed to use `mem.*`, raw addresses, struct offsets**; named address table + patch ledger |
 | `Fixes.lua` | port of `MAW_Fixes.dll` (skill-hint format, recovery floor 30→1, mm8.ini fix) so the DLL could be deleted |
 | `Skills.lua` | port of `Skillz.dll`, stage 1: storage, engine GetSkill, bonus clamp, persistence, mastery tables, full `Skillz.*` API + legacy DLL bridge — **bridges to the DLL if `ExeMods/Skillz.dll` exists** |
-| `SkillsUI.lua` | `Skillz.dll` stage 2: char-screen rows for extended skills, Lua-built skill hints, house Learn-Skills integration (see `SKILLZ_PORT.md` engineering notes) |
-| `Pipeline.lua` | ordered named-stage chains — the replacement for N anonymous event handlers (damage will be the first pipeline) |
+| `SkillTooltip.lua` | per-player skill tooltip text (`SKILL_TOOLTIPS.md`): `getTooltipText(pl, skillId)` + per-(skill, part) dynamic builders — replaces the legacy Tick handlers that rewrote the global desc store for the current player |
+| `SkillsUI.lua` | `Skillz.dll` stage 2: char-screen rows for extended skills, skill hints (text from `SkillTooltip`), house Learn-Skills integration (see `SKILLZ_PORT.md` engineering notes) |
+| `Pipeline.lua` | ordered named-stage chains — the replacement for N anonymous event handlers (damage is the first pipeline) |
+| `MonsterHP.lua` | real monster HP beyond the engine's 16-bit cap: per-map ledger (`mapvars.MawMonsterHP`), engine keeps a capped proxy; registered via `MawSetMonsterHP` at the recalc/spawn sites, applied by the pipeline's `monster-hp` stage (see `DAMAGE_PIPELINE.md` "MonsterHP") |
+| `Damage.lua` | the `CalcDamageToMonster` pipeline (`DAMAGE_PIPELINE.md`): all legacy handlers as named stages (phase 1 complete — 29 stages, verbatim bodies); registered per playthrough by `Scripts/Global/zzzzzMaw_Damage.lua` |
 | `Scheduler.lua` | one `events.Tick`; named tasks at real-time intervals (game-time stays with MMExtension's `Timer`/`RefillTimer`) |
 | `ItemFields.lua` | the item struct registry — the save format, with its two hazards documented |
 | `Tooltip.lua` | tooltip section registry — one `BuildItemInformationBox` handler, ordered sections |
@@ -57,6 +60,7 @@ tooltip handler with zero sections — both no-ops.
 ```lua
 print(MawCore.Scheduler.describe())
 print(MawCore.Tooltip.describe())
+print(MawCore.SkillTooltip.describe())
 print(MawCore.Engine.describe())
 print(MawCore.ItemFields.describe())
 ```
