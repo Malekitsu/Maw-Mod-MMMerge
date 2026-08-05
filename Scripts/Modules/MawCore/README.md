@@ -36,7 +36,7 @@ Load order inside the core is the `MawCore.ModuleOrder` list in
 | `Damage.lua` | the `CalcDamageToMonster` pipeline (`DAMAGE_PIPELINE.md`): all legacy handlers as named stages (phase 1 complete — 29 stages, verbatim bodies); registered per playthrough by `Scripts/Global/zzzzzMaw_Damage.lua` |
 | `Scheduler.lua` | one `events.Tick`; named tasks at real-time intervals (game-time stays with MMExtension's `Timer`/`RefillTimer`) |
 | `ItemFields.lua` | the item struct registry — the save format, with its two hazards documented |
-| `Tooltip.lua` | tooltip section registry — one `BuildItemInformationBox` handler, ordered sections |
+| `Tooltip.lua` | item tooltips — ONE `BuildItemInformationBox` handler running 13 named ordered sections, whose bodies (moved verbatim from the legacy files) live in this file |
 | `Save.lua` | `vars.MawCore` namespace + the clean-break version stamp |
 
 ## The two rules
@@ -49,11 +49,12 @@ Load order inside the core is the `MawCore.ModuleOrder` list in
 Everything registered anywhere carries a **unique string id** — that's what makes
 `describe()` output readable and single handlers replaceable during migration.
 
-## Deliberately absent (skeleton stage)
+## Migration status
 
-No game logic. No damage pipeline instance. No migrated handlers. No patches
-applied. The only observable behaviour is one empty `Tick` handler and one
-tooltip handler with zero sections — both no-ops.
+Live: `Fixes` (DLL patches), `Skills`/`SkillsUI` (Skillz port), `Damage`
+(the CalcDamageToMonster pipeline), `MonsterHP`, `SkillTooltip` (skill
+hints), `Tooltip` (all 13 item-tooltip sections). Still idle: `Scheduler`
+(no tasks yet), `ItemFields` (no fields registered).
 
 ## Console inspection (in-game)
 

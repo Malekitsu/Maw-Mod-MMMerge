@@ -288,18 +288,17 @@ end
 
 -- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
---skill tooltips
---tooltips
+--skill tooltips: base school descriptions (12-20 part 1), captured before
+--the later init handlers append to them; the class tooltip builders in
+--Scripts/Modules/MawCore/SkillTooltip.lua read this
+MawSchoolDescBase={}
 function events.GameInitialized2()
-	baseSchoolsTxtSERAPH={
-		[16]=Skillz.getDesc(16,1),
-		[17]=Skillz.getDesc(17,1),
-		[18]=Skillz.getDesc(18,1),
-		[19]=Skillz.getDesc(19,1),
-	}
+	for id=12,20 do
+		MawSchoolDescBase[id]=Skillz.getDesc(id,1)
+	end
 end
 
--- moved to SkillTooltip builders: see the CLASS SKILL TOOLTIPS block at the end of this file (SKILL_TOOLTIPS.md)
+-- moved to SkillTooltip builders: Scripts/Modules/MawCore/SkillTooltip.lua (SKILL_TOOLTIPS.md)
 
 
 
@@ -737,14 +736,8 @@ function events.GameInitialized2()
 	MOVED IN MAW ITEMS, DUE TO WEAPON SCALING]]
 end
 
-local baseSchoolsTxt={}
-function events.GameInitialized2()
-	for i=12,18 do
-		baseSchoolsTxt[i]=Skillz.getDesc(i,1)
-	end
-end
 
--- moved to SkillTooltip builders: see the CLASS SKILL TOOLTIPS block at the end of this file (SKILL_TOOLTIPS.md)
+-- moved to SkillTooltip builders: Scripts/Modules/MawCore/SkillTooltip.lua (SKILL_TOOLTIPS.md)
 
 
 ---------------------------------------
@@ -899,9 +892,7 @@ end
 
 
 --tooltips
-local baseSchoolsTxtDK={}
 function events.GameInitialized2()
-	baseSchoolsTxtDK={[14]=Skillz.getDesc(14,1), [18]=Skillz.getDesc(18,1), [20]=Skillz.getDesc(20,1)}
 	spellDesc={}
 	for key, value in pairs(DKSpellList) do
 		for i=1,#DKSpellList[key] do
@@ -1685,247 +1676,5 @@ function events.BeforeLoadMap()
 			end
 		end
 		vars.LichFix=true
-	end
-end
-
-
-
-
-------------------------------------------------------------------------
---CLASS SKILL TOOLTIPS -> MawCore.SkillTooltip builders (SKILL_TOOLTIPS.md)
---The old class functions rewrote the shared desc store every checkSkills
---call for the current player. Here each class declares its texts as DATA:
---classSpecs[n].slots[skillId][part] = a string, or function(pl) when the
---text carries computed numbers. One dispatcher serves the first matching
---class, then whatever the old reset branches forced (neutralText), then
---falls through to the desc store. Which (skill, part) slots get builders
---is derived from these tables. Names, SpellsTxt and mana costs still swap
---in checkSkills.
-------------------------------------------------------------------------
-
-function events.GameInitialized2()
-	local ST=MawCore.SkillTooltip
-	local EV="Effects vary per spell"
-	local ASC="\n\nEvery 7 Skill level adds 1 level into ascension.\n"
-
-	--what the old reset branches forced, where that differs from the store:
-	--EV mastery rows for 16-19, plus the part-1 school texts captured HERE --
-	--before the later "\n"-append init handlers run -- exactly like the
-	--captures the resets wrote back every checkSkills call
-	local neutralText={
-		[16]={[2]=EV,[3]=EV,[4]=EV},
-		[17]={[2]=EV,[3]=EV,[4]=EV},
-		[18]={[2]=EV,[3]=EV,[4]=EV},
-		[19]={[2]=EV,[3]=EV,[4]=EV,[5]=EV},
-		[20]={[1]=Skillz.getDesc(20,1)},
-	}
-	for id=12,15 do
-		neutralText[id]={[1]=Skillz.getDesc(id,1)}
-	end
-
-	local classSpecs={
-
-	--was shamanSkills(true)
-	{match=function(pl) return table.find(shamanClass, pl.Class) end, slots={
-		[12]={[1]=function(pl)
-			local m1=SplitSkill(pl.Skills[const.Skills.Fire])
-			return baseSchoolsTxt[12] .. ASC .. "Melee attacks deal an extra " .. m1/10 .. "% of monster Hit points as fire damage."
-		end},
-		[13]={[1]=function(pl)
-			local m2=SplitSkill(pl.Skills[const.Skills.Air])
-			local airReduction=round((1-1/(m2/100+1))*1000)/10
-			return baseSchoolsTxt[13] .. ASC .. "Reduce all damage taken by " .. airReduction .. "%\n"
-		end},
-		[14]={[1]=function(pl)
-			local m3=SplitSkill(pl.Skills[const.Skills.Water])
-			local lvl=getPartyLevel(4)
-			local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
-			local waterReduction=round(getMonsterDamage(false,(lvl+1))*(m3/lvl^0.65)/avgRed*0.99^(lvl^0.65)/2) --on average 1/2 of a B monster
-			return baseSchoolsTxt[14] .. ASC .. "Reduce all damage taken by " .. waterReduction .. "(calculated after resistances)\n"
-		end},
-		[15]={[1]=baseSchoolsTxt[15] .. ASC .. "Increases melee damage 1-2-3-4 (at N-E-M-GM) per Earth Magic Level\n"},
-		[16]={[1]=function(pl)
-			local m5=SplitSkill(pl.Skills[const.Skills.Spirit])
-			return baseSchoolsTxt[16] .. ASC .. "Increases melee damage by " .. m5 .. "%\n"
-		end},
-		[17]={[1]=function(pl)
-			local m6=SplitSkill(pl.Skills[const.Skills.Mind])
-			local spLeech=round(m6^1.25)
-			return baseSchoolsTxt[17] .. ASC .. "Melee attacks restore " .. spLeech .. " Spell Points\n"
-		end},
-		[18]={[1]=function(pl)
-			local m7, bodyMastery=SplitSkill(pl.Skills[const.Skills.Body])
-			local FHP=pl:GetFullHP()
-			local leech=math.max(round(FHP^0.5* m7^1.5/70 * (1+bodyMastery/2)),m7)
-			return baseSchoolsTxt[18] .. ASC .. "Melee attacks restore " .. leech .. " Hit Points\n"
-		end},
-	}},
-
-	--was dkSkills(true) desc lines
-	{match=function(pl) return table.find(dkClass, pl.Class) end, slots={
-		[14]={[1]="This skill is only available to death knights and increases damage by 0.5-1-1.5 (at Novice, Expert, Master) and increases attack speed by 2% per skill point.\n",
-			[5]=EV},
-		[18]={[1]=function(pl)
-			local bloodS=SplitSkill(pl.Skills[const.Skills.Body])
-			local leech=round(bloodS/round(pl.LevelBase^0.7)*5*100)/100
-			return "This skill is only available to death knights and reduces physical damage taken.\n" .. "Current Reduction: " .. round((1-1/(bloodS/100+1))*1000)/10 .."%\n\nAdditionally it will make your attacks to leech damage based on your total HP.\n\nCurrent leech vs. same level monsters: " .. leech .. "%\n"
-		end,
-			[5]=EV},
-		[20]={[1]=function(pl)
-			local unholyS=SplitSkill(pl.Skills[const.Skills.Dark])
-			return "This skill is only available to death knights and increases damage by 0.5-1-1.5 (at Novice, Expert, Master) and reduces magical damage taken.\n" .. "Current Reduction: " .. round((1-1/(unholyS/100+1))*1000)/10 .."%\n"
-		end},
-	}},
-
-	--was seraphSkills(true)
-	{match=function(pl) return table.find(seraphClass, pl.Class) end, slots={
-		[16]={[1]=function(pl)
-			local spiritS=SplitSkill(pl.Skills[const.Skills.Spirit])
-			local lvl=getTotalLevel()
-			local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
-			local spiritReduction=round(getMonsterDamage(false,(lvl+1))*(spiritS/lvl^0.65)/avgRed/2*0.99^(lvl^0.65)) --on average 1/2 of a B monster
-			return baseSchoolsTxtSERAPH[16] .. "\n\nSeraph Spirit strengthens the Seraph's resolve, shrugging off light hits and softening heavy blows\n" .. "Damage reduction: " .. StrColor(0,255,0,spiritReduction) .. " (applied after resistances)\n"
-		end},
-		[17]={[1]=function(pl)
-			local mindS, mindM=SplitSkill(pl.Skills[const.Skills.Mind])
-			return baseSchoolsTxtSERAPH[17] .. "\n\nSeraphim damage upon attack increases depending on Mind magic, scaling with might(weapon speed and weapon damage multiplier applies).\n\n" .. "Current damage from Mind: " .. StrColor(255,0,0,mindS*mindM) .. "\n"
-		end,
-			[2]="Increases damage by 2 per Skill point",
-			[3]="Increases damage by 3 per Skill point",
-			[4]="Increases damage by 4 per Skill point",
-			[5]="n/a"},
-		[18]={[1]=function(pl)
-			local bodyS, bodyM=SplitSkill(pl.Skills[const.Skills.Body])
-			local healMult=1+pl:GetPersonality()/1000
-			local bodyHeal=0
-			if damageMultiplier[pl:GetIndex()] then
-				bodyHeal=round(bodyS^1.3*bodyM*damageMultiplier[pl:GetIndex()]["Melee"]*healMult*2)
-			end
-			return baseSchoolsTxtSERAPH[18] .. "\n\nSeraphim healing upon attack increases depending on Body magic, scaling with personality(weapon speed multiplier applies).\n\n" .. "Current heal from Body: " .. StrColor(0,255,0,bodyHeal) .. "\n"
-		end,
-			[2]="Melee attacks heal on hit",
-			[3]="Double healing effect",
-			[4]="Triple healing effect",
-			[5]="n/a"},
-		[19]={[1]=baseSchoolsTxtSERAPH[19]
-				.. StrColor(255,255,30,"\n\nLight Magic quickens the Seraphim's strikes, increasing attack speed.\n\nIts radiance lightens the blade so much that even a two-handed sword can be wielded in one hand, freeing the off hand for a shield.\n"),
-			[2]="Increased Attack speed by 1% per Skill",
-			[3]="Increased Attack speed by 2% per Skill",
-			[4]="Increased Attack speed by 3% per Skill",
-			[5]="Increased Attack speed by 4% per Skill"},
-	}},
-
-	--was elementalistSkills(true) desc loop
-	{match=function(pl) return table.find(elementalistClass, pl.Class) end, slots=(function()
-		local function progressionText(pl, id)
-			vars.elementalistSpells=vars.elementalistSpells or {}
-			vars.elementalistSpells[pl:GetIndex()]=vars.elementalistSpells[pl:GetIndex()] or {}
-			for i=12,15 do
-				vars.elementalistSpells[pl:GetIndex()][i]=vars.elementalistSpells[pl:GetIndex()][i] or 0
-			end
-			local list = vars.elementalistSpells[pl:GetIndex()]
-			local enableDisableText = StrColor(0,255,0, "Enabled")
-			if vars.disableRotation and vars.disableRotation[pl:GetIndex()] then
-				enableDisableText = StrColor(255,0,0, "Disabled")
-			end
-			local rotationText = StrColor(0,0,0,"Elementalist offensive spells, when casted randomly, grant elementalist stacks, which increase spell damage, speed and cost.\nPress R to enable/disable random rotation.\nCurrently ") .. enableDisableText .. "\n\n"
-			local progression=list[id]
-			local currentTier=0
-			for j=1,#spellRequirements do
-				if progression>=spellRequirements[j] then
-					currentTier=j
-				end
-			end
-			if currentTier<11 then
-				local low=spellRequirements[currentTier]
-				local high=spellRequirements[currentTier+1]
-				local percentageProgression=math.floor((progression-low)/(high-low)*10000)/100
-				return EV .. " \n\n" .. rotationText .. "Elementalists learn new spells with practice instead of books.\n\nProgress toward learning " .. Game.SpellsTxt[(id-12)*11+currentTier+1].Name .. ": " .. percentageProgression .."%"
-			else
-				return EV .. " \n\n" .. rotationText .. "Elementalists learn new spells with practice instead of books.\n\nAll the available spells of this school have been learned."
-			end
-		end
-		local slots={}
-		for id=12,15 do
-			slots[id]={[5]=progressionText}
-		end
-		return slots
-	end)()},
-
-	--was assassinSkills(true) desc lines
-	{match=function(pl) return table.find(assassinClass, pl.Class) end, slots={
-		[12]={[1]="Combat is the skill that allows you to endure prolonged fights by enhancing your energy recovery.\n\nEach attack has a base 10% chance, plus 1% per skill point, to restore 15 energy.\n\n",
-			[2]="Melee attack costs 45 energy",[3]="Melee attack costs 40 energy",[4]="Melee attack costs 35 energy",[5]="Melee attack costs 30 energy"},
-		[13]={[1]="Subtlety manipulates the boundary between life and death, granting you energy upon killing enemies and increasing your speed.\n\nEnergy consuming attack grants 1 stack, which increase your attack speed by 1% per skill point in Subtlety. Stacks up to 5 times.\n\n",
-			[2]="Killing a monster restores 10 energy",[3]="Killing a monster restores 15 energy",[4]="Killing a monster restores 20 energy",[5]="Killing a monster restores 25 energy"},
-		[14]={[1]="Poisoning is the art of mastering toxins through self-experimentation, transforming suffering into vitality. Higher skill levels increase your energy regeneration.\n\nEach attack deals bonus water damage equal to 0.1% of the target's HP per skill point.\n\n",
-			[2]="You regenerate 8 energy per second",[3]="You regenerate 10 energy per second",[4]="You regenerate 12 energy per second",[5]="You regenerate 14 energy per second"},
-		[15]={[1]="Assassination focuses on eliminating isolated targets before they react. Attacks that spend energy or spells, have your damage increased by 4-6-8-10 per skill point, reduced by 20% for each target's nearby enemy (up to 4 enemies).\nSuch attacks also grant 1 combo point, allowing the assassin to cast offensive spells.\nBow has 50% chance and energy cost.\n\nHigher levels also grant more starting energy, ideal for high burst damage in short engagements.\n\n",
-			[2]="Increases your maximum energy by 10",[3]="Increases your maximum energy by 20",[4]="Increases your maximum energy by 30",[5]="Increases your maximum energy by 40"},
-	}},
-
-	}
-
-	local function slotText(slots, pl, id, part)
-		local slot=slots[id]
-		local v=slot and slot[part]
-		if type(v)=="function" then
-			v=v(pl, id)
-		end
-		return v
-	end
-
-	local function classText(pl, id, part)
-		for i=1,#classSpecs do
-			if classSpecs[i].match(pl) then
-				local v=slotText(classSpecs[i].slots, pl, id, part)
-				if v then
-					return v
-				end
-				break
-			end
-		end
-		return neutralText[id] and neutralText[id][part]
-	end
-
-	--register exactly the slots the tables above declare
-	local covered={}
-	local function cover(slots)
-		for id, parts in pairs(slots) do
-			covered[id]=covered[id] or {}
-			for part in pairs(parts) do
-				covered[id][part]=true
-			end
-		end
-	end
-	for i=1,#classSpecs do
-		cover(classSpecs[i].slots)
-	end
-	cover(neutralText)
-	for id, parts in pairs(covered) do
-		for part in pairs(parts) do
-			ST.set(id, part, classText, "class school text")
-		end
-	end
-
-	--was dragonSkill desc + engine-array writes: dragons swap Unarmed/Dodging
-	--for Fangs/Scales by RACE, independent of the class system above (their
-	--slots don't overlap it)
-	local dragonSlots={
-		[33]={[1]="Dragons can use their fangs to deal atrocious damage to enemies. Damage is 30 + 2 per level (up to level 600). Fang skill increases this amount by a percentage based on mastery and skill level.\n\nWhenever this skill is below dragon skill it will push monsters away\nEach point in the skill increases damage and increases recovery time by 1.5%.\n" .. "\n------------------------------------------------------------\n            Attack| Dmg|",
-			[2]=fangsNormal,[3]=fangsExpert,[4]=fangsMaster,[5]=fangsGM},
-		[32]={[1]="Dragons scales are hard enough to work as natural armor, gaining naturally 40 + 1 AC per level (up to level 600).\nScales further enhance their toughness and resistance to magical damage, increasing the thoughness by a percentage.\n\n------------------------------------------------------------\n          AC%| Res%",
-			[2]=scalesNormal,[3]=scalesExpert,[4]=scalesMaster,[5]=scalesGM},
-	}
-	local function dragonText(pl, id, part)
-		if Game.CharacterPortraits[pl.Face].Race~=const.Race.Dragon then
-			return nil
-		end
-		return slotText(dragonSlots, pl, id, part)
-	end
-	for id, parts in pairs(dragonSlots) do
-		for part in pairs(parts) do
-			ST.set(id, part, dragonText, id==33 and "dragon fangs" or "dragon scales")
-		end
 	end
 end

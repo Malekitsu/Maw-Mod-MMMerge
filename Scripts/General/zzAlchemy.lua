@@ -406,65 +406,7 @@ function events.DoBadThingToPlayer(t)
 	end
 end
 
-function events.BuildItemInformationBox(t)
-	if potionText[t.Item.Number] then
-		t.Description=potionText[t.Item.Number]--REMOVED .. "\n(To drink, pick the potion up and right-click over a character's portrait.  To mix, pick the potion up and right-click over another potion.)"
-	elseif t.Item.Number>=264 and t.Item.Number<=299 then
-		t.Description="This potion has been removed"
-	end
-	if t.Item.Number==222 then
-		t.Description=StrColor(255,255,153,"Heals " .. round(t.Item.Bonus^1.75)+10 .. " Hit Points") .. "\n" .. t.Description
-	end
-	if t.Item.Number==223 then
-		t.Description=StrColor(255,255,153,"Restores " .. round(t.Item.Bonus^1.6*2/3)+10 .. " Spell Points") .. "\n" .. t.Description
-	end
-	if t.Item.Number==232 then
-		t.Description="Grants " .. StrColor(0,0,200,math.ceil(t.Item.Bonus^0.5/1.5) + 1) .. " bonus to Meditation skill for 6 hours."
-	end
-	if t.Item.Number==247 then
-		t.Description=StrColor(255,255,153,"Heals " .. round(t.Item.Bonus^1.75*1.5)+20 .. " Hit Points") .. "\n" .. t.Description
-	end
-	if t.Item.Number==248 then
-		t.Description=StrColor(255,255,153,"Restores " .. round(t.Item.Bonus^1.6)+20 .. " Spell Points") .. "\n" .. t.Description
-	end
-	if t.Item.Number==259 then
-		local id=Game.CurrentPlayer
-		if Game.CurrentPlayer<0 or Game.CurrentPlayer>Party.High then
-			id=0
-		end
-		index=Party[id]:GetIndex()
-		vars.expPot=vars.expPot or {}
-		vars.expPot[index]=vars.expPot[index] or 0
-		local percent=round(vars.expPot[index]/(Party[id].Exp-vars.expPot[index])*10000)/100
-		if percent<25 then
-			str=StrColor(0,255,0,percent .. "%")
-		else
-			str=StrColor(255,0,0,percent .. "%")
-		end
-		
-		local baseExp=(pl.Exp-vars.expPot[index])
-		local baseLevel=calcLevel(baseExp)
-		local currentLevel=calcLevel(pl.Exp)
-		local levelDiff=round(currentLevel-baseLevel)
-		t.Description=t.Description .. "\n\nCan benefit only if experience gained this way is less than 25% of base experience and level gained are less than 50\nCurrent amount: " .. str .. "\nLevels: " .. levelDiff
-	end
-		
-	if table.find(potionUsingCharges,t.Item.Number) then
-		local charges=t.Item.Charges-1
-		if charges==-1 then
-			charges=5
-		end
-		t.Description=StrColor(255,255,153,"Charges: " .. charges) .. "\n\n" .. t.Description
-	end
-	
-	if potionRecipeText[t.Item.Number] then
-		if extraDescription then
-			t.Description=t.Description .. "\n\n" .. potionRecipeText[t.Item.Number]
-		else
-			t.Description=t.Description .. StrColor(100,100,100,"\n\nPress alt to show recipe list")
-		end
-	end
-end
+-- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
 
 potionText={
 	[222] = "",
@@ -609,12 +551,7 @@ function events.GameInitialized2()
 	end
 end
 
-function events.BuildItemInformationBox(t)
-	if reagentList[t.Item.Number] then
-		local bonus=round(reagentList[t.Item.Number] *((t.Item.Bonus*0.25)/20+1)+t.Item.Bonus*0.75)
-		t.Enchantment="Power: " .. bonus
-	end
-end
+-- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
 
 --add scaling effect on reagents
 function events.ItemGenerated(t)
@@ -687,65 +624,7 @@ function events.GameInitialized2()
 	Game.SkillDesMaster[const.Skills.Alchemy]="Allows to make white potions. Power when mixing will be increased to 1.5 per skill point."
 	Game.SkillDesGM[const.Skills.Alchemy]="Allows to make black potions. Power when mixing will be increased to 2 and increases potion duration by 6 Minutes per skill point. Allows the Endless potion to be dropped by monsters, which power is determined by Alchemy level."
 end
-function events.BuildItemInformationBox(t)
-	if t.Item.Number>=1041 and t.Item.Number<=1060 then
-		--[[
-		if t.Name then
-			if t.Item.BonusStrength==1 then
-				t.Name=StrColor(178,255,255, "Ascended " .. t.Name) 
-			end
-		end
-		]]
-		if t.Description then
-			local mult=math.max((Game.BolsterAmount-100)/2000+1,1)
-			if vars.insanityMode then
-				mult=1.4
-			end
-			if vars.madnessMode then
-				mult=2
-			end
-			local tier=(t.Item.Number-1040)*mult
-			local power = 3
-			
-			local twoHanded = tier * 6 * 2
-			local bodyArmor = round(tier * 1.5 * 6)
-			local helmEtc = round(tier * 1.25 * 6)
-			local rings = round(tier * 0.75 * 6)
-			
-			
-			t.Description = "A special Gem that allows to increase an item Enchant Strength (right-click on an item with a base enchant to use)\nAncient, Primordial and Legendary items have increased Max power.\n\nIt is possible to upgrade 3 gems into 1 of upper tier by pressing U in the inventory page.\n\nMax Power: " 
-			.. StrColor(255, 128, 0, tostring(round(tier * 6))) --.. " (65% on AC)"
-			.. "\nBonus: " .. StrColor(255, 128, 0, tostring(power)) 
-			.. "\n\nItem Modifier:\nTwo Handed Weapons: " .. StrColor(255, 128, 0, twoHanded)
-			.. "\nBody Armor: " .. StrColor(255, 128, 0, bodyArmor)
-			.. "\nHelm-Boots-Gloves-Bow: " .. StrColor(255, 128, 0, helmEtc)
-			.. "\nRings: " .. StrColor(255, 128, 0, rings)
-		end
-	end
-	if t.Item.Number==1067 then
-		if t.Description then
-			if t.Item.BonusStrength<10 or t.Item.BonusStrength>1000 then
-				t.Description="Oracle's Orb is a mysterious and powerful artifact, a large, purple orb with a haunting face suspended within its core. This enigmatic relic is known for storing legendary abilities upon items it enchants.\n\nRight click a legendary item to store its power"
-			else
-				t.Description="Oracle's Orb is a mysterious and powerful artifact, a large, purple orb with a haunting face suspended within its core. This enigmatic relic is known for storing legendary abilities upon items it enchants.\n\nAdds the following legendary power to an item:"
-			end
-			t.Description = t.Description .. "\n\n" .. StrColor(255,255,30,legendaryEffects[t.Item.BonusStrength])
-		end
-	end
-	if t.Item.Number==1068 then
-		if t.Description then				
-			t.Description="\nThe Celestial Orb allows the transfer of celestial essence from one item to another, preserving the divine property while freeing the original item of its blessing.\n\n(right-click on a celestial item to extract its power charging the Celestial orb, then right-click on a non celestial item to transfer its power.)"
-			if t.Item.BonusStrength==1 then
-				t.Description = t.Description .. "\n\n" .. StrColor(120, 240, 255,"Celestial orb is charged and it's ready to grant celestial powers to any non-Artifact Equipment")
-			end
-		end
-	end
-	if t.Item.Number==1069 then
-		if t.Description then				
-			t.Description=t.Description .. StrColor(255,255,30, "\n\nIncreases Charges by " .. t.Item.BonusStrength)
-		end
-	end
-end
+-- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
 
 local function upgradeGem(it, tier)
 	local enchanted=false
@@ -1127,11 +1006,7 @@ end
 --manually use crafting items on maps
 local overworldMaps={1,2,3,4,5,6,7,8,9,10,11,12,13,14,62,63,64,65,66,67,68,69,70,71,72,73,74,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151}
 
-function events.BuildItemInformationBox(t)
-	if Mouse.Item then
-		UseItem(t.Item, Mouse.Item)
-	end
-end
+-- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
 
 local chargePotions={231, 232, 233, 237, 245, 251, 257, 263}
 function UseItem(it, usedIt)
@@ -1423,5 +1298,3 @@ function events.GameInitialized2()
 	Game.ItemsTxt[1069].Skill=40
 	Game.ItemsTxt[1069].SpriteIndex=130
 end
-
-

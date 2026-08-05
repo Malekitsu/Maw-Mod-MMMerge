@@ -3315,32 +3315,7 @@ function events.GameInitialized2()
 
 end
 
-local mastery={"Novice","Expert","Master","Grandmaster"}
-function events.BuildItemInformationBox(t)
-	local it=t.Item
-	if it.Number>=971 and it.Number<980 then
-		local identify=Game.ItemsTxt[it.BonusStrength].IdRepSt
-		local m=1
-		if identify>=15 then
-			m=4
-		elseif identify>=10 then
-			m=3
-		elseif identify>=5 then
-			m=2
-		end
-		local id=Game.CurrentPlayer
-		if id<0 or id>Party.High then return end
-		local pl=Party[Game.CurrentPlayer]
-		local s2,m2=SplitSkill(pl.Skills[t.Item.Number-959])
-		if m2>=m then
-			it.Number=it.BonusStrength
-		end
-		if t.Description then
-			local name=Skillz.getName(t.Item.Number-959)
-			t.Description=t.Description .. StrColor(255,0,0, "\n\nYou need at least " .. mastery[m] .. " skill in " ..  name .. " to open the book")
-		end
-	end
-end
+-- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
 
 function events.ItemGenerated(t)
 	if disableSpellBookRework then return end

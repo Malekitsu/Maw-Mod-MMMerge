@@ -341,14 +341,7 @@ function changeBag(pl, bag)
 end
 
 --remove buttons when tooltip is on the bottom right
-function events.BuildItemInformationBox(t)
-	for i=1,5 do
-		multibagButton[i].Active=false
-		RunNextTick(function()
-			multibagButton[i].Active=true
-		end)
-	end
-end
+-- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
 
 --sortMultiBag(Party[0])
 --debug.Message(dump(tempBag))
