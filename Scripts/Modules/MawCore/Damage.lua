@@ -1342,6 +1342,12 @@ local function stage_trackAndClamp(t)
 		end
 		if crit then
 			critMessage=StrColor(255,255,30,"(CRIT!)")
+			--consume the flag: legacy never cleared it, so "(CRIT!)" stuck to
+			--later non-crit hits. Cleared next tick rather than here so every
+			--same-tick hit of one cast/attack still shares the crit tag
+			RunNextTick(function()
+				crit=false
+			end)
 		end
 		if t.Monster.NameId>0 then
 			monName=Game.PlaceMonTxt[t.Monster.NameId]
