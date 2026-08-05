@@ -74,3 +74,56 @@ end
 function ClearEnc2(it)
 	it.Charges = 0
 end
+
+------------------------------------------------------------------------
+-- BonusExpireTime -- the item tier/affix field (registry with hazards:
+-- Scripts/Modules/MawCore/ItemFields.lua). One i8, meaning depends on the
+-- item class:
+--   1 / 2            ancient / primordial weapon tier
+--   11-35            legendary affix id (rolled affix + 10)
+--   +100             celestial flag on top (exactly 100 = celestial with no
+--                    legendary affix, written by black potions)
+--   1-1000           artifact level (artifact-list items)
+--   getUniqueAffix() map affix id (map items, zzMaw-Maps)
+--   Game.Time        vanilla temporary-enchant expiry (unmodified items)
+-- These accessors cover the tier/affix/celestial family and encode the
+-- DOMINANT legacy idioms. Artifact level, map affixes and the vanilla
+-- expiry keep reading the field directly -- same field, other classes.
+------------------------------------------------------------------------
+
+-- Ancient (1) / primordial (2) weapon tier; 0 for everything else.
+function GetAncientTier(it)
+	local v = it.BonusExpireTime
+	if v == 1 or v == 2 then
+		return v
+	end
+	return 0
+end
+
+function IsAncientItem(it)
+	return it.BonusExpireTime == 1
+end
+
+function IsPrimordialItem(it)
+	return it.BonusExpireTime == 2
+end
+
+-- Legendary affix stored as id 11-35 (+100 when celestial). The dominant
+-- legacy gate is ">10 and <1000".
+function HasLegendaryAffix(it)
+	local v = it.BonusExpireTime
+	return v > 10 and v < 1000
+end
+
+-- The affix id (11-35) with the celestial hundred stripped; 0 if none.
+function GetLegendaryAffix(it)
+	if HasLegendaryAffix(it) then
+		return it.BonusExpireTime % 100
+	end
+	return 0
+end
+
+function IsCelestialItem(it)
+	local v = it.BonusExpireTime
+	return v >= 100 and v < 200
+end

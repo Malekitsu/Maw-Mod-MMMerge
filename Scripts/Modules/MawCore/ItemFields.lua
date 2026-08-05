@@ -59,9 +59,15 @@ ItemFields.Registry = {
 		holds = "unused",
 		note  = "unnamed, so field-by-field copies (Item-Sorter, MultiBag) drop it"},
 	{offset = 0x1C, name = "BonusExpireTime", type = "i8", spare = "no",
-		holds = "1 ancient, 2 primordial, 11-35 legendary affix, +100 celestial, "
-			.. "1-1000 artifact level",
-		note  = "read as a whole number everywhere -- see hazard 1"},
+		holds = "1 ancient, 2 primordial, 11-35 legendary affix, +100 celestial "
+			.. "(exactly 100 = celestial without affix, from black potions), "
+			.. "1-1000 artifact level, map affix id on map items (getUniqueAffix), "
+			.. "vanilla Game.Time expiry on unmodified temp-enchanted items",
+		note  = "read as a whole number everywhere -- see hazard 1. Tier/affix/"
+			.. "celestial accessors live in zMaw_ItemBits.lua (GetAncientTier, "
+			.. "IsAncientItem, IsPrimordialItem, HasLegendaryAffix, "
+			.. "GetLegendaryAffix, IsCelestialItem); artifact level, map affixes "
+			.. "and the vanilla expiry read the field directly"},
 }
 
 function ItemFields.describe()

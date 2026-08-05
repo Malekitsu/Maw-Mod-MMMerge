@@ -448,11 +448,11 @@ function events.AfterLoadMap()
 					if HasEnc2(it) then
 						itemPower=itemPower+1
 					end
-					if it.BonusExpireTime==1 then
+					if IsAncientItem(it) then
 						itemPower=5
-					elseif it.BonusExpireTime==2 then
+					elseif IsPrimordialItem(it) then
 						itemPower=6
-					elseif it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
+					elseif HasLegendaryAffix(it) then
 						itemPower=7
 					end
 					
@@ -873,7 +873,7 @@ function events.ItemGenerated(t)
 		--loot multiplier
 		lootMultiplier=lootMultiplier or 1
 		--legendary
-		if it.BonusExpireTime==2 then
+		if IsPrimordialItem(it) then
 			-- Initialize pity protection
 			vars.legendaryPityCounter = vars.legendaryPityCounter or 0
 			
@@ -1069,18 +1069,6 @@ function events.ItemGenerated(t)
 			end
 		end
 		
-		--[[statistics
-		ancientDrops=ancientDrops or 0
-		primordialDrops=primordialDrops or 0
-		legendaryDrops=legendaryDrops or 0
-		if it.BonusExpireTime==1 then
-			ancientDrops=ancientDrops+1
-		elseif it.BonusExpireTime==2 then
-			primordialDrops=primordialDrops+1
-		elseif it.BonusExpireTime>=10 and it.BonusExpireTime<=30 then
-			legendaryDrops=legendaryDrops+1
-		end
-		]]
 		local itemPower=1
 		if it.Bonus>0 then
 			itemPower=itemPower+1
@@ -1091,11 +1079,11 @@ function events.ItemGenerated(t)
 		if HasEnc2(it) then
 			itemPower=itemPower+1
 		end
-		if it.BonusExpireTime==1 then
+		if IsAncientItem(it) then
 			itemPower=5
-		elseif it.BonusExpireTime==2 then
+		elseif IsPrimordialItem(it) then
 			itemPower=6
-		elseif it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
+		elseif HasLegendaryAffix(it) then
 			itemPower=7
 		end
 		
@@ -1393,7 +1381,7 @@ legendaryEffects={
 }
 
 function updateCelestialItem(it,pl)
-	if it.BonusExpireTime>=100 and it.BonusExpireTime<200 then
+	if IsCelestialItem(it) then
 		if not pl then
 			local id=Game.CurrentPlayer
 			if id<0 or id>Party.High then
@@ -1739,7 +1727,7 @@ function getItemValue(it, lootFilter)
 			end
 		end
 		local value=basePrice+(basePriceBonus+bonus1+bonus2)
-		if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
+		if HasLegendaryAffix(it) then
 			value=value*2.5
 		end
 		if Game.HouseScreen==2 or Game.HouseScreen==95 then
@@ -1753,9 +1741,9 @@ function getItemValue(it, lootFilter)
 			if it.Bonus2>0 then
 				count=count+1
 			end
-			if it.BonusExpireTime>0 and it.BonusExpireTime<3 then
-				count=count+it.BonusExpireTime
-			end	
+			if GetAncientTier(it)>0 then
+				count=count+GetAncientTier(it)
+			end
 			if count>0 then
 				value=value^(1+count*0.08)
 			end
@@ -2452,7 +2440,7 @@ local function collectEnchant(index, it, bonus, power, tab, isSecond)
 			power=round(power*(1+math.min(power/50/mult,5)))
 		end
 	end
-	if it.BonusExpireTime%100==20 then
+	if GetLegendaryAffix(it)==20 then
 		power=math.ceil(power*1.5)
 	end
 	local txt=it:T()
@@ -3075,8 +3063,8 @@ function itemStats(index)
 	vars.legendaries=vars.legendaries or {}
 	vars.legendaries[index]={}
 	for it in pl:EnumActiveItems() do
-		if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
-			table.insert(vars.legendaries[index], it.BonusExpireTime%100)
+		if HasLegendaryAffix(it) then
+			table.insert(vars.legendaries[index], GetLegendaryAffix(it))
 		end
 	end
 
@@ -4071,7 +4059,7 @@ function GetLevelRquirement(it)
 	if itemType>11 then
 		return 0 
 	end
-	if it.BonusExpireTime>=100 and it.BonusExpireTime<=200 then
+	if IsCelestialItem(it) then
 		return 1
 	end
 	local difficultyExtraPower=1
@@ -4090,10 +4078,10 @@ function GetLevelRquirement(it)
 	end
 	tot = math.max(tot,1)
 	local maxCharges=math.round(it.MaxCharges/difficultyExtraPower)
-	if it.BonusExpireTime>0 and it.BonusExpireTime<=2 then
+	if GetAncientTier(it)>0 then
 		maxCharges=math.floor(math.max(maxCharges/1.2,maxCharges-5))
 	end
-	if it.BonusExpireTime>10 and it.BonusExpireTime<=100 then
+	if HasLegendaryAffix(it) then
 		maxCharges=math.floor(math.max(maxCharges/1.2,maxCharges-10))
 	end
 	
@@ -4111,11 +4099,11 @@ function GetLevelRquirement(it)
 	
 	local chargesPower=GetEnc2Strength(it)
 	
-	if it.BonusExpireTime>0 and it.BonusExpireTime<=2 then
+	if GetAncientTier(it)>0 then
 		bonusStrength=math.floor(math.max(bonusStrength/1.2,bonusStrength-5))
 		chargesPower=math.floor(math.max(chargesPower/1.2,chargesPower-5))
 	end
-	if it.BonusExpireTime>10 and it.BonusExpireTime<=100 then
+	if HasLegendaryAffix(it) then
 		bonusStrength=math.floor(math.max(bonusStrength/1.2,bonusStrength-10))
 		chargesPower=math.floor(math.max(chargesPower/1.2,chargesPower-10))
 	end

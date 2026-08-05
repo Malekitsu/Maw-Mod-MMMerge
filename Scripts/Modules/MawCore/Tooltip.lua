@@ -315,7 +315,7 @@ local function tooltipEnchantStats(t)
 				if t.Item:T().EquipStat==5 and t.Item:T().Mod2==0 then
 					power=math.ceil(power*1.5)
 				end
-				if t.Item.BonusExpireTime%100==20 then
+				if GetLegendaryAffix(t.Item)==20 then
 					power=math.ceil(power*1.5)
 				end
 				local resLegendary=false
@@ -340,13 +340,13 @@ local function tooltipEnchantStats(t)
 						bolsterMult=2
 					end
 					local maxValue=120 * bolsterMult
-					if it.BonusExpireTime==1 or it.BonusExpireTime==2 then
+					if GetAncientTier(it)>0 then
 						maxValue=math.min(maxValue+10,maxValue*1.2)
 					end
-					if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
+					if HasLegendaryAffix(it) then
 						maxValue=math.min(maxValue+20,maxValue*1.44)
 					end
-					if it.BonusExpireTime%100==20 then
+					if GetLegendaryAffix(it)==20 then
 						maxValue=maxValue*1.5
 					end
 					local mult=slotMult[it:T().EquipStat] or 1
@@ -383,7 +383,7 @@ local function tooltipEnchantStats(t)
 				if t.Item:T().EquipStat==5 and t.Item:T().Mod2==0 then
 					strength=math.ceil(strength*1.5)
 				end				
-				if t.Item.BonusExpireTime%100==20 then
+				if GetLegendaryAffix(t.Item)==20 then
 					strength=math.ceil(strength*1.5)
 				end
 				local resLegendary=false
@@ -409,13 +409,13 @@ local function tooltipEnchantStats(t)
 							bolsterMult=2
 						end
 						local maxValue=120 * bolsterMult
-						if it.BonusExpireTime==1 or it.BonusExpireTime==2 then
+						if GetAncientTier(it)>0 then
 							maxValue=math.min(maxValue+10,maxValue*1.2)
 						end
-						if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
+						if HasLegendaryAffix(it) then
 							maxValue=math.min(maxValue+20,maxValue*1.44)
 						end
-						if it.BonusExpireTime%100==20 then
+						if GetLegendaryAffix(it)==20 then
 							maxValue=maxValue*1.5
 						end
 						local mult=slotMult[it:T().EquipStat] or 1
@@ -522,11 +522,11 @@ local function tooltipEnchantStats(t)
 			if HasEnc2(t.Item) then
 				bonus=bonus+1
 			end
-			if t.Item.BonusExpireTime==1 then
+			if IsAncientItem(t.Item) then
 				t.Name=StrColor(255,128,0,"Ancient " .. t.Name)
-			elseif t.Item.BonusExpireTime==2 then
+			elseif IsPrimordialItem(t.Item) then
 				t.Name=StrColor(255,0,0,"Primordial " .. t.Name)
-			elseif t.Item.BonusExpireTime>=100 and t.Item.BonusExpireTime<=200 then
+			elseif IsCelestialItem(t.Item) then
 				t.Name=StrColor(120, 240, 255,"Celestial " .. t.Name)
 			elseif legendaryEffects[t.Item.BonusExpireTime] then
 				t.Name=StrColor(255,255,30,"Legendary " .. t.Name)
@@ -540,7 +540,7 @@ local function tooltipEnchantStats(t)
 				t.Name=StrColor(255,255,255,t.Name)
 			end
 		elseif t.Description then
-			if t.Item.BonusExpireTime>=10 and t.Item.BonusExpireTime<1000 then
+			if HasLegendaryAffix(t.Item) then
 				t.Description=""
 			end
 			if legendaryEffects[t.Item.BonusExpireTime%100]then
@@ -619,7 +619,7 @@ local function tooltipEnchantStats(t)
 				difficultyExtraPower=(Game.BolsterAmount-100)/2000+1
 			end
 			local maxChargesCap=50*((difficultyExtraPower-1)*2+1)
-			if t.Item.BonusExpireTime>=10 and t.Item.BonusExpireTime<1000 then
+			if HasLegendaryAffix(t.Item) then
 				maxChargesCap=50*((difficultyExtraPower-1)*4+1)
 			end
 			maxChargesCap=maxChargesCap+100 --mapping release
@@ -796,7 +796,7 @@ local function tooltipStatCompare(t)
 			--restore hp
 			pl.HP=hp
 			pl.SP=sp
-			if t.Item.BonusExpireTime%100==32 then
+			if GetLegendaryAffix(t.Item)==32 then
 				buffManaLock()
 			end
 			vars.currentHPPool[i]=maxHP
@@ -820,7 +820,7 @@ local function tooltipLevelRequirement(t)
 			if plLvl<levelRequired then
 				txt=StrColor(255,0,0,txt)
 			end
-			if t.Item.BonusExpireTime>100 and t.Item.BonusExpireTime<200 then
+			if IsCelestialItem(t.Item) then
 				txt=StrColor(120, 240, 255,"\n\nCelestial Items cannot be upgraded with crafting Gems or Cubes, but scale with player level, up to level 600.")
 				if vars.madnessMode then
 					txt=StrColor(120, 240, 255,"\n\nCelestial Items cannot be upgraded with crafting Gems or Cubes, but scale with player level, up to level 1000.")

@@ -645,10 +645,10 @@ local function upgradeGem(it, tier)
 	--base value
 	local maxValue1=round(tier*6)
 	
-	if it.BonusExpireTime==1 or it.BonusExpireTime==2 then
+	if GetAncientTier(it)>0 then
 		maxValue1=math.min(maxValue1+10,maxValue1*1.2)
 	end
-	if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
+	if HasLegendaryAffix(it) then
 		maxValue1=math.min(maxValue1+20,maxValue1*1.44)
 	end
 	local maxValue2=maxValue1
@@ -712,7 +712,7 @@ end
 for i=1,20 do
 	evt.PotionEffects[70+i] = function(IsDrunk, t, Power)
 		if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then			
-			if craftWaitTime>0 or t.BonusExpireTime>100 then return end
+			if craftWaitTime>0 or IsCelestialItem(t) then return end
 			local levelRequired=GetLevelRquirement(t)
 			--check if equippable
 			local plLvl=Party[Game.CurrentPlayer].LevelBase
@@ -810,13 +810,13 @@ end
 
 evt.PotionEffects[93] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
-		if t.BonusExpireTime>=100 and t.BonusExpireTime<200 then return end
+		if IsCelestialItem(t) then return end
 		local difficultyExtraPower=1
 		if Game.BolsterAmount>100 then
 			difficultyExtraPower=(Game.BolsterAmount-100)/2000+1
 		end
 		local maxChargesCap=50*((difficultyExtraPower-1)*2+1)
-		if t.BonusExpireTime>=10 and t.BonusExpireTime<1000 then
+		if HasLegendaryAffix(t) then
 			maxChargesCap=50*((difficultyExtraPower-1)*4+1)
 		end
 		maxChargesCap=maxChargesCap+100 --mapping release
