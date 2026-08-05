@@ -31,6 +31,8 @@
 local Tooltip = {}
 MawCore.Tooltip = Tooltip
 
+local Formulas = MawCore.Formulas
+
 local sections = {}
 local seq = 0
 
@@ -326,7 +328,7 @@ local function tooltipEnchantStats(t)
 							resLegendary=true
 						end
 					end
-					power=round((1-1/((power+10)/100+1))*1000)/10 .. "%"
+					power=Formulas.reductionPercent(power+10) .. "%"
 				end
 				if extraDescription then
 					local it=t.Item
@@ -356,7 +358,7 @@ local function tooltipEnchantStats(t)
 						if resLegendary then
 							maxValue=maxValue*1.5
 						end
-						maxValue=round((1-1/((maxValue+10)/100+1))*1000)/10 .. "%"
+						maxValue=Formulas.reductionPercent(maxValue+10) .. "%"
 					elseif t.Item.Bonus==8 or t.Item.Bonus==9 then
 						local mult=GetSlotMult(t.Item)
 						maxValue=round(maxValue*(1+math.min(maxValue/50/mult,5)))
@@ -394,7 +396,7 @@ local function tooltipEnchantStats(t)
 							resLegendary=true
 						end
 					end
-					strength=round((1-1/((strength+10)/100+1))*1000)/10 .. "%"
+					strength=Formulas.reductionPercent(strength+10) .. "%"
 				end
 				if itemStatName[bonus] then
 					if extraDescription then
@@ -425,7 +427,7 @@ local function tooltipEnchantStats(t)
 							if resLegendary then
 								maxValue=maxValue*1.5
 							end
-							maxValue=round((1-1/((maxValue+10)/100+1))*1000)/10 .. "%"
+							maxValue=Formulas.reductionPercent(maxValue+10) .. "%"
 						elseif bonus==8 or bonus==9 then
 							local mult=GetSlotMult(t.Item)
 							maxValue=round(maxValue*(1+math.min(maxValue/50/mult,5)))
@@ -470,7 +472,7 @@ local function tooltipEnchantStats(t)
 					local bonus=math.floor(charges/1000)
 					local strength=charges%1000
 					if stat>=11 and stat<=16 then
-						strength=round((1-1/((charges+10)%1000/100+1))*1000)/10 .. "%"
+						strength=Formulas.reductionPercent((charges+10)%1000) .. "%"
 					end
 					txt=baseStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
 					t.Enchantment = StrColor(100,100,100, txt)

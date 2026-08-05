@@ -39,6 +39,7 @@ end
 MawCore.ModuleOrder = {
 	"Engine",		-- Tier-4 boundary: addresses, patches, mem.*
 	"Fixes",		-- engine patches ported from MAW_Fixes.dll
+	"Formulas",		-- shared gameplay formulas: effect + display read one source
 	"Pipeline",		-- ordered named-stage processing chains
 	"Scheduler",	-- one Tick handler, named interval tasks
 	"ItemFields",	-- item struct field registry (the save format)

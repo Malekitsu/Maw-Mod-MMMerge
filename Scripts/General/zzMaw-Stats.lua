@@ -342,7 +342,7 @@ function events.BuildStatInformationBox(t)
 		endurance=Party[i]:GetEndurance()
 		HPScaling=Game.Classes.HPFactor[Party[i].Class]
 		level=Party[i]:GetLevel()
-		t.Text=string.format("%s\n\nHealth bonus from Endurance: %s%s\n\nFlat HP bonus from Endurance: %s",Game.StatsDescriptions[3],endurance/10,"%",math.floor(endurance/5)*HPScaling)
+		t.Text=string.format("%s\n\nHealth bonus from Endurance: %s%s\n\nFlat HP bonus from Endurance: %s",Game.StatsDescriptions[3],endurance/10,"%",Game.GetStatisticEffect(endurance)*HPScaling)
 	end
 	if t.Stat==4 then
 		i=Game.CurrentPlayer

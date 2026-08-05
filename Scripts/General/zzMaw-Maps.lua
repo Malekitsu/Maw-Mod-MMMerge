@@ -2031,7 +2031,7 @@ function calculateAffixPower(n, p)
 	--reductions can eventually go to 0, fix
 	local reductionAffix={13,21,22,23,24,25,26,27,28,29,30,31,32,33}
 	if table.find(reductionAffix,n) then
-		power=round((1-1/(power/100+1))*10000)/100
+		power=MawCore.Formulas.reductionPercent(power, 2)
 	end
 	--fix for proc chance over 100
 	local procAffix={3,4,8,9,14,19,34}

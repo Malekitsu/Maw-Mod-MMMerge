@@ -324,6 +324,36 @@ local dragonScales={
 	["Resistances"]={1,1,2,3,[0]=0},
 }
 
+--shared dragon formulas -- one source for the stat rows and recovery below
+--(min/max damage rows differ only by the 0.75/1.25 spread multiplier)
+local dragonRecoveryPerSkill=0.015
+local function dragonEffLevel(pl)
+	local bolster=getPartyLevel(4)+1
+	local lvl=pl.LevelBase
+	if pl.LevelBase/bolster>1.2 then
+		lvl=math.min(pl.LevelBase/2,bolster)
+	end
+	local cap=600
+	if vars.madnessMode then
+		cap=900
+	end
+	return math.min(lvl,cap)
+end
+local function dragonFangDamage(pl, mult)
+	local s, m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
+	local might=pl:GetMight()
+	local mightEffect=Game.GetStatisticEffect(might)
+	local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (dragonEffLevel(pl) * 2 +30)
+	return round((bonus*(1+might/1000)+(mightEffect*might/1000))*mult*(1+s*dragonRecoveryPerSkill))
+end
+local function dragonBreathDamage(pl, mult)
+	local s, m = SplitSkill(pl:GetSkill(const.Skills.DragonAbility))
+	local might=pl:GetMight()
+	local mightEffect=Game.GetStatisticEffect(might)
+	local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * dragonEffLevel(pl)) + mightEffect
+	return round(baseDamage*(1+might/1000)*mult*(1+s*dragonRecoveryPerSkill))
+end
+
 function events.GameInitialized2()
 	--fire blast tooltip
 	Game.SpellsTxt[123].Description="This ability is an upgraded version of the normal Dragon breath weapon attack.  It acts much like a fireball, striking its target and exploding out to hit everything near it, except the explosion does much more damage than most fireballs."
@@ -349,52 +379,9 @@ function events.GameInitialized2()
 		if Game.CharacterPortraits[t.Player.Face].Race~=const.Race.Dragon then return end
 		--melee
 		if t.Stat==27 then --min damage
-			local pl=t.Player
-			local s, m = SplitSkill(pl:GetSkill(const.Skills.Unarmed)) 
-			local might=t.Player:GetMight()
-			if might>=25 then
-				mightEffect=math.floor(might/5)
-			else
-				mightEffect=math.floor((might-13)/2)
-			end
-			local bolster=getPartyLevel(4)+1
-			local lvl=pl.LevelBase
-			if pl.LevelBase/bolster>1.2 then
-				lvl=math.min(pl.LevelBase/2,bolster)
-			end
-			local cap=600
-			if vars.madnessMode then
-				cap=900
-			end
-			local speedDelay=0.015
-			local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (math.min(lvl,cap) * 2 +30) 
-			t.Result=round((bonus*(1+might/1000)+(mightEffect*might/1000))*0.75*(1+s*speedDelay))
-			
+			t.Result=dragonFangDamage(t.Player, 0.75)
 		elseif t.Stat==28 then --max damage
-			local pl=t.Player
-			local s, m = SplitSkill(pl:GetSkill(const.Skills.Unarmed)) 
-			local might=t.Player:GetMight()
-			if might>=25 then
-				mightEffect=math.floor(might/5)
-			else
-				mightEffect=math.floor((might-13)/2)
-			end
-			
-			
-			local bolster=getPartyLevel(4)+1
-			local lvl=pl.LevelBase
-			if pl.LevelBase/bolster>1.2 then
-				lvl=math.min(pl.LevelBase/2,bolster)
-			end
-			local cap=600
-			if vars.madnessMode then
-				cap=900
-			end
-			local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (math.min(lvl,cap) * 2 +30)
-			
-			local speedDelay=0.015
-			t.Result=round((bonus*(1+might/1000)+(mightEffect*might/1000))*1.25*(1+s*speedDelay))
-			
+			t.Result=dragonFangDamage(t.Player, 1.25)
 		elseif t.Stat==25 then --attack
 			local pl=t.Player
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
@@ -404,90 +391,21 @@ function events.GameInitialized2()
 		end
 		--breath
 		if t.Stat==31 then --min damage
-			local pl=t.Player
-			local s, m = SplitSkill(pl:GetSkill(const.Skills.DragonAbility))
-			local might=t.Player:GetMight()
-			local mightEffect
-			if might>=25 then
-				mightEffect=math.floor(might/5)
-			else
-				mightEffect=math.floor((might-13)/2)
-			end
-			
-			local bolster=getPartyLevel(4)+1
-			local lvl=pl.LevelBase
-			if pl.LevelBase/bolster>1.2 then
-				lvl=math.min(pl.LevelBase/2,bolster)
-			end
-			local cap=600
-			if vars.madnessMode then
-				cap=900
-			end
-			local speedDelay=0.015
-			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(lvl,cap)) + mightEffect
-			local damage=round(baseDamage*(1+might/1000)*0.75*(1+s*speedDelay))
-			
-			t.Result=damage
-			
+			t.Result=dragonBreathDamage(t.Player, 0.75)
 		elseif t.Stat==32 then --max damage
-			local pl=t.Player
-			local s, m = SplitSkill(pl:GetSkill(const.Skills.DragonAbility))
-			local might=t.Player:GetMight()
-			local mightEffect
-			if might>=25 then
-				mightEffect=math.floor(might/5)
-			else
-				mightEffect=math.floor((might-13)/2)
-			end
-			
-			local bolster=getPartyLevel(4)+1
-			local lvl=pl.LevelBase
-			if pl.LevelBase/bolster>1.2 then
-				lvl=math.min(pl.LevelBase/2,bolster)
-			end
-			
-			local cap=600
-			if vars.madnessMode then
-				cap=900
-			end
-			local speedDelay=0.015
-			local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * math.min(lvl,cap)) + mightEffect
-			local damage=round(baseDamage*(1+might/1000)*1.25*(1+s*speedDelay))
-			
-			t.Result=damage
-		
+			t.Result=dragonBreathDamage(t.Player, 1.25)
+
 		--AC
 		elseif t.Stat==9 then
 			local pl=t.Player
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.Dodging))
 			local oldDodge=skillAC[const.Skills.Dodging][m] or 0
-			
-			local bolster=getPartyLevel(4)+1
-			local lvl=pl.LevelBase
-			if pl.LevelBase/bolster>1.2 then
-				lvl=math.min(pl.LevelBase/2,bolster)
-			end
-			local cap=600
-			if vars.madnessMode then
-				cap=900
-			end
-			local bonus= (1 + dragonScales.AC[m]/100 * s) * (math.min(lvl,cap)+40) - (s * oldDodge)
+			local bonus= (1 + dragonScales.AC[m]/100 * s) * (dragonEffLevel(pl)+40) - (s * oldDodge)
 			t.Result=t.Result+bonus
 		elseif t.Stat>=10 and t.Stat<=15 then
 			local pl=t.Player
 			local s, m = SplitSkill(pl:GetSkill(const.Skills.Dodging))
-			local oldDodge=skillAC[const.Skills.Dodging][m] or 0
-			
-			local bolster=getPartyLevel(4)+1
-			local lvl=pl.LevelBase
-			if pl.LevelBase/bolster>1.2 then
-				lvl=math.min(pl.LevelBase/2,bolster)
-			end
-			local cap=600
-			if vars.madnessMode then
-				cap=900
-			end
-			local bonus= (dragonScales.AC[m]/100 * s) * (math.min(lvl,cap)+40)
+			local bonus= (dragonScales.Resistances[m]/100 * s) * (dragonEffLevel(pl)+40)
 			t.Result=t.Result+bonus
 		end
 		
@@ -501,11 +419,11 @@ function events.GameInitialized2()
 		if Game.CharacterPortraits[t.Player.Face].Race==const.Race.Dragon then
 			if useBreathCooldown or t.Ranged then
 				local s, m = SplitSkill(t.Player:GetSkill(const.Skills.DragonAbility))
-				t.Result=t.Result * (1+0.015*s)
+				t.Result=t.Result * (1+dragonRecoveryPerSkill*s)
 				useBreathCooldown=false
 			else
 				local s, m = SplitSkill(t.Player:GetSkill(const.Skills.Unarmed))
-				t.Result=t.Result * (1+0.015*s)
+				t.Result=t.Result * (1+dragonRecoveryPerSkill*s)
 			end
 		end	
 	end
@@ -949,19 +867,19 @@ function dkSkills(isDK, id)
 		local bloodS, bloodM=SplitSkill(pl.Skills[const.Skills.Body])
 		
 		local FHP=pl:GetFullHP()
-		local leech=math.max(FHP^0.5* bloodS^1.5/70, bloodS*2)
+		local leech=MawCore.Formulas.bloodLeech
 		Game.SpellsTxt[68].Name="Blood Leech"
 		Game.SpellsTxt[68].Description="Activating this spell imbues the knight body with blood, leeching life upon attacking at the cost of 6 spell points."
-		Game.SpellsTxt[68].Normal="Leeches " .. round(leech * 1.25) .. " Hit Points"
-		Game.SpellsTxt[68].Expert="Leeches " .. round(leech * 1.5) .. " Hit Points"
-		Game.SpellsTxt[68].Master="Leeches " .. round(leech * 1.75) .. " Hit Points"
-		Game.SpellsTxt[68].GM="Leeches " .. round(leech * 2) .. " Hit Points"
+		Game.SpellsTxt[68].Normal="Leeches " .. round(leech(FHP, bloodS, 1)) .. " Hit Points"
+		Game.SpellsTxt[68].Expert="Leeches " .. round(leech(FHP, bloodS, 2)) .. " Hit Points"
+		Game.SpellsTxt[68].Master="Leeches " .. round(leech(FHP, bloodS, 3)) .. " Hit Points"
+		Game.SpellsTxt[68].GM="Leeches " .. round(leech(FHP, bloodS, 4)) .. " Hit Points"
 		
 		-- Spell 74: Superior Blood Leech
 		Game.SpellsTxt[74].Name="Superior Blood Leech"
 		Game.SpellsTxt[74].Description="Activating this spell imbues the knight essence with blood, leeching a superior amount of life upon attacking at the cost of 12 spell points."
 		Game.SpellsTxt[74].Master="n/a"
-		Game.SpellsTxt[74].GM="Leeches " .. round(leech * 4) .. " Hit Points"
+		Game.SpellsTxt[74].GM="Leeches " .. round(leech(FHP, bloodS, 4) * 2) .. " Hit Points"
 		
 		-- Spell 76: Asphyxiate (no entry in DKDamageMult, but description mentions 110% and 140%)
 		local mult76= DKDamageMult[76]

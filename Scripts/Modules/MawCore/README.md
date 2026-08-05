@@ -28,6 +28,7 @@ Load order inside the core is the `MawCore.ModuleOrder` list in
 |---|---|
 | `Engine.lua` | the Tier-4 boundary: **only file allowed to use `mem.*`, raw addresses, struct offsets**; named address table + patch ledger |
 | `Fixes.lua` | port of `MAW_Fixes.dll` (skill-hint format, recovery floor 30→1, mm8.ini fix) so the DLL could be deleted |
+| `Formulas.lua` | single source for gameplay formulas that appear at an effect site AND a display site (leeches, regen rates, reduction %); pure value-in/value-out functions — effect code and tooltips both call these instead of keeping private copies |
 | `Skills.lua` | port of `Skillz.dll`, stage 1: storage, engine GetSkill, bonus clamp, persistence, mastery tables, full `Skillz.*` API + legacy DLL bridge — **bridges to the DLL if `ExeMods/Skillz.dll` exists** |
 | `SkillTooltip.lua` | per-player skill tooltip text (`SKILL_TOOLTIPS.md`): `getTooltipText(pl, skillId)` + per-(skill, part) dynamic builders — replaces the legacy Tick handlers that rewrote the global desc store for the current player |
 | `SkillsUI.lua` | `Skillz.dll` stage 2: char-screen rows for extended skills, skill hints (text from `SkillTooltip`), house Learn-Skills integration (see `SKILLZ_PORT.md` engineering notes) |
@@ -51,7 +52,8 @@ Everything registered anywhere carries a **unique string id** — that's what ma
 
 ## Migration status
 
-Live: `Fixes` (DLL patches), `Skills`/`SkillsUI` (Skillz port), `Damage`
+Live: `Fixes` (DLL patches), `Formulas` (shared effect/display formulas —
+also used by legacy files), `Skills`/`SkillsUI` (Skillz port), `Damage`
 (the CalcDamageToMonster pipeline), `MonsterHP`, `SkillTooltip` (skill
 hints), `Tooltip` (all 13 item-tooltip sections). Still idle: `Scheduler`
 (no tasks yet), `ItemFields` (no fields registered).

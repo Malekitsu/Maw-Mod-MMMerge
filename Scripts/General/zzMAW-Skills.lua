@@ -1131,8 +1131,7 @@ function getBuffHealthRegen(pl)
 	
 	--regeneration skill
 	local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Regeneration))
-	local regenEffect={[0]=0,2,4,6,6}
-	regen=regen + FHP^0.5*RegS^1.65*(regenEffect[RegM]/350)+RegS
+	regen=regen + MawCore.Formulas.hpRegenPerSec(FHP, RegS, RegM)
 	if RegM==4 then
 		local hpRateo=math.max(pl.HP/FHP, -1)
 		regen=regen*(1+(1-hpRateo)^2)
@@ -1231,16 +1230,13 @@ function MawRegen(timePassed)
 				mult=mult*4
 			end
 			local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Meditation))
-			if RegM==4 then
-				RegM=5
-			end
 			FSP	= pl:GetFullSP()
 			if FSP>0 and vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[i] then
 				FSP=math.max(math.ceil(FSP*(vars.currentManaPool[i]/FSP)^0.5),0)
 				
 			end
 			
-			local SPREGEN = (FSP^0.35*RegS^1.4*((RegM+1)/2000) +0.02)
+			local SPREGEN = MawCore.Formulas.spRegenPerSec(FSP, RegS, RegM)/10
 			
 			for it in pl:EnumActiveItems() do
 				--[[special enchants now increase meditation

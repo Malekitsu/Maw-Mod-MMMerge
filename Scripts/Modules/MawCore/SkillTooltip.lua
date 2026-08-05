@@ -23,6 +23,8 @@
 local SkillTooltip = {}
 MawCore.SkillTooltip = SkillTooltip
 
+local Formulas = MawCore.Formulas
+
 -- index part -> row label; also the source for SkillsUI's mastery name
 -- array (the engine's four name slots get redirected to these strings)
 SkillTooltip.masteryNames = {"", "Novice", "Expert", "Master", "Grand",
@@ -143,9 +145,8 @@ end
 SkillTooltip.set(30, 1, function(pl)
 	local FHP = GetMaxHP(pl)
 	local s, m = SplitSkill(pl:GetSkill(30))
-	local regenEffect = {[0] = 0, 2, 4, 6, 6}
-	local hpRegen = round(FHP ^ 0.5 * s ^ 1.65 * ((regenEffect[m]) / 35)) / 10 + s
-	local hpRegen2 = round(FHP ^ 0.5 * (s + 1) ^ 1.65 * ((regenEffect[m]) / 35)) / 10 + (s + 1)
+	local hpRegen = round(Formulas.hpRegenPerSec(FHP, s, m) * 10) / 10
+	local hpRegen2 = round(Formulas.hpRegenPerSec(FHP, s + 1, m) * 10) / 10
 	local txt = string.format("%s\n\nCurrent HP Regeneration: %s\nNext Level Bonus: %s HP Regen", baseRegStr, StrColor(0, 255, 0, hpRegen), StrColor(0, 255, 0, "+" .. hpRegen2 - hpRegen))
 	--dragon melee leech, shown only for dragons
 	local leech = getDragonRegenLeech(pl)
@@ -164,11 +165,8 @@ SkillTooltip.set(28, 1, function(pl)
 		FSP = vars.currentManaPool[Game.CurrentPlayer]
 	end
 	local s, m = SplitSkill(pl:GetSkill(28))
-	if m == 4 then
-		m = 5
-	end
-	local spRegen = (FSP ^ 0.35 * s ^ 1.4 * ((m + 1) / 20) + 2) / 10
-	local spRegen2 = (FSP ^ 0.35 * (s + 1) ^ 1.4 * ((m + 1) / 20) + 2) / 10
+	local spRegen = Formulas.spRegenPerSec(FSP, s, m)
+	local spRegen2 = Formulas.spRegenPerSec(FSP, s + 1, m)
 	local spRegen2 = round((spRegen2 - spRegen) * 100) / 100
 	if spRegen > 10 then
 		spRegen = round((spRegen) * 10) / 10
@@ -357,7 +355,7 @@ local function registerClassBuilders()
 		end},
 		[13]={[1]=function(pl)
 			local m2=SplitSkill(pl.Skills[const.Skills.Air])
-			local airReduction=round((1-1/(m2/100+1))*1000)/10
+			local airReduction=Formulas.reductionPercent(m2)
 			return MawSchoolDescBase[13] .. ASC .. "Reduce all damage taken by " .. airReduction .. "%\n"
 		end},
 		[14]={[1]=function(pl)
@@ -374,13 +372,13 @@ local function registerClassBuilders()
 		end},
 		[17]={[1]=function(pl)
 			local m6=SplitSkill(pl.Skills[const.Skills.Mind])
-			local spLeech=round(m6^1.25)
+			local spLeech=round(Formulas.mindLeech(m6))
 			return MawSchoolDescBase[17] .. ASC .. "Melee attacks restore " .. spLeech .. " Spell Points\n"
 		end},
 		[18]={[1]=function(pl)
 			local m7, bodyMastery=SplitSkill(pl.Skills[const.Skills.Body])
 			local FHP=pl:GetFullHP()
-			local leech=math.max(round(FHP^0.5* m7^1.5/70 * (1+bodyMastery/2)),m7)
+			local leech=Formulas.bodyLeech(FHP, m7, bodyMastery)
 			return MawSchoolDescBase[18] .. ASC .. "Melee attacks restore " .. leech .. " Hit Points\n"
 		end},
 	}},
@@ -391,13 +389,13 @@ local function registerClassBuilders()
 			[5]=EV},
 		[18]={[1]=function(pl)
 			local bloodS=SplitSkill(pl.Skills[const.Skills.Body])
-			local leech=round(bloodS/round(pl.LevelBase^0.7)*5*100)/100
-			return "This skill is only available to death knights and reduces physical damage taken.\n" .. "Current Reduction: " .. round((1-1/(bloodS/100+1))*1000)/10 .."%\n\nAdditionally it will make your attacks to leech damage based on your total HP.\n\nCurrent leech vs. same level monsters: " .. leech .. "%\n"
+			local leech=round(Formulas.dkPassiveLeech(100, bloodS, pl.LevelBase)*100)/100
+			return "This skill is only available to death knights and reduces physical damage taken.\n" .. "Current Reduction: " .. Formulas.reductionPercent(bloodS) .."%\n\nAdditionally it will make your attacks to leech damage based on your total HP.\n\nCurrent leech vs. same level monsters: " .. leech .. "%\n"
 		end,
 			[5]=EV},
 		[20]={[1]=function(pl)
 			local unholyS=SplitSkill(pl.Skills[const.Skills.Dark])
-			return "This skill is only available to death knights and increases damage by 0.5-1-1.5 (at Novice, Expert, Master) and reduces magical damage taken.\n" .. "Current Reduction: " .. round((1-1/(unholyS/100+1))*1000)/10 .."%\n"
+			return "This skill is only available to death knights and increases damage by 0.5-1-1.5 (at Novice, Expert, Master) and reduces magical damage taken.\n" .. "Current Reduction: " .. Formulas.reductionPercent(unholyS) .."%\n"
 		end},
 	}},
 
@@ -536,9 +534,15 @@ local function registerClassBuilders()
 	--for Fangs/Scales by RACE, independent of the class system above (their
 	--slots don't overlap it)
 	local dragonSlots={
-		[33]={[1]="Dragons can use their fangs to deal atrocious damage to enemies. Damage is 30 + 2 per level (up to level 600). Fang skill increases this amount by a percentage based on mastery and skill level.\n\nWhenever this skill is below dragon skill it will push monsters away\nEach point in the skill increases damage and increases recovery time by 1.5%.\n" .. "\n------------------------------------------------------------\n            Attack| Dmg|",
+		[33]={[1]=function(pl)
+			local cap=vars.madnessMode and 900 or 600
+			return "Dragons can use their fangs to deal atrocious damage to enemies. Damage is 30 + 2 per level (up to level " .. cap .. "). Fang skill increases this amount by a percentage based on mastery and skill level.\n\nWhenever this skill is below dragon skill it will push monsters away\nEach point in the skill increases damage and increases recovery time by 1.5%.\n" .. "\n------------------------------------------------------------\n            Attack| Dmg|"
+		end,
 			[2]=fangsNormal,[3]=fangsExpert,[4]=fangsMaster,[5]=fangsGM},
-		[32]={[1]="Dragons scales are hard enough to work as natural armor, gaining naturally 40 + 1 AC per level (up to level 600).\nScales further enhance their toughness and resistance to magical damage, increasing the thoughness by a percentage.\n\n------------------------------------------------------------\n          AC%| Res%",
+		[32]={[1]=function(pl)
+			local cap=vars.madnessMode and 900 or 600
+			return "Dragons scales are hard enough to work as natural armor, gaining naturally 40 + 1 AC per level (up to level " .. cap .. ").\nScales further enhance their toughness and resistance to magical damage, increasing the thoughness by a percentage.\n\n------------------------------------------------------------\n          AC%| Res%"
+		end,
 			[2]=scalesNormal,[3]=scalesExpert,[4]=scalesMaster,[5]=scalesGM},
 	}
 	local function dragonText(pl, id, part)

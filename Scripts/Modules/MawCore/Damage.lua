@@ -28,6 +28,8 @@
 local Damage = {}
 MawCore.Damage = Damage
 
+local Formulas = MawCore.Formulas
+
 -- also still defined in zzMAWStatusMsg.lua, whose CalcDamageToPlayer stays
 local REMOTE_OWNER_BIT = 0x800
 
@@ -718,9 +720,9 @@ local function stage_shamanOnHit(t)
 		m7,bM=SplitSkill(data.Player.Skills[const.Skills.Body])
 		
 		local FHP=data.Player:GetFullHP()
-		local leech=math.max(round(FHP^0.5* m7^1.5/70 * (0.5+bM/2)), m7)
+		local leech=Formulas.bodyLeech(FHP, m7, bM)
 		local maxSP=data.Player:GetFullSP()
-		data.Player.SP=math.min(data.Player.SP+m6^1.25, getMaxMana(data.Player))
+		data.Player.SP=math.min(data.Player.SP+Formulas.mindLeech(m6), getMaxMana(data.Player))
 		
 		local id=data.Player:GetIndex()
 		
@@ -784,14 +786,14 @@ local function stage_dkAttack(t)
 			local bloodS, bloodM=SplitSkill(pl.Skills[const.Skills.Body])
 			local FHP=pl:GetFullHP()
 			local monLvl=getMonsterLevel(t.Monster)
-			local heal=FHP*(bloodS/round(monLvl^0.7))*0.05
+			local heal=Formulas.dkPassiveLeech(FHP, bloodS, monLvl)
 			--current active leech spell
 			vars.dkActiveAttackSpell=vars.dkActiveAttackSpell or {}
 			local id=pl:GetIndex()
 			leech=0
 			if vars.dkActiveAttackSpell and (vars.dkActiveAttackSpell[id]==68 or vars.dkActiveAttackSpell[id]==74) then
 				local FHP=pl:GetFullHP()
-				local leech=math.max(FHP^0.5* bloodS^1.5/70* (1+bloodM/4), bloodS*2)
+				leech=Formulas.bloodLeech(FHP, bloodS, bloodM)
 				pl.SP=pl.SP-6
 				if vars.dkActiveAttackSpell[id]==74 then
 					leech=leech * 2

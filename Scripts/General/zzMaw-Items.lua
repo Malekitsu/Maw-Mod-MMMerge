@@ -2824,15 +2824,9 @@ end
 --phase 2: luck feeds all resistances
 local function addLuckRes(pl, tab)
 	local luck=tab[7]+pl.LuckBase+pl.LuckBonus
-	if luck<=21 then
-		luck=(luck-13)/2
-	elseif luck<=100 then
-		luck=math.floor(luck/5)
-	else
-		luck=math.floor(luck/10)+10
-	end
+	local luckEff=Game.GetStatisticEffect(luck)
 	for i=11, 16 do
-		tab[i]=tab[i]+luck -- -penalty
+		tab[i]=tab[i]+luckEff -- -penalty
 	end
 end
 
@@ -2843,12 +2837,7 @@ local function addHP(pl, id, tab, enduranceStatBuff)
 		buffBonus=0
 	end
 	local endurance=tab[4]+pl.EnduranceBase+pl.EnduranceBonus+buffBonus
-	local endEff
-	if endurance<=21 then
-		endEff=math.floor((endurance-13)/2)
-	else
-		endEff=math.floor(endurance/5)
-	end
+	local endEff=Game.GetStatisticEffect(endurance)
 
 	local s,m=SplitSkill(pl:GetSkill(const.Skills.Bodybuilding))
 	local m2=m
@@ -2879,13 +2868,8 @@ end
 local function addMana(pl, tab)
 	local manaScaling=Game.Classes.SPFactor[pl.Class]
 	local totalMana=manaScaling*pl.LevelBase+Game.Classes.SPBase[pl.Class]
-	local effect=0
 	local stat=pl:GetPersonality()
-	if stat<=21 then
-		effect=effect+math.floor((stat-13)/2)
-	else
-		effect=effect+math.floor(stat/5)
-	end
+	local effect=Game.GetStatisticEffect(stat)
 	local s2,m2=SplitSkill(pl:GetSkill(const.Skills.Meditation))
 	if m2==4 then
 		m2=5
@@ -3054,12 +3038,7 @@ end
 --damage rows
 local function applyDamageMultipliers(pl, tab, unarmed)
 	local might=tab[1]+pl.MightBase+pl.MightBonus+Party.SpellBuffs[2].Power
-	local mightEffect
-	if might<=21 then
-		mightEffect=(might-13)/2
-	else
-		mightEffect=math.floor(might/5)
-	end
+	local mightEffect=Game.GetStatisticEffect(might)
 	local bonusDamage=mightEffect+Party.SpellBuffs[const.PartyBuff.Heroism].Power
 	local heroismMult=0
 	local unarmedMult=0
