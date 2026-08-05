@@ -1869,7 +1869,7 @@ function events.Action(t)
 	]]
 end
 
-function events.Tick()
+function mawTick_Ascension()
 	lastCheck=lastCheck or -1
 	local lowestDelay=math.huge
 	local playerToAscend=Game.CurrentPlayer
@@ -3459,7 +3459,7 @@ end)
 
 ]]
 
-function events.Tick()
+function mawTick_InsanityShieldStrip()
 	if vars.insanityMode then
 		if Party.SpellBuffs[11].ExpireTime>=Game.Time then
 			if Party.EnemyDetectorRed then
@@ -3467,4 +3467,14 @@ function events.Tick()
 			end
 		end
 	end
+end
+
+--Tick handlers above now run as named MawCore scheduler tasks, all at 0ms
+--(= every frame, exactly as before -- slowing tasks down is a later tuning
+--pass). Registered at GameInitialized2 because MawCore loads after every
+--General file. In-game: print(MawCore.Scheduler.describe())
+function events.GameInitialized2()
+	local every=MawCore.Scheduler.every
+	every("spells/ascension", 0, mawTick_Ascension)
+	every("spells/insanity-shield-strip", 0, mawTick_InsanityShieldStrip)
 end

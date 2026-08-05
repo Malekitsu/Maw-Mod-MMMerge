@@ -504,7 +504,7 @@ function events.Action(t)
 	end
 end
 
-function events.Tick()
+function mawTick_DragonCharScreen()
 	if Game.CurrentScreen==7 then
 		local current=Game.CurrentPlayer
 		if current>=0 and current<=Party.High then
@@ -576,7 +576,7 @@ function directionToUnitVector(direction)
     return x, y
 end
 
-function events.Tick()
+function mawTick_MonsterPush()
 	if push and push[1] then
 		for i=1, #push do
 			if push[i].duration>0 then
@@ -1132,7 +1132,7 @@ function events.GameInitialized2()
 	end
 end
 
-function events.Tick()
+function mawTick_ElementalistStacks()
 	for i=0,Party.High do
 		local pl=Party[i]
 		if table.find(elementalistClass,pl.Class) then
@@ -1510,7 +1510,7 @@ function events.GameInitialized2()
 	end
 end
 
-function events.Tick()
+function mawTick_AssassinStacks()
 	for i=0,Party.High do
 		local pl=Party[i]
 		if table.find(assassinClass,pl.Class) then
@@ -1564,4 +1564,16 @@ function events.BeforeLoadMap()
 		end
 		vars.LichFix=true
 	end
+end
+
+--Tick handlers above now run as named MawCore scheduler tasks, all at 0ms
+--(= every frame, exactly as before -- slowing tasks down is a later tuning
+--pass). Registered at GameInitialized2 because MawCore loads after every
+--General file. In-game: print(MawCore.Scheduler.describe())
+function events.GameInitialized2()
+	local every=MawCore.Scheduler.every
+	every("classes/dragon-charscreen", 0, mawTick_DragonCharScreen)
+	every("classes/monster-push", 0, mawTick_MonsterPush)
+	every("classes/elementalist-stacks", 0, mawTick_ElementalistStacks)
+	every("classes/assassin-stacks", 0, mawTick_AssassinStacks)
 end

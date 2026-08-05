@@ -128,7 +128,7 @@ function events.BeforeNewGameAutosave()
 	end
 end
 
-function events.Tick()
+function mawTick_SurvivalTeleport()
 	if vars.survivalTeleport then
 		vars.survivalTeleport=false
 		evt.MoveToMap{-9729, -10555, 160, 512, 0, 0, 0, 0, "oute3.odm"}
@@ -342,4 +342,13 @@ function events.GameInitialized2()
 			mon.TreasureItemType=0
 		end
 	end
+end
+
+--Tick handlers above now run as named MawCore scheduler tasks, all at 0ms
+--(= every frame, exactly as before -- slowing tasks down is a later tuning
+--pass). Registered at GameInitialized2 because MawCore loads after every
+--General file. In-game: print(MawCore.Scheduler.describe())
+function events.GameInitialized2()
+	local every=MawCore.Scheduler.every
+	every("survival/teleport", 0, mawTick_SurvivalTeleport)
 end

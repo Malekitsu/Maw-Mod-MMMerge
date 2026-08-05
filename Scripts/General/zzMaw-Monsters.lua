@@ -2556,7 +2556,7 @@ function events.CalcDamageToPlayer(t)
   end
 end
 
-function events.Tick()
+function mawTick_DeathSeedTimeout()
   if not vars then return end
   if vars.madnessMode and vars.MadnessDeathSeed then
     vars.lastHitTime=vars.lastHitTime or 0
@@ -2581,7 +2581,7 @@ deathCounter=CustomUI.CreateText{
   Layer=1, Screen=7, AlignLeft=true, Width=300, Height=16, X=470, Y=1
 }
 
-function events.Tick()
+function mawTick_DeathCounterUI()
   if vars and vars.madnessMode and vars.lastHitTime and vars.MadnessDeathSeed and showDeathCounter then
     local secondsLeft=math.max(math.ceil((vars.lastHitTime+const.Minute*5-Game.Time)/128),0)
     local txt=(secondsLeft>0) and StrColor(255,0,0,secondsLeft) or StrColor(0,255,0,secondsLeft)
@@ -3512,7 +3512,7 @@ end
 -- =========================
 -- Swift (mob affixe/skill)
 -- =========================
-function events.Tick()
+function mawTick_SwiftBosses()
   -- Swift via boss data (iterate only bossData keys, not all monsters)
   if mapvars and mapvars.bossData then
     swiftLocation = swiftLocation or {}
@@ -3732,7 +3732,7 @@ function events.BeforeLoadMap()
 end
 
 --nerf to movement speed in doom
-function events.Tick()
+function mawTick_TurnbasedMoveLimit()
 	if Game.TurnBased then
 		if vars.Mode==2 or vars.AusterityMode then
 			turnBaseStartPositionX=turnBaseStartPositionX or Party.X
@@ -3900,7 +3900,7 @@ local explosions={
 }
 local transformedList={734,739,712,732,740,737,736}
 
-function events.Tick()
+function mawTick_RestoreProjectiles()
 	if vars.MAWSETTINGS.restoreProjectiles=="OFF" then return end
 	if Multiplyer and Multiplayer.in_game then return end
 	for i=0, Map.Objects.High do
@@ -4486,4 +4486,17 @@ function events.KeyDown(t)
 			Game.ShowStatusText("Teleported " .. count .. " monsters and " .. objCount .. " crafting items")
 		end
 	end
+end
+
+--Tick handlers above now run as named MawCore scheduler tasks, all at 0ms
+--(= every frame, exactly as before -- slowing tasks down is a later tuning
+--pass). Registered at GameInitialized2 because MawCore loads after every
+--General file. In-game: print(MawCore.Scheduler.describe())
+function events.GameInitialized2()
+	local every=MawCore.Scheduler.every
+	every("monsters/death-seed-timeout", 0, mawTick_DeathSeedTimeout)
+	every("monsters/death-counter-ui", 0, mawTick_DeathCounterUI)
+	every("monsters/swift-bosses", 0, mawTick_SwiftBosses)
+	every("monsters/turnbased-move-limit", 0, mawTick_TurnbasedMoveLimit)
+	every("monsters/restore-projectiles", 0, mawTick_RestoreProjectiles)
 end

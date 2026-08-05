@@ -958,7 +958,7 @@ function events.Action(t)
 		end
 	end
 end
-function events.Tick()
+function mawTick_PoolLabels()
 	if Game.CurrentCharScreen==100 and Game.CurrentScreen==7 then
 		i=Game.CurrentPlayer 
 		if i==-1 then return end --prevent bug message
@@ -1295,7 +1295,7 @@ end
 
 
 
-function events.Tick()
+function mawTick_PowerLabels()
 	if Game.CurrentCharScreen==100 and Game.CurrentScreen==7 then
 		local i=Game.CurrentPlayer
 		if i<0 or i>Party.High then return end
@@ -2055,4 +2055,14 @@ function GetDifficulty()
 		difficulty=1
 	end
 	return difficulty
+end
+
+--Tick handlers above now run as named MawCore scheduler tasks, all at 0ms
+--(= every frame, exactly as before -- slowing tasks down is a later tuning
+--pass). Registered at GameInitialized2 because MawCore loads after every
+--General file. In-game: print(MawCore.Scheduler.describe())
+function events.GameInitialized2()
+	local every=MawCore.Scheduler.every
+	every("stats/pool-labels", 0, mawTick_PoolLabels)
+	every("stats/power-labels", 0, mawTick_PowerLabels)
 end

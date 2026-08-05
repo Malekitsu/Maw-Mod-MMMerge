@@ -55,8 +55,11 @@ Everything registered anywhere carries a **unique string id** — that's what ma
 Live: `Fixes` (DLL patches), `Formulas` (shared effect/display formulas —
 also used by legacy files), `Skills`/`SkillsUI` (Skillz port), `Damage`
 (the CalcDamageToMonster pipeline), `MonsterHP`, `SkillTooltip` (skill
-hints), `Tooltip` (all 13 item-tooltip sections). Still idle: `Scheduler`
-(no tasks yet), `ItemFields` (no fields registered).
+hints), `Tooltip` (all 13 item-tooltip sections), `Scheduler` (27 named
+tasks — every top-level Tick handler from the General/ mod files, bodies
+still in their home files, all at 0ms pending an interval-tuning pass;
+raw `events.Tick` remains only in sync files, self-removing transients,
+and Global/ scripts). Still idle: `ItemFields` (no fields registered).
 
 ## Console inspection (in-game)
 

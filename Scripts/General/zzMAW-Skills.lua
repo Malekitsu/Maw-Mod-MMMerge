@@ -467,7 +467,7 @@ local function navigateMissile(object)
 end
 
 -- game tick related functionality
-function events.Tick()
+function mawTick_HomingProjectiles()
 	-- navigateMissiles
 	if vars.MAWSETTINGS.homingProjectiles == "ON" then
 		for objectIndex = 0,Map.Objects.high do
@@ -741,7 +741,7 @@ function chargeTimer()
 	end
 end
 --movement
-function events.Tick()
+function mawTick_ChargeMovement()
 	if Multiplayer and Multiplayer.client_monsters()[0] and checkCharge and checkCharge>=0 then
 		--check for charge working
 		checkCharge=checkCharge-1
@@ -1887,7 +1887,7 @@ end
 
 local partySharedSkills={24,25,26,29,31,34,37}
 local skillRequirements={1,4,7,10}
-function events.Tick()
+function mawTick_SoloMastery()
 	--give masteries to solo player
 	vars.checkSoloMastery=vars.checkSoloMastery or true
 	if vars.checkSoloMastery and Party.High==0 then
@@ -1943,7 +1943,7 @@ function events.GameInitialized2()
 end
 
 -- COVER SKILL
-function events.Tick()
+function mawTick_MiscSkillsUI()
 	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
 		local index=Game.CurrentPlayer
 		if index<0 or index>Party.High then return end
@@ -2444,7 +2444,7 @@ do
   end
 
   -- filet de sécu périodique: si `pl` saute, on le remplace
-  function events.Tick()
+  mawTick_PlFallback=function()
     if not pl or type(pl) ~= "table" then
       pl = __maw_pick_any_party_member() or __MAW_DUMMY_PL
     end
@@ -2602,7 +2602,7 @@ function events.Action(t)
 end
 
 local lastPlayer=-1
-function events.Tick()
+function mawTick_DwarfAxes()
 	if Game.CurrentScreen==7 or Game.CurrentScreen==15 then
 		local currentPlayer=Game.CurrentPlayer
 		if lastPlayer==currentPlayer then return end
@@ -2651,4 +2651,18 @@ function events.Tick()
 	else
 		lastPlayer=-1
 	end
+end
+
+--Tick handlers above now run as named MawCore scheduler tasks, all at 0ms
+--(= every frame, exactly as before -- slowing tasks down is a later tuning
+--pass). Registered at GameInitialized2 because MawCore loads after every
+--General file. In-game: print(MawCore.Scheduler.describe())
+function events.GameInitialized2()
+	local every=MawCore.Scheduler.every
+	every("skills/homing-projectiles", 0, mawTick_HomingProjectiles)
+	every("skills/charge-movement", 0, mawTick_ChargeMovement)
+	every("skills/solo-mastery", 0, mawTick_SoloMastery)
+	every("skills/misc-skills-ui", 0, mawTick_MiscSkillsUI)
+	every("skills/pl-fallback", 0, mawTick_PlFallback)
+	every("skills/dwarf-axes", 0, mawTick_DwarfAxes)
 end

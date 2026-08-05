@@ -510,7 +510,7 @@ reagentList={
 	--mm6
 	[1762] = 1, [1763] = 1, [1764] = 1,
 }
-function events.Tick()
+function mawTick_ReagentPower()
 	alcBonus=alcBonus or {}
 	if Game.CurrentPlayer<0 or Game.CurrentPlayer>Party.High then 
 		return
@@ -741,7 +741,7 @@ end
 function events.GameInitialized2()
 	craftWaitTime=craftWaitTime or 0
 end
-function events.Tick()
+function mawTick_CraftCooldown()
 	if craftingItemUsed then
 		craftWaitTime=60
 		craftingItemUsed=false
@@ -1297,4 +1297,14 @@ function events.GameInitialized2()
 	Game.ItemsTxt[1069].Picture="item280"
 	Game.ItemsTxt[1069].Skill=40
 	Game.ItemsTxt[1069].SpriteIndex=130
+end
+
+--Tick handlers above now run as named MawCore scheduler tasks, all at 0ms
+--(= every frame, exactly as before -- slowing tasks down is a later tuning
+--pass). Registered at GameInitialized2 because MawCore loads after every
+--General file. In-game: print(MawCore.Scheduler.describe())
+function events.GameInitialized2()
+	local every=MawCore.Scheduler.every
+	every("alchemy/reagent-power", 0, mawTick_ReagentPower)
+	every("alchemy/craft-cooldown", 0, mawTick_CraftCooldown)
 end

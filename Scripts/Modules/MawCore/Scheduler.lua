@@ -9,6 +9,13 @@
 -- game-time scheduling MMExtension already provides Timer() and RefillTimer()
 -- (Scripts/Core/timers.lua -- Game.Time based, per-map lifecycle). Use those
 -- for anything that should follow the game clock; they are not duplicated here.
+--
+-- Deliberately NOT migrated here: the legacy dynamic transients -- handlers
+-- that register `function events.Tick()` inside an action and self-remove
+-- with events.Remove("Tick", 1). The number is a STACK LEVEL (the caller
+-- removes itself; Core/EventsList.lua `replace`), so inside a scheduler task
+-- that call would remove the scheduler's own shared Tick handler. Leave them
+-- as raw events.Tick.
 
 local Scheduler = {}
 MawCore.Scheduler = Scheduler
@@ -18,6 +25,8 @@ local tasks = {}	-- array; execution order = registration order
 -- Scheduler.every("buffDecay", 500, fn)	-- at most once per 500ms of real time
 -- Scheduler.every("crosshair", 0, fn)		-- every frame; use sparingly
 function Scheduler.every(id, ms, fn)
+	assert(type(fn) == "function",
+		("scheduler: task %s registered without a function"):format(id))
 	for _, t in ipairs(tasks) do
 		assert(t.id ~= id, ("scheduler: task %s already registered"):format(id))
 	end

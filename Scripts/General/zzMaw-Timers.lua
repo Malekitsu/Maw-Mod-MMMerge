@@ -13,7 +13,7 @@ local year   = 123863040
 local FALLBACK_DT = 1/60   -- used ONLY when time goes backwards (<0)
 local MAX_DT      = 2   -- cap to avoid huge bursts
 
-function events.Tick()
+function mawTick_TimerDriver()
   vars = vars or {}
   vars.LastTime = vars.LastTime or Game.Time
 
@@ -97,3 +97,11 @@ MawAddTimer("elementalistStacksDecay", 0.1, elementalistStacksDecay)
 MawAddTimer("poisonTimer", 1, poisonTimer)
 MawAddTimer("chargeTimer", 1, chargeTimer)
 
+--Tick handlers above now run as named MawCore scheduler tasks, all at 0ms
+--(= every frame, exactly as before -- slowing tasks down is a later tuning
+--pass). Registered at GameInitialized2 because MawCore loads after every
+--General file. In-game: print(MawCore.Scheduler.describe())
+function events.GameInitialized2()
+	local every=MawCore.Scheduler.every
+	every("timers/driver", 0, mawTick_TimerDriver)
+end
