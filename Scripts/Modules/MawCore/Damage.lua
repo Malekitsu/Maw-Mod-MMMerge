@@ -30,7 +30,6 @@ MawCore.Damage = Damage
 
 local Formulas = MawCore.Formulas
 
--- also still defined in zzMAWStatusMsg.lua, whose CalcDamageToPlayer stays
 local REMOTE_OWNER_BIT = 0x800
 
 -- ===========================================================================
@@ -1493,5 +1492,466 @@ function Damage.run(t)
 end
 
 function Damage.describe()
-	return pipe:describe()
+	return pipe:describe() .. "\n" .. Damage.playerPipe:describe()
+end
+
+------------------------------------------------------------------------
+-- CalcDamageToPlayer pipeline -- the second damage event, migrated the
+-- same way (DAMAGE_PIPELINE.md, "CalcDamageToPlayer"). Bodies verbatim
+-- from the legacy handlers; zzzzzMaw_Damage.lua registers the single
+-- event handler per playthrough. Left raw, running before the pipeline:
+-- zzMaw-Multiplayer:294 + the three Modules/Multiplayer handlers (sync,
+-- descoped) and zzzzMALEKITH:220 (untracked file; idempotent duplicate
+-- of death-seed-mark).
+------------------------------------------------------------------------
+
+local aoespellsMultiplayer={6,9,22,41,97}
+
+-- from Scripts/General/zzMaw-Items.lua:3595 -- deferred per-hit item stats
+-- refresh: hits taken can break equipment
+local function pstage_itemRefresh(t)
+	RunNextTick(function()
+		mawRefresh(t.PlayerIndex)
+	end)
+end
+
+-- from Scripts/General/zzMaw-Monsters.lua:2552 -- madness death-seed:
+-- getting hit stamps the hit time and marks a pending seed entry
+local function pstage_deathSeedMark(t)
+  if vars.madnessMode and vars.MadnessDeathSeed then
+    vars.lastHitTime=Game.Time
+    SeedDeaths.mark_pending_for_current()
+  end
+end
+
+-- from Scripts/General/zzMaw-Stats.lua:735 -- THE player-damage replacement:
+-- reflect/pain-reflection returns, friendly fire recompute, trap/fall damage,
+-- dodge roll, monster attack-2 pick, mistform, affix kind-swap, monster spell
+-- damage, randomize, DamageHalved, calcMawDamage, disease mult, exploding bosses
+local function pstage_damageRecompute(t)
+	local data=mawCustomMonObj or WhoHitPlayer()
+	if reflectedDamage then
+		data=nil
+	end
+	local pl=t.Player
+	
+	if reflectedDamage then
+		reflectedDamage=false
+		t.Result=t.Result^0.85
+		return
+	end
+	--PAIN REFLECTION FIX
+	if painReflectionHit then
+		painReflectionHit=false
+		t.Result=t.Result^0.85
+		return
+	end
+	if pl.SpellBuffs[10].ExpireTime>Game.Time then
+		reflecting=true
+	end
+	if data and data.Player and data.Spell and data.Spell==133 then
+		return
+	end
+	--properly calculate friendly fire damage
+	if data and data.Player and data.Spell and data.Spell<133 and data.Spell>0 then	
+		local s,m = SplitSkill(data.Player:GetSkill(const.Skills.Learning))
+		local diceMin, diceMax, damageAdd = ascendSpellDamage(s, m, data.Spell,data.Player:GetIndex())
+		local damage=damageAdd
+		for i=1, data.SpellSkill do
+			damage=damage+math.random(diceMin,diceMax)
+		end
+		local distance=getDistance(data.Object.X,data.Object.Y,data.Object.Z)/512
+		local damageMult=math.max(1-distance, 0)
+		damage=damage*damageMult
+		
+		--no crit nor intellect buff
+		t.Result=calcMawDamage(t.Player,t.DamageKind,damage,false,data.Player.LevelBase)
+		return
+	end
+	
+	if not (data) or not (data and data.Monster) then
+		if (t.DamageKind~=4 and t.DamageKind~=2) or Map.IndoorOrOutdoor==1 then --drown and fall
+			--[[
+			local name=Game.MapStats[Map.MapStatsIndex].Name
+			local bolster=getPartyLevel()
+			local mapLevel=mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High
+			if vars.madnessMode then
+				mapLevel=madnessMapLevels[name]
+			elseif vars.freeProgression then
+				mapLevel=bolster+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
+			end
+			if mapvars.mapAffixes then
+				mapLevel=(mapvars.mapAffixes.Power*10+(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)
+			end
+			if not mapLevel then
+				mapLevel=getTotalLevel()
+			end
+			]]
+			mapLevel=getTotalLevel()
+			--trap and objects multiplier
+			local damage=getMonsterDamage(false, mapLevel)
+			
+			if data and data.Object and data.Object.SpellType==15 then 
+				damage=damage/3
+			end
+			local s,m=SplitSkill(t.Player.Skills[const.Skills.Perception])
+			damage=damage*math.min((11-m*2)/10,1)
+			t.Result=calcMawDamage(t.Player,t.DamageKind,damage)
+		end
+		
+		return
+	end
+	
+	--carnage fix
+	if data and data.Player and data.Spell==133 then
+		t.Result=0
+		return
+	end
+	
+	local mon=data.Monster
+	local lvl=getMonsterLevel(mon)
+
+	--dodging DODGE 
+	local dodging=0
+	local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Dodging))
+	if Mas == 4 then
+		dodging=Skill+10
+	end
+	local dodgeChance=1-1/(1+dodging/200)
+	if Game.CharacterPortraits[pl.Face].Race==const.Race.Dragon then
+		dodgeChance=0
+	end
+	--[[
+	if table.find(assassinClass,pl.Class) then
+		local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Air))
+		dodgeChance=1-0.995^Skill+0.05
+	end
+	]]
+	roll=math.random()
+	if dodgeChance>=roll then
+		t.Result=0
+		-- Use the same player that performed the dodge calculation
+		local index = -1
+		for i = 0, Party.High do
+			if Party[i]:GetIndex() == t.PlayerIndex then
+				index = i
+				break
+			end
+		end
+		if index >= 0 then
+			evt.FaceExpression{Player = index, Frame = 33}
+		end
+		return
+	end
+	
+	local damage=getMonsterDamage(mon)
+	--works for attack 1 and 2
+	if data.MonsterAction==1 then
+		local atk1=mon["Attack1"]
+		local damage1=atk1.DamageAdd
+		for i=1,atk1.DamageDiceCount do
+			damage1=damage1+(atk1.DamageDiceSides+1)/2
+		end
+		local atk2=mon["Attack2"]
+		local damage2=atk2.DamageAdd
+		for i=1,atk2.DamageDiceCount do
+			damage2=damage2+(atk2.DamageDiceSides+1)/2
+		end
+		local mult=damage2/damage1
+		
+		t.DamageKind=atk2.Type
+		t.Damage=damage*mult
+	elseif data.MonsterAction==0 then
+		local atk=mon["Attack1"]
+		t.DamageKind=atk.Type
+		t.Damage=damage
+		
+	end
+	
+	if t.Damage==0 and t.Result==0 then return end
+
+	if t.DamageKind==4 and restoringMistformTime then --mistform 
+		t.Damage=t.Damage*0.25
+	end
+
+	--mapping
+	if getMapAffixPower(14) and math.random()<getMapAffixPower(14) then
+		t.DamageKind=12
+	end
+	
+	--apply Damage
+	--modify spell damage as it's not handled in maw-monsters
+	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
+		local damage=getMonsterDamage(mon)
+		if monsterSpellMultiplierList[data.Object.Spell] then
+			damage=damage*monsterSpellMultiplierList[data.Object.Spell]
+		end
+		t.Damage=damage
+	end
+	t.Damage=round(t.Damage)
+	--randomize
+	local roll=(math.random(75,125)+math.random(75,125))/200
+	t.Damage=t.Damage*roll
+	
+	if mon and mon.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime>=Game.Time then
+		t.Damage=t.Damage*0.75
+	end
+	
+	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
+		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,false,lvl) -- spell randomization is off
+	elseif data and data.Monster then
+		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,false,lvl)
+	else
+		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true)
+	end
+	
+	local DiseaseDamage = 1
+	if t.Player.Disease3>0 then
+		DiseaseDamage = 2
+	elseif t.Player.Disease2>0 then
+		DiseaseDamage = 1.5
+	elseif t.Player.Disease1>0 then
+		DiseaseDamage = 1.25
+	end
+	if Party.High==0 then
+		DiseaseDamage = (DiseaseDamage-1)/2 + 1
+	end
+	t.Result = t.Result * DiseaseDamage
+	if data and data.Monster and data.Monster.NameId>220 then
+		local mon=data.Monster
+		local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+		if skill=="Exploding" or skill=="Omnipotent" then
+			t.Result=t.Result/2
+			aoeDamage=t.Result/Party.Count
+			for i=0,Party.High do
+				local damage = calcManaShield(Party[i], aoeDamage)
+				Party[i].HP=Party[i].HP-damage
+				Party[i]:ShowFaceAnimation(24)
+			end
+		end
+	end
+end
+
+-- from Scripts/General/zzMaw-Monsters.lua:3269 (was GameInitialized2-nested) --
+-- boss on-hit affixes vs the player: Summoner/Venomous/Plagueborn/Fixator/
+-- Swapper/Puller/Omnipotent
+local function pstage_bossAffixesPlayer(t)
+	local data=mawCustomMonObj or WhoHitPlayer()
+	if data and data.Monster and data.Monster.NameId>=220 and data.Monster.NameId<300 then
+		mon=data.Monster
+		skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+		if skill=="Summoner" then
+			if math.random()<0.4 or t.DamageKind==4 then
+				pseudoSpawnpoint{monster = math.ceil(mon.Id/3)*3-2, x = (Party.X+mon.X)/2, y = (Party.Y+mon.Y)/2, z = Party.Z, count = 1, powerChances = {75, 25, 0}, radius = 64, group = 1,transform = function(mon) mon.Hostile = true mon.ShowAsHostile = true mon.Velocity=350 end}
+			end
+		elseif skill=="Venomous" then
+			t.Player.Poison3=Game.Time
+		elseif skill=="Plagueborn" then
+			t.Player.Disease3=Game.Time
+		elseif skill=="Fixator" then
+			t.Player.Weak=Game.Time
+		elseif skill=="Swapper" then	
+			Game.ShowStatusText("*Swap*")
+			Party.X, Party.Y, Party.Z, mon.X, mon.Y, mon.Z = mon.X, mon.Y, mon.Z, Party.X, Party.Y, Party.Z
+			Party.Direction, mon.Direction=mon.Direction, Party.Direction
+		elseif skill=="Puller" then
+			local direction=calculateDirection(Party.X, Party.Y,mon.X,mon.Y)
+			evt.Jump{Direction = direction, ZAngle = 128, Speed = 1000}
+		end
+		
+		if skill=="Omnipotent" then
+			if math.random()<0.4 or t.DamageKind==4 then
+				pseudoSpawnpoint{monster = math.ceil(mon.Id/3)*3-2, x = (Party.X+mon.X)/2, y = (Party.Y+mon.Y)/2, z = Party.Z, count = 1, powerChances = {75, 25, 0}, radius = 64, group = 1,transform = function(mon) mon.Hostile = true mon.ShowAsHostile = true mon.Velocity=350 end}
+			end
+			t.Player.Poison3=Game.Time
+			t.Player.Disease3=Game.Time
+			t.Player.Weak=Game.Time
+			Game.ShowStatusText("*Swap*")
+			Party.X, Party.Y, Party.Z, mon.X, mon.Y, mon.Z = mon.X, mon.Y, mon.Z, Party.X, Party.Y, Party.Z
+			Party.Direction, mon.Direction=mon.Direction, Party.Direction
+			local direction=calculateDirection(Party.X, Party.Y,mon.X,mon.Y)
+			evt.Jump{Direction = direction, ZAngle = 128, Speed = 1000}
+		end
+	end
+end
+
+-- from Scripts/General/zzMaw-Survival.lua:309 (was GameInitialized2-nested) --
+-- survival mode: no damage taken outside survival maps
+local function pstage_survivalGatePlayer(t)
+	if not survivalMaps[Map.Name] and vars.SuvivalMode then
+		t.Result=0
+	end
+end
+
+-- from Scripts/Global/zzMaw_Legendaries.lua:53 -- legendary 22 proximity
+-- reduction, shaman/seraph flat reduction, MANA SHIELD, legendary 15 +
+-- seraph divine protection, bolster>=300 death/eradication thresholds
+local function pstage_legendariesAndShields(t)
+	local id=t.Player:GetIndex()
+	--legendary [22]
+	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 22) then
+		local count=0
+		for i=0, Map.Monsters.High do
+			if Map.Monsters[i].Active then
+				dist=getDistanceToMonster(Map.Monsters[i])
+				if dist<=512 then
+					count=count+1
+				end
+			end
+		end
+		t.Result=t.Result*math.max(0.97^count,0.5)
+	end
+	
+	local pl = t.Player
+	
+	--shaman code
+	if table.find(shamanClass, pl.Class) and pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0  then
+		m3=SplitSkill(pl.Skills[const.Skills.Water])
+		local lvl=getTotalLevel()
+		local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
+		local reduction=round(getMonsterDamage(false,(lvl+1))*(m3/lvl^0.65)/avgRed/2*0.99^(lvl^0.65)) --on average 1/2 of a B monster
+		t.Result=math.max(t.Result-reduction, t.Result*0.25)
+	end
+	--seraph code
+	if table.find(seraphClass, pl.Class) and pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0  then
+		m3=SplitSkill(pl.Skills[const.Skills.Spirit])
+		local lvl=getTotalLevel()
+		local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
+		local reduction=round(getMonsterDamage(false,(lvl+1))*(m3/lvl^0.65)/avgRed/2*0.99^(lvl^0.65)) --on average 1/2 of a B monster
+		t.Result=math.max(t.Result-reduction, t.Result*0.25)
+	end
+	
+	--end of [22]
+	--------------------
+	--MANA SHIELD CODE--
+	--------------------
+	
+	t.Result = calcManaShield(pl, t.Result)
+	
+	---------------------
+	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 15) then
+		if pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0 then
+			if vars.legendaryProtectionCooldown[id]==nil then
+				vars.legendaryProtectionCooldown[id]=0
+			end		
+			if t.Result>=pl.HP and Game.Time>vars.legendaryProtectionCooldown[id] then
+				--calculate healing
+				for i=0,Party.High do
+					if Party[i]:GetIndex()==id then
+						Party[i].HP=Party[i]:GetFullHP()/4
+					end
+				end
+				vars.legendaryProtectionCooldown[id] = Game.Time + const.Minute * 150
+				Game.ShowStatusText("Legendary power saves you from lethal damage")
+				t.Result=0
+			end
+		end
+	end
+	--seraphim
+	if table.find(seraphClass, pl.Class) and pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0 then
+		if vars.divineProtectionCooldown[id]==nil then
+			vars.divineProtectionCooldown[id]=0
+		end		
+		if t.Result>=pl.HP and Game.Time>vars.divineProtectionCooldown[id] then
+				--calculate healing
+			heal=round(GetMaxHP(pl)*0.25)
+			for i=0,Party.High do
+				if Party[i]:GetIndex()==id then
+					evt[i].Add("HP",heal)
+				end
+			end
+			vars.divineProtectionCooldown[id] = Game.Time + const.Minute * 150
+			Game.ShowStatusText("Divine Protection saves you from lethal damage")
+			t.Result=math.min(t.Result, pl.HP-1)
+		end	
+	end
+	
+	if Game.BolsterAmount>=300 then
+		RunNextTick(function()
+			local fullHP=pl:GetFullHP()
+			local id=pl:GetIndex()
+			if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 30) then
+				fullHP=math.max(fullHP,pl:GetFullSP())
+				fullHP=fullHP*manaShieldManaEfficiency(pl)
+			end
+			local currentHP=pl.HP
+			if currentHP<-fullHP then
+				pl.Dead=Game.Time
+				pl.SP=0
+			end
+			if currentHP<-fullHP*2 then
+				pl.Eradicated=Game.Time
+			end
+			if vars.insanityMode and enableDisintegrate and currentHP<-fullHP*10 and Party.Count>1 then
+				for i=0,Party.High do
+					if Party[i]:GetIndex()==id then
+						Game.PlaySound(4833+pl.Voice*100)
+						DismissCharacter(i)
+						Game.ShowStatusText("Disintegrated")
+						return
+					end
+				end
+			end
+		end)
+	end
+end
+
+-- from Scripts/Global/zzMaw_Mapping.lua:1 -- map affixes vs the player:
+-- 1 flat %, 2 double-damage chance, 10 %-of-full-HP add
+local function pstage_mapAffixesPlayer(t)
+	if t.Monster and getMapAffixPower(1) then
+		t.Result=t.Result*(1+getMapAffixPower(1)/100)
+	end
+	if getMapAffixPower(2) then
+		if math.random()<getMapAffixPower(2)/100 then
+			t.Result=t.Result*2
+		end
+	end
+	if t.Monster and getMapAffixPower(10) then
+		local hp=t.Player:GetFullHP()
+		t.Result=t.Result+hp*getMapAffixPower(10)/100
+	end
+end
+
+-- from Scripts/Global/zzMAWStatusMsg.lua:4 -- remote-owner zero (solo-active
+-- MP guard); aoespellsMultiplayer moved along (it was the only consumer)
+local function pstage_remoteOwnerZeroPlayer(t)
+	local source = WhoHitPlayer()
+	if source then
+		local obj = source.Object
+		if obj and bit.And(obj.Bits, REMOTE_OWNER_BIT) > 0 then
+			if not table.find(aoespellsMultiplayer, source.Spell) then
+				t.Result = 0
+			end
+		end
+	end
+end
+
+local ppipe = MawCore.Pipeline.new("DamageToPlayer", {
+	-- tier 1: was General file-scope
+	"item-refresh",			-- [reactions] deferred itemStats refresh
+	"death-seed-mark",		-- [reactions] madness death-seed marker
+	"damage-recompute",		-- [base] THE replacement (dodge, monster damage, disease, ...)
+	-- tier 2: was GameInitialized2-registered
+	"boss-affixes-player",	-- [reactions] boss on-hit effects
+	"survival-gate",		-- [gates]
+	-- tier 3: was Global file-scope
+	"legendaries-and-shields",	-- [mult/reactions] incl. mana shield + divine protection
+	"map-affixes-player",	-- [mult]
+	"remote-owner-zero",	-- [gates] solo-active MP guard
+})
+
+ppipe:on("item-refresh",        "zzMaw-Items:3595",      pstage_itemRefresh)
+ppipe:on("death-seed-mark",     "zzMaw-Monsters:2552",   pstage_deathSeedMark)
+ppipe:on("damage-recompute",    "zzMaw-Stats:735",       pstage_damageRecompute)
+ppipe:on("boss-affixes-player", "zzMaw-Monsters:3269",   pstage_bossAffixesPlayer)
+ppipe:on("survival-gate",       "zzMaw-Survival:309",    pstage_survivalGatePlayer)
+ppipe:on("legendaries-and-shields", "zzMaw_Legendaries:53", pstage_legendariesAndShields)
+ppipe:on("map-affixes-player",  "zzMaw_Mapping:1",       pstage_mapAffixesPlayer)
+ppipe:on("remote-owner-zero",   "zzMAWStatusMsg:4",      pstage_remoteOwnerZeroPlayer)
+
+Damage.playerPipe = ppipe
+
+function Damage.runPlayer(t)
+	ppipe:run(t)
 end

@@ -34,7 +34,7 @@ Load order inside the core is the `MawCore.ModuleOrder` list in
 | `SkillsUI.lua` | `Skillz.dll` stage 2: char-screen rows for extended skills, skill hints (text from `SkillTooltip`), house Learn-Skills integration (see `SKILLZ_PORT.md` engineering notes) |
 | `Pipeline.lua` | ordered named-stage chains — the replacement for N anonymous event handlers (damage is the first pipeline) |
 | `MonsterHP.lua` | real monster HP beyond the engine's 16-bit cap: per-map ledger (`mapvars.MawMonsterHP`), engine keeps a capped proxy; registered via `MawSetMonsterHP` at the recalc/spawn sites, applied by the pipeline's `monster-hp` stage (see `DAMAGE_PIPELINE.md` "MonsterHP") |
-| `Damage.lua` | the `CalcDamageToMonster` pipeline (`DAMAGE_PIPELINE.md`): all legacy handlers as named stages (phase 1 complete — 29 stages, verbatim bodies); registered per playthrough by `Scripts/Global/zzzzzMaw_Damage.lua` |
+| `Damage.lua` | both damage pipelines (`DAMAGE_PIPELINE.md`): `CalcDamageToMonster` (30 stages) and `CalcDamageToPlayer` (8 stages), all legacy handlers as named stages; registered per playthrough by `Scripts/Global/zzzzzMaw_Damage.lua` |
 | `Scheduler.lua` | one `events.Tick`; named tasks at real-time intervals (game-time stays with MMExtension's `Timer`/`RefillTimer`) |
 | `ItemFields.lua` | the item struct registry — the save format, with its two hazards documented |
 | `Tooltip.lua` | item tooltips — ONE `BuildItemInformationBox` handler running 13 named ordered sections, whose bodies (moved verbatim from the legacy files) live in this file |

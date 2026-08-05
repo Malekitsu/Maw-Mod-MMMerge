@@ -7,3 +7,7 @@
 function events.CalcDamageToMonster(t)
 	MawCore.Damage.run(t)
 end
+
+function events.CalcDamageToPlayer(t)
+	MawCore.Damage.runPlayer(t)
+end

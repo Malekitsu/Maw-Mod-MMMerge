@@ -3592,11 +3592,7 @@ function events.Action(t)
 		end)
 	--end
 end
-function events.CalcDamageToPlayer(t)
-	RunNextTick(function()
-		mawRefresh(t.PlayerIndex)
-	end)
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 function mawRefresh(i)
 	if i=="all" then
 		for v=0,Party.High do

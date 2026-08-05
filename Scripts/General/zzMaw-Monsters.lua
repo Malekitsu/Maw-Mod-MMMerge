@@ -2549,12 +2549,7 @@ function events.LeaveMap()
 	vars.lastHitTime=0
 	SeedDeaths.clear_pending_for_current()
 end
-function events.CalcDamageToPlayer(t)
-  if vars.madnessMode and vars.MadnessDeathSeed then
-    vars.lastHitTime=Game.Time
-    SeedDeaths.mark_pending_for_current()
-  end
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 function mawTick_DeathSeedTimeout()
   if not vars then return end
@@ -3266,45 +3261,7 @@ function checkPityProtectedBoss(seed, chanceMult, generatedByBroodlord)
 	return skill, hpMult, dmgMult
 end
 function events.GameInitialized2() --to make the after all the other code
-	function events.CalcDamageToPlayer(t)
-		local data=mawCustomMonObj or WhoHitPlayer()
-		if data and data.Monster and data.Monster.NameId>=220 and data.Monster.NameId<300 then
-			mon=data.Monster
-			skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
-			if skill=="Summoner" then
-				if math.random()<0.4 or t.DamageKind==4 then
-					pseudoSpawnpoint{monster = math.ceil(mon.Id/3)*3-2, x = (Party.X+mon.X)/2, y = (Party.Y+mon.Y)/2, z = Party.Z, count = 1, powerChances = {75, 25, 0}, radius = 64, group = 1,transform = function(mon) mon.Hostile = true mon.ShowAsHostile = true mon.Velocity=350 end}
-				end
-			elseif skill=="Venomous" then
-				t.Player.Poison3=Game.Time
-			elseif skill=="Plagueborn" then
-				t.Player.Disease3=Game.Time
-			elseif skill=="Fixator" then
-				t.Player.Weak=Game.Time
-			elseif skill=="Swapper" then	
-				Game.ShowStatusText("*Swap*")
-				Party.X, Party.Y, Party.Z, mon.X, mon.Y, mon.Z = mon.X, mon.Y, mon.Z, Party.X, Party.Y, Party.Z
-				Party.Direction, mon.Direction=mon.Direction, Party.Direction
-			elseif skill=="Puller" then
-				local direction=calculateDirection(Party.X, Party.Y,mon.X,mon.Y)
-				evt.Jump{Direction = direction, ZAngle = 128, Speed = 1000}
-			end
-			
-			if skill=="Omnipotent" then
-				if math.random()<0.4 or t.DamageKind==4 then
-					pseudoSpawnpoint{monster = math.ceil(mon.Id/3)*3-2, x = (Party.X+mon.X)/2, y = (Party.Y+mon.Y)/2, z = Party.Z, count = 1, powerChances = {75, 25, 0}, radius = 64, group = 1,transform = function(mon) mon.Hostile = true mon.ShowAsHostile = true mon.Velocity=350 end}
-				end
-				t.Player.Poison3=Game.Time
-				t.Player.Disease3=Game.Time
-				t.Player.Weak=Game.Time
-				Game.ShowStatusText("*Swap*")
-				Party.X, Party.Y, Party.Z, mon.X, mon.Y, mon.Z = mon.X, mon.Y, mon.Z, Party.X, Party.Y, Party.Z
-				Party.Direction, mon.Direction=mon.Direction, Party.Direction
-				local direction=calculateDirection(Party.X, Party.Y,mon.X,mon.Y)
-				evt.Jump{Direction = direction, ZAngle = 128, Speed = 1000}
-			end
-		end
-	end
+	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 end

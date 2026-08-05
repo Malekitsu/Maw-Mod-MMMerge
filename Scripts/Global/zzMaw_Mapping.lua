@@ -1,17 +1,4 @@
-function events.CalcDamageToPlayer(t)
-	if t.Monster and getMapAffixPower(1) then
-		t.Result=t.Result*(1+getMapAffixPower(1)/100)
-	end
-	if getMapAffixPower(2) then
-		if math.random()<getMapAffixPower(2)/100 then
-			t.Result=t.Result*2
-		end
-	end
-	if t.Monster and getMapAffixPower(10) then
-		local hp=t.Player:GetFullHP()
-		t.Result=t.Result+hp*getMapAffixPower(10)/100
-	end
-end
+-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 -- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 function events.DoBadThingToPlayer(t)

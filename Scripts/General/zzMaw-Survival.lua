@@ -306,11 +306,7 @@ function survivalMonsterTable(currentMapLevel)
 end
 
 function events.GameInitialized2()
-	function events.CalcDamageToPlayer(t)
-		if not survivalMaps[Map.Name] and vars.SuvivalMode then
-			t.Result=0
-		end
-	end
+	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 	function events.CanOpenChest(t)
 		if not survivalMaps[Map.Name] and vars.SuvivalMode then
