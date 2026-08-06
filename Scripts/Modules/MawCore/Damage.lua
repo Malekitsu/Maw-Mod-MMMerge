@@ -131,20 +131,6 @@ local function stage_seraphOnHitHeal(t)
 	end
 end
 
--- from zzClasses:357 -- Seraph dual-wield ban, after res-and-retaliation so
--- the zero sticks; the equip-time gate is CanDualWield (NOTES.md)
-local function stage_seraphDualWield(t)
---covers offhand swords already equipped on older saves
-	local data=t.Hit
-	if data and data.Player then
-		local item=data.Player:GetActiveItem(0)
-		if item and not CanDualWield(data.Player, item) then
-			t.Result=0
-			Message("Seraphim aren't able to dual wield")
-		end
-	end
-end
-
 -- from Scripts/General/zzClasses.lua:1534 -- Elementalist learn-by-casting
 -- progression (spellRequirements stays in zzClasses -- its tooltip code
 -- reads it too)
@@ -1423,7 +1409,6 @@ local pipe = MawCore.Pipeline.new("DamageToMonster", {
 	"weapon-recompute",			-- [base] THE melee/ranged replacement
 	"pain-reflection-flag",		-- [reactions]
 	"res-and-retaliation",		-- [resistance] final / 2^(res/100)
-	"seraph-dual-wield",	-- [gates] after the recompute so its zero sticks
 	-- tier 2: was GameInitialized2-registered
 	"dragon-attack",			-- [base] class override
 	"shaman-on-hit",			-- [reactions]
@@ -1459,7 +1444,6 @@ pipe:on("sparks-chain",      "zzMaw-Spells:3191",    stage_sparksChain)
 pipe:on("weapon-recompute",  "zzMaw-Stats:141",      stage_weaponRecompute)
 pipe:on("pain-reflection-flag", "zzMaw-Stats:770",   stage_painReflectionFlag)
 pipe:on("res-and-retaliation",  "zzMaw-Stats:1105",  stage_resAndRetaliation)
-pipe:on("seraph-dual-wield", "zzClasses:357",        stage_seraphDualWield)
 pipe:on("dragon-attack",     "zzClasses:855",        stage_dragonAttack)
 pipe:on("shaman-on-hit",     "zzClasses:972",        stage_shamanOnHit)
 pipe:on("dk-attack",         "zzClasses:1133",       stage_dkAttack)
