@@ -446,12 +446,12 @@ local function tooltipEnchantStats(t)
 						--power=power*0.667
 					end
 					local slotMult=slotMult[t.Item:T().EquipStat] or 1
-					cap=math.min(cap*slotMult,999)
-					
-					charges=stat*1000+math.min(round(power*(1+0.25*math.random())),cap)
-					
-					local bonus=math.floor(charges/1000)
-					local strength=charges%1000
+					cap=math.min(cap*slotMult,ENC2_MAX_STRENGTH)
+
+					--was packed as stat*1000+strength and unpacked again on the
+					--next line; the decimal round trip was what forced cap<=999
+					local bonus=stat
+					local strength=math.min(round(power*(1+0.25*math.random())),cap)
 					if stat>=11 and stat<=16 then
 						--second enchants grant the raw strength, no +10 (collectEnchant)
 						strength=Formulas.reductionPercent(strength) .. "%"

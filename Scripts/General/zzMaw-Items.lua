@@ -90,10 +90,10 @@ local function getBossLootSeed(mon)
 	return bossLootSeed
 end
 
---the three base equipment id bands: MM8 0-151, MM6 803-936, MM7 1603-1736.
---Artifacts and quest items sit outside them.
+--the three base equipment id bands: MM8 1-151, MM6 803-936, MM7 1603-1736.
+--Artifacts and quest items sit outside them; 0 is an empty slot, not an item.
 function IsBaseItemId(num)
-	return num <= 151 or (num >= 803 and num <= 936) or (num >= 1603 and num <= 1736)
+	return (num >= 1 and num <= 151) or (num >= 803 and num <= 936) or (num >= 1603 and num <= 1736)
 end
 
 --artifact id bands, one per game. ancientWeapons sit outside these, inside
@@ -104,6 +104,9 @@ end
 
 --base equipment the loot/enchant system may roll on: ancientWeapons are
 --artifacts that happen to fall inside the bands, so they are excluded.
+--Crafting deliberately does NOT use this -- the alchemy and potion gates
+--test IsBaseItemId, so ancient weapons stay craftable by hand while the
+--loot roller never touches them.
 function IsEnchantableItem(it)
 	return IsBaseItemId(it.Number) and not table.find(ancientWeapons, it.Number)
 end
@@ -447,7 +450,7 @@ function events.AfterLoadMap()
 		for i=0,Map.Chests.High do
 			for k=1,Map.Chests[i].Items.High do
 				local it=Map.Chests[i].Items[k]
-				if (it.Number>0 and IsBaseItemId(it.Number)) then
+				if IsBaseItemId(it.Number) then
 					local itemPower=1
 					if it.Bonus>0 then
 						itemPower=itemPower+1
@@ -992,7 +995,8 @@ function events.ItemGenerated(t)
 			local hpType,hpPower=GetEnc2(it)
 			if hpType==8 or hpType==9 then
 				local power=hpPower
-				power=power*(2+math.min(power/50,4)) --cap is 999
+				power=power*(2+math.min(power/50,4))
+				--threshold, not a cap: 999 is where charges outgrow the base slot
 				if power >= 999 and it.Bonus<17 then --swap base with charges
 					local bonus=it.Bonus
 					local str=it.BonusStrength
@@ -1022,7 +1026,7 @@ function events.ItemGenerated(t)
 		if mult then
 			it.BonusStrength=math.ceil(it.BonusStrength*mult)
 			local enc2Type,enc2Power=GetEnc2(it)
-			enc2Power=math.min(enc2Power*mult,999) --cap is 999
+			enc2Power=math.min(enc2Power*mult,ENC2_MAX_STRENGTH)
 			SetEnc2(it,enc2Type,enc2Power)
 		end
 		--check if int/pers or might/accuracy item to change special enchant
@@ -1119,7 +1123,9 @@ function events.ItemGenerated(t)
 		end
 		if higherLootPowerRange then
 			local minValue=0
-			--celestial first: HasLegendaryAffix also covers the celestial band
+			--celestial first: HasLegendaryAffix also covers the celestial band.
+			--255 on purpose: celestials are the one case allowed past
+			--maxChargesCap, up to what the u1 field can hold.
 			if IsCelestialItem(it) then
 				it.MaxCharges=math.min(it.MaxCharges*1.5,255)
 				return
@@ -1432,7 +1438,7 @@ function updateCelestialItem(it,pl)
 			end
 		end
 		if HasEnc2(it) then
-			SetEnc2Strength(it,math.min(math.round(tier*mult*slotMult),999))
+			SetEnc2Strength(it,math.min(math.round(tier*mult*slotMult),ENC2_MAX_STRENGTH))
 		end
 		local cap=180 
 		if vars.madnessMode then
@@ -4036,7 +4042,7 @@ function events.AfterLoadMap()
 				for i=1,Map.Chests[k].Items.High do
 					local it=Map.Chests[k].Items[i]
 					if it.MaxCharges==0 then
-						if (it.Number>0 and IsBaseItemId(it.Number)) then
+						if IsBaseItemId(it.Number) then
 							it:Randomize(lootLevel,it:T().EquipStat+1)
 						end
 					end
@@ -4045,7 +4051,7 @@ function events.AfterLoadMap()
 			for i=0,Map.Objects.High do
 				local it=Map.Objects[i].Item
 				if it.MaxCharges==0 then
-					if (it.Number>0 and IsBaseItemId(it.Number)) then
+					if IsBaseItemId(it.Number) then
 						it:Randomize(lootLevel,it:T().EquipStat+1)
 					end
 				end

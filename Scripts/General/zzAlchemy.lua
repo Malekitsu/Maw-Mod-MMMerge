@@ -709,9 +709,9 @@ local function upgradeGem(it, tier)
 	if bonus1percent<=bonus2percent and it.BonusStrength<maxValue1 then
 		enchanted=true
 		it.BonusStrength=math.min(it.BonusStrength+upgradeAmount1,maxValue1)
-	elseif bonus2percent<=bonus1percent and bonus2Strength<maxValue2 and bonus2Strength<999 then --currently capped at 999
+	elseif bonus2percent<=bonus1percent and bonus2Strength<maxValue2 and bonus2Strength<ENC2_MAX_STRENGTH then
 		enchanted=true
-		SetEnc2(it,bonus2,math.min(bonus2Strength+upgradeAmount2,maxValue2,999))
+		SetEnc2(it,bonus2,math.min(bonus2Strength+upgradeAmount2,maxValue2,ENC2_MAX_STRENGTH))
 	end
 	return enchanted
 end
@@ -800,7 +800,7 @@ evt.PotionEffects[92] = function(IsDrunk, t, Power)
 				end
 			end
 			local slotMult=slotMult[t:T().EquipStat] or 1
-			cap=math.min(cap*slotMult,999)
+			cap=math.min(cap*slotMult,ENC2_MAX_STRENGTH)
 			
 			SetEnc2(t,stat,math.min(round(power*(1+0.25*math.random())),cap))
 			Mouse.Item.Number=0
