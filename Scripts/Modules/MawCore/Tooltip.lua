@@ -285,13 +285,9 @@ local function tooltipEnchantStats(t)
 			t.Enchantment=""
 			if t.Item.Bonus>0 then
 				local power=t.Item.BonusStrength
-				if vars.itemStatsFix then
-					if (t.Item.Bonus==8 or t.Item.Bonus==9) then
-						local mult=GetSlotMult(it)
-						power=round(power*(1+math.min(power/50/mult,5)))
-					elseif t.Item.Bonus==10 then
-						--power=round(power*0.667)
-					end
+				if t.Item.Bonus==8 or t.Item.Bonus==9 then
+					local mult=GetSlotMult(it)
+					power=round(power*(1+math.min(power/50/mult,5)))
 				end
 				if t.Item:T().EquipStat==5 and t.Item:T().Mod2==0 then
 					power=math.ceil(power*1.5)
@@ -353,13 +349,9 @@ local function tooltipEnchantStats(t)
 			end
 			if HasEnc2(t.Item) then
 				local bonus,strength=GetEnc2(t.Item)
-				if vars.itemStatsFix then
-					if (bonus==8 or bonus==9) then
-						local mult=GetSlotMult(it)
-						strength=round(strength*(1+math.min(strength/50/mult,5)))
-					elseif bonus==10 then
-						--strength=round(strength*0.667)
-					end
+				if bonus==8 or bonus==9 then
+					local mult=GetSlotMult(it)
+					strength=round(strength*(1+math.min(strength/50/mult,5)))
 				end
 				if t.Item:T().EquipStat==5 and t.Item:T().Mod2==0 then
 					strength=math.ceil(strength*1.5)

@@ -987,36 +987,6 @@ function events.ItemGenerated(t)
 		lootMultiplier=1 --reset
 		
 		OmnipotentLoot=false
-		--buff to hp and mana items
-		if vars and not vars.itemStatsFix then
-			if it.Bonus==8 or it.Bonus==9 then
-				it.BonusStrength=it.BonusStrength*(1+math.min(it.BonusStrength/50,4))
-			end
-			local hpType,hpPower=GetEnc2(it)
-			if hpType==8 or hpType==9 then
-				local power=hpPower
-				power=power*(2+math.min(power/50,4))
-				--threshold, not a cap: 999 is where charges outgrow the base slot
-				if power >= 999 and it.Bonus<17 then --swap base with charges
-					local bonus=it.Bonus
-					local str=it.BonusStrength
-					it.Bonus=hpType
-					it.BonusStrength=power
-					SetEnc2(it,bonus,str)
-				else
-					SetEnc2(it,hpType,power)
-				end
-			end
-			--nerf to AC
-			if it.Bonus==10 then
-				--it.BonusStrength=math.ceil(it.BonusStrength*0.667)
-			end
-			local acType,acPower=GetEnc2(it)
-			if acType==10 then
-				SetEnc2(it,acType,acPower-math.floor(acPower*0.333))
-			end
-		end
-		
 		--nerf to skills
 		if it.Bonus>=17 and it.Bonus<=24 then
 			it.BonusStrength=math.ceil(math.max(it.BonusStrength^0.5,it.BonusStrength/10))
@@ -1139,10 +1109,6 @@ function events.ItemGenerated(t)
 			SetEnc2(it,rollType,math.random(1+rollPower*minValue,rollPower))
 		end
 	end
-end
-
-function events.BeforeNewGameAutosave()
-	vars.itemStatsFix=true
 end
 
 -- Function to get an affix based on the pity system
@@ -2442,11 +2408,10 @@ end
 --stats 1-10 into tab, resistances 11-16 into vars.normalEnchantResistance,
 --skill enchants into the +50 slots (first enchant only, as before)
 local function collectEnchant(index, it, bonus, power, tab, isSecond)
-	if vars.itemStatsFix then
-		if (bonus==8 or bonus==9) then
-			local mult=GetSlotMult(it)
-			power=round(power*(1+math.min(power/50/mult,5)))
-		end
+	--HP/SP enchants scale on read, not baked into BonusStrength at generation
+	if bonus==8 or bonus==9 then
+		local mult=GetSlotMult(it)
+		power=round(power*(1+math.min(power/50/mult,5)))
 	end
 	if GetLegendaryAffix(it)==20 then
 		power=math.ceil(power*1.5)

@@ -12,16 +12,15 @@ local ENC2_STR_MAX = 0xFFFF   -- 16 bits
 ENC2_MAX_TYPE = ENC2_TYPE_MAX
 ENC2_MAX_STRENGTH = ENC2_STR_MAX
 
--- Returns type, strength. Handles both the bitfield and the legacy decimal layout.
+-- Returns type, strength. Only marked values are enc2 data: Charges also
+-- carries potion counters, map affix pairs and MP sync ids, and those now
+-- read as "no enchant" instead of being decoded as one.
 function DecodeEnc2(v)
 	v = v or 0
-	if v <= 0 then
-		return 0, 0
-	end
-	if bit.band(v, ENC2_MARKER) ~= 0 then
+	if v > 0 and bit.band(v, ENC2_MARKER) ~= 0 then
 		return bit.band(bit.rshift(v, ENC2_TYPE_SHIFT), ENC2_TYPE_MAX), bit.band(v, ENC2_STR_MAX)
 	end
-	return math.floor(v / 1000), v % 1000
+	return 0, 0
 end
 
 -- Packs type and strength into the bitfield, clamping both to their field widths.

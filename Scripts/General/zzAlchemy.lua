@@ -222,20 +222,7 @@ function events.UseMouseItem(t)
 				return
 			end
 		end
-		--retroactive fix
-		for key, value in pairs(vars.BlackPotions[index]) do
-			if type(key)=="string" then
-				if pl[key]<255 then
-					pl[key]=math.max(0, pl[key]-value)
-				else
-					pl[key]=math.max(100, pl[key]-value)
-				end
-				local stat=retroActiveFix[key]
-				vars.BlackPotions[index][stat]=value
-				vars.BlackPotions[index][key]=nil
-			end
-		end
-	end	
+	end
 	
 	--age potions
 	if it.Number==258 then
@@ -313,21 +300,6 @@ blackPermanentBuffs={
 	[254]={4,6,7},
 	[261]={11,12,13,14},
 	[262]={15,16},
-}
-retroActiveFix={
-	["MightBase"]=1,
-	["IntellectBase"]=2,
-	["PersonalityBase"]=3,
-	["EnduranceBase"]=4,
-	["AccuracyBase"]=5,
-	["SpeedBase"]=6,
-	["LuckBase"]=7,
-	["FireResistanceBase"]=11,
-	["AirResistanceBase"]=12,
-	["WaterResistanceBase"]=13,
-	["EarthResistanceBase"]=14,
-	["MindResistanceBase"]=15,
-	["BodyResistanceBase"]=16,
 }
 itemBuffMapping = {
 	[228] = 7,	 --haste
@@ -659,24 +631,6 @@ local function upgradeGem(it, tier)
 		maxValue1=math.min(maxValue1+20,maxValue1*1.44)
 	end
 	local maxValue2=maxValue1
-	if not vars.itemStatsFix then
-		--hp/sp value
-		if it.Bonus==8 or it.Bonus==9 then
-			maxValue1=math.floor(maxValue1*(2+maxValue1/50))
-			upgradeAmount1=upgradeAmount1^2+1
-		end
-		if bonus2==8 or bonus2==9 then
-			maxValue2=math.floor(maxValue2*(2+maxValue2/50))
-			upgradeAmount2=upgradeAmount2^2+1
-		end
-		--AC
-		if it.Bonus==10 then
-			--maxValue1=math.floor(maxValue1*0.667)
-		end
-		if bonus2==10 then
-			--maxValue2=math.floor(maxValue2*0.667)
-		end
-	end
 	--skills
 	if it.Bonus>=17 then
 		maxValue1=math.floor(math.max((tier*10)^0.5, round(tier)))
