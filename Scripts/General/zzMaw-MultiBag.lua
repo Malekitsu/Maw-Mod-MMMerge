@@ -222,7 +222,7 @@ function changeBag(pl, bag)
 			it.BonusExpireTime = 0
 			it.BonusStrength = 0
 			it.Broken = false
-			it.Charges = false
+			it.Charges = 0
 			it.Condition = 0
 			it.Hardened = false
 			it.Identified = true

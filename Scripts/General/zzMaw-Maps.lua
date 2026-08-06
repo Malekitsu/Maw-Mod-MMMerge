@@ -1850,7 +1850,7 @@ function events.UseMouseItem(t)
 		mapAffixList={	it.BonusExpireTime, 
 						affixes>=2 and it.Bonus2 or 0, 
 						affixes>=3 and it.Charges%1000 or 0, 
-						affixes>=4 and round(it.Charges/1000) or 0, 
+						affixes>=4 and math.floor(it.Charges/1000) or 0,
 						["Power"]=it.MaxCharges}
 		math.randomseed(it.BonusExpireTime+it.Bonus2*10^3+it.Charges*10^6+it.MaxCharges*10^9+it.BonusStrength*10^12)
 

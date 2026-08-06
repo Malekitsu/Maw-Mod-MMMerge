@@ -161,7 +161,7 @@ function events.GameInitialized2()
 end
 
 --class ID
-seraphClass={53,54,55}
+--class id lists + the presentation dispatcher: MawCore/Classes.lua
 
 --2h swords in 1h
 function events.GameInitialized2()
@@ -597,7 +597,6 @@ function events.GameInitialized2()
 	Game.ClassDescriptions[59] = "The Shaman is a mystical warrior whose knowledge of magic enhances his martial prowess.\nYou can check following values by checking magic schools description in skills menu.\n - Each school will provide a unique bonus. There is strength in diversifying as well as specialization\n - Each point in Air will reduce damage a % pr rank reduced by level\n - Each point in Water will reduce damage by a flat number, making water better for weaker enemies, or if your defenses are already strong\n - Each point in spirit will increase healing and spell damage by a %\n - Fire will deal a % of current monster HP as fire damage, partially piercing this resistance. The bosskiller.\n - Each point in Earth will increase melee damage by a flat amount\n - Each point in Body will heal by flat amount\n - Each point in mind will restore a flat amount of mana"
 end
 
-shamanClass={59, 60, 61}
 
 function events.GameInitialized2()
 	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
@@ -635,7 +634,6 @@ end
 --death grip
 
 --runic power
-dkClass={56,57,58}
 spRegen={
 	[56]=10,
 	[57]=15,
@@ -935,7 +933,6 @@ end
 --ELEMENTALIST--
 ----------------
 
-elementalistClass={62,63,64}
 
 function events.GameInitialized2()
 	Game.ClassDescriptions[62] = "The Elementalist is the caster with the highest mana pool, who learns spells not from the book, but from casting spells of the same elemental school. He can't learn Ascension, but his ascension level is directly tied to the sum of the school levels divided by 4. Baseline spell recovery time is 50% higher; however, when he casts Magic, he gains stacks, which increase:\n\nSpell Damage: 10% per stack\nSpell Recovery Speed: 5% per stack\nMana Cost: 1 + 7.5% of the total.\n\nAfter a few seconds without casting, the stacks decay by 50%. Dealing damage with a bow, melee weapon, or from the spellbook will break concentration, instantly resetting all stacks.\n\nSpells are cast randomly but divided into three categories: Single Target, Area of Effect, and Shotgun. Depending on the chosen quick-cast spell, the rotation is adjusted accordingly. For example, setting Fireball as a quick-cast spell will automatically prioritize AoE spells."
@@ -1144,7 +1141,7 @@ function mawTick_ElementalistStacks()
 	end
 end
 
-local function elementalistSkills(isElementalist, id)
+function elementalistSkills(isElementalist, id)
 	if isElementalist then
 		local pl=Party[id]
 		vars.elementalistSpells=vars.elementalistSpells or {}
@@ -1158,25 +1155,7 @@ end
 
 
 function checkSkills(id)
-	dkSkills(false, id)
-	elementalistSkills(false, id)
-	assassinSkills(false)
-	adjustSpellTooltips()
-	if id>=0 and id<=Party.High then
-		local class=Party[id].Class
-		if table.find(dkClass, class) then
-			dkSkills(true, id)
-			return
-		end
-		if table.find(elementalistClass, class) then
-			elementalistSkills(true, id)
-			return
-		end
-		if table.find(assassinClass, class) then
-			assassinSkills(true, Party[id])
-			return
-		end
-	end
+	MawCore.Classes.present(id)
 end
 --[[test code
 function events.PlayerCastSpell(t)
@@ -1289,7 +1268,6 @@ end
 --ASSASSIN--
 ------------
 
-assassinClass={const.Class.Thief,const.Class.Rogue,const.Class.Assassin,const.Class.Spy}
 
 function events.GameInitialized2()
 	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)

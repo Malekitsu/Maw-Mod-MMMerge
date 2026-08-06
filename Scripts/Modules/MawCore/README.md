@@ -31,6 +31,7 @@ Load order inside the core is the `MawCore.ModuleOrder` list in
 | `Engine.lua` | the Tier-4 boundary: **only file allowed to use `mem.*`, raw addresses, struct offsets**; named address table + patch ledger |
 | `Fixes.lua` | port of `MAW_Fixes.dll` (skill-hint format, recovery floor 30→1, mm8.ini fix) so the DLL could be deleted |
 | `Formulas.lua` | single source for gameplay formulas that appear at an effect site AND a display site (leeches, regen rates, reduction %); pure value-in/value-out functions — effect code and tooltips both call these instead of keeping private copies |
+| `Classes.lua` | the custom class registry: class id lists (published as the legacy `dkClass`/`shamanClass`/… globals) + the presentation swap `checkSkills` runs; first batch of the zzClasses content port |
 | `Skills.lua` | port of `Skillz.dll`, stage 1: storage, engine GetSkill, bonus clamp, persistence, mastery tables, full `Skillz.*` API + legacy DLL bridge — **bridges to the DLL if `ExeMods/Skillz.dll` exists** |
 | `SkillTooltip.lua` | per-player skill tooltip text (`SKILL_TOOLTIPS.md`): `getTooltipText(pl, skillId)` + per-(skill, part) dynamic builders — replaces the legacy Tick handlers that rewrote the global desc store for the current player |
 | `SkillsUI.lua` | `Skillz.dll` stage 2: char-screen rows for extended skills, skill hints (text from `SkillTooltip`), house Learn-Skills integration (see `SKILLZ_PORT.md` engineering notes) |

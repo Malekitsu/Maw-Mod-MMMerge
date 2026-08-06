@@ -2937,22 +2937,24 @@ local function addWeaponACRes(pl, index, tab)
 				lifeLeech[index]["Spell"]=0.1
 			end
 
-			if vars.MAWSETTINGS.buffRework=="ON" and getBuffSkill(91)>0 then
-				lifeLeech[index]["Melee"]=lifeLeech[index]["Melee"]+0.05
-				lifeLeech[index]["Ranged"]=lifeLeech[index]["Ranged"]+0.025
-				lifeLeech[index]["Spell"]=lifeLeech[index]["Spell"]+0.025
-			end
-			local race=Game.CharacterPortraits[pl.Face].Race
-			if race==const.Race.Vampire then
-				local mult=1
-				if pl.Class==40 or pl.Class==41 then
-					mult=2
-				end
-				lifeLeech[index]["Melee"]=lifeLeech[index]["Melee"]+0.05*mult
-				lifeLeech[index]["Ranged"]=lifeLeech[index]["Ranged"]+0.025*mult
-				lifeLeech[index]["Spell"]=lifeLeech[index]["Spell"]+0.025*mult
-			end
 		end
+	end
+	--flat leech, once per player: these read nothing from the item, and the
+	--per-item enchants above ASSIGN, so inside the loop they both multiplied
+	--by weapon count and got partly overwritten by later slots
+	if vars.MAWSETTINGS.buffRework=="ON" and getBuffSkill(91)>0 then
+		lifeLeech[index]["Melee"]=lifeLeech[index]["Melee"]+0.05
+		lifeLeech[index]["Ranged"]=lifeLeech[index]["Ranged"]+0.025
+		lifeLeech[index]["Spell"]=lifeLeech[index]["Spell"]+0.025
+	end
+	if Game.CharacterPortraits[pl.Face].Race==const.Race.Vampire then
+		local mult=1
+		if pl.Class==40 or pl.Class==41 then
+			mult=2
+		end
+		lifeLeech[index]["Melee"]=lifeLeech[index]["Melee"]+0.05*mult
+		lifeLeech[index]["Ranged"]=lifeLeech[index]["Ranged"]+0.025*mult
+		lifeLeech[index]["Spell"]=lifeLeech[index]["Spell"]+0.025*mult
 	end
 end
 
