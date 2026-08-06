@@ -544,7 +544,16 @@ local mawSettings={
 local defaultSettings=mawSettings
 
 function events.MultiplayerInitialized()
-    local ScreenId = 111
+    --the MAW SETTINGS page is created by AdaptiveMonstersStats with an
+    --AUTO-ASSIGNED id (CustomUI.NewScreen counts up from 105 over every
+    --registered screen), so it is only 111 on an install with exactly our
+    --set of scripts. Look it up by name instead.
+    local ScreenId = const.Screens.BolsterFineTuning
+    if not ScreenId or not CustomUI.ActiveElements[ScreenId] then
+        debug.Message("MAW: settings page not registered -- incomplete or "
+            .. "mismatched installation; MAW settings will be unavailable.")
+        return
+    end
 	local mawSettingsButton={}
     local function createSwitch(Y, Header, Field, Options)
         mawSettingsButton[#mawSettingsButton + 1] = CustomSwitch(ScreenId, 120, Y, nil,
