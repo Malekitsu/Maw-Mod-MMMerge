@@ -50,10 +50,12 @@ ItemFields.Registry = {
 			.. "1-1000 artifact level, map affix id on map items (getUniqueAffix), "
 			.. "vanilla Game.Time expiry on unmodified temp-enchanted items",
 		note  = "read as a whole number everywhere -- see hazard 1. Tier/affix/"
-			.. "celestial accessors live in zMaw_ItemBits.lua (GetAncientTier, "
-			.. "IsAncientItem, IsPrimordialItem, HasLegendaryAffix, "
-			.. "GetLegendaryAffix, IsCelestialItem); artifact level, map affixes "
-			.. "and the vanilla expiry read the field directly"},
+			.. "celestial accessors live in zMaw_ItemBits.lua: read with "
+			.. "GetAncientTier / IsAncientItem / IsPrimordialItem / "
+			.. "HasLegendaryAffix / GetLegendaryAffix / IsCelestialItem, write "
+			.. "with SetAncientTier / SetLegendaryAffix / SetCelestialItem. "
+			.. "Artifact level, map affixes and the vanilla expiry read and "
+			.. "write the field directly"},
 }
 
 function ItemFields.describe()

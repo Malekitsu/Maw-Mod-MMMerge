@@ -962,17 +962,19 @@ evt.PotionEffects[97] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
 		if craftWaitTime>0 then return end
 		craftingItemUsed=true
-		if (t.BonusExpireTime>=100 and t.BonusExpireTime<1000 and Mouse.Item.BonusStrength==0) then
-			Mouse.Item.BonusStrength=t.BonusExpireTime%100
-			t.BonusExpireTime=100
-		elseif (t.BonusExpireTime>=10 and t.BonusExpireTime<100 and Mouse.Item.BonusStrength==0) then
-			Mouse.Item.BonusStrength=t.BonusExpireTime
-			t.BonusExpireTime=2
-		elseif Mouse.Item.BonusStrength>=10 and Mouse.Item.BonusStrength<1000 and t.BonusExpireTime>=100 then
-			t.BonusExpireTime=Mouse.Item.BonusStrength+100
-			Mouse.Item.Number=0
-		elseif Mouse.Item.BonusStrength>=10 and Mouse.Item.BonusStrength<1000 then
-			t.BonusExpireTime=Mouse.Item.BonusStrength
+		--the potion carries an extracted affix in its own BonusStrength
+		local stored=Mouse.Item.BonusStrength
+		if stored==0 and IsCelestialItem(t) then
+			--extract, leaving the item celestial without an affix
+			Mouse.Item.BonusStrength=GetLegendaryAffix(t)
+			SetLegendaryAffix(t,0)
+		elseif stored==0 and HasLegendaryAffix(t) then
+			--extract, dropping the item back to primordial
+			Mouse.Item.BonusStrength=GetLegendaryAffix(t)
+			SetAncientTier(t,2)
+		elseif stored>LEGENDARY_AFFIX_BASE and stored<1000 then
+			--imprint; the item's own celestial status is kept
+			SetLegendaryAffix(t,stored)
 			Mouse.Item.Number=0
 		else
 			return
@@ -987,11 +989,10 @@ evt.PotionEffects[98] = function(IsDrunk, t, Power)
 	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
 		if craftWaitTime>0 then return end
 		craftingItemUsed=true
-		if Mouse.Item.BonusStrength==1 and t.BonusExpireTime<100 then
-			t.BonusExpireTime=t.BonusExpireTime+100
+		--the potion carries the celestial status in its own BonusStrength
+		if Mouse.Item.BonusStrength==1 and SetCelestialItem(t,true) then
 			Mouse.Item.Number=0
-		elseif Mouse.Item.BonusStrength==0 and t.BonusExpireTime>=100 then
-			t.BonusExpireTime=t.BonusExpireTime-100
+		elseif Mouse.Item.BonusStrength==0 and SetCelestialItem(t,false) then
 			Mouse.Item.BonusStrength=1
 		else
 			Game.ShowStatusText("Invalid Item")

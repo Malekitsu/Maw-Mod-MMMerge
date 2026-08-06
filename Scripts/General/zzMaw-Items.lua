@@ -816,7 +816,7 @@ function events.ItemGenerated(t)
 			power=2
 			chargesBonus=math.random(1,5)
 			it.MaxCharges=it.MaxCharges+chargesBonus
-			it.BonusExpireTime=1
+			SetAncientTier(it,1)
 		end
 		--apply special enchant
 		if p3>rollSpc or ancient then
@@ -849,7 +849,7 @@ function events.ItemGenerated(t)
 			if ancient then
 				it.MaxCharges=it.MaxCharges-chargesBonus
 			end
-			it.BonusExpireTime=2
+			SetAncientTier(it,2)
 			local enc2Strength=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
 			enc2Strength=math.ceil(enc2Strength*difficultyExtraPower) --bolster
 			SetEnc2(it,math.random(1,16),enc2Strength)
@@ -908,9 +908,9 @@ function events.ItemGenerated(t)
 				end
 				legendaryAffix=get_affix(vars.legendaryAffixDropped)
 				vars.legendaryAffixDropped[legendaryAffix]=vars.legendaryAffixDropped[legendaryAffix]+1
-				it.BonusExpireTime=legendaryAffix+10
+				SetLegendaryAffix(it,legendaryAffix+LEGENDARY_AFFIX_BASE)
 				--adjust bonus 2 if enchant damage legendary
-				if it.BonusExpireTime==19 then
+				if GetLegendaryAffix(it)==19 then
 					if it.Bonus2==40 then
 						it.Bonus2=39
 					elseif it.Bonus2==41 then
@@ -955,7 +955,7 @@ function events.ItemGenerated(t)
 			end
 		end
 		--celestial
-		if it.BonusExpireTime>10 and it.BonusExpireTime<100 then
+		if HasLegendaryAffix(it) and not IsCelestialItem(it) then
 			vars.celestialPityCounter = vars.celestialPityCounter or 0
 			local baseChance=0.1
 			local chance = pity_chance(baseChance, vars.celestialPityCounter)
@@ -963,7 +963,7 @@ function events.ItemGenerated(t)
 			
 			
 			if math.random()<chance or OmnipotentLoot then
-				it.BonusExpireTime=it.BonusExpireTime+100
+				SetCelestialItem(it,true)
 				if not OmnipotentLoot then
 					vars.celestialPityCounter = 0
 				end
@@ -1109,16 +1109,12 @@ function events.ItemGenerated(t)
 		end
 		if higherLootPowerRange then
 			local minValue=0
-			local itemType=it.BonusExpireTime
-			if itemType==1 then
-				minValue=0.3
-			elseif itemType==2 then
-				minValue=0.3
-			elseif itemType>=10 and itemType<100 then
-				minValue=0.3
-			elseif itemType>=100 and itemType<200 then
+			--celestial first: HasLegendaryAffix also covers the celestial band
+			if IsCelestialItem(it) then
 				it.MaxCharges=math.min(it.MaxCharges*1.5,255)
 				return
+			elseif GetAncientTier(it)>0 or HasLegendaryAffix(it) then
+				minValue=0.3
 			end
 			
 			it.BonusStrength=math.random(1+it.BonusStrength*minValue,it.BonusStrength)
@@ -2939,9 +2935,6 @@ local function addWeaponACRes(pl, index, tab)
 
 		end
 	end
-	--flat leech, once per player: these read nothing from the item, and the
-	--per-item enchants above ASSIGN, so inside the loop they both multiplied
-	--by weapon count and got partly overwritten by later slots
 	if vars.MAWSETTINGS.buffRework=="ON" and getBuffSkill(91)>0 then
 		lifeLeech[index]["Melee"]=lifeLeech[index]["Melee"]+0.05
 		lifeLeech[index]["Ranged"]=lifeLeech[index]["Ranged"]+0.025

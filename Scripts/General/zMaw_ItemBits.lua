@@ -79,7 +79,15 @@ end
 -- BonusExpireTime -- item tier / legendary affix / celestial. The field
 -- carries other meanings per item class (artifact level, map affix,
 -- vanilla expiry) which read it directly: NOTES.md, ItemFields.lua.
+--
+--   0        nothing        1  ancient        2  primordial
+--   11-35    legendary affix (rolled 1-25 + LEGENDARY_AFFIX_BASE, the
+--            same ids legendaryEffects is keyed by)
+--   +100     celestial (exactly 100 = celestial with no affix)
 ------------------------------------------------------------------------
+
+LEGENDARY_AFFIX_BASE = 10
+CELESTIAL_OFFSET = 100
 
 -- Ancient (1) / primordial (2) weapon tier; 0 for everything else.
 function GetAncientTier(it)
@@ -102,18 +110,47 @@ end
 -- legacy gate is ">10 and <1000".
 function HasLegendaryAffix(it)
 	local v = it.BonusExpireTime
-	return v > 10 and v < 1000
+	return v > LEGENDARY_AFFIX_BASE and v < 1000
 end
 
 -- The affix id (11-35) with the celestial hundred stripped; 0 if none.
 function GetLegendaryAffix(it)
 	if HasLegendaryAffix(it) then
-		return it.BonusExpireTime % 100
+		return it.BonusExpireTime % CELESTIAL_OFFSET
 	end
 	return 0
 end
 
 function IsCelestialItem(it)
 	local v = it.BonusExpireTime
-	return v >= 100 and v < 200
+	return v >= CELESTIAL_OFFSET and v < CELESTIAL_OFFSET * 2
+end
+
+-- Ancient (1) / primordial (2); any other value clears the field.
+function SetAncientTier(it, tier)
+	it.BonusExpireTime = (tier == 1 or tier == 2) and tier or 0
+end
+
+-- Writes a stored affix id (11-35); 0 removes the affix. Whatever tier the
+-- item carried is replaced, the celestial hundred is kept.
+function SetLegendaryAffix(it, affix)
+	affix = (affix and affix > 0) and affix % CELESTIAL_OFFSET or 0
+	it.BonusExpireTime = (IsCelestialItem(it) and CELESTIAL_OFFSET or 0) + affix
+end
+
+-- Adds/removes the celestial hundred, keeping the tier or affix underneath.
+-- Returns false (item untouched) when the item is not in a state for it.
+function SetCelestialItem(it, on)
+	if on then
+		if it.BonusExpireTime >= CELESTIAL_OFFSET then
+			return false
+		end
+		it.BonusExpireTime = it.BonusExpireTime + CELESTIAL_OFFSET
+	else
+		if not IsCelestialItem(it) then
+			return false
+		end
+		it.BonusExpireTime = it.BonusExpireTime - CELESTIAL_OFFSET
+	end
+	return true
 end
