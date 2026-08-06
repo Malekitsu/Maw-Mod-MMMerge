@@ -373,63 +373,10 @@ function events.GameInitialized2()
 	
 	Skillz.setDesc(23,1,"Dragons are powerful creatures with innate abilities.\nLike the racial abilities of Dark Elves and Vampires, Dragon abilities are cast like spells, but are acquired like skills. Dragons begin able to cast Fear, the gain a second breath weapon, Flight and Wing Bugget at expert, master and grandmaster rankings.\n\nBreath damage is 20 + 2 per level (up to level 600, or 900 in madness) and total damage is increased by " .. dragonBreath.Damage[1] .. "-" .. dragonBreath.Damage[2] .. "-" .. dragonBreath.Damage[3] .. "-" .. dragonBreath.Damage[4] .. "% at novice, expert, master and grandmaster rankings per point of skill in Dragon Ability.\nEach point in the skill increases damage and increases recovery time by 3%."  )
 	
-	function events.CalcStatBonusByItems(t)
-		if Game.CharacterPortraits[t.Player.Face].Race~=const.Race.Dragon then return end
-		--melee
-		if t.Stat==27 then --min damage
-			t.Result=dragonFangDamage(t.Player, 0.75)
-		elseif t.Stat==28 then --max damage
-			t.Result=dragonFangDamage(t.Player, 1.25)
-		elseif t.Stat==25 then --attack
-			local pl=t.Player
-			local s, m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
-			local bonus= (dragonFang.Attack[m]) * s +10
-			t.Result=t.Result+bonus 
-			
-		end
-		--breath
-		if t.Stat==31 then --min damage
-			t.Result=dragonBreathDamage(t.Player, 0.75)
-		elseif t.Stat==32 then --max damage
-			t.Result=dragonBreathDamage(t.Player, 1.25)
-
-		--AC
-		elseif t.Stat==9 then
-			local pl=t.Player
-			local s, m = SplitSkill(pl:GetSkill(const.Skills.Dodging))
-			local oldDodge=skillAC[const.Skills.Dodging][m] or 0
-			local bonus= (1 + dragonScales.AC[m]/100 * s) * (dragonEffLevel(pl)+40) - (s * oldDodge)
-			t.Result=t.Result+bonus
-		elseif t.Stat>=10 and t.Stat<=15 then
-			local pl=t.Player
-			local s, m = SplitSkill(pl:GetSkill(const.Skills.Dodging))
-			local bonus= (dragonScales.Resistances[m]/100 * s) * (dragonEffLevel(pl)+40)
-			t.Result=t.Result+bonus
-		end
-		
-		--no mana from items
-		if t.Stat==const.Stats.SpellPoints then
-			t.Result=0
-		end
-	end
+	--moved to MawCore/Classes.lua (registered from Classes.start, still after everything)
 	
-	function events.GetAttackDelay(t)
-		if Game.CharacterPortraits[t.Player.Face].Race==const.Race.Dragon then
-			if useBreathCooldown or t.Ranged then
-				local s, m = SplitSkill(t.Player:GetSkill(const.Skills.DragonAbility))
-				t.Result=t.Result * (1+dragonRecoveryPerSkill*s)
-				useBreathCooldown=false
-			else
-				local s, m = SplitSkill(t.Player:GetSkill(const.Skills.Unarmed))
-				t.Result=t.Result * (1+dragonRecoveryPerSkill*s)
-			end
-		end	
-	end
-	function events.PlaySound(t)
-		if t.Sound==18080 then
-			useBreathCooldown=true
-		end
-	end
+	--moved to MawCore/Classes.lua (registered from Classes.start, still after everything)
+	--moved to MawCore/Classes.lua (registered from Classes.start, still after everything)
 	--skill text: one row per mastery from the dragonFang/dragonScales tables
 	local function fangRow(m)
 		return string.format("      %s|     %s|",dragonFang.Attack[m],dragonFang.Damage[m])
@@ -634,143 +581,26 @@ end
 --death grip
 
 --runic power
-spRegen={
-	[56]=10,
-	[57]=15,
-	[58]=20,
-}
+--moved to MawCore/Classes.lua (per-class data)
 
 --change spell cost to personalized value:
-local DKManaCost={
-	[26]=15,
-	[27]=0,
-	[29]=30,
-	[32]=50,
-	[68]=6,
-	[71]=0,
-	[76]=70,
-	[74]=12,
-	[91]=0,
-	[90]=30,
-	[96]=15,
-	[97]=100,
-}
+--moved to MawCore/Classes.lua (the class presentation registry)
 
--- global since the damage pipeline migration (DAMAGE_PIPELINE.md)
-DKDamageMult={
-	[26]={1,1,1.2,1.2,["Skill"]=14},
-	[29]={1.5,1.5,1.5,2,["Skill"]=14},
-	[32]={0.75,0.75,0.75,0.75,["Skill"]=14},
-	[76]={1.1,1.1,1.1,1.4,["Skill"]=18},
-	[90]={1,1,1,1.2,["Skill"]=20},
-	[97]={0.6,0.6,0.6,0.6,["Skill"]=20},
-}
+--moved to MawCore/Classes.lua (per-class data)
 
 --spells
-function events.GameInitialized2()
-	function events.CalcStatBonusByItems(t)
-		--[[damage from skills 
-		if t.Stat==const.Stats.MeleeDamageMax or t.Stat==const.Stats.MeleeDamageMin then
-			if table.find(dkClass, t.Player.Class) then	
-				local s1, m1=SplitSkill(t.Player.Skills[const.Skills.Water])
-				--local s2, m2=SplitSkill(t.Player.Skills[const.Skills.Body])
-				local s3, m3=SplitSkill(t.Player.Skills[const.Skills.Dark])
-				local might=t.Player:GetMight()
-				local bonus=s1*math.min(m1, 3)+s3*math.min(m3, 3)
-				bonus=bonus*(1+might/1000)
-				t.Result=t.Result+s1*math.min(m1, 3)+s3*math.min(m3, 3)
-			end
-		end
-		MOVED IN MAW ITEMS, DUE TO WEAPON SCALING]]
-			
-		if t.Stat==const.Stats.SpellPoints and table.find(dkClass, t.Player.Class) then
-			t.Result=0
-		end
-	end	
-	--body leech damage
-	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
-	
-	function events.Action(t)
-		if (t.Action==142 and t.Param==68) or (t.Action==142 and t.Param==74) or (t.Action==142 and t.Param==96) then
-			if table.find(dkClass, Party[Game.CurrentPlayer].Class) then
-				t.Handled=true
-				vars.dkActiveAttackSpell=vars.dkActiveAttackSpell or {}
-				local id=Party[Game.CurrentPlayer]:GetIndex()
-				if vars.dkActiveAttackSpell[id]==t.Param then
-					vars.dkActiveAttackSpell[id]=false
-					Game.ShowStatusText(Game.SpellsTxt[t.Param].Name .. " on attack disabled")
-				else
-					Game.ShowStatusText(Game.SpellsTxt[t.Param].Name .. " on attack activated")
-					vars.dkActiveAttackSpell[id]=t.Param
-				end
-			end
-		end
-		--same for quickcast
-		if t.Action==25 and Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High and table.find(dkClass, Party[Game.CurrentPlayer].Class) then
-			local pl=Party[Game.CurrentPlayer]
-			local id=pl:GetIndex()
-			if pl.QuickSpell==68 or pl.QuickSpell==74 or pl.QuickSpell==96 then
-				t.Handled=true
-				vars.dkActiveAttackSpell=vars.dkActiveAttackSpell or {}
-				local id=Party[Game.CurrentPlayer]:GetIndex()
-				if vars.dkActiveAttackSpell[id]==t.Param then
-					vars.dkActiveAttackSpell[id]=false
-					Game.ShowStatusText(Game.SpellsTxt[pl.QuickSpell].Name .. " on attack disabled")
-				else
-					Game.ShowStatusText(Game.SpellsTxt[pl.QuickSpell].Name .. " on attack activated")
-					vars.dkActiveAttackSpell[id]=t.Param
-				end
-			end
-		end
-	end
-	
-	--spells speed depends on weapon
-	function events.PlayerCastSpell(t)
-		if table.find(dkClass, t.Player.Class) then
-			local spell=t.SpellId
-			local m=t.Mastery
-			Game.Spells[spell]["Delay" .. masteryName[m]]=t.Player:GetAttackDelay()
-			if t.SpellId==68 or t.SpellId==74 then
-				t.Handled=true
-			end
-		end
-	end
-end
+--DK engine-event handlers moved to MawCore/Classes.lua (registered from Classes.start, still after everything)
 
-DKSpellList={
-	[const.Skills.Water]={26, 27, 29, 32},
-	[const.Skills.Body]={68, 71, 76, 74},
-	[const.Skills.Dark]={91, 90, 96, 97},
-}
+--moved to MawCore/Classes.lua (per-class data)
 
+--body: MawCore/Classes.lua; registration kept here for handler order
 function events.Action(t)
-	if t.Action==105 and Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
-		
-		pl=Party[Game.CurrentPlayer]
-		if table.find(dkClass, pl.Class) then
-			for i=1,99 do
-				pl.Spells[i]=false
-			end
-			local s1, m1=SplitSkill(pl.Skills[const.Skills.Water])
-			local s2, m2=SplitSkill(pl.Skills[const.Skills.Body])
-			local s3, m3=SplitSkill(pl.Skills[const.Skills.Dark])
-			for i=1, m1 do
-				pl.Spells[DKSpellList[const.Skills.Water][i]]=true
-			end
-			for i=1, m2 do
-				pl.Spells[DKSpellList[const.Skills.Body][i]]=true
-			end
-			for i=1, m3 do
-				pl.Spells[DKSpellList[const.Skills.Dark][i]]=true
-			end
-		end
-	end
+	MawCore.Classes.dkSpellbook(t)
 end
 
+--body: MawCore/Classes.lua; registration kept here for handler order
 function events.CanLearnSpell(t)
-	if table.find(dkClass, t.Player.Class) then
-		t.NeedMastery = 5
-	end
+	MawCore.Classes.dkLearnSpell(t)
 end
 
 
@@ -793,105 +623,7 @@ function events.GameInitialized2()
 	end
 end
 
-function dkSkills(isDK, id)
-	if isDK then
-		local pl=Party[id]
-		for key, value in pairs(DKManaCost) do
-			for i=1,4 do
-				Game.Spells[key]["SpellPoints" .. masteryName[i]]=value
-			end
-		end
-		
-		-- Spell 26: Icy Touch
-		local mult26 = DKDamageMult[26]
-		Game.SpellsTxt[26].Name="Icy Touch"
-		Game.SpellsTxt[26].Description="This spell is exclusive to Death Knights and deals damage equal to " .. (mult26[1]*100) .. "% of current weapon damage."
-		Game.SpellsTxt[26].Normal="Deals damage equal to " .. (mult26[1]*100) .. "% of Melee damage"
-		Game.SpellsTxt[26].Expert="Monster slows by 1/2 of speed"
-		Game.SpellsTxt[26].Master="Damage Increased to " .. (mult26[3]*100) .. "%"
-		Game.SpellsTxt[26].GM="Monster slows by 1/4 of speed"
-		
-		-- Spell 29: Frostbite
-		local mult29 = DKDamageMult[29]
-		Game.SpellsTxt[29].Name="Frostbite"
-		Game.SpellsTxt[29].Description="This is the strongest single damage spell available to death knights and deals damage equal to " .. (mult29[1]*100) .. "% of current weapon damage."
-		Game.SpellsTxt[29].Expert="n/a"
-		Game.SpellsTxt[29].Master="Deals damage equal to " .. (mult29[3]*100) .. "% of Melee damage"
-		Game.SpellsTxt[29].GM="Deals damage equal to " .. (mult29[4]*100) .. "% of Melee damage"
-		
-		-- Spell 32: Ice Bomb
-		local mult32 = DKDamageMult[32]
-		Game.SpellsTxt[32].Name="Ice Bomb"
-		Game.SpellsTxt[32].Description="Throw an ice bomb that shatters upon hitting something, most effective versus big foes or multiple enemies.\nDeals damage equal to " .. (mult32[1]*100) .. "% of current weapon damage."
-		Game.SpellsTxt[32].Expert="n/a"
-		Game.SpellsTxt[32].Master="n/a"
-		Game.SpellsTxt[32].GM="Each hit deals damage equal to " .. (mult32[4]*100) .. "% of Melee damage"
-		
-		
-		
-		local bloodS, bloodM=SplitSkill(pl.Skills[const.Skills.Body])
-		
-		local FHP=pl:GetFullHP()
-		local leech=MawCore.Formulas.bloodLeech
-		Game.SpellsTxt[68].Name="Blood Leech"
-		Game.SpellsTxt[68].Description="Activating this spell imbues the knight body with blood, leeching life upon attacking at the cost of 6 spell points."
-		Game.SpellsTxt[68].Normal="Leeches " .. round(leech(FHP, bloodS, 1)) .. " Hit Points"
-		Game.SpellsTxt[68].Expert="Leeches " .. round(leech(FHP, bloodS, 2)) .. " Hit Points"
-		Game.SpellsTxt[68].Master="Leeches " .. round(leech(FHP, bloodS, 3)) .. " Hit Points"
-		Game.SpellsTxt[68].GM="Leeches " .. round(leech(FHP, bloodS, 4)) .. " Hit Points"
-		
-		-- Spell 74: Superior Blood Leech
-		Game.SpellsTxt[74].Name="Superior Blood Leech"
-		Game.SpellsTxt[74].Description="Activating this spell imbues the knight essence with blood, leeching a superior amount of life upon attacking at the cost of 12 spell points."
-		Game.SpellsTxt[74].Master="n/a"
-		Game.SpellsTxt[74].GM="Leeches " .. round(leech(FHP, bloodS, 4) * 2) .. " Hit Points"
-		
-		-- Spell 76: Asphyxiate (no entry in DKDamageMult, but description mentions 110% and 140%)
-		local mult76= DKDamageMult[76]
-		Game.SpellsTxt[76].Name="Asphyxiate"
-		Game.SpellsTxt[76].Description="Asphyxiate the target deal damage equal to " .. (mult76[3]*100) .. "% and making him unable to act for 4 seconds"
-		Game.SpellsTxt[76].Master="No additional effects"
-		Game.SpellsTxt[76].GM="Damage increased to " .. (mult76[4]*100) .. "%"
-		
-		-- Spell 90: Death Coil
-		local mult90 = DKDamageMult[90]
-		Game.SpellsTxt[90].Name="Death Coil"
-		Game.SpellsTxt[90].Description="A deadly spell capable to heal the caster upon hitting the target by an amount equal to double the Life leech enchant. Deals damage equal to " .. (mult90[1]*100) .. "% of the base weapon damage"
-		Game.SpellsTxt[90].Normal="N/A"
-		Game.SpellsTxt[90].Expert="Deals damage equal to " .. (mult90[2]*100) .. "%"
-		Game.SpellsTxt[90].Master="Leech amount increased by 50%"
-		Game.SpellsTxt[90].GM="Damage increased to " .. (mult90[4]*100) .. "%"
-		
-		Game.SpellsTxt[96].Name="Death Grasp"
-		Game.SpellsTxt[96].Description="Activating this spell imbues the knight body with dark powers, empairing oppenents powers (damage halved) upon attacking 15 spell points."
-		Game.SpellsTxt[96].Expert="n/a"
-		Game.SpellsTxt[96].Master="No additional effects"
-		Game.SpellsTxt[96].GM="Monster looses the ability to deal ranged damage"
-		
-		-- Spell 97: Death Breath
-		local mult97 = DKDamageMult[97]
-		Game.SpellsTxt[97].Name="Death Breath"
-		Game.SpellsTxt[97].Description="A lethal explosion dealing huge damage to all monsters in the area. Can be used safely also in close combat.\nDeals damage equal to " .. (mult97[1]*100) .. "% of weapon damage"
-		Game.SpellsTxt[97].Expert="n/a"
-		Game.SpellsTxt[97].Master="n/a"
-		Game.SpellsTxt[97].GM="This spell is as good as it will ever be!"
-		
-		--skill names and desc
-		
-		Skillz.setName(14, "Frost")
-		Skillz.setName(18, "Blood")
-		Skillz.setName(20, "Unholy")
-	else
-		for key, value in pairs(spellDesc) do
-			for key2, value2 in pairs(value) do
-				Game.SpellsTxt[key][key2]=value2
-			end
-		end
-		Skillz.setName(14, "Water Magic")
-		Skillz.setName(18, "Body Magic")
-		Skillz.setName(20, "Dark Magic")
-	end
-end
+--moved to MawCore/Classes.lua (the class presentation registry)
 
 
 --[[add tooltips
@@ -939,179 +671,46 @@ function events.GameInitialized2()
 	Game.Classes.HPFactor[63]=2.5
 end
 
+--body: MawCore/Classes.lua; registration kept here for handler order
 function events.CanLearnSpell(t)
-	if table.find(elementalistClass, t.Player.Class) then
-		t.NeedMastery = 5
-		Game.ShowStatusText("Elementalists learn their spells through practice")
-	end
+	MawCore.Classes.eleLearnSpell(t)
 end
 
-spellRequirements={0,0,500,1500,5000,10000,20000,40000,80000,160000,320000}
+--moved to MawCore/Classes.lua (per-class data)
 -- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
-eleOffSpellsOut={2,6,7,9,11,
-				15,18,20,22,
-				24,26,29,32,
-				37,39,41,43,44}
-eleOffSpellsIn={2,6,7,10,11,
-				15,18,20,
-				24,26,29,32,
-				37,39,41,44}
+--moved to MawCore/Classes.lua (per-class data)
 
+--body: MawCore/Classes.lua; registration kept here for handler order
 function events.Action(t)
-	if t.Action==105 then
-		if Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
-			local pl=Party[Game.CurrentPlayer]
-			if table.find(elementalistClass, pl.Class) then
-				pl.Spells[2]=true
-				pl.Spells[15]=true
-				pl.Spells[24]=true
-				pl.Spells[37]=true
-			end
-		end
-	end
+	MawCore.Classes.eleSpellbook(t)
 end
 
 
+--body: MawCore/Classes.lua; registration kept here for handler order
 function events.PlayerCastSpell(t)
-	if vars.disableRotation and vars.disableRotation[t.PlayerIndex] then
-		return
-	end
-	if table.find(elementalistClass, t.Player.Class) and (table.find(eleOffSpellsOut, t.SpellId) or table.find(eleOffSpellsIn, t.SpellId)) and vars.elementalistSpellBinds then
-		local pl=t.Player
-		local index=t.PlayerIndex
-		local spell=t.SpellId
-		for i=1,6 do
-			if i<=4 and ExtraQuickSpells.SpellSlots then
-				if ExtraQuickSpells.SpellSlots[index][i]==spell then
-					ExtraQuickSpells.SpellSlots[index][i]=elementalistRandomizer(pl, vars.elementalistSpellBinds[index][i])
-				end
-			elseif i==5 then
-				if pl.AttackSpell==spell then
-					pl.AttackSpell=elementalistRandomizer(pl, vars.elementalistSpellBinds[index][i])
-				end
-			elseif i==6 then
-				if pl.QuickSpell==spell then
-					pl.QuickSpell=elementalistRandomizer(pl, vars.elementalistSpellBinds[index][i])
-				end
-			end
-		end
-		vars.eleTimer=vars.eleTimer or {}
-		vars.eleTimer[index]=Game.Time+math.max(getSpellDelay(pl,spell)*4, 128)
-		vars.eleStacks=vars.eleStacks or {}
-		vars.eleStacks[index]=vars.eleStacks[index] or 0
-		vars.eleStacks[index]=vars.eleStacks[index]+1
-		vars.eleTimer=vars.eleTimer or {}
-	end
+	MawCore.Classes.eleCastRotation(t)
 end
 
-function elementalistStacksDecay()
-	for i=0,Party.High do
-		local pl=Party[i]
-		if table.find(elementalistClass, pl.Class) then
-			local id=pl:GetIndex()
-			vars.eleStacks=vars.eleStacks or {}
-			vars.eleStacks[id]=vars.eleStacks[id] or 0
-			vars.eleTimer=vars.eleTimer or {}
-			vars.eleTimer[id]=vars.eleTimer[id] or Game.Time
-			if Game.Time>vars.eleTimer[id] then
-				vars.eleTimer[id]=Game.Time+const.Minute/2
-				vars.eleStacks[id]=math.max(math.floor(vars.eleStacks[id]*0.5),0)
-			end
-		end	
-	end
-end
+--moved to MawCore/Classes.lua (per-class runtime)
 
 
 -- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
-singleTarget={2,11,20,26,29,37,39}
-shotGun={2,15,24,37}
-aoeIn={6,10,18,32,41}
-aoeOut={6,9,18,22,32,41,43}
+--moved to MawCore/Classes.lua (per-class data)
 
-function elementalistRandomizer(pl, spellType)
-	local possibleSpells={}
-	if spellType=="single" then
-		for i=1,#singleTarget do
-			if pl.Spells[singleTarget[i]] then
-				table.insert(possibleSpells, singleTarget[i])
-			end
-		end
-	elseif spellType=="shotgun" then
-		for i=1,#shotGun do
-			if pl.Spells[shotGun[i]] then
-				table.insert(possibleSpells, shotGun[i])
-			end
-		end
-	elseif spellType=="aoe" and Map.IsIndoor() then
-		for i=1,#aoeIn do
-			if pl.Spells[aoeIn[i]] then
-				table.insert(possibleSpells, aoeIn[i])
-			end
-		end
-	elseif spellType=="aoe" then
-		for i=1,#aoeOut do
-			if pl.Spells[aoeOut[i]] then
-				table.insert(possibleSpells, aoeOut[i])
-			end
-		end
-	end
-	if #possibleSpells>=1 then
-		return possibleSpells[math.random(1,#possibleSpells)]
-	else
-		return false
-	end
-end
+--moved to MawCore/Classes.lua (per-class runtime)
 
 --reset stacks when casting from spellbook
+--body: MawCore/Classes.lua; registration kept here for handler order
 function events.Action(t)
-	if t.Action==142 then
-		local id=Game.CurrentPlayer
-		if id>=0 and id<=Party.High then
-			if table.find(elementalistClass,Party[id].Class) then
-				if table.find(eleOffSpellsOut,t.Param) or table.find(eleOffSpellsIn,t.Param) then
-					vars.eleStacks=vars.eleStacks or {}
-					vars.eleStacks[Party[id]:GetIndex()]=0
-				end
-			end
-		end
-	end
+	MawCore.Classes.eleBindQuick(t)
 end
 
 --set current keybind by keybindrotation
+--body: MawCore/Classes.lua; registration kept here for handler order
 function events.Action(t)
-	if Game.CurrentScreen==8 and t.Action==113 then
-		local id=Game.CurrentPlayer
-		if id>=0 and id<=Party.High then
-			local pl=Party[id]
-			local index=pl:GetIndex()
-			if table.find(elementalistClass,pl.Class) then
-				for i=1,6 do
-					local spell=0
-					if i<=4 and ExtraQuickSpells.SpellSlots then
-						spell=ExtraQuickSpells.SpellSlots[index][i]
-					elseif i==5 then
-						spell=pl.AttackSpell
-					elseif i==6 then
-						spell=pl.QuickSpell
-					end
-					
-					vars.elementalistSpellBinds=vars.elementalistSpellBinds or {}
-					vars.elementalistSpellBinds[index]=vars.elementalistSpellBinds[index] or {}
-					if table.find(singleTarget,spell) then
-						vars.elementalistSpellBinds[index][i]="single"
-					elseif table.find(shotGun,spell) then
-						vars.elementalistSpellBinds[index][i]="shotgun"
-					elseif table.find(aoeIn,spell) or table.find(aoeOut,spell) then
-						vars.elementalistSpellBinds[index][i]="aoe"
-					else
-						vars.elementalistSpellBinds[index][i]=false					
-					end
-				end
-			end
-		end
-	end
+	MawCore.Classes.eleBindScreen(t)
 end
 
 --show stacks
@@ -1127,31 +726,9 @@ function events.GameInitialized2()
 	end
 end
 
-function mawTick_ElementalistStacks()
-	for i=0,Party.High do
-		local pl=Party[i]
-		if table.find(elementalistClass,pl.Class) then
-			local id=pl:GetIndex()
-			vars.eleStacks=vars.eleStacks or {}
-			vars.eleStacks[id]=vars.eleStacks[id] or 0
-			elementalistStacks[i].Text=string.format(vars.eleStacks[id])
-		else
-			elementalistStacks[i].Text=""
-		end
-	end
-end
+--moved to MawCore/Classes.lua (per-class runtime)
 
-function elementalistSkills(isElementalist, id)
-	if isElementalist then
-		local pl=Party[id]
-		vars.elementalistSpells=vars.elementalistSpells or {}
-		vars.elementalistSpells[pl:GetIndex()]=vars.elementalistSpells[pl:GetIndex()] or {}
-		for i=12,15 do
-			vars.elementalistSpells[pl:GetIndex()][i]=vars.elementalistSpells[pl:GetIndex()][i] or 0
-		end
-	end
-	-- school progression tooltips (12-15 part 5) moved to SkillTooltip builders (SKILL_TOOLTIPS.md)
-end
+--moved to MawCore/Classes.lua (the class presentation registry)
 
 
 function checkSkills(id)
@@ -1275,202 +852,20 @@ function events.GameInitialized2()
 end
 
 
-function assassinationDamage(pl,mon,obj)
-	local id=pl:GetIndex()
-	vars.assassinDamage=vars.assassinDamage or {}
-	vars.assassinDamage[id]=vars.assassinDamage[id] or 0
-	vars.assassinStacks=vars.assassinStacks or {}
-	vars.assassinStacks[id]=vars.assassinStacks[id] or 0
-	
-	local s,m=SplitSkill(pl:GetSkill(const.Skills.Fire))
-	local restoreChance=0.1+s*0.01
-	local manaCost=50-m*5
-	
-	if obj and obj.Spell>0 and obj.Spell<100 then
-		restoreChance=0
-		manaCost=0
-	end
-	
-	if obj then
-		restoreChance=restoreChance/2
-		manaCost=manaCost/2
-	end
-	if restoreChance>math.random() then
-		pl.SP=math.min(pl:GetFullSP(),pl.SP+15)
-	end
-	RunNextTick(function()
-		if mon.HP<=0 then
-			s,m=SplitSkill(pl:GetSkill(const.Skills.Air))
-			local fullSP=pl:GetFullSP()
-			pl.SP=math.min(fullSP, pl.SP+(1+m)*5)
-			vars.assassinStacks[id]=math.min(vars.assassinStacks[id]+1,5)
-		end
-	end)
-	if pl.SP>=manaCost and mon.ShowAsHostile then
-		if obj and obj.Spell>100 then
-			vars.assassinStacks[id]=math.min(vars.assassinStacks[id]+0.5,5)--arrow nerf
-			vars.AttackSpeedStack=vars.AttackSpeedStack or {}
-			vars.AttackSpeedStack[id]=vars.AttackSpeedStack[id] or 0
-			vars.AttackSpeedStack[id]=math.min(vars.AttackSpeedStack[id] + 0.5, 5)
-			vars.AttackSpeedStackDecay=vars.AttackSpeedStackDecay or {}
-			vars.AttackSpeedStackDecay[id]=vars.AttackSpeedStackDecay[id] or {}
-			vars.AttackSpeedStackDecay[id]=Game.Time+const.Minute*4
-		elseif not obj then
-			vars.assassinStacks[id]=math.min(vars.assassinStacks[id]+1,5)
-			vars.AttackSpeedStack=vars.AttackSpeedStack or {}
-			vars.AttackSpeedStack[id]=vars.AttackSpeedStack[id] or 0
-			vars.AttackSpeedStack[id]=math.min(vars.AttackSpeedStack[id] + 1, 5)
-			vars.AttackSpeedStackDecay=vars.AttackSpeedStackDecay or {}
-			vars.AttackSpeedStackDecay[id]=vars.AttackSpeedStackDecay[id] or {}
-			vars.AttackSpeedStackDecay[id]=Game.Time+const.Minute*4
-		end
-		local damage=vars.assassinDamage[id]
-		local monsters=0
-		for i=0,Map.Monsters.High do
-			local mapMon=Map.Monsters[i]
-			if mapMon.AIState~=11 and mapMon.AIState~=5 and getDistances(mon,mapMon)<384 then
-				monsters=monsters+1
-			end
-		end
-		local damageMult=math.min(0.8,(monsters-1)*0.2)
-		if obj then
-			damage=damage/2
-		end
-		pl.SP=pl.SP-manaCost
-		
-		damage=damage*damageMult
-		return damage
-	end
-	return vars.assassinDamage[id]	
-end
+--moved to MawCore/Classes.lua (per-class runtime)
 
-function assassinSkills(isAssassin, pl)
-	if isAssassin then
-		if pl then
-			for key, value in pairs(assassinSpells) do
-				local id=pl:GetIndex()
-				if vars.assassinStacks[id]<assassinSpells[key].StackCost then
-					for i=1,4 do
-						Game.Spells[key]["SpellPoints" .. masteryName[i]]=1000
-					end
-				else
-					for i=1,4 do
-						Game.Spells[key]["SpellPoints" .. masteryName[i]]=assassinSpells[key].Cost
-					end
-				end
-			end
-		end
-		--skill names and desc
-		
-		Skillz.setName(12, "Combat")
-		Skillz.setName(13, "Subtlety")
-		Skillz.setName(14, "Poisons")
-		Skillz.setName(15, "Assassination")
-		
-		Game.SpellsTxt[6].Description=string.format("Fires a ball of fire at a single target. When it hits, the ball explodes damaging all those nearby, including your characters if they're too close.  Fireball does %s%% of a melee attack damage.",assassinSpells[6].DamageMult*100)
-		Game.SpellsTxt[7].Description=string.format("Drops a Fire Spike on the ground that waits for a creature to get near it before exploding.  Fire Spikes last until you leave the map or they are triggered. Fire Spike does %s%% of a melee attack damage.",assassinSpells[7].DamageMult*100)
-		Game.SpellsTxt[18].Description=string.format("Lightning Bolt discharges electricity from the caster's hand to a single target.  It always hits and does %s%% of a melee attack damage.\n\nThe spell then arcs to a second target, hitting it as well.",assassinSpells[18].DamageMult*100)
-		Game.SpellsTxt[24].Description=string.format("Sprays poison at monsters directly in front of your characters.  Damage is low, but few monsters have resistance to Water Magic, so it usually works.  Each shot does %s%% of a melee attack damage.",assassinSpells[24].DamageMult*100)
-		Game.SpellsTxt[29].Description=string.format("Acid burst squirts a jet of extremely caustic acid at a single victim.  It always hits and does %s%% of a melee attack damage.",assassinSpells[29].DamageMult*100)
-		Game.SpellsTxt[34].Description=string.format("Slaps a monster with magical force, forcing it to recover from the stun spell before it can do anything else.  Stun also knocks monsters back a little, giving you a chance to get away while the getting is good.  The greater your skill in Earth Magic, the greater the effect of the spell. Stun does %s%% of a melee attack damage.",assassinSpells[34].DamageMult*100)
-		Game.SpellsTxt[39].Description=string.format("Fires a rotating, razor-thin metal blade at a single monster.  The blade does %s%% of a melee attack damage.\n\nBlades is the only spell capable to deal Physical damage.",assassinSpells[39].DamageMult*100)
-		Game.SpellsTxt[44].Description=string.format("Increases the weight of a single target enormously for an instant, causing internal damage equal to %s%% of a melee attack damage.",assassinSpells[44].DamageMult*100)
-		
-		Game.SpellsTxt[18].Expert="Spell hits up to 2 times"
-		Game.SpellsTxt[18].Master="Spell hits up to 3 times"
-		Game.SpellsTxt[18].GM="Spell hits up to 4 times"
-		
-		for key, value in pairs(assassinSpells) do
-			if assassinSpells[key].StackCost>0 then
-				Game.SpellsTxt[key].Description=Game.SpellsTxt[key].Description .. "\n\nThis Ability requires " .. assassinSpells[key].StackCost .. " Combo Points to be casted."
-			end
-		end
-		
-	else
-		for key, value in pairs(spellDesc2) do
-			for key2, value2 in pairs(value) do
-				Game.SpellsTxt[key][key2]=value2
-			end
-		end
-		Skillz.setName(12, "Fire Magic")
-		Skillz.setName(13, "Air Magic")
-		Skillz.setName(14, "Water Magic")
-		Skillz.setName(15, "Earth Magic")
-	end
-end
+--moved to MawCore/Classes.lua (the class presentation registry)
+--body: MawCore/Classes.lua; registration kept here for handler order
 function events.CanLearnSpell(t)
-	if table.find(assassinClass, t.Player.Class) then
-		t.NeedMastery = 5
-	end
+	MawCore.Classes.assassinLearnSpell(t)
 end
 
-function events.GameInitialized2()
-	local sp=const.Spells
-	assassinSpells={
-		[sp.TorchLight]={["Cost"]=1,["StackCost"]=0,["DamageMult"]=0,},
-		[sp.FireAura]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
-		[sp.Haste]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
-		[sp.Fireball]={["Cost"]=0,["StackCost"]=5,["DamageMult"]=1,},
-		[sp.FireSpike]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=2.5,},
-		
-		[sp.WizardEye]={["Cost"]=1,["StackCost"]=0,["DamageMult"]=0,},
-		[sp.Jump]={["Cost"]=5,["StackCost"]=0,["DamageMult"]=0,},
-		[sp.Shield]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
-		[sp.LightningBolt]={["Cost"]=0,["StackCost"]=5,["DamageMult"]=1.5,},
-		[sp.Invisibility]={["Cost"]=15,["StackCost"]=0,["DamageMult"]=0,},
-		[sp.Fly]={["Cost"]=25,["StackCost"]=0,["DamageMult"]=0,},
-		
-		[sp.PoisonSpray]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=0.75,},
-		[sp.WaterWalk]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
-		[sp.AcidBurst]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=3,},
-		[sp.TownPortal]={["Cost"]=20,["StackCost"]=0,["DamageMult"]=0,},
-		[sp.LloydsBeacon]={["Cost"]=30,["StackCost"]=0,["DamageMult"]=0,},
-		
-		[sp.Stun]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=1.5,},
-		[sp.StoneSkin]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
-		[sp.Blades]={["Cost"]=0,["StackCost"]=3,["DamageMult"]=3},
-		[sp.Telekinesis]={["Cost"]=0,["StackCost"]=0,["DamageMult"]=0,},
-		[sp.MassDistortion]={["Cost"]=0,["StackCost"]=4,["DamageMult"]=4,},
-	}				
-end
 
-assassinSpellList={
-	[const.Skills.Fire]={1, 4, 5, 6, 7},
-	[const.Skills.Air]={12, 17, 16, 18, 21, 19},
-	[const.Skills.Water]={24, 27, 29, 31, 33},
-	[const.Skills.Earth]={34, 38, 39, 42, 44},
-}
+--moved to MawCore/Classes.lua (per-class data)
 
+--body: MawCore/Classes.lua; registration kept here for handler order
 function events.Action(t)
-	if t.Action==105 and Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
-		
-		pl=Party[Game.CurrentPlayer]
-		if table.find(assassinClass, pl.Class) then
-			for i=1,99 do
-				pl.Spells[i]=false
-			end
-			local s1, m1=SplitSkill(pl.Skills[const.Skills.Fire])
-			local s2, m2=SplitSkill(pl.Skills[const.Skills.Air])
-			local s3, m3=SplitSkill(pl.Skills[const.Skills.Water])
-			local s4, m4=SplitSkill(pl.Skills[const.Skills.Earth])
-			m1=m1+1
-			m2=m2+2
-			m3=m3+1
-			m4=m4+1
-			for i=1, m1 do
-				pl.Spells[assassinSpellList[const.Skills.Fire][i]]=true
-			end
-			for i=1, m2 do
-				pl.Spells[assassinSpellList[const.Skills.Air][i]]=true
-			end
-			for i=1, m3 do
-				pl.Spells[assassinSpellList[const.Skills.Water][i]]=true
-			end
-			for i=1, m4 do
-				pl.Spells[assassinSpellList[const.Skills.Earth][i]]=true
-			end
-		end
-	end
+	MawCore.Classes.assassinSpellbook(t)
 end
 
 --show stacks
@@ -1486,38 +881,14 @@ function events.GameInitialized2()
 	end
 end
 
-function mawTick_AssassinStacks()
-	for i=0,Party.High do
-		local pl=Party[i]
-		if table.find(assassinClass,pl.Class) then
-			local id=pl:GetIndex()
-			vars.assassinStacks=vars.assassinStacks or {}
-			vars.assassinStacks[id]=vars.assassinStacks[id] or 0
-			assassinStacks[i].Text=string.format(math.floor(vars.assassinStacks[id]))
-		else
-			assassinStacks[i].Text=""
-		end
-	end
-end
+--moved to MawCore/Classes.lua (per-class runtime)
 
+--body: MawCore/Classes.lua; registration kept here for handler order
 function events.PlayerCastSpell(t)
-	local pl=t.Player
-	if table.find(assassinClass,pl.Class) then
-		if assassinSpells[t.SpellId] and assassinSpells[t.SpellId].StackCost>0 then 
-			local id=pl:GetIndex()
-			if vars.assassinStacks[id]<assassinSpells[t.SpellId].StackCost then
-				t.Handled=true
-				DoGameAction(23,0,0)
-			else
-				vars.assassinStacks[id]=vars.assassinStacks[id]-assassinSpells[t.SpellId].StackCost
-			end
-		end
-	end
+	MawCore.Classes.assassinCastStacks(t)
 end
 --spells speed depends on weapon
-function GetAssassinSpellDelay(pl,spell)
-	return pl:GetAttackDelay()*2
-end
+--moved to MawCore/Classes.lua (per-class runtime)
 --CastQuickSpell(0,6)
 --[[spells
 fire spike fire aura fireball haste
