@@ -28,6 +28,11 @@ Engine.Addr = {
 	-- world state
 	IndoorOrOutdoor    = 0x6F39A0,	-- 1 = indoor, 2 = outdoor (= Game.Map.IndoorOrOutdoor)
 
+	-- paper-doll item glow countdown, i4 (Modules/PaperDoll.lua ~507 names
+	-- the same address EffectTime): decremented by Game.TimeDelta per doll
+	-- draw, and at 0 that code clears the item's Condition 0xF0 nibble
+	ItemEffectTime     = 0x51E100,
+
 	-- party-hits-monster resolution: (attackerID, monIndex, speed, action).
 	-- Statically confirmed as a real routine: 0x42DA44 in the player-attack
 	-- path is a direct "call 0x436E26". The calling convention is still
@@ -91,6 +96,14 @@ function Engine.writePtr(addr, value)
 	mem.IgnoreProtection(true)
 	mem.u4[addr] = value
 	mem.IgnoreProtection(false)
+end
+
+-- Starts the paper-doll glow on an item. `sprite` is Condition's 0xF0 nibble
+-- (0x10 sptext01, 0x20 sp28a, 0x40 sp30a, 0x80 sp91a); PaperDoll.lua clears
+-- it when the timer runs out, so callers never have to undo this.
+function Engine.showItemEffect(it, sprite, time)
+	mem.u4[Engine.Addr.ItemEffectTime] = time or 0x100
+	it.Condition = it.Condition:Or(sprite or 0x10)
 end
 
 function Engine.describe()

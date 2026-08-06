@@ -619,7 +619,7 @@ end
 
 -- was zzMaw-Items.lua
 local function tooltipArtifactScaling(t)
-	if t.Description and ((t.Item.Number>=500 and t.Item.Number<=543) or (t.Item.Number>=1302 and t.Item.Number<=1354) or (t.Item.Number>=2020 and t.Item.Number<=2049)) then
+	if t.Description and (IsArtifactId(t.Item.Number)) then
 		require("string")
 		local pattern = "(%d+)"
 		text=t.Description
@@ -637,7 +637,7 @@ end
 
 -- was zzMaw-Items.lua
 local function tooltipArtifactBaseStats(t)
-	if (t.Item.Number>=500 and t.Item.Number<=543) or (t.Item.Number>=1302 and t.Item.Number<=1354) or (t.Item.Number>=2020 and t.Item.Number<=2049) or table.find(ancientWeapons,t.Item.Number) then 
+	if IsArtifactId(t.Item.Number) or table.find(ancientWeapons,t.Item.Number) then 
 		if t.Type then
 			local id=Game.CurrentPlayer
 			if id==-1 then

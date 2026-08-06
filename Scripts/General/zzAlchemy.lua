@@ -1,3 +1,10 @@
+--Every successful craft ends the same way: glow the item on the paper doll
+--and play the enchant sound. Also called from Global/zzMAWPotions.lua.
+function ShowCraftedItemEffect(it)
+	MawCore.Engine.showItemEffect(it)
+	evt.PlaySound(12070)
+end
+
 function events.GameInitialized2()
 	storePotionsNames={}
 	for i=232,263 do
@@ -711,7 +718,7 @@ end
 
 for i=1,20 do
 	evt.PotionEffects[70+i] = function(IsDrunk, t, Power)
-		if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then			
+		if IsBaseItemId(t.Number) then			
 			if craftWaitTime>0 or IsCelestialItem(t) then return end
 			local levelRequired=GetLevelRquirement(t)
 			--check if equippable
@@ -728,9 +735,7 @@ for i=1,20 do
 			end
 			if enchanted then
 				Mouse.Item.Number=0
-				mem.u4[0x51E100] = 0x100 
-				t.Condition = t.Condition:Or(0x10)
-				evt.PlaySound(12070)
+				ShowCraftedItemEffect(t)
 			else
 				Game.ShowStatusText("Gem power is not enough")
 			end
@@ -752,7 +757,7 @@ function mawTick_CraftCooldown()
 end
 
 evt.PotionEffects[91] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+	if IsBaseItemId(t.Number) then
 		if t.Bonus2~=0 then 
 			return
 		end
@@ -775,14 +780,12 @@ evt.PotionEffects[91] = function(IsDrunk, t, Power)
 		end			
 		::continue::
 		Mouse.Item.Number=0
-		mem.u4[0x51E100] = 0x100 
-		t.Condition = t.Condition:Or(0x10)
-		evt.PlaySound(12070)
+		ShowCraftedItemEffect(t)
 	end
 end
 
 evt.PotionEffects[92] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+	if IsBaseItemId(t.Number) then
 		if t.Bonus>0 and t.BonusStrength>0 and not HasEnc2(t) then
 			math.randomseed(t.Number*10000+t.MaxCharges*1000+t.Bonus*100+t.BonusStrength*10+t.Charges)
 			
@@ -801,15 +804,13 @@ evt.PotionEffects[92] = function(IsDrunk, t, Power)
 			
 			SetEnc2(t,stat,math.min(round(power*(1+0.25*math.random())),cap))
 			Mouse.Item.Number=0
-			mem.u4[0x51E100] = 0x100 
-			t.Condition = t.Condition:Or(0x10)
-			evt.PlaySound(12070)
+			ShowCraftedItemEffect(t)
 		end
 	end
 end
 
 evt.PotionEffects[93] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+	if IsBaseItemId(t.Number) then
 		if IsCelestialItem(t) then return end
 		local difficultyExtraPower=1
 		if Game.BolsterAmount>100 then
@@ -845,14 +846,12 @@ evt.PotionEffects[93] = function(IsDrunk, t, Power)
 		end
 		t.MaxCharges=math.min(t.MaxCharges+changeIncrease,maxChargesCap)
 		Mouse.Item.Number=0
-		mem.u4[0x51E100] = 0x100 
-		t.Condition = t.Condition:Or(0x10)
-		evt.PlaySound(12070)
+		ShowCraftedItemEffect(t)
 	end
 end
 
 evt.PotionEffects[94] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) or (t.Number>=500 and t.Number<=542) or (t.Number>=1302 and t.Number<=1354) or (t.Number>=2020 and t.Number<=2049) then
+	if IsBaseItemId(t.Number) or IsArtifactId(t.Number) then
 		Mouse.Item.Number=t.Number
 		Mouse.Item.Bonus=t.Bonus
 		Mouse.Item.BonusStrength=t.BonusStrength
@@ -861,14 +860,12 @@ evt.PotionEffects[94] = function(IsDrunk, t, Power)
 		Mouse.Item.MaxCharges=t.MaxCharges
 		Mouse.Item.BonusExpireTime=t.BonusExpireTime
 		
-		mem.u4[0x51E100] = 0x100 
-		t.Condition = t.Condition:Or(0x10)
-		evt.PlaySound(12070)
+		ShowCraftedItemEffect(t)
 	end
 end
 
 evt.PotionEffects[95] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+	if IsBaseItemId(t.Number) then
 		local modified=false
 		if Game.ItemsTxt[t.Number].NotIdentifiedName==Game.ItemsTxt[t.Number+1].NotIdentifiedName then
 			t.Number=t.Number+1
@@ -882,7 +879,7 @@ evt.PotionEffects[95] = function(IsDrunk, t, Power)
 				local upgradeItemId=false
 				local upgradePower=math.huge
 				for i=1, Game.ItemsTxt.High do
-					if i<=151 or (i>=803 and i<=936) or (i>=1603 and i<=1736) then
+					if IsBaseItemId(i) then
 						local it=Game.ItemsTxt[i]
 						local power=(it.Mod1DiceCount*it.Mod1DiceSides+1)/2+it.Mod2
 						if itemType==GetItemSkill(i) and itemSlot==it.EquipStat and power>basePower and power<upgradePower then
@@ -903,7 +900,7 @@ evt.PotionEffects[95] = function(IsDrunk, t, Power)
 				local upgradeItemId=false
 				local upgradePower=math.huge
 				for i=1, Game.ItemsTxt.High do
-					if i<=151 or (i>=803 and i<=936) or (i>=1603 and i<=1736) then
+					if IsBaseItemId(i) then
 						local it=Game.ItemsTxt[i]
 						local power=it.Mod1DiceCount+it.Mod2
 						if itemType==it.Skill and itemSlot==it.EquipStat and power>basePower and power<upgradePower then
@@ -920,15 +917,13 @@ evt.PotionEffects[95] = function(IsDrunk, t, Power)
 			end
 		end
 		if not modified then return end
-		mem.u4[0x51E100] = 0x100 
-		t.Condition = t.Condition:Or(0x10)
-		evt.PlaySound(12070)
+		ShowCraftedItemEffect(t)
 		Game:ExitHouseScreen()
 	end
 end
 
 evt.PotionEffects[96] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+	if IsBaseItemId(t.Number) then
 		if t.Bonus==0 and not HasEnc2(t) and t.Bonus2==0 then
 			return
 		end
@@ -952,14 +947,12 @@ evt.PotionEffects[96] = function(IsDrunk, t, Power)
 			end
 		end
 		Mouse.Item.Number=0
-		mem.u4[0x51E100] = 0x100 
-		t.Condition = t.Condition:Or(0x10)
-		evt.PlaySound(12070)
+		ShowCraftedItemEffect(t)
 	end
 end
 
 evt.PotionEffects[97] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+	if IsBaseItemId(t.Number) then
 		if craftWaitTime>0 then return end
 		craftingItemUsed=true
 		--the potion carries an extracted affix in its own BonusStrength
@@ -979,14 +972,12 @@ evt.PotionEffects[97] = function(IsDrunk, t, Power)
 		else
 			return
 		end
-		mem.u4[0x51E100] = 0x100 
-		t.Condition = t.Condition:Or(0x10)
-		evt.PlaySound(12070)
+		ShowCraftedItemEffect(t)
 	end
 end
 
 evt.PotionEffects[98] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+	if IsBaseItemId(t.Number) then
 		if craftWaitTime>0 then return end
 		craftingItemUsed=true
 		--the potion carries the celestial status in its own BonusStrength
@@ -998,9 +989,7 @@ evt.PotionEffects[98] = function(IsDrunk, t, Power)
 			Game.ShowStatusText("Invalid Item")
 			return
 		end
-		mem.u4[0x51E100] = 0x100 
-		t.Condition = t.Condition:Or(0x10)
-		evt.PlaySound(12070)
+		ShowCraftedItemEffect(t)
 	end
 end
 
@@ -1051,9 +1040,7 @@ function UseItem(it, usedIt)
 		end
 		if craftUsed then
 			Mouse.Item.Number=0
-			mem.u4[0x51E100] = 0x100 
-			it.Condition = it.Condition:Or(0x10)
-			evt.PlaySound(12070)
+			ShowCraftedItemEffect(it)
 		end
 	end
 	

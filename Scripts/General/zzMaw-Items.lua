@@ -90,12 +90,22 @@ local function getBossLootSeed(mon)
 	return bossLootSeed
 end
 
-function IsEnchantableItem(it)
-	local num = it.Number
-	if num == 866 or num == 867 or num == 1666 or num == 1667 then
-		return false
-	end
+--the three base equipment id bands: MM8 0-151, MM6 803-936, MM7 1603-1736.
+--Artifacts and quest items sit outside them.
+function IsBaseItemId(num)
 	return num <= 151 or (num >= 803 and num <= 936) or (num >= 1603 and num <= 1736)
+end
+
+--artifact id bands, one per game. ancientWeapons sit outside these, inside
+--the base bands, so tests that want them too must add them explicitly.
+function IsArtifactId(num)
+	return (num >= 500 and num <= 543) or (num >= 1302 and num <= 1354) or (num >= 2020 and num <= 2049)
+end
+
+--base equipment the loot/enchant system may roll on: ancientWeapons are
+--artifacts that happen to fall inside the bands, so they are excluded.
+function IsEnchantableItem(it)
+	return IsBaseItemId(it.Number) and not table.find(ancientWeapons, it.Number)
 end
 
 function events.PickCorpse(t)
@@ -437,7 +447,7 @@ function events.AfterLoadMap()
 		for i=0,Map.Chests.High do
 			for k=1,Map.Chests[i].Items.High do
 				local it=Map.Chests[i].Items[k]
-				if (it.Number>=1 and it.Number<=151) or (it.Number>=803 and it.Number<=936) or (it.Number>=1603 and it.Number<=1736) then
+				if (it.Number>0 and IsBaseItemId(it.Number)) then
 					local itemPower=1
 					if it.Bonus>0 then
 						itemPower=itemPower+1
@@ -903,7 +913,7 @@ function events.ItemGenerated(t)
 				end
 				-- Initialize counts for each affix
 				vars.legendaryAffixDropped=vars.legendaryAffixDropped or {}
-				for i = 1, #legendaryEffects-10 do
+				for i = 1, LEGENDARY_AFFIX_COUNT do
 					vars.legendaryAffixDropped[i] = vars.legendaryAffixDropped[i] or 0
 				end
 				legendaryAffix=get_affix(vars.legendaryAffixDropped)
@@ -1375,6 +1385,15 @@ legendaryEffects={
 	[34]="Overhealing refunds mana",
 	[35]="Overhealing reduces recovery time equal to half overhealing amount",
 }
+
+--Roll ids run 1..LEGENDARY_AFFIX_COUNT and store as id+LEGENDARY_AFFIX_BASE.
+--Derived from the keys rather than `#legendaryEffects`: that table starts at
+--11, so its length only answers correctly because Lua happens to give it an
+--array part -- add or remove affixes and it can silently stop matching.
+LEGENDARY_AFFIX_COUNT = 0
+for id in pairs(legendaryEffects) do
+	LEGENDARY_AFFIX_COUNT = math.max(LEGENDARY_AFFIX_COUNT, id - LEGENDARY_AFFIX_BASE)
+end
 
 function updateCelestialItem(it,pl)
 	if IsCelestialItem(it) then
@@ -2092,7 +2111,7 @@ function events.CalcStatBonusByItems(t)
 	local cs = const.Stats
 	if t.Stat==cs.MeleeDamageMin or t.Stat==cs.MeleeDamageMax or t.Stat==cs.MeleeAttack then
 		for it in t.Player:EnumActiveItems() do 
-			if (it.Number>=500 and it.Number<=543) or (it.Number>=1302 and it.Number<=1354) or (it.Number>=2020 and it.Number<=2049) then 
+			if IsArtifactId(it.Number) then 
 				txt=Game.ItemsTxt[it.Number]
 				c=txt.EquipStat
 				if c<=1 then
@@ -2107,7 +2126,7 @@ function events.CalcStatBonusByItems(t)
 	--same for ranged
 	if t.Stat==cs.RangedDamageMin or t.Stat==cs.RangedDamageMax or t.Stat==cs.RangedAttack then
 		for it in t.Player:EnumActiveItems() do 
-			if (it.Number>=500 and it.Number<=543) or (it.Number>=1302 and it.Number<=1354) or (it.Number>=2020 and it.Number<=2049) then 
+			if IsArtifactId(it.Number) then 
 				txt=Game.ItemsTxt[it.Number]
 				c=txt.EquipStat
 				if c==2 then
@@ -4017,7 +4036,7 @@ function events.AfterLoadMap()
 				for i=1,Map.Chests[k].Items.High do
 					local it=Map.Chests[k].Items[i]
 					if it.MaxCharges==0 then
-						if (it.Number>=1 and it.Number<=151) or (it.Number>=803 and it.Number<=936) or (it.Number>=1603 and it.Number<=1736) then
+						if (it.Number>0 and IsBaseItemId(it.Number)) then
 							it:Randomize(lootLevel,it:T().EquipStat+1)
 						end
 					end
@@ -4026,7 +4045,7 @@ function events.AfterLoadMap()
 			for i=0,Map.Objects.High do
 				local it=Map.Objects[i].Item
 				if it.MaxCharges==0 then
-					if (it.Number>=1 and it.Number<=151) or (it.Number>=803 and it.Number<=936) or (it.Number>=1603 and it.Number<=1736) then
+					if (it.Number>0 and IsBaseItemId(it.Number)) then
 						it:Randomize(lootLevel,it:T().EquipStat+1)
 					end
 				end

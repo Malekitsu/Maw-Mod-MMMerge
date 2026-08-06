@@ -467,8 +467,8 @@ function events.BuildStatInformationBox(t)
 		local id=pl:GetIndex()
 		--check and add equipped legendaries
 		local legTxt="Currently Active Legendary effects:"
-		for i=1,#legendaryEffects-10 do
-			local legId=i+10
+		for i=1,LEGENDARY_AFFIX_COUNT do
+			local legId=i+LEGENDARY_AFFIX_BASE
 			if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], legId) then
 				legTxt= legTxt .. StrColor(255,255,30,"\n\n - " .. legendaryEffects[legId])
 			end

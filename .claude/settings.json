@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git grep *)",
+      "Bash(python itemgates.py)",
+      "Bash(python -c ' *)",
+      "Bash(git check-ignore *)",
+      "Bash(echo \"exit=$? \\(1 = none ignored\\)\")",
+      "Bash(python artifactgates.py)"
+    ]
+  }
+}
