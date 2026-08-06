@@ -469,7 +469,7 @@ local function stage_weaponRecompute(t)
   local critChance, critMult, success = getCritInfo(pl, false, safeGetMonsterLevel(t.Monster))
   if success then
     t.Result = t.Result * critMult
-	crit=true
+	DamageState.setCrit(true)
   end
 
   if data.Player.Weak and data.Player.Weak > 0 then
@@ -618,9 +618,8 @@ local function stage_dragonAttack(t)
 			local fang, fangM = SplitSkill(data.Player:GetSkill(const.Skills.Unarmed))
 			if breath>=fang then
 				local x, y = directionToUnitVector(Party.Direction)
-				push=push or {}
 				mult=fang/t.Monster.Level^0.75
-				table.insert(push,{["directionX"]=x, ["directionY"]=y, ["duration"]=60*mult^0.5, ["totalDuration"]=60*mult^0.5, ["totalForce"]=800*mult, ["currentForce"]=800*mult, ["id"]=t.MonsterIndex})
+				DamageState.addPush({["directionX"]=x, ["directionY"]=y, ["duration"]=60*mult^0.5, ["totalDuration"]=60*mult^0.5, ["totalForce"]=800*mult, ["currentForce"]=800*mult, ["id"]=t.MonsterIndex})
 			end
 			
 			local low=pl:GetMeleeDamageMin()
@@ -631,8 +630,11 @@ local function stage_dragonAttack(t)
 			index=table.find(damageKindMap,t.DamageKind)
 			res=t.Monster.Resistances[index]
 			if not res then return end
-			critChance, critMult, crit=getCritInfo(pl,false,getMonsterLevel(t.Monster))
-			if crit then
+			local gotCrit
+			critChance, critMult, gotCrit=getCritInfo(pl,false,getMonsterLevel(t.Monster))
+			--assigned, not or'd: a non-crit here clears a previous hit's tag
+			DamageState.setCrit(gotCrit)
+			if gotCrit then
 				damage=damage*critMult
 			end
 			if pl.Class==10 then
@@ -647,8 +649,11 @@ local function stage_dragonAttack(t)
 			local high=pl:GetRangedDamageMax()
 			local damage=rollDice(low, high)
 			
-			critChance, critMult, crit=getCritInfo(pl,false,getMonsterLevel(t.Monster))
-			if crit then
+			local gotCrit
+			critChance, critMult, gotCrit=getCritInfo(pl,false,getMonsterLevel(t.Monster))
+			--assigned, not or'd: a non-crit here clears a previous hit's tag
+			DamageState.setCrit(gotCrit)
+			if gotCrit then
 				damage=damage*critMult
 			end
 			if data.Spell==123 then
@@ -724,7 +729,7 @@ local function stage_dkAttack(t)
 			critChance, critMult, success=getCritInfo(pl,false,getMonsterLevel(t.Monster))
 			if success then
 				damage=damage*critMult
-				crit=true
+				DamageState.setCrit(true)
 			end
 			for i=0,1 do
 				local it=pl:GetActiveItem(i)
@@ -848,7 +853,7 @@ local function stage_assassinAttack(t)
 			critChance, critMult, success=getCritInfo(pl,false,getMonsterLevel(t.Monster))
 			if success then
 				damage=damage*critMult
-				crit=true
+				DamageState.setCrit(true)
 			end
 			
 			for i=0,1 do
@@ -1284,7 +1289,7 @@ local function stage_trackAndClamp(t)
 			track("damageTrack", data.Player:GetIndex(), damage)
 		end
 		if ShowDamage then
-			ShowDamage(data.Player, damage, crit, data.Object, t.Monster)
+			ShowDamage(data.Player, damage, DamageState.isCrit(), data.Object, t.Monster)
 		end
 		
 	end
@@ -1318,11 +1323,11 @@ local function stage_trackAndClamp(t)
 		if damage>MawCore.MonsterHP.current(t.Monster) then
 			shoot="inflicts"
 		end
-		if crit then
+		if DamageState.isCrit() then
 			critMessage=StrColor(255,255,30,"(CRIT!)")
 --consume the flag next tick, so same-tick hits still share the tag
 			RunNextTick(function()
-				crit=false
+				DamageState.setCrit(false)
 			end)
 		end
 		if t.Monster.NameId>0 then

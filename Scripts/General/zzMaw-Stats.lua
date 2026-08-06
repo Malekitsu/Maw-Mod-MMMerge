@@ -919,7 +919,7 @@ autohook(0x4376AC, function(d)
 		error("Unknown attack message type")
 	end
 	u4[d.esp + 4] = result
-	crit = false
+	MawCore.DamageState.setCrit(false)
 end)
 
 --resistance map

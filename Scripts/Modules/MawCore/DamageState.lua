@@ -43,3 +43,31 @@ end
 function DamageState.getCustomAttacker()
 	return customAttacker
 end
+
+-- Crit tag. Set while a hit resolves and read by the status-message stage,
+-- which clears it on the NEXT tick rather than immediately so every hit of
+-- one same-tick cast shares the tag. zzMaw-Spells sets it for spell crits;
+-- the engine crit-message hook in zzMaw-Stats clears it. Stored as given,
+-- not normalised, because ShowDamage receives the value directly.
+local crit = false
+
+function DamageState.setCrit(on)
+	crit = on
+end
+
+function DamageState.isCrit()
+	return crit
+end
+
+-- Monster knockback queue. Damage.lua appends one entry per pushing hit;
+-- the classes/monster-push scheduler task decays them every frame. Entries
+-- are never removed once spent -- that is legacy behaviour, see NOTES.md.
+local pushes = {}
+
+function DamageState.addPush(entry)
+	pushes[#pushes + 1] = entry
+end
+
+function DamageState.getPushes()
+	return pushes
+end

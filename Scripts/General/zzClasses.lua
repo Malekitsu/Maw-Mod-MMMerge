@@ -522,16 +522,15 @@ function directionToUnitVector(direction)
 end
 
 function mawTick_MonsterPush()
-	if push and push[1] then
-		for i=1, #push do
-			if push[i].duration>0 then
-				push[i].duration=push[i].duration-1
-				mon=Map.Monsters[push[i].id]
-				mon.VelocityX=push[i].directionX * push[i].currentForce
-				mon.VelocityY=push[i].directionY * push[i].currentForce
-				mon.VelocityZ=push[i].currentForce/2 - push[i].totalForce/4
-				push[i].currentForce=push[i].currentForce - push[i].totalForce / push[i].totalDuration
-			end
+	local push=MawCore.DamageState.getPushes()
+	for i=1, #push do
+		if push[i].duration>0 then
+			push[i].duration=push[i].duration-1
+			mon=Map.Monsters[push[i].id]
+			mon.VelocityX=push[i].directionX * push[i].currentForce
+			mon.VelocityY=push[i].directionY * push[i].currentForce
+			mon.VelocityZ=push[i].currentForce/2 - push[i].totalForce/4
+			push[i].currentForce=push[i].currentForce - push[i].totalForce / push[i].totalDuration
 		end
 	end
 end

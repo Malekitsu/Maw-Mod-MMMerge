@@ -1746,7 +1746,7 @@ function events.CalcSpellDamage(t)
 		t.Result=t.Result*mult
 		if success then
 			t.Result=t.Result*critMult
-			crit=true
+			MawCore.DamageState.setCrit(true)
 		end
 	end
 	--enchants
