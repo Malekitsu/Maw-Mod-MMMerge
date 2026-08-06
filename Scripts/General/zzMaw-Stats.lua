@@ -702,7 +702,6 @@ function events.Regeneration(t)
 	end
 end
 
-painReflectionHit=false
 -- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 --mistform
 function events.PlayerAttacked(t)

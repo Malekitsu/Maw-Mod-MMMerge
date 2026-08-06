@@ -3904,7 +3904,7 @@ function mawTick_RestoreProjectiles()
 				if obj.Spell~=0 then
 					action=2
 				end
-				mawCustomMonObj={["Monster"]=mon, 
+				MawCore.DamageState.setCustomAttacker({["Monster"]=mon,
 								["Object"]=obj,
 								["MonsterAction"]=action,
 								["MonsterIndex"]=id,
@@ -3912,7 +3912,7 @@ function mawTick_RestoreProjectiles()
 								["Spell"]=obj.Spell,
 								["SpellMastery"]=obj.SpellMastery,
 								["SpellSkill"]=obj.SpellSkill,
-								}
+								})
 				
 				obj.X=obj.X+(Party.X-obj.X)/3
 				obj.Y=obj.Y+(Party.Y-obj.Y)/3
@@ -3940,9 +3940,8 @@ function mawTick_RestoreProjectiles()
 					local s, m= SplitSkill(Skillz.get(Party[i], 50))
 					if s>0 and vars.covering[i] and m>=masteryRequired and i~=target then
 						cover[i]={["Chance"]=1-(0.99^s-0.05),["Mastery"]= m}
-						if coverBonus[i] then
+						if MawCore.DamageState.takeCoverBonus(i) then
 							cover[i].Chance=cover[i].Chance+0.3
-							coverBonus[i]=false
 						end
 					else
 						cover[i]=false
@@ -4009,7 +4008,7 @@ function mawTick_RestoreProjectiles()
 				
 				--apply damage
 				Party[target]:DoDamage(10000,mon.Attack1.Type)
-				mawCustomMonObj=false
+				MawCore.DamageState.clearCustomAttacker()
 			end
 		else
 			lastLocation[i]={obj.X, obj.Y}

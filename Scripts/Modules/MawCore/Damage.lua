@@ -10,8 +10,15 @@ local Damage = {}
 MawCore.Damage = Damage
 
 local Formulas = MawCore.Formulas
+local DamageState = MawCore.DamageState
 
 local REMOTE_OWNER_BIT = 0x800
+
+-- Reflect bookkeeping. These three are read and written only inside this
+-- file: a stage sets one, a later stage in the same hit consumes it.
+local reflecting = false
+local painReflectionHit = false
+local reflectedDamage = false
 
 -- ===========================================================================
 -- Shared helpers -- one source for ideas duplicated across stages.
@@ -232,7 +239,7 @@ local function stage_coverFlag(t)
 			if m>=4 then
 				local slot=slotByIndex(t.PlayerIndex)
 				if slot then
-					coverBonus[slot]=true
+					DamageState.setCoverBonus(slot)
 				end
 			end
 		end
@@ -474,8 +481,7 @@ local function stage_weaponRecompute(t)
 end
 
 -- from Scripts/General/zzMaw-Stats.lua:770 -- pain-reflection flag dance
--- (pairs with the CalcDamageToPlayer handler still in zzMaw-Stats; the
--- painReflectionHit init also stays there)
+-- (pairs with pstage_damageRecompute below, which consumes the flag)
 local function stage_painReflectionFlag(t)
 	if reflecting then
 		reflecting=false
@@ -1494,7 +1500,7 @@ end
 -- from zzMaw-Stats:735 -- THE player-damage replacement (reflects, friendly
 -- fire, traps, dodge, monster attacks, disease, exploding bosses)
 local function pstage_damageRecompute(t)
-	local data=mawCustomMonObj or WhoHitPlayer()
+	local data=DamageState.getCustomAttacker() or WhoHitPlayer()
 	if reflectedDamage then
 		data=nil
 	end
@@ -1699,7 +1705,7 @@ end
 
 -- from zzMaw-Monsters:3269 -- boss on-hit affixes vs the player
 local function pstage_bossAffixesPlayer(t)
-	local data=mawCustomMonObj or WhoHitPlayer()
+	local data=DamageState.getCustomAttacker() or WhoHitPlayer()
 	if data and data.Monster and data.Monster.NameId>=220 and data.Monster.NameId<300 then
 		mon=data.Monster
 		skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")

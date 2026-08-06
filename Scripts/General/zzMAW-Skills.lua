@@ -1044,9 +1044,8 @@ function events.PlayerAttacked(t)
 			local s, m= SplitSkill(Skillz.get(Party[i], 50))
 			if s>0 and vars.covering[i] and m>=masteryRequired and i~=t.PlayerSlot then
 				cover[i]={["Chance"]=math.min(0.1+s*0.01,0.40),["Mastery"]= m}
-				if coverBonus[i] then
+				if MawCore.DamageState.takeCoverBonus(i) then
 					cover[i].Chance=cover[i].Chance+0.15
-					coverBonus[i]=false
 				end
 			else
 				cover[i]=false
@@ -2137,7 +2136,7 @@ function events.LoadMap()
 	end
 end
 ]]
-coverBonus={}
+--coverBonus now lives in MawCore/DamageState.lua
 -- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 		
