@@ -120,16 +120,18 @@ local function tooltipPotions(t)
 		if Game.CurrentPlayer<0 or Game.CurrentPlayer>Party.High then
 			id=0
 		end
-		index=Party[id]:GetIndex()
+		local pl=Party[id]
+		local index=pl:GetIndex()
 		vars.expPot=vars.expPot or {}
 		vars.expPot[index]=vars.expPot[index] or 0
-		local percent=round(vars.expPot[index]/(Party[id].Exp-vars.expPot[index])*10000)/100
+		local percent=round(vars.expPot[index]/(pl.Exp-vars.expPot[index])*10000)/100
+		local str
 		if percent<25 then
 			str=StrColor(0,255,0,percent .. "%")
 		else
 			str=StrColor(255,0,0,percent .. "%")
 		end
-		
+
 		local baseExp=(pl.Exp-vars.expPot[index])
 		local baseLevel=calcLevel(baseExp)
 		local currentLevel=calcLevel(pl.Exp)
@@ -502,7 +504,7 @@ local function tooltipEnchantStats(t)
 			--add enchant Name
 			t.Name = Game.ItemsTxt[t.Item.Number].Name
 			if t.Item.Bonus2>0 then
-				enchString=Game.SpcItemsTxt[t.Item.Bonus2-1].NameAdd
+				local enchString=Game.SpcItemsTxt[t.Item.Bonus2-1].NameAdd
 				if string.match(enchString, "^%u") then
 					t.Name= enchString .. " " .. t.Name
 				else
@@ -549,7 +551,7 @@ local function tooltipEnchantStats(t)
 					local count=0
 					for i=0, Map.Monsters.High do
 						if Map.Monsters[i].Active then
-							dist=getDistanceToMonster(Map.Monsters[i])
+							local dist=getDistanceToMonster(Map.Monsters[i])
 							if dist<=512 then
 								count=count+1
 							end
@@ -561,7 +563,7 @@ local function tooltipEnchantStats(t)
 					local count=0
 					for i=0, Map.Monsters.High do
 						if Map.Monsters[i].Active then
-							dist=getDistanceToMonster(Map.Monsters[i])
+							local dist=getDistanceToMonster(Map.Monsters[i])
 							if dist<=512 then
 								count=count+1
 							end
@@ -581,6 +583,7 @@ local function tooltipEnchantStats(t)
 				t.Description = StrColor(255,255,153,text) .. "\n\n" .. t.Description
 			end
 			if t.Item.Bonus>0 and t.Item.Bonus2==0 and extraDescription then
+				local n, c, power, totB2, roll, tot, enchantNumber
 				n=t.Item.Number
 				c=Game.ItemsTxt[n].EquipStat
 				math.randomseed(t.Item.Number*10000+t.Item.MaxCharges*1000+t.Item.Bonus*100+t.Item.BonusStrength*10+t.Item.Charges)
@@ -639,7 +642,7 @@ end
 local function tooltipArtifactScaling(t)
 	if t.Description and ((t.Item.Number>=500 and t.Item.Number<=543) or (t.Item.Number>=1302 and t.Item.Number<=1354) or (t.Item.Number>=2020 and t.Item.Number<=2049)) then
 		require("string")
-		pattern = "(%d+)"
+		local pattern = "(%d+)"
 		text=t.Description
 		t.Description = text:gsub(pattern, function(match) return replaceNumber(match, t.Item.BonusExpireTime) end)
 		local txt="\n\nScale with player level, up to level 550."
@@ -901,7 +904,7 @@ local function tooltipMapLevel(t)
 	
 	if it.Number==290 and t.Description then
 		local power=it.MaxCharges
-		mapAffixes={
+		local mapAffixes={
 			[0]="",
 			[1]="Monsters deal " .. getMapAffixPower(1, power) .. "% increased damage",
 			[2]="Monsters have " .. getMapAffixPower(2, power) .. "% critical chance",

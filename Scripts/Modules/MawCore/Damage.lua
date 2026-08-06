@@ -114,11 +114,11 @@ local function stage_seraphOnHitHeal(t)
 		local partyHP=partyHPSum()
 
 		--get body
-		bodyS,bodyM=SplitSkill(pl.Skills[const.Skills.Body])
+		local bodyS,bodyM=SplitSkill(pl.Skills[const.Skills.Body])
 
 		--Calculate heal value and apply
-		healValue=(bodyS^1.3*bodyM*2)*damageMultiplier[t.PlayerIndex]["Melee"]
-		personality=pl:GetPersonality()
+		local healValue=(bodyS^1.3*bodyM*2)*damageMultiplier[t.PlayerIndex]["Melee"]
+		local personality=pl:GetPersonality()
 		healValue=round(healValue*(1+personality/1000))
 
 		local healTarget, lowestHealthPercentage=pickLowestPartyMember()
@@ -157,7 +157,7 @@ local function stage_seraphDualWield(t)
 	if t.Player and (t.Player.Class==55 or t.Player.Class==54 or t.Player.Class==53) then
 		data=t.Hit
 		if data and data.Player then
-			item=data.Player:GetActiveItem(0)
+			local item=data.Player:GetActiveItem(0)
 		end
 		if item~=nil then
 			if item:T().Skill==1 then
@@ -194,7 +194,7 @@ local function stage_elementalistLearning(t)
 			learningBonus=learningBonus/3
 		end
 		vars.elementalistSpells[pl:GetIndex()][school]=vars.elementalistSpells[pl:GetIndex()][school] + learningBonus
-		school2=(school-12)*11
+		local school2=(school-12)*11
 		for i=1,11 do
 			local spell2= school2+i
 			if pl.Spells[spell2]==false then
@@ -262,7 +262,7 @@ end
 -- from Scripts/General/zzMAW-Skills.lua:2248 -- Cover GM flag (read by the
 -- cover redirect logic in zzMAW-Skills/zzMaw-Monsters; init stays there)
 local function stage_coverFlag(t)
-	data = t.Hit	
+	local data = t.Hit	
 	if data and data.Player and t.DamageKind==4 then
 		if data.Object==nil then
 			local s, m=SplitSkill(Skillz.get(data.Player,50))
@@ -340,8 +340,8 @@ local function stage_flyRemoval(t)
 		if table.find(flyAllowedMaps,Map.Name) then 
 			return
 		end
-		data=t.Hit
-		flyTime=Party.SpellBuffs[7].ExpireTime
+		local data=t.Hit
+		local flyTime=Party.SpellBuffs[7].ExpireTime
 		if data and data.Player and flyTime>Game.Time then
 			Party.SpellBuffs[5].ExpireTime=flyTime
 			Party.SpellBuffs[7].ExpireTime=0
@@ -421,7 +421,7 @@ local function stage_sparksChain(t)
 	local data = t.Hit
 	if data and data.Object and data.Player then
 		if data.Object.Spell==18 and data.Object.SpellMastery>1 then
-			monsterIndex=getClosestMonsterInRange(t.Monster,768)
+			local monsterIndex=getClosestMonsterInRange(t.Monster,768)
 			if monsterIndex~=nil then
 				BeginGrabObjects()
 				Game.SummonObjects(2060,t.Monster.X,t.Monster.Y,t.Monster.Z+100,0,1)
@@ -641,7 +641,7 @@ end
 -- melee (fang knockback, SP gain for classes 10/11, own res division) and
 -- breath/spell-123 ranged (crit, min-res pick, randomized spread)
 local function stage_dragonAttack(t)
-	data=t.Hit
+	local data=t.Hit
 	if data and data.Player and Game.CharacterPortraits[data.Player.Face].Race==const.Race.Dragon then
 		local pl=data.Player
 		if data.Object==nil then
@@ -715,8 +715,8 @@ end
 local function stage_shamanOnHit(t)
 	local data = t.Hit
 	if data and data.Player and table.find(shamanClass, data.Player.Class) and t.DamageKind==4 and data.Object==nil and t.Result>0 then	
-		m6=SplitSkill(data.Player.Skills[const.Skills.Mind])
-		m7,bM=SplitSkill(data.Player.Skills[const.Skills.Body])
+		local m6=SplitSkill(data.Player.Skills[const.Skills.Mind])
+		local m7,bM=SplitSkill(data.Player.Skills[const.Skills.Body])
 		
 		local FHP=data.Player:GetFullHP()
 		local leech=Formulas.bodyLeech(FHP, m7, bM)
@@ -740,6 +740,11 @@ local function stage_dkAttack(t)
 	local data = t.Hit
 	if data and data.Player and table.find(dkClass, data.Player.Class) then
 		local pl=data.Player
+		--this hit's damage; the DKDamageMult branch below overwrites it with
+		--its own roll. Legacy read a GLOBAL here, so on the first DK melee
+		--hit of a session the SP-restore compare saw zzMAW-Skills' init-time
+		--BOOLEAN flag of the same name ("compare number with boolean" crash)
+		local damage=t.Result
 		local spell=0
 		if data and data.Object and data.Object.Spell then
 			spell=data.Object.Spell
@@ -973,6 +978,10 @@ end
 
 -- from Scripts/Global/zzMaw_Legendaries.lua:22 -- enchant/fire-aura flat adds,
 -- legendaries 17/21/14/24/11, shaman fire + assassin water adds, shaman spell mult
+--legendary-11 recovery-refund flag: consumed once across the deferred
+--closures of same-tick hits (shared between runs on purpose)
+local reduceRecovery
+
 local function stage_legendaries(t)
 	if t.Result==0 then return end
 	local id=t.PlayerIndex
@@ -1066,7 +1075,7 @@ local function stage_legendaries(t)
 		local mult=1
 		for i=0, Map.Monsters.High do
 			if Map.Monsters[i].Active then
-				dist=getDistanceToMonster(Map.Monsters[i])
+				local dist=getDistanceToMonster(Map.Monsters[i])
 				if dist<=512 then
 					mult=mult+0.05
 				end
@@ -1120,7 +1129,7 @@ local function stage_legendaries(t)
 		if t.Result>0 and data and data.Object and data.Object.Spell>0 and data.Object.Spell<99 and data.Object.Spell~=44 then
 			local s=0
 			for school=12,18 do
-				skill=SplitSkill(pl.Skills[school])
+				local skill=SplitSkill(pl.Skills[school])
 				s=s+skill
 			end
 			local mult=1+s/200
@@ -1288,6 +1297,11 @@ end
 
 -- from Scripts/Global/zzMAWStatusMsg.lua:151 (rest) -- damage tracking vars,
 -- ShowDamage status message, HP-overcap divide, ceil + 32500 cap
+--AoE-total message state shared across the same-tick hits of one cast:
+--each hit's deferred closure decrements calls; the last resets MSGdamage.
+--File-scope locals, not globals -- shared BETWEEN pipeline runs on purpose
+local MSGdamage, calls
+
 local function stage_trackAndClamp(t)
 	if t.Result==0 then return end
 
@@ -1322,10 +1336,11 @@ local function stage_trackAndClamp(t)
 		MSGdamage=MSGdamage+math.ceil(damage)
 		local msgTxt=MSGdamage
 		msgTxt=shortenNumber(msgTxt, 4, true)
-		attackIsSpell=false
-		castedAoe=false
-		shoot="hits"
-		critMessage= ""
+		local attackIsSpell=false
+		local castedAoe=false
+		local shoot="hits"
+		local critMessage= ""
+		local name, monName, msg
 		if data.Object then 
 			if data.Object.SpellType>1 and data.Object.SpellType<133 then
 				name=Game.SpellsTxt[data.Object.SpellType].Name
@@ -1593,7 +1608,7 @@ local function pstage_damageRecompute(t)
 				mapLevel=getTotalLevel()
 			end
 			]]
-			mapLevel=getTotalLevel()
+			local mapLevel=getTotalLevel()
 			--trap and objects multiplier
 			local damage=getMonsterDamage(false, mapLevel)
 			
@@ -1728,7 +1743,7 @@ local function pstage_damageRecompute(t)
 		local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
 		if skill=="Exploding" or skill=="Omnipotent" then
 			t.Result=t.Result/2
-			aoeDamage=t.Result/Party.Count
+			local aoeDamage=t.Result/Party.Count
 			for i=0,Party.High do
 				local damage = calcManaShield(Party[i], aoeDamage)
 				Party[i].HP=Party[i].HP-damage
@@ -1799,7 +1814,7 @@ local function pstage_legendariesAndShields(t)
 		local count=0
 		for i=0, Map.Monsters.High do
 			if Map.Monsters[i].Active then
-				dist=getDistanceToMonster(Map.Monsters[i])
+				local dist=getDistanceToMonster(Map.Monsters[i])
 				if dist<=512 then
 					count=count+1
 				end
@@ -1812,7 +1827,7 @@ local function pstage_legendariesAndShields(t)
 	
 	--shaman code
 	if table.find(shamanClass, pl.Class) and pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0  then
-		m3=SplitSkill(pl.Skills[const.Skills.Water])
+		local m3=SplitSkill(pl.Skills[const.Skills.Water])
 		local lvl=getTotalLevel()
 		local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
 		local reduction=round(getMonsterDamage(false,(lvl+1))*(m3/lvl^0.65)/avgRed/2*0.99^(lvl^0.65)) --on average 1/2 of a B monster
@@ -1820,7 +1835,7 @@ local function pstage_legendariesAndShields(t)
 	end
 	--seraph code
 	if table.find(seraphClass, pl.Class) and pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0  then
-		m3=SplitSkill(pl.Skills[const.Skills.Spirit])
+		local m3=SplitSkill(pl.Skills[const.Skills.Spirit])
 		local lvl=getTotalLevel()
 		local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
 		local reduction=round(getMonsterDamage(false,(lvl+1))*(m3/lvl^0.65)/avgRed/2*0.99^(lvl^0.65)) --on average 1/2 of a B monster
