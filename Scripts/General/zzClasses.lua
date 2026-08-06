@@ -185,12 +185,12 @@ function events.Action(t)
 			local it=Mouse.Item
 			if it then
 				local txt=it:T()
-				local s,m=SplitSkill(pl.Skills[const.Skills.Sword])
+				local s=SplitSkill(pl.Skills[const.Skills.Sword])
 				if txt.EquipStat==1 and txt.Skill==1 then
 					txt.EquipStat=0
-					pl.Skills[const.Skills.Sword]=JoinSkill(s,1)
+--Novice for this action only: the now-one-handed sword must not go offhand
+					tempSkillForEquip(pl, const.Skills.Sword, s, 1)
 					RunNextTick(function()
-						pl.Skills[const.Skills.Sword]=JoinSkill(s,m)
 						txt.EquipStat=1
 					end)
 				elseif txt.EquipStat==4 and txt.Skill==8 then
@@ -288,9 +288,8 @@ end
 
 -- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
---skill tooltips: base school descriptions (12-20 part 1), captured before
---the later init handlers append to them; the class tooltip builders in
---Scripts/Modules/MawCore/SkillTooltip.lua read this
+--base school texts for the tooltip builders, captured before the later
+--init handlers append to them (SKILL_TOOLTIPS.md)
 MawSchoolDescBase={}
 function events.GameInitialized2()
 	for id=12,20 do
@@ -324,8 +323,7 @@ local dragonScales={
 	["Resistances"]={1,1,2,3,[0]=0},
 }
 
---shared dragon formulas -- one source for the stat rows and recovery below
---(min/max damage rows differ only by the 0.75/1.25 spread multiplier)
+--shared dragon formulas (min/max rows differ only by the spread mult)
 local dragonRecoveryPerSkill=0.015
 local function dragonEffLevel(pl)
 	local bolster=getPartyLevel(4)+1
@@ -1566,9 +1564,7 @@ function events.BeforeLoadMap()
 	end
 end
 
---Tick handlers above now run as named MawCore scheduler tasks (interval in
---ms; 0 = every frame). Registered at GameInitialized2 because MawCore loads after every
---General file. In-game: print(MawCore.Scheduler.describe())
+--Tick handlers above run as MawCore scheduler tasks (ms; 0=frame, -1=poke only)
 function events.GameInitialized2()
 	local every=MawCore.Scheduler.every
 	every("classes/dragon-charscreen", 100, mawTick_DragonCharScreen)

@@ -2,6 +2,8 @@
 
 The clean structure the legacy mod gets migrated into, one system at a time
 (strangler pattern). Full context: `GREENFIELD.md` at the repo root.
+**`NOTES.md` (next to this file) holds the traps and the "why does it look
+like this" behind the migrated code** — the source files only point at it.
 
 ## Decisions in force (2026-08-04)
 

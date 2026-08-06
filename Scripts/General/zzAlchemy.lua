@@ -1299,9 +1299,7 @@ function events.GameInitialized2()
 	Game.ItemsTxt[1069].SpriteIndex=130
 end
 
---Tick handlers above now run as named MawCore scheduler tasks (interval in
---ms; 0 = every frame). Registered at GameInitialized2 because MawCore loads after every
---General file. In-game: print(MawCore.Scheduler.describe())
+--Tick handlers above run as MawCore scheduler tasks (ms; 0=frame, -1=poke only)
 function events.GameInitialized2()
 	local every=MawCore.Scheduler.every
 	every("alchemy/reagent-power", -1, mawTick_ReagentPower)	--poked by stats/label-watch

@@ -717,9 +717,8 @@ function events.PlayerAttacked(t)
 	end)
 end
 
---shaman Air / DK class damage reduction: divide by (1+skill/100), once for
---the physical path (DK uses Body) and once for the magical path (DK uses
---Dark); the % shown in tooltips is MawCore.Formulas.reductionPercent
+--shaman Air / DK Body-or-Dark damage reduction; the % printed in tooltips
+--comes from MawCore.Formulas.reductionPercent
 local function classDamageReduction(pl, damage, dkSkill)
 	if table.find(shamanClass, pl.Class) then
 		local s=SplitSkill(pl.Skills[const.Skills.Air])
@@ -734,10 +733,8 @@ end
 --reduce damage by %
 -- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
---the stat-page label tasks run throttled; this every-frame watcher (three
---field reads) pokes them the moment the selected player, the screen, or the
---mouse-held item changes -- the last one catches every equip/unequip, since
---the item always passes over the cursor
+--pokes the throttled label tasks whenever something they display changes
+--(player, screen, char tab, mouse-held item) -- NOTES.md
 local lastLabelPlayer, lastLabelScreen, lastLabelCharScreen, labelPokes = nil, nil, nil, 0
 local lmNum, lmBonus, lmStr, lmB2, lmChg, lmMax, lmExp, lmCond
 mawTick_LabelWatch=function()
@@ -1892,9 +1889,7 @@ function GetDifficulty()
 	return difficulty
 end
 
---Tick handlers above now run as named MawCore scheduler tasks (interval in
---ms; 0 = every frame). Registered at GameInitialized2 because MawCore loads after every
---General file. In-game: print(MawCore.Scheduler.describe())
+--Tick handlers above run as MawCore scheduler tasks (ms; 0=frame, -1=poke only)
 function events.GameInitialized2()
 	local every=MawCore.Scheduler.every
 	every("stats/label-watch", 0, mawTick_LabelWatch)

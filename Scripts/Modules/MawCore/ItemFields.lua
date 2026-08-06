@@ -1,25 +1,11 @@
 -- ItemFields.lua -- the item struct field registry, as code.
 --
--- GREENFIELD.md par.4 calls this table "the single most valuable thing in
--- this document". Update it in the same commit as any change to how a field
--- is used. The two hazards to re-read before touching anything:
+-- Update it in the same commit as any change to how a field is used.
+-- The two hazards (unused bits are not a free field; the Lua-double round
+-- trip in Item-Sorter/MultiBag) are written up in GREENFIELD.md par.4.
 --
---   1. UNUSED BITS ARE NOT A FREE FIELD. The test is whether existing code
---      reads the field as a whole number. BonusExpireTime looked free in its
---      high 32 bits, failed that test, and broke celestial/legendary items
---      on live saves.
---   2. THE LUA-NUMBER ROUND TRIP. Item-Sorter and MultiBag copy items field
---      by field through Lua doubles: anything above 2^52 corrupts silently,
---      and the unnamed pad byte at 0x1B does not survive the copy at all.
---
--- Clean-break note (decision 2026-08-04): the finished greenfield requires a
--- new game, so NEW encodings need no legacy decode path. But while the legacy
--- mod runs side by side, its systems keep WRITING the old encodings -- a
--- field only becomes free to redesign once its last legacy writer has been
--- migrated. Check writers before redesigning, not after.
---
--- spare column: "no" = leave alone | "owned" = we control the only encoder
---               | "free" = passes the whole-number test, bits available
+-- spare: "no" = leave alone | "owned" = we control the only encoder
+--        | "free" = passes the whole-number test, bits available
 
 local ItemFields = {}
 MawCore.ItemFields = ItemFields

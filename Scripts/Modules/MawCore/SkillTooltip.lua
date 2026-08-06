@@ -1,24 +1,12 @@
 -- SkillTooltip.lua -- per-player skill tooltip text (SKILL_TOOLTIPS.md).
 --
--- Legacy: events.Tick/Action handlers rewrote the GLOBAL description store
--- (Skillz.setDesc / Game.SkillDes*) for the current player while the skill
--- screen was open. Here the store holds only static text; anything dynamic
--- is a builder function (pl, skillId, part) -> string registered per
--- (skill, part) slot. Nothing is written back; text is computed at
--- click time for the player the tooltip is about.
+-- The desc store holds static text only; anything dynamic is a builder
+-- fn(pl, skillId, part) -> string registered per (skill, part) slot, and
+-- getTooltipText(pl, skillId [, withBonus]) composes the hint at click time.
+-- Return nil from a builder to fall through to the static store.
 --
--- Entry point:
---   MawCore.SkillTooltip.getTooltipText(pl, skillId [, withBonus])
--- composes the full hint exactly as SkillsUI renders it: part 1 body, then
--- one row per mastery part (2 = Novice .. 9 = Deity) colored by whether the
--- player's class / promoted class can reach that mastery, then the buffed
--- "Bonus:" line unless withBonus is false.
---
--- Part slots follow the Skillz desc convention: 1 = description body,
--- part n = mastery row for mastery n-1 (2 Novice, 3 Expert, 4 Master,
--- 5 Grand, 6 Supreme, ...). Builders return nil to fall through to the
--- static desc store (Skillz.getDesc, which itself falls back to the
--- engine's SkillDes* arrays for base skills).
+-- Slots: 1 = body, part n = mastery row for mastery n-1 (2 Novice, 3 Expert,
+-- 4 Master, 5 Grand, 6 Supreme, ...).
 
 local SkillTooltip = {}
 MawCore.SkillTooltip = SkillTooltip
@@ -131,13 +119,9 @@ function SkillTooltip.describe()
 end
 
 ------------------------------------------------------------------------
--- Migrated dynamic builders (batch 1) -- verbatim bodies from the legacy
--- Tick/Action rewriters, per SKILL_TOOLTIPS.md. Base strings captured by
--- the legacy files at GameInitialized2 (baseRegStr, baseMedStr, baseAscStr,
--- baseSpearTooltip, maceGMtxt) stay captured THERE -- the capture timing
--- relative to other init appends is part of the displayed text.
--- Where legacy indexed per-player vars tables with Game.CurrentPlayer it
--- still does; the hint is only ever built for the current player.
+-- Dynamic builders -- bodies verbatim from the legacy Tick/Action
+-- rewriters. Base strings stay captured in the legacy files (timing) and
+-- per-player vars are still read via Game.CurrentPlayer: SKILL_TOOLTIPS.md.
 ------------------------------------------------------------------------
 
 -- was zzMAW-Skills.lua "DINAMIC SKILL TOOLTIP" events.Tick
@@ -311,17 +295,10 @@ end, "armsmaster supreme requirement")
 
 
 ------------------------------------------------------------------------
--- Class school tooltips (12-20) + dragon fangs/scales (32/33) -- the
--- content of zzClasses' old per-checkSkills desc rewrites, as data:
--- classSpecs[n].slots[skillId][part] = a string, or function(pl) when
--- the text carries computed numbers. One dispatcher serves the first
--- matching class, then whatever the old reset branches forced
--- (neutralText), then falls through to the desc store. Names, SpellsTxt
--- and mana costs still swap in zzClasses' checkSkills.
---
--- Registered from start() via GameInitialized2: MawCore registers last,
--- so this runs after every legacy handler -- MawSchoolDescBase and the
--- fangs/scales row strings already exist.
+-- Class school tooltips (12-20) + dragon fangs/scales (32/33), as data:
+-- classSpecs[n].slots[skillId][part] = string, or function(pl) when the
+-- text carries numbers. Dispatch order, the neutral fallbacks and why
+-- registration waits for GameInitialized2: SKILL_TOOLTIPS.md.
 ------------------------------------------------------------------------
 
 local function registerClassBuilders()

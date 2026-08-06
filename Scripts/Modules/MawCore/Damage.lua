@@ -1,29 +1,10 @@
--- Damage.lua -- the CalcDamageToMonster pipeline (see DAMAGE_PIPELINE.md).
+-- Damage.lua -- both damage pipelines: CalcDamageToMonster (30 stages) and
+-- CalcDamageToPlayer (8). Stages are the former legacy handlers, close to
+-- verbatim, in legacy registration order; zzzzzMaw_Damage.lua registers the
+-- two event handlers per playthrough.
 --
--- Every stage is a former legacy event handler, kept close to verbatim and
--- run in the legacy registration order (the tier markers below). The event
--- handler itself is registered per playthrough by
--- Scripts/Global/zzzzzMaw_Damage.lua: Global scripts re-register on every
--- save load, always appending last, so the pipeline runs after every legacy
--- handler (map scripts still run after it). The four Multiplayer sync
--- handlers register in GameInitialized2 and run before the pipeline.
---
--- Deliberate differences from the legacy chain:
---   * "friendly-fire-zero" runs before "leech": zeroed hits must not heal.
---   * "seraph-dual-wield" sits after the recompute stages so its zero sticks;
---     long-term it becomes a canEquip restriction instead.
---   * the "context" stage resolves WhoHitMonster() once into t.Hit (stable
---     for the whole event); the weapon rolls share rollDice().
---
--- Stage bodies still call legacy globals (damageMultiplier, lifeLeech,
--- HPtable, getCritInfo, checkSkills, ...) on purpose. Cross-stage globals:
--- `crit` (set by the recompute/class stages, read by track-and-clamp; never
--- reset to false -- legacy behavior kept), `divide`, `coverBonus`, the
--- reflect flags.
---
--- Physical re-bucketing into the [phase] taxonomy tagged on the stage list
--- is deliberately deferred: each move changes execution order and needs its
--- own equivalence argument (DAMAGE_PIPELINE.md).
+-- Inventories, deliberate order changes, open items: DAMAGE_PIPELINE.md.
+-- Variable scoping and cross-stage state: NOTES.md.
 
 local Damage = {}
 MawCore.Damage = Damage
@@ -150,20 +131,16 @@ local function stage_seraphOnHitHeal(t)
 	end
 end
 
--- from Scripts/General/zzClasses.lua:357 -- Seraph dual-wield ban; its stage
--- runs after res-and-retaliation so the zero sticks (long-term this becomes
--- a canEquip restriction instead)
+-- from zzClasses:357 -- Seraph dual-wield ban, after res-and-retaliation so
+-- the zero sticks; the equip-time gate is CanDualWield (NOTES.md)
 local function stage_seraphDualWield(t)
-	if t.Player and (t.Player.Class==55 or t.Player.Class==54 or t.Player.Class==53) then
-		data=t.Hit
-		if data and data.Player then
-			local item=data.Player:GetActiveItem(0)
-		end
-		if item~=nil then
-			if item:T().Skill==1 then
-				t.Result=0
-				Message("Seraphim aren't able to dual wield")
-			end
+--covers offhand swords already equipped on older saves
+	local data=t.Hit
+	if data and data.Player then
+		local item=data.Player:GetActiveItem(0)
+		if item and not CanDualWield(data.Player, item) then
+			t.Result=0
+			Message("Seraphim aren't able to dual wield")
 		end
 	end
 end
@@ -740,10 +717,7 @@ local function stage_dkAttack(t)
 	local data = t.Hit
 	if data and data.Player and table.find(dkClass, data.Player.Class) then
 		local pl=data.Player
-		--this hit's damage; the DKDamageMult branch below overwrites it with
-		--its own roll. Legacy read a GLOBAL here, so on the first DK melee
-		--hit of a session the SP-restore compare saw zzMAW-Skills' init-time
-		--BOOLEAN flag of the same name ("compare number with boolean" crash)
+--this hit's damage; the DKDamageMult branch below rolls its own
 		local damage=t.Result
 		local spell=0
 		if data and data.Object and data.Object.Spell then
@@ -978,8 +952,7 @@ end
 
 -- from Scripts/Global/zzMaw_Legendaries.lua:22 -- enchant/fire-aura flat adds,
 -- legendaries 17/21/14/24/11, shaman fire + assassin water adds, shaman spell mult
---legendary-11 recovery-refund flag: consumed once across the deferred
---closures of same-tick hits (shared between runs on purpose)
+--legendary-11 recovery-refund flag, consumed once per cast (NOTES.md)
 local reduceRecovery
 
 local function stage_legendaries(t)
@@ -1297,9 +1270,7 @@ end
 
 -- from Scripts/Global/zzMAWStatusMsg.lua:151 (rest) -- damage tracking vars,
 -- ShowDamage status message, HP-overcap divide, ceil + 32500 cap
---AoE-total message state shared across the same-tick hits of one cast:
---each hit's deferred closure decrements calls; the last resets MSGdamage.
---File-scope locals, not globals -- shared BETWEEN pipeline runs on purpose
+--AoE-total message state, shared across the hits of one cast (NOTES.md)
 local MSGdamage, calls
 
 local function stage_trackAndClamp(t)
@@ -1357,9 +1328,7 @@ local function stage_trackAndClamp(t)
 		end
 		if crit then
 			critMessage=StrColor(255,255,30,"(CRIT!)")
-			--consume the flag: legacy never cleared it, so "(CRIT!)" stuck to
-			--later non-crit hits. Cleared next tick rather than here so every
-			--same-tick hit of one cast/attack still shares the crit tag
+--consume the flag next tick, so same-tick hits still share the tag
 			RunNextTick(function()
 				crit=false
 			end)
@@ -1517,27 +1486,20 @@ function Damage.describe()
 end
 
 ------------------------------------------------------------------------
--- CalcDamageToPlayer pipeline -- the second damage event, migrated the
--- same way (DAMAGE_PIPELINE.md, "CalcDamageToPlayer"). Bodies verbatim
--- from the legacy handlers; zzzzzMaw_Damage.lua registers the single
--- event handler per playthrough. Left raw, running before the pipeline:
--- zzMaw-Multiplayer:294 + the three Modules/Multiplayer handlers (sync,
--- descoped) and zzzzMALEKITH:220 (untracked file; idempotent duplicate
--- of death-seed-mark).
-------------------------------------------------------------------------
+-- CalcDamageToPlayer pipeline -- stage bodies verbatim from the legacy
+-- handlers; zzzzzMaw_Damage.lua registers the event. Inventory and the
+-- handlers deliberately left raw: DAMAGE_PIPELINE.md.
 
 local aoespellsMultiplayer={6,9,22,41,97}
 
--- from Scripts/General/zzMaw-Items.lua:3595 -- deferred per-hit item stats
--- refresh: hits taken can break equipment
+-- from zzMaw-Items:3595 -- per-hit itemStats refresh (hits break equipment)
 local function pstage_itemRefresh(t)
 	RunNextTick(function()
 		mawRefresh(t.PlayerIndex)
 	end)
 end
 
--- from Scripts/General/zzMaw-Monsters.lua:2552 -- madness death-seed:
--- getting hit stamps the hit time and marks a pending seed entry
+-- from zzMaw-Monsters:2552 -- madness death-seed mark
 local function pstage_deathSeedMark(t)
   if vars.madnessMode and vars.MadnessDeathSeed then
     vars.lastHitTime=Game.Time
@@ -1545,10 +1507,8 @@ local function pstage_deathSeedMark(t)
   end
 end
 
--- from Scripts/General/zzMaw-Stats.lua:735 -- THE player-damage replacement:
--- reflect/pain-reflection returns, friendly fire recompute, trap/fall damage,
--- dodge roll, monster attack-2 pick, mistform, affix kind-swap, monster spell
--- damage, randomize, DamageHalved, calcMawDamage, disease mult, exploding bosses
+-- from zzMaw-Stats:735 -- THE player-damage replacement (reflects, friendly
+-- fire, traps, dodge, monster attacks, disease, exploding bosses)
 local function pstage_damageRecompute(t)
 	local data=mawCustomMonObj or WhoHitPlayer()
 	if reflectedDamage then
@@ -1753,9 +1713,7 @@ local function pstage_damageRecompute(t)
 	end
 end
 
--- from Scripts/General/zzMaw-Monsters.lua:3269 (was GameInitialized2-nested) --
--- boss on-hit affixes vs the player: Summoner/Venomous/Plagueborn/Fixator/
--- Swapper/Puller/Omnipotent
+-- from zzMaw-Monsters:3269 -- boss on-hit affixes vs the player
 local function pstage_bossAffixesPlayer(t)
 	local data=mawCustomMonObj or WhoHitPlayer()
 	if data and data.Monster and data.Monster.NameId>=220 and data.Monster.NameId<300 then
@@ -1796,17 +1754,15 @@ local function pstage_bossAffixesPlayer(t)
 	end
 end
 
--- from Scripts/General/zzMaw-Survival.lua:309 (was GameInitialized2-nested) --
--- survival mode: no damage taken outside survival maps
+-- from zzMaw-Survival:309 -- no damage outside survival maps
 local function pstage_survivalGatePlayer(t)
 	if not survivalMaps[Map.Name] and vars.SuvivalMode then
 		t.Result=0
 	end
 end
 
--- from Scripts/Global/zzMaw_Legendaries.lua:53 -- legendary 22 proximity
--- reduction, shaman/seraph flat reduction, MANA SHIELD, legendary 15 +
--- seraph divine protection, bolster>=300 death/eradication thresholds
+-- from zzMaw_Legendaries:53 -- legendary 22, shaman/seraph reduction, mana
+-- shield, legendary 15 + divine protection, bolster>=300 death thresholds
 local function pstage_legendariesAndShields(t)
 	local id=t.Player:GetIndex()
 	--legendary [22]
@@ -1917,8 +1873,7 @@ local function pstage_legendariesAndShields(t)
 	end
 end
 
--- from Scripts/Global/zzMaw_Mapping.lua:1 -- map affixes vs the player:
--- 1 flat %, 2 double-damage chance, 10 %-of-full-HP add
+-- from zzMaw_Mapping:1 -- map affixes 1/2/10 vs the player
 local function pstage_mapAffixesPlayer(t)
 	if t.Monster and getMapAffixPower(1) then
 		t.Result=t.Result*(1+getMapAffixPower(1)/100)
@@ -1934,8 +1889,7 @@ local function pstage_mapAffixesPlayer(t)
 	end
 end
 
--- from Scripts/Global/zzMAWStatusMsg.lua:4 -- remote-owner zero (solo-active
--- MP guard); aoespellsMultiplayer moved along (it was the only consumer)
+-- from zzMAWStatusMsg:4 -- remote-owner zero (solo-active MP guard)
 local function pstage_remoteOwnerZeroPlayer(t)
 	local source = WhoHitPlayer()
 	if source then

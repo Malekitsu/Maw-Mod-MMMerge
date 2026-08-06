@@ -1,32 +1,14 @@
--- Tooltip.lua -- item tooltip section registry.
+-- Tooltip.lua -- item tooltip section registry: ONE
+-- BuildItemInformationBox handler running named sections in sort order
+-- (sort keys mirror the old file load order; see the registrations at the
+-- bottom). print(MawCore.Tooltip.describe()) lists them in-game.
 --
--- Legacy: raw BuildItemInformationBox handlers scattered across 5 General
--- files, running in file load order (GREENFIELD.md par.2). Now every one is
--- a named SECTION with a sort key; the ONE event handler here (registered
--- by start()) runs them in declared order. print(MawCore.Tooltip.describe())
--- in-game lists the pipeline.
+-- Section fn(t) -> string appends to t.Description (bring your own "\n\n"),
+-- or mutates t and returns nil, which is what most migrated bodies do.
 --
--- The section bodies live in THIS file (moved verbatim -- every helper
--- they call is a global). Sort keys mirror the old file load order:
---   100-130  zzAlchemy    potions, reagent power, orbs/gems, craft-on-hover
---   200-250  zzMaw-Items  enchant stats, artifact scaling/base stats,
---                         stat compare, level requirement, fire aura
---   300      zzMaw-Maps   map item level
---   310      zzMaw-MultiBag  bag-button hiding (behavior, not text)
---   320      zzMaw-Spells skill books
--- The Structs handler in extraEditableDescriptions.lua is engine
--- infrastructure and stays raw; it registered earlier, so it still runs
--- before all sections.
---
--- Section fn signature: fn(t) -> string or nil.
---   t is the BuildItemInformationBox event table (t.Item, t.Description,
---   t.Type, t.Name, ...). Return a string to append it to the description --
---   include your own leading "\n\n". Return nil for "no section on this
---   item". A section that must REWRITE rather than append (as most migrated
---   ones do) can mutate t directly and return nil.
---
--- Rendering knowledge (images, tooltip geometry, draw timing) lives in
--- GREENFIELD.md par.6; none of it is wired here yet.
+-- Tooltip rendering knowledge (images, geometry, draw timing): GREENFIELD.md
+-- par.6. The Structs handler in extraEditableDescriptions.lua stays raw and
+-- still runs before every section.
 
 local Tooltip = {}
 MawCore.Tooltip = Tooltip
@@ -86,11 +68,8 @@ end
 
 
 ------------------------------------------------------------------------
--- Item tooltip sections -- bodies moved verbatim from the legacy files
--- named below; every helper they call (IsEnchantableItem, UseItem,
--- artifactPowerMult, calcFireAuraDamage, ...) is a global, so they run
--- unchanged from here. Registration order at the bottom = the old file
--- load order.
+-- Section bodies, verbatim from the legacy files named on each one; the
+-- helpers they call are globals, so they run unchanged from here.
 ------------------------------------------------------------------------
 
 -- was zzAlchemy.lua

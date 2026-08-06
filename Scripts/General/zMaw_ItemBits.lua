@@ -76,19 +76,9 @@ function ClearEnc2(it)
 end
 
 ------------------------------------------------------------------------
--- BonusExpireTime -- the item tier/affix field (registry with hazards:
--- Scripts/Modules/MawCore/ItemFields.lua). One i8, meaning depends on the
--- item class:
---   1 / 2            ancient / primordial weapon tier
---   11-35            legendary affix id (rolled affix + 10)
---   +100             celestial flag on top (exactly 100 = celestial with no
---                    legendary affix, written by black potions)
---   1-1000           artifact level (artifact-list items)
---   getUniqueAffix() map affix id (map items, zzMaw-Maps)
---   Game.Time        vanilla temporary-enchant expiry (unmodified items)
--- These accessors cover the tier/affix/celestial family and encode the
--- DOMINANT legacy idioms. Artifact level, map affixes and the vanilla
--- expiry keep reading the field directly -- same field, other classes.
+-- BonusExpireTime -- item tier / legendary affix / celestial. The field
+-- carries other meanings per item class (artifact level, map affix,
+-- vanilla expiry) which read it directly: NOTES.md, ItemFields.lua.
 ------------------------------------------------------------------------
 
 -- Ancient (1) / primordial (2) weapon tier; 0 for everything else.

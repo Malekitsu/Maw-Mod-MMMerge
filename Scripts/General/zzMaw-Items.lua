@@ -2366,22 +2366,9 @@ local bonusBaseEnchantSkill={
 }
 
 --RECALCULATE THE WHOLE ITEMS EFFECTS
---
---itemStats(index) rebuilds a player's item/stat snapshot (plItemsStats).
---Two phases:
---  1. COLLECT everything that does not depend on effective skills --
---     enchants, item-granted skill bonuses (+50 slots), equipment spell
---     bonuses, artifact bonuses, raw armor AC -- then PUBLISH the snapshot.
---  2. ADD everything computed FROM effective skills: weapon rows, armor
---     skill scaling, buffs, HP/SP, attack rows, damage multipliers.
---pl:GetSkill routes through events.GetSkill above, which reads the
---PUBLISHED snapshot for item-granted skill bonuses. Publishing between the
---phases is what makes one pass exact -- the old single-pass layout read the
---PREVIOUS snapshot's bonuses and had to run twice to converge.
+--two phases with the snapshot published between them: MawCore/NOTES.md
 
---set lookups for the item-id lists scanned per item below; built on first
---itemStats call, NOT at GameInitialized2 -- the axe lists are created in
---zzMAW-Skills' GameInitialized2, which runs after this file's handlers
+--built lazily: the axe lists don't exist yet at init time (NOTES.md)
 local artArmorsSet, artWeaponsSet, oneHandedAxesSet, twoHandedAxesSet
 local ancientWeaponsSet, meditationBonusItemSet
 local function makeSet(list, set)

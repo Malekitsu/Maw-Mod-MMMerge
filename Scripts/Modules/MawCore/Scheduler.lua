@@ -1,21 +1,8 @@
--- Scheduler.lua -- one events.Tick for the whole core.
+-- Scheduler.lua -- one events.Tick for the whole core: named tasks with
+-- real-time intervals instead of N raw Tick handlers.
 --
--- The legacy mod has 57 raw events.Tick handlers, most doing work that does
--- not need to run every frame (GREENFIELD.md par.2). Here a task registers
--- once, with a name and a real-time interval; a single Tick handler drives
--- them all, and Scheduler.describe() lists exactly what runs and how often.
---
--- Scope note: this is for REAL-TIME / per-frame cadence work only. For
--- game-time scheduling MMExtension already provides Timer() and RefillTimer()
--- (Scripts/Core/timers.lua -- Game.Time based, per-map lifecycle). Use those
--- for anything that should follow the game clock; they are not duplicated here.
---
--- Deliberately NOT migrated here: the legacy dynamic transients -- handlers
--- that register `function events.Tick()` inside an action and self-remove
--- with events.Remove("Tick", 1). The number is a STACK LEVEL (the caller
--- removes itself; Core/EventsList.lua `replace`), so inside a scheduler task
--- that call would remove the scheduler's own shared Tick handler. Leave them
--- as raw events.Tick.
+-- Game-TIME scheduling stays with MMExtension's Timer()/RefillTimer().
+-- Cadence rules and what must never be throttled: NOTES.md.
 
 local Scheduler = {}
 MawCore.Scheduler = Scheduler
@@ -35,9 +22,7 @@ function Scheduler.every(id, ms, fn)
 	tasks[#tasks + 1] = {id = id, ms = ms, fn = fn, last = 0}
 end
 
--- Force a task to run on the next frame regardless of its interval -- for
--- "refresh immediately on this event" pokes (e.g. char-screen labels on
--- character switch) without giving up the task's slow steady cadence.
+-- Run a task next frame regardless of its interval (event pokes).
 function Scheduler.now(id)
 	for _, t in ipairs(tasks) do
 		if t.id == id then

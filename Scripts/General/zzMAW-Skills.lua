@@ -1293,10 +1293,8 @@ function events.GameInitialized2()
 	baseMedStr=	Skillz.getDesc(28,1)
 	baseAscStr= "Increases spell damage and healing at the expense of higher mana cost and cast time."
 end
--- regeneration / meditation / ascension / spear GM tooltips moved to
--- Scripts/Modules/MawCore/SkillTooltip.lua (SKILL_TOOLTIPS.md); the base
--- strings captured above (baseRegStr, baseMedStr, baseAscStr) stay here --
--- capture timing relative to other GameInitialized2 appends is part of the text
+-- dynamic tooltips moved to MawCore/SkillTooltip.lua; the base strings
+-- above stay here, capture timing is part of the text (SKILL_TOOLTIPS.md)
 
 function events.LoadMap()
 	if vars.hirelingFix then
@@ -1573,6 +1571,43 @@ function events.CanWearItem(t)
 	end
 end
 ]]
+
+--may this item sit in this player's offhand? (tricks: MawCore/NOTES.md)
+function CanDualWield(pl, it)
+	if table.find(seraphClass, pl.Class) and it:T().Skill==1 then
+		return false
+	end
+	return true
+end
+
+--temporary skill for one equip action, restoring the EXACT raw value.
+--Never nest two of these on one skill in one action -- MawCore/NOTES.md
+function tempSkillForEquip(pl, skillId, level, mastery)
+	local saved=pl.Skills[skillId]
+	pl.Skills[skillId]=JoinSkill(level, mastery)
+	RunNextTick(function()
+		pl.Skills[skillId]=saved
+	end)
+end
+
+--fake Novice Sword so the engine itself refuses the offhand placement.
+--2h swords excluded: zzClasses owns those (NOTES.md)
+function events.Action(t)
+	if t.Action==133 then
+		local id=Game.CurrentPlayer
+		if id<0 or id>Party.High then
+			id=0
+		end
+		local pl=Party[id]
+		local it=Mouse.Item
+		if it and it.Number>0 and it:T().EquipStat==0
+				and not table.find(twoHandedSwords, it.Number)
+				and not CanDualWield(pl, it) then
+			tempSkillForEquip(pl, const.Skills.Sword, 1, 1)
+		end
+	end
+end
+
 --list of 2h axes and 1h axe
 function events.GameInitialized2()
 	oneHandedAxes={}
@@ -2535,7 +2570,8 @@ function events.LoadMap()
 	end
 end
 
---dwarf with double 1h axes
+--axe dual wield: fake Dagger mastery for the equip action so the engine
+--offhands the (dagger-reskinned) axe -- MawCore/NOTES.md
 function events.Action(t)
 	if t.Action==133 then
 		local id=Game.CurrentPlayer
@@ -2545,57 +2581,22 @@ function events.Action(t)
 		end
 		local pl=Party[id]
 		local race=Game.CharacterPortraits[pl.Face].Race
-		if race==const.Race.Dwarf then
-			local it=Mouse.Item
-			if it then
-				local txt=it:T()
-				local s,m=SplitSkill(pl.Skills[const.Skills.Dagger])
-				local s2,m2=SplitSkill(pl.Skills[3])--axe
-				if table.find(oneHandedAxes, it.Number) then
-					if m2>=2 then
-						pl.Skills[const.Skills.Dagger]=JoinSkill(2,2)
-						RunNextTick(function()
-							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
-						end)
-					else
-						pl.Skills[const.Skills.Dagger]=JoinSkill(1,1)
-						RunNextTick(function()
-							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
-						end)
-					end
-				end
+		local it=Mouse.Item
+		if not it or (race~=const.Race.Dwarf and race~=const.Race.Minotaur) then
+			return
+		end
+		local s2,m2=SplitSkill(pl.Skills[3])--axe
+		if table.find(oneHandedAxes, it.Number) then
+			if m2>=2 then
+				tempSkillForEquip(pl, const.Skills.Dagger, 2, 2)
+			else
+				tempSkillForEquip(pl, const.Skills.Dagger, 1, 1)
 			end
-		elseif race==const.Race.Minotaur then
-			local it=Mouse.Item
-			if it then
-				local txt=it:T()
-				local s,m=SplitSkill(pl.Skills[2])--dagger
-				local s2,m2=SplitSkill(pl.Skills[3])--axe
-				if table.find(oneHandedAxes, it.Number) then
-					if m2>=2 then
-						pl.Skills[const.Skills.Dagger]=JoinSkill(2,2)
-						RunNextTick(function()
-							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
-						end)
-					else
-						pl.Skills[const.Skills.Dagger]=JoinSkill(1,1)
-						RunNextTick(function()
-							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
-						end)
-					end
-				elseif table.find(twoHandedAxes,it.Number) then
-					if m2>=3 then
-						pl.Skills[const.Skills.Dagger]=JoinSkill(2,2)
-						RunNextTick(function()
-							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
-						end)
-					else
-						pl.Skills[const.Skills.Dagger]=JoinSkill(1,1)
-						RunNextTick(function()
-							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
-						end)
-					end
-				end
+		elseif race==const.Race.Minotaur and table.find(twoHandedAxes, it.Number) then
+			if m2>=3 then
+				tempSkillForEquip(pl, const.Skills.Dagger, 2, 2)
+			else
+				tempSkillForEquip(pl, const.Skills.Dagger, 1, 1)
 			end
 		end
 	end
@@ -2653,9 +2654,7 @@ function mawTick_DwarfAxes()
 	end
 end
 
---Tick handlers above now run as named MawCore scheduler tasks (interval in
---ms; 0 = every frame). Registered at GameInitialized2 because MawCore loads after every
---General file. In-game: print(MawCore.Scheduler.describe())
+--Tick handlers above run as MawCore scheduler tasks (ms; 0=frame, -1=poke only)
 function events.GameInitialized2()
 	local every=MawCore.Scheduler.every
 	every("skills/homing-projectiles", 0, mawTick_HomingProjectiles)
