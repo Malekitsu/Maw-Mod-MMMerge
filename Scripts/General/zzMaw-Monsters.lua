@@ -2058,7 +2058,7 @@ function events.BuildMonsterInformationBox(t)
 	local mon=Map.Monsters[id]
 	--real HP for monsters over the engine cap (MawCore.MonsterHP ledger)
 	if t.IdentifiedHitPoints and MawCore and MawCore.MonsterHP then
-		local cur=MawCore.MonsterHP.current(mon)
+		local cur=MawCore.MonsterHP.max(mon)
 		if cur~=mon.HP then
 			t.HitPoints.Text="Hit Points \t100" .. shortenNumber(round(cur), 3, true)
 		end
@@ -2175,7 +2175,7 @@ function events.BuildMonsterInformationBox(t)
 		local experienceAwarded=experience*healthRateo
 		local lvl=pl.LevelBase
 		experienceAwarded=round(math.min((lvl+1)*1000, experienceAwarded))
-		t.EffectsHeader.Text=t.EffectsHeader.Text .. "\n\nExperience: " .. experienceAwarded .. "\n\nCurrent Health: " .. shortenNumber(round(mon.HP*2^math.floor(mon.Resistances[0]/1000)), 4)
+		t.EffectsHeader.Text=t.EffectsHeader.Text .. "\n\nExperience: " .. experienceAwarded .. "\n\nCurrent Health: " .. shortenNumber(MawCore.MonsterHP.current(mon), 4)
 		
 		-- Display active debuffs
 		local debuffNames = {

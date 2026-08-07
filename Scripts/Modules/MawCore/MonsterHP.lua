@@ -21,11 +21,19 @@ local function ledger()
 	return mapvars.MawMonsterHP
 end
 
+local function reconcile(mon, e)
+	if mon.HP ~= e.proxy then
+		e.hp = math.max(math.min(e.hp + (mon.HP - e.proxy)*(e.max/math.max(mon.FullHP, 1)), e.max), 0)
+		e.proxy = mon.HP
+	end
+	return e
+end
+
 -- real current HP of any monster
 function MonsterHP.current(mon)
 	local e = ledger()[mon:GetIndex()]
 	if e then
-		return e.hp
+		return reconcile(mon, e).hp
 	end
 	return mon.HP
 end
@@ -54,6 +62,11 @@ end
 -- res-thousands halving at every recalc/spawn site.
 function MonsterHP.apply(mon, realMax, fraction)
 	realMax = math.max(round(realMax), 1)
+
+	local tracked = fraction and fraction > 0 and ledger()[mon:GetIndex()]
+	if tracked then
+		fraction = reconcile(mon, tracked).hp / tracked.max
+	end
 	fraction = fraction or 1
 	if fraction ~= fraction or fraction > 1 then	-- NaN (0/0) or overfull
 		fraction = 1
@@ -80,10 +93,7 @@ function MonsterHP.stage(t)
 	if not e then
 		return
 	end
-	-- reconcile engine-side heals/regeneration/off-pipeline damage
-	if mon.HP ~= e.proxy then
-		e.hp = math.max(math.min(e.hp + (mon.HP - e.proxy)*(e.max/math.max(mon.FullHP, 1)), e.max), 0)
-	end
+	reconcile(mon, e)
 	local real = t.Result
 	local data = t.Hit
 	if data and data.Spell == 44 then	-- engine computed this from the proxy pool
