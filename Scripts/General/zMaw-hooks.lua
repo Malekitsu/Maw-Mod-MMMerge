@@ -1,7 +1,18 @@
 
 do
+	-- Hook registers come back as SIGNED i4 (RSMem: i4 returns n-0x100000000
+	-- for n >= 0x80000000) while ["?ptr"] is an unsigned address. Subtracting
+	-- them mixes the two conventions, so any pointer past 2GB makes the
+	-- difference wrap by 2^32 and the index lands wildly out of bounds.
+	local function asPointer(v)
+		if v < 0 then
+			return v + 0x100000000
+		end
+		return v
+	end
+
 	local function getSFTItem(p)
-		local i = (p - Game.SFTBin.Frames["?ptr"]) / Game.SFTBin.Frames[0]["?size"]
+		local i = (asPointer(p) - Game.SFTBin.Frames["?ptr"]) / Game.SFTBin.Frames[0]["?size"]
 		return Game.SFTBin.Frames[i]
 	end
 
@@ -9,7 +20,7 @@ do
 	local scaleHook = function(indoor)
 		return function(d)
 			local t = {Scale = d.eax, Frame = getSFTItem(d.ebx)}
-			t.MonsterIndex, t.Monster = internal.GetMonster(indoor and d.edi or (d.edi - 0x9A))
+			t.MonsterIndex, t.Monster = internal.GetMonster(asPointer(indoor and d.edi or (d.edi - 0x9A)))
 			events.call("MonsterSpriteScale", t)
 			d.eax = t.Scale
 		end
