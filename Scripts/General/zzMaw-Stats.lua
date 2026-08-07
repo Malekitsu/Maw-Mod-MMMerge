@@ -49,7 +49,6 @@ function events.KeyDown(t)
 end
 
 
-
 function getCritInfo(pl, dmgType, monLvl)
 	if not pl then return 0, 1, false end
 	monLvl = monLvl or pl.LevelBase or 0
@@ -135,10 +134,6 @@ function getCritInfo(pl, dmgType, monLvl)
 	local success = math.random() < totalCrit
 	return totalCrit, critDamageMultiplier, success
 end
-
-
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
-
 
 
 --speed
@@ -584,7 +579,6 @@ function events.BuildStatInformationBox(t)
 	end
 	
 	
-	
 	if t.Stat==17 then
 		local i=Game.CurrentPlayer
 		local atk=Party[i]:GetRangedAttack()
@@ -701,8 +695,6 @@ function events.Regeneration(t)
 		t.SP=round(t.SP)
 	end
 end
-
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 --mistform
 function events.PlayerAttacked(t)
 	if restoringMistformTime then return end
@@ -730,7 +722,6 @@ local function classDamageReduction(pl, damage, dkSkill)
 end
 
 --reduce damage by %
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 --pokes the throttled label tasks whenever something they display changes
 --(player, screen, char tab, mouse-held item) -- NOTES.md
@@ -875,7 +866,6 @@ damageKindMap={
 	[9]=const.Damage.Light,
 	[10]=const.Damage.Dark,
 }
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 --spear reset stacks after kill
 function events.MonsterKilled(mon)
@@ -1123,7 +1113,6 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	local damage=round(damage*res)
 	return damage
 end
-
 
 
 function mawTick_PowerLabels()

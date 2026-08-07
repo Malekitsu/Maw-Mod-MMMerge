@@ -146,7 +146,6 @@ function survivalMonsterTable(currentMapLevel)
 		LevelB=BLevel[i]
 		
 		
-		
 		mon.Level=math.min(currentMapLevel,255)
 
 		totalLevel=totalLevel or {}
@@ -306,8 +305,6 @@ function survivalMonsterTable(currentMapLevel)
 end
 
 function events.GameInitialized2()
-	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
-	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 	function events.CanOpenChest(t)
 		if not survivalMaps[Map.Name] and vars.SuvivalMode then
 			t.CanOpenChest=false

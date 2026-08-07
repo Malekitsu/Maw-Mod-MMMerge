@@ -1040,7 +1040,6 @@ end
 --map affixes
 
 totalMapAffixes=33
--- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
 
 function events.LoadMap()
 	if vars.madnessMode then

@@ -1,6 +1,3 @@
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
-
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 function events.DoBadThingToPlayer(t)
 	if t.Allow==false and getMapAffixPower(8) and math.random()<getMapAffixPower(8)/100 then
 		t.Allow=true

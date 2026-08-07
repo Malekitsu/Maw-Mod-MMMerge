@@ -1414,8 +1414,6 @@ function updateCelestialItem(it,pl)
 	end
 end
 
--- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
-
 extraDescription=false
 function events.KeyDown(t)
 	if t.Alt then
@@ -2060,7 +2058,6 @@ function artifactTextBuilder(n,lvl)
 	return artifactTxt[n]
 end
 ]]
--- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
 
 function replaceNumber(match, bonusStrength)
 	lvl=Party[Game.CurrentPlayer].LevelBase
@@ -2076,7 +2073,6 @@ end
 --ARTIFACTS BASE STATS SCALING--
 --------------------------------
 ancientWeapons={866,867,1666,1667}
--- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
 --[[
 --increase artifact damage tooltip
 function events.CalcStatBonusByItems(t)
@@ -2204,10 +2200,7 @@ slotMap={
 	[10]=10,
 }
 
-
--- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
 --item level
--- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
 
 function calculateStatsAdd(item, stats)
 	statValue={}
@@ -2250,9 +2243,6 @@ function calculateStatsAdd(item, stats)
 	end	
 	return statValue
 end
-
-
-
 
 
 function events.ModifyItemDamage(t)
@@ -3227,7 +3217,6 @@ artifactStatsBonus[537]	= {	[const.Stats.Might]	= 120,
 							[const.Stats.ArmorClass]	= -15}							
 							
 
-
 -- Cycle of life
 artifactStatsBonus[543] = {	[const.Stats.Endurance] = 20}
 
@@ -3552,7 +3541,6 @@ function events.Action(t)
 		end)
 	--end
 end
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 function mawRefresh(i)
 	if i=="all" then
 		for v=0,Party.High do
@@ -3994,8 +3982,6 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 	end
 end
 
--- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
-
 function events.AfterLoadMap()
 	if isRedone then
 		if not mapvars.chestFix then
@@ -4090,7 +4076,6 @@ function GetLevelRquirement(it)
 	
 	local weight = equipSlotWeights[itemType]
 	local levelRequired=(baseLevel*weight[1]+bonusLevel*weight[2]+chargesLevel*weight[3]+specialEnchantLevel*weight[4])
-	
 	
 	
 	levelRequired=math.max(1,math.floor(levelRequired-10))

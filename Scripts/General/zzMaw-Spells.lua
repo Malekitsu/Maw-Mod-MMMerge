@@ -751,7 +751,6 @@ function events.GameInitialized2()
 	Game.SpellsTxt[114].Description="Mistform allows the vampire to reduce physical damage by 75%.  However, a vampire in Mistform cannot perform any physical attacks.  Vampires in Mistform are able to use spells and abilities and are affected by spells and abilities."
 
 	
-
 	--store non buff rework tooltips
 	storeBaseText={}
 	for i=1, Game.SpellsTxt.High do
@@ -970,7 +969,6 @@ mem.nop(0x426CD3, 6)
 
 --removes fly when attacking, except in certain maps
 flyAllowedMaps={"elema.odm","elemf.odm","elemw.odm","out12.odm","outa1.odm","outa2.odm","outa3.odm","outb2.odm","outb3.odm","out05.odm", "out07.odm"}
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 function events.LoadMap()
 	if table.find(flyAllowedMaps,Map.Name) then 
@@ -1286,7 +1284,6 @@ function events.Action(t)
 end
 
 
-
 ----------------------------------------
 --CC REWORK
 ----------------------------------------
@@ -1580,8 +1577,6 @@ function calcDebuffDuration(monster, cc, duration)
 	return finalDuration
 end
 
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
-
 
 function calcEffectChance(lvl, res, skill, chance, mon)
 	totRes=lvl/4+res
@@ -1769,8 +1764,6 @@ function events.CalcSpellDamage(t)
 	end
 	
 end
-
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 
 function ascendSpellDamage(skill, mastery, spell, index)
@@ -3116,8 +3109,6 @@ function getMaxMana(pl)
 end
 
 
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
-
 --set reference coord and desired range
 function getClosestMonsterInRange(mon,range)
 	local X,Y,Z=mon.X,mon.Y,mon.Z
@@ -3314,8 +3305,6 @@ function events.GameInitialized2()
 	end
 
 end
-
--- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
 
 function events.ItemGenerated(t)
 	if disableSpellBookRework then return end

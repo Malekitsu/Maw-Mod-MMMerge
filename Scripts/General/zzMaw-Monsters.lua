@@ -588,7 +588,6 @@ function recalculateMonsterTable()
 		LevelB=BLevel[i]
 		
 		
-		
 		mon.Level=math.min(base.Level+bolsterLevel,255)
 		
 		--monsters scale based on map
@@ -2212,8 +2211,6 @@ function events.LoadMap()
 	Game.UseMonsterBolster=false
 end
 
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
-
 --TRUE NIGHTMARE MODE
 function events.CanSaveGame(t)
 	if Game.BolsterAmount~=300 and vars and vars.Mode~=2 then return end
@@ -2549,7 +2546,6 @@ function events.LeaveMap()
 	vars.lastHitTime=0
 	SeedDeaths.clear_pending_for_current()
 end
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 function mawTick_DeathSeedTimeout()
   if not vars then return end
@@ -3261,9 +3257,6 @@ function checkPityProtectedBoss(seed, chanceMult, generatedByBroodlord)
 	return skill, hpMult, dmgMult
 end
 function events.GameInitialized2() --to make the after all the other code
-	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
-
-	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 end
 --leecher drain
 local a1, b1, c1, d1
@@ -3705,7 +3698,6 @@ function mawTick_TurnbasedMoveLimit()
 		end
 	end
 end
-
 
 
 effectNames={
@@ -4343,8 +4335,6 @@ function events.BeforeLoadMap()
 	end
 end
 
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
-
 function getDistances(unit1,unit2)
 	distance=((unit1.X-unit2.X)^2+(unit1.Y-unit2.Y)^2+(unit1.Z-unit2.Z)^2)^0.5
 	return distance
@@ -4406,8 +4396,6 @@ function events.PickCorpse(t)
 	end
 end
 
-
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 local teleportKey=teleportDeadMonstersAndCraftingKey or 75 --K as default
 function events.KeyDown(t)

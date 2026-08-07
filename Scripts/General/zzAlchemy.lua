@@ -1,3 +1,4 @@
+--Item tooltip sections live in Scripts/Modules/MawCore/Tooltip.lua.
 --Every successful craft ends the same way: glow the item on the paper doll
 --and play the enchant sound. Also called from Global/zzMAWPotions.lua.
 function ShowCraftedItemEffect(it)
@@ -385,8 +386,6 @@ function events.DoBadThingToPlayer(t)
 	end
 end
 
--- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
-
 potionText={
 	[222] = "",
 	[223] = "",
@@ -530,8 +529,6 @@ function events.GameInitialized2()
 	end
 end
 
--- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
-
 --add scaling effect on reagents
 function events.ItemGenerated(t)
 	if Map.MapStatsIndex==0 then return end
@@ -603,7 +600,6 @@ function events.GameInitialized2()
 	Game.SkillDesMaster[const.Skills.Alchemy]="Allows to make white potions. Power when mixing will be increased to 1.5 per skill point."
 	Game.SkillDesGM[const.Skills.Alchemy]="Allows to make black potions. Power when mixing will be increased to 2 and increases potion duration by 6 Minutes per skill point. Allows the Endless potion to be dropped by monsters, which power is determined by Alchemy level."
 end
--- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
 
 local function upgradeGem(it, tier)
 	local enchanted=false
@@ -949,8 +945,6 @@ end
 
 --manually use crafting items on maps
 local overworldMaps={1,2,3,4,5,6,7,8,9,10,11,12,13,14,62,63,64,65,66,67,68,69,70,71,72,73,74,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151}
-
--- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
 
 local chargePotions={231, 232, 233, 237, 245, 251, 257, 263}
 function UseItem(it, usedIt)

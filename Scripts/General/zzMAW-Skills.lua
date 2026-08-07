@@ -576,8 +576,6 @@ function events.GameInitialized2()
 		end
 	end
 end
-
--- armor skill tooltips (8-11) moved to Scripts/Modules/MawCore/SkillTooltip.lua (SKILL_TOOLTIPS.md)
 		
 	
 function events.GameInitialized2()
@@ -1292,7 +1290,6 @@ function events.GameInitialized2()
 	baseMedStr=	Skillz.getDesc(28,1)
 	baseAscStr= "Increases spell damage and healing at the expense of higher mana cost and cast time."
 end
--- dynamic tooltips moved to MawCore/SkillTooltip.lua; the base strings
 -- above stay here, capture timing is part of the text (SKILL_TOOLTIPS.md)
 
 function events.LoadMap()
@@ -1759,7 +1756,6 @@ function horizontalModeMasteries()
 end
 
 
-
 function events.Action(t)
 	horizontalModeMasteries()
 end
@@ -2137,7 +2133,6 @@ function events.LoadMap()
 end
 ]]
 --coverBonus now lives in MawCore/DamageState.lua
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 		
 function events.CanIdentifyItem(t)
@@ -2266,12 +2261,6 @@ function events.BeforeLoadMap(wasInGame)
 		Skillz.set(pl,52,0)
 	end
 end
-
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
-
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
-
--- mace GM stun/paralyze tooltip moved to Scripts/Modules/MawCore/SkillTooltip.lua (SKILL_TOOLTIPS.md)
 
 --mana shield
 function events.GameInitialized2()
@@ -2484,8 +2473,6 @@ do
     end
   end
 end
-
--- armsmaster supreme-requirement tooltip moved to Scripts/Modules/MawCore/SkillTooltip.lua
 -- (SKILL_TOOLTIPS.md); the static Supreme row (35/6) is set in the armsmaster
 -- GameInitialized2 above
 

@@ -19,7 +19,6 @@ function events.ItemAdditionalDamage(t)
 	t.Result=0
 end
 --[11]="Killing a monster will recover you action time",
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 function changePlayer(id)
 	RunNextTick(function()
@@ -50,12 +49,10 @@ function events.LoadMap(wasInGame)
 		vars.legendaryProtectionCooldown[index]=vars.legendaryProtectionCooldown[index] or 0
 	end
 end
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 
 
 --[16]="Your highest resistance will always be used against non physical attacks",
 --inside calcMawDamage
-
 
 
 --[19]="Your weapon enchants now scales with the highest between might/int./pers.",

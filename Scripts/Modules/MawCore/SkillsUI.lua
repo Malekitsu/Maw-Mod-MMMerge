@@ -411,6 +411,16 @@ function SkillsUI.start()
 	end
 
 	local function hintTail(addr, withBonus, ledgerName)
+		-- We cut the builder short MID-BODY, so this stub is its epilogue --
+		-- but esp here is NOT where it is at the real exit (0x417653), because
+		-- the body has call arguments and temporaries below the saved regs.
+		-- So we cannot pop: any pop order grabs whatever is on top right now.
+		-- Restore from fixed frame offsets instead and let leave reset esp.
+		--   0x4171E0: push ebp / mov ebp,esp / sub esp,0x534 / push ebx / push esi
+		--   => saved ebx at [ebp-0x538], saved esi at [ebp-0x53C]
+		-- ebp is a true frame pointer here and is never reloaded in the body,
+		-- so this is correct at any cut point. (0x417653 pops esi then ebx,
+		-- confirming both the registers and that the exit is a plain retn.)
 		local code = Engine.asmproc(string.format([[
 			nop
 			nop
@@ -418,8 +428,8 @@ function SkillsUI.start()
 			nop
 			nop
 			mov eax, 0x%X
-			pop edi
-			pop ebx
+			mov esi, [ebp - 0x53C]
+			mov ebx, [ebp - 0x538]
 			leave
 			retn
 		]], hintBuf))
@@ -440,11 +450,11 @@ function SkillsUI.start()
 	hintTail(0x4172C1, true, "SkillzUIHintTailBonus")
 	hintTail(0x4174DD, false, "SkillzUIHintTail")
 
-	-- 0x417708, 12 bytes: the hover-hint title. The call to the hint-text
-	-- builder (0x4171E0) returns with esi CLOBBERED to the player pointer,
-	-- because the tail hooks inside it (ours, like the DLL's) skip the
-	-- original epilogue that restored esi. The DLL therefore hooked HERE --
-	-- before the call -- guarding the skill id across it; same fix.
+	-- 0x417708, 12 bytes: the hover-hint title. This guarded the skill id
+	-- across the call to the hint builder (0x4171E0) because the tail stub
+	-- used to leave esi clobbered with the player pointer. The stub now
+	-- restores esi properly, so the guard is redundant -- kept because it is
+	-- also what the DLL did, and it is harmless.
 	Engine.asmpatch("SkillzUIHintName1",
 		"Skillz port: hover hint title, skill id guarded across text build",
 		0x417708, string.format([[

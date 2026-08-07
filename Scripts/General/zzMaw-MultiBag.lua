@@ -128,7 +128,6 @@ function mawTick_MultibagButtons()
 end	
 
 
-
 --multiple inventory code
 function changeBag(pl, bag)
 	local id=pl:GetIndex()
@@ -341,12 +340,9 @@ function changeBag(pl, bag)
 end
 
 --remove buttons when tooltip is on the bottom right
--- moved to Scripts/Modules/MawCore/Tooltip.lua (item tooltip sections)
 
 --sortMultiBag(Party[0])
 --debug.Message(dump(tempBag))
-
-
 
 
 function sortMultiBag(pl)

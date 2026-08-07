@@ -1,3 +1,7 @@
+--Per-class data, runtime and handler bodies live in
+--Scripts/Modules/MawCore/Classes.lua (see MawCore/NOTES.md).
+--What stays here: promotions, seraph, dragon, shaman, and the one-line
+--registration stubs that must keep their position in the handler chain.
 --code to share promotions
 --game ordered from mm6 to mm8, first promotion then honorary promotion qbits, mm7 has 4 qbits total
 promotionList={
@@ -252,8 +256,6 @@ function pickLowestPartyMember()
 	return min_index, min_value
 end
 
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
-
 --[[mind light increases melee damage
 
 function events.GameInitialized2()
@@ -286,8 +288,6 @@ function events.LoadMap(wasInGame)
 	end
 end
 
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
-
 --base school texts for the tooltip builders, captured before the later
 --init handlers append to them (SKILL_TOOLTIPS.md)
 MawSchoolDescBase={}
@@ -296,13 +296,6 @@ function events.GameInitialized2()
 		MawSchoolDescBase[id]=Skillz.getDesc(id,1)
 	end
 end
-
--- moved to SkillTooltip builders: Scripts/Modules/MawCore/SkillTooltip.lua (SKILL_TOOLTIPS.md)
-
-
-
-
-
 
 
 ----------------------------------
@@ -372,11 +365,6 @@ function events.GameInitialized2()
 	Game.Classes.SPStats[11]=3
 	
 	Skillz.setDesc(23,1,"Dragons are powerful creatures with innate abilities.\nLike the racial abilities of Dark Elves and Vampires, Dragon abilities are cast like spells, but are acquired like skills. Dragons begin able to cast Fear, the gain a second breath weapon, Flight and Wing Bugget at expert, master and grandmaster rankings.\n\nBreath damage is 20 + 2 per level (up to level 600, or 900 in madness) and total damage is increased by " .. dragonBreath.Damage[1] .. "-" .. dragonBreath.Damage[2] .. "-" .. dragonBreath.Damage[3] .. "-" .. dragonBreath.Damage[4] .. "% at novice, expert, master and grandmaster rankings per point of skill in Dragon Ability.\nEach point in the skill increases damage and increases recovery time by 3%."  )
-	
-	--moved to MawCore/Classes.lua (registered from Classes.start, still after everything)
-	
-	--moved to MawCore/Classes.lua (registered from Classes.start, still after everything)
-	--moved to MawCore/Classes.lua (registered from Classes.start, still after everything)
 	--skill text: one row per mastery from the dragonFang/dragonScales tables
 	local function fangRow(m)
 		return string.format("      %s|     %s|",dragonFang.Attack[m],dragonFang.Damage[m])
@@ -501,7 +489,6 @@ function dragonSkill(dragon, index)
 end
 
 function events.GameInitialized2()
-	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 end
 
 -- Function to convert party direction to radians
@@ -545,7 +532,6 @@ end
 
 
 function events.GameInitialized2()
-	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 	--[[
 	function events.CalcStatBonusByItems(t)
 		if t.Stat==const.Stats.MeleeDamageMax or t.Stat==const.Stats.MeleeDamageMin then
@@ -567,9 +553,6 @@ function events.GameInitialized2()
 end
 
 
--- moved to SkillTooltip builders: Scripts/Modules/MawCore/SkillTooltip.lua (SKILL_TOOLTIPS.md)
-
-
 ---------------------------------------
 --DEATH KNIGHT
 ---------------------------------------
@@ -580,17 +563,10 @@ end
 --death grip
 
 --runic power
---moved to MawCore/Classes.lua (per-class data)
 
 --change spell cost to personalized value:
---moved to MawCore/Classes.lua (the class presentation registry)
-
---moved to MawCore/Classes.lua (per-class data)
 
 --spells
---DK engine-event handlers moved to MawCore/Classes.lua (registered from Classes.start, still after everything)
-
---moved to MawCore/Classes.lua (per-class data)
 
 --body: MawCore/Classes.lua; registration kept here for handler order
 function events.Action(t)
@@ -621,8 +597,6 @@ function events.GameInitialized2()
 		end
 	end
 end
-
---moved to MawCore/Classes.lua (the class presentation registry)
 
 
 --[[add tooltips
@@ -675,11 +649,6 @@ function events.CanLearnSpell(t)
 	MawCore.Classes.eleLearnSpell(t)
 end
 
---moved to MawCore/Classes.lua (per-class data)
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
-
---moved to MawCore/Classes.lua (per-class data)
-
 --body: MawCore/Classes.lua; registration kept here for handler order
 function events.Action(t)
 	MawCore.Classes.eleSpellbook(t)
@@ -691,14 +660,6 @@ function events.PlayerCastSpell(t)
 	MawCore.Classes.eleCastRotation(t)
 end
 
---moved to MawCore/Classes.lua (per-class runtime)
-
-
--- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
-
---moved to MawCore/Classes.lua (per-class data)
-
---moved to MawCore/Classes.lua (per-class runtime)
 
 --reset stacks when casting from spellbook
 --body: MawCore/Classes.lua; registration kept here for handler order
@@ -724,10 +685,6 @@ function events.GameInitialized2()
 		}
 	end
 end
-
---moved to MawCore/Classes.lua (per-class runtime)
-
---moved to MawCore/Classes.lua (the class presentation registry)
 
 
 function checkSkills(id)
@@ -846,21 +803,14 @@ end
 
 
 function events.GameInitialized2()
-	-- moved to the MawCore damage pipeline: Scripts/Modules/MawCore/Damage.lua (DAMAGE_PIPELINE.md)
 	
 end
 
-
---moved to MawCore/Classes.lua (per-class runtime)
-
---moved to MawCore/Classes.lua (the class presentation registry)
 --body: MawCore/Classes.lua; registration kept here for handler order
 function events.CanLearnSpell(t)
 	MawCore.Classes.assassinLearnSpell(t)
 end
 
-
---moved to MawCore/Classes.lua (per-class data)
 
 --body: MawCore/Classes.lua; registration kept here for handler order
 function events.Action(t)
@@ -880,14 +830,11 @@ function events.GameInitialized2()
 	end
 end
 
---moved to MawCore/Classes.lua (per-class runtime)
-
 --body: MawCore/Classes.lua; registration kept here for handler order
 function events.PlayerCastSpell(t)
 	MawCore.Classes.assassinCastStacks(t)
 end
 --spells speed depends on weapon
---moved to MawCore/Classes.lua (per-class runtime)
 --CastQuickSpell(0,6)
 --[[spells
 fire spike fire aura fireball haste
