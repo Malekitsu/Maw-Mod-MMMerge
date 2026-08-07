@@ -301,51 +301,11 @@ end
 ----------------------------------
 -- DRAGON REWORK
 ----------------------------------
-local dragonFang={
-	["Attack"]={2,3,4,5,[0]=0},
-	["Damage"]={4,6,8,10,[0]=0},
-	--["Speed"]={0,0,1,2,[0]=0},
-}
-local dragonBreath={
-	--["Attack"]={0,0,0,0,[0]=0},
-	["Damage"]={3,4,5,6,[0]=0},
-	--["Speed"]={0,0,1,1,[0]=0},
-}
-local dragonScales={
-	["AC"]={2,3,3,4,[0]=0},
-	["Resistances"]={1,1,2,3,[0]=0},
-}
-
---shared dragon formulas (min/max rows differ only by the spread mult)
-local dragonRecoveryPerSkill=0.015
-local function dragonEffLevel(pl)
-	local bolster=getPartyLevel(4)+1
-	local lvl=pl.LevelBase
-	if pl.LevelBase/bolster>1.2 then
-		lvl=math.min(pl.LevelBase/2,bolster)
-	end
-	local cap=600
-	if vars.madnessMode then
-		cap=900
-	end
-	return math.min(lvl,cap)
-end
-local function dragonFangDamage(pl, mult)
-	local s, m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
-	local might=pl:GetMight()
-	local mightEffect=Game.GetStatisticEffect(might)
-	local bonus= (1 + (dragonFang.Damage[m]) * s / 100)  * (dragonEffLevel(pl) * 2 +30)
-	return round((bonus*(1+might/1000)+(mightEffect*might/1000))*mult*(1+s*dragonRecoveryPerSkill))
-end
-local function dragonBreathDamage(pl, mult)
-	local s, m = SplitSkill(pl:GetSkill(const.Skills.DragonAbility))
-	local might=pl:GetMight()
-	local mightEffect=Game.GetStatisticEffect(might)
-	local baseDamage=(1 + dragonBreath.Damage[m] * s / 100) * (20 + 2 * dragonEffLevel(pl)) + mightEffect
-	return round(baseDamage*(1+might/1000)*mult*(1+s*dragonRecoveryPerSkill))
-end
+--data and formulas live in MawCore/Classes.lua, with the handlers that use them
 
 function events.GameInitialized2()
+	local dragonFang, dragonBreath, dragonScales =
+		MawCore.Classes.dragonFang, MawCore.Classes.dragonBreath, MawCore.Classes.dragonScales
 	--fire blast tooltip
 	Game.SpellsTxt[123].Description="This ability is an upgraded version of the normal Dragon breath weapon attack.  It acts much like a fireball, striking its target and exploding out to hit everything near it, except the explosion does much more damage than most fireballs."
 	Game.SpellsTxt[123].Expert="Deals damage equal to 70% of breath damage"
