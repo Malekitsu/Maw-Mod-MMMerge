@@ -310,7 +310,7 @@ end
 
 --fraction of bonus damage per point of might, normalized by level
 function GetMightDamageMultiplier(mightAmount, playerLevel)
-	return mightAmount/(1000+playerLevel*3)
+	return mightAmount/math.min(1000+playerLevel*3, 4000)
 end
 
 function events.BuildStatInformationBox(t)

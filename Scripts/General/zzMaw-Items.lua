@@ -2706,36 +2706,54 @@ local function addBuffStats(pl, tab)
 		local buffList={6,0,17,4,12,1}
 		local spellList={3,14,25,36,58,69}
 		local spellStat={[3]=2,[14]=6,[25]=7,[36]=4,[46]=5,[58]=3,[69]=1}
-		--resistances and stats
+		--total current stat per tab index (base + potion bonus; tab adds items)
+		local statBase={
+			pl.MightBase+pl.MightBonus,
+			pl.IntellectBase+pl.IntellectBonus,
+			pl.PersonalityBase+pl.PersonalityBonus,
+			pl.EnduranceBase+pl.EnduranceBonus,
+			pl.AccuracyBase+pl.AccuracyBonus,
+			pl.SpeedBase+pl.SpeedBonus,
+			pl.LuckBase+pl.LuckBonus,
+		}
+		--resistances (flat, unchanged)
 		local s, m, level=getBuffSkill(85)
 		local buff2=(buffPower[85].Base[m]+level/2)*(1+buffPower[85].Scaling[m]/100*s/1.5)
-		local s, m, level=getBuffSkill(83)
-		local buff3=(buffPower[83].Base[m]+level/2)*(1+buffPower[83].Scaling[m]/100*s/1.5)
+		--light: percentage of the total stat
+		local s83=getBuffSkill(83)
+		local lightPct=0
+		if s83>0 then
+			lightPct=GetBuffStatPct(s83, true)
+		end
 		for i=1,6 do
 			local buff=0
-			local statBuff=0
+			local pct=0
 			if Party.SpellBuffs[buffList[i]].ExpireTime>=Game.Time then
 				local s, m, level=getBuffSkill(spellList[i])
 				buff=(buffPower[spellList[i]].Base[m]+level/2)*(1+buffPower[spellList[i]].Scaling[m]/100*s)
 				buff4=math.max(buff,buff2)
 				tab[i+10]=tab[i+10]+buff4
+				if s>0 then
+					pct=GetBuffStatPct(s)
+				end
 			end
-			statBuff=math.max(buff, buff3)
-			if i==4 then
-				enduranceStatBuff=buff3
-			end
+			pct=math.max(pct, lightPct)
 			local tabID=spellStat[spellList[i]]
+			local statBuff=(tab[tabID]+statBase[tabID])*pct
+			if i==4 then
+				enduranceStatBuff=(tab[tabID]+statBase[tabID])*lightPct
+			end
 			tab[tabID]=tab[tabID]+statBuff
 		end
 		--special case for accuracy, as it comes from bless
-		local accBonus=0
-		local buff=0
+		local accPct=lightPct
 		if pl.SpellBuffs[1].ExpireTime>=Game.Time then
-			local s, m, level=getBuffSkill(46)
-			buff=(buffPower[3].Base[m]+level/2)*(1+buffPower[3].Scaling[m]/100*s)
+			local s=getBuffSkill(46)
+			if s>0 then
+				accPct=math.max(accPct, GetBuffStatPct(s))
+			end
 		end
-		accBonus=math.max(buff3, buff)
-		tab[5]=tab[5]+accBonus
+		tab[5]=tab[5]+(tab[5]+statBase[5])*accPct
 		--stoneskin
 		if Party.SpellBuffs[15].ExpireTime>=Game.Time then
 			local s,m,level=getBuffSkill(38)
