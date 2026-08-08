@@ -164,14 +164,14 @@ local function tooltipOrbsGems(t)
 			local tier=(t.Item.Number-1040)*mult
 			local power = 3
 			
-			local twoHanded = tier * 6 * 2
-			local bodyArmor = round(tier * 1.5 * 6)
-			local helmEtc = round(tier * 1.25 * 6)
-			local rings = round(tier * 0.75 * 6)
+			local twoHanded = tier * 4 * 2
+			local bodyArmor = round(tier * 1.5 * 4)
+			local helmEtc = round(tier * 1.25 * 4)
+			local rings = round(tier * 0.75 * 4)
 			
 			
 			t.Description = "A special Gem that allows to increase an item Enchant Strength (right-click on an item with a base enchant to use)\nAncient, Primordial and Legendary items have increased Max power.\n\nIt is possible to upgrade 3 gems into 1 of upper tier by pressing U in the inventory page.\n\nMax Power: " 
-			.. StrColor(255, 128, 0, tostring(round(tier * 6))) --.. " (65% on AC)"
+			.. StrColor(255, 128, 0, tostring(round(tier * 4))) --.. " (65% on AC)"
 			.. "\nBonus: " .. StrColor(255, 128, 0, tostring(power)) 
 			.. "\n\nItem Modifier:\nTwo Handed Weapons: " .. StrColor(255, 128, 0, twoHanded)
 			.. "\nBody Armor: " .. StrColor(255, 128, 0, bodyArmor)

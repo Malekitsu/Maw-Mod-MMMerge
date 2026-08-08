@@ -618,7 +618,7 @@ local function upgradeGem(it, tier)
 	local upgradeAmount1=3
 	local upgradeAmount2=upgradeAmount1
 	--base value
-	local maxValue1=round(tier*6)
+	local maxValue1=round(tier*4)
 	
 	if GetAncientTier(it)>0 then
 		maxValue1=math.min(maxValue1+10,maxValue1*1.2)
