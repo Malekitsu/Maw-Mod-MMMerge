@@ -386,7 +386,9 @@ encStrUp={3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,7
 local function rollEnchantStrength(tier)
 	return round(encStrUp[tier]*math.random(5,10)/10)
 end
-
+local function rollMaxCharges(maxCharges)
+	return round(maxCharges*math.random(8,10)/10)
+end
 
 enc1Chance={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80}
 enc2Chance={20,30,35,40,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60}
@@ -1094,7 +1096,7 @@ function events.ItemGenerated(t)
 		end
 
 		it.BonusStrength=math.random(1+it.BonusStrength*minValue,it.BonusStrength)
-		it.MaxCharges=math.min(math.random(1+it.MaxCharges*minValue,it.MaxCharges*1.5),255)
+		it.MaxCharges=math.min(rollMaxCharges(it.MaxCharges),255)
 		local rollType,rollPower=GetEnc2(it)
 		SetEnc2(it,rollType,math.random(1+rollPower*minValue,rollPower))
 	end
