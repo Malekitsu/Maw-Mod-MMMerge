@@ -50,6 +50,7 @@ local active = false
 
 local names = {}       -- [id] = string (authoritative for >=39; mirror for <39)
 local descs = {}       -- [id] = {[part] = string}, parts 1..20
+local origDescs = {}   -- [part.."_"..id] = engine text captured at first override
 local nameBufs = {}    -- engine-side string buffers we allocated, [key] = ptr
 local namePtrs         -- char*[128] array read by the SkillsUI asm shims
 
@@ -432,7 +433,21 @@ local function setDesc(id, part, s)
 	descs[id][part] = s
 	if id < OLD_COUNT and part >= 1 and part <= 5 then
 		local arr = MawCore.Engine.Addr.SkillDescPtrArrays[part]
+		local key = part .. "_" .. id
+		if origDescs[key] == nil then
+			local p = mem.u4[arr + id * 4]
+			origDescs[key] = p ~= 0 and mem.string(p) or ""
+		end
 		MawCore.Engine.writePtr(arr + id * 4, stringBuf("d" .. part .. "_" .. id, s, 4096))
+	end
+end
+
+--engine text back for one desc part; no-op unless setDesc overrode it this
+--session. Base-skill engine parts only -- extended skills have no default.
+local function restoreDesc(id, part)
+	local orig = origDescs[part .. "_" .. id]
+	if orig then
+		setDesc(id, part, orig)
 	end
 end
 
@@ -475,6 +490,7 @@ Skills.API = {
 	setName = setName,
 	getDesc = getDesc,
 	setDesc = setDesc,
+	restoreDesc = restoreDesc,
 	-- stage 2 will route this through the engine's buffed-value function;
 	-- until then it returns the raw value (only used by the hint builder)
 	get_buffed = function(pl, id)
@@ -611,7 +627,17 @@ local function dllWrapper()
 			return mem.string(mem.dll.skillz.getDesc(id, part))
 		end,
 		setDesc = function(id, part, s)
+			local key = part .. "_" .. id
+			if origDescs[key] == nil then
+				origDescs[key] = mem.string(mem.dll.skillz.getDesc(id, part))
+			end
 			mem.dll.skillz.setDesc(id, part, s)
+		end,
+		restoreDesc = function(id, part)
+			local orig = origDescs[part .. "_" .. id]
+			if orig then
+				mem.dll.skillz.setDesc(id, part, orig)
+			end
 		end,
 		get_buffed = function(pl, id)
 			hlp(pl)

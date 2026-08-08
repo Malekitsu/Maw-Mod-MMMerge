@@ -2866,6 +2866,12 @@ end
 --tooltips
 function adjustSpellTooltips()
 	if vars.MAWSETTINGS.buffRework=="ON" then
+		--the school part-5 descs set in the OFF branch stick for the whole
+		--session (engine pointers); put the engine text back
+		for _,sk in ipairs{const.Skills.Fire,const.Skills.Air,const.Skills.Water,
+				const.Skills.Earth,const.Skills.Spirit,const.Skills.Mind,const.Skills.Body} do
+			Skillz.restoreDesc(sk,5)
+		end
 		--fire resistance
 		local id=3
 		local sp=Game.SpellsTxt[id]
