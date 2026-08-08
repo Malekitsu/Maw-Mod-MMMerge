@@ -418,6 +418,15 @@ local function stage_sparksChain(t)
 	end
 end
 
+-- the stat rows bake the might multiplier at PLAYER level (stat screen);
+-- real hits swap the level term to the monster's level
+local function mightLevelSwap(pl, mon)
+	if not mon then return 1 end
+	local might=pl:GetMight()
+	return (1+GetMightDamageMultiplier(might, safeGetMonsterLevel(mon)))
+		/(1+GetMightDamageMultiplier(might, pl.LevelBase))
+end
+
 -- from Scripts/General/zzMaw-Stats.lua:141 -- THE base replacement for
 -- melee/bow/blaster hits: recompute from Get(Melee|Ranged)DamageMin/Max,
 -- x damageMultiplier (weapon-speed scaling), assassin isolation subtraction,
@@ -463,7 +472,7 @@ local function stage_weaponRecompute(t)
     end
   end
 
-  t.Result = damage * (dmgMult or 1)
+  t.Result = damage * (dmgMult or 1) * mightLevelSwap(pl, t.Monster)
 
 
   local critChance, critMult, success = getCritInfo(pl, false, safeGetMonsterLevel(t.Monster))
@@ -624,8 +633,8 @@ local function stage_dragonAttack(t)
 			
 			local low=pl:GetMeleeDamageMin()
 			local high=pl:GetMeleeDamageMax()
-			local damage=rollDice(low, high)
-			
+			local damage=rollDice(low, high)*mightLevelSwap(pl, t.Monster)
+
 			--check by damage type
 			index=table.find(damageKindMap,t.DamageKind)
 			res=t.Monster.Resistances[index]
@@ -647,7 +656,7 @@ local function stage_dragonAttack(t)
 		elseif t.DamageKind==50 or data.Spell==123 then
 			local low=pl:GetRangedDamageMin()
 			local high=pl:GetRangedDamageMax()
-			local damage=rollDice(low, high)
+			local damage=rollDice(low, high)*mightLevelSwap(pl, t.Monster)
 			
 			local gotCrit
 			critChance, critMult, gotCrit=getCritInfo(pl,false,getMonsterLevel(t.Monster))
@@ -724,8 +733,8 @@ local function stage_dkAttack(t)
 			--add physical damage to spells
 			baseDamage=pl:GetMeleeDamageMin()
 			maxDamage=pl:GetMeleeDamageMax()
-			damage=rollDice(baseDamage, maxDamage)
-			
+			damage=rollDice(baseDamage, maxDamage)*mightLevelSwap(pl, t.Monster)
+
 			critChance, critMult, success=getCritInfo(pl,false,getMonsterLevel(t.Monster))
 			if success then
 				damage=damage*critMult
@@ -845,7 +854,7 @@ local function stage_assassinAttack(t)
 		if assassinSpells[spell] then
 			local baseDamage=pl:GetMeleeDamageMin()
 			local maxDamage=pl:GetMeleeDamageMax()
-			local damage=rollDice(baseDamage, maxDamage)
+			local damage=rollDice(baseDamage, maxDamage)*mightLevelSwap(pl, t.Monster)
 			
 			local isolatedDamageReduction=assassinationDamage(pl,t.Monster,data.Object) --must be subtracted
 			damage=damage-isolatedDamageReduction

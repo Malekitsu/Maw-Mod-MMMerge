@@ -349,7 +349,7 @@ local function registerClassBuilders()
 			local waterReduction=round(getMonsterDamage(false,(lvl+1))*(m3/lvl^0.65)/avgRed*0.99^(lvl^0.65)/2) --on average 1/2 of a B monster
 			return MawSchoolDescBase[14] .. ASC .. "Reduce all damage taken by " .. waterReduction .. "(calculated after resistances)\n"
 		end},
-		[15]={[1]=MawSchoolDescBase[15] .. ASC .. "Increases melee damage 1-2-3-4 (at N-E-M-GM) per Earth Magic Level\n"},
+		[15]={[1]=MawSchoolDescBase[15] .. ASC .. "Increases melee damage 0.5-1-1.5-2 (at N-E-M-GM) per Earth Magic Level\n"},
 		[16]={[1]=function(pl)
 			local m5=SplitSkill(pl.Skills[const.Skills.Spirit])
 			return MawSchoolDescBase[16] .. ASC .. "Increases melee damage by " .. m5 .. "%\n"
@@ -369,7 +369,7 @@ local function registerClassBuilders()
 
 	--was dkSkills(true) desc lines
 	{match=function(pl) return table.find(dkClass, pl.Class) end, slots={
-		[14]={[1]="This skill is only available to death knights and increases damage by 0.5-1-1.5 (at Novice, Expert, Master) and increases attack speed by 2% per skill point.\n",
+		[14]={[1]="This skill is only available to death knights and increases damage by 0.25-0.5-0.75 (at Novice, Expert, Master) and increases attack speed by 1% per skill point.\n",
 			[5]=EV},
 		[18]={[1]=function(pl)
 			local bloodS=SplitSkill(pl.Skills[const.Skills.Body])
@@ -379,7 +379,7 @@ local function registerClassBuilders()
 			[5]=EV},
 		[20]={[1]=function(pl)
 			local unholyS=SplitSkill(pl.Skills[const.Skills.Dark])
-			return "This skill is only available to death knights and increases damage by 0.5-1-1.5 (at Novice, Expert, Master) and reduces magical damage taken.\n" .. "Current Reduction: " .. Formulas.reductionPercent(unholyS) .."%\n"
+			return "This skill is only available to death knights and increases damage by 0.25-0.5-0.75 (at Novice, Expert, Master) and reduces magical damage taken.\n" .. "Current Reduction: " .. Formulas.reductionPercent(unholyS) .."%\n"
 		end},
 	}},
 
@@ -394,11 +394,11 @@ local function registerClassBuilders()
 		end},
 		[17]={[1]=function(pl)
 			local mindS, mindM=SplitSkill(pl.Skills[const.Skills.Mind])
-			return MawSchoolDescBase[17] .. "\n\nSeraphim damage upon attack increases depending on Mind magic, scaling with might(weapon speed and weapon damage multiplier applies).\n\n" .. "Current damage from Mind: " .. StrColor(255,0,0,mindS*mindM) .. "\n"
+			return MawSchoolDescBase[17] .. "\n\nSeraphim damage upon attack increases depending on Mind magic, scaling with might(weapon speed and weapon damage multiplier applies).\n\n" .. "Current damage from Mind: " .. StrColor(255,0,0,round(mindS*(mindM+1)/2)) .. "\n"
 		end,
-			[2]="Increases damage by 2 per Skill point",
-			[3]="Increases damage by 3 per Skill point",
-			[4]="Increases damage by 4 per Skill point",
+			[2]="Increases damage by 1 per Skill point",
+			[3]="Increases damage by 1.5 per Skill point",
+			[4]="Increases damage by 2 per Skill point",
 			[5]="n/a"},
 		[18]={[1]=function(pl)
 			local bodyS, bodyM=SplitSkill(pl.Skills[const.Skills.Body])
@@ -412,10 +412,10 @@ local function registerClassBuilders()
 			[5]="n/a"},
 		[19]={[1]=MawSchoolDescBase[19]
 				.. StrColor(255,255,30,"\n\nLight Magic quickens the Seraphim's strikes, increasing attack speed.\n\nIts radiance lightens the blade so much that even a two-handed sword can be wielded in one hand, freeing the off hand for a shield.\n"),
-			[2]="Increased Attack speed by 1% per Skill",
-			[3]="Increased Attack speed by 2% per Skill",
-			[4]="Increased Attack speed by 3% per Skill",
-			[5]="Increased Attack speed by 4% per Skill"},
+			[2]="Increased Attack speed by 0.5% per Skill",
+			[3]="Increased Attack speed by 1% per Skill",
+			[4]="Increased Attack speed by 1.5% per Skill",
+			[5]="Increased Attack speed by 2% per Skill"},
 	}},
 
 	--was elementalistSkills(true) desc loop
@@ -459,11 +459,11 @@ local function registerClassBuilders()
 	{match=function(pl) return table.find(assassinClass, pl.Class) end, slots={
 		[12]={[1]="Combat is the skill that allows you to endure prolonged fights by enhancing your energy recovery.\n\nEach attack has a base 10% chance, plus 1% per skill point, to restore 15 energy.\n\n",
 			[2]="Melee attack costs 45 energy",[3]="Melee attack costs 40 energy",[4]="Melee attack costs 35 energy",[5]="Melee attack costs 30 energy"},
-		[13]={[1]="Subtlety manipulates the boundary between life and death, granting you energy upon killing enemies and increasing your speed.\n\nEnergy consuming attack grants 1 stack, which increase your attack speed by 1% per skill point in Subtlety. Stacks up to 5 times.\n\n",
+		[13]={[1]="Subtlety manipulates the boundary between life and death, granting you energy upon killing enemies and increasing your speed.\n\nEnergy consuming attack grants 1 stack, which increase your attack speed by 0.5% per skill point in Subtlety. Stacks up to 5 times.\n\n",
 			[2]="Killing a monster restores 10 energy",[3]="Killing a monster restores 15 energy",[4]="Killing a monster restores 20 energy",[5]="Killing a monster restores 25 energy"},
 		[14]={[1]="Poisoning is the art of mastering toxins through self-experimentation, transforming suffering into vitality. Higher skill levels increase your energy regeneration.\n\nEach attack deals bonus water damage equal to 0.1% of the target's HP per skill point.\n\n",
 			[2]="You regenerate " .. Formulas.assassinEnergyPerSec(1) .. " energy per second",[3]="You regenerate " .. Formulas.assassinEnergyPerSec(2) .. " energy per second",[4]="You regenerate " .. Formulas.assassinEnergyPerSec(3) .. " energy per second",[5]="You regenerate " .. Formulas.assassinEnergyPerSec(4) .. " energy per second"},
-		[15]={[1]="Assassination focuses on eliminating isolated targets before they react. Attacks that spend energy or spells, have your damage increased by 4-6-8-10 per skill point, reduced by 20% for each target's nearby enemy (up to 4 enemies).\nSuch attacks also grant 1 combo point, allowing the assassin to cast offensive spells.\nBow has 50% chance and energy cost.\n\nHigher levels also grant more starting energy, ideal for high burst damage in short engagements.\n\n",
+		[15]={[1]="Assassination focuses on eliminating isolated targets before they react. Attacks that spend energy or spells, have your damage increased by 2-3-4-5 per skill point, reduced by 20% for each target's nearby enemy (up to 4 enemies).\nSuch attacks also grant 1 combo point, allowing the assassin to cast offensive spells.\nBow has 50% chance and energy cost.\n\nHigher levels also grant more starting energy, ideal for high burst damage in short engagements.\n\n",
 			[2]="Increases your maximum energy by 10",[3]="Increases your maximum energy by 20",[4]="Increases your maximum energy by 30",[5]="Increases your maximum energy by 40"},
 	}},
 

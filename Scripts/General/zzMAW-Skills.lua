@@ -60,27 +60,27 @@ skillAttack =
 skillRecovery =
 {
 	[const.Skills.Staff]	= {[0]=0, 0, 0, 0, 0,},
-	[const.Skills.Sword]	= {[0]=0, 0, 2, 3, 3,},
-	[const.Skills.Dagger]	= {[0]=0, 1, 1, 1, 2,},
-	[const.Skills.Axe]		= {[0]=0, 0, 1, 2, 2,},
+	[const.Skills.Sword]	= {[0]=0, 0, 1, 1.5, 1.5,},
+	[const.Skills.Dagger]	= {[0]=0, 0.5, 0.5, 0.5, 1,},
+	[const.Skills.Axe]		= {[0]=0, 0, 0.5, 1, 1,},
 	[const.Skills.Spear]	= {[0]=0, 0, 0, 0, 0,},
-	[const.Skills.Bow]		= {[0]=0, 1, 2, 3, 5,},
+	[const.Skills.Bow]		= {[0]=0, 0.5, 1, 1.5, 2.5,},
 	[const.Skills.Mace]		= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0,},
-	[const.Skills.Unarmed]	= {[0]=0, 0, 1, 2, 2,},
+	[const.Skills.Unarmed]	= {[0]=0, 0, 0.5, 1, 1,},
 }
 
 skillDamage =
 {
-	[const.Skills.Staff]	= {[0]=0, 2, 3, 3, 4,},
-	[const.Skills.Sword]	= {[0]=0, 2, 3, 3, 4,},
-	[const.Skills.Dagger]	= {[0]=0, 2, 3, 3, 4,},
-	[const.Skills.Axe]		= {[0]=0, 2, 3, 4, 4,},
-	[const.Skills.Spear]	= {[0]=0, 1, 2, 3, 3,},
-	[const.Skills.Bow]		= {[0]=0, 2, 4, 6, 8,},
-	[const.Skills.Mace]		= {[0]=0, 2, 3, 3, 4,},
-	[const.Skills.Blaster]	= {[0]=0, 2, 4, 6, 8,},
-	[const.Skills.Unarmed]	= {[0]=0, 3, 4, 5, 6,},
+	[const.Skills.Staff]	= 2,
+	[const.Skills.Sword]	= 2,
+	[const.Skills.Dagger]	= 2,
+	[const.Skills.Axe]		= 2,
+	[const.Skills.Spear]	= 2,
+	[const.Skills.Bow]		= 4,
+	[const.Skills.Mace]		= 2,
+	[const.Skills.Blaster]	= 4,
+	[const.Skills.Unarmed]	= 2,
 }
 -- weapon skill AC bonuses (by rank)
 
@@ -145,14 +145,26 @@ twoHandedWeaponDamageBonusByMastery = {
 }
 
 armsmasterSkill={
-	["Damage"]={0.5,1,1.5,2,3,[0]=0},
-	["Speed"]={0,1,2,2,2,[0]=0},
+	["Damage"]={0,1,1,1.5,2,[0]=0},
+	["Speed"]={0,0,0.5,1,1,[0]=0},
 	["Attack"]={1,1,2,3,3,[0]=0},
 }
 
 --all stats bonus are calculated in Maw Items, as this function only changes hp,sp,ac,attack and damage
 function events.CalcStatBonusBySkills(t)
 	t.Result=0
+end
+
+function GetSpeedBonus(pl)
+	local speed=pl:GetSpeed()
+	local speedEffect=0
+	if speed<=21 then
+		speedEffect=(speed-13)/4
+	else
+		speedEffect=math.floor(speed/10)
+	end
+	speedEffect=speedEffect/(1 + math.min(pl.LevelBase, 1000) * 0.0015)
+	return speedEffect
 end
 
 function getItemRecovery(it, playerLevel)
@@ -257,20 +269,21 @@ function events.GetAttackDelay(t)
 		local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Armsmaster))
 		bonusSpeed=bonusSpeed+s*armsmasterSkill.Speed[m]
 	end
+	--class speed bonuses are halved like skillRecovery/armsmasterSkill.Speed
 	if table.find(dkClass, t.Player.Class) then
 		local s, m=SplitSkill(t.Player.Skills[const.Skills.Water])
-		bonusSpeed=bonusSpeed+s*2
+		bonusSpeed=bonusSpeed+s
 	end
 	if table.find(seraphClass, t.Player.Class) then
 		local s, m=SplitSkill(t.Player.Skills[const.Skills.Light])
-		bonusSpeed=bonusSpeed+s*m
+		bonusSpeed=bonusSpeed+s*m/2
 	end
 	if table.find(assassinClass, t.Player.Class) then
 		local id=t.Player:GetIndex()
 		if vars.AttackSpeedStackDecay and vars.AttackSpeedStackDecay[id] then
 			if vars.AttackSpeedStackDecay[id]>=Game.Time then
 				local s, m=SplitSkill(t.Player.Skills[const.Skills.Air])
-				bonusSpeed=bonusSpeed+s*vars.AttackSpeedStack[id]
+				bonusSpeed=bonusSpeed+s*vars.AttackSpeedStack[id]/2
 			else
 				vars.AttackSpeedStack[id]=0
 			end
@@ -280,12 +293,7 @@ function events.GetAttackDelay(t)
 	if baseSpeed==0 then
 		baseSpeed=100
 	end
-	local speed=t.Player:GetSpeed()
-	if speed<=21 then
-		speedEffect=(speed-13)/4
-	else
-		speedEffect=math.floor(speed/10)
-	end
+	local speedEffect = GetSpeedBonus(t.Player)
 	bonusSpeed=bonusSpeed+speedEffect
 	if not vars.MAWSETTINGS.buffRework=="ON" and (t.Player.SpellBuffs[const.PlayerBuff.Haste].ExpireTime>Game.Time or Party.SpellBuffs[const.PartyBuff.Haste].ExpireTime>Game.Time) then
 		bonusSpeed=bonusSpeed+20
@@ -476,18 +484,19 @@ end
 ------------------------
 function events.GameInitialized2()
 	Skillz.setDesc(6,1,Skillz.getDesc(6,1) .. "\nThe paralyze effect lasts for 5 seconds on regular monsters and 2 seconds on bosses. The stun effect lasts for half the duration of the paralyze effect. The chances of successfully applying these effects depend on the skill level and the monster's level.\n")
-	Skillz.setDesc(0,1,Skillz.getDesc(0,1) .. "\nThis skill increases the damage gained from weapon by a percentage when equipping a staff.\nAt Grandmaster can combine staff and unarmed skill, increasing its damage with staff skill at half effect.\n\nYour full Staff Attack boosts AC and all Resistances by X% per skill point, counting an extra +10 points of skill. Resistances apply to the entire party.\n")
-	Skillz.setDesc(1,1,Skillz.getDesc(1,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping a sword.\n\nYour full Sword Attack boosts AC by X% per skill point, counting an extra +10 points of skill.\n")
-	Skillz.setDesc(2,1,Skillz.getDesc(2,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping a dagger.\nCrit chance will get lower as monsters grow stronger, up to level 600.")
-	Skillz.setDesc(3,1,Skillz.getDesc(3,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping an axe.\n")
-	Skillz.setDesc(4,1,Skillz.getDesc(4,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping a spear.\n\nSpear skill raises AC by X% per skill point, counting an extra +10 effective skill.\n")
-	Skillz.setDesc(5,1,Skillz.getDesc(5,1) .. "\nThis skill increases the damage gained from weapon +1 per skill point in the bow skill, by a percentage when equipping a bow.\n")
-	Skillz.setDesc(6,1,Skillz.getDesc(6,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping a mace.\n")
+	Skillz.setDesc(0,1,Skillz.getDesc(0,1) .. "\nThis skill increases the damage gained from weapon by " .. skillDamage[0] .. "% per skill point when equipping a staff.\nAt Grandmaster can combine staff and unarmed skill, increasing its damage with staff skill at half effect.\n\nYour full Staff Attack boosts AC and all Resistances by X% per skill point, counting an extra +10 points of skill. Resistances apply to the entire party.\n")
+	Skillz.setDesc(1,1,Skillz.getDesc(1,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[1] .. "% per skill point when equipping a sword.\n\nYour full Sword Attack boosts AC by X% per skill point, counting an extra +10 points of skill.\n")
+	Skillz.setDesc(2,1,Skillz.getDesc(2,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[2] .. "% per skill point when equipping a dagger.\nCrit chance will get lower as monsters grow stronger, up to level 600.")
+	Skillz.setDesc(3,1,Skillz.getDesc(3,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[3] .. "% per skill point when equipping an axe.\n")
+	Skillz.setDesc(4,1,Skillz.getDesc(4,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[4] .. "% per skill point when equipping a spear.\n\nSpear skill raises AC by X% per skill point, counting an extra +10 effective skill.\n")
+	Skillz.setDesc(5,1,Skillz.getDesc(5,1) .. "\nThis skill increases the damage gained from weapon +1 per skill point in the bow skill, by " .. skillDamage[5] .. "% per skill point when equipping a bow.\n")
+	Skillz.setDesc(6,1,Skillz.getDesc(6,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[6] .. "% per skill point when equipping a mace.\n")
+	Skillz.setDesc(7,1,Skillz.getDesc(7,1) .. "\nThis skill increases the damage gained from weapon by " .. skillDamage[7] .. "% per skill point when equipping a blaster.\n")
+	Skillz.setDesc(33,1,Skillz.getDesc(33,1) .. "\nUnarmed combat deals " .. skillDamage[33] .. " extra damage per skill point.\n")
 	for i=0,33 do
 		if i<=7 or i==33 then
 			attack=false
 			recovery=false
-			damage=false
 			ac=false
 			res=false
 			baseString=string.format("%s\n------------------------------------------------------------\n",	Skillz.getDesc(i,1))
@@ -497,9 +506,6 @@ function events.GameInitialized2()
 				end
 				if skillRecovery[i][v]~=0 then
 					recovery=true
-				end
-				if skillDamage[i][v]~=0 then
-					damage=true
 				end
 				if skillAC[i][v]~=0 then
 					ac=true
@@ -530,21 +536,6 @@ function events.GameInitialized2()
 				expert=string.format("%s\t" .. tab+33 .. "%s|",expert,skillRecovery[i][2])
 				master=string.format("%s\t" .. tab+33 .. "%s|",master,skillRecovery[i][3])
 				gm=string.format("%s\t" .. tab+33 .. "%s|",gm,skillRecovery[i][4])
-			end
-			if damage and i~=33 then
-				tab=tab+55
-				baseString=string.format("%s\t" .. tab .. "Dmg%%|",baseString)
-				normal=string.format("%s\t" .. tab+22 .. "%s%%|",normal,skillDamage[i][1])
-				expert=string.format("%s\t" .. tab+22 .. "%s%%|",expert,skillDamage[i][2])
-				master=string.format("%s\t" .. tab+22 .. "%s%%|",master,skillDamage[i][3])
-				gm=string.format("%s\t" .. tab+22 .. "%s%%|",gm,skillDamage[i][4])
-			else --unarmed
-				tab=tab+55
-				baseString=string.format("%s\t" .. tab .. "Dmg|",baseString)
-				normal=string.format("%s\t" .. tab+22 .. "%s|",normal,skillDamage[i][1])
-				expert=string.format("%s\t" .. tab+22 .. "%s|",expert,skillDamage[i][2])
-				master=string.format("%s\t" .. tab+22 .. "%s|",master,skillDamage[i][3])
-				gm=string.format("%s\t" .. tab+22 .. "%s|",gm,skillDamage[i][4])
 			end
 			if ac then
 				tab=tab+55

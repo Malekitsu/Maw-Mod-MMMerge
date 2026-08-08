@@ -1806,7 +1806,7 @@ enchantbonusdamage[46] = {40,80,["Type"]=0,["Coeff"]=0.5}
 --weapon damage (the damping factor cancels the divisor in GetWeaponDamage)
 function enchantDamageRange(it, id)
 	local ench=enchantbonusdamage[id]
-	local avg=GetWeaponDamage(it)*ench.Coeff*(1+0.04*GetItemLevel(it)^0.675)
+	local avg=GetWeaponDamage(it)*estimateWeaponDamageMultiplier(GetItemLevel(it))
 	local mean=(ench[1]+ench[2])/2
 	return avg*ench[1]/mean, avg*ench[2]/mean, avg
 end
@@ -2546,7 +2546,7 @@ local function addWeaponRows(pl, index, it, txt, tab)
 	end
 	local mult=1
 	if skillDamage[skill] then
-		mult=(1+s2*skillDamage[skill][m2]/100)
+		mult=(1+s2*skillDamage[skill]/100)
 	end
 	local side=math.max(sidesBonus*mult)
 	local add=math.max(bonus*mult)
@@ -2571,30 +2571,31 @@ local function addWeaponRows(pl, index, it, txt, tab)
 	end
 	--substitute with unarmed if staff
 	if skill==0 then
-		armsDmg=skillDamage[33][m]*s*mult
+		armsDmg=skillDamage[33]*s*mult
 	end
 	--make classes such as DK, SERAPH, SHAMAN gain their bonus the armsmaster way
+	--(halved together with the armsmasterSkill.Damage nerf)
 	--DK
 	if table.find(dkClass, pl.Class) then
 		local s1, m1=SplitSkill(pl.Skills[const.Skills.Water])
 		local s2, m2=SplitSkill(pl.Skills[const.Skills.Dark])
-		local bonus=s1*math.min(m1, 3)/2+s2*math.min(m2, 3)/2
+		local bonus=s1*math.min(m1, 3)/4+s2*math.min(m2, 3)/4
 		armsDmg=armsDmg+bonus*mult
 	end
 	--SERAPHIM
 	if table.find(seraphClass, pl.Class) then
 		local s1, m1=SplitSkill(pl.Skills[const.Skills.Mind])
-		local mindBonus=s1*(m1+1)
+		local mindBonus=s1*(m1+1)/2
 		armsDmg=armsDmg+mindBonus*mult
 	end
 	--SHAMAN
 	if table.find(shamanClass, pl.Class) then
 		local s,m=SplitSkill(pl.Skills[const.Skills.Earth])
-		armsDmg=armsDmg+s*m*mult
+		armsDmg=armsDmg+s*m/2*mult
 	end
 	if table.find(assassinClass,pl.Class) then
 		local s,m=SplitSkill(pl.Skills[const.Skills.Earth])
-		armsDmg=armsDmg+s*(2+m*2)*mult
+		armsDmg=armsDmg+s*(1+m)*mult
 		--needed to reduce damage when target is not isolated
 		vars.assassinDamage=vars.assassinDamage or {}
 		vars.assassinDamage[pl:GetIndex()]=armsDmg
@@ -2881,9 +2882,9 @@ local function addMiscAttack(pl, tab)
 	if (m>=1 and not pl:GetActiveItem(0) and not pl:GetActiveItem(1)) or (m1==4 and pl:GetActiveItem(1) and pl:GetActiveItem(1):T().Skill==0 ) then
 		if m>0 then
 			tab[40]=tab[40]+skillAttack[const.Skills.Unarmed][m]*s
-			tab[41]=tab[41]+skillDamage[const.Skills.Unarmed][m]*s
-			tab[42]=tab[42]+skillDamage[const.Skills.Unarmed][m]*s
-			tab[43]=tab[43]+skillDamage[const.Skills.Unarmed][m]*s
+			tab[41]=tab[41]+skillDamage[const.Skills.Unarmed]*s
+			tab[42]=tab[42]+skillDamage[const.Skills.Unarmed]*s
+			tab[43]=tab[43]+skillDamage[const.Skills.Unarmed]*s
 			unarmed=true
 		end
 	end
@@ -3970,7 +3971,7 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 		--aura scales with the undamped item-level weapon damage: multiplying the
 		--damping factor back cancels the divisor inside GetWeaponDamage
 		local itemLevel=GetItemLevel(it)
-		local damage=GetWeaponDamage(it)*fireAuraDamage[m]*(1+0.04*itemLevel^0.675)*GetLegendary19Mult(pl)
+		local damage=GetWeaponDamage(it)*fireAuraDamage[m]*estimateWeaponDamageMultiplier(itemLevel)*GetLegendary19Mult(pl)
 		if calcType~="tooltip" and vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 26) then
 			if isSpell then
 				critChance, critMult, success=getCritInfo(pl,"spell")
@@ -4382,6 +4383,10 @@ function GetItemLevel(it)
 	return round(lvl/tot*18-17)+it.MaxCharges*5
 end
 
+function estimateWeaponDamageMultiplier(level)
+	return 0.02 * level ^ 0.675
+end
+
 function GetWeaponDamage(it)
 	local itemLevel = GetItemLevel(it)
 	--below stat 25 the engine breakpoints go negative; a weapon never subtracts
@@ -4390,6 +4395,6 @@ function GetWeaponDamage(it)
 	if not (it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number)) then
 		damage=damage/2
 	end
-	damage=damage / (1 + 0.04 * itemLevel ^ 0.675)
+	damage=damage / (1 + estimateWeaponDamageMultiplier(itemLevel))
 	return damage
 end

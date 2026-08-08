@@ -1543,11 +1543,13 @@ function getPlayerEstimatedPower(lvl)
 	elseif vars.insanityMode then
 		masterLearned=20
 	end
-	local armsMasterDamage=math.min(0.5+skill/masterLearned,2) --use gm as a reference
-	
+	--mirrors armsmasterSkill.Damage (0/1/1/1.5, GM as the cap)
+	local armsMasterDamage=math.min(skill/masterLearned*0.5,1.5)
+
 	local baseDamage=twoHandedSwordDamagePerLevel*lvl+armsMasterDamage*skill+baseDamage
-	
-	local swordMultiplier=armsMasterDamage*2*skill/100
+
+	--weapon skill % is flat now: read the table instead of the old armsmaster proxy
+	local swordMultiplier=skillDamage[const.Skills.Sword]*skill/100
 	
 	local damage=baseDamage*(1+swordMultiplier)+baseDamage
 	
@@ -1559,8 +1561,9 @@ function getPlayerEstimatedPower(lvl)
 	damage=(damage+mightEffect)*heroismBuff*(1+GetMightDamageMultiplier(might, lvl))
 	
 	local speedEffect=(mightEffect/2)/1000
-	local weaponSpeed=math.min(1+skill/masterLearned*2,3)*skill/100
-	local armsMasterSpeed=math.min(1+skill/masterLearned,2)*skill/100
+	--both mirror the halved speed tables (skillRecovery, armsmasterSkill.Speed)
+	local weaponSpeed=math.min(1+skill/masterLearned*2,3)/2*skill/100
+	local armsMasterSpeed=math.min(math.max(skill/masterLearned-1,0),2)/2*skill/100
 	local hasteBuff=math.min((1+0.004*lvl^0.65),1.2)
 	local haste=(1+speedEffect+weaponSpeed+armsMasterSpeed)*hasteBuff
 	
