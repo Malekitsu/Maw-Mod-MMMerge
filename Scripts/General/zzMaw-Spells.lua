@@ -1368,12 +1368,8 @@ function applyCCDebuff(mon, cc, pl, spellId, resistance, engineApplied)
 	return finalDuration > 0
 end
 
---Scripted CC casts (NOTES.md): no engine effect for these, so the cast is
---fully ours -- no crosshair pause, auto-target the visible hostile within
---4800 whose debuff has the least time left (an untouched monster counts as
---expired, so it wins). No valid target = fizzle: no mana spent, 30 recovery.
---Visual on apply: EffectObj (zero-speed ObjList effect row summoned on the
---target) where one exists, otherwise ShowSpellEffect in EffectColor.
+--Scripted CC casts: the engine has no effect for these ids, so the cast is
+--fully ours. Rules and findings: MawCore/NOTES.md "Projectile impacts".
 local scriptedCC={
 	[const.Spells.Slow]=true,
 	[60]=true, --mind Charm (no const: the dark elf one overwrote it)
@@ -1412,20 +1408,30 @@ function castCCSpell(t)
 	if not checkManaForSpell(pl, t.SpellId, cc.School) then return end
 	local d1=type(cc.Debuff)=="table" and cc.Debuff[1] or cc.Debuff
 	local ai=const.AIState
-	local list=Game.GetMonstersInSight() or {}
+	local function validTarget(mon)
+		return mon.AIState~=ai.Dead and mon.AIState~=ai.Invisible and mon.AIState~=ai.Removed and mon.ShowAsHostile and mon.Hostile
+			and (not cc.UndeadOnly or Game.IsMonsterOfKind(mon.Id, const.MonsterKind.Undead)==1)
+			and getDistanceToMonster(mon)<=4800
+	end
 	local lim=Map.Monsters.High
 	local target, lowest=nil, math.huge
-	for i=1,#list do
-		local idx=list[i]
-		if idx<=lim then
-			local mon=Map.Monsters[idx]
-			if mon.AIState~=ai.Dead and mon.AIState~=ai.Invisible and mon.AIState~=ai.Removed and mon.ShowAsHostile and mon.Hostile
-					and (not cc.UndeadOnly or Game.IsMonsterOfKind(mon.Id, const.MonsterKind.Undead)==1)
-					and getDistanceToMonster(mon)<=4800 then
-				local e=mon.SpellBuffs[d1].ExpireTime
-				if e<lowest then
-					lowest=e
-					target=idx
+	--a valid monster under the mouse wins (spellbook crosshair resolves here)
+	local mt=Mouse:GetTarget()
+	if mt.Kind==3 and mt.Index<=lim and validTarget(Map.Monsters[mt.Index]) then
+		target=mt.Index
+	end
+	if not target then
+		local list=Game.GetMonstersInSight() or {}
+		for i=1,#list do
+			local idx=list[i]
+			if idx<=lim then
+				local mon=Map.Monsters[idx]
+				if validTarget(mon) then
+					local e=mon.SpellBuffs[d1].ExpireTime
+					if e<lowest then
+						lowest=e
+						target=idx
+					end
 				end
 			end
 		end
@@ -1453,6 +1459,41 @@ function castCCSpell(t)
 	end
 	pl:SetRecoveryDelay(getSpellDelay(pl, t.SpellId))
 	nextReadyPartyMember()
+end
+
+--Berserk/Enslave enter engine aim mode BEFORE PlayerCastSpell can fire, so
+--both quick-cast entries bypass the engine entirely (NOTES.md).
+local aimlessQuickCC={[const.Spells.Berserk]=true,[const.Spells.Enslave]=true}
+
+--entry 1: the Merge's extra quick-spell slots (Lua hotkeys -> CastQuickSpell)
+function events.GameInitialized2()
+	local orig=CastQuickSpell
+	function CastQuickSpell(playerId, spellId)
+		if aimlessQuickCC[spellId] and Party[playerId] then
+			castCCSpell{Player=Party[playerId], SpellId=spellId}
+			return
+		end
+		orig(playerId, spellId)
+	end
+end
+
+--entry 2: the vanilla quick-cast keys -- Action 25, Param 0 = QuickSpell,
+--Param 1 = AttackSpell (same decode as the auto-target-heal handler)
+function events.Action(t)
+	if t.Action==25 and not t.Handled then
+		if Game.CurrentPlayer<0 or Game.CurrentPlayer>Party.High then return end
+		local pl=Party[Game.CurrentPlayer]
+		local spellCast=0
+		if t.Param==0 then
+			spellCast=pl.QuickSpell
+		elseif t.Param==1 then
+			spellCast=pl.AttackSpell
+		end
+		if aimlessQuickCC[spellCast] and pl.RecoveryDelay==0 then
+			t.Handled=true
+			castCCSpell{Player=pl, SpellId=spellCast}
+		end
+	end
 end
 
 function events.PlayerCastSpell(t)
@@ -1532,11 +1573,8 @@ function events.PlayerCastSpell(t)
 	end
 end
 
---CC spells whose Merge object types have no engine impact case --
---AutoCollision makes the collide code fire MonsterAttacked; CC applied
---there, on the exact monster the projectile hit (NOTES.md). BuffPower is
---stamped on the debuff(s) after a successful apply (the engine only sets
---Power when it applies a debuff itself).
+--Impact-applied CC: AutoCollision fires MonsterAttacked for these object
+--types; the CC and BuffPower are applied there (NOTES.md).
 local ccByObjType = {
 	[9030] = const.Spells.ShrinkingRay,
 }
