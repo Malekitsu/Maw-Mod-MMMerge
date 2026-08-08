@@ -166,13 +166,7 @@ function getItemRecovery(it, playerLevel)
 		baseSpeed=baseRecovery[skill] * (0.75+playerLevel/250)
 		baseSpeed=round(baseSpeed/10)*10
 	elseif baseRecovery[skill] then
-		local tot=0
-		local lvl=0
-		for i=1, 6 do
-			tot=tot+it:T().ChanceByLevel[i]
-			lvl=lvl+it:T().ChanceByLevel[i]*i
-		end
-		itemLevel=round(lvl/tot*18-17)+it.MaxCharges*5
+		itemLevel=GetItemLevel(it)
 		baseSpeed=baseRecovery[skill] * (0.75+itemLevel/250)
 		baseSpeed=round(baseSpeed/10)*10
 	end

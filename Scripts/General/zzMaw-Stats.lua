@@ -1350,6 +1350,7 @@ function events.GetSkill(t)
 end
 
 function estimateStat(level)
+	local baseStat = 21
 	local statsPerLevel=2
 	if vars.insanityMode then
 		statsPerLevel=5
@@ -1365,7 +1366,7 @@ function estimateStat(level)
 	if vars.AusterityMode then
 		statsPerLevel=statsPerLevel+Game.BolsterAmount/100
 	end
-	return statsPerLevel*level
+	return statsPerLevel*level + baseStat
 end
 
 --average

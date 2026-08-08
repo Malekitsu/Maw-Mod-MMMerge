@@ -1557,36 +1557,39 @@ function checktext(MaxCharges,bonus2,it)
 	--else
 	--	mult=2+2*(MaxCharges-20)/20
 	--end
-	if it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number) then --attack speed no longer shown in tooltip, due to spell tooltip
-		attackSpeedMult=2
-	else
-		attackSpeedMult=1
-	end
 	--bow tooltip
 	local weaponType="Melee"
 	if it:T().EquipStat==2 then
 		weaponType="Bow"
 	end
-	local legDmgMult=1 --was legendary 19; kept at 1 until the rework
 
-	--damage multiplier
-	local enchantDamageMult=math.max(MawCore.Formulas.chargesDamageScale(MaxCharges),0.5)
-	
+	--damage enchants read the shared range (same numbers the damage roll uses)
+	local function enchRangeText(id)
+		local lo, hi=enchantDamageRange(it, id)
+		if math.floor(lo)==math.floor(hi) then
+			return tostring(math.floor(lo))
+		end
+		return math.floor(lo) .. "-" .. math.floor(hi)
+	end
+	local function enchDmgText(id, kind)
+		return "Adds " .. enchRangeText(id) .. " points of " .. kind .. " damage."
+	end
+
 	bonus2txt={
 		[1] =  " +" .. math.floor(bonusEffects[1].statModifier * mult) .. " to all Resistances.",
 		[2] = " +" .. math.floor(bonusEffects[2].statModifier * mult) .. " to all Seven Statistics.",
-		[4] ="Adds " .. math.floor(6*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(8*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Cold damage.",
-		[5] ="Adds " .. math.floor(18*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(24*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Cold damage.",
-		[6] ="Adds " .. math.floor(36*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(48*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Cold damage.",
-		[7] ="Adds " .. math.floor(4*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(10*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Electrical damage.",
-		[8] ="Adds " .. math.floor(12*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(30*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Electrical damage.",
-		[9] ="Adds " .. math.floor(24*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(60*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Electrical damage.",
-		[10] ="Adds " .. math.floor(2*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(12*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Fire damage.",
-		[11] ="Adds " .. math.floor(6*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(36*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Fire damage.",
-		[12] ="Adds " .. math.floor(12*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(72*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Fire damage.",
-		[13] ="Adds " .. math.floor(12*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Body damage.",
-		[14] ="Adds " .. math.floor(24*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Body damage.",
-		[15] ="Adds " .. math.floor(48*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Body damage.",
+		[4] = enchDmgText(4, "Cold"),
+		[5] = enchDmgText(5, "Cold"),
+		[6] = enchDmgText(6, "Cold"),
+		[7] = enchDmgText(7, "Electrical"),
+		[8] = enchDmgText(8, "Electrical"),
+		[9] = enchDmgText(9, "Electrical"),
+		[10] = enchDmgText(10, "Fire"),
+		[11] = enchDmgText(11, "Fire"),
+		[12] = enchDmgText(12, "Fire"),
+		[13] = enchDmgText(13, "Body"),
+		[14] = enchDmgText(14, "Body"),
+		[15] = enchDmgText(15, "Body"),
 		--spell enchants
 		[26] = "Air Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
 		[27] = "Body Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
@@ -1599,13 +1602,13 @@ function checktext(MaxCharges,bonus2,it)
 		[34] = "Water Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
 		--stats enchants
 		[38] = "Meditation Skill +" .. MawCore.Formulas.chargesMeditationSkill(MaxCharges),
-		[39] = "Adds " .. math.floor(40*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(80*enchantDamageMult*attackSpeedMult*legDmgMult) .. " to spell damage and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Intellect and personality.",
+		[39] = "Adds " .. enchRangeText(39) .. " to spell damage and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Intellect and personality.",
 		[40] = "Spells Drain Hit points from target and Increased Spell speed.(except when equipping off-hand).",
 		[42] = " +" .. math.floor(bonusEffects[42].statModifier * mult) .. " to Seven Stats, HP, SP, Armor, Resistances.",
 		[43] = " +" .. math.floor(bonusEffects[43].statModifier * mult) .. " to Endurance, Armor, Hit points.",
 		[44] = " +" .. math.floor(bonusEffects[44].statModifier * mult) .. " Hit points and Regenerate Hit points over time.",
 		[45] = " +" .. math.floor(bonusEffects[45].statModifier * mult) .. " Speed and Accuracy.",
-		[46] = "Adds " .. math.floor(40*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(80*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Fire damage to " .. weaponType .. " attacks and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Might.",
+		[46] = "Adds " .. enchRangeText(46) .. " points of Fire damage to " .. weaponType .. " attacks and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Might.",
 		[47] = " +" .. math.floor(bonusEffects[47].statModifier * mult) .. " Spell points and Meditation Skill +" .. MawCore.Formulas.chargesMeditationSkill(MaxCharges),
 		[48] = " +" .. math.floor(bonusEffects[48].statModifier[1] * mult) .. " Endurance and" .. " +" .. math.floor(bonusEffects[48].statModifier[2] * mult).. " Armor.",
 		[49] = " +" .. math.floor(bonusEffects[49].statModifier * mult) .. " Intellect and Luck.",
@@ -1775,21 +1778,32 @@ reagentPrices={
 
 --ENCHANTS HERE
 --MELEE bonuses
+--{min,max} set only the roll's shape; Coeff = share of the undamped
+--item-level weapon damage dealt on average (see enchantDamageRange)
 enchantbonusdamage = {}
-enchantbonusdamage[4] = {6,8,["Type"]=2}
-enchantbonusdamage[5] = {18,24,["Type"]=2}
-enchantbonusdamage[6] = {36,48,["Type"]=2}
-enchantbonusdamage[7] = {4,10,["Type"]=1}
-enchantbonusdamage[8] = {18,45,["Type"]=1}
-enchantbonusdamage[9] = {24,60,["Type"]=1}
-enchantbonusdamage[10] = {2,12,["Type"]=0}
-enchantbonusdamage[11] = {6,36,["Type"]=0}
-enchantbonusdamage[12] = {12,72,["Type"]=0}
-enchantbonusdamage[13] = {10,10,["Type"]=8}
-enchantbonusdamage[14] = {24,24,["Type"]=8}
-enchantbonusdamage[15] = {48,48,["Type"]=8}
-enchantbonusdamage[39] = {40,80,["Type"]=0}
-enchantbonusdamage[46] = {40,80,["Type"]=0}
+enchantbonusdamage[4] = {6,8,["Type"]=2,["Coeff"]=0.2}
+enchantbonusdamage[5] = {18,24,["Type"]=2,["Coeff"]=0.3}
+enchantbonusdamage[6] = {36,48,["Type"]=2,["Coeff"]=0.4}
+enchantbonusdamage[7] = {4,10,["Type"]=1,["Coeff"]=0.2}
+enchantbonusdamage[8] = {18,45,["Type"]=1,["Coeff"]=0.3}
+enchantbonusdamage[9] = {24,60,["Type"]=1,["Coeff"]=0.4}
+enchantbonusdamage[10] = {2,12,["Type"]=0,["Coeff"]=0.2}
+enchantbonusdamage[11] = {6,36,["Type"]=0,["Coeff"]=0.3}
+enchantbonusdamage[12] = {12,72,["Type"]=0,["Coeff"]=0.4}
+enchantbonusdamage[13] = {10,10,["Type"]=8,["Coeff"]=0.25}
+enchantbonusdamage[14] = {24,24,["Type"]=8,["Coeff"]=0.35}
+enchantbonusdamage[15] = {48,48,["Type"]=8,["Coeff"]=0.45}
+enchantbonusdamage[39] = {40,80,["Type"]=0,["Coeff"]=0.5}
+enchantbonusdamage[46] = {40,80,["Type"]=0,["Coeff"]=0.5}
+
+--min/max roll of a damage enchant: average = Coeff * undamped item-level
+--weapon damage (the damping factor cancels the divisor in GetWeaponDamage)
+function enchantDamageRange(it, id)
+	local ench=enchantbonusdamage[id]
+	local avg=GetWeaponDamage(it)*ench.Coeff*(1+0.04*GetItemLevel(it)^0.675)
+	local mean=(ench[1]+ench[2])/2
+	return avg*ench[1]/mean, avg*ench[2]/mean, avg
+end
 fireAuraDamage={10,20,40,60,[0]=0}
 --calculate enchant damage
 function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType)
@@ -1797,16 +1811,15 @@ function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType)
 	if not ench or (it.Bonus2==39 and not isSpell) or (it.Bonus2==46 and isSpell) then
 		return 0
 	end
-	local damage=0
+	local lo, hi, avg=enchantDamageRange(it, it.Bonus2)
+	local damage=avg
 	if rand then
-		damage=math.random(ench[1],ench[2])
-	else
-		damage=(ench[1]+ench[2])/2
+		damage=math.random(round(lo), round(hi))
 	end
 	local id=pl:GetIndex()
 	local mult=1
 	if calcType~="tooltip" and vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 26) then
-		if isSpell then 
+		if isSpell then
 			critChance, critMult, success=getCritInfo(pl,"spell")
 		else
 			critChance, critMult, success=getCritInfo(pl)
@@ -1819,10 +1832,6 @@ function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType)
 		end
 	end
 	damage=damage*mult
-	if it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number) then
-		damage=damage*2
-	end
-	damage=math.max(damage*MawCore.Formulas.chargesDamageScale(it.MaxCharges),0.5)
 	damage = damage/2^(resistance%1000/100)
 	return damage
 end
@@ -2481,10 +2490,11 @@ local function addWeaponRows(pl, index, it, txt, tab)
 	if not ancientWeaponsSet[it.Number] and mainWeapon and mainWeapon:T().Skill==7 then
 		return
 	end
-	--bolster mult
-	local maxCharges=it.MaxCharges
-	local bonus=txt.Mod2+round(referenceWeaponAttack[it.Number]*(maxCharges/30))
-	local sidesBonus=txt.Mod1DiceSides+round(referenceWeaponSides[it.Number]*(maxCharges/30))
+	--item-level weapon damage replaces base Mod2/sides and charge scaling:
+	--half as attack/flat, half spread over the dice sides
+	local wDmg=GetWeaponDamage(it)
+	local bonus=wDmg/2
+	local sidesBonus=wDmg/2/math.max(txt.Mod1DiceCount,1)
 	if artWeaponsSet[it.Number] then
 		if txt.EquipStat<=1 then
 			local artifactMult=artifactPowerMult(pl.LevelBase, false, it.BonusExpireTime)
@@ -3910,37 +3920,32 @@ function events.Tick()
 end
 ]]
 
---vampiric aura and fire aura 
-fireAuraDamage={10,20,40,60,[0]=0}
+--vampiric aura and fire aura
+fireAuraDamage={0.1,0.15,0.2,0.25,[0]=0}
 function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 	if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[4] then
 		if not it or (it and it.Number==0) or (it and it:T().EquipStat>2) then return 0 end
 		local s, m, level=getBuffSkill(4)
 		local id=pl:GetIndex()
-		local mult=math.max(MawCore.Formulas.chargesDamageScale(it.MaxCharges),0.5)
-		if table.find(artWeap1h, it.Number) or table.find(artWeap2h, it.Number) then
-			mult=(1+artifactPowerMult(pl.LevelBase, false, it.BonusExpireTime))^1.5
-		end
+		--aura scales with the undamped item-level weapon damage: multiplying the
+		--damping factor back cancels the divisor inside GetWeaponDamage
+		local itemLevel=GetItemLevel(it)
+		local damage=GetWeaponDamage(it)*fireAuraDamage[m]*(1+0.04*itemLevel^0.675)
 		if calcType~="tooltip" and vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 26) then
-			if isSpell then 
+			if isSpell then
 				critChance, critMult, success=getCritInfo(pl,"spell")
 			else
 				critChance, critMult, success=getCritInfo(pl)
 			end
 			if calcType=="damage" and success then
-				mult=mult*critMult
+				damage=damage*critMult
 			end
 			if calcType=="power" then
-				mult=mult*(1+math.min(critChance,1)*(critMult-1))
+				damage=damage*(1+math.min(critChance,1)*(critMult-1))
 			end
 		end
-		if it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number)then
-			mult=mult*2
-		end
-		mult=mult*(400+Game.BolsterAmount)/1000
-		local damage=fireAuraDamage[m]*mult
 		local res=res or 0
-		local damage=damage/2^(res/100)
+		damage=damage/2^(res/100)
 		if speedMult then
 			damage=damage*getItemRecovery(it, pl.LevelBase)/100
 		end
@@ -4320,4 +4325,31 @@ function events.AfterLoadMap()
 			end
 		end
 	end
+end
+
+--item level from the drop-tier average (the getItemRecovery curve); each charge adds 5
+function GetItemLevel(it)
+	local txt=it:T()
+	local tot=0
+	local lvl=0
+	for i=1,6 do
+		tot=tot+txt.ChanceByLevel[i]
+		lvl=lvl+txt.ChanceByLevel[i]*i
+	end
+	if tot==0 then
+		return it.MaxCharges*5
+	end
+	return round(lvl/tot*18-17)+it.MaxCharges*5
+end
+
+function GetWeaponDamage(it)
+	local itemLevel = GetItemLevel(it)
+	--below stat 25 the engine breakpoints go negative; a weapon never subtracts
+	local damage = math.max(Game.GetStatisticEffect(estimateStat(itemLevel)), 0)
+	--2h = dual-slot weapon or the axes the mod treats as two-handed
+	if not (it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number)) then
+		damage=damage/2
+	end
+	damage=damage / (1 + 0.04 * itemLevel ^ 0.675)
+	return damage
 end

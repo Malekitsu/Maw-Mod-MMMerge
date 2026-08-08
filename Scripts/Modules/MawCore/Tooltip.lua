@@ -252,30 +252,15 @@ local function tooltipEnchantStats(t)
 					end
 				end
 			end
-			--WEAPONS
-			if t.Item.MaxCharges>0 then
+			--WEAPONS (no charge gate: item-level damage shows on uncharged weapons too)
+			do
 				local txt=Game.ItemsTxt[t.Item.Number]
 				local equipStat=txt.EquipStat
 				if equipStat<=2 then
-					
-					local lookup=0
-					while Game.ItemsTxt[t.Item.Number].NotIdentifiedName==Game.ItemsTxt[t.Item.Number+lookup+1].NotIdentifiedName do 
-						lookup=lookup+1
-					end
-					local bonus=txt.Mod2
-					local bonus2=Game.ItemsTxt[t.Item.Number+lookup].Mod2
-					local maxCharges=t.Item.MaxCharges
-					--[[
-					if vars.insanityMode then
-						maxCharges=math.ceil(maxCharges*4/3)
-					end
-					]]
-					local bonusATK=Formulas.chargesWeaponBonus(bonus2, maxCharges)
-					bonus=bonus+round(bonusATK)
-					local sides=txt.Mod1DiceSides
-					local sides2=Game.ItemsTxt[t.Item.Number+lookup].Mod1DiceSides
-					local sidesBonus=Formulas.chargesWeaponBonus(sides2, maxCharges)
-					sides=sides+round(sidesBonus)
+					--item-level weapon damage, same split as addWeaponRows
+					local wDmg=GetWeaponDamage(t.Item)
+					local bonus=round(wDmg/2)
+					local sides=round(wDmg/2/math.max(txt.Mod1DiceCount,1))
 					t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " ..  txt.Mod1DiceCount .. "d" .. sides .. "+" .. bonus
 				end
 			end
