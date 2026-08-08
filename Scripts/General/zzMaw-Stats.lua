@@ -979,12 +979,12 @@ function compute_damage(x)
 end
 ]]
 
-function calcMawDamage(pl,damageKind,damage,rand,monLvl)
+function calcMawDamage(pl,damageKind,originalDamage,rand,monLvl)
 	local monLvl=monLvl or pl.LevelBase
 
 	local id=pl:GetIndex()
 	--AC for phys
-	
+	local damage = originalDamage
 	
 	--[18]="Reduce all damage taken by 10%",
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 18) then
@@ -1020,7 +1020,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		if vars.shieldEnchant and vars.shieldEnchant[id] then
 			damage=damage*0.85
 		end
-		return damage
+		return math.max(damage, originalDamage*0.1)
 	end
 	
 	
@@ -1055,7 +1055,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	--get resistances
 	if not damageKindResistance[damageKind] then
 		local damage=round(damage)
-		return damage
+		return math.max(damage, originalDamage*0.1)
 	end
 	local res=math.huge
 	local resList=damageKindResistance[damageKind]
@@ -1114,7 +1114,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	end
 	
 	local damage=round(damage*res)
-	return damage
+	return math.max(damage, originalDamage*0.1)
 end
 
 
