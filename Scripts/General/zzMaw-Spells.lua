@@ -1368,10 +1368,101 @@ function applyCCDebuff(mon, cc, pl, spellId, resistance, engineApplied)
 	return finalDuration > 0
 end
 
+--Scripted CC casts (NOTES.md): no engine effect for these, so the cast is
+--fully ours -- no crosshair pause, auto-target the visible hostile within
+--4800 whose debuff has the least time left (an untouched monster counts as
+--expired, so it wins). No valid target = fizzle: no mana spent, 30 recovery.
+--Visual on apply: EffectObj (zero-speed ObjList effect row summoned on the
+--target) where one exists, otherwise ShowSpellEffect in EffectColor.
+local scriptedCC={
+	[const.Spells.Slow]=true,
+	[60]=true, --mind Charm (no const: the dark elf one overwrote it)
+	[const.Spells.Charm]=true, --dark elf
+	[const.Spells.Berserk]=true,
+	[const.Spells.Paralyze]=true,
+	[const.Spells.Enslave]=true,
+	[const.Spells.DarkGrasp]=true,
+	[const.Spells.ControlUndead]=true,
+}
+CCMAP[const.Spells.ControlUndead].UndeadOnly=true
+CCMAP[const.Spells.Berserk].EffectObj=6060      --"Berzerk" spell62
+CCMAP[const.Spells.Enslave].EffectObj=6100      --"Enslave" spell66
+CCMAP[const.Spells.ControlUndead].EffectObj=9050 --"Control Undead" spell94
+CCMAP[const.Spells.Slow].EffectColor=0xC08020
+CCMAP[60].EffectColor=0xFF60C0
+CCMAP[const.Spells.Charm].EffectColor=0xFF60C0
+CCMAP[const.Spells.Paralyze].EffectColor=0xFFFF80
+CCMAP[const.Spells.DarkGrasp].EffectColor=0xA020F0
+
+local function nextReadyPartyMember()
+	local cur=Game.CurrentPlayer
+	for i=1,Party.High+1 do
+		local slot=(cur+i)%(Party.High+1)
+		if Party[slot].RecoveryDelay==0 and Party[slot]:IsConscious() then
+			Game.CurrentPlayer=slot
+			return
+		end
+	end
+end
+
+function castCCSpell(t)
+	t.Handled=true
+	local pl=t.Player
+	local cc=CCMAP[t.SpellId]
+	if not checkManaForSpell(pl, t.SpellId, cc.School) then return end
+	local d1=type(cc.Debuff)=="table" and cc.Debuff[1] or cc.Debuff
+	local ai=const.AIState
+	local list=Game.GetMonstersInSight() or {}
+	local lim=Map.Monsters.High
+	local target, lowest=nil, math.huge
+	for i=1,#list do
+		local idx=list[i]
+		if idx<=lim then
+			local mon=Map.Monsters[idx]
+			if mon.AIState~=ai.Dead and mon.AIState~=ai.Invisible and mon.AIState~=ai.Removed and mon.ShowAsHostile and mon.Hostile
+					and (not cc.UndeadOnly or Game.IsMonsterOfKind(mon.Id, const.MonsterKind.Undead)==1)
+					and getDistanceToMonster(mon)<=4800 then
+				local e=mon.SpellBuffs[d1].ExpireTime
+				if e<lowest then
+					lowest=e
+					target=idx
+				end
+			end
+		end
+	end
+	if not target then
+		Game.ShowStatusText("Spell Failed")
+		pl:SetRecoveryDelay(30)
+		nextReadyPartyMember()
+		return
+	end
+	local s,m=SplitSkill(pl:GetSkill(cc.School))
+	pl.SP=pl.SP-Game.Spells[t.SpellId]["SpellPoints"..masteryName[math.min(m,4)]]
+	local snd=Game.SpellSounds[t.SpellId]
+	if snd and snd>0 then
+		evt.PlaySound(snd)
+	end
+	local mon=Map.Monsters[target]
+	if applyCCDebuff(mon, cc, pl, t.SpellId, mon.Resistances[cc.DamageKind], false) then
+		--DR-resisted casts show nothing: the visual doubles as hit feedback
+		if cc.EffectObj then
+			Game.SummonObjects(cc.EffectObj, mon.X, mon.Y, mon.Z, 0, 1)
+		else
+			mon:ShowSpellEffect(cc.EffectColor or 0xA020F0)
+		end
+	end
+	pl:SetRecoveryDelay(getSpellDelay(pl, t.SpellId))
+	nextReadyPartyMember()
+end
+
 function events.PlayerCastSpell(t)
 	if CCMAP[t.SpellId] then
 		if t.SpellId==const.Spells.Stun then return end --stun is handled differently
-		if t.SpellId==const.Spells.ShrinkingRay then return end --no engine impact for type 9030: applied at hit via AutoCollision below
+		if t.SpellId==const.Spells.ShrinkingRay then return end --impact-applied via AutoCollision below
+		if scriptedCC[t.SpellId] then
+			castCCSpell(t)
+			return
+		end
 		local resistance={}
 		local level={}
 		local prevExpireTime={} -- Record current debuff ExpireTime before cast
@@ -1441,23 +1532,36 @@ function events.PlayerCastSpell(t)
 	end
 end
 
---Shrinking Ray: no engine impact case for Merge type 9030 -- AutoCollision
---makes the collide code fire MonsterAttacked; CC applied there (NOTES.md).
-local SHRINK_OBJ = 9030
+--CC spells whose Merge object types have no engine impact case --
+--AutoCollision makes the collide code fire MonsterAttacked; CC applied
+--there, on the exact monster the projectile hit (NOTES.md). BuffPower is
+--stamped on the debuff(s) after a successful apply (the engine only sets
+--Power when it applies a debuff itself).
+local ccByObjType = {
+	[9030] = const.Spells.ShrinkingRay,
+}
+CCMAP[const.Spells.ShrinkingRay].BuffPower = 2
+
 function events.GameInitialized2()
-	MawEnableProjectileImpact(SHRINK_OBJ) --helper in zzMaw-Monsters (MM6 projectiles)
+	for objType in pairs(ccByObjType) do
+		MawEnableProjectileImpact(objType) --helper in zzMaw-Monsters (MM6 projectiles)
+	end
 end
 
 function events.MonsterAttacked(t)
 	local o = t.Attacker and t.Attacker.Object
-	if o and o.Type == SHRINK_OBJ and not t.Handled then
-		t.Handled = true --shrink carries no damage: skip engine attack processing
+	local spellId = o and ccByObjType[o.Type]
+	if spellId and not t.Handled then
+		t.Handled = true --no damage component: skip engine attack processing
 		local pl = t.Attacker.Player
-		local cc = CCMAP[const.Spells.ShrinkingRay]
+		local cc = CCMAP[spellId]
 		if pl and cc then
 			local mon = t.Monster
-			if applyCCDebuff(mon, cc, pl, const.Spells.ShrinkingRay, mon.Resistances[cc.DamageKind], false) then
-				mon.SpellBuffs[cc.Debuff].Power=2 --engine set this on its own applies; we must too
+			if applyCCDebuff(mon, cc, pl, spellId, mon.Resistances[cc.DamageKind], false) and cc.BuffPower then
+				local debuffs = type(cc.Debuff)=="table" and cc.Debuff or {cc.Debuff}
+				for v=1,#debuffs do
+					mon.SpellBuffs[debuffs[v]].Power=cc.BuffPower
+				end
 			end
 		end
 	end
