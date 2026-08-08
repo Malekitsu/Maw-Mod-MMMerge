@@ -684,7 +684,6 @@ function events.ItemGenerated(t)
 		end
 		]]
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
-		bonusCharges=(difficultyExtraPower-1)*10
 		cap1=50*((difficultyExtraPower-1)*2+1)
 		maxChargesCap=50*((difficultyExtraPower-1)*4+1)
 		if mapvars.mapAffixes or Map.Name=="d42.blv" then
@@ -699,8 +698,6 @@ function events.ItemGenerated(t)
 			maxChargesCap=200
 		end
 		it.MaxCharges=math.floor(partyLevel/10+mapLevel/80)
-		--bolster boost
-		it.MaxCharges=math.min(math.floor(it.MaxCharges*difficultyExtraPower+bonusCharges),cap1)
 		
 		bonusCap=math.floor((difficultyExtraPower-1)*10)
 		if mapvars.mapAffixes then
@@ -4385,7 +4382,7 @@ function GetItemLevel(it)
 	if tot==0 then
 		return it.MaxCharges*5
 	end
-	return round(lvl/tot*18-17)+it.MaxCharges*5
+	return round(lvl/tot*6-5)+it.MaxCharges*5
 end
 
 function estimateWeaponDamageMultiplier(level)
