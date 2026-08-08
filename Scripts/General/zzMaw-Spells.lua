@@ -1302,32 +1302,6 @@ CCMAP={
 	[const.Spells.TurnUndead]={["Duration"]=const.Minute*5, ["ChanceMult"]=0.005, ["BaseCost"]=1, ["ScalingCost"]=0.5, ["School"]=const.Skills.Spirit, ["DamageKind"]=const.Damage.Spirit, ["Debuff"]=const.MonsterBuff.Fear},	
 	[const.Spells.ControlUndead]={["Duration"]=const.Minute*10, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=1.5, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]=const.MonsterBuff.Enslave},
 }
---[[
-function events.PlayerCastSpell(t)
-	if CCMAP[t.SpellId] then
-		t.Handled=true
-		
-		if t.SpellId==66 then
-			local mon=Map.Monsters[Mouse:GetTarget().Index]
-			BeginGrabObjects()
-			Game.SummonObjects(497, mon.X,mon.Y,mon.Z+100, 0,1)
-			local obj=GrabObjects()
-			if obj then
-				obj.Spell=66
-				obj.SpellLevel=0
-				obj.SpellMastery=0
-				obj.SpellSkill=0
-				obj.SpellType=66
-				obj.TypeIndex=497
-				obj.Owner=4
-				obj.Visible=true
-				obj.Target=3
-				obj.AttachToHead=true
-			end
-		end
-	end
-end
-]]
 function getCCDiffMult(bolster)
 	local diffMult=math.max(((bolster-100)/200)+1,1)
 	if bolster==600 then 
@@ -1368,11 +1342,8 @@ function events.Action(t)
 	Game.Spells[122]["SpellPointsGM"]=30
 end
 
---One source for CC debuff application: duration scaling, diminishing
---returns, ExpireTime write. engineApplied=true is the cast-window path,
---capping the engine's own roll (min -- a 0 duration CANCELS the engine
---debuff, that is the resist outcome). false is for effects we apply
---ourselves at impact (max -- a 0 duration is simply a no-op).
+--One source for CC application (MawCore/NOTES.md): engineApplied caps the
+--engine's roll (min: 0 duration = resist), the impact path extends (max).
 function applyCCDebuff(mon, cc, pl, spellId, resistance, engineApplied)
 	local s, m = SplitSkill(pl:GetSkill(cc.School))
 	local masteryMult = ({0.5, 0.65, 0.8, 1})[math.min(math.max(m, 1), 4)]
@@ -1463,9 +1434,6 @@ function events.PlayerCastSpell(t)
 					currentExpireTime=mon.SpellBuffs[cc.Debuff].ExpireTime
 				end
 				if currentExpireTime > prevExpireTime[i] then
-					-- Monster was affected: one shared application (this also
-					-- reads the caster's real mastery -- the old inline copy
-					-- read a stale GLOBAL `m` here)
 					applyCCDebuff(mon, cc, t.Player, t.SpellId, resistance[i], true)
 				end
 			end
@@ -1473,18 +1441,11 @@ function events.PlayerCastSpell(t)
 	end
 end
 
---Shrinking Ray: the engine's impact switch has no case for the Merge's
---object type 9030, so the landing was a silent no-op -- the resistance
---window above never had an engine roll to feed. Game.MissileSetup[type]
---.AutoCollision is the Merge's dormant per-type switch (hooked into the
---collide code by Structs/After/Spells.lua): explosion + spell sound +
---MonsterAttacked on impact. We flip it for 9030 and apply the CC there.
+--Shrinking Ray: no engine impact case for Merge type 9030 -- AutoCollision
+--makes the collide code fire MonsterAttacked; CC applied there (NOTES.md).
 local SHRINK_OBJ = 9030
 function events.GameInitialized2()
-	if Game.MissileSetup.count < SHRINK_OBJ + 1 then
-		Game.MissileSetup.count = SHRINK_OBJ + 1
-	end
-	Game.MissileSetup[SHRINK_OBJ].AutoCollision = true
+	MawEnableProjectileImpact(SHRINK_OBJ) --helper in zzMaw-Monsters (MM6 projectiles)
 end
 
 function events.MonsterAttacked(t)
@@ -1495,7 +1456,9 @@ function events.MonsterAttacked(t)
 		local cc = CCMAP[const.Spells.ShrinkingRay]
 		if pl and cc then
 			local mon = t.Monster
-			applyCCDebuff(mon, cc, pl, const.Spells.ShrinkingRay, mon.Resistances[cc.DamageKind], false)
+			if applyCCDebuff(mon, cc, pl, const.Spells.ShrinkingRay, mon.Resistances[cc.DamageKind], false) then
+				mon.SpellBuffs[cc.Debuff].Power=2 --engine set this on its own applies; we must too
+			end
 		end
 	end
 end
