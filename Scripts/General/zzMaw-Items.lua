@@ -1338,7 +1338,7 @@ legendaryEffects={
 	
 	[17]="Your hits deal 2% of current monster HP as physical damage (1% for AoE, multi-hit spells and arrows).\nDamage is increased by weapon base attack speed or Ascensions for spells.",
 	[18]="Reduce all damage taken by 10%",
-	[19]="Your weapon enchants scale with the highest between might/int./pers. (TODO: rework it)",
+	[19]="Your weapon enchants scale with the highest between might/int./pers.",
 	[20]="Base enchants on this items are 50% stronger",
 	[21]="Increase melee damage by 5% for each enemy in the nearbies",
 	[22]="Reduces damage by 3% for each enemy in the nearbies",
@@ -1564,8 +1564,14 @@ function checktext(MaxCharges,bonus2,it)
 	end
 
 	--damage enchants read the shared range (same numbers the damage roll uses)
+	local plId=Game.CurrentPlayer
+	if plId<0 or plId>Party.High then
+		plId=0
+	end
+	local legDmgMult=GetLegendary19Mult(Party[plId])
 	local function enchRangeText(id)
 		local lo, hi=enchantDamageRange(it, id)
+		lo, hi=lo*legDmgMult, hi*legDmgMult
 		if math.floor(lo)==math.floor(hi) then
 			return tostring(math.floor(lo))
 		end
@@ -1804,7 +1810,17 @@ function enchantDamageRange(it, id)
 	local mean=(ench[1]+ench[2])/2
 	return avg*ench[1]/mean, avg*ench[2]/mean, avg
 end
-fireAuraDamage={10,20,40,60,[0]=0}
+
+--legendary 19: enchant/aura damage scales with the highest stat, same
+--level normalization as the might damage bonus
+function GetLegendary19Mult(pl)
+	local id=pl:GetIndex()
+	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
+		local bonusStat=math.max(pl:GetMight(), pl:GetIntellect(), pl:GetPersonality())
+		return 1+GetMightDamageMultiplier(bonusStat, pl.LevelBase)
+	end
+	return 1
+end
 --calculate enchant damage
 function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType)
 	local ench=enchantbonusdamage[it.Bonus2]
@@ -1817,7 +1833,7 @@ function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType)
 		damage=math.random(round(lo), round(hi))
 	end
 	local id=pl:GetIndex()
-	local mult=1
+	local mult=GetLegendary19Mult(pl)
 	if calcType~="tooltip" and vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 26) then
 		if isSpell then
 			critChance, critMult, success=getCritInfo(pl,"spell")
@@ -2946,11 +2962,12 @@ local function addStaffPartyRes(tab)
 	end
 end
 
---phase 2: heroism / unarmed-buff / shaman-spirit multipliers on the
+--phase 2: might / heroism / unarmed-buff / shaman-spirit multipliers on the
 --damage rows
 local function applyDamageMultipliers(pl, tab, unarmed)
 	local might=tab[1]+pl.MightBase+pl.MightBonus+Party.SpellBuffs[2].Power
 	local mightEffect=Game.GetStatisticEffect(might)
+	local mightMult=GetMightDamageMultiplier(might, pl.LevelBase)
 	local bonusDamage=mightEffect+Party.SpellBuffs[const.PartyBuff.Heroism].Power
 	local heroismMult=0
 	local unarmedMult=0
@@ -2971,13 +2988,18 @@ local function applyDamageMultipliers(pl, tab, unarmed)
 		shamanSpiritMult=s/100
 	end
 
+	tab[42]=tab[42]+(tab[42]+bonusDamage)*mightMult
 	tab[42]=tab[42]+(tab[42]+bonusDamage)*heroismMult
 	tab[42]=tab[42]+(tab[42]+bonusDamage)*unarmedMult
 	tab[42]=tab[42]+(tab[42]+bonusDamage)*shamanSpiritMult
 
+	tab[43]=tab[43]+(tab[43]+bonusDamage)*mightMult
 	tab[43]=tab[43]+(tab[43]+bonusDamage)*heroismMult
 	tab[43]=tab[43]+(tab[43]+bonusDamage)*unarmedMult
 	tab[43]=tab[43]+(tab[43]+bonusDamage)*shamanSpiritMult
+
+	tab[46]=tab[46]+(tab[46]+bonusDamage)*mightMult
+	tab[47]=tab[47]+(tab[47]+bonusDamage)*mightMult
 end
 
 function itemStats(index)
@@ -3930,7 +3952,7 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 		--aura scales with the undamped item-level weapon damage: multiplying the
 		--damping factor back cancels the divisor inside GetWeaponDamage
 		local itemLevel=GetItemLevel(it)
-		local damage=GetWeaponDamage(it)*fireAuraDamage[m]*(1+0.04*itemLevel^0.675)
+		local damage=GetWeaponDamage(it)*fireAuraDamage[m]*(1+0.04*itemLevel^0.675)*GetLegendary19Mult(pl)
 		if calcType~="tooltip" and vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 26) then
 			if isSpell then
 				critChance, critMult, success=getCritInfo(pl,"spell")

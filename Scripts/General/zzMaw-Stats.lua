@@ -308,7 +308,18 @@ function events.GameInitialized2()
 	Skillz.setDesc(27,1,txt)
 end
 
+--fraction of bonus damage per point of might, normalized by level
+function GetMightDamageMultiplier(mightAmount, playerLevel)
+	return mightAmount/(1000+playerLevel*3)
+end
+
 function events.BuildStatInformationBox(t)
+	if t.Stat==0 then
+		i=Game.CurrentPlayer
+		might=Party[i]:GetMight()
+		local bonus=round(GetMightDamageMultiplier(might, Party[i].LevelBase)*1000)/10
+		t.Text=string.format("%s\n\nBonus Melee/Bow Damage: %s%s",Game.StatsDescriptions[0],bonus,"%")
+	end
 	if t.Stat==1 then
 		i=Game.CurrentPlayer
 		intellect=Party[i]:GetIntellect()
@@ -1545,7 +1556,7 @@ function getPlayerEstimatedPower(lvl)
 	
 	local heroismBuff=math.min((1+0.006*lvl^0.65),1.3)
 	
-	damage=(damage+mightEffect)*heroismBuff
+	damage=(damage+mightEffect)*heroismBuff*(1+GetMightDamageMultiplier(might, lvl))
 	
 	local speedEffect=(mightEffect/2)/1000
 	local weaponSpeed=math.min(1+skill/masterLearned*2,3)*skill/100
