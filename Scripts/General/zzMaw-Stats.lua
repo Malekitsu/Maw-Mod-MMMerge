@@ -54,14 +54,14 @@ function getCritInfo(pl, dmgType, monLvl)
 	monLvl = monLvl or pl.LevelBase or 0
 
 	local luck = pl.GetLuck and pl:GetLuck() or 0
-	local totalCrit = luck / math.min((500 + monLvl*7.5), 5000) + 0.05
+	local totalCrit = luck / math.min((500 + monLvl*9.5), 10000) + 0.05
 	local critDamageMultiplier = 1
 	
-	local cap=1000
+	local cap=3000
 	if vars.madnessMode then
-		cap=1500
+		cap=5000
 	end
-	local diminishingLevel=math.min(100+monLvl*1.4,cap)
+	local diminishingLevel=math.min(250+monLvl*2.5,cap)
 	if dmgType == "spell" then
 		local intellect = pl.GetIntellect and pl:GetIntellect() or 0
 		critDamageMultiplier = intellect/(diminishingLevel*4) + 1.5
@@ -304,7 +304,7 @@ end
 
 --body building description
 function events.GameInitialized2()
-	txt=Skillz.getDesc(27,1) .. "\n\nHit Points are also increased 2-3-4-5% per skill point, depending on mastery."
+	txt=Skillz.getDesc(27,1) .. "\n\nHit Points are also increased " .. bodybuildingHP[1] .. "-" .. bodybuildingHP[2] .. "-" .. bodybuildingHP[3] .. "-" .. bodybuildingHP[4] .. "% per skill point, depending on mastery."
 	Skillz.setDesc(27,1,txt)
 end
 
@@ -1013,7 +1013,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		if getMapAffixPower(28) then
 			AC=AC*(1-getMapAffixPower(28)/100)
 		end
-		local divider=math.min(90+monLvl*0.25*bolster)
+		local divider=math.min(90+monLvl*0.5*bolster)
 		local reduction=AC/divider+1
 		local damage=round(damage/reduction)
 		
@@ -1093,7 +1093,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		end
 		
 		-- Calculate the effective resistance using the proper formula
-		local divider=math.min(60+monLvl*0.5*bolster)
+		local divider=math.min(60+monLvl*1*bolster)
 		local reduction=totalRes/divider+1
 		local effectiveRes=1/reduction* itemResMultiplier
 		
@@ -1415,7 +1415,7 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 		masterLearned=20
 	end
 	local bbMasteryBonus=math.min(1+skill/masterLearned*2,3) --use master as a reference
-	local bbPercentBonus=bbMasteryBonus+1
+	local bbPercentBonus=bodybuildingHP[math.floor(bbMasteryBonus)]
 	health=health+(enduranceEffect+bbMasteryBonus)*scalingHP+extimatedHealthBonus
 	
 	health=health*(1+bbPercentBonus*skill/100)*(1+extimatedEndurance/1000)
@@ -1449,7 +1449,7 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 	local resReduction=resistances/divider+1
 	local shieldBuff=math.max((1-0.006*lvl^0.65),0.7) --starts with no shield gradually into max res at ~400 lvl
 	resReduction=resReduction/shieldBuff
-	local power=statsPerLevel*lvl/12 
+	local power=estimatedStat/12 
 	
 	local ringReduction=(power/100+1)
 	resReduction=resReduction*ringReduction

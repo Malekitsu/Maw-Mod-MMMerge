@@ -38,7 +38,7 @@ ItemFields.Registry = {
 	{offset = 0x19, name = "MaxCharges",      type = "u1", spare = "no",
 		holds = "clamped to maxChargesCap (difficulty-derived, <= 200)",
 		note  = "completely full, no slack. Celestials are the one exception "
-			.. "and may reach 255, the u1 ceiling (zzMaw-Items, higherLootPowerRange)"},
+			.. "and may reach 255, the u1 ceiling (zzMaw-Items, ItemGenerated)"},
 	{offset = 0x1A, name = "Owner",           type = "i1", spare = "no",
 		holds = "unused by the mod",
 		note  = "OFF-LIMITS by user decision"},

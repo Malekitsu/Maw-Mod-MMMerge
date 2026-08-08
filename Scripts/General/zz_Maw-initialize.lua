@@ -32,7 +32,6 @@ return {
     AlchemyBagKey = 69,                 -- alchemy bag key (default: E)
     
     -- Gameplay Features
-    higherLootPowerRange = true,        -- enchants range from 1-100 instead of tier-based ranges
     enableAllTrainers = true,           -- find trainers that weren't previously available in all continents
     onlineQualityOfLifeFeatures = true, -- remove travel/training time, coaches/ships always available
 	teleportDeadMonstersAndCraftingKey = 75, -- teleports up to 30 monsters and 30 crafting items to the player location
@@ -278,7 +277,6 @@ removeBuffsKey = mawSettings.removeBuffsKey
 chargeKey = mawSettings.chargeKey
 healthPotionKey = mawSettings.healthPotionKey
 manaPotionKey = mawSettings.manaPotionKey
-higherLootPowerRange = mawSettings.higherLootPowerRange
 disableBow = mawSettings.disableBow
 enableAllTrainers = mawSettings.enableAllTrainers
 enableDisintegrate = mawSettings.enableDisintegrate

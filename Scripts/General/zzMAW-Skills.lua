@@ -86,8 +86,8 @@ skillDamage =
 
 skillAC =
 {
-	[const.Skills.Staff]	= {[0]=0, 0, 2, 3, 4,},
-	[const.Skills.Sword]	= {[0]=0, 0, 0, 1, 2,},
+	[const.Skills.Staff]	= {[0]=0, 0, 1, 2, 2,},
+	[const.Skills.Sword]	= {[0]=0, 0, 0, 0, 1,},
 	[const.Skills.Dagger]	= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Axe]		= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Spear]	= {[0]=0, 0, 4, 6, 8,},
@@ -102,9 +102,12 @@ skillAC =
 	--[const.Skills.Plate]	= {[0]=0, 2, 2, 3, 4,},
 	[const.Skills.Dodging]	= {[0]=0, 4, 5, 6, 6,},
 }
+-- bodybuilding % bonus HP per skill point (by rank)
+bodybuildingHP = {[0]=0, 0, 1, 1.5, 2,}
+
 skillResistance =
 {
-	[const.Skills.Staff]	= {[0]=0, 0, 2, 3, 4},
+	[const.Skills.Staff]	= {[0]=0, 0, 1, 1, 2},
 	[const.Skills.Sword]	= {[0]=0, 0, 0, 0, 0},
 	[const.Skills.Dagger]	= {[0]=0, 0, 0, 0, 0},
 	[const.Skills.Axe]		= {[0]=0, 0, 0, 0, 0},
@@ -121,18 +124,18 @@ skillResistance =
 	[const.Skills.Dodging]	= {[0]=0, 0, 0, 0, 0,},
 }
 skillItemAC={
-	[const.Skills.Leather]	= {[0]=0, 3, 4, 5, 6,},
-	[const.Skills.Chain]	= {[0]=0, 3, 4, 5, 6,},
-	[const.Skills.Plate]	= {[0]=0, 3, 4, 5, 6,},
-	[const.Skills.Shield]	= {[0]=0, 4, 6, 8, 10,},
-	[const.Skills.Dodging]	= {[0]=0, 5, 5, 10, 10,},
+	[const.Skills.Leather]	= {[0]=0, 1, 1, 2, 3,},
+	[const.Skills.Chain]	= {[0]=0, 1, 2, 2, 3,},
+	[const.Skills.Plate]	= {[0]=0, 1, 2, 3, 3,},
+	[const.Skills.Shield]	= {[0]=0, 2, 3, 4, 5,},
+	[const.Skills.Dodging]	= {[0]=0, 3, 3, 5, 5,},
 }
 skillItemRes={
-	[const.Skills.Leather]	= {[0]=0, 2, 3, 4, 5,},
-	[const.Skills.Chain]	= {[0]=0, 1, 2, 3, 4,},
-	[const.Skills.Plate]	= {[0]=0, 0, 1, 2, 3,},
-	[const.Skills.Shield]	= {[0]=0, 4, 6, 8, 10,},
-	[const.Skills.Dodging]	= {[0]=0, 0, 5, 5, 10,},
+	[const.Skills.Leather]	= {[0]=0, 1, 2, 3, 4,},
+	[const.Skills.Chain]	= {[0]=0, 1, 2, 2, 3,},
+	[const.Skills.Plate]	= {[0]=0, 0, 1, 1, 2,},
+	[const.Skills.Shield]	= {[0]=0, 2, 3, 4, 5,},
+	[const.Skills.Dodging]	= {[0]=0, 0, 3, 3, 3,},
 }
 	
 
