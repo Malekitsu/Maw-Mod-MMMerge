@@ -13,6 +13,13 @@ MawCore.SkillTooltip = SkillTooltip
 
 local Formulas = MawCore.Formulas
 
+-- damageMultiplier (zzMAW-Skills) is only filled by the in-game skill
+-- recalc; on the creation screen it's nil, so fall back to 1
+local function meleeMult(pl)
+	local t = damageMultiplier and damageMultiplier[pl:GetIndex()]
+	return t and t.Melee or 1
+end
+
 -- index part -> row label; also the source for SkillsUI's mastery name
 -- array (the engine's four name slots get redirected to these strings)
 SkillTooltip.masteryNames = {"", "Novice", "Expert", "Master", "Grand",
@@ -182,7 +189,7 @@ end, "ascension bonuses")
 
 SkillTooltip.set(const.Skills.Spear, 5, function(pl)
 	local s = SplitSkill(pl:GetSkill(const.Skills.Spear))
-	local mult = damageMultiplier[pl:GetIndex()]["Melee"]
+	local mult = meleeMult(pl)
 	local damageIncrease = round((2 + s * 0.02) * mult * 10) / 10
 	local it = pl:GetActiveItem(1)
 	if it then
@@ -275,7 +282,7 @@ SkillTooltip.set(6, 5, function(pl)
 	if m < 3 then
 		return maceGMtxt
 	end
-	local chance = round(s / pl.LevelBase ^ 0.65 * 1500 * damageMultiplier[pl:GetIndex()].Melee / math.min(1 + pl.LevelBase / 150, 3)) / 100
+	local chance = round(s / pl.LevelBase ^ 0.65 * 1500 * meleeMult(pl) / math.min(1 + pl.LevelBase / 150, 3)) / 100
 	local txt = "\n\n"
 	if m == 3 then
 		txt = txt .. "Chance to Stun: " .. chance .. "%"
@@ -396,10 +403,7 @@ local function registerClassBuilders()
 		[18]={[1]=function(pl)
 			local bodyS, bodyM=SplitSkill(pl.Skills[const.Skills.Body])
 			local healMult=1+pl:GetPersonality()/1000
-			local bodyHeal=0
-			if damageMultiplier[pl:GetIndex()] then
-				bodyHeal=round(bodyS^1.3*bodyM*damageMultiplier[pl:GetIndex()]["Melee"]*healMult*2)
-			end
+			local bodyHeal=round(bodyS^1.3*bodyM*meleeMult(pl)*healMult*2)
 			return MawSchoolDescBase[18] .. "\n\nSeraphim healing upon attack increases depending on Body magic, scaling with personality(weapon speed multiplier applies).\n\n" .. "Current heal from Body: " .. StrColor(0,255,0,bodyHeal) .. "\n"
 		end,
 			[2]="Melee attacks heal on hit",
