@@ -5,11 +5,17 @@
 local Formulas = {}
 MawCore.Formulas = Formulas
 
+-- Ring resistance enchants run on a gentler curve than every other reduction.
+-- The applied side (zzMaw-Items collectEnchant) stores ring power rescaled to
+-- the /100 curve, so this constant is the single place the ratio lives.
+Formulas.ringReductionDivisor = 200
+
 -- Display % for the "divide by (1 + power/100)" reductions. decimals=2 for
--- two shown digits.
-function Formulas.reductionPercent(power, decimals)
+-- two shown digits, isRing for the ring curve.
+function Formulas.reductionPercent(power, decimals, isRing)
 	local f = decimals == 2 and 100 or 10
-	local fraction = 1 - 1/(power/100 + 1)
+	local divisor = isRing and Formulas.ringReductionDivisor or 100
+	local fraction = 1 - 1/(power/divisor + 1)
 	return round(fraction * 100 * f) / f
 end
 

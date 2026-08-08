@@ -1382,12 +1382,12 @@ function updateCelestialItem(it,pl)
 		if vars.madnessMode then
 			tier=math.min(math.min(lvl,1000)/11+5,90)
 		end
-		local mult=3
+		local mult=2
 		if vars.Mode==2 then
-			mult=4
+			mult=2.5
 		end
 		if vars.insanityMode then
-			mult=5
+			mult=3
 		end
 		if it.Bonus>0 and it.BonusStrength>0 then
 			it.BonusStrength=math.round(tier*mult*slotMult)
@@ -2421,11 +2421,16 @@ local function collectEnchant(index, it, bonus, power, tab, isSecond)
 		end
 	elseif bonus<=16 then
 		local res=vars.normalEnchantResistance[index]
-		if isSecond then
-			res[bonus]=math.max(res[bonus] or 0, power)
-		else
-			res[bonus]=math.max(res[bonus], power+10)
+		local value=power
+		if not isSecond then
+			value=power+10
 		end
+		--rings run on the /300 curve; the reduction is applied as /100
+		--(zzMaw-Stats calcMawDamage), so store the equivalent power there
+		if GetItemEquipStat(it)==10 then
+			value=value*100/MawCore.Formulas.ringReductionDivisor
+		end
+		res[bonus]=math.max(res[bonus] or 0, value)
 	elseif not isSecond then
 		local slot=bonusBaseEnchantSkill[bonus]+50
 		tab[slot]=(tab[slot] or 0)+power
@@ -2796,7 +2801,8 @@ local function addHP(pl, id, tab, enduranceStatBuff)
 	local hpScaling=Game.Classes.HPFactor[pl.Class]
 	local baseHP=Game.Classes.HPBase[pl.Class]+hpScaling*(level+endEff+BBHP)
 	local fullHP1=baseHP+tab[8]
-	local enduranceBonus=fullHP1*endurance/1000
+	--1% bonus HP every 25 endurance
+	local enduranceBonus=fullHP1*endurance/2500
 	local fullHP2=fullHP1+enduranceBonus
 	local BBBonus=fullHP2*(bodybuildingHP[math.min(m,4)]*0.01*s)
 	local bbEndBonus=fullHP2+BBBonus-fullHP1

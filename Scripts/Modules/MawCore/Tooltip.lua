@@ -290,7 +290,7 @@ local function tooltipEnchantStats(t)
 							resLegendary=true
 						end
 					end
-					power=Formulas.reductionPercent(power+10) .. "%"
+					power=Formulas.reductionPercent(power+10, nil, GetItemEquipStat(t.Item)==10) .. "%"
 				end
 				if extraDescription then
 					local it=t.Item
@@ -320,7 +320,7 @@ local function tooltipEnchantStats(t)
 						if resLegendary then
 							maxValue=maxValue*1.5
 						end
-						maxValue=Formulas.reductionPercent(maxValue+10) .. "%"
+						maxValue=Formulas.reductionPercent(maxValue+10, nil, GetItemEquipStat(t.Item)==10) .. "%"
 					elseif t.Item.Bonus==8 or t.Item.Bonus==9 then
 						local mult=GetSlotMult(t.Item)
 						maxValue=round(maxValue*(1+math.min(maxValue/50/mult,5)))
@@ -354,7 +354,7 @@ local function tooltipEnchantStats(t)
 							resLegendary=true
 						end
 					end
-					strength=Formulas.reductionPercent(strength+10) .. "%"
+					strength=Formulas.reductionPercent(strength+10, nil, GetItemEquipStat(t.Item)==10) .. "%"
 				end
 				if itemStatName[bonus] then
 					if extraDescription then
@@ -385,7 +385,7 @@ local function tooltipEnchantStats(t)
 							if resLegendary then
 								maxValue=maxValue*1.5
 							end
-							maxValue=Formulas.reductionPercent(maxValue+10) .. "%"
+							maxValue=Formulas.reductionPercent(maxValue+10, nil, GetItemEquipStat(t.Item)==10) .. "%"
 						elseif bonus==8 or bonus==9 then
 							local mult=GetSlotMult(t.Item)
 							maxValue=round(maxValue*(1+math.min(maxValue/50/mult,5)))
@@ -431,7 +431,7 @@ local function tooltipEnchantStats(t)
 					local strength=math.min(round(power*(1+0.25*math.random())),cap)
 					if stat>=11 and stat<=16 then
 						--second enchants grant the raw strength, no +10 (collectEnchant)
-						strength=Formulas.reductionPercent(strength) .. "%"
+						strength=Formulas.reductionPercent(strength, nil, GetItemEquipStat(t.Item)==10) .. "%"
 					end
 					txt=baseStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
 					t.Enchantment = StrColor(100,100,100, txt)

@@ -343,7 +343,7 @@ function events.BuildStatInformationBox(t)
 		endurance=Party[i]:GetEndurance()
 		HPScaling=Game.Classes.HPFactor[Party[i].Class]
 		level=Party[i]:GetLevel()
-		t.Text=string.format("%s\n\nHealth bonus from Endurance: %s%s\n\nFlat HP bonus from Endurance: %s",Game.StatsDescriptions[3],endurance/10,"%",Game.GetStatisticEffect(endurance)*HPScaling)
+		t.Text=string.format("%s\n\nHealth bonus from Endurance: %s%s\n\nFlat HP bonus from Endurance: %s",Game.StatsDescriptions[3],round(endurance/25*10)/10,"%",Game.GetStatisticEffect(endurance)*HPScaling)
 	end
 	if t.Stat==4 then
 		i=Game.CurrentPlayer
@@ -981,10 +981,7 @@ end
 
 function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 	local monLvl=monLvl or pl.LevelBase
-	local bolster=(math.max(Game.BolsterAmount, 100)/100-1)/4+1
-	if vars.insanityMode then
-		bolster=3
-	end
+
 	local id=pl:GetIndex()
 	--AC for phys
 	
@@ -1013,7 +1010,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		if getMapAffixPower(28) then
 			AC=AC*(1-getMapAffixPower(28)/100)
 		end
-		local divider=math.min(90+monLvl*0.5*bolster)
+		local divider=math.min(200+monLvl*3)
 		local reduction=AC/divider+1
 		local damage=round(damage/reduction)
 		
@@ -1093,7 +1090,7 @@ function calcMawDamage(pl,damageKind,damage,rand,monLvl)
 		end
 		
 		-- Calculate the effective resistance using the proper formula
-		local divider=math.min(60+monLvl*1*bolster)
+		local divider=math.min(100+monLvl*6)
 		local reduction=totalRes/divider+1
 		local effectiveRes=1/reduction* itemResMultiplier
 		
@@ -1418,7 +1415,7 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 	local bbPercentBonus=bodybuildingHP[math.floor(bbMasteryBonus)]
 	health=health+(enduranceEffect+bbMasteryBonus)*scalingHP+extimatedHealthBonus
 	
-	health=health*(1+bbPercentBonus*skill/100)*(1+extimatedEndurance/1000)
+	health=health*(1+bbPercentBonus*skill/100)*(1+extimatedEndurance/2500)
 	
 	-- Return just health if requested
 	if healthOnly then
