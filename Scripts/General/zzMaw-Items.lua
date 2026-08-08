@@ -1338,7 +1338,7 @@ legendaryEffects={
 	
 	[17]="Your hits deal 2% of current monster HP as physical damage (1% for AoE, multi-hit spells and arrows).\nDamage is increased by weapon base attack speed or Ascensions for spells.",
 	[18]="Reduce all damage taken by 10%",
-	[19]="Your weapon enchants scale with the highest between might/int./pers.",
+	[19]="Your weapon enchants scale with the highest between might/int./pers. (TODO: rework it)",
 	[20]="Base enchants on this items are 50% stronger",
 	[21]="Increase melee damage by 5% for each enemy in the nearbies",
 	[22]="Reduces damage by 3% for each enemy in the nearbies",
@@ -1567,21 +1567,8 @@ function checktext(MaxCharges,bonus2,it)
 	if it:T().EquipStat==2 then
 		weaponType="Bow"
 	end
-	local id=Game.CurrentPlayer
-	if id<0 or id>Party.High then
-		id=0
-	end
-	local legDmgMult=1
-	local pl=Party[id]
-	local index=pl:GetIndex()
-	if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 19) then
-		local str=pl:GetMight()
-		local int=pl:GetIntellect()
-		local pers=pl:GetPersonality()
-		local bonusStat=math.max(str,int,pers)
-		legDmgMult=(1+bonusStat/1000)
-	end
-	
+	local legDmgMult=1 --was legendary 19; kept at 1 until the rework
+
 	--damage multiplier
 	local enchantDamageMult=math.max(MawCore.Formulas.chargesDamageScale(MaxCharges),0.5)
 	
@@ -1818,13 +1805,6 @@ function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType)
 	end
 	local id=pl:GetIndex()
 	local mult=1
-	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
-		local str=pl:GetMight()
-		local int=pl:GetIntellect()
-		local pers=pl:GetPersonality()
-		local bonusStat=math.max(str,int,pers)
-		mult=(1+bonusStat/1000)
-	end
 	if calcType~="tooltip" and vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 26) then
 		if isSpell then 
 			critChance, critMult, success=getCritInfo(pl,"spell")
@@ -2956,7 +2936,7 @@ local function addStaffPartyRes(tab)
 	end
 end
 
---phase 2: might / heroism / unarmed-buff / shaman-spirit multipliers on the
+--phase 2: heroism / unarmed-buff / shaman-spirit multipliers on the
 --damage rows
 local function applyDamageMultipliers(pl, tab, unarmed)
 	local might=tab[1]+pl.MightBase+pl.MightBonus+Party.SpellBuffs[2].Power
@@ -2981,18 +2961,13 @@ local function applyDamageMultipliers(pl, tab, unarmed)
 		shamanSpiritMult=s/100
 	end
 
-	tab[42]=tab[42]+(tab[42]+bonusDamage)*might/1000
 	tab[42]=tab[42]+(tab[42]+bonusDamage)*heroismMult
 	tab[42]=tab[42]+(tab[42]+bonusDamage)*unarmedMult
 	tab[42]=tab[42]+(tab[42]+bonusDamage)*shamanSpiritMult
 
-	tab[43]=tab[43]+(tab[43]+bonusDamage)*might/1000
 	tab[43]=tab[43]+(tab[43]+bonusDamage)*heroismMult
 	tab[43]=tab[43]+(tab[43]+bonusDamage)*unarmedMult
 	tab[43]=tab[43]+(tab[43]+bonusDamage)*shamanSpiritMult
-
-	tab[46]=tab[46]+(tab[46]+bonusDamage)*might/1000
-	tab[47]=tab[47]+(tab[47]+bonusDamage)*might/1000
 end
 
 function itemStats(index)
@@ -3945,13 +3920,6 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 		local mult=math.max(MawCore.Formulas.chargesDamageScale(it.MaxCharges),0.5)
 		if table.find(artWeap1h, it.Number) or table.find(artWeap2h, it.Number) then
 			mult=(1+artifactPowerMult(pl.LevelBase, false, it.BonusExpireTime))^1.5
-		end
-		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
-			local str=pl:GetMight()
-			local int=pl:GetIntellect()
-			local pers=pl:GetPersonality()
-			local bonusStat=math.max(str,int,pers)
-			mult=mult*(1+bonusStat/1000)
 		end
 		if calcType~="tooltip" and vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 26) then
 			if isSpell then 

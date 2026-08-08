@@ -309,11 +309,6 @@ function events.GameInitialized2()
 end
 
 function events.BuildStatInformationBox(t)
-	if t.Stat==0 then
-		i=Game.CurrentPlayer
-		might=Party[i]:GetMight()
-		t.Text=string.format("%s\n\nBonus Melee/Bow Damage: %s%s",Game.StatsDescriptions[0],might/10,"%")
-	end
 	if t.Stat==1 then
 		i=Game.CurrentPlayer
 		intellect=Party[i]:GetIntellect()
@@ -1152,7 +1147,6 @@ function calcPowerVitality(pl, statsMenu)
 	--MELEE
 	local low=pl:GetMeleeDamageMin()
 	local high=pl:GetMeleeDamageMax()
-	local might=pl:GetMight()
 	local accuracy=pl:GetAccuracy()
 	local luck=pl:GetLuck()
 	local delay=pl:GetAttackDelay()
@@ -1355,19 +1349,7 @@ function events.GetSkill(t)
 	end
 end
 
---average
-function getPlayerEstimatedVitality(lvl, healthOnly)
-	local baseHP=25
-	local baseScaling=3
-	local endScaling=9
-	local maxPromotionLevel=250
-	if vars.madnessMode then
-		maxPromotionLevel=500
-	end
-	local scalingHP=math.min((endScaling-baseScaling)*lvl/maxPromotionLevel,endScaling-baseScaling)+baseScaling
-	local health=baseHP+scalingHP*(lvl)
-	
-	
+function estimateStat(level)
 	local statsPerLevel=2
 	if vars.insanityMode then
 		statsPerLevel=5
@@ -1383,6 +1365,23 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 	if vars.AusterityMode then
 		statsPerLevel=statsPerLevel+Game.BolsterAmount/100
 	end
+	return statsPerLevel*level
+end
+
+--average
+function getPlayerEstimatedVitality(lvl, healthOnly)
+	local baseHP=25
+	local baseScaling=3
+	local endScaling=9
+	local maxPromotionLevel=250
+	if vars.madnessMode then
+		maxPromotionLevel=500
+	end
+	local scalingHP=math.min((endScaling-baseScaling)*lvl/maxPromotionLevel,endScaling-baseScaling)+baseScaling
+	local health=baseHP+scalingHP*(lvl)
+	
+	local estimatedStat=estimateStat(lvl)
+
 	
 	local levelCap=700
 	if vars.madnessMode then
@@ -1390,9 +1389,9 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 	end
 	local levelMult=math.min(lvl/levelCap,1)
 	
-	local extimatedEndurance=statsPerLevel*lvl
+	local extimatedEndurance=estimatedStat
 	
-	local healthPower=statsPerLevel*lvl/10
+	local healthPower=estimatedStat/10
 	local extimatedHealthBonus=healthPower*math.min(1+healthPower/50,5)*4	
 	
 	local enduranceEffect=extimatedEndurance/5
@@ -1414,7 +1413,7 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 		return health
 	end
 	
-	local armorClass=statsPerLevel*lvl*1.5
+	local armorClass=estimatedStat*1.5
 	
 	local bolster=1
 	if vars.insanityMode then
@@ -1545,7 +1544,7 @@ function getPlayerEstimatedPower(lvl)
 	
 	local heroismBuff=math.min((1+0.006*lvl^0.65),1.3)
 	
-	damage=(damage+mightEffect)*heroismBuff*(1+might/1000)
+	damage=(damage+mightEffect)*heroismBuff
 	
 	local speedEffect=(mightEffect/2)/1000
 	local weaponSpeed=math.min(1+skill/masterLearned*2,3)*skill/100
