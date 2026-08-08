@@ -1297,8 +1297,8 @@ CCMAP={
 	[const.Spells.Fear]=	{["Duration"]=const.Minute*4, ["ChanceMult"]=0.005, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Fear},
 	[const.Spells.Enslave]=	{["Duration"]=const.Minute*5, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=1, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Enslave},
 	[const.Spells.Paralyze]={["Duration"]=const.Minute*3, ["ChanceMult"]=0.04, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Light, ["DamageKind"]=const.Damage.Light,["Debuff"]=const.MonsterBuff.Paralyze},	
-[const.Spells.ShrinkingRay]={["Duration"]=const.Minute*6, ["ChanceMult"]=0.01, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark,["Debuff"]=const.MonsterBuff.ShrinkingRay},
-[const.Spells.DarkGrasp]=	{["Duration"]=const.Minute*10, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]={const.MonsterBuff.ArmorHalved, const.MonsterBuff.Slow, const.MonsterBuff.DamageHalved, const.MonsterBuff.MeleeOnly}},																									
+	[const.Spells.ShrinkingRay]={["Duration"]=const.Minute*6, ["ChanceMult"]=0.01, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark,["Debuff"]=const.MonsterBuff.ShrinkingRay},
+	[const.Spells.DarkGrasp]=	{["Duration"]=const.Minute*10, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]={const.MonsterBuff.ArmorHalved, const.MonsterBuff.Slow, const.MonsterBuff.DamageHalved, const.MonsterBuff.MeleeOnly}},																									
 	[const.Spells.TurnUndead]={["Duration"]=const.Minute*5, ["ChanceMult"]=0.005, ["BaseCost"]=1, ["ScalingCost"]=0.5, ["School"]=const.Skills.Spirit, ["DamageKind"]=const.Damage.Spirit, ["Debuff"]=const.MonsterBuff.Fear},	
 	[const.Spells.ControlUndead]={["Duration"]=const.Minute*10, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=1.5, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]=const.MonsterBuff.Enslave},
 }
@@ -1368,9 +1368,39 @@ function events.Action(t)
 	Game.Spells[122]["SpellPointsGM"]=30
 end
 
+--One source for CC debuff application: duration scaling, diminishing
+--returns, ExpireTime write. engineApplied=true is the cast-window path,
+--capping the engine's own roll (min -- a 0 duration CANCELS the engine
+--debuff, that is the resist outcome). false is for effects we apply
+--ourselves at impact (max -- a 0 duration is simply a no-op).
+function applyCCDebuff(mon, cc, pl, spellId, resistance, engineApplied)
+	local s, m = SplitSkill(pl:GetSkill(cc.School))
+	local masteryMult = ({0.5, 0.65, 0.8, 1})[math.min(math.max(m, 1), 4)]
+	local duration = cc.Duration * masteryMult
+	if spellId ~= 122 then
+		local ascension = SplitSkill(pl:GetSkill(const.Skills.Learning))
+		duration = duration * 1.015^ascension / (1 + resistance/100)
+	end
+	if Party.High == 0 then
+		duration = duration * 2
+	end
+	local finalDuration = calcDebuffDuration(mon, cc, duration)
+	local debuffs = type(cc.Debuff)=="table" and cc.Debuff or {cc.Debuff}
+	for v = 1, #debuffs do
+		local buff = mon.SpellBuffs[debuffs[v]]
+		if engineApplied then
+			buff.ExpireTime = math.min(buff.ExpireTime, Game.Time + finalDuration)
+		else
+			buff.ExpireTime = math.max(buff.ExpireTime, Game.Time + finalDuration)
+		end
+	end
+	return finalDuration > 0
+end
+
 function events.PlayerCastSpell(t)
 	if CCMAP[t.SpellId] then
 		if t.SpellId==const.Spells.Stun then return end --stun is handled differently
+		if t.SpellId==const.Spells.ShrinkingRay then return end --no engine impact for type 9030: applied at hit via AutoCollision below
 		local resistance={}
 		local level={}
 		local prevExpireTime={} -- Record current debuff ExpireTime before cast
@@ -1433,26 +1463,39 @@ function events.PlayerCastSpell(t)
 					currentExpireTime=mon.SpellBuffs[cc.Debuff].ExpireTime
 				end
 				if currentExpireTime > prevExpireTime[i] then
-					-- Monster was affected, apply diminishing returns
-					local masteryMult = ({0.5, 0.65, 0.8, 1})[math.max(1,m)]
-					local duration=cc.Duration * masteryMult
-					if t.SpellId~=122 then
-						local ascension = SplitSkill(t.Player:GetSkill(const.Skills.Learning))
-						duration=duration*1.015^ascension/(1+resistance[i]/100)
-					end
-					if Party.High==0 then
-						duration=duration*2
-					end
-					local finalDuration = calcDebuffDuration(mon, cc, duration)
-					if type(cc.Debuff)=="table" then
-						for v =1,#cc.Debuff do 
-							mon.SpellBuffs[cc.Debuff[v]].ExpireTime=math.min(mon.SpellBuffs[cc.Debuff[v]].ExpireTime, Game.Time+finalDuration)
-						end
-					else
-						mon.SpellBuffs[cc.Debuff].ExpireTime=math.min(mon.SpellBuffs[cc.Debuff].ExpireTime, Game.Time+finalDuration)
-					end
+					-- Monster was affected: one shared application (this also
+					-- reads the caster's real mastery -- the old inline copy
+					-- read a stale GLOBAL `m` here)
+					applyCCDebuff(mon, cc, t.Player, t.SpellId, resistance[i], true)
 				end
 			end
+		end
+	end
+end
+
+--Shrinking Ray: the engine's impact switch has no case for the Merge's
+--object type 9030, so the landing was a silent no-op -- the resistance
+--window above never had an engine roll to feed. Game.MissileSetup[type]
+--.AutoCollision is the Merge's dormant per-type switch (hooked into the
+--collide code by Structs/After/Spells.lua): explosion + spell sound +
+--MonsterAttacked on impact. We flip it for 9030 and apply the CC there.
+local SHRINK_OBJ = 9030
+function events.GameInitialized2()
+	if Game.MissileSetup.count < SHRINK_OBJ + 1 then
+		Game.MissileSetup.count = SHRINK_OBJ + 1
+	end
+	Game.MissileSetup[SHRINK_OBJ].AutoCollision = true
+end
+
+function events.MonsterAttacked(t)
+	local o = t.Attacker and t.Attacker.Object
+	if o and o.Type == SHRINK_OBJ and not t.Handled then
+		t.Handled = true --shrink carries no damage: skip engine attack processing
+		local pl = t.Attacker.Player
+		local cc = CCMAP[const.Spells.ShrinkingRay]
+		if pl and cc then
+			local mon = t.Monster
+			applyCCDebuff(mon, cc, pl, const.Spells.ShrinkingRay, mon.Resistances[cc.DamageKind], false)
 		end
 	end
 end
