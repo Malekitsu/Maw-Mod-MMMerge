@@ -60,14 +60,14 @@ skillAttack =
 skillRecovery =
 {
 	[const.Skills.Staff]	= {[0]=0, 0, 0, 0, 0,},
-	[const.Skills.Sword]	= {[0]=0, 0, 1, 1.5, 1.5,},
-	[const.Skills.Dagger]	= {[0]=0, 0.5, 0.5, 0.5, 1,},
-	[const.Skills.Axe]		= {[0]=0, 0, 0.5, 1, 1,},
+	[const.Skills.Sword]	= {[0]=0, 0, 1, 1, 2,},
+	[const.Skills.Dagger]	= {[0]=0, 0, 0, 0, 1,},
+	[const.Skills.Axe]		= {[0]=0, 0, 0, 1, 1,},
 	[const.Skills.Spear]	= {[0]=0, 0, 0, 0, 0,},
-	[const.Skills.Bow]		= {[0]=0, 0.5, 1, 1.5, 2.5,},
+	[const.Skills.Bow]		= {[0]=0, 0, 1, 1, 2,},
 	[const.Skills.Mace]		= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0,},
-	[const.Skills.Unarmed]	= {[0]=0, 0, 0.5, 1, 1,},
+	[const.Skills.Unarmed]	= {[0]=0, 0, 1, 1, 2,},
 }
 
 skillDamage =
@@ -175,11 +175,11 @@ function getItemRecovery(it, playerLevel)
 	local baseSpeed=100
 	if table.find(artWeap1h,it.Number) or table.find(artWeap2h,it.Number) then 
 		itemLevel=playerLevel
-		baseSpeed=baseRecovery[skill] * (0.75+playerLevel/250)
+		baseSpeed=baseRecovery[skill] * (0.75+playerLevel/500)
 		baseSpeed=round(baseSpeed/10)*10
 	elseif baseRecovery[skill] then
 		itemLevel=GetItemLevel(it)
-		baseSpeed=baseRecovery[skill] * (0.75+itemLevel/250)
+		baseSpeed=baseRecovery[skill] * (0.75+itemLevel/500)
 		baseSpeed=round(baseSpeed/10)*10
 	end
 	if it:T().EquipStat==1 then
@@ -484,14 +484,14 @@ end
 ------------------------
 function events.GameInitialized2()
 	Skillz.setDesc(6,1,Skillz.getDesc(6,1) .. "\nThe paralyze effect lasts for 5 seconds on regular monsters and 2 seconds on bosses. The stun effect lasts for half the duration of the paralyze effect. The chances of successfully applying these effects depend on the skill level and the monster's level.\n")
-	Skillz.setDesc(0,1,Skillz.getDesc(0,1) .. "\nThis skill increases the damage gained from weapon by " .. skillDamage[0] .. "% per skill point when equipping a staff.\nAt Grandmaster can combine staff and unarmed skill, increasing its damage with staff skill at half effect.\n\nYour full Staff Attack boosts AC and all Resistances by X% per skill point, counting an extra +10 points of skill. Resistances apply to the entire party.\n")
-	Skillz.setDesc(1,1,Skillz.getDesc(1,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[1] .. "% per skill point when equipping a sword.\n\nYour full Sword Attack boosts AC by X% per skill point, counting an extra +10 points of skill.\n")
-	Skillz.setDesc(2,1,Skillz.getDesc(2,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[2] .. "% per skill point when equipping a dagger.\nCrit chance will get lower as monsters grow stronger, up to level 600.")
-	Skillz.setDesc(3,1,Skillz.getDesc(3,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[3] .. "% per skill point when equipping an axe.\n")
-	Skillz.setDesc(4,1,Skillz.getDesc(4,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[4] .. "% per skill point when equipping a spear.\n\nSpear skill raises AC by X% per skill point, counting an extra +10 effective skill.\n")
-	Skillz.setDesc(5,1,Skillz.getDesc(5,1) .. "\nThis skill increases the damage gained from weapon +1 per skill point in the bow skill, by " .. skillDamage[5] .. "% per skill point when equipping a bow.\n")
-	Skillz.setDesc(6,1,Skillz.getDesc(6,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[6] .. "% per skill point when equipping a mace.\n")
-	Skillz.setDesc(7,1,Skillz.getDesc(7,1) .. "\nThis skill increases the damage gained from weapon by " .. skillDamage[7] .. "% per skill point when equipping a blaster.\n")
+	Skillz.setDesc(0,1,Skillz.getDesc(0,1) .. "\nThis skill increases the damage gained from weapon by " .. skillDamage[0] .. "% per skill point, never less than 1 damage per point, when equipping a staff.\nAt Grandmaster can combine staff and unarmed skill, increasing its damage with staff skill at half effect.\n\nYour full Staff Attack boosts AC and all Resistances by X% per skill point, counting an extra +10 points of skill. Resistances apply to the entire party.\n")
+	Skillz.setDesc(1,1,Skillz.getDesc(1,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[1] .. "% per skill point, never less than 1 damage per point, when equipping a sword.\n\nYour full Sword Attack boosts AC by X% per skill point, counting an extra +10 points of skill.\n")
+	Skillz.setDesc(2,1,Skillz.getDesc(2,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[2] .. "% per skill point, never less than 1 damage per point, when equipping a dagger.\nCrit chance will get lower as monsters grow stronger, up to level 600.")
+	Skillz.setDesc(3,1,Skillz.getDesc(3,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[3] .. "% per skill point, never less than 1 damage per point, when equipping an axe.\n")
+	Skillz.setDesc(4,1,Skillz.getDesc(4,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[4] .. "% per skill point, never less than 1 damage per point, when equipping a spear.\n\nSpear skill raises AC by X% per skill point, counting an extra +10 effective skill.\n")
+	Skillz.setDesc(5,1,Skillz.getDesc(5,1) .. "\nThis skill increases the damage gained from weapon +1 per skill point in the bow skill, by " .. skillDamage[5] .. "% per skill point, never less than 1 damage per point, when equipping a bow.\n")
+	Skillz.setDesc(6,1,Skillz.getDesc(6,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[6] .. "% per skill point, never less than 1 damage per point, when equipping a mace.\n")
+	Skillz.setDesc(7,1,Skillz.getDesc(7,1) .. "\nThis skill increases the damage gained from weapon by " .. skillDamage[7] .. "% per skill point, never less than 1 damage per point, when equipping a blaster.\n")
 	Skillz.setDesc(33,1,Skillz.getDesc(33,1) .. "\nUnarmed combat deals " .. skillDamage[33] .. " extra damage per skill point.\n")
 	for i=0,33 do
 		if i<=7 or i==33 then

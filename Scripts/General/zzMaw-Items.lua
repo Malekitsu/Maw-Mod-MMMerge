@@ -2617,6 +2617,13 @@ local function addWeaponRows(pl, index, it, txt, tab)
 	if skill==7 then
 		armsDmg=0
 	end
+	--floor: a weapon skill point is always worth at least 1 average damage.
+	--armsDmg/mult recovers what the percentage is applied to, so the top-up is
+	--only what the percentage failed to deliver on a weak weapon
+	if skillDamage[skill] then
+		local scalable=bonus+sidesBonus*txt.Mod1DiceCount/2+armsDmg/mult
+		add=add+math.max(s2-scalable*(mult-1),0)
+	end
 	local totBonus=armsDmg+add
 	if skill ~= 5 then
 		tab[40] = tab[40] + round(bonus)
