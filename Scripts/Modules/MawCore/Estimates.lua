@@ -37,6 +37,13 @@ local function masterLearned()
 	return 12
 end
 
+local LEGENDARY_START_LEVEL = 100
+local LEGENDARY_FULL_LEVEL = 700
+local function legendaryRamp(lvl)
+	local t = (lvl - LEGENDARY_START_LEVEL)/(LEGENDARY_FULL_LEVEL - LEGENDARY_START_LEVEL)
+	return math.min(math.max(t, 0), 1)
+end
+
 function skillPointsAtLevel(lvl)
 	if lvl < 2 then
 		return 0
@@ -220,7 +227,8 @@ function getMonsterDamage(mon, level)
 end
 
 --what the average character is assumed to be carrying and hitting with
-local EXPECTED_ENCHANT_COEFF = 0.3	--one tier-2 damage enchant (enchantbonusdamage)
+local EXPECTED_ENCHANT_COEFF = 0.5	--one damage enchant (enchantDamageRange ignores tier)
+local EXPECTED_ENCHANT_LEVEL = 100	--level by which the average weapon carries it
 local EXPECTED_WEAPON_DICE = 3		--only feeds the +diceCount/2 floor of a roll
 
 
@@ -267,16 +275,23 @@ function getPlayerEstimatedPower(lvl)
 	local hasteBuff = 1 + buffMult(const.Spells.Haste, skill, m)
 	damage = damage*(1 + speedEffect + weaponSpeed + armsMasterSpeed)*hasteBuff
 
+	local legendary = legendaryRamp(lvl)
+
 	local luck, accuracy = might, might
-	local critChance = F.critChance(luck, lvl) + 0.1*math.min(lvl/300, 1) --assume crit enchant at lvl 500
+	local critChance = F.critChance(luck, lvl) + 0.1*legendary	--legendary 14
 	local extraMult = 1
 	if critChance > 1 then
 		extraMult = critChance
 	end
 	local critDamage = F.critDamageMult(accuracy, lvl, vars.madnessMode) - 1
-	damage = damage*(1 + math.min(critChance, 1)*critDamage*extraMult)
+	local critMult = 1 + math.min(critChance, 1)*critDamage*extraMult
+	damage = damage*critMult
 
-	damage = damage + wDmg*estimateWeaponDamageMultiplier(itemLevel)*EXPECTED_ENCHANT_COEFF
+	local enchantLegendary = (1 + GetMightDamageMultiplier(might, lvl)*legendary)
+		*(1 + (critMult-1)*legendary)
+	local undamped = wDmg*estimateWeaponDamageMultiplier(itemLevel)*enchantLegendary
+	damage = damage + undamped*EXPECTED_ENCHANT_COEFF*math.min(lvl/EXPECTED_ENCHANT_LEVEL, 1)
+	damage = damage + undamped*GetGradualMasteryValue(fireAuraDamage, skill, m)
 
 	--the average character has the attack mawHitChance measures against, so
 	--its hit chance is par by definition
