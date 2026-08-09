@@ -15,15 +15,19 @@
 -- Still globals on purpose: legacy files and other MawCore modules
 -- (SkillTooltip, Damage) call them by bare name.
 
+--A buff is worth nothing until expert and reaches its full value at master.
+local function buffRamp(s)
+	local th = masteryThresholds()
+	return math.min(math.max((s-th[2])/(th[3]-th[2]), 0), 1)
+end
+
 local BUFF_MULT_PER_SKILL = 0.02
 local function buffMult(spellId, s, m)
 	local bf = buffPower[spellId]
 	if not bf then
 		return 0
 	end
-	local th = masteryThresholds()
-	local ramp = math.min(math.max((s-th[2])/(th[3]-th[2]), 0), 1)
-	return bf.Base[m]/100 * ramp * math.min(1 + BUFF_MULT_PER_SKILL*s, 2)
+	return bf.Base[m]/100 * buffRamp(s) * math.min(1 + BUFF_MULT_PER_SKILL*s, 2)
 end
 
 --how fast the average character reaches the next mastery; the estimators use
@@ -97,9 +101,10 @@ function estimateStat(level)
 	local statsFromAlchemy = level*0.2
 	--most of the stats come from enchants
 	local geared = 0.1^(1/(1 + level/10))
-	local dayOfTheGods = 1 + GetBuffStatPct(estimateSkill(level), true)
+	local skill = estimateSkill(level)
+	local dayOfTheGods = 1 + GetBuffStatPct(skill, true)*buffRamp(skill)
 
-	return (baseStat + statsFromAlchemy + getTotalEnchantPower(level)*STAT_SHARE)*dayOfTheGods
+	return (baseStat + statsFromAlchemy + getTotalEnchantPower(level)*STAT_SHARE*geared)*dayOfTheGods
 end
 
 --average
