@@ -65,7 +65,7 @@ end
 WEAPON_BASE_DICE_DAMAGE = 8
 
 function getWeaponDamageForLevel(itemLevel, twoHanded)
-	local damage = math.max(Game.GetStatisticEffect(getStatFromLevel(itemLevel)), 0)
+	local damage = math.max(Game.GetStatisticEffect(estimateStat(itemLevel)), 0)
 	local diceOnly = WEAPON_BASE_DICE_DAMAGE
 	if not twoHanded then
 		damage = damage/2
@@ -79,25 +79,6 @@ function getMonsterEstimatedResistance(lvl)
 	return math.min(lvl/2, 999)
 end
 
-function getStatFromLevel(level)
-	local baseStat = 15
-	local statsPerLevel=2
-	if vars.insanityMode then
-		statsPerLevel=5
-	elseif vars.Mode==2 then
-		statsPerLevel=4
-	elseif Game.BolsterAmount==300 then
-		statsPerLevel=3
-	elseif Game.BolsterAmount==200 then
-		statsPerLevel=2.5
-	elseif Game.BolsterAmount==150 then
-		statsPerLevel=2
-	end
-	if vars.AusterityMode then
-		statsPerLevel=statsPerLevel+Game.BolsterAmount/100
-	end
-	return statsPerLevel*level + baseStat
-end
 
 function getEnchantPower(level)
 	local tier = math.min(level/11 + 5, 60)
@@ -113,19 +94,20 @@ function getEnchantPower(level)
 	return tier*mult
 end
 
---How much gear the average character devotes to ONE stat. A base enchant rolls
---one of 16 kinds, so nobody gets this by luck -- it is what a player builds
---towards, not what drops.
 local EXPECTED_STAT_ENCHANTS = 3	--worn slots carrying that stat
 local EXPECTED_SLOT_MULT = 1.1		--average slotMult of those slots
 local EXPECTED_ENCHANT_LEVEL = 100	--level by which the gear is fully enchanted
 
---What the character actually has: level-ups plus the gear stacking that stat,
---which fills up over the first levels instead of being there from the start.
 function estimateStat(level)
-	return getStatFromLevel(level)
-		+ EXPECTED_STAT_ENCHANTS*EXPECTED_SLOT_MULT*getEnchantPower(level)
-			*math.min(level/EXPECTED_ENCHANT_LEVEL, 1)
+	local baseStat = 17 --on creation
+	local statsFromAlchemy = level*0.2
+	--most of the stats come from enchants
+	--slots are: 2h weapon, cloak, helm, armor, gloves, boots, ring, amulet, bow, belt, 
+	-- coefficients are: 2, 1, 1.25, 1.5, 1.25, 1.25, 0.75 * 6, 1, 1.25, 1
+	local totalSlots = 13.75 --16 - 2.25 for ring resistance enchants
+	local maxEnchantPower = 1 --todo 
+
+	return baseStat + statsFromAlchemy
 end
 
 --average
