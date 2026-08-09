@@ -65,7 +65,7 @@ end
 WEAPON_BASE_DICE_DAMAGE = 8
 
 function getWeaponDamageForLevel(itemLevel, twoHanded)
-	local damage = math.max(Game.GetStatisticEffect(estimateStat(itemLevel)), 0)
+	local damage = math.max(Game.GetStatisticEffect(getStatFromLevel(itemLevel)), 0)
 	local diceOnly = WEAPON_BASE_DICE_DAMAGE
 	if not twoHanded then
 		damage = damage/2
@@ -75,8 +75,12 @@ function getWeaponDamageForLevel(itemLevel, twoHanded)
 	return (damage + diceOnly)/damping, diceOnly/damping
 end
 
-function estimateStat(level)
-	local baseStat = 21
+function getMonsterEstimatedResistance(lvl)
+	return math.min(lvl/2, 999)
+end
+
+function getStatFromLevel(level)
+	local baseStat = 15
 	local statsPerLevel=2
 	if vars.insanityMode then
 		statsPerLevel=5
@@ -93,6 +97,35 @@ function estimateStat(level)
 		statsPerLevel=statsPerLevel+Game.BolsterAmount/100
 	end
 	return statsPerLevel*level + baseStat
+end
+
+function getEnchantPower(level)
+	local tier = math.min(level/11 + 5, 60)
+	if vars.madnessMode then
+		tier = math.min(math.min(level, 1000)/11 + 5, 90)
+	end
+	local mult = 2
+	if vars.Mode==2 then
+		mult = 2.5
+	elseif vars.insanityMode then
+		mult = 3
+	end
+	return tier*mult
+end
+
+--How much gear the average character devotes to ONE stat. A base enchant rolls
+--one of 16 kinds, so nobody gets this by luck -- it is what a player builds
+--towards, not what drops.
+local EXPECTED_STAT_ENCHANTS = 3	--worn slots carrying that stat
+local EXPECTED_SLOT_MULT = 1.1		--average slotMult of those slots
+local EXPECTED_ENCHANT_LEVEL = 100	--level by which the gear is fully enchanted
+
+--What the character actually has: level-ups plus the gear stacking that stat,
+--which fills up over the first levels instead of being there from the start.
+function estimateStat(level)
+	return getStatFromLevel(level)
+		+ EXPECTED_STAT_ENCHANTS*EXPECTED_SLOT_MULT*getEnchantPower(level)
+			*math.min(level/EXPECTED_ENCHANT_LEVEL, 1)
 end
 
 --average
@@ -228,8 +261,24 @@ end
 
 --what the average character is assumed to be carrying and hitting with
 local EXPECTED_ENCHANT_COEFF = 0.5	--one damage enchant (enchantDamageRange ignores tier)
-local EXPECTED_ENCHANT_LEVEL = 100	--level by which the average weapon carries it
 local EXPECTED_WEAPON_DICE = 3		--only feeds the +diceCount/2 floor of a roll
+local EXPECTED_NEARBY_MONSTERS = 5	--how crowded a fight legendary 21 is judged on
+
+local LEGENDARY_21_PER_MONSTER = 0.05	--melee damage per monster within 512
+--11 halves the recovery after a kill, so it is worth more the fewer swings a
+--kill takes -- which depends on the weapon's base recovery, the monster's HP
+--and the difficulty. Pricing that properly costs more time than it is worth:
+--15% is a gut number.
+local LEGENDARY_11_DAMAGE = 0.15
+local LEGENDARY_33_SKILL = 10		--added to every melee weapon skill
+--what the affixes NOT modelled above are worth at full ramp: 12 and 20 (gear
+--stats, blocked on estimateStat) and 29 (resistance shred)
+local LEGENDARY_RESIDUAL = 0.2
+
+--legendary 33 adds 10 to every melee weapon skill
+function getMeleeSkill(lvl)
+	return estimateSkill(lvl) + LEGENDARY_33_SKILL*legendaryRamp(lvl)
+end
 
 
 --Attack rating of the average character: the weapon's flat half plus the
@@ -238,9 +287,10 @@ local EXPECTED_WEAPON_DICE = 3		--only feeds the +diceCount/2 floor of a roll
 function getPlayerEstimatedAttack(lvl)
 	local skill = estimateSkill(lvl)
 	local m = masteryPerLevel(lvl)
+	local meleeSkill = getMeleeSkill(lvl)
 	local wDmg, wDice = getWeaponDamageForLevel(lvl, true)
 	return (wDmg-wDice)/2
-		+ GetGradualMasteryValue(skillAttack[const.Skills.Sword], skill, m)*skill
+		+ GetGradualMasteryValue(skillAttack[const.Skills.Sword], meleeSkill, m)*meleeSkill
 		+ GetGradualMasteryValue(armsmasterSkill.Attack, skill, m)*skill
 		+ Game.GetStatisticEffect(estimateStat(lvl))
 end
@@ -253,14 +303,15 @@ function getPlayerEstimatedPower(lvl)
 	local itemLevel = lvl
 	local wDmg, wDice = getWeaponDamageForLevel(itemLevel, true)	--two-handed reference
 
-	local weaponSkillMult = 1 + skillDamage[const.Skills.Sword]*skill/100
+	local meleeSkill = getMeleeSkill(lvl)	--the weapon skill, legendary 33 included
+	local weaponSkillMult = 1 + skillDamage[const.Skills.Sword]*meleeSkill/100
 	local armsBase = GetGradualMasteryValue(armsmasterSkill.Damage, skill, m)*skill
 	--flat half counts in full, the dice half averages to half of it
 	local scalable = 0.75*(wDmg-wDice) + 0.5*wDice + armsBase
 	local damage = EXPECTED_WEAPON_DICE/2 + scalable*weaponSkillMult
 
 	--the floor: a weapon skill point is worth at least 1 damage
-	damage = damage + math.max(skill - scalable*(weaponSkillMult-1), 0)
+	damage = damage + math.max(meleeSkill - scalable*(weaponSkillMult-1), 0)
 
 	--MIGHT: flat breakpoint bonus, then the level-normalized percentage
 	local might = estimateStat(lvl)
@@ -270,7 +321,7 @@ function getPlayerEstimatedPower(lvl)
 
 	--real speed-stat recovery bonus (GetSpeedBonus), in percentage points
 	local speedEffect = GetSpeedBonusFromStat(estimateStat(lvl), lvl)/100
-	local weaponSpeed = GetGradualMasteryValue(skillRecovery[const.Skills.Sword], skill, m)*skill/100
+	local weaponSpeed = GetGradualMasteryValue(skillRecovery[const.Skills.Sword], meleeSkill, m)*meleeSkill/100
 	local armsMasterSpeed = GetGradualMasteryValue(armsmasterSkill.Speed, skill, m)*skill/100
 	local hasteBuff = 1 + buffMult(const.Spells.Haste, skill, m)
 	damage = damage*(1 + speedEffect + weaponSpeed + armsMasterSpeed)*hasteBuff
@@ -293,10 +344,12 @@ function getPlayerEstimatedPower(lvl)
 	damage = damage + undamped*EXPECTED_ENCHANT_COEFF*math.min(lvl/EXPECTED_ENCHANT_LEVEL, 1)
 	damage = damage + undamped*GetGradualMasteryValue(fireAuraDamage, skill, m)
 
+	local crowd = math.min(1 + LEGENDARY_21_PER_MONSTER*EXPECTED_NEARBY_MONSTERS*legendary, 2)
+	damage = damage*crowd*(1 + LEGENDARY_11_DAMAGE*legendary)
+
 	--the average character has the attack mawHitChance measures against, so
 	--its hit chance is par by definition
-	local extimatedLegendaryPower = 1 + 0.002*lvl
-	return damage*F.hitAtPar*extimatedLegendaryPower
+	return damage*F.hitAtPar*(1 + LEGENDARY_RESIDUAL*legendary)
 end
 
 function getMonsterHealth(mon, level)
@@ -320,13 +373,10 @@ function getMonsterHealth(mon, level)
 	if vars.AusterityMode then
 		hits=hitToKillMonsterAusterity[difficulty]
 	end
-	
-	hits=hits*(1+level/1000)
-	
 	health=health*hits
 	
 	--account for resistances
-	health=health/2^(math.min(level/2/100,10)) --approx
+	health=health/2^(math.min(getMonsterEstimatedResistance(level)/100,10)) --approx
 	
 	if not mon then
 		return health
