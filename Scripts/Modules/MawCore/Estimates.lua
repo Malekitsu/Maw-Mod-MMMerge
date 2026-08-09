@@ -57,7 +57,7 @@ end
 
 
 function getWeaponDamageForLevel(itemLevel, twoHanded)
-	local damage = math.max(Game.GetStatisticEffect(estimateStat(itemLevel)), 0)
+	local damage = math.max(Game.GetStatisticEffect(estimateStat(itemLevel)), 0) + 8
 	if not twoHanded then
 		damage = damage/2
 	end
@@ -114,7 +114,7 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 	local skill=estimateSkill(lvl)
 	local mastery=masteryPerLevel(lvl)
 	local bbMasteryBonus=math.min(1+skill/masterLearned()*2,3) --use master as a reference
-	local bbPercentBonus=bodybuildingHP[mastery]
+	local bbPercentBonus=GetGradualMasteryValue(bodybuildingHP, skill, mastery)
 	health=health+(enduranceEffect+bbMasteryBonus)*scalingHP+extimatedHealthBonus
 	
 	health=health*(1+bbPercentBonus*skill/100)*(1+extimatedEndurance/2500)
@@ -217,9 +217,26 @@ end
 
 --what the average character is assumed to be carrying and hitting with
 local EXPECTED_ENCHANT_COEFF = 0.3	--one tier-2 damage enchant (enchantbonusdamage)
-local EXPECTED_HIT_CHANCE = 0.8
 local EXPECTED_WEAPON_DICE = 3		--only feeds the +diceCount/2 floor of a roll
 
+
+--Attack rating of the average character: the weapon's flat half plus the
+--weapon-skill and armsmaster attack rows and the accuracy breakpoint bonus --
+--the same pieces itemStats sums into tab[40].
+function getPlayerEstimatedAttack(lvl)
+	local skill = estimateSkill(lvl)
+	local m = masteryPerLevel(lvl)
+	return getWeaponDamageForLevel(lvl, true)/2
+		+ GetGradualMasteryValue(skillAttack[const.Skills.Sword], skill, m)*skill
+		+ GetGradualMasteryValue(armsmasterSkill.Attack, skill, m)*skill
+		+ Game.GetStatisticEffect(estimateStat(lvl))
+end
+
+--the engine's to-hit curve (as calcPowerVitality applies it), attack vs level
+function getEstimatedHitChance(lvl)
+	local atk = getPlayerEstimatedAttack(lvl)
+	return (15 + atk*2)/(30 + atk*2 + lvl)
+end
 
 function getPlayerEstimatedPower(lvl)
 	local F = MawCore.Formulas
@@ -230,7 +247,7 @@ function getPlayerEstimatedPower(lvl)
 	local wDmg = getWeaponDamageForLevel(itemLevel, true)	--two-handed reference
 
 	local weaponSkillMult = 1 + skillDamage[const.Skills.Sword]*skill/100
-	local armsBase = armsmasterSkill.Damage[m]*skill
+	local armsBase = GetGradualMasteryValue(armsmasterSkill.Damage, skill, m)*skill
 	local scalable = 0.75*wDmg + armsBase
 	local damage = EXPECTED_WEAPON_DICE/2 + scalable*weaponSkillMult
 
@@ -239,13 +256,14 @@ function getPlayerEstimatedPower(lvl)
 
 	--MIGHT: flat breakpoint bonus, then the level-normalized percentage
 	local might = estimateStat(lvl)
-	local mightEffect = might/5
+	local mightEffect = Game.GetStatisticEffect(might)
 	local heroismBuff = 1 + buffMult(const.Spells.Heroism, skill, m)
 	damage = (damage + mightEffect)*heroismBuff*(1 + GetMightDamageMultiplier(might, lvl))
 
-	local speedEffect = (mightEffect/2)/1000
-	local weaponSpeed = skillRecovery[const.Skills.Sword][m]*skill/100
-	local armsMasterSpeed = armsmasterSkill.Speed[m]*skill/100
+	--real speed-stat recovery bonus (GetSpeedBonus), in percentage points
+	local speedEffect = GetSpeedBonusFromStat(estimateStat(lvl), lvl)/100
+	local weaponSpeed = GetGradualMasteryValue(skillRecovery[const.Skills.Sword], skill, m)*skill/100
+	local armsMasterSpeed = GetGradualMasteryValue(armsmasterSkill.Speed, skill, m)*skill/100
 	local hasteBuff = 1 + buffMult(const.Spells.Haste, skill, m)
 	damage = damage*(1 + speedEffect + weaponSpeed + armsMasterSpeed)*hasteBuff
 
@@ -261,7 +279,7 @@ function getPlayerEstimatedPower(lvl)
 	damage = damage + wDmg*estimateWeaponDamageMultiplier(itemLevel)*EXPECTED_ENCHANT_COEFF
 
 	local extimatedLegendaryPower = 1 + 0.002*lvl
-	return damage*EXPECTED_HIT_CHANCE*extimatedLegendaryPower
+	return damage*getEstimatedHitChance(lvl)*extimatedLegendaryPower
 end
 
 function getMonsterHealth(mon, level)

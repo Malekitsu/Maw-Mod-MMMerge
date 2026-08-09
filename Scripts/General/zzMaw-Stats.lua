@@ -1508,6 +1508,28 @@ function masteryPerLevel(lvl)
 	return m
 end
 
+--A mastery bonus phases in instead of jumping. The value a rank grants ramps
+--from that rank's skill threshold to the next rank's (GM has no next rank, so
+--it ramps to 1.5x its own: skill 10->15, or 50->75 in madness). Training a
+--mastery is then a gradual gain rather than a step.
+--tbl is any mastery-indexed table (armsmasterSkill.Damage, skillRecovery[x], ...)
+function GetGradualMasteryValue(tbl, s, m)
+	m = math.max(m or 0, 0)
+	if m < 1 then
+		return tbl[0] or 0
+	end
+	local th = masteryThresholds()
+	local i = math.min(m, #th)
+	local from = th[i]
+	local to = th[i+1] or from*1.5
+	local prev = tbl[m-1] or 0
+	local cur = tbl[m] or prev
+	if to <= from then
+		return cur
+	end
+	return prev + (cur-prev)*math.min(math.max((s-from)/(to-from), 0), 1)
+end
+
 function masteryThresholds()
 	if vars.madnessMode then
 	  return {0, 12, 30, 50}

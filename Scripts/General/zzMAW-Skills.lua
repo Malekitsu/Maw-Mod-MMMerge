@@ -158,16 +158,20 @@ function events.CalcStatBonusBySkills(t)
 	t.Result=0
 end
 
-function GetSpeedBonus(pl)
-	local speed=pl:GetSpeed()
+--speed stat -> recovery bonus in percentage points; the estimator feeds it a
+--modeled speed, so the curve stays in one place
+function GetSpeedBonusFromStat(speed, level)
 	local speedEffect=0
 	if speed<=21 then
 		speedEffect=(speed-13)/4
 	else
 		speedEffect=math.floor(speed/10)
 	end
-	speedEffect=speedEffect/(1 + math.min(pl.LevelBase, 1000) * 0.0015)
-	return speedEffect
+	return speedEffect/(1 + math.min(level, 1000) * 0.0015)
+end
+
+function GetSpeedBonus(pl)
+	return GetSpeedBonusFromStat(pl:GetSpeed(), pl.LevelBase)
 end
 
 function getItemRecovery(it, playerLevel)
