@@ -79,35 +79,20 @@ function getMonsterEstimatedResistance(lvl)
 	return math.min(lvl/2, 999)
 end
 
-
-function getEnchantPower(level)
-	local tier = math.min(level/11 + 5, 60)
-	if vars.madnessMode then
-		tier = math.min(math.min(level, 1000)/11 + 5, 90)
-	end
-	local mult = 2
-	if vars.Mode==2 then
-		mult = 2.5
-	elseif vars.insanityMode then
-		mult = 3
-	end
-	return tier*mult
-end
-
-local EXPECTED_STAT_ENCHANTS = 3	--worn slots carrying that stat
-local EXPECTED_SLOT_MULT = 1.1		--average slotMult of those slots
-local EXPECTED_ENCHANT_LEVEL = 100	--level by which the gear is fully enchanted
+local STAT_SHARE = 0.25
 
 function estimateStat(level)
 	local baseStat = 17 --on creation
 	local statsFromAlchemy = level*0.2
 	--most of the stats come from enchants
-	--slots are: 2h weapon, cloak, helm, armor, gloves, boots, ring, amulet, bow, belt, 
+	--slots are: 2h weapon, cloak, helm, armor, gloves, boots, ring, amulet, bow, belt,
 	-- coefficients are: 2, 1, 1.25, 1.5, 1.25, 1.25, 0.75 * 6, 1, 1.25, 1
 	local totalSlots = 13.75 --16 - 2.25 for ring resistance enchants
-	local maxEnchantPower = 1 --todo 
+	local enchants = 3 --2 normal + 1 special
+	local maxEnchantPower = enchants*totalSlots*encStrUp[maxTier]
+	local geared = 0.1^(1/(1 + level/10))
 
-	return baseStat + statsFromAlchemy
+	return baseStat + statsFromAlchemy + maxEnchantPower*STAT_SHARE*geared
 end
 
 --average
@@ -131,19 +116,19 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 	end
 	local levelMult=math.min(lvl/levelCap,1)
 	
-	local extimatedEndurance=estimatedStat
+	local estimatedEndurance=estimatedStat
 	
 	local healthPower=estimatedStat/10
-	local extimatedHealthBonus=healthPower*math.min(1+healthPower/50,5)*4	
+	local estimatedHealthBonus=healthPower*math.min(1+healthPower/50,5)*4	
 	
-	local enduranceEffect=extimatedEndurance/5
+	local enduranceEffect=estimatedEndurance/5
 	local skill=estimateSkill(lvl)
 	local mastery=masteryPerLevel(lvl)
 	local bbMasteryBonus=math.min(1+skill/masterLearned()*2,3) --use master as a reference
 	local bbPercentBonus=GetGradualMasteryValue(bodybuildingHP, skill, mastery)
-	health=health+(enduranceEffect+bbMasteryBonus)*scalingHP+extimatedHealthBonus
+	health=health+(enduranceEffect+bbMasteryBonus)*scalingHP+estimatedHealthBonus
 	
-	health=health*(1+bbPercentBonus*skill/100)*(1+extimatedEndurance/2500)
+	health=health*(1+bbPercentBonus*skill/100)*(1+estimatedEndurance/2500)
 	
 	-- Return just health if requested
 	if healthOnly then
@@ -182,14 +167,14 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 	
 	local averageReduction=(totalArmorReduction+resReduction)/2
 
-	local extimatedLegendaryPower=1+0.001*lvl
+	local estimatedLegendaryPower=1+0.001*lvl
 	
-	local vitality=health*averageReduction*extimatedLegendaryPower
+	local vitality=health*averageReduction*estimatedLegendaryPower
 	
 	return vitality, totalArmorReduction, resReduction, averageReduction , health
 	
 end
-function getPlayerExtimatedHealth(lvl)
+function getPlayerEstimatedHealth(lvl)
 	local health=getPlayerEstimatedVitality(lvl,true)
 	return health
 end
@@ -243,6 +228,7 @@ end
 
 --what the average character is assumed to be carrying and hitting with
 local EXPECTED_ENCHANT_COEFF = 0.5	--one damage enchant (enchantDamageRange ignores tier)
+local EXPECTED_ENCHANT_LEVEL = 100	--level by which the weapon carries that enchant
 local EXPECTED_WEAPON_DICE = 3		--only feeds the +diceCount/2 floor of a roll
 local EXPECTED_NEARBY_MONSTERS = 5	--how crowded a fight legendary 21 is judged on
 
