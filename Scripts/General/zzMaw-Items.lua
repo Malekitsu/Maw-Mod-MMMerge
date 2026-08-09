@@ -1102,21 +1102,10 @@ function events.ItemGenerated(t)
 				end)
 			end
 		end
-		local minValue=0
-		--celestial first: HasLegendaryAffix also covers the celestial band.
-		--255 on purpose: celestials are the one case allowed past
-		--maxChargesCap, up to what the u1 field can hold.
 		if IsCelestialItem(it) then
 			it.MaxCharges=math.min(it.MaxCharges*1.5,255)
 			return
-		elseif GetAncientTier(it)>0 or HasLegendaryAffix(it) then
-			minValue=0.3
 		end
-
-		it.BonusStrength=math.random(1+it.BonusStrength*minValue,it.BonusStrength)
-		it.MaxCharges=math.min(rollMaxCharges(it.MaxCharges),255)
-		local rollType,rollPower=GetEnc2(it)
-		SetEnc2(it,rollType,math.random(1+rollPower*minValue,rollPower))
 	end
 end
 
