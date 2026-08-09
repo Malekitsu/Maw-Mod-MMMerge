@@ -19,6 +19,10 @@ function Formulas.reductionPercent(power, decimals, isRing)
 	return round(fraction * 100 * f) / f
 end
 
+function Formulas.playerHitChance(atk, monsterLevel)
+	return (15 + atk*2)/(30 + atk*2 + monsterLevel)
+end
+
 function Formulas.critCap(madness)
 	return madness and 5000 or 3000
 end

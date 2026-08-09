@@ -237,10 +237,8 @@ function getPlayerEstimatedAttack(lvl)
 		+ Game.GetStatisticEffect(estimateStat(lvl))
 end
 
---the engine's to-hit curve (as calcPowerVitality applies it), attack vs level
 function getEstimatedHitChance(lvl)
-	local atk = getPlayerEstimatedAttack(lvl)
-	return (15 + atk*2)/(30 + atk*2 + lvl)
+	return MawCore.Formulas.playerHitChance(getPlayerEstimatedAttack(lvl), lvl)
 end
 
 function getPlayerEstimatedPower(lvl)
