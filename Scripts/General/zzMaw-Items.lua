@@ -380,11 +380,31 @@ function events.GameInitialized2()
 end
 
 --create enchant table
-encStrUp={3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87,90,93,96,99,102,105,108,111,114,117,120,125,130}
+--Enchant strength per tier. BeforeLoadMap swaps the whole set for austerity,
+--so both variants are named here instead of being written out a second time
+--inside the handler -- that copy silently won and undid changes made here.
+encStrUpNormal={3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87,90,93,96,99,102,105,108,111,114,117,120,123,126,129,132,135,138,141,144,147,150}
+encStrUpAusterity={3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60}
+encStrUp=encStrUpNormal
 
---an enchant rolls 50/60/70/80/90/100% of its tier's strength, 1/6 each
-local function rollEnchantStrength(tier)
-	return round(encStrUp[tier]*math.random(5,10)/10)
+
+local DIFFICULTY_ENCHANT_CAP = 50
+local function applyDifficulty(strength)
+	return math.min(math.ceil(strength*GetDifficultyExtraPower()), strength+DIFFICULTY_ENCHANT_CAP)
+end
+
+local PRIMORDIAL_ENCHANT_MULT = 1.25
+local function rollEnchantStrength(tier, ancientTier)
+	if ancientTier==2 then
+		return round(applyDifficulty(encStrUp[tier])*PRIMORDIAL_ENCHANT_MULT)
+	elseif ancientTier==1 then
+		return round(applyDifficulty(encStrUp[tier])*math.random(20,PRIMORDIAL_ENCHANT_MULT*20)/20)
+	end
+	return applyDifficulty(round(encStrUp[tier]*math.random(8,20)/20))
+end
+
+function GetMaxEnchantStrength()
+	return round(applyDifficulty(encStrUp[#encStrUp])*PRIMORDIAL_ENCHANT_MULT)
 end
 
 
@@ -424,25 +444,27 @@ local function rollMaxCharges(maxCharges)
 	return round(maxCharges*math.random(8,10)/10)
 end
 
-enc1Chance={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80}
-enc2Chance={20,30,35,40,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60}
-spcEncChance={5,10,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40}
+enc1ChanceNormal={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80}
+enc2ChanceNormal={20,30,35,40,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60}
+spcEncChanceNormal={5,10,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40}
+enc1ChanceAusterity={20,20,21,21,22,22,23,23,24,24,25,25,26,26,27,27,28,28,29,29}
+enc2ChanceAusterity={10,10,11,11,12,12,13,13,14,14,15,15,16,16,17,17,18,18,19,19}
+spcEncChanceAusterity={40,40,41,41,42,42,43,43,44,44,45,45,46,46,47,47,48,48,49,49}
+enc1Chance=enc1ChanceNormal
+enc2Chance=enc2ChanceNormal
+spcEncChance=spcEncChanceNormal
 
 function events.BeforeLoadMap()
 	if vars.AusterityMode then
-		encStrUp={3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60}
-
-
-		enc1Chance = {20, 20, 21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26, 27, 27, 28, 28, 29, 29}
-		enc2Chance = {10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19}
-		spcEncChance = {40, 40, 41, 41, 42, 42, 43, 43, 44, 44, 45, 45, 46, 46, 47, 47, 48, 48, 49, 49}
+		encStrUp=encStrUpAusterity
+		enc1Chance=enc1ChanceAusterity
+		enc2Chance=enc2ChanceAusterity
+		spcEncChance=spcEncChanceAusterity
 	else
-		encStrUp={3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87,90,93,96,99,102,105,108,111,114,117,120,125,130}
-
-
-		enc1Chance={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80}
-		enc2Chance={20,30,35,40,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60}
-		spcEncChance={5,10,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40}
+		encStrUp=encStrUpNormal
+		enc1Chance=enc1ChanceNormal
+		enc2Chance=enc2ChanceNormal
+		spcEncChance=spcEncChanceNormal
 	end
 end
 
@@ -778,8 +800,6 @@ function events.ItemGenerated(t)
 		if p1>roll1 then
 			it.Bonus=math.random(1,16)
 			it.BonusStrength=rollEnchantStrength(pseudoStr)
-			--bolster
-			it.BonusStrength=math.ceil(it.BonusStrength*difficultyExtraPower)
 			if math.random(1,10)==10 then
 				it.Bonus=math.random(17,24)
 				local skill=it:T().Skill
@@ -793,8 +813,6 @@ function events.ItemGenerated(t)
 		--apply enchant2
 		if p2>roll2 then
 			local enc2Strength=rollEnchantStrength(pseudoStr)
-			--bolster
-			enc2Strength=math.ceil(enc2Strength*difficultyExtraPower)
 			--bonus type
 			SetEnc2(it,math.random(1,16),enc2Strength)
 			--[[ no skill bonuses
@@ -831,12 +849,10 @@ function events.ItemGenerated(t)
 		ancientRoll=math.random()
 		if ancientRoll<=ancientChance or OmnipotentLoot then
 			ancient=true
-			local enc2Strength=math.random(round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10))
-			enc2Strength=math.ceil(enc2Strength*difficultyExtraPower) --bolster
+			local enc2Strength=rollEnchantStrength(pseudoStr, 1)
 			SetEnc2(it,math.random(1,16),enc2Strength)
 			it.Bonus=math.random(1,16)
-			it.BonusStrength=math.random(round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10))
-			it.BonusStrength=math.ceil(it.BonusStrength*difficultyExtraPower) --bolster
+			it.BonusStrength=rollEnchantStrength(pseudoStr, 1)
 			power=2
 			chargesBonus=math.random(1,5)
 			it.MaxCharges=it.MaxCharges+chargesBonus
@@ -874,13 +890,11 @@ function events.ItemGenerated(t)
 				it.MaxCharges=it.MaxCharges-chargesBonus
 			end
 			SetAncientTier(it,2)
-			local enc2Strength=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
-			enc2Strength=math.ceil(enc2Strength*difficultyExtraPower) --bolster
+			local enc2Strength=rollEnchantStrength(pseudoStr, 2)
 			SetEnc2(it,math.random(1,16),enc2Strength)
-			
+
 			it.Bonus=math.random(1,16)
-			it.BonusStrength=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
-			it.BonusStrength=math.ceil(it.BonusStrength*difficultyExtraPower) --bolster
+			it.BonusStrength=rollEnchantStrength(pseudoStr, 2)
 			it.MaxCharges=math.min(maxChargesCap,math.min(it.MaxCharges+5, it.MaxCharges*1.25), it.MaxCharges+10)
 			--apply special enchant
 			n=it.Number

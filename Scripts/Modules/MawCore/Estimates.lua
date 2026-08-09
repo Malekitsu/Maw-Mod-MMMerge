@@ -86,10 +86,10 @@ local STAT_SHARE = 0.33
 -- coefficients are: 2, 1, 1.25, 1.5, 1.25, 1.25, 0.75 * 6, 1, 1.25, 1
 local TOTAL_SLOTS = 13.75	--16 - 2.25 for ring resistance enchants
 local ENCHANTS_PER_ITEM = 3	--2 normal + 1 special
-local ENCHANT_ROLL = 1	--rollEnchantStrength picks 50..100% of the tier
+local ENCHANT_MAX_LEVEL = 1000
 function getTotalEnchantPower(level)
-	local tier = math.max(GetTier(level), 1)
-	return ENCHANTS_PER_ITEM*TOTAL_SLOTS*encStrUp[tier]*ENCHANT_ROLL*GetDifficultyExtraPower()
+	local geared = math.min(level, ENCHANT_MAX_LEVEL)/ENCHANT_MAX_LEVEL
+	return ENCHANTS_PER_ITEM*TOTAL_SLOTS*GetMaxEnchantStrength()*geared
 end
 
 function estimateStat(level)
@@ -99,7 +99,7 @@ function estimateStat(level)
 	local geared = 0.1^(1/(1 + level/10))
 	local dayOfTheGods = 1 + GetBuffStatPct(estimateSkill(level), true)
 
-	return (baseStat + statsFromAlchemy + getTotalEnchantPower(level)*STAT_SHARE*geared)*dayOfTheGods
+	return (baseStat + statsFromAlchemy + getTotalEnchantPower(level)*STAT_SHARE)*dayOfTheGods
 end
 
 --average
