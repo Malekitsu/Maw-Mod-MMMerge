@@ -55,13 +55,17 @@ function estimateSkill(lvl)
 	return skillLevelFromPoints(skillPointsAtLevel(lvl)/SKILLS_TRAINED)
 end
 
+WEAPON_BASE_DICE_DAMAGE = 8
 
 function getWeaponDamageForLevel(itemLevel, twoHanded)
-	local damage = math.max(Game.GetStatisticEffect(estimateStat(itemLevel)), 0) + 8
+	local damage = math.max(Game.GetStatisticEffect(estimateStat(itemLevel)), 0)
+	local diceOnly = WEAPON_BASE_DICE_DAMAGE
 	if not twoHanded then
 		damage = damage/2
+		diceOnly = diceOnly/2
 	end
-	return damage/(1 + estimateWeaponDamageMultiplier(itemLevel))
+	local damping = 1 + estimateWeaponDamageMultiplier(itemLevel)
+	return (damage + diceOnly)/damping, diceOnly/damping
 end
 
 function estimateStat(level)
@@ -226,7 +230,8 @@ local EXPECTED_WEAPON_DICE = 3		--only feeds the +diceCount/2 floor of a roll
 function getPlayerEstimatedAttack(lvl)
 	local skill = estimateSkill(lvl)
 	local m = masteryPerLevel(lvl)
-	return getWeaponDamageForLevel(lvl, true)/2
+	local wDmg, wDice = getWeaponDamageForLevel(lvl, true)
+	return (wDmg-wDice)/2
 		+ GetGradualMasteryValue(skillAttack[const.Skills.Sword], skill, m)*skill
 		+ GetGradualMasteryValue(armsmasterSkill.Attack, skill, m)*skill
 		+ Game.GetStatisticEffect(estimateStat(lvl))
@@ -244,11 +249,12 @@ function getPlayerEstimatedPower(lvl)
 	local m = masteryPerLevel(lvl)	--the mastery that skill level buys
 
 	local itemLevel = lvl
-	local wDmg = getWeaponDamageForLevel(itemLevel, true)	--two-handed reference
+	local wDmg, wDice = getWeaponDamageForLevel(itemLevel, true)	--two-handed reference
 
 	local weaponSkillMult = 1 + skillDamage[const.Skills.Sword]*skill/100
 	local armsBase = GetGradualMasteryValue(armsmasterSkill.Damage, skill, m)*skill
-	local scalable = 0.75*wDmg + armsBase
+	--flat half counts in full, the dice half averages to half of it
+	local scalable = 0.75*(wDmg-wDice) + 0.5*wDice + armsBase
 	local damage = EXPECTED_WEAPON_DICE/2 + scalable*weaponSkillMult
 
 	--the floor: a weapon skill point is worth at least 1 damage

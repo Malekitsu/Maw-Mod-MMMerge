@@ -2504,9 +2504,11 @@ local function addWeaponRows(pl, index, it, txt, tab)
 	end
 	--item-level weapon damage replaces base Mod2/sides and charge scaling:
 	--half as attack/flat, half spread over the dice sides
-	local wDmg=GetWeaponDamage(it)
-	local bonus=wDmg/2
-	local sidesBonus=wDmg/2/math.max(txt.Mod1DiceCount,1)
+	--the dice-only part skips the flat half and lands entirely on the sides
+	local wDmg,wDice=GetWeaponDamage(it)
+	local split=wDmg-wDice
+	local bonus=split/2
+	local sidesBonus=(split/2+wDice)/math.max(txt.Mod1DiceCount,1)
 	if artWeaponsSet[it.Number] then
 		if txt.EquipStat<=1 then
 			local artifactMult=artifactPowerMult(pl.LevelBase, false, it.BonusExpireTime)
