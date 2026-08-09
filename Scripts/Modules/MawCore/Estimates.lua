@@ -237,10 +237,6 @@ function getPlayerEstimatedAttack(lvl)
 		+ Game.GetStatisticEffect(estimateStat(lvl))
 end
 
-function getEstimatedHitChance(lvl)
-	return MawCore.Formulas.mawHitChance(getPlayerEstimatedAttack(lvl), lvl) or 0
-end
-
 function getPlayerEstimatedPower(lvl)
 	local F = MawCore.Formulas
 	local skill = estimateSkill(lvl)
@@ -282,8 +278,10 @@ function getPlayerEstimatedPower(lvl)
 
 	damage = damage + wDmg*estimateWeaponDamageMultiplier(itemLevel)*EXPECTED_ENCHANT_COEFF
 
+	--the average character has the attack mawHitChance measures against, so
+	--its hit chance is par by definition
 	local extimatedLegendaryPower = 1 + 0.002*lvl
-	return damage*getEstimatedHitChance(lvl)*extimatedLegendaryPower
+	return damage*F.hitAtPar*extimatedLegendaryPower
 end
 
 function getMonsterHealth(mon, level)

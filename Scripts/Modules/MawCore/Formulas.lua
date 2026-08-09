@@ -21,24 +21,20 @@ end
 
 
 
-Formulas.hitAtPar    = 0.75	--attack == expected
-Formulas.hitMax      = 1	--reached at +hitOverPar
-Formulas.hitMin      = 0.25	--floor, reached at -hitUnderPar
+Formulas.hitAtPar    = 0.75	--attack == expected for the monster's level
+Formulas.hitMax      = 1	--reached at hitOverPar above par
+Formulas.hitMin      = 0.25	--floor
 Formulas.hitOverPar  = 0.5
-Formulas.hitUnderPar = 0.66
 
+--one straight line through par, clamped at both ends
 function Formulas.mawHitChance(atk, monsterLevel)
 	local expected = getPlayerEstimatedAttack(monsterLevel)
 	if not expected or expected <= 0 then
 		return nil
 	end
-	local ratio = atk/expected
-	if ratio >= 1 then
-		return math.min(Formulas.hitAtPar
-			+ (ratio-1)/Formulas.hitOverPar*(Formulas.hitMax-Formulas.hitAtPar), Formulas.hitMax)
-	end
-	return math.max(Formulas.hitAtPar
-		- (1-ratio)/Formulas.hitUnderPar*(Formulas.hitAtPar-Formulas.hitMin), Formulas.hitMin)
+	local overPar = (Formulas.hitAtPar * 10 + atk)/(expected + 10) - 1
+	local slope = (Formulas.hitMax - Formulas.hitAtPar)/Formulas.hitOverPar
+	return math.min(math.max(Formulas.hitAtPar + overPar*slope, Formulas.hitMin), Formulas.hitMax)
 end
 
 --what the PlayerHitOrMiss hook rolls against; nil leaves the engine's roll
