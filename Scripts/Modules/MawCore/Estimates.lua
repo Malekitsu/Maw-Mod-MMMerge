@@ -251,9 +251,6 @@ local LEGENDARY_21_PER_MONSTER = 0.05	--melee damage per monster within 512
 --15% is a gut number.
 local LEGENDARY_11_DAMAGE = 0.15
 local LEGENDARY_33_SKILL = 10		--added to every melee weapon skill
---what the affixes NOT modelled above are worth at full ramp: 12 and 20 (gear
---stats, blocked on estimateStat) and 29 (resistance shred)
-local LEGENDARY_RESIDUAL = 0.2
 
 --legendary 33 adds 10 to every melee weapon skill
 function getMeleeSkill(lvl)
@@ -329,7 +326,7 @@ function getPlayerEstimatedPower(lvl)
 
 	--the average character has the attack mawHitChance measures against, so
 	--its hit chance is par by definition
-	return damage*F.hitAtPar*(1 + LEGENDARY_RESIDUAL*legendary)
+	return damage*F.hitAtPar
 end
 
 function getMonsterHealth(mon, level)

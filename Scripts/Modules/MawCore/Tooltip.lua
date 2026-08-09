@@ -278,9 +278,6 @@ local function tooltipEnchantStats(t)
 				if t.Item:T().EquipStat==5 and t.Item:T().Mod2==0 then
 					power=math.ceil(power*1.5)
 				end
-				if GetLegendaryAffix(t.Item)==20 then
-					power=math.ceil(power*1.5)
-				end
 				local resLegendary=false
 				if t.Item.Bonus>=11 and t.Item.Bonus<=16 then
 					local id=Game.CurrentPlayer
@@ -308,9 +305,6 @@ local function tooltipEnchantStats(t)
 					end
 					if HasLegendaryAffix(it) then
 						maxValue=math.min(maxValue+20,maxValue*1.44)
-					end
-					if GetLegendaryAffix(it)==20 then
-						maxValue=maxValue*1.5
 					end
 					local mult=slotMult[it:T().EquipStat] or 1
 					if table.find(twoHandedAxes, it.Number) then
@@ -342,9 +336,6 @@ local function tooltipEnchantStats(t)
 				if t.Item:T().EquipStat==5 and t.Item:T().Mod2==0 then
 					strength=math.ceil(strength*1.5)
 				end				
-				if GetLegendaryAffix(t.Item)==20 then
-					strength=math.ceil(strength*1.5)
-				end
 				local resLegendary=false
 				if bonus>=11 and bonus<=16 then
 					local id=Game.CurrentPlayer
@@ -373,9 +364,6 @@ local function tooltipEnchantStats(t)
 						end
 						if HasLegendaryAffix(it) then
 							maxValue=math.min(maxValue+20,maxValue*1.44)
-						end
-						if GetLegendaryAffix(it)==20 then
-							maxValue=maxValue*1.5
 						end
 						local mult=slotMult[it:T().EquipStat] or 1
 						if table.find(twoHandedAxes, it.Number) then

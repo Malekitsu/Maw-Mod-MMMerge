@@ -1374,7 +1374,7 @@ legendaryEffects={
 	[17]="Your hits deal 2% of current monster HP as physical damage (1% for AoE, multi-hit spells and arrows).\nDamage is increased by weapon base attack speed or Ascensions for spells.",
 	[18]="Reduce all damage taken by 10%",
 	[19]="Your weapon enchants scale with the highest between might/int./pers.",
-	[20]="Base enchants on this items are 50% stronger",
+	[20]="Meditation restores 1% more mana for each 1% of your mana reserved by buffs",
 	[21]="Increase melee damage by 5% for each enemy in the nearbies",
 	[22]="Reduces damage by 3% for each enemy in the nearbies",
 	[23]="Successfully covering an ally restores 3% of your HP",
@@ -2455,9 +2455,6 @@ local function collectEnchant(index, it, bonus, power, tab, isSecond)
 	if bonus==8 or bonus==9 then
 		local mult=GetSlotMult(it)
 		power=round(power*(1+math.min(power/50/mult,5)))
-	end
-	if GetLegendaryAffix(it)==20 then
-		power=math.ceil(power*1.5)
 	end
 	local txt=it:T()
 	if txt.EquipStat==5 and txt.Mod2==0 then
