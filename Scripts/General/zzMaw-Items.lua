@@ -386,6 +386,40 @@ encStrUp={3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,7
 local function rollEnchantStrength(tier)
 	return round(encStrUp[tier]*math.random(5,10)/10)
 end
+
+
+--Bolster/insanity multiplier: it raises the tier cap AND multiplies every
+--rolled enchant strength. Insanity overrides the bolster, as in the generator.
+function GetDifficultyExtraPower()
+	if vars.insanityMode then
+		return 1.4
+	end
+	if Game.BolsterAmount>100 then
+		return (Game.BolsterAmount-100)/2000+1
+	end
+	return 1
+end
+
+function GetEnchantTierCap()
+	local bonusCap=math.floor((GetDifficultyExtraPower()-1)*10)
+	if mapvars and mapvars.mapAffixes then
+		bonusCap=bonusCap+math.floor(math.min(math.max((mapvars.mapAffixes.Power-30+2)/2,0),20)) --cap at map level 700
+	end
+	if Map.Name=="d42.blv" then
+		bonusCap=bonusCap+20
+	end
+	local cap2=14+bonusCap
+	if vars.madnessMode then
+		cap2=54
+		bonusCap=42
+	end
+	return math.min(20+bonusCap,#encStrUp), cap2
+end
+
+function GetTier(level)
+	local maxTier, cap2=GetEnchantTierCap()
+	return math.min(math.floor(level/18), cap2, maxTier)
+end
 local function rollMaxCharges(maxCharges)
 	return round(maxCharges*math.random(8,10)/10)
 end
@@ -672,13 +706,7 @@ function events.ItemGenerated(t)
 		end
 		
 		--difficulty settings
-		difficultyExtraPower=1
-		if Game.BolsterAmount>100 then
-			difficultyExtraPower=(Game.BolsterAmount-100)/2000+1
-		end
-		if vars.insanityMode then
-			difficultyExtraPower=1.4
-		end
+		difficultyExtraPower=GetDifficultyExtraPower()
 		--nerf shops if no exp in current world
 		--[[
 		if (Game.HouseScreen==2 or Game.HouseScreen==95) and Game.freeProgression then 
@@ -701,19 +729,9 @@ function events.ItemGenerated(t)
 		end
 		it.MaxCharges=math.floor(partyLevel/10+mapLevel/80)
 		
-		bonusCap=math.floor((difficultyExtraPower-1)*10)
-		if mapvars.mapAffixes then
-			bonusCap=bonusCap+math.floor(math.min(math.max((mapvars.mapAffixes.Power-30+2)/2,0),20))  --cap at map level 700
-		end
-		if Map.Name=="d42.blv" then
-			bonusCap=bonusCap+20
-		end
-		cap2=14+bonusCap
-		if vars.madnessMode then
-			cap2=54
-			bonusCap=42
-		end
-		partyLevel1=math.min(math.floor((partyLevel+bonus)/18),cap2) 
+		local maxTier
+		maxTier, cap2=GetEnchantTierCap()
+		partyLevel1=math.min(math.floor((partyLevel+bonus)/18),cap2)
 		--adjust loot Strength
 		ps1=t.Strength
 
@@ -727,7 +745,7 @@ function events.ItemGenerated(t)
 		if math.random(1,18)<partyLevel1%18 then
 			pseudoStr=pseudoStr+1
 		end
-		pseudoStr=math.min(pseudoStr,20+bonusCap,#encStrUp) --CAP CURRENTLY AT 20, 22 in doom,42 for mapping
+		pseudoStr=math.min(pseudoStr,maxTier) --CAP CURRENTLY AT 20, 22 in doom,42 for mapping
 		roll1=math.random()
 		roll2=math.random()
 		rollSpc=math.random()
@@ -4049,13 +4067,7 @@ function GetLevelRquirement(it)
 	if IsCelestialItem(it) then
 		return 1
 	end
-	local difficultyExtraPower=1
-	if Game.BolsterAmount>100 then
-		difficultyExtraPower=(Game.BolsterAmount-100)/2000+1
-	end
-	if vars.insanityMode then
-		difficultyExtraPower=1.4
-	end
+	local difficultyExtraPower=GetDifficultyExtraPower()
 	local bonusBasePower=(difficultyExtraPower-1)*10
 	local tot=0
 	local lvl=0

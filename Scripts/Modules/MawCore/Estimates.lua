@@ -79,20 +79,27 @@ function getMonsterEstimatedResistance(lvl)
 	return math.min(lvl/2, 999)
 end
 
-local STAT_SHARE = 0.25
+local STAT_SHARE = 0.33
+
+--Every enchant a fully geared character wears, added up.
+--slots are: 2h weapon, cloak, helm, armor, gloves, boots, ring, amulet, bow, belt,
+-- coefficients are: 2, 1, 1.25, 1.5, 1.25, 1.25, 0.75 * 6, 1, 1.25, 1
+local TOTAL_SLOTS = 13.75	--16 - 2.25 for ring resistance enchants
+local ENCHANTS_PER_ITEM = 3	--2 normal + 1 special
+local ENCHANT_ROLL = 1	--rollEnchantStrength picks 50..100% of the tier
+function getTotalEnchantPower(level)
+	local tier = math.max(GetTier(level), 1)
+	return ENCHANTS_PER_ITEM*TOTAL_SLOTS*encStrUp[tier]*ENCHANT_ROLL*GetDifficultyExtraPower()
+end
 
 function estimateStat(level)
 	local baseStat = 17 --on creation
 	local statsFromAlchemy = level*0.2
 	--most of the stats come from enchants
-	--slots are: 2h weapon, cloak, helm, armor, gloves, boots, ring, amulet, bow, belt,
-	-- coefficients are: 2, 1, 1.25, 1.5, 1.25, 1.25, 0.75 * 6, 1, 1.25, 1
-	local totalSlots = 13.75 --16 - 2.25 for ring resistance enchants
-	local enchants = 3 --2 normal + 1 special
-	local maxEnchantPower = enchants*totalSlots*encStrUp[maxTier]
 	local geared = 0.1^(1/(1 + level/10))
+	local dayOfTheGods = 1 + GetBuffStatPct(estimateSkill(level), true)
 
-	return baseStat + statsFromAlchemy + maxEnchantPower*STAT_SHARE*geared
+	return (baseStat + statsFromAlchemy + getTotalEnchantPower(level)*STAT_SHARE*geared)*dayOfTheGods
 end
 
 --average
