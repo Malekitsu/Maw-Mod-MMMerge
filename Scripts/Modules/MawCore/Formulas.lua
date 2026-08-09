@@ -19,8 +19,32 @@ function Formulas.reductionPercent(power, decimals, isRing)
 	return round(fraction * 100 * f) / f
 end
 
-function Formulas.playerHitChance(atk, monsterLevel)
-	return (15 + atk*2)/(30 + atk*2 + monsterLevel)
+
+
+Formulas.hitAtPar    = 0.75	--attack == expected
+Formulas.hitMax      = 1	--reached at +hitOverPar
+Formulas.hitMin      = 0.25	--floor, reached at -hitUnderPar
+Formulas.hitOverPar  = 0.5
+Formulas.hitUnderPar = 0.66
+
+function Formulas.mawHitChance(atk, monsterLevel)
+	local expected = getPlayerEstimatedAttack(monsterLevel)
+	if not expected or expected <= 0 then
+		return nil
+	end
+	local ratio = atk/expected
+	if ratio >= 1 then
+		return math.min(Formulas.hitAtPar
+			+ (ratio-1)/Formulas.hitOverPar*(Formulas.hitMax-Formulas.hitAtPar), Formulas.hitMax)
+	end
+	return math.max(Formulas.hitAtPar
+		- (1-ratio)/Formulas.hitUnderPar*(Formulas.hitAtPar-Formulas.hitMin), Formulas.hitMin)
+end
+
+--what the PlayerHitOrMiss hook rolls against; nil leaves the engine's roll
+function Formulas.mawPlayerHitChance(pl, mon, range, bonus)
+	local atk = (range == 0 and pl:GetMeleeAttack() or pl:GetRangedAttack()) + (bonus or 0)
+	return Formulas.mawHitChance(atk, getMonsterLevel(mon))
 end
 
 function Formulas.critCap(madness)

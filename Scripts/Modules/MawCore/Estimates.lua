@@ -238,7 +238,7 @@ function getPlayerEstimatedAttack(lvl)
 end
 
 function getEstimatedHitChance(lvl)
-	return MawCore.Formulas.playerHitChance(getPlayerEstimatedAttack(lvl), lvl)
+	return MawCore.Formulas.mawHitChance(getPlayerEstimatedAttack(lvl), lvl) or 0
 end
 
 function getPlayerEstimatedPower(lvl)

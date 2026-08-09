@@ -161,3 +161,37 @@ do
 		hooks.Switch(slowerBackpedaling)
 	end
 end
+
+local function safeGet(get, p)
+	if type(p) ~= "number" or p == 0 then
+		return nil, nil
+	end
+	local ok, index, obj = pcall(get, p)
+	if ok then
+		return index, obj
+	end
+	return nil, nil
+end
+
+mem.hookfunction(0x4256DB, 0, 4, function(d, def, this, mon, range, bonus)
+	local t = {
+		Range = range,
+		Bonus = bonus,
+		Result = def(this, mon, range, bonus) ~= 0,
+	}
+	t.PlayerIndex, t.Player = safeGet(internal.GetPlayer, this)
+	t.MonsterIndex, t.Monster = safeGet(internal.GetMonster, mon)
+	local engineResult = t.Result
+	--your own formula gets first refusal; returning nil keeps the engine roll
+	local customChance
+	if t.Player and t.Monster and MawCore and MawCore.Formulas
+			and MawCore.Formulas.mawPlayerHitChance then
+		customChance = MawCore.Formulas.mawPlayerHitChance(t.Player, t.Monster, range, bonus)
+		if customChance then
+			t.Result = customChance >= math.random()
+		end
+	end
+	--event handlers still have the final say
+	events.cocalls("PlayerHitOrMiss", t)
+	return t.Result and 1 or 0
+end)
