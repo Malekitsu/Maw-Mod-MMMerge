@@ -761,7 +761,7 @@ end
 --TOOLTIPS
 function events.Action(t)
 	if vars.MAWSETTINGS.buffRework=="ON" then
-		if t.Action==94 then
+		if t.Action==94 and Game.CurrentScreen==0 then
 			local i=t.Param-1
 			if i>=0 and i<=Party.High and vars.currentManaPool[i] and vars.maxManaPool[i]>0 then
 				local manaPool=round(vars.currentManaPool[i]/vars.maxManaPool[i]*1000)/10
