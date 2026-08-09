@@ -2998,7 +2998,7 @@ end
 --  - si vars.mawbuff[spell] est un {s,m,l} (table), on retourne tel quel
 --  - si c’est un "string" (Temple/Map.Name) on retourne une valeur >0 pour l’appliquer localement,
 --    mais le MULTI côté client filtre ces spéciaux pour éviter la re-diffusion.
-function getBuffSkill(spell)
+local function getCasterBuffSkill(spell)
 	local id=vars.mawbuff[spell]
 	if type(id)=="table" then
 		return id[1], id[2], id[3]
@@ -3020,6 +3020,38 @@ function getBuffSkill(spell)
 	else
 		return 0,0,0
 	end
+end
+
+POTION_BUFF_SKILL=25
+POTION_BUFF_MASTERY=3
+
+--per drinker: only the character who drank it benefits
+function setPotionBuff(pl, spell, expireTime)
+	vars.mawPotionBuff=vars.mawPotionBuff or {}
+	local index=pl:GetIndex()
+	vars.mawPotionBuff[index]=vars.mawPotionBuff[index] or {}
+	vars.mawPotionBuff[index][spell]=expireTime
+end
+
+function potionBuffActive(pl, spell)
+	if not pl then
+		return false
+	end
+	local list=vars.mawPotionBuff and vars.mawPotionBuff[pl:GetIndex()]
+	return list~=nil and list[spell]~=nil and list[spell]>Game.Time
+end
+
+function getBuffSkill(spell, pl)
+	local s, m, level=getCasterBuffSkill(spell)
+	if potionBuffActive(pl, spell) then
+		local bf=buffPower[spell]
+		local casterPower=bf and (bf.Base[m] or 0)+(bf.Scaling[m] or 0)*s/10 or s
+		local potionPower=bf and (bf.Base[POTION_BUFF_MASTERY] or 0)+(bf.Scaling[POTION_BUFF_MASTERY] or 0)*POTION_BUFF_SKILL/10 or POTION_BUFF_SKILL
+		if potionPower>casterPower then
+			return POTION_BUFF_SKILL, POTION_BUFF_MASTERY, pl.LevelBase
+		end
+	end
+	return s, m, level
 end
 
 	

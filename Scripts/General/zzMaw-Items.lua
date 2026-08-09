@@ -2596,8 +2596,8 @@ local function addWeaponRows(pl, index, it, txt, tab)
 		vars.assassinDamage=vars.assassinDamage or {}
 		vars.assassinDamage[pl:GetIndex()]=armsDmg
 		if vars.MAWSETTINGS.buffRework=="ON" then
-			if Party.SpellBuffs[9].ExpireTime>=Game.Time then
-				local s,m=getBuffSkill(51)
+			if Party.SpellBuffs[9].ExpireTime>=Game.Time or potionBuffActive(pl, const.Spells.Heroism) then
+				local s,m=getBuffSkill(51, pl)
 				heroismMult=GetBuffMultiplier(const.Spells.Heroism, s, m)
 				vars.assassinDamage[pl:GetIndex()]=vars.assassinDamage[pl:GetIndex()]*(1+heroismMult)
 			end
@@ -2638,7 +2638,7 @@ end
 local function addBless(pl, tab)
 	if vars.MAWSETTINGS.buffRework=="ON" then
 		if pl.SpellBuffs[1].ExpireTime>=Game.Time then
-			local s,m, level=getBuffSkill(46)
+			local s,m, level=getBuffSkill(46, pl)
 			local blessBonus=(buffPower[46].Base[m]+level/4)*(1+buffPower[46].Scaling[m]*s/100)
 			tab[40] = tab[40] + blessBonus
 			tab[44] = tab[44] + blessBonus
@@ -2732,8 +2732,8 @@ local function addBuffStats(pl, tab)
 		for i=1,6 do
 			local buff=0
 			local pct=0
-			if Party.SpellBuffs[buffList[i]].ExpireTime>=Game.Time then
-				local s, m, level=getBuffSkill(spellList[i])
+			if Party.SpellBuffs[buffList[i]].ExpireTime>=Game.Time or potionBuffActive(pl, spellList[i]) then
+				local s, m, level=getBuffSkill(spellList[i], pl)
 				buff=(buffPower[spellList[i]].Base[m]+level/4)*(1+buffPower[spellList[i]].Scaling[m]/100*s)
 				buff4=math.max(buff,buff2)
 				tab[i+10]=tab[i+10]+buff4
@@ -2752,15 +2752,15 @@ local function addBuffStats(pl, tab)
 		--special case for accuracy, as it comes from bless
 		local accPct=lightPct
 		if pl.SpellBuffs[1].ExpireTime>=Game.Time then
-			local s=getBuffSkill(46)
+			local s=getBuffSkill(46, pl)
 			if s>0 then
 				accPct=math.max(accPct, GetBuffStatPct(s))
 			end
 		end
 		tab[5]=tab[5]+(tab[5]+statBase[5])*accPct
 		--stoneskin
-		if Party.SpellBuffs[15].ExpireTime>=Game.Time then
-			local s,m,level=getBuffSkill(38)
+		if Party.SpellBuffs[15].ExpireTime>=Game.Time or potionBuffActive(pl, const.Spells.StoneSkin) then
+			local s,m,level=getBuffSkill(38, pl)
 			local s2,m2,level2=getBuffSkill(86)
 			s=math.max(s,s2/1.5)
 			m=math.max(m,m2)
@@ -2996,8 +2996,8 @@ local function applyDamageMultipliers(pl, tab, unarmed)
 	local unarmedMult=0
 	if vars.MAWSETTINGS.buffRework=="ON" then
 		bonusDamage=mightEffect
-		if Party.SpellBuffs[9].ExpireTime>=Game.Time then
-			local s,m=getBuffSkill(51)
+		if Party.SpellBuffs[9].ExpireTime>=Game.Time or potionBuffActive(pl, const.Spells.Heroism) then
+			local s,m=getBuffSkill(51, pl)
 			heroismMult=GetBuffMultiplier(const.Spells.Heroism, s, m)
 		end
 		if pl.SpellBuffs[6].ExpireTime>=Game.Time and unarmed then

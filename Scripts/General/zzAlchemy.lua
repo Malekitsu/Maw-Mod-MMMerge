@@ -165,32 +165,20 @@ function events.UseMouseItem(t)
 	--------------------
 	if itemBuffMapping[it.Number] then
 		local buff=itemBuffMapping[it.Number]
-		if type(buff)=="table" then
-			for i=1,#buff do
-				buffID=itemBuffMapping[it.Number][i]
-				pl.SpellBuffs[buffID].Power=it.Bonus+10
-				pl.SpellBuffs[buffID].ExpireTime=Game.Time+potionDuration
-				pl.SpellBuffs[buffID].Skill=0
-				vars.buffToIgnore[t.PlayerSlot][buffID]=Game.Time+potionDuration
-			end
-		else
-			pl.SpellBuffs[buff].Power=it.Bonus+10
-			pl.SpellBuffs[buff].ExpireTime=Game.Time+potionDuration
-			pl.SpellBuffs[buff].Skill=0
-			vars.buffToIgnore[t.PlayerSlot][buff]=Game.Time+potionDuration
+		if type(buff)~="table" then
+			buff={buff}
 		end
-		--half effect for bless, heroism and stoneskin
-		if (it.Number<=234 and it.Number~=229) or it.Number==245 or  it.Number==251 then
-			if type(buff)=="table" then
-				for i=1,#buff do
-					buffID=itemBuffMapping[it.Number][i]
-					pl.SpellBuffs[buffID].Power=round(pl.SpellBuffs[buffID].Power/2)
-					pl.SpellBuffs[buffID].Skill=0
-				end
-			else
-				pl.SpellBuffs[buff].Power=round(pl.SpellBuffs[buff].Power/2)
-				pl.SpellBuffs[buff].Skill=0
-			end
+		for i=1,#buff do
+			local buffID=buff[i]
+			pl.SpellBuffs[buffID].ExpireTime=Game.Time+potionDuration
+			pl.SpellBuffs[buffID].Skill=0
+			vars.buffToIgnore[t.PlayerSlot][buffID]=Game.Time+potionDuration
+		end
+	end
+
+	if potionBuffSpells[it.Number] then
+		for i=1,#potionBuffSpells[it.Number] do
+			setPotionBuff(pl, potionBuffSpells[it.Number][i], Game.Time+potionDuration)
 		end
 	end
 	
@@ -320,6 +308,22 @@ itemBuffMapping = {
     [257] = {19,15,17,20,16,21,18},  --stats
     [263] = {5,0,22,3,9,2},  --resistances
 }
+
+--spell ids as buffPower/buffSpell key them: 3 fire res, 14 air res, 25 water
+--res, 36 earth res, 58 mind res, 69 body res, 50 preservation
+potionBuffSpells = {
+	[228] = {const.Spells.Haste},
+	[229] = {const.Spells.Heroism},
+	[230] = {const.Spells.Bless},
+	[231] = {const.Spells.Shield, 50},
+	[234] = {const.Spells.StoneSkin},
+	[245] = {const.Spells.Haste, const.Spells.Heroism, const.Spells.Bless},	--Champions
+	[249] = {3, 14, 25, 36},												--Elemental
+	[250] = {58, 69},														--Self
+	[251] = {const.Spells.Shield, 50, const.Spells.StoneSkin},				--Paladins
+	[263] = {3, 14, 25, 36, 58, 69},										--Resistances
+}
+
 itemImmunityMapping = {
 	[224] = {"Weak","Asleep"},
 	[225] = {"Disease1","Disease2","Disease3","Poison1","Poison2","Poison3"},
@@ -430,6 +434,24 @@ potionText={
 	[262] = "Permanently adds 30 per 50 potion power to Mind and Body Resistance, single-use.\nRequire 50 power per step to work.\nPreviously gained bonus do not stack.\n",
 	[263] = "Increases all resistances temporarily by 10+ (1 x Power) for 6 hours.",
 }
+
+function events.GameInitialized2()
+	local function pct(spell)
+		return round(GetBuffMultiplier(spell, POTION_BUFF_SKILL, POTION_BUFF_MASTERY)*1000)/10
+	end
+	local statPct=round(GetBuffStatPct(POTION_BUFF_SKILL)*100)
+
+	potionText[228]="Increases your Attack Speed by " .. pct(const.Spells.Haste) .. "% for 6 hours."
+	potionText[229]="Increases your Melee Damage by " .. pct(const.Spells.Heroism) .. "% for 6 hours."
+	potionText[230]="Increases your Attack, and your Accuracy by " .. statPct .. "%, for 6 hours."
+	potionText[231]="Reduces magic damage taken by " .. pct(const.Spells.Shield) .. "% and grants Preservation for 6 hours.\nRequire 20 power to work.\n"
+	potionText[234]="Increases your Armor Class for 6 hours."
+	potionText[245]="Grants Haste, Heroism and Bless for 6 hours."
+	potionText[249]="Increases your Fire, Air, Water and Earth Resistance, and those stats by " .. statPct .. "%, for 6 hours."
+	potionText[250]="Increases your Mind and Body Resistance, and those stats by " .. statPct .. "%, for 6 hours."
+	potionText[251]="Grants Shield, Stone Skin and Preservation for 6 hours."
+	potionText[263]="Increases all your Resistances, and all seven stats by " .. statPct .. "%, for 6 hours."
+end
 
 potionRecipeText={
 	--orange

@@ -333,17 +333,12 @@ function events.GetAttackDelay(t)
 	
 	if vars.MAWSETTINGS.buffRework=="ON" then
 		local hasteMult=1
-		if Party.SpellBuffs[8].ExpireTime>=Game.Time or pl.SpellBuffs[const.PlayerBuff.Haste].ExpireTime>Game.Time then
-			local s, m=getBuffSkill(5)
+		if Party.SpellBuffs[8].ExpireTime>=Game.Time or potionBuffActive(t.Player, const.Spells.Haste) then
+			--getBuffSkill already returns the stronger of caster and potion
+			local s, m=getBuffSkill(5, t.Player)
 			local s2,m2=getBuffSkill(86)
-			local s3=0
-			local m3=0
-			if t.Player.SpellBuffs[const.PlayerBuff.Haste].ExpireTime>Game.Time then
-				s3=25
-				m3=3
-			end
-			s=math.max(s,s2/1.5,s3)
-			m=math.max(m,m2,m3)
+			s=math.max(s,s2/1.5)
+			m=math.max(m,m2)
 			hasteMult=math.max(1+GetBuffMultiplier(const.Spells.Haste, s, m), hasteMult)
 		end
 		totalSpeed=totalSpeed/hasteMult
