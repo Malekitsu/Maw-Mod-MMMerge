@@ -481,14 +481,14 @@ local function tooltipEnchantStats(t)
 			if HasEnc2(t.Item) then
 				bonus=bonus+1
 			end
-			if IsAncientItem(t.Item) then
-				t.Name=StrColor(255,128,0,"Ancient " .. t.Name)
+			if IsCelestialItem(t.Item) then
+				t.Name=StrColor(120, 240, 255,"Celestial " .. t.Name)
+			elseif HasLegendaryAffix(t.Item) then
+				t.Name=StrColor(255,255,30,"Legendary " .. t.Name)
 			elseif IsPrimordialItem(t.Item) then
 				t.Name=StrColor(255,0,0,"Primordial " .. t.Name)
-			elseif IsCelestialItem(t.Item) then
-				t.Name=StrColor(120, 240, 255,"Celestial " .. t.Name)
-			elseif legendaryEffects[t.Item.BonusExpireTime] then
-				t.Name=StrColor(255,255,30,"Legendary " .. t.Name)
+			elseif IsAncientItem(t.Item) then
+				t.Name=StrColor(255,128,0,"Ancient " .. t.Name)
 			elseif bonus==3 then
 				t.Name=StrColor(163,53,238,t.Name)
 			elseif bonus==2 then
@@ -502,9 +502,10 @@ local function tooltipEnchantStats(t)
 			if HasLegendaryAffix(t.Item) then
 				t.Description=""
 			end
-			if legendaryEffects[t.Item.BonusExpireTime%100]then
-				local legText=legendaryEffects[t.Item.BonusExpireTime%100]
-				if t.Item.BonusExpireTime%100==21 then
+			local legAffix=GetLegendaryAffix(t.Item)
+			if legendaryEffects[legAffix] then
+				local legText=legendaryEffects[legAffix]
+				if legAffix==21 then
 					local count=0
 					for i=0, Map.Monsters.High do
 						if Map.Monsters[i].Active then
@@ -516,7 +517,7 @@ local function tooltipEnchantStats(t)
 					end
 					local dmg=math.min(count*5,100)
 					legText=legText .. "\nCurrent bonus Damage: " .. dmg .. "%"
-				elseif t.Item.BonusExpireTime%100==22 then
+				elseif legAffix==22 then
 					local count=0
 					for i=0, Map.Monsters.High do
 						if Map.Monsters[i].Active then

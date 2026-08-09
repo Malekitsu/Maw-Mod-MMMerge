@@ -929,14 +929,9 @@ evt.PotionEffects[97] = function(IsDrunk, t, Power)
 		craftingItemUsed=true
 		--the potion carries an extracted affix in its own BonusStrength
 		local stored=Mouse.Item.BonusStrength
-		if stored==0 and IsCelestialItem(t) then
-			--extract, leaving the item celestial without an affix
+		if stored==0 and HasLegendaryAffix(t) then
 			Mouse.Item.BonusStrength=GetLegendaryAffix(t)
 			SetLegendaryAffix(t,0)
-		elseif stored==0 and HasLegendaryAffix(t) then
-			--extract, dropping the item back to primordial
-			Mouse.Item.BonusStrength=GetLegendaryAffix(t)
-			SetAncientTier(t,2)
 		elseif stored>LEGENDARY_AFFIX_BASE and stored<1000 then
 			--imprint; the item's own celestial status is kept
 			SetLegendaryAffix(t,stored)

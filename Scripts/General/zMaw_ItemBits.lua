@@ -151,6 +151,10 @@ local function SetRarity(it, tier, affix, celestial)
 	it.BonusExpireTime = EncodeRarity(tier, affix, celestial)
 end
 
+function HasRarityData(it)
+	return bit.band(it.BonusExpireTime or 0, RARITY_MARKER) ~= 0
+end
+
 -- Ancient (1) / primordial (2) tier; 0 for everything else.
 function GetAncientTier(it)
 	return (DecodeRarity(it))

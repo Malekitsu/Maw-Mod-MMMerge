@@ -623,12 +623,14 @@ function events.AfterLoadMap()
 					if HasEnc2(it) then
 						itemPower=itemPower+1
 					end
-					if IsAncientItem(it) then
-						itemPower=5
-					elseif IsPrimordialItem(it) then
-						itemPower=6
+					if IsCelestialItem(it) then
+						itemPower=8
 					elseif HasLegendaryAffix(it) then
 						itemPower=7
+					elseif IsPrimordialItem(it) then
+						itemPower=6
+					elseif IsAncientItem(it) then
+						itemPower=5
 					end
 					
 					local filter=vars.MAWSETTINGS.lootFilter
@@ -1106,12 +1108,15 @@ function events.ItemGenerated(t)
 		if HasEnc2(it) then
 			itemPower=itemPower+1
 		end
-		if IsAncientItem(it) then
-			itemPower=5
-		elseif IsPrimordialItem(it) then
-			itemPower=6
+		--rarest first, same order as the loot filter above
+		if IsCelestialItem(it) then
+			itemPower=8
 		elseif HasLegendaryAffix(it) then
 			itemPower=7
+		elseif IsPrimordialItem(it) then
+			itemPower=6
+		elseif IsAncientItem(it) then
+			itemPower=5
 		end
 		
 		vars.MAWSETTINGS=vars.MAWSETTINGS or {}
@@ -1728,7 +1733,10 @@ function getItemValue(it, lootFilter)
 		mult=MaxCharges/20
 		
 		basePriceBonus=basePrice*mult
-		if it.Bonus2>0 and it.Bonus2<=Game.SpcItemsTxt.high and it.BonusExpireTime<Game.Time then
+		--the expiry test only means something when the field IS a timer: on a
+		--rarity item it holds the marker, which is far bigger than Game.Time
+		if it.Bonus2>0 and it.Bonus2<=Game.SpcItemsTxt.high
+				and (HasRarityData(it) or it.BonusExpireTime<Game.Time) then
 			special=Game.SpcItemsTxt[it.Bonus2-1].Value
 			if bonusEffects[it.Bonus2]~=nil then
 				special=special*mult
