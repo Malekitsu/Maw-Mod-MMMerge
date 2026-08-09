@@ -40,6 +40,7 @@ MawCore.ModuleOrder = {
 	"Engine",		-- Tier-4 boundary: addresses, patches, mem.*
 	"Fixes",		-- engine patches ported from MAW_Fixes.dll
 	"Formulas",		-- shared gameplay formulas: effect + display read one source
+	"Estimates",	-- balance model: expected player power, monster HP/damage
 	"Classes",		-- custom class registry: ids + presentation swap
 	"Pipeline",		-- ordered named-stage processing chains
 	"Scheduler",	-- one Tick handler, named interval tasks

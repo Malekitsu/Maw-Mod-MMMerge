@@ -1,0 +1,326 @@
+-- Estimates.lua -- the balance model: what an AVERAGE character of a given
+-- level is expected to have (stats, health, vitality, damage), and the
+-- monster numbers derived from it. Moved verbatim out of zzMaw-Stats.lua.
+--
+-- These are estimates, not live readings: they take a level and rebuild a
+-- typical character from the same curves the real code uses (statsPerLevel,
+-- skillDamage, armsmasterSkill, bodybuildingHP, GetMightDamageMultiplier).
+-- When one of those curves is retuned, the matching term HERE must move too,
+-- or monster HP/damage stops tracking player power.
+--
+-- The chain: estimateStat -> getPlayerEstimatedVitality / getPlayerEstimatedPower
+-- -> getMonsterDamage / getMonsterHealth (monsters are sized as a ratio of the
+-- expected player, via GetDifficulty's hits-to-kill tables).
+--
+-- Still globals on purpose: legacy files and other MawCore modules
+-- (SkillTooltip, Damage) call them by bare name.
+
+--how fast the average character reaches the next mastery; the estimators use
+--it wherever the real code would read a skill's mastery
+local function masterLearned()
+	if vars.madnessMode then
+		return 30
+	elseif vars.insanityMode then
+		return 20
+	end
+	return 12
+end
+
+--Weapon damage from an ITEM LEVEL. The live path (zzMaw-Items GetWeaponDamage)
+--and the estimator both call this, so the curve, the damping and the 1h
+--halving live in one place. Below stat 25 the engine breakpoints go negative:
+--a weapon never subtracts, hence the clamp.
+function getWeaponDamageForLevel(itemLevel, twoHanded)
+	local damage = math.max(Game.GetStatisticEffect(estimateStat(itemLevel)), 0)
+	if not twoHanded then
+		damage = damage/2
+	end
+	return damage/(1 + estimateWeaponDamageMultiplier(itemLevel))
+end
+
+function estimateStat(level)
+	local baseStat = 21
+	local statsPerLevel=2
+	if vars.insanityMode then
+		statsPerLevel=5
+	elseif vars.Mode==2 then
+		statsPerLevel=4
+	elseif Game.BolsterAmount==300 then
+		statsPerLevel=3
+	elseif Game.BolsterAmount==200 then
+		statsPerLevel=2.5
+	elseif Game.BolsterAmount==150 then
+		statsPerLevel=2
+	end
+	if vars.AusterityMode then
+		statsPerLevel=statsPerLevel+Game.BolsterAmount/100
+	end
+	return statsPerLevel*level + baseStat
+end
+
+--average
+function getPlayerEstimatedVitality(lvl, healthOnly)
+	local baseHP=25
+	local baseScaling=3
+	local endScaling=9
+	local maxPromotionLevel=250
+	if vars.madnessMode then
+		maxPromotionLevel=500
+	end
+	local scalingHP=math.min((endScaling-baseScaling)*lvl/maxPromotionLevel,endScaling-baseScaling)+baseScaling
+	local health=baseHP+scalingHP*(lvl)
+	
+	local estimatedStat=estimateStat(lvl)
+
+	
+	local levelCap=700
+	if vars.madnessMode then
+		levelCap=1050
+	end
+	local levelMult=math.min(lvl/levelCap,1)
+	
+	local extimatedEndurance=estimatedStat
+	
+	local healthPower=estimatedStat/10
+	local extimatedHealthBonus=healthPower*math.min(1+healthPower/50,5)*4	
+	
+	local enduranceEffect=extimatedEndurance/5
+	local skill=lvl^0.7
+	local bbMasteryBonus=math.min(1+skill/masterLearned()*2,3) --use master as a reference
+	local bbPercentBonus=bodybuildingHP[math.floor(bbMasteryBonus)]
+	health=health+(enduranceEffect+bbMasteryBonus)*scalingHP+extimatedHealthBonus
+	
+	health=health*(1+bbPercentBonus*skill/100)*(1+extimatedEndurance/2500)
+	
+	-- Return just health if requested
+	if healthOnly then
+		return health
+	end
+	
+	local armorClass=estimatedStat*1.5
+	
+	local bolster=1
+	if vars.insanityMode then
+		bolster=3
+	end
+	
+	local bolster=(math.max(Game.BolsterAmount, 100)/100-1)/4+1
+	if vars.insanityMode then
+		bolster=3
+	end
+	
+	local divider=math.min(90+lvl*0.25*bolster)
+	local armorReduction=armorClass/divider+1
+	local nerfAmount=math.max(1,lvl/255)
+	local blockAC=armorClass/(math.max(Game.BolsterAmount/100,1)/nerfAmount)
+	local blockChanceVitMultiplier= 1/((5+lvl*2)/(10+lvl*2+blockAC))
+	local totalArmorReduction=armorReduction*blockChanceVitMultiplier
+	local resistances=armorClass*2/3
+	
+	local divider=math.min(60+lvl*0.5*bolster)
+	local resReduction=resistances/divider+1
+	local shieldBuff=math.max((1-0.006*lvl^0.65),0.7) --starts with no shield gradually into max res at ~400 lvl
+	resReduction=resReduction/shieldBuff
+	local power=estimatedStat/12 
+	
+	local ringReduction=(power/100+1)
+	resReduction=resReduction*ringReduction
+	
+	local averageReduction=(totalArmorReduction+resReduction)/2
+
+	local extimatedLegendaryPower=1+0.001*lvl
+	
+	local vitality=health*averageReduction*extimatedLegendaryPower
+	
+	return vitality, totalArmorReduction, resReduction, averageReduction , health
+	
+end
+function getPlayerExtimatedHealth(lvl)
+	local health=getPlayerEstimatedVitality(lvl,true)
+	return health
+end
+
+function getMonsterDamage(mon, level)
+	local hitToKill={14,10,7,6.5,6,5.5,5,4.5,4}
+	local hitToKillAusterity={15,10,5,4,3,2.5,2,1.5,1}
+	
+	if mon then
+		local id=mon.Id
+		if id%3==1 then
+			id=id+1
+		elseif id%3==0 then
+			id=id-1
+		end
+		level=mon and totalLevel[id] or level
+	end
+	local vitality=getPlayerEstimatedVitality(level)
+
+	local difficulty=GetDifficulty()
+	local hits=hitToKill[difficulty]
+	if vars.AusterityMode then
+		hits=hitToKillAusterity[difficulty]
+	end
+
+	local damage=vitality/hits
+	
+	if not mon then
+		return damage
+	end
+	
+	if mon.Id%3==1 then
+		damage=damage*0.66
+	elseif mon.Id%3==0 then
+		damage=damage*1.5
+	end
+	local index=mon:GetIndex()
+	if mon.NameId>=220 and mon.NameId<=300 then
+		mapvars.bossData=mapvars.bossData or {}
+		if not mapvars.bossData[index] then
+			generateBoss(index)
+		end
+		damage=damage*mapvars.bossData[index].DamageMult
+	end
+	
+	--buff based on density
+	damage=damage*GetDensityMultiplier(mon.Id)
+	
+	return damage
+end
+
+--what the average character is assumed to be carrying and hitting with
+local EXPECTED_ENCHANT_COEFF = 0.3	--one tier-2 damage enchant (enchantbonusdamage)
+local EXPECTED_HIT_CHANCE = 0.8
+local EXPECTED_WEAPON_DICE = 3		--only feeds the +diceCount/2 floor of a roll
+
+function getPlayerEstimatedPower(lvl)
+	local F = MawCore.Formulas
+	local skill = lvl^0.7
+	local mL = masterLearned()
+
+	local itemLevel = lvl
+	local wDmg = getWeaponDamageForLevel(itemLevel, true)	--two-handed reference
+
+	local weaponSkillMult = 1 + skillDamage[const.Skills.Sword]*skill/100
+	local armsMasterDamage = math.min(skill/mL*0.5, 1.5)
+	local armsBase = armsMasterDamage*skill
+	local damage = EXPECTED_WEAPON_DICE/2 + (0.75*wDmg + armsBase)*weaponSkillMult
+
+	local scalable = 0.75*wDmg + armsBase
+	damage = damage + math.max(skill - scalable*(weaponSkillMult-1), 0)
+
+	local might = estimateStat(lvl)
+	local mightEffect = might/5
+	local heroismBuff = math.min(1 + 0.006*lvl^0.65, 1.3)
+	damage = (damage + mightEffect)*heroismBuff*(1 + GetMightDamageMultiplier(might, lvl))
+
+	local speedEffect = (mightEffect/2)/1000
+	local weaponSpeed = math.min(1 + skill/mL*2, 3)/2*skill/100
+	local armsMasterSpeed = math.min(math.max(skill/mL-1, 0), 2)/2*skill/100
+	local hasteBuff = math.min(1 + 0.004*lvl^0.65, 1.2)
+	damage = damage*(1 + speedEffect + weaponSpeed + armsMasterSpeed)*hasteBuff
+
+	local luck, accuracy = might, might
+	local critChance = F.critChance(luck, lvl) + 0.1*math.min(lvl/300, 1) --assume crit enchant at lvl 500
+	local extraMult = 1
+	if critChance > 1 then
+		extraMult = critChance
+	end
+	local critDamage = F.critDamageMult(accuracy, lvl, vars.madnessMode) - 1
+	damage = damage*(1 + math.min(critChance, 1)*critDamage*extraMult)
+
+	damage = damage + wDmg*estimateWeaponDamageMultiplier(itemLevel)*EXPECTED_ENCHANT_COEFF
+
+	local extimatedLegendaryPower = 1 + 0.002*lvl
+	return damage*EXPECTED_HIT_CHANCE*extimatedLegendaryPower
+end
+
+function getMonsterHealth(mon, level)
+	local hitToKillMonster={1,1.5,2,2.5,3,3.5,4,4.5,5}
+	local hitToKillMonsterAusterity={1,2,4,5,6,7,8,9,9.5}
+	if mon then
+		local id=mon.Id
+		if id%3==1 then
+			id=id+1
+		elseif id%3==0 then
+			id=id-1
+		end
+		level=mon and totalLevel[id] or level
+	end
+	local health=getPlayerEstimatedPower(level)
+
+	local difficulty=GetDifficulty()
+
+	local hits=hitToKillMonster[difficulty] --baseline MAW
+
+	if vars.AusterityMode then
+		hits=hitToKillMonsterAusterity[difficulty]
+	end
+	
+	hits=hits*(1+level/1000)
+	
+	health=health*hits
+	
+	--account for resistances
+	health=health/2^(math.min(level/2/100,10)) --approx
+	
+	if not mon then
+		return health
+	end	
+	
+	
+	local id=mon.Id
+	local rateo=1
+	if id%3==1 then
+		rateo=basetable[id].FullHP/basetable[id+1].FullHP
+	elseif id%3==0 then
+		rateo=basetable[id].FullHP/basetable[id-1].FullHP
+	end
+	rateo=math.max(0.6,math.min(rateo,1.8))
+	health=health*rateo
+	
+	-- Check if monster has GetIndex method (real monster vs mock object)
+	if not mon.GetIndex then
+		return health
+	end
+	
+	local index=mon:GetIndex()
+	if mon.NameId>=220 and mon.NameId<=300 then
+		mapvars.bossData=mapvars.bossData or {}
+		if not mapvars.bossData[index] then
+			generateBoss(index)
+		end
+		health=health*mapvars.bossData[index].HealthMult
+	end
+	
+	--buff based on density
+	health=health*GetDensityMultiplier(mon.Id)
+	
+	return health
+end
+
+--[[ test code, don't touch
+for i=1,1000 do
+	HPtable=i*(i/10+3)*2*(1+i/360)
+	if Game.BolsterAmount==600 then
+		hpMult=(2+i/300)
+	end	
+	if vars.insanityMode then
+		hpMult=hpMult*(1.5+i/300)
+	end		
+	
+	hpMult=hpMult/math.min(math.max(0.3+totalLevel[i]/200,1),50/15) --50/15 is the amount needed to get 1% crit, now and before
+
+	HPtable=HPtable*hpMult
+	
+	res=i/2
+	HPtable=HPtable*2^(res/(100))
+	
+	print(round(HPtable/GetPlayerEstimatedPower(i)*100)/100)
+end
+]]
+
+--[[
+for i=1,1000 do
+	print(round(getMonsterDamage(i)/getPlayerEstimatedVitality(i)*100)/100)
+end
+]]

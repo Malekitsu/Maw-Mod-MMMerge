@@ -4392,13 +4392,6 @@ function estimateWeaponDamageMultiplier(level)
 end
 
 function GetWeaponDamage(it)
-	local itemLevel = GetItemLevel(it)
-	--below stat 25 the engine breakpoints go negative; a weapon never subtracts
-	local damage = math.max(Game.GetStatisticEffect(estimateStat(itemLevel)), 0)
-	--2h = dual-slot weapon or the axes the mod treats as two-handed
-	if not (it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number)) then
-		damage=damage/2
-	end
-	damage=damage / (1 + estimateWeaponDamageMultiplier(itemLevel))
-	return damage
+	local twoHanded = it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number)
+	return getWeaponDamageForLevel(GetItemLevel(it), twoHanded)
 end

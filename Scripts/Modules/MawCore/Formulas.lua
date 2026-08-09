@@ -19,6 +19,26 @@ function Formulas.reductionPercent(power, decimals, isRing)
 	return round(fraction * 100 * f) / f
 end
 
+function Formulas.critCap(madness)
+	return madness and 5000 or 3000
+end
+
+function Formulas.critChance(luck, monsterLevel)
+	return luck/math.min(500 + monsterLevel*9.5, 10000) + 0.05
+end
+
+function Formulas.critDiminishingLevel(monsterLevel, madness)
+	return math.min(250 + monsterLevel*2.5, Formulas.critCap(madness))
+end
+
+function Formulas.critDamageMult(stat, monsterLevel, madness, isSpell)
+	local dim = Formulas.critDiminishingLevel(monsterLevel, madness)
+	if isSpell then
+		return stat/(dim*4) + 1.5
+	end
+	return stat/dim + 1.5
+end
+
 -- Regeneration skill: HP/sec at full health (the GM low-HP amplification
 -- stays at the effect site -- it needs current HP).
 local regenEffect = {[0] = 0, 2, 4, 6, 6}
