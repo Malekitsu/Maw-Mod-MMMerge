@@ -2493,7 +2493,7 @@ end
 
 --phase 2: weapon attack/damage rows (40-43 melee, 44-47 bow); every skill
 --read here sees the published snapshot
-local function addWeaponRows(pl, index, it, txt, tab)
+local function addWeaponRows(pl, index, it, txt, tab, floorPaid)
 	if txt.Skill>7 and txt.Skill~=39 then
 		return
 	end
@@ -2618,7 +2618,12 @@ local function addWeaponRows(pl, index, it, txt, tab)
 	--floor: a weapon skill point is always worth at least 1 average damage.
 	--armsDmg/mult recovers what the percentage is applied to, so the top-up is
 	--only what the percentage failed to deliver on a weak weapon
-	if skillDamage[skill] then
+	--the top-up is a skill bonus, so a second weapon of the same skill does not
+	--earn it again (the percentage above is per weapon and stays per weapon)
+	if skillDamage[skill] and not (floorPaid and floorPaid[skill]) then
+		if floorPaid then
+			floorPaid[skill]=true
+		end
 		local scalable=bonus+sidesBonus*txt.Mod1DiceCount/2+armsDmg/mult
 		add=add+math.max(s2-scalable*(mult-1),0)
 	end
@@ -2838,6 +2843,8 @@ end
 
 --phase 2: per-slot skill attack bonuses + dodging AC
 local function addSlotAttackRows(pl, tab)
+	--a weapon skill pays its attack bonus once, not once per slot holding it
+	local attackSkillPaid={}
 	for i=0,3 do
 		local item=pl:GetActiveItem(i)
 		if item then
@@ -2854,7 +2861,8 @@ local function addSlotAttackRows(pl, tab)
 			end
 			local s,m = SplitSkill(pl:GetSkill(skill))
 
-			if skillAttack[skill] and skillAttack[skill][m] then
+			if skillAttack[skill] and skillAttack[skill][m] and not attackSkillPaid[skill] then
+				attackSkillPaid[skill]=true
 				if i~=2 then
 					tab[40]=tab[40]+skillAttack[skill][m]*s
 				else
@@ -3094,8 +3102,9 @@ function itemStats(index)
 	plItemsStats[index]=tab
 
 	--phase 2: everything computed from effective skills
+	local floorPaid={}
 	for it in pl:EnumActiveItems() do
-		addWeaponRows(pl, index, it, it:T(), tab)
+		addWeaponRows(pl, index, it, it:T(), tab, floorPaid)
 	end
 	addBless(pl, tab)
 	addArmorSkillAC(pl, tab)

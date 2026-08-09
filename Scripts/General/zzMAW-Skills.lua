@@ -222,6 +222,8 @@ function events.GetAttackDelay(t)
 		end
 	else
 		local speed={}
+		--a weapon skill pays its recovery bonus once, not once per hand
+		local speedSkillPaid={}
 		for i=0,1 do
 			local it=t.Player:GetActiveItem(i)
 			if it then
@@ -237,11 +239,12 @@ function events.GetAttackDelay(t)
 						skill=3
 					end
 					local s,m = SplitSkill(t.Player:GetSkill(skill))
-					if skillRecovery[skill] and skillRecovery[skill][m] then
+					if skillRecovery[skill] and skillRecovery[skill][m] and not speedSkillPaid[skill] then
 						if not table.find(twoHandedAxes, it.Number) or i~=0 then
 							bonusSpeed=bonusSpeed+skillRecovery[skill][m]*s
+							speedSkillPaid[skill]=true
 						end
-					end	
+					end
 					if it.Bonus2==41 or it.Bonus2==59 then
 						local equipStat=GetItemEquipStat(it)
 						if equipStat==1 then
@@ -252,12 +255,15 @@ function events.GetAttackDelay(t)
 					end
 					
 					--unarmed working with staff GM
-					if skill==0 and m==4 then
+					if skill==0 and m==4 and not speedSkillPaid[const.Skills.Unarmed] then
+						speedSkillPaid[const.Skills.Unarmed]=true
 						local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Unarmed))
 						bonusSpeed=bonusSpeed+skillRecovery[const.Skills.Unarmed][m]*s
 					end
 				end
-			elseif i==1 and Game.CharacterPortraits[pl.Face].Race~=const.Race.Dragon then
+			elseif i==1 and Game.CharacterPortraits[pl.Face].Race~=const.Race.Dragon
+					and not speedSkillPaid[const.Skills.Unarmed] then
+				speedSkillPaid[const.Skills.Unarmed]=true
 				local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Unarmed))
 				bonusSpeed=bonusSpeed+skillRecovery[const.Skills.Unarmed][m]*s
 			end

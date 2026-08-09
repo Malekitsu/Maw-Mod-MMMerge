@@ -88,13 +88,17 @@ function getCritInfo(pl, dmgType, monLvl)
 		end
 	end
 
-	-- axe bonus
+	-- axe bonus: either hand grants it, a second axe does not grant it again
+	-- (unlike the dagger crit chance above, which is per hand on purpose)
 	if not dmgType then
-		local it = pl:GetActiveItem(1)
-		if it and (table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number)) then
-			local s, m = SplitSkill(pl:GetSkill(const.Skills.Axe))
-			if m == 4 then
-				critDamageMultiplier = critDamageMultiplier + math.min(0.01* cap / diminishingLevel, 0.05) *s
+		for i = 0, 1 do
+			local it = pl:GetActiveItem(i)
+			if it and (table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number)) then
+				local s, m = SplitSkill(pl:GetSkill(const.Skills.Axe))
+				if m == 4 then
+					critDamageMultiplier = critDamageMultiplier + math.min(0.01* cap / diminishingLevel, 0.05) *s
+				end
+				break
 			end
 		end
 	end
