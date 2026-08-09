@@ -436,6 +436,26 @@ function GetEnchantTierCap()
 	return math.min(20+bonusCap,#encStrUp), cap2
 end
 
+function RollEnchantType(it, exclude)
+	local highest=GetItemEquipStat(it)==10 and 16 or 10
+	local id
+	repeat
+		id=math.random(1,highest)
+	until id~=exclude
+	return id
+end
+
+function RollStatFromList(list, exclude)
+	if #list<=1 then
+		return list[1]
+	end
+	local id
+	repeat
+		id=list[math.random(1,#list)]
+	until id~=exclude
+	return id
+end
+
 function GetTier(level)
 	local maxTier, cap2=GetEnchantTierCap()
 	return math.min(math.floor(level/18), cap2, maxTier)
@@ -798,7 +818,7 @@ function events.ItemGenerated(t)
 		p3=p3^(1/diffMult)
 		
 		if p1>roll1 then
-			it.Bonus=math.random(1,16)
+			it.Bonus=RollEnchantType(it)
 			it.BonusStrength=rollEnchantStrength(pseudoStr)
 			if math.random(1,10)==10 then
 				it.Bonus=math.random(17,24)
@@ -814,7 +834,7 @@ function events.ItemGenerated(t)
 		if p2>roll2 then
 			local enc2Strength=rollEnchantStrength(pseudoStr)
 			--bonus type
-			SetEnc2(it,math.random(1,16),enc2Strength)
+			SetEnc2(it,RollEnchantType(it, it.Bonus),enc2Strength)
 			--[[ no skill bonuses
 			if math.random(1,10)==10 then
 				it.Charges=math.random(17,24)*1000
@@ -846,12 +866,13 @@ function events.ItemGenerated(t)
 			bossLoot=false
 		end
 	
+		lootMultiplier=lootMultiplier or 1
 		ancientRoll=math.random()
 		if ancientRoll<=ancientChance or OmnipotentLoot then
 			ancient=true
 			local enc2Strength=rollEnchantStrength(pseudoStr, 1)
-			SetEnc2(it,math.random(1,16),enc2Strength)
-			it.Bonus=math.random(1,16)
+			it.Bonus=RollEnchantType(it)
+			SetEnc2(it,RollEnchantType(it, it.Bonus),enc2Strength)
 			it.BonusStrength=rollEnchantStrength(pseudoStr, 1)
 			power=2
 			chargesBonus=math.random(1,5)
@@ -883,17 +904,20 @@ function events.ItemGenerated(t)
 		
 		
 		--primordial item
-		primordial=math.random()
 		primordialChance=ancientChance/4^(1/diffMult^0.5)
-		if primordial<=primordialChance or OmnipotentLoot then
+		vars.primordialPityCounter=vars.primordialPityCounter or 0
+		primordial=pity_chance(primordialChance, vars.primordialPityCounter)*lootMultiplier^0.5
+		if math.random()<=primordial or OmnipotentLoot then
+			if not OmnipotentLoot then
+				vars.primordialPityCounter=0
+			end
 			if ancient then
 				it.MaxCharges=it.MaxCharges-chargesBonus
 			end
 			SetAncientTier(it,2)
 			local enc2Strength=rollEnchantStrength(pseudoStr, 2)
-			SetEnc2(it,math.random(1,16),enc2Strength)
-
-			it.Bonus=math.random(1,16)
+			it.Bonus=RollEnchantType(it)
+			SetEnc2(it,RollEnchantType(it, it.Bonus),enc2Strength)
 			it.BonusStrength=rollEnchantStrength(pseudoStr, 2)
 			it.MaxCharges=math.min(maxChargesCap,math.min(it.MaxCharges+5, it.MaxCharges*1.25), it.MaxCharges+10)
 			--apply special enchant
@@ -906,16 +930,13 @@ function events.ItemGenerated(t)
 				roll=math.random(1,#primordialArmorEnchants)
 				it.Bonus2=primordialArmorEnchants[roll]
 			end
-		end			
-		
-		--loot multiplier
-		lootMultiplier=lootMultiplier or 1
-		--legendary
-		if IsPrimordialItem(it) then
-			-- Initialize pity protection
+		elseif primordialChance>0 then
+			vars.primordialPityCounter=vars.primordialPityCounter+lootMultiplier
+		end
+
+		do
 			vars.legendaryPityCounter = vars.legendaryPityCounter or 0
-			
-			-- Reduced base chances (roughly 50% of original)
+
 			local baseChance=0.05
 			if vars.AusterityMode then
 				baseChance=0
@@ -930,10 +951,8 @@ function events.ItemGenerated(t)
 			if Game.HouseScreen==2 or Game.HouseScreen==95 then
 				baseChance=0
 			end
-			local chance = pity_chance(baseChance, vars.legendaryPityCounter)
+			local chance = pity_chance(baseChance*primordialChance, vars.legendaryPityCounter)
 			chance=chance*lootMultiplier^0.5
-			-- Apply pity protection using new pity system
-			
 			if chance>=math.random() or OmnipotentLoot then
 				-- Reset pity counter on successful drop
 				if not OmnipotentLoot then
@@ -955,38 +974,14 @@ function events.ItemGenerated(t)
 						it.Bonus2=46
 					end
 				end
-				local relevantStats={1,2,3,4,5,6,7,8,10}
 				it.MaxCharges=round(math.min(maxChargesCap,it.MaxCharges*1.2,it.MaxCharges+10))
-				local roll=math.random(1,3)
-				if roll==1 then
-					local stats={1, 5, 6, 7}
-					if GetItemEquipStat(it)==10 then
-						stats={1, 5, 6, 7, 11, 12, 13, 14, 15, 16}
-					end
-					it.Bonus=stats[math.random(1,4)]
-					SetEnc2Type(it,stats[math.random(1,#stats)])
-				elseif roll==2 then
-					local stats={4, 6, 8, 10}
-					if GetItemEquipStat(it)==10 then
-						stats={1, 5, 6, 7, 11, 12, 13, 14, 15, 16}
-					end
-					it.Bonus=stats[math.random(1,4)]
-					SetEnc2Type(it,stats[math.random(1,#stats)])
-				elseif roll==3 then
-					local stats={2, 3, 4, 6, 7}
-					if GetItemEquipStat(it)==10 then
-						stats={1, 5, 6, 7, 11, 12, 13, 14, 15, 16}
-					end
-					it.Bonus=stats[math.random(1,5)]
-					SetEnc2Type(it,stats[math.random(1,#stats)])
-					if it.Bonus==2 and GetEnc2Type(it)==3 then
-						it.Bonus=GetEnc2Type(it)
-					end
+				local statSets={{1, 5, 6, 7}, {4, 6, 8, 10}, {2, 3, 4, 6, 7}}
+				local stats=statSets[math.random(1,#statSets)]
+				if GetItemEquipStat(it)==10 then
+					stats={1, 5, 6, 7, 11, 12, 13, 14, 15, 16}
 				end
-				--increase stats
-				local enc2Type,enc2Strength=GetEnc2(it)
-				SetEnc2(it,enc2Type,enc2Strength+math.min(math.ceil(enc2Strength*0.2),10))
-				it.BonusStrength=math.min(math.ceil(it.BonusStrength*1.2),it.BonusStrength+10)
+				it.Bonus=RollStatFromList(stats)
+				SetEnc2Type(it,RollStatFromList(stats, it.Bonus))
 			elseif baseChance > 0 then
 				-- Only increment pity counter if legendaries are enabled but roll failed
 				vars.legendaryPityCounter = vars.legendaryPityCounter + lootMultiplier
@@ -994,19 +989,17 @@ function events.ItemGenerated(t)
 		end
 		--celestial
 		if HasLegendaryAffix(it) and not IsCelestialItem(it) then
-			vars.celestialPityCounter = vars.celestialPityCounter or 0
+			vars.celestialPityCounter=vars.celestialPityCounter or 0
 			local baseChance=0.1
-			local chance = pity_chance(baseChance, vars.celestialPityCounter)
-			chance = chance * lootMultiplier^0.5
-			
-			
+			local chance=pity_chance(baseChance, vars.celestialPityCounter)*lootMultiplier^0.5
 			if math.random()<chance or OmnipotentLoot then
 				SetCelestialItem(it,true)
+				SetAncientTier(it,2)
 				if not OmnipotentLoot then
-					vars.celestialPityCounter = 0
+					vars.celestialPityCounter=0
 				end
 			else
-				vars.celestialPityCounter = vars.celestialPityCounter + lootMultiplier
+				vars.celestialPityCounter=vars.celestialPityCounter+lootMultiplier
 			end
 		end
 		lootMultiplier=1 --reset
@@ -1409,14 +1402,19 @@ function updateCelestialItem(it,pl)
 		if vars.insanityMode then
 			mult=3
 		end
+
+		if IsPrimordialItem(it) then
+			mult=mult*PRIMORDIAL_ENCHANT_MULT
+		end
+		local strength=math.round(tier*mult*slotMult)
 		if it.Bonus>0 and it.BonusStrength>0 then
-			it.BonusStrength=math.round(tier*mult*slotMult)
+			it.BonusStrength=strength
 			if it.Bonus>=17 then
 				it.BonusStrength=math.round(it.BonusStrength/10)
 			end
 		end
 		if HasEnc2(it) then
-			SetEnc2Strength(it,math.min(math.round(tier*mult*slotMult),ENC2_MAX_STRENGTH))
+			SetEnc2Strength(it,math.min(strength,ENC2_MAX_STRENGTH))
 		end
 		local cap=180 
 		if vars.madnessMode then
@@ -4369,8 +4367,13 @@ print(mean)
 
 ]]
 
+--Each failure raises the chance; the exponent is picked so that the AVERAGE
+--wait stays at 1/chance (within 2% for every rate in use, from 0.5% to 12%).
+--At 1.45 the curve started so far under the nominal chance that it cost ~10%
+--more rolls than having no pity at all.
+local PITY_EXPONENT = 1.38
 function pity_chance(chance, failures)
-	local successChance=chance^(1.45-chance*failures*0.5)
+	local successChance=chance^(PITY_EXPONENT-chance*failures*0.5)
 	return successChance
 end
 

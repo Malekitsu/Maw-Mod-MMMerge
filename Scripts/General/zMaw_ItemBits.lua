@@ -75,81 +75,136 @@ function ClearEnc2(it)
 end
 
 ------------------------------------------------------------------------
--- BonusExpireTime -- item tier / legendary affix / celestial. The field
--- carries other meanings per item class (artifact level, map affix,
--- vanilla expiry) which read it directly: NOTES.md, ItemFields.lua.
+-- BonusExpireTime -- item rarity. Tier, legendary affix and celestial now
+-- live side by side instead of overwriting each other: setting one keeps
+-- the others.
 --
---   0        nothing        1  ancient        2  primordial
---   11-35    legendary affix (rolled 1-25 + LEGENDARY_AFFIX_BASE, the
---            same ids legendaryEffects is keyed by)
---   +100     celestial (exactly 100 = celestial with no affix)
+--   bit 30    marker: this value is rarity data
+--   bits 0-5  legendary affix, 1-25 (0 = none)
+--   bits 6-7  tier: 0 none, 1 ancient, 2 primordial
+--   bit 8     celestial
+--
+-- The same field also carries an artifact's level, a map affix id and the
+-- vanilla bonus expiry. Those are plain numbers with no marker, so they read
+-- as "no rarity". Values written before the marker existed are still
+-- understood (0/1/2 tier, 11-35 affix, +100 celestial) so old saves keep
+-- their items -- except on artifacts, where the number is a level and never
+-- was a rarity.
 ------------------------------------------------------------------------
+local RARITY_MARKER = 0x40000000
+local RARITY_AFFIX_MAX = 0x3F		--bits 0-5
+local RARITY_TIER_SHIFT = 6
+local RARITY_TIER_MAX = 3		--bits 6-7
+local RARITY_CELESTIAL = 0x100		--bit 8
 
 LEGENDARY_AFFIX_BASE = 10
 CELESTIAL_OFFSET = 100
 
--- Ancient (1) / primordial (2) weapon tier; 0 for everything else.
-function GetAncientTier(it)
-	local v = it.BonusExpireTime
-	if v == 1 or v == 2 then
-		return v
+--mawArtifacts is defined later in load order, so the set is built on demand
+local artifactSet
+local function isArtifact(it)
+	if artifactSet == nil then
+		if not mawArtifacts then
+			return false
+		end
+		artifactSet = {}
+		for _, number in ipairs(mawArtifacts) do
+			artifactSet[number] = true
+		end
 	end
-	return 0
+	return artifactSet[it.Number] == true
+end
+
+--tier, affix (1-25, 0 for none), celestial
+local function DecodeRarity(it)
+	local v = it.BonusExpireTime or 0
+	if bit.band(v, RARITY_MARKER) ~= 0 then
+		return bit.band(bit.rshift(v, RARITY_TIER_SHIFT), RARITY_TIER_MAX),
+			bit.band(v, RARITY_AFFIX_MAX),
+			bit.band(v, RARITY_CELESTIAL) ~= 0
+	end
+	if v <= 0 or isArtifact(it) then
+		return 0, 0, false
+	end
+	--legacy layout
+	local celestial = v >= CELESTIAL_OFFSET and v < CELESTIAL_OFFSET*2
+	local base = celestial and v - CELESTIAL_OFFSET or v
+	if base > LEGENDARY_AFFIX_BASE and base < CELESTIAL_OFFSET then
+		return 0, base - LEGENDARY_AFFIX_BASE, celestial
+	elseif base == 1 or base == 2 then
+		return base, 0, celestial
+	end
+	return 0, 0, celestial
+end
+
+local function EncodeRarity(tier, affix, celestial)
+	tier = math.max(0, math.min(math.floor(tier or 0), RARITY_TIER_MAX))
+	affix = math.max(0, math.min(math.floor(affix or 0), RARITY_AFFIX_MAX))
+	if tier == 0 and affix == 0 and not celestial then
+		return 0
+	end
+	return RARITY_MARKER + bit.lshift(tier, RARITY_TIER_SHIFT) + affix
+		+ (celestial and RARITY_CELESTIAL or 0)
+end
+
+local function SetRarity(it, tier, affix, celestial)
+	it.BonusExpireTime = EncodeRarity(tier, affix, celestial)
+end
+
+-- Ancient (1) / primordial (2) tier; 0 for everything else.
+function GetAncientTier(it)
+	return (DecodeRarity(it))
 end
 
 function IsAncientItem(it)
-	return it.BonusExpireTime == 1
+	return GetAncientTier(it) == 1
 end
 
 function IsPrimordialItem(it)
-	return it.BonusExpireTime == 2
+	return GetAncientTier(it) == 2
 end
 
--- Legendary affix stored as id 11-35 (+100 when celestial). The dominant
--- legacy gate is ">10 and <1000".
 function HasLegendaryAffix(it)
-	local v = it.BonusExpireTime
-	return v > LEGENDARY_AFFIX_BASE and v < 1000
+	local _, affix = DecodeRarity(it)
+	return affix > 0
 end
 
--- The affix id (11-35) with the celestial hundred stripped; 0 if none.
+-- The affix id as legendaryEffects keys it (11-35); 0 if none.
 function GetLegendaryAffix(it)
-	if HasLegendaryAffix(it) then
-		return it.BonusExpireTime % CELESTIAL_OFFSET
+	local _, affix = DecodeRarity(it)
+	if affix > 0 then
+		return affix + LEGENDARY_AFFIX_BASE
 	end
 	return 0
 end
 
 function IsCelestialItem(it)
-	local v = it.BonusExpireTime
-	return v >= CELESTIAL_OFFSET and v < CELESTIAL_OFFSET * 2
+	local _, _, celestial = DecodeRarity(it)
+	return celestial
 end
 
--- Ancient (1) / primordial (2); any other value clears the field.
+-- Ancient (1) / primordial (2); any other value clears the tier. Affix and
+-- celestial are kept.
 function SetAncientTier(it, tier)
-	it.BonusExpireTime = (tier == 1 or tier == 2) and tier or 0
+	local _, affix, celestial = DecodeRarity(it)
+	SetRarity(it, (tier == 1 or tier == 2) and tier or 0, affix, celestial)
 end
 
--- Writes a stored affix id (11-35); 0 removes the affix. Whatever tier the
--- item carried is replaced, the celestial hundred is kept.
+-- Takes a stored affix id (11-35); 0 removes the affix. Tier and celestial
+-- are kept.
 function SetLegendaryAffix(it, affix)
-	affix = (affix and affix > 0) and affix % CELESTIAL_OFFSET or 0
-	it.BonusExpireTime = (IsCelestialItem(it) and CELESTIAL_OFFSET or 0) + affix
+	local tier, _, celestial = DecodeRarity(it)
+	affix = (affix and affix > LEGENDARY_AFFIX_BASE) and affix - LEGENDARY_AFFIX_BASE or 0
+	SetRarity(it, tier, affix, celestial)
 end
 
--- Adds/removes the celestial hundred, keeping the tier or affix underneath.
--- Returns false (item untouched) when the item is not in a state for it.
+-- Adds/removes celestial, keeping tier and affix. Returns false (item
+-- untouched) when it already is in the requested state.
 function SetCelestialItem(it, on)
-	if on then
-		if it.BonusExpireTime >= CELESTIAL_OFFSET then
-			return false
-		end
-		it.BonusExpireTime = it.BonusExpireTime + CELESTIAL_OFFSET
-	else
-		if not IsCelestialItem(it) then
-			return false
-		end
-		it.BonusExpireTime = it.BonusExpireTime - CELESTIAL_OFFSET
+	local tier, affix, celestial = DecodeRarity(it)
+	if celestial == (on and true or false) then
+		return false
 	end
+	SetRarity(it, tier, affix, on)
 	return true
 end
