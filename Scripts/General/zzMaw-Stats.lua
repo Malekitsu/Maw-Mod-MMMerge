@@ -1383,8 +1383,8 @@ end
 function getBodyHealing(lvl, spellId, mastery)
 	local health=getPlayerExtimatedHealth(lvl)
 	
-	-- Skills equal to level^0.675 for both body and ascension (Learning)
-	local skill = lvl^0.675
+
+	local skill = estimateSkill(lvl)
 	local bodySkill = skill
 	local learningSkill = skill	
 		

@@ -26,10 +26,25 @@ local function masterLearned()
 	return 12
 end
 
---Weapon damage from an ITEM LEVEL. The live path (zzMaw-Items GetWeaponDamage)
---and the estimator both call this, so the curve, the damping and the 1h
---halving live in one place. Below stat 25 the engine breakpoints go negative:
---a weapon never subtracts, hence the clamp.
+function skillPointsAtLevel(lvl)
+	if lvl < 2 then
+		return 0
+	end
+	local q = math.floor(lvl/10)
+	local r = lvl - q*10
+	return 5*(lvl-1) + 5*q*(q-1) + q*(r+1)
+end
+
+function skillLevelFromPoints(points)
+	return math.floor((math.sqrt(1 + 8*(points+1)) - 1)/2)
+end
+
+local SKILLS_TRAINED = 5
+function estimateSkill(lvl)
+	return skillLevelFromPoints(skillPointsAtLevel(lvl)/SKILLS_TRAINED)
+end
+
+
 function getWeaponDamageForLevel(itemLevel, twoHanded)
 	local damage = math.max(Game.GetStatisticEffect(estimateStat(itemLevel)), 0)
 	if not twoHanded then
@@ -85,7 +100,7 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 	local extimatedHealthBonus=healthPower*math.min(1+healthPower/50,5)*4	
 	
 	local enduranceEffect=extimatedEndurance/5
-	local skill=lvl^0.7
+	local skill=estimateSkill(lvl)
 	local bbMasteryBonus=math.min(1+skill/masterLearned()*2,3) --use master as a reference
 	local bbPercentBonus=bodybuildingHP[math.floor(bbMasteryBonus)]
 	health=health+(enduranceEffect+bbMasteryBonus)*scalingHP+extimatedHealthBonus
@@ -194,7 +209,7 @@ local EXPECTED_WEAPON_DICE = 3		--only feeds the +diceCount/2 floor of a roll
 
 function getPlayerEstimatedPower(lvl)
 	local F = MawCore.Formulas
-	local skill = lvl^0.7
+	local skill = estimateSkill(lvl)
 	local mL = masterLearned()
 
 	local itemLevel = lvl
