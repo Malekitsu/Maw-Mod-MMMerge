@@ -3890,7 +3890,7 @@ function mawTick_RestoreProjectiles()
 				if Party[j]:GetIndex()==id then
 					local pl=Party[j]
 					local s,m=SplitSkill(pl.Skills[const.Skills.Bow])
-					if m==4 then
+					if m>=4 then
 						obj.Type=550
 						obj.TypeIndex=427
 					end
@@ -4003,7 +4003,7 @@ function events.PlayerAttacked(t)
 			vars.retaliation[id]["Time"]=vars.retaliation[id]["Time"] or Game.Time
 			vars.retaliation[id]["Stacks"]=vars.retaliation[id]["Stacks"]+1
 			local cap=1
-			if m==4 then
+			if m>=4 then
 				cap=3
 			end
 			vars.retaliation[id]["Stacks"]=math.min(vars.retaliation[id]["Stacks"],cap)

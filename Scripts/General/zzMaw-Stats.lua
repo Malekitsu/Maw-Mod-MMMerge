@@ -95,7 +95,7 @@ function getCritInfo(pl, dmgType, monLvl)
 			local it = pl:GetActiveItem(i)
 			if it and (table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number)) then
 				local s, m = SplitSkill(pl:GetSkill(const.Skills.Axe))
-				if m == 4 then
+				if m >= 4 then
 					critDamageMultiplier = critDamageMultiplier + math.min(0.01* cap / diminishingLevel, 0.05) *s
 				end
 				break
@@ -402,7 +402,7 @@ function events.BuildStatInformationBox(t)
 		end
 		local skill=Party[i]:GetSkill(const.Skills.Meditation)
 		local s,m=SplitSkill(skill)
-		if m==4 then
+		if m>=4 then
 			m=5
 		end
 		local medRegen = round(fullSP^0.35*s^1.4*(m+1)/20)+2
@@ -1211,7 +1211,7 @@ function calcPowerVitality(pl, statsMenu)
 		if spellIndex==111 then
 			if mastery==3 then
 				power=power/3*5
-			elseif mastery==4 then
+			elseif mastery>=4 then
 				power=power/3*7
 			end
 		end

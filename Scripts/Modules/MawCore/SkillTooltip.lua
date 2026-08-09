@@ -286,7 +286,7 @@ SkillTooltip.set(6, 5, function(pl)
 	local txt = "\n\n"
 	if m == 3 then
 		txt = txt .. "Chance to Stun: " .. chance .. "%"
-	elseif m == 4 then
+	elseif m >= 4 then
 		txt = txt .. "Chance to Paralyze: " .. chance .. "%"
 	end
 	return maceGMtxt .. StrColor(0, 0, 0, txt)

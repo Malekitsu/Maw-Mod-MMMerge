@@ -75,7 +75,7 @@ function events.UseMouseItem(t)
 	local bonusDuration=0
 	for i=0,Party.High do
 		local s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Alchemy))
-		if m==4 then
+		if m>=4 then
 			bonusDuration = math.max(bonusDuration, const.Minute * 6 * s)
 		end
 	end
@@ -529,7 +529,7 @@ function mawTick_ReagentPower()
 		local bonus=0
 		if m==3 then
 			bonus=s*0.5
-		elseif m==4 then
+		elseif m>=4 then
 			bonus=s
 		end
 		if it.Mod1DiceCount+bonus>255 then
@@ -602,7 +602,7 @@ function events.MonsterKilled(mon)
 			end
 		end
 	end
-	if dropPossible and m==4 then
+	if dropPossible and m>=4 then
 		local chance=0.002
 		if chance>math.random() then
 			local obj = SummonItem(1069, mon.X, mon.Y, mon.Z + 100, 100)

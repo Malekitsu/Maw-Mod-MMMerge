@@ -255,7 +255,7 @@ function events.GetAttackDelay(t)
 					end
 					
 					--unarmed working with staff GM
-					if skill==0 and m==4 and not speedSkillPaid[const.Skills.Unarmed] then
+					if skill==0 and m>=4 and not speedSkillPaid[const.Skills.Unarmed] then
 						speedSkillPaid[const.Skills.Unarmed]=true
 						local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Unarmed))
 						bonusSpeed=bonusSpeed+skillRecovery[const.Skills.Unarmed][m]*s
@@ -1075,7 +1075,7 @@ function events.PlayerAttacked(t)
 				vars.retaliation[id]["Time"]=Game.Time
 				vars.retaliation[id]["Stacks"]=vars.retaliation[id]["Stacks"]+1
 				local cap=1
-				if m==4 then
+				if m>=4 then
 					cap=3
 				end
 				vars.retaliation[id]["Stacks"]=math.min(vars.retaliation[id]["Stacks"],cap)
@@ -1829,7 +1829,7 @@ function events.GetMerchantTotalSkill(t)
 			end
 		end
 		if tot>maxMerchantSkill then
-			if m==4 or tot>=45 then
+			if m>=4 or tot>=45 then
 				maxMerchantSkill=100
 			else
 				maxMerchantSkill=tot
@@ -2524,7 +2524,7 @@ function events.GetSkill(t)
 		local s,m=SplitSkill(pl:GetSkill(35))
 		local requirementS=SplitSkill(pl.Skills[35])
 		local s2,m2=SplitSkill(pl.Skills[t.Skill])
-		if requirementS>=requirement and m==4 then
+		if requirementS>=requirement and m>=4 then
 			t.Result=math.min(t.Result + math.floor(s/10), JoinSkill(s2*2,m2))
 		end
 	end

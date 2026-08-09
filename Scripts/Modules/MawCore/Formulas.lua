@@ -72,7 +72,7 @@ end
 
 -- Meditation skill: SP/sec (GM counts as mastery 5).
 function Formulas.spRegenPerSec(fullSP, s, m)
-	if m == 4 then
+	if m >= 4 then
 		m = 5
 	end
 	return fullSP^0.35 * s^1.4 * ((m+1)/200) + 0.2

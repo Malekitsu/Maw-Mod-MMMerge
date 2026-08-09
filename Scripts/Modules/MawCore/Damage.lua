@@ -525,7 +525,7 @@ local function stage_resAndRetaliation(t)
 			skill=it:T().Skill
 				if skill==const.Skills.Bow then
 					local s,m=SplitSkill(t.Player.Skills[const.Skills.Bow])
-					if m==4 then
+					if m>=4 then
 						res=math.min(t.Monster.Resistances[0]%1000, t.Monster.Resistances[4])
 					end
 				end
@@ -541,7 +541,7 @@ local function stage_resAndRetaliation(t)
 			local skill=it:T().Skill
 			if skill==const.Skills.Spear then
 				local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spear))
-				if m==4 then
+				if m>=4 then
 					local id=t.Monster:GetIndex()
 					mapvars.originalResistance=mapvars.originalResistance or {}
 					mapvars.originalResistance[id]=mapvars.originalResistance[id] or t.Monster.Resistances[index]
@@ -670,7 +670,7 @@ local function stage_dragonAttack(t)
 				local mult=0.85
 				if m<=2 then
 					mult=0.7
-				elseif m==4 then
+				elseif m>=4 then
 					mult=1
 				end
 				damage=damage*mult
@@ -802,7 +802,7 @@ local function stage_dkAttack(t)
 				if graspDuration > 0 then
 					t.Monster.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime, Game.Time+graspDuration)
 					local s, m=SplitSkill(pl.Skills[const.Skills.Dark])
-					if m==4 then
+					if m>=4 then
 						t.Monster.SpellBuffs[const.MonsterBuff.MeleeOnly].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.MeleeOnly].ExpireTime, Game.Time+graspDuration)
 					end
 				end

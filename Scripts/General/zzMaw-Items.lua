@@ -2524,7 +2524,7 @@ local function addWeaponRows(pl, index, it, txt, tab, floorPaid)
 	--armsmaster
 	local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
 	local requirement=GetArmsmasterSupremeRequirement()
-	if pl.Class>=16 and pl.Class<=19 and s>=requirement and m==4 then
+	if pl.Class>=16 and pl.Class<=19 and s>=requirement and m>=4 then
 		m=5
 	end
 	--weapon
@@ -2534,7 +2534,7 @@ local function addWeaponRows(pl, index, it, txt, tab, floorPaid)
 		bonus=bonus+s2
 	end
 	if skill==0 then
-		if m2==4 then
+		if m2>=4 then
 			s,m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
 			s=s/2
 		else
@@ -2799,7 +2799,7 @@ local function addHP(pl, id, tab, enduranceStatBuff)
 
 	local s,m=SplitSkill(pl:GetSkill(const.Skills.Bodybuilding))
 	local m2=m
-	if m==4 then
+	if m>=4 then
 		m2=5
 	end
 	local BBHP=s*m2
@@ -2830,7 +2830,7 @@ local function addMana(pl, tab)
 	local stat=pl:GetPersonality()
 	local effect=Game.GetStatisticEffect(stat)
 	local s2,m2=SplitSkill(pl:GetSkill(const.Skills.Meditation))
-	if m2==4 then
+	if m2>=4 then
 		m2=5
 	end
 	local totalEffect=effect*2+s2*m2
@@ -2869,7 +2869,7 @@ local function addSlotAttackRows(pl, tab)
 					tab[44]=tab[44]+skillAttack[skill][m]*s
 				end
 			end
-			if i==2 and m==4 then --remove vanilla calculation
+			if i==2 and m>=4 then --remove vanilla calculation
 				tab[46]=tab[46]-s
 				tab[47]=tab[47]-s
 			end
@@ -2893,7 +2893,7 @@ local function addMiscAttack(pl, tab)
 	local s,m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
 	local s1,m1 = SplitSkill(pl:GetSkill(const.Skills.Staff))
 	local unarmed=false
-	if (m>=1 and not pl:GetActiveItem(0) and not pl:GetActiveItem(1)) or (m1==4 and pl:GetActiveItem(1) and pl:GetActiveItem(1):T().Skill==0 ) then
+	if (m>=1 and not pl:GetActiveItem(0) and not pl:GetActiveItem(1)) or (m1>=4 and pl:GetActiveItem(1) and pl:GetActiveItem(1):T().Skill==0 ) then
 		if m>0 then
 			tab[40]=tab[40]+skillAttack[const.Skills.Unarmed][m]*s
 			tab[41]=tab[41]+skillDamage[const.Skills.Unarmed]*s
@@ -3700,7 +3700,7 @@ function mawStoreShop()
 	merchantFix=false
 	for i=0,Party.High do
 		s,m=SplitSkill(Party[i].Skills[const.Skills.Merchant])
-		if s>15 or m==4 then
+		if s>15 or m>=4 then
 			Game.Houses[id].Val=1
 			merchantFix=true
 		end
@@ -3850,7 +3850,7 @@ function events.CanOpenChest(t)
 		for i=0,Party.High do
 			local s, m = SplitSkill(Party[i]:GetSkill(const.Skills.DisarmTraps))
 			local skill=s*m
-			if m==4 or skill>=skillRequired then
+			if m>=4 or skill>=skillRequired then
 				t.CanOpen=true
 			end
 		end

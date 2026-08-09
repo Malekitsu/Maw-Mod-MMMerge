@@ -231,7 +231,7 @@ function events.PlayerCastSpell(t)
 	if t.SpellId == 53 then
 		if t.TargetKind == 4 and not t.RemoteData then
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
-			if m==4 then
+			if m>=4 then
 				Party[t.TargetId].Unconscious=0
 				Party[t.TargetId].Dead=0
 				Party[t.TargetId].Eradicated=0
@@ -426,7 +426,7 @@ function events.PlayerCastSpell(t)
 	--protection from Magic, no need for online code
 	if t.SpellId==75 and not vars.MAWSETTINGS.buffRework=="ON" then
 		local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Body))
-		if m==4 then
+		if m>=4 then
 			t.Skill=10
 		else
 			t.Skill=math.min(t.Skill,10)
@@ -810,7 +810,7 @@ function doSharedLife(amount, spellQueueData)
 	end		
 	if m==3 then
 		totHeal=totHeal-s*3
-	elseif m==4 then
+	elseif m>=4 then
 		totHeal=totHeal-s*4
 	end
 	totHeal=math.max(totHeal, 0)
@@ -1004,7 +1004,7 @@ function elementalBuffs()
 			if not table.find(dkClass,pl.Class) then
 				for v=1,6 do
 					local s,m=SplitSkill(pl:GetSkill(schools[v]))
-					if m==4 then
+					if m>=4 then
 						local power=s*3
 						if Party.SpellBuffs[buffsOrdered[v]].Power<=s*3 then
 							if Party.SpellBuffs[buffsOrdered[v]].Power<=power then
@@ -1018,7 +1018,7 @@ function elementalBuffs()
 				--stats bonus
 				for key, value in pairs(schoolToBuff) do
 					local s,m=SplitSkill(pl:GetSkill(key))
-					if m==4 then
+					if m>=4 then
 						local power=s*3
 						for k=0, Party.High do
 							if Party[k].SpellBuffs[value].Power<=s*3 then
