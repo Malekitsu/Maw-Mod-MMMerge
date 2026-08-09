@@ -106,10 +106,7 @@ function getCritInfo(pl, dmgType, monLvl)
 			local s2, m2 = getBuffSkill(86)
 			s = math.max(s, s2/1.5)
 			m = math.max(m, m2)
-			if buffPower and buffPower[47] and buffPower[47].Base and buffPower[47].Scaling then
-				local bonus = (buffPower[47].Base[m] or 0)/100 + (buffPower[47].Scaling[m] or 0)*s/1000
-				totalCrit = totalCrit + bonus
-			end
+			totalCrit = totalCrit + GetBuffMultiplier(const.Spells.Fate, s, m)
 		end
 	end
 
@@ -226,7 +223,7 @@ function getSpellDelay(pl,spell)
 			end
 			s=math.max(s,s2/1.5,s3)
 			m=math.max(m,m2,m3)
-			hasteDiv=math.max(1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]*s/1000, hasteDiv)
+			hasteDiv=math.max(1+GetBuffMultiplier(const.Spells.Haste, s, m), hasteDiv)
 		end
 	end
 	local delay=round(oldTable[spell][m]/(1+haste/100)*1.015^ascensionSkill/hasteDiv/enchantMult)*armorDelay
@@ -1032,7 +1029,7 @@ function calcMawDamage(pl,damageKind,originalDamage,rand,monLvl)
 			local s2,m2=getBuffSkill(86)
 			s=math.max(s,s2/1.5)
 			m=math.max(m,m2)
-			damage=damage*math.max(0.85-0.003*s,0.7)
+			damage=damage*math.max(1-GetBuffMultiplier(const.Spells.Shield, s, m),0.7)
 		end
 	else
 		if pl.SpellBuffs[11].ExpireTime>Game.Time or Party.SpellBuffs[14].ExpireTime>Game.Time  then --shield buff

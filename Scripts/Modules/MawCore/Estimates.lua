@@ -15,6 +15,17 @@
 -- Still globals on purpose: legacy files and other MawCore modules
 -- (SkillTooltip, Damage) call them by bare name.
 
+local BUFF_MULT_PER_SKILL = 0.02
+local function buffMult(spellId, s, m)
+	local bf = buffPower[spellId]
+	if not bf then
+		return 0
+	end
+	local th = masteryThresholds()
+	local ramp = math.min(math.max((s-th[2])/(th[3]-th[2]), 0), 1)
+	return bf.Base[m]/100 * ramp * math.min(1 + BUFF_MULT_PER_SKILL*s, 2)
+end
+
 --how fast the average character reaches the next mastery; the estimators use
 --it wherever the real code would read a skill's mastery
 local function masterLearned()
@@ -101,8 +112,9 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 	
 	local enduranceEffect=extimatedEndurance/5
 	local skill=estimateSkill(lvl)
+	local mastery=masteryPerLevel(lvl)
 	local bbMasteryBonus=math.min(1+skill/masterLearned()*2,3) --use master as a reference
-	local bbPercentBonus=bodybuildingHP[math.floor(bbMasteryBonus)]
+	local bbPercentBonus=bodybuildingHP[mastery]
 	health=health+(enduranceEffect+bbMasteryBonus)*scalingHP+extimatedHealthBonus
 	
 	health=health*(1+bbPercentBonus*skill/100)*(1+extimatedEndurance/2500)
@@ -134,7 +146,8 @@ function getPlayerEstimatedVitality(lvl, healthOnly)
 	
 	local divider=math.min(60+lvl*0.5*bolster)
 	local resReduction=resistances/divider+1
-	local shieldBuff=math.max((1-0.006*lvl^0.65),0.7) --starts with no shield gradually into max res at ~400 lvl
+	--Shield buff, same numbers calcMawDamage applies (buffPower, floored at 0.7)
+	local shieldBuff=math.max(1-buffMult(const.Spells.Shield, skill, mastery), 0.7)
 	resReduction=resReduction/shieldBuff
 	local power=estimatedStat/12 
 	
@@ -207,31 +220,33 @@ local EXPECTED_ENCHANT_COEFF = 0.3	--one tier-2 damage enchant (enchantbonusdama
 local EXPECTED_HIT_CHANCE = 0.8
 local EXPECTED_WEAPON_DICE = 3		--only feeds the +diceCount/2 floor of a roll
 
+
 function getPlayerEstimatedPower(lvl)
 	local F = MawCore.Formulas
 	local skill = estimateSkill(lvl)
-	local mL = masterLearned()
+	local m = masteryPerLevel(lvl)	--the mastery that skill level buys
 
 	local itemLevel = lvl
 	local wDmg = getWeaponDamageForLevel(itemLevel, true)	--two-handed reference
 
 	local weaponSkillMult = 1 + skillDamage[const.Skills.Sword]*skill/100
-	local armsMasterDamage = math.min(skill/mL*0.5, 1.5)
-	local armsBase = armsMasterDamage*skill
-	local damage = EXPECTED_WEAPON_DICE/2 + (0.75*wDmg + armsBase)*weaponSkillMult
-
+	local armsBase = armsmasterSkill.Damage[m]*skill
 	local scalable = 0.75*wDmg + armsBase
+	local damage = EXPECTED_WEAPON_DICE/2 + scalable*weaponSkillMult
+
+	--the floor: a weapon skill point is worth at least 1 damage
 	damage = damage + math.max(skill - scalable*(weaponSkillMult-1), 0)
 
+	--MIGHT: flat breakpoint bonus, then the level-normalized percentage
 	local might = estimateStat(lvl)
 	local mightEffect = might/5
-	local heroismBuff = math.min(1 + 0.006*lvl^0.65, 1.3)
+	local heroismBuff = 1 + buffMult(const.Spells.Heroism, skill, m)
 	damage = (damage + mightEffect)*heroismBuff*(1 + GetMightDamageMultiplier(might, lvl))
 
 	local speedEffect = (mightEffect/2)/1000
-	local weaponSpeed = math.min(1 + skill/mL*2, 3)/2*skill/100
-	local armsMasterSpeed = math.min(math.max(skill/mL-1, 0), 2)/2*skill/100
-	local hasteBuff = math.min(1 + 0.004*lvl^0.65, 1.2)
+	local weaponSpeed = skillRecovery[const.Skills.Sword][m]*skill/100
+	local armsMasterSpeed = armsmasterSkill.Speed[m]*skill/100
+	local hasteBuff = 1 + buffMult(const.Spells.Haste, skill, m)
 	damage = damage*(1 + speedEffect + weaponSpeed + armsMasterSpeed)*hasteBuff
 
 	local luck, accuracy = might, might

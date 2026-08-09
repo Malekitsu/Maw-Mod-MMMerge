@@ -1919,7 +1919,7 @@ function ascendSpellDamage(skill, mastery, spell, index)
 	local empowerMult=1
 	if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[28] then
 		local s, m=getBuffSkill(28)
-		empowerMult=1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]/1000*s
+		empowerMult=1+GetBuffMultiplier(const.Spells.Haste, s, m)
 	end
 	
 	diceMin=spellPowers[spell].diceMin*empowerMult
@@ -2488,6 +2488,18 @@ utilityBuffs={16,19,11,18}
 mawPartyBuffList={6,0,17,4,12,1,8,10,14,15,9,13,2,16,19,18}
 mawPartyBuffIgnore={16,19,11,18,10}
 mawSingleBuffList={1,4,11,12,6,10}
+
+--Multiplier buffs (haste, shield, empower, fate, heroism, hammerhands) as a
+--fraction: 0.15 = +15%. Flat base plus the per-skill-point scaling, exactly
+--what the effect sites used to compute inline -- one function so every site
+--(and the tooltips) read the same numbers.
+function GetBuffMultiplier(spellId, s, m)
+	local bf=buffPower[spellId]
+	if not bf then
+		return 0
+	end
+	return bf.Base[m]/100 + bf.Scaling[m]*s/1000
+end
 
 --stat part of the rework buffs: fraction of the total stat granted.
 --10% base, +1% per 5 skill levels (7 for light), capped at 20%

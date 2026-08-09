@@ -2598,7 +2598,7 @@ local function addWeaponRows(pl, index, it, txt, tab)
 		if vars.MAWSETTINGS.buffRework=="ON" then
 			if Party.SpellBuffs[9].ExpireTime>=Game.Time then
 				local s,m=getBuffSkill(51)
-				heroismMult=(buffPower[51].Base[m]/100+buffPower[51].Scaling[m]*s/1000)
+				heroismMult=GetBuffMultiplier(const.Spells.Heroism, s, m)
 				vars.assassinDamage[pl:GetIndex()]=vars.assassinDamage[pl:GetIndex()]*(1+heroismMult)
 			end
 		end
@@ -2998,11 +2998,11 @@ local function applyDamageMultipliers(pl, tab, unarmed)
 		bonusDamage=mightEffect
 		if Party.SpellBuffs[9].ExpireTime>=Game.Time then
 			local s,m=getBuffSkill(51)
-			heroismMult=(buffPower[51].Base[m]/100+buffPower[51].Scaling[m]*s/1000)
+			heroismMult=GetBuffMultiplier(const.Spells.Heroism, s, m)
 		end
 		if pl.SpellBuffs[6].ExpireTime>=Game.Time and unarmed then
 			local s,m=getBuffSkill(73)
-			unarmedMult=(buffPower[73].Base[m]/100+buffPower[73].Scaling[m]*s/1000)
+			unarmedMult=GetBuffMultiplier(const.Spells.Hammerhands, s, m)
 		end
 	end
 	local shamanSpiritMult=0

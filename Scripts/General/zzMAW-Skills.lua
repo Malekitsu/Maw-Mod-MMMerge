@@ -344,7 +344,7 @@ function events.GetAttackDelay(t)
 			end
 			s=math.max(s,s2/1.5,s3)
 			m=math.max(m,m2,m3)
-			hasteMult=math.max(1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]*s/1000, hasteMult)
+			hasteMult=math.max(1+GetBuffMultiplier(const.Spells.Haste, s, m), hasteMult)
 		end
 		totalSpeed=totalSpeed/hasteMult
 	end
