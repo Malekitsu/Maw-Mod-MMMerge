@@ -89,7 +89,7 @@ end
 Timer(evt.map[1000].last, const.Minute*0.5)
 
 --fort
-Game.PlaceMonTxt[301]="Goblin's Liutenant"
+Game.PlaceMonTxt[301]="Goblin's Lieutenant"
 if not mapvars.maw then
 	mapvars.maw=true
 	mawmapvarsend("maw",true)

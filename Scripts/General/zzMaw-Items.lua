@@ -379,10 +379,6 @@ function events.GameInitialized2()
 	enchants[6]={3}
 end
 
---create enchant table
---Enchant strength per tier. BeforeLoadMap swaps the whole set for austerity,
---so both variants are named here instead of being written out a second time
---inside the handler -- that copy silently won and undid changes made here.
 encStrUpNormal={3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87,90,93,96,99,102,105,108,111,114,117,120,123,126,129,132,135,138,141,144,147,150}
 encStrUpAusterity={3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60}
 encStrUp=encStrUpNormal
@@ -399,6 +395,8 @@ local function rollEnchantStrength(tier, ancientTier)
 		return round(applyDifficulty(encStrUp[tier])*PRIMORDIAL_ENCHANT_MULT)
 	elseif ancientTier==1 then
 		return round(applyDifficulty(encStrUp[tier])*math.random(20,PRIMORDIAL_ENCHANT_MULT*20)/20)
+	elseif ancientTier==3 then
+		return round(applyDifficulty(encStrUp[tier])*math.random(16,20)/20)
 	end
 	return applyDifficulty(round(encStrUp[tier]*math.random(8,20)/20))
 end
@@ -434,6 +432,98 @@ function GetEnchantTierCap()
 		bonusCap=42
 	end
 	return math.min(20+bonusCap,#encStrUp), cap2
+end
+
+RARITY_UNCOMMON, RARITY_RARE, RARITY_EPIC = 1, 2, 3
+RARITY_ANCIENT, RARITY_PRIMORDIAL, RARITY_LEGENDARY, RARITY_CELESTIAL = 4, 5, 6, 7
+
+rarityChance = {
+	[RARITY_CELESTIAL]  = 0.001,
+	[RARITY_LEGENDARY]  = 0.02,
+	[RARITY_PRIMORDIAL] = 0.03,
+	[RARITY_ANCIENT]    = 0.16,
+}
+
+local rarityDifficultyMult = {
+	[1] = 1,	--bolster 40
+	[2] = 1,	--bolster 70
+	[3] = 1,	--bolster 100, baseline
+	[4] = 1.1,	--bolster 150
+	[5] = 1.2,	--bolster 200
+	[6] = 1.4,	--bolster 300
+	[7] = 1.6,	--doom
+	[8] = 2,	--road to insanity
+	[9] = 2,	--beyond madness
+}
+
+local rarityPityField = {
+	[RARITY_CELESTIAL]  = "celestialPityCounter",
+	[RARITY_LEGENDARY]  = "legendaryPityCounter",
+	[RARITY_PRIMORDIAL] = "primordialPityCounter",
+}
+
+--Which roll rollEnchantStrength should use. These are ids, not a scale: 3 is
+--the legendary roll and sits BELOW 1 (ancient) in strength.
+function GetRarityEnchantTier(rarity)
+	if rarity==RARITY_PRIMORDIAL or rarity==RARITY_CELESTIAL then
+		return 2
+	elseif rarity==RARITY_ANCIENT then
+		return 1
+	elseif rarity==RARITY_LEGENDARY then
+		return 3
+	end
+	return 0
+end
+
+function GetRarityMultiplier(pseudoStr, bossLoot)
+	local tierFactor=enc1Chance[math.min(pseudoStr,#enc1Chance)]/enc1Chance[#enc1Chance]
+	local mult=(rarityDifficultyMult[GetDifficulty()] or 1)*tierFactor*(lootMultiplier or 1)^0.5
+	if bossLoot then
+		mult=mult*5
+	end
+	if mapvars and mapvars.mapAffixes then
+		local nAff=0
+		for i=1,4 do
+			if mapvars.mapAffixes[i]>0 then
+				nAff=nAff+1
+			end
+		end
+		mult=mult*(1+(mapvars.mapAffixes.Power*nAff+nAff*20)/400)
+	end
+	return mult
+end
+
+function RollItemRarity(pseudoStr, bossLoot, noLegendary)
+	local mult=GetRarityMultiplier(pseudoStr, bossLoot)
+	local result=RARITY_EPIC
+	for rarity=RARITY_CELESTIAL, RARITY_ANCIENT, -1 do
+		local base=rarityChance[rarity]
+		if noLegendary and rarity>=RARITY_LEGENDARY then
+			base=0
+		end
+		if base>0 then
+			local field=rarityPityField[rarity]
+			local chance=base
+			if field then
+				vars[field]=vars[field] or 0
+				chance=pity_chance(base, vars[field])
+			end
+			chance=chance*mult
+			if math.random()<chance then
+				if field then
+					vars[field]=0
+				end
+				result=rarity
+				break
+			end
+		end
+	end
+	for rarity, field in pairs(rarityPityField) do
+		if rarity>result and not (noLegendary and rarity>=RARITY_LEGENDARY) then
+			vars[field]=(vars[field] or 0)+mult
+		end
+	end
+	return result
 end
 
 function RollEnchantType(it, exclude)
@@ -788,38 +878,50 @@ function events.ItemGenerated(t)
 			pseudoStr=pseudoStr+1
 		end
 		pseudoStr=math.min(pseudoStr,maxTier) --CAP CURRENTLY AT 20, 22 in doom,42 for mapping
-		roll1=math.random()
-		roll2=math.random()
-		rollSpc=math.random()
 		power=0
-		
-		if bossLoot then
-			roll1=roll1/2
-			roll2=roll1/2
-			rollSpc=roll1/2
-		end
 		--difficulty multiplier 
 		diffMult=math.max((Game.BolsterAmount-100)/500+1,1)
 		if vars.Mode==2 then
 			diffMult=1.8
 		end
-		--[[nerf
-		if vars.insanityMode then
-			diffMult=2
-		end
-		]]
-		--calculate chances
+		lootMultiplier=lootMultiplier or 1
+
+		--the common end: how many of the three enchant chances hit
 		local p1=enc1Chance[math.min(pseudoStr,#enc1Chance)]/100
 		local p2=enc2Chance[math.min(pseudoStr,#enc2Chance)]/100
 		local p3=spcEncChance[math.min(pseudoStr,#spcEncChance)]/100
-		
 		p1=p1^(1/diffMult)
 		p2=p2^(1/diffMult)
 		p3=p3^(1/diffMult)
-		
+		local roll1,roll2,rollSpc=math.random(),math.random(),math.random()
+		if bossLoot then
+			roll1=roll1/2
+			roll2=roll2/2
+			rollSpc=rollSpc/2
+		end
+		local rarity=0
 		if p1>roll1 then
+			rarity=rarity+1
+		end
+		if p2>roll2 then
+			rarity=rarity+1
+		end
+		if p3>rollSpc then
+			rarity=rarity+1
+		end
+		local noLegendary=vars.AusterityMode or Game.HouseScreen==2 or Game.HouseScreen==95
+		if rarity==RARITY_EPIC then
+			rarity=RollItemRarity(pseudoStr, bossLoot, noLegendary)
+		end
+		bossLoot=false
+		if OmnipotentLoot then
+			rarity=RARITY_CELESTIAL
+		end
+		local enchantTier=GetRarityEnchantTier(rarity)
+
+		if rarity>=RARITY_UNCOMMON then
 			it.Bonus=RollEnchantType(it)
-			it.BonusStrength=rollEnchantStrength(pseudoStr)
+			it.BonusStrength=rollEnchantStrength(pseudoStr, enchantTier)
 			if math.random(1,10)==10 then
 				it.Bonus=math.random(17,24)
 				local skill=it:T().Skill
@@ -831,8 +933,8 @@ function events.ItemGenerated(t)
 			end
 		end
 		--apply enchant2
-		if p2>roll2 then
-			local enc2Strength=rollEnchantStrength(pseudoStr)
+		if rarity>=RARITY_RARE then
+			local enc2Strength=rollEnchantStrength(pseudoStr, enchantTier)
 			--bonus type
 			SetEnc2(it,RollEnchantType(it, it.Bonus),enc2Strength)
 			--[[ no skill bonuses
@@ -848,39 +950,16 @@ function events.ItemGenerated(t)
 			it.Charges=0
 		end
 				
-		--ancient item
-		ancient=false
-		ancientChance=(p1*p2*p3)/4^(1/diffMult^0.5)
-		if mapvars.mapAffixes then
-			local nAff=0
-			for i=1,4 do
-				if mapvars.mapAffixes[i]>0 then
-					nAff=nAff+1
-				end
-			end
-			ancientChance=ancientChance*(1+(mapvars.mapAffixes.Power*nAff+nAff*20)/400)
-		end
-		
-		if bossLoot then
-			ancientChance=ancientChance*5
-			bossLoot=false
-		end
-	
-		lootMultiplier=lootMultiplier or 1
-		ancientRoll=math.random()
-		if ancientRoll<=ancientChance or OmnipotentLoot then
-			ancient=true
-			local enc2Strength=rollEnchantStrength(pseudoStr, 1)
-			it.Bonus=RollEnchantType(it)
-			SetEnc2(it,RollEnchantType(it, it.Bonus),enc2Strength)
-			it.BonusStrength=rollEnchantStrength(pseudoStr, 1)
+		--the whole rare end rolls its special enchant a couple of tiers up
+		if rarity>=RARITY_ANCIENT then
 			power=2
-			chargesBonus=math.random(1,5)
-			it.MaxCharges=it.MaxCharges+chargesBonus
+		end
+		if rarity==RARITY_ANCIENT then
+			it.MaxCharges=it.MaxCharges+math.random(1,5)
 			SetAncientTier(it,1)
 		end
 		--apply special enchant
-		if p3>rollSpc or ancient then
+		if rarity>=RARITY_EPIC then
 			n=it.Number
 			c=Game.ItemsTxt[n].EquipStat
 			if c<12 then
@@ -903,22 +982,9 @@ function events.ItemGenerated(t)
 		::continue::
 		
 		
-		--primordial item
-		primordialChance=ancientChance/4^(1/diffMult^0.5)
-		vars.primordialPityCounter=vars.primordialPityCounter or 0
-		primordial=pity_chance(primordialChance, vars.primordialPityCounter)*lootMultiplier^0.5
-		if math.random()<=primordial or OmnipotentLoot then
-			if not OmnipotentLoot then
-				vars.primordialPityCounter=0
-			end
-			if ancient then
-				it.MaxCharges=it.MaxCharges-chargesBonus
-			end
+		--primordial item, and the celestial that carries its grade
+		if enchantTier==2 then
 			SetAncientTier(it,2)
-			local enc2Strength=rollEnchantStrength(pseudoStr, 2)
-			it.Bonus=RollEnchantType(it)
-			SetEnc2(it,RollEnchantType(it, it.Bonus),enc2Strength)
-			it.BonusStrength=rollEnchantStrength(pseudoStr, 2)
 			it.MaxCharges=math.min(maxChargesCap,math.min(it.MaxCharges+5, it.MaxCharges*1.25), it.MaxCharges+10)
 			--apply special enchant
 			n=it.Number
@@ -930,77 +996,36 @@ function events.ItemGenerated(t)
 				roll=math.random(1,#primordialArmorEnchants)
 				it.Bonus2=primordialArmorEnchants[roll]
 			end
-		elseif primordialChance>0 then
-			vars.primordialPityCounter=vars.primordialPityCounter+lootMultiplier
 		end
 
-		do
-			vars.legendaryPityCounter = vars.legendaryPityCounter or 0
-
-			local baseChance=0.05
-			if vars.AusterityMode then
-				baseChance=0
+		if rarity>=RARITY_LEGENDARY then
+			vars.legendaryAffixDropped=vars.legendaryAffixDropped or {}
+			for i = 1, LEGENDARY_AFFIX_COUNT do
+				vars.legendaryAffixDropped[i] = vars.legendaryAffixDropped[i] or 0
 			end
-			if vars.Mode==2 then
-				baseChance=0.1
-			end
-			if vars.insanityMode then
-				baseChance=0.125
-			end
-			--No legendary in shop
-			if Game.HouseScreen==2 or Game.HouseScreen==95 then
-				baseChance=0
-			end
-			local chance = pity_chance(baseChance*primordialChance, vars.legendaryPityCounter)
-			chance=chance*lootMultiplier^0.5
-			if chance>=math.random() or OmnipotentLoot then
-				-- Reset pity counter on successful drop
-				if not OmnipotentLoot then
-					vars.legendaryPityCounter = 0
+			legendaryAffix=get_affix(vars.legendaryAffixDropped)
+			vars.legendaryAffixDropped[legendaryAffix]=vars.legendaryAffixDropped[legendaryAffix]+1
+			SetLegendaryAffix(it,legendaryAffix+LEGENDARY_AFFIX_BASE)
+			--adjust bonus 2 if enchant damage legendary
+			if GetLegendaryAffix(it)==19 then
+				if it.Bonus2==40 then
+					it.Bonus2=39
+				elseif it.Bonus2==41 then
+					it.Bonus2=46
 				end
-				-- Initialize counts for each affix
-				vars.legendaryAffixDropped=vars.legendaryAffixDropped or {}
-				for i = 1, LEGENDARY_AFFIX_COUNT do
-					vars.legendaryAffixDropped[i] = vars.legendaryAffixDropped[i] or 0
-				end
-				legendaryAffix=get_affix(vars.legendaryAffixDropped)
-				vars.legendaryAffixDropped[legendaryAffix]=vars.legendaryAffixDropped[legendaryAffix]+1
-				SetLegendaryAffix(it,legendaryAffix+LEGENDARY_AFFIX_BASE)
-				--adjust bonus 2 if enchant damage legendary
-				if GetLegendaryAffix(it)==19 then
-					if it.Bonus2==40 then
-						it.Bonus2=39
-					elseif it.Bonus2==41 then
-						it.Bonus2=46
-					end
-				end
-				it.MaxCharges=round(math.min(maxChargesCap,it.MaxCharges*1.2,it.MaxCharges+10))
-				local statSets={{1, 5, 6, 7}, {4, 6, 8, 10}, {2, 3, 4, 6, 7}}
-				local stats=statSets[math.random(1,#statSets)]
-				if GetItemEquipStat(it)==10 then
-					stats={1, 5, 6, 7, 11, 12, 13, 14, 15, 16}
-				end
-				it.Bonus=RollStatFromList(stats)
-				SetEnc2Type(it,RollStatFromList(stats, it.Bonus))
-			elseif baseChance > 0 then
-				-- Only increment pity counter if legendaries are enabled but roll failed
-				vars.legendaryPityCounter = vars.legendaryPityCounter + lootMultiplier
 			end
+			it.MaxCharges=round(math.min(maxChargesCap,it.MaxCharges*1.2,it.MaxCharges+10))
+			local statSets={{1, 5, 6, 7}, {4, 6, 8, 10}, {2, 3, 4, 6, 7}}
+			local stats=statSets[math.random(1,#statSets)]
+			if GetItemEquipStat(it)==10 then
+				stats={1, 5, 6, 7, 11, 12, 13, 14, 15, 16}
+			end
+			it.Bonus=RollStatFromList(stats)
+			SetEnc2Type(it,RollStatFromList(stats, it.Bonus))
 		end
 		--celestial
-		if HasLegendaryAffix(it) and not IsCelestialItem(it) then
-			vars.celestialPityCounter=vars.celestialPityCounter or 0
-			local baseChance=0.1
-			local chance=pity_chance(baseChance, vars.celestialPityCounter)*lootMultiplier^0.5
-			if math.random()<chance or OmnipotentLoot then
-				SetCelestialItem(it,true)
-				SetAncientTier(it,2)
-				if not OmnipotentLoot then
-					vars.celestialPityCounter=0
-				end
-			else
-				vars.celestialPityCounter=vars.celestialPityCounter+lootMultiplier
-			end
+		if rarity==RARITY_CELESTIAL then
+			SetCelestialItem(it,true)
 		end
 		lootMultiplier=1 --reset
 		
@@ -4373,8 +4398,11 @@ print(mean)
 --more rolls than having no pity at all.
 local PITY_EXPONENT = 1.38
 function pity_chance(chance, failures)
-	local successChance=chance^(PITY_EXPONENT-chance*failures*0.5)
-	return successChance
+	--above 1 the exponent would turn the curve upside down and LOWER it
+	if chance>=1 then
+		return 1
+	end
+	return chance^(PITY_EXPONENT-chance*failures*0.5)
 end
 
 --remove artifacts
