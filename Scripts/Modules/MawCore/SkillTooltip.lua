@@ -282,7 +282,7 @@ SkillTooltip.set(6, 5, function(pl)
 	if m < 3 then
 		return maceGMtxt
 	end
-	local chance = round(s / pl.LevelBase ^ 0.65 * 1500 * meleeMult(pl) / math.min(1 + pl.LevelBase / 150, 3)) / 100
+	local chance = round(s / estimateSkill(pl.LevelBase) * 1500 * meleeMult(pl) / math.min(1 + pl.LevelBase / 150, 3)) / 100
 	local txt = "\n\n"
 	if m == 3 then
 		txt = txt .. "Chance to Stun: " .. chance .. "%"
@@ -346,7 +346,7 @@ local function registerClassBuilders()
 			local m3=SplitSkill(pl.Skills[const.Skills.Water])
 			local lvl=getPartyLevel(4)
 			local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
-			local waterReduction=round(getMonsterDamage(false,(lvl+1))*(m3/lvl^0.65)/avgRed*0.99^(lvl^0.65)/2) --on average 1/2 of a B monster
+			local waterReduction=round(getMonsterDamage(false,(lvl+1))*(m3/estimateSkill(lvl))/avgRed*0.99^estimateSkill(lvl)/2) --on average 1/2 of a B monster
 			return MawSchoolDescBase[14] .. ASC .. "Reduce all damage taken by " .. waterReduction .. "(calculated after resistances)\n"
 		end},
 		[15]={[1]=MawSchoolDescBase[15] .. ASC .. "Increases melee damage 0.5-1-1.5-2 (at N-E-M-GM) per Earth Magic Level\n"},
@@ -389,7 +389,7 @@ local function registerClassBuilders()
 			local spiritS=SplitSkill(pl.Skills[const.Skills.Spirit])
 			local lvl=getTotalLevel()
 			local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
-			local spiritReduction=round(getMonsterDamage(false,(lvl+1))*(spiritS/lvl^0.65)/avgRed/2*0.99^(lvl^0.65)) --on average 1/2 of a B monster
+			local spiritReduction=round(getMonsterDamage(false,(lvl+1))*(spiritS/estimateSkill(lvl))/avgRed/2*0.99^estimateSkill(lvl)) --on average 1/2 of a B monster
 			return MawSchoolDescBase[16] .. "\n\nSeraph Spirit strengthens the Seraph's resolve, shrugging off light hits and softening heavy blows\n" .. "Damage reduction: " .. StrColor(0,255,0,spiritReduction) .. " (applied after resistances)\n"
 		end},
 		[17]={[1]=function(pl)

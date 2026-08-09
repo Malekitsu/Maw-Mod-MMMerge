@@ -263,7 +263,7 @@ local function stage_maceStun(t)
 				local id=t.MonsterIndex
 				local lvl=getMonsterLevel(mon)
 				--chance to paralyze
-				local chance=s/lvl^0.65*0.15*damageMultiplier[t.Player:GetIndex()].Melee/math.min(1+lvl/150,3)
+				local chance=s/estimateSkill(lvl)*0.15*damageMultiplier[t.Player:GetIndex()].Melee/math.min(1+lvl/150,3)
 				local applyParalyze=applyParalyze or {}
 				applyParalyze[id]=false
 				local previousDuration=mon.SpellBuffs[6].ExpireTime
@@ -1790,7 +1790,7 @@ local function pstage_legendariesAndShields(t)
 		local m3=SplitSkill(pl.Skills[const.Skills.Water])
 		local lvl=getTotalLevel()
 		local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
-		local reduction=round(getMonsterDamage(false,(lvl+1))*(m3/lvl^0.65)/avgRed/2*0.99^(lvl^0.65)) --on average 1/2 of a B monster
+		local reduction=round(getMonsterDamage(false,(lvl+1))*(m3/estimateSkill(lvl))/avgRed/2*0.99^estimateSkill(lvl)) --on average 1/2 of a B monster
 		t.Result=math.max(t.Result-reduction, t.Result*0.25)
 	end
 	--seraph code
@@ -1798,7 +1798,7 @@ local function pstage_legendariesAndShields(t)
 		local m3=SplitSkill(pl.Skills[const.Skills.Spirit])
 		local lvl=getTotalLevel()
 		local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
-		local reduction=round(getMonsterDamage(false,(lvl+1))*(m3/lvl^0.65)/avgRed/2*0.99^(lvl^0.65)) --on average 1/2 of a B monster
+		local reduction=round(getMonsterDamage(false,(lvl+1))*(m3/estimateSkill(lvl))/avgRed/2*0.99^estimateSkill(lvl)) --on average 1/2 of a B monster
 		t.Result=math.max(t.Result-reduction, t.Result*0.25)
 	end
 	

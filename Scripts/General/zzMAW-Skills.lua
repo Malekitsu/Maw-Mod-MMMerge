@@ -1238,7 +1238,7 @@ function MawRegen(timePassed)
 			--meditation buff
 			if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[56] and not table.find(classesWithNoMeditationRegen, pl.Class) then
 				local s, m, level=getBuffSkill(56)
-				local level=level^0.65
+				local level=estimateSkill(level)
 				regenSP[i] = regenSP[i] + (FSP^0.35*level^1.4*((buffPower[56].Base[m])/10000) +0.1)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
 			end
 			--dragon regen
@@ -1269,7 +1269,7 @@ function getDragonRegenLeech(pl, targetLevel)
 	local regen=SplitSkill(pl:GetSkill(const.Skills.Regeneration))
 	if regen<=0 then return 0 end
 	local lvl=math.max(targetLevel or pl.LevelBase,1)
-	return regen/lvl^0.675*0.05
+	return regen/estimateSkill(lvl)*0.05
 end
 
 --DINAMIC SKILL TOOLTIP
@@ -1422,7 +1422,7 @@ function events.Action(t)
 					local id=Game.CurrentPlayer
 					if id>=0 and id<=Party.High then
 						local lvl=Party[id].LevelBase
-						house.Val=round(lvl^0.7)+4
+						house.Val=estimateSkill(lvl)+4
 					end
 				end
 			end

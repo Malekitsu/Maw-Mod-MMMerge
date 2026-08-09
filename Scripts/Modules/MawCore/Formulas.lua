@@ -73,7 +73,7 @@ end
 -- Death Knight passive on-hit leech; the Body tooltip passes fullHP=100
 -- to show it as a % vs same-level monsters.
 function Formulas.dkPassiveLeech(fullHP, s, monsterLevel)
-	return fullHP * (s/round(monsterLevel^0.7)) * 0.05
+	return fullHP * (s/estimateSkill(monsterLevel)) * 0.05
 end
 
 -- Regeneration buff/potion: HP/sec for the buff's stored skill.

@@ -413,7 +413,7 @@ function events.BuildStatInformationBox(t)
 		--meditation buff
 		if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[56] then
 			local s, m, level=getBuffSkill(56)
-			local level=level^0.65
+			local level=estimateSkill(level)
 			medRegen = medRegen + round((fullSP^0.35*level^1.4*((buffPower[56].Base[m])/100) +10)*(1+buffPower[56].Scaling[m]/100*s))
 		end
 		
@@ -1507,7 +1507,7 @@ function GetHealParams(id)
 end
 
 function masteryPerLevel(lvl)
-	local S = lvl ^ 0.675
+	local S = estimateSkill(lvl)
 	local th = masteryThresholds()
 	local m = 1
 	for i = 4, 1, -1 do
