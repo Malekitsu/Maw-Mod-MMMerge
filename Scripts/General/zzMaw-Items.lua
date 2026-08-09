@@ -1799,28 +1799,33 @@ reagentPrices={
 --{min,max} set only the roll's shape; Coeff = share of the undamped
 --item-level weapon damage dealt on average (see enchantDamageRange)
 enchantbonusdamage = {}
-enchantbonusdamage[4] = {6,8,["Type"]=2,["Coeff"]=0.2}
-enchantbonusdamage[5] = {18,24,["Type"]=2,["Coeff"]=0.3}
-enchantbonusdamage[6] = {36,48,["Type"]=2,["Coeff"]=0.4}
-enchantbonusdamage[7] = {4,10,["Type"]=1,["Coeff"]=0.2}
-enchantbonusdamage[8] = {18,45,["Type"]=1,["Coeff"]=0.3}
-enchantbonusdamage[9] = {24,60,["Type"]=1,["Coeff"]=0.4}
-enchantbonusdamage[10] = {2,12,["Type"]=0,["Coeff"]=0.2}
-enchantbonusdamage[11] = {6,36,["Type"]=0,["Coeff"]=0.3}
-enchantbonusdamage[12] = {12,72,["Type"]=0,["Coeff"]=0.4}
-enchantbonusdamage[13] = {10,10,["Type"]=8,["Coeff"]=0.25}
-enchantbonusdamage[14] = {24,24,["Type"]=8,["Coeff"]=0.35}
-enchantbonusdamage[15] = {48,48,["Type"]=8,["Coeff"]=0.45}
-enchantbonusdamage[39] = {40,80,["Type"]=0,["Coeff"]=0.5}
-enchantbonusdamage[46] = {40,80,["Type"]=0,["Coeff"]=0.5}
+enchantbonusdamage[4] = {3,4,["Type"]=2,["Coeff"]=0.2}
+enchantbonusdamage[5] = {9,12,["Type"]=2,["Coeff"]=0.3}
+enchantbonusdamage[6] = {18,24,["Type"]=2,["Coeff"]=0.4}
+enchantbonusdamage[7] = {2,5,["Type"]=1,["Coeff"]=0.2}
+enchantbonusdamage[8] = {6,15,["Type"]=1,["Coeff"]=0.3}
+enchantbonusdamage[9] = {12,30,["Type"]=1,["Coeff"]=0.4}
+enchantbonusdamage[10] = {1,6,["Type"]=0,["Coeff"]=0.2}
+enchantbonusdamage[11] = {3,18,["Type"]=0,["Coeff"]=0.3}
+enchantbonusdamage[12] = {6,36,["Type"]=0,["Coeff"]=0.4}
+enchantbonusdamage[13] = {5,5,["Type"]=8,["Coeff"]=0.25}
+enchantbonusdamage[14] = {12,12,["Type"]=8,["Coeff"]=0.35}
+enchantbonusdamage[15] = {24,24,["Type"]=8,["Coeff"]=0.45}
+enchantbonusdamage[39] = {20,40,["Type"]=0,["Coeff"]=0.5}
+enchantbonusdamage[46] = {20,40,["Type"]=0,["Coeff"]=0.5}
 
 --min/max roll of a damage enchant: average = Coeff * undamped item-level
 --weapon damage (the damping factor cancels the divisor in GetWeaponDamage)
 function enchantDamageRange(it, id)
 	local ench=enchantbonusdamage[id]
-	local avg=GetWeaponDamage(it)*estimateWeaponDamageMultiplier(GetItemLevel(it))
+	local avg=GetWeaponDamage(it)*estimateWeaponDamageMultiplier(GetItemLevel(it))*ench.Coeff
 	local mean=(ench[1]+ench[2])/2
-	return avg*ench[1]/mean, avg*ench[2]/mean, avg
+	--{min,max} are also a guaranteed floor, so a low item level still deals
+	--something; two-handed weapons are owed twice as much of it
+	local floorMult=IsTwoHandedWeapon(it) and 2 or 1
+	local lo=math.max(avg*ench[1]/mean, ench[1]*floorMult)
+	local hi=math.max(avg*ench[2]/mean, ench[2]*floorMult)
+	return lo, hi, (lo+hi)/2
 end
 
 --legendary 19: enchant/aura damage scales with the highest stat, same
@@ -3999,6 +4004,9 @@ end
 
 --vampiric aura and fire aura
 fireAuraDamage={0.1,0.15,0.2,0.25,[0]=0}
+--guaranteed damage per mastery when the weapon is too weak for the share
+--above to beat it; doubled on two-handed weapons, same as the enchant floor
+fireAuraMinDamage={3,6,12,24,[0]=0}
 function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 	if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[4] then
 		if not it or (it and it.Number==0) or (it and it:T().EquipStat>2) then return 0 end
@@ -4007,7 +4015,9 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 		--aura scales with the undamped item-level weapon damage: multiplying the
 		--damping factor back cancels the divisor inside GetWeaponDamage
 		local itemLevel=GetItemLevel(it)
-		local damage=GetWeaponDamage(it)*fireAuraDamage[m]*estimateWeaponDamageMultiplier(itemLevel)*GetLegendary19Mult(pl)
+		local damage=GetWeaponDamage(it)*fireAuraDamage[m]*estimateWeaponDamageMultiplier(itemLevel)
+		damage=math.max(damage, fireAuraMinDamage[m]*(IsTwoHandedWeapon(it) and 2 or 1))
+		damage=damage*GetLegendary19Mult(pl)
 		if calcType~="tooltip" and vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 26) then
 			if isSpell then
 				critChance, critMult, success=getCritInfo(pl,"spell")
@@ -4414,10 +4424,13 @@ function GetItemLevel(it)
 end
 
 function estimateWeaponDamageMultiplier(level)
-	return 0.02 * level ^ 0.675
+	return 1 + 0.02 * level ^ 0.675
+end
+
+function IsTwoHandedWeapon(it)
+	return it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number)~=nil
 end
 
 function GetWeaponDamage(it)
-	local twoHanded = it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number)
-	return getWeaponDamageForLevel(GetItemLevel(it), twoHanded)
+	return getWeaponDamageForLevel(GetItemLevel(it), IsTwoHandedWeapon(it))
 end
