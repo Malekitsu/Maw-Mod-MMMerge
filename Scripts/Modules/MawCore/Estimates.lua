@@ -21,13 +21,30 @@ local function buffRamp(s)
 	return math.min(math.max((s-th[2])/(th[3]-th[2]), 0), 1)
 end
 
+local BUFF_SKILL_CAP = 50
+local BUFF_SKILL_CAP_DAY = 75	--Day of the Gods, Day of Protection, Hour of Power
+local dayBuffs = {[83] = true, [85] = true, [86] = true}
+local function casterSkill(spellId, s)
+	return math.min(s, dayBuffs[spellId] and BUFF_SKILL_CAP_DAY or BUFF_SKILL_CAP)
+end
+
+local CASTER_LEVEL_DIVISOR = 4
+local function buffFlat(spellId, s, m, level)
+	local bf = buffPower[spellId]
+	if not bf then
+		return 0
+	end
+	local flat = bf.Base[m] + level/CASTER_LEVEL_DIVISOR
+	return flat*(1 + bf.Scaling[m]/100*casterSkill(spellId, s))*buffRamp(s)
+end
+
 local BUFF_MULT_PER_SKILL = 0.02
 local function buffMult(spellId, s, m)
 	local bf = buffPower[spellId]
 	if not bf then
 		return 0
 	end
-	return bf.Base[m]/100 * buffRamp(s) * math.min(1 + BUFF_MULT_PER_SKILL*s, 2)
+	return bf.Base[m]/100 * buffRamp(s) * (1 + BUFF_MULT_PER_SKILL*casterSkill(spellId, s))
 end
 
 --how fast the average character reaches the next mastery; the estimators use
@@ -96,11 +113,15 @@ function getTotalEnchantPower(level)
 	return ENCHANTS_PER_ITEM*TOTAL_SLOTS*GetMaxEnchantStrength()*geared
 end
 
+function gearedFraction(level)
+	return 0.1^(1/(1 + level/10))
+end
+
 function estimateStat(level)
 	local baseStat = 17 --on creation
 	local statsFromAlchemy = level*0.2
 	--most of the stats come from enchants
-	local geared = 0.1^(1/(1 + level/10))
+	local geared = gearedFraction(level)
 	local skill = estimateSkill(level)
 	local dayOfTheGods = 1 + GetBuffStatPct(skill, true)*buffRamp(skill)
 
@@ -139,20 +160,40 @@ local function estimateHealth(lvl)
 end
 
 local EXPECTED_NEARBY_MONSTERS = 5
-local AC_PER_STAT = 1.5		--armor class as a multiple of the average stat
-local RESISTANCE_PER_STAT = 1	--base resistance likewise
+local ARMOR_REFERENCE_AC = 116
+
+local function estimateWornArmor(lvl)
+	local charges = GetPrimordialCharges(lvl)
+	local worn = ARMOR_REFERENCE_AC + MawCore.Formulas.chargesArmorAC(ARMOR_REFERENCE_AC, charges)
+	return worn*gearedFraction(lvl)
+end
+
+local LEGENDARY_28_ARMOR = 0.5
 
 local function estimateArmorClass(lvl)
-	return estimateStat(lvl)*AC_PER_STAT
+	local skill = estimateSkill(lvl)
+	local armorMult = skillItemAC[const.Skills.Chain][masteryPerLevel(lvl)]*skill/100
+	local legendary = 1 + LEGENDARY_28_ARMOR*legendaryRamp(lvl)
+	--the engine adds the Speed breakpoint on top of everything item-derived
+	return estimateWornArmor(lvl)*(legendary + armorMult)
+		+ Game.GetStatisticEffect(estimateStat(lvl))
 end
 
 local function estimateResistance(lvl)
-	return estimateStat(lvl)*RESISTANCE_PER_STAT
+	local skill = estimateSkill(lvl)
+	local mastery = masteryPerLevel(lvl)
+	local resMult = skillItemRes[const.Skills.Chain][mastery]*skill/100
+	--the six element buffs all carry the same numbers; one stands for all
+	return estimateWornArmor(lvl)*resMult
+		+ buffFlat(const.Spells.FireResistance, skill, mastery, lvl)
 end
+
+local LEGENDARY_16_RESISTANCE = 0.5
 
 local function estimateEnchantResistance(lvl)
 	local geared = math.min(lvl, ENCHANT_MAX_LEVEL)/ENCHANT_MAX_LEVEL
-	return MawCore.Formulas.resistanceEnchantPower(GetMaxEnchantStrength()*geared, true)
+	local power = MawCore.Formulas.resistanceEnchantPower(GetMaxEnchantStrength()*geared, true)
+	return power*(1 + LEGENDARY_16_RESISTANCE*legendaryRamp(lvl))
 end
 
 local function estimateChanceToGetHit(lvl)

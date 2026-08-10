@@ -493,6 +493,10 @@ local function rollTierCharges(charges, ancientTier)
 	return math.min(rolled, GetMaxItemCharges())
 end
 
+function GetPrimordialCharges(level)
+	return rollTierCharges(MawCore.ItemLevel.ChargesFor(level), 2)
+end
+
 
 --Bolster/insanity multiplier: it raises the tier cap AND multiplies every
 --rolled enchant strength. Insanity overrides the bolster, as in the generator.
@@ -1522,7 +1526,7 @@ function updateCelestialItem(it,pl)
 		if HasEnc2(it) then
 			SetEnc2Strength(it,math.min(strength,ENC2_MAX_STRENGTH))
 		end
-		it.MaxCharges=rollTierCharges(MawCore.ItemLevel.ChargesFor(lvl), 2)
+		it.MaxCharges=GetPrimordialCharges(lvl)
 	end
 end
 
@@ -2514,7 +2518,7 @@ local function collectArmorAC(pl, index, it, txt, tab)
 		armorAC=armorAC+acBonus
 	end
 	if table.find(vars.legendaries[index], 28) then
-		acBonus=acBonus*2
+		acBonus=acBonus*1.5
 	end
 	tab[10]=tab[10]+acBonus
 end
