@@ -90,7 +90,7 @@ skillAC =
 	[const.Skills.Sword]	= {[0]=0, 0, 0, 0, 1,},
 	[const.Skills.Dagger]	= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Axe]		= {[0]=0, 0, 0, 0, 0,},
-	[const.Skills.Spear]	= {[0]=0, 0, 4, 6, 8,},
+	[const.Skills.Spear]	= {[0]=0, 0, 2, 3, 4,},
 	[const.Skills.Bow]		= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Mace]		= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0,},
