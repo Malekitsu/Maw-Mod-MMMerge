@@ -252,16 +252,15 @@ function events.PlayerAttacked(t)
 		mon=t.Attacker.Monster --don't set local
 		local lvl=getMonsterLevel(mon)
 		if t.Attacker.MonsterAction==0 then
-			ac=t.Player:GetArmorClass()
 			if t.Attacker.Monster.Attack1.Type~=4 then
 				nextACToZero=2
-			elseif Game.BolsterAmount>100 then
+			else
 				acNerf=2
 			end
 		elseif t.Attacker.MonsterAction==1 then
 			if t.Attacker.Monster.Attack2.Type~=4 then
 				nextACToZero=2
-			elseif Game.BolsterAmount>100 then
+			else
 				acNerf=2
 			end
 		end
@@ -274,7 +273,7 @@ function events.GetArmorClass(t)
 		nextACToZero=nextACToZero-1
 	elseif acNerf>0 then
 		local lvl=getMonsterLevel(mon)
-		local hit=CalcHitOrMiss(lvl, MawCore.Formulas.blockArmorClass(t.AC, lvl, Game.BolsterAmount))
+		local hit=CalcHitOrMiss(lvl, t.Player:GetSpeed())
 		if hit then
 			t.AC=0
 		else
@@ -284,8 +283,8 @@ function events.GetArmorClass(t)
 	end
 end
 
-function CalcHitOrMiss(monLvl, AC)
-	local hitChance=MawCore.Formulas.chanceToBeHit(AC, monLvl)
+function CalcHitOrMiss(monLvl, speed)
+	local hitChance=MawCore.Formulas.chanceToBeHit(speed, monLvl)
 	if hitChance<math.random() then
 		return false
 	else
@@ -301,7 +300,7 @@ end
 
 --fraction of bonus damage per point of might, normalized by level
 function GetMightDamageMultiplier(mightAmount, playerLevel)
-	return mightAmount/math.min(1000+playerLevel*3, 4000)
+	return mightAmount/math.min(1000+playerLevel*1.5, 2500)
 end
 
 function events.BuildStatInformationBox(t)
@@ -347,7 +346,7 @@ function events.BuildStatInformationBox(t)
 		speed=Party[i]:GetSpeed()
 		dodging=0
 		Skill, Mas = SplitSkill(Party[i]:GetSkill(const.Skills.Dodging))
-		if Mas == 4 and Game.CharacterPortraits[pl.Face].Race~=const.Race.Dragon then
+		if Mas == 4 and Game.CharacterPortraits[Party[i].Face].Race~=const.Race.Dragon then
 			dodging=Skill+10
 			dodgeChance=1-1/(1+dodging/200)
 			t.Text=string.format("%s\n\nDodge chance: %s%%",Game.StatsDescriptions[5],math.floor(dodgeChance*1000)/10)
@@ -365,7 +364,10 @@ function events.BuildStatInformationBox(t)
 		--bow haste
 		delay=Party[i]:GetAttackDelay(true)
 		bowHaste=bonusSpeed
-		t.Text=string.format("%s\n\nMelee Haste:   %s%%\nRanged Haste: %s%%\nSpell Haste:   %s%%",t.Text,meleeHaste,bowHaste,spellSpeedEffect)
+		--Speed is what decides whether a swing lands (Formulas.chanceToBeHit),
+		--so the block chance is reported here and not under Armor Class
+		local blockChance=100-round(MawCore.Formulas.chanceToBeHit(speed, Party[i].LevelBase)*10000)/100
+		t.Text=string.format("%s\n\nMelee Haste:   %s%%\nRanged Haste: %s%%\nSpell Haste:   %s%%\n\nChance to Dodge Physical Attacks: %s%%",t.Text,meleeHaste,bowHaste,spellSpeedEffect,blockChance)
 	end
 	if t.Stat==6 then
 		local i=Game.CurrentPlayer
@@ -429,13 +431,13 @@ function events.BuildStatInformationBox(t)
 	
 	if t.Stat==9 then
 		i=Game.CurrentPlayer
-		local ac=Party[i]:GetArmorClass()
 		local acReduction=round((100-calcMawDamage(Party[i],4,10000)/100)*100)/100
 		local lvl=math.min(Party[i].LevelBase)
-		ac=MawCore.Formulas.blockArmorClass(ac, lvl, Game.BolsterAmount)
-		blockChance= 100-round(MawCore.Formulas.chanceToBeHit(ac, lvl)*10000)/100
+		--the block chance itself is reported under Speed, which is what buys it;
+		--it is still needed here because the total combines the two
+		blockChance= 100-round(MawCore.Formulas.chanceToBeHit(Party[i]:GetSpeed(), lvl)*10000)/100
 		totRed= 100-round((100-blockChance)*(100-acReduction))/100
-		t.Text=string.format("%s\n\nPhysical damage reduction: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\nBlock chance vs same level monsters: " .. StrColor(255,255,100,blockChance) .. StrColor(255,255,100,"%") .. "\n\nTotal average damage reduction: " .. StrColor(255,255,100,totRed) .. "%")
+		t.Text=string.format("%s\n\nPhysical damage reduction: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\n\nTotal average damage reduction: " .. StrColor(255,255,100,totRed) .. "%")
 	end
 	
 	if t.Stat==5234672 then
@@ -1252,11 +1254,9 @@ function calcPowerVitality(pl, statsMenu)
 		end
 	end
 	--AC
-	local ac=pl:GetArmorClass()
 	local acReduction=1-calcMawDamage(pl,4,10000)/10000
 	local lvl=pl.LevelBase
-	local ac=MawCore.Formulas.blockArmorClass(ac, lvl, Game.BolsterAmount)
-	local chanceToGetHit=MawCore.Formulas.chanceToBeHit(ac, lvl)
+	local chanceToGetHit=MawCore.Formulas.chanceToBeHit(pl:GetSpeed(), lvl)
 	local ACRed= 1 - chanceToGetHit*(1-acReduction)
 	--dodging
 	local speed=pl:GetSpeed()

@@ -1171,12 +1171,16 @@ function events.ItemGenerated(t)
 			SetEnc2Type(it,math.random(1,10))
 		end
 
-		--fix to resistances not to rolled be twice
+		--can't roll same enchant
 		local bonus2=GetEnc2Type(it)
-		if it.Bonus>=11 and it.Bonus<=16 then
-			while it.Bonus>0 and it.Bonus==bonus2 do
-				it.Bonus=math.random(11,16)
+		if it.Bonus>0 and it.Bonus<=16 and it.Bonus==bonus2 then
+			local low,high=1,10
+			if it.Bonus>=11 then
+				low,high=11,16
 			end
+			repeat
+				it.Bonus=math.random(low,high)
+			until it.Bonus~=bonus2
 		end
 		
 		local itemPower=1
@@ -2398,6 +2402,10 @@ function events.CalcStatBonusByItems(t)
 	end
 	if vars.BlackPotions and vars.BlackPotions[t.PlayerIndex] and vars.BlackPotions[t.PlayerIndex][t.Stat+1] then
 		t.Result=t.Result+vars.BlackPotions[t.PlayerIndex][t.Stat+1]
+	end
+
+	if t.Stat==const.Stats.ArmorClass then
+		t.Result=t.Result-Game.GetStatisticEffect(t.Player:GetSpeed())
 	end
 end
 

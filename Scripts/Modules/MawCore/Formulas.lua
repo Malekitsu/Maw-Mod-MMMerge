@@ -44,15 +44,10 @@ function Formulas.enchantResistanceDamageTaken(itemResistance)
 	return 1/(itemResistance/100 + 1)
 end
 
-Formulas.armorNerfLevel = 255
-Formulas.armorBolsterCap = 300
-function Formulas.blockArmorClass(ac, level, bolster)
-	bolster = math.min(math.max(bolster or 100, 100), Formulas.armorBolsterCap)/100
-	return ac/(math.max(1, level/Formulas.armorNerfLevel)*bolster)
-end
-
-function Formulas.chanceToBeHit(ac, level)
-	return (5 + level*2)/(10 + level*2 + ac)
+Formulas.speedDodgeShare = 0.5
+function Formulas.chanceToBeHit(speed, monsterLevel)
+	local expected = estimateStat(monsterLevel)
+	return 1/(1 + speed/(100 + expected)*Formulas.speedDodgeShare)
 end
 
 -- Vitality counts physical for half, the elements for the other half.

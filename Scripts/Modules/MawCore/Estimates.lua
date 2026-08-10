@@ -172,9 +172,7 @@ local function estimateArmorClass(lvl)
 	local skill = estimateSkill(lvl)
 	local armorMult = skillItemAC[const.Skills.Chain][masteryPerLevel(lvl)]*skill/100
 	local legendary = 1 + LEGENDARY_28_ARMOR*legendaryRamp(lvl)
-	--the engine adds the Speed breakpoint on top of everything item-derived
 	return estimateWornArmor(lvl)*(legendary + armorMult)
-		+ Game.GetStatisticEffect(estimateStat(lvl))
 end
 
 local function estimateResistance(lvl)
@@ -195,9 +193,7 @@ local function estimateEnchantResistance(lvl)
 end
 
 local function estimateChanceToGetHit(lvl)
-	local F = MawCore.Formulas
-	local ac = F.blockArmorClass(estimateArmorClass(lvl), lvl, Game.BolsterAmount)
-	return F.chanceToBeHit(ac, lvl)
+	return MawCore.Formulas.chanceToBeHit(estimateStat(lvl), lvl)
 end
 
 local function estimatePhysicalDamageTaken(lvl)
