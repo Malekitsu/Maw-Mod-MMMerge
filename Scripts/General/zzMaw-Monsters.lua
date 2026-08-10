@@ -64,8 +64,7 @@ function events.AfterLoadMap()
       if basetable and round and m.Level and m.Id and m.Resistances and basetable[m.Id]
          and basetable[m.Id].Level and basetable[m.Id].Resistances then
 
-		local level=getMonsterLevel(m)
-        local bolsterRes = math.max(round((level - basetable[m.Id].Level) / 2), 0)
+        local bolsterRes = 0
         for v = 0, 10 do
           if v ~= 5 then
             if v == 0 and m.Resistances[v] and m.Resistances[v] < 65000 then
@@ -694,12 +693,7 @@ function recalculateMonsterTable()
 		--Create a mock monster object to pass the correct ID and level
 		local mockMon = {Id = i, Level = totalLevel[i]}
 		HPtable[i] = round(getMonsterHealth(mockMon, totalLevel[i]))
-		--resistances 
-		bolsterRes=math.max(round((totalLevel[i]-basetable[i].Level)/10)*5,0)
-		--mapping
-		if getMapAffixPower(12) then
-			bolsterRes=bolsterRes+getMapAffixPower(12)
-		end
+		bolsterRes=getMapAffixPower(12) or 0
 		for v=0,10 do
 			if v~=5 then
 				mon.Resistances[v]=math.min(bolsterRes+basetable[i].Resistances[v],bolsterRes+200,999)

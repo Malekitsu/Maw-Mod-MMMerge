@@ -157,7 +157,7 @@ function survivalMonsterTable(currentMapLevel)
 		HPtable=HPtable or {}
 		HPtable[i]=HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180)
 		--resistances 
-		bolsterRes=math.max(math.round((totalLevel[i]-basetable[i].Level)/10)*5,0)
+		bolsterRes=0
 		for v=0,10 do
 			if v~=5 then
 			mon.Resistances[v]=math.min(bolsterRes+basetable[i].Resistances[v],bolsterRes+200)

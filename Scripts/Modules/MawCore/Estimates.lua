@@ -96,10 +96,6 @@ function getWeaponDamageForLevel(itemLevel, twoHanded)
 	return (damage + diceOnly)/damping, diceOnly/damping
 end
 
-function getMonsterEstimatedResistance(lvl)
-	return math.min(lvl/2, 999)
-end
-
 local STAT_SHARE = 0.33
 
 --Every enchant a fully geared character wears, added up.
@@ -409,10 +405,7 @@ function getMonsterHealth(mon, level)
 		hits=hitToKillMonsterAusterity[difficulty]
 	end
 	health=health*hits
-	
-	--account for resistances
-	health=health/2^(math.min(getMonsterEstimatedResistance(level)/100,10)) --approx
-	
+		
 	if not mon then
 		return health
 	end	
