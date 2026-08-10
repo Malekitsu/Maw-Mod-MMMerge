@@ -345,8 +345,8 @@ local function registerClassBuilders()
 		[14]={[1]=function(pl)
 			local m3=SplitSkill(pl.Skills[const.Skills.Water])
 			local lvl=getPartyLevel(4)
-			local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
-			local waterReduction=round(getMonsterDamage(false,(lvl+1))*(m3/estimateSkill(lvl))/avgRed*0.99^estimateSkill(lvl)/2) --on average 1/2 of a B monster
+			local _,_,_,avgTaken=getPlayerEstimatedVitality(lvl+1)
+			local waterReduction=round(getMonsterDamage(false,(lvl+1))*(m3/estimateSkill(lvl))*avgTaken*0.99^estimateSkill(lvl)/2) --on average 1/2 of a B monster
 			return MawSchoolDescBase[14] .. ASC .. "Reduce all damage taken by " .. waterReduction .. "(calculated after resistances)\n"
 		end},
 		[15]={[1]=MawSchoolDescBase[15] .. ASC .. "Increases melee damage 0.5-1-1.5-2 (at N-E-M-GM) per Earth Magic Level\n"},
@@ -388,8 +388,8 @@ local function registerClassBuilders()
 		[16]={[1]=function(pl)
 			local spiritS=SplitSkill(pl.Skills[const.Skills.Spirit])
 			local lvl=getTotalLevel()
-			local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
-			local spiritReduction=round(getMonsterDamage(false,(lvl+1))*(spiritS/estimateSkill(lvl))/avgRed/2*0.99^estimateSkill(lvl)) --on average 1/2 of a B monster
+			local _,_,_,avgTaken=getPlayerEstimatedVitality(lvl+1)
+			local spiritReduction=round(getMonsterDamage(false,(lvl+1))*(spiritS/estimateSkill(lvl))*avgTaken/2*0.99^estimateSkill(lvl)) --on average 1/2 of a B monster
 			return MawSchoolDescBase[16] .. "\n\nSeraph Spirit strengthens the Seraph's resolve, shrugging off light hits and softening heavy blows\n" .. "Damage reduction: " .. StrColor(0,255,0,spiritReduction) .. " (applied after resistances)\n"
 		end},
 		[17]={[1]=function(pl)

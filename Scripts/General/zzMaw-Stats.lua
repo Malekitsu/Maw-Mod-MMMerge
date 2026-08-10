@@ -251,21 +251,18 @@ function events.PlayerAttacked(t)
 	if t.Attacker and t.Attacker.Monster then
 		mon=t.Attacker.Monster --don't set local
 		local lvl=getMonsterLevel(mon)
-		nerfAmount=math.max(1,lvl/255) --don't set local
 		if t.Attacker.MonsterAction==0 then
 			ac=t.Player:GetArmorClass()
 			if t.Attacker.Monster.Attack1.Type~=4 then
 				nextACToZero=2
 			elseif Game.BolsterAmount>100 then
 				acNerf=2
-				nerfAmount=nerfAmount*math.min(Game.BolsterAmount,300)/100
 			end
 		elseif t.Attacker.MonsterAction==1 then
 			if t.Attacker.Monster.Attack2.Type~=4 then
 				nextACToZero=2
 			elseif Game.BolsterAmount>100 then
 				acNerf=2
-				nerfAmount=nerfAmount*math.min(Game.BolsterAmount,300)/100
 			end
 		end
 	end
@@ -277,7 +274,7 @@ function events.GetArmorClass(t)
 		nextACToZero=nextACToZero-1
 	elseif acNerf>0 then
 		local lvl=getMonsterLevel(mon)
-		local hit=CalcHitOrMiss(lvl, t.AC/nerfAmount)
+		local hit=CalcHitOrMiss(lvl, MawCore.Formulas.blockArmorClass(t.AC, lvl, Game.BolsterAmount))
 		if hit then
 			t.AC=0
 		else
@@ -288,7 +285,7 @@ function events.GetArmorClass(t)
 end
 
 function CalcHitOrMiss(monLvl, AC)
-	local hitChance=(5+monLvl*2)/(10+monLvl*2+AC)
+	local hitChance=MawCore.Formulas.chanceToBeHit(AC, monLvl)
 	if hitChance<math.random() then
 		return false
 	else
@@ -435,12 +432,8 @@ function events.BuildStatInformationBox(t)
 		local ac=Party[i]:GetArmorClass()
 		local acReduction=round((100-calcMawDamage(Party[i],4,10000)/100)*100)/100
 		local lvl=math.min(Party[i].LevelBase)
-		local nerfAmount=math.max(1,lvl/255)
-		if Game.BolsterAmount>100 then
-			nerfAmount=Game.BolsterAmount/100
-			ac=ac/nerfAmount
-		end
-		blockChance= 100-round((5+lvl*2)/(10+lvl*2+ac)*10000)/100
+		ac=MawCore.Formulas.blockArmorClass(ac, lvl, Game.BolsterAmount)
+		blockChance= 100-round(MawCore.Formulas.chanceToBeHit(ac, lvl)*10000)/100
 		totRed= 100-round((100-blockChance)*(100-acReduction))/100
 		t.Text=string.format("%s\n\nPhysical damage reduction: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\nBlock chance vs same level monsters: " .. StrColor(255,255,100,blockChance) .. StrColor(255,255,100,"%") .. "\n\nTotal average damage reduction: " .. StrColor(255,255,100,totRed) .. "%")
 	end
@@ -1004,9 +997,7 @@ function calcMawDamage(pl,damageKind,originalDamage,rand,monLvl)
 		if getMapAffixPower(28) then
 			AC=AC*(1-getMapAffixPower(28)/100)
 		end
-		local divider=math.min(200+monLvl*3)
-		local reduction=AC/divider+1
-		local damage=round(damage/reduction)
+		local damage=round(damage*MawCore.Formulas.armorDamageTaken(AC, monLvl))
 		
 		--dk/shaman
 		damage=classDamageReduction(pl, damage, const.Skills.Body)
@@ -1014,7 +1005,7 @@ function calcMawDamage(pl,damageKind,originalDamage,rand,monLvl)
 		if vars.shieldEnchant and vars.shieldEnchant[id] then
 			damage=damage*0.85
 		end
-		return math.max(damage, originalDamage*0.1)
+		return math.max(damage, originalDamage*MawCore.Formulas.damageFloor)
 	end
 	
 	
@@ -1049,7 +1040,7 @@ function calcMawDamage(pl,damageKind,originalDamage,rand,monLvl)
 	--get resistances
 	if not damageKindResistance[damageKind] then
 		local damage=round(damage)
-		return math.max(damage, originalDamage*0.1)
+		return math.max(damage, originalDamage*MawCore.Formulas.damageFloor)
 	end
 	local res=math.huge
 	local resList=damageKindResistance[damageKind]
@@ -1075,7 +1066,7 @@ function calcMawDamage(pl,damageKind,originalDamage,rand,monLvl)
 		end
 		
 		-- Calculate total resistance for this type (base resistance with item enchant multiplier)
-		local itemResMultiplier = 1/(itemRes/100+1)
+		local itemResMultiplier = MawCore.Formulas.enchantResistanceDamageTaken(itemRes)
 		local totalRes = baseRes 
 		
 		-- Apply map affix reduction if present
@@ -1084,9 +1075,7 @@ function calcMawDamage(pl,damageKind,originalDamage,rand,monLvl)
 		end
 		
 		-- Calculate the effective resistance using the proper formula
-		local divider=math.min(100+monLvl*6)
-		local reduction=totalRes/divider+1
-		local effectiveRes=1/reduction* itemResMultiplier
+		local effectiveRes=MawCore.Formulas.resistanceDamageTaken(totalRes, monLvl)*itemResMultiplier
 		
 		-- Keep track of the highest effective resistance (best protection)
 		if effectiveRes > bestEffectiveRes then
@@ -1108,7 +1097,7 @@ function calcMawDamage(pl,damageKind,originalDamage,rand,monLvl)
 	end
 	
 	local damage=round(damage*res)
-	return math.max(damage, originalDamage*0.1)
+	return math.max(damage, originalDamage*MawCore.Formulas.damageFloor)
 end
 
 
@@ -1266,10 +1255,9 @@ function calcPowerVitality(pl, statsMenu)
 	local ac=pl:GetArmorClass()
 	local acReduction=1-calcMawDamage(pl,4,10000)/10000
 	local lvl=pl.LevelBase
-	local nerfAmount=math.max(1,lvl/255)
-	local ac=ac/(Game.BolsterAmount/100*nerfAmount)
-	local blockChance= 1-(5+lvl*2)/(10+lvl*2+ac)
-	local ACRed= 1 - (1-blockChance)*(1-acReduction)
+	local ac=MawCore.Formulas.blockArmorClass(ac, lvl, Game.BolsterAmount)
+	local chanceToGetHit=MawCore.Formulas.chanceToBeHit(ac, lvl)
+	local ACRed= 1 - chanceToGetHit*(1-acReduction)
 	--dodging
 	local speed=pl:GetSpeed()
 	local dodging=0
@@ -1291,7 +1279,9 @@ function calcPowerVitality(pl, statsMenu)
 	end
 	
 	--calculation
-	local reduction= 1 - (ACRed/2 + res[1]/16 + res[2]/16 + res[3]/16 + res[4]/16 + res[5]/16 + res[6]/16 + res[7]/8)
+	local physShare=MawCore.Formulas.physicalVitalityShare
+	local magicShare=(1-physShare)/8
+	local reduction= 1 - (ACRed*physShare + (res[1]+res[2]+res[3]+res[4]+res[5]+res[6])*magicShare + res[7]*magicShare*2)
 	
 	vitality=round(fullHP/reduction)
 	if statsMenu then

@@ -2478,11 +2478,7 @@ local function collectEnchant(index, it, bonus, power, tab, isSecond)
 		if not isSecond then
 			value=power+10
 		end
-		--rings run on the /300 curve; the reduction is applied as /100
-		--(zzMaw-Stats calcMawDamage), so store the equivalent power there
-		if GetItemEquipStat(it)==10 then
-			value=value*100/MawCore.Formulas.ringReductionDivisor
-		end
+		value=MawCore.Formulas.resistanceEnchantPower(value, GetItemEquipStat(it)==10)
 		res[bonus]=math.max(res[bonus] or 0, value)
 	elseif not isSecond then
 		local slot=bonusBaseEnchantSkill[bonus]+50

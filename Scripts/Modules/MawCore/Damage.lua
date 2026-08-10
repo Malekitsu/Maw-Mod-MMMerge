@@ -1789,16 +1789,16 @@ local function pstage_legendariesAndShields(t)
 	if table.find(shamanClass, pl.Class) and pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0  then
 		local m3=SplitSkill(pl.Skills[const.Skills.Water])
 		local lvl=getTotalLevel()
-		local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
-		local reduction=round(getMonsterDamage(false,(lvl+1))*(m3/estimateSkill(lvl))/avgRed/2*0.99^estimateSkill(lvl)) --on average 1/2 of a B monster
+		local _,_,_,avgTaken=getPlayerEstimatedVitality(lvl+1)
+		local reduction=round(getMonsterDamage(false,(lvl+1))*(m3/estimateSkill(lvl))*avgTaken/2*0.99^estimateSkill(lvl)) --on average 1/2 of a B monster
 		t.Result=math.max(t.Result-reduction, t.Result*0.25)
 	end
 	--seraph code
 	if table.find(seraphClass, pl.Class) and pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0  then
 		local m3=SplitSkill(pl.Skills[const.Skills.Spirit])
 		local lvl=getTotalLevel()
-		local _,_,_,avgRed=getPlayerEstimatedVitality(lvl+1)
-		local reduction=round(getMonsterDamage(false,(lvl+1))*(m3/estimateSkill(lvl))/avgRed/2*0.99^estimateSkill(lvl)) --on average 1/2 of a B monster
+		local _,_,_,avgTaken=getPlayerEstimatedVitality(lvl+1)
+		local reduction=round(getMonsterDamage(false,(lvl+1))*(m3/estimateSkill(lvl))*avgTaken/2*0.99^estimateSkill(lvl)) --on average 1/2 of a B monster
 		t.Result=math.max(t.Result-reduction, t.Result*0.25)
 	end
 	

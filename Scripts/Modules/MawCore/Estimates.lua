@@ -107,88 +107,100 @@ function estimateStat(level)
 	return (baseStat + statsFromAlchemy + getTotalEnchantPower(level)*STAT_SHARE*geared)*dayOfTheGods
 end
 
---average
-function getPlayerEstimatedVitality(lvl, healthOnly)
-	local baseHP=25
-	local baseScaling=3
-	local endScaling=9
-	local maxPromotionLevel=250
-	if vars.madnessMode then
-		maxPromotionLevel=500
-	end
-	local scalingHP=math.min((endScaling-baseScaling)*lvl/maxPromotionLevel,endScaling-baseScaling)+baseScaling
-	local health=baseHP+scalingHP*(lvl)
-	
-	local estimatedStat=estimateStat(lvl)
 
-	
-	local levelCap=700
-	if vars.madnessMode then
-		levelCap=1050
-	end
-	local levelMult=math.min(lvl/levelCap,1)
-	
-	local estimatedEndurance=estimatedStat
-	
-	local healthPower=estimatedStat/10
-	local estimatedHealthBonus=healthPower*math.min(1+healthPower/50,5)*4	
-	
-	local enduranceEffect=estimatedEndurance/5
-	local skill=estimateSkill(lvl)
-	local mastery=masteryPerLevel(lvl)
-	local bbMasteryBonus=math.min(1+skill/masterLearned()*2,3) --use master as a reference
-	local bbPercentBonus=GetGradualMasteryValue(bodybuildingHP, skill, mastery)
-	health=health+(enduranceEffect+bbMasteryBonus)*scalingHP+estimatedHealthBonus
-	
-	health=health*(1+bbPercentBonus*skill/100)*(1+estimatedEndurance/2500)
-	
-	-- Return just health if requested
-	if healthOnly then
-		return health
-	end
-	
-	local armorClass=estimatedStat*1.5
-	
-	local bolster=1
-	if vars.insanityMode then
-		bolster=3
-	end
-	
-	local bolster=(math.max(Game.BolsterAmount, 100)/100-1)/4+1
-	if vars.insanityMode then
-		bolster=3
-	end
-	
-	local divider=math.min(90+lvl*0.25*bolster)
-	local armorReduction=armorClass/divider+1
-	local nerfAmount=math.max(1,lvl/255)
-	local blockAC=armorClass/(math.max(Game.BolsterAmount/100,1)/nerfAmount)
-	local blockChanceVitMultiplier= 1/((5+lvl*2)/(10+lvl*2+blockAC))
-	local totalArmorReduction=armorReduction*blockChanceVitMultiplier
-	local resistances=armorClass*2/3
-	
-	local divider=math.min(60+lvl*0.5*bolster)
-	local resReduction=resistances/divider+1
-	--Shield buff, same numbers calcMawDamage applies (buffPower, floored at 0.7)
-	local shieldBuff=math.max(1-buffMult(const.Spells.Shield, skill, mastery), 0.7)
-	resReduction=resReduction/shieldBuff
-	local power=estimatedStat/12 
-	
-	local ringReduction=(power/100+1)
-	resReduction=resReduction*ringReduction
-	
-	local averageReduction=(totalArmorReduction+resReduction)/2
+local BASE_HP = 25
+local HP_PER_LEVEL_MIN = 3
+local HP_PER_LEVEL_MAX = 9
 
-	local estimatedLegendaryPower=1+0.001*lvl
-	
-	local vitality=health*averageReduction*estimatedLegendaryPower
-	
-	return vitality, totalArmorReduction, resReduction, averageReduction , health
-	
+--HP per level grows into its cap over the promotion range
+local function hpPerLevel(lvl)
+	local promotionLevel = vars.madnessMode and 500 or 250
+	local growth = HP_PER_LEVEL_MAX - HP_PER_LEVEL_MIN
+	return math.min(growth*lvl/promotionLevel, growth) + HP_PER_LEVEL_MIN
 end
+
+local function estimateHealth(lvl)
+	local perLevel = hpPerLevel(lvl)
+	local stat = estimateStat(lvl)
+	local skill = estimateSkill(lvl)
+	local mastery = masteryPerLevel(lvl)
+
+	--flat HP enchants: they roll on their own curve, not the per-level one
+	local healthPower = stat/10
+	local flatBonus = healthPower*math.min(1 + healthPower/50, 5)*4
+
+	--endurance and bodybuilding both buy extra HP on every level
+	local enduranceEffect = stat/5
+	local bodybuildingFlat = math.min(1 + skill/masterLearned()*2, 3)	--master as reference
+	local bodybuildingPct = GetGradualMasteryValue(bodybuildingHP, skill, mastery)
+
+	local health = BASE_HP + perLevel*lvl + (enduranceEffect + bodybuildingFlat)*perLevel + flatBonus
+	return health*(1 + bodybuildingPct*skill/100)*(1 + stat/2500)
+end
+
+local EXPECTED_NEARBY_MONSTERS = 5
+local AC_PER_STAT = 1.5		--armor class as a multiple of the average stat
+local RESISTANCE_PER_STAT = 1	--base resistance likewise
+
+local function estimateArmorClass(lvl)
+	return estimateStat(lvl)*AC_PER_STAT
+end
+
+local function estimateResistance(lvl)
+	return estimateStat(lvl)*RESISTANCE_PER_STAT
+end
+
+local function estimateEnchantResistance(lvl)
+	local geared = math.min(lvl, ENCHANT_MAX_LEVEL)/ENCHANT_MAX_LEVEL
+	return MawCore.Formulas.resistanceEnchantPower(GetMaxEnchantStrength()*geared, true)
+end
+
+local function estimateChanceToGetHit(lvl)
+	local F = MawCore.Formulas
+	local ac = F.blockArmorClass(estimateArmorClass(lvl), lvl, Game.BolsterAmount)
+	return F.chanceToBeHit(ac, lvl)
+end
+
+local function estimatePhysicalDamageTaken(lvl)
+	local F = MawCore.Formulas
+	return math.max(F.armorDamageTaken(estimateArmorClass(lvl), lvl), F.damageFloor)
+end
+
+local function estimateMagicDamageTaken(lvl)
+	local F = MawCore.Formulas
+	local skill = estimateSkill(lvl)
+	local mastery = masteryPerLevel(lvl)
+	local taken = F.resistanceDamageTaken(estimateResistance(lvl), lvl)
+	--Shield buff, same numbers calcMawDamage applies (buffPower, floored at 0.7)
+	taken = taken*math.max(1 - buffMult(const.Spells.Shield, skill, mastery), 0.7)
+	taken = taken*F.enchantResistanceDamageTaken(estimateEnchantResistance(lvl))
+	return math.max(taken, F.damageFloor)
+end
+
+local LEGENDARY_18_REDUCTION = 0.10	--flat cut to everything
+local LEGENDARY_22_PER_MONSTER = 0.03	--per monster within 512
+
+local function estimateLegendaryDamageTaken(lvl)
+	local ramp = legendaryRamp(lvl)
+	local crowd = (1-LEGENDARY_22_PER_MONSTER)^EXPECTED_NEARBY_MONSTERS
+	return (1 - LEGENDARY_18_REDUCTION*ramp)*(1 - (1-crowd)*ramp)
+end
+
+--average
+function getPlayerEstimatedVitality(lvl)
+	local health = estimateHealth(lvl)
+	local share = MawCore.Formulas.physicalVitalityShare
+
+	--physical: the swing has to land before armor gets to cut it
+	local physical = estimateChanceToGetHit(lvl)*estimatePhysicalDamageTaken(lvl)
+	local magic = estimateMagicDamageTaken(lvl)
+	local taken = (physical*share + magic*(1-share))*estimateLegendaryDamageTaken(lvl)
+
+	return health/taken, physical, magic, taken, health
+end
+
 function getPlayerEstimatedHealth(lvl)
-	local health=getPlayerEstimatedVitality(lvl,true)
-	return health
+	return estimateHealth(lvl)
 end
 
 function getMonsterDamage(mon, level)
@@ -242,7 +254,6 @@ end
 local EXPECTED_ENCHANT_COEFF = 0.5	--one damage enchant (enchantDamageRange ignores tier)
 local EXPECTED_ENCHANT_LEVEL = 100	--level by which the weapon carries that enchant
 local EXPECTED_WEAPON_DICE = 3		--only feeds the +diceCount/2 floor of a roll
-local EXPECTED_NEARBY_MONSTERS = 5	--how crowded a fight legendary 21 is judged on
 
 local LEGENDARY_21_PER_MONSTER = 0.05	--melee damage per monster within 512
 --11 halves the recovery after a kill, so it is worth more the fewer swings a
@@ -251,6 +262,12 @@ local LEGENDARY_21_PER_MONSTER = 0.05	--melee damage per monster within 512
 --15% is a gut number.
 local LEGENDARY_11_DAMAGE = 0.15
 local LEGENDARY_33_SKILL = 10		--added to every melee weapon skill
+
+--Legendary 29 (every hit shaves a point off the monster's resistance) is NOT
+--modelled anywhere. It used to sit inside a blanket residual that has since
+--been removed. It belongs on the monster side -- getMonsterHealth already
+--divides by 2^(resistance/100) -- not in the player's damage.
+--Also unmodelled by choice: 12 enables hybrid builds instead of adding power,
 
 --legendary 33 adds 10 to every melee weapon skill
 function getMeleeSkill(lvl)

@@ -5,21 +5,58 @@
 local Formulas = {}
 MawCore.Formulas = Formulas
 
--- Ring resistance enchants run on a gentler curve than every other reduction.
--- The applied side (zzMaw-Items collectEnchant) stores ring power rescaled to
--- the /100 curve, so this constant is the single place the ratio lives.
 Formulas.ringReductionDivisor = 200
 
+function Formulas.resistanceEnchantPower(roll, isRing)
+	if isRing then
+		return roll*100/Formulas.ringReductionDivisor
+	end
+	return roll
+end
+
 -- Display % for the "divide by (1 + power/100)" reductions. decimals=2 for
--- two shown digits, isRing for the ring curve.
-function Formulas.reductionPercent(power, decimals, isRing)
+-- two shown digits. Takes STORED power: run a raw ring roll through
+-- resistanceEnchantPower first.
+function Formulas.reductionPercent(power, decimals)
 	local f = decimals == 2 and 100 or 10
-	local divisor = isRing and Formulas.ringReductionDivisor or 100
-	local fraction = 1 - 1/(power/divisor + 1)
+	local fraction = 1 - 1/(power/100 + 1)
 	return round(fraction * 100 * f) / f
 end
 
 
+Formulas.damageFloor = 0.1
+
+Formulas.armorDivisorBase = 200
+Formulas.armorDivisorPerLevel = 3
+function Formulas.armorDamageTaken(ac, monsterLevel)
+	local divisor = Formulas.armorDivisorBase + monsterLevel*Formulas.armorDivisorPerLevel
+	return 1/(ac/divisor + 1)
+end
+
+Formulas.resistanceDivisorBase = 100
+Formulas.resistanceDivisorPerLevel = 6
+function Formulas.resistanceDamageTaken(resistance, monsterLevel)
+	local divisor = Formulas.resistanceDivisorBase + monsterLevel*Formulas.resistanceDivisorPerLevel
+	return 1/(resistance/divisor + 1)
+end
+
+function Formulas.enchantResistanceDamageTaken(itemResistance)
+	return 1/(itemResistance/100 + 1)
+end
+
+Formulas.armorNerfLevel = 255
+Formulas.armorBolsterCap = 300
+function Formulas.blockArmorClass(ac, level, bolster)
+	bolster = math.min(math.max(bolster or 100, 100), Formulas.armorBolsterCap)/100
+	return ac/(math.max(1, level/Formulas.armorNerfLevel)*bolster)
+end
+
+function Formulas.chanceToBeHit(ac, level)
+	return (5 + level*2)/(10 + level*2 + ac)
+end
+
+-- Vitality counts physical for half, the elements for the other half.
+Formulas.physicalVitalityShare = 0.5
 
 Formulas.hitAtPar    = 0.75	--attack == expected for the monster's level
 Formulas.hitMax      = 1	--reached at hitOverPar above par
