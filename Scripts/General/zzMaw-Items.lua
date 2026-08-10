@@ -254,6 +254,16 @@ function events.PickCorpse(t)
 		goldBeforeLoot = Party.Gold
 		lootFromMonster = true
 		lootMultiplier=densityMultiplier
+		lootMonsterLevel=getMonsterLevel(mon)
+		local pickCorpseDefault=t.CallDefault
+		t.CallDefault=function()
+			local allowed=t.Allow
+			pickCorpseDefault()
+			if allowed then
+				mon.TreasureGenerated=false
+				mon.AIState=const.AIState.Removed
+			end
+		end
 		-- Handle seed state after loot calculations
 		RunNextTick(function()
 			lootFromMonster = false
@@ -849,7 +859,10 @@ function events.ItemGenerated(t)
 		]]
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
 		maxChargesCap=GetMaxChargesCap()
-		it.MaxCharges=GetChargesForLevel(partyLevel+mapLevel/8)
+		--consume: one corpse hands its level to one drop
+		local monsterLevel=lootMonsterLevel
+		lootMonsterLevel=nil
+		it.MaxCharges=GetChargesForLevel(GetLootLevel(monsterLevel, partyLevel, mapLevel))
 		
 		local maxTier
 		maxTier, cap2=GetEnchantTierCap()
@@ -4447,6 +4460,30 @@ end
 
 function GetMaxChargesCap()
 	return math.floor(GetMaxItemLevel()/ITEM_LEVEL_PER_CHARGE)
+end
+
+local FALLBACK_PARTY_SHARE=7/8
+
+--how far a drop may outpace the rest of your progression: whichever is kinder,
+--+10% or a flat margin. partyLevel counts the OTHER worlds, so this is the
+--anti-farm brake. Chests get the tighter margin: they are free, a kill is not.
+local GUARD_PERCENT=1.1
+local GUARD_MARGIN_MONSTER=40
+local GUARD_MARGIN_CHEST=20
+
+local function progressionGuard(partyLevel, margin)
+	return math.max(partyLevel*GUARD_PERCENT, partyLevel+margin)
+end
+
+--A monster hands over its own level: the same number getMonsterHealth and
+--getMonsterDamage size it with, so a kill and its loot land on the same scale
+--by construction. monsterLevel is nil for chests and shops.
+function GetLootLevel(monsterLevel, partyLevel, mapLevel)
+	if monsterLevel then
+		return math.min(monsterLevel, progressionGuard(partyLevel, GUARD_MARGIN_MONSTER))
+	end
+	local level=partyLevel*FALLBACK_PARTY_SHARE+mapLevel*(1-FALLBACK_PARTY_SHARE)
+	return math.min(level, progressionGuard(partyLevel, GUARD_MARGIN_CHEST))
 end
 
 --the charges a drop needs in order to read back as a given level
