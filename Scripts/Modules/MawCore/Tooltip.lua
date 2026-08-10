@@ -404,13 +404,7 @@ local function tooltipEnchantStats(t)
 					elseif t.Item.Bonus==10 then
 						--power=power*1.5
 					end
-					local stat=math.random(1,10)
-					if GetItemEquipStat(t.Item)==10 then
-						stat=math.random(1,16)
-						if stat>10 and stat==t.Bonus then
-							stat=math.random(1,10)
-						end
-					end
+					local stat=RollEnchantType(t.Item, t.Item.Bonus)
 					if stat==8 or stat==9 then
 						GetSlotMult(t.Item)
 						power=power*(1+math.min(power/50/mult,5))
