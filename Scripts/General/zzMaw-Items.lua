@@ -111,6 +111,53 @@ function IsEnchantableItem(it)
 	return IsBaseItemId(it.Number) and not table.find(ancientWeapons, it.Number)
 end
 
+------------------------------------------------------------------------
+-- LootContext -- what a corpse hands to the item generator.
+--
+-- One producer (PickCorpse), one consumer (ItemGenerated), so this state
+-- belongs to this file and not to a shared type. take() empties it: one corpse
+-- feeds one drop, and anything a corpse leaves behind because it rolled
+-- nothing dies here instead of leaking into the next chest.
+--
+-- restore() exists for one reason. A boss drop whose rolled item is not a base
+-- item calls Item:Randomize, and Randomize calls 0x453ECC -- the exact engine
+-- function the ItemGenerated hook sits on (structs.Item.Randomize). One drop
+-- therefore runs the handler TWICE and the INNER call is the one that
+-- generates, so the outer call hands the context back before recursing.
+------------------------------------------------------------------------
+local lootContext = {}
+local LootContext = {}
+
+--the corpse's contribution to the next drop
+function LootContext.set(t)
+	lootContext = {
+		monsterLevel = t.monsterLevel,
+		multiplier = t.multiplier,
+		boss = t.boss,
+		omnipotent = t.omnipotent,
+	}
+end
+
+--chest artifacts are re-rolled through the boss path (AfterLoadMap)
+function LootContext.markBoss()
+	lootContext.boss = true
+end
+
+function LootContext.take()
+	local c = lootContext
+	lootContext = {}
+	return {
+		monsterLevel = c.monsterLevel,
+		multiplier = c.multiplier or 1,
+		boss = c.boss == true,
+		omnipotent = c.omnipotent == true,
+	}
+end
+
+function LootContext.restore(drop)
+	lootContext = drop
+end
+
 function events.PickCorpse(t)
 	--if Game.BolsterAmount~=300 then return end
 	local monster = Map.Monsters[t.MonsterIndex]
@@ -214,6 +261,7 @@ function events.PickCorpse(t)
 		end
 		
 		local densityMultiplier=GetDensityMultiplier(mon.Id)
+		local dropIsBoss, dropIsOmnipotent=false, false
 		-- Special handling for bosses and resurrected
 		if mon.NameId > 300 then
 			mon.TreasureItemPercent = round(mon.TreasureItemPercent / 4*densityMultiplier^0.5)
@@ -243,18 +291,22 @@ function events.PickCorpse(t)
 				itemTier = itemTier + 1
 			end
 			mon.TreasureItemLevel = math.max(math.min(itemTier, 6), 2)
-			bossLoot = true
+			dropIsBoss = true
 			local monsterSkill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
 			if monsterSkill == "Omnipotent" then
-				OmnipotentLoot = true
+				dropIsOmnipotent = true
 			end
 		end
 		
 		-- Loot filter code
 		goldBeforeLoot = Party.Gold
 		lootFromMonster = true
-		lootMultiplier=densityMultiplier
-		lootMonsterLevel=getMonsterLevel(mon)
+		LootContext.set{
+			monsterLevel=getMonsterLevel(mon),
+			multiplier=densityMultiplier,
+			boss=dropIsBoss,
+			omnipotent=dropIsOmnipotent,
+		}
 		local pickCorpseDefault=t.CallDefault
 		t.CallDefault=function()
 			local allowed=t.Allow
@@ -485,7 +537,9 @@ function GetRarityEnchantTier(rarity)
 	return 0
 end
 
-function GetRarityMultiplier(pseudoStr, bossLoot)
+--lootMultiplier arrives as an argument: the drop context owns it, this is a
+--pure function of what it is handed.
+function GetRarityMultiplier(pseudoStr, bossLoot, lootMultiplier)
 	local tierFactor=enc1Chance[math.min(pseudoStr,#enc1Chance)]/enc1Chance[#enc1Chance]
 	local mult=(rarityDifficultyMult[GetDifficulty()] or 1)*tierFactor*(lootMultiplier or 1)^0.5
 	if bossLoot then
@@ -503,8 +557,8 @@ function GetRarityMultiplier(pseudoStr, bossLoot)
 	return mult
 end
 
-function RollItemRarity(pseudoStr, bossLoot, noLegendary)
-	local mult=GetRarityMultiplier(pseudoStr, bossLoot)
+function RollItemRarity(pseudoStr, bossLoot, noLegendary, lootMultiplier)
+	local mult=GetRarityMultiplier(pseudoStr, bossLoot, lootMultiplier)
 	local result=RARITY_EPIC
 	for rarity=RARITY_CELESTIAL, RARITY_ANCIENT, -1 do
 		local base=rarityChance[rarity]
@@ -663,9 +717,14 @@ end
 
 function events.ItemGenerated(t)
 	if Game.CurrentScreen==16 or Game.CurrentScreen==21 then return end
+	--one corpse feeds one drop: consume the whole context here
+	local drop=LootContext.take()
 	--boss items forced
-	if bossLoot then
+	if drop.boss then
 		if not IsEnchantableItem(t.Item) then
+			--Randomize re-enters this handler; the inner call is the real
+			--consumer, so give the context back to it
+			LootContext.restore(drop)
 			t.Item:Randomize(t.Strength, 0)
 			return
 		end
@@ -690,9 +749,8 @@ function events.ItemGenerated(t)
 	end
 
 	-- Build combined artifact list and initialize pity counters
-	lootMultiplier = lootMultiplier or 1
 	if Game.HouseScreen~=2 and Game.HouseScreen~=95 and IsEnchantableItem(t.Item) then
-		local artifactChance = 0.005 * lootMultiplier
+		local artifactChance = 0.005 * drop.multiplier
 		vars.artifactRollPity = vars.artifactRollPity or 0
 		local chance = pity_chance(artifactChance, vars.artifactRollPity)
 		if math.random() < chance then
@@ -715,7 +773,7 @@ function events.ItemGenerated(t)
 			t.Item.Bonus=0
 			t.Item.Charges=0
 		else
-			vars.artifactRollPity = vars.artifactRollPity + lootMultiplier
+			vars.artifactRollPity = vars.artifactRollPity + drop.multiplier
 		end
 	end	
 
@@ -859,11 +917,8 @@ function events.ItemGenerated(t)
 		]]
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
 		local maxChargesCap=MawCore.ItemLevel.MaxCharges()
-		--consume: one corpse hands its level to one drop
-		local monsterLevel=lootMonsterLevel
-		lootMonsterLevel=nil
 		it.MaxCharges=MawCore.ItemLevel.ChargesFor(
-			MawCore.ItemLevel.ForDrop(monsterLevel, partyLevel, mapLevel))
+			MawCore.ItemLevel.ForDrop(drop.monsterLevel, partyLevel, mapLevel))
 		
 		local maxTier
 		maxTier, cap2=GetEnchantTierCap()
@@ -872,10 +927,10 @@ function events.ItemGenerated(t)
 		ps1=t.Strength
 
 		pseudoStr=ps1+partyLevel1
-		if bossLoot then
+		if drop.boss then
 			pseudoStr=pseudoStr+1
 		end
-		if OmnipotentLoot then
+		if drop.omnipotent then
 			pseudoStr=pseudoStr+1
 		end
 		if math.random(1,18)<partyLevel1%18 then
@@ -888,7 +943,6 @@ function events.ItemGenerated(t)
 		if vars.Mode==2 then
 			diffMult=1.8
 		end
-		lootMultiplier=lootMultiplier or 1
 
 		--the common end: how many of the three enchant chances hit
 		local p1=enc1Chance[math.min(pseudoStr,#enc1Chance)]/100
@@ -898,7 +952,7 @@ function events.ItemGenerated(t)
 		p2=p2^(1/diffMult)
 		p3=p3^(1/diffMult)
 		local roll1,roll2,rollSpc=math.random(),math.random(),math.random()
-		if bossLoot then
+		if drop.boss then
 			roll1=roll1/2
 			roll2=roll2/2
 			rollSpc=rollSpc/2
@@ -915,10 +969,9 @@ function events.ItemGenerated(t)
 		end
 		local noLegendary=vars.AusterityMode or Game.HouseScreen==2 or Game.HouseScreen==95
 		if rarity==RARITY_EPIC then
-			rarity=RollItemRarity(pseudoStr, bossLoot, noLegendary)
+			rarity=RollItemRarity(pseudoStr, drop.boss, noLegendary, drop.multiplier)
 		end
-		bossLoot=false
-		if OmnipotentLoot then
+		if drop.omnipotent then
 			rarity=RARITY_CELESTIAL
 		end
 		local enchantTier=GetRarityEnchantTier(rarity)
@@ -1031,9 +1084,6 @@ function events.ItemGenerated(t)
 		if rarity==RARITY_CELESTIAL then
 			SetCelestialItem(it,true)
 		end
-		lootMultiplier=1 --reset
-		
-		OmnipotentLoot=false
 		--nerf to skills
 		if it.Bonus>=17 and it.Bonus<=24 then
 			it.BonusStrength=math.ceil(math.max(it.BonusStrength^0.5,it.BonusStrength/10))
@@ -4417,7 +4467,7 @@ function events.AfterLoadMap()
 			if it.MaxCharges==0 then
 				if table.find(mawArtifacts, it.Number) then
 					if it:T().Value>=20000 and it.BonusStrength==0 then
-						bossLoot = true
+						LootContext.markBoss()
 						it:Randomize(6,0)
 					end
 				end
