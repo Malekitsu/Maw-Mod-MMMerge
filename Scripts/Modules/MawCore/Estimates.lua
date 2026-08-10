@@ -104,8 +104,10 @@ local STAT_SHARE = 0.33
 local TOTAL_SLOTS = 13.75	--16 - 2.25 for ring resistance enchants
 local ENCHANTS_PER_ITEM = 3	--2 normal + 1 special
 local ENCHANT_MAX_LEVEL = 1000
+
 function getTotalEnchantPower(level)
-	local geared = math.min(level, ENCHANT_MAX_LEVEL)/ENCHANT_MAX_LEVEL
+	--local geared = math.min(level, ENCHANT_MAX_LEVEL)/ENCHANT_MAX_LEVEL
+	local geared = level/ENCHANT_MAX_LEVEL --using this or monsters don't scale end game
 	return ENCHANTS_PER_ITEM*TOTAL_SLOTS*GetMaxEnchantStrength()*geared
 end
 
@@ -223,6 +225,25 @@ local function estimateLegendaryDamageTaken(lvl)
 	return (1 - LEGENDARY_18_REDUCTION*ramp)*(1 - (1-crowd)*ramp)
 end
 
+local COVER_BASE = 0.10
+local COVER_PER_SKILL = 0.01
+local COVER_MAX = 0.40
+local COVER_MASTERY = 2
+
+local TANK_RATIO_CAP = 7		--approached, never passed
+local TANK_RATIO_MIDPOINT = 240	--level at which it is halfway there
+local function tankVitalityRatio(lvl)
+	return 1 + (TANK_RATIO_CAP-1)*lvl/(lvl + TANK_RATIO_MIDPOINT)
+end
+
+local function coverMultiplier(lvl)
+	if masteryPerLevel(lvl) < COVER_MASTERY then
+		return 1
+	end
+	local p = math.min(COVER_BASE + COVER_PER_SKILL*estimateSkill(lvl), COVER_MAX)
+	return 1/((1 - p) + p/tankVitalityRatio(lvl))
+end
+
 --average
 function getPlayerEstimatedVitality(lvl)
 	local health = estimateHealth(lvl)
@@ -233,7 +254,7 @@ function getPlayerEstimatedVitality(lvl)
 	local magic = estimateMagicDamageTaken(lvl)
 	local taken = (physical*share + magic*(1-share))*estimateLegendaryDamageTaken(lvl)
 
-	return health/taken, physical, magic, taken, health
+	return health/taken*coverMultiplier(lvl), physical, magic, taken, health
 end
 
 function getPlayerEstimatedHealth(lvl)
