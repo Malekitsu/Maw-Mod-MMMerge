@@ -848,20 +848,8 @@ function events.ItemGenerated(t)
 		end
 		]]
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
-		cap1=50*((difficultyExtraPower-1)*2+1)
-		maxChargesCap=50*((difficultyExtraPower-1)*4+1)
-		if mapvars.mapAffixes or Map.Name=="d42.blv" then
-			cap1=cap1+75
-			maxChargesCap=maxChargesCap+100
-		end
-		--nerf
-		cap1=cap1/2
-		maxChargesCap=maxChargesCap/2
-		
-		if vars.madnessMode then
-			maxChargesCap=200
-		end
-		it.MaxCharges=math.floor(partyLevel/10+mapLevel/80)
+		maxChargesCap=GetMaxChargesCap()
+		it.MaxCharges=GetChargesForLevel(partyLevel+mapLevel/8)
 		
 		local maxTier
 		maxTier, cap2=GetEnchantTierCap()
@@ -4440,6 +4428,32 @@ function events.AfterLoadMap()
 	end
 end
 
+ITEM_LEVEL_PER_CHARGE=5
+local maxItemLevel = {
+	[1] = 350,	--bolster 40
+	[2] = 350,	--bolster 70
+	[3] = 350,	--bolster 100, baseline
+	[4] = 350,	--bolster 150
+	[5] = 350,	--bolster 200
+	[6] = 350,	--bolster 300
+	[7] = 500,	--doom
+	[8] = 700,	--road to insanity
+	[9] = 1000,	--beyond madness
+}
+
+function GetMaxItemLevel()
+	return maxItemLevel[GetDifficulty()] or maxItemLevel[3]
+end
+
+function GetMaxChargesCap()
+	return math.floor(GetMaxItemLevel()/ITEM_LEVEL_PER_CHARGE)
+end
+
+--the charges a drop needs in order to read back as a given level
+function GetChargesForLevel(level)
+	return math.floor(math.max(level, 0)/ITEM_LEVEL_PER_CHARGE)
+end
+
 --item level from the drop-tier average (the getItemRecovery curve); each charge adds 5
 function GetItemLevel(it)
 	local txt=it:T()
@@ -4450,9 +4464,9 @@ function GetItemLevel(it)
 		lvl=lvl+txt.ChanceByLevel[i]*i
 	end
 	if tot==0 then
-		return it.MaxCharges*5
+		return it.MaxCharges*ITEM_LEVEL_PER_CHARGE
 	end
-	return round(lvl/tot*6-5)+it.MaxCharges*5
+	return round(lvl/tot*6-5)+it.MaxCharges*ITEM_LEVEL_PER_CHARGE
 end
 
 function estimateWeaponDamageMultiplier(level)
