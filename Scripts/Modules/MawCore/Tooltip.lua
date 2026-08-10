@@ -569,7 +569,7 @@ local function tooltipEnchantStats(t)
 			end
 		end
 		if extraDescription and t.Description then
-			local txt="\n\nItem Bonus Power: " .. t.Item.MaxCharges .. "/" .. MawCore.ItemLevel.MaxCharges()
+			local txt="\n\nItem Bonus Power: " .. t.Item.MaxCharges .. "/" .. GetItemChargesCap(t.Item)
 			t.Description =t.Description .. StrColor(100,100,100, txt)
 		end
 	end

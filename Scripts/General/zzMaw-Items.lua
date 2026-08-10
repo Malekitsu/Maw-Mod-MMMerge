@@ -467,6 +467,32 @@ function GetMaxEnchantStrength()
 	return round(applyDifficulty(encStrUp[#encStrUp])*PRIMORDIAL_ENCHANT_MULT)
 end
 
+local PRIMORDIAL_CHARGES_MULT = 1.2
+local ANCIENT_MIN_CHARGES = 2
+local PRIMORDIAL_MIN_CHARGES = 4
+
+function GetMaxItemCharges()
+	return round(MawCore.ItemLevel.MaxCharges()*PRIMORDIAL_CHARGES_MULT)
+end
+
+function GetItemChargesCap(it)
+	if GetAncientTier(it)>0 then
+		return GetMaxItemCharges()
+	end
+	return MawCore.ItemLevel.MaxCharges()
+end
+
+local function rollTierCharges(charges, ancientTier)
+	local rolled = charges
+	if ancientTier==2 then
+		rolled = math.max(round(charges*PRIMORDIAL_CHARGES_MULT), charges+PRIMORDIAL_MIN_CHARGES)
+	elseif ancientTier==1 then
+		rolled = math.max(round(charges*math.random(20,PRIMORDIAL_CHARGES_MULT*20)/20),
+			charges+ANCIENT_MIN_CHARGES)
+	end
+	return math.min(rolled, GetMaxItemCharges())
+end
+
 
 --Bolster/insanity multiplier: it raises the tier cap AND multiplies every
 --rolled enchant strength. Insanity overrides the bolster, as in the generator.
@@ -1012,7 +1038,7 @@ function events.ItemGenerated(t)
 			power=2
 		end
 		if rarity==RARITY_ANCIENT then
-			it.MaxCharges=it.MaxCharges+math.random(1,5)
+			it.MaxCharges=rollTierCharges(it.MaxCharges, 1)
 			SetAncientTier(it,1)
 		end
 		--apply special enchant
@@ -1042,7 +1068,7 @@ function events.ItemGenerated(t)
 		--primordial item, and the celestial that carries its grade
 		if enchantTier==2 then
 			SetAncientTier(it,2)
-			it.MaxCharges=math.min(maxChargesCap,math.min(it.MaxCharges+5, it.MaxCharges*1.25), it.MaxCharges+10)
+			it.MaxCharges=rollTierCharges(it.MaxCharges, 2)
 			--apply special enchant
 			n=it.Number
 			c=Game.ItemsTxt[n].EquipStat
@@ -1130,8 +1156,7 @@ function events.ItemGenerated(t)
 			SetEnc2(it,syncType,it.BonusStrength)
 		end
 		
-		--maxcharges Cap
-		it.MaxCharges=math.min(maxChargesCap, it.MaxCharges)
+		it.MaxCharges=math.min(GetItemChargesCap(it), it.MaxCharges)
 		
 		--reduce chances for resistances
 		if GetItemEquipStat(it)~=10 and it.Bonus>=11 and it.Bonus<=16 then
@@ -1192,7 +1217,6 @@ function events.ItemGenerated(t)
 			end
 		end
 		if IsCelestialItem(it) then
-			it.MaxCharges=math.min(it.MaxCharges*1.5,255)
 			return
 		end
 	end
@@ -1498,11 +1522,7 @@ function updateCelestialItem(it,pl)
 		if HasEnc2(it) then
 			SetEnc2Strength(it,math.min(strength,ENC2_MAX_STRENGTH))
 		end
-		local cap=180 
-		if vars.madnessMode then
-			cap=240
-		end
-		it.MaxCharges=math.min(math.round(tier*mult*0.8),cap)
+		it.MaxCharges=rollTierCharges(MawCore.ItemLevel.ChargesFor(lvl), 2)
 	end
 end
 
