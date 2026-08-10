@@ -858,11 +858,12 @@ function events.ItemGenerated(t)
 		end
 		]]
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
-		maxChargesCap=GetMaxChargesCap()
+		local maxChargesCap=MawCore.ItemLevel.MaxCharges()
 		--consume: one corpse hands its level to one drop
 		local monsterLevel=lootMonsterLevel
 		lootMonsterLevel=nil
-		it.MaxCharges=GetChargesForLevel(GetLootLevel(monsterLevel, partyLevel, mapLevel))
+		it.MaxCharges=MawCore.ItemLevel.ChargesFor(
+			MawCore.ItemLevel.ForDrop(monsterLevel, partyLevel, mapLevel))
 		
 		local maxTier
 		maxTier, cap2=GetEnchantTierCap()
@@ -1850,7 +1851,7 @@ enchantbonusdamage[46] = {20,40,["Type"]=0,["Coeff"]=0.5}
 --weapon damage (the damping factor cancels the divisor in GetWeaponDamage)
 function enchantDamageRange(it, id)
 	local ench=enchantbonusdamage[id]
-	local avg=GetWeaponDamage(it)*estimateWeaponDamageMultiplier(GetItemLevel(it))*ench.Coeff
+	local avg=GetWeaponDamage(it)*estimateWeaponDamageMultiplier(MawCore.ItemLevel.OfItem(it))*ench.Coeff
 	local mean=(ench[1]+ench[2])/2
 	--{min,max} are also a guaranteed floor, so a low item level still deals
 	--something; two-handed weapons are owed twice as much of it
@@ -4039,7 +4040,7 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 		local id=pl:GetIndex()
 		--aura scales with the undamped item-level weapon damage: multiplying the
 		--damping factor back cancels the divisor inside GetWeaponDamage
-		local itemLevel=GetItemLevel(it)
+		local itemLevel=MawCore.ItemLevel.OfItem(it)
 		local damage=GetWeaponDamage(it)*fireAuraDamage[m]*estimateWeaponDamageMultiplier(itemLevel)
 		damage=math.max(damage, fireAuraMinDamage[m]*(IsTwoHandedWeapon(it) and 2 or 1))
 		damage=damage*GetLegendary19Mult(pl)
@@ -4441,71 +4442,6 @@ function events.AfterLoadMap()
 	end
 end
 
-ITEM_LEVEL_PER_CHARGE=5
-local maxItemLevel = {
-	[1] = 350,	--bolster 40
-	[2] = 350,	--bolster 70
-	[3] = 350,	--bolster 100, baseline
-	[4] = 350,	--bolster 150
-	[5] = 350,	--bolster 200
-	[6] = 350,	--bolster 300
-	[7] = 500,	--doom
-	[8] = 700,	--road to insanity
-	[9] = 1000,	--beyond madness
-}
-
-function GetMaxItemLevel()
-	return maxItemLevel[GetDifficulty()] or maxItemLevel[3]
-end
-
-function GetMaxChargesCap()
-	return math.floor(GetMaxItemLevel()/ITEM_LEVEL_PER_CHARGE)
-end
-
-local FALLBACK_PARTY_SHARE=7/8
-
---how far a drop may outpace the rest of your progression: whichever is kinder,
---+10% or a flat margin. partyLevel counts the OTHER worlds, so this is the
---anti-farm brake. Chests get the tighter margin: they are free, a kill is not.
-local GUARD_PERCENT=1.1
-local GUARD_MARGIN_MONSTER=40
-local GUARD_MARGIN_CHEST=20
-
-local function progressionGuard(partyLevel, margin)
-	return math.max(partyLevel*GUARD_PERCENT, partyLevel+margin)
-end
-
---A monster hands over its own level: the same number getMonsterHealth and
---getMonsterDamage size it with, so a kill and its loot land on the same scale
---by construction. monsterLevel is nil for chests and shops.
-function GetLootLevel(monsterLevel, partyLevel, mapLevel)
-	if monsterLevel then
-		return math.min(monsterLevel, progressionGuard(partyLevel, GUARD_MARGIN_MONSTER))
-	end
-	local level=partyLevel*FALLBACK_PARTY_SHARE+mapLevel*(1-FALLBACK_PARTY_SHARE)
-	return math.min(level, progressionGuard(partyLevel, GUARD_MARGIN_CHEST))
-end
-
---the charges a drop needs in order to read back as a given level
-function GetChargesForLevel(level)
-	return math.floor(math.max(level, 0)/ITEM_LEVEL_PER_CHARGE)
-end
-
---item level from the drop-tier average (the getItemRecovery curve); each charge adds 5
-function GetItemLevel(it)
-	local txt=it:T()
-	local tot=0
-	local lvl=0
-	for i=1,6 do
-		tot=tot+txt.ChanceByLevel[i]
-		lvl=lvl+txt.ChanceByLevel[i]*i
-	end
-	if tot==0 then
-		return it.MaxCharges*ITEM_LEVEL_PER_CHARGE
-	end
-	return round(lvl/tot*6-5)+it.MaxCharges*ITEM_LEVEL_PER_CHARGE
-end
-
 function estimateWeaponDamageMultiplier(level)
 	return 1 + 0.02 * level ^ 0.675
 end
@@ -4515,5 +4451,5 @@ function IsTwoHandedWeapon(it)
 end
 
 function GetWeaponDamage(it)
-	return getWeaponDamageForLevel(GetItemLevel(it), IsTwoHandedWeapon(it))
+	return getWeaponDamageForLevel(MawCore.ItemLevel.OfItem(it), IsTwoHandedWeapon(it))
 end

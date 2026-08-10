@@ -784,21 +784,7 @@ end
 evt.PotionEffects[93] = function(IsDrunk, t, Power)
 	if IsBaseItemId(t.Number) then
 		if IsCelestialItem(t) then return end
-		local difficultyExtraPower=1
-		if Game.BolsterAmount>100 then
-			difficultyExtraPower=(Game.BolsterAmount-100)/2000+1
-		end
-		local maxChargesCap=50*((difficultyExtraPower-1)*2+1)
-		if HasLegendaryAffix(t) then
-			maxChargesCap=50*((difficultyExtraPower-1)*4+1)
-		end
-		maxChargesCap=maxChargesCap+100 --mapping release
-		maxChargesCap=maxChargesCap/2
-
-		if vars.madnessMode then
-			maxChargesCap=150
-		end
-		maxChargesCap=round(maxChargesCap)
+		local maxChargesCap=MawCore.ItemLevel.MaxCharges()
 		local levelRequired=GetLevelRquirement(t)
 		--check if equippable
 		local plLvl=Party[Game.CurrentPlayer].LevelBase

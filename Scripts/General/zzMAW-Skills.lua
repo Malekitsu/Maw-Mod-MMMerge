@@ -185,7 +185,7 @@ function getItemRecovery(it, playerLevel)
 		baseSpeed=baseRecovery[skill] * (0.75+playerLevel/500)
 		baseSpeed=round(baseSpeed/10)*10
 	elseif baseRecovery[skill] then
-		itemLevel=GetItemLevel(it)
+		itemLevel=MawCore.ItemLevel.OfItem(it)
 		baseSpeed=baseRecovery[skill] * (0.75+itemLevel/500)
 		baseSpeed=round(baseSpeed/10)*10
 	end
