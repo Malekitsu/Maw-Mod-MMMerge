@@ -106,9 +106,9 @@ local ENCHANTS_PER_ITEM = 3	--2 normal + 1 special
 local ENCHANT_MAX_LEVEL = 1000
 
 function getTotalEnchantPower(level)
-	--local geared = math.min(level, ENCHANT_MAX_LEVEL)/ENCHANT_MAX_LEVEL
-	local geared = level/ENCHANT_MAX_LEVEL --using this or monsters don't scale end game
-	return ENCHANTS_PER_ITEM*TOTAL_SLOTS*GetMaxEnchantStrength()*geared
+	--local currentLevelRatio = math.min(level, ENCHANT_MAX_LEVEL)/ENCHANT_MAX_LEVEL
+	local currentLevelRatio = level/ENCHANT_MAX_LEVEL --using this or monsters don't scale end game
+	return ENCHANTS_PER_ITEM*TOTAL_SLOTS*GetMaxEnchantStrength()*currentLevelRatio
 end
 
 function gearedFraction(level)
@@ -130,6 +130,7 @@ end
 local BASE_HP = 25
 local HP_PER_LEVEL_MIN = 3
 local HP_PER_LEVEL_MAX = 9
+local BODYBUILDING_MASTERY = 3	--the average character stops at Master, never GM
 
 --HP per level grows into its cap over the promotion range
 local function hpPerLevel(lvl)
@@ -150,8 +151,10 @@ local function estimateHealth(lvl)
 
 	--endurance and bodybuilding both buy extra HP on every level
 	local enduranceEffect = stat/5
-	local bodybuildingFlat = math.min(1 + skill/masterLearned()*2, 3)	--master as reference
-	local bodybuildingPct = GetGradualMasteryValue(bodybuildingHP, skill, mastery)
+
+	local bbMastery = math.min(mastery, BODYBUILDING_MASTERY)
+	local bodybuildingFlat = skill*bbMastery
+	local bodybuildingPct = GetGradualMasteryValue(bodybuildingHP, skill, bbMastery)
 
 	local health = BASE_HP + perLevel*lvl + (enduranceEffect + bodybuildingFlat)*perLevel + flatBonus
 	return health*(1 + bodybuildingPct*skill/100)*(1 + stat/2500)
@@ -186,10 +189,10 @@ end
 
 local LEGENDARY_16_RESISTANCE = 0.5
 
-local function estimateEnchantResistance(lvl)
-	local geared = math.min(lvl, ENCHANT_MAX_LEVEL)/ENCHANT_MAX_LEVEL
-	local power = MawCore.Formulas.resistanceEnchantPower(GetMaxEnchantStrength()*geared, true)
-	return power*(1 + LEGENDARY_16_RESISTANCE*legendaryRamp(lvl))
+local function estimateEnchantResistance(level)
+	local currentLevelRatio = level/ENCHANT_MAX_LEVEL
+	local power = MawCore.Formulas.resistanceEnchantPower(GetMaxEnchantStrength()*currentLevelRatio, true)
+	return power*(1 + LEGENDARY_16_RESISTANCE*legendaryRamp(level))
 end
 
 local function estimateChanceToGetHit(lvl)
