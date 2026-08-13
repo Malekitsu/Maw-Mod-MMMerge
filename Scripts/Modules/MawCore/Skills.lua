@@ -19,8 +19,11 @@
 --   * names/descriptions stored; base-skill (<39) writes reach the engine's
 --     own pointer arrays, extended ones are Lua-side only until the UI
 --     hooks arrive in stage 2 (K4, K5 partial)
---   * mastery-limit tables parsed from Data\Tables (K6 data side; the
---     teacher/UI hooks that consume them engine-side are stage 3)
+--   * mastery-limit tables parsed from Data\Tables (K6) and projected onto
+--     Game.Classes.Skills, so the engine's own readers -- the skill teacher
+--     first of all -- answer from Class Skillz.txt. Race modifiers still
+--     reach only Skillz.MasteryTable_get, not the engine (see
+--     projectEngineTable)
 --   * category/shop registrations recorded for stage 3 (K8, K9 data side)
 --   * CleanMastery is a NO-OP for now: it zeroes player skills when it acts,
 --     so it stays disabled until MasteryLimit values are verified in-game
@@ -340,6 +343,22 @@ local function masteryLimitRaw(race, clas, skill)
 		return applyMod(raceM[race] and raceM[race][skill] or DEFAULT_MOD, base)
 	end
 	return base
+end
+
+local ENGINE_MAX_MASTERY = 4
+
+function Skills.projectEngineTable()
+	local t = Game.Classes.Skills
+	local lastSkill = math.min(t[0].count, OLD_COUNT) - 1
+	for clas = 0, t.count - 1 do
+		local row = classM[clas]
+		if row then
+			local dst = t[clas]
+			for skill = 0, lastSkill do
+				dst[skill] = math.min(row[skill] or 0, ENGINE_MAX_MASTERY)
+			end
+		end
+	end
 end
 
 -- DLL next_class: last consecutive entry sharing the current class's kind
@@ -850,6 +869,10 @@ function Skills.start()
 		if not wasInGame then
 			loadFromVars()
 		end
+	end
+
+	function events.GameInitialized2()
+		Skills.projectEngineTable()
 	end
 
 	-- take over the public API; from here every Skillz.* call runs in Lua
