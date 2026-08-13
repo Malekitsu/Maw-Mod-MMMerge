@@ -99,10 +99,10 @@ local function tooltipPotions(t)
 		t.Description="Grants " .. StrColor(0,0,200,math.ceil(t.Item.Bonus^0.5/1.5) + 1) .. " bonus to Meditation skill for 6 hours."
 	end
 	if t.Item.Number==247 then
-		t.Description=StrColor(255,255,153,"Heals " .. round(t.Item.Bonus^1.75*1.5)+20 .. " Hit Points") .. "\n" .. t.Description
+		t.Description=StrColor(255,255,153,"Heals " .. round(t.Item.Bonus^1.75*1.5+50) .. " Hit Points") .. "\n" .. t.Description
 	end
 	if t.Item.Number==248 then
-		t.Description=StrColor(255,255,153,"Restores " .. round(t.Item.Bonus^1.6)+20 .. " Spell Points") .. "\n" .. t.Description
+		t.Description=StrColor(255,255,153,"Restores " .. round(t.Item.Bonus^1.6+50) .. " Spell Points") .. "\n" .. t.Description
 	end
 	if t.Item.Number==TRANSCENDENCE_POTION then
 		local index=Party[math.min(math.max(Game.CurrentPlayer, 0), Party.High)]:GetIndex()
