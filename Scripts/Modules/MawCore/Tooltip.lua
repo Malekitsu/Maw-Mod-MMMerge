@@ -104,28 +104,11 @@ local function tooltipPotions(t)
 	if t.Item.Number==248 then
 		t.Description=StrColor(255,255,153,"Restores " .. round(t.Item.Bonus^1.6)+20 .. " Spell Points") .. "\n" .. t.Description
 	end
-	if t.Item.Number==259 then
-		local id=Game.CurrentPlayer
-		if Game.CurrentPlayer<0 or Game.CurrentPlayer>Party.High then
-			id=0
-		end
-		local pl=Party[id]
-		local index=pl:GetIndex()
-		vars.expPot=vars.expPot or {}
-		vars.expPot[index]=vars.expPot[index] or 0
-		local percent=round(vars.expPot[index]/(pl.Exp-vars.expPot[index])*10000)/100
-		local str
-		if percent<25 then
-			str=StrColor(0,255,0,percent .. "%")
-		else
-			str=StrColor(255,0,0,percent .. "%")
-		end
-
-		local baseExp=(pl.Exp-vars.expPot[index])
-		local baseLevel=calcLevel(baseExp)
-		local currentLevel=calcLevel(pl.Exp)
-		local levelDiff=round(currentLevel-baseLevel)
-		t.Description=t.Description .. "\n\nCan benefit only if experience gained this way is less than 25% of base experience and level gained are less than 50\nCurrent amount: " .. str .. "\nLevels: " .. levelDiff
+	if t.Item.Number==TRANSCENDENCE_POTION then
+		local index=Party[math.min(math.max(Game.CurrentPlayer, 0), Party.High)]:GetIndex()
+		local reached=vars.mawTranscendence and vars.mawTranscendence[index] or 0
+		t.Description=t.Description .. "\n\nBest step already taken: " .. reached
+			.. " (" .. GetTranscendenceSkillPoints(reached) .. " Skill Points)"
 	end
 		
 	if table.find(potionUsingCharges,t.Item.Number) then

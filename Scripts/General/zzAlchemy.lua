@@ -212,6 +212,7 @@ function events.UseMouseItem(t)
 			end
 		end
 	end
+
 	
 	--age potions
 	if it.Number==258 then
@@ -223,21 +224,24 @@ function events.UseMouseItem(t)
 		pl.AgeBonus=0
 	end
 	
-	--exp potion
-	if it.Number==259 then
-		local experience=it.Bonus*500
-		vars.expPot=vars.expPot or {}
-		vars.expPot[index]=vars.expPot[index] or 0
-		local baseExp=(pl.Exp-vars.expPot[index])
-		local baseLevel=calcLevel(baseExp)
-		local currentLevel=calcLevel(pl.Exp)
-		if vars.expPot[index]/(pl.Exp-vars.expPot[index])<0.25 and currentLevel-baseLevel<50 then
-			pl.Exp=pl.Exp+experience
-			vars.expPot[index]=vars.expPot[index]+experience
-		else
-			Game.ShowStatusText("You need to gain more exp. to benefit from this potion")
+	--Transcendence: permanent SKILL POINTS, on the same step ladder as the
+	--black stat potions above -- one step per 50 power, non-stacking.
+	--
+	--It cannot be stored the way those are, though: a stat bonus is recomputed
+	--from vars.BlackPotions on every read, while skill points are SPENT. So
+	--what is remembered is the highest STEP reached, and each drink hands out
+	--only the difference. A weaker potion afterwards gives nothing.
+	if it.Number==TRANSCENDENCE_POTION then
+		local step=math.floor(it.Bonus/BLACK_POTION_POWER_PER_STEP)
+		vars.mawTranscendence=vars.mawTranscendence or {}
+		local reached=vars.mawTranscendence[index] or 0
+		if step<=reached then
+			Game.ShowStatusText("Can't benefit anymore")
 			return
 		end
+		pl.SkillPoints=pl.SkillPoints+GetTranscendenceSkillPoints(step)
+			-GetTranscendenceSkillPoints(reached)
+		vars.mawTranscendence[index]=step
 	end
 	
 	--consume
@@ -283,6 +287,14 @@ potionPowerRequirement={
 	[246]=40,
 	[256]=50,
 }
+
+TRANSCENDENCE_POTION=259
+BLACK_POTION_POWER_PER_STEP=50
+
+function GetTranscendenceSkillPoints(step)
+	return 5*step*step + 15*step
+end
+
 blackPermanentBuffs={
 	[252]={1,5},
 	[253]={2,3},
@@ -429,7 +441,7 @@ potionText={
 	[256] = "Permanently adds 'of Darkness' property to a non-magic weapon.\nRequire 100 power to work.\n",
 	[257] = "Increases all Seven Statistics temporarily by 10+(1 x Power) for 6 hours.",
 	[258] = "Fix caracter age at 60.\nRequire 50 power to work.\n",
-	[259] = "Grant 500 Experience point per Power to the player.",
+	[259] = "Permanently grants Skill Points.",
 	[260] = "Fix caracter age at 20.\nRequire 50 power to work.\n",
 	[261] = "Permanently adds 30 per 50 potion power to Fire, Air, Water and Earth Resistance, single-use.\nRequire 50 power per step to work.\nPreviously gained bonus do not stack.\n",
 	[262] = "Permanently adds 30 per 50 potion power to Mind and Body Resistance, single-use.\nRequire 50 power per step to work.\nPreviously gained bonus do not stack.\n",
@@ -485,6 +497,16 @@ function events.GameInitialized2()
 	potionText[257]=function(power)
 		return "Increases all seven of your Statistics by " .. statPctLight(power)
 			.. "% for 6 hours."
+	end
+	potionText[TRANSCENDENCE_POTION]=function(power)
+		local step=math.floor((power or 0)/BLACK_POTION_POWER_PER_STEP)
+		if step<1 then
+			return "Permanently grants Skill Points. Requires "
+				.. BLACK_POTION_POWER_PER_STEP .. " power per step to work."
+		end
+		return "Permanently grants " .. GetTranscendenceSkillPoints(step)
+			.. " Skill Points (step " .. step .. ").\nOnly the difference over the "
+			.. "best one already drunk is granted."
 	end
 	potionText[263]=function(power)
 		local bf=buffPower[85]
