@@ -246,30 +246,9 @@ function events.PlayerAttacked(t)
 	end
 end
 
---Fires ONLY while a monster is attacking a player: the hook at 0x48db2f bails
---out unless WhoHitPlayer() returns a monster and a valid party slot. So every
---call here IS one attack roll and there is nothing to pair up -- the old
---acNerf=2 counter existed to mark "the next two AC reads belong to this
---attack", and it could leak into the following attack whenever the engine read
---AC fewer times than expected. t.Monster is the attacker, which beats reading
---a global that a previous event happened to leave behind.
-function events.GetArmorClass(t)
-	--t.Monster comes from the emitter; 'mon' is the fallback in case some other
-	--path ever raises this event without one
-	if CalcHitOrMiss(getMonsterLevel(t.Monster or mon), t.Player:GetSpeed()) then
-		t.AC=0
-	else
-		t.AC=64000
-	end
-end
 
 function CalcHitOrMiss(monLvl, speed)
-	local hitChance=MawCore.Formulas.chanceToBeHit(speed, monLvl)
-	if hitChance<math.random() then
-		return false
-	else
-		return true
-	end
+	return MawCore.Formulas.chanceToBeHit(speed, monLvl)>=math.random()
 end
 
 --body building description

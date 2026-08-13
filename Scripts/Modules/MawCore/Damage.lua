@@ -1613,7 +1613,11 @@ local function pstage_damageRecompute(t)
 	end
 	]]
 	roll=math.random()
-	if dodgeChance>=roll then
+
+	local dodgeableHere=data.MonsterAction==2 or data.MonsterAction==3
+		or data.Object~=nil
+	local speedDodged=dodgeableHere and MawRollDodge(mon, pl)==false
+	if dodgeChance>=roll or speedDodged then
 		t.Result=0
 		-- Use the same player that performed the dodge calculation
 		local index = -1
@@ -1911,6 +1915,7 @@ local ppipe = MawCore.Pipeline.new("DamageToPlayer", {
 	"item-refresh",			-- [reactions] deferred itemStats refresh
 	"death-seed-mark",		-- [reactions] madness death-seed marker
 	"damage-recompute",		-- [base] THE replacement (dodge, monster damage, disease, ...)
+
 	-- tier 2: was GameInitialized2-registered
 	"boss-affixes-player",	-- [reactions] boss on-hit effects
 	"survival-gate",		-- [gates]
