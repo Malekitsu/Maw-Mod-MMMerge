@@ -104,6 +104,12 @@ end
 --hour of power buff list
 local hopList = {8, 9, 14, 15}
 
+local function skipRemoteCast(t)
+	if t.MultiplayerData then
+		t.MultiplayerData.skipped=true
+	end
+end
+
 --modify Spells
 function events.PlayerCastSpell(t)
 	--refresh everyone before and after casting
@@ -120,7 +126,10 @@ function events.PlayerCastSpell(t)
 	end
 	
 	local currentPl=Game.CurrentPlayer
-	if table.find(assassinClass, t.Player.Class) then return end
+	if not t.RemoteData and table.find(assassinClass, t.Player.Class) then
+		skipRemoteCast(t)
+		return
+	end
 	for i=0,Party.High do
 		if Party[i]:GetIndex()==t.PlayerIndex then
 			Game.CurrentPlayer=i
@@ -130,14 +139,21 @@ function events.PlayerCastSpell(t)
 	Game.CurrentPlayer=currentPl
 	
 	if t.IsSpellScroll then -- disable for scrolls
+		if t.MultiplayerData then
+			t.MultiplayerData.skipped=true
+		end
 		return
 	end
-	if t.Player.SP<t.SPCost then 
+	if t.RemoteData and t.RemoteData.skipped then
+		return
+	end
+	if not t.RemoteData and t.Player.SP<t.SPCost then
 		return
 	end
 	--Invisibility
 	if t.SpellId==19 then
-		if Party.EnemyDetectorRed or Party.EnemyDetectorYellow then
+		if not t.RemoteData and (Party.EnemyDetectorRed or Party.EnemyDetectorYellow) then
+			skipRemoteCast(t)
 			return
 		end
 		if not t.RemoteData then
@@ -298,7 +314,10 @@ function events.PlayerCastSpell(t)
 	
 	--lesser heal
 	if t.SpellId == 68 then
-		if table.find(dkClass, t.Player.Class) then return end
+		if not t.RemoteData and table.find(dkClass, t.Player.Class) then
+			skipRemoteCast(t)
+			return
+		end
 		if not t.RemoteData then
 			local sp=healingSpells[68]
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
@@ -373,7 +392,10 @@ function events.PlayerCastSpell(t)
 	
 	--cure disease, reworked to greater heal
 	if t.SpellId==74 then
-		if table.find(dkClass, t.Player.Class) then return end
+		if not t.RemoteData and table.find(dkClass, t.Player.Class) then
+			skipRemoteCast(t)
+			return
+		end
 		if not t.RemoteData then
 			local sp=healingSpells[74]
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
