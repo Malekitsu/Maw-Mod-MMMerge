@@ -2876,13 +2876,15 @@ local function addBuffStats(pl, tab)
 			if Party.SpellBuffs[buffList[i]].ExpireTime>=Game.Time or potionBuffActive(pl, spellList[i]) then
 				local s, m, level=getBuffSkill(spellList[i], pl)
 				buff=(buffPower[spellList[i]].Base[m]+level/4)*(1+buffPower[spellList[i]].Scaling[m]/100*s)
-				buff4=math.max(buff,buff2)
-				tab[i+10]=tab[i+10]+buff4
 				if m>0 then
 					--mastery 0 means no source at all; a low-power potion is a NEGATIVE
 					--skill and still has to grant its reduced share
 					pct=GetBuffStatPct(s)
 				end
+			end
+			buff4=math.max(buff, buff2)
+			if buff4>0 then
+				tab[i+10]=tab[i+10]+buff4
 			end
 			pct=math.max(pct, lightPct)
 			local tabID=spellStat[spellList[i]]
