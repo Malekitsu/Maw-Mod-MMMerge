@@ -2862,7 +2862,8 @@ local function addBuffStats(pl, tab)
 			pl.LuckBase+pl.LuckBonus,
 		}
 		local s, m, level=getBuffSkill(85, pl)
-		local buff2=(buffPower[85].Base[m]+level/4)*(1+buffPower[85].Scaling[m]/100*s/1.5)
+		local buff2=(buffPower[85].Base[m]+level/4)
+			*(1+buffPower[85].Scaling[m]/100*s/DAY_OF_PROTECTION_SKILL_PENALTY)
 		--light: percentage of the total stat
 		local s83, m83=getBuffSkill(83, pl)
 		local lightPct=0

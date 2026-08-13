@@ -3028,6 +3028,9 @@ POTION_BUFF_MIN=0.75
 POTION_BUFF_MAX=1.5
 POTION_BUFF_FULL_POWER=200
 POTION_BUFF_SKILL_SPAN=50
+POTION_BUFF_SKILL_SPAN_WIDE=70
+DAY_OF_PROTECTION_SKILL_PENALTY=1.4
+local wideSpanBuffs={[83]=true, [85]=true}
 POTION_LEVEL_PER_POWER=0.5
 
 function GetPotionBuffFraction(power)
@@ -3035,8 +3038,10 @@ function GetPotionBuffFraction(power)
 	return POTION_BUFF_MIN+(POTION_BUFF_MAX-POTION_BUFF_MIN)*t
 end
 
-function GetPotionBuffSkill(power)
-	return POTION_BUFF_SKILL_SPAN*(GetPotionBuffFraction(power)-1)
+function GetPotionBuffSkill(power, spell)
+	local span=wideSpanBuffs[spell] and POTION_BUFF_SKILL_SPAN_WIDE
+		or POTION_BUFF_SKILL_SPAN
+	return span*(GetPotionBuffFraction(power)-1)
 end
 
 function GetPotionBuffLevel(power)
@@ -3114,7 +3119,7 @@ function getBuffSkill(spell, pl)
 	local s, m, level=getCasterBuffSkill(spell)
 	if potionBuffActive(pl, spell) then
 		local power=potionBuffPower(pl, spell)
-		local ps, plevel=GetPotionBuffSkill(power), GetPotionBuffLevel(power)
+		local ps, plevel=GetPotionBuffSkill(power, spell), GetPotionBuffLevel(power)
 		if buffStrength(spell, ps, POTION_BUFF_MASTERY, plevel)
 				> buffStrength(spell, s, m, level) then
 			return ps, POTION_BUFF_MASTERY, plevel

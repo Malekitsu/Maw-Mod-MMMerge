@@ -449,21 +449,20 @@ potionText={
 }
 
 function events.GameInitialized2()
-	--Stored as FUNCTIONS of the potion's power so the tooltip prints what
-	--THAT potion grants (GetPotionBuffSkill) instead of one fixed number.
-	--tooltipPotions in MawCore/Tooltip.lua calls them; plain string entries
-	--still work and are left alone.
 	local function pct(spell, power)
-		return round(GetBuffMultiplier(spell, GetPotionBuffSkill(power), POTION_BUFF_MASTERY)*1000)/10
+		return round(GetBuffMultiplier(spell, GetPotionBuffSkill(power, spell),
+			POTION_BUFF_MASTERY)*1000)/10
 	end
 	local function statPct(power)
 		return round(GetBuffStatPct(GetPotionBuffSkill(power))*100)
 	end
+	--Day of the Gods: the 'light' curve, and the wide span that matches it
 	local function statPctLight(power)
-		return round(GetBuffStatPct(GetPotionBuffSkill(power), true)*100)
+		return round(GetBuffStatPct(GetPotionBuffSkill(power, 83), true)*100)
 	end
+	--the fraction of a normal buff this potion's power is worth
 	local function strength(power)
-		return round((1+GetPotionBuffSkill(power)/POTION_BUFF_SKILL_SPAN)*100)
+		return round(GetPotionBuffFraction(power)*100)
 	end
 
 	potionText[228]=function(power)
@@ -513,7 +512,8 @@ function events.GameInitialized2()
 		local m=POTION_BUFF_MASTERY
 		local lvl=GetPotionBuffLevel(power)
 		local value=(bf.Base[m]+lvl/FLAT_BUFF_LEVEL_DIVISOR)
-			*(1+bf.Scaling[m]/100*GetPotionBuffSkill(power)/1.5)
+			*(1+bf.Scaling[m]/100*GetPotionBuffSkill(power, 85)
+				/DAY_OF_PROTECTION_SKILL_PENALTY)
 		return "Increases every one of your Resistances by " .. round(value) .. " for 6 hours."
 	end
 end
