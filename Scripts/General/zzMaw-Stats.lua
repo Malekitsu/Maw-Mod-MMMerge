@@ -240,42 +240,26 @@ function getSpellDelay(pl,spell)
 	delay=round(delay)
 	return delay
 end
---remove AC from hit calculation and unarmed code from misctweaks
-nextACToZero=0
-acNerf=0
 function events.PlayerAttacked(t)
 	if t.Attacker and t.Attacker.Monster then
 		mon=t.Attacker.Monster --don't set local
-		local lvl=getMonsterLevel(mon)
-		if t.Attacker.MonsterAction==0 then
-			if t.Attacker.Monster.Attack1.Type~=4 then
-				nextACToZero=2
-			else
-				acNerf=2
-			end
-		elseif t.Attacker.MonsterAction==1 then
-			if t.Attacker.Monster.Attack2.Type~=4 then
-				nextACToZero=2
-			else
-				acNerf=2
-			end
-		end
 	end
 end
 
+--Fires ONLY while a monster is attacking a player: the hook at 0x48db2f bails
+--out unless WhoHitPlayer() returns a monster and a valid party slot. So every
+--call here IS one attack roll and there is nothing to pair up -- the old
+--acNerf=2 counter existed to mark "the next two AC reads belong to this
+--attack", and it could leak into the following attack whenever the engine read
+--AC fewer times than expected. t.Monster is the attacker, which beats reading
+--a global that a previous event happened to leave behind.
 function events.GetArmorClass(t)
-	if nextACToZero>0 then
+	--t.Monster comes from the emitter; 'mon' is the fallback in case some other
+	--path ever raises this event without one
+	if CalcHitOrMiss(getMonsterLevel(t.Monster or mon), t.Player:GetSpeed()) then
 		t.AC=0
-		nextACToZero=nextACToZero-1
-	elseif acNerf>0 then
-		local lvl=getMonsterLevel(mon)
-		local hit=CalcHitOrMiss(lvl, t.Player:GetSpeed())
-		if hit then
-			t.AC=0
-		else
-			t.AC=64000
-		end
-		acNerf=acNerf-1
+	else
+		t.AC=64000
 	end
 end
 
@@ -1250,7 +1234,6 @@ function calcPowerVitality(pl, statsMenu)
 	local acReduction=1-calcMawDamage(pl,4,10000)/10000
 	local lvl=pl.LevelBase
 	local chanceToGetHit=MawCore.Formulas.chanceToBeHit(pl:GetSpeed(), lvl)
-	local ACRed= 1 - chanceToGetHit*(1-acReduction)
 	--dodging
 	local speed=pl:GetSpeed()
 	local dodging=0
@@ -1274,7 +1257,9 @@ function calcPowerVitality(pl, statsMenu)
 	--calculation
 	local physShare=MawCore.Formulas.physicalVitalityShare
 	local magicShare=(1-physShare)/8
-	local reduction= 1 - (ACRed*physShare + (res[1]+res[2]+res[3]+res[4]+res[5]+res[6])*magicShare + res[7]*magicShare*2)
+	local magicTaken=(1-res[1])+(1-res[2])+(1-res[3])+(1-res[4])+(1-res[5])+(1-res[6])
+	local reduction= ((1-acReduction)*physShare + magicTaken*magicShare
+		+ (1-res[7])*magicShare*2)*chanceToGetHit
 	
 	vitality=round(fullHP/reduction)
 	if statsMenu then

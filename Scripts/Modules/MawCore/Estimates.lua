@@ -252,10 +252,12 @@ function getPlayerEstimatedVitality(lvl)
 	local health = estimateHealth(lvl)
 	local share = MawCore.Formulas.physicalVitalityShare
 
-	--physical: the swing has to land before armor gets to cut it
-	local physical = estimateChanceToGetHit(lvl)*estimatePhysicalDamageTaken(lvl)
+	--the swing has to land before anything gets to cut it, and Speed now
+	--dodges the elemental half too
+	local physical = estimatePhysicalDamageTaken(lvl)
 	local magic = estimateMagicDamageTaken(lvl)
-	local taken = (physical*share + magic*(1-share))*estimateLegendaryDamageTaken(lvl)
+	local taken = (physical*share + magic*(1-share))
+		*estimateChanceToGetHit(lvl)*estimateLegendaryDamageTaken(lvl)
 
 	return health/taken*coverMultiplier(lvl), physical, magic, taken, health
 end
