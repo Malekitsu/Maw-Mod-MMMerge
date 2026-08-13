@@ -3022,15 +3022,27 @@ local function getCasterBuffSkill(spell)
 	end
 end
 
-POTION_BUFF_SKILL=25
 POTION_BUFF_MASTERY=3
 
+POTION_BUFF_MIN=0.75
+POTION_BUFF_MAX=1.5
+POTION_BUFF_FULL_POWER=200
+POTION_BUFF_SKILL_SPAN=50
+
+function GetPotionBuffSkill(power)
+	local t=math.min(math.max(power or 0, 0), POTION_BUFF_FULL_POWER)/POTION_BUFF_FULL_POWER
+	return POTION_BUFF_SKILL_SPAN*(POTION_BUFF_MIN+(POTION_BUFF_MAX-POTION_BUFF_MIN)*t-1)
+end
+
 --per drinker: only the character who drank it benefits
-function setPotionBuff(pl, spell, expireTime)
+function setPotionBuff(pl, spell, expireTime, power)
 	vars.mawPotionBuff=vars.mawPotionBuff or {}
 	local index=pl:GetIndex()
 	vars.mawPotionBuff[index]=vars.mawPotionBuff[index] or {}
 	vars.mawPotionBuff[index][spell]=expireTime
+	vars.mawPotionBuffPower=vars.mawPotionBuffPower or {}
+	vars.mawPotionBuffPower[index]=vars.mawPotionBuffPower[index] or {}
+	vars.mawPotionBuffPower[index][spell]=power
 end
 
 function potionBuffActive(pl, spell)
@@ -3041,14 +3053,46 @@ function potionBuffActive(pl, spell)
 	return list~=nil and list[spell]~=nil and list[spell]>Game.Time
 end
 
+HOUR_OF_POWER_DIVISOR=1.5
+
+function buffValueMult(spell, s, m, level)
+	return GetBuffMultiplier(spell, s, m)
+end
+
+function buffValueFlat(spell, s, m, level)
+	local bf=buffPower[spell]
+	if not bf then
+		return 0
+	end
+	return (bf.Base[m]+level/4)*(1+bf.Scaling[m]/100*s)
+end
+
+function bestBuffSource(spell, pl, valueOf)
+	local s, m, level=getBuffSkill(spell, pl)
+	local s2, m2, level2=getBuffSkill(86)
+	if s2>0 then
+		s2=s2/HOUR_OF_POWER_DIVISOR
+		if valueOf(spell, s2, m2, level2)>valueOf(spell, s, m, level) then
+			return s2, m2, level2
+		end
+	end
+	return s, m, level
+end
+
+function potionBuffSkill(pl, spell)
+	local list=vars.mawPotionBuffPower and vars.mawPotionBuffPower[pl:GetIndex()]
+	return GetPotionBuffSkill(list and list[spell])
+end
+
 function getBuffSkill(spell, pl)
 	local s, m, level=getCasterBuffSkill(spell)
 	if potionBuffActive(pl, spell) then
 		local bf=buffPower[spell]
+		local ps=potionBuffSkill(pl, spell)
 		local casterPower=bf and (bf.Base[m] or 0)+(bf.Scaling[m] or 0)*s/10 or s
-		local potionPower=bf and (bf.Base[POTION_BUFF_MASTERY] or 0)+(bf.Scaling[POTION_BUFF_MASTERY] or 0)*POTION_BUFF_SKILL/10 or POTION_BUFF_SKILL
+		local potionPower=bf and (bf.Base[POTION_BUFF_MASTERY] or 0)+(bf.Scaling[POTION_BUFF_MASTERY] or 0)*ps/10 or ps
 		if potionPower>casterPower then
-			return POTION_BUFF_SKILL, POTION_BUFF_MASTERY, pl.LevelBase
+			return ps, POTION_BUFF_MASTERY, pl.LevelBase
 		end
 	end
 	return s, m, level

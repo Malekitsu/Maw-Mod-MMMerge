@@ -2878,7 +2878,9 @@ local function addBuffStats(pl, tab)
 				buff=(buffPower[spellList[i]].Base[m]+level/4)*(1+buffPower[spellList[i]].Scaling[m]/100*s)
 				buff4=math.max(buff,buff2)
 				tab[i+10]=tab[i+10]+buff4
-				if s>0 then
+				if m>0 then
+					--mastery 0 means no source at all; a low-power potion is a NEGATIVE
+					--skill and still has to grant its reduced share
 					pct=GetBuffStatPct(s)
 				end
 			end
@@ -2893,20 +2895,16 @@ local function addBuffStats(pl, tab)
 		--special case for accuracy, as it comes from bless
 		local accPct=lightPct
 		if pl.SpellBuffs[1].ExpireTime>=Game.Time then
-			local s=getBuffSkill(46, pl)
-			if s>0 then
+			local s,m=getBuffSkill(46, pl)
+			if m>0 then
 				accPct=math.max(accPct, GetBuffStatPct(s))
 			end
 		end
 		tab[5]=tab[5]+(tab[5]+statBase[5])*accPct
 		--stoneskin
 		if Party.SpellBuffs[15].ExpireTime>=Game.Time or potionBuffActive(pl, const.Spells.StoneSkin) then
-			local s,m,level=getBuffSkill(38, pl)
-			local s2,m2,level2=getBuffSkill(86)
-			s=math.max(s,s2/1.5)
-			m=math.max(m,m2)
-			level=math.max(level,level2)
-			acBonus=(buffPower[38].Base[m]+level/2)*(1+buffPower[38].Scaling[m]/100*s)
+			local s,m,level=bestBuffSource(38, pl, buffValueFlat)
+			acBonus=(buffPower[38].Base[m]+level/4)*(1+buffPower[38].Scaling[m]/100*s)
 			tab[10]=tab[10]+acBonus
 		end
 	end

@@ -29,12 +29,13 @@ local function casterSkill(spellId, s)
 end
 
 local CASTER_LEVEL_DIVISOR = 4
-local function buffFlat(spellId, s, m, level)
+local STONESKIN_LEVEL_DIVISOR = 4
+local function buffFlat(spellId, s, m, level, levelDivisor)
 	local bf = buffPower[spellId]
 	if not bf then
 		return 0
 	end
-	local flat = bf.Base[m] + level/CASTER_LEVEL_DIVISOR
+	local flat = bf.Base[m] + level/(levelDivisor or CASTER_LEVEL_DIVISOR)
 	return flat*(1 + bf.Scaling[m]/100*casterSkill(spellId, s))*buffRamp(s)
 end
 
@@ -173,9 +174,12 @@ local LEGENDARY_28_ARMOR = 0.5
 
 local function estimateArmorClass(lvl)
 	local skill = estimateSkill(lvl)
-	local armorMult = skillItemAC[const.Skills.Chain][masteryPerLevel(lvl)]*skill/100
+	local mastery = masteryPerLevel(lvl)
+	local armorMult = skillItemAC[const.Skills.Chain][mastery]*skill/100
 	local legendary = 1 + LEGENDARY_28_ARMOR*legendaryRamp(lvl)
-	return estimateWornArmor(lvl)*(legendary + armorMult)
+	local stoneskin = buffFlat(const.Spells.StoneSkin, skill, mastery, lvl,
+		STONESKIN_LEVEL_DIVISOR)
+	return estimateWornArmor(lvl)*(legendary + armorMult) + stoneskin
 end
 
 local function estimateResistance(lvl)

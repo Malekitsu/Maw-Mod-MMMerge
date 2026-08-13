@@ -80,8 +80,12 @@ end
 
 -- was zzAlchemy.lua
 local function tooltipPotions(t)
-	if potionText[t.Item.Number] then
-		t.Description=potionText[t.Item.Number]--REMOVED .. "\n(To drink, pick the potion up and right-click over a character's portrait.  To mix, pick the potion up and right-click over another potion.)"
+	local text=potionText[t.Item.Number]
+	if type(text)=="function" then
+		text=text(t.Item.Bonus)
+	end
+	if text then
+		t.Description=text--REMOVED .. "\n(To drink, pick the potion up and right-click over a character's portrait.  To mix, pick the potion up and right-click over another potion.)"
 	elseif t.Item.Number>=264 and t.Item.Number<=299 then
 		t.Description="This potion has been removed"
 	end

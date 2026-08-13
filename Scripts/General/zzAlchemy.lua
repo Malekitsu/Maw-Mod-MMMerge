@@ -178,7 +178,7 @@ function events.UseMouseItem(t)
 
 	if potionBuffSpells[it.Number] then
 		for i=1,#potionBuffSpells[it.Number] do
-			setPotionBuff(pl, potionBuffSpells[it.Number][i], Game.Time+potionDuration)
+			setPotionBuff(pl, potionBuffSpells[it.Number][i], Game.Time+potionDuration, it.Bonus)
 		end
 	end
 	
@@ -436,21 +436,48 @@ potionText={
 }
 
 function events.GameInitialized2()
-	local function pct(spell)
-		return round(GetBuffMultiplier(spell, POTION_BUFF_SKILL, POTION_BUFF_MASTERY)*1000)/10
+	--Stored as FUNCTIONS of the potion's power so the tooltip prints what
+	--THAT potion grants (GetPotionBuffSkill) instead of one fixed number.
+	--tooltipPotions in MawCore/Tooltip.lua calls them; plain string entries
+	--still work and are left alone.
+	local function pct(spell, power)
+		return round(GetBuffMultiplier(spell, GetPotionBuffSkill(power), POTION_BUFF_MASTERY)*1000)/10
 	end
-	local statPct=round(GetBuffStatPct(POTION_BUFF_SKILL)*100)
+	local function statPct(power)
+		return round(GetBuffStatPct(GetPotionBuffSkill(power))*100)
+	end
 
-	potionText[228]="Increases your Attack Speed by " .. pct(const.Spells.Haste) .. "% for 6 hours."
-	potionText[229]="Increases your Melee Damage by " .. pct(const.Spells.Heroism) .. "% for 6 hours."
-	potionText[230]="Increases your Attack, and your Accuracy by " .. statPct .. "%, for 6 hours."
-	potionText[231]="Reduces magic damage taken by " .. pct(const.Spells.Shield) .. "% and grants Preservation for 6 hours.\nRequire 20 power to work.\n"
+	potionText[228]=function(power)
+		return "Increases your Attack Speed by " .. pct(const.Spells.Haste, power) .. "% for 6 hours."
+	end
+	potionText[229]=function(power)
+		return "Increases your Melee Damage by " .. pct(const.Spells.Heroism, power) .. "% for 6 hours."
+	end
+	potionText[230]=function(power)
+		return "Increases your Attack, and your Accuracy by " .. statPct(power) .. "%, for 6 hours."
+	end
+	potionText[231]=function(power)
+		return "Reduces magic damage taken by " .. pct(const.Spells.Shield, power) .. "% and grants Preservation for 6 hours.\nRequire 20 power to work.\n"
+	end
 	potionText[234]="Increases your Armor Class for 6 hours."
-	potionText[245]="Grants Haste, Heroism and Bless for 6 hours."
-	potionText[249]="Increases your Fire, Air, Water and Earth Resistance, and those stats by " .. statPct .. "%, for 6 hours."
-	potionText[250]="Increases your Mind and Body Resistance, and those stats by " .. statPct .. "%, for 6 hours."
-	potionText[251]="Grants Shield, Stone Skin and Preservation for 6 hours."
-	potionText[263]="Increases all your Resistances, and all seven stats by " .. statPct .. "%, for 6 hours."
+	potionText[245]=function(power)
+		return "Grants Haste (+" .. pct(const.Spells.Haste, power) .. "% Attack Speed), Heroism (+"
+			.. pct(const.Spells.Heroism, power) .. "% Melee Damage) and Bless (+" .. statPct(power)
+			.. "% Accuracy) for 6 hours."
+	end
+	potionText[249]=function(power)
+		return "Increases your Fire, Air, Water and Earth Resistance, and those stats by " .. statPct(power) .. "%, for 6 hours."
+	end
+	potionText[250]=function(power)
+		return "Increases your Mind and Body Resistance, and those stats by " .. statPct(power) .. "%, for 6 hours."
+	end
+	potionText[251]=function(power)
+		return "Grants Shield (-" .. pct(const.Spells.Shield, power)
+			.. "% magic damage taken), Stone Skin and Preservation for 6 hours."
+	end
+	potionText[263]=function(power)
+		return "Increases all your Resistances, and all seven stats by " .. statPct(power) .. "%, for 6 hours."
+	end
 end
 
 potionRecipeText={

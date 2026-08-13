@@ -125,7 +125,7 @@ skillResistance =
 }
 skillItemAC={
 	[const.Skills.Leather]	= {[0]=0, 1, 1, 2, 3,},
-	[const.Skills.Chain]	= {[0]=0, 1, 2, 2, 3,},
+	[const.Skills.Chain]	= {[0]=0, 1, 2, 3, 3,},
 	[const.Skills.Plate]	= {[0]=0, 1, 2, 3, 3,},
 	[const.Skills.Shield]	= {[0]=0, 2, 3, 4, 5,},
 	[const.Skills.Dodging]	= {[0]=0, 3, 3, 5, 5,},
@@ -345,10 +345,7 @@ function events.GetAttackDelay(t)
 		local hasteMult=1
 		if Party.SpellBuffs[8].ExpireTime>=Game.Time or potionBuffActive(t.Player, const.Spells.Haste) then
 			--getBuffSkill already returns the stronger of caster and potion
-			local s, m=getBuffSkill(5, t.Player)
-			local s2,m2=getBuffSkill(86)
-			s=math.max(s,s2/1.5)
-			m=math.max(m,m2)
+			local s, m=bestBuffSource(5, t.Player, buffValueMult)
 			hasteMult=math.max(1+GetBuffMultiplier(const.Spells.Haste, s, m), hasteMult)
 		end
 		totalSpeed=totalSpeed/hasteMult

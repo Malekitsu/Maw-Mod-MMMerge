@@ -217,11 +217,7 @@ function getSpellDelay(pl,spell)
 	if vars.MAWSETTINGS.buffRework=="ON" then
 		local hasteMult=1
 		if Party.SpellBuffs[8].ExpireTime>=Game.Time or potionBuffActive(pl, const.Spells.Haste) then
-			--getBuffSkill already returns the stronger of caster and potion
-			local s, m=getBuffSkill(5, pl)
-			local s2,m2=getBuffSkill(86)
-			s=math.max(s,s2/1.5)
-			m=math.max(m,m2)
+			local s, m=bestBuffSource(5, pl, buffValueMult)
 			hasteDiv=math.max(1+GetBuffMultiplier(const.Spells.Haste, s, m), hasteDiv)
 		end
 	end
@@ -1017,10 +1013,7 @@ function calcMawDamage(pl,damageKind,originalDamage,rand,monLvl)
 	--shield buff
 	if vars.MAWSETTINGS.buffRework=="ON" then
 		if Party.SpellBuffs[14].ExpireTime>=Game.Time or potionBuffActive(pl, const.Spells.Shield) then
-			local s,m=getBuffSkill(17, pl)
-			local s2,m2=getBuffSkill(86)
-			s=math.max(s,s2/1.5)
-			m=math.max(m,m2)
+			local s,m=bestBuffSource(17, pl, buffValueMult)
 			damage=damage*math.max(1-GetBuffMultiplier(const.Spells.Shield, s, m),0.7)
 		end
 	else
