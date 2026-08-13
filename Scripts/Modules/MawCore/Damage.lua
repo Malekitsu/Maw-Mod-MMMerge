@@ -1659,7 +1659,8 @@ local function pstage_damageRecompute(t)
 	
 	if t.Damage==0 and t.Result==0 then return end
 
-	if t.DamageKind==4 and restoringMistformTime then --mistform 
+	if t.DamageKind==4 and restoringMistformTime
+			and restoringMistformTime[t.PlayerIndex] then
 		t.Damage=t.Damage*0.25
 	end
 
@@ -1769,48 +1770,23 @@ local function pstage_survivalGatePlayer(t)
 	end
 end
 
--- from zzMaw_Legendaries:53 -- legendary 22, shaman/seraph reduction, mana
--- shield, legendary 15 + divine protection, bolster>=300 death thresholds
+-- from zzMaw_Legendaries:53 -- mana shield, legendary 15 + divine protection,
+-- bolster>=300 death thresholds.
+--
+-- Legendary 22 and the shaman/seraph cut used to be here too. They are plain
+-- reductions of the hit, so they moved into calcMawDamage (zzMaw-Stats):
+-- running after it left the monster tooltip and the character sheet quoting a
+-- damage the player never took. What is left below all has a side effect --
+-- spent SP, a healed player, a cooldown, a death -- so it cannot run from a
+-- display query and has to stay in the pipeline.
 local function pstage_legendariesAndShields(t)
 	local id=t.Player:GetIndex()
-	--legendary [22]
-	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 22) then
-		local count=0
-		for i=0, Map.Monsters.High do
-			if Map.Monsters[i].Active then
-				local dist=getDistanceToMonster(Map.Monsters[i])
-				if dist<=512 then
-					count=count+1
-				end
-			end
-		end
-		t.Result=t.Result*math.max(0.97^count,0.5)
-	end
-	
 	local pl = t.Player
-	
-	--shaman code
-	if table.find(shamanClass, pl.Class) and pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0  then
-		local m3=SplitSkill(pl.Skills[const.Skills.Water])
-		local lvl=getTotalLevel()
-		local _,_,_,avgTaken=getPlayerEstimatedVitality(lvl+1)
-		local reduction=round(getMonsterDamage(false,(lvl+1))*(m3/estimateSkill(lvl))*avgTaken/2*0.99^estimateSkill(lvl)) --on average 1/2 of a B monster
-		t.Result=math.max(t.Result-reduction, t.Result*0.25)
-	end
-	--seraph code
-	if table.find(seraphClass, pl.Class) and pl.Unconscious==0 and pl.Dead==0 and pl.Eradicated==0  then
-		local m3=SplitSkill(pl.Skills[const.Skills.Spirit])
-		local lvl=getTotalLevel()
-		local _,_,_,avgTaken=getPlayerEstimatedVitality(lvl+1)
-		local reduction=round(getMonsterDamage(false,(lvl+1))*(m3/estimateSkill(lvl))*avgTaken/2*0.99^estimateSkill(lvl)) --on average 1/2 of a B monster
-		t.Result=math.max(t.Result-reduction, t.Result*0.25)
-	end
-	
-	--end of [22]
+
 	--------------------
 	--MANA SHIELD CODE--
 	--------------------
-	
+
 	t.Result = calcManaShield(pl, t.Result)
 	
 	---------------------

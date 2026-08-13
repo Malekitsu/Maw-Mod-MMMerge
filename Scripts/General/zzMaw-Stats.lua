@@ -390,7 +390,7 @@ function events.BuildStatInformationBox(t)
 	
 	if t.Stat==9 then
 		i=Game.CurrentPlayer
-		local acReduction=round((100-calcMawDamage(Party[i],4,10000)/100)*100)/100
+		local acReduction=round((100-calcMawDamage(Party[i],4,10000,false,nil,true)/100)*100)/100
 		local lvl=math.min(Party[i].LevelBase)
 		--the block chance itself is reported under Speed, which is what buys it;
 		--it is still needed here because the total combines the two
@@ -650,20 +650,88 @@ function events.Regeneration(t)
 	end
 end
 --mistform
+--
+--The engine has its own mist-form rule. The mod replaces it with a flat 0.25
+--to physical damage in the damage pipeline, so the buff is zeroed for the
+--duration of the hit -- PlayerAttacked fires before the engine resolves it --
+--and put back next tick. The pipeline keys the 0.25 off "a restore is
+--pending on this character".
+--
+--That flag used to be a single boolean raised on EVERY attack, mist form or
+--not, so the 0.25 applied to every physical hit in the game on every
+--character: monsters landed at a quarter of what their tooltip advertised.
+--Two things fix it -- the buff has to actually be up, and the flag is per
+--character, since one party member in mist form must not quarter the hits
+--the other four take. The saved expiry lives in the same table for the same
+--reason: as a lone global, two characters hit in one tick overwrote it.
+restoringMistformTime = {}
 function events.PlayerAttacked(t)
-	if restoringMistformTime then return end
-	restoringMistformTime=true
 	local pl=t.Player
-	lastMistformTime=pl.SpellBuffs[26].ExpireTime
+	local id=pl:GetIndex()
+	if restoringMistformTime[id] then return end
+	if pl.SpellBuffs[26].ExpireTime<=Game.Time then return end
+	restoringMistformTime[id]=pl.SpellBuffs[26].ExpireTime
 	pl.SpellBuffs[26].ExpireTime=0
 	RunNextTick(function()
-		pl.SpellBuffs[26].ExpireTime=lastMistformTime
-		restoringMistformTime=false
+		pl.SpellBuffs[26].ExpireTime=restoringMistformTime[id]
+		restoringMistformTime[id]=nil
 	end)
 end
 
 --shaman Air / DK Body-or-Dark damage reduction; the % printed in tooltips
 --comes from MawCore.Formulas.reductionPercent
+
+--legendary 22: 3% per active monster within 512, never past half.
+local function legendaryCrowdMultiplier(pl)
+	local id=pl:GetIndex()
+	if not (vars and vars.legendaries and vars.legendaries[id]
+			and table.find(vars.legendaries[id], 22)) then
+		return 1
+	end
+	--Global/ owns getDistanceToMonster, so it can be absent outside a game
+	if not getDistanceToMonster then
+		return 1
+	end
+	local count=0
+	for i=0, Map.Monsters.High do
+		if Map.Monsters[i].Active and getDistanceToMonster(Map.Monsters[i])<=512 then
+			count=count+1
+		end
+	end
+	return math.max(0.97^count, 0.5)
+end
+
+local function flatClassReduction(pl)
+	if pl.Unconscious~=0 or pl.Dead~=0 or pl.Eradicated~=0 then
+		return 0
+	end
+	local skill
+	if table.find(shamanClass, pl.Class) then
+		skill=SplitSkill(pl.Skills[const.Skills.Water])
+	elseif table.find(seraphClass, pl.Class) then
+		skill=SplitSkill(pl.Skills[const.Skills.Spirit])
+	end
+	if not skill then
+		return 0
+	end
+	local lvl=getTotalLevel()
+	local _,_,_,avgTaken=getPlayerEstimatedVitality(lvl+1)
+	return round(getMonsterDamage(false,(lvl+1))*(skill/estimateSkill(lvl))
+		*avgTaken/2*0.99^estimateSkill(lvl))
+end
+
+local function applyPostMitigation(pl, damage, originalDamage, ratioOnly)
+	damage=math.max(damage, originalDamage*MawCore.Formulas.damageFloor)
+	damage=damage*legendaryCrowdMultiplier(pl)
+	if not ratioOnly then
+		local flat=flatClassReduction(pl)
+		if flat>0 then
+			damage=math.max(damage-flat, damage*0.25)
+		end
+	end
+	return damage
+end
+
 local function classDamageReduction(pl, damage, dkSkill)
 	if table.find(shamanClass, pl.Class) then
 		local s=SplitSkill(pl.Skills[const.Skills.Air])
@@ -763,7 +831,7 @@ function mawTick_PoolLabels()
 			if resistances[i]>=64000 then
 				resistances[i]="Immune"
 			end
-			resistances2[i]=100-math.max(round(calcMawDamage(pl,damageList[i-9],1000))/10, 0)
+			resistances2[i]=100-math.max(round(calcMawDamage(pl,damageList[i-9],1000,false,nil,true))/10, 0)
 			resistances2[i]=round(resistances2[i]*100)/100
 			if resistances2[i]%1==0 then
 				resistances2[i]=resistances2[i] .. ".0"
@@ -927,7 +995,7 @@ function compute_damage(x)
 end
 ]]
 
-function calcMawDamage(pl,damageKind,originalDamage,rand,monLvl)
+function calcMawDamage(pl,damageKind,originalDamage,rand,monLvl,ratioOnly)
 	local monLvl=monLvl or pl.LevelBase
 
 	local id=pl:GetIndex()
@@ -966,7 +1034,7 @@ function calcMawDamage(pl,damageKind,originalDamage,rand,monLvl)
 		if vars.shieldEnchant and vars.shieldEnchant[id] then
 			damage=damage*0.85
 		end
-		return math.max(damage, originalDamage*MawCore.Formulas.damageFloor)
+		return applyPostMitigation(pl, damage, originalDamage, ratioOnly)
 	end
 	
 	
@@ -998,7 +1066,7 @@ function calcMawDamage(pl,damageKind,originalDamage,rand,monLvl)
 	--get resistances
 	if not damageKindResistance[damageKind] then
 		local damage=round(damage)
-		return math.max(damage, originalDamage*MawCore.Formulas.damageFloor)
+		return applyPostMitigation(pl, damage, originalDamage, ratioOnly)
 	end
 	local res=math.huge
 	local resList=damageKindResistance[damageKind]
@@ -1055,7 +1123,7 @@ function calcMawDamage(pl,damageKind,originalDamage,rand,monLvl)
 	end
 	
 	local damage=round(damage*res)
-	return math.max(damage, originalDamage*MawCore.Formulas.damageFloor)
+	return applyPostMitigation(pl, damage, originalDamage, ratioOnly)
 end
 
 
@@ -1210,7 +1278,7 @@ function calcPowerVitality(pl, statsMenu)
 		end
 	end
 	--AC
-	local acReduction=1-calcMawDamage(pl,4,10000)/10000
+	local acReduction=1-calcMawDamage(pl,4,10000,false,nil,true)/10000
 	local lvl=pl.LevelBase
 	local chanceToGetHit=MawCore.Formulas.chanceToBeHit(pl:GetSpeed(), lvl)
 	--dodging
@@ -1230,7 +1298,7 @@ function calcPowerVitality(pl, statsMenu)
 	--resistances
 	res={0,1,2,3,7,8,12}
 	for v=1,7 do 
-		res[v]=1-calcMawDamage(pl,res[v],10000)/10000
+		res[v]=1-calcMawDamage(pl,res[v],10000,false,nil,true)/10000
 	end
 	
 	--calculation
