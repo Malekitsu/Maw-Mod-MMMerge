@@ -44,6 +44,11 @@ end
 
 local FALLBACK_PARTY_SHARE = 7/8
 
+ItemLevel.GUARD_MARGIN = 20
+
+function ItemLevel.WearLevel(dropLevel)
+	return dropLevel - ItemLevel.GUARD_MARGIN * (dropLevel * 0.08)
+end
 
 function ItemLevel.ForDrop(monsterLevel, partyLevel, mapLevel)
 	if monsterLevel then

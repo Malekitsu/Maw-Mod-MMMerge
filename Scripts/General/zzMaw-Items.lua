@@ -470,6 +470,8 @@ end
 local PRIMORDIAL_CHARGES_MULT = 1.2
 local ANCIENT_MIN_CHARGES = 2
 local PRIMORDIAL_MIN_CHARGES = 4
+local LEGENDARY_CHARGES_MULT = 1.2
+local LEGENDARY_CHARGES_BONUS = 10
 
 function GetMaxItemCharges()
 	return round(MawCore.ItemLevel.MaxCharges()*PRIMORDIAL_CHARGES_MULT)
@@ -495,6 +497,31 @@ end
 
 function GetPrimordialCharges(level)
 	return rollTierCharges(MawCore.ItemLevel.ChargesFor(level), 2)
+end
+
+function GetItemDropLevel(it)
+	local charges=it.MaxCharges
+	--undo in reverse generation order: the legendary boost came last.
+	--Inverting flips the picker: the legendary boost took the SMALLER of
+	--x1.2/+10 (math.min), so its inverse takes the LARGER rollback; the
+	--tier boosts took the LARGER of x1.2/+min (math.max), so their inverse
+	--takes the SMALLER. Using max here too was the old function's bug: on
+	--big items it left ~0.2x of the primordial inflation in, and a
+	--primordial from a level-700 map gated at 820.
+	if HasLegendaryAffix(it) then
+		charges=math.floor(math.max(charges/LEGENDARY_CHARGES_MULT,
+			charges-LEGENDARY_CHARGES_BONUS))
+	end
+	local tier=GetAncientTier(it)
+	if tier==2 then
+		charges=math.floor(math.min(charges/PRIMORDIAL_CHARGES_MULT,
+			charges-PRIMORDIAL_MIN_CHARGES))
+	elseif tier==1 then
+		--ancient rolled a random 1.0..1.2x: undo the midpoint
+		charges=math.floor(math.min(charges/((1+PRIMORDIAL_CHARGES_MULT)/2),
+			charges-ANCIENT_MIN_CHARGES))
+	end
+	return charges*MawCore.ItemLevel.PerCharge
 end
 
 
@@ -1106,7 +1133,9 @@ function events.ItemGenerated(t)
 					it.Bonus2=46
 				end
 			end
-			it.MaxCharges=round(math.min(maxChargesCap,it.MaxCharges*1.2,it.MaxCharges+10))
+			it.MaxCharges=round(math.min(maxChargesCap,
+				it.MaxCharges*LEGENDARY_CHARGES_MULT,
+				it.MaxCharges+LEGENDARY_CHARGES_BONUS))
 			local statSets={{1, 5, 6, 7}, {4, 6, 8, 10}, {2, 3, 4, 6, 7}}
 			local stats=statSets[math.random(1,#statSets)]
 			if GetItemEquipStat(it)==10 then
@@ -4184,17 +4213,15 @@ function events.AfterLoadMap()
 	end
 end
 
-	
+
 function GetLevelRquirement(it)
 	local itemType = it:T().EquipStat
 	if itemType>11 then
-		return 0 
+		return 0
 	end
 	if IsCelestialItem(it) then
 		return 1
 	end
-	local difficultyExtraPower=GetDifficultyExtraPower()
-	local bonusBasePower=(difficultyExtraPower-1)*10
 	local tot=0
 	local lvl=0
 	for i=1, 6 do
@@ -4202,51 +4229,10 @@ function GetLevelRquirement(it)
 		lvl=lvl+it:T().ChanceByLevel[i]*i
 	end
 	tot = math.max(tot,1)
-	local maxCharges=math.round(it.MaxCharges/difficultyExtraPower)
-	if GetAncientTier(it)>0 then
-		maxCharges=math.floor(math.max(maxCharges/1.2,maxCharges-5))
-	end
-	if HasLegendaryAffix(it) then
-		maxCharges=math.floor(math.max(maxCharges/1.2,maxCharges-10))
-	end
-	
-	local baseLevel=(maxCharges)*5+lvl/tot*2
-	
-	local specialEnchantLevel = 0
-	if it.Bonus2>0 then
-		specialEnchantLevel = (Game.SpcItemsTxt[it.Bonus2-1].Lvl + 1) * (2 + maxCharges)
-	end
-	
-	local bonusStrength=it.BonusStrength
-	if it.Bonus>=17 then
-		bonusStrength = math.min(bonusStrength^2, bonusStrength*10)
-	end
-	
-	local chargesPower=GetEnc2Strength(it)
-	
-	if GetAncientTier(it)>0 then
-		bonusStrength=math.floor(math.max(bonusStrength/1.2,bonusStrength-5))
-		chargesPower=math.floor(math.max(chargesPower/1.2,chargesPower-5))
-	end
-	if HasLegendaryAffix(it) then
-		bonusStrength=math.floor(math.max(bonusStrength/1.2,bonusStrength-10))
-		chargesPower=math.floor(math.max(chargesPower/1.2,chargesPower-10))
-	end
-	
-	local equipStat=it:T().EquipStat
-	if table.find(twoHandedAxes, it.Number) or table.find(twoHandedSwords, it.Number) then
-		equipStat=1
-	end
-	
-	local bonusLevel=math.round(bonusStrength * 3 / difficultyExtraPower/slotMult[equipStat])
-	local chargesLevel=math.round((chargesPower%1000) * 3 / difficultyExtraPower/slotMult[equipStat])
-	
-	local weight = equipSlotWeights[itemType]
-	local levelRequired=(baseLevel*weight[1]+bonusLevel*weight[2]+chargesLevel*weight[3]+specialEnchantLevel*weight[4])
-	
-	
-	levelRequired=math.max(1,math.floor(levelRequired-10))
-	
+
+	local dropLevel=GetItemDropLevel(it)+lvl/tot*2
+	local levelRequired=MawCore.ItemLevel.WearLevel(dropLevel)
+
 	if Game.BolsterAmount>=300 then
 		levelRequired=levelRequired-6
 	end
@@ -4256,9 +4242,8 @@ function GetLevelRquirement(it)
 	if vars.insanityMode then
 		levelRequired=levelRequired-3
 	end
-	levelRequired=math.max(1,math.floor(levelRequired))
-	
-	return levelRequired
+
+	return math.max(1,math.floor(levelRequired))
 end
 
 equipSlotWeights = {
