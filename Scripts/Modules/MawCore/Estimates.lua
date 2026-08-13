@@ -190,7 +190,7 @@ end
 local LEGENDARY_16_RESISTANCE = 0.5
 
 local function estimateEnchantResistance(level)
-	local currentLevelRatio = level/ENCHANT_MAX_LEVEL
+	local currentLevelRatio = math.min(level, ENCHANT_MAX_LEVEL)/ENCHANT_MAX_LEVEL
 	local power = MawCore.Formulas.resistanceEnchantPower(GetMaxEnchantStrength()*currentLevelRatio, true)
 	return power*(1 + LEGENDARY_16_RESISTANCE*legendaryRamp(level))
 end
