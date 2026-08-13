@@ -113,16 +113,14 @@ function events.UseMouseItem(t)
 	end
 	--healing potion
 	if it.Number==222 then
-		heal=round(it.Bonus^1.75+10)
-		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
+		pl.HP=math.min(pl:GetFullHP(),pl.HP+GetPotionHeal(222, it.Bonus))
 	--mana potion
 	elseif it.Number==223 then
 		spRestore=round(it.Bonus^1.6*2/3+10)
 		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
 	end
 	if it.Number==247 then
-		heal=round(it.Bonus^1.75*1.5+50)
-		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
+		pl.HP=math.min(pl:GetFullHP(),pl.HP+GetPotionHeal(247, it.Bonus))
 	--mana potion
 	elseif it.Number==248 then
 		spRestore=round(it.Bonus^1.6+50)
@@ -401,6 +399,19 @@ function events.DoBadThingToPlayer(t)
 			end
 		end
 	end
+end
+
+POTION_HEAL={
+	[222]={flat=20, share=0.25},
+	[247]={flat=50, share=0.35},
+}
+
+function GetPotionHeal(number, power)
+	local h=POTION_HEAL[number]
+	if not h then
+		return 0
+	end
+	return round(h.flat + getPlayerEstimatedHealth(power or 0)*h.share)
 end
 
 potionText={
