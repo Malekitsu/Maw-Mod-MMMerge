@@ -44,20 +44,12 @@ end
 
 local FALLBACK_PARTY_SHARE = 7/8
 
-local GUARD_PERCENT = 1.1
-local GUARD_MARGIN_MONSTER = 40
-local GUARD_MARGIN_CHEST = 20
-
-local function progressionGuard(partyLevel, margin)
-	return math.max(partyLevel*GUARD_PERCENT, partyLevel + margin)
-end
 
 function ItemLevel.ForDrop(monsterLevel, partyLevel, mapLevel)
 	if monsterLevel then
-		return math.min(monsterLevel, progressionGuard(partyLevel, GUARD_MARGIN_MONSTER))
+		return monsterLevel
 	end
-	local level = partyLevel*FALLBACK_PARTY_SHARE + mapLevel*(1 - FALLBACK_PARTY_SHARE)
-	return math.min(level, progressionGuard(partyLevel, GUARD_MARGIN_CHEST))
+	return partyLevel*FALLBACK_PARTY_SHARE + mapLevel*(1 - FALLBACK_PARTY_SHARE)
 end
 
 return ItemLevel

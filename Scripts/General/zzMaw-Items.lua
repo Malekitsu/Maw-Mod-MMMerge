@@ -908,7 +908,12 @@ function events.ItemGenerated(t)
 					mapLevel=0
 				end
 			elseif mapLevels[name] and mapLevels[name].Low~=0 then
-				partyLevel=mapLevel*0.2+partyLevel
+				if Game.HouseScreen~=2 and Game.HouseScreen~=95 then
+					partyLevel=mapLevel
+					mapLevel=0
+				else
+					partyLevel=mapLevel*0.2+partyLevel
+				end
 			else
 				partyLevel=partyLevel+math.min(currentLevel/2,54)
 				mapLevel=0
