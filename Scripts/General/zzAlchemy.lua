@@ -321,7 +321,8 @@ potionBuffSpells = {
 	[249] = {3, 14, 25, 36},												--Elemental
 	[250] = {58, 69},														--Self
 	[251] = {const.Spells.Shield, 50, const.Spells.StoneSkin},				--Paladins
-	[263] = {3, 14, 25, 36, 58, 69},										--Resistances
+	[257] = {83},														--Day of the Gods: the 7 stats, as a %
+	[263] = {85},														--Day of Protection: every resistance, no stats
 }
 
 itemImmunityMapping = {
@@ -446,6 +447,12 @@ function events.GameInitialized2()
 	local function statPct(power)
 		return round(GetBuffStatPct(GetPotionBuffSkill(power))*100)
 	end
+	local function statPctLight(power)
+		return round(GetBuffStatPct(GetPotionBuffSkill(power), true)*100)
+	end
+	local function strength(power)
+		return round((1+GetPotionBuffSkill(power)/POTION_BUFF_SKILL_SPAN)*100)
+	end
 
 	potionText[228]=function(power)
 		return "Increases your Attack Speed by " .. pct(const.Spells.Haste, power) .. "% for 6 hours."
@@ -475,8 +482,17 @@ function events.GameInitialized2()
 		return "Grants Shield (-" .. pct(const.Spells.Shield, power)
 			.. "% magic damage taken), Stone Skin and Preservation for 6 hours."
 	end
+	potionText[257]=function(power)
+		return "Increases all seven of your Statistics by " .. statPctLight(power)
+			.. "% for 6 hours."
+	end
 	potionText[263]=function(power)
-		return "Increases all your Resistances, and all seven stats by " .. statPct(power) .. "%, for 6 hours."
+		local bf=buffPower[85]
+		local m=POTION_BUFF_MASTERY
+		local lvl=GetPotionBuffLevel(power)
+		local value=(bf.Base[m]+lvl/FLAT_BUFF_LEVEL_DIVISOR)
+			*(1+bf.Scaling[m]/100*GetPotionBuffSkill(power)/1.5)
+		return "Increases every one of your Resistances by " .. round(value) .. " for 6 hours."
 	end
 end
 

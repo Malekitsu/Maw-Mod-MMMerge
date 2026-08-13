@@ -2861,13 +2861,12 @@ local function addBuffStats(pl, tab)
 			pl.SpeedBase+pl.SpeedBonus,
 			pl.LuckBase+pl.LuckBonus,
 		}
-		--resistances stay flat; halved base and caster-level term
-		local s, m, level=getBuffSkill(85)
+		local s, m, level=getBuffSkill(85, pl)
 		local buff2=(buffPower[85].Base[m]+level/4)*(1+buffPower[85].Scaling[m]/100*s/1.5)
 		--light: percentage of the total stat
-		local s83=getBuffSkill(83)
+		local s83, m83=getBuffSkill(83, pl)
 		local lightPct=0
-		if s83>0 then
+		if m83>0 then
 			lightPct=GetBuffStatPct(s83, true)
 		end
 		for i=1,6 do
