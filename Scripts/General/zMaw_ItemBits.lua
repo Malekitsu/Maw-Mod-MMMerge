@@ -83,6 +83,11 @@ end
 --   bits 0-5  legendary affix, 1-25 (0 = none)
 --   bits 6-7  tier: 0 none, 1 ancient, 2 primordial
 --   bit 8     celestial
+--   bits 9-19 the drop level the item spawned at (0 = unknown: loot from
+--             saves made before it was stored). Charges are randomized,
+--             rarity-inflated and Cube-raised, so only this field
+--             remembers what AREA produced the item -- the wear gate
+--             (GetLevelRquirement) reads it through GetItemDropLevel.
 --
 -- The same field also carries an artifact's level, a map affix id and the
 -- vanilla bonus expiry. Those are plain numbers with no marker, so they read
@@ -96,6 +101,8 @@ local RARITY_AFFIX_MAX = 0x3F		--bits 0-5
 local RARITY_TIER_SHIFT = 6
 local RARITY_TIER_MAX = 3		--bits 6-7
 local RARITY_CELESTIAL = 0x100		--bit 8
+local RARITY_LEVEL_SHIFT = 9
+local RARITY_LEVEL_MAX = 0x7FF		--bits 9-19
 
 LEGENDARY_AFFIX_BASE = 10
 CELESTIAL_OFFSET = 100
@@ -115,40 +122,43 @@ local function isArtifact(it)
 	return artifactSet[it.Number] == true
 end
 
---tier, affix (1-25, 0 for none), celestial
+--tier, affix (1-25, 0 for none), celestial, drop level (0 = unknown)
 local function DecodeRarity(it)
 	local v = it.BonusExpireTime or 0
 	if bit.band(v, RARITY_MARKER) ~= 0 then
 		return bit.band(bit.rshift(v, RARITY_TIER_SHIFT), RARITY_TIER_MAX),
 			bit.band(v, RARITY_AFFIX_MAX),
-			bit.band(v, RARITY_CELESTIAL) ~= 0
+			bit.band(v, RARITY_CELESTIAL) ~= 0,
+			bit.band(bit.rshift(v, RARITY_LEVEL_SHIFT), RARITY_LEVEL_MAX)
 	end
 	if v <= 0 or isArtifact(it) then
-		return 0, 0, false
+		return 0, 0, false, 0
 	end
-	--legacy layout
+	--legacy layout: had no room for a level, so it reads as unknown
 	local celestial = v >= CELESTIAL_OFFSET and v < CELESTIAL_OFFSET*2
 	local base = celestial and v - CELESTIAL_OFFSET or v
 	if base > LEGENDARY_AFFIX_BASE and base < CELESTIAL_OFFSET then
-		return 0, base - LEGENDARY_AFFIX_BASE, celestial
+		return 0, base - LEGENDARY_AFFIX_BASE, celestial, 0
 	elseif base == 1 or base == 2 then
-		return base, 0, celestial
+		return base, 0, celestial, 0
 	end
-	return 0, 0, celestial
+	return 0, 0, celestial, 0
 end
 
-local function EncodeRarity(tier, affix, celestial)
+local function EncodeRarity(tier, affix, celestial, level)
 	tier = math.max(0, math.min(math.floor(tier or 0), RARITY_TIER_MAX))
 	affix = math.max(0, math.min(math.floor(affix or 0), RARITY_AFFIX_MAX))
-	if tier == 0 and affix == 0 and not celestial then
+	level = math.max(0, math.min(math.floor(level or 0), RARITY_LEVEL_MAX))
+	if tier == 0 and affix == 0 and not celestial and level == 0 then
 		return 0
 	end
 	return RARITY_MARKER + bit.lshift(tier, RARITY_TIER_SHIFT) + affix
 		+ (celestial and RARITY_CELESTIAL or 0)
+		+ bit.lshift(level, RARITY_LEVEL_SHIFT)
 end
 
-local function SetRarity(it, tier, affix, celestial)
-	it.BonusExpireTime = EncodeRarity(tier, affix, celestial)
+local function SetRarity(it, tier, affix, celestial, level)
+	it.BonusExpireTime = EncodeRarity(tier, affix, celestial, level)
 end
 
 function HasRarityData(it)
@@ -190,25 +200,36 @@ end
 -- Ancient (1) / primordial (2); any other value clears the tier. Affix and
 -- celestial are kept.
 function SetAncientTier(it, tier)
-	local _, affix, celestial = DecodeRarity(it)
-	SetRarity(it, (tier == 1 or tier == 2) and tier or 0, affix, celestial)
+	local _, affix, celestial, level = DecodeRarity(it)
+	SetRarity(it, (tier == 1 or tier == 2) and tier or 0, affix, celestial, level)
 end
 
 -- Takes a stored affix id (11-35); 0 removes the affix. Tier and celestial
 -- are kept.
 function SetLegendaryAffix(it, affix)
-	local tier, _, celestial = DecodeRarity(it)
+	local tier, _, celestial, level = DecodeRarity(it)
 	affix = (affix and affix > LEGENDARY_AFFIX_BASE) and affix - LEGENDARY_AFFIX_BASE or 0
-	SetRarity(it, tier, affix, celestial)
+	SetRarity(it, tier, affix, celestial, level)
 end
 
 -- Adds/removes celestial, keeping tier and affix. Returns false (item
 -- untouched) when it already is in the requested state.
 function SetCelestialItem(it, on)
-	local tier, affix, celestial = DecodeRarity(it)
+	local tier, affix, celestial, level = DecodeRarity(it)
 	if celestial == (on and true or false) then
 		return false
 	end
-	SetRarity(it, tier, affix, on)
+	SetRarity(it, tier, affix, on, level)
 	return true
+end
+
+-- The drop level the item spawned at; 0 when unknown (legacy loot).
+function GetStoredDropLevel(it)
+	local _, _, _, level = DecodeRarity(it)
+	return level
+end
+
+function SetStoredDropLevel(it, level)
+	local tier, affix, celestial = DecodeRarity(it)
+	SetRarity(it, tier, affix, celestial, level)
 end

@@ -500,14 +500,11 @@ function GetPrimordialCharges(level)
 end
 
 function GetItemDropLevel(it)
+	local stored=GetStoredDropLevel(it)
+	if stored>0 then
+		return stored
+	end
 	local charges=it.MaxCharges
-	--undo in reverse generation order: the legendary boost came last.
-	--Inverting flips the picker: the legendary boost took the SMALLER of
-	--x1.2/+10 (math.min), so its inverse takes the LARGER rollback; the
-	--tier boosts took the LARGER of x1.2/+min (math.max), so their inverse
-	--takes the SMALLER. Using max here too was the old function's bug: on
-	--big items it left ~0.2x of the primordial inflation in, and a
-	--primordial from a level-700 map gated at 820.
 	if HasLegendaryAffix(it) then
 		charges=math.floor(math.max(charges/LEGENDARY_CHARGES_MULT,
 			charges-LEGENDARY_CHARGES_BONUS))
@@ -672,7 +669,7 @@ function GetTier(level)
 	return math.min(math.floor(level/18), cap2, maxTier)
 end
 local function rollMaxCharges(maxCharges)
-	return round(maxCharges*math.random(8,10)/10)
+	return round(maxCharges*math.random(16,20)/20)
 end
 
 enc1ChanceNormal={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80}
@@ -979,8 +976,10 @@ function events.ItemGenerated(t)
 		]]
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
 		local maxChargesCap=MawCore.ItemLevel.MaxCharges()
-		it.MaxCharges=MawCore.ItemLevel.ChargesFor(
-			MawCore.ItemLevel.ForDrop(drop.monsterLevel, partyLevel, mapLevel))
+		local dropLevel=MawCore.ItemLevel.ForDrop(drop.monsterLevel, partyLevel, mapLevel)
+
+		SetStoredDropLevel(it, dropLevel)
+		it.MaxCharges=rollMaxCharges(MawCore.ItemLevel.ChargesFor(dropLevel))
 		
 		local maxTier
 		maxTier, cap2=GetEnchantTierCap()
