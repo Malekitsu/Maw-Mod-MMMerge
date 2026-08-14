@@ -2285,10 +2285,12 @@ function events.GameInitialized2()
 	Skillz.new_magic(Enlightenment)
 	Skillz.setName(Enlightenment, "Enlightenment")
 	Skillz.setDesc(Enlightenment, 1, "Unlock the true potential of your mana reserves with Enlightenment, a transformative skill that increases your mana pool and reduces mana reserved by buffs, empowering you to cast more freely and frequently.\n\nThe cost of buffs is divided by the amount of mana you gain per level. As you reach higher mastery levels, the divisor increases, but your total mana pool remains the same.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n")
-	Skillz.setDesc(Enlightenment, 2, "Mana is increased by 2% per skill level, cost divisor increased by 0.5")
-	Skillz.setDesc(Enlightenment, 3, "Mana is increased by 3% per skill level, cost divisor increased by 1")
-	Skillz.setDesc(Enlightenment, 4, "Mana is increased by 4% per skill level, cost divisor increased by 1.5")
-	Skillz.setDesc(Enlightenment, 5, "Mana is increased by 5% per skill level, cost divisor increased by 2")
+
+	for mastery=1,4 do
+		Skillz.setDesc(Enlightenment, mastery+1, string.format(
+			"Mana is increased by %s%% per skill level, cost divisor increased by %s",
+			MawCore.Formulas.enlightenmentManaPerSkill[mastery], mastery/2))
+	end
 	Skillz.learn_at(Enlightenment, 3) --alchemy shop
 end
 

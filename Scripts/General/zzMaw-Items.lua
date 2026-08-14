@@ -3004,7 +3004,7 @@ local function addMana(pl, tab)
 	totalMana=totalMana+manaScaling*totalEffect+tab[9]
 
 	local s,m=SplitSkill(Skillz.get(pl,52))
-	local enlightIncrease=totalMana*((m+1)/100*s)
+	local enlightIncrease=totalMana*MawCore.Formulas.enlightenmentManaBonus(s, m)
 	tab[9]=tab[9]+enlightIncrease+manaScaling*effect
 end
 

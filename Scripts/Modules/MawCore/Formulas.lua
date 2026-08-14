@@ -123,6 +123,17 @@ function Formulas.meditationRegenPerSec(fullSP, s, m, reserved, legendary20)
 	return regen, pool
 end
 
+Formulas.enlightenmentManaPerSkill = {0.5, 1, 1.5, 2}
+
+function Formulas.enlightenmentManaBonus(s, m)
+	local t = Formulas.enlightenmentManaPerSkill
+	local pct = t[math.min(m, #t)]
+	if not pct then
+		return 0
+	end
+	return pct/100*s
+end
+
 -- Shaman melee hit: HP leeched (Body magic).
 function Formulas.bodyLeech(fullHP, s, m)
 	return math.max(round(fullHP^0.5 * s^1.5/70 * (0.5 + m/2)), s)
