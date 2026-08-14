@@ -1495,7 +1495,7 @@ legendaryEffects={
 	[21]="Increase melee damage by 5% for each enemy in the nearbies",
 	[22]="Reduces damage by 3% for each enemy in the nearbies",
 	[23]="Successfully covering an ally restores 3% of your HP",
-	[24]="Killing a Monster Restores 10% of Health and Mana",
+	[24]="Killing a Monster Restores 10% of Health and 5% of Mana",
 	[25]="Increases Ascension Skill level by 10",
 	[26]="Your weapon enchants can deal critical damage",
 	
