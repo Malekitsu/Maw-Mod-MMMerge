@@ -1310,7 +1310,7 @@ function events.GameInitialized2()
 	end
 --Weapon upscaler 
     for i = 1, 2199 do
-		if (i>=1 and i<=83) or (i>=803 and i<=865) or (i>=1603 and i<=1665) or i>=2201 then
+		if (i>=1 and i<=83) or (i>=803 and i<=865) or (i>=1603 and i<=1665) then
 			
 			local goalDamage=WEAPON_BASE_DICE_DAMAGE
 			local flatDamage=weaponTierFlat(MawCore.ItemLevel.LadderTier(i))
@@ -2463,8 +2463,7 @@ function events.GameInitialized2()
 	--weapons and armors
     referenceAC = {}
     referenceWeaponAttack = {}
-    referenceWeaponSides = {}
-	
+
     for i = 0, 2199 do
         local txt = Game.ItemsTxt
         local lookup = 0
@@ -2478,14 +2477,12 @@ function events.GameInitialized2()
         elseif txt[i].Skill <= 7 or txt[i].Skill==39 then
             -- Weapons
             referenceWeaponAttack[i] = txt[i + lookup].Mod2
-            referenceWeaponSides[i] = txt[i + lookup].Mod1DiceSides
         end
     end
 	if isRedone and Game.ItemsTxt.High>2200 then
 		local txt = Game.ItemsTxt[2205]
 		for i=1,5 do
 			referenceWeaponAttack[i+2200] = txt.Mod2
-			referenceWeaponSides[i+2200] = txt.Mod1DiceSides
 		end
 	end
 end
@@ -4502,11 +4499,15 @@ function IsTwoHandedWeapon(it)
 	return it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number)~=nil
 end
 
+function GetWeaponFlatDamage(it)
+	return weaponTierFlat(MawCore.ItemLevel.LadderTier(it.Number))
+end
+
 function GetWeaponDamage(it)
-	return getWeaponDamageForLevel(MawCore.ItemLevel.OfItem(it), IsTwoHandedWeapon(it), MawCore.ItemLevel.LadderTier(it.Number))
+	return getWeaponDamageForLevel(MawCore.ItemLevel.OfItem(it), IsTwoHandedWeapon(it), GetWeaponFlatDamage(it))
 end
 
 --what enchants and auras scale off: the item-level share only, undamped
 function GetWeaponLevelDamage(it)
-	return getWeaponLevelDamage(MawCore.ItemLevel.OfItem(it), IsTwoHandedWeapon(it), MawCore.ItemLevel.LadderTier(it.Number))
+	return getWeaponLevelDamage(MawCore.ItemLevel.OfItem(it), IsTwoHandedWeapon(it), GetWeaponFlatDamage(it))
 end

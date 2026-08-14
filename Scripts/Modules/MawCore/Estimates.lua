@@ -94,11 +94,17 @@ function weaponTierFlat(tier)
 	return WEAPON_TIER_FLAT_DAMAGE*(tier - 1)/(IL.Tiers - 1)
 end
 
-function getWeaponDamageForLevel(itemLevel, twoHanded, tier)
+WEAPON_FLAT_PER_LEVEL = 0.5	
+
+function estimateWeaponFlat(lvl)
+	return math.min(lvl*WEAPON_FLAT_PER_LEVEL, WEAPON_TIER_FLAT_DAMAGE)
+end
+
+function getWeaponDamageForLevel(itemLevel, twoHanded, flat)
 	local damage = math.max(Game.GetStatisticEffect(estimateStat(itemLevel)), 0)
 
 	local diceOnly = WEAPON_BASE_DICE_DAMAGE*2
-	local flatOnly = weaponTierFlat(tier)
+	local flatOnly = flat or 0
 	if not twoHanded then
 		damage = damage/2
 		diceOnly = diceOnly/2
@@ -108,8 +114,8 @@ function getWeaponDamageForLevel(itemLevel, twoHanded, tier)
 	return damage/damping + diceOnly + flatOnly, diceOnly, flatOnly
 end
 
-function getWeaponLevelDamage(itemLevel, twoHanded, tier)
-	local total, dice, flat = getWeaponDamageForLevel(itemLevel, twoHanded, tier)
+function getWeaponLevelDamage(itemLevel, twoHanded, weaponFlat)
+	local total, dice, flat = getWeaponDamageForLevel(itemLevel, twoHanded, weaponFlat)
 	return (total - dice - flat)*estimateWeaponDamageMultiplier(itemLevel)
 end
 
@@ -433,7 +439,7 @@ function getPlayerEstimatedAttack(lvl)
 	local skill = estimateSkill(lvl)
 	local m = masteryPerLevel(lvl)
 	local meleeSkill = getMeleeSkill(lvl)
-	local wDmg, wDice, wFlat = getWeaponDamageForLevel(lvl, true)
+	local wDmg, wDice, wFlat = getWeaponDamageForLevel(lvl, true, estimateWeaponFlat(lvl))
 	--half the enchant split becomes attack; the weapon's own flat part all does
 	return (wDmg-wDice-wFlat)/2 + wFlat
 		+ GetGradualMasteryValue(skillAttack[const.Skills.Sword], meleeSkill, m)*meleeSkill
@@ -447,7 +453,7 @@ function getPlayerEstimatedPower(lvl)
 	local m = masteryPerLevel(lvl)	--the mastery that skill level buys
 
 	local itemLevel = lvl
-	local wDmg, wDice, wFlat = getWeaponDamageForLevel(itemLevel, true)	--two-handed reference
+	local wDmg, wDice, wFlat = getWeaponDamageForLevel(itemLevel, true, estimateWeaponFlat(lvl))	--two-handed reference
 
 	local meleeSkill = getMeleeSkill(lvl)	--the weapon skill, legendary 33 included
 	local weaponSkillMult = 1 + skillDamage[const.Skills.Sword]*meleeSkill/100
