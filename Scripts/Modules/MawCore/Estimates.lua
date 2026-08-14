@@ -140,7 +140,7 @@ local function hpPerLevel(lvl)
 	return math.min(growth*lvl/promotionLevel, growth) + HP_PER_LEVEL_MIN
 end
 
-local function estimateHealth(lvl)
+local function computeHealth(lvl)
 	local perLevel = hpPerLevel(lvl)
 	local stat = estimateStat(lvl)
 	local skill = estimateSkill(lvl)
@@ -159,6 +159,28 @@ local function estimateHealth(lvl)
 
 	local health = BASE_HP + perLevel*lvl + (enduranceEffect + bodybuildingFlat)*perLevel + flatBonus
 	return health*(1 + bodybuildingPct*skill/100)*(1 + stat/2500)
+end
+
+local healthCache = {}
+local cachedMadness, cachedInsanity, cachedAusterity, cachedBolster
+
+local function estimateHealth(lvl)
+	if vars.madnessMode ~= cachedMadness or vars.insanityMode ~= cachedInsanity
+			or vars.AusterityMode ~= cachedAusterity
+			or Game.BolsterAmount ~= cachedBolster then
+		healthCache = {}
+		cachedMadness, cachedInsanity = vars.madnessMode, vars.insanityMode
+		cachedAusterity, cachedBolster = vars.AusterityMode, Game.BolsterAmount
+	end
+	local health = healthCache[lvl]
+	if not health then
+		health = computeHealth(lvl)
+		--NaN check
+		if lvl == lvl then
+			healthCache[lvl] = health
+		end
+	end
+	return health
 end
 
 local EXPECTED_NEARBY_MONSTERS = 5

@@ -95,11 +95,15 @@ function Formulas.critDamageMult(stat, monsterLevel, madness, isSpell)
 	return stat/dim + 1.5
 end
 
--- Regeneration skill: HP/sec at full health (the GM low-HP amplification
--- stays at the effect site -- it needs current HP).
-local regenEffect = {[0] = 0, 2, 4, 6, 6}
+Formulas.hpRegenRate = {0.06, 0.08, 0.10, 0.10}
+
 function Formulas.hpRegenPerSec(fullHP, s, m)
-	return fullHP^0.5 * s^1.65 * (regenEffect[m]/350) + s
+	local rate = Formulas.hpRegenRate[math.min(m or 0, #Formulas.hpRegenRate)]
+	if not rate or s <= 0 or fullHP <= 0 then
+		return 0
+	end
+	local expected = getPlayerEstimatedHealth(s^1.4)
+	return rate*math.sqrt(expected*fullHP)
 end
 
 -- Meditation skill: SP/sec (GM counts as mastery 5).
