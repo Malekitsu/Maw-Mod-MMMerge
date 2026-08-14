@@ -1519,6 +1519,13 @@ for id in pairs(legendaryEffects) do
 	LEGENDARY_AFFIX_COUNT = math.max(LEGENDARY_AFFIX_COUNT, id - LEGENDARY_AFFIX_BASE)
 end
 
+function events.GameInitialized2()
+	local F=MawCore.Formulas
+	legendaryEffects[24]=string.format(
+		"Killing a Monster restores %s%% of Health and %s%% of Mana, counted on the pool left after buffs reserve theirs",
+		F.legendary24Health*100, F.legendary24Mana*100)
+end
+
 function updateCelestialItem(it,pl)
 	if IsCelestialItem(it) then
 		if not pl then

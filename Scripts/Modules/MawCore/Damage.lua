@@ -1069,17 +1069,18 @@ local function stage_legendaries(t)
 		t.Result=math.round(t.Result*math.max(critChance,1))
 	end
 	--end of [14]
-	--[24]="killing a Monster Restores 10% of Health and Mana"
+	--[24] killing a monster restores a share of health and mana
 	if hasLegendary(id,24) then
 		--restoreHPLeg=true
 		RunNextTick(function()
 			--if restoreHPLeg then
 				--restoreHPLeg=false
 				if mon.HP<=0 then
-					local fullHP=pl:GetFullHP()
-					local fullSP=pl:GetFullSP()
-					pl.HP=math.min(fullHP, pl.HP+fullHP*0.1)
-					pl.SP=math.min(fullSP, pl.SP+fullSP*0.1)
+					local fullHP=GetMaxHP(pl)
+					local fullSP=getMaxMana(pl)
+					local F=MawCore.Formulas
+					pl.HP=math.min(fullHP, pl.HP+fullHP*F.legendary24Health)
+					pl.SP=math.min(fullSP, pl.SP+fullSP*F.legendary24Mana)
 				end
 			--end
 		end)

@@ -134,6 +134,9 @@ function Formulas.enlightenmentManaBonus(s, m)
 	return pct/100*s
 end
 
+Formulas.legendary24Health = 0.10
+Formulas.legendary24Mana = 0.05
+
 -- Shaman melee hit: HP leeched (Body magic).
 function Formulas.bodyLeech(fullHP, s, m)
 	return math.max(round(fullHP^0.5 * s^1.5/70 * (0.5 + m/2)), s)
