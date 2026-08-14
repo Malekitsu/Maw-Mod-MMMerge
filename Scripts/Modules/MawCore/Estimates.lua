@@ -84,17 +84,33 @@ function estimateSkill(lvl)
 	return skillLevelFromPoints(skillPointsAtLevel(lvl)/SKILLS_TRAINED)
 end
 
-WEAPON_BASE_DICE_DAMAGE = 8
 
-function getWeaponDamageForLevel(itemLevel, twoHanded)
+WEAPON_BASE_DICE_DAMAGE = 8	--expected damage, spread over the dice; same on every weapon
+WEAPON_TIER_FLAT_DAMAGE = 30	--flat damage a top-tier base type is worth; tier 1 gets none
+
+function weaponTierFlat(tier)
+	local IL = MawCore.ItemLevel
+	tier = math.min(math.max(tier or IL.ExpectedTier, 1), IL.Tiers)
+	return WEAPON_TIER_FLAT_DAMAGE*(tier - 1)/(IL.Tiers - 1)
+end
+
+function getWeaponDamageForLevel(itemLevel, twoHanded, tier)
 	local damage = math.max(Game.GetStatisticEffect(estimateStat(itemLevel)), 0)
-	local diceOnly = WEAPON_BASE_DICE_DAMAGE
+
+	local diceOnly = WEAPON_BASE_DICE_DAMAGE*2
+	local flatOnly = weaponTierFlat(tier)
 	if not twoHanded then
 		damage = damage/2
 		diceOnly = diceOnly/2
+		flatOnly = flatOnly/2
 	end
 	local damping = 1 + estimateWeaponDamageMultiplier(itemLevel)
-	return (damage + diceOnly)/damping, diceOnly/damping
+	return damage/damping + diceOnly + flatOnly, diceOnly, flatOnly
+end
+
+function getWeaponLevelDamage(itemLevel, twoHanded, tier)
+	local total, dice, flat = getWeaponDamageForLevel(itemLevel, twoHanded, tier)
+	return (total - dice - flat)*estimateWeaponDamageMultiplier(itemLevel)
 end
 
 local STAT_SHARE = 0.33
@@ -417,8 +433,9 @@ function getPlayerEstimatedAttack(lvl)
 	local skill = estimateSkill(lvl)
 	local m = masteryPerLevel(lvl)
 	local meleeSkill = getMeleeSkill(lvl)
-	local wDmg, wDice = getWeaponDamageForLevel(lvl, true)
-	return (wDmg-wDice)/2
+	local wDmg, wDice, wFlat = getWeaponDamageForLevel(lvl, true)
+	--half the enchant split becomes attack; the weapon's own flat part all does
+	return (wDmg-wDice-wFlat)/2 + wFlat
 		+ GetGradualMasteryValue(skillAttack[const.Skills.Sword], meleeSkill, m)*meleeSkill
 		+ GetGradualMasteryValue(armsmasterSkill.Attack, skill, m)*skill
 		+ Game.GetStatisticEffect(estimateStat(lvl))
@@ -430,13 +447,12 @@ function getPlayerEstimatedPower(lvl)
 	local m = masteryPerLevel(lvl)	--the mastery that skill level buys
 
 	local itemLevel = lvl
-	local wDmg, wDice = getWeaponDamageForLevel(itemLevel, true)	--two-handed reference
+	local wDmg, wDice, wFlat = getWeaponDamageForLevel(itemLevel, true)	--two-handed reference
 
 	local meleeSkill = getMeleeSkill(lvl)	--the weapon skill, legendary 33 included
 	local weaponSkillMult = 1 + skillDamage[const.Skills.Sword]*meleeSkill/100
 	local armsBase = GetGradualMasteryValue(armsmasterSkill.Damage, skill, m)*skill
-	--flat half counts in full, the dice half averages to half of it
-	local scalable = 0.75*(wDmg-wDice) + 0.5*wDice + armsBase
+	local scalable = 0.75*(wDmg-wDice-wFlat) + wFlat + 0.5*wDice + armsBase
 	local damage = EXPECTED_WEAPON_DICE/2 + scalable*weaponSkillMult
 
 	--the floor: a weapon skill point is worth at least 1 damage

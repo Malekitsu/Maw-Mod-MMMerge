@@ -1312,34 +1312,16 @@ function events.GameInitialized2()
     for i = 1, 2199 do
 		if (i>=1 and i<=83) or (i>=803 and i<=865) or (i>=1603 and i<=1665) or i>=2201 then
 			
-			upTierDifference=0
-			downTierDifference=0
-			downDamage=0
-			--set goal damage for weapons (end game weapon damage)
-			goalDamage=35
-			if Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Axe" or Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Sword" or Game.ItemsTxt[i].NotIdentifiedName == "Halberd" or Game.ItemsTxt[i].Skill==0 then
-				goalDamage=goalDamage*2
+			local goalDamage=WEAPON_BASE_DICE_DAMAGE
+			local flatDamage=weaponTierFlat(MawCore.ItemLevel.LadderTier(i))
+			if not (Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Axe" or Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Sword" or Game.ItemsTxt[i].NotIdentifiedName == "Halberd" or Game.ItemsTxt[i].Skill==0) then
+				goalDamage=goalDamage/2
+				flatDamage=flatDamage/2
 			end
-			currentDamage = (Game.ItemsTxt[i].Mod1DiceCount *Game.ItemsTxt[i]. Mod1DiceSides + 1)/2+Game.ItemsTxt[i].Mod2 
-
-			for v=1,4 do
-				if Game.ItemsTxt[i].NotIdentifiedName==Game.ItemsTxt[i+v].NotIdentifiedName then
-				upTierDifference=upTierDifference+1
-				end
-				if Game.ItemsTxt[i].NotIdentifiedName==Game.ItemsTxt[math.max(i-v,0)].NotIdentifiedName then
-				downTierDifference=downTierDifference+1
-				downDamage = (Game.ItemsTxt[i-v].Mod1DiceCount *Game.ItemsTxt[i-v]. Mod1DiceSides + 1)/2+Game.ItemsTxt[i-v].Mod2
-				elseif downTierDifference==0 then
-					downDamage = currentDamage
-				end
+			if Game.ItemsTxt[i].Mod1DiceCount>0 then
+				Game.ItemsTxt[i].Mod1DiceSides=math.ceil(goalDamage*2/Game.ItemsTxt[i].Mod1DiceCount)
 			end
-
-			--calculate expected value
-			tierRange=upTierDifference+downTierDifference+1
-			damageRange=goalDamage-downDamage
-			expectedDamageIncrease=damageRange*(downTierDifference/(tierRange-1))
-			Game.ItemsTxt[i].Mod1DiceSides = Game.ItemsTxt[i].Mod1DiceSides + (expectedDamageIncrease / Game.ItemsTxt[i].Mod1DiceCount)
-			Game.ItemsTxt[i].Mod2=expectedDamageIncrease/2
+			Game.ItemsTxt[i].Mod2=round(flatDamage)
 
 		elseif Game.ItemsTxt[i].Skill==8 then
 			--increase shield value
@@ -1966,10 +1948,10 @@ enchantbonusdamage[39] = {20,40,["Type"]=0,["Coeff"]=0.5}
 enchantbonusdamage[46] = {20,40,["Type"]=0,["Coeff"]=0.5}
 
 --min/max roll of a damage enchant: average = Coeff * undamped item-level
---weapon damage (the damping factor cancels the divisor in GetWeaponDamage)
+--weapon damage (the flat base every weapon shares is not part of that scale)
 function enchantDamageRange(it, id)
 	local ench=enchantbonusdamage[id]
-	local avg=GetWeaponDamage(it)*estimateWeaponDamageMultiplier(MawCore.ItemLevel.OfItem(it))*ench.Coeff
+	local avg=GetWeaponLevelDamage(it)*ench.Coeff
 	local mean=(ench[1]+ench[2])/2
 	--{min,max} are also a guaranteed floor, so a low item level still deals
 	--something; two-handed weapons are owed twice as much of it
@@ -2677,11 +2659,12 @@ local function addWeaponRows(pl, index, it, txt, tab, floorPaid)
 		return
 	end
 	--item-level weapon damage replaces base Mod2/sides and charge scaling:
-	--half as attack/flat, half spread over the dice sides
-	--the dice-only part skips the flat half and lands entirely on the sides
-	local wDmg,wDice=GetWeaponDamage(it)
-	local split=wDmg-wDice
-	local bonus=split/2
+	--the enchant-driven split goes half as attack/flat and half over the sides,
+	--while the weapon's own base skips the split entirely -- its dice part lands
+	--only on the sides, its flat part only on attack/flat
+	local wDmg,wDice,wFlat=GetWeaponDamage(it)
+	local split=wDmg-wDice-wFlat
+	local bonus=split/2+wFlat
 	local sidesBonus=(split/2+wDice)/math.max(txt.Mod1DiceCount,1)
 	if artWeaponsSet[it.Number] then
 		if txt.EquipStat<=1 then
@@ -4160,10 +4143,9 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 		if not it or (it and it.Number==0) or (it and it:T().EquipStat>2) then return 0 end
 		local s, m, level=getBuffSkill(4)
 		local id=pl:GetIndex()
-		--aura scales with the undamped item-level weapon damage: multiplying the
-		--damping factor back cancels the divisor inside GetWeaponDamage
-		local itemLevel=MawCore.ItemLevel.OfItem(it)
-		local damage=GetWeaponDamage(it)*fireAuraDamage[m]*estimateWeaponDamageMultiplier(itemLevel)
+		--aura scales with the undamped item-level weapon damage; the flat base
+		--every weapon shares is not part of that scale
+		local damage=GetWeaponLevelDamage(it)*fireAuraDamage[m]
 		damage=math.max(damage, fireAuraMinDamage[m]*(IsTwoHandedWeapon(it) and 2 or 1))
 		damage=damage*GetLegendary19Mult(pl)
 		if calcType~="tooltip" and vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 26) then
@@ -4228,15 +4210,7 @@ function GetLevelRquirement(it)
 	if IsCelestialItem(it) then
 		return 1
 	end
-	local tot=0
-	local lvl=0
-	for i=1, 6 do
-		tot=tot+it:T().ChanceByLevel[i]
-		lvl=lvl+it:T().ChanceByLevel[i]*i
-	end
-	tot = math.max(tot,1)
-
-	local dropLevel=GetItemDropLevel(it)+lvl/tot*2
+	local dropLevel=GetItemDropLevel(it)+MawCore.ItemLevel.TierLevels(it.Number)
 	local levelRequired=MawCore.ItemLevel.WearLevel(dropLevel)
 
 	if Game.BolsterAmount>=300 then
@@ -4529,5 +4503,10 @@ function IsTwoHandedWeapon(it)
 end
 
 function GetWeaponDamage(it)
-	return getWeaponDamageForLevel(MawCore.ItemLevel.OfItem(it), IsTwoHandedWeapon(it))
+	return getWeaponDamageForLevel(MawCore.ItemLevel.OfItem(it), IsTwoHandedWeapon(it), MawCore.ItemLevel.LadderTier(it.Number))
+end
+
+--what enchants and auras scale off: the item-level share only, undamped
+function GetWeaponLevelDamage(it)
+	return getWeaponLevelDamage(MawCore.ItemLevel.OfItem(it), IsTwoHandedWeapon(it), MawCore.ItemLevel.LadderTier(it.Number))
 end

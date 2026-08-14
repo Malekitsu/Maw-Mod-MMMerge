@@ -28,18 +28,46 @@ function ItemLevel.ChargesFor(level)
 	return math.floor(math.max(level, 0)/ItemLevel.PerCharge)
 end
 
+ItemLevel.Tiers = 6
+ItemLevel.ExpectedTier = (1 + ItemLevel.Tiers)/2	--the tier the damage model assumes
+
+local ladder
+
+local function buildLadder()
+	ladder = {}
+	local txt = Game.ItemsTxt
+	local i = 0
+	while i <= txt.High do
+		local name = txt[i].NotIdentifiedName
+		local last = i
+		while last < txt.High and txt[last + 1].NotIdentifiedName == name do
+			last = last + 1
+		end
+		local span = last - i
+		for k = i, last do
+			--a type with no siblings has no position to read: assume average
+			ladder[k] = span > 0 and 1 + (k - i)/span*(ItemLevel.Tiers - 1) or ItemLevel.ExpectedTier
+		end
+		i = last + 1
+	end
+end
+
+function ItemLevel.LadderTier(itemId)
+	if not ladder then
+		buildLadder()
+	end
+	return ladder[itemId]
+end
+
+ItemLevel.PerTier = 3	--extra levels to wear, per tier above the first
+
+function ItemLevel.TierLevels(itemId)
+	local tier = ItemLevel.LadderTier(itemId) or ItemLevel.ExpectedTier
+	return (math.min(math.max(tier, 1), ItemLevel.Tiers) - 1)*ItemLevel.PerTier
+end
+
 function ItemLevel.OfItem(it)
-	local txt = it:T()
-	local tot = 0
-	local lvl = 0
-	for i = 1, 6 do
-		tot = tot + txt.ChanceByLevel[i]
-		lvl = lvl + txt.ChanceByLevel[i]*i
-	end
-	if tot == 0 then
-		return it.MaxCharges*ItemLevel.PerCharge
-	end
-	return round(lvl/tot*6 - 5) + it.MaxCharges*ItemLevel.PerCharge
+	return it.MaxCharges*ItemLevel.PerCharge
 end
 
 local FALLBACK_PARTY_SHARE = 7/8
