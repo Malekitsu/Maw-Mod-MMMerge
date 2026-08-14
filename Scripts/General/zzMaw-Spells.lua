@@ -2069,33 +2069,14 @@ function getPersonalityManaCostReduction(pl)
 	return (0.99^reductionPercent)
 end
 
-function AscendCCSpells(pl,s,m,personalityReduction)
-	local mult=getCCDiffMult(Game.BolsterAmount)
-	local lvl=pl.LevelBase
-	
+--Mana cost of the control spells.
+local function ascendCCSpellCosts(pl, s, m, personalityReduction)
 	for key, value in pairs(CCMAP) do
 		for i=1,4 do
 			local baseCost = spellCost[key][masteryName[i]]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
 			local finalCost=math.min(math.ceil(baseCost * personalityReduction), 65000)
 			Game.Spells[key]["SpellPoints" .. masteryName[i]]=finalCost
 		end
-		
-		local baseDuration=value.Duration/const.Minute*2
-		local school=math.ceil(key/11)+11
-		local spellS, spellM = SplitSkill(pl.Skills[school])
-		local masteryMult = ({0.5, 0.65, 0.8, 1})[math.max(1,spellM)]
-		local ascendedDuration=baseDuration * masteryMult * 1.015^(s) / (lvl/200)
-		
-		-- Update N/E/M/GM descriptions with duration at each mastery
-		local durN = baseDuration * ({0.5, 0.65, 0.8, 1})[1] * 1.015^(s) / (lvl/200)
-		local durE = baseDuration * ({0.5, 0.65, 0.8, 1})[2] * 1.015^(s) / (lvl/200)
-		local durM = baseDuration * ({0.5, 0.65, 0.8, 1})[3] * 1.015^(s) / (lvl/200)
-		local durGM = baseDuration * ({0.5, 0.65, 0.8, 1})[4] * 1.015^(s) / (lvl/200)
-		Game.SpellsTxt[key].Normal = string.format("Duration: %.1f seconds", durN)
-		Game.SpellsTxt[key].Expert = string.format("Duration: %.1f seconds", durE)
-		Game.SpellsTxt[key].Master = string.format("Duration: %.1f seconds", durM)
-		Game.SpellsTxt[key].GM = string.format("Duration: %.1f seconds", durGM)
-	
 		if key==122 then
 			Game.Spells[key]["SpellPointsNormal"]=15
 			Game.Spells[key]["SpellPointsExpert"]=15
@@ -2105,11 +2086,335 @@ function AscendCCSpells(pl,s,m,personalityReduction)
 	end
 end
 
+
+local function ascendCCTooltips(pl, s)
+	local lvl=pl.LevelBase
+	for key, value in pairs(CCMAP) do
+		local baseDuration=value.Duration/const.Minute*2
+		local masteryStep={0.5, 0.65, 0.8, 1}
+		local durN = baseDuration * masteryStep[1] * 1.015^(s) / (lvl/200)
+		local durE = baseDuration * masteryStep[2] * 1.015^(s) / (lvl/200)
+		local durM = baseDuration * masteryStep[3] * 1.015^(s) / (lvl/200)
+		local durGM = baseDuration * masteryStep[4] * 1.015^(s) / (lvl/200)
+		Game.SpellsTxt[key].Normal = string.format("Duration: %.1f seconds", durN)
+		Game.SpellsTxt[key].Expert = string.format("Duration: %.1f seconds", durE)
+		Game.SpellsTxt[key].Master = string.format("Duration: %.1f seconds", durM)
+		Game.SpellsTxt[key].GM = string.format("Duration: %.1f seconds", durGM)
+	end
+end
+
+local function ascensionLevel(pl)
+	local level=pl:GetSkill(const.Skills.Learning)
+	lastLevel=level
+	local s,m = SplitSkill(level)
+	local elementalist=false
+	local id=pl:GetIndex()
+	if table.find(elementalistClass, pl.Class) then
+		elementalist=true
+		s=0
+		m=4
+		for i=12,15 do
+			local skill = SplitSkill(pl.Skills[i])
+			s=s+skill
+		end
+		s=s/4
+		vars.eleStacks=vars.eleStacks or {}
+		vars.eleStacks[id]=vars.eleStacks[id] or 0
+	end
+	if table.find(shamanClass, pl.Class) then
+		s=0
+		m=4
+		for i=12,18 do
+			local skill = SplitSkill(pl.Skills[i])
+			s=s+skill
+		end
+		s=s/7
+	end
+	return s, m, elementalist, id
+end
+
+--Mana cost of every damage spell.
+local function ascendSpellCosts(pl, s, m, elementalist, id, personalityReduction)
+	for v=1,#spells do 
+		local num=spells[v]
+		for i=1,4 do
+			local baseCost = spellCost[num][masteryName[i]]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
+			Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(math.ceil(baseCost * personalityReduction), 65000)
+			if elementalist then
+				local baseCost=round((spellCost[num][masteryName[i]]+vars.eleStacks[id])*(1+s*0.125)*1.04^(s)*(1-0.125*m))
+				Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(round(math.ceil(baseCost*(1+vars.eleStacks[id]*0.075) * personalityReduction)),65000)
+			end
+		end
+		if num==44 then	
+			Game.Spells[num]["SpellPointsGM"]=math.ceil(math.min(pl.LevelBase, 255)^1.4/12.5 * personalityReduction)
+		end
+	end				
+end
+
+local function ascendDamageTooltips(s, m)
+	--change tooltips according to ascended damage
+	Game.SpellsTxt[2].Description=string.format("Launches a burst of fire at a single target.  Damage is %s+1-%s points of damage per point of skill in Fire Magic.   Firebolt is safe, effective and has a low casting cost.",dmgAddTooltip(s, m,2),diceMaxTooltip(s, m,2))
+	Game.SpellsTxt[6].Description=string.format("Fires a ball of fire at a single target. When it hits, the ball explodes damaging all those nearby, including your characters if they're too close.  Fireball does 1-%s points of damage per point of skill in Fire Magic.",diceMaxTooltip(s, m,6))
+	--fire spikes fix
+	Game.SpellsTxt[7].Description="Drops a Fire Spike on the ground that waits for a creature to get near it before exploding.  Fire Spikes last until you leave the map or they are triggered."
+	Game.SpellsTxt[7].Expert=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",diceMaxTooltip(s, m,7))
+	Game.SpellsTxt[7].Master=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",round(diceMaxTooltip(s, m,7)/6*8))
+	Game.SpellsTxt[7].GM=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",round(diceMaxTooltip(s, m,7)/6*10))
+	----------------------------------------
+	
+	Game.SpellsTxt[8].Description=string.format("Reserve a mana percentage to surround your characters with a very hot fire that is only harmful to others.  The spell will deliver %s points of damage plus 1-%s per point of skill to all nearby monsters for as long as they remain in the area of effect.",dmgAddTooltip(s, m,8),diceMaxTooltip(s, m,8))
+	Game.SpellsTxt[9].Description=string.format("Summons flaming rocks from the sky which fall in a large radius surrounding your chosen target.  Try not to be near the victim when you use this spell.  A single meteor does %s points of damage plus %s per point of skill in Fire Magic.  This spell only works outdoors.",dmgAddTooltip(s, m,9),diceMaxTooltip(s, m,9))
+	Game.SpellsTxt[10].Description=string.format("Inferno burns all monsters in sight when cast, excluding your characters.  One or two castings can clear out a room of weak or moderately powerful creatures. Each monster takes %s points of damage plus %s per point of skill in Fire Magic.  This spell only works indoors.",dmgAddTooltip(s, m,10),diceMaxTooltip(s, m,10))
+	Game.SpellsTxt[11].Description=string.format("Among the strongest direct damage spells available, Incinerate inflicts massive damage on a single target.  Only the strongest of monsters can expect to survive this spell.  Damage is %s points plus 1-%s per point of skill in Fire Magic.",dmgAddTooltip(s, m,11),diceMaxTooltip(s, m,11))
+	Game.SpellsTxt[15].Description=string.format("Sparks fires small balls of lightning into the world that bounce around until they hit something or dissipate. It is hard to tell where they will go, so this spell is best used in a room crowded with small monsters. Each spark does 1-%s per point of skill in Air Magic.",diceMaxTooltip(s, m,15))
+	Game.SpellsTxt[18].Description=string.format("Lightning Bolt discharges electricity from the caster's hand to a single target.  It always hits and does %s points plus 1-%s points of damage per point of skill in Air Magic.\n\nThe spell then arcs to a second target, hitting it as well.",dmgAddTooltip(s, m,18),diceMaxTooltip(s, m,18))
+	Game.SpellsTxt[20].Description=string.format("Implosion is a nasty spell that affects a single target by destroying the air around it, causing a sudden inrush from the surrounding air, a thunderclap, and %s points plus 1-%s points of damage per point of skill in Air Magic.",dmgAddTooltip(s, m,20),diceMaxTooltip(s, m,20))
+	Game.SpellsTxt[22].Description=string.format("Calls stars from the heavens to smite and burn your enemies.  Twenty stars are called, and the damage for each star is %s points plus %s per point of skill in Air Magic. Try not to get caught in the blast! This spell only works outdoors.",dmgAddTooltip(s, m,22),diceMaxTooltip(s, m,22))
+	Game.SpellsTxt[24].Description=string.format("Sprays poison at monsters directly in front of your characters.  Damage is low, but few monsters have resistance to Water Magic, so it usually works.  Each shot does %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,24),diceMaxTooltip(s, m,24))
+	Game.SpellsTxt[26].Description=string.format("Fires a bolt of ice at a single target.  The missile does %s + 1-%s points of damage per point of skill in Water Magic.",dmgAddTooltip(s, m,26),diceMaxTooltip(s, m,26))
+	Game.SpellsTxt[29].Description=string.format("Acid burst squirts a jet of extremely caustic acid at a single victim.  It always hits and does %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,29),diceMaxTooltip(s, m,29))
+	Game.SpellsTxt[32].Description=string.format("Fires a ball of ice in the direction the caster is facing.  The ball will shatter when it hits something, launching 7 shards of ice in all directions except the caster's.  The shards will ricochet until they strike a creature or melt.  Each shard does %s points of damage plus 1-%s per point of skill in Water Magic.",dmgAddTooltip(s, m,32),diceMaxTooltip(s, m,32))
+	Game.SpellsTxt[34].Description="Slaps a monster with magical force, forcing it to recover from the stun spell before it can do anything else.  Stun also knocks monsters back a little, giving you a chance to get away while the getting is good.  The greater your skill in Earth Magic, the greater the effect of the spell."
+	Game.SpellsTxt[37].Description=string.format("Summons a swarm of biting, stinging insects to bedevil a single target.  The swarm does %s points of damage plus 1-%s per point of skill in Earth Magic.",dmgAddTooltip(s, m,37),diceMaxTooltip(s, m,37))
+	Game.SpellsTxt[39].Description=string.format("Fires a rotating, razor-thin metal blade at a single monster.  The blade does 1-%s points of damage per point of skill in Earth Magic.\n\nBlades is the only spell capable to deal Physical damage.",diceMaxTooltip(s, m,39))
+	Game.SpellsTxt[41].Description=string.format("Releases a magical stone into the world that will explode when it comes into contact with a creature or enough time passes.  The rock will bounce and roll until it finds a resting spot, so be careful not to be caught in the blast.  The explosion causes %s points of damage plus 1-%s points of damage per point of skill in Earth Magic.",dmgAddTooltip(s, m,41),diceMaxTooltip(s, m,41))
+	Game.SpellsTxt[43].Description=string.format("Launches a magical stone which bursts in air, sending shards of explosive earth raining to the ground.  The damage is 1-%s per point of skill in Earth Magic for each shard.  This spell can only be used outdoors.",diceMaxTooltip(s, m,43))
+	--Game.SpellsTxt[44].Description=string.format("Increases the weight of a single target enormously for an instant, causing internal damage equal to %s%% of the monster's hit points plus another %s%% per point of skill in Earth Magic.  The bigger they are, the harder they fall.",dmgAddTooltip(s, m,44),diceMaxTooltip(s, m,44))
+	Game.SpellsTxt[44].Description="Increases the weight of a single target enormously for an instant, causing internal damage equal to 15%% of the monster's hit points plus another 0.5%% per point of skill in Earth Magic. The bigger they are, the harder they fall."
+	Game.SpellsTxt[52].Description=string.format("This spell weakens the link between a target's body and soul, causing %s + 2-%s points of damage per point of skill in Spirit Magic to all monsters near the caster.",dmgAddTooltip(s, m,52),diceMaxTooltip(s, m,52))
+	Game.SpellsTxt[59].Description=string.format("Fires a bolt of mental force which damages a single target's nervous system.  Mind Blast does %s points of damage plus 1-%s per point of skill in Mind Magic.",dmgAddTooltip(s, m,59),diceMaxTooltip(s, m,59))
+	Game.SpellsTxt[65].Description=string.format("Similar to Mind Blast, Psychic Shock targets a single creature with mind damaging magic--only it has a much greater effect.  Psychic Shock does %s points of damage plus 1-%s per point of skill in Mind Magic.",dmgAddTooltip(s, m,65),diceMaxTooltip(s, m,65))
+	Game.SpellsTxt[70].Description=string.format("Directly inflicts magical damage upon a single creature.  Harm does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(s, m,70),diceMaxTooltip(s, m,70))
+	Game.SpellsTxt[76].Description=string.format("Flying Fist throws a heavy magical force at a single opponent that does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(s, m,76),diceMaxTooltip(s, m,76))
+	Game.SpellsTxt[76].Description=string.format("Flying Fist throws a heavy magical force at a single opponent that does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(s, m,76),diceMaxTooltip(s, m,76))
+	Game.SpellsTxt[78].Description=string.format("Fires a bolt of light at a single target that does %s + 1-%s points of damage per point of skill in light magic.  Damage vs. Undead is doubled.",dmgAddTooltip(s, m,78),diceMaxTooltip(s, m,78))
+	Game.SpellsTxt[79].Description=string.format("Calls upon the power of heaven to undo the evil magic that extends the lives of the undead, inflicting %s points of damage plus 1-%s per point of skill in Light Magic upon a single, unlucky target.  This spell only works on the undead.",dmgAddTooltip(s, m,79),diceMaxTooltip(s, m,79))
+	Game.SpellsTxt[84].Description=string.format("Inflicts %s points of damage plus %s per point of skill in Light Magic on all creatures in sight.  This spell can only be cast indoors.",dmgAddTooltip(s, m,84),diceMaxTooltip(s, m,84))
+	Game.SpellsTxt[87].Description=string.format("Sunray is the second most devastating damage spell in the game. It does %s points of damage plus 1-%s points per point of skill in Light Magic, by concentrating the light of the sun on one unfortunate creature. Indoors it can be cast at any time; outdoors it only works during the day.",dmgAddTooltip(s, m,87),diceMaxTooltip(s, m,87))
+	Game.SpellsTxt[90].Description=string.format("A poisonous cloud of noxious gases is formed in front of the caster and moves slowly away from your characters.  The cloud does %s points of damage plus 1-%s per point of skill in Dark Magic and lasts until something runs into it.",dmgAddTooltip(s, m,90),diceMaxTooltip(s, m,90))
+	Game.SpellsTxt[93].Description=string.format("Fires a blast of hot, jagged metal in front of the caster, striking any creature that gets in the way.  Each piece inflicts 1-%s points of damage per point of skill in Dark Magic.",diceMaxTooltip(s, m,93))
+	Game.SpellsTxt[97].Description=string.format("Dragon Breath empowers the caster to exhale a cloud of toxic vapors that targets a single monster and damage all creatures nearby, doing 1-%s points of damage per point of skill in Dark Magic.",diceMaxTooltip(s, m,97))
+	Game.SpellsTxt[98].Description=string.format("This spell is the town killer. Armageddon inflicts %s points of damage plus %s point of damage for every point of Dark skill your character has to every creature on the map, including all your characters. It can only be cast three times per day and only outdoors.",dmgAddTooltip(s, m,98),diceMaxTooltip(s, m,98))
+	Game.SpellsTxt[99].Description=string.format("This horrible spell sucks the life from all creatures in sight, friend or enemy.  Souldrinker then transfers that life to your party in much the same fashion as Shared Life.  Damage (and healing) is %s + 1-%s per point of skill.",dmgAddTooltip(s, m,99),diceMaxTooltip(s, m,99))
+	
+	Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,103),diceMaxTooltip(s, m,103))
+	Game.SpellsTxt[111].Description=string.format("Lifedrain allows the vampire to damage his or her target and simultaneously heal based on the damage done in the Lifedrain.  This ability does 1-%s points of damage per skill.",diceMaxTooltip(s, m,111))
+	Game.SpellsTxt[111].Master=string.format("Damage 1-%s per point of skill",round(diceMaxTooltip(s, m,111)/3*5))
+	Game.SpellsTxt[111].GM=string.format("Damage 1-%s per point of skill",round(diceMaxTooltip(s, m,111)/3*7))
+	Game.SpellsTxt[123].Description="This ability is an upgraded version of the normal Dragon breath weapon attack.  It acts much like a fireball, striking its target and exploding out to hit everything near it, except the explosion does much more damage than most fireballs."
+end
+
+local function ascendHealingSpells(pl, s, m, personalityReduction)
+	-----------------------
+	--Healing Spells
+	-----------------------
+	if vars.insanityMode then
+		healingSpells={
+		[const.Spells.RemoveCurse]=    {["Cost"]={0,15,30,60,[0]=0}, ["Base"]={0,20,40,60,[0]=0}, ["Scaling"]={0,8,12,16}},
+		[const.Spells.SharedLife]=    {["Cost"]={0,0,25,40,[0]=0}, ["Base"]={0,0,0,0,[0]=0}, ["Scaling"]={0,0,7,9}},
+            [const.Spells.Resurrection]={["Cost"]={0,0,0,300,[0]=0}, ["Base"]={0,0,0,450,[0]=0}, ["Scaling"]={0,0,0,50}},
+            [const.Spells.Heal]=        {["Cost"]={6,15,24,40,[0]=0}, ["Base"]={12,24,36,48,[0]=0}, ["Scaling"]={6,9,12,15}},
+            [const.Spells.CureDisease]=    {["Cost"]={0,0,45,100,[0]=0}, ["Base"]={0,0,50,100,[0]=0}, ["Scaling"]={0,0,16,25}},
+            [const.Spells.PowerCure]=    {["Cost"]={0,0,0,150,[0]=0}, ["Base"]={0,0,0,50,[0]=0}, ["Scaling"]={0,0,0,12}}
+	}
+	else
+		healingSpells={
+			[const.Spells.RemoveCurse]=    {["Cost"]={0,5,10,20,[0]=0}, ["Base"]={0,10,20,30,[0]=0}, ["Scaling"]={0,4,6,8}},
+			[const.Spells.SharedLife]=    {["Cost"]={0,0,25,40,[0]=0}, ["Base"]={0,0,0,0,[0]=0}, ["Scaling"]={0,0,7,9}},
+			[const.Spells.Resurrection]={["Cost"]={0,0,0,100,[0]=0}, ["Base"]={0,0,0,150,[0]=0}, ["Scaling"]={0,0,0,21}},
+			[const.Spells.Heal]=        {["Cost"]={2,4,6,8,[0]=0}, ["Base"]={4,8,12,16,[0]=0}, ["Scaling"]={2,3,4,6}},
+			[const.Spells.CureDisease]=    {["Cost"]={0,0,15,25,[0]=0}, ["Base"]={0,0,25,40,[0]=0}, ["Scaling"]={0,0,7,10}},
+			[const.Spells.PowerCure]=    {["Cost"]={0,0,0,30,[0]=0}, ["Base"]={0,0,0,15,[0]=0}, ["Scaling"]={0,0,0,4}}
+		}
+	end
+	for i=1, 6 do
+		for v=1,4 do
+			local baseCost = healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
+			healingSpells[healingList[i]].Cost[v]=math.min(round(baseCost*personalityReduction), 65000)
+			healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
+		end
+	end
+	for i=1, 6 do
+		Game.SpellsTxt[healingList[i]].Description=baseHealTooltip[healingList[i]]
+	end
+	--shaman modifier
+	if table.find(shamanClass, pl.Class) then
+		local s=0
+		for school=12,18 do
+			skill=SplitSkill(pl.Skills[school])
+			s=s+skill
+		end
+		local mult=1+s/400
+		for i=1,5 do
+			for v=1,4 do
+				healingSpells[healingList[i]].Scaling[v]=round(healingSpells[healingList[i]].Scaling[v]*mult)
+				healingSpells[healingList[i]].Base[v]=round(healingSpells[healingList[i]].Base[v]*mult)
+			end
+		end
+	end
+end
+
+local function ascendHealingTooltips()
+	local sp=healingSpells[49]
+	Game.Spells[49]["SpellPointsExpert"]=math.ceil(sp.Cost[2])
+	Game.Spells[49]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
+	Game.Spells[49]["SpellPointsGM"]=math.ceil(sp.Cost[4])
+	Game.SpellsTxt[49].Expert=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[2], sp.Base[2], sp.Scaling[2])
+	Game.SpellsTxt[49].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[3], sp.Base[3], sp.Scaling[3])
+	Game.SpellsTxt[49].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[4], sp.Base[4], sp.Scaling[4])
+
+	--shared life
+	local sp=healingSpells[54]
+	Game.Spells[54]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
+	Game.Spells[54]["SpellPointsGM"]=math.ceil(sp.Cost[4])
+	Game.SpellsTxt[54].Master=string.format("Adds %s + %s HP per point of skill to the pool", sp.Base[3], sp.Scaling[3])
+	Game.SpellsTxt[54].GM=string.format("Adds %s + %s HP per point of skill to the pool", sp.Base[4], sp.Scaling[4])
+	
+	--raise dead
+	local sp=healingSpells[53]
+	Game.SpellsTxt[53].GM="Removes Death and Eradication with no time limit"
+	
+	--resurrection
+	local sp=healingSpells[55]
+	Game.Spells[55]["SpellPointsGM"]=math.ceil(sp.Cost[4])
+	Game.SpellsTxt[55].GM=string.format("Cures %s + %s HP per point of skill", sp.Base[4], sp.Scaling[4])
+
+	--heal
+	local sp=healingSpells[68]
+	Game.Spells[68]["SpellPointsNormal"]=math.ceil(sp.Cost[1])
+	Game.Spells[68]["SpellPointsExpert"]=math.ceil(sp.Cost[2])
+	Game.Spells[68]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
+	Game.Spells[68]["SpellPointsGM"]=math.ceil(sp.Cost[4])
+	Game.SpellsTxt[68].Normal=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[1], sp.Base[1], sp.Scaling[1])
+	Game.SpellsTxt[68].Expert=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[2], sp.Base[2], sp.Scaling[2])
+	Game.SpellsTxt[68].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[3], sp.Base[3], sp.Scaling[3])
+	Game.SpellsTxt[68].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[4], sp.Base[4], sp.Scaling[4])
+
+	--greater heal
+	local sp=healingSpells[74]
+	Game.Spells[74]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
+	Game.Spells[74]["SpellPointsGM"]=math.ceil(sp.Cost[4])
+	Game.SpellsTxt[74].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[3], sp.Base[3], sp.Scaling[3])
+	Game.SpellsTxt[74].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\nno limit\n",sp.Cost[4], sp.Base[4], sp.Scaling[4])
+
+	--power heal
+	local sp=healingSpells[77]
+	Game.Spells[77]["SpellPointsGM"]=math.ceil(sp.Cost[4])
+	Game.SpellsTxt[77].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[4], sp.Base[4], sp.Scaling[4])
+end
+
+local function ascendRemaining(pl, s, m, id)
+	--ADD CAST RECOVERY TIME 
+	
+	--haste
+	local haste=math.floor(pl:GetSpeed()/10)
+	local it=pl:GetActiveItem(1)
+	if it and it.Bonus2==40 then
+		haste=haste+20
+	end
+	
+	adjustSpellTooltips()
+
+	if vars.MAWSETTINGS.buffRework=="ON" then
+		for i=1, #buffSpellList do
+			local sp=buffSpellList[i]
+			if buffSpell[sp] then
+				local cost, percent=getBuffCost(pl, sp)
+				percent=round(percent*10000)/100
+				local txt=StrColor(255,0,0,"\nNot Active")
+				if vars.mawbuff[sp] then
+					for j=0, Party.High do
+						if Party[j]:GetIndex()==vars.mawbuff[sp] then
+							txt=StrColor(0,255,0,"\nActive (" .. Party[j].Name .. ")")
+						end
+					end
+				end
+				if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 32) then
+					Game.SpellsTxt[sp].Description=Game.SpellsTxt[sp].Description .. "\n\nHealth Reserved: " .. StrColor(0,255,0,percent .. "%" .. txt)
+				else
+					Game.SpellsTxt[sp].Description=Game.SpellsTxt[sp].Description .. "\n\nMana Reserved: " .. StrColor(0,100,255,percent .. "%" .. txt)
+				end					
+			elseif utilitySpell[sp] then
+				local cost, percent=getBuffCost(pl, sp)
+				cost=round(cost)
+				local txt=StrColor(255,0,0,"\nNot Active")
+				if vars.mawbuff[sp] then
+					for j=0, Party.High do
+						if Party[j]:GetIndex()==vars.mawbuff[sp] then
+							txt=StrColor(0,255,0,"\nActive(" .. Party[j].Name .. ")")
+						end
+					end
+				end
+				if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 32) then
+					Game.SpellsTxt[sp].Description=oldSpellTooltips[sp] .. "\n\nHealth Reserved: " .. StrColor(0,255,0,cost .. txt)
+				else
+					Game.SpellsTxt[sp].Description=oldSpellTooltips[sp] .. "\n\nMana Reserved: " .. StrColor(0,100,255,cost .. txt)
+				end			
+			end
+			for v=1,4 do
+				if buffSpell[sp] then
+					Game.Spells[sp]["SpellPoints" .. masteryName[v]]=0
+					Game.SpellsTxt[sp].Normal=""
+					Game.SpellsTxt[sp].Expert=""
+					Game.SpellsTxt[sp].Master=""
+					Game.SpellsTxt[sp].GM=""
+				elseif utilitySpell[sp] then
+					Game.Spells[sp]["SpellPoints" .. masteryName[v]]=0
+					Game.SpellsTxt[sp].Normal=""
+					Game.SpellsTxt[sp].Expert=""
+					Game.SpellsTxt[sp].Master=""
+					Game.SpellsTxt[sp].GM=""
+				end
+			end
+		end
+	end
+
+	for i=1,132 do
+		local skill=11+math.ceil(i/11)
+		local magicS, magicM=SplitSkill(pl.Skills[skill])
+		if magicM>0 then
+			local speed=getSpellDelay(pl,i)
+			if table.find(spells, i) then
+				Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. speed
+			elseif healingSpells[i] then
+				Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. speed
+			elseif CCMAP[i] and i~=122 then
+				Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. "\n\nControl Spell duration is reduced by monster resistances but increased by Ascension; Recovery time is reduced by Spell Skill. Duration shown is against " .. round(pl.LevelBase/2) .. " resistance. Control duration against bosses is halved.\n\nRecovery time: " .. speed
+			elseif buffSpell and (buffSpell[i] or utilitySpell[i]) then
+				Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. oldTable[i][magicM]
+			else
+				Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. "\n\nRecovery time: " .. oldTable[i][magicM]
+			end
+		end
+		local capMastery=Skillz.MasteryLimit(pl,skill)
+		local tier=i%11==0 and 11 or i%11
+		local learnableSpells={{1,2,3,4},{5,6,7},{8,9,10},{11}}
+		if not pl.Spells[i] then
+			local txt=StrColor(255,0,0,"\n\nCan't learn")
+			for k=1,capMastery do
+				if table.find(learnableSpells[k],tier) then
+					txt=StrColor(255,0,0,"\n\nNot Learned")
+				end
+			end
+			
+			if table.find(spells, i) then
+				Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. txt
+			elseif healingSpells[i] then
+				Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. txt
+			elseif buffSpell and (buffSpell[i] or utilitySpell[i]) then
+				Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. txt
+			else
+				Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. txt
+			end
+		end
+	end
+end
+
 function ascension(customIndex)
-	local index=customIndex or Game.CurrentPlayer 
+	local index=customIndex or Game.CurrentPlayer
 	if index> Party.High then
 		Game.CurrentPlayer=0
-	end 
+	end
 	if index>=0 and index<=Party.High then
 		local pl=Party[index]
 		
@@ -2118,308 +2423,21 @@ function ascension(customIndex)
 			dkSkills(true, index)
 			return
 		end
-		if table.find(assassinClass, pl.Class) then 
+		if table.find(assassinClass, pl.Class) then
 			assassinSkills(true, pl)
 			return
 		end
-		
-		
-		local level=pl:GetSkill(const.Skills.Learning)
-		lastLevel=level
-		local s,m = SplitSkill(level)
-		local elementalist=false
-		local id=pl:GetIndex()
-		if table.find(elementalistClass, pl.Class) then
-			elementalist=true
-			s=0
-			m=4
-			for i=12,15 do
-				local skill = SplitSkill(pl.Skills[i])
-				s=s+skill
-			end
-			s=s/4
-			vars.eleStacks=vars.eleStacks or {}
-			vars.eleStacks[id]=vars.eleStacks[id] or 0
-		end
-		if table.find(shamanClass, pl.Class) then
-			s=0
-			m=4
-			for i=12,18 do
-				local skill = SplitSkill(pl.Skills[i])
-				s=s+skill
-			end
-			s=s/7
-		end
-		-- Apply personality mana cost reduction
+
+		local s, m, elementalist, id = ascensionLevel(pl)
 		local personalityReduction = getPersonalityManaCostReduction(pl)
 
-		for v=1,#spells do 
-			num=spells[v]
-			for i=1,4 do
-				local baseCost = spellCost[num][masteryName[i]]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
-				Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(math.ceil(baseCost * personalityReduction), 65000)
-				if elementalist then
-					local baseCost=round((spellCost[num][masteryName[i]]+vars.eleStacks[id])*(1+s*0.125)*1.04^(s)*(1-0.125*m))
-					Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(round(math.ceil(baseCost*(1+vars.eleStacks[id]*0.075) * personalityReduction)),65000)
-				end
-			end
-			if num==44 then	
-				Game.Spells[num]["SpellPointsGM"]=math.min(pl.LevelBase, 255)^1.4/12.5
-			end
-		end				
-			
-		--change tooltips according to ascended damage
-		Game.SpellsTxt[2].Description=string.format("Launches a burst of fire at a single target.  Damage is %s+1-%s points of damage per point of skill in Fire Magic.   Firebolt is safe, effective and has a low casting cost.",dmgAddTooltip(s, m,2),diceMaxTooltip(s, m,2))
-		Game.SpellsTxt[6].Description=string.format("Fires a ball of fire at a single target. When it hits, the ball explodes damaging all those nearby, including your characters if they're too close.  Fireball does 1-%s points of damage per point of skill in Fire Magic.",diceMaxTooltip(s, m,6))
-		--fire spikes fix
-		Game.SpellsTxt[7].Description="Drops a Fire Spike on the ground that waits for a creature to get near it before exploding.  Fire Spikes last until you leave the map or they are triggered."
-		Game.SpellsTxt[7].Expert=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",diceMaxTooltip(s, m,7))
-		Game.SpellsTxt[7].Master=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",round(diceMaxTooltip(s, m,7)/6*8))
-		Game.SpellsTxt[7].GM=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",round(diceMaxTooltip(s, m,7)/6*10))
-		----------------------------------------
-		
-		Game.SpellsTxt[8].Description=string.format("Reserve a mana percentage to surround your characters with a very hot fire that is only harmful to others.  The spell will deliver %s points of damage plus 1-%s per point of skill to all nearby monsters for as long as they remain in the area of effect.",dmgAddTooltip(s, m,8),diceMaxTooltip(s, m,8))
-		Game.SpellsTxt[9].Description=string.format("Summons flaming rocks from the sky which fall in a large radius surrounding your chosen target.  Try not to be near the victim when you use this spell.  A single meteor does %s points of damage plus %s per point of skill in Fire Magic.  This spell only works outdoors.",dmgAddTooltip(s, m,9),diceMaxTooltip(s, m,9))
-		Game.SpellsTxt[10].Description=string.format("Inferno burns all monsters in sight when cast, excluding your characters.  One or two castings can clear out a room of weak or moderately powerful creatures. Each monster takes %s points of damage plus %s per point of skill in Fire Magic.  This spell only works indoors.",dmgAddTooltip(s, m,10),diceMaxTooltip(s, m,10))
-		Game.SpellsTxt[11].Description=string.format("Among the strongest direct damage spells available, Incinerate inflicts massive damage on a single target.  Only the strongest of monsters can expect to survive this spell.  Damage is %s points plus 1-%s per point of skill in Fire Magic.",dmgAddTooltip(s, m,11),diceMaxTooltip(s, m,11))
-		Game.SpellsTxt[15].Description=string.format("Sparks fires small balls of lightning into the world that bounce around until they hit something or dissipate. It is hard to tell where they will go, so this spell is best used in a room crowded with small monsters. Each spark does 1-%s per point of skill in Air Magic.",diceMaxTooltip(s, m,15))
-		Game.SpellsTxt[18].Description=string.format("Lightning Bolt discharges electricity from the caster's hand to a single target.  It always hits and does %s points plus 1-%s points of damage per point of skill in Air Magic.\n\nThe spell then arcs to a second target, hitting it as well.",dmgAddTooltip(s, m,18),diceMaxTooltip(s, m,18))
-		Game.SpellsTxt[20].Description=string.format("Implosion is a nasty spell that affects a single target by destroying the air around it, causing a sudden inrush from the surrounding air, a thunderclap, and %s points plus 1-%s points of damage per point of skill in Air Magic.",dmgAddTooltip(s, m,20),diceMaxTooltip(s, m,20))
-		Game.SpellsTxt[22].Description=string.format("Calls stars from the heavens to smite and burn your enemies.  Twenty stars are called, and the damage for each star is %s points plus %s per point of skill in Air Magic. Try not to get caught in the blast! This spell only works outdoors.",dmgAddTooltip(s, m,22),diceMaxTooltip(s, m,22))
-		Game.SpellsTxt[24].Description=string.format("Sprays poison at monsters directly in front of your characters.  Damage is low, but few monsters have resistance to Water Magic, so it usually works.  Each shot does %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,24),diceMaxTooltip(s, m,24))
-		Game.SpellsTxt[26].Description=string.format("Fires a bolt of ice at a single target.  The missile does %s + 1-%s points of damage per point of skill in Water Magic.",dmgAddTooltip(s, m,26),diceMaxTooltip(s, m,26))
-		Game.SpellsTxt[29].Description=string.format("Acid burst squirts a jet of extremely caustic acid at a single victim.  It always hits and does %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,29),diceMaxTooltip(s, m,29))
-		Game.SpellsTxt[32].Description=string.format("Fires a ball of ice in the direction the caster is facing.  The ball will shatter when it hits something, launching 7 shards of ice in all directions except the caster's.  The shards will ricochet until they strike a creature or melt.  Each shard does %s points of damage plus 1-%s per point of skill in Water Magic.",dmgAddTooltip(s, m,32),diceMaxTooltip(s, m,32))
-		Game.SpellsTxt[34].Description="Slaps a monster with magical force, forcing it to recover from the stun spell before it can do anything else.  Stun also knocks monsters back a little, giving you a chance to get away while the getting is good.  The greater your skill in Earth Magic, the greater the effect of the spell."
-		Game.SpellsTxt[37].Description=string.format("Summons a swarm of biting, stinging insects to bedevil a single target.  The swarm does %s points of damage plus 1-%s per point of skill in Earth Magic.",dmgAddTooltip(s, m,37),diceMaxTooltip(s, m,37))
-		Game.SpellsTxt[39].Description=string.format("Fires a rotating, razor-thin metal blade at a single monster.  The blade does 1-%s points of damage per point of skill in Earth Magic.\n\nBlades is the only spell capable to deal Physical damage.",diceMaxTooltip(s, m,39))
-		Game.SpellsTxt[41].Description=string.format("Releases a magical stone into the world that will explode when it comes into contact with a creature or enough time passes.  The rock will bounce and roll until it finds a resting spot, so be careful not to be caught in the blast.  The explosion causes %s points of damage plus 1-%s points of damage per point of skill in Earth Magic.",dmgAddTooltip(s, m,41),diceMaxTooltip(s, m,41))
-		Game.SpellsTxt[43].Description=string.format("Launches a magical stone which bursts in air, sending shards of explosive earth raining to the ground.  The damage is 1-%s per point of skill in Earth Magic for each shard.  This spell can only be used outdoors.",diceMaxTooltip(s, m,43))
-		--Game.SpellsTxt[44].Description=string.format("Increases the weight of a single target enormously for an instant, causing internal damage equal to %s%% of the monster's hit points plus another %s%% per point of skill in Earth Magic.  The bigger they are, the harder they fall.",dmgAddTooltip(s, m,44),diceMaxTooltip(s, m,44))
-		Game.SpellsTxt[44].Description="Increases the weight of a single target enormously for an instant, causing internal damage equal to 15%% of the monster's hit points plus another 0.5%% per point of skill in Earth Magic. The bigger they are, the harder they fall."
-		Game.SpellsTxt[52].Description=string.format("This spell weakens the link between a target's body and soul, causing %s + 2-%s points of damage per point of skill in Spirit Magic to all monsters near the caster.",dmgAddTooltip(s, m,52),diceMaxTooltip(s, m,52))
-		Game.SpellsTxt[59].Description=string.format("Fires a bolt of mental force which damages a single target's nervous system.  Mind Blast does %s points of damage plus 1-%s per point of skill in Mind Magic.",dmgAddTooltip(s, m,59),diceMaxTooltip(s, m,59))
-		Game.SpellsTxt[65].Description=string.format("Similar to Mind Blast, Psychic Shock targets a single creature with mind damaging magic--only it has a much greater effect.  Psychic Shock does %s points of damage plus 1-%s per point of skill in Mind Magic.",dmgAddTooltip(s, m,65),diceMaxTooltip(s, m,65))
-		Game.SpellsTxt[70].Description=string.format("Directly inflicts magical damage upon a single creature.  Harm does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(s, m,70),diceMaxTooltip(s, m,70))
-		Game.SpellsTxt[76].Description=string.format("Flying Fist throws a heavy magical force at a single opponent that does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(s, m,76),diceMaxTooltip(s, m,76))
-		Game.SpellsTxt[76].Description=string.format("Flying Fist throws a heavy magical force at a single opponent that does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(s, m,76),diceMaxTooltip(s, m,76))
-		Game.SpellsTxt[78].Description=string.format("Fires a bolt of light at a single target that does %s + 1-%s points of damage per point of skill in light magic.  Damage vs. Undead is doubled.",dmgAddTooltip(s, m,78),diceMaxTooltip(s, m,78))
-		Game.SpellsTxt[79].Description=string.format("Calls upon the power of heaven to undo the evil magic that extends the lives of the undead, inflicting %s points of damage plus 1-%s per point of skill in Light Magic upon a single, unlucky target.  This spell only works on the undead.",dmgAddTooltip(s, m,79),diceMaxTooltip(s, m,79))
-		Game.SpellsTxt[84].Description=string.format("Inflicts %s points of damage plus %s per point of skill in Light Magic on all creatures in sight.  This spell can only be cast indoors.",dmgAddTooltip(s, m,84),diceMaxTooltip(s, m,84))
-		Game.SpellsTxt[87].Description=string.format("Sunray is the second most devastating damage spell in the game. It does %s points of damage plus 1-%s points per point of skill in Light Magic, by concentrating the light of the sun on one unfortunate creature. Indoors it can be cast at any time; outdoors it only works during the day.",dmgAddTooltip(s, m,87),diceMaxTooltip(s, m,87))
-		Game.SpellsTxt[90].Description=string.format("A poisonous cloud of noxious gases is formed in front of the caster and moves slowly away from your characters.  The cloud does %s points of damage plus 1-%s per point of skill in Dark Magic and lasts until something runs into it.",dmgAddTooltip(s, m,90),diceMaxTooltip(s, m,90))
-		Game.SpellsTxt[93].Description=string.format("Fires a blast of hot, jagged metal in front of the caster, striking any creature that gets in the way.  Each piece inflicts 1-%s points of damage per point of skill in Dark Magic.",diceMaxTooltip(s, m,93))
-		Game.SpellsTxt[97].Description=string.format("Dragon Breath empowers the caster to exhale a cloud of toxic vapors that targets a single monster and damage all creatures nearby, doing 1-%s points of damage per point of skill in Dark Magic.",diceMaxTooltip(s, m,97))
-		Game.SpellsTxt[98].Description=string.format("This spell is the town killer. Armageddon inflicts %s points of damage plus %s point of damage for every point of Dark skill your character has to every creature on the map, including all your characters. It can only be cast three times per day and only outdoors.",dmgAddTooltip(s, m,98),diceMaxTooltip(s, m,98))
-		Game.SpellsTxt[99].Description=string.format("This horrible spell sucks the life from all creatures in sight, friend or enemy.  Souldrinker then transfers that life to your party in much the same fashion as Shared Life.  Damage (and healing) is %s + 1-%s per point of skill.",dmgAddTooltip(s, m,99),diceMaxTooltip(s, m,99))
-		
-		Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,103),diceMaxTooltip(s, m,103))
-		Game.SpellsTxt[111].Description=string.format("Lifedrain allows the vampire to damage his or her target and simultaneously heal based on the damage done in the Lifedrain.  This ability does 1-%s points of damage per skill.",diceMaxTooltip(s, m,111))
-		Game.SpellsTxt[111].Master=string.format("Damage 1-%s per point of skill",round(diceMaxTooltip(s, m,111)/3*5))
-		Game.SpellsTxt[111].GM=string.format("Damage 1-%s per point of skill",round(diceMaxTooltip(s, m,111)/3*7))
-		Game.SpellsTxt[123].Description="This ability is an upgraded version of the normal Dragon breath weapon attack.  It acts much like a fireball, striking its target and exploding out to hit everything near it, except the explosion does much more damage than most fireballs."
-		
-		-----------------------
-		--Healing Spells
-		-----------------------
-		if vars.insanityMode then
-			healingSpells={
-			[const.Spells.RemoveCurse]=    {["Cost"]={0,15,30,60,[0]=0}, ["Base"]={0,20,40,60,[0]=0}, ["Scaling"]={0,8,12,16}},
-			[const.Spells.SharedLife]=    {["Cost"]={0,0,25,40,[0]=0}, ["Base"]={0,0,0,0,[0]=0}, ["Scaling"]={0,0,7,9}},
-            [const.Spells.Resurrection]={["Cost"]={0,0,0,300,[0]=0}, ["Base"]={0,0,0,450,[0]=0}, ["Scaling"]={0,0,0,50}},
-            [const.Spells.Heal]=        {["Cost"]={6,15,24,40,[0]=0}, ["Base"]={12,24,36,48,[0]=0}, ["Scaling"]={6,9,12,15}},
-            [const.Spells.CureDisease]=    {["Cost"]={0,0,45,100,[0]=0}, ["Base"]={0,0,50,100,[0]=0}, ["Scaling"]={0,0,16,25}},
-            [const.Spells.PowerCure]=    {["Cost"]={0,0,0,150,[0]=0}, ["Base"]={0,0,0,50,[0]=0}, ["Scaling"]={0,0,0,12}}
-		}
-		else
-			healingSpells={
-				[const.Spells.RemoveCurse]=    {["Cost"]={0,5,10,20,[0]=0}, ["Base"]={0,10,20,30,[0]=0}, ["Scaling"]={0,4,6,8}},
-				[const.Spells.SharedLife]=    {["Cost"]={0,0,25,40,[0]=0}, ["Base"]={0,0,0,0,[0]=0}, ["Scaling"]={0,0,7,9}},
-				[const.Spells.Resurrection]={["Cost"]={0,0,0,100,[0]=0}, ["Base"]={0,0,0,150,[0]=0}, ["Scaling"]={0,0,0,21}},
-				[const.Spells.Heal]=        {["Cost"]={2,4,6,8,[0]=0}, ["Base"]={4,8,12,16,[0]=0}, ["Scaling"]={2,3,4,6}},
-				[const.Spells.CureDisease]=    {["Cost"]={0,0,15,25,[0]=0}, ["Base"]={0,0,25,40,[0]=0}, ["Scaling"]={0,0,7,10}},
-				[const.Spells.PowerCure]=    {["Cost"]={0,0,0,30,[0]=0}, ["Base"]={0,0,0,15,[0]=0}, ["Scaling"]={0,0,0,4}}
-			}
-		end
-		for i=1, 6 do
-			for v=1,4 do
-				local baseCost = healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
-				healingSpells[healingList[i]].Cost[v]=math.min(round(baseCost*personalityReduction), 65000)
-				healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
-			end
-		end
-		for i=1, 6 do
-			Game.SpellsTxt[healingList[i]].Description=baseHealTooltip[healingList[i]]
-		end
-		--shaman modifier
-		if table.find(shamanClass, pl.Class) then
-			local s=0
-			for school=12,18 do
-				skill=SplitSkill(pl.Skills[school])
-				s=s+skill
-			end
-			local mult=1+s/400
-			for i=1,5 do
-				for v=1,4 do
-					healingSpells[healingList[i]].Scaling[v]=round(healingSpells[healingList[i]].Scaling[v]*mult)
-					healingSpells[healingList[i]].Base[v]=round(healingSpells[healingList[i]].Base[v]*mult)
-				end
-			end
-		end
-		--remove curse
-		local sp=healingSpells[49]
-		Game.Spells[49]["SpellPointsExpert"]=math.ceil(sp.Cost[2])
-		Game.Spells[49]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
-		Game.Spells[49]["SpellPointsGM"]=math.ceil(sp.Cost[4])
-		Game.SpellsTxt[49].Expert=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[2], sp.Base[2], sp.Scaling[2])
-		Game.SpellsTxt[49].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[3], sp.Base[3], sp.Scaling[3])
-		Game.SpellsTxt[49].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[4], sp.Base[4], sp.Scaling[4])
-
-		--shared life
-		local sp=healingSpells[54]
-		Game.Spells[54]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
-		Game.Spells[54]["SpellPointsGM"]=math.ceil(sp.Cost[4])
-		Game.SpellsTxt[54].Master=string.format("Adds %s + %s HP per point of skill to the pool", sp.Base[3], sp.Scaling[3])
-		Game.SpellsTxt[54].GM=string.format("Adds %s + %s HP per point of skill to the pool", sp.Base[4], sp.Scaling[4])
-		
-		--raise dead
-		local sp=healingSpells[53]
-		Game.SpellsTxt[53].GM="Removes Death and Eradication with no time limit"
-		
-		--resurrection
-		local sp=healingSpells[55]
-		Game.Spells[55]["SpellPointsGM"]=math.ceil(sp.Cost[4])
-		Game.SpellsTxt[55].GM=string.format("Cures %s + %s HP per point of skill", sp.Base[4], sp.Scaling[4])
-		
-		--heal
-		local sp=healingSpells[68]
-		Game.Spells[68]["SpellPointsNormal"]=math.ceil(sp.Cost[1])
-		Game.Spells[68]["SpellPointsExpert"]=math.ceil(sp.Cost[2])
-		Game.Spells[68]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
-		Game.Spells[68]["SpellPointsGM"]=math.ceil(sp.Cost[4])
-		Game.SpellsTxt[68].Normal=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[1], sp.Base[1], sp.Scaling[1])
-		Game.SpellsTxt[68].Expert=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[2], sp.Base[2], sp.Scaling[2])
-		Game.SpellsTxt[68].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[3], sp.Base[3], sp.Scaling[3])
-		Game.SpellsTxt[68].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[4], sp.Base[4], sp.Scaling[4])
-		
-		--greater heal
-		local sp=healingSpells[74]
-		Game.Spells[74]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
-		Game.Spells[74]["SpellPointsGM"]=math.ceil(sp.Cost[4])
-		Game.SpellsTxt[74].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[3], sp.Base[3], sp.Scaling[3])
-		Game.SpellsTxt[74].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\nno limit\n",sp.Cost[4], sp.Base[4], sp.Scaling[4])
-		
-		--power heal
-		local sp=healingSpells[77]
-		Game.Spells[77]["SpellPointsGM"]=math.ceil(sp.Cost[4])
-		Game.SpellsTxt[77].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[4], sp.Base[4], sp.Scaling[4])
-		
-		--ADD CAST RECOVERY TIME 
-		
-		--haste
-		local haste=math.floor(pl:GetSpeed()/10)
-		local it=pl:GetActiveItem(1)
-		if it and it.Bonus2==40 then
-			haste=haste+20
-		end
-		
-		adjustSpellTooltips()
-		
-		if vars.MAWSETTINGS.buffRework=="ON" then
-			for i=1, #buffSpellList do
-				local sp=buffSpellList[i]
-				if buffSpell[sp] then
-					local cost, percent=getBuffCost(pl, sp)
-					percent=round(percent*10000)/100
-					local txt=StrColor(255,0,0,"\nNot Active")
-					if vars.mawbuff[sp] then
-						for j=0, Party.High do
-							if Party[j]:GetIndex()==vars.mawbuff[sp] then
-								txt=StrColor(0,255,0,"\nActive (" .. Party[j].Name .. ")")
-							end
-						end
-					end
-					if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 32) then
-						Game.SpellsTxt[sp].Description=Game.SpellsTxt[sp].Description .. "\n\nHealth Reserved: " .. StrColor(0,255,0,percent .. "%" .. txt)
-					else
-						Game.SpellsTxt[sp].Description=Game.SpellsTxt[sp].Description .. "\n\nMana Reserved: " .. StrColor(0,100,255,percent .. "%" .. txt)
-					end					
-				elseif utilitySpell[sp] then
-					local cost, percent=getBuffCost(pl, sp)
-					cost=round(cost)
-					local txt=StrColor(255,0,0,"\nNot Active")
-					if vars.mawbuff[sp] then
-						for j=0, Party.High do
-							if Party[j]:GetIndex()==vars.mawbuff[sp] then
-								txt=StrColor(0,255,0,"\nActive(" .. Party[j].Name .. ")")
-							end
-						end
-					end
-					if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 32) then
-						Game.SpellsTxt[sp].Description=oldSpellTooltips[sp] .. "\n\nHealth Reserved: " .. StrColor(0,255,0,cost .. txt)
-					else
-						Game.SpellsTxt[sp].Description=oldSpellTooltips[sp] .. "\n\nMana Reserved: " .. StrColor(0,100,255,cost .. txt)
-					end			
-				end
-				for v=1,4 do
-					if buffSpell[sp] then
-						Game.Spells[sp]["SpellPoints" .. masteryName[v]]=0
-						Game.SpellsTxt[sp].Normal=""
-						Game.SpellsTxt[sp].Expert=""
-						Game.SpellsTxt[sp].Master=""
-						Game.SpellsTxt[sp].GM=""
-					elseif utilitySpell[sp] then
-						Game.Spells[sp]["SpellPoints" .. masteryName[v]]=0
-						Game.SpellsTxt[sp].Normal=""
-						Game.SpellsTxt[sp].Expert=""
-						Game.SpellsTxt[sp].Master=""
-						Game.SpellsTxt[sp].GM=""
-					end
-				end
-			end
-		end
-		
-		for i=1,132 do
-			local skill=11+math.ceil(i/11)
-			local magicS, magicM=SplitSkill(pl.Skills[skill])
-			if magicM>0 then
-				local speed=getSpellDelay(pl,i)
-				if table.find(spells, i) then
-					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. speed
-				elseif healingSpells[i] then
-					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. speed
-				elseif CCMAP[i] and i~=122 then
-					Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. "\n\nControl Spell duration is reduced by monster resistances but increased by Ascension; Recovery time is reduced by Spell Skill. Duration shown is against " .. round(pl.LevelBase/2) .. " resistance. Control duration against bosses is halved.\n\nRecovery time: " .. speed
-				elseif buffSpell and (buffSpell[i] or utilitySpell[i]) then
-					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. oldTable[i][magicM]
-				else
-					Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. "\n\nRecovery time: " .. oldTable[i][magicM]
-				end
-			end
-			local capMastery=Skillz.MasteryLimit(pl,skill)
-			local tier=i%11==0 and 11 or i%11
-			local learnableSpells={{1,2,3,4},{5,6,7},{8,9,10},{11}}
-			if not pl.Spells[i] then
-				local txt=StrColor(255,0,0,"\n\nCan't learn")
-				for k=1,capMastery do
-					if table.find(learnableSpells[k],tier) then
-						txt=StrColor(255,0,0,"\n\nNot Learned")
-					end
-				end
-				
-				if table.find(spells, i) then
-					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. txt
-				elseif healingSpells[i] then
-					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. txt
-				elseif buffSpell and (buffSpell[i] or utilitySpell[i]) then
-					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. txt
-				else
-					Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. txt
-				end
-			end
-		end
-
-		AscendCCSpells(pl,s,m,personalityReduction)
+		ascendSpellCosts(pl, s, m, elementalist, id, personalityReduction)
+		ascendDamageTooltips(s, m)
+		ascendHealingSpells(pl, s, m, personalityReduction)
+		ascendHealingTooltips()
+		ascendRemaining(pl, s, m, id)
+		ascendCCSpellCosts(pl, s, m, personalityReduction)
+		ascendCCTooltips(pl, s)
 	end
 end
 
