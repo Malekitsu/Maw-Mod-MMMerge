@@ -1904,10 +1904,10 @@ function events.CalcSpellDamage(t)
 		
 		local critChance, critMult, success=getCritInfo(data.Player,"spell")
 		
-		--int/pers scaling
+		--int/pers scaling: same level-normalized curve as might on melee
 		local int=data.Player:GetIntellect()
 		local per=data.Player:GetPersonality()
-		local mult=math.max(int,per)/1000+1
+		local mult=1+getIntellectDamageMultiplier(math.max(int,per), data.Player.LevelBase)
 		t.Result=t.Result*mult
 		if success then
 			t.Result=t.Result*critMult

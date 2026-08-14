@@ -262,6 +262,10 @@ function GetMightDamageMultiplier(mightAmount, playerLevel)
 	return mightAmount/math.min(1000+playerLevel*1.5, 2500)
 end
 
+function getIntellectDamageMultiplier(intellectAmount, playerLevel)
+	return intellectAmount/math.min(1500+playerLevel*2.25, 2500)
+end
+
 function events.BuildStatInformationBox(t)
 	if t.Stat==0 then
 		i=Game.CurrentPlayer
@@ -274,7 +278,8 @@ function events.BuildStatInformationBox(t)
 		intellect=Party[i]:GetIntellect()
 		_,critDmg=getCritInfo(Party[i],"spell")
 		local baseText="Intellect represents a character's ability to reason and understand complex, abstract concepts.\nSpell Damage and Spell Critical Damage are based on Intellect."
-		t.Text=string.format("%s\n\nBonus magic damage: %s%s\n\nCritical spell strike damage: %s%s",baseText,intellect/10,"%",critDmg*100-100,"%")
+		local bonus=round(getIntellectDamageMultiplier(intellect, Party[i].LevelBase)*1000)/10
+		t.Text=string.format("%s\n\nBonus magic damage: %s%s\n\nCritical spell strike damage: %s%s",baseText,bonus,"%",critDmg*100-100,"%")
 	end
 	if t.Stat==2 then
 		i=Game.CurrentPlayer
@@ -1232,7 +1237,7 @@ function calcPowerVitality(pl, statsMenu)
 			power=power*(1+personality/math.min(1000+level*3, 4000))  -- Personality affects healing
 		else
 			critChance, critDamage=getCritInfo(pl, "spell",lvl)
-			power=power*(1+intellect/1000)   -- Intellect affects spell damage
+			power=power*(1+getIntellectDamageMultiplier(intellect, lvl))   -- Intellect affects spell damage, might curve
 		end
 		enchantDamage=0
 		for i=0,2 do 
