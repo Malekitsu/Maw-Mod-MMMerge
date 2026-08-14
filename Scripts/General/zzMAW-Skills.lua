@@ -1216,23 +1216,10 @@ function MawRegen(timePassed)
 			if (not Party.EnemyDetectorYellow and not Party.EnemyDetectorRed) then
 				mult=mult*4
 			end
-			local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Meditation))
-			FSP	= pl:GetFullSP()
-			--share of the pool the buffs are holding, taken before FSP is damped
-			local reservedMana=0
-			if FSP>0 and vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[i] then
-				reservedMana=math.min(math.max(1-vars.currentManaPool[i]/FSP, 0), 1)
-				FSP=math.max(math.ceil(FSP*(vars.currentManaPool[i]/FSP)^0.5),0)
-			end
+			local SPREGEN
+			SPREGEN, FSP = getMeditationRegen(i)
+			SPREGEN = SPREGEN/10
 
-			local SPREGEN = MawCore.Formulas.spRegenPerSec(FSP, RegS, RegM)/10
-			--legendary 20: 1% more meditation regen per 1% of mana reserved
-			local legIndex=pl:GetIndex()
-			if reservedMana>0 and vars.legendaries and vars.legendaries[legIndex]
-					and table.find(vars.legendaries[legIndex], 20) then
-				SPREGEN=SPREGEN*(1+reservedMana)
-			end
-			
 			for it in pl:EnumActiveItems() do
 				--[[special enchants now increase meditation
 				if it.Bonus2 == 38 or it.Bonus2==47 or it.Bonus2==55 or it.Bonus2==66 or table.find(artifactSpRegen, it.Number) then	

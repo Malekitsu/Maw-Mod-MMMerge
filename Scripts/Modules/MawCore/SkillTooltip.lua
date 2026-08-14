@@ -151,14 +151,9 @@ SkillTooltip.set(30, 1, function(pl)
 end, "regeneration + dragon leech")
 
 SkillTooltip.set(28, 1, function(pl)
-	local FSP = pl:GetFullSP()
-	if vars.MAWSETTINGS.buffRework == "ON" and vars.currentManaPool and vars.currentManaPool[i] then
-		FSP = vars.currentManaPool[Game.CurrentPlayer]
-	end
-	local s, m = SplitSkill(pl:GetSkill(28))
-	local spRegen = Formulas.spRegenPerSec(FSP, s, m)
-	local spRegen2 = Formulas.spRegenPerSec(FSP, s + 1, m)
-	local spRegen2 = round((spRegen2 - spRegen) * 100) / 100
+	local slot = Game.CurrentPlayer
+	local spRegen = getMeditationRegen(slot)
+	local spRegen2 = round((getMeditationRegen(slot, 1) - spRegen) * 100) / 100
 	if spRegen > 10 then
 		spRegen = round((spRegen) * 10) / 10
 	else

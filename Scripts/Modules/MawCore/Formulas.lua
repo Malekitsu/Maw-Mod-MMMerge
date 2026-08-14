@@ -110,6 +110,19 @@ function Formulas.spRegenPerSec(fullSP, s, m)
 	return fullSP^0.35 * s^1.4 * ((m+1)/200) + 0.2
 end
 
+function Formulas.meditationRegenPerSec(fullSP, s, m, reserved, legendary20)
+	reserved = math.min(math.max(reserved or 0, 0), 1)
+	local pool = fullSP
+	if reserved > 0 then
+		pool = math.max(math.ceil(fullSP*(1 - reserved)^0.5), 0)
+	end
+	local regen = Formulas.spRegenPerSec(pool, s, m)
+	if legendary20 and reserved > 0 then
+		regen = regen*(1 + reserved)
+	end
+	return regen, pool
+end
+
 -- Shaman melee hit: HP leeched (Body magic).
 function Formulas.bodyLeech(fullHP, s, m)
 	return math.max(round(fullHP^0.5 * s^1.5/70 * (0.5 + m/2)), s)

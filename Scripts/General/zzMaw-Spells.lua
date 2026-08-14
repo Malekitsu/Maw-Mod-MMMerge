@@ -3408,6 +3408,38 @@ function events.PlayerCastSpell(t)
 	end
 end
 
+--The share of a character's mana pool the buffs are holding, 0..1, by party
+--slot. Only meaningful under the buff rework, which is what owns
+--vars.currentManaPool.
+function getReservedManaShare(slot)
+	if vars.MAWSETTINGS.buffRework~="ON" or not vars.currentManaPool then
+		return 0
+	end
+	local pool=vars.currentManaPool[slot]
+	if type(pool)~="number" or slot<0 or slot>Party.High then
+		return 0
+	end
+	local fullSP=Party[slot]:GetFullSP()
+	if fullSP<=0 then
+		return 0
+	end
+	return math.min(math.max(1-pool/fullSP, 0), 1)
+end
+
+function getMeditationRegen(slot, extraSkill)
+	if slot<0 or slot>Party.High then
+		return 0, 0
+	end
+	local pl=Party[slot]
+	local s,m=SplitSkill(pl:GetSkill(const.Skills.Meditation))
+	s=s+(extraSkill or 0)
+	local id=pl:GetIndex()
+	local legendary20=vars.legendaries and vars.legendaries[id]
+		and table.find(vars.legendaries[id], 20) and true or false
+	return MawCore.Formulas.meditationRegenPerSec(pl:GetFullSP(), s, m,
+		getReservedManaShare(slot), legendary20)
+end
+
 function getMaxMana(pl)
 	if vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool then
 		local index=pl:GetIndex()

@@ -354,16 +354,8 @@ function events.BuildStatInformationBox(t)
 	end
 	if t.Stat==8 then
 		local i=Game.CurrentPlayer
-		local fullSP=Party[i]:GetFullSP()
-		if vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[i] then
-			fullSP=fullSP*(vars.currentManaPool[Game.CurrentPlayer]/fullSP)^0.5
-		end
-		local skill=Party[i]:GetSkill(const.Skills.Meditation)
-		local s,m=SplitSkill(skill)
-		if m>=4 then
-			m=5
-		end
-		local medRegen = round(fullSP^0.35*s^1.4*(m+1)/20)+2
+		local medRegen, fullSP = getMeditationRegen(i)
+		medRegen = medRegen*10
 		--meditation buff
 		if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[56] then
 			local s, m, level=getBuffSkill(56)
@@ -722,6 +714,11 @@ end
 
 local function applyPostMitigation(pl, damage, originalDamage, ratioOnly)
 	damage=math.max(damage, originalDamage*MawCore.Formulas.damageFloor)
+	local id=pl:GetIndex()
+	if vars and vars.legendaries and vars.legendaries[id]
+			and table.find(vars.legendaries[id], 18) then
+		damage=damage*0.9
+	end
 	damage=damage*legendaryCrowdMultiplier(pl)
 	if not ratioOnly then
 		local flat=flatClassReduction(pl)
@@ -1002,10 +999,6 @@ function calcMawDamage(pl,damageKind,originalDamage,rand,monLvl,ratioOnly)
 	--AC for phys
 	local damage = originalDamage
 	
-	--[18]="Reduce all damage taken by 10%",
-	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 18) then
-		damage=damage*0.9
-	end	
 	--shield skill
 	if pl:GetActiveItem(0) then
 		local it=pl:GetActiveItem(0)
@@ -1019,10 +1012,6 @@ function calcMawDamage(pl,damageKind,originalDamage,rand,monLvl,ratioOnly)
 	--PHYSICAL DAMAGE CALCULATION
 	if damageKind==4 then 		
 		local AC=pl:GetArmorClass()
-		AC=pl:GetArmorClass()
-		AC=pl:GetArmorClass()
-		AC=pl:GetArmorClass()
-		AC=pl:GetArmorClass()
 		if getMapAffixPower(28) then
 			AC=AC*(1-getMapAffixPower(28)/100)
 		end
