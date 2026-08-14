@@ -106,14 +106,14 @@ function Formulas.hpRegenPerSec(fullHP, s, m)
 	return rate*math.sqrt(expected*fullHP)
 end
 
-Formulas.spRegenRate = {0.015, 0.02, 0.025, 0.025}
+Formulas.spRegenRate = {0.02, 0.025, 0.03, 0.04}
 
 function Formulas.spRegenPerSec(fullSP, s, m)
 	local rate = Formulas.spRegenRate[math.min(m or 0, #Formulas.spRegenRate)]
 	if not rate or s <= 0 or fullSP <= 0 then
 		return 0
 	end
-	local expected = getPlayerEstimatedMana(s^1.4)
+	local expected = getPlayerEstimatedMana(s^1.4/2)
 	return rate*math.sqrt(expected*fullSP)
 end
 
