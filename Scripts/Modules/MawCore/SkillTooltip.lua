@@ -136,9 +136,12 @@ end
 SkillTooltip.set(30, 1, function(pl)
 	local FHP = GetMaxHP(pl)
 	local s, m = SplitSkill(pl:GetSkill(30))
-	local hpRegen = round(Formulas.hpRegenPerSec(FHP, s, m) * 10) / 10
+	local raw = Formulas.hpRegenPerSec(FHP, s, m)
+	local hpRegen = round(raw * 10) / 10
 	local hpRegen2 = round(Formulas.hpRegenPerSec(FHP, s + 1, m) * 10) / 10
-	local txt = string.format("%s\n\nCurrent HP Regeneration: %s\nNext Level Bonus: %s HP Regen", baseRegStr, StrColor(0, 255, 0, hpRegen), StrColor(0, 255, 0, "+" .. hpRegen2 - hpRegen))
+	local pct = FHP > 0 and round(raw/FHP * 1000) / 10 or 0
+	local nextBonus = round((hpRegen2 - hpRegen) * 10) / 10
+	local txt = string.format("%s\n\nCurrent HP Regeneration: %s (%s of your health per second)\nNext Level Bonus: %s HP Regen", baseRegStr, StrColor(0, 255, 0, hpRegen), StrColor(0, 255, 0, pct .. "%"), StrColor(0, 255, 0, "+" .. nextBonus))
 	--dragon melee leech, shown only for dragons
 	local leech = getDragonRegenLeech(pl)
 	if leech > 0 then
@@ -152,13 +155,9 @@ end, "regeneration + dragon leech")
 
 SkillTooltip.set(28, 1, function(pl)
 	local slot = Game.CurrentPlayer
-	local spRegen = getMeditationRegen(slot)
-	local spRegen2 = round((getMeditationRegen(slot, 1) - spRegen) * 100) / 100
-	if spRegen > 10 then
-		spRegen = round((spRegen) * 10) / 10
-	else
-		spRegen = round((spRegen) * 100) / 100
-	end
+	local raw = getMeditationRegen(slot)
+	local spRegen2 = round((getMeditationRegen(slot, 1) - raw) * 100) / 100
+	local spRegen = raw > 10 and round(raw * 10) / 10 or round(raw * 100) / 100
 	return string.format("%s\n\nIncreases spell points based on SP per level and mastery\n\nCurrent SP Regeneration: %s\nNext Level Bonus: %s SP Regen\n", baseMedStr, StrColor(60, 60, 255, spRegen), StrColor(60, 60, 255, "+" .. spRegen2))
 end, "meditation SP regen")
 

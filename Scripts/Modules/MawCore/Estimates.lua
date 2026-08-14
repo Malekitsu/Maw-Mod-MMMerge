@@ -183,6 +183,56 @@ local function estimateHealth(lvl)
 	return health
 end
 
+local BASE_SP = 15
+local SP_PER_LEVEL_MIN = 3
+local SP_PER_LEVEL_MAX = 9
+local MEDITATION_GM_MASTERY = 5
+
+local function spPerLevel(lvl)
+	local promotionLevel = vars.madnessMode and 500 or 250
+	local growth = SP_PER_LEVEL_MAX - SP_PER_LEVEL_MIN
+	return math.min(growth*lvl/promotionLevel, growth) + SP_PER_LEVEL_MIN
+end
+
+local function computeMana(lvl)
+	local perLevel = spPerLevel(lvl)
+	local stat = estimateStat(lvl)
+	local skill = estimateSkill(lvl)
+	local mastery = masteryPerLevel(lvl)
+
+	local statEffect = Game.GetStatisticEffect(stat)
+	local medMastery = mastery >= 4 and MEDITATION_GM_MASTERY or mastery
+
+	local pool = BASE_SP + perLevel*(lvl + 2*statEffect + skill*medMastery)
+	return pool*(1 + MawCore.Formulas.enlightenmentManaBonus(skill, mastery))
+end
+
+local manaCache = {}
+local manaMadness, manaInsanity, manaAusterity, manaBolster
+
+local function estimateMana(lvl)
+	if vars.madnessMode ~= manaMadness or vars.insanityMode ~= manaInsanity
+			or vars.AusterityMode ~= manaAusterity
+			or Game.BolsterAmount ~= manaBolster then
+		manaCache = {}
+		manaMadness, manaInsanity = vars.madnessMode, vars.insanityMode
+		manaAusterity, manaBolster = vars.AusterityMode, Game.BolsterAmount
+	end
+	local mana = manaCache[lvl]
+	if not mana then
+		mana = computeMana(lvl)
+		--NaN check
+		if lvl == lvl then
+			manaCache[lvl] = mana
+		end
+	end
+	return mana
+end
+
+function getPlayerEstimatedMana(lvl)
+	return estimateMana(lvl)
+end
+
 local EXPECTED_NEARBY_MONSTERS = 5
 local ARMOR_REFERENCE_AC = 116
 

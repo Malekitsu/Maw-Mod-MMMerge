@@ -2350,9 +2350,20 @@ function events.Action(t)
 	end
 end
 
---regeneration for Troll
+--Regeneration
 function events.GameInitialized2()
-	Skillz.setDesc(30, 5, "Increase your regeneration by 1% per every 1% of hp lost")
+	local F=MawCore.Formulas
+	for mastery=1,4 do
+		local hp=string.format("Restores %s%% of your maximum health per second",
+			F.hpRegenRate[mastery]*100)
+		if mastery==4 then
+			hp=hp .. "\nIncrease your regeneration by 1% per every 1% of hp lost"
+		end
+		Skillz.setDesc(30, mastery+1, hp)
+		Skillz.setDesc(28, mastery+1, string.format(
+			"Restores %s%% of your maximum mana per second",
+			F.spRegenRate[mastery]*100))
+	end
 end
 
 --disable arrows

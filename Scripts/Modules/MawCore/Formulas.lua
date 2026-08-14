@@ -106,12 +106,15 @@ function Formulas.hpRegenPerSec(fullHP, s, m)
 	return rate*math.sqrt(expected*fullHP)
 end
 
--- Meditation skill: SP/sec (GM counts as mastery 5).
+Formulas.spRegenRate = {0.015, 0.02, 0.025, 0.025}
+
 function Formulas.spRegenPerSec(fullSP, s, m)
-	if m >= 4 then
-		m = 5
+	local rate = Formulas.spRegenRate[math.min(m or 0, #Formulas.spRegenRate)]
+	if not rate or s <= 0 or fullSP <= 0 then
+		return 0
 	end
-	return fullSP^0.35 * s^1.4 * ((m+1)/200) + 0.2
+	local expected = getPlayerEstimatedMana(s^1.4)
+	return rate*math.sqrt(expected*fullSP)
 end
 
 function Formulas.meditationRegenPerSec(fullSP, s, m, reserved, legendary20)

@@ -346,11 +346,14 @@ function events.BuildStatInformationBox(t)
 		local i=Game.CurrentPlayer
 		local pl=Party[i]
 		HPregenItem=HPregenItem
-		regen=math.round(getBuffHealthRegen(pl)*10)/10
-		
+		local rawRegen=getBuffHealthRegen(pl)
+		regen=math.round(rawRegen*10)/10
+		local maxHP=GetMaxHP(pl)
+		local regenPct=maxHP>0 and round(rawRegen/maxHP*1000)/10 or 0
+
 		hpMap=hpStatsMap[i]
-		
-		t.Text=string.format("%s\n\nHP bonus from Endurance: %s\nHP bonus from Body building: %s\nHP bonus from items: %s\nBase HP: %s\n\n HP Regen per second: %s",t.Text,StrColor(0,255,0,hpMap.totalEnduranceBonus), StrColor(0,255,0,hpMap.totalBBBonus),StrColor(0,255,0,round(hpMap.totalhpFromItems)),StrColor(0,255,0,hpMap.totalBaseHP),StrColor(0,255,0,regen))
+
+		t.Text=string.format("%s\n\nHP bonus from Endurance: %s\nHP bonus from Body building: %s\nHP bonus from items: %s\nBase HP: %s\n\n HP Regen per second: %s (%s)",t.Text,StrColor(0,255,0,hpMap.totalEnduranceBonus), StrColor(0,255,0,hpMap.totalBBBonus),StrColor(0,255,0,round(hpMap.totalhpFromItems)),StrColor(0,255,0,hpMap.totalBaseHP),StrColor(0,255,0,regen),StrColor(0,255,0,regenPct .. "%"))
 	end
 	if t.Stat==8 then
 		local i=Game.CurrentPlayer
@@ -377,7 +380,9 @@ function events.BuildStatInformationBox(t)
 			end
 		end
 		regen=math.ceil(Party[i]:GetFullSP()*SPregenItem*0.01)+medRegen+bonusregen
-		t.Text=string.format("%s\n\nSpell point regen per second: %s",t.Text,StrColor(40,100,255,regen/10))
+		--regen is a float now that medRegen is not pre-rounded: one decimal
+		local perSec=round(regen)/10
+		t.Text=string.format("%s\n\nSpell point regen per second: %s",t.Text,StrColor(40,100,255,perSec))
 	end
 	
 	if t.Stat==9 then
