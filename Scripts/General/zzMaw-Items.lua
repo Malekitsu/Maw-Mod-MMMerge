@@ -4521,7 +4521,7 @@ function events.AfterLoadMap()
 end
 
 function estimateWeaponDamageMultiplier(level)
-	return 1 + 0.02 * level ^ 0.675
+	return 1 + 0.02 * estimateSkill(level)
 end
 
 function IsTwoHandedWeapon(it)
