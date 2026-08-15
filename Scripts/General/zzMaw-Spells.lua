@@ -2064,7 +2064,7 @@ function getPersonalityManaCostReduction(pl)
 	local personality = pl:GetPersonality()
 	local level = math.min(getTotalLevel(),1000)
 	
-	local personalityDivisor = 10 + (level) * 65 / 1000
+	local personalityDivisor = 10 + (level) * 40 / 1000
 	local reductionPercent = personality / personalityDivisor
 	return (0.99^reductionPercent)
 end
