@@ -2,6 +2,8 @@
 --Empower Monsters
 ----------------------------------------------------
 --function to calculate the level you are (float number) give x amount of experience
+--calcLevel must stay the exact inverse of calcExp, and zzzMaw_Experience feeds calcExp to the
+--engine's level-up check -- change one of the two and both of the others have to follow
 function calcLevel(x)
 	return (25+(5*x+625)^0.5)/50
 end 
