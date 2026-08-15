@@ -544,10 +544,11 @@ end
 --rolled enchant strength. Insanity overrides the bolster, as in the generator.
 function GetDifficultyExtraPower()
 	if vars.insanityMode then
-		return 1.4
-	end
-	if Game.BolsterAmount>100 then
-		return (Game.BolsterAmount-100)/2000+1
+		return 1.2
+	elseif vars.Mode==2 then
+		return 1.1
+	elseif vars.trueNightmare then
+		return 1.05
 	end
 	return 1
 end
