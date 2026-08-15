@@ -273,7 +273,7 @@ function recalculateMawMonster()
 				local name=Game.MapStats[Map.MapStatsIndex].Name
 				if Game.freeProgression==false then
 					if not horizontalMaps[name] then
-						partyLvl=oldTable.Level*2
+						partyLvl=oldTable.Level*1.5 --keeps uniques at base*2.5 like the trash multiplier
 					end
 				end
 				if vars.madnessMode then
@@ -695,7 +695,7 @@ function recalculateMonsterTable()
 		--horizontal progression
 		local name=Game.MapStats[Map.MapStatsIndex].Name
 		if Game.freeProgression==false and not mapvars.mapAffixes then
-			horizontalMultiplier=3
+			horizontalMultiplier=2.5
 			local cap=base.Level+bolsterLevel+extraBolster+bonus
 			if partyBolster then
 				cap=bolsteredLevel(bolsterLevel+bonus, base.Level+extraBolster)
@@ -1968,15 +1968,18 @@ local mm8MapProgression={
 
 madnessMapLevels={}
 for key, value in pairs(mm6MapProgression) do
-	madnessMapLevels[key]=round(((value/54)*100)^1.5)
+	--madnessMapLevels[key]=round(((value/54)*100)^1.5)
+	madnessMapLevels[key]=round(((value/54)*100)*5)
 end
 
 for key, value in pairs(mm7MapProgression) do
-	madnessMapLevels[key]=round(((value/52)*100)^1.5)
+	--madnessMapLevels[key]=round(((value/52)*100)^1.5)
+	madnessMapLevels[key]=round(((value/52)*100)*5)
 end
 
 for key, value in pairs(mm8MapProgression) do
-	madnessMapLevels[key]=round(((value/58)*100)^1.5)
+	--madnessMapLevels[key]=round(((value/58)*100)^1.5)
+	madnessMapLevels[key]=round(((value/58)*100)*5)
 end
 
 madnessMapLevels["Basement of the Breach"] = 1100
