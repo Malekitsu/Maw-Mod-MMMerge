@@ -3,24 +3,14 @@ MawCore.ItemLevel = ItemLevel
 
 ItemLevel.PerCharge = 5
 
-local maxByDifficulty = {
-	[1] = 350,	--bolster 40
-	[2] = 350,	--bolster 70
-	[3] = 350,	--bolster 100, baseline
-	[4] = 350,	--bolster 150
-	[5] = 350,	--bolster 200
-	[6] = 350,	--bolster 300
-	[7] = 500,	--doom
-	[8] = 700,	--road to insanity
-	[9] = 1000,	--beyond madness
-}
-
-function ItemLevel.Max()
-	return maxByDifficulty[GetDifficulty()] or maxByDifficulty[3]
-end
+ItemLevel.CHARGES_HARD_CAP = 255
 
 function ItemLevel.MaxCharges()
-	return math.floor(ItemLevel.Max()/ItemLevel.PerCharge)
+	return ItemLevel.CHARGES_HARD_CAP
+end
+
+function ItemLevel.Max()
+	return ItemLevel.MaxCharges()*ItemLevel.PerCharge
 end
 
 -- the charges a drop needs in order to read back as a given level

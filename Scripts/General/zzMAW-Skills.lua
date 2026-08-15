@@ -167,7 +167,7 @@ function GetSpeedBonusFromStat(speed, level)
 	else
 		speedEffect=math.floor(speed/10)
 	end
-	return speedEffect/(1 + math.min(level, 1000) * 0.0015)
+	return speedEffect
 end
 
 function GetSpeedBonus(pl)

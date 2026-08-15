@@ -126,12 +126,9 @@ local STAT_SHARE = 0.33
 -- coefficients are: 2, 1, 1.25, 1.5, 1.25, 1.25, 0.75 * 6, 1, 1.25, 1
 local TOTAL_SLOTS = 13.75	--16 - 2.25 for ring resistance enchants
 local ENCHANTS_PER_ITEM = 3	--2 normal + 1 special
-local ENCHANT_MAX_LEVEL = 1000
 
 function getTotalEnchantPower(level)
-	--local currentLevelRatio = math.min(level, ENCHANT_MAX_LEVEL)/ENCHANT_MAX_LEVEL
-	local currentLevelRatio = level/ENCHANT_MAX_LEVEL --using this or monsters don't scale end game
-	return ENCHANTS_PER_ITEM*TOTAL_SLOTS*GetMaxEnchantStrength()*currentLevelRatio
+	return ENCHANTS_PER_ITEM*TOTAL_SLOTS*GetMaxEnchantStrength(level)
 end
 
 function gearedFraction(level)
@@ -180,7 +177,7 @@ local function computeHealth(lvl)
 	local bodybuildingPct = GetGradualMasteryValue(bodybuildingHP, skill, bbMastery)
 
 	local health = BASE_HP + perLevel*lvl + (enduranceEffect + bodybuildingFlat)*perLevel + flatBonus
-	return health*(1 + bodybuildingPct*skill/100)*(1 + stat/2500)
+	return health*(1 + bodybuildingPct*skill/100)*(1 + stat/STAT_DAMAGE_DIVISOR)
 end
 
 local healthCache = {}
@@ -288,8 +285,7 @@ end
 local LEGENDARY_16_RESISTANCE = 0.5
 
 local function estimateEnchantResistance(level)
-	local currentLevelRatio = math.min(level, ENCHANT_MAX_LEVEL)/ENCHANT_MAX_LEVEL
-	local power = MawCore.Formulas.resistanceEnchantPower(GetMaxEnchantStrength()*currentLevelRatio, true)
+	local power = MawCore.Formulas.resistanceEnchantPower(GetMaxEnchantStrength(level), true)
 	return power*(1 + LEGENDARY_16_RESISTANCE*legendaryRamp(level))
 end
 

@@ -441,30 +441,51 @@ function events.GameInitialized2()
 	enchants[6]={3}
 end
 
-encStrUpNormal={3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87,90,93,96,99,102,105,108,111,114,117,120,123,126,129,132,135,138,141,144,147,150}
-encStrUpAusterity={3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60}
+
+function encStrUpNormal(tier)
+	if tier<=10 then
+		return tier*2
+	elseif tier<= 20 then
+		return 20+(tier-20)*1.8
+	elseif tier<=30 then
+		return 38+(tier-30)*1.6
+	elseif tier<=40 then
+		return 54+(tier-40)*1.4
+	elseif tier<=50 then
+		return 68+(tier-50)*1.2
+	else
+		return math.min(80+(tier-50)*1, 100)
+	end
+end
+
+function encStrUpAusterity(tier)
+	if tier<=30 then
+		return tier+2
+	end
+	return 32+(tier-30)*2
+end
+
 encStrUp=encStrUpNormal
 
 
-local DIFFICULTY_ENCHANT_CAP = 50
 local function applyDifficulty(strength)
-	return math.min(math.ceil(strength*GetDifficultyExtraPower()), strength+DIFFICULTY_ENCHANT_CAP)
+	return math.ceil(strength*GetDifficultyExtraPower())
 end
 
 local PRIMORDIAL_ENCHANT_MULT = 1.25
 local function rollEnchantStrength(tier, ancientTier)
 	if ancientTier==2 then
-		return round(applyDifficulty(encStrUp[tier])*PRIMORDIAL_ENCHANT_MULT)
+		return round(applyDifficulty(encStrUp(tier))*PRIMORDIAL_ENCHANT_MULT)
 	elseif ancientTier==1 then
-		return round(applyDifficulty(encStrUp[tier])*math.random(20,PRIMORDIAL_ENCHANT_MULT*20)/20)
+		return round(applyDifficulty(encStrUp(tier))*math.random(20,PRIMORDIAL_ENCHANT_MULT*20)/20)
 	elseif ancientTier==3 then
-		return round(applyDifficulty(encStrUp[tier])*math.random(16,20)/20)
+		return round(applyDifficulty(encStrUp(tier))*math.random(16,20)/20)
 	end
-	return applyDifficulty(round(encStrUp[tier]*math.random(8,20)/20))
+	return applyDifficulty(round(encStrUp(tier)*math.random(8,20)/20))
 end
 
-function GetMaxEnchantStrength()
-	return round(applyDifficulty(encStrUp[#encStrUp])*PRIMORDIAL_ENCHANT_MULT)
+function GetMaxEnchantStrength(level)
+	return round(applyDifficulty(encStrUp(GetTier(level)))*PRIMORDIAL_ENCHANT_MULT)
 end
 
 local PRIMORDIAL_CHARGES_MULT = 1.2
@@ -474,13 +495,10 @@ local LEGENDARY_CHARGES_MULT = 1.2
 local LEGENDARY_CHARGES_BONUS = 10
 
 function GetMaxItemCharges()
-	return round(MawCore.ItemLevel.MaxCharges()*PRIMORDIAL_CHARGES_MULT)
+	return MawCore.ItemLevel.MaxCharges()
 end
 
 function GetItemChargesCap(it)
-	if GetAncientTier(it)>0 then
-		return GetMaxItemCharges()
-	end
 	return MawCore.ItemLevel.MaxCharges()
 end
 
@@ -534,20 +552,17 @@ function GetDifficultyExtraPower()
 	return 1
 end
 
-function GetEnchantTierCap()
-	local bonusCap=math.floor((GetDifficultyExtraPower()-1)*10)
+--The tier a drop can reach beyond what its level alone buys: difficulty, map
+--affixes and d42 all still ADD tiers, they just no longer cap anything.
+function GetEnchantTierBonus()
+	local bonus=math.floor((GetDifficultyExtraPower()-1)*10)
 	if mapvars and mapvars.mapAffixes then
-		bonusCap=bonusCap+math.floor(math.min(math.max((mapvars.mapAffixes.Power-30+2)/2,0),20)) --cap at map level 700
+		bonus=bonus+math.floor(math.max((mapvars.mapAffixes.Power-30+2)/2,0))
 	end
 	if Map.Name=="d42.blv" then
-		bonusCap=bonusCap+20
+		bonus=bonus+20
 	end
-	local cap2=14+bonusCap
-	if vars.madnessMode then
-		cap2=54
-		bonusCap=42
-	end
-	return math.min(20+bonusCap,#encStrUp), cap2
+	return bonus
 end
 
 RARITY_UNCOMMON, RARITY_RARE, RARITY_EPIC = 1, 2, 3
@@ -665,8 +680,7 @@ function RollStatFromList(list, exclude)
 end
 
 function GetTier(level)
-	local maxTier, cap2=GetEnchantTierCap()
-	return math.min(math.floor(level/18), cap2, maxTier)
+	return math.floor((level or 0)/18)
 end
 local function rollMaxCharges(maxCharges)
 	return round(maxCharges*math.random(16,20)/20)
@@ -981,9 +995,7 @@ function events.ItemGenerated(t)
 		SetStoredDropLevel(it, dropLevel)
 		it.MaxCharges=rollMaxCharges(MawCore.ItemLevel.ChargesFor(dropLevel))
 		
-		local maxTier
-		maxTier, cap2=GetEnchantTierCap()
-		partyLevel1=math.min(math.floor((partyLevel+bonus)/18),cap2)
+		partyLevel1=GetTier(partyLevel+bonus)+GetEnchantTierBonus()
 		--adjust loot Strength
 		ps1=t.Strength
 
@@ -997,7 +1009,6 @@ function events.ItemGenerated(t)
 		if math.random(1,18)<partyLevel1%18 then
 			pseudoStr=pseudoStr+1
 		end
-		pseudoStr=math.min(pseudoStr,maxTier) --CAP CURRENTLY AT 20, 22 in doom,42 for mapping
 		power=0
 		--difficulty multiplier 
 		diffMult=math.max((Game.BolsterAmount-100)/500+1,1)
@@ -2961,8 +2972,7 @@ local function addHP(pl, id, tab, enduranceStatBuff)
 	local hpScaling=Game.Classes.HPFactor[pl.Class]
 	local baseHP=Game.Classes.HPBase[pl.Class]+hpScaling*(level+endEff+BBHP)
 	local fullHP1=baseHP+tab[8]
-	--1% bonus HP every 25 endurance
-	local enduranceBonus=fullHP1*endurance/2500
+	local enduranceBonus=fullHP1*endurance/STAT_DAMAGE_DIVISOR
 	local fullHP2=fullHP1+enduranceBonus
 	local BBBonus=fullHP2*(bodybuildingHP[math.min(m,4)]*0.01*s)
 	local bbEndBonus=fullHP2+BBBonus-fullHP1
@@ -3796,14 +3806,11 @@ function refreshItems()
 	
 	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 	local partyLevel=getPartyLevel(4)-math.min(vars.MMLVL[currentWorld]/2, 54)
-	--cap
-	difficultyExtraPower=math.max((Game.BolsterAmount-100)/2000+1,1)
-	cap2=14+ math.floor((difficultyExtraPower-1)*10)
 	--calculate power
 	local currentLevel=vars.MMLVL[currentWorld]
 	strength=math.floor(currentLevel/18)+2
 	strength=math.min(strength,5)
-	partyLevel1=math.min(math.floor(partyLevel/18),cap2)
+	partyLevel1=GetTier(partyLevel)
 	cost=(partyLevel1+strength)^2*250
 	if cost>Party.Gold then
 		return

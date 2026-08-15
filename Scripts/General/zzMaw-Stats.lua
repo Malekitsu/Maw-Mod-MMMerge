@@ -257,13 +257,14 @@ function events.GameInitialized2()
 	Skillz.setDesc(27,1,txt)
 end
 
---fraction of bonus damage per point of might, normalized by level
+STAT_DAMAGE_DIVISOR = 1000
+
 function GetMightDamageMultiplier(mightAmount, playerLevel)
-	return mightAmount/math.min(1000+playerLevel*1.5, 2500)
+	return mightAmount/STAT_DAMAGE_DIVISOR
 end
 
 function getIntellectDamageMultiplier(intellectAmount, playerLevel)
-	return intellectAmount/math.min(1500+playerLevel*2.25, 2500)
+	return intellectAmount/STAT_DAMAGE_DIVISOR
 end
 
 function events.BuildStatInformationBox(t)
@@ -297,7 +298,7 @@ function events.BuildStatInformationBox(t)
 		endurance=Party[i]:GetEndurance()
 		HPScaling=Game.Classes.HPFactor[Party[i].Class]
 		level=Party[i]:GetLevel()
-		t.Text=string.format("%s\n\nHealth bonus from Endurance: %s%s\n\nFlat HP bonus from Endurance: %s",Game.StatsDescriptions[3],round(endurance/25*10)/10,"%",Game.GetStatisticEffect(endurance)*HPScaling)
+		t.Text=string.format("%s\n\nHealth bonus from Endurance: %s%s\n\nFlat HP bonus from Endurance: %s",Game.StatsDescriptions[3],round(endurance/STAT_DAMAGE_DIVISOR*1000)/10,"%",Game.GetStatisticEffect(endurance)*HPScaling)
 	end
 	if t.Stat==4 then
 		i=Game.CurrentPlayer
