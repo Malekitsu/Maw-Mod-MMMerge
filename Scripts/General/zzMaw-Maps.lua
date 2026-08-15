@@ -742,6 +742,8 @@ function getUniqueAffix()
     return affix
 end
 
+MADNESS_MAP_DROP_LEVEL = 950
+
 function events.MonsterKilled(mon)
 	if mon.NameId>300 then -- no drop from reanimated monsters
 		return
@@ -751,14 +753,20 @@ function events.MonsterKilled(mon)
 	local chances=0.001
 	if vars.madnessMode then
 		chances=chances*2
-		if mapvars.mapAffixes then
-			local map=mapLevels[Game.MapStats[Map.MapStatsIndex].Name]
-			local level=mapvars.mapAffixes.Power*10+round((map.Low+map.Mid+map.High)/3)+20
-			if level<1000 then
-				chances=0
-			else
-				chances=chances/2
+
+		local map=mapLevels[Game.MapStats[Map.MapStatsIndex].Name]
+		local level=0
+		if map then
+			level=round((map.Low+map.Mid+map.High)/3)+20
+			if mapvars.mapAffixes then
+				level=level+mapvars.mapAffixes.Power*10
 			end
+		end
+		if level<MADNESS_MAP_DROP_LEVEL then
+			chances=0
+			return
+		else
+			chances=chances/2
 		end
 	end
 	local levelRequired=100
