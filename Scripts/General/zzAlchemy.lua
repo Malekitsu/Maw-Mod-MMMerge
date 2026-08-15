@@ -766,6 +766,8 @@ end
 
 for i=1,20 do
 	evt.PotionEffects[70+i] = function(IsDrunk, t, Power)
+		Game.ShowStatusText("Gems lost their power.")
+		return
 		if IsBaseItemId(t.Number) then			
 			if craftWaitTime>0 or IsCelestialItem(t) then return end
 			local levelRequired=GetLevelRquirement(t)
