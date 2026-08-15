@@ -89,18 +89,17 @@ function calcManaShield(pl, damage)
 	return damage
 end
 
+MANA_SHIELD_SKILL_CAP = 50
+
 function manaShieldManaEfficiency(pl, skill)
 	if pl then
 		skill=SplitSkill(Skillz.get(pl, 51))
 	end
-	if skill>1024 then
-		skill=SplitSkill(skill)
+	if skill == 50 then
+		return 5
 	end
-	local manaEfficiency = (1 + skill^1.4 / 60)
-	if skill > 50 then
-		manaEfficiency = (1 + 50^1.4 / 60) * skill / 50
-	end
-	return manaEfficiency
+	skill = math.min(skill, MANA_SHIELD_SKILL_CAP)
+	return 1 + skill^1.4 / 60
 end
 
 --[[

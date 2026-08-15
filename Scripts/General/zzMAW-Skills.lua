@@ -2270,6 +2270,15 @@ function events.Action(t)
 			end
 			local pl=Party[Game.CurrentPlayer]
 			local s,m=SplitSkill(Skillz.get(pl,51))
+			if s>=MANA_SHIELD_SKILL_CAP then
+				t.Handled=true
+				while s>MANA_SHIELD_SKILL_CAP do
+					pl.SkillPoints=pl.SkillPoints+s
+					s=s-1
+				end
+				Skillz.set(pl,51,JoinSkill(s,m))
+				Game.ShowStatusText("This skill has reached its limit")
+			end
 			if pl.SkillPoints>s and manaShieldRequirements[m] and s+1>=manaShieldRequirements[m] and Skillz.MasteryLimit(pl,51)>m then
 				Skillz.set(pl,51,JoinSkill(s, m+1))
 			elseif manaShieldRequirements[m] and s>=manaShieldRequirements[m] and Skillz.MasteryLimit(pl,51)>m then

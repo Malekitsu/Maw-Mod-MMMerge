@@ -257,7 +257,8 @@ SkillTooltip.set(51, 1, function(pl)
 	local efficiency = round(manaShieldManaEfficiency(false, s) * 100) / 100
 	return "Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill "
 		.. (vars.insanityMode and "8-20-32" or "6-12-20")
-		.. ".\n\nMastery increase its mana efficience.\n" .. "Current Damage reduction per Mana: " .. StrColor(178, 255, 255, efficiency) .. "\n\nPress M to enable/disable"
+		.. ".\n\nMastery increase its mana efficience, which stops growing past skill "
+		.. MANA_SHIELD_SKILL_CAP .. ".\n" .. "Current Damage reduction per Mana: " .. StrColor(178, 255, 255, efficiency) .. "\n\nPress M to enable/disable"
 		.. toggleState("manaShield")
 end, "mana shield efficiency + toggle state")
 

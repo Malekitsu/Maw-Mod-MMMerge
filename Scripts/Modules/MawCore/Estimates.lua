@@ -503,6 +503,60 @@ function getPlayerEstimatedPower(lvl)
 	return damage*F.hitAtPar
 end
 
+local SPELL_REF_NOVICE = {add = 8, dice = 2, delay = 110}	--fire bolt
+local SPELL_REF_GM = {add = 19, dice = 21, delay = 90}	--incinerate
+
+CASTER_SKILL_ENCHANT_MULT = 2	--casters carry a doubled school skill via enchants
+
+local function estimateSpellReference(lvl)
+	local th = masteryThresholds()
+	local t = math.min(estimateSkill(lvl)/th[4], 1)
+	local a, b = SPELL_REF_NOVICE, SPELL_REF_GM
+	return a.add + (b.add - a.add)*t,
+		a.dice + (b.dice - a.dice)*t,
+		a.delay + (b.delay - a.delay)*t
+end
+
+function estimateSpellDelay(lvl, baseDelay)
+	local skill = estimateSkill(lvl)
+	local m = masteryPerLevel(lvl)
+	local haste = math.floor(estimateStat(lvl)/10)
+	local hasteBuff = 1 + buffMult(const.Spells.Haste, skill, m)
+	return baseDelay/(1 + haste/100)*1.015^skill/hasteBuff
+end
+
+function getPlayerEstimatedSpellPower(lvl)
+	local F = MawCore.Formulas
+	local skill = estimateSkill(lvl)
+	local m = masteryPerLevel(lvl)
+	local stat = estimateStat(lvl)
+
+	local add, dice, baseDelay = estimateSpellReference(lvl)
+	local empower = 1 + buffMult(const.Spells.Haste, skill, m)
+	dice = dice*empower*(1 + 0.09*skill)*1.025^skill
+	add = add*empower*(1 + 0.04*skill^2)*1.025^skill
+
+	local power = add + skill*CASTER_SKILL_ENCHANT_MULT*(1 + dice)/2
+
+	power = power*(1 + getIntellectDamageMultiplier(stat, lvl))
+
+	local critChance = F.critChance(stat, lvl)
+	local critDamage = F.critDamageMult(stat, lvl, vars.madnessMode, true)
+	power = power*(1 + math.min(critChance, 1)*(critDamage - 1))
+
+	local legendary = legendaryRamp(lvl)
+	local wDmg = getWeaponDamageForLevel(lvl, true, estimateWeaponFlat(lvl))
+	local spellCritFactor = 1 + math.min(critChance, 1)*(critDamage - 1)
+	local enchantLegendary = (1 + GetMightDamageMultiplier(stat, lvl)*legendary)
+		*(1 + (spellCritFactor - 1)*legendary)
+	local undamped = wDmg*estimateWeaponDamageMultiplier(lvl)*enchantLegendary
+	local enchant = undamped*(EXPECTED_ENCHANT_COEFF*math.min(lvl/EXPECTED_ENCHANT_LEVEL, 1)
+		+ GetGradualMasteryValue(fireAuraDamage, skill, m))*1.015^skill
+
+	local delay = estimateSpellDelay(lvl, baseDelay)
+	return (power + enchant)/(delay/60)*math.max(critChance, 1)
+end
+
 function getMonsterHealth(mon, level)
 	local hitToKillMonster={1,1.5,2,2.5,3,3.5,4,4.5,5}
 	local hitToKillMonsterAusterity={1,2,4,5,6,7,8,9,9.5}
