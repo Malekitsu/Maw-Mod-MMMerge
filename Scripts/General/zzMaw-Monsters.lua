@@ -2842,9 +2842,10 @@ function checkMapCompletition()
 						for i=1, math.floor(gemTier/10) do
 							evt.Add("Items", 1063)
 						end
-					else
-						evt.Add("Items",1040+gemTier)
-						evt.Add("Items",1040+gemTier)
+					--crafting gems no longer come from dungeon completion
+					--else
+					--	evt.Add("Items",1040+gemTier)
+					--	evt.Add("Items",1040+gemTier)
 					end
 				end
 				--bolster code

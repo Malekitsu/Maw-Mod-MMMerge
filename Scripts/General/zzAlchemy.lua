@@ -1074,7 +1074,8 @@ function UseItem(it, usedIt)
 end
 
 craftDropChances={
-		["gems"]=0.006,
+		--["gems"]=0.006,
+		["gems"]=0.000,
 		[1061]=0.0002,
 		[1062]=0.0002,
 		[1063]=0.001,

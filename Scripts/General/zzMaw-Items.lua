@@ -443,19 +443,7 @@ end
 
 
 function encStrUpNormal(tier)
-	if tier<=10 then
-		return tier*2
-	elseif tier<= 20 then
-		return 20+(tier-20)*1.8
-	elseif tier<=30 then
-		return 38+(tier-30)*1.6
-	elseif tier<=40 then
-		return 54+(tier-40)*1.4
-	elseif tier<=50 then
-		return 68+(tier-50)*1.2
-	else
-		return math.min(80+(tier-50)*1, 100)
-	end
+	return math.min(tier*3, 100)
 end
 
 function encStrUpAusterity(tier)
@@ -852,13 +840,6 @@ function events.ItemGenerated(t)
 		local stat = t.Item:T().EquipStat
 
 		if (stat >= 12 and math.random() < 0.3 or stat == 19) and id <= 110 then
-			-- reset item
-			t.Item.Bonus = 0
-			t.Item.BonusStrength = 0
-			t.Item.Bonus2 = 0
-			t.Item.Charges = 0
-			t.Item.MaxCharges = 0
-
 			local lootTable = {
 				{id = 1061, weight = 7},
 				{id = 1062, weight = 7},
@@ -873,6 +854,13 @@ function events.ItemGenerated(t)
 			local successChance = math.min((gold / 20000000)^0.7, 1)
 			if math.random() < successChance then
 				-- SUCCESS: roll from loot table
+
+				-- reset item
+				t.Item.Bonus = 0
+				t.Item.BonusStrength = 0
+				t.Item.Bonus2 = 0
+				t.Item.Charges = 0
+				t.Item.MaxCharges = 0
 
 				local totalWeight = 0
 				for i = 1, #lootTable do
@@ -891,18 +879,18 @@ function events.ItemGenerated(t)
 				end
 			end
 
-			-- fallback: reagent
-			local partyLevel = getPartyLevel(4)
-			local reagentLevel = math.floor(partyLevel / 25)
-
-			local r = math.random()
-			if r < 0.05 then
-				reagentLevel = reagentLevel + 2
-			elseif r < 0.30 then
-				reagentLevel = reagentLevel + 1
-			end
-
-			t.Item.Number = 1041 + math.min(reagentLevel, 19)
+			-- fallback: reagent -- crafting gems no longer come from shops
+			--local partyLevel = getPartyLevel(4)
+			--local reagentLevel = math.floor(partyLevel / 25)
+			--
+			--local r = math.random()
+			--if r < 0.05 then
+			--	reagentLevel = reagentLevel + 2
+			--elseif r < 0.30 then
+			--	reagentLevel = reagentLevel + 1
+			--end
+			--
+			--t.Item.Number = 1041 + math.min(reagentLevel, 19)
 			return
 		end
 	end
@@ -915,6 +903,8 @@ function events.ItemGenerated(t)
 		it.Bonus=0
 		it.Bonus2=0
 		it.BonusStrength=0
+		it.Charges=0
+		it.MaxCharges=0
 		--calculate party level
 		local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 		local currentLevel=vars.MMLVL[currentWorld]

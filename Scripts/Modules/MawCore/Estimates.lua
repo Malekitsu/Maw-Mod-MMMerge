@@ -60,7 +60,7 @@ local function masterLearned()
 end
 
 local LEGENDARY_START_LEVEL = 100
-local LEGENDARY_FULL_LEVEL = 700
+local LEGENDARY_FULL_LEVEL = 420	--exp-equivalent of the old 700 on the slowed curve
 local function legendaryRamp(lvl)
 	local t = (lvl - LEGENDARY_START_LEVEL)/(LEGENDARY_FULL_LEVEL - LEGENDARY_START_LEVEL)
 	return math.min(math.max(t, 0), 1)
@@ -154,7 +154,7 @@ local BODYBUILDING_MASTERY = 3	--the average character stops at Master, never GM
 
 --HP per level grows into its cap over the promotion range
 local function hpPerLevel(lvl)
-	local promotionLevel = vars.madnessMode and 500 or 250
+	local promotionLevel = vars.madnessMode and 330 or 210	--exp-equivalent of 500/250 on the slowed curve
 	local growth = HP_PER_LEVEL_MAX - HP_PER_LEVEL_MIN
 	return math.min(growth*lvl/promotionLevel, growth) + HP_PER_LEVEL_MIN
 end
@@ -208,7 +208,7 @@ local SP_PER_LEVEL_MAX = 9
 local MEDITATION_GM_MASTERY = 5
 
 local function spPerLevel(lvl)
-	local promotionLevel = vars.madnessMode and 500 or 250
+	local promotionLevel = vars.madnessMode and 330 or 210	--exp-equivalent of 500/250 on the slowed curve
 	local growth = SP_PER_LEVEL_MAX - SP_PER_LEVEL_MIN
 	return math.min(growth*lvl/promotionLevel, growth) + SP_PER_LEVEL_MIN
 end
