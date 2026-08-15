@@ -183,7 +183,7 @@ end
 
 -- Special-enchant (Bonus2) stat multiplier.
 function Formulas.chargesStatMult(charges)
-	return 1 + charges/20
+	return math.min(1 + charges/25, 5)
 end
 
 -- Enchant weapon-damage curve; unclamped on purpose (NOTES.md).

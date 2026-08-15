@@ -561,7 +561,7 @@ rarityChance = {
 	[RARITY_CELESTIAL]  = 0.001,
 	[RARITY_LEGENDARY]  = 0.02,
 	[RARITY_PRIMORDIAL] = 0.03,
-	[RARITY_ANCIENT]    = 0.16,
+	[RARITY_ANCIENT]    = 0.12,
 }
 
 local rarityDifficultyMult = {
@@ -1529,22 +1529,15 @@ function updateCelestialItem(it,pl)
 		if lvl>lvl2*1.2 then
 			lvl=lvl2*1.2
 		end
-		local tier=math.min(lvl/11+5,60)
+		local tier=lvl/11+5
 		if vars.madnessMode then
-			tier=math.min(math.min(lvl,1000)/11+5,90)
+			tier=math.min(lvl,500)/11+5
 		end
-		local mult=2
-		if vars.Mode==2 then
-			mult=2.5
-		end
-		if vars.insanityMode then
-			mult=3
-		end
-
+		local mult=1
 		if IsPrimordialItem(it) then
-			mult=mult*PRIMORDIAL_ENCHANT_MULT
+			mult=PRIMORDIAL_ENCHANT_MULT
 		end
-		local strength=math.round(tier*mult*slotMult)
+		local strength=math.round(applyDifficulty(encStrUp(tier))*mult*slotMult)
 		if it.Bonus>0 and it.BonusStrength>0 then
 			it.BonusStrength=strength
 			if it.Bonus>=17 then
@@ -1663,7 +1656,7 @@ bonusEffectsBase = {
 --MODIFY THIS TO CHANGE ACTUAL VALUES
 bonusEffects = {
     [1] = { bonusType = 1, bonusRange = {11, 16}, statModifier = 10 },
-    [2] = { bonusType = 2, bonusRange = {1, 7}, statModifier = 10 },
+    [2] = { bonusType = 2, bonusRange = {1, 7}, statModifier = 8 },
     [39] = { bonusType = 39, bonusValues = {2, 3}, statModifier = 25 },
     [42] = { bonusType = 42, bonusRange = {1, 16}, statModifier = 3 },
     [43] = { bonusType = 43, bonusValues = {4, 8, 10}, statModifier = 10 },
