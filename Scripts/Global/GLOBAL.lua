@@ -54,54 +54,19 @@ function events.EvtGlobal(i) -- happens after related global evt executed
 	end
 	LastTopic = nil
 	
-	-- calculate differencies and recalculate rewards
-	
+
 	local ExpRewards = {}
-	
-	local partyLevel=getPartyLevel()
-	if vars.madnessMode then
-		partyLevel=getTotalLevel()
-	end
+
 	for i, Exp in pairs(LastStats.Exp) do
 		if i < Party.count then
 			ExpRewards[i] = Party[i].Exp - Exp
-			if ExpRewards[i]>0 then
-				local bonusExp=calculateExp(ExpRewards[i], partyLevel)
-				Party[i].Experience=math.min(Party[i].Experience+bonusExp, 2^32-3982296)
-				
-				--bolster code
-				addBolsterExp((bonusExp+ExpRewards[i])/5)
-			end
 		end
 	end
-	vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
-	
+
 	local GoldReward = Party.Gold - LastStats.Gold
 	if GoldReward>0 and ExpRewards[0]>0 then
 		Party.Gold = Party.Gold + calculateGold(GoldReward)
 	end
-end
-function events.Tick()
-	vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
-end
-function events.EvtMap(i)
-	if vars.lastPartyExperience and Party[0]:GetIndex()==vars.lastPartyExperience[1] then --check if party member isn't changed
-		if Party[0].Experience>vars.lastPartyExperience[2] then --bolster
-			local expGained=Party[0].Experience-vars.lastPartyExperience[2]
-			addBolsterExp(expGained)
-			vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
-		end
-	else --in case player 1 is changed
-		vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}		
-		for i=0, Party.High do
-			Party[i].Exp=math.min(Party[i].Exp, 2^32-3982296)
-		end
-	end
-end
-
-
-function calculateExp(experience, partyLevel)
-	return experience*(1+partyLevel/100)+500*partyLevel - experience
 end
 function calculateGold(gold)
 	--calculate party level

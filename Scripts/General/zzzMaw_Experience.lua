@@ -41,3 +41,27 @@ mem.hookfunction(0x48CD4D, 1, 0, function(d, def, playerPtr)
 	end
 	return pl.Experience >= expForNextLevel(pl.LevelBase) and 1 or 0
 end, 14)
+
+function EventExperience(value, player)
+	if value <= 0 or not vars.MMLVL then
+		return value
+	end
+	local partyLevel = getPartyLevel()
+	if vars.madnessMode then
+		partyLevel = getTotalLevel()
+	end
+	local total = value*(1+partyLevel/100) + 500*partyLevel
+	addBolsterExp(total/5)
+	return total
+end
+
+mem.hookfunction(0x4485EC, 1, 2, function(d, def, playerPtr, varNum, value)
+	if varNum == 0x0D then
+		local ok, _, pl = pcall(internal.GetPlayer, playerPtr)
+		local newValue = EventExperience(value, ok and pl or nil)
+		if type(newValue) == "number" and newValue == newValue then
+			value = math.max(0, math.min(math.floor(newValue), 0x7FFFFFFF))
+		end
+	end
+	return def(playerPtr, varNum, value)
+end, 6)

@@ -1,14 +1,54 @@
 ----------------------------------------------------
 --Empower Monsters
 ----------------------------------------------------
---function to calculate the level you are (float number) give x amount of experience
---calcLevel must stay the exact inverse of calcExp, and zzzMaw_Experience feeds calcExp to the
---engine's level-up check -- change one of the two and both of the others have to follow
+local function expStep(lvl)
+	return 1000*lvl*math.max(1 + (lvl-100)*0.01, 1)
+end
+
+local MAX_TABLE_LEVEL = 2000
+local expRequired = {[1] = 0}
+for lvl = 2, MAX_TABLE_LEVEL do
+	expRequired[lvl] = expRequired[lvl-1] + expStep(lvl-1)
+end
+
 function calcLevel(x)
-	return (25+(5*x+625)^0.5)/50
-end 
+	if x <= 0 then
+		return 1
+	end
+	local top = expRequired[MAX_TABLE_LEVEL]
+	if x >= top then --past the table: extrapolate with the last step
+		return MAX_TABLE_LEVEL + (x - top)/expStep(MAX_TABLE_LEVEL)
+	end
+	local lo, hi = 1, MAX_TABLE_LEVEL --binary search: biggest lo with expRequired[lo] <= x
+	while hi - lo > 1 do
+		local mid = math.floor((lo + hi)/2)
+		if expRequired[mid] <= x then
+			lo = mid
+		else
+			hi = mid
+		end
+	end
+	return lo + (x - expRequired[lo])/expStep(lo)
+end
 function calcExp(lvl)
-	return lvl*(lvl-1)*500
+	if lvl <= 1 then
+		return 0
+	end
+	if lvl >= MAX_TABLE_LEVEL then
+		return expRequired[MAX_TABLE_LEVEL] + (lvl - MAX_TABLE_LEVEL)*expStep(MAX_TABLE_LEVEL)
+	end
+	local base = math.floor(lvl)
+	return expRequired[base] + (lvl - base)*expStep(base)
+end
+
+function bolsteredLevel(floor, levels)
+	floor = math.max(floor, 0)
+	if levels <= 0 then
+		return floor + levels
+	end
+	local top = floor + levels
+	local oldExpClimbed = 500*(top*(top-1) - floor*(floor-1))
+	return calcLevel(calcExp(floor) + oldExpClimbed)
 end
 
 function events.GameInitialized2()
@@ -243,10 +283,14 @@ function recalculateMawMonster()
 						partyLvl=oldTable.Level*2
 					end
 				end
-				--level increase 
+				--level increase
 				oldLevel=oldTable.Level
 				mapvars.uniqueMonsterLevel=mapvars.uniqueMonsterLevel or {}
-				mapvars.uniqueMonsterLevel[i]=oldTable.Level+partyLvl
+				if not vars.madnessMode and not (Game.freeProgression==false and not horizontalMaps[name]) then
+					mapvars.uniqueMonsterLevel[i]=bolsteredLevel(partyLvl, oldTable.Level)
+				else
+					mapvars.uniqueMonsterLevel[i]=oldTable.Level+partyLvl
+				end
 				mon.Level=math.min(mapvars.uniqueMonsterLevel[i],255)
 				--HP calculated using the proper getMonsterHealth function
 				mon.Resistances[0]=mon.Resistances[0]%1000
@@ -554,7 +598,9 @@ function recalculateMonsterTable()
 	if mapvars.mapAffixes then
 		bolsterLevel=mapvars.mapAffixes.Power*10+20
 	end
-	
+
+	local partyBolster = not (vars.madnessMode and madnessMapLevels[name]) and not mapvars.mapAffixes
+
 	bolsterLevel2=bolsterLevel --used for loot
 	
 	--check for current map monsters
@@ -639,13 +685,22 @@ function recalculateMonsterTable()
 		end
 		mon.Level=math.min(mon.Level+extraBolster,255)
 		totalLevel=totalLevel or {}
-		totalLevel[i]=basetable[i].Level+bolsterLevel+extraBolster
-		
+		if partyBolster then
+			totalLevel[i]=bolsteredLevel(bolsterLevel, basetable[i].Level+extraBolster)
+			mon.Level=math.min(totalLevel[i],255)
+		else
+			totalLevel[i]=basetable[i].Level+bolsterLevel+extraBolster
+		end
+
 		--horizontal progression
 		local name=Game.MapStats[Map.MapStatsIndex].Name
 		if Game.freeProgression==false and not mapvars.mapAffixes then
 			horizontalMultiplier=3
-			local level=math.max(math.min((base.Level+extraBolster)*horizontalMultiplier,base.Level+bolsterLevel+extraBolster+bonus),1)
+			local cap=base.Level+bolsterLevel+extraBolster+bonus
+			if partyBolster then
+				cap=bolsteredLevel(bolsterLevel+bonus, base.Level+extraBolster)
+			end
+			local level=math.max(math.min((base.Level+extraBolster)*horizontalMultiplier,cap),1)
 			totalLevel[i]=level
 			mon.Level=math.min(totalLevel[i],255)
 			if not horizontalMaps[name] then
