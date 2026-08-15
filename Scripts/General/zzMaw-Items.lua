@@ -572,7 +572,7 @@ local rarityDifficultyMult = {
 	[5] = 1.2,	--bolster 200
 	[6] = 1.4,	--bolster 300
 	[7] = 1.6,	--doom
-	[8] = 2,	--road to insanity
+	[8] = 1.8,	--road to insanity
 	[9] = 2,	--beyond madness
 }
 
