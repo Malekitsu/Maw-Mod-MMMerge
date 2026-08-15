@@ -80,11 +80,11 @@ function Formulas.critCap(madness)
 end
 
 function Formulas.critChance(luck, monsterLevel)
-	return luck/math.min(500 + monsterLevel*9.5, 10000) + 0.05
+	return luck/math.min(500 + monsterLevel*4.5, 5000) + 0.05
 end
 
 function Formulas.critDiminishingLevel(monsterLevel, madness)
-	return math.min(250 + monsterLevel*2.5, Formulas.critCap(madness))
+	return math.min(250 + monsterLevel*2.25, Formulas.critCap(madness))
 end
 
 function Formulas.critDamageMult(stat, monsterLevel, madness, isSpell)
