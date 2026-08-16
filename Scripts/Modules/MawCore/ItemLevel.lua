@@ -1,21 +1,22 @@
 local ItemLevel = {}
 MawCore.ItemLevel = ItemLevel
 
-ItemLevel.PerCharge = 5
+-- item levels one point of bonus power (the MaxCharges field) is worth
+ItemLevel.PerPower = 5
 
-ItemLevel.CHARGES_HARD_CAP = 255
+ItemLevel.POWER_HARD_CAP = 255
 
-function ItemLevel.MaxCharges()
-	return ItemLevel.CHARGES_HARD_CAP
+function ItemLevel.MaxPower()
+	return ItemLevel.POWER_HARD_CAP
 end
 
 function ItemLevel.Max()
-	return ItemLevel.MaxCharges()*ItemLevel.PerCharge
+	return ItemLevel.MaxPower()*ItemLevel.PerPower
 end
 
--- the charges a drop needs in order to read back as a given level
-function ItemLevel.ChargesFor(level)
-	return math.floor(math.max(level, 0)/ItemLevel.PerCharge)
+-- the bonus power a drop needs in order to read back as a given level
+function ItemLevel.PowerFor(level)
+	return math.floor(math.max(level, 0)/ItemLevel.PerPower)
 end
 
 ItemLevel.Tiers = 6
@@ -57,7 +58,7 @@ function ItemLevel.TierLevels(itemId)
 end
 
 function ItemLevel.OfItem(it)
-	return it.MaxCharges*ItemLevel.PerCharge
+	return it.MaxCharges*ItemLevel.PerPower
 end
 
 local FALLBACK_PARTY_SHARE = 7/8

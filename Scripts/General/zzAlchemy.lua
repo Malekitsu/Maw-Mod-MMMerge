@@ -868,7 +868,7 @@ end
 evt.PotionEffects[93] = function(IsDrunk, t, Power)
 	if IsBaseItemId(t.Number) then
 		if IsCelestialItem(t) then return end
-		local maxChargesCap=MawCore.ItemLevel.MaxCharges()
+		local maxChargesCap=MawCore.ItemLevel.MaxPower()
 		local levelRequired=GetLevelRquirement(t)
 		--check if equippable
 		local plLvl=Party[Game.CurrentPlayer].LevelBase

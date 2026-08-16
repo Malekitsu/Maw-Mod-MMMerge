@@ -58,6 +58,10 @@ local function masterLearned()
 	return 12
 end
 
+function estimateWeaponDamageMultiplier(level)
+	return 1 + 0.02 * estimateSkill(level)
+end
+
 local LEGENDARY_START_LEVEL = 100
 local LEGENDARY_FULL_LEVEL = 420	--exp-equivalent of the old 700 on the slowed curve
 local function legendaryRamp(lvl)
@@ -99,37 +103,37 @@ function estimateWeaponFlat(lvl)
 	return math.min(lvl*WEAPON_FLAT_PER_LEVEL, WEAPON_TIER_FLAT_DAMAGE)
 end
 
---A charge pays one channel whole instead of half of each: even charges buy flat damage
---and attack, odd charges buy the dice. Both values are two-handed and expected damage,
---like WEAPON_BASE_DICE_DAMAGE -- the dice one is doubled into the sides budget below,
---because a roll averages half of it.
-WEAPON_FLAT_PER_CHARGE = 2	--flat damage and attack, on even charges
-WEAPON_DICE_PER_CHARGE = 2	--damage over the dice sides, on odd charges
+--A point of item bonus power pays one channel whole instead of half of each: even points
+--buy flat damage and attack, odd points buy the dice. Both values are two-handed and
+--expected damage, like WEAPON_BASE_DICE_DAMAGE -- the dice one is doubled into the sides
+--budget below, because a roll averages half of it.
+WEAPON_FLAT_PER_POWER = 2	--flat damage and attack, on even points
+WEAPON_DICE_PER_POWER = 2	--damage over the dice sides, on odd points
 
 function getWeaponDamageForLevel(itemLevel, twoHanded, flat)
 	local IL = MawCore.ItemLevel
-	--above the charge cap no real item can keep scaling, so neither does the model
-	local charges = math.min(IL.ChargesFor(itemLevel), IL.MaxCharges())
-	local flatCharges = math.floor(charges/2)
+	--above the power cap no real item can keep scaling, so neither does the model
+	local power = math.min(IL.PowerFor(itemLevel), IL.MaxPower())
+	local flatPower = math.floor(power/2)
 
-	local chargeFlat = WEAPON_FLAT_PER_CHARGE*flatCharges
-	local chargeDice = WEAPON_DICE_PER_CHARGE*2*(charges - flatCharges)
-	local diceOnly = WEAPON_BASE_DICE_DAMAGE*2 + chargeDice
-	local flatOnly = (flat or 0) + chargeFlat
-	--the average damage the charges added: what enchants and auras scale off
-	local charged = chargeFlat + chargeDice/2
+	local powerFlat = WEAPON_FLAT_PER_POWER*flatPower
+	local powerDice = WEAPON_DICE_PER_POWER*2*(power - flatPower)
+	local diceOnly = WEAPON_BASE_DICE_DAMAGE*2 + powerDice
+	local flatOnly = (flat or 0) + powerFlat
+	--the average damage the item power added: what enchants and auras scale off
+	local levelDamage = powerFlat + powerDice/2
 	if not twoHanded then
 		diceOnly = diceOnly/2
 		flatOnly = flatOnly/2
-		charged = charged/2
+		levelDamage = levelDamage/2
 	end
 	--nothing is left to split half and half: each channel is already whole
-	return diceOnly + flatOnly, diceOnly, flatOnly, charged
+	return diceOnly + flatOnly, diceOnly, flatOnly, levelDamage
 end
 
 function getWeaponLevelDamage(itemLevel, twoHanded, weaponFlat)
-	local _, _, _, charged = getWeaponDamageForLevel(itemLevel, twoHanded, weaponFlat)
-	return charged*estimateWeaponDamageMultiplier(itemLevel)
+	local _, _, _, levelDamage = getWeaponDamageForLevel(itemLevel, twoHanded, weaponFlat)
+	return levelDamage*estimateWeaponDamageMultiplier(itemLevel)
 end
 
 local STAT_SHARE = 0.25

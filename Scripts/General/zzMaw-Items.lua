@@ -483,11 +483,11 @@ local LEGENDARY_CHARGES_MULT = 1.2
 local LEGENDARY_CHARGES_BONUS = 10
 
 function GetMaxItemCharges()
-	return MawCore.ItemLevel.MaxCharges()
+	return MawCore.ItemLevel.MaxPower()
 end
 
 function GetItemChargesCap(it)
-	return MawCore.ItemLevel.MaxCharges()
+	return MawCore.ItemLevel.MaxPower()
 end
 
 local function rollTierCharges(charges, ancientTier)
@@ -502,7 +502,7 @@ local function rollTierCharges(charges, ancientTier)
 end
 
 function GetPrimordialCharges(level)
-	return rollTierCharges(MawCore.ItemLevel.ChargesFor(level), 2)
+	return rollTierCharges(MawCore.ItemLevel.PowerFor(level), 2)
 end
 
 function GetItemDropLevel(it)
@@ -524,7 +524,7 @@ function GetItemDropLevel(it)
 		charges=math.floor(math.min(charges/((1+PRIMORDIAL_CHARGES_MULT)/2),
 			charges-ANCIENT_MIN_CHARGES))
 	end
-	return charges*MawCore.ItemLevel.PerCharge
+	return charges*MawCore.ItemLevel.PerPower
 end
 
 
@@ -980,11 +980,11 @@ function events.ItemGenerated(t)
 		end
 		]]
 		--ADD MAX CHARGES BASED ON PARTY LEVEL
-		local maxChargesCap=MawCore.ItemLevel.MaxCharges()
+		local maxChargesCap=MawCore.ItemLevel.MaxPower()
 		local dropLevel=MawCore.ItemLevel.ForDrop(drop.monsterLevel, partyLevel, mapLevel)
 
 		SetStoredDropLevel(it, dropLevel)
-		it.MaxCharges=rollMaxCharges(MawCore.ItemLevel.ChargesFor(dropLevel))
+		it.MaxCharges=rollMaxCharges(MawCore.ItemLevel.PowerFor(dropLevel))
 		
 		partyLevel1=GetTier(partyLevel+bonus)+GetEnchantTierBonus()
 		--adjust loot Strength
@@ -4480,10 +4480,6 @@ function events.AfterLoadMap()
 			end
 		end
 	end
-end
-
-function estimateWeaponDamageMultiplier(level)
-	return 1 + 0.02 * estimateSkill(level)
 end
 
 function IsTwoHandedWeapon(it)
