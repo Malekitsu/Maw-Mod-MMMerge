@@ -119,15 +119,13 @@ function events.UseMouseItem(t)
 		pl.HP=math.min(pl:GetFullHP(),pl.HP+GetPotionHeal(222, it.Bonus))
 	--mana potion
 	elseif it.Number==223 then
-		spRestore=round(it.Bonus^1.6*2/3+10)
-		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
+		pl.SP=math.min(pl:GetFullSP(),pl.SP+GetPotionHeal(223, it.Bonus))
 	end
 	if it.Number==247 then
 		pl.HP=math.min(pl:GetFullHP(),pl.HP+GetPotionHeal(247, it.Bonus))
 	--mana potion
 	elseif it.Number==248 then
-		spRestore=round(it.Bonus^1.6+50)
-		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
+		pl.SP=math.min(pl:GetFullSP(),pl.SP+GetPotionHeal(248, it.Bonus))
 	end
 	--Regen
 	if it.Number==233 then
@@ -413,8 +411,10 @@ function events.DoBadThingToPlayer(t)
 end
 
 POTION_HEAL={
-	[222]={flat=20, share=0.25},
-	[247]={flat=50, share=0.35},
+	[222]={pool="HP", flat=20, share=0.25},
+	[223]={pool="SP", flat=10, share=0.25},
+	[247]={pool="HP", flat=50, share=0.35},
+	[248]={pool="SP", flat=50, share=0.35},
 }
 
 function GetPotionHeal(number, power)
@@ -422,7 +422,9 @@ function GetPotionHeal(number, power)
 	if not h then
 		return 0
 	end
-	return round(h.flat + getPlayerEstimatedHealth(power or 0)*h.share)
+	power=power or 0
+	local pool=h.pool=="SP" and getPlayerEstimatedMana(power) or getPlayerEstimatedHealth(power)
+	return round(h.flat + pool*h.share)
 end
 
 potionText={
