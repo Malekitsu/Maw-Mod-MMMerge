@@ -550,7 +550,7 @@ function getPlayerEstimatedSpellPower(lvl)
 		+ GetGradualMasteryValue(fireAuraDamage, skill, m))*1.015^skill
 
 	local delay = estimateSpellDelay(lvl, baseDelay)
-	return (power + enchant)/(delay/60)*math.max(critChance, 1)
+	return (power + enchant)/(delay/100)*math.max(critChance, 1)
 end
 
 function getMonsterHealth(mon, level)
