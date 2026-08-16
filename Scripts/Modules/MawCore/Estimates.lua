@@ -133,7 +133,7 @@ function getWeaponLevelDamage(itemLevel, twoHanded, weaponFlat)
 	return charged*estimateWeaponDamageMultiplier(itemLevel)
 end
 
-local STAT_SHARE = 0.33
+local STAT_SHARE = 0.25
 
 --Every enchant a fully geared character wears, added up.
 --slots are: 2h weapon, cloak, helm, armor, gloves, boots, ring, amulet, bow, belt,

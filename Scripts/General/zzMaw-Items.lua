@@ -669,7 +669,7 @@ function RollStatFromList(list, exclude)
 end
 
 function GetTier(level)
-	return math.floor((level or 0)/18)
+	return math.floor((level or 0)/16)
 end
 local function rollMaxCharges(maxCharges)
 	return round(maxCharges*math.random(16,20)/20)
