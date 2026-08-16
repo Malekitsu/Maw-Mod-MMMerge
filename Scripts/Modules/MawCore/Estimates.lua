@@ -297,6 +297,7 @@ local function estimateResistance(lvl)
 	--the six element buffs all carry the same numbers; one stands for all
 	return estimateWornArmor(lvl)*resMult
 		+ buffFlat(const.Spells.FireResistance, skill, mastery, lvl)
+		+ Game.GetStatisticEffect(estimateStat(lvl))	--luck, the same addLuckRes gives
 end
 
 local LEGENDARY_16_RESISTANCE = 0.5

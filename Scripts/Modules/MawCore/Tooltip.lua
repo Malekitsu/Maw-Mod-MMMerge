@@ -284,42 +284,7 @@ local function tooltipEnchantStats(t)
 					end
 					power=resistancePercent(power+10, t.Item) .. "%"
 				end
-				if extraDescription then
-					local it=t.Item
-					local bolsterMult=math.max((Game.BolsterAmount-100)/2000+1,1)
-					if vars.insanityMode then
-						bolsterMult=1.4
-					end
-					if vars.madnessMode then
-						bolsterMult=2
-					end
-					local maxValue=120 * bolsterMult
-					if GetAncientTier(it)>0 then
-						maxValue=math.min(maxValue+10,maxValue*1.2)
-					end
-					if HasLegendaryAffix(it) then
-						maxValue=math.min(maxValue+20,maxValue*1.44)
-					end
-					local mult=slotMult[it:T().EquipStat] or 1
-					if table.find(twoHandedAxes, it.Number) then
-						mult=2
-					end
-					maxValue=round(maxValue*mult)
-					if t.Item.Bonus>=11 and t.Item.Bonus<=16 then
-						if resLegendary then
-							maxValue=maxValue*1.5
-						end
-						maxValue=resistancePercent(maxValue+10, t.Item) .. "%"
-					elseif t.Item.Bonus==8 or t.Item.Bonus==9 then
-						local mult=GetSlotMult(t.Item)
-						maxValue=round(maxValue*(1+math.min(maxValue/50/mult,5)))
-					elseif t.Item.Bonus>=17 then
-						maxValue=round(maxValue/10)
-					end
-					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. power .. StrColor(100,100,100, " / " .. maxValue)
-				else
-					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. power
-				end
+				t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. power
 			end
 			if HasEnc2(t.Item) then
 				local bonus,strength=GetEnc2(t.Item)
@@ -343,42 +308,7 @@ local function tooltipEnchantStats(t)
 					strength=resistancePercent(strength+10, t.Item) .. "%"
 				end
 				if itemStatName[bonus] then
-					if extraDescription then
-						local it=t.Item
-						local bolsterMult=math.max((Game.BolsterAmount-100)/2000+1,1)
-						if vars.insanityMode then
-							bolsterMult=1.4
-						end
-						if vars.madnessMode then
-							bolsterMult=2
-						end
-						local maxValue=120 * bolsterMult
-						if GetAncientTier(it)>0 then
-							maxValue=math.min(maxValue+10,maxValue*1.2)
-						end
-						if HasLegendaryAffix(it) then
-							maxValue=math.min(maxValue+20,maxValue*1.44)
-						end
-						local mult=slotMult[it:T().EquipStat] or 1
-						if table.find(twoHandedAxes, it.Number) then
-							mult=2
-						end
-						maxValue=round(maxValue*mult)
-						if bonus>=11 and bonus<=16 then
-							if resLegendary then
-								maxValue=maxValue*1.5
-							end
-							maxValue=resistancePercent(maxValue+10, t.Item) .. "%"
-						elseif bonus==8 or bonus==9 then
-							local mult=GetSlotMult(t.Item)
-							maxValue=round(maxValue*(1+math.min(maxValue/50/mult,5)))
-						elseif bonus>=17 then
-							maxValue=round(maxValue/10)
-						end
-						t.Enchantment = itemStatName[bonus] .. " +" .. strength .. StrColor(100,100,100, " / " .. maxValue) .. "\n" .. t.Enchantment
-					else
-						t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
-					end
+					t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
 				end
 			elseif t.Item.Bonus~=0 and t.Item.BonusStrength~=0 then
 				if extraDescription then
