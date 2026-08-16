@@ -42,7 +42,6 @@ weaponImpair =
 	[const.Skills.Shield]	= {[0]=10, 10, 0, 0, 0,},
 }
 
-
 skillAttack =
 {
 	[const.Skills.Staff]	= {[0]=0, 1, 2, 2, 2,},
@@ -152,6 +151,239 @@ armsmasterSkill={
 	["Speed"]={0,0,0.5,1,1,[0]=0},
 	["Attack"]={1,1,2,3,3,[0]=0},
 }
+
+skillCap={
+	[const.Skills.Alchemy]=60,
+	[50]=30,	--Cover: the chance is 10% +1% per point, so it tops out at 40%
+	[51]=50,	--Mana Shield: its mana efficiency stops growing there anyway
+	[53]=50,	--Retaliation
+}
+
+skillEffectCap={
+	buff=50,	--caster skill a buff counts, whatever the school (getBuffSkill)
+	dayBuff=75,	--Day of the Gods, Day of Protection, Hour of Power
+}
+
+skillCapExtra={}
+
+skillMasteryLadder={
+	[50]={normal={6,12,20}, insanity={8,20,30}},	--Cover
+	[51]={normal={6,12,20}, insanity={8,20,32}},	--Mana Shield
+	[52]={normal={6,12,20}},						--Enlightenment
+	[53]={normal={12,30,50}},						--Retaliation
+}
+
+skillTrainHook={}
+
+skillTrainHook[50]=function(pl, s)
+	local cap=skillCap[50]
+	if s<cap-1 or (s==cap-1 and pl.SkillPoints<=s) then
+		return
+	end
+	if SplitSkill(Skillz.get(pl, 53))~=0 then
+		return
+	end
+	Skillz.set(pl, 53, 1)
+	Game.ShowStatusText("YOU LEARNED RETALIATION!!")
+	return true
+end
+
+function events.GameInitialized2()
+	function events.GetSkill(t)
+		local cap=skillCap[t.Skill]
+		if not cap then
+			return
+		end
+		local s,m=SplitSkill(t.Result)
+		if s>cap*2 then
+			t.Result=JoinSkill(cap*2, m)
+		end
+		local extra=skillCapExtra[t.Skill]
+		if extra then
+			t.Result=t.Result+extra(t.PlayerIndex)
+		end
+	end
+end
+
+local learningRequirementsNormal={0,4,7,10}
+local learningRequirements={0,6,12,20}
+local horizontalSkills={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,27,28,30,32,33,35,38}
+
+--------------------------------------
+--THE SKILL "+" BUTTON (action 121)
+--------------------------------------
+local function refundSharedCost(pl, skill)
+	local shared=sharedSkills
+	if table.find(shamanClass, pl.Class) or table.find(seraphClass, pl.Class)
+			or table.find(dkClass, pl.Class) or table.find(assassinClass, pl.Class) then
+		shared={12,13,14,15,16,17,18,19,20,21,22}
+	end
+	if not table.find(shared, skill) then
+		return
+	end
+	local currentCost=SplitSkill(pl.Skills[skill])+1
+	if currentCost>1000 then
+		return
+	end
+	local n=1
+	for i=1,#shared do
+		local s=SplitSkill(pl.Skills[shared[i]])
+		if s>=currentCost then
+			n=n+1
+		end
+	end
+	local actualCost=math.ceil(currentCost/n)
+	if pl.SkillPoints>=actualCost then
+		pl.SkillPoints=pl.SkillPoints+currentCost-actualCost
+	end
+end
+
+local function restoreMasteries(pl, skill)
+	if skill>39 then	-- to do it better later
+		return
+	end
+	local currentCost=SplitSkill(pl.Skills[skill])+1
+	local n=1
+	if skill>=12 and skill<=23 then
+		for i=1,11 do
+			local s=SplitSkill(pl.Skills[11+i])
+			if s>=currentCost then
+				n=n+1
+			end
+		end
+	end
+	if pl.SkillPoints<math.ceil(currentCost/n) then
+		return
+	end
+	local id=pl:GetIndex()
+	local s,m=SplitSkill(pl.Skills[skill])
+	if table.find(horizontalSkills, skill) and vars.storedMasteries and vars.storedMasteries[id]
+			and vars.storedMasteries[id][skill] then
+		while m<4 and vars.storedMasteries[id][skill]>m
+				and ((s+1>=learningRequirements[m+1] and not Game.freeProgression)
+					or (s+1>=learningRequirementsNormal[m+1] and Game.freeProgression)) do
+			pl.Skills[skill]=JoinSkill(s,m+1)
+			m=m+1
+		end
+	end
+	if vars.oldPlayerMasteries and vars.oldPlayerMasteries[id]
+			and m<4 and vars.oldPlayerMasteries[id][skill]>m then
+		local requirements
+		if vars.madnessMode and table.find(horizontalSkills, skill) then
+			requirements={0,12,30,50}
+		elseif vars.insanityMode and table.find(horizontalSkills, skill) then
+			requirements={0,8,20,32}
+		elseif Game.freeProgression or not table.find(horizontalSkills, skill) then
+			requirements={0,4,7,10}
+		else
+			requirements={0,6,12,20}
+		end
+		if s+1>=requirements[m+1] then
+			pl.Skills[skill]=JoinSkill(s,m+1)
+		end
+	end
+end
+
+local function applyCap(pl, t)
+	local cap=skillCap[t.Param]
+	if not cap then
+		return
+	end
+	local s,m=SplitSkill(Skillz.get(pl, t.Param))
+	local hook=skillTrainHook[t.Param]
+	local swallow=hook and hook(pl, s, m, cap)
+	if s<cap then
+		return
+	end
+	t.Handled=true
+	while s>cap do
+		pl.SkillPoints=pl.SkillPoints+s
+		s=s-1
+	end
+	Skillz.set(pl, t.Param, JoinSkill(s, m))
+	if not swallow then
+		Game.ShowStatusText("This skill has reached its limit (" .. cap .. ")")
+	end
+end
+
+local function autoLearnMastery(pl, skill)
+	local ladder=skillMasteryLadder[skill]
+	if not ladder then
+		return
+	end
+	local req=(vars.insanityMode and ladder.insanity) or ladder.normal
+	local s,m=SplitSkill(Skillz.get(pl, skill))
+	if not req[m] or Skillz.MasteryLimit(pl, skill)<=m then
+		return
+	end
+	if s>=req[m] or (pl.SkillPoints>s and s+1>=req[m]) then
+		Skillz.set(pl, skill, JoinSkill(s, m+1))
+	end
+end
+
+local function armsmasterSupreme(pl, id, skill)
+	if skill~=35 or pl.Class<16 or pl.Class>19 then
+		return
+	end
+	local s=SplitSkill(pl.Skills[35])
+	if pl.SkillPoints>s and s+1==GetArmsmasterSupremeRequirement() then
+		Game.ShowStatusText("SUPREME UNLOCKED!!!")
+		evt[id].Add("HP", 0) --graphic
+	end
+end
+
+function events.Action(t)
+	if t.Action~=121 then
+		return
+	end
+	local id=Game.CurrentPlayer
+	if id<0 or id>Party.High then
+		return
+	end
+	local pl=Party[id]
+	vars.checkSoloMastery=true --makes skills to be automatically learned if solo
+
+	refundSharedCost(pl, t.Param)
+	restoreMasteries(pl, t.Param)
+	applyCap(pl, t)
+	autoLearnMastery(pl, t.Param)
+	armsmasterSupreme(pl, id, t.Param)
+end
+
+		--[[  skill share system, disabled, fix at the bottom
+		if table.find(partySharedSkills,t.Param) then
+			maxS=0
+			maxM=0
+			increased=-1
+			for i=0,Party.High do
+				skill=partySharedSkills[table.find(partySharedSkills,t.Param)]
+				s,m=SplitSkill(Party[i].Skills[skill])
+				if Game.CurrentPlayer==i then
+					if Party[i].SkillPoints>s and (s<10 or m~=4) then
+						s=s+1
+						increased=i
+					end
+				end
+				if s>maxS then
+					maxS=s
+				end
+				if m>maxM then
+					maxM=m
+				end
+			end
+			for i=0,Party.High do
+				if increased==i then
+					Party[i].Skills[skill]=JoinSkill(maxS-1,maxM)
+				else
+					Party[i].Skills[skill]=JoinSkill(maxS,maxM)
+				end
+			end
+			if maxS>=10 and maxM==4 then
+				t.Handled=true
+				Game.ShowStatusText("This skill is already as good as it will ever get")
+			end
+		end
+		]]
 
 --all stats bonus are calculated in Maw Items, as this function only changes hp,sp,ac,attack and damage
 function events.CalcStatBonusBySkills(t)
@@ -792,7 +1024,6 @@ function events.LoadMap(wasInGame)
 	Timer(chargeTimer, const.Minute/2) 
 end
 
-
 --------------------------------------
 --MANA potion drink hotkey only in SOLO
 --------------------------------------
@@ -834,7 +1065,6 @@ function events.LoadMap(wasInGame)
 	Timer(chargeTimer, const.Minute/2) 
 end
 
-
 --function that checks for enchant that increases skill 
 function checkbonus(enchantNumber, playerIndex)
 	local skillBonus=0
@@ -847,69 +1077,6 @@ function checkbonus(enchantNumber, playerIndex)
 end
 
 sharedSkills={0,1,2,3,4,5,6,7,12,13,14,15,16,17,18,19,20,21,22}
-function events.Action(t)
-	if t.Action==121 then
-		vars.checkSoloMastery=true --makes skills to be automatically learned if solo
-		local shared=sharedSkills
-		if table.find(shamanClass, pl.Class) or table.find(seraphClass, pl.Class) or table.find(dkClass, pl.Class) or table.find(assassinClass, pl.Class) then
-			shared={12,13,14,15,16,17,18,19,20,21,22}
-		end
-		if table.find(shared, t.Param) then
-			t.Handled=false
-			pl=Party[Game.CurrentPlayer]
-			local currentCost=SplitSkill(pl.Skills[t.Param])+1
-			if currentCost>1000 then
-				return
-			end
-			--calculate actual cost
-			local n=1
-			for i=1,#shared do
-				local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[shared[i]])
-				if s>=currentCost then
-					n=n+1
-				end
-			end
-			local actualCost=math.ceil(currentCost/n)
-			if pl.SkillPoints>=actualCost then
-				pl.SkillPoints=pl.SkillPoints+currentCost-actualCost
-			end
-		end
-		--[[  skill share system, disabled, fix at the bottom
-		if table.find(partySharedSkills,t.Param) then
-			maxS=0
-			maxM=0
-			increased=-1
-			for i=0,Party.High do
-				skill=partySharedSkills[table.find(partySharedSkills,t.Param)]
-				s,m=SplitSkill(Party[i].Skills[skill])
-				if Game.CurrentPlayer==i then
-					if Party[i].SkillPoints>s and (s<10 or m~=4) then
-						s=s+1
-						increased=i
-					end
-				end
-				if s>maxS then
-					maxS=s
-				end
-				if m>maxM then
-					maxM=m
-				end
-			end
-			for i=0,Party.High do
-				if increased==i then
-					Party[i].Skills[skill]=JoinSkill(maxS-1,maxM)
-				else
-					Party[i].Skills[skill]=JoinSkill(maxS,maxM)
-				end
-			end
-			if maxS>=10 and maxM==4 then
-				t.Handled=true
-				Game.ShowStatusText("This skill is already as good as it will ever get")
-			end
-		end
-		]]
-	end
-end
 function events.LoadMap()
 	if not vars.weaponSkillRefunded then
 		vars.weaponSkillRefunded=true
@@ -1031,7 +1198,7 @@ function events.PlayerAttacked(t)
 		for i=0,Party.High do
 			local s, m= SplitSkill(Skillz.get(Party[i], 50))
 			if s>0 and vars.covering[i] and m>=masteryRequired and i~=t.PlayerSlot then
-				cover[i]={["Chance"]=math.min(0.1+s*0.01,0.40),["Mastery"]= m}
+				cover[i]={["Chance"]=math.min(0.1+s*0.01, 0.1+skillCap[50]*0.01),["Mastery"]= m}
 				if MawCore.DamageState.takeCoverBonus(i) then
 					cover[i].Chance=cover[i].Chance+0.15
 				end
@@ -1342,7 +1509,6 @@ function events.GameInitialized2()
 	Game.SkillDesGM[const.Skills.Perception]= "Reduces traps and lava damage by 70%."
 end
 
-
 --open time at 5 instead of 6
 function events.GameInitialized2()
 	baseOpenTimes={}
@@ -1606,11 +1772,7 @@ function events.GameInitialized2()
 	
 end
 
-
 --HORIZONTAL SKILL PROGRESSION
-local learningRequirementsNormal={0,4,7,10}
-local learningRequirements={0,6,12,20}
-local horizontalSkills={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,27,28,30,32,33,35,38}
 --online
 local insanityLearningRequirements={0,8,20,32}
 local madnessLearningRequirements={0,12,30,50}
@@ -1740,58 +1902,11 @@ function horizontalModeMasteries()
 	end
 end
 
-
 function events.Action(t)
 	horizontalModeMasteries()
 end
 
 --restore masteries 
-function events.Action(t)
-	if t.Action==121 then
-		if t.Param>39 then return end -- to do it better later
-		t.Handled=false
-		pl=Party[Game.CurrentPlayer]
-		local currentCost=SplitSkill(pl.Skills[t.Param])+1
-		--calculate actual cost
-		local n=1
-		if t.Param>=12 and t.Param<=23 then
-			for i=1,11 do
-				local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[11+i])
-				if s>=currentCost then
-					n=n+1
-				end
-			end
-		end
-		local actualCost=math.ceil(currentCost/n)
-		if pl.SkillPoints>=actualCost then
-			local id=pl:GetIndex()
-			local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[t.Param])
-			if table.find(horizontalSkills, t.Param) and vars.storedMasteries and vars.storedMasteries[id] and vars.storedMasteries[id][t.Param] then
-				while m<4 and vars.storedMasteries[id][t.Param]>m and ((s+1>=learningRequirements[m+1] and not Game.freeProgression) or (s+1>=learningRequirementsNormal[m+1] and Game.freeProgression))  do
-					Party[Game.CurrentPlayer].Skills[t.Param]=JoinSkill(s,m+1)
-					m=m+1
-				end
-			end
-			if vars.oldPlayerMasteries and vars.oldPlayerMasteries[id] then
-				if m<4 and vars.oldPlayerMasteries[id][t.Param]>m then
-					if vars.madnessMode and table.find(horizontalSkills, t.Param) then
-						requirements={0,12,30,50}
-					elseif vars.insanityMode and table.find(horizontalSkills, t.Param) then
-						requirements={0,8,20,32}
-					elseif Game.freeProgression or not table.find(horizontalSkills, t.Param) then
-						requirements={0,4,7,10}
-					else
-						requirements={0,6,12,20}
-					end
-					if s+1>=requirements[m+1] then
-						Party[Game.CurrentPlayer].Skills[t.Param]=JoinSkill(s,m+1)
-						m=m+1
-					end
-				end
-			end
-		end
-	end
-end
 
 function events.CanRepairItem(t)
 	local requiredSkill=t.Item:T().IdRepSt
@@ -2051,58 +2166,6 @@ function events.KeyDown(t)
 		end
 	end
 end
-function events.Action(t)
-	if t.Action==121 then
-		if t.Param==50 then
-			local coverRequirements={6,12,20}
-			if vars.insanityMode then
-				coverRequirements={8,20,30}
-			end
-			local pl=Party[Game.CurrentPlayer]
-			local s,m=SplitSkill(Skillz.get(pl,50))
-			if s==29 and pl.SkillPoints>29 then
-				local s,m=SplitSkill(Skillz.get(pl,53))
-				if s==0 then
-					Skillz.set(pl,53,1)
-					Game.ShowStatusText("YOU LEARNED RETALIATION!!")
-				end
-			end
-			if s==30 then 
-				t.Handled=true
-				local s,m=SplitSkill(Skillz.get(pl,53))
-				if s==0 then
-					Skillz.set(pl,53,1)
-					Game.ShowStatusText("YOU LEARNED RETALIATION!!")
-				else
-					Game.ShowStatusText("This skill has reached its limit")
-				end
-			elseif s>30 then
-				t.Handled=true
-				while s>30 do
-					pl.SkillPoints=pl.SkillPoints+s
-					s=s-1
-				end
-				Skillz.set(pl,50,JoinSkill(s,m))
-			end
-			if pl.SkillPoints>s and coverRequirements[m] and s+1>=coverRequirements[m] and Skillz.MasteryLimit(pl,50)>m then
-				Skillz.set(pl,50,JoinSkill(s, m+1))
-			elseif coverRequirements[m] and s>=coverRequirements[m] and Skillz.MasteryLimit(pl,50)>m then
-				Skillz.set(pl,50,JoinSkill(s, m+1))
-			end
-		end
-		--[[ CAP REMOVED
-		if t.Param==51 then
-			local pl=Party[Game.CurrentPlayer]
-			local s,m=SplitSkill(Skillz.get(pl,51))
-			if s>=32 then 
-				t.Handled=true
-				local s,m=SplitSkill(Skillz.get(pl,51))
-				Game.ShowStatusText("This skill has reached its limit")
-			end
-		end
-		]]
-	end
-end
 --[[
 function events.LoadMap()
 	for i=0,Party.High do
@@ -2260,34 +2323,6 @@ function events.GameInitialized2()
 	Skillz.learn_at(manaSkill, 3) --alchemy shop
 end
 
-local manaShieldRequirements={6,12,20}
-function events.Action(t)
-	if t.Action==121 then
-		if t.Param==51 then
-			local manaShieldRequirements={6,12,20}
-			if vars.insanityMode then
-				manaShieldRequirements={8,20,32}
-			end
-			local pl=Party[Game.CurrentPlayer]
-			local s,m=SplitSkill(Skillz.get(pl,51))
-			if s>=MANA_SHIELD_SKILL_CAP then
-				t.Handled=true
-				while s>MANA_SHIELD_SKILL_CAP do
-					pl.SkillPoints=pl.SkillPoints+s
-					s=s-1
-				end
-				Skillz.set(pl,51,JoinSkill(s,m))
-				Game.ShowStatusText("This skill has reached its limit")
-			end
-			if pl.SkillPoints>s and manaShieldRequirements[m] and s+1>=manaShieldRequirements[m] and Skillz.MasteryLimit(pl,51)>m then
-				Skillz.set(pl,51,JoinSkill(s, m+1))
-			elseif manaShieldRequirements[m] and s>=manaShieldRequirements[m] and Skillz.MasteryLimit(pl,51)>m then
-				Skillz.set(pl,51,JoinSkill(s, m+1))
-			end
-		end
-	end
-end
-
 --Enlightenment
 function events.GameInitialized2()
 	local Enlightenment=52
@@ -2303,24 +2338,6 @@ function events.GameInitialized2()
 	Skillz.learn_at(Enlightenment, 3) --alchemy shop
 end
 
-function events.Action(t)
-	if t.Action==121 then
-		if t.Param==52 then
-			local EnlightenmentRequirements={6,12,20}
-			if vars.insanityMode then
-				--EnlightenmentRequirements={8,20,32}
-			end
-			local pl=Party[Game.CurrentPlayer]
-			local s,m=SplitSkill(Skillz.get(pl,52))
-			if pl.SkillPoints>s and EnlightenmentRequirements[m] and s+1>=EnlightenmentRequirements[m] and Skillz.MasteryLimit(pl,52)>m then
-				Skillz.set(pl,52,JoinSkill(s, m+1))
-			elseif EnlightenmentRequirements[m] and s>=EnlightenmentRequirements[m] and Skillz.MasteryLimit(pl,52)>m then
-				Skillz.set(pl,52,JoinSkill(s, m+1))
-			end
-		end
-	end
-end
-
 --RETALIATION
 function events.GameInitialized2()
 	local Retaliation=53
@@ -2331,32 +2348,6 @@ function events.GameInitialized2()
 	Skillz.setDesc(Retaliation, 3, "Your next attack recovery time is reduced by 30%")
 	Skillz.setDesc(Retaliation, 4, "Your next attack has a 25% chance to stun the enemy for 2 seconds")
 	Skillz.setDesc(Retaliation, 5, "Retaliation can stack up to 3 times, allowing to consume all the stacks in 1 single powerful hit")
-end
-
-function events.Action(t)
-	if t.Action==121 then
-		if t.Param==53 then
-			local retaliationRequirements={12,30,50}
-			local pl=Party[Game.CurrentPlayer]
-			local s,m=SplitSkill(Skillz.get(pl,53))
-			if s==50 then 
-				t.Handled=true
-				Game.ShowStatusText("This skill has reached its limit")
-			elseif s>50 then
-				t.Handled=true
-				while s>50 do
-					pl.SkillPoints=pl.SkillPoints+s
-					s=s-1
-				end
-				Skillz.set(pl,53,JoinSkill(s,m))
-			end
-			if pl.SkillPoints>s and retaliationRequirements[m] and s+1>=retaliationRequirements[m] and Skillz.MasteryLimit(pl,53)>m then
-				Skillz.set(pl,53,JoinSkill(s, m+1))
-			elseif retaliationRequirements[m] and s>=retaliationRequirements[m] and Skillz.MasteryLimit(pl,53)>m then
-				Skillz.set(pl,53,JoinSkill(s, m+1))
-			end
-		end
-	end
 end
 
 --Regeneration
@@ -2491,31 +2482,6 @@ function GetArmsmasterSupremeRequirement()
 		requirement=50
 	end
 	return requirement
-end
-
-function events.Action(t)
-	if t.Action==121 then
-		if t.Param==35 then
-			local id=Game.CurrentPlayer
-			
-			if id<0 or id>Party.High then
-				return
-			end
-			local pl=Party[id]
-			local class=pl.Class
-			if class<16 or class>19 then --knights only
-				return
-			end
-			
-			local requirement=GetArmsmasterSupremeRequirement()
-			
-			local s,m=SplitSkill(pl.Skills[35])
-			if pl.SkillPoints>s and s+1==requirement then
-				Game.ShowStatusText("SUPREME UNLOCKED!!!")
-				evt[id].Add("HP", 0) --graphic
-			end
-		end
-	end
 end
 
 local meleeSkills={0,1,2,3,4,6}

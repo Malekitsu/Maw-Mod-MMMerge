@@ -21,11 +21,10 @@ local function buffRamp(s)
 	return math.min(math.max((s-th[2])/(th[3]-th[2]), 0), 1)
 end
 
-local BUFF_SKILL_CAP = 50
-local BUFF_SKILL_CAP_DAY = 75	--Day of the Gods, Day of Protection, Hour of Power
+--the caps live in zzMAW-Skills (skillEffectCap), the same numbers getBuffSkill applies
 local dayBuffs = {[83] = true, [85] = true, [86] = true}
 local function casterSkill(spellId, s)
-	return math.min(s, dayBuffs[spellId] and BUFF_SKILL_CAP_DAY or BUFF_SKILL_CAP)
+	return math.min(s, dayBuffs[spellId] and skillEffectCap.dayBuff or skillEffectCap.buff)
 end
 
 local CASTER_LEVEL_DIVISOR = 4
@@ -334,7 +333,6 @@ end
 
 local COVER_BASE = 0.10
 local COVER_PER_SKILL = 0.01
-local COVER_MAX = 0.40
 local COVER_MASTERY = 2
 
 local TANK_RATIO_CAP = 7		--approached, never passed
@@ -347,7 +345,8 @@ local function coverMultiplier(lvl)
 	if masteryPerLevel(lvl) < COVER_MASTERY then
 		return 1
 	end
-	local p = math.min(COVER_BASE + COVER_PER_SKILL*estimateSkill(lvl), COVER_MAX)
+	local p = math.min(COVER_BASE + COVER_PER_SKILL*estimateSkill(lvl),
+		COVER_BASE + COVER_PER_SKILL*skillCap[50])
 	return 1/((1 - p) + p/tankVitalityRatio(lvl))
 end
 

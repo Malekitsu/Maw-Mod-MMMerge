@@ -3052,9 +3052,9 @@ local function getCasterBuffSkill(spell)
 		local school=11+math.ceil(spell/11)
 		local s,m=SplitSkill(player.Skills[school])
 		if spell==83 or spell==85 or spell==86 then
-			s=math.min(s,75)
+			s=math.min(s,skillEffectCap.dayBuff)
 		else
-			s=math.min(s,50)
+			s=math.min(s,skillEffectCap.buff)
 		end
 		return s, m, player.LevelBase
 	else

@@ -89,8 +89,6 @@ function calcManaShield(pl, damage)
 	return damage
 end
 
-MANA_SHIELD_SKILL_CAP = 50
-
 function manaShieldManaEfficiency(pl, skill)
 	if pl then
 		skill=SplitSkill(Skillz.get(pl, 51))
@@ -98,7 +96,8 @@ function manaShieldManaEfficiency(pl, skill)
 	if skill == 50 then
 		return 5
 	end
-	skill = math.min(skill, MANA_SHIELD_SKILL_CAP)
+	--the cap is the skillCap row in zzMAW-Skills, so training and efficiency stop together
+	skill = math.min(skill, skillCap[51])
 	return 1 + skill^1.4 / 60
 end
 

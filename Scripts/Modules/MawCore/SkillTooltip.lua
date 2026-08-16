@@ -245,7 +245,7 @@ end
 
 SkillTooltip.set(50, 1, function(pl)
 	local s = SplitSkill(Skillz.get(pl, 50))
-	local chance = math.min(10 + s, 40)
+	local chance = math.min(10 + s, 10 + skillCap[50])
 	return "Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nIf available, Expert, Master and Grandmaster is learned at skill "
 		.. (vars.insanityMode and "8-20-30" or "6-12-20")
 		.. ".\n\nGrants 10 plus 1% chance per skill point to Cover, up to 40%, however, something might happen once at max level....\n\nCurrent cover chance: " .. chance .. "%\n\nPress P to enable/disable\n"
@@ -258,7 +258,7 @@ SkillTooltip.set(51, 1, function(pl)
 	return "Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill "
 		.. (vars.insanityMode and "8-20-32" or "6-12-20")
 		.. ".\n\nMastery increase its mana efficience, which stops growing past skill "
-		.. MANA_SHIELD_SKILL_CAP .. ".\n" .. "Current Damage reduction per Mana: " .. StrColor(178, 255, 255, efficiency) .. "\n\nPress M to enable/disable"
+		.. skillCap[51] .. ".\n" .. "Current Damage reduction per Mana: " .. StrColor(178, 255, 255, efficiency) .. "\n\nPress M to enable/disable"
 		.. toggleState("manaShield")
 end, "mana shield efficiency + toggle state")
 

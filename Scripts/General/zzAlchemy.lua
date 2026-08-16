@@ -295,7 +295,6 @@ BLACK_POTION_STAT_PER_STEP=20	--permanent stat a full step buys, per stat in the
 
 REAGENT_LEVEL_DIVISOR=2
 REAGENT_POWER_CAP=255
-ALCHEMY_SKILL_CAP=30
 POTION_POWER_CAP=500
 
 function GetTranscendenceSkillPoints(step)
@@ -633,31 +632,8 @@ function mawTick_ReagentPower()
 	end
 end
 function events.GameInitialized2()
-	function events.GetSkill(t)
-		if t.Skill~=const.Skills.Alchemy then
-			return
-		end
-		local s,m=SplitSkill(t.Result)
-		if s>ALCHEMY_SKILL_CAP*2 then
-			t.Result=JoinSkill(ALCHEMY_SKILL_CAP*2, m)
-		end
-		if alcBonus and alcBonus[t.PlayerIndex] then
-			t.Result=t.Result+alcBonus[t.PlayerIndex]
-		end
-	end
-
-	function events.Action(t)
-		if t.Action~=121 or t.Param~=const.Skills.Alchemy then
-			return
-		end
-		local id=Game.CurrentPlayer
-		if id<0 or id>Party.High then
-			return
-		end
-		if SplitSkill(Party[id].Skills[t.Param])>=ALCHEMY_SKILL_CAP then
-			t.Handled=true
-			Game.ShowStatusText("Alchemy cannot be trained past " .. ALCHEMY_SKILL_CAP)
-		end
+	skillCapExtra[const.Skills.Alchemy]=function(playerIndex)
+		return alcBonus and alcBonus[playerIndex] or 0
 	end
 end
 
