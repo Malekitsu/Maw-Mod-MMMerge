@@ -504,9 +504,10 @@ function getPlayerEstimatedPower(lvl)
 
 	local enchantLegendary = (1 + GetMightDamageMultiplier(might, lvl)*legendary)
 		*(1 + (critMult-1)*legendary)
-	local undamped = wDmg*estimateWeaponDamageMultiplier(itemLevel)*enchantLegendary
-	damage = damage + undamped*EXPECTED_ENCHANT_COEFF*math.min(lvl/EXPECTED_ENCHANT_LEVEL, 1)
-	damage = damage + undamped*GetGradualMasteryValue(fireAuraDamage, skill, m)
+	--the same call the game makes in GetWeaponLevelDamage
+	local enchantBase = getWeaponLevelDamage(itemLevel, true, estimateWeaponFlat(lvl))*enchantLegendary
+	damage = damage + enchantBase*EXPECTED_ENCHANT_COEFF*math.min(lvl/EXPECTED_ENCHANT_LEVEL, 1)
+	damage = damage + enchantBase*GetGradualMasteryValue(fireAuraDamage, skill, m)
 
 	local crowd = math.min(1 + LEGENDARY_21_PER_MONSTER*EXPECTED_NEARBY_MONSTERS*legendary, 2)
 	damage = damage*crowd*(1 + LEGENDARY_11_DAMAGE*legendary)
@@ -558,12 +559,11 @@ function getPlayerEstimatedSpellPower(lvl)
 	power = power*(1 + math.min(critChance, 1)*(critDamage - 1))
 
 	local legendary = legendaryRamp(lvl)
-	local wDmg = getWeaponDamageForLevel(lvl, true, estimateWeaponFlat(lvl))
 	local spellCritFactor = 1 + math.min(critChance, 1)*(critDamage - 1)
 	local enchantLegendary = (1 + GetMightDamageMultiplier(stat, lvl)*legendary)
 		*(1 + (spellCritFactor - 1)*legendary)
-	local undamped = wDmg*estimateWeaponDamageMultiplier(lvl)*enchantLegendary
-	local enchant = undamped*(EXPECTED_ENCHANT_COEFF*math.min(lvl/EXPECTED_ENCHANT_LEVEL, 1)
+	local enchantBase = getWeaponLevelDamage(lvl, true, estimateWeaponFlat(lvl))*enchantLegendary
+	local enchant = enchantBase*(EXPECTED_ENCHANT_COEFF*math.min(lvl/EXPECTED_ENCHANT_LEVEL, 1)
 		+ GetGradualMasteryValue(fireAuraDamage, skill, m))*1.015^skill
 
 	local delay = estimateSpellDelay(lvl, baseDelay)
