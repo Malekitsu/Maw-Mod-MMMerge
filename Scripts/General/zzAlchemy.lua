@@ -64,6 +64,9 @@ function events.UseMouseItem(t)
 	local it=Mouse.Item
 	if it.Number<221 or it.Number>=300 or it.Number==290 then return end
 	t.Allow=false
+	if it.Bonus>POTION_POWER_CAP then
+		it.Bonus=POTION_POWER_CAP
+	end
 	local pl=Party[t.PlayerSlot]
 	local index=pl:GetIndex()
 	local delay=pl.RecoveryDelay
@@ -195,7 +198,9 @@ function events.UseMouseItem(t)
 			end
 		end
 		--effect
-		local power=math.min(math.floor(it.Bonus/50))*20
+		--it.Bonus was clamped to POTION_POWER_CAP on the way in, so the steps are capped
+		--with it: 10 steps, BLACK_POTION_STAT_PER_STEP each
+		local power=math.floor(it.Bonus/BLACK_POTION_POWER_PER_STEP)*BLACK_POTION_STAT_PER_STEP
 		if it.Number==261 or it.Number==262 then
 			power=power*1.5
 		end
@@ -288,6 +293,12 @@ potionPowerRequirement={
 
 TRANSCENDENCE_POTION=259
 BLACK_POTION_POWER_PER_STEP=50
+BLACK_POTION_STAT_PER_STEP=20	--permanent stat a full step buys, per stat in the group
+
+REAGENT_LEVEL_DIVISOR=2
+REAGENT_POWER_CAP=255
+ALCHEMY_SKILL_CAP=30
+POTION_POWER_CAP=500
 
 function GetTranscendenceSkillPoints(step)
 	return 5*step*step + 15*step
@@ -608,21 +619,42 @@ function mawTick_ReagentPower()
 		elseif m>=4 then
 			bonus=s
 		end
-		if it.Mod1DiceCount+bonus>255 then
+		if it.Mod1DiceCount+bonus>REAGENT_POWER_CAP then
 			local id=Party[Game.CurrentPlayer]:GetIndex()
-			alcBonus[id]=it.Mod1DiceCount+bonus-255
-			it.Mod1DiceCount=255
+			local over=(it.Mod1DiceCount+bonus-REAGENT_POWER_CAP)/2
+			alcBonus[id]=math.min(math.floor(over), 900)
+			it.Mod1DiceCount=REAGENT_POWER_CAP
 		else
 			it.Mod1DiceCount=it.Mod1DiceCount+bonus
 		end
 		lastModifiedReagent=Mouse.Item.Number
 	end
 end
---increase alchemy skill to fix reagent power overflow
 function events.GameInitialized2()
 	function events.GetSkill(t)
-		if t.Skill==const.Skills.Alchemy and alcBonus and alcBonus[t.PlayerIndex] then
+		if t.Skill~=const.Skills.Alchemy then
+			return
+		end
+		local s,m=SplitSkill(t.Result)
+		if s>ALCHEMY_SKILL_CAP*2 then
+			t.Result=JoinSkill(ALCHEMY_SKILL_CAP*2, m)
+		end
+		if alcBonus and alcBonus[t.PlayerIndex] then
 			t.Result=t.Result+alcBonus[t.PlayerIndex]
+		end
+	end
+
+	function events.Action(t)
+		if t.Action~=121 or t.Param~=const.Skills.Alchemy then
+			return
+		end
+		local id=Game.CurrentPlayer
+		if id<0 or id>Party.High then
+			return
+		end
+		if SplitSkill(Party[id].Skills[t.Param])>=ALCHEMY_SKILL_CAP then
+			t.Handled=true
+			Game.ShowStatusText("Alchemy cannot be trained past " .. ALCHEMY_SKILL_CAP)
 		end
 	end
 end
@@ -671,7 +703,7 @@ function events.MonsterKilled(mon)
 			alchemyPower=power
 		end
 		if obj then
-			obj.Item.Bonus=round(getPartyLevel()/3)
+			obj.Item.Bonus=round(getPartyLevel()/REAGENT_LEVEL_DIVISOR)
 			if obj.Item.Bonus+alchemyPower>200 then
 				obj.Item.Number=math.random(221,224)
 				obj.Item.Bonus=round(obj.Item.Bonus+alchemyPower)

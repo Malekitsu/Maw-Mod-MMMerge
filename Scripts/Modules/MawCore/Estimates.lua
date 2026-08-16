@@ -151,7 +151,7 @@ end
 
 function estimateStat(level)
 	local baseStat = 17 --on creation
-	local statsFromAlchemy = level*0.2
+	local statsFromAlchemy = math.min(level, 500)*0.2
 	--most of the stats come from enchants
 	local geared = gearedFraction(level)
 	local skill = estimateSkill(level)
