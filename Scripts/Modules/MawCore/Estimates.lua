@@ -86,7 +86,7 @@ end
 
 
 WEAPON_BASE_DICE_DAMAGE = 8	--expected damage, spread over the dice; same on every weapon
-WEAPON_TIER_FLAT_DAMAGE = 30	--flat damage a top-tier base type is worth; tier 1 gets none
+WEAPON_TIER_FLAT_DAMAGE = 16	--flat damage a top-tier base type is worth; tier 1 gets none
 
 function weaponTierFlat(tier)
 	local IL = MawCore.ItemLevel
@@ -100,23 +100,37 @@ function estimateWeaponFlat(lvl)
 	return math.min(lvl*WEAPON_FLAT_PER_LEVEL, WEAPON_TIER_FLAT_DAMAGE)
 end
 
-function getWeaponDamageForLevel(itemLevel, twoHanded, flat)
-	local damage = math.max(Game.GetStatisticEffect(estimateStat(itemLevel)), 0)
+--A charge pays one channel whole instead of half of each: even charges buy flat damage
+--and attack, odd charges buy the dice. Both values are two-handed and expected damage,
+--like WEAPON_BASE_DICE_DAMAGE -- the dice one is doubled into the sides budget below,
+--because a roll averages half of it.
+WEAPON_FLAT_PER_CHARGE = 2	--flat damage and attack, on even charges
+WEAPON_DICE_PER_CHARGE = 2	--damage over the dice sides, on odd charges
 
-	local diceOnly = WEAPON_BASE_DICE_DAMAGE*2
-	local flatOnly = flat or 0
+function getWeaponDamageForLevel(itemLevel, twoHanded, flat)
+	local IL = MawCore.ItemLevel
+	--above the charge cap no real item can keep scaling, so neither does the model
+	local charges = math.min(IL.ChargesFor(itemLevel), IL.MaxCharges())
+	local flatCharges = math.floor(charges/2)
+
+	local chargeFlat = WEAPON_FLAT_PER_CHARGE*flatCharges
+	local chargeDice = WEAPON_DICE_PER_CHARGE*2*(charges - flatCharges)
+	local diceOnly = WEAPON_BASE_DICE_DAMAGE*2 + chargeDice
+	local flatOnly = (flat or 0) + chargeFlat
+	--the average damage the charges added: what enchants and auras scale off
+	local charged = chargeFlat + chargeDice/2
 	if not twoHanded then
-		damage = damage/2
 		diceOnly = diceOnly/2
 		flatOnly = flatOnly/2
+		charged = charged/2
 	end
-	local damping = 1 + estimateWeaponDamageMultiplier(itemLevel)
-	return damage/damping + diceOnly + flatOnly, diceOnly, flatOnly
+	--nothing is left to split half and half: each channel is already whole
+	return diceOnly + flatOnly, diceOnly, flatOnly, charged
 end
 
 function getWeaponLevelDamage(itemLevel, twoHanded, weaponFlat)
-	local total, dice, flat = getWeaponDamageForLevel(itemLevel, twoHanded, weaponFlat)
-	return (total - dice - flat)*estimateWeaponDamageMultiplier(itemLevel)
+	local _, _, _, charged = getWeaponDamageForLevel(itemLevel, twoHanded, weaponFlat)
+	return charged*estimateWeaponDamageMultiplier(itemLevel)
 end
 
 local STAT_SHARE = 0.33
