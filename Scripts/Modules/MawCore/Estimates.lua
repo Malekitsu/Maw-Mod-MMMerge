@@ -149,7 +149,7 @@ function getTotalEnchantPower(level)
 end
 
 function gearedFraction(level)
-	return 0.1^(1/(1 + level/10))
+	return (level+20)/(level + 100)
 end
 
 function estimateStat(level)

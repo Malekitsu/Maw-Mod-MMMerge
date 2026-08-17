@@ -443,7 +443,10 @@ end
 
 
 function encStrUpNormal(tier)
-	return math.min(tier*3, 100)
+	if tier<=12 then
+		return 1+tier*2
+	end
+	return 25 + math.min((tier-12)*3, 75)
 end
 
 function encStrUpAusterity(tier)
@@ -472,8 +475,15 @@ local function rollEnchantStrength(tier, ancientTier)
 	return applyDifficulty(round(encStrUp(tier)*math.random(8,20)/20))
 end
 
+LOOT_STRENGTH_MAX = 6
+
+function GetLootStrength(level)
+	return math.min(1 + (level or 0)/TIER_LEVELS, LOOT_STRENGTH_MAX)
+end
+
 function GetMaxEnchantStrength(level)
-	return encStrUp((level or 0)/TIER_LEVELS)*GetDifficultyExtraPower()*PRIMORDIAL_ENCHANT_MULT
+	local tier = (level or 0)/TIER_LEVELS + GetLootStrength(level)
+	return encStrUp(tier)*GetDifficultyExtraPower()*PRIMORDIAL_ENCHANT_MULT
 end
 
 local PRIMORDIAL_CHARGES_MULT = 1.2
@@ -666,7 +676,7 @@ function RollStatFromList(list, exclude)
 	return id
 end
 
-TIER_LEVELS = 16
+TIER_LEVELS = 13.5
 
 function GetTier(level)
 	return math.floor((level or 0)/TIER_LEVELS)
