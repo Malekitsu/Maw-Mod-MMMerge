@@ -575,11 +575,14 @@ const.Rarity={
 }
 
 rarityUpgradeChance = {
-	[const.Rarity.Celestial]  = 0.001,
-	[const.Rarity.Legendary]  = 0.02,
-	[const.Rarity.Primordial] = 0.03,
+	[const.Rarity.Celestial]  = 0.002,
+	[const.Rarity.Legendary]  = 0.03,
+	[const.Rarity.Primordial] = 0.04,
 	[const.Rarity.Ancient]    = 0.12,
 }
+
+BOSS_ROLL_DIVISOR = 4	--band roll window: math.random()/BOSS_ROLL_DIVISOR
+BOSS_RARITY_MULT = 2	--upgrade cascade multiplier
 
 local rarityDifficultyMult = {
 	[1] = 1,	--bolster 40
@@ -676,7 +679,7 @@ end
 function GetRarityMultiplier(pseudoStr, bossLoot, lootMultiplier)
 	local mult=GetRarityBaseMultiplier(pseudoStr, lootMultiplier)
 	if bossLoot then
-		mult=mult*5
+		mult=mult*BOSS_RARITY_MULT
 	end
 	if mapvars and mapvars.mapAffixes then
 		local nAff=0
@@ -1117,7 +1120,7 @@ function events.ItemGenerated(t)
 		local bands, bandTotal=GetEnchantBands(pseudoStr)
 		local roll=math.random()
 		if drop.boss then
-			roll=roll/4 --this makes higher tier bosses to always drop an epic
+			roll=roll/BOSS_ROLL_DIVISOR --this makes higher tier bosses to always drop an epic
 		end
 		roll=roll*bandTotal
 		local rarity=const.Rarity.Common
