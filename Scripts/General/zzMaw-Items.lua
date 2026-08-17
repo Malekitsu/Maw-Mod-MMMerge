@@ -465,14 +465,14 @@ end
 
 local PRIMORDIAL_ENCHANT_MULT = 1.25
 local function rollEnchantStrength(tier, rarity)
-	if rarity==const.Rarity.Primordial or rarity==const.Rarity.Celestial then
-		return round(applyDifficulty(encStrUp(tier))*PRIMORDIAL_ENCHANT_MULT)
-	elseif rarity==const.Rarity.Ancient then
-		return round(applyDifficulty(encStrUp(tier))*math.random(20,PRIMORDIAL_ENCHANT_MULT*20)/20)
-	elseif rarity==const.Rarity.Legendary then
-		return round(applyDifficulty(encStrUp(tier))*math.random(16,20)/20)
+	local range=enchantStrengthRange[rarity]
+	if range then
+		return round(applyDifficulty(encStrUp(tier))
+			*math.random(range.Min, range.Max)/ENCHANT_STRENGTH_DIV)
 	end
-	return applyDifficulty(round(encStrUp(tier)*math.random(8,20)/20))
+	range=ENCHANT_STRENGTH_DEFAULT
+	return applyDifficulty(round(encStrUp(tier)
+		*math.random(range.Min, range.Max)/ENCHANT_STRENGTH_DIV))
 end
 
 LOOT_STRENGTH_MAX = 6
@@ -481,9 +481,12 @@ function GetLootStrength(level)
 	return math.min(1 + (level or 0)/TIER_LEVELS, LOOT_STRENGTH_MAX)
 end
 
+function GetLootTier(level)
+	return (level or 0)/TIER_LEVELS + GetLootStrength(level)
+end
+
 function GetMaxEnchantStrength(level)
-	local tier = (level or 0)/TIER_LEVELS + GetLootStrength(level)
-	return encStrUp(tier)*GetDifficultyExtraPower()*PRIMORDIAL_ENCHANT_MULT
+	return encStrUp(GetLootTier(level))*GetDifficultyExtraPower()*PRIMORDIAL_ENCHANT_MULT
 end
 
 local PRIMORDIAL_CHARGES_MULT = 1.2
@@ -560,19 +563,6 @@ function GetEnchantTierBonus()
 	return bonus
 end
 
---=============================== RARITY ===============================
---The whole ladder in one place, on the const.Rarity keys. Never stored in
---saves: an item carries its AncientTier/affix/celestial bits (zMaw_ItemBits).
---BANDS (Common..Epic, enchantChances): each row is a CUMULATIVE chance --
---  "this band or better", in percent, min(Cap, Base + PerTier*pseudoStr).
---  Readable as a table; the roll needs widths, so GetEnchantBands differences
---  the rows, scales each width by rarityBandMult, then RENORMALISES to 100.
---  Multiplying widths and normalising after is what keeps every band alive
---  and off the 100 ceiling -- the cost is that a mult is relative, not
---  absolute: at cap, "epic x2" takes epic from 15% to 25%, and the ratios
---  between the bands are what it states exactly. A boss halves its roll.
---UPGRADES (Ancient..Celestial, rarityUpgradeChance): rolled only when the
---  Epic band hits -- best first, with pity, scaled by GetRarityMultiplier.
 const.Rarity={
 	Common=1,
 	Uncommon=2,
@@ -612,26 +602,22 @@ local rarityPityField = {
 --rows must stay ordered: Epic <= Rare <= Uncommon <= Common, or the band in
 --between collapses to nothing
 enchantChances={
-	[const.Rarity.Epic]    ={Base=1,   PerTier=0.9, Cap=15},
-	[const.Rarity.Rare]    ={Base=8,   PerTier=4,   Cap=35},
-	[const.Rarity.Uncommon]={Base=35,  PerTier=10,  Cap=60},
+	[const.Rarity.Epic]    ={Base=0,   PerTier=0.5, Cap=15},
+	[const.Rarity.Rare]    ={Base=15,   PerTier=1,   Cap=35},
+	[const.Rarity.Uncommon]={Base=45,  PerTier=0.5,  Cap=60},
 	[const.Rarity.Common]  ={Base=100, PerTier=0,   Cap=100},
 }
-
---the chance of landing in this band OR ANY BETTER one
+--cap at tier 30
 function GetEnchantChance(rarity, pseudoStr)
 	local c=enchantChances[rarity]
 	return math.min(c.Base + c.PerTier*pseudoStr, c.Cap)
 end
 
---each band's own width, difficulty applied, renormalised to sum to 100.
---Returns the widths keyed by rarity plus their total.
-function GetEnchantBands(pseudoStr)
-	local mult=rarityBandMult[GetDifficulty()] or {}
+function GetEnchantBands(pseudoStr, difficulty)
+	local mult=rarityBandMult[difficulty or GetDifficulty()] or {}
 	local widths, total, previous = {}, 0, 0
 	for r=const.Rarity.Epic, const.Rarity.Common, -1 do
 		local threshold=GetEnchantChance(r, pseudoStr)
-		--max(): a table tuned out of order would otherwise give a negative width
 		local w=math.max(threshold-previous, 0)*(mult[r] or 1)
 		widths[r]=w
 		total=total+w
@@ -650,20 +636,45 @@ rarityBandMult={
 	[1]={},	--bolster 40
 	[2]={},	--bolster 70
 	[3]={},	--bolster 100, baseline
-	[4]={[const.Rarity.Epic]=1.15, [const.Rarity.Rare]=1.05},	--bolster 150
-	[5]={[const.Rarity.Epic]=1.3,  [const.Rarity.Rare]=1.07},	--bolster 200
-	[6]={[const.Rarity.Epic]=1.6,  [const.Rarity.Rare]=1.13},	--bolster 300
-	[7]={[const.Rarity.Epic]=2,    [const.Rarity.Rare]=1.2},	--doom
-	[8]={[const.Rarity.Epic]=2,    [const.Rarity.Rare]=1.2},	--road to insanity
-	[9]={[const.Rarity.Epic]=2,    [const.Rarity.Rare]=1.2},	--beyond madness
+	[4]={[const.Rarity.Epic]=1.5, [const.Rarity.Rare]=1.4, [const.Rarity.Uncommon]=1.4},	--bolster 150
+	[5]={[const.Rarity.Epic]=2,   [const.Rarity.Rare]=1.8, [const.Rarity.Uncommon]=1.6},	--bolster 200
+	[6]={[const.Rarity.Epic]=2.5, [const.Rarity.Rare]=2.2, [const.Rarity.Uncommon]=1.8},	--bolster 300
+	[7]={[const.Rarity.Epic]=3,   [const.Rarity.Rare]=2.6, [const.Rarity.Uncommon]=2},	--doom
+	[8]={[const.Rarity.Epic]=4,   [const.Rarity.Rare]=3, [const.Rarity.Uncommon]=2.2},	--road to insanity
+	[9]={[const.Rarity.Epic]=5.5, [const.Rarity.Rare]=3.4, [const.Rarity.Uncommon]=2.4},	--beyond madness
+}
+
+enchantStrengthRange={
+	[const.Rarity.Celestial] ={Min=25, Max=25},
+	[const.Rarity.Primordial]={Min=25, Max=25},
+	[const.Rarity.Ancient]   ={Min=20, Max=25},
+	[const.Rarity.Legendary] ={Min=16, Max=20},
+}
+ENCHANT_STRENGTH_DEFAULT={Min=8, Max=20}	--Common..Epic
+ENCHANT_STRENGTH_DIV=20
+
+enchantCountByRarity={
+	[const.Rarity.Common]=0,
+	[const.Rarity.Uncommon]=1,
+	[const.Rarity.Rare]=2,
+	[const.Rarity.Epic]=3,
+	[const.Rarity.Ancient]=3,
+	[const.Rarity.Primordial]=3,
+	[const.Rarity.Legendary]=3,
+	[const.Rarity.Celestial]=3,
 }
 --============================= end RARITY =============================
 
-function GetRarityMultiplier(pseudoStr, bossLoot, lootMultiplier)
+function GetRarityBaseMultiplier(pseudoStr, lootMultiplier, difficulty)
 	--how far the loot has ramped at this tier, from the same curve the roll uses
 	local tierFactor=GetEnchantChance(const.Rarity.Uncommon, pseudoStr)
 		/enchantChances[const.Rarity.Uncommon].Cap
-	local mult=(rarityDifficultyMult[GetDifficulty()] or 1)*tierFactor*(lootMultiplier or 1)^0.5
+	return (rarityDifficultyMult[difficulty or GetDifficulty()] or 1)
+		*tierFactor*(lootMultiplier or 1)^0.5
+end
+
+function GetRarityMultiplier(pseudoStr, bossLoot, lootMultiplier)
+	local mult=GetRarityBaseMultiplier(pseudoStr, lootMultiplier)
 	if bossLoot then
 		mult=mult*5
 	end
@@ -711,6 +722,64 @@ function RollItemRarity(pseudoStr, bossLoot, noLegendary, lootMultiplier)
 	end
 	return result
 end
+
+local function enchantStrengthMean(rarity)
+	local range=enchantStrengthRange[rarity] or ENCHANT_STRENGTH_DEFAULT
+	return (range.Min+range.Max)/2/ENCHANT_STRENGTH_DIV
+end
+
+--one drop's worth, as a fraction of that ceiling: how many enchant slots the
+--rarity fills, times how hard they rolled
+local function rarityItemFraction(rarity)
+	local slots=enchantCountByRarity[const.Rarity.Celestial]
+	local ceiling=enchantStrengthMean(const.Rarity.Primordial)
+	return enchantCountByRarity[rarity]/slots*enchantStrengthMean(rarity)/ceiling
+end
+
+function GetRarityDistribution(pseudoStr, difficulty)
+	local bands=GetEnchantBands(pseudoStr, difficulty)
+	local dist={}
+	for rarity=const.Rarity.Common, const.Rarity.Epic do
+		dist[rarity]=(bands[rarity] or 0)/100
+	end
+	local epic=dist[const.Rarity.Epic]
+	local mult=GetRarityBaseMultiplier(pseudoStr, nil, difficulty)
+	local left=1
+	for rarity=const.Rarity.Celestial, const.Rarity.Ancient, -1 do
+		local chance=math.min(rarityUpgradeChance[rarity]*mult, 1)
+		dist[rarity]=epic*left*chance
+		left=left-left*chance
+	end
+	dist[const.Rarity.Epic]=epic*left
+	return dist
+end
+
+local rarityByValue
+local function getRarityByValue()
+	if not rarityByValue then
+		rarityByValue={}
+		for rarity=const.Rarity.Common, const.Rarity.Celestial do
+			rarityByValue[#rarityByValue+1]=rarity
+		end
+		table.sort(rarityByValue, function(a, b)
+			return rarityItemFraction(a)<rarityItemFraction(b)
+		end)
+	end
+	return rarityByValue
+end
+
+function GetExpectedEnchantFraction(pseudoStr, drops, difficulty)
+	local dist=GetRarityDistribution(pseudoStr, difficulty)
+	local n=math.max(drops or 1, 1)
+	local expected, below=0, 0
+	for _, rarity in ipairs(getRarityByValue()) do
+		local cumulative=below+(dist[rarity] or 0)
+		expected=expected+rarityItemFraction(rarity)*(cumulative^n-below^n)
+		below=cumulative
+	end
+	return expected
+end
+--======================= end EXPECTED LOOT QUALITY =======================
 
 function RollEnchantType(it, exclude)
 	local highest=GetItemEquipStat(it)==10 and 16 or 10
@@ -1048,7 +1117,7 @@ function events.ItemGenerated(t)
 		local bands, bandTotal=GetEnchantBands(pseudoStr)
 		local roll=math.random()
 		if drop.boss then
-			roll=roll/2
+			roll=roll/4 --this makes higher tier bosses to always drop an epic
 		end
 		roll=roll*bandTotal
 		local rarity=const.Rarity.Common

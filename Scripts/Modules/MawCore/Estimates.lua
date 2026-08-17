@@ -148,8 +148,51 @@ function getTotalEnchantPower(level)
 	return ENCHANTS_PER_ITEM*TOTAL_SLOTS*GetMaxEnchantStrength(level)
 end
 
-function gearedFraction(level)
+local function gearedAnchor(level)
 	return (level+20)/(level + 100)
+end
+
+local GEARED_ANCHOR_DIFFICULTY = 9	--beyond madness
+
+--both are AT MADNESS, the anchor: lower difficulties are scaled down below
+local DROPS_PER_SLOT_RATE = 3.6		--a candidate every ~3.6 levels early on
+local DROPS_PER_SLOT_CAP = 140		--saturating at ~140 seen per slot
+
+--Almost all loot comes off monsters, so drops seen scale with monster density.
+local DROPS_DENSITY_BY_DIFFICULTY = {
+	[1] = 0.40,	--bolster 40
+	[2] = 0.40,	--bolster 70
+	[3] = 0.40,	--bolster 100, baseline
+	[4] = 0.43,	--bolster 150
+	[5] = 0.47,	--bolster 200
+	[6] = 0.59,	--bolster 300
+	[7] = 0.66,	--doom
+	[8] = 0.74,	--road to insanity
+	[9] = 1,	--beyond madness
+}
+
+local function dropsSeenPerSlot(level, difficulty)
+	local density = DROPS_DENSITY_BY_DIFFICULTY[difficulty] or 1
+	return (level/(DROPS_PER_SLOT_RATE + level/DROPS_PER_SLOT_CAP) + 1)*density
+end
+
+local gearedCache, gearedCacheDifficulty = {}, nil
+
+function gearedFraction(level)
+	local difficulty = GetDifficulty()
+	if difficulty ~= gearedCacheDifficulty then
+		gearedCache, gearedCacheDifficulty = {}, difficulty
+	end
+	local cached = gearedCache[level]
+	if not cached then
+		local tier = GetLootTier(level)
+		cached = gearedAnchor(level)
+			*GetExpectedEnchantFraction(tier, dropsSeenPerSlot(level, difficulty), difficulty)
+			/GetExpectedEnchantFraction(tier,
+				dropsSeenPerSlot(level, GEARED_ANCHOR_DIFFICULTY), GEARED_ANCHOR_DIFFICULTY)
+		gearedCache[level] = cached
+	end
+	return cached
 end
 
 function estimateStat(level)
