@@ -464,12 +464,12 @@ local function applyDifficulty(strength)
 end
 
 local PRIMORDIAL_ENCHANT_MULT = 1.25
-local function rollEnchantStrength(tier, ancientTier)
-	if ancientTier==2 then
+local function rollEnchantStrength(tier, rarity)
+	if rarity==const.Rarity.Primordial or rarity==const.Rarity.Celestial then
 		return round(applyDifficulty(encStrUp(tier))*PRIMORDIAL_ENCHANT_MULT)
-	elseif ancientTier==1 then
+	elseif rarity==const.Rarity.Ancient then
 		return round(applyDifficulty(encStrUp(tier))*math.random(20,PRIMORDIAL_ENCHANT_MULT*20)/20)
-	elseif ancientTier==3 then
+	elseif rarity==const.Rarity.Legendary then
 		return round(applyDifficulty(encStrUp(tier))*math.random(16,20)/20)
 	end
 	return applyDifficulty(round(encStrUp(tier)*math.random(8,20)/20))
@@ -489,8 +489,6 @@ end
 local PRIMORDIAL_CHARGES_MULT = 1.2
 local ANCIENT_MIN_CHARGES = 2
 local PRIMORDIAL_MIN_CHARGES = 4
-local LEGENDARY_CHARGES_MULT = 1.2
-local LEGENDARY_CHARGES_BONUS = 10
 
 function GetMaxItemCharges()
 	return MawCore.ItemLevel.MaxPower()
@@ -500,19 +498,23 @@ function GetItemChargesCap(it)
 	return MawCore.ItemLevel.MaxPower()
 end
 
-local function rollTierCharges(charges, ancientTier)
-	local rolled = charges
-	if ancientTier==2 then
+local function rollTierCharges(charges, rarity)
+	local rolled
+	if rarity==const.Rarity.Primordial or rarity==const.Rarity.Celestial then
 		rolled = math.max(round(charges*PRIMORDIAL_CHARGES_MULT), charges+PRIMORDIAL_MIN_CHARGES)
-	elseif ancientTier==1 then
+	elseif rarity==const.Rarity.Ancient then
 		rolled = math.max(round(charges*math.random(20,PRIMORDIAL_CHARGES_MULT*20)/20),
 			charges+ANCIENT_MIN_CHARGES)
+	elseif rarity==const.Rarity.Legendary then
+		rolled = round(charges*math.random(16,20)/20)
+	else
+		rolled = round(charges*math.random(12,20)/20)
 	end
 	return math.min(rolled, GetMaxItemCharges())
 end
 
 function GetPrimordialCharges(level)
-	return rollTierCharges(MawCore.ItemLevel.PowerFor(level), 2)
+	return rollTierCharges(MawCore.ItemLevel.PowerFor(level), const.Rarity.Primordial)
 end
 
 function GetItemDropLevel(it)
@@ -521,10 +523,6 @@ function GetItemDropLevel(it)
 		return stored
 	end
 	local charges=it.MaxCharges
-	if HasLegendaryAffix(it) then
-		charges=math.floor(math.max(charges/LEGENDARY_CHARGES_MULT,
-			charges-LEGENDARY_CHARGES_BONUS))
-	end
 	local tier=GetAncientTier(it)
 	if tier==2 then
 		charges=math.floor(math.min(charges/PRIMORDIAL_CHARGES_MULT,
@@ -562,14 +560,24 @@ function GetEnchantTierBonus()
 	return bonus
 end
 
-RARITY_UNCOMMON, RARITY_RARE, RARITY_EPIC = 1, 2, 3
-RARITY_ANCIENT, RARITY_PRIMORDIAL, RARITY_LEGENDARY, RARITY_CELESTIAL = 4, 5, 6, 7
+--The one rarity scale, lowest to highest. Never stored in saves: an item
+--carries its AncientTier/affix/celestial bits instead (zMaw_ItemBits).
+const.Rarity={
+	Common=1,
+	Uncommon=2,
+	Rare=3,
+	Epic=4,
+	Ancient=5,
+	Primordial=6,
+	Legendary=7,
+	Celestial=8,
+}
 
 rarityChance = {
-	[RARITY_CELESTIAL]  = 0.001,
-	[RARITY_LEGENDARY]  = 0.02,
-	[RARITY_PRIMORDIAL] = 0.03,
-	[RARITY_ANCIENT]    = 0.12,
+	[const.Rarity.Celestial]  = 0.001,
+	[const.Rarity.Legendary]  = 0.02,
+	[const.Rarity.Primordial] = 0.03,
+	[const.Rarity.Ancient]    = 0.12,
 }
 
 local rarityDifficultyMult = {
@@ -585,28 +593,16 @@ local rarityDifficultyMult = {
 }
 
 local rarityPityField = {
-	[RARITY_CELESTIAL]  = "celestialPityCounter",
-	[RARITY_LEGENDARY]  = "legendaryPityCounter",
-	[RARITY_PRIMORDIAL] = "primordialPityCounter",
+	[const.Rarity.Celestial]  = "celestialPityCounter",
+	[const.Rarity.Legendary]  = "legendaryPityCounter",
+	[const.Rarity.Primordial] = "primordialPityCounter",
 }
-
---Which roll rollEnchantStrength should use. These are ids, not a scale: 3 is
---the legendary roll and sits BELOW 1 (ancient) in strength.
-function GetRarityEnchantTier(rarity)
-	if rarity==RARITY_PRIMORDIAL or rarity==RARITY_CELESTIAL then
-		return 2
-	elseif rarity==RARITY_ANCIENT then
-		return 1
-	elseif rarity==RARITY_LEGENDARY then
-		return 3
-	end
-	return 0
-end
 
 --lootMultiplier arrives as an argument: the drop context owns it, this is a
 --pure function of what it is handed.
 function GetRarityMultiplier(pseudoStr, bossLoot, lootMultiplier)
-	local tierFactor=enc1Chance[math.min(pseudoStr,#enc1Chance)]/enc1Chance[#enc1Chance]
+	--how far the loot has ramped at this tier, from the same table the roll uses
+	local tierFactor=anyEnchantChance[math.min(pseudoStr,#anyEnchantChance)]/anyEnchantChance[#anyEnchantChance]
 	local mult=(rarityDifficultyMult[GetDifficulty()] or 1)*tierFactor*(lootMultiplier or 1)^0.5
 	if bossLoot then
 		mult=mult*5
@@ -625,10 +621,10 @@ end
 
 function RollItemRarity(pseudoStr, bossLoot, noLegendary, lootMultiplier)
 	local mult=GetRarityMultiplier(pseudoStr, bossLoot, lootMultiplier)
-	local result=RARITY_EPIC
-	for rarity=RARITY_CELESTIAL, RARITY_ANCIENT, -1 do
+	local result=const.Rarity.Epic
+	for rarity=const.Rarity.Celestial, const.Rarity.Ancient, -1 do
 		local base=rarityChance[rarity]
-		if noLegendary and rarity>=RARITY_LEGENDARY then
+		if noLegendary and rarity>=const.Rarity.Legendary then
 			base=0
 		end
 		if base>0 then
@@ -649,7 +645,7 @@ function RollItemRarity(pseudoStr, bossLoot, noLegendary, lootMultiplier)
 		end
 	end
 	for rarity, field in pairs(rarityPityField) do
-		if rarity>result and not (noLegendary and rarity>=RARITY_LEGENDARY) then
+		if rarity>result and not (noLegendary and rarity>=const.Rarity.Legendary) then
 			vars[field]=(vars[field] or 0)+mult
 		end
 	end
@@ -681,31 +677,52 @@ TIER_LEVELS = 13.5
 function GetTier(level)
 	return math.floor((level or 0)/TIER_LEVELS)
 end
-local function rollMaxCharges(maxCharges)
-	return round(maxCharges*math.random(16,20)/20)
-end
 
-enc1ChanceNormal={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80}
-enc2ChanceNormal={20,30,35,40,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60}
-spcEncChanceNormal={5,10,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40}
-enc1ChanceAusterity={20,20,21,21,22,22,23,23,24,24,25,25,26,26,27,27,28,28,29,29}
-enc2ChanceAusterity={10,10,11,11,12,12,13,13,14,14,15,15,16,16,17,17,18,18,19,19}
-spcEncChanceAusterity={40,40,41,41,42,42,43,43,44,44,45,45,46,46,47,47,48,48,49,49}
-enc1Chance=enc1ChanceNormal
-enc2Chance=enc2ChanceNormal
-spcEncChance=spcEncChanceNormal
+--ONE roll decides how enchanted a drop is. The tables are CUMULATIVE chances
+--("this band or better"), in percent, indexed by pseudoStr:
+--  epic = 2 enchants + special, and the ticket into RollItemRarity's ancient+ ladder
+--  rare = at least 2 enchants
+--  any  = at least 1 enchant
+--Difficulty multiplies epic/rare via rarityBandMult; a boss halves its roll.
+--The numbers are what the old three-coin system produced, now stated directly.
+epicEnchantChanceNormal={0.2,0.9,2,4,7,8,9,9,10,10,11,12,13,14,14,15,16,17,18,19}
+rareEnchantChanceNormal={6,13,21,30,42,44,45,47,48,50,52,53,55,56,58,59,61,63,64,66}
+anyEnchantChanceNormal={39,56,67,76,86,86,87,88,89,90,90,91,91,92,93,93,94,94,95,95}
+
+epicEnchantChanceAusterity={0.8,0.8,0.9,0.9,1.1,1.1,1.3,1.3,1.5,1.5,1.7,1.7,1.9,1.9,2,2,2,2,3,3}
+rareEnchantChanceAusterity={12,12,14,14,15,15,16,16,17,17,18,18,20,20,21,21,22,22,24,24}
+anyEnchantChanceAusterity={57,57,59,59,60,60,62,62,63,63,65,65,66,66,68,68,69,69,71,71}
+
+epicEnchantChance=epicEnchantChanceNormal
+rareEnchantChance=rareEnchantChanceNormal
+anyEnchantChance=anyEnchantChanceNormal
+
+--difficulty multiplies the two upper bands, flat: "madness: epic chance x2".
+--any is untouched on purpose: difficulty changes how good a drop is, not how
+--often it is enchanted. Same shape as rarityDifficultyMult for ancient+.
+rarityBandMult={
+	[1]={epic=1,    rare=1},	--bolster 40
+	[2]={epic=1,    rare=1},	--bolster 70
+	[3]={epic=1,    rare=1},	--bolster 100, baseline
+	[4]={epic=1.15, rare=1.05},	--bolster 150
+	[5]={epic=1.3,  rare=1.07},	--bolster 200
+	[6]={epic=1.6,  rare=1.13},	--bolster 300
+	[7]={epic=2,    rare=1.2},	--doom
+	[8]={epic=2,    rare=1.2},	--road to insanity
+	[9]={epic=2,    rare=1.2},	--beyond madness
+}
 
 function events.BeforeLoadMap()
 	if vars.AusterityMode then
 		encStrUp=encStrUpAusterity
-		enc1Chance=enc1ChanceAusterity
-		enc2Chance=enc2ChanceAusterity
-		spcEncChance=spcEncChanceAusterity
+		epicEnchantChance=epicEnchantChanceAusterity
+		rareEnchantChance=rareEnchantChanceAusterity
+		anyEnchantChance=anyEnchantChanceAusterity
 	else
 		encStrUp=encStrUpNormal
-		enc1Chance=enc1ChanceNormal
-		enc2Chance=enc2ChanceNormal
-		spcEncChance=spcEncChanceNormal
+		epicEnchantChance=epicEnchantChanceNormal
+		rareEnchantChance=rareEnchantChanceNormal
+		anyEnchantChance=anyEnchantChanceNormal
 	end
 end
 
@@ -989,12 +1006,8 @@ function events.ItemGenerated(t)
 			partyLevel=round(partyLevel*(math.min(partyLevel/160 + currentLevel/80,1)))
 		end
 		]]
-		--ADD MAX CHARGES BASED ON PARTY LEVEL
-		local maxChargesCap=MawCore.ItemLevel.MaxPower()
 		local dropLevel=MawCore.ItemLevel.ForDrop(drop.monsterLevel, partyLevel, mapLevel)
-
 		SetStoredDropLevel(it, dropLevel)
-		it.MaxCharges=rollMaxCharges(MawCore.ItemLevel.PowerFor(dropLevel))
 		
 		--enchant tier and charges both read dropLevel: one item, one level
 		local partyLevel1=GetTier(dropLevel)+GetEnchantTierBonus()
@@ -1011,47 +1024,35 @@ function events.ItemGenerated(t)
 		if dropLevel%TIER_LEVELS/TIER_LEVELS > math.random() then
 			pseudoStr=pseudoStr+1
 		end
-		--difficulty multiplier
-		local diffMult=math.max((Game.BolsterAmount-100)/500+1,1)
-		if vars.Mode==2 then
-			diffMult=1.8
-		end
-
-		--the common end: how many of the three enchant chances hit
-		local p1=enc1Chance[math.min(pseudoStr,#enc1Chance)]/100
-		local p2=enc2Chance[math.min(pseudoStr,#enc2Chance)]/100
-		local p3=spcEncChance[math.min(pseudoStr,#spcEncChance)]/100
-		p1=p1^(1/diffMult)
-		p2=p2^(1/diffMult)
-		p3=p3^(1/diffMult)
-		local roll1,roll2,rollSpc=math.random(),math.random(),math.random()
+		--one roll against the cumulative chances, best band first
+		local idx=math.min(pseudoStr,#epicEnchantChance)
+		local bandMult=rarityBandMult[GetDifficulty()] or rarityBandMult[3]
+		local roll=math.random()
 		if drop.boss then
-			roll1=roll1/2
-			roll2=roll2/2
-			rollSpc=rollSpc/2
+			roll=roll/2
 		end
-		local rarity=0
-		if p1>roll1 then
-			rarity=rarity+1
-		end
-		if p2>roll2 then
-			rarity=rarity+1
-		end
-		if p3>rollSpc then
-			rarity=rarity+1
+		local rarity=const.Rarity.Common
+		if roll<epicEnchantChance[idx]/100*bandMult.epic then
+			rarity=const.Rarity.Epic
+		elseif roll<rareEnchantChance[idx]/100*bandMult.rare then
+			rarity=const.Rarity.Rare
+		elseif roll<anyEnchantChance[idx]/100 then
+			rarity=const.Rarity.Uncommon
 		end
 		local noLegendary=vars.AusterityMode or Game.HouseScreen==2 or Game.HouseScreen==95
-		if rarity==RARITY_EPIC then
+		if rarity==const.Rarity.Epic then
 			rarity=RollItemRarity(pseudoStr, drop.boss, noLegendary, drop.multiplier)
 		end
 		if drop.omnipotent then
-			rarity=RARITY_CELESTIAL
+			rarity=const.Rarity.Celestial
 		end
-		local enchantTier=GetRarityEnchantTier(rarity)
 
-		if rarity>=RARITY_UNCOMMON then
+		--charges: every drop rolls here, the rarity decides the range
+		it.MaxCharges=rollTierCharges(MawCore.ItemLevel.PowerFor(dropLevel), rarity)
+
+		if rarity>=const.Rarity.Uncommon then
 			it.Bonus=RollEnchantType(it)
-			it.BonusStrength=rollEnchantStrength(pseudoStr, enchantTier)
+			it.BonusStrength=rollEnchantStrength(pseudoStr, rarity)
 			if math.random(1,10)==10 then
 				it.Bonus=math.random(17,24)
 				local skill=it:T().Skill
@@ -1063,8 +1064,8 @@ function events.ItemGenerated(t)
 			end
 		end
 		--apply enchant2
-		if rarity>=RARITY_RARE then
-			local enc2Strength=rollEnchantStrength(pseudoStr, enchantTier)
+		if rarity>=const.Rarity.Rare then
+			local enc2Strength=rollEnchantStrength(pseudoStr, rarity)
 			--bonus type
 			SetEnc2(it,RollEnchantType(it, it.Bonus),enc2Strength)
 			--[[ no skill bonuses
@@ -1080,12 +1081,11 @@ function events.ItemGenerated(t)
 			it.Charges=0
 		end
 				
-		if rarity==RARITY_ANCIENT then
-			it.MaxCharges=rollTierCharges(it.MaxCharges, 1)
+		if rarity==const.Rarity.Ancient then
 			SetAncientTier(it,1)
 		end
 		--apply special enchant: only a boss drop reaches the top-tier-only band
-		if rarity>=RARITY_EPIC then
+		if rarity>=const.Rarity.Epic then
 			local c=Game.ItemsTxt[it.Number].EquipStat
 			if c<12 then
 				local power=math.max(math.min(ps1, drop.boss and 6 or 5), 3)
@@ -1108,13 +1108,12 @@ function events.ItemGenerated(t)
 		
 		
 		--primordial item, and the celestial that carries its grade: the special
-		--enchant is the one the ancient roll above already gave them
-		if enchantTier==2 then
+		--enchant is the one the epic roll above already gave them
+		if rarity==const.Rarity.Primordial or rarity==const.Rarity.Celestial then
 			SetAncientTier(it,2)
-			it.MaxCharges=rollTierCharges(it.MaxCharges, 2)
 		end
 
-		if rarity>=RARITY_LEGENDARY then
+		if rarity>=const.Rarity.Legendary then
 			vars.legendaryAffixDropped=vars.legendaryAffixDropped or {}
 			for i = 1, LEGENDARY_AFFIX_COUNT do
 				vars.legendaryAffixDropped[i] = vars.legendaryAffixDropped[i] or 0
@@ -1130,12 +1129,9 @@ function events.ItemGenerated(t)
 					it.Bonus2=46
 				end
 			end
-			it.MaxCharges=round(math.min(maxChargesCap,
-				it.MaxCharges*LEGENDARY_CHARGES_MULT,
-				it.MaxCharges+LEGENDARY_CHARGES_BONUS))
 		end
 		--celestial
-		if rarity==RARITY_CELESTIAL then
+		if rarity==const.Rarity.Celestial then
 			SetCelestialItem(it,true)
 		end
 		--nerf to skills
