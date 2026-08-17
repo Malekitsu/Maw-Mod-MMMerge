@@ -287,9 +287,10 @@ function events.PickCorpse(t)
 				lvl = mapvars.uniqueMonsterLevel[id]
 			end
 			local itemTier = lvl / 20 + 2
-			if itemTier % 15 / 15 > math.random() then
+			if itemTier % 1 > math.random() then
 				itemTier = itemTier + 1
 			end
+			itemTier = math.floor(itemTier)
 			mon.TreasureItemLevel = math.max(math.min(itemTier, 6), 2)
 			dropIsBoss = true
 			local monsterSkill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
@@ -620,16 +621,16 @@ enchantChances={
 	[const.Rarity.Common]  ={Base=100, PerTier=0,   Cap=100},
 }
 --cap at tier 30
-function GetEnchantChance(rarity, pseudoStr)
+function GetEnchantChance(rarity, lootTier)
 	local c=enchantChances[rarity]
-	return math.min(c.Base + c.PerTier*pseudoStr, c.Cap)
+	return math.min(c.Base + c.PerTier*lootTier, c.Cap)
 end
 
-function GetEnchantBands(pseudoStr, difficulty)
+function GetEnchantBands(lootTier, difficulty)
 	local mult=rarityBandMult[difficulty or GetDifficulty()] or {}
 	local widths, total, previous = {}, 0, 0
 	for r=const.Rarity.Epic, const.Rarity.Common, -1 do
-		local threshold=GetEnchantChance(r, pseudoStr)
+		local threshold=GetEnchantChance(r, lootTier)
 		local w=math.max(threshold-previous, 0)*(mult[r] or 1)
 		widths[r]=w
 		total=total+w
@@ -677,16 +678,16 @@ enchantCountByRarity={
 }
 --============================= end RARITY =============================
 
-function GetRarityBaseMultiplier(pseudoStr, lootMultiplier, difficulty)
+function GetRarityBaseMultiplier(lootTier, lootMultiplier, difficulty)
 	--how far the loot has ramped at this tier, from the same curve the roll uses
-	local tierFactor=GetEnchantChance(const.Rarity.Uncommon, pseudoStr)
+	local tierFactor=GetEnchantChance(const.Rarity.Uncommon, lootTier)
 		/enchantChances[const.Rarity.Uncommon].Cap
 	return (rarityDifficultyMult[difficulty or GetDifficulty()] or 1)
 		*tierFactor*(lootMultiplier or 1)^0.5
 end
 
-function GetRarityMultiplier(pseudoStr, bossLoot, lootMultiplier)
-	local mult=GetRarityBaseMultiplier(pseudoStr, lootMultiplier)
+function GetRarityMultiplier(lootTier, bossLoot, lootMultiplier)
+	local mult=GetRarityBaseMultiplier(lootTier, lootMultiplier)
 	if bossLoot then
 		mult=mult*BOSS_RARITY_MULT
 	end
@@ -702,8 +703,8 @@ function GetRarityMultiplier(pseudoStr, bossLoot, lootMultiplier)
 	return mult
 end
 
-function RollItemRarity(pseudoStr, bossLoot, noLegendary, lootMultiplier, isShop)
-	local mult=GetRarityMultiplier(pseudoStr, bossLoot, lootMultiplier)
+function RollItemRarity(lootTier, bossLoot, noLegendary, lootMultiplier, isShop)
+	local mult=GetRarityMultiplier(lootTier, bossLoot, lootMultiplier)
 	local result=const.Rarity.Epic
 	for rarity=const.Rarity.Celestial, const.Rarity.Ancient, -1 do
 		local base=rarityUpgradeChance[rarity]
@@ -755,14 +756,14 @@ local function rarityItemFraction(rarity)
 	return enchantCountByRarity[rarity]/slots*enchantStrengthMean(rarity)/ceiling
 end
 
-function GetRarityDistribution(pseudoStr, difficulty)
-	local bands=GetEnchantBands(pseudoStr, difficulty)
+function GetRarityDistribution(lootTier, difficulty)
+	local bands=GetEnchantBands(lootTier, difficulty)
 	local dist={}
 	for rarity=const.Rarity.Common, const.Rarity.Epic do
 		dist[rarity]=(bands[rarity] or 0)/100
 	end
 	local epic=dist[const.Rarity.Epic]
-	local mult=GetRarityBaseMultiplier(pseudoStr, nil, difficulty)
+	local mult=GetRarityBaseMultiplier(lootTier, nil, difficulty)
 	local left=1
 	for rarity=const.Rarity.Celestial, const.Rarity.Ancient, -1 do
 		local chance=math.min(rarityUpgradeChance[rarity]*mult, 1)
@@ -787,8 +788,8 @@ local function getRarityByValue()
 	return rarityByValue
 end
 
-function GetExpectedEnchantFraction(pseudoStr, drops, difficulty)
-	local dist=GetRarityDistribution(pseudoStr, difficulty)
+function GetExpectedEnchantFraction(lootTier, drops, difficulty)
+	local dist=GetRarityDistribution(lootTier, difficulty)
 	local n=math.max(drops or 1, 1)
 	local expected, below=0, 0
 	for _, rarity in ipairs(getRarityByValue()) do
@@ -809,17 +810,6 @@ function RollEnchantType(it, exclude)
 	return id
 end
 
-function RollStatFromList(list, exclude)
-	if #list<=1 then
-		return list[1]
-	end
-	local id
-	repeat
-		id=list[math.random(1,#list)]
-	until id~=exclude
-	return id
-end
-
 TIER_LEVELS = 13.5
 
 function GetTier(level)
@@ -833,9 +823,6 @@ function events.BeforeLoadMap()
 		encStrUp=encStrUpNormal
 	end
 end
-
-primordialWeapEnchants={39,40,41,46}
-primordialArmorEnchants={1,2,80}
 
 local goldId={187,188,189,197,198,199,999,1000,1001,1799,1800,1801}
 function events.AfterLoadMap()
@@ -1122,18 +1109,18 @@ function events.ItemGenerated(t)
 		--adjust loot Strength
 		local ps1=t.Strength
 
-		local pseudoStr=ps1+partyLevel1
+		local lootTier=ps1+partyLevel1
 		if drop.boss then
-			pseudoStr=pseudoStr+1
+			lootTier=lootTier+1
 		end
 		if drop.omnipotent then
-			pseudoStr=pseudoStr+1
+			lootTier=lootTier+1
 		end
 		if dropLevel%TIER_LEVELS/TIER_LEVELS > math.random() then
-			pseudoStr=pseudoStr+1
+			lootTier=lootTier+1
 		end
 		--one roll walks the normalised band widths, best first
-		local bands, bandTotal=GetEnchantBands(pseudoStr)
+		local bands, bandTotal=GetEnchantBands(lootTier)
 		local roll=math.random()
 		if drop.boss then
 			roll=roll/BOSS_ROLL_DIVISOR --this makes higher tier bosses to always drop an epic
@@ -1151,7 +1138,7 @@ function events.ItemGenerated(t)
 		local isShop=Game.HouseScreen==2 or Game.HouseScreen==95
 		local noLegendary=vars.AusterityMode or isShop
 		if rarity==const.Rarity.Epic then
-			rarity=RollItemRarity(pseudoStr, drop.boss, noLegendary, drop.multiplier, isShop)
+			rarity=RollItemRarity(lootTier, drop.boss, noLegendary, drop.multiplier, isShop)
 		end
 		if drop.omnipotent then
 			rarity=const.Rarity.Celestial
@@ -1162,7 +1149,7 @@ function events.ItemGenerated(t)
 
 		if rarity>=const.Rarity.Uncommon then
 			it.Bonus=RollEnchantType(it)
-			it.BonusStrength=rollEnchantStrength(pseudoStr, rarity)
+			it.BonusStrength=rollEnchantStrength(lootTier, rarity)
 			if math.random(1,10)==10 then
 				it.Bonus=math.random(17,24)
 				local skill=it:T().Skill
@@ -1175,13 +1162,13 @@ function events.ItemGenerated(t)
 		end
 		--apply enchant2
 		if rarity>=const.Rarity.Rare then
-			local enc2Strength=rollEnchantStrength(pseudoStr, rarity)
+			local enc2Strength=rollEnchantStrength(lootTier, rarity)
 			--bonus type
 			SetEnc2(it,RollEnchantType(it, it.Bonus),enc2Strength)
 			--[[ no skill bonuses
 			if math.random(1,10)==10 then
 				it.Charges=math.random(17,24)*1000
-				it.Charges=it.Charges+round(rollEnchantStrength(pseudoStr)^0.5)
+				it.Charges=it.Charges+round(rollEnchantStrength(lootTier)^0.5)
 			end
 			]]
 		end
@@ -4402,135 +4389,6 @@ function events.LoadMap()
 		end
 	end
 end
----------------------------
---PITY SYSTEM CALCULATION--
----------------------------
---[[
--- Tunables
-local SURV_TOL   = 1e-12          -- stop when survival prob < this
-local BISECT_ITR = 30             -- bisection iterations (30 is plenty)
-local TINY_P     = 1e-4           -- threshold to use asymptotic
-local MAX_K_CAP  = 5e6            -- hard safety cap so we don't loop forever
-
--- Compute effective drops/kill for sequence p_k = s * u_k(k), capped at 1
-local function effective_rate(u_k, s, p_base)
-  -- choose an adaptive upper bound: ~c/p is usually enough
-  local max_k = math.min(MAX_K_CAP, math.max(10000, math.floor(20.0 / p_base)))
-
-  -- accumulate survival in log-space for stability when S gets tiny
-  local logS, EK, k = 0.0, 0.0, 0
-  while true do
-    -- S = exp(logS); add S to EK
-    EK = EK + math.exp(logS)
-
-    local pk = s * u_k(k)
-    if pk >= 1 then
-      break
-    end
-
-    -- update survival: logS += log1p(-pk)
-    -- (use stable log1p if available, otherwise approximation)
-    local step = math.log(1 - pk)
-    logS = logS + step
-
-    -- termination criteria
-    if logS < math.log(SURV_TOL) then break end  -- survival tiny enough
-    if k >= max_k then break end
-
-    k = k + 1
-  end
-  return 1.0 / EK
-end
-
--- Asymptotic scale for tiny p (linear pity shape)
-local function tiny_p_scale(p, a)
-  -- s ≈ 1 / (1 + a/(2p)), clamp to [0,1]
-  local s = 1.0 / (1.0 + (a / (2.0 * p)))
-  if s < 0 then s = 0 end
-  if s > 1 then s = 1 end
-  return s
-end
-
--- Find s so that the long-run effective rate equals the base p
-local function scale_for_constant_expectation(p, u_k, a)
-  -- start from a good guess for tiny p to avoid massive loops
-  local lo, hi
-  if p <= TINY_P then
-    local s0 = tiny_p_scale(p, a)
-    -- bracket around s0
-    lo = 0.5 * s0
-    hi = math.min(1.0, s0 * 1.5 + 1e-9)
-  else
-    lo, hi = 0.0, 1.0
-  end
-
-  for _ = 1, BISECT_ITR do
-    local mid = 0.5 * (lo + hi)
-    local r = effective_rate(u_k, mid, p)
-    if r > p then
-      hi = mid
-    else
-      lo = mid
-    end
-  end
-  return 0.5 * (lo + hi)
-end
-
--- Optional tiny cache so we don't recompute s(p,a) every call
-local _scale_cache = {}
-local function _cache_key(p, a)
-  local pr = math.floor(p * 1e9 + 0.5)  -- quantize to 1e-9
-  local ar = math.floor(a * 1e6 + 0.5)  -- quantize to 1e-6
-  return pr .. ":" .. ar
-end
-
--- Returns the pity-adjusted chance for base p, failures k, and slope a (default 0.1)
-function pity_chance(p, k, a)
-  a = (a == nil) and 0.1 or a
-  k = (k and k >= 0) and k or 0
-  if p <= 0 then return 0 end
-  if p >= 1 then return 1 end
-
-  -- linear unscaled pity shape u_k = p * (1 + a*k)
-  local function u_k(idx) return p * (1 + a * idx) end
-
-  -- get or compute scale s so that expectation stays constant
-  local key = _cache_key(p, a)
-  local s = _scale_cache[key]
-  if not s then
-    s = scale_for_constant_expectation(p, u_k, a)
-    _scale_cache[key] = s
-  end
-
-  -- pity-adjusted chance for this failure count
-  local pk = s * u_k(k)
-  if pk > 1 then pk = 1 end
-  if pk < 0 then pk = 0 end
-  return pk
-end
-
-NEW ONE
-succ={}
-chance=0.1
-pity=0
-for i=1,100000 do
-	roll=math.random()
-	win=chance^(1.8-chance*pity)  1.8 is close to the real mean
-	if win>=roll then
-		table.insert(succ, pity)
-		pity=0
-	else
-		pity=pity+1
-	end
-end
-sum=0
-for i=1,#succ do
-	sum=sum+succ[i]
-end
-mean=sum/#succ
-print(mean)
-
-]]
 
 --Each failure raises the chance; the exponent is picked so that the AVERAGE
 --wait stays at 1/chance (within 2% for every rate in use, from 0.5% to 12%).

@@ -272,14 +272,12 @@ local function tooltipEnchantStats(t)
 				if t.Item:T().EquipStat==5 and t.Item:T().Mod2==0 then
 					power=math.ceil(power*1.5)
 				end
-				local resLegendary=false
 				if t.Item.Bonus>=11 and t.Item.Bonus<=16 then
 					local id=Game.CurrentPlayer
 					if id>=0 and id<=Party.High then
 						local index=Party[id]:GetIndex()
 						if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 16) then
 							power=power*1.5
-							resLegendary=true
 						end
 					end
 					power=resistancePercent(power+10, t.Item) .. "%"
@@ -295,14 +293,12 @@ local function tooltipEnchantStats(t)
 				if t.Item:T().EquipStat==5 and t.Item:T().Mod2==0 then
 					strength=math.ceil(strength*1.5)
 				end				
-				local resLegendary=false
 				if bonus>=11 and bonus<=16 then
 					local id=Game.CurrentPlayer
 					if id>=0 and id<=Party.High then
 						local index=Party[id]:GetIndex()
 						if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 16) then
 							strength=strength*1.5
-							resLegendary=true
 						end
 					end
 					strength=resistancePercent(strength+10, t.Item) .. "%"
@@ -456,14 +452,17 @@ local function tooltipEnchantStats(t)
 					totB2=itemStrength[power][c]
 					roll=math.random(1,totB2)
 					tot=0
+					--must stay identical to the apply step in zzAlchemy.lua: this is
+					--the promise, that is the delivery, and they share the seed
 					for i=0,Game.SpcItemsTxt.High do
-						if roll<=tot then
-							enchantNumber=i
-							goto continue
-						elseif table.find(enchants[power], Game.SpcItemsTxt[i].Lvl) then
+						if table.find(enchants[power], Game.SpcItemsTxt[i].Lvl) then
 							tot=tot+Game.SpcItemsTxt[i].ChanceForSlot[c]
+							if roll<=tot then
+								enchantNumber=i+1	--1-based, like Bonus2
+								goto continue
+							end
 						end
-					end	
+					end
 				end
 				:: continue ::
 				if (t.Item.MaxCharges>=0 and bonusEffects[enchantNumber]~= nil) or enchantList[enchantNumber] then

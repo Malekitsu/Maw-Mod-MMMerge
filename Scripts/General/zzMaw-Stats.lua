@@ -1558,23 +1558,24 @@ end
 
 function GetDifficulty()
 	local difficulty=3 --baseline
+	local bolster=Game.BolsterAmount or 100
 	if vars.madnessMode then
 		difficulty=9
 	elseif vars.insanityMode then
 		difficulty=8
 	elseif vars.Mode==2 then
 		difficulty=7
-	elseif Game.BolsterAmount==300 then
+	elseif bolster>=300 then
 		difficulty=6
-	elseif Game.BolsterAmount==200 then
+	elseif bolster>=200 then
 		difficulty=5
-	elseif Game.BolsterAmount==150 then
+	elseif bolster>=150 then
 		difficulty=4
-	elseif Game.BolsterAmount==100 then
+	elseif bolster>=100 then
 		difficulty=3
-	elseif Game.BolsterAmount==70 then
+	elseif bolster>=70 then
 		difficulty=2
-	elseif Game.BolsterAmount==40 then
+	else
 		difficulty=1
 	end
 	return difficulty

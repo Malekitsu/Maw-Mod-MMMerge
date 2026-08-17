@@ -832,13 +832,14 @@ evt.PotionEffects[91] = function(IsDrunk, t, Power)
 			roll=math.random(1,totB2)
 			tot=0
 			for i=0,Game.SpcItemsTxt.High do
-				if roll<=tot then
-					t.Bonus2=i
-					goto continue
-				elseif table.find(enchants[power], Game.SpcItemsTxt[i].Lvl) then
+				if table.find(enchants[power], Game.SpcItemsTxt[i].Lvl) then
 					tot=tot+Game.SpcItemsTxt[i].ChanceForSlot[c]
+					if roll<=tot then
+						t.Bonus2=i+1	--Bonus2 is 1-based: SpcItemsTxt[Bonus2-1]
+						goto continue
+					end
 				end
-			end	
+			end
 		end			
 		::continue::
 		Mouse.Item.Number=0
