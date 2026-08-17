@@ -581,6 +581,15 @@ rarityUpgradeChance = {
 	[const.Rarity.Ancient]    = 0.12,
 }
 
+shopRarityRedirect = {
+	[const.Rarity.Celestial]  = false,
+	[const.Rarity.Legendary]  = false,
+	[const.Rarity.Primordial] = false,
+	[const.Rarity.Ancient]    = const.Rarity.Primordial,
+}
+--the AncientTier a Primordial carries, which is what a shop Ancient gets charged as
+SHOP_ANCIENT_PRICE_TIER = 2
+
 BOSS_ROLL_DIVISOR = 4	--band roll window: math.random()/BOSS_ROLL_DIVISOR
 BOSS_RARITY_MULT = 2	--upgrade cascade multiplier
 
@@ -693,12 +702,15 @@ function GetRarityMultiplier(pseudoStr, bossLoot, lootMultiplier)
 	return mult
 end
 
-function RollItemRarity(pseudoStr, bossLoot, noLegendary, lootMultiplier)
+function RollItemRarity(pseudoStr, bossLoot, noLegendary, lootMultiplier, isShop)
 	local mult=GetRarityMultiplier(pseudoStr, bossLoot, lootMultiplier)
 	local result=const.Rarity.Epic
 	for rarity=const.Rarity.Celestial, const.Rarity.Ancient, -1 do
 		local base=rarityUpgradeChance[rarity]
-		if noLegendary and rarity>=const.Rarity.Legendary then
+		if isShop then
+			local borrow=shopRarityRedirect[rarity]
+			base=borrow and rarityUpgradeChance[borrow] or 0
+		elseif noLegendary and rarity>=const.Rarity.Legendary then
 			base=0
 		end
 		if base>0 then
@@ -718,8 +730,12 @@ function RollItemRarity(pseudoStr, bossLoot, noLegendary, lootMultiplier)
 			end
 		end
 	end
+	--a rarity this roll could never have produced does not charge its pity, which
+	--is what the noLegendary case already did -- the shop just blocks more of them
 	for rarity, field in pairs(rarityPityField) do
-		if rarity>result and not (noLegendary and rarity>=const.Rarity.Legendary) then
+		local blocked=(isShop and not shopRarityRedirect[rarity])
+			or (noLegendary and rarity>=const.Rarity.Legendary)
+		if rarity>result and not blocked then
 			vars[field]=(vars[field] or 0)+mult
 		end
 	end
@@ -1132,9 +1148,10 @@ function events.ItemGenerated(t)
 				break
 			end
 		end
-		local noLegendary=vars.AusterityMode or Game.HouseScreen==2 or Game.HouseScreen==95
+		local isShop=Game.HouseScreen==2 or Game.HouseScreen==95
+		local noLegendary=vars.AusterityMode or isShop
 		if rarity==const.Rarity.Epic then
-			rarity=RollItemRarity(pseudoStr, drop.boss, noLegendary, drop.multiplier)
+			rarity=RollItemRarity(pseudoStr, drop.boss, noLegendary, drop.multiplier, isShop)
 		end
 		if drop.omnipotent then
 			rarity=const.Rarity.Celestial
@@ -1940,8 +1957,10 @@ function getItemValue(it, lootFilter)
 			if it.Bonus2>0 then
 				count=count+1
 			end
+			--an Ancient is priced as a Primordial here, same reason it rolls at the
+			--Primordial's odds: on a shelf it IS the top rarity
 			if GetAncientTier(it)>0 then
-				count=count+GetAncientTier(it)
+				count=count+math.max(GetAncientTier(it), SHOP_ANCIENT_PRICE_TIER)
 			end
 			if count>0 then
 				value=value^(1+count*0.08)
