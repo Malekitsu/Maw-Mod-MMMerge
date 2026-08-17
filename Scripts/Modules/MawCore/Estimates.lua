@@ -79,7 +79,7 @@ function skillPointsAtLevel(lvl)
 end
 
 function skillLevelFromPoints(points)
-	return math.floor((math.sqrt(1 + 8*(points+1)) - 1)/2)
+	return (math.sqrt(1 + 8*(points+1)) - 1)/2
 end
 
 local SKILLS_TRAINED = 5

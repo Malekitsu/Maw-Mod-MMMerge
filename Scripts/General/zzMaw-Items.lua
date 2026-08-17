@@ -247,7 +247,7 @@ function events.PickCorpse(t)
 			end
 			
 			local itemTier = (lvl + 10 * tier) / 20
-			if itemTier % 20 / 20 > math.random() then
+			if itemTier % 1 > math.random() then
 				itemTier = itemTier + 1
 			end
 			itemTier = math.floor(itemTier)
@@ -473,7 +473,7 @@ local function rollEnchantStrength(tier, ancientTier)
 end
 
 function GetMaxEnchantStrength(level)
-	return round(applyDifficulty(encStrUp(GetTier(level)))*PRIMORDIAL_ENCHANT_MULT)
+	return encStrUp((level or 0)/TIER_LEVELS)*GetDifficultyExtraPower()*PRIMORDIAL_ENCHANT_MULT
 end
 
 local PRIMORDIAL_CHARGES_MULT = 1.2
@@ -541,10 +541,8 @@ function GetDifficultyExtraPower()
 	return 1
 end
 
---The tier a drop can reach beyond what its level alone buys: difficulty, map
---affixes and d42 all still ADD tiers, they just no longer cap anything.
 function GetEnchantTierBonus()
-	local bonus=math.floor((GetDifficultyExtraPower()-1)*10)
+	local bonus=0
 	if mapvars and mapvars.mapAffixes then
 		bonus=bonus+math.floor(math.max((mapvars.mapAffixes.Power-30+2)/2,0))
 	end
@@ -668,8 +666,10 @@ function RollStatFromList(list, exclude)
 	return id
 end
 
+TIER_LEVELS = 16
+
 function GetTier(level)
-	return math.floor((level or 0)/16)
+	return math.floor((level or 0)/TIER_LEVELS)
 end
 local function rollMaxCharges(maxCharges)
 	return round(maxCharges*math.random(16,20)/20)
@@ -986,23 +986,23 @@ function events.ItemGenerated(t)
 		SetStoredDropLevel(it, dropLevel)
 		it.MaxCharges=rollMaxCharges(MawCore.ItemLevel.PowerFor(dropLevel))
 		
-		partyLevel1=GetTier(partyLevel+bonus)+GetEnchantTierBonus()
+		--enchant tier and charges both read dropLevel: one item, one level
+		local partyLevel1=GetTier(dropLevel)+GetEnchantTierBonus()
 		--adjust loot Strength
-		ps1=t.Strength
+		local ps1=t.Strength
 
-		pseudoStr=ps1+partyLevel1
+		local pseudoStr=ps1+partyLevel1
 		if drop.boss then
 			pseudoStr=pseudoStr+1
 		end
 		if drop.omnipotent then
 			pseudoStr=pseudoStr+1
 		end
-		if math.random(1,18)<partyLevel1%18 then
+		if dropLevel%TIER_LEVELS/TIER_LEVELS > math.random() then
 			pseudoStr=pseudoStr+1
 		end
-		power=0
-		--difficulty multiplier 
-		diffMult=math.max((Game.BolsterAmount-100)/500+1,1)
+		--difficulty multiplier
+		local diffMult=math.max((Game.BolsterAmount-100)/500+1,1)
 		if vars.Mode==2 then
 			diffMult=1.8
 		end
@@ -1070,52 +1070,38 @@ function events.ItemGenerated(t)
 			it.Charges=0
 		end
 				
-		--the whole rare end rolls its special enchant a couple of tiers up
-		if rarity>=RARITY_ANCIENT then
-			power=2
-		end
 		if rarity==RARITY_ANCIENT then
 			it.MaxCharges=rollTierCharges(it.MaxCharges, 1)
 			SetAncientTier(it,1)
 		end
-		--apply special enchant
+		--apply special enchant: only a boss drop reaches the top-tier-only band
 		if rarity>=RARITY_EPIC then
-			n=it.Number
-			c=Game.ItemsTxt[n].EquipStat
+			local c=Game.ItemsTxt[it.Number].EquipStat
 			if c<12 then
-				power=ps1+power
-				power=math.max(math.min(power,6),3)
-				totB2=itemStrength[power][c]
-				roll=math.random(1,totB2)
-				tot=0
+				local power=math.max(math.min(ps1, drop.boss and 6 or 5), 3)
+				local totB2=itemStrength[power][c]
+				local roll=math.random(1,totB2)
+				local tot=0
 				for i=0,Game.SpcItemsTxt.High do
-					if roll<=tot then
-						it.Bonus2=i
-						goto continue
-					elseif table.find(enchants[power], Game.SpcItemsTxt[i].Lvl) then
+					if table.find(enchants[power], Game.SpcItemsTxt[i].Lvl) then
 						tot=tot+Game.SpcItemsTxt[i].ChanceForSlot[c]
+						if roll<=tot then
+							it.Bonus2=i+1
+							goto continue
+						end
 					end
-				end	
+				end
 			end			
 		end
 		
 		::continue::
 		
 		
-		--primordial item, and the celestial that carries its grade
+		--primordial item, and the celestial that carries its grade: the special
+		--enchant is the one the ancient roll above already gave them
 		if enchantTier==2 then
 			SetAncientTier(it,2)
 			it.MaxCharges=rollTierCharges(it.MaxCharges, 2)
-			--apply special enchant
-			n=it.Number
-			c=Game.ItemsTxt[n].EquipStat
-			if c<=2 then
-				roll=math.random(1,#primordialWeapEnchants)
-				it.Bonus2=primordialWeapEnchants[roll]
-			else
-				roll=math.random(1,#primordialArmorEnchants)
-				it.Bonus2=primordialArmorEnchants[roll]
-			end
 		end
 
 		if rarity>=RARITY_LEGENDARY then
@@ -1137,13 +1123,6 @@ function events.ItemGenerated(t)
 			it.MaxCharges=round(math.min(maxChargesCap,
 				it.MaxCharges*LEGENDARY_CHARGES_MULT,
 				it.MaxCharges+LEGENDARY_CHARGES_BONUS))
-			local statSets={{1, 5, 6, 7}, {4, 6, 8, 10}, {2, 3, 4, 6, 7}}
-			local stats=statSets[math.random(1,#statSets)]
-			if GetItemEquipStat(it)==10 then
-				stats={1, 5, 6, 7, 11, 12, 13, 14, 15, 16}
-			end
-			it.Bonus=RollStatFromList(stats)
-			SetEnc2Type(it,RollStatFromList(stats, it.Bonus))
 		end
 		--celestial
 		if rarity==RARITY_CELESTIAL then
