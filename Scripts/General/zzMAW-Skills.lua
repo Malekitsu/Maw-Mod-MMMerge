@@ -148,8 +148,8 @@ twoHandedWeaponDamageBonusByMastery = {
 
 armsmasterSkill={
 	["Damage"]={0,1,1,1.5,2,[0]=0},
-	["Speed"]={0,0,0.5,1,1,[0]=0},
-	["Attack"]={1,1,2,3,3,[0]=0},
+	["Speed"]={0,0,1,1,1,[0]=0},
+	["Attack"]={1,1,1,1,1,[0]=0},
 }
 
 skillCap={
@@ -392,6 +392,8 @@ end
 
 --speed stat -> recovery bonus in percentage points; the estimator feeds it a
 --modeled speed, so the curve stays in one place
+SPELL_HASTE_DIVISOR = 20
+
 function GetSpeedBonusFromStat(speed, level)
 	local speedEffect=0
 	if speed<=21 then
@@ -852,7 +854,8 @@ function events.GameInitialized2()
 	end
 	
 	--adjust tooltips with special effects
-	Game.SkillDesGM[const.Skills.Axe]=string.format("%s 1%% to halve AC and increases critical strike damage by 5%% per skill point, reduced up to 1%% as monsters get stronger",Game.SkillDesGM[const.Skills.Axe])
+	Game.SkillDesGM[const.Skills.Axe]=string.format("%s increases critical strike damage by %g%% per skill point",
+		Game.SkillDesGM[const.Skills.Axe], AXE_CRIT_DAMAGE_PER_SKILL*100)
 	Game.SkillDesMaster[const.Skills.Bow]=string.format("%s 2 arrows",Game.SkillDesMaster[const.Skills.Bow])
 	Game.SkillDesGM[const.Skills.Bow]=string.format("%s shoots fire arrows, dealing highest between fire and physical damage",Game.SkillDesGM[const.Skills.Bow])
 	Game.SkillDesExpert[const.Skills.Dagger]=string.format("%s can dual wield",Game.SkillDesExpert[const.Skills.Dagger])
@@ -870,15 +873,31 @@ function events.GameInitialized2()
 	Game.SkillDesGM[const.Skills.Plate]=string.format("%s rec. pen. elim.",Game.SkillDesGM[const.Skills.Plate])
 	Game.SkillDesExpert[const.Skills.Shield]=string.format("%s recovery penalty eliminated",Game.SkillDesExpert[const.Skills.Shield])
 	Game.SkillDesGM[const.Skills.Shield]=string.format("%s 15%% Damage reduction",Game.SkillDesGM[const.Skills.Shield])
-	Game.SkillDesNormal[const.Skills.Armsmaster]=string.format("Skills adds " .. armsmasterSkill.Damage[1] .. " dmg and " .. armsmasterSkill.Attack[1] .. " atk")
-	Game.SkillDesExpert[const.Skills.Armsmaster]=string.format("Skills adds " .. armsmasterSkill.Damage[2] .. " dmg, " .. armsmasterSkill.Attack[2] .. " atk, " .. armsmasterSkill.Speed[2] .. "%% speed")
-	Game.SkillDesMaster[const.Skills.Armsmaster]=string.format("Skills adds " .. armsmasterSkill.Damage[3] .. " dmg, " .. armsmasterSkill.Attack[3] .. " atk, " .. armsmasterSkill.Speed[3] .. "%% speed")
-	Game.SkillDesGM[const.Skills.Armsmaster]=string.format("Skills adds " .. armsmasterSkill.Damage[4] .. " dmg, " .. armsmasterSkill.Attack[4] .. " atk, " .. armsmasterSkill.Speed[4] .. "%% speed")
+	local function armsmasterDesc(m)
+		local parts={}
+		local function add(value, unit)
+			if (value or 0)>0 then
+				parts[#parts+1]=value .. unit
+			end
+		end
+		add(armsmasterSkill.Damage[m], " dmg")
+		add(armsmasterSkill.Attack[m], " atk")
+		add(armsmasterSkill.Speed[m], "% speed")
+		if #parts==0 then
+			return "No bonus at this rank"
+		end
+		return "Each skill point adds " .. table.concat(parts, ", ")
+	end
+	Game.SkillDesNormal[const.Skills.Armsmaster]=armsmasterDesc(1)
+	Game.SkillDesExpert[const.Skills.Armsmaster]=armsmasterDesc(2)
+	Game.SkillDesMaster[const.Skills.Armsmaster]=armsmasterDesc(3)
+	Game.SkillDesGM[const.Skills.Armsmaster]=armsmasterDesc(4)
 	Game.SkillDesMaster[const.Skills.Dodging]=string.format("%s usable with Leather Armor",Game.SkillDesGM[const.Skills.Dodging])
 	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Dodging])
-	--Game.SkillDesGM[const.Skills.Unarmed]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Unarmed])	
 	Skillz.setDesc(35,1,"Armsmaster skill represents the warrior's tricks of the trade, enhancing your proficiency with all weapons-except staves.\nThis skill allows you to strike faster, execute smoother attacks, and deal more powerful blows.\n\nDamage added by armsmaster skill scales with your weapon skill, amplifying its impact as you grow more adept.\n")
-	Skillz.setDesc(35,6,"Skills adds 3 dmg, 3 atk, 2% speed\nEach 10 points in armsmaster increase all the melee weapon skills by 1")
+	Skillz.setDesc(35,6,armsmasterDesc(5)
+		.. "\nKnights only. Each 10 points of armsmaster raise every melee weapon"
+		.. " skill by 1, up to double its base value.")
 	baseSpearTooltip=Game.SkillDesGM[const.Skills.Spear]
 	maceGMtxt=Game.SkillDesGM[6] --used for mace tooltip
 end

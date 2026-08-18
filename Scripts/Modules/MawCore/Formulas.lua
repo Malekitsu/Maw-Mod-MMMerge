@@ -99,7 +99,7 @@ function Formulas.mawPlayerHitChance(pl, mon, range, bonus)
 end
 
 function Formulas.critCap(madness)
-	return madness and 5000 or 3000
+	return madness and 3000 or 2000
 end
 
 function Formulas.critChance(luck, monsterLevel)

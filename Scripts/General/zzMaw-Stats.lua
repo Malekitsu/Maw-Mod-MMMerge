@@ -49,6 +49,8 @@ function events.KeyDown(t)
 end
 
 
+AXE_CRIT_DAMAGE_PER_SKILL = 0.01
+
 function getCritInfo(pl, dmgType, monLvl)
 	if not pl then return 0, 1, false end
 	monLvl = monLvl or pl.LevelBase or 0
@@ -58,8 +60,6 @@ function getCritInfo(pl, dmgType, monLvl)
 	local totalCrit = F.critChance(luck, monLvl)
 	local critDamageMultiplier = 1
 
-	local cap = F.critCap(vars.madnessMode)
-	local diminishingLevel = F.critDiminishingLevel(monLvl, vars.madnessMode)
 	if dmgType == "spell" then
 		local intellect = pl.GetIntellect and pl:GetIntellect() or 0
 		critDamageMultiplier = F.critDamageMult(intellect, monLvl, vars.madnessMode, true)
@@ -96,7 +96,7 @@ function getCritInfo(pl, dmgType, monLvl)
 			if it and (table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number)) then
 				local s, m = SplitSkill(pl:GetSkill(const.Skills.Axe))
 				if m >= 4 then
-					critDamageMultiplier = critDamageMultiplier + math.min(0.01* cap / diminishingLevel, 0.05) *s
+					critDamageMultiplier = critDamageMultiplier + AXE_CRIT_DAMAGE_PER_SKILL*s
 				end
 				break
 			end
@@ -162,7 +162,7 @@ function getSpellDelay(pl,spell)
 
 	local s,m=SplitSkill(pl.Skills[math.ceil(spell/11)+11])
 	if m==0 then return 150 end
-	local haste=math.floor(pl:GetSpeed()/10)
+	local haste=math.floor(pl:GetSpeed()/SPELL_HASTE_DIVISOR)
 	local enchantMult=1
 	for i=0,2 do
 		local it=pl:GetActiveItem(i)

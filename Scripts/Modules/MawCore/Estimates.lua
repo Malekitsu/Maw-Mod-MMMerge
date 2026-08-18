@@ -577,7 +577,7 @@ end
 function estimateSpellDelay(lvl, baseDelay)
 	local skill = estimateSkill(lvl)
 	local m = masteryPerLevel(lvl)
-	local haste = math.floor(estimateStat(lvl)/10)
+	local haste = math.floor(estimateStat(lvl)/SPELL_HASTE_DIVISOR)
 	local hasteBuff = 1 + buffMult(const.Spells.Haste, skill, m)
 	return baseDelay/(1 + haste/100)*1.015^skill/hasteBuff
 end
