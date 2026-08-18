@@ -403,17 +403,19 @@ function recalculateMonsterTable()
 	
 	--madness, used to calculate gold
 	local name=Game.MapStats[Map.MapStatsIndex].Name
-	if vars.madnessMode and madnessMapLevels[name] then
+	local fixedMadnessLevel = vars.madnessMode and madnessMapLevels[name]
+		and not madnessStartingMaps[name]
+	if fixedMadnessLevel then
 		bolsterLevel=madnessMapLevels[name]
-	end	
-	
+	end
+
 	bolsterLevel=bolsterLevel+bonus
-	
+
 	if mapvars.mapAffixes then
 		bolsterLevel=mapvars.mapAffixes.Power*10+20
 	end
 
-	local partyBolster = not (vars.madnessMode and madnessMapLevels[name]) and not mapvars.mapAffixes
+	local partyBolster = not fixedMadnessLevel and not mapvars.mapAffixes
 
 	bolsterLevel2=bolsterLevel --used for loot
 	
@@ -530,8 +532,8 @@ function recalculateMonsterTable()
 		
 	
 		--madness
-		if vars.madnessMode and not madnessStartingMaps[name] and not mapvars.mapAffixes then
-			local baseLevel=madnessMapLevels[name] or 0
+		if fixedMadnessLevel and not mapvars.mapAffixes then
+			local baseLevel=madnessMapLevels[name]
 			local withinMapDifference=(baseMapLevel-mean)*2
 			local tierModifier=(base.Level-LevelB)*2
 			local level=baseLevel+withinMapDifference+tierModifier
