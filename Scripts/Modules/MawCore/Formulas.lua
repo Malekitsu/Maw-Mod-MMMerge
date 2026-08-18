@@ -57,22 +57,45 @@ Formulas.hitAtPar    = 0.75	--attack == expected for the monster's level
 Formulas.hitMax      = 1	--reached at hitOverPar above par
 Formulas.hitMin      = 0.25	--floor
 Formulas.hitOverPar  = 0.5
+Formulas.blessHitMin = 0.05	--Bless with no caster skill behind it
+Formulas.blessHitMax = 0.10	--Bless at the buff skill cap
+
+function Formulas.blessHitBonusForSkill(s)
+	local cap = skillEffectCap.buff
+	return Formulas.blessHitMin
+		+ (Formulas.blessHitMax - Formulas.blessHitMin)*math.min(s or 0, cap)/cap
+end
+
+function Formulas.blessHitBonus(pl)
+	if vars.MAWSETTINGS and vars.MAWSETTINGS.buffRework ~= "ON" then
+		return 0
+	end
+	if not pl or not pl.SpellBuffs then
+		return 0
+	end
+	local buff = pl.SpellBuffs[const.PlayerBuff.Bless]
+	if not buff or buff.ExpireTime < Game.Time then
+		return 0
+	end
+	return Formulas.blessHitBonusForSkill(getBuffSkill(const.Spells.Bless, pl))
+end
 
 --one straight line through par, clamped at both ends
-function Formulas.mawHitChance(atk, monsterLevel)
+function Formulas.mawHitChance(atk, monsterLevel, hitBonus)
 	local expected = getPlayerEstimatedAttack(monsterLevel)
 	if not expected or expected <= 0 then
 		return nil
 	end
 	local overPar = (Formulas.hitAtPar * 10 + atk)/(expected + 10) - 1
 	local slope = (Formulas.hitMax - Formulas.hitAtPar)/Formulas.hitOverPar
-	return math.min(math.max(Formulas.hitAtPar + overPar*slope, Formulas.hitMin), Formulas.hitMax)
+	return math.min(math.max(Formulas.hitAtPar + overPar*slope + (hitBonus or 0),
+		Formulas.hitMin), Formulas.hitMax)
 end
 
 --what the PlayerHitOrMiss hook rolls against; nil leaves the engine's roll
 function Formulas.mawPlayerHitChance(pl, mon, range, bonus)
 	local atk = (range == 0 and pl:GetMeleeAttack() or pl:GetRangedAttack()) + (bonus or 0)
-	return Formulas.mawHitChance(atk, getMonsterLevel(mon))
+	return Formulas.mawHitChance(atk, getMonsterLevel(mon), Formulas.blessHitBonus(pl))
 end
 
 function Formulas.critCap(madness)
@@ -80,11 +103,11 @@ function Formulas.critCap(madness)
 end
 
 function Formulas.critChance(luck, monsterLevel)
-	return luck/math.min(500 + monsterLevel*4.5, 5000) + 0.05
+	return luck/math.min(500 + monsterLevel*5, 3000) + 0.05
 end
 
 function Formulas.critDiminishingLevel(monsterLevel, madness)
-	return math.min(250 + monsterLevel*2.25, Formulas.critCap(madness))
+	return math.min(250 + monsterLevel*2.5, Formulas.critCap(madness))
 end
 
 function Formulas.critDamageMult(stat, monsterLevel, madness, isSpell)

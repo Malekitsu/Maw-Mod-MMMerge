@@ -446,7 +446,8 @@ function events.BuildStatInformationBox(t)
 		local i=Game.CurrentPlayer
 		local atk=Party[i]:GetMeleeAttack()
 		local lvl=Party[i].LevelBase
-		local hitChance= round((MawCore.Formulas.mawHitChance(atk, lvl) or 0)*10000)/100
+		local hitChance= round((MawCore.Formulas.mawHitChance(atk, lvl,
+			MawCore.Formulas.blessHitBonus(Party[i])) or 0)*10000)/100
 		t.Text=string.format("%s\n\nHit chance vs same level monster: %s%s",t.Text,StrColor(255,255,100,hitChance),StrColor(255,255,100,"%"))
 	end
 	
@@ -540,7 +541,8 @@ function events.BuildStatInformationBox(t)
 		local i=Game.CurrentPlayer
 		local atk=Party[i]:GetRangedAttack()
 		local lvl=Party[i].LevelBase
-		local hitChance= round((MawCore.Formulas.mawHitChance(atk, lvl) or 0)*10000)/100
+		local hitChance= round((MawCore.Formulas.mawHitChance(atk, lvl,
+			MawCore.Formulas.blessHitBonus(Party[i])) or 0)*10000)/100
 		t.Text=string.format("%s\n\nHit chance vs same level monster: %s%s",t.Text,StrColor(255,255,100,hitChance),StrColor(255,255,100,"%"))
 	end
 	
@@ -1171,7 +1173,8 @@ function calcPowerVitality(pl, statsMenu)
 	--hit chance
 	local atk=pl:GetMeleeAttack()
 	local lvl=pl.LevelBase
-	local hitChance= MawCore.Formulas.mawHitChance(atk, lvl) or 0
+	local hitChance= MawCore.Formulas.mawHitChance(atk, lvl,
+		MawCore.Formulas.blessHitBonus(pl)) or 0
 	if Party.High==0 then
 		lvl=calcLevel(Party[0].Experience/5)
 	end
@@ -1195,7 +1198,8 @@ function calcPowerVitality(pl, statsMenu)
 	local dmg=(low+high)/2
 	--hit chance
 	local atk=pl:GetRangedAttack()
-	local hitChance= MawCore.Formulas.mawHitChance(atk, lvl) or 0
+	local hitChance= MawCore.Formulas.mawHitChance(atk, lvl,
+		MawCore.Formulas.blessHitBonus(pl)) or 0
 	local it=pl:GetActiveItem(2)
 	enchantDamage=0
 	if it and it:T().EquipStat<=2 then

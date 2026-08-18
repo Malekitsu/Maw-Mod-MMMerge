@@ -483,9 +483,11 @@ local LEGENDARY_33_SKILL = 10		--added to every melee weapon skill
 --divides by 2^(resistance/100) -- not in the player's damage.
 --Also unmodelled by choice: 12 enables hybrid builds instead of adding power,
 
---legendary 33 adds 10 to every melee weapon skill
+
+SKILL_ENCHANT_MULT = 1.5
+
 function getMeleeSkill(lvl)
-	return estimateSkill(lvl) + LEGENDARY_33_SKILL*legendaryRamp(lvl)
+	return estimateSkill(lvl)*SKILL_ENCHANT_MULT + LEGENDARY_33_SKILL*legendaryRamp(lvl)
 end
 
 
@@ -502,6 +504,7 @@ function getPlayerEstimatedAttack(lvl)
 		+ GetGradualMasteryValue(skillAttack[const.Skills.Sword], meleeSkill, m)*meleeSkill
 		+ GetGradualMasteryValue(armsmasterSkill.Attack, skill, m)*skill
 		+ Game.GetStatisticEffect(estimateStat(lvl))
+		+ buffFlat(const.Spells.Bless, skill, m, lvl)
 end
 
 function getPlayerEstimatedPower(lvl)
@@ -514,7 +517,8 @@ function getPlayerEstimatedPower(lvl)
 
 	local meleeSkill = getMeleeSkill(lvl)	--the weapon skill, legendary 33 included
 	local weaponSkillMult = 1 + skillDamage[const.Skills.Sword]*meleeSkill/100
-	local armsBase = GetGradualMasteryValue(armsmasterSkill.Damage, skill, m)*skill
+	local armsSkill = skill*SKILL_ENCHANT_MULT
+	local armsBase = GetGradualMasteryValue(armsmasterSkill.Damage, armsSkill, m)*armsSkill
 	local scalable = 0.75*(wDmg-wDice-wFlat) + wFlat + 0.5*wDice + armsBase
 	local damage = EXPECTED_WEAPON_DICE/2 + scalable*weaponSkillMult
 
@@ -530,20 +534,17 @@ function getPlayerEstimatedPower(lvl)
 	--real speed-stat recovery bonus (GetSpeedBonus), in percentage points
 	local speedEffect = GetSpeedBonusFromStat(estimateStat(lvl), lvl)/100
 	local weaponSpeed = GetGradualMasteryValue(skillRecovery[const.Skills.Sword], meleeSkill, m)*meleeSkill/100
-	local armsMasterSpeed = GetGradualMasteryValue(armsmasterSkill.Speed, skill, m)*skill/100
+	local armsMasterSpeed = GetGradualMasteryValue(armsmasterSkill.Speed, armsSkill, m)*armsSkill/100
 	local hasteBuff = 1 + buffMult(const.Spells.Haste, skill, m)
 	damage = damage*(1 + speedEffect + weaponSpeed + armsMasterSpeed)*hasteBuff
 
 	local legendary = legendaryRamp(lvl)
 
 	local luck, accuracy = might, might
-	local critChance = F.critChance(luck, lvl) + 0.1*legendary	--legendary 14
-	local extraMult = 1
-	if critChance > 1 then
-		extraMult = critChance
-	end
+	local critChance = F.critChance(luck, lvl) + 0.1*legendary
+		+ buffMult(const.Spells.Fate, skill, m)
 	local critDamage = F.critDamageMult(accuracy, lvl, vars.madnessMode) - 1
-	local critMult = 1 + math.min(critChance, 1)*critDamage*extraMult
+	local critMult = 1 + math.min(critChance, 1)*critDamage
 	damage = damage*critMult
 
 	local enchantLegendary = (1 + GetMightDamageMultiplier(might, lvl)*legendary)
@@ -556,15 +557,13 @@ function getPlayerEstimatedPower(lvl)
 	local crowd = math.min(1 + LEGENDARY_21_PER_MONSTER*EXPECTED_NEARBY_MONSTERS*legendary, 2)
 	damage = damage*crowd*(1 + LEGENDARY_11_DAMAGE*legendary)
 
-	--the average character has the attack mawHitChance measures against, so
-	--its hit chance is par by definition
-	return damage*F.hitAtPar
+	damage = damage*math.max(critChance, 1)
+	local hitChance = math.min(F.hitAtPar + F.blessHitBonusForSkill(skill), F.hitMax)
+	return damage*hitChance
 end
 
 local SPELL_REF_NOVICE = {add = 8, dice = 2, delay = 110}	--fire bolt
 local SPELL_REF_GM = {add = 19, dice = 21, delay = 90}	--incinerate
-
-CASTER_SKILL_ENCHANT_MULT = 2	--casters carry a doubled school skill via enchants
 
 local function estimateSpellReference(lvl)
 	local th = masteryThresholds()
@@ -594,15 +593,16 @@ function getPlayerEstimatedSpellPower(lvl)
 	dice = dice*empower*(1 + 0.09*skill)*1.025^skill
 	add = add*empower*(1 + 0.04*skill^2)*1.025^skill
 
-	local power = add + skill*CASTER_SKILL_ENCHANT_MULT*(1 + dice)/2
+	local power = add + skill*SKILL_ENCHANT_MULT*(1 + dice)/2
 
 	power = power*(1 + getIntellectDamageMultiplier(stat, lvl))
 
-	local critChance = F.critChance(stat, lvl)
+	local legendary = legendaryRamp(lvl)
+	local critChance = F.critChance(stat, lvl) + 0.1*legendary
+		+ buffMult(const.Spells.Fate, skill, m)
 	local critDamage = F.critDamageMult(stat, lvl, vars.madnessMode, true)
 	power = power*(1 + math.min(critChance, 1)*(critDamage - 1))
 
-	local legendary = legendaryRamp(lvl)
 	local spellCritFactor = 1 + math.min(critChance, 1)*(critDamage - 1)
 	local enchantLegendary = (1 + GetMightDamageMultiplier(stat, lvl)*legendary)
 		*(1 + (spellCritFactor - 1)*legendary)
