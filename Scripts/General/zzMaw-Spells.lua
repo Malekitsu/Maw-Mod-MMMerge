@@ -1433,10 +1433,10 @@ function events.GameInitialized2()
 		return CCMAP[spellId].Duration/const.Minute*MawCore.Formulas.gameMinuteSeconds
 	end
 	Game.SpellsTxt[const.Spells.ShrinkingRay].Description=string.format(
-		"Shrinks even the grandest of monsters down to more manageable sizes. A shrunken monster deals %d%% less damage. Each impact covers one monster per mastery nearby, preferring those not already shrunk. Base duration %gs at every mastery, extended by Learning. Does not stack with Dark Grasp.",
+		"Shrinks even the grandest of monsters down to more manageable sizes. A shrunken monster deals %d%% less damage. Each impact covers one monster per mastery nearby, preferring those not already shrunk. Base duration %gs at every mastery, extended by Ascension. Does not stack with Dark Grasp.",
 		damageCut(const.MonsterBuff.ShrinkingRay), baseSeconds(const.Spells.ShrinkingRay))
 	local graspText=string.format(
-		"This spell surrounds its target with the power of raw darkness, rendering it unable to fire missile attacks or cast spells. Further the target's movement is slowed, its armor class is halved and it deals %d%% less damage. Base duration %gs at Grandmaster, less below, extended by Learning. Does not stack with Shrinking Ray.",
+		"This spell surrounds its target with the power of raw darkness, rendering it unable to fire missile attacks or cast spells. Further the target's movement is slowed, its armor class is halved and it deals %d%% less damage. Base duration %gs at Grandmaster, less below, extended by Ascension. Does not stack with Shrinking Ray.",
 		damageCut(const.MonsterBuff.DamageHalved), baseSeconds(const.Spells.DarkGrasp))
 	Game.SpellsTxt[const.Spells.DarkGrasp].Description=graspText
 	--spell 96 is a DK spell: dkSkills() restores non-DK characters from the
