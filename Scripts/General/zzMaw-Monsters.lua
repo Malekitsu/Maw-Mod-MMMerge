@@ -379,7 +379,9 @@ function events.AfterLoadMap()
 end
 
 function events.BeforeLoadMap()
-	recalculateMonsterTable()
+	if vars.MMLVL then
+		recalculateMonsterTable()
+	end
 end
 
 function events.LoadMap()
