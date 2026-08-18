@@ -962,7 +962,7 @@ madnessStartingMaps={["Dagger Wound Island"] =true,
 mapLevels={
 --MM8
 ["Dagger Wound Island"] = 
-{["Low"] = 5 , ["Mid"] = 6 , ["High"] = 6},
+{["Low"] = 3 , ["Mid"] = 4 , ["High"] = 4},
 
 ["Abandoned Temple"] = 
 {["Low"] = 5 , ["Mid"] = 6 , ["High"] = 7},
@@ -1147,7 +1147,7 @@ mapLevels={
 
 --MM7
 ["Emerald Island"] = 
-{["Low"] = 5 , ["Mid"] = 5 , ["High"] = 5},
+{["Low"] = 4 , ["Mid"] = 4 , ["High"] = 4},
 
 ["The Temple of the Moon"] = 
 {["Low"] = 5 , ["Mid"] = 6 , ["High"] = 8},
@@ -1418,7 +1418,7 @@ mapLevels={
 {["Low"] = 5 , ["Mid"] = 5 , ["High"] = 5},
 
 ["New Sorpigal"] = 
-{["Low"] = 6 , ["Mid"] = 6 , ["High"] = 6},
+{["Low"] = 4 , ["Mid"] = 4 , ["High"] = 4},
 
 ["Goblinwatch"] = 
 {["Low"] = 4 , ["Mid"] = 4 , ["High"] = 6},
@@ -1783,20 +1783,24 @@ local mm8MapProgression={
   ["Prison of the Lord of Fire"] = 58,
 }
 
+MADNESS_TOP_LEVEL = 500
+MADNESS_CURVE = 1.2
+
+local function madnessLevel(position, campaignLength)
+	return round(MADNESS_TOP_LEVEL*(position/campaignLength)^MADNESS_CURVE)
+end
+
 madnessMapLevels={}
 for key, value in pairs(mm6MapProgression) do
-	--madnessMapLevels[key]=round(((value/54)*100)^1.5)
-	madnessMapLevels[key]=round(((value/54)*100)*5)
+	madnessMapLevels[key]=madnessLevel(value, 54)
 end
 
 for key, value in pairs(mm7MapProgression) do
-	--madnessMapLevels[key]=round(((value/52)*100)^1.5)
-	madnessMapLevels[key]=round(((value/52)*100)*5)
+	madnessMapLevels[key]=madnessLevel(value, 52)
 end
 
 for key, value in pairs(mm8MapProgression) do
-	--madnessMapLevels[key]=round(((value/58)*100)^1.5)
-	madnessMapLevels[key]=round(((value/58)*100)*5)
+	madnessMapLevels[key]=madnessLevel(value, 58)
 end
 
 madnessMapLevels["Basement of the Breach"] = 1100
