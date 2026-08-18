@@ -18,8 +18,8 @@ Earth	E	M	G	G	=	=	=	=	E	M	=	=	E	M	G	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	E	E	M	M	E	M	G	
 Spirit	=	=	=	=	E	M	G	G	=	=	=	=	E	M	G	G	=	=	=	=	E	M	=	N	E	E	E	M	G	G	E	E	M	M	=	=	=	=	=	=	E	M	=	=	=	=	=	=	=	=	G	=	=	E	M	M	=	=	=	E	M	G	=	=	=
 Mind	=	=	=	=	E	M	G	G	=	=	=	=	E	M	G	G	=	=	=	=	E	M	=	N	E	E	E	M	G	G	E	E	M	M	=	=	=	=	=	=	M	G	=	=	=	=	=	=	=	=	G	=	=	E	M	M	=	=	=	E	M	G	=	=	=
 Body	=	=	=	=	E	M	G	G	=	=	=	=	E	M	G	G	=	=	=	=	E	M	=	N	E	E	E	M	M	M	E	E	M	M	=	=	=	=	=	=	E	M	=	=	=	=	=	=	=	=	G	=	=	E	M	M	E	M	G	E	M	G	=	=	=
-Light	=	=	G	=	=	=	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	G	=	=	=	G	G	G	M	M	G	=	=	=	=	=	=	=	=	=
-Dark	=	=	=	G	=	=	=	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	M	G	=	G	=	=	G	G	G	=	=	=	E	M	G	=	=	=	=	=	=
+Light	=	=	G	=	=	=	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	G	=	=	=	=	E	=	=	=	=	=	=	=	=	=	=	=	=	G	=	=	=	G	G	G	M	M	G	=	=	=	=	=	=	=	=	=
+Dark	=	=	=	G	=	=	=	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	G	=	=	E	=	=	=	=	=	=	=	=	=	=	=	M	G	=	G	=	=	G	G	G	=	=	=	E	M	G	=	=	=	=	=	=
 DarkElfAbility	=	=	=	=	=	=	=	=	M	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=
 VampireAbility	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	M	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=
 DragonAbility	=	=	=	=	=	=	=	=	=	=	M	G	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=	=
