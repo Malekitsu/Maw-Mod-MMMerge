@@ -1512,6 +1512,11 @@ local function pstage_deathSeedMark(t)
   end
 end
 
+local monsterDamageDebuff = {
+	[const.MonsterBuff.DamageHalved] = 0.7,	--Dark Grasp
+	[const.MonsterBuff.ShrinkingRay] = 0.7,
+}
+
 -- from zzMaw-Stats:735 -- THE player-damage replacement (reflects, friendly
 -- fire, traps, dodge, monster attacks, disease, exploding bosses)
 local function pstage_damageRecompute(t)
@@ -1684,8 +1689,14 @@ local function pstage_damageRecompute(t)
 	local roll=(math.random(75,125)+math.random(75,125))/200
 	t.Damage=t.Damage*roll
 	
-	if mon and mon.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime>=Game.Time then
-		t.Damage=t.Damage*0.75
+	if mon then
+		local debuffMult=1
+		for buff, mult in pairs(monsterDamageDebuff) do
+			if mon.SpellBuffs[buff].ExpireTime>=Game.Time then
+				debuffMult=math.min(debuffMult, mult)
+			end
+		end
+		t.Damage=t.Damage*debuffMult
 	end
 	
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
