@@ -4421,9 +4421,9 @@ function events.AfterLoadMap()
 	end
 	if vars.Mode==2 and not vars.StartingItemFix then
 		vars.StartingItemFix=true
-		local extraPower=5
+		local extraPower=2
 		if vars.insanityMode then
-			extraPower=10
+			extraPower=4
 		end
 		for i=0,Party.PlayersArray.High do
 			local pl=Party.PlayersArray[i]

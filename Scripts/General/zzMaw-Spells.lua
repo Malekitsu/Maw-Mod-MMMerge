@@ -1412,6 +1412,30 @@ CCMAP[const.Spells.Charm].EffectColor=0xFF60C0
 CCMAP[const.Spells.Paralyze].EffectColor=0xFFFF80
 CCMAP[const.Spells.DarkGrasp].EffectColor=0xA020F0
 
+--vanilla text claims a mastery-scaled 1/2..1/4 damage cut and a Dark-skill
+--duration; both are false now, so it is rebuilt from the values that apply it
+function events.GameInitialized2()
+	local function damageCut(buff)
+		return round((1 - MawCore.Damage.monsterDamageDebuff[buff])*100)
+	end
+	local function baseSeconds(spellId)
+		return CCMAP[spellId].Duration/const.Minute*MawCore.Formulas.gameMinuteSeconds
+	end
+	Game.SpellsTxt[const.Spells.ShrinkingRay].Description=string.format(
+		"Shrinks even the grandest of monsters down to more manageable sizes. A shrunken monster deals %d%% less damage, at any mastery. Base duration %gs at Grandmaster, less below, extended by Learning. Does not stack with Dark Grasp.",
+		damageCut(const.MonsterBuff.ShrinkingRay), baseSeconds(const.Spells.ShrinkingRay))
+	local graspText=string.format(
+		"This spell surrounds its target with the power of raw darkness, rendering it unable to fire missile attacks or cast spells. Further the target's movement is slowed, its armor class is halved and it deals %d%% less damage. Base duration %gs at Grandmaster, less below, extended by Learning. Does not stack with Shrinking Ray.",
+		damageCut(const.MonsterBuff.DamageHalved), baseSeconds(const.Spells.DarkGrasp))
+	Game.SpellsTxt[const.Spells.DarkGrasp].Description=graspText
+	--spell 96 is a DK spell: dkSkills() restores non-DK characters from the
+	--snapshot zzClasses takes earlier in GameInitialized2, so it needs the new
+	--text too or selecting a non-DK wipes it back to vanilla
+	if spellDesc and spellDesc[const.Spells.DarkGrasp] then
+		spellDesc[const.Spells.DarkGrasp].Description=graspText
+	end
+end
+
 local function nextReadyPartyMember()
 	local cur=Game.CurrentPlayer
 	for i=1,Party.High+1 do
@@ -1732,7 +1756,10 @@ function calcDebuffDuration(monster, cc, duration)
 	end
 	
 	local finalDuration = duration * durationMult
-	
+	if monster.NameId>=220 and monster.NameId<300 then
+		finalDuration = finalDuration/2
+	end
+
 	-- Record this CC application
 	mapvars.ccHistory[monsterIndex] = mapvars.ccHistory[monsterIndex] or {}
 	mapvars.ccHistory[monsterIndex][group] = mapvars.ccHistory[monsterIndex][group] or {}
@@ -1740,10 +1767,7 @@ function calcDebuffDuration(monster, cc, duration)
 		startTime = Game.Time,
 		endTime = Game.Time + finalDuration
 	})
-	
-	if mon.NameId>=220 and mon.NameId<300 then
-		return finalDuration/2
-	end
+
 	return finalDuration
 end
 
@@ -2087,19 +2111,21 @@ local function ascendCCSpellCosts(pl, s, m, personalityReduction)
 end
 
 
+--monsters no longer carry bolstered resistances, so the CC tooltips assume a
+--monster at the caster's level and convert: roughly 1 resistance per 2 levels
+CC_TOOLTIP_LEVELS_PER_RESISTANCE = 2
+
 local function ascendCCTooltips(pl, s)
-	local lvl=pl.LevelBase
+	local resistance=pl.LevelBase/CC_TOOLTIP_LEVELS_PER_RESISTANCE
+	local masteryStep={0.5, 0.65, 0.8, 1}
 	for key, value in pairs(CCMAP) do
-		local baseDuration=value.Duration/const.Minute*2
-		local masteryStep={0.5, 0.65, 0.8, 1}
-		local durN = baseDuration * masteryStep[1] * 1.015^(s) / (lvl/200)
-		local durE = baseDuration * masteryStep[2] * 1.015^(s) / (lvl/200)
-		local durM = baseDuration * masteryStep[3] * 1.015^(s) / (lvl/200)
-		local durGM = baseDuration * masteryStep[4] * 1.015^(s) / (lvl/200)
-		Game.SpellsTxt[key].Normal = string.format("Duration: %.1f seconds", durN)
-		Game.SpellsTxt[key].Expert = string.format("Duration: %.1f seconds", durE)
-		Game.SpellsTxt[key].Master = string.format("Duration: %.1f seconds", durM)
-		Game.SpellsTxt[key].GM = string.format("Duration: %.1f seconds", durGM)
+		--same shape as applyCCDebuff
+		local duration=value.Duration/const.Minute*MawCore.Formulas.gameMinuteSeconds
+			*1.015^s/(1 + resistance/100)
+		Game.SpellsTxt[key].Normal = string.format("Duration: %.1f seconds", duration*masteryStep[1])
+		Game.SpellsTxt[key].Expert = string.format("Duration: %.1f seconds", duration*masteryStep[2])
+		Game.SpellsTxt[key].Master = string.format("Duration: %.1f seconds", duration*masteryStep[3])
+		Game.SpellsTxt[key].GM = string.format("Duration: %.1f seconds", duration*masteryStep[4])
 	end
 end
 
@@ -2379,7 +2405,7 @@ local function ascendRemaining(pl, s, m, id)
 			elseif healingSpells[i] then
 				Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. speed
 			elseif CCMAP[i] and i~=122 then
-				Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. "\n\nControl Spell duration is reduced by monster resistances but increased by Ascension; Recovery time is reduced by Spell Skill. Duration shown is against " .. round(pl.LevelBase/2) .. " resistance. Control duration against bosses is halved.\n\nRecovery time: " .. speed
+				Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. "\n\nControl Spell duration is reduced by monster level but increased by Ascension; Recovery time is reduced by Spell Skill. Duration shown is against a level " .. pl.LevelBase .. " monster. Control duration against bosses is halved.\n\nRecovery time: " .. speed
 			elseif buffSpell and (buffSpell[i] or utilitySpell[i]) then
 				Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. oldTable[i][magicM]
 			else

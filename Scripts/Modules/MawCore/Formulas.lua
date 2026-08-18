@@ -5,6 +5,10 @@
 local Formulas = {}
 MawCore.Formulas = Formulas
 
+-- Real seconds in one const.Minute of game time. Durations are stored in game
+-- time; tooltips show players real seconds.
+Formulas.gameMinuteSeconds = 2
+
 Formulas.ringReductionDivisor = 200
 
 function Formulas.resistanceEnchantPower(roll, isRing)

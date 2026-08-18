@@ -119,6 +119,7 @@ local DKManaCost={
 	[96]=15,
 	[97]=100,
 }
+Classes.DKManaCost = DKManaCost	--the damage pipeline charges the per-hit ones
 
 function dkSkills(isDK, id)
 	if isDK then
@@ -190,10 +191,13 @@ function dkSkills(isDK, id)
 		Game.SpellsTxt[90].GM="Damage increased to " .. (mult90[4]*100) .. "%"
 		
 		Game.SpellsTxt[96].Name="Death Grasp"
-		Game.SpellsTxt[96].Description="Activating this spell imbues the knight body with dark powers, empairing oppenents powers (damage halved) upon attacking 15 spell points."
+		Game.SpellsTxt[96].Description=string.format("Activating this spell imbues the knight's body with dark powers. Every melee hit costs %d spell points and leaves the target dealing %d%% less damage for %gs, refreshed on each hit.",
+			DKManaCost[96],
+			round((1 - MawCore.Damage.monsterDamageDebuff[const.MonsterBuff.DamageHalved])*100),
+			MawCore.Damage.dkGraspDuration/const.Minute*MawCore.Formulas.gameMinuteSeconds)
 		Game.SpellsTxt[96].Expert="n/a"
 		Game.SpellsTxt[96].Master="No additional effects"
-		Game.SpellsTxt[96].GM="Monster looses the ability to deal ranged damage"
+		Game.SpellsTxt[96].GM="Target also loses the ability to attack at range"
 		
 		-- Spell 97: Death Breath
 		local mult97 = DKDamageMult[97]

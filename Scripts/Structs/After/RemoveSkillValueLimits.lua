@@ -493,28 +493,28 @@ and eax, ]] .. MaxSkillValStr)
 --   Mace Stun
 mem.asmpatch(0x4371BE, [[
 mov ebx, eax
-and ebx, ]] .. MaxSkillValStr)
+and ebx, 0]])
 
 --   Mace Paralyze
 mem.asmpatch(0x4371E9, [[
 mov ebx, eax
-and ebx, ]] .. MaxSkillValStr)
+and ebx, 0]])
 
 --   Staff Stun
 mem.asmpatch(0x437215, [[
 mov ebx, eax
-and ebx, ]] .. MaxSkillValStr)
+and ebx, 0]])
 
 --   Mace Paralyze
 mem.asmpatch(0x4377B8, [[
-and ebx, ]] .. MaxSkillValStr .. [[;
+and ebx, 0;
 imul ebx, 1E00h
 ]])
 mem.nop(0x4377BD, 4)
 
 -- Unarmed Evasion
 mem.asmpatch(0x4380C4, [[
-and edi, ]] .. MaxSkillValStr .. [[;
+and edi, 0;
 cmp edx, edi
 ]])
 

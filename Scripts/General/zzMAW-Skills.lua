@@ -860,11 +860,23 @@ function events.GameInitialized2()
 	Game.SkillDesGM[const.Skills.Bow]=string.format("%s shoots fire arrows, dealing highest between fire and physical damage",Game.SkillDesGM[const.Skills.Bow])
 	Game.SkillDesExpert[const.Skills.Dagger]=string.format("%s can dual wield",Game.SkillDesExpert[const.Skills.Dagger])
 	Game.SkillDesMaster[const.Skills.Dagger]=string.format("%s 5+1 crit%%/skill",Game.SkillDesMaster[const.Skills.Dagger])
-	Game.SkillDesMaster[const.Skills.Mace]=string.format("%s chance to stun",Game.SkillDesMaster[const.Skills.Mace])
-	Game.SkillDesGM[const.Skills.Mace]=string.format("%s chance to paralyze",Game.SkillDesGM[const.Skills.Mace])
+	local function stunChance(skill)
+		return MawCore.Damage.weaponStun[skill].chanceMult*100
+	end
+	local function stunSeconds(skill, m)
+		local cfg=MawCore.Damage.weaponStun[skill]
+		local seconds=cfg.duration/const.Minute*MawCore.Formulas.gameMinuteSeconds
+		return m==cfg.mastery and seconds/2 or seconds
+	end
+	Game.SkillDesMaster[const.Skills.Mace]=string.format("%s %g%% to stun for %gs",
+		Game.SkillDesMaster[const.Skills.Mace], stunChance(const.Skills.Mace), stunSeconds(const.Skills.Mace, 3))
+	Game.SkillDesGM[const.Skills.Mace]=string.format("%s stun lasts %gs",
+		Game.SkillDesGM[const.Skills.Mace], stunSeconds(const.Skills.Mace, 4))
 	Game.SkillDesMaster[const.Skills.Spear]=string.format("%s can hold with 1 hand",Game.SkillDesMaster[const.Skills.Spear])
-	Game.SkillDesMaster[const.Skills.Staff]=string.format("%s 1%% to stun",Game.SkillDesMaster[const.Skills.Staff])
-	Game.SkillDesGM[const.Skills.Staff]=string.format("%s usable with Unarm.",Game.SkillDesGM[const.Skills.Staff])
+	Game.SkillDesMaster[const.Skills.Staff]=string.format("%s %g%% to stun for %gs",
+		Game.SkillDesMaster[const.Skills.Staff], stunChance(const.Skills.Staff), stunSeconds(const.Skills.Staff, 3))
+	Game.SkillDesGM[const.Skills.Staff]=string.format("%s usable with Unarm., stun lasts %gs",
+		Game.SkillDesGM[const.Skills.Staff], stunSeconds(const.Skills.Staff, 4))
 	Game.SkillDesMaster[const.Skills.Sword]=string.format("%s can dual wield",Game.SkillDesMaster[const.Skills.Sword])
 	Game.SkillDesExpert[const.Skills.Leather]=string.format("%s recovery penalty eliminated",Game.SkillDesExpert[const.Skills.Leather])
 	Game.SkillDesExpert[const.Skills.Chain]=string.format("%s recovery penalty halved",Game.SkillDesExpert[const.Skills.Chain])

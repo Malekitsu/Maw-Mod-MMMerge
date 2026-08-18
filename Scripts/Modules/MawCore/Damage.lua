@@ -246,50 +246,46 @@ local function stage_coverFlag(t)
 	end
 end
 
--- from Scripts/General/zzMAW-Skills.lua:2393-2436 -- mace M/GM stun/paralyze roll
---mace stun
-local maceStunCC = {Debuff = const.MonsterBuff.Paralyze}
-local function stage_maceStun(t)
-	if t.Player then
-		local it=t.Player:GetActiveItem(1)
-		if not it then return end
-		local skill=it:T().Skill
-		local data=t.Hit
-		if skill==6 and t.DamageKind==4 and data and data.Object==nil then
-			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Mace))
-			if m>=3 then
-				local mon=t.Monster
-				--get Level
-				local id=t.MonsterIndex
-				local lvl=getMonsterLevel(mon)
-				--chance to paralyze
-				local chance=s/estimateSkill(lvl)*0.15*damageMultiplier[t.Player:GetIndex()].Melee/math.min(1+lvl/150,3)
-				local applyParalyze=applyParalyze or {}
-				applyParalyze[id]=false
-				local previousDuration=mon.SpellBuffs[6].ExpireTime
-				local duration=0
-				if chance>math.random() then
-					applyParalyze[id]=true
-					duration=const.Minute*3
-					if m==3 then
-						duration=duration/2
-					end
-					-- Apply diminishing returns
-					duration = calcDebuffDuration(mon, maceStunCC, duration)
-				end
-				RunNextTick(function()
-					if applyParalyze[id] and duration > 0 then
-						if mon.HP~=0 then
-							mon.SpellBuffs[6].ExpireTime=Game.Time+duration
-						end
-						applyParalyze[id]=false
-					else
-						mon.SpellBuffs[6].ExpireTime=previousDuration
-					end
-				end)
-			end
-		end
+--Death Knight active Dark Grasp (spell 96): how long the debuff it leaves
+--lasts, refreshed on every hit. Classes.lua prints it.
+local DK_GRASP_DURATION = const.Minute
+Damage.dkGraspDuration = DK_GRASP_DURATION
+local darkGraspCC = {Debuff = const.MonsterBuff.DamageHalved}
+
+local weaponStun = {
+	[const.Skills.Mace]  = {mastery = 3, chanceMult = 0.15, duration = const.Minute*2},
+	[const.Skills.Staff] = {mastery = 3, chanceMult = 0.10, duration = const.Minute*2},
+}
+Damage.weaponStun = weaponStun	--zzMAW-Skills prints these in the skill tooltips
+local stunCC = {Debuff = const.MonsterBuff.Paralyze}
+local function stage_weaponStun(t)
+	if not t.Player then return end
+	local data=t.Hit
+	if t.DamageKind~=4 or not data or data.Object~=nil then return end
+	local it=t.Player:GetActiveItem(1)
+	if not it then return end
+	local skill=it:T().Skill
+	local cfg=weaponStun[skill]
+	if not cfg then return end
+	local s,m=SplitSkill(t.Player:GetSkill(skill))
+	if m<cfg.mastery then return end
+	local mon=t.Monster
+	local lvl=getMonsterLevel(mon)
+	local chance=s/estimateSkill(lvl)*cfg.chanceMult
+		*damageMultiplier[t.Player:GetIndex()].Melee/math.min(1+lvl/150,3)
+	if chance<=math.random() then return end
+	local duration=cfg.duration
+	if m==cfg.mastery then
+		duration=duration/2
 	end
+	duration=calcDebuffDuration(mon, stunCC, duration)
+	if duration<=0 then return end
+	RunNextTick(function()
+		if mon.HP~=0 then
+			--extend, never cut a longer stun already running
+			mon.SpellBuffs[6].ExpireTime=math.max(mon.SpellBuffs[6].ExpireTime, Game.Time+duration)
+		end
+	end)
 end
 
 -- from Scripts/General/zzMAW-Skills.lua:2439 -- clear stun when monster dies
@@ -796,9 +792,8 @@ local function stage_dkAttack(t)
 			
 			--dark grasp
 			if vars.dkActiveAttackSpell and vars.dkActiveAttackSpell[id]==96 then
-				pl.SP=pl.SP-15
-				local darkGraspCC = {Debuff = const.MonsterBuff.DamageHalved}
-				local graspDuration = calcDebuffDuration(t.Monster, darkGraspCC, const.Minute)
+				pl.SP=pl.SP-MawCore.Classes.DKManaCost[96]
+				local graspDuration = calcDebuffDuration(t.Monster, darkGraspCC, DK_GRASP_DURATION)
 				if graspDuration > 0 then
 					t.Monster.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime, Game.Time+graspDuration)
 					local s, m=SplitSkill(pl.Skills[const.Skills.Dark])
@@ -1421,7 +1416,7 @@ local pipe = MawCore.Pipeline.new("DamageToMonster", {
 	"reveal-nearby",			-- [reactions]
 	"monster-vs-monster",		-- [base]
 	"cover-flag",				-- [reactions]
-	"mace-stun",				-- [reactions]
+	"weapon-stun",				-- [reactions]
 	"stun-death-cleanup",		-- [reactions]
 	"fly-removal",				-- [reactions]
 	"stun-spell-prime",			-- [resistance] primes res for res-and-retaliation
@@ -1456,7 +1451,7 @@ pipe:on("engine-reset",      "zzMaw-Monsters:2236",  stage_engineReset)
 pipe:on("reveal-nearby",     "zzMaw-Monsters:4475",  stage_revealNearby)
 pipe:on("monster-vs-monster","zzMaw-Monsters:4548",  stage_monsterVsMonster)
 pipe:on("cover-flag",        "zzMAW-Skills:2248",    stage_coverFlag)
-pipe:on("mace-stun",         "zzMAW-Skills:2395",    stage_maceStun)
+pipe:on("weapon-stun",       "zzMAW-Skills:2395",    stage_weaponStun)
 pipe:on("stun-death-cleanup","zzMAW-Skills:2439",    stage_stunDeathCleanup)
 pipe:on("fly-removal",       "zzMaw-Spells:973",     stage_flyRemoval)
 pipe:on("stun-spell-prime",  "zzMaw-Spells:1596",    stage_stunSpellPrime)
@@ -1516,6 +1511,7 @@ local monsterDamageDebuff = {
 	[const.MonsterBuff.DamageHalved] = 0.7,	--Dark Grasp
 	[const.MonsterBuff.ShrinkingRay] = 0.7,
 }
+Damage.monsterDamageDebuff = monsterDamageDebuff	--zzMaw-Spells prints these
 
 -- from zzMaw-Stats:735 -- THE player-damage replacement (reflects, friendly
 -- fire, traps, dodge, monster attacks, disease, exploding bosses)
@@ -1602,7 +1598,7 @@ local function pstage_damageRecompute(t)
 	local mon=data.Monster
 	local lvl=getMonsterLevel(mon)
 
-	--dodging DODGE 
+	--dodging DODGE
 	local dodging=0
 	local Skill, Mas = SplitSkill(pl:GetSkill(const.Skills.Dodging))
 	if Mas == 4 then
