@@ -356,6 +356,10 @@ function events.AfterLoadMap()
 	end
 end
 
+function events.BeforeLoadMap()
+	recalculateMonsterTable()
+end
+
 function events.LoadMap()
 	recalculateMonsterTable()
 	recalculateMawMonster()
@@ -611,6 +615,7 @@ function recalculateMonsterTable()
 			HPtable[i]=HPtable[i]*(1+getMapAffixPower(15)/100)
 		end
 	end
+	monsterTableMap=Map.MapStatsIndex
 end
 
 
@@ -1858,6 +1863,46 @@ function getMonsterLevel(mon)
 		lvl=mapvars.bossData[id].Level
 	end
 	return lvl
+end
+
+local function staticMapDropLevel()
+	local name=Game.MapStats[Map.MapStatsIndex].Name
+	local mp=mapLevels[name] or {Low=0, Mid=0, High=0}
+	local mapSum=mp.Low+mp.Mid+mp.High
+
+	local bonus=(vars.mapResetCount and vars.mapResetCount[Map.Name] or 0)*20
+	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
+	local partyLevel=getPartyLevel()+bonus
+	local mapLevel=mapSum
+
+	if mp.Low~=0 then
+		--the map declares its own monsters: they set the level
+		partyLevel, mapLevel = mapSum, 0
+	elseif not Game.freeProgression then
+		partyLevel = getPartyLevel(4)*0.75
+	else
+		partyLevel = partyLevel+math.min((vars.MMLVL[currentWorld]+bonus)/2, 54)
+		mapLevel = 0
+	end
+	if vars.madnessMode then
+		partyLevel = madnessMapLevels[name] or (mapSum/3)^1.5
+		mapLevel = 0
+	end
+	if mapvars.mapAffixes then
+		partyLevel = mapvars.mapAffixes.Power*10+20
+	end
+	return MawCore.ItemLevel.ForDrop(nil, partyLevel, mapLevel)
+end
+
+function MawMapDropLevel()
+	local natives=currentMapMonsters
+	if monsterTableMap==Map.MapStatsIndex and totalLevel and natives and #natives>0 then
+		local lvl=totalLevel[natives[math.ceil(#natives/2)]]
+		if lvl and lvl>0 then
+			return lvl
+		end
+	end
+	return staticMapDropLevel()
 end
 
 function events.GameInitialized2()

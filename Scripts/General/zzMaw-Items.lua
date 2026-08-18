@@ -494,6 +494,8 @@ local PRIMORDIAL_CHARGES_MULT = 1.2
 local ANCIENT_MIN_CHARGES = 2
 local PRIMORDIAL_MIN_CHARGES = 4
 
+SHOP_LEVEL_SHARE = 0.75
+
 function GetMaxItemCharges()
 	return MawCore.ItemLevel.MaxPower()
 end
@@ -810,7 +812,7 @@ function RollEnchantType(it, exclude)
 	return id
 end
 
-TIER_LEVELS = 13.5
+TIER_LEVELS = 15
 
 function GetTier(level)
 	return math.floor((level or 0)/TIER_LEVELS)
@@ -1027,81 +1029,26 @@ function events.ItemGenerated(t)
 		it.BonusStrength=0
 		it.Charges=0
 		it.MaxCharges=0
-		--calculate party level
-		local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
-		local currentLevel=vars.MMLVL[currentWorld]
- 		local partyLevel=getPartyLevel()
-		
-		vars.mapResetCount=vars.mapResetCount or {}
-		vars.mapResetCount[Map.Name]=vars.mapResetCount[Map.Name] or 0
-		local bonus=vars.mapResetCount[Map.Name]*20
-		currentLevel=currentLevel+bonus
-		partyLevel=partyLevel+bonus
-		
-		if Map.Name=="d42.blv" then
-			currentLevel=monTbl[math.min((vars.highestArenaWave+1)*3,#monTbl)].Level*6
-			partyLevel=monTbl[math.min((vars.highestArenaWave+1)*3,#monTbl)].Level*6/1.5
-			if (vars.highestArenaWave+1)*3>#monTbl then
-				local diff=(vars.highestArenaWave+1)*3-#monTbl
-				local extraBoost=diff*3.5
-				currentLevel=currentLevel+extraBoost
-				partyLevel=partyLevel+extraBoost/1.5
-			end
+		local isShop=Game.HouseScreen==2 or Game.HouseScreen==95
+		local dropLevel
+		if isShop then
+			dropLevel=getTotalLevel()*SHOP_LEVEL_SHARE
+		else
+			dropLevel=drop.monsterLevel or MawMapDropLevel()
 		end
-		
-		local name=Game.MapStats[Map.MapStatsIndex].Name
-		mapLevel=mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High
-		if Map.Name~="d42.blv" then
-			if not Game.freeProgression then
-				partyLevel=getPartyLevel(4)*0.75
-				if mapLevels[name] and mapLevels[name].Low~=0 and Game.HouseScreen~=2 and Game.HouseScreen~=95 then
-					partyLevel=mapLevel
-					mapLevel=0
-				end
-			elseif mapLevels[name] and mapLevels[name].Low~=0 then
-				if Game.HouseScreen~=2 and Game.HouseScreen~=95 then
-					partyLevel=mapLevel
-					mapLevel=0
-				else
-					partyLevel=mapLevel*0.2+partyLevel
-				end
-			else
-				partyLevel=partyLevel+math.min(currentLevel/2,54)
-				mapLevel=0
-			end
-		end
-		if vars.madnessMode then
-			if madnessMapLevels[name] then
-				partyLevel=madnessMapLevels[name]
-			else
-				partyLevel=((mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)^1.5
-			end
-			mapLevel=0
-		end
-		if mapvars.mapAffixes then
-			currentLevel=mapvars.mapAffixes.Power*10+20
-			partyLevel=mapvars.mapAffixes.Power*10+20
-		end
+
 		--modify reagents
 		local itmod=3
 		if vars.AusterityMode then
 			itmod=8
 		end
 		if reagentList[it.Number] then
-			local bonus=math.min(partyLevel, getTotalLevel())
-			it.Bonus=round(bonus/itmod)
+			it.Bonus=round(math.min(dropLevel, getTotalLevel())/itmod)
 			return
 		end
-		
+
 		--difficulty settings
 		difficultyExtraPower=GetDifficultyExtraPower()
-		--nerf shops if no exp in current world
-		--[[
-		if (Game.HouseScreen==2 or Game.HouseScreen==95) and Game.freeProgression then 
-			partyLevel=round(partyLevel*(math.min(partyLevel/160 + currentLevel/80,1)))
-		end
-		]]
-		local dropLevel=MawCore.ItemLevel.ForDrop(drop.monsterLevel, partyLevel, mapLevel)
 		SetStoredDropLevel(it, dropLevel)
 		
 		--enchant tier and charges both read dropLevel: one item, one level
@@ -1135,7 +1082,6 @@ function events.ItemGenerated(t)
 				break
 			end
 		end
-		local isShop=Game.HouseScreen==2 or Game.HouseScreen==95
 		local noLegendary=vars.AusterityMode or isShop
 		if rarity==const.Rarity.Epic then
 			rarity=RollItemRarity(lootTier, drop.boss, noLegendary, drop.multiplier, isShop)
