@@ -1368,26 +1368,6 @@ function events.GetSkill(t)
 end
 
 
-function GetDensityMultiplier(id)
-	if vars.madnessMode then
-		density=7
-		divisor=10*2
-	elseif vars.insanityMode then
-		density=5
-		divisor=14*2
-	elseif vars.Mode==2 then
-		density=4
-		divisor=18*2
-	else 
-		return 1
-	end
-	
-	local baseLevel=BLevel[id]
-	local newDensity=math.max(density-math.floor(baseLevel/divisor),1)
-	local mult=density/newDensity
-	return mult^0.5
-end
-
 
 --I need to compute what's the expected healing amount
 -- to do so I need to first get the expected health, then having a coefficient

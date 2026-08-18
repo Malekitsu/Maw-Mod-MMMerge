@@ -790,7 +790,7 @@ function events.MonsterKilled(mon)
 	dropChance = pity_chance(dropChance, vars.mapDropFailures)
 	
 	-- Seeded map drop calculation
-	local mult = GetDensityMultiplier(mon.Id)
+	local mult = 1
 	if mon.NameId>=220 and mon.NameId<=300 then
 		mult=mult*10
 		

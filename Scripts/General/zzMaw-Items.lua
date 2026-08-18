@@ -260,12 +260,11 @@ function events.PickCorpse(t)
 			end
 		end
 		
-		local densityMultiplier=GetDensityMultiplier(mon.Id)
 		local dropIsBoss, dropIsOmnipotent=false, false
 		-- Special handling for bosses and resurrected
 		if mon.NameId > 300 then
-			mon.TreasureItemPercent = round(mon.TreasureItemPercent / 4*densityMultiplier^0.5)
-			mon.TreasureDiceSides = math.max(round(mon.TreasureDiceSides / 4*densityMultiplier^0.5), 1)
+			mon.TreasureItemPercent = round(mon.TreasureItemPercent / 4)
+			mon.TreasureDiceSides = math.max(round(mon.TreasureDiceSides / 4), 1)
 		elseif mon.NameId > 220 or mon.NameId == 160 then
 			mon.TreasureItemPercent = 100
 			local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
@@ -304,7 +303,6 @@ function events.PickCorpse(t)
 		lootFromMonster = true
 		LootContext.set{
 			monsterLevel=getMonsterLevel(mon),
-			multiplier=densityMultiplier,
 			boss=dropIsBoss,
 			omnipotent=dropIsOmnipotent,
 		}

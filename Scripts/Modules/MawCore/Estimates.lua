@@ -452,9 +452,6 @@ function getMonsterDamage(mon, level)
 		damage=damage*mapvars.bossData[index].DamageMult
 	end
 	
-	--buff based on density
-	damage=damage*GetDensityMultiplier(mon.Id)
-	
 	return damage
 end
 
@@ -653,9 +650,6 @@ function getMonsterHealth(mon, level)
 		end
 		health=health*mapvars.bossData[index].HealthMult
 	end
-	
-	--buff based on density
-	health=health*GetDensityMultiplier(mon.Id)
 	
 	return health
 end
