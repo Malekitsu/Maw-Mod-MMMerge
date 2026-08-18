@@ -790,11 +790,11 @@ local function stage_dkAttack(t)
 			
 			pl.HP=math.min(pl:GetFullHP(), pl.HP+heal+leech)
 			
-			--dark grasp
-			if vars.dkActiveAttackSpell and vars.dkActiveAttackSpell[id]==96 then
-				pl.SP=pl.SP-MawCore.Classes.DKManaCost[96]
+			local graspCost=MawCore.Classes.DKManaCost[96]
+			if vars.dkActiveAttackSpell and vars.dkActiveAttackSpell[id]==96 and pl.SP>=graspCost then
 				local graspDuration = calcDebuffDuration(t.Monster, darkGraspCC, DK_GRASP_DURATION)
 				if graspDuration > 0 then
+					pl.SP=pl.SP-graspCost
 					t.Monster.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime, Game.Time+graspDuration)
 					local s, m=SplitSkill(pl.Skills[const.Skills.Dark])
 					if m>=4 then
