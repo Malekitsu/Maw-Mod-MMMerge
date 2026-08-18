@@ -1948,8 +1948,8 @@ function ascendSpellDamage(skill, mastery, spell, index)
 	diceMax=spellPowers[spell].diceMax*empowerMult
 	damageAdd=spellPowers[spell].dmgAdd*empowerMult
 	
-	diceMax=diceMax * (1+0.09 * skill)*1.025^skill
-	damageAdd=damageAdd*(1+0.04*skill^2)*1.025^skill
+	diceMax=diceMax*MawCore.Formulas.spellDiceScale(skill)
+	damageAdd=damageAdd*MawCore.Formulas.spellAddScale(skill)
 		
 	diceMin, diceMax, damageAdd = round(diceMin), round(diceMax), round(damageAdd)
 	return diceMin, diceMax, damageAdd
@@ -2064,7 +2064,7 @@ function getPersonalityManaCostReduction(pl)
 	local personality = pl:GetPersonality()
 	local level = math.min(getTotalLevel(),1000)
 	
-	local personalityDivisor = 10 + (level) * 40 / 1000
+	local personalityDivisor = 10 + (level) * 60 / 1000
 	local reductionPercent = personality / personalityDivisor
 	return (0.99^reductionPercent)
 end
@@ -2073,7 +2073,7 @@ end
 local function ascendCCSpellCosts(pl, s, m, personalityReduction)
 	for key, value in pairs(CCMAP) do
 		for i=1,4 do
-			local baseCost = spellCost[key][masteryName[i]]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
+			local baseCost = spellCost[key][masteryName[i]]*(1+s*0.2)*1.03^(s)*(1-0.125*m)
 			local finalCost=math.min(math.ceil(baseCost * personalityReduction), 65000)
 			Game.Spells[key]["SpellPoints" .. masteryName[i]]=finalCost
 		end

@@ -98,6 +98,18 @@ function Formulas.mawPlayerHitChance(pl, mon, range, bonus)
 	return Formulas.mawHitChance(atk, getMonsterLevel(mon), Formulas.blessHitBonus(pl))
 end
 
+Formulas.spellDicePerSkill  = 0.02
+Formulas.spellAddPerSkillSq = 0.01
+Formulas.spellSkillBase     = 1.025
+
+function Formulas.spellDiceScale(s)
+	return (1 + Formulas.spellDicePerSkill*s)*Formulas.spellSkillBase^s
+end
+
+function Formulas.spellAddScale(s)
+	return (1 + Formulas.spellAddPerSkillSq*s*s)*Formulas.spellSkillBase^s
+end
+
 function Formulas.critCap(madness)
 	return madness and 3000 or 2000
 end

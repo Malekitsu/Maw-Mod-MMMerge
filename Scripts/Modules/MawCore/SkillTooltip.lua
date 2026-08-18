@@ -163,8 +163,9 @@ end, "meditation SP regen")
 
 SkillTooltip.set(const.Skills.Learning, 1, function(pl)
 	local s, m = SplitSkill(pl:GetSkill(const.Skills.Learning))
-	local dmgMult = shortenNumber(round(((1 + 0.075 * s) * 1.025 ^ s - 1) * 100), 3)
-	local dmgBaseMult = shortenNumber(round(((1 + 0.05 * s ^ 2) * 1.025 ^ s - 1) * 100), 3)
+	local F = MawCore.Formulas
+	local dmgMult = shortenNumber(round((F.spellDiceScale(s) - 1) * 100), 3)
+	local dmgBaseMult = shortenNumber(round((F.spellAddScale(s) - 1) * 100), 3)
 	local healMult = shortenNumber(round(((1 + 0.05 * s) * 1.02 ^ s - 1) * 100), 3)
 	local healBaseMult = shortenNumber(round(((1 + 0.03 * s ^ 2) * 1.02 ^ s - 1) * 100), 3)
 	local masteryReduction = (1 - m * 0.125)
