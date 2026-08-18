@@ -12,6 +12,33 @@ function bolsteredLevel(floor, levels)
 	return calcLevel(calcExp(floor) + oldExpClimbed)
 end
 
+--Monsters come in families of three (A/B/C). Every stat is read off the B
+--variant and the A/C difference is carried by their own multipliers, so this is
+--the id anything level-related should look up.
+function MawTierB(id)
+	if id%3==1 then
+		return id+1
+	elseif id%3==0 then
+		return id-1
+	end
+	return id
+end
+
+BOSS_HP_BASE = 1			--worth before any level scaling
+BOSS_HP_LEVEL_DIVISOR = 255	--levels per extra point of multiplier
+AUSTERITY_BOSS_FLATTEN = 4	--Austerity divides both the level term and the roll
+
+function MawBossLevel(id)
+	local lvl=totalLevel and totalLevel[id]
+	if not lvl then
+		return nil
+	end
+	if id%3==0 then
+		return lvl + (lvl - (totalLevel[id-1] or lvl))
+	end
+	return totalLevel[id+1] or lvl
+end
+
 function events.GameInitialized2()
 BLevel={}
 	for i=1, 217 do
@@ -278,11 +305,6 @@ function recalculateMawMonster()
 				end
 				if mapvars.uniqueMonsterLevel and mapvars.uniqueMonsterLevel[index] then
 					mon.Level=math.min(mapvars.uniqueMonsterLevel[index],255)
-				end
-				local totalHP=mon.HP*2^(math.floor(mon.Resistances[0]/1000))
-				local austerityMod=1
-				if vars.AusterityMode then
-					austerityMod=4
 				end
 				mon.Resistances[0]=round(txt.Resistances[0]*5)/5%1000
 				local HPproportion=mon.HP/mon.FullHP
@@ -2909,17 +2931,16 @@ function generateBoss(index, nameIndex, skillType)
 	mon.NameId = nameIndex
 
 
-	local lvl = totalLevel[mon.Id] or mon.Level
-	if lvl > 100 then
-		lvl = round(lvl + math.random() * 20 + 10)
-	else
-		lvl = round(lvl * (1.1 + math.random() * 0.2))
-	end
+	local lvl = round(MawBossLevel(mon.Id) or mon.Level)
 	mon.Level = math.min(lvl, 255)
 	
 
-	local austerityMod = vars.AusterityMode and 4 or 1
-	local hpMult= 2 * (0.75 + mon.Level / 85 / austerityMod) * (1 + math.random() / austerityMod)
+	--Austerity flattens bosses in two ways at once: a quarter of the level
+	--scaling, and a quarter of the roll's spread.
+	local flatten = vars.AusterityMode and AUSTERITY_BOSS_FLATTEN or 1
+	local fromLevel = BOSS_HP_BASE + mon.Level/BOSS_HP_LEVEL_DIVISOR/flatten
+	local roll = 1 + math.random() * 0.5 /flatten
+	local hpMult = 2.5*fromLevel*roll
 	if getMapAffixPower(18) then
 		hpMult = hpMult * (1 + getMapAffixPower(18) / 100)
 	end
@@ -2930,7 +2951,7 @@ function generateBoss(index, nameIndex, skillType)
 	mon.TreasureItemType		= math.random(1, 12)
 	mon.TreasureItemLevel	 = math.min(mon.TreasureItemLevel + 1, 6)
 
-	local dmgMult = 1.5 + math.random() * 0.5
+	local dmgMult = 1.2 + math.random() * 0.2
 
 	-- skill / nom
 	local skill=skillType
@@ -2964,15 +2985,15 @@ function generateBoss(index, nameIndex, skillType)
 			skill = SkillList[math.random(1, #SkillList)]
 			if math.random() < 0.01 * chanceMult and not generatedByBroodlord then
 				skill = "Broodlord"
-				hpMult=hpMult*2
-				dmgMult = dmgMult * 1.5
+				hpMult=hpMult*1.5
+				dmgMult = 1.5 + math.random() * 0.3
 			end
 			if generatedByBroodlord then
 				skill = "Broodling"
 			end
 			if math.random() < 0.001 * chanceMult then
 				skill = "Omnipotent"
-				dmgMult = dmgMult * 2
+				dmgMult = 2 + math.random()*0.5
 				hpMult=hpMult*4
 			end
 		end
