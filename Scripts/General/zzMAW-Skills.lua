@@ -152,6 +152,11 @@ armsmasterSkill={
 	["Attack"]={1,1,1,1,1,[0]=0},
 }
 
+function MawArmsmasterApplies(pl)
+	local main=pl:GetActiveItem(1)
+	return main~=nil and main:T().Skill~=const.Skills.Staff
+end
+
 skillCap={
 	[const.Skills.Alchemy]=60,
 	[50]=30,	--Cover: the chance is 10% +1% per point, so it tops out at 40%
@@ -513,8 +518,10 @@ function events.GetAttackDelay(t)
 			baseSpeed=baseSpeed/2
 		end
 		
-		local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Armsmaster))
-		bonusSpeed=bonusSpeed+s*armsmasterSkill.Speed[m]
+		if MawArmsmasterApplies(t.Player) then
+			local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Armsmaster))
+			bonusSpeed=bonusSpeed+s*armsmasterSkill.Speed[m]
+		end
 	end
 	--class speed bonuses are halved like skillRecovery/armsmasterSkill.Speed
 	if table.find(dkClass, t.Player.Class) then

@@ -27,7 +27,7 @@ function events.Action(t)
 			RunNextTick(function()
 				pl.LevelBase=lvl
 				pl.Experience=ex
-				itemStats(Party[0])
+				itemStats(pl:GetIndex())
 				mawRefresh("all")
 				mawRefresh("all")
 			end)

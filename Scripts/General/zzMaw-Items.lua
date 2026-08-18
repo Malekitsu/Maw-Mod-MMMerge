@@ -3062,7 +3062,7 @@ end
 local function addMiscAttack(pl, tab)
 	--armsmaster attack
 	local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
-	if m>0 then
+	if m>0 and MawArmsmasterApplies(pl) then
 		tab[40]=tab[40]+armsmasterSkill.Attack[m]*s
 	end
 	--unarmed
