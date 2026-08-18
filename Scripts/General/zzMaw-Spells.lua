@@ -1319,8 +1319,8 @@ CCMAP={
 	[const.Spells.Fear]=	{["Duration"]=const.Minute*4, ["ChanceMult"]=0.005, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Fear},
 	[const.Spells.Enslave]=	{["Duration"]=const.Minute*5, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=1, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Enslave},
 	[const.Spells.Paralyze]={["Duration"]=const.Minute*3, ["ChanceMult"]=0.04, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Light, ["DamageKind"]=const.Damage.Light,["Debuff"]=const.MonsterBuff.Paralyze},	
-	[const.Spells.ShrinkingRay]={["Duration"]=const.Minute*6, ["ChanceMult"]=0.01, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark,["Debuff"]=const.MonsterBuff.ShrinkingRay},
-	[const.Spells.DarkGrasp]=	{["Duration"]=const.Minute*10, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]={const.MonsterBuff.ArmorHalved, const.MonsterBuff.Slow, const.MonsterBuff.DamageHalved, const.MonsterBuff.MeleeOnly}},																									
+	[const.Spells.ShrinkingRay]={["Duration"]=const.Minute*4, ["ChanceMult"]=0.01, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark,["Debuff"]=const.MonsterBuff.ShrinkingRay},
+	[const.Spells.DarkGrasp]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]={const.MonsterBuff.ArmorHalved, const.MonsterBuff.Slow, const.MonsterBuff.DamageHalved, const.MonsterBuff.MeleeOnly}},																									
 	[const.Spells.TurnUndead]={["Duration"]=const.Minute*5, ["ChanceMult"]=0.005, ["BaseCost"]=1, ["ScalingCost"]=0.5, ["School"]=const.Skills.Spirit, ["DamageKind"]=const.Damage.Spirit, ["Debuff"]=const.MonsterBuff.Fear},	
 	[const.Spells.ControlUndead]={["Duration"]=const.Minute*10, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=1.5, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]=const.MonsterBuff.Enslave},
 }
@@ -1364,12 +1364,23 @@ function events.Action(t)
 	Game.Spells[122]["SpellPointsGM"]=30
 end
 
+--What mastery is worth on a CC duration. FlatDuration opts a spell out: it
+--buys its mastery scaling somewhere else (Shrinking Ray buys targets).
+--applyCCDebuff and ascendCCTooltips both go through here.
+local CC_MASTERY_STEP = {0.5, 0.65, 0.8, 1}
+
+function GetCCMasteryMult(cc, m)
+	if cc.FlatDuration then
+		return 1
+	end
+	return CC_MASTERY_STEP[math.min(math.max(m, 1), 4)]
+end
+
 --One source for CC application (MawCore/NOTES.md): engineApplied caps the
 --engine's roll (min: 0 duration = resist), the impact path extends (max).
 function applyCCDebuff(mon, cc, pl, spellId, resistance, engineApplied)
 	local s, m = SplitSkill(pl:GetSkill(cc.School))
-	local masteryMult = ({0.5, 0.65, 0.8, 1})[math.min(math.max(m, 1), 4)]
-	local duration = cc.Duration * masteryMult
+	local duration = cc.Duration * GetCCMasteryMult(cc, m)
 	if spellId ~= 122 then
 		local ascension = SplitSkill(pl:GetSkill(const.Skills.Learning))
 		duration = duration * 1.015^ascension / (1 + resistance/100)
@@ -1422,7 +1433,7 @@ function events.GameInitialized2()
 		return CCMAP[spellId].Duration/const.Minute*MawCore.Formulas.gameMinuteSeconds
 	end
 	Game.SpellsTxt[const.Spells.ShrinkingRay].Description=string.format(
-		"Shrinks even the grandest of monsters down to more manageable sizes. A shrunken monster deals %d%% less damage, at any mastery. Base duration %gs at Grandmaster, less below, extended by Learning. Does not stack with Dark Grasp.",
+		"Shrinks even the grandest of monsters down to more manageable sizes. A shrunken monster deals %d%% less damage. Each impact covers one monster per mastery nearby, preferring those not already shrunk. Base duration %gs at every mastery, extended by Learning. Does not stack with Dark Grasp.",
 		damageCut(const.MonsterBuff.ShrinkingRay), baseSeconds(const.Spells.ShrinkingRay))
 	local graspText=string.format(
 		"This spell surrounds its target with the power of raw darkness, rendering it unable to fire missile attacks or cast spells. Further the target's movement is slowed, its armor class is halved and it deals %d%% less damage. Base duration %gs at Grandmaster, less below, extended by Learning. Does not stack with Shrinking Ray.",
@@ -1625,11 +1636,45 @@ local ccByObjType = {
 	[9030] = const.Spells.ShrinkingRay,
 }
 CCMAP[const.Spells.ShrinkingRay].BuffPower = 2
+CCMAP[const.Spells.ShrinkingRay].SplashRadius = 512
+--mastery buys targets, so it must not also buy duration
+CCMAP[const.Spells.ShrinkingRay].FlatDuration = true
 
 function events.GameInitialized2()
 	for objType in pairs(ccByObjType) do
 		MawEnableProjectileImpact(objType) --helper in zzMaw-Monsters (MM6 projectiles)
 	end
+end
+
+local function splashTargets(cc, x, y, z, count, skipIndex)
+	local debuff = type(cc.Debuff)=="table" and cc.Debuff[1] or cc.Debuff
+	local ai = const.AIState
+	local taken, out = {[skipIndex] = true}, {}
+	for _ = 1, count do
+		local fresh, freshDist, stale, staleExpire
+		for i = 0, Map.Monsters.High do
+			local mon = Map.Monsters[i]
+			if not taken[i] and mon.Hostile and mon.AIState~=ai.Dead
+					and mon.AIState~=ai.Removed and mon.AIState~=ai.Invisible then
+				local dist = math.sqrt((mon.X-x)^2 + (mon.Y-y)^2 + (mon.Z-z)^2)
+				if dist <= cc.SplashRadius then
+					local expire = mon.SpellBuffs[debuff].ExpireTime
+					if expire <= Game.Time then
+						if not freshDist or dist < freshDist then
+							fresh, freshDist = i, dist
+						end
+					elseif not staleExpire or expire < staleExpire then
+						stale, staleExpire = i, expire
+					end
+				end
+			end
+		end
+		local pick = fresh or stale
+		if not pick then break end
+		taken[pick] = true
+		out[#out+1] = Map.Monsters[pick]
+	end
+	return out
 end
 
 function events.MonsterAttacked(t)
@@ -1640,11 +1685,21 @@ function events.MonsterAttacked(t)
 		local pl = t.Attacker.Player
 		local cc = CCMAP[spellId]
 		if pl and cc then
-			local mon = t.Monster
-			if applyCCDebuff(mon, cc, pl, spellId, mon.Resistances[cc.DamageKind], false) and cc.BuffPower then
-				local debuffs = type(cc.Debuff)=="table" and cc.Debuff or {cc.Debuff}
-				for v=1,#debuffs do
-					mon.SpellBuffs[debuffs[v]].Power=cc.BuffPower
+			local targets = {t.Monster}
+			if cc.SplashRadius then
+				--the monster hit is target 1, mastery buys the rest
+				local _, m = SplitSkill(pl:GetSkill(cc.School))
+				for _, extra in ipairs(splashTargets(cc, o.X, o.Y, o.Z,
+						math.max(m, 1) - 1, t.MonsterIndex)) do
+					targets[#targets+1] = extra
+				end
+			end
+			for _, mon in ipairs(targets) do
+				if applyCCDebuff(mon, cc, pl, spellId, mon.Resistances[cc.DamageKind], false) and cc.BuffPower then
+					local debuffs = type(cc.Debuff)=="table" and cc.Debuff or {cc.Debuff}
+					for v=1,#debuffs do
+						mon.SpellBuffs[debuffs[v]].Power=cc.BuffPower
+					end
 				end
 			end
 		end
@@ -2114,18 +2169,34 @@ end
 --monsters no longer carry bolstered resistances, so the CC tooltips assume a
 --monster at the caster's level and convert: roughly 1 resistance per 2 levels
 CC_TOOLTIP_LEVELS_PER_RESISTANCE = 2
+learnableSpells={{1,2,3,4},{5,6,7},{8,9,10},{11}}
+local tierMinMastery={}
+for m=1,#learnableSpells do
+	for _,tier in ipairs(learnableSpells[m]) do
+		tierMinMastery[tier]=m
+	end
+end
+
+function GetSpellMinMastery(spellId)
+	return tierMinMastery[spellId%11==0 and 11 or spellId%11] or 1
+end
+
+local masteryField={"Normal", "Expert", "Master", "GM"}
 
 local function ascendCCTooltips(pl, s)
 	local resistance=pl.LevelBase/CC_TOOLTIP_LEVELS_PER_RESISTANCE
-	local masteryStep={0.5, 0.65, 0.8, 1}
 	for key, value in pairs(CCMAP) do
 		--same shape as applyCCDebuff
 		local duration=value.Duration/const.Minute*MawCore.Formulas.gameMinuteSeconds
 			*1.015^s/(1 + resistance/100)
-		Game.SpellsTxt[key].Normal = string.format("Duration: %.1f seconds", duration*masteryStep[1])
-		Game.SpellsTxt[key].Expert = string.format("Duration: %.1f seconds", duration*masteryStep[2])
-		Game.SpellsTxt[key].Master = string.format("Duration: %.1f seconds", duration*masteryStep[3])
-		Game.SpellsTxt[key].GM = string.format("Duration: %.1f seconds", duration*masteryStep[4])
+		local minMastery=GetSpellMinMastery(key)
+		for m=1,#masteryField do
+			local line=string.format("Duration: %.1f seconds", duration*GetCCMasteryMult(value, m))
+			if value.SplashRadius then
+				line=string.format("%s, %d target%s", line, m, m>1 and "s" or "")
+			end
+			Game.SpellsTxt[key][masteryField[m]] = m<minMastery and "n/a" or line
+		end
 	end
 end
 
@@ -2414,7 +2485,6 @@ local function ascendRemaining(pl, s, m, id)
 		end
 		local capMastery=Skillz.MasteryLimit(pl,skill)
 		local tier=i%11==0 and 11 or i%11
-		local learnableSpells={{1,2,3,4},{5,6,7},{8,9,10},{11}}
 		if not pl.Spells[i] then
 			local txt=StrColor(255,0,0,"\n\nCan't learn")
 			for k=1,capMastery do
