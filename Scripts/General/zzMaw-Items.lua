@@ -2546,6 +2546,12 @@ local function buildSets()
 	meditationBonusItemSet=makeSet(meditationBonusItemMap)
 end
 
+--ancientWeapons are listed inside artWeap1h/2h, so they answer true here too
+function IsArtifactWeapon(it)
+	buildSets()
+	return artWeaponsSet[it.Number]==true
+end
+
 --phase 1: armor/shield AC accumulated into the globals armorAC/shieldAC
 --(read by the armor-skill scaling and the armor skill tooltips) and tab[10]
 local function collectArmorAC(pl, index, it, txt, tab)
@@ -2678,21 +2684,8 @@ local function addWeaponRows(pl, index, it, txt, tab, floorPaid)
 	if not ancientWeaponsSet[it.Number] and mainWeapon and mainWeapon:T().Skill==7 then
 		return
 	end
-	--item-level weapon damage replaces base Mod2/sides and charge scaling:
-	--the enchant-driven split goes half as attack/flat and half over the sides,
-	--while the weapon's own base skips the split entirely -- its dice part lands
-	--only on the sides, its flat part only on attack/flat
-	local wDmg,wDice,wFlat=GetWeaponDamage(it)
-	local split=wDmg-wDice-wFlat
-	local bonus=split/2+wFlat
-	local sidesBonus=(split/2+wDice)/math.max(txt.Mod1DiceCount,1)
-	if artWeaponsSet[it.Number] then
-		if txt.EquipStat<=1 then
-			local artifactMult=artifactPowerMult(pl.LevelBase, false, it.BonusExpireTime)
-			bonus=math.ceil(txt.Mod2*artifactMult)
-			sidesBonus=math.ceil(txt.Mod1DiceSides*artifactMult)
-		end
-	end
+	--item-level weapon damage replaces base Mod2/sides and charge scaling
+	local bonus,sidesBonus=GetWeaponDamageRows(it)
 	local skill=txt.Skill
 	--minotaur fix
 	if oneHandedAxesSet[it.Number] or twoHandedAxesSet[it.Number] then
@@ -2987,7 +2980,7 @@ local function addHP(pl, id, tab, enduranceStatBuff)
 	local enduranceBonus=fullHP1*endurance/STAT_DAMAGE_DIVISOR
 	local fullHP2=fullHP1+enduranceBonus
 	local BBBonus=fullHP2*(bodybuildingHP[math.min(m,4)]*0.01*s)
-	local bbEndBonus=fullHP2+BBBonus-fullHP1
+	local bbEndBonus=enduranceBonus+BBBonus+hpScaling*BBHP
 	--used for stats
 	hpStatsMap=hpStatsMap or {}
 	hpStatsMap[id]={
@@ -4385,12 +4378,39 @@ function IsTwoHandedWeapon(it)
 	return it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number)~=nil
 end
 
+--An artifact is always the best of its weapon type. The ladder answers which
+--rung of a base family an item sits on, and an artifact sits on no family: read
+--that way it would land on the average rung, or on a neighbour's by accident.
 function GetWeaponFlatDamage(it)
+	if IsArtifactWeapon(it) then
+		return weaponTierFlat(MawCore.ItemLevel.Tiers)
+	end
 	return weaponTierFlat(MawCore.ItemLevel.LadderTier(it.Number))
 end
 
 function GetWeaponDamage(it)
 	return getWeaponDamageForLevel(MawCore.ItemLevel.OfItem(it), IsTwoHandedWeapon(it), GetWeaponFlatDamage(it))
+end
+
+--The two damage rows an item is worth: the flat/attack bonus and the sides of
+--one damage die. The enchant-driven split goes half to attack/flat and half
+--over the sides, while the weapon's own base skips the split -- its dice part
+--lands only on the sides, its flat part only on attack/flat.
+--
+--An artifact needs no case of its own here: it is exactly a top-tier weapon at
+--the party's own level, and both of those answers already come from
+--GetWeaponDamage above, through ItemLevel.OfItem and GetWeaponFlatDamage. Its
+--printed Mod2/Mod1DiceSides are ignored on purpose.
+--
+--addWeaponRows applies these to the character and the item tooltip prints them,
+--so they have to come from here: the number shown is the number dealt.
+function GetWeaponDamageRows(it)
+	local txt=it:T()
+	local wDmg,wDice,wFlat=GetWeaponDamage(it)
+	local split=wDmg-wDice-wFlat
+	local bonus=split/2+wFlat
+	local sides=(split/2+wDice)/math.max(txt.Mod1DiceCount,1)
+	return bonus, sides
 end
 
 --what enchants and auras scale off: the item-level share only, undamped

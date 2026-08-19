@@ -3,7 +3,7 @@ MawCore.ItemLevel = ItemLevel
 
 -- item levels one point of bonus power (the MaxCharges field) is worth
 ItemLevel.PerPower = 5
-
+ItemLevel.POWER_CAP = 100
 ItemLevel.POWER_HARD_CAP = 255
 
 function ItemLevel.MaxPower()
@@ -16,7 +16,8 @@ end
 
 -- the bonus power a drop needs in order to read back as a given level
 function ItemLevel.PowerFor(level)
-	return math.floor(math.max(level, 0)/ItemLevel.PerPower)
+	return math.min(math.floor(math.max(level, 0)/ItemLevel.PerPower),
+		ItemLevel.POWER_CAP)
 end
 
 ItemLevel.Tiers = 6
@@ -58,6 +59,9 @@ function ItemLevel.TierLevels(itemId)
 end
 
 function ItemLevel.OfItem(it)
+	if vars.MMLVL and IsArtifactWeapon and IsArtifactWeapon(it) then
+		return getTotalLevel()
+	end
 	return it.MaxCharges*ItemLevel.PerPower
 end
 

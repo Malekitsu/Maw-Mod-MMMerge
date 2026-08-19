@@ -251,11 +251,9 @@ local function tooltipEnchantStats(t)
 				local txt=Game.ItemsTxt[t.Item.Number]
 				local equipStat=txt.EquipStat
 				if equipStat<=2 then
-					--item-level weapon damage, same split as addWeaponRows
-					local wDmg,wDice,wFlat=GetWeaponDamage(t.Item)
-					local split=wDmg-wDice-wFlat
-					local bonus=round(split/2+wFlat)
-					local sides=round((split/2+wDice)/math.max(txt.Mod1DiceCount,1))
+					--the rows addWeaponRows actually applies, artifacts included
+					local bonus,sides=GetWeaponDamageRows(t.Item)
+					bonus,sides=round(bonus),round(sides)
 					t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " ..  txt.Mod1DiceCount .. "d" .. sides .. "+" .. bonus
 				end
 			end
@@ -518,12 +516,9 @@ local function tooltipArtifactBaseStats(t)
 			if ac>0 then 			
 				t.BasicStat= "Armor: +" .. ac
 			end
-			--WEAPONS
-			artifactMult=artifactPowerMult(Party[id].LevelBase, false, t.Item.BonusExpireTime)
-			local equipStat=txt.EquipStat
-			if equipStat<=2 then
-				local bonus=math.ceil(txt.Mod2*artifactMult)
-				local sides=math.ceil(txt.Mod1DiceSides*artifactMult)
+			if txt.EquipStat<=2 then
+				local bonus,sides=GetWeaponDamageRows(t.Item)
+				bonus,sides=round(bonus),round(sides)
 				t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " ..  txt.Mod1DiceCount .. "d" .. sides .. "+" .. bonus
 			end
 			local skill=t.Item:T().Skill
