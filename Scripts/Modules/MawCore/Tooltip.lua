@@ -486,6 +486,9 @@ end
 
 -- was zzMaw-Items.lua
 local function tooltipArtifactScaling(t)
+	if MawCore.Artifacts.Has(t.Item) then
+		return
+	end
 	if t.Description and (IsArtifactId(t.Item.Number)) then
 		require("string")
 		local pattern = "(%d+)"

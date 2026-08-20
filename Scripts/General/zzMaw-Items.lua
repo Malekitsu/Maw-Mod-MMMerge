@@ -1177,7 +1177,7 @@ function events.ItemGenerated(t)
 		end
 		--nerf to skills
 		if it.Bonus>=17 and it.Bonus<=24 then
-			it.BonusStrength=math.ceil(math.max(it.BonusStrength^0.5,it.BonusStrength/10))
+			it.BonusStrength=MawCore.Formulas.skillEnchantPower(it.BonusStrength)
 		end
 		-- buff to 2h weapons enchants
 		local mult=slotMult[it:T().EquipStat]
@@ -2552,6 +2552,12 @@ function IsArtifactWeapon(it)
 	return artWeaponsSet[it.Number]==true
 end
 
+--Every artifact, not just the ones on the weapon/armor lists: rings, belts and
+--amulets are in neither, and they still need one level and one power budget.
+function IsArtifactItem(it)
+	return IsArtifactId(it.Number) or IsArtifactWeapon(it) or artArmorsSet[it.Number]==true
+end
+
 --phase 1: armor/shield AC accumulated into the globals armorAC/shieldAC
 --(read by the armor-skill scaling and the armor skill tooltips) and tab[10]
 local function collectArmorAC(pl, index, it, txt, tab)
@@ -2565,7 +2571,13 @@ local function collectArmorAC(pl, index, it, txt, tab)
 	end
 	--artifacts
 	if artArmorsSet[it.Number] then
-		acBonus=math.ceil(acBonus*artifactPowerMult(pl.LevelBase, true, it.BonusExpireTime))
+		if MawCore.Artifacts.Has(it) then
+			local power=MawCore.ItemLevel.PowerFor(MawCore.Artifacts.LevelOf(it))
+			acBonus=ac+round(MawCore.Formulas.chargesArmorAC(referenceAC[it.Number], power))
+			acBonus=math.ceil(acBonus*MawCore.Artifacts.BaseMult(it))
+		else
+			acBonus=math.ceil(acBonus*artifactPowerMult(pl.LevelBase, true, it.BonusExpireTime))
+		end
 	end
 	--used later by the armor-skill scaling
 	if txt.Skill==8 then
@@ -2657,8 +2669,18 @@ local function collectEquipEffects(it, tab)
 	end
 end
 
---phase 1: artifact flat stat/skill bonuses, scaled by player level
+--phase 1: artifact flat stat/skill bonuses
 local function collectArtifactBonuses(pl, it, tab)
+	local bonuses=MawCore.Artifacts.BonusesOf(it)
+	if bonuses then
+		for key,value in pairs(bonuses.Stats) do
+			tab[key+1]=tab[key+1]+value
+		end
+		for key,value in pairs(bonuses.Skills) do
+			tab[key+50]=(tab[key+50] or 0)+round(value)
+		end
+		return
+	end
 	if artifactStatsBonus[it.Number] then
 		local mult=artifactPowerMult(pl.LevelBase, false, it.BonusExpireTime)
 		for key,value in pairs(artifactStatsBonus[it.Number]) do
@@ -3334,9 +3356,28 @@ statMap={
 	
 }
 
+--------------------------------
+---- Artifact power budgets
+--
+-- The system, and why a coefficient instead of a number: MawCore/Artifacts.lua.
+-- One point of coefficient = one enchant of a perfectly rolled Epic, on this
+-- slot, at this level. Three of them = exactly a perfect Epic.
+--
+--   artifactPower[504] = {
+--       [const.Stats.Might]     = 2,
+--       [const.Stats.Endurance] = 1,
+--       Skills = { [const.Skills.Armsmaster] = 0.5 },
+--       baseStatMultiplier = 1.2,	--weapon damage / armor AC, 1 = like the Epic
+--   }
+--
+-- An artifact with no entry here keeps running on the legacy artifactStatsBonus
+-- tables below, so the two can coexist while the data is filled in one item at
+-- a time. Delete an item's legacy rows when you give it a budget.
+artifactPower={}
+
 --artifacts stats bonus
 --------------------------------
----- Stat bonuses
+---- Stat bonuses (LEGACY -- being replaced by artifactPower above)
 artifactStatsBonus={}
 artifactStatsBonus[500] = {	[const.Stats.Accuracy] = 60}
 artifactStatsBonus[501] = {	[const.Stats.Might] = 60}
@@ -4410,7 +4451,8 @@ function GetWeaponDamageRows(it)
 	local split=wDmg-wDice-wFlat
 	local bonus=split/2+wFlat
 	local sides=(split/2+wDice)/math.max(txt.Mod1DiceCount,1)
-	return bonus, sides
+	local baseMult=MawCore.Artifacts.BaseMult(it)
+	return bonus*baseMult, sides*baseMult
 end
 
 --what enchants and auras scale off: the item-level share only, undamped

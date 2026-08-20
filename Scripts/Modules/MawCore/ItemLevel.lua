@@ -59,7 +59,7 @@ function ItemLevel.TierLevels(itemId)
 end
 
 function ItemLevel.OfItem(it)
-	if vars.MMLVL and IsArtifactWeapon and IsArtifactWeapon(it) then
+	if vars.MMLVL and IsArtifactItem and IsArtifactItem(it) then
 		return getTotalLevel()
 	end
 	return it.MaxCharges*ItemLevel.PerPower

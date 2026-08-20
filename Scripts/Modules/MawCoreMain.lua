@@ -41,6 +41,7 @@ MawCore.ModuleOrder = {
 	"Fixes",		-- engine patches ported from MAW_Fixes.dll
 	"Formulas",		-- shared gameplay formulas: effect + display read one source
 	"ItemLevel",	-- an item's level: MaxCharges <-> level, drop level, caps
+	"Artifacts",	-- artifact power as a budget priced against a perfect Epic
 	"Estimates",	-- balance model: expected player power, monster HP/damage
 	"Classes",		-- custom class registry: ids + presentation swap
 	"Pipeline",		-- ordered named-stage processing chains
