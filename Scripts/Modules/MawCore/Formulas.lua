@@ -22,6 +22,13 @@ function Formulas.skillEnchantPower(roll)
 	return math.ceil(math.max(roll^0.5, roll/10))
 end
 
+Formulas.vitalityEnchantHalfPoint = 50
+Formulas.vitalityEnchantCap = 5
+function Formulas.vitalityEnchantPower(roll, slotMult)
+	local growth = roll/Formulas.vitalityEnchantHalfPoint/(slotMult or 1)
+	return roll*(1 + math.min(growth, Formulas.vitalityEnchantCap))
+end
+
 -- Display % for the "divide by (1 + power/100)" reductions. decimals=2 for
 -- two shown digits. Takes STORED power: run a raw ring roll through
 -- resistanceEnchantPower first.

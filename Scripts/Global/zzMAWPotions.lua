@@ -51,6 +51,8 @@ evt.PotionEffects[24] = function(IsDrunk, t, Power)
 		end
 	end
 end
+local ENCHANT_POTION_POWER_SHARE = 1/5
+local ENCHANT_POTION_MAX_POWER = 500
 evt.PotionEffects[18] = function(IsDrunk, t, Power)
 	if IsBaseItemId(t.Number) then
 		if t.Bonus2==0 and t.Bonus==0 and not HasEnc2(t) then
@@ -69,7 +71,8 @@ evt.PotionEffects[18] = function(IsDrunk, t, Power)
 				t.Bonus=math.random(1,10)
 			end
 			
-			t.BonusStrength=math.min(Mouse.Item.Bonus/3,200)
+			t.BonusStrength=math.min(Mouse.Item.Bonus, ENCHANT_POTION_MAX_POWER)
+				*ENCHANT_POTION_POWER_SHARE
 			-- buff to 2h weapons enchants
 			local mult=slotMult[t:T().EquipStat]
 			if mult then

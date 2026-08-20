@@ -485,24 +485,50 @@ local function tooltipEnchantStats(t)
 end
 
 -- was zzMaw-Items.lua
+
+local function signed(value)
+	return (value >= 0 and "+" or "") .. value
+end
+
+local function sortedKeys(t)
+	local keys = {}
+	for k in pairs(t) do
+		keys[#keys + 1] = k
+	end
+	table.sort(keys)
+	return keys
+end
+
 local function tooltipArtifactScaling(t)
-	if MawCore.Artifacts.Has(t.Item) then
+	if not (t.Description and IsArtifactItem(t.Item)) then
 		return
 	end
-	if t.Description and (IsArtifactId(t.Item.Number)) then
-		require("string")
-		local pattern = "(%d+)"
-		text=t.Description
-		t.Description = text:gsub(pattern, function(match) return replaceNumber(match, t.Item.BonusExpireTime) end)
-		local txt="\n\nScale with player level, up to level 550."
-		if vars.madnessMode then
-			txt="\n\nScale with player level, up to level 900."
-		end
-		if t.Item.BonusExpireTime>=1 then
-			txt=StrColor(120, 240, 255,"\n\nArtifact Level: " .. t.Item.BonusExpireTime)
-		end
-		t.Description = t.Description .. txt
+	local bonuses = MawCore.Artifacts.BonusesOf(t.Item)
+	--the vanilla "(Special Powers: +30 Might)" clause is the stale copy of what
+	--we are about to print, so it goes
+	local cut = t.Description:find("%(Special")
+	if cut then
+		t.Description = t.Description:sub(1, cut - 1)
 	end
+	local lines = {}
+	for _, stat in ipairs(sortedKeys(bonuses.Stats)) do
+		local name = itemStatName and itemStatName[stat + 1]
+		if name then
+			lines[#lines + 1] = name .. ": " .. signed(bonuses.Stats[stat])
+		end
+	end
+	for _, skill in ipairs(sortedKeys(bonuses.Skills)) do
+		local name = Game.SkillNames[skill]
+		if name then
+			lines[#lines + 1] = StrColor(255, 255, 153, name .. " skill")
+				.. ": " .. signed(bonuses.Skills[skill])
+		end
+	end
+	if #lines > 0 then
+		t.Description = t.Description .. "\n\n" .. table.concat(lines, "\n")
+	end
+	t.Description = t.Description .. StrColor(120, 240, 255,
+		"\n\nArtifact Level: " .. round(MawCore.Artifacts.LevelOf(t.Item)))
 end
 
 -- was zzMaw-Items.lua
@@ -513,11 +539,16 @@ local function tooltipArtifactBaseStats(t)
 			if id==-1 then
 				id=0
 			end
-			local artifactMult=artifactPowerMult(Party[id].LevelBase, true, t.Item.BonusExpireTime)
 			local txt=Game.ItemsTxt[t.Item.Number]
-			local ac=math.ceil((txt.Mod2+txt.Mod1DiceCount)*artifactMult)
-			if ac>0 then 			
-				t.BasicStat= "Armor: +" .. ac
+
+			if (txt.Skill>=8 and txt.Skill<=11) or txt.Skill==40 then
+				local power=MawCore.ItemLevel.PowerFor(MawCore.Artifacts.LevelOf(t.Item))
+				local ac=txt.Mod2+txt.Mod1DiceCount
+				ac=ac+round(MawCore.Formulas.chargesArmorAC(referenceAC[t.Item.Number] or ac, power))
+				ac=math.ceil(ac*MawCore.Artifacts.BaseMult(t.Item))
+				if ac>0 then
+					t.BasicStat= "Armor: +" .. ac
+				end
 			end
 			if txt.EquipStat<=2 then
 				local bonus,sides=GetWeaponDamageRows(t.Item)

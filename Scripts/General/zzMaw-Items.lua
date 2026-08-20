@@ -2569,15 +2569,10 @@ local function collectArmorAC(pl, index, it, txt, tab)
 	if it.MaxCharges>0 and not artArmorsSet[it.Number] then
 		acBonus=ac+round(MawCore.Formulas.chargesArmorAC(referenceAC[it.Number], it.MaxCharges))
 	end
-	--artifacts
 	if artArmorsSet[it.Number] then
-		if MawCore.Artifacts.Has(it) then
-			local power=MawCore.ItemLevel.PowerFor(MawCore.Artifacts.LevelOf(it))
-			acBonus=ac+round(MawCore.Formulas.chargesArmorAC(referenceAC[it.Number], power))
-			acBonus=math.ceil(acBonus*MawCore.Artifacts.BaseMult(it))
-		else
-			acBonus=math.ceil(acBonus*artifactPowerMult(pl.LevelBase, true, it.BonusExpireTime))
-		end
+		local power=MawCore.ItemLevel.PowerFor(MawCore.Artifacts.LevelOf(it))
+		acBonus=ac+round(MawCore.Formulas.chargesArmorAC(referenceAC[it.Number], power))
+		acBonus=math.ceil(acBonus*MawCore.Artifacts.BaseMult(it))
 	end
 	--used later by the armor-skill scaling
 	if txt.Skill==8 then
@@ -2597,8 +2592,7 @@ end
 local function collectEnchant(index, it, bonus, power, tab, isSecond)
 	--HP/SP enchants scale on read, not baked into BonusStrength at generation
 	if bonus==8 or bonus==9 then
-		local mult=GetSlotMult(it)
-		power=round(power*(1+math.min(power/50/mult,5)))
+		power=round(MawCore.Formulas.vitalityEnchantPower(power, GetSlotMult(it)))
 	end
 	local txt=it:T()
 	if txt.EquipStat==5 and txt.Mod2==0 then
@@ -2669,29 +2663,17 @@ local function collectEquipEffects(it, tab)
 	end
 end
 
---phase 1: artifact flat stat/skill bonuses
+
 local function collectArtifactBonuses(pl, it, tab)
 	local bonuses=MawCore.Artifacts.BonusesOf(it)
-	if bonuses then
-		for key,value in pairs(bonuses.Stats) do
-			tab[key+1]=tab[key+1]+value
-		end
-		for key,value in pairs(bonuses.Skills) do
-			tab[key+50]=(tab[key+50] or 0)+round(value)
-		end
+	if not bonuses then
 		return
 	end
-	if artifactStatsBonus[it.Number] then
-		local mult=artifactPowerMult(pl.LevelBase, false, it.BonusExpireTime)
-		for key,value in pairs(artifactStatsBonus[it.Number]) do
-			tab[key+1]=tab[key+1]+value*mult
-		end
+	for key,value in pairs(bonuses.Stats) do
+		tab[key+1]=tab[key+1]+value
 	end
-	if artifactSkillBonus[it.Number] then
-		local mult=artifactPowerMult(pl.LevelBase, false, it.BonusExpireTime)
-		for key,value in pairs(artifactSkillBonus[it.Number]) do
-			tab[key+50]=(tab[key+50] or 0)+round(value*mult)
-		end
+	for key,value in pairs(bonuses.Skills) do
+		tab[key+50]=(tab[key+50] or 0)+value
 	end
 end
 
@@ -3361,381 +3343,348 @@ statMap={
 --
 -- The system, and why a coefficient instead of a number: MawCore/Artifacts.lua.
 -- One point of coefficient = one enchant of a perfectly rolled Epic, on this
--- slot, at this level. Three of them = exactly a perfect Epic.
+-- slot, at this level. A whole artifact is worth Artifacts.Slots of them.
 --
 --   artifactPower[504] = {
 --       [const.Stats.Might]     = 2,
 --       [const.Stats.Endurance] = 1,
 --       Skills = { [const.Skills.Armsmaster] = 0.5 },
+--       Flat   = { [const.Stats.FireResistance] = 65000 },	--not a budget
 --       baseStatMultiplier = 1.2,	--weapon damage / armor AC, 1 = like the Epic
 --   }
 --
--- An artifact with no entry here keeps running on the legacy artifactStatsBonus
--- tables below, so the two can coexist while the data is filled in one item at
--- a time. Delete an item's legacy rows when you give it a budget.
+-- An id with no entry has no bonuses, which is not the same as having no
+-- budget: every artifact is on this system, and the base damage/AC it carries
+-- comes from its item level either way.
 artifactPower={}
 
---artifacts stats bonus
---------------------------------
----- Stat bonuses (LEGACY -- being replaced by artifactPower above)
-artifactStatsBonus={}
-artifactStatsBonus[500] = {	[const.Stats.Accuracy] = 60}
-artifactStatsBonus[501] = {	[const.Stats.Might] = 60}
-artifactStatsBonus[502] = {	[const.Stats.AirResistance] = 100}
-artifactStatsBonus[503] = {	[const.Stats.Endurance] = 40,
-							[const.Stats.Luck] = 40}
-artifactStatsBonus[504] = {	[const.Stats.Might] = 100}
-artifactStatsBonus[505] = {	[const.Stats.FireResistance] = 100}
-artifactStatsBonus[506] = {	[const.Stats.Endurance] = 60}
-artifactStatsBonus[507] = {[const.Stats.Might] 		= 20,
-							[const.Stats.Intellect] 	= 20,
-							[const.Stats.Personality] 	= 20,
-							[const.Stats.Speed] 		= 20,
-							[const.Stats.Accuracy]		= 20,
-							[const.Stats.Endurance] 	= 20,
-							[const.Stats.Luck]			= 20}
-artifactStatsBonus[509] = {	[const.Stats.Personality]   = 80}
-artifactStatsBonus[510] = { [const.Stats.Might] 		= 30,
-							[const.Stats.Endurance] 	= 30}		
-artifactStatsBonus[512] = { [const.Stats.Accuracy] 		= 50}						
-artifactStatsBonus[513] = { [const.Stats.Endurance] 	= 70}						
-artifactStatsBonus[514] = { [const.Stats.Might] 		= 20,
-							[const.Stats.Intellect] 	= 20,
-							[const.Stats.Personality] 	= 20,
-							[const.Stats.Speed] 		= 20,
-							[const.Stats.Accuracy]		= 20,
-							[const.Stats.Endurance] 	= 20,
-							[const.Stats.Luck]			= 20,
-							[const.Stats.FireResistance]	= 20,
-							[const.Stats.AirResistance]		= 20,
-							[const.Stats.WaterResistance]	= 20,
-							[const.Stats.EarthResistance]	= 20,
-							[const.Stats.MindResistance]	= 20,
-							[const.Stats.BodyResistance]	= 20,}	
-artifactStatsBonus[515] = { [const.Stats.Speed] 		= 60,							
-							[const.Stats.Accuracy] 		= 60}
-artifactStatsBonus[518] = { [const.Stats.Speed] 		= 60}
-artifactStatsBonus[519] = { [const.Stats.FireResistance]	= 40,
-							[const.Stats.AirResistance]		= 40,
-							[const.Stats.WaterResistance]	= 40,
-							[const.Stats.EarthResistance]	= 40}
-artifactStatsBonus[520] = { [const.Stats.Personality]	= 60,
-							[const.Stats.Intellect]		= 60}	
-artifactStatsBonus[521] = {	[const.Stats.Intellect] = 100}							
-artifactStatsBonus[522] = { [const.Stats.Intellect]	= 40,
-							[const.Stats.FireResistance]	= 10,
-							[const.Stats.AirResistance]		= 10,
-							[const.Stats.WaterResistance]	= 10,
-							[const.Stats.EarthResistance]	= 10,
-							[const.Stats.MindResistance]	= 10,
-							[const.Stats.BodyResistance]	= 10}
-artifactStatsBonus[523] = { [const.Stats.Speed]	= 100,
-							[const.Stats.WaterResistance]	= -50,
-							[const.Stats.Personality]	= -15}
-artifactStatsBonus[524] = {	[const.Stats.Speed]	= 70,
-							[const.Stats.Accuracy]	= 70,
-							[const.Stats.ArmorClass]	= -20}						
-artifactStatsBonus[525] = {	
-							[const.Stats.Accuracy]	= 120,		
-							[const.Stats.Speed]	= -20}		
-artifactStatsBonus[526] = {	[const.Stats.Might]	= 70,
-							[const.Stats.Accuracy]		= 70,
-							[const.Stats.Personality]	= 50,
-							[const.Stats.Intellect]	= 50}		
-artifactStatsBonus[527] = {	[const.Stats.Might]	= 80,
-							[const.Stats.Luck]	= -40}
-artifactStatsBonus[528]	= {	[const.Stats.WaterResistance]	= 140,
-							[const.Stats.FireResistance]	= -40}		
-artifactStatsBonus[529]	= {	[const.Stats.Might]	= 100,
-							[const.Stats.Accuracy]	= 100}		
-artifactStatsBonus[530]	= {	[const.Stats.ArmorClass]	= -40}		
-artifactStatsBonus[531]	= {	[const.Stats.Accuracy]	= 100,
-							[const.Stats.ArmorClass]	= -20}		
-artifactStatsBonus[532]	= {	[const.Stats.Might]	= 60,
-							[const.Stats.Speed]	= 60,}		
-artifactStatsBonus[533]	= {	[const.Stats.Intellect]	= 140,
-							[const.Stats.Personality] = 140,
-							[const.Stats.MindResistance]	= -100,
-							[const.Stats.BodyResistance]	= -100}		
-artifactStatsBonus[534]	= {	[const.Stats.Luck]	= -15,
-							[const.Stats.Endurance]	= 50}
-artifactStatsBonus[535]	= {	[const.Stats.Intellect]	= 60,
-							[const.Stats.Endurance]	= -20}			
-artifactStatsBonus[536]	= {	[const.Stats.Luck]	= 100,
-							[const.Stats.Personality]	= -50}		
-artifactStatsBonus[537]	= {	[const.Stats.Might]	= 120,
-							[const.Stats.Accuracy]	= -30,
-							[const.Stats.ArmorClass]	= -15}							
-							
+-- Converted from the old artifactStatsBonus/artifactSkillBonus numbers by
+-- keeping each artifact's INTERNAL split and renormalising its upside to 3.
+-- A skill point was priced at 10 stat points, which is the ratio the old
+-- tables used. Drawbacks kept the same exchange rate as the upside they sit
+-- next to, so an artifact that gave up a lot still gives it up.
 
+-- Ogre's Hammer
+artifactPower[500] = {	[const.Stats.Accuracy] = 3}
+-- Sword of Might
+artifactPower[501] = {	[const.Stats.Might] = 3}
+artifactPower[502] = {	[const.Stats.AirResistance] = 1.76,
+						Skills = {	[const.Skills.Armsmaster] = 1.24}}
+artifactPower[503] = {	[const.Stats.Endurance] = 1.5,
+						[const.Stats.Luck] = 1.5}
+artifactPower[504] = {	[const.Stats.Might] = 3}
+artifactPower[505] = {	[const.Stats.FireResistance] = 3}
+artifactPower[506] = {	[const.Stats.Endurance] = 3}
+artifactPower[507] = {	[const.Stats.Might] 		= 0.43,
+						[const.Stats.Intellect] 	= 0.43,
+						[const.Stats.Personality] 	= 0.43,
+						[const.Stats.Speed] 		= 0.43,
+						[const.Stats.Accuracy]		= 0.43,
+						[const.Stats.Endurance] 	= 0.43,
+						[const.Stats.Luck]			= 0.43}
+artifactPower[509] = {	[const.Stats.Personality] = 3}
+artifactPower[510] = {	[const.Stats.Might] = 1.5,
+						[const.Stats.Endurance] = 1.5}
+artifactPower[512] = {	[const.Stats.Accuracy] = 1.67,
+						Skills = {	[const.Skills.Bow] = 1.33}}
+artifactPower[513] = {	[const.Stats.Endurance] = 3}
+artifactPower[514] = {	[const.Stats.Might] 		= 0.23,
+						[const.Stats.Intellect] 	= 0.23,
+						[const.Stats.Personality] 	= 0.23,
+						[const.Stats.Speed] 		= 0.23,
+						[const.Stats.Accuracy]		= 0.23,
+						[const.Stats.Endurance] 	= 0.23,
+						[const.Stats.Luck]			= 0.23,
+						[const.Stats.FireResistance]	= 0.23,
+						[const.Stats.AirResistance]		= 0.23,
+						[const.Stats.WaterResistance]	= 0.23,
+						[const.Stats.EarthResistance]	= 0.23,
+						[const.Stats.MindResistance]	= 0.23,
+						[const.Stats.BodyResistance]	= 0.23}
+artifactPower[515] = {	[const.Stats.Speed] = 1.5,
+						[const.Stats.Accuracy] = 1.5}
+artifactPower[517] = {	Skills = {	[const.Skills.DisarmTraps] = 1,
+									[const.Skills.Bow] = 1,
+									[const.Skills.Armsmaster] = 1}}
+artifactPower[518] = {	[const.Stats.Speed] = 3}
+artifactPower[519] = {	[const.Stats.FireResistance]	= 0.75,
+						[const.Stats.AirResistance]		= 0.75,
+						[const.Stats.WaterResistance]	= 0.75,
+						[const.Stats.EarthResistance]	= 0.75}
+artifactPower[520] = {	[const.Stats.Personality] = 1.5,
+						[const.Stats.Intellect] = 1.5}
+artifactPower[521] = {	[const.Stats.Intellect] = 3}
+artifactPower[522] = {	[const.Stats.Intellect] = 1.2,
+						[const.Stats.FireResistance]	= 0.3,
+						[const.Stats.AirResistance]		= 0.3,
+						[const.Stats.WaterResistance]	= 0.3,
+						[const.Stats.EarthResistance]	= 0.3,
+						[const.Stats.MindResistance]	= 0.3,
+						[const.Stats.BodyResistance]	= 0.3}
+artifactPower[523] = {	[const.Stats.Speed] = 3,
+						[const.Stats.WaterResistance] = -1.5,
+						[const.Stats.Personality] = -0.45}
+artifactPower[524] = {	[const.Stats.Speed] = 1.5,
+						[const.Stats.Accuracy] = 1.5,
+						[const.Stats.ArmorClass] = -0.43}
+artifactPower[525] = {	[const.Stats.Accuracy] = 3,
+						[const.Stats.Speed] = -0.5}
+artifactPower[526] = {	[const.Stats.Might] = 0.88,
+						[const.Stats.Accuracy] = 0.88,
+						[const.Stats.Personality] = 0.63,
+						[const.Stats.Intellect] = 0.63}
+artifactPower[527] = {	[const.Stats.Might] = 3,
+						[const.Stats.Luck] = -1.5}
+artifactPower[528] = {	[const.Stats.WaterResistance] = 3,
+						[const.Stats.FireResistance] = -0.86}
+artifactPower[529] = {	[const.Stats.Might] = 1.5,
+						[const.Stats.Accuracy] = 1.5}
+-- Staff of Elements: its four spell schools are the item, the AC is the price
+artifactPower[530] = {	[const.Stats.ArmorClass] = -1.2}
+artifactPower[531] = {	[const.Stats.Accuracy] = 2.14,
+						[const.Stats.ArmorClass] = -0.43,
+						Skills = {	[const.Skills.Bow] = 0.86}}
+artifactPower[532] = {	[const.Stats.Might] = 1.5,
+						[const.Stats.Speed] = 1.5}
+artifactPower[533] = {	[const.Stats.Intellect] = 1.5,
+						[const.Stats.Personality] = 1.5,
+						[const.Stats.MindResistance] = -1.07,
+						[const.Stats.BodyResistance] = -1.07}
+artifactPower[534] = {	[const.Stats.Endurance] = 3,
+						[const.Stats.Luck] = -0.9}
+artifactPower[535] = {	[const.Stats.Intellect] = 1.64,
+						[const.Stats.Endurance] = -0.55,
+						Skills = {	[const.Skills.Alchemy] = 1.36}}
+artifactPower[536] = {	[const.Stats.Luck] = 3,
+						[const.Stats.Personality] = -1.5}
+artifactPower[537] = {	[const.Stats.Might] = 3,
+						[const.Stats.Accuracy] = -0.75,
+						[const.Stats.ArmorClass] = -0.38}
 -- Cycle of life
-artifactStatsBonus[543] = {	[const.Stats.Endurance] = 20}
-
+artifactPower[543] = {	[const.Stats.Endurance] = 3}
 
 -- Puck
-artifactStatsBonus[1302] = {[const.Stats.Speed]	= 80}
+artifactPower[1302] = {	[const.Stats.Speed] = 3}
 -- Iron Feather
-artifactStatsBonus[1303] = {[const.Stats.Might]	= 80}
+artifactPower[1303] = {	[const.Stats.Might] = 3}
 -- Wallace
-artifactStatsBonus[1304] = {[const.Stats.Personality] = 40}
+artifactPower[1304] = {	[const.Stats.Personality] = 0.86,
+						Skills = {	[const.Skills.Armsmaster] = 2.14}}
 -- Corsair
-artifactStatsBonus[1305] = {[const.Stats.Luck] = 80}
+artifactPower[1305] = {	[const.Stats.Luck] = 1.33,
+						Skills = {	[const.Skills.DisarmTraps] = 1.67}}
 -- Governor's Armor
-artifactStatsBonus[1306] = {[const.Stats.Might] 		= 20,
-							[const.Stats.Intellect] 	= 20,
-							[const.Stats.Personality] 	= 20,
-							[const.Stats.Speed] 		= 20,
-							[const.Stats.Accuracy]		= 20,
-							[const.Stats.Endurance] 	= 20,
-							[const.Stats.Luck]			= 20}
+artifactPower[1306] = {	[const.Stats.Might] 		= 0.43,
+						[const.Stats.Intellect] 	= 0.43,
+						[const.Stats.Personality] 	= 0.43,
+						[const.Stats.Speed] 		= 0.43,
+						[const.Stats.Accuracy]		= 0.43,
+						[const.Stats.Endurance] 	= 0.43,
+						[const.Stats.Luck]			= 0.43}
 -- Yoruba
-artifactStatsBonus[1307] = {[const.Stats.Endurance] 	= 100}
--- Splitter
-artifactStatsBonus[1308] = {[const.Stats.FireResistance] = 65000}
+artifactPower[1307] = {	[const.Stats.Endurance] = 3}
+-- Splitter: fire immunity is a threshold, not a budget -- see Flat
+artifactPower[1308] = {	Flat = {	[const.Stats.FireResistance] = 65000}}
 -- Ullyses
-artifactStatsBonus[1312] = {[const.Stats.Accuracy] = 80}
--- Seven League Boots
-artifactStatsBonus[1314] = {[const.Stats.Speed] = 80}
--- Mash
-artifactStatsBonus[1316] = {[const.Stats.Might] 		= 150,
-							[const.Stats.Intellect] 	= -40,
-							[const.Stats.Personality] 	= -40,
-							[const.Stats.Speed] 		= -40}
--- Hareck's Leather
-artifactStatsBonus[1318] = {[const.Stats.Luck]				= 100,
-							[const.Stats.FireResistance] 	= -20,
-							[const.Stats.AirResistance] 	= -20,
-							[const.Stats.WaterResistance] 	= -20,
-							[const.Stats.EarthResistance] 	= -20,
-							[const.Stats.MindResistance] 	= -20,
-							[const.Stats.BodyResistance] 	= -20,}
--- Amuck
-artifactStatsBonus[1320] = {[const.Stats.Might] 		= 100,
-							[const.Stats.Endurance] 	= 100,
-							[const.Stats.ArmorClass] 	= -15}
--- Glory shield
-artifactStatsBonus[1321] = {[const.Stats.BodyResistance] = -20,
-							[const.Stats.MindResistance] = -20}
--- Kelebrim
-artifactStatsBonus[1322] = {[const.Stats.Endurance] = 100,
-							[const.Stats.EarthResistance] = -60}
--- Taledon's Helm
-artifactStatsBonus[1323] = {
-							[const.Stats.Might] = 45,
-							[const.Stats.Personality] = 45,
-							[const.Stats.Luck] = -40
-}
--- Scholar's Cap
-artifactStatsBonus[1324] = {[const.Stats.Endurance] = -50}
--- Phynaxian Crown
-artifactStatsBonus[1325] = {
-							[const.Stats.Personality] = 30,
-							[const.Stats.ArmorClass] = -20,
-							[const.Stats.WaterResistance] = 100
-}
--- Titan's Belt
-artifactStatsBonus[1326] = {
-							[const.Stats.Might] = 115,
-							[const.Stats.Speed] = -40
-}
--- Twilight
-artifactStatsBonus[1327] = {
-							[const.Stats.Speed] = 50,
-							[const.Stats.Luck] = 50,
-							[const.Stats.FireResistance] = -30,
-							[const.Stats.AirResistance] = -30,
-							[const.Stats.WaterResistance] = -30,
-							[const.Stats.EarthResistance] = -30,
-							[const.Stats.MindResistance] = -30,
-							[const.Stats.BodyResistance] = -30,
-}
--- Ania Selving
-artifactStatsBonus[1328] = {[const.Stats.ArmorClass] = -25,
-							[const.Stats.Accuracy] = 150}
--- Justice
-artifactStatsBonus[1329] = {[const.Stats.Speed] = -40}
--- Mekorig's hammer
-artifactStatsBonus[1330] = {[const.Stats.Might] = 75,
-							[const.Stats.AirResistance] = -100}
-							-- Hermes's Sandals
-artifactStatsBonus[1331] = {[const.Stats.Speed] = 100,
-							[const.Stats.Accuracy] = 50,
-							[const.Stats.AirResistance] = 100}
--- Cloak of the sheep
-artifactStatsBonus[1332] = {[const.Stats.Intellect] 	= -20,
-							[const.Stats.Personality] 	= -20}
--- Elfbane
-artifactStatsBonus[1333] = {[const.Stats.Speed] = 100}
--- Mind's Eye
-artifactStatsBonus[1334] = {
-							[const.Stats.Intellect] = 30,
-							[const.Stats.Personality] = 30
-}
--- Elven Chainmail
-artifactStatsBonus[1335] = {[const.Stats.Speed] = 30,
-							[const.Stats.Accuracy] = 30
-}
--- Forge Gauntlets
-artifactStatsBonus[1336] = {
-							[const.Stats.Might] = 30,
-							[const.Stats.Endurance] = 30,
-							[const.Stats.FireResistance] = 60
-}
--- Hero's belt
-artifactStatsBonus[1337] = {[const.Stats.Might] = 30}
--- Lady's Escort ring
-artifactStatsBonus[1338] = {[const.Stats.FireResistance]	= 10,
-							[const.Stats.AirResistance]		= 10,
-							[const.Stats.WaterResistance]	= 10,
-							[const.Stats.EarthResistance]	= 10,
-							[const.Stats.MindResistance]	= 10,
-							[const.Stats.BodyResistance]	= 10,}
--- Thor
-artifactStatsBonus[2021] = {[const.Stats.Might] = 75}
--- Conan
-artifactStatsBonus[2022] = {[const.Stats.Accuracy] = 150}
--- Excalibur
-artifactStatsBonus[2023] = {[const.Stats.Might] = 100}
--- Merlin
-artifactStatsBonus[2024] = {[const.Stats.Intellect] = 120,
-							[const.Stats.Personality] = 120,
-							[const.Stats.SP] = 200,
-							}
--- Percival
-artifactStatsBonus[2025] = {[const.Stats.Speed] = 40}
--- Galahad
-artifactStatsBonus[2026] = {[const.Stats.Endurance] = 100}
--- Pellinore
-artifactStatsBonus[2027] = {[const.Stats.Endurance] = 120}
--- Valeria
-artifactStatsBonus[2028] = {[const.Stats.Accuracy] = 80}
--- Arthur
-artifactStatsBonus[2029] = {
-							[const.Stats.Might] = 20,
-							[const.Stats.Intellect] = 20,
-							[const.Stats.Personality] = 20,
-							[const.Stats.Endurance] = 20,
-							[const.Stats.Accuracy] = 20,
-							[const.Stats.Speed] = 20,
-							[const.Stats.Luck] = 20,
-							[const.Stats.SP] = 100
-}
--- Pendragon
-artifactStatsBonus[2030] = {[const.Stats.Luck] = 60}
--- Lucius
-artifactStatsBonus[2031] = {[const.Stats.Speed] = 70}
--- Guinevere
-artifactStatsBonus[2032] = {[const.Stats.SP] = 100}
--- Igraine
-artifactStatsBonus[2033] = {[const.Stats.SP] = 100}
--- Morgan
-artifactStatsBonus[2034] = {[const.Stats.SP] = 80}
--- Hades
-artifactStatsBonus[2035] = {[const.Stats.Luck] = 60}
--- Ares
-artifactStatsBonus[2036] = {[const.Stats.FireResistance] = 100}
--- Poseidon
-artifactStatsBonus[2037] = {[const.Stats.Might] 	 = 40,
-							[const.Stats.Endurance]  = 40,
-							[const.Stats.Accuracy] 	 = 40,
-							[const.Stats.Speed] 	 = -10,
-							[const.Stats.ArmorClass] = -10}
--- Cronos
-artifactStatsBonus[2038] = {[const.Stats.Luck] 	 	= -60,
-							[const.Stats.Endurance] = 120}
--- Hercules
-artifactStatsBonus[2039] = {[const.Stats.Might] 	= 100,
-							[const.Stats.Endurance] = 60,
-							[const.Stats.Intellect]	= -30}
--- Artemis
-artifactStatsBonus[2040] = {[const.Stats.FireResistance] 	= -20,
-							[const.Stats.AirResistance] 	= -20,
-							[const.Stats.WaterResistance] 	= -20,
-							[const.Stats.EarthResistance] 	= -20}
--- Apollo
-artifactStatsBonus[2041] = {[const.Stats.Endurance]			= -30,
-							[const.Stats.FireResistance] 	= 40,
-							[const.Stats.AirResistance] 	= 40,
-							[const.Stats.WaterResistance] 	= 40,
-							[const.Stats.EarthResistance] 	= 40,
-							[const.Stats.MindResistance] 	= 40,
-							[const.Stats.BodyResistance] 	= 40,
-							[const.Stats.Luck]				= 20}
--- Zeus
-artifactStatsBonus[2042] = {[const.Stats.Endurance] 		= 50,
-							[const.Stats.Personality] 		= 50,
-							[const.Stats.Luck] 		= 50,
-							[const.Stats.Intellect] = -50}
--- Aegis
-artifactStatsBonus[2043] = {[const.Stats.Speed] = -20,
-							[const.Stats.Luck] 	= 100}
--- Odin
-artifactStatsBonus[2044] = {
-							[const.Stats.Speed] = -40,
-							[const.Stats.FireResistance] = 60,
-							[const.Stats.AirResistance] = 60,
-							[const.Stats.WaterResistance] = 60,
-							[const.Stats.EarthResistance] = 60
-						}
--- Atlas
-artifactStatsBonus[2045] = {
-							[const.Stats.Might] = 120,
-							[const.Stats.Speed] = -40
-						}
--- Hermes
-artifactStatsBonus[2046] = {
-							[const.Stats.Speed] = 140,
-							[const.Stats.Accuracy] = -40
-						}
--- Aphrodite
-artifactStatsBonus[2047] = {[const.Stats.Personality] = 100,
-							[const.Stats.Luck] 	= -40}
--- Athena
-artifactStatsBonus[2048] = {[const.Stats.Intellect] = 100,
-							[const.Stats.Might] 	= -40}
--- Hera
-artifactStatsBonus[2049] = {[const.Stats.HP] = 100,
-							[const.Stats.SP] = 100,
-							[const.Stats.Luck] = 50,
-							[const.Stats.Personality] = -50}
-
---SKILLS ARTEFACTS
----- Skill bonuses
-artifactSkillBonus={}
-artifactSkillBonus[502] =	{	[const.Skills.Armsmaster] = 7}
-artifactSkillBonus[512] =	{	[const.Skills.Bow] = 4}
-artifactSkillBonus[517] =	{	[const.Skills.DisarmTraps] = 8,
-								[const.Skills.Bow] = 8,
-								[const.Skills.Armsmaster] = 8}
-artifactSkillBonus[531] =	{	[const.Skills.Bow] = 4}
-artifactSkillBonus[535] =	{	[const.Skills.Alchemy] = 5}
--- Hero's belt
-artifactSkillBonus[1337] =	{	[const.Skills.Armsmaster] = 5}
--- Wallace
-artifactSkillBonus[1304] =	{	[const.Skills.Armsmaster] = 10}
--- Corsair
-artifactSkillBonus[1305] =	{	[const.Skills.DisarmTraps] = 10}
+artifactPower[1312] = {	[const.Stats.Accuracy] = 3}
 -- Hands of the Master
-artifactSkillBonus[1313] =	{	[const.Skills.Unarmed] = 10,
-								[const.Skills.Dodging] = 10}
+artifactPower[1313] = {	Skills = {	[const.Skills.Unarmed] = 1.5,
+									[const.Skills.Dodging] = 1.5}}
+-- Seven League Boots
+artifactPower[1314] = {	[const.Stats.Speed] = 3}
+-- Mash
+artifactPower[1316] = {	[const.Stats.Might] = 3,
+						[const.Stats.Intellect] = -0.8,
+						[const.Stats.Personality] = -0.8,
+						[const.Stats.Speed] = -0.8}
 -- Ethric's Staff
-artifactSkillBonus[1317] =	{	[const.Skills.Meditation] = 8}
+artifactPower[1317] = {	Skills = {	[const.Skills.Meditation] = 3}}
 -- Hareck's Leather
-artifactSkillBonus[1318] =	{	[const.Skills.Dagger] = 5,
-								[const.Skills.Unarmed] = 5,}
+artifactPower[1318] = {	[const.Stats.Luck] = 1.5,
+						[const.Stats.FireResistance] 	= -0.3,
+						[const.Stats.AirResistance] 	= -0.3,
+						[const.Stats.WaterResistance] 	= -0.3,
+						[const.Stats.EarthResistance] 	= -0.3,
+						[const.Stats.MindResistance] 	= -0.3,
+						[const.Stats.BodyResistance] 	= -0.3,
+						Skills = {	[const.Skills.Dagger] = 0.75,
+									[const.Skills.Unarmed] = 0.75}}
 -- Old Nick
-artifactSkillBonus[1319] =	{	[const.Skills.DisarmTraps] = 5}
+artifactPower[1319] = {	Skills = {	[const.Skills.DisarmTraps] = 3}}
+-- Amuck
+artifactPower[1320] = {	[const.Stats.Might] = 1.5,
+						[const.Stats.Endurance] = 1.5,
+						[const.Stats.ArmorClass] = -0.23}
 -- Glory shield
-artifactSkillBonus[1321] =	{	[const.Skills.Shield] = 5}
+artifactPower[1321] = {	[const.Stats.BodyResistance] = -1.2,
+						[const.Stats.MindResistance] = -1.2,
+						Skills = {	[const.Skills.Shield] = 3}}
+-- Kelebrim
+artifactPower[1322] = {	[const.Stats.Endurance] = 3,
+						[const.Stats.EarthResistance] = -1.8}
+-- Taledon's Helm
+artifactPower[1323] = {	[const.Stats.Might] = 1.5,
+						[const.Stats.Personality] = 1.5,
+						[const.Stats.Luck] = -1.33}
 -- Scholar's Cap
-artifactSkillBonus[1324] = {	[const.Skills.Learning] = 15}
+artifactPower[1324] = {	[const.Stats.Endurance] = -1,
+						Skills = {	[const.Skills.Learning] = 3}}
+-- Phynaxian Crown
+artifactPower[1325] = {	[const.Stats.Personality] = 0.69,
+						[const.Stats.WaterResistance] = 2.31,
+						[const.Stats.ArmorClass] = -0.46}
+-- Titan's Belt
+artifactPower[1326] = {	[const.Stats.Might] = 3,
+						[const.Stats.Speed] = -1.04}
+-- Twilight
+artifactPower[1327] = {	[const.Stats.Speed] = 1.5,
+						[const.Stats.Luck] = 1.5,
+						[const.Stats.FireResistance] = -0.9,
+						[const.Stats.AirResistance] = -0.9,
+						[const.Stats.WaterResistance] = -0.9,
+						[const.Stats.EarthResistance] = -0.9,
+						[const.Stats.MindResistance] = -0.9,
+						[const.Stats.BodyResistance] = -0.9}
 -- Ania Selving
-artifactSkillBonus[1328] =	{	[const.Skills.Bow] = 5}
+artifactPower[1328] = {	[const.Stats.Accuracy] = 2.25,
+						[const.Stats.ArmorClass] = -0.38,
+						Skills = {	[const.Skills.Bow] = 0.75}}
+-- Justice
+artifactPower[1329] = {	[const.Stats.Speed] = -1.2}
+-- Mekorig's hammer
+artifactPower[1330] = {	[const.Stats.Might] = 3,
+						[const.Stats.AirResistance] = -4}
+-- Hermes's Sandals
+artifactPower[1331] = {	[const.Stats.Speed] = 1.2,
+						[const.Stats.Accuracy] = 0.6,
+						[const.Stats.AirResistance] = 1.2}
+-- Cloak of the sheep
+artifactPower[1332] = {	[const.Stats.Intellect] = -0.6,
+						[const.Stats.Personality] = -0.6}
+-- Elfbane
+artifactPower[1333] = {	[const.Stats.Speed] = 3}
+-- Mind's Eye
+artifactPower[1334] = {	[const.Stats.Intellect] = 1.5,
+						[const.Stats.Personality] = 1.5}
+-- Elven Chainmail
+artifactPower[1335] = {	[const.Stats.Speed] = 1.5,
+						[const.Stats.Accuracy] = 1.5}
+-- Forge Gauntlets
+artifactPower[1336] = {	[const.Stats.Might] = 0.75,
+						[const.Stats.Endurance] = 0.75,
+						[const.Stats.FireResistance] = 1.5}
+-- Hero's belt
+artifactPower[1337] = {	[const.Stats.Might] = 1.13,
+						Skills = {	[const.Skills.Armsmaster] = 1.88}}
+-- Lady's Escort ring
+artifactPower[1338] = {	[const.Stats.FireResistance]	= 0.5,
+						[const.Stats.AirResistance]		= 0.5,
+						[const.Stats.WaterResistance]	= 0.5,
+						[const.Stats.EarthResistance]	= 0.5,
+						[const.Stats.MindResistance]	= 0.5,
+						[const.Stats.BodyResistance]	= 0.5}
+-- Thor
+artifactPower[2021] = {	[const.Stats.Might] = 3}
+-- Conan
+artifactPower[2022] = {	[const.Stats.Accuracy] = 3}
+-- Excalibur
+artifactPower[2023] = {	[const.Stats.Might] = 3}
+-- Merlin
+artifactPower[2024] = {	[const.Stats.Intellect] = 0.82,
+						[const.Stats.Personality] = 0.82,
+						[const.Stats.SP] = 1.36}
+-- Percival
+artifactPower[2025] = {	[const.Stats.Speed] = 3}
+-- Galahad
+artifactPower[2026] = {	[const.Stats.Endurance] = 3}
+-- Pellinore
+artifactPower[2027] = {	[const.Stats.Endurance] = 3}
+-- Valeria
+artifactPower[2028] = {	[const.Stats.Accuracy] = 3}
+-- Arthur
+artifactPower[2029] = {	[const.Stats.Might] = 0.25,
+						[const.Stats.Intellect] = 0.25,
+						[const.Stats.Personality] = 0.25,
+						[const.Stats.Endurance] = 0.25,
+						[const.Stats.Accuracy] = 0.25,
+						[const.Stats.Speed] = 0.25,
+						[const.Stats.Luck] = 0.25,
+						[const.Stats.SP] = 1.25}
 -- Pendragon
-artifactSkillBonus[2030] =	{	[const.Skills.Dagger] = 5,
-								[const.Skills.DisarmTraps] = 10}
+artifactPower[2030] = {	[const.Stats.Luck] = 0.86,
+						Skills = {	[const.Skills.Dagger] = 0.71,
+									[const.Skills.DisarmTraps] = 1.43}}
+-- Lucius
+artifactPower[2031] = {	[const.Stats.Speed] = 3}
+-- Guinevere
+artifactPower[2032] = {	[const.Stats.SP] = 3}
+-- Igraine
+artifactPower[2033] = {	[const.Stats.SP] = 3}
+-- Morgan
+artifactPower[2034] = {	[const.Stats.SP] = 3}
 -- Hades
-artifactSkillBonus[2035] =	{	[const.Skills.DisarmTraps] = 10}
+artifactPower[2035] = {	[const.Stats.Luck] = 1.13,
+						Skills = {	[const.Skills.DisarmTraps] = 1.88}}
+-- Ares
+artifactPower[2036] = {	[const.Stats.FireResistance] = 3}
+-- Poseidon
+artifactPower[2037] = {	[const.Stats.Might] = 1,
+						[const.Stats.Endurance] = 1,
+						[const.Stats.Accuracy] = 1,
+						[const.Stats.Speed] = -0.25,
+						[const.Stats.ArmorClass] = -0.25}
+-- Cronos
+artifactPower[2038] = {	[const.Stats.Endurance] = 3,
+						[const.Stats.Luck] = -1.5}
+-- Hercules
+artifactPower[2039] = {	[const.Stats.Might] = 1.88,
+						[const.Stats.Endurance] = 1.13,
+						[const.Stats.Intellect] = -0.56}
+-- Artemis
+artifactPower[2040] = {	[const.Stats.FireResistance] = -0.6,
+						[const.Stats.AirResistance] = -0.6,
+						[const.Stats.WaterResistance] = -0.6,
+						[const.Stats.EarthResistance] = -0.6}
+-- Apollo
+artifactPower[2041] = {	[const.Stats.FireResistance] = 0.46,
+						[const.Stats.AirResistance] = 0.46,
+						[const.Stats.WaterResistance] = 0.46,
+						[const.Stats.EarthResistance] = 0.46,
+						[const.Stats.MindResistance] = 0.46,
+						[const.Stats.BodyResistance] = 0.46,
+						[const.Stats.Luck] = 0.23,
+						[const.Stats.Endurance] = -0.35}
+-- Zeus
+artifactPower[2042] = {	[const.Stats.Endurance] = 1,
+						[const.Stats.Personality] = 1,
+						[const.Stats.Luck] = 1,
+						[const.Stats.Intellect] = -1}
+-- Aegis
+artifactPower[2043] = {	[const.Stats.Luck] = 3,
+						[const.Stats.Speed] = -0.6}
+-- Odin
+artifactPower[2044] = {	[const.Stats.FireResistance] = 0.75,
+						[const.Stats.AirResistance] = 0.75,
+						[const.Stats.WaterResistance] = 0.75,
+						[const.Stats.EarthResistance] = 0.75,
+						[const.Stats.Speed] = -0.5}
+-- Atlas
+artifactPower[2045] = {	[const.Stats.Might] = 3,
+						[const.Stats.Speed] = -1}
+-- Hermes
+artifactPower[2046] = {	[const.Stats.Speed] = 3,
+						[const.Stats.Accuracy] = -0.86}
+-- Aphrodite
+artifactPower[2047] = {	[const.Stats.Personality] = 3,
+						[const.Stats.Luck] = -1.2}
+-- Athena
+artifactPower[2048] = {	[const.Stats.Intellect] = 3,
+						[const.Stats.Might] = -1.2}
+-- Hera
+artifactPower[2049] = {	[const.Stats.HP] = 1.2,
+						[const.Stats.SP] = 1.2,
+						[const.Stats.Luck] = 0.6,
+						[const.Stats.Personality] = -0.6}
 
 --artifacts HP/SP regen
 artifactHpRegen={509,520,1131,1337}
