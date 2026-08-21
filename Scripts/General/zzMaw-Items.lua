@@ -2336,7 +2336,7 @@ function events.ItemAdditionalDamage(t)
 	for i=0,1 do
 		it=t.Player:GetActiveItem(i)
 		if it then
-			vamp=it.Bonus2==41 or it.Bonus2==16
+			vamp=it.Bonus2==41 or it.Bonus2==16 or MawArtifactVampiric(it.Number)
 			gotVamp[t.Player:GetIndex()]=gotVamp[t.Player:GetIndex()] or 0
 			gotVamp[t.Player:GetIndex()]=gotVamp[t.Player:GetIndex()]/2+1
 		end
@@ -2351,7 +2351,7 @@ function events.ItemAdditionalDamage(t)
 	vamp=false
 	it=t.Player:GetActiveItem(2)
 	if it then
-		vamp=it.Bonus2==41 or it.Bonus2==16
+		vamp=it.Bonus2==41 or it.Bonus2==16 or MawArtifactVampiric(it.Number)
 	end
 	if vamp then
 		t.Vampiric = false
@@ -3686,9 +3686,8 @@ artifactPower[2049] = {	[const.Stats.HP] = 1.2,
 						[const.Stats.Luck] = 0.6,
 						[const.Stats.Personality] = -0.6}
 
---artifacts HP/SP regen
-artifactHpRegen={509,520,1131,1337}
-artifactSpRegen={513,1131,1334}
+artifactHpRegen={509,520,1337,1331,1335,2027}
+artifactSpRegen={513,1334,1331,2024,2032,2033,2034}
 
 --artifact spells
 artifactSpellBonus={}

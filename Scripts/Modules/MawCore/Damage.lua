@@ -1434,6 +1434,7 @@ local pipe = MawCore.Pipeline.new("DamageToMonster", {
 	"survival-gate",			-- [gates]
 	-- tier 3: was Global file-scope
 	"legendaries",				-- [additive/mult] post-res on purpose
+	"artifact-on-hit",			-- [additive] next to the aura it is priced like
 	"map-affixes",				-- [mult/gates]
 	"remote-owner-zero",		-- [gates]
 	"friendly-fire-zero",	-- [gates] ahead of leech: zeroed hits must not heal
@@ -1467,6 +1468,7 @@ pipe:on("assassin-attack",   "zzClasses:1962",       stage_assassinAttack)
 pipe:on("boss-affixes",      "zzMaw-Monsters:3340",  stage_bossAffixes)
 pipe:on("survival-gate",     "zzMaw-Survival:316",   stage_survivalGate)
 pipe:on("legendaries",       "zzMaw_Legendaries:22", stage_legendaries)
+pipe:on("artifact-on-hit",   "zzzMaw_Artifacts",     function(t) MawArtifactOnHit(t) end)
 pipe:on("map-affixes",       "zzMaw_Mapping:16",     stage_mapAffixes)
 pipe:on("remote-owner-zero", "zzMAWStatusMsg:2",     stage_remoteOwnerZero)
 pipe:on("friendly-fire-zero","zzMAWStatusMsg:151a",  stage_friendlyFireZero)
