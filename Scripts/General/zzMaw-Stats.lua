@@ -51,9 +51,16 @@ end
 
 AXE_CRIT_DAMAGE_PER_SKILL = 0.01
 
+function MawReferenceLevel()
+	if not vars.MMLVL then
+		return 0
+	end
+	return round(getTotalLevel())
+end
+
 function getCritInfo(pl, dmgType, monLvl)
 	if not pl then return 0, 1, false end
-	monLvl = monLvl or pl.LevelBase or 0
+	monLvl = monLvl or MawReferenceLevel()
 
 	local F = MawCore.Formulas
 	local luck = pl.GetLuck and pl:GetLuck() or 0
@@ -354,21 +361,19 @@ function events.BuildStatInformationBox(t)
 		bowHaste=bonusSpeed
 		--Speed is what decides whether a swing lands (Formulas.chanceToBeHit),
 		--so the block chance is reported here and not under Armor Class
-		local blockChance=100-round(MawCore.Formulas.chanceToBeHit(speed, Party[i].LevelBase)*10000)/100
-		t.Text=string.format("%s\n\nMelee Haste:   %s%%\nRanged Haste: %s%%\nSpell Haste:   %s%%\n\nChance to Dodge Physical Attacks: %s%%",t.Text,meleeHaste,bowHaste,spellSpeedEffect,blockChance)
+		local refLvl=MawReferenceLevel()
+		local blockChance=100-round(MawCore.Formulas.chanceToBeHit(speed, refLvl)*10000)/100
+		t.Text=string.format("%s\n\nMelee Haste:   %s%%\nRanged Haste: %s%%\nSpell Haste:   %s%%\n\nChance to Dodge Physical Attacks vs level %s: %s%%",t.Text,meleeHaste,bowHaste,spellSpeedEffect,refLvl,blockChance)
 	end
 	if t.Stat==6 then
 		local i=Game.CurrentPlayer
-		local lvl=Party[i].LevelBase
-		if Party.High==0 then
-			lvl=calcLevel(Party[0].Experience/5)
-		end
+		local lvl=MawReferenceLevel()
 		local critChance=round(getCritInfo(Party[i], "ranged",lvl)*10000)/100
 		local daggerCritBonus=round(getCritInfo(Party[i],false,lvl)*10000)/100
-		t.Text=string.format("%s\n\nCritical strike chance: %s%%",Game.StatsDescriptions[6],critChance)
+		t.Text=string.format("%s\n\nCritical strike chance vs level %s: %s%%",Game.StatsDescriptions[6],lvl,critChance)
 		daggerBonus=daggerCritBonus~=critChance
 		if daggerBonus then
-			t.Text=string.format("%s\n\nCritical strike chance: %s%%(%s%% with dagger)",Game.StatsDescriptions[6],critChance, daggerCritBonus)
+			t.Text=string.format("%s\n\nCritical strike chance vs level %s: %s%%(%s%% with dagger)",Game.StatsDescriptions[6],lvl,critChance, daggerCritBonus)
 		end
 	end
 	if t.Stat==7 then
@@ -416,13 +421,13 @@ function events.BuildStatInformationBox(t)
 	
 	if t.Stat==9 then
 		i=Game.CurrentPlayer
-		local acReduction=round((100-calcMawDamage(Party[i],4,10000,false,nil,true)/100)*100)/100
-		local lvl=math.min(Party[i].LevelBase)
+		local lvl=MawReferenceLevel()
+		local acReduction=round((100-calcMawDamage(Party[i],4,10000,false,lvl,true)/100)*100)/100
 		--the block chance itself is reported under Speed, which is what buys it;
 		--it is still needed here because the total combines the two
 		blockChance= 100-round(MawCore.Formulas.chanceToBeHit(Party[i]:GetSpeed(), lvl)*10000)/100
 		totRed= 100-round((100-blockChance)*(100-acReduction))/100
-		t.Text=string.format("%s\n\nPhysical damage reduction: %s%s",t.Text,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\n\nTotal average damage reduction: " .. StrColor(255,255,100,totRed) .. "%")
+		t.Text=string.format("%s\n\nPhysical damage reduction vs level %s: %s%s",t.Text,lvl,StrColor(255,255,100,acReduction),StrColor(255,255,100,"%") .. "\n\nTotal average damage reduction: " .. StrColor(255,255,100,totRed) .. "%")
 	end
 	
 	if t.Stat==5234672 then
@@ -468,10 +473,10 @@ function events.BuildStatInformationBox(t)
 	if t.Stat==15 then
 		local i=Game.CurrentPlayer
 		local atk=Party[i]:GetMeleeAttack()
-		local lvl=Party[i].LevelBase
+		local lvl=MawReferenceLevel()
 		local hitChance= round((MawCore.Formulas.mawHitChance(atk, lvl,
 			MawCore.Formulas.blessHitBonus(Party[i])) or 0)*10000)/100
-		t.Text=string.format("%s\n\nHit chance vs same level monster: %s%s",t.Text,StrColor(255,255,100,hitChance),StrColor(255,255,100,"%"))
+		t.Text=string.format("%s\n\nHit chance vs level %s monsters: %s%s",t.Text,lvl,StrColor(255,255,100,hitChance),StrColor(255,255,100,"%"))
 	end
 	
 	if t.Stat==16 then
@@ -563,10 +568,10 @@ function events.BuildStatInformationBox(t)
 	if t.Stat==17 then
 		local i=Game.CurrentPlayer
 		local atk=Party[i]:GetRangedAttack()
-		local lvl=Party[i].LevelBase
+		local lvl=MawReferenceLevel()
 		local hitChance= round((MawCore.Formulas.mawHitChance(atk, lvl,
 			MawCore.Formulas.blessHitBonus(Party[i])) or 0)*10000)/100
-		t.Text=string.format("%s\n\nHit chance vs same level monster: %s%s",t.Text,StrColor(255,255,100,hitChance),StrColor(255,255,100,"%"))
+		t.Text=string.format("%s\n\nHit chance vs level %s monsters: %s%s",t.Text,lvl,StrColor(255,255,100,hitChance),StrColor(255,255,100,"%"))
 	end
 	
 	if t.Stat==18 then
@@ -864,7 +869,7 @@ function mawTick_PoolLabels()
 			if resistances[i]>=64000 then
 				resistances[i]="Immune"
 			end
-			resistances2[i]=100-math.max(round(calcMawDamage(pl,damageList[i-9],1000,false,nil,true))/10, 0)
+			resistances2[i]=100-math.max(round(calcMawDamage(pl,damageList[i-9],1000,false,MawReferenceLevel(),true))/10, 0)
 			resistances2[i]=round(resistances2[i]*100)/100
 			if resistances2[i]%1==0 then
 				resistances2[i]=resistances2[i] .. ".0"
@@ -1195,12 +1200,9 @@ function calcPowerVitality(pl, statsMenu)
 	local dmg=(low+high)/2
 	--hit chance
 	local atk=pl:GetMeleeAttack()
-	local lvl=pl.LevelBase
+	local lvl=MawReferenceLevel()
 	local hitChance= MawCore.Formulas.mawHitChance(atk, lvl,
 		MawCore.Formulas.blessHitBonus(pl)) or 0
-	if Party.High==0 then
-		lvl=calcLevel(Party[0].Experience/5)
-	end
 	local critChance, critMult=getCritInfo(pl,false,lvl)
 	local enchantDamage=0
 	for i=0,1 do
@@ -1302,8 +1304,8 @@ function calcPowerVitality(pl, statsMenu)
 		end
 	end
 	--AC
-	local acReduction=1-calcMawDamage(pl,4,10000,false,nil,true)/10000
-	local lvl=pl.LevelBase
+	local lvl=MawReferenceLevel()
+	local acReduction=1-calcMawDamage(pl,4,10000,false,lvl,true)/10000
 	local chanceToGetHit=MawCore.Formulas.chanceToBeHit(pl:GetSpeed(), lvl)
 	--dodging
 	local speed=pl:GetSpeed()
@@ -1321,8 +1323,8 @@ function calcPowerVitality(pl, statsMenu)
 	local fullHP=fullHP/dodgeChance
 	--resistances
 	res={0,1,2,3,7,8,12}
-	for v=1,7 do 
-		res[v]=1-calcMawDamage(pl,res[v],10000,false,nil,true)/10000
+	for v=1,7 do
+		res[v]=1-calcMawDamage(pl,res[v],10000,false,lvl,true)/10000
 	end
 	
 	--calculation
