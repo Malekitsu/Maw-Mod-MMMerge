@@ -107,6 +107,29 @@ function Formulas.mawHitChance(atk, monsterLevel, hitBonus)
 		Formulas.hitMin), Formulas.hitMax)
 end
 
+function Formulas.hitCapLevel(atk, hitBonus, from)
+	from = math.max(from or 1, 1)
+	if (Formulas.mawHitChance(atk, from, hitBonus) or 0) < Formulas.hitMax then
+		return nil
+	end
+	local lo, hi = from, from
+	repeat
+		hi = hi*2 + 100
+		if hi > 100000 then
+			return hi
+		end
+	until (Formulas.mawHitChance(atk, hi, hitBonus) or 0) < Formulas.hitMax
+	while hi - lo > 1 do
+		local mid = math.floor((lo + hi)/2)
+		if (Formulas.mawHitChance(atk, mid, hitBonus) or 0) < Formulas.hitMax then
+			hi = mid
+		else
+			lo = mid
+		end
+	end
+	return lo
+end
+
 --what the PlayerHitOrMiss hook rolls against; nil leaves the engine's roll
 function Formulas.mawPlayerHitChance(pl, mon, range, bonus)
 	local atk = (range == 0 and pl:GetMeleeAttack() or pl:GetRangedAttack()) + (bonus or 0)

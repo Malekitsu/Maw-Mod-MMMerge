@@ -474,9 +474,14 @@ function events.BuildStatInformationBox(t)
 		local i=Game.CurrentPlayer
 		local atk=Party[i]:GetMeleeAttack()
 		local lvl=MawReferenceLevel()
-		local hitChance= round((MawCore.Formulas.mawHitChance(atk, lvl,
-			MawCore.Formulas.blessHitBonus(Party[i])) or 0)*10000)/100
-		t.Text=string.format("%s\n\nHit chance vs level %s monsters: %s%s",t.Text,lvl,StrColor(255,255,100,hitChance),StrColor(255,255,100,"%"))
+		local bless=MawCore.Formulas.blessHitBonus(Party[i])
+		local hitChance= round((MawCore.Formulas.mawHitChance(atk, lvl, bless) or 0)*10000)/100
+		local capLvl=MawCore.Formulas.hitCapLevel(atk, bless, lvl)
+		if capLvl then
+			t.Text=string.format("%s\n\nHit chance: %s up to level %s monsters",t.Text,StrColor(255,255,100,"100%"),StrColor(255,255,100,capLvl))
+		else
+			t.Text=string.format("%s\n\nHit chance vs level %s monsters: %s%s",t.Text,lvl,StrColor(255,255,100,hitChance),StrColor(255,255,100,"%"))
+		end
 	end
 	
 	if t.Stat==16 then
@@ -569,9 +574,14 @@ function events.BuildStatInformationBox(t)
 		local i=Game.CurrentPlayer
 		local atk=Party[i]:GetRangedAttack()
 		local lvl=MawReferenceLevel()
-		local hitChance= round((MawCore.Formulas.mawHitChance(atk, lvl,
-			MawCore.Formulas.blessHitBonus(Party[i])) or 0)*10000)/100
-		t.Text=string.format("%s\n\nHit chance vs level %s monsters: %s%s",t.Text,lvl,StrColor(255,255,100,hitChance),StrColor(255,255,100,"%"))
+		local bless=MawCore.Formulas.blessHitBonus(Party[i])
+		local hitChance= round((MawCore.Formulas.mawHitChance(atk, lvl, bless) or 0)*10000)/100
+		local capLvl=MawCore.Formulas.hitCapLevel(atk, bless, lvl)
+		if capLvl then
+			t.Text=string.format("%s\n\nHit chance: %s up to level %s monsters",t.Text,StrColor(255,255,100,"100%"),StrColor(255,255,100,capLvl))
+		else
+			t.Text=string.format("%s\n\nHit chance vs level %s monsters: %s%s",t.Text,lvl,StrColor(255,255,100,hitChance),StrColor(255,255,100,"%"))
+		end
 	end
 	
 	if t.Stat==18 then
