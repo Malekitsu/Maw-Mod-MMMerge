@@ -1392,71 +1392,6 @@ end
 
 
 
---I need to compute what's the expected healing amount
--- to do so I need to first get the expected health, then having a coefficient
---let's compute first body current expected healing
-function getBodyHealing(lvl, spellId, mastery)
-	local health=getPlayerExtimatedHealth(lvl)
-	
-
-	local skill = estimateSkill(lvl)
-	local bodySkill = skill
-	local learningSkill = skill	
-		
-	local masteries={0,4,7,10}
-	if vars.madnessMode then
-		masteries={0,12,30,50}
-	elseif vars.insanityMode then
-		masteries={0,8,20,32}
-	end
-
-	if not mastery then
-		mastery = masteryPerLevel(lvl)
-	end
-	-- Use appropriate healing spell based on mastery level
-	local baseHeal=0
-	local scaling=0
-	if not spellId then
-		if mastery <= 2 then
-			-- Use Heal spell for mastery 1-2
-			spellId = const.Spells.Heal
-			baseHeal = healingSpells[const.Spells.Heal].Base[mastery]
-			scaling = healingSpells[const.Spells.Heal].Scaling[mastery]
-		else
-			-- Use Greater Heal (CureDisease) for mastery 3-4
-			spellId = const.Spells.CureDisease
-			baseHeal = healingSpells[const.Spells.CureDisease].Base[mastery]
-			scaling = healingSpells[const.Spells.CureDisease].Scaling[mastery]
-		end
-	else
-		baseHeal = healingSpells[spellId].Base[mastery]
-		scaling = healingSpells[spellId].Scaling[mastery]
-	end
-	-- Calculate base healing amount
-	local healingAmount = baseHeal + scaling * bodySkill
-	
-	local ascensionTier = math.min(math.floor(learningSkill / 11), 8)  -- Rough ascension tier estimation
-	if ascensionTier > 0 then
-		local newScaling = scaling * (1 + 0.01 * learningSkill * ascensionTier) * (1.2^ascensionTier)
-		local newBase = baseHeal * (1 + learningSkill * 0.1 * ascensionTier) * (1.4^ascensionTier)
-		healingAmount = newBase + newScaling * bodySkill
-	end
-	
-	local personality = estimateStat(lvl)
-	local personalityBonus = personality / math.min(1000+level*3, 4000)
-	healingAmount = healingAmount * (1 + personalityBonus)
-
-	return healingAmount
-end
-
---[[ to test
-for i=1,100 do
-	local heal=getBodyHealing(i*10)
-	local health=getPlayerExtimatedHealth(i*10)
-	local rateo=round(heal/health*100)/100
-	print(rateo)
-end
-]]
 
 function GetHealParams(id)
 	local base, scaling = healingSpells[id].Base[1], healingSpells[id].Scaling[1]
@@ -1521,8 +1456,7 @@ function GetHealParams(id)
 	return base, scaling
 end
 
-function masteryPerLevel(lvl)
-	local S = estimateSkill(lvl)
+function masteryForSkill(S)
 	local th = masteryThresholds()
 	local m = 1
 	for i = 4, 1, -1 do
@@ -1531,9 +1465,13 @@ function masteryPerLevel(lvl)
 	return m
 end
 
+function masteryPerLevel(lvl)
+	return masteryForSkill(estimateSkill(lvl))
+end
+
 --A mastery bonus phases in instead of jumping. The value a rank grants ramps
 --from that rank's skill threshold to the next rank's (GM has no next rank, so
---it ramps to 1.5x its own: skill 10->15, or 50->75 in madness). Training a
+--it ramps to 1.4x its own: skill 10->14, or 50->70 in madness). Training a
 --mastery is then a gradual gain rather than a step.
 --tbl is any mastery-indexed table (armsmasterSkill.Damage, skillRecovery[x], ...)
 function GetGradualMasteryValue(tbl, s, m)
@@ -1544,7 +1482,7 @@ function GetGradualMasteryValue(tbl, s, m)
 	local th = masteryThresholds()
 	local i = math.min(m, #th)
 	local from = th[i]
-	local to = th[i+1] or from*1.5
+	local to = th[i+1] or from*1.4
 	local prev = tbl[m-1] or 0
 	local cur = tbl[m] or prev
 	if to <= from then
