@@ -175,25 +175,33 @@ end
 
 local GEARED_ANCHOR_DIFFICULTY = 9	--beyond madness
 
---both are AT MADNESS, the anchor: lower difficulties are scaled down below
+--both are AT THE ANCHOR: lower densities are scaled down below
 local DROPS_PER_SLOT_RATE = 3.6		--a candidate every ~3.6 levels early on
 local DROPS_PER_SLOT_CAP = 140		--saturating at ~140 seen per slot
 
---Almost all loot comes off monsters, so drops seen scale with monster density.
+--The density gearedAnchor was fitted against: madness as it spawned then.
+--It is a CONSTANT on purpose. Read the live madness density on both sides of
+--the ratio below and madness cancels out to exactly gearedAnchor, so thinning
+--the spawns could never reach the model -- the whole loss would silently land
+--on the other difficulties instead.
+local GEARED_ANCHOR_DENSITY = 1
+
+--Almost all loot comes off monsters, so drops seen scale with monster density:
+--these are the mean spawn per point from AdjustMonsterDensity (zzMaw-Monsters),
+--as a share of the anchor. Retune the spawn counts -> move the matching row.
 local DROPS_DENSITY_BY_DIFFICULTY = {
 	[1] = 0.40,	--bolster 40
 	[2] = 0.40,	--bolster 70
 	[3] = 0.40,	--bolster 100, baseline
 	[4] = 0.43,	--bolster 150
-	[5] = 0.47,	--bolster 200
-	[6] = 0.59,	--bolster 300
-	[7] = 0.66,	--doom
-	[8] = 0.74,	--road to insanity
-	[9] = 1,	--beyond madness
+	[5] = 0.43,	--bolster 200
+	[6] = 0.47,	--bolster 300
+	[7] = 0.59,	--doom
+	[8] = 0.66,	--road to insanity
+	[9] = 0.70,	--beyond madness
 }
 
-local function dropsSeenPerSlot(level, difficulty)
-	local density = DROPS_DENSITY_BY_DIFFICULTY[difficulty] or 1
+local function dropsSeenPerSlot(level, density)
 	return (level/(DROPS_PER_SLOT_RATE + level/DROPS_PER_SLOT_CAP) + 1)*density
 end
 
@@ -207,10 +215,11 @@ function gearedFraction(level)
 	local cached = gearedCache[level]
 	if not cached then
 		local tier = GetLootTier(level)
+		local density = DROPS_DENSITY_BY_DIFFICULTY[difficulty] or 1
 		cached = gearedAnchor(level)
-			*GetExpectedEnchantFraction(tier, dropsSeenPerSlot(level, difficulty), difficulty)
+			*GetExpectedEnchantFraction(tier, dropsSeenPerSlot(level, density), difficulty)
 			/GetExpectedEnchantFraction(tier,
-				dropsSeenPerSlot(level, GEARED_ANCHOR_DIFFICULTY), GEARED_ANCHOR_DIFFICULTY)
+				dropsSeenPerSlot(level, GEARED_ANCHOR_DENSITY), GEARED_ANCHOR_DIFFICULTY)
 		gearedCache[level] = cached
 	end
 	return cached

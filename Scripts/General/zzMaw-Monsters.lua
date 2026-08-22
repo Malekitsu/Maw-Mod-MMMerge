@@ -765,73 +765,57 @@ function AdjustMonsterDensity()
 		end
 	end
 	
-	--Hard
-	if Game.BolsterAmount==150 then
+	if Game.BolsterAmount==150 or Game.BolsterAmount==200 then
 		for i=1,Game.MapStats.High do
+			Game.MapStats[i].Mon1Low=BackupMapStats[i].Mon1Low
+			Game.MapStats[i].Mon2Low=BackupMapStats[i].Mon2Low
+			Game.MapStats[i].Mon3Low=BackupMapStats[i].Mon3Low
 			if Game.MapStats[i].Mon1Hi<=3 then
 				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+1
-			end 
-			if Game.MapStats[i].Mon2Hi<=3 then
-				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+1
-			end 
-			if Game.MapStats[i].Mon3Hi<=3 then
-				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+1
-			end 
-		end
-	end
-	
-	--Hell
-	if Game.BolsterAmount==200 then
-		for i=1,Game.MapStats.High do
-			if Game.MapStats[i].Mon1Low==1 then
-				Game.MapStats[i].Mon1Low=2
-			end
-			if Game.MapStats[i].Mon1Hi<=3 then
-				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+1
-			end 
-			if Game.MapStats[i].Mon2Low==1 then
-				Game.MapStats[i].Mon2Low=2
 			end
 			if Game.MapStats[i].Mon2Hi<=3 then
 				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+1
-			end 
-			if Game.MapStats[i].Mon3Low==1 then
-				Game.MapStats[i].Mon3Low=2
 			end
 			if Game.MapStats[i].Mon3Hi<=3 then
 				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+1
-			end 
+			end
 		end
 	end
-	
+
 	if Game.BolsterAmount==300 then
 		for i=1,Game.MapStats.High do
-			if Game.MapStats[i].Mon1Hi>1 then
-				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+3
-			end 
-			if Game.MapStats[i].Mon2Hi>1 then
-				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+3
-			end 
-			if Game.MapStats[i].Mon3Hi>1 then
-				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+3
-			end 
+			if BackupMapStats[i].Mon1Hi>1 then
+				Game.MapStats[i].Mon1Low=math.max(BackupMapStats[i].Mon1Low,2)
+				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+1
+			end
+			if BackupMapStats[i].Mon2Hi>1 then
+				Game.MapStats[i].Mon2Low=math.max(BackupMapStats[i].Mon2Low,2)
+				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+1
+			end
+			if BackupMapStats[i].Mon3Hi>1 then
+				Game.MapStats[i].Mon3Low=math.max(BackupMapStats[i].Mon3Low,2)
+				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+1
+			end
 			Game.MapStats[i].Mon1Dif=math.min(BackupMapStats[i].Mon1Dif+1,5)
 			Game.MapStats[i].Mon2Dif=math.min(BackupMapStats[i].Mon2Dif+1,5)
 			Game.MapStats[i].Mon3Dif=math.min(BackupMapStats[i].Mon3Dif+1,5)
 		end
 	end
-	
+
 	if vars.Mode==2 then
 		for i=1,Game.MapStats.High do
-			if Game.MapStats[i].Mon1Hi>1 then
-				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+4
-			end 
-			if Game.MapStats[i].Mon2Hi>1 then
-				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+4
-			end 
-			if Game.MapStats[i].Mon3Hi>1 then
-				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+4
-			end 
+			if BackupMapStats[i].Mon1Hi>1 then
+				Game.MapStats[i].Mon1Low=math.max(BackupMapStats[i].Mon1Low,2)
+				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+2
+			end
+			if BackupMapStats[i].Mon2Hi>1 then
+				Game.MapStats[i].Mon2Low=math.max(BackupMapStats[i].Mon2Low,2)
+				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+2
+			end
+			if BackupMapStats[i].Mon3Hi>1 then
+				Game.MapStats[i].Mon3Low=math.max(BackupMapStats[i].Mon3Low,2)
+				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+2
+			end
 			Game.MapStats[i].Mon1Dif=math.min(BackupMapStats[i].Mon1Dif+1,5)
 			Game.MapStats[i].Mon2Dif=math.min(BackupMapStats[i].Mon2Dif+1,5)
 			Game.MapStats[i].Mon3Dif=math.min(BackupMapStats[i].Mon3Dif+1,5)
@@ -839,33 +823,28 @@ function AdjustMonsterDensity()
 	end
 	if vars.insanityMode then
 		for i=1,Game.MapStats.High do
-			if Game.MapStats[i].Mon1Hi>1 then
-				Game.MapStats[i].Mon1Low=3
-				Game.MapStats[i].Mon2Low=3
-				Game.MapStats[i].Mon3Low=3
+			--all three floors are gated on slot 1's Hi, as they always were
+			if BackupMapStats[i].Mon1Hi>1 then
+				Game.MapStats[i].Mon1Low=math.max(BackupMapStats[i].Mon1Low,3)
+				Game.MapStats[i].Mon2Low=math.max(BackupMapStats[i].Mon2Low,3)
+				Game.MapStats[i].Mon3Low=math.max(BackupMapStats[i].Mon3Low,3)
 			end
 		end
 	end
 	if vars.madnessMode then
 		for i=1,Game.MapStats.High do
-			if Game.MapStats[i].Mon1Hi>1 then
-				Game.MapStats[i].Mon1Low=5
+			if BackupMapStats[i].Mon1Hi>1 then
+				Game.MapStats[i].Mon1Low=math.max(BackupMapStats[i].Mon1Low,3)
+				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+3
 			end
-			if Game.MapStats[i].Mon2Hi>1 then
-				Game.MapStats[i].Mon2Low=5
+			if BackupMapStats[i].Mon2Hi>1 then
+				Game.MapStats[i].Mon2Low=math.max(BackupMapStats[i].Mon2Low,3)
+				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+3
 			end
-			if Game.MapStats[i].Mon3Hi>1 then
-				Game.MapStats[i].Mon3Low=5
+			if BackupMapStats[i].Mon3Hi>1 then
+				Game.MapStats[i].Mon3Low=math.max(BackupMapStats[i].Mon3Low,3)
+				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+3
 			end
-			if Game.MapStats[i].Mon1Hi>1 then
-				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+6
-			end 
-			if Game.MapStats[i].Mon2Hi>1 then
-				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+6
-			end 
-			if Game.MapStats[i].Mon3Hi>1 then
-				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+6
-			end 
 		end
 	end
 	
