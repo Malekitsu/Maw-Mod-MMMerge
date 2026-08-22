@@ -867,30 +867,26 @@ evt.PotionEffects[92] = function(IsDrunk, t, Power)
 end
 
 evt.PotionEffects[93] = function(IsDrunk, t, Power)
-	if IsBaseItemId(t.Number) then
-		if IsCelestialItem(t) then return end
-		local maxChargesCap=MawCore.ItemLevel.MaxPower()
-		local levelRequired=GetLevelRquirement(t)
-		--check if equippable
-		local plLvl=Party[Game.CurrentPlayer].LevelBase
-		if plLvl<levelRequired then
-			Game.ShowStatusText("Your level is too low (Level " .. levelRequired .. " required)")
-			return
-		end
-		
-		
-		if t.MaxCharges>=maxChargesCap then
-			Game.ShowStatusText("Item power reached its limit")
-			return
-		end
-		local changeIncrease=4
-		if t:T().EquipStat<=3 then
-			changeIncrease=2
-		end
-		t.MaxCharges=math.min(t.MaxCharges+changeIncrease,maxChargesCap)
-		Mouse.Item.Number=0
-		ShowCraftedItemEffect(t)
+	if not (IsBaseItemId(t.Number) or IsArtifactId(t.Number)) then return end
+	local step=GetCubeQualityStep(t)
+	if step<=0 then
+		Game.ShowStatusText("Only weapons and armor can be refined")
+		return
 	end
+	local levelRequired=GetLevelRquirement(t)
+	local plLvl=Party[Game.CurrentPlayer].LevelBase
+	if plLvl<levelRequired then
+		Game.ShowStatusText("Your level is too low (Level " .. levelRequired .. " required)")
+		return
+	end
+	local quality=GetItemQuality(t)
+	if quality>=CUBE_QUALITY_MAX then
+		Game.ShowStatusText("Item quality reached its limit")
+		return
+	end
+	SetItemQuality(t, quality+step)
+	Mouse.Item.Number=0
+	ShowCraftedItemEffect(t)
 end
 
 evt.PotionEffects[94] = function(IsDrunk, t, Power)
@@ -1049,25 +1045,6 @@ function UseItem(it, usedIt)
 				it.Bonus=it.Bonus+1
 				craftUsed=true
 			end
-		elseif id==1063 then
-			local outside=false
-			if table.find(overworldMaps,it.BonusStrength) then
-				outside=true
-			end
-			math.randomseed(it.BonusStrength+it.Bonus2*1000+it.Charges+1000000)
-			local possibleMaps={}
-			for i=1,#mapDungeons do
-				local id=mapDungeons[i]
-				if id~=it.BonusStrength then
-					if (outside and table.find(overworldMaps,id)) or (not outside and not table.find(overworldMaps,id)) then
-						if vars.dungeonCompletedList[Game.MapStats[mapDungeons[i]].Name] then
-							table.insert(possibleMaps, mapDungeons[i])
-						end
-					end
-				end
-			end
-			it.BonusStrength=possibleMaps[math.random(1,#possibleMaps)]
-			craftUsed=true
 		elseif id==1065 then
 			if it.MaxCharges<255 then
 				it.MaxCharges=math.min(it.MaxCharges+5,255)
@@ -1297,6 +1274,7 @@ function events.GameInitialized2()
 	local txt=Game.ItemsTxt
 	txt[1061].Notes="This Eye allows to add a Special enchant to any equipment that has already 2 base enchants\n(right-click on an item with a base enchant to use)"
 	txt[1062].Notes="This Hourglass allows to add a second base enchant to any equipment that has 1 base and a special enchant\n(right-click on an item with a base enchant to use)"
+	txt[1063].Notes="Pandora's Cube refines the base damage of a weapon or the base armor of a piece of armor, up to " .. CUBE_QUALITY_MAX .. "% above what the item is worth.\nThe better the item, the less one Cube adds to it: " .. cubeQualityStep[const.Rarity.Common] .. "% on plain and enchanted items, " .. cubeQualityStep[const.Rarity.Rare] .. "% on rare, " .. cubeQualityStep[const.Rarity.Epic] .. "% on epic, " .. cubeQualityStep[const.Rarity.Ancient] .. "% on ancient, " .. cubeQualityStep[const.Rarity.Primordial] .. "% on primordial and legendary, " .. CUBE_QUALITY_STEP_ARTIFACT .. "% on artifacts, " .. cubeQualityStep[const.Rarity.Celestial] .. "% on celestial.\n(right-click on a weapon or armor to use)"
 	txt[1066].Notes="The Pearl of Memory is a mystical item valued for its power to erase one random enchant from any enchanted item."
 	txt[1067].Notes="Oracle's Orb is a mysterious and powerful artifact, a large, purple orb with a haunting face suspended within its core. This enigmatic relic is known for storing legendary abilities upon items it enchants.\n\n Adds the following legendary power to an item:"
 	for i=1, #names do

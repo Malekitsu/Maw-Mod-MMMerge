@@ -676,6 +676,75 @@ enchantCountByRarity={
 	[const.Rarity.Legendary]=3,
 	[const.Rarity.Celestial]=3,
 }
+
+--The rarity an item IS, as opposed to the one it was rolled at. Nothing
+--stores it: RollItemRarity only decides it while generating, so it has to be
+--read back off the item -- the rarity bits for everything from ancient up,
+--the enchant count (the same one enchantCountByRarity states) below that.
+function MawItemRarity(it)
+	if IsCelestialItem(it) then
+		return const.Rarity.Celestial
+	elseif HasLegendaryAffix(it) then
+		return const.Rarity.Legendary
+	end
+	local tier=GetAncientTier(it)
+	if tier==2 then
+		return const.Rarity.Primordial
+	elseif tier==1 then
+		return const.Rarity.Ancient
+	end
+	local enchants=0
+	if it.Bonus>0 then enchants=enchants+1 end
+	if HasEnc2(it) then enchants=enchants+1 end
+	if it.Bonus2>0 then enchants=enchants+1 end
+	if enchants>=enchantCountByRarity[const.Rarity.Epic] then
+		return const.Rarity.Epic
+	elseif enchants>=enchantCountByRarity[const.Rarity.Rare] then
+		return const.Rarity.Rare
+	elseif enchants>=enchantCountByRarity[const.Rarity.Uncommon] then
+		return const.Rarity.Uncommon
+	end
+	return const.Rarity.Common
+end
+
+cubeQualityStep={
+	[const.Rarity.Common]=20,
+	[const.Rarity.Uncommon]=20,
+	[const.Rarity.Rare]=10,
+	[const.Rarity.Epic]=7,
+	[const.Rarity.Ancient]=5,
+	[const.Rarity.Primordial]=4,
+	[const.Rarity.Legendary]=4,
+	[const.Rarity.Celestial]=1,
+}
+CUBE_QUALITY_STEP_ARTIFACT=2
+
+function CanTakeCube(it)
+	local txt=it:T()
+	if txt.EquipStat<=2 and txt.Skill<const.Skills.Shield then
+		return true
+	end
+	return (txt.Skill>=const.Skills.Shield and txt.Skill<=const.Skills.Plate)
+		or (txt.Skill==40 and txt.EquipStat~=12)
+end
+
+function GetCubeQualityStep(it)
+	if not CanTakeCube(it) then
+		return 0
+	end
+	if IsArtifactItem(it) then
+		return CUBE_QUALITY_STEP_ARTIFACT
+	end
+	return cubeQualityStep[MawItemRarity(it)] or 0
+end
+
+function MawQualityText(it)
+	local quality=GetItemQuality(it)
+	if quality<=0 then
+		return ""
+	end
+	return StrColor(255, 190, 90, "  (Quality +" .. quality .. "%)")
+end
 --============================= end RARITY =============================
 
 function GetRarityBaseMultiplier(lootTier, lootMultiplier, difficulty)
@@ -2616,6 +2685,7 @@ local function collectArmorAC(pl, index, it, txt, tab)
 		acBonus=ac+round(MawCore.Formulas.chargesArmorAC(referenceAC[it.Number], power))
 		acBonus=math.ceil(acBonus*MawCore.Artifacts.BaseMult(it))
 	end
+	acBonus=round(acBonus*ItemQualityMult(it))
 	--used later by the armor-skill scaling
 	if txt.Skill==8 then
 		shieldAC=shieldAC+acBonus
@@ -4459,7 +4529,7 @@ function GetWeaponDamageRows(it)
 	local split=wDmg-wDice-wFlat
 	local bonus=split/2+wFlat
 	local sides=(split/2+wDice)/math.max(txt.Mod1DiceCount,1)
-	local baseMult=MawCore.Artifacts.BaseMult(it)
+	local baseMult=MawCore.Artifacts.BaseMult(it)*ItemQualityMult(it)
 	return bonus*baseMult, sides*baseMult
 end
 

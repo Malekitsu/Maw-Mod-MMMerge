@@ -241,8 +241,10 @@ local function tooltipEnchantStats(t)
 						--else
 						--	local bonusAC=(ac+ac2)*(t.Item.MaxCharges/20)
 						--	ac=ac3+round(bonusAC)
-						--end		
-						t.BasicStat= "Armor: +" .. ac
+						--end
+						--same cube raise collectArmorAC applies to the character
+						ac=round(ac*ItemQualityMult(t.Item))
+						t.BasicStat= "Armor: +" .. ac .. MawQualityText(t.Item)
 					end
 				end
 			end
@@ -254,6 +256,7 @@ local function tooltipEnchantStats(t)
 					--the rows addWeaponRows actually applies, artifacts included
 					local bonus,lo,hi=GetWeaponDamageMinMax(t.Item)
 					t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " .. lo .. "-" .. hi
+						.. MawQualityText(t.Item)
 				end
 			end
 			
@@ -556,13 +559,15 @@ local function tooltipArtifactBaseStats(t)
 				local ac=txt.Mod2+txt.Mod1DiceCount
 				ac=ac+round(MawCore.Formulas.chargesArmorAC(referenceAC[t.Item.Number] or ac, power))
 				ac=math.ceil(ac*MawCore.Artifacts.BaseMult(t.Item))
+				ac=round(ac*ItemQualityMult(t.Item))
 				if ac>0 then
-					t.BasicStat= "Armor: +" .. ac
+					t.BasicStat= "Armor: +" .. ac .. MawQualityText(t.Item)
 				end
 			end
 			if txt.EquipStat<=2 then
 				local bonus,lo,hi=GetWeaponDamageMinMax(t.Item)
 				t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " .. lo .. "-" .. hi
+					.. MawQualityText(t.Item)
 			end
 			local skill=t.Item:T().Skill
 			if table.find(twoHandedAxes, t.Item.Number) or table.find(oneHandedAxes, t.Item.Number) then
@@ -858,7 +863,7 @@ local function tooltipMapLevel(t)
 		if it.BonusExpireTime>0 then
 			txt=StrColor(255,255,153,"- " .. mapAffixes[it.BonusExpireTime]) .. "\n\n" .. txt
 		end
-		t.Description="\n" .. txt .. "Creator's Hourglass and Eye of the void can be used to unlock new affixes, Pandora's Cube to change the Map and emerald of power to increase the map Level.\nUsing this map will teleport you to the entrance."
+		t.Description="\n" .. txt .. "Creator's Hourglass and Eye of the void can be used to unlock new affixes, emerald of power to increase the map Level.\nUsing this map will teleport you to the entrance."
 	end
 end
 
