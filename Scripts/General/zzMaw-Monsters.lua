@@ -583,16 +583,7 @@ function recalculateMonsterTable()
 		if currentWorld==2 then
 			mon.Experience = math.min(mon.Experience*2, mon.Experience+1000)
 		end
-		--true nightmare nerf
-		if Game.BolsterAmount==300 then
-			mon.Experience=mon.Experience*0.67
-		end
-		if vars.Mode==2 then
-			mon.Experience=mon.Experience*0.5
-		end
-		if vars.insanityMode then
-			mon.Experience=mon.Experience*0.8
-		end
+		mon.Experience=mon.Experience*GetMonsterExpMult()
 		mon.ArmorClass=base.ArmorClass*((totalLevel[i]+10)/(LevelB+10))
 	end
 	
@@ -747,6 +738,33 @@ function events.BeforeLoadMap()
 	AdjustMonsterDensity()
 end
 
+REFERENCE_SPAWN_HI = 3
+monsterDensity = {
+	[1] = {Low=1, Hi=3},	--bolster 40
+	[2] = {Low=1, Hi=3},	--bolster 70
+	[3] = {Low=1, Hi=3},	--bolster 100, baseline
+	[4] = {Low=1, Hi=4},	--bolster 150
+	[5] = {Low=1, Hi=4},	--bolster 200
+	[6] = {Low=2, Hi=4},	--bolster 300
+	[7] = {Low=2, Hi=5},	--doom
+	[8] = {Low=3, Hi=5},	--road to insanity
+	[9] = {Low=3, Hi=6},	--beyond madness
+}
+
+function GetDensitySpread(difficulty)
+	local s = monsterDensity[difficulty or GetDifficulty()] or monsterDensity[3]
+	return s.Low, s.Hi - REFERENCE_SPAWN_HI
+end
+
+function GetDensityMean(difficulty)
+	local s = monsterDensity[difficulty or GetDifficulty()] or monsterDensity[3]
+	return (s.Low + s.Hi)/2
+end
+
+function GetMonsterExpMult(difficulty)
+	return (GetDensityMean(3)/GetDensityMean(difficulty))^0.5
+end
+
 function AdjustMonsterDensity()
 	--add difficulty related damage
 	if Game.BolsterAmount%50~=0 then
@@ -766,35 +784,37 @@ function AdjustMonsterDensity()
 	end
 	
 	if Game.BolsterAmount==150 or Game.BolsterAmount==200 then
+		local low, bonus = GetDensitySpread(Game.BolsterAmount==150 and 4 or 5)
 		for i=1,Game.MapStats.High do
-			Game.MapStats[i].Mon1Low=BackupMapStats[i].Mon1Low
-			Game.MapStats[i].Mon2Low=BackupMapStats[i].Mon2Low
-			Game.MapStats[i].Mon3Low=BackupMapStats[i].Mon3Low
+			Game.MapStats[i].Mon1Low=math.max(BackupMapStats[i].Mon1Low,low)
+			Game.MapStats[i].Mon2Low=math.max(BackupMapStats[i].Mon2Low,low)
+			Game.MapStats[i].Mon3Low=math.max(BackupMapStats[i].Mon3Low,low)
 			if Game.MapStats[i].Mon1Hi<=3 then
-				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+1
+				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+bonus
 			end
 			if Game.MapStats[i].Mon2Hi<=3 then
-				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+1
+				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+bonus
 			end
 			if Game.MapStats[i].Mon3Hi<=3 then
-				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+1
+				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+bonus
 			end
 		end
 	end
 
 	if Game.BolsterAmount==300 then
+		local low, bonus = GetDensitySpread(6)
 		for i=1,Game.MapStats.High do
 			if BackupMapStats[i].Mon1Hi>1 then
-				Game.MapStats[i].Mon1Low=math.max(BackupMapStats[i].Mon1Low,2)
-				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+1
+				Game.MapStats[i].Mon1Low=math.max(BackupMapStats[i].Mon1Low,low)
+				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+bonus
 			end
 			if BackupMapStats[i].Mon2Hi>1 then
-				Game.MapStats[i].Mon2Low=math.max(BackupMapStats[i].Mon2Low,2)
-				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+1
+				Game.MapStats[i].Mon2Low=math.max(BackupMapStats[i].Mon2Low,low)
+				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+bonus
 			end
 			if BackupMapStats[i].Mon3Hi>1 then
-				Game.MapStats[i].Mon3Low=math.max(BackupMapStats[i].Mon3Low,2)
-				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+1
+				Game.MapStats[i].Mon3Low=math.max(BackupMapStats[i].Mon3Low,low)
+				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+bonus
 			end
 			Game.MapStats[i].Mon1Dif=math.min(BackupMapStats[i].Mon1Dif+1,5)
 			Game.MapStats[i].Mon2Dif=math.min(BackupMapStats[i].Mon2Dif+1,5)
@@ -803,18 +823,19 @@ function AdjustMonsterDensity()
 	end
 
 	if vars.Mode==2 then
+		local low, bonus = GetDensitySpread(7)
 		for i=1,Game.MapStats.High do
 			if BackupMapStats[i].Mon1Hi>1 then
-				Game.MapStats[i].Mon1Low=math.max(BackupMapStats[i].Mon1Low,2)
-				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+2
+				Game.MapStats[i].Mon1Low=math.max(BackupMapStats[i].Mon1Low,low)
+				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+bonus
 			end
 			if BackupMapStats[i].Mon2Hi>1 then
-				Game.MapStats[i].Mon2Low=math.max(BackupMapStats[i].Mon2Low,2)
-				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+2
+				Game.MapStats[i].Mon2Low=math.max(BackupMapStats[i].Mon2Low,low)
+				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+bonus
 			end
 			if BackupMapStats[i].Mon3Hi>1 then
-				Game.MapStats[i].Mon3Low=math.max(BackupMapStats[i].Mon3Low,2)
-				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+2
+				Game.MapStats[i].Mon3Low=math.max(BackupMapStats[i].Mon3Low,low)
+				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+bonus
 			end
 			Game.MapStats[i].Mon1Dif=math.min(BackupMapStats[i].Mon1Dif+1,5)
 			Game.MapStats[i].Mon2Dif=math.min(BackupMapStats[i].Mon2Dif+1,5)
@@ -822,28 +843,30 @@ function AdjustMonsterDensity()
 		end
 	end
 	if vars.insanityMode then
+		local low = GetDensitySpread(8)
 		for i=1,Game.MapStats.High do
 			--all three floors are gated on slot 1's Hi, as they always were
 			if BackupMapStats[i].Mon1Hi>1 then
-				Game.MapStats[i].Mon1Low=math.max(BackupMapStats[i].Mon1Low,3)
-				Game.MapStats[i].Mon2Low=math.max(BackupMapStats[i].Mon2Low,3)
-				Game.MapStats[i].Mon3Low=math.max(BackupMapStats[i].Mon3Low,3)
+				Game.MapStats[i].Mon1Low=math.max(BackupMapStats[i].Mon1Low,low)
+				Game.MapStats[i].Mon2Low=math.max(BackupMapStats[i].Mon2Low,low)
+				Game.MapStats[i].Mon3Low=math.max(BackupMapStats[i].Mon3Low,low)
 			end
 		end
 	end
 	if vars.madnessMode then
+		local low, bonus = GetDensitySpread(9)
 		for i=1,Game.MapStats.High do
 			if BackupMapStats[i].Mon1Hi>1 then
-				Game.MapStats[i].Mon1Low=math.max(BackupMapStats[i].Mon1Low,3)
-				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+3
+				Game.MapStats[i].Mon1Low=math.max(BackupMapStats[i].Mon1Low,low)
+				Game.MapStats[i].Mon1Hi=BackupMapStats[i].Mon1Hi+bonus
 			end
 			if BackupMapStats[i].Mon2Hi>1 then
-				Game.MapStats[i].Mon2Low=math.max(BackupMapStats[i].Mon2Low,3)
-				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+3
+				Game.MapStats[i].Mon2Low=math.max(BackupMapStats[i].Mon2Low,low)
+				Game.MapStats[i].Mon2Hi=BackupMapStats[i].Mon2Hi+bonus
 			end
 			if BackupMapStats[i].Mon3Hi>1 then
-				Game.MapStats[i].Mon3Low=math.max(BackupMapStats[i].Mon3Low,3)
-				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+3
+				Game.MapStats[i].Mon3Low=math.max(BackupMapStats[i].Mon3Low,low)
+				Game.MapStats[i].Mon3Hi=BackupMapStats[i].Mon3Hi+bonus
 			end
 		end
 	end
@@ -3981,16 +4004,8 @@ function events.MonsterKilled(mon)
 	if currentWorld==2 then
 		mon.Experience = math.min(mon.Experience*2, mon.Experience+1000)
 	end
-	--true nightmare nerf
-	if Game.BolsterAmount==300 then
-		mon.Experience=mon.Experience*0.67
-	end
-	if vars.Mode==2 then
-		mon.Experience=mon.Experience*0.5
-	end
-	if vars.insanityMode then
-		mon.Experience=mon.Experience*0.8
-	end
+	--same density pricing as the bulk recalc above
+	mon.Experience=mon.Experience*GetMonsterExpMult()
 	
 	local data=WhoHitMonster()
 	if data and data.Monster and data.Monster.Ally==9999 and Multiplayer and not Multiplayer.in_game then
