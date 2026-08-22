@@ -485,9 +485,11 @@ local function tooltipEnchantStats(t)
 end
 
 -- was zzMaw-Items.lua
-
 local function signed(value)
-	return (value >= 0 and "+" or "") .. value
+	if value < 0 then
+		return StrColor(255, 64, 64, tostring(value))
+	end
+	return "+" .. value
 end
 
 local function sortedKeys(t)
@@ -504,11 +506,15 @@ local function tooltipArtifactScaling(t)
 		return
 	end
 	local bonuses = MawCore.Artifacts.BonusesOf(t.Item)
-	--the vanilla "(Special Powers: +30 Might)" clause is the stale copy of what
-	--we are about to print, so it goes
 	local cut = t.Description:find("%(Special")
 	if cut then
 		t.Description = t.Description:sub(1, cut - 1)
+	end
+	if t.Description:sub(1, 1) == "(" then
+		local close = t.Description:find(")", 1, true)
+		if close then
+			t.Description = t.Description:sub(close + 1):gsub("^%s+", "")
+		end
 	end
 	local lines = {}
 	for _, stat in ipairs(sortedKeys(bonuses.Stats)) do
@@ -522,6 +528,11 @@ local function tooltipArtifactScaling(t)
 		if name then
 			lines[#lines + 1] = StrColor(255, 255, 153, name .. " skill")
 				.. ": " .. signed(bonuses.Skills[skill])
+		end
+	end
+	if MawArtifactOnHitText then
+		for _, line in ipairs(MawArtifactOnHitText(t.Item) or {}) do
+			lines[#lines + 1] = StrColor(255, 170, 60, line)
 		end
 	end
 	if #lines > 0 then

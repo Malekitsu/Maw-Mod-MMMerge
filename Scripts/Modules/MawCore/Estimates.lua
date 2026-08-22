@@ -133,7 +133,14 @@ end
 
 function getWeaponLevelDamage(itemLevel, twoHanded, weaponFlat)
 	local _, _, _, levelDamage = getWeaponDamageForLevel(itemLevel, twoHanded, weaponFlat)
-	return levelDamage*estimateWeaponDamageMultiplier(itemLevel)
+	local armsSkill = estimateSkill(itemLevel)*SKILL_ENCHANT_MULT
+	local arms = GetGradualMasteryValue(armsmasterSkill.Damage, armsSkill,
+		masteryPerLevel(itemLevel))*armsSkill
+	if not twoHanded then
+		arms = arms/2
+	end
+	local mightMult = 1 + GetMightDamageMultiplier(estimateStat(itemLevel), itemLevel)
+	return (levelDamage + arms)*estimateWeaponDamageMultiplier(itemLevel)*mightMult
 end
 
 local STAT_SHARE = 0.25
@@ -455,8 +462,13 @@ function getMonsterDamage(mon, level)
 	return damage
 end
 
---what the average character is assumed to be carrying and hitting with
-local EXPECTED_ENCHANT_COEFF = 0.5	--one damage enchant (enchantDamageRange ignores tier)
+--what the average character is assumed to be carrying and hitting with.
+--The enchant coefficient is read LIVE off the same table the game deals from
+--(enchant 46 times the global dial), so tuning ENCHANT_DAMAGE_MULT moves the
+--model by itself.
+local function expectedEnchantCoeff()
+	return enchantbonusdamage[46].Coeff*ENCHANT_DAMAGE_MULT
+end
 local EXPECTED_ENCHANT_LEVEL = 100	--level by which the weapon carries that enchant
 local EXPECTED_WEAPON_DICE = 3		--only feeds the +diceCount/2 floor of a roll
 
@@ -538,11 +550,11 @@ function getPlayerEstimatedPower(lvl)
 	local critMult = 1 + math.min(critChance, 1)*critDamage
 	damage = damage*critMult
 
-	local enchantLegendary = (1 + GetMightDamageMultiplier(might, lvl)*legendary)
+	local enchantLegendary = (1 + (LEGENDARY19_ENCHANT_MULT - 1)*legendary)
 		*(1 + (critMult-1)*legendary)
 	--the same call the game makes in GetWeaponLevelDamage
 	local enchantBase = getWeaponLevelDamage(itemLevel, true, estimateWeaponFlat(lvl))*enchantLegendary
-	damage = damage + enchantBase*EXPECTED_ENCHANT_COEFF*math.min(lvl/EXPECTED_ENCHANT_LEVEL, 1)
+	damage = damage + enchantBase*expectedEnchantCoeff()*math.min(lvl/EXPECTED_ENCHANT_LEVEL, 1)
 	damage = damage + enchantBase*GetGradualMasteryValue(fireAuraDamage, skill, m)
 
 	local crowd = math.min(1 + LEGENDARY_21_PER_MONSTER*EXPECTED_NEARBY_MONSTERS*legendary, 2)
@@ -595,10 +607,11 @@ function getPlayerEstimatedSpellPower(lvl)
 	power = power*(1 + math.min(critChance, 1)*(critDamage - 1))
 
 	local spellCritFactor = 1 + math.min(critChance, 1)*(critDamage - 1)
-	local enchantLegendary = (1 + GetMightDamageMultiplier(stat, lvl)*legendary)
+	--legendary 19 is a flat enchant bonus now, here as on the melee side
+	local enchantLegendary = (1 + (LEGENDARY19_ENCHANT_MULT - 1)*legendary)
 		*(1 + (spellCritFactor - 1)*legendary)
 	local enchantBase = getWeaponLevelDamage(lvl, true, estimateWeaponFlat(lvl))*enchantLegendary
-	local enchant = enchantBase*(EXPECTED_ENCHANT_COEFF*math.min(lvl/EXPECTED_ENCHANT_LEVEL, 1)
+	local enchant = enchantBase*(expectedEnchantCoeff()*math.min(lvl/EXPECTED_ENCHANT_LEVEL, 1)
 		+ GetGradualMasteryValue(fireAuraDamage, skill, m))*1.015^skill
 
 	local delay = estimateSpellDelay(lvl, baseDelay)

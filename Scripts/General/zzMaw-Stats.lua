@@ -164,11 +164,8 @@ function getSpellDelay(pl,spell)
 	if m==0 then return 150 end
 	local haste=math.floor(pl:GetSpeed()/SPELL_HASTE_DIVISOR)
 	local enchantMult=1
-	for i=0,2 do
-		local it=pl:GetActiveItem(i)
-		if it and it.Bonus2==40 then
-			enchantMult=enchantMult+0.1
-		end
+	if HasSpellHasteEnchant(pl) then
+		enchantMult=1.1
 	end
 	local ascensionSkill=0
 	local skill=SplitSkill(pl:GetSkill(const.Skills.Learning))
@@ -263,6 +260,33 @@ function GetMightDamageMultiplier(mightAmount, playerLevel)
 	return mightAmount/STAT_DAMAGE_DIVISOR
 end
 
+--The Leech block at the bottom of the Power tooltip. Reads the same lifeLeech
+--table stage_leech spends, so the shown percentages are the ones applied.
+function leechAllText(pl)
+	local id=pl:GetIndex()
+	if not (lifeLeech and lifeLeech[id]) then
+		return ""
+	end
+	local m=lifeLeech[id].Melee or 0
+	local r=lifeLeech[id].Ranged or 0
+	local s=lifeLeech[id].Spell or 0
+	if m==0 and r==0 and s==0 then
+		return ""
+	end
+	--a negative leech (Hades) drains: red, not healing green
+	local function pct(v)
+		if v<0 then
+			return StrColor(255,64,64, round(v*100) .. "%")
+		end
+		return StrColor(0,255,0, round(v*100) .. "%")
+	end
+	return string.format("\n\nPhysical Leech: %s\nMagical Leech: %s",
+			pct(m), pct(s))
+		.. "\nLeech done with bow is halved. Magical Leech also includes damage done with weapons enchants."
+		.. "\nLeech counts health bars, not damage: take away 50% of a monster's health with 10% leech, and you heal 5% of your own."
+		.. "\nEvery monster is measured with the bar of the middle variant of its family: weak variants leech for less, strong ones and bosses for more."
+end
+
 function getIntellectDamageMultiplier(intellectAmount, playerLevel)
 	return intellectAmount/STAT_DAMAGE_DIVISOR
 end
@@ -319,8 +343,7 @@ function events.BuildStatInformationBox(t)
 		--spell haste
 		speed=Party[i]:GetSpeed()
 		spellSpeedEffect=math.floor(speed/10)
-		local it=Party[i]:GetActiveItem(1)
-		if it and it.Bonus2==40 then
+		if HasSpellHasteEnchant(Party[i]) then
 			spellSpeedEffect=spellSpeedEffect+20
 		end
 		--melee haste
@@ -408,9 +431,9 @@ function events.BuildStatInformationBox(t)
 		--get spell and its damage
 		DPS1, DPS2, DPS3, vitality=calcPowerVitality(pl)
 		local txt=string.format("Melee Power: %s\nRanged Power: %s\nSpell Power: %s",StrColor(255,0,0,DPS1),StrColor(200,200,0,DPS2),StrColor(50,50,220,DPS3))
-			
-		t.Text=string.format("%s\n%s",t.Text,txt)
-		
+
+		t.Text=string.format("%s\n%s",t.Text,txt) .. leechAllText(pl)
+
 	end
 	
 	if t.Stat==11 then

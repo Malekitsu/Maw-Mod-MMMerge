@@ -1002,7 +1002,8 @@ local function stage_legendaries(t)
 		end 
 	end
 	t.Result=t.Result+fireAuraDamage+enchantDamage
-	
+	t.ElementalDamage=(t.ElementalDamage or 0)+fireAuraDamage+enchantDamage
+
 	--[17]="Your hits will deal 1% of current monster HP health (0.4% for AoE, multi-hit spells and arrows)",
 	if hasLegendary(id,17) then
 		if t.Result>0 and ((data and data.Object==nil and t.DamageKind==4) or (data and data.Object)) then
@@ -1184,9 +1185,16 @@ local function stage_leech(t)
 			fullHP=getMaxMana(pl) or 0
 			manaLeechLeg=true
 		end
-		local baselineHeal=t.Result/refHP*fullHP --basically dealing 100% of monster B HP as damage heals you by 100%
-		
+		--overkill does not leech: only damage the monster could actually
+		--absorb counts, capped at its real max HP
+		local counted=math.min(t.Result, MawCore.MonsterHP.max(mon))
+		local elemental=math.min(t.ElementalDamage or 0, counted)
+		local baselineHeal=counted/refHP*fullHP --basically dealing 100% of monster B HP as damage heals you by 100%
+		local elementalHeal=elemental/refHP*fullHP
+
 		baselineHeal=affixCut(baselineHeal, 32)
+		elementalHeal=affixCut(elementalHeal, 32)
+		local physicalHeal=baselineHeal-elementalHeal
 		local totalHeal=0
 		local minLeech=0
 		if not lifeLeech or not lifeLeech[index] then return end
@@ -1195,15 +1203,15 @@ local function stage_leech(t)
 			--melee
 			if not data.Object then
 				local meleeLeech=lifeLeech[index].Melee+getDragonRegenLeech(pl, getMonsterLevel(mon))
-				totalHeal=baselineHeal*meleeLeech
+				totalHeal=physicalHeal*meleeLeech+elementalHeal*lifeLeech[index].Spell
 
 				local recovery=pl:GetAttackDelay()
 				minLeech=fullHP*meleeLeech/5*recovery/100
 			end
 			--ranged
 			if data.Object and data.Object.Spell==133 then
-				totalHeal=baselineHeal*lifeLeech[index].Ranged
-				
+				totalHeal=physicalHeal*lifeLeech[index].Ranged+elementalHeal*lifeLeech[index].Spell
+
 				local recovery=pl:GetAttackDelay(true)
 				minLeech=fullHP*lifeLeech[index].Ranged/5*recovery/100
 			end
@@ -1242,7 +1250,13 @@ local function stage_leech(t)
 			end
 			totalHeal=totalHeal+baselineHeal*0.2*mult
 		end
-		totalHeal=math.ceil(math.max(totalHeal, minLeech))
+		--a NEGATIVE total is Hades draining its wielder: the recovery floor is
+		--a guarantee for healers, not a shield for the drained
+		if totalHeal>=0 then
+			totalHeal=math.ceil(math.max(totalHeal, minLeech))
+		else
+			totalHeal=math.floor(totalHeal)
+		end
 		
 		local overHeal=0
 		if manaLeechLeg then

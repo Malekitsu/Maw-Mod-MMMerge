@@ -2405,8 +2405,7 @@ local function ascendRemaining(pl, s, m, id)
 	
 	--haste
 	local haste=math.floor(pl:GetSpeed()/10)
-	local it=pl:GetActiveItem(1)
-	if it and it.Bonus2==40 then
+	if HasSpellHasteEnchant(pl) then
 		haste=haste+20
 	end
 	

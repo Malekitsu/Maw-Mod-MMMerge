@@ -1408,6 +1408,9 @@ function events.GameInitialized2()
 	Game.SpcItemsTxt[22].BonusStat="Stone and premature ageing Immunity"
 	Game.SpcItemsTxt[24].BonusStat="Death and Eradication Immunity"
 	Game.SpcItemsTxt[35].BonusStat="Reduces Physical damage taken by 15%"
+	Game.SpcItemsTxt[15].BonusStat="Leech 10% of physical and magical damage"
+	Game.SpcItemsTxt[40].BonusStat="Leech 10% of physical damage, increases attack speed"
+	Game.SpcItemsTxt[39].BonusStat="Leech 10% of magical damage, increases cast speed (does not stack)"
 end
 --------------------
 --STATUS REWORK (needs to stay after status immunity)
@@ -1500,7 +1503,7 @@ legendaryEffects={
 	
 	[17]="Your hits deal 2% of current monster HP as physical damage (1% for AoE, multi-hit spells and arrows).\nDamage is increased by weapon base attack speed or Ascensions for spells.",
 	[18]="Reduce all damage taken by 10%",
-	[19]="Your weapon enchants scale with the highest between might/int./pers.",
+	[19]="Increases damage from weapon enchants by 50%",
 	[20]="Meditation restores 1% more mana for each 1% of your mana reserved by buffs",
 	[21]="Increase melee damage by 5% for each enemy in the nearbies",
 	[22]="Reduces damage by 3% for each enemy in the nearbies",
@@ -1772,7 +1775,7 @@ function checktext(MaxCharges,bonus2,it)
 		--stats enchants
 		[38] = "Meditation Skill +" .. MawCore.Formulas.chargesMeditationSkill(MaxCharges),
 		[39] = "Adds " .. enchRangeText(39) .. " to spell damage and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Intellect and personality.",
-		[40] = "Spells Drain Hit points from target and Increased Spell speed.(except when equipping off-hand).",
+		[40] = "Leech 10% of magical damage, increases cast speed (does not stack).",
 		[42] = " +" .. math.floor(bonusEffects[42].statModifier * mult) .. " to Seven Stats, HP, SP, Armor, Resistances.",
 		[43] = " +" .. math.floor(bonusEffects[43].statModifier * mult) .. " to Endurance, Armor, Hit points.",
 		[44] = " +" .. math.floor(bonusEffects[44].statModifier * mult) .. " Hit points and Regenerate Hit points over time.",
@@ -1970,27 +1973,45 @@ enchantbonusdamage[15] = {24,24,["Type"]=8,["Coeff"]=0.45}
 enchantbonusdamage[39] = {20,40,["Type"]=0,["Coeff"]=0.5}
 enchantbonusdamage[46] = {20,40,["Type"]=0,["Coeff"]=0.5}
 
+ENCHANT_DAMAGE_MULT = 1
+ENCHANT_FLOOR_SHARE = 0.5
+
 --min/max roll of a damage enchant: average = Coeff * undamped item-level
---weapon damage (the flat base every weapon shares is not part of that scale)
-function enchantDamageRange(it, id)
+function enchantDamageRange(it, id, itemLevel)
 	local ench=enchantbonusdamage[id]
-	local avg=GetWeaponLevelDamage(it)*ench.Coeff
+	local levelDamage
+	if itemLevel then
+		levelDamage=getWeaponLevelDamage(itemLevel, IsTwoHandedWeapon(it), GetWeaponFlatDamage(it))
+	else
+		levelDamage=GetWeaponLevelDamage(it)
+	end
+	local avg=levelDamage*ench.Coeff*ENCHANT_DAMAGE_MULT
 	local mean=(ench[1]+ench[2])/2
 	--{min,max} are also a guaranteed floor, so a low item level still deals
-	--something; two-handed weapons are owed twice as much of it
-	local floorMult=IsTwoHandedWeapon(it) and 2 or 1
+	local floorMult=(IsTwoHandedWeapon(it) and 2 or 1)*ENCHANT_FLOOR_SHARE
 	local lo=math.max(avg*ench[1]/mean, ench[1]*floorMult)
 	local hi=math.max(avg*ench[2]/mean, ench[2]*floorMult)
 	return lo, hi, (lo+hi)/2
 end
 
---legendary 19: enchant/aura damage scales with the highest stat, same
---level normalization as the might damage bonus
+--enchant 40: faster spell casting from any weapon slot (main, offhand or
+--bow), ONE instance only -- it does not stack across items. getSpellDelay
+--applies it and the haste displays print it, so both must read this.
+function HasSpellHasteEnchant(pl)
+	for i=0,2 do
+		local it=pl:GetActiveItem(i)
+		if it and it.Bonus2==40 then
+			return true
+		end
+	end
+	return false
+end
+
+LEGENDARY19_ENCHANT_MULT = 1.5
 function GetLegendary19Mult(pl)
 	local id=pl:GetIndex()
 	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
-		local bonusStat=math.max(pl:GetMight(), pl:GetIntellect(), pl:GetPersonality())
-		return 1+GetMightDamageMultiplier(bonusStat, pl.LevelBase)
+		return LEGENDARY19_ENCHANT_MULT
 	end
 	return 1
 end
@@ -3093,6 +3114,12 @@ local function addWeaponACRes(pl, index, tab)
 	lifeLeech[index]["Melee"]=0
 	lifeLeech[index]["Ranged"]=0
 	lifeLeech[index]["Spell"]=0
+	--Vampiric enchants do not stack with themselves, so they are FLAGS; the
+	--artifact drain (Hades) adds. Collected first and applied once after the
+	--loop, or the result would depend on which hand holds which: an enchant
+	--assignment in a later slot used to erase the drain of an earlier one.
+	local meleeVamp, rangedVamp, spellVamp=false, false, false
+	local artifactDrain=0
 	for j=0,2 do
 		local it=pl:GetActiveItem(j)
 		if it then
@@ -3117,16 +3144,34 @@ local function addWeaponACRes(pl, index, tab)
 			end
 			if it.Bonus2==16 or it.Bonus2==41 then
 				if j~=2 then
-					lifeLeech[index]["Melee"]=0.1
+					meleeVamp=true
 				else
-					lifeLeech[index]["Ranged"]=0.05
+					rangedVamp=true
+				end
+				--16 is the greater vampirism: it leeches the magical side too
+				if it.Bonus2==16 then
+					spellVamp=true
 				end
 			elseif it.Bonus2==40 then
-				lifeLeech[index]["Spell"]=0.1
+				spellVamp=true
+			end
+			--negative leech artifacts (Hades) drain a share of physical damage
+			if artifactLeech and artifactLeech[it.Number] then
+				artifactDrain=artifactDrain+artifactLeech[it.Number]
 			end
 
 		end
 	end
+	if meleeVamp then
+		lifeLeech[index]["Melee"]=0.1
+	end
+	if rangedVamp then
+		lifeLeech[index]["Ranged"]=0.05
+	end
+	if spellVamp then
+		lifeLeech[index]["Spell"]=0.1
+	end
+	lifeLeech[index]["Melee"]=lifeLeech[index]["Melee"]+artifactDrain
 	if vars.MAWSETTINGS.buffRework=="ON" and getBuffSkill(91)>0 then
 		lifeLeech[index]["Melee"]=lifeLeech[index]["Melee"]+0.05
 		lifeLeech[index]["Ranged"]=lifeLeech[index]["Ranged"]+0.025
@@ -3429,10 +3474,10 @@ artifactPower[524] = {	[const.Stats.Speed] = 1.5,
 						[const.Stats.ArmorClass] = -0.43}
 artifactPower[525] = {	[const.Stats.Accuracy] = 3,
 						[const.Stats.Speed] = -0.5}
-artifactPower[526] = {	[const.Stats.Might] = 0.88,
-						[const.Stats.Accuracy] = 0.88,
-						[const.Stats.Personality] = 0.63,
-						[const.Stats.Intellect] = 0.63}
+artifactPower[526] = {	[const.Stats.Might] = 1.5,
+						[const.Stats.Accuracy] = 1.5,
+						[const.Stats.Personality] = -1.07,
+						[const.Stats.Intellect] = -1.07}
 artifactPower[527] = {	[const.Stats.Might] = 3,
 						[const.Stats.Luck] = -1.5}
 artifactPower[528] = {	[const.Stats.WaterResistance] = 3,
@@ -4403,7 +4448,6 @@ function GetWeaponDamageRows(it)
 	return bonus*baseMult, sides*baseMult
 end
 
---what enchants and auras scale off: the item-level share only, undamped
 function GetWeaponLevelDamage(it)
 	return getWeaponLevelDamage(MawCore.ItemLevel.OfItem(it), IsTwoHandedWeapon(it), GetWeaponFlatDamage(it))
 end
