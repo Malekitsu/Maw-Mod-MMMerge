@@ -3139,7 +3139,7 @@ local function addWeaponACRes(pl, index, tab)
 	--artifact drain (Hades) adds. Collected first and applied once after the
 	--loop, or the result would depend on which hand holds which: an enchant
 	--assignment in a later slot used to erase the drain of an earlier one.
-	local meleeVamp, rangedVamp, spellVamp=false, false, false
+	local physVamp, spellVamp=false, false
 	local artifactDrain=0
 	for j=0,2 do
 		local it=pl:GetActiveItem(j)
@@ -3164,11 +3164,7 @@ local function addWeaponACRes(pl, index, tab)
 				end
 			end
 			if it.Bonus2==16 or it.Bonus2==41 then
-				if j~=2 then
-					meleeVamp=true
-				else
-					rangedVamp=true
-				end
+				physVamp=true
 				--16 is the greater vampirism: it leeches the magical side too
 				if it.Bonus2==16 then
 					spellVamp=true
@@ -3183,10 +3179,8 @@ local function addWeaponACRes(pl, index, tab)
 
 		end
 	end
-	if meleeVamp then
+	if physVamp then
 		lifeLeech[index]["Melee"]=0.1
-	end
-	if rangedVamp then
 		lifeLeech[index]["Ranged"]=0.05
 	end
 	if spellVamp then
