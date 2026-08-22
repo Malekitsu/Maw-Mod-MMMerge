@@ -2015,6 +2015,25 @@ function GetLegendary19Mult(pl)
 	end
 	return 1
 end
+
+function GetPlayerBaseRecovery(pl, it)
+	if it and it:T().EquipStat==2 then
+		return getItemRecovery(it, 0)
+	end
+	local total, count=0, 0
+	for i=0,1 do
+		local held=pl:GetActiveItem(i)
+		if held and held:T().Skill<8 then
+			total=total+getItemRecovery(held, 0)
+			count=count+1
+		end
+	end
+	if count==0 then
+		return 100
+	end
+	return total/count
+end
+
 --calculate enchant damage
 function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType)
 	local ench=enchantbonusdamage[it.Bonus2]
@@ -2042,6 +2061,8 @@ function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType)
 		end
 	end
 	damage=damage*mult
+
+	damage=damage*GetPlayerBaseRecovery(pl, it)/100
 	damage = damage/2^(resistance%1000/100)
 	return damage
 end
@@ -4446,6 +4467,16 @@ function GetWeaponDamageRows(it)
 	local sides=(split/2+wDice)/math.max(txt.Mod1DiceCount,1)
 	local baseMult=MawCore.Artifacts.BaseMult(it)
 	return bonus*baseMult, sides*baseMult
+end
+
+--The damage range the rows amount to, for tooltips: min = every die at 1,
+--max = every die at its rounded sides -- the same rounding addWeaponRows
+--bakes into the character, so the shown range is the dealt one.
+function GetWeaponDamageMinMax(it)
+	local bonus, sides = GetWeaponDamageRows(it)
+	bonus, sides = round(bonus), round(sides)
+	local count = it:T().Mod1DiceCount
+	return bonus, count + bonus, count*sides + bonus
 end
 
 function GetWeaponLevelDamage(it)

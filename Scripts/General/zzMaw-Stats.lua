@@ -1203,12 +1203,12 @@ function calcPowerVitality(pl, statsMenu)
 	end
 	local critChance, critMult=getCritInfo(pl,false,lvl)
 	local enchantDamage=0
-	for i=0,1 do 
+	for i=0,1 do
 		local it=pl:GetActiveItem(i)
 		if it and it:T().EquipStat<=2 then
 			local dmg1=calcEnchantDamage(pl, it, 0, false, false, "power")
 			local dmg2=calcFireAuraDamage(pl, it, 0, false, false, "power")
-			enchantDamage=enchantDamage+dmg1+dmg2
+			enchantDamage=enchantDamage+dmg1+dmg2+MawArtifactOnHitPower(it, pl)
 		end
 	end
 	DPS1=round((dmg*(1+math.min(critChance,1)*(critMult-1))+enchantDamage)/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Melee"]*math.max(critChance,1))
@@ -1228,7 +1228,7 @@ function calcPowerVitality(pl, statsMenu)
 	if it and it:T().EquipStat<=2 then
 		local dmg=calcEnchantDamage(pl, it, 0, false, false, "power")
 		local dmg2=calcFireAuraDamage(pl, it, 0, false, false, "power")
-		enchantDamage=enchantDamage+dmg+dmg2
+		enchantDamage=enchantDamage+dmg+dmg2+MawArtifactOnHitPower(it, pl)
 	end
 	local s,m=SplitSkill(pl.Skills[const.Skills.Bow])
 	if m>=3 then

@@ -252,9 +252,8 @@ local function tooltipEnchantStats(t)
 				local equipStat=txt.EquipStat
 				if equipStat<=2 then
 					--the rows addWeaponRows actually applies, artifacts included
-					local bonus,sides=GetWeaponDamageRows(t.Item)
-					bonus,sides=round(bonus),round(sides)
-					t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " ..  txt.Mod1DiceCount .. "d" .. sides .. "+" .. bonus
+					local bonus,lo,hi=GetWeaponDamageMinMax(t.Item)
+					t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " .. lo .. "-" .. hi
 				end
 			end
 			
@@ -562,9 +561,8 @@ local function tooltipArtifactBaseStats(t)
 				end
 			end
 			if txt.EquipStat<=2 then
-				local bonus,sides=GetWeaponDamageRows(t.Item)
-				bonus,sides=round(bonus),round(sides)
-				t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " ..  txt.Mod1DiceCount .. "d" .. sides .. "+" .. bonus
+				local bonus,lo,hi=GetWeaponDamageMinMax(t.Item)
+				t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " .. lo .. "-" .. hi
 			end
 			local skill=t.Item:T().Skill
 			if table.find(twoHandedAxes, t.Item.Number) or table.find(oneHandedAxes, t.Item.Number) then

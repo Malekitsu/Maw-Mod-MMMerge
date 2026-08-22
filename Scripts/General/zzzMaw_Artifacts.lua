@@ -436,7 +436,7 @@ function MawArtifactLevel()
 	return 0
 end
 
-function MawArtifactOnHitDamage(it, effect, rand)
+function MawArtifactOnHitDamage(it, effect, rand, pl)
 	if not effect.Damage then
 		return 0
 	end
@@ -445,7 +445,16 @@ function MawArtifactOnHitDamage(it, effect, rand)
 	if rand then
 		damage = math.random(round(lo), round(hi))
 	end
-	return damage*effect.Damage
+	local pace=pl and GetPlayerBaseRecovery(pl, it)/100 or 1
+	return damage*effect.Damage*pace
+end
+
+function MawArtifactOnHitPower(it, pl)
+	local effect = it and artifactOnHit[it.Number]
+	if not effect or it.Broken then
+		return 0
+	end
+	return MawArtifactOnHitDamage(it, effect, false, pl)
 end
 
 --damageKindMap is index -> const.Damage; resistances are read by index, so the
@@ -477,7 +486,7 @@ local function onHitForItem(t, pl, it)
 	if not effect or it.Broken then
 		return 0
 	end
-	local damage = MawArtifactOnHitDamage(it, effect, true)
+	local damage = MawArtifactOnHitDamage(it, effect, true, pl)
 	if effect.MultVs then
 		local kind = Game.Bolster.Monsters[t.Monster.Id].Type
 		damage = damage*(effect.MultVs[kind] or 1)

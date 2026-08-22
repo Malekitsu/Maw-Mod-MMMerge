@@ -131,16 +131,22 @@ function getWeaponDamageForLevel(itemLevel, twoHanded, flat)
 	return diceOnly + flatOnly, diceOnly, flatOnly, levelDamage
 end
 
+function estimateStatFlatDamage(level)
+	return Game.GetStatisticEffect(estimateStat(level))
+end
+
 function getWeaponLevelDamage(itemLevel, twoHanded, weaponFlat)
 	local _, _, _, levelDamage = getWeaponDamageForLevel(itemLevel, twoHanded, weaponFlat)
 	local armsSkill = estimateSkill(itemLevel)*SKILL_ENCHANT_MULT
 	local arms = GetGradualMasteryValue(armsmasterSkill.Damage, armsSkill,
 		masteryPerLevel(itemLevel))*armsSkill
+	local statFlat = estimateStatFlatDamage(itemLevel)
 	if not twoHanded then
 		arms = arms/2
+		statFlat = statFlat/2
 	end
 	local mightMult = 1 + GetMightDamageMultiplier(estimateStat(itemLevel), itemLevel)
-	return (levelDamage + arms)*estimateWeaponDamageMultiplier(itemLevel)*mightMult
+	return ((levelDamage + arms)*estimateWeaponDamageMultiplier(itemLevel) + statFlat)*mightMult
 end
 
 local STAT_SHARE = 0.25

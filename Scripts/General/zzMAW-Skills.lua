@@ -413,18 +413,15 @@ function GetSpeedBonus(pl)
 	return GetSpeedBonusFromStat(pl:GetSpeed(), pl.LevelBase)
 end
 
+ITEM_RECOVERY_LEVEL_CAP = 600
 function getItemRecovery(it, playerLevel)
 	local skill=it:T().Skill
 	if table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number) then
 		skill=3
 	end
 	local baseSpeed=100
-	if table.find(artWeap1h,it.Number) or table.find(artWeap2h,it.Number) then 
-		itemLevel=playerLevel
-		baseSpeed=baseRecovery[skill] * (0.75+playerLevel/500)
-		baseSpeed=round(baseSpeed/10)*10
-	elseif baseRecovery[skill] then
-		itemLevel=MawCore.ItemLevel.OfItem(it)
+	if baseRecovery[skill] then
+		local itemLevel=math.min(MawCore.ItemLevel.OfItem(it), ITEM_RECOVERY_LEVEL_CAP)
 		baseSpeed=baseRecovery[skill] * (0.75+itemLevel/500)
 		baseSpeed=round(baseSpeed/10)*10
 	end
