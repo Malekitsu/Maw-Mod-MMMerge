@@ -255,7 +255,7 @@ local function tooltipEnchantStats(t)
 				if equipStat<=2 then
 					--the rows addWeaponRows actually applies, artifacts included
 					local bonus,lo,hi=GetWeaponDamageMinMax(t.Item)
-					t.BasicStat= "Damage: " .. lo .. "-" .. hi .. "\nAttack: +" .. bonus .. MawQualityText(t.Item)
+					t.BasicStat= "Attack: +" .. bonus .. "  Damage: " .. lo .. "-" .. hi
 						.. MawQualityText(t.Item)
 				end
 			end
@@ -566,7 +566,8 @@ local function tooltipArtifactBaseStats(t)
 			end
 			if txt.EquipStat<=2 then
 				local bonus,lo,hi=GetWeaponDamageMinMax(t.Item)
-				t.BasicStat= "Damage: " .. lo .. "-" .. hi .. "\nAttack: +" .. bonus .. MawQualityText(t.Item)
+				t.BasicStat= "Attack: +" .. bonus .. "  Damage: " .. lo .. "-" .. hi
+					.. MawQualityText(t.Item)
 			end
 			local skill=t.Item:T().Skill
 			if table.find(twoHandedAxes, t.Item.Number) or table.find(oneHandedAxes, t.Item.Number) then

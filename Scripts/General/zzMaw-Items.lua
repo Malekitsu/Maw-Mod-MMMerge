@@ -743,7 +743,7 @@ function MawQualityText(it)
 	if quality<=0 then
 		return ""
 	end
-	return StrColor(255, 190, 90, "  (Quality +" .. quality .. "%)")
+	return StrColor(255, 190, 90, "\nQuality bonus: +" .. quality .. "%")
 end
 --============================= end RARITY =============================
 
