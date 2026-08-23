@@ -3262,6 +3262,11 @@ local function addWeaponACRes(pl, index, tab)
 		lifeLeech[index]["Ranged"]=lifeLeech[index]["Ranged"]+0.025*mult
 		lifeLeech[index]["Spell"]=lifeLeech[index]["Spell"]+0.025*mult
 	end
+	if table.find(dkClass, pl.Class) then
+		local blood=MawCore.Formulas.dkBloodLeech
+		lifeLeech[index]["Melee"]=lifeLeech[index]["Melee"]+blood
+		lifeLeech[index]["Ranged"]=lifeLeech[index]["Ranged"]+blood/2
+	end
 end
 
 --phase 2: every equipped staff in the party adds resistances to everyone

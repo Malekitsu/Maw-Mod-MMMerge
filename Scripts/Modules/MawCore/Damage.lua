@@ -764,9 +764,6 @@ local function stage_dkAttack(t)
 		if t.DamageKind==4 and table.find(dkClass, data.Player.Class) then
 			local pl=data.Player
 			local bloodS, bloodM=SplitSkill(pl.Skills[const.Skills.Body])
-			local FHP=pl:GetFullHP()
-			local monLvl=getMonsterLevel(t.Monster)
-			local heal=Formulas.dkPassiveLeech(FHP, bloodS, monLvl)
 			--current active leech spell
 			vars.dkActiveAttackSpell=vars.dkActiveAttackSpell or {}
 			local id=pl:GetIndex()
@@ -782,13 +779,13 @@ local function stage_dkAttack(t)
 			end
 			
 			local id=pl:GetIndex()
-		
-			local healing=math.min(pl:GetFullHP()-pl.HP, round(leech+heal))
+
+			local healing=math.min(pl:GetFullHP()-pl.HP, round(leech))
 			if healing>0 then
 				track("leechDone", id, healing)
 			end
-			
-			pl.HP=math.min(pl:GetFullHP(), pl.HP+heal+leech)
+
+			pl.HP=math.min(pl:GetFullHP(), pl.HP+leech)
 			
 			local graspCost=MawCore.Classes.DKManaCost[96]
 			if vars.dkActiveAttackSpell and vars.dkActiveAttackSpell[id]==96 and pl.SP>=graspCost then

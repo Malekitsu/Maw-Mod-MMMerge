@@ -378,9 +378,11 @@ local function registerClassBuilders()
 			[5]=EV},
 		[18]={[1]=function(pl)
 			local bloodS=SplitSkill(pl.Skills[const.Skills.Body])
-			local refLvl=MawReferenceLevel()
-			local leech=round(Formulas.dkPassiveLeech(100, bloodS, refLvl)*100)/100
-			return "This skill is only available to death knights and reduces physical damage taken.\n" .. "Current Reduction: " .. Formulas.reductionPercent(bloodS) .."%\n\nAdditionally it will make your attacks to leech damage based on your total HP.\n\nCurrent leech vs. level " .. refLvl .. " monsters: " .. leech .. "%\n"
+			local blood=Formulas.dkBloodLeech*100
+			return "This skill is only available to death knights and reduces physical damage taken.\n"
+				.. "Current Reduction: " .. Formulas.reductionPercent(bloodS) .."%\n\n"
+				.. "Your attacks also leech " .. blood .. "% of the physical damage you deal ("
+				.. blood/2 .. "% with a bow). This stacks with a weapon's vampiric enchant.\n"
 		end,
 			[5]=EV},
 		[20]={[1]=function(pl)
