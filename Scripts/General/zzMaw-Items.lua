@@ -3128,30 +3128,19 @@ end
 
 --phase 2: per-slot skill attack bonuses + dodging AC
 local function addSlotAttackRows(pl, tab)
-	--a weapon skill pays its attack bonus once, not once per slot holding it
-	local attackSkillPaid={}
+	local meleeAttack=0
 	for i=0,3 do
 		local item=pl:GetActiveItem(i)
 		if item then
 			local skill=item:T().Skill
-			--minotaur fix
-			if i==1 or i==0 then
-				if oneHandedAxesSet[item.Number] or twoHandedAxesSet[item.Number] then
-					if i==0 then
-						skill=2
-					else
-						skill=3
-					end
-				end
-			end
 			local s,m = SplitSkill(pl:GetSkill(skill))
 
-			if skillAttack[skill] and skillAttack[skill][m] and not attackSkillPaid[skill] then
-				attackSkillPaid[skill]=true
+			if skillAttack[skill] and skillAttack[skill][m] then
+				local bonus=skillAttack[skill][m]*s
 				if i~=2 then
-					tab[40]=tab[40]+skillAttack[skill][m]*s
+					meleeAttack=math.max(meleeAttack, bonus)
 				else
-					tab[44]=tab[44]+skillAttack[skill][m]*s
+					tab[44]=tab[44]+bonus
 				end
 			end
 			if i==2 and m>=4 then --remove vanilla calculation
@@ -3164,6 +3153,7 @@ local function addSlotAttackRows(pl, tab)
 			tab[10]=tab[10]+skillAC[const.Skills.Dodging][m]*s
 		end
 	end
+	tab[40]=tab[40]+meleeAttack
 end
 
 --phase 2: armsmaster attack, bare-hand unarmed rows, hammerhand; returns

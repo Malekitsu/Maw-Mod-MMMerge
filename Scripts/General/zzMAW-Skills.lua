@@ -102,7 +102,7 @@ skillAC =
 	[const.Skills.Dodging]	= {[0]=0, 4, 5, 6, 6,},
 }
 -- bodybuilding % bonus HP per skill point (by rank)
-bodybuildingHP = {[0]=0, 0, 1, 1.5, 2,}
+bodybuildingHP = {[0]=0, 0.5, 1, 1.5, 2,}
 
 skillResistance =
 {
