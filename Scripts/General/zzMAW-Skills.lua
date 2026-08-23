@@ -152,6 +152,8 @@ armsmasterSkill={
 	["Attack"]={1,1,1,1,1,[0]=0},
 }
 
+dkDamageSkill={0.5,0.75,1,1,[0]=0}
+
 function MawArmsmasterApplies(pl)
 	local main=pl:GetActiveItem(1)
 	return main~=nil and main:T().Skill~=const.Skills.Staff

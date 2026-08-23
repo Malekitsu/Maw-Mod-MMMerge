@@ -2863,7 +2863,8 @@ local function addWeaponRows(pl, index, it, txt, tab, floorPaid)
 	if table.find(dkClass, pl.Class) then
 		local s1, m1=SplitSkill(pl.Skills[const.Skills.Water])
 		local s2, m2=SplitSkill(pl.Skills[const.Skills.Dark])
-		local bonus=s1*math.min(m1, 3)/4+s2*math.min(m2, 3)/4
+		local bonus=GetGradualMasteryValue(dkDamageSkill, s1, m1)*s1
+			+GetGradualMasteryValue(dkDamageSkill, s2, m2)*s2
 		armsDmg=armsDmg+bonus*mult
 	end
 	--SERAPHIM

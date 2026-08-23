@@ -20,6 +20,10 @@ local function meleeMult(pl)
 	return t and t.Melee or 1
 end
 
+function dkDamageRow()
+	return dkDamageSkill[1] .. "-" .. dkDamageSkill[2] .. "-" .. dkDamageSkill[3]
+end
+
 -- index part -> row label; also the source for SkillsUI's mastery name
 -- array (the engine's four name slots get redirected to these strings)
 SkillTooltip.masteryNames = {"", "Novice", "Expert", "Master", "Grand",
@@ -366,7 +370,11 @@ local function registerClassBuilders()
 
 	--was dkSkills(true) desc lines
 	{match=function(pl) return table.find(dkClass, pl.Class) end, slots={
-		[14]={[1]="This skill is only available to death knights and increases damage by 0.25-0.5-0.75 (at Novice, Expert, Master) and increases attack speed by 1% per skill point.\n",
+		[14]={[1]=function(pl)
+			return "This skill is only available to death knights and increases damage by "
+				.. dkDamageRow() .. " per skill point (at Novice, Expert, Master; Grand Master adds nothing)"
+				.. " and increases attack speed by 1% per skill point.\n"
+		end,
 			[5]=EV},
 		[18]={[1]=function(pl)
 			local bloodS=SplitSkill(pl.Skills[const.Skills.Body])
@@ -377,7 +385,10 @@ local function registerClassBuilders()
 			[5]=EV},
 		[20]={[1]=function(pl)
 			local unholyS=SplitSkill(pl.Skills[const.Skills.Dark])
-			return "This skill is only available to death knights and increases damage by 0.25-0.5-0.75 (at Novice, Expert, Master) and reduces magical damage taken.\n" .. "Current Reduction: " .. Formulas.reductionPercent(unholyS) .."%\n"
+			return "This skill is only available to death knights and increases damage by "
+				.. dkDamageRow() .. " per skill point (at Novice, Expert, Master; Grand Master adds nothing)"
+				.. " and reduces magical damage taken.\n"
+				.. "Current Reduction: " .. Formulas.reductionPercent(unholyS) .."%\n"
 		end},
 	}},
 
