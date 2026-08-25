@@ -93,6 +93,19 @@ end, 14)
 --engine's AddVariable at 0x4485EC. Experience is varNum 0x0D. With ForPlayer("All")
 --the engine calls it once per party member with the full amount, so EventExperience
 --runs once per player, not once per reward.
+local REFERENCE_PARTY_SIZE = 5
+local pendingEventBolster = 0
+local eventBolsterQueued = false
+
+local function flushEventBolster()
+	eventBolsterQueued = false
+	local amount = pendingEventBolster
+	pendingEventBolster = 0
+	if amount > 0 then
+		addBolsterExp(amount)
+	end
+end
+
 function EventExperience(value, player)
 	if value <= 0 or not vars.MMLVL then
 		return value
@@ -102,8 +115,15 @@ function EventExperience(value, player)
 		partyLevel = getTotalLevel()
 	end
 	local total = value*(1+partyLevel/100) + 500*partyLevel
-	addBolsterExp(total/5)
-	return total
+	local partyCount = math.max(Party.Count, 1)
+	--each per-member call contributes its slice, so the bolster banks the same amount
+	--whatever the party size
+	pendingEventBolster = pendingEventBolster + total/partyCount
+	if not eventBolsterQueued then
+		eventBolsterQueued = true
+		RunNextTick(flushEventBolster)
+	end
+	return total*REFERENCE_PARTY_SIZE/partyCount
 end
 
 mem.hookfunction(0x4485EC, 1, 2, function(d, def, playerPtr, varNum, value)
@@ -191,8 +211,7 @@ function events.MonsterKillExp(t)
 	end
 	
 	addBolsterExp(bolsterExp/5)
-	
-	vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
+
 	for i=0, Party.High do
 		Party[i].Exp=math.min(Party[i].Exp, 2^32-3982296)
 	end

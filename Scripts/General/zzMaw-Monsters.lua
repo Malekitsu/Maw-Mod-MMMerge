@@ -2715,7 +2715,6 @@ function checkMapCompletition()
 				end
 				--bolster code
 				addBolsterExp(experience)
-				vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
 				--end
 				experience=round(experience*5/Party.Count/1000)*1000
 				if Multiplayer and Multiplayer.in_game then

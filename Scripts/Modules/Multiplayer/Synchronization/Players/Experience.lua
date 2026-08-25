@@ -49,8 +49,7 @@ local function MulAddKillExp(Amount, monLvl)
 	end
 	
 	addBolsterExp(bolsterExp)
-	
-	vars.lastPartyExperience={Party[0]:GetIndex(),Party[0].Experience}
+
 	for i=0, Party.High do
 		Party[i].Exp=math.min(Party[i].Exp, 2^32-3982296)
 	end
