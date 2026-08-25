@@ -1,3 +1,11 @@
+--Item tooltip sections live in Scripts/Modules/MawCore/Tooltip.lua.
+--Every successful craft ends the same way: glow the item on the paper doll
+--and play the enchant sound. Also called from Global/zzMAWPotions.lua.
+function ShowCraftedItemEffect(it)
+	MawCore.Engine.showItemEffect(it)
+	evt.PlaySound(12070)
+end
+
 function events.GameInitialized2()
 	storePotionsNames={}
 	for i=232,263 do
@@ -56,6 +64,9 @@ function events.UseMouseItem(t)
 	local it=Mouse.Item
 	if it.Number<221 or it.Number>=300 or it.Number==290 then return end
 	t.Allow=false
+	if it.Bonus>POTION_POWER_CAP then
+		it.Bonus=POTION_POWER_CAP
+	end
 	local pl=Party[t.PlayerSlot]
 	local index=pl:GetIndex()
 	local delay=pl.RecoveryDelay
@@ -67,7 +78,7 @@ function events.UseMouseItem(t)
 	local bonusDuration=0
 	for i=0,Party.High do
 		local s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Alchemy))
-		if m==4 then
+		if m>=4 then
 			bonusDuration = math.max(bonusDuration, const.Minute * 6 * s)
 		end
 	end
@@ -105,20 +116,16 @@ function events.UseMouseItem(t)
 	end
 	--healing potion
 	if it.Number==222 then
-		heal=round(it.Bonus^1.75+10)
-		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
+		pl.HP=math.min(pl:GetFullHP(),pl.HP+GetPotionHeal(222, it.Bonus))
 	--mana potion
 	elseif it.Number==223 then
-		spRestore=round(it.Bonus^1.6*2/3+10)
-		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
+		pl.SP=math.min(pl:GetFullSP(),pl.SP+GetPotionHeal(223, it.Bonus))
 	end
 	if it.Number==247 then
-		heal=round(it.Bonus^1.75*1.5+50)
-		pl.HP=math.min(pl:GetFullHP(),pl.HP+heal)
+		pl.HP=math.min(pl:GetFullHP(),pl.HP+GetPotionHeal(247, it.Bonus))
 	--mana potion
 	elseif it.Number==248 then
-		spRestore=round(it.Bonus^1.6+50)
-		pl.SP=math.min(pl:GetFullSP(),pl.SP+spRestore)
+		pl.SP=math.min(pl:GetFullSP(),pl.SP+GetPotionHeal(248, it.Bonus))
 	end
 	--Regen
 	if it.Number==233 then
@@ -157,32 +164,20 @@ function events.UseMouseItem(t)
 	--------------------
 	if itemBuffMapping[it.Number] then
 		local buff=itemBuffMapping[it.Number]
-		if type(buff)=="table" then
-			for i=1,#buff do
-				buffID=itemBuffMapping[it.Number][i]
-				pl.SpellBuffs[buffID].Power=it.Bonus+10
-				pl.SpellBuffs[buffID].ExpireTime=Game.Time+potionDuration
-				pl.SpellBuffs[buffID].Skill=0
-				vars.buffToIgnore[t.PlayerSlot][buffID]=Game.Time+potionDuration
-			end
-		else
-			pl.SpellBuffs[buff].Power=it.Bonus+10
-			pl.SpellBuffs[buff].ExpireTime=Game.Time+potionDuration
-			pl.SpellBuffs[buff].Skill=0
-			vars.buffToIgnore[t.PlayerSlot][buff]=Game.Time+potionDuration
+		if type(buff)~="table" then
+			buff={buff}
 		end
-		--half effect for bless, heroism and stoneskin
-		if (it.Number<=234 and it.Number~=229) or it.Number==245 or  it.Number==251 then
-			if type(buff)=="table" then
-				for i=1,#buff do
-					buffID=itemBuffMapping[it.Number][i]
-					pl.SpellBuffs[buffID].Power=round(pl.SpellBuffs[buffID].Power/2)
-					pl.SpellBuffs[buffID].Skill=0
-				end
-			else
-				pl.SpellBuffs[buff].Power=round(pl.SpellBuffs[buff].Power/2)
-				pl.SpellBuffs[buff].Skill=0
-			end
+		for i=1,#buff do
+			local buffID=buff[i]
+			pl.SpellBuffs[buffID].ExpireTime=Game.Time+potionDuration
+			pl.SpellBuffs[buffID].Skill=0
+			vars.buffToIgnore[t.PlayerSlot][buffID]=Game.Time+potionDuration
+		end
+	end
+
+	if potionBuffSpells[it.Number] then
+		for i=1,#potionBuffSpells[it.Number] do
+			setPotionBuff(pl, potionBuffSpells[it.Number][i], Game.Time+potionDuration, it.Bonus)
 		end
 	end
 	
@@ -201,7 +196,9 @@ function events.UseMouseItem(t)
 			end
 		end
 		--effect
-		local power=math.min(math.floor(it.Bonus/50))*20
+		--it.Bonus was clamped to POTION_POWER_CAP on the way in, so the steps are capped
+		--with it: 10 steps, BLACK_POTION_STAT_PER_STEP each
+		local power=math.floor(it.Bonus/BLACK_POTION_POWER_PER_STEP)*BLACK_POTION_STAT_PER_STEP
 		if it.Number==261 or it.Number==262 then
 			power=power*1.5
 		end
@@ -215,20 +212,8 @@ function events.UseMouseItem(t)
 				return
 			end
 		end
-		--retroactive fix
-		for key, value in pairs(vars.BlackPotions[index]) do
-			if type(key)=="string" then
-				if pl[key]<255 then
-					pl[key]=math.max(0, pl[key]-value)
-				else
-					pl[key]=math.max(100, pl[key]-value)
-				end
-				local stat=retroActiveFix[key]
-				vars.BlackPotions[index][stat]=value
-				vars.BlackPotions[index][key]=nil
-			end
-		end
-	end	
+	end
+
 	
 	--age potions
 	if it.Number==258 then
@@ -240,21 +225,24 @@ function events.UseMouseItem(t)
 		pl.AgeBonus=0
 	end
 	
-	--exp potion
-	if it.Number==259 then
-		local experience=it.Bonus*500
-		vars.expPot=vars.expPot or {}
-		vars.expPot[index]=vars.expPot[index] or 0
-		local baseExp=(pl.Exp-vars.expPot[index])
-		local baseLevel=calcLevel(baseExp)
-		local currentLevel=calcLevel(pl.Exp)
-		if vars.expPot[index]/(pl.Exp-vars.expPot[index])<0.25 and currentLevel-baseLevel<50 then
-			pl.Exp=pl.Exp+experience
-			vars.expPot[index]=vars.expPot[index]+experience
-		else
-			Game.ShowStatusText("You need to gain more exp. to benefit from this potion")
+	--Transcendence: permanent SKILL POINTS, on the same step ladder as the
+	--black stat potions above -- one step per 50 power, non-stacking.
+	--
+	--It cannot be stored the way those are, though: a stat bonus is recomputed
+	--from vars.BlackPotions on every read, while skill points are SPENT. So
+	--what is remembered is the highest STEP reached, and each drink hands out
+	--only the difference. A weaker potion afterwards gives nothing.
+	if it.Number==TRANSCENDENCE_POTION then
+		local step=math.floor(it.Bonus/BLACK_POTION_POWER_PER_STEP)
+		vars.mawTranscendence=vars.mawTranscendence or {}
+		local reached=vars.mawTranscendence[index] or 0
+		if step<=reached then
+			Game.ShowStatusText("Can't benefit anymore")
 			return
 		end
+		pl.SkillPoints=pl.SkillPoints+GetTranscendenceSkillPoints(step)
+			-GetTranscendenceSkillPoints(reached)
+		vars.mawTranscendence[index]=step
 	end
 	
 	--consume
@@ -300,27 +288,25 @@ potionPowerRequirement={
 	[246]=40,
 	[256]=50,
 }
+
+TRANSCENDENCE_POTION=259
+BLACK_POTION_POWER_PER_STEP=50
+BLACK_POTION_STAT_PER_STEP=20	--permanent stat a full step buys, per stat in the group
+
+REAGENT_LEVEL_DIVISOR=2
+REAGENT_POWER_CAP=255
+POTION_POWER_CAP=500
+
+function GetTranscendenceSkillPoints(step)
+	return 5*step*step + 15*step
+end
+
 blackPermanentBuffs={
 	[252]={1,5},
 	[253]={2,3},
 	[254]={4,6,7},
 	[261]={11,12,13,14},
 	[262]={15,16},
-}
-retroActiveFix={
-	["MightBase"]=1,
-	["IntellectBase"]=2,
-	["PersonalityBase"]=3,
-	["EnduranceBase"]=4,
-	["AccuracyBase"]=5,
-	["SpeedBase"]=6,
-	["LuckBase"]=7,
-	["FireResistanceBase"]=11,
-	["AirResistanceBase"]=12,
-	["WaterResistanceBase"]=13,
-	["EarthResistanceBase"]=14,
-	["MindResistanceBase"]=15,
-	["BodyResistanceBase"]=16,
 }
 itemBuffMapping = {
 	[228] = 7,	 --haste
@@ -340,6 +326,23 @@ itemBuffMapping = {
     [257] = {19,15,17,20,16,21,18},  --stats
     [263] = {5,0,22,3,9,2},  --resistances
 }
+
+--spell ids as buffPower/buffSpell key them: 3 fire res, 14 air res, 25 water
+--res, 36 earth res, 58 mind res, 69 body res, 50 preservation
+potionBuffSpells = {
+	[228] = {const.Spells.Haste},
+	[229] = {const.Spells.Heroism},
+	[230] = {const.Spells.Bless},
+	[231] = {const.Spells.Shield, 50},
+	[234] = {const.Spells.StoneSkin},
+	[245] = {const.Spells.Haste, const.Spells.Heroism, const.Spells.Bless},	--Champions
+	[249] = {3, 14, 25, 36},												--Elemental
+	[250] = {58, 69},														--Self
+	[251] = {const.Spells.Shield, 50, const.Spells.StoneSkin},				--Paladins
+	[257] = {83},														--Day of the Gods: the 7 stats, as a %
+	[263] = {85},														--Day of Protection: every resistance, no stats
+}
+
 itemImmunityMapping = {
 	[224] = {"Weak","Asleep"},
 	[225] = {"Disease1","Disease2","Disease3","Poison1","Poison2","Poison3"},
@@ -406,64 +409,21 @@ function events.DoBadThingToPlayer(t)
 	end
 end
 
-function events.BuildItemInformationBox(t)
-	if potionText[t.Item.Number] then
-		t.Description=potionText[t.Item.Number]--REMOVED .. "\n(To drink, pick the potion up and right-click over a character's portrait.  To mix, pick the potion up and right-click over another potion.)"
-	elseif t.Item.Number>=264 and t.Item.Number<=299 then
-		t.Description="This potion has been removed"
+POTION_HEAL={
+	[222]={pool="HP", flat=20, share=0.25},
+	[223]={pool="SP", flat=10, share=0.25},
+	[247]={pool="HP", flat=50, share=0.35},
+	[248]={pool="SP", flat=50, share=0.35},
+}
+
+function GetPotionHeal(number, power)
+	local h=POTION_HEAL[number]
+	if not h then
+		return 0
 	end
-	if t.Item.Number==222 then
-		t.Description=StrColor(255,255,153,"Heals " .. round(t.Item.Bonus^1.75)+10 .. " Hit Points") .. "\n" .. t.Description
-	end
-	if t.Item.Number==223 then
-		t.Description=StrColor(255,255,153,"Restores " .. round(t.Item.Bonus^1.6*2/3)+10 .. " Spell Points") .. "\n" .. t.Description
-	end
-	if t.Item.Number==232 then
-		t.Description="Grants " .. StrColor(0,0,200,math.ceil(t.Item.Bonus^0.5/1.5) + 1) .. " bonus to Meditation skill for 6 hours."
-	end
-	if t.Item.Number==247 then
-		t.Description=StrColor(255,255,153,"Heals " .. round(t.Item.Bonus^1.75*1.5)+20 .. " Hit Points") .. "\n" .. t.Description
-	end
-	if t.Item.Number==248 then
-		t.Description=StrColor(255,255,153,"Restores " .. round(t.Item.Bonus^1.6)+20 .. " Spell Points") .. "\n" .. t.Description
-	end
-	if t.Item.Number==259 then
-		local id=Game.CurrentPlayer
-		if Game.CurrentPlayer<0 or Game.CurrentPlayer>Party.High then
-			id=0
-		end
-		index=Party[id]:GetIndex()
-		vars.expPot=vars.expPot or {}
-		vars.expPot[index]=vars.expPot[index] or 0
-		local percent=round(vars.expPot[index]/(Party[id].Exp-vars.expPot[index])*10000)/100
-		if percent<25 then
-			str=StrColor(0,255,0,percent .. "%")
-		else
-			str=StrColor(255,0,0,percent .. "%")
-		end
-		
-		local baseExp=(pl.Exp-vars.expPot[index])
-		local baseLevel=calcLevel(baseExp)
-		local currentLevel=calcLevel(pl.Exp)
-		local levelDiff=round(currentLevel-baseLevel)
-		t.Description=t.Description .. "\n\nCan benefit only if experience gained this way is less than 25% of base experience and level gained are less than 50\nCurrent amount: " .. str .. "\nLevels: " .. levelDiff
-	end
-		
-	if table.find(potionUsingCharges,t.Item.Number) then
-		local charges=t.Item.Charges-1
-		if charges==-1 then
-			charges=5
-		end
-		t.Description=StrColor(255,255,153,"Charges: " .. charges) .. "\n\n" .. t.Description
-	end
-	
-	if potionRecipeText[t.Item.Number] then
-		if extraDescription then
-			t.Description=t.Description .. "\n\n" .. potionRecipeText[t.Item.Number]
-		else
-			t.Description=t.Description .. StrColor(100,100,100,"\n\nPress alt to show recipe list")
-		end
-	end
+	power=power or 0
+	local pool=h.pool=="SP" and getPlayerEstimatedMana(power) or getPlayerEstimatedHealth(power)
+	return round(h.flat + pool*h.share)
 end
 
 potionText={
@@ -504,12 +464,82 @@ potionText={
 	[256] = "Permanently adds 'of Darkness' property to a non-magic weapon.\nRequire 100 power to work.\n",
 	[257] = "Increases all Seven Statistics temporarily by 10+(1 x Power) for 6 hours.",
 	[258] = "Fix caracter age at 60.\nRequire 50 power to work.\n",
-	[259] = "Grant 500 Experience point per Power to the player.",
+	[259] = "Permanently grants Skill Points.",
 	[260] = "Fix caracter age at 20.\nRequire 50 power to work.\n",
 	[261] = "Permanently adds 30 per 50 potion power to Fire, Air, Water and Earth Resistance, single-use.\nRequire 50 power per step to work.\nPreviously gained bonus do not stack.\n",
 	[262] = "Permanently adds 30 per 50 potion power to Mind and Body Resistance, single-use.\nRequire 50 power per step to work.\nPreviously gained bonus do not stack.\n",
 	[263] = "Increases all resistances temporarily by 10+ (1 x Power) for 6 hours.",
 }
+
+function events.GameInitialized2()
+	local function pct(spell, power)
+		return round(GetBuffMultiplier(spell, GetPotionBuffSkill(power, spell),
+			POTION_BUFF_MASTERY)*1000)/10
+	end
+	local function statPct(power)
+		return round(GetBuffStatPct(GetPotionBuffSkill(power))*100)
+	end
+	--Day of the Gods: the 'light' curve, and the wide span that matches it
+	local function statPctLight(power)
+		return round(GetBuffStatPct(GetPotionBuffSkill(power, 83), true)*100)
+	end
+	--the fraction of a normal buff this potion's power is worth
+	local function strength(power)
+		return round(GetPotionBuffFraction(power)*100)
+	end
+
+	potionText[228]=function(power)
+		return "Increases your Attack Speed by " .. pct(const.Spells.Haste, power) .. "% for 6 hours."
+	end
+	potionText[229]=function(power)
+		return "Increases your Melee Damage by " .. pct(const.Spells.Heroism, power) .. "% for 6 hours."
+	end
+	potionText[230]=function(power)
+		return "Increases your Attack, and your Accuracy by " .. statPct(power) .. "%, for 6 hours."
+	end
+	potionText[231]=function(power)
+		return "Reduces magic damage taken by " .. pct(const.Spells.Shield, power) .. "% and grants Preservation for 6 hours.\nRequire 20 power to work.\n"
+	end
+	potionText[234]="Increases your Armor Class for 6 hours."
+	potionText[245]=function(power)
+		return "Grants Haste (+" .. pct(const.Spells.Haste, power) .. "% Attack Speed), Heroism (+"
+			.. pct(const.Spells.Heroism, power) .. "% Melee Damage) and Bless (+" .. statPct(power)
+			.. "% Accuracy) for 6 hours."
+	end
+	potionText[249]=function(power)
+		return "Increases your Fire, Air, Water and Earth Resistance, and those stats by " .. statPct(power) .. "%, for 6 hours."
+	end
+	potionText[250]=function(power)
+		return "Increases your Mind and Body Resistance, and those stats by " .. statPct(power) .. "%, for 6 hours."
+	end
+	potionText[251]=function(power)
+		return "Grants Shield (-" .. pct(const.Spells.Shield, power)
+			.. "% magic damage taken), Stone Skin and Preservation for 6 hours."
+	end
+	potionText[257]=function(power)
+		return "Increases all seven of your Statistics by " .. statPctLight(power)
+			.. "% for 6 hours."
+	end
+	potionText[TRANSCENDENCE_POTION]=function(power)
+		local step=math.floor((power or 0)/BLACK_POTION_POWER_PER_STEP)
+		if step<1 then
+			return "Permanently grants Skill Points. Requires "
+				.. BLACK_POTION_POWER_PER_STEP .. " power per step to work."
+		end
+		return "Permanently grants " .. GetTranscendenceSkillPoints(step)
+			.. " Skill Points (step " .. step .. ").\nOnly the difference over the "
+			.. "best one already drunk is granted."
+	end
+	potionText[263]=function(power)
+		local bf=buffPower[85]
+		local m=POTION_BUFF_MASTERY
+		local lvl=GetPotionBuffLevel(power)
+		local value=(bf.Base[m]+lvl/FLAT_BUFF_LEVEL_DIVISOR)
+			*(1+bf.Scaling[m]/100*GetPotionBuffSkill(power, 85)
+				/DAY_OF_PROTECTION_SKILL_PENALTY)
+		return "Increases every one of your Resistances by " .. round(value) .. " for 6 hours."
+	end
+end
 
 potionRecipeText={
 	--orange
@@ -568,7 +598,7 @@ reagentList={
 	--mm6
 	[1762] = 1, [1763] = 1, [1764] = 1,
 }
-function events.Tick()
+function mawTick_ReagentPower()
 	alcBonus=alcBonus or {}
 	if Game.CurrentPlayer<0 or Game.CurrentPlayer>Party.High then 
 		return
@@ -587,32 +617,23 @@ function events.Tick()
 		local bonus=0
 		if m==3 then
 			bonus=s*0.5
-		elseif m==4 then
+		elseif m>=4 then
 			bonus=s
 		end
-		if it.Mod1DiceCount+bonus>255 then
+		if it.Mod1DiceCount+bonus>REAGENT_POWER_CAP then
 			local id=Party[Game.CurrentPlayer]:GetIndex()
-			alcBonus[id]=it.Mod1DiceCount+bonus-255
-			it.Mod1DiceCount=255
+			local over=(it.Mod1DiceCount+bonus-REAGENT_POWER_CAP)/2
+			alcBonus[id]=math.min(math.floor(over), 900)
+			it.Mod1DiceCount=REAGENT_POWER_CAP
 		else
 			it.Mod1DiceCount=it.Mod1DiceCount+bonus
 		end
 		lastModifiedReagent=Mouse.Item.Number
 	end
 end
---increase alchemy skill to fix reagent power overflow
 function events.GameInitialized2()
-	function events.GetSkill(t)
-		if t.Skill==const.Skills.Alchemy and alcBonus and alcBonus[t.PlayerIndex] then
-			t.Result=t.Result+alcBonus[t.PlayerIndex]
-		end
-	end
-end
-
-function events.BuildItemInformationBox(t)
-	if reagentList[t.Item.Number] then
-		local bonus=round(reagentList[t.Item.Number] *((t.Item.Bonus*0.25)/20+1)+t.Item.Bonus*0.75)
-		t.Enchantment="Power: " .. bonus
+	skillCapExtra[const.Skills.Alchemy]=function(playerIndex)
+		return alcBonus and alcBonus[playerIndex] or 0
 	end
 end
 
@@ -660,14 +681,14 @@ function events.MonsterKilled(mon)
 			alchemyPower=power
 		end
 		if obj then
-			obj.Item.Bonus=round(getPartyLevel()/3)
+			obj.Item.Bonus=round(getPartyLevel()/REAGENT_LEVEL_DIVISOR)
 			if obj.Item.Bonus+alchemyPower>200 then
 				obj.Item.Number=math.random(221,224)
 				obj.Item.Bonus=round(obj.Item.Bonus+alchemyPower)
 			end
 		end
 	end
-	if dropPossible and m==4 then
+	if dropPossible and m>=4 then
 		local chance=0.002
 		if chance>math.random() then
 			local obj = SummonItem(1069, mon.X, mon.Y, mon.Z + 100, 100)
@@ -687,65 +708,6 @@ function events.GameInitialized2()
 	Game.SkillDesMaster[const.Skills.Alchemy]="Allows to make white potions. Power when mixing will be increased to 1.5 per skill point."
 	Game.SkillDesGM[const.Skills.Alchemy]="Allows to make black potions. Power when mixing will be increased to 2 and increases potion duration by 6 Minutes per skill point. Allows the Endless potion to be dropped by monsters, which power is determined by Alchemy level."
 end
-function events.BuildItemInformationBox(t)
-	if t.Item.Number>=1041 and t.Item.Number<=1060 then
-		--[[
-		if t.Name then
-			if t.Item.BonusStrength==1 then
-				t.Name=StrColor(178,255,255, "Ascended " .. t.Name) 
-			end
-		end
-		]]
-		if t.Description then
-			local mult=math.max((Game.BolsterAmount-100)/2000+1,1)
-			if vars.insanityMode then
-				mult=1.4
-			end
-			if vars.madnessMode then
-				mult=2
-			end
-			local tier=(t.Item.Number-1040)*mult
-			local power = 3
-			
-			local twoHanded = tier * 6 * 2
-			local bodyArmor = round(tier * 1.5 * 6)
-			local helmEtc = round(tier * 1.25 * 6)
-			local rings = round(tier * 0.75 * 6)
-			
-			
-			t.Description = "A special Gem that allows to increase an item Enchant Strength (right-click on an item with a base enchant to use)\nAncient, Primordial and Legendary items have increased Max power.\n\nIt is possible to upgrade 3 gems into 1 of upper tier by pressing U in the inventory page.\n\nMax Power: " 
-			.. StrColor(255, 128, 0, tostring(round(tier * 6))) --.. " (65% on AC)"
-			.. "\nBonus: " .. StrColor(255, 128, 0, tostring(power)) 
-			.. "\n\nItem Modifier:\nTwo Handed Weapons: " .. StrColor(255, 128, 0, twoHanded)
-			.. "\nBody Armor: " .. StrColor(255, 128, 0, bodyArmor)
-			.. "\nHelm-Boots-Gloves-Bow: " .. StrColor(255, 128, 0, helmEtc)
-			.. "\nRings: " .. StrColor(255, 128, 0, rings)
-		end
-	end
-	if t.Item.Number==1067 then
-		if t.Description then
-			if t.Item.BonusStrength<10 or t.Item.BonusStrength>1000 then
-				t.Description="Oracle's Orb is a mysterious and powerful artifact, a large, purple orb with a haunting face suspended within its core. This enigmatic relic is known for storing legendary abilities upon items it enchants.\n\nRight click a legendary item to store its power"
-			else
-				t.Description="Oracle's Orb is a mysterious and powerful artifact, a large, purple orb with a haunting face suspended within its core. This enigmatic relic is known for storing legendary abilities upon items it enchants.\n\nAdds the following legendary power to an item:"
-			end
-			t.Description = t.Description .. "\n\n" .. StrColor(255,255,30,legendaryEffects[t.Item.BonusStrength])
-		end
-	end
-	if t.Item.Number==1068 then
-		if t.Description then				
-			t.Description="\nThe Celestial Orb allows the transfer of celestial essence from one item to another, preserving the divine property while freeing the original item of its blessing.\n\n(right-click on a celestial item to extract its power charging the Celestial orb, then right-click on a non celestial item to transfer its power.)"
-			if t.Item.BonusStrength==1 then
-				t.Description = t.Description .. "\n\n" .. StrColor(120, 240, 255,"Celestial orb is charged and it's ready to grant celestial powers to any non-Artifact Equipment")
-			end
-		end
-	end
-	if t.Item.Number==1069 then
-		if t.Description then				
-			t.Description=t.Description .. StrColor(255,255,30, "\n\nIncreases Charges by " .. t.Item.BonusStrength)
-		end
-	end
-end
 
 local function upgradeGem(it, tier)
 	local enchanted=false
@@ -764,33 +726,15 @@ local function upgradeGem(it, tier)
 	local upgradeAmount1=3
 	local upgradeAmount2=upgradeAmount1
 	--base value
-	local maxValue1=round(tier*6)
+	local maxValue1=round(tier*4)
 	
-	if it.BonusExpireTime==1 or it.BonusExpireTime==2 then
+	if GetAncientTier(it)>0 then
 		maxValue1=math.min(maxValue1+10,maxValue1*1.2)
 	end
-	if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
+	if HasLegendaryAffix(it) then
 		maxValue1=math.min(maxValue1+20,maxValue1*1.44)
 	end
 	local maxValue2=maxValue1
-	if not vars.itemStatsFix then
-		--hp/sp value
-		if it.Bonus==8 or it.Bonus==9 then
-			maxValue1=math.floor(maxValue1*(2+maxValue1/50))
-			upgradeAmount1=upgradeAmount1^2+1
-		end
-		if bonus2==8 or bonus2==9 then
-			maxValue2=math.floor(maxValue2*(2+maxValue2/50))
-			upgradeAmount2=upgradeAmount2^2+1
-		end
-		--AC
-		if it.Bonus==10 then
-			--maxValue1=math.floor(maxValue1*0.667)
-		end
-		if bonus2==10 then
-			--maxValue2=math.floor(maxValue2*0.667)
-		end
-	end
 	--skills
 	if it.Bonus>=17 then
 		maxValue1=math.floor(math.max((tier*10)^0.5, round(tier)))
@@ -823,17 +767,20 @@ local function upgradeGem(it, tier)
 	if bonus1percent<=bonus2percent and it.BonusStrength<maxValue1 then
 		enchanted=true
 		it.BonusStrength=math.min(it.BonusStrength+upgradeAmount1,maxValue1)
-	elseif bonus2percent<=bonus1percent and bonus2Strength<maxValue2 and bonus2Strength<999 then --currently capped at 999
+	elseif bonus2percent<=bonus1percent and bonus2Strength<maxValue2 and bonus2Strength<ENC2_MAX_STRENGTH then
 		enchanted=true
-		SetEnc2(it,bonus2,math.min(bonus2Strength+upgradeAmount2,maxValue2,999))
+		SetEnc2(it,bonus2,math.min(bonus2Strength+upgradeAmount2,maxValue2,ENC2_MAX_STRENGTH))
 	end
 	return enchanted
 end
 
 for i=1,20 do
 	evt.PotionEffects[70+i] = function(IsDrunk, t, Power)
-		if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then			
-			if craftWaitTime>0 or t.BonusExpireTime>100 then return end
+		Game.ShowStatusText("Gems lost their power.")
+		return
+		--[[
+		if IsBaseItemId(t.Number) then			
+			if craftWaitTime>0 or IsCelestialItem(t) then return end
 			local levelRequired=GetLevelRquirement(t)
 			--check if equippable
 			local plLvl=Party[Game.CurrentPlayer].LevelBase
@@ -849,20 +796,19 @@ for i=1,20 do
 			end
 			if enchanted then
 				Mouse.Item.Number=0
-				mem.u4[0x51E100] = 0x100 
-				t.Condition = t.Condition:Or(0x10)
-				evt.PlaySound(12070)
+				ShowCraftedItemEffect(t)
 			else
 				Game.ShowStatusText("Gem power is not enough")
 			end
 		end
+		]]
 	end
 end
 
 function events.GameInitialized2()
 	craftWaitTime=craftWaitTime or 0
 end
-function events.Tick()
+function mawTick_CraftCooldown()
 	if craftingItemUsed then
 		craftWaitTime=60
 		craftingItemUsed=false
@@ -873,7 +819,7 @@ function events.Tick()
 end
 
 evt.PotionEffects[91] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+	if IsBaseItemId(t.Number) then
 		if t.Bonus2~=0 then 
 			return
 		end
@@ -886,94 +832,65 @@ evt.PotionEffects[91] = function(IsDrunk, t, Power)
 			roll=math.random(1,totB2)
 			tot=0
 			for i=0,Game.SpcItemsTxt.High do
-				if roll<=tot then
-					t.Bonus2=i
-					goto continue
-				elseif table.find(enchants[power], Game.SpcItemsTxt[i].Lvl) then
+				if table.find(enchants[power], Game.SpcItemsTxt[i].Lvl) then
 					tot=tot+Game.SpcItemsTxt[i].ChanceForSlot[c]
+					if roll<=tot then
+						t.Bonus2=i+1	--Bonus2 is 1-based: SpcItemsTxt[Bonus2-1]
+						goto continue
+					end
 				end
-			end	
+			end
 		end			
 		::continue::
 		Mouse.Item.Number=0
-		mem.u4[0x51E100] = 0x100 
-		t.Condition = t.Condition:Or(0x10)
-		evt.PlaySound(12070)
+		ShowCraftedItemEffect(t)
 	end
 end
 
 evt.PotionEffects[92] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+	if IsBaseItemId(t.Number) then
 		if t.Bonus>0 and t.BonusStrength>0 and not HasEnc2(t) then
 			math.randomseed(t.Number*10000+t.MaxCharges*1000+t.Bonus*100+t.BonusStrength*10+t.Charges)
 			
 			local mult=math.max((Game.BolsterAmount-100)/1000+1,1)
 			local cap=100*mult
 			local power=t.BonusStrength
-			local stat=math.random(1,10)
-			if GetItemEquipStat(t)==10 then
-				stat=math.random(1,16)
-				if stat>10 and stat==t.Bonus then
-					stat=math.random(1,10)
-				end
-			end
+			local stat=RollEnchantType(t, t.Bonus)
 			local slotMult=slotMult[t:T().EquipStat] or 1
-			cap=math.min(cap*slotMult,999)
+			cap=math.min(cap*slotMult,ENC2_MAX_STRENGTH)
 			
 			SetEnc2(t,stat,math.min(round(power*(1+0.25*math.random())),cap))
 			Mouse.Item.Number=0
-			mem.u4[0x51E100] = 0x100 
-			t.Condition = t.Condition:Or(0x10)
-			evt.PlaySound(12070)
+			ShowCraftedItemEffect(t)
 		end
 	end
 end
 
 evt.PotionEffects[93] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
-		if t.BonusExpireTime>=100 and t.BonusExpireTime<200 then return end
-		local difficultyExtraPower=1
-		if Game.BolsterAmount>100 then
-			difficultyExtraPower=(Game.BolsterAmount-100)/2000+1
-		end
-		local maxChargesCap=50*((difficultyExtraPower-1)*2+1)
-		if t.BonusExpireTime>=10 and t.BonusExpireTime<1000 then
-			maxChargesCap=50*((difficultyExtraPower-1)*4+1)
-		end
-		maxChargesCap=maxChargesCap+100 --mapping release
-		maxChargesCap=maxChargesCap/2
-
-		if vars.madnessMode then
-			maxChargesCap=150
-		end
-		maxChargesCap=round(maxChargesCap)
-		local levelRequired=GetLevelRquirement(t)
-		--check if equippable
-		local plLvl=Party[Game.CurrentPlayer].LevelBase
-		if plLvl<levelRequired then
-			Game.ShowStatusText("Your level is too low (Level " .. levelRequired .. " required)")
-			return
-		end
-		
-		
-		if t.MaxCharges>=maxChargesCap then
-			Game.ShowStatusText("Item power reached its limit")
-			return
-		end
-		local changeIncrease=4
-		if t:T().EquipStat<=3 then
-			changeIncrease=2
-		end
-		t.MaxCharges=math.min(t.MaxCharges+changeIncrease,maxChargesCap)
-		Mouse.Item.Number=0
-		mem.u4[0x51E100] = 0x100 
-		t.Condition = t.Condition:Or(0x10)
-		evt.PlaySound(12070)
+	if not (IsBaseItemId(t.Number) or IsArtifactId(t.Number)) then return end
+	local step=GetCubeQualityStep(t)
+	if step<=0 then
+		Game.ShowStatusText("Only weapons and armor can be refined")
+		return
 	end
+	local levelRequired=GetLevelRquirement(t)
+	local plLvl=Party[Game.CurrentPlayer].LevelBase
+	if plLvl<levelRequired then
+		Game.ShowStatusText("Your level is too low (Level " .. levelRequired .. " required)")
+		return
+	end
+	local quality=GetItemQuality(t)
+	if quality>=CUBE_QUALITY_MAX then
+		Game.ShowStatusText("Item quality reached its limit")
+		return
+	end
+	SetItemQuality(t, quality+step)
+	Mouse.Item.Number=0
+	ShowCraftedItemEffect(t)
 end
 
 evt.PotionEffects[94] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) or (t.Number>=500 and t.Number<=542) or (t.Number>=1302 and t.Number<=1354) or (t.Number>=2020 and t.Number<=2049) then
+	if IsBaseItemId(t.Number) or IsArtifactId(t.Number) then
 		Mouse.Item.Number=t.Number
 		Mouse.Item.Bonus=t.Bonus
 		Mouse.Item.BonusStrength=t.BonusStrength
@@ -982,14 +899,12 @@ evt.PotionEffects[94] = function(IsDrunk, t, Power)
 		Mouse.Item.MaxCharges=t.MaxCharges
 		Mouse.Item.BonusExpireTime=t.BonusExpireTime
 		
-		mem.u4[0x51E100] = 0x100 
-		t.Condition = t.Condition:Or(0x10)
-		evt.PlaySound(12070)
+		ShowCraftedItemEffect(t)
 	end
 end
 
 evt.PotionEffects[95] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+	if IsBaseItemId(t.Number) then
 		local modified=false
 		if Game.ItemsTxt[t.Number].NotIdentifiedName==Game.ItemsTxt[t.Number+1].NotIdentifiedName then
 			t.Number=t.Number+1
@@ -1003,7 +918,7 @@ evt.PotionEffects[95] = function(IsDrunk, t, Power)
 				local upgradeItemId=false
 				local upgradePower=math.huge
 				for i=1, Game.ItemsTxt.High do
-					if i<=151 or (i>=803 and i<=936) or (i>=1603 and i<=1736) then
+					if IsBaseItemId(i) then
 						local it=Game.ItemsTxt[i]
 						local power=(it.Mod1DiceCount*it.Mod1DiceSides+1)/2+it.Mod2
 						if itemType==GetItemSkill(i) and itemSlot==it.EquipStat and power>basePower and power<upgradePower then
@@ -1024,7 +939,7 @@ evt.PotionEffects[95] = function(IsDrunk, t, Power)
 				local upgradeItemId=false
 				local upgradePower=math.huge
 				for i=1, Game.ItemsTxt.High do
-					if i<=151 or (i>=803 and i<=936) or (i>=1603 and i<=1736) then
+					if IsBaseItemId(i) then
 						local it=Game.ItemsTxt[i]
 						local power=it.Mod1DiceCount+it.Mod2
 						if itemType==it.Skill and itemSlot==it.EquipStat and power>basePower and power<upgradePower then
@@ -1041,15 +956,13 @@ evt.PotionEffects[95] = function(IsDrunk, t, Power)
 			end
 		end
 		if not modified then return end
-		mem.u4[0x51E100] = 0x100 
-		t.Condition = t.Condition:Or(0x10)
-		evt.PlaySound(12070)
+		ShowCraftedItemEffect(t)
 		Game:ExitHouseScreen()
 	end
 end
 
 evt.PotionEffects[96] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+	if IsBaseItemId(t.Number) then
 		if t.Bonus==0 and not HasEnc2(t) and t.Bonus2==0 then
 			return
 		end
@@ -1073,65 +986,49 @@ evt.PotionEffects[96] = function(IsDrunk, t, Power)
 			end
 		end
 		Mouse.Item.Number=0
-		mem.u4[0x51E100] = 0x100 
-		t.Condition = t.Condition:Or(0x10)
-		evt.PlaySound(12070)
+		ShowCraftedItemEffect(t)
 	end
 end
 
 evt.PotionEffects[97] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+	if IsBaseItemId(t.Number) then
 		if craftWaitTime>0 then return end
 		craftingItemUsed=true
-		if (t.BonusExpireTime>=100 and t.BonusExpireTime<1000 and Mouse.Item.BonusStrength==0) then
-			Mouse.Item.BonusStrength=t.BonusExpireTime%100
-			t.BonusExpireTime=100
-		elseif (t.BonusExpireTime>=10 and t.BonusExpireTime<100 and Mouse.Item.BonusStrength==0) then
-			Mouse.Item.BonusStrength=t.BonusExpireTime
-			t.BonusExpireTime=2
-		elseif Mouse.Item.BonusStrength>=10 and Mouse.Item.BonusStrength<1000 and t.BonusExpireTime>=100 then
-			t.BonusExpireTime=Mouse.Item.BonusStrength+100
-			Mouse.Item.Number=0
-		elseif Mouse.Item.BonusStrength>=10 and Mouse.Item.BonusStrength<1000 then
-			t.BonusExpireTime=Mouse.Item.BonusStrength
+		--the potion carries an extracted affix in its own BonusStrength
+		local stored=Mouse.Item.BonusStrength
+		if stored==0 and HasLegendaryAffix(t) then
+			Mouse.Item.BonusStrength=GetLegendaryAffix(t)
+			SetLegendaryAffix(t,0)
+		elseif stored>LEGENDARY_AFFIX_BASE and stored<1000 then
+			--imprint; the item's own celestial status is kept
+			SetLegendaryAffix(t,stored)
 			Mouse.Item.Number=0
 		else
 			return
 		end
-		mem.u4[0x51E100] = 0x100 
-		t.Condition = t.Condition:Or(0x10)
-		evt.PlaySound(12070)
+		ShowCraftedItemEffect(t)
 	end
 end
 
 evt.PotionEffects[98] = function(IsDrunk, t, Power)
-	if t.Number<=151 or (t.Number>=803 and t.Number<=936) or (t.Number>=1603 and t.Number<=1736) then
+	if IsBaseItemId(t.Number) then
 		if craftWaitTime>0 then return end
 		craftingItemUsed=true
-		if Mouse.Item.BonusStrength==1 and t.BonusExpireTime<100 then
-			t.BonusExpireTime=t.BonusExpireTime+100
+		--the potion carries the celestial status in its own BonusStrength
+		if Mouse.Item.BonusStrength==1 and SetCelestialItem(t,true) then
 			Mouse.Item.Number=0
-		elseif Mouse.Item.BonusStrength==0 and t.BonusExpireTime>=100 then
-			t.BonusExpireTime=t.BonusExpireTime-100
+		elseif Mouse.Item.BonusStrength==0 and SetCelestialItem(t,false) then
 			Mouse.Item.BonusStrength=1
 		else
 			Game.ShowStatusText("Invalid Item")
 			return
 		end
-		mem.u4[0x51E100] = 0x100 
-		t.Condition = t.Condition:Or(0x10)
-		evt.PlaySound(12070)
+		ShowCraftedItemEffect(t)
 	end
 end
 
 --manually use crafting items on maps
 local overworldMaps={1,2,3,4,5,6,7,8,9,10,11,12,13,14,62,63,64,65,66,67,68,69,70,71,72,73,74,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151}
-
-function events.BuildItemInformationBox(t)
-	if Mouse.Item then
-		UseItem(t.Item, Mouse.Item)
-	end
-end
 
 local chargePotions={231, 232, 233, 237, 245, 251, 257, 263}
 function UseItem(it, usedIt)
@@ -1148,25 +1045,6 @@ function UseItem(it, usedIt)
 				it.Bonus=it.Bonus+1
 				craftUsed=true
 			end
-		elseif id==1063 then
-			local outside=false
-			if table.find(overworldMaps,it.BonusStrength) then
-				outside=true
-			end
-			math.randomseed(it.BonusStrength+it.Bonus2*1000+it.Charges+1000000)
-			local possibleMaps={}
-			for i=1,#mapDungeons do
-				local id=mapDungeons[i]
-				if id~=it.BonusStrength then
-					if (outside and table.find(overworldMaps,id)) or (not outside and not table.find(overworldMaps,id)) then
-						if vars.dungeonCompletedList[Game.MapStats[mapDungeons[i]].Name] then
-							table.insert(possibleMaps, mapDungeons[i])
-						end
-					end
-				end
-			end
-			it.BonusStrength=possibleMaps[math.random(1,#possibleMaps)]
-			craftUsed=true
 		elseif id==1065 then
 			if it.MaxCharges<255 then
 				it.MaxCharges=math.min(it.MaxCharges+5,255)
@@ -1175,9 +1053,7 @@ function UseItem(it, usedIt)
 		end
 		if craftUsed then
 			Mouse.Item.Number=0
-			mem.u4[0x51E100] = 0x100 
-			it.Condition = it.Condition:Or(0x10)
-			evt.PlaySound(12070)
+			ShowCraftedItemEffect(it)
 		end
 	end
 	
@@ -1190,7 +1066,8 @@ function UseItem(it, usedIt)
 end
 
 craftDropChances={
-		["gems"]=0.006,
+		--["gems"]=0.006,
+		["gems"]=0.000,
 		[1061]=0.0002,
 		[1062]=0.0002,
 		[1063]=0.001,
@@ -1260,9 +1137,6 @@ function events.MonsterKilled(mon)
 		local tier=(mon.Id-1)%3+1
 		extraRoll=extraRoll/(5-tier)
 	end
-	--densityMult
-	local densityMult=GetDensityMultiplier(mon.Id)
-	extraRoll=extraRoll*densityMult
 	if Multiplayer and Multiplayer.client_monsters()[0] then
 		bonusRoll=bonusRoll/(1+#Multiplayer.client_monsters())
 	end
@@ -1400,6 +1274,7 @@ function events.GameInitialized2()
 	local txt=Game.ItemsTxt
 	txt[1061].Notes="This Eye allows to add a Special enchant to any equipment that has already 2 base enchants\n(right-click on an item with a base enchant to use)"
 	txt[1062].Notes="This Hourglass allows to add a second base enchant to any equipment that has 1 base and a special enchant\n(right-click on an item with a base enchant to use)"
+	txt[1063].Notes="Pandora's Cube refines the base damage of a weapon or the base armor of a piece of armor, up to " .. CUBE_QUALITY_MAX .. "% above what the item is worth.\nThe better the item, the less one Cube adds to it: " .. cubeQualityStep[const.Rarity.Common] .. "% on plain and enchanted items, " .. cubeQualityStep[const.Rarity.Rare] .. "% on rare, " .. cubeQualityStep[const.Rarity.Epic] .. "% on epic, " .. cubeQualityStep[const.Rarity.Ancient] .. "% on ancient, " .. cubeQualityStep[const.Rarity.Primordial] .. "% on primordial and legendary, " .. CUBE_QUALITY_STEP_ARTIFACT .. "% on artifacts, " .. cubeQualityStep[const.Rarity.Celestial] .. "% on celestial.\n(right-click on a weapon or armor to use)"
 	txt[1066].Notes="The Pearl of Memory is a mystical item valued for its power to erase one random enchant from any enchanted item."
 	txt[1067].Notes="Oracle's Orb is a mysterious and powerful artifact, a large, purple orb with a haunting face suspended within its core. This enigmatic relic is known for storing legendary abilities upon items it enchants.\n\n Adds the following legendary power to an item:"
 	for i=1, #names do
@@ -1424,4 +1299,9 @@ function events.GameInitialized2()
 	Game.ItemsTxt[1069].SpriteIndex=130
 end
 
-
+--Tick handlers above run as MawCore scheduler tasks (ms; 0=frame, -1=poke only)
+function events.GameInitialized2()
+	local every=MawCore.Scheduler.every
+	every("alchemy/reagent-power", -1, mawTick_ReagentPower)	--poked by stats/label-watch
+	every("alchemy/craft-cooldown", 0, mawTick_CraftCooldown)
+end

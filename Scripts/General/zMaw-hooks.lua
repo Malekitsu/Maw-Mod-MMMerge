@@ -1,7 +1,18 @@
 
 do
+	-- Hook registers come back as SIGNED i4 (RSMem: i4 returns n-0x100000000
+	-- for n >= 0x80000000) while ["?ptr"] is an unsigned address. Subtracting
+	-- them mixes the two conventions, so any pointer past 2GB makes the
+	-- difference wrap by 2^32 and the index lands wildly out of bounds.
+	local function asPointer(v)
+		if v < 0 then
+			return v + 0x100000000
+		end
+		return v
+	end
+
 	local function getSFTItem(p)
-		local i = (p - Game.SFTBin.Frames["?ptr"]) / Game.SFTBin.Frames[0]["?size"]
+		local i = (asPointer(p) - Game.SFTBin.Frames["?ptr"]) / Game.SFTBin.Frames[0]["?size"]
 		return Game.SFTBin.Frames[i]
 	end
 
@@ -9,7 +20,7 @@ do
 	local scaleHook = function(indoor)
 		return function(d)
 			local t = {Scale = d.eax, Frame = getSFTItem(d.ebx)}
-			t.MonsterIndex, t.Monster = internal.GetMonster(indoor and d.edi or (d.edi - 0x9A))
+			t.MonsterIndex, t.Monster = internal.GetMonster(asPointer(indoor and d.edi or (d.edi - 0x9A)))
 			events.call("MonsterSpriteScale", t)
 			d.eax = t.Scale
 		end
@@ -150,3 +161,37 @@ do
 		hooks.Switch(slowerBackpedaling)
 	end
 end
+
+local function safeGet(get, p)
+	if type(p) ~= "number" or p == 0 then
+		return nil, nil
+	end
+	local ok, index, obj = pcall(get, p)
+	if ok then
+		return index, obj
+	end
+	return nil, nil
+end
+
+mem.hookfunction(0x4256DB, 0, 4, function(d, def, this, mon, range, bonus)
+	local t = {
+		Range = range,
+		Bonus = bonus,
+		Result = def(this, mon, range, bonus) ~= 0,
+	}
+	t.PlayerIndex, t.Player = safeGet(internal.GetPlayer, this)
+	t.MonsterIndex, t.Monster = safeGet(internal.GetMonster, mon)
+	local engineResult = t.Result
+	--your own formula gets first refusal; returning nil keeps the engine roll
+	local customChance
+	if t.Player and t.Monster and MawCore and MawCore.Formulas
+			and MawCore.Formulas.mawPlayerHitChance then
+		customChance = MawCore.Formulas.mawPlayerHitChance(t.Player, t.Monster, range, bonus)
+		if customChance then
+			t.Result = customChance >= math.random()
+		end
+	end
+	--event handlers still have the final say
+	events.cocalls("PlayerHitOrMiss", t)
+	return t.Result and 1 or 0
+end)

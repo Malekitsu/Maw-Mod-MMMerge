@@ -82,7 +82,7 @@ function events.Action(t)
 end
 
 --keep the button pushed effect
-function events.Tick()
+function mawTick_MultibagButtons()
 	if Game.CurrentScreen ~= 7 then
 		for i=6,10 do
 			multibagButton[i].Active=false
@@ -126,7 +126,6 @@ function events.Tick()
 		end
 	end
 end	
-
 
 
 --multiple inventory code
@@ -222,7 +221,7 @@ function changeBag(pl, bag)
 			it.BonusExpireTime = 0
 			it.BonusStrength = 0
 			it.Broken = false
-			it.Charges = false
+			it.Charges = 0
 			it.Condition = 0
 			it.Hardened = false
 			it.Identified = true
@@ -341,19 +340,9 @@ function changeBag(pl, bag)
 end
 
 --remove buttons when tooltip is on the bottom right
-function events.BuildItemInformationBox(t)
-	for i=1,5 do
-		multibagButton[i].Active=false
-		RunNextTick(function()
-			multibagButton[i].Active=true
-		end)
-	end
-end
 
 --sortMultiBag(Party[0])
 --debug.Message(dump(tempBag))
-
-
 
 
 function sortMultiBag(pl)
@@ -552,4 +541,10 @@ end
 
 function isnan(x)
     return x ~= x
+end
+
+--Tick handlers above run as MawCore scheduler tasks (ms; 0=frame, -1=poke only)
+function events.GameInitialized2()
+	local every=MawCore.Scheduler.every
+	every("multibag/buttons", 100, mawTick_MultibagButtons)
 end

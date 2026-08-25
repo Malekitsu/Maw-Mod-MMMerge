@@ -170,8 +170,8 @@ function arenaSpawns()
 end
 
 function events.PickCorpse(t)
+	local mon=t.Monster
 	if Map.Name=="d42.blv" and mon.NameId==0 then
-		mon=t.Monster
 		mon.TreasureItemPercent=0
 		mon.TreasureDiceCount=0
 		mon.TreasureDiceSides=0

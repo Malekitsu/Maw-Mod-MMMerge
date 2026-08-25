@@ -1,4 +1,5 @@
-local survivalMaps={
+-- survivalMaps is global since the damage pipeline migration (DAMAGE_PIPELINE.md)
+survivalMaps={
 	["7out01.odm"]=1, -- emerald isle
 }
 --[[survival mode
@@ -127,7 +128,7 @@ function events.BeforeNewGameAutosave()
 	end
 end
 
-function events.Tick()
+function mawTick_SurvivalTeleport()
 	if vars.survivalTeleport then
 		vars.survivalTeleport=false
 		evt.MoveToMap{-9729, -10555, 160, 512, 0, 0, 0, 0, "oute3.odm"}
@@ -145,7 +146,6 @@ function survivalMonsterTable(currentMapLevel)
 		LevelB=BLevel[i]
 		
 		
-		
 		mon.Level=math.min(currentMapLevel,255)
 
 		totalLevel=totalLevel or {}
@@ -157,7 +157,7 @@ function survivalMonsterTable(currentMapLevel)
 		HPtable=HPtable or {}
 		HPtable[i]=HPBolsterLevel*(HPBolsterLevel/10+3)*2*(1+HPBolsterLevel/180)
 		--resistances 
-		bolsterRes=math.max(math.round((totalLevel[i]-basetable[i].Level)/10)*5,0)
+		bolsterRes=0
 		for v=0,10 do
 			if v~=5 then
 			mon.Resistances[v]=math.min(bolsterRes+basetable[i].Resistances[v],bolsterRes+200)
@@ -288,18 +288,15 @@ function survivalMonsterTable(currentMapLevel)
 			--HPtable[i]=(HPtable[i]*0.3+HPtable[i-1]*(basetable[i].FullHP/basetable[i-1].FullHP))/1.3
 		end
 		
-		hpOvercap=0
-		while HPtable[i]>32500 do
-			HPtable[i]=math.round(HPtable[i]/2)
-			hpOvercap=hpOvercap+1
+		-- template proxy HP is capped; real pools are ledgered per map monster
+		-- through MawSetMonsterHP (MawCore.MonsterHP). HPtable keeps real values.
+		mon.Resistances[0]=mon.Resistances[0]%1000
+		local hp=math.min(math.round(HPtable[i]), 32000)
+		if hp>1000 then
+			hp=math.round(hp/10)*10
 		end
-		mon.Resistances[0]=mon.Resistances[0]+hpOvercap*1000
-		mon.HP=HPtable[i]
-		mon.FullHP=HPtable[i]
-		if mon.FullHP>1000 then
-			mon.FullHP=math.round(mon.FullHP/10)*10
-			mon.HP=math.round(mon.HP/10)*10
-		end
+		mon.HP=hp
+		mon.FullHP=hp
 		--fixes for survival
 		mon.AIType=0
 		mon.MoveType=math.min(mon.MoveType,1)
@@ -308,16 +305,6 @@ function survivalMonsterTable(currentMapLevel)
 end
 
 function events.GameInitialized2()
-	function events.CalcDamageToPlayer(t)
-		if not survivalMaps[Map.Name] and vars.SuvivalMode then
-			t.Result=0
-		end
-	end
-	function events.CalcDamageToMonster(t)
-		if not survivalMaps[Map.Name] and vars.SuvivalMode then
-			t.Result=0
-		end
-	end
 	function events.CanOpenChest(t)
 		if not survivalMaps[Map.Name] and vars.SuvivalMode then
 			t.CanOpenChest=false
@@ -348,4 +335,10 @@ function events.GameInitialized2()
 			mon.TreasureItemType=0
 		end
 	end
+end
+
+--Tick handlers above run as MawCore scheduler tasks (ms; 0=frame, -1=poke only)
+function events.GameInitialized2()
+	local every=MawCore.Scheduler.every
+	every("survival/teleport", 100, mawTick_SurvivalTeleport)
 end

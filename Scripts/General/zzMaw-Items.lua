@@ -90,12 +90,72 @@ local function getBossLootSeed(mon)
 	return bossLootSeed
 end
 
+--the three base equipment id bands: MM8 1-151, MM6 803-936, MM7 1603-1736.
+--Artifacts and quest items sit outside them; 0 is an empty slot, not an item.
+function IsBaseItemId(num)
+	return (num >= 1 and num <= 151) or (num >= 803 and num <= 936) or (num >= 1603 and num <= 1736)
+end
+
+--artifact id bands, one per game. ancientWeapons sit outside these, inside
+--the base bands, so tests that want them too must add them explicitly.
+function IsArtifactId(num)
+	return (num >= 500 and num <= 543) or (num >= 1302 and num <= 1354) or (num >= 2020 and num <= 2049)
+end
+
+--base equipment the loot/enchant system may roll on: ancientWeapons are
+--artifacts that happen to fall inside the bands, so they are excluded.
+--Crafting deliberately does NOT use this -- the alchemy and potion gates
+--test IsBaseItemId, so ancient weapons stay craftable by hand while the
+--loot roller never touches them.
 function IsEnchantableItem(it)
-	local num = it.Number
-	if num == 866 or num == 867 or num == 1666 or num == 1667 then
-		return false
-	end
-	return num <= 151 or (num >= 803 and num <= 936) or (num >= 1603 and num <= 1736)
+	return IsBaseItemId(it.Number) and not table.find(ancientWeapons, it.Number)
+end
+
+------------------------------------------------------------------------
+-- LootContext -- what a corpse hands to the item generator.
+--
+-- One producer (PickCorpse), one consumer (ItemGenerated), so this state
+-- belongs to this file and not to a shared type. take() empties it: one corpse
+-- feeds one drop, and anything a corpse leaves behind because it rolled
+-- nothing dies here instead of leaking into the next chest.
+--
+-- restore() exists for one reason. A boss drop whose rolled item is not a base
+-- item calls Item:Randomize, and Randomize calls 0x453ECC -- the exact engine
+-- function the ItemGenerated hook sits on (structs.Item.Randomize). One drop
+-- therefore runs the handler TWICE and the INNER call is the one that
+-- generates, so the outer call hands the context back before recursing.
+------------------------------------------------------------------------
+local lootContext = {}
+local LootContext = {}
+
+--the corpse's contribution to the next drop
+function LootContext.set(t)
+	lootContext = {
+		monsterLevel = t.monsterLevel,
+		multiplier = t.multiplier,
+		boss = t.boss,
+		omnipotent = t.omnipotent,
+	}
+end
+
+--chest artifacts are re-rolled through the boss path (AfterLoadMap)
+function LootContext.markBoss()
+	lootContext.boss = true
+end
+
+function LootContext.take()
+	local c = lootContext
+	lootContext = {}
+	return {
+		monsterLevel = c.monsterLevel,
+		multiplier = c.multiplier or 1,
+		boss = c.boss == true,
+		omnipotent = c.omnipotent == true,
+	}
+end
+
+function LootContext.restore(drop)
+	lootContext = drop
 end
 
 function events.PickCorpse(t)
@@ -187,7 +247,7 @@ function events.PickCorpse(t)
 			end
 			
 			local itemTier = (lvl + 10 * tier) / 20
-			if itemTier % 20 / 20 > math.random() then
+			if itemTier % 1 > math.random() then
 				itemTier = itemTier + 1
 			end
 			itemTier = math.floor(itemTier)
@@ -200,11 +260,11 @@ function events.PickCorpse(t)
 			end
 		end
 		
-		local densityMultiplier=GetDensityMultiplier(mon.Id)
+		local dropIsBoss, dropIsOmnipotent=false, false
 		-- Special handling for bosses and resurrected
 		if mon.NameId > 300 then
-			mon.TreasureItemPercent = round(mon.TreasureItemPercent / 4*densityMultiplier^0.5)
-			mon.TreasureDiceSides = math.max(round(mon.TreasureDiceSides / 4*densityMultiplier^0.5), 1)
+			mon.TreasureItemPercent = round(mon.TreasureItemPercent / 4)
+			mon.TreasureDiceSides = math.max(round(mon.TreasureDiceSides / 4), 1)
 		elseif mon.NameId > 220 or mon.NameId == 160 then
 			mon.TreasureItemPercent = 100
 			local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
@@ -226,21 +286,35 @@ function events.PickCorpse(t)
 				lvl = mapvars.uniqueMonsterLevel[id]
 			end
 			local itemTier = lvl / 20 + 2
-			if itemTier % 15 / 15 > math.random() then
+			if itemTier % 1 > math.random() then
 				itemTier = itemTier + 1
 			end
+			itemTier = math.floor(itemTier)
 			mon.TreasureItemLevel = math.max(math.min(itemTier, 6), 2)
-			bossLoot = true
+			dropIsBoss = true
 			local monsterSkill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
 			if monsterSkill == "Omnipotent" then
-				OmnipotentLoot = true
+				dropIsOmnipotent = true
 			end
 		end
 		
 		-- Loot filter code
 		goldBeforeLoot = Party.Gold
 		lootFromMonster = true
-		lootMultiplier=densityMultiplier
+		LootContext.set{
+			monsterLevel=getMonsterLevel(mon),
+			boss=dropIsBoss,
+			omnipotent=dropIsOmnipotent,
+		}
+		local pickCorpseDefault=t.CallDefault
+		t.CallDefault=function()
+			local allowed=t.Allow
+			pickCorpseDefault()
+			if allowed then
+				mon.TreasureGenerated=false
+				mon.AIState=const.AIState.Removed
+			end
+		end
 		-- Handle seed state after loot calculations
 		RunNextTick(function()
 			lootFromMonster = false
@@ -366,45 +440,458 @@ function events.GameInitialized2()
 	enchants[6]={3}
 end
 
---create enchant table
-encStrDown={2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,78,80,82,84}
-encStrUp={3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87,90,93,96,99,102,105,108,111,114,117,120,125,130}
+
+function encStrUpNormal(tier)
+	if tier<=12 then
+		return 1+tier*2
+	end
+	return 25 + math.min((tier-12)*3, 75)
+end
+
+function encStrUpAusterity(tier)
+	if tier<=30 then
+		return tier+2
+	end
+	return 32+(tier-30)*2
+end
+
+encStrUp=encStrUpNormal
 
 
-enc1Chance={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80}
-enc2Chance={20,30,35,40,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60}
-spcEncChance={5,10,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40}
+local function applyDifficulty(strength)
+	return math.ceil(strength*GetDifficultyExtraPower())
+end
+
+local PRIMORDIAL_ENCHANT_MULT = 1.25
+local function rollEnchantStrength(tier, rarity)
+	local range=enchantStrengthRange[rarity]
+	if range then
+		return round(applyDifficulty(encStrUp(tier))
+			*math.random(range.Min, range.Max)/ENCHANT_STRENGTH_DIV)
+	end
+	range=ENCHANT_STRENGTH_DEFAULT
+	return applyDifficulty(round(encStrUp(tier)
+		*math.random(range.Min, range.Max)/ENCHANT_STRENGTH_DIV))
+end
+
+LOOT_STRENGTH_MAX = 6
+
+function GetLootStrength(level)
+	return math.min(1 + (level or 0)/TIER_LEVELS, LOOT_STRENGTH_MAX)
+end
+
+function GetLootTier(level)
+	return (level or 0)/TIER_LEVELS + GetLootStrength(level)
+end
+
+function GetMaxEnchantStrength(level)
+	return encStrUp(GetLootTier(level))*GetDifficultyExtraPower()*PRIMORDIAL_ENCHANT_MULT
+end
+
+local PRIMORDIAL_CHARGES_MULT = 1.2
+local ANCIENT_MIN_CHARGES = 2
+local PRIMORDIAL_MIN_CHARGES = 4
+
+SHOP_LEVEL_SHARE = 0.75
+
+function GetMaxItemCharges()
+	return MawCore.ItemLevel.MaxPower()
+end
+
+function GetItemChargesCap(it)
+	return MawCore.ItemLevel.MaxPower()
+end
+
+local function rollTierCharges(charges, rarity)
+	local rolled
+	if rarity==const.Rarity.Primordial or rarity==const.Rarity.Celestial then
+		rolled = math.max(round(charges*PRIMORDIAL_CHARGES_MULT), charges+PRIMORDIAL_MIN_CHARGES)
+	elseif rarity==const.Rarity.Ancient then
+		rolled = math.max(round(charges*math.random(20,PRIMORDIAL_CHARGES_MULT*20)/20),
+			charges+ANCIENT_MIN_CHARGES)
+	elseif rarity==const.Rarity.Legendary then
+		rolled = round(charges*math.random(16,20)/20)
+	else
+		rolled = round(charges*math.random(12,20)/20)
+	end
+	return math.min(rolled, GetMaxItemCharges())
+end
+
+function GetPrimordialCharges(level)
+	return rollTierCharges(MawCore.ItemLevel.PowerFor(level), const.Rarity.Primordial)
+end
+
+function GetItemDropLevel(it)
+	local stored=GetStoredDropLevel(it)
+	if stored>0 then
+		return stored
+	end
+	local charges=it.MaxCharges
+	local tier=GetAncientTier(it)
+	if tier==2 then
+		charges=math.floor(math.min(charges/PRIMORDIAL_CHARGES_MULT,
+			charges-PRIMORDIAL_MIN_CHARGES))
+	elseif tier==1 then
+		--ancient rolled a random 1.0..1.2x: undo the midpoint
+		charges=math.floor(math.min(charges/((1+PRIMORDIAL_CHARGES_MULT)/2),
+			charges-ANCIENT_MIN_CHARGES))
+	end
+	return charges*MawCore.ItemLevel.PerPower
+end
+
+
+--Bolster/insanity multiplier: it raises the tier cap AND multiplies every
+--rolled enchant strength. Insanity overrides the bolster, as in the generator.
+function GetDifficultyExtraPower()
+	if vars.insanityMode then
+		return 1.2
+	elseif vars.Mode==2 then
+		return 1.1
+	elseif vars.trueNightmare then
+		return 1.05
+	end
+	return 1
+end
+
+function GetEnchantTierBonus()
+	local bonus=0
+	if mapvars and mapvars.mapAffixes then
+		bonus=bonus+math.floor(math.max((mapvars.mapAffixes.Power-30+2)/2,0))
+	end
+	if Map.Name=="d42.blv" then
+		bonus=bonus+20
+	end
+	return bonus
+end
+
+const.Rarity={
+	Common=1,
+	Uncommon=2,
+	Rare=3,
+	Epic=4,
+	Ancient=5,
+	Primordial=6,
+	Legendary=7,
+	Celestial=8,
+}
+
+rarityUpgradeChance = {
+	[const.Rarity.Celestial]  = 0.002,
+	[const.Rarity.Legendary]  = 0.03,
+	[const.Rarity.Primordial] = 0.04,
+	[const.Rarity.Ancient]    = 0.12,
+}
+
+shopRarityRedirect = {
+	[const.Rarity.Celestial]  = false,
+	[const.Rarity.Legendary]  = false,
+	[const.Rarity.Primordial] = false,
+	[const.Rarity.Ancient]    = const.Rarity.Primordial,
+}
+--the AncientTier a Primordial carries, which is what a shop Ancient gets charged as
+SHOP_ANCIENT_PRICE_TIER = 2
+
+BOSS_ROLL_DIVISOR = 4	--band roll window: math.random()/BOSS_ROLL_DIVISOR
+BOSS_RARITY_MULT = 2	--upgrade cascade multiplier
+
+local rarityDifficultyMult = {
+	[1] = 1,	--bolster 40
+	[2] = 1,	--bolster 70
+	[3] = 1,	--bolster 100, baseline
+	[4] = 1.1,	--bolster 150
+	[5] = 1.2,	--bolster 200
+	[6] = 1.4,	--bolster 300
+	[7] = 1.6,	--doom
+	[8] = 1.8,	--road to insanity
+	[9] = 2,	--beyond madness
+}
+
+local rarityPityField = {
+	[const.Rarity.Celestial]  = "celestialPityCounter",
+	[const.Rarity.Legendary]  = "legendaryPityCounter",
+	[const.Rarity.Primordial] = "primordialPityCounter",
+}
+
+--rows must stay ordered: Epic <= Rare <= Uncommon <= Common, or the band in
+--between collapses to nothing
+enchantChances={
+	[const.Rarity.Epic]    ={Base=0,   PerTier=0.5, Cap=15},
+	[const.Rarity.Rare]    ={Base=15,   PerTier=1,   Cap=35},
+	[const.Rarity.Uncommon]={Base=45,  PerTier=0.5,  Cap=60},
+	[const.Rarity.Common]  ={Base=100, PerTier=0,   Cap=100},
+}
+--cap at tier 30
+function GetEnchantChance(rarity, lootTier)
+	local c=enchantChances[rarity]
+	return math.min(c.Base + c.PerTier*lootTier, c.Cap)
+end
+
+function GetEnchantBands(lootTier, difficulty)
+	local mult=rarityBandMult[difficulty or GetDifficulty()] or {}
+	local widths, total, previous = {}, 0, 0
+	for r=const.Rarity.Epic, const.Rarity.Common, -1 do
+		local threshold=GetEnchantChance(r, lootTier)
+		local w=math.max(threshold-previous, 0)*(mult[r] or 1)
+		widths[r]=w
+		total=total+w
+		previous=threshold
+	end
+	if total<=0 then
+		return {[const.Rarity.Common]=100}, 100
+	end
+	for r, w in pairs(widths) do
+		widths[r]=w/total*100
+	end
+	return widths, 100
+end
+
+rarityBandMult={
+	[1]={},	--bolster 40
+	[2]={},	--bolster 70
+	[3]={},	--bolster 100, baseline
+	[4]={[const.Rarity.Epic]=1.5, [const.Rarity.Rare]=1.4, [const.Rarity.Uncommon]=1.4},	--bolster 150
+	[5]={[const.Rarity.Epic]=2,   [const.Rarity.Rare]=1.8, [const.Rarity.Uncommon]=1.6},	--bolster 200
+	[6]={[const.Rarity.Epic]=2.5, [const.Rarity.Rare]=2.2, [const.Rarity.Uncommon]=1.8},	--bolster 300
+	[7]={[const.Rarity.Epic]=3,   [const.Rarity.Rare]=2.6, [const.Rarity.Uncommon]=2},	--doom
+	[8]={[const.Rarity.Epic]=4,   [const.Rarity.Rare]=3, [const.Rarity.Uncommon]=2.2},	--road to insanity
+	[9]={[const.Rarity.Epic]=5.5, [const.Rarity.Rare]=3.4, [const.Rarity.Uncommon]=2.4},	--beyond madness
+}
+
+enchantStrengthRange={
+	[const.Rarity.Celestial] ={Min=25, Max=25},
+	[const.Rarity.Primordial]={Min=25, Max=25},
+	[const.Rarity.Ancient]   ={Min=20, Max=25},
+	[const.Rarity.Legendary] ={Min=16, Max=20},
+}
+ENCHANT_STRENGTH_DEFAULT={Min=8, Max=20}	--Common..Epic
+ENCHANT_STRENGTH_DIV=20
+
+enchantCountByRarity={
+	[const.Rarity.Common]=0,
+	[const.Rarity.Uncommon]=1,
+	[const.Rarity.Rare]=2,
+	[const.Rarity.Epic]=3,
+	[const.Rarity.Ancient]=3,
+	[const.Rarity.Primordial]=3,
+	[const.Rarity.Legendary]=3,
+	[const.Rarity.Celestial]=3,
+}
+
+--The rarity an item IS, as opposed to the one it was rolled at. Nothing
+--stores it: RollItemRarity only decides it while generating, so it has to be
+--read back off the item -- the rarity bits for everything from ancient up,
+--the enchant count (the same one enchantCountByRarity states) below that.
+function MawItemRarity(it)
+	if IsCelestialItem(it) then
+		return const.Rarity.Celestial
+	elseif HasLegendaryAffix(it) then
+		return const.Rarity.Legendary
+	end
+	local tier=GetAncientTier(it)
+	if tier==2 then
+		return const.Rarity.Primordial
+	elseif tier==1 then
+		return const.Rarity.Ancient
+	end
+	local enchants=0
+	if it.Bonus>0 then enchants=enchants+1 end
+	if HasEnc2(it) then enchants=enchants+1 end
+	if it.Bonus2>0 then enchants=enchants+1 end
+	if enchants>=enchantCountByRarity[const.Rarity.Epic] then
+		return const.Rarity.Epic
+	elseif enchants>=enchantCountByRarity[const.Rarity.Rare] then
+		return const.Rarity.Rare
+	elseif enchants>=enchantCountByRarity[const.Rarity.Uncommon] then
+		return const.Rarity.Uncommon
+	end
+	return const.Rarity.Common
+end
+
+cubeQualityStep={
+	[const.Rarity.Common]=20,
+	[const.Rarity.Uncommon]=20,
+	[const.Rarity.Rare]=10,
+	[const.Rarity.Epic]=7,
+	[const.Rarity.Ancient]=5,
+	[const.Rarity.Primordial]=4,
+	[const.Rarity.Legendary]=4,
+	[const.Rarity.Celestial]=1,
+}
+CUBE_QUALITY_STEP_ARTIFACT=2
+
+function CanTakeCube(it)
+	local txt=it:T()
+	if txt.EquipStat<=2 and txt.Skill<const.Skills.Shield then
+		return true
+	end
+	return (txt.Skill>=const.Skills.Shield and txt.Skill<=const.Skills.Plate)
+		or (txt.Skill==40 and txt.EquipStat~=12)
+end
+
+function GetCubeQualityStep(it)
+	if not CanTakeCube(it) then
+		return 0
+	end
+	if IsArtifactItem(it) then
+		return CUBE_QUALITY_STEP_ARTIFACT
+	end
+	return cubeQualityStep[MawItemRarity(it)] or 0
+end
+
+function MawQualityText(it)
+	local quality=GetItemQuality(it)
+	if quality<=0 then
+		return ""
+	end
+	return StrColor(255, 190, 90, "\nQuality bonus: +" .. quality .. "%")
+end
+--============================= end RARITY =============================
+
+function GetRarityBaseMultiplier(lootTier, lootMultiplier, difficulty)
+	--how far the loot has ramped at this tier, from the same curve the roll uses
+	local tierFactor=GetEnchantChance(const.Rarity.Uncommon, lootTier)
+		/enchantChances[const.Rarity.Uncommon].Cap
+	return (rarityDifficultyMult[difficulty or GetDifficulty()] or 1)
+		*tierFactor*(lootMultiplier or 1)^0.5
+end
+
+function GetRarityMultiplier(lootTier, bossLoot, lootMultiplier)
+	local mult=GetRarityBaseMultiplier(lootTier, lootMultiplier)
+	if bossLoot then
+		mult=mult*BOSS_RARITY_MULT
+	end
+	if mapvars and mapvars.mapAffixes then
+		local nAff=0
+		for i=1,4 do
+			if mapvars.mapAffixes[i]>0 then
+				nAff=nAff+1
+			end
+		end
+		mult=mult*(1+(mapvars.mapAffixes.Power*nAff+nAff*20)/400)
+	end
+	return mult
+end
+
+function RollItemRarity(lootTier, bossLoot, noLegendary, lootMultiplier, isShop)
+	local mult=GetRarityMultiplier(lootTier, bossLoot, lootMultiplier)
+	local result=const.Rarity.Epic
+	for rarity=const.Rarity.Celestial, const.Rarity.Ancient, -1 do
+		local base=rarityUpgradeChance[rarity]
+		if isShop then
+			local borrow=shopRarityRedirect[rarity]
+			base=borrow and rarityUpgradeChance[borrow] or 0
+		elseif noLegendary and rarity>=const.Rarity.Legendary then
+			base=0
+		end
+		if base>0 then
+			local field=rarityPityField[rarity]
+			local chance=base
+			if field then
+				vars[field]=vars[field] or 0
+				chance=pity_chance(base, vars[field])
+			end
+			chance=chance*mult
+			if math.random()<chance then
+				if field then
+					vars[field]=0
+				end
+				result=rarity
+				break
+			end
+		end
+	end
+	--a rarity this roll could never have produced does not charge its pity, which
+	--is what the noLegendary case already did -- the shop just blocks more of them
+	for rarity, field in pairs(rarityPityField) do
+		local blocked=(isShop and not shopRarityRedirect[rarity])
+			or (noLegendary and rarity>=const.Rarity.Legendary)
+		if rarity>result and not blocked then
+			vars[field]=(vars[field] or 0)+mult
+		end
+	end
+	return result
+end
+
+local function enchantStrengthMean(rarity)
+	local range=enchantStrengthRange[rarity] or ENCHANT_STRENGTH_DEFAULT
+	return (range.Min+range.Max)/2/ENCHANT_STRENGTH_DIV
+end
+
+--one drop's worth, as a fraction of that ceiling: how many enchant slots the
+--rarity fills, times how hard they rolled
+local function rarityItemFraction(rarity)
+	local slots=enchantCountByRarity[const.Rarity.Celestial]
+	local ceiling=enchantStrengthMean(const.Rarity.Primordial)
+	return enchantCountByRarity[rarity]/slots*enchantStrengthMean(rarity)/ceiling
+end
+
+function GetRarityDistribution(lootTier, difficulty)
+	local bands=GetEnchantBands(lootTier, difficulty)
+	local dist={}
+	for rarity=const.Rarity.Common, const.Rarity.Epic do
+		dist[rarity]=(bands[rarity] or 0)/100
+	end
+	local epic=dist[const.Rarity.Epic]
+	local mult=GetRarityBaseMultiplier(lootTier, nil, difficulty)
+	local left=1
+	for rarity=const.Rarity.Celestial, const.Rarity.Ancient, -1 do
+		local chance=math.min(rarityUpgradeChance[rarity]*mult, 1)
+		dist[rarity]=epic*left*chance
+		left=left-left*chance
+	end
+	dist[const.Rarity.Epic]=epic*left
+	return dist
+end
+
+local rarityByValue
+local function getRarityByValue()
+	if not rarityByValue then
+		rarityByValue={}
+		for rarity=const.Rarity.Common, const.Rarity.Celestial do
+			rarityByValue[#rarityByValue+1]=rarity
+		end
+		table.sort(rarityByValue, function(a, b)
+			return rarityItemFraction(a)<rarityItemFraction(b)
+		end)
+	end
+	return rarityByValue
+end
+
+function GetExpectedEnchantFraction(lootTier, drops, difficulty)
+	local dist=GetRarityDistribution(lootTier, difficulty)
+	local n=math.max(drops or 1, 1)
+	local expected, below=0, 0
+	for _, rarity in ipairs(getRarityByValue()) do
+		local cumulative=below+(dist[rarity] or 0)
+		expected=expected+rarityItemFraction(rarity)*(cumulative^n-below^n)
+		below=cumulative
+	end
+	return expected
+end
+--======================= end EXPECTED LOOT QUALITY =======================
+
+function RollEnchantType(it, exclude)
+	local highest=GetItemEquipStat(it)==10 and 16 or 10
+	local id
+	repeat
+		id=math.random(1,highest)
+	until id~=exclude
+	return id
+end
+
+TIER_LEVELS = 15
+
+function GetTier(level)
+	return math.floor((level or 0)/TIER_LEVELS)
+end
 
 function events.BeforeLoadMap()
 	if vars.AusterityMode then
-		encStrDown={1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 19, 20, 21, 22, 23, 24, 25}
-		encStrUp={3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60}
-
-
-		enc1Chance = {20, 20, 21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26, 27, 27, 28, 28, 29, 29}
-		enc2Chance = {10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19}
-		spcEncChance = {40, 40, 41, 41, 42, 42, 43, 43, 44, 44, 45, 45, 46, 46, 47, 47, 48, 48, 49, 49}
-	elseif higherLootPowerRange then
-		encStrDown={5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,190,195,200,205,210,215,220,225,230,235,240,245,250,255,260,265,270,275,280,285,290,295,300,310,320}
-		encStrUp={5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,190,195,200,205,210,215,220,225,230,235,240,245,250,255,260,265,270,275,280,285,290,295,300,310,320}
-
-
-		enc1Chance={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80}
-		enc2Chance={20,30,35,40,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60}
-		spcEncChance={5,10,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40}
+		encStrUp=encStrUpAusterity
 	else
-		encStrDown={2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,78,80,82,84}
-		encStrUp={3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87,90,93,96,99,102,105,108,111,114,117,120,125,130}
-
-
-		enc1Chance={20,30,40,50,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80}
-		enc2Chance={20,30,35,40,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60}
-		spcEncChance={5,10,15,20,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40}
+		encStrUp=encStrUpNormal
 	end
 end
-
-primordialWeapEnchants={39,40,41,46}
-primordialArmorEnchants={1,2,80}
 
 local goldId={187,188,189,197,198,199,999,1000,1001,1799,1800,1801}
 function events.AfterLoadMap()
@@ -437,7 +924,7 @@ function events.AfterLoadMap()
 		for i=0,Map.Chests.High do
 			for k=1,Map.Chests[i].Items.High do
 				local it=Map.Chests[i].Items[k]
-				if (it.Number>=1 and it.Number<=151) or (it.Number>=803 and it.Number<=936) or (it.Number>=1603 and it.Number<=1736) then
+				if IsBaseItemId(it.Number) then
 					local itemPower=1
 					if it.Bonus>0 then
 						itemPower=itemPower+1
@@ -448,12 +935,14 @@ function events.AfterLoadMap()
 					if HasEnc2(it) then
 						itemPower=itemPower+1
 					end
-					if it.BonusExpireTime==1 then
-						itemPower=5
-					elseif it.BonusExpireTime==2 then
-						itemPower=6
-					elseif it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
+					if IsCelestialItem(it) then
+						itemPower=8
+					elseif HasLegendaryAffix(it) then
 						itemPower=7
+					elseif IsPrimordialItem(it) then
+						itemPower=6
+					elseif IsAncientItem(it) then
+						itemPower=5
 					end
 					
 					local filter=vars.MAWSETTINGS.lootFilter
@@ -476,9 +965,14 @@ end
 
 function events.ItemGenerated(t)
 	if Game.CurrentScreen==16 or Game.CurrentScreen==21 then return end
+	--one corpse feeds one drop: consume the whole context here
+	local drop=LootContext.take()
 	--boss items forced
-	if bossLoot then
+	if drop.boss then
 		if not IsEnchantableItem(t.Item) then
+			--Randomize re-enters this handler; the inner call is the real
+			--consumer, so give the context back to it
+			LootContext.restore(drop)
 			t.Item:Randomize(t.Strength, 0)
 			return
 		end
@@ -503,9 +997,8 @@ function events.ItemGenerated(t)
 	end
 
 	-- Build combined artifact list and initialize pity counters
-	lootMultiplier = lootMultiplier or 1
 	if Game.HouseScreen~=2 and Game.HouseScreen~=95 and IsEnchantableItem(t.Item) then
-		local artifactChance = 0.005 * lootMultiplier
+		local artifactChance = 0.005 * drop.multiplier
 		vars.artifactRollPity = vars.artifactRollPity or 0
 		local chance = pity_chance(artifactChance, vars.artifactRollPity)
 		if math.random() < chance then
@@ -528,7 +1021,7 @@ function events.ItemGenerated(t)
 			t.Item.Bonus=0
 			t.Item.Charges=0
 		else
-			vars.artifactRollPity = vars.artifactRollPity + lootMultiplier
+			vars.artifactRollPity = vars.artifactRollPity + drop.multiplier
 		end
 	end	
 
@@ -538,13 +1031,6 @@ function events.ItemGenerated(t)
 		local stat = t.Item:T().EquipStat
 
 		if (stat >= 12 and math.random() < 0.3 or stat == 19) and id <= 110 then
-			-- reset item
-			t.Item.Bonus = 0
-			t.Item.BonusStrength = 0
-			t.Item.Bonus2 = 0
-			t.Item.Charges = 0
-			t.Item.MaxCharges = 0
-
 			local lootTable = {
 				{id = 1061, weight = 7},
 				{id = 1062, weight = 7},
@@ -559,6 +1045,13 @@ function events.ItemGenerated(t)
 			local successChance = math.min((gold / 20000000)^0.7, 1)
 			if math.random() < successChance then
 				-- SUCCESS: roll from loot table
+
+				-- reset item
+				t.Item.Bonus = 0
+				t.Item.BonusStrength = 0
+				t.Item.Bonus2 = 0
+				t.Item.Charges = 0
+				t.Item.MaxCharges = 0
 
 				local totalWeight = 0
 				for i = 1, #lootTable do
@@ -577,18 +1070,18 @@ function events.ItemGenerated(t)
 				end
 			end
 
-			-- fallback: reagent
-			local partyLevel = getPartyLevel(4)
-			local reagentLevel = math.floor(partyLevel / 25)
-
-			local r = math.random()
-			if r < 0.05 then
-				reagentLevel = reagentLevel + 2
-			elseif r < 0.30 then
-				reagentLevel = reagentLevel + 1
-			end
-
-			t.Item.Number = 1041 + math.min(reagentLevel, 19)
+			-- fallback: reagent -- crafting gems no longer come from shops
+			--local partyLevel = getPartyLevel(4)
+			--local reagentLevel = math.floor(partyLevel / 25)
+			--
+			--local r = math.random()
+			--if r < 0.05 then
+			--	reagentLevel = reagentLevel + 2
+			--elseif r < 0.30 then
+			--	reagentLevel = reagentLevel + 1
+			--end
+			--
+			--t.Item.Number = 1041 + math.min(reagentLevel, 19)
 			return
 		end
 	end
@@ -601,161 +1094,75 @@ function events.ItemGenerated(t)
 		it.Bonus=0
 		it.Bonus2=0
 		it.BonusStrength=0
-		--calculate party level
-		local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
-		local currentLevel=vars.MMLVL[currentWorld]
- 		local partyLevel=getPartyLevel()
-		
-		vars.mapResetCount=vars.mapResetCount or {}
-		vars.mapResetCount[Map.Name]=vars.mapResetCount[Map.Name] or 0
-		local bonus=vars.mapResetCount[Map.Name]*20
-		currentLevel=currentLevel+bonus
-		partyLevel=partyLevel+bonus
-		
-		if Map.Name=="d42.blv" then
-			currentLevel=monTbl[math.min((vars.highestArenaWave+1)*3,#monTbl)].Level*6
-			partyLevel=monTbl[math.min((vars.highestArenaWave+1)*3,#monTbl)].Level*6/1.5
-			if (vars.highestArenaWave+1)*3>#monTbl then
-				local diff=(vars.highestArenaWave+1)*3-#monTbl
-				local extraBoost=diff*3.5
-				currentLevel=currentLevel+extraBoost
-				partyLevel=partyLevel+extraBoost/1.5
-			end
+		it.Charges=0
+		it.MaxCharges=0
+		local isShop=Game.HouseScreen==2 or Game.HouseScreen==95
+		local dropLevel
+		if isShop then
+			dropLevel=getTotalLevel()*SHOP_LEVEL_SHARE
+		else
+			dropLevel=drop.monsterLevel or MawMapDropLevel()
 		end
-		
-		local name=Game.MapStats[Map.MapStatsIndex].Name
-		mapLevel=mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High
-		if Map.Name~="d42.blv" then
-			if not Game.freeProgression then
-				partyLevel=getPartyLevel(4)*0.75
-				if mapLevels[name] and mapLevels[name].Low~=0 and Game.HouseScreen~=2 and Game.HouseScreen~=95 then
-					partyLevel=mapLevel
-					mapLevel=0
-				end
-			elseif mapLevels[name] and mapLevels[name].Low~=0 then
-				partyLevel=mapLevel*0.2+partyLevel
-			else
-				partyLevel=partyLevel+math.min(currentLevel/2,54)
-				mapLevel=0
-			end
-		end
-		if vars.madnessMode then
-			if madnessMapLevels[name] then
-				partyLevel=madnessMapLevels[name]
-			else
-				partyLevel=((mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3)^1.5
-			end
-			mapLevel=0
-		end
-		if mapvars.mapAffixes then
-			currentLevel=mapvars.mapAffixes.Power*10+20
-			partyLevel=mapvars.mapAffixes.Power*10+20
-		end
+
 		--modify reagents
 		local itmod=3
 		if vars.AusterityMode then
 			itmod=8
 		end
 		if reagentList[it.Number] then
-			local bonus=math.min(partyLevel, getTotalLevel())
-			it.Bonus=round(bonus/itmod)
+			it.Bonus=round(math.min(dropLevel, getTotalLevel())/itmod)
 			return
 		end
-		
-		--difficulty settings
-		difficultyExtraPower=1
-		if Game.BolsterAmount>100 then
-			difficultyExtraPower=(Game.BolsterAmount-100)/2000+1
-		end
-		if vars.insanityMode then
-			difficultyExtraPower=1.4
-		end
-		--nerf shops if no exp in current world
-		--[[
-		if (Game.HouseScreen==2 or Game.HouseScreen==95) and Game.freeProgression then 
-			partyLevel=round(partyLevel*(math.min(partyLevel/160 + currentLevel/80,1)))
-		end
-		]]
-		--ADD MAX CHARGES BASED ON PARTY LEVEL
-		bonusCharges=(difficultyExtraPower-1)*10
-		cap1=50*((difficultyExtraPower-1)*2+1)
-		maxChargesCap=50*((difficultyExtraPower-1)*4+1)
-		if mapvars.mapAffixes or Map.Name=="d42.blv" then
-			cap1=cap1+75
-			maxChargesCap=maxChargesCap+100
-		end
-		--nerf
-		cap1=cap1/2
-		maxChargesCap=maxChargesCap/2
-		
-		if vars.madnessMode then
-			maxChargesCap=200
-		end
-		it.MaxCharges=math.floor(partyLevel/10+mapLevel/80)
-		--bolster boost
-		it.MaxCharges=math.min(math.floor(it.MaxCharges*difficultyExtraPower+bonusCharges),cap1)
-		
-		bonusCap=math.floor((difficultyExtraPower-1)*10)
-		if mapvars.mapAffixes then
-			bonusCap=bonusCap+math.floor(math.min(math.max((mapvars.mapAffixes.Power-30+2)/2,0),20))  --cap at map level 700
-		end
-		if Map.Name=="d42.blv" then
-			bonusCap=bonusCap+20
-		end
-		cap2=14+bonusCap
-		if vars.madnessMode then
-			cap2=54
-			bonusCap=42
-		end
-		partyLevel1=math.min(math.floor((partyLevel+bonus)/18),cap2) 
-		--adjust loot Strength
-		ps1=t.Strength
 
-		pseudoStr=ps1+partyLevel1
-		if bossLoot then
-			pseudoStr=pseudoStr+1
-		end
-		if OmnipotentLoot then
-			pseudoStr=pseudoStr+1
-		end
-		if math.random(1,18)<partyLevel1%18 then
-			pseudoStr=pseudoStr+1
-		end
-		pseudoStr=math.min(pseudoStr,20+bonusCap,#encStrUp, #encStrDown) --CAP CURRENTLY AT 20, 22 in doom,42 for mapping
-		roll1=math.random()
-		roll2=math.random()
-		rollSpc=math.random()
-		power=0
+		--difficulty settings
+		difficultyExtraPower=GetDifficultyExtraPower()
+		SetStoredDropLevel(it, dropLevel)
 		
-		if bossLoot then
-			roll1=roll1/2
-			roll2=roll1/2
-			rollSpc=roll1/2
+		--enchant tier and charges both read dropLevel: one item, one level
+		local partyLevel1=GetTier(dropLevel)+GetEnchantTierBonus()
+		--adjust loot Strength
+		local ps1=t.Strength
+
+		local lootTier=ps1+partyLevel1
+		if drop.boss then
+			lootTier=lootTier+1
 		end
-		--difficulty multiplier 
-		diffMult=math.max((Game.BolsterAmount-100)/500+1,1)
-		if vars.Mode==2 then
-			diffMult=1.8
+		if drop.omnipotent then
+			lootTier=lootTier+1
 		end
-		--[[nerf
-		if vars.insanityMode then
-			diffMult=2
+		if dropLevel%TIER_LEVELS/TIER_LEVELS > math.random() then
+			lootTier=lootTier+1
 		end
-		]]
-		--calculate chances
-		local p1=enc1Chance[math.min(pseudoStr,#enc1Chance)]/100
-		local p2=enc2Chance[math.min(pseudoStr,#enc2Chance)]/100
-		local p3=spcEncChance[math.min(pseudoStr,#spcEncChance)]/100
-		
-		p1=p1^(1/diffMult)
-		p2=p2^(1/diffMult)
-		p3=p3^(1/diffMult)
-		
-		if p1>roll1 then
-			it.Bonus=math.random(1,16)
-			it.BonusStrength=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
-			--bolster
-			it.BonusStrength=math.ceil(it.BonusStrength*difficultyExtraPower)
+		--one roll walks the normalised band widths, best first
+		local bands, bandTotal=GetEnchantBands(lootTier)
+		local roll=math.random()
+		if drop.boss then
+			roll=roll/BOSS_ROLL_DIVISOR --this makes higher tier bosses to always drop an epic
+		end
+		roll=roll*bandTotal
+		local rarity=const.Rarity.Common
+		local cum=0
+		for r=const.Rarity.Epic, const.Rarity.Common, -1 do
+			cum=cum+(bands[r] or 0)
+			if roll<cum then
+				rarity=r
+				break
+			end
+		end
+		local noLegendary=vars.AusterityMode or isShop
+		if rarity==const.Rarity.Epic then
+			rarity=RollItemRarity(lootTier, drop.boss, noLegendary, drop.multiplier, isShop)
+		end
+		if drop.omnipotent then
+			rarity=const.Rarity.Celestial
+		end
+
+		--charges: every drop rolls here, the rarity decides the range
+		it.MaxCharges=rollTierCharges(MawCore.ItemLevel.PowerFor(dropLevel), rarity)
+
+		if rarity>=const.Rarity.Uncommon then
+			it.Bonus=RollEnchantType(it)
+			it.BonusStrength=rollEnchantStrength(lootTier, rarity)
 			if math.random(1,10)==10 then
 				it.Bonus=math.random(17,24)
 				local skill=it:T().Skill
@@ -767,16 +1174,14 @@ function events.ItemGenerated(t)
 			end
 		end
 		--apply enchant2
-		if p2>roll2 then
-			local enc2Strength=math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])
-			--bolster
-			enc2Strength=math.ceil(enc2Strength*difficultyExtraPower)
+		if rarity>=const.Rarity.Rare then
+			local enc2Strength=rollEnchantStrength(lootTier, rarity)
 			--bonus type
-			SetEnc2(it,math.random(1,16),enc2Strength)
+			SetEnc2(it,RollEnchantType(it, it.Bonus),enc2Strength)
 			--[[ no skill bonuses
 			if math.random(1,10)==10 then
 				it.Charges=math.random(17,24)*1000
-				it.Charges=it.Charges+round(math.random(encStrDown[pseudoStr],encStrUp[pseudoStr])^0.5)
+				it.Charges=it.Charges+round(rollEnchantStrength(lootTier)^0.5)
 			end
 			]]
 		end
@@ -786,233 +1191,69 @@ function events.ItemGenerated(t)
 			it.Charges=0
 		end
 				
-		--ancient item
-		ancient=false
-		ancientChance=(p1*p2*p3)/4^(1/diffMult^0.5)
-		if mapvars.mapAffixes then
-			local nAff=0
-			for i=1,4 do
-				if mapvars.mapAffixes[i]>0 then
-					nAff=nAff+1
-				end
-			end
-			ancientChance=ancientChance*(1+(mapvars.mapAffixes.Power*nAff+nAff*20)/400)
+		if rarity==const.Rarity.Ancient then
+			SetAncientTier(it,1)
 		end
-		
-		if bossLoot then
-			ancientChance=ancientChance*5
-			bossLoot=false
-		end
-	
-		ancientRoll=math.random()
-		if ancientRoll<=ancientChance or OmnipotentLoot then
-			ancient=true
-			local enc2Strength=math.random(round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10))
-			enc2Strength=math.ceil(enc2Strength*difficultyExtraPower) --bolster
-			SetEnc2(it,math.random(1,16),enc2Strength)
-			it.Bonus=math.random(1,16)
-			it.BonusStrength=math.random(round(encStrUp[pseudoStr]+1),math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10))
-			it.BonusStrength=math.ceil(it.BonusStrength*difficultyExtraPower) --bolster
-			power=2
-			chargesBonus=math.random(1,5)
-			it.MaxCharges=it.MaxCharges+chargesBonus
-			it.BonusExpireTime=1
-		end
-		--apply special enchant
-		if p3>rollSpc or ancient then
-			n=it.Number
-			c=Game.ItemsTxt[n].EquipStat
+		--apply special enchant: only a boss drop reaches the top-tier-only band
+		if rarity>=const.Rarity.Epic then
+			local c=Game.ItemsTxt[it.Number].EquipStat
 			if c<12 then
-				power=ps1+power
-				power=math.max(math.min(power,6),3)
-				totB2=itemStrength[power][c]
-				roll=math.random(1,totB2)
-				tot=0
+				local power=math.max(math.min(ps1, drop.boss and 6 or 5), 3)
+				local totB2=itemStrength[power][c]
+				local roll=math.random(1,totB2)
+				local tot=0
 				for i=0,Game.SpcItemsTxt.High do
-					if roll<=tot then
-						it.Bonus2=i
-						goto continue
-					elseif table.find(enchants[power], Game.SpcItemsTxt[i].Lvl) then
+					if table.find(enchants[power], Game.SpcItemsTxt[i].Lvl) then
 						tot=tot+Game.SpcItemsTxt[i].ChanceForSlot[c]
+						if roll<=tot then
+							it.Bonus2=i+1
+							goto continue
+						end
 					end
-				end	
+				end
 			end			
 		end
 		
 		::continue::
 		
 		
-		--primordial item
-		primordial=math.random()
-		primordialChance=ancientChance/4^(1/diffMult^0.5)
-		if primordial<=primordialChance or OmnipotentLoot then
-			if ancient then
-				it.MaxCharges=it.MaxCharges-chargesBonus
+		--primordial item, and the celestial that carries its grade: the special
+		--enchant is the one the epic roll above already gave them
+		if rarity==const.Rarity.Primordial or rarity==const.Rarity.Celestial then
+			SetAncientTier(it,2)
+		end
+
+		if rarity>=const.Rarity.Legendary then
+			vars.legendaryAffixDropped=vars.legendaryAffixDropped or {}
+			for i = 1, LEGENDARY_AFFIX_COUNT do
+				vars.legendaryAffixDropped[i] = vars.legendaryAffixDropped[i] or 0
 			end
-			it.BonusExpireTime=2
-			local enc2Strength=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
-			enc2Strength=math.ceil(enc2Strength*difficultyExtraPower) --bolster
-			SetEnc2(it,math.random(1,16),enc2Strength)
-			
-			it.Bonus=math.random(1,16)
-			it.BonusStrength=math.min(math.ceil(encStrUp[pseudoStr]*1.2), encStrUp[pseudoStr]+10)
-			it.BonusStrength=math.ceil(it.BonusStrength*difficultyExtraPower) --bolster
-			it.MaxCharges=math.min(maxChargesCap,math.min(it.MaxCharges+5, it.MaxCharges*1.25), it.MaxCharges+10)
-			--apply special enchant
-			n=it.Number
-			c=Game.ItemsTxt[n].EquipStat
-			if c<=2 then
-				roll=math.random(1,#primordialWeapEnchants)
-				it.Bonus2=primordialWeapEnchants[roll]
-			else
-				roll=math.random(1,#primordialArmorEnchants)
-				it.Bonus2=primordialArmorEnchants[roll]
-			end
-		end			
-		
-		--loot multiplier
-		lootMultiplier=lootMultiplier or 1
-		--legendary
-		if it.BonusExpireTime==2 then
-			-- Initialize pity protection
-			vars.legendaryPityCounter = vars.legendaryPityCounter or 0
-			
-			-- Reduced base chances (roughly 50% of original)
-			local baseChance=0.05
-			if vars.AusterityMode then
-				baseChance=0
-			end
-			if vars.Mode==2 then
-				baseChance=0.1
-			end
-			if vars.insanityMode then
-				baseChance=0.125
-			end
-			--No legendary in shop
-			if Game.HouseScreen==2 or Game.HouseScreen==95 then
-				baseChance=0
-			end
-			local chance = pity_chance(baseChance, vars.legendaryPityCounter)
-			chance=chance*lootMultiplier^0.5
-			-- Apply pity protection using new pity system
-			
-			if chance>=math.random() or OmnipotentLoot then
-				-- Reset pity counter on successful drop
-				if not OmnipotentLoot then
-					vars.legendaryPityCounter = 0
+			legendaryAffix=get_affix(vars.legendaryAffixDropped)
+			vars.legendaryAffixDropped[legendaryAffix]=vars.legendaryAffixDropped[legendaryAffix]+1
+			SetLegendaryAffix(it,legendaryAffix+LEGENDARY_AFFIX_BASE)
+			--adjust bonus 2 if enchant damage legendary
+			if GetLegendaryAffix(it)==19 then
+				if it.Bonus2==40 then
+					it.Bonus2=39
+				elseif it.Bonus2==41 then
+					it.Bonus2=46
 				end
-				-- Initialize counts for each affix
-				vars.legendaryAffixDropped=vars.legendaryAffixDropped or {}
-				for i = 1, #legendaryEffects-10 do
-					vars.legendaryAffixDropped[i] = vars.legendaryAffixDropped[i] or 0
-				end
-				legendaryAffix=get_affix(vars.legendaryAffixDropped)
-				vars.legendaryAffixDropped[legendaryAffix]=vars.legendaryAffixDropped[legendaryAffix]+1
-				it.BonusExpireTime=legendaryAffix+10
-				--adjust bonus 2 if enchant damage legendary
-				if it.BonusExpireTime==19 then
-					if it.Bonus2==40 then
-						it.Bonus2=39
-					elseif it.Bonus2==41 then
-						it.Bonus2=46
-					end
-				end
-				local relevantStats={1,2,3,4,5,6,7,8,10}
-				it.MaxCharges=round(math.min(maxChargesCap,it.MaxCharges*1.2,it.MaxCharges+10))
-				local roll=math.random(1,3)
-				if roll==1 then
-					local stats={1, 5, 6, 7}
-					if GetItemEquipStat(it)==10 then
-						stats={1, 5, 6, 7, 11, 12, 13, 14, 15, 16}
-					end
-					it.Bonus=stats[math.random(1,4)]
-					SetEnc2Type(it,stats[math.random(1,#stats)])
-				elseif roll==2 then
-					local stats={4, 6, 8, 10}
-					if GetItemEquipStat(it)==10 then
-						stats={1, 5, 6, 7, 11, 12, 13, 14, 15, 16}
-					end
-					it.Bonus=stats[math.random(1,4)]
-					SetEnc2Type(it,stats[math.random(1,#stats)])
-				elseif roll==3 then
-					local stats={2, 3, 4, 6, 7}
-					if GetItemEquipStat(it)==10 then
-						stats={1, 5, 6, 7, 11, 12, 13, 14, 15, 16}
-					end
-					it.Bonus=stats[math.random(1,5)]
-					SetEnc2Type(it,stats[math.random(1,#stats)])
-					if it.Bonus==2 and GetEnc2Type(it)==3 then
-						it.Bonus=GetEnc2Type(it)
-					end
-				end
-				--increase stats
-				local enc2Type,enc2Strength=GetEnc2(it)
-				SetEnc2(it,enc2Type,enc2Strength+math.min(math.ceil(enc2Strength*0.2),10))
-				it.BonusStrength=math.min(math.ceil(it.BonusStrength*1.2),it.BonusStrength+10)
-			elseif baseChance > 0 then
-				-- Only increment pity counter if legendaries are enabled but roll failed
-				vars.legendaryPityCounter = vars.legendaryPityCounter + lootMultiplier
 			end
 		end
 		--celestial
-		if it.BonusExpireTime>10 and it.BonusExpireTime<100 then
-			vars.celestialPityCounter = vars.celestialPityCounter or 0
-			local baseChance=0.1
-			local chance = pity_chance(baseChance, vars.celestialPityCounter)
-			chance = chance * lootMultiplier^0.5
-			
-			
-			if math.random()<chance or OmnipotentLoot then
-				it.BonusExpireTime=it.BonusExpireTime+100
-				if not OmnipotentLoot then
-					vars.celestialPityCounter = 0
-				end
-			else
-				vars.celestialPityCounter = vars.celestialPityCounter + lootMultiplier
-			end
+		if rarity==const.Rarity.Celestial then
+			SetCelestialItem(it,true)
 		end
-		lootMultiplier=1 --reset
-		
-		OmnipotentLoot=false
-		--buff to hp and mana items
-		if vars and not vars.itemStatsFix then
-			if it.Bonus==8 or it.Bonus==9 then
-				it.BonusStrength=it.BonusStrength*(1+math.min(it.BonusStrength/50,4))
-			end
-			local hpType,hpPower=GetEnc2(it)
-			if hpType==8 or hpType==9 then
-				local power=hpPower
-				power=power*(2+math.min(power/50,4)) --cap is 999
-				if power >= 999 and it.Bonus<17 then --swap base with charges
-					local bonus=it.Bonus
-					local str=it.BonusStrength
-					it.Bonus=hpType
-					it.BonusStrength=power
-					SetEnc2(it,bonus,str)
-				else
-					SetEnc2(it,hpType,power)
-				end
-			end
-			--nerf to AC
-			if it.Bonus==10 then
-				--it.BonusStrength=math.ceil(it.BonusStrength*0.667)
-			end
-			local acType,acPower=GetEnc2(it)
-			if acType==10 then
-				SetEnc2(it,acType,acPower-math.floor(acPower*0.333))
-			end
-		end
-		
 		--nerf to skills
 		if it.Bonus>=17 and it.Bonus<=24 then
-			it.BonusStrength=math.ceil(math.max(it.BonusStrength^0.5,it.BonusStrength/10))
+			it.BonusStrength=MawCore.Formulas.skillEnchantPower(it.BonusStrength)
 		end
 		-- buff to 2h weapons enchants
 		local mult=slotMult[it:T().EquipStat]
 		if mult then
 			it.BonusStrength=math.ceil(it.BonusStrength*mult)
 			local enc2Type,enc2Power=GetEnc2(it)
-			enc2Power=math.min(enc2Power*mult,999) --cap is 999
+			enc2Power=math.min(enc2Power*mult,ENC2_MAX_STRENGTH)
 			SetEnc2(it,enc2Type,enc2Power)
 		end
 		--check if int/pers or might/accuracy item to change special enchant
@@ -1049,8 +1290,7 @@ function events.ItemGenerated(t)
 			SetEnc2(it,syncType,it.BonusStrength)
 		end
 		
-		--maxcharges Cap
-		it.MaxCharges=math.min(maxChargesCap, it.MaxCharges)
+		it.MaxCharges=math.min(GetItemChargesCap(it), it.MaxCharges)
 		
 		--reduce chances for resistances
 		if GetItemEquipStat(it)~=10 and it.Bonus>=11 and it.Bonus<=16 then
@@ -1061,26 +1301,18 @@ function events.ItemGenerated(t)
 			SetEnc2Type(it,math.random(1,10))
 		end
 
-		--fix to resistances not to rolled be twice
+		--can't roll same enchant
 		local bonus2=GetEnc2Type(it)
-		if it.Bonus>=11 and it.Bonus<=16 then
-			while it.Bonus>0 and it.Bonus==bonus2 do
-				it.Bonus=math.random(11,16)
+		if it.Bonus>0 and it.Bonus<=16 and it.Bonus==bonus2 then
+			local low,high=1,10
+			if it.Bonus>=11 then
+				low,high=11,16
 			end
+			repeat
+				it.Bonus=math.random(low,high)
+			until it.Bonus~=bonus2
 		end
 		
-		--[[statistics
-		ancientDrops=ancientDrops or 0
-		primordialDrops=primordialDrops or 0
-		legendaryDrops=legendaryDrops or 0
-		if it.BonusExpireTime==1 then
-			ancientDrops=ancientDrops+1
-		elseif it.BonusExpireTime==2 then
-			primordialDrops=primordialDrops+1
-		elseif it.BonusExpireTime>=10 and it.BonusExpireTime<=30 then
-			legendaryDrops=legendaryDrops+1
-		end
-		]]
 		local itemPower=1
 		if it.Bonus>0 then
 			itemPower=itemPower+1
@@ -1091,12 +1323,15 @@ function events.ItemGenerated(t)
 		if HasEnc2(it) then
 			itemPower=itemPower+1
 		end
-		if it.BonusExpireTime==1 then
-			itemPower=5
-		elseif it.BonusExpireTime==2 then
-			itemPower=6
-		elseif it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
+		--rarest first, same order as the loot filter above
+		if IsCelestialItem(it) then
+			itemPower=8
+		elseif HasLegendaryAffix(it) then
 			itemPower=7
+		elseif IsPrimordialItem(it) then
+			itemPower=6
+		elseif IsAncientItem(it) then
+			itemPower=5
 		end
 		
 		vars.MAWSETTINGS=vars.MAWSETTINGS or {}
@@ -1119,30 +1354,10 @@ function events.ItemGenerated(t)
 				end)
 			end
 		end
-		if higherLootPowerRange then
-			local minValue=0
-			local itemType=it.BonusExpireTime
-			if itemType==1 then
-				minValue=0.3
-			elseif itemType==2 then
-				minValue=0.3
-			elseif itemType>=10 and itemType<100 then
-				minValue=0.3
-			elseif itemType>=100 and itemType<200 then
-				it.MaxCharges=math.min(it.MaxCharges*1.5,255)
-				return
-			end
-			
-			it.BonusStrength=math.random(1+it.BonusStrength*minValue,it.BonusStrength)
-			it.MaxCharges=math.min(math.random(1+it.MaxCharges*minValue,it.MaxCharges*1.5),255)
-			local rollType,rollPower=GetEnc2(it)
-			SetEnc2(it,rollType,math.random(1+rollPower*minValue,rollPower))
+		if IsCelestialItem(it) then
+			return
 		end
 	end
-end
-
-function events.BeforeNewGameAutosave()
-	vars.itemStatsFix=true
 end
 
 -- Function to get an affix based on the pity system
@@ -1192,36 +1407,18 @@ function events.GameInitialized2()
 	end
 --Weapon upscaler 
     for i = 1, 2199 do
-		if (i>=1 and i<=83) or (i>=803 and i<=865) or (i>=1603 and i<=1665) or i>=2201 then
+		if (i>=1 and i<=83) or (i>=803 and i<=865) or (i>=1603 and i<=1665) then
 			
-			upTierDifference=0
-			downTierDifference=0
-			downDamage=0
-			--set goal damage for weapons (end game weapon damage)
-			goalDamage=35
-			if Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Axe" or Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Sword" or Game.ItemsTxt[i].NotIdentifiedName == "Halberd" or Game.ItemsTxt[i].Skill==0 then
-				goalDamage=goalDamage*2
+			local goalDamage=WEAPON_BASE_DICE_DAMAGE
+			local flatDamage=weaponTierFlat(MawCore.ItemLevel.LadderTier(i))
+			if not (Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Axe" or Game.ItemsTxt[i].NotIdentifiedName == "Two-Handed Sword" or Game.ItemsTxt[i].NotIdentifiedName == "Halberd" or Game.ItemsTxt[i].Skill==0) then
+				goalDamage=goalDamage/2
+				flatDamage=flatDamage/2
 			end
-			currentDamage = (Game.ItemsTxt[i].Mod1DiceCount *Game.ItemsTxt[i]. Mod1DiceSides + 1)/2+Game.ItemsTxt[i].Mod2 
-
-			for v=1,4 do
-				if Game.ItemsTxt[i].NotIdentifiedName==Game.ItemsTxt[i+v].NotIdentifiedName then
-				upTierDifference=upTierDifference+1
-				end
-				if Game.ItemsTxt[i].NotIdentifiedName==Game.ItemsTxt[math.max(i-v,0)].NotIdentifiedName then
-				downTierDifference=downTierDifference+1
-				downDamage = (Game.ItemsTxt[i-v].Mod1DiceCount *Game.ItemsTxt[i-v]. Mod1DiceSides + 1)/2+Game.ItemsTxt[i-v].Mod2
-				elseif downTierDifference==0 then
-					downDamage = currentDamage
-				end
+			if Game.ItemsTxt[i].Mod1DiceCount>0 then
+				Game.ItemsTxt[i].Mod1DiceSides=math.ceil(goalDamage*2/Game.ItemsTxt[i].Mod1DiceCount)
 			end
-
-			--calculate expected value
-			tierRange=upTierDifference+downTierDifference+1
-			damageRange=goalDamage-downDamage
-			expectedDamageIncrease=damageRange*(downTierDifference/(tierRange-1))
-			Game.ItemsTxt[i].Mod1DiceSides = Game.ItemsTxt[i].Mod1DiceSides + (expectedDamageIncrease / Game.ItemsTxt[i].Mod1DiceCount)
-			Game.ItemsTxt[i].Mod2=expectedDamageIncrease/2
+			Game.ItemsTxt[i].Mod2=round(flatDamage)
 
 		elseif Game.ItemsTxt[i].Skill==8 then
 			--increase shield value
@@ -1280,6 +1477,9 @@ function events.GameInitialized2()
 	Game.SpcItemsTxt[22].BonusStat="Stone and premature ageing Immunity"
 	Game.SpcItemsTxt[24].BonusStat="Death and Eradication Immunity"
 	Game.SpcItemsTxt[35].BonusStat="Reduces Physical damage taken by 15%"
+	Game.SpcItemsTxt[15].BonusStat="Leech 10% of physical and magical damage"
+	Game.SpcItemsTxt[40].BonusStat="Leech 10% of physical damage, increases attack speed"
+	Game.SpcItemsTxt[39].BonusStat="Leech 10% of magical damage, increases cast speed (does not stack)"
 end
 --------------------
 --STATUS REWORK (needs to stay after status immunity)
@@ -1372,12 +1572,12 @@ legendaryEffects={
 	
 	[17]="Your hits deal 2% of current monster HP as physical damage (1% for AoE, multi-hit spells and arrows).\nDamage is increased by weapon base attack speed or Ascensions for spells.",
 	[18]="Reduce all damage taken by 10%",
-	[19]="Your weapon enchants scale with the highest between might/int./pers.",
-	[20]="Base enchants on this items are 50% stronger",
+	[19]="Increases damage from weapon enchants by 50%",
+	[20]="Meditation restores 1% more mana for each 1% of your mana reserved by buffs",
 	[21]="Increase melee damage by 5% for each enemy in the nearbies",
 	[22]="Reduces damage by 3% for each enemy in the nearbies",
 	[23]="Successfully covering an ally restores 3% of your HP",
-	[24]="Killing a Monster Restores 10% of Health and Mana",
+	[24]="Killing a Monster Restores 10% of Health and 5% of Mana",
 	[25]="Increases Ascension Skill level by 10",
 	[26]="Your weapon enchants can deal critical damage",
 	
@@ -1392,8 +1592,24 @@ legendaryEffects={
 	[35]="Overhealing reduces recovery time equal to half overhealing amount",
 }
 
+--Roll ids run 1..LEGENDARY_AFFIX_COUNT and store as id+LEGENDARY_AFFIX_BASE.
+--Derived from the keys rather than `#legendaryEffects`: that table starts at
+--11, so its length only answers correctly because Lua happens to give it an
+--array part -- add or remove affixes and it can silently stop matching.
+LEGENDARY_AFFIX_COUNT = 0
+for id in pairs(legendaryEffects) do
+	LEGENDARY_AFFIX_COUNT = math.max(LEGENDARY_AFFIX_COUNT, id - LEGENDARY_AFFIX_BASE)
+end
+
+function events.GameInitialized2()
+	local F=MawCore.Formulas
+	legendaryEffects[24]=string.format(
+		"Killing a Monster restores %s%% of Health and %s%% of Mana, counted on the pool left after buffs reserve theirs",
+		F.legendary24Health*100, F.legendary24Mana*100)
+end
+
 function updateCelestialItem(it,pl)
-	if it.BonusExpireTime>=100 and it.BonusExpireTime<200 then
+	if IsCelestialItem(it) then
 		if not pl then
 			local id=Game.CurrentPlayer
 			if id<0 or id>Party.High then
@@ -1411,434 +1627,25 @@ function updateCelestialItem(it,pl)
 		if lvl>lvl2*1.2 then
 			lvl=lvl2*1.2
 		end
-		local tier=math.min(lvl/11+5,60)
+		local tier=lvl/11+5
 		if vars.madnessMode then
-			tier=math.min(math.min(lvl,1000)/11+5,90)
+			tier=math.min(lvl,500)/11+5
 		end
-		local mult=3
-		if vars.Mode==2 then
-			mult=4
+		local mult=1
+		if IsPrimordialItem(it) then
+			mult=PRIMORDIAL_ENCHANT_MULT
 		end
-		if vars.insanityMode then
-			mult=5
-		end
+		local strength=math.round(applyDifficulty(encStrUp(tier))*mult*slotMult)
 		if it.Bonus>0 and it.BonusStrength>0 then
-			it.BonusStrength=math.round(tier*mult*slotMult)
+			it.BonusStrength=strength
 			if it.Bonus>=17 then
 				it.BonusStrength=math.round(it.BonusStrength/10)
 			end
 		end
 		if HasEnc2(it) then
-			SetEnc2Strength(it,math.min(math.round(tier*mult*slotMult),999))
+			SetEnc2Strength(it,math.min(strength,ENC2_MAX_STRENGTH))
 		end
-		local cap=180 
-		if vars.madnessMode then
-			cap=240
-		end
-		it.MaxCharges=math.min(math.round(tier*mult*0.8),cap)
-	end
-end
-
-function events.BuildItemInformationBox(t)
-	if IsEnchantableItem(t.Item) then 
-
-		local it=t.Item
-		if t.Type then
-			t.Type = t.Type
-			
-			updateCelestialItem(it)
-			
-			--add code to increase base stats based on bolster enchant
-			--ARMORS
-			if t.Item.MaxCharges>0 then
-				local txt=Game.ItemsTxt[t.Item.Number]
-				local equipStat=txt.EquipStat
-				if equipStat>=3 and equipStat<=9 then
-				local ac3=txt.Mod2+txt.Mod1DiceCount 
-					if ac3>0 then
-						local lookup=0
-						while Game.ItemsTxt[t.Item.Number].NotIdentifiedName==Game.ItemsTxt[t.Item.Number+lookup+1].NotIdentifiedName do 
-							lookup=lookup+1
-						end
-						local ac=Game.ItemsTxt[t.Item.Number].Mod2+Game.ItemsTxt[t.Item.Number].Mod1DiceCount 
-						local ac2=Game.ItemsTxt[t.Item.Number+lookup].Mod2+Game.ItemsTxt[t.Item.Number+lookup].Mod1DiceCount 
-						local maxCharges=t.Item.MaxCharges
-						--[[
-						if vars.insanityMode then
-							maxCharges=math.ceil(maxCharges*4/3)
-						end
-						--]]
-						local bonusAC=ac2*(maxCharges/40)
-						--if t.Item.MaxCharges <= 20 then
-							ac=ac3+round(bonusAC)
-						--else
-						--	local bonusAC=(ac+ac2)*(t.Item.MaxCharges/20)
-						--	ac=ac3+round(bonusAC)
-						--end		
-						t.BasicStat= "Armor: +" .. ac
-					end
-				end
-			end
-			--WEAPONS
-			if t.Item.MaxCharges>0 then
-				local txt=Game.ItemsTxt[t.Item.Number]
-				local equipStat=txt.EquipStat
-				if equipStat<=2 then
-					
-					local lookup=0
-					while Game.ItemsTxt[t.Item.Number].NotIdentifiedName==Game.ItemsTxt[t.Item.Number+lookup+1].NotIdentifiedName do 
-						lookup=lookup+1
-					end
-					local bonus=txt.Mod2
-					local bonus2=Game.ItemsTxt[t.Item.Number+lookup].Mod2
-					local maxCharges=t.Item.MaxCharges
-					--[[
-					if vars.insanityMode then
-						maxCharges=math.ceil(maxCharges*4/3)
-					end
-					]]
-					local bonusATK=bonus2*(maxCharges/30)
-					bonus=bonus+round(bonusATK)
-					local sides=txt.Mod1DiceSides
-					local sides2=Game.ItemsTxt[t.Item.Number+lookup].Mod1DiceSides
-					local sidesBonus=sides2*(maxCharges/30)
-					sides=sides+round(sidesBonus)
-					t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " ..  txt.Mod1DiceCount .. "d" .. sides .. "+" .. bonus
-				end
-			end
-			
-			
-			--add code to build enchant list
-			t.Enchantment=""
-			if t.Item.Bonus>0 then
-				local power=t.Item.BonusStrength
-				if vars.itemStatsFix then
-					if (t.Item.Bonus==8 or t.Item.Bonus==9) then
-						local mult=GetSlotMult(it)
-						power=round(power*(1+math.min(power/50/mult,5)))
-					elseif t.Item.Bonus==10 then
-						--power=round(power*0.667)
-					end
-				end
-				if t.Item:T().EquipStat==5 and t.Item:T().Mod2==0 then
-					power=math.ceil(power*1.5)
-				end
-				if t.Item.BonusExpireTime%100==20 then
-					power=math.ceil(power*1.5)
-				end
-				local resLegendary=false
-				if t.Item.Bonus>=11 and t.Item.Bonus<=16 then
-					local id=Game.CurrentPlayer
-					if id>=0 and id<=Party.High then
-						local index=Party[id]:GetIndex()
-						if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 16) then
-							power=power*1.5
-							resLegendary=true
-						end
-					end
-					power=round((1-1/((power+10)/100+1))*1000)/10 .. "%"
-				end
-				if extraDescription then
-					local it=t.Item
-					local bolsterMult=math.max((Game.BolsterAmount-100)/2000+1,1)
-					if vars.insanityMode then
-						bolsterMult=1.4
-					end
-					if vars.madnessMode then
-						bolsterMult=2
-					end
-					local maxValue=120 * bolsterMult
-					if it.BonusExpireTime==1 or it.BonusExpireTime==2 then
-						maxValue=math.min(maxValue+10,maxValue*1.2)
-					end
-					if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
-						maxValue=math.min(maxValue+20,maxValue*1.44)
-					end
-					if it.BonusExpireTime%100==20 then
-						maxValue=maxValue*1.5
-					end
-					local mult=slotMult[it:T().EquipStat] or 1
-					if table.find(twoHandedAxes, it.Number) then
-						mult=2
-					end
-					maxValue=round(maxValue*mult)
-					if t.Item.Bonus>=11 and t.Item.Bonus<=16 then
-						if resLegendary then
-							maxValue=maxValue*1.5
-						end
-						maxValue=round((1-1/((maxValue+10)/100+1))*1000)/10 .. "%"
-					elseif t.Item.Bonus==8 or t.Item.Bonus==9 then
-						local mult=GetSlotMult(t.Item)
-						maxValue=round(maxValue*(1+math.min(maxValue/50/mult,5)))
-					elseif t.Item.Bonus>=17 then
-						maxValue=round(maxValue/10)
-					end
-					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. power .. StrColor(100,100,100, " / " .. maxValue)
-				else
-					t.Enchantment = itemStatName[t.Item.Bonus] .. " +" .. power
-				end
-			end
-			if HasEnc2(t.Item) then
-				local bonus,strength=GetEnc2(t.Item)
-				if vars.itemStatsFix then
-					if (bonus==8 or bonus==9) then
-						local mult=GetSlotMult(it)
-						strength=round(strength*(1+math.min(strength/50/mult,5)))
-					elseif bonus==10 then
-						--strength=round(strength*0.667)
-					end
-				end
-				if t.Item:T().EquipStat==5 and t.Item:T().Mod2==0 then
-					strength=math.ceil(strength*1.5)
-				end				
-				if t.Item.BonusExpireTime%100==20 then
-					strength=math.ceil(strength*1.5)
-				end
-				local resLegendary=false
-				if bonus>=11 and bonus<=16 then
-					local id=Game.CurrentPlayer
-					if id>=0 and id<=Party.High then
-						local index=Party[id]:GetIndex()
-						if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 16) then
-							strength=strength*1.5
-							resLegendary=true
-						end
-					end
-					strength=round((1-1/((strength+10)/100+1))*1000)/10 .. "%"
-				end
-				if itemStatName[bonus] then
-					if extraDescription then
-						local it=t.Item
-						local bolsterMult=math.max((Game.BolsterAmount-100)/2000+1,1)
-						if vars.insanityMode then
-							bolsterMult=1.4
-						end
-						if vars.madnessMode then
-							bolsterMult=2
-						end
-						local maxValue=120 * bolsterMult
-						if it.BonusExpireTime==1 or it.BonusExpireTime==2 then
-							maxValue=math.min(maxValue+10,maxValue*1.2)
-						end
-						if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
-							maxValue=math.min(maxValue+20,maxValue*1.44)
-						end
-						if it.BonusExpireTime%100==20 then
-							maxValue=maxValue*1.5
-						end
-						local mult=slotMult[it:T().EquipStat] or 1
-						if table.find(twoHandedAxes, it.Number) then
-							mult=2
-						end
-						maxValue=round(maxValue*mult)
-						if bonus>=11 and bonus<=16 then
-							if resLegendary then
-								maxValue=maxValue*1.5
-							end
-							maxValue=round((1-1/((maxValue+10)/100+1))*1000)/10 .. "%"
-						elseif bonus==8 or bonus==9 then
-							local mult=GetSlotMult(t.Item)
-							maxValue=round(maxValue*(1+math.min(maxValue/50/mult,5)))
-						elseif bonus>=17 then
-							maxValue=round(maxValue/10)
-						end
-						t.Enchantment = itemStatName[bonus] .. " +" .. strength .. StrColor(100,100,100, " / " .. maxValue) .. "\n" .. t.Enchantment
-					else
-						t.Enchantment = itemStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
-					end
-				end
-			elseif t.Item.Bonus~=0 and t.Item.BonusStrength~=0 then
-				if extraDescription then
-					math.randomseed(t.Item.Number*10000+t.Item.MaxCharges*1000+t.Item.Bonus*100+t.Item.BonusStrength*10+t.Item.Charges)
-					
-					local mult=math.max((Game.BolsterAmount-100)/1000+1,1)
-					local cap=100*mult
-					local power=t.Item.BonusStrength
-					if t.Item.Bonus==8 or t.Bonus==9 then
-						power=math.floor((-100+(100^2+power*200)^0.5)/2)
-					elseif t.Item.Bonus==10 then
-						--power=power*1.5
-					end
-					local stat=math.random(1,10)
-					if GetItemEquipStat(t.Item)==10 then
-						stat=math.random(1,16)
-						if stat>10 and stat==t.Bonus then
-							stat=math.random(1,10)
-						end
-					end
-					if stat==8 or stat==9 then
-						GetSlotMult(t.Item)
-						power=power*(1+math.min(power/50/mult,5))
-					elseif stat==10 then
-						--power=power*0.667
-					end
-					local slotMult=slotMult[t.Item:T().EquipStat] or 1
-					cap=math.min(cap*slotMult,999)
-					
-					charges=stat*1000+math.min(round(power*(1+0.25*math.random())),cap)
-					
-					local bonus=math.floor(charges/1000)
-					local strength=charges%1000
-					if stat>=11 and stat<=16 then
-						strength=round((1-1/((charges+10)%1000/100+1))*1000)/10 .. "%"
-					end
-					txt=baseStatName[bonus] .. " +" .. strength .. "\n" .. t.Enchantment
-					t.Enchantment = StrColor(100,100,100, txt)
-					vars.extraShown=true
-				end
-			end
-			if t.Item.Bonus==0 and t.Item.Bonus2==0 and not HasEnc2(t.Item) and extraDescription then
-				if vars.enchantSeedList==nil then
-				vars.enchantSeedList={}
-					for i=0,2500 do
-						vars.enchantSeedList[i]=math.random(1,100000)
-					end
-				end
-				math.randomseed(vars.enchantSeedList[t.Item.Number]+t.Item.MaxCharges)
-				if math.random(1,10)==1 then
-					bonus=math.random(17,24)
-				elseif GetItemEquipStat(t.Item)==10 then
-					bonus=math.random(1,16)
-				else
-					bonus=math.random(1,10)
-				end
-				txt=baseStatName[bonus] .. " +X"
-				t.Enchantment = StrColor(100,100,100, txt)
-			end
-		elseif t.Name then
-			--add enchant Name
-			t.Name = Game.ItemsTxt[t.Item.Number].Name
-			if t.Item.Bonus2>0 then
-				enchString=Game.SpcItemsTxt[t.Item.Bonus2-1].NameAdd
-				if string.match(enchString, "^%u") then
-					t.Name= enchString .. " " .. t.Name
-				else
-					t.Name= t.Name .. " " .. enchString
-				end
-			elseif t.Item.Bonus>0 then
-				t.Name= t.Name .. " " .. Game.StdItemsTxt[t.Item.Bonus-1].NameAdd
-			end
-			--choose colour
-			local bonus=0
-			if t.Item.Bonus>0 then
-				bonus=bonus+1
-			end
-			if t.Item.Bonus2>0 then
-				bonus=bonus+1
-			end
-			if HasEnc2(t.Item) then
-				bonus=bonus+1
-			end
-			if t.Item.BonusExpireTime==1 then
-				t.Name=StrColor(255,128,0,"Ancient " .. t.Name)
-			elseif t.Item.BonusExpireTime==2 then
-				t.Name=StrColor(255,0,0,"Primordial " .. t.Name)
-			elseif t.Item.BonusExpireTime>=100 and t.Item.BonusExpireTime<=200 then
-				t.Name=StrColor(120, 240, 255,"Celestial " .. t.Name)
-			elseif legendaryEffects[t.Item.BonusExpireTime] then
-				t.Name=StrColor(255,255,30,"Legendary " .. t.Name)
-			elseif bonus==3 then
-				t.Name=StrColor(163,53,238,t.Name)
-			elseif bonus==2 then
-				t.Name=StrColor(0,150,255,t.Name)
-			elseif bonus==1 then
-				t.Name=StrColor(30,255,0,t.Name)
-			else
-				t.Name=StrColor(255,255,255,t.Name)
-			end
-		elseif t.Description then
-			if t.Item.BonusExpireTime>=10 and t.Item.BonusExpireTime<1000 then
-				t.Description=""
-			end
-			if legendaryEffects[t.Item.BonusExpireTime%100]then
-				local legText=legendaryEffects[t.Item.BonusExpireTime%100]
-				if t.Item.BonusExpireTime%100==21 then
-					local count=0
-					for i=0, Map.Monsters.High do
-						if Map.Monsters[i].Active then
-							dist=getDistanceToMonster(Map.Monsters[i])
-							if dist<=512 then
-								count=count+1
-							end
-						end
-					end
-					local dmg=math.min(count*5,100)
-					legText=legText .. "\nCurrent bonus Damage: " .. dmg .. "%"
-				elseif t.Item.BonusExpireTime%100==22 then
-					local count=0
-					for i=0, Map.Monsters.High do
-						if Map.Monsters[i].Active then
-							dist=getDistanceToMonster(Map.Monsters[i])
-							if dist<=512 then
-								count=count+1
-							end
-						end
-					end
-					local red=round(math.min(1-0.97^count,0.5)*10000)/100
-					legText=legText .. "\nCurrent Reduction: " .. red .. "%"
-				end
-				t.Description = StrColor(255,255,30,legText) .. t.Description
-			end
-			if t.Item.Bonus2>0 then	
-				if (t.Item.MaxCharges>=0 and bonusEffects[t.Item.Bonus2]~= nil) or enchantList[t.Item.Bonus2] then
-					text=checktext(t.Item.MaxCharges,t.Item.Bonus2,t.Item)
-				else
-					text=Game.SpcItemsTxt[t.Item.Bonus2-1].BonusStat
-				end
-				t.Description = StrColor(255,255,153,text) .. "\n\n" .. t.Description
-			end
-			if t.Item.Bonus>0 and t.Item.Bonus2==0 and extraDescription then
-				n=t.Item.Number
-				c=Game.ItemsTxt[n].EquipStat
-				math.randomseed(t.Item.Number*10000+t.Item.MaxCharges*1000+t.Item.Bonus*100+t.Item.BonusStrength*10+t.Item.Charges)
-				if c<12 then
-					power=6
-					totB2=itemStrength[power][c]
-					roll=math.random(1,totB2)
-					tot=0
-					for i=0,Game.SpcItemsTxt.High do
-						if roll<=tot then
-							enchantNumber=i
-							goto continue
-						elseif table.find(enchants[power], Game.SpcItemsTxt[i].Lvl) then
-							tot=tot+Game.SpcItemsTxt[i].ChanceForSlot[c]
-						end
-					end	
-				end
-				:: continue ::
-				if (t.Item.MaxCharges>=0 and bonusEffects[enchantNumber]~= nil) or enchantList[enchantNumber] then
-					text=checktext(t.Item.MaxCharges,enchantNumber,t.Item)
-				else
-					text=Game.SpcItemsTxt[enchantNumber-1].BonusStat
-				end
-				t.Description = StrColor(100,100,100,text) .. "\n\n" .. t.Description
-				vars.extraShown=true
-			end
-			if t.Item.Bonus>0 and t.Item.BonusStrength>0 then
-				if not extraDescription and not vars.extraShown then
-					t.Description = t.Description .. "\n\n" .. StrColor(100,100,100,"Press alt to show craftable stats")
-				end
-			end
-		end
-		if extraDescription and t.Description then
-			local difficultyExtraPower=1
-			if Game.BolsterAmount>100 then
-				difficultyExtraPower=(Game.BolsterAmount-100)/2000+1
-			end
-			local maxChargesCap=50*((difficultyExtraPower-1)*2+1)
-			if t.Item.BonusExpireTime>=10 and t.Item.BonusExpireTime<1000 then
-				maxChargesCap=50*((difficultyExtraPower-1)*4+1)
-			end
-			maxChargesCap=maxChargesCap+100 --mapping release
-			maxChargesCap=maxChargesCap/2
-
-			if vars.madnessMode then
-				maxChargesCap=150
-			end
-			maxChargesCap=round(maxChargesCap)
-			local txt="\n\nItem Bonus Power: " .. t.Item.MaxCharges .. "/" .. maxChargesCap
-			t.Description =t.Description .. StrColor(100,100,100, txt)
-		end
+		it.MaxCharges=GetPrimordialCharges(lvl)
 	end
 end
 
@@ -1947,7 +1754,7 @@ bonusEffectsBase = {
 --MODIFY THIS TO CHANGE ACTUAL VALUES
 bonusEffects = {
     [1] = { bonusType = 1, bonusRange = {11, 16}, statModifier = 10 },
-    [2] = { bonusType = 2, bonusRange = {1, 7}, statModifier = 10 },
+    [2] = { bonusType = 2, bonusRange = {1, 7}, statModifier = 8 },
     [39] = { bonusType = 39, bonusValues = {2, 3}, statModifier = 25 },
     [42] = { bonusType = 42, bonusRange = {1, 16}, statModifier = 3 },
     [43] = { bonusType = 43, bonusValues = {4, 8, 10}, statModifier = 10 },
@@ -1981,73 +1788,69 @@ function checktext(MaxCharges,bonus2,it)
 		MaxCharges=math.ceil(MaxCharges*4/3)
 	end
 	]]
-	mult=1+MaxCharges/20
+	mult=MawCore.Formulas.chargesStatMult(MaxCharges)
 	--else
 	--	mult=2+2*(MaxCharges-20)/20
 	--end
-	if it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number) then --attack speed no longer shown in tooltip, due to spell tooltip
-		attackSpeedMult=2
-	else
-		attackSpeedMult=1
-	end
 	--bow tooltip
 	local weaponType="Melee"
 	if it:T().EquipStat==2 then
 		weaponType="Bow"
 	end
-	local id=Game.CurrentPlayer
-	if id<0 or id>Party.High then
-		id=0
+
+	--damage enchants read the shared range (same numbers the damage roll uses)
+	local plId=Game.CurrentPlayer
+	if plId<0 or plId>Party.High then
+		plId=0
 	end
-	local legDmgMult=1
-	local pl=Party[id]
-	local index=pl:GetIndex()
-	if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 19) then
-		local str=pl:GetMight()
-		local int=pl:GetIntellect()
-		local pers=pl:GetPersonality()
-		local bonusStat=math.max(str,int,pers)
-		legDmgMult=(1+bonusStat/1000)
+	local legDmgMult=GetLegendary19Mult(Party[plId])
+	local function enchRangeText(id)
+		local lo, hi=enchantDamageRange(it, id)
+		lo, hi=lo*legDmgMult, hi*legDmgMult
+		if math.floor(lo)==math.floor(hi) then
+			return tostring(math.floor(lo))
+		end
+		return math.floor(lo) .. "-" .. math.floor(hi)
 	end
-	
-	--damage multiplier
-	local enchantDamageMult=math.max((0.5+MaxCharges/20)^1.5,0.5)
-	
+	local function enchDmgText(id, kind)
+		return "Adds " .. enchRangeText(id) .. " points of " .. kind .. " damage."
+	end
+
 	bonus2txt={
 		[1] =  " +" .. math.floor(bonusEffects[1].statModifier * mult) .. " to all Resistances.",
 		[2] = " +" .. math.floor(bonusEffects[2].statModifier * mult) .. " to all Seven Statistics.",
-		[4] ="Adds " .. math.floor(6*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(8*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Cold damage.",
-		[5] ="Adds " .. math.floor(18*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(24*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Cold damage.",
-		[6] ="Adds " .. math.floor(36*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(48*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Cold damage.",
-		[7] ="Adds " .. math.floor(4*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(10*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Electrical damage.",
-		[8] ="Adds " .. math.floor(12*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(30*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Electrical damage.",
-		[9] ="Adds " .. math.floor(24*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(60*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Electrical damage.",
-		[10] ="Adds " .. math.floor(2*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(12*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Fire damage.",
-		[11] ="Adds " .. math.floor(6*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(36*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Fire damage.",
-		[12] ="Adds " .. math.floor(12*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(72*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Fire damage.",
-		[13] ="Adds " .. math.floor(12*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Body damage.",
-		[14] ="Adds " .. math.floor(24*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Body damage.",
-		[15] ="Adds " .. math.floor(48*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Body damage.",
+		[4] = enchDmgText(4, "Cold"),
+		[5] = enchDmgText(5, "Cold"),
+		[6] = enchDmgText(6, "Cold"),
+		[7] = enchDmgText(7, "Electrical"),
+		[8] = enchDmgText(8, "Electrical"),
+		[9] = enchDmgText(9, "Electrical"),
+		[10] = enchDmgText(10, "Fire"),
+		[11] = enchDmgText(11, "Fire"),
+		[12] = enchDmgText(12, "Fire"),
+		[13] = enchDmgText(13, "Body"),
+		[14] = enchDmgText(14, "Body"),
+		[15] = enchDmgText(15, "Body"),
 		--spell enchants
-		[26] = "Air Magic Skill +" .. math.floor(MaxCharges/4)+5,
-		[27] = "Body Magic Skill +" .. math.floor(MaxCharges/4)+5,
-		[28] = "Dark Magic Skill +" .. math.floor(MaxCharges/4)+5,
-		[29] = "Earth Magic Skill +" .. math.floor(MaxCharges/4)+5,
-		[30] = "Fire Magic Skill +" .. math.floor(MaxCharges/4)+5,
-		[31] = "Light Magic Skill +" .. math.floor(MaxCharges/4)+5,
-		[32] = "Mind Magic Skill +" .. math.floor(MaxCharges/4)+5,
-		[33] = "Spirit Magic Skill +" .. math.floor(MaxCharges/4)+5,
-		[34] = "Water Magic Skill +" .. math.floor(MaxCharges/4)+5,
+		[26] = "Air Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
+		[27] = "Body Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
+		[28] = "Dark Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
+		[29] = "Earth Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
+		[30] = "Fire Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
+		[31] = "Light Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
+		[32] = "Mind Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
+		[33] = "Spirit Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
+		[34] = "Water Magic Skill +" .. MawCore.Formulas.chargesSchoolSkill(MaxCharges),
 		--stats enchants
-		[38] = "Meditation Skill +" .. math.floor(MaxCharges*3/20)+3,
-		[39] = "Adds " .. math.floor(40*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(80*enchantDamageMult*attackSpeedMult*legDmgMult) .. " to spell damage and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Intellect and personality.",
-		[40] = "Spells Drain Hit points from target and Increased Spell speed.(except when equipping off-hand).",
+		[38] = "Meditation Skill +" .. MawCore.Formulas.chargesMeditationSkill(MaxCharges),
+		[39] = "Adds " .. enchRangeText(39) .. " to spell damage and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Intellect and personality.",
+		[40] = "Leech 10% of magical damage, increases cast speed (does not stack).",
 		[42] = " +" .. math.floor(bonusEffects[42].statModifier * mult) .. " to Seven Stats, HP, SP, Armor, Resistances.",
 		[43] = " +" .. math.floor(bonusEffects[43].statModifier * mult) .. " to Endurance, Armor, Hit points.",
 		[44] = " +" .. math.floor(bonusEffects[44].statModifier * mult) .. " Hit points and Regenerate Hit points over time.",
 		[45] = " +" .. math.floor(bonusEffects[45].statModifier * mult) .. " Speed and Accuracy.",
-		[46] = "Adds " .. math.floor(40*enchantDamageMult*attackSpeedMult*legDmgMult) .. "-" .. math.floor(80*enchantDamageMult*attackSpeedMult*legDmgMult) .. " points of Fire damage to " .. weaponType .. " attacks and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Might.",
-		[47] = " +" .. math.floor(bonusEffects[47].statModifier * mult) .. " Spell points and Meditation Skill +" .. math.floor(MaxCharges*3/20)+3,
+		[46] = "Adds " .. enchRangeText(46) .. " points of Fire damage to " .. weaponType .. " attacks and +" .. math.floor(bonusEffects[46].statModifier * mult).. " Might.",
+		[47] = " +" .. math.floor(bonusEffects[47].statModifier * mult) .. " Spell points and Meditation Skill +" .. MawCore.Formulas.chargesMeditationSkill(MaxCharges),
 		[48] = " +" .. math.floor(bonusEffects[48].statModifier[1] * mult) .. " Endurance and" .. " +" .. math.floor(bonusEffects[48].statModifier[2] * mult).. " Armor.",
 		[49] = " +" .. math.floor(bonusEffects[49].statModifier * mult) .. " Intellect and Luck.",
 		[50] = " +" .. math.floor(bonusEffects[50].statModifier * mult) .. " Fire Resistance and Regenerate Hit points over time.",
@@ -2055,10 +1858,10 @@ function checktext(MaxCharges,bonus2,it)
 		[52] = " +" .. math.floor(bonusEffects[52].statModifier * mult) .. " Endurance and Accuracy.",
 		[53] = " +" .. math.floor(bonusEffects[53].statModifier * mult) .. " Might and Personality.",
 		[54] = " +" .. math.floor(bonusEffects[54].statModifier * mult) .. " Endurance and Regenerate Hit points over time.",
-		[55] = " +" .. math.floor(bonusEffects[55].statModifier * mult) .. " Luck and Meditation Skill +" .. math.floor(MaxCharges*3/20)+3,
+		[55] = " +" .. math.floor(bonusEffects[55].statModifier * mult) .. " Luck and Meditation Skill +" .. MawCore.Formulas.chargesMeditationSkill(MaxCharges),
 		[56] = " +" .. math.floor(bonusEffects[56].statModifier * mult) .. " Might and Endurance.",
 		[57] = " +" .. math.floor(bonusEffects[57].statModifier * mult) .. " Intellect and Personality.",
-		[66] = "Regenerates Hit Points and Meditation Skill +" .. math.floor(MaxCharges*3/20)+3,
+		[66] = "Regenerates Hit Points and Meditation Skill +" .. MawCore.Formulas.chargesMeditationSkill(MaxCharges),
 		--hybrids enchants 
 		[74] = " +" .. math.floor(bonusEffects[74].statModifier * mult) .. " Personality and Accuracy.",
 		[75] = " +" .. math.floor(bonusEffects[75].statModifier * mult) .. " Intellect and Might.",
@@ -2125,7 +1928,10 @@ function getItemValue(it, lootFilter)
 		mult=MaxCharges/20
 		
 		basePriceBonus=basePrice*mult
-		if it.Bonus2>0 and it.Bonus2<=Game.SpcItemsTxt.high and it.BonusExpireTime<Game.Time then
+		--the expiry test only means something when the field IS a timer: on a
+		--rarity item it holds the marker, which is far bigger than Game.Time
+		if it.Bonus2>0 and it.Bonus2<=Game.SpcItemsTxt.high
+				and (HasRarityData(it) or it.BonusExpireTime<Game.Time) then
 			special=Game.SpcItemsTxt[it.Bonus2-1].Value
 			if bonusEffects[it.Bonus2]~=nil then
 				special=special*mult
@@ -2140,7 +1946,7 @@ function getItemValue(it, lootFilter)
 			end
 		end
 		local value=basePrice+(basePriceBonus+bonus1+bonus2)
-		if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
+		if HasLegendaryAffix(it) then
 			value=value*2.5
 		end
 		if Game.HouseScreen==2 or Game.HouseScreen==95 then
@@ -2154,9 +1960,11 @@ function getItemValue(it, lootFilter)
 			if it.Bonus2>0 then
 				count=count+1
 			end
-			if it.BonusExpireTime>0 and it.BonusExpireTime<3 then
-				count=count+it.BonusExpireTime
-			end	
+			--an Ancient is priced as a Primordial here, same reason it rolls at the
+			--Primordial's odds: on a shelf it IS the top rarity
+			if GetAncientTier(it)>0 then
+				count=count+math.max(GetAncientTier(it), SHOP_ANCIENT_PRICE_TIER)
+			end
 			if count>0 then
 				value=value^(1+count*0.08)
 			end
@@ -2216,45 +2024,100 @@ reagentPrices={
 
 --ENCHANTS HERE
 --MELEE bonuses
+--{min,max} set only the roll's shape; Coeff = share of the undamped
+--item-level weapon damage dealt on average (see enchantDamageRange)
 enchantbonusdamage = {}
-enchantbonusdamage[4] = {6,8,["Type"]=2}
-enchantbonusdamage[5] = {18,24,["Type"]=2}
-enchantbonusdamage[6] = {36,48,["Type"]=2}
-enchantbonusdamage[7] = {4,10,["Type"]=1}
-enchantbonusdamage[8] = {18,45,["Type"]=1}
-enchantbonusdamage[9] = {24,60,["Type"]=1}
-enchantbonusdamage[10] = {2,12,["Type"]=0}
-enchantbonusdamage[11] = {6,36,["Type"]=0}
-enchantbonusdamage[12] = {12,72,["Type"]=0}
-enchantbonusdamage[13] = {10,10,["Type"]=8}
-enchantbonusdamage[14] = {24,24,["Type"]=8}
-enchantbonusdamage[15] = {48,48,["Type"]=8}
-enchantbonusdamage[39] = {40,80,["Type"]=0}
-enchantbonusdamage[46] = {40,80,["Type"]=0}
-fireAuraDamage={10,20,40,60,[0]=0}
+enchantbonusdamage[4] = {3,4,["Type"]=2,["Coeff"]=0.2}
+enchantbonusdamage[5] = {9,12,["Type"]=2,["Coeff"]=0.3}
+enchantbonusdamage[6] = {18,24,["Type"]=2,["Coeff"]=0.4}
+enchantbonusdamage[7] = {2,5,["Type"]=1,["Coeff"]=0.2}
+enchantbonusdamage[8] = {6,15,["Type"]=1,["Coeff"]=0.3}
+enchantbonusdamage[9] = {12,30,["Type"]=1,["Coeff"]=0.4}
+enchantbonusdamage[10] = {1,6,["Type"]=0,["Coeff"]=0.2}
+enchantbonusdamage[11] = {3,18,["Type"]=0,["Coeff"]=0.3}
+enchantbonusdamage[12] = {6,36,["Type"]=0,["Coeff"]=0.4}
+enchantbonusdamage[13] = {5,5,["Type"]=8,["Coeff"]=0.25}
+enchantbonusdamage[14] = {12,12,["Type"]=8,["Coeff"]=0.35}
+enchantbonusdamage[15] = {24,24,["Type"]=8,["Coeff"]=0.45}
+enchantbonusdamage[39] = {20,40,["Type"]=0,["Coeff"]=0.5}
+enchantbonusdamage[46] = {20,40,["Type"]=0,["Coeff"]=0.5}
+
+ENCHANT_DAMAGE_MULT = 1
+ENCHANT_FLOOR_SHARE = 0.5
+
+--min/max roll of a damage enchant: average = Coeff * undamped item-level
+function enchantDamageRange(it, id, itemLevel)
+	local ench=enchantbonusdamage[id]
+	local levelDamage
+	if itemLevel then
+		levelDamage=getWeaponLevelDamage(itemLevel, IsTwoHandedWeapon(it), GetWeaponFlatDamage(it))
+	else
+		levelDamage=GetWeaponLevelDamage(it)
+	end
+	local avg=levelDamage*ench.Coeff*ENCHANT_DAMAGE_MULT
+	local mean=(ench[1]+ench[2])/2
+	--{min,max} are also a guaranteed floor, so a low item level still deals
+	local floorMult=(IsTwoHandedWeapon(it) and 2 or 1)*ENCHANT_FLOOR_SHARE
+	local lo=math.max(avg*ench[1]/mean, ench[1]*floorMult)
+	local hi=math.max(avg*ench[2]/mean, ench[2]*floorMult)
+	return lo, hi, (lo+hi)/2
+end
+
+--enchant 40: faster spell casting from any weapon slot (main, offhand or
+--bow), ONE instance only -- it does not stack across items. getSpellDelay
+--applies it and the haste displays print it, so both must read this.
+function HasSpellHasteEnchant(pl)
+	for i=0,2 do
+		local it=pl:GetActiveItem(i)
+		if it and it.Bonus2==40 then
+			return true
+		end
+	end
+	return false
+end
+
+LEGENDARY19_ENCHANT_MULT = 1.5
+function GetLegendary19Mult(pl)
+	local id=pl:GetIndex()
+	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
+		return LEGENDARY19_ENCHANT_MULT
+	end
+	return 1
+end
+
+function GetPlayerBaseRecovery(pl, it)
+	if it and it:T().EquipStat==2 then
+		return getItemRecovery(it, 0)
+	end
+	local total, count=0, 0
+	for i=0,1 do
+		local held=pl:GetActiveItem(i)
+		if held and held:T().Skill<8 then
+			total=total+getItemRecovery(held, 0)
+			count=count+1
+		end
+	end
+	if count==0 then
+		return 100
+	end
+	return total/count
+end
+
 --calculate enchant damage
 function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType)
 	local ench=enchantbonusdamage[it.Bonus2]
 	if not ench or (it.Bonus2==39 and not isSpell) or (it.Bonus2==46 and isSpell) then
 		return 0
 	end
-	local damage=0
+	local lo, hi, avg=enchantDamageRange(it, it.Bonus2)
+	local damage=avg
 	if rand then
-		damage=math.random(ench[1],ench[2])
-	else
-		damage=(ench[1]+ench[2])/2
+		damage=math.random(round(lo), round(hi))
 	end
 	local id=pl:GetIndex()
-	local mult=1
-	if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
-		local str=pl:GetMight()
-		local int=pl:GetIntellect()
-		local pers=pl:GetPersonality()
-		local bonusStat=math.max(str,int,pers)
-		mult=(1+bonusStat/1000)
-	end
+	local mult=GetLegendary19Mult(pl)
 	if calcType~="tooltip" and vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 26) then
-		if isSpell then 
+		if isSpell then
 			critChance, critMult, success=getCritInfo(pl,"spell")
 		else
 			critChance, critMult, success=getCritInfo(pl)
@@ -2267,10 +2130,8 @@ function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType)
 		end
 	end
 	damage=damage*mult
-	if it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number) then
-		damage=damage*2
-	end
-	damage=math.max(damage*(0.5+it.MaxCharges/20)^1.5,0.5)
+
+	damage=damage*GetPlayerBaseRecovery(pl, it)/100
 	damage = damage/2^(resistance%1000/100)
 	return damage
 end
@@ -2486,22 +2347,6 @@ function artifactTextBuilder(n,lvl)
 	return artifactTxt[n]
 end
 ]]
-function events.BuildItemInformationBox(t)
-	if t.Description and ((t.Item.Number>=500 and t.Item.Number<=543) or (t.Item.Number>=1302 and t.Item.Number<=1354) or (t.Item.Number>=2020 and t.Item.Number<=2049)) then
-		require("string")
-		pattern = "(%d+)"
-		text=t.Description
-		t.Description = text:gsub(pattern, function(match) return replaceNumber(match, t.Item.BonusExpireTime) end)
-		local txt="\n\nScale with player level, up to level 550."
-		if vars.madnessMode then
-			txt="\n\nScale with player level, up to level 900."
-		end
-		if t.Item.BonusExpireTime>=1 then
-			txt=StrColor(120, 240, 255,"\n\nArtifact Level: " .. t.Item.BonusExpireTime)
-		end
-		t.Description = t.Description .. txt
-	end
-end
 
 function replaceNumber(match, bonusStrength)
 	lvl=Party[Game.CurrentPlayer].LevelBase
@@ -2517,50 +2362,13 @@ end
 --ARTIFACTS BASE STATS SCALING--
 --------------------------------
 ancientWeapons={866,867,1666,1667}
-function events.BuildItemInformationBox(t)
-	if (t.Item.Number>=500 and t.Item.Number<=543) or (t.Item.Number>=1302 and t.Item.Number<=1354) or (t.Item.Number>=2020 and t.Item.Number<=2049) or table.find(ancientWeapons,t.Item.Number) then 
-		if t.Type then
-			local id=Game.CurrentPlayer
-			if id==-1 then
-				id=0
-			end
-			local artifactMult=artifactPowerMult(Party[id].LevelBase, true, t.Item.BonusExpireTime)
-			local txt=Game.ItemsTxt[t.Item.Number]
-			local ac=math.ceil((txt.Mod2+txt.Mod1DiceCount)*artifactMult)
-			if ac>0 then 			
-				t.BasicStat= "Armor: +" .. ac
-			end
-			--WEAPONS
-			artifactMult=artifactPowerMult(Party[id].LevelBase, false, t.Item.BonusExpireTime)
-			local equipStat=txt.EquipStat
-			if equipStat<=2 then
-				local bonus=math.ceil(txt.Mod2*artifactMult)
-				local sides=math.ceil(txt.Mod1DiceSides*artifactMult)
-				t.BasicStat= "Attack: +" .. bonus .. "  " .. "Damage: " ..  txt.Mod1DiceCount .. "d" .. sides .. "+" .. bonus
-			end
-			local skill=t.Item:T().Skill
-			if table.find(twoHandedAxes, t.Item.Number) or table.find(oneHandedAxes, t.Item.Number) then
-				skill=3
-			end
-			if baseRecovery[skill] then
-				local pl=Party[0]
-				local id=Game.CurrentPlayer
-				if id>0 and id<Party.High then
-					pl=Party[id]
-				end
-				local playerLevel=pl.LevelBase
-				t.Type = t.Type .. "\nAttack Speed: " .. getItemRecovery(t.Item, playerLevel)/100
-			end
-		end
-	end
-end
 --[[
 --increase artifact damage tooltip
 function events.CalcStatBonusByItems(t)
 	local cs = const.Stats
 	if t.Stat==cs.MeleeDamageMin or t.Stat==cs.MeleeDamageMax or t.Stat==cs.MeleeAttack then
 		for it in t.Player:EnumActiveItems() do 
-			if (it.Number>=500 and it.Number<=543) or (it.Number>=1302 and it.Number<=1354) or (it.Number>=2020 and it.Number<=2049) then 
+			if IsArtifactId(it.Number) then 
 				txt=Game.ItemsTxt[it.Number]
 				c=txt.EquipStat
 				if c<=1 then
@@ -2575,7 +2383,7 @@ function events.CalcStatBonusByItems(t)
 	--same for ranged
 	if t.Stat==cs.RangedDamageMin or t.Stat==cs.RangedDamageMax or t.Stat==cs.RangedAttack then
 		for it in t.Player:EnumActiveItems() do 
-			if (it.Number>=500 and it.Number<=543) or (it.Number>=1302 and it.Number<=1354) or (it.Number>=2020 and it.Number<=2049) then 
+			if IsArtifactId(it.Number) then 
 				txt=Game.ItemsTxt[it.Number]
 				c=txt.EquipStat
 				if c==2 then
@@ -2639,7 +2447,7 @@ function events.ItemAdditionalDamage(t)
 	for i=0,1 do
 		it=t.Player:GetActiveItem(i)
 		if it then
-			vamp=it.Bonus2==41 or it.Bonus2==16
+			vamp=it.Bonus2==41 or it.Bonus2==16 or MawArtifactVampiric(it.Number)
 			gotVamp[t.Player:GetIndex()]=gotVamp[t.Player:GetIndex()] or 0
 			gotVamp[t.Player:GetIndex()]=gotVamp[t.Player:GetIndex()]/2+1
 		end
@@ -2654,7 +2462,7 @@ function events.ItemAdditionalDamage(t)
 	vamp=false
 	it=t.Player:GetActiveItem(2)
 	if it then
-		vamp=it.Bonus2==41 or it.Bonus2==16
+		vamp=it.Bonus2==41 or it.Bonus2==16 or MawArtifactVampiric(it.Number)
 	end
 	if vamp then
 		t.Vampiric = false
@@ -2681,153 +2489,7 @@ slotMap={
 	[10]=10,
 }
 
-
-function events.BuildItemInformationBox(t)
-	--partyLevel=getPartyLevel()
-	--maxItemBolster=(partyLevel)/5+20
-	--failsafe
-	--if Game.freeProgression and t.Item and t.Item.Charges==0 and t.Item.Bonus==0 and t.Item.Bonus2==0 and t.Item.MaxCharges>maxItemBolster then
-	--	if not Game.freeProgression then
-	--		maxItemBolster=maxItemBolster+10
-	--	end
-	--	t.Item.MaxCharges=round(partyLevel/5)
-	--end
-	if t.Description then
-		local i=Game.CurrentPlayer
-		if i==-1 or i>Party.High then return end
-		local equipStat=t.Item:T().EquipStat
-		if equipStat<=11 then 
-			local pl=Party[i]
-			local hp=pl.HP
-			local sp=pl.SP
-			local maxHP=vars.currentHPPool[i]
-			local maxSP=vars.currentManaPool[i]
-			local playerIndex=pl:GetIndex()
-			local oldDPS1, oldDPS2, oldDPS3, oldVitality=calcPowerVitality(pl)
-			--substitute item
-			local slot=slotMap[equipStat]
-			local itemBackup={}
-			local it=pl:GetActiveItem(slot)
-			if it then
-				--backup item
-				itemBackup["BodyLocation"]=it.BodyLocation
-				itemBackup["Bonus"]=it.Bonus
-				itemBackup["Bonus2"]=it.Bonus2
-				itemBackup["BonusExpireTime"]=it.BonusExpireTime
-				itemBackup["BonusStrength"]=it.BonusStrength
-				itemBackup["Broken"]=it.Broken
-				itemBackup["Charges"]=it.Charges
-				itemBackup["Condition"]=it.Condition
-				itemBackup["Hardened"]=it.Hardened
-				itemBackup["Identified"]=it.Identified
-				itemBackup["MaxCharges"]=it.MaxCharges
-				itemBackup["Number"]=it.Number
-				itemBackup["Owner"]=it.Owner
-				itemBackup["Refundable"]=it.Refundable
-				itemBackup["Stolen"]=it.Stolen
-				itemBackup["TemporaryBonus"]=it.TemporaryBonus
-				
-				--substitute item
-				it.BodyLocation=t.Item.BodyLocation
-				it.Bonus=t.Item.Bonus
-				it.Bonus2=t.Item.Bonus2
-				it.BonusExpireTime=t.Item.BonusExpireTime
-				it.BonusStrength=t.Item.BonusStrength
-				it.Broken=t.Item.Broken
-				it.Charges=t.Item.Charges
-				it.Condition=t.Item.Condition
-				it.Hardened=t.Item.Hardened
-				it.Identified=t.Item.Identified
-				it.MaxCharges=t.Item.MaxCharges
-				it.Number=t.Item.Number
-				it.Owner=t.Item.Owner
-				it.Refundable=t.Item.Refundable
-				it.Stolen=t.Item.Stolen
-				it.TemporaryBonus=t.Item.TemporaryBonus
-			else
-				return
-			end
-			mawRefresh(playerIndex)
-			mawRefresh(playerIndex)
-			
-			local newDPS1, newDPS2, newDPS3, newVitality=calcPowerVitality(pl)
-			local increaseDPSPercent=round(math.max(newDPS1, newDPS2, newDPS3)/math.max(oldDPS1, oldDPS2, oldDPS3)*10000-10000)/100
-			local increaseVitalityPercent=round(newVitality/oldVitality*10000-10000)/100
-			if increaseDPSPercent<0 then
-				t.Description = t.Description .. "\n\n" .. "Power: " .. StrColor(255,0,0,increaseDPSPercent .. "%")
-			elseif increaseDPSPercent>0 then
-				t.Description = t.Description .. "\n\n" .. "Power: " .. StrColor(0,255,0,"+" .. increaseDPSPercent .. "%")
-			end
-			if increaseVitalityPercent<0 then
-				t.Description = t.Description .. "\n" .. "Vitality: " .. StrColor(255,0,0, increaseVitalityPercent .. "%")
-			elseif increaseVitalityPercent>0 then
-				t.Description = t.Description .. "\n" .. "Vitality: " .. StrColor(0,255,0,"+" .. increaseVitalityPercent .. "%")
-			end
-			--restore item
-			it.BodyLocation=itemBackup["BodyLocation"]
-			it.Bonus=itemBackup["Bonus"]
-			it.Bonus2=itemBackup["Bonus2"]
-			it.BonusExpireTime=itemBackup["BonusExpireTime"]
-			it.BonusStrength=itemBackup["BonusStrength"]
-			it.Broken=itemBackup["Broken"]
-			it.Charges=itemBackup["Charges"]
-			it.Condition=itemBackup["Condition"]
-			it.Hardened=itemBackup["Hardened"]
-			it.Identified=itemBackup["Identified"]
-			it.MaxCharges=itemBackup["MaxCharges"]
-			it.Number=itemBackup["Number"]
-			it.Owner=itemBackup["Owner"]
-			it.Refundable=itemBackup["Refundable"]
-			it.Stolen=itemBackup["Stolen"]
-			it.TemporaryBonus=itemBackup["TemporaryBonus"]
-			mawRefresh(playerIndex)
-			mawRefresh(playerIndex)
-			--restore hp
-			pl.HP=hp
-			pl.SP=sp
-			if t.Item.BonusExpireTime%100==32 then
-				buffManaLock()
-			end
-			vars.currentHPPool[i]=maxHP
-			vars.currentManaPool[i]=maxSP
-		end
-	end
-end
 --item level
-function events.BuildItemInformationBox(t)
-	if IsEnchantableItem(t.Item) then 
-		if t.Description then
-			
-			local levelRequired=GetLevelRquirement(t.Item)
-			local txt="\n\nLevel Required: " .. levelRequired 
-			local id=Game.CurrentPlayer
-			if id<0 or id>Party.High then
-				id=0
-			end
-			local plLvl=Party[id].LevelBase
-			if plLvl<levelRequired then
-				txt=StrColor(255,0,0,txt)
-			end
-			if t.Item.BonusExpireTime>100 and t.Item.BonusExpireTime<200 then
-				txt=StrColor(120, 240, 255,"\n\nCelestial Items cannot be upgraded with crafting Gems or Cubes, but scale with player level, up to level 600.")
-				if vars.madnessMode then
-					txt=StrColor(120, 240, 255,"\n\nCelestial Items cannot be upgraded with crafting Gems or Cubes, but scale with player level, up to level 1000.")
-				end
-			end
-			t.Description = t.Description .. txt
-			
-		end	
-		
-		--attack speed tooltip
-		local skill=t.Item:T().Skill
-		if table.find(twoHandedAxes, t.Item.Number) or table.find(oneHandedAxes, t.Item.Number) then
-			skill=3
-		end
-		if t.Type and baseRecovery[skill] then
-			t.Type = t.Type .. "\nAttack Speed: " .. getItemRecovery(t.Item, 0)/100
-		end
-	end
-end
 
 function calculateStatsAdd(item, stats)
 	statValue={}
@@ -2846,7 +2508,7 @@ function calculateStatsAdd(item, stats)
 		--maxcharges mult
 		MaxCharges=item.MaxCharges
 		--if MaxCharges <= 20 then
-			mult=1+MaxCharges/20
+			mult=MawCore.Formulas.chargesStatMult(MaxCharges)
 		--else
 		--	mult=2+2*(MaxCharges-20)/20
 		--end
@@ -2870,37 +2532,6 @@ function calculateStatsAdd(item, stats)
 	end	
 	return statValue
 end
-
-function getNewArmor(it)
-	local txt=it:T()
-	local charges=it.MaxCharges
-	if txt.EquipStat>=3 and txt.EquipStat<=9 then
-		local ac3=txt.Mod2+txt.Mod1DiceCount
-		local n=it.Number
-		if charges>0 then
-			if ac3>0 then
-				local lookup=0
-				while txt.NotIdentifiedName==Game.ItemsTxt[n+lookup+1].NotIdentifiedName do 
-					lookup=lookup+1
-				end
-				local ac=txt.Mod2+txt.Mod1DiceCount 
-				local ac2=Game.ItemsTxt[n+lookup].Mod2+Game.ItemsTxt[n+lookup].Mod1DiceCount 
-				local bonusAC=ac2*(charges/20)
-				if charges <= 20 then
-					ac3=ac3+round(bonusAC)
-				else
-					local bonusAC=(ac+ac2)*(charges/20)
-					ac3=ac3+round(bonusAC)
-				end				
-			end
-		end
-		return ac3	
-	else
-		return 0
-	end
-end
-
-
 
 
 function events.ModifyItemDamage(t)
@@ -2928,13 +2559,17 @@ function events.CalcStatBonusByItems(t)
 	if vars.BlackPotions and vars.BlackPotions[t.PlayerIndex] and vars.BlackPotions[t.PlayerIndex][t.Stat+1] then
 		t.Result=t.Result+vars.BlackPotions[t.PlayerIndex][t.Stat+1]
 	end
+
+	if t.Stat==const.Stats.ArmorClass then
+		t.Result=t.Result-Game.GetStatisticEffect(t.Player:GetSpeed())
+	end
 end
 
 --get artifacts Skills
 function events.GetSkill(t)
 	local bonus=0
 	if t.Skill>=12 and t.Skill<=20 then
-		bonus = plItemsStats[t.PlayerIndex][table.find(equipSpellMap,t.Skill)]
+		bonus = plItemsStats[t.PlayerIndex][equipSpellSlot[t.Skill]]
 	end
 	if plItemsStats[t.PlayerIndex] and plItemsStats[t.PlayerIndex][t.Skill+50] then
 		bonus = bonus+plItemsStats[t.PlayerIndex][t.Skill+50]
@@ -2962,8 +2597,7 @@ function events.GameInitialized2()
 	--weapons and armors
     referenceAC = {}
     referenceWeaponAttack = {}
-    referenceWeaponSides = {}
-	
+
     for i = 0, 2199 do
         local txt = Game.ItemsTxt
         local lookup = 0
@@ -2977,14 +2611,12 @@ function events.GameInitialized2()
         elseif txt[i].Skill <= 7 or txt[i].Skill==39 then
             -- Weapons
             referenceWeaponAttack[i] = txt[i + lookup].Mod2
-            referenceWeaponSides[i] = txt[i + lookup].Mod1DiceSides
         end
     end
 	if isRedone and Game.ItemsTxt.High>2200 then
 		local txt = Game.ItemsTxt[2205]
 		for i=1,5 do
 			referenceWeaponAttack[i+2200] = txt.Mod2
-			referenceWeaponSides[i+2200] = txt.Mod1DiceSides
 		end
 	end
 end
@@ -3001,439 +2633,323 @@ local bonusBaseEnchantSkill={
 }
 
 --RECALCULATE THE WHOLE ITEMS EFFECTS
-function itemStats(index)
-	if index==-1 or index==nil then
-		return 0
+--two phases with the snapshot published between them: MawCore/NOTES.md
+
+--built lazily: the axe lists don't exist yet at init time (NOTES.md)
+local artArmorsSet, artWeaponsSet, oneHandedAxesSet, twoHandedAxesSet
+local ancientWeaponsSet, meditationBonusItemSet
+local function makeSet(list, set)
+	set=set or {}
+	for i=1,#list do
+		set[list[i]]=true
 	end
-	local id=0
-	for i=0,Party.High do 
-		if Party[i]:GetIndex()==index then
-			id=i
-		end
+	return set
+end
+local function buildSets()
+	if artArmorsSet then
+		return
 	end
-	if id>Party.High then return end
-	local pl=Party[id]
-	tab=plItemsStats[index]
-	
-	--set all to 0
-	tab={}
-	for i=1,50 do
-		tab[i]=0
+	artArmorsSet=makeSet(artArmors)
+	artWeaponsSet=makeSet(artWeap2h, makeSet(artWeap1h))
+	oneHandedAxesSet=makeSet(oneHandedAxes)
+	twoHandedAxesSet=makeSet(twoHandedAxes)
+	ancientWeaponsSet=makeSet(ancientWeapons)
+	meditationBonusItemSet=makeSet(meditationBonusItemMap)
+end
+
+--ancientWeapons are listed inside artWeap1h/2h, so they answer true here too
+function IsArtifactWeapon(it)
+	buildSets()
+	return artWeaponsSet[it.Number]==true
+end
+
+--Every artifact, not just the ones on the weapon/armor lists: rings, belts and
+--amulets are in neither, and they still need one level and one power budget.
+function IsArtifactItem(it)
+	return IsArtifactId(it.Number) or IsArtifactWeapon(it) or artArmorsSet[it.Number]==true
+end
+
+--phase 1: armor/shield AC accumulated into the globals armorAC/shieldAC
+--(read by the armor-skill scaling and the armor skill tooltips) and tab[10]
+local function collectArmorAC(pl, index, it, txt, tab)
+	if not ((txt.Skill>=8 and txt.Skill<=11) or (txt.Skill==40 and txt.EquipStat~=12)) then
+		return
 	end
-	local gotShieldEnchant=false
-	--used for armor skill	
-	shieldAC=0
-	armorAC=0
-	vars.normalEnchantResistance=vars.normalEnchantResistance or {}
-	vars.normalEnchantResistance[index]={}
-	for i=11,16 do
-		vars.normalEnchantResistance[index][i]=0
+	local ac=txt.Mod1DiceCount+txt.Mod2
+	local acBonus=ac
+	if it.MaxCharges>0 and not artArmorsSet[it.Number] then
+		acBonus=ac+round(MawCore.Formulas.chargesArmorAC(referenceAC[it.Number], it.MaxCharges))
 	end
-	--iterate once for legendaries
-	vars.legendaries=vars.legendaries or {}
-	vars.legendaries[index]={}
-	for it in pl:EnumActiveItems() do
-		if it.BonusExpireTime>10 and it.BonusExpireTime<1000 then
-			table.insert(vars.legendaries[index], it.BonusExpireTime%100)
-		end
+	if artArmorsSet[it.Number] then
+		local power=MawCore.ItemLevel.PowerFor(MawCore.Artifacts.LevelOf(it))
+		acBonus=ac+round(MawCore.Formulas.chargesArmorAC(referenceAC[it.Number], power))
+		acBonus=math.ceil(acBonus*MawCore.Artifacts.BaseMult(it))
 	end
-	--iterate items and get bonuses
-	for it in pl:EnumActiveItems() do
-		updateCelestialItem(it,pl)
-		--maxcharges fix for moon cloak
-		if it.Number==1349 or it.Number==1350 then
-			it.MaxCharges=0
-		end
-		
-		local txt=it:T()
-		if (txt.Skill>=8 and txt.Skill<=11) or (txt.Skill==40 and txt.EquipStat~=12) then --AC from items
-			local mult=0
-			local resMult=0
-			local skill=it:T().Skill
-			local slot=it:T().EquipStat
-						
-			local ac=txt.Mod1DiceCount+txt.Mod2
-			local acBonus=ac
-			if it.MaxCharges>0 and not table.find(artArmors,it.Number) then 
-				local ac2=referenceAC[it.Number]
-				local maxCharges=it.MaxCharges
-				--[[
-				if vars.insanityMode then
-					maxCharges=math.ceil(maxCharges*4/3)
-				end
-				]]
-				local bonusAC=ac2*(maxCharges/40)
-				acBonus=ac+round(bonusAC)
-			end
-			--artifacts
-			if table.find(artArmors,it.Number) then 
-				artifactMult=artifactPowerMult(pl.LevelBase, true, it.BonusExpireTime)
-				acBonus=math.ceil(acBonus*artifactMult)
-			end
-			acBonus=round(acBonus*(1+mult))
-			
-			
-			--used later
-			if skill==8 then
-				shieldAC=shieldAC+acBonus
-			else
-				armorAC=armorAC+acBonus
-			end
-			if vars.legendaries and vars.legendaries[pl:GetIndex()] and table.find(vars.legendaries[pl:GetIndex()], 28) then
-				acBonus=acBonus*2
-			end
-			tab[10]=tab[10]+acBonus
-		end
-				
-		
-		if it.Bonus>0 then 
-			local power=it.BonusStrength
-			if vars.itemStatsFix then
-				if (it.Bonus==8 or it.Bonus==9) then
-					local mult=GetSlotMult(it)
-					power=round(power*(1+math.min(power/50/mult,5)))
-				elseif it.Bonus==10 then
-					--power=round(power*0.667)
-				end
-			end
-			--[[
-			if vars.insanityMode then
-				power=math.ceil(power*4/3)
-			end
-			]]
-			if it.BonusExpireTime%100==20 then
-				power=math.ceil(power*1.5)
-			end
-			if it:T().EquipStat==5 and it:T().Mod2==0 then
-				power=math.ceil(power*1.5)
-			end
-			if it.Bonus<=10 then
-				tab[it.Bonus]=tab[it.Bonus]+power
-				--legendary power 12
-				if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 12) then
-					if it.Bonus==1 or it.Bonus==5 then -- might or accuracy
-						tab[2]=tab[2]+power*0.4 -- intellect
-						tab[3]=tab[3]+power*0.4 -- personality
-					elseif it.Bonus==2 or it.Bonus==3 then -- intellect or personality
-						tab[1]=tab[1]+power*0.4 -- might
-						tab[5]=tab[5]+power*0.4 -- accuracy
-					end
-				end
-			elseif it.Bonus<=16 then
-				vars.normalEnchantResistance[index][it.Bonus]=math.max(vars.normalEnchantResistance[index][it.Bonus], power+10)		
-			else
-				local tabNumber=bonusBaseEnchantSkill[it.Bonus]+50
-				tab[tabNumber]=tab[tabNumber] or 0
-				tab[tabNumber]=tab[tabNumber]+power
-				--tab[tabNumber]=math.max(tab[tabNumber] or 0, it.BonusStrength)
+	acBonus=round(acBonus*ItemQualityMult(it))
+	--used later by the armor-skill scaling
+	if txt.Skill==8 then
+		shieldAC=shieldAC+acBonus
+	else
+		armorAC=armorAC+acBonus
+	end
+	if table.find(vars.legendaries[index], 28) then
+		acBonus=acBonus*1.5
+	end
+	tab[10]=tab[10]+acBonus
+end
+
+--phase 1: one base enchant (it.Bonus, or the second one from GetEnc2):
+--stats 1-10 into tab, resistances 11-16 into vars.normalEnchantResistance,
+--skill enchants into the +50 slots (first enchant only, as before)
+local function collectEnchant(index, it, bonus, power, tab, isSecond)
+	--HP/SP enchants scale on read, not baked into BonusStrength at generation
+	if bonus==8 or bonus==9 then
+		power=round(MawCore.Formulas.vitalityEnchantPower(power, GetSlotMult(it)))
+	end
+	local txt=it:T()
+	if txt.EquipStat==5 and txt.Mod2==0 then
+		power=math.ceil(power*1.5)
+	end
+	if bonus<=10 then
+		tab[bonus]=tab[bonus]+power
+		--legendary power 12: stat enchants echo into their counterparts
+		if table.find(vars.legendaries[index], 12) then
+			if bonus==1 or bonus==5 then -- might or accuracy
+				tab[2]=tab[2]+power*0.4 -- intellect
+				tab[3]=tab[3]+power*0.4 -- personality
+			elseif bonus==2 or bonus==3 then -- intellect or personality
+				tab[1]=tab[1]+power*0.4 -- might
+				tab[5]=tab[5]+power*0.4 -- accuracy
 			end
 		end
-		--fix for double enchants
-		if it.Bonus2==62 then
-			tab[74]=tab[74] or 0
-			tab[74]=tab[74]+3
-			tab[84]=tab[84] or 0
-			tab[84]=tab[84]+3
-		end		
-		if HasEnc2(it) then
-			local bonus,power=GetEnc2(it)
-			if vars.itemStatsFix then
-				if (bonus==8 or bonus==9) then
-					local mult=GetSlotMult(it)
-					power=round(power*(1+math.min(power/50/mult,5)))
-				elseif bonus==10 then
-					--power=round(power*0.667)
-				end
-			end
-			--[[
-			if vars.insanityMode then
-				power=math.ceil(power*4/3)
-			end
-			]]
-			if it.BonusExpireTime%100==20 then
-				power=math.ceil(power*1.5)
-			end
-			if it:T().EquipStat==5 and it:T().Mod2==0 then
-				power=math.ceil(power*1.5)
-			end
-			if bonus<=10 then
-				tab[bonus]=tab[bonus]+power
-				--legendary power 12
-				if vars.legendaries and vars.legendaries[index] and table.find(vars.legendaries[index], 12) then
-					if bonus==1 or bonus==5 then -- might or accuracy
-						tab[2]=tab[2]+power*0.4 -- intellect
-						tab[3]=tab[3]+power*0.4 -- personality
-					elseif bonus==2 or bonus==3 then -- intellect or personality
-						tab[1]=tab[1]+power*0.4 -- might
-						tab[5]=tab[5]+power*0.4 -- accuracy
-					end
-				end
-			elseif vars.normalEnchantResistance and vars.normalEnchantResistance[index] and vars.normalEnchantResistance[index][bonus] then
-				vars.normalEnchantResistance[index][bonus]=math.max(vars.normalEnchantResistance[index][bonus], power)	
-			end
-		end		
-		--bolster mult
-		mult=1+it.MaxCharges/20
-		--[[
-		if vars.insanityMode then
-			mult=mult*4/3
+	elseif bonus<=16 then
+		local res=vars.normalEnchantResistance[index]
+		local value=power
+		if not isSecond then
+			value=power+10
 		end
-		]]
-		if it.Bonus2==36 then
-			gotShieldEnchant=true
-		end
-		if it.Bonus2>0 then
-			bonusData = bonusEffects[it.Bonus2]
-			if bonusData then
-				if bonusData.bonusRange then
-					for i=bonusData.bonusRange[1], bonusData.bonusRange[2] do
-						tab[i]=tab[i]+bonusData.statModifier*mult
-					end
-				elseif bonusData.bonusValues then
-					for i =1, 3 do
-						if bonusData.bonusValues[i] then
-							 modifier = bonusData.statModifier
-							if type(modifier) == "table" then
-								tab[bonusData.bonusValues[i]] = round(tab[bonusData.bonusValues[i]] + modifier[i] * mult)
-							else
-								tab[bonusData.bonusValues[i]] = round(tab[bonusData.bonusValues[i]] + modifier * mult)
-							end
+		value=MawCore.Formulas.resistanceEnchantPower(value, GetItemEquipStat(it)==10)
+		res[bonus]=math.max(res[bonus] or 0, value)
+	elseif not isSecond then
+		local slot=bonusBaseEnchantSkill[bonus]+50
+		tab[slot]=(tab[slot] or 0)+power
+	end
+end
+
+--phase 1: equipment effects keyed by the special-enchant id (it.Bonus2)
+local function collectEquipEffects(it, tab)
+	--fix for double enchants
+	if it.Bonus2==62 then
+		tab[74]=(tab[74] or 0)+3
+		tab[84]=(tab[84] or 0)+3
+	end
+	if it.Bonus2>0 then
+		local bonusData=bonusEffects[it.Bonus2]
+		if bonusData then
+			local mult=MawCore.Formulas.chargesStatMult(it.MaxCharges) --bolster mult
+			if bonusData.bonusRange then
+				for i=bonusData.bonusRange[1], bonusData.bonusRange[2] do
+					tab[i]=tab[i]+bonusData.statModifier*mult
+				end
+			elseif bonusData.bonusValues then
+				for i=1,3 do
+					if bonusData.bonusValues[i] then
+						local modifier=bonusData.statModifier
+						if type(modifier)=="table" then
+							tab[bonusData.bonusValues[i]]=round(tab[bonusData.bonusValues[i]]+modifier[i]*mult)
+						else
+							tab[bonusData.bonusValues[i]]=round(tab[bonusData.bonusValues[i]]+modifier*mult)
 						end
 					end
 				end
 			end
 		end
+	end
+	--equipment spell-school bonuses (slots 26-34, read by events.GetSkill)
+	if equipSpellMap[it.Bonus2] then
+		tab[it.Bonus2]=(tab[it.Bonus2] or 0)+MawCore.Formulas.chargesSchoolSkill(it.MaxCharges)
+	end
+	if meditationBonusItemSet[it.Bonus2] then
+		local slot=50+const.Skills.Meditation
+		tab[slot]=(tab[slot] or 0)+MawCore.Formulas.chargesMeditationSkill(it.MaxCharges)
+	end
+end
 
-		
-		--weapons
-		if txt.Skill <= 7 or txt.Skill==39 then
-			
-			local mainWeapon=pl:GetActiveItem(1)
-			if not table.find(ancientWeapons, it.Number) and mainWeapon and mainWeapon:T().Skill==7 then
-				goto continue
-			end
-		
-			local bonus = txt.Mod2
-			local bonus2 = referenceWeaponAttack[it.Number]
-			local bonusATK
-			--bolster mult
-			maxCharges=it.MaxCharges
-			--[[
-			if vars.insanityMode then
-				maxCharges=math.ceil(maxCharges*4/3)
-			end
-			]]
-			bonusATK = bonus2 * (maxCharges / 30)
-			
-			bonus = bonus + round(bonusATK)
 
-			local sides = txt.Mod1DiceSides
-			local sides2 = referenceWeaponSides[it.Number]
-			local sidesBonus
-			
-			sidesBonus = sides2 * (maxCharges / 30)
-			
-			sidesBonus = sides + round(sidesBonus)
-			
-			if table.find(artWeap1h,it.Number) or table.find(artWeap2h,it.Number) then 
-				if txt.EquipStat<=1 then
-					artifactMult=artifactPowerMult(pl.LevelBase, false, it.BonusExpireTime)
-					bonus=math.ceil(txt.Mod2*artifactMult)
-					sidesBonus=math.ceil(txt.Mod1DiceSides*artifactMult)
-				end
-			end	
-			
-			local skill=txt.Skill
-			--minotaur fix
-			if table.find(oneHandedAxes, it.Number) or table.find(twoHandedAxes, it.Number) then
-				skill=3
-			end	
-			
-			--armsmaster
-			local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
-			local requirement=GetArmsmasterSupremeRequirement()
-			if pl.Class>=16 and pl.Class<=19 and s>=requirement and m==4 then
-				m=5
-			end
-		
-			--weapon 
-			local s2,m2=SplitSkill(pl:GetSkill(skill))
-			
-			--bow
-			if skill==5 then
-				bonus=bonus+s2
-			end
-			
-			if skill==0 then
-				if m2==4 then
-					s,m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
-					s=s/2
-				else
-					s=0
-					m=0
-				end
-			end
-			
-			local mult=1
-			if skillDamage[skill] then
-				mult=(1+s2*skillDamage[skill][m2]/100)
-			end
-			
-			
-			
-			local side=math.max(sidesBonus*mult)
-			local add=math.max(bonus*mult)
-			local armsDmg=armsmasterSkill.Damage[m]*s*mult
-			
-			--mino nerf
-			local axeCount=0
-			local axeDamageMult=1
-			for k=0,1 do
-				local it=pl:GetActiveItem(k)
-				if it then
-					if table.find(oneHandedAxes, it.Number) then
-						axeCount=axeCount+1
-					elseif table.find(twoHandedAxes, it.Number) then
-						axeCount=axeCount+1
-						axeDamageMult=axeDamageMult-0.1
-					end
-				end
-			end
-			if axeCount==2 then
-				side=side*axeDamageMult
-				add=add*axeDamageMult
-			end
-			--substitute with unarmed if staff
-			if skill==0 then
-				armsDmg=skillDamage[33][m]*s*mult
-			end
-			
-			
-			--make classes such as DK, SERAPH,SHAMAN to make their bonus work in a similar way as armsmaster
-			--DK
-			if table.find(dkClass, pl.Class) then	
-				local s1, m1=SplitSkill(pl.Skills[const.Skills.Water])
-				local s2, m2=SplitSkill(pl.Skills[const.Skills.Dark])
-				local bonus=s1*math.min(m1, 3)/2+s2*math.min(m2, 3)/2
-				armsDmg=armsDmg+bonus*mult
-			end
-			--SERAPHIM
-			if table.find(seraphClass, pl.Class) then	
-				local s1, m1=SplitSkill(pl.Skills[const.Skills.Mind])
-				local mindBonus=s1*(m1+1)
-				armsDmg=armsDmg+mindBonus*mult
-			end
-			--SHAMAN
-			if table.find(shamanClass, pl.Class) then	
-				local s,m=SplitSkill(pl.Skills[const.Skills.Earth])
-                armsDmg=armsDmg+s*m*mult
-			end
-			if table.find(assassinClass,pl.Class) then
-				local s,m=SplitSkill(pl.Skills[const.Skills.Earth])
-                armsDmg=armsDmg+s*(2+m*2)*mult
-				
-				--needed to reduce damage when target is not isolated
-				vars.assassinDamage=vars.assassinDamage or {}
-				vars.assassinDamage[pl:GetIndex()]=armsDmg
-				if vars.MAWSETTINGS.buffRework=="ON" then 
-					if Party.SpellBuffs[9].ExpireTime>=Game.Time then
-						local s,m=getBuffSkill(51)
-						heroismMult=(buffPower[51].Base[m]/100+buffPower[51].Scaling[m]*s/1000)
-						vars.assassinDamage[pl:GetIndex()]=vars.assassinDamage[pl:GetIndex()]*(1+heroismMult)
-					end
-				end
-				
-			end
-			--split armsmaster between main and offhand
-			local item=pl:GetActiveItem(0)
-			if item and skill ~= 5 and item:T().Skill~=8 then
-				if skill~=8 then
-					armsDmg=armsDmg/2
-				end
-			end
-			if skill==7 then
-				armsDmg=0
-			end
-			
-			local totBonus=armsDmg+add
-			if skill ~= 5 then
-				tab[40] = tab[40] + round(bonus)
-				tab[41] = tab[41] + round(bonus)
-				tab[42] = tab[42] + txt.Mod1DiceCount+round(totBonus)
-				tab[43] = tab[43] + round(side)*txt.Mod1DiceCount+round(totBonus)
-			else
-				tab[44] = tab[44] + round(bonus)
-				tab[45] = tab[45] + round(bonus)
-				tab[46] = tab[46] + round(txt.Mod1DiceCount)+add
-				tab[47] = tab[47] + round(side)*txt.Mod1DiceCount+add
-			end
-			::continue::
+local function collectArtifactBonuses(pl, it, tab)
+	local bonuses=MawCore.Artifacts.BonusesOf(it)
+	if not bonuses then
+		return
+	end
+	for key,value in pairs(bonuses.Stats) do
+		tab[key+1]=tab[key+1]+value
+	end
+	for key,value in pairs(bonuses.Skills) do
+		tab[key+50]=(tab[key+50] or 0)+value
+	end
+end
+
+--phase 2: weapon attack/damage rows (40-43 melee, 44-47 bow); every skill
+--read here sees the published snapshot
+local function addWeaponRows(pl, index, it, txt, tab, floorPaid)
+	if txt.Skill>7 and txt.Skill~=39 then
+		return
+	end
+	--blaster in the main hand disables the offhand weapon
+	local mainWeapon=pl:GetActiveItem(1)
+	if not ancientWeaponsSet[it.Number] and mainWeapon and mainWeapon:T().Skill==7 then
+		return
+	end
+	--item-level weapon damage replaces base Mod2/sides and charge scaling
+	local bonus,sidesBonus=GetWeaponDamageRows(it)
+	local skill=txt.Skill
+	--minotaur fix
+	if oneHandedAxesSet[it.Number] or twoHandedAxesSet[it.Number] then
+		skill=3
+	end
+	--armsmaster
+	local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
+	local requirement=GetArmsmasterSupremeRequirement()
+	if pl.Class>=16 and pl.Class<=19 and s>=requirement and m>=4 then
+		m=5
+	end
+	--weapon
+	local s2,m2=SplitSkill(pl:GetSkill(skill))
+	--bow
+	if skill==5 then
+		bonus=bonus+s2
+	end
+	if skill==0 then
+		if m2>=4 then
+			s,m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
+			s=s/2
+		else
+			s=0
+			m=0
 		end
-		
-		--skills
-		if equipSpellMap[it.Bonus2] then
-			tab[it.Bonus2]=tab[it.Bonus2] or 0
-			local maxCharges=it.MaxCharges
-			--[[
-			if vars.insanityMode then
-				maxCharges=math.ceil(maxCharges*4/3)
-			end
-			]]
-			tab[it.Bonus2]=tab[it.Bonus2] + (5 +  math.floor(maxCharges/4))
-		end
-		
-		if table.find(meditationBonusItemMap, it.Bonus2) then
-			local maxCharges=it.MaxCharges
-			--[[
-			if vars.insanityMode then
-				maxCharges=math.ceil(maxCharges*4/3)
-			end
-			]]
-			tab[50+const.Skills.Meditation]=tab[50+const.Skills.Meditation] or 0
-			tab[50+const.Skills.Meditation]=tab[50+const.Skills.Meditation] + (3 +  math.floor(maxCharges/20*3))
-		end
-		--artifacts stats bonus
-		
-		if artifactStatsBonus[it.Number] then
-			artifactMult=artifactPowerMult(pl.LevelBase, false, it.BonusExpireTime)
-			for key,value in pairs(artifactStatsBonus[it.Number]) do
-				tab[key+1]=tab[key+1]+value*artifactMult
+	end
+	local mult=1
+	if skillDamage[skill] then
+		mult=(1+s2*skillDamage[skill]/100)
+	end
+	local side=math.max(sidesBonus*mult)
+	local add=math.max(bonus*mult)
+	local armsDmg=armsmasterSkill.Damage[m]*s*mult
+	--mino nerf
+	local axeCount=0
+	local axeDamageMult=1
+	for k=0,1 do
+		local held=pl:GetActiveItem(k)
+		if held then
+			if oneHandedAxesSet[held.Number] then
+				axeCount=axeCount+1
+			elseif twoHandedAxesSet[held.Number] then
+				axeCount=axeCount+1
+				axeDamageMult=axeDamageMult-0.1
 			end
 		end
-		--artifacts skill bonuses
-		if artifactSkillBonus[it.Number] then
-			artifactMult=artifactPowerMult(pl.LevelBase, false, it.BonusExpireTime)
-			for key,value in pairs(artifactSkillBonus[it.Number]) do
-				tab[key+50]=tab[key+50] or 0
-				tab[key+50]=tab[key+50]+round(value*artifactMult)
+	end
+	if axeCount==2 then
+		side=side*axeDamageMult
+		add=add*axeDamageMult
+	end
+	--substitute with unarmed if staff
+	if skill==0 then
+		armsDmg=skillDamage[33]*s*mult
+	end
+	--make classes such as DK, SERAPH, SHAMAN gain their bonus the armsmaster way
+	--(halved together with the armsmasterSkill.Damage nerf)
+	--DK
+	if table.find(dkClass, pl.Class) then
+		local s1, m1=SplitSkill(pl.Skills[const.Skills.Water])
+		local s2, m2=SplitSkill(pl.Skills[const.Skills.Dark])
+		local bonus=GetGradualMasteryValue(dkDamageSkill, s1, m1)*s1
+			+GetGradualMasteryValue(dkDamageSkill, s2, m2)*s2
+		armsDmg=armsDmg+bonus*mult
+	end
+	--SERAPHIM
+	if table.find(seraphClass, pl.Class) then
+		local s1, m1=SplitSkill(pl.Skills[const.Skills.Mind])
+		local mindBonus=s1*(m1+1)/2
+		armsDmg=armsDmg+mindBonus*mult
+	end
+	--SHAMAN
+	if table.find(shamanClass, pl.Class) then
+		local s,m=SplitSkill(pl.Skills[const.Skills.Earth])
+		armsDmg=armsDmg+s*m/2*mult
+	end
+	if table.find(assassinClass,pl.Class) then
+		local s,m=SplitSkill(pl.Skills[const.Skills.Earth])
+		armsDmg=armsDmg+s*(1+m)*mult
+		--needed to reduce damage when target is not isolated
+		vars.assassinDamage=vars.assassinDamage or {}
+		vars.assassinDamage[pl:GetIndex()]=armsDmg
+		if vars.MAWSETTINGS.buffRework=="ON" then
+			if Party.SpellBuffs[9].ExpireTime>=Game.Time or potionBuffActive(pl, const.Spells.Heroism) then
+				local s,m=getBuffSkill(51, pl)
+				heroismMult=GetBuffMultiplier(const.Spells.Heroism, s, m)
+				vars.assassinDamage[pl:GetIndex()]=vars.assassinDamage[pl:GetIndex()]*(1+heroismMult)
 			end
 		end
-	end	
-	
-	--special enchant
-	vars.shieldEnchant=vars.shieldEnchant or {}
-	vars.shieldEnchant[index]=gotShieldEnchant
-	
-	--bless
+	end
+	--split armsmaster between main and offhand
+	local item=pl:GetActiveItem(0)
+	if item and skill ~= 5 and item:T().Skill~=8 then
+		if skill~=8 then
+			armsDmg=armsDmg/2
+		end
+	end
+	if skill==7 then
+		armsDmg=0
+	end
+	--floor: a weapon skill point is always worth at least 1 average damage.
+	--armsDmg/mult recovers what the percentage is applied to, so the top-up is
+	--only what the percentage failed to deliver on a weak weapon
+	--the top-up is a skill bonus, so a second weapon of the same skill does not
+	--earn it again (the percentage above is per weapon and stays per weapon)
+	if skillDamage[skill] and not (floorPaid and floorPaid[skill]) then
+		if floorPaid then
+			floorPaid[skill]=true
+		end
+		local scalable=bonus+sidesBonus*txt.Mod1DiceCount/2+armsDmg/mult
+		add=add+math.max(s2-scalable*(mult-1),0)
+	end
+	local totBonus=armsDmg+add
+	if skill ~= 5 then
+		tab[40] = tab[40] + round(bonus)
+		tab[41] = tab[41] + round(bonus)
+		tab[42] = tab[42] + txt.Mod1DiceCount+round(totBonus)
+		tab[43] = tab[43] + round(side)*txt.Mod1DiceCount+round(totBonus)
+	else
+		tab[44] = tab[44] + round(bonus)
+		tab[45] = tab[45] + round(bonus)
+		tab[46] = tab[46] + round(txt.Mod1DiceCount)+add
+		tab[47] = tab[47] + round(side)*txt.Mod1DiceCount+add
+	end
+end
+
+--phase 2: bless adds flat attack to both rows
+local function addBless(pl, tab)
 	if vars.MAWSETTINGS.buffRework=="ON" then
 		if pl.SpellBuffs[1].ExpireTime>=Game.Time then
-			local s,m, level=getBuffSkill(46)
+			local s,m, level=getBuffSkill(46, pl)
 			local blessBonus=(buffPower[46].Base[m]+level/4)*(1+buffPower[46].Scaling[m]*s/100)
 			tab[40] = tab[40] + blessBonus
 			tab[44] = tab[44] + blessBonus
 		end
 	end
-	
-	--armor skill multiplier
+end
+
+--phase 2: armor/shield skill scales the accumulated armorAC/shieldAC into
+--AC and resistances; also feeds the armor skill tooltip globals
+local function addArmorSkillAC(pl, tab)
 	local armorMult=0
 	local armorResMult=0
-	local shieldMult=0
-	local shieldResMult=0
 	local bodyS=0
 	local bodyM=0
 	local it=pl:GetActiveItem(3)
 	if it then
-		bodyArmorSkill=it:T().Skill
+		local bodyArmorSkill=it:T().Skill
 		bodyS, bodyM=SplitSkill(pl:GetSkill(bodyArmorSkill))
 		armorMult=skillItemAC[bodyArmorSkill][bodyM]*bodyS/100
 		armorResMult=skillItemRes[bodyArmorSkill][bodyM]*bodyS/100
@@ -3441,7 +2957,7 @@ function itemStats(index)
 	local s,m=SplitSkill(pl:GetSkill(const.Skills.Shield))
 	local shieldMult=(skillItemAC[const.Skills.Shield][m]*s/100)
 	local shieldResMult=(skillItemRes[const.Skills.Shield][m]*s/100)
-	
+
 	itemArmorClassBonus1=math.round(armorAC*armorMult)
 	if armorAC>=1 and vars.AusterityMode then
 		itemArmorClassBonus1=math.max(itemArmorClassBonus1,math.round(bodyS*bodyM)*2)
@@ -3451,7 +2967,7 @@ function itemStats(index)
 		itemArmorClassBonus2=math.max(itemArmorClassBonus2,math.round(s*m)*2)
 	end
 	tab[10]=tab[10]+itemArmorClassBonus1+itemArmorClassBonus2
-	
+
 	itemResistanceBonus1=math.round(armorAC*armorResMult)
 	if armorAC>=1 and vars.AusterityMode then
 		itemResistanceBonus1=math.max(itemResistanceBonus1,math.round(bodyS*bodyM)*2)
@@ -3460,12 +2976,13 @@ function itemStats(index)
 	if shieldAC>=1 and vars.AusterityMode then
 		itemResistanceBonus2=math.max(itemResistanceBonus2,math.round(s*m)*2)
 	end
-	
 	for i=11,16 do
 		tab[i]=tab[i]+itemResistanceBonus1+itemResistanceBonus2
 	end
-	
-	--dragon
+end
+
+--phase 2: dragons triple their item-derived stats and resistances
+local function applyDragonMult(pl, tab)
 	if Game.CharacterPortraits[pl.Face].Race==const.Race.Dragon then
 		for i=1,16 do
 			tab[i]=tab[i]*3
@@ -3477,179 +2994,187 @@ function itemStats(index)
 			tab[83]=tab[83]*3
 		end
 	end
-	--------------
-	--end of items
-	--------------
-	--buffs
+end
+
+--phase 2: buff-rework party buffs on stats and resistances; returns the
+--endurance buff for the HP calculation
+local function addBuffStats(pl, tab)
 	local enduranceStatBuff=0
 	if vars.MAWSETTINGS.buffRework=="ON" then
 		local buffList={6,0,17,4,12,1}
 		local spellList={3,14,25,36,58,69}
 		local spellStat={[3]=2,[14]=6,[25]=7,[36]=4,[46]=5,[58]=3,[69]=1}
-		--resistances and stats
-		local s, m, level=getBuffSkill(85)
-		local buff2=(buffPower[85].Base[m]+level/2)*(1+buffPower[85].Scaling[m]/100*s/1.5)
-		local s, m, level=getBuffSkill(83)
-		local buff3=(buffPower[83].Base[m]+level/2)*(1+buffPower[83].Scaling[m]/100*s/1.5)
+		--total current stat per tab index (base + potion bonus; tab adds items)
+		local statBase={
+			pl.MightBase+pl.MightBonus,
+			pl.IntellectBase+pl.IntellectBonus,
+			pl.PersonalityBase+pl.PersonalityBonus,
+			pl.EnduranceBase+pl.EnduranceBonus,
+			pl.AccuracyBase+pl.AccuracyBonus,
+			pl.SpeedBase+pl.SpeedBonus,
+			pl.LuckBase+pl.LuckBonus,
+		}
+		local s, m, level=getBuffSkill(85, pl)
+		local buff2=(buffPower[85].Base[m]+level/4)
+			*(1+buffPower[85].Scaling[m]/100*s/DAY_OF_PROTECTION_SKILL_PENALTY)
+		--light: percentage of the total stat
+		local s83, m83=getBuffSkill(83, pl)
+		local lightPct=0
+		if m83>0 then
+			lightPct=GetBuffStatPct(s83, true)
+		end
 		for i=1,6 do
 			local buff=0
-			local statBuff=0
-			if Party.SpellBuffs[buffList[i]].ExpireTime>=Game.Time then
-				local s, m, level=getBuffSkill(spellList[i])
-				buff=(buffPower[spellList[i]].Base[m]+level/2)*(1+buffPower[spellList[i]].Scaling[m]/100*s)
-				buff4=math.max(buff,buff2)
+			local pct=0
+			if Party.SpellBuffs[buffList[i]].ExpireTime>=Game.Time or potionBuffActive(pl, spellList[i]) then
+				local s, m, level=getBuffSkill(spellList[i], pl)
+				buff=(buffPower[spellList[i]].Base[m]+level/4)*(1+buffPower[spellList[i]].Scaling[m]/100*s)
+				if m>0 then
+					--mastery 0 means no source at all; a low-power potion is a NEGATIVE
+					--skill and still has to grant its reduced share
+					pct=GetBuffStatPct(s)
+				end
+			end
+			buff4=math.max(buff, buff2)
+			if buff4>0 then
 				tab[i+10]=tab[i+10]+buff4
 			end
-			statBuff=math.max(buff, buff3)
-			if i==4 then
-				enduranceStatBuff=buff3
-			end
+			pct=math.max(pct, lightPct)
 			local tabID=spellStat[spellList[i]]
+			local statBuff=(tab[tabID]+statBase[tabID])*pct
+			if i==4 then
+				enduranceStatBuff=(tab[tabID]+statBase[tabID])*lightPct
+			end
 			tab[tabID]=tab[tabID]+statBuff
 		end
 		--special case for accuracy, as it comes from bless
-		local accBonus=0
-		local buff=0
+		local accPct=lightPct
 		if pl.SpellBuffs[1].ExpireTime>=Game.Time then
-			local s, m, level=getBuffSkill(46)
-			buff=(buffPower[3].Base[m]+level/2)*(1+buffPower[3].Scaling[m]/100*s)
+			local s,m=getBuffSkill(46, pl)
+			if m>0 then
+				accPct=math.max(accPct, GetBuffStatPct(s))
+			end
 		end
-		accBonus=math.max(buff3, buff)
-		tab[5]=tab[5]+accBonus
+		tab[5]=tab[5]+(tab[5]+statBase[5])*accPct
 		--stoneskin
-		if Party.SpellBuffs[15].ExpireTime>=Game.Time then
-			local s,m,level=getBuffSkill(38)
-			local s2,m2,level2=getBuffSkill(86)
-			s=math.max(s,s2/1.5)
-			m=math.max(m,m2)
-			level=math.max(level,level2)
-			acBonus=(buffPower[38].Base[m]+level/2)*(1+buffPower[38].Scaling[m]/100*s)
+		if Party.SpellBuffs[15].ExpireTime>=Game.Time or potionBuffActive(pl, const.Spells.StoneSkin) then
+			local s,m,level=bestBuffSource(38, pl, buffValueFlat)
+			acBonus=(buffPower[38].Base[m]+level/4)*(1+buffPower[38].Scaling[m]/100*s)
 			tab[10]=tab[10]+acBonus
 		end
 	end
-	--add luck to resistances
+	return enduranceStatBuff
+end
+
+--phase 2: luck feeds all resistances
+local function addLuckRes(pl, tab)
 	local luck=tab[7]+pl.LuckBase+pl.LuckBonus
-	if luck<=21 then
-		luck=(luck-13)/2
-	elseif luck<=100 then
-		luck=math.floor(luck/5)
-	else
-		luck=math.floor(luck/10)+10
-	end
-	
+	local luckEff=Game.GetStatisticEffect(luck)
 	for i=11, 16 do
-		tab[i]=tab[i]+luck -- -penalty
-	end	
-	--BB HP INCREASE
+		tab[i]=tab[i]+luckEff -- -penalty
+	end
+end
+
+--phase 2: endurance + bodybuilding HP into tab[8]; also fills hpStatsMap
+local function addHP(pl, id, tab, enduranceStatBuff)
 	local buffBonus=math.max(Party.SpellBuffs[2].Power,pl.SpellBuffs[16].Power)
 	if enduranceStatBuff>Party.SpellBuffs[2].Power and enduranceStatBuff>pl.SpellBuffs[16].Power then
 		buffBonus=0
 	end
 	local endurance=tab[4]+pl.EnduranceBase+pl.EnduranceBonus+buffBonus
-	local endEff
-	if endurance<=21 then
-		endEff=math.floor((endurance-13)/2)
-	else
-		endEff=math.floor(endurance/5)
-	end
-	
+	local endEff=Game.GetStatisticEffect(endurance)
+
 	local s,m=SplitSkill(pl:GetSkill(const.Skills.Bodybuilding))
-	local m2=m	
-	if m==4 then
+	local m2=m
+	if m>=4 then
 		m2=5
 	end
-	BBHP=s*m2
-	level=pl.LevelBonus+pl.LevelBase
-	hpScaling=Game.Classes.HPFactor[pl.Class]
-	baseHP=Game.Classes.HPBase[pl.Class]+hpScaling*(level+endEff+BBHP)
-	fullHP1=baseHP+tab[8]
-	Endurancebonus=fullHP1*endurance/1000
-	fullHP2=fullHP1+Endurancebonus
-	BBBonus=fullHP2*((m+1)*0.01*s)
-	bbEndBonus=fullHP2+BBBonus-fullHP1
+	local BBHP=s*m2
+	local level=pl.LevelBonus+pl.LevelBase
+	local hpScaling=Game.Classes.HPFactor[pl.Class]
+	local baseHP=Game.Classes.HPBase[pl.Class]+hpScaling*(level+endEff+BBHP)
+	local fullHP1=baseHP+tab[8]
+	local enduranceBonus=fullHP1*endurance/STAT_DAMAGE_DIVISOR
+	local fullHP2=fullHP1+enduranceBonus
+	local BBBonus=fullHP2*(bodybuildingHP[math.min(m,4)]*0.01*s)
+	local bbEndBonus=enduranceBonus+BBBonus+hpScaling*BBHP
 	--used for stats
 	hpStatsMap=hpStatsMap or {}
 	hpStatsMap[id]={
 		["totalhpFromItems"]=round(tab[8]),
-		["totalEnduranceBonus"]=round(Endurancebonus+endEff*hpScaling),
+		["totalEnduranceBonus"]=round(enduranceBonus+endEff*hpScaling),
 		["totalBBBonus"]=round(BBBonus+s*m2*hpScaling),
 		["totalBaseHP"]=round(Game.Classes.HPBase[pl.Class]+hpScaling*level),
 	}
-	
 	tab[8]=tab[8]+bbEndBonus
-	
-	--get bonus stats from skills
-	
-	--enlighnenment
+end
+
+--phase 2: meditation/personality/enlightenment SP into tab[9]
+local function addMana(pl, tab)
 	local manaScaling=Game.Classes.SPFactor[pl.Class]
 	local totalMana=manaScaling*pl.LevelBase+Game.Classes.SPBase[pl.Class]
-	local effect=0
 	local stat=pl:GetPersonality()
-	if stat<=21 then
-		effect=effect+math.floor((stat-13)/2) 
-	else
-		effect=effect+math.floor(stat/5) 
-	end
+	local effect=Game.GetStatisticEffect(stat)
 	local s2,m2=SplitSkill(pl:GetSkill(const.Skills.Meditation))
-	if m2==4 then
+	if m2>=4 then
 		m2=5
 	end
-	totalEffect=effect*2+s2*m2
+	local totalEffect=effect*2+s2*m2
 	totalMana=totalMana+manaScaling*totalEffect+tab[9]
-	
+
 	local s,m=SplitSkill(Skillz.get(pl,52))
-	local enlightIncrease=totalMana*((m+1)/100*s)
+	local enlightIncrease=totalMana*MawCore.Formulas.enlightenmentManaBonus(s, m)
 	tab[9]=tab[9]+enlightIncrease+manaScaling*effect
-	
-	for i=0,3 do 
+end
+
+--phase 2: per-slot skill attack bonuses + dodging AC
+local function addSlotAttackRows(pl, tab)
+	local meleeAttack=0
+	for i=0,3 do
 		local item=pl:GetActiveItem(i)
 		if item then
 			local skill=item:T().Skill
-			--minotaur fix
-			if i==1 or i==0 then
-				if table.find(oneHandedAxes, item.Number) or table.find(twoHandedAxes, item.Number) then
-					if i==0 then
-						skill=2
-					else
-						skill=3
-					end
-				end				
-			end
 			local s,m = SplitSkill(pl:GetSkill(skill))
-			
+
 			if skillAttack[skill] and skillAttack[skill][m] then
+				local bonus=skillAttack[skill][m]*s
 				if i~=2 then
-					tab[40]=tab[40]+skillAttack[skill][m]*s
+					meleeAttack=math.max(meleeAttack, bonus)
 				else
-					tab[44]=tab[44]+skillAttack[skill][m]*s
+					tab[44]=tab[44]+bonus
 				end
 			end
-			if i==2 and m==4 then --remove vanilla calculation
+			if i==2 and m>=4 then --remove vanilla calculation
 				tab[46]=tab[46]-s
 				tab[47]=tab[47]-s
 			end
 		end
-		local s,m = SplitSkill(pl:GetSkill(const.Skills.Dodging)) 
+		local s,m = SplitSkill(pl:GetSkill(const.Skills.Dodging))
 		if (i==3 and item==nil and m>=1) or (m>=3 and item and item:T().Skill==9) then
 			tab[10]=tab[10]+skillAC[const.Skills.Dodging][m]*s
 		end
 	end
-	
+	tab[40]=tab[40]+meleeAttack
+end
+
+--phase 2: armsmaster attack, bare-hand unarmed rows, hammerhand; returns
+--whether the unarmed rows applied (used by the damage multipliers)
+local function addMiscAttack(pl, tab)
 	--armsmaster attack
 	local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
-	if m>0 then
+	if m>0 and MawArmsmasterApplies(pl) then
 		tab[40]=tab[40]+armsmasterSkill.Attack[m]*s
 	end
 	--unarmed
 	local s,m = SplitSkill(pl:GetSkill(const.Skills.Unarmed))
 	local s1,m1 = SplitSkill(pl:GetSkill(const.Skills.Staff))
 	local unarmed=false
-	if (m>=1 and not pl:GetActiveItem(0) and not pl:GetActiveItem(1)) or (m1==4 and pl:GetActiveItem(1) and pl:GetActiveItem(1):T().Skill==0 ) then
+	if (m>=1 and not pl:GetActiveItem(0) and not pl:GetActiveItem(1)) or (m1>=4 and pl:GetActiveItem(1) and pl:GetActiveItem(1):T().Skill==0 ) then
 		if m>0 then
 			tab[40]=tab[40]+skillAttack[const.Skills.Unarmed][m]*s
-			tab[41]=tab[41]+skillDamage[const.Skills.Unarmed][m]*s
-			tab[42]=tab[42]+skillDamage[const.Skills.Unarmed][m]*s
-			tab[43]=tab[43]+skillDamage[const.Skills.Unarmed][m]*s
+			tab[41]=tab[41]+skillDamage[const.Skills.Unarmed]*s
+			tab[42]=tab[42]+skillDamage[const.Skills.Unarmed]*s
+			tab[43]=tab[43]+skillDamage[const.Skills.Unarmed]*s
 			unarmed=true
 		end
 	end
@@ -3659,44 +3184,24 @@ function itemStats(index)
 		tab[42]=tab[42]+buff.Power
 		tab[43]=tab[43]+buff.Power
 	end
-	--necessary to load attack speed and damage multiplier
-	pl:GetAttackDelay()
-	pl:GetAttackDelay(true)
-	--add might and speed multiplier
-	local might=tab[1]+pl.MightBase+pl.MightBonus+Party.SpellBuffs[2].Power
-	if might<=21 then
-		mightEffect=(might-13)/2
-	else
-		mightEffect=math.floor(might/5)
-	end
-	local bonusDamage=mightEffect+Party.SpellBuffs[const.PartyBuff.Heroism].Power
-	local heroismMult=0
-	local unarmedMult=0
-	if vars.MAWSETTINGS.buffRework=="ON" then 
-		bonusDamage=mightEffect
-		if Party.SpellBuffs[9].ExpireTime>=Game.Time then
-			local s,m=getBuffSkill(51)
-			heroismMult=(buffPower[51].Base[m]/100+buffPower[51].Scaling[m]*s/1000)
-		end
-		if pl.SpellBuffs[6].ExpireTime>=Game.Time and unarmed then
-			local s,m=getBuffSkill(73)
-			unarmedMult=(buffPower[73].Base[m]/100+buffPower[73].Scaling[m]*s/1000)
-		end
-	end
-	local shamanSpiritMult=0
+	return unarmed
+end
 
-	if table.find(shamanClass, pl.Class) then
-		local s=SplitSkill(pl.Skills[const.Skills.Spirit])
-		shamanSpiritMult=s/100
-	end
-	
-	--weapon AC adding as a %, not flat
+--phase 2: weapon skill turns weapon attack into AC/resistances (as a %,
+--not flat) and collects the life leech sources
+local function addWeaponACRes(pl, index, tab)
 	--vampiric code
 	lifeLeech=lifeLeech or {}
 	lifeLeech[index]=lifeLeech[index] or {}
 	lifeLeech[index]["Melee"]=0
 	lifeLeech[index]["Ranged"]=0
 	lifeLeech[index]["Spell"]=0
+	--Vampiric enchants do not stack with themselves, so they are FLAGS; the
+	--artifact drain (Hades) adds. Collected first and applied once after the
+	--loop, or the result would depend on which hand holds which: an enchant
+	--assignment in a later slot used to erase the drain of an earlier one.
+	local physVamp, spellVamp=false, false
+	local artifactDrain=0
 	for j=0,2 do
 		local it=pl:GetActiveItem(j)
 		if it then
@@ -3707,8 +3212,8 @@ function itemStats(index)
 				s=s+10
 				local bonus = txt.Mod2
 				local bonus2 = referenceWeaponAttack[it.Number]
-				local bonusATK = bonus2 * (it.MaxCharges / 30)
-				
+				local bonusATK = MawCore.Formulas.chargesWeaponBonus(bonus2, it.MaxCharges)
+
 				local bonusBase = bonus + round(bonusATK)
 				local bonusAC = round(skillAC[skill][m]*bonusBase/100*s)
 				local bonusRes = round(skillResistance[skill][m]*bonusBase/100*s)
@@ -3720,34 +3225,52 @@ function itemStats(index)
 				end
 			end
 			if it.Bonus2==16 or it.Bonus2==41 then
-				if j~=2 then
-					lifeLeech[index]["Melee"]=0.1
-				else
-					lifeLeech[index]["Ranged"]=0.05
+				physVamp=true
+				--16 is the greater vampirism: it leeches the magical side too
+				if it.Bonus2==16 then
+					spellVamp=true
 				end
 			elseif it.Bonus2==40 then
-				lifeLeech[index]["Spell"]=0.1
+				spellVamp=true
 			end
-			
-			if vars.MAWSETTINGS.buffRework=="ON" and getBuffSkill(91)>0 then
-				lifeLeech[index]["Melee"]=lifeLeech[index]["Melee"]+0.05
-				lifeLeech[index]["Ranged"]=lifeLeech[index]["Ranged"]+0.025
-				lifeLeech[index]["Spell"]=lifeLeech[index]["Spell"]+0.025
+			--negative leech artifacts (Hades) drain a share of physical damage
+			if artifactLeech and artifactLeech[it.Number] then
+				artifactDrain=artifactDrain+artifactLeech[it.Number]
 			end
-			local race=Game.CharacterPortraits[pl.Face].Race
-			if race==const.Race.Vampire then
-				local mult=1
-				if pl.Class==40 or pl.Class==41 then
-					mult=2
-				end
-				lifeLeech[index]["Melee"]=lifeLeech[index]["Melee"]+0.05*mult
-				lifeLeech[index]["Ranged"]=lifeLeech[index]["Ranged"]+0.025*mult
-				lifeLeech[index]["Spell"]=lifeLeech[index]["Spell"]+0.025*mult
-			end
+
 		end
 	end
-	
-	--staff party buff
+	if physVamp then
+		lifeLeech[index]["Melee"]=0.1
+		lifeLeech[index]["Ranged"]=0.05
+	end
+	if spellVamp then
+		lifeLeech[index]["Spell"]=0.1
+	end
+	lifeLeech[index]["Melee"]=lifeLeech[index]["Melee"]+artifactDrain
+	if vars.MAWSETTINGS.buffRework=="ON" and getBuffSkill(91)>0 then
+		lifeLeech[index]["Melee"]=lifeLeech[index]["Melee"]+0.05
+		lifeLeech[index]["Ranged"]=lifeLeech[index]["Ranged"]+0.025
+		lifeLeech[index]["Spell"]=lifeLeech[index]["Spell"]+0.025
+	end
+	if Game.CharacterPortraits[pl.Face].Race==const.Race.Vampire then
+		local mult=1
+		if pl.Class==40 or pl.Class==41 then
+			mult=2
+		end
+		lifeLeech[index]["Melee"]=lifeLeech[index]["Melee"]+0.05*mult
+		lifeLeech[index]["Ranged"]=lifeLeech[index]["Ranged"]+0.025*mult
+		lifeLeech[index]["Spell"]=lifeLeech[index]["Spell"]+0.025*mult
+	end
+	if table.find(dkClass, pl.Class) then
+		local blood=MawCore.Formulas.dkBloodLeech
+		lifeLeech[index]["Melee"]=lifeLeech[index]["Melee"]+blood
+		lifeLeech[index]["Ranged"]=lifeLeech[index]["Ranged"]+blood/2
+	end
+end
+
+--phase 2: every equipped staff in the party adds resistances to everyone
+local function addStaffPartyRes(tab)
 	local bonusRes=0
 	for i=0, Party.High do
 		local it=Party[i]:GetActiveItem(1)
@@ -3759,29 +3282,144 @@ function itemStats(index)
 				s=s+10
 				local bonus = txt.Mod2
 				local bonus2 = referenceWeaponAttack[it.Number]
-				local bonusATK = bonus2 * (it.MaxCharges / 30)
-				
+				local bonusATK = MawCore.Formulas.chargesWeaponBonus(bonus2, it.MaxCharges)
+
 				local bonusBase = bonus + round(bonusATK)
-				bonusRes = bonusRes + round(skillResistance[skill][m]*bonusBase/100*s) 
+				bonusRes = bonusRes + round(skillResistance[skill][m]*bonusBase/100*s)
 			end
 		end
 	end
 	for v=11,16 do
 		tab[v]=tab[v]+bonusRes
 	end
-	
-	tab[42]=tab[42]+(tab[42]+bonusDamage)*might/1000
-	tab[42]=tab[42]+(tab[42]+bonusDamage)*heroismMult 
+end
+
+--phase 2: might / heroism / unarmed-buff / shaman-spirit multipliers on the
+--damage rows
+local function applyDamageMultipliers(pl, tab, unarmed)
+	local might=tab[1]+pl.MightBase+pl.MightBonus+Party.SpellBuffs[2].Power
+	local mightEffect=Game.GetStatisticEffect(might)
+	local mightMult=GetMightDamageMultiplier(might, pl.LevelBase)
+	local bonusDamage=mightEffect+Party.SpellBuffs[const.PartyBuff.Heroism].Power
+	local heroismMult=0
+	local unarmedMult=0
+	if vars.MAWSETTINGS.buffRework=="ON" then
+		bonusDamage=mightEffect
+		if Party.SpellBuffs[9].ExpireTime>=Game.Time or potionBuffActive(pl, const.Spells.Heroism) then
+			local s,m=getBuffSkill(51, pl)
+			heroismMult=GetBuffMultiplier(const.Spells.Heroism, s, m)
+		end
+		if pl.SpellBuffs[6].ExpireTime>=Game.Time and unarmed then
+			local s,m=getBuffSkill(73)
+			unarmedMult=GetBuffMultiplier(const.Spells.Hammerhands, s, m)
+		end
+	end
+	local shamanSpiritMult=0
+	if table.find(shamanClass, pl.Class) then
+		local s=SplitSkill(pl.Skills[const.Skills.Spirit])
+		shamanSpiritMult=s/100
+	end
+
+	tab[42]=tab[42]+(tab[42]+bonusDamage)*mightMult
+	tab[42]=tab[42]+(tab[42]+bonusDamage)*heroismMult
 	tab[42]=tab[42]+(tab[42]+bonusDamage)*unarmedMult
 	tab[42]=tab[42]+(tab[42]+bonusDamage)*shamanSpiritMult
-	
-	tab[43]=tab[43]+(tab[43]+bonusDamage)*might/1000
-	tab[43]=tab[43]+(tab[43]+bonusDamage)*heroismMult 
+
+	tab[43]=tab[43]+(tab[43]+bonusDamage)*mightMult
+	tab[43]=tab[43]+(tab[43]+bonusDamage)*heroismMult
 	tab[43]=tab[43]+(tab[43]+bonusDamage)*unarmedMult
 	tab[43]=tab[43]+(tab[43]+bonusDamage)*shamanSpiritMult
-	
-	tab[46]=tab[46]+(tab[46]+bonusDamage)*might/1000
-	tab[47]=tab[47]+(tab[47]+bonusDamage)*might/1000
+
+	tab[46]=tab[46]+(tab[46]+bonusDamage)*mightMult
+	tab[47]=tab[47]+(tab[47]+bonusDamage)*mightMult
+end
+
+function itemStats(index)
+	if index==-1 or index==nil then
+		return 0
+	end
+	local id=0
+	for i=0,Party.High do
+		if Party[i]:GetIndex()==index then
+			id=i
+		end
+	end
+	if id>Party.High then return end
+	local pl=Party[id]
+	buildSets()
+
+	local tab={}
+	for i=1,50 do
+		tab[i]=0
+	end
+	--used for armor skill
+	shieldAC=0
+	armorAC=0
+	vars.normalEnchantResistance=vars.normalEnchantResistance or {}
+	vars.normalEnchantResistance[index]={}
+	for i=11,16 do
+		vars.normalEnchantResistance[index][i]=0
+	end
+	--iterate once for legendaries
+	vars.legendaries=vars.legendaries or {}
+	vars.legendaries[index]={}
+	for it in pl:EnumActiveItems() do
+		if HasLegendaryAffix(it) then
+			table.insert(vars.legendaries[index], GetLegendaryAffix(it))
+		end
+	end
+
+	--phase 1: collect everything that does not depend on effective skills
+	local gotShieldEnchant=false
+	for it in pl:EnumActiveItems() do
+		updateCelestialItem(it,pl)
+		--maxcharges fix for moon cloak
+		if it.Number==1349 or it.Number==1350 then
+			it.MaxCharges=0
+		end
+		local txt=it:T()
+		collectArmorAC(pl, index, it, txt, tab)
+		if it.Bonus>0 then
+			collectEnchant(index, it, it.Bonus, it.BonusStrength, tab, false)
+		end
+		if HasEnc2(it) then
+			local bonus,power=GetEnc2(it)
+			collectEnchant(index, it, bonus, power, tab, true)
+		end
+		collectEquipEffects(it, tab)
+		collectArtifactBonuses(pl, it, tab)
+		if it.Bonus2==36 then
+			gotShieldEnchant=true
+		end
+	end
+	--special enchant
+	vars.shieldEnchant=vars.shieldEnchant or {}
+	vars.shieldEnchant[index]=gotShieldEnchant
+
+	--PUBLISH: from here on pl:GetSkill sees the just-collected item skill
+	--bonuses instead of the previous snapshot's
+	plItemsStats[index]=tab
+
+	--phase 2: everything computed from effective skills
+	local floorPaid={}
+	for it in pl:EnumActiveItems() do
+		addWeaponRows(pl, index, it, it:T(), tab, floorPaid)
+	end
+	addBless(pl, tab)
+	addArmorSkillAC(pl, tab)
+	applyDragonMult(pl, tab)
+	local enduranceStatBuff=addBuffStats(pl, tab)
+	addLuckRes(pl, tab)
+	addHP(pl, id, tab, enduranceStatBuff)
+	addMana(pl, tab)
+	addSlotAttackRows(pl, tab)
+	local unarmed=addMiscAttack(pl, tab)
+	--necessary to load attack speed and damage multiplier
+	pl:GetAttackDelay()
+	pl:GetAttackDelay(true)
+	addWeaponACRes(pl, index, tab)
+	addStaffPartyRes(tab)
+	applyDamageMultipliers(pl, tab, unarmed)
 	return tab
 end
 
@@ -3796,6 +3434,12 @@ equipSpellMap={
 	[31] = const.Skills.Light,
 	[28] = const.Skills.Dark,
 }
+--reverse map: skill -> plItemsStats slot; the GetSkill hook runs constantly,
+--so no table.find there
+equipSpellSlot={}
+for slot, skill in pairs(equipSpellMap) do
+	equipSpellSlot[skill]=slot
+end
 
 meditationBonusItemMap={38,47,55,66}
 
@@ -3820,372 +3464,356 @@ statMap={
 	
 }
 
---artifacts stats bonus
 --------------------------------
----- Stat bonuses
-artifactStatsBonus={}
-artifactStatsBonus[500] = {	[const.Stats.Accuracy] = 60}
-artifactStatsBonus[501] = {	[const.Stats.Might] = 60}
-artifactStatsBonus[502] = {	[const.Stats.AirResistance] = 100}
-artifactStatsBonus[503] = {	[const.Stats.Endurance] = 40,
-							[const.Stats.Luck] = 40}
-artifactStatsBonus[504] = {	[const.Stats.Might] = 100}
-artifactStatsBonus[505] = {	[const.Stats.FireResistance] = 100}
-artifactStatsBonus[506] = {	[const.Stats.Endurance] = 60}
-artifactStatsBonus[507] = {[const.Stats.Might] 		= 20,
-							[const.Stats.Intellect] 	= 20,
-							[const.Stats.Personality] 	= 20,
-							[const.Stats.Speed] 		= 20,
-							[const.Stats.Accuracy]		= 20,
-							[const.Stats.Endurance] 	= 20,
-							[const.Stats.Luck]			= 20}
-artifactStatsBonus[509] = {	[const.Stats.Personality]   = 80}
-artifactStatsBonus[510] = { [const.Stats.Might] 		= 30,
-							[const.Stats.Endurance] 	= 30}		
-artifactStatsBonus[512] = { [const.Stats.Accuracy] 		= 50}						
-artifactStatsBonus[513] = { [const.Stats.Endurance] 	= 70}						
-artifactStatsBonus[514] = { [const.Stats.Might] 		= 20,
-							[const.Stats.Intellect] 	= 20,
-							[const.Stats.Personality] 	= 20,
-							[const.Stats.Speed] 		= 20,
-							[const.Stats.Accuracy]		= 20,
-							[const.Stats.Endurance] 	= 20,
-							[const.Stats.Luck]			= 20,
-							[const.Stats.FireResistance]	= 20,
-							[const.Stats.AirResistance]		= 20,
-							[const.Stats.WaterResistance]	= 20,
-							[const.Stats.EarthResistance]	= 20,
-							[const.Stats.MindResistance]	= 20,
-							[const.Stats.BodyResistance]	= 20,}	
-artifactStatsBonus[515] = { [const.Stats.Speed] 		= 60,							
-							[const.Stats.Accuracy] 		= 60}
-artifactStatsBonus[518] = { [const.Stats.Speed] 		= 60}
-artifactStatsBonus[519] = { [const.Stats.FireResistance]	= 40,
-							[const.Stats.AirResistance]		= 40,
-							[const.Stats.WaterResistance]	= 40,
-							[const.Stats.EarthResistance]	= 40}
-artifactStatsBonus[520] = { [const.Stats.Personality]	= 60,
-							[const.Stats.Intellect]		= 60}	
-artifactStatsBonus[521] = {	[const.Stats.Intellect] = 100}							
-artifactStatsBonus[522] = { [const.Stats.Intellect]	= 40,
-							[const.Stats.FireResistance]	= 10,
-							[const.Stats.AirResistance]		= 10,
-							[const.Stats.WaterResistance]	= 10,
-							[const.Stats.EarthResistance]	= 10,
-							[const.Stats.MindResistance]	= 10,
-							[const.Stats.BodyResistance]	= 10}
-artifactStatsBonus[523] = { [const.Stats.Speed]	= 100,
-							[const.Stats.WaterResistance]	= -50,
-							[const.Stats.Personality]	= -15}
-artifactStatsBonus[524] = {	[const.Stats.Speed]	= 70,
-							[const.Stats.Accuracy]	= 70,
-							[const.Stats.ArmorClass]	= -20}						
-artifactStatsBonus[525] = {	
-							[const.Stats.Accuracy]	= 120,		
-							[const.Stats.Speed]	= -20}		
-artifactStatsBonus[526] = {	[const.Stats.Might]	= 70,
-							[const.Stats.Accuracy]		= 70,
-							[const.Stats.Personality]	= 50,
-							[const.Stats.Intellect]	= 50}		
-artifactStatsBonus[527] = {	[const.Stats.Might]	= 80,
-							[const.Stats.Luck]	= -40}
-artifactStatsBonus[528]	= {	[const.Stats.WaterResistance]	= 140,
-							[const.Stats.FireResistance]	= -40}		
-artifactStatsBonus[529]	= {	[const.Stats.Might]	= 100,
-							[const.Stats.Accuracy]	= 100}		
-artifactStatsBonus[530]	= {	[const.Stats.ArmorClass]	= -40}		
-artifactStatsBonus[531]	= {	[const.Stats.Accuracy]	= 100,
-							[const.Stats.ArmorClass]	= -20}		
-artifactStatsBonus[532]	= {	[const.Stats.Might]	= 60,
-							[const.Stats.Speed]	= 60,}		
-artifactStatsBonus[533]	= {	[const.Stats.Intellect]	= 140,
-							[const.Stats.Personality] = 140,
-							[const.Stats.MindResistance]	= -100,
-							[const.Stats.BodyResistance]	= -100}		
-artifactStatsBonus[534]	= {	[const.Stats.Luck]	= -15,
-							[const.Stats.Endurance]	= 50}
-artifactStatsBonus[535]	= {	[const.Stats.Intellect]	= 60,
-							[const.Stats.Endurance]	= -20}			
-artifactStatsBonus[536]	= {	[const.Stats.Luck]	= 100,
-							[const.Stats.Personality]	= -50}		
-artifactStatsBonus[537]	= {	[const.Stats.Might]	= 120,
-							[const.Stats.Accuracy]	= -30,
-							[const.Stats.ArmorClass]	= -15}							
-							
+---- Artifact power budgets
+--
+-- The system, and why a coefficient instead of a number: MawCore/Artifacts.lua.
+-- One point of coefficient = one enchant of a perfectly rolled Epic, on this
+-- slot, at this level. A whole artifact is worth Artifacts.Slots of them.
+--
+--   artifactPower[504] = {
+--       [const.Stats.Might]     = 2,
+--       [const.Stats.Endurance] = 1,
+--       Skills = { [const.Skills.Armsmaster] = 0.5 },
+--       Flat   = { [const.Stats.FireResistance] = 65000 },	--not a budget
+--       baseStatMultiplier = 1.2,	--weapon damage / armor AC, 1 = like the Epic
+--   }
+--
+-- An id with no entry has no bonuses, which is not the same as having no
+-- budget: every artifact is on this system, and the base damage/AC it carries
+-- comes from its item level either way.
+artifactPower={}
 
+-- Converted from the old artifactStatsBonus/artifactSkillBonus numbers by
+-- keeping each artifact's INTERNAL split and renormalising its upside to 3.
+-- A skill point was priced at 10 stat points, which is the ratio the old
+-- tables used. Drawbacks kept the same exchange rate as the upside they sit
+-- next to, so an artifact that gave up a lot still gives it up.
 
+-- Ogre's Hammer
+artifactPower[500] = {	[const.Stats.Accuracy] = 3}
+-- Sword of Might
+artifactPower[501] = {	[const.Stats.Might] = 3}
+artifactPower[502] = {	[const.Stats.AirResistance] = 1.76,
+						Skills = {	[const.Skills.Armsmaster] = 1.24}}
+artifactPower[503] = {	[const.Stats.Endurance] = 1.5,
+						[const.Stats.Luck] = 1.5}
+artifactPower[504] = {	[const.Stats.Might] = 3}
+artifactPower[505] = {	[const.Stats.FireResistance] = 3}
+artifactPower[506] = {	[const.Stats.Endurance] = 3}
+artifactPower[507] = {	[const.Stats.Might] 		= 0.43,
+						[const.Stats.Intellect] 	= 0.43,
+						[const.Stats.Personality] 	= 0.43,
+						[const.Stats.Speed] 		= 0.43,
+						[const.Stats.Accuracy]		= 0.43,
+						[const.Stats.Endurance] 	= 0.43,
+						[const.Stats.Luck]			= 0.43}
+artifactPower[509] = {	[const.Stats.Personality] = 3}
+artifactPower[510] = {	[const.Stats.Might] = 1.5,
+						[const.Stats.Endurance] = 1.5}
+artifactPower[512] = {	[const.Stats.Accuracy] = 1.67,
+						Skills = {	[const.Skills.Bow] = 1.33}}
+artifactPower[513] = {	[const.Stats.Endurance] = 3}
+artifactPower[514] = {	[const.Stats.Might] 		= 0.23,
+						[const.Stats.Intellect] 	= 0.23,
+						[const.Stats.Personality] 	= 0.23,
+						[const.Stats.Speed] 		= 0.23,
+						[const.Stats.Accuracy]		= 0.23,
+						[const.Stats.Endurance] 	= 0.23,
+						[const.Stats.Luck]			= 0.23,
+						[const.Stats.FireResistance]	= 0.23,
+						[const.Stats.AirResistance]		= 0.23,
+						[const.Stats.WaterResistance]	= 0.23,
+						[const.Stats.EarthResistance]	= 0.23,
+						[const.Stats.MindResistance]	= 0.23,
+						[const.Stats.BodyResistance]	= 0.23}
+artifactPower[515] = {	[const.Stats.Speed] = 1.5,
+						[const.Stats.Accuracy] = 1.5}
+artifactPower[517] = {	Skills = {	[const.Skills.DisarmTraps] = 1,
+									[const.Skills.Bow] = 1,
+									[const.Skills.Armsmaster] = 1}}
+artifactPower[518] = {	[const.Stats.Speed] = 3}
+artifactPower[519] = {	[const.Stats.FireResistance]	= 0.75,
+						[const.Stats.AirResistance]		= 0.75,
+						[const.Stats.WaterResistance]	= 0.75,
+						[const.Stats.EarthResistance]	= 0.75}
+artifactPower[520] = {	[const.Stats.Personality] = 1.5,
+						[const.Stats.Intellect] = 1.5}
+artifactPower[521] = {	[const.Stats.Intellect] = 3}
+artifactPower[522] = {	[const.Stats.Intellect] = 1.2,
+						[const.Stats.FireResistance]	= 0.3,
+						[const.Stats.AirResistance]		= 0.3,
+						[const.Stats.WaterResistance]	= 0.3,
+						[const.Stats.EarthResistance]	= 0.3,
+						[const.Stats.MindResistance]	= 0.3,
+						[const.Stats.BodyResistance]	= 0.3}
+artifactPower[523] = {	[const.Stats.Speed] = 3,
+						[const.Stats.WaterResistance] = -1.5,
+						[const.Stats.Personality] = -0.45}
+artifactPower[524] = {	[const.Stats.Speed] = 1.5,
+						[const.Stats.Accuracy] = 1.5,
+						[const.Stats.ArmorClass] = -0.43}
+artifactPower[525] = {	[const.Stats.Accuracy] = 3,
+						[const.Stats.Speed] = -0.5}
+artifactPower[526] = {	[const.Stats.Might] = 1.5,
+						[const.Stats.Accuracy] = 1.5,
+						[const.Stats.Personality] = -1.07,
+						[const.Stats.Intellect] = -1.07}
+artifactPower[527] = {	[const.Stats.Might] = 3,
+						[const.Stats.Luck] = -1.5}
+artifactPower[528] = {	[const.Stats.WaterResistance] = 3,
+						[const.Stats.FireResistance] = -0.86}
+artifactPower[529] = {	[const.Stats.Might] = 1.5,
+						[const.Stats.Accuracy] = 1.5}
+-- Staff of Elements: its four spell schools are the item, the AC is the price
+artifactPower[530] = {	[const.Stats.ArmorClass] = -1.2}
+artifactPower[531] = {	[const.Stats.Accuracy] = 2.14,
+						[const.Stats.ArmorClass] = -0.43,
+						Skills = {	[const.Skills.Bow] = 0.86}}
+artifactPower[532] = {	[const.Stats.Might] = 1.5,
+						[const.Stats.Speed] = 1.5}
+artifactPower[533] = {	[const.Stats.Intellect] = 1.5,
+						[const.Stats.Personality] = 1.5,
+						[const.Stats.MindResistance] = -1.07,
+						[const.Stats.BodyResistance] = -1.07}
+artifactPower[534] = {	[const.Stats.Endurance] = 3,
+						[const.Stats.Luck] = -0.9}
+artifactPower[535] = {	[const.Stats.Intellect] = 1.64,
+						[const.Stats.Endurance] = -0.55,
+						Skills = {	[const.Skills.Alchemy] = 1.36}}
+artifactPower[536] = {	[const.Stats.Luck] = 3,
+						[const.Stats.Personality] = -1.5}
+artifactPower[537] = {	[const.Stats.Might] = 3,
+						[const.Stats.Accuracy] = -0.75,
+						[const.Stats.ArmorClass] = -0.38}
 -- Cycle of life
-artifactStatsBonus[543] = {	[const.Stats.Endurance] = 20}
-
+artifactPower[543] = {	[const.Stats.Endurance] = 3}
 
 -- Puck
-artifactStatsBonus[1302] = {[const.Stats.Speed]	= 80}
+artifactPower[1302] = {	[const.Stats.Speed] = 3}
 -- Iron Feather
-artifactStatsBonus[1303] = {[const.Stats.Might]	= 80}
+artifactPower[1303] = {	[const.Stats.Might] = 3}
 -- Wallace
-artifactStatsBonus[1304] = {[const.Stats.Personality] = 40}
+artifactPower[1304] = {	[const.Stats.Personality] = 0.86,
+						Skills = {	[const.Skills.Armsmaster] = 2.14}}
 -- Corsair
-artifactStatsBonus[1305] = {[const.Stats.Luck] = 80}
+artifactPower[1305] = {	[const.Stats.Luck] = 1.33,
+						Skills = {	[const.Skills.DisarmTraps] = 1.67}}
 -- Governor's Armor
-artifactStatsBonus[1306] = {[const.Stats.Might] 		= 20,
-							[const.Stats.Intellect] 	= 20,
-							[const.Stats.Personality] 	= 20,
-							[const.Stats.Speed] 		= 20,
-							[const.Stats.Accuracy]		= 20,
-							[const.Stats.Endurance] 	= 20,
-							[const.Stats.Luck]			= 20}
+artifactPower[1306] = {	[const.Stats.Might] 		= 0.43,
+						[const.Stats.Intellect] 	= 0.43,
+						[const.Stats.Personality] 	= 0.43,
+						[const.Stats.Speed] 		= 0.43,
+						[const.Stats.Accuracy]		= 0.43,
+						[const.Stats.Endurance] 	= 0.43,
+						[const.Stats.Luck]			= 0.43}
 -- Yoruba
-artifactStatsBonus[1307] = {[const.Stats.Endurance] 	= 100}
--- Splitter
-artifactStatsBonus[1308] = {[const.Stats.FireResistance] = 65000}
+artifactPower[1307] = {	[const.Stats.Endurance] = 3}
+-- Splitter: fire immunity is a threshold, not a budget -- see Flat
+artifactPower[1308] = {	Flat = {	[const.Stats.FireResistance] = 65000}}
 -- Ullyses
-artifactStatsBonus[1312] = {[const.Stats.Accuracy] = 80}
--- Seven League Boots
-artifactStatsBonus[1314] = {[const.Stats.Speed] = 80}
--- Mash
-artifactStatsBonus[1316] = {[const.Stats.Might] 		= 150,
-							[const.Stats.Intellect] 	= -40,
-							[const.Stats.Personality] 	= -40,
-							[const.Stats.Speed] 		= -40}
--- Hareck's Leather
-artifactStatsBonus[1318] = {[const.Stats.Luck]				= 100,
-							[const.Stats.FireResistance] 	= -20,
-							[const.Stats.AirResistance] 	= -20,
-							[const.Stats.WaterResistance] 	= -20,
-							[const.Stats.EarthResistance] 	= -20,
-							[const.Stats.MindResistance] 	= -20,
-							[const.Stats.BodyResistance] 	= -20,}
--- Amuck
-artifactStatsBonus[1320] = {[const.Stats.Might] 		= 100,
-							[const.Stats.Endurance] 	= 100,
-							[const.Stats.ArmorClass] 	= -15}
--- Glory shield
-artifactStatsBonus[1321] = {[const.Stats.BodyResistance] = -20,
-							[const.Stats.MindResistance] = -20}
--- Kelebrim
-artifactStatsBonus[1322] = {[const.Stats.Endurance] = 100,
-							[const.Stats.EarthResistance] = -60}
--- Taledon's Helm
-artifactStatsBonus[1323] = {
-							[const.Stats.Might] = 45,
-							[const.Stats.Personality] = 45,
-							[const.Stats.Luck] = -40
-}
--- Scholar's Cap
-artifactStatsBonus[1324] = {[const.Stats.Endurance] = -50}
--- Phynaxian Crown
-artifactStatsBonus[1325] = {
-							[const.Stats.Personality] = 30,
-							[const.Stats.ArmorClass] = -20,
-							[const.Stats.WaterResistance] = 100
-}
--- Titan's Belt
-artifactStatsBonus[1326] = {
-							[const.Stats.Might] = 115,
-							[const.Stats.Speed] = -40
-}
--- Twilight
-artifactStatsBonus[1327] = {
-							[const.Stats.Speed] = 50,
-							[const.Stats.Luck] = 50,
-							[const.Stats.FireResistance] = -30,
-							[const.Stats.AirResistance] = -30,
-							[const.Stats.WaterResistance] = -30,
-							[const.Stats.EarthResistance] = -30,
-							[const.Stats.MindResistance] = -30,
-							[const.Stats.BodyResistance] = -30,
-}
--- Ania Selving
-artifactStatsBonus[1328] = {[const.Stats.ArmorClass] = -25,
-							[const.Stats.Accuracy] = 150}
--- Justice
-artifactStatsBonus[1329] = {[const.Stats.Speed] = -40}
--- Mekorig's hammer
-artifactStatsBonus[1330] = {[const.Stats.Might] = 75,
-							[const.Stats.AirResistance] = -100}
-							-- Hermes's Sandals
-artifactStatsBonus[1331] = {[const.Stats.Speed] = 100,
-							[const.Stats.Accuracy] = 50,
-							[const.Stats.AirResistance] = 100}
--- Cloak of the sheep
-artifactStatsBonus[1332] = {[const.Stats.Intellect] 	= -20,
-							[const.Stats.Personality] 	= -20}
--- Elfbane
-artifactStatsBonus[1333] = {[const.Stats.Speed] = 100}
--- Mind's Eye
-artifactStatsBonus[1334] = {
-							[const.Stats.Intellect] = 30,
-							[const.Stats.Personality] = 30
-}
--- Elven Chainmail
-artifactStatsBonus[1335] = {[const.Stats.Speed] = 30,
-							[const.Stats.Accuracy] = 30
-}
--- Forge Gauntlets
-artifactStatsBonus[1336] = {
-							[const.Stats.Might] = 30,
-							[const.Stats.Endurance] = 30,
-							[const.Stats.FireResistance] = 60
-}
--- Hero's belt
-artifactStatsBonus[1337] = {[const.Stats.Might] = 30}
--- Lady's Escort ring
-artifactStatsBonus[1338] = {[const.Stats.FireResistance]	= 10,
-							[const.Stats.AirResistance]		= 10,
-							[const.Stats.WaterResistance]	= 10,
-							[const.Stats.EarthResistance]	= 10,
-							[const.Stats.MindResistance]	= 10,
-							[const.Stats.BodyResistance]	= 10,}
--- Thor
-artifactStatsBonus[2021] = {[const.Stats.Might] = 75}
--- Conan
-artifactStatsBonus[2022] = {[const.Stats.Accuracy] = 150}
--- Excalibur
-artifactStatsBonus[2023] = {[const.Stats.Might] = 100}
--- Merlin
-artifactStatsBonus[2024] = {[const.Stats.Intellect] = 120,
-							[const.Stats.Personality] = 120,
-							[const.Stats.SP] = 200,
-							}
--- Percival
-artifactStatsBonus[2025] = {[const.Stats.Speed] = 40}
--- Galahad
-artifactStatsBonus[2026] = {[const.Stats.Endurance] = 100}
--- Pellinore
-artifactStatsBonus[2027] = {[const.Stats.Endurance] = 120}
--- Valeria
-artifactStatsBonus[2028] = {[const.Stats.Accuracy] = 80}
--- Arthur
-artifactStatsBonus[2029] = {
-							[const.Stats.Might] = 20,
-							[const.Stats.Intellect] = 20,
-							[const.Stats.Personality] = 20,
-							[const.Stats.Endurance] = 20,
-							[const.Stats.Accuracy] = 20,
-							[const.Stats.Speed] = 20,
-							[const.Stats.Luck] = 20,
-							[const.Stats.SP] = 100
-}
--- Pendragon
-artifactStatsBonus[2030] = {[const.Stats.Luck] = 60}
--- Lucius
-artifactStatsBonus[2031] = {[const.Stats.Speed] = 70}
--- Guinevere
-artifactStatsBonus[2032] = {[const.Stats.SP] = 100}
--- Igraine
-artifactStatsBonus[2033] = {[const.Stats.SP] = 100}
--- Morgan
-artifactStatsBonus[2034] = {[const.Stats.SP] = 80}
--- Hades
-artifactStatsBonus[2035] = {[const.Stats.Luck] = 60}
--- Ares
-artifactStatsBonus[2036] = {[const.Stats.FireResistance] = 100}
--- Poseidon
-artifactStatsBonus[2037] = {[const.Stats.Might] 	 = 40,
-							[const.Stats.Endurance]  = 40,
-							[const.Stats.Accuracy] 	 = 40,
-							[const.Stats.Speed] 	 = -10,
-							[const.Stats.ArmorClass] = -10}
--- Cronos
-artifactStatsBonus[2038] = {[const.Stats.Luck] 	 	= -60,
-							[const.Stats.Endurance] = 120}
--- Hercules
-artifactStatsBonus[2039] = {[const.Stats.Might] 	= 100,
-							[const.Stats.Endurance] = 60,
-							[const.Stats.Intellect]	= -30}
--- Artemis
-artifactStatsBonus[2040] = {[const.Stats.FireResistance] 	= -20,
-							[const.Stats.AirResistance] 	= -20,
-							[const.Stats.WaterResistance] 	= -20,
-							[const.Stats.EarthResistance] 	= -20}
--- Apollo
-artifactStatsBonus[2041] = {[const.Stats.Endurance]			= -30,
-							[const.Stats.FireResistance] 	= 40,
-							[const.Stats.AirResistance] 	= 40,
-							[const.Stats.WaterResistance] 	= 40,
-							[const.Stats.EarthResistance] 	= 40,
-							[const.Stats.MindResistance] 	= 40,
-							[const.Stats.BodyResistance] 	= 40,
-							[const.Stats.Luck]				= 20}
--- Zeus
-artifactStatsBonus[2042] = {[const.Stats.Endurance] 		= 50,
-							[const.Stats.Personality] 		= 50,
-							[const.Stats.Luck] 		= 50,
-							[const.Stats.Intellect] = -50}
--- Aegis
-artifactStatsBonus[2043] = {[const.Stats.Speed] = -20,
-							[const.Stats.Luck] 	= 100}
--- Odin
-artifactStatsBonus[2044] = {
-							[const.Stats.Speed] = -40,
-							[const.Stats.FireResistance] = 60,
-							[const.Stats.AirResistance] = 60,
-							[const.Stats.WaterResistance] = 60,
-							[const.Stats.EarthResistance] = 60
-						}
--- Atlas
-artifactStatsBonus[2045] = {
-							[const.Stats.Might] = 120,
-							[const.Stats.Speed] = -40
-						}
--- Hermes
-artifactStatsBonus[2046] = {
-							[const.Stats.Speed] = 140,
-							[const.Stats.Accuracy] = -40
-						}
--- Aphrodite
-artifactStatsBonus[2047] = {[const.Stats.Personality] = 100,
-							[const.Stats.Luck] 	= -40}
--- Athena
-artifactStatsBonus[2048] = {[const.Stats.Intellect] = 100,
-							[const.Stats.Might] 	= -40}
--- Hera
-artifactStatsBonus[2049] = {[const.Stats.HP] = 100,
-							[const.Stats.SP] = 100,
-							[const.Stats.Luck] = 50,
-							[const.Stats.Personality] = -50}
-
---SKILLS ARTEFACTS
----- Skill bonuses
-artifactSkillBonus={}
-artifactSkillBonus[502] =	{	[const.Skills.Armsmaster] = 7}
-artifactSkillBonus[512] =	{	[const.Skills.Bow] = 4}
-artifactSkillBonus[517] =	{	[const.Skills.DisarmTraps] = 8,
-								[const.Skills.Bow] = 8,
-								[const.Skills.Armsmaster] = 8}
-artifactSkillBonus[531] =	{	[const.Skills.Bow] = 4}
-artifactSkillBonus[535] =	{	[const.Skills.Alchemy] = 5}
--- Hero's belt
-artifactSkillBonus[1337] =	{	[const.Skills.Armsmaster] = 5}
--- Wallace
-artifactSkillBonus[1304] =	{	[const.Skills.Armsmaster] = 10}
--- Corsair
-artifactSkillBonus[1305] =	{	[const.Skills.DisarmTraps] = 10}
+artifactPower[1312] = {	[const.Stats.Accuracy] = 3}
 -- Hands of the Master
-artifactSkillBonus[1313] =	{	[const.Skills.Unarmed] = 10,
-								[const.Skills.Dodging] = 10}
+artifactPower[1313] = {	Skills = {	[const.Skills.Unarmed] = 1.5,
+									[const.Skills.Dodging] = 1.5}}
+-- Seven League Boots
+artifactPower[1314] = {	[const.Stats.Speed] = 3}
+-- Mash
+artifactPower[1316] = {	[const.Stats.Might] = 3,
+						[const.Stats.Intellect] = -0.8,
+						[const.Stats.Personality] = -0.8,
+						[const.Stats.Speed] = -0.8}
 -- Ethric's Staff
-artifactSkillBonus[1317] =	{	[const.Skills.Meditation] = 8}
+artifactPower[1317] = {	Skills = {	[const.Skills.Meditation] = 3}}
 -- Hareck's Leather
-artifactSkillBonus[1318] =	{	[const.Skills.Dagger] = 5,
-								[const.Skills.Unarmed] = 5,}
+artifactPower[1318] = {	[const.Stats.Luck] = 1.5,
+						[const.Stats.FireResistance] 	= -0.3,
+						[const.Stats.AirResistance] 	= -0.3,
+						[const.Stats.WaterResistance] 	= -0.3,
+						[const.Stats.EarthResistance] 	= -0.3,
+						[const.Stats.MindResistance] 	= -0.3,
+						[const.Stats.BodyResistance] 	= -0.3,
+						Skills = {	[const.Skills.Dagger] = 0.75,
+									[const.Skills.Unarmed] = 0.75}}
 -- Old Nick
-artifactSkillBonus[1319] =	{	[const.Skills.DisarmTraps] = 5}
+artifactPower[1319] = {	Skills = {	[const.Skills.DisarmTraps] = 3}}
+-- Amuck
+artifactPower[1320] = {	[const.Stats.Might] = 1.5,
+						[const.Stats.Endurance] = 1.5,
+						[const.Stats.ArmorClass] = -0.23}
 -- Glory shield
-artifactSkillBonus[1321] =	{	[const.Skills.Shield] = 5}
+artifactPower[1321] = {	[const.Stats.BodyResistance] = -1.2,
+						[const.Stats.MindResistance] = -1.2,
+						Skills = {	[const.Skills.Shield] = 3}}
+-- Kelebrim
+artifactPower[1322] = {	[const.Stats.Endurance] = 3,
+						[const.Stats.EarthResistance] = -1.8}
+-- Taledon's Helm
+artifactPower[1323] = {	[const.Stats.Might] = 1.5,
+						[const.Stats.Personality] = 1.5,
+						[const.Stats.Luck] = -1.33}
 -- Scholar's Cap
-artifactSkillBonus[1324] = {	[const.Skills.Learning] = 15}
+artifactPower[1324] = {	[const.Stats.Endurance] = -1,
+						Skills = {	[const.Skills.Learning] = 3}}
+-- Phynaxian Crown
+artifactPower[1325] = {	[const.Stats.Personality] = 0.69,
+						[const.Stats.WaterResistance] = 2.31,
+						[const.Stats.ArmorClass] = -0.46}
+-- Titan's Belt
+artifactPower[1326] = {	[const.Stats.Might] = 3,
+						[const.Stats.Speed] = -1.04}
+-- Twilight
+artifactPower[1327] = {	[const.Stats.Speed] = 1.5,
+						[const.Stats.Luck] = 1.5,
+						[const.Stats.FireResistance] = -0.9,
+						[const.Stats.AirResistance] = -0.9,
+						[const.Stats.WaterResistance] = -0.9,
+						[const.Stats.EarthResistance] = -0.9,
+						[const.Stats.MindResistance] = -0.9,
+						[const.Stats.BodyResistance] = -0.9}
 -- Ania Selving
-artifactSkillBonus[1328] =	{	[const.Skills.Bow] = 5}
+artifactPower[1328] = {	[const.Stats.Accuracy] = 2.25,
+						[const.Stats.ArmorClass] = -0.38,
+						Skills = {	[const.Skills.Bow] = 0.75}}
+-- Justice
+artifactPower[1329] = {	[const.Stats.Speed] = -1.2}
+-- Mekorig's hammer
+artifactPower[1330] = {	[const.Stats.Might] = 3,
+						[const.Stats.AirResistance] = -4}
+-- Hermes's Sandals
+artifactPower[1331] = {	[const.Stats.Speed] = 1.2,
+						[const.Stats.Accuracy] = 0.6,
+						[const.Stats.AirResistance] = 1.2}
+-- Cloak of the sheep
+artifactPower[1332] = {	[const.Stats.Intellect] = -0.6,
+						[const.Stats.Personality] = -0.6}
+-- Elfbane
+artifactPower[1333] = {	[const.Stats.Speed] = 3}
+-- Mind's Eye
+artifactPower[1334] = {	[const.Stats.Intellect] = 1.5,
+						[const.Stats.Personality] = 1.5}
+-- Elven Chainmail
+artifactPower[1335] = {	[const.Stats.Speed] = 1.5,
+						[const.Stats.Accuracy] = 1.5}
+-- Forge Gauntlets
+artifactPower[1336] = {	[const.Stats.Might] = 0.75,
+						[const.Stats.Endurance] = 0.75,
+						[const.Stats.FireResistance] = 1.5}
+-- Hero's belt
+artifactPower[1337] = {	[const.Stats.Might] = 1.13,
+						Skills = {	[const.Skills.Armsmaster] = 1.88}}
+-- Lady's Escort ring
+artifactPower[1338] = {	[const.Stats.FireResistance]	= 0.5,
+						[const.Stats.AirResistance]		= 0.5,
+						[const.Stats.WaterResistance]	= 0.5,
+						[const.Stats.EarthResistance]	= 0.5,
+						[const.Stats.MindResistance]	= 0.5,
+						[const.Stats.BodyResistance]	= 0.5}
+-- Thor
+artifactPower[2021] = {	[const.Stats.Might] = 3}
+-- Conan
+artifactPower[2022] = {	[const.Stats.Accuracy] = 3}
+-- Excalibur
+artifactPower[2023] = {	[const.Stats.Might] = 3}
+-- Merlin
+artifactPower[2024] = {	[const.Stats.Intellect] = 0.82,
+						[const.Stats.Personality] = 0.82,
+						[const.Stats.SP] = 1.36}
+-- Percival
+artifactPower[2025] = {	[const.Stats.Speed] = 3}
+-- Galahad
+artifactPower[2026] = {	[const.Stats.Endurance] = 3}
+-- Pellinore
+artifactPower[2027] = {	[const.Stats.Endurance] = 3}
+-- Valeria
+artifactPower[2028] = {	[const.Stats.Accuracy] = 3}
+-- Arthur
+artifactPower[2029] = {	[const.Stats.Might] = 0.25,
+						[const.Stats.Intellect] = 0.25,
+						[const.Stats.Personality] = 0.25,
+						[const.Stats.Endurance] = 0.25,
+						[const.Stats.Accuracy] = 0.25,
+						[const.Stats.Speed] = 0.25,
+						[const.Stats.Luck] = 0.25,
+						[const.Stats.SP] = 1.25}
 -- Pendragon
-artifactSkillBonus[2030] =	{	[const.Skills.Dagger] = 5,
-								[const.Skills.DisarmTraps] = 10}
+artifactPower[2030] = {	[const.Stats.Luck] = 0.86,
+						Skills = {	[const.Skills.Dagger] = 0.71,
+									[const.Skills.DisarmTraps] = 1.43}}
+-- Lucius
+artifactPower[2031] = {	[const.Stats.Speed] = 3}
+-- Guinevere
+artifactPower[2032] = {	[const.Stats.SP] = 3}
+-- Igraine
+artifactPower[2033] = {	[const.Stats.SP] = 3}
+-- Morgan
+artifactPower[2034] = {	[const.Stats.SP] = 3}
 -- Hades
-artifactSkillBonus[2035] =	{	[const.Skills.DisarmTraps] = 10}
+artifactPower[2035] = {	[const.Stats.Luck] = 1.13,
+						Skills = {	[const.Skills.DisarmTraps] = 1.88}}
+-- Ares
+artifactPower[2036] = {	[const.Stats.FireResistance] = 3}
+-- Poseidon
+artifactPower[2037] = {	[const.Stats.Might] = 1,
+						[const.Stats.Endurance] = 1,
+						[const.Stats.Accuracy] = 1,
+						[const.Stats.Speed] = -0.25,
+						[const.Stats.ArmorClass] = -0.25}
+-- Cronos
+artifactPower[2038] = {	[const.Stats.Endurance] = 3,
+						[const.Stats.Luck] = -1.5}
+-- Hercules
+artifactPower[2039] = {	[const.Stats.Might] = 1.88,
+						[const.Stats.Endurance] = 1.13,
+						[const.Stats.Intellect] = -0.56}
+-- Artemis
+artifactPower[2040] = {	[const.Stats.FireResistance] = -0.6,
+						[const.Stats.AirResistance] = -0.6,
+						[const.Stats.WaterResistance] = -0.6,
+						[const.Stats.EarthResistance] = -0.6}
+-- Apollo
+artifactPower[2041] = {	[const.Stats.FireResistance] = 0.46,
+						[const.Stats.AirResistance] = 0.46,
+						[const.Stats.WaterResistance] = 0.46,
+						[const.Stats.EarthResistance] = 0.46,
+						[const.Stats.MindResistance] = 0.46,
+						[const.Stats.BodyResistance] = 0.46,
+						[const.Stats.Luck] = 0.23,
+						[const.Stats.Endurance] = -0.35}
+-- Zeus
+artifactPower[2042] = {	[const.Stats.Endurance] = 1,
+						[const.Stats.Personality] = 1,
+						[const.Stats.Luck] = 1,
+						[const.Stats.Intellect] = -1}
+-- Aegis
+artifactPower[2043] = {	[const.Stats.Luck] = 3,
+						[const.Stats.Speed] = -0.6}
+-- Odin
+artifactPower[2044] = {	[const.Stats.FireResistance] = 0.75,
+						[const.Stats.AirResistance] = 0.75,
+						[const.Stats.WaterResistance] = 0.75,
+						[const.Stats.EarthResistance] = 0.75,
+						[const.Stats.Speed] = -0.5}
+-- Atlas
+artifactPower[2045] = {	[const.Stats.Might] = 3,
+						[const.Stats.Speed] = -1}
+-- Hermes
+artifactPower[2046] = {	[const.Stats.Speed] = 3,
+						[const.Stats.Accuracy] = -0.86}
+-- Aphrodite
+artifactPower[2047] = {	[const.Stats.Personality] = 3,
+						[const.Stats.Luck] = -1.2}
+-- Athena
+artifactPower[2048] = {	[const.Stats.Intellect] = 3,
+						[const.Stats.Might] = -1.2}
+-- Hera
+artifactPower[2049] = {	[const.Stats.HP] = 1.2,
+						[const.Stats.SP] = 1.2,
+						[const.Stats.Luck] = 0.6,
+						[const.Stats.Personality] = -0.6}
 
---artifacts HP/SP regen
-artifactHpRegen={509,520,1131,1337}
-artifactSpRegen={513,1131,1334}
+artifactHpRegen={509,520,1337,1331,1335,2027}
+artifactSpRegen={513,1334,1331,2024,2032,2033,2034}
 
 --artifact spells
 artifactSpellBonus={}
@@ -4235,14 +3863,8 @@ function events.Action(t)
 		local id=Party[Game.CurrentPlayer]:GetIndex()
 		RunNextTick(function()
 			mawRefresh(id)
-			mawRefresh(id) --fixes some skill not being accounted on the first go this could be optimized, but it doesn't affects performance
 		end)
 	--end
-end
-function events.CalcDamageToPlayer(t)
-	RunNextTick(function()
-		mawRefresh(t.PlayerIndex)
-	end)
 end
 function mawRefresh(i)
 	if i=="all" then
@@ -4304,14 +3926,11 @@ function refreshItems()
 	
 	local currentWorld=TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 	local partyLevel=getPartyLevel(4)-math.min(vars.MMLVL[currentWorld]/2, 54)
-	--cap
-	difficultyExtraPower=math.max((Game.BolsterAmount-100)/2000+1,1)
-	cap2=14+ math.floor((difficultyExtraPower-1)*10)
 	--calculate power
 	local currentLevel=vars.MMLVL[currentWorld]
 	strength=math.floor(currentLevel/18)+2
 	strength=math.min(strength,5)
-	partyLevel1=math.min(math.floor(partyLevel/18),cap2)
+	partyLevel1=GetTier(partyLevel)
 	cost=(partyLevel1+strength)^2*250
 	if cost>Party.Gold then
 		return
@@ -4362,7 +3981,7 @@ function mawStoreShop()
 	merchantFix=false
 	for i=0,Party.High do
 		s,m=SplitSkill(Party[i].Skills[const.Skills.Merchant])
-		if s>15 or m==4 then
+		if s>15 or m>=4 then
 			Game.Houses[id].Val=1
 			merchantFix=true
 		end
@@ -4512,7 +4131,7 @@ function events.CanOpenChest(t)
 		for i=0,Party.High do
 			local s, m = SplitSkill(Party[i]:GetSkill(const.Skills.DisarmTraps))
 			local skill=s*m
-			if m==4 or skill>=skillRequired then
+			if m>=4 or skill>=skillRequired then
 				t.CanOpen=true
 			end
 		end
@@ -4638,44 +4257,36 @@ function events.Tick()
 end
 ]]
 
---vampiric aura and fire aura 
-fireAuraDamage={10,20,40,60,[0]=0}
+--vampiric aura and fire aura
+fireAuraDamage={0.1,0.15,0.2,0.25,[0]=0}
+--guaranteed damage per mastery when the weapon is too weak for the share
+--above to beat it; doubled on two-handed weapons, same as the enchant floor
+fireAuraMinDamage={3,6,12,24,[0]=0}
 function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 	if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[4] then
 		if not it or (it and it.Number==0) or (it and it:T().EquipStat>2) then return 0 end
 		local s, m, level=getBuffSkill(4)
 		local id=pl:GetIndex()
-		local mult=math.max((0.5+it.MaxCharges/20)^1.5,0.5)
-		if table.find(artWeap1h, it.Number) or table.find(artWeap2h, it.Number) then
-			mult=(1+artifactPowerMult(pl.LevelBase, false, it.BonusExpireTime))^1.5
-		end
-		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 19) then
-			local str=pl:GetMight()
-			local int=pl:GetIntellect()
-			local pers=pl:GetPersonality()
-			local bonusStat=math.max(str,int,pers)
-			mult=mult*(1+bonusStat/1000)
-		end
+		--aura scales with the undamped item-level weapon damage; the flat base
+		--every weapon shares is not part of that scale
+		local damage=GetWeaponLevelDamage(it)*fireAuraDamage[m]
+		damage=math.max(damage, fireAuraMinDamage[m]*(IsTwoHandedWeapon(it) and 2 or 1))
+		damage=damage*GetLegendary19Mult(pl)
 		if calcType~="tooltip" and vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 26) then
-			if isSpell then 
+			if isSpell then
 				critChance, critMult, success=getCritInfo(pl,"spell")
 			else
 				critChance, critMult, success=getCritInfo(pl)
 			end
 			if calcType=="damage" and success then
-				mult=mult*critMult
+				damage=damage*critMult
 			end
 			if calcType=="power" then
-				mult=mult*(1+math.min(critChance,1)*(critMult-1))
+				damage=damage*(1+math.min(critChance,1)*(critMult-1))
 			end
 		end
-		if it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number)then
-			mult=mult*2
-		end
-		mult=mult*(400+Game.BolsterAmount)/1000
-		local damage=fireAuraDamage[m]*mult
 		local res=res or 0
-		local damage=damage/2^(res/100)
+		damage=damage/2^(res/100)
 		if speedMult then
 			damage=damage*getItemRecovery(it, pl.LevelBase)/100
 		end
@@ -4684,34 +4295,6 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 		return 0
 	end
 end
-
-function events.BuildItemInformationBox(t)
-	if t.Item:T().EquipStat==0 or t.Item:T().EquipStat==1 or t.Item:T().EquipStat==2 then 
-		if t.Description then
-			if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[4] then --fire aura
-				if Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
-					local pl=Party[Game.CurrentPlayer]
-					local s, m, level=getBuffSkill(4)
-					if m>=1 then
-						local name={"Fire","Flame","Inferno","Hell",[0]=""}
-						local damage=calcFireAuraDamage(pl, t.Item, 0, false, false, "tooltip")
-						if damage then
-							local txt=string.format(name[m] .. " Aura: adds " .. damage .. " Fire Damage to any attack\n\n")
-							t.Description=StrColor(255,255,153,txt) .. t.Description
-						end
-					end
-				end
-			end
-			if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[91] then --vampiric aura
-				local s, m, level=getBuffSkill(91)
-				if m>=1 then
-					t.Description=StrColor(255,255,153,"Vampiric Aura: damage done will restore player HP.\n\n") .. t.Description
-				end
-			end
-		end
-	end
-end	
-
 
 function events.AfterLoadMap()
 	if isRedone then
@@ -4724,7 +4307,7 @@ function events.AfterLoadMap()
 				for i=1,Map.Chests[k].Items.High do
 					local it=Map.Chests[k].Items[i]
 					if it.MaxCharges==0 then
-						if (it.Number>=1 and it.Number<=151) or (it.Number>=803 and it.Number<=936) or (it.Number>=1603 and it.Number<=1736) then
+						if IsBaseItemId(it.Number) then
 							it:Randomize(lootLevel,it:T().EquipStat+1)
 						end
 					end
@@ -4733,7 +4316,7 @@ function events.AfterLoadMap()
 			for i=0,Map.Objects.High do
 				local it=Map.Objects[i].Item
 				if it.MaxCharges==0 then
-					if (it.Number>=1 and it.Number<=151) or (it.Number>=803 and it.Number<=936) or (it.Number>=1603 and it.Number<=1736) then
+					if IsBaseItemId(it.Number) then
 						it:Randomize(lootLevel,it:T().EquipStat+1)
 					end
 				end
@@ -4742,76 +4325,18 @@ function events.AfterLoadMap()
 	end
 end
 
-	
+
 function GetLevelRquirement(it)
 	local itemType = it:T().EquipStat
 	if itemType>11 then
-		return 0 
+		return 0
 	end
-	if it.BonusExpireTime>=100 and it.BonusExpireTime<=200 then
+	if IsCelestialItem(it) then
 		return 1
 	end
-	local difficultyExtraPower=1
-	if Game.BolsterAmount>100 then
-		difficultyExtraPower=(Game.BolsterAmount-100)/2000+1
-	end
-	if vars.insanityMode then
-		difficultyExtraPower=1.4
-	end
-	local bonusBasePower=(difficultyExtraPower-1)*10
-	local tot=0
-	local lvl=0
-	for i=1, 6 do
-		tot=tot+it:T().ChanceByLevel[i]
-		lvl=lvl+it:T().ChanceByLevel[i]*i
-	end
-	tot = math.max(tot,1)
-	local maxCharges=math.round(it.MaxCharges/difficultyExtraPower)
-	if it.BonusExpireTime>0 and it.BonusExpireTime<=2 then
-		maxCharges=math.floor(math.max(maxCharges/1.2,maxCharges-5))
-	end
-	if it.BonusExpireTime>10 and it.BonusExpireTime<=100 then
-		maxCharges=math.floor(math.max(maxCharges/1.2,maxCharges-10))
-	end
-	
-	local baseLevel=(maxCharges)*5+lvl/tot*2
-	
-	local specialEnchantLevel = 0
-	if it.Bonus2>0 then
-		specialEnchantLevel = (Game.SpcItemsTxt[it.Bonus2-1].Lvl + 1) * (2 + maxCharges)
-	end
-	
-	local bonusStrength=it.BonusStrength
-	if it.Bonus>=17 then
-		bonusStrength = math.min(bonusStrength^2, bonusStrength*10)
-	end
-	
-	local chargesPower=GetEnc2Strength(it)
-	
-	if it.BonusExpireTime>0 and it.BonusExpireTime<=2 then
-		bonusStrength=math.floor(math.max(bonusStrength/1.2,bonusStrength-5))
-		chargesPower=math.floor(math.max(chargesPower/1.2,chargesPower-5))
-	end
-	if it.BonusExpireTime>10 and it.BonusExpireTime<=100 then
-		bonusStrength=math.floor(math.max(bonusStrength/1.2,bonusStrength-10))
-		chargesPower=math.floor(math.max(chargesPower/1.2,chargesPower-10))
-	end
-	
-	local equipStat=it:T().EquipStat
-	if table.find(twoHandedAxes, it.Number) or table.find(twoHandedSwords, it.Number) then
-		equipStat=1
-	end
-	
-	local bonusLevel=math.round(bonusStrength * 3 / difficultyExtraPower/slotMult[equipStat])
-	local chargesLevel=math.round((chargesPower%1000) * 3 / difficultyExtraPower/slotMult[equipStat])
-	
-	local weight = equipSlotWeights[itemType]
-	local levelRequired=(baseLevel*weight[1]+bonusLevel*weight[2]+chargesLevel*weight[3]+specialEnchantLevel*weight[4])
-	
-	
-	
-	levelRequired=math.max(1,math.floor(levelRequired-10))
-	
+	local dropLevel=GetItemDropLevel(it)+MawCore.ItemLevel.TierLevels(it.Number)
+	local levelRequired=MawCore.ItemLevel.WearLevel(dropLevel)
+
 	if Game.BolsterAmount>=300 then
 		levelRequired=levelRequired-6
 	end
@@ -4821,9 +4346,8 @@ function GetLevelRquirement(it)
 	if vars.insanityMode then
 		levelRequired=levelRequired-3
 	end
-	levelRequired=math.max(1,math.floor(levelRequired))
-	
-	return levelRequired
+
+	return math.max(1,math.floor(levelRequired))
 end
 
 equipSlotWeights = {
@@ -4917,139 +4441,18 @@ function events.LoadMap()
 		end
 	end
 end
----------------------------
---PITY SYSTEM CALCULATION--
----------------------------
---[[
--- Tunables
-local SURV_TOL   = 1e-12          -- stop when survival prob < this
-local BISECT_ITR = 30             -- bisection iterations (30 is plenty)
-local TINY_P     = 1e-4           -- threshold to use asymptotic
-local MAX_K_CAP  = 5e6            -- hard safety cap so we don't loop forever
 
--- Compute effective drops/kill for sequence p_k = s * u_k(k), capped at 1
-local function effective_rate(u_k, s, p_base)
-  -- choose an adaptive upper bound: ~c/p is usually enough
-  local max_k = math.min(MAX_K_CAP, math.max(10000, math.floor(20.0 / p_base)))
-
-  -- accumulate survival in log-space for stability when S gets tiny
-  local logS, EK, k = 0.0, 0.0, 0
-  while true do
-    -- S = exp(logS); add S to EK
-    EK = EK + math.exp(logS)
-
-    local pk = s * u_k(k)
-    if pk >= 1 then
-      break
-    end
-
-    -- update survival: logS += log1p(-pk)
-    -- (use stable log1p if available, otherwise approximation)
-    local step = math.log(1 - pk)
-    logS = logS + step
-
-    -- termination criteria
-    if logS < math.log(SURV_TOL) then break end  -- survival tiny enough
-    if k >= max_k then break end
-
-    k = k + 1
-  end
-  return 1.0 / EK
-end
-
--- Asymptotic scale for tiny p (linear pity shape)
-local function tiny_p_scale(p, a)
-  -- s ≈ 1 / (1 + a/(2p)), clamp to [0,1]
-  local s = 1.0 / (1.0 + (a / (2.0 * p)))
-  if s < 0 then s = 0 end
-  if s > 1 then s = 1 end
-  return s
-end
-
--- Find s so that the long-run effective rate equals the base p
-local function scale_for_constant_expectation(p, u_k, a)
-  -- start from a good guess for tiny p to avoid massive loops
-  local lo, hi
-  if p <= TINY_P then
-    local s0 = tiny_p_scale(p, a)
-    -- bracket around s0
-    lo = 0.5 * s0
-    hi = math.min(1.0, s0 * 1.5 + 1e-9)
-  else
-    lo, hi = 0.0, 1.0
-  end
-
-  for _ = 1, BISECT_ITR do
-    local mid = 0.5 * (lo + hi)
-    local r = effective_rate(u_k, mid, p)
-    if r > p then
-      hi = mid
-    else
-      lo = mid
-    end
-  end
-  return 0.5 * (lo + hi)
-end
-
--- Optional tiny cache so we don't recompute s(p,a) every call
-local _scale_cache = {}
-local function _cache_key(p, a)
-  local pr = math.floor(p * 1e9 + 0.5)  -- quantize to 1e-9
-  local ar = math.floor(a * 1e6 + 0.5)  -- quantize to 1e-6
-  return pr .. ":" .. ar
-end
-
--- Returns the pity-adjusted chance for base p, failures k, and slope a (default 0.1)
-function pity_chance(p, k, a)
-  a = (a == nil) and 0.1 or a
-  k = (k and k >= 0) and k or 0
-  if p <= 0 then return 0 end
-  if p >= 1 then return 1 end
-
-  -- linear unscaled pity shape u_k = p * (1 + a*k)
-  local function u_k(idx) return p * (1 + a * idx) end
-
-  -- get or compute scale s so that expectation stays constant
-  local key = _cache_key(p, a)
-  local s = _scale_cache[key]
-  if not s then
-    s = scale_for_constant_expectation(p, u_k, a)
-    _scale_cache[key] = s
-  end
-
-  -- pity-adjusted chance for this failure count
-  local pk = s * u_k(k)
-  if pk > 1 then pk = 1 end
-  if pk < 0 then pk = 0 end
-  return pk
-end
-
-NEW ONE
-succ={}
-chance=0.1
-pity=0
-for i=1,100000 do
-	roll=math.random()
-	win=chance^(1.8-chance*pity)  1.8 is close to the real mean
-	if win>=roll then
-		table.insert(succ, pity)
-		pity=0
-	else
-		pity=pity+1
-	end
-end
-sum=0
-for i=1,#succ do
-	sum=sum+succ[i]
-end
-mean=sum/#succ
-print(mean)
-
-]]
-
+--Each failure raises the chance; the exponent is picked so that the AVERAGE
+--wait stays at 1/chance (within 2% for every rate in use, from 0.5% to 12%).
+--At 1.45 the curve started so far under the nominal chance that it cost ~10%
+--more rolls than having no pity at all.
+local PITY_EXPONENT = 1.38
 function pity_chance(chance, failures)
-	local successChance=chance^(1.45-chance*failures*0.5)
-	return successChance
+	--above 1 the exponent would turn the curve upside down and LOWER it
+	if chance>=1 then
+		return 1
+	end
+	return chance^(PITY_EXPONENT-chance*failures*0.5)
 end
 
 --remove artifacts
@@ -5061,7 +4464,7 @@ function events.AfterLoadMap()
 			if it.MaxCharges==0 then
 				if table.find(mawArtifacts, it.Number) then
 					if it:T().Value>=20000 and it.BonusStrength==0 then
-						bossLoot = true
+						LootContext.markBoss()
 						it:Randomize(6,0)
 					end
 				end
@@ -5070,9 +4473,9 @@ function events.AfterLoadMap()
 	end
 	if vars.Mode==2 and not vars.StartingItemFix then
 		vars.StartingItemFix=true
-		local extraPower=5
+		local extraPower=2
 		if vars.insanityMode then
-			extraPower=10
+			extraPower=4
 		end
 		for i=0,Party.PlayersArray.High do
 			local pl=Party.PlayersArray[i]
@@ -5084,4 +4487,58 @@ function events.AfterLoadMap()
 			end
 		end
 	end
+end
+
+function IsTwoHandedWeapon(it)
+	return it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number)~=nil
+end
+
+--An artifact is always the best of its weapon type. The ladder answers which
+--rung of a base family an item sits on, and an artifact sits on no family: read
+--that way it would land on the average rung, or on a neighbour's by accident.
+function GetWeaponFlatDamage(it)
+	if IsArtifactWeapon(it) then
+		return weaponTierFlat(MawCore.ItemLevel.Tiers)
+	end
+	return weaponTierFlat(MawCore.ItemLevel.LadderTier(it.Number))
+end
+
+function GetWeaponDamage(it)
+	return getWeaponDamageForLevel(MawCore.ItemLevel.OfItem(it), IsTwoHandedWeapon(it), GetWeaponFlatDamage(it))
+end
+
+--The two damage rows an item is worth: the flat/attack bonus and the sides of
+--one damage die. The enchant-driven split goes half to attack/flat and half
+--over the sides, while the weapon's own base skips the split -- its dice part
+--lands only on the sides, its flat part only on attack/flat.
+--
+--An artifact needs no case of its own here: it is exactly a top-tier weapon at
+--the party's own level, and both of those answers already come from
+--GetWeaponDamage above, through ItemLevel.OfItem and GetWeaponFlatDamage. Its
+--printed Mod2/Mod1DiceSides are ignored on purpose.
+--
+--addWeaponRows applies these to the character and the item tooltip prints them,
+--so they have to come from here: the number shown is the number dealt.
+function GetWeaponDamageRows(it)
+	local txt=it:T()
+	local wDmg,wDice,wFlat=GetWeaponDamage(it)
+	local split=wDmg-wDice-wFlat
+	local bonus=split/2+wFlat
+	local sides=(split/2+wDice)/math.max(txt.Mod1DiceCount,1)
+	local baseMult=MawCore.Artifacts.BaseMult(it)*ItemQualityMult(it)
+	return bonus*baseMult, sides*baseMult
+end
+
+--The damage range the rows amount to, for tooltips: min = every die at 1,
+--max = every die at its rounded sides -- the same rounding addWeaponRows
+--bakes into the character, so the shown range is the dealt one.
+function GetWeaponDamageMinMax(it)
+	local bonus, sides = GetWeaponDamageRows(it)
+	bonus, sides = round(bonus), round(sides)
+	local count = it:T().Mod1DiceCount
+	return bonus, count + bonus, count*sides + bonus
+end
+
+function GetWeaponLevelDamage(it)
+	return getWeaponLevelDamage(MawCore.ItemLevel.OfItem(it), IsTwoHandedWeapon(it), GetWeaponFlatDamage(it))
 end

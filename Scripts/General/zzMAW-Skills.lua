@@ -42,7 +42,6 @@ weaponImpair =
 	[const.Skills.Shield]	= {[0]=10, 10, 0, 0, 0,},
 }
 
-
 skillAttack =
 {
 	[const.Skills.Staff]	= {[0]=0, 1, 2, 2, 2,},
@@ -60,37 +59,37 @@ skillAttack =
 skillRecovery =
 {
 	[const.Skills.Staff]	= {[0]=0, 0, 0, 0, 0,},
-	[const.Skills.Sword]	= {[0]=0, 0, 2, 3, 3,},
-	[const.Skills.Dagger]	= {[0]=0, 1, 1, 1, 2,},
-	[const.Skills.Axe]		= {[0]=0, 0, 1, 2, 2,},
+	[const.Skills.Sword]	= {[0]=0, 0, 1, 1, 2,},
+	[const.Skills.Dagger]	= {[0]=0, 0, 0, 0, 1,},
+	[const.Skills.Axe]		= {[0]=0, 0, 0, 1, 1,},
 	[const.Skills.Spear]	= {[0]=0, 0, 0, 0, 0,},
-	[const.Skills.Bow]		= {[0]=0, 1, 2, 3, 5,},
+	[const.Skills.Bow]		= {[0]=0, 0, 1, 1, 2,},
 	[const.Skills.Mace]		= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0,},
-	[const.Skills.Unarmed]	= {[0]=0, 0, 1, 2, 2,},
+	[const.Skills.Unarmed]	= {[0]=0, 0, 1, 1, 2,},
 }
 
 skillDamage =
 {
-	[const.Skills.Staff]	= {[0]=0, 2, 3, 3, 4,},
-	[const.Skills.Sword]	= {[0]=0, 2, 3, 3, 4,},
-	[const.Skills.Dagger]	= {[0]=0, 2, 3, 3, 4,},
-	[const.Skills.Axe]		= {[0]=0, 2, 3, 4, 4,},
-	[const.Skills.Spear]	= {[0]=0, 1, 2, 3, 3,},
-	[const.Skills.Bow]		= {[0]=0, 2, 4, 6, 8,},
-	[const.Skills.Mace]		= {[0]=0, 2, 3, 3, 4,},
-	[const.Skills.Blaster]	= {[0]=0, 2, 4, 6, 8,},
-	[const.Skills.Unarmed]	= {[0]=0, 3, 4, 5, 6,},
+	[const.Skills.Staff]	= 2,
+	[const.Skills.Sword]	= 2,
+	[const.Skills.Dagger]	= 2,
+	[const.Skills.Axe]		= 2,
+	[const.Skills.Spear]	= 2,
+	[const.Skills.Bow]		= 4,
+	[const.Skills.Mace]		= 2,
+	[const.Skills.Blaster]	= 4,
+	[const.Skills.Unarmed]	= 2,
 }
 -- weapon skill AC bonuses (by rank)
 
 skillAC =
 {
-	[const.Skills.Staff]	= {[0]=0, 0, 2, 3, 4,},
-	[const.Skills.Sword]	= {[0]=0, 0, 0, 1, 2,},
+	[const.Skills.Staff]	= {[0]=0, 0, 1, 2, 2,},
+	[const.Skills.Sword]	= {[0]=0, 0, 0, 0, 1,},
 	[const.Skills.Dagger]	= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Axe]		= {[0]=0, 0, 0, 0, 0,},
-	[const.Skills.Spear]	= {[0]=0, 0, 4, 6, 8,},
+	[const.Skills.Spear]	= {[0]=0, 0, 2, 3, 4,},
 	[const.Skills.Bow]		= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Mace]		= {[0]=0, 0, 0, 0, 0,},
 	[const.Skills.Blaster]	= {[0]=0, 0, 0, 0, 0,},
@@ -102,9 +101,12 @@ skillAC =
 	--[const.Skills.Plate]	= {[0]=0, 2, 2, 3, 4,},
 	[const.Skills.Dodging]	= {[0]=0, 4, 5, 6, 6,},
 }
+-- bodybuilding % bonus HP per skill point (by rank)
+bodybuildingHP = {[0]=0, 0.5, 1, 1.5, 2,}
+
 skillResistance =
 {
-	[const.Skills.Staff]	= {[0]=0, 0, 2, 3, 4},
+	[const.Skills.Staff]	= {[0]=0, 0, 1, 1, 2},
 	[const.Skills.Sword]	= {[0]=0, 0, 0, 0, 0},
 	[const.Skills.Dagger]	= {[0]=0, 0, 0, 0, 0},
 	[const.Skills.Axe]		= {[0]=0, 0, 0, 0, 0},
@@ -121,18 +123,18 @@ skillResistance =
 	[const.Skills.Dodging]	= {[0]=0, 0, 0, 0, 0,},
 }
 skillItemAC={
-	[const.Skills.Leather]	= {[0]=0, 3, 4, 5, 6,},
-	[const.Skills.Chain]	= {[0]=0, 3, 4, 5, 6,},
-	[const.Skills.Plate]	= {[0]=0, 3, 4, 5, 6,},
-	[const.Skills.Shield]	= {[0]=0, 4, 6, 8, 10,},
-	[const.Skills.Dodging]	= {[0]=0, 5, 5, 10, 10,},
+	[const.Skills.Leather]	= {[0]=0, 1, 1, 2, 3,},
+	[const.Skills.Chain]	= {[0]=0, 1, 2, 3, 3,},
+	[const.Skills.Plate]	= {[0]=0, 1, 2, 3, 3,},
+	[const.Skills.Shield]	= {[0]=0, 2, 3, 4, 5,},
+	[const.Skills.Dodging]	= {[0]=0, 3, 3, 5, 5,},
 }
 skillItemRes={
-	[const.Skills.Leather]	= {[0]=0, 2, 3, 4, 5,},
-	[const.Skills.Chain]	= {[0]=0, 1, 2, 3, 4,},
-	[const.Skills.Plate]	= {[0]=0, 0, 1, 2, 3,},
-	[const.Skills.Shield]	= {[0]=0, 4, 6, 8, 10,},
-	[const.Skills.Dodging]	= {[0]=0, 0, 5, 5, 10,},
+	[const.Skills.Leather]	= {[0]=0, 1, 2, 3, 4,},
+	[const.Skills.Chain]	= {[0]=0, 1, 2, 2, 3,},
+	[const.Skills.Plate]	= {[0]=0, 0, 1, 1, 2,},
+	[const.Skills.Shield]	= {[0]=0, 2, 3, 4, 5,},
+	[const.Skills.Dodging]	= {[0]=0, 0, 3, 3, 3,},
 }
 	
 
@@ -145,35 +147,284 @@ twoHandedWeaponDamageBonusByMastery = {
 }
 
 armsmasterSkill={
-	["Damage"]={0.5,1,1.5,2,3,[0]=0},
-	["Speed"]={0,1,2,2,2,[0]=0},
-	["Attack"]={1,1,2,3,3,[0]=0},
+	["Damage"]={0,1,1,1.5,2,[0]=0},
+	["Speed"]={0,0,1,1,1,[0]=0},
+	["Attack"]={1,1,1,1,1,[0]=0},
 }
+
+dkDamageSkill={0.5,0.75,1,1,[0]=0}
+
+function MawArmsmasterApplies(pl)
+	local main=pl:GetActiveItem(1)
+	return main~=nil and main:T().Skill~=const.Skills.Staff
+end
+
+skillCap={
+	[const.Skills.Alchemy]=60,
+	[50]=30,	--Cover: the chance is 10% +1% per point, so it tops out at 40%
+	[51]=50,	--Mana Shield: its mana efficiency stops growing there anyway
+	[53]=50,	--Retaliation
+}
+
+skillEffectCap={
+	buff=50,	--caster skill a buff counts, whatever the school (getBuffSkill)
+	dayBuff=75,	--Day of the Gods, Day of Protection, Hour of Power
+}
+
+skillCapExtra={}
+
+skillMasteryLadder={
+	[50]={normal={6,12,20}, insanity={8,20,30}},	--Cover
+	[51]={normal={6,12,20}, insanity={8,20,32}},	--Mana Shield
+	[52]={normal={6,12,20}},						--Enlightenment
+	[53]={normal={12,30,50}},						--Retaliation
+}
+
+skillTrainHook={}
+
+skillTrainHook[50]=function(pl, s)
+	local cap=skillCap[50]
+	if s<cap-1 or (s==cap-1 and pl.SkillPoints<=s) then
+		return
+	end
+	if SplitSkill(Skillz.get(pl, 53))~=0 then
+		return
+	end
+	Skillz.set(pl, 53, 1)
+	Game.ShowStatusText("YOU LEARNED RETALIATION!!")
+	return true
+end
+
+function events.GameInitialized2()
+	function events.GetSkill(t)
+		local cap=skillCap[t.Skill]
+		if not cap then
+			return
+		end
+		local s,m=SplitSkill(t.Result)
+		if s>cap*2 then
+			t.Result=JoinSkill(cap*2, m)
+		end
+		local extra=skillCapExtra[t.Skill]
+		if extra then
+			t.Result=t.Result+extra(t.PlayerIndex)
+		end
+	end
+end
+
+local learningRequirementsNormal={0,4,7,10}
+local learningRequirements={0,6,12,20}
+local horizontalSkills={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,27,28,30,32,33,35,38}
+
+--------------------------------------
+--THE SKILL "+" BUTTON (action 121)
+--------------------------------------
+local function refundSharedCost(pl, skill)
+	local shared=sharedSkills
+	if table.find(shamanClass, pl.Class) or table.find(seraphClass, pl.Class)
+			or table.find(dkClass, pl.Class) or table.find(assassinClass, pl.Class) then
+		shared={12,13,14,15,16,17,18,19,20,21,22}
+	end
+	if not table.find(shared, skill) then
+		return
+	end
+	local currentCost=SplitSkill(pl.Skills[skill])+1
+	if currentCost>1000 then
+		return
+	end
+	local n=1
+	for i=1,#shared do
+		local s=SplitSkill(pl.Skills[shared[i]])
+		if s>=currentCost then
+			n=n+1
+		end
+	end
+	local actualCost=math.ceil(currentCost/n)
+	if pl.SkillPoints>=actualCost then
+		pl.SkillPoints=pl.SkillPoints+currentCost-actualCost
+	end
+end
+
+local function restoreMasteries(pl, skill)
+	if skill>39 then	-- to do it better later
+		return
+	end
+	local currentCost=SplitSkill(pl.Skills[skill])+1
+	local n=1
+	if skill>=12 and skill<=23 then
+		for i=1,11 do
+			local s=SplitSkill(pl.Skills[11+i])
+			if s>=currentCost then
+				n=n+1
+			end
+		end
+	end
+	if pl.SkillPoints<math.ceil(currentCost/n) then
+		return
+	end
+	local id=pl:GetIndex()
+	local s,m=SplitSkill(pl.Skills[skill])
+	if table.find(horizontalSkills, skill) and vars.storedMasteries and vars.storedMasteries[id]
+			and vars.storedMasteries[id][skill] then
+		while m<4 and vars.storedMasteries[id][skill]>m
+				and ((s+1>=learningRequirements[m+1] and not Game.freeProgression)
+					or (s+1>=learningRequirementsNormal[m+1] and Game.freeProgression)) do
+			pl.Skills[skill]=JoinSkill(s,m+1)
+			m=m+1
+		end
+	end
+	if vars.oldPlayerMasteries and vars.oldPlayerMasteries[id]
+			and m<4 and vars.oldPlayerMasteries[id][skill]>m then
+		local requirements
+		if vars.madnessMode and table.find(horizontalSkills, skill) then
+			requirements={0,12,30,50}
+		elseif vars.insanityMode and table.find(horizontalSkills, skill) then
+			requirements={0,8,20,32}
+		elseif Game.freeProgression or not table.find(horizontalSkills, skill) then
+			requirements={0,4,7,10}
+		else
+			requirements={0,6,12,20}
+		end
+		if s+1>=requirements[m+1] then
+			pl.Skills[skill]=JoinSkill(s,m+1)
+		end
+	end
+end
+
+local function applyCap(pl, t)
+	local cap=skillCap[t.Param]
+	if not cap then
+		return
+	end
+	local s,m=SplitSkill(Skillz.get(pl, t.Param))
+	local hook=skillTrainHook[t.Param]
+	local swallow=hook and hook(pl, s, m, cap)
+	if s<cap then
+		return
+	end
+	t.Handled=true
+	while s>cap do
+		pl.SkillPoints=pl.SkillPoints+s
+		s=s-1
+	end
+	Skillz.set(pl, t.Param, JoinSkill(s, m))
+	if not swallow then
+		Game.ShowStatusText("This skill has reached its limit (" .. cap .. ")")
+	end
+end
+
+local function autoLearnMastery(pl, skill)
+	local ladder=skillMasteryLadder[skill]
+	if not ladder then
+		return
+	end
+	local req=(vars.insanityMode and ladder.insanity) or ladder.normal
+	local s,m=SplitSkill(Skillz.get(pl, skill))
+	if not req[m] or Skillz.MasteryLimit(pl, skill)<=m then
+		return
+	end
+	if s>=req[m] or (pl.SkillPoints>s and s+1>=req[m]) then
+		Skillz.set(pl, skill, JoinSkill(s, m+1))
+	end
+end
+
+local function armsmasterSupreme(pl, id, skill)
+	if skill~=35 or pl.Class<16 or pl.Class>19 then
+		return
+	end
+	local s=SplitSkill(pl.Skills[35])
+	if pl.SkillPoints>s and s+1==GetArmsmasterSupremeRequirement() then
+		Game.ShowStatusText("SUPREME UNLOCKED!!!")
+		evt[id].Add("HP", 0) --graphic
+	end
+end
+
+function events.Action(t)
+	if t.Action~=121 then
+		return
+	end
+	local id=Game.CurrentPlayer
+	if id<0 or id>Party.High then
+		return
+	end
+	local pl=Party[id]
+	vars.checkSoloMastery=true --makes skills to be automatically learned if solo
+
+	refundSharedCost(pl, t.Param)
+	restoreMasteries(pl, t.Param)
+	applyCap(pl, t)
+	autoLearnMastery(pl, t.Param)
+	armsmasterSupreme(pl, id, t.Param)
+end
+
+		--[[  skill share system, disabled, fix at the bottom
+		if table.find(partySharedSkills,t.Param) then
+			maxS=0
+			maxM=0
+			increased=-1
+			for i=0,Party.High do
+				skill=partySharedSkills[table.find(partySharedSkills,t.Param)]
+				s,m=SplitSkill(Party[i].Skills[skill])
+				if Game.CurrentPlayer==i then
+					if Party[i].SkillPoints>s and (s<10 or m~=4) then
+						s=s+1
+						increased=i
+					end
+				end
+				if s>maxS then
+					maxS=s
+				end
+				if m>maxM then
+					maxM=m
+				end
+			end
+			for i=0,Party.High do
+				if increased==i then
+					Party[i].Skills[skill]=JoinSkill(maxS-1,maxM)
+				else
+					Party[i].Skills[skill]=JoinSkill(maxS,maxM)
+				end
+			end
+			if maxS>=10 and maxM==4 then
+				t.Handled=true
+				Game.ShowStatusText("This skill is already as good as it will ever get")
+			end
+		end
+		]]
 
 --all stats bonus are calculated in Maw Items, as this function only changes hp,sp,ac,attack and damage
 function events.CalcStatBonusBySkills(t)
 	t.Result=0
 end
 
+--speed stat -> recovery bonus in percentage points; the estimator feeds it a
+--modeled speed, so the curve stays in one place
+SPELL_HASTE_DIVISOR = 20
+
+function GetSpeedBonusFromStat(speed, level)
+	local speedEffect=0
+	if speed<=21 then
+		speedEffect=(speed-13)/4
+	else
+		speedEffect=math.floor(speed/10)
+	end
+	return speedEffect
+end
+
+function GetSpeedBonus(pl)
+	return GetSpeedBonusFromStat(pl:GetSpeed(), pl.LevelBase)
+end
+
+ITEM_RECOVERY_LEVEL_CAP = 600
 function getItemRecovery(it, playerLevel)
 	local skill=it:T().Skill
 	if table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number) then
 		skill=3
 	end
 	local baseSpeed=100
-	if table.find(artWeap1h,it.Number) or table.find(artWeap2h,it.Number) then 
-		itemLevel=playerLevel
-		baseSpeed=baseRecovery[skill] * (0.75+playerLevel/250)
-		baseSpeed=round(baseSpeed/10)*10
-	elseif baseRecovery[skill] then
-		local tot=0
-		local lvl=0
-		for i=1, 6 do
-			tot=tot+it:T().ChanceByLevel[i]
-			lvl=lvl+it:T().ChanceByLevel[i]*i
-		end
-		itemLevel=round(lvl/tot*18-17)+it.MaxCharges*5
-		baseSpeed=baseRecovery[skill] * (0.75+itemLevel/250)
+	if baseRecovery[skill] then
+		local itemLevel=math.min(MawCore.ItemLevel.OfItem(it), ITEM_RECOVERY_LEVEL_CAP)
+		baseSpeed=baseRecovery[skill] * (0.75+itemLevel/500)
 		baseSpeed=round(baseSpeed/10)*10
 	end
 	if it:T().EquipStat==1 then
@@ -209,6 +460,8 @@ function events.GetAttackDelay(t)
 		end
 	else
 		local speed={}
+		--a weapon skill pays its recovery bonus once, not once per hand
+		local speedSkillPaid={}
 		for i=0,1 do
 			local it=t.Player:GetActiveItem(i)
 			if it then
@@ -224,11 +477,12 @@ function events.GetAttackDelay(t)
 						skill=3
 					end
 					local s,m = SplitSkill(t.Player:GetSkill(skill))
-					if skillRecovery[skill] and skillRecovery[skill][m] then
+					if skillRecovery[skill] and skillRecovery[skill][m] and not speedSkillPaid[skill] then
 						if not table.find(twoHandedAxes, it.Number) or i~=0 then
 							bonusSpeed=bonusSpeed+skillRecovery[skill][m]*s
+							speedSkillPaid[skill]=true
 						end
-					end	
+					end
 					if it.Bonus2==41 or it.Bonus2==59 then
 						local equipStat=GetItemEquipStat(it)
 						if equipStat==1 then
@@ -239,12 +493,15 @@ function events.GetAttackDelay(t)
 					end
 					
 					--unarmed working with staff GM
-					if skill==0 and m==4 then
+					if skill==0 and m>=4 and not speedSkillPaid[const.Skills.Unarmed] then
+						speedSkillPaid[const.Skills.Unarmed]=true
 						local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Unarmed))
 						bonusSpeed=bonusSpeed+skillRecovery[const.Skills.Unarmed][m]*s
 					end
 				end
-			elseif i==1 and Game.CharacterPortraits[pl.Face].Race~=const.Race.Dragon then
+			elseif i==1 and Game.CharacterPortraits[pl.Face].Race~=const.Race.Dragon
+					and not speedSkillPaid[const.Skills.Unarmed] then
+				speedSkillPaid[const.Skills.Unarmed]=true
 				local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Unarmed))
 				bonusSpeed=bonusSpeed+skillRecovery[const.Skills.Unarmed][m]*s
 			end
@@ -260,23 +517,26 @@ function events.GetAttackDelay(t)
 			baseSpeed=baseSpeed/2
 		end
 		
-		local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Armsmaster))
-		bonusSpeed=bonusSpeed+s*armsmasterSkill.Speed[m]
+		if MawArmsmasterApplies(t.Player) then
+			local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Armsmaster))
+			bonusSpeed=bonusSpeed+s*armsmasterSkill.Speed[m]
+		end
 	end
+	--class speed bonuses are halved like skillRecovery/armsmasterSkill.Speed
 	if table.find(dkClass, t.Player.Class) then
 		local s, m=SplitSkill(t.Player.Skills[const.Skills.Water])
-		bonusSpeed=bonusSpeed+s*2
+		bonusSpeed=bonusSpeed+s
 	end
 	if table.find(seraphClass, t.Player.Class) then
 		local s, m=SplitSkill(t.Player.Skills[const.Skills.Light])
-		bonusSpeed=bonusSpeed+s*m
+		bonusSpeed=bonusSpeed+s*m/2
 	end
 	if table.find(assassinClass, t.Player.Class) then
 		local id=t.Player:GetIndex()
 		if vars.AttackSpeedStackDecay and vars.AttackSpeedStackDecay[id] then
 			if vars.AttackSpeedStackDecay[id]>=Game.Time then
 				local s, m=SplitSkill(t.Player.Skills[const.Skills.Air])
-				bonusSpeed=bonusSpeed+s*vars.AttackSpeedStack[id]
+				bonusSpeed=bonusSpeed+s*vars.AttackSpeedStack[id]/2
 			else
 				vars.AttackSpeedStack[id]=0
 			end
@@ -286,12 +546,7 @@ function events.GetAttackDelay(t)
 	if baseSpeed==0 then
 		baseSpeed=100
 	end
-	local speed=t.Player:GetSpeed()
-	if speed<=21 then
-		speedEffect=(speed-13)/4
-	else
-		speedEffect=math.floor(speed/10)
-	end
+	local speedEffect = GetSpeedBonus(t.Player)
 	bonusSpeed=bonusSpeed+speedEffect
 	if not vars.MAWSETTINGS.buffRework=="ON" and (t.Player.SpellBuffs[const.PlayerBuff.Haste].ExpireTime>Game.Time or Party.SpellBuffs[const.PartyBuff.Haste].ExpireTime>Game.Time) then
 		bonusSpeed=bonusSpeed+20
@@ -328,18 +583,10 @@ function events.GetAttackDelay(t)
 	
 	if vars.MAWSETTINGS.buffRework=="ON" then
 		local hasteMult=1
-		if Party.SpellBuffs[8].ExpireTime>=Game.Time or pl.SpellBuffs[const.PlayerBuff.Haste].ExpireTime>Game.Time then
-			local s, m=getBuffSkill(5)
-			local s2,m2=getBuffSkill(86)
-			local s3=0
-			local m3=0
-			if t.Player.SpellBuffs[const.PlayerBuff.Haste].ExpireTime>Game.Time then
-				s3=25
-				m3=3
-			end
-			s=math.max(s,s2/1.5,s3)
-			m=math.max(m,m2,m3)
-			hasteMult=math.max(1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]*s/1000, hasteMult)
+		if Party.SpellBuffs[8].ExpireTime>=Game.Time or potionBuffActive(t.Player, const.Spells.Haste) then
+			--getBuffSkill already returns the stronger of caster and potion
+			local s, m=bestBuffSource(5, t.Player, buffValueMult)
+			hasteMult=math.max(1+GetBuffMultiplier(const.Spells.Haste, s, m), hasteMult)
 		end
 		totalSpeed=totalSpeed/hasteMult
 	end
@@ -467,7 +714,7 @@ local function navigateMissile(object)
 end
 
 -- game tick related functionality
-function events.Tick()
+function mawTick_HomingProjectiles()
 	-- navigateMissiles
 	if vars.MAWSETTINGS.homingProjectiles == "ON" then
 		for objectIndex = 0,Map.Objects.high do
@@ -482,18 +729,19 @@ end
 ------------------------
 function events.GameInitialized2()
 	Skillz.setDesc(6,1,Skillz.getDesc(6,1) .. "\nThe paralyze effect lasts for 5 seconds on regular monsters and 2 seconds on bosses. The stun effect lasts for half the duration of the paralyze effect. The chances of successfully applying these effects depend on the skill level and the monster's level.\n")
-	Skillz.setDesc(0,1,Skillz.getDesc(0,1) .. "\nThis skill increases the damage gained from weapon by a percentage when equipping a staff.\nAt Grandmaster can combine staff and unarmed skill, increasing its damage with staff skill at half effect.\n\nYour full Staff Attack boosts AC and all Resistances by X% per skill point, counting an extra +10 points of skill. Resistances apply to the entire party.\n")
-	Skillz.setDesc(1,1,Skillz.getDesc(1,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping a sword.\n\nYour full Sword Attack boosts AC by X% per skill point, counting an extra +10 points of skill.\n")
-	Skillz.setDesc(2,1,Skillz.getDesc(2,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping a dagger.\nCrit chance will get lower as monsters grow stronger, up to level 600.")
-	Skillz.setDesc(3,1,Skillz.getDesc(3,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping an axe.\n")
-	Skillz.setDesc(4,1,Skillz.getDesc(4,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping a spear.\n\nSpear skill raises AC by X% per skill point, counting an extra +10 effective skill.\n")
-	Skillz.setDesc(5,1,Skillz.getDesc(5,1) .. "\nThis skill increases the damage gained from weapon +1 per skill point in the bow skill, by a percentage when equipping a bow.\n")
-	Skillz.setDesc(6,1,Skillz.getDesc(6,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by a percentage when equipping a mace.\n")
+	Skillz.setDesc(0,1,Skillz.getDesc(0,1) .. "\nThis skill increases the damage gained from weapon by " .. skillDamage[0] .. "% per skill point, never less than 1 damage per point, when equipping a staff.\nAt Grandmaster can combine staff and unarmed skill, increasing its damage with staff skill at half effect.\n\nYour full Staff Attack boosts AC and all Resistances by X% per skill point, counting an extra +10 points of skill. Resistances apply to the entire party.\n")
+	Skillz.setDesc(1,1,Skillz.getDesc(1,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[1] .. "% per skill point, never less than 1 damage per point, when equipping a sword.\n\nYour full Sword Attack boosts AC by X% per skill point, counting an extra +10 points of skill.\n")
+	Skillz.setDesc(2,1,Skillz.getDesc(2,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[2] .. "% per skill point, never less than 1 damage per point, when equipping a dagger.\nCrit chance will get lower as monsters grow stronger, up to level 600.")
+	Skillz.setDesc(3,1,Skillz.getDesc(3,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[3] .. "% per skill point, never less than 1 damage per point, when equipping an axe.\n")
+	Skillz.setDesc(4,1,Skillz.getDesc(4,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[4] .. "% per skill point, never less than 1 damage per point, when equipping a spear.\n\nSpear skill raises AC by X% per skill point, counting an extra +10 effective skill.\n")
+	Skillz.setDesc(5,1,Skillz.getDesc(5,1) .. "\nThis skill increases the damage gained from weapon +1 per skill point in the bow skill, by " .. skillDamage[5] .. "% per skill point, never less than 1 damage per point, when equipping a bow.\n")
+	Skillz.setDesc(6,1,Skillz.getDesc(6,1) .. "\nThis skill increases the damage gained from weapon, armsmaster, and special abilities by " .. skillDamage[6] .. "% per skill point, never less than 1 damage per point, when equipping a mace.\n")
+	Skillz.setDesc(7,1,Skillz.getDesc(7,1) .. "\nThis skill increases the damage gained from weapon by " .. skillDamage[7] .. "% per skill point, never less than 1 damage per point, when equipping a blaster.\n")
+	Skillz.setDesc(33,1,Skillz.getDesc(33,1) .. "\nUnarmed combat deals " .. skillDamage[33] .. " extra damage per skill point.\n")
 	for i=0,33 do
 		if i<=7 or i==33 then
 			attack=false
 			recovery=false
-			damage=false
 			ac=false
 			res=false
 			baseString=string.format("%s\n------------------------------------------------------------\n",	Skillz.getDesc(i,1))
@@ -503,9 +751,6 @@ function events.GameInitialized2()
 				end
 				if skillRecovery[i][v]~=0 then
 					recovery=true
-				end
-				if skillDamage[i][v]~=0 then
-					damage=true
 				end
 				if skillAC[i][v]~=0 then
 					ac=true
@@ -537,21 +782,6 @@ function events.GameInitialized2()
 				master=string.format("%s\t" .. tab+33 .. "%s|",master,skillRecovery[i][3])
 				gm=string.format("%s\t" .. tab+33 .. "%s|",gm,skillRecovery[i][4])
 			end
-			if damage and i~=33 then
-				tab=tab+55
-				baseString=string.format("%s\t" .. tab .. "Dmg%%|",baseString)
-				normal=string.format("%s\t" .. tab+22 .. "%s%%|",normal,skillDamage[i][1])
-				expert=string.format("%s\t" .. tab+22 .. "%s%%|",expert,skillDamage[i][2])
-				master=string.format("%s\t" .. tab+22 .. "%s%%|",master,skillDamage[i][3])
-				gm=string.format("%s\t" .. tab+22 .. "%s%%|",gm,skillDamage[i][4])
-			else --unarmed
-				tab=tab+55
-				baseString=string.format("%s\t" .. tab .. "Dmg|",baseString)
-				normal=string.format("%s\t" .. tab+22 .. "%s|",normal,skillDamage[i][1])
-				expert=string.format("%s\t" .. tab+22 .. "%s|",expert,skillDamage[i][2])
-				master=string.format("%s\t" .. tab+22 .. "%s|",master,skillDamage[i][3])
-				gm=string.format("%s\t" .. tab+22 .. "%s|",gm,skillDamage[i][4])
-			end
 			if ac then
 				tab=tab+55
 				baseString=string.format("%s\t" .. tab .. "AC|",baseString)
@@ -575,46 +805,6 @@ function events.GameInitialized2()
 			Skillz.setDesc(i,1,baseString)
 		end
 	end
-end
-
---now do same for armors
-function events.Action(t)
-	RunNextTick(function()
-		if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
-			local i=Game.CurrentPlayer
-			if i<0 or i>Party.High then return end
-			local pl=Party[i]
-			local index=pl:GetIndex()
-			itemStats(index)
-			--base descriptions
-			Skillz.setDesc(8,1,"Shield skill provides great defense against both physical and magical attacks.\n\nShield Skill boosts the AC and Resistances gained from your Shield  by a percent amount.")
-			Skillz.setDesc(9,1,"Leather armor is the lightest armor a character can wear.  While leather provides less protection than chain or plate armor, it also slows your character down the least.\n\nLeather Armor Skill boosts the AC and Resistances gained by ALL armors when equipping a Leather Armor by a percent amount.")
-			Skillz.setDesc(10,1,"Chain armor is the medium armor type.  It provides more protection than leather and less than plate, but it also slows your character down more than leather.\n\nChain Armor Skill boosts the AC and Resistances gained by ALL armors when equipping a Chain Armor by a percent amount.")
-			Skillz.setDesc(11,1,"Plate armor is the heaviest armor type.  It provides the most protection, but it slows your character down more than leather or chain.\n\nPlate Armor Skill boosts the AC and Resistances gained by ALL armors when equipping a Plate Armor by a percent amount.")
-			local it=pl:GetActiveItem(3)
-			if it then
-				local skill=it:T().Skill
-				Skillz.setDesc(skill,1,string.format(Skillz.getDesc(skill,1) .. "\n\nCurrent AC from items: " .. StrColor(255,255,100,armorAC) .. "\n"))
-				Skillz.setDesc(skill,1,string.format(Skillz.getDesc(skill,1) .. "Bonus AC: " .. StrColor(255,255,100,itemArmorClassBonus1) .. "\n"))
-				Skillz.setDesc(skill,1,string.format(Skillz.getDesc(skill,1) .. "Bonus Resistances: " .. StrColor(255,255,100,itemResistanceBonus1) .. "\n"))
-			end
-			local it=pl:GetActiveItem(0)
-			if it then
-				local skill=it:T().Skill
-				if skill==8 then
-					Skillz.setDesc(skill,1,string.format(Skillz.getDesc(skill,1) .. "\n\nBonus AC: " .. StrColor(255,255,100,itemArmorClassBonus2) .. "\n"))
-					Skillz.setDesc(skill,1,string.format(Skillz.getDesc(skill,1) .. "Bonus Resistances: " .. StrColor(255,255,100,itemResistanceBonus2) .. "\n"))
-				end	
-			end
-			
-			baseString="\n------------------------------------------------------------\n         "
-			baseString=string.format("%s\t075AC|",baseString)
-			baseString=string.format("%s Res\t000",baseString)
-			for i=8,11 do
-				Skillz.setDesc(i,1,string.format(Skillz.getDesc(i,1) .. baseString))
-			end
-		end
-	end)
 end
 		
 	
@@ -670,16 +860,29 @@ function events.GameInitialized2()
 	end
 	
 	--adjust tooltips with special effects
-	Game.SkillDesGM[const.Skills.Axe]=string.format("%s 1%% to halve AC and increases critical strike damage by 5%% per skill point, reduced up to 1%% as monsters get stronger",Game.SkillDesGM[const.Skills.Axe])
+	Game.SkillDesGM[const.Skills.Axe]=string.format("%s increases critical strike damage by %g%% per skill point",
+		Game.SkillDesGM[const.Skills.Axe], AXE_CRIT_DAMAGE_PER_SKILL*100)
 	Game.SkillDesMaster[const.Skills.Bow]=string.format("%s 2 arrows",Game.SkillDesMaster[const.Skills.Bow])
 	Game.SkillDesGM[const.Skills.Bow]=string.format("%s shoots fire arrows, dealing highest between fire and physical damage",Game.SkillDesGM[const.Skills.Bow])
 	Game.SkillDesExpert[const.Skills.Dagger]=string.format("%s can dual wield",Game.SkillDesExpert[const.Skills.Dagger])
 	Game.SkillDesMaster[const.Skills.Dagger]=string.format("%s 5+1 crit%%/skill",Game.SkillDesMaster[const.Skills.Dagger])
-	Game.SkillDesMaster[const.Skills.Mace]=string.format("%s chance to stun",Game.SkillDesMaster[const.Skills.Mace])
-	Game.SkillDesGM[const.Skills.Mace]=string.format("%s chance to paralyze",Game.SkillDesGM[const.Skills.Mace])
+	local function stunChance(skill)
+		return MawCore.Damage.weaponStun[skill].chanceMult*100
+	end
+	local function stunSeconds(skill, m)
+		local cfg=MawCore.Damage.weaponStun[skill]
+		local seconds=cfg.duration/const.Minute*MawCore.Formulas.gameMinuteSeconds
+		return m==cfg.mastery and seconds/2 or seconds
+	end
+	Game.SkillDesMaster[const.Skills.Mace]=string.format("%s %g%% to stun for %gs",
+		Game.SkillDesMaster[const.Skills.Mace], stunChance(const.Skills.Mace), stunSeconds(const.Skills.Mace, 3))
+	Game.SkillDesGM[const.Skills.Mace]=string.format("%s stun lasts %gs",
+		Game.SkillDesGM[const.Skills.Mace], stunSeconds(const.Skills.Mace, 4))
 	Game.SkillDesMaster[const.Skills.Spear]=string.format("%s can hold with 1 hand",Game.SkillDesMaster[const.Skills.Spear])
-	Game.SkillDesMaster[const.Skills.Staff]=string.format("%s 1%% to stun",Game.SkillDesMaster[const.Skills.Staff])
-	Game.SkillDesGM[const.Skills.Staff]=string.format("%s usable with Unarm.",Game.SkillDesGM[const.Skills.Staff])
+	Game.SkillDesMaster[const.Skills.Staff]=string.format("%s %g%% to stun for %gs",
+		Game.SkillDesMaster[const.Skills.Staff], stunChance(const.Skills.Staff), stunSeconds(const.Skills.Staff, 3))
+	Game.SkillDesGM[const.Skills.Staff]=string.format("%s usable with Unarm., stun lasts %gs",
+		Game.SkillDesGM[const.Skills.Staff], stunSeconds(const.Skills.Staff, 4))
 	Game.SkillDesMaster[const.Skills.Sword]=string.format("%s can dual wield",Game.SkillDesMaster[const.Skills.Sword])
 	Game.SkillDesExpert[const.Skills.Leather]=string.format("%s recovery penalty eliminated",Game.SkillDesExpert[const.Skills.Leather])
 	Game.SkillDesExpert[const.Skills.Chain]=string.format("%s recovery penalty halved",Game.SkillDesExpert[const.Skills.Chain])
@@ -688,14 +891,31 @@ function events.GameInitialized2()
 	Game.SkillDesGM[const.Skills.Plate]=string.format("%s rec. pen. elim.",Game.SkillDesGM[const.Skills.Plate])
 	Game.SkillDesExpert[const.Skills.Shield]=string.format("%s recovery penalty eliminated",Game.SkillDesExpert[const.Skills.Shield])
 	Game.SkillDesGM[const.Skills.Shield]=string.format("%s 15%% Damage reduction",Game.SkillDesGM[const.Skills.Shield])
-	Game.SkillDesNormal[const.Skills.Armsmaster]=string.format("Skills adds " .. armsmasterSkill.Damage[1] .. " dmg and " .. armsmasterSkill.Attack[1] .. " atk")
-	Game.SkillDesExpert[const.Skills.Armsmaster]=string.format("Skills adds " .. armsmasterSkill.Damage[2] .. " dmg, " .. armsmasterSkill.Attack[2] .. " atk, " .. armsmasterSkill.Speed[2] .. "%% speed")
-	Game.SkillDesMaster[const.Skills.Armsmaster]=string.format("Skills adds " .. armsmasterSkill.Damage[3] .. " dmg, " .. armsmasterSkill.Attack[3] .. " atk, " .. armsmasterSkill.Speed[3] .. "%% speed")
-	Game.SkillDesGM[const.Skills.Armsmaster]=string.format("Skills adds " .. armsmasterSkill.Damage[4] .. " dmg, " .. armsmasterSkill.Attack[4] .. " atk, " .. armsmasterSkill.Speed[4] .. "%% speed")
+	local function armsmasterDesc(m)
+		local parts={}
+		local function add(value, unit)
+			if (value or 0)>0 then
+				parts[#parts+1]=value .. unit
+			end
+		end
+		add(armsmasterSkill.Damage[m], " dmg")
+		add(armsmasterSkill.Attack[m], " atk")
+		add(armsmasterSkill.Speed[m], "% speed")
+		if #parts==0 then
+			return "No bonus at this rank"
+		end
+		return "Each skill point adds " .. table.concat(parts, ", ")
+	end
+	Game.SkillDesNormal[const.Skills.Armsmaster]=armsmasterDesc(1)
+	Game.SkillDesExpert[const.Skills.Armsmaster]=armsmasterDesc(2)
+	Game.SkillDesMaster[const.Skills.Armsmaster]=armsmasterDesc(3)
+	Game.SkillDesGM[const.Skills.Armsmaster]=armsmasterDesc(4)
 	Game.SkillDesMaster[const.Skills.Dodging]=string.format("%s usable with Leather Armor",Game.SkillDesGM[const.Skills.Dodging])
 	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Dodging])
-	--Game.SkillDesGM[const.Skills.Unarmed]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Unarmed])	
 	Skillz.setDesc(35,1,"Armsmaster skill represents the warrior's tricks of the trade, enhancing your proficiency with all weapons-except staves.\nThis skill allows you to strike faster, execute smoother attacks, and deal more powerful blows.\n\nDamage added by armsmaster skill scales with your weapon skill, amplifying its impact as you grow more adept.\n")
+	Skillz.setDesc(35,6,armsmasterDesc(5)
+		.. "\nKnights only. Each 10 points of armsmaster raise every melee weapon"
+		.. " skill by 1, up to double its base value.")
 	baseSpearTooltip=Game.SkillDesGM[const.Skills.Spear]
 	maceGMtxt=Game.SkillDesGM[6] --used for mace tooltip
 end
@@ -778,7 +998,7 @@ function chargeTimer()
 	end
 end
 --movement
-function events.Tick()
+function mawTick_ChargeMovement()
 	if Multiplayer and Multiplayer.client_monsters()[0] and checkCharge and checkCharge>=0 then
 		--check for charge working
 		checkCharge=checkCharge-1
@@ -841,7 +1061,6 @@ function events.LoadMap(wasInGame)
 	Timer(chargeTimer, const.Minute/2) 
 end
 
-
 --------------------------------------
 --MANA potion drink hotkey only in SOLO
 --------------------------------------
@@ -883,7 +1102,6 @@ function events.LoadMap(wasInGame)
 	Timer(chargeTimer, const.Minute/2) 
 end
 
-
 --function that checks for enchant that increases skill 
 function checkbonus(enchantNumber, playerIndex)
 	local skillBonus=0
@@ -896,69 +1114,6 @@ function checkbonus(enchantNumber, playerIndex)
 end
 
 sharedSkills={0,1,2,3,4,5,6,7,12,13,14,15,16,17,18,19,20,21,22}
-function events.Action(t)
-	if t.Action==121 then
-		vars.checkSoloMastery=true --makes skills to be automatically learned if solo
-		local shared=sharedSkills
-		if table.find(shamanClass, pl.Class) or table.find(seraphClass, pl.Class) or table.find(dkClass, pl.Class) or table.find(assassinClass, pl.Class) then
-			shared={12,13,14,15,16,17,18,19,20,21,22}
-		end
-		if table.find(shared, t.Param) then
-			t.Handled=false
-			pl=Party[Game.CurrentPlayer]
-			local currentCost=SplitSkill(pl.Skills[t.Param])+1
-			if currentCost>1000 then
-				return
-			end
-			--calculate actual cost
-			local n=1
-			for i=1,#shared do
-				local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[shared[i]])
-				if s>=currentCost then
-					n=n+1
-				end
-			end
-			local actualCost=math.ceil(currentCost/n)
-			if pl.SkillPoints>=actualCost then
-				pl.SkillPoints=pl.SkillPoints+currentCost-actualCost
-			end
-		end
-		--[[  skill share system, disabled, fix at the bottom
-		if table.find(partySharedSkills,t.Param) then
-			maxS=0
-			maxM=0
-			increased=-1
-			for i=0,Party.High do
-				skill=partySharedSkills[table.find(partySharedSkills,t.Param)]
-				s,m=SplitSkill(Party[i].Skills[skill])
-				if Game.CurrentPlayer==i then
-					if Party[i].SkillPoints>s and (s<10 or m~=4) then
-						s=s+1
-						increased=i
-					end
-				end
-				if s>maxS then
-					maxS=s
-				end
-				if m>maxM then
-					maxM=m
-				end
-			end
-			for i=0,Party.High do
-				if increased==i then
-					Party[i].Skills[skill]=JoinSkill(maxS-1,maxM)
-				else
-					Party[i].Skills[skill]=JoinSkill(maxS,maxM)
-				end
-			end
-			if maxS>=10 and maxM==4 then
-				t.Handled=true
-				Game.ShowStatusText("This skill is already as good as it will ever get")
-			end
-		end
-		]]
-	end
-end
 function events.LoadMap()
 	if not vars.weaponSkillRefunded then
 		vars.weaponSkillRefunded=true
@@ -1080,10 +1235,9 @@ function events.PlayerAttacked(t)
 		for i=0,Party.High do
 			local s, m= SplitSkill(Skillz.get(Party[i], 50))
 			if s>0 and vars.covering[i] and m>=masteryRequired and i~=t.PlayerSlot then
-				cover[i]={["Chance"]=math.min(0.1+s*0.01,0.40),["Mastery"]= m}
-				if coverBonus[i] then
+				cover[i]={["Chance"]=math.min(0.1+s*0.01, 0.1+skillCap[50]*0.01),["Mastery"]= m}
+				if MawCore.DamageState.takeCoverBonus(i) then
 					cover[i].Chance=cover[i].Chance+0.15
-					coverBonus[i]=false
 				end
 			else
 				cover[i]=false
@@ -1122,7 +1276,7 @@ function events.PlayerAttacked(t)
 				vars.retaliation[id]["Time"]=Game.Time
 				vars.retaliation[id]["Stacks"]=vars.retaliation[id]["Stacks"]+1
 				local cap=1
-				if m==4 then
+				if m>=4 then
 					cap=3
 				end
 				vars.retaliation[id]["Stacks"]=math.min(vars.retaliation[id]["Stacks"],cap)
@@ -1168,8 +1322,7 @@ function getBuffHealthRegen(pl)
 	
 	--regeneration skill
 	local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Regeneration))
-	local regenEffect={[0]=0,2,4,6,6}
-	regen=regen + FHP^0.5*RegS^1.65*(regenEffect[RegM]/350)+RegS
+	regen=regen + MawCore.Formulas.hpRegenPerSec(FHP, RegS, RegM)
 	if RegM==4 then
 		local hpRateo=math.max(pl.HP/FHP, -1)
 		regen=regen*(1+(1-hpRateo)^2)
@@ -1190,13 +1343,13 @@ function getBuffHealthRegen(pl)
 			local regen1 = FHP^0.5*skill^1.25*(buffPower[71].Base[m]/1000)
 			--potion
 			RegS, RegM = SplitSkill(Buff.Skill)
-			local regen2 = FHP^0.5*RegS^1.25*((RegM+1)/1000)
-			
+			local regen2 = MawCore.Formulas.hpRegenBuffPerSec(FHP, RegS, RegM)
+
 			regen=regen+math.max(regen1, regen2)
 		end
 	elseif Buff.ExpireTime > Game.Time then
 		RegS, RegM = SplitSkill(Buff.Skill)
-		regen = regen+FHP^0.5*RegS^1.25*((RegM+1)/1000)
+		regen = regen+MawCore.Formulas.hpRegenBuffPerSec(FHP, RegS, RegM)
 	end
 	return regen
 end
@@ -1267,18 +1420,10 @@ function MawRegen(timePassed)
 			if (not Party.EnemyDetectorYellow and not Party.EnemyDetectorRed) then
 				mult=mult*4
 			end
-			local RegS, RegM = SplitSkill(pl:GetSkill(const.Skills.Meditation))
-			if RegM==4 then
-				RegM=5
-			end
-			FSP	= pl:GetFullSP()
-			if FSP>0 and vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[i] then
-				FSP=math.max(math.ceil(FSP*(vars.currentManaPool[i]/FSP)^0.5),0)
-				
-			end
-			
-			local SPREGEN = (FSP^0.35*RegS^1.4*((RegM+1)/2000) +0.02)
-			
+			local SPREGEN
+			SPREGEN, FSP = getMeditationRegen(i)
+			SPREGEN = SPREGEN/10
+
 			for it in pl:EnumActiveItems() do
 				--[[special enchants now increase meditation
 				if it.Bonus2 == 38 or it.Bonus2==47 or it.Bonus2==55 or it.Bonus2==66 or table.find(artifactSpRegen, it.Number) then	
@@ -1294,7 +1439,7 @@ function MawRegen(timePassed)
 			--meditation buff
 			if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[56] and not table.find(classesWithNoMeditationRegen, pl.Class) then
 				local s, m, level=getBuffSkill(56)
-				local level=level^0.65
+				local level=estimateSkill(level)
 				regenSP[i] = regenSP[i] + (FSP^0.35*level^1.4*((buffPower[56].Base[m])/10000) +0.1)* timeMultiplier*mult*(1+buffPower[56].Scaling[m]/100*s)
 			end
 			--dragon regen
@@ -1305,7 +1450,7 @@ function MawRegen(timePassed)
 			end
 			if table.find(assassinClass, pl.Class) then
 				local s,m=SplitSkill(pl:GetSkill(const.Skills.Water))
-				regenSP[i]=regenSP[i]+ (0.6+m*0.2) * timeMultiplier
+				regenSP[i]=regenSP[i]+ MawCore.Formulas.assassinEnergyPerSec(m)/10 * timeMultiplier
 			end
 			local playersSP = math.min(FSP, pl.SP + math.floor(regenSP[i]))
 			if vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[i] then
@@ -1325,7 +1470,7 @@ function getDragonRegenLeech(pl, targetLevel)
 	local regen=SplitSkill(pl:GetSkill(const.Skills.Regeneration))
 	if regen<=0 then return 0 end
 	local lvl=math.max(targetLevel or pl.LevelBase,1)
-	return regen/lvl^0.675*0.05
+	return regen/estimateSkill(lvl)*0.05
 end
 
 --DINAMIC SKILL TOOLTIP
@@ -1334,79 +1479,7 @@ function events.GameInitialized2()
 	baseMedStr=	Skillz.getDesc(28,1)
 	baseAscStr= "Increases spell damage and healing at the expense of higher mana cost and cast time."
 end
-function events.Tick()
-	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
-		--regeneration tooltip
-		if Game.CurrentPlayer<0 or Game.CurrentPlayer>Party.High then return end
-		pl=Party[Game.CurrentPlayer]
-		local FHP=GetMaxHP(pl)
-		local s,m = SplitSkill(pl:GetSkill(30))
-		local regenEffect={[0]=0,2,4,6,6}
-		local hpRegen = round(FHP^0.5*s^1.65*((regenEffect[m])/35))/10+s
-		local hpRegen2 = round(FHP^0.5*(s+1)^1.65*((regenEffect[m])/35))/10+(s+1)
-		local txt = string.format("%s\n\nCurrent HP Regeneration: %s\nNext Level Bonus: %s HP Regen",baseRegStr,StrColor(0,255,0,hpRegen),StrColor(0,255,0,"+" .. hpRegen2-hpRegen))
-		--dragon melee leech, shown only for dragons
-		local leech=getDragonRegenLeech(pl)
-		if leech>0 then
-			local leechNext=leech*(s+1)/s
-			txt = txt .. string.format("\n\nMelee Life Leech vs equal level: %s\nNext Level Bonus: %s\n(lower against higher level monsters)",
-				StrColor(255,80,80,round(leech*1000)/10 .. "%"),
-				StrColor(255,80,80,"+" .. round((leechNext-leech)*1000)/10 .. "%\n"))
-		end
-		Skillz.setDesc(30,1,txt)
-		--meditation tooltip
-		local FSP=pl:GetFullSP()
-		if vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool and vars.currentManaPool[i] then
-			FSP=vars.currentManaPool[Game.CurrentPlayer]
-		end
-		local s,m = SplitSkill(pl:GetSkill(28))
-		if m==4 then
-			m=5
-		end
-		local spRegen = (FSP^0.35*s^1.4*((m+1)/20)+2)/10
-		local spRegen2 = (FSP^0.35*(s+1)^1.4*((m+1)/20)+2)/10
-		local spRegen2 = round((spRegen2-spRegen)*100)/100
-		if spRegen>10 then
-			spRegen = round((spRegen)*10)/10
-		else
-			spRegen = round((spRegen)*100)/100
-		end
-		txt= string.format("%s\n\nIncreases spell points based on SP per level and mastery\n\nCurrent SP Regeneration: %s\nNext Level Bonus: %s SP Regen\n",baseMedStr,StrColor(60,60,255,spRegen),StrColor(60,60,255,"+" .. spRegen2))
-		Skillz.setDesc(28,1,txt)
-		
-		--ascension tooltip
-		local s,m = SplitSkill(pl:GetSkill(const.Skills.Learning))
-		local dmgMult = shortenNumber(round(((1+0.075*s)*1.025^s - 1)*100),3)
-		local dmgBaseMult = shortenNumber(round(((1+0.05*s^2)*1.025^s - 1)*100),3)
-		local healMult = shortenNumber(round(((1+0.05*s)*1.02^s - 1)*100),3)
-		local healBaseMult = shortenNumber(round(((1+0.03*s^2)*1.02^s - 1)*100),3)
-		local masteryReduction = (1 - m * 0.125)
-		local manaMult = shortenNumber(round(((1+0.125*s)*1.04^s - 1) * masteryReduction *100),3)
-		local castMult = shortenNumber(round((1.015^s-1)*100),3)
-		txt = string.format("%s\n\nCurrent bonuses at skill %s:\n- Damage base: %s\n- Damage scaling: %s\n\n- Healing base: %s\n- Healing scaling: %s\n\n- Mana cost: %s\n- Cast time: %s\n",
-			baseAscStr, 
-			StrColor(255,255,100,s),
-			StrColor(0,255,0,"+"..dmgBaseMult.."%"),
-			StrColor(0,255,0,"+"..dmgMult.."%"),
-			StrColor(0,255,0,"+"..healBaseMult.."%"),
-			StrColor(0,255,0,"+"..healMult.."%"),
-			StrColor(255,100,100,"+"..manaMult.."%"),
-			StrColor(255,100,100,"+"..castMult.."%"))
-		Skillz.setDesc(const.Skills.Learning,1,txt)
-		
-		--spear tooltip
-		local s,m=SplitSkill(pl:GetSkill(const.Skills.Spear))
-		local mult=damageMultiplier[pl:GetIndex()]["Melee"]
-		local damageIncrease=round((2+s*0.02)*mult*10)/10
-		local it=pl:GetActiveItem(1)
-		if it then
-			if it:T().Skill==4 and it:T().EquipStat==1 then
-				damageIncrease=damageIncrease*1.5
-			end
-		end
-		Game.SkillDesGM[const.Skills.Spear]=string.format("%s\n\t070Each spear attack reduces physical resistance, increasing damage by: %s%%\nIncreased by 50%% with Halberds",baseSpearTooltip,damageIncrease)
-	end
-end
+-- above stay here, capture timing is part of the text (SKILL_TOOLTIPS.md)
 
 function events.LoadMap()
 	if vars.hirelingFix then
@@ -1472,7 +1545,6 @@ function events.GameInitialized2()
 	Game.SkillDesMaster[const.Skills.Perception]= "Reduces traps and lava damage by 50%."
 	Game.SkillDesGM[const.Skills.Perception]= "Reduces traps and lava damage by 70%."
 end
-
 
 --open time at 5 instead of 6
 function events.GameInitialized2()
@@ -1550,7 +1622,7 @@ function events.Action(t)
 					local id=Game.CurrentPlayer
 					if id>=0 and id<=Party.High then
 						local lvl=Party[id].LevelBase
-						house.Val=round(lvl^0.7)+4
+						house.Val=estimateSkill(lvl)+4
 					end
 				end
 			end
@@ -1683,6 +1755,43 @@ function events.CanWearItem(t)
 	end
 end
 ]]
+
+--may this item sit in this player's offhand? (tricks: MawCore/NOTES.md)
+function CanDualWield(pl, it)
+	if table.find(seraphClass, pl.Class) and it:T().Skill==1 then
+		return false
+	end
+	return true
+end
+
+--temporary skill for one equip action, restoring the EXACT raw value.
+--Never nest two of these on one skill in one action -- MawCore/NOTES.md
+function tempSkillForEquip(pl, skillId, level, mastery)
+	local saved=pl.Skills[skillId]
+	pl.Skills[skillId]=JoinSkill(level, mastery)
+	RunNextTick(function()
+		pl.Skills[skillId]=saved
+	end)
+end
+
+--fake Novice Sword so the engine itself refuses the offhand placement.
+--2h swords excluded: zzClasses owns those (NOTES.md)
+function events.Action(t)
+	if t.Action==133 then
+		local id=Game.CurrentPlayer
+		if id<0 or id>Party.High then
+			id=0
+		end
+		local pl=Party[id]
+		local it=Mouse.Item
+		if it and it.Number>0 and it:T().EquipStat==0
+				and not table.find(twoHandedSwords, it.Number)
+				and not CanDualWield(pl, it) then
+			tempSkillForEquip(pl, const.Skills.Sword, 1, 1)
+		end
+	end
+end
+
 --list of 2h axes and 1h axe
 function events.GameInitialized2()
 	oneHandedAxes={}
@@ -1700,11 +1809,7 @@ function events.GameInitialized2()
 	
 end
 
-
 --HORIZONTAL SKILL PROGRESSION
-local learningRequirementsNormal={0,4,7,10}
-local learningRequirements={0,6,12,20}
-local horizontalSkills={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,27,28,30,32,33,35,38}
 --online
 local insanityLearningRequirements={0,8,20,32}
 local madnessLearningRequirements={0,12,30,50}
@@ -1834,59 +1939,11 @@ function horizontalModeMasteries()
 	end
 end
 
-
-
 function events.Action(t)
 	horizontalModeMasteries()
 end
 
 --restore masteries 
-function events.Action(t)
-	if t.Action==121 then
-		if t.Param>39 then return end -- to do it better later
-		t.Handled=false
-		pl=Party[Game.CurrentPlayer]
-		local currentCost=SplitSkill(pl.Skills[t.Param])+1
-		--calculate actual cost
-		local n=1
-		if t.Param>=12 and t.Param<=23 then
-			for i=1,11 do
-				local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[11+i])
-				if s>=currentCost then
-					n=n+1
-				end
-			end
-		end
-		local actualCost=math.ceil(currentCost/n)
-		if pl.SkillPoints>=actualCost then
-			local id=pl:GetIndex()
-			local s,m=SplitSkill(Party[Game.CurrentPlayer].Skills[t.Param])
-			if table.find(horizontalSkills, t.Param) and vars.storedMasteries and vars.storedMasteries[id] and vars.storedMasteries[id][t.Param] then
-				while m<4 and vars.storedMasteries[id][t.Param]>m and ((s+1>=learningRequirements[m+1] and not Game.freeProgression) or (s+1>=learningRequirementsNormal[m+1] and Game.freeProgression))  do
-					Party[Game.CurrentPlayer].Skills[t.Param]=JoinSkill(s,m+1)
-					m=m+1
-				end
-			end
-			if vars.oldPlayerMasteries and vars.oldPlayerMasteries[id] then
-				if m<4 and vars.oldPlayerMasteries[id][t.Param]>m then
-					if vars.madnessMode and table.find(horizontalSkills, t.Param) then
-						requirements={0,12,30,50}
-					elseif vars.insanityMode and table.find(horizontalSkills, t.Param) then
-						requirements={0,8,20,32}
-					elseif Game.freeProgression or not table.find(horizontalSkills, t.Param) then
-						requirements={0,4,7,10}
-					else
-						requirements={0,6,12,20}
-					end
-					if s+1>=requirements[m+1] then
-						Party[Game.CurrentPlayer].Skills[t.Param]=JoinSkill(s,m+1)
-						m=m+1
-					end
-				end
-			end
-		end
-	end
-end
 
 function events.CanRepairItem(t)
 	local requiredSkill=t.Item:T().IdRepSt
@@ -1916,7 +1973,7 @@ function events.GetMerchantTotalSkill(t)
 			end
 		end
 		if tot>maxMerchantSkill then
-			if m==4 or tot>=45 then
+			if m>=4 or tot>=45 then
 				maxMerchantSkill=100
 			else
 				maxMerchantSkill=tot
@@ -1997,7 +2054,7 @@ end
 
 local partySharedSkills={24,25,26,29,31,34,37}
 local skillRequirements={1,4,7,10}
-function events.Tick()
+function mawTick_SoloMastery()
 	--give masteries to solo player
 	vars.checkSoloMastery=vars.checkSoloMastery or true
 	if vars.checkSoloMastery and Party.High==0 then
@@ -2053,7 +2110,7 @@ function events.GameInitialized2()
 end
 
 -- COVER SKILL
-function events.Tick()
+function mawTick_MiscSkillsUI()
 	if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
 		local index=Game.CurrentPlayer
 		if index<0 or index>Party.High then return end
@@ -2092,46 +2149,14 @@ function events.Tick()
 				vars.covering[i]=true
 			end
 		end
-		local s= SplitSkill(Skillz.get(pl, 50))
-		local chance=math.min(10+s,40)
-		local txt="Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nGrants 10 plus 1% chance per skill point to Cover, up to 40%, however, something might happen once at max level....\n\nCurrent cover chance: " .. chance .. "%\n\nPress P to enable/disable\n"
-		if vars.insanityMode then
-			txt="Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nIf available, Expert, Master and Grandmaster is learned at skill 8-20-30.\n\nGrants 10 plus 1% chance per skill point to Cover, up to 40%, however, something might happen once at max level....\n\nCurrent cover chance: " .. chance .. "%\n\nPress P to enable/disable\n"
-		end
-		if vars.covering[index] then
-			txt=txt .. StrColor(0,255,0,"\nCurrently enabled\n")
-			Skillz.setDesc(50, 1, txt)
-		else
-			txt=txt .. StrColor(255,0,0,"\nCurrently disabled\n")
-			Skillz.setDesc(50, 1, txt)
-		end
-		
-		--MANA SHIELD
 		if not vars.manaShield then
 			vars.manaShield={}
 			for i=0,4 do
 				vars.manaShield[i]=true
 			end
 		end
-		local s, m= SplitSkill(Skillz.get(pl, 51))
-		local efficiency=round(manaShieldManaEfficiency(false, s)*100)/100
-		local txt="Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n\nMastery increase its mana efficience.\n" .. "Current Damage reduction per Mana: " .. StrColor(178,255,255, efficiency) .. "\n\nPress M to enable/disable"
-		if vars.insanityMode then
-			txt="Mana shield consume mana to reduce damage when an hit would take you below a certain threshold.\n\nIf available, Expert, Master and Grandmaster is learned at skill 8-20-32.\n\nMastery increase its mana efficience.\n" .. "Current Damage reduction per Mana: " .. StrColor(178,255,255, efficiency) .. "\n\nPress M to enable/disable"
-		end
-		if vars.manaShield[index] then
-			txt=txt .. StrColor(0,255,0,"\nCurrently enabled\n")
-			Skillz.setDesc(51, 1, txt)
-		else
-			txt=txt .. StrColor(255,0,0,"\nCurrently disabled\n")
-			Skillz.setDesc(51, 1, txt)
-		end
-		
-		local powerMult, DPS2, DPS3, vitMult=calcPowerVitality(pl)
-		local vit=round(vitMult^0.35)
-		local power=round(powerMult^0.35)
-		local retS, m= SplitSkill(Skillz.get(pl, 53))
-		Skillz.setDesc(53, 1, "After mastering the art of covering, you have become capable delivering deadly counter attacks to those who dare try harm your allies. Retaliation has a 1% per skill point chance to activate after successfully covering an ally.\n\nExpert, Master and Grandmaster are learned automatically at skill 12, 30 and 50.\n\nDamage done depends on 2 coefficients, multiplied then by skill level:\n\nMelee Power coefficient: " .. StrColor(255,0,0, power) .. "\nVitality coefficient: " .. StrColor(255,0,0, vit) .. "\n\nTotal Damage: " .. StrColor(255,0,0, retS*vit*power) .. "\n\nBalancing power and vitality leads to the highest damage.\n")
+		-- cover / mana shield / retaliation tooltip text moved to
+		-- Scripts/Modules/MawCore/SkillTooltip.lua (SKILL_TOOLTIPS.md)
 		
 	end
 end
@@ -2178,58 +2203,6 @@ function events.KeyDown(t)
 		end
 	end
 end
-function events.Action(t)
-	if t.Action==121 then
-		if t.Param==50 then
-			local coverRequirements={6,12,20}
-			if vars.insanityMode then
-				coverRequirements={8,20,30}
-			end
-			local pl=Party[Game.CurrentPlayer]
-			local s,m=SplitSkill(Skillz.get(pl,50))
-			if s==29 and pl.SkillPoints>29 then
-				local s,m=SplitSkill(Skillz.get(pl,53))
-				if s==0 then
-					Skillz.set(pl,53,1)
-					Game.ShowStatusText("YOU LEARNED RETALIATION!!")
-				end
-			end
-			if s==30 then 
-				t.Handled=true
-				local s,m=SplitSkill(Skillz.get(pl,53))
-				if s==0 then
-					Skillz.set(pl,53,1)
-					Game.ShowStatusText("YOU LEARNED RETALIATION!!")
-				else
-					Game.ShowStatusText("This skill has reached its limit")
-				end
-			elseif s>30 then
-				t.Handled=true
-				while s>30 do
-					pl.SkillPoints=pl.SkillPoints+s
-					s=s-1
-				end
-				Skillz.set(pl,50,JoinSkill(s,m))
-			end
-			if pl.SkillPoints>s and coverRequirements[m] and s+1>=coverRequirements[m] and Skillz.MasteryLimit(pl,50)>m then
-				Skillz.set(pl,50,JoinSkill(s, m+1))
-			elseif coverRequirements[m] and s>=coverRequirements[m] and Skillz.MasteryLimit(pl,50)>m then
-				Skillz.set(pl,50,JoinSkill(s, m+1))
-			end
-		end
-		--[[ CAP REMOVED
-		if t.Param==51 then
-			local pl=Party[Game.CurrentPlayer]
-			local s,m=SplitSkill(Skillz.get(pl,51))
-			if s>=32 then 
-				t.Handled=true
-				local s,m=SplitSkill(Skillz.get(pl,51))
-				Game.ShowStatusText("This skill has reached its limit")
-			end
-		end
-		]]
-	end
-end
 --[[
 function events.LoadMap()
 	for i=0,Party.High do
@@ -2244,23 +2217,7 @@ function events.LoadMap()
 	end
 end
 ]]
-coverBonus={}
-function events.CalcDamageToMonster(t)
-	data = WhoHitMonster()	
-	if data and data.Player and t.DamageKind==4 then
-		if data.Object==nil then
-			local s, m=SplitSkill(Skillz.get(data.Player,50))
-			if m>=4 then
-				for i=0, Party.High do
-					if Party[i]:GetIndex()==t.PlayerIndex then
-						coverBonus[i]=true
-						return
-					end
-				end
-			end
-		end
-	end
-end	
+--coverBonus now lives in MawCore/DamageState.lua
 
 		
 function events.CanIdentifyItem(t)
@@ -2390,85 +2347,6 @@ function events.BeforeLoadMap(wasInGame)
 	end
 end
 
---mace stun
-local maceStunCC = {Debuff = const.MonsterBuff.Paralyze}
-function events.CalcDamageToMonster(t)
-	if t.Player then
-		local it=t.Player:GetActiveItem(1)
-		if not it then return end
-		local skill=it:T().Skill
-		local data=WhoHitMonster()
-		if skill==6 and t.DamageKind==4 and data and data.Object==nil then
-			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Mace))
-			if m>=3 then
-				local mon=t.Monster
-				--get Level
-				local id=t.MonsterIndex
-				local lvl=getMonsterLevel(mon)
-				--chance to paralyze
-				local chance=s/lvl^0.65*0.15*damageMultiplier[t.Player:GetIndex()].Melee/math.min(1+lvl/150,3)
-				local applyParalyze=applyParalyze or {}
-				applyParalyze[id]=false
-				local previousDuration=mon.SpellBuffs[6].ExpireTime
-				local duration=0
-				if chance>math.random() then
-					applyParalyze[id]=true
-					duration=const.Minute*3
-					if m==3 then
-						duration=duration/2
-					end
-					-- Apply diminishing returns
-					duration = calcDebuffDuration(mon, maceStunCC, duration)
-				end
-				RunNextTick(function()
-					if applyParalyze[id] and duration > 0 then
-						if mon.HP~=0 then
-							mon.SpellBuffs[6].ExpireTime=Game.Time+duration
-						end
-						applyParalyze[id]=false
-					else
-						mon.SpellBuffs[6].ExpireTime=previousDuration
-					end
-				end)
-			end
-		end
-	end
-end
-
---remove stun if monster is Dead
-function events.CalcDamageToMonster(t)
-	local mon=t.Monster
-	RunNextTick(function()
-		if mon.HP==0 then
-			mon.SpellBuffs[6].ExpireTime=0
-		end
-	end)
-end
-
-function events.Action(t)
-	RunNextTick(function()
-		if Game.CurrentCharScreen==101 and Game.CurrentScreen==7 then
-			local i=Game.CurrentPlayer
-			if i<0 or i>Party.High then return end
-			local pl=Party[i]
-			local index=pl:GetIndex()
-			itemStats(index)
-			--base descriptions
-			Skillz.setDesc(6,5,maceGMtxt)
-			local s,m=SplitSkill(pl:GetSkill(const.Skills.Mace))
-			if m<3 then return end
-			local chance=round(s/pl.LevelBase^0.65*1500*damageMultiplier[pl:GetIndex()].Melee/math.min(1+pl.LevelBase/150,3))/100
-			local txt="\n\n"
-			if m==3 then
-				txt=txt .. "Chance to Stun: " .. chance .. "%"
-			elseif m==4 then
-				txt=txt .. "Chance to Paralyze: " .. chance .. "%"
-			end
-			Skillz.setDesc(6,5,maceGMtxt .. StrColor(0,0,0,txt))
-		end
-	end)
-end
-
 --mana shield
 function events.GameInitialized2()
 	local manaSkill=51
@@ -2482,54 +2360,19 @@ function events.GameInitialized2()
 	Skillz.learn_at(manaSkill, 3) --alchemy shop
 end
 
-local manaShieldRequirements={6,12,20}
-function events.Action(t)
-	if t.Action==121 then
-		if t.Param==51 then
-			local manaShieldRequirements={6,12,20}
-			if vars.insanityMode then
-				manaShieldRequirements={8,20,32}
-			end
-			local pl=Party[Game.CurrentPlayer]
-			local s,m=SplitSkill(Skillz.get(pl,51))
-			if pl.SkillPoints>s and manaShieldRequirements[m] and s+1>=manaShieldRequirements[m] and Skillz.MasteryLimit(pl,51)>m then
-				Skillz.set(pl,51,JoinSkill(s, m+1))
-			elseif manaShieldRequirements[m] and s>=manaShieldRequirements[m] and Skillz.MasteryLimit(pl,51)>m then
-				Skillz.set(pl,51,JoinSkill(s, m+1))
-			end
-		end
-	end
-end
-
 --Enlightenment
 function events.GameInitialized2()
 	local Enlightenment=52
 	Skillz.new_magic(Enlightenment)
 	Skillz.setName(Enlightenment, "Enlightenment")
 	Skillz.setDesc(Enlightenment, 1, "Unlock the true potential of your mana reserves with Enlightenment, a transformative skill that increases your mana pool and reduces mana reserved by buffs, empowering you to cast more freely and frequently.\n\nThe cost of buffs is divided by the amount of mana you gain per level. As you reach higher mastery levels, the divisor increases, but your total mana pool remains the same.\n\nIf available, Expert, Master and Grandmaster is learned at skill 6-12-20.\n")
-	Skillz.setDesc(Enlightenment, 2, "Mana is increased by 2% per skill level, cost divisor increased by 0.5")
-	Skillz.setDesc(Enlightenment, 3, "Mana is increased by 3% per skill level, cost divisor increased by 1")
-	Skillz.setDesc(Enlightenment, 4, "Mana is increased by 4% per skill level, cost divisor increased by 1.5")
-	Skillz.setDesc(Enlightenment, 5, "Mana is increased by 5% per skill level, cost divisor increased by 2")
-	Skillz.learn_at(Enlightenment, 3) --alchemy shop
-end
 
-function events.Action(t)
-	if t.Action==121 then
-		if t.Param==52 then
-			local EnlightenmentRequirements={6,12,20}
-			if vars.insanityMode then
-				--EnlightenmentRequirements={8,20,32}
-			end
-			local pl=Party[Game.CurrentPlayer]
-			local s,m=SplitSkill(Skillz.get(pl,52))
-			if pl.SkillPoints>s and EnlightenmentRequirements[m] and s+1>=EnlightenmentRequirements[m] and Skillz.MasteryLimit(pl,52)>m then
-				Skillz.set(pl,52,JoinSkill(s, m+1))
-			elseif EnlightenmentRequirements[m] and s>=EnlightenmentRequirements[m] and Skillz.MasteryLimit(pl,52)>m then
-				Skillz.set(pl,52,JoinSkill(s, m+1))
-			end
-		end
+	for mastery=1,4 do
+		Skillz.setDesc(Enlightenment, mastery+1, string.format(
+			"Mana is increased by %s%% per skill level, cost divisor increased by %s",
+			MawCore.Formulas.enlightenmentManaPerSkill[mastery], mastery/2))
 	end
+	Skillz.learn_at(Enlightenment, 3) --alchemy shop
 end
 
 --RETALIATION
@@ -2544,35 +2387,20 @@ function events.GameInitialized2()
 	Skillz.setDesc(Retaliation, 5, "Retaliation can stack up to 3 times, allowing to consume all the stacks in 1 single powerful hit")
 end
 
-function events.Action(t)
-	if t.Action==121 then
-		if t.Param==53 then
-			local retaliationRequirements={12,30,50}
-			local pl=Party[Game.CurrentPlayer]
-			local s,m=SplitSkill(Skillz.get(pl,53))
-			if s==50 then 
-				t.Handled=true
-				Game.ShowStatusText("This skill has reached its limit")
-			elseif s>50 then
-				t.Handled=true
-				while s>50 do
-					pl.SkillPoints=pl.SkillPoints+s
-					s=s-1
-				end
-				Skillz.set(pl,53,JoinSkill(s,m))
-			end
-			if pl.SkillPoints>s and retaliationRequirements[m] and s+1>=retaliationRequirements[m] and Skillz.MasteryLimit(pl,53)>m then
-				Skillz.set(pl,53,JoinSkill(s, m+1))
-			elseif retaliationRequirements[m] and s>=retaliationRequirements[m] and Skillz.MasteryLimit(pl,53)>m then
-				Skillz.set(pl,53,JoinSkill(s, m+1))
-			end
-		end
-	end
-end
-
---regeneration for Troll
+--Regeneration
 function events.GameInitialized2()
-	Skillz.setDesc(30, 5, "Increase your regeneration by 1% per every 1% of hp lost")
+	local F=MawCore.Formulas
+	for mastery=1,4 do
+		local hp=string.format("Restores %s%% of your maximum health per second",
+			F.hpRegenRate[mastery]*100)
+		if mastery==4 then
+			hp=hp .. "\nIncrease your regeneration by 1% per every 1% of hp lost"
+		end
+		Skillz.setDesc(30, mastery+1, hp)
+		Skillz.setDesc(28, mastery+1, string.format(
+			"Restores %s%% of your maximum mana per second",
+			F.spRegenRate[mastery]*100))
+	end
 end
 
 --disable arrows
@@ -2674,25 +2502,14 @@ do
   end
 
   -- filet de sécu périodique: si `pl` saute, on le remplace
-  function events.Tick()
+  mawTick_PlFallback=function()
     if not pl or type(pl) ~= "table" then
       pl = __maw_pick_any_party_member() or __MAW_DUMMY_PL
     end
   end
 end
-
-local armsmasterDesc=false
-function events.LoadMap()
-	if not armsmasterDesc then
-		armsmasterDesc=Skillz.getDesc(35,1,txt)
-	end
-	local descTxt=armsmasterDesc
-	local requirement=GetArmsmasterSupremeRequirement()
-	local descTxt=descTxt .. "\nKnights can learn up to a Supreme level, which is learned automatically at skill level " .. requirement .. ".\n"
-	Skillz.setDesc(35,1,descTxt)
-	local txt="Skills adds 3 dmg, 3 atk, 2% speed\nEach 10 points in armsmaster increase all the melee weapon skills by 1"
-	Skillz.setDesc(35,6,txt)
-end
+-- (SKILL_TOOLTIPS.md); the static Supreme row (35/6) is set in the armsmaster
+-- GameInitialized2 above
 
 function GetArmsmasterSupremeRequirement()
 	local requirement=30
@@ -2702,31 +2519,6 @@ function GetArmsmasterSupremeRequirement()
 		requirement=50
 	end
 	return requirement
-end
-
-function events.Action(t)
-	if t.Action==121 then
-		if t.Param==35 then
-			local id=Game.CurrentPlayer
-			
-			if id<0 or id>Party.High then
-				return
-			end
-			local pl=Party[id]
-			local class=pl.Class
-			if class<16 or class>19 then --knights only
-				return
-			end
-			
-			local requirement=GetArmsmasterSupremeRequirement()
-			
-			local s,m=SplitSkill(pl.Skills[35])
-			if pl.SkillPoints>s and s+1==requirement then
-				Game.ShowStatusText("SUPREME UNLOCKED!!!")
-				evt[id].Add("HP", 0) --graphic
-			end
-		end
-	end
 end
 
 local meleeSkills={0,1,2,3,4,6}
@@ -2749,7 +2541,7 @@ function events.GetSkill(t)
 		local s,m=SplitSkill(pl:GetSkill(35))
 		local requirementS=SplitSkill(pl.Skills[35])
 		local s2,m2=SplitSkill(pl.Skills[t.Skill])
-		if requirementS>=requirement and m==4 then
+		if requirementS>=requirement and m>=4 then
 			t.Result=math.min(t.Result + math.floor(s/10), JoinSkill(s2*2,m2))
 		end
 	end
@@ -2774,7 +2566,8 @@ function events.LoadMap()
 	end
 end
 
---dwarf with double 1h axes
+--axe dual wield: fake Dagger mastery for the equip action so the engine
+--offhands the (dagger-reskinned) axe -- MawCore/NOTES.md
 function events.Action(t)
 	if t.Action==133 then
 		local id=Game.CurrentPlayer
@@ -2784,64 +2577,29 @@ function events.Action(t)
 		end
 		local pl=Party[id]
 		local race=Game.CharacterPortraits[pl.Face].Race
-		if race==const.Race.Dwarf then
-			local it=Mouse.Item
-			if it then
-				local txt=it:T()
-				local s,m=SplitSkill(pl.Skills[const.Skills.Dagger])
-				local s2,m2=SplitSkill(pl.Skills[3])--axe
-				if table.find(oneHandedAxes, it.Number) then
-					if m2>=2 then
-						pl.Skills[const.Skills.Dagger]=JoinSkill(2,2)
-						RunNextTick(function()
-							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
-						end)
-					else
-						pl.Skills[const.Skills.Dagger]=JoinSkill(1,1)
-						RunNextTick(function()
-							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
-						end)
-					end
-				end
+		local it=Mouse.Item
+		if not it or (race~=const.Race.Dwarf and race~=const.Race.Minotaur) then
+			return
+		end
+		local s2,m2=SplitSkill(pl.Skills[3])--axe
+		if table.find(oneHandedAxes, it.Number) then
+			if m2>=2 then
+				tempSkillForEquip(pl, const.Skills.Dagger, 2, 2)
+			else
+				tempSkillForEquip(pl, const.Skills.Dagger, 1, 1)
 			end
-		elseif race==const.Race.Minotaur then
-			local it=Mouse.Item
-			if it then
-				local txt=it:T()
-				local s,m=SplitSkill(pl.Skills[2])--dagger
-				local s2,m2=SplitSkill(pl.Skills[3])--axe
-				if table.find(oneHandedAxes, it.Number) then
-					if m2>=2 then
-						pl.Skills[const.Skills.Dagger]=JoinSkill(2,2)
-						RunNextTick(function()
-							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
-						end)
-					else
-						pl.Skills[const.Skills.Dagger]=JoinSkill(1,1)
-						RunNextTick(function()
-							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
-						end)
-					end
-				elseif table.find(twoHandedAxes,it.Number) then
-					if m2>=3 then
-						pl.Skills[const.Skills.Dagger]=JoinSkill(2,2)
-						RunNextTick(function()
-							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
-						end)
-					else
-						pl.Skills[const.Skills.Dagger]=JoinSkill(1,1)
-						RunNextTick(function()
-							pl.Skills[const.Skills.Dagger]=JoinSkill(s,m)
-						end)
-					end
-				end
+		elseif race==const.Race.Minotaur and table.find(twoHandedAxes, it.Number) then
+			if m2>=3 then
+				tempSkillForEquip(pl, const.Skills.Dagger, 2, 2)
+			else
+				tempSkillForEquip(pl, const.Skills.Dagger, 1, 1)
 			end
 		end
 	end
 end
 
 local lastPlayer=-1
-function events.Tick()
+function mawTick_DwarfAxes()
 	if Game.CurrentScreen==7 or Game.CurrentScreen==15 then
 		local currentPlayer=Game.CurrentPlayer
 		if lastPlayer==currentPlayer then return end
@@ -2890,4 +2648,15 @@ function events.Tick()
 	else
 		lastPlayer=-1
 	end
+end
+
+--Tick handlers above run as MawCore scheduler tasks (ms; 0=frame, -1=poke only)
+function events.GameInitialized2()
+	local every=MawCore.Scheduler.every
+	every("skills/homing-projectiles", 0, mawTick_HomingProjectiles)
+	every("skills/charge-movement", 0, mawTick_ChargeMovement)
+	every("skills/solo-mastery", 1000, mawTick_SoloMastery)
+	every("skills/misc-skills-ui", -1, mawTick_MiscSkillsUI)	--poked by stats/label-watch
+	every("skills/pl-fallback", 1000, mawTick_PlFallback)
+	every("skills/dwarf-axes", -1, mawTick_DwarfAxes)	--poked by stats/label-watch
 end

@@ -32,7 +32,6 @@ return {
     AlchemyBagKey = 69,                 -- alchemy bag key (default: E)
     
     -- Gameplay Features
-    higherLootPowerRange = true,        -- enchants range from 1-100 instead of tier-based ranges
     enableAllTrainers = true,           -- find trainers that weren't previously available in all continents
     onlineQualityOfLifeFeatures = true, -- remove travel/training time, coaches/ships always available
 	teleportDeadMonstersAndCraftingKey = 75, -- teleports up to 30 monsters and 30 crafting items to the player location
@@ -278,7 +277,6 @@ removeBuffsKey = mawSettings.removeBuffsKey
 chargeKey = mawSettings.chargeKey
 healthPotionKey = mawSettings.healthPotionKey
 manaPotionKey = mawSettings.manaPotionKey
-higherLootPowerRange = mawSettings.higherLootPowerRange
 disableBow = mawSettings.disableBow
 enableAllTrainers = mawSettings.enableAllTrainers
 enableDisintegrate = mawSettings.enableDisintegrate
@@ -544,7 +542,16 @@ local mawSettings={
 local defaultSettings=mawSettings
 
 function events.MultiplayerInitialized()
-    local ScreenId = 111
+    --the MAW SETTINGS page is created by AdaptiveMonstersStats with an
+    --AUTO-ASSIGNED id (CustomUI.NewScreen counts up from 105 over every
+    --registered screen), so it is only 111 on an install with exactly our
+    --set of scripts. Look it up by name instead.
+    local ScreenId = const.Screens.BolsterFineTuning
+    if not ScreenId or not CustomUI.ActiveElements[ScreenId] then
+        debug.Message("MAW: settings page not registered -- incomplete or "
+            .. "mismatched installation; MAW settings will be unavailable.")
+        return
+    end
 	local mawSettingsButton={}
     local function createSwitch(Y, Header, Field, Options)
         mawSettingsButton[#mawSettingsButton + 1] = CustomSwitch(ScreenId, 120, Y, nil,

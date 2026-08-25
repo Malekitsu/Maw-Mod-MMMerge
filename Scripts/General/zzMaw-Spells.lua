@@ -76,6 +76,11 @@ local function getSpellQueueData(spellQueuePtr, targetPtr)
 	return t
 end
 
+--personality bonus curve for healing, pure in (personality, level)
+function getHealPersonalityBonus(personality, level)
+	return personality/math.min(1000+level*3, 4000)
+end
+
 function getHealSpellMultiPlier(pl)
 	local mult=1
 	--crit
@@ -86,9 +91,7 @@ function getHealSpellMultiPlier(pl)
 		mult=critMult
 	end
 	--personality bonus for healing only
-	local persBonus=pl:GetPersonality()
-	local level = pl.LevelBase
-	local statBonus=persBonus/math.min(1000+level*3, 4000)
+	local statBonus=getHealPersonalityBonus(pl:GetPersonality(), pl.LevelBase)
 	mult=mult*(1+statBonus)
 	if getMapAffixPower(31) then
 		mult=mult*(1-getMapAffixPower(31)/100)
@@ -103,6 +106,12 @@ end
 -------------------------------------------------
 --hour of power buff list
 local hopList = {8, 9, 14, 15}
+
+local function skipRemoteCast(t)
+	if t.MultiplayerData then
+		t.MultiplayerData.skipped=true
+	end
+end
 
 --modify Spells
 function events.PlayerCastSpell(t)
@@ -120,7 +129,10 @@ function events.PlayerCastSpell(t)
 	end
 	
 	local currentPl=Game.CurrentPlayer
-	if table.find(assassinClass, t.Player.Class) then return end
+	if not t.RemoteData and table.find(assassinClass, t.Player.Class) then
+		skipRemoteCast(t)
+		return
+	end
 	for i=0,Party.High do
 		if Party[i]:GetIndex()==t.PlayerIndex then
 			Game.CurrentPlayer=i
@@ -130,14 +142,21 @@ function events.PlayerCastSpell(t)
 	Game.CurrentPlayer=currentPl
 	
 	if t.IsSpellScroll then -- disable for scrolls
+		if t.MultiplayerData then
+			t.MultiplayerData.skipped=true
+		end
 		return
 	end
-	if t.Player.SP<t.SPCost then 
+	if t.RemoteData and t.RemoteData.skipped then
+		return
+	end
+	if not t.RemoteData and t.Player.SP<t.SPCost then
 		return
 	end
 	--Invisibility
 	if t.SpellId==19 then
-		if Party.EnemyDetectorRed or Party.EnemyDetectorYellow then
+		if not t.RemoteData and (Party.EnemyDetectorRed or Party.EnemyDetectorYellow) then
+			skipRemoteCast(t)
 			return
 		end
 		if not t.RemoteData then
@@ -231,7 +250,7 @@ function events.PlayerCastSpell(t)
 	if t.SpellId == 53 then
 		if t.TargetKind == 4 and not t.RemoteData then
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
-			if m==4 then
+			if m>=4 then
 				Party[t.TargetId].Unconscious=0
 				Party[t.TargetId].Dead=0
 				Party[t.TargetId].Eradicated=0
@@ -298,7 +317,10 @@ function events.PlayerCastSpell(t)
 	
 	--lesser heal
 	if t.SpellId == 68 then
-		if table.find(dkClass, t.Player.Class) then return end
+		if not t.RemoteData and table.find(dkClass, t.Player.Class) then
+			skipRemoteCast(t)
+			return
+		end
 		if not t.RemoteData then
 			local sp=healingSpells[68]
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
@@ -373,7 +395,10 @@ function events.PlayerCastSpell(t)
 	
 	--cure disease, reworked to greater heal
 	if t.SpellId==74 then
-		if table.find(dkClass, t.Player.Class) then return end
+		if not t.RemoteData and table.find(dkClass, t.Player.Class) then
+			skipRemoteCast(t)
+			return
+		end
 		if not t.RemoteData then
 			local sp=healingSpells[74]
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Body))
@@ -426,7 +451,7 @@ function events.PlayerCastSpell(t)
 	--protection from Magic, no need for online code
 	if t.SpellId==75 and not vars.MAWSETTINGS.buffRework=="ON" then
 		local s,m = SplitSkill(t.Player:GetSkill(const.Skills.Body))
-		if m==4 then
+		if m>=4 then
 			t.Skill=10
 		else
 			t.Skill=math.min(t.Skill,10)
@@ -751,7 +776,6 @@ function events.GameInitialized2()
 	Game.SpellsTxt[114].Description="Mistform allows the vampire to reduce physical damage by 75%.  However, a vampire in Mistform cannot perform any physical attacks.  Vampires in Mistform are able to use spells and abilities and are affected by spells and abilities."
 
 	
-
 	--store non buff rework tooltips
 	storeBaseText={}
 	for i=1, Game.SpellsTxt.High do
@@ -811,7 +835,7 @@ function doSharedLife(amount, spellQueueData)
 	end		
 	if m==3 then
 		totHeal=totHeal-s*3
-	elseif m==4 then
+	elseif m>=4 then
 		totHeal=totHeal-s*4
 	end
 	totHeal=math.max(totHeal, 0)
@@ -970,19 +994,6 @@ mem.nop(0x426CD3, 6)
 
 --removes fly when attacking, except in certain maps
 flyAllowedMaps={"elema.odm","elemf.odm","elemw.odm","out12.odm","outa1.odm","outa2.odm","outa3.odm","outb2.odm","outb3.odm","out05.odm", "out07.odm"}
-function events.CalcDamageToMonster(t)
-	if Game.BolsterAmount>100 or vars.AusterityMode then
-		if table.find(flyAllowedMaps,Map.Name) then 
-			return
-		end
-		data=WhoHitMonster()
-		flyTime=Party.SpellBuffs[7].ExpireTime
-		if data and data.Player and flyTime>Game.Time then
-			Party.SpellBuffs[5].ExpireTime=flyTime
-			Party.SpellBuffs[7].ExpireTime=0
-		end
-	end
-end
 
 function events.LoadMap()
 	if table.find(flyAllowedMaps,Map.Name) then 
@@ -1018,7 +1029,7 @@ function elementalBuffs()
 			if not table.find(dkClass,pl.Class) then
 				for v=1,6 do
 					local s,m=SplitSkill(pl:GetSkill(schools[v]))
-					if m==4 then
+					if m>=4 then
 						local power=s*3
 						if Party.SpellBuffs[buffsOrdered[v]].Power<=s*3 then
 							if Party.SpellBuffs[buffsOrdered[v]].Power<=power then
@@ -1032,7 +1043,7 @@ function elementalBuffs()
 				--stats bonus
 				for key, value in pairs(schoolToBuff) do
 					local s,m=SplitSkill(pl:GetSkill(key))
-					if m==4 then
+					if m>=4 then
 						local power=s*3
 						for k=0, Party.High do
 							if Party[k].SpellBuffs[value].Power<=s*3 then
@@ -1298,7 +1309,6 @@ function events.Action(t)
 end
 
 
-
 ----------------------------------------
 --CC REWORK
 ----------------------------------------
@@ -1312,37 +1322,11 @@ CCMAP={
 	[const.Spells.Fear]=	{["Duration"]=const.Minute*4, ["ChanceMult"]=0.005, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Fear},
 	[const.Spells.Enslave]=	{["Duration"]=const.Minute*5, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=1, ["School"]=const.Skills.Mind, ["DamageKind"]=const.Damage.Mind, ["Debuff"]=const.MonsterBuff.Enslave},
 	[const.Spells.Paralyze]={["Duration"]=const.Minute*3, ["ChanceMult"]=0.04, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Light, ["DamageKind"]=const.Damage.Light,["Debuff"]=const.MonsterBuff.Paralyze},	
-[const.Spells.ShrinkingRay]={["Duration"]=const.Minute*6, ["ChanceMult"]=0.01, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark,["Debuff"]=const.MonsterBuff.ShrinkingRay},
-[const.Spells.DarkGrasp]=	{["Duration"]=const.Minute*10, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]={const.MonsterBuff.ArmorHalved, const.MonsterBuff.Slow, const.MonsterBuff.DamageHalved, const.MonsterBuff.MeleeOnly}},																									
+	[const.Spells.ShrinkingRay]={["Duration"]=const.Minute*4, ["ChanceMult"]=0.01, ["BaseCost"]=1, ["ScalingCost"]=2, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark,["Debuff"]=const.MonsterBuff.ShrinkingRay},
+	[const.Spells.DarkGrasp]=	{["Duration"]=const.Minute*6, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=3, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]={const.MonsterBuff.ArmorHalved, const.MonsterBuff.Slow, const.MonsterBuff.DamageHalved, const.MonsterBuff.MeleeOnly}},																									
 	[const.Spells.TurnUndead]={["Duration"]=const.Minute*5, ["ChanceMult"]=0.005, ["BaseCost"]=1, ["ScalingCost"]=0.5, ["School"]=const.Skills.Spirit, ["DamageKind"]=const.Damage.Spirit, ["Debuff"]=const.MonsterBuff.Fear},	
 	[const.Spells.ControlUndead]={["Duration"]=const.Minute*10, ["ChanceMult"]=0.07, ["BaseCost"]=1, ["ScalingCost"]=1.5, ["School"]=const.Skills.Dark, ["DamageKind"]=const.Damage.Dark, ["Debuff"]=const.MonsterBuff.Enslave},
 }
---[[
-function events.PlayerCastSpell(t)
-	if CCMAP[t.SpellId] then
-		t.Handled=true
-		
-		if t.SpellId==66 then
-			local mon=Map.Monsters[Mouse:GetTarget().Index]
-			BeginGrabObjects()
-			Game.SummonObjects(497, mon.X,mon.Y,mon.Z+100, 0,1)
-			local obj=GrabObjects()
-			if obj then
-				obj.Spell=66
-				obj.SpellLevel=0
-				obj.SpellMastery=0
-				obj.SpellSkill=0
-				obj.SpellType=66
-				obj.TypeIndex=497
-				obj.Owner=4
-				obj.Visible=true
-				obj.Target=3
-				obj.AttachToHead=true
-			end
-		end
-	end
-end
-]]
 function getCCDiffMult(bolster)
 	local diffMult=math.max(((bolster-100)/200)+1,1)
 	if bolster==600 then 
@@ -1383,9 +1367,203 @@ function events.Action(t)
 	Game.Spells[122]["SpellPointsGM"]=30
 end
 
+--What mastery is worth on a CC duration. FlatDuration opts a spell out: it
+--buys its mastery scaling somewhere else (Shrinking Ray buys targets).
+--applyCCDebuff and ascendCCTooltips both go through here.
+local CC_MASTERY_STEP = {0.5, 0.65, 0.8, 1}
+
+function GetCCMasteryMult(cc, m)
+	if cc.FlatDuration then
+		return 1
+	end
+	return CC_MASTERY_STEP[math.min(math.max(m, 1), 4)]
+end
+
+--One source for CC application (MawCore/NOTES.md): engineApplied caps the
+--engine's roll (min: 0 duration = resist), the impact path extends (max).
+function applyCCDebuff(mon, cc, pl, spellId, resistance, engineApplied)
+	local s, m = SplitSkill(pl:GetSkill(cc.School))
+	local duration = cc.Duration * GetCCMasteryMult(cc, m)
+	if spellId ~= 122 then
+		local ascension = SplitSkill(pl:GetSkill(const.Skills.Learning))
+		duration = duration * 1.015^ascension / (1 + resistance/100)
+	end
+	if Party.High == 0 then
+		duration = duration * 2
+	end
+	local finalDuration = calcDebuffDuration(mon, cc, duration)
+	local debuffs = type(cc.Debuff)=="table" and cc.Debuff or {cc.Debuff}
+	for v = 1, #debuffs do
+		local buff = mon.SpellBuffs[debuffs[v]]
+		if engineApplied then
+			buff.ExpireTime = math.min(buff.ExpireTime, Game.Time + finalDuration)
+		else
+			buff.ExpireTime = math.max(buff.ExpireTime, Game.Time + finalDuration)
+		end
+	end
+	return finalDuration > 0
+end
+
+--Scripted CC casts: the engine has no effect for these ids, so the cast is
+--fully ours. Rules and findings: MawCore/NOTES.md "Projectile impacts".
+local scriptedCC={
+	[const.Spells.Slow]=true,
+	[60]=true, --mind Charm (no const: the dark elf one overwrote it)
+	[const.Spells.Charm]=true, --dark elf
+	[const.Spells.Berserk]=true,
+	[const.Spells.Paralyze]=true,
+	[const.Spells.Enslave]=true,
+	[const.Spells.DarkGrasp]=true,
+	[const.Spells.ControlUndead]=true,
+}
+CCMAP[const.Spells.ControlUndead].UndeadOnly=true
+CCMAP[const.Spells.Berserk].EffectObj=6060      --"Berzerk" spell62
+CCMAP[const.Spells.Enslave].EffectObj=6100      --"Enslave" spell66
+CCMAP[const.Spells.ControlUndead].EffectObj=9050 --"Control Undead" spell94
+CCMAP[const.Spells.Slow].EffectColor=0xC08020
+CCMAP[60].EffectColor=0xFF60C0
+CCMAP[const.Spells.Charm].EffectColor=0xFF60C0
+CCMAP[const.Spells.Paralyze].EffectColor=0xFFFF80
+CCMAP[const.Spells.DarkGrasp].EffectColor=0xA020F0
+
+--vanilla text claims a mastery-scaled 1/2..1/4 damage cut and a Dark-skill
+--duration; both are false now, so it is rebuilt from the values that apply it
+function events.GameInitialized2()
+	local function damageCut(buff)
+		return round((1 - MawCore.Damage.monsterDamageDebuff[buff])*100)
+	end
+	local function baseSeconds(spellId)
+		return CCMAP[spellId].Duration/const.Minute*MawCore.Formulas.gameMinuteSeconds
+	end
+	Game.SpellsTxt[const.Spells.ShrinkingRay].Description=string.format(
+		"Shrinks even the grandest of monsters down to more manageable sizes. A shrunken monster deals %d%% less damage. Each impact covers one monster per mastery nearby, preferring those not already shrunk. Base duration %gs at every mastery, extended by Ascension. Does not stack with Dark Grasp.",
+		damageCut(const.MonsterBuff.ShrinkingRay), baseSeconds(const.Spells.ShrinkingRay))
+	local graspText=string.format(
+		"This spell surrounds its target with the power of raw darkness, rendering it unable to fire missile attacks or cast spells. Further the target's movement is slowed, its armor class is halved and it deals %d%% less damage. Base duration %gs at Grandmaster, less below, extended by Ascension. Does not stack with Shrinking Ray.",
+		damageCut(const.MonsterBuff.DamageHalved), baseSeconds(const.Spells.DarkGrasp))
+	Game.SpellsTxt[const.Spells.DarkGrasp].Description=graspText
+	--spell 96 is a DK spell: dkSkills() restores non-DK characters from the
+	--snapshot zzClasses takes earlier in GameInitialized2, so it needs the new
+	--text too or selecting a non-DK wipes it back to vanilla
+	if spellDesc and spellDesc[const.Spells.DarkGrasp] then
+		spellDesc[const.Spells.DarkGrasp].Description=graspText
+	end
+end
+
+local function nextReadyPartyMember()
+	local cur=Game.CurrentPlayer
+	for i=1,Party.High+1 do
+		local slot=(cur+i)%(Party.High+1)
+		if Party[slot].RecoveryDelay==0 and Party[slot]:IsConscious() then
+			Game.CurrentPlayer=slot
+			return
+		end
+	end
+end
+
+function castCCSpell(t)
+	t.Handled=true
+	local pl=t.Player
+	local cc=CCMAP[t.SpellId]
+	if not checkManaForSpell(pl, t.SpellId, cc.School) then return end
+	local d1=type(cc.Debuff)=="table" and cc.Debuff[1] or cc.Debuff
+	local ai=const.AIState
+	local function validTarget(mon)
+		return mon.AIState~=ai.Dead and mon.AIState~=ai.Invisible and mon.AIState~=ai.Removed and mon.ShowAsHostile and mon.Hostile
+			and (not cc.UndeadOnly or Game.IsMonsterOfKind(mon.Id, const.MonsterKind.Undead)==1)
+			and getDistanceToMonster(mon)<=4800
+	end
+	local lim=Map.Monsters.High
+	local target, lowest=nil, math.huge
+	--a valid monster under the mouse wins (spellbook crosshair resolves here)
+	local mt=Mouse:GetTarget()
+	if mt.Kind==3 and mt.Index<=lim and validTarget(Map.Monsters[mt.Index]) then
+		target=mt.Index
+	end
+	if not target then
+		local list=Game.GetMonstersInSight() or {}
+		for i=1,#list do
+			local idx=list[i]
+			if idx<=lim then
+				local mon=Map.Monsters[idx]
+				if validTarget(mon) then
+					local e=mon.SpellBuffs[d1].ExpireTime
+					if e<lowest then
+						lowest=e
+						target=idx
+					end
+				end
+			end
+		end
+	end
+	if not target then
+		Game.ShowStatusText("Spell Failed")
+		pl:SetRecoveryDelay(30)
+		nextReadyPartyMember()
+		return
+	end
+	local s,m=SplitSkill(pl:GetSkill(cc.School))
+	pl.SP=pl.SP-Game.Spells[t.SpellId]["SpellPoints"..masteryName[math.min(m,4)]]
+	local snd=Game.SpellSounds[t.SpellId]
+	if snd and snd>0 then
+		evt.PlaySound(snd)
+	end
+	local mon=Map.Monsters[target]
+	if applyCCDebuff(mon, cc, pl, t.SpellId, mon.Resistances[cc.DamageKind], false) then
+		--DR-resisted casts show nothing: the visual doubles as hit feedback
+		if cc.EffectObj then
+			Game.SummonObjects(cc.EffectObj, mon.X, mon.Y, mon.Z, 0, 1)
+		else
+			mon:ShowSpellEffect(cc.EffectColor or 0xA020F0)
+		end
+	end
+	pl:SetRecoveryDelay(getSpellDelay(pl, t.SpellId))
+	nextReadyPartyMember()
+end
+
+--Berserk/Enslave enter engine aim mode BEFORE PlayerCastSpell can fire, so
+--both quick-cast entries bypass the engine entirely (NOTES.md).
+local aimlessQuickCC={[const.Spells.Berserk]=true,[const.Spells.Enslave]=true}
+
+--entry 1: the Merge's extra quick-spell slots (Lua hotkeys -> CastQuickSpell)
+function events.GameInitialized2()
+	local orig=CastQuickSpell
+	function CastQuickSpell(playerId, spellId)
+		if aimlessQuickCC[spellId] and Party[playerId] then
+			castCCSpell{Player=Party[playerId], SpellId=spellId}
+			return
+		end
+		orig(playerId, spellId)
+	end
+end
+
+--entry 2: the vanilla quick-cast keys -- Action 25, Param 0 = QuickSpell,
+--Param 1 = AttackSpell (same decode as the auto-target-heal handler)
+function events.Action(t)
+	if t.Action==25 and not t.Handled then
+		if Game.CurrentPlayer<0 or Game.CurrentPlayer>Party.High then return end
+		local pl=Party[Game.CurrentPlayer]
+		local spellCast=0
+		if t.Param==0 then
+			spellCast=pl.QuickSpell
+		elseif t.Param==1 then
+			spellCast=pl.AttackSpell
+		end
+		if aimlessQuickCC[spellCast] and pl.RecoveryDelay==0 then
+			t.Handled=true
+			castCCSpell{Player=pl, SpellId=spellCast}
+		end
+	end
+end
+
 function events.PlayerCastSpell(t)
 	if CCMAP[t.SpellId] then
 		if t.SpellId==const.Spells.Stun then return end --stun is handled differently
+		if t.SpellId==const.Spells.ShrinkingRay then return end --impact-applied via AutoCollision below
+		if scriptedCC[t.SpellId] then
+			castCCSpell(t)
+			return
+		end
 		local resistance={}
 		local level={}
 		local prevExpireTime={} -- Record current debuff ExpireTime before cast
@@ -1448,23 +1626,82 @@ function events.PlayerCastSpell(t)
 					currentExpireTime=mon.SpellBuffs[cc.Debuff].ExpireTime
 				end
 				if currentExpireTime > prevExpireTime[i] then
-					-- Monster was affected, apply diminishing returns
-					local masteryMult = ({0.5, 0.65, 0.8, 1})[math.max(1,m)]
-					local duration=cc.Duration * masteryMult
-					if t.SpellId~=122 then
-						local ascension = SplitSkill(t.Player:GetSkill(const.Skills.Learning))
-						duration=duration*1.015^ascension/(1+resistance[i]/100)
-					end
-					if Party.High==0 then
-						duration=duration*2
-					end
-					local finalDuration = calcDebuffDuration(mon, cc, duration)
-					if type(cc.Debuff)=="table" then
-						for v =1,#cc.Debuff do 
-							mon.SpellBuffs[cc.Debuff[v]].ExpireTime=math.min(mon.SpellBuffs[cc.Debuff[v]].ExpireTime, Game.Time+finalDuration)
+					applyCCDebuff(mon, cc, t.Player, t.SpellId, resistance[i], true)
+				end
+			end
+		end
+	end
+end
+
+--Impact-applied CC: AutoCollision fires MonsterAttacked for these object
+--types; the CC and BuffPower are applied there (NOTES.md).
+local ccByObjType = {
+	[9030] = const.Spells.ShrinkingRay,
+}
+CCMAP[const.Spells.ShrinkingRay].BuffPower = 2
+CCMAP[const.Spells.ShrinkingRay].SplashRadius = 512
+--mastery buys targets, so it must not also buy duration
+CCMAP[const.Spells.ShrinkingRay].FlatDuration = true
+
+function events.GameInitialized2()
+	for objType in pairs(ccByObjType) do
+		MawEnableProjectileImpact(objType) --helper in zzMaw-Monsters (MM6 projectiles)
+	end
+end
+
+local function splashTargets(cc, x, y, z, count, skipIndex)
+	local debuff = type(cc.Debuff)=="table" and cc.Debuff[1] or cc.Debuff
+	local ai = const.AIState
+	local taken, out = {[skipIndex] = true}, {}
+	for _ = 1, count do
+		local fresh, freshDist, stale, staleExpire
+		for i = 0, Map.Monsters.High do
+			local mon = Map.Monsters[i]
+			if not taken[i] and mon.Hostile and mon.AIState~=ai.Dead
+					and mon.AIState~=ai.Removed and mon.AIState~=ai.Invisible then
+				local dist = math.sqrt((mon.X-x)^2 + (mon.Y-y)^2 + (mon.Z-z)^2)
+				if dist <= cc.SplashRadius then
+					local expire = mon.SpellBuffs[debuff].ExpireTime
+					if expire <= Game.Time then
+						if not freshDist or dist < freshDist then
+							fresh, freshDist = i, dist
 						end
-					else
-						mon.SpellBuffs[cc.Debuff].ExpireTime=math.min(mon.SpellBuffs[cc.Debuff].ExpireTime, Game.Time+finalDuration)
+					elseif not staleExpire or expire < staleExpire then
+						stale, staleExpire = i, expire
+					end
+				end
+			end
+		end
+		local pick = fresh or stale
+		if not pick then break end
+		taken[pick] = true
+		out[#out+1] = Map.Monsters[pick]
+	end
+	return out
+end
+
+function events.MonsterAttacked(t)
+	local o = t.Attacker and t.Attacker.Object
+	local spellId = o and ccByObjType[o.Type]
+	if spellId and not t.Handled then
+		t.Handled = true --no damage component: skip engine attack processing
+		local pl = t.Attacker.Player
+		local cc = CCMAP[spellId]
+		if pl and cc then
+			local targets = {t.Monster}
+			if cc.SplashRadius then
+				--the monster hit is target 1, mastery buys the rest
+				local _, m = SplitSkill(pl:GetSkill(cc.School))
+				for _, extra in ipairs(splashTargets(cc, o.X, o.Y, o.Z,
+						math.max(m, 1) - 1, t.MonsterIndex)) do
+					targets[#targets+1] = extra
+				end
+			end
+			for _, mon in ipairs(targets) do
+				if applyCCDebuff(mon, cc, pl, spellId, mon.Resistances[cc.DamageKind], false) and cc.BuffPower then
+					local debuffs = type(cc.Debuff)=="table" and cc.Debuff or {cc.Debuff}
+					for v=1,#debuffs do
+						mon.SpellBuffs[debuffs[v]].Power=cc.BuffPower
 					end
 				end
 			end
@@ -1577,7 +1814,10 @@ function calcDebuffDuration(monster, cc, duration)
 	end
 	
 	local finalDuration = duration * durationMult
-	
+	if monster.NameId>=220 and monster.NameId<300 then
+		finalDuration = finalDuration/2
+	end
+
 	-- Record this CC application
 	mapvars.ccHistory[monsterIndex] = mapvars.ccHistory[monsterIndex] or {}
 	mapvars.ccHistory[monsterIndex][group] = mapvars.ccHistory[monsterIndex][group] or {}
@@ -1585,40 +1825,8 @@ function calcDebuffDuration(monster, cc, duration)
 		startTime = Game.Time,
 		endTime = Game.Time + finalDuration
 	})
-	
-	if mon.NameId>=220 and mon.NameId<300 then
-		return finalDuration/2
-	end
-	return finalDuration
-end
 
---stun code
-function events.CalcDamageToMonster(t)
-	local data=WhoHitMonster()
-	if data and data.Player and data.Object and data.Object.Spell==34 then
-		local cc=CCMAP[const.Spells.Stun]
-		local mon=t.Monster
-		local oldResistance=mon.Resistances[const.Damage.Earth]
-		local res=mon.Resistances[const.Damage.Earth]
-		local lvl=mon.Level
-		local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Earth))
-		local newLevel=calcEffectChance(lvl, res, s, cc.ChanceMult, mon)
-		local hit=(30/(30+newLevel/4))
-		--mapping
-		if getMapAffixPower(13) then
-			hit=hit*(1-getMapAffixPower(13)/100)
-		end
-		if hit>math.random() then
-			mon.Resistances[const.Damage.Earth]=0
-			mon.Level=0
-		else
-			mon.Resistances[const.Damage.Earth]=65000
-		end
-		RunNextTick(function()
-			mon.Level=lvl
-			mon.Resistances[const.Skills.Earth]=res
-		end)
-	end
+	return finalDuration
 end
 
 
@@ -1778,14 +1986,14 @@ function events.CalcSpellDamage(t)
 		
 		local critChance, critMult, success=getCritInfo(data.Player,"spell")
 		
-		--int/pers scaling
+		--int/pers scaling: same level-normalized curve as might on melee
 		local int=data.Player:GetIntellect()
 		local per=data.Player:GetPersonality()
-		local mult=math.max(int,per)/1000+1
+		local mult=1+getIntellectDamageMultiplier(math.max(int,per), data.Player.LevelBase)
 		t.Result=t.Result*mult
 		if success then
 			t.Result=t.Result*critMult
-			crit=true
+			MawCore.DamageState.setCrit(true)
 		end
 	end
 	--enchants
@@ -1809,67 +2017,37 @@ function events.CalcSpellDamage(t)
 	
 end
 
---MASS DISTORSION Handled
---needs separate code to account for all scenario
-local massHPMULT={
-	[0]=1,
-	[50]=1,
-	[100]=1,
-	[150]=1.4,
-	[200]=1.8,
-	[300]=3,
-	[600]="doom",
-}
-function events.CalcDamageToMonster(t)
-	local data=WhoHitMonster()
-			local mon=t.Monster
-			local lvl=getMonsterLevel(mon)
-	if data and data.Player and data.Spell==44 then
-		mult=1
-
-		if massHPMULT[Game.BolsterAmount]=="doom" then
-
-			mult=3.33*(1+lvl/75)
-			if mon.NameId>=220 and mon.NameId<300 then
-				mult=mult*2*(1+mon.Level/80)
-			end
-		else
-			mult=massHPMULT[Game.BolsterAmount] or 1
-		end
-		if vars.AusterityMode then
-			mult=mult*4
-		end
-		t.Result=t.Result/mult^0.5*math.max(1, (mon.Level/250)^2)
-	end
-	
-end
-
 
 function ascendSpellDamage(skill, mastery, spell, index)
 	--empower spell buff
 	local empowerMult=1
 	if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[28] then
 		local s, m=getBuffSkill(28)
-		empowerMult=1+buffPower[5].Base[m]/100+buffPower[5].Scaling[m]/1000*s
+		empowerMult=1+GetBuffMultiplier(const.Spells.Haste, s, m)
 	end
 	
 	diceMin=spellPowers[spell].diceMin*empowerMult
 	diceMax=spellPowers[spell].diceMax*empowerMult
 	damageAdd=spellPowers[spell].dmgAdd*empowerMult
 	
-	diceMax=diceMax * (1+0.09 * skill)*1.025^skill
-	damageAdd=damageAdd*(1+0.04*skill^2)*1.025^skill
+	diceMax=diceMax*MawCore.Formulas.spellDiceScale(skill)
+	damageAdd=damageAdd*MawCore.Formulas.spellAddScale(skill)
 		
 	diceMin, diceMax, damageAdd = round(diceMin), round(diceMax), round(damageAdd)
 	return diceMin, diceMax, damageAdd
 end
 
+--the ascension curve applied to a healing spell's raw base/scaling pair
+function ascendHealingValues(skill, base, scaling)
+	scaling=scaling * (1+0.02 * skill)*1.015^skill
+	base=base*(1 + 0.01 * skill^2)*1.015^skill
+	return round(scaling), round(base)
+end
+
 function ascendSpellHealing(skill, mastery, spell, healM)
 	base=healingSpells[spell].Base[healM]
 	scaling=healingSpells[spell].Scaling[healM]
-	scaling=scaling * (1+0.06 * skill)*1.02^skill
-	base=base*(1 + 0.025 * skill^2)*1.02^skill
-	scaling, base = round(scaling), round(base)
+	scaling, base = ascendHealingValues(skill, base, scaling)
 	return scaling, base
 end
 
@@ -1941,7 +2119,7 @@ function events.Action(t)
 	]]
 end
 
-function events.Tick()
+function mawTick_Ascension()
 	lastCheck=lastCheck or -1
 	local lowestDelay=math.huge
 	local playerToAscend=Game.CurrentPlayer
@@ -1973,38 +2151,19 @@ function getPersonalityManaCostReduction(pl)
 	local personality = pl:GetPersonality()
 	local level = math.min(getTotalLevel(),1000)
 	
-	local personalityDivisor = 10 + (level) * 65 / 1000
+	local personalityDivisor = 10 + (level) * 60 / 1000
 	local reductionPercent = personality / personalityDivisor
 	return (0.99^reductionPercent)
 end
 
-function AscendCCSpells(pl,s,m,personalityReduction)
-	local mult=getCCDiffMult(Game.BolsterAmount)
-	local lvl=pl.LevelBase
-	
+--Mana cost of the control spells.
+local function ascendCCSpellCosts(pl, s, m, personalityReduction)
 	for key, value in pairs(CCMAP) do
 		for i=1,4 do
-			local baseCost = spellCost[key][masteryName[i]]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
+			local baseCost = spellCost[key][masteryName[i]]*(1+s*0.2)*1.03^(s)*(1-0.125*m)
 			local finalCost=math.min(math.ceil(baseCost * personalityReduction), 65000)
 			Game.Spells[key]["SpellPoints" .. masteryName[i]]=finalCost
 		end
-		
-		local baseDuration=value.Duration/const.Minute*2
-		local school=math.ceil(key/11)+11
-		local spellS, spellM = SplitSkill(pl.Skills[school])
-		local masteryMult = ({0.5, 0.65, 0.8, 1})[math.max(1,spellM)]
-		local ascendedDuration=baseDuration * masteryMult * 1.015^(s) / (lvl/200)
-		
-		-- Update N/E/M/GM descriptions with duration at each mastery
-		local durN = baseDuration * ({0.5, 0.65, 0.8, 1})[1] * 1.015^(s) / (lvl/200)
-		local durE = baseDuration * ({0.5, 0.65, 0.8, 1})[2] * 1.015^(s) / (lvl/200)
-		local durM = baseDuration * ({0.5, 0.65, 0.8, 1})[3] * 1.015^(s) / (lvl/200)
-		local durGM = baseDuration * ({0.5, 0.65, 0.8, 1})[4] * 1.015^(s) / (lvl/200)
-		Game.SpellsTxt[key].Normal = string.format("Duration: %.1f seconds", durN)
-		Game.SpellsTxt[key].Expert = string.format("Duration: %.1f seconds", durE)
-		Game.SpellsTxt[key].Master = string.format("Duration: %.1f seconds", durM)
-		Game.SpellsTxt[key].GM = string.format("Duration: %.1f seconds", durGM)
-	
 		if key==122 then
 			Game.Spells[key]["SpellPointsNormal"]=15
 			Game.Spells[key]["SpellPointsExpert"]=15
@@ -2014,11 +2173,354 @@ function AscendCCSpells(pl,s,m,personalityReduction)
 	end
 end
 
+
+--monsters no longer carry bolstered resistances, so the CC tooltips assume a
+--monster at the caster's level and convert: roughly 1 resistance per 2 levels
+CC_TOOLTIP_LEVELS_PER_RESISTANCE = 2
+learnableSpells={{1,2,3,4},{5,6,7},{8,9,10},{11}}
+local tierMinMastery={}
+for m=1,#learnableSpells do
+	for _,tier in ipairs(learnableSpells[m]) do
+		tierMinMastery[tier]=m
+	end
+end
+
+function GetSpellMinMastery(spellId)
+	return tierMinMastery[spellId%11==0 and 11 or spellId%11] or 1
+end
+
+local masteryField={"Normal", "Expert", "Master", "GM"}
+
+local function ascendCCTooltips(pl, s)
+	local resistance=pl.LevelBase/CC_TOOLTIP_LEVELS_PER_RESISTANCE
+	for key, value in pairs(CCMAP) do
+		--same shape as applyCCDebuff
+		local duration=value.Duration/const.Minute*MawCore.Formulas.gameMinuteSeconds
+			*1.015^s/(1 + resistance/100)
+		local minMastery=GetSpellMinMastery(key)
+		for m=1,#masteryField do
+			local line=string.format("Duration: %.1f seconds", duration*GetCCMasteryMult(value, m))
+			if value.SplashRadius then
+				line=string.format("%s, %d target%s", line, m, m>1 and "s" or "")
+			end
+			Game.SpellsTxt[key][masteryField[m]] = m<minMastery and "n/a" or line
+		end
+	end
+end
+
+local function ascensionLevel(pl)
+	local level=pl:GetSkill(const.Skills.Learning)
+	lastLevel=level
+	local s,m = SplitSkill(level)
+	local elementalist=false
+	local id=pl:GetIndex()
+	if table.find(elementalistClass, pl.Class) then
+		elementalist=true
+		s=0
+		m=4
+		for i=12,15 do
+			local skill = SplitSkill(pl.Skills[i])
+			s=s+skill
+		end
+		s=s/4
+		vars.eleStacks=vars.eleStacks or {}
+		vars.eleStacks[id]=vars.eleStacks[id] or 0
+	end
+	if table.find(shamanClass, pl.Class) then
+		s=0
+		m=4
+		for i=12,18 do
+			local skill = SplitSkill(pl.Skills[i])
+			s=s+skill
+		end
+		s=s/7
+	end
+	return s, m, elementalist, id
+end
+
+--Mana cost of every damage spell.
+local function ascendSpellCosts(pl, s, m, elementalist, id, personalityReduction)
+	for v=1,#spells do 
+		local num=spells[v]
+		for i=1,4 do
+			local baseCost = spellCost[num][masteryName[i]]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
+			Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(math.ceil(baseCost * personalityReduction), 65000)
+			if elementalist then
+				local baseCost=round((spellCost[num][masteryName[i]]+vars.eleStacks[id])*(1+s*0.125)*1.04^(s)*(1-0.125*m))
+				Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(round(math.ceil(baseCost*(1+vars.eleStacks[id]*0.075) * personalityReduction)),65000)
+			end
+		end
+		if num==44 then	
+			Game.Spells[num]["SpellPointsGM"]=math.ceil(math.min(pl.LevelBase, 255)^1.4/12.5 * personalityReduction)
+		end
+	end				
+end
+
+local function ascendDamageTooltips(s, m)
+	--change tooltips according to ascended damage
+	Game.SpellsTxt[2].Description=string.format("Launches a burst of fire at a single target.  Damage is %s+1-%s points of damage per point of skill in Fire Magic.   Firebolt is safe, effective and has a low casting cost.",dmgAddTooltip(s, m,2),diceMaxTooltip(s, m,2))
+	Game.SpellsTxt[6].Description=string.format("Fires a ball of fire at a single target. When it hits, the ball explodes damaging all those nearby, including your characters if they're too close.  Fireball does 1-%s points of damage per point of skill in Fire Magic.",diceMaxTooltip(s, m,6))
+	--fire spikes fix
+	Game.SpellsTxt[7].Description="Drops a Fire Spike on the ground that waits for a creature to get near it before exploding.  Fire Spikes last until you leave the map or they are triggered."
+	Game.SpellsTxt[7].Expert=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",diceMaxTooltip(s, m,7))
+	Game.SpellsTxt[7].Master=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",round(diceMaxTooltip(s, m,7)/6*8))
+	Game.SpellsTxt[7].GM=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",round(diceMaxTooltip(s, m,7)/6*10))
+	----------------------------------------
+	
+	Game.SpellsTxt[8].Description=string.format("Reserve a mana percentage to surround your characters with a very hot fire that is only harmful to others.  The spell will deliver %s points of damage plus 1-%s per point of skill to all nearby monsters for as long as they remain in the area of effect.",dmgAddTooltip(s, m,8),diceMaxTooltip(s, m,8))
+	Game.SpellsTxt[9].Description=string.format("Summons flaming rocks from the sky which fall in a large radius surrounding your chosen target.  Try not to be near the victim when you use this spell.  A single meteor does %s points of damage plus %s per point of skill in Fire Magic.  This spell only works outdoors.",dmgAddTooltip(s, m,9),diceMaxTooltip(s, m,9))
+	Game.SpellsTxt[10].Description=string.format("Inferno burns all monsters in sight when cast, excluding your characters.  One or two castings can clear out a room of weak or moderately powerful creatures. Each monster takes %s points of damage plus %s per point of skill in Fire Magic.  This spell only works indoors.",dmgAddTooltip(s, m,10),diceMaxTooltip(s, m,10))
+	Game.SpellsTxt[11].Description=string.format("Among the strongest direct damage spells available, Incinerate inflicts massive damage on a single target.  Only the strongest of monsters can expect to survive this spell.  Damage is %s points plus 1-%s per point of skill in Fire Magic.",dmgAddTooltip(s, m,11),diceMaxTooltip(s, m,11))
+	Game.SpellsTxt[15].Description=string.format("Sparks fires small balls of lightning into the world that bounce around until they hit something or dissipate. It is hard to tell where they will go, so this spell is best used in a room crowded with small monsters. Each spark does 1-%s per point of skill in Air Magic.",diceMaxTooltip(s, m,15))
+	Game.SpellsTxt[18].Description=string.format("Lightning Bolt discharges electricity from the caster's hand to a single target.  It always hits and does %s points plus 1-%s points of damage per point of skill in Air Magic.\n\nThe spell then arcs to a second target, hitting it as well.",dmgAddTooltip(s, m,18),diceMaxTooltip(s, m,18))
+	Game.SpellsTxt[20].Description=string.format("Implosion is a nasty spell that affects a single target by destroying the air around it, causing a sudden inrush from the surrounding air, a thunderclap, and %s points plus 1-%s points of damage per point of skill in Air Magic.",dmgAddTooltip(s, m,20),diceMaxTooltip(s, m,20))
+	Game.SpellsTxt[22].Description=string.format("Calls stars from the heavens to smite and burn your enemies.  Twenty stars are called, and the damage for each star is %s points plus %s per point of skill in Air Magic. Try not to get caught in the blast! This spell only works outdoors.",dmgAddTooltip(s, m,22),diceMaxTooltip(s, m,22))
+	Game.SpellsTxt[24].Description=string.format("Sprays poison at monsters directly in front of your characters.  Damage is low, but few monsters have resistance to Water Magic, so it usually works.  Each shot does %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,24),diceMaxTooltip(s, m,24))
+	Game.SpellsTxt[26].Description=string.format("Fires a bolt of ice at a single target.  The missile does %s + 1-%s points of damage per point of skill in Water Magic.",dmgAddTooltip(s, m,26),diceMaxTooltip(s, m,26))
+	Game.SpellsTxt[29].Description=string.format("Acid burst squirts a jet of extremely caustic acid at a single victim.  It always hits and does %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,29),diceMaxTooltip(s, m,29))
+	Game.SpellsTxt[32].Description=string.format("Fires a ball of ice in the direction the caster is facing.  The ball will shatter when it hits something, launching 7 shards of ice in all directions except the caster's.  The shards will ricochet until they strike a creature or melt.  Each shard does %s points of damage plus 1-%s per point of skill in Water Magic.",dmgAddTooltip(s, m,32),diceMaxTooltip(s, m,32))
+	Game.SpellsTxt[34].Description="Slaps a monster with magical force, forcing it to recover from the stun spell before it can do anything else.  Stun also knocks monsters back a little, giving you a chance to get away while the getting is good.  The greater your skill in Earth Magic, the greater the effect of the spell."
+	Game.SpellsTxt[37].Description=string.format("Summons a swarm of biting, stinging insects to bedevil a single target.  The swarm does %s points of damage plus 1-%s per point of skill in Earth Magic.",dmgAddTooltip(s, m,37),diceMaxTooltip(s, m,37))
+	Game.SpellsTxt[39].Description=string.format("Fires a rotating, razor-thin metal blade at a single monster.  The blade does 1-%s points of damage per point of skill in Earth Magic.\n\nBlades is the only spell capable to deal Physical damage.",diceMaxTooltip(s, m,39))
+	Game.SpellsTxt[41].Description=string.format("Releases a magical stone into the world that will explode when it comes into contact with a creature or enough time passes.  The rock will bounce and roll until it finds a resting spot, so be careful not to be caught in the blast.  The explosion causes %s points of damage plus 1-%s points of damage per point of skill in Earth Magic.",dmgAddTooltip(s, m,41),diceMaxTooltip(s, m,41))
+	Game.SpellsTxt[43].Description=string.format("Launches a magical stone which bursts in air, sending shards of explosive earth raining to the ground.  The damage is 1-%s per point of skill in Earth Magic for each shard.  This spell can only be used outdoors.",diceMaxTooltip(s, m,43))
+	--Game.SpellsTxt[44].Description=string.format("Increases the weight of a single target enormously for an instant, causing internal damage equal to %s%% of the monster's hit points plus another %s%% per point of skill in Earth Magic.  The bigger they are, the harder they fall.",dmgAddTooltip(s, m,44),diceMaxTooltip(s, m,44))
+	Game.SpellsTxt[44].Description="Increases the weight of a single target enormously for an instant, causing internal damage equal to 15%% of the monster's hit points plus another 0.5%% per point of skill in Earth Magic. The bigger they are, the harder they fall."
+	Game.SpellsTxt[52].Description=string.format("This spell weakens the link between a target's body and soul, causing %s + 2-%s points of damage per point of skill in Spirit Magic to all monsters near the caster.",dmgAddTooltip(s, m,52),diceMaxTooltip(s, m,52))
+	Game.SpellsTxt[59].Description=string.format("Fires a bolt of mental force which damages a single target's nervous system.  Mind Blast does %s points of damage plus 1-%s per point of skill in Mind Magic.",dmgAddTooltip(s, m,59),diceMaxTooltip(s, m,59))
+	Game.SpellsTxt[65].Description=string.format("Similar to Mind Blast, Psychic Shock targets a single creature with mind damaging magic--only it has a much greater effect.  Psychic Shock does %s points of damage plus 1-%s per point of skill in Mind Magic.",dmgAddTooltip(s, m,65),diceMaxTooltip(s, m,65))
+	Game.SpellsTxt[70].Description=string.format("Directly inflicts magical damage upon a single creature.  Harm does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(s, m,70),diceMaxTooltip(s, m,70))
+	Game.SpellsTxt[76].Description=string.format("Flying Fist throws a heavy magical force at a single opponent that does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(s, m,76),diceMaxTooltip(s, m,76))
+	Game.SpellsTxt[76].Description=string.format("Flying Fist throws a heavy magical force at a single opponent that does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(s, m,76),diceMaxTooltip(s, m,76))
+	Game.SpellsTxt[78].Description=string.format("Fires a bolt of light at a single target that does %s + 1-%s points of damage per point of skill in light magic.  Damage vs. Undead is doubled.",dmgAddTooltip(s, m,78),diceMaxTooltip(s, m,78))
+	Game.SpellsTxt[79].Description=string.format("Calls upon the power of heaven to undo the evil magic that extends the lives of the undead, inflicting %s points of damage plus 1-%s per point of skill in Light Magic upon a single, unlucky target.  This spell only works on the undead.",dmgAddTooltip(s, m,79),diceMaxTooltip(s, m,79))
+	Game.SpellsTxt[84].Description=string.format("Inflicts %s points of damage plus %s per point of skill in Light Magic on all creatures in sight.  This spell can only be cast indoors.",dmgAddTooltip(s, m,84),diceMaxTooltip(s, m,84))
+	Game.SpellsTxt[87].Description=string.format("Sunray is the second most devastating damage spell in the game. It does %s points of damage plus 1-%s points per point of skill in Light Magic, by concentrating the light of the sun on one unfortunate creature. Indoors it can be cast at any time; outdoors it only works during the day.",dmgAddTooltip(s, m,87),diceMaxTooltip(s, m,87))
+	Game.SpellsTxt[90].Description=string.format("A poisonous cloud of noxious gases is formed in front of the caster and moves slowly away from your characters.  The cloud does %s points of damage plus 1-%s per point of skill in Dark Magic and lasts until something runs into it.",dmgAddTooltip(s, m,90),diceMaxTooltip(s, m,90))
+	Game.SpellsTxt[93].Description=string.format("Fires a blast of hot, jagged metal in front of the caster, striking any creature that gets in the way.  Each piece inflicts 1-%s points of damage per point of skill in Dark Magic.",diceMaxTooltip(s, m,93))
+	Game.SpellsTxt[97].Description=string.format("Dragon Breath empowers the caster to exhale a cloud of toxic vapors that targets a single monster and damage all creatures nearby, doing 1-%s points of damage per point of skill in Dark Magic.",diceMaxTooltip(s, m,97))
+	Game.SpellsTxt[98].Description=string.format("This spell is the town killer. Armageddon inflicts %s points of damage plus %s point of damage for every point of Dark skill your character has to every creature on the map, including all your characters. It can only be cast three times per day and only outdoors.",dmgAddTooltip(s, m,98),diceMaxTooltip(s, m,98))
+	Game.SpellsTxt[99].Description=string.format("This horrible spell sucks the life from all creatures in sight, friend or enemy.  Souldrinker then transfers that life to your party in much the same fashion as Shared Life.  Damage (and healing) is %s + 1-%s per point of skill.",dmgAddTooltip(s, m,99),diceMaxTooltip(s, m,99))
+	
+	Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,103),diceMaxTooltip(s, m,103))
+	Game.SpellsTxt[111].Description=string.format("Lifedrain allows the vampire to damage his or her target and simultaneously heal based on the damage done in the Lifedrain.  This ability does 1-%s points of damage per skill.",diceMaxTooltip(s, m,111))
+	Game.SpellsTxt[111].Master=string.format("Damage 1-%s per point of skill",round(diceMaxTooltip(s, m,111)/3*5))
+	Game.SpellsTxt[111].GM=string.format("Damage 1-%s per point of skill",round(diceMaxTooltip(s, m,111)/3*7))
+	Game.SpellsTxt[123].Description="This ability is an upgraded version of the normal Dragon breath weapon attack.  It acts much like a fireball, striking its target and exploding out to hit everything near it, except the explosion does much more damage than most fireballs."
+end
+
+function getBaseHealingSpells()
+	if vars.insanityMode then
+		return {
+			[const.Spells.RemoveCurse]=    {["Cost"]={0,15,30,60,[0]=0}, ["Base"]={0,20,40,60,[0]=0}, ["Scaling"]={0,8,12,16}},
+			[const.Spells.SharedLife]=    {["Cost"]={0,0,25,40,[0]=0}, ["Base"]={0,0,0,0,[0]=0}, ["Scaling"]={0,0,7,9}},
+			[const.Spells.Resurrection]={["Cost"]={0,0,0,300,[0]=0}, ["Base"]={0,0,0,450,[0]=0}, ["Scaling"]={0,0,0,50}},
+			[const.Spells.Heal]=        {["Cost"]={6,15,24,40,[0]=0}, ["Base"]={12,24,36,48,[0]=0}, ["Scaling"]={6,9,12,15}},
+			[const.Spells.CureDisease]=    {["Cost"]={0,0,45,100,[0]=0}, ["Base"]={0,0,50,100,[0]=0}, ["Scaling"]={0,0,16,25}},
+			[const.Spells.PowerCure]=    {["Cost"]={0,0,0,150,[0]=0}, ["Base"]={0,0,0,50,[0]=0}, ["Scaling"]={0,0,0,12}}
+		}
+	end
+	return {
+		[const.Spells.RemoveCurse]=    {["Cost"]={0,5,10,20,[0]=0}, ["Base"]={0,10,20,30,[0]=0}, ["Scaling"]={0,4,6,8}},
+		[const.Spells.SharedLife]=    {["Cost"]={0,0,25,40,[0]=0}, ["Base"]={0,0,0,0,[0]=0}, ["Scaling"]={0,0,7,9}},
+		[const.Spells.Resurrection]={["Cost"]={0,0,0,100,[0]=0}, ["Base"]={0,0,0,150,[0]=0}, ["Scaling"]={0,0,0,21}},
+		[const.Spells.Heal]=        {["Cost"]={2,4,6,8,[0]=0}, ["Base"]={4,8,12,16,[0]=0}, ["Scaling"]={2,3,4,6}},
+		[const.Spells.CureDisease]=    {["Cost"]={0,0,15,25,[0]=0}, ["Base"]={0,0,25,40,[0]=0}, ["Scaling"]={0,0,7,10}},
+		[const.Spells.PowerCure]=    {["Cost"]={0,0,0,30,[0]=0}, ["Base"]={0,0,0,15,[0]=0}, ["Scaling"]={0,0,0,4}}
+	}
+end
+
+local function ascendHealingSpells(pl, s, m, personalityReduction)
+	-----------------------
+	--Healing Spells
+	-----------------------
+	healingSpells=getBaseHealingSpells()
+	for i=1, 6 do
+		for v=1,4 do
+			local baseCost = healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
+			healingSpells[healingList[i]].Cost[v]=math.min(round(baseCost*personalityReduction), 65000)
+			healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
+		end
+	end
+	for i=1, 6 do
+		Game.SpellsTxt[healingList[i]].Description=baseHealTooltip[healingList[i]]
+	end
+	--shaman modifier
+	if table.find(shamanClass, pl.Class) then
+		local s=0
+		for school=12,18 do
+			skill=SplitSkill(pl.Skills[school])
+			s=s+skill
+		end
+		local mult=1+s/400
+		for i=1,5 do
+			for v=1,4 do
+				healingSpells[healingList[i]].Scaling[v]=round(healingSpells[healingList[i]].Scaling[v]*mult)
+				healingSpells[healingList[i]].Base[v]=round(healingSpells[healingList[i]].Base[v]*mult)
+			end
+		end
+	end
+end
+
+local function ascendHealingTooltips()
+	local sp=healingSpells[49]
+	Game.Spells[49]["SpellPointsExpert"]=math.ceil(sp.Cost[2])
+	Game.Spells[49]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
+	Game.Spells[49]["SpellPointsGM"]=math.ceil(sp.Cost[4])
+	Game.SpellsTxt[49].Expert=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[2], sp.Base[2], sp.Scaling[2])
+	Game.SpellsTxt[49].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[3], sp.Base[3], sp.Scaling[3])
+	Game.SpellsTxt[49].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[4], sp.Base[4], sp.Scaling[4])
+
+	--shared life
+	local sp=healingSpells[54]
+	Game.Spells[54]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
+	Game.Spells[54]["SpellPointsGM"]=math.ceil(sp.Cost[4])
+	Game.SpellsTxt[54].Master=string.format("Adds %s + %s HP per point of skill to the pool", sp.Base[3], sp.Scaling[3])
+	Game.SpellsTxt[54].GM=string.format("Adds %s + %s HP per point of skill to the pool", sp.Base[4], sp.Scaling[4])
+	
+	--raise dead
+	local sp=healingSpells[53]
+	Game.SpellsTxt[53].GM="Removes Death and Eradication with no time limit"
+	
+	--resurrection
+	local sp=healingSpells[55]
+	Game.Spells[55]["SpellPointsGM"]=math.ceil(sp.Cost[4])
+	Game.SpellsTxt[55].GM=string.format("Cures %s + %s HP per point of skill", sp.Base[4], sp.Scaling[4])
+
+	--heal
+	local sp=healingSpells[68]
+	Game.Spells[68]["SpellPointsNormal"]=math.ceil(sp.Cost[1])
+	Game.Spells[68]["SpellPointsExpert"]=math.ceil(sp.Cost[2])
+	Game.Spells[68]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
+	Game.Spells[68]["SpellPointsGM"]=math.ceil(sp.Cost[4])
+	Game.SpellsTxt[68].Normal=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[1], sp.Base[1], sp.Scaling[1])
+	Game.SpellsTxt[68].Expert=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[2], sp.Base[2], sp.Scaling[2])
+	Game.SpellsTxt[68].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[3], sp.Base[3], sp.Scaling[3])
+	Game.SpellsTxt[68].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[4], sp.Base[4], sp.Scaling[4])
+
+	--greater heal
+	local sp=healingSpells[74]
+	Game.Spells[74]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
+	Game.Spells[74]["SpellPointsGM"]=math.ceil(sp.Cost[4])
+	Game.SpellsTxt[74].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[3], sp.Base[3], sp.Scaling[3])
+	Game.SpellsTxt[74].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\nno limit\n",sp.Cost[4], sp.Base[4], sp.Scaling[4])
+
+	--power heal
+	local sp=healingSpells[77]
+	Game.Spells[77]["SpellPointsGM"]=math.ceil(sp.Cost[4])
+	Game.SpellsTxt[77].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[4], sp.Base[4], sp.Scaling[4])
+end
+
+local function ascendRemaining(pl, s, m, id)
+	--ADD CAST RECOVERY TIME 
+	
+	--haste
+	local haste=math.floor(pl:GetSpeed()/10)
+	if HasSpellHasteEnchant(pl) then
+		haste=haste+20
+	end
+	
+	adjustSpellTooltips()
+
+	if vars.MAWSETTINGS.buffRework=="ON" then
+		for i=1, #buffSpellList do
+			local sp=buffSpellList[i]
+			if buffSpell[sp] then
+				local cost, percent=getBuffCost(pl, sp)
+				percent=round(percent*10000)/100
+				local txt=StrColor(255,0,0,"\nNot Active")
+				if vars.mawbuff[sp] then
+					for j=0, Party.High do
+						if Party[j]:GetIndex()==vars.mawbuff[sp] then
+							txt=StrColor(0,255,0,"\nActive (" .. Party[j].Name .. ")")
+						end
+					end
+				end
+				if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 32) then
+					Game.SpellsTxt[sp].Description=Game.SpellsTxt[sp].Description .. "\n\nHealth Reserved: " .. StrColor(0,255,0,percent .. "%" .. txt)
+				else
+					Game.SpellsTxt[sp].Description=Game.SpellsTxt[sp].Description .. "\n\nMana Reserved: " .. StrColor(0,100,255,percent .. "%" .. txt)
+				end					
+			elseif utilitySpell[sp] then
+				local cost, percent=getBuffCost(pl, sp)
+				cost=round(cost)
+				local txt=StrColor(255,0,0,"\nNot Active")
+				if vars.mawbuff[sp] then
+					for j=0, Party.High do
+						if Party[j]:GetIndex()==vars.mawbuff[sp] then
+							txt=StrColor(0,255,0,"\nActive(" .. Party[j].Name .. ")")
+						end
+					end
+				end
+				if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 32) then
+					Game.SpellsTxt[sp].Description=oldSpellTooltips[sp] .. "\n\nHealth Reserved: " .. StrColor(0,255,0,cost .. txt)
+				else
+					Game.SpellsTxt[sp].Description=oldSpellTooltips[sp] .. "\n\nMana Reserved: " .. StrColor(0,100,255,cost .. txt)
+				end			
+			end
+			for v=1,4 do
+				if buffSpell[sp] then
+					Game.Spells[sp]["SpellPoints" .. masteryName[v]]=0
+					Game.SpellsTxt[sp].Normal=""
+					Game.SpellsTxt[sp].Expert=""
+					Game.SpellsTxt[sp].Master=""
+					Game.SpellsTxt[sp].GM=""
+				elseif utilitySpell[sp] then
+					Game.Spells[sp]["SpellPoints" .. masteryName[v]]=0
+					Game.SpellsTxt[sp].Normal=""
+					Game.SpellsTxt[sp].Expert=""
+					Game.SpellsTxt[sp].Master=""
+					Game.SpellsTxt[sp].GM=""
+				end
+			end
+		end
+	end
+
+	for i=1,132 do
+		local skill=11+math.ceil(i/11)
+		local magicS, magicM=SplitSkill(pl.Skills[skill])
+		if magicM>0 then
+			local speed=getSpellDelay(pl,i)
+			if table.find(spells, i) then
+				Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. speed
+			elseif healingSpells[i] then
+				Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. speed
+			elseif CCMAP[i] and i~=122 then
+				Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. "\n\nControl Spell duration is reduced by monster level but increased by Ascension; Recovery time is reduced by Spell Skill. Duration shown is against a level " .. pl.LevelBase .. " monster. Control duration against bosses is halved.\n\nRecovery time: " .. speed
+			elseif buffSpell and (buffSpell[i] or utilitySpell[i]) then
+				Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. oldTable[i][magicM]
+			else
+				Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. "\n\nRecovery time: " .. oldTable[i][magicM]
+			end
+		end
+		local capMastery=Skillz.MasteryLimit(pl,skill)
+		local tier=i%11==0 and 11 or i%11
+		if not pl.Spells[i] then
+			local txt=StrColor(255,0,0,"\n\nCan't learn")
+			for k=1,capMastery do
+				if table.find(learnableSpells[k],tier) then
+					txt=StrColor(255,0,0,"\n\nNot Learned")
+				end
+			end
+			
+			if table.find(spells, i) then
+				Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. txt
+			elseif healingSpells[i] then
+				Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. txt
+			elseif buffSpell and (buffSpell[i] or utilitySpell[i]) then
+				Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. txt
+			else
+				Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. txt
+			end
+		end
+	end
+end
+
 function ascension(customIndex)
-	local index=customIndex or Game.CurrentPlayer 
+	local index=customIndex or Game.CurrentPlayer
 	if index> Party.High then
 		Game.CurrentPlayer=0
-	end 
+	end
 	if index>=0 and index<=Party.High then
 		local pl=Party[index]
 		
@@ -2027,308 +2529,21 @@ function ascension(customIndex)
 			dkSkills(true, index)
 			return
 		end
-		if table.find(assassinClass, pl.Class) then 
+		if table.find(assassinClass, pl.Class) then
 			assassinSkills(true, pl)
 			return
 		end
-		
-		
-		local level=pl:GetSkill(const.Skills.Learning)
-		lastLevel=level
-		local s,m = SplitSkill(level)
-		local elementalist=false
-		local id=pl:GetIndex()
-		if table.find(elementalistClass, pl.Class) then
-			elementalist=true
-			s=0
-			m=4
-			for i=12,15 do
-				local skill = SplitSkill(pl.Skills[i])
-				s=s+skill
-			end
-			s=s/4
-			vars.eleStacks=vars.eleStacks or {}
-			vars.eleStacks[id]=vars.eleStacks[id] or 0
-		end
-		if table.find(shamanClass, pl.Class) then
-			s=0
-			m=4
-			for i=12,18 do
-				local skill = SplitSkill(pl.Skills[i])
-				s=s+skill
-			end
-			s=s/7
-		end
-		-- Apply personality mana cost reduction
+
+		local s, m, elementalist, id = ascensionLevel(pl)
 		local personalityReduction = getPersonalityManaCostReduction(pl)
 
-		for v=1,#spells do 
-			num=spells[v]
-			for i=1,4 do
-				local baseCost = spellCost[num][masteryName[i]]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
-				Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(math.ceil(baseCost * personalityReduction), 65000)
-				if elementalist then
-					local baseCost=round((spellCost[num][masteryName[i]]+vars.eleStacks[id])*(1+s*0.125)*1.04^(s)*(1-0.125*m))
-					Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(round(math.ceil(baseCost*(1+vars.eleStacks[id]*0.075) * personalityReduction)),65000)
-				end
-			end
-			if num==44 then	
-				Game.Spells[num]["SpellPointsGM"]=math.min(pl.LevelBase, 255)^1.4/12.5
-			end
-		end				
-			
-		--change tooltips according to ascended damage
-		Game.SpellsTxt[2].Description=string.format("Launches a burst of fire at a single target.  Damage is %s+1-%s points of damage per point of skill in Fire Magic.   Firebolt is safe, effective and has a low casting cost.",dmgAddTooltip(s, m,2),diceMaxTooltip(s, m,2))
-		Game.SpellsTxt[6].Description=string.format("Fires a ball of fire at a single target. When it hits, the ball explodes damaging all those nearby, including your characters if they're too close.  Fireball does 1-%s points of damage per point of skill in Fire Magic.",diceMaxTooltip(s, m,6))
-		--fire spikes fix
-		Game.SpellsTxt[7].Description="Drops a Fire Spike on the ground that waits for a creature to get near it before exploding.  Fire Spikes last until you leave the map or they are triggered."
-		Game.SpellsTxt[7].Expert=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",diceMaxTooltip(s, m,7))
-		Game.SpellsTxt[7].Master=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",round(diceMaxTooltip(s, m,7)/6*8))
-		Game.SpellsTxt[7].GM=string.format("Causes 1-%s points of damage per point of skill, 5 spikes maximum",round(diceMaxTooltip(s, m,7)/6*10))
-		----------------------------------------
-		
-		Game.SpellsTxt[8].Description=string.format("Reserve a mana percentage to surround your characters with a very hot fire that is only harmful to others.  The spell will deliver %s points of damage plus 1-%s per point of skill to all nearby monsters for as long as they remain in the area of effect.",dmgAddTooltip(s, m,8),diceMaxTooltip(s, m,8))
-		Game.SpellsTxt[9].Description=string.format("Summons flaming rocks from the sky which fall in a large radius surrounding your chosen target.  Try not to be near the victim when you use this spell.  A single meteor does %s points of damage plus %s per point of skill in Fire Magic.  This spell only works outdoors.",dmgAddTooltip(s, m,9),diceMaxTooltip(s, m,9))
-		Game.SpellsTxt[10].Description=string.format("Inferno burns all monsters in sight when cast, excluding your characters.  One or two castings can clear out a room of weak or moderately powerful creatures. Each monster takes %s points of damage plus %s per point of skill in Fire Magic.  This spell only works indoors.",dmgAddTooltip(s, m,10),diceMaxTooltip(s, m,10))
-		Game.SpellsTxt[11].Description=string.format("Among the strongest direct damage spells available, Incinerate inflicts massive damage on a single target.  Only the strongest of monsters can expect to survive this spell.  Damage is %s points plus 1-%s per point of skill in Fire Magic.",dmgAddTooltip(s, m,11),diceMaxTooltip(s, m,11))
-		Game.SpellsTxt[15].Description=string.format("Sparks fires small balls of lightning into the world that bounce around until they hit something or dissipate. It is hard to tell where they will go, so this spell is best used in a room crowded with small monsters. Each spark does 1-%s per point of skill in Air Magic.",diceMaxTooltip(s, m,15))
-		Game.SpellsTxt[18].Description=string.format("Lightning Bolt discharges electricity from the caster's hand to a single target.  It always hits and does %s points plus 1-%s points of damage per point of skill in Air Magic.\n\nThe spell then arcs to a second target, hitting it as well.",dmgAddTooltip(s, m,18),diceMaxTooltip(s, m,18))
-		Game.SpellsTxt[20].Description=string.format("Implosion is a nasty spell that affects a single target by destroying the air around it, causing a sudden inrush from the surrounding air, a thunderclap, and %s points plus 1-%s points of damage per point of skill in Air Magic.",dmgAddTooltip(s, m,20),diceMaxTooltip(s, m,20))
-		Game.SpellsTxt[22].Description=string.format("Calls stars from the heavens to smite and burn your enemies.  Twenty stars are called, and the damage for each star is %s points plus %s per point of skill in Air Magic. Try not to get caught in the blast! This spell only works outdoors.",dmgAddTooltip(s, m,22),diceMaxTooltip(s, m,22))
-		Game.SpellsTxt[24].Description=string.format("Sprays poison at monsters directly in front of your characters.  Damage is low, but few monsters have resistance to Water Magic, so it usually works.  Each shot does %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,24),diceMaxTooltip(s, m,24))
-		Game.SpellsTxt[26].Description=string.format("Fires a bolt of ice at a single target.  The missile does %s + 1-%s points of damage per point of skill in Water Magic.",dmgAddTooltip(s, m,26),diceMaxTooltip(s, m,26))
-		Game.SpellsTxt[29].Description=string.format("Acid burst squirts a jet of extremely caustic acid at a single victim.  It always hits and does %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,29),diceMaxTooltip(s, m,29))
-		Game.SpellsTxt[32].Description=string.format("Fires a ball of ice in the direction the caster is facing.  The ball will shatter when it hits something, launching 7 shards of ice in all directions except the caster's.  The shards will ricochet until they strike a creature or melt.  Each shard does %s points of damage plus 1-%s per point of skill in Water Magic.",dmgAddTooltip(s, m,32),diceMaxTooltip(s, m,32))
-		Game.SpellsTxt[34].Description="Slaps a monster with magical force, forcing it to recover from the stun spell before it can do anything else.  Stun also knocks monsters back a little, giving you a chance to get away while the getting is good.  The greater your skill in Earth Magic, the greater the effect of the spell."
-		Game.SpellsTxt[37].Description=string.format("Summons a swarm of biting, stinging insects to bedevil a single target.  The swarm does %s points of damage plus 1-%s per point of skill in Earth Magic.",dmgAddTooltip(s, m,37),diceMaxTooltip(s, m,37))
-		Game.SpellsTxt[39].Description=string.format("Fires a rotating, razor-thin metal blade at a single monster.  The blade does 1-%s points of damage per point of skill in Earth Magic.\n\nBlades is the only spell capable to deal Physical damage.",diceMaxTooltip(s, m,39))
-		Game.SpellsTxt[41].Description=string.format("Releases a magical stone into the world that will explode when it comes into contact with a creature or enough time passes.  The rock will bounce and roll until it finds a resting spot, so be careful not to be caught in the blast.  The explosion causes %s points of damage plus 1-%s points of damage per point of skill in Earth Magic.",dmgAddTooltip(s, m,41),diceMaxTooltip(s, m,41))
-		Game.SpellsTxt[43].Description=string.format("Launches a magical stone which bursts in air, sending shards of explosive earth raining to the ground.  The damage is 1-%s per point of skill in Earth Magic for each shard.  This spell can only be used outdoors.",diceMaxTooltip(s, m,43))
-		--Game.SpellsTxt[44].Description=string.format("Increases the weight of a single target enormously for an instant, causing internal damage equal to %s%% of the monster's hit points plus another %s%% per point of skill in Earth Magic.  The bigger they are, the harder they fall.",dmgAddTooltip(s, m,44),diceMaxTooltip(s, m,44))
-		Game.SpellsTxt[44].Description="Increases the weight of a single target enormously for an instant, causing internal damage equal to 15%% of the monster's hit points plus another 0.5%% per point of skill in Earth Magic. The bigger they are, the harder they fall."
-		Game.SpellsTxt[52].Description=string.format("This spell weakens the link between a target's body and soul, causing %s + 2-%s points of damage per point of skill in Spirit Magic to all monsters near the caster.",dmgAddTooltip(s, m,52),diceMaxTooltip(s, m,52))
-		Game.SpellsTxt[59].Description=string.format("Fires a bolt of mental force which damages a single target's nervous system.  Mind Blast does %s points of damage plus 1-%s per point of skill in Mind Magic.",dmgAddTooltip(s, m,59),diceMaxTooltip(s, m,59))
-		Game.SpellsTxt[65].Description=string.format("Similar to Mind Blast, Psychic Shock targets a single creature with mind damaging magic--only it has a much greater effect.  Psychic Shock does %s points of damage plus 1-%s per point of skill in Mind Magic.",dmgAddTooltip(s, m,65),diceMaxTooltip(s, m,65))
-		Game.SpellsTxt[70].Description=string.format("Directly inflicts magical damage upon a single creature.  Harm does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(s, m,70),diceMaxTooltip(s, m,70))
-		Game.SpellsTxt[76].Description=string.format("Flying Fist throws a heavy magical force at a single opponent that does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(s, m,76),diceMaxTooltip(s, m,76))
-		Game.SpellsTxt[76].Description=string.format("Flying Fist throws a heavy magical force at a single opponent that does %s points of damage plus 1-%s per point of skill in Body Magic.",dmgAddTooltip(s, m,76),diceMaxTooltip(s, m,76))
-		Game.SpellsTxt[78].Description=string.format("Fires a bolt of light at a single target that does %s + 1-%s points of damage per point of skill in light magic.  Damage vs. Undead is doubled.",dmgAddTooltip(s, m,78),diceMaxTooltip(s, m,78))
-		Game.SpellsTxt[79].Description=string.format("Calls upon the power of heaven to undo the evil magic that extends the lives of the undead, inflicting %s points of damage plus 1-%s per point of skill in Light Magic upon a single, unlucky target.  This spell only works on the undead.",dmgAddTooltip(s, m,79),diceMaxTooltip(s, m,79))
-		Game.SpellsTxt[84].Description=string.format("Inflicts %s points of damage plus %s per point of skill in Light Magic on all creatures in sight.  This spell can only be cast indoors.",dmgAddTooltip(s, m,84),diceMaxTooltip(s, m,84))
-		Game.SpellsTxt[87].Description=string.format("Sunray is the second most devastating damage spell in the game. It does %s points of damage plus 1-%s points per point of skill in Light Magic, by concentrating the light of the sun on one unfortunate creature. Indoors it can be cast at any time; outdoors it only works during the day.",dmgAddTooltip(s, m,87),diceMaxTooltip(s, m,87))
-		Game.SpellsTxt[90].Description=string.format("A poisonous cloud of noxious gases is formed in front of the caster and moves slowly away from your characters.  The cloud does %s points of damage plus 1-%s per point of skill in Dark Magic and lasts until something runs into it.",dmgAddTooltip(s, m,90),diceMaxTooltip(s, m,90))
-		Game.SpellsTxt[93].Description=string.format("Fires a blast of hot, jagged metal in front of the caster, striking any creature that gets in the way.  Each piece inflicts 1-%s points of damage per point of skill in Dark Magic.",diceMaxTooltip(s, m,93))
-		Game.SpellsTxt[97].Description=string.format("Dragon Breath empowers the caster to exhale a cloud of toxic vapors that targets a single monster and damage all creatures nearby, doing 1-%s points of damage per point of skill in Dark Magic.",diceMaxTooltip(s, m,97))
-		Game.SpellsTxt[98].Description=string.format("This spell is the town killer. Armageddon inflicts %s points of damage plus %s point of damage for every point of Dark skill your character has to every creature on the map, including all your characters. It can only be cast three times per day and only outdoors.",dmgAddTooltip(s, m,98),diceMaxTooltip(s, m,98))
-		Game.SpellsTxt[99].Description=string.format("This horrible spell sucks the life from all creatures in sight, friend or enemy.  Souldrinker then transfers that life to your party in much the same fashion as Shared Life.  Damage (and healing) is %s + 1-%s per point of skill.",dmgAddTooltip(s, m,99),diceMaxTooltip(s, m,99))
-		
-		Game.SpellsTxt[103].Description=string.format("This frightening ability grants the Dark Elf the power to wield Darkfire, a dangerous combination of the powers of Dark and Fire. Any target stricken by the Darkfire bolt resists with either its Fire or Dark resistance--whichever is lower. Damage is %s points of damage plus 1-%s per point of skill.",dmgAddTooltip(s, m,103),diceMaxTooltip(s, m,103))
-		Game.SpellsTxt[111].Description=string.format("Lifedrain allows the vampire to damage his or her target and simultaneously heal based on the damage done in the Lifedrain.  This ability does 1-%s points of damage per skill.",diceMaxTooltip(s, m,111))
-		Game.SpellsTxt[111].Master=string.format("Damage 1-%s per point of skill",round(diceMaxTooltip(s, m,111)/3*5))
-		Game.SpellsTxt[111].GM=string.format("Damage 1-%s per point of skill",round(diceMaxTooltip(s, m,111)/3*7))
-		Game.SpellsTxt[123].Description="This ability is an upgraded version of the normal Dragon breath weapon attack.  It acts much like a fireball, striking its target and exploding out to hit everything near it, except the explosion does much more damage than most fireballs."
-		
-		-----------------------
-		--Healing Spells
-		-----------------------
-		if vars.insanityMode then
-			healingSpells={
-			[const.Spells.RemoveCurse]=    {["Cost"]={0,15,30,60,[0]=0}, ["Base"]={0,20,40,60,[0]=0}, ["Scaling"]={0,8,12,16}},
-			[const.Spells.SharedLife]=    {["Cost"]={0,0,25,40,[0]=0}, ["Base"]={0,0,0,0,[0]=0}, ["Scaling"]={0,0,7,9}},
-            [const.Spells.Resurrection]={["Cost"]={0,0,0,300,[0]=0}, ["Base"]={0,0,0,450,[0]=0}, ["Scaling"]={0,0,0,50}},
-            [const.Spells.Heal]=        {["Cost"]={6,15,24,40,[0]=0}, ["Base"]={12,24,36,48,[0]=0}, ["Scaling"]={6,9,12,15}},
-            [const.Spells.CureDisease]=    {["Cost"]={0,0,45,100,[0]=0}, ["Base"]={0,0,50,100,[0]=0}, ["Scaling"]={0,0,16,25}},
-            [const.Spells.PowerCure]=    {["Cost"]={0,0,0,150,[0]=0}, ["Base"]={0,0,0,50,[0]=0}, ["Scaling"]={0,0,0,12}}
-		}
-		else
-			healingSpells={
-				[const.Spells.RemoveCurse]=    {["Cost"]={0,5,10,20,[0]=0}, ["Base"]={0,10,20,30,[0]=0}, ["Scaling"]={0,4,6,8}},
-				[const.Spells.SharedLife]=    {["Cost"]={0,0,25,40,[0]=0}, ["Base"]={0,0,0,0,[0]=0}, ["Scaling"]={0,0,7,9}},
-				[const.Spells.Resurrection]={["Cost"]={0,0,0,100,[0]=0}, ["Base"]={0,0,0,150,[0]=0}, ["Scaling"]={0,0,0,21}},
-				[const.Spells.Heal]=        {["Cost"]={2,4,6,8,[0]=0}, ["Base"]={4,8,12,16,[0]=0}, ["Scaling"]={2,3,4,6}},
-				[const.Spells.CureDisease]=    {["Cost"]={0,0,15,25,[0]=0}, ["Base"]={0,0,25,40,[0]=0}, ["Scaling"]={0,0,7,10}},
-				[const.Spells.PowerCure]=    {["Cost"]={0,0,0,30,[0]=0}, ["Base"]={0,0,0,15,[0]=0}, ["Scaling"]={0,0,0,4}}
-			}
-		end
-		for i=1, 6 do
-			for v=1,4 do
-				local baseCost = healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
-				healingSpells[healingList[i]].Cost[v]=math.min(round(baseCost*personalityReduction), 65000)
-				healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
-			end
-		end
-		for i=1, 6 do
-			Game.SpellsTxt[healingList[i]].Description=baseHealTooltip[healingList[i]]
-		end
-		--shaman modifier
-		if table.find(shamanClass, pl.Class) then
-			local s=0
-			for school=12,18 do
-				skill=SplitSkill(pl.Skills[school])
-				s=s+skill
-			end
-			local mult=1+s/400
-			for i=1,5 do
-				for v=1,4 do
-					healingSpells[healingList[i]].Scaling[v]=round(healingSpells[healingList[i]].Scaling[v]*mult)
-					healingSpells[healingList[i]].Base[v]=round(healingSpells[healingList[i]].Base[v]*mult)
-				end
-			end
-		end
-		--remove curse
-		local sp=healingSpells[49]
-		Game.Spells[49]["SpellPointsExpert"]=math.ceil(sp.Cost[2])
-		Game.Spells[49]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
-		Game.Spells[49]["SpellPointsGM"]=math.ceil(sp.Cost[4])
-		Game.SpellsTxt[49].Expert=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[2], sp.Base[2], sp.Scaling[2])
-		Game.SpellsTxt[49].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[3], sp.Base[3], sp.Scaling[3])
-		Game.SpellsTxt[49].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[4], sp.Base[4], sp.Scaling[4])
-
-		--shared life
-		local sp=healingSpells[54]
-		Game.Spells[54]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
-		Game.Spells[54]["SpellPointsGM"]=math.ceil(sp.Cost[4])
-		Game.SpellsTxt[54].Master=string.format("Adds %s + %s HP per point of skill to the pool", sp.Base[3], sp.Scaling[3])
-		Game.SpellsTxt[54].GM=string.format("Adds %s + %s HP per point of skill to the pool", sp.Base[4], sp.Scaling[4])
-		
-		--raise dead
-		local sp=healingSpells[53]
-		Game.SpellsTxt[53].GM="Removes Death and Eradication with no time limit"
-		
-		--resurrection
-		local sp=healingSpells[55]
-		Game.Spells[55]["SpellPointsGM"]=math.ceil(sp.Cost[4])
-		Game.SpellsTxt[55].GM=string.format("Cures %s + %s HP per point of skill", sp.Base[4], sp.Scaling[4])
-		
-		--heal
-		local sp=healingSpells[68]
-		Game.Spells[68]["SpellPointsNormal"]=math.ceil(sp.Cost[1])
-		Game.Spells[68]["SpellPointsExpert"]=math.ceil(sp.Cost[2])
-		Game.Spells[68]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
-		Game.Spells[68]["SpellPointsGM"]=math.ceil(sp.Cost[4])
-		Game.SpellsTxt[68].Normal=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[1], sp.Base[1], sp.Scaling[1])
-		Game.SpellsTxt[68].Expert=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[2], sp.Base[2], sp.Scaling[2])
-		Game.SpellsTxt[68].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[3], sp.Base[3], sp.Scaling[3])
-		Game.SpellsTxt[68].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[4], sp.Base[4], sp.Scaling[4])
-		
-		--greater heal
-		local sp=healingSpells[74]
-		Game.Spells[74]["SpellPointsMaster"]=math.ceil(sp.Cost[3])
-		Game.Spells[74]["SpellPointsGM"]=math.ceil(sp.Cost[4])
-		Game.SpellsTxt[74].Master=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\n1 day limit\n",sp.Cost[3], sp.Base[3], sp.Scaling[3])
-		Game.SpellsTxt[74].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill\nno limit\n",sp.Cost[4], sp.Base[4], sp.Scaling[4])
-		
-		--power heal
-		local sp=healingSpells[77]
-		Game.Spells[77]["SpellPointsGM"]=math.ceil(sp.Cost[4])
-		Game.SpellsTxt[77].GM=string.format("%s Mana cost: \ncures %s + %s HP per point of skill",sp.Cost[4], sp.Base[4], sp.Scaling[4])
-		
-		--ADD CAST RECOVERY TIME 
-		
-		--haste
-		local haste=math.floor(pl:GetSpeed()/10)
-		local it=pl:GetActiveItem(1)
-		if it and it.Bonus2==40 then
-			haste=haste+20
-		end
-		
-		adjustSpellTooltips()
-		
-		if vars.MAWSETTINGS.buffRework=="ON" then
-			for i=1, #buffSpellList do
-				local sp=buffSpellList[i]
-				if buffSpell[sp] then
-					local cost, percent=getBuffCost(pl, sp)
-					percent=round(percent*10000)/100
-					local txt=StrColor(255,0,0,"\nNot Active")
-					if vars.mawbuff[sp] then
-						for j=0, Party.High do
-							if Party[j]:GetIndex()==vars.mawbuff[sp] then
-								txt=StrColor(0,255,0,"\nActive (" .. Party[j].Name .. ")")
-							end
-						end
-					end
-					if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 32) then
-						Game.SpellsTxt[sp].Description=Game.SpellsTxt[sp].Description .. "\n\nHealth Reserved: " .. StrColor(0,255,0,percent .. "%" .. txt)
-					else
-						Game.SpellsTxt[sp].Description=Game.SpellsTxt[sp].Description .. "\n\nMana Reserved: " .. StrColor(0,100,255,percent .. "%" .. txt)
-					end					
-				elseif utilitySpell[sp] then
-					local cost, percent=getBuffCost(pl, sp)
-					cost=round(cost)
-					local txt=StrColor(255,0,0,"\nNot Active")
-					if vars.mawbuff[sp] then
-						for j=0, Party.High do
-							if Party[j]:GetIndex()==vars.mawbuff[sp] then
-								txt=StrColor(0,255,0,"\nActive(" .. Party[j].Name .. ")")
-							end
-						end
-					end
-					if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 32) then
-						Game.SpellsTxt[sp].Description=oldSpellTooltips[sp] .. "\n\nHealth Reserved: " .. StrColor(0,255,0,cost .. txt)
-					else
-						Game.SpellsTxt[sp].Description=oldSpellTooltips[sp] .. "\n\nMana Reserved: " .. StrColor(0,100,255,cost .. txt)
-					end			
-				end
-				for v=1,4 do
-					if buffSpell[sp] then
-						Game.Spells[sp]["SpellPoints" .. masteryName[v]]=0
-						Game.SpellsTxt[sp].Normal=""
-						Game.SpellsTxt[sp].Expert=""
-						Game.SpellsTxt[sp].Master=""
-						Game.SpellsTxt[sp].GM=""
-					elseif utilitySpell[sp] then
-						Game.Spells[sp]["SpellPoints" .. masteryName[v]]=0
-						Game.SpellsTxt[sp].Normal=""
-						Game.SpellsTxt[sp].Expert=""
-						Game.SpellsTxt[sp].Master=""
-						Game.SpellsTxt[sp].GM=""
-					end
-				end
-			end
-		end
-		
-		for i=1,132 do
-			local skill=11+math.ceil(i/11)
-			local magicS, magicM=SplitSkill(pl.Skills[skill])
-			if magicM>0 then
-				local speed=getSpellDelay(pl,i)
-				if table.find(spells, i) then
-					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. speed
-				elseif healingSpells[i] then
-					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. speed
-				elseif CCMAP[i] and i~=122 then
-					Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. "\n\nControl Spell duration is reduced by monster resistances but increased by Ascension; Recovery time is reduced by Spell Skill. Duration shown is against " .. round(pl.LevelBase/2) .. " resistance. Control duration against bosses is halved.\n\nRecovery time: " .. speed
-				elseif buffSpell and (buffSpell[i] or utilitySpell[i]) then
-					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. "\n\nRecovery time: " .. oldTable[i][magicM]
-				else
-					Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. "\n\nRecovery time: " .. oldTable[i][magicM]
-				end
-			end
-			local capMastery=Skillz.MasteryLimit(pl,skill)
-			local tier=i%11==0 and 11 or i%11
-			local learnableSpells={{1,2,3,4},{5,6,7},{8,9,10},{11}}
-			if not pl.Spells[i] then
-				local txt=StrColor(255,0,0,"\n\nCan't learn")
-				for k=1,capMastery do
-					if table.find(learnableSpells[k],tier) then
-						txt=StrColor(255,0,0,"\n\nNot Learned")
-					end
-				end
-				
-				if table.find(spells, i) then
-					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. txt
-				elseif healingSpells[i] then
-					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. txt
-				elseif buffSpell and (buffSpell[i] or utilitySpell[i]) then
-					Game.SpellsTxt[i].Description=Game.SpellsTxt[i].Description .. txt
-				else
-					Game.SpellsTxt[i].Description=oldSpellTooltips[i] .. txt
-				end
-			end
-		end
-
-		AscendCCSpells(pl,s,m,personalityReduction)
+		ascendSpellCosts(pl, s, m, elementalist, id, personalityReduction)
+		ascendDamageTooltips(s, m)
+		ascendHealingSpells(pl, s, m, personalityReduction)
+		ascendHealingTooltips()
+		ascendRemaining(pl, s, m, id)
+		ascendCCSpellCosts(pl, s, m, personalityReduction)
+		ascendCCTooltips(pl, s)
 	end
 end
 
@@ -2420,13 +2635,33 @@ mawPartyBuffList={6,0,17,4,12,1,8,10,14,15,9,13,2,16,19,18}
 mawPartyBuffIgnore={16,19,11,18,10}
 mawSingleBuffList={1,4,11,12,6,10}
 
+--Multiplier buffs (haste, shield, empower, fate, heroism, hammerhands) as a
+--fraction: 0.15 = +15%. Flat base plus the per-skill-point scaling, exactly
+--what the effect sites used to compute inline -- one function so every site
+--(and the tooltips) read the same numbers.
+function GetBuffMultiplier(spellId, s, m)
+	local bf=buffPower[spellId]
+	if not bf then
+		return 0
+	end
+	return bf.Base[m]/100 + bf.Scaling[m]*s/1000
+end
+
+--stat part of the rework buffs: fraction of the total stat granted.
+--10% base, +1% per 5 skill levels (7 for light), capped at 20%
+function GetBuffStatPct(s, light)
+	local perLevel=light and 7 or 5
+	return math.min(10+s/perLevel, 20)/100
+end
+
 buffPower={
-	[3]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},
-	[14]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},
-	[25]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},
-	[36]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},
-	[58]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},
-	[69]= {["Base"]={[0]=0,20,20,20,20}, ["Scaling"]={[0]=0,2,2,2,2}},
+	--resistance buffs: halved base, and the caster-level term is level/4
+	[3]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},
+	[14]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},
+	[25]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},
+	[36]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},
+	[58]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},
+	[69]= {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},
 	[5]=  {["Base"]={[0]=0,10,10,10,10}, ["Scaling"]={[0]=0,2,2,2,2}},
 	[17]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},
 	[28]= {["Base"]={[0]=0,15,15,15,15}, ["Scaling"]={[0]=0,3,3,3,3}},
@@ -2438,7 +2673,7 @@ buffPower={
 	[71]= {["Base"]={[0]=0,5,5,5,5},    ["Scaling"]={[0]=0,2,2,2,2}},
 	[73]= {["Base"]={[0]=0,15,15,15,15},["Scaling"]={[0]=0,3,3,3,3}},
 	[83]= {["Base"]={[0]=0,20,20,20,20},["Scaling"]={[0]=0,2,2,2,2}},
-	[85]= {["Base"]={[0]=0,20,20,20,20},["Scaling"]={[0]=0,2,2,2,2}},
+	[85]= {["Base"]={[0]=0,10,10,10,10},["Scaling"]={[0]=0,2,2,2,2}},
 	[86]= {["Base"]={[0]=0,10,10,10,10},["Scaling"]={[0]=0,2,2,2,2}},
 }
 
@@ -2909,7 +3144,7 @@ end
 --  - si vars.mawbuff[spell] est un {s,m,l} (table), on retourne tel quel
 --  - si c’est un "string" (Temple/Map.Name) on retourne une valeur >0 pour l’appliquer localement,
 --    mais le MULTI côté client filtre ces spéciaux pour éviter la re-diffusion.
-function getBuffSkill(spell)
+local function getCasterBuffSkill(spell)
 	local id=vars.mawbuff[spell]
 	if type(id)=="table" then
 		return id[1], id[2], id[3]
@@ -2923,14 +3158,120 @@ function getBuffSkill(spell)
 		local school=11+math.ceil(spell/11)
 		local s,m=SplitSkill(player.Skills[school])
 		if spell==83 or spell==85 or spell==86 then
-			s=math.min(s,75)
+			s=math.min(s,skillEffectCap.dayBuff)
 		else
-			s=math.min(s,50)
+			s=math.min(s,skillEffectCap.buff)
 		end
 		return s, m, player.LevelBase
 	else
 		return 0,0,0
 	end
+end
+
+POTION_BUFF_MASTERY=3
+
+POTION_BUFF_MIN=0.75
+POTION_BUFF_MAX=1.5
+POTION_BUFF_FULL_POWER=200
+POTION_BUFF_SKILL_SPAN=50
+POTION_BUFF_SKILL_SPAN_WIDE=70
+DAY_OF_PROTECTION_SKILL_PENALTY=1.4
+local wideSpanBuffs={[83]=true, [85]=true}
+POTION_LEVEL_PER_POWER=0.5
+
+function GetPotionBuffFraction(power)
+	local t=math.min(math.max(power or 0, 0), POTION_BUFF_FULL_POWER)/POTION_BUFF_FULL_POWER
+	return POTION_BUFF_MIN+(POTION_BUFF_MAX-POTION_BUFF_MIN)*t
+end
+
+function GetPotionBuffSkill(power, spell)
+	local span=wideSpanBuffs[spell] and POTION_BUFF_SKILL_SPAN_WIDE
+		or POTION_BUFF_SKILL_SPAN
+	return span*(GetPotionBuffFraction(power)-1)
+end
+
+function GetPotionBuffLevel(power)
+	return (power or 0)*POTION_LEVEL_PER_POWER*GetPotionBuffFraction(power)
+end
+
+--per drinker: only the character who drank it benefits
+function setPotionBuff(pl, spell, expireTime, power)
+	vars.mawPotionBuff=vars.mawPotionBuff or {}
+	local index=pl:GetIndex()
+	vars.mawPotionBuff[index]=vars.mawPotionBuff[index] or {}
+	vars.mawPotionBuff[index][spell]=expireTime
+	vars.mawPotionBuffPower=vars.mawPotionBuffPower or {}
+	vars.mawPotionBuffPower[index]=vars.mawPotionBuffPower[index] or {}
+	vars.mawPotionBuffPower[index][spell]=power
+end
+
+function potionBuffActive(pl, spell)
+	if not pl then
+		return false
+	end
+	local list=vars.mawPotionBuff and vars.mawPotionBuff[pl:GetIndex()]
+	return list~=nil and list[spell]~=nil and list[spell]>Game.Time
+end
+
+HOUR_OF_POWER_DIVISOR=1.5
+
+function buffValueMult(spell, s, m, level)
+	return GetBuffMultiplier(spell, s, m)
+end
+
+function buffValueFlat(spell, s, m, level)
+	local bf=buffPower[spell]
+	if not bf then
+		return 0
+	end
+	return (bf.Base[m]+level/4)*(1+bf.Scaling[m]/100*s)
+end
+
+function bestBuffSource(spell, pl, valueOf)
+	local s, m, level=getBuffSkill(spell, pl)
+	local s2, m2, level2=getBuffSkill(86)
+	if s2>0 then
+		s2=s2/HOUR_OF_POWER_DIVISOR
+		if valueOf(spell, s2, m2, level2)>valueOf(spell, s, m, level) then
+			return s2, m2, level2
+		end
+	end
+	return s, m, level
+end
+
+--the power this drinker's potion was brewed at; a missing entry reads as 0
+function potionBuffPower(pl, spell)
+	local list=vars.mawPotionBuffPower and vars.mawPotionBuffPower[pl:GetIndex()]
+	return (list and list[spell]) or 0
+end
+
+FLAT_BUFF_LEVEL_DIVISOR=4
+local flatBuffs={[3]=true, [14]=true, [25]=true, [36]=true, [38]=true,
+	[46]=true, [58]=true, [69]=true, [85]=true}
+
+local function buffStrength(spell, s, m, level)
+	local bf=buffPower[spell]
+	if not bf then
+		return s
+	end
+	local strength=(bf.Base[m] or 0)+(bf.Scaling[m] or 0)*s/10
+	if flatBuffs[spell] then
+		strength=strength+level/FLAT_BUFF_LEVEL_DIVISOR
+	end
+	return strength
+end
+
+function getBuffSkill(spell, pl)
+	local s, m, level=getCasterBuffSkill(spell)
+	if potionBuffActive(pl, spell) then
+		local power=potionBuffPower(pl, spell)
+		local ps, plevel=GetPotionBuffSkill(power, spell), GetPotionBuffLevel(power)
+		if buffStrength(spell, ps, POTION_BUFF_MASTERY, plevel)
+				> buffStrength(spell, s, m, level) then
+			return ps, POTION_BUFF_MASTERY, plevel
+		end
+	end
+	return s, m, level
 end
 
 	
@@ -2939,11 +3280,17 @@ end
 --tooltips
 function adjustSpellTooltips()
 	if vars.MAWSETTINGS.buffRework=="ON" then
+		--the school part-5 descs set in the OFF branch stick for the whole
+		--session (engine pointers); put the engine text back
+		for _,sk in ipairs{const.Skills.Fire,const.Skills.Air,const.Skills.Water,
+				const.Skills.Earth,const.Skills.Spirit,const.Skills.Mind,const.Skills.Body} do
+			Skillz.restoreDesc(sk,5)
+		end
 		--fire resistance
 		local id=3
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Fire Resistance and Intellect by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Fire Resistance by %s (plus 1 for every 4 caster levels, increased by %s%% per skill level, up to double bonus) and Intellect by 10%% of the total stat, plus 1%% every 5 skill levels, up to 20%%.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
 		
 		--fire aura
 		local id=4
@@ -2955,37 +3302,37 @@ function adjustSpellTooltips()
 		local id=14
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Air Resistance and Speed by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Air Resistance by %s (plus 1 for every 4 caster levels, increased by %s%% per skill level, up to double bonus) and Speed by 10%% of the total stat, plus 1%% every 5 skill levels, up to 20%%.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
 		
 		--water resistance
 		local id=25
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Water Resistance and Luck by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Water Resistance by %s (plus 1 for every 4 caster levels, increased by %s%% per skill level, up to double bonus) and Luck by 10%% of the total stat, plus 1%% every 5 skill levels, up to 20%%.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
 		
 		--earth res
 		local id=36
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Earth Resistance and Endurance by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Earth Resistance by %s (plus 1 for every 4 caster levels, increased by %s%% per skill level, up to double bonus) and Endurance by 10%% of the total stat, plus 1%% every 5 skill levels, up to 20%%.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
 		
 		--mind res
 		local id=58
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Mind Resistance and Personality by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Mind Resistance by %s (plus 1 for every 4 caster levels, increased by %s%% per skill level, up to double bonus) and Personality by 10%% of the total stat, plus 1%% every 5 skill levels, up to 20%%.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
 		
 		--body res
 		local id=69
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Body Resistance and Might by %s.\nYou get an additional 1 point for every 2 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Body Resistance by %s (plus 1 for every 4 caster levels, increased by %s%% per skill level, up to double bonus) and Might by 10%% of the total stat, plus 1%% every 5 skill levels, up to 20%%.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
 		
 		--Bless
 		local id=46
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Attack and Accuracy.\nThe enhancement equals a flat %s plus an additional 1 point for every 2 caster levels, increased by %s%% per skill level, up to double bonus.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		sp.Description = string.format("Reserve a percentage of your mana to enhance your party's Attack by a flat %s plus 1 for every 2 caster levels, increased by %s%% per skill level, up to double bonus, and Accuracy by 10%% of the total stat, plus 1%% every 5 skill levels, up to 20%%.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
 		
 		--Haste
 		local id=5
@@ -3047,7 +3394,7 @@ function adjustSpellTooltips()
 		local id=83
 		local sp=Game.SpellsTxt[id]
 		local bf=buffPower[id]
-		sp.Description = string.format("Reserve a percentage of your mana to increases all seven stats on all your characters by %s.\nWhile the base effects remain consistent, each additional 3 levels in Light Magic will enhance the effects equivalently to only 2 levels.\nThis effect remains active until deactivated or lose consciousness.", bf.Base[1], bf.Scaling[1])
+		sp.Description = string.format("Reserve a percentage of your mana to increase all seven stats on all your characters by 10%% of the total stat, plus 1%% every 7 Light skill levels, up to 20%%.\nThis effect remains active until deactivated or lose consciousness.")
 		
 		--day of protection
 		local id=85
@@ -3167,6 +3514,38 @@ function events.PlayerCastSpell(t)
 	end
 end
 
+--The share of a character's mana pool the buffs are holding, 0..1, by party
+--slot. Only meaningful under the buff rework, which is what owns
+--vars.currentManaPool.
+function getReservedManaShare(slot)
+	if vars.MAWSETTINGS.buffRework~="ON" or not vars.currentManaPool then
+		return 0
+	end
+	local pool=vars.currentManaPool[slot]
+	if type(pool)~="number" or slot<0 or slot>Party.High then
+		return 0
+	end
+	local fullSP=Party[slot]:GetFullSP()
+	if fullSP<=0 then
+		return 0
+	end
+	return math.min(math.max(1-pool/fullSP, 0), 1)
+end
+
+function getMeditationRegen(slot, extraSkill)
+	if slot<0 or slot>Party.High then
+		return 0, 0
+	end
+	local pl=Party[slot]
+	local s,m=SplitSkill(pl:GetSkill(const.Skills.Meditation))
+	s=s+(extraSkill or 0)
+	local id=pl:GetIndex()
+	local legendary20=vars.legendaries and vars.legendaries[id]
+		and table.find(vars.legendaries[id], 20) and true or false
+	return MawCore.Formulas.meditationRegenPerSec(pl:GetFullSP(), s, m,
+		getReservedManaShare(slot), legendary20)
+end
+
 function getMaxMana(pl)
 	if vars.MAWSETTINGS.buffRework=="ON" and vars.currentManaPool then
 		local index=pl:GetIndex()
@@ -3187,42 +3566,6 @@ function getMaxMana(pl)
 	end	
 end
 
-
-function events.CalcDamageToMonster(t)
-	local data = WhoHitMonster()
-	if data and data.Object and data.Player then
-		if data.Object.Spell==18 and data.Object.SpellMastery>1 then
-			monsterIndex=getClosestMonsterInRange(t.Monster,768)
-			if monsterIndex~=nil then
-				BeginGrabObjects()
-				Game.SummonObjects(2060,t.Monster.X,t.Monster.Y,t.Monster.Z+100,0,1)
-				local obj=GrabObjects()
-				if not obj then return end
-				local index=data.Player:GetIndex()
-				local id=0
-				for i=0, Party.High do
-					if Party[i]:GetIndex()==index then
-						id=i
-					end
-				end
-				local skill=Party[id].Skills[const.Skills.Air]
-				local s, m = SplitSkill(skill)
-				obj.Spell=18
-				obj.SpellLevel=m
-				obj.SpellMastery=data.Object.SpellMastery-1
-				obj.SpellSkill=s
-				obj.SpellType=18
-				obj.TypeIndex=455
-				obj.Owner=index*8+4
-				obj.Visible=true
-				obj.Velocity[0]=3000
-				obj.Velocity[1]=3000
-				obj.Velocity[2]=3000
-				obj.Target=3+8*monsterIndex
-			end
-		end
-	end
-end
 
 --set reference coord and desired range
 function getClosestMonsterInRange(mon,range)
@@ -3421,33 +3764,6 @@ function events.GameInitialized2()
 
 end
 
-local mastery={"Novice","Expert","Master","Grandmaster"}
-function events.BuildItemInformationBox(t)
-	local it=t.Item
-	if it.Number>=971 and it.Number<980 then
-		local identify=Game.ItemsTxt[it.BonusStrength].IdRepSt
-		local m=1
-		if identify>=15 then
-			m=4
-		elseif identify>=10 then
-			m=3
-		elseif identify>=5 then
-			m=2
-		end
-		local id=Game.CurrentPlayer
-		if id<0 or id>Party.High then return end
-		local pl=Party[Game.CurrentPlayer]
-		local s2,m2=SplitSkill(pl.Skills[t.Item.Number-959])
-		if m2>=m then
-			it.Number=it.BonusStrength
-		end
-		if t.Description then
-			local name=Skillz.getName(t.Item.Number-959)
-			t.Description=t.Description .. StrColor(255,0,0, "\n\nYou need at least " .. mastery[m] .. " skill in " ..  name .. " to open the book")
-		end
-	end
-end
-
 function events.ItemGenerated(t)
 	if disableSpellBookRework then return end
 	if Game.HouseScreen==2 or Game.HouseScreen==95 then return end
@@ -3590,7 +3906,7 @@ end)
 
 ]]
 
-function events.Tick()
+function mawTick_InsanityShieldStrip()
 	if vars.insanityMode then
 		if Party.SpellBuffs[11].ExpireTime>=Game.Time then
 			if Party.EnemyDetectorRed then
@@ -3598,4 +3914,11 @@ function events.Tick()
 			end
 		end
 	end
+end
+
+--Tick handlers above run as MawCore scheduler tasks (ms; 0=frame, -1=poke only)
+function events.GameInitialized2()
+	local every=MawCore.Scheduler.every
+	every("spells/ascension", 0, mawTick_Ascension)
+	every("spells/insanity-shield-strip", 100, mawTick_InsanityShieldStrip)
 end

@@ -13,7 +13,7 @@ local year   = 123863040
 local FALLBACK_DT = 1/60   -- used ONLY when time goes backwards (<0)
 local MAX_DT      = 2   -- cap to avoid huge bursts
 
-function events.Tick()
+function mawTick_TimerDriver()
   vars = vars or {}
   vars.LastTime = vars.LastTime or Game.Time
 
@@ -93,7 +93,13 @@ MawAddTimer("checkMapCompletition", 10, checkMapCompletition) -- double-check th
 MawAddTimer("nightmare", 0.5, nightmare)
 MawAddTimer("elementalBuffs", 1, elementalBuffs)
 MawAddTimer("mawBuffApply", 0.5, mawBuffApply)
-MawAddTimer("elementalistStacksDecay", 0.1, elementalistStacksDecay)
+--late bound: the body lives in MawCore/Classes.lua, which loads after this file
+MawAddTimer("elementalistStacksDecay", 0.1, function() elementalistStacksDecay() end)
 MawAddTimer("poisonTimer", 1, poisonTimer)
 MawAddTimer("chargeTimer", 1, chargeTimer)
 
+--Tick handlers above run as MawCore scheduler tasks (ms; 0=frame, -1=poke only)
+function events.GameInitialized2()
+	local every=MawCore.Scheduler.every
+	every("timers/driver", 0, mawTick_TimerDriver)
+end
