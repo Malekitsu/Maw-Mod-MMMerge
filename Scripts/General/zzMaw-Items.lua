@@ -485,7 +485,9 @@ function GetLootTier(level)
 end
 
 function GetMaxEnchantStrength(level)
-	return encStrUp(GetLootTier(level))*GetDifficultyExtraPower()*PRIMORDIAL_ENCHANT_MULT
+	--NOTE: FOR ESTIMATOR ITEMS ARE EITHER PRIMORDIAL OR LEGENDARY, SO WE ACCOUNT AN AVERAGE OF STAT*1.1
+	--this is false only for celestials, but it's ok.
+	return encStrUp(GetLootTier(level))*GetDifficultyExtraPower()*((PRIMORDIAL_ENCHANT_MULT-1)*0.4+1)
 end
 
 local PRIMORDIAL_CHARGES_MULT = 1.2
