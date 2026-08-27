@@ -4083,105 +4083,124 @@ function getMonsterDamage(lvl,calcType) --NO LONGER USED
 end
 ]]
 
-function events.MonstersProcessed()
-	if not Game.TurnBased and Map.IsIndoor() then
-		for i=0,Map.Monsters.High do
-			local mon=Map.Monsters[i]
-			if mon.AIState==0 and mon.ShowOnMap and getDistance(mon.X,mon.Y,mon.Z)<350 then
-				local midZ=(mon.Z+Party.Z)/2+50
-				local distanceX=mon.X-Party.X
-				local distanceY=mon.Y-Party.Y
-				local requiresHandling=false
-				local j=0
-				while not requiresHandling and j<9 do
-					j=j+1
-					local x=Party.X+distanceX*(0.1*j)
-					local y=Party.Y+distanceY*(0.1*j)
-					if Map.RoomFromPoint(x, y, midZ) == 0 then
-						requiresHandling=true
-					end
-				end
-				
-				if requiresHandling then
-					-- Get relative position of monster to party
-					local dx = mon.X - Party.X
-					local dy = mon.Y - Party.Y
-					
-					-- Calculate angle in radians
-					local angle = math.atan2(dy, dx) -- atan2 gives angle in range -pi to pi
-					
-					-- Calculate theoretical positions
-					local clockwise_angle = angle - math.pi / 2 -- Rotate clockwise
-					local counterclockwise_angle = angle + math.pi / 2 -- Rotate counterclockwise
-					
-					-- Define movement distance
-					local move_distance = 300
-					
-					-- Theoretical coordinates after moving
-					local directionFound=false
-					while not directionFound and move_distance>50 do
-						local clockwise_x = mon.X + math.cos(clockwise_angle) * move_distance
-						local clockwise_y = mon.Y + math.sin(clockwise_angle) * move_distance
-						local counterclockwise_x = mon.X + math.cos(counterclockwise_angle) * move_distance
-						local counterclockwise_y = mon.Y + math.sin(counterclockwise_angle) * move_distance
-						if Map.RoomFromPoint(clockwise_x, clockwise_y, midZ) == 0 then
-							if Map.RoomFromPoint(counterclockwise_x, counterclockwise_y, midZ) ~= 0 then
-								clockwise=false
-								directionFound=true
-							end
-						else
-							clockwise=true
-							directionFound=true
-						end
-						move_distance = move_distance-50
-					end
-					if not directionFound then
-						return
-					end
-					-- Set the final angle based on the chosen direction
-					if clockwise then
-						angle = clockwise_angle
-					else
-						angle = counterclockwise_angle
-					end
-					
-					-- Normalize angle to range [0, 2*pi]
-					if angle < 0 then
-						angle = angle + 2 * math.pi
-					end
-					
-					-- Convert angle to the game's direction format (0 to 2048)
-					local direction=math.floor(angle / (2 * math.pi) * 2048)
-					mon.Direction = direction
-					
-					-- Set velocity
-					local speed = mon.Velocity -- This is the monster's movement speed
-					local speedX=math.cos(angle) * speed
-					local speedY=math.sin(angle) * speed
-					mon.VelocityX = speedX
-					mon.VelocityY = speedY
-					
-					mon.AIState = 6
-					
-					local calls=10
-					function events.Tick()
-						calls=calls-1
-						if not calls or calls<0 then
-							events.Remove("Tick",1)	
-						end
-						if mon:GetIndex()>Map.Monsters.High then
-							return
-						end
-						local midX=(mon.X+Party.X)/2
-						local midY=(mon.Y+Party.Y)/2
-						local midZ=(mon.Z+Party.Z)/2
-						if mon.AIState==6 and Map.RoomFromPoint(midX, midY, midZ) == 0 then
-							mon.VelocityX = speedX
-							mon.VelocityY = speedY
-						end
-					end
-				end
+local function nudgeMonsterAroundCorner(mon)
+	local midZ=(mon.Z+Party.Z)/2+50
+	local distanceX=mon.X-Party.X
+	local distanceY=mon.Y-Party.Y
+	local requiresHandling=false
+	local j=0
+	while not requiresHandling and j<9 do
+		j=j+1
+		local x=Party.X+distanceX*(0.1*j)
+		local y=Party.Y+distanceY*(0.1*j)
+		if Map.RoomFromPoint(x, y, midZ) == 0 then
+			requiresHandling=true
+		end
+	end
+	if not requiresHandling then
+		return
+	end
+
+	-- Get relative position of monster to party
+	local dx = mon.X - Party.X
+	local dy = mon.Y - Party.Y
+
+	-- Calculate angle in radians
+	local angle = math.atan2(dy, dx) -- atan2 gives angle in range -pi to pi
+
+	-- Calculate theoretical positions
+	local clockwise_angle = angle - math.pi / 2 -- Rotate clockwise
+	local counterclockwise_angle = angle + math.pi / 2 -- Rotate counterclockwise
+
+	-- Define movement distance
+	local move_distance = 300
+
+	-- Theoretical coordinates after moving
+	local clockwise=false
+	local directionFound=false
+	while not directionFound and move_distance>50 do
+		local clockwise_x = mon.X + math.cos(clockwise_angle) * move_distance
+		local clockwise_y = mon.Y + math.sin(clockwise_angle) * move_distance
+		local counterclockwise_x = mon.X + math.cos(counterclockwise_angle) * move_distance
+		local counterclockwise_y = mon.Y + math.sin(counterclockwise_angle) * move_distance
+		if Map.RoomFromPoint(clockwise_x, clockwise_y, midZ) == 0 then
+			if Map.RoomFromPoint(counterclockwise_x, counterclockwise_y, midZ) ~= 0 then
+				clockwise=false
+				directionFound=true
 			end
+		else
+			clockwise=true
+			directionFound=true
+		end
+		move_distance = move_distance-50
+	end
+	if not directionFound then
+		return
+	end
+	-- Set the final angle based on the chosen direction
+	if clockwise then
+		angle = clockwise_angle
+	else
+		angle = counterclockwise_angle
+	end
+
+	-- Normalize angle to range [0, 2*pi]
+	if angle < 0 then
+		angle = angle + 2 * math.pi
+	end
+
+	-- Convert angle to the game's direction format (0 to 2048)
+	local direction=math.floor(angle / (2 * math.pi) * 2048)
+	mon.Direction = direction
+
+	-- Set velocity
+	local speed = mon.Velocity -- This is the monster's movement speed
+	local speedX=math.cos(angle) * speed
+	local speedY=math.sin(angle) * speed
+	mon.VelocityX = speedX
+	mon.VelocityY = speedY
+
+	--writing AIState on its own does not stick: the engine picks a new action as
+	--soon as CurrentActionStep reaches CurrentActionLength, and a standing
+	--monster is usually already past it, so the pursue lasted one frame. This
+	--sets state, animation and the animation's own length together -- the same
+	--thing the DLL pathfinder does through its SetMonAction.
+	Multiplayer.SyncMonsters.set_mon_action(mon, const.AIState.Pursue)
+
+	local calls=10
+	function events.Tick()
+		calls=calls-1
+		if calls<=0 then
+			events.Remove("Tick",1)
+		end
+		--GetIndex returns nil, not a number, once the monster is out of the
+		--array -- comparing that against High is what used to throw here
+		if not mon:GetIndex() then
+			events.Remove("Tick",1)
+			return
+		end
+		local midX=(mon.X+Party.X)/2
+		local midY=(mon.Y+Party.Y)/2
+		local midZ=(mon.Z+Party.Z)/2
+		if mon.AIState==const.AIState.Pursue and Map.RoomFromPoint(midX, midY, midZ) == 0 then
+			mon.VelocityX = speedX
+			mon.VelocityY = speedY
+		end
+	end
+end
+
+function events.MonstersProcessed()
+	if Game.TurnBased or not Map.IsIndoor() then
+		return
+	end
+	for i=0,Map.Monsters.High do
+		local mon=Map.Monsters[i]
+		--ShowOnMap only means "the party has seen it once", so neutrals and
+		--allies were being shoved too; this is the pair the rest of Maw uses to
+		--mean "actively an enemy"
+		if mon.AIState==0 and mon.ShowAsHostile and mon.Hostile
+			and getDistance(mon.X,mon.Y,mon.Z)<350 then
+			nudgeMonsterAroundCorner(mon)
 		end
 	end
 end
