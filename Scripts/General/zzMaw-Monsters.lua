@@ -878,46 +878,6 @@ function AdjustMonsterDensity()
 	Game.MapStats[96].Mon3Low=1
 	Game.MapStats[96].Mon3Hi=3
 
-	--make bigger monsters more rare
-	if vars.Mode==2 then
-		for i=1,Game.MapStats.High do
-			local map=Game.MapStats[i]
-			local name1=map.Monster1Pic
-			local name2=map.Monster2Pic
-			local name3=map.Monster3Pic
-			local divisor=18
-			if vars.madnessMode then
-				divisor=10
-			elseif vars.insanityMode then
-				divisor=14
-			end
-			local level1=math.floor(monsterPicTable[name1]/divisor)
-			local level2=math.floor(monsterPicTable[name2]/divisor)
-			local level3=math.floor(monsterPicTable[name3]/divisor)
-			for j=1,level1 do
-				if j%3==0 then
-					map.Mon1Low=math.max(map.Mon1Low-1, 1)
-				else
-					map.Mon1Hi=math.max(map.Mon1Hi-1, 1)
-				end
-			end
-			for j=1,level2 do
-				if j%3==0 then
-					map.Mon2Low=math.max(map.Mon2Low-1, 1)
-				else
-					map.Mon2Hi=math.max(map.Mon2Hi-1, 1)
-				end
-			end
-			for j=1,level3 do
-				if j%3==0 then
-					map.Mon3Low=math.max(map.Mon3Low-1, 1)
-				else
-					map.Mon3Hi=math.max(map.Mon3Hi-1, 1)
-				end
-			end
-		end
-	end
-			
 	--mapping fix
 	if mapMonsterDensity then
 		local map=Game.MapStats[mapMonsterDensity[1]]
@@ -925,6 +885,14 @@ function AdjustMonsterDensity()
 		map.Mon2Hi=round(map.Mon2Hi*mapMonsterDensity[2])
 		map.Mon3Hi=round(map.Mon3Hi*mapMonsterDensity[2])
 		mapMonsterDensity=nil
+	end
+
+	--safeguard against /0 crash
+	for i=1,Game.MapStats.High do
+		local map=Game.MapStats[i]
+		map.Mon1Low=math.min(map.Mon1Low, map.Mon1Hi)
+		map.Mon2Low=math.min(map.Mon2Low, map.Mon2Hi)
+		map.Mon3Low=math.min(map.Mon3Low, map.Mon3Hi)
 	end
 end
 
@@ -3556,7 +3524,7 @@ end
 local resizeList={
 	207,208,209, --behemoth
 	300,301,302, --minotaur
-	578,579,560, --minotaur mm6
+	578,579,580, --minotaur mm6
 	498,499,500, --demons mm6
 	501,502,503, --demons mm6
 }
