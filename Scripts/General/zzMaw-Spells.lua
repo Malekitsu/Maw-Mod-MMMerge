@@ -671,6 +671,20 @@ end
 end
 
 ------------------------------------------------------
+--Protection from Magic: immunity to Unconscious------
+------------------------------------------------------
+function events.DoBadThingToPlayer(t)
+	if not t.Allow or t.Thing ~= const.MonsterBonus.Uncon then
+		return
+	end
+	local buff = Party.SpellBuffs[const.PartyBuff.ProtectionFromMagic]
+	if buff and buff.ExpireTime > Game.Time then
+		t.Allow = false
+		Game.ShowStatusText(string.format("Protection from Magic keeps %s conscious", t.Player.Name))
+	end
+end
+
+------------------------------------------------------
 --online data are processed in zzMAW-Multiplayer.lua--
 ------------------------------------------------------
 
