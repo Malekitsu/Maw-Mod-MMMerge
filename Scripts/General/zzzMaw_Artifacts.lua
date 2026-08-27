@@ -337,8 +337,9 @@ local immunityName = {
 	[const.MonsterBonus.Asleep] = "Sleep",
 }
 
---Every effect line an artifact is worth, in display order: on-hit, buffs,
---immunities, speed, drain, wear requirement. nil when the item has none.
+--Every effect line an artifact is worth, in display order: on-hit, magic
+--schools, buffs, immunities, speed, drain, wear requirement. nil when the item
+--has none.
 --Items.txt stops mentioning any of this; these tables are the source.
 function MawArtifactOnHitText(it)
 	local lines = {}
@@ -368,6 +369,17 @@ function MawArtifactOnHitText(it)
 		if effect.Text then
 			lines[#lines + 1] = effect.Text
 		end
+	end
+
+	local schools = artifactSpellBonus[it.Number]
+	if schools then
+		local names = {}
+		for _, skill in ipairs(schools) do
+			names[#names + 1] = Game.SkillNames[skill]
+		end
+		table.sort(names)
+		lines[#lines + 1] = "+" .. round(ARTIFACT_SPELL_SKILL_BONUS*100)
+			.. "% skill in " .. table.concat(names, ", ")
 	end
 	local buffs = artifactBuffs[it.Number]
 	if buffs then

@@ -2579,7 +2579,7 @@ function events.GetSkill(t)
 			for i=1,#artifactSpellBonus[it.Number] do
 				if t.Skill==artifactSpellBonus[it.Number][i] then
 					local baseSkill=SplitSkill(t.Player.Skills[t.Skill])
-					bonus = bonus + baseSkill * 0.5
+					bonus = bonus + baseSkill * ARTIFACT_SPELL_SKILL_BONUS
 				end
 			end
 		end
@@ -3816,6 +3816,7 @@ artifactHpRegen={509,520,1337,1331,1335,2027}
 artifactSpRegen={513,1334,1331,2024,2032,2033,2034}
 
 --artifact spells
+ARTIFACT_SPELL_SKILL_BONUS=0.5
 artifactSpellBonus={}
 -- Eclipse
 artifactSpellBonus[516] =	{16, 18, 17}
