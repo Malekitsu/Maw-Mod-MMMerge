@@ -555,6 +555,49 @@ function SkillsUI.start()
 	luaGate("SkillzUILearnGate3", "Skillz port: learn click class gate",
 		0x4BAF64, 15, 0x4BAF73, "ebp", "ebp", "ecx")
 
+	local swapped	-- {Class = n, Player = ptr, Rows = {[skill] = old value}}
+
+	local function restoreClassRow()
+		if not swapped then
+			return
+		end
+		local dst = Game.Classes.Skills[swapped.Class]
+		for skill, v in pairs(swapped.Rows) do
+			dst[skill] = v
+		end
+		swapped = nil
+	end
+
+	local function swapClassRow(pl)
+		local dst = Game.Classes.Skills[pl.Class]
+		local rows = {}
+		for skill = 0, math.min(dst.count, OLD_COUNT) - 1 do
+			rows[skill] = dst[skill]
+			dst[skill] = math.min(Skills.API.MasteryLimit(pl, skill), 4)
+		end
+		swapped = {Class = pl.Class, Player = pl["?ptr"], Rows = rows}
+	end
+
+	--note: this reads every frame. Shouldn't be heavy anyway
+	local HOUSE_SCREEN = const.Screens.House
+	MawCore.Scheduler.every("skills/trainer-mastery-row", 0, function()
+		if Game.CurrentScreen ~= HOUSE_SCREEN then
+			restoreClassRow()
+			return
+		end
+		local i = Game.CurrentPlayer
+		if i < 0 or i > Party.High then
+			restoreClassRow()
+			return
+		end
+		local pl = Party[i]
+		if swapped and swapped.Player == pl["?ptr"] then
+			return
+		end
+		restoreClassRow()
+		swapClassRow(pl)
+	end)
+
 	-- known-skill checks: value via storage, ZF drives the skip branch
 	Engine.asmpatch("SkillzUILearnKnown1", "Skillz port: learn list known check",
 		0x4B32FA, string.format([[
