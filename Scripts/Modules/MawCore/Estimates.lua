@@ -429,7 +429,11 @@ local function coverMultiplier(lvl)
 	end
 	local p = math.min(COVER_BASE + COVER_PER_SKILL*skill,
 		COVER_BASE + COVER_PER_SKILL*skillCap[50])*gate
-	return 1/((1 - p) + p/tankVitalityRatio(lvl))
+	local ratio = tankVitalityRatio(lvl)
+	if Party.Count <= 1 then
+		ratio = 1/MawCore.Formulas.soloCoverDamageTaken
+	end
+	return 1/((1 - p) + p/ratio)
 end
 
 --average

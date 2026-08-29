@@ -1715,7 +1715,11 @@ local function pstage_damageRecompute(t)
 	else
 		t.Result = calcMawDamage(t.Player,t.DamageKind,t.Damage,true)
 	end
-	
+
+	if DamageState.takeSoloCover() then
+		t.Result = t.Result*MawCore.Formulas.soloCoverDamageTaken
+	end
+
 	local DiseaseDamage = 1
 	if t.Player.Disease3>0 then
 		DiseaseDamage = 2

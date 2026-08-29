@@ -251,9 +251,16 @@ end
 SkillTooltip.set(50, 1, function(pl)
 	local s = SplitSkill(Skillz.get(pl, 50))
 	local chance = math.min(10 + s, 10 + skillCap[50])
+	local solo = ""
+	if Party.Count <= 1 then
+		local cut = round((1 - MawCore.Formulas.soloCoverDamageTaken)*100)
+		solo = StrColor(178, 255, 255, "\n\nThere is only you and those who would harm you. With no one else to shield, every guard you raise is your own: a successful Cover turns the blow aside, taking "
+			.. cut .. "% off its damage -- and Retaliation answers it all the same.")
+	end
 	return "Cover Skill is a defensive prowess enabling a character to shield allies by intercepting incoming damage. This ability strategically positions the user as the primary target of enemy onslaughts, thereby protecting teammates who are more susceptible to damage.\n\nIf available, Expert, Master and Grandmaster is learned at skill "
 		.. (vars.insanityMode and "8-20-30" or "6-12-20")
-		.. ".\n\nGrants 10 plus 1% chance per skill point to Cover, up to 40%, however, something might happen once at max level....\n\nCurrent cover chance: " .. chance .. "%\n\nPress P to enable/disable\n"
+		.. ".\n\nGrants 10 plus 1% chance per skill point to Cover, up to 40%, however, something might happen once at max level....\n\nCurrent cover chance: " .. chance .. "%"
+		.. solo .. "\n\nPress P to enable/disable\n"
 		.. toggleState("covering")
 end, "cover chance + toggle state")
 
@@ -272,7 +279,7 @@ SkillTooltip.set(53, 1, function(pl)
 	local vit = round(vitMult ^ 0.35)
 	local power = round(powerMult ^ 0.35)
 	local retS = SplitSkill(Skillz.get(pl, 53))
-	return "After mastering the art of covering, you have become capable delivering deadly counter attacks to those who dare try harm your allies. Retaliation has a 1% per skill point chance to activate after successfully covering an ally.\n\nExpert, Master and Grandmaster are learned automatically at skill 12, 30 and 50.\n\nDamage done depends on 2 coefficients, multiplied then by skill level:\n\nMelee Power coefficient: " .. StrColor(255, 0, 0, power) .. "\nVitality coefficient: " .. StrColor(255, 0, 0, vit) .. "\n\nTotal Damage: " .. StrColor(255, 0, 0, retS * vit * power) .. "\n\nBalancing power and vitality leads to the highest damage.\n"
+	return "After mastering the art of covering, you have become capable delivering deadly counter attacks to those who dare try harm your allies. Retaliation has a 1% per skill point chance to activate after a successful Cover -- on an ally, or on yourself when you travel alone.\n\nExpert, Master and Grandmaster are learned automatically at skill 12, 30 and 50.\n\nDamage done depends on 2 coefficients, multiplied then by skill level:\n\nMelee Power coefficient: " .. StrColor(255, 0, 0, power) .. "\nVitality coefficient: " .. StrColor(255, 0, 0, vit) .. "\n\nTotal Damage: " .. StrColor(255, 0, 0, retS * vit * power) .. "\n\nBalancing power and vitality leads to the highest damage.\n"
 end, "retaliation coefficients")
 
 -- was zzMAW-Skills.lua mace events.Action (RunNextTick on the skill screen)

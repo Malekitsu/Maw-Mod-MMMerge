@@ -41,6 +41,8 @@ end
 
 Formulas.damageFloor = 0.1
 
+Formulas.soloCoverDamageTaken = 0.5
+
 Formulas.armorDivisorBase = 200
 Formulas.armorDivisorPerLevel = 3
 function Formulas.armorDamageTaken(ac, monsterLevel)

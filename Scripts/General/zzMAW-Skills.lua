@@ -1231,10 +1231,14 @@ function events.PlayerAttacked(t)
 			t.PlayerSlot=lowestHPId
 			return
 		end
+		--solo: the only candidate IS the target, so the "not yourself" rule has
+		--to go or the skill can never fire. What lands is a halved hit instead
+		--of a redirected one (MawCore/Formulas.soloCoverDamageTaken).
+		local solo=Party.Count==1
 		cover={}
 		for i=0,Party.High do
 			local s, m= SplitSkill(Skillz.get(Party[i], 50))
-			if s>0 and vars.covering[i] and m>=masteryRequired and i~=t.PlayerSlot then
+			if s>0 and vars.covering[i] and m>=masteryRequired and (solo or i~=t.PlayerSlot) then
 				cover[i]={["Chance"]=math.min(0.1+s*0.01, 0.1+skillCap[50]*0.01),["Mastery"]= m}
 				if MawCore.DamageState.takeCoverBonus(i) then
 					cover[i].Chance=cover[i].Chance+0.15
@@ -1261,14 +1265,18 @@ function events.PlayerAttacked(t)
 			mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Shield, t.PlayerSlot)
 			Party[coverPlayerIndex]:ShowFaceAnimation(14)
 			--Game.ShowStatusText(Party[coverPlayerIndex].Name .. " cover " .. Party[t.PlayerSlot].Name)
-			t.PlayerSlot=coverPlayerIndex
+			if solo then
+				MawCore.DamageState.setSoloCover()
+			else
+				t.PlayerSlot=coverPlayerIndex
+			end
 			local pl=Party[t.PlayerSlot]
 			local id=pl:GetIndex()
 			if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 23) then
 				evt[t.PlayerSlot].Add("HP", GetMaxHP(Party[t.PlayerSlot])*0.03)
 			end
 			--retaliation code
-			local s,m=Skillz.get(pl,53)
+			local s,m=SplitSkill(Skillz.get(pl,53))
 			if s/100>=math.random() then
 				vars.retaliation=vars.retaliation or {}
 				vars.retaliation[id]=vars.retaliation[id] or {}

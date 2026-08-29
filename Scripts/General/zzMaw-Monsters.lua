@@ -3826,10 +3826,14 @@ function events.PlayerAttacked(t)
 			vars.covering[i]=true
 		end
 	end
+	--solo: the only candidate IS the target, so the "not yourself" rule has to
+	--go or the skill can never fire. What lands is a halved hit instead of a
+	--redirected one (MawCore/Formulas.soloCoverDamageTaken).
+	local solo=Party.Count==1
 	cover={}
 	for i=0,Party.High do
 		local s, m= SplitSkill(Skillz.get(Party[i], 50))
-		if s>0 and vars.covering[i] and m>=masteryRequired and i~=target then
+		if s>0 and vars.covering[i] and m>=masteryRequired and (solo or i~=target) then
 			cover[i]={["Chance"]=1-(0.99^s-0.05),["Mastery"]= m}
 			if MawCore.DamageState.takeCoverBonus(i) then
 				cover[i].Chance=cover[i].Chance+0.3
@@ -3872,8 +3876,14 @@ function events.PlayerAttacked(t)
 	if covered then
 		mem.call(0x4A6FCE, 1, mem.call(0x42D747, 1, mem.u4[0x75CE00]), const.Spells.Shield, target)
 		Party[coverPlayerIndex]:ShowFaceAnimation(14)
-		Game.ShowStatusText(Party[coverPlayerIndex].Name .. " cover " .. Party[target].Name)
-		target=coverPlayerIndex
+		if solo then
+			--the target does not move; the pipeline cuts the hit instead
+			MawCore.DamageState.setSoloCover()
+			Game.ShowStatusText(Party[coverPlayerIndex].Name .. " covers the blow")
+		else
+			Game.ShowStatusText(Party[coverPlayerIndex].Name .. " cover " .. Party[target].Name)
+			target=coverPlayerIndex
+		end
 		local pl=Party[target]
 		local id=pl:GetIndex()
 		if vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 23) then
@@ -3881,7 +3891,9 @@ function events.PlayerAttacked(t)
 		end
 
 		--retaliation code
-		local s,m=Skillz.get(pl,53)
+		--Skillz.get returns ONE packed value: unsplit, the roll always passed
+		--and the "if m>=4" below compared nil (same fix as zzMAW-Skills)
+		local s,m=SplitSkill(Skillz.get(pl,53))
 		if s/100>=math.random() then
 			vars.retaliation=vars.retaliation or {}
 			vars.retaliation[id]=vars.retaliation[id] or {}

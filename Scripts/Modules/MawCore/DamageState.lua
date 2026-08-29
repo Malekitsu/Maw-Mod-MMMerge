@@ -27,6 +27,18 @@ function DamageState.takeCoverBonus(slot)
 	return true
 end
 
+local soloCover = false
+
+function DamageState.setSoloCover()
+	soloCover = true
+end
+
+function DamageState.takeSoloCover()
+	local on = soloCover
+	soloCover = false
+	return on
+end
+
 -- Custom attacker. zzMaw-Monsters drives some monster projectiles itself
 -- instead of through the engine, so WhoHitPlayer() cannot answer "who hit
 -- me" for those; it publishes the attacker record here around the hit.
