@@ -586,8 +586,8 @@ local function stage_resAndRetaliation(t)
 				stacks=1
 			end
 			local powerMult, DPS2, DPS3, vitMult=calcPowerVitality(pl, false)
-			local vit=round(vitMult^0.35)
-			local power=round(powerMult^0.35)
+			local vit=round(vitMult^0.25)
+			local power=round(powerMult^0.25)
 			local totalRetDamage=power*vit*s*stacks
 			t.Result=t.Result+totalRetDamage
 			
