@@ -2670,16 +2670,7 @@ function checkMapCompletition()
 					end
 					evt.Add("Items",rewards[nAff])
 				elseif not vars.AusterityMode then
-					local gemTier=math.ceil((mapLevel+bolster)/25+0.5)
-					if gemTier>20 then
-						for i=1, math.floor(gemTier/10) do
-							evt.Add("Items", 1063)
-						end
-					--crafting gems no longer come from dungeon completion
-					--else
-					--	evt.Add("Items",1040+gemTier)
-					--	evt.Add("Items",1040+gemTier)
-					end
+					evt.Add("Items", 1063)
 				end
 				--bolster code
 				addBolsterExp(experience)
