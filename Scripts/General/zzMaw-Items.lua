@@ -617,7 +617,7 @@ local rarityPityField = {
 --rows must stay ordered: Epic <= Rare <= Uncommon <= Common, or the band in
 --between collapses to nothing
 enchantChances={
-	[const.Rarity.Epic]    ={Base=5,   PerTier=1, Cap=20},
+	[const.Rarity.Epic]    ={Base=5,   PerTier=0.75, Cap=20},
 	[const.Rarity.Rare]    ={Base=20,   PerTier=2,   Cap=60},
 	[const.Rarity.Uncommon]={Base=60,  PerTier=1,  Cap=80},
 	[const.Rarity.Common]  ={Base=100, PerTier=0,   Cap=100},
