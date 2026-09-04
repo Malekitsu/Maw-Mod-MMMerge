@@ -617,9 +617,9 @@ local rarityPityField = {
 --rows must stay ordered: Epic <= Rare <= Uncommon <= Common, or the band in
 --between collapses to nothing
 enchantChances={
-	[const.Rarity.Epic]    ={Base=0,   PerTier=0.5, Cap=15},
-	[const.Rarity.Rare]    ={Base=15,   PerTier=1,   Cap=35},
-	[const.Rarity.Uncommon]={Base=45,  PerTier=0.5,  Cap=60},
+	[const.Rarity.Epic]    ={Base=5,   PerTier=1, Cap=20},
+	[const.Rarity.Rare]    ={Base=20,   PerTier=2,   Cap=60},
+	[const.Rarity.Uncommon]={Base=60,  PerTier=1,  Cap=80},
 	[const.Rarity.Common]  ={Base=100, PerTier=0,   Cap=100},
 }
 --cap at tier 30
@@ -4459,12 +4459,53 @@ function pity_chance(chance, failures)
 end
 
 --remove artifacts
-mawArtifacts={500,501,502,503,504,505,506,507,508,509,510,511,512,513,514,515,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,523,533,534,535,536,537,542,1302,1303,1304,1305,1306,1307,1308,1309,1310,1311,1312,1313,1314,1315,1316,1317,1318,1319,1320,1321,1322,1323,1324,1325,1326,1327,1328,1329,1330,1331,1332,1333,1334,1335,1336,1337,1338,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040,2041,2042,2043,2044,2045,2046,2047,2048,2049}
+mawArtifacts={500,501,502,503,504,505,506,507,508,509,510,511,512,513,514,515,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,533,533,534,535,536,537,542,1302,1303,1304,1305,1306,1307,1308,1309,1310,1311,1312,1313,1314,1315,1316,1317,1318,1319,1320,1321,1322,1323,1324,1325,1326,1327,1328,1329,1330,1331,1332,1333,1334,1335,1336,1337,1338,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040,2041,2042,2043,2044,2045,2046,2047,2048,2049}
+--Artifacts that are a GUARANTEED reward: a named quest, an obelisk prize or a
+--hand-placed chest. Rerolling one does not move it, it DELETES the reward, so
+--these keep the spot the map gave them.
+--Listed whole rather than only the ones the sweep can currently reach: most of
+--them are spared today just because their Value sits under the 20000 gate
+--below, which is an accident of pricing, not a decision. Raise one and the
+--reward would quietly vanish.
+mawArtifactsKeep={
+	--MM6
+	--[[	2032,	--Guinevere, obelisk quest
+	2033,	--Igraine, obelisk quest -- the Dragonsand chest gives all THREE
+	2034,	--Morgan, obelisk quest
+	2023,	--Excalibur, Eel-Infested Waters
+	2020,	--Mordred, Dragoon's Keep in Free Haven (already outside
+			--mawArtifacts, listed so the exemption survives a list rebuild)
+	--MM7
+	1340,	--Lieutenant's Cutlass
+	1343,	--Villain's Blade
+	1351,	--Zokarr's Axe
+	1337,	--Hero's Belt, obelisk quest
+	1338,	--Lady's Escort, obelisk quest
+	1335,	--Elven Chainmail, Archmage quest
+	1336,	--Forge Gauntlets, Archmage quest
+	1333,	--Elfbane, Archmage quest
+	1334,	--Mind's Eye, Archmage quest
+	--MM8
+	501,	--Glomenthal, Archmage quest
+	503,	--Judicious Measure, Ravage Roaming
+	541,	--Axe of Balthazar, black dwarf compound
+	519,	--Ring of Planes, Dark Dwarf Compound (from the artifact-location
+			--guides, not confirmed in-game -- drop this line if it is wrong)
+	542,	--Noblebone Bow, Yaardrake's Cave in Shadowspire
+	516,	--Eclipse, necromancy guild
+	539,	--Ebonest, mad necromancer's lab
+	540,	--Sword of Whistlebone, Garrot Gorge
+	504,	--Elderaxe, Vault of Time obelisk
+	508,	--Foulfang, Vault of Time obelisk
+	509,	--Scepter of Kings, Vault of Time obelisk
+	]]
+}
+
 function events.AfterLoadMap()
 	for k=0,Map.Chests.High do
 		for i=1,Map.Chests[k].Items.High do
 			local it=Map.Chests[k].Items[i]
-			if it.MaxCharges==0 then
+			if it.MaxCharges==0 and not table.find(mawArtifactsKeep, it.Number) then
 				if table.find(mawArtifacts, it.Number) then
 					if it:T().Value>=20000 and it.BonusStrength==0 then
 						LootContext.markBoss()
