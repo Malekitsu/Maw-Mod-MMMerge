@@ -1505,9 +1505,9 @@ end
 
 function masteryThresholds()
 	if vars.madnessMode then
-	  return {0, 12, 30, 50}
+	  return {0, 10, 24, 40}
 	elseif vars.insanityMode then
-	  return {0, 8, 20, 32}
+	  return {0, 8, 16, 25}
 	else
 	  return {0, 4, 7, 10}
 	end

@@ -214,7 +214,23 @@ end
 
 local learningRequirementsNormal={0,4,7,10}
 local learningRequirements={0,6,12,20}
+local learningRequirementsInsanity={0,8,16,25}
+local learningRequirementsMadness={0,10,24,40}
 local horizontalSkills={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,27,28,30,32,33,35,38}
+
+function GetLearningRequirements(skill)
+	if skill and not table.find(horizontalSkills, skill) then
+		return learningRequirementsNormal
+	end
+	if vars.madnessMode then
+		return learningRequirementsMadness
+	elseif vars.insanityMode then
+		return learningRequirementsInsanity
+	elseif vars.Mode==2 or not Game.freeProgression then
+		return learningRequirements
+	end
+	return learningRequirementsNormal
+end
 
 --------------------------------------
 --THE SKILL "+" BUTTON (action 121)
@@ -264,27 +280,17 @@ local function restoreMasteries(pl, skill)
 	end
 	local id=pl:GetIndex()
 	local s,m=SplitSkill(pl.Skills[skill])
+	local requirements=GetLearningRequirements(skill)
 	if table.find(horizontalSkills, skill) and vars.storedMasteries and vars.storedMasteries[id]
 			and vars.storedMasteries[id][skill] then
 		while m<4 and vars.storedMasteries[id][skill]>m
-				and ((s+1>=learningRequirements[m+1] and not Game.freeProgression)
-					or (s+1>=learningRequirementsNormal[m+1] and Game.freeProgression)) do
+				and s+1>=requirements[m+1] do
 			pl.Skills[skill]=JoinSkill(s,m+1)
 			m=m+1
 		end
 	end
 	if vars.oldPlayerMasteries and vars.oldPlayerMasteries[id]
 			and m<4 and vars.oldPlayerMasteries[id][skill]>m then
-		local requirements
-		if vars.madnessMode and table.find(horizontalSkills, skill) then
-			requirements={0,12,30,50}
-		elseif vars.insanityMode and table.find(horizontalSkills, skill) then
-			requirements={0,8,20,32}
-		elseif Game.freeProgression or not table.find(horizontalSkills, skill) then
-			requirements={0,4,7,10}
-		else
-			requirements={0,6,12,20}
-		end
 		if s+1>=requirements[m+1] then
 			pl.Skills[skill]=JoinSkill(s,m+1)
 		end
@@ -1819,34 +1825,27 @@ end
 
 --HORIZONTAL SKILL PROGRESSION
 --online
-local insanityLearningRequirements={0,8,20,32}
-local madnessLearningRequirements={0,12,30,50}
 local normalCosts={0,1000,4000,20000}
 local doomCosts={0,2000,10000,50000}
 local insanityCost={0,10000,50000,250000}
-local madnessCost={0,25000,500000,2000000}
+local madnessCost={0,15000,300000,1250000}
 
+--callers gate on horizontalSkills before getting here, hence no skill argument
 local function getReqAndCost(mastery, player)
 	local pl = Party[player or Game.CurrentPlayer]
-	
-	local baseCost, requirements
+
+	local baseCost
 	if vars.madnessMode then
 		baseCost = madnessCost[mastery]
-		requirements = madnessLearningRequirements[mastery]
 	elseif vars.insanityMode then
 		baseCost = insanityCost[mastery]
-		requirements = insanityLearningRequirements[mastery]
 	elseif vars.Mode==2 then
 		baseCost = doomCosts[mastery]
-		requirements = learningRequirements[mastery]
-	elseif not Game.freeProgression then
-		baseCost = normalCosts[mastery]
-		requirements = learningRequirements[mastery]
 	else
 		baseCost = normalCosts[mastery]
-		requirements = learningRequirementsNormal[mastery]
 	end
-	
+	local requirements = GetLearningRequirements()[mastery]
+
 	local cost = baseCost
 	local playerIndex = pl:GetIndex()
 	local oldMasteries = vars.oldPlayerMasteries and vars.oldPlayerMasteries[playerIndex]
@@ -1870,6 +1869,8 @@ function events.AfterPopulateNPCDialog(t)
 	local message=Game.NPCText[298+3*skill+skillM]
 	local function printMessage(player)
 		local req,cost=getReqAndCost(skillM, player)
+		--NOT the current requirement: this is the vanilla number baked into the
+		--engine's own text, used to find which digit group in it to replace
 		Message(message:gsub("%d+", |contents| contents==tostring(learningRequirementsNormal[skillM]) and req or cost or contents))
 	end
 	local function charChanged(t)
@@ -1921,9 +1922,10 @@ function horizontalModeMasteries()
 		for i=0,Party.PlayersArray.High do
 			local pl=Party.PlayersArray[i]
 			vars.storedMasteries[i]=vars.storedMasteries[i] or {}
-			for v=0,23 do 
+			for v=0,23 do
 				local s,m = SplitSkill(pl.Skills[v])
-				while m>0 and s<learningRequirements[m] do
+				local requirements=GetLearningRequirements(v)
+				while m>0 and s<requirements[m] do
 					vars.storedMasteries[i][v]=vars.storedMasteries[i][v] or 0
 					vars.storedMasteries[i][v]=math.max(vars.storedMasteries[i][v],m)
 					m=m-1
