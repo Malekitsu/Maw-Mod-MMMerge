@@ -117,7 +117,7 @@ local function apply_boss_set(list, do_refresh_after)
     for _, pair in ipairs(list) do
       local idx, nid, mid = pair[1], pair[2], pair[3]   -- mid = monster.Id (tier)
       local mon = Map.Monsters[idx]
-      if mon then
+      if mon and mon.AIState ~= 11 then
         if type(mid) == "number" then mon.Id = mid end   -- aligne le tier côté clients
         if type(nid) == "number" then mon.NameId = nid end
       end
@@ -131,7 +131,7 @@ local function apply_boss_set(list, do_refresh_after)
     for _, pair in ipairs(list) do
       local idx, nid = pair[1], pair[2]
       local mon = Map.Monsters[idx]
-      if mon and type(nid) == "number" then
+      if mon and mon.AIState ~= 11 and type(nid) == "number" then
         mon.NameId = 0
         mon.NameId = nid
       end
@@ -147,7 +147,7 @@ local function refresh_all_boss_labels()
   for _, pair in ipairs(mapvars.bossSet) do
     local idx, nid = pair[1], pair[2]
     local mon = Map.Monsters[idx]
-    if mon and type(nid) == "number" then
+    if mon and mon.AIState ~= 11 and type(nid) == "number" then
       mon.NameId = 0
       mon.NameId = nid
     end

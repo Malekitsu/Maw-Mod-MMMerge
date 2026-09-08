@@ -2188,7 +2188,7 @@ function events.LoadMap()
 	end
 end
 function events.LeaveMap()
-	if (Game.BolsterAmount~=300 or Game.BolsterAmount~=600) and vars.Mode~=2 then return end
+	if Game.BolsterAmount~=300 and Game.BolsterAmount~=600 and vars.Mode~=2 then return end
 	if Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.monsterMap.cleared==false then
 		if Map.Monsters.Count==0 then return end
 		-- Get list of player-controlled monsters once
@@ -4031,6 +4031,13 @@ function events.PickCorpse(t)
 	local index=t.MonsterIndex
 	if mapvars.bossData and mapvars.bossData[index] then
 		mapvars.bossData[index]=nil
+	end
+	if mapvars.bossSet then
+		for i=#mapvars.bossSet,1,-1 do
+			if mapvars.bossSet[i][1]==index then
+				table.remove(mapvars.bossSet, i)
+			end
+		end
 	end
 	RunNextTick(function()
 		if mon.AIState==11 then

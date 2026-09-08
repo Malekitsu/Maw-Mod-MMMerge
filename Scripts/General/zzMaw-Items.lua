@@ -622,7 +622,7 @@ enchantChances={
 	[const.Rarity.Uncommon]={Base=60,  PerTier=1,  Cap=80},
 	[const.Rarity.Common]  ={Base=100, PerTier=0,   Cap=100},
 }
---cap at tier 30
+--all three bands reach their Cap at tier 20
 function GetEnchantChance(rarity, lootTier)
 	local c=enchantChances[rarity]
 	return math.min(c.Base + c.PerTier*lootTier, c.Cap)
