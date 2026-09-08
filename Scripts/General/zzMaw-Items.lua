@@ -1585,7 +1585,7 @@ legendaryEffects={
 	
 	[27]="Leech overhealing heals the most injured party member instead",
 	[28]="AC gained from armors is doubled",
-	[29]="Each attack reduces monster resistances by 1",
+	[29]="Each attack makes the monster take 1% more damage of any kind, stacking until it dies",
 	[30]="Threshold HP to determine death/eradication depends on SP multiplied by mana shield efficiency instead, if higher",
 	[31]="Leech also restores Mana, but its effect is halved",
 	[32]="Buffs reserve Hit Points instead of Mana and Hit Point coefficient is used instead.\nEnlightenment bonus still apply.",
@@ -1608,6 +1608,9 @@ function events.GameInitialized2()
 	legendaryEffects[24]=string.format(
 		"Killing a Monster restores %s%% of Health and %s%% of Mana, counted on the pool left after buffs reserve theirs",
 		F.legendary24Health*100, F.legendary24Mana*100)
+	legendaryEffects[29]=string.format(
+		"Each attack makes the monster take %s%% more damage of any kind, stacking until it dies",
+		F.legendary29DamageTaken)
 end
 
 function updateCelestialItem(it,pl)

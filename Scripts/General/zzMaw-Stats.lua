@@ -943,13 +943,9 @@ function events.MonsterKilled(mon)
 	if mapvars.spearDamageIncrease and mapvars.spearDamageIncrease[id] then
 		mapvars.spearDamageIncrease[id]=0
 	end
-end
-
-
-function calcSpearResReduction(y)
-    local log2 = math.log(1 + y / 100) / math.log(2)
-    local reduction = 100 * log2
-    return reduction
+	if mapvars.legendaryDamageTaken and mapvars.legendaryDamageTaken[id] then
+		mapvars.legendaryDamageTaken[id]=0
+	end
 end
 
 --stats breakpoints

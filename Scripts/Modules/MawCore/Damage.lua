@@ -498,7 +498,7 @@ local function stage_painReflectionFlag(t)
 end
 
 -- from Scripts/General/zzMaw-Stats.lua:1105 -- damage-kind remaps, GM-bow
--- min-res pick, GM-spear cumulative res shred, legendary 29 res shred,
+-- min-res pick, GM-spear and legendary 29 damage-taken stacks,
 -- retaliation add, then the FINAL division by 2^(res%1000/100)
 local function stage_resAndRetaliation(t)
 	local data=t.Hit
@@ -538,9 +538,7 @@ local function stage_resAndRetaliation(t)
 			if skill==const.Skills.Spear then
 				local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spear))
 				if m>=4 then
-					local id=t.Monster:GetIndex()
-					mapvars.originalResistance=mapvars.originalResistance or {}
-					mapvars.originalResistance[id]=mapvars.originalResistance[id] or t.Monster.Resistances[index]
+					local id=t.MonsterIndex
 					mapvars.spearDamageIncrease=mapvars.spearDamageIncrease or {}
 					mapvars.spearDamageIncrease[id]=mapvars.spearDamageIncrease[id] or 0
 					local mult=damageMultiplier[t.PlayerIndex]["Melee"]
@@ -549,8 +547,6 @@ local function stage_resAndRetaliation(t)
 						damageIncrease=damageIncrease*1.5
 					end
 					mapvars.spearDamageIncrease[id]=mapvars.spearDamageIncrease[id]+damageIncrease
-					local reduction=calcSpearResReduction(mapvars.spearDamageIncrease[id])
-					t.Monster.Resistances[index]=round(math.max(mapvars.originalResistance[id]-reduction,0))
 				end
 			end
 		end
@@ -558,22 +554,22 @@ local function stage_resAndRetaliation(t)
 	if t.Player and hasLegendary(t.PlayerIndex, 29) then
 		if data and data.Object==nil and t.DamageKind~=4 then goto continue end --disable for melee elemental damage
 		if data and table.find(aoespells, data.Spell) and math.random()>0.4 then goto continue end
-		for i=0, 10 do
-			if i~=5 then
-				if i==4 then
-					local id=t.Monster:GetIndex()
-					if mapvars.originalResistance and mapvars.originalResistance[id] then
-						mapvars.originalResistance[id]=math.max(mapvars.originalResistance[id]-1,0)
-					else
-						t.Monster.Resistances[i]=math.max(t.Monster.Resistances[i]-1,0)
-					end
-				else
-					t.Monster.Resistances[i]=math.max(t.Monster.Resistances[i]%1000-1,0)+math.floor(t.Monster.Resistances[i]/1000)*1000
-				end
-			end
-		end
+		local id=t.MonsterIndex
+		mapvars.legendaryDamageTaken=mapvars.legendaryDamageTaken or {}
+		mapvars.legendaryDamageTaken[id]=(mapvars.legendaryDamageTaken[id] or 0)+MawCore.Formulas.legendary29DamageTaken
 	end
 	::continue::
+	do
+		local id=t.MonsterIndex
+		local taken=0
+		if t.DamageKind==const.Damage.Phys and mapvars.spearDamageIncrease and mapvars.spearDamageIncrease[id] then
+			taken=taken+mapvars.spearDamageIncrease[id]
+		end
+		if mapvars.legendaryDamageTaken and mapvars.legendaryDamageTaken[id] then
+			taken=taken+mapvars.legendaryDamageTaken[id]
+		end
+		t.Result=t.Result*(1+taken/100)
+	end
 	--retaliation code
 	if t.Player then
 		local id=t.Player:GetIndex()

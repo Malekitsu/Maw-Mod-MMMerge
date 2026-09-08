@@ -190,10 +190,6 @@ function recalculateMawMonster()
 					mon.Resistances[v]=	txt.Resistances[v]
 				end
 			end
-			if mapvars.spearDamageIncrease and mapvars.spearDamageIncrease[i] then
-				local reduction=calcSpearResReduction(mapvars.spearDamageIncrease[i])
-				mon.Resistances[4]=mon.Resistances[4]-reduction
-			end
 			local currentHPPercentage=mon.HP/mon.FullHitPoints
 			mon.Resistances[0]=mon.Resistances[0]%1000
 			MawSetMonsterHP(mon, getMonsterHealth(mon), currentHPPercentage)
@@ -2084,6 +2080,14 @@ function events.BuildMonsterInformationBox(t)
 				local remaining = math.ceil((buff.ExpireTime - Game.Time) / const.Minute * 2)
 				activeDebuffs = activeDebuffs .. "\n" .. buffName .. ": " .. remaining .. "s"
 			end
+		end
+		local spearStack = mapvars.spearDamageIncrease and mapvars.spearDamageIncrease[id] or 0
+		if spearStack > 0 then
+			activeDebuffs = activeDebuffs .. "\nPhysical damage taken: +" .. round(spearStack) .. "%"
+		end
+		local legendaryStack = mapvars.legendaryDamageTaken and mapvars.legendaryDamageTaken[id] or 0
+		if legendaryStack > 0 then
+			activeDebuffs = activeDebuffs .. "\nAll damage taken: +" .. round(legendaryStack) .. "%"
 		end
 		if activeDebuffs ~= "" then
 			t.EffectsHeader.Text = t.EffectsHeader.Text .. "\n\n" .. StrColor(255,200,0, "Debuffs:" .. activeDebuffs)

@@ -196,8 +196,8 @@ SkillTooltip.set(const.Skills.Spear, 5, function(pl)
 			damageIncrease = damageIncrease * 1.5
 		end
 	end
-	return string.format("%s\n\t070Each spear attack reduces physical resistance, increasing damage by: %s%%\nIncreased by 50%% with Halberds", baseSpearTooltip, damageIncrease)
-end, "spear GM resistance shred")
+	return string.format("%s\n\t070Each spear attack makes the target take %s%% more physical damage, stacking until it dies\nIncreased by 50%% with Halberds", baseSpearTooltip, damageIncrease)
+end, "spear GM damage taken stacks")
 
 -- was zzMAW-Skills.lua armor events.Action (RunNextTick on the skill screen)
 
