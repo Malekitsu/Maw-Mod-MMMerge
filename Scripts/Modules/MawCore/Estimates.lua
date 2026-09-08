@@ -484,10 +484,11 @@ function getMonsterDamage(mon, level)
 	local index=mon:GetIndex()
 	if mon.NameId>=220 and mon.NameId<=300 then
 		mapvars.bossData=mapvars.bossData or {}
-		if not mapvars.bossData[index] then
+		if not mapvars.bossData[index] and not (Multiplayer and Multiplayer.in_game and not Multiplayer.im_host()) then
 			generateBoss(index)
 		end
-		damage=damage*mapvars.bossData[index].DamageMult
+		local boss=mapvars.bossData[index]
+		damage=damage*(boss and boss.DamageMult or 1)
 	end
 	
 	return damage
@@ -714,10 +715,11 @@ function getMonsterHealth(mon, level)
 	local index=mon:GetIndex()
 	if mon.NameId>=220 and mon.NameId<=300 then
 		mapvars.bossData=mapvars.bossData or {}
-		if not mapvars.bossData[index] then
+		if not mapvars.bossData[index] and not (Multiplayer and Multiplayer.in_game and not Multiplayer.im_host()) then
 			generateBoss(index)
 		end
-		health=health*mapvars.bossData[index].HealthMult
+		local boss=mapvars.bossData[index]
+		health=health*(boss and boss.HealthMult or 1)
 	end
 	
 	return health

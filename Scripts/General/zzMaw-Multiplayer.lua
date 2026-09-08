@@ -58,7 +58,7 @@ end
 -- === Compat maps: mawmapvarsend shim ===
 if not rawget(_G, "mawmapvarsend") then
 	local function __senderId()
-		return (Multiplayer and Multiplayer.player_id) or "host"
+		return Multiplayer.my_id
 	end
 	function mawmapvarsend(key, val)
 		mapvars = mapvars or {}
@@ -86,13 +86,8 @@ local function isReworkOn()
 end
 
 local function isHost()
-	if not Multiplayer then return true end
-	if Multiplayer.is_host ~= nil then return not not Multiplayer.is_host end
-	if Multiplayer.IsHost	~= nil then return not not Multiplayer.IsHost end
-	if Multiplayer.host_id and Multiplayer.player_id then return Multiplayer.player_id == Multiplayer.host_id end
-	if type(Multiplayer.player_id)=="string" then return Multiplayer.player_id == "host" end
-	if type(Multiplayer.player_id)=="number" then return Multiplayer.player_id == 0 end
-	return false
+	if not (Multiplayer and Multiplayer.in_game) then return true end
+	return Multiplayer.im_host()
 end
 ------------------------------------------------------------
 -- SAFETY SHIMS
@@ -113,7 +108,7 @@ do
 end
 
 local function inMulti() return (Multiplayer and Multiplayer.in_game) and true or false end
-local SEC	= (const and const.Second) or 1
+local SEC	= const.Minute/2
 local NOW	= function() return (Game and Game.Time) or 0 end
 local BASE_RADIUS	= 20000
 local SEND_PERIOD	= 4 * SEC
@@ -125,7 +120,7 @@ local function maxSpellId()
 	return 300
 end
 
-local function senderId() return (Multiplayer and Multiplayer.player_id) or "host" end
+local function senderId() return Multiplayer.my_id end
 local function sum3(a,b,c) return (tonumber(a) or 0)+(tonumber(b) or 0)+(tonumber(c) or 0) end
 local function pick_max(a,b)
 	local as,am,al = a[1] or 0, a[2] or 0, a[3] or 0
@@ -565,7 +560,7 @@ function events.Tick()
 	-- Détection resync/rewind/bond
 	local lastClock = vars._maw_clock_last or now
 	local delta = now - lastClock
-	if delta < -0.5*SEC or delta > (12*3600) then
+	if delta < -0.5*SEC or delta > 12*const.Hour then
 		vars._maw_next_send_time = now + SEC
 		vars._maw_last_sent = {}
 		vars._maw_sync_guard_until = now + 10
@@ -621,9 +616,11 @@ function events.Tick()
 	-- Cadence d’envoi sans Timer
 	if not inMulti() or not isReworkOn() then return end
 	if now < (START_DELAY or 0) then return end
-	if (vars._maw_next_send_time or 0) <= now or now < (vars._maw_resend_boost_until or 0) then
+	local period = SEND_PERIOD
+	if now < (vars._maw_resend_boost_until or 0) then period = SEC end
+	if (vars._maw_next_send_time or 0) <= now then
 		pcall(sendBuffs)
-		vars._maw_next_send_time = now + SEND_PERIOD
+		vars._maw_next_send_time = now + period
 	end
 end
 
@@ -685,15 +682,7 @@ local function __after_death_resend_pulse()
 	__begin_hp_guard(12)
 end
 
-function events.GameOver()
-	ensure_state()
-	if isHost() then vars._maw_host_death_count = (vars._maw_host_death_count or 0) + 1; __notify("mawHostDown") else __notify("mawClientDown") end
-	vars._maw_clear_weak_ticks = math.max(vars._maw_clear_weak_ticks or 0, 20)
-	MAW_StartWeakProtect(30)
-	__after_death_resend_pulse()
-end
-
-function events.DeathMenu()
+function events.MultiplayerDeathScreen()
 	ensure_state()
 	if isHost() then vars._maw_host_death_count = (vars._maw_host_death_count or 0) + 1; __notify("mawHostDown") else __notify("mawClientDown") end
 	vars._maw_clear_weak_ticks = math.max(vars._maw_clear_weak_ticks or 0, 20)
@@ -770,7 +759,7 @@ function MAW_NUKE_ALL_BUFFS(broadcast)
 			X = (Party and Party.X) or 0,
 			Y = (Party and Party.Y) or 0,
 			Z = (Party and Party.Z) or 0,
-			sender = (Multiplayer.player_id or "host"),
+			sender = Multiplayer.my_id,
 		}
 		if vars._maw_last_sent then
 			for id,_ in pairs(vars._maw_last_sent) do payload_off[id] = 1 end
@@ -795,16 +784,28 @@ function events.MultiplayerInitialized()
 	Multiplayer.allow_remote_event("bolsterEvt")
 end
 function events.bolsterEvt(t)
+	if t.DataType~="bolsterLevels" or type(t.levels)~="table" then return end
 	vars.MultiplayerBolsterLevels=vars.MultiplayerBolsterLevels or {}
-	vars.MultiplayerBolsterLevels[t.DataType] = t.value/100
-end
-function ShareBolster()
-	if Multiplayer and Multiplayer.in_game and Multiplayer.im_host() then
-		for i=1,4 do
-			local lvl=round(vars.MMLVL[i]*100)
-			Multiplayer.broadcast_mapdata({ DataType=i, value=lvl }, "bolsterEvt")
-		end
+	for i=1,4 do
+		vars.MultiplayerBolsterLevels[i]=(tonumber(t.levels[i]) or 0)/100
 	end
+end
+local lastSharedBolster
+function ShareBolster()
+	if not (Multiplayer and Multiplayer.in_game and Multiplayer.im_host() and vars.MMLVL) then return end
+	local levels={}
+	local changed=lastSharedBolster==nil
+	for i=1,4 do
+		levels[i]=round(vars.MMLVL[i]*100)
+		if not changed and lastSharedBolster[i]~=levels[i] then changed=true end
+	end
+	if not changed then return end
+	lastSharedBolster=levels
+	Multiplayer.broadcast_questdata({ DataType="bolsterLevels", levels=levels }, "bolsterEvt")
+end
+function events.ClientJoined()
+	lastSharedBolster=nil
+	ShareBolster()
 end
 
 --[[share boss name table

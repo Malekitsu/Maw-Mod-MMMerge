@@ -9,7 +9,7 @@
 -- mawmapvarsend: envoie une clé/valeur mapvars à tous les clients autour (via MAWMapvarArrived)
 if not rawget(_G, "mawmapvarsend") then
   local function __senderId()
-    return (Multiplayer and Multiplayer.player_id) or "host"
+    return Multiplayer.my_id
   end
   function mawmapvarsend(key, val)
     mapvars = mapvars or {}
@@ -45,7 +45,7 @@ local function isHost()
   return false
 end
 
-local SEC = (const and const.Second) or 1
+local SEC = const.Minute/2
 local function NOW() return (Game and Game.Time) or 0 end
 
 -- Fenêtre de “rattrapage” UI côté client (force relecture des labels)
@@ -55,7 +55,8 @@ local function schedule_refresh(secs)
 end
 
 -- Rafales de snapshot côté HOST (re-broadcast périodique pendant quelques secondes)
-local _burst_until, _burst_next = 0, 0
+local _burst_until, _burst_next, _burst_period = 0, 0, 0
+local _snapshot_pending = false
 local function HostBurst_Start(secs, period)
   _burst_until = NOW() + (secs or 4)*SEC
   _burst_next  = 0
@@ -188,7 +189,7 @@ local function request_boss_snapshot()
   if Multiplayer and Multiplayer.allow_remote_event then
     Multiplayer.allow_remote_event("mawBossNamesReq")
     Multiplayer.broadcast_mapdata(
-      { DataType = "mawBossNamesReq", map = (Map and Map.Name) or "", sender = (Multiplayer.player_id or "client") },
+      { DataType = "mawBossNamesReq", map = (Map and Map.Name) or "", sender = Multiplayer.my_id },
       "mawBossNamesReq"
     )
   end
@@ -197,10 +198,7 @@ end
 -- Host -> répond à la requête (envoie bossNames puis bossSet)
 function events.mawBossNamesReq(t)
   if not inMulti() or not isHost() then return end
-  if mawmapvarsend and mapvars and (mapvars.bossNames or mapvars.bossSet) then
-    if mapvars.bossNames then mawmapvarsend("bossNames", mapvars.bossNames) end
-    if mapvars.bossSet   then mawmapvarsend("bossSet",   mapvars.bossSet)   end
-  end
+  BossSync_BroadcastSnapshot()
   -- lance une courte rafale pour fiabiliser
   HostBurst_Start(4, 0.6)
 end
@@ -217,11 +215,18 @@ end
 -- API côté host : broadcast immédiat du snapshot
 ------------------------------------------------------------
 function BossSync_BroadcastSnapshot()
+  _snapshot_pending = false
   if not inMulti() or not isHost() then return end
   if mawmapvarsend and mapvars then
     if mapvars.bossNames then mawmapvarsend("bossNames", mapvars.bossNames) end
+    if mapvars.bossData  then mawmapvarsend("bossData",  mapvars.bossData)  end
     if mapvars.bossSet   then mawmapvarsend("bossSet",   mapvars.bossSet)   end
   end
+end
+
+function BossSync_ScheduleBroadcast()
+  if not inMulti() or not isHost() then return end
+  _snapshot_pending = true
 end
 
 -- Quand un client rejoint la partie alors que le host est déjà sur la map
@@ -249,7 +254,7 @@ end
 
 
 -- Après chargement : applique ce qu’on a et redemande le snapshot si besoin
-function events.AfterLoadMap()
+local function on_map_ready()
   if mapvars and mapvars.bossNames then apply_boss_names(mapvars.bossNames) end
   if mapvars and mapvars.bossSet   then
     local have_names = mapvars and mapvars.bossNames and next(mapvars.bossNames) ~= nil
@@ -266,9 +271,23 @@ function events.AfterLoadMap()
   end
 end
 
+function events.AfterLoadMap()
+  if inMulti() then return end
+  on_map_ready()
+end
+
+function events.MultiplayerMapDataProcessed()
+  if not inMulti() then return end
+  on_map_ready()
+end
+
 -- Tick : 1) fenêtre de “rattrapage” UI côté client  2) rafales host
 function events.Tick()
   local now = NOW()
+
+  if _snapshot_pending then
+    BossSync_BroadcastSnapshot()
+  end
 
   -- client: forcer la relecture des labels pendant la fenêtre
   if _boss_refresh_until and now < _boss_refresh_until then
@@ -290,7 +309,7 @@ end
 -- Ctrl+F9: auto-dump on AfterLoadMap (toggle) • Alt+F9: écrit boss_dump.txt
 -- Non-invasif : ne modifie ni la génération ni la synchro, lit seulement mapvars/Map.
 
-local SEC = (const and const.Second) or 1
+local SEC = const.Minute/2
 local function NOW() return (Game and Game.Time) or 0 end
 
 -- File-scoped state

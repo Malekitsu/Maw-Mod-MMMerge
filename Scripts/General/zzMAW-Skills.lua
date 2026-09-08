@@ -1005,7 +1005,7 @@ function chargeTimer()
 end
 --movement
 function mawTick_ChargeMovement()
-	if Multiplayer and Multiplayer.client_monsters()[0] and checkCharge and checkCharge>=0 then
+	if Multiplayer and Multiplayer.in_game and checkCharge and checkCharge>=0 then
 		--check for charge working
 		checkCharge=checkCharge-1
 	end

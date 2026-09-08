@@ -48,7 +48,7 @@ local function getDistance(x, y, z)
 end
 _G.getDistance = _G.getDistance or getDistance
 
-local SEC = (const and const.Second) or 1
+local SEC = const.Minute/2
 local function NOW() return (Game and Game.Time) or 0 end
 local _net_quiet_until = 0
 local function NetQuiet(secs) _net_quiet_until = math.max(_net_quiet_until, NOW() + (secs or 2.5)*SEC) end

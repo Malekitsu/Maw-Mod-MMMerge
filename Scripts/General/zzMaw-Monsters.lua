@@ -2783,7 +2783,7 @@ teleport behind party
 
 
 -- === AFTER LOAD MAP (host generates; clients do not generate) ===
-function events.AfterLoadMap()
+local function mawBossesOnMapReady()
 	local IN_MULTI  = Multiplayer and Multiplayer.in_game
 	local IS_HOST   = IN_MULTI and Multiplayer.im_host and Multiplayer.im_host()
 
@@ -2872,6 +2872,16 @@ function events.AfterLoadMap()
       BossSync_BroadcastSnapshot()
     end
   end
+end
+
+function events.AfterLoadMap()
+	if Multiplayer and Multiplayer.in_game then return end
+	mawBossesOnMapReady()
+end
+
+function events.MultiplayerMapDataProcessed()
+	if not (Multiplayer and Multiplayer.in_game) then return end
+	mawBossesOnMapReady()
 end
 
 
@@ -3006,6 +3016,9 @@ function generateBoss(index, nameIndex, skillType)
 	-- Generate and assign loot seed for this boss
 	if generateBossLootSeed then
 		generateBossLootSeed(index, mon.Id)
+	end
+	if type(BossSync_ScheduleBroadcast)=="function" then
+		BossSync_ScheduleBroadcast()
 	end
 end
 
@@ -3751,7 +3764,7 @@ end
 
 function mawTick_RestoreProjectiles()
 	if vars.MAWSETTINGS.restoreProjectiles=="OFF" then return end
-	if Multiplyer and Multiplayer.in_game then return end
+	if Multiplayer and Multiplayer.in_game then return end
 	for i=0, Map.Objects.High do
 		local obj=Map.Objects[i]
 		if transform[obj.Type] and obj.Owner%8==3 and obj.Spell==0 then
@@ -4042,6 +4055,9 @@ function events.PickCorpse(t)
 				table.remove(mapvars.bossSet, i)
 			end
 		end
+	end
+	if type(BossSync_ScheduleBroadcast)=="function" then
+		BossSync_ScheduleBroadcast()
 	end
 	RunNextTick(function()
 		if mon.AIState==11 then

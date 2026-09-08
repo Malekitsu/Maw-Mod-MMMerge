@@ -248,6 +248,7 @@ function addBolsterExp(experience)
 	local currentLvl = calcLevel(vars.EXPBEFORE)
 	vars.MMLVL[currentWorld] = vars.MMLVL[currentWorld] + currentLvl - vars.LVLBEFORE
 	vars.LVLBEFORE = currentLvl
+	ShareBolster()
 end
 
 
@@ -265,9 +266,6 @@ function getTotalLevel()
 	for i=1,4 do
 		result = result + vars.MMLVL[i]
 	end
-	
-	ShareBolster()
-	
 	return result
 end
 
@@ -294,9 +292,6 @@ function getPartyLevel(currentWorld)
 			result = result + vars.MMLVL[i]
 		end
 	end
-	
-	ShareBolster()
-	
 	return result
 end
 
