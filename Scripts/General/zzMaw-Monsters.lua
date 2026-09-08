@@ -2825,7 +2825,9 @@ local function mawBossesOnMapReady()
 				if getMapAffixPower(17) then
 					for i = 0, Map.Monsters.High do
 						if Map.Monsters[i].Id % 3 ~= 0 and not table.find(puppets, i) and math.random() < getMapAffixPower(17) / 100 then
-							Map.Monsters[i].Id = Map.Monsters[i].Id + 1
+							local mon = Map.Monsters[i]
+							mon:SetId(mon.Id + 1)
+							mon:LoadFramesAndSounds()
 						end
 					end
 				end

@@ -110,7 +110,10 @@ local function apply_boss_set(list, do_refresh_after)
       local idx, nid, mid = pair[1], pair[2], pair[3]   -- mid = monster.Id (tier)
       local mon = Map.Monsters[idx]
       if mon and mon.AIState ~= 11 then
-        if type(mid) == "number" then mon.Id = mid end   -- aligne le tier côté clients
+        if type(mid) == "number" and mon.Id ~= mid then   -- aligne le tier côté clients
+          mon:SetId(mid)
+          mon:LoadFramesAndSounds()
+        end
         if type(nid) == "number" then mon.NameId = nid end
       end
     end
@@ -270,7 +273,10 @@ function BossSync_ApplyBossAdded(t)
   if Map and Map.Monsters and t.index < Map.Monsters.count then
     local mon = Map.Monsters[t.index]
     if mon.AIState ~= 11 then
-      if type(t.id) == "number" then mon.Id = t.id end
+      if type(t.id) == "number" and mon.Id ~= t.id then
+        mon:SetId(t.id)
+        mon:LoadFramesAndSounds()
+      end
       if type(t.nid) == "number" then mon.NameId = t.nid end
     end
   end
