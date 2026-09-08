@@ -52,7 +52,10 @@ local SEC	= const.Minute/2
 local NOW	= function() return (Game and Game.Time) or 0 end
 local BASE_RADIUS	= 20000
 local SEND_PERIOD	= 4 * SEC
+local HEARTBEAT		= 30 * SEC
 local DAY					= const.Day
+
+local last_on_signature, last_on_time = nil, 0
 
 local function maxSpellId()
 	if Game and Game.Spells and type(Game.Spells.High)=="number" then return Game.Spells.High end
@@ -363,9 +366,30 @@ local function sendBuffs()
 		if not current[id] and not BLOCK[id] then payload_off[id] = 1; hasOff = true end
 	end
 
-	if hasOn	then Multiplayer.broadcast_mapdata(payload_on,	"MAWMapvarArrived") end
+	local signature = {}
+	for id, v in pairs(payload_on) do
+		if type(id) == "number" then
+			signature[#signature + 1] = id .. ":" .. v[1] .. "/" .. v[2] .. "/" .. v[3]
+		end
+	end
+	table.sort(signature)
+	signature = table.concat(signature, ",")
+	local now = NOW()
+	local forced = next(vars._maw_last_sent or {}) == nil
+	if hasOn and (forced or signature ~= last_on_signature or now - last_on_time >= HEARTBEAT or now < last_on_time) then
+		Multiplayer.broadcast_mapdata(payload_on, "MAWMapvarArrived")
+		last_on_signature, last_on_time = signature, now
+	end
 	if hasOff then Multiplayer.broadcast_mapdata(payload_off, "MAWMapvarArrived") end
 	vars._maw_last_sent = current
+end
+
+function events.ClientJoined()
+	last_on_signature = nil
+end
+
+function events.ClientChangeMap()
+	last_on_signature = nil
 end
 
 ------------------------------------------------------------

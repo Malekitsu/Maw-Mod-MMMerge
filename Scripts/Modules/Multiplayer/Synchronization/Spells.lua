@@ -731,6 +731,9 @@ local function share_auras()
 	if not Multiplayer.in_game then
 		return
 	end
+	if vars.MAWSETTINGS and vars.MAWSETTINGS.buffRework == "ON" then
+		return -- Maw shares its buffs itself; these would only ping-pong with them
+	end
 
 	for spell_id, info in pairs(auras) do
 		if info.aura_type == 'party' then

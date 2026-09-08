@@ -295,7 +295,20 @@ function events.ClientJoined(client)
 	end
 end
 
+-- the arbiter leaving hands the map's claims to the next main player, so a
+-- chest or a stock someone is in stays taken
 function events.LeaveMap()
+	if Multiplayer.in_game and Multiplayer.connector and Multiplayer.main_player_on_map() == Multiplayer.my_id then
+		local heir
+		for client_id, client in pairs(Multiplayer.connector.clients) do
+			if client.in_game and client.map == Map.MapStatsIndex and (not heir or client_id < heir) then
+				heir = client_id
+			end
+		end
+		if heir then
+			Multiplayer.add_to_send_queue(heir, packets.claims_snapshot:prep("map"))
+		end
+	end
 	reset("map")
 end
 

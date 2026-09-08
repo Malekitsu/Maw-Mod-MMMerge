@@ -19,6 +19,38 @@ Multiplayer.NO_SYNC_OBJECT_BIT = NO_SYNC_OBJECT_BIT -- no synchronization if bit
 local last_object_state = {}
 local last_object_postime = {}
 
+---- object versions ----
+-- every state broadcast of an object carries a version: whoever sends bases it
+-- on the highest one seen plus one, so a late packet can never undo a newer
+-- state. Equal versions from two senders settle on the lower client id.
+-- Position updates do not bump: they apply only on the version they were made on.
+
+local versions = {} -- sync ID -> {v = n, sender = client id}
+Multiplayer.debug.object_versions = versions
+
+local function version_of(ID)
+	local e = versions[ID]
+	if e then
+		return e.v, e.sender
+	end
+	return 0, -1
+end
+
+local function bump_version(ID)
+	local v = version_of(ID) + 1
+	versions[ID] = {v = v, sender = Multiplayer.my_id}
+	return v
+end
+
+local function accept_version(ID, v, sender)
+	local cur, cur_sender = version_of(ID)
+	if v > cur or (v == cur and sender < cur_sender) then
+		versions[ID] = {v = v, sender = sender}
+		return true
+	end
+	return false
+end
+
 local gold_pile_ids = {[187] = true, [188] = true, [189] = true, [999] = true, [1000] = true, [1001] = true, [1799] = true, [1800] = true, [1801] = true}
 local PICKED_BY_OTHER_TEXT = "Another player picked that up first."
 
@@ -148,6 +180,24 @@ function events.MultiplayerStarted()
 	current_ID = 0
 end
 
+-- versions live with the map: the player already there hands them over with the map data
+function events.LeaveMap()
+	table.clear(versions)
+end
+
+function events.MultiplayerPrepMapData(t)
+	t.ObjectVersions = versions
+end
+
+function events.MultiplayerProcessMapData(t)
+	if t.ObjectVersions then
+		table.clear(versions)
+		for ID, e in pairs(t.ObjectVersions) do
+			versions[ID] = e
+		end
+	end
+end
+
 function Multiplayer.debug.list_obj_IDs()
 	for i, v in Map.Objects do
 		print(i, getID(v))
@@ -227,6 +277,8 @@ local function object_bin(i)
 	return mstr(first, last - first, true)
 end
 
+local waiting_for_send = {}
+
 local packets = {
 	objects_info = {
 		bulb = function(object_ids)
@@ -239,13 +291,13 @@ local packets = {
 				if bit.And(object.Owner, 7) == 4 then
 					old_owner = object.Owner
 					object.Owner = REMOTE_PLAYER_REF + bit.lshift(Multiplayer.my_id, 3) -- mark object as owned by remote player
-					t[ID] = object_bin(i)
+					t[ID] = {bump_version(ID), object_bin(i)}
 					object.Owner = old_owner
 				else
-					t[ID] = object_bin(i)
+					t[ID] = {bump_version(ID), object_bin(i)}
 				end
 			end
-			
+
 			return item_to_bin(t)
 		end,
 		handler = function(bin_string, metadata)
@@ -265,17 +317,20 @@ local packets = {
 			end
 
 			local t = binstr_to_item(bin_string)
-			local i, object, new
-			for ID, str in pairs(t) do
-				object, i = get_obj_by_ID(ID)
-				new = structs.MapObject:new(toptr(str))
-				if new.SpellType > 0 and object.Item.Number > 0 then
-					-- Prevent overwriting items with spells.
-					-- Happens on short frame after simultaneous map load.
-					-- Cannot find root issue at the moment.
-					Multiplayer.utils.LogEvent("SYNC", "Attempt to overwrite object-item with object-spell: id %d, hash %d, from #%d", i, ID, metadata.sender_id)
-				else	
-					import(i, object, str)
+			local i, object, new, str
+			for ID, entry in pairs(t) do
+				str = entry[2]
+				if accept_version(ID, entry[1], metadata.sender_id) then
+					object, i = get_obj_by_ID(ID)
+					new = structs.MapObject:new(toptr(str))
+					if new.SpellType > 0 and object.Item.Number > 0 then
+						-- Prevent overwriting items with spells.
+						-- Happens on short frame after simultaneous map load.
+						-- Cannot find root issue at the moment.
+						Multiplayer.utils.LogEvent("SYNC", "Attempt to overwrite object-item with object-spell: id %d, hash %d, from #%d", i, ID, metadata.sender_id)
+					else
+						import(i, object, str)
+					end
 				end
 			end
 		end,
@@ -287,30 +342,51 @@ local packets = {
 		bulb = function(object_ids)
 			local fields = {"TypeIndex","X","Y","Z","VelocityX","VelocityY","VelocityZ"}
 			local t = {}
-			local obj
+			local obj, ID
 			for _, id in pairs(object_ids) do
 				obj = Map.Objects[id]
-				t[getsetID(obj, id)] = nums_to_bin(obj, fields, 2)
+				ID = getsetID(obj, id)
+				t[ID] = {(version_of(ID)), nums_to_bin(obj, fields, 2)}
 			end
 			return item_to_bin(t)
 		end,
 		handler = function(bin_string, metadata)
 			local fields = {"TypeIndex","X","Y","Z","VelocityX","VelocityY","VelocityZ"}
 			local t = {X = 0, Y = 0, Z = 0, TypeIndex = 0}
-			local obj
-			for ID, bin in pairs(binstr_to_item(bin_string)) do
-				obj = find_obj_by_ID(ID)
-				if obj then
-					XYZ(t, XYZ(obj))
-					fill_from_bin(obj, toptr(bin), fields, 2, true)
-					if distance(obj, t) < 256 then
-						XYZ(obj, XYZ(t))
+			local obj, cur
+			for ID, entry in pairs(binstr_to_item(bin_string)) do
+				cur = version_of(ID)
+				if entry[1] == cur then
+					obj = find_obj_by_ID(ID)
+					if obj then
+						XYZ(t, XYZ(obj))
+						fill_from_bin(obj, toptr(entry[2]), fields, 2, true)
+						if distance(obj, t) < 256 then
+							XYZ(obj, XYZ(t))
+						end
 					end
+				elseif entry[1] > cur then
+					-- we missed a state packet: ask the sender for the whole object
+					Multiplayer.add_to_send_queue(metadata.sender_id, packets.request_object_info:prep(ID))
 				end
 			end
 		end,
 		same_map_only = true,
 		compress = true
+	},
+
+	request_object_info = {
+		bulb = function(ID)
+			return Multiplayer.utils.num_to_hexstr(ID, 4)
+		end,
+		handler = function(bin_string, metadata)
+			local ID = Multiplayer.utils.num_from_hexstr(bin_string, 4)
+			local obj, i = find_obj_by_ID(ID)
+			if obj then
+				table.insert(waiting_for_send, i)
+			end
+		end,
+		same_map_only = true
 	},
 
 	pick_object_sound = {
@@ -322,7 +398,6 @@ local packets = {
 }
 Multiplayer.utils.init_packets(packets)
 
-local waiting_for_send = {}
 local function sync_objects()
 	if Multiplayer.leave_map_halt or Multiplayer.OnDeathScreen() then
 		return

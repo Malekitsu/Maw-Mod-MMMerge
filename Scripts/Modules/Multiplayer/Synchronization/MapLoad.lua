@@ -408,13 +408,19 @@ local function get_remote_map_data(map_id)
 	local filename = Game.MapStats[map_id].FileName
 
 	LogEvent("MAP_LOAD", "%s: asking players for map data.", filename)
+	-- everyone on that map is asked at once; the first real answer wins
+	local hashes = {}
 	for client_id, client in pairs(Multiplayer.connector.clients) do
 		if client.map == map_id then
-			got_response, response = get_client_map_data(client_id, map_id)
-			if got_response and response.handler_result then
-				LogEvent("MAP_LOAD", "%s: got data from player #%s.", filename, client_id)
-				return got_response, response, true
-			end
+			LogEvent("MAP_LOAD", "%s: asking player #%s.", filename, client_id)
+			table.insert(hashes, Multiplayer.add_to_send_queue(client_id, packets.request_map_data:prep(map_id)))
+		end
+	end
+	if #hashes > 0 then
+		response = Multiplayer.wait_first_response(hashes, 12, function(r) return r.handler_result end)
+		if response then
+			LogEvent("MAP_LOAD", "%s: got data from player #%s.", filename, response.metadata.sender_id)
+			return true, response, true
 		end
 	end
 

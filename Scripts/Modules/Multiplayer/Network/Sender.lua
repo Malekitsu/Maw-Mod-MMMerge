@@ -93,6 +93,41 @@ local function wait_response(hash, timeout)
 end
 Multiplayer.wait_response = wait_response
 
+-- several questions out, first acceptable answer back; nil when nobody
+-- answered in time or every answer was refused by `accept`
+local function wait_first_response(hashes, timeout, accept)
+	local endtime = os.time() + timeout
+	local pending = {}
+	for _, hash in pairs(hashes) do
+		pending[hash] = true
+	end
+
+	repeat
+		if not Multiplayer.connector then
+			return nil
+		end
+
+		network_cycle()
+		for hash in pairs(pending) do
+			local response = response_received(hash)
+			if response then
+				pending[hash] = nil
+				local result = {bin_string = response:full_bulb(), metadata = response.metadata, handler_result = response.handler_result}
+				if not accept or accept(result) then
+					return result
+				end
+			end
+		end
+		if next(pending) == nil then
+			return nil
+		end
+		socket.sleep(0.02)
+
+	until os.time() > endtime
+	return nil
+end
+Multiplayer.wait_first_response = wait_first_response
+
 local function send_wait_response(client_id, packet, timeout, ...)
 	assert(packet.check_delivery and packet.response, "Cannot wait response for packet without 'check_delivery' flag and 'response' field set.")
 

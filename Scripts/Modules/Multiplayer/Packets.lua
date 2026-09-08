@@ -578,7 +578,8 @@ Multiplayer.require("Network/Receiver.lua")
 ----------------------------------------------------------------
 -- connection holding
 
-Multiplayer.CLIENT_TIMEOUT_PERIOD = 300
+Multiplayer.CLIENT_TIMEOUT_PERIOD = 30
+Multiplayer.LOADING_TIMEOUT_PERIOD = 300
 local function check_clients_connections()
 	if Multiplayer.CLIENT_TIMEOUT_PERIOD == 0 then
 		return
@@ -588,9 +589,10 @@ local function check_clients_connections()
 	local clients_left = {}
 	for client_id, client in pairs(Multiplayer.connector.clients) do
 		local diff = timestamp - client.last_packet_timestamp
-		if diff > Multiplayer.CLIENT_TIMEOUT_PERIOD then
+		local limit = client.loading and Multiplayer.LOADING_TIMEOUT_PERIOD or Multiplayer.CLIENT_TIMEOUT_PERIOD
+		if diff > limit then
 			table.insert(clients_left, client)
-		elseif diff > Multiplayer.CLIENT_TIMEOUT_PERIOD * 0.5 then
+		elseif diff > limit * 0.5 then
 			Multiplayer.add_to_send_queue(client_id, packets.ping_request:prep())
 		end
 	end
@@ -605,7 +607,21 @@ local function check_clients_connections()
 	end
 end
 
-Multiplayer.utils.MillisecCounter(check_clients_connections, Multiplayer.CLIENT_TIMEOUT_PERIOD * 500)
+Multiplayer.utils.MillisecCounter(check_clients_connections, 5000)
+
+function events.ClientChangeMap(client_id, old, new)
+	local client = Multiplayer.connector.clients[client_id]
+	if client then
+		client.loading = new == -1 or nil
+	end
+end
+
+function events.MapLoadingDone()
+	local timestamp = os.time()
+	for _, client in pairs(Multiplayer.connector.clients) do
+		client.last_packet_timestamp = timestamp
+	end
+end
 
 function events.MultiplayerStopped()
 	table.clear(Multiplayer.outgoing_packets())
