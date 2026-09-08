@@ -61,7 +61,7 @@ function events.LeaveMap()
 	damaged_monsters = {}
 end
 
-function events.Tick()
+local function send_damage()
 	if Multiplayer.leave_map_halt then
 		return
 	end
@@ -87,3 +87,4 @@ function events.Tick()
 		damaged_monsters = {}
 	end
 end
+Multiplayer.utils.TickCounter(send_damage, 4)

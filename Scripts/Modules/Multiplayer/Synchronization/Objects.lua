@@ -19,6 +19,11 @@ Multiplayer.NO_SYNC_OBJECT_BIT = NO_SYNC_OBJECT_BIT -- no synchronization if bit
 local last_object_state = {}
 local last_object_postime = {}
 
+-- pickups done on trust: request hash -> what we took, rolled back if the host says no
+local pending_pickups = {}
+local gold_pile_ids = {[187] = true, [188] = true, [189] = true, [999] = true, [1000] = true, [1001] = true, [1799] = true, [1800] = true, [1801] = true}
+local PICKED_BY_OTHER_TEXT = "Another player picked that up first."
+
 ---- object ID setup -----
 
 local current_ID = 0
@@ -321,7 +326,11 @@ local packets = {
 				return true
 			end
 
-			local can_pickup = not object.Removed
+			local can_pickup = not object.Removed and object.TypeIndex ~= 0
+			if not can_pickup and not object.Removed and object.TypeIndex == 0
+					and bit.And(object.Owner, 7) == REMOTE_PLAYER_REF and bit.rshift(object.Owner, 3) == metadata.sender_id then
+				can_pickup = true -- the asker's own pickup notification got here before the question
+			end
 			if can_pickup then
 				object.TypeIndex = 0
 				object.Removed = true
@@ -339,7 +348,19 @@ local packets = {
 			return handler_result and '\1' or '\0'
 		end,
 		handler = function(bin_string, metadata)
-			return bin_string == '\1'
+			local allowed = bin_string == '\1'
+			local taken = pending_pickups[metadata.response_to]
+			pending_pickups[metadata.response_to] = nil
+			if taken and not allowed then
+				-- somebody else got there first: give back what the engine already handed us
+				if taken.Gold then
+					evt.Subtract("Gold", taken.Gold)
+				else
+					evt.Subtract("Items", taken.Number)
+				end
+				Game.ShowStatusText(PICKED_BY_OTHER_TEXT)
+			end
+			return allowed
 		end,
 		check_delivery = true,
 		same_map_only = true
@@ -355,11 +376,11 @@ local packets = {
 Multiplayer.utils.init_packets(packets)
 
 local waiting_for_send = {}
-function events.Tick()
+local function sync_objects()
 	if Multiplayer.leave_map_halt or Multiplayer.OnDeathScreen() then
 		return
 	end
-	
+
 	remove_ID_doubles()
 	
 	local pos_update = {}
@@ -380,6 +401,7 @@ function events.Tick()
 		Multiplayer.broadcast(packets.objects_position:prep(pos_update), cond_same_map)
 	end
 end
+Multiplayer.utils.TickCounter(sync_objects, 4)
 
 function events.CanRepairItem(t)
 	if t.Object and t.CanRepair then
@@ -415,7 +437,7 @@ Multiplayer.utils.broadcast_pick_object_sound = broadcast_pick_object_sound
 
 local function notify_object_picked(i)
 	local obj = Map.Objects[i]
-	obj.Owner = REMOTE_PLAYER_REF
+	obj.Owner = REMOTE_PLAYER_REF + bit.lshift(Multiplayer.my_id, 3)
 	obj.Bits = bit.Or(obj.Bits, PICKED_BY_PLAYER_BIT)
 	fill_state(i, obj)
 	table.insert(waiting_for_send, i)
@@ -432,43 +454,31 @@ local function notify_object_picked(i)
 	obj.Type, obj.TypeIndex = oType, oTypeIndex
 end
 
+-- the pickup happens at once; when another player is close enough to be a
+-- rival, the host is asked in the background and a "no" takes the item back
 local function can_pick_object(t)
-	if Multiplayer.my_id == Multiplayer.main_player_on_map() then
-		notify_object_picked(t.ObjectId)
-		return -- i am host, no checks necessary
-	end
+	local main_player = Multiplayer.main_player_on_map()
+	if Multiplayer.my_id ~= main_player then
+		local object, need_check = Map.Objects[t.ObjectId], false
+		for i, v in pairs(SyncPlayers.client_monsters()) do
+			if v < Map.Monsters.count and Multiplayer.utils.distance(Map.Monsters[v], object) < 1000 then
+				need_check = true
+				break
+			end
+		end
 
-	-- if other players are in range of object, ask host if object can be picked up, to prevent duplications.
-	local object, need_check = Map.Objects[t.ObjectId], false
-	for i, v in pairs(SyncPlayers.client_monsters()) do
-		if v < Map.Monsters.count and Multiplayer.utils.distance(Map.Monsters[v], object) < 1000 then
-			need_check = true
-			break
+		if need_check then
+			local item = object.Item
+			local hash = Multiplayer.add_to_send_queue(main_player, packets.can_pickup_object:prep(t.ObjectId))
+			pending_pickups[hash] = {Number = item.Number, Gold = gold_pile_ids[item.Number] and item.Bonus2 or nil}
 		end
 	end
 
-	if need_check then
-		-- potential concurrents in range.
-		LogEvent("SYNC", "Asking host whether object #%s is pickable", t.ObjectId)
-		local got_response, response = Multiplayer.send_wait_response(Multiplayer.main_player_on_map(), packets.can_pickup_object, 4, t.ObjectId)
-		if not got_response then
-			-- forbid pickup, but keep object for new attempt
-			t.Handled = true
-			LogEvent("SYNC", "No response, keeping object for future attempt")
-		elseif not response.handler_result then
-			-- host forbids pickup, happens when object was picked up by other player, but was not syncronized in time.
-			-- forbid pickup, remove object
-			LogEvent("SYNC", "Host forbids picking up, removing object")
-			Map.Objects[t.ObjectId].TypeIndex = 0
-			t.Handled = true
-		else
-			LogEvent("SYNC", "Host allows picking up")
-		end
-	end
+	notify_object_picked(t.ObjectId)
+end
 
-	if not t.Handled then
-		notify_object_picked(t.ObjectId)
-	end
+function events.LeaveMap()
+	table.clear(pending_pickups)
 end
 events.PickObject = can_pick_object
 

@@ -418,7 +418,7 @@ function events.BeforeSaveGame()
 	Multiplayer.broadcast_keep_hash(packets.save_game, nil, hashes)
 	LogEvent("SAVE_LOAD", "I'm host, saving game. Sent save data requests: %s", table.concat(hashes, ","))
 
-	Multiplayer.wait_responses(hashes, 20)
+	-- client data arrives on its own and updates RemotePlayers; the save takes what is already there
 
 	Multiplayer.SaveGameData().GameData = Multiplayer.prep_game_data()
 end
