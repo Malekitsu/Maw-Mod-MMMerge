@@ -1449,6 +1449,7 @@ local pipe = MawCore.Pipeline.new("DamageToMonster", {
 	"track-and-clamp",			-- [reactions] tracking + status message
 	"monster-hp",				-- [clamp] real-HP ledger, proxy conversion
 	"final-clamp",				-- [clamp] ceil + 32500 cap
+	"publish",					-- [out] MawMonsterDamage event with the final t
 })
 
 pipe:on("context",           "MawCore",              stage_context)
@@ -1483,6 +1484,7 @@ pipe:on("leech",             "zzMAWStatusMsg:24",    stage_leech)
 pipe:on("track-and-clamp",   "zzMAWStatusMsg:151",   stage_trackAndClamp)
 pipe:on("monster-hp",        "MawCore",              stage_monsterHP)
 pipe:on("final-clamp",       "MawCore",              stage_finalClamp)
+pipe:on("publish",           "MawCore",              function(t) events.call("MawMonsterDamage", t) end)
 
 Damage.pipe = pipe
 

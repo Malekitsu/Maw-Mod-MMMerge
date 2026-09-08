@@ -64,7 +64,7 @@ end
 
 -- Helper function to get list of player-controlled monsters in multiplayer
 local function getPlayerControlledMonsters()
-	if not (Multiplayer and Multiplayer.in_game) then
+	if not MawCore.Sync.inGame() then
 		return {}
 	end
 	-- Use Multiplayer.client_monsters() to get player-controlled monster indices
@@ -2680,7 +2680,7 @@ function checkMapCompletition()
 				addBolsterExp(experience)
 				--end
 				experience=round(experience*5/Party.Count/1000)*1000
-				if Multiplayer and Multiplayer.in_game then
+				if MawCore.Sync.inGame() then
 					experience=round(experience / math.min(PlayersInGame(),5)/1000)*1000
 				end
 				for i=0,Party.High do
@@ -2784,8 +2784,8 @@ teleport behind party
 
 -- === AFTER LOAD MAP (host generates; clients do not generate) ===
 local function mawBossesOnMapReady()
-	local IN_MULTI  = Multiplayer and Multiplayer.in_game
-	local IS_HOST   = IN_MULTI and Multiplayer.im_host and Multiplayer.im_host()
+	local IN_MULTI  = MawCore.Sync.inGame()
+	local IS_HOST   = MawCore.Sync.isHost()
 
 	-- Multi-client: block local generation; the zzBossSync module will request a snapshot.
 	if IN_MULTI and not IS_HOST then
@@ -2875,12 +2875,12 @@ local function mawBossesOnMapReady()
 end
 
 function events.AfterLoadMap()
-	if Multiplayer and Multiplayer.in_game then return end
+	if MawCore.Sync.inGame() then return end
 	mawBossesOnMapReady()
 end
 
 function events.MultiplayerMapDataProcessed()
-	if not (Multiplayer and Multiplayer.in_game) then return end
+	if not MawCore.Sync.inGame() then return end
 	mawBossesOnMapReady()
 end
 
@@ -3764,7 +3764,7 @@ end
 
 function mawTick_RestoreProjectiles()
 	if vars.MAWSETTINGS.restoreProjectiles=="OFF" then return end
-	if Multiplayer and Multiplayer.in_game then return end
+	if MawCore.Sync.inGame() then return end
 	for i=0, Map.Objects.High do
 		local obj=Map.Objects[i]
 		if transform[obj.Type] and obj.Owner%8==3 and obj.Spell==0 then

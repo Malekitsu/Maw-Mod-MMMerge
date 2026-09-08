@@ -150,11 +150,11 @@ function events.MonsterKillExp(t)
 	end 
 	]]
 	
-	if Multiplayer and Multiplayer.in_game then
+	if MawCore.Sync.inGame() then
 		t.Exp=0
 		return
 	end
-	if vars.madnessMode then 
+	if vars.madnessMode then
 		if mapvars.mawBounty or Map.Name=="zarena.blv" or Map.Name=="d42.blv" or Map.Name=="7d05.blv" then
 			t.Exp=0
 			return
@@ -243,25 +243,18 @@ function events.BeforeLoadMap(wasInGame)
 end
 
 function addBolsterExp(experience)
+	if MawCore.Sync.isClient() then
+		return
+	end
 	local currentWorld = TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 	vars.EXPBEFORE = vars.EXPBEFORE + experience
 	local currentLvl = calcLevel(vars.EXPBEFORE)
 	vars.MMLVL[currentWorld] = vars.MMLVL[currentWorld] + currentLvl - vars.LVLBEFORE
 	vars.LVLBEFORE = currentLvl
-	ShareBolster()
 end
 
 
-function getTotalLevel() 
-	if Multiplayer and Multiplayer.in_game then
-		if not Multiplayer.im_host() and vars.MultiplayerBolsterLevels then
-			local lvl=0
-			for i=1,4 do
-				lvl = lvl + vars.MultiplayerBolsterLevels[i]
-			end
-			return lvl
-		end
-	end
+function getTotalLevel()
 	local result = 0
 	for i=1,4 do
 		result = result + vars.MMLVL[i]
@@ -274,18 +267,7 @@ function getTotalExp()
 end
 
 function getPartyLevel(currentWorld)
-	currentWorld = currentWorld or TownPortalControls.MapOfContinent(Map.MapStatsIndex) 
-	if Multiplayer and Multiplayer.in_game then
-		if not Multiplayer.im_host() and vars.MultiplayerBolsterLevels then
-			local lvl=0
-			for i=1,4 do
-				if currentWorld ~= i then
-					lvl = lvl + vars.MultiplayerBolsterLevels[i]
-				end
-			end
-			return lvl
-		end
-	end
+	currentWorld = currentWorld or TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 	local result = 0
 	for i=1,4 do
 		if currentWorld ~= i then

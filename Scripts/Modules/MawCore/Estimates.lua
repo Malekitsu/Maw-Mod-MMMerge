@@ -484,7 +484,7 @@ function getMonsterDamage(mon, level)
 	local index=mon:GetIndex()
 	if mon.NameId>=220 and mon.NameId<=300 then
 		mapvars.bossData=mapvars.bossData or {}
-		if not mapvars.bossData[index] and not (Multiplayer and Multiplayer.in_game and not Multiplayer.im_host()) then
+		if not mapvars.bossData[index] and not MawCore.Sync.isClient() then
 			generateBoss(index)
 		end
 		local boss=mapvars.bossData[index]
@@ -715,7 +715,7 @@ function getMonsterHealth(mon, level)
 	local index=mon:GetIndex()
 	if mon.NameId>=220 and mon.NameId<=300 then
 		mapvars.bossData=mapvars.bossData or {}
-		if not mapvars.bossData[index] and not (Multiplayer and Multiplayer.in_game and not Multiplayer.im_host()) then
+		if not mapvars.bossData[index] and not MawCore.Sync.isClient() then
 			generateBoss(index)
 		end
 		local boss=mapvars.bossData[index]

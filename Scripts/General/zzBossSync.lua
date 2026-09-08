@@ -29,20 +29,11 @@ if not rawget(_G, "mawmapvarsend") then
   end
 end
 
-local function inMulti() return Multiplayer and Multiplayer.in_game end
+local function inMulti() return MawCore.Sync.inGame() end
 
 local function isHost()
-  if not Multiplayer then return true end
-  if type(Multiplayer.im_host) == "function" then
-    local ok,res = pcall(Multiplayer.im_host, Multiplayer)
-    if ok and res ~= nil then return not not res end
-  end
-  if Multiplayer.is_host ~= nil then return not not Multiplayer.is_host end
-  if Multiplayer.IsHost  ~= nil then return not not Multiplayer.IsHost  end
-  if Multiplayer.host_id and Multiplayer.player_id then return Multiplayer.player_id == Multiplayer.host_id end
-  if type(Multiplayer.player_id)=="number" then return Multiplayer.player_id == 0 end
-  if type(Multiplayer.player_id)=="string" then return Multiplayer.player_id == "host" end
-  return false
+  if not inMulti() then return true end
+  return MawCore.Sync.isHost()
 end
 
 local SEC = const.Minute/2

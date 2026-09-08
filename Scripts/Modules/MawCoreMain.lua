@@ -55,6 +55,7 @@ MawCore.ModuleOrder = {
 	"MonsterHP",	-- real monster HP beyond the engine's 16-bit field
 	"DamageState",	-- the two damage values legacy files share (MP hook points)
 	"Damage",		-- CalcDamageToMonster pipeline (DAMAGE_PIPELINE.md)
+	"Sync",			-- multiplayer: host/client role, host-owned game state
 }
 
 for _, name in ipairs(MawCore.ModuleOrder) do

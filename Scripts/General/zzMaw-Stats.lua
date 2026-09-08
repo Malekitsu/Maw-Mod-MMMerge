@@ -464,11 +464,7 @@ function events.BuildStatInformationBox(t)
 		local bolsterLevel8=math.max(bolsterLevel8-4,0)
 		local bolsterLevel7=math.max(bolsterLevel7-4,0)
 		local bolsterLevel6=math.max(bolsterLevel6-4,0)
-		if Multiplayer and Multiplayer.in_game and not Multiplayer.im_host() and vars.MultiplayerBolsterLevels then
-			t.Text=t.Text .."\n\nTotal Levels gained: " .. StrColor(255,255,153,round(getTotalLevel()*100)/100).. "\n\nLevels gained in MM6: " .. StrColor(255,255,153,round(vars.MultiplayerBolsterLevels[3]*100)/100) .. "\nLevels gained in MM7: " .. StrColor(255,255,153,round(vars.MultiplayerBolsterLevels[2]*100)/100) .. "\nLevels gained in MM8: " .. StrColor(255,255,153,round(vars.MultiplayerBolsterLevels[1]*100)/100) .. "\n\nBolster Level in MM6: " .. StrColor(255,255,153,round(bolsterLevel6)) .."\nBolster Level in MM7: " .. StrColor(255,255,153,round(bolsterLevel7)) .."\nBolster Level in MM8: " .. StrColor(255,255,153,round(bolsterLevel8))
-		else
-			t.Text=t.Text .."\n\nTotal Levels gained: " .. StrColor(255,255,153,round(getTotalLevel())).. "\n\nLevels gained in MM6: " .. StrColor(255,255,153,round(vars.MMLVL[3]*100)/100) .. "\nLevels gained in MM7: " .. StrColor(255,255,153,round(vars.MMLVL[2]*100)/100) .. "\nLevels gained in MM8: " .. StrColor(255,255,153,round(vars.MMLVL[1]*100)/100) .. "\n\nBolster Level in MM6: " .. StrColor(255,255,153,round(bolsterLevel6)) .."\nBolster Level in MM7: " .. StrColor(255,255,153,round(bolsterLevel7)) .."\nBolster Level in MM8: " .. StrColor(255,255,153,round(bolsterLevel8))
-		end
+		t.Text=t.Text .."\n\nTotal Levels gained: " .. StrColor(255,255,153,round(getTotalLevel())).. "\n\nLevels gained in MM6: " .. StrColor(255,255,153,round(vars.MMLVL[3]*100)/100) .. "\nLevels gained in MM7: " .. StrColor(255,255,153,round(vars.MMLVL[2]*100)/100) .. "\nLevels gained in MM8: " .. StrColor(255,255,153,round(vars.MMLVL[1]*100)/100) .. "\n\nBolster Level in MM6: " .. StrColor(255,255,153,round(bolsterLevel6)) .."\nBolster Level in MM7: " .. StrColor(255,255,153,round(bolsterLevel7)) .."\nBolster Level in MM8: " .. StrColor(255,255,153,round(bolsterLevel8))
 	end
 	if t.Stat==15 then
 		local i=Game.CurrentPlayer

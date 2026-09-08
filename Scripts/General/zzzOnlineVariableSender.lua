@@ -360,7 +360,7 @@ function OnlineLowestHealthPercentage()
   local lowestPercentage, LPpartyId, LPplayerId = 3, -1, -1
   if Multiplayer and Multiplayer.in_game then
     for PartyId, party in pairs(vars.online.partyHealthMana.Parties) do
-      if party.Map == Map.Name and getDistance(party.X, party.Y, party.Z) < 4000 then
+      if PartyId ~= Multiplayer.my_id and party.Map == Map.Name and getDistance(party.X, party.Y, party.Z) < 4000 then
         for i=0, (party.High or -1) do
           local p = party[i]
           if p and p.Dead==0 and p.Eradicated==0 and (p.FHP or 0) > 0 then

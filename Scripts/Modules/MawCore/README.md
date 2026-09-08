@@ -10,8 +10,10 @@ like this" behind the migrated code** — the source files only point at it.
 - **Same repo, side by side.** Legacy mod keeps running; systems migrate one at
   a time and their legacy counterparts get deleted when the replacement takes over.
 - **Clean break on saves.** The finished greenfield requires a new game.
-- **Multiplayer descoped.** State changes go through named functions so sync can
-  be reattached later at those points.
+- **Multiplayer in scope (2026-09-08).** `Sync.lua` owns the host/client
+  question and the host-owned game state; the damage pipeline publishes its
+  final result as the `MawMonsterDamage` event, which the base multiplayer
+  module consumes instead of hooking the engine event itself.
 
 ## Load path
 
@@ -42,6 +44,7 @@ Load order inside the core is the `MawCore.ModuleOrder` list in
 | `ItemFields.lua` | the item struct registry — the save format, with its two hazards documented |
 | `Tooltip.lua` | item tooltips — ONE `BuildItemInformationBox` handler running 13 named ordered sections, whose bodies (moved verbatim from the legacy files) live in this file |
 | `Save.lua` | `vars.MawCore` namespace + the clean-break version stamp |
+| `Sync.lua` | multiplayer: `inGame/isHost/isClient`, the host-owned game state list (`GameStateVars`, `GameStateGame`) mirrored to clients at join (`GatherGameData`/`ProcessGameData`) and live (`MawGameState` questdata, host-side change detection every 2 s) |
 
 ## The two rules
 

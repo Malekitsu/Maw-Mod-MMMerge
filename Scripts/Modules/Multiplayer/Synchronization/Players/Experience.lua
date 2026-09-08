@@ -27,33 +27,31 @@ local function MulAddKillExp(Amount, monLvl)
 	local experience=avg/partyCount
 	local bolsterExp=0
 	for i=0, Party.High do
-		local playerLevel=math.min(calcLevel(Party[i].Experience),partyLvl) --accounts for the cases which you want to level a low lvl character
-		local multiplier1=((monLvl+10)/(playerLevel+5))^2
-		local multiplier2=1+(monLvl^0.5)-(playerLevel^0.5)
-		mult=math.min(math.max(multiplier1,multiplier2),3)
-		if mult<1 then
-			multiplier2=1+(playerLevel^0.5)-(monLvl^0.5)
-			mult=math.min(math.min(multiplier1,1/multiplier2),1/3)
+		if Party[i].Dead==0 and Party[i].Eradicated==0 then
+			local playerLevel=math.min(calcLevel(Party[i].Experience),partyLvl) --accounts for the cases which you want to level a low lvl character
+			local multiplier1=((monLvl+10)/(playerLevel+5))^2
+			local multiplier2=1+(monLvl^0.5)-(playerLevel^0.5)
+			local mult=math.min(math.max(multiplier1,multiplier2),3)
+			if mult<1 then
+				multiplier2=1+(playerLevel^0.5)-(monLvl^0.5)
+				mult=math.min(math.min(multiplier1,1/multiplier2),1/3)
+			end
+			local experienceAwarded=experience*mult
+			Party[i].Experience=math.min(Party[i].Experience+experienceAwarded, 2^32-3982296)
+			bolsterExp=bolsterExp+experience*mult
 		end
-		local experienceAwarded=experience*mult
-		Party[i].Experience=math.min(Party[i].Experience+experienceAwarded, 2^32-3982296)
-		
-		--calculate again based for bolster
-		playerLevel=partyLvl
-		bolsterExp=bolsterExp+experience*mult
 	end
-	
+
 	--no bolster from arena
 	if Map.Name=="d42.blv" then
 		return
 	end
-	
+
 	addBolsterExp(bolsterExp)
 
 	for i=0, Party.High do
 		Party[i].Exp=math.min(Party[i].Exp, 2^32-3982296)
 	end
-	ShareBolster()
 end
 Multiplayer.AddKillExp = MulAddKillExp
 
@@ -110,10 +108,10 @@ end
 
 function events.MonsterKilled(mon, monId, _, killer)
 	if last_hit_by_player[monId] then
-		Multiplayer.broadcast(packets.kill_monster_exp:prep(mon.Experience, mon.Level), cond_same_map)
+		Multiplayer.broadcast(packets.kill_monster_exp:prep(mon.Experience, getMonsterLevel(mon)), nil)
 		
 		-- override experience gain by player-killer
-		if vars.insanityMode and monId>300 then 
+		if vars.insanityMode and mon.NameId>300 then
 			mon.Experience = 0
 			return
 		end
