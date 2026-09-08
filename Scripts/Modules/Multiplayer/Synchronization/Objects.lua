@@ -19,8 +19,6 @@ Multiplayer.NO_SYNC_OBJECT_BIT = NO_SYNC_OBJECT_BIT -- no synchronization if bit
 local last_object_state = {}
 local last_object_postime = {}
 
--- pickups done on trust: request hash -> what we took, rolled back if the host says no
-local pending_pickups = {}
 local gold_pile_ids = {[187] = true, [188] = true, [189] = true, [999] = true, [1000] = true, [1001] = true, [1799] = true, [1800] = true, [1801] = true}
 local PICKED_BY_OTHER_TEXT = "Another player picked that up first."
 
@@ -315,57 +313,6 @@ local packets = {
 		compress = true
 	},
 
-	can_pickup_object = {
-		bulb = function(object_id)
-			return Multiplayer.utils.num_to_hexstr(getsetID(Map.Objects[object_id], object_id), 2)
-		end,
-		handler = function(bin_string, metadata)
-			local ID = mem.u2[toptr(bin_string)]
-			local object, object_id = find_obj_by_ID(ID)
-			if not object then
-				return true
-			end
-
-			local can_pickup = not object.Removed and object.TypeIndex ~= 0
-			if not can_pickup and not object.Removed and object.TypeIndex == 0
-					and bit.And(object.Owner, 7) == REMOTE_PLAYER_REF and bit.rshift(object.Owner, 3) == metadata.sender_id then
-				can_pickup = true -- the asker's own pickup notification got here before the question
-			end
-			if can_pickup then
-				object.TypeIndex = 0
-				object.Removed = true
-				fill_state(object_id, object)
-			end
-			return can_pickup
-		end,
-		response = 'can_pickup_object_response',
-		check_delivery = true,
-		same_map_only = true
-	},
-
-	can_pickup_object_response = {
-		bulb = function(handler_result)
-			return handler_result and '\1' or '\0'
-		end,
-		handler = function(bin_string, metadata)
-			local allowed = bin_string == '\1'
-			local taken = pending_pickups[metadata.response_to]
-			pending_pickups[metadata.response_to] = nil
-			if taken and not allowed then
-				-- somebody else got there first: give back what the engine already handed us
-				if taken.Gold then
-					evt.Subtract("Gold", taken.Gold)
-				else
-					evt.Subtract("Items", taken.Number)
-				end
-				Game.ShowStatusText(PICKED_BY_OTHER_TEXT)
-			end
-			return allowed
-		end,
-		check_delivery = true,
-		same_map_only = true
-	},
-
 	pick_object_sound = {
 		handler = function(bin_string, metadata)
 			Multiplayer.SyncPlayers.play_puppet_sound2(133, metadata.sender_id)
@@ -454,31 +401,32 @@ local function notify_object_picked(i)
 	obj.Type, obj.TypeIndex = oType, oTypeIndex
 end
 
--- the pickup happens at once; when another player is close enough to be a
--- rival, the host is asked in the background and a "no" takes the item back
-local function can_pick_object(t)
-	local main_player = Multiplayer.main_player_on_map()
-	if Multiplayer.my_id ~= main_player then
-		local object, need_check = Map.Objects[t.ObjectId], false
-		for i, v in pairs(SyncPlayers.client_monsters()) do
-			if v < Map.Monsters.count and Multiplayer.utils.distance(Map.Monsters[v], object) < 1000 then
-				need_check = true
-				break
-			end
+-- the pickup happens at once under a claim on the object's sync id; a lost
+-- claim gives back what the engine already handed us
+Multiplayer.Claims.define("object", {
+	scope = "map",
+	announce = false,
+	on_lost = function(id, taken)
+		if taken.Gold then
+			evt.Subtract("Gold", taken.Gold)
+		else
+			evt.Subtract("Items", taken.Number)
 		end
+		Game.ShowStatusText(PICKED_BY_OTHER_TEXT)
+	end,
+})
 
-		if need_check then
-			local item = object.Item
-			local hash = Multiplayer.add_to_send_queue(main_player, packets.can_pickup_object:prep(t.ObjectId))
-			pending_pickups[hash] = {Number = item.Number, Gold = gold_pile_ids[item.Number] and item.Bonus2 or nil}
-		end
+local function can_pick_object(t)
+	local object = Map.Objects[t.ObjectId]
+	local item = object.Item
+	local verdict = Multiplayer.Claims.try("object", getsetID(object, t.ObjectId),
+		{Number = item.Number, Gold = gold_pile_ids[item.Number] and item.Bonus2 or nil})
+	if verdict == "taken" then
+		t.Handled = true
+		return
 	end
 
 	notify_object_picked(t.ObjectId)
-end
-
-function events.LeaveMap()
-	table.clear(pending_pickups)
 end
 events.PickObject = can_pick_object
 

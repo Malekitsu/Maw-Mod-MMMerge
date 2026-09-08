@@ -441,7 +441,7 @@ end
 -- Dialogs - block NPC topics, if other player already talking to this character
 
 local dummy_topic = 1450
-local blocked_npcs = {} -- client_id = npc_id
+local Claims = Multiplayer.Claims
 
 local function init_dummy_topic(WasInGame)
 	if not WasInGame then
@@ -453,66 +453,19 @@ local function init_dummy_topic(WasInGame)
 			UniMessage(LastReceivedNPCMsg)
 			service_calls = state
 		end
-		table.clear(blocked_npcs)
 	end
 end
 events.LoadMapScripts = init_dummy_topic
 events.MultiplayerStarted = init_dummy_topic
 
-function events.ClientChangeMap(client_id, old, new)
-	blocked_npcs[client_id] = nil
-end
-
+-- client_id -> npc being talked to, for the house UI
 Multiplayer.blocked_npcs = function()
-	return blocked_npcs
+	local t = {}
+	for npc, owner in pairs(Claims.list("npc")) do
+		t[owner] = npc
+	end
+	return t
 end
-
-local block_npc = {
-	can_use_npc_topics = {
-		bulb = Multiplayer.utils.num_to_hexstr,
-		handler = function(bin_string, metadata)
-			local npc_id = Multiplayer.utils.num_from_hexstr(bin_string)
-			local owner = table.find(blocked_npcs, npc_id)
-			if owner == nil then
-				blocked_npcs[metadata.sender_id] = npc_id
-			end
-			return {Result = owner == nil or owner == metadata.sender_id, Owner = owner or metadata.sender_id, NPCId = npc_id}
-		end,
-		response = "npc_blocked",
-		check_delivery = true
-	},
-
-	npc_blocked = {
-		bulb = Multiplayer.utils.item_to_bin,
-		handler = function(bin_string, metadata)
-			if Multiplayer.main_player_on_map() == Multiplayer.my_id then
-				-- Ignore notification packet
-				return true
-			end
-
-			local t = Multiplayer.utils.binstr_to_item(bin_string)
-			blocked_npcs[t.Owner] = t.NPCId
-			events.Call("NPCDialogAnswered", t.NPCId)
-			return t.Result
-		end,
-		check_delivery = true,
-		compress = true
-	},
-
-	free_npc = {
-		bulb = Multiplayer.utils.num_to_hexstr,
-		handler = function(bin_string, metadata)
-			local npc_id = Multiplayer.utils.num_from_hexstr(bin_string)
-			blocked_npcs[metadata.sender_id] = nil
-			if GetCurrentNPC() == npc_id then
-				Game.UpdateDialogTopics()
-			end
-		end,
-		check_delivery = true,
-		ignore_reload_count = true
-	}
-}
-Multiplayer.utils.init_packets(block_npc)
 
 local function SetNPCDialog(NPCId, Result)
 	local NPC = Game.NPC[NPCId]
@@ -526,14 +479,13 @@ local function SetNPCDialog(NPCId, Result)
 end
 
 local PENDING_TOPIC_TEXT = "..."
-local pending_npc -- NPC we asked the host about; its topics show up once the answer comes
 
 local function SetNPCBlockTopic(NPCId, Result, pending)
 	table.clear(Result)
 
 	local NPC = Game.NPC[NPCId]
-	local owner = table.find(blocked_npcs, NPCId)
-	local client = Multiplayer.connector.clients[owner]
+	local owner = Claims.owner("npc", NPCId)
+	local client = owner and Multiplayer.connector.clients[owner]
 
 	local free_event = NPCFollowers.FindFreeEvent(NPC, {dummy_topic})
 	if free_event then
@@ -547,56 +499,39 @@ local function SetNPCBlockTopic(NPCId, Result, pending)
 	end
 end
 
+-- while the verdict travels the dialog shows a placeholder; any change of
+-- ownership redraws the topics of the dialog that is open
+local function refresh_dialog(npc)
+	if GetCurrentNPC() == npc then
+		Game.UpdateDialogTopics()
+	end
+end
+
+Claims.define("npc", {
+	scope = "game",
+	on_granted = refresh_dialog,
+	on_lost = refresh_dialog,
+	on_update = refresh_dialog,
+})
+
 function events.PopulateNPCDialog(t)
 	local IsNPCDialog = t.NPC and t.Index and (t.DlgKind == "Main" or t.DlgKind == "StreetNPC")
 	if not IsNPCDialog or t.Index == Game.HouseExtraExitNPCDummy then
 		return
 	end
-	if blocked_npcs[Multiplayer.my_id] == t.Index then
-		SetNPCDialog(t.Index, t.Result) -- drops the placeholder left from the pending state
-		return
-	end
 
-	-- the host decides who talks to whom; while the answer travels the dialog
-	-- shows a placeholder instead of holding the whole game
-	local can_interact = false
-	local main_player = Multiplayer.main_player_in_game()
-	if main_player == Multiplayer.my_id then
-		can_interact = table.find(blocked_npcs, t.Index) == nil
-	elseif table.find(blocked_npcs, t.Index) == nil then
-		if pending_npc ~= t.Index then
-			Multiplayer.add_to_send_queue(main_player, block_npc.can_use_npc_topics:prep(t.Index))
-			pending_npc = t.Index
-		end
-		SetNPCBlockTopic(t.Index, t.Result, true)
-		return
-	end
-
-	if can_interact then
-		blocked_npcs[Multiplayer.my_id] = t.Index
+	local verdict = Claims.try("npc", t.Index)
+	if verdict == "granted" then
 		SetNPCDialog(t.Index, t.Result)
-
-		Multiplayer.broadcast(block_npc.npc_blocked:prep{Owner = Multiplayer.my_id, NPCId = t.Index}, nil)
+	elseif verdict == "pending" then
+		SetNPCBlockTopic(t.Index, t.Result, true)
 	else
 		SetNPCBlockTopic(t.Index, t.Result)
 	end
 end
 
 function events.ExitNPC(i)
-	if blocked_npcs[Multiplayer.my_id] == i or pending_npc == i then
-		Multiplayer.broadcast(block_npc.free_npc:prep(i), nil)
-		blocked_npcs[Multiplayer.my_id] = nil
-	end
-	pending_npc = nil
+	Claims.release("npc", i)
 	NPCFollowers.ClearEvents(Game.NPC[i], {dummy_topic})
 	LastReceivedNPCMsg = ""
-end
-
--- the host's answer to can_use_npc_topics comes back as npc_blocked; refresh
--- the open dialog so the placeholder turns into the real topics (or the owner's name)
-function events.NPCDialogAnswered(NPCId)
-	if pending_npc == NPCId and GetCurrentNPC() == NPCId then
-		pending_npc = nil
-		Game.UpdateDialogTopics()
-	end
 end

@@ -2,22 +2,14 @@ local events = Multiplayer.events
 local u1, u2, u4, r4, i4, mstr, mcopy, toptr = mem.u1, mem.u2, mem.u4, mem.r4, mem.i4, mem.string, mem.copy, mem.topointer
 local item_to_bin, bin_to_item = Multiplayer.utils.item_to_bin, Multiplayer.utils.bin_to_item
 local cond_same_map = Multiplayer.utils.cond_same_map
-local num_to_hexstr = Multiplayer.utils.num_to_hexstr
-local num_from_hexstr = Multiplayer.utils.num_from_hexstr
 local LogEvent = Multiplayer.utils.LogEvent
+local Claims = Multiplayer.Claims
 
 local CHEST_ITEM_SIZE = 36
 
 local last_chest
-local chest_users = {}
 local ServiceTrapTrigger = false
-
--- chests asked about in the background: request hash -> chest id; the chest
--- opens by itself when the main player says yes
-local pending_chests = {}
-local confirmed_chest
-
-Multiplayer.debug.chest_users = chest_users
+local confirmed_chest -- opened through evt.OpenChest once the arbiter said yes
 
 local packets = {
 	chest_items = {
@@ -102,85 +94,6 @@ local packets = {
 		compress = true,
 	},
 
-	can_open_chest = {
-		bulb = num_to_hexstr,
-		response = 'can_open_chest_result',
-		handler = function(bin_string, metadata)
-			local chest_id = num_from_hexstr(bin_string)
-			local user = chest_users[chest_id]
-			if user ~= nil and user ~= Multiplayer.my_id then
-				local client = Multiplayer.connector.clients[user]
-				if not client or client.map ~= Map.MapStatsIndex then
-					chest_users[chest_id] = nil
-					user = nil
-				end
-			end
-
-			if chest_id < Map.Chests.count and user == nil then
-				chest_users[chest_id] = metadata.sender_id
-			end
-
-			LogEvent("SYNC", "Got open chest request from %s, current user - %s, my result: %s", metadata.sender_id, tostring(chest_users[chest_id]), chest_users[chest_id] == metadata.sender_id)
-
-			return chest_users
-		end,
-		same_map_only = true,
-		check_delivery = true
-	},
-
-	can_open_chest_result = {
-		bulb = function(handler_result)
-			return item_to_bin(handler_result)
-		end,
-		handler = function(bin_string, metadata)
-			local users = bin_to_item(toptr(bin_string))
-			for k, v in pairs(users) do
-				chest_users[k] = v
-			end
-
-			local chest_id = pending_chests[metadata.response_to]
-			pending_chests[metadata.response_to] = nil
-			if chest_id then
-				if users[chest_id] == Multiplayer.my_id then
-					if Game.CurrentScreen == 0 then
-						confirmed_chest = chest_id
-						evt.OpenChest{chest_id}
-					end
-				else
-					local cur_player = math.max(Game.CurrentPlayer, 0)
-					Party[cur_player]:ShowFaceAnimation(const.FaceAnimation.DoorLocked)
-				end
-			end
-			return users
-		end,
-		same_map_only = true,
-		check_delivery = true
-	},
-
-	free_chest = {
-		bulb = num_to_hexstr,
-		handler = function(bin_string, metadata)
-			local chest_id = num_from_hexstr(bin_string)
-			local user = chest_users[chest_id]
-			if user ~= nil and user ~= Multiplayer.my_id then
-				local client = Multiplayer.client_info(user)
-				if not client or client.map ~= Map.MapStatsIndex then
-					chest_users[chest_id] = nil
-					user = nil
-				end
-			end
-			for i = 0, Map.Chests.count - 1 do
-				if chest_users[i] == metadata.sender_id then
-					chest_users[i] = nil
-				end
-			end
-			LogEvent("SYNC", "Client %s freeing chest %s.", metadata.sender_id, chest_id)
-		end,
-		same_map_only = true,
-		check_delivery = true,
-		ignore_reload_count = true
-	},
-
 	remove_trap = {
 		bulb = item_to_bin,
 		handler = function(bin_string, metadata)
@@ -248,62 +161,54 @@ end
 
 -- Handlers
 
-local function CanOpenChest(chest_id)
-	local main_player = Multiplayer.main_player_on_map()
-	if main_player == Multiplayer.my_id then
-		local user = chest_users[chest_id]
-		if user == nil or user == Multiplayer.my_id or Multiplayer.client_info(user).map ~= Map.MapStatsIndex then
-			chest_users[chest_id] = Multiplayer.my_id
-			return true
-		end
-		return false
-	else
-		if confirmed_chest == chest_id then
-			confirmed_chest = nil
-			chest_users[chest_id] = Multiplayer.my_id
-			return true
-		end
-
-		local user = chest_users[chest_id]
-		if user == Multiplayer.my_id then
-			return true
-		elseif user ~= nil then
-			local client = Multiplayer.client_info(user)
-			if client and client.map == Map.MapStatsIndex then
-				return false
-			end
-		end
-
-		-- unknown: ask in the background, the answer opens the chest
-		local hash = Multiplayer.add_to_send_queue(main_player, packets.can_open_chest:prep(chest_id))
-		pending_chests[hash] = chest_id
-		return "pending"
-	end
+local function locked_anim()
+	local cur_player = math.max(Game.CurrentPlayer, 0)
+	Party[cur_player]:ShowFaceAnimation(const.FaceAnimation.DoorLocked)
 end
 
+-- one player in a chest at a time; the answer opens it when it comes
+Claims.define("chest", {
+	scope = "map",
+	on_granted = function(chest_id)
+		if Game.CurrentScreen == 0 then
+			confirmed_chest = chest_id
+			evt.OpenChest{chest_id}
+		else
+			Claims.release("chest", chest_id)
+		end
+	end,
+	on_lost = function(chest_id)
+		locked_anim()
+	end,
+})
+
 function events.CanOpenChest(t)
-	local result = CanOpenChest(t.ChestId)
-	if result == "pending" then
-		t.CanOpen = false
-		return
+	if confirmed_chest == t.ChestId then
+		confirmed_chest = nil
+		t.CanOpen = true
+	else
+		local verdict = Claims.try("chest", t.ChestId)
+		if verdict == "pending" then
+			t.CanOpen = false
+			return
+		end
+		t.CanOpen = verdict == "granted"
 	end
-	t.CanOpen = result
+
 	if not t.CanOpen then
-		local cur_player = math.max(Game.CurrentPlayer, 0)
-		Party[cur_player]:ShowFaceAnimation(const.FaceAnimation.DoorLocked)
+		locked_anim()
 	else
 		Multiplayer.utils.delayed_call(function()
 			-- in case chest was not actually open, but interrupted by trap activation
 			Multiplayer.broadcast(packets.remove_trap:prep(t.ChestId), cond_same_map)
 			if Game.CurrentScreen ~= const.Screens.Chest and Game.CurrentScreen ~= const.Screens.InventoryInChest then
-				Multiplayer.add_to_send_queue(Multiplayer.main_player_on_map(), packets.free_chest:prep(t.ChestId))
+				Claims.release("chest", t.ChestId)
 			end
 		end, 16)
 	end
 end
 
 function events.LeaveMap()
-	table.clear(pending_chests)
 	confirmed_chest = nil
 end
 
@@ -357,11 +262,8 @@ function events.Action(t)
 			Multiplayer.utils.delayed_call(update_chest, 10)
 		elseif t.Action == 11 then
 			-- exit chest screen
-			local main_player = Multiplayer.main_player_on_map()
-			if main_player == Multiplayer.my_id then
-				chest_users[last_chest] = nil
-			else
-				Multiplayer.add_to_send_queue(main_player, packets.free_chest:prep(last_chest))
+			if last_chest then
+				Claims.release("chest", last_chest)
 			end
 			Multiplayer.utils.delayed_call(Multiplayer.broadcast, 1, packets.chest_items:prep(last_chest), cond_same_map)
 		end

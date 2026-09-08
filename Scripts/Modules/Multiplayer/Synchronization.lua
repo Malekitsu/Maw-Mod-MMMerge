@@ -2,6 +2,7 @@ local folder = "Synchronization/%s"
 
 local modules = {
 	"Players.lua",
+	"Claims.lua",
 	"Monsters.lua",
 	"SaveLoadExit.lua",
 	"MapLoad.lua",

@@ -99,13 +99,41 @@ local packets = {
 }
 Multiplayer.utils.init_packets(packets)
 
+-- ask the others for this month's bounty as soon as the map is up, so the
+-- town hall dialog finds it already there
+local function prefetch_bounty()
+	if Multiplayer.alone_on_map() then
+		return
+	end
+
+	local map_name, month = Map.Name, Game.Month
+	Multiplayer.ask_all(Multiplayer.utils.cond_same_map, packets.request_active_bounty, 4, function(results)
+		if Map.Name ~= map_name then
+			return
+		end
+		vars.BountyHunt = vars.BountyHunt or {}
+		local mine = vars.BountyHunt[map_name]
+		if mine and mine.Month == month then
+			return
+		end
+		for _, response in pairs(results) do
+			if response and type(response.handler_result) == "table" then
+				vars.BountyHunt[map_name] = response.handler_result
+				return
+			end
+		end
+	end, map_name, month)
+end
+events.MapLoadingDone = prefetch_bounty
+
+-- fallback for a town hall visit that beats the prefetch answer
 function events.BountyHuntGeneration(t) -- MapName, Handled, Entry
 	if Multiplayer.alone_on_map() then
 		return
 	end
 
 	local hashes = Multiplayer.broadcast(packets.request_active_bounty:prep(Map.Name, Game.Month), nil)
-	local responses = Multiplayer.wait_responses(hashes, 4)
+	local responses = Multiplayer.wait_responses(hashes, 2)
 
 	for _, response in pairs(responses) do
 		if response and response.handler_result then
