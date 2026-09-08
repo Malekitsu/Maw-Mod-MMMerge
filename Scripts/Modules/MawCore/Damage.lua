@@ -86,6 +86,13 @@ local function stage_context(t)
 	t.Hit = WhoHitMonster()
 end
 
+local function stage_puppetZero(t)
+	if MawCore.Sync.inGame() and Multiplayer.posessed_by_player(t.MonsterIndex) then
+		t.Result = 0
+		t.Stop = true
+	end
+end
+
 -- ===========================================================================
 -- Stage bodies, near-verbatim from the legacy files (source noted per stage).
 -- ===========================================================================
@@ -1415,6 +1422,7 @@ end
 
 local pipe = MawCore.Pipeline.new("DamageToMonster", {
 	"context",				-- resolve t.Hit once
+	"puppet-zero",			-- [gates] remote players' avatars take no damage
 	-- tier 1: was General file-scope
 	"seraph-on-hit-heal",		-- [reactions]
 	"elementalist-learning",	-- [reactions]
@@ -1453,6 +1461,7 @@ local pipe = MawCore.Pipeline.new("DamageToMonster", {
 })
 
 pipe:on("context",           "MawCore",              stage_context)
+pipe:on("puppet-zero",       "MawCore",              stage_puppetZero)
 pipe:on("seraph-on-hit-heal", "zzClasses:255",       stage_seraphOnHitHeal)
 pipe:on("elementalist-learning",    "zzClasses:1534", stage_elementalistLearning)
 pipe:on("elementalist-stack-reset", "zzClasses:1649", stage_elementalistStackReset)

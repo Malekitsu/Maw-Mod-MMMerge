@@ -9,7 +9,7 @@ local packets = {
 	monsters_health = {
 		bulb = function(damage_done)
 			for mon_id, damage in pairs(damage_done) do
-				damage_done[mon_id] = bit.lshift(damage, 16) + Map.Monsters[mon_id].HP
+				damage_done[mon_id] = {damage, Map.Monsters[mon_id].HP}
 			end
 			return item_to_bin(damage_done)
 		end,
@@ -23,11 +23,11 @@ local packets = {
 			for i, v in pairs(t) do
 				if i < Map.Monsters.count then
 					local mon = Map.Monsters[i]
-					local hp, dmg = bit.And(v, 0xffff), bit.rshift(v, 16)
+					local dmg, hp = v[1], v[2]
 					if mon.HP < hp then
 						corrections[i] = true
 					else
-						mon.HP = v
+						mon.HP = hp
 					end
 
 					if dmg > 0 then
