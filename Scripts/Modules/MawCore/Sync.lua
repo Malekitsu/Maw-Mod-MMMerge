@@ -17,6 +17,11 @@ function Sync.isClient()
 	return Sync.inGame() and not Multiplayer.im_host()
 end
 
+-- the one player who owns the current map's spawning (true when alone or offline)
+function Sync.isMainOnMap()
+	return not Sync.inGame() or Multiplayer.main_player_on_map() == Multiplayer.my_id
+end
+
 -- Host-owned game state. vars keys are mirrored verbatim (tables replaced
 -- content-wise, so references held by other files stay valid); Game fields
 -- likewise. Add a key here and nowhere else.

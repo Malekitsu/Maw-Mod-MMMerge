@@ -151,7 +151,15 @@ end
 ------------------------------------------------------------
 -- Réception (transite via MAWMapvarArrived / DataType "mapvar")
 function events.MAWMapvarArrived(t)
-  if not t or t.DataType ~= "mapvar" then return end
+  if not t then return end
+  if t.DataType == "bossAdded" then
+    BossSync_ApplyBossAdded(t)
+    return
+  elseif t.DataType == "bossRemoved" then
+    if type(mawForgetBoss) == "function" and type(t.index) == "number" then mawForgetBoss(t.index) end
+    return
+  end
+  if t.DataType ~= "mapvar" then return end
   local key, val = t[1], t[2]
 
   if key == "bossNames" then
@@ -218,6 +226,54 @@ end
 function BossSync_ScheduleBroadcast()
   if not inMulti() or not isHost() then return end
   _snapshot_pending = true
+end
+
+-- one boss created on this side: everyone on the map gets it right away, whoever made it
+function BossSync_BroadcastBoss(index)
+  BossSync_ScheduleBroadcast()
+  if not inMulti() or not mapvars then return end
+  if not (Map and Map.Monsters) or type(index) ~= "number" or index >= Map.Monsters.count then return end
+  local mon = Map.Monsters[index]
+  local nid = mon.NameId
+  Multiplayer.broadcast_mapdata({
+    DataType = "bossAdded",
+    index = index,
+    nid = nid,
+    id = mon.Id,
+    name = mapvars.bossNames and mapvars.bossNames[nid],
+    data = mapvars.bossData and mapvars.bossData[index],
+    sender = Multiplayer.my_id,
+  }, "MAWMapvarArrived")
+end
+
+function BossSync_BroadcastBossRemoved(index)
+  BossSync_ScheduleBroadcast()
+  if not inMulti() or type(index) ~= "number" then return end
+  Multiplayer.broadcast_mapdata({ DataType = "bossRemoved", index = index, sender = Multiplayer.my_id }, "MAWMapvarArrived")
+end
+
+function BossSync_ApplyBossAdded(t)
+  mapvars = mapvars or {}
+  mapvars.bossNames = mapvars.bossNames or {}
+  mapvars.bossSet = mapvars.bossSet or {}
+  mapvars.bossData = mapvars.bossData or {}
+  if type(t.nid) == "number" and type(t.name) == "string" then
+    mapvars.bossNames[t.nid] = t.name
+    if Game and Game.PlaceMonTxt then Game.PlaceMonTxt[t.nid] = t.name end
+  end
+  if type(t.index) ~= "number" then return end
+  if type(t.data) == "table" then mapvars.bossData[t.index] = t.data end
+  for i = #mapvars.bossSet, 1, -1 do
+    if mapvars.bossSet[i][1] == t.index then table.remove(mapvars.bossSet, i) end
+  end
+  table.insert(mapvars.bossSet, {t.index, t.nid, t.id})
+  if Map and Map.Monsters and t.index < Map.Monsters.count then
+    local mon = Map.Monsters[t.index]
+    if mon.AIState ~= 11 then
+      if type(t.id) == "number" then mon.Id = t.id end
+      if type(t.nid) == "number" then mon.NameId = t.nid end
+    end
+  end
 end
 
 -- Quand un client rejoint la partie alors que le host est déjà sur la map

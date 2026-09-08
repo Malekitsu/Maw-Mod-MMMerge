@@ -179,11 +179,12 @@ function recalculateMawMonster()
 	if Map.Name=="d42.blv" then
 		return
 	end
+	local puppets=getPlayerControlledMonsters()
 	
 	for i=0, Map.Monsters.High do
 		local mon=Map.Monsters[i]
 		
-		if mon.NameId==0 then
+		if mon.NameId==0 and not table.find(puppets, i) then
 			local txt=Game.MonstersTxt[mon.Id]
 			for v=0,10 do
 				if v~=5 then
@@ -199,7 +200,7 @@ function recalculateMawMonster()
 			mon.Attack2Chance=txt.Attack2Chance
 			mon.Experience=txt.Experience
 		end
-		if mon.AIType~=1 then
+		if mon.AIType~=1 and not table.find(puppets, i) then
 			mon.AIType=0
 		end
 	end
@@ -2812,6 +2813,7 @@ local function mawBossesOnMapReady()
 					end
 				end
 
+				local puppets = getPlayerControlledMonsters()
 				local possibleMonsters = {}
 				local bossSpawns = math.ceil((Map.Monsters.Count - 30) / 150)
 				if vars.Mode == 2 then 
@@ -2822,7 +2824,7 @@ local function mawBossesOnMapReady()
 				end
 				if getMapAffixPower(17) then
 					for i = 0, Map.Monsters.High do
-						if Map.Monsters[i].Id % 3 ~= 0 and math.random() < getMapAffixPower(17) / 100 then
+						if Map.Monsters[i].Id % 3 ~= 0 and not table.find(puppets, i) and math.random() < getMapAffixPower(17) / 100 then
 							Map.Monsters[i].Id = Map.Monsters[i].Id + 1
 						end
 					end
@@ -2830,7 +2832,7 @@ local function mawBossesOnMapReady()
 				if getMapAffixPower(19) then
 					for i = 0, Map.Monsters.High do
 						local id = Map.Monsters[i].Id
-						if id % 3 ~= 0 and Game.MonstersTxt[id].AIType ~= 1 and Map.Monsters[i].NameId == 0 and math.random() < getMapAffixPower(19) / 100 then
+						if id % 3 ~= 0 and Game.MonstersTxt[id].AIType ~= 1 and Map.Monsters[i].NameId == 0 and not table.find(puppets, i) and math.random() < getMapAffixPower(19) / 100 then
 							generateBoss(i)
 						end
 					end
@@ -2838,7 +2840,7 @@ local function mawBossesOnMapReady()
 
 				for i = 0, Map.Monsters.High do
 					local id = Map.Monsters[i].Id
-					if id % 3 == 0 and Game.MonstersTxt[id].AIType ~= 1 and Map.Monsters[i].NameId == 0 then
+					if id % 3 == 0 and Game.MonstersTxt[id].AIType ~= 1 and Map.Monsters[i].NameId == 0 and not table.find(puppets, i) then
 						table.insert(possibleMonsters, i)
 					end
 				end
@@ -3017,8 +3019,8 @@ function generateBoss(index, nameIndex, skillType)
 	if generateBossLootSeed then
 		generateBossLootSeed(index, mon.Id)
 	end
-	if type(BossSync_ScheduleBroadcast)=="function" then
-		BossSync_ScheduleBroadcast()
+	if type(BossSync_BroadcastBoss)=="function" then
+		BossSync_BroadcastBoss(index)
 	end
 end
 
@@ -4038,14 +4040,7 @@ function events.MonsterKilled(mon)
 	
 end
 
-function events.PickCorpse(t)
-	local mon=t.Monster
-	if vars.insanityMode and mon.NameId>300 then
-		mon.TreasureItemPercent=0
-		mon.TreasureDiceSides=0
-		mon.TreasureDiceCount=0
-	end
-	local index=t.MonsterIndex
+function mawForgetBoss(index)
 	if mapvars.bossData and mapvars.bossData[index] then
 		mapvars.bossData[index]=nil
 	end
@@ -4056,8 +4051,19 @@ function events.PickCorpse(t)
 			end
 		end
 	end
-	if type(BossSync_ScheduleBroadcast)=="function" then
-		BossSync_ScheduleBroadcast()
+end
+
+function events.PickCorpse(t)
+	local mon=t.Monster
+	if vars.insanityMode and mon.NameId>300 then
+		mon.TreasureItemPercent=0
+		mon.TreasureDiceSides=0
+		mon.TreasureDiceCount=0
+	end
+	local index=t.MonsterIndex
+	mawForgetBoss(index)
+	if type(BossSync_BroadcastBossRemoved)=="function" then
+		BossSync_BroadcastBossRemoved(index)
 	end
 	RunNextTick(function()
 		if mon.AIState==11 then

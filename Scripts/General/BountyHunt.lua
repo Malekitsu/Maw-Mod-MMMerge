@@ -200,6 +200,11 @@ local function SetCurrentHunt()
 		Entry = t.Entry
 		events.Call("BountyHuntGeneration", t)
 
+		if t.Handled and vars.BountyHunt[Map.Name] then
+			Entry = vars.BountyHunt[Map.Name]
+			return HuntText(Entry.MonId, Entry.MonName)
+		end
+
 		vars.BountyHunt[Map.Name] = Entry
 		
 		-- Summon monster
@@ -234,7 +239,7 @@ local function SetCurrentHunt()
 		--MonBuff.Skill = 4
 		--MonBuff.Caster = 49
 
-		events.Call("NewBountyHuntCreated", Map.Name, Entry, mon)
+		events.Call("NewBountyHuntCreated", Map.Name, Entry, Hunt)
 		BountyText = HuntText(Entry.MonId, Entry.MonName)
 	end
 
