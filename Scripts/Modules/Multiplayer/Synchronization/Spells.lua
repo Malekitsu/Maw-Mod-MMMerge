@@ -343,11 +343,12 @@ local spells_info = {
 		end,
 	},
 
--- Armageddon - no range restriction
+-- Armageddon - no range restriction; re-cast here only when friendly fire is
+-- on (the caster's own damage to monsters arrives with the damage sync)
 	[98] = {
 		is_buff = true,
 		anim_handler = function(spell_info, skill, mastery, target_kind, target_id, extra)
-			if extra.can_apply then
+			if extra.can_apply and MawCore.Damage.FRIENDLY_FIRE then
 				std_apply_buff(spell_info, skill, mastery, false, extra)
 			end
 		end,

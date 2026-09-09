@@ -2513,6 +2513,24 @@ function events.MonsterKilled(mon)
 	monsterKilled=false
 end
 
+local forceMapCompletion=false
+local function shareMapCompletion()
+	if MawCore.Sync.inGame() and not forceMapCompletion then
+		Multiplayer.broadcast_mapdata({DataType="MawMapCompleted"}, "MawMapCompleted")
+	end
+end
+
+function events.MultiplayerInitialized()
+	Multiplayer.allow_remote_event("MawMapCompleted")
+end
+
+function events.MawMapCompleted()
+	if mapvars.completed==nil then
+		forceMapCompletion=true
+		checkMapCompletition()
+		forceMapCompletion=false
+	end
+end
 
 function checkMapCompletition()
 	--retroactive fix, can remove this code after a while
@@ -2564,7 +2582,7 @@ function checkMapCompletition()
 			txt=StrColor(255,0,0,text)
 		end
 		completition.Text=txt
-		if m/n>=requiredRateo then
+		if m/n>=requiredRateo or forceMapCompletion then
 			local name=Game.MapStats[Map.MapStatsIndex].Name
 			local bolster=getPartyLevel()
 			
@@ -2586,6 +2604,7 @@ function checkMapCompletition()
 						end
 					end
 					mapvars.completed=true
+					shareMapCompletion()
 				end
 				if mapvars.mapAffixes then
 					evt.Add("Items", 290)
@@ -2688,6 +2707,7 @@ function checkMapCompletition()
 					Party[i].Experience=math.min(Party[i].Experience+experience, 2^32-3982296)
 				end
 				mapvars.completed=true
+				shareMapCompletion()
 				vars.dungeonCompletedList=vars.dungeonCompletedList or {}
 				vars.dungeonCompletedList[name]=true
 				if mapvars.monsterMap then

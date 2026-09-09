@@ -361,7 +361,7 @@ local function type_code(val)
 		if val ~= val:floor() then
 			code = 7
 		else
-			code = val <= 0xFFFFFFFF and 2 or 6
+			code = (val >= -0x80000000 and val < 0x80000000) and 2 or 6
 		end
 	end
 	return code

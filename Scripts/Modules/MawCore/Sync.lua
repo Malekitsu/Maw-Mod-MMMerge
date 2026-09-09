@@ -28,8 +28,35 @@ end
 Sync.GameStateVars = {
 	"Mode", "insanityMode", "madnessMode", "AusterityMode", "trueNightmare",
 	"freeProgression", "MAWSETTINGS", "MMLVL", "EXPBEFORE", "LVLBEFORE",
+	"RandomizerMode", "RandomizerFixed", "Randomizer", "OriginalItemOrder", "ItemFound", "MonsterShuffleList",
 }
 Sync.GameStateGame = {"Mode", "BolsterAmount", "freeProgression"}
+
+-- host-owned lists that clients also grow: a client's additions are sent up
+-- and merged by the host, then come back with the next state
+Sync.MergeUpLists = {"ItemFound"}
+
+-- per-party state that travels with the party data the base module keeps for
+-- every client (the host's save copy, the client save, the client autosave).
+-- Add a key here and nowhere else.
+Sync.PartyVars = {
+	"mawbags", "CraftingBags", "alchemyPlayer", "inventoryLocked", "SmallerPotionBottles",
+	"currentHPPool", "maxHPPool", "currentManaPool", "maxManaPool",
+	"mawbuff", "mawbuff_remote", "maw_remote_owners", "maw_remote_values", "_maw_local_off", "maw_special_expire",
+	"mawPotionBuff", "mawPotionBuffPower", "PlayerAlchemyBuffs", "BlackPotions", "poisonTime", "bonusMeditation",
+	"horizontaSpells", "magicResistancePotionExpire", "buffToIgnore", "mawTranscendence", "PotionBuffs", "enchantSeedList",
+	"legendaries", "elementalistSpells", "elementalistSpellBinds", "eleStacks", "eleTimer", "disableRotation",
+	"dkActiveAttackSpell", "assassinDamage", "assassinStacks", "AttackSpeedStack", "AttackSpeedStackDecay",
+	"oldPlayerMasteries", "storedMasteries", "soloMiscMasteries", "trainings", "weaponSkillRefunded", "UncappedSkills",
+	"learningFix", "removeSoloMastery", "checkSoloMastery", "BBFIX", "needToFixCover", "needToFixMaxCharges",
+	"StartingItemFix", "hirelingFix", "LichFix", "dragonMeditationRemoved",
+	"damageTrack", "damageTrackRanged", "healingDone", "leechDone", "regenerationHeal", "manaShield", "shieldEnchant",
+	"normalEnchantResistance", "spearDamageIncrease", "retaliation", "covering",
+	"divineProtectionCooldown", "legendaryProtectionCooldown", "healthPotionCooldown", "manaPotionCooldown", "chargeCooldown",
+	"artifactRollPity", "artPity", "craftPityCounters", "legendaryAffixDropped", "monsterCounters", "monsterSeeds", "SeedList", "seed",
+	"ownedMaps", "introduction", "refundFood",
+	"MawCore",
+}
 
 -- the fields whose change requires the current map's monsters to be redone
 local difficultyKeys = {"vars.Mode", "vars.insanityMode", "vars.madnessMode",
@@ -122,9 +149,130 @@ local function broadcastGameState(force)
 	Multiplayer.broadcast_questdata({DataType = "MawGameState", state = s}, "MawGameState")
 end
 
+-- the client side: the last state the host sent is the truth; local drift
+-- (a menu closed on the client, a script touching a synced key) is pulled
+-- back to it on the next check
+local lastReceived
+
+local function applyReceived(s)
+	local before = difficultyStamp(Sync.snapshotGameState())
+	local buffReworkBefore = vars.MAWSETTINGS and vars.MAWSETTINGS.buffRework
+	Sync.applyGameState(s)
+	if difficultyStamp(Sync.snapshotGameState()) ~= before
+			and type(recalculateMonsterTable) == "function"
+			and type(recalculateMawMonster) == "function" then
+		recalculateMonsterTable()
+		recalculateMawMonster()
+	end
+	if vars.MAWSETTINGS and vars.MAWSETTINGS.buffRework ~= buffReworkBefore
+			and type(adjustSpellTooltips) == "function" then
+		adjustSpellTooltips()
+	end
+end
+
+local function sendMergeUp()
+	local lists
+	local received = lastReceived.vars or {}
+	for _, k in ipairs(Sync.MergeUpLists) do
+		local mine, theirs = vars[k], received[k]
+		if type(mine) == "table" then
+			local extra = {}
+			for _, v in ipairs(mine) do
+				if not (type(theirs) == "table" and table.find(theirs, v)) then
+					extra[#extra + 1] = v
+				end
+			end
+			if #extra > 0 then
+				lists = lists or {}
+				lists[k] = extra
+			end
+		end
+	end
+	if lists then
+		Multiplayer.broadcast_questdata({DataType = "MawStateMerge", lists = lists}, "MawStateMerge")
+	end
+end
+
+local function converge()
+	if not Sync.isClient() or not lastReceived or type(vars) ~= "table" or not vars.MMLVL then
+		return
+	end
+	if stamp(Sync.snapshotGameState()) ~= stamp(lastReceived) then
+		sendMergeUp()
+		applyReceived(lastReceived)
+	end
+end
+
+local function mergeUp(lists)
+	if type(lists) ~= "table" then
+		return
+	end
+	for _, k in ipairs(Sync.MergeUpLists) do
+		local items = lists[k]
+		if type(items) == "table" then
+			if type(vars[k]) ~= "table" then
+				vars[k] = {}
+			end
+			for _, v in ipairs(items) do
+				if not table.find(vars[k], v) then
+					table.insert(vars[k], v)
+				end
+			end
+		end
+	end
+end
+
+function Sync.gatherPartyVars(t)
+	local out = {}
+	for _, k in ipairs(Sync.PartyVars) do
+		local v = vars[k]
+		if type(v) == "table" then
+			v = copyFlat(v)
+		end
+		out[k] = v
+	end
+	t.MawPartyVars = out
+end
+
+function Sync.applyPartyVars(t)
+	local data = t.MawPartyVars
+	if type(data) ~= "table" then
+		return
+	end
+	for _, k in ipairs(Sync.PartyVars) do
+		local v = data[k]
+		if type(v) == "table" then
+			if type(vars[k]) ~= "table" then
+				vars[k] = {}
+			end
+			table.clear(vars[k])
+			for a, b in pairs(v) do
+				vars[k][a] = b
+			end
+		else
+			vars[k] = v
+		end
+	end
+end
+
 function Sync.start()
 	function events.MultiplayerInitialized()
 		Multiplayer.allow_remote_event("MawGameState")
+		Multiplayer.allow_remote_event("MawStateMerge")
+	end
+
+	function events.MawStateMerge(t)
+		if Sync.isHost() and type(vars) == "table" then
+			mergeUp(t.lists)
+		end
+	end
+
+	function events.GatherPartySaveData(t)
+		Sync.gatherPartyVars(t)
+	end
+
+	function events.ProcessPartySaveData(t)
+		Sync.applyPartyVars(t)
 	end
 
 	function events.GatherGameData(t)
@@ -132,6 +280,7 @@ function Sync.start()
 	end
 
 	function events.ProcessGameData(t)
+		lastReceived = t.MawGameState
 		Sync.applyGameState(t.MawGameState)
 	end
 
@@ -139,24 +288,20 @@ function Sync.start()
 		if not Sync.isClient() or type(vars) ~= "table" then
 			return
 		end
-		local before = difficultyStamp(Sync.snapshotGameState())
-		local buffReworkBefore = vars.MAWSETTINGS and vars.MAWSETTINGS.buffRework
-		Sync.applyGameState(t.state)
-		if difficultyStamp(Sync.snapshotGameState()) ~= before
-				and type(recalculateMonsterTable) == "function"
-				and type(recalculateMawMonster) == "function" then
-			recalculateMonsterTable()
-			recalculateMawMonster()
-		end
-		if vars.MAWSETTINGS and vars.MAWSETTINGS.buffRework ~= buffReworkBefore
-				and type(adjustSpellTooltips) == "function" then
-			adjustSpellTooltips()
-		end
+		lastReceived = t.state
+		applyReceived(t.state)
 	end
 
 	function events.ClientJoined()
 		broadcastGameState(true)
 	end
 
-	MawCore.Scheduler.every("sync/gamestate", 2000, function() broadcastGameState(false) end)
+	function events.MultiplayerStopped()
+		lastReceived = nil
+	end
+
+	MawCore.Scheduler.every("sync/gamestate", 2000, function()
+		broadcastGameState(false)
+		converge()
+	end)
 end

@@ -3,7 +3,7 @@ local item_to_bin, binstr_to_item = Multiplayer.utils.item_to_bin, Multiplayer.u
 local cond_same_map = Multiplayer.utils.cond_same_map
 
 local damaged_monsters = {}
-local corrections = {}
+local HP_FLOOR = -32000
 
 local packets = {
 	monsters_health = {
@@ -19,14 +19,16 @@ local packets = {
 				t[monid] = nil
 			end
 
-			local props = {MonsterIndex = 0, Monster = nil, Result}
+			-- damage is a delta, so two players hitting at once both count;
+			-- a kill is absolute, so the corpse exists everywhere
 			for i, v in pairs(t) do
 				if i < Map.Monsters.count then
 					local mon = Map.Monsters[i]
 					local dmg, hp = v[1], v[2]
-					if mon.HP < hp then
-						corrections[i] = true
-					else
+					if mon.HP > 0 then
+						mon.HP = math.max(mon.HP - dmg, HP_FLOOR)
+					end
+					if hp <= 0 and mon.HP > 0 then
 						mon.HP = hp
 					end
 
@@ -65,11 +67,6 @@ local function send_damage()
 	if Multiplayer.leave_map_halt then
 		return
 	end
-
-	for k,v in pairs(corrections) do
-		damaged_monsters[k] = damaged_monsters[k] or 0
-	end
-	table.clear(corrections)
 
 	if next(damaged_monsters) then
 		-- handled by SyncPlayers

@@ -14,6 +14,10 @@ local DamageState = MawCore.DamageState
 
 local REMOTE_OWNER_BIT = 0x800
 
+-- multiplayer: whether another player's projectiles and area spells can hurt
+-- this party at all. Off: their hits on us are cancelled before any effect.
+Damage.FRIENDLY_FIRE = false
+
 -- Reflect bookkeeping. These three are read and written only inside this
 -- file: a stage sets one, a later stage in the same hit consumes it.
 local reflecting = false
@@ -1140,13 +1144,31 @@ local function stage_mapAffixes(t)
 	end
 end
 
--- from Scripts/Global/zzMAWStatusMsg.lua:2 -- multiplayer remote-owner zero
+-- from Scripts/Global/zzMAWStatusMsg.lua:2 -- multiplayer remote-owner zero.
+-- A hit that belongs to another player (their projectile, or a spell the
+-- module re-cast here on their behalf) is theirs to compute: nothing runs.
 local function stage_remoteOwnerZero(t)
 	local source = t.Hit
-	if source then
-		local obj = source.Object
-		if obj and bit.And(obj.Bits, REMOTE_OWNER_BIT) > 0 then
-			t.Result = 0 -- let owner calculate damage
+	local obj = source and source.Object
+	if obj and bit.And(obj.Bits, REMOTE_OWNER_BIT) > 0 then
+		t.Result = 0
+		t.Stop = true
+		return
+	end
+	if not MawCore.Sync.inGame() then
+		return
+	end
+	if t.PlayerIndex == Multiplayer.SERVICE_CASTER then
+		t.Result = 0
+		t.Stop = true
+		return
+	end
+	-- a monster's own attack is computed by the client running its AI
+	if source and source.Monster then
+		local owner = Multiplayer.SyncMonsters.monster_owner(source.MonsterIndex)
+		if owner ~= -1 and owner ~= Multiplayer.my_id then
+			t.Result = 0
+			t.Stop = true
 		end
 	end
 end
@@ -1423,6 +1445,7 @@ end
 local pipe = MawCore.Pipeline.new("DamageToMonster", {
 	"context",				-- resolve t.Hit once
 	"puppet-zero",			-- [gates] remote players' avatars take no damage
+	"remote-owner-zero",	-- [gates] another player's hit: the owner computes it
 	-- tier 1: was General file-scope
 	"seraph-on-hit-heal",		-- [reactions]
 	"elementalist-learning",	-- [reactions]
@@ -1451,7 +1474,6 @@ local pipe = MawCore.Pipeline.new("DamageToMonster", {
 	"legendaries",				-- [additive/mult] post-res on purpose
 	"artifact-on-hit",			-- [additive] next to the aura it is priced like
 	"map-affixes",				-- [mult/gates]
-	"remote-owner-zero",		-- [gates]
 	"friendly-fire-zero",	-- [gates] ahead of leech: zeroed hits must not heal
 	"leech",					-- [reactions]
 	"track-and-clamp",			-- [reactions] tracking + status message
@@ -1908,17 +1930,17 @@ end
 -- from zzMAWStatusMsg:4 -- remote-owner zero (solo-active MP guard)
 local function pstage_remoteOwnerZeroPlayer(t)
 	local source = WhoHitPlayer()
-	if source then
-		local obj = source.Object
-		if obj and bit.And(obj.Bits, REMOTE_OWNER_BIT) > 0 then
-			if not table.find(aoespellsMultiplayer, source.Spell) then
-				t.Result = 0
-			end
+	local obj = source and source.Object
+	if obj and bit.And(obj.Bits, REMOTE_OWNER_BIT) > 0 then
+		if not Damage.FRIENDLY_FIRE or not table.find(aoespellsMultiplayer, source.Spell) then
+			t.Result = 0
+			t.Stop = true
 		end
 	end
 end
 
 local ppipe = MawCore.Pipeline.new("DamageToPlayer", {
+	"remote-owner-zero",	-- [gates] another player's hit on us
 	-- tier 1: was General file-scope
 	"item-refresh",			-- [reactions] deferred itemStats refresh
 	"death-seed-mark",		-- [reactions] madness death-seed marker
@@ -1930,7 +1952,6 @@ local ppipe = MawCore.Pipeline.new("DamageToPlayer", {
 	-- tier 3: was Global file-scope
 	"legendaries-and-shields",	-- [mult/reactions] incl. mana shield + divine protection
 	"map-affixes-player",	-- [mult]
-	"remote-owner-zero",	-- [gates] solo-active MP guard
 })
 
 ppipe:on("item-refresh",        "zzMaw-Items:3595",      pstage_itemRefresh)
@@ -1946,4 +1967,16 @@ Damage.playerPipe = ppipe
 
 function Damage.runPlayer(t)
 	ppipe:run(t)
+end
+
+function Damage.start()
+	function events.PlayerAttacked(t)
+		if Damage.FRIENDLY_FIRE then
+			return
+		end
+		local obj = t.Attacker and t.Attacker.Object
+		if obj and bit.And(obj.Bits, REMOTE_OWNER_BIT) > 0 then
+			t.Handled = true
+		end
+	end
 end

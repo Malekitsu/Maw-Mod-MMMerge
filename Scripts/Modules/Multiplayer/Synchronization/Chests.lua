@@ -183,6 +183,14 @@ Claims.define("chest", {
 })
 
 function events.CanOpenChest(t)
+	if t.CanOpen == false then
+		if confirmed_chest == t.ChestId then
+			confirmed_chest = nil
+		end
+		Claims.release("chest", t.ChestId)
+		return
+	end
+
 	if confirmed_chest == t.ChestId then
 		confirmed_chest = nil
 		t.CanOpen = true
