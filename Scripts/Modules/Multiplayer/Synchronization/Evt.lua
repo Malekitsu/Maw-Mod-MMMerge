@@ -336,11 +336,25 @@ packets = {
 		handler = function(bin_string, metadata)
 			local params = bin_to_item(toptr(bin_string))
 			local command = remote_commands[params._id]
-			if command then
-				params._map = metadata.map_id
-				--LogEvent("EVT", "Executing remote evt #%s, params: %s.", command.id, table.concat(params, ","))
-				local_evt(command.evt, params)
+			if not command then
+				return
 			end
+			params._map = metadata.map_id
+			-- a map command is applied only on the map it was fired on, never during a load
+			if command.map_only then
+				if metadata.map_id ~= Map.MapStatsIndex then
+					return
+				elseif Multiplayer.leave_map_halt then
+					events.Once("MapLoadingDone", function()
+						if metadata.map_id == Map.MapStatsIndex then
+							local_evt(command.evt, params)
+						end
+					end)
+					return
+				end
+			end
+			--LogEvent("EVT", "Executing remote evt #%s, params: %s.", command.id, table.concat(params, ","))
+			local_evt(command.evt, params)
 		end,
 		check_delivery = true,
 		compress = true

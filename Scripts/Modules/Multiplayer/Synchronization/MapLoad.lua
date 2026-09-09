@@ -274,8 +274,10 @@ local packets = {
 					else
 						LogEvent("MAP_LOAD", "Queueing delayed response.")
 						events.Once("MapLoadingDone", function()
-							LogEvent("MAP_LOAD", "Sending response after delay: map data %s.", map_id)
-							Multiplayer.send_response(Multiplayer.packet_by_code[metadata.packet_code], metadata, prep_map_data())
+							-- the halt may have been me leaving this very map: answer only if still here
+							local delayed = Map.MapStatsIndex == map_id and prep_map_data() or false
+							LogEvent("MAP_LOAD", "Sending response after delay: map data %s (%s).", map_id, tostring(delayed))
+							Multiplayer.send_response(Multiplayer.packet_by_code[metadata.packet_code], metadata, delayed)
 						end)
 						return nil -- delayed response
 					end
@@ -417,7 +419,10 @@ local function get_remote_map_data(map_id)
 		end
 	end
 	if #hashes > 0 then
-		response = Multiplayer.wait_first_response(hashes, 12, function(r) return r.handler_result end)
+		response = Multiplayer.wait_first_response(hashes, 12, function(r)
+			local data = r.handler_result
+			return data and data.DataMapStatsIndex == map_id
+		end)
 		if response then
 			LogEvent("MAP_LOAD", "%s: got data from player #%s.", filename, response.metadata.sender_id)
 			return true, response, true
