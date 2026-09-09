@@ -63,13 +63,19 @@ end
 -- (aucun fallback, aucun changement de formules, on ne touche rien si un champ manque)
 
 -- Helper function to get list of player-controlled monsters in multiplayer
+-- by marker, not by session: a puppet left behind in a save is still a puppet
 local function getPlayerControlledMonsters()
-	if not MawCore.Sync.inGame() then
-		return {}
+	local puppets = {}
+	local aitype = Multiplayer and Multiplayer.PUPPET_AITYPE
+	if not aitype then
+		return puppets
 	end
-	-- Use Multiplayer.client_monsters() to get player-controlled monster indices
-	local clientMonsters = Multiplayer.client_monsters()
-	return clientMonsters or {}
+	for i = 0, Map.Monsters.High do
+		if Map.Monsters[i].AIType == aitype then
+			table.insert(puppets, i)
+		end
+	end
+	return puppets
 end
 
 function events.AfterLoadMap()
