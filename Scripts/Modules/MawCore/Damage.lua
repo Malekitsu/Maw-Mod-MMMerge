@@ -291,10 +291,12 @@ local function stage_weaponStun(t)
 	end
 	duration=calcDebuffDuration(mon, stunCC, duration)
 	if duration<=0 then return end
+	local idx=t.MonsterIndex
 	RunNextTick(function()
 		if mon.HP~=0 then
 			--extend, never cut a longer stun already running
 			mon.SpellBuffs[6].ExpireTime=math.max(mon.SpellBuffs[6].ExpireTime, Game.Time+duration)
+			MawCore.Sync.monsterBuffChanged(idx, 6)
 		end
 	end)
 end
@@ -604,6 +606,7 @@ local function stage_resAndRetaliation(t)
 					stunDuration=stunDuration/2
 				end
 				t.Monster.SpellBuffs[6].ExpireTime=Game.Time+const.Minute
+				MawCore.Sync.monsterBuffChanged(t.MonsterIndex, 6)
 			end
 			RunNextTick(function()
 				pl.RecoveryDelay=pl.RecoveryDelay*(math.max(1-0.3*stacks,0))
@@ -800,9 +803,11 @@ local function stage_dkAttack(t)
 				if graspDuration > 0 then
 					pl.SP=pl.SP-graspCost
 					t.Monster.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.DamageHalved].ExpireTime, Game.Time+graspDuration)
+					MawCore.Sync.monsterBuffChanged(t.MonsterIndex, const.MonsterBuff.DamageHalved)
 					local s, m=SplitSkill(pl.Skills[const.Skills.Dark])
 					if m>=4 then
 						t.Monster.SpellBuffs[const.MonsterBuff.MeleeOnly].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.MeleeOnly].ExpireTime, Game.Time+graspDuration)
+						MawCore.Sync.monsterBuffChanged(t.MonsterIndex, const.MonsterBuff.MeleeOnly)
 					end
 				end
 			end
@@ -827,6 +832,7 @@ local function stage_dkAttack(t)
 					if slowDuration > 0 then
 						t.Monster.SpellBuffs[const.MonsterBuff.Slow].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.Slow].ExpireTime, Game.Time+slowDuration)
 						t.Monster.SpellBuffs[const.MonsterBuff.Slow].Power=power
+						MawCore.Sync.monsterBuffChanged(t.MonsterIndex, const.MonsterBuff.Slow)
 					end
 				end
 			elseif data.Object.Spell==76 then
@@ -834,6 +840,7 @@ local function stage_dkAttack(t)
 				local paraDuration = calcDebuffDuration(t.Monster, paraCC, const.Minute*2)
 				if paraDuration > 0 then
 					t.Monster.SpellBuffs[const.MonsterBuff.Paralyze].ExpireTime=math.max(t.Monster.SpellBuffs[const.MonsterBuff.Paralyze].ExpireTime, Game.Time+paraDuration)
+					MawCore.Sync.monsterBuffChanged(t.MonsterIndex, const.MonsterBuff.Paralyze)
 				end
 			end
 		end

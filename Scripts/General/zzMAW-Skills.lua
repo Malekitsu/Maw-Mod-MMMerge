@@ -652,6 +652,10 @@ local function navigateMissile(object)
 	then
 		return
 	end
+	-- another player's projectile flies by his aim, not ours
+	if MawCore.Sync.inGame() and bit.band(object.Bits, Multiplayer.REMOTE_OWNER_BIT) ~= 0 then
+		return
+	end
 	-- object parameters
 	local ownerKind = bit.band(object.Owner, 7)
 	local targetKind = bit.band(object.Target, 7)
@@ -974,6 +978,7 @@ function events.KeyDown(t)
 						duration = calcDebuffDuration(mon, chargeCC, duration)
 						if duration > 0 then
 							mon.SpellBuffs[6].ExpireTime=Game.Time+duration
+							MawCore.Sync.monsterBuffChanged(mon:GetIndex(), 6)
 						end
 						local vel=mon.Velocity
 						mon.Velocity=0

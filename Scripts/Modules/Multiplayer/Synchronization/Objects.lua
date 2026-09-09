@@ -15,6 +15,7 @@ local NO_SYNC_OBJECT_BIT = 0x1000
 local PICKED_BY_PLAYER_BIT = 0x2000
 
 Multiplayer.NO_SYNC_OBJECT_BIT = NO_SYNC_OBJECT_BIT -- no synchronization if bit set
+Multiplayer.REMOTE_OWNER_BIT = REMOTE_OWNER_BIT -- object belongs to another player
 
 local last_object_state = {}
 local last_object_postime = {}

@@ -22,6 +22,24 @@ function Sync.isMainOnMap()
 	return not Sync.inGame() or Multiplayer.main_player_on_map() == Multiplayer.my_id
 end
 
+-- whether this client's engine runs the monster's AI: moves, pushes and
+-- nudges belong to that client only (true when alone or offline)
+function Sync.drivesMonster(index)
+	if not Sync.inGame() or type(index) ~= "number" then
+		return true
+	end
+	local owner = Multiplayer.SyncMonsters.monster_owner(index)
+	return owner == Multiplayer.my_id or owner == -1
+end
+
+-- a debuff written straight into a monster's SpellBuffs bypasses the engine
+-- routine the module hooks: tell the module ourselves so the others get it
+function Sync.monsterBuffChanged(index, buff)
+	if Sync.inGame() and type(index) == "number" and Multiplayer.SyncMonsters.notify_spellbuff then
+		Multiplayer.SyncMonsters.notify_spellbuff(index, buff)
+	end
+end
+
 -- Host-owned game state. vars keys are mirrored verbatim (tables replaced
 -- content-wise, so references held by other files stay valid); Game fields
 -- likewise. Add a key here and nowhere else.

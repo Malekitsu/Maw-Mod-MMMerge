@@ -9,6 +9,7 @@ local events = Multiplayer.events
 local LogEvent = Multiplayer.utils.LogEvent
 
 local ALLOWED_CHANGE_FREQUENCY = 4000 -- milliseconds
+local OWNER_DRIVE_RANGE = 4096 -- an owner this close to the monster is still running it
 local TAKEN = 1
 local FREED = 0
 
@@ -109,6 +110,10 @@ local function can_takeover_monster(i, mon, timestamp, attacked)
 		return false
 	end
 
+	local owner_mon = Multiplayer.get_client_mon(own.Owner)
+	if owner_mon and Multiplayer.utils.distance(owner_mon, mon) < OWNER_DRIVE_RANGE then
+		return false
+	end
 	return true
 end
 

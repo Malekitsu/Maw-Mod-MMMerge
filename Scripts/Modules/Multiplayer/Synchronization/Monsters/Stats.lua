@@ -238,18 +238,30 @@ function events.PlayerCastSpell(t)
 	end
 end
 
+local function queue_spellbuff(mon_index, buff_id, skill, power, expire_time)
+	local spellbuffs = received_spellbuffs[mon_index]
+	if not spellbuffs then
+		spellbuffs = {}
+		received_spellbuffs[mon_index] = spellbuffs
+	end
+	spellbuffs[buff_id] = {Skill = skill, Power = power, ExpireTime = expire_time}
+end
+
 function events.MonsterReceiveSpellBuff(t)
 	if Multiplayer.posessed_by_player(t.MonsterIndex) then
 		t.Handled = true
 		return
 	end
+	queue_spellbuff(t.MonsterIndex, t.SpellBuff, t.Skill, t.Power, t.ExpireTime)
+end
 
-	local spellbuffs = received_spellbuffs[t.MonsterIndex]
-	if not spellbuffs then
-		spellbuffs = {}
-		received_spellbuffs[t.MonsterIndex] = spellbuffs
+-- for buffs written into the monster struct by scripts, past the engine routine
+Multiplayer.SyncMonsters.notify_spellbuff = function(mon_index, buff_id)
+	if mon_index >= Map.Monsters.count or Multiplayer.posessed_by_player(mon_index) then
+		return
 	end
-	spellbuffs[t.SpellBuff] = {Skill = t.Skill, Power = t.Power, ExpireTime = t.ExpireTime}
+	local buff = Map.Monsters[mon_index].SpellBuffs[buff_id]
+	queue_spellbuff(mon_index, buff_id, buff.Skill, buff.Power, buff.ExpireTime)
 end
 
 function events.Tick()

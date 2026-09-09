@@ -473,10 +473,12 @@ function mawTick_MonsterPush()
 	for i=1, #push do
 		if push[i].duration>0 then
 			push[i].duration=push[i].duration-1
-			mon=Map.Monsters[push[i].id]
-			mon.VelocityX=push[i].directionX * push[i].currentForce
-			mon.VelocityY=push[i].directionY * push[i].currentForce
-			mon.VelocityZ=push[i].currentForce/2 - push[i].totalForce/4
+			if MawCore.Sync.drivesMonster(push[i].id) then
+				mon=Map.Monsters[push[i].id]
+				mon.VelocityX=push[i].directionX * push[i].currentForce
+				mon.VelocityY=push[i].directionY * push[i].currentForce
+				mon.VelocityZ=push[i].currentForce/2 - push[i].totalForce/4
+			end
 			push[i].currentForce=push[i].currentForce - push[i].totalForce / push[i].totalDuration
 		end
 	end

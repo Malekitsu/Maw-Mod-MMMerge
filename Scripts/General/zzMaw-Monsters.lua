@@ -3395,7 +3395,8 @@ function mawTick_SwiftBosses()
               loc = { mon.X or 0, mon.Y or 0 }
               swiftLocation[mid] = loc
             end
-            if math.abs((mon.X or 0) - loc[1]) < 100 and math.abs((mon.Y or 0) - loc[2]) < 100 then
+            if math.abs((mon.X or 0) - loc[1]) < 100 and math.abs((mon.Y or 0) - loc[2]) < 100
+              and MawCore.Sync.drivesMonster(mid) then
               mon.X = (mon.X or 0) + ((mon.X or 0) - loc[1])
               mon.Y = (mon.Y or 0) + ((mon.Y or 0) - loc[2])
             end
@@ -3418,7 +3419,8 @@ function mawTick_SwiftBosses()
           loc = { mon.X or 0, mon.Y or 0 }
           swiftLocation[i] = loc
         end
-        if math.abs((mon.X or 0) - loc[1]) < 100 and math.abs((mon.Y or 0) - loc[2]) < 100 then
+        if math.abs((mon.X or 0) - loc[1]) < 100 and math.abs((mon.Y or 0) - loc[2]) < 100
+          and MawCore.Sync.drivesMonster(i) then
           local k = (aff or 0) / 100
           mon.X = (mon.X or 0) + ((mon.X or 0) - loc[1]) * k
           mon.Y = (mon.Y or 0) + ((mon.Y or 0) - loc[2]) * k
@@ -4257,7 +4259,7 @@ function events.MonstersProcessed()
 		--allies were being shoved too; this is the pair the rest of Maw uses to
 		--mean "actively an enemy"
 		if mon.AIState==0 and mon.ShowAsHostile and mon.Hostile
-			and getDistance(mon.X,mon.Y,mon.Z)<350 then
+			and getDistance(mon.X,mon.Y,mon.Z)<350 and MawCore.Sync.drivesMonster(i) then
 			nudgeMonsterAroundCorner(mon)
 		end
 	end
