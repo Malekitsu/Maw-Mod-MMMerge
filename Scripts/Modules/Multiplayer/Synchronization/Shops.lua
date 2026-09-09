@@ -91,6 +91,17 @@ local function shake_head()
 	Game.PlaySound(27)
 end
 
+local function leave_stock()
+	if not last_shop then
+		return
+	end
+	if Claims.owner("stock", last_shop) == Multiplayer.my_id then
+		Multiplayer.broadcast(packets.stock_info:prep(last_shop))
+	end
+	Claims.release("stock", last_shop)
+	last_shop = nil
+end
+
 -- one player per stock; the stock opens at once and a lost claim sends us back out
 Claims.define("stock", {
 	scope = "map",
@@ -140,6 +151,9 @@ function events.ClickShopTopic(t)
 	local this_shop = shop_ref(stock_type, stock_id)
 	Multiplayer.debug.last_stock_ref = this_shop
 
+	if last_shop and last_shop ~= this_shop then
+		leave_stock()
+	end
 	if Claims.try("stock", this_shop) == "taken" then
 		shake_head()
 		t.Handled = true
@@ -149,23 +163,7 @@ function events.ClickShopTopic(t)
 end
 
 function events.Action(t)
-	if t.Action ~= 113 then
-		return
+	if t.Action == 113 then
+		leave_stock()
 	end
-
-	local house_type = Game.Houses[GetCurrentHouse()].Type
-	if house_type < 1 or house_type > 15 then
-		last_shop = nil
-		return
-	end
-
-	if not last_shop then
-		return
-	end
-
-	if Claims.owner("stock", last_shop) == Multiplayer.my_id then
-		Multiplayer.broadcast(packets.stock_info:prep(last_shop))
-	end
-	Claims.release("stock", last_shop)
-	last_shop = nil
 end

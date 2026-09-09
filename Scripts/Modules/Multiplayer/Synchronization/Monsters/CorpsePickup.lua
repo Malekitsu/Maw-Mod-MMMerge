@@ -31,7 +31,7 @@ local function loot_corpse_now(index)
 		return
 	end
 	local mon = Map.Monsters[index]
-	if mon.AIState ~= const.AIState.Removed then
+	if mon.AIState ~= const.AIState.Removed and mon.AIState ~= const.AIState.Dead then
 		return
 	end
 

@@ -154,11 +154,17 @@ packets = {
 	},
 
 	claims_snapshot = {
-		bulb = function(scope)
+		bulb = function(scope, exclude_mine)
 			local t = {scope = scope, map = Map.MapStatsIndex, kinds = {}}
 			for kind, def in pairs(kinds) do
 				if def.scope == scope then
-					t.kinds[kind] = claims[kind]
+					local list = {}
+					for id, owner in pairs(claims[kind]) do
+						if not (exclude_mine and owner == Multiplayer.my_id) then
+							list[id] = owner
+						end
+					end
+					t.kinds[kind] = list
 				end
 			end
 			return item_to_bin(t)
@@ -191,7 +197,9 @@ function Claims.try(kind, id, ctx)
 	local mine = Multiplayer.my_id
 	local owner = claims[kind][id]
 
-	if pending[kind][id] then
+	local ask = pending[kind][id]
+	if ask then
+		ask.release = nil
 		return "pending"
 	end
 	if owner == mine then
@@ -212,11 +220,21 @@ function Claims.try(kind, id, ctx)
 	Multiplayer.ask(judge, packets.claim, CLAIM_TIMEOUT, function(ok, response)
 		local ask = pending[kind][id]
 		if not ask then
-			return -- released or map left while the answer travelled
+			return -- map left while the answer travelled
 		end
 		pending[kind][id] = nil
 
 		local verdict = ok and response.handler_result
+		if ask.release then
+			-- released before the verdict: hand it back only once the arbiter has seen the claim
+			if not ok or type(verdict) ~= "table" or verdict.granted then
+				claims[kind][id] = nil
+				Multiplayer.add_to_send_queue(judge, packets.claim_release:prep(kind, id))
+			else
+				claims[kind][id] = verdict.owner
+			end
+			return
+		end
 		if not ok or type(verdict) ~= "table" then
 			LogEvent("SYNC", "No verdict for %s #%s, keeping it", kind, tostring(id))
 			if def.on_timeout then
@@ -241,7 +259,11 @@ function Claims.release(kind, id)
 	if not kinds[kind] then
 		return
 	end
-	pending[kind][id] = nil
+	local ask = pending[kind][id]
+	if ask then
+		ask.release = true
+		return
+	end
 	if claims[kind][id] ~= Multiplayer.my_id then
 		return
 	end
@@ -306,7 +328,7 @@ function events.LeaveMap()
 			end
 		end
 		if heir then
-			Multiplayer.add_to_send_queue(heir, packets.claims_snapshot:prep("map"))
+			Multiplayer.add_to_send_queue(heir, packets.claims_snapshot:prep("map", true))
 		end
 	end
 	reset("map")
