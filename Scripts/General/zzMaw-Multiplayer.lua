@@ -384,12 +384,45 @@ local function sendBuffs()
 	vars._maw_last_sent = current
 end
 
+-- a sender gone from the map never sends its OFF: drop what it shared
+local function purge_sender_buffs(client_id)
+	ensure_state()
+	local sender = tostring(client_id)
+	local changed = false
+	for id, owners in pairs(vars.maw_remote_owners) do
+		if owners[sender] then
+			owners[sender] = nil
+			local perSender = vars.maw_remote_values[id]
+			if perSender then perSender[sender] = nil end
+			local v = vars.mawbuff[id]
+			if next(owners) == nil then
+				if type(v) == "table" then vars.mawbuff[id] = nil; changed = true end
+				vars.mawbuff_remote[id] = nil
+				vars.maw_remote_values[id] = nil
+				vars.maw_remote_owners[id] = nil
+			elseif type(v) == "table" then
+				local eff = remote_effective(id)
+				if v[1] ~= eff[1] or v[2] ~= eff[2] or v[3] ~= eff[3] then
+					vars.mawbuff[id] = { eff[1], eff[2], eff[3] }
+					changed = true
+				end
+			end
+		end
+	end
+	if changed and type(mawBuffApply) == "function" then mawBuffApply() end
+end
+
 function events.ClientJoined()
 	last_on_signature = nil
 end
 
-function events.ClientChangeMap()
+function events.ClientChangeMap(client_id)
 	last_on_signature = nil
+	purge_sender_buffs(client_id)
+end
+
+function events.ClientLeft(client_id)
+	purge_sender_buffs(client_id)
 end
 
 ------------------------------------------------------------
@@ -525,3 +558,39 @@ function events.MultiplayerDeathScreen()
 	MAW_StartWeakProtect(30)
 	__after_death_resend_pulse()
 end
+
+------------------------------------------------------------
+-- ENTRY CLOAK: invisible for the first ticks after a map load
+------------------------------------------------------------
+local ENTRY_CLOAK_TICKS = 15 --must be above 10 due to MAW teleport code
+local entryCloakTicks = 0
+
+local function dropEntryCloak()
+	if entryCloakTicks <= 0 then return end
+	entryCloakTicks = 0
+	local buff = Party.SpellBuffs[const.PartyBuff.Invisibility]
+	if buff.Skill == 0 and buff.Power == 0 then
+		buff.ExpireTime = 0
+	end
+end
+
+function events.AfterLoadMap()
+	entryCloakTicks = 0
+	if not inMulti() then return end
+	local buff = Party.SpellBuffs[const.PartyBuff.Invisibility]
+	if buff.ExpireTime > NOW() then return end
+	buff.ExpireTime = NOW() + const.Hour
+	buff.Skill, buff.Power = 0, 0
+	entryCloakTicks = ENTRY_CLOAK_TICKS
+end
+
+function events.Tick()
+	if entryCloakTicks <= 0 then return end
+	entryCloakTicks = entryCloakTicks - 1
+	if entryCloakTicks == 0 then
+		dropEntryCloak()
+	end
+end
+
+events.LeaveMap = dropEntryCloak
+events.MultiplayerStopped = dropEntryCloak
