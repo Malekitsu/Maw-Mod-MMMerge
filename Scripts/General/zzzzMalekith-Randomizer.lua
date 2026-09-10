@@ -330,17 +330,75 @@ function SetMonsterDensity()
 		end
 	end
 
+	--make bigger monsters more rare
+	if vars.Mode==2 then
+		for i=1,Game.MapStats.High do
+			local map=Game.MapStats[i]
+			local name1=map.Monster1Pic
+			local name2=map.Monster2Pic
+			local name3=map.Monster3Pic
+			local divisor=18
+			if vars.madnessMode then
+				divisor=10
+			elseif vars.insanityMode then
+				divisor=14
+			end
+			local level1=math.floor(monsterPicTable[name1]/divisor)
+			local level2=math.floor(monsterPicTable[name2]/divisor)
+			local level3=math.floor(monsterPicTable[name3]/divisor)
+			for j=1,level1 do
+				if j%3==0 then
+					map.Mon1Low=math.max(map.Mon1Low-1, 1)
+				else
+					map.Mon1Hi=math.max(map.Mon1Hi-1, 1)
+				end
+			end
+			for j=1,level2 do
+				if j%3==0 then
+					map.Mon2Low=math.max(map.Mon2Low-1, 1)
+				else
+					map.Mon2Hi=math.max(map.Mon2Hi-1, 1)
+				end
+			end
+			for j=1,level3 do
+				if j%3==0 then
+					map.Mon3Low=math.max(map.Mon3Low-1, 1)
+				else
+					map.Mon3Hi=math.max(map.Mon3Hi-1, 1)
+				end
+			end
+		end
+	end
 end
 
 function events.GameInitialized2()
-	--picked on the new-game setup page (zzMaw_GameSetup) now, not on the
-	--character creation screen
-	MawGameSetup.AddOption{
-		Label	= "Randomizer",
-		Values	= {false, true},
-		Get		= function() return Game.RandomizerMode == true end,
-		Set		= function(val) Game.RandomizerMode=val end,
-		Text	= function(val) return val and "On" or "Off" end}
+	randomizerButton=CustomUI.CreateButton{
+		IconUp	 	= "TmblrOff",
+		IconDown	= "TmblrOn",
+		Screen		= 21,
+		Layer		= 0,
+		X		=	485,
+		Y		=	55,
+		Action	=	function()
+						if Game.RandomizerMode then
+							Game.RandomizerMode=false
+							randomizerButton.IUpSrc="TmblrOff"
+							randomizerButton.IDwSrc="TmblrOn"
+						else
+							Game.RandomizerMode=true
+							randomizerButton.IUpSrc="TmblrOn"
+							randomizerButton.IDwSrc="TmblrOff"
+						end
+					end
+	}
+	CustomUI.CreateText{
+		Text = " Randomizer",
+		X = 380,
+		Y = 58,
+		Width = 45,
+		Height = 16,
+		Screen = 21
+	}
 end
 
 function events.BeforeNewGameAutosave()
