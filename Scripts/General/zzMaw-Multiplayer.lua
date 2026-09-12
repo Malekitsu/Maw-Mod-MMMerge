@@ -562,12 +562,13 @@ end
 ------------------------------------------------------------
 -- ENTRY CLOAK: invisible for the first ticks after a map load
 ------------------------------------------------------------
-local ENTRY_CLOAK_TICKS = 15 --must be above 10 due to MAW teleport code
-local entryCloakTicks = 0
+local ENTRY_CLOAK_GRACE_TICKS = 15 --no checks at all for these frames (MAW teleport code runs here)
+local ENTRY_CLOAK_MOVE = 16
+local entryCloak
 
 local function dropEntryCloak()
-	if entryCloakTicks <= 0 then return end
-	entryCloakTicks = 0
+	if not entryCloak then return end
+	entryCloak = nil
 	local buff = Party.SpellBuffs[const.PartyBuff.Invisibility]
 	if buff.Skill == 0 and buff.Power == 0 then
 		buff.ExpireTime = 0
@@ -575,19 +576,31 @@ local function dropEntryCloak()
 end
 
 function events.AfterLoadMap()
-	entryCloakTicks = 0
+	entryCloak = nil
 	if not inMulti() then return end
 	local buff = Party.SpellBuffs[const.PartyBuff.Invisibility]
 	if buff.ExpireTime > NOW() then return end
 	buff.ExpireTime = NOW() + const.Hour
 	buff.Skill, buff.Power = 0, 0
-	entryCloakTicks = ENTRY_CLOAK_TICKS
+	entryCloak = { grace = ENTRY_CLOAK_GRACE_TICKS }
 end
 
+-- grace frames first, then the buff stays until the party moves; an attack
+-- or a cast is the engine's job and just ends the tracking
 function events.Tick()
-	if entryCloakTicks <= 0 then return end
-	entryCloakTicks = entryCloakTicks - 1
-	if entryCloakTicks == 0 then
+	if not entryCloak then return end
+	if Party.SpellBuffs[const.PartyBuff.Invisibility].ExpireTime <= NOW() then
+		entryCloak = nil
+		return
+	end
+	if entryCloak.grace then
+		entryCloak.grace = entryCloak.grace - 1
+		if entryCloak.grace <= 0 then
+			entryCloak = { X = Party.X, Y = Party.Y }
+		end
+		return
+	end
+	if math.abs(Party.X - entryCloak.X) > ENTRY_CLOAK_MOVE or math.abs(Party.Y - entryCloak.Y) > ENTRY_CLOAK_MOVE then
 		dropEntryCloak()
 	end
 end
