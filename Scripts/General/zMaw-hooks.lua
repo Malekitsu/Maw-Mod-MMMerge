@@ -195,3 +195,30 @@ mem.hookfunction(0x4256DB, 0, 4, function(d, def, this, mon, range, bonus)
 	events.cocalls("PlayerHitOrMiss", t)
 	return t.Result and 1 or 0
 end)
+
+-- temple main screen: the engine splits the free space by the number of
+-- visible topics with no zero check (idiv edi at 0x4b5d85)
+mem.asmhook(0x4b5d84, [[
+test edi, edi
+jnz @ok
+inc edi
+@ok:
+]])
+
+-- UI message loop (0x43318b): ebx, esi and edi are constants for the whole
+-- function. Something run while handling a message can hand them back
+-- changed and the next message then reads Party through garbage (crash at
+-- 0x4026F8). Put them back at every loop head and log the message that did it.
+mem.autohook(0x4331aa, function(d)
+	if d.edi == 0xB20E90 and d.esi == 0xFEB360 and d.ebx == 0 then
+		return
+	end
+	local f = io.open("MawRegisterGuard.log", "a")
+	if f then
+		f:write(string.format("%s action %s: ebx=%s esi=%s edi=%s map=%s\n",
+			os.date("%Y-%m-%d %H:%M:%S"), tostring(mem.i4[d.esp + 0x1c]),
+			tostring(d.ebx), tostring(d.esi), tostring(d.edi), tostring(Map and Map.Name)))
+		f:close()
+	end
+	d.edi, d.esi, d.ebx = 0xB20E90, 0xFEB360, 0
+end)
