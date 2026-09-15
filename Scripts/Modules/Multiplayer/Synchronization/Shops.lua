@@ -96,7 +96,10 @@ local function leave_stock()
 		return
 	end
 	if Claims.owner("stock", last_shop) == Multiplayer.my_id then
-		Multiplayer.broadcast(packets.stock_info:prep(last_shop))
+		-- prep returns packet, bulb, metadata: the condition argument must be
+		-- given explicitly or the bulb lands in it and broadcast calls a string
+		local data = packets.stock_info:prep(last_shop)
+		Multiplayer.broadcast(data, nil)
 	end
 	Claims.release("stock", last_shop)
 	last_shop = nil
