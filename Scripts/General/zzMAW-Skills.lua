@@ -177,7 +177,7 @@ skillMasteryLadder={
 	[50]={normal={6,12,20}, insanity={8,20,30}},	--Cover
 	[51]={normal={6,12,20}, insanity={8,20,32}},	--Mana Shield
 	[52]={normal={6,12,20}},						--Enlightenment
-	[53]={normal={12,30,50}},						--Retaliation
+	[53]={normal={10,24,40}},						--Retaliation
 }
 
 skillTrainHook={}
