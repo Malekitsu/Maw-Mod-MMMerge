@@ -2088,11 +2088,12 @@ function events.BuildMonsterInformationBox(t)
 				activeDebuffs = activeDebuffs .. "\n" .. buffName .. ": " .. remaining .. "s"
 			end
 		end
-		local spearStack = mapvars.spearDamageIncrease and mapvars.spearDamageIncrease[id] or 0
+		local monIndex = mon:GetIndex()
+		local spearStack = mapvars.spearDamageIncrease and mapvars.spearDamageIncrease[monIndex] or 0
 		if spearStack > 0 then
 			activeDebuffs = activeDebuffs .. "\nPhysical damage taken: +" .. round(spearStack) .. "%"
 		end
-		local legendaryStack = mapvars.legendaryDamageTaken and mapvars.legendaryDamageTaken[id] or 0
+		local legendaryStack = mapvars.legendaryDamageTaken and mapvars.legendaryDamageTaken[monIndex] or 0
 		if legendaryStack > 0 then
 			activeDebuffs = activeDebuffs .. "\nAll damage taken: +" .. round(legendaryStack) .. "%"
 		end

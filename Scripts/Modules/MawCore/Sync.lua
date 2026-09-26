@@ -69,7 +69,7 @@ Sync.PartyVars = {
 	"learningFix", "removeSoloMastery", "checkSoloMastery", "BBFIX", "needToFixCover", "needToFixMaxCharges",
 	"StartingItemFix", "hirelingFix", "LichFix", "dragonMeditationRemoved",
 	"damageTrack", "damageTrackRanged", "healingDone", "leechDone", "regenerationHeal", "manaShield", "shieldEnchant",
-	"normalEnchantResistance", "spearDamageIncrease", "retaliation", "covering",
+	"normalEnchantResistance", "retaliation", "covering",
 	"divineProtectionCooldown", "legendaryProtectionCooldown", "healthPotionCooldown", "manaPotionCooldown", "chargeCooldown",
 	"artifactRollPity", "artPity", "craftPityCounters", "legendaryAffixDropped", "monsterCounters", "monsterSeeds", "SeedList", "seed",
 	"ownedMaps", "introduction", "refundFood",
