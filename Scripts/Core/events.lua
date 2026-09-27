@@ -2186,12 +2186,12 @@ do
 			}
 			-- can be called even if 'Handled' is 'true'
 			function t.CallDefault()
-				def(this, t.Strength or strength, t.Kind or kind, item)
+				def(this, t.Strength or strength, t.Kind or kind, item, t.AlwaysEnchant)
 				t.Handled = true
 			end
 			events.cocalls("GenerateItem", t)
 			if not t.Handled then
-				def(this, t.Strength or strength, t.Kind or kind, item)
+				def(this, t.Strength or strength, t.Kind or kind, item, t.AlwaysEnchant)
 			end
 			events.cocalls("ItemGenerated", t)
 		end)
