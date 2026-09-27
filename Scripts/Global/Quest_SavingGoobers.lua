@@ -479,7 +479,7 @@ Quest{
 	CanShow = function() return vars.Quests["SG_Attunement"] == "Done" and not (vars.Quests["SG_ActivateTheTele"] == "Done") end,
 	CheckDone = function()
 		local Taken = false
-		while TakeItemFromParty(219) or TakeItemFromParty(1021) and QSet.PhilStonesLeft > 0 do
+		while QSet.PhilStonesLeft > 0 and (TakeItemFromParty(219) or TakeItemFromParty(1021)) do
 			QSet.PhilStonesLeft = QSet.PhilStonesLeft - 1
 			Taken = true
 		end
