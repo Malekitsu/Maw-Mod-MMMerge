@@ -1865,13 +1865,28 @@ local function getReqAndCost(mastery, player)
 	return requirements, cost
 end
 
+--the teacher topic the player clicked: the merge keeps several teach texts per
+--skill and mastery (Data/Tables/Teacher topics.txt, exposed as Game.TeacherTopics:
+--MM6 and MM7 teachers, Blaster, Dodging, Unarmed). 298+3*skill+mastery is only
+--MM8's own text, and for Blaster, Dodging and Unarmed it is a roster character's
+--join speech
+local lastClickedTopic
+function events.ClickNPCTopic(topic)
+	lastClickedTopic=topic
+end
+
 function events.AfterPopulateNPCDialog(t)
 	if t.DlgKind ~= "TeachSkill" then return end
 	local skill = Game.HouseActionInfo
 	if not table.find(horizontalSkills, skill) then return end
 	local skillM = Game.HouseTeachMastery
 
-	local message=Game.NPCText[298+3*skill+skillM]
+	local textId=298+3*skill+skillM
+	local topic=Game.TeacherTopics and lastClickedTopic and Game.TeacherTopics[lastClickedTopic]
+	if topic and topic.SId==skill and topic.Mas==skillM-1 then
+		textId=topic.Text
+	end
+	local message=Game.NPCText[textId]
 	local function printMessage(player)
 		local req,cost=getReqAndCost(skillM, player)
 		--NOT the current requirement: this is the vanilla number baked into the
