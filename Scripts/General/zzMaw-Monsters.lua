@@ -4273,6 +4273,12 @@ function events.MonstersProcessed()
 end
 
 --translate mapLevels table
+--mapLevels and madnessMapLevels are keyed by English map names. A localization
+--renames Game.MapStats in GameInitialized2 after this handler (LocalizeTables.lua
+--registers itself last), so the English names are kept here and a lookup by a
+--localized name falls back to its English key. A metatable rather than copies made
+--in BeforeLoadMap: the BeforeLoadMap handler above that recalculates the monster
+--table runs first, so on the first map load it found no entry and crashed.
 function events.GameInitialized2()
 	engLocalizedMap={}
 	for i=0, Game.MapStats.High do
@@ -4280,17 +4286,34 @@ function events.GameInitialized2()
 	end	
 end
 
-function events.BeforeLoadMap()
-	for i=1, #engLocalizedMap do
-		if mapLevels[engLocalizedMap[i]] then
-			local tab=mapLevels[engLocalizedMap[i]]
-			mapLevels[Game.MapStats[i].Name]={}
-			mapLevels[Game.MapStats[i].Name]["Low"]=tab.Low
-			mapLevels[Game.MapStats[i].Name]["Mid"]=tab.Mid
-			mapLevels[Game.MapStats[i].Name]["High"]=tab.High
+local localizedToEnglish
+local function englishMapName(name)
+	if not localizedToEnglish then
+		local map, count={}, 0
+		for i=0, Game.MapStats.High do
+			local eng=engLocalizedMap[i]
+			if eng and Game.MapStats[i].Name~=eng then
+				map[Game.MapStats[i].Name]=eng
+				count=count+1
+			end
 		end
+		--nothing renamed (an English game, or asked before the localization ran):
+		--do not keep an empty table, look again next time
+		if count==0 then return nil end
+		localizedToEnglish=map
 	end
+	return localizedToEnglish[name]
 end
+
+local function aliasLocalizedNames(t)
+	setmetatable(t, {__index=function(tab, name)
+		if type(name)~="string" or not engLocalizedMap then return nil end
+		local eng=englishMapName(name)
+		return eng and rawget(tab, eng)
+	end})
+end
+aliasLocalizedNames(mapLevels)
+aliasLocalizedNames(madnessMapLevels)
 
 function getDistances(unit1,unit2)
 	distance=((unit1.X-unit2.X)^2+(unit1.Y-unit2.Y)^2+(unit1.Z-unit2.Z)^2)^0.5
