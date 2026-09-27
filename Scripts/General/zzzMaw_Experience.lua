@@ -256,6 +256,10 @@ end
 
 function getTotalLevel()
 	local result = 0
+	--party creation: skill tooltips ask before BeforeNewGameAutosave creates MMLVL
+	if not vars.MMLVL then
+		return result
+	end
 	for i=1,4 do
 		result = result + vars.MMLVL[i]
 	end
@@ -269,6 +273,9 @@ end
 function getPartyLevel(currentWorld)
 	currentWorld = currentWorld or TownPortalControls.MapOfContinent(Map.MapStatsIndex)
 	local result = 0
+	if not vars.MMLVL then
+		return result
+	end
 	for i=1,4 do
 		if currentWorld ~= i then
 			result = result + vars.MMLVL[i]
