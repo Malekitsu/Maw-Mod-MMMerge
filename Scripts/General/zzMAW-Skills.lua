@@ -1887,11 +1887,44 @@ function events.AfterPopulateNPCDialog(t)
 		textId=topic.Text
 	end
 	local message=Game.NPCText[textId]
+	--the teach texts name the skill requirement and the price in any order, and
+	--often other numbers that must stay: a stat threshold ("Endurance of 50"), "fire
+	--2 arrows", a second skill. Every number of 100 or more is the price. The
+	--requirement is the digit group equal to the vanilla requirement - NOT the
+	--current one, but the number baked into the text - or failing that the first
+	--number up to 12 (texts say 8, 9 and 12 too). A text that lacks one of the two
+	--(some MM6/MM7 ones, Blaster) gets both on a line of its own.
+	local digits={}
+	for d in message:gmatch("%d+") do
+		digits[#digits+1]=d
+	end
+	local reqDigits=tostring(learningRequirementsNormal[skillM])
+	if not table.find(digits, reqDigits) then
+		reqDigits=nil
+		for _, d in ipairs(digits) do
+			if tonumber(d)<=12 then
+				reqDigits=d
+				break
+			end
+		end
+	end
 	local function printMessage(player)
 		local req,cost=getReqAndCost(skillM, player)
-		--NOT the current requirement: this is the vanilla number baked into the
-		--engine's own text, used to find which digit group in it to replace
-		Message(message:gsub("%d+", |contents| contents==tostring(learningRequirementsNormal[skillM]) and req or cost or contents))
+		local reqDone, costDone=false, false
+		local text=message:gsub("%d+", function(d)
+			if tonumber(d)>=100 then
+				costDone=true
+				return tostring(cost)
+			end
+			if d==reqDigits and not reqDone then
+				reqDone=true
+				return tostring(req)
+			end
+		end)
+		if not (reqDone and costDone) then
+			text=text .. "\n\nYou need at least " .. req .. " skill and " .. cost .. " gold."
+		end
+		Message(text)
 	end
 	local function charChanged(t)
 		if t.Action~=110 then return end
