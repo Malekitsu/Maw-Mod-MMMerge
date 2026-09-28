@@ -3939,7 +3939,7 @@ function events.PlayerAttacked(t)
 			vars.retaliation=vars.retaliation or {}
 			vars.retaliation[id]=vars.retaliation[id] or {}
 			vars.retaliation[id]["Stacks"]=vars.retaliation[id]["Stacks"] or 0
-			vars.retaliation[id]["Time"]=vars.retaliation[id]["Time"] or Game.Time
+			vars.retaliation[id]["Time"]=Game.Time
 			vars.retaliation[id]["Stacks"]=vars.retaliation[id]["Stacks"]+1
 			local cap=1
 			if m>=4 then

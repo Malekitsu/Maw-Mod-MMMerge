@@ -43,6 +43,18 @@ Formulas.damageFloor = 0.1
 
 Formulas.soloCoverDamageTaken = 0.5
 
+-- Retaliation damage per stack, before the monster's resistance: melee power
+-- and vitality (calcPowerVitality) each shrunk by the exponent, times skill.
+Formulas.retaliationExponent = 0.25
+function Formulas.retaliationCoefficients(power, vitality)
+	local e = Formulas.retaliationExponent
+	return round(power^e), round(vitality^e)
+end
+function Formulas.retaliationDamage(power, vitality, skill)
+	local p, v = Formulas.retaliationCoefficients(power, vitality)
+	return p*v*skill
+end
+
 Formulas.armorDivisorBase = 200
 Formulas.armorDivisorPerLevel = 3
 function Formulas.armorDamageTaken(ac, monsterLevel)
