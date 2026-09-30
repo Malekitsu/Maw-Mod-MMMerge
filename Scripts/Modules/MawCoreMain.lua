@@ -39,7 +39,7 @@ end
 MawCore.ModuleOrder = {
 	"Engine",		-- Tier-4 boundary: addresses, patches, mem.*
 	"Fixes",		-- engine patches ported from MAW_Fixes.dll
-	"SpecialItems",	-- shops: identify and repair quest and special items
+	"SpecialItems",	-- shops: identify/repair quest and special items, sell them once no quest needs them
 	"Formulas",		-- shared gameplay formulas: effect + display read one source
 	"ItemLevel",	-- an item's level: MaxCharges <-> level, drop level, caps
 	"Artifacts",	-- artifact power as a budget priced against a perfect Epic
