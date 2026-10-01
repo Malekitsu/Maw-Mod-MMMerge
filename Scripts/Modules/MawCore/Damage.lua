@@ -511,8 +511,9 @@ local function stage_painReflectionFlag(t)
 end
 
 -- from Scripts/General/zzMaw-Stats.lua:1105 -- damage-kind remaps, GM-bow
--- min-res pick, GM-spear and legendary 29 damage-taken stacks,
--- retaliation add, then the FINAL division by 2^(res%1000/100)
+-- min-res pick, GM-spear and legendary 29 damage-taken stacks, then the
+-- FINAL division by 2^(res%1000/100). The res it used is left in
+-- t.RetaliationRes for the retaliation stage.
 local function stage_resAndRetaliation(t)
 	local data=t.Hit
 	if data and data.Player and data.Spell then
@@ -580,38 +581,8 @@ local function stage_resAndRetaliation(t)
 		end
 		t.Result=t.Result*(1+taken/100)
 	end
-	--retaliation code
-	if t.Player then
-		local id=t.Player:GetIndex()
-		if vars.retaliation and vars.retaliation[id] and vars.retaliation[id]["Time"] and vars.retaliation[id].Time+const.Minute*5>Game.Time and vars.retaliation[id].Stacks>0 then
-			local pl=t.Player
-			local s,m=SplitSkill(Skillz.get(pl,53))
-			local fullHP=pl:GetFullHP()
-			local stacks=vars.retaliation[id].Stacks
-			if m<4 then
-				stacks=1
-			end
-			local powerMult, DPS2, DPS3, vitMult=calcPowerVitality(pl, false)
-			local vit=round(vitMult^0.25)
-			local power=round(powerMult^0.25)
-			local totalRetDamage=power*vit*s*stacks
-			t.Result=t.Result+totalRetDamage
-			
-			if 0.25*stacks>math.random() then
-				local stunDuration=const.Minute
-				if t.Monster.NameId>=220 and t.Monster.NameId<=300 then
-					stunDuration=stunDuration/2
-				end
-				t.Monster.SpellBuffs[6].ExpireTime=Game.Time+const.Minute
-				MawCore.Sync.monsterBuffChanged(t.MonsterIndex, 6)
-			end
-			RunNextTick(function()
-				pl.RecoveryDelay=pl.RecoveryDelay*(math.max(1-0.3*stacks,0))
-			end)
-			vars.retaliation[id].Stacks=0
-		end
-	end
-	
+
+	t.RetaliationRes = res
 	t.Result = resDivide(t.Result, res)
 end
 
@@ -894,6 +865,39 @@ local function stage_assassinAttack(t)
 			end
 		end
 	end
+end
+
+-- Retaliation stacks (earned by Cover) spent on the next hit. After the class
+-- overrides on purpose: dragon attacks and the DK/assassin spells replace
+-- t.Result, and while this sat in res-and-retaliation they wiped the added
+-- damage although the stacks were spent.
+local function stage_retaliation(t)
+	if not t.Player or t.Result==0 then return end
+	local id=t.Player:GetIndex()
+	local ret=vars.retaliation and vars.retaliation[id]
+	if not (ret and ret.Time and ret.Time+const.Minute*5>Game.Time and ret.Stacks>0) then return end
+	local pl=t.Player
+	local s,m=SplitSkill(Skillz.get(pl,53))
+	local stacks=ret.Stacks
+	if m<4 then
+		stacks=1
+	end
+	local powerMult, DPS2, DPS3, vitMult=calcPowerVitality(pl, false)
+	local res=t.RetaliationRes or t.Monster.Resistances[table.find(damageKindMap,t.DamageKind)] or 0
+	t.Result=t.Result+resDivide(Formulas.retaliationDamage(powerMult, vitMult, s)*stacks, res)
+
+	if 0.25*stacks>math.random() then
+		local stunDuration=const.Minute
+		if t.Monster.NameId>=220 and t.Monster.NameId<=300 then
+			stunDuration=stunDuration/2
+		end
+		t.Monster.SpellBuffs[6].ExpireTime=Game.Time+stunDuration
+		MawCore.Sync.monsterBuffChanged(t.MonsterIndex, 6)
+	end
+	RunNextTick(function()
+		pl.RecoveryDelay=pl.RecoveryDelay*(math.max(1-0.3*stacks,0))
+	end)
+	ret.Stacks=0
 end
 
 -- from Scripts/General/zzMaw-Monsters.lua:3340 -- boss affixes (NameId 220-299):
@@ -1481,6 +1485,7 @@ local pipe = MawCore.Pipeline.new("DamageToMonster", {
 	"shaman-on-hit",			-- [reactions]
 	"dk-attack",				-- [base] class override
 	"assassin-attack",			-- [base] class override
+	"retaliation",				-- [additive] Cover stacks, after the overrides
 	"boss-affixes",				-- [reactions]
 	"survival-gate",			-- [gates]
 	-- tier 3: was Global file-scope
@@ -1518,6 +1523,7 @@ pipe:on("dragon-attack",     "zzClasses:855",        stage_dragonAttack)
 pipe:on("shaman-on-hit",     "zzClasses:972",        stage_shamanOnHit)
 pipe:on("dk-attack",         "zzClasses:1133",       stage_dkAttack)
 pipe:on("assassin-attack",   "zzClasses:1962",       stage_assassinAttack)
+pipe:on("retaliation",       "zzMaw-Stats:1105",     stage_retaliation)
 pipe:on("boss-affixes",      "zzMaw-Monsters:3340",  stage_bossAffixes)
 pipe:on("survival-gate",     "zzMaw-Survival:316",   stage_survivalGate)
 pipe:on("legendaries",       "zzMaw_Legendaries:22", stage_legendaries)

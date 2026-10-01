@@ -276,10 +276,10 @@ end, "mana shield efficiency + toggle state")
 
 SkillTooltip.set(53, 1, function(pl)
 	local powerMult, DPS2, DPS3, vitMult = calcPowerVitality(pl)
-	local vit = round(vitMult ^ 0.35)
-	local power = round(powerMult ^ 0.35)
+	local power, vit = MawCore.Formulas.retaliationCoefficients(powerMult, vitMult)
 	local retS = SplitSkill(Skillz.get(pl, 53))
-	return "After mastering the art of covering, you have become capable delivering deadly counter attacks to those who dare try harm your allies. Retaliation has a 1% per skill point chance to activate after a successful Cover -- on an ally, or on yourself when you travel alone.\n\nExpert, Master and Grandmaster are learned automatically at skill 12, 30 and 50.\n\nDamage done depends on 2 coefficients, multiplied then by skill level:\n\nMelee Power coefficient: " .. StrColor(255, 0, 0, power) .. "\nVitality coefficient: " .. StrColor(255, 0, 0, vit) .. "\n\nTotal Damage: " .. StrColor(255, 0, 0, retS * vit * power) .. "\n\nBalancing power and vitality leads to the highest damage.\n"
+	local ladder = skillMasteryLadder[53].normal
+	return "After mastering the art of covering, you have become capable delivering deadly counter attacks to those who dare try harm your allies. Retaliation has a 1% per skill point chance to activate after a successful Cover -- on an ally, or on yourself when you travel alone.\n\nExpert, Master and Grandmaster are learned automatically at skill " .. ladder[1] .. ", " .. ladder[2] .. " and " .. ladder[3] .. ".\n\nDamage done depends on 2 coefficients, multiplied then by skill level:\n\nMelee Power coefficient: " .. StrColor(255, 0, 0, power) .. "\nVitality coefficient: " .. StrColor(255, 0, 0, vit) .. "\n\nTotal Damage: " .. StrColor(255, 0, 0, retS * vit * power) .. "\n\nBalancing power and vitality leads to the highest damage.\n"
 end, "retaliation coefficients")
 
 -- was zzMAW-Skills.lua mace events.Action (RunNextTick on the skill screen)
