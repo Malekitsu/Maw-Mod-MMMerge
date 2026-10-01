@@ -58,6 +58,24 @@ Engine.Addr = {
 	SkillNamePtrArray   = 0xBB3060,	-- char* [39], base skill names
 	-- char* [39] per description part (1=base text, 2..5 = N/E/M/G lines)
 	SkillDescPtrArrays  = {0x5E4CB0, 0x5E4C10, 0x5E4B70, 0x5E4AD0, 0x5E4A30},
+
+	-- shop item filter (see SpecialItems.lua). Validated against the merge,
+	-- which jumps out of exactly these four sites in RemoveItemsLimits.lua
+	-- to refuse items with Value 0 or Material 3.
+	-- "does this shop take the item" (ecx = item, edx = house); one routine
+	-- for repair, identify and sell, told apart by its three callers
+	ShopItemCheck       = 0x4BB612,
+	ShopRepairCall      = 0x4BB7ED,	-- call ShopItemCheck, dialog 5 (repair price, broken bit)
+	ShopIdentifyCall    = 0x4BB913,	-- call ShopItemCheck, dialog 4 (identify price, identified bit)
+	ShopSellCall        = 0x4BBA13,	-- call ShopItemCheck, dialog 3
+	ShopCheckSites      = {0x4BB632, 0x4BB642},	-- item-number range tests; esi = number
+	ShopCheckPass       = 0x4BB65A,
+	ShopCheckRefuse     = 0x4BB6B6,	-- xor eax, eax: refused
+	-- merchant sentence (ebx = item, [ebp+0x14] = action 3 sell / 4 identify /
+	-- 5 repair); returns the MerchantTxt row, 5 = "Unnecessary"
+	MerchantRowSites    = {0x49003C, 0x49004C},
+	MerchantRowPass     = 0x490068,
+	MerchantRowReturn   = 0x490096,	-- pop eax / return: jump here after a push
 }
 
 -- Ledger of every binary patch MawCore applies. Nothing in the core may
@@ -104,6 +122,85 @@ end
 function Engine.showItemEffect(it, sprite, time)
 	mem.u4[Engine.Addr.ItemEffectTime] = time or 0x100
 	it.Condition = it.Condition:Or(sprite or 0x10)
+end
+
+-- Replaces the merge's shop item test (refuse Value 0 or Material 3, i.e.
+-- every "special" item for every service) with refuses(item, action, forText):
+-- action 3 = sell, 4 = identify, 5 = repair; true refuses. forText is set when
+-- the merchant's sentence is being chosen, which happens separately from the
+-- click and must agree with it. The rest of the engine's test (stolen items,
+-- shop type) still runs after a pass.
+function Engine.setShopItemFilter(refuses)
+	local A = Engine.Addr
+	local action = Engine.alloc(4)	-- set by each caller of ShopItemCheck
+	local function luaProc(f)
+		local p = Engine.asmproc([[
+			nop
+			nop
+			nop
+			nop
+			nop
+			retn]])
+		mem.hook(p, function(d)
+			local ok, err = pcall(f, d)
+			if not ok then
+				print("shop item filter: " .. tostring(err))
+				d.eax = 1
+			end
+		end)
+		return p
+	end
+	local check = luaProc(function(d)
+		d.eax = refuses(structs.Item:new(d.eax), d.edx, d.ecx ~= 0) and 1 or 0
+	end)
+
+	local callers = {[3] = A.ShopSellCall, [4] = A.ShopIdentifyCall, [5] = A.ShopRepairCall}
+	for act, addr in pairs(callers) do
+		local wrap = Engine.asmproc(string.format([[
+			mov dword [0x%X], %d
+			jmp absolute 0x%X]], action, act, A.ShopItemCheck))
+		Engine.asmpatch("ShopItemCheckCaller" .. act, "shop filter: tell the check which service asks",
+			addr, string.format("call absolute 0x%X", wrap), 5)
+	end
+
+	for i, addr in ipairs(A.ShopCheckSites) do
+		Engine.asmpatch("ShopItemCheck" .. i, "shop filter: repair/identify/sell test",
+			addr, string.format([[
+			push eax
+			push ecx
+			push edx
+			mov eax, ecx
+			mov edx, [0x%X]
+			xor ecx, ecx
+			call absolute 0x%X
+			test eax, eax
+			pop edx
+			pop ecx
+			pop eax
+			jnz absolute 0x%X
+			jmp absolute 0x%X]], action, check, A.ShopCheckRefuse, A.ShopCheckPass), 5)
+	end
+
+	for i, addr in ipairs(A.MerchantRowSites) do
+		Engine.asmpatch("MerchantRow" .. i, "shop filter: merchant sentence agrees with the click",
+			addr, string.format([[
+			push eax
+			push ecx
+			push edx
+			mov eax, ebx
+			mov edx, [ebp + 0x14]
+			mov ecx, 1
+			call absolute 0x%X
+			test eax, eax
+			pop edx
+			pop ecx
+			pop eax
+			jz mr_pass
+			push 5
+			jmp absolute 0x%X
+		mr_pass:
+			jmp absolute 0x%X]], check, A.MerchantRowReturn, A.MerchantRowPass), 5)
+	end
 end
 
 function Engine.describe()
