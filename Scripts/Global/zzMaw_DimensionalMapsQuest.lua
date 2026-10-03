@@ -7,7 +7,7 @@ end
 
 local TEXT_TOO_LOW = "The rifts between worlds open only for those who have walked far enough. Return to me when one of you has reached level %d."
 local TEXT_GIVE = "I have looked beyond the veil and found a place the other side has rewritten. Take this map: it will open %s anew, filled with creatures from another dimension (Map Level %d). Clear it, then return to me."
-local TEXT_NOT_CLEARED = "The rift in %s still stands. Clear it, then return to me."
+local TEXT_NOT_CLEARED = "The rift I showed you still stands. Clear it, then return to me."
 local TEXT_REWARD = "The rift in %s is sealed. Accept this reward: %d gold."
 local TEXT_ALL_DONE = "You have sealed every rift I could find. There is nothing more I can show you."
 
@@ -62,6 +62,7 @@ local function dimensionalMapsTopic()
 	vars.dimensionalMapsQuest = q
 	local level = TIERS[q.Tier]
 	if not level then
+		q.Done = true
 		Message(TEXT_ALL_DONE)
 		return
 	end
@@ -77,29 +78,39 @@ local function dimensionalMapsTopic()
 		Message(string.format(TEXT_GIVE, Game.MapStats[m.BonusStrength].Name, m.Level))
 		return
 	end
-	local name = Game.MapStats[m.BonusStrength].Name
 	if not q.Cleared then
-		Message(string.format(TEXT_NOT_CLEARED, name))
+		Message(TEXT_NOT_CLEARED)
 		return
 	end
-	local reward = m.Level*1000
+	local reward = q.Level*1000
 	AddGoldExp(reward, reward)
-	Message(string.format(TEXT_REWARD, name, reward, m.Level))
+	Message(string.format(TEXT_REWARD, q.MapName, reward))
 	q.Tier = q.Tier + 1
 	q.Map = nil
 	q.Cleared = nil
+	q.Level = nil
+	q.MapName = nil
+	if not TIERS[q.Tier] then
+		q.Done = true
+	end
+end
+
+function events.LoadMap()
+	local q = vars.dimensionalMapsQuest
+	if q and q.Map and not q.Cleared and mapvars.mapAffixes and not mapvars.completed then
+		mapvars.dimensionalMapsTier = q.Tier
+	end
 end
 
 function events.LeaveMap()
 	local q = vars.dimensionalMapsQuest
-	local m = q and q.Map
 	local affixes = mapvars.mapAffixes
-	if not m or q.Cleared or not mapvars.completed or not affixes then
+	if not (q and q.Map) or q.Cleared or not mapvars.completed or not affixes or mapvars.dimensionalMapsTier ~= q.Tier then
 		return
 	end
-	if Map.MapStatsIndex == m.BonusStrength and affixes.Power == m.MaxCharges and affixes[1] == m.BonusExpireTime then
-		q.Cleared = true
-	end
+	q.Cleared = true
+	q.Level = getDimensionMapLevel(Map.MapStatsIndex, affixes.Power)
+	q.MapName = Game.MapStats[Map.MapStatsIndex].Name
 end
 
 for npc, slot in pairs(ORACLES) do

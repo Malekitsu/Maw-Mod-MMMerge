@@ -748,6 +748,11 @@ function getDimensionMapLevel(mapIndex, power)
 	return power*10+20+round((baseMap.Low+baseMap.Mid+baseMap.High)/3)
 end
 
+function dimensionMapsUnlocked()
+	local q=vars.dimensionalMapsQuest
+	return q and q.Done or false
+end
+
 -- Function to get a unique random affix
 function getUniqueAffix()
     local affix
@@ -762,6 +767,9 @@ MADNESS_MAP_DROP_LEVEL = 950
 
 function events.MonsterKilled(mon)
 	if mon.NameId>300 then -- no drop from reanimated monsters
+		return
+	end
+	if not dimensionMapsUnlocked() then
 		return
 	end
 	mapvars.mapsDropped=mapvars.mapsDropped or 0

@@ -2613,7 +2613,7 @@ function checkMapCompletition()
 					mapvars.completed=true
 					shareMapCompletion()
 				end
-				if mapvars.mapAffixes then
+				if mapvars.mapAffixes and dimensionMapsUnlocked() then
 					evt.Add("Items", 290)
 					assignedAffixes = {} --don't make it local
 					
