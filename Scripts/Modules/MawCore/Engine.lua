@@ -129,8 +129,10 @@ end
 -- action 3 = sell, 4 = identify, 5 = repair; true refuses. forText is set when
 -- the merchant's sentence is being chosen, which happens separately from the
 -- click and must agree with it. The rest of the engine's test (stolen items,
--- shop type) still runs after a pass.
-function Engine.setShopItemFilter(refuses)
+-- shop type) still runs after a pass. onSold(item), if given, runs when the
+-- whole test passed for a sale -- the engine then sells unconditionally
+-- (ShopSellCall is followed by the sale itself), with the item still in place.
+function Engine.setShopItemFilter(refuses, onSold)
 	local A = Engine.Addr
 	local action = Engine.alloc(4)	-- set by each caller of ShopItemCheck
 	local function luaProc(f)
@@ -153,8 +155,13 @@ function Engine.setShopItemFilter(refuses)
 	local check = luaProc(function(d)
 		d.eax = refuses(structs.Item:new(d.eax), d.edx, d.ecx ~= 0) and 1 or 0
 	end)
+	local sold = luaProc(function(d)
+		if onSold then
+			onSold(structs.Item:new(d.eax))
+		end
+	end)
 
-	local callers = {[3] = A.ShopSellCall, [4] = A.ShopIdentifyCall, [5] = A.ShopRepairCall}
+	local callers = {[4] = A.ShopIdentifyCall, [5] = A.ShopRepairCall}
 	for act, addr in pairs(callers) do
 		local wrap = Engine.asmproc(string.format([[
 			mov dword [0x%X], %d
@@ -162,6 +169,22 @@ function Engine.setShopItemFilter(refuses)
 		Engine.asmpatch("ShopItemCheckCaller" .. act, "shop filter: tell the check which service asks",
 			addr, string.format("call absolute 0x%X", wrap), 5)
 	end
+	-- the sell caller also reports a passed test (eax kept for the caller)
+	local wrap = Engine.asmproc(string.format([[
+		mov dword [0x%X], 3
+		push ecx
+		call absolute 0x%X
+		pop ecx
+		test eax, eax
+		jz sw_done
+		push eax
+		mov eax, ecx
+		call absolute 0x%X
+		pop eax
+	sw_done:
+		retn]], action, A.ShopItemCheck, sold))
+	Engine.asmpatch("ShopItemCheckCaller3", "shop filter: sell test, and report the sale",
+		A.ShopSellCall, string.format("call absolute 0x%X", wrap), 5)
 
 	for i, addr in ipairs(A.ShopCheckSites) do
 		Engine.asmpatch("ShopItemCheck" .. i, "shop filter: repair/identify/sell test",
