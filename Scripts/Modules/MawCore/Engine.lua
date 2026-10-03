@@ -76,6 +76,16 @@ Engine.Addr = {
 	MerchantRowSites    = {0x49003C, 0x49004C},
 	MerchantRowPass     = 0x490068,
 	MerchantRowReturn   = 0x490096,	-- pop eax / return: jump here after a push
+
+	-- free item record search (see Fixes.lua): thiscall on a player, returns
+	-- the 0-based index of the first record with Number 0 among the first
+	-- 126 of Items[138], or -1. Callers: pick up, evt.Add Items, shops,
+	-- chests (0x46638E, 0x490EF6, 0x49102A, 0x4911B7 and others).
+	FindFreeItemRecord  = 0x490ED3,
+	PlayerItemsOffset   = 0x4A8,	-- Items[138] inside Player
+	ItemSize            = 0x24,
+	ItemBodyLocation    = 0x18,	-- i1: 0 = backpack, 1..16 = equipped slot
+	PlayerItemRecords   = 138,
 }
 
 -- Ledger of every binary patch MawCore applies. Nothing in the core may
@@ -224,6 +234,32 @@ function Engine.setShopItemFilter(refuses, onSold)
 		mr_pass:
 			jmp absolute 0x%X]], check, A.MerchantRowReturn, A.MerchantRowPass), 5)
 	end
+end
+
+-- Lets the free item record search use all of a player's records, while
+-- fewer than `backpackCap` records hold backpack items (BodyLocation 0).
+function Engine.setBackpackItemCap(backpackCap)
+	local A = Engine.Addr
+	table.insert(Engine.Patches, {name = "FreeItemRecord",
+		why = ("free item record search: all %d records, at most %d backpack items"):format(
+			A.PlayerItemRecords, backpackCap)})
+	mem.hookfunction(A.FindFreeItemRecord, 1, 0, function(d, def, pl)
+		local free, inBackpack = -1, 0
+		for i = 0, A.PlayerItemRecords - 1 do
+			local p = pl + A.PlayerItemsOffset + i*A.ItemSize
+			if mem.i4[p] == 0 then
+				if free < 0 then
+					free = i
+				end
+			elseif mem.u1[p + A.ItemBodyLocation] == 0 then
+				inBackpack = inBackpack + 1
+			end
+		end
+		if inBackpack >= backpackCap then
+			return -1
+		end
+		return free
+	end)
 end
 
 function Engine.describe()
