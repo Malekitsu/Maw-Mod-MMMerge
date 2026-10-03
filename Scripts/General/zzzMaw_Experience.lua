@@ -137,6 +137,11 @@ mem.hookfunction(0x4485EC, 1, 2, function(d, def, playerPtr, varNum, value)
 	return def(playerPtr, varNum, value)
 end, 6)
 
+--flat experience to one player: no bolster scaling, nothing banked into the bolster
+function addExpNoBolster(pl, amount)
+	pl.Experience = math.min(pl.Experience + amount, 2^32-3982296)
+end
+
 ----------------------------------------------------
 --Kill experience
 ----------------------------------------------------

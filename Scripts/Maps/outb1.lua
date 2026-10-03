@@ -27,7 +27,8 @@ evt.map[101] = function()
 	if evt.Cmp{"MapVar0", Value = 1} then
 		if evt.Cmp{"Gold", Value = 5000} then
 			evt.Subtract{"Gold", Value = 5000}
-			evt.Add{"Experience", Value = 5000}
+			addExpNoBolster(Party[evt.Player], 5000)
+			evt.Add{"Experience", Value = 0}
 			evt.Subtract{"MapVar0", Value = 1}
 			evt.StatusText{Str = 4}         -- "+5000 Experience, -5000 Gold."
 			evt.Set{"AutonotesBits", Value = 434}         -- "5000 Experience and minus 5000 gold from the southern well in the town of Kriegspire."
