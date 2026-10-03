@@ -58,8 +58,9 @@ SpecialItems.SellOnce = {
 	[1439] = {}, [2118] = {}, [2119] = {}, [2199] = {},
 }
 
--- the merchant's answer when a quest still needs the item; %24 = item name
+-- merchant answers for quest-bound and already-sold items; %24 = item name
 SpecialItems.Text = {
+	AlreadySold = "I have already bought an item like that.",
 	QuestItem = "No, no -- you will still need that %24. Come back once the task it is for is done.",
 }
 
@@ -90,18 +91,18 @@ local function soldOnce()
 end
 
 -- MerchantTxt[1][5]: the Sell column, "Unnecessary" row
-local unnecessary, shownQuest
+local unnecessary, shownReason
 
-local function setSellRefusal(quest)
-	if quest == shownQuest then
+local function setSellRefusal(reason)
+	if reason == shownReason then
 		return
 	end
 	local col = Game.MerchantTxt[1]
-	if not shownQuest then
+	if not shownReason then
 		unnecessary = col[5]
 	end
-	col[5] = quest and SpecialItems.Text.QuestItem or unnecessary
-	shownQuest = quest
+	col[5] = reason and SpecialItems.Text[reason] or unnecessary
+	shownReason = reason
 end
 
 -- true refuses; see Engine.setShopItemFilter
@@ -111,17 +112,18 @@ function SpecialItems.refuses(item, action, forText)
 	end
 	local n = item.Number
 	local txt = Game.ItemsTxt[n]
-	local refuse, quest = txt.Value == 0, false
+	local refuse, reason = txt.Value == 0, false
 	if action == SELL and not refuse then
 		if SpecialItems.SellOnce[n] and soldOnce()[n] then
 			refuse = true
+			reason = "AlreadySold"
 		elseif txt.Material == 3 or SpecialItems.QuestBound[n] then
-			quest = not SpecialItems.questDone(n)
-			refuse = quest
+			refuse = not SpecialItems.questDone(n)
+			reason = refuse and "QuestItem" or false
 		end
 	end
 	if forText and action == SELL then
-		setSellRefusal(quest)
+		setSellRefusal(reason)
 	end
 	return refuse
 end
