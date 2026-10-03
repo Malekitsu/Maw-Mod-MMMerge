@@ -1005,6 +1005,14 @@ end)
 
 mem.nop(0x426CD3, 6)
 
+--spirit lash M increased range
+mem.asmhook(0x427899, [[
+cmp edi, 3
+jnz @f
+mov eax, 0x180
+@@:
+]])
+
 
 --removes fly when attacking, except in certain maps
 flyAllowedMaps={"elema.odm","elemf.odm","elemw.odm","out12.odm","outa1.odm","outa2.odm","outa3.odm","outb2.odm","outb3.odm","out05.odm", "out07.odm"}
