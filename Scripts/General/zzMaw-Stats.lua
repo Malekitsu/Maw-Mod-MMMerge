@@ -144,7 +144,6 @@ end
 
 --speed
 --SPEED WILL NOW REDUCE RECOVERY TIME
-masteryName={"Normal", "Expert", "Master", "GM"}
 oldTable={}
 function events.GameInitialized2()
 	for i=0,132 do 
