@@ -406,6 +406,10 @@ function MawArtifactOnHitText(it)
 	if artifactAttackSpeed[it.Number] then
 		lines[#lines + 1] = "Swift"
 	end
+	if it.Number == 543 then
+		lines[#lines + 1] = "Shared Life: periodically transfers HP from party members with more current HP to the wearer."
+		lines[#lines + 1] = "Uses HP amounts, not percentages. Can revive the wearer from unconsciousness."
+	end
 	local drain = artifactDrain[it.Number]
 	if drain then
 		lines[#lines + 1] = "Drains " .. -drain.HP .. " HP over time"
