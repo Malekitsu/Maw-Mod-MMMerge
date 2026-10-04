@@ -1012,18 +1012,17 @@ local chargePotions={231, 232, 233, 237, 245, 251, 257, 263}
 CRAFTING_CUBE_POWER=4
 CRAFTING_CUBE_POWER_WEAPON_ARMOR=2
 
+function GetCraftingCubeCap(level)
+	return math.min(math.floor(math.max(level,0)/MawCore.ItemLevel.PerPower), GetPrimordialCharges(math.huge))
+end
+
 local function craftingCubeOnItem(it)
 	if not IsBaseItemId(it.Number) or IsCelestialItem(it) then return end
 	local id=Game.CurrentPlayer
 	if id<0 then return end
-	local maxChargesCap=MawCore.ItemLevel.MaxPower()
-	local levelRequired=GetLevelRquirement(it)
-	if Party[id].LevelBase<levelRequired then
-		Game.ShowStatusText("Your level is too low (Level " .. levelRequired .. " required)")
-		return
-	end
+	local maxChargesCap=GetCraftingCubeCap(Party[id].LevelBase)
 	if it.MaxCharges>=maxChargesCap then
-		Game.ShowStatusText("Item power reached its limit")
+		Game.ShowStatusText("Item power reached the limit for your level (" .. maxChargesCap .. ")")
 		return
 	end
 	local increase=CRAFTING_CUBE_POWER
@@ -1329,7 +1328,8 @@ function events.GameInitialized2()
 	cube.Name="Crafting Cube"
 	cube.NotIdentifiedName="Crafting Item"
 	cube.Picture=txt[2076].Picture
-	cube.SpriteIndex=txt[2076].SpriteIndex
+	cube.SpriteIndex=txt[1063].SpriteIndex
+	txt[1063].SpriteIndex=txt[2076].SpriteIndex
 	cube.EquipStat=txt[1063].EquipStat
 	cube.Skill=txt[1063].Skill
 	cube.Mod1DiceCount=txt[1063].Mod1DiceCount
@@ -1337,7 +1337,7 @@ function events.GameInitialized2()
 	cube.Mod2=txt[1063].Mod2
 	cube.Material=txt[1063].Material
 	cube.Value=15000
-	cube.Notes="The Crafting Cube raises the Item Bonus Power of any equipment by " .. CRAFTING_CUBE_POWER .. " (" .. CRAFTING_CUBE_POWER_WEAPON_ARMOR .. " on weapons and body armor), up to " .. MawCore.ItemLevel.MaxPower() .. ". Each point of Bonus Power is worth " .. MawCore.ItemLevel.PerPower .. " item levels.\nUsed on a Dimension Map, it moves the map to another dungeon you have already completed, of the same kind (outdoor or indoor).\n(right-click on an item or a map to use)"
+	cube.Notes="The Crafting Cube raises the Item Bonus Power of any equipment by " .. CRAFTING_CUBE_POWER .. " (" .. CRAFTING_CUBE_POWER_WEAPON_ARMOR .. " on weapons and body armor), up to 1 Bonus Power every " .. MawCore.ItemLevel.PerPower .. " levels of the character using it, max " .. GetPrimordialCharges(math.huge) .. " (the most a Primordial item can drop with). Each point of Bonus Power is worth " .. MawCore.ItemLevel.PerPower .. " item levels.\nUsed on a Dimension Map, it moves the map to another dungeon you have already completed, of the same kind (outdoor or indoor).\n(right-click on an item or a map to use)"
 	itemSizeMap[1070]={itemSizeMap[2076][1], itemSizeMap[2076][2]}
 end
 
