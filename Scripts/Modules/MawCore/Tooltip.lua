@@ -851,7 +851,7 @@ local function tooltipMapLevel(t)
 		if it.BonusExpireTime>0 then
 			txt=StrColor(255,255,153,"- " .. mapAffixes[it.BonusExpireTime]) .. "\n\n" .. txt
 		end
-		t.Description="\n" .. txt .. "Creator's Hourglass and Eye of the void can be used to unlock new affixes, emerald of power to increase the map Level.\nUsing this map will teleport you to the entrance."
+		t.Description="\n" .. txt .. "Creator's Hourglass and Eye of the void can be used to unlock new affixes, Crafting Cube to change the Map and emerald of power to increase the map Level.\nUsing this map will teleport you to the entrance."
 	end
 end
 

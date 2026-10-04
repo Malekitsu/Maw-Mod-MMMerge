@@ -1009,6 +1009,32 @@ end
 local overworldMaps={1,2,3,4,5,6,7,8,9,10,11,12,13,14,62,63,64,65,66,67,68,69,70,71,72,73,74,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151}
 
 local chargePotions={231, 232, 233, 237, 245, 251, 257, 263}
+CRAFTING_CUBE_POWER=4
+CRAFTING_CUBE_POWER_WEAPON_ARMOR=2
+
+local function craftingCubeOnItem(it)
+	if not IsBaseItemId(it.Number) or IsCelestialItem(it) then return end
+	local id=Game.CurrentPlayer
+	if id<0 then return end
+	local maxChargesCap=MawCore.ItemLevel.MaxPower()
+	local levelRequired=GetLevelRquirement(it)
+	if Party[id].LevelBase<levelRequired then
+		Game.ShowStatusText("Your level is too low (Level " .. levelRequired .. " required)")
+		return
+	end
+	if it.MaxCharges>=maxChargesCap then
+		Game.ShowStatusText("Item power reached its limit")
+		return
+	end
+	local increase=CRAFTING_CUBE_POWER
+	if it:T().EquipStat<=3 then
+		increase=CRAFTING_CUBE_POWER_WEAPON_ARMOR
+	end
+	it.MaxCharges=math.min(it.MaxCharges+increase,maxChargesCap)
+	Mouse.Item.Number=0
+	ShowCraftedItemEffect(it)
+end
+
 function UseItem(it, usedIt)
 	if it.Number==290 then
 		local id=usedIt.Number
@@ -1028,13 +1054,33 @@ function UseItem(it, usedIt)
 				it.MaxCharges=math.min(it.MaxCharges+5,255)
 				craftUsed=true
 			end
+		elseif id==1070 then
+			local outside=table.find(overworldMaps,it.BonusStrength)~=nil
+			math.randomseed(it.BonusStrength+it.Bonus2*1000+it.Charges+1000000)
+			local possibleMaps={}
+			for _, mapId in ipairs(getDimensionMapPool()) do
+				if mapId~=it.BonusStrength and (table.find(overworldMaps,mapId)~=nil)==outside then
+					table.insert(possibleMaps, mapId)
+				end
+			end
+			if #possibleMaps>0 then
+				it.BonusStrength=possibleMaps[math.random(1,#possibleMaps)]
+				craftUsed=true
+			else
+				Game.ShowStatusText("No other completed dungeon to move this map to")
+			end
+			math.randomseed(os.time())
 		end
 		if craftUsed then
 			Mouse.Item.Number=0
 			ShowCraftedItemEffect(it)
 		end
 	end
-	
+
+	if usedIt.Number==1070 then
+		craftingCubeOnItem(it)
+	end
+
 	if usedIt.Number==1069 and table.find(chargePotions, it.Number) then
 		local baseCharges=it.Charges==0 and 6 or it.Charges
 		it.Charges=baseCharges+usedIt.BonusStrength
@@ -1274,6 +1320,22 @@ function events.GameInitialized2()
 	Game.ItemsTxt[1069].Picture="item280"
 	Game.ItemsTxt[1069].Skill=40
 	Game.ItemsTxt[1069].SpriteIndex=130
+
+	--crafting cube
+	local cube=txt[1070]
+	cube.Name="Crafting Cube"
+	cube.NotIdentifiedName="Crafting Item"
+	cube.Picture=txt[2076].Picture
+	cube.SpriteIndex=txt[2076].SpriteIndex
+	cube.EquipStat=txt[1063].EquipStat
+	cube.Skill=txt[1063].Skill
+	cube.Mod1DiceCount=txt[1063].Mod1DiceCount
+	cube.Mod1DiceSides=txt[1063].Mod1DiceSides
+	cube.Mod2=txt[1063].Mod2
+	cube.Material=txt[1063].Material
+	cube.Value=15000
+	cube.Notes="The Crafting Cube raises the Item Bonus Power of any equipment by " .. CRAFTING_CUBE_POWER .. " (" .. CRAFTING_CUBE_POWER_WEAPON_ARMOR .. " on weapons and body armor), up to " .. MawCore.ItemLevel.MaxPower() .. ". Each point of Bonus Power is worth " .. MawCore.ItemLevel.PerPower .. " item levels.\nUsed on a Dimension Map, it moves the map to another dungeon you have already completed, of the same kind (outdoor or indoor).\n(right-click on an item or a map to use)"
+	itemSizeMap[1070]={itemSizeMap[2076][1], itemSizeMap[2076][2]}
 end
 
 --Tick handlers above run as MawCore scheduler tasks (ms; 0=frame, -1=poke only)
