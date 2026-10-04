@@ -474,6 +474,11 @@ local function rollEnchantStrength(tier, rarity)
 		*math.random(range.Min, range.Max)/ENCHANT_STRENGTH_DIV))
 end
 
+function GetPrimordialMaxEnchantStrength()
+	local range=enchantStrengthRange[const.Rarity.Primordial]
+	return round(applyDifficulty(encStrUpNormal(math.huge))*range.Max/ENCHANT_STRENGTH_DIV)
+end
+
 LOOT_STRENGTH_MAX = 6
 
 function GetLootStrength(level)
@@ -1033,6 +1038,13 @@ function events.ItemGenerated(t)
 		local stat = t.Item:T().EquipStat
 
 		if (stat >= 12 and math.random() < 0.3 or stat == 19) and id <= 110 then
+			-- reset item
+			t.Item.Bonus = 0
+			t.Item.BonusStrength = 0
+			t.Item.Bonus2 = 0
+			t.Item.Charges = 0
+			t.Item.MaxCharges = 0
+
 			local lootTable = {
 				{id = 1061, weight = 7},
 				{id = 1062, weight = 7},
@@ -1047,13 +1059,6 @@ function events.ItemGenerated(t)
 			local successChance = math.min((gold / 20000000)^0.7, 1)
 			if math.random() < successChance then
 				-- SUCCESS: roll from loot table
-
-				-- reset item
-				t.Item.Bonus = 0
-				t.Item.BonusStrength = 0
-				t.Item.Bonus2 = 0
-				t.Item.Charges = 0
-				t.Item.MaxCharges = 0
 
 				local totalWeight = 0
 				for i = 1, #lootTable do
@@ -1072,18 +1077,18 @@ function events.ItemGenerated(t)
 				end
 			end
 
-			-- fallback: reagent -- crafting gems no longer come from shops
-			--local partyLevel = getPartyLevel(4)
-			--local reagentLevel = math.floor(partyLevel / 25)
-			--
-			--local r = math.random()
-			--if r < 0.05 then
-			--	reagentLevel = reagentLevel + 2
-			--elseif r < 0.30 then
-			--	reagentLevel = reagentLevel + 1
-			--end
-			--
-			--t.Item.Number = 1041 + math.min(reagentLevel, 19)
+			-- fallback: reagent
+			local partyLevel = getPartyLevel(4)
+			local reagentLevel = math.floor(partyLevel / 25)
+
+			local r = math.random()
+			if r < 0.05 then
+				reagentLevel = reagentLevel + 2
+			elseif r < 0.30 then
+				reagentLevel = reagentLevel + 1
+			end
+
+			t.Item.Number = 1041 + math.min(reagentLevel, GEM_DROP_MAX_TIER - 1)
 			return
 		end
 	end

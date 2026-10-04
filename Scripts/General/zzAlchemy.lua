@@ -709,48 +709,30 @@ function events.GameInitialized2()
 	Game.SkillDesGM[const.Skills.Alchemy]="Allows to make black potions. Power when mixing will be increased to 2 and increases potion duration by 6 Minutes per skill point. Allows the Endless potion to be dropped by monsters, which power is determined by Alchemy level."
 end
 
+GEM_TIERS=20
+GEM_DROP_MAX_TIER=16
+
+function GetGemCap(tier, equipStat, skill)
+	local cap=round(tier/GEM_TIERS*GetPrimordialMaxEnchantStrength())
+	if skill then
+		cap=MawCore.Formulas.skillEnchantPower(cap)
+	end
+	return math.ceil(cap*(slotMult[equipStat] or 1))
+end
+
+function GetGemStep(cap)
+	return math.max(round(cap/10),1)
+end
+
 local function upgradeGem(it, tier)
 	local enchanted=false
-	--bolster multiplier
-	local bolsterMult=math.max((Game.BolsterAmount-100)/2000+1,1)
-	if vars.insanityMode then
-		bolsterMult=1.4
-	end
-	if vars.madnessMode then
-		bolsterMult=2
-	end
-	local tier=tier*bolsterMult
 	--2nd enchant value
 	local bonus2,bonus2Strength=GetEnc2(it)
-	--upgrade amount
-	local upgradeAmount1=3
-	local upgradeAmount2=upgradeAmount1
-	--base value
-	local maxValue1=round(tier*4)
-	
-	if GetAncientTier(it)>0 then
-		maxValue1=math.min(maxValue1+10,maxValue1*1.2)
-	end
-	if HasLegendaryAffix(it) then
-		maxValue1=math.min(maxValue1+20,maxValue1*1.44)
-	end
-	local maxValue2=maxValue1
-	--skills
-	if it.Bonus>=17 then
-		maxValue1=math.floor(math.max((tier*10)^0.5, round(tier)))
-		upgradeAmount1=1
-	end
-	--item slot multiplier and legendary multiplier
-	local mult=slotMult[it:T().EquipStat] or 1
-	if table.find(twoHandedAxes, it.Number) then
-		mult=2
-	end
-	--[[if it.BonusExpireTime==20 then
-		mult=mult*2
-	end
-	]]
-	maxValue1=math.round(maxValue1*mult)
-	maxValue2=math.round(maxValue2*mult)
+	local equipStat=it:T().EquipStat
+	local maxValue1=GetGemCap(tier, equipStat, it.Bonus>=17)
+	local maxValue2=GetGemCap(tier, equipStat, false)
+	local upgradeAmount1=GetGemStep(maxValue1)
+	local upgradeAmount2=GetGemStep(maxValue2)
 	--pick the lowest one
 	local bonus1percent=it.BonusStrength/maxValue1
 	local bonus2percent=bonus2Strength/maxValue2
@@ -776,10 +758,7 @@ end
 
 for i=1,20 do
 	evt.PotionEffects[70+i] = function(IsDrunk, t, Power)
-		Game.ShowStatusText("Gems lost their power.")
-		return
-		--[[
-		if IsBaseItemId(t.Number) then			
+		if IsBaseItemId(t.Number) then
 			if craftWaitTime>0 or IsCelestialItem(t) then return end
 			local levelRequired=GetLevelRquirement(t)
 			--check if equippable
@@ -801,7 +780,6 @@ for i=1,20 do
 				Game.ShowStatusText("Gem power is not enough")
 			end
 		end
-		]]
 	end
 end
 
@@ -1066,8 +1044,7 @@ function UseItem(it, usedIt)
 end
 
 craftDropChances={
-		--["gems"]=0.006,
-		["gems"]=0.000,
+		["gems"]=0.006,
 		[1061]=0.0002,
 		[1062]=0.0002,
 		[1063]=0.001,
@@ -1169,7 +1146,7 @@ function events.MonsterKilled(mon)
 	if math.random()<craftDropChances.gems*bonusRoll*insanityMult then
 		baseCraftDrop=true
 		local craftStrength = math.floor(normal_random(math.max(lvl^0.6/4+1,lvl/40), 2))
-		craftStrength=math.max(math.min(craftStrength,20),1)
+		craftStrength=math.max(math.min(craftStrength,GEM_DROP_MAX_TIER),1)
 		crafMaterialNumber=1040+craftStrength
 	end	
 	if baseCraftDrop then

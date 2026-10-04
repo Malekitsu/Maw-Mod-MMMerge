@@ -2702,6 +2702,9 @@ function checkMapCompletition()
 					evt.Add("Items",rewards[nAff])
 				elseif not vars.AusterityMode then
 					evt.Add("Items", 1063)
+					local gemTier=math.min(math.ceil((mapLevel+bolster)/25+0.5),GEM_DROP_MAX_TIER)
+					evt.Add("Items",1040+gemTier)
+					evt.Add("Items",1040+gemTier)
 				end
 				--bolster code
 				addBolsterExp(experience)

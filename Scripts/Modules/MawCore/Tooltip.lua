@@ -148,29 +148,17 @@ local function tooltipOrbsGems(t)
 		end
 		]]
 		if t.Description then
-			local mult=math.max((Game.BolsterAmount-100)/2000+1,1)
-			if vars.insanityMode then
-				mult=1.4
-			end
-			if vars.madnessMode then
-				mult=2
-			end
-			local tier=(t.Item.Number-1040)*mult
-			local power = 3
-			
-			local twoHanded = tier * 4 * 2
-			local bodyArmor = round(tier * 1.5 * 4)
-			local helmEtc = round(tier * 1.25 * 4)
-			local rings = round(tier * 0.75 * 4)
-			
-			
-			t.Description = "A special Gem that allows to increase an item Enchant Strength (right-click on an item with a base enchant to use)\nAncient, Primordial and Legendary items have increased Max power.\n\nIt is possible to upgrade 3 gems into 1 of upper tier by pressing U in the inventory page.\n\nMax Power: " 
-			.. StrColor(255, 128, 0, tostring(round(tier * 4))) --.. " (65% on AC)"
-			.. "\nBonus: " .. StrColor(255, 128, 0, tostring(power)) 
-			.. "\n\nItem Modifier:\nTwo Handed Weapons: " .. StrColor(255, 128, 0, twoHanded)
-			.. "\nBody Armor: " .. StrColor(255, 128, 0, bodyArmor)
-			.. "\nHelm-Boots-Gloves-Bow: " .. StrColor(255, 128, 0, helmEtc)
-			.. "\nRings: " .. StrColor(255, 128, 0, rings)
+			local tier=t.Item.Number-1040
+			local maxPower=GetGemCap(tier, 0, false)
+
+			t.Description = "A special Gem that allows to increase an item Enchant Strength (right-click on an item with a base enchant to use)\nMax Power is the highest Enchant Strength a Primordial item can roll, scaled by the gem tier.\n\nIt is possible to upgrade 3 gems into 1 of upper tier by pressing U in the inventory page.\nGems drop only up to tier " .. GEM_DROP_MAX_TIER .. ": tiers " .. GEM_DROP_MAX_TIER+1 .. "-" .. GEM_TIERS .. " can only be made by upgrading with U.\n\nTier: " .. StrColor(255, 128, 0, tostring(tier))
+			.. "\nMax Power: " .. StrColor(255, 128, 0, tostring(maxPower))
+			.. "\nBonus: " .. StrColor(255, 128, 0, tostring(GetGemStep(maxPower))) .. " (10% of Max Power)"
+			.. "\nSkills Max Power: " .. StrColor(255, 128, 0, tostring(GetGemCap(tier, 0, true)))
+			.. "\n\nItem Modifier:\nTwo Handed Weapons: " .. StrColor(255, 128, 0, tostring(GetGemCap(tier, 1, false)))
+			.. "\nBody Armor: " .. StrColor(255, 128, 0, tostring(GetGemCap(tier, 3, false)))
+			.. "\nHelm-Boots-Gloves-Bow: " .. StrColor(255, 128, 0, tostring(GetGemCap(tier, 5, false)))
+			.. "\nRings: " .. StrColor(255, 128, 0, tostring(GetGemCap(tier, 10, false)))
 		end
 	end
 	if t.Item.Number==1067 then
