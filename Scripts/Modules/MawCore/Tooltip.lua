@@ -153,7 +153,7 @@ local function tooltipOrbsGems(t)
 
 			t.Description = "A special Gem that allows to increase an item Enchant Strength (right-click on an item with a base enchant to use)\nMax Power is the highest Enchant Strength a Primordial item can roll, scaled by the gem tier.\n\nIt is possible to upgrade 3 gems into 1 of upper tier by pressing U in the inventory page.\nGems drop only up to tier " .. GEM_DROP_MAX_TIER .. ": tiers " .. GEM_DROP_MAX_TIER+1 .. "-" .. GEM_TIERS .. " can only be made by upgrading with U.\n\nTier: " .. StrColor(255, 128, 0, tostring(tier))
 			.. "\nMax Power: " .. StrColor(255, 128, 0, tostring(maxPower))
-			.. "\nBonus: " .. StrColor(255, 128, 0, tostring(GetGemStep(maxPower))) .. " (10% of Max Power)"
+			.. "\nBonus: " .. StrColor(255, 128, 0, tostring(GEM_STEP)) .. " (" .. GEM_STEP_SKILL .. " on skills)"
 			.. "\nSkills Max Power: " .. StrColor(255, 128, 0, tostring(GetGemCap(tier, 0, true)))
 			.. "\n\nItem Modifier:\nTwo Handed Weapons: " .. StrColor(255, 128, 0, tostring(GetGemCap(tier, 1, false)))
 			.. "\nBody Armor: " .. StrColor(255, 128, 0, tostring(GetGemCap(tier, 3, false)))

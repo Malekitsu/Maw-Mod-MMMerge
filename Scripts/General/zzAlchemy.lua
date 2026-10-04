@@ -720,19 +720,19 @@ function GetGemCap(tier, equipStat, skill)
 	return math.ceil(cap*(slotMult[equipStat] or 1))
 end
 
-function GetGemStep(cap)
-	return math.max(round(cap/10),1)
-end
+GEM_STEP=3
+GEM_STEP_SKILL=1
 
 local function upgradeGem(it, tier)
 	local enchanted=false
 	--2nd enchant value
 	local bonus2,bonus2Strength=GetEnc2(it)
 	local equipStat=it:T().EquipStat
-	local maxValue1=GetGemCap(tier, equipStat, it.Bonus>=17)
+	local skill=it.Bonus>=17
+	local maxValue1=GetGemCap(tier, equipStat, skill)
 	local maxValue2=GetGemCap(tier, equipStat, false)
-	local upgradeAmount1=GetGemStep(maxValue1)
-	local upgradeAmount2=GetGemStep(maxValue2)
+	local upgradeAmount1=skill and GEM_STEP_SKILL or GEM_STEP
+	local upgradeAmount2=GEM_STEP
 	--pick the lowest one
 	local bonus1percent=it.BonusStrength/maxValue1
 	local bonus2percent=bonus2Strength/maxValue2
@@ -1099,6 +1099,7 @@ craftDropChances={
 		[1066]=0.0002,
 		[1067]=0.00006,
 		[1068]=0.0000025,
+		[1070]=0.001,
 	}
 	
 -- Function to generate normally distributed random numbers
@@ -1203,32 +1204,34 @@ function events.MonsterKilled(mon)
 		end
 	end
 	--pick special drop with pity protection
-	for i=1061,1068 do
-		-- Advance seed for each crafting item to get different rolls
-		local currentSeed = Game.RandSeed
-		local newSeed = (currentSeed * 1664525 + 1013904223) % 4294967296
-		Game.RandSeed = newSeed
-		math.randomseed(newSeed)
-		
-		-- Initialize pity counter for this crafting material
-		vars.craftPityCounters = vars.craftPityCounters or {}
-		vars.craftPityCounters[i] = vars.craftPityCounters[i] or 0
-		
-		-- Apply pity protection using new pity system
-		local pityAdjustedChance = pity_chance(craftDropChances[i], vars.craftPityCounters[i])
-		local pityAdjustedChance = pityAdjustedChance * bonusRoll
-		if math.random() < pityAdjustedChance then
-			-- Reset pity counter on successful drop
-			vars.craftPityCounters[i] = 0
-			
-			if table.find(waterMonsters, mon.Id) then
-				evt.Add("Items", i)
+	for i=1061,1070 do
+		if craftDropChances[i] then
+			-- Advance seed for each crafting item to get different rolls
+			local currentSeed = Game.RandSeed
+			local newSeed = (currentSeed * 1664525 + 1013904223) % 4294967296
+			Game.RandSeed = newSeed
+			math.randomseed(newSeed)
+
+			-- Initialize pity counter for this crafting material
+			vars.craftPityCounters = vars.craftPityCounters or {}
+			vars.craftPityCounters[i] = vars.craftPityCounters[i] or 0
+
+			-- Apply pity protection using new pity system
+			local pityAdjustedChance = pity_chance(craftDropChances[i], vars.craftPityCounters[i])
+			local pityAdjustedChance = pityAdjustedChance * bonusRoll
+			if math.random() < pityAdjustedChance then
+				-- Reset pity counter on successful drop
+				vars.craftPityCounters[i] = 0
+
+				if table.find(waterMonsters, mon.Id) then
+					evt.Add("Items", i)
+				else
+					obj = SummonItem(i, mon.X, mon.Y, mon.Z + 100, 100)
+				end
 			else
-				obj = SummonItem(i, mon.X, mon.Y, mon.Z + 100, 100)
+				-- Increment pity counter on failed drop
+				vars.craftPityCounters[i] = vars.craftPityCounters[i] + round(bonusRoll)
 			end
-		else
-			-- Increment pity counter on failed drop
-			vars.craftPityCounters[i] = vars.craftPityCounters[i] + round(bonusRoll)
 		end
 	end
 	

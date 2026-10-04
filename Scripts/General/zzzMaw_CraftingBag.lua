@@ -1,5 +1,5 @@
 function isCraftingMaterial(number)
-	if number >= 1041 and number <= 1069 then
+	if number >= 1041 and number <= 1070 then
 		return true
 	end
 	return false

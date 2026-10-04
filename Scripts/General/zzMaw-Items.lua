@@ -1053,6 +1053,7 @@ function events.ItemGenerated(t)
 				{id = 1065, weight = 5},
 				{id = 1066, weight = 7},
 				{id = 1067, weight = 3},
+				{id = 1070, weight = 15},
 			}
 
 			local gold = Party.Gold
@@ -2029,6 +2030,7 @@ reagentPrices={
 	[1065] = 2000000,
 	[1066] = 1000000,
 	[1067] = 3000000,
+	[1070] = 250000,
 }
 --modify weapon enchant damage
 
