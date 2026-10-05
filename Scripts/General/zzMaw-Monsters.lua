@@ -2539,6 +2539,13 @@ function events.MawMapCompleted()
 	end
 end
 
+-- monsters the party can never reach on some maps; they would hold the completion below 100%
+-- mdt15 (The Small House) holds two separate copies of one house: Tolberti's (entered from the Pit)
+-- and Robert the Wise's (entered from Celeste); only one of them is ever visited
+local unreachableMonsters={
+	["mdt15.blv"]=function(mon) return (mon.X < -7680) ~= (Party.X < -7680) end,
+}
+
 function checkMapCompletition()
 	--retroactive fix, can remove this code after a while
 	if mapvars.completed and mapvars.monsterMap then
@@ -2558,12 +2565,15 @@ function checkMapCompletition()
 		]]
 		-- Get list of player-controlled monsters once
 		local playerControlledMonsters = getPlayerControlledMonsters()
+		local unreachable=unreachableMonsters[Map.Name]
 		
 		for i=0,Map.Monsters.High do
 			monster=Map.Monsters[i]
 			-- Skip player-controlled monsters in multiplayer
 			if monster and table.find(playerControlledMonsters, i) then
 				-- Exclude from total count
+				n=n-1
+			elseif unreachable and unreachable(monster) then
 				n=n-1
 			elseif monster.AIState==4 or monster.AIState==5 or monster.AIState==11 or monster.AIState==16 or monster.AIState==17 or monster.NameId>300 then
 				m=m+1
