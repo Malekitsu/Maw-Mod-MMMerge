@@ -168,7 +168,8 @@ function events.GameInitialized2()
 
 	-- The original assembly gate only notices Race.Zombie when healing.
 	-- Restore creature portraits before that gate when their condition is cleared.
-	mem.hook(NewCode, function(d)
+	-- Preserve the displaced mov ecx,eax / movzx eax,[esi+0x353] instructions.
+	mem.autohook(NewCode, function(d)
 		local PlayerId = (d.esi - Party.PlayersArray["?ptr"])/Party.PlayersArray[0]["?size"]
 		local Player = Party.PlayersArray[PlayerId]
 		local Original = vars.PlayerFaces and vars.PlayerFaces[PlayerId]
@@ -177,7 +178,7 @@ function events.GameInitialized2()
 					(Player.Face ~= Original.Face or Player.Voice ~= Original.Voice)) then
 			SetFace(PlayerId)
 		end
-	end)
+	end, 9)
 
 	mem.hook(NewCode+44, function(d)
 		local PlayerId	= (d.esi - Party.PlayersArray["?ptr"])/Party.PlayersArray[0]["?size"]
