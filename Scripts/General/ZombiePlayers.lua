@@ -119,6 +119,8 @@ function events.GameInitialized2()
 			or Game.CharacterPortraits[Face].Race == const.Race.Zombie
 	end
 
+	local WasZombie = {}
+
 	local function SetFace(PlayerId)
 		local Player = Party.PlayersArray[PlayerId]
 		local CurrentPlayer = 0
@@ -132,6 +134,7 @@ function events.GameInitialized2()
 		vars.PlayerFaces = vars.PlayerFaces or {}
 
 		if Player.Conditions[const.Condition.Zombie] > 0 then
+			WasZombie[PlayerId] = true
 			if not IsZombieFace(Player.Face) then
 				vars.PlayerFaces[PlayerId] = {Face = Player.Face, Voice = Player.Voice}
 			end
@@ -159,9 +162,7 @@ function events.GameInitialized2()
 				Player.ExpressionTimePassed = 0
 				Player.ExpressionLength = 0
 			end
-			if IsZombieFace(Player.Face) then
-				Player.Conditions[const.Condition.Zombie] = Game.Time
-			end
+			WasZombie[PlayerId] = nil
 		end
 	end
 
@@ -170,7 +171,10 @@ function events.GameInitialized2()
 	mem.hook(NewCode, function(d)
 		local PlayerId = (d.esi - Party.PlayersArray["?ptr"])/Party.PlayersArray[0]["?size"]
 		local Player = Party.PlayersArray[PlayerId]
-		if Player.Conditions[const.Condition.Zombie] == 0 and IsZombieFace(Player.Face) then
+		local Original = vars.PlayerFaces and vars.PlayerFaces[PlayerId]
+		if Player.Conditions[const.Condition.Zombie] == 0 and IsZombieFace(Player.Face)
+				and (WasZombie[PlayerId] or Original and
+					(Player.Face ~= Original.Face or Player.Voice ~= Original.Voice)) then
 			SetFace(PlayerId)
 		end
 	end)
@@ -269,6 +273,11 @@ function events.GameInitialized2()
 
 			if Cost and evt.Subtract{"Gold", Cost} then
 				t.Handled = true
+				-- Capture the original before transformation, including chosen zombie skins.
+				if Conditions[const.Condition.Zombie] == 0 then
+					vars.PlayerFaces = vars.PlayerFaces or {}
+					vars.PlayerFaces[Party.PlayersIndexes[PlayerId]] = {Face = cPlayer.Face, Voice = cPlayer.Voice}
+				end
 				cPlayer.HP = cPlayer:GetFullHP()
 				cPlayer.SP = cPlayer:GetFullSP()
 				evt.ForPlayer(PlayerId).Set{"MainCondition", 1}
@@ -314,6 +323,10 @@ function events.GameInitialized2()
 				Target.Conditions[const.Condition.Dead] = 0
 
 				if Race ~= const.Race.Undead then
+					if Target.Conditions[const.Condition.Zombie] == 0 then
+						vars.PlayerFaces = vars.PlayerFaces or {}
+						vars.PlayerFaces[Target:GetIndex()] = {Face = Target.Face, Voice = Target.Voice}
+					end
 					Target.Conditions[const.Condition.Zombie] = Game.Time
 					SetFace(Target:GetIndex())
 				end
