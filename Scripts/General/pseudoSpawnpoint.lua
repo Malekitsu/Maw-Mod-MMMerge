@@ -81,7 +81,19 @@ function pseudoSpawnpoint(monster, x, y, z, count, powerChances, radius, group, 
 			local yadd = math.sin(angle) * random(1, t.radius)
 			x, y = t.x + xadd, t.y + yadd
 			z = not t.exactZ and Map.IsOutdoor() and Map.GetGroundLevel(x, y) or t.z
-			if Map.IsIndoor() and Map.RoomFromPoint(x, y, z) > 0 then -- room from point check makes sure that monsters won't generate in a wall
+			local room = Map.IsIndoor() and Map.RoomFromPoint(x, y, z) or 0
+			if Map.IsIndoor() and room <= 0 and not t.exactZ then
+				-- a monster can die a unit below the floor (War Camp d30: z -1 over a floor at 0),
+				-- and every point at that height is "in a wall"; probe higher and stand on the floor there
+				room = Map.RoomFromPoint(x, y, z + 64)
+				if room > 0 then
+					local floorZ = Map.GetFloorLevel(x, y, z + 64, room)
+					if floorZ > -29000 then
+						z = floorZ
+					end
+				end
+			end
+			if Map.IsIndoor() and room > 0 then -- room from point check makes sure that monsters won't generate in a wall
 				break
 			elseif Map.IsIndoor() then
 				table.insert(failReasons, {"monster generated in a wall", x, y, z})
