@@ -2547,6 +2547,8 @@ function checkMapCompletition()
 
 	if (Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.completed==nil) or (Map.IndoorOrOutdoor==2 and mapvars.completed==nil) then
 		if Map.Name=="d42.blv" then return end --arena
+		--no monsters at all (the Alvar Merchant House d09): nothing to clear, nothing to reward
+		if Map.Monsters.Count==0 then return end
 		local n=Map.Monsters.Count
 		local m=0
 		if monsterKilled then
@@ -2571,9 +2573,9 @@ function checkMapCompletition()
 				n=n-1
 			end
 		end
-		--nothing left to count (no monsters at all, or only friendly and hidden ones, like the
-		--Alvar Merchant House d09 or the Balthazar Lair d24 after its quest): 0/0 is NaN, which
-		--never reaches requiredRateo, so such a map showed 100% and could never be completed
+		--monsters are there but none is left to count (all friendly or hidden, like the Balthazar
+		--Lair d24 after the minotaur quest): 0/0 is NaN, which never reaches requiredRateo, so such
+		--a map showed 100% and could never be completed. It counts as cleared
 		local ratio=n>0 and m/n or 1
 		local requiredRateo=0.99^(math.floor(n/100))
 		if vars.insanityMode and not mapvars.monsterMap then
