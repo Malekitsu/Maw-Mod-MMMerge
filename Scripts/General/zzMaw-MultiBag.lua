@@ -528,11 +528,11 @@ end
 function events.Action(t)
 	if t.Action==113 or t.Action==123 then
 		if vars.SmallerPotionBottles then
-			for i=220, 299 do
+			for i=220, 289 do
 				itemSizeMap[i][2]=1
 			end	
 		else
-			for i=220, 299 do
+			for i=220, 289 do
 				itemSizeMap[i][2]=2
 			end	
 		end

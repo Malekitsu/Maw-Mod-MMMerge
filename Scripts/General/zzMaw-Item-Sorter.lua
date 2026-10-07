@@ -116,14 +116,14 @@ function sortInventory(all)
 		end
 		vars.alchemyPlayer=vars.alchemyPlayer or -1
 		table.sort(itemList, function(a, b)
-			-- Special sorting for items with number >= 220 and < 300
+			-- Special sorting for items with number >= 220 and < 290 (potions; 290 is the Map)
 			if vars.alchemyPlayer>=0 then
-				if (a["Number"] >= 220 and a["Number"] < 300) or (b["Number"] >= 220 and b["Number"] < 300) then
+				if (a["Number"] >= 220 and a["Number"] < 290) or (b["Number"] >= 220 and b["Number"] < 290) then
 					-- Ensure that items in the specified range are sorted first and from biggest to smallest
-					if (a["Number"] >= 220 and a["Number"] < 300) and (b["Number"] >= 220 and b["Number"] < 300) then
+					if (a["Number"] >= 220 and a["Number"] < 290) and (b["Number"] >= 220 and b["Number"] < 290) then
 						return a["Number"] > b["Number"] -- Both in range, sort descending
 					else
-						return a["Number"] >= 220 and a["Number"] < 300 -- Only one in range, it goes first
+						return a["Number"] >= 220 and a["Number"] < 290 -- Only one in range, it goes first
 					end
 				end
 
@@ -170,7 +170,7 @@ function sortInventory(all)
 		vars.alchemyPlayer=vars.alchemyPlayer or -1
 		for i=1,#itemList do
 			if vars.alchemyPlayer>=0 then
-				if table.find(alchemyItemsOrder,itemList[i].Number) or (itemList[i].Number>=220 and itemList[i].Number<300) then
+				if table.find(alchemyItemsOrder,itemList[i].Number) or (itemList[i].Number>=220 and itemList[i].Number<290) then
 					Game.CurrentPlayer=vars.alchemyPlayer
 				end
 			end
@@ -279,14 +279,14 @@ function sortMultibag()
 		end
 		vars.alchemyPlayer=vars.alchemyPlayer or -1
 		table.sort(itemList, function(a, b)
-			-- Special sorting for items with number >= 220 and < 300
+			-- Special sorting for items with number >= 220 and < 290 (potions; 290 is the Map)
 			if vars.alchemyPlayer>=0 then
-				if (a["Number"] >= 220 and a["Number"] < 300) or (b["Number"] >= 220 and b["Number"] < 300) then
+				if (a["Number"] >= 220 and a["Number"] < 290) or (b["Number"] >= 220 and b["Number"] < 290) then
 					-- Ensure that items in the specified range are sorted first and from biggest to smallest
-					if (a["Number"] >= 220 and a["Number"] < 300) and (b["Number"] >= 220 and b["Number"] < 300) then
+					if (a["Number"] >= 220 and a["Number"] < 290) and (b["Number"] >= 220 and b["Number"] < 290) then
 						return a["Number"] > b["Number"] -- Both in range, sort descending
 					else
-						return a["Number"] >= 220 and a["Number"] < 300 -- Only one in range, it goes first
+						return a["Number"] >= 220 and a["Number"] < 290 -- Only one in range, it goes first
 					end
 				end
 
@@ -338,7 +338,7 @@ function sortMultibag()
 			local alchemyItem=false
 			if vars.alchemyPlayer>=0 and vars.alchemyPlayer~=Game.CurrentPlayer then
 				alchemyPlayer=Party[vars.alchemyPlayer]
-				if table.find(alchemyItemsOrder,itemList[i].Number) or (itemList[i].Number>=220 and itemList[i].Number<300) then
+				if table.find(alchemyItemsOrder,itemList[i].Number) or (itemList[i].Number>=220 and itemList[i].Number<290) then
 					Game.CurrentPlayer=vars.alchemyPlayer
 					alchemyItem=true
 					changeBag(pl , 0)
@@ -428,11 +428,11 @@ function events.KeyDown(t)
     if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 103 then
         if t.Key == multiBagSortKey then
 			if vars.SmallerPotionBottles then
-				for i=220, 299 do
+				for i=220, 289 do
 					itemSizeMap[i][2]=1
 				end	
 			else
-				for i=220, 299 do
+				for i=220, 289 do
 					itemSizeMap[i][2]=2
 				end	
 			end
@@ -526,14 +526,14 @@ function gigaChadSort()
 	end
 	
 	table.sort(itemList, function(a, b)
-		-- Special sorting for items with number >= 220 and < 300
+		-- Special sorting for items with number >= 220 and < 290 (potions; 290 is the Map)
 		if vars.alchemyPlayer>=0 then
-			if (a["Number"] >= 220 and a["Number"] < 300) or (b["Number"] >= 220 and b["Number"] < 300) then
+			if (a["Number"] >= 220 and a["Number"] < 290) or (b["Number"] >= 220 and b["Number"] < 290) then
 				-- Ensure that items in the specified range are sorted first and from biggest to smallest
-				if (a["Number"] >= 220 and a["Number"] < 300) and (b["Number"] >= 220 and b["Number"] < 300) then
+				if (a["Number"] >= 220 and a["Number"] < 290) and (b["Number"] >= 220 and b["Number"] < 290) then
 					return a["Number"] > b["Number"] -- Both in range, sort descending
 				else
-					return a["Number"] >= 220 and a["Number"] < 300 -- Only one in range, it goes first
+					return a["Number"] >= 220 and a["Number"] < 290 -- Only one in range, it goes first
 				end
 			end
 
@@ -593,7 +593,7 @@ function gigaChadSort()
 			local alchemyItem=false
 			if vars.alchemyPlayer>=0 and vars.alchemyPlayer~=Game.CurrentPlayer then
 				alchemyPlayer=Party[vars.alchemyPlayer]
-				if table.find(alchemyItemsOrder,itemList[i].Number) or (itemList[i].Number>=220 and itemList[i].Number<300) then
+				if table.find(alchemyItemsOrder,itemList[i].Number) or (itemList[i].Number>=220 and itemList[i].Number<290) then
 					Game.CurrentPlayer=vars.alchemyPlayer
 					alchemyItem=true
 					for k=0, Party.High do
