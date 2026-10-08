@@ -2547,8 +2547,11 @@ function checkMapCompletition()
 
 	if (Map.IndoorOrOutdoor==1 and mapvars.monsterMap and mapvars.completed==nil) or (Map.IndoorOrOutdoor==2 and mapvars.completed==nil) then
 		if Map.Name=="d42.blv" then return end --arena
+		--no monsters at all (the Alvar Merchant House d09): nothing to clear, nothing to reward
+		if Map.Monsters.Count==0 then return end
 		local n=Map.Monsters.Count
 		local m=0
+		local hidden=0
 		if monsterKilled then
 			m=m+1
 		end
@@ -2569,13 +2572,29 @@ function checkMapCompletition()
 				m=m+1
 			elseif monster:IsAgainst() == 0 or monster.AIState==19 then
 				n=n-1
+				if monster.AIState==19 then
+					hidden=hidden+1
+				end
 			end
+		end
+		--monsters are there but none is left to count: 0/0 is NaN, which never reaches
+		--requiredRateo, so such a map showed 100% and could never be completed.
+		--Some hidden by the map (the Balthazar Lair d24 after the minotaur quest): counts as cleared.
+		--All just friendly (the School of Sorcery or Castle Gryphonheart before the event that turns
+		--them hostile): nothing to clear yet, left alone like an empty map
+		local ratio
+		if n>0 then
+			ratio=m/n
+		elseif hidden>0 or forceMapCompletion then
+			ratio=1
+		else
+			return
 		end
 		local requiredRateo=0.99^(math.floor(n/100))
 		if vars.insanityMode and not mapvars.monsterMap then
 			requiredRateo=1
 		end
-		mapvars.completition=math.min(round(m/n*1000/requiredRateo)/10,100)
+		mapvars.completition=math.min(round(ratio*1000/requiredRateo)/10,100)
 		if mapvars.completed then
 			mapvars.completition=100
 		end
@@ -2589,7 +2608,7 @@ function checkMapCompletition()
 			txt=StrColor(255,0,0,text)
 		end
 		completition.Text=txt
-		if m/n>=requiredRateo or forceMapCompletion then
+		if ratio>=requiredRateo or forceMapCompletion then
 			local name=Game.MapStats[Map.MapStatsIndex].Name
 			local bolster=getPartyLevel()
 			
@@ -2733,7 +2752,7 @@ function checkMapCompletition()
 				return
 			end
 		end
-		if mapvars.monsterMap and mapvars.monsterMap.cleared==false and m/n>=0.65 and Game.BolsterAmount>=300 then
+		if mapvars.monsterMap and mapvars.monsterMap.cleared==false and ratio>=0.65 and Game.BolsterAmount>=300 then
 			mapvars.monsterMap.cleared=true
 		 	if Game.CurrentScreen~=22 then
 		 		if disableCompletitionMessage then
