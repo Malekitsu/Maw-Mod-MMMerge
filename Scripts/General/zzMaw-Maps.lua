@@ -173,6 +173,9 @@ end
 --event carries neither. Shaped after MMExtension's own evt.HouseDoor.
 function addDungeonEntrance(eventId, dungeonId, moveArgs, label)
 	Game.MapEvtLines:RemoveEvent(eventId)
+	--RemoveEvent drops only the map's .evt lines, and evt.map handlers add up: a handler the
+	--map's own script (Scripts/Maps) set on this event would run too (event N lives at N*256)
+	evt.map.clear(eventId*256)
 	if label and label.hint then
 		evt.hint[eventId] = evt.str[label.hint]
 	elseif label and label.house then
@@ -253,12 +256,15 @@ function events.AfterLoadMap()
 		addDungeonEntrance(502, "d08.blv", {X = 2157, Y = 1003, Z = 1, Direction = 1024, LookAngle = 0, SpeedZ = 0, HouseId = 353, Icon = 1, Name = "d08.blv"}, {hint = 51})         -- "Dire Wolf Den"
 
 		Game.MapEvtLines:RemoveEvent(504)
+		evt.map.clear(504*256)  --Scripts/Maps/out02.lua sets its own
 		evt.hint[504] = evt.str[53]  -- "Enter Escaton's Crystal"
 		evt.map[504] = function()
 			local dungeonId="d10.blv"
 			if tryResetDungeon(dungeonId) then return end
 			evt.ForPlayer("All")
-			if evt.Cmp{"Inventory", Value = 610} then         -- "Conflux Key"
+			--as Scripts/Maps/out02.lua: once opened, the crystal lets the party in without the key
+			if mapvars.CrystalOpened or evt.Cmp{"Inventory", Value = 610} then         -- "Conflux Key"
+				mapvars.CrystalOpened = true
 				evt.MoveToMap{X = -1024, Y = -1626, Z = 0, Direction = 520, LookAngle = 0, SpeedZ = 0, HouseId = 355, Icon = 1, Name = "d10.blv"}         -- "Inside the Crystal"
 			else
 				evt.FaceAnimation{Player = "Current", Animation = 18}
@@ -491,14 +497,16 @@ function events.AfterLoadMap()
 		addDungeonEntrance(502, "7d08.blv", {X = 2071, Y = 448, Z = 1, Direction = 1024, LookAngle = 0, SpeedZ = 0, HouseId = 394, Icon = 3, Name = "7d08.blv"}, {hint = 31})         -- "Tularean Caves"
 
 		Game.MapEvtLines:RemoveEvent(503)
+		evt.map.clear(503*256)  --Scripts/Maps/7out04.lua sets its own (house 395 with Archibald)
 		evt.hint[503] = evt.str[32]  -- "Enter Clanker's Laboratory"
 		evt.map[503] = function()
 			if not evt.Cmp{"QBits", Value = 710} then         -- Archibald in Clankers Lab now
 				local dungeonId="7d12.blv"
 				if tryResetDungeon(dungeonId) then return end
 				evt.MoveToMap{X = 0, Y = -709, Z = 1, Direction = 512, LookAngle = 0, SpeedZ = 0, HouseId = 395, Icon = 9, Name = "7d12.blv"}         -- "Clanker's Laboratory"
+			else
+				evt.SpeakNPC{NPC = 427}         -- "Archibald Ironfist"
 			end
-			evt.SpeakNPC{NPC = 427}         -- "Archibald Ironfist"
 		end
 	end
 	
