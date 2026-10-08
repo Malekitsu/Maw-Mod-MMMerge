@@ -2551,6 +2551,7 @@ function checkMapCompletition()
 		if Map.Monsters.Count==0 then return end
 		local n=Map.Monsters.Count
 		local m=0
+		local hidden=0
 		if monsterKilled then
 			m=m+1
 		end
@@ -2571,12 +2572,24 @@ function checkMapCompletition()
 				m=m+1
 			elseif monster:IsAgainst() == 0 or monster.AIState==19 then
 				n=n-1
+				if monster.AIState==19 then
+					hidden=hidden+1
+				end
 			end
 		end
-		--monsters are there but none is left to count (all friendly or hidden, like the Balthazar
-		--Lair d24 after the minotaur quest): 0/0 is NaN, which never reaches requiredRateo, so such
-		--a map showed 100% and could never be completed. It counts as cleared
-		local ratio=n>0 and m/n or 1
+		--monsters are there but none is left to count: 0/0 is NaN, which never reaches
+		--requiredRateo, so such a map showed 100% and could never be completed.
+		--Some hidden by the map (the Balthazar Lair d24 after the minotaur quest): counts as cleared.
+		--All just friendly (the School of Sorcery or Castle Gryphonheart before the event that turns
+		--them hostile): nothing to clear yet, left alone like an empty map
+		local ratio
+		if n>0 then
+			ratio=m/n
+		elseif hidden>0 or forceMapCompletion then
+			ratio=1
+		else
+			return
+		end
 		local requiredRateo=0.99^(math.floor(n/100))
 		if vars.insanityMode and not mapvars.monsterMap then
 			requiredRateo=1
