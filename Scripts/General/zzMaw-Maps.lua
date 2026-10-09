@@ -101,6 +101,65 @@ function events.LoadMap()
 	end
 end
 
+--Completed dungeons are keyed by map file name. Display names are not unique ("Temple of the
+--Sun" is both d22 and 6t4, a localization adds more: the Russian one shares "Abandoned Temple",
+--"Temple of Baa" and "Temple of the Moon" between the games), so one cleared map used to mark its
+--namesake cleared too: no reward there, and a reset prompt on its very first visit.
+function dungeonCompletedKey(mapIndex)
+	return Game.MapStats[mapIndex].FileName:lower()
+end
+
+--older saves: move each name to the maps of that name whose own map vars say completed (a name
+--only one map has: that map, as a reset clears its map vars); a shared name no such map has goes
+--to every visited map of that name, so nothing cleared is lost
+local function migrateDungeonCompletedList()
+	if vars.dungeonCompletedByFile then
+		return
+	end
+	vars.dungeonCompletedByFile=true
+	local list=vars.dungeonCompletedList
+	if not list then
+		return
+	end
+	local maps=internal.SaveGameData and internal.SaveGameData.Maps or {}
+	local byName={}
+	for i=1,Game.MapStats.High do
+		local name=Game.MapStats[i].Name
+		byName[name]=byName[name] or {}
+		table.insert(byName[name], i)
+	end
+	local new={}
+	for name, value in pairs(list) do
+		local ids=byName[name]
+		if ids then
+			local hits={}
+			for _, i in ipairs(ids) do
+				local mv=maps[dungeonCompletedKey(i)]
+				if #ids==1 or (mv and mv.completed) then
+					table.insert(hits, i)
+				end
+			end
+			if #hits==0 then
+				for _, i in ipairs(ids) do
+					if maps[dungeonCompletedKey(i)] then
+						table.insert(hits, i)
+					end
+				end
+			end
+			for _, i in ipairs(hits) do
+				new[dungeonCompletedKey(i)]=value
+			end
+		elseif type(name)=="string" and name:find("%.") then
+			new[name]=value  --already a file name
+		end
+	end
+	vars.dungeonCompletedList=new
+end
+
+function events.BeforeLoadMap()
+	migrateDungeonCompletedList()
+end
+
 --restore
 function events.AfterLoadMap()
 	for i=1,Game.MapStats.High do
@@ -125,16 +184,7 @@ function canResetDungeon(mapFileName)
 	if vars.insanityMode then
 		return false
 	end
-	for i=1,Game.MapStats.High do
-		if Game.MapStats[i].FileName==mapFileName then
-			local name=Game.MapStats[i].Name
-			if vars.dungeonCompletedList[name]==true then
-				return true
-			else
-				return false
-			end			
-		end
-	end
+	return vars.dungeonCompletedList[mapFileName:lower()]==true
 end
 
 --used in maps
@@ -154,7 +204,7 @@ function tryResetDungeon(dungeonId)
 		vars.resetDungeon=dungeonId
 		for i=1,Game.MapStats.High do
 			if Game.MapStats[i].FileName==vars.resetDungeon then
-				vars.dungeonCompletedList[Game.MapStats[i].Name]="resetting"
+				vars.dungeonCompletedList[dungeonCompletedKey(i)]="resetting"
 				Game.MapStats[i].RefillDays=0
 				Game.ShowStatusText("Entering will reset the dungeon")
 			end
@@ -736,7 +786,7 @@ function getDimensionMapPool()
 	local completed=vars.dungeonCompletedList or {}
 	local pool={}
 	for i=1,#mapDungeons do
-		if completed[Game.MapStats[mapDungeons[i]].Name] then
+		if completed[dungeonCompletedKey(mapDungeons[i])] then
 			table.insert(pool, mapDungeons[i])
 		end
 	end
@@ -803,7 +853,7 @@ function events.MonsterKilled(mon)
 	
 	possibleMaps={}
 	for i=1,#mapDungeons do
-		if vars.dungeonCompletedList[Game.MapStats[mapDungeons[i]].Name] then
+		if vars.dungeonCompletedList[dungeonCompletedKey(mapDungeons[i])] then
 			table.insert(possibleMaps, mapDungeons[i])
 		end
 	end

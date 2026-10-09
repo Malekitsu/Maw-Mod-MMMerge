@@ -2591,11 +2591,12 @@ function checkMapCompletition()
 		completition.Text=txt
 		if m/n>=requiredRateo or forceMapCompletion then
 			local name=Game.MapStats[Map.MapStatsIndex].Name
+			local key=dungeonCompletedKey(Map.MapStatsIndex)
 			local bolster=getPartyLevel()
 			
 			vars.dungeonCompletedList=vars.dungeonCompletedList or {}
-			if vars.dungeonCompletedList[name] and not vars.madnessMode then
-				vars.dungeonCompletedList[name]=true
+			if vars.dungeonCompletedList[key] and not vars.madnessMode then
+				vars.dungeonCompletedList[key]=true
 				if Game.CurrentScreen~=22 then
 					if vars.insanityMode then
 						if disableCompletitionMessage then
@@ -2619,7 +2620,7 @@ function checkMapCompletition()
 					
 					local possibleMaps={}
 					for i=1,#mapDungeons do
-						if vars.dungeonCompletedList[Game.MapStats[mapDungeons[i]].Name] then
+						if vars.dungeonCompletedList[dungeonCompletedKey(mapDungeons[i])] then
 							table.insert(possibleMaps, mapDungeons[i])
 						end
 					end
@@ -2642,7 +2643,7 @@ function checkMapCompletition()
 					end
 					possibleMaps={}
 					for i=1,#mapDungeons do
-						if vars.dungeonCompletedList[Game.MapStats[mapDungeons[i]].Name] then
+						if vars.dungeonCompletedList[dungeonCompletedKey(mapDungeons[i])] then
 							table.insert(possibleMaps, mapDungeons[i])
 						end
 					end
@@ -2719,7 +2720,7 @@ function checkMapCompletition()
 				mapvars.completed=true
 				shareMapCompletion()
 				vars.dungeonCompletedList=vars.dungeonCompletedList or {}
-				vars.dungeonCompletedList[name]=true
+				vars.dungeonCompletedList[key]=true
 				if mapvars.monsterMap then
 					mapvars.monsterMap.cleared=true
 				end
