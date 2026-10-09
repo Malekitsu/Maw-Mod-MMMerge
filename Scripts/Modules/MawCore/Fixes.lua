@@ -40,11 +40,29 @@ function Fixes.start()
 	--    engine looks for a free record only among the first 126 of 138, so
 	--    e.g. 118 backpack items + 8 equipped leave free cells that refuse
 	--    every item -- easy to reach once the sorter packs small items tight.
-	--    All 138 may be used now, with at most 122 backpack items: MultiBag
-	--    lays a stored bag out over consecutive free records, and a bag of
-	--    122 plus 16 equipped items is exactly 138. Every other engine loop
-	--    over records goes through grid cells or over all 138.
-	Engine.setBackpackItemCap(122)
+	--    All 138 may be used now, minus one per equipment slot the
+	--    character's doll has: MultiBag lays a stored bag out over
+	--    consecutive free records, and the bag must still fit after every
+	--    free slot has been filled from another bag. Amulet, gauntlets and
+	--    six rings are on every doll; the doll type adds the rest. A dragon
+	--    (doll without any of them) keeps 130, so its whole grid; most dolls
+	--    122. Every other engine loop over records goes through grid cells
+	--    or over all 138.
+	local records = A.PlayerItemRecords
+	Engine.setBackpackItemCap(function(pl)
+		local portrait = Game.CharacterPortraits[pl.Face]
+		local doll = portrait and Game.CharacterDollTypes[portrait.DollType]
+		if not doll then
+			return records - 16
+		end
+		local slots = 8 + (doll.Weapon and 2 or 0)
+		for _, k in ipairs{"Bow", "Armor", "Helm", "Belt", "Boots", "Cloak"} do
+			if doll[k] then
+				slots = slots + 1
+			end
+		end
+		return records - slots
+	end, records - 16)
 
 	-- 4. mm8.ini: force FixMonstersBlockingShots=1 (GrayFace patch option).
 	--    Like the DLL, this edits the file, and the option is read at engine

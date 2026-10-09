@@ -237,13 +237,19 @@ function Engine.setShopItemFilter(refuses, onSold)
 end
 
 -- Lets the free item record search use all of a player's records, while
--- fewer than `backpackCap` records hold backpack items (BodyLocation 0).
-function Engine.setBackpackItemCap(backpackCap)
+-- fewer than backpackCap(player) records hold backpack items (BodyLocation 0).
+-- backpackCap gets the roster player; a pointer outside the roster gets
+-- `fallback`.
+function Engine.setBackpackItemCap(backpackCap, fallback)
 	local A = Engine.Addr
 	table.insert(Engine.Patches, {name = "FreeItemRecord",
-		why = ("free item record search: all %d records, at most %d backpack items"):format(
-			A.PlayerItemRecords, backpackCap)})
+		why = ("free item record search: all %d records, backpack items capped per player"):format(
+			A.PlayerItemRecords)})
 	mem.hookfunction(A.FindFreeItemRecord, 1, 0, function(d, def, pl)
+		local index, cap = (pl - A.PlayerBase) / A.PlayerStride, fallback
+		if index % 1 == 0 and index >= 0 and index < Party.PlayersArray.count then
+			cap = backpackCap(Party.PlayersArray[index])
+		end
 		local free, inBackpack = -1, 0
 		for i = 0, A.PlayerItemRecords - 1 do
 			local p = pl + A.PlayerItemsOffset + i*A.ItemSize
@@ -255,7 +261,7 @@ function Engine.setBackpackItemCap(backpackCap)
 				inBackpack = inBackpack + 1
 			end
 		end
-		if inBackpack >= backpackCap then
+		if inBackpack >= cap then
 			return -1
 		end
 		return free
