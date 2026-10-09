@@ -54,4 +54,24 @@ function Fixes.start()
 			end
 		end
 	end
+
+	-- 4. Arena crash at Lord level. MAW rescales MonstersTxt levels, so with a
+	--    strong party no monster type falls into the arena's level range and
+	--    the engine divides by zero. Offer the 12 types nearest to the range
+	--    instead; the engine draws its up-to-6 from those (the nearest alone
+	--    would make the whole arena one kind of monster).
+	Engine.setArenaPoolFallback(function(min, max, list)
+		local function dist(m)
+			return m.level < min and min - m.level or m.level > max and m.level - max or 0
+		end
+		table.sort(list, function(a, b)
+			local da, db = dist(a), dist(b)
+			return da < db or da == db and a.id < b.id
+		end)
+		local ids = {}
+		for k = 1, math.min(#list, 12) do
+			ids[k] = list[k].id
+		end
+		return ids
+	end)
 end
