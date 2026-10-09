@@ -76,6 +76,15 @@ Engine.Addr = {
 	MerchantRowSites    = {0x49003C, 0x49004C},
 	MerchantRowPass     = 0x490068,
 	MerchantRowReturn   = 0x490096,	-- pop eax / return: jump here after a push
+
+	-- arena monster draw, sub_4BA21D (see Engine.setArenaPoolFallback).
+	-- Validated against the merge, which patches the loop end at 0x4BA561
+	-- and hooks 0x4BA5A1 / 0x4BA624 of the same routine
+	-- (Structs/After/RemoveMonstersAndPlacemonLimits.lua).
+	ArenaPoolDone       = 0x4BA569,	-- 5 bytes after the candidate loop: mov eax,[ebp-0x10] / push 6
+	ArenaPoolCount      = -0x10,	-- ebp offset, i4: candidates found
+	ArenaPoolList       = -0x138,	-- ebp offset, u2[140]: their MonstersTxt ids
+	ArenaPoolMaxLevel   = -0x8,	-- ebp offset, i4: top of the level range; esi = bottom
 }
 
 -- Ledger of every binary patch MawCore applies. Nothing in the core may
@@ -224,6 +233,40 @@ function Engine.setShopItemFilter(refuses, onSold)
 		mr_pass:
 			jmp absolute 0x%X]], check, A.MerchantRowReturn, A.MerchantRowPass), 5)
 	end
+end
+
+-- Arena (Page..Lord) monster draw. The engine collects the monster types
+-- whose Level byte lies in a range from the arena tier and the party's highest
+-- level (Lord: L..2L, both clamped to 2..100), draws up to 6 of them and then
+-- divides Rand() by how many it drew (0x4BA615) -- with no candidate at all,
+-- a division by zero. When the engine found none, pick(min, max, list) is
+-- called with every type that passes the engine's other tests (record byte
+-- 0x10 ~= 1, not of kind NoArena) as {id = MonstersTxt index, level = Level},
+-- and the ids it returns become the candidates. A non-empty draw is untouched.
+function Engine.setArenaPoolFallback(pick)
+	local A = Engine.Addr
+	local u1, u2, i4 = mem.u1, mem.u2, mem.i4
+	local MAX = 140	-- the engine's buffer ends at [ebp-0x1E]
+	Engine.patch("ArenaPoolFallback", "arena: no monster in the level range divided by zero", function()
+		mem.autohook(A.ArenaPoolDone, function(d)
+			if i4[d.ebp + A.ArenaPoolCount] ~= 0 then
+				return
+			end
+			local list = {}
+			for i = 1, Game.MonstersTxt.count - 1 do
+				local p = Game.MonstersTxt[i]["?ptr"]
+				if u1[p + 0x10] ~= 1 and Game.IsMonsterOfKind(i, const.MonsterKind.NoArena) == 0 then
+					list[#list + 1] = {id = i, level = u1[p + 8]}
+				end
+			end
+			local ids = pick(d.esi, i4[d.ebp + A.ArenaPoolMaxLevel], list)
+			local n = math.min(#ids, MAX)
+			for k = 1, n do
+				u2[d.ebp + A.ArenaPoolList + 2*(k - 1)] = ids[k]
+			end
+			i4[d.ebp + A.ArenaPoolCount] = n
+		end, 5)
+	end)
 end
 
 function Engine.describe()
