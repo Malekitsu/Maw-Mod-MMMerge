@@ -11,9 +11,10 @@
 -- quest needs it any more. Items that are only rewards sell at once; a
 -- quest-bound one when its quest is done. For the promotion items those are
 -- the bits Classes/zzClasses promote characters hired later by, so the item
--- is not needed for that either. Items without a price (keys, letters, the
--- Wetsuit and the Cloak of Baa, which open maps, the blasters) still do not
--- sell.
+-- is not needed for that either. Junk with Value 0 that drops in numbers
+-- (Endless Potion, Whisp wrappings) gets a nominal price. Items without a
+-- price (keys, letters, the Wetsuit and the Cloak of Baa, which open maps,
+-- the blasters) still do not sell.
 --
 -- Unique items that the game can hand out again sell once per game: the MM8
 -- seer returns Ebonest/Whistlebone/Balthazar while their "lost it" bit is set
@@ -28,7 +29,8 @@ MawCore.SpecialItems = SpecialItems
 
 local SELL, IDENTIFY, REPAIR = 3, 4, 5
 
--- item -> the quest bits (or awards) of which any one means "done"
+-- item -> the quest bits, awards or MMExtension quests (vars.Quests[name] ==
+-- "Done") of which any one means "done"
 SpecialItems.QuestBound = {
 	[516] = {QBits = {128}},					-- Eclipse: Lathius, Ravenshore
 	[539] = {QBits = {1540, 1541}},				-- Ebonest: Champion (Charles Quixote)
@@ -38,6 +40,7 @@ SpecialItems.QuestBound = {
 	[1344] = {QBits = {1586, 1587, 1588, 1589}},	-- The Perfect Bow (unrepaired): Master Archer / Sniper
 	[2118] = {Awards = {79}},					-- Snergle's Axe: Avinril Smythers
 	[2119] = {Awards = {57}},					-- Lord Kilburn's Shield: Wilbur Humphrey
+	[665] = {Quests = {"SG_WispWrappings"}},	-- Whisp wrappings: Verdant (Quest_SavingGoobers.lua) takes one
 }
 
 -- items whose Value is 0 in the table
@@ -46,6 +49,8 @@ SpecialItems.Prices = {
 	[539] = 20000,	-- as Wyrm Spitter, Gibbet
 	[540] = 20000,	-- as Iron Feather (4d5 two-handed sword)
 	[541] = 20000,	-- as Conan (3d7 two-handed axe)
+	[665] = 10,		-- Whisp wrappings: the dungeon drops dozens, the quest takes one
+	[1069] = 10,	-- Endless Potion: nominal value to sell unwanted drops
 	[1439] = 2500,	-- Winged Sandals: no script uses them
 	[2118] = 2500,
 	[2119] = 2500,
@@ -79,6 +84,11 @@ function SpecialItems.questDone(number)
 			if pl.Awards[a] then
 				return true
 			end
+		end
+	end
+	for _, name in ipairs(q.Quests or {}) do
+		if vars.Quests and vars.Quests[name] == "Done" then
+			return true
 		end
 	end
 	return false
@@ -131,17 +141,19 @@ end
 function SpecialItems.sold(item)
 	local n = item.Number
 	local once = SpecialItems.SellOnce[n]
-	if not once then
-		return
+	if once then
+		soldOnce()[n] = true
+		if once.SeerBit then
+			Party.QBits[once.SeerBit] = false
+		end
 	end
-	soldOnce()[n] = true
-	if once.SeerBit then
-		Party.QBits[once.SeerBit] = false
-	end
-	-- continent 0 never matches, so the topic does not return it, while the
-	-- entry still counts as "the party had it" (outb2.lua refills Kilburn's
-	-- chest until then) and keeps GotItem from registering it again
-	if vars.LostItems then
+	-- a sold item is not "lost": without this the topic would hand out a new
+	-- one on the next map load (Whisp wrappings were registered while their
+	-- Value was 0). Continent 0 never matches, so the topic does not return
+	-- it, while the entry still counts as "the party had it" (outb2.lua
+	-- refills Kilburn's chest until then) and keeps GotItem from registering
+	-- it again
+	if vars.LostItems and (once or vars.LostItems[n]) then
 		vars.LostItems[n] = 0
 	end
 end
