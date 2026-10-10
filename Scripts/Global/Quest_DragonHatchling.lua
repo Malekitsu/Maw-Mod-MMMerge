@@ -6,6 +6,18 @@ vars.Quest_DragonHatchling = vars.Quest_DragonHatchling or {}
 local QSet = vars.Quest_DragonHatchling
 local DragonNPC = 396
 
+local FedText = "Yum! The dragon ate 5 food. Eaten so far: %d of 100."
+local DaysLeftText = "Days left: %d."
+local HungryText = "Grrr! The dragon needs 5 food, the party has less."
+
+-- Every string topic of slot 0 gets the same event (995), so when one of the dragon's topics
+-- replaces another, UpdateNPCQuests sees no change and does not redraw the dialog: after naming,
+-- the name was taken but the old "Dragon" button stayed and asked for the name again.
+local function RefreshTopics()
+	UpdateNPCQuests()
+	Game.UpdateDialogTopics()
+end
+
 -- Refresh NPC's name.
 function events.LoadMapScripts(WasInGame)
 	if not WasInGame and QSet.NameChosen then
@@ -104,15 +116,19 @@ NPCTopic{
 				QSet.DragonGrown = true
 				Game.NPC[DragonNPC].Pic = Game.CharacterPortraits[Party.QBits[611] and 74 or 71].NPCPic
 				Message(Game.NPCText[1689]) -- "Dragon grown"
+				RefreshTopics()
 			else
-				Message(Game.NPCText[1684]) -- "Dragon ate enough"
+				local DaysLeft = math.max(1, math.ceil((QSet.FirstFeed + const.Month - Game.Time) / const.Day))
+				Message(Game.NPCText[1684] .. "\n" .. string.format(DaysLeftText, DaysLeft)) -- "Dragon ate enough"
 			end
 		elseif Party.Food >= 5 then
 			Party.Food = Party.Food - 5
 			QSet.FoodEaten = QSet.FoodEaten + 5
 			evt.PlaySound{205} -- error sound
+			Message(string.format(FedText, QSet.FoodEaten))
 		else
 			evt.PlaySound{27} -- error sound
+			Message(HungryText)
 		end
 	end}
 
@@ -135,6 +151,7 @@ NPCTopic{
 				QSet.NameChosen = true
 			end
 		end
+		RefreshTopics()
 	end}
 
 -- Move Dragon to Party.
