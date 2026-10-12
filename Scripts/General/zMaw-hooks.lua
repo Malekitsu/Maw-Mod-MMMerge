@@ -205,33 +205,6 @@ inc edi
 @ok:
 ]])
 
-local ARENA_FALLBACK_COUNT = 6
-mem.autohook(0x4ba569, function(d)
-	if mem.i4[d.ebp - 0x10] > 0 then
-		return
-	end
-	local low, high = d.esi, mem.i4[d.ebp - 8]
-	local list = {}
-	for i = 1, Game.MonstersTxt.count - 1 do
-		local txt = Game.MonstersTxt[i]
-		if txt.AIType ~= 1 and Game.IsMonsterOfKind(i, const.MonsterKind.NoArena) == 0 then
-			local lv = txt.Level
-			list[#list + 1] = {Id = i, Dist = lv < low and low - lv or lv > high and lv - high or 0, Tie = math.random()}
-		end
-	end
-	table.sort(list, function(a, b)
-		if a.Dist ~= b.Dist then
-			return a.Dist < b.Dist
-		end
-		return a.Tie < b.Tie
-	end)
-	local n = math.min(#list, ARENA_FALLBACK_COUNT)
-	for k = 1, n do
-		mem.u2[d.ebp - 0x138 + (k - 1)*2] = list[k].Id
-	end
-	mem.i4[d.ebp - 0x10] = n
-end)
-
 -- UI message loop (0x43318b): ebx, esi and edi are constants for the whole
 -- function. Something run while handling a message can hand them back
 -- changed and the next message then reads Party through garbage (crash at
