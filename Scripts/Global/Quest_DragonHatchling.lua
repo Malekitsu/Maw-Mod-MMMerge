@@ -9,6 +9,9 @@ local DragonNPC = 396
 local FedText = "Yum! The dragon ate 5 food. Eaten so far: %d of 100."
 local DaysLeftText = "Days left: %d."
 local HungryText = "Grrr! The dragon needs 5 food, the party has less."
+local ReleaseTopic = "Release the dragon"
+local ReleaseAsk = "The dragon will fly away for good. Release him? (Y/N)"
+local ReleasedText = "The dragon spread his wings and flew away."
 
 -- Every string topic of slot 0 gets the same event (995), so when one of the dragon's topics
 -- replaces another, UpdateNPCQuests sees no change and does not redraw the dialog: after naming,
@@ -22,6 +25,9 @@ end
 function events.LoadMapScripts(WasInGame)
 	if not WasInGame and QSet.NameChosen then
 		Game.NPC[DragonNPC].Name = QSet.DragonName
+	end
+	if QSet.Released and Game.NPC[DragonNPC].Hired then
+		NPCFollowers.Remove(DragonNPC)
 	end
 end
 
@@ -57,24 +63,19 @@ evt.Global[850] = function()
 	end
 end
 
--- Override dismiss behaivor for hatchling - put him into NPCFollowers, don't send to Adventurer's Inn.
-function AfterDismissDragon(PlayerId)
-	local CharId = Party.PlayersIndexes[PlayerId]
-	if CharId == QSet.DragonRosterId then
-		Party.QBits[CharId + 400] = false
-		while not Party.QBits[CharId + 400] do -- let original function to set flags.
-			Sleep(10)
-		end
-		local Face = Party.PlayersArray[QSet.DragonRosterId].Face
-		Game.NPC[DragonNPC].Pic = Game.CharacterPortraits[Face].NPCPic
-		NPCFollowers.Add(DragonNPC)
-		Party.QBits[CharId + 400] = false
-		vars.MercenariesProps[CharId].CurContinent = -1
+-- A grown dragon who joined the party is an ordinary character and is dismissed like one, to the
+-- Adventurer's Inn (NPCMercenaries.lua). That shows a mercenary only in the inns of the continent
+-- he was dismissed on; the game's own characters, MM8's dragons among them, are seen in every inn,
+-- and so is this one, being the only one of his kind. Runs after NPCMercenaries.lua's handler
+-- (General scripts load before Global ones).
+function events.ContinentChange3()
+	local Id = QSet.DragonRosterId
+	local Props = Id and vars.MercenariesProps and vars.MercenariesProps[Id]
+	if vars.madnessMode or not Props or not Props.Hired or QSet.Released
+		or Game.NPC[DragonNPC].Hired or evt.IsPlayerInParty(Id) then
+		return
 	end
-end
-
-function events.DismissCharacter(t)
-	coroutine.resume(coroutine.create(AfterDismissDragon), t.PlayerId)
+	Party.QBits[400 + Id] = true
 end
 
 -- Create Dragon player upon first hiring.
@@ -174,6 +175,28 @@ NPCTopic{
 		end
 		HireCharacter(QSet.DragonRosterId)
 		NPCFollowers.Remove(DragonNPC)
+		Sleep(100, 100)
+		if Game.CurrentScreen == 4 then
+			ExitCurrentScreen()
+		end
+	end}
+
+-- Release the dragon for good: he has no profession, so NPCFollowers.lua gives him no dismiss topic.
+NPCTopic{
+	NPC = DragonNPC,
+	Branch = "",
+	Slot = 1,
+	Topic = ReleaseTopic,
+	CanShow = function()
+		return Game.NPC[DragonNPC].Hired
+	end,
+	Ungive = function()
+		if string.lower(Question(ReleaseAsk) or "") ~= "y" then
+			return
+		end
+		QSet.Released = true
+		NPCFollowers.Remove(DragonNPC)
+		Game.ShowStatusText(ReleasedText)
 		Sleep(100, 100)
 		if Game.CurrentScreen == 4 then
 			ExitCurrentScreen()
