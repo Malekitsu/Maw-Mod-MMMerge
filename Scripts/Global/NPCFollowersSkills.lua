@@ -257,7 +257,7 @@ SkillBonuses = {
 [const.Skills.Body]		= {[17] = 2, [18] = 3, [19] = 4},
 [const.Skills.Light]	= {[17] = 2, [18] = 3, [19] = 4},
 [const.Skills.Dark]		= {[17] = 2, [18] = 3, [19] = 4},
-[const.Skills.Merchant]		= {[20] = 4, [21] = 6},
+[const.Skills.Merchant]		= {[20] = 4, [21] = 6, [48] = 3, [50] = 8},
 [const.Skills.DisarmTraps]	= {[25] = 4, [26] = 6},
 [const.Skills.Perception]	= {[22] = 6, [47] = 5}
 }
