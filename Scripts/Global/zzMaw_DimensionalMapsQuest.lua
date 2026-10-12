@@ -1,15 +1,35 @@
 local ORACLES = {[314] = 4, [413] = 4, [794] = 0}
 
-local TIERS = {100, 140, 170, 200}
+local FIRST_TIER = 100
+local UNLOCK_TIER = 500
+local TIER_STEPS = {{Below = 140, Step = 20}, {Below = 200, Step = 15}, {Below = math.huge, Step = 10}}
+
+local LEGACY_TIERS = {100, 140, 170, 200}
 for level = 220, 500, 20 do
-	TIERS[#TIERS + 1] = level
+	LEGACY_TIERS[#LEGACY_TIERS + 1] = level
+end
+
+local function nextTier(level)
+	for _, s in ipairs(TIER_STEPS) do
+		if level < s.Below then
+			return level + s.Step
+		end
+	end
+end
+
+local function migrate(q)
+	if q.Tier then
+		q.TierLevel = LEGACY_TIERS[q.Tier] or nextTier(UNLOCK_TIER)
+		q.LegacyStamp = q.Map and q.Tier or nil
+		q.Tier = nil
+	end
+	q.TierLevel = q.TierLevel or FIRST_TIER
 end
 
 local TEXT_TOO_LOW = "The rifts between worlds open only for those who have walked far enough. Return to me when one of you has reached level %d."
 local TEXT_GIVE = "I have looked beyond the veil and found a place the other side has rewritten. Take this map: it will open %s anew, filled with creatures from another dimension (Map Level %d). Clear it, then return to me."
 local TEXT_NOT_CLEARED = "The rift I showed you still stands. Clear it, then return to me."
 local TEXT_REWARD = "The rift in %s is sealed. Accept this reward: %d gold."
-local TEXT_ALL_DONE = "You have sealed every rift I could find. There is nothing more I can show you."
 
 local function highestLevel()
 	local best = 0
@@ -19,11 +39,11 @@ local function highestLevel()
 	return best
 end
 
-local function rollQuestMap(tier, level)
+local function rollQuestMap(level)
 	if not vars.seed then
 		vars.seed = os.time()
 	end
-	math.randomseed((vars.seed + tier*7919) % 2147483647)
+	math.randomseed((vars.seed + level*7919) % 2147483647)
 	local pool = getDimensionMapPool()
 	if #pool == 0 then
 		pool = mapDungeons
@@ -38,7 +58,7 @@ local function rollQuestMap(tier, level)
 	local roll = math.random()
 	m.Bonus = roll <= 0.1 and 4 or roll < 0.3 and 3 or 2
 	math.randomseed(os.time())
-	m.MaxCharges = (level - 20)/10
+	m.MaxCharges = math.min(math.floor((level - 20)/10), MawCore.ItemLevel.MaxPower())
 	m.Level = getDimensionMapLevel(m.BonusStrength, m.MaxCharges)
 	return m
 end
@@ -58,21 +78,17 @@ local function giveMap(m)
 end
 
 local function dimensionalMapsTopic()
-	local q = vars.dimensionalMapsQuest or {Tier = 1}
+	local q = vars.dimensionalMapsQuest or {}
 	vars.dimensionalMapsQuest = q
-	local level = TIERS[q.Tier]
-	if not level then
-		q.Done = true
-		Message(TEXT_ALL_DONE)
-		return
-	end
+	migrate(q)
+	local level = q.TierLevel
 	local m = q.Map
 	if not m then
 		if highestLevel() < level then
 			Message(string.format(TEXT_TOO_LOW, level))
 			return
 		end
-		m = rollQuestMap(q.Tier, level)
+		m = rollQuestMap(level)
 		q.Map = m
 		giveMap(m)
 		Message(string.format(TEXT_GIVE, Game.MapStats[m.BonusStrength].Name, m.Level))
@@ -85,27 +101,40 @@ local function dimensionalMapsTopic()
 	local reward = q.Level*1000
 	AddGoldExp(reward, reward)
 	Message(string.format(TEXT_REWARD, q.MapName, reward))
-	q.Tier = q.Tier + 1
+	if level >= UNLOCK_TIER then
+		q.Done = true
+	end
+	q.TierLevel = nextTier(level)
 	q.Map = nil
 	q.Cleared = nil
 	q.Level = nil
 	q.MapName = nil
-	if not TIERS[q.Tier] then
-		q.Done = true
-	end
+	q.LegacyStamp = nil
 end
 
 function events.LoadMap()
 	local q = vars.dimensionalMapsQuest
-	if q and q.Map and not q.Cleared and mapvars.mapAffixes and not mapvars.completed then
-		mapvars.dimensionalMapsTier = q.Tier
+	if not q then
+		return
+	end
+	migrate(q)
+	if q.Map and not q.Cleared and mapvars.mapAffixes and not mapvars.completed then
+		mapvars.dimensionalMapsTier = q.TierLevel
 	end
 end
 
 function events.LeaveMap()
 	local q = vars.dimensionalMapsQuest
+	if not q then
+		return
+	end
+	migrate(q)
 	local affixes = mapvars.mapAffixes
-	if not (q and q.Map) or q.Cleared or not mapvars.completed or not affixes or mapvars.dimensionalMapsTier ~= q.Tier then
+	local stamp = mapvars.dimensionalMapsTier
+	if not q.Map or q.Cleared or not mapvars.completed or not affixes then
+		return
+	end
+	if stamp ~= q.TierLevel and (not q.LegacyStamp or stamp ~= q.LegacyStamp) then
 		return
 	end
 	q.Cleared = true
