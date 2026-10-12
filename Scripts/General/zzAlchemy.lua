@@ -1114,7 +1114,7 @@ function normal_random(mean, stddev)
 end
 
 local noCorpseMonsters={82,83,84,97,98,99,241,242,243,523,524,525,529,530,531,532,533,534,622,623,624,625,626,627}
-local waterMonsters={244,245,246,625,626,627}
+local waterMonsters={244,245,246,532,533,534,625,626,627}
 function events.MonsterKilled(mon)
 	if mon.Ally == 9999 or mon.NameId>300 then -- no drop from reanimated monsters
 		return
