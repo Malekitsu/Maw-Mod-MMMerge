@@ -56,14 +56,14 @@ function Formulas.retaliationDamage(power, vitality, skill)
 end
 
 Formulas.armorDivisorBase = 200
-Formulas.armorDivisorPerLevel = 3
+Formulas.armorDivisorPerLevel = 6
 function Formulas.armorDamageTaken(ac, monsterLevel)
 	local divisor = Formulas.armorDivisorBase + monsterLevel*Formulas.armorDivisorPerLevel
 	return 1/(ac/divisor + 1)
 end
 
 Formulas.resistanceDivisorBase = 100
-Formulas.resistanceDivisorPerLevel = 6
+Formulas.resistanceDivisorPerLevel = 12
 function Formulas.resistanceDamageTaken(resistance, monsterLevel)
 	local divisor = Formulas.resistanceDivisorBase + monsterLevel*Formulas.resistanceDivisorPerLevel
 	return 1/(resistance/divisor + 1)
