@@ -2558,7 +2558,10 @@ function checkMapCompletition()
 		]]
 		-- Get list of player-controlled monsters once
 		local playerControlledMonsters = getPlayerControlledMonsters()
-		
+		if Map.Name=="mdt15.blv" then
+			n=n-1
+		end
+
 		for i=0,Map.Monsters.High do
 			monster=Map.Monsters[i]
 			-- Skip player-controlled monsters in multiplayer
