@@ -1,23 +1,59 @@
 local count = 10
 
+-- The Adventurer's Inn shows a character's screen without leaving its own
+-- screen (const.Screens.AdventurersInn), so the checks for screens 7/13/15
+-- missed its backpack. Returns the roster player whose backpack the inn
+-- shows, party member or not: the inn dialog has 1 at +0xC while a
+-- character's screen is open (29 in the list; CurrentCharScreen keeps its
+-- last value there) and the character's roster index at +0x128.
+local function innBagPlayer()
+	if Game.CurrentScreen ~= 29 or Game.CurrentCharScreen ~= 103 then
+		return
+	end
+	local dlg = mem.u4[0x100614C]
+	if dlg == 0 or mem.i4[dlg + 0xC] ~= 1 then
+		return
+	end
+	local index = mem.i4[dlg + 0x128]
+	if index >= 0 and index < Party.PlayersArray.count then
+		return Party.PlayersArray[index]
+	end
+end
+
+-- The player whose bags the buttons and keys act on.
+local function bagOwner()
+	return innBagPlayer() or Party[Game.CurrentPlayer]
+end
+
+-- changeBag hands an item on the mouse to the current party member, so
+-- a character outside the party may switch bags only with an empty mouse.
+local function switchBag(pl, bag)
+	if Mouse.Item.Number ~= 0 and pl:GetIndex() ~= Party.PlayersIndexes[Game.CurrentPlayer] then
+		Game.ShowStatusText("Put the item down before switching this character's bag")
+		return
+	end
+	changeBag(pl, bag)
+end
+
 function events.KeyDown(t)
 	if t.Key==16 then
 		shiftPressed=true
 	end
-    if ((Game.CurrentScreen == 7 or Game.CurrentScreen==15) and Game.CurrentCharScreen == 103) or Game.CurrentScreen==13 then
+    local innPl = innBagPlayer()
+    if ((Game.CurrentScreen == 7 or Game.CurrentScreen==15) and Game.CurrentCharScreen == 103) or Game.CurrentScreen==13 or innPl then
 		local id=Game.CurrentPlayer
-		if (id>=0 and id <=Party.High) then
-			local pl = Party[Game.CurrentPlayer]
+		if innPl or (id>=0 and id <=Party.High) then
+			local pl = innPl or Party[Game.CurrentPlayer]
 			if Party.High==0 and shiftPressed then
 				if t.Key>=49 and t.Key<=48+5 then
-					changeBag(pl , (t.Key-48)*100)
+					switchBag(pl , (t.Key-48)*100)
 				end
 			elseif Party.High==0 or shiftPressed then
 				if t.Key>=49 and t.Key<=48+5 then
 					if Party.High==0 and t.Key==49 and Mouse.Item.Number~=0 then
 						return
 					else
-						changeBag(pl , t.Key-48)
+						switchBag(pl , t.Key-48)
 					end
 				end
 			end
@@ -36,23 +72,25 @@ function events.GameInitialized2()
 			multibagButton[i]=CustomUI.CreateButton{
 			IconUp = "SlChar" .. i .. "U",
 			IconDown = "SlChar" .. i .. "D",
-			Screen = {7, 13, 15},
+			Screen = {7, 13, 15, 29},
+			Condition = function() return Game.CurrentScreen ~= 29 or innBagPlayer() ~= nil end,
 			Layer = 1,
 			X =	455+i*30,
 			Y =	372,
 			Masked = true,
-			Action = function() changeBag(Party[Game.CurrentPlayer], i) end,
+			Action = function() switchBag(bagOwner(), i) end,
 			}
 		else
 			multibagButton[i]=CustomUI.CreateButton{
 			IconUp = "SlChar" .. i-5 .. "U",
 			IconDown = "SlChar" .. i-5 .. "D",
-			Screen = {7, 13, 15},
+			Screen = {7, 13, 15, 29},
+			Condition = function() return Game.CurrentScreen ~= 29 or innBagPlayer() ~= nil end,
 			Layer = 1,
 			X =	455+(i-5)*30,
 			Y =	445,
 			Masked = true,
-			Action = function() changeBag(Party[Game.CurrentPlayer], (i-5)*100) end,
+			Action = function() switchBag(bagOwner(), (i-5)*100) end,
 			}
 
 		end
@@ -88,8 +126,9 @@ function mawTick_MultibagButtons()
 			multibagButton[i].Active=false
 		end
 	end
-	if (Game.CurrentScreen == 7 or Game.CurrentScreen==13) and Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
-		local pl=Party[Game.CurrentPlayer]
+	local innPl = innBagPlayer()
+	if innPl or (Game.CurrentScreen == 7 or Game.CurrentScreen==13) and Game.CurrentPlayer>=0 and Game.CurrentPlayer<=Party.High then
+		local pl=innPl or Party[Game.CurrentPlayer]
 		local id=pl:GetIndex()
 		vars.mawbags=vars.mawbags or {}
 		if not vars.mawbags[id] then
