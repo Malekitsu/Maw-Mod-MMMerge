@@ -100,20 +100,64 @@ local questRemoveList={207,571,572,573,574,575,576, 181, 203, 212,234,246,1442,1
 for i=1,#questRemoveList do
 	Game.GlobalEvtLines:RemoveEvent(questRemoveList[i])
 end
+
+local REAGENT_COLORS = {
+	red    = {{200, 204}, {1002, 1006}, {1764, 1764}},
+	blue   = {{205, 209}, {1007, 1011}, {1763, 1763}},
+	yellow = {{210, 214}, {1012, 1016}, {1762, 1762}},
+}
+
+local function countItemsInRange(min, max)
+	local n = 0
+	local held = Mouse.Item.Number
+	if held >= min and held <= max then
+		n = n + 1
+	end
+	for _, pl in Party do
+		for cell = 0, 125 do
+			local idx = pl.Inventory[cell]
+			if idx > 0 then
+				local num = pl.Items[idx].Number
+				if num >= min and num <= max then
+					n = n + 1
+				end
+			end
+		end
+	end
+	return n
+end
+
+local function hasReagents(color, count)
+	local n = 0
+	for _, r in ipairs(REAGENT_COLORS[color]) do
+		n = n + countItemsInRange(r[1], r[2])
+	end
+	return n >= count
+end
+
+local function takeReagents(color, count)
+	for _, r in ipairs(REAGENT_COLORS[color]) do
+		local take = math.min(count, countItemsInRange(r[1], r[2]))
+		if take > 0 then
+			evt.RemoveItems{MinItemIndex = r[1], MaxItemIndex = r[2], Count = take}
+			count = count - take
+		end
+	end
+end
 evt.global[181] = function()
-	if not evt.CheckItemsCount{MinItemIndex = 200, MaxItemIndex = 204, Count = 4} then         -- "Widowsweep Berries"..."Phoenix Feather"
+	if not hasReagents("red", 4) then
 		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
 Return when you have them all." ]]
-	elseif not evt.CheckItemsCount{MinItemIndex = 205, MaxItemIndex = 209, Count = 2} then         -- "Phima Root"..."Dragon Turtle Fang"
+	elseif not hasReagents("blue", 2) then
 		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
 Return when you have them all." ]]
-	elseif evt.CheckItemsCount{MinItemIndex = 210, MaxItemIndex = 214, Count = 1} then         -- "Poppy Pod"..."Unicorn Horn"
+	elseif hasReagents("yellow", 1) then
 		evt.SetMessage{Str = 626}         --[[ "The ingredients!
 Thank you!
 Take this as a reward!" ]]
-		evt.RemoveItems{MinItemIndex = 200, MaxItemIndex = 204, Count = 4}         -- "Widowsweep Berries"..."Phoenix Feather"
-		evt.RemoveItems{MinItemIndex = 205, MaxItemIndex = 209, Count = 2}         -- "Phima Root"..."Dragon Turtle Fang"
-		evt.RemoveItems{MinItemIndex = 210, MaxItemIndex = 214, Count = 1}         -- "Poppy Pod"..."Unicorn Horn"
+		takeReagents("red", 4)
+		takeReagents("blue", 2)
+		takeReagents("yellow", 1)
 		evt.Subtract{"QBits", Value = 113}         -- "Bring Thistle on the Dagger Wound Islands the basic ingredients for a potion of Pure Speed."
 		evt.Add{"QBits", Value = 114}         -- returned ingredients for a potion of Pure Speed
 		evt.Add{"Inventory", Value = 254}         -- "Pure Speed"
@@ -127,19 +171,19 @@ Return when you have them all." ]]
 end
 
 evt.global[203] = function()
-	if not evt.CheckItemsCount{MinItemIndex = 200, MaxItemIndex = 204, Count = 2} then         -- "Widowsweep Berries"..."Phoenix Feather"
+	if not hasReagents("red", 2) then
 		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
 Return when you have them all." ]]
-	elseif not evt.CheckItemsCount{MinItemIndex = 205, MaxItemIndex = 209, Count = 3} then         -- "Phima Root"..."Dragon Turtle Fang"
+	elseif not hasReagents("blue", 3) then
 		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
 Return when you have them all." ]]
-	elseif evt.CheckItemsCount{MinItemIndex = 210, MaxItemIndex = 214, Count = 3} then         -- "Poppy Pod"..."Unicorn Horn"
+	elseif hasReagents("yellow", 3) then
 		evt.SetMessage{Str = 648}         --[[ "Excellent!
 With this I can brew another Potion of Pure Luck.
 Take this potion as your reward!" ]]
-		evt.RemoveItems{MinItemIndex = 200, MaxItemIndex = 204, Count = 2}         -- "Widowsweep Berries"..."Phoenix Feather"
-		evt.RemoveItems{MinItemIndex = 205, MaxItemIndex = 209, Count = 3}         -- "Phima Root"..."Dragon Turtle Fang"
-		evt.RemoveItems{MinItemIndex = 210, MaxItemIndex = 214, Count = 3}         -- "Poppy Pod"..."Unicorn Horn"
+		takeReagents("red", 2)
+		takeReagents("blue", 3)
+		takeReagents("yellow", 3)
 		evt.Subtract{"QBits", Value = 115}         -- "Bring Rihansi in Alvar the basic ingredients for a potion of Pure Luck."
 		evt.Add{"QBits", Value = 116}         -- returned ingredients for a potion of Pure Luck
 		evt.Add{"Inventory", Value = 254}         -- "Pure Luck"
@@ -153,19 +197,19 @@ Return when you have them all." ]]
 end
 
 evt.global[212] = function()
-	if not evt.CheckItemsCount{MinItemIndex = 200, MaxItemIndex = 204, Count = 2} then         -- "Widowsweep Berries"..."Phoenix Feather"
+	if not hasReagents("red", 2) then
 		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
 Return when you have them all." ]]
-	elseif not evt.CheckItemsCount{MinItemIndex = 205, MaxItemIndex = 209, Count = 4} then         -- "Phima Root"..."Dragon Turtle Fang"
+	elseif not hasReagents("blue", 4) then
 		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
 Return when you have them all." ]]
-	elseif evt.CheckItemsCount{MinItemIndex = 210, MaxItemIndex = 214, Count = 1} then         -- "Poppy Pod"..."Unicorn Horn"
+	elseif hasReagents("yellow", 1) then
 		evt.SetMessage{Str = 648}         --[[ "Excellent!
 With this I can brew another Potion of Pure Luck.
 Take this potion as your reward!" ]]
-		evt.RemoveItems{MinItemIndex = 200, MaxItemIndex = 204, Count = 2}         -- "Widowsweep Berries"..."Phoenix Feather"
-		evt.RemoveItems{MinItemIndex = 205, MaxItemIndex = 209, Count = 4}         -- "Phima Root"..."Dragon Turtle Fang"
-		evt.RemoveItems{MinItemIndex = 210, MaxItemIndex = 214, Count = 1}         -- "Poppy Pod"..."Unicorn Horn"
+		takeReagents("red", 2)
+		takeReagents("blue", 4)
+		takeReagents("yellow", 1)
 		evt.Subtract{"QBits", Value = 121}         -- "Bring Talion in the Ironsand Desert the basic ingredients for a potion of Pure Endurance."
 		evt.Add{"QBits", Value = 122}         -- returned ingredients for a potion of Pure Endurance
 		evt.Add{"Inventory", Value = 254}         -- "Pure Endurance"
@@ -179,18 +223,18 @@ Return when you have them all." ]]
 end
 
 evt.global[234] = function()
-	if not evt.CheckItemsCount{MinItemIndex = 200, MaxItemIndex = 204, Count = 1} then         -- "Widowsweep Berries"..."Phoenix Feather"
+	if not hasReagents("red", 1) then
 		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
 Return when you have them all." ]]
-	elseif not evt.CheckItemsCount{MinItemIndex = 205, MaxItemIndex = 209, Count = 2} then         -- "Phima Root"..."Dragon Turtle Fang"
+	elseif not hasReagents("blue", 2) then
 		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
 Return when you have them all." ]]
-	elseif evt.CheckItemsCount{MinItemIndex = 210, MaxItemIndex = 214, Count = 4} then         -- "Poppy Pod"..."Unicorn Horn"
+	elseif hasReagents("yellow", 4) then
 		evt.SetMessage{Str = 679}         --[[ "You have returned with the ingredients, holding up you end of the bargain.
 Here is your Potion of Pure Intellect." ]]
-		evt.RemoveItems{MinItemIndex = 200, MaxItemIndex = 204, Count = 1}         -- "Widowsweep Berries"..."Phoenix Feather"
-		evt.RemoveItems{MinItemIndex = 205, MaxItemIndex = 209, Count = 2}         -- "Phima Root"..."Dragon Turtle Fang"
-		evt.RemoveItems{MinItemIndex = 210, MaxItemIndex = 214, Count = 4}         -- "Poppy Pod"..."Unicorn Horn"
+		takeReagents("red", 1)
+		takeReagents("blue", 2)
+		takeReagents("yellow", 4)
 		evt.Subtract{"QBits", Value = 123}         -- "Bring Kelvin in Shadowspire the basic ingredients for a potion of Pure Intellect."
 		evt.Add{"QBits", Value = 124}         -- returned ingredients for a potion of Pure Intellect
 		evt.Add{"Inventory", Value = 253}         -- "Pure Intellect"
@@ -204,17 +248,17 @@ Return when you have them all." ]]
 end
 
 evt.global[246] = function()
-	if not evt.CheckItemsCount{MinItemIndex = 200, MaxItemIndex = 204, Count = 2} then         -- "Widowsweep Berries"..."Phoenix Feather"
+	if not hasReagents("red", 2) then
 		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
 Return when you have them all." ]]
-	elseif not evt.CheckItemsCount{MinItemIndex = 205, MaxItemIndex = 209, Count = 1} then         -- "Phima Root"..."Dragon Turtle Fang"
+	elseif not hasReagents("blue", 1) then
 		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
 Return when you have them all." ]]
-	elseif evt.CheckItemsCount{MinItemIndex = 210, MaxItemIndex = 214, Count = 4} then         -- "Poppy Pod"..."Unicorn Horn"
+	elseif hasReagents("yellow", 4) then
 		evt.SetMessage{Str = 691}         -- "Ah, the right ingredients always do the trick! Here is your potion."
-		evt.RemoveItems{MinItemIndex = 200, MaxItemIndex = 204, Count = 2}         -- "Widowsweep Berries"..."Phoenix Feather"
-		evt.RemoveItems{MinItemIndex = 205, MaxItemIndex = 209, Count = 1}         -- "Phima Root"..."Dragon Turtle Fang"
-		evt.RemoveItems{MinItemIndex = 210, MaxItemIndex = 214, Count = 4}         -- "Poppy Pod"..."Unicorn Horn"
+		takeReagents("red", 2)
+		takeReagents("blue", 1)
+		takeReagents("yellow", 4)
 		evt.Subtract{"QBits", Value = 133}         -- returned ingredients for a potion of Pure Accuracy
 		evt.Add{"QBits", Value = 134}         -- Gave Gem of Restoration to Blazen Stormlance
 		evt.Add{"Inventory", Value = 252}         -- "Pure Accuracy"
