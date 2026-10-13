@@ -1,68 +1,118 @@
--- MAW/MMMerge skill-name compatibility. UI strings only; never rename skill IDs.
--- The original MMMerge data still contains Learning/Diplomacy descriptions.
--- Limit replacements to known text IDs to avoid changing unrelated quests.
-local npcTextIds = {
-    -- MM8 Learning/Ascension teachers, with old XP-bonus explanations:
-    414, 415, 416, 1382, 1383, 1384,
-    -- MM6 Learning teachers:
-    1950, 1951,
-    -- MM8/MM7 teacher-location hints:
-    519, 520, 521, 1480, 1481, 1988,
-}
-local topicIds = {
-    414, 415, 416, 1058, 1059, 1060, 1571, 1572
+-- MAW / MMMerge: correct known legacy trainer and hireling text.
+-- Only visible text is changed here. Skill IDs and class tables stay intact.
+-- MM6/7/8 text IDs were cross-checked against the MMMerge reference text tables.
+-- The descriptions are read through Game.NPCProf's dynamic NPCText lookup.
+-- Do not do global Learning/Diplomacy replacements: normal quest dialogue and
+-- internal const.Skills.Learning use those words for unrelated reasons.
+
+local ascensionOverview =
+    "Ascension strengthens spell damage and healing at the cost of higher " ..
+    "mana consumption and casting time. "
+
+-- The six MM8/MM7 trainer speeches still advertised XP gains. Preserve
+-- the original rank/price numbers so MAW's teacher-dialog formatter can
+-- replace them with the difficulty-mode-specific requirements and cost.
+local ascensionTrainerTexts = {
+    [414] = ascensionOverview ..
+        "I can teach you Expert Ascension if your skill is level 4 and you pay 2000 gold.",
+    [415] = ascensionOverview ..
+        "I can teach you Master Ascension if your Expert skill is level 7 and you pay 5000 gold.",
+    [416] = ascensionOverview ..
+        "I can teach you Grand Master Ascension if your Master skill is level 10 and you pay 8000 gold.",
+    [1382] = ascensionOverview ..
+        "I can teach you Expert Ascension if your skill is level 4 and you pay 2000 gold.",
+    [1383] = ascensionOverview ..
+        "I can teach you Master Ascension if your Expert skill is level 7 and you pay 5000 gold.",
+    [1384] = ascensionOverview ..
+        "I can teach you Grand Master Ascension if your Master skill is level 10 and you pay 8000 gold.",
 }
 
-local function replaceLearningTeacherText(s)
-    -- Old teacher descriptions assert that Learning grants extra XP.
-    -- Don't silently retain false mechanics or invent training requirements.
-    if s:find("Learning allows you to gain more experience", 1, true) then
-        local first = s:find("I will instruct you", 1, true)
-        if first then
-            s = "Ascension enhances spellcasting rather than experience gained. " .. s:sub(first)
-        end
-    end
-    s = s:gsub("Expert Learning", "Expert Ascension")
-         :gsub("Master Learning", "Master Ascension")
-         :gsub("Grand Master Learning", "Grand Master Ascension")
-         :gsub("Learning skill", "Ascension skill")
-         :gsub("learning skill", "Ascension skill")
-         :gsub("skill of Learning", "skill of Ascension")
-         :gsub("Master of Learning", "Master of Ascension")
-         :gsub("master of learning", "master of Ascension")
-         :gsub("of learning", "of Ascension")
-    return s
+-- The base game labels these two old MM6 diplomacy speeches as unused.
+-- Still update them when present, since a custom map can reference them.
+-- Avoid hard-coded requirements: they are supplied by the trainer's logic.
+local legacyDiplomacyTexts = {
+    [1946] = "I can teach you Expert Alchemy if you meet the requirements.",
+    [1947] = "I can teach you Master Alchemy if you meet the requirements.",
+}
+
+-- Hints remain otherwise unchanged, including trainer names and locations.
+local ascensionHintTextIds = {519, 520, 521, 1480, 1481, 1950, 1951, 1988}
+local ascensionTopicIds = {414, 415, 416, 1058, 1059, 1060, 1571, 1572}
+local alchemyTopicIds = {1031, 1032, 1033}
+
+local function replaceSkillWord(s, old, new)
+    -- Lua frontier patterns match whole words, not "Learning" in other words.
+    return s:gsub("%f[%a]" .. old .. "%f[%A]", new)
+end
+
+local function replaceDescription(id, summary)
+    local original = Game.NPCText[id]
+    if not original or original == "" then return end
+
+    -- Keep the engine's placeholders for NPC name and fee. NPCFollowers.lua
+    -- performs the %01 / %17 substitutions when the player reads the text.
+    local fee = original:match("(%%01 takes .*)")
+    Game.NPCText[id] = summary .. (fee and ("\n" .. fee) or "")
 end
 
 function events.GameInitialized2()
-    for _, id in ipairs(npcTextIds) do
+    if not Game.NPCText or not Game.NPCTopic then return end
+
+    for id, updated in pairs(ascensionTrainerTexts) do
         local original = Game.NPCText[id]
-        if original and original ~= "" then
-            Game.NPCText[id] = replaceLearningTeacherText(original)
-        end
-    end
-    for _, id in ipairs(topicIds) do
-        local original = Game.NPCTopic[id]
-        if original and original ~= "" then
-            Game.NPCTopic[id] = original:gsub("Learning", "Ascension")
+        if original and original:find("Learning", 1, true) then
+            Game.NPCText[id] = updated
         end
     end
 
-    -- In MAW the Learning skill slot is Ascension. The follower bonuses
-    -- use const.Skills.Learning (ID retained), not the old XP mechanic.
-    local descriptions = {
-        [2324] = "Identifies items and grants +5 to effective Ascension skill level to each character.",
-        [2333] = "Grants +10 to effective Ascension skill level to each character.",
-        [2334] = "Grants +15 to effective Ascension skill level to each character.",
-        -- Negotiator profession 49: MAW follower code grants +4 Merchant.
-        -- No Alchemy or Diplomacy bonus is implemented.
-        [2369] = "Grants +4 to effective Merchant skill level to each character.",
-    }
-    for id, prefix in pairs(descriptions) do
+    for id, updated in pairs(legacyDiplomacyTexts) do
         local original = Game.NPCText[id]
-        if original and original ~= "" then
-            local fee = original:match("(%%01 takes .*)")
-            Game.NPCText[id] = prefix .. (fee and ("\n" .. fee) or "")
+        if original and original:lower():find("diploma", 1, true) then
+            Game.NPCText[id] = updated
         end
     end
+
+    for _, id in ipairs(ascensionHintTextIds) do
+        local original = Game.NPCText[id]
+        if original then
+            original = replaceSkillWord(original, "Learning", "Ascension")
+            -- ID 1988 uses lowercase "learning skill".
+            if id == 1988 then
+                original = replaceSkillWord(original, "learning", "Ascension")
+            end
+            Game.NPCText[id] = original
+        end
+    end
+
+    for _, id in ipairs(ascensionTopicIds) do
+        local original = Game.NPCTopic[id]
+        if original then
+            Game.NPCTopic[id] = replaceSkillWord(original, "Learning", "Ascension")
+        end
+    end
+
+    -- Legacy MM6 diplomacy-topic labels; modern merged trainers use Alchemy.
+    for _, id in ipairs(alchemyTopicIds) do
+        local original = Game.NPCTopic[id]
+        if original then
+            Game.NPCTopic[id] = replaceSkillWord(original, "Diplomacy", "Alchemy")
+        end
+    end
+
+    -- Verified against NPCFollowersSkills.lua, which treats the internal
+    -- Learning skill ID as Ascension. These are EFFECTIVE skill levels,
+    -- not spendable skill points and not extra experience earned.
+    replaceDescription(2324, "Can identify items and grants +5 effective Ascension skill to party members.")
+    replaceDescription(2333, "Grants +10 effective Ascension skill to party members.")
+    replaceDescription(2334, "Grants +15 effective Ascension skill to party members.")
+
+    -- Counselor (23) and Barrister (24) no longer have a working Diplomacy
+    -- bonus; no Alchemy or Merchant bonus is defined for them in MAW.
+    -- Do not invent a replacement bonus merely to match an old tooltip.
+    replaceDescription(2343, "No skill bonus is implemented for the Counselor in MAW.")
+    replaceDescription(2344, "No skill bonus is implemented for the Barrister in MAW.")
+
+    -- Negotiator (49): +4 effective Merchant, restored in the bonus table.
+    -- There is no bonus to Alchemy or to the removed Diplomacy skill.
+    replaceDescription(2369, "Grants +4 effective Merchant skill to party members.")
 end
