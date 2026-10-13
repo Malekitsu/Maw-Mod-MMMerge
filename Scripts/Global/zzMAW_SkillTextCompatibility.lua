@@ -25,6 +25,11 @@ local ascensionTrainerTexts = {
         "I can teach you Master Ascension if your Expert skill is level 7 and you pay 5000 gold.",
     [1384] = ascensionOverview ..
         "I can teach you Grand Master Ascension if your Master skill is level 10 and you pay 8000 gold.",
+    -- Original MM6 expert and master training speeches:
+    [1950] = ascensionOverview ..
+        "I can teach you Expert Ascension if your skill is level 4 and you pay 2000 gold.",
+    [1951] = ascensionOverview ..
+        "I can teach you Master Ascension if your Expert skill is level 7 and you pay 5000 gold.",
 }
 
 -- The base game labels these two old MM6 diplomacy speeches as unused.
@@ -36,7 +41,7 @@ local legacyDiplomacyTexts = {
 }
 
 -- Hints remain otherwise unchanged, including trainer names and locations.
-local ascensionHintTextIds = {519, 520, 521, 1480, 1481, 1950, 1951, 1988}
+local ascensionHintTextIds = {519, 520, 521, 1480, 1481, 1988}
 local ascensionTopicIds = {414, 415, 416, 1058, 1059, 1060, 1571, 1572}
 local alchemyTopicIds = {1031, 1032, 1033}
 
