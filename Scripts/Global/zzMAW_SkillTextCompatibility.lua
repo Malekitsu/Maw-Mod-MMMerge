@@ -51,12 +51,12 @@ function events.GameInitialized2()
     -- In MAW the Learning skill slot is Ascension. The follower bonuses
     -- use const.Skills.Learning (ID retained), not the old XP mechanic.
     local descriptions = {
-        [2324] = "Identifies items and grants +5 Ascension skill points to each character.",
-        [2333] = "Grants +10 Ascension skill points to each character.",
-        [2334] = "Grants +15 Ascension skill points to each character.",
+        [2324] = "Identifies items and grants +5 to effective Ascension skill level to each character.",
+        [2333] = "Grants +10 to effective Ascension skill level to each character.",
+        [2334] = "Grants +15 to effective Ascension skill level to each character.",
         -- Negotiator profession 49: MAW follower code grants +4 Merchant.
         -- No Alchemy or Diplomacy bonus is implemented.
-        [2369] = "Grants +4 Merchant skill points to each character.",
+        [2369] = "Grants +4 to effective Merchant skill level to each character.",
     }
     for id, prefix in pairs(descriptions) do
         local original = Game.NPCText[id]
