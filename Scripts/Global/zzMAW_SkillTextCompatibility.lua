@@ -104,12 +104,11 @@ function events.GameInitialized2()
         end
     end
 
-    -- Verified against NPCFollowersSkills.lua, which treats the internal
-    -- Learning skill ID as Ascension. These are EFFECTIVE skill levels,
-    -- not spendable skill points and not extra experience earned.
-    replaceDescription(2324, "Can identify items and grants +5 effective Ascension skill to party members.")
-    replaceDescription(2333, "Grants +10 effective Ascension skill to party members.")
-    replaceDescription(2334, "Grants +15 effective Ascension skill to party members.")
+    -- Scholar (4), Teacher (13), Instructor (14) grant non-stacking
+    -- experience bonuses. Ascension is not affected by these followers.
+    replaceDescription(2324, "Can identify items and increases experience gained by 5%.")
+    replaceDescription(2333, "Increases experience gained by 10%.")
+    replaceDescription(2334, "Increases experience gained by 15%.")
 
     -- Counselor (23) and Barrister (24) no longer have a working Diplomacy
     -- bonus; no Alchemy or Merchant bonus is defined for them in MAW.
