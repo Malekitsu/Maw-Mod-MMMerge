@@ -57,6 +57,21 @@ function events.GetSkill(t)
 	t.Result = JoinSkill(Skill, Mas)
 end
 
+---- Experience bonuses ----
+-- Scholar (4), Teacher (13), Instructor (14): largest percentage wins.
+local ExperienceBonuses = {[4] = 0.05, [13] = 0.10, [14] = 0.15}
+function NPCFollowers.GetExperienceMultiplier()
+	local bonus = 0
+	for _, followerId in pairs(vars.NPCFollowers or {}) do
+		local follower = Game.NPC[followerId]
+		if follower then
+			bonus = math.max(bonus, ExperienceBonuses[follower.Profession] or 0)
+		end
+	end
+	return 1 + bonus
+end
+
+
 ---- Crossing map bonuses ----
 -- ProfID == Amount of days to subtract
 local CrossMapBonuses
@@ -237,7 +252,6 @@ GoldFindBonuses = {[31] = 0.10, [32] = 0.20, [45] = 0.10}
 ---- Skill bonuses
 SkillBonuses = {
 
-[const.Skills.Learning] = {[4]	= 5, [13] = 10, [14] = 15},
 [const.Skills.Staff]	= {[15] = 2, [16] = 3, [46] = 2},
 [const.Skills.Sword]	= {[15] = 2, [16] = 3, [46] = 2},
 [const.Skills.Dagger]	= {[15] = 2, [16] = 3, [46] = 2},
