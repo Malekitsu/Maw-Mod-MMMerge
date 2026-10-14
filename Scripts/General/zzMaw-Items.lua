@@ -1661,15 +1661,21 @@ function updateCelestialItem(it,pl)
 end
 
 extraDescription=false
+local altHeld=false
+function UpdateExtraDescription()
+	local settings=vars and vars.MAWSETTINGS
+	local always=settings~=nil and settings.extraItemTooltip=="ON"
+	extraDescription=altHeld~=always
+end
 function events.KeyDown(t)
 	if t.Alt then
-		extraDescription=true
-	end	
+		altHeld=true
+	end
 end
 function events.KeyUp(t)
 	if t.Alt then
-		extraDescription=false
-	end	
+		altHeld=false
+	end
 end
 
 --colours

@@ -538,6 +538,7 @@ local mawSettings={
 	homingProjectiles="ON",
 	friendlyDamage="OFF",
 	lootFilter="OFF",
+	extraItemTooltip="OFF",
 }
 local defaultSettings=mawSettings
 
@@ -565,6 +566,7 @@ function events.MultiplayerInitialized()
     createSwitch(260, "Homing Projectiles", "homingProjectiles", {"ON","OFF"})
     createSwitch(300, "Damage on Friendly Units", "friendlyDamage", {"ON","OFF"})
     createSwitch(340, "Loot Filter", "lootFilter", {"OFF","Common", "Uncom.", "Rare", "Epic","Ancient","Primordial"})
+    createSwitch(380, "Extra Item Tooltip", "extraItemTooltip", {"OFF","ON"})
 	
     function events.OpenExtraSettingsMenu()
         for _, v in pairs(mawSettingsButton) do

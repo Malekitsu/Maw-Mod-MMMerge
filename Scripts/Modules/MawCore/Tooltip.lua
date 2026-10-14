@@ -63,6 +63,7 @@ end
 
 function Tooltip.start()
 	function events.BuildItemInformationBox(t)
+		UpdateExtraDescription()
 		for _, s in ipairs(sections) do
 			local text = s.fn(t)
 			if text and t.Description then
