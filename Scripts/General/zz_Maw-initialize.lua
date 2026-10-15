@@ -292,6 +292,7 @@ partyMultyBagSortKey = mawSettings.partyMultyBagSortKey
 AlchemyBagKey = mawSettings.AlchemyBagKey
 disableSpellBookRework = mawSettings.disableSpellBookRework
 teleportDeadMonstersAndCraftingKey = mawSettings.teleportDeadMonstersAndCraftingKey
+crashDiagnostics = mawSettings.crashDiagnostics
 
 -- Store settings in vars for access by other scripts
 function events.LoadMap()
