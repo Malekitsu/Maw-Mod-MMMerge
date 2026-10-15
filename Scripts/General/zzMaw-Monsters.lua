@@ -541,8 +541,14 @@ function recalculateMonsterTable()
 			local baseLevel=madnessMapLevels[name]
 			local withinMapDifference=(baseMapLevel-mean)*2
 			local tierModifier=(base.Level-LevelB)*2
-			local level=baseLevel+withinMapDifference+tierModifier
-			
+			local offset=withinMapDifference+tierModifier
+			local level
+			if offset>=0 then
+				level=bolsteredLevel(baseLevel, offset)
+			else
+				level=2*baseLevel-bolsteredLevel(baseLevel, -offset)
+			end
+
 			totalLevel[i]=math.max(level, 5)
 			mon.Level=math.min(totalLevel[i],255)
 			
