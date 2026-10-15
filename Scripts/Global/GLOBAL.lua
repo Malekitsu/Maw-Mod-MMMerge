@@ -96,7 +96,7 @@ end
 
 
 --QUEST FIX
-local questRemoveList={207,571,572,573,574,575,576, 181, 203, 212,234,246,1442,1443,1444,1445,1446,1447}
+local questRemoveList={207,571,572,573,574,575,576, 181, 203, 212,234,244,246,1442,1443,1444,1445,1446,1447}
 for i=1,#questRemoveList do
 	Game.GlobalEvtLines:RemoveEvent(questRemoveList[i])
 end
@@ -247,6 +247,26 @@ Return when you have them all." ]]
 	end
 end
 
+-- Galvinus: MM8 itself shifted this quest's bits by one. Taking it set 133, which has no journal
+-- text, so the quest never showed in the journal, and the turn-in set 134, "Gave Gem of
+-- Restoration to Blazen Stormlance", which the "Thank you again!" topic of Isthric the Tongue
+-- (event 297) checks. Now 132 (the journal entry) while the quest runs and 133 once the
+-- ingredients are returned, as the other black potion quests do. A save that took the quest
+-- before this fix has 133 instead of 132; the turn-in topic accepts both.
+evt.CanShowTopic[244] = function()
+	return not evt.Cmp{"QBits", Value = 132} and not evt.Cmp{"QBits", Value = 133}
+end
+
+evt.global[244] = function()
+	evt.SetMessage{Str = 689}         -- "Accuracy can determine who lives and who dies in battle. If you cannot hit your opponent you will surely perish! If you bring me the ingredients of a Potion of Pure Accuracy, I will brew that potion for you."
+	evt.Add{"QBits", Value = 132}         -- "Bring Galvinus in Ravage Roaming the basic ingredients for a potion of Pure Accuracy."
+	evt.SetNPCTopic{NPC = 77, Index = 0, Event = 0}         -- "Galvinus"
+end
+
+evt.CanShowTopic[246] = function()
+	return evt.Cmp{"QBits", Value = 132} or evt.Cmp{"QBits", Value = 133}
+end
+
 evt.global[246] = function()
 	if not hasReagents("red", 2) then
 		evt.SetMessage{Str = 684}         --[[ "You are missing all or some of the needed ingredients.
@@ -259,8 +279,8 @@ Return when you have them all." ]]
 		takeReagents("red", 2)
 		takeReagents("blue", 1)
 		takeReagents("yellow", 4)
-		evt.Subtract{"QBits", Value = 133}         -- returned ingredients for a potion of Pure Accuracy
-		evt.Add{"QBits", Value = 134}         -- Gave Gem of Restoration to Blazen Stormlance
+		evt.Subtract{"QBits", Value = 132}         -- "Bring Galvinus in Ravage Roaming the basic ingredients for a potion of Pure Accuracy."
+		evt.Add{"QBits", Value = 133}         -- returned ingredients for a potion of Pure Accuracy
 		evt.Add{"Inventory", Value = 252}         -- "Pure Accuracy"
 		evt.ForPlayer("All")
 		evt.Add{"Experience", Value = 5000}
