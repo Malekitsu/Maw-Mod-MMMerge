@@ -2571,8 +2571,6 @@ end
 
 ---------------
 -- BUFF REWORK (MAW SPELL)
--- SOLO : spéciaux sans TTL (comportement original)
--- MULTI : spéciaux avec TTL (Temple/Scroll/Piédestal)
 ---------------
 
 function events.GameInitialized2()
@@ -2599,15 +2597,8 @@ function events.GameInitialized2()
 	spScaling[const.Class.Assassin]=7.5
 	spScaling[const.Class.Spy]=7.5
 
-	-- === TTL par défaut pour buffs spéciaux (Temple / Scroll / Piédestal)
 	vars = vars or {}
 	vars.MAWSETTINGS = vars.MAWSETTINGS or {}
-	if vars.MAWSETTINGS.templeBuffTTL == nil then
-		vars.MAWSETTINGS.templeBuffTTL = const.Hour           -- 1h temple (MULTI)
-	end
-	if vars.MAWSETTINGS.scrollBuffTTL == nil then
-		vars.MAWSETTINGS.scrollBuffTTL  = const.Minute*15     -- 15min scroll/piedestal (MULTI)
-	end
 
 	-- map OFF local
 	vars._maw_local_off = vars._maw_local_off or {}
@@ -2699,53 +2690,6 @@ buffPower={
 	[86]= {["Base"]={[0]=0,10,10,10,10},["Scaling"]={[0]=0,2,2,2,2}},
 }
 
--- =================================================================================
--- Spéciaux (Temple/Scroll/Piédestal) : SOLO vs MULTI
--- =================================================================================
-local function __is_special_source(v) return type(v)=="string" end
-local function __is_temple(v) return v=="Temple" end
-local function __special_ttl_for(v)
-	if __is_temple(v) then
-		return (vars.MAWSETTINGS and vars.MAWSETTINGS.templeBuffTTL) or const.Hour
-	end
-	return (vars.MAWSETTINGS and vars.MAWSETTINGS.scrollBuffTTL) or (const.Minute*15)
-end
-local function __ensure_expire_map()
-	vars.maw_special_expire = vars.maw_special_expire or {}
-	return vars.maw_special_expire
-end
-
--- SOLO vs MULTI
-local function inMulti()
-	return Multiplayer and Multiplayer.in_game and true or false
-end
-local function special_use_ttl()
-	-- On utilise le TTL uniquement en MULTI et si le rework n'est pas OFF
-	return inMulti() and (not vars.MAWSETTINGS or vars.MAWSETTINGS.buffRework ~= "OFF")
-end
-
--- NE PAS renouveler auto quand expiré (on écrit une fois)
-local function __ensure_special_expire(buff)
-	if not special_use_ttl() then return nil end  -- SOLO => pas de TTL
-	local exmap = __ensure_expire_map()
-	local src = vars.mawbuff and vars.mawbuff[buff]
-	if not __is_special_source(src) then return nil end
-	local ex = exmap[buff]
-	if not ex then
-		ex = Game.Time + __special_ttl_for(src)
-		exmap[buff] = ex
-	end
-	return ex
-end
-local function __get_special_expire(buff)
-	local exmap = __ensure_expire_map()
-	return exmap[buff]
-end
-local function __clear_special_expire(buff)
-	local exmap = __ensure_expire_map()
-	exmap[buff] = nil
-end
-
 -- === Gestion Load / Leave et purge des spéciaux ===
 function events.LoadMap()
 	if vars.MAWSETTINGS and vars.MAWSETTINGS.buffRework=="OFF" then return end
@@ -2762,7 +2706,6 @@ function events.LoadMap()
 			if vars.mawbuff[buff] then
 				if type(vars.mawbuff[buff])=="string" and vars.mawbuff[buff]~=Map.Name and vars.mawbuff[buff]~="Temple" then
 					vars.mawbuff[buff]=false
-					__clear_special_expire(buff)
 				end
 			end
 		end
@@ -2773,7 +2716,6 @@ function events.LoadMap()
 			local buff=buffSpellList[i]
 			if vars.mawbuff[buff] and vars.mawbuff[buff]=="Temple" then
 				vars.mawbuff[buff]=false
-				__clear_special_expire(buff)
 			end
 		end
 	end
@@ -2791,7 +2733,7 @@ function events.LeaveMap()
 	end
 end
 
--- interception Action & Cast (pose TTL sur spéciaux en MULTI)
+-- interception Action & Cast
 function events.Action(t)
 	if t.Action==142 and (buffSpell[t.Param] or utilitySpell[t.Param]) and vars.MAWSETTINGS.buffRework=="ON" then
 		t.Handled=true
@@ -2806,12 +2748,6 @@ function events.PlayerCastSpell(t)
 		-- Scrolls & Pedestals
 		if t.TargetKind==4 or t.IsSpellScroll then
 			vars.mawbuff[t.SpellId]=Map.Name
-			do
-				if special_use_ttl() and type(vars.mawbuff[t.SpellId])=="string" then
-					local exmap = __ensure_expire_map()
-					exmap[t.SpellId] = Game.Time + __special_ttl_for(vars.mawbuff[t.SpellId])
-				end
-			end
 			RunNextTick(function()
 				mawBuffApply()
 			end)
@@ -2905,12 +2841,6 @@ function mawBuffCast(pl, index, spellId)
 		local delay=getSpellDelay(pl,spellId)
 		if not delay or Game:GetCurrentHouse() then --donation en Temple
 			vars.mawbuff[spellId]="Temple"
-			do
-				if special_use_ttl() then
-					local exmap = __ensure_expire_map()
-					exmap[spellId] = Game.Time + __special_ttl_for("Temple")
-				end
-			end
 		else
 			pl:SetRecoveryDelay(delay)
 		end
@@ -2921,7 +2851,6 @@ function mawBuffCast(pl, index, spellId)
 	else
 		-- === DEBUFF local : pose un override OFF de 90s pour ignorer les retours distants
 		vars.mawbuff[spellId]=false
-		__clear_special_expire(spellId)
 		vars._maw_local_off[spellId] = Game.Time + const.Minute + const.Second*30
 
 		RunNextTick(function()
@@ -2968,26 +2897,7 @@ function mawBuffApply()
 
 			-- déterminer expiration cible
 			local isSpecial = (type(vars.mawbuff[buff])=="string")
-			local expireTarget
-			if isSpecial then
-				if special_use_ttl() then
-					-- MULTI: TTL spécial
-					local ex = __ensure_special_expire(buff)
-					-- si le TTL existe ET qu'il est dépassé, couper
-					if ex and Game.Time >= ex then
-						vars.mawbuff[buff]=false
-						__clear_special_expire(buff)
-						goto skip_apply_this_buff
-					else
-						expireTarget = ex or (Game.Time + const.Hour) -- fallback sécurité
-					end
-				else
-					-- SOLO: comportement original => longue durée
-					expireTarget = Game.Time + const.Week
-				end
-			else
-				expireTarget = Game.Time + const.Week
-			end
+			local expireTarget = Game.Time + const.Week
 
 			local pl=GetPlayerFromIndex(vars.mawbuff[buff])
 			if (pl and pl:IsConscious()) or isSpecial or type(vars.mawbuff[buff])=="table" then
@@ -3166,6 +3076,10 @@ end
 --  - si vars.mawbuff[spell] est un {s,m,l} (table), on retourne tel quel
 --  - si c’est un "string" (Temple/Map.Name) on retourne une valeur >0 pour l’appliquer localement,
 --    mais le MULTI côté client filtre ces spéciaux pour éviter la re-diffusion.
+function getSpecialBuffSkill()
+	return 7,3,40
+end
+
 local function getCasterBuffSkill(spell)
 	local id=vars.mawbuff[spell]
 	if type(id)=="table" then
@@ -3173,7 +3087,11 @@ local function getCasterBuffSkill(spell)
 	end
 	if type(id)=="string" then
 		-- spécial (Temple/Scroll/Piédestal) : applique localement
-		return 7,3,40
+		local s, m, level=getSpecialBuffSkill()
+		if MAW_StrongerRemoteBuff then
+			return MAW_StrongerRemoteBuff(spell, s, m, level)
+		end
+		return s, m, level
 	end
 	local player=GetPlayerFromIndex(id)
 	if player and player:IsConscious() then

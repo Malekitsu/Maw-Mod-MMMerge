@@ -19,6 +19,7 @@ Multiplayer.REMOTE_OWNER_BIT = REMOTE_OWNER_BIT -- object belongs to another pla
 
 local last_object_state = {}
 local last_object_postime = {}
+local last_object_age = {}
 
 ---- object versions ----
 -- every state broadcast of an object carries a version: whoever sends bases it
@@ -217,6 +218,7 @@ local function fill_state(i, object)
 	for _, v in pairs(compare_fields) do
 		state[v] = object[v]
 	end
+	last_object_age[i] = object.Age
 end
 
 local function state_changed(state, object)
@@ -239,7 +241,9 @@ local function need_send(i, object)
 		return object.TypeIndex > 0
 	end
 
+	local seen_age = last_object_age[i]
 	return state_changed(state, object)
+		or object.TypeIndex > 0 and seen_age ~= nil and object.Age >= 0 and object.Age < seen_age
 end
 
 local function fill_all_states()
@@ -280,7 +284,8 @@ end
 
 local waiting_for_send = {}
 
-local packets = {
+local packets
+packets = {
 	objects_info = {
 		bulb = function(object_ids)
 			local t = {}
@@ -324,7 +329,7 @@ local packets = {
 				if accept_version(ID, entry[1], metadata.sender_id) then
 					object, i = get_obj_by_ID(ID)
 					new = structs.MapObject:new(toptr(str))
-					if new.SpellType > 0 and object.Item.Number > 0 then
+					if new.SpellType > 0 and object.TypeIndex > 0 and object.SpellType == 0 and object.Item.Number > 0 then
 						-- Prevent overwriting items with spells.
 						-- Happens on short frame after simultaneous map load.
 						-- Cannot find root issue at the moment.
@@ -414,6 +419,7 @@ local function sync_objects()
 		elseif need_pos_update(i, v) then
 			table.insert(pos_update, i)
 		end
+		last_object_age[i] = v.Age
 	end
 	
 	if next(waiting_for_send) then
@@ -440,6 +446,7 @@ end
 
 function events.LoadMapScripts()
 	last_object_state = {}
+	last_object_age = {}
 	waiting_for_send = {}
 end
 

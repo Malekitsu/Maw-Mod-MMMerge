@@ -84,6 +84,13 @@ local function remote_effective(id)
 	return eff
 end
 
+function MAW_StrongerRemoteBuff(id, s, m, l)
+	if not inMulti() then return s, m, l end
+	ensure_state()
+	local best = pick_max({ s, m, l }, remote_effective(id))
+	return best[1], best[2], best[3]
+end
+
 ------------------------------------------------------------
 -- CONDITIONS (indices Weak/Poison/Disease/Curse)
 ------------------------------------------------------------
@@ -225,13 +232,16 @@ function events.MAWMapvarArrived(t)
 				owners[sender] = true
 				vars.maw_remote_owners[id] = owners
 
+				local before = remote_effective(id)
 				local perSender = vars.maw_remote_values[id] or {}
 				perSender[sender] = { tonumber(payload[1]) or 0, tonumber(payload[2]) or 0, tonumber(payload[3]) or 0 }
 				vars.maw_remote_values[id] = perSender
 
 				local eff = remote_effective(id)
 				local v = vars.mawbuff[id]
-				if not (type(v)=="number" or v==true) then
+				if type(v)=="string" then
+					if before[1]~=eff[1] or before[2]~=eff[2] or before[3]~=eff[3] then changed = true end
+				elseif not (type(v)=="number" or v==true) then
 					local old = vars.mawbuff[id]
 					if (type(old)~="table") or (old[1]~=eff[1] or old[2]~=eff[2] or old[3]~=eff[3]) then
 						vars.mawbuff[id] = { eff[1], eff[2], eff[3] }
@@ -244,6 +254,7 @@ function events.MAWMapvarArrived(t)
 	else
 		for id,_ in pairs(t) do
 			if type(id)=="number" then
+				local before = remote_effective(id)
 				local owners = vars.maw_remote_owners[id]
 				if owners then owners[sender] = nil end
 				local perSender = vars.maw_remote_values[id]
@@ -253,7 +264,9 @@ function events.MAWMapvarArrived(t)
 				if hasOther then
 					local eff = remote_effective(id)
 					local v = vars.mawbuff[id]
-					if not (type(v)=="number" or v==true) then
+					if type(v)=="string" then
+						if before[1]~=eff[1] or before[2]~=eff[2] or before[3]~=eff[3] then changed = true end
+					elseif not (type(v)=="number" or v==true) then
 						if (type(v)~="table") or (v[1]~=eff[1] or v[2]~=eff[2] or v[3]~=eff[3]) then
 							vars.mawbuff[id] = { eff[1], eff[2], eff[3] }
 							changed = true
@@ -263,6 +276,8 @@ function events.MAWMapvarArrived(t)
 				else
 					if type(vars.mawbuff[id])=="table" then
 						vars.mawbuff[id] = nil
+						changed = true
+					elseif type(vars.mawbuff[id])=="string" then
 						changed = true
 					end
 					vars.mawbuff_remote[id]	 = nil
@@ -326,6 +341,9 @@ local function sendBuffs()
 			if (type(v)=="number" and v~=0) or v==true then
 				localActive = true
 				if type(getBuffSkill)=="function" then s,m,l = getBuffSkill(id) end
+			elseif type(v)=="string" and type(getSpecialBuffSkill)=="function" then
+				localActive = true
+				s,m,l = getSpecialBuffSkill()
 			elseif type(v)=="table" and not isRemote then
 				localActive = true
 				s = tonumber(v[1]) or 0; m = tonumber(v[2]) or 0; l = tonumber(v[3]) or 0
@@ -395,6 +413,7 @@ local function purge_sender_buffs(client_id)
 			local perSender = vars.maw_remote_values[id]
 			if perSender then perSender[sender] = nil end
 			local v = vars.mawbuff[id]
+			if type(v) == "string" then changed = true end
 			if next(owners) == nil then
 				if type(v) == "table" then vars.mawbuff[id] = nil; changed = true end
 				vars.mawbuff_remote[id] = nil

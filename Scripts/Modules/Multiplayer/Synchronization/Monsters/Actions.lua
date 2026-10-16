@@ -108,7 +108,7 @@ packets = {
 
 					if mon.HP <= 0 and not dying_state or mon.HP > 0 and dying_state then
 						SyncMonsters.request_full_monster_data(monIndex, metadata.sender_id)
-						return
+						goto next_monster
 					end
 
 					fill_from_bin(mon, toptr(bin_info), bin_fields.monster_action, 2, true)
@@ -128,6 +128,7 @@ packets = {
 						monsters_under_control[monIndex] = metadata.sender_id
 					end
 				end
+				::next_monster::
 			end
 		end,
 		same_map_only = true,

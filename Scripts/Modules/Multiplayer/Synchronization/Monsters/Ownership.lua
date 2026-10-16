@@ -10,6 +10,7 @@ local LogEvent = Multiplayer.utils.LogEvent
 
 local ALLOWED_CHANGE_FREQUENCY = 4000 -- milliseconds
 local OWNER_DRIVE_RANGE = 4096 -- an owner this close to the monster is still running it
+local SIMULTANEOUS_CLAIM = 1000 -- milliseconds
 local TAKEN = 1
 local FREED = 0
 
@@ -33,6 +34,19 @@ end
 events.MultiplayerStarted = InitOwnership
 events.MapLoadingDone = ResetOwnership
 
+local function claim(own, timestamp)
+	if own.Owner ~= Multiplayer.my_id then
+		own.FreeClaim = own.Owner == -1 and timestamp or nil
+	end
+	own.Owner = Multiplayer.my_id
+	own.LastChange = timestamp
+end
+
+local function keeps_free_claim(own, sender, timestamp)
+	return own.Owner == Multiplayer.my_id and own.FreeClaim ~= nil
+		and timestamp - own.FreeClaim < SIMULTANEOUS_CLAIM and Multiplayer.my_id < sender
+end
+
 local packets = {
 	notify_ownership_changes = {
 		bulb = function(changes)
@@ -44,8 +58,11 @@ local packets = {
 			for mon_id, act in pairs(changes) do
 				local own = Ownership[mon_id]
 				if act == TAKEN then
-					own.Owner = metadata.sender_id
-					own.LastChange = timestamp
+					if not keeps_free_claim(own, metadata.sender_id, timestamp) then
+						own.Owner = metadata.sender_id
+						own.LastChange = timestamp
+						own.FreeClaim = nil
+					end
 				elseif own.Owner == metadata.sender_id then
 					own.Owner = -1
 				end
@@ -127,8 +144,7 @@ local function pick_monsters()
 		if taken then
 			if own.Owner ~= my_id then
 				LastChanges[i] = TAKEN
-				own.Owner = my_id
-				own.LastChange = timestamp
+				claim(own, timestamp)
 			end
 		else
 			if own.Owner == my_id then
@@ -142,9 +158,7 @@ end
 local function try_takeover(i, mon, attacked)
 	local timestamp = timeGetTime()
 	if can_takeover_monster(i, mon, timestamp, attacked) then
-		local own = Ownership[i]
-		own.Owner = Multiplayer.my_id
-		own.LastChange = timestamp
+		claim(Ownership[i], timestamp)
 		LastChanges[i] = TAKEN
 	end
 end
@@ -207,7 +221,16 @@ end, ALLOWED_CHANGE_FREQUENCY)
 local monsters_under_control = {}
 setmetatable(monsters_under_control, {
 	__newindex = function(t, key, val)
-		local old = Ownership[key].Owner
+		local own = Ownership[key]
+		if val ~= Multiplayer.my_id and val ~= -1 and keeps_free_claim(own, val, timeGetTime()) then
+			return
+		end
+		local old = own.Owner
+		if val == Multiplayer.my_id and old ~= val then
+			own.FreeClaim = old == -1 and timeGetTime() or nil
+		elseif val ~= Multiplayer.my_id then
+			own.FreeClaim = nil
+		end
 		Ownership[key].LastChange = timeGetTime()
 		if old ~= val then
 			Ownership[key].Owner = val

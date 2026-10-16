@@ -60,7 +60,7 @@ Sync.MergeUpLists = {"ItemFound"}
 Sync.PartyVars = {
 	"mawbags", "CraftingBags", "alchemyPlayer", "inventoryLocked", "SmallerPotionBottles",
 	"currentHPPool", "maxHPPool", "currentManaPool", "maxManaPool",
-	"mawbuff", "mawbuff_remote", "maw_remote_owners", "maw_remote_values", "_maw_local_off", "maw_special_expire",
+	"mawbuff", "mawbuff_remote", "maw_remote_owners", "maw_remote_values", "_maw_local_off",
 	"mawPotionBuff", "mawPotionBuffPower", "PlayerAlchemyBuffs", "BlackPotions", "poisonTime", "bonusMeditation",
 	"horizontaSpells", "magicResistancePotionExpire", "buffToIgnore", "mawTranscendence", "PotionBuffs", "enchantSeedList",
 	"legendaries", "elementalistSpells", "elementalistSpellBinds", "eleStacks", "eleTimer", "disableRotation",

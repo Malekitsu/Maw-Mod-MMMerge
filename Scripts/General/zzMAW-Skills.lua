@@ -628,6 +628,14 @@ function calculateAngle(vector1, vector2)
     return angleDegrees
 end
 
+local unhittableStates = {
+	[const.AIState.Dying] = true,
+	[const.AIState.Dead] = true,
+	[const.AIState.Removed] = true,
+	[const.AIState.Summoned] = true,
+	[const.AIState.Invisible] = true,
+}
+
 local function navigateMissile(object)
 
 	-- exclude some special non targeting spells
@@ -675,7 +683,7 @@ local function navigateMissile(object)
 	if ownerKind == const.ObjectRefKind.Party and targetKind == const.ObjectRefKind.Monster then
 		local mapMonster = Map.Monsters[targetIndex]
 		-- target only alive monster
-		if mapMonster.HitPoints > 0 then
+		if mapMonster.HitPoints > 0 and not unhittableStates[mapMonster.AIState] then
 			targetPosition = {["X"] = mapMonster.X, ["Y"] = mapMonster.Y, ["Z"] = mapMonster.Z + mapMonster.BodyHeight * 0.75, }
 		else
 			return
