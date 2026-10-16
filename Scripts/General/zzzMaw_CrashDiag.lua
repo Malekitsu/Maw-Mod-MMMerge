@@ -599,8 +599,9 @@ local function luaHeapWrite(p, size)
 end
 
 local function installWriteGuard()
-	local prev = internal.mem_ptr_callback
-	internal.mem_ptr_callback = function(p, size)
+	local rsmem = internal.RSMem
+	local prev = rsmem.mem_ptr_callback
+	rsmem.mem_ptr_callback = function(p, size)
 		local s = pageSeg[floor(p / 0x10000)]
 		if s and p < segEnd[s] and p + size > segBase[s] then
 			pcall(luaHeapWrite, p, size)
@@ -609,7 +610,7 @@ local function installWriteGuard()
 			return prev(p, size)
 		end
 	end
-	internal.UpdateCallbacks()
+	rsmem.UpdateCallbacks()
 end
 
 local function installTrail()
