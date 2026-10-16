@@ -3152,6 +3152,9 @@ local function addSlotAttackRows(pl, tab)
 		local item=pl:GetActiveItem(i)
 		if item then
 			local skill=item:T().Skill
+			if oneHandedAxesSet[item.Number] or twoHandedAxesSet[item.Number] then
+				skill=3
+			end
 			local s,m = SplitSkill(pl:GetSkill(skill))
 
 			if skillAttack[skill] and skillAttack[skill][m] then
