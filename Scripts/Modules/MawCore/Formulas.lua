@@ -182,7 +182,7 @@ function Formulas.critDamageMult(stat, monsterLevel, madness, isSpell)
 	return stat/dim + 1.5
 end
 
-Formulas.hpRegenRate = {0.06, 0.08, 0.10, 0.10}
+Formulas.hpRegenRate = {0.05, 0.075, 0.10, 0.10}
 
 function Formulas.hpRegenPerSec(fullHP, s, m)
 	local rate = Formulas.hpRegenRate[math.min(m or 0, #Formulas.hpRegenRate)]

@@ -2450,19 +2450,21 @@ function events.GameInitialized2()
 	Skillz.setDesc(Retaliation, 5, "Retaliation can stack up to 3 times, allowing to consume all the stacks in 1 single powerful hit")
 end
 
---Regeneration
+--Regeneration and Meditation
 function events.GameInitialized2()
 	local F=MawCore.Formulas
-	for mastery=1,4 do
-		local hp=string.format("Restores %s%% of your maximum health per second",
-			F.hpRegenRate[mastery]*100)
+	Skillz.setDesc(30, 2, "Increases hit points regained over time")
+	Skillz.setDesc(28, 2, "Increases spell points regained over time")
+	for mastery=2,4 do
+		local hp=string.format("+%s%% effect of skill", round((F.hpRegenRate[mastery]/F.hpRegenRate[1]-1)*100))
 		if mastery==4 then
-			hp=hp .. "\nIncrease your regeneration by 1% per every 1% of hp lost"
+			hp="Increase your regeneration by 1% per every 1% of hp lost"
+			if F.hpRegenRate[4]~=F.hpRegenRate[3] then
+				hp=string.format("+%s%% effect of skill. ", round((F.hpRegenRate[4]/F.hpRegenRate[1]-1)*100)) .. hp
+			end
 		end
 		Skillz.setDesc(30, mastery+1, hp)
-		Skillz.setDesc(28, mastery+1, string.format(
-			"Restores %s%% of your maximum mana per second",
-			F.spRegenRate[mastery]*100))
+		Skillz.setDesc(28, mastery+1, string.format("+%s%% effect of skill", round((F.spRegenRate[mastery]/F.spRegenRate[1]-1)*100)))
 	end
 end
 

@@ -140,12 +140,10 @@ end
 SkillTooltip.set(30, 1, function(pl)
 	local FHP = GetMaxHP(pl)
 	local s, m = SplitSkill(pl:GetSkill(30))
-	local raw = Formulas.hpRegenPerSec(FHP, s, m)
-	local hpRegen = round(raw * 10) / 10
+	local hpRegen = round(Formulas.hpRegenPerSec(FHP, s, m) * 10) / 10
 	local hpRegen2 = round(Formulas.hpRegenPerSec(FHP, s + 1, m) * 10) / 10
-	local pct = FHP > 0 and round(raw/FHP * 1000) / 10 or 0
 	local nextBonus = round((hpRegen2 - hpRegen) * 10) / 10
-	local txt = string.format("%s\n\nCurrent HP Regeneration: %s (%s of your health per second)\nNext Level Bonus: %s HP Regen", baseRegStr, StrColor(0, 255, 0, hpRegen), StrColor(0, 255, 0, pct .. "%"), StrColor(0, 255, 0, "+" .. nextBonus))
+	local txt = string.format("%s\n\nCurrent HP Regeneration: %s\nNext Level Bonus: %s HP Regen", baseRegStr, StrColor(0, 255, 0, hpRegen), StrColor(0, 255, 0, "+" .. nextBonus))
 	--dragon melee leech, shown only for dragons
 	local leech = getDragonRegenLeech(pl)
 	if leech > 0 then
