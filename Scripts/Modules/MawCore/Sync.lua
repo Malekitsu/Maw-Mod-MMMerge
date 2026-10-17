@@ -47,6 +47,7 @@ Sync.GameStateVars = {
 	"Mode", "insanityMode", "madnessMode", "AusterityMode", "trueNightmare",
 	"freeProgression", "MAWSETTINGS", "MMLVL", "EXPBEFORE", "LVLBEFORE",
 	"RandomizerMode", "RandomizerFixed", "Randomizer", "OriginalItemOrder", "ItemFound", "MonsterShuffleList",
+	"highestArenaWave",
 }
 Sync.GameStateGame = {"Mode", "BolsterAmount", "freeProgression"}
 
