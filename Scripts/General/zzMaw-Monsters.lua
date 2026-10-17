@@ -78,6 +78,10 @@ local function getPlayerControlledMonsters()
 	return puppets
 end
 
+local function speedBonus(v)
+  return v + (400 - v) / 2 + 100
+end
+
 function events.AfterLoadMap()
   if not Map or not Map.Monsters or type(Map.Monsters.High) ~= "number" then return end
 
@@ -88,7 +92,11 @@ function events.AfterLoadMap()
 
       -- SPEED (identique, protégé)
       if m.Velocity and m.Velocity > 150 and m.Attack1 and m.Attack1.Missile == 0 then
-        m.Velocity = (m.Velocity + (400 - m.Velocity) / 2 + 100)
+        if m.Hostile or m.Ally == 9999 then
+          m.Velocity = speedBonus(m.Velocity)
+        elseif math.abs(m.Velocity - speedBonus(m.MoveSpeed)) < 1 then
+          m.Velocity = m.MoveSpeed
+        end
       end
 
       -- Fix broken spell levels (identique)
@@ -129,6 +137,18 @@ function events.AfterLoadMap()
       vars._maw_monster_recalc_done[mapId] = true
     end
   end
+end
+
+local function speedBonusInCombat(m)
+  if m and m.Ally ~= 9999 and m.Velocity == m.MoveSpeed and m.MoveSpeed > 150
+      and m.Attack1.Missile == 0 then
+    m.Velocity = speedBonus(m.MoveSpeed)
+  end
+end
+
+function events.AfterMonsterAttacked(t)
+  speedBonusInCombat(t.Monster)
+  speedBonusInCombat(t.Attacker and t.Attacker.Monster)
 end
 
 --MODIFY MONSTERS SPELL DAMAGE
