@@ -311,6 +311,24 @@ function Engine.setArenaPoolFallback(pick)
 	end)
 end
 
+function Engine.snapshotPlayerBuffs()
+	local snapshot = {}
+	for _, pl in Party do
+		local buffs = pl.SpellBuffs
+		snapshot[pl:GetIndex()] = mem.string(buffs["?ptr"], buffs["?size"], true)
+	end
+	return snapshot
+end
+
+function Engine.restorePlayerBuffs(snapshot)
+	for _, pl in Party do
+		local saved = snapshot[pl:GetIndex()]
+		if saved then
+			mem.copy(pl.SpellBuffs["?ptr"], saved)
+		end
+	end
+end
+
 function Engine.describe()
 	local out = {"engine patches applied:"}
 	for i, p in ipairs(Engine.Patches) do

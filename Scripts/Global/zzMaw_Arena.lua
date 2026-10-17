@@ -80,6 +80,8 @@ monsterSpawnLocation={ --Z is 1
 	[14]={3100,9350},
 }
 
+local arenaBuffSnapshot
+
 function startGeneratingWaves(level)
 	currentArenaLevel=level
 	currentWave=level*3-2
@@ -90,7 +92,15 @@ function startGeneratingWaves(level)
 	bossSpawned=0
 	removedWaves=0
 	waveState=1
+	arenaBuffSnapshot=MawCore.Engine.snapshotPlayerBuffs()
 	evt.MoveToMap{X = 3850, Y = 5776, Z = 1, Direction = 512, LookAngle = 0, SpeedZ = 0, HouseId = 0, Icon = 0, Name = "d42.blv"} 
+end
+
+function events.AfterLoadMap()
+	if arenaBuffSnapshot and Map.Name=="d42.blv" then
+		MawCore.Engine.restorePlayerBuffs(arenaBuffSnapshot)
+	end
+	arenaBuffSnapshot=nil
 end
 
 function arenaSpawns()
