@@ -8,6 +8,8 @@ Multiplayer.reload_count = 0
 local LogEvent = Multiplayer.utils.LogEvent
 local DataFilePath = "Saves/MultiplayerGames.bin"
 local AutosaveFilePath = "Saves/MultiplayerAutosave.bin"
+local SnapshotsPath = "Saves/MultiplayerSnapshots/"
+local SNAPSHOTS_PER_GAME = 30
 
 local SyncPlayers = Multiplayer.require("Synchronization/Players.lua")
 local CharChoice = {}
@@ -43,6 +45,7 @@ local function GlobalData()
 	loaded_global_data.Games = loaded_global_data.Games or {}
 	loaded_global_data.ClientSaves = loaded_global_data.ClientSaves or {}
 	loaded_global_data.Connections = loaded_global_data.Connections or {}
+	loaded_global_data.SaveSnapshots = loaded_global_data.SaveSnapshots or {}
 
 	return loaded_global_data
 end
@@ -250,9 +253,91 @@ local function prep_party_data()
 end
 Multiplayer.prep_party_data = prep_party_data
 
-local function client_save_party()
+local function write_party_file(path, data)
+	local bin = item_to_bin({game_id = Multiplayer.GameId(), data = data})
+	bin = Multiplayer.compress(bin)
+
+	LogEvent("INTERNAL", "Openning file: %s", path)
+	local file = io.open(path, "wb")
+	if not file then
+		LogEvent("INTERNAL", "Could not open file %s", path)
+		return false
+	end
+
+	file:write(bin)
+	file:close()
+	LogEvent("INTERNAL", "File closed: %s, bytes written: %s", path, #bin)
+	return true
+end
+
+local function read_party_file(path, game_id)
+	LogEvent("INTERNAL", "Openning file: %s", path)
+	local file = io.open(path, "rb")
+	if not file then
+		LogEvent("INTERNAL", "Could not open file %s", path)
+		return
+	end
+
+	local bin = file:read("*a")
+	file:close()
+	LogEvent("INTERNAL", "File closed: %s", path)
+
+	bin = Multiplayer.decompress(bin)
+	local success, data = pcall(binstr_to_item, bin)
+	if not success then
+		LogEvent("INTERNAL", "Error while decoding %s:\n%s", path, data)
+		return
+	end
+
+	if not game_id then
+		return data.data
+	end
+
+	if game_id == data.game_id then
+		return data.data
+	end
+end
+
+local function snapshot_path(save_token)
+	return SnapshotsPath .. save_token:gsub("[^%w_]", "_") .. ".bin"
+end
+
+local function store_save_snapshot(save_token, data)
+	local game_id = CurrentGameId()
+	local tokens = GlobalData().SaveSnapshots[game_id]
+	if not tokens then
+		tokens = {}
+		GlobalData().SaveSnapshots[game_id] = tokens
+	end
+
+	for _, token in ipairs(tokens) do
+		if token == save_token then
+			return
+		end
+	end
+
+	os.mkdir(SnapshotsPath)
+	if write_party_file(snapshot_path(save_token), data) then
+		table.insert(tokens, save_token)
+		while #tokens > SNAPSHOTS_PER_GAME do
+			os.remove(snapshot_path(table.remove(tokens, 1)))
+		end
+	end
+end
+
+local function read_save_snapshot(save_token)
+	return read_party_file(snapshot_path(save_token), CurrentGameId())
+end
+
+local function client_save_party(save_token)
 	local data = prep_party_data()
 	Multiplayer.GlobalData().ClientSaves[Multiplayer.GameId()] = data
+	if save_token then
+		local success, err = pcall(store_save_snapshot, save_token, data)
+		if not success then
+			LogEvent("SAVE_LOAD", "Could not store snapshot of save %s: %s", save_token, err)
+		end
+	end
 	SaveGlobalData()
 	LogEvent("SAVE_LOAD", "Client data saved, game id: %s.", Multiplayer.GameId())
 	return data
@@ -272,8 +357,11 @@ local packets = {
 	save_game = {
 		-- clients don't use this packet
 		-- host gather position/map/party data from players
+		bulb = function(save_token)
+			return save_token or ""
+		end,
 		handler = function(bin_string, metadata)
-			return Multiplayer.reload_count == metadata.reload_count
+			return Multiplayer.reload_count == metadata.reload_count and (bin_string ~= "" and bin_string or true)
 		end,
 		response = "send_client_data",
 		check_delivery = true,
@@ -285,7 +373,7 @@ local packets = {
 			local data = false
 			if Allow or Allow == nil then
 				Game.ShowStatusText("Host saved the game.")
-				data = client_save_party()
+				data = client_save_party(type(Allow) == "string" and Allow or nil)
 			end
 			return item_to_bin(data)
 		end,
@@ -360,7 +448,7 @@ local packets = {
 			end
 
 			Multiplayer.GameId(t.Game.game_id)
-			CharChoice.process_character_choice(routine, 4, MoveToMapParams, t.Game.Time)
+			CharChoice.process_character_choice(routine, 4, MoveToMapParams, t.Game.Time, t.SaveToken)
 		end,
 		check_delivery = true,
 		compress = true,
@@ -409,14 +497,36 @@ local packets = {
 }
 Multiplayer.utils.init_packets(packets)
 
+local current_save_token, save_tokens_made = nil, 0
+local function this_save_token()
+	if not current_save_token then
+		save_tokens_made = save_tokens_made + 1
+		current_save_token = GenericId() .. "_" .. save_tokens_made
+	end
+	return current_save_token
+end
+
+function Multiplayer.std_events.BeforeSaveGame()
+	if vars.MultiplayerGameData then
+		vars.MultiplayerGameData.save_token = this_save_token()
+	end
+end
+
+function Multiplayer.std_events.InternalBeforeSaveGame()
+	current_save_token = nil
+end
+
 function events.BeforeSaveGame()
 	if not Multiplayer.im_host() or Multiplayer.connector:active_clients_count() == 0 then
 		return
 	end
 
+	local save_token = this_save_token()
+	Multiplayer.SaveGameData().save_token = save_token
+
 	local hashes = {}
-	Multiplayer.broadcast_keep_hash(packets.save_game, nil, hashes)
-	LogEvent("SAVE_LOAD", "I'm host, saving game. Sent save data requests: %s", table.concat(hashes, ","))
+	Multiplayer.broadcast_keep_hash(packets.save_game, nil, hashes, save_token)
+	LogEvent("SAVE_LOAD", "I'm host, saving game (save token %s). Sent save data requests: %s", save_token, table.concat(hashes, ","))
 
 	-- client data arrives on its own and updates RemotePlayers; the save takes what is already there
 
@@ -429,7 +539,7 @@ local function host_load_game()
 	dummy_player.Gold = nil
 	dummy_player.Food = nil
 
-	local data = packets.load_game:prep({Party = dummy_player, Game = Multiplayer.prep_game_data()})
+	local data = packets.load_game:prep({Party = dummy_player, Game = Multiplayer.prep_game_data(), SaveToken = Multiplayer.SaveGameData().save_token})
 	Multiplayer.broadcast(data)
 end
 
@@ -492,13 +602,13 @@ local function current_character_choice()
 end
 CharChoice.current_character_choice = current_character_choice
 
-local function character_choice(PartyData)
+local function character_choice(PartyData, Label)
 	if not PartyData then
 		return
 	end
 
 	return {
-		Name = StrColor(46,237,218, "(client save) ") .. StrColor(250,250,250) .. PartyData.player_name,
+		Name = (Label or StrColor(46,237,218, "(client save) ")) .. StrColor(250,250,250) .. PartyData.player_name,
 		ClassId = PartyData.player_class_id,
 		PicId = PartyData.player_pic,
 		Level = PartyData.level,
@@ -523,7 +633,7 @@ local function do_callback(callback, callback_delay, MoveToMapParams)
 	end
 end
 
-local function process_character_choice(callback, callback_delay, MoveToMapParams, HostTime)
+local function process_character_choice(callback, callback_delay, MoveToMapParams, HostTime, SaveToken)
 	local choices = {}
 
 	local function handler(i)
@@ -575,14 +685,19 @@ local function process_character_choice(callback, callback_delay, MoveToMapParam
 		if v then table.insert(t, v) end
 	end
 
-	local autosave = Multiplayer.read_client_autosave()
+	local autosave = Multiplayer.read_client_autosave(CurrentGameId())
 	local client_save = GlobalData().ClientSaves[CurrentGameId()]
-	if client_save and autosave and (math.abs(client_save.Time - HostTime) > math.abs(autosave.Time - HostTime)) then
+	if autosave and (not client_save or math.abs(client_save.Time - HostTime) > math.abs(autosave.Time - HostTime)) then
 		client_save = autosave
 	end
 	if client_save then
 		client_save = character_choice(client_save)
 		client_save.time_diff = math.abs(client_save.Time - HostTime)
+	end
+
+	local this_save = SaveToken and read_save_snapshot(SaveToken)
+	if this_save then
+		this_save = character_choice(this_save, StrColor(255,160,40, "(this save) "))
 	end
 
 	local host_save = CharChoice.request_host_saved_characters()
@@ -595,6 +710,9 @@ local function process_character_choice(callback, callback_delay, MoveToMapParam
 
 	table.sort(choices, function(t1, t2) return t1.time_diff < t2.time_diff end)
 
+	if this_save then
+		table.insert(choices, 1, this_save)
+	end
 	tinsert(choices, current)
 
 	if #choices == 1 then
@@ -727,48 +845,11 @@ events.MultiplayerRoleChanged = notify_leave_game
 CharChoice.supress_autosave = true
 
 Multiplayer.client_autosave = function()
-	LogEvent("INTERNAL", "Openning file: %s", AutosaveFilePath)
-	local file = io.open(AutosaveFilePath, "wb")
-	if not file then
-		LogEvent("INTERNAL", "Could not open file %s", AutosaveFilePath)
-		return
-	end
-
-	local data = prep_party_data()
-	local bin = item_to_bin({game_id = Multiplayer.GameId(), data = data})
-	bin = Multiplayer.compress(bin)
-
-	file:write(bin)
-	file:close()
-	LogEvent("INTERNAL", "File closed: %s, bytes written: %s", AutosaveFilePath, #bin)
+	write_party_file(AutosaveFilePath, prep_party_data())
 end
 
 Multiplayer.read_client_autosave = function(game_id)
-	LogEvent("INTERNAL", "Openning file: %s", AutosaveFilePath)
-	local file = io.open(AutosaveFilePath, "rb")
-	if not file then
-		LogEvent("INTERNAL", "Could not open file %s", AutosaveFilePath)
-		return
-	end
-
-	local bin = file:read("*a")
-	file:close()
-	LogEvent("INTERNAL", "File closed: %s", AutosaveFilePath)
-
-	bin = Multiplayer.decompress(bin)
-	local success, data = pcall(binstr_to_item, bin)
-	if not success then
-		LogEvent("INTERNAL", "Error while decoding %s:\n%s", AutosaveFilePath, data)
-		return
-	end
-
-	if not game_id then
-		return data.data
-	end
-
-	if game_id == data.game_id then
-		return data.data
-	end
+	return read_party_file(AutosaveFilePath, game_id)
 end
 
 Multiplayer.utils.MillisecCounter(function()
