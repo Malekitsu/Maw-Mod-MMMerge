@@ -253,7 +253,10 @@ end)
 mem.autohook2(0x468514, function(d) -- spacebar
 	-- Prevent looting items too far away from party.
 	local obj = Mouse:GetTarget()
-	if d.edx ~= obj.Index or (obj.Kind == 2 and GetSqDist(XYZ(Map.Objects[obj.Index])) > 250000) then
+	-- d.edx comes from the engine's 16-bit object ref (index*8 + kind), so above 8191 it holds the
+	-- index modulo 8192, while GetTarget returns the full one ("02 Increase Facets Limit.lua"):
+	-- compare them alike, or Space does nothing on facets above 8191 (maps with more facets)
+	if d.edx ~= obj.Index % 0x2000 or (obj.Kind == 2 and GetSqDist(XYZ(Map.Objects[obj.Index])) > 250000) then
 		d:push(0x4686a5)
 		return true
 	end
