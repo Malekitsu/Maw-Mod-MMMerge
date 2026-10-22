@@ -158,8 +158,11 @@ end
 local function try_takeover(i, mon, attacked)
 	local timestamp = timeGetTime()
 	if can_takeover_monster(i, mon, timestamp, attacked) then
-		claim(Ownership[i], timestamp)
-		LastChanges[i] = TAKEN
+		local own = Ownership[i]
+		if own.Owner ~= Multiplayer.my_id then
+			LastChanges[i] = TAKEN
+		end
+		claim(own, timestamp)
 	end
 end
 

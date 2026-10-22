@@ -77,6 +77,74 @@ Sync.PartyVars = {
 	"MawCore",
 }
 
+Sync.MonsterStacks = {"spearDamageIncrease", "legendaryDamageTaken"}
+
+local pendingStacks, pendingResets = {}, {}
+
+function Sync.monsterStackAdded(key, index, amount)
+	if not Sync.inGame() then
+		return
+	end
+	local t = pendingStacks[key]
+	if not t then
+		t = {}
+		pendingStacks[key] = t
+	end
+	t[index] = (t[index] or 0) + amount
+end
+
+local function sendMonsterStacks()
+	if not next(pendingStacks) and not next(pendingResets) then
+		return
+	end
+	if Sync.inGame() then
+		local resets = {}
+		for index in pairs(pendingResets) do
+			resets[#resets + 1] = index
+		end
+		Multiplayer.broadcast_mapdata({add = pendingStacks, reset = resets}, "MawMonsterStacks")
+	end
+	pendingStacks, pendingResets = {}, {}
+end
+
+local function monsterAlive(index)
+	if index < 0 or index >= Map.Monsters.count then
+		return false
+	end
+	local mon = Map.Monsters[index]
+	local state = mon.AIState
+	return mon.HP > 0 and state ~= const.AIState.Dying and state ~= const.AIState.Dead
+		and state ~= const.AIState.Removed
+end
+
+local function applyMonsterStacks(t)
+	if type(t) ~= "table" or type(mapvars) ~= "table" then
+		return
+	end
+	if type(t.add) == "table" then
+		for _, key in ipairs(Sync.MonsterStacks) do
+			local deltas = t.add[key]
+			if type(deltas) == "table" then
+				for index, delta in pairs(deltas) do
+					if type(index) == "number" and type(delta) == "number" and monsterAlive(index) then
+						mapvars[key] = mapvars[key] or {}
+						mapvars[key][index] = (mapvars[key][index] or 0) + delta
+					end
+				end
+			end
+		end
+	end
+	if type(t.reset) == "table" then
+		for _, index in ipairs(t.reset) do
+			for _, key in ipairs(Sync.MonsterStacks) do
+				if mapvars[key] and mapvars[key][index] then
+					mapvars[key][index] = 0
+				end
+			end
+		end
+	end
+end
+
 -- the fields whose change requires the current map's monsters to be redone
 local difficultyKeys = {"vars.Mode", "vars.insanityMode", "vars.madnessMode",
 	"vars.AusterityMode", "vars.trueNightmare", "game.BolsterAmount", "game.freeProgression"}
@@ -278,6 +346,21 @@ function Sync.start()
 	function events.MultiplayerInitialized()
 		Multiplayer.allow_remote_event("MawGameState")
 		Multiplayer.allow_remote_event("MawStateMerge")
+		Multiplayer.allow_remote_event("MawMonsterStacks")
+	end
+
+	function events.MawMonsterStacks(t)
+		applyMonsterStacks(t)
+	end
+
+	function events.MonsterKilled(mon, index)
+		if Sync.inGame() then
+			pendingResets[index] = true
+		end
+	end
+
+	function events.LeaveMap()
+		pendingStacks, pendingResets = {}, {}
 	end
 
 	function events.MawStateMerge(t)
@@ -323,4 +406,5 @@ function Sync.start()
 		broadcastGameState(false)
 		converge()
 	end)
+	MawCore.Scheduler.every("sync/monster-stacks", 250, sendMonsterStacks)
 end

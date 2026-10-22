@@ -3,7 +3,24 @@ local item_to_bin, binstr_to_item = Multiplayer.utils.item_to_bin, Multiplayer.u
 local cond_same_map = Multiplayer.utils.cond_same_map
 
 local damaged_monsters = {}
-local HP_FLOOR = -32000
+local DEATH_GRACE = 2000 -- milliseconds
+local died_at = {}
+
+local function died_recently(i)
+	local t = died_at[i]
+	return t ~= nil and timeGetTime() - t < DEATH_GRACE
+end
+Multiplayer.SyncMonsters.died_recently = died_recently
+
+local function remote_kill(i, mon)
+	local state = mon.AIState
+	if state == const.AIState.Dying or state == const.AIState.Dead or state == const.AIState.Removed then
+		return
+	end
+	mon.HP = 0
+	Multiplayer.SyncMonsters.set_mon_action(mon, const.AIState.Dying)
+	died_at[i] = timeGetTime()
+end
 
 -- Damage travels as deltas: every sender numbers its packets per map, every
 -- receiver remembers which numbers it applied. A snapshot of monster HP (map
@@ -116,11 +133,10 @@ local packets = {
 						and not contains(mon_floor[i] and mon_floor[i][sender], s) then
 					local mon = Map.Monsters[i]
 					local dmg, hp = v[1], v[2]
-					if mon.HP > 0 then
-						mon.HP = math.max(mon.HP - dmg, HP_FLOOR)
-					end
-					if hp <= 0 and mon.HP > 0 then
-						mon.HP = hp
+					if hp <= 0 then
+						remote_kill(i, mon)
+					elseif mon.HP > 0 then
+						mon.HP = math.max(mon.HP - dmg, 1)
 					end
 
 					if dmg > 0 then
@@ -158,8 +174,13 @@ function events.MultiplayerProcessMapData(t)
 	set_map_floor(t.DamageSeq)
 end
 
+function events.MonsterKilled(mon, index)
+	died_at[index] = timeGetTime()
+end
+
 function events.LeaveMap()
 	damaged_monsters = {}
+	died_at = {}
 	seq = 0
 	map_floor = {}
 	mon_floor = {}
@@ -167,6 +188,7 @@ end
 
 function events.MultiplayerStarted()
 	damaged_monsters = {}
+	died_at = {}
 	seq = 0
 	applied = {}
 	map_floor = {}

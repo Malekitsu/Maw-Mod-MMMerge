@@ -561,6 +561,7 @@ local function stage_resAndRetaliation(t)
 						damageIncrease=damageIncrease*1.5
 					end
 					mapvars.spearDamageIncrease[id]=mapvars.spearDamageIncrease[id]+damageIncrease
+					MawCore.Sync.monsterStackAdded("spearDamageIncrease", id, damageIncrease)
 				end
 			end
 		end
@@ -571,6 +572,7 @@ local function stage_resAndRetaliation(t)
 		local id=t.MonsterIndex
 		mapvars.legendaryDamageTaken=mapvars.legendaryDamageTaken or {}
 		mapvars.legendaryDamageTaken[id]=(mapvars.legendaryDamageTaken[id] or 0)+MawCore.Formulas.legendary29DamageTaken
+		MawCore.Sync.monsterStackAdded("legendaryDamageTaken", id, MawCore.Formulas.legendary29DamageTaken)
 	end
 	::continue::
 	do

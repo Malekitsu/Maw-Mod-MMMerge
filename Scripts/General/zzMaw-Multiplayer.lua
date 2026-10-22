@@ -533,7 +533,7 @@ function events.LoadMap()
 	ensure_state()
 	vars._maw_last_sent = {}
 	vars._maw_next_send_time = NOW() + 0.5*SEC
-	if not inMulti() then purge_remote_buffs_keep_local() end
+	purge_remote_buffs_keep_local()
 	vars._maw_clear_weak_ticks = math.max(vars._maw_clear_weak_ticks or 0, 12)
 	__refresh_condition_indices()
 end

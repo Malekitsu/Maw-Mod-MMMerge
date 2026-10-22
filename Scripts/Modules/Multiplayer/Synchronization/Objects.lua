@@ -282,12 +282,37 @@ local function object_bin(i)
 	return mstr(first, last - first, true)
 end
 
+local scratch_ptr = mem.StaticAlloc(MAP_OBJECT_SIZE)
+local scratch = structs.MapObject:new(scratch_ptr)
+
+local function snapshot_bin(bin, ID)
+	mcopy(scratch_ptr, bin)
+	if scratch.SpellType == 0 then
+		scratch.SpellSkill = ID
+	else
+		scratch.Item.Charges = ID
+	end
+	if bit.And(scratch.Owner, 7) == 4 then
+		scratch.Owner = REMOTE_PLAYER_REF + bit.lshift(Multiplayer.my_id, 3)
+	end
+	return mstr(scratch_ptr, MAP_OBJECT_SIZE, true)
+end
+
 local waiting_for_send = {}
+local created = {}
+
+local function same_object(e)
+	if e.gone or e.i >= Map.Objects.count then
+		return false
+	end
+	local obj = Map.Objects[e.i]
+	return obj.TypeIndex == e.TypeIndex and obj.Type == e.Type and obj.Age >= e.Age
+end
 
 local packets
 packets = {
 	objects_info = {
-		bulb = function(object_ids)
+		bulb = function(object_ids, snapshots)
 			local t = {}
 			local object, old_owner, ID
 			for _, i in pairs(object_ids) do
@@ -301,6 +326,13 @@ packets = {
 					object.Owner = old_owner
 				else
 					t[ID] = {bump_version(ID), object_bin(i)}
+				end
+			end
+
+			if snapshots then
+				for _, bin in ipairs(snapshots) do
+					ID = nextID()
+					t[ID] = {bump_version(ID), snapshot_bin(bin, ID)}
 				end
 			end
 
@@ -406,11 +438,12 @@ Multiplayer.utils.init_packets(packets)
 
 local function sync_objects()
 	if Multiplayer.leave_map_halt or Multiplayer.OnDeathScreen() then
+		created = {}
 		return
 	end
 
 	remove_ID_doubles()
-	
+
 	local pos_update = {}
 	for i, v in Map.Objects do
 		if need_send(i, v) then
@@ -421,9 +454,22 @@ local function sync_objects()
 		end
 		last_object_age[i] = v.Age
 	end
-	
-	if next(waiting_for_send) then
-		Multiplayer.broadcast(packets.objects_info:prep(waiting_for_send), cond_same_map)
+
+	local lost = {}
+	for _, e in ipairs(created) do
+		if not e.skip then
+			if not same_object(e) then
+				lost[#lost + 1] = e.bin
+			elseif not table.find(waiting_for_send, e.i) then
+				fill_state(e.i, Map.Objects[e.i])
+				table.insert(waiting_for_send, e.i)
+			end
+		end
+	end
+	created = {}
+
+	if next(waiting_for_send) or next(lost) then
+		Multiplayer.broadcast(packets.objects_info:prep(waiting_for_send, lost), cond_same_map)
 		waiting_for_send = {}
 	end
 	if next(pos_update) then
@@ -431,6 +477,38 @@ local function sync_objects()
 	end
 end
 Multiplayer.utils.TickCounter(sync_objects, 4)
+
+function events.ObjectCreated(i)
+	if Multiplayer.leave_map_halt then
+		return
+	end
+	local obj = Map.Objects[i]
+	if obj.TypeIndex == 0 or obj.SpellType == 0 or bit.And(obj.Bits, NO_SYNC_OBJECT_BIT) > 0 then
+		return
+	end
+	for _, e in ipairs(created) do
+		if e.i == i then
+			e.gone = true
+		end
+	end
+	created[#created + 1] = {i = i, Type = obj.Type, TypeIndex = obj.TypeIndex, Age = obj.Age, bin = object_bin(i)}
+end
+
+function events.Tick()
+	for _, e in ipairs(created) do
+		if not e.checked then
+			e.checked = true
+			if same_object(e) then
+				local obj = Map.Objects[e.i]
+				if bit.And(obj.Bits, NO_SYNC_OBJECT_BIT) > 0 then
+					e.skip = true
+				else
+					e.bin = object_bin(e.i)
+				end
+			end
+		end
+	end
+end
 
 function events.CanRepairItem(t)
 	if t.Object and t.CanRepair then
@@ -448,6 +526,7 @@ function events.LoadMapScripts()
 	last_object_state = {}
 	last_object_age = {}
 	waiting_for_send = {}
+	created = {}
 end
 
 function events.MapLoadingDone()

@@ -105,8 +105,17 @@ packets = {
 					local old_id = mon.Id
 					local was_full_hp = mon.HP == mon.FullHP
 					local dying_state = AIState == const.AIState.Dead or AIState == const.AIState.Dying
+					local local_state = mon.AIState
+
+					if dying_state and (local_state == const.AIState.Dying or local_state == const.AIState.Dead
+							or local_state == const.AIState.Removed) then
+						goto next_monster
+					end
 
 					if mon.HP <= 0 and not dying_state or mon.HP > 0 and dying_state then
+						if not dying_state and SyncMonsters.died_recently(monIndex) then
+							goto next_monster
+						end
 						SyncMonsters.request_full_monster_data(monIndex, metadata.sender_id)
 						goto next_monster
 					end
