@@ -1934,7 +1934,12 @@ end
 
 -- from zzMaw_Mapping:1 -- map affixes 1/2/10 vs the player
 local function pstage_mapAffixesPlayer(t)
-	if t.Monster and getMapAffixPower(1) then
+	local data=DamageState.getCustomAttacker() or WhoHitPlayer()
+	local mon=data and data.Monster
+	if mon and Multiplayer and mon.AIType==Multiplayer.PUPPET_AITYPE then
+		mon=nil
+	end
+	if mon and t.Result>0 and getMapAffixPower(1) then
 		t.Result=t.Result*(1+getMapAffixPower(1)/100)
 	end
 	if getMapAffixPower(2) then
@@ -1942,7 +1947,7 @@ local function pstage_mapAffixesPlayer(t)
 			t.Result=t.Result*2
 		end
 	end
-	if t.Monster and getMapAffixPower(10) then
+	if mon and t.Result>0 and getMapAffixPower(10) then
 		local hp=t.Player:GetFullHP()
 		t.Result=t.Result+hp*getMapAffixPower(10)/100
 	end
@@ -1971,8 +1976,8 @@ local ppipe = MawCore.Pipeline.new("DamageToPlayer", {
 	"boss-affixes-player",	-- [reactions] boss on-hit effects
 	"survival-gate",		-- [gates]
 	-- tier 3: was Global file-scope
-	"legendaries-and-shields",	-- [mult/reactions] incl. mana shield + divine protection
 	"map-affixes-player",	-- [mult]
+	"legendaries-and-shields",	-- [mult/reactions] incl. mana shield + divine protection
 })
 
 ppipe:on("item-refresh",        "zzMaw-Items:3595",      pstage_itemRefresh)
