@@ -9,8 +9,6 @@
 local Fixes = {}
 MawCore.Fixes = Fixes
 
-local ATTACK_BUFFER = 1000 -- milliseconds
-
 function Fixes.start()
 	local Engine = MawCore.Engine
 	local A = Engine.Addr
@@ -107,23 +105,5 @@ function Fixes.start()
 			ids[k] = list[k].id
 		end
 		return ids
-	end)
-
-	local pendingAttack
-	function events.Action(t)
-		if t.Action == 23 and Game.CurrentPlayer < 0 and not Game.TurnBased and Game.CurrentScreen == 0 then
-			pendingAttack = timeGetTime()
-		end
-	end
-	MawCore.Scheduler.every("fixes/attack-buffer", 0, function()
-		if not pendingAttack then
-			return
-		end
-		if timeGetTime() - pendingAttack > ATTACK_BUFFER or Game.TurnBased or Game.CurrentScreen ~= 0 then
-			pendingAttack = nil
-		elseif Game.CurrentPlayer >= 0 then
-			pendingAttack = nil
-			Game.Actions.Add(23, 0, 0)
-		end
 	end)
 end
