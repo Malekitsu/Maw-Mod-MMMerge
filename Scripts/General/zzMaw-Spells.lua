@@ -1508,7 +1508,7 @@ function castCCSpell(t)
 			local idx=list[i]
 			if idx<=lim then
 				local mon=Map.Monsters[idx]
-				if validTarget(mon) then
+				if validTarget(mon) and getBossSkill(mon)~="Unstoppable" then
 					local e=mon.SpellBuffs[d1].ExpireTime
 					if e<lowest then
 						lowest=e
@@ -1680,7 +1680,8 @@ local function splashTargets(cc, x, y, z, count, skipIndex)
 		for i = 0, Map.Monsters.High do
 			local mon = Map.Monsters[i]
 			if not taken[i] and mon.Hostile and mon.AIState~=ai.Dead
-					and mon.AIState~=ai.Removed and mon.AIState~=ai.Invisible then
+					and mon.AIState~=ai.Removed and mon.AIState~=ai.Invisible
+					and getBossSkill(mon)~="Unstoppable" then
 				local dist = math.sqrt((mon.X-x)^2 + (mon.Y-y)^2 + (mon.Z-z)^2)
 				if dist <= cc.SplashRadius then
 					local expire = mon.SpellBuffs[debuff].ExpireTime
@@ -1799,6 +1800,9 @@ end
 
 -- Check-only version: calculates duration WITHOUT recording history
 function checkDebuffDuration(monster, cc, duration)
+	if getBossSkill(monster)=="Unstoppable" then
+		return 0
+	end
 	local monsterIndex = monster:GetIndex()
 	local debuffList = cc.Debuff
 	if type(debuffList) ~= "table" then
@@ -1815,6 +1819,9 @@ end
 
 -- Full version: calculates duration AND records history
 function calcDebuffDuration(monster, cc, duration)
+	if getBossSkill(monster)=="Unstoppable" then
+		return 0
+	end
 	local monsterIndex = monster:GetIndex()
 	local debuffList = cc.Debuff
 	if type(debuffList) ~= "table" then

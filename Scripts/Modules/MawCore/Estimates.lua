@@ -489,6 +489,9 @@ function getMonsterDamage(mon, level)
 		end
 		local boss=mapvars.bossData[index]
 		damage=damage*(boss and boss.DamageMult or 1)
+		if getBossSkill(mon)=="Berserker" then
+			damage=damage*(2-MawCore.MonsterHP.current(mon)/math.max(MawCore.MonsterHP.max(mon),1))
+		end
 	end
 	
 	return damage

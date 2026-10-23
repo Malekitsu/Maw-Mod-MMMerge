@@ -344,7 +344,7 @@ local function stage_stunSpellPrime(t)
 		local hit=(30/(30+newLevel/4))
 		--mapping
 		hit=affixCut(hit, 13)
-		if hit>math.random() then
+		if hit>math.random() and getBossSkill(mon)~="Unstoppable" then
 			mon.Resistances[const.Damage.Earth]=0
 			mon.Level=0
 		else
@@ -352,7 +352,7 @@ local function stage_stunSpellPrime(t)
 		end
 		RunNextTick(function()
 			mon.Level=lvl
-			mon.Resistances[const.Skills.Earth]=res
+			mon.Resistances[const.Damage.Earth]=res
 		end)
 	end
 end
@@ -888,7 +888,7 @@ local function stage_retaliation(t)
 	local res=t.RetaliationRes or t.Monster.Resistances[table.find(damageKindMap,t.DamageKind)] or 0
 	t.Result=t.Result+resDivide(Formulas.retaliationDamage(powerMult, vitMult, s)*stacks, res)
 
-	if 0.25*stacks>math.random() then
+	if 0.25*stacks>math.random() and getBossSkill(t.Monster)~="Unstoppable" then
 		local stunDuration=const.Minute
 		if t.Monster.NameId>=220 and t.Monster.NameId<=300 then
 			stunDuration=stunDuration/2
@@ -908,7 +908,7 @@ local function stage_bossAffixes(t)
 	if t.Monster.NameId>=220 and t.Monster.NameId<300 then
 		if t.Player then
 			index=slotByIndex(t.Player:GetIndex())
-			skill = string.match(Game.PlaceMonTxt[t.Monster.NameId], "([^%s]+)")
+			skill = getBossSkill(t.Monster)
 			if skill=="Thorn" or skill=="Omnipotent" then
 				if t.DamageKind==4 then
 					reflectedDamage=true
@@ -1786,7 +1786,7 @@ local function pstage_damageRecompute(t)
 	t.Result = t.Result * DiseaseDamage
 	if data and data.Monster and data.Monster.NameId>220 then
 		local mon=data.Monster
-		local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+		local skill = getBossSkill(mon)
 		if skill=="Exploding" or skill=="Omnipotent" then
 			t.Result=t.Result/2
 			local aoeDamage=t.Result/Party.Count
@@ -1804,7 +1804,7 @@ local function pstage_bossAffixesPlayer(t)
 	local data=DamageState.getCustomAttacker() or WhoHitPlayer()
 	if data and data.Monster and data.Monster.NameId>=220 and data.Monster.NameId<300 then
 		mon=data.Monster
-		skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+		skill = getBossSkill(mon)
 		if skill=="Summoner" then
 			if math.random()<0.4 or t.DamageKind==4 then
 				pseudoSpawnpoint{monster = math.ceil(mon.Id/3)*3-2, x = (Party.X+mon.X)/2, y = (Party.Y+mon.Y)/2, z = Party.Z, count = 1, powerChances = {75, 25, 0}, radius = 64, group = 1,transform = function(mon) mon.Hostile = true mon.ShowAsHostile = true mon.Velocity=350 end}

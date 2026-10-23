@@ -3064,6 +3064,11 @@ function generateBoss(index, nameIndex, skillType)
 		end
 	end
 
+	local effectSkill=skill
+	if skill=="Cryptic" then
+		effectSkill=getCrypticSkill(vars.madnessMode and getMapSeedForBossAffixes())
+	end
+
 	local name = string.format(skill .. " " .. Game.MonstersTxt[mon.Id].Name)
 	Game.PlaceMonTxt[mon.NameId] = name
 
@@ -3081,7 +3086,7 @@ function generateBoss(index, nameIndex, skillType)
 	["Level"]=lvl,
 	["DamageMult"]=dmgMult,
 	["HealthMult"]=hpMult,
-	["Skills"]=skill, 
+	["Skills"]=effectSkill,
 	}
 	
 	-- Calculate health using the centralized getMonsterHealth function
@@ -3107,7 +3112,19 @@ end
 
 
 --SKILLS
-SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Adamantite","Swapper","Regenerating","Puller","Leecher","Swift","Fixator","Shadow","Plagueborn"} --defensives
+SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Adamantite","Swapper","Regenerating","Puller","Leecher","Swift","Fixator","Shadow","Plagueborn","Unstoppable","Berserker","Cryptic"} --defensives
+OmnipotentExcluded={Unstoppable=true,Berserker=true,Cryptic=true}
+
+function getBossSkill(mon)
+	if mon.NameId<220 or mon.NameId>299 then
+		return nil
+	end
+	local data=mapvars and mapvars.bossData and mapvars.bossData[mon:GetIndex()]
+	if data and data.NameId==mon.NameId and data.Skills then
+		return data.Skills
+	end
+	return string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+end
 --to add: splitting
 --on attack skills
 
@@ -3157,6 +3174,25 @@ function getSeededSkillForBoss(seed)
 	-- Determine skill based on seeded random
 	local skillIndex = math.floor(normalizedRandom * #SkillList) + 1
 	return SkillList[skillIndex]
+end
+
+function getCrypticSkill(seed)
+	local pool = {}
+	for _, s in ipairs(SkillList) do
+		if s ~= "Cryptic" then
+			pool[#pool + 1] = s
+		end
+	end
+	local normalizedRandom
+	if seed then
+		local combinedSeed = seed + (vars.totalBossesSpawned or 0) * 31
+		local pseudoRandom = (combinedSeed * 9301 + 49297) % 233280
+		pseudoRandom = (pseudoRandom * 9301 + 49297) % 233280
+		normalizedRandom = pseudoRandom / 233280
+	else
+		normalizedRandom = math.random()
+	end
+	return pool[math.floor(normalizedRandom * #pool) + 1]
 end
 
 function getSeededSpecialBossChance(seed, chanceType)
@@ -3951,7 +3987,7 @@ function events.PlayerAttacked(t)
 		end
 	end
 
-	local skill = string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+	local skill = getBossSkill(mon)
 	if skill=="Fixator" then
 		covered=false
 		local lowestHPId=0
@@ -4098,8 +4134,10 @@ function events.MonsterKilled(mon)
 	local monsterSkill = string.match(Game.PlaceMonTxt[killedMonster.NameId], "([^%s]+)")
 	if monsterSkill=="Omnipotent" then
 		for i=1,#SkillList do
-			pseudoSpawnpoint{monster = killedMonster.Id,  x = killedMonster.X, y = killedMonster.Y, z = killedMonster.Z, count = 1, powerChances = {0,0,100}, radius = 512, group = 2,transform = function(spawnedMon) spawnedMon.Hostile = true spawnedMon.ShowAsHostile = true spawnedMon.Velocity=350 bossId=spawnedMon:GetIndex() end}
-			generateBoss(bossId,false,SkillList[i])
+			if not OmnipotentExcluded[SkillList[i]] then
+				pseudoSpawnpoint{monster = killedMonster.Id,  x = killedMonster.X, y = killedMonster.Y, z = killedMonster.Z, count = 1, powerChances = {0,0,100}, radius = 512, group = 2,transform = function(spawnedMon) spawnedMon.Hostile = true spawnedMon.ShowAsHostile = true spawnedMon.Velocity=350 bossId=spawnedMon:GetIndex() end}
+				generateBoss(bossId,false,SkillList[i])
+			end
 		end
 	end
 	if monsterSkill=="Broodlord" or monsterSkill=="Broodling" or monsterSkill=="Omnipotent" then
