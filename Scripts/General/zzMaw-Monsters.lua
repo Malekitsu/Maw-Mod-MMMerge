@@ -3112,8 +3112,8 @@ end
 
 
 --SKILLS
-SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Adamantite","Swapper","Regenerating","Puller","Leecher","Swift","Fixator","Shadow","Plagueborn","Unstoppable","Berserker","Cryptic"} --defensives
-OmnipotentExcluded={Unstoppable=true,Berserker=true,Cryptic=true}
+SkillList={"Summoner","Venomous","Exploding","Thorn","Reflecting","Adamantite","Swapper","Regenerating","Puller","Leecher","Swift","Fixator","Shadow","Plagueborn","Unstoppable","Berserker","Cryptic","Skilled"} --defensives
+OmnipotentExcluded={Unstoppable=true,Berserker=true,Cryptic=true,Skilled=true}
 
 function getBossSkill(mon)
 	if mon.NameId<220 or mon.NameId>299 then
@@ -3124,6 +3124,12 @@ function getBossSkill(mon)
 		return data.Skills
 	end
 	return string.match(Game.PlaceMonTxt[mon.NameId], "([^%s]+)")
+end
+
+function events.PlayerHitOrMiss(t)
+	if t.Result and t.Monster and getBossSkill(t.Monster)=="Skilled" and math.random()<0.4 then
+		t.Result=false
+	end
 end
 --to add: splitting
 --on attack skills
@@ -4131,6 +4137,11 @@ function events.MonsterKilled(mon)
 	end
 	
 	local killedMonster=mon
+	if getBossSkill(killedMonster)=="Skilled" then
+		for i=1,4 do
+			SummonItem(656, killedMonster.X, killedMonster.Y, killedMonster.Z + 100, 100)
+		end
+	end
 	local monsterSkill = string.match(Game.PlaceMonTxt[killedMonster.NameId], "([^%s]+)")
 	if monsterSkill=="Omnipotent" then
 		for i=1,#SkillList do

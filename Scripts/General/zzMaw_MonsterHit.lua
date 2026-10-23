@@ -13,6 +13,9 @@ function MawRollDodge(mon, pl)
 	if not mon or not pl then
 		return nil
 	end
+	if getBossSkill(mon)=="Skilled" then
+		return true
+	end
 	return CalcHitOrMiss(getMonsterLevel(mon), pl:GetSpeed())
 end
 

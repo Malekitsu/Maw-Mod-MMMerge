@@ -1670,7 +1670,7 @@ local function pstage_damageRecompute(t)
 		dodging=Skill+10
 	end
 	local dodgeChance=1-1/(1+dodging/200)
-	if Game.CharacterPortraits[pl.Face].Race==const.Race.Dragon then
+	if Game.CharacterPortraits[pl.Face].Race==const.Race.Dragon or getBossSkill(mon)=="Skilled" then
 		dodgeChance=0
 	end
 	--[[
