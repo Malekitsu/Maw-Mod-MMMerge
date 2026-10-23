@@ -54,6 +54,7 @@ MawCore.ModuleOrder = {
 	"SkillTooltip",	-- per-player skill tooltip text (SKILL_TOOLTIPS.md)
 	"SkillsUI",		-- Skillz.dll port stage 2: character screen
 	"MonsterHP",	-- real monster HP beyond the engine's 16-bit field
+	"MonsterAttackSpeed",	-- per-monster attack speed multiplier (animation + recovery)
 	"DamageState",	-- the two damage values legacy files share (MP hook points)
 	"Damage",		-- CalcDamageToMonster pipeline (DAMAGE_PIPELINE.md)
 	"Sync",			-- multiplayer: host/client role, host-owned game state
