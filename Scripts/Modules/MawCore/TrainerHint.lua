@@ -113,7 +113,7 @@ function TrainerHint.buildIndex(src)
 							listed[key] = true
 							local slot = index[topic.SId][topic.Mas]
 							slot[#slot + 1] = {
-								npc = npc.id, name = npc.name, house = house,
+								npc = npc.id, name = trim(npc.name), house = house,
 								houseName = place.houseName, map = place.map,
 								mapName = place.mapName, cont = place.cont,
 								outdoor = place.outdoor,
@@ -351,6 +351,15 @@ function TrainerHint.selfTest()
 		houseName = function(h) return houseNames[h] end,
 	})
 	eq("one entry per (npc, house) and slot", #(dupIndex[5] and dupIndex[5][1] or {}), 1)
+	local paddedIndex = TrainerHint.buildIndex({
+		npcs = {{id = 9, name = "Pat  ", house = 101, events = {10}}},
+		topics = topics,
+		houseMap = function(h) return houseMaps[h] end,
+		mapInfo = function(m) return maps[m] end,
+		houseName = function(h) return houseNames[h] end,
+	})
+	eq("NPC names are trimmed (the tables pad some)", paddedIndex[5] and paddedIndex[5][1] and paddedIndex[5][1][1]
+		and paddedIndex[5][1][1].name, "Pat")
 
 	-- pick -------------------------------------------------------------------
 	eq("pick same map, then continent, then rest",
