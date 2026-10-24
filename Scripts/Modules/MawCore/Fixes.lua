@@ -106,4 +106,19 @@ function Fixes.start()
 		end
 		return ids
 	end)
+
+	local DIALOG_EDGE_ROWS = 6
+	function events.WindowMessage(t)
+		if t.Msg ~= 0x200 or Game.CurrentScreen == 0 or not Game.PatchOptions.UILayoutActive() then
+			return
+		end
+		local w, h = Engine.windowClientSize()
+		local scale = math.min(w/640, h/480)
+		local edge = math.floor((h + 480*scale)/2 - DIALOG_EDGE_ROWS*scale)
+		local y = bit.arshift(t.LParam, 16)
+		if y >= edge then
+			Engine.moveCursorBy(0, edge - 1 - y)
+			t.Handled = true
+		end
+	end
 end

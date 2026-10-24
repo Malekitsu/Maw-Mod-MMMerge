@@ -114,6 +114,8 @@ local function reloadArena()
 	if online() then
 		Multiplayer.utils.ExitToScreen0(move)
 	else
+		ExitCurrentScreen()
+		Sleep(100,100)
 		move()
 	end
 end

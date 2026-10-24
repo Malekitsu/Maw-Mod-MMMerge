@@ -311,6 +311,20 @@ function Engine.setArenaPoolFallback(pick)
 	end)
 end
 
+local clientRect, cursorPoint
+
+function Engine.windowClientSize()
+	clientRect = clientRect or Engine.alloc(16)
+	mem.dll.user32.GetClientRect(Game.WindowHandle, clientRect)
+	return mem.i4[clientRect + 8], mem.i4[clientRect + 12]
+end
+
+function Engine.moveCursorBy(dx, dy)
+	cursorPoint = cursorPoint or Engine.alloc(8)
+	mem.dll.user32.GetCursorPos(cursorPoint)
+	mem.dll.user32.SetCursorPos(mem.i4[cursorPoint] + dx, mem.i4[cursorPoint + 4] + dy)
+end
+
 function Engine.snapshotPlayerBuffs()
 	local snapshot = {}
 	for _, pl in Party do
