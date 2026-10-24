@@ -569,13 +569,13 @@ function events.MultiplayerInitialized()
     end
 
     -- Define switches
-    createSwitch(180, "Buff Rework", "buffRework", {"ON","OFF"})
-    createSwitch(220, "M&M6 Projectiles", "restoreProjectiles", {"ON","OFF"})
-    createSwitch(260, "Homing Projectiles", "homingProjectiles", {"ON","OFF"})
-    createSwitch(300, "Damage on Friendly Units", "friendlyDamage", {"ON","OFF"})
-    createSwitch(340, "Loot Filter", "lootFilter", {"OFF","Common", "Uncom.", "Rare", "Epic","Ancient","Primordial"})
-    createSwitch(380, "Extra Item Tooltip", "extraItemTooltip", {"OFF","ON"})
-    createSwitch(400, "Trainer Hints", "trainerHints", {"OFF","ON"})
+    createSwitch(170, "Buff Rework", "buffRework", {"ON","OFF"})
+    createSwitch(205, "M&M6 Projectiles", "restoreProjectiles", {"ON","OFF"})
+    createSwitch(240, "Homing Projectiles", "homingProjectiles", {"ON","OFF"})
+    createSwitch(275, "Damage on Friendly Units", "friendlyDamage", {"ON","OFF"})
+    createSwitch(310, "Loot Filter", "lootFilter", {"OFF","Common", "Uncom.", "Rare", "Epic","Ancient","Primordial"})
+    createSwitch(345, "Extra Item Tooltip", "extraItemTooltip", {"OFF","ON"})
+    createSwitch(380, "Trainer Hints", "trainerHints", {"OFF","ON"})
 	
     function events.OpenExtraSettingsMenu()
         for _, v in pairs(mawSettingsButton) do
