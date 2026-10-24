@@ -194,7 +194,8 @@ end
 --   "trainers"  nextName, need, have, curCont, trainers (picked entries)
 --   "none"      nextName
 --   "auto"      nextName, need
---   "promotion" nextName, need, have, curCont, trainers (possibly empty)
+--   "promotion" nextName, need, have, curCont, trainers (possibly empty; nil = skill
+--               without teachers, learned automatically)
 --   "max"
 -- `color` (r, g, b, text) defaults to the engine's StrColor.
 function TrainerHint.compose(info, color)
@@ -229,10 +230,10 @@ function TrainerHint.compose(info, color)
 	if kind == "promotion" then
 		lines[#lines + 1] = " Requires a class promotion first."
 	end
-	if #info.trainers == 0 then
+	if info.trainers and #info.trainers == 0 then
 		lines[#lines + 1] = " No trainer found."
 	end
-	for _, e in ipairs(info.trainers) do
+	for _, e in ipairs(info.trainers or {}) do
 		local line = " " .. e.name .. " - "
 		if e.houseName then
 			line = line .. e.houseName .. ", "
@@ -401,7 +402,10 @@ function TrainerHint.selfTest()
 	eq("compose promotion without trainers", TrainerHint.compose({kind = "promotion", nextName = "Master",
 			need = 7, have = 3, trainers = {}}, plain),
 		"Next mastery: Master (skill 7 required)\n Requires a class promotion first.\n No trainer found.")
-	eq("compose unknown kind", TrainerHint.compose({kind = "bogus"}, plain), nil)
+	eq("compose promotion, no trainer list (skills that are learned automatically)", TrainerHint.compose({
+			kind = "promotion", nextName = "Master", need = 12, have = 14}, plain),
+		"Next mastery: Master (skill 12 required)\n Requires a class promotion first.")
+	eq("compose unknown kind",TrainerHint.compose({kind = "bogus"}, plain), nil)
 	eq("compose nil", TrainerHint.compose(nil, plain), nil)
 
 	-- compose: colours ---------------------------------------------------------------
@@ -418,4 +422,196 @@ function TrainerHint.selfTest()
 		"<255,255,100:Highest mastery for this class reached.>")
 
 	return #errors == 0 and "ok" or table.concat(errors, "\n")
+end
+
+------------------------------------------------------------------------
+-- Game adapter: reads the live engine data, caches the index until the
+-- next map load (a quest MoveNPC or hiring without a map change shows up
+-- only then -- known and accepted).
+------------------------------------------------------------------------
+
+local MASTERY_NAMES = {[2] = "Expert", [3] = "Master", [4] = "Grand Master"}
+local MAX_MASTERY = 4			-- SplitSkill reports nothing above Grand Master
+local CHARACTER_CREATION = 21	-- Game.CurrentScreen while the party is built: no map yet
+
+local cache
+local builtMs
+
+local function contains(list, value)
+	for _, v in ipairs(list) do
+		if v == value then
+			return true
+		end
+	end
+	return false
+end
+
+-- the engine arrays raise on a bad index: wrap each lookup, a house or map the
+-- tables don't know is simply left out
+local function gameSource()
+	local npcs = {}
+	for i = 0, Game.NPC.High do
+		local npc = Game.NPC[i]
+		local events = {}
+		for e = 0, 5 do
+			events[#events + 1] = npc.Events[e]
+		end
+		npcs[#npcs + 1] = {id = i, name = npc.Name, house = npc.House, events = events}
+	end
+	return {
+		npcs = npcs,
+		topics = Game.TeacherTopics or {},
+		-- zzMAW_MoveTrainers.lua moves teachers only while enableAllTrainers is on
+		moves = enableAllTrainers and MawTrainerMoves or nil,
+		houseMap = function(house)
+			local ok, map = pcall(function() return Game.HousesExtra[house].Map end)
+			if ok and map and map > 0 then
+				return map
+			end
+		end,
+		mapInfo = function(map)
+			local ok, info = pcall(function()
+				local stats = Game.MapStats[map]
+				return {name = stats.Name, file = stats.FileName}
+			end)
+			if not ok then
+				return nil
+			end
+			local contOk, cont = pcall(TownPortalControls.MapOfContinent, map)
+			info.cont = contOk and cont or nil
+			return info
+		end,
+		houseName = function(house)
+			local ok, name = pcall(function() return Game.Houses[house].Name end)
+			return ok and name or nil
+		end,
+	}
+end
+
+local function getIndex()
+	if not cache then
+		local t0 = os.clock()
+		cache = TrainerHint.buildIndex(gameSource())
+		builtMs = (os.clock() - t0) * 1000
+	end
+	return cache
+end
+
+function TrainerHint.invalidate()
+	cache = nil
+end
+
+-- The block to append to the skill tooltip for (pl, skillId), or nil for "no
+-- hint". Errors are not caught here; SkillTooltip isolates them.
+function TrainerHint.text(pl, skillId)
+	if not (MawTrainerHintsEnabled and MawTrainerHintsEnabled()) then
+		return nil
+	end
+	if Game.CurrentScreen == CHARACTER_CREATION then
+		return nil
+	end
+	-- SplitSkill reports mastery 1 for every value >= 1, so skill 0 is its own test
+	local s, m = SplitSkill(Skillz.get(pl, skillId))
+	if not s or s == 0 or m + 1 > MAX_MASTERY then
+		return nil
+	end
+	local nextM = m + 1
+	local info = {
+		nextName = MASTERY_NAMES[nextM], have = s,
+		need = GetLearningRequirements(skillId)[nextM],
+	}
+	local function finish()
+		local text = TrainerHint.compose(info)
+		return text and ("\n\n" .. text) or nil
+	end
+
+	-- a solo party gets these masteries by skill level alone (mawTick_SoloMastery),
+	-- whatever the class
+	if Party.High == 0 and MawSoloAutoMasterySkills and contains(MawSoloAutoMasterySkills, skillId) then
+		info.kind = "auto"
+		return finish()
+	end
+
+	local topics = getIndex()[skillId]
+	local ladder = skillMasteryLadder and skillMasteryLadder[skillId]
+	if not topics and not ladder then
+		return nil		-- nobody teaches this skill and nothing grants it
+	end
+
+	local API = MawCore.Skills.API
+	local race = Game.CharacterPortraits[pl.Face].Race
+	local reachable = API.MasteryTable_get(race, pl.Class, skillId) >= nextM
+	if not reachable and API.MasteryTable_get(race, MawCore.Skills.nextClass(pl.Class), skillId) < nextM then
+		info.kind = "max"
+		return finish()
+	end
+
+	-- same ladder and same rule as autoLearnMastery (zzMAW-Skills.lua)
+	local steps = ladder and ((vars.insanityMode and ladder.insanity) or ladder.normal)
+	if steps and steps[m] then
+		info.need = steps[m]
+		info.kind = reachable and "auto" or "promotion"
+		return finish()
+	end
+	if not topics then
+		return nil
+	end
+
+	local contOk, curCont = pcall(TownPortalControls.MapOfContinent, Map.MapStatsIndex)
+	info.curCont = contOk and curCont or nil
+	-- teacher topics count masteries from Expert = 1, i.e. by the mastery the player has now
+	info.trainers = TrainerHint.pick(topics[m] or {}, Map.MapStatsIndex, info.curCont)
+	info.kind = reachable and "trainers" or "promotion"
+	return finish()
+end
+
+-- console: print(MawCore.TrainerHint.describe()) -- rebuilds the index, so the
+-- time shown is a fresh build of the current game data
+function TrainerHint.describe()
+	TrainerHint.invalidate()
+	local index = getIndex()
+	local skills, entries = 0, 0
+	for _, slots in pairs(index) do
+		skills = skills + 1
+		for _, list in pairs(slots) do
+			entries = entries + #list
+		end
+	end
+	return table.concat({
+		"trainer hint:",
+		"  option: " .. ((MawTrainerHintsEnabled and MawTrainerHintsEnabled()) and "ON" or "OFF"),
+		"  moved teachers: " .. ((enableAllTrainers and MawTrainerMoves) and "included" or "not included"),
+		("  index: %d skills, %d entries, built in %.1f ms"):format(skills, entries, builtMs),
+	}, "\n")
+end
+
+-- console: print(MawCore.TrainerHint.dump(skillId, mastery)) -- every entry of
+-- one slot (mastery 1 = Expert teachers), unranked
+function TrainerHint.dump(skillId, mastery)
+	local slot = getIndex()[skillId] and getIndex()[skillId][mastery]
+	if not slot then
+		return ("skill %d, mastery %d: no teacher topic"):format(skillId, mastery)
+	end
+	local sorted = {}
+	for i, e in ipairs(slot) do
+		sorted[i] = e
+	end
+	table.sort(sorted, function(a, b)
+		if a.name ~= b.name then
+			return a.name < b.name
+		end
+		return a.house < b.house
+	end)
+	local out = {("skill %d, mastery %d: %d entries"):format(skillId, mastery, #sorted)}
+	for _, e in ipairs(sorted) do
+		out[#out + 1] = ("  %s (npc %d) - house %d %s, %s (map %d, continent %s)"):format(
+			e.name, e.npc, e.house, e.houseName or "-", e.mapName, e.map, tostring(e.cont))
+	end
+	return table.concat(out, "\n")
+end
+
+function TrainerHint.start()
+	function events.LoadMap()
+		TrainerHint.invalidate()
+	end
 end
