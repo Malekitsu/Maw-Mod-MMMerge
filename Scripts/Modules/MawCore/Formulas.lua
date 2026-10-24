@@ -162,6 +162,24 @@ function Formulas.spellAddScale(s)
 	return (1 + Formulas.spellAddPerSkillSq*s*s)*Formulas.spellSkillBase^s
 end
 
+-- Ascension curves for healing spells (ascendHealingValues) and the
+-- mana cost of damage / control spells (ascendSpellCosts / ascendCCSpellCosts)
+function Formulas.healScalingScale(s)
+	return (1 + 0.02*s)*1.015^s
+end
+
+function Formulas.healBaseScale(s)
+	return (1 + 0.01*s^2)*1.015^s
+end
+
+function Formulas.spellManaScale(s, m)
+	return (1 + s*0.125)*1.04^s*(1 - 0.125*m)
+end
+
+function Formulas.ccManaScale(s, m)
+	return (1 + s*0.2)*1.03^s*(1 - 0.125*m)
+end
+
 function Formulas.critCap(madness)
 	return madness and 3000 or 2000
 end

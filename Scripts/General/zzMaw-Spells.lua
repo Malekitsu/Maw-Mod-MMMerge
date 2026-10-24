@@ -2068,8 +2068,8 @@ end
 
 --the ascension curve applied to a healing spell's raw base/scaling pair
 function ascendHealingValues(skill, base, scaling)
-	scaling=scaling * (1+0.02 * skill)*1.015^skill
-	base=base*(1 + 0.01 * skill^2)*1.015^skill
+	scaling=scaling*MawCore.Formulas.healScalingScale(skill)
+	base=base*MawCore.Formulas.healBaseScale(skill)
 	return round(scaling), round(base)
 end
 
@@ -2189,7 +2189,7 @@ end
 local function ascendCCSpellCosts(pl, s, m, personalityReduction)
 	for key, value in pairs(CCMAP) do
 		for i=1,4 do
-			local baseCost = spellCost[key][masteryName[i]]*(1+s*0.2)*1.03^(s)*(1-0.125*m)
+			local baseCost = spellCost[key][masteryName[i]]*MawCore.Formulas.ccManaScale(s, m)
 			local finalCost=math.min(math.ceil(baseCost * personalityReduction), 65000)
 			Game.Spells[key]["SpellPoints" .. masteryName[i]]=finalCost
 		end
@@ -2237,6 +2237,8 @@ local function ascendCCTooltips(pl, s)
 	end
 end
 
+--effective Ascension skill and mastery: Elementalists and Shamans use the
+--average of their magic schools at GM instead of the Ascension skill
 local function ascensionLevel(pl)
 	local level=pl:GetSkill(const.Skills.Learning)
 	lastLevel=level
@@ -2266,16 +2268,17 @@ local function ascensionLevel(pl)
 	end
 	return s, m, elementalist, id
 end
+GetAscensionLevel=ascensionLevel
 
 --Mana cost of every damage spell.
 local function ascendSpellCosts(pl, s, m, elementalist, id, personalityReduction)
 	for v=1,#spells do 
 		local num=spells[v]
 		for i=1,4 do
-			local baseCost = spellCost[num][masteryName[i]]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
+			local baseCost = spellCost[num][masteryName[i]]*MawCore.Formulas.spellManaScale(s, m)
 			Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(math.ceil(baseCost * personalityReduction), 65000)
 			if elementalist then
-				local baseCost=round((spellCost[num][masteryName[i]]+vars.eleStacks[id])*(1+s*0.125)*1.04^(s)*(1-0.125*m))
+				local baseCost=round((spellCost[num][masteryName[i]]+vars.eleStacks[id])*MawCore.Formulas.spellManaScale(s, m))
 				Game.Spells[num]["SpellPoints" .. masteryName[i]]=math.min(round(math.ceil(baseCost*(1+vars.eleStacks[id]*0.075) * personalityReduction)),65000)
 			end
 		end
@@ -2366,7 +2369,7 @@ local function ascendHealingSpells(pl, s, m, personalityReduction)
 	healingSpells=getBaseHealingSpells()
 	for i=1, 6 do
 		for v=1,4 do
-			local baseCost = healingSpells[healingList[i]].Cost[v]*(1+s*0.125)*1.04^(s)*(1-0.125*m)
+			local baseCost = healingSpells[healingList[i]].Cost[v]*MawCore.Formulas.spellManaScale(s, m)
 			healingSpells[healingList[i]].Cost[v]=math.min(round(baseCost*personalityReduction), 65000)
 			healingSpells[healingList[i]].Scaling[v], healingSpells[healingList[i]].Base[v]=ascendSpellHealing(s, m, healingList[i], v)
 		end
