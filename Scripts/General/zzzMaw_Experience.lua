@@ -206,7 +206,7 @@ function events.MonsterKillExp(t)
 			
 			--calculate again based for bolster
 			playerLevel=partyLvl
-			bolsterExp=bolsterExp+experience*healthRateo
+			bolsterExp=bolsterExp+experienceAwarded
 		end
 	end
 	
