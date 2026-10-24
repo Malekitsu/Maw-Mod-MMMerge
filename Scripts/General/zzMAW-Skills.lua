@@ -895,7 +895,7 @@ function events.GameInitialized2()
 	Game.SkillDesMaster[const.Skills.Bow]=string.format("%s 2 arrows",Game.SkillDesMaster[const.Skills.Bow])
 	Game.SkillDesGM[const.Skills.Bow]=string.format("%s shoots fire arrows, dealing highest between fire and physical damage",Game.SkillDesGM[const.Skills.Bow])
 	Game.SkillDesExpert[const.Skills.Dagger]=string.format("%s can dual wield",Game.SkillDesExpert[const.Skills.Dagger])
-	Game.SkillDesMaster[const.Skills.Dagger]=string.format("%s 5+1 crit%%/skill",Game.SkillDesMaster[const.Skills.Dagger])
+	Game.SkillDesMaster[const.Skills.Dagger]=string.format("%s +5%% crit chance +1%% per skill per dagger; the per-skill part is divided by 1+monster level/200 (max 4)",Game.SkillDesMaster[const.Skills.Dagger])
 	local function stunChance(skill)
 		return MawCore.Damage.weaponStun[skill].chanceMult*100
 	end
@@ -941,7 +941,8 @@ function events.GameInitialized2()
 	Game.SkillDesMaster[const.Skills.Armsmaster]=armsmasterDesc(3)
 	Game.SkillDesGM[const.Skills.Armsmaster]=armsmasterDesc(4)
 	Game.SkillDesMaster[const.Skills.Dodging]=string.format("%s usable with Leather Armor",Game.SkillDesGM[const.Skills.Dodging])
-	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s 0.5%% dodge chance",Game.SkillDesGM[const.Skills.Dodging])
+	--matches Damage.lua: 1-1/(1+(skill+10)/200) = (skill+10)/(skill+210)
+	Game.SkillDesGM[const.Skills.Dodging]=string.format("%s dodge chance (skill+10)/(skill+210): 9%% at 10, 33%% at 90, 50%% at 190",Game.SkillDesGM[const.Skills.Dodging])
 	Skillz.setDesc(35,1,"Armsmaster skill represents the warrior's tricks of the trade, enhancing your proficiency with all weapons-except staves.\nThis skill allows you to strike faster, execute smoother attacks, and deal more powerful blows.\n\nDamage added by armsmaster skill scales with your weapon skill, amplifying its impact as you grow more adept.\n")
 	Skillz.setDesc(35,6,armsmasterDesc(5)
 		.. "\nKnights only. Each 10 points of armsmaster raise every melee weapon"
@@ -1556,18 +1557,18 @@ end
 function events.LoadMap()
 	vars.learningFix=vars.learningFix or {}
 	for i=0,Party.PlayersArray.High do
-		pl=Party.PlayersArray[i]
+		local pl=Party.PlayersArray[i]
 		local id=pl:GetIndex()
-		if vars.learningFix[id] then 
-			return 
-		end 
-		local s, m = SplitSkill(pl.Skills[const.Skills.Learning])
-		while s>1 do
-			pl.SkillPoints=pl.SkillPoints+s
-			s=s-1
+		--skip characters already converted, keep checking the rest
+		if not vars.learningFix[id] then
+			local s, m = SplitSkill(pl.Skills[const.Skills.Learning])
+			while s>1 do
+				pl.SkillPoints=pl.SkillPoints+s
+				s=s-1
+			end
+			pl.Skills[const.Skills.Learning]=0
+			vars.learningFix[id]=true
 		end
-		pl.Skills[const.Skills.Learning]=0
-		vars.learningFix[id]=true
 	end
 end
 
