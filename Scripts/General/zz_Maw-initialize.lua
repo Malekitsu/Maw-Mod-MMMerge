@@ -540,8 +540,15 @@ local mawSettings={
 	friendlyDamage="OFF",
 	lootFilter="OFF",
 	extraItemTooltip="OFF",
+	trainerHints="OFF",
 }
 local defaultSettings=mawSettings
+
+--read by MawCore.TrainerHint on every skill tooltip click: Lua data only, no engine access.
+--per save (vars.MAWSETTINGS); in multiplayer the host's save decides
+function MawTrainerHintsEnabled()
+	return vars.MAWSETTINGS and vars.MAWSETTINGS.trainerHints=="ON" or false
+end
 
 function events.MultiplayerInitialized()
     --the MAW SETTINGS page is created by AdaptiveMonstersStats with an
@@ -568,6 +575,7 @@ function events.MultiplayerInitialized()
     createSwitch(300, "Damage on Friendly Units", "friendlyDamage", {"ON","OFF"})
     createSwitch(340, "Loot Filter", "lootFilter", {"OFF","Common", "Uncom.", "Rare", "Epic","Ancient","Primordial"})
     createSwitch(380, "Extra Item Tooltip", "extraItemTooltip", {"OFF","ON"})
+    createSwitch(400, "Trainer Hints", "trainerHints", {"OFF","ON"})
 	
     function events.OpenExtraSettingsMenu()
         for _, v in pairs(mawSettingsButton) do
