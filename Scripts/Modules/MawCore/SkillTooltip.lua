@@ -164,24 +164,36 @@ SkillTooltip.set(28, 1, function(pl)
 end, "meditation SP regen")
 
 SkillTooltip.set(const.Skills.Learning, 1, function(pl)
-	local s, m = SplitSkill(pl:GetSkill(const.Skills.Learning))
+	-- same effective skill/mastery the spell recalc uses (Elementalists and
+	-- Shamans average their schools); fall back to the raw skill
+	local s, m
+	if GetAscensionLevel then
+		s, m = GetAscensionLevel(pl)
+	else
+		s, m = SplitSkill(pl:GetSkill(const.Skills.Learning))
+	end
 	local F = MawCore.Formulas
-	local dmgMult = shortenNumber(round((F.spellDiceScale(s) - 1) * 100), 3)
-	local dmgBaseMult = shortenNumber(round((F.spellAddScale(s) - 1) * 100), 3)
-	local healMult = shortenNumber(round(((1 + 0.05 * s) * 1.02 ^ s - 1) * 100), 3)
-	local healBaseMult = shortenNumber(round(((1 + 0.03 * s ^ 2) * 1.02 ^ s - 1) * 100), 3)
-	local masteryReduction = (1 - m * 0.125)
-	local manaMult = shortenNumber(round(((1 + 0.125 * s) * 1.04 ^ s - 1) * masteryReduction * 100), 3)
-	local castMult = shortenNumber(round((1.015 ^ s - 1) * 100), 3)
-	return string.format("%s\n\nCurrent bonuses at skill %s:\n- Damage base: %s\n- Damage scaling: %s\n\n- Healing base: %s\n- Healing scaling: %s\n\n- Mana cost: %s\n- Cast time: %s\n",
+	local function pct(mult)
+		return shortenNumber(round((mult - 1) * 100), 3)
+	end
+	-- mana can end up below the base cost at high mastery: green when cheaper
+	local function manaStr(mult)
+		local v = pct(mult)
+		if mult < 1 then
+			return StrColor(0, 255, 0, v .. "%")
+		end
+		return StrColor(255, 100, 100, "+" .. v .. "%")
+	end
+	return string.format("%s\n\nCurrent bonuses at skill %s:\n- Damage base: %s\n- Damage scaling: %s\n\n- Healing base: %s\n- Healing scaling: %s\n\n- Mana cost: %s\n- Control spells mana cost: %s\n- Cast time: %s\n",
 		baseAscStr,
-		StrColor(255, 255, 100, s),
-		StrColor(0, 255, 0, "+" .. dmgBaseMult .. "%"),
-		StrColor(0, 255, 0, "+" .. dmgMult .. "%"),
-		StrColor(0, 255, 0, "+" .. healBaseMult .. "%"),
-		StrColor(0, 255, 0, "+" .. healMult .. "%"),
-		StrColor(255, 100, 100, "+" .. manaMult .. "%"),
-		StrColor(255, 100, 100, "+" .. castMult .. "%"))
+		StrColor(255, 255, 100, round(s * 10) / 10),
+		StrColor(0, 255, 0, "+" .. pct(F.spellAddScale(s)) .. "%"),
+		StrColor(0, 255, 0, "+" .. pct(F.spellDiceScale(s)) .. "%"),
+		StrColor(0, 255, 0, "+" .. pct(F.healBaseScale(s)) .. "%"),
+		StrColor(0, 255, 0, "+" .. pct(F.healScalingScale(s)) .. "%"),
+		manaStr(F.spellManaScale(s, m)),
+		manaStr(F.ccManaScale(s, m)),
+		StrColor(255, 100, 100, "+" .. pct(1.015 ^ s) .. "%"))
 end, "ascension bonuses")
 
 SkillTooltip.set(const.Skills.Spear, 5, function(pl)
