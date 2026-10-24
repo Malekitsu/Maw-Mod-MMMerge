@@ -11,7 +11,7 @@
 local TrainerHint = {}
 MawCore.TrainerHint = TrainerHint
 
-TrainerHint.MAX_ENTRIES = 3
+TrainerHint.MAX_ENTRIES = 1		-- the tooltip box is short: the nearest teacher only
 
 -- 2DEvents.txt names the houses of the ordinary Enroth teachers just "House"
 local PLACEHOLDER_HOUSE = "House"
@@ -373,7 +373,8 @@ function TrainerHint.selfTest()
 		show(TrainerHint.pick(expert, 99, nil, 3)), "Ann@101,Flo@105,Ed@103")
 	eq("pick indoor map of the party", show(TrainerHint.pick(expert, 3, 1, 3)), "Ann@103,Ed@103,Flo@105")
 	eq("pick one entry per npc", show(TrainerHint.pick(expert, 1, 1, 10)), "Ann@101,Ed@103,Flo@105")
-	eq("pick default limit is 3", #TrainerHint.pick(expert, 99, nil), 3)
+	eq("pick default limit is MAX_ENTRIES", #TrainerHint.pick(expert, 99, nil), TrainerHint.MAX_ENTRIES)
+	eq("MAX_ENTRIES is 1: only the nearest trainer", TrainerHint.MAX_ENTRIES, 1)
 	eq("pick empty list", #TrainerHint.pick({}, 1, 1, 3), 0)
 	eq("pick leaves the index alone", tostring((expert[1] or {rank = "missing"}).rank), "nil")
 
@@ -510,19 +511,22 @@ function TrainerHint.invalidate()
 	cache = nil
 end
 
--- The block to append to the skill tooltip for (pl, skillId), or nil for "no
--- hint". Errors are not caught here; SkillTooltip isolates them.
-function TrainerHint.text(pl, skillId)
+-- block, reason: the hint block for (pl, skillId), or nil and why there is none.
+-- Errors are not caught here; SkillTooltip isolates them.
+function TrainerHint.explain(pl, skillId)
 	if not (MawTrainerHintsEnabled and MawTrainerHintsEnabled()) then
-		return nil
+		return nil, "option off"
 	end
 	if Game.CurrentScreen == CHARACTER_CREATION then
-		return nil
+		return nil, "character creation screen"
 	end
 	-- SplitSkill reports mastery 1 for every value >= 1, so skill 0 is its own test
 	local s, m = SplitSkill(Skillz.get(pl, skillId))
-	if not s or s == 0 or m + 1 > MAX_MASTERY then
-		return nil
+	if not s or s == 0 then
+		return nil, "skill not learned"
+	end
+	if m + 1 > MAX_MASTERY then
+		return nil, "already grand master"
 	end
 	local nextM = m + 1
 	local info = {
@@ -531,7 +535,7 @@ function TrainerHint.text(pl, skillId)
 	}
 	local function finish()
 		local text = TrainerHint.compose(info)
-		return text and ("\n\n" .. text) or nil
+		return text, text == nil and "nothing to say" or nil
 	end
 
 	-- a solo party gets these masteries by skill level alone (mawTick_SoloMastery),
@@ -544,7 +548,7 @@ function TrainerHint.text(pl, skillId)
 	local topics = getIndex()[skillId]
 	local ladder = skillMasteryLadder and skillMasteryLadder[skillId]
 	if not topics and not ladder then
-		return nil		-- nobody teaches this skill and nothing grants it
+		return nil, "nobody teaches this skill"		-- and nothing grants it
 	end
 
 	local API = MawCore.Skills.API
@@ -563,7 +567,7 @@ function TrainerHint.text(pl, skillId)
 		return finish()
 	end
 	if not topics then
-		return nil
+		return nil, "no teacher topic for this mastery"
 	end
 
 	local contOk, curCont = pcall(TownPortalControls.MapOfContinent, Map.MapStatsIndex)
@@ -572,6 +576,28 @@ function TrainerHint.text(pl, skillId)
 	info.trainers = TrainerHint.pick(topics[m] or {}, Map.MapStatsIndex, info.curCont)
 	info.kind = reachable and "trainers" or "promotion"
 	return finish()
+end
+
+-- the block SkillTooltip puts between description and mastery rows
+function TrainerHint.text(pl, skillId)
+	return (TrainerHint.explain(pl, skillId))
+end
+
+-- console: print(MawCore.TrainerHint.probe(skillId)) -- why the hint is (not) in the
+-- tooltip of this skill for the current character: lengths and outcome
+function TrainerHint.probe(skillId)
+	local pl = Party[math.max(Game.CurrentPlayer, 0)]
+	local _, info = MawCore.SkillTooltip.build(pl, skillId)
+	local outcome = info.status
+	if info.status == "skipped" then
+		outcome = "skipped (too long)"
+	elseif info.status == "nil" then
+		outcome = "nil (" .. select(2, TrainerHint.explain(pl, skillId)) .. ")"
+	elseif info.status == "error" then
+		outcome = "error (" .. tostring(info.error) .. ")"
+	end
+	return ("skill %d: tooltip without hint %d bytes, hint %d bytes, limit %d, %s"):format(
+		skillId, info.baseLen, info.hintLen or 0, 4095, outcome)
 end
 
 -- console: print(MawCore.TrainerHint.describe()) -- rebuilds the index, so the

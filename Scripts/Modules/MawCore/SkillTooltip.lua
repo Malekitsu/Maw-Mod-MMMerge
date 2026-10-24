@@ -60,9 +60,13 @@ end
 
 -- SkillsUI copies at most HINT_CAP - 1 = 4095 bytes of the tooltip into its buffer
 local TOOLTIP_MAX_BYTES = 4095
+local HINT_FRAME_BYTES = 3		-- blank line before ("\n") and after ("\n\n") the trainer hint
 local hintErrorsShown = {}
 
-function SkillTooltip.getTooltipText(pl, skillId, withBonus)
+-- text, info: info = {baseLen = bytes without the trainer hint, hintLen = bytes of
+-- the hint if there is one, status = "inserted" | "skipped" (too long) | "nil" (no
+-- hint) | "error"}; TrainerHint.probe reports it
+function SkillTooltip.build(pl, skillId, withBonus)
 	if withBonus == nil then
 		withBonus = true
 	end
@@ -96,22 +100,48 @@ function SkillTooltip.getTooltipText(pl, skillId, withBonus)
 		end
 	end
 	local text = table.concat(s)
-	-- optional trainer hint (TrainerHint.lua). It runs under pcall: an error
-	-- escaping from here would make SkillsUI replace the whole tooltip
+	local info = {baseLen = #text, status = "nil"}
+	-- optional trainer hint (TrainerHint.lua), between the description and the
+	-- mastery rows. It runs under pcall: an error escaping from here would make
+	-- SkillsUI replace the whole tooltip
 	local TH = MawCore.TrainerHint
 	if TH then
 		local ok, hint = pcall(TH.text, pl, skillId)
 		if not ok then
 			hint = tostring(hint)
+			info.status = "error"
+			info.error = hint
 			if not hintErrorsShown[hint] then
 				hintErrorsShown[hint] = true
 				print("[TrainerHint] " .. hint)
 			end
-		elseif type(hint) == "string" and #text + #hint < TOOLTIP_MAX_BYTES then
-			text = text .. hint
+		elseif type(hint) == "string" then
+			info.hintLen = #hint
+			-- over the buffer SkillsUI would cut the end off, i.e. the mastery rows
+			if #text + #hint + HINT_FRAME_BYTES < TOOLTIP_MAX_BYTES then
+				-- weapon, armor and dragon part 1 end in a separator line plus the
+				-- column header of the rows: keep those two lines below the hint
+				local cut = s[1]:find("\n%-%-%-%-%-%-%-%-%-%-")
+				if cut then
+					local head = s[1]:sub(1, cut - 1):gsub("\n+$", "")
+					local tail = s[1]:sub(cut)
+					s[1] = head
+					table.insert(s, 2, "\n\n" .. hint .. "\n" .. tail)
+				else
+					table.insert(s, 3, "\n" .. hint .. "\n\n")
+				end
+				text = table.concat(s)
+				info.status = "inserted"
+			else
+				info.status = "skipped"
+			end
 		end
 	end
-	return text
+	return text, info
+end
+
+function SkillTooltip.getTooltipText(pl, skillId, withBonus)
+	return (SkillTooltip.build(pl, skillId, withBonus))
 end
 
 function SkillTooltip.describe()
