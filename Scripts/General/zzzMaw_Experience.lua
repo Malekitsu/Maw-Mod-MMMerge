@@ -106,11 +106,20 @@ local function flushEventBolster()
 	end
 end
 
+--Scholar/Teacher/Instructor bonus. Applied to experience the party receives only,
+--never to bolster experience, so hirelings don't make the world scale faster.
+function getFollowerExpMultiplier()
+	if NPCFollowers and NPCFollowers.GetExperienceMultiplier then
+		return NPCFollowers.GetExperienceMultiplier()
+	end
+	return 1
+end
+
 function EventExperience(value, player)
 	if value <= 0 then
 		return value
 	end
-	local expMultiplier = NPCFollowers.GetExperienceMultiplier()
+	local expMultiplier = getFollowerExpMultiplier()
 	if not vars.MMLVL then
 		return value*expMultiplier
 	end
@@ -118,7 +127,7 @@ function EventExperience(value, player)
 	if vars.madnessMode then
 		partyLevel = getTotalLevel()
 	end
-	local total = (value*(1+partyLevel/100) + 500*partyLevel)*expMultiplier
+	local total = value*(1+partyLevel/100) + 500*partyLevel
 	local partyCount = math.max(Party.Count, 1)
 	--each per-member call contributes its slice, so the bolster banks the same amount
 	--whatever the party size
@@ -127,7 +136,7 @@ function EventExperience(value, player)
 		eventBolsterQueued = true
 		RunNextTick(flushEventBolster)
 	end
-	return total*REFERENCE_PARTY_SIZE/partyCount
+	return total*expMultiplier*REFERENCE_PARTY_SIZE/partyCount
 end
 
 mem.hookfunction(0x4485EC, 1, 2, function(d, def, playerPtr, varNum, value)
@@ -142,8 +151,9 @@ mem.hookfunction(0x4485EC, 1, 2, function(d, def, playerPtr, varNum, value)
 end, 6)
 
 --flat experience to one player: no bolster scaling, nothing banked into the bolster
+--(hireling experience bonus still applies)
 function addExpNoBolster(pl, amount)
-	pl.Experience = math.min(pl.Experience + math.floor(amount*NPCFollowers.GetExperienceMultiplier() + 0.5), 2^32-3982296)
+	pl.Experience = math.min(pl.Experience + math.floor(amount*getFollowerExpMultiplier() + 0.5), 2^32-3982296)
 end
 
 ----------------------------------------------------
@@ -193,7 +203,7 @@ function events.MonsterKillExp(t)
 	end
 	partyCount=math.max(1,partyCount)
 	local experience=round(t.Exp/partyCount)
-	local expMultiplier = NPCFollowers.GetExperienceMultiplier()
+	local expMultiplier = getFollowerExpMultiplier()
 	
 	local monHealth=getMonsterHealth(mon)
 	--local monDamage=getMonsterDamage(mon)
@@ -206,12 +216,12 @@ function events.MonsterKillExp(t)
 						
 			local experienceAwarded=experience*healthRateo
 			local lvl=Party[i].LevelBase
-			experienceAwarded=math.min((lvl+1)*1000, experienceAwarded)*expMultiplier
+			experienceAwarded=math.min((lvl+1)*1000, experienceAwarded*expMultiplier)
 			Party[i].Experience=math.min(Party[i].Experience+experienceAwarded, 2^32-3982296)
 			
 			--calculate again based for bolster
 			playerLevel=partyLvl
-			bolsterExp=bolsterExp+experience*healthRateo*expMultiplier
+			bolsterExp=bolsterExp+experience*healthRateo
 		end
 	end
 	
