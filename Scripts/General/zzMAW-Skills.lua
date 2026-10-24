@@ -636,7 +636,11 @@ local unhittableStates = {
 	[const.AIState.Invisible] = true,
 }
 
-local function navigateMissile(object)
+local HOMING_DEGREES_PER_TICK=0.5/3
+local HOMING_MAX_TICKS=32
+local lastHomingTime
+
+local function navigateMissile(object, homingDegree)
 
 	-- exclude some special non targeting spells
 	if
@@ -678,7 +682,6 @@ local function navigateMissile(object)
 	
 	-- process only missiles between party and monster
 	-- target position
-	local homingDegree=0.5
 	local targetPosition
 	if ownerKind == const.ObjectRefKind.Party and targetKind == const.ObjectRefKind.Monster then
 		local mapMonster = Map.Monsters[targetIndex]
@@ -735,9 +738,18 @@ end
 function mawTick_HomingProjectiles()
 	-- navigateMissiles
 	if vars.MAWSETTINGS.homingProjectiles == "ON" then
+		local dt=Game.TimeDelta
+		if not Game.TurnBased and lastHomingTime and Game.Time>lastHomingTime then
+			dt=math.min(Game.Time-lastHomingTime, HOMING_MAX_TICKS)
+		end
+		lastHomingTime=Game.Time
+		if dt<=0 then
+			return
+		end
+		local homingDegree=HOMING_DEGREES_PER_TICK*dt
 		for objectIndex = 0,Map.Objects.high do
 			local object =  Map.Objects[objectIndex]
-			navigateMissile(object)
+			navigateMissile(object, homingDegree)
 		end
 	end
 end
