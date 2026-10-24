@@ -1,8 +1,9 @@
 local ORACLES = {[314] = 4, [413] = 4, [794] = 0}
 
-local FIRST_TIER = 100
+local FIRST_TIER = 80
 local UNLOCK_TIER = 500
-local TIER_STEPS = {{Below = 140, Step = 20}, {Below = 200, Step = 15}, {Below = math.huge, Step = 10}}
+local FIRST_STEP = 30
+local LAST_STEP = 10
 
 local LEGACY_TIERS = {100, 140, 170, 200}
 for level = 220, 500, 20 do
@@ -10,11 +11,12 @@ for level = 220, 500, 20 do
 end
 
 local function nextTier(level)
-	for _, s in ipairs(TIER_STEPS) do
-		if level < s.Below then
-			return level + s.Step
-		end
+	local tier, step = FIRST_TIER, FIRST_STEP
+	while tier <= level do
+		tier = tier + step
+		step = math.max(step - 1, LAST_STEP)
 	end
+	return tier
 end
 
 local function migrate(q)
