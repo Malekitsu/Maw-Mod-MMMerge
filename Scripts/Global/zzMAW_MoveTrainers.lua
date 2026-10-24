@@ -65,6 +65,7 @@ local npcMovesByMap = {
 
   ["out13.odm"] = { {532,236},{535,236}, },
 }
+MawTrainerMoves = npcMovesByMap --read by MawCore.TrainerHint (where moved teachers will stand)
 
 function events.LoadMap()
 	if enableAllTrainers then
