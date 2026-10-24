@@ -60,11 +60,11 @@ end
 
 -- SkillsUI copies at most HINT_CAP - 1 = 4095 bytes of the tooltip into its buffer
 local TOOLTIP_MAX_BYTES = 4095
-local HINT_FRAME_BYTES = 3		-- blank line before ("\n") and after ("\n\n") the trainer hint
+local HINT_SEPARATOR = "\n\n"
 local hintErrorsShown = {}
 
 -- text, info: info = {baseLen = bytes without the trainer hint, hintLen = bytes of
--- the hint if there is one, status = "inserted" | "skipped" (too long) | "nil" (no
+-- the hint if there is one, status = "inserted" (appended) | "skipped" (too long) | "nil" (no
 -- hint) | "error"}; TrainerHint.probe reports it
 function SkillTooltip.build(pl, skillId, withBonus)
 	if withBonus == nil then
@@ -101,9 +101,10 @@ function SkillTooltip.build(pl, skillId, withBonus)
 	end
 	local text = table.concat(s)
 	local info = {baseLen = #text, status = "nil"}
-	-- optional trainer hint (TrainerHint.lua), between the description and the
-	-- mastery rows. It runs under pcall: an error escaping from here would make
-	-- SkillsUI replace the whole tooltip
+	-- optional trainer hint (TrainerHint.lua). It runs under pcall: an error
+	-- escaping from here would make SkillsUI replace the whole tooltip.
+	-- It is only ever APPENDED: inserting it before the mastery rows made the
+	-- game show no skill tooltip at all (play test 2026-10-24)
 	local TH = MawCore.TrainerHint
 	if TH then
 		local ok, hint = pcall(TH.text, pl, skillId)
@@ -117,20 +118,9 @@ function SkillTooltip.build(pl, skillId, withBonus)
 			end
 		elseif type(hint) == "string" then
 			info.hintLen = #hint
-			-- over the buffer SkillsUI would cut the end off, i.e. the mastery rows
-			if #text + #hint + HINT_FRAME_BYTES < TOOLTIP_MAX_BYTES then
-				-- weapon, armor and dragon part 1 end in a separator line plus the
-				-- column header of the rows: keep those two lines below the hint
-				local cut = s[1]:find("\n%-%-%-%-%-%-%-%-%-%-")
-				if cut then
-					local head = s[1]:sub(1, cut - 1):gsub("\n+$", "")
-					local tail = s[1]:sub(cut)
-					s[1] = head
-					table.insert(s, 2, "\n\n" .. hint .. "\n" .. tail)
-				else
-					table.insert(s, 3, "\n" .. hint .. "\n\n")
-				end
-				text = table.concat(s)
+			-- over the buffer SkillsUI would cut the end off
+			if #text + #HINT_SEPARATOR + #hint < TOOLTIP_MAX_BYTES then
+				text = text .. HINT_SEPARATOR .. hint
 				info.status = "inserted"
 			else
 				info.status = "skipped"

@@ -197,6 +197,7 @@ end
 --   "promotion" nextName, need, have, curCont, trainers (possibly empty; nil = skill
 --               without teachers, learned automatically)
 --   "max"
+--   "grandmaster"  (nothing left to learn)
 -- `color` (r, g, b, text) defaults to the engine's StrColor.
 function TrainerHint.compose(info, color)
 	if not info then
@@ -212,6 +213,9 @@ function TrainerHint.compose(info, color)
 	end
 	if kind == "max" then
 		return paint(COLOR_HEAD, "Highest mastery for this class reached.")
+	end
+	if kind == "grandmaster" then
+		return paint(COLOR_HEAD, "Grand Master reached.")
 	end
 	if kind ~= "none" and kind ~= "auto" and kind ~= "trainers" and kind ~= "promotion" then
 		return nil
@@ -415,6 +419,7 @@ function TrainerHint.selfTest()
 	eq("compose promotion, no trainer list (skills that are learned automatically)", TrainerHint.compose({
 			kind = "promotion", nextName = "Master", need = 12, have = 14}, plain),
 		"Next mastery: Master (skill 12 required)\n Requires a class promotion first.")
+	eq("compose grand master reached", TrainerHint.compose({kind = "grandmaster"}, plain), "Grand Master reached.")
 	eq("compose unknown kind",TrainerHint.compose({kind = "bogus"}, plain), nil)
 	eq("compose nil", TrainerHint.compose(nil, plain), nil)
 
@@ -428,6 +433,8 @@ function TrainerHint.selfTest()
 			need = 7, have = 9, curCont = 1, trainers = {dalin}}, tag),
 		"<255,255,100:Next mastery: Master (skill ><0,255,0:7><255,255,100: required)>\n"
 		.. " Dalin Keenedge - Keenedge Residence, The Pit (Antagarich)")
+	eq("compose colours, grand master", TrainerHint.compose({kind = "grandmaster"}, tag),
+		"<255,255,100:Grand Master reached.>")
 	eq("compose colours, special lines", TrainerHint.compose({kind = "max"}, tag),
 		"<255,255,100:Highest mastery for this class reached.>")
 
@@ -526,7 +533,11 @@ function TrainerHint.explain(pl, skillId)
 		return nil, "skill not learned"
 	end
 	if m + 1 > MAX_MASTERY then
-		return nil, "already grand master"
+		-- nothing left to learn: say so, but only for skills that have masteries to learn at all
+		if not getIndex()[skillId] and not (skillMasteryLadder and skillMasteryLadder[skillId]) then
+			return nil, "nobody teaches this skill"
+		end
+		return TrainerHint.compose({kind = "grandmaster"})
 	end
 	local nextM = m + 1
 	local info = {
