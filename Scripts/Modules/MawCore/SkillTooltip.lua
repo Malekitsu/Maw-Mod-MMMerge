@@ -58,6 +58,10 @@ function SkillTooltip.partText(pl, id, part)
 	return Skillz.getDesc(id, part)
 end
 
+-- SkillsUI copies at most HINT_CAP - 1 = 4095 bytes of the tooltip into its buffer
+local TOOLTIP_MAX_BYTES = 4095
+local hintErrorsShown = {}
+
 function SkillTooltip.getTooltipText(pl, skillId, withBonus)
 	if withBonus == nil then
 		withBonus = true
@@ -91,7 +95,23 @@ function SkillTooltip.getTooltipText(pl, skillId, withBonus)
 			s[#s + 1] = string.format("\n\n Bonus: %s%d", diff > 0 and "+" or "", diff)
 		end
 	end
-	return table.concat(s)
+	local text = table.concat(s)
+	-- optional trainer hint (TrainerHint.lua). It runs under pcall: an error
+	-- escaping from here would make SkillsUI replace the whole tooltip
+	local TH = MawCore.TrainerHint
+	if TH then
+		local ok, hint = pcall(TH.text, pl, skillId)
+		if not ok then
+			hint = tostring(hint)
+			if not hintErrorsShown[hint] then
+				hintErrorsShown[hint] = true
+				print("[TrainerHint] " .. hint)
+			end
+		elseif type(hint) == "string" and #text + #hint < TOOLTIP_MAX_BYTES then
+			text = text .. hint
+		end
+	end
+	return text
 end
 
 function SkillTooltip.describe()
