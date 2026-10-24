@@ -2762,6 +2762,7 @@ function checkMapCompletition()
 				if MawCore.Sync.inGame() then
 					experience=round(experience / math.min(PlayersInGame(),5)/1000)*1000
 				end
+				experience=experience*getFollowerExpMultiplier()
 				for i=0,Party.High do
 					Party[i].Experience=math.min(Party[i].Experience+experience, 2^32-3982296)
 				end
@@ -4131,7 +4132,7 @@ function events.MonsterKilled(mon)
 		end
 		for i=0, Party.High do
 			if Party[i]:IsConscious() then
-				Party[i].Experience=Party[i].Experience+mon.Exp/consciousPlayers
+				Party[i].Experience=Party[i].Experience+mon.Exp/consciousPlayers*getFollowerExpMultiplier()
 			end
 		end
 	end
