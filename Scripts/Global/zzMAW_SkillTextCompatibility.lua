@@ -104,11 +104,12 @@ function events.GameInitialized2()
         end
     end
 
-    -- Scholar (4), Teacher (13), Instructor (14) grant non-stacking
-    -- experience bonuses. Ascension is not affected by these followers.
-    replaceDescription(2324, "Can identify items and increases experience gained by 5%.")
-    replaceDescription(2333, "Increases experience gained by 10%.")
-    replaceDescription(2334, "Increases experience gained by 15%.")
+    -- Scholar (4), Teacher (13), Instructor (14): effective Ascension
+    -- (internal Learning skill ID) levels, only the highest counts.
+    -- MAW has no experience bonus from these followers.
+    replaceDescription(2324, "Can identify items and grants +2 effective Ascension skill to party members.")
+    replaceDescription(2333, "Grants +4 effective Ascension skill to party members.")
+    replaceDescription(2334, "Grants +6 effective Ascension skill to party members.")
 
     -- Counselor (23) and Barrister (24) no longer have a working Diplomacy
     -- bonus; no Alchemy or Merchant bonus is defined for them in MAW.

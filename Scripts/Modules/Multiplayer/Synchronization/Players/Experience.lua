@@ -25,7 +25,6 @@ local function MulAddKillExp(Amount, monLvl)
 	end
 	partyCount=math.max(1,partyCount)
 	local experience=avg/partyCount
-	local expMultiplier=getFollowerExpMultiplier()
 	local bolsterExp=0
 	for i=0, Party.High do
 		if Party[i].Dead==0 and Party[i].Eradicated==0 then
@@ -37,7 +36,7 @@ local function MulAddKillExp(Amount, monLvl)
 				multiplier2=1+(playerLevel^0.5)-(monLvl^0.5)
 				mult=math.min(math.min(multiplier1,1/multiplier2),1/3)
 			end
-			local experienceAwarded=experience*mult*expMultiplier
+			local experienceAwarded=experience*mult
 			Party[i].Experience=math.min(Party[i].Experience+experienceAwarded, 2^32-3982296)
 			bolsterExp=bolsterExp+experience*mult
 		end
@@ -72,7 +71,7 @@ local packets = {
 			local t = bin_to_item(toptr(bin_string))
 			local msg = ("%s: %s grants you %s exp."):format(t[2], t[3], t[1])
 			for _, pl in Party do
-				pl.Experience = pl.Experience + math.floor(t[1]*getFollowerExpMultiplier() + 0.5)
+				pl.Experience = pl.Experience + t[1]
 			end
 			addBolsterExp(t[1])
 			evt.All.Add{"Experience", 0}
@@ -141,8 +140,7 @@ local function check_diff(current_topic)
 			end
 		end
 		if count > 0 then
-			-- strip our own hireling bonus; every receiver applies its own
-			local avg = math.floor(total / count / getFollowerExpMultiplier())
+			local avg = math.floor(total / count)
 			if avg > 0 then
 				Multiplayer.broadcast(packets.quest_exp:prep(avg, Game.NPCTopic[current_topic], Game.NPC[GetCurrentNPC()].Name), nil)
 			end
