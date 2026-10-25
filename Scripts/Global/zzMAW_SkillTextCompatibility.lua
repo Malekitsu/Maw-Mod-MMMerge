@@ -105,11 +105,12 @@ function events.GameInitialized2()
     end
 
     -- Scholar (4), Teacher (13), Instructor (14): effective Ascension
-    -- (internal Learning skill ID) levels, only the highest counts.
+    -- (internal Learning skill ID) levels, only the highest counts, and only
+    -- for characters who have learned Ascension.
     -- MAW has no experience bonus from these followers.
-    replaceDescription(2324, "Can identify items and grants +2 effective Ascension skill to party members.")
-    replaceDescription(2333, "Grants +4 effective Ascension skill to party members.")
-    replaceDescription(2334, "Grants +6 effective Ascension skill to party members.")
+    replaceDescription(2324, "Can identify items and grants +2 effective Ascension skill to party members who have learned Ascension.")
+    replaceDescription(2333, "Grants +4 effective Ascension skill to party members who have learned Ascension.")
+    replaceDescription(2334, "Grants +6 effective Ascension skill to party members who have learned Ascension.")
 
     -- Counselor (23) and Barrister (24) no longer have a working Diplomacy
     -- bonus; no Alchemy or Merchant bonus is defined for them in MAW.

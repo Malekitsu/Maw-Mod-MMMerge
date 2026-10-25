@@ -52,6 +52,10 @@ local function CountSkillBonus(skill)
 end
 
 function events.GetSkill(t)
+	-- Ascension bonus only for characters who have learned Ascension
+	if t.Skill == const.Skills.Learning and t.Player.Skills[t.Skill] == 0 then
+		return
+	end
 	local Skill, Mas = SplitSkill(t.Result)
 	Skill = Skill + (NPCBonuses.Skills[t.Skill] or CountSkillBonus(t.Skill))
 	t.Result = JoinSkill(Skill, Mas)
