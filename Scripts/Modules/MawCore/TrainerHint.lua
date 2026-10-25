@@ -127,18 +127,83 @@ function TrainerHint.buildIndex(src)
 	return index
 end
 
--- rank 0 = party map, 1 = same continent, 2 = rest; then outdoor before indoor
+-- Where one can get to from each map in one step: links[from][to] = "walk" (the
+-- outdoor map borders it) or "route" (a coach or boat goes there; walking wins).
+-- src = {
+--   travels   = {[fileLower] = {up|down|left|right = {map = file}}}   (Game.OutdoorTravels)
+--   routes    = {{from = map, to = {map, ...}}, ...}                  (coach and boat houses)
+--   mapByFile = function(fileLower) -> map index or nil
+-- }
+-- Missing parts just mean fewer links.
+function TrainerHint.buildLinks(src)
+	local links = {}
+	if not src or not src.mapByFile then
+		return links
+	end
+	local function link(from, to, kind)
+		if from and to and from ~= to then
+			links[from] = links[from] or {}
+			if links[from][to] ~= "walk" then
+				links[from][to] = kind
+			end
+		end
+	end
+	for file, travel in pairs(src.travels or {}) do
+		local from = src.mapByFile(tostring(file):lower())
+		if from then
+			for _, side in ipairs({"up", "down", "left", "right"}) do
+				local exit = type(travel) == "table" and travel[side]
+				if exit and exit.map then
+					link(from, src.mapByFile(tostring(exit.map):lower()), "walk")
+				end
+			end
+		end
+	end
+	for _, route in ipairs(src.routes or {}) do
+		for _, to in ipairs(route.to or {}) do
+			link(route.from, to, "route")
+		end
+	end
+	return links
+end
+
+-- the neighbours pick() gets: those of the party map plus, in an indoor map,
+-- those of the outdoor map the party came from (refMap); walking wins. nil when
+-- neither has any.
+function TrainerHint.neighbours(links, curMap, refMap)
+	local a = links and curMap ~= nil and links[curMap] or nil
+	local b = links and refMap ~= nil and links[refMap] or nil
+	if not (a and b) then
+		return a or b
+	end
+	local out = {}
+	for map, kind in pairs(a) do
+		out[map] = kind
+	end
+	for map, kind in pairs(b) do
+		if out[map] ~= "walk" then
+			out[map] = kind
+		end
+	end
+	return out
+end
+
+-- rank 0 = party map (or the outdoor map the party came from when it stands in
+-- an indoor one: refMap, marked outside = true), 1 = a neighbour (neighbors[map]
+-- = "walk" | "route"), 2 = same continent, 3 = rest; then outdoor before indoor
 -- maps, continent, map name, NPC name. A teacher who stands in several places
 -- counts once, at the best one.
-function TrainerHint.pick(entries, curMap, curCont, limit)
+function TrainerHint.pick(entries, curMap, curCont, limit, neighbors, refMap)
 	limit = limit or TrainerHint.MAX_ENTRIES
 	local ranked = {}
 	for i, e in ipairs(entries or {}) do
-		local rank = 2
-		if e.map == curMap then
+		local rank = 3
+		if e.map == curMap or (refMap ~= nil and e.map == refMap) then
 			rank = 0
-		elseif curCont ~= nil and e.cont == curCont then
+		elseif neighbors and neighbors[e.map] then
 			rank = 1
+		elseif curCont ~= nil and e.cont == curCont then
+			rank = 2
 		end
 		ranked[i] = {e = e, rank = rank}
 	end
@@ -177,6 +242,8 @@ function TrainerHint.pick(entries, curMap, curCont, limit)
 				copy[k] = v
 			end
 			copy.rank = r.rank
+			copy.link = r.rank == 1 and neighbors[r.e.map] or nil
+			copy.outside = r.rank == 0 and r.e.map ~= curMap or nil
 			out[#out + 1] = copy
 		end
 	end
@@ -244,9 +311,20 @@ function TrainerHint.compose(info, color)
 		end
 		line = line .. e.mapName
 		if e.rank == 0 then
-			line = line .. " " .. paint(COLOR_MET, "(this map)")
-		elseif e.cont and e.cont ~= info.curCont and CONTINENTS[e.cont] then
-			line = line .. " (" .. CONTINENTS[e.cont] .. ")"
+			line = line .. " " .. paint(COLOR_MET, e.outside and "(outside)" or "(this map)")
+		else
+			local tags = {}
+			if e.rank == 1 and e.link == "walk" then
+				tags[#tags + 1] = "next map"
+			elseif e.rank == 1 and e.link == "route" then
+				tags[#tags + 1] = "coach/boat"
+			end
+			if e.cont and e.cont ~= info.curCont and CONTINENTS[e.cont] then
+				tags[#tags + 1] = CONTINENTS[e.cont]
+			end
+			if #tags > 0 then
+				line = line .. " (" .. table.concat(tags, ", ") .. ")"
+			end
 		end
 		lines[#lines + 1] = line
 	end
@@ -371,7 +449,7 @@ function TrainerHint.selfTest()
 	eq("pick ranks", (function()
 		local r = TrainerHint.pick(expert, 1, 1, 3)
 		return table.concat({tostring(r[1] and r[1].rank), tostring(r[2] and r[2].rank), tostring(r[3] and r[3].rank)}, ",")
-	end)(), "0,1,2")
+	end)(), "0,2,3")
 	eq("pick limit", show(TrainerHint.pick(expert, 2, 2, 2)), "Ann@102,Flo@105")
 	eq("pick outdoor before indoor, unknown continent last",
 		show(TrainerHint.pick(expert, 99, nil, 3)), "Ann@101,Flo@105,Ed@103")
@@ -380,7 +458,66 @@ function TrainerHint.selfTest()
 	eq("pick default limit is MAX_ENTRIES", #TrainerHint.pick(expert, 99, nil), TrainerHint.MAX_ENTRIES)
 	eq("MAX_ENTRIES is 1: only the nearest trainer", TrainerHint.MAX_ENTRIES, 1)
 	eq("pick empty list", #TrainerHint.pick({}, 1, 1, 3), 0)
+	-- neighbours: neighbors[map] = "walk" | "route" (out of the map the party stands on)
+	eq("pick: a walk neighbour beats a teacher elsewhere on the continent",
+		show(TrainerHint.pick(expert, 99, 1, 1, {[4] = "walk"})), "Flo@105")
+	eq("pick: without neighbour data the continent decides as before",
+		show(TrainerHint.pick(expert, 99, 1, 1)), "Ann@101")
+	eq("pick: neighbours, then the rest of the continent", show(TrainerHint.pick(expert, 99, 1, 3,
+		{[2] = "route", [4] = "walk"})), "Ann@102,Flo@105,Ed@103")
+	eq("pick: neighbour ranks and links", (function()
+		local r = TrainerHint.pick(expert, 99, 1, 3, {[2] = "route", [4] = "walk"})
+		return table.concat({r[1].rank, tostring(r[1].link), r[2].rank, tostring(r[2].link), r[3].rank, tostring(r[3].link)}, ",")
+	end)(), "1,route,1,walk,2,nil")
+	eq("pick: the party's own map still comes first", show(TrainerHint.pick(expert, 1, 1, 2, {[2] = "route"})),
+		"Ann@101,Ed@103")
+	eq("pick: party in an indoor map, last outdoor map as reference", (function()
+		local r = TrainerHint.pick(expert, 3, 1, 3, {[4] = "walk"}, 1)
+		return show(r) .. ";" .. r[1].rank .. r[2].rank .. r[3].rank
+	end)(), "Ann@101,Ed@103,Flo@105;001")
+	eq("pick: a teacher on the reference map is outside, one on the party map is not", (function()
+		local r = TrainerHint.pick(expert, 3, 1, 3, {[4] = "walk"}, 1)
+		return tostring(r[1].outside) .. "," .. tostring(r[2].outside) .. "," .. tostring(r[3].outside)
+	end)(), "true,nil,nil")
+	eq("pick: without a reference map the indoor map counts alone", show(TrainerHint.pick(expert, 3, 1, 3)),
+		"Ann@103,Ed@103,Flo@105")
 	eq("pick leaves the index alone", tostring((expert[1] or {rank = "missing"}).rank), "nil")
+
+	-- buildLinks ---------------------------------------------------------------------
+	local mapByFile = {["out01.odm"] = 1, ["out02.odm"] = 2, ["out03.odm"] = 4, ["d01.blv"] = 3}
+	local links = TrainerHint.buildLinks({
+		travels = {
+			["out01.odm"] = {up = {map = "Out03.odm"}, down = {map = "Nowhere.odm"}, StraightTravel = false},
+			["out99.odm"] = {left = {map = "out01.odm"}},		-- unknown source file
+			["out02.odm"] = {right = {map = "out02.odm"}},		-- itself
+		},
+		routes = {
+			{from = 1, to = {2, 4, 1, -1}},
+			{from = 2, to = {1}},
+			{from = 7, to = {}},
+		},
+		mapByFile = function(file) return mapByFile[file] end,
+	})
+	eq("links: walk wins over a route to the same map", links[1] and links[1][4], "walk")
+	eq("links: route", links[1] and links[1][2], "route")
+	eq("links: not to itself", links[1] and links[1][1], nil)
+	eq("links: unknown target file ignored", links[1] and links[1][0], nil)
+	eq("links: routes are one-way", links[2] and links[2][1], "route")
+	eq("links: unknown source file ignored", links[4], nil)
+	eq("links: no data at all", next(TrainerHint.buildLinks({mapByFile = function() end})), nil)
+	eq("links: nothing given", next(TrainerHint.buildLinks(nil)), nil)
+
+	-- neighbours --------------------------------------------------------------------
+	local nl = {[1] = {[2] = "route", [5] = "walk"}, [3] = {[2] = "walk", [6] = "route"}}
+	eq("neighbours: party map only", TrainerHint.neighbours(nl, 1), nl[1])
+	eq("neighbours: indoor map without links uses the reference map", TrainerHint.neighbours(nl, 9, 3), nl[3])
+	eq("neighbours: both merged, walking wins", (function()
+		local n = TrainerHint.neighbours(nl, 1, 3)
+		return table.concat({n[2], n[5], n[6]}, ",")
+	end)(), "walk,walk,route")
+	eq("neighbours: merging leaves the links alone", nl[1][2], "route")
+	eq("neighbours: none", TrainerHint.neighbours(nl, 9, 8), nil)
+	eq("neighbours: no links", TrainerHint.neighbours(nil, 1, 3), nil)
 
 	-- compose: exact texts -------------------------------------------------------
 	local jasp = {name = "Jasp Hunter", houseName = "Hunter's Hovel", mapName = "Ravenshore", cont = 1, rank = 0}
@@ -400,6 +537,19 @@ function TrainerHint.selfTest()
 	eq("compose unknown current continent shows every continent", TrainerHint.compose({kind = "trainers",
 			nextName = "Expert", need = 4, have = 4, trainers = {nearby}}, plain),
 		"Next mastery: Expert (skill 4 required)\n Zed - Harmondale (Antagarich)")
+	eq("compose neighbour labels", TrainerHint.compose({kind = "trainers", nextName = "Master", need = 7, have = 7,
+			curCont = 1, trainers = {
+				{name = "A", mapName = "M1", cont = 1, rank = 1, link = "walk"}}}, plain),
+		"Next mastery: Master (skill 7 required)\n A - M1 (next map)")
+	eq("compose route label", TrainerHint.compose({kind = "trainers", nextName = "Master", need = 7, have = 7,
+			curCont = 1, trainers = {{name = "A", mapName = "M1", cont = 1, rank = 1, link = "route"}}}, plain),
+		"Next mastery: Master (skill 7 required)\n A - M1 (coach/boat)")
+	eq("compose route to another continent", TrainerHint.compose({kind = "trainers", nextName = "Master", need = 7,
+			have = 7, curCont = 1, trainers = {{name = "A", mapName = "M1", cont = 2, rank = 1, link = "route"}}}, plain),
+		"Next mastery: Master (skill 7 required)\n A - M1 (coach/boat, Antagarich)")
+	eq("compose outside label", TrainerHint.compose({kind = "trainers", nextName = "Master", need = 7, have = 7,
+			curCont = 1, trainers = {{name = "A", mapName = "M1", cont = 1, rank = 0, outside = true}}}, plain),
+		"Next mastery: Master (skill 7 required)\n A - M1 (outside)")
 	eq("compose none", TrainerHint.compose({kind = "none", nextName = "Grand Master"}, plain),
 		"Next mastery: Grand Master\n No trainer found.")
 	eq("compose trainers with an empty list is none", TrainerHint.compose({kind = "trainers",
@@ -442,16 +592,17 @@ function TrainerHint.selfTest()
 end
 
 ------------------------------------------------------------------------
--- Game adapter: reads the live engine data, caches the index until the
--- next map load (a quest MoveNPC or hiring without a map change shows up
--- only then -- known and accepted).
+-- Game adapter: reads the live engine data, caches the index and the map
+-- links until the next map load (a quest MoveNPC, hiring or a route's quest
+-- bit without a map change shows up only then -- known and accepted).
 ------------------------------------------------------------------------
 
 local MASTERY_NAMES = {[2] = "Expert", [3] = "Master", [4] = "Grand Master"}
 local MAX_MASTERY = 4			-- SplitSkill reports nothing above Grand Master
 local CHARACTER_CREATION = 21	-- Game.CurrentScreen while the party is built: no map yet
+local HOUSE_STABLES, HOUSE_BOATS = 27, 28	-- Game.Houses[i].Type
 
-local cache
+local cache, links, mapByFile
 local builtMs
 
 local function contains(list, value)
@@ -505,6 +656,78 @@ local function gameSource()
 	}
 end
 
+-- map index by lower-case file name (Game.MapStats does not change in a game)
+local function mapIndexByFile()
+	if not mapByFile then
+		mapByFile = {}
+		for i, stats in Game.MapStats do
+			local file = stats.FileName
+			if type(file) == "string" and file ~= "" and not mapByFile[file:lower()] then
+				mapByFile[file:lower()] = i
+			end
+		end
+	end
+	return mapByFile
+end
+
+-- src for buildLinks. A coach or boat house reads its row of Game.TransportIndex:
+-- row = its place among the stables (IndexByType - 1), the boats come after all
+-- stables (the layout RemoveHouseRulesLimits.lua gives the table from "House
+-- rules.txt"). A row holds up to four Game.TransportLocations (-1 = none); a
+-- location that needs a quest bit counts only once the bit is set.
+local function linkSource()
+	local houses, stables = {}, 0
+	for i, house in Game.Houses do
+		local kind = house.Type
+		if kind == HOUSE_STABLES or kind == HOUSE_BOATS then
+			local ok, nth, map = pcall(function()
+				local extra = Game.HousesExtra[i]
+				return extra.IndexByType, extra.Map
+			end)
+			if ok and nth and nth > 0 then
+				houses[#houses + 1] = {kind = kind, nth = nth, map = map}
+				if kind == HOUSE_STABLES then
+					stables = math.max(stables, nth)
+				end
+			end
+		end
+	end
+
+	local routes = {}
+	for _, h in ipairs(houses) do
+		if h.map and h.map > 0 then
+			local row = (h.kind == HOUSE_BOATS and stables or 0) + h.nth - 1
+			local to = {}
+			for slot = 1, 4 do
+				local ok, map = pcall(function()
+					local loc = Game.TransportIndex[row][slot]
+					if loc < 0 then
+						return nil
+					end
+					local tran = Game.TransportLocations[loc]
+					if tran.QBit ~= 0 and not Party.QBits[tran.QBit] then
+						return nil
+					end
+					return tran.MapIndex
+				end)
+				if ok and map then
+					to[#to + 1] = map
+				end
+			end
+			routes[#routes + 1] = {from = h.map, to = to}
+		end
+	end
+
+	local byFile = mapIndexByFile()
+	return {
+		travels = Game.OutdoorTravels,	-- MMMerge's 2_OutdoorTravels.lua
+		routes = routes,
+		mapByFile = function(file)
+			return byFile[file]
+		end,
+	}
+end
+
 local function getIndex()
 	if not cache then
 		local t0 = os.clock()
@@ -514,8 +737,27 @@ local function getIndex()
 	return cache
 end
 
+local function getLinks()
+	if not links then
+		links = TrainerHint.buildLinks(linkSource())
+	end
+	return links
+end
+
+-- in an indoor map: the outdoor map the party came from (vars.LastOutdoorMap,
+-- kept by MMMerge's 2_OutdoorTravels.lua); nil outdoors or when unknown
+local function referenceMap()
+	local ok, outdoor = pcall(Map.IsOutdoor)
+	if not ok or outdoor then
+		return nil
+	end
+	local file = vars.LastOutdoorMap
+	return type(file) == "string" and mapIndexByFile()[file:lower()] or nil
+end
+
 function TrainerHint.invalidate()
 	cache = nil
+	links = nil
 end
 
 -- block, reason: the hint block for (pl, skillId), or nil and why there is none.
@@ -581,10 +823,13 @@ function TrainerHint.explain(pl, skillId)
 		return nil, "no teacher topic for this mastery"
 	end
 
-	local contOk, curCont = pcall(TownPortalControls.MapOfContinent, Map.MapStatsIndex)
+	local curMap = Map.MapStatsIndex
+	local contOk, curCont = pcall(TownPortalControls.MapOfContinent, curMap)
 	info.curCont = contOk and curCont or nil
+	local refMap = referenceMap()
+	local neighbors = TrainerHint.neighbours(getLinks(), curMap, refMap)
 	-- teacher topics count masteries from Expert = 1, i.e. by the mastery the player has now
-	info.trainers = TrainerHint.pick(topics[m] or {}, Map.MapStatsIndex, info.curCont)
+	info.trainers = TrainerHint.pick(topics[m] or {}, curMap, info.curCont, nil, neighbors, refMap)
 	info.kind = reachable and "trainers" or "promotion"
 	return finish()
 end
@@ -623,11 +868,25 @@ function TrainerHint.describe()
 			entries = entries + #list
 		end
 	end
+	local linked, walks, routes = 0, 0, 0
+	for _, to in pairs(getLinks()) do
+		linked = linked + 1
+		for _, kind in pairs(to) do
+			if kind == "walk" then
+				walks = walks + 1
+			else
+				routes = routes + 1
+			end
+		end
+	end
+	local refMap = referenceMap()
 	return table.concat({
 		"trainer hint:",
 		"  option: " .. ((MawTrainerHintsEnabled and MawTrainerHintsEnabled()) and "ON" or "OFF"),
 		"  moved teachers: " .. ((enableAllTrainers and MawTrainerMoves) and "included" or "not included"),
 		("  index: %d skills, %d entries, built in %.1f ms"):format(skills, entries, builtMs),
+		("  links: %d maps, %d walking, %d coach/boat"):format(linked, walks, routes),
+		"  reference map: " .. (refMap and tostring(refMap) or "none (outdoors or unknown)"),
 	}, "\n")
 end
 
@@ -654,6 +913,28 @@ function TrainerHint.dump(skillId, mastery)
 			e.name, e.npc, e.house, e.houseName or "-", e.mapName, e.map, tostring(e.cont))
 	end
 	return table.concat(out, "\n")
+end
+
+-- console: print(MawCore.TrainerHint.travel()) -- where one gets in one step from the
+-- party's map, or from map index `map`
+function TrainerHint.travel(map)
+	map = map or Map.MapStatsIndex
+	local function name(i)
+		local ok, n = pcall(function() return Game.MapStats[i].Name end)
+		return ok and trim(n) or ("map " .. tostring(i))
+	end
+	local walk, route = {}, {}
+	for to, kind in pairs(getLinks()[map] or {}) do
+		local list = kind == "walk" and walk or route
+		list[#list + 1] = name(to)
+	end
+	table.sort(walk)
+	table.sort(route)
+	return table.concat({
+		("%s (map %d):"):format(name(map), map),
+		"  walking: " .. (#walk > 0 and table.concat(walk, ", ") or "-"),
+		"  coach/boat: " .. (#route > 0 and table.concat(route, ", ") or "-"),
+	}, "\n")
 end
 
 function TrainerHint.start()
