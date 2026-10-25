@@ -1,5 +1,5 @@
 -- TrainerHint.lua -- optional line in the skill tooltip: who teaches the next
--- mastery of this skill, and where (docs/superpowers/plans/2026-10-24-trainer-hint.md).
+-- mastery of this skill, and where.
 --
 -- Pure core (buildIndex / pick / compose / selfTest): no engine globals, so it
 -- loads and tests under a plain Lua interpreter. All engine reads sit in the
@@ -589,7 +589,7 @@ function TrainerHint.explain(pl, skillId)
 	return finish()
 end
 
--- the block SkillTooltip puts between description and mastery rows
+-- the block SkillTooltip appends to the end of the tooltip
 function TrainerHint.text(pl, skillId)
 	return (TrainerHint.explain(pl, skillId))
 end
