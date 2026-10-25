@@ -424,6 +424,7 @@ mulhook(0x48c0b6, 6, 1, function(d)
 
 	if t.Handled then
 		d:push(0x48c15c)
+		return true
 	end
 end)
 
