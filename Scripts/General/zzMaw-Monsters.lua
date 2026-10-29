@@ -794,6 +794,16 @@ function GetMonsterExpMult(difficulty)
 	return (GetDensityMean(3)/GetDensityMean(difficulty))^0.5
 end
 
+--safeguard against /0 crash
+function ClampMonsterDensity()
+	for i=1,Game.MapStats.High do
+		local map=Game.MapStats[i]
+		map.Mon1Low=math.min(map.Mon1Low, map.Mon1Hi)
+		map.Mon2Low=math.min(map.Mon2Low, map.Mon2Hi)
+		map.Mon3Low=math.min(map.Mon3Low, map.Mon3Hi)
+	end
+end
+
 function AdjustMonsterDensity()
 	--add difficulty related damage
 	if Game.BolsterAmount%50~=0 then
@@ -916,13 +926,7 @@ function AdjustMonsterDensity()
 		mapMonsterDensity=nil
 	end
 
-	--safeguard against /0 crash
-	for i=1,Game.MapStats.High do
-		local map=Game.MapStats[i]
-		map.Mon1Low=math.min(map.Mon1Low, map.Mon1Hi)
-		map.Mon2Low=math.min(map.Mon2Low, map.Mon2Hi)
-		map.Mon3Low=math.min(map.Mon3Low, map.Mon3Hi)
-	end
+	ClampMonsterDensity()
 end
 
 --fix to monsters AI (zombies and ghouls)

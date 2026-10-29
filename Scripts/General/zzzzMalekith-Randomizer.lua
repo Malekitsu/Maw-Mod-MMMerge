@@ -167,6 +167,7 @@ function events.BeforeLoadMap()
 				end
 			end
 		end
+		ClampMonsterDensity()
 		needsRestore = true
 	elseif needsRestore then
 		for i=1,Game.MapStats.High do
