@@ -277,10 +277,10 @@ Alchem shops Special
 Spellbook shops
 1	5
 2	7
-3	9
+3	10
 4	11
 5	6
-6	9
+6	10
 7	11
 Stables	Loc1	Loc2	Loc3	Loc4
 1	0	2	3	15
