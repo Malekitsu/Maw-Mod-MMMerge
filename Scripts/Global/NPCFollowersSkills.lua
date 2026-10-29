@@ -52,6 +52,10 @@ local function CountSkillBonus(skill)
 end
 
 function events.GetSkill(t)
+	-- Ascension bonus only for characters who have learned Ascension
+	if t.Skill == const.Skills.Learning and t.Player.Skills[t.Skill] == 0 then
+		return
+	end
 	local Skill, Mas = SplitSkill(t.Result)
 	Skill = Skill + (NPCBonuses.Skills[t.Skill] or CountSkillBonus(t.Skill))
 	t.Result = JoinSkill(Skill, Mas)
@@ -237,7 +241,7 @@ GoldFindBonuses = {[31] = 0.10, [32] = 0.20, [45] = 0.10}
 ---- Skill bonuses
 SkillBonuses = {
 
-[const.Skills.Learning] = {[4]	= 5, [13] = 10, [14] = 15},
+[const.Skills.Learning] = {[4]	= 2, [13] = 4, [14] = 6},
 [const.Skills.Staff]	= {[15] = 2, [16] = 3, [46] = 2},
 [const.Skills.Sword]	= {[15] = 2, [16] = 3, [46] = 2},
 [const.Skills.Dagger]	= {[15] = 2, [16] = 3, [46] = 2},
@@ -257,7 +261,7 @@ SkillBonuses = {
 [const.Skills.Body]		= {[17] = 2, [18] = 3, [19] = 4},
 [const.Skills.Light]	= {[17] = 2, [18] = 3, [19] = 4},
 [const.Skills.Dark]		= {[17] = 2, [18] = 3, [19] = 4},
-[const.Skills.Merchant]		= {[20] = 4, [21] = 6},
+[const.Skills.Merchant]		= {[20] = 4, [21] = 6, [48] = 3, [49] = 4, [50] = 8},
 [const.Skills.DisarmTraps]	= {[25] = 4, [26] = 6},
 [const.Skills.Perception]	= {[22] = 6, [47] = 5}
 }
