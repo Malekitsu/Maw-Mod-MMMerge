@@ -38,6 +38,7 @@ Load order inside the core is the `MawCore.ModuleOrder` list in
 | `Skills.lua` | port of `Skillz.dll`, stage 1: storage, engine GetSkill, bonus clamp, persistence, mastery tables, full `Skillz.*` API + legacy DLL bridge — **bridges to the DLL if `ExeMods/Skillz.dll` exists** |
 | `SkillTooltip.lua` | per-player skill tooltip text (`SKILL_TOOLTIPS.md`): `getTooltipText(pl, skillId)` + per-(skill, part) dynamic builders — replaces the legacy Tick handlers that rewrote the global desc store for the current player |
 | `SkillsUI.lua` | `Skillz.dll` stage 2: char-screen rows for extended skills, skill hints (text from `SkillTooltip`), house Learn-Skills integration (see `SKILLZ_PORT.md` engineering notes) |
+| `TrainerHint.lua` | optional block appended to the skill tooltip (after the bonus line) naming the nearest trainer for the next mastery, or "Grand Master reached." Sources: the NPCs' teacher topics (`Game.NPC` events → `Game.TeacherTopics`), teachers moved by `zzMAW_MoveTrainers.lua` (`MawTrainerMoves`). "Nearest" is ranked: (1) the party's map (in a dungeon also the outdoor map it came from, `vars.LastOutdoorMap`), (2) maps one step away on foot (`Game.OutdoorTravels`) or by coach/boat (`Game.TransportIndex`/`TransportLocations`), (3) the rest of the continent, (4) everywhere else. Off unless the per-save MAW setting "Trainer Hints" is ON. Index and map links are rebuilt on every map load |
 | `Pipeline.lua` | ordered named-stage chains — the replacement for N anonymous event handlers (damage is the first pipeline) |
 | `MonsterHP.lua` | real monster HP beyond the engine's 16-bit cap: per-map ledger (`mapvars.MawMonsterHP`), engine keeps a capped proxy; registered via `MawSetMonsterHP` at the recalc/spawn sites, applied by the pipeline's `monster-hp` stage (see `DAMAGE_PIPELINE.md` "MonsterHP") |
 | `MonsterAttackSpeed.lua` | per-monster attack speed multiplier (`mapvars.MawAttackSpeed`, set via `MawSetMonsterAttackSpeed(mon, mult)`): scales the engine's own progress on `CurrentActionStep` during attack states (animation and hit timing together) and divides the recovery set at each attack start; synced with `mawmapvarsend` |
@@ -63,7 +64,7 @@ Everything registered anywhere carries a **unique string id** — that's what ma
 Live: `Fixes` (DLL patches), `Formulas` (shared effect/display formulas —
 also used by legacy files), `Skills`/`SkillsUI` (Skillz port), `Damage`
 (the CalcDamageToMonster pipeline), `MonsterHP`, `SkillTooltip` (skill
-hints), `Tooltip` (all 13 item-tooltip sections), `Scheduler` (27 named
+hints), `TrainerHint` (opt-in appended trainer hint), `Tooltip` (all 13 item-tooltip sections), `Scheduler` (27 named
 tasks — every top-level Tick handler from the General/ mod files, bodies
 still in their home files, all at 0ms pending an interval-tuning pass;
 raw `events.Tick` remains only in sync files, self-removing transients,
@@ -75,6 +76,7 @@ and Global/ scripts). Still idle: `ItemFields` (no fields registered).
 print(MawCore.Scheduler.describe())
 print(MawCore.Tooltip.describe())
 print(MawCore.SkillTooltip.describe())
+print(MawCore.TrainerHint.describe())
 print(MawCore.Engine.describe())
 print(MawCore.ItemFields.describe())
 ```

@@ -2137,6 +2137,7 @@ function events.CanIdentifyMonster(t)
 end
 
 local partySharedSkills={24,25,26,29,31,34,37}
+MawSoloAutoMasterySkills=partySharedSkills --read by MawCore.TrainerHint (a solo player masters these automatically)
 local skillRequirements={1,4,7,10}
 function mawTick_SoloMastery()
 	--give masteries to solo player
