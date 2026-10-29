@@ -1124,12 +1124,17 @@ function events.MonsterKilled(mon)
 	if mon.Ally == 9999 or mon.NameId>300 then -- no drop from reanimated monsters
 		return
 	end
-	if vars.madnessMode then 
+	if vars.madnessMode then
 		if mapvars.mawBounty or Map.Name=="zarena.blv" or Map.Name=="d42.blv" or Map.Name=="7d05.blv" then
 			return
 		end
 	end
-	
+	if getBossSkill(mon)=="Skilled" then
+		for i=1,4 do
+			SummonItem(656, mon.X, mon.Y, mon.Z + 100, 100)
+		end
+	end
+
 	-- Apply seeding for deterministic drops (use same system as loot drops)
 	if vars.insanityMode then
 		-- Use the same deterministic monster-type seeding as loot drops

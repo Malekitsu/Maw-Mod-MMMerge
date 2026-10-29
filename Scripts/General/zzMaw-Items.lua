@@ -2794,13 +2794,21 @@ local function collectEquipEffects(it, tab)
 end
 
 
-local function collectArtifactBonuses(pl, it, tab)
+local function collectArtifactBonuses(pl, index, it, tab)
 	local bonuses=MawCore.Artifacts.BonusesOf(it)
 	if not bonuses then
 		return
 	end
+	local power=MawCore.Artifacts.PowerOf(it.Number)
+	local flat=power and power.Flat or {}
+	local res=vars.normalEnchantResistance[index]
 	for key,value in pairs(bonuses.Stats) do
-		tab[key+1]=tab[key+1]+value
+		local enchantPart=0
+		if MawCore.Artifacts.IsResistanceStat(key) then
+			enchantPart=math.max(value-(flat[key] or 0), 0)
+			res[key+1]=math.max(res[key+1] or 0, enchantPart)
+		end
+		tab[key+1]=tab[key+1]+value-enchantPart
 	end
 	for key,value in pairs(bonuses.Skills) do
 		tab[key+50]=(tab[key+50] or 0)+value
@@ -3408,7 +3416,7 @@ function itemStats(index)
 			collectEnchant(index, it, bonus, power, tab, true)
 		end
 		collectEquipEffects(it, tab)
-		collectArtifactBonuses(pl, it, tab)
+		collectArtifactBonuses(pl, index, it, tab)
 		if it.Bonus2==36 then
 			gotShieldEnchant=true
 		end

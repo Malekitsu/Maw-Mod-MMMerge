@@ -501,17 +501,20 @@ local function tooltipArtifactScaling(t)
 	if cut then
 		t.Description = t.Description:sub(1, cut - 1)
 	end
-	if t.Description:sub(1, 1) == "(" then
-		local close = t.Description:find(")", 1, true)
+	local prefix = t.Description:match("^Quest Item:%s*") or ""
+	local rest = t.Description:sub(#prefix + 1)
+	if rest:sub(1, 1) == "(" then
+		local close = rest:find(")", 1, true)
 		if close then
-			t.Description = t.Description:sub(close + 1):gsub("^%s+", "")
+			t.Description = prefix .. rest:sub(close + 1):gsub("^%s+", "")
 		end
 	end
 	local lines = {}
 	for _, stat in ipairs(sortedKeys(bonuses.Stats)) do
 		local name = itemStatName and itemStatName[stat + 1]
 		if name then
-			lines[#lines + 1] = name .. ": " .. signed(bonuses.Stats[stat])
+			local value = bonuses.Stats[stat]
+			lines[#lines + 1] = name .. ": " .. (value >= 65000 and "Immune" or signed(value))
 		end
 	end
 	for _, skill in ipairs(sortedKeys(bonuses.Skills)) do

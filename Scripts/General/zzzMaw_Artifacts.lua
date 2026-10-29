@@ -63,6 +63,24 @@ local function castAt(spell, pl, it, mon)
 	evt.CastSpell(spell, mastery, skill, mon.X, mon.Y, mon.Z + 50, mon.X, mon.Y, mon.Z)
 end
 
+local knockbacks = {}
+
+local function knockBack(t, pl, it)
+	local mult = MawArtifactSpellPower(pl, it)/math.max(t.Monster.Level, 1)^0.75
+	local entry = knockbacks[t.MonsterIndex]
+	if not entry then
+		entry = {}
+		knockbacks[t.MonsterIndex] = entry
+		MawCore.DamageState.addPush(entry)
+	end
+	entry.directionX, entry.directionY = directionToUnitVector(Party.Direction)
+	entry.duration = 60*mult^0.5
+	entry.totalDuration = entry.duration
+	entry.totalForce = 800*mult
+	entry.currentForce = entry.totalForce
+	entry.id = t.MonsterIndex
+end
+
 ----------------------------------------------------------------------
 -- MM8 artifacts (500-543). Their on-hit effects were hardcoded in the engine
 -- and died when Maw zeroed ItemAdditionalDamage, so they are re-stated here
@@ -214,6 +232,11 @@ artifactOnHit[1319] = {
 	Damage = 1.1,
 	MultVs = {[const.MonsterKind.Elf] = 2},
 }
+-- Justice
+artifactOnHit[1329] = {
+	Damage = 0.8,
+	MultVs = {[const.MonsterKind.Undead] = 2},
+}
 -- Elfbane -- the old code doubled the engine's own additional damage, which
 -- Maw zeroes, so this weapon had no anti-elf bonus for a while; the Damage
 -- gives its MultVs something to double.
@@ -228,11 +251,12 @@ artifactOnHit[2020] = {
 -- Thor
 artifactOnHit[2021] = {
 	Damage = 0.7,
-	Text = "Casts Lightning Bolt on hit",
+	Text = "Casts Lightning Bolt and knocks the target back on hit",
 	OnHit = function(t, pl, it)
 		CastSpellDirect(125, 7, 3)
 		if t.Monster.HP - t.Result > 0 then
 			castAt(18, pl, it, t.Monster)
+			knockBack(t, pl, it)
 		end
 	end,
 }
@@ -323,8 +347,13 @@ local playerBuffName = {
 	[const.PlayerBuff.Preservation] = "Preservation",
 }
 
+local partyBuffName = {
+	[const.PartyBuff.FeatherFall] = "Feather Fall",
+}
+
 --Poison1..3 and Disease1..3 are one word to the player
 local immunityName = {
+	[const.MonsterBonus.Afraid] = "Fear",
 	[const.MonsterBonus.Insane] = "Insanity",
 	[const.MonsterBonus.Disease1] = "Disease",
 	[const.MonsterBonus.Disease2] = "Disease",
@@ -390,6 +419,15 @@ function MawArtifactOnHitText(it)
 		table.sort(names)
 		lines[#lines + 1] = "Permanent " .. table.concat(names, ", ")
 	end
+	local partyBuffs = artifactPartyBuffs[it.Number]
+	if partyBuffs then
+		local names = {}
+		for buff in pairs(partyBuffs) do
+			names[#names + 1] = partyBuffName[buff] or "?"
+		end
+		table.sort(names)
+		lines[#lines + 1] = "Permanent " .. table.concat(names, ", ") .. " for the party"
+	end
 	local immune = artifactImmunities[it.Number]
 	if immune then
 		local seen, names = {}, {}
@@ -402,6 +440,12 @@ function MawArtifactOnHitText(it)
 		end
 		table.sort(names)
 		lines[#lines + 1] = "Immune to " .. table.concat(names, ", ")
+	end
+	if table.find(artifactHpRegen, it.Number) then
+		lines[#lines + 1] = "Regenerates Hit Points"
+	end
+	if table.find(artifactSpRegen, it.Number) then
+		lines[#lines + 1] = "Regenerates Spell Points"
 	end
 	if artifactAttackSpeed[it.Number] then
 		lines[#lines + 1] = "Swift"
@@ -733,6 +777,8 @@ end
 ----------------------------------------------------------------------
 
 artifactBuffs = {
+	[511]  = {[const.PlayerBuff.Shield] = 3},			-- Staff of the Swamp
+	[528]  = {[const.PlayerBuff.WaterBreathing] = 0},	-- Trident of Rulership
 	[1306] = {[const.PlayerBuff.Shield] = 3},			-- Governor's Armor
 	[1318] = {[const.PlayerBuff.WaterBreathing] = 0},	-- Hareck's Leather
 	[1322] = {[const.PlayerBuff.Shield] = 3},			-- Kelebrim
@@ -746,6 +792,12 @@ artifactBuffs = {
 	[2027] = {[const.PlayerBuff.Stoneskin] = 20},		-- Pellinore
 	[2028] = {[const.PlayerBuff.Shield] = 3},			-- Valeria
 	[2043] = {[const.PlayerBuff.Shield] = 3},			-- Aegis
+}
+
+artifactPartyBuffs = {
+	[522]  = {[const.PartyBuff.FeatherFall] = 3},		-- Archangel Wings
+	[1331] = {[const.PartyBuff.FeatherFall] = 3},		-- Hermes' Sandals
+	[1338] = {[const.PartyBuff.FeatherFall] = 3},		-- Lady's Escort ring
 }
 
 HORN_OF_ROS = 2055
@@ -782,6 +834,12 @@ function mawTick_ArtifactBuffs()
 					refreshBuff(pl.SpellBuffs[buff], skill)
 				end
 			end
+			local partyBuffs = artifactPartyBuffs[it.Number]
+			if partyBuffs then
+				for buff, skill in pairs(partyBuffs) do
+					refreshBuff(Party.SpellBuffs[buff], skill)
+				end
+			end
 		end
 	end
 	if partyHasItem(HORN_OF_ROS) then
@@ -798,6 +856,23 @@ end
 ----------------------------------------------------------------------
 
 artifactImmunities = {
+	-- Staff of the Swamp
+	[511] = {[const.MonsterBonus.Disease1] = true,
+			[const.MonsterBonus.Disease2] = true,
+			[const.MonsterBonus.Disease3] = true,
+			[const.MonsterBonus.Paralyze] = true,
+			[const.MonsterBonus.Poison1] = true,
+			[const.MonsterBonus.Poison2] = true,
+			[const.MonsterBonus.Poison3] = true},
+	-- Herald's Boots
+	[518] = {[const.MonsterBonus.Asleep] = true},
+	-- Herondale's Lost Shield
+	[534] = {[const.MonsterBonus.Afraid] = true,
+			[const.MonsterBonus.Stone] = true,
+			[const.MonsterBonus.Paralyze] = true,
+			[const.MonsterBonus.Asleep] = true},
+	-- Berserker Belt
+	[537] = {[const.MonsterBonus.Afraid] = true},
 	-- Yoruba
 	[1307] = {[const.MonsterBonus.Insane] = true,
 			[const.MonsterBonus.Disease1] = true,
@@ -854,7 +929,12 @@ end
 ----------------------------------------------------------------------
 
 artifactAttackSpeed = {
+	[504]  = -20,	-- Elderaxe
+	[506]  = -20,	-- Wyrm Spitter
+	[512]  = -20,	-- Longseeker
 	[515]  = -20,	-- Supreme Plate
+	[518]  = -20,	-- Herald's Boots
+	[532]  = -20,	-- Lightning Crossbow
 	[1302] = -20,	-- Puck
 	[2024] = -20,	-- Merlin
 	[2025] = -20,	-- Percival

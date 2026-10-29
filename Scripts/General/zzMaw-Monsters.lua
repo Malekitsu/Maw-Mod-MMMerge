@@ -4141,11 +4141,6 @@ function events.MonsterKilled(mon)
 	end
 	
 	local killedMonster=mon
-	if getBossSkill(killedMonster)=="Skilled" then
-		for i=1,4 do
-			SummonItem(656, killedMonster.X, killedMonster.Y, killedMonster.Z + 100, 100)
-		end
-	end
 	local monsterSkill = string.match(Game.PlaceMonTxt[killedMonster.NameId], "([^%s]+)")
 	if monsterSkill=="Omnipotent" then
 		for i=1,#SkillList do

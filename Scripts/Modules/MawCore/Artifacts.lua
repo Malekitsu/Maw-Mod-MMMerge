@@ -86,6 +86,7 @@ local function isResistanceStat(stat)
 	local last = const.Stats.BodyResistance or const.Stats.PoisonResistance
 	return stat >= const.Stats.FireResistance and stat <= last
 end
+Artifacts.IsResistanceStat = isResistanceStat
 
 --HP and SP enchants are amplified on read, not at generation: a budget point
 --spent on them has to buy the same as the enchant it is priced against.
