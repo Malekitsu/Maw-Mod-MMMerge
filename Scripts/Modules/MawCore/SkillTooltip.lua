@@ -58,7 +58,15 @@ function SkillTooltip.partText(pl, id, part)
 	return Skillz.getDesc(id, part)
 end
 
-function SkillTooltip.getTooltipText(pl, skillId, withBonus)
+-- SkillsUI copies at most HINT_CAP - 1 = 4095 bytes of the tooltip into its buffer
+local TOOLTIP_MAX_BYTES = 4095
+local HINT_SEPARATOR = "\n\n"
+local hintErrorsShown = {}
+
+-- text, info: info = {baseLen = bytes without the trainer hint, hintLen = bytes of
+-- the hint if there is one, status = "inserted" (appended) | "skipped" (too long) | "nil" (no
+-- hint) | "error"}; TrainerHint.probe reports it
+function SkillTooltip.build(pl, skillId, withBonus)
 	if withBonus == nil then
 		withBonus = true
 	end
@@ -91,7 +99,39 @@ function SkillTooltip.getTooltipText(pl, skillId, withBonus)
 			s[#s + 1] = string.format("\n\n Bonus: %s%d", diff > 0 and "+" or "", diff)
 		end
 	end
-	return table.concat(s)
+	local text = table.concat(s)
+	local info = {baseLen = #text, status = "nil"}
+	-- optional trainer hint (TrainerHint.lua). It runs under pcall: an error
+	-- escaping from here would make SkillsUI replace the whole tooltip.
+	-- It is only ever APPENDED: inserting it before the mastery rows made the
+	-- game show no skill tooltip at all (play test 2026-10-24)
+	local TH = MawCore.TrainerHint
+	if TH then
+		local ok, hint = pcall(TH.text, pl, skillId)
+		if not ok then
+			hint = tostring(hint)
+			info.status = "error"
+			info.error = hint
+			if not hintErrorsShown[hint] then
+				hintErrorsShown[hint] = true
+				print("[TrainerHint] " .. hint)
+			end
+		elseif type(hint) == "string" then
+			info.hintLen = #hint
+			-- over the buffer SkillsUI would cut the end off
+			if #text + #HINT_SEPARATOR + #hint < TOOLTIP_MAX_BYTES then
+				text = text .. HINT_SEPARATOR .. hint
+				info.status = "inserted"
+			else
+				info.status = "skipped"
+			end
+		end
+	end
+	return text, info
+end
+
+function SkillTooltip.getTooltipText(pl, skillId, withBonus)
+	return (SkillTooltip.build(pl, skillId, withBonus))
 end
 
 function SkillTooltip.describe()
