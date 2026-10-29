@@ -941,7 +941,7 @@ local function stage_bossAffixes(t)
 				end
 			end
 			if skill=="Regenerating" or skill=="Omnipotent" then
-				id=t.Monster:GetIndex()
+				local id=t.Monster:GetIndex()
 				mapvars.regenerating=mapvars.regenerating or {}
 				mapvars.regenerating[id] = mapvars.regenerating[id] or 0
 				mapvars.regenerating[id] = mapvars.regenerating[id] + 1
