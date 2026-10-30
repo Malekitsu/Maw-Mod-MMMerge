@@ -15,7 +15,9 @@
 -- Stage 1 scope (see SKILLZ_PORT.md "Status"):
 --   * extended skill storage, IDs 39..127, engine-visible (K1, K3)
 --   * skill+item-bonus clamp raised from the engine's 60 to 1023 (K12)
---   * persistence in vars instead of the DLL's skillz.bin (K2)
+--   * persistence in vars instead of the DLL's skillz.bin (K2); a save from
+--     the DLL era still has its skills in skillz.bin, which loadFromVars
+--     takes over once (see legacyWanted)
 --   * names/descriptions stored; base-skill (<39) writes reach the engine's
 --     own pointer arrays, extended ones are Lua-side only until the UI
 --     hooks arrive in stage 2 (K4, K5 partial)
@@ -162,15 +164,91 @@ local function syncToVars()
 		end
 		sk[p], ms[p] = rowS, rowM
 	end
-	MawCore.Save.data().skillz = {skills = sk, mastery = ms}
+	local d = MawCore.Save.data()
+	d.skillz = {skills = sk, mastery = ms}
+	d.skillzBinImported = true
+end
+
+-- Saves from the Skillz.dll era (before the Lua port) keep the extended skills
+-- in skillz.bin, a raw copy of the runtime block. The port never read it, so
+-- such a save came up with every extended skill gone. Decodes skillz.bin into
+-- the shape of vars.MawCore.skillz; nil unless it has exactly the block size.
+local BLOCK_SIZE = MASTERY_OFF + PLAYERS * NEW_COUNT
+
+local function decodeLegacyBlock(raw)
+	if not raw or #raw ~= BLOCK_SIZE then
+		return nil
+	end
+	local sk, ms = {}, {}
+	for p = 0, PLAYERS - 1 do
+		local rowS, rowM
+		for id = OLD_COUNT, NEW_COUNT - 1 do
+			local o = p * SKILL_ROW + (id - OLD_COUNT) * 2 + 1
+			local v = raw:byte(o) + raw:byte(o + 1) * 256
+			if v ~= 0 then
+				rowS = rowS or {}
+				rowS[id] = v
+			end
+		end
+		for id = 0, NEW_COUNT - 1 do
+			local m = raw:byte(MASTERY_OFF + p * NEW_COUNT + id + 1)
+			if m ~= 0 then
+				rowM = rowM or {}
+				rowM[id] = m
+			end
+		end
+		sk[p], ms[p] = rowS, rowM
+	end
+	return {skills = sk, mastery = ms}
+end
+
+-- Whether skillz.bin should be consulted for a save whose vars.MawCore is `d`
+-- (nil in saves older than the port). Only while vars hold no extended skills
+-- at all and no earlier save already settled the question: skillz.bin stays
+-- in the .dod forever, so without the flag it would bring back skills the
+-- player later dropped on purpose.
+local function legacyWanted(d)
+	if d and d.skillzBinImported then
+		return false
+	end
+	local z = d and d.skillz
+	return not (z and (next(z.skills or {}) or next(z.mastery or {})))
+end
+
+Skills.decodeLegacyBlock = decodeLegacyBlock
+Skills.legacyWanted = legacyWanted
+
+local function logSkills(msg)
+	local f = io.open(AppPath .. "MawDiag.txt", "a")
+	if f then
+		f:write(os.date("%Y-%m-%d %H:%M:%S"), " [Skills] ", msg, "\n")
+		f:close()
+	end
 end
 
 local function loadFromVars()
-	for i = 0, MASTERY_OFF + PLAYERS * NEW_COUNT - 4, 4 do
+	for i = 0, BLOCK_SIZE - 4, 4 do
 		mem.u4[block + i] = 0
 	end
 	local d = vars.MawCore
 	local z = d and d.skillz
+	if legacyWanted(d) then
+		local ok, legacy = pcall(function()
+			return decodeLegacyBlock(MawCore.Engine.readSaveFile("skillz.bin", BLOCK_SIZE))
+		end)
+		if not ok then
+			logSkills("skillz.bin not readable: " .. tostring(legacy))
+		elseif legacy then
+			local n = 0
+			for _, row in pairs(legacy.skills) do
+				for _ in pairs(row) do
+					n = n + 1
+				end
+			end
+			logSkills(("took %d extended skill values from skillz.bin of the old save"):format(n))
+			z = legacy
+		end
+	end
 	if not z then
 		return
 	end

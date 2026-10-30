@@ -10,6 +10,9 @@ like this" behind the migrated code** — the source files only point at it.
 - **Same repo, side by side.** Legacy mod keeps running; systems migrate one at
   a time and their legacy counterparts get deleted when the replacement takes over.
 - **Clean break on saves.** The finished greenfield requires a new game.
+  One exception (2026-10-30): the extended skills of saves from the
+  Skillz.dll era are taken over from their `skillz.bin` on load (`Skills.lua`,
+  `legacyWanted`), because the port otherwise silently emptied them.
 - **Multiplayer in scope (2026-09-08).** `Sync.lua` owns the host/client
   question and the host-owned game state; the damage pipeline publishes its
   final result as the `MawMonsterDamage` event, which the base multiplayer

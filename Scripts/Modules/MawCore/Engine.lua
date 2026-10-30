@@ -343,6 +343,32 @@ function Engine.restorePlayerBuffs(snapshot)
 	end
 end
 
+-- Raw contents of `name` inside the current savegame's LOD, or nil when the
+-- save has no such file or it is not exactly `size` bytes long. The size check
+-- matters: the stream is the whole .dod, so a short file would read on into
+-- the next one.
+function Engine.readSaveFile(name, size)
+	local found
+	for _, f in Game.SaveGameLod.Files do
+		if f.Name:lower() == name then
+			found = f
+			break
+		end
+	end
+	if not found or found.Size ~= size then
+		return nil
+	end
+	local stream = Game.SaveGameLod:FindFile(name, true)
+	if stream == 0 then
+		return nil
+	end
+	local buf = mem.malloc(size)
+	mem.call(offsets.fread, 0, buf, size, 1, stream)
+	local data = mem.string(buf, size, true)
+	mem.free(buf)
+	return data
+end
+
 function Engine.describe()
 	local out = {"engine patches applied:"}
 	for i, p in ipairs(Engine.Patches) do
