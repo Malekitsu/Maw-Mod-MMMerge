@@ -63,7 +63,7 @@ function Formulas.armorDamageTaken(ac, monsterLevel)
 end
 
 Formulas.resistanceDivisorBase = 100
-Formulas.resistanceDivisorPerLevel = 12
+Formulas.resistanceDivisorPerLevel = 3
 function Formulas.resistanceDamageTaken(resistance, monsterLevel)
 	local divisor = Formulas.resistanceDivisorBase + monsterLevel*Formulas.resistanceDivisorPerLevel
 	return 1/(resistance/divisor + 1)
