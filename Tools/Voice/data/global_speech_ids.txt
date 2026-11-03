@@ -1,0 +1,15 @@
+# Rows of the game's Global.txt (GlobalTxt) that an NPC says. Most of that table is interface text and stays silent.
+# One id per line (first column of the row); text after # is a comment. Checked by hand against the table.
+151   # Congratulations Adventurer.
+527   # Thank You!
+528   # I can offer you nothing further.
+529   # Sorry, but we are unable to train you.
+533   # I cannot join you, you're party is full  (the typo is in the game; the text is looked up as shown)
+536   # With your skills, you should be working here as a teacher.
+561   # Sorry, come back another day
+565   # Have a Drink first...
+570   # Good as New!
+574   # Welcome to the Arena of Life and Death. ...
+575   # Please wait while I summon the monsters.  Good luck.
+577   # Get back in there you wimps...
+582   # You already won this trip to the Arena...

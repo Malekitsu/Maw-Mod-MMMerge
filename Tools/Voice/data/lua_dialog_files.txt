@@ -1,0 +1,9 @@
+# Lua scripts (relative to <game>/Scripts) whose string literals are dialog lines of NPCs.
+# Everything in them that reads like a spoken sentence is voiced; the quest texts of MMMerge itself
+# (Quest_CrossContinents, PromotionTopics, ...) live in NPCText.txt and are already covered.
+# Not listed on purpose: Quest_SavingGoobers, Quest_DragonHatchling, BountyHunt - status read-outs, not NPC speech.
+Global/zzMAW_DruidCircletQuest.lua
+Global/zzMAWRespec.lua
+Global/zzMaw_DimensionalMapsQuest.lua
+Global/zzMaw_Arena.lua
+General/NPCFollowers.lua
