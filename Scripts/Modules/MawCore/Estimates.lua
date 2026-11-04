@@ -629,8 +629,8 @@ function getPlayerEstimatedSpellPower(lvl)
 
 	local add, dice, baseDelay = estimateSpellReference(lvl)
 	local empower = 1 + buffMult(const.Spells.Haste, skill, m)
-	dice = dice*empower*F.spellDiceScale(skill)
-	add = add*empower*F.spellAddScale(skill)
+	dice = dice*empower*F.spellDiceScale(skill)*F.spellDamageMult
+	add = add*empower*F.spellAddScale(skill)*F.spellDamageMult
 
 	local power = add + skill*SKILL_ENCHANT_MULT*(1 + dice)/2
 

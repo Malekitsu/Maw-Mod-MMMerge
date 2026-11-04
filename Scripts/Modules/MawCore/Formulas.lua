@@ -152,7 +152,8 @@ end
 
 Formulas.spellDicePerSkill  = 0.02
 Formulas.spellAddPerSkillSq = 0.01
-Formulas.spellSkillBase     = 1.025
+Formulas.spellSkillBase     = 1.02
+Formulas.spellDamageMult    = 0.7
 
 function Formulas.spellDiceScale(s)
 	return (1 + Formulas.spellDicePerSkill*s)*Formulas.spellSkillBase^s
