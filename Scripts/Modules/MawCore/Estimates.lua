@@ -157,7 +157,7 @@ function getWeaponLevelDamage(itemLevel, twoHanded, weaponFlat)
 	return ((levelDamage + arms)*estimateWeaponDamageMultiplier(itemLevel) + statFlat)*mightMult
 end
 
-local STAT_SHARE = 0.25
+local STAT_SHARE = 1/6
 
 --Every enchant a fully geared character wears, added up.
 --slots are: 2h weapon, cloak, helm, armor, gloves, boots, ring, amulet, bow, belt,
@@ -257,8 +257,8 @@ local function computeHealth(lvl)
 	local mastery = masteryPerLevel(lvl)
 
 	--flat HP enchants: they roll on their own curve, not the per-level one
-	local healthPower = stat/10
-	local flatBonus = healthPower*math.min(1 + healthPower/50, 5)*4
+	local strength = GetMaxEnchantStrength(lvl)
+	local flatBonus = getTotalEnchantPower(lvl)*STAT_SHARE*gearedFraction(lvl)*(1 + math.min(strength/50, 5))
 
 	--endurance and bodybuilding both buy extra HP on every level
 	local enduranceEffect = stat/5
@@ -524,7 +524,7 @@ local LEGENDARY_33_SKILL = 10		--added to every melee weapon skill
 SKILL_ENCHANT_MULT = 1.5
 
 function getMeleeSkill(lvl)
-	return estimateSkill(lvl)*SKILL_ENCHANT_MULT + LEGENDARY_33_SKILL*legendaryRamp(lvl)
+	return estimateSkill(lvl) + LEGENDARY_33_SKILL*legendaryRamp(lvl)
 end
 
 
