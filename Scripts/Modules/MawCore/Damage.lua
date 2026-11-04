@@ -1700,7 +1700,6 @@ local function pstage_damageRecompute(t)
 		return
 	end
 	
-	local damage=getMonsterDamage(mon)
 	--works for attack 1 and 2
 	if data.MonsterAction==1 then
 		local atk1=mon["Attack1"]
@@ -1716,11 +1715,11 @@ local function pstage_damageRecompute(t)
 		local mult=damage2/damage1
 		
 		t.DamageKind=atk2.Type
-		t.Damage=damage*mult
+		t.Damage=getMonsterDamage(mon, nil, t.DamageKind)*mult
 	elseif data.MonsterAction==0 then
 		local atk=mon["Attack1"]
 		t.DamageKind=atk.Type
-		t.Damage=damage
+		t.Damage=getMonsterDamage(mon, nil, t.DamageKind)
 		
 	end
 	
@@ -1733,13 +1732,16 @@ local function pstage_damageRecompute(t)
 
 	--mapping
 	if getMapAffixPower(14) and math.random()<getMapAffixPower(14) then
+		if data.MonsterAction==0 or data.MonsterAction==1 then
+			t.Damage=t.Damage*getMonsterDamage(mon, nil, 12)/getMonsterDamage(mon, nil, t.DamageKind)
+		end
 		t.DamageKind=12
 	end
 	
 	--apply Damage
 	--modify spell damage as it's not handled in maw-monsters
 	if data and data.Monster and data.Object and data.Object.Spell<100 and data.Object.Spell>0 then
-		local damage=getMonsterDamage(mon)
+		local damage=getMonsterDamage(mon, nil, t.DamageKind)
 		if monsterSpellMultiplierList[data.Object.Spell] then
 			damage=damage*monsterSpellMultiplierList[data.Object.Spell]
 		end

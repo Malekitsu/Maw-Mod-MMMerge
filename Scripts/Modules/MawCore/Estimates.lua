@@ -413,13 +413,9 @@ end
 
 local COVER_BASE = 0.10
 local COVER_PER_SKILL = 0.01
-local COVER_GATE = {0, 1}	--worthless at novice, phases in across the expert band
+local COVER_GATE = {0, 1, 1, 1}	--worthless at novice, phases in across the expert band
 
-local TANK_RATIO_CAP = 7		--approached, never passed
-local TANK_RATIO_MIDPOINT = 240	--level at which it is halfway there
-local function tankVitalityRatio(lvl)
-	return 1 + (TANK_RATIO_CAP-1)*lvl/(lvl + TANK_RATIO_MIDPOINT)
-end
+local TANK_VITALITY_RATIO = 2
 
 local function coverMultiplier(lvl)
 	local skill = estimateSkill(lvl)
@@ -429,7 +425,7 @@ local function coverMultiplier(lvl)
 	end
 	local p = math.min(COVER_BASE + COVER_PER_SKILL*skill,
 		COVER_BASE + COVER_PER_SKILL*skillCap[50])*gate
-	local ratio = tankVitalityRatio(lvl)
+	local ratio = TANK_VITALITY_RATIO
 	if Party.Count <= 1 then
 		ratio = 1/MawCore.Formulas.soloCoverDamageTaken
 	end
@@ -437,7 +433,7 @@ local function coverMultiplier(lvl)
 end
 
 --average
-function getPlayerEstimatedVitality(lvl)
+function getPlayerEstimatedVitality(lvl, damageKind)
 	local health = estimateHealth(lvl)
 	local share = MawCore.Formulas.physicalVitalityShare
 
@@ -445,8 +441,11 @@ function getPlayerEstimatedVitality(lvl)
 	--dodges the elemental half too
 	local physical = estimatePhysicalDamageTaken(lvl)
 	local magic = estimateMagicDamageTaken(lvl)
-	local taken = (physical*share + magic*(1-share))
-		*estimateChanceToGetHit(lvl)*estimateLegendaryDamageTaken(lvl)
+	local mitigation = physical*share + magic*(1-share)
+	if damageKind then
+		mitigation = damageKind==const.Damage.Phys and physical or magic
+	end
+	local taken = mitigation*estimateChanceToGetHit(lvl)*estimateLegendaryDamageTaken(lvl)
 
 	return health/taken*coverMultiplier(lvl), physical, magic, taken, health
 end
@@ -455,14 +454,14 @@ function getPlayerEstimatedHealth(lvl)
 	return estimateHealth(lvl)
 end
 
-function getMonsterDamage(mon, level)
+function getMonsterDamage(mon, level, damageKind)
 	local hitToKill={14,10,7,6.5,6,5.5,5,4.5,4}
 	local hitToKillAusterity={15,10,5,4,3,2.5,2,1.5,1}
 	
 	if mon then
 		level=totalLevel[MawTierB(mon.Id)] or level
 	end
-	local vitality=getPlayerEstimatedVitality(level)
+	local vitality=getPlayerEstimatedVitality(level, damageKind)
 
 	local difficulty=GetDifficulty()
 	local hits=hitToKill[difficulty]

@@ -1990,10 +1990,11 @@ function events.BuildMonsterInformationBox(t)
 		t.ArmorClass.Text=string.format("Level:          " .. lvl .. "\n" .. t.ArmorClass.Text)
 	end
 	--difficulty multiplier
-	local damage=getMonsterDamage(mon)
+	local affixMult=1
 	if getMapAffixPower(1) then
-		damage=damage*(1+getMapAffixPower(1)/100)
+		affixMult=1+getMapAffixPower(1)/100
 	end
+	local damage=getMonsterDamage(mon, nil, mon.Attack1.Type)*affixMult
 	
 	--some statistics here, calculate the standard deviation of dices to get the range of which 95% will fall into
 	mean=damage
@@ -2011,6 +2012,7 @@ function events.BuildMonsterInformationBox(t)
 	if t.IdentifiedDamage or t.IdentifiedAttack then
 		t.Damage.Text=string.format("Attack 00000	050" .. lowerLimit .. "-" .. upperLimit .. " " .. text)
 		if mon.Attack2Chance>0 and Game.CurrentPlayer>=0 then
+			damage=getMonsterDamage(mon, nil, mon.Attack2.Type)*affixMult
 			mean=damage
 			range=((damage*1.25-damage*0.75)^2*2/12)^0.5*1.96
 			lowerLimit=round(math.max(mean-range, damage*0.75))
@@ -2032,14 +2034,15 @@ function events.BuildMonsterInformationBox(t)
 			spell=Game.Spells[spellId]
 			name=Game.SpellsTxt[spellId].Name
 			skill=SplitSkill(mon.SpellSkill)
-			--get damage multiplier
-			if monsterSpellMultiplierList[spellId] then
-				damage=damage*monsterSpellMultiplierList[spellId]
-			end
 			--damageType
 			damageType=spellToDamageKind[math.ceil(mon.Spell/11)]
 			if not damageType then
 				damageType=12
+			end
+			--get damage multiplier
+			damage=getMonsterDamage(mon, nil, damageType)*affixMult
+			if monsterSpellMultiplierList[spellId] then
+				damage=damage*monsterSpellMultiplierList[spellId]
 			end
 			--calculate
 			mean=damage
