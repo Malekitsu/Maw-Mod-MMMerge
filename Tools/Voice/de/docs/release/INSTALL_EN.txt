@@ -1,0 +1,61 @@
+MAW voices (English) and German edition - installation
+=======================================================
+
+What you get
+------------
+* MAW-Voices-EN : the English voices. About 8,500 spoken lines for the people of the game.
+* MAW-German    : the German edition. German texts, German voices, a language switch.
+                  Use it together with MAW-Voices-EN (English is the fallback).
+
+You need first
+--------------
+Might and Magic 8 (GOG) with MMMerge, the patch, Multiplayer and the MAW mod,
+installed in the order of the MAW README. The game must start and work.
+Close the game before you install.
+
+A. English voices (about 670 MB)
+--------------------------------
+1. Unzip MAW-Voices-EN-1.0.0.zip into the game folder.
+   (The folder that holds mm8.exe. Answer "Yes" when Windows asks to merge or replace files.)
+2. Start the game. Open the settings page "Sprache / Language" (MAW Extras, in the game menu).
+3. Set "Voice output" to On.
+Done. The people speak English now.
+
+B. German edition (about 400 MB, needs the English voices from A)
+-----------------------------------------------------------------
+Your game must contain the files Data\GermanT.lod and Data\GermanD.lod.
+(The installer uses them to make the rest of the German texts and the voices
+of your party members. They are not in our package.)
+
+1. Unzip MAW-German-1.0.0.zip into the game folder (same place as above).
+2. Double-click Install_German.exe in the game folder.
+   Windows may warn "Windows protected your PC" because the file is new and not signed:
+   click "More info", then "Run anyway". Nothing else needs to be installed.
+3. Wait until it says "Done." (2 to 5 minutes). Press Enter to close the window.
+4. Start the game. The game is German now.
+
+Settings (page "Sprache / Language" in the game, or MAWSettings.lua in the game folder)
+* Language          : Deutsch or English. Texts and voices follow this.
+* Items, tooltips   : English (default) or Deutsch. Names of items and the item info.
+* Shops, houses     : English (default) or Deutsch. All house names, shops and huts.
+* Voice output      : On or Off. The spoken lines of the people.
+Items and houses stay English on purpose: many players know the English names.
+After you change an option, restart the game.
+
+Back to English
+---------------
+Set "Language" to English in the game, restart. Or open MAWSettings.lua with Notepad
+and write   language = "en"
+Uninstall: delete the files of the packages again. Nothing else is changed.
+
+If something does not work
+--------------------------
+* Silence: check "Voice output" is On, the Sound slider is not at zero, and the folder
+  Data\Voices\NPC exists.
+* Text is still English: it is a text that the game makes in a script. Please send us the file
+  MawLanguageUntranslated.txt from the game folder.
+* Error messages: MawLanguageLog.txt and NPCVoicesLog.txt in the game folder.
+* Discord of the MAW mod: https://discord.gg/n59XMtMcnF
+
+This is a fan project. It is not made or approved by the owners of Might and Magic.
+See LICENSE.txt.

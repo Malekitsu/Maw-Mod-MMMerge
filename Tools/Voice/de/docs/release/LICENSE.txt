@@ -1,0 +1,30 @@
+MAW voices and German edition - terms of use / Nutzungsbedingungen
+===================================================================
+
+DRAFT, to be confirmed by the author before publication. / ENTWURF, vor der Veröffentlichung vom Autor zu bestätigen.
+
+English
+-------
+1. Code (Lua modules, Python tools): free to use, copy and change. Keep this notice.
+2. English voices: made on the author's PC with the model Kokoro-82M. Free to use with the game.
+3. German voices: made with ElevenLabs (voices "Michael Danisch" and "Sarah"). Free to use with the game
+   Might and Magic 8 / MAW. NOT allowed: selling them, using them to train AI models, or
+   passing them on under other terms.
+4. German texts: translated by AI and checked by hand. The texts that exist in the original German game
+   are NOT in this package. The installer makes them from your own game files.
+5. Might and Magic is a trademark of its owners. This is a fan project, not made or approved by them.
+   If an owner asks us to remove a file, we will remove it.
+6. No warranty.
+
+Deutsch
+-------
+1. Code (Lua-Module, Python-Werkzeuge): frei nutzbar, kopierbar und änderbar. Diesen Hinweis behalten.
+2. Englische Stimmen: auf dem PC des Autors mit dem Modell Kokoro-82M erzeugt. Frei nutzbar mit dem Spiel.
+3. Deutsche Stimmen: mit ElevenLabs erzeugt (Stimmen "Michael Danisch" und "Sarah"). Frei nutzbar mit dem Spiel
+   Might and Magic 8 / MAW. NICHT erlaubt: Verkauf, Training von KI-Modellen oder Weitergabe unter anderen
+   Bedingungen.
+4. Deutsche Texte: KI-Übersetzung, von Hand geprüft. Texte, die es im deutschen Originalspiel gibt,
+   sind NICHT in diesem Paket. Der Installer erzeugt sie aus deinen eigenen Spieldateien.
+5. Might and Magic ist eine Marke der Rechteinhaber. Das ist ein Fan-Projekt, nicht von ihnen erstellt
+   oder genehmigt. Wenn ein Rechteinhaber die Entfernung einer Datei verlangt, entfernen wir sie.
+6. Keine Gewährleistung.

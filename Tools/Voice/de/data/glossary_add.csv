@@ -1,0 +1,227 @@
+term_en,term_de,regel,beleg,hinweis
+Harmondale,Harmondale,behalten,75,Land/Stadt der Spielerfigur in MM7; Genitiv Harmondales; 'Lords von Harmondale'
+Free Haven,Free Haven,behalten,39,Stadt in MM7; ohne Artikel
+Silver Cove,Silver Cove,behalten,25,Stadt in MM7
+Stone City,Stone City,behalten,20,Zwergenstadt in den Grabhügeln
+Deyja,Deyja,behalten,26,Land der Nekromanten; Genitiv Deyjas
+Nighon,Nighon,behalten,24,Land der Hexenmeister; 'Hexenmeister von Nighon'
+Bracada,Bracada,behalten,31,Land der Zauberer; Adjektiv/Zusammensetzung siehe Bracada-Wüste
+Kriegspire,Kriegspire,behalten,26,Ort in MM7; Schloß Kriegspire
+Blackshire,Blackshire,behalten,24,Stadt in MM7
+Tatalia,Tatalia,behalten,21,Land in Erathia; Genitiv Tatalias
+Dragonsand,Dragonsand,behalten,17,Ort in MM7
+Stromgard,Stromgard,behalten,15,Ort/Familienname in MM7; Schloß Stromgard
+Evenmorn,Evenmorn,behalten,6,allein stehend unverändert; Zusammensetzung siehe Evenmorn-Inseln
+Darkmoor,Darkmoor,behalten,13,Ort in MM7; Schloß Darkmoor
+Sweet Water,Sweet Water,behalten,12,Ort in MM7
+Bootleg Bay,Bootleg Bay,behalten,11,Ort in MM7
+Riverstride / Fort Riverstride,Riverstride / Fort Riverstride,behalten,9,Festung bleibt 'Fort Riverstride'
+Paradise Valley,Paradise Valley,behalten,9,Ort in MM7
+Pleasant Valley,Pleasant Valley,behalten,7,Ort in MM7
+Icewind Pass / Icewind Keep,Icewind Pass / Icewind Keep,behalten,5,beide Namen bleiben englisch
+Rockham,Rockham,behalten,2,Ort in MM7
+Sorpigal / New Sorpigal,Sorpigal / New Sorpigal,behalten,15,MM6-Stadt; 'New Sorpigal' bleibt unübersetzt
+Mist,Mist,behalten,26,MM6-Stadt auf der Insel Mist; nicht verwechseln mit Walls of Mist
+Steadwick,Steadwick,behalten,12,Hauptstadt von Erathia; Genitiv Steadwicks
+Avlee,Avlee,behalten,55,Land; Genitiv Avlees; 'Erathia und Avlee'
+Celeste,Celeste,behalten,13,Stadt der Zauberer von Bracada
+Pierpont,Pierpont,behalten,17,Elfenstadt im Tularean-Wald; 'Vertrag von Pierpont'
+Tidewater,Tidewater,behalten,2,Stadt in Tatalia; Höhlen siehe Gezeitenhöhlen
+Goblinwatch,Goblinwatch,behalten,3,Goblinfestung in MM7
+Lincoln,Lincoln,behalten,4,Schiff der Kreeganer-Gegner (Wrack vor Avlee)
+Hermit's Isle,Hermit's Isle,behalten,4,Insel; bleibt englisch (so schon in Paket 07)
+Alamos,Alamos,behalten,8,Schloß Alamos
+Temper,Temper,behalten,12,Schloß Temper; Lord Temper
+Castle <Name> / <Name> Castle,Schloß <Name>,uebersetzen,89,"durchgehend 'Schloß Harmondale', 'Schloß Ironfist', 'Schloß Gryphonheart', 'Schloß Lambent', 'Schloß Gloaming', 'Schloß Darkmoor'; nicht 'Burg'; Genitiv 'des Schlosses Gryphonheart'; allgemein 'das Schloß'"
+Tularean Forest,Tularean-Wald,uebersetzen,23,"mit Bindestrich, Tularean bleibt unverändert; Höhlen = Tularean-Höhlen; Genitiv Tularean-Waldes; nicht 'Tulareanischer Wald', nicht 'Tularea-Wald', nicht englisch"
+Tularean Wood,Tularean-Holz,uebersetzen,6,Handelsware; analog Tularean-Wald
+Barrow Downs,Grabhügel,uebersetzen,10,"Plural, mit Artikel: 'in den Grabhügeln', 'der Grabhügel'; Zwergen-Gräberland um Stone City"
+Barrows,Hügelgräber,uebersetzen,2,einzelne Gräber im Labyrinth; nicht 'Hügelgräberhügel'
+Pit (Deyja),Grube,uebersetzen,19,"unterirdische Stadt der Nekromanten; 'die Grube', nicht 'die Pit'"
+Hall of the Pit,Halle der Grube,uebersetzen,3,Eingang zur Grube im Norden von Deyja
+Breeding Zone / Breeding Pit,Brutzone / Brutgrube,uebersetzen,5,"Bereich der Grube; Breeding Zone = Brutzone, Breeding Pit = Brutgrube"
+Walls of Mist,Nebelwälle,uebersetzen,5,"Prüfungsstätte der Zauberer; Plural, 'in den Nebelwällen'; auch in Anführungszeichen als Aufgabenname"
+Red Dwarf Mines,Minen der Roten Zwerge,uebersetzen,6,Muster wie 'Minen der Dunkelzwerge'; Singular 'Mine der Roten Zwerge'; Red Dwarf = Roter Zwerg
+Bracada Desert,Bracada-Wüste,uebersetzen,8,mit Bindestrich wie Eisensand-Wüste
+Evenmorn Islands,Evenmorn-Inseln,uebersetzen,5,Plural mit Bindestrich; Singular 'Evenmorn Island/Isle' = 'Insel Evenmorn'
+Emerald Island,Smaragdinsel,uebersetzen,16,ein Wort (Zusammensetzung); 'der Drache der Smaragdinsel'
+Star Island,Sterneninsel,uebersetzen,3,Zusammensetzung wie Smaragdinsel
+Frozen Highlands,Frosthochland,uebersetzen,4,Gebiet als Zusammensetzung
+Steel Mountains,Stahlberge,uebersetzen,2,Zusammensetzung
+White Cliff Caves,Weißklippenhöhlen,uebersetzen,2,ein Wort
+Tidewater Caverns,Gezeitenhöhlen,uebersetzen,2,ein Wort; Stadt Tidewater bleibt englisch
+Faerie Mound,Feenhügel,uebersetzen,2,Eingang zum Feenreich in Avlee; Halle unter dem Hügel bleibt als Umschreibung
+House of Stars,Haus der Sterne,uebersetzen,2,Wohnort des Schiedsrichters
+Land of the Giants,Land der Riesen,uebersetzen,8,
+Mire of the Damned,Sumpf der Verdammten,uebersetzen,9,bei Corlagons Anwesen
+Corlagon's Estate,Corlagons Anwesen,uebersetzen,3,Genitiv vorangestellt ohne Apostroph
+Clanker's Laboratory,Clankers Labor,uebersetzen,2,
+Abdul's Desert Resort,Abduls Wüstenresort,uebersetzen,3,
+Control Center / Control Cube,Kontrollzentrum / Kontrollwürfel,uebersetzen,4,Zugang zum Kontrollzentrum nur mit Kontrollwürfel (Tempel von VARN in Dragonsand)
+Dragon Towers,Drachentürme,uebersetzen,6,Abwehrtürme gegen Flieger; Singular Drachenturm
+Crescent River / Crescent Lake,Halbmondfluß / Halbmondsee,uebersetzen,2,
+Elemental Planes,Elementar-Ebenen,uebersetzen,2,Bindestrich wie Elementar-Portale
+Circle of Stone,Steinkreis,uebersetzen,3,Plural Steinkreise (Druidenstätten)
+Royal Library,Königliche Bibliothek,uebersetzen,2,
+Watchtower (Deyja),Wachturm,uebersetzen,6,'Wachturm 6'
+Sentinels,Sentinels,behalten,2,Felsformation/Posten bei Kriegspire; bleibt englisch (so in Paket 09)
+Temple of Baa,Tempel von Baa,uebersetzen,37,Kult der Schafe; Baa bleibt; 'Baa-Kult'
+Superior Temple / Supreme Temple of Baa,Oberer Tempel von Baa,uebersetzen,5,beide englische Varianten gleich
+Order of Baa,Orden von Baa,uebersetzen,2,
+Church of the Sun / Church of the Moon,Kirche der Sonne / Kirche des Mondes,uebersetzen,13,Plural Kirchen; Tempel (Temple of the Sun) bleibt davon getrennt
+Fraternal Order of Silver,Brüderlicher Orden des Silbers,uebersetzen,8,Orden der Silberhelme
+Silver Helms,Silberhelme,flexibel,12,Mitglieder des Ordens; Singular Silberhelm; 'Silberhelm-Außenposten'
+Shadow Guild,Schattengilde,uebersetzen,15,Gilde der Diebe und Spione
+Thieves' Guild,Diebesgilde,uebersetzen,8,
+Smugglers' Guild,Schmugglergilde,uebersetzen,4,
+Mercenary Guild,Söldnergilde,uebersetzen,8,"Namen der Gilden siehe Blades' End, Duelists' Edge, Berserkers' Fury"
+Blades' End,Klingenende,uebersetzen,3,Söldnergilde
+Duelists' Edge,Duellanten-Schneide,uebersetzen,5,Söldnergilde
+Berserkers' Fury,Berserkerwut,uebersetzen,4,Söldnergilde
+Buccaneers' Lair,Freibeuter-Versteck,uebersetzen,4,Söldnergilde in New Sorpigal
+Imp Slapper,Zum Wichtelklatscher,uebersetzen,2,Gasthaus; Muster wie 'Zum Piraten'
+Guild of Fire/Earth/Water/Air/Body/Spirit/Mind/Light/Dark,Gilde des Feuers / der Erde / des Wassers / der Luft / des Körpers / der Seele / des Geistes / des Lichts / der Dunkelheit,uebersetzen,15,"Kurzformen: Feuergilde, Erdgilde, Wassergilde, Luftgilde, Körpergilde, Seelengilde, Geistesgilde; zur Wahl vgl. Magie-Schulen im Glossar"
+Royal Diplomatic Corps,Königliches Diplomatisches Korps,uebersetzen,2,
+High Council,Hoher Rat,uebersetzen,17,Rat in Harmondale/Deyja; 'im Hohen Rat'
+Celestial Order,Himmlischer Orden,uebersetzen,2,
+Druid Circle,Druidenzirkel,uebersetzen,4,vgl. steinerner Druidenzirkel
+Scavenger Hunt,Schatzsuche,uebersetzen,4,Lord Markhams Schatzsuche
+Succession War(s),Thronfolgekrieg,flexibel,11,Plural Thronfolgekriege
+Timber War(s),Holzkrieg,flexibel,5,Plural Holzkriege
+Treaty of Pierpont,Vertrag von Pierpont,uebersetzen,3,beendete den ersten Holzkrieg
+Night of Shooting Stars,Nacht der Sternschnuppen,uebersetzen,8,
+Time of Wonders,Zeit der Wunder,uebersetzen,5,
+Mandate of Heaven,Mandat des Himmels,uebersetzen,5,
+Ritual of Endless Night,Ritual der endlosen Nacht,uebersetzen,2,allgemein 'das Ritual'
+Ceremony of Ascension,Zeremonie des Aufstiegs,uebersetzen,4,Druiden; 'Ceremony of the Sun' = 'Zeremonie der Sonne'
+Controlled Breach,Kontrollierte Bresche,uebersetzen,2,Ort in Alvar-Questkette
+Runaway Chaos,Entlaufenes Chaos,uebersetzen,5,
+Uneasy Origin Matter,Unruhige Urmaterie,uebersetzen,2,
+Heavenly Forge,Himmlische Schmiede,uebersetzen,4,Schmiede aus der Zeit vor dem Schweigen
+Third Eye,Drittes Auge,uebersetzen,4,Edelstein für das Gewölbe; 'das Dritte Auge'
+Scroll of Waves,Schriftrolle der Wellen,uebersetzen,2,
+Oscillation Overthruster,Oscillation Overthruster,behalten,8,"technischer Gegenstand, bleibt englisch (auch 'der Overthruster'); nicht 'Oszillations-Überstoßer'"
+Telelocator,Telelocator,behalten,21,Gerät; 'Verdants Telelocator'
+Soul Jar,Seelengefäß,uebersetzen,5,Plural Seelengefäße; Lich Jar bleibt Lich-Gefäß
+Pearl of Purity,Perle der Reinheit,uebersetzen,4,
+Druid Circlet of Power,Druidenreif der Macht,uebersetzen,3,
+Gryphonheart's Trumpet,Gryphonhearts Trompete,uebersetzen,3,Genitiv vorangestellt
+Chime of Harmony,Glockenspiel der Harmonie,uebersetzen,2,
+Hourglass of Time,Sanduhr der Zeit,uebersetzen,2,
+Seasons' Stole,Stola der Jahreszeiten,uebersetzen,3,
+Lantern of Light,Laterne des Lichts,uebersetzen,3,
+Parson's Quill,Parsons Feder,uebersetzen,2,"Feder, mit der der Vertrag von Pierpont unterzeichnet wurde"
+Griffin Feathers,Greifenfedern,uebersetzen,6,Handelsware; Singular Greifenfeder
+Glass Bottles,Glasflaschen,uebersetzen,6,
+Arrowheads,Pfeilspitzen,uebersetzen,6,
+Enrothian Wine,Enroth-Wein,uebersetzen,8,
+Philosopher Stones,Steine der Weisen,uebersetzen,2,
+Wisp Wrappings / Will'o'Wisp Hearts,Irrlicht-Umhüllungen / Irrlichtherzen,uebersetzen,5,Zutaten für den Telelocator
+Wolf Eyes / Dragon's Eyes,Wolfsaugen / Drachenaugen,uebersetzen,2,Zutaten
+Phoenix Feathers,Phönixfedern,uebersetzen,2,Singular Phönixfeder
+Gog Blood,Gog-Blut,uebersetzen,2,Zutat
+Focal Ring,Fokusring,uebersetzen,2,Zutat
+Goblin's Tooth,Goblinzahn,uebersetzen,2,
+Lloyd's Beacon,Lloyds Leuchtfeuer,uebersetzen,4,Zauber
+Town Portal,Stadtportal,uebersetzen,5,Zauber
+Divine Intervention,Göttliches Eingreifen,uebersetzen,5,Zauber; Genitiv 'des Göttlichen Eingreifens'
+Water Walk,Wasserwandeln,uebersetzen,2,Zauber
+First Aid,Erste Hilfe,uebersetzen,2,Zauber
+Power Cure,Kraftheilung,uebersetzen,3,Zauber
+Fly (Zauber),Fliegen,uebersetzen,5,Zauber der Luftmagie
+Unarmed Combat,Faustkampf,uebersetzen,7,Fertigkeit; so bereits in Paket 05 und 07
+Dodging,Ausweichen,uebersetzen,6,Fertigkeit; 'Fertigkeit im Ausweichen'
+Lock Picking,Schlösserknacken,uebersetzen,3,Fertigkeit; 'Experte im Schlösserknacken'
+Stealing,Stehlen,uebersetzen,6,Fertigkeit
+Diplomacy,Diplomatie,uebersetzen,5,Fertigkeit
+Grandmaster,Großmeister,flexibel,32,Schreibvariante von Grand Master; Rang und Titel 'Großmeister der ...'
+Cavalier,Kavalier,flexibel,6,MM6/MM7-Rang der Ritter; Plural Kavaliere (Dativ Kavalieren)
+Champion (Rang),Erster Ritter,uebersetzen,11,"Glossar hat Vorrang: Champion = Erster Ritter, Plural 'Erste Ritter' ('zu Ersten Rittern ernennen'); nie 'Champion(s)'; ArcoMage Champion bleibt Arcomage-Meister"
+Paladin,Paladin,flexibel,5,Plural Paladine
+Foremost Paladin,Oberster Paladin,uebersetzen,2,Titel von Wilbur Humphrey
+Archer,Bogenschütze,flexibel,5,Klasse; Plural Bogenschützen
+Warrior Mage,Kriegsmagier,flexibel,7,Rang der Bogenschützen; Dativ Kriegsmagiern
+Master Archer,Meisterbogenschütze,flexibel,4,Dativ Plural Meisterbogenschützen
+Sniper,Scharfschütze,flexibel,4,Plural Scharfschützen
+Sorcerer,Magier,flexibel,33,Klasse; Plural Magier; 'Magus' nur als Titel eines Lehrers
+Wizard,Zauberer,flexibel,23,Rang der Magier; Dativ Plural Zauberern; Wizard Eye bleibt Magisches Auge
+Archmage,Erzmagier,flexibel,6,Rang; Plural Erzmagier
+Mage,Magier,flexibel,2,allgemein; Ogre Mage = Ogermagier
+Warlock,Hexenmeister,flexibel,21,Rang der Druiden; Dativ Plural Hexenmeistern
+Druid,Druide,flexibel,18,Plural Druiden
+Great Druid,Großer Druide,flexibel,6,"zwei Wörter, Adjektiv gebeugt: 'Große Druiden', 'Großen Druiden'; nicht 'Großdruide'"
+Arch Druid,Erzdruide,flexibel,3,Plural Erzdruiden
+Honorary <Rang>,Ehren-<Rang> / <Rang> ehrenhalber,uebersetzen,44,"Einwortränge mit Bindestrich: 'Ehren-Kavalier', 'Ehren-Priester', 'Ehren-Kriegsmagier'; mehrwortige Ränge nachgestellt: 'Erste Ritter ehrenhalber', 'Große Druiden ehrenhalber', 'Waldläufer-Lords ehrenhalber'; nie zusammengeschrieben ('Ehrenpriester'); Ehrentitel = honorary title bleibt"
+Priest,Priester,flexibel,26,"Dativ Plural Priestern; 'Priester des Lichts', 'Priester der Dunkelheit'"
+High Priest,Hohepriester,flexibel,7,ein Wort; Genitiv Hohepriesters
+Rogue,Schurke,flexibel,9,MM6/7-Rang der Diebe; Plural Schurken; nicht 'Gauner'
+Spy,Spion,flexibel,3,Rang; Plural Spione
+Assassin,Meuchelmörder,flexibel,8,"Rang; nicht 'Assassine', nicht 'Attentäter'"
+Master Assassin,Meistermeuchelmörder,uebersetzen,2,ein Wort
+Thief,Dieb,flexibel,22,Plural Diebe
+Master Thief,Meisterdieb,uebersetzen,5,
+Villain,Bösewicht,flexibel,7,Rang der Dunkelmagier; Dativ Plural Bösewichten
+Monk,Mönch,flexibel,2,Klasse; Plural Mönche
+Initiate,Eingeweihter,flexibel,5,Rang der Mönche; Plural Eingeweihte (Dativ Eingeweihten)
+Ninja,Ninja,flexibel,4,Plural Ninjas
+Hunter,Jäger,flexibel,9,Rang; Kopfgeldjäger siehe Bounty Hunter
+Ranger,Waldläufer,flexibel,5,Rang
+Ranger Lord,Waldläufer-Lord,uebersetzen,3,Bindestrich wie Minotauren-Lord
+Black Knight,Schwarzer Ritter,flexibel,3,"Rang; Plural 'Schwarze Ritter', Dativ 'Schwarzen Rittern'"
+Dragoon,Dragoner,flexibel,8,Banditen bei Harmondale; Plural Dragoner
+Lich (Rang),Liche,flexibel,9,Plural; 'Liche ehrenhalber'; Rang der Nekromanten
+Titan,Titan,flexibel,7,Plural Titanen
+Dwarf,Zwerg,flexibel,19,Plural Zwerge; Red Dwarf = Roter Zwerg; Dwarf King = Zwergenkönig
+Faerie,Fee,flexibel,8,Plural Feen; Faerie King = Feenkönig; Faerie Pipes = Feenflöte
+Giant,Riese,flexibel,9,Plural Riesen
+Devil,Teufel,flexibel,9,"Plural Teufel; Kreegan-Teufel, nicht 'Dämonen'"
+Medusa,Meduse,flexibel,5,Plural Medusen; nicht 'Medusa'
+Golem,Golem,flexibel,2,Plural Golems
+Duergar,Duergar,flexibel,2,Plural unverändert
+Goblin,Goblin,flexibel,7,Plural Goblins
+Erathian (Volk),Erathianer,flexibel,3,Adjektiv erathianisch (Glossar)
+King,König,flexibel,72,"'König Roland', 'König Parson'; Plural Könige"
+Regent,Regent,flexibel,6,"'Regent Wilbur Humphrey', Dativ Regenten"
+Judge,Richter,flexibel,17,'Richter Grey'
+Arbiter,Schiedsrichter,flexibel,8,Amt in Harmondale; nicht 'Richter'
+Mayor,Bürgermeister,flexibel,3,
+Ambassador,Botschafter,flexibel,7,'Botschafter Scale'
+Warlord,Kriegsherr,flexibel,4,Dativ/Akkusativ Kriegsherrn
+Highness,Hoheit,flexibel,2,Anrede
+Lord / Lords,Lord / Lords,behalten,102,"Titel bleibt englisch, Plural 'Lords'; 'Meine Lords' für 'my lords'; nicht 'Herr/Herren'"
+Lords of Harmondale,Lords von Harmondale,uebersetzen,24,feste Anrede der Spieler; nicht 'Herren von Harmondale'
+My Lords,Meine Lords,uebersetzen,42,Anrede der Gruppe (MM7); nicht 'meine Herren'
+Lady,Lady,behalten,11,"'Lady Ellen', 'Lady Fleise'"
+Mr.,Herr,uebersetzen,6,"'Herr Malwick', 'Herr Steel'"
+Ethric the Mad,Ethric der Wahnsinnige,uebersetzen,4,Beiname übersetzt
+Wromthrax the Heartless,Wromthrax der Herzlose,uebersetzen,2,Beiname übersetzt
+Robert the Wise,Robert der Weise,uebersetzen,3,Beiname übersetzt
+Prince of Thieves,Prinz der Diebe,uebersetzen,3,
+Self Guild / Guild of the Self,Gilde des Selbst,uebersetzen,8,"MM6-Name, getrennt von Spirit Guild = Seelengilde / Gilde der Seele und Mind Guild = Geistesgilde; Plural 'Gilden des Selbst'; nicht mit Seelengilde mischen"
+Circus of the Sun,Zirkus der Sonne,uebersetzen,5,nie englisch 'Circus of the Sun'
+Star Lake,Star Lake,behalten,8,MM7-Ortsname wie Silver Cove (3 von 5 Übersetzern englisch); nicht 'Sternensee'; Sterneninsel (Star Island) bleibt wie im Glossar
+Silver River / White Forest River / Winter Cap / White Cap / Spyre Town / Sweet Water Pass,Silver River / White Forest River / Winter Cap / White Cap / Spyre Town / Sweet Water Pass,behalten,20,MM7-Ortsnamen bleiben englisch (so von allen Übersetzern gehandhabt)
+Blackwoode Forest,Blackwoode Forest,behalten,5,bleibt englisch (so in allen Paketen)
+Temple Stone,Temple Stone,behalten,6,Eigenname des Tempels in Free Haven; nicht 'Tempel Stone'
+King's Crown / Eagle's Eye / Knight's Paradise / Howling Moon / On the House / Mighty Magicks / Protection Services,unverändert,behalten,10,"Namen von Läden, Tavernen und Gilden bleiben englisch"
+the Crossing,Überfahrt,uebersetzen,3,Schiffsüberfahrt; allgemein 'crossings' = Überquerungen
+Fountain of Magic,Brunnen der Magie,uebersetzen,3,nie englisch; Fountains-Reiter im Autonotizbuch (UI-Begriff) bleibt 'Fountains'
+Gargoyle,Gargyle,flexibel,2,Plural Gargylen; Zusammensetzung Diamantgargylen
+Troglodyte,Troglodyt,flexibel,4,Plural Troglodyten
+Order of the Fist,Orden der Faust,uebersetzen,2,Token Fist (Personenname) bleibt
+Temple of the Fist,Tempel der Faust,uebersetzen,1,siehe Orden der Faust
+Necromancers' Guild,Gilde der Nekromanten,uebersetzen,8,nicht 'Nekromantengilde'; Kurzform sonst nur mit Namen (Gilde der Nekromanten)
+Dimension Door,Dimensionstor,uebersetzen,2,Zauber; Plural Dimensionstore; Schriftrolle des Dimensionstors
+Raise Dead,Tote erwecken,uebersetzen,3,Zauber: 'der Zauber Tote erwecken'; nicht gleichsetzen mit Resurrection
+Resurrection (Zauber),Auferstehung,uebersetzen,2,"Zauber; als Tempeldienst (Preis, Kosten) 'Wiederbelebung'"
+Heroism,Heldentum,uebersetzen,2,Zauber
+Bless,Segen,uebersetzen,3,Zauber: 'der Zauber Segen'
+Ice Blast,Eisstoß,uebersetzen,1,Zauber
+Lightning Bolt,Blitzschlag,uebersetzen,2,Zauber; Plural Blitzschläge
+Fireball,Feuerball,uebersetzen,3,Zauber; Feuerball-Zauberstab
+Blaster,Blaster,behalten,7,Fertigkeit/Waffe; Fertigkeitsstufe im Blaster
+Liche (Plural),Liche,uebersetzen,12,Plural von Lich; Genitiv Singular 'des Lichs'; nicht 'die Lichs'; Buch der Liche
+Honorary Druid / Honorary Arch Druid,Ehren-Druide / Ehren-Erzdruide,uebersetzen,4,"Einwortränge mit Bindestrich: 'zu Ehren-Druiden', 'zu Ehren-Erzdruiden'; Mehrwort bleibt 'Große Druiden ehrenhalber'"
+Villain (Rangtitel),Bösewicht,flexibel,8,Rang der Dunkelmagier auch in 'Bösewicht von außerordentlichem Rang'; Rogue = Schurke; als Schimpfwort/Anrede ('Villain!') ist Schurke zulässig
+castle (allgemein),Schloß,uebersetzen,25,"'Euer Schloß', 'das Schloß', 'im Schloß'; 'Burg' nur dort, wo Schloß mit Türschloß verwechselt würde; Fort/Keep/fortress bleiben Festung; Castle <Name> siehe oben"
+Lords of Harmondale (rightful rulers),Lords von Harmondale,uebersetzen,2,"auch 'die rechtmäßigen Lords von Harmondale', nicht 'Herrscher'"

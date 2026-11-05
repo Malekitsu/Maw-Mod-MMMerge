@@ -1,0 +1,10 @@
+MAW NPC voices - terms of use
+=============================
+
+DRAFT, to be confirmed by the author before publication.
+
+1. Code (Lua module, Python tools): free to use, copy and change. Keep this notice.
+2. English voices: made on the author's PC with the model Kokoro-82M. Free to use with the game.
+3. Might and Magic is a trademark of its owners. This is a fan project, not made or approved by them.
+   If an owner asks us to remove a file, we will remove it.
+4. No warranty.

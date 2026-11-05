@@ -1,0 +1,87 @@
+Table;Id;Field;German
+GlobalTxt;46;;Dunkelpriester
+GlobalTxt;680;;Sonnenpriester
+GlobalTxt;86;;Vorrat für %d Tage: %d Gold
+GlobalTxt;88;;Monster erkennen
+GlobalTxt;195;;Gegenstand zum Kauf wählen
+GlobalTxt;196;;Spezialgegenstand wählen
+GlobalTxt;197;;Zu bestimmenden Gegenstand wählen
+GlobalTxt;198;;Zu reparierenden Gegenstand wählen
+GlobalTxt;199;;Zu verkaufenden Gegenstand wählen
+GlobalTxt;237;;Bis zum Morgen warten
+GlobalTxt;446;;Bestimmen misslungen
+GlobalTxt;459;;Blitzschutz
+GlobalTxt;469;;Ihr braucht %d weitere Fertigkeitspunkte
+GlobalTxt;471;;Gegenstand gefunden (%s)!
+GlobalTxt;484;;Zauber wählen, dann hier klicken
+GlobalTxt;491;;Meteorregen nicht in Gebäuden!
+GlobalTxt;492;;Inferno nicht im Freien!
+GlobalTxt;493;;Sprung nicht in der Luft!
+GlobalTxt;494;;Fliegen nicht in Gebäuden!
+GlobalTxt;495;;Sternenfeuer nicht in Gebäuden!
+GlobalTxt;499;;Armageddon nicht in Gebäuden!
+GlobalTxt;501;;Nahrung: %lu
+GlobalTxt;502;;Nahrung gefunden: %lu
+GlobalTxt;504;;Nahrung verloren: %lu
+GlobalTxt;523;;Leuchtfeuer holen
+GlobalTxt;529;;Wir können Euch nicht trainieren.
+GlobalTxt;533;;Eure Gruppe ist voll, ich kann nicht mit!
+GlobalTxt;542;;Reparieren
+GlobalTxt;555;;Schmugglerbucht West
+GlobalTxt;561;;Kommt an einem anderen Tag wieder
+GlobalTxt;571;;Bereit: %s
+GlobalTxt;583;;In der Arena kein Speichern
+GlobalTxt;667;;Zurücksetzen
+GlobalTxt;713;;BEREITZAUBER
+GlobalTxt;750;;Euch fehlt das Können dafür.
+NPCTopic;1;;Elementarsturm
+NPCTopic;4;;Elementarsturm
+NPCTopic;7;;Elementarsturm
+NPCTopic;11;;Elementarsturm
+NPCTopic;161;;Elementarsturm
+NPCTopic;114;;Kerker der Elementarfürsten
+NPCTopic;119;;Armee aufstellen
+NPCTopic;227;;Knochengeschichte
+NPCTopic;257;;Sonnenfisch verkaufen
+NPCTopic;263;;Wyvernhorn verkaufen
+NPCTopic;372;;Experte: Bestimmen
+NPCTopic;373;;Meister: Bestimmen
+NPCTopic;378;;Experte: Reparieren
+NPCTopic;379;;Meister: Reparieren
+NPCTopic;548;;Tempospiel
+NPCTopic;555;;Tempowettstreit
+NPCTopic;562;;Tempoprobe
+NPCTopic;569;;Herausforderung: Tempo
+NPCTopic;570;;Herausforderung: Glück
+NPCTopic;581;;Kleriker gegen Nekromanten
+GlobalTxt;718;;CHAR WECHSEL
+GlobalTxt;720;;ÜBERSICHT
+GlobalTxt;723;;NOTIZEN
+GlobalTxt;725;;DAUERLAUF
+GlobalTxt;726;;HOCHSEHEN
+GlobalTxt;727;;RUNTERSEHEN
+GlobalTxt;728;;ZENTRIEREN
+GlobalTxt;731;;AUFSTEIGEN
+GlobalTxt;732;;ABSTEIGEN
+GlobalTxt;292;;Bestimmen
+GlobalTxt;541;;Bestimmen
+GlobalTxt;540;;Verkaufen
+GlobalTxt;539;;Kaufen
+GlobalTxt;400;;Zauber kaufen
+GlobalTxt;543;;Spezialwaren
+GlobalTxt;371;;Schreiber
+GlobalTxt;515;;Mittel
+GlobalTxt;258;;Temp. Tempo
+GlobalTxt;460;;Kälteschutz
+GlobalTxt;458;;Feuerschutz
+GlobalTxt;462;;Magieschutz
+GlobalTxt;590;;Fernschaden
+GlobalTxt;589;;Fernbonus
+GlobalTxt;695;;Drachenkraft
+GlobalTxt;693;;Dunkelelfenkraft
+GlobalTxt;183;;8 Std. rasten & heilen
+GlobalTxt;207;;Fertigk.-Punkte
+GlobalTxt;125;;+2 Fertigk.-Punkte!
+GlobalTxt;518;;Verachtet
+GlobalTxt;16;;Autospeichern
+GlobalTxt;544;;%s, sucht anderswo nach Wissen
