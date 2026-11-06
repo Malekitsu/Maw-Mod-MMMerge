@@ -7,7 +7,7 @@ local posted = {}
 local clock = 0
 os.clock = function() return clock end
 mem = {dll = {user32 = {PostMessageA = function(hwnd, msg, key) posted[#posted + 1] = {hwnd, msg, key} end}}}
-Game = {WindowHandle = 77, CurrentScreen = 0, TurnBased = 0}
+Game = {WindowHandle = 77, CurrentScreen = 0, TurnBased = 0, LoadingScreen = false}
 Party = setmetatable({}, {__call = function(self, _, i)
 	i = (i == nil) and 0 or i + 1
 	if self[i + 1] then return i, self[i + 1] end
@@ -99,6 +99,11 @@ Game.CurrentScreen = 21
 fight()
 check(#posted == 0, "no save on another screen")
 Game.CurrentScreen = 0
+Game.LoadingScreen = true
+clock = clock + 400
+fight()
+check(#posted == 0, "no save while a map is loading")
+Game.LoadingScreen = false
 Game.TurnBased = 1
 clock = clock + 400
 fight()
@@ -119,6 +124,14 @@ fight()
 check(#posted == 2, "after travelling the old save time counts")
 Party.EnemyDetectorRed = false
 MawAutosave.Tick()
+-- travelling does not restart the timer of the periodic autosave
+posted = {}
+MawAutosave.Set(3)
+clock = clock + 120
+handlers.LoadMap[1](true)
+clock = clock + 61
+MawAutosave.Tick()
+check(#posted == 2, "travelling to another map keeps the timer: " .. #posted)
 -- any save restarts the timer of the periodic autosave
 posted = {}
 MawAutosave.SetCombat(false)

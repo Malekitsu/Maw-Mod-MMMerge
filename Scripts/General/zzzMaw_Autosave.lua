@@ -46,7 +46,7 @@ end
 -- the main game screen is shown, no turn-based fight, someone is alive (an enemy may be near)
 local function playable()
 	local ok, result = pcall(function()
-		if Game.CurrentScreen ~= 0 then
+		if Game.CurrentScreen ~= 0 or Game.LoadingScreen then
 			return false
 		end
 		if Game.TurnBased == 1 or Game.TurnBased == true then
@@ -199,10 +199,10 @@ function events.GameInitialized2()
 	refresh()
 end
 
-function events.LoadMap(wasInGame)  -- a new map or a loaded game: count from here
-	schedule()
+function events.LoadMap(wasInGame)
 	wasNear = false
-	if wasInGame == false then  -- a loaded game is as good as saved
+	if wasInGame == false then  -- a game was loaded or started (the game leaves the game before it loads): count from here
 		lastSave = os.clock()
-	end
+		schedule()
+	end  -- travelling to another map does not restart the timer, or it would never run for a player who travels often
 end
