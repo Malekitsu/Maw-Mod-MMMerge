@@ -1927,7 +1927,7 @@ local function staticMapDropLevel()
 	return MawCore.ItemLevel.ForDrop(nil, partyLevel, mapLevel)
 end
 
-function MawMapDropLevel()
+local function mapMonsterLevel()
 	local natives=currentMapMonsters
 	if monsterTableMap==Map.MapStatsIndex and totalLevel and natives and #natives>0 then
 		local lvl=totalLevel[natives[math.ceil(#natives/2)]]
@@ -1935,7 +1935,10 @@ function MawMapDropLevel()
 			return lvl
 		end
 	end
-	return staticMapDropLevel()
+end
+
+function MawMapDropLevel()
+	return mapMonsterLevel() or staticMapDropLevel()
 end
 
 function events.GameInitialized2()
@@ -2572,6 +2575,25 @@ function events.MawMapCompleted()
 	end
 end
 
+local function mapClearLevel(playerControlledMonsters)
+	local level=mapMonsterLevel()
+	if level then
+		return level
+	end
+	local sum, count=0, 0
+	for i=0,Map.Monsters.High do
+		local mon=Map.Monsters[i]
+		if not table.find(playerControlledMonsters, i) and mon:IsAgainst()~=0 then
+			sum=sum+getMonsterLevel(mon)
+			count=count+1
+		end
+	end
+	if count==0 then
+		return nil
+	end
+	return sum/count
+end
+
 function checkMapCompletition()
 	--retroactive fix, can remove this code after a while
 	if mapvars.completed and mapvars.monsterMap then
@@ -2647,7 +2669,6 @@ function checkMapCompletition()
 		if ratio>=requiredRateo or forceMapCompletion then
 			local name=Game.MapStats[Map.MapStatsIndex].Name
 			local key=dungeonCompletedKey(Map.MapStatsIndex)
-			local bolster=getPartyLevel()
 			
 			vars.dungeonCompletedList=vars.dungeonCompletedList or {}
 			if vars.dungeonCompletedList[key] and not vars.madnessMode then
@@ -2711,14 +2732,15 @@ function checkMapCompletition()
 			else
 				local mapLevel=(mapLevels[name].Low+mapLevels[name].Mid+mapLevels[name].High)/3
 				local bolster=0
-				if not Game.freeProgression then
-					bolster=mapLevel*2
-				end
 				if vars.madnessMode then
 					bolster=madnessMapLevels[name] or 0
 				end
 				if mapvars.mapAffixes then
 					bolster=mapvars.mapAffixes.Power*10
+				end
+				local clearLevel
+				if not vars.madnessMode and not mapvars.mapAffixes then
+					clearLevel=mapClearLevel(playerControlledMonsters)
 				end
 				local totalMonster=m
 				if Game.BolsterAmount==300 then
@@ -2733,6 +2755,9 @@ function checkMapCompletition()
 				mapLevel=math.max(mapLevel,1)
 				mapLevel=math.min(mapLevel,100)
 				local experience=math.ceil(totalMonster^0.7*(mapLevel*20+mapLevel^1.8)/3*(bolster+mapLevel)/mapLevel/1000)*1000
+				if clearLevel then
+					experience=math.ceil(totalMonster^0.7*(clearLevel*20+clearLevel^1.8)/3/1000)*1000
+				end
 				if vars.madnessMode then
 					experience=math.ceil(totalMonster^0.7*(bolster*20+bolster^1.8)/3/1000)*1000
 					if not mapvars.mapAffixes then
@@ -2758,7 +2783,7 @@ function checkMapCompletition()
 					evt.Add("Items",rewards[nAff])
 				elseif not vars.AusterityMode then
 					evt.Add("Items", 1070)
-					local gemTier=math.min(math.ceil((mapLevel+bolster)/25+0.5),GEM_DROP_MAX_TIER)
+					local gemTier=math.min(math.ceil((clearLevel or mapLevel+bolster)/25+0.5),GEM_DROP_MAX_TIER)
 					evt.Add("Items",1040+gemTier)
 					evt.Add("Items",1040+gemTier)
 				end
