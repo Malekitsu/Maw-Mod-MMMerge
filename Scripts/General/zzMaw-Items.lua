@@ -4364,8 +4364,7 @@ function GetLevelRquirement(it)
 	if IsCelestialItem(it) then
 		return 1
 	end
-	local dropLevel=GetItemDropLevel(it)+MawCore.ItemLevel.TierLevels(it.Number)
-	local levelRequired=MawCore.ItemLevel.WearLevel(dropLevel)
+	local levelRequired=MawCore.ItemLevel.WearLevel(GetItemDropLevel(it), MawCore.ItemLevel.TierLevels(it.Number))
 
 	if Game.BolsterAmount>=300 then
 		levelRequired=levelRequired-6

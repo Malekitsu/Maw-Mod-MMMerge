@@ -68,10 +68,12 @@ end
 local FALLBACK_PARTY_SHARE = 7/8
 
 ItemLevel.GUARD_MARGIN = 10
+ItemLevel.WEAR_SHARE_CAP = 0.8
 
-function ItemLevel.WearLevel(dropLevel)
-	local margin = ItemLevel.GUARD_MARGIN + (dropLevel * 0.09)
-	return dropLevel - margin
+function ItemLevel.WearLevel(dropLevel, tierLevels)
+	local level = dropLevel + tierLevels
+	local margin = ItemLevel.GUARD_MARGIN + (level * 0.09)
+	return math.min(level - margin, dropLevel * ItemLevel.WEAR_SHARE_CAP)
 end
 
 function ItemLevel.ForDrop(monsterLevel, partyLevel, mapLevel)
