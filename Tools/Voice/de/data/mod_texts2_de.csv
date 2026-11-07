@@ -1,0 +1,2856 @@
+Table;Id;Field;German
+GlobalTxt;15;;Fehler bei %d in %s
+GlobalTxt;27;;Ninja
+GlobalTxt;30;;Bonus
+GlobalTxt;49;;Liche
+GlobalTxt;97;;Gold
+GlobalTxt;103;;Elf
+GlobalTxt;106;;Goblin
+GlobalTxt;121;;Dauerhaft
+GlobalTxt;149;;Name
+GlobalTxt;177;;Standard
+GlobalTxt;234;;Regeneration
+GlobalTxt;262;;Paladin
+GlobalTxt;278;;Blaster
+GlobalTxt;296;;Meditation
+GlobalTxt;314;;Navigator
+GlobalTxt;378;;%s %d, %d
+GlobalTxt;385;;Sir
+GlobalTxt;386;;Sir
+GlobalTxt;387;;Lady
+GlobalTxt;388;;Lord
+GlobalTxt;389;;Lady
+GlobalTxt;399;;Neutral
+GlobalTxt;418;;April
+GlobalTxt;422;;August
+GlobalTxt;423;;September
+GlobalTxt;425;;November
+GlobalTxt;431;;Normal
+GlobalTxt;437;;Minute
+GlobalTxt;444;;Hoppla!
+GlobalTxt;472;;am
+GlobalTxt;473;;pm
+GlobalTxt;506;;Roderick
+GlobalTxt;507;;Alexis
+GlobalTxt;508;;Serena
+GlobalTxt;509;;Zoltan
+GlobalTxt;548;;Arena
+GlobalTxt;578;;Page
+GlobalTxt;581;;Lord
+GlobalTxt;597;;Diplomat
+GlobalTxt;601;;Zombie
+GlobalTxt;613;;AutoSave.dod
+GlobalTxt;623;;Bonus
+GlobalTxt;659;;x: %d  y: %d
+GlobalTxt;678;;Liche
+GlobalTxt;683;;Troll
+GlobalTxt;685;;Minotaur
+GlobalTxt;690;;Nosferatu
+GlobalTxt;699;;Blind
+GlobalTxt;702;;Levitation
+GlobalTxt;747;;QuikSave.dod
+NPCTopic;9;;Fredrick Talimere
+NPCTopic;16;;Fredrick Talimere
+NPCTopic;23;;Cauri Blackthorne
+NPCTopic;25;;Patriarch
+NPCTopic;27;;Cauri Blackthorne
+NPCTopic;47;;Vilebite
+NPCTopic;53;;Ebonest
+NPCTopic;56;;Stormlance
+NPCTopic;57;;Ebonest
+NPCTopic;82;;Korbu
+NPCTopic;84;;Korbu
+NPCTopic;85;;Korbu
+NPCTopic;86;;Lich
+NPCTopic;96;;Dyson Leland
+NPCTopic;101;;Thant
+NPCTopic;106;;Ironfists
+NPCTopic;109;;Xanthor
+NPCTopic;117;;Blackwell Cooper
+NPCTopic;118;;Xanthor
+NPCTopic;121;;Xanthor
+NPCTopic;132;;Ironfists
+NPCTopic;139;;Catherine Ironfist
+NPCTopic;151;;Xanthor
+NPCTopic;162;;Kreeganer
+NPCTopic;194;;Eclipse
+NPCTopic;296;;Rothnax
+NPCTopic;417;;Puddle Thain
+NPCTopic;418;;Celia Stone
+NPCTopic;419;;Tristen Stillwater
+NPCTopic;420;;Aerie Luodrin
+NPCTopic;421;;Jaycin Cardron
+NPCTopic;422;;Miyon Dragontracker
+NPCTopic;423;;Lori Vespers
+NPCTopic;424;;Jobber
+NPCTopic;425;;Karla Nirses
+NPCTopic;426;;Herald Foestryke
+NPCTopic;427;;Jasp Hunter 
+NPCTopic;428;;Garic Senjac
+NPCTopic;429;;Matric Townsaver
+NPCTopic;430;;Ashandra Withersmythe
+NPCTopic;431;;Yarrow
+NPCTopic;432;;Shivan Keeneye
+NPCTopic;433;;Oberic Nosewort
+NPCTopic;434;;Solis
+NPCTopic;435;;Lisha Sourbrow
+NPCTopic;436;;Robert Morningstar
+NPCTopic;438;;Qillain Moore
+NPCTopic;439;;Sheldon Nightwood
+NPCTopic;440;;Peryn Reaverston
+NPCTopic;441;;Thadin
+NPCTopic;442;;Shamus Hollyfield
+NPCTopic;443;;Medwari Elmsmire
+NPCTopic;444;;Tobren Forgewright 
+NPCTopic;445;;Halian Eversmyle
+NPCTopic;446;;Seline Burnkindle
+NPCTopic;447;;Bone
+NPCTopic;448;;Botham
+NPCTopic;449;;Seth Ironfist
+NPCTopic;450;;Taren Temper
+NPCTopic;451;;Solomon Steele
+NPCTopic;452;;Burn
+NPCTopic;453;;Reshie
+NPCTopic;454;;Hollis Stormeye
+NPCTopic;455;;Cloud Nedlon
+NPCTopic;456;;Ulbrecht Pederton
+NPCTopic;457;;Gregory Mist
+NPCTopic;458;;Black Current
+NPCTopic;459;;Ostrin Grivic
+NPCTopic;460;;Dorothy Sablewood
+NPCTopic;461;;Griven
+NPCTopic;462;;Straton Hawthorne
+NPCTopic;463;;Bethold Kern
+NPCTopic;464;;Lasiter Ravensight
+NPCTopic;465;;Shane Krewlen 
+NPCTopic;466;;Barthine Lotts
+NPCTopic;467;;Gilad Dreamwright
+NPCTopic;468;;Zevah Poised
+NPCTopic;469;;Tugor Arin
+NPCTopic;470;;Critias Snowtree
+NPCTopic;471;;Archibald Dawnsglow
+NPCTopic;472;;Lunius Dawnbringer
+NPCTopic;473;;Aldrin Cleareye
+NPCTopic;474;;Patwin Darkenmore
+NPCTopic;475;;Carla Umberpool
+NPCTopic;476;;Sithicus Shadowrunner
+NPCTopic;477;;Kyra Sparkmen
+NPCTopic;478;;Eithian
+NPCTopic;479;;Elzbet Roggen
+NPCTopic;480;;Fishner Thomb
+NPCTopic;481;;Fenton Iverson
+NPCTopic;482;;Raven Quicktoungue
+NPCTopic;483;;Evandar Lotts 
+NPCTopic;485;;Quethrin Tonk
+NPCTopic;486;;Menasaur
+NPCTopic;487;;Kenneth Otterton
+NPCTopic;488;;Mikel Smithson
+NPCTopic;489;;Alton Putnam
+NPCTopic;490;;Gretchin Nevermore
+NPCTopic;491;;Lenord Nightcrawler
+NPCTopic;492;;Silk Nightwalker
+NPCTopic;493;;Helga Steeleye
+NPCTopic;494;;Balan Suretrail
+NPCTopic;495;;Kethric Tarent
+NPCTopic;496;;William Sampson
+NPCTopic;498;;Chevon Wist
+NPCTopic;499;;Kelli Lightfingers
+NPCTopic;500;;Gareth Lifter
+NPCTopic;501;;Waffe bauen
+NPCTopic;502;;Rüstg. bauen
+NPCTopic;503;;Teil bauen
+NPCTopic;504;;Signal 
+NPCTopic;505;;Libellen
+NPCTopic;506;;Gefällte Bäume
+NPCTopic;507;;Tessa Maker
+NPCTopic;508;;Matric Keenedge
+NPCTopic;509;;Blacken Stonecleaver
+NPCTopic;510;;Norbert Slayer
+NPCTopic;512;;Jasper Steelcoif
+NPCTopic;513;;1000 Gold geben
+NPCTopic;514;;Ablehnen
+NPCTopic;515;;Pfeilspitzen für 200 Gold
+NPCTopic;516;;Tabitha Watershed
+NPCTopic;517;;Kethry Treasurestone
+NPCTopic;518;;Ich
+NPCTopic;519;;Petra Mithrit
+NPCTopic;520;;Garret Mistspring
+NPCTopic;521;;Wanda Lightsworn
+NPCTopic;522;;Flynn Shador
+NPCTopic;523;;Douglas Dirthmoore
+NPCTopic;524;;Payge Arachnia
+NPCTopic;525;;Fedwin Dervish
+NPCTopic;526;;Lanshee Caverhill
+NPCTopic;527;;Ton Agraynel
+NPCTopic;528;;Ishton
+NPCTopic;529;;Erthint
+NPCTopic;530;;Klain Scarwing
+NPCTopic;587;;Kreeganer
+NPCTopic;589;;Enroth
+NPCTopic;590;;Erathia
+NPCTopic;591;;Kreeganer
+NPCTopic;682;;Shalwend
+NPCTopic;685;;Acwalander
+NPCTopic;686;;Pyrannaste
+NPCTopic;704;;Arena
+NPCTopic;712;;Zanthora
+NPCTopic;717;;Navigation
+NPCTopic;745;;Platzhalter
+NPCTopic;746;;Platzhalter
+NPCTopic;747;;Platzhalter
+NPCTopic;748;;Platzhalter
+NPCTopic;749;;Platzhalter
+NPCTopic;750;;Platzhalter
+NPCTopic;751;;Schloß Harmondale
+NPCTopic;752;;Die Jagd
+NPCTopic;753;;Glückwunsch
+NPCTopic;754;;Euer Schiff…
+NPCTopic;755;;Regeln der Jagd
+NPCTopic;756;;Was habt Ihr?
+NPCTopic;757;;Gruß
+NPCTopic;758;;Smaragdinsel
+NPCTopic;759;;Wettkampf
+NPCTopic;760;;Schatzsuche
+NPCTopic;761;;Instrumente
+NPCTopic;762;;Laute
+NPCTopic;763;;Laute für 500 Gold
+NPCTopic;764;;Ozean
+NPCTopic;765;;Muschel
+NPCTopic;766;;Muschel für 100 Gold
+NPCTopic;767;;Harmondale
+NPCTopic;768;;Vorschlag
+NPCTopic;769;;Stab annehmen
+NPCTopic;770;;Stab ablehnen
+NPCTopic;771;;Euren Hut, bitte…
+NPCTopic;772;;Tempel
+NPCTopic;773;;Sal den Hut geben
+NPCTopic;774;;Behalten
+NPCTopic;775;;Gewarnt…
+NPCTopic;776;;Nun denn…
+NPCTopic;777;;Trank für Hut?
+NPCTopic;778;;Räuber
+NPCTopic;779;;Blaue Tränke
+NPCTopic;780;;Trank gegen Hut
+NPCTopic;781;;Behalten
+NPCTopic;782;;Bootsreise
+NPCTopic;783;;Leinen los!
+NPCTopic;784;;Vermisste Teilnehmer
+NPCTopic;785;;Vermisste Teilnehmer
+NPCTopic;786;;Vermisste
+NPCTopic;787;;Verlassener Tempel
+NPCTopic;788;;Libellen
+NPCTopic;789;;Drache
+NPCTopic;790;;Drachenhöhle
+NPCTopic;791;;Teilnehmer
+NPCTopic;792;;Tour aus
+NPCTopic;793;;Tour an
+NPCTopic;794;;Schurke 
+NPCTopic;795;;Schurke 
+NPCTopic;796;;Spion
+NPCTopic;797;;Spion
+NPCTopic;798;;Tee trinken
+NPCTopic;799;;Meuchler
+NPCTopic;800;;Meuchler
+NPCTopic;801;;Kreuzr.
+NPCTopic;802;;Kreuzr.
+NPCTopic;803;;Held
+NPCTopic;804;;Held
+NPCTopic;805;;Hallo?
+NPCTopic;806;;Bösewicht
+NPCTopic;807;;Bösewicht
+NPCTopic;808;;Eingew.
+NPCTopic;809;;Eingew.
+NPCTopic;810;;Eingew.
+NPCTopic;811;;Meister
+NPCTopic;812;;Meister
+NPCTopic;813;;Ninja
+NPCTopic;814;;Ninja
+NPCTopic;815;;Meisterschütze
+NPCTopic;816;;Meisterschütze
+NPCTopic;817;;Kriegsmagier
+NPCTopic;818;;Kriegsmagier
+NPCTopic;819;;Scharfs.
+NPCTopic;820;;Scharfs.
+NPCTopic;821;;1. Ritter
+NPCTopic;822;;1. Ritter
+NPCTopic;823;;Kavalier
+NPCTopic;824;;Kavalier
+NPCTopic;825;;Schw. Ritter
+NPCTopic;826;;Schw. Ritter
+NPCTopic;827;;Waldl.-Lord
+NPCTopic;828;;Waldl.-Lord
+NPCTopic;829;;Jäger
+NPCTopic;830;;Jäger
+NPCTopic;831;;Kopfgeldjäger
+NPCTopic;832;;Kopfgeldjäger
+NPCTopic;833;;Jäger?
+NPCTopic;834;;Herz des Waldes
+NPCTopic;835;;Herz des Waldes
+NPCTopic;836;;Lichtpriester
+NPCTopic;837;;Lichtpriester
+NPCTopic;838;;Priester
+NPCTopic;839;;Priester
+NPCTopic;840;;Dunkelpriester
+NPCTopic;841;;Dunkelpriester
+NPCTopic;842;;Zauberer
+NPCTopic;843;;Zauberer
+NPCTopic;844;;Erzmagier
+NPCTopic;845;;Erzmagier
+NPCTopic;846;;Liche
+NPCTopic;847;;Liche
+NPCTopic;848;;Großer Druide
+NPCTopic;849;;Großer Druide
+NPCTopic;850;;Erzdruide
+NPCTopic;851;;Erzdruide
+NPCTopic;852;;Hexer
+NPCTopic;853;;Hexer
+NPCTopic;854;;Golem-Teile
+NPCTopic;855;;Kopftausch
+NPCTopic;856;;Goblins
+NPCTopic;857;;Zwerge retten
+NPCTopic;858;;Zwerge retten
+NPCTopic;859;;Elixier
+NPCTopic;860;;Elixier
+NPCTopic;861;;Elixier
+NPCTopic;862;;Elixier
+NPCTopic;863;;Elixier
+NPCTopic;864;;Elixier
+NPCTopic;865;;Elixier
+NPCTopic;866;;Eine Einladung…
+NPCTopic;867;;Falsche Pläne
+NPCTopic;868;;Artefakt
+NPCTopic;869;;Verraten?
+NPCTopic;870;;Eine Einladung…
+NPCTopic;871;;Falscher Häftl.
+NPCTopic;872;;Artefakt
+NPCTopic;873;;Verraten?
+NPCTopic;874;;Kriegsgefangener
+NPCTopic;875;;Kriegsgefangener
+NPCTopic;876;;Falscher Häftling hier…
+NPCTopic;877;;Riverstride-Pläne
+NPCTopic;878;;Riverstride-Pläne
+NPCTopic;879;;Wir stahlen Pläne…
+NPCTopic;880;;Artefakt
+NPCTopic;881;;Riverstride-Pläne
+NPCTopic;882;;Riverstride-Pläne
+NPCTopic;883;;Falsche Pläne hier…
+NPCTopic;884;;Ausbruch
+NPCTopic;885;;Ausbruch
+NPCTopic;886;;Wir retteten Loren!..
+NPCTopic;887;;Artefakt
+NPCTopic;888;;Tipp
+NPCTopic;889;;Verloren
+NPCTopic;890;;Artefakt
+NPCTopic;891;;Ihr seid es!
+NPCTopic;892;;Tipp
+NPCTopic;893;;Ihr seid es!
+NPCTopic;894;;Tipp
+NPCTopic;895;;Prüfgelände
+NPCTopic;896;;Prüfgelände
+NPCTopic;897;;Tempel d. Dunkelheit
+NPCTopic;898;;Tempel d. Dunkelheit
+NPCTopic;899;;Schlagt die Teufel
+NPCTopic;900;;Schlagt die Teufel
+NPCTopic;901;;Vampire
+NPCTopic;902;;Vampire
+NPCTopic;903;;Seelengef.
+NPCTopic;904;;Seelengef.
+NPCTopic;905;;Tolberti
+NPCTopic;906;;Tolberti
+NPCTopic;907;;Tempel des Lichts
+NPCTopic;908;;Tempel des Lichts
+NPCTopic;909;;Schlagt die Teufel
+NPCTopic;910;;Schlagt die Teufel
+NPCTopic;911;;Seelengef.
+NPCTopic;912;;Seelengef.
+NPCTopic;913;;Clankers Labor
+NPCTopic;914;;Clankers Labor
+NPCTopic;915;;Robert der Weise
+NPCTopic;916;;Robert der Weise
+NPCTopic;917;;Brutgrube
+NPCTopic;918;;Brutgrube
+NPCTopic;919;;Endaufgabe
+NPCTopic;920;;Endaufgabe
+NPCTopic;921;;Endaufgabe
+NPCTopic;922;;Endaufgabe
+NPCTopic;923;;Lichttempel betreten
+NPCTopic;924;;Dunkeltempel betreten
+NPCTopic;925;;Thomas Grey
+NPCTopic;926;;Buchladen
+NPCTopic;927;;Buchladen
+NPCTopic;928;;Zokarrs Knochen
+NPCTopic;929;;Aufgabe
+NPCTopic;930;;Aufgabe
+NPCTopic;931;;Aufgabe
+NPCTopic;932;;Aufgabe
+NPCTopic;933;;Aufgabe
+NPCTopic;934;;Aufgabe
+NPCTopic;935;;Aufgabe
+NPCTopic;936;;Thrushs Brief
+NPCTopic;937;;Aufgabe
+NPCTopic;938;;Aufgabe
+NPCTopic;939;;Pfeifen
+NPCTopic;940;;Aufgabe
+NPCTopic;941;;Aufgabe
+NPCTopic;942;;Aufgabe
+NPCTopic;943;;Aufgabe
+NPCTopic;944;;Aufgabe
+NPCTopic;945;;Aufgabe
+NPCTopic;946;;Aufgabe
+NPCTopic;947;;Aufgabe
+NPCTopic;948;;Aufgabe
+NPCTopic;949;;Aufgabe
+NPCTopic;950;;Antike Waffe
+NPCTopic;951;;Platzhalter
+NPCTopic;952;;Platzhalter
+NPCTopic;953;;Experte Schwert
+NPCTopic;954;;Meister Schwert
+NPCTopic;955;;Großmeister Schwert
+NPCTopic;956;;Experte Dolch
+NPCTopic;957;;Meister Dolch
+NPCTopic;958;;Großmeister Dolch
+NPCTopic;959;;Experte Axt
+NPCTopic;960;;Meister Axt
+NPCTopic;961;;Großmeister Axt
+NPCTopic;962;;Experte Speer
+NPCTopic;963;;Meister Speer
+NPCTopic;964;;Großmeister Speer
+NPCTopic;965;;Exp. Bogen
+NPCTopic;966;;Mstr. Bogen
+NPCTopic;967;;Großmeister Bogen
+NPCTopic;968;;Experte Keule
+NPCTopic;969;;Meister Keule
+NPCTopic;970;;Großmeister Keule
+NPCTopic;971;;Experte Antike Waffe
+NPCTopic;972;;Meister Antike Waffe
+NPCTopic;973;;Großmeister Antike Waffe
+NPCTopic;974;;Experte Schild
+NPCTopic;975;;Meister Schild
+NPCTopic;976;;Großmeister Schild
+NPCTopic;977;;Experte Leder
+NPCTopic;978;;Meister Leder
+NPCTopic;979;;Großmeister Leder
+NPCTopic;980;;Experte Kette
+NPCTopic;981;;Meister Kette
+NPCTopic;982;;Großmeister Kette
+NPCTopic;983;;Exp. Platten
+NPCTopic;984;;Mstr. Platten
+NPCTopic;985;;Großmeister Platten
+NPCTopic;986;;Experte Feuermagie
+NPCTopic;987;;Meister Feuermagie
+NPCTopic;988;;Großmeister Feuermagie
+NPCTopic;989;;Experte Luftmagie
+NPCTopic;990;;Meister Luftmagie
+NPCTopic;991;;Großmeister Luftmagie
+NPCTopic;992;;Experte Wassermagie
+NPCTopic;993;;Meister Wassermagie
+NPCTopic;994;;Großm. Wassermagie
+NPCTopic;995;;MMExt-Platzhalter
+NPCTopic;996;;MMExt-Platzhalter
+NPCTopic;997;;MMExt-Platzhalter
+NPCTopic;998;;MMExt-Platzhalter
+NPCTopic;999;;MMExt-Platzhalter
+NPCTopic;1000;;MMExt-Platzhalter
+NPCTopic;1001;;Exp. Geistesmagie
+NPCTopic;1002;;Mstr. Geistesmagie
+NPCTopic;1003;;Großmeister Geistesmagie
+NPCTopic;1004;;Experte Körpermagie
+NPCTopic;1005;;Meister Körpermagie
+NPCTopic;1006;;Großmeister Körpermagie
+NPCTopic;1007;;Experte Lichtmagie
+NPCTopic;1008;;Meister Lichtmagie
+NPCTopic;1009;;Großmeister Lichtmagie
+NPCTopic;1010;;Exp. Dunkle Magie
+NPCTopic;1011;;Mstr. Dunkle Magie
+NPCTopic;1012;;Großmeister Dunkle Magie
+NPCTopic;1013;;Experte Bestimmen
+NPCTopic;1014;;Meister Bestimmen
+NPCTopic;1015;;Großmeister Bestimmen
+NPCTopic;1016;;Experte Handel
+NPCTopic;1017;;Meister Handel
+NPCTopic;1018;;Großmeister Handel
+NPCTopic;1019;;Experte Reparieren
+NPCTopic;1020;;Meister Reparieren
+NPCTopic;1021;;Großmeister Reparieren
+NPCTopic;1022;;Experte Bodybuilding
+NPCTopic;1023;;Meister Bodybuilding
+NPCTopic;1024;;Großmeister Bodybuilding
+NPCTopic;1025;;Experte Meditation
+NPCTopic;1026;;Meister Meditation
+NPCTopic;1027;;Großmeister Meditation
+NPCTopic;1028;;Experte Wahrnehmung
+NPCTopic;1029;;Meister Wahrnehmung
+NPCTopic;1030;;Großmeister Wahrnehmung
+NPCTopic;1031;;Experte Diplomatie
+NPCTopic;1032;;Meister Diplomatie
+NPCTopic;1033;;Großmeister Diplomatie
+NPCTopic;1034;;Exp. Diebeskunst
+NPCTopic;1035;;Mstr. Diebeskunst
+NPCTopic;1036;;GM Diebesk.
+NPCTopic;1037;;Exp. Fallen entsch.
+NPCTopic;1038;;Mstr. Fallen entsch.
+NPCTopic;1039;;Großm. Fallen entsch.
+NPCTopic;1040;;Exp. Ausweichen
+NPCTopic;1041;;Mstr. Ausweichen
+NPCTopic;1042;;Großm. Ausweichen
+NPCTopic;1043;;Exp. Waffenlos
+NPCTopic;1044;;Mstr. Waffenlos
+NPCTopic;1045;;Großmeister Waffenlos
+NPCTopic;1046;;Experte Monster erkennen
+NPCTopic;1047;;Meister Monster erkennen
+NPCTopic;1048;;Großmeister Monster erkennen
+NPCTopic;1049;;Exp. Waffenmeister
+NPCTopic;1050;;Mstr. Waffenmeister
+NPCTopic;1051;;Großm. Waffenmeister
+NPCTopic;1052;;Experte Stehlen
+NPCTopic;1053;;Meister Stehlen
+NPCTopic;1054;;Großmeister Stehlen
+NPCTopic;1055;;Experte Alchimie
+NPCTopic;1056;;Meister Alchimie
+NPCTopic;1057;;Großmeister Alchimie
+NPCTopic;1058;;Experte Lernen
+NPCTopic;1059;;Meister Lernen
+NPCTopic;1060;;Großmeister Lernen
+NPCTopic;1061;;Kopfgeldjagd
+NPCTopic;1062;;Strafe
+NPCTopic;1063;;Aufgabe
+NPCTopic;1064;;Aufgabe
+NPCTopic;1065;;Elsie Pederton
+NPCTopic;1066;;Jillian Mithrit
+NPCTopic;1067;;Tugor Slicer
+NPCTopic;1068;;Chadric Townsaver
+NPCTopic;1069;;Aznog Slasher
+NPCTopic;1070;;Tonken Fist
+NPCTopic;1071;;Dalin Keenedge
+NPCTopic;1072;;Karn Stonecleaver
+NPCTopic;1073;;Claderin Silverpoint
+NPCTopic;1074;;Seline Falconeye
+NPCTopic;1075;;Lanshee Ravensight
+NPCTopic;1076;;Cardric der Stete
+NPCTopic;1077;;Brother Rothham
+NPCTopic;1078;;Patwin Fellbern
+NPCTopic;1079;;Isram Gallowswell
+NPCTopic;1080;;Fedwin Smithson
+NPCTopic;1081;;Rabisa Nedlon
+NPCTopic;1082;;Miyon der Flinke
+NPCTopic;1083;;Medwari Dragontracker
+NPCTopic;1084;;Halian Nevermore
+NPCTopic;1085;;Dekian Forgewright
+NPCTopic;1086;;Brand der Macher
+NPCTopic;1087;;Ashen Temper
+NPCTopic;1088;;Blayze 
+NPCTopic;1089;;Rislyn Greenstorm
+NPCTopic;1090;;Gayle
+NPCTopic;1091;;Tobren Rainshield
+NPCTopic;1092;;Torrent
+NPCTopic;1093;;Lara Stonewright
+NPCTopic;1094;;Avalanche
+NPCTopic;1095;;Heather Dreamwright
+NPCTopic;1096;;Benjamin der Maßvolle
+NPCTopic;1097;;Myles Featherwind
+NPCTopic;1098;;Xavier Bremen
+NPCTopic;1099;;Brother Bombah
+NPCTopic;1100;;Tempus
+NPCTopic;1101;;Samuel Benson
+NPCTopic;1102;;Payge Blueswan
+NPCTopic;1103;;Bethold Caverhill
+NPCTopic;1104;;Brigham d. Sparsame
+NPCTopic;1105;;Thomas Moore
+NPCTopic;1106;;Gareth der Flicker
+NPCTopic;1107;;Wanda Foestryke
+NPCTopic;1108;;Evandar Thomas
+NPCTopic;1109;;Tessa Greensward
+NPCTopic;1110;;Kaine
+NPCTopic;1111;;Garret Dotes
+NPCTopic;1112;;Petra Cleareye
+NPCTopic;1113;;Lenord Skinner
+NPCTopic;1114;;Silk Quicktoungue
+NPCTopic;1115;;Oberic Crane
+NPCTopic;1116;;Kenneth Wain
+NPCTopic;1117;;Ulbrecht der Raufer
+NPCTopic;1118;;Norris 
+NPCTopic;1119;;Jeni Swiftfoot
+NPCTopic;1120;;Raven der Jäger
+NPCTopic;1121;;Paula Brightspear
+NPCTopic;1122;;Lasiter der Töter
+NPCTopic;1123;;Leane Shadowrunner
+NPCTopic;1124;;Everil Nightwalker
+NPCTopic;1125;;Elzbet Winterspoon
+NPCTopic;1126;;Lucid Apple
+NPCTopic;1127;;Dorothy Senjac
+NPCTopic;1128;;William Davies
+NPCTopic;1129;;Helena Morningstar
+NPCTopic;1130;;Gavin Magnus
+NPCTopic;1131;;Seth Darkenmore
+NPCTopic;1132;;Archibald
+NPCTopic;1133;;Leeres Faß
+NPCTopic;1134;;Rotes Faß
+NPCTopic;1135;;Gelbes Faß
+NPCTopic;1136;;Blaues Faß
+NPCTopic;1137;;Oranges Faß
+NPCTopic;1138;;Grünes Faß
+NPCTopic;1139;;Violettes Faß
+NPCTopic;1140;;Weißes Faß
+NPCTopic;1141;;Leerer Kessel
+NPCTopic;1142;;Dampfender Kessel
+NPCTopic;1143;;Frostiger Kessel
+NPCTopic;1144;;Knisternder Kessel
+NPCTopic;1145;;Dreckiger Kessel
+NPCTopic;1146;;Müllhaufen
+NPCTopic;1147;;Müllhaufen
+NPCTopic;1148;;Müllhaufen
+NPCTopic;1149;;Arenakampf betreten
+NPCTopic;1150;;Elementargilde-Beitritt
+NPCTopic;1151;;Selbstgilde-Beitritt
+NPCTopic;1152;;Luftgilde-Beitritt
+NPCTopic;1153;;Erdgilde-Beitritt
+NPCTopic;1154;;Feuergilde-Beitritt
+NPCTopic;1155;;Wassergilde-Beitritt
+NPCTopic;1156;;Körpergilde-Beitritt
+NPCTopic;1157;;Geistesgilde-Beitritt
+NPCTopic;1158;;Seelengilde-Beitritt
+NPCTopic;1159;;Lichtgilde-Beitritt
+NPCTopic;1160;;Dunkelgilde-Beitritt
+NPCTopic;1161;;Müllhaufen
+NPCTopic;1162;;Lagerfeuer
+NPCTopic;1163;;Lagerfeuer
+NPCTopic;1164;;Futternapf
+NPCTopic;1165;;Leere Tonne
+NPCTopic;1166;;Tonne
+NPCTopic;1167;;Pilz
+NPCTopic;1168;;Lord Markham
+NPCTopic;1169;;Der Meisterdieb
+NPCTopic;1170;;Wachtürme
+NPCTopic;1171;;Bill Lasker
+NPCTopic;1172;;Lady Carmine
+NPCTopic;1173;;Meuchler
+NPCTopic;1174;;Wromthrax der Herzlose
+NPCTopic;1175;;Kreuzritter
+NPCTopic;1176;;Die Schönste von allen
+NPCTopic;1177;;Bösewichte
+NPCTopic;1178;;Mönchstraining
+NPCTopic;1179;;Medusen
+NPCTopic;1180;;Tempel von Baa
+NPCTopic;1181;;Schafe vermisst
+NPCTopic;1182;;Chiffren
+NPCTopic;1183;;Wesen des Schleims
+NPCTopic;1184;;Medusen
+NPCTopic;1185;;Titanenfestung
+NPCTopic;1186;;Die Arena
+NPCTopic;1187;;Arena-Meisterschaft
+NPCTopic;1188;;Spukhaus
+NPCTopic;1189;;Geister
+NPCTopic;1190;;Geheimgang
+NPCTopic;1191;;Feen
+NPCTopic;1192;;Irrwald
+NPCTopic;1193;;Ältester Baum
+NPCTopic;1194;;Kopfgeldjagd
+NPCTopic;1195;;Profi-Kopfgeldjagd
+NPCTopic;1196;;Gezeitenhöhlen
+NPCTopic;1197;;Evenmorn-Inseln
+NPCTopic;1198;;Riffkarten
+NPCTopic;1199;;Der Fluch
+NPCTopic;1200;;Golem-Teile
+NPCTopic;1201;;Golems
+NPCTopic;1202;;Buch: Göttl. Eingreifen
+NPCTopic;1203;;Göttliches Eingreifen
+NPCTopic;1204;;Seelengef.
+NPCTopic;1205;;Die Rituale
+NPCTopic;1206;;Steinkreis
+NPCTopic;1207;;Sommerkreis
+NPCTopic;1208;;Der Friedhof
+NPCTopic;1209;;Grabhügelnavigation
+NPCTopic;1210;;Land der Titanen
+NPCTopic;1211;;Der Megadrache
+NPCTopic;1212;;Aufgabe
+NPCTopic;1213;;Aufgabe
+NPCTopic;1214;;Aufgabe
+NPCTopic;1215;;Aufgabe
+NPCTopic;1216;;Aufgabe
+NPCTopic;1217;;Aufgabe
+NPCTopic;1218;;Stone City
+NPCTopic;1219;;Stone City
+NPCTopic;1220;;Weg nach Nighon
+NPCTopic;1221;;Hexenmeistertunnel
+NPCTopic;1222;;Grabhügel
+NPCTopic;1223;;Medusen
+NPCTopic;1224;;Rotzwerg-Minen
+NPCTopic;1225;;Die Statuen
+NPCTopic;1226;;Stone City
+NPCTopic;1227;;Harmondale
+NPCTopic;1228;;Rebellionen
+NPCTopic;1229;;Schloß Harmondale
+NPCTopic;1230;;Tularean-Höhlen
+NPCTopic;1231;;Weißklippenhöhlen
+NPCTopic;1232;;Fort Riverstride
+NPCTopic;1233;;Die Trophäe
+NPCTopic;1234;;Der Schiedsr.
+NPCTopic;1235;;Fundbüro
+NPCTopic;1236;;Die Wahl
+NPCTopic;1237;;Prüfgelände
+NPCTopic;1238;;Celeste
+NPCTopic;1239;;Die Grube
+NPCTopic;1240;;Celeste
+NPCTopic;1241;;Rätselhafte Morde
+NPCTopic;1242;;Der Kreeganer
+NPCTopic;1243;;Kriegsniederlage
+NPCTopic;1244;;Zerwürfnis in Deyja
+NPCTopic;1245;;Roland von Enroth
+NPCTopic;1246;;Seelengef.
+NPCTopic;1247;;Hexer
+NPCTopic;1248;;Clankers Abwehr
+NPCTopic;1249;;Expertenlehrer
+NPCTopic;1250;;Vermisste
+NPCTopic;1251;;Bracada-Teleporter
+NPCTopic;1252;;Schloßausbau
+NPCTopic;1253;;Sockel
+NPCTopic;1254;;Strittiges Land
+NPCTopic;1255;;Schloß Harmondale
+NPCTopic;1256;;Leuchtfeuer
+NPCTopic;1257;;Verk. Tularean-Holz
+NPCTopic;1258;;Kauft Greifenfedern für 200 Gold
+NPCTopic;1259;;Verk. Pfeilspitzen
+NPCTopic;1260;;Kauft Tularean-Holz für 200 Gold
+NPCTopic;1261;;Verkauft Greifenfedern
+NPCTopic;1262;;Kauft Sand für 2000 Gold
+NPCTopic;1263;;Verkauft Enroth-Wein
+NPCTopic;1264;;Kauft Glasflaschen für 2000 Gold
+NPCTopic;1265;;Verk. Sand
+NPCTopic;1266;;Kauft Enroth-Wein für 2000 Gold
+NPCTopic;1267;;Glasflaschen verk.
+NPCTopic;1268;;Bootsfahrplan
+NPCTopic;1269;;Nighon-Tunnel
+NPCTopic;1270;;Handel
+NPCTopic;1271;;Podest der Eile
+NPCTopic;1272;;Podest der Erd-Resistenz
+NPCTopic;1273;;Podest des Tags der Götter
+NPCTopic;1274;;Schild-Podest
+NPCTopic;1275;;Podest der Wasser-Resistenz
+NPCTopic;1276;;Podest der Feuer-Resistenz
+NPCTopic;1277;;Heldentum-Podest
+NPCTopic;1278;;Podest des Feuerrings
+NPCTopic;1279;;Geistes-Resistenz-Podest
+NPCTopic;1280;;Podest d. Körper-Resistenz
+NPCTopic;1281;;Podest der Steinhaut
+NPCTopic;1282;;Podest der Luft-Resistenz
+NPCTopic;1283;;Stärkespiel
+NPCTopic;1284;;Ausdauerspiel
+NPCTopic;1285;;Intellektspiel
+NPCTopic;1286;;Persönlichkeitsspiel
+NPCTopic;1287;;Genauigkeitsspiel
+NPCTopic;1288;;Tempospiel
+NPCTopic;1289;;Glücksspiel
+NPCTopic;1290;;Stärkewettstreit
+NPCTopic;1291;;Ausdauerwettstreit
+NPCTopic;1292;;Intellektwettstreit
+NPCTopic;1293;;Persönl.-Wettstreit
+NPCTopic;1294;;Genauigk.-Wettstreit
+NPCTopic;1295;;Tempowettstreit
+NPCTopic;1296;;Glückswettstreit
+NPCTopic;1297;;Test der Stärke
+NPCTopic;1298;;Test der Ausdauer
+NPCTopic;1299;;Test des Intellekts
+NPCTopic;1300;;Persönlichkeitstest
+NPCTopic;1301;;Genauigkeitstest
+NPCTopic;1302;;Tempotest
+NPCTopic;1303;;Glückstest
+NPCTopic;1304;;Stärkeprobe
+NPCTopic;1305;;Ausdauerprobe
+NPCTopic;1306;;Intellektprobe
+NPCTopic;1307;;Persönlichkeitsprobe
+NPCTopic;1308;;Genauigkeitsprobe
+NPCTopic;1309;;Tempoprobe
+NPCTopic;1310;;Glücksprobe
+NPCTopic;1311;;Verräter!
+NPCTopic;1312;;Schrein
+NPCTopic;1313;;Prüfungen
+NPCTopic;1314;;Der Brief
+NPCTopic;1315;;Der Brief
+NPCTopic;1316;;Goblinwatch
+NPCTopic;1317;;Goblinwatch
+NPCTopic;1318;;Böse Kulte
+NPCTopic;1319;;Böse Kulte
+NPCTopic;1320;;Böse Kulte
+NPCTopic;1321;;The Howling Moon
+NPCTopic;1322;;Der Brief
+NPCTopic;1323;;Lord Kilburn
+NPCTopic;1324;;Lord Kilburn
+NPCTopic;1325;;Der Hohe Rat
+NPCTopic;1326;;Kreuzritter
+NPCTopic;1327;;Kreuzritter
+NPCTopic;1328;;Helden
+NPCTopic;1329;;Helden
+NPCTopic;1330;;Helden
+NPCTopic;1331;;Müßiggang
+NPCTopic;1332;;Der Zirkus
+NPCTopic;1333;;Fehlender Text 20
+NPCTopic;1334;;Verzeihung, Hoheit…
+NPCTopic;1335;;Verzeihung, Hoheit…
+NPCTopic;1336;;Fehlender Text 23
+NPCTopic;1337;;Der Zirkus
+NPCTopic;1338;;Onkel Archibald
+NPCTopic;1339;;Das Dritte Auge
+NPCTopic;1340;;Onkel Archibald
+NPCTopic;1341;;Onkel Archibald
+NPCTopic;1342;;Leer
+NPCTopic;1343;;Archibald befreien
+NPCTopic;1344;;Silberhelme
+NPCTopic;1345;;Der Prinz der Diebe
+NPCTopic;1346;;Der Prinz der Diebe
+NPCTopic;1347;;Der Hohe Rat
+NPCTopic;1348;;Priester
+NPCTopic;1349;;Priester
+NPCTopic;1350;;Hohepriester
+NPCTopic;1351;;Hohepriester
+NPCTopic;1352;;Hohepriester
+NPCTopic;1353;;Erzmagier
+NPCTopic;1354;;Pilgerfahrt
+NPCTopic;1355;;Aufgabe
+NPCTopic;1356;;Aufgabe
+NPCTopic;1357;;Text einfügen 44
+NPCTopic;1358;;Verloren
+NPCTopic;1359;;Tipp
+NPCTopic;1360;;Göttliche Fügung
+NPCTopic;1361;;Göttliche Fügung
+NPCTopic;1362;;Göttliche Fügung
+NPCTopic;1363;;Text einfügen 50
+NPCTopic;1364;;Ratsaufgabe
+NPCTopic;1365;;Ratsaufgabe
+NPCTopic;1366;;Text einfügen
+NPCTopic;1367;;Ratsaufgabe
+NPCTopic;1368;;Zauberer
+NPCTopic;1369;;Zauberer
+NPCTopic;1370;;Text einfügen 57
+NPCTopic;1371;;Zauberer
+NPCTopic;1372;;Meisterzauberer
+NPCTopic;1373;;Meisterzauberer
+NPCTopic;1374;;Ratsaufgabe
+NPCTopic;1375;;Ratsaufgabe
+NPCTopic;1376;;Text einfügen 63
+NPCTopic;1377;;Ratsaufgabe
+NPCTopic;1378;;Kavaliere
+NPCTopic;1379;;Ernennung
+NPCTopic;1380;;Kavaliere
+NPCTopic;1381;;Kavaliere
+NPCTopic;1382;;Kavaliere
+NPCTopic;1383;;Champions
+NPCTopic;1384;;Champions
+NPCTopic;1385;;Champions
+NPCTopic;1386;;Kristallorte
+NPCTopic;1387;;Speicherkristall
+NPCTopic;1388;;Text einfügen 75
+NPCTopic;1389;;Kontrollzentrum
+NPCTopic;1390;;Kreegan
+NPCTopic;1391;;Die Alten
+NPCTopic;1392;;Geld
+NPCTopic;1393;;Geld
+NPCTopic;1394;;Geld
+NPCTopic;1395;;Große Druiden
+NPCTopic;1396;;Große Druiden
+NPCTopic;1397;;Erzdruiden
+NPCTopic;1398;;Erzdruiden
+NPCTopic;1399;;Erzdruiden
+NPCTopic;1400;;Winter
+NPCTopic;1401;;Winter
+NPCTopic;1402;;Winter
+NPCTopic;1403;;Winter
+NPCTopic;1404;;Kriegsmagier
+NPCTopic;1405;;Kriegsmagier
+NPCTopic;1406;;Meisterschützen
+NPCTopic;1407;;Meisterschützen
+NPCTopic;1408;;Winter
+NPCTopic;1409;;Winter
+NPCTopic;1410;;Winter
+NPCTopic;1411;;Gefangen
+NPCTopic;1412;;Preisabsprache
+NPCTopic;1413;;Meisterschützen
+NPCTopic;1414;;Silvertongues Weigerung
+NPCTopic;1415;;Silvertongues Heilung
+NPCTopic;1416;;Dienst an der Krone
+NPCTopic;1417;;Regeln
+NPCTopic;1418;;Preise
+NPCTopic;1419;;Anleitung
+NPCTopic;1420;;Stärkespiel für 50 Gold
+NPCTopic;1421;;Ausdauerspiel für 50 Gold
+NPCTopic;1422;;Tempospiel für 50 Gold
+NPCTopic;1423;;Genauigkeitsspiel für 50 Gold
+NPCTopic;1424;;Glücksspiel für 50 Gold
+NPCTopic;1425;;Intellektspiel für 50 Gold
+NPCTopic;1426;;Gongs
+NPCTopic;1427;;Knochen
+NPCTopic;1428;;Magnetsteine
+NPCTopic;1429;;Harpyienfedern
+NPCTopic;1430;;Goldene Pyramiden
+NPCTopic;1431;;Weinfässer
+NPCTopic;1432;;Zähne
+NPCTopic;1433;;Kleeblätter
+NPCTopic;1434;;Bernst.
+NPCTopic;1435;;Aufgabe
+NPCTopic;1436;;Aufgabe
+NPCTopic;1437;;Hallo
+NPCTopic;1438;;Jungbrunnen
+NPCTopic;1439;;Anleitung
+NPCTopic;1440;;Anleitung
+NPCTopic;1441;;Anleitung
+NPCTopic;1442;;Pyramide gegen Rüstung
+NPCTopic;1443;;Pyramide gegen Waffe
+NPCTopic;1444;;Pyramide gegen Zubehör
+NPCTopic;1445;;Faß gegen Rüstung
+NPCTopic;1446;;Faß gegen Waffe
+NPCTopic;1447;;Faß gegen Zubehör
+NPCTopic;1448;;Lampe gegen Juwelen
+NPCTopic;1449;;Text einfügen
+NPCTopic;1450;;Text einfügen
+NPCTopic;1451;;Text einfügen
+NPCTopic;1452;;Text einfügen
+NPCTopic;1453;;Text einfügen
+NPCTopic;1454;;Text einfügen
+NPCTopic;1455;;Text einfügen
+NPCTopic;1456;;Text einfügen
+NPCTopic;1457;;Text einfügen
+NPCTopic;1458;;Text einfügen
+NPCTopic;1459;;Text einfügen
+NPCTopic;1460;;Text einfügen
+NPCTopic;1461;;Text einfügen
+NPCTopic;1462;;Text einfügen
+NPCTopic;1463;;Text einfügen
+NPCTopic;1464;;Text einfügen
+NPCTopic;1465;;Text einfügen
+NPCTopic;1466;;Text einfügen
+NPCTopic;1467;;Text einfügen
+NPCTopic;1468;;Text einfügen
+NPCTopic;1469;;Text einfügen
+NPCTopic;1470;;Text einfügen
+NPCTopic;1471;;Text einfügen
+NPCTopic;1472;;Text einfügen
+NPCTopic;1473;;Text einfügen
+NPCTopic;1474;;Text einfügen
+NPCTopic;1475;;Text einfügen
+NPCTopic;1476;;Text einfügen
+NPCTopic;1477;;Text einfügen
+NPCTopic;1478;;Text einfügen
+NPCTopic;1479;;Text einfügen
+NPCTopic;1480;;Text einfügen
+NPCTopic;1481;;Text einfügen
+NPCTopic;1482;;Text einfügen
+NPCTopic;1483;;Text einfügen
+NPCTopic;1484;;Text einfügen
+NPCTopic;1485;;Text einfügen
+NPCTopic;1486;;Text einfügen
+NPCTopic;1487;;Text einfügen
+NPCTopic;1488;;Text einfügen
+NPCTopic;1489;;Text einfügen
+NPCTopic;1490;;Text einfügen
+NPCTopic;1491;;Text einfügen
+NPCTopic;1492;;Text einfügen
+NPCTopic;1493;;Text einfügen
+NPCTopic;1494;;Text einfügen
+NPCTopic;1495;;Text einfügen
+NPCTopic;1496;;Text einfügen
+NPCTopic;1497;;Text einfügen
+NPCTopic;1498;;Text einfügen
+NPCTopic;1499;;Text einfügen
+NPCTopic;1500;;Text einfügen
+NPCTopic;1501;;Text einfügen
+NPCTopic;1502;;Text einfügen
+NPCTopic;1503;;Text einfügen
+NPCTopic;1504;;Text einfügen
+NPCTopic;1505;;Text einfügen
+NPCTopic;1506;;Text einfügen
+NPCTopic;1507;;Text einfügen
+NPCTopic;1508;;Text einfügen
+NPCTopic;1509;;Text einfügen
+NPCTopic;1510;;Text einfügen
+NPCTopic;1511;;Text einfügen
+NPCTopic;1512;;Text einfügen
+NPCTopic;1513;;Experte Stabkampf
+NPCTopic;1514;;Stabmeister
+NPCTopic;1515;;Experte Schwertkunst
+NPCTopic;1516;;Schwertmeister
+NPCTopic;1517;;Experte Dolchkampf
+NPCTopic;1518;;Dolchmeister
+NPCTopic;1519;;Experte Axtkampf
+NPCTopic;1520;;Axtmeister
+NPCTopic;1521;;Experte Speerkampf
+NPCTopic;1522;;Speermeister
+NPCTopic;1523;;Experte Bogenkunst
+NPCTopic;1524;;Bogenmeister
+NPCTopic;1525;;Experte Streitkolben
+NPCTopic;1526;;Meister Streitkolben
+NPCTopic;1527;;Experte Uralte Waffen
+NPCTopic;1528;;Meister Uralte Waffen
+NPCTopic;1529;;Experte Schildkunst
+NPCTopic;1530;;Schildmeister
+NPCTopic;1531;;Experte Lederrüstung
+NPCTopic;1532;;Meister Lederrüstung
+NPCTopic;1533;;Experte Kettenrüstung
+NPCTopic;1534;;Meister Kettenrüstung
+NPCTopic;1535;;Experte Plattenrüstung
+NPCTopic;1536;;Meister Plattenrüstung
+NPCTopic;1537;;Experte Feuermagie
+NPCTopic;1538;;Feuermeister
+NPCTopic;1539;;Experte Luftmagie
+NPCTopic;1540;;Luftmeister
+NPCTopic;1541;;Experte Wassermagie
+NPCTopic;1542;;Wassermeister
+NPCTopic;1543;;Experte Erdmagie
+NPCTopic;1544;;Erdmeister
+NPCTopic;1545;;Experte Seelenmagie
+NPCTopic;1546;;Meister Seelenmagie
+NPCTopic;1547;;Geistesexperte
+NPCTopic;1548;;Meister Geistesmagie
+NPCTopic;1549;;Experte Körpermagie
+NPCTopic;1550;;Meister Körpermagie
+NPCTopic;1551;;Experte Lichtmagie
+NPCTopic;1552;;Lichtmeister
+NPCTopic;1553;;Experte Dunkelmagie
+NPCTopic;1554;;Meister Dunkelmagie
+NPCTopic;1555;;Experte: Bestimmen
+NPCTopic;1556;;Meister: Bestimmen
+NPCTopic;1557;;Experte Feilschen
+NPCTopic;1558;;Meister Feilschen
+NPCTopic;1559;;Reparaturexperte
+NPCTopic;1560;;Reparaturmeister
+NPCTopic;1561;;Experte Bodybuilding
+NPCTopic;1562;;Meister Bodybuilding
+NPCTopic;1563;;Experte Meditation
+NPCTopic;1564;;Meister Meditation
+NPCTopic;1565;;Experte Wahrnehmung
+NPCTopic;1566;;Meister Wahrnehmung
+NPCTopic;1567;;Experte Alchimie
+NPCTopic;1568;;Meister Alchimie
+NPCTopic;1569;;Experte Entschärfen
+NPCTopic;1570;;Meister Entschärfen
+NPCTopic;1571;;Experte Lernen
+NPCTopic;1572;;Meister Lernen
+NPCTopic;1573;;Jasper Rice
+NPCTopic;1574;;Guy Hampton
+NPCTopic;1575;;Jules Miles
+NPCTopic;1576;;Avinril Smythers
+NPCTopic;1577;;Burton Rutherford
+NPCTopic;1578;;Desmond Weller
+NPCTopic;1579;;Errol Ostermann
+NPCTopic;1580;;Rexella
+NPCTopic;1581;;Bronwyn Meck
+NPCTopic;1582;;Arlen Sailor
+NPCTopic;1583;;David Feather
+NPCTopic;1584;;Forrest Suthers
+NPCTopic;1585;;Jezebel
+NPCTopic;1586;;Caao Salem
+NPCTopic;1587;;Harper Collins
+NPCTopic;1588;;Revee Botania
+NPCTopic;1589;;Bishop Inquisitorio
+NPCTopic;1590;;Thane Roper
+NPCTopic;1591;;Gilbert Hammer
+NPCTopic;1592;;Ki Lo Nee
+NPCTopic;1593;;Su Lang Manchu
+NPCTopic;1594;;Hans Gifford
+NPCTopic;1595;;Will Ottoman
+NPCTopic;1596;;Ryan Treacle
+NPCTopic;1597;;Jason Traveler
+NPCTopic;1598;;Norio Ariganaka
+NPCTopic;1599;;Macro Caligula
+NPCTopic;1600;;Jacques Kohl
+NPCTopic;1601;;Gabe Lester
+NPCTopic;1602;;John Tuck
+NPCTopic;1603;;Aufgabe
+NPCTopic;1604;;Aufgabe
+NPCTopic;1605;;Aufgabe
+NPCTopic;1606;;Aufgabe
+NPCTopic;1607;;Silberhelme
+NPCTopic;1608;;Silberhelme
+NPCTopic;1609;;Aufgabe
+NPCTopic;1610;;Aufgabe
+NPCTopic;1611;;Brüderl. Orden des Silbers
+NPCTopic;1612;;Melodie
+NPCTopic;1613;;Ankh
+NPCTopic;1614;;Snergles Schl.
+NPCTopic;1615;;Verborgene Gänge
+NPCTopic;1616;;Aufgabe
+NPCTopic;1617;;Aufgabe
+NPCTopic;1618;;Aufgabe
+NPCTopic;1619;;Aufgabe
+NPCTopic;1620;;Text einfügen 307
+NPCTopic;1621;;Aufgabe
+NPCTopic;1622;;Aufgabe
+NPCTopic;1623;;Aufgabe
+NPCTopic;1624;;Aufgabe
+NPCTopic;1625;;Kobraeier
+NPCTopic;1626;;Aufgabe
+NPCTopic;1627;;Aufgabe
+NPCTopic;1628;;Aufgabe
+NPCTopic;1629;;Aufgabe
+NPCTopic;1630;;Aufgabe
+NPCTopic;1631;;Aufgabe
+NPCTopic;1632;;Gruß
+NPCTopic;1633;;Gruß
+NPCTopic;1634;;Blackshire
+NPCTopic;1635;;Aufgabe
+NPCTopic;1636;;Aufgabe
+NPCTopic;1637;;Aufgabe
+NPCTopic;1638;;Aufgabe
+NPCTopic;1639;;Schattengilde
+NPCTopic;1640;;New Sorpigal
+NPCTopic;1641;;Aufgabe
+NPCTopic;1642;;Aufgabe
+NPCTopic;1643;;Hilfe!
+NPCTopic;1644;;Aufgabe
+NPCTopic;1645;;Aufgabe
+NPCTopic;1646;;Flucht
+NPCTopic;1647;;Aufgabe
+NPCTopic;1648;;Aufgabe
+NPCTopic;1649;;Gruß
+NPCTopic;1650;;Gruß
+NPCTopic;1651;;Werwölfe
+NPCTopic;1652;;Reinheitsperle
+NPCTopic;1653;;Aufgabe
+NPCTopic;1654;;Aufgabe
+NPCTopic;1655;;Reinheitsperle
+NPCTopic;1656;;Text einfügen 343
+NPCTopic;1657;;Text einfügen 344
+NPCTopic;1658;;Text einfügen 345
+NPCTopic;1659;;Text einfügen 346
+NPCTopic;1660;;Menschen
+NPCTopic;1661;;Gruß
+NPCTopic;1662;;Rat
+NPCTopic;1663;;Nebenjobs
+NPCTopic;1664;;Aufgabe
+NPCTopic;1665;;Aufgabe
+NPCTopic;1666;;Archibald
+NPCTopic;1667;;Aufgabe
+NPCTopic;1668;;Aufgabe
+NPCTopic;1669;;Aufgabe
+NPCTopic;1670;;Aufgabe
+NPCTopic;1671;;Diener
+NPCTopic;1672;;Kreatur
+NPCTopic;1673;;Aufgabe
+NPCTopic;1674;;Text einfügen 361
+NPCTopic;1675;;Ankh
+NPCTopic;1676;;Ankh
+NPCTopic;1677;;Ankh
+NPCTopic;1678;;Zeremonie der Sonne
+NPCTopic;1679;;Zeremonie des Mondes
+NPCTopic;1680;;Text einfügen 367
+NPCTopic;1681;;Text einfügen 368
+NPCTopic;1682;;Text einfügen 369
+NPCTopic;1683;;Text einfügen 370
+NPCTopic;1684;;Text einfügen 371
+NPCTopic;1685;;Text einfügen 372
+NPCTopic;1686;;Text einfügen 373
+NPCTopic;1687;;Text einfügen 374
+NPCTopic;1688;;Zutritt zum Orakel
+NPCTopic;1689;;Zutritt zum Orakel
+NPCTopic;1690;;Zutritt zum Orakel
+NPCTopic;1691;;Zutritt zum Orakel
+NPCTopic;1692;;Zutritt zum Orakel
+NPCTopic;1693;;Zutritt zum Orakel
+NPCTopic;1694;;Mitgl. Elementargilde
+NPCTopic;1695;;Mitgl. Gilde des Selbst
+NPCTopic;1696;;Mitgl. Freibeuter-Versteck
+NPCTopic;1697;;Mitgl. Protection Services
+NPCTopic;1698;;Mitgl. Schmugglergilde
+NPCTopic;1699;;Mitgl. Blade's End
+NPCTopic;1700;;Mitgl. Duelist's Edge
+NPCTopic;1701;;Mitgl. Berserker's Fury
+NPCTopic;1702;;Mitgl. Luftgilde
+NPCTopic;1703;;Mitgliedschaft Erdgilde
+NPCTopic;1704;;Mitgl. Feuergilde
+NPCTopic;1705;;Mitgl. Wassergilde
+NPCTopic;1706;;Mitgl. Körpergilde
+NPCTopic;1707;;Mitgl. Geistesgilde
+NPCTopic;1708;;Mitgl. Seelengilde
+NPCTopic;1709;;Mitgl. Lichtgilde
+NPCTopic;1710;;Mitgl. Dunkelgilde
+NPCTopic;1711;;Aufgabe
+NPCTopic;1712;;Kopfgeldjagd
+NPCTopic;1713;;Arenapreis abholen
+NPCTopic;1714;;Party heilen
+NPCTopic;1715;;Proviant
+NPCTopic;1716;;Fliegen
+NPCTopic;1717;;Wasserwandeln
+NPCTopic;1718;;Stadtportal
+NPCTopic;1719;;Segen
+NPCTopic;1720;;Heldentum
+NPCTopic;1721;;Kein Nutzen
+NPCTopic;1722;;Leere Tonne
+NPCTopic;1723;;Rote Tonne
+NPCTopic;1724;;Gelbe Tonne
+NPCTopic;1725;;Blaue Tonne
+NPCTopic;1726;;Orangefarbene Tonne
+NPCTopic;1727;;Grüne Tonne
+NPCTopic;1728;;Purpurne Tonne
+NPCTopic;1729;;Weiße Tonne
+NPCTopic;1730;;Leerer Kessel
+NPCTopic;1731;;Dampfgebräu
+NPCTopic;1732;;Frostgebräu
+NPCTopic;1733;;Funkengebräu
+NPCTopic;1734;;Giftgebräu
+NPCTopic;1735;;Zaubergebräu
+NPCTopic;1736;;Kochtopf
+NPCTopic;1737;;Kochtopf
+NPCTopic;1738;;Kochtopf
+NPCTopic;1739;;Kochtopf
+NPCTopic;1740;;Kochtopf
+NPCTopic;1741;;Mehlsack
+NPCTopic;1742;;Mehlsack
+NPCTopic;1743;;Großer Sack
+NPCTopic;1744;;Großer Sack
+NPCTopic;1745;;Großer Sack
+NPCTopic;1746;;Großer Sack
+NPCTopic;1747;;Goldbeutel
+NPCTopic;1748;;Müllhaufen
+NPCTopic;1749;;Müllhaufen
+NPCTopic;1750;;Schädelberg
+NPCTopic;1751;;Schädelberg der Schwäche
+NPCTopic;1752;;Schädelberg der Flüche
+NPCTopic;1753;;Schädelberg des Wahns
+NPCTopic;1754;;Schädelberg des Todes
+NPCTopic;1755;;Eimer
+NPCTopic;1756;;Eimer
+NPCTopic;1757;;Eimer
+NPCTopic;1758;;Eimer
+NPCTopic;1759;;Kristalle
+NPCTopic;1760;;Kristalle
+NPCTopic;1761;;Kristalle
+NPCTopic;1762;;Kristalle
+NPCTopic;1763;;Kristalle
+NPCTopic;1764;;Kristalle
+NPCTopic;1765;;Kristalle
+NPCTopic;1766;;Bitte
+NPCTopic;1767;;Drohung
+NPCTopic;1768;;Obolus
+NPCTopic;1770;;Großmeister Seelenmagie
+NPCTopic;1771;;Meister Seelenmagie
+NPCTopic;1772;;Experte Seelenmagie
+NPCTopic;1773;;Großmeister Erdmagie
+NPCTopic;1774;;Meister Erdmagie
+NPCTopic;1775;;Experte Erdmagie
+NPCTopic;1776;;Großmeister Wassermagie
+NPCTopic;1777;;Meister Wassermagie
+NPCTopic;1778;;Die wichtige Sache
+NPCTopic;1779;;Eine Kleinigkeit
+NPCTopic;1780;;Aufgabe
+NPCTopic;1781;;Zeitreise-Führer
+NPCTopic;1782;;Jadame
+NPCTopic;1783;;Antagarich
+NPCTopic;1784;;Enroth
+NPCTopic;1785;;Etwas Schreckliches
+NPCTopic;1786;;Der kontrollierte Riß
+NPCTopic;1787;;Was nun?
+NPCTopic;1788;;Kopplerstein
+NPCTopic;1789;;Dabei!
+NPCTopic;1790;;Rätsel
+NPCTopic;1791;;Rätsel?
+NPCTopic;1792;;Kommt mit
+NPCTopic;1793;;Freund!
+NPCTopic;1794;;Wildes Chaos
+TransTxt;8;;Ein großer Drache hat offenbar seine Behausung in diesen Höhlen.  Die Leichen nahe seinem Heim waren vielleicht Abenteurer auf der Suche nach dem Schatz des Drachen.
+TransTxt;9;;Lord Markhams Anwesen sticht mit seiner Größe und Pracht deutlich von den bescheidenen Bauernhäusern und Hütten ringsum ab.
+TransTxt;10;;Dem Müll und dem verrottenden Unrat vor der Höhle nach zu urteilen, haben sich hier schon viele Generationen von Banditen vor dem Gesetz versteckt.
+TransTxt;11;;Dieses alte Haus war einst ein stattliches Herrenhaus und wurde von seinen ersten Besitzern längst verlassen.  Die jetzigen Bewohner halten es nicht gerade gut in Schuß.
+TransTxt;12;;Der Eingang zu diesem Grabhügel ist schön anzusehen und wirkt doch zugleich abweisend.  Nahe dem Eingang herrscht tiefe Stille.
+TransTxt;13;;Der Eingang zu diesem Grabhügel ist schön anzusehen und wirkt doch zugleich abweisend.  Nahe dem Eingang herrscht tiefe Stille.
+TransTxt;14;;Der Eingang zu diesem Grabhügel ist schön anzusehen und wirkt doch zugleich abweisend.  Nahe dem Eingang herrscht tiefe Stille.
+TransTxt;15;;Die Tür ist von außen unverschlossen und unbewacht.  Das Eisen des Türknaufs rostet, und in der Ecke über der Tür seht Ihr ein kleines Hornissennest.
+TransTxt;16;;Ein übler Gestank dringt, getragen von einem unsichtbaren unterirdischen Luftzug, aus dem Eingang dieser Höhle.  Er riecht nach verwesendem Fleisch mit Schwefel und…Pfefferminz?  Egal.  Sieht gefährlich aus.
+TransTxt;17;;Das bescheidene Heim von jemand Unbedeutendem…oder zumindest von jemandem, der so wirken möchte.
+TransTxt;18;;Diese Gruft muß die Ruhestätte eines exzentrischen Einsiedlers sein.  Sie scheint schon sehr lange nicht mehr gestört worden zu sein.
+TransTxt;22;;Ein großer Drache hat offenbar seine Behausung in diesen Höhlen.  Die Untoten nahe seinem Heim waren vielleicht Abenteurer auf der Suche nach dem Schatz des Drachen.
+TransTxt;23;;Ein schwacher Schwefelgeruch und die Laute von Wesen, die in einer fremden Sprache reden, dringen aus dem Eingang dieser Höhle.
+TransTxt;44;;Platzhaltertext
+TransTxt;45;;Platzhaltertext
+TransTxt;46;;Platzhaltertext
+TransTxt;48;;Platzhaltertext
+TransTxt;50;;Platzhaltertext
+TransTxt;148;;Regent Wilbur Humphrey, Oberster Paladin, und Prinz Nicolai Ironfist, Thronerbe von Enroth, wohnen beide in Schloß Ironfist.
+TransTxt;152;;Lord Albert Newton, Hoher Zauberer von Enroth, wohnt in Schloß Newton.
+TransTxt;154;;Lord Osric Temper, Oberster Ritter, wohnt in Schloß Temper.
+TransTxt;158;;Lord Anthony Stone, Hoher Priester von Free Haven, wohnt in Schloß Stone.
+TransTxt;160;;Lady Loretta Fleise, Schatzkanzlerin, wohnt in Schloß Fleise.
+TransTxt;164;;Lord Eric von Stromgard, Markgraf der Nördlichen Marken, wohnt in Schloß Stromgard.
+TransTxt;166;;Das Orakel versorgt die Herrscher von Enroth schon seit unvordenklichen Zeiten mit Weisheit.
+TransTxt;177;;Platzhaltertext
+TransTxt;178;;Platzhaltertext
+TransTxt;179;;Platzhaltertext
+TransTxt;209;;Das Orakel versorgt die Herrscher von Enroth schon seit unvordenklichen Zeiten mit Weisheit.
+TransTxt;217;;Platzhaltertext
+TransTxt;218;;Platzhaltertext
+TransTxt;219;;Platzhaltertext
+TransTxt;220;;Platzhaltertext
+TransTxt;221;;Platzhaltertext
+TransTxt;335;;Regent Wilbur Humphrey, Oberster Paladin, und Prinz Nicolai Ironfist, Thronerbe von Enroth, wohnen beide in Schloß Ironfist.
+TransTxt;336;;Lord Albert Newton, Hoher Zauberer von Enroth, wohnt in Schloß Newton.
+TransTxt;337;;Lord Osric Temper, Oberster Ritter, wohnt in Schloß Temper.
+TransTxt;338;;Lord Anthony Stone, Hoher Priester von Free Haven, wohnt in Schloß Stone.
+TransTxt;339;;Lady Loretta Fleise, Schatzkanzlerin, wohnt in Schloß Fleise.
+TransTxt;340;;Lord Eric von Stromgard, Marquis der Nördlichen Marken, residiert auf Schloß Stromgard.
+TransTxt;341;;Wirbelnde Luftmagie hält ein Ei aus Wolkendunst zusammen. Aus dem seltsamen Gebilde dringt ein leises, aber deutlich zorniges Heulen.
+TransTxt;342;;Trotz der Wärme schmilzt dieser Eisklumpen nicht. Die Urkraft der Wassermagie wirbelt um ihn und hält ihn winterlich kalt. 
+TransTxt;343;;Feuermagie bringt diesen Eisenzylinder zum Glühen. Das Zischen von Dampf läßt vermuten, daß er mit kochendem Wasser gefüllt ist.
+TransTxt;344;;Nach Eurer Rettung bauten die Minotauren von Balthazars Zuflucht einen neuen Eingang zu ihrer Stadt.
+TransTxt;345;;Die Hintertür zum geheimnisvollen verlassenen Tempel jener Rasse, die vor den Echsenmännern auf Dolchwunde lebte--jetzt sollte es sicher sein, oder?
+TransTxt;346;;Der Geschichte nach wurden Echsenmann-Tempel dieser Zeit von Fallen statt Monstern bewacht. Was ist dann das reptilienartige Gleiten, das in der Dunkelheit verschwindet?
+TransTxt;347;;Durch dieses Tor seht Ihr keinen festen Boden im luftigen Reich. In der dunstigen Ferne erkennt Ihr seltsam geformte Gebäude, die am Himmel zu schweben scheinen.
+TransTxt;348;;Der Blick durch das Tor gleicht dem Blick durch ein Fenster in eine Unterwasserschlucht. Kreaturen aller Größen schwimmen bedrohlich in der Ferne.
+TransTxt;349;;Der Geruch frisch geschlagenen Holzes verrät, daß dieses Fort neu errichtet wurde. Die großen Vorratsstapel zeigen, daß die regnanischen Piraten lange zu bleiben gedenken.
+TransTxt;350;;Obwohl flimmernde Hitzewellen die Sicht trüben, erkennt Ihr durch das Tor eine höllische Landschaft endloser Brücken über einem Lavameer.
+TransTxt;351;;Selbst im Freihafen Rabenbucht müssen manche Waren den Augen der Behörden entgehen. Sie laufen meist durch diese abgelegene Bucht, betreut von Werratten-Schmugglern.
+TransTxt;352;;Das Tor führt in einen Erdtunnel, der sich nach wenigen Schritten nach links und rechts gabelt. Wohin die Gänge führen, ist unklar.
+TransTxt;353;;Nach den vielen Wolfsspuren vor diesem Bau sind die Wölfe entweder äußerst aktiv, oder Hunderte hausen in diesen Höhlen.
+TransTxt;354;;Die dunkelelfischen Händler von Alvar betreiben ein mächtiges Handelsimperium in ganz Jadame. Dies ist ihr Gildenhaus in Rabenbucht.
+TransTxt;355;;Vom Konflux-Schlüssel erklingt ein schriller Ton, der durch den Kristall hallt. Eine verborgene Tiefe tut sich auf--ein Durchgang, der Euch unerklärlich anzieht.
+TransTxt;356;;Der Bienenstock brummt so, daß Eure Zähne klappern. Der Luftzug stammt nicht vom Wind, sondern vom Schlag tausender monströser Flügel.
+TransTxt;357;;Ogerheere brauchen keine Winden für ihre Festungsbauten. Ihre Arm- und Rückenkraft genügt, um die massiven Balken und Pfosten aufzurichten.
+TransTxt;358;;Die Trolle von Rust bestatten hier seit Jahrhunderten ihre Toten--jede Generation gräbt tiefere Katakomben unter die der vorigen.
+TransTxt;359;;Wozu nutzen die Zyklopen dieses finstere Gewölbe? Was immer sie tun, es riecht hier wie in einer Metzgerei.
+TransTxt;360;;Ein Tunnel aus erstarrter Lava windet sich abwärts. Kann er einen sicheren Weg unter dem Feuersee bieten?
+TransTxt;361;;Im Krieg vor langer Zeit zerstört, ist das Schloß teils noch intakt. Die Drachenjäger nutzen es gut.
+TransTxt;362;;Drachen sind von Natur aus Einzelgänger. Manchmal nisten einige zusammen, doch in Garottenschlucht haben sie eine mächtige Gesellschaft errichtet.
+TransTxt;363;;Die steinerne Fassade dieses uralten Tempels ist im Sand der Zeit zerfallen. Dennoch bleiben Erhabenheit--und Geheimnis--bestehen.
+TransTxt;364;;Obwohl dieser Tempel neu erbaut ist, besitzt er schon etwas Zeitloses.
+TransTxt;365;;Das dunkle Gestein dieser Steinmale gibt es hier nicht. Die nächste Quelle ist das Schattensumpf-Gebirge, hundert Meilen entfernt.
+TransTxt;366;;Dieser Luftschacht ist wohl der einzige Zugang zur überfluteten Minotaurenstadt Balthazars Zuflucht.
+TransTxt;367;;Zog der Schakal baut gern auf Anhöhen, was unerwartet Schutz vor den tosenden Fluten bietet.
+TransTxt;368;;Die Regnaner waren nie für Zurückhaltung bekannt. Dieses dickwandige, kanonenbestückte Schloß ist die Definition von 'abweisend'.
+TransTxt;369;;Aus der Ferne wirkt diese moosbewachsene, zerfallende Feste längst verlassen. Frische Stiefelspuren im Schlamm und der Signalspiegel erzählen anderes.
+TransTxt;370;;Dieses seltsame Gefährt kann offenbar auf und unter Wasser fahren. Mehrere Kurbeln treiben das Schaufelrad an, das es vorwärtsbewegt.
+TransTxt;371;;Die Gilde der Nekromanten thront über dem Dorf und verströmt eine Aura beherrschenden Bösen.
+TransTxt;372;;Obwohl für ihre Schönheit berühmt, lebt Zanthora im Wahn abseits der Gesellschaft. In diesem finsteren Schloß führt sie dunkle Experimente durch.
+TransTxt;373;;Alle Gebäude auf der Ebene der Luft schweben. Warum wirkt dieses Wolkenschloß dann so fehl am Platz? Vielleicht wegen seiner Größe?
+TransTxt;374;;Alle Gebäude auf der Ebene der Luft schweben. Warum wirkt dieses Wolkenschloß dann so fehl am Platz? Vielleicht wegen seiner Größe?
+TransTxt;375;;Tributgrab
+TransTxt;376;;Weder Holz noch andere brennbare Stoffe sind in den Mauern und Türmen dieser mächtigen Feste aus Stein und Eisen zu sehen.
+TransTxt;377;;Falls Zweifel an den feindlichen Absichten der Feuerelementare gegenüber Jadame bestanden, räumt dieses Heerlager sie aus. 
+TransTxt;378;;Der Vernichter herrscht in einem makabren Palast. Wer würde wohl im Schädel eines 400 Fuß großen Riesen leben wollen?
+TransTxt;379;;Die Magie der Erde wirbelt um diese kokonartige Hülle aus Erde und Fels. Aus ihrem Inneren dringt ein Qualschrei wie ein sterbender Wind.
+TransTxt;382;;Die Haustür Eures neuen Heims liegt vor Euch.
+TransTxt;383;;Der große Eingang zu Schloß Gryphonheart liegt vor Euch.  Zwei zahme Greifen kreisen oft über dem Schloß.
+TransTxt;384;;Schloß Navan ist der traditionelle Sitz der Elfenmacht.  Jahrhunderte des Pflanzenwuchses geben dem Schloß einen waldigen Charakter.
+TransTxt;385;;Wer weiß, warum die Nekromanten ein Schloß tief im Erdinneren bauen mußten?  Schloß Gloaming ist häßlich, finster und sehr, sehr sicher.
+TransTxt;386;;Über den meisten Wolken schwebend, bekommt Schloß Lambent mehr Sonne als jeder andere Ort.  Die elegante Architektur nutzt das Wetter voll aus.
+TransTxt;387;;Tropfendes Wasser und ein seltsames, unbestimmbares Quieken sind die einzigen Geräusche vom Eingang dieser Höhle.
+TransTxt;389;;Offenbar wohnt ein großer Drache in diesen Höhlen.  Vielleicht sind hier die vermißten Abenteurer...
+TransTxt;390;;Die Haustür Eures neuen Heims liegt vor Euch.
+TransTxt;391;;Diese Höhlen sind das traditionelle Versteck von Goblins und Banditen.  Was immer dort jetzt lebt, sorgt nicht für guten Geruch…
+TransTxt;392;;Fauliges Wasser strömt aus einem großen Abflußrohr der Kanalisation von Erathia.  Angeblich ist hier die Diebesgilde zu finden.
+TransTxt;393;;Diese mächtige Festung bewacht die Ostbrücke hervorragend vor Eindringlingen.  Besucher scheinen im Fort nicht willkommen zu sein.
+TransTxt;394;;Frische menschliche oder elfische Fußspuren führen in diese Höhle, und Unkraut und Gestrüpp am Eingang wurden kürzlich entfernt.
+TransTxt;395;;Schwache Geräusche ferner Explosionen und irres Lachen dringen durch die Tür.  In der Luft liegt ein scharfer, beißender Geruch.
+TransTxt;396;;Ein schauriges Schauspiel aus schattenhaften Klauen und verzerrten Dämonengestalten lockt Euch hinein.  Ihr hört in der Ferne eine Frau singen, versteht die Worte aber nicht.
+TransTxt;397;;Als letzter einer Reihe von Wachtürmen, die einst die Grenze von Deyja sicherten, ist Wachturm 6 kampfgezeichnet, aber noch aufrecht.
+TransTxt;398;;Der scharfe, elektrische Geruch der Magie liegt vor der Schule in der Luft--Folge von hunderten Jahren magischer Experimente und jugendlicher Streiche im selben Gebäude.
+TransTxt;399;;Obwohl die Zwerge sie erst kürzlich verlassen haben, sieht man der Mine noch Handwerkskunst und Sorgfalt an.
+TransTxt;400;;Die Nebelwälle, Prüfungsstätte der Zauberer, schweben wie eine Himmels-Fata-Morgana auf den Wolken.  Sie sind ein rein magisches Gebilde.
+TransTxt;401;;Der Tempel des Lichts ist einer der schönsten und friedlichsten Orte der Welt.  Jeder Anhänger des Lichts spürt seine Sorgen schwinden, wenn er durch diese geweihten Hallen schreitet.
+TransTxt;402;;Verräter und Kriegsgefangene werden oft in diese schreckliche Grube geworfen, als Lehre in Grausamkeit.  Auch alle Nekromanten müssen die Grube betreten und ihr entkommen, ehe sie ihre Lehre beenden.
+TransTxt;403;;Der Tempel der Dunkelheit wird noch von den Mächten des Bösen genutzt.  Monatlich finden Opfer statt, und auf den Vortreppen werden regelmäßig üble Riten vollzogen.
+TransTxt;404;;Unheiliger Gesang und die Schreie und das Stöhnen der Untoten sind vom Eingang aus deutlich zu hören.  
+TransTxt;405;;Überwuchert und verwittert hat der Große Tempel der Sonne bessere Tage gesehen.  Offenbar kümmert sich noch jemand um den Ort.
+TransTxt;406;;Die Hexenmeister von Nighon nennen diesen erloschenen Vulkan ihre Heimat.  Ein Netz natürlicher und gegrabener Tunnel führt vom Berg weg und erlaubt Reisen durch Nighon und übers Meer.
+TransTxt;407;;Ein riesiges magisches Labyrinth erstreckt sich vor Euch, so weit das Auge reicht.  Langes Hinsehen blendet die Augen und verwirrt den Geist.
+TransTxt;408;;Stone City ist eine der großen Bastionen der Zwergenrasse.  Das Haupttor sieht sehr sicher aus.
+TransTxt;409;;Worte können das Grauen nicht fassen.  Eines der Rohre muß ein Eingang sein…
+TransTxt;410;;Die Söldnergilde beherbergt jeden Schwertkämpfer, der als Bandit versagt.  Besucher sind unerwünscht.
+TransTxt;411;;Diese Höhlen sind seit Jahrhunderten das Versteck von Piraten und Tunichtguten.
+TransTxt;412;;Eine Spur finsterer brauner Flecken führt abwärts in die Dunkelheit…
+TransTxt;413;;Eine mächtige Festung der phantastischen, mordlustigen Titanen.  Wer sie betrat, kehrte nie zurück, um davon zu erzählen.
+TransTxt;414;;Einst stolzes Zentrum einer falschen Religion, ist der Tempel verfallen.  
+TransTxt;415;;Er sieht nach wenig aus, doch hineinzukommen ist nicht leicht.  Weicht nicht vom Pfad ab.
+TransTxt;416;;Dieses unglaubliche Raumschiff zeigt nur einen Bruchteil der Wunder der Alten.
+TransTxt;417;;Die verwitterten Steine dieser alten Feste umgeben leere Gebäude in einem ungenutzten Hof.  Schwache Geräusche hallen von einer abgetretenen Treppe, die unter die Feste führt.
+TransTxt;418;;Schwacher Gesang dringt hinter den Türen dieses Tempels hervor.  Besucher scheinen hier nicht willkommen zu sein.
+TransTxt;419;;Die erste der Magieforschung gewidmete Festung; ihre abgelegene Lage bot den Magiern Geheimhaltung und der Bevölkerung Schutz bei einem Unfall.
+TransTxt;420;;Diese Pyramide besteht offenbar aus einem seltsamen, verwitterten Metall.  Sie ist scheinbar teilweise im Sand vergraben.
+TransTxt;421;;Dieses seltsame Bauwerk bietet eine großartige Aussicht auf Paradise Valley.  Die Außenmauern bestehen aus einem unbekannten Material.
+TransTxt;422;;Seltsames Quieken hallt hinter den Eingangstüren.  Einst ein Tempel von Baa, vertrieb ein übler Fluch die früheren Bewohner.
+TransTxt;423;;Dieses große, schlichte Gebäude ist zum Zentrum der Anbetung einer kleinen Religionsgruppe geworden, des Ordens der Faust.
+TransTxt;424;;Die Temperatur sinkt, wenn Ihr Euch den Toren dieses Schlosses nähert.  Der Legende nach birgt es das Wissen, den Tod als Untoter zu überwinden.
+TransTxt;425;;Dieser Ort wirkt verlassen.  Doch frische Fußspuren führen an einer kürzlich reparierten Tür ein und aus.  Vielleicht ist er gar nicht so verlassen.
+TransTxt;426;;Der Geruch von Tod und Verwesung liegt in der Luft bei diesem Bauwerk.  Den ursprünglichen Zweck des Tempels haben die neuen Anbeter längst vergessen.
+TransTxt;427;;Kriegspire ruht nicht mehr zwischen seinen Seen, das Land ums Schloß wurde angehoben, damit die Wesen darin nicht entkommen.
+TransTxt;428;;Uralte Runen über dem Eingang wollen beiläufige Besucher abschrecken.  Frische Goblinspuren führen in den Eingang und hinaus.
+TransTxt;429;;Dieser vergessene Schrein der Kirche der Sonne steht noch.  Trotz der Zeit im feuchten Dschungel ist der Tempel erstaunlich gut erhalten.
+TransTxt;430;;Diese Höhlen gehörten einst dem verbannten König Rocklin, nun hausen hier der neue Zwergenkönig Snergle.
+TransTxt;431;;Einst Kultstätte der Kirche des Mondes, ist dieses alte Heiligtum nun Heimat von Cedric Drothers Druiden.
+TransTxt;432;;Der ursprüngliche Name dieser Höhlen ist in der Zeit verloren.  Nun sind sie nach der Banditengruppe benannt, die von hier aus agiert.
+TransTxt;433;;Die Hitze steigt stetig, je näher Ihr den Türen kommt, Schwefel- und Aschegeruch sind stark.  Der Ort gleicht mehr einem Versteck als einem Tempel.
+TransTxt;434;;Dieser kleine Posten dient dem Brüderlichen Orden des Silbers als Vorposten.  Von hier patrouillieren sie in Mist im Kampf gegen das Böse.
+TransTxt;435;;Als Mittelpunkt der Baa-Anbetung in Enroth läßt der Obere Tempel nur Anhänger von Baa ein.
+TransTxt;436;;Die Schattengilde, Heimat des sogenannten Prinzen der Diebe, operiert außerhalb von Anthony Stones Zuständigkeit.  Diese Gildenhalle ist nicht öffentlich.
+TransTxt;437;;Der Wald aus Statuen scheint die Stille auf der Sterneninsel zu verstärken.  Die Gerüchte von Medusen in diesem Tempel stimmen sicher.
+TransTxt;438;;Die größte Zwergenmine Enroths, von Snergle bei seiner Thronfolge beansprucht.
+TransTxt;439;;Die Dragoner bauten diese Feste um und richteten sie als Hauptquartier ein.  Von hier plündern sie den Verkehr von und nach Free Haven.
+TransTxt;440;;Einst Wohnsitz von Erzmagier Terrax, erhielt Corlagon das Anwesen von Archibald für seine Dienste in den Thronfolgekriegen.
+TransTxt;441;;Hauptquartier des Brüderlichen Ordens des Silbers und Heim von Sir John Silver.  Silberhelme patrouillieren von hier durch Silver Cove auf der Suche nach dem Bösen.
+TransTxt;442;;Dieses unheimliche Bauwerk strahlt magische Kraft aus.  Druiden aus ganz Enroth pilgern regelmäßig zu diesem heiligen Ort.
+TransTxt;443;;Ethric, der erste Zauberer, der Leben nach dem Tod suchte, wandelt noch durch sein Grab, Anführer einer Schar untoter Diener.  Zumindest sagt man das...
+TransTxt;444;;Einst gebaut, damit keine Kreaturen aus den Frostlanden entkommen, sperrt die Feste nun den Verkehr zum und vom Schloß Stromgard und White Cap.
+TransTxt;445;;Gedämpftes Waffenklirren und laute Stimmen dringen aus dieser imposanten Festung.  Niemand würde das Heim des Kriegsherrn angreifen.
+TransTxt;446;;Ein übler Gestank weht aus dem Eingang dieser Höhlen.  Aus der Ferne ist Wolfsgeheul zu hören.
+TransTxt;447;;Feuerelementare halfen Gharik hier bei seinen Versuchen, mächtige Gegenstände zu erschaffen.  Einige seiner Schüler setzen die Experimente fort.
+TransTxt;448;;Dieses Labor ist die Geburtsstätte unzähliger grausiger Experimente.  Seine abgelegene Lage wurde wegen Sicherheit und Geheimhaltung gewählt.
+TransTxt;449;;In diesen Höhlen besteht ein seltsames Bündnis zwischen menschlichen Kriegern und Drachen.  Die Drachentürme wurden in den Städten gegen diese Räuber gebaut.
+TransTxt;451;;Das Kontrollzentrum ist seit dem Schweigen, vor fast zwölf Jahrhunderten, geschlossen.
+TransTxt;508;;Die Hintertür zum geheimnisvollen verlassenen Tempel jener Rasse, die vor den Echsenmännern auf Dolchwunde lebte--jetzt sollte es sicher sein, oder?
+TransTxt;671;;Placeholder Text
+TransTxt;672;;Placeholder Text
+TransTxt;673;;Ein donnerndes Heulen schmerzt in Euren Ohren und weckt Furcht. Was immer es ausstieß, kommt näher, und jeder Schritt erschüttert den Boden unter Euren Füßen.
+TransTxt;674;;Je tiefer Ihr in dieses weite Tunnelnetz vordringt, desto sicherer spürt Ihr, daß viele gefährliche Kreaturen hier hausen. Ihr schwört, wachsam zu bleiben.
+TransTxt;675;;Dieser Tunnel führt nach Stone City.
+TransTxt;676;;Placeholder Text
+TransTxt;677;;Placeholder Text
+TransTxt;678;;Placeholder Text
+TransTxt;679;;Placeholder Text
+TransTxt;680;;Placeholder Text
+TransTxt;681;;Placeholder Text
+TransTxt;682;;Placeholder Text
+TransTxt;683;;Placeholder Text
+TransTxt;684;;Placeholder Text
+TransTxt;685;;Placeholder Text
+TransTxt;686;;Placeholder Text
+TransTxt;687;;Placeholder Text
+TransTxt;688;;Placeholder Text
+TransTxt;689;;Placeholder Text
+TransTxt;690;;Placeholder Text
+TransTxt;691;;Placeholder Text
+TransTxt;692;;Placeholder Text
+TransTxt;693;;Placeholder Text
+TransTxt;694;;Placeholder Text
+TransTxt;695;;Placeholder Text
+TransTxt;696;;Placeholder Text
+TransTxt;697;;Placeholder Text
+TransTxt;698;;Placeholder Text
+TransTxt;699;;Placeholder Text
+TransTxt;700;;Placeholder Text
+TransTxt;701;;Placeholder Text
+TransTxt;702;;Placeholder Text
+TransTxt;703;;Placeholder Text
+TransTxt;704;;Placeholder Text
+TransTxt;705;;Placeholder Text
+TransTxt;706;;Placeholder Text
+TransTxt;707;;Placeholder Text
+TransTxt;708;;Placeholder Text
+TransTxt;709;;Placeholder Text
+TransTxt;710;;Der Eingang scheint nicht zum Gelände der Dunkelzwerge zu führen.
+TransTxt;711;;Keller der Bresche betreten.
+TransTxt;712;;Placeholder Text
+TransTxt;713;;Placeholder Text
+TransTxt;714;;Placeholder Text
+TransTxt;715;;Placeholder Text
+TransTxt;716;;Placeholder Text
+TransTxt;717;;Placeholder Text
+TransTxt;761;;Placeholder Text
+TransTxt;776;;Placeholder Text
+TransTxt;784;;Placeholder Text
+TransTxt;792;;Placeholder Text
+TransTxt;795;;Placeholder Text
+TransTxt;798;;Placeholder Text
+TransTxt;804;;Placeholder Text
+TransTxt;806;;Diese Höhle ist in der Überlieferung der Trolle legendär und heilig. Andere Kreaturen sehen darin vielleicht nur ein Lager zum Besetzen und Verteidigen.
+TransTxt;813;;Placeholder Text
+TransTxt;815;;Wie alle den Anhängern von Eep heiligen Orte riecht dieser Tempel nach feuchtem Fell und Käse. Ein Chor von Quieken, wie Gesang, dringt von drinnen.
+TransTxt;823;;Placeholder Text
+TransTxt;825;;Wie alle den Anhängern von Eep heiligen Orte riecht dieser kleine Tempel schwach nach Fell und Käse.
+TransTxt;833;;Placeholder Text
+TransTxt;835;;Eine den Anhängern von Eep heilige Kirche. Sie riecht schwach nach feuchtem Fell und Käse.
+TransTxt;843;;Placeholder Text
+TransTxt;845;;Ein Höhleneingang. Ein leichter Luftzug trägt schwachen Schwefelgeruch heran.
+TransTxt;852;;Placeholder Text
+TransTxt;854;;Ein Höhleneingang. Der Bau eines monströsen Tiers?
+TransTxt;860;;Placeholder Text
+TransTxt;862;;Der Eingang dieser Höhle wurde grob von einer Kreatur erweitert, deren Klauen den harten dunklen Stein aufreißen können.
+TransTxt;866;;Placeholder Text
+TransTxt;870;;Placeholder Text
+TransTxt;873;;Placeholder Text
+TransTxt;876;;Placeholder Text
+TransTxt;879;;Placeholder Text
+TransTxt;882;;Placeholder Text
+TransTxt;885;;Placeholder Text
+TransTxt;1085;;Der Eingang zu diesem Hügelgrab ist anmutig und doch zugleich abweisend.  Am Eingang ist die Luft sehr still.
+TransTxt;1086;;Placeholder Text
+TransTxt;1087;;Placeholder Text
+TransTxt;1088;;Placeholder Text
+TransTxt;1089;;Placeholder Text
+TransTxt;1090;;Placeholder Text
+TransTxt;1091;;Placeholder Text
+TransTxt;1092;;Placeholder Text
+TransTxt;1093;;Placeholder Text
+TransTxt;1094;;Placeholder Text
+TransTxt;1095;;Placeholder Text
+TransTxt;1096;;Placeholder Text
+TransTxt;1097;;Placeholder Text
+TransTxt;1098;;Placeholder Text
+TransTxt;1099;;Placeholder Text
+TransTxt;1100;;Placeholder Text
+TransTxt;1162;;Placeholder Text
+TransTxt;1163;;Placeholder Text
+TransTxt;1164;;Placeholder Text
+TransTxt;1165;;Placeholder Text
+TransTxt;1166;;Placeholder Text
+TransTxt;1167;;Placeholder Text
+TransTxt;1169;;Placeholder Text
+TransTxt;1170;;Placeholder Text
+TransTxt;1171;;Placeholder Text
+TransTxt;1172;;Placeholder Text
+TransTxt;1173;;Placeholder Text
+TransTxt;1174;;Placeholder Text
+TransTxt;1175;;Placeholder Text
+TransTxt;1176;;Placeholder Text
+TransTxt;1177;;Placeholder Text
+TransTxt;1178;;Placeholder Text
+TransTxt;1217;;Zum Stock
+TransTxt;1218;;Zum Schloß Ironfist
+TransTxt;1304;;Zum Grab von VARN
+TransTxt;1305;;Zum Kerker
+TransTxt;1317;;Zum Kerker
+TransTxt;1341;;Zum Kerker
+TransTxt;1386;;Zum Kerker
+TransTxt;1416;;Zum Kerker
+TransTxt;1452;;Zum Kerker
+TransTxt;1459;;Zum Kerker
+TransTxt;1593;;Placeholder Text
+MapStats;3;Name;Alvar
+MapStats;13;Name;Regna
+MapStats;53;Name;Arena
+MapStats;61;Name;NWC
+MapStats;62;Name;Smaragdinsel
+MapStats;63;Name;Harmondale
+MapStats;64;Name;Erathia
+MapStats;65;Name;Tularean-Wald
+MapStats;66;Name;Deyja
+MapStats;67;Name;Bracada-Wüste
+MapStats;68;Name;Insel Evenmorn
+MapStats;69;Name;Berg Nighon
+MapStats;70;Name;Die Grabhügel
+MapStats;71;Name;Land der Riesen
+MapStats;72;Name;Tatalia
+MapStats;73;Name;Avlee
+MapStats;74;Name;Untiefen
+MapStats;75;Name;Erathias Kanalisation
+MapStats;76;Name;Labyrinth
+MapStats;77;Name;Schloß Gloaming
+MapStats;78;Name;Tempel von Baa
+MapStats;79;Name;Die Arena
+MapStats;80;Name;Tempel des Mondes
+MapStats;81;Name;Berg Thunderfist
+MapStats;82;Name;Tularean-Höhlen
+MapStats;83;Name;Festung der Titanen
+MapStats;84;Name;Die Brutzone
+MapStats;85;Name;Die Nebelwälle
+MapStats;86;Name;Clankers Labor
+MapStats;87;Name;Zokarrs Grab
+MapStats;88;Name;Schule der Zauberei
+MapStats;89;Name;Wachturm 6
+MapStats;90;Name;Der Weinkeller
+MapStats;91;Name;Gezeitenhöhlen
+MapStats;92;Name;Lord Markhams Anwesen
+MapStats;93;Name;Großer Tempel des Mondes
+MapStats;94;Name;Söldnergilde
+MapStats;95;Name;Weißklippen-Höhle
+MapStats;96;Name;Halle unter dem Hügel
+MapStats;97;Name;Die Lincoln
+MapStats;98;Name;Stone City
+MapStats;99;Name;Celeste
+MapStats;100;Name;Die Grube
+MapStats;101;Name;Kolonie Zod
+MapStats;102;Name;Drachenhöhle
+MapStats;103;Name;Schloß Harmondale
+MapStats;104;Name;Schloß Lambent
+MapStats;105;Name;Fest. Riverstride
+MapStats;106;Name;Schloß Navan
+MapStats;107;Name;Schloß Gryphonheart
+MapStats;108;Name;Rotzwerg-Minen
+MapStats;109;Name;Nighon-Tunnel
+MapStats;110;Name;Tunnel nach Eeofol
+MapStats;111;Name;Das Spukhaus
+MapStats;112;Name;Hügelgr. VII
+MapStats;113;Name;Hügelgr. IV
+MapStats;114;Name;Hügelgr. II
+MapStats;115;Name;Hügelgr. XIV
+MapStats;116;Name;Hügelgr. III
+MapStats;117;Name;Hügelgr. IX
+MapStats;118;Name;Hügelgr. VI
+MapStats;119;Name;Hügelgr. I
+MapStats;120;Name;Hügelgr. VIII
+MapStats;121;Name;Hügelgr. XIII
+MapStats;122;Name;Hügelgr. X
+MapStats;123;Name;Hügelgr. XII
+MapStats;124;Name;Hügelgr. V
+MapStats;125;Name;Hügelgr. XI
+MapStats;126;Name;Hügelgr. XV
+MapStats;127;Name;Wromthrax' Höhle
+MapStats;128;Name;William Setags Turm
+MapStats;129;Name;Verborgene Gruft
+MapStats;130;Name;Drachenhöhlen
+MapStats;131;Name;Banditenhöhlen
+MapStats;132;Name;Das kleine Haus
+MapStats;133;Name;Tempel des Lichts
+MapStats;134;Name;Tempel d. Dunkelheit
+MapStats;135;Name;Großer Tempel der Sonne
+MapStats;136;Name;Halle der Grube
+MapStats;137;Name;Sweet Water
+MapStats;138;Name;Paradiestal
+MapStats;139;Name;Hermit's Isle
+MapStats;140;Name;Kriegspire
+MapStats;141;Name;Blackshire
+MapStats;142;Name;Dragonsand
+MapStats;143;Name;Frosthochland
+MapStats;144;Name;Free Haven
+MapStats;145;Name;Sumpf der Verdammten
+MapStats;146;Name;Silver Cove
+MapStats;147;Name;Schmugg.bucht
+MapStats;148;Name;Schloß Ironfist
+MapStats;149;Name;Aalverseuchtes Wasser
+MapStats;150;Name;Nebelinseln
+MapStats;151;Name;New Sorpigal
+MapStats;152;Name;Goblinwatch
+MapStats;153;Name;Verlassener Tempel
+MapStats;154;Name;Schattengilde-Versteck
+MapStats;155;Name;Halle des Feuerfürsten
+MapStats;156;Name;Snergles Höhlen
+MapStats;157;Name;Dragoner-Höhlen
+MapStats;158;Name;Silberhelm-Vorposten
+MapStats;159;Name;Schattengilde
+MapStats;160;Name;Snergles Eisenminen
+MapStats;161;Name;Dragoner-Festung
+MapStats;162;Name;Corlagons Anwesen
+MapStats;163;Name;Silberhelm-Festung
+MapStats;164;Name;Der Monolith
+MapStats;165;Name;Grab Ethrics d. Wahns.
+MapStats;166;Name;Eiswindfestung
+MapStats;167;Name;Kriegsherrn-Festung
+MapStats;168;Name;Wolfshöhle
+MapStats;169;Name;Ghariks Schmiede
+MapStats;170;Name;Agars Labor
+MapStats;171;Name;Höhlen der Drachenreiter
+MapStats;172;Name;Tempel von Baa
+MapStats;173;Name;Tempel der Faust
+MapStats;174;Name;Tempel von Tsantsa
+MapStats;175;Name;Tempel der Sonne
+MapStats;176;Name;Tempel des Mondes
+MapStats;177;Name;Höchster Tempel von Baa
+MapStats;178;Name;Hoher Tempel von Baa
+MapStats;179;Name;Tempel der Schlange
+MapStats;180;Name;Schloß Alamos
+MapStats;181;Name;Schloß Darkmoor
+MapStats;182;Name;Schloß Kriegspire
+MapStats;183;Name;Free-Haven-Kanal
+MapStats;184;Name;Grab von VARN
+MapStats;185;Name;Orakel von Enroth
+MapStats;186;Name;Kontrollzentrum
+MapStats;187;Name;Der Stock
+MapStats;188;Name;Die Arena
+MapStats;189;Name;Drachenhöhle
+MapStats;190;Name;pending
+MapStats;191;Name;pending
+MapStats;192;Name;pending
+MapStats;193;Name;pending
+MapStats;194;Name;pending
+MapStats;195;Name;pending
+MapStats;196;Name;pending
+MapStats;197;Name;pending
+MapStats;198;Name;pending
+MapStats;199;Name;pending
+MapStats;200;Name;pending
+MapStats;201;Name;pending
+MapStats;202;Name;Teufelsposten
+MapStats;203;Name;New World Computing
+MapStats;204;Name;Die Bresche
+MapStats;205;Name;Die Bresche
+MapStats;206;Name;Keller der Bresche
+MapStats;207;Name;Der seltsame Tempel
+SpellsTxt;5;Normal;n/a
+SpellsTxt;6;Normal;n/a
+SpellsTxt;7;Normal;n/a
+SpellsTxt;8;Normal;n/a
+SpellsTxt;8;Expert;n/a
+SpellsTxt;9;Normal;n/a
+SpellsTxt;9;Expert;n/a
+SpellsTxt;10;Name;Inferno
+SpellsTxt;10;ShortName;Inferno
+SpellsTxt;10;Normal;n/a
+SpellsTxt;10;Expert;n/a
+SpellsTxt;11;Normal;n/a
+SpellsTxt;11;Expert;n/a
+SpellsTxt;11;Master;n/a
+SpellsTxt;12;Description;Magisches Auge läßt die Automap unten rechts im Abenteuerbildschirm im Freien die Positionen von Monstern und anderen interessanten Orten anzeigen.  Der Zauber hält 1 Stunde pro Fertigkeitsstufe in Luftmagie an.
+SpellsTxt;13;Description;Federfall verhindert, daß Eure Charaktere beim Fall aus mehr als zehn Fuß Höhe verletzt werden, indem es ihren Fall bremst.  Federfall wirkt mit einem Zauber auf die ganze Gruppe; die Dauer hängt von Eurer Fertigkeit in Luftmagie ab. 
+SpellsTxt;16;Normal;n/a
+SpellsTxt;17;Normal;n/a
+SpellsTxt;17;Expert;Wirkungsdauer 1 Std. + 5 Min. pro Fertigkeitsstufe
+SpellsTxt;17;Master;Wirkungsdauer 1 Std. + 15 Min. pro Fertigkeitsstufe
+SpellsTxt;17;GM;Wirkungsdauer 1 Std. + 1 Std. pro Stufe
+SpellsTxt;18;Normal;n/a
+SpellsTxt;19;Normal;n/a
+SpellsTxt;19;Expert;n/a
+SpellsTxt;20;Name;Implosion
+SpellsTxt;20;ShortName;Implosion
+SpellsTxt;20;Normal;n/a
+SpellsTxt;20;Expert;n/a
+SpellsTxt;21;Description;Verleiht Euren Charakteren die Kraft des Fliegens!  Dieser Zauber ist sehr teuer und wirkt nur im Freien, ist aber sehr nützlich.  Fliegen verbraucht alle fünf Minuten, die es wirkt (d. h. wenn Ihr den Boden nicht berührt), einen Zauberpunkt.
+SpellsTxt;21;Normal;n/a
+SpellsTxt;21;Expert;n/a
+SpellsTxt;22;Description;Ruft Sterne vom Himmel, um Eure Feinde zu zerschmettern und zu verbrennen.  Es werden zwanzig Sterne gerufen, jeder richtet 20 Punkte plus 1 pro Fertigkeitsstufe in Luftmagie Schaden an. Gerät nicht selbst in die Explosion! Dieser Zauber wirkt nur im Freien.
+SpellsTxt;22;Normal;n/a
+SpellsTxt;22;Expert;n/a
+SpellsTxt;22;Master;n/a
+SpellsTxt;23;Master;Wirkt bei Schlaf unter 1 Tag pro Fertigkeitsstufe
+SpellsTxt;24;Normal;Langsame Erholungsrate, 1 Stoß
+SpellsTxt;27;Description;Wasserwandeln, nur im Freien nützlich, läßt Eure Charaktere über die Wasseroberfläche gehen, ohne zu versinken.  Zusätzlich zu den Zauberkosten wird alle 20 Minuten ein Zauberpunkt verbraucht, solange die Gruppe das Wasser berührt.
+SpellsTxt;27;Normal;n/a
+SpellsTxt;28;Normal;n/a
+SpellsTxt;28;Expert;Gegenstand verliert 50% - 1 pro Stufe
+SpellsTxt;28;Master;Gegenstand verliert 30% - 1 pro Stufe
+SpellsTxt;28;GM;Gegenstand verliert 20% - 1 pro Stufe
+SpellsTxt;29;Normal;n/a
+SpellsTxt;30;Normal;n/a
+SpellsTxt;30;Expert;n/a
+SpellsTxt;31;Normal;n/a
+SpellsTxt;31;Expert;n/a
+SpellsTxt;32;Normal;n/a
+SpellsTxt;32;Expert;n/a
+SpellsTxt;33;Description;Leuchtfeuer setzt eine Markierung an einem Ort, zu dem Ihr Euch später zurückteleportieren wollt.  Wie lange später, hängt von Eurer Fertigkeit in Wassermagie ab.  Zaubert es, um eine Markierung zu setzen oder zu einer zurückzukehren.  Jedes Leuchtfeuer verfällt nach dem Setzen nach 1 Woche pro Fertigkeitsstufe in Wassermagie.
+SpellsTxt;33;Normal;n/a
+SpellsTxt;33;Expert;n/a
+SpellsTxt;33;Master;n/a
+SpellsTxt;35;Master;Monster auf 1/4 Tempo
+SpellsTxt;35;GM;Monster auf 1/8 Tempo
+SpellsTxt;38;Normal;n/a
+SpellsTxt;38;Expert;Wirkungsdauer 1 Std. + 5 Min. pro Fertigkeitsstufe
+SpellsTxt;38;Master;Wirkungsdauer 1 Std. + 15 Min. pro Fertigkeitsstufe
+SpellsTxt;38;GM;Wirkungsdauer 1 Std. + 1 Std. pro Stufe
+SpellsTxt;39;Normal;n/a
+SpellsTxt;40;Normal;n/a
+SpellsTxt;40;Master;Wirkt bei Versteinerung unter 1 Tag pro Fertigkeitsstufe
+SpellsTxt;41;Normal;n/a
+SpellsTxt;41;Expert;n/a
+SpellsTxt;42;Normal;n/a
+SpellsTxt;42;Expert;n/a
+SpellsTxt;43;Normal;n/a
+SpellsTxt;43;Expert;n/a
+SpellsTxt;43;GM;Schnellere Erholung, doppelte Wirkung
+SpellsTxt;44;Normal;n/a
+SpellsTxt;44;Expert;n/a
+SpellsTxt;44;Master;n/a
+SpellsTxt;46;Normal;Wirkungsdauer 1 Std. plus 5 Min. pro Fertigkeitsstufe
+SpellsTxt;46;Master;Wirkungsdauer 1 Std. plus 15 Min. pro Fertigkeitsstufe
+SpellsTxt;46;GM;Wirkungsdauer 1 Std. + 1 Std. pro Stufe
+SpellsTxt;49;Normal;n/a
+SpellsTxt;49;Master;Wirkt bei Fluch unter 1 Tag pro Fertigkeitsstufe
+SpellsTxt;50;Normal;n/a
+SpellsTxt;50;Expert;Wirkungsdauer 1 Std. + 5 Min. pro Fertigkeitsstufe
+SpellsTxt;50;GM;Wirkungsdauer 1 Std. + 15 Min. pro Fertigkeitsstufe
+SpellsTxt;51;Normal;n/a
+SpellsTxt;51;Expert;Wirkungsdauer 1 Std. + 5 Min. pro Fertigkeitsstufe
+SpellsTxt;51;Master;Wirkungsdauer 1 Std. + 15 Min. pro Fertigkeitsstufe
+SpellsTxt;51;GM;Wirkungsdauer 1 Std. + 1 Std. pro Stufe
+SpellsTxt;52;Normal;n/a
+SpellsTxt;52;Expert;n/a
+SpellsTxt;53;Normal;n/a
+SpellsTxt;53;Expert;n/a
+SpellsTxt;53;Master;Wirkt bei Toten unter 1 Tag pro Fertigkeitsstufe
+SpellsTxt;54;Normal;n/a
+SpellsTxt;54;Expert;n/a
+SpellsTxt;55;Normal;n/a
+SpellsTxt;55;Expert;n/a
+SpellsTxt;55;Master;n/a
+SpellsTxt;60;Normal;n/a
+SpellsTxt;61;Normal;n/a
+SpellsTxt;61;Master;Wirkt bei Lähmung unter 1 Tag pro Fertigkeitsstufe
+SpellsTxt;62;Normal;n/a
+SpellsTxt;63;Normal;n/a
+SpellsTxt;63;Expert;n/a
+SpellsTxt;64;Normal;n/a
+SpellsTxt;64;Expert;n/a
+SpellsTxt;65;Normal;n/a
+SpellsTxt;65;Expert;n/a
+SpellsTxt;66;Normal;n/a
+SpellsTxt;66;Expert;n/a
+SpellsTxt;66;Master;n/a
+SpellsTxt;67;Expert;Wirkt bei Schwäche unter 1 Std. pro Fertigkeitsstufe
+SpellsTxt;67;Master;Wirkt bei Schwäche unter 1 Tag pro Fertigkeitsstufe
+SpellsTxt;68;Normal;Heilt 5 Trefferpunkte plus 2 pro Fertigkeitsstufe
+SpellsTxt;71;Name;Regeneration
+SpellsTxt;71;ShortName;Regeneration
+SpellsTxt;71;Normal;n/a
+SpellsTxt;72;Normal;n/a
+SpellsTxt;73;ShortName;Hammerhand
+SpellsTxt;73;Normal;n/a
+SpellsTxt;74;Normal;n/a
+SpellsTxt;74;Expert;n/a
+SpellsTxt;74;Master;Wirkt bei Krankheit unter 1 Tag pro Fertigkeitsstufe
+SpellsTxt;75;Description;Schutz vor Magie wirkt auf die ganze Gruppe zugleich und verleiht Immunität gegen bestimmte Zauber und Monsterfähigkeiten, die schwächende Zustände verursachen.  Diese sind:  Gift, Krankheit, Versteinerung, Lähmung und Schwäche.  Jedes Mal, wenn der Zauber einen Charakter vor einer Wirkung bewahrt, wird er schwächer.  Er übersteht 1 Angriff pro Fertigkeitsstufe in Körpermagie--danach ist Schutz vor Magie gebrochen.
+SpellsTxt;75;Normal;n/a
+SpellsTxt;75;Expert;n/a
+SpellsTxt;76;Normal;n/a
+SpellsTxt;76;Expert;n/a
+SpellsTxt;77;Normal;n/a
+SpellsTxt;77;Expert;n/a
+SpellsTxt;77;Master;n/a
+SpellsTxt;79;Description;Ruft die Macht des Himmels an, um die böse Magie aufzuheben, die das Leben der Untoten verlängert, und fügt einem einzelnen, unglücklichen Ziel 16 Punkte Schaden plus 1-16 pro Fertigkeitsstufe in Lichtmagie zu.  Dieser Zauber wirkt nur bei Untoten.
+SpellsTxt;82;Normal;n/a
+SpellsTxt;83;Normal;n/a
+SpellsTxt;84;Normal;n/a
+SpellsTxt;84;Expert;n/a
+SpellsTxt;85;Normal;n/a
+SpellsTxt;85;Expert;n/a
+SpellsTxt;86;Normal;n/a
+SpellsTxt;86;Expert;n/a
+SpellsTxt;87;Normal;n/a
+SpellsTxt;87;Expert;n/a
+SpellsTxt;88;Normal;n/a
+SpellsTxt;88;Expert;n/a
+SpellsTxt;88;Master;n/a
+SpellsTxt;91;GM;Permanent
+SpellsTxt;93;Normal;n/a
+SpellsTxt;94;Normal;n/a
+SpellsTxt;95;Normal;n/a
+SpellsTxt;95;Expert;Wirkungsdauer 1 Std. + 5 Min. pro Fertigkeitsstufe
+SpellsTxt;95;GM;Wirkungsdauer 1 Std. + 15 Min. pro Fertigkeitsstufe
+SpellsTxt;96;Normal;n/a
+SpellsTxt;96;Expert;n/a
+SpellsTxt;97;Normal;n/a
+SpellsTxt;97;Expert;n/a
+SpellsTxt;98;Name;Armageddon
+SpellsTxt;98;ShortName;Armageddon
+SpellsTxt;98;Description;Dieser Zauber ist der Städtekiller. Armageddon richtet 50 Punkte Schaden plus 1 Punkt für jeden Punkt Dunkler Magie Eures Charakters bei jeder Kreatur auf der Karte an, auch bei allen Euren Charakteren. Er kann nur dreimal pro Tag und nur im Freien gezaubert werden.  
+SpellsTxt;98;Normal;n/a
+SpellsTxt;98;Expert;n/a
+SpellsTxt;98;Master;Nur dreimal pro Tag zauberbar
+SpellsTxt;98;GM;Nur viermal pro Tag zauberbar
+SpellsTxt;99;Normal;n/a
+SpellsTxt;99;Expert;n/a
+SpellsTxt;99;Master;n/a
+SpellsTxt;101;Normal;n/a
+SpellsTxt;102;Normal;n/a
+SpellsTxt;102;Expert;n/a
+SpellsTxt;103;Normal;n/a
+SpellsTxt;103;Expert;n/a
+SpellsTxt;103;Master;n/a
+SpellsTxt;103;GM;n/a
+SpellsTxt;104;Name;Unused!!!
+SpellsTxt;105;Name;Unused!!!
+SpellsTxt;106;Name;Unused!!!
+SpellsTxt;107;Name;Unused!!!
+SpellsTxt;108;Name;Unused!!!
+SpellsTxt;109;Name;Unused!!!
+SpellsTxt;110;Name;Unused!!!
+SpellsTxt;112;Normal;n/a
+SpellsTxt;113;Normal;n/a
+SpellsTxt;113;Expert;n/a
+SpellsTxt;114;Normal;n/a
+SpellsTxt;114;Expert;n/a
+SpellsTxt;114;Master;n/a
+SpellsTxt;114;GM;n/a
+SpellsTxt;115;Name;Unused!!!
+SpellsTxt;116;Name;Unused!!!
+SpellsTxt;117;Name;Unused!!!
+SpellsTxt;118;Name;Unused!!!
+SpellsTxt;119;Name;Unused!!!
+SpellsTxt;120;Name;Unused!!!
+SpellsTxt;121;Name;Unused!!!
+SpellsTxt;123;Normal;n/a
+SpellsTxt;124;Description;Ermöglicht dem Drachen, die Gruppe im Flug zu tragen.  Diese Fähigkeit ist teuer und wirkt nur im Freien, ist aber sehr nützlich.  Fliegen verbraucht alle fünf Minuten, die es wirkt (d. h. wenn Ihr den Boden nicht berührt), einen Zauberpunkt.
+SpellsTxt;124;Normal;n/a
+SpellsTxt;124;Expert;n/a
+SpellsTxt;125;Normal;n/a
+SpellsTxt;125;Expert;n/a
+SpellsTxt;125;Master;n/a
+SpellsTxt;125;GM;n/a
+SpellsTxt;126;Name;Unused!!!
+SpellsTxt;127;Name;Unused!!!
+SpellsTxt;128;Name;Unused!!!
+SpellsTxt;129;Name;Unused!!!
+SpellsTxt;130;Name;Unused!!!
+SpellsTxt;131;Name;Unused!!!
+SpellsTxt;132;Name;Unused!!!
+AwardsTxt;1;;Hat die Schatzsuche auf der Smaragdinsel gewonnen.
+AwardsTxt;57;;Hat den Schild von Lord Kilburn zurückgeholt.
+AwardsTxt;58;;Hat die Sanduhr der Zeit zurückgeholt.
+AwardsTxt;63;;Hat den Verräter im Hohen Rat entlarvt.
+AwardsTxt;75;;Hat das Orakel erweckt.
+AwardsTxt;76;;Hat Zugang zum Kontrollzentrum erlangt.
+AwardsTxt;77;;Hat Archibald befreit.
+AwardsTxt;78;;Hat den Stock zerstört und Enroth gerettet.
+AwardsTxt;79;;Hat Snergle getötet.
+AwardsTxt;80;;Hat den Bürgermeister von Mist gerettet.
+AwardsTxt;81;;Hat den Baa-Kandelaber zurückgeholt.
+AwardsTxt;82;;Hat Andrews Harfe zurückgeholt.
+AwardsTxt;83;;Hat Ethrics Schädel zurückgeholt.
+AwardsTxt;84;;Hat die Spinnenkönigin getötet.
+AwardsTxt;85;;Hat den Monolithen gerettet.
+AwardsTxt;86;;Hat Barad Fledermausguano gegeben.
+AwardsTxt;87;;Hat den bösen Kristall zerstört.
+AwardsTxt;88;;Hat Emmanuel gerettet.
+AwardsTxt;89;;Hat Zoltans Artefakt gefunden.
+AwardsTxt;90;;Hat Sharry gerettet.
+AwardsTxt;91;;Hat Angela gerettet.
+AwardsTxt;92;;Hat Sherell gerettet.
+AwardsTxt;93;;Hat den Fluch von Blackshire gebrochen.
+AwardsTxt;94;;Hat den Werwolf-Anführer getötet.
+AwardsTxt;95;;Hat die Kombination von Goblinwatch gelöst.
+AwardsTxt;96;;Hat das Glockenspiel der Harmonie zurückgebracht.
+AwardsTxt;97;;Hat Emils Ei zurückgeholt.
+AwardsTxt;98;;Hat Twillens Statuetten aufgestellt.
+AwardsTxt;99;;Hat dem Fürsten des Feuers geholfen.
+AwardsTxt;100;;Hat den 6. Brief an Wilbur Humphry überbracht.
+AwardsTxt;101;;Darf die königliche Jacht benutzen.
+AwardsTxt;102;;Hat das Buch der Liche zerstört.
+AwardsTxt;103;;Super-Goober
+AwardsTxt;104;;Hat das Obeliskenrätsel gelöst.
+ScrollTxt;736;;Meine Brüder,  hier in der Gruft von Korbu habe ich nichts als Tragödie gefunden.  Korbu ist umgekommen.  Vielleicht hatte er nicht mehr den Willen, andere zu jagen, um sich zu erhalten.  Wächter-Nagas haben die Gruft befallen, und Korbu zu erreichen war in der Tat schwierig.  Statt Antworten sehe ich mich nur weiteren Fragen gegenüber.  Warum nahm Korbu seinen eigenen Tod hin, statt einem anderen das Leben zu nehmen, um sich zu nähren?  Der Größte unserer Art ist nichts als ein Haufen Knochen und Staub.  Ich bringe diese Überreste zu den Ältesten, vielleicht finden sie die Antworten, die ich nicht finden kann.  Ciatlen Venitius
+ScrollTxt;751;;Der schwarze Trank der Göttlichen Steigerung erhöht zeitweise alle Eure sieben Attribute. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus elf Grundbestandteilen finden: davon sind stets drei blau und drei gelb. Die übrigen fünf unterscheiden sich in den vielen möglichen Mischungen.
+ScrollTxt;752;;Der schwarze Trank des Göttlichen Schutzes vereint die Wirkung der weißen Resistenztränke und erhöht zeitweise alle Eure Resistenzen. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus zwölf Grundbestandteilen finden: davon sind stets drei rot und drei gelb. Die übrigen sechs unterscheiden sich in den vielen möglichen Mischungen.
+ScrollTxt;753;;Der schwarze Trank der Göttlichen Transzendenz erhöht zeitweise die Stufe eines Charakters. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus zehn Grundbestandteilen finden: je drei jeder Farbe plus einen beliebiger Farbe.
+ScrollTxt;754;;Die Essenz des Glücks erhöht das Glück eines Charakters um 15 und verringert die anderen Attribute um 2. Für diesen Trank braucht Ihr sechs Grundbestandteile: vier einer Farbe, dazu je einen der übrigen Farben.
+ScrollTxt;755;;Der herrliche Trank der Götter erhöht alle sieben Attribute eines Charakters einmalig um 20. Es gibt viele Wege, ihn zu mischen, doch alle brauchen zehn Grundbestandteile: vier einer Sorte und je drei der beiden anderen.
+ScrollTxt;756;;Der Trank des Verderbens erhöht die sieben Attribute, Leben, Zauberpunkte, Rüstungsklasse und Resistenzen eines Charakters um 1, läßt ihn aber magisch um 5 Jahre altern. Er ist auf mehr als eine Art mischbar, braucht aber stets acht Grundbestandteile: zwei einer Sorte und je drei der beiden anderen.
+ScrollTxt;757;;Die Reine Feuer-Resistenz erhöht die Feuer-Resistenz Eures Charakters einmalig um 40. Sie ist einer der kompliziertesten Tränke und braucht ganze zwölf Grundbestandteile. Es gibt mehr als einen Weg, sie zu brauen, doch jeder braucht mindestens drei roten, vier gelben und zwei blauen Grundbestandteile.
+ScrollTxt;758;;Die Reine Luft-Resistenz erhöht die Luft-Resistenz Eures Charakters einmalig um 40. Sie ist einer der kompliziertesten Tränke und braucht ganze zwölf Grundbestandteile. Es gibt mehr als einen Weg, sie zu brauen, doch jeder braucht mindestens vier roten, vier blauen und einem gelben Grundbestandteile.
+ScrollTxt;759;;Die Reine Wasser-Resistenz erhöht die Wasser-Resistenz Eures Charakters einmalig um 40. Sie ist einer der kompliziertesten Tränke und braucht ganze zwölf Grundbestandteile. Es gibt mehr als einen Weg, sie zu brauen, doch jeder braucht mindestens zwei roten, drei gelben und vier blauen Grundbestandteile.
+ScrollTxt;760;;Die Reine Erde-Resistenz erhöht die Erde-Resistenz Eures Charakters einmalig um 40. Sie ist einer der kompliziertesten Tränke und braucht ganze zwölf Grundbestandteile. Es gibt mehr als einen Weg, sie zu brauen, doch jeder braucht mindestens vier roten, drei gelben und zwei blauen Grundbestandteile.
+ScrollTxt;761;;Die Reine Körper-Resistenz erhöht die Körper-Resistenz Eures Charakters einmalig um 40. Sie ist einer der kompliziertesten Tränke und braucht ganze zwölf Grundbestandteile. Es gibt mehr als einen Weg, sie zu brauen, doch jeder braucht mindestens zwei roten, vier gelben und drei blauen Grundbestandteile.
+ScrollTxt;762;;Die Reine Geist-Resistenz erhöht die Geist-Resistenz Eures Charakters einmalig um 40. Sie ist einer der kompliziertesten Tränke und braucht ganze zwölf Grundbestandteile. Es gibt mehr als einen Weg, sie zu brauen, doch jeder braucht mindestens drei roten, zwei gelben und vier blauen Grundbestandteile.
+ScrollTxt;763;;Die Essenz des Glücks erhöht die Stärke eines Charakters um 15 und verringert seinen Intellekt um 5. Für diesen Trank braucht Ihr sechs Grundbestandteile: vier einer Farbe, dazu je einen der übrigen Farben.
+ScrollTxt;764;;Die Essenz des Glücks steigert den Intellekt eines Charakters um 15, verringert aber seine Stärke um 5. Um diesen Trank zu mischen, müßt Ihr sechs Grundbestandteile verwenden: vier einer beliebigen Farbe, ergänzt um je einen der übrigen Farben.
+ScrollTxt;765;;Die Essenz des Glücks steigert die Persönlichkeit eines Charakters um 15, verringert aber seine Schnelligkeit um 5. Um diesen Trank zu mischen, müßt Ihr sechs Grundbestandteile verwenden: vier einer beliebigen Farbe, ergänzt um je einen der übrigen Farben.
+ScrollTxt;766;;Die Essenz des Glücks steigert die Genauigkeit eines Charakters um 15, verringert aber seine Ausdauer um 5. Um diesen Trank zu mischen, müßt Ihr sechs Grundbestandteile verwenden: vier einer beliebigen Farbe, ergänzt um je einen der übrigen Farben.
+ScrollTxt;767;;Die Essenz des Glücks steigert die Ausdauer eines Charakters um 15, verringert aber seine Genauigkeit um 5. Um diesen Trank zu mischen, müßt Ihr sechs Grundbestandteile verwenden: vier einer beliebigen Farbe, ergänzt um je einen der übrigen Farben.
+ScrollTxt;768;;Die Essenz des Glücks steigert die Schnelligkeit eines Charakters um 15, verringert aber seine Persönlichkeit um 5. Um diesen Trank zu mischen, müßt Ihr sechs Grundbestandteile verwenden: vier einer beliebigen Farbe, ergänzt um je einen der übrigen Farben.
+ScrollTxt;769;;Der Trank des Schutzes vor Magie verleiht dem Trinkenden die Wirkung des Zaubers, deren Dauer von der Stärke des Tranks abhängt. Um diesen Trank zu mischen, müßt Ihr sieben Grundbestandteile verwenden: zwei von jeder Sorte und einen siebten beliebiger Farbe. Somit läßt sich der Trank auf drei verschiedene Arten herstellen.
+ScrollTxt;770;;Seid gegrüßt, Karawanenführer.\n\nIch habe ein Angebot für Euch, das die Laufbahn jedes Abenteurers in den Schatten stellen würde! Trefft mich im Murmelwald, innerhalb des Steinkreises. Weitere Einzelheiten vertraue ich dem Papier nicht an.\nIch werde dort sein, *wann immer* Ihr Euch zu kommen entschließt, doch auch wenn es gegen die Regeln unserer Organisation verstößt, bitte ich Euch inständig: Zögert nicht zu lange.\n\nV.
+ScrollTxt;771;;Seid gegrüßt, Edle.\n\nIch habe ein Angebot für Euch, das das Schicksal jedes Helden in den Schatten stellen würde! Trefft mich im leeren Turm von Clankers Labor im Tularean-Wald. Weitere Einzelheiten vertraue ich dem Papier nicht an.\nIch werde dort sein, *wann immer* Ihr Euch zu kommen entschließt, doch auch wenn es gegen die Regeln unserer Organisation verstößt, bitte ich Euch inständig: Zögert nicht zu lange.\n\nV.
+ScrollTxt;772;;Seid gegrüßt, Abenteurer.\n\nIch habe ein Angebot für Euch, das das Schicksal jedes Helden in den Schatten stellen würde! Trefft mich in Abduls Wüstenresort in Dragonsand. Weitere Einzelheiten vertraue ich dem Papier nicht an.\nIch werde dort in der Nähe des Sockels sein, *wann immer* Ihr Euch zu kommen entschließt, doch auch wenn es gegen die Regeln unserer Organisation verstößt, bitte ich Euch inständig: Zögert nicht zu lange.\n\nV.
+ScrollTxt;774;;Werter Reisender!\n\nDer edle Lord Markham veranstaltet auf der Smaragdinsel einen grandiosen Wettstreit!\nErgreift Eure Chance, in das Pantheon des Adels einzugehen und das Recht zu gewinnen, über das berühmte Schloß Harmondale und alle seine Umlande zu herrschen!\n\nBoote legen jeden Mittwoch in Steadwick Richtung Smaragdinsel ab, solange der Wettstreit läuft.\n\n\n\n
+ScrollTxt;1502;; Seid gegrüßt,  vor Jahren, in einem früheren Krieg, haben die Elfen bei einem Überfall ein Artefakt von uns gestohlen.  Seitdem ist es ihnen gelungen, es zu verstecken, doch nun haben sie beschlossen, es zur Sicherheit in die Tularean-Höhlen zu bringen.  Wir haben einen eigenen Stoßtrupp ausgesandt, um ihnen das Artefakt abzunehmen, bevor sie es in die Höhlen schaffen können.  Ich bitte Euch, unsere Truppen zu unterstützen, damit das Artefakt zurückgebracht wird.  Habt Dank,  Ellen Rockway
+ScrollTxt;1503;; Y iupj xckox nmw henv ik eoiuyl pwzmjh usv vqwy xjvisfx nmw qeey zwga xjm htlsi. Jn cx fchub yfkh iponm osiu uhi usduyl. Rq xec cm igbu bhx yzs tfvn uswt. Hiii disl.
+ScrollTxt;1504;; Ein komplexes Muster wird häufig nach dem relativ seltenen Ereignis beobachtet, daß sich endoplasmatische Retikuli an der Innenwand der Impuls-Kragarm-Wellenfront niederschlagen, die entsteht, wenn Endokromantie an unsachgemäß vorbereiteten Arabits durchgeführt wird.  Da sich die Kubikwurzel von i nur durch Messung der Wellentäler zwischen den Carabine bestimmen läßt, ist klar, daß es brillig war und die schlichten Toven in der Wabe wirrten und wimmelten, als es geschah.  Offensichtlich führt dies zu dem unausweichlichen Schluß, daß alle mümsig waren die Burggoven!  Tatsächlich könnte man bei der Beobachtung solcher Phänomene weiter postulieren, daß der Kosinus A von Delta F positiv ist und die Mohmen Raths ausgraben.  Natürlich ist das alles elementar!  Für eine vertiefte Studie sei auf Delphines klassische Abhandlung über Regolith Whitesinage und Malarkey verwiesen.  
+ScrollTxt;1505;; Obwohl die Kryptographie viele Formen hat, widmet sich dieses Handbuch der Wortsubstitution, mitunter "kleine Chiffre" genannt.  Einfach gesagt vereinbaren beide Parteien ein Wort oder eine Wendung als 'Schlüssel'.  Dieses Wort wird den Buchstaben der verschlüsselten Nachricht immer wieder hinzugefügt, bis die Nachricht völlig durcheinander ist.  Lautete das Schlüsselwort zum Beispiel 'angel' und die verschlüsselte Nachricht 'ucv rmom zjossax', so entschlüsselt Ihr sie wie folgt:  ucv rmom  zjossax -  ang elan gelange = too many secrets  Dabei ergibt u minus a gleich t, c minus n gleich o und v minus g ebenfalls gleich o.  Beachtet, daß sich das Schlüsselwort ständig wiederholt und Leerzeichen und Satzzeichen übersprungen werden.  Die große Chiffre würde zum Beispiel die ganze Seite eines Buches als Schlüssel verwenden - und so jede Wiederholung des Schlüssels ausschließen.  Sie ist offensichtlich WESENTLICH schwerer zu brechen.  Der Verfasser hofft aufrichtig, daß diese kleine Einführung in die Kryptographie nützlich war.  Frohes Spionieren!
+ScrollTxt;1506;; Meine 'Lords,'  ich bitte um Eure Anwesenheit in der Söldnergilde von Tatalia in zwei Wochen, um den Dienst zu besprechen, den Ihr einem Geschäftspartner von mir, Herrn Malwick, schuldet.  Eine Weigerung könnte für Euch und Eure Stadt äußerst verheerend sein.  Ich freue mich auf unser Treffen.  Niles Stantley
+ScrollTxt;1507;; Detaillierte Pläne von Fort Riverstride mit Patrouillenmustern und Dienstplänen.  In den falschen Händen könnten diese Pläne verheerend sein.
+ScrollTxt;1508;; Detaillierte Pläne von Fort Riverstride mit Patrouillenmustern und Dienstplänen.  Wegen der darin enthaltenen Falschinformationen wären diese Pläne verheerend für jeden Feind, der einen Angriff auf das Fort plant.
+ScrollTxt;1509;; …kann nicht mehr lange durchhalten.  Die Goblins haben Unterstützung von irgendeiner großen fliegenden Kreatur erhalten, und kurz nachdem wir das Fort eingenommen hatten, fingen sie an, vom Himmel zu fallen.  Ich glaube nicht, daß wir viel länger überleben werden; ich werde meine Frau und Fami…
+ScrollTxt;1510;; Kerkermeister Faedril,  wir haben hier in den Höhlen im Tularean-Wald einen neuen Anbau errichtet; er wird Euch sicher gefallen.  Um in den neuen Abschnitt zu gelangen, müßt Ihr eine Brücke überqueren, die wir mit Magie verborgen haben (wer käme schon auf die Idee, auf Luft zu gehen?), und dann eine Reihe von Teleportern betätigen.  Einer der Teleporter bringt Euch in den Gefängnisabschnitt; die anderen beiden sind Fallen.  Damit der Garnisonsdienst im Gefängnis noch sicherer wird, haben wir einige Wyvern aus Avlee und einen kleinen Stamm Troglodyten eingefangen, die den Gefängnisabschnitt der Höhlen bewachen.  Achtet darauf, sie gut zu füttern, wenn Ihr diesen Abschnitt besuchen wollt - die Wyvern können recht feindselig sein.  Natürlich übernehmen wir keine Verantwortung für Euer Leben oder das Eurer Männer - unsere Aufgabe war es, den Gefängnisbau zu beaufsichtigen und die Gefahr einer Befreiung oder Flucht zu verringern.  Eure Sicherheit liegt in Euren eigenen Händen.  Niles Stantley
+ScrollTxt;1511;; …Sankt Perci reiste von Avlee nach Bracada auf der Suche nach dem verschollenen Speer und verlor dabei oft den Weg.  Er konnte nicht herausfinden, wo er sich befand, und irrte durch den größten Teil des Kontinents Erathia.  Als er schließlich alle Hoffnung verloren hatte, hatte er eine Vision:  Wenn die Sonne im Westen untergeht, wenn der Mond im Norden untergeht und wenn die Sterne im Osten fallen, werdet Ihr finden, wonach Ihr sucht.  Sankt Perci schöpfte aus seiner Vision Hoffnung und machte sich erneut auf, um zu su... 
+ScrollTxt;1512;; …Studien zum Spiel Arcomage haben folgende Beobachtungen ergeben:  Wie Ihr das Spiel gewinnen wollt, sollte von den Siegbedingungen abhängen.  Wenn die Türme klein beginnen, habt Ihr gute Chancen, den Turm Eures Gegners zu zerstören.  Wenn die Türme oder Wälle groß beginnen, solltet Ihr Euch auf Euren eigenen Turm konzentrieren.  Wenn die Türme oder Wälle groß beginnen und Ihr einen riesigen Turm zum Sieg braucht, ist ein Ressourcen-Sieg vielleicht leichter zu erreichen.  Beachtet auch, daß rote Karten sich eher auf Euren Wall, blaue Karten auf Euren Turm und grüne Karten auf Euren Angriff konzentrieren.  Behaltet das im Hinterkopf, wenn Ihr entscheidet, ob Ihr Steinbrüche, Magie oder Zoos ausbauen wollt.  Mir IST ein vorherrschender Trend im Denken der meisten Arcomage-Spieler aufgefallen, der einen Vorteil gegen sie bieten könnte: Wenn sie beginnen, blaue Karten zu spielen, könnt Ihr das mit...
+ScrollTxt;1513;; Notizen des Schreibers (Verhör von Seljin, Tag 3) 8. Juni 1120  Verhörer:  Gehen wir das noch einmal durch, ja?  Gestern habt Ihr gesagt, das Grab liege in Bracada.  Mehrere meiner Männer wurden von Golems erschlagen, als sie dort suchten, wo Ihr es angegeben hattet.  Ich dachte, wir hätten uns endlich zur Zusammenarbeit entschlossen.  Nun sehe ich, daß Ihr mich belogen habt.  Seljin:  Nein...Nicht gelogen...Grenzen ändern sich...  Verhörer:  Pah!  Sie haben sich letztes Jahr geändert!  Setzt die Instrumente an!  Verhörer:  Gut, heilt ihn und weckt ihn auf.  (Pause).  Ich bin Euer Freund.  Ich kann den Schmerz beenden.  Sagt mir, wo das Grab des Meisters liegt.  Seljin:  Erathia!  Süd-Erathia!    Verhörer:  Hmm.  Klingt wahrscheinlicher.  Setzt die Instrumente noch einmal an, nur um sicherzugehen.  (Pause)  Gut, heilt ihn und weckt ihn wieder auf.  Ich bin Euer Freund.  Ich kann den Schmerz beenden.  Sagt mir die Wahrheit.  Wo ist das Grab des Meisters?  Seljin:  Ich habe es Euch gesagt!  Oh bitte!  Süd...Süd-Erathia!    Verhörer:  Gut.  Das war's, Jungs.  Bringt den Gefangenen zurück in seine Zelle, und dann los!      
+ScrollTxt;1514;; Scale  Catherine und Eldrich werden nie unsere Freude über ihren Kampf um das umstrittene Harmondale verstehen.  Erntet weiter die Früchte ihres Krieges.  Am Ende werden sie uns nicht standhalten können.   -Archibald
+ScrollTxt;1515;; Niles,  ich glaube, ich habe eine Gruppe von "Abenteurern" gefunden, die Euren Bedürfnissen entsprechen wird.  Sie haben einige Fähigkeiten, wirken aber sehr leichtgläubig.  Ich werde mein Bestes tun, sie dazu zu bringen, einen Gefallen von uns anzunehmen.  Sind sie erst einmal getäuscht, können wir diesen geschuldeten Gefallen sicher zu unserem Vorteil nutzen.  Wollen sie uns diesen Gefallen nicht "zurückzahlen", können wir immer noch dafür sorgen, daß ihnen ein Unfall zustößt.  Hoffentlich erfüllt diese Gruppe Eure Anforderungen, und Ihr organisiert den Transport weg von diesem Felsen!  Ich freue mich darauf, diese verfluchte Insel zu verlassen.  -Malwick
+ScrollTxt;1516;; Botschafter Wright,  es ist sehr wichtig, daß Ihr mit den neuen Lords von Harmondale sprecht.  Ich hoffe, sie können diese Torheit zwischen Königin Catherine und König Eldrich beenden.  Loren Steel, der Überbringer dieser Nachricht, kann Euch weitere Einzelheiten nennen.  Wenn der Krieg weitergeht, stärkt das nur Archibalds Position.  Gavin Magnus Regierender Zauberer
+ScrollTxt;1517;;   …unser erster Tag seit der Ankunft auf der Smaragdinsel.    Ein seltsamer Mann namens Malwick sprach uns an. Sein Angebot schien merkwürdig, ein Zauberstab für "künftige Erwägungen".  Wir lehnten ab.  Als wir gingen und uns in den nordöstlichen Teil der Insel aufmachten, lachte er und rief, er wisse, daß er uns "nicht wiedersehen würde".
+ScrollTxt;1518;; -Hairbaugh  Entzündet die Signalfeuer, wenn Ihr wißt, daß die Menschen am schwächsten sind.  Wir treffen innerhalb von Tagen nach Eurem Signal ein!  Verratet mich nicht noch einmal!  Ihr müßt Eure persönlichen Interessen zurücklassen, wenn Ihr in meinem Stamm überleben wollt.  Grognard der Große!
+ScrollTxt;1519;; Mein lieber Herr Malwick,  ich habe lange nichts von Euch gehört.  Ich hoffe, dieser Brief trifft Euch wohlauf.  Ihr solltet uns regelmäßig Nachrichten schicken, damit wir über Eure "Anwerbekampagne" auf dem Laufenden bleiben.  Es ist wichtig, daß Ihr die richtigen Leute findet.  Markham muß richtig behandelt werden...und dann sollte Harmondale uns gehören.  Sobald Ihr dies erledigt habt, können wir sicher Vorkehrungen treffen, Euch nach Hause zu holen und Eure Schulden zu begleichen.  -Niles
+ScrollTxt;1520;; Tagebucheintrag 23. April 1058  Möge die Sonne meinen Pfad erleuchten und mich heute leiten.  Heute erreichte uns die Nachricht, daß der Tempel des Mondes eine bewaffnete Streitmacht nach Nighon entsandt hat.  Es wurde beschlossen, daß ich einige meiner Brüder anführe, um zu versuchen, die abscheuliche Tat aufzuhalten, die sie auch planen mögen.  Möge die Sonne auf uns scheinen und diesen Krieg so bald wie möglich beenden.  Die Schlachten im Norden haben die Ebenen von Bracada zerrissen.  Wenn wir diesen Krieg fortsetzen, zerstören wir vielleicht das Land selbst, das wir zu retten versuchen...
+ScrollTxt;1523;; Velatyr,  unsere Überfälle waren recht erfolgreich; unsere Lage erlaubt es uns, zwei Routen anzugreifen, Erathia nach Deyja und Erathia nach Harmondale.  Wir haben getan, was Ihr vorgeschlagen habt, und unsere Tätigkeit selten genug gehalten, um ein direktes Eingreifen der erathianischen Truppen zu verhindern.  Außerdem ist unsere Höhle gut genug verborgen, daß flüchtige Beobachtung nicht ausreicht, sie zu finden.  Eure Bezahlung wird gerade fertiggestellt und Euch bald zugeschickt.  Laerat
+ScrollTxt;1524;; Tagebucheintrag 11. Dezember 1059  Möge die Sonne die Dunkelheit niederstrecken und die Wahrheit offenbaren  Wir haben uns zu den Grabhügeln durchgeschlagen.  Alles hat sich verändert.  Geister und Gogs überrennen die Gegend.  Bruder Peter wurde in der Nacht von etwas fortgeholt.  Die Hügelgräber scheinen ihr Böses in die Umgebung entlassen zu haben.  Bruder Christian und ich versuchen, ein mir bekanntes Herrenhaus im äußersten Osten dieser Region zu erreichen.  Er und ich sind die Einzigen, die noch übrig sind.  Möge die Sonne unseren Pfad leiten...
+ScrollTxt;1526;; Tagebucheintrag 2. Januar 1057  Die Sonne lenkt meine Füße auf den Pfad der Wahrheit  Der Große Tempel hat mich auf eine Anwerbereise nach Tatalia geschickt.  Wir hoffen, unseren Glauben zu stärken und unsere Reihen zu mehren.  Die Jünger des Mondes verfolgen einen großen Plan.  Möge die Sonne sie in ihrer Dunkelheit aufhalten...
+ScrollTxt;1529;;Missing Scroll Text 727
+ScrollTxt;1530;; Kaufbeleg  An:  Schmendrick Von:  ACME Golem's  Wir haben die Golem-Teile nach Eurem Wunsch angefertigt.  Leider hat unser Lieferdienst diese Teile für Euch verlegt.  Für Fehler des Lieferdienstes übernehmen wir keine Verantwortung.  Wir wissen jedoch, wohin Eure Teile geliefert wurden, und Ihr könnt sie nach Belieben zurückholen.  1 Teil wurde in die Grabhügel geliefert 1 Teil wurde nach Tatalia geliefert 1 Teil wurde nach Avlee geliefert 2 Teile wurden nach Deyja geliefert 2 Köpfe wurden nach Bracada geliefert (da wir nicht wußten, welches Modell Ihr bevorzugt)
+ScrollTxt;1531;;Missing Scroll Text 729
+ScrollTxt;1532;;Missing Scroll Text 730
+ScrollTxt;1533;;Missing Scroll Text 731
+ScrollTxt;1534;;Missing Scroll Text 732
+ScrollTxt;1535;;Missing Scroll Text 733
+ScrollTxt;1536;; Meine Priester,  ich habe schlechte Nachrichten.  Es scheint, daß unser Vorstoß in Enroth gescheitert ist und auch unser Schachzug gegen Catherine hier in Erathia fehlgeschlagen ist.  Ich erwarte nicht, daß Eure Versuche, Anhänger zu gewinnen, erfolgreich sein werden, und rate Euch daher, Euch so gut wie möglich zu verkriechen.  Ich glaube, wir können unsere Verluste auffangen und zum richtigen Zeitpunkt zurückschlagen, doch bis dahin solltet Ihr Euch nicht sehen lassen.  Xenofex
+ScrollTxt;1537;;Missing Scroll Text 735
+ScrollTxt;1538;;Missing Scroll Text 736
+ScrollTxt;1539;;Missing Scroll Text 737
+ScrollTxt;1540;;Missing Scroll Text 738
+ScrollTxt;1541;;Missing Scroll Text 739
+ScrollTxt;1542;; Ein schwarzer Trank der Verjüngung kann bei der Korrektur von Alterungseffekten ausgesprochen hilfreich sein. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus jeweils drei der Grundbestandteile finden. 
+ScrollTxt;1543;; Ein schwarzer Trank der wahren Stärke ist der Traum jedes Abenteurers. Die permanente Verbesserung der Stärke kann JEDEN in eine Kampfmaschine verwandeln. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus vier der roten, zwei der blauen und einem der gelben Grundbestandteile finden.  
+ScrollTxt;1544;; Ein schwarzer Trank der wahren Genauigkeit ist der Traum jedes Abenteurers. Die permanente Verbesserung der Genauigkeit kann JEDEN in eine Kampfmaschine verwandeln. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus vier der gelben, zwei der roten und einem der blauen Grundbestandteile finden.  
+ScrollTxt;1545;; Ein schwarzer Trank der wahren Persönlichkeit steigert den Persönlichkeitswert eines Charakters. Dadurch wird die maximale Zahl der Zauberpunkte, die auf Persönlichkeit basieren, erhöht. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus einem der roten, vier der blauen und zwei der gelben Grundbestandteile finden.  
+ScrollTxt;1546;; Ein schwarzer Trank der wahren Ausdauer ist der Traum jedes Abenteurers. Die permanente Verbesserung der Ausdauer kann JEDEN in eine Kampfmaschine verwandeln, da die Trefferpunkte weit über den gewöhnlichen Werten liegen. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus zwei der roten, vier der blauen und einem der gelben Grundbestandteile finden.  
+ScrollTxt;1547;; Ein schwarzer Trank des wahren Intellekts steigert den Intellektwert eines Charakters und erhöht so die maximale Zahl der Zauberpunkte, die auf Intellekt basieren Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus einem der roten, zwei der blauen und vier der gelben Grundbestandteile finden.  
+ScrollTxt;1548;; Ein schwarzer Trank der wahren Schnelligkeit könnte die Lösung für eine Abenteurergruppe sein, die einfach nicht vor den Monstern zum Zuge kommt. Die permanente Verbesserung der Schnelligkeit könnte alles sein, was man braucht, um schneller als die Monster handeln zu können. Man kann nie zu schnell sein. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus vier der roten, zwei der blauen und einem der gelben Grundbestandteile finden.  
+ScrollTxt;1549;; Ein schwarzer Trank des wahren Glücks könnte die Lösung für eine Abenteurergruppe sein, die etwas Schwierigkeiten mit dem Entschärfen von Fallen hat. Die permanente Verbesserung des Glücks könnte alles sein, was man braucht, um sich rechtzeitig zu ducken, wenn eine Falle ausgelöst wird. Man kann nie zu viel Glück haben. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus zwei der roten, drei der blauen und drei der gelben Grundbestandteile finden.
+ScrollTxt;1550;; Das Waffenöl des Drachentöters verwandelt jede normale Waffe in eine Waffe des Drachentöters. Um einen solches Öl zu mischen, müßt Ihr die richtige Kombination aus drei der roten, drei der blauen und zwei der gelben Grundbestandteile finden.
+ScrollTxt;1551;; Der schwarze Trank des Stein zu Fleisch ermöglicht es Euch, einen Charakter vom Zustand der Versteinerung zu befreien. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus drei der roten, zwei der blauen und drei der gelben Grundbestandteile finden.
+ScrollTxt;1552;; Die Essenz der Stärke, ein weißer Trank, erhöht zeitweise Eure Stärke, wenn dies erforderlich sein sollte. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus drei der roten und zwei der blauen Grundbestandteile finden.
+ScrollTxt;1553;; Die Essenz des Intellekts, ein weißer Trank, erhöht zeitweise Euren Intellekt, wenn dies erforderlich sein sollte. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus zwei der blauen und drei der gelben Grundbestandteile finden.
+ScrollTxt;1554;; Die Essenz der Persönlichkeit, ein weißer Trank, erhöht zeitweise Euren Persönlichkeitswert, wenn dies erforderlich sein sollte. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus drei der blauen und zwei der gelben Grundbestandteile finden.
+ScrollTxt;1555;; Die Essenz der Ausdauer, ein weißer Trank, erhöht zeitweise Eure Ausdauer, wenn dies erforderlich sein sollte. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus zwei der roten und drei der blauen Grundbestandteile finden.
+ScrollTxt;1556;; Die Essenz der Schnelligkeit, ein weißer Trank, erhöht zeitweise Eure Schnelligkeit, wenn dies erforderlich sein sollte. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus drei der roten und zwei der gelben Grundbestandteile finden.
+ScrollTxt;1557;; Die Essenz der Genauigkeit, ein weißer Trank, erhöht zeitweise Eure Genauigkeit, wenn dies erforderlich sein sollte. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus zwei der roten und drei der gelben Grundbestandteile finden.
+ScrollTxt;1558;; Das weiße Waffenöl der Flammen verwandelt jede normale Waffe in eine Waffe der Flammen. Um einen solches Öl zu mischen, müßt Ihr die richtige Kombination aus zwei der roten, einem der blauen und zwei der gelben Grundbestandteile finden.
+ScrollTxt;1559;; Das weiße Waffenöl der Vereisung verwandelt jede normale Waffe in eine Waffe des Frostes. Um einen solches Öl zu mischen, müßt Ihr die richtige Kombination aus zwei der roten, zwei der blauen und einem der gelben Grundbestandteile finden.
+ScrollTxt;1560;; Das weiße Waffenöl des Vergiftens verwandelt jede normale Waffe in eine Waffe des Giftes. Um einen solches Öl zu mischen, müßt Ihr die richtige Kombination aus einem der roten, zwei der blauen und zwei der gelben Grundbestandteile finden.
+ScrollTxt;1561;; Das weiße Waffenöl der Funken verwandelt jede normale Waffe in eine Waffe der Funken. Um einen solches Öl zu mischen, müßt Ihr die richtige Kombination aus drei der roten, einem der blauen und einem der gelben Grundbestandteile finden.
+ScrollTxt;1562;; Das weiße Waffenöl der Schnelligkeit verwandelt jede normale Waffe in eine Waffe der Schnelligkeit. Um einen solches Öl zu mischen, müßt Ihr die richtige Kombination aus einem der roten, drei der blauen und einem der gelben Grundbestandteile finden.
+ScrollTxt;1563;; Der weiße Trank des Lähmung Heilen hebt den Zustand der Lähmung auf. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus einem der roten, einem der blauen und drei der gelben Grundbestandteile finden.
+ScrollTxt;1564;; Der weiße Trank der Göttlichen Wiederherstellung hebt alle Zustände außer versteinert, tot oder ausgelöscht auf. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus einem der roten, einem der blauen und drei der gelben Grundbestandteile finden.
+ScrollTxt;1565;; Der weiße Trank der Göttlichen Heilung ist stärker als der Trank für Wunden heilen. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus drei der roten und drei der gelben Grundbestandteile finden.
+ScrollTxt;1566;; Der weiße Trank der Göttlichen Macht ist stärker als der magische Trank. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus drei der blauen und drei der gelben Grundbestandteile finden.
+ScrollTxt;1567;; Die Essenz des Glücks, ein weißer Trank, erhöht zeitweise Euer Glück, wenn dies erforderlich sein sollte. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination drei der roten und drei der blauen Grundbestandteile finden.
+ScrollTxt;1568;; Der weiße Trank der Feuer-Resistenz erhöht zeitweise Eure Widerstandfähigkeit gegen Schaden durch das Element Feuer. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus zwei der roten, einem der blauen und drei der gelben Grundbestandteile finden.
+ScrollTxt;1569;; Der weiße Trank der Luft-Resistenz erhöht zeitweise Eure Widerstandfähigkeit gegen Schaden durch das Element Luft. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus drei der roten, zwei der blauen und einem der gelben Grundbestandteile finden.
+ScrollTxt;1570;; Der weiße Trank der Wasser-Resistenz erhöht zeitweise Eure Widerstandfähigkeit gegen Schaden durch das Element Wasser. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus einem der roten, drei der blauen und zwei der gelben Grundbestandteile finden.
+ScrollTxt;1571;; Der weiße Trank der Erd-Resistenz erhöht zeitweise Eure Widerstandfähigkeit gegen Schaden durch das Element Erde. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus drei der roten, einem der blauen und zwei der gelben Grundbestandteile finden.
+ScrollTxt;1572;; Der weiße Trank der Geist-Resistenz erhöht zeitweise Eure Widerstandfähigkeit gegen Schaden durch Geistesmagie. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus zwei der roten, drei der blauen und einem der gelben Grundbestandteile finden.
+ScrollTxt;1573;; Der weiße Trank der Körper-Resistenz erhöht zeitweise Eure Widerstandfähigkeit gegen Schaden durch Körpermagie. Um einen solchen Trank zu mischen, müßt Ihr die richtige Kombination aus einem der roten, zwei der blauen und drei der gelben Grundbestandteile finden.
+ScrollTxt;1574;;Graue Tränke - Katalysatoren - lassen sich zu einem Trank von höherer Wirkung mischen. Wendet man den Zauber "Verzaubern" auf einen ausreichend starken Katalysator an, verwandelt er sich in einen Stein der Weisen.
+ScrollTxt;2120;;III = 16 & IV = 4
+ScrollTxt;2121;;Stirb, Eindringling!
+ScrollTxt;2122;;Silvertongue,  meine Spione berichten, daß eine kleine Gruppe angehender Helden durch das Land zieht und versucht, unserem kleinen Plan für eine Neue Welt ein Ende zu bereiten.  Berichten zufolge suchen sie die Erlaubnis, das Orakel in Free Haven zu besuchen.  Ihr dürft nicht zulassen, daß dies geschieht - wenn der Wächter erwacht, bevor unser Plan gereift ist, bedeutet das das Ende für uns beide.  Verweigert ihnen die Erlaubnis, das Orakel zu besuchen, selbst wenn es Euch als Verräter entlarvt.  Wir brauchen die Zeit, die Eure Verzögerung uns verschafft.  Ach ja...Preist Baa. \nZenofex
+ScrollTxt;2123;;Jarvis,  wir haben festgestellt, daß der Bürgermeister von Mist an dritter Stelle unserer Feindesliste steht, nur hinter Charles d’Sorpigal und Jennica Bradley.  Ihr sollt BEHUTSAM die Zuständigkeit erlangen, Mist und die umliegende Insel zu überwachen, und dann entsprechend mit dem Bürgermeister verfahren.  Wenn das reibungslos verläuft, beseitigt auch Charles und Jennica.  Erledigt diese Aufgabe mit größter Sorgfalt, und Ihr werdet belohnt.  Gerrard Blackames  
+ScrollTxt;2124;;Damian,  Glückwunsch zu Eurem neuen Auftrag.  Die Schattengilde will, daß Ihr Karawanen überfallt, die von New Sorpigal nach Ironfist oder Free Haven ziehen.  Ihr dürft unter keinen Umständen preisgeben, daß Ihr irgendeine Verbindung zu uns habt, sonst ist der Handel hinfällig, und Ihr werdet erfahren, was mit denen geschieht, die uns verraten.  Tut, was Euch gesagt wird, und es wird keine Probleme geben.  Prinz der Diebe
+ScrollTxt;2125;;Mein lieber Sulman, 17. Sep. 1152\nIhr habt gute Arbeit geleistet, und ich befördere Euch hiermit zum Hohepriester des Zweiten Zirkels.  Bei Andover Potbello in New Sorpigal liegt eine Summe Gold für Euch bereit, die er Euch aushändigen wird, wenn Ihr ihm sagt, daß der Sandmann Euch schickt, und ihm das Siegel auf diesem Brief zeigt.  Sandmann...das gefällt mir.    \nDie Behandlung der Roland-Angelegenheit war meisterhaft, und der Schneesturm hat mir besonders gefallen - er hat ihm die Furcht wirklich in die Glieder fahren lassen, nicht wahr?  Dieser abergläubische Narr!  Seine Beseitigung hat unseren Zeitplan um mindestens zwei Jahre vorverlegt und uns die Mühe erspart, ihn zu einem heikleren Zeitpunkt zu ermorden.  Alle Vorkehrungen sind getroffen. Meine Schergen haben die Rückberufung von Königin Catherine in ihre Heimat Erathia zur Beerdigung ihres Vaters bewirkt.  Sie wird dieses Jahr nicht zurückkehren, und damit bleiben nur ihre wertlose Göre Nicolai und dieser Idiot von Regent Wilbur Humphrey, die im Palast das Sagen haben. \nDas Volk beginnt zu spüren, daß etwas nicht stimmt, daß vielleicht die Götter zürnen.  Daß vielleicht...die Ironfists das Mandat des Himmels verloren haben.  Nur noch ein paar Katastrophen, und es könnte durchaus zu einer ausgewachsenen Rebellion kommen!  Und wir werden an der Bresche warten, bereit einzuspringen und den Schafen zu sagen, was sie wann tun sollen.  Schon jetzt breiten sich unsere Tempel über das Land aus und bieten den Vertriebenen der Katastrophen Hilfe und den Trauernden Trost...   \nJa.  Bleibt in New Sorpigal und haltet Euch bedeckt.  Wenn die Zeit gekommen ist, wird man Euch kontaktieren und weitere Anweisungen geben.  Faßt also Mut, und wißt, daß unser Plan reibungslos voranschreitet und wir bald diese Welt beherrschen werden.  Eure Stellung in unserer Hierarchie wird sehr hoch sein!\n--Zenofex
+ScrollTxt;2126;;Der Inhalt dieser Schriftrolle ist schwer zu verstehen, hauptsächlich weil er in einer fremden Sprache verfaßt ist.  Einige der Diagramme zeigen jedoch die Standorte und Patrouillenmuster der Teufel.
+ScrollTxt;2127;;Die Fertigstellung dieses Tempels ist ein stolzer Tag für die Kirche der Sonne!  Wir haben nun Tempel in jeder bedeutenden Region der Welt.  Dieser Tempel, von der Natur umgeben und abgeschieden, wird als Mittelpunkt der Verehrung für unsere neuen Anhänger dienen - die Eingeborenen dieser Inseln.  Möge der Glanz der Sonne auf Euch alle scheinen und Eure Arbeit segnen.
+ScrollTxt;2128;;Kergmond,   Euch fehlt es an Waffenkunst, an Hingabe und vor allem an der Fähigkeit zu befehligen, um als Ritter zu bestehen.  Eure ständigen Fehlschläge lassen mir keine andere Wahl, als Euch aus den Rittern von Enroth zu entlassen.  Ich würde Euch raten, einen neuen Beruf zu suchen, denn die Kunst des Krieges werdet Ihr niemals meistern.  Osric Temper
+ScrollTxt;2129;;Ich muß Euch zu Eurer ausgezeichneten Arbeit beglückwünschen.  Untergrabt weiter die Macht der Ironfists, und niemand wird mehr übrig sein, um uns herauszufordern.  Wenn sich die Gelegenheit bietet, haltet möglichst vielen Leuten die Aussicht auf den Thron vor die Nase.  Wenn wir unsere Karten richtig ausspielen, werden die Menschen sich in einem blutigen Krieg um den Thron gegenseitig auslöschen.  Die Kreeganer werden ihre treuen Anhänger gut belohnen.
+ScrollTxt;2130;;Setzt Eure dunklen Verzauberungen am Monolithen fort.  Wenn wir den Monolithen vollständig verderben können, werden wir Lorettas Druiden so weit schwächen, daß wir die Macht übernehmen können.  Diese Aufgabe ist für unsere künftigen Pläne entscheidend, versagt nicht!
+ScrollTxt;2131;;Wendet Euch der Natur zu, wo die Zivilisation versagt - die Felsen und Bäume, der Himmel und die Erde bergen eine Macht, die größer ist als der Mensch.
+ScrollTxt;2132;;Snergle,  wir haben Rocklin nirgends finden können.  In welches Loch er auch gekrochen ist, es muß ihn verschluckt haben.  Ich weiß, daß Ihr seinen Tod braucht, um den Rest der Zwerge zu unterwerfen, aber wir haben ganz Enroth durchsucht und ihn nicht aufspüren können.  Lunstone
+ScrollTxt;2133;;Setzt Eure Arbeit in Schloß Ironfist und New Sorpigal fort.  Die Trottel im Süden sind nicht auf uns vorbereitet, daher sollte Euch eine reiche Ernte von ihnen möglich sein.  Denkt daran, Eure Exempel scharf und deutlich zu statuieren, dann werden die Schafe Euch überallhin folgen.
+ScrollTxt;2134;;Message Scroll Text. 514
+ScrollTxt;2135;;Gerrard,  Glückwunsch zu Eurer Beförderung.  Nun, da Ihr den Brüderlichen Orden des Silbers unter Eurer Kontrolle habt, habt Ihr größere Freiheit, jene aufzuspüren, die in Enroth nicht hart genug gegen das Böse vorgehen.  Letztlich hoffen wir, Euch dabei zu helfen, den Nachlässigsten von allen im Kampf gegen das Böse zu beseitigen, die Ironfists.  Setzt Eure Arbeit fort, und Eure Träume werden sich erfüllen.  Zenofex
+ScrollTxt;2136;;Prinz,  Anthony Stone hat beschlossen, Euch ein für alle Mal zu beseitigen.  Ich bin sicher, daß Ihr bald seine Männer zu sehen bekommt.  Zu Eurer Sicherheit habe ich in der Kanalisation unter Free Haven einen Unterschlupf für Euch vorbereitet.  Verlaßt sofort die Gildenhalle und kommt in die Kanalisation.  Sobald sich die Lage beruhigt hat, könnt Ihr in die Gildenhalle zurückkehren.  Fetzil
+ScrollTxt;2137;;Message Scroll Text. 517
+ScrollTxt;2138;;Der Versuch, Gewalt gegen die Drachentürme anzuwenden, war ein Fehler, wie uns die Lektion von Kriegspire gelehrt hat.  Wir verloren bei dem Angriff fast zwanzig unserer Reittiere und konnten den Turm nur mit Mühe abschalten.  Zum Glück haben unsere Verbündeten am Icewind Pass die Schlüssel gefunden, die nötig sind, um die Türme vollständig abzuschalten.  Bald werden wir wieder fliegen können, und die Bauern werden vor uns auseinanderstieben wie die Hasen vor den Wölfen.  Ich bin schon zu lange in diesen Höhlen gefangen - sogar Goliath, mein Reittier, wird unruhig.  Wenn die Drachentürme abgeschaltet sind und die Armeen im Süden daran gehindert werden, zu uns vorzudringen, können wir wieder frei reiten.
+ScrollTxt;2139;;Verdammt!  Es scheint, daß ich den Gedächtniskristall in Kriegspire zurückgelassen habe, als wir vor meinen Minotauren flohen.  Man sollte einen Stier nie mit irgendetwas kreuzen!  Ich hätte wissen müssen, daß die emotionale Instabilität der Menschen und das schlechte Temperament der Stiere in einem völligen Desaster enden würden.  Ich muß zur Burg reisen, um den Kristall zu holen, aber zuerst brauche ich einige Kreaturen, die mir helfen, an den Minotauren vorbeizukommen.  Vielleicht, wenn ich eine Art fliegendes, magisches Auge erschaffen würde…
+ScrollTxt;2140;;…ich weiß nicht, wie er es macht, aber Lord Eustace kann manchmal so schnell aus dem Thronsaal verschwinden.  Ich weiß nicht einmal, wohin er geht, es gibt nur einen Ausgang.  Ich dachte, es könnte einen Geheimausgang aus dem Raum geben, aber das ist doch einfach albern.  Außerdem habe ich nie Auslöser gefunden, als ich die…
+ScrollTxt;2141;;Gute Arbeit beim Abschluß des ersten Teils des Plans.  Mit dieser Festung könnt Ihr jede Einmischung aus dem Süden unterbinden.  Benutzt die Drachenturm-Schlüssel, um die Drachentürme abzuschalten, dann können wir wieder die Städte überfallen.  Ihr werdet für Eure gute Arbeit reich belohnt werden.  Kommt zu unseren Höhlen im Nordwesten, wenn Ihr fertig seid, um Eure Bezahlung abzuholen.
+ScrollTxt;2142;;Es scheint, daß der Kristall, den Ihr entdeckt habt, nicht ganz dem entspricht, was wir erwartet hatten, aber wir erkennen seinen Nutzen an.  Wir werden einige Kleriker schicken, die den Kristall untersuchen, und dann entscheiden, was zu tun ist.  Bereitet Euch in einigen Wochen auf sie vor.
+ScrollTxt;2143;;Ratten!  Buchstäblich Ratten.  Wir hatten den Fluch der endlosen Plage perfektioniert, aber einer der Akolythen hat sich verpatzt, und statt New Sorpigal zu plagen, ist nun unser Tempel von mehr Ungeziefer, Insekten und Schädlingen befallen, als ich je irgendwo gesehen habe.  Zwei Tage lang haben wir versucht, den Fluch umzukehren und die Flut lästiger Kreaturen zurückzudrängen, doch ohne Erfolg.  Unsere einzige Möglichkeit ist jetzt die Flucht und der Bau eines Tempels an anderer Stelle im Süden.
+ScrollTxt;2144;;Message Scroll Text. 524
+ScrollTxt;2145;;Wir brauchen in den nächsten Wochen mindestens 150% Förderleistung aus dieser Mine.  Ich brauche Waffen und Rüstungen für meine Soldaten, um jeden Unmut über meine Herrschaft zu ersticken.  Sucht weiter nach den kostbareren Metallen wie Stalt und Kergar.  Ignoriert vorerst das Gold und die Edelsteine, wir haben genug Geld für eine ganze Weile - der Mangel an Waffen und Rüstungen wird unser Verderben sein.
+ScrollTxt;2146;;Message Scroll Text. 526
+ScrollTxt;2147;;Meine Studien mit dem Kristall von Terrax sind ermüdend geworden.  Ich glaube nicht, daß ich genug von den Grundlagen der Magie begreife, um die Lektionen des Kristalls vollständig zu verstehen.  Meine Zeit hier wird knapp, und ich glaube, ich werde gezwungen sein, meine Studien als Lich fortzusetzen.  Ich weigere mich loszulassen und den Tod zu umarmen, nicht nach meinem Scheitern in den Thronfolgekriegen und meinem Scheitern beim Erlernen der Magie.  Die Zeit, die mir die Lichwerdung verschafft, werde ich nutzen, um mich vollständiger in der Magie auszubilden und meine Rache an den Ironfists für das zu planen, was sie Archibald und mir angetan haben.
+ScrollTxt;2148;;Bruder, wir werden bald alles brauchen, was Ihr uns an Waffen verschaffen könnt.  Da Gharik fort ist, habt Ihr die volle Kontrolle über die Anlagen der Schmiede.  Ich brauche, daß Ihr diese Kontrolle in Hilfe für uns umsetzt.  Bald werden wir das Herz unserer Feinde treffen können, und Ihr werdet an meiner Seite als Herrscher von Enroth einen Platz haben.  Gerrard Blackames
+ScrollTxt;2149;;Wenn es nicht das eine ist, dann das andere.  Jetzt will Archibald, daß ich seine Armee mit den besten Gegenständen ausrüste, die ich herstellen kann.  Ich mußte von Alamos hierher umziehen, um diese Aufgabe so schnell wie möglich zu erledigen.  Den verdammten Kristall, um den er sich so sorgte, habe ich bei meinen Kollegen in Alamos gelassen.  Hoffentlich kommen sie bald zu einem Schluß darüber, auch wenn ich mir wünschte, Archibald würde sich entscheiden, was er getan haben will.
+ScrollTxt;2150;;…denkt daran, daß unser Ziel ist, der einzige Druidenorden in Enroth zu werden.  Nichts darf uns im Weg stehen, wenn wir versuchen, unsere Reihen zu läutern und jeden Widerstand zu beseitigen.  Zu diesem Zweck werden wir sowohl den Monolithen als auch das, was wir in diesem alten Tempel des Mondes finden können, nutzen, um die Macht Lorettas und ihrer Druiden überall zu untergraben.  Wir müssen unsere Entbehrungen ertragen, um stärker zu werden.  Cedric Druthers
+ScrollTxt;2151;;Glückwunsch zur erfolgreichen Vollendung Eurer Verwandlung.  Ich hoffe, es geht Euch gut.  Selbst wenn nicht, brauche ich den Gedächtniskristall erforscht und seine Informationen enthüllt.  Ich habe keine Zeit mehr für Verzögerungen oder Fehlschläge und erwarte, daß Ihr Erfolg habt, wo die anderen versagt haben.  Ich weiß, daß Ihr eine Vorliebe für Kristalle habt, und ich erwarte, daß Ihr Eure Erfahrung mit ihnen nutzt, um diese Aufgabe rasch zu beenden.  Wenn Ihr die Informationen habt, bringt sie mir nach Schloß Ironfist.  Vielleicht können wir mit dem, was Ihr findet, an die übrigen Kristalle gelangen.  Archibald
+ScrollTxt;2152;;Das Ritual der endlosen Nacht ist vielleicht eines der schwierigsten durchzuführenden.  Nicht wegen dessen, was körperlich erforderlich ist, sondern wegen der geistigen und seelischen Qual, die der Magier ertragen muß.  Die eigene Menschlichkeit, die eigene Seele aufzugeben, ist nicht leicht.  Nur die Gierigsten, die Ehrgeizigsten oder die Herzlosen können die damit verbundene Belastung überwinden.
+ScrollTxt;2153;; ...versuchten, die magisch gesicherten Türen zu finden.  William weigerte sich, etwas von dem gefundenen Bernstein mitzunehmen, da er ihn für verflucht hielt.  Nachdem wir fast einen Tag lang umhergeirrt waren, trafen wir auf ein seltsames Wesen, das uns zum Eingang teleportierte.  Als Gegenleistung für diesen Dienst entzog es Williams Lebenskraft, doch er erholte sich innerhalb weniger Tage.  Wir stellen alle weiteren Expeditionen ein, bis wir feststellen können…
+ScrollTxt;2154;;Stellt Eure derzeitigen Experimente zur Entwicklung und Erschaffung von Kreaturen ein.  Ich brauche Eure Bemühungen für die Erforschung von Zweck und Informationen dieses Kristalls.  Das Orakel benutzt diese offenbar für irgendeinen Zweck, und Ihr sollt herausfinden, welchen genau.  Diese Aufgabe ist wichtiger, als flugunfähige Vögel und Stiermenschen zu erschaffen oder was immer Ihr gerade tut.  Archibald
+ScrollTxt;2155;;Setzt Euer Wissen über arkane Gegenstände und Materialien ein, um diesem Kristall die darin enthaltenen Informationen zu entlocken.  Nutzt, wenn nötig, alle Mittel von Alamos, aber versagt nicht.  Es ist unerläßlich, daß ich erfahre, welche Informationen auch immer das Orakel mir vorzuenthalten versucht.  Archibald
+ScrollTxt;2156;;Osten:  Gildenhalle der Schattengilde Westen:  Versteck der Schattengilde Norden:  Diebesgilde von Free Haven Süden:  Höhlen der Dragoner
+ScrollTxt;2157;;Wenn die Landung beginnt, Kapitän, nehmt diese Kodeschriftrolle mit in die zentrale Kontrollkammer und sprecht den Aktivierungsschlüssel 'krik', wenn Ihr dazu aufgefordert werdet.  Alle hohen Offiziere müssen ihre Kodeschriftrollen und Schlüssel vorlegen, um den Weg zu öffnen.  Euer Schlüssel ist der letzte in der Reihenfolge.
+ScrollTxt;2158;;Wenn die Landung beginnt, Erster Offizier, nehmt diese Kodeschriftrolle mit in die zentrale Kontrollkammer und sprecht den Aktivierungsschlüssel 'kcops', wenn Ihr dazu aufgefordert werdet.  Alle hohen Offiziere müssen ihre Kodeschriftrollen und Schlüssel vorlegen, um den Weg zu öffnen.
+ScrollTxt;2159;;Wenn die Landung beginnt, Navigator, nehmt diese Kodeschriftrolle mit in die zentrale Kontrollkammer und sprecht den Aktivierungsschlüssel 'ulus', wenn Ihr dazu aufgefordert werdet.  Alle hohen Offiziere müssen ihre Kodeschriftrollen und Schlüssel vorlegen, um den Weg zu öffnen.
+ScrollTxt;2160;;Wenn die Landung beginnt, Kommunikationsoffizier, nehmt diese Kodeschriftrolle mit in die zentrale Kontrollkammer und sprecht den Aktivierungsschlüssel 'aruhu', wenn Ihr dazu aufgefordert werdet.  Alle hohen Offiziere müssen ihre Kodeschriftrollen und Schlüssel vorlegen, um den Weg zu öffnen.
+ScrollTxt;2161;;Wenn die Landung beginnt, Ingenieur, nehmt diese Kodeschriftrolle mit in die zentrale Kontrollkammer und sprecht den Aktivierungsschlüssel 'yttocs', wenn Ihr dazu aufgefordert werdet.  Alle hohen Offiziere müssen ihre Kodeschriftrollen und Schlüssel vorlegen, um den Weg zu öffnen.
+ScrollTxt;2162;;Wenn die Landung beginnt, Arzt, nehmt diese Kodeschriftrolle mit in die zentrale Kontrollkammer und sprecht den Aktivierungsschlüssel 'yoccm', wenn Ihr dazu aufgefordert werdet.  Alle hohen Offiziere müssen ihre Kodeschriftrollen und Schlüssel vorlegen, um den Weg zu öffnen.
+ScrollTxt;2163;;Hier ist der Schlüssel zu der Kombinationstür, die Ihr verlangt habt.\n\nA.  Falle.\nB.  Öffnet Tür 4 und schließt Tür 5.\nC.  Öffnet Tür 5 und schließt Tür 4.\nD.  Öffnet Tür 1 und schließt Tür 5.\nE.  Öffnet Tür 5 und schließt Tür 1.\nF.  Öffnet Tür 2 und schließt Tür 4.\nG.  Öffnet Tür 6.\nH.  Öffnet Tür 3 und schließt Tür 2.\nI.    Öffnet Tür 2 und schließt Tür 3.\nJ.   Öffnet Tür 2 und schließt Tür 1.\nK.  Öffnet Tür 6 und schließt Tür 5.\nL.   Öffnet Tür 3 und schließt Tür 4.\nM.  Wartung.\nN.  Öffnet Tür 1 und schließt Tür 2.\nO.  Öffnet Tür 5 und schließt Tür 6.\nP.  Zurücksetzen.  \n\nHochachtungsvoll, die Drawkcab-Mönche.
+ScrollTxt;2164;;Das auf dieser Schriftrolle beschriebene Ritual scheint eine komplexe magische Formel zu sein, bei der der Zaubernde dem Ziel aus der Ferne gegenüberstehen und eine lange, genaue Abfolge von Schritten befolgen muß.  Ihr könnt nicht erkennen, welche Wirkung der Zauber haben wird, wenn er einmal gewirkt ist.
+ScrollTxt;2165;;Ich habe diesen Brief hier versteckt, in der Hoffnung, daß ihn jemand findet, der der Krone treu ist.  Daß ich ihn überhaupt schreiben kann, ist ein Wunder - meine Häscher waren zu dumm, mir mein Schreibzeug abzunehmen - und ich brauche noch viele weitere Wunder, um diese Lage zu überleben.  Alle meine Männer sind im Kampf gegen die Teufel gefallen, nur Tanir, Ragnar und ich leben noch.  Lord Ragnar ist übel zugerichtet, und ich fürchte, er wird die Nacht nicht überleben.  Vielleicht ist es besser für ihn.  Da man uns noch nicht getötet hat, vermute ich, daß wir für etwas Besonderes aufgespart werden.  Was es auch ist, solange es Leben gibt, gibt es Hoffnung.  Vermutlich bringen sie Tanir und mich von diesem schrecklichen Ort an einen anderen schrecklichen Ort, um uns auszulösen oder um uns zu foltern und Informationen zu erpressen.  Was auch immer unser Schicksal ist, Ihr, mein treuer Untertan, müßt dafür sorgen, daß das Königreich und unsere Welt überleben.  Diese Teufel sind eine weit schlimmere Bedrohung, als Archibald es je war, und erfordern die verzweifeltsten Maßnahmen, um sie zu besiegen.  Ergreift diese Maßnahmen, selbst wenn es bedeutet, meinen bösen Bruder aus seinem steinernen Grab zu befreien.  Sucht vor allem den Rat des Orakels in Free Haven.  Ich höre meine Häscher den Gang entlangkommen!  Sagt meiner Frau und meinem Sohn, daß ich sie liebe, und TRAUT SULMAN NICHT! Er ist ein Verräter.  Viel Glück!  --Roland Ironfist, König von Enroth   
+ScrollTxt;2166;;Herzlichen Glückwunsch!  Hiermit erkläre ich Euch alle zu Super-Goobers!
+AwardsTxt;2;;Hat die vermißten Teilnehmer auf der Smaragdinsel gefunden.
+AwardsTxt;3;;Hat die Goblins aus Schloß Harmondale vertrieben.
+AwardsTxt;4;;Hat die Zwerge aus der Roten Zwergenmine gerettet.
+AwardsTxt;6;;Hat das Prüfgelände der Zauberer abgeschlossen.
+AwardsTxt;19;;Hat beide Tempelteile zurückgebracht.
+AwardsTxt;21;;Hat Xenofex erschlagen.
+AwardsTxt;22;;Hat das Geheimnis des Weinkellers gelöst.
+AwardsTxt;23;;Hat das Herz des Waldes zurückgebracht.
+AwardsTxt;24;;Hat die Seelenkrüge zurückgebracht.
+AwardsTxt;25;;Hat Tolberti ermordet.
+AwardsTxt;26;;Hat Clankers Labor gesäubert.
+AwardsTxt;27;;Hat Robert den Weisen ermordet.
+AwardsTxt;28;;Hat die Brutgrube der Nekromanten bezwungen.
+AwardsTxt;30;;Hat Witherns Laterne zurückgegeben.
+AwardsTxt;32;;Hat Haldars Überreste zurückgegeben.
+AwardsTxt;34;;Hat Lord Davriks Siegelring zurückgegeben.
+AwardsTxt;38;;Hat Norbert Thrush die Feder des Pfarrers zurückgegeben.
+AwardsTxt;39;;Hat Johann Kerrid die Feenflöten zurückgegeben.
+AwardsTxt;40;;Troglodytentöter.
+AwardsTxt;51;;Greifentöter.
+AwardsTxt;52;;Hat die Stola der Jahreszeiten zurückgebracht.
+AwardsTxt;53;;Hat alle Statuetten gefunden und aufgestellt.
+AwardsTxt;55;;Hat die vollständige Gemäldesammlung zurückgebracht.
+AwardsTxt;56;;Hat den Prinzen zurückgebracht.
+AwardsTxt;59;;Hat den Teufelsposten zerstört.
+AwardsTxt;60;;Hat den Prinzen der Diebe gefangen.
+AwardsTxt;61;;Hat die Stallpreise in Ordnung gebracht.
+AwardsTxt;62;;Hat den Winter beendet.
+AutonoteTxt;33;;Gift heilen (violett) = blau + rot
+AutonoteTxt;34;;Erwachen (grün) = gelb + blau
+AutonoteTxt;35;;Eile (rot-orange) = rot + orange
+AutonoteTxt;36;;Heldentum (rot-violett) = rot + violett
+AutonoteTxt;37;;Segen (rot-grün) = rot + grün
+AutonoteTxt;38;;Bewahrung (blau-orange) = blau + orange
+AutonoteTxt;39;;Schild (blau-violett) = blau + violett
+AutonoteTxt;40;;Gegenstand aufladen (blau-grün) = blau + grün
+AutonoteTxt;41;;Steinhaut (gelb-orange) = gelb + orange
+AutonoteTxt;42;;Wasseratmung (gelb-violett) = gelb + violett
+AutonoteTxt;43;;Gegenstand härten (gelb-grün) = gelb + grün
+AutonoteTxt;53;;Waffenöl der Flammen (weiß) = grün + rot-orange
+AutonoteTxt;54;;Waffenöl der Flammen (weiß) = violett + gelb-orange
+AutonoteTxt;56;;Waffenöl der Vereisung (weiß) = orange + blau-violett
+AutonoteTxt;57;;Waffenöl des Giftes (weiß) = orange + blau-grün
+AutonoteTxt;58;;Waffenöl des Giftes (weiß) = violett + gelb-grün
+AutonoteTxt;60;;Waffenöl der Funken (weiß) = orange + rot-violett
+AutonoteTxt;61;;Waffenöl der Schnelligkeit (weiß) = grün + blau-violett
+AutonoteTxt;63;;Lähmung heilen (weiß) = grün + gelb-orange
+AutonoteTxt;64;;Lähmung heilen (weiß) = orange + gelb-grün
+AutonoteTxt;67;;Göttliche Wiederherstellung (weiß) = rot-violett + gelb-grün
+AutonoteTxt;69;;Göttliche Macht (weiß) = blau-grün + gelb-grün
+AutonoteTxt;70;;Essenz des Glücks (weiß) = rot-violett + blau-violett
+AutonoteTxt;71;;Feuer-Resistenz (weiß) = rot-orange + gelb-grün
+AutonoteTxt;72;;Luft-Resistenz (weiß) = rot-orange + blau-violett
+AutonoteTxt;73;;Wasser-Resistenz (weiß) = blau-violett + gelb-grün
+AutonoteTxt;74;;Erd-Resistenz (weiß) = rot-violett + gelb-orange
+AutonoteTxt;75;;Geist-Resistenz (weiß) = rot-violett + blau-grün
+AutonoteTxt;76;;Körper-Resistenz (weiß) = blau-grün + gelb-orange
+AutonoteTxt;77;;Stein zu Fleisch (schwarz) = rot-violett + Lähmung heilen (weiß)
+AutonoteTxt;78;;Waffenöl des Drachentöters (schwarz) = blau-violett + Waffenöl der Flammen (weiß)
+AutonoteTxt;79;;Wahres Glück (schwarz) = gelb-orange + Waffenöl der Schnelligkeit (weiß)
+AutonoteTxt;80;;Wahre Schnelligkeit (schwarz) = violett + Essenz der Schnelligkeit (weiß)
+AutonoteTxt;81;;Wahrer Intellekt (schwarz) = orange + Essenz des Intellekts (weiß)
+AutonoteTxt;82;;Wahre Ausdauer (schwarz) = grün + Essenz der Ausdauer (weiß)
+AutonoteTxt;83;;Wahre Persönlichkeit (schwarz) = violett + Essenz der Persönlichkeit (weiß)
+AutonoteTxt;84;;Wahre Genauigkeit (schwarz) = grün + Essenz der Genauigkeit (weiß)
+AutonoteTxt;85;;Wahre Stärke (schwarz) = orange + Essenz der Stärke (weiß)
+AutonoteTxt;86;;Verjüngung (schwarz) = rot-grün + göttliche Wiederherstellung (weiß)
+AutonoteTxt;87;;Verjüngung (schwarz) = blau-orange + göttliche Wiederherstellung (weiß)
+AutonoteTxt;90;;Celia Stone im Dorf Rust lehrt den meisterlichen Umgang mit dem Stab. Rust liegt in der Eisensand-Wüste.
+AutonoteTxt;91;;Tristen Stillwater, Großmeister des Stabes, lebt in der Stadt des Zwielichts im Schattensumpf.
+AutonoteTxt;92;;Expertenhafte Schwertkunst lehrt Aerie Luodrin in der Stadt Rabenbucht.
+AutonoteTxt;94;;Miyon Dragontracker, Großmeister des Schwertkampfes, ist auf der Insel Regna zu finden.
+AutonoteTxt;95;;Lori Vespers, Expertin des Dolchkampfes, lebt in der Dunkelelfenstadt Alvar.
+AutonoteTxt;96;;Jobber lehrt den meisterlichen Dolchkampf. Er lebt in der Stadt Rabenbucht.
+AutonoteTxt;97;;Karla Nirses, Großmeisterin des Dolchkampfes, ist auf der Insel Regna zu finden.
+AutonoteTxt;98;;Herald Foestryke lehrt den expertenhaften Axtkampf im Drachenjäger-Lager von Garottenschlucht.
+AutonoteTxt;101;;Matric Townsaver lehrt in seinem Haus in Rabenbucht den expertenhaften Speerkampf.
+AutonoteTxt;102;;Ashandra Withersmythe ist Meisterin des Speerkampfes. Sie lebt in der Händlerstadt Alvar.
+AutonoteTxt;103;;Yarrow ist Großmeisterin des Speerkampfes. Ihr findet sie auf den Dolchwunden-Inseln.
+AutonoteTxt;104;;Shivan Keeneye lehrt den expertenhaften Bogenkampf. Er lebt im Dorf Blutstropfen auf den Dolchwunden-Inseln.
+AutonoteTxt;105;;Oberic Nosewort, Meister des Bogenkampfes, lebt in der Stadt Rabenbucht.
+AutonoteTxt;106;;Solis, Großmeister des Bogenkampfes, lebt in der Dunkelelfenstadt Alvar.
+AutonoteTxt;107;;Lisha Sourbrow lehrt in ihrem Haus in Rabenbucht den expertenhaften Streitkolbenkampf.
+AutonoteTxt;108;;Robert Morningstar, Meister des Streitkolbens, bildet die Ritter im Drachenjäger-Lager von Garottenschlucht aus.
+AutonoteTxt;109;;Bruder Hearthsworn, Großmeister des Streitkolbens, ist im Dorf Rust in der Eisensand-Wüste zu finden.
+AutonoteTxt;113;;Qillain Moore, Experte des Schildes, lebt in der Stadt Alvar.
+AutonoteTxt;128;;Reshie lehrt in seinem Haus auf den Dolchwunden-Inseln die Luftmagie auf Expertenstufe.
+AutonoteTxt;129;;Hollis Stormeye, Meisterin der Luftmagie, wohnt in Balthazars Zuflucht im Felswüstenland.
+AutonoteTxt;130;;Cloud Nedlon, Großmeister der Luftmagie, ist auf der Ebene der Luft zu finden.
+AutonoteTxt;131;;Ulbrecht Pederton, Experte der Wassermagie, lebt in der Stadt Rabenbucht.
+AutonoteTxt;132;;Gregory Mist, Meister der Wassermagie, wohnt im Dorf Rust in der Eisensand-Wüste.
+AutonoteTxt;133;;Black Current, Großmeister der Wassermagie, ist auf der Ebene des Wassers zu finden.
+AutonoteTxt;134;;Ostrin Grivic, Experte der Erdmagie, lebt im Dorf Blutstropfen auf den Dolchwunden-Inseln.
+AutonoteTxt;135;;Dorothy Sablewood, Meisterin der Erdmagie, lebt in der Stadt Alvar.
+AutonoteTxt;136;;Griven, Großmeister der Luftmagie, ist auf der Ebene der Luft zu finden.
+AutonoteTxt;137;;Straton Hawthorne bringt Euch in der Seelenmagie auf Expertenstufe. Er wohnt in der Hafenstadt Rabenbucht.
+AutonoteTxt;138;;Bethold Kern, Meister der Seelenmagie, ist im Drachenjäger-Lager von Garottenschlucht zu finden.
+AutonoteTxt;139;;Lasiter Ravensight ist Großmeister der Seelenmagie. Er lebt im Murmelwald nahe beim Tempel der Sonne.
+AutonoteTxt;140;;Shane Krewlen, Experte der Geistesmagie, lebt in der Dunkelelfenstadt Alvar.
+AutonoteTxt;141;;Barthine Lotts, Meisterin der Geistesmagie, wohnt in der Minotaurenstadt Balthazars Zuflucht im Felswüstenland.
+AutonoteTxt;142;;Gilad Dreamwright, Großmeister der Geistesmagie, lebt im Murmelwald beim Tempel der Sonne.
+AutonoteTxt;143;;Zevah Poised, Experte der Körpermagie, lebt mit seinem Volk auf den Dolchwunden-Inseln.
+AutonoteTxt;144;;Tugor Arin, Meister der Körpermagie, ist im Drachenjäger-Lager von Garottenschlucht zu finden.
+AutonoteTxt;145;;Critias Snowtree, Großmeister der Körpermagie, wohnt im Murmelwald.
+AutonoteTxt;146;;Archibald Dawnsglow, Experte der Lichtmagie, übt seine Künste in der Stadt Rabenbucht aus.
+AutonoteTxt;147;;Lunius Dawnbringer, Meister der Lichtmagie, wohnt nahe beim Tempel der Sonne im Murmelwald.
+AutonoteTxt;148;;Aldrin Cleareye, Großmeister der Lichtmagie, lebt auf der Insel Regna.
+AutonoteTxt;152;;Fedwin Dervish lehrt die Dunkelelf-Fähigkeiten auf Expertenstufe. Ihr findet ihn in der Dunkelelfenstadt Alvar.
+AutonoteTxt;153;;Lanshee Caverhill wohnt in der Hafenstadt Rabenbucht. Sie lehrt die Dunkelelf-Fähigkeiten auf Meisterstufe.
+AutonoteTxt;154;;Ton Agraynel lehrt die Dunkelelf-Fähigkeiten auf Großmeisterstufe. Er lebt in der Stadt Alvar.
+AutonoteTxt;155;;Flynn Shador, Experte der Vampir-Fähigkeiten, lebt in der Stadt des Zwielichts im Schattensumpf.
+AutonoteTxt;156;;Douglas Dirthmoore, Meister der Vampir-Fähigkeiten, wohnt in der Stadt des Zwielichts im Schattensumpf.
+AutonoteTxt;157;;Payge Arachnia, Großmeisterin der Vampir-Fähigkeiten, lebt in ihrem Bau im Schattensumpf.
+AutonoteTxt;158;;Ishton lehrt Drachen ihre Drachen-Fähigkeiten auf Expertenstufe. Er wohnt in den Drachenhöhlen von Garottenschlucht.
+AutonoteTxt;159;;Erthint, Meister der Drachen-Fähigkeiten, lebt in den Drachenhöhlen von Garottenschlucht.
+AutonoteTxt;160;;Klain, Großmeister der Drachen-Fähigkeiten, wohnt in den Drachenhöhlen von Garottenschlucht.
+AutonoteTxt;161;;Kyra Sparkmen, Expertin der Identifikation von Gegenständen, lebt in der Stadt Alvar.
+AutonoteTxt;162;;Eithian, Meister der Identifikation von Gegenständen, lebt auf den Dolchwunden-Inseln.
+AutonoteTxt;163;;Elzbet Roggen, Großmeisterin der Identifikation von Gegenständen, lebt in der Stadt des Zwielichts im Schattensumpf.
+AutonoteTxt;164;;Fishner Thomb, Experte des Feilschens, wohnt auf den Dolchwunden-Inseln.
+AutonoteTxt;165;;Fenton Iverson, Meister des Feilschens, lebt in der Händlerstadt Alvar.
+AutonoteTxt;166;;Raven Quicktoungue, Großmeister des Feilschens, wohnt in der Stadt Rabenbucht.
+AutonoteTxt;167;;Evandar Lotts lehrt Gegenstände reparieren auf Expertenstufe. Er wohnt in der Hafenstadt Rabenbucht.
+AutonoteTxt;168;;Quick Jeni ist Meisterin im Reparieren von Gegenständen. Sie lebt im Dorf um die Drachenjäger-Festung in Garottenschlucht.
+AutonoteTxt;169;;Quethrin Tonk, Großmeister im Reparieren von Gegenständen, wohnt im Murmelwald.
+AutonoteTxt;170;;Menasaur lebt auf den Dolchwunden-Inseln. Er ist Experte im Bodybuilding.
+AutonoteTxt;171;;Kenneth Otterton, Meister im Bodybuilding, lebt im Drachenjäger-Lager von Garottenschlucht.
+AutonoteTxt;172;;Mikel Smithson ist Großmeister des Bodybuildings. Ihr findet ihn im Dorf Rust in der Eisensand-Wüste.
+AutonoteTxt;173;;Alton Putnam ist Experte der Meditation. Ihr findet ihn in der Hafenstadt Rabenbucht.
+AutonoteTxt;174;;Gretchin Nevermore, Meisterin der Meditation, wohnt in der Händlerstadt Alvar.
+AutonoteTxt;175;;Lenord Nightcrawler, Großmeister der Meditation, lehrt in seinem Haus im Dorf Zwielicht.
+AutonoteTxt;176;;Silk Nightwalker, Experte der Wahrnehmung, wohnt in der Dunkelelfenstadt Alvar.
+AutonoteTxt;177;;Helga Steeleye, Meisterin der Wahrnehmung, lebt in der Stadt des Zwielichts im Schattensumpf.
+AutonoteTxt;178;;Balan Suretrail, Großmeister der Wahrnehmung, lebt in der Minotaurenstadt Balthazars Zuflucht.
+AutonoteTxt;179;;Kethric Tarent lehrt Regeneration auf Expertenstufe in seinem Haus im Dorf Rust in der Eisensand-Wüste.
+AutonoteTxt;180;;William Sampson, Meister der Regeneration, wohnt im Murmelwald.
+AutonoteTxt;181;;Ush der Vielschwänzige, Großmeister der Regeneration, lebt bei seinem Volk auf den Dolchwunden-Inseln.
+AutonoteTxt;182;;Chevon Wist lehrt Fallen entschärfen auf Expertenstufe in seinem Haus auf den Dolchwunden-Inseln.
+AutonoteTxt;183;;Kelli Lightfingers, Meisterin im Fallenentschärfen, lehrt in ihrem Haus in der Stadt Alvar.
+AutonoteTxt;184;;Gareth Lifter, Großmeister im Fallenentschärfen, lehrt in seinem Haus auf der Insel Regna.
+AutonoteTxt;185;;dodging expert unused
+AutonoteTxt;186;;dodging master unused
+AutonoteTxt;187;;dodging gm unused
+AutonoteTxt;188;;unarmed expert unused
+AutonoteTxt;189;;unarmed master unused
+AutonoteTxt;190;;unarmed gm unused
+AutonoteTxt;191;;Tessa Maker, Expertin im Identifizieren von Monstern, wohnt im Drachenjäger-Lager von Garottenschlucht.
+AutonoteTxt;192;;Matric Keenedge, Meister im Identifizieren von Monstern, ist im Murmelwald zu finden.
+AutonoteTxt;193;;Blacken Stonecleaver, Großmeister im Identifizieren von Monstern, lehrt in seinem Haus in der Stadt Rabenbucht.
+AutonoteTxt;194;;Ritter Norbert Slayer lehrt Waffenmeister auf Expertenstufe. Er lebt im Drachenjäger-Lager von Garottenschlucht.
+AutonoteTxt;195;;Lasatin der Vernarbte lehrt Waffenmeister auf Meisterstufe. Er lebt auf den Dolchwunden-Inseln.
+AutonoteTxt;196;;Jasper Steelcoif lehrt Waffenmeister auf Großmeisterstufe. Ihr findet ihn auf der Insel Regna.
+AutonoteTxt;197;;stealing expert unused
+AutonoteTxt;198;;stealing master unused
+AutonoteTxt;199;;stealing gm unused
+AutonoteTxt;200;;Tabitha Watershed, Expertin der Alchimie, lehrt in ihrem Haus in der Händlerstadt Alvar.
+AutonoteTxt;201;;Kethry Treasurestone, Meisterin der Alchimie, wohnt im Murmelwald.
+AutonoteTxt;202;;Ich, Großmeister der Alchimie, lehrt in seinem Haus im üppigen Dschungel der Dolchwunden-Inseln.
+AutonoteTxt;203;;Petra Mithrit, Expertin des Lernens, wohnt nahe beim Tempel der Sonne im Murmelwald.
+AutonoteTxt;204;;Garret Mistspring, Meister des Lernens, unterrichtet in seinem Haus in der Stadt des Zwielichts im Schattensumpf.
+AutonoteTxt;205;;Wanda Lightsworn, Großmeisterin des Lernens, lebt im Drachenjäger-Lager von Garottenschlucht.
+AutonoteTxt;209;;Brunnen im Dorf Blutstropfen auf der Dolchwunden-Insel heilt Trefferpunkte.
+AutonoteTxt;214;;Brunnen in der Stadt Alvar stellt Zauberpunkte wieder her.
+AutonoteTxt;222;;Brunnen in der Stadt des Zwielichts im Schattensumpf stellt Zauberpunkte wieder her.
+AutonoteTxt;239;;Mir ist klar, daß Ihr den Troll Overdune zur Händlergilde in Alvar bringen müßt.
+AutonoteTxt;248;;Ihr müßt mit Xanthor sprechen, dem Hofweisen der Ironfists. Er hält sich in Rabenbucht auf.
+AutonoteTxt;289;;Rote Flüssigkeit gewährt Stärke.
+AutonoteTxt;292;;Grüne Flüssigkeit gewährt Ausdauer.
+AutonoteTxt;293;;Gelbe Flüssigkeit gewährt Genauigkeit.
+AutonoteTxt;294;;Violette Flüssigkeit gewährt Schnelligkeit.
+AutonoteTxt;295;;Weiße Flüssigkeit gewährt Glück.
+QuestsTxt;82;;Findet das verlorene Buch von Khel und bringt es zu Vertrinus in Schattensumpf.
+QuestsTxt;284;;Kehrt zu Fellmoon in Rabenbucht zurück und meldet ihm Euren Erfolg bei der Erpressung des Werratten-Schmugglers Arion Hunter.
+
+Houses;8;Name;Die Klinge des Ritters
+Houses;9;Name;Gehärteter Stahl
+Houses;10;Name;Königinnenschmiede
+Houses;11;Name;Jagdhaus
+Houses;12;Name;Das geweihte Schwert
+Houses;13;Name;Klingen der Bosheit
+Houses;14;Name;Der blutige Dolch
+Houses;15;Name;Vanders Klingen & Bögen
+Houses;16;Name;Der aufgelegte Bogen
+Houses;17;Name;Die ausgewogene Axt
+Houses;18;Name;Schwerter GmbH
+Houses;19;Name;Legierte Waffen
+Houses;20;Name;Die beste Verteidigung
+Houses;21;Name;Eisenholzspeere
+Houses;22;Name;Der Messerladen
+Houses;23;Name;Hammer und Zange
+Houses;24;Name;Feine Klingen
+Houses;25;Name;Das Adlerauge
+Houses;26;Name;Speere auf Armlänge
+Houses;27;Name;Stumpfe Traumawaffen
+Houses;28;Name;Der Schleifstein
+Houses;29;Name;Federn und Schnur
+Houses;30;Name;Stangenwaffen: Schaft & Griff
+Houses;31;Name;Abduls billige Waffen
+Houses;32;Name;Singender Stahl
+Houses;33;Name;Ziel und Geschoss
+Houses;34;Name;Starkherz Stab und Speer
+Houses;35;Name;Paradies der Ritter
+Houses;43;Name;Eriks Arsenal
+Houses;44;Name;Schloss Deadwood
+Houses;45;Name;Platzhalter
+Houses;46;Name;Platzhalter
+Houses;47;Name;Die Bauernschmiede
+Houses;48;Name;Platzhalter
+Houses;49;Name;Königin Catherines Schmiede
+Houses;50;Name;Platzhalter
+Houses;51;Name;Wildleder und Buckler
+Houses;52;Name;Rüstung der Ehre
+Houses;53;Name;Schilde der Bosheit
+Houses;54;Name;Die Gerberei
+Houses;55;Name;Das fehlende Glied
+Houses;56;Name;Außenposten Avlee
+Houses;57;Name;Die polierte Schulterplatte
+Houses;58;Name;Thels Rüstungen und Schilde
+Houses;59;Name;Legierte Rüstung und Schilde
+Houses;60;Name;Die Schmiede Greenwood
+Houses;61;Name;Der geworfene Handschuh
+Houses;62;Name;Die gemeinsame Abwehr
+Houses;63;Name;Rüstungsemporium
+Houses;64;Name;Metallgewebe-Rüstkammer
+Houses;65;Name;Abrahams Metallwerk
+Houses;66;Name;Arsenal der Eisenfaust
+Houses;67;Name;Die Gießerei
+Houses;68;Name;Eiserne Verteidigung
+Houses;69;Name;Abduls billige Rüstung
+Houses;70;Name;Qualitätsrüstung
+Houses;71;Name;Kettenhemd und Beinschienen
+Houses;72;Name;Der Freund des Fußsoldaten
+Houses;73;Name;Rüstungswerk
+Houses;74;Name;Silberstreif Rüstung
+Houses;75;Name;Das verzauberte Kettenhemd
+Houses;84;Name;Smaragdverzauberungen
+Houses;85;Name;Ottos Kuriositäten
+Houses;86;Name;Magie Ihrer Majestät
+Houses;87;Name;Naturmagie
+Houses;88;Name;Pforte des Todes
+Houses;89;Name;Artefakte & Antiquitäten
+Houses;90;Name;Esoterische Genüsse
+Houses;91;Name;Unheimliche Einflüsse
+Houses;92;Name;Arkane Artikel
+Houses;93;Name;Zarte Dinge
+Houses;94;Name;Ringe & Relikte
+Houses;95;Name;Mystische Kräfte
+Houses;96;Name;Die bekritzelte Seite
+Houses;97;Name;Das sehende Auge
+Houses;98;Name;Hexengebräu
+Houses;99;Name;Der kleine Zauberladen
+Houses;100;Name;Abduls billige Magie
+Houses;101;Name;Molchsauge
+Houses;102;Name;Rauch und Spiegel
+Houses;103;Name;Äpfel, Dornen und Tränke
+Houses;104;Name;Seltene Verzauberungen
+Houses;105;Name;Der Zaubererladen
+Houses;106;Name;Tys Schmuckstücke
+Houses;107;Name;Alchemie und Beschwörungen
+Houses;108;Name;Kleine Zauber
+Houses;109;Name;Mächtige Magie
+Houses;116;Name;Die blaue Flasche
+Houses;117;Name;Tränke und Elixiere
+Houses;118;Name;Bleiwandlungen
+Houses;119;Name;Der brodelnde Kessel
+Houses;120;Name;Die geschwärzte Phiole
+Houses;121;Name;Edmonds Ampullen
+Houses;122;Name;Phiolen des Glaubens
+Houses;123;Name;Höllische Versuchungen
+Houses;124;Name;Starke Tränke & Gebräue
+Houses;125;Name;Kolben und Flaschen
+Houses;126;Name;Aromatherapien
+Houses;127;Name;Hilfreiche Lösungen
+Houses;131;Name;Oberste Feuergilde
+Houses;137;Name;Oberste Luftgilde
+Houses;143;Name;Oberste Wassergilde
+Houses;149;Name;Oberste Erdgilde
+Houses;155;Name;Oberste Seelengilde
+Houses;161;Name;Oberste Geistesgilde
+Houses;167;Name;Oberste Körpergilde
+Houses;171;Name;Gilde der Erhellung
+Houses;172;Name;Gilde der Erleuchtung
+Houses;173;Name;Lichtgilde (Anfänger)
+Houses;174;Name;Lichtgilde (Adept)
+Houses;176;Name;Gilde der Dämmerung
+Houses;177;Name;Platzhalter
+Houses;178;Name;Gilde der Nacht
+Houses;179;Name;Platzhalter
+Houses;180;Name;Dunkelgilde (Anfänger)
+Houses;181;Name;Dunkelgilde (Adept)
+Houses;185;Name;Schutzmagie
+Houses;189;Name;Selbstgilde (Anfänger)
+Houses;190;Name;Selbstgilde (Adept)
+Houses;203;Name;Rathaus Harmondale
+Houses;204;Name;Rathaus Steadwick
+Houses;205;Name;Rathaus Pierpont
+Houses;206;Name;Halle der Morgenröte
+Houses;207;Name;Halle der Mitternacht
+Houses;209;Name;Hoher Rat
+Houses;212;Name;Halle des Clanführers
+Houses;212;OwnerTitle;Brekish Einzahn
+Houses;213;Name;Thronsaal Sandro/Thant
+Houses;213;OwnerTitle;Sandro
+Houses;214;Name;Sonnentempel-Führerraum
+Houses;214;OwnerTitle;Platzhalter
+Houses;215;Name;Gemach von Lord Markham
+Houses;239;Name;Taverne Zwei Palmen
+Houses;240;Name;Aufs Haus
+Houses;241;Name;Greifenrast
+Houses;242;Name;Smaragd-Gasthof
+Houses;243;Name;Der versnobte Goblin
+Houses;244;Name;Vertrauter Ort
+Houses;245;Name;Das gesegnete Gebräu
+Houses;246;Name;Die Vampyr-Lounge
+Houses;247;Name;Zum lachenden Mönch
+Houses;248;Name;Glückstorheit
+Houses;249;Name;Nur für Bergleute
+Houses;250;Name;Der treue Söldner
+Houses;251;Name;Die eingetopfte Fee
+Houses;252;Name;Groggs Grog
+Houses;253;Name;Ritterliche Ziele
+Houses;254;Name;Der letzte Ausweg
+Houses;255;Name;Garrions Rasthaus
+Houses;256;Name;Tierische Annehmlichkeiten
+Houses;257;Name;Du willst ein Held sein?
+Houses;258;Name;Zum eleganten Ork
+Houses;259;Name;Das Vogelparadies
+Houses;260;Name;Ein einsamer Ritter
+Houses;261;Name;Zum Kobold-Klatscher
+Houses;262;Name;Flug des Pfeils
+Houses;263;Name;Ein Steinwurf
+Houses;264;Name;Die Krone des Königs
+Houses;265;Name;Das Irrlicht
+Houses;266;Name;Der Goblinzahn
+Houses;267;Name;Der zerbrochene Säbel
+Houses;268;Name;Anker auf!
+Houses;269;Name;Der Hain
+Houses;270;Name;Der Spuk
+Houses;271;Name;Der rostige Schild
+Houses;272;Name;Viktors Halle
+Houses;273;Name;Das hallende Flüstern
+Houses;274;Name;Rockhams Stolz
+Houses;275;Name;Reif und Vernunft
+Houses;276;Name;Zum frostigen Krug
+Houses;277;Name;Die Oase
+Houses;278;Name;Zum heulenden Mond
+Houses;279;Name;Der Wortbruch
+Houses;280;Name;Die letzte Chance
+Houses;286;Name;Das Gewölbe
+Houses;287;Name;Bank von Erathia
+Houses;288;Name;Vorrat der Natur
+Houses;289;Name;Materieller Reichtum
+Houses;290;Name;Eingefrorene Werte
+Houses;292;Name;Hallen des Goldes
+Houses;293;Name;Mineralienreichtum
+Houses;294;Name;Platzhalter
+Houses;295;Name;Platzhalter
+Houses;296;Name;Platzhalter
+Houses;297;Name;Sparhaus
+Houses;298;Name;Die Reserven
+Houses;299;Name;Die Erste Bank von Enroth
+Houses;300;Name;Geldwechsel
+Houses;301;Name;Sicherer Hafen
+Houses;311;Name;Kathedrale WelNin
+Houses;312;Name;Haus des Trostes
+Houses;313;Name;Heilmittel der Natur
+Houses;318;Name;Gaben und Segen
+Houses;319;Name;Der Orden von Tatalia
+Houses;320;Name;Tempel der Ruhe
+Houses;321;Name;Tempel des Steins
+Houses;322;Name;Zuflucht
+Houses;323;Name;Heiliger Boden
+Houses;325;Name;Tempel Neu-Sorpigal
+Houses;326;Name;Tempel des Steins
+Houses;327;Name;Tempel von Blackshire
+Houses;328;Name;Abduls billiger Tempel
+Houses;329;Name;Tempel Weißkappe
+Houses;330;Name;Tempel der Nebelinsel
+Houses;331;Name;Tempel Silberbucht
+Houses;332;Name;Tempel des Königs
+Houses;333;Name;Haus der Heilung
+Houses;334;Name;Tempel Baa
+Houses;335;Name;Schloss Ironfist
+Houses;336;Name;Schloss Newton
+Houses;337;Name;Schloss Temper
+Houses;338;Name;Schloss Stone
+Houses;339;Name;Schloss Fleise
+Houses;340;Name;Schloss Stromgard
+Houses;341;Name;Gefängnis des Erdfürsten
+Houses;342;Name;Gefängnis des Feuerfürsten
+Houses;343;Name;Gefängnis des Wasserfürsten
+Houses;344;Name;Versteck Balthazar
+Houses;345;Name;Hintertür des alten Tempels
+Houses;347;Name;Tor zur Ebene der Luft
+Houses;348;Name;Tor zur Ebene des Wassers
+Houses;349;Name;Piratenaußenposten
+Houses;350;Name;Tor zur Ebene des Feuers
+Houses;351;Name;Schmugglerbucht
+Houses;352;Name;Tor zur Ebene der Erde
+Houses;353;Name;Bau der Schreckenswölfe
+Houses;354;Name;Handelshaus von Alvar
+Houses;355;Name;Im Kristall
+Houses;356;Name;Wespennest
+Houses;357;Name;Ogerkriegsfestung
+Houses;358;Name;Trollgrab
+Houses;359;Name;Zyklopen-Speisekammer
+Houses;360;Name;Feuerkette
+Houses;361;Name;Drachenjägerlager
+Houses;362;Name;Drachenhöhle
+Houses;363;Name;Nagagewölbe
+Houses;365;Name;Verlassener Druidenkreis
+Houses;366;Name;Minotaurenhöhle
+Houses;367;Name;Barbarenfestung
+Houses;368;Name;Piratenfestung
+Houses;369;Name;Verlassene Piratenfeste
+Houses;370;Name;Kleines U-Boot-Dock
+Houses;371;Name;Gilde der Nekromanten
+Houses;372;Name;Labor des irren Nekromanten
+Houses;375;Name;Tributgrab
+Houses;376;Name;Schloss des Feuers
+Houses;377;Name;Kriegslager
+Houses;378;Name;Escatons Palast
+Houses;379;Name;Gefängnis des Luftfürsten
+Houses;383;Name;Schloss Gryphonheart
+Houses;384;Name;Schloss Navan
+Houses;385;Name;Schloss Gloaming
+Houses;386;Name;Schloss Lambent
+Houses;388;Name;Hügelgrab
+Houses;389;Name;Drachenhort
+Houses;391;Name;Weißklippen-Höhlen
+Houses;392;Name;Kanalisation von Erathia
+Houses;393;Name;Fort Riverstride
+Houses;394;Name;Tularea-Höhlen
+Houses;395;Name;Clankers Labor
+Houses;396;Name;Halle der Grube
+Houses;397;Name;Wachturm 6
+Houses;398;Name;Schule der Zauberei
+Houses;399;Name;Rotzwerg-Minen
+Houses;400;Name;Nebelmauern
+Houses;401;Name;Tempel des Lichts
+Houses;402;Name;Zuchtgebiet
+Houses;403;Name;Tempel der Dunkelheit
+Houses;404;Name;Großer Tempel des Mondes
+Houses;405;Name;Großer Tempel der Sonne
+Houses;406;Name;Donnerfaust-Berg
+Houses;407;Name;Das Labyrinth
+Houses;408;Name;Steinstadt
+Houses;409;Name;Kolonie Zod
+Houses;410;Name;Söldnergilde
+Houses;411;Name;Gezeitenhöhlen
+Houses;412;Name;Weinkeller
+Houses;413;Name;Festung des Titanen
+Houses;415;Name;Halle unter dem Hügel
+Houses;416;Name;Die Lincoln
+Houses;417;Name;Goblinwacht
+Houses;419;Name;Schloss Alamos
+Houses;420;Name;Grab von VARN
+Houses;421;Name;Der Bienenstock
+Houses;423;Name;Tempel der Faust
+Houses;424;Name;Schloss Darkmoor
+Houses;425;Name;Versteck der Schattengilde
+Houses;426;Name;Tempel von Tsantsa
+Houses;427;Name;Schloss Kriegspire
+Houses;428;Name;Halle des Feuerlords
+Houses;430;Name;Snergles Höhlen
+Houses;432;Name;Höhlen der Dragoner
+Houses;433;Name;Oberster Tempel des Baa
+Houses;434;Name;Außenposten Silberhelm
+Houses;435;Name;Höherer Tempel des Baa
+Houses;436;Name;Schattengilde
+Houses;437;Name;Tempel der Schlange
+Houses;438;Name;Snergles Eisenminen
+Houses;439;Name;Feste der Dragoner
+Houses;441;Name;Festung Silberhelm
+Houses;442;Name;Der Monolith
+Houses;443;Name;Grab von Ethric d. Irren
+Houses;444;Name;Feste Icewind
+Houses;445;Name;Festung des Kriegsherrn
+Houses;446;Name;Bau des Wolfs
+Houses;447;Name;Ghariks Schmiede
+Houses;448;Name;Agars Labor
+Houses;449;Name;Höhlen der Drachenreiter
+Houses;450;Name;Der Seher
+Houses;451;Name;Das Orakel
+Houses;461;Name;Der J.V.C-Pferch
+Houses;462;Name;Königliche Rosse
+Houses;463;Name;Hus Hengste
+Houses;464;Name;Treue Rösser
+Houses;465;Name;Kristallkarawanen
+Houses;466;Name;Trockene Sättel
+Houses;467;Name;Luxuskutschen
+Houses;468;Name;Platzhalter
+Houses;469;Name;Platzhalter
+Houses;470;Name;Kutschen Neu-Sorpigal
+Houses;471;Name;Königslinien
+Houses;472;Name;Reisen Free Haven Ost
+Houses;473;Name;Reisen Free Haven West
+Houses;474;Name;Reisen Darkmoor
+Houses;475;Name;Abduls billige Reisen
+Houses;476;Name;Transport Weißkappe
+Houses;477;Name;Königsstraße
+Houses;478;Name;Blackshire Kutschen & Wagen
+Houses;483;Name;Wind
+Houses;485;Name;Lady Margaret
+Houses;486;Name;Lady Catherine
+Houses;487;Name;Seeelfe
+Houses;488;Name;Zauberin
+Houses;489;Name;Heilige Segel
+Houses;490;Name;Der Unerschrockene
+Houses;491;Name;Narwal
+Houses;492;Name;Windläufer
+Houses;493;Name;Nebelflieger
+Houses;494;Name;Platzhalter
+Houses;495;Name;Platzhalter
+Houses;496;Name;Odyssee
+Houses;497;Name;Zephyr
+Houses;498;Name;Königin Catherine
+Houses;499;Name;Abenteuer
+Houses;500;Name;Azurblauer Himmel
+Houses;501;Name;Windläufer
+Houses;502;Name;Barrakuda
+Houses;503;Name;Cirrus
+Houses;504;Name;Tigerhai
+Houses;505;Name;Tsunami
+Houses;506;Name;Walküre
+Houses;507;Name;Das Wagnis
+Houses;508;Name;Wilburts Hütte
+Houses;510;Name;Halle Vespers
+Houses;511;Name;Halle von Solis
+Houses;512;Name;Halle Eversmyle
+Houses;514;Name;Haus Krewlen
+Houses;515;Name;Halle Darkenmoore
+Houses;517;Name;Halle Agraynel
+Houses;518;Name;Haus Lightfinger
+Houses;520;Name;Heim Sparkman
+Houses;521;Name;Halle Sablewood
+Houses;525;Name;Gut Fromago
+Houses;527;Name;Haus Nevermore
+Houses;529;Name;Halle Havest
+Houses;535;Name;Haus Brandy
+Houses;545;Name;Haus Black Current
+Houses;547;Name;Heim von Rihansi
+Houses;548;Name;Halle Bombah
+Houses;553;Name;Stones Hütte
+Houses;554;Name;Hütte Hearthsworn
+Houses;555;Name;Talions Hütte
+Houses;556;Name;Hütte im Nebel
+Houses;557;Name;Hoberts Hütte
+Houses;558;Name;Hütte Greenstorm
+Houses;559;Name;Poles Hütte
+Houses;560;Name;Hütte Tarent
+Houses;561;Name;Schmeckers Hütte
+Houses;572;Name;Ishtons Höhle
+Houses;573;Name;Ithilgores Höhle
+Houses;574;Name;Scarwings Höhle
+Houses;575;Name;Sag James, du siehst dies 353
+Houses;576;Name;Sag James, du siehst dies 354
+Houses;577;Name;Halle Taleshire
+Houses;582;Name;Haus Lathaen
+Houses;583;Name;Halle Brightsprear
+Houses;587;Name;Halle Roggen
+Houses;591;Name;Haus der Reise
+Houses;592;Name;Flüsterhalle
+Houses;594;Name;Haus der Pfründe
+Houses;597;Name;Halle Caverhill
+Houses;603;Name;Gut Gallowswell
+Houses;608;Name;Wargreens Labor
+Houses;621;Name;Sails Hütte
+Houses;622;Name;Pordos Hütte
+Houses;627;Name;Überfluteter Laden
+Houses;628;Name;Waffenladen-Platzhalter
+Houses;629;Name;Haus Suretail
+Houses;631;Name;Rüstungsladen Platzhalter
+Houses;632;Name;Zauberladen Platzhalter
+Houses;633;Name;Zauberladen-Platzhalter
+Houses;636;Name;Alchimist Platzhalter
+Houses;637;Name;Tempel-Platzhalter
+Houses;639;Name;Haus Hollyfield
+Houses;642;Name;Bank Platzhalter
+Houses;643;Name;Trainingshalle-Platzhalter
+Houses;645;Name;Halle Dragontracker
+Houses;646;Name;Nirses Beute
+Houses;647;Name;Burnkindles Beute
+Houses;648;Name;Halle Cleareye
+Houses;649;Name;Shadowrunners Tresor
+Houses;650;Name;Diebesgewahrsam
+Houses;651;Name;Halle Steelcoif
+Houses;652;Name;Gut Jawblower
+Houses;653;Name;Domizil Marmon
+Houses;654;Name;Einauges Versteck
+Houses;657;Name;Versteck Ferne
+Houses;658;Name;Pavels Haus
+Houses;659;Name;Nalanis Halle
+Houses;660;Name;Domizil Mercer
+Houses;661;Name;Zelle des Luftlords
+Houses;662;Name;Zelle des Wasserfürsten
+Houses;663;Name;Zelle des Erdlords
+Houses;664;Name;Zelle des Feuerlords
+Houses;674;Name;Cagnors Laden
+Houses;702;Name;Flamdrings Höhle
+Houses;703;Name;Brimstones Höhle
+Houses;704;Name;Duroths Höhle
+Houses;705;Name;PLATZHALTER
+Houses;743;Name;Platzhalter
+Houses;744;Name;Platzhalter
+Houses;745;Name;Platzhalter
+Houses;746;Name;Platzhalter
+Houses;747;Name;Platzhalter
+Houses;748;Name;Platzhalter
+Houses;749;Name;Platzhalter
+Houses;750;Name;Platzhalter
+Houses;751;Name;Tür zum Ratssaal
+Houses;752;OwnerTitle;Overdune
+Houses;753;Name;Charles Quixotes Haus
+Houses;753;OwnerTitle;Charles Quixote
+Houses;754;Name;Dyson Lelands Zimmer
+Houses;754;OwnerTitle;Dyson Leland
+Houses;755;Name;Raum des Minotaurenführers
+Houses;755;OwnerTitle;Platzhalter
+Houses;757;Name;Orakel
+Houses;761;Name;Hiss' Hütte
+Houses;762;Name;Jacks Hütte
+Houses;763;Name;Platzhalter
+Houses;764;Name;Platzhalter
+Houses;765;Name;Platzhalter
+Houses;766;Name;Platzhalter
+Houses;767;Name;Platzhalter
+Houses;768;Name;Platzhalter
+Houses;769;Name;Platzhalter
+Houses;770;Name;Platzhalter
+Houses;771;Name;Platzhalter
+Houses;772;Name;Werratten-Schmugglerführer
+Houses;772;OwnerTitle;Werratten-Schmuggler
+Houses;773;Name;Händlergildenhaus
+Houses;774;Name;Höhle des Drachenführers
+Houses;774;OwnerTitle;Drache
+Houses;775;Name;Escatons Thronsaal
+Houses;775;OwnerTitle;Escaton
+Houses;778;Name;Platzhalter
+Houses;779;Name;Platzhalter
+Houses;780;Name;Platzhalter
+Houses;781;Name;Platzhalter
+Houses;782;Name;Platzhalter
+Houses;783;Name;Platzhalter
+Houses;784;Name;Tisks Hütte
+Houses;785;Name;Haus Pederton
+Houses;786;Name;Platzhalter
+Houses;787;Name;Platzhalter
+Houses;788;Name;Platzhalter
+Houses;789;Name;Platzhalter
+Houses;790;Name;Platzhalter
+Houses;791;Name;Platzhalter
+Houses;793;Name;Puddles Hütte
+Houses;794;Name;Platzhalter
+Houses;795;Name;Haus Ich
+Houses;797;Name;Platzhalter
+Houses;798;Name;Languids Hütte
+Houses;799;Name;Heim Apple
+Houses;800;Name;Platzhalter
+Houses;801;Name;Platzhalter
+Houses;802;Name;Platzhalter
+Houses;803;Name;Platzhalter
+Houses;804;Name;Haus Thistle
+Houses;806;Name;Platzhalter
+Houses;807;Name;Platzhalter
+Houses;808;Name;Platzhalter
+Houses;809;Name;Platzhalter
+Houses;810;Name;Platzhalter
+Houses;811;Name;Platzhalter
+Houses;812;Name;Platzhalter
+Houses;813;Name;Zevahs Hütte
+Houses;814;Name;Holdens Hütte
+Houses;815;Name;Platzhalter
+Houses;816;Name;Platzhalter
+Houses;817;Name;Platzhalter
+Houses;818;Name;Platzhalter
+Houses;819;Name;Platzhalter
+Houses;820;Name;Platzhalter
+Houses;821;Name;Platzhalter
+Houses;822;Name;Platzhalter
+Houses;824;Name;Aznogs Hütte
+Houses;825;Name;Platzhalter
+Houses;826;Name;Platzhalter
+Houses;827;Name;Platzhalter
+Houses;828;Name;Platzhalter
+Houses;829;Name;Platzhalter
+Houses;830;Name;Platzhalter
+Houses;831;Name;Platzhalter
+Houses;832;Name;Platzhalter
+Houses;834;Name;Haus Luodrin
+Houses;835;Name;Platzhalter
+Houses;836;Name;Platzhalter
+Houses;837;Name;Platzhalter
+Houses;838;Name;Platzhalter
+Houses;839;Name;Platzhalter
+Houses;840;Name;Platzhalter
+Houses;841;Name;Platzhalter
+Houses;842;Name;Platzhalter
+Houses;843;Name;Lasatins Hütte
+Houses;845;Name;Platzhalter
+Houses;846;Name;Platzhalter
+Houses;847;Name;Platzhalter
+Houses;848;Name;Platzhalter
+Houses;849;Name;Platzhalter
+Houses;850;Name;Platzhalter
+Houses;851;Name;Platzhalter
+Houses;854;Name;Platzhalter
+Houses;855;Name;Platzhalter
+Houses;856;Name;Platzhalter
+Houses;857;Name;Platzhalter
+Houses;858;Name;Platzhalter
+Houses;859;Name;Platzhalter
+Houses;860;Name;Husks Hütte
+Houses;862;Name;Platzhalter
+Houses;863;Name;Platzhalter
+Houses;864;Name;Platzhalter
+Houses;865;Name;Platzhalter
+Houses;866;Name;Talimeres Hütte
+Houses;868;Name;Platzhalter
+Houses;869;Name;Platzhalter
+Houses;870;Name;Haus Reshie
+Houses;871;Name;Halle Townsaver
+Houses;872;Name;Platzhalter
+Houses;875;Name;Platzhalter
+Houses;876;Name;Langschwanz' Hütte
+Houses;878;Name;Platzhalter
+Houses;880;Name;Heim Bluesawn
+Houses;881;Name;Platzhalter
+Houses;882;Name;Haus Grivic
+Houses;884;Name;Platzhalter
+Houses;885;Name;Ushs Hütte
+Houses;887;Name;Platzhalter
+Houses;891;Name;Halle Temper
+Houses;896;Name;Halle Botham
+Houses;898;Name;Halle Stonecleaver
+Houses;903;Name;Haus Hawthorne
+Houses;904;Name;Heim der Familie Lott
+Houses;905;Name;Haus Nosewort
+Houses;906;Name;Halle des Fährtensuchers
+Houses;907;Name;Hütte des Jägers
+Houses;909;Name;Hütte der Familie Dotes
+Houses;917;Name;Heim Sourbrow
+Houses;922;Name;Haus Talion
+Houses;928;Name;Schönes Haus
+Houses;929;Name;Heim der Familie Lotts
+Houses;936;Name;Heim Heartsworn
+Houses;942;Name;Org-Haus
+Houses;944;Name;Heim Barnes
+Houses;947;Name;Heim Suretrail
+Houses;950;Name;Grünes Haus
+Houses;953;Name;Heim Blueswan
+Houses;954;Name;Heim Treasurestone
+Houses;955;Name;Haus Windsong
+Houses;957;Name;Haus Ottin
+Houses;958;Name;Schwarzes Haus
+Houses;978;Name;Harlis Bleibe
+Houses;989;Name;Haus Riverstone
+Houses;1020;Name;Haus Snick
+Houses;1026;Name;Heim Conscience
+Houses;1035;Name;Bruder Bombahs
+Houses;1039;Name;Wackos
+Houses;1055;Name;Gizmos
+Houses;1101;Name;Nebelanwesen
+Houses;1104;Name;Gut Mark
+Houses;1110;Name;Zum lächelnden Jack
+Houses;1112;Name;Gut Applebee
+Houses;1115;Name;Gayles
+Houses;1125;Name;Torrents
+Houses;1129;Name;Blayzes
+Houses;1132;Name;Anwesen Wain
+Houses;1135;Name;Avalanches
+Houses;1136;Name;Steinhaus
+Houses;1141;Name;Kaines
+Houses;1145;Name;Aznogs Bleibe
+Houses;1155;Name;Haus Garnet
+Houses;1157;Name;Thomas Grey
+Houses;1158;Name;Alice Hargreaves
+Houses;1162;Name;Meisterdieb
+Houses;1163;Name;Markhams Hauptquartier
+Houses;1167;Name;Residenz Donna Wyrith
+Houses;1168;Name;Die Lady Margaret
+Houses;1170;Name;Mia Lucilles Heim
+Houses;1183;Name;Carolyn Weathers' Haus
+Houses;1213;Name;Reisebedarf
+Houses;1214;Name;Elementgilde (Anfänger)
+Houses;1229;Name;Mit Sack und Pack
+Houses;1230;Name;Elementgilde (Adept)
+Houses;1245;Name;Händler Joes
+Houses;1259;Name;Abduls billige Waren
+Houses;1274;Name;Gemischtwarenladen
+Houses;1289;Name;Handelsposten Outland
+Houses;1442;Name;Tempel von Free Haven
+Houses;1451;Name;Hütte des Einsiedlers
+Houses;1570;Name;Übungsgelände der Insel
+Houses;1571;Name;Grundprinzipien
+Houses;1572;Name;In Diensten Ihrer Majestät
+Houses;1573;Name;Das Prüfungsgelände
+Houses;1574;Name;Prüfung der Ehre
+Houses;1575;Name;Flamme des Verderbens
+Houses;1576;Name;Angewandte Lehre
+Houses;1577;Name;Trainingsbedarf
+Houses;1578;Name;Übungsraum Avlee
+Houses;1579;Name;Kriegsakademie
+Houses;1580;Name;Platzhalter
+Houses;1581;Name;Platzhalter
+Houses;1582;Name;Platzhalter
+Houses;1583;Name;Übungsplatz Neu-Sorpigal
+Houses;1584;Name;Akademie von Free Haven
+Houses;1585;Name;Abduls billiges Training
+Houses;1586;Name;Der Kampfplatz
+Houses;1587;Name;Training am Meer
+Houses;1588;Name;Wolfsbau
+Houses;1589;Name;Königliche Turnhalle
+Houses;1590;Name;Prüfungszentrum der Insel
+Houses;1591;Name;Training Einsamer Baum
+Houses;1592;Name;Akademie am Fluss
+Houses;1595;Name;Zirkus

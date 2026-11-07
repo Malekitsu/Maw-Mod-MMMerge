@@ -192,7 +192,7 @@ end
 
 function events.GameInitialized2()
 
-	local keys_per_column = 5
+	local keys_per_column = 6
 	local key_labels = {}
 	local selection = 0
 	local offset = 0

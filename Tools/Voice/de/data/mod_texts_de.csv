@@ -1,0 +1,686 @@
+Table;Id;German
+QuestsTxt;513;Dem Richter auf der Smaragdinsel einen roten Trank bringen.
+QuestsTxt;514;Dem Richter auf der Smaragdinsel eine Muschel bringen.
+QuestsTxt;515;Dem Richter auf der Smaragdinsel einen Langbogen bringen.
+QuestsTxt;516;Dem Richter auf der Smaragdinsel eine Bodenfliese bringen.
+QuestsTxt;517;Dem Richter auf der Smaragdinsel ein Musikinstrument bringen.
+QuestsTxt;518;Dem Richter auf der Smaragdinsel einen kostbaren Hut bringen.
+QuestsTxt;528;Die vermißten Teilnehmer auf der Smaragdinsel finden und Lord Markham einen Beweis bringen.
+QuestsTxt;530;Die Vase aus Lord Markhams Anwesen in Tatalia stehlen und William Lasker in der Kanalisation von Erathia bringen.
+QuestsTxt;531;In Wachturm 6 in den Deyja-Mooren das Gewicht von der Turmspitze zum Turmfuß bringen. Dann zu William Lasker in der Kanalisation von Erathia zurückkehren.
+QuestsTxt;533;Im Himmlischen Hof in Celeste Lady Eleanor Carmine töten. Mit Beweis zu Seknit Undershadow in den Deyja-Mooren zurückkehren.
+QuestsTxt;534;Wromthrax den Herzlosen in seiner Höhle in Tatalia töten, dann mit Sir Charles Quixote sprechen.
+QuestsTxt;536;Alice Hargreaves aus Williams Turm in den Deyja-Mooren retten, dann mit Sir Charles Quixote sprechen.
+QuestsTxt;538;Alice Hargreaves aus ihrer Residenz im Schloß Gryphonheart entführen und zu Williams Turm in den Deyja-Mooren bringen.
+QuestsTxt;539;Den verlorenen Meditationsort in den Zwergen-Grabhügeln finden.
+QuestsTxt;540;Im Tempel von Baa in Avlee den Hohepriester von Baa töten, dann zu Bartholomew Hume in Harmondale zurückkehren.
+QuestsTxt;541;In der Schule der Zauberei in der Bracada-Wüste den Code knacken, um den Ort des Grabes von Ashwar Nog'Nogoth zu erfahren. Das Grab finden, betreten und dann Stephan Sand in der Grube Bericht erstatten.
+QuestsTxt;542;Den Perfekten Bogen aus der Titanenfestung in Avlee holen und Lawrence Mark in Harmondale bringen.
+QuestsTxt;543;Den Aufzug in den Minen der Roten Zwerge in der Bracada-Wüste sabotieren, dann zu Steagal Snick in Avlee zurückkehren.
+QuestsTxt;544;Den Perfekten Bogen aus der Titanenfestung in Avlee holen und Steagal Snick in Avlee bringen.
+QuestsTxt;545;Fünf Arena-Herausforderungen gewinnen, dann zu Leda Rowan in der Bracada-Wüste zurückkehren.
+QuestsTxt;546;Alle Untoten im Spukhaus in den Grabhügeln vernichten und zu Frederick Org in Erathia zurückkehren.
+QuestsTxt;547;Die Elfen-Schatzkammer im Schloß Navan im Tularean-Wald plündern und zu Frederick Org in Erathia zurückkehren.
+QuestsTxt;548;Die Bäume im Tularean-Wald beruhigen, indem mit dem Ältesten Baum gesprochen wird, dann zu Lysander Sweet in der Bracada-Wüste zurückkehren.
+QuestsTxt;549;Das Geheimnis des Eingangs zum Feenhügel in Avlee lösen und mit dem Feenkönig sprechen.
+QuestsTxt;550;Kopfgelder im Wert von 10.000 Goldstücken bei den Kopfgeldjagden in den Rathäusern einsammeln, dann zu Ebednezer Sower im Tularean-Wald zurückkehren.
+QuestsTxt;551;Das Herz des Waldes in der Söldnergilde in Tatalia finden und zum Ältesten Baum im Tularean-Wald bringen.
+QuestsTxt;554;Den Altar des Bösen im Tempel des Mondes auf der Insel Evenmorn reinigen, dann zu Rebecca Devine in Celeste zurückkehren.
+QuestsTxt;555;Die verlorene Piratenkarte in den Gezeitenhöhlen in Tatalia finden und zu Daedalus Falk in den Deyja-Mooren zurückbringen.
+QuestsTxt;556;Den Altar des Guten im Tempel der Sonne auf der Insel Evenmorn schänden, dann zu Daedalus Falk in den Deyja-Mooren zurückkehren.
+QuestsTxt;557;Die sechs Golemteile sammeln und einen vollständigen Golem bauen, dann zu Thomas Grey in der Schule der Zauberei zurückkehren.
+QuestsTxt;559;Das Buch des Göttlichen Eingreifens in der Brutzone in der Grube finden und Thomas Grey in der Schule der Zauberei bringen.
+QuestsTxt;560;Die Lich-Gefäße aus dem Prüfgelände in Celeste holen und Halfgild Wynac in der Grube bringen.
+QuestsTxt;561;Die drei Stonehenge-Monolithen in Tatalia, den Evenmorn-Inseln und Avlee besuchen, dann zu Anthony Green im Tularean-Wald zurückkehren.
+QuestsTxt;566;Die Gebeine des Zwergenkönigs aus den Tunneln zwischen Stone City und Nighon holen und an ihrer rechten Ruhestätte in den Grabhügeln beisetzen, dann zu Anthony Green im Tularean-Wald zurückkehren.
+QuestsTxt;567;Das Drachenei aus der Drachenhöhle im Land der Riesen holen und Tor Anwyn auf dem Berg Nighon bringen.
+QuestsTxt;587;Schloß Harmondale säubern und zum Butler in der Taverne On the House in Harmondale zurückkehren.
+QuestsTxt;588;Die Zwerge aus den Minen der Roten Zwerge retten und zum Zwergenkönig in Stone City in den Grabhügeln zurückkehren.
+QuestsTxt;589;Die Pläne von Fort Riverstride holen und Eldrich Parson im Schloß Navan im Tularean-Wald bringen.
+QuestsTxt;590;Loren Steel aus den Tularean-Höhlen im Tularean-Wald retten und zu Königin Catherine bringen.
+QuestsTxt;591;Gryphonhearts Trompete aus der Schlacht im Tularean-Wald holen und einer Seite nach Wahl übergeben.
+QuestsTxt;606;Eldrich Parson im Schloß Navan im Tularean-Wald falsche Riverstride-Pläne übergeben.
+QuestsTxt;607;Den Loren-Betrüger zu Königin Catherine ins Schloß Gryphonheart in Erathia bringen.
+QuestsTxt;613;Die Nebelwälle abschließen, ohne einen einzigen Gegner zu töten, und zu Gavin Magnus im Schloß Lambent in Celeste zurückkehren.
+QuestsTxt;615;Das Altarteil aus dem Tempel des Lichts in Celeste und dem Tempel der Dunkelheit in der Grube holen und Resurectra im Schloß Lambent in Celeste bringen.
+QuestsTxt;616;In Colony Zod im Land der Riesen Xenofex erschlagen, dann zu Resurectra im Schloß Lambent in Celeste zurückkehren.
+QuestsTxt;618;Den Weinkeller in Tatalia untersuchen und zu Crag Hack im Schloß Lambent in Celeste zurückkehren.
+QuestsTxt;620;Den Koffer mit Seelengefäßen aus Schloß Gloaming in der Grube holen und zu Sir Caneghem in Celeste zurückkehren.
+QuestsTxt;621;Tolberti in seinem Haus in der Grube ermorden und seinen Kontrollwürfel zu Robert dem Weisen in Celeste bringen.
+QuestsTxt;634;Das Altarteil aus dem Tempel des Lichts in Celeste und dem Tempel der Dunkelheit in der Grube holen und Kastore in der Grube bringen.
+QuestsTxt;635;In Colony Zod im Land der Riesen Xenofex erschlagen, dann zu Kastore in der Grube zurückkehren.
+QuestsTxt;636;Den Koffer mit Seelengefäßen von den Hexenmeistern im Thunderfist-Gebirge holen und Maximus in der Grube bringen.
+QuestsTxt;637;Die magischen Abwehranlagen in Clankers Labor zerstören und zu Dark Shade in der Grube zurückkehren.
+QuestsTxt;639;Robert den Weisen in seinem Haus in Celeste ermorden und zu Tolberti in der Grube zurückkehren.
+QuestsTxt;640;Die Brutzone abschließen und zu Archibald in der Grube zurückkehren.
+QuestsTxt;642;Zur Lincoln im Meer westlich von Avlee fahren, den Oscillation Overthruster holen und Resurectra in Celeste bringen.
+QuestsTxt;643;Zur Lincoln im Meer westlich von Avlee fahren, den Oscillation Overthruster holen und Kastore in der Grube bringen.
+QuestsTxt;658;Mit den Zwergen in Stone City in den Grabhügeln sprechen, um einen Weg zur Reparatur von Schloß Harmondale zu finden.
+QuestsTxt;663;Die Grube von der Halle der Grube in den Deyja-Mooren aus betreten, dann mit Archibald im Schloß Gloaming in der Grube sprechen.
+QuestsTxt;664;Celeste durch den großen Teleporter in der Bracada-Wüste betreten, dann mit Gavin Magnus im Schloß Lambent in Celeste sprechen.
+QuestsTxt;665;Einen Richter als Nachfolger von Richter Grey zum Schiedsrichter in Harmondale wählen.
+QuestsTxt;667;Die Laterne des Lichts aus den Grabhügeln holen und Tarin Withern in Harmondale bringen.
+QuestsTxt;668;Haldars Überreste aus dem Labyrinth in Nighon holen und Mazim Dusk in Nighon bringen.
+QuestsTxt;669;Davriks Siegelring aus den Banditenhöhlen im Nordosten von Erathia holen und Davrik Peladium in Harmondale bringen.
+QuestsTxt;670;Den versiegelten Brief für den Sammler Norbert Thrush zu Lord Markham in Lord Markhams Anwesen in Tatalia bringen.
+QuestsTxt;671;Parsons Feder zu Norbert Thrush in Erathia zurückbringen.
+QuestsTxt;691;Den versiegelten Brief zum Feenkönig in die Halle unter dem Hügel in Avlee bringen.
+QuestsTxt;692;Die Feenflöte zu Johann Kerrid im Tularean-Wald bringen.
+QuestsTxt;693;Innerhalb von zwei Wochen in die Söldnergilde in Tatalia gehen und mit Niles Stantley sprechen.
+QuestsTxt;694;Den Wandteppich aus dem Schloß Eures Verbündeten stehlen und Niles Stantley in der Söldnergilde in Tatalia bringen.
+QuestsTxt;698;Alle Troglodyten unter Stone City töten und zu Spark Burnkindle in Stone City zurückkehren.
+QuestsTxt;699;Alle Greifen in Erathia und der Bracada-Wüste töten und zu Seth Drakkson in den Deyja-Mooren zurückkehren.
+QuestsTxt;706;Das Schicksal von Darrons Bruder in den Weißklippenhöhlen herausfinden, dann zu Darron Temper in Harmondale zurückkehren.
+QuestsTxt;707;Die Stola der Jahreszeiten aus der Halle der Grube holen und Gary Zimm in der Bracada-Wüste bringen.
+QuestsTxt;712;Die drei Statuetten holen und auf den Schreinen in der Bracada-Wüste, Tatalia und Avlee aufstellen, dann zu Thom Lumbra im Tularean-Wald zurückkehren.
+QuestsTxt;716;Die drei Gemälde holen und Ferdinand Visconti in Tatalia bringen.
+QuestsTxt;717;In allen dreizehn Gasthäusern eine Partie Arcomage gewinnen, dann zu Gina Barnes in Erathia zurückkehren.
+QuestsTxt;757;Glückwunsch
+QuestsTxt;1105;Sulmans Brief Andover Potbello in New Sorpigal zeigen.
+QuestsTxt;1106;Sulmans Brief zu Regent Wilbur Humphrey ins Schloß Ironfist bringen.
+QuestsTxt;1107;Die Kombination für die Tresortür in Goblinwatch finden und zum Rathaus von New Sorpigal zurückkehren.
+QuestsTxt;1108;Das Glockenspiel der Harmonie aus dem Tempel von Baa holen und zum Rathaus von New Sorpigal zurückbringen.
+QuestsTxt;1110;Lord Kilburns Schild finden und Wilbur Humphrey im Schloß Ironfist Bericht erstatten.
+QuestsTxt;1112;Eine Jungfrau in Nöten retten und mit ihr zu Wilbur Humphrey ins Schloß Ironfist zurückkehren.
+QuestsTxt;1113;Longfang Witherhide in seiner Höhle nahe Schloß Darkmoor erschlagen und zu Wilbur Humphrey ins Schloß Ironfist zurückkehren.
+QuestsTxt;1114;Nicolai unterhalten.
+QuestsTxt;1119;Prinz Nicolai finden und ins Schloß Ironfist zurückbringen.
+QuestsTxt;1120;Das Dritte Auge finden und Prinz Nicolai im Schloß Ironfist bringen.
+QuestsTxt;1122;Den Prinzen der Diebe fangen und zu Lord Anthony Stone ins Schloß Stone bringen.
+QuestsTxt;1129;Einen Steinmetz und einen Zimmermann anheuern, sie zur Reparatur des Temple Stone nach Free Haven bringen und dann zu Lord Anthony Stone ins Schloß Stone zurückkehren.
+QuestsTxt;1131;Den Heiligen Kelch von den Mönchen in ihrem Inseltempel östlich von Free Haven holen, im Temple Stone in Free Haven abgeben und dann zu Lord Stone ins Schloß Stone zurückkehren.
+QuestsTxt;1134;Die Sanduhr der Zeit finden und zu Lord Albert Newton in Mist zurückbringen.
+QuestsTxt;1135;Vom Brunnen der Magie trinken und zu Lord Albert Newton in Mist zurückkehren.
+QuestsTxt;1136;Den Kristall von Terrax holen und zu Lord Albert Newton in Mist zurückbringen.
+QuestsTxt;1137;Den Außenposten der Teufel zerstören und zu Lord Osric Temper im Schloß Temper zurückkehren.
+QuestsTxt;1138;Chadwicks Nominierung zum Ritter erhalten und zu Lord Osric Temper im Schloß Temper zurückkehren.
+QuestsTxt;1139;Den Kriegsherrn besiegen und Osric Temper einen Beweis bringen
+QuestsTxt;1140;Die Preise aller 9 Ställe des Königreichs festsetzen und zu Lady Fleise in Silver Cove zurückkehren.
+QuestsTxt;1142;Den Altar der Sonne im Steinkreis nördlich von Silver Cove an einer Tagundnachtgleiche oder Sonnenwende besuchen (HINWEIS: Der 20. März ist eine Tagundnachtgleiche).
+QuestsTxt;1143;Den Altar des Mondes im Tempel des Mondes um Mitternacht bei Vollmond besuchen.
+QuestsTxt;1144;Den Winter für Lord Stromgard im Schloß Stromgard beenden und ihm die gute Nachricht überbringen.
+QuestsTxt;1145;Den Schlüssel zu den Drachentürmen aus Icewind Keep südlich von Whitecap holen und Lord Stromgard im Schloß Stromgard bringen.
+QuestsTxt;1146;Alle Drachentürme in jeder Stadt zurücksetzen und zu Lord Stromgard im Schloß Stromgard zurückkehren.
+QuestsTxt;1148;Snergle in Snergles Höhlen töten und mit seiner Axt zu Avinril Smythers in der Taverne The Haunt im Sumpf der Verdammten zurückkehren.
+QuestsTxt;1149;Den Silberhelm-Außenposten bei Mist stürmen und mit Beweisen ihrer Verdorbenheit zum Konstabler von Mist zurückkehren.
+QuestsTxt;1150;Den Kerzenleuchter aus dem Verlassenen Tempel für Andover Potbello in New Sorpigal holen.
+QuestsTxt;1152;Die Harfe aus den Dragoner-Höhlen südlich von Schloß Ironfist holen und Andrew Besper im Schloß Ironfist bringen.
+QuestsTxt;1153;Ethrics Schädel aus seinem Grab westlich von Free Haven für Gabriel Cartman in Free Haven holen.
+QuestsTxt;1154;Die Spinnenkönigin im Verlassenen Tempel in New Sorpigal töten und mit ihrem Herzen zu Buford T. Allman in New Sorpigal zurückkehren.
+QuestsTxt;1155;Den Altar im Monolithen westlich von Silver Cove schänden und zu Eleanor Vanderbilt in Silver Cove zurückkehren.
+QuestsTxt;1158;Den Kristall im Tempel der Faust zerstören und zu Winston Schezar in Bootleg Bay zurückkehren.
+QuestsTxt;1160;Emmanuel aus dem Tempel der Schlange bei Blackshire retten und zu Joanne Cravitz in Blackshire zurückbringen.
+QuestsTxt;1161;Das verlorene Artefakt in der Dragoner-Festung bei Schloß Temper finden und Zoltan Phelps in Free Haven bringen.
+QuestsTxt;1162;Sharry aus dem Versteck der Schattengilde retten und mit ihr zu Frank Fairchild in New Sorpigal zurückkehren.
+QuestsTxt;1163;Angela aus dem Verlassenen Tempel retten und zu Violet Dawson in New Sorpigal zurückbringen.
+QuestsTxt;1164;Sherell von den Kannibalen auf den Inseln östlich von Free Haven retten und mit ihr zu Carlo Tormini in Free Haven zurückkehren.
+QuestsTxt;1165;Den Altar des Werwolfs in der Wolfshöhle zerstören und zu Maria Trepan in Blackshire zurückkehren.
+QuestsTxt;1167;Die Perle der Fäulnis in der Wolfshöhle finden und zum Geist von Balthasar, ebenfalls in der Wolfshöhle, bringen.
+QuestsTxt;1168;Das juwelenbesetzte Ei aus Schloß Kriegspire holen und Emil Lime im Dorf Kriegspire bringen.
+QuestsTxt;1169;Die Schutzzauber der Türen in der Halle des Feuerfürsten aufheben und zum Feuerfürsten, ebenfalls in der Halle des Feuerfürsten, zurückkehren.
+QuestsTxt;1186;Gedächtniskristall Alpha im Oberen Tempel von Baa finden und auf einem Modulaltar im Orakel unter dem Hohen Rat einsetzen.
+QuestsTxt;1187;Gedächtniskristall Beta in Schloß Alamos finden und auf einem Modulaltar im Orakel unter dem Hohen Rat einsetzen.
+QuestsTxt;1188;Gedächtniskristall Delta in Schloß Darkmoor finden und auf einem Modulaltar im Orakel unter dem Hohen Rat einsetzen.
+QuestsTxt;1189;Gedächtniskristall Epsilon in Schloß Kriegspire finden und auf einem Modulaltar im Orakel unter dem Hohen Rat einsetzen.
+QuestsTxt;1190;Den Kontrollwürfel aus dem Grab von Varn in Dragonsand holen und zum Orakel unter dem Hohen Rat zurückkehren.
+QuestsTxt;1224;Im Oberen Tempel von Baa östlich von Schloß Kriegspire ein Heilmittel für Slicker Silvertongue finden und mit der guten Nachricht zu Wilbur Humphrey zurückkehren.
+QuestsTxt;1225;Den Brief über Silvertongues Verrat zum Hohen Rat in Free Haven bringen.
+QuestsTxt;1228;Das Buch der Liche in Schloß Darkmoor finden und zerstören, dann zu Terry Ros im Dorf Darkmoor zurückkehren.
+QuestsTxt;1243;Die Statuetten in Sweet Water, Kriegspire, Dragonsand, im Sumpf der Verdammten und in Bootleg Bay aufstellen und zu Twillen in Blackshire zurückkehren.
+QuestsTxt;1259;Arkane Magie von Archibald in der Königlichen Bibliothek im Schloß Ironfist erlangen
+QuestsTxt;1712;Eine geheimnisvolle Frau bat darum, durch die Zeit zu reisen und die Schicksale anderer Helden zu erfüllen. Nun ja...
+QuestsTxt;1713;Die Kontrollierte Bresche betreten, das Entlaufene Chaos finden und zur Unruhigen Urmaterie bringen.
+QuestsTxt;1714;Die Freunde finden.
+QuestsTxt;1715;Den Eingang zur Hauptstruktur der Bresche finden.
+AutonoteTxt;1;Rätsel des Vernichters. Rätsel eins: "Gefängnis."  Rätsel zwei: ?  Rätsel drei: ?  Gefängnis + ? + ?
+AutonoteTxt;2;Rätsel des Vernichters. Rätsel eins: "Gefängnis."  Rätsel zwei: "Innen."  Rätsel drei: ?  Gefängnis + Innen + ?
+AutonoteTxt;3;Rätsel des Vernichters. Rätsel eins: "Gefängnis."  Rätsel zwei: ?  Rätsel drei: "Ei."  Gefängnis + ? + Ei
+AutonoteTxt;4;Rätsel des Vernichters. Rätsel eins: "Gefängnis."  Rätsel zwei: "Innen."  Rätsel drei: "Ei."  Gefängnis + Innen + Ei
+AutonoteTxt;5;Rätsel des Vernichters. Rätsel eins: ?  Rätsel zwei: "Innen."  Rätsel drei: ?  ? + Innen + ?
+AutonoteTxt;6;Rätsel des Vernichters. Erstes Rätsel: ?  Zweites Rätsel: "Innen."  Drittes Rätsel: "Ei."  ? + Innen + Ei
+AutonoteTxt;7;Rätsel des Vernichters. Erstes Rätsel: ?  Zweites Rätsel: ?  Drittes Rätsel: "Ei."  ? + ? + Ei
+AutonoteTxt;8;Obelisk-Botschaft Nr. 1: theunicornkin
+AutonoteTxt;9;Obelisk-Botschaft Nr. 2: gholdsold
+AutonoteTxt;10;Obelisk-Botschaft Nr. 3: thornskey
+AutonoteTxt;11;Obelisk-Botschaft Nr. 4: amonghiss
+AutonoteTxt;12;Obelisk-Botschaft Nr. 5: ubjectsap
+AutonoteTxt;13;Obelisk-Botschaft Nr. 6: pearswhil
+AutonoteTxt;14;Obelisk-Botschaft Nr. 7: ethesunsh
+AutonoteTxt;15;Obelisk-Botschaft Nr. 8: inesonmid
+AutonoteTxt;16;Obelisk-Botschaft Nr. 9: summerday
+AutonoteTxt;17;Rote Flüssigkeit gewährt Stärke.
+AutonoteTxt;18;Orangefarbene Flüssigkeit gewährt Intellekt.
+AutonoteTxt;19;Blaue Flüssigkeit gewährt Persönlichkeit.
+AutonoteTxt;20;Grüne Flüssigkeit gewährt Ausdauer.
+AutonoteTxt;21;Gelbe Flüssigkeit gewährt Genauigkeit.
+AutonoteTxt;22;Violette Flüssigkeit gewährt Schnelligkeit.
+AutonoteTxt;23;Weiße Flüssigkeit gewährt Glück.
+AutonoteTxt;24;Dampfende Flüssigkeit gewährt Feuer-Resistenz.
+AutonoteTxt;25;Eisige Flüssigkeit gewährt Wasser-Resistenz.
+AutonoteTxt;26;Funkensprühende Flüssigkeit gewährt Luft-Resistenz.
+AutonoteTxt;27;Trübe Flüssigkeit gewährt Erd-Resistenz.
+AutonoteTxt;28;Katalysator (grau) = Pilze + leere Flasche. Um den Effekt zu steigern, können verschiedene graue Bestandteile verwendet werden.
+AutonoteTxt;29;Wunden heilen (rot) = Witwentrauer-Beeren + leere Flasche. Um den Effekt zu steigern, können verschiedene rote Bestandteile verwendet werden.
+AutonoteTxt;30;Magietrank (blau) = Phima-Wurzel + leere Flasche. Um den Effekt zu steigern, können verschiedene blaue Bestandteile verwendet werden.
+AutonoteTxt;31;Schwäche heilen (gelb) = Klatschmohn + leere Flasche. Um den Effekt zu steigern, können verschiedene gelbe Bestandteile verwendet werden.
+AutonoteTxt;32;Krankheit heilen (orange) = gelb + rot
+AutonoteTxt;44;Furcht verjagen (orange-violett) = orange + violett
+AutonoteTxt;45;Fluch entfernen (violett-grün) = violett + grün
+AutonoteTxt;46;Irrsinn heilen (orange-grün) = orange + grün
+AutonoteTxt;47;Essenz der Stärke (weiß) = violett + rot-violett
+AutonoteTxt;48;Essenz des Intellekts (weiß) = grün + gelb-grün
+AutonoteTxt;49;Essenz der Persönlichkeit (weiß) = grün + blau-grün
+AutonoteTxt;50;Essenz der Ausdauer (weiß) = violett + blau-violett
+AutonoteTxt;51;Essenz der Schnelligkeit (weiß) = orange + rot-orange
+AutonoteTxt;52;Essenz der Genauigkeit (weiß) = orange + gelb-orange
+AutonoteTxt;55;Waffenöl der Vereisung (weiß) = grün + rot-violett
+AutonoteTxt;59;Waffenöl der Funken (weiß) = violett + rot-orange
+AutonoteTxt;62;Waffenöl der Schnelligkeit (weiß) = violett + blau-grün
+AutonoteTxt;65;Göttliche Wiederherstellung (weiß) = rot-orange + blau-grün
+AutonoteTxt;66;Göttliche Wiederherstellung (weiß) = blau-violett + gelb-orange
+AutonoteTxt;68;Göttliche Heilung (weiß) = rot-orange + gelb-orange
+AutonoteTxt;88;Verjüngung (schwarz) = gelb-violett + göttliche Wiederherstellung (weiß)
+AutonoteTxt;89;Puddle Thain in der Stadt Rabenbucht lehrt den expertenhaften Umgang mit dem Stab.
+AutonoteTxt;93;Meisterliche Schwertkunst lehrt Jaycin Cardron. Ihr findet sie im Drachenjäger-Lager von Garottenschlucht.
+AutonoteTxt;99;Jasp Hunter lehrt den meisterlichen Umgang mit der Axt. Er lebt in der Hafenstadt Rabenbucht.
+AutonoteTxt;100;Garic Senjac, Großmeister der Axt, lebt in Balthazars Zuflucht im Felswüstenland.
+AutonoteTxt;114;Sheldon Nightwood, Meister des Schildes, lebt in der Stadt des Zwielichts im Schattensumpf.
+AutonoteTxt;115;Peryn Reaverston, Großmeister des Schildes, lebt im Drachenjäger-Lager von Garottenschlucht.
+AutonoteTxt;116;Thadin lehrt den expertenhaften Umgang mit Lederrüstungen. Ihr findet ihn auf den Dolchwunden-Inseln.
+AutonoteTxt;117;Shamus Hollyfield, Meister der Lederrüstungen, lebt in der Minotaurenstadt Balthazars Zuflucht im Felswüstenland.
+AutonoteTxt;118;Medwari Elmsmire, Großmeisterin der Lederrüstungen, lebt im Dorf Rust in der Eisensand-Wüste.
+AutonoteTxt;119;Tobren Forgewright lehrt den expertenhaften Umgang mit Kettenrüstungen. Er lebt in der Hafenstadt Rabenbucht.
+AutonoteTxt;120;Halian Eversmyle, Meister der Kettenrüstungen, ist in der Stadt Alvar zu finden.
+AutonoteTxt;121;Seline Burnkindle, Großmeisterin der Kettenrüstungen, lehrt in ihrem Haus auf der Insel Regna.
+AutonoteTxt;122;Bone lehrt den expertenhaften Umgang mit Plattenrüstungen. Er lebt in einer Hütte auf den Dolchwunden-Inseln.
+AutonoteTxt;123;Botham, Meister der Plattenrüstungen, lebt in der Stadt Rabenbucht.
+AutonoteTxt;124;Seth Ironfist, Großmeister der Plattenrüstungen, lehrt im Drachenjäger-Lager von Garottenschlucht.
+AutonoteTxt;125;Taren Temper lehrt den expertenhaften Umgang mit der Feuermagie. Er lebt in Rabenbucht.
+AutonoteTxt;126;Solomon Steele, Meister der Feuermagie, lebt in der friedlichen Stadt Alvar.
+AutonoteTxt;127;Burn, Großmeister der Feuermagie, lebt in der drückenden Hitze der Ebene des Feuers.
+AutonoteTxt;149;Patwin Darkenmore, Experte der dunklen Magie, lebt unter den Dunkelelfen von Alvar.
+AutonoteTxt;150;Carla Umberpool, Meisterin der dunklen Magie, lebt im Dorf Zwielicht am Fuß des Schattensumpfs.
+AutonoteTxt;151;Sithicus Shadowrunner, Großmeister der dunklen Magie, lebt auf der Insel Regna.
+AutonoteTxt;206;Brunnen im Dorf Blutstropfen auf der Dolchwunden-Insel gibt zeitweilig +15 Intellekt.
+AutonoteTxt;207;Brunnen im Dorf Blutstropfen auf der Dolchwunden-Insel gibt dauerhaft Glück bis maximal 16.
+AutonoteTxt;208;Brunnen im Dorf Blutstropfen auf der Dolchwunden-Insel gibt 1000 Gold, wenn Glück über 14 liegt und das Gold von Gruppe und Bank zusammen unter 100 liegt.
+AutonoteTxt;210;Brunnen in der Stadt Rabenbucht gibt zeitweilig +25 Stärke.
+AutonoteTxt;211;Springbrunnen in der Stadt Rabenbucht gibt 200 Gold, wenn das Gold von Gruppe und Bank zusammen unter 100 liegt.
+AutonoteTxt;212;Brunnen in der Stadt Alvar gibt zeitweilig +25 Persönlichkeit.
+AutonoteTxt;213;Brunnen in der Stadt Alvar gibt dauerhaft Stärke bis maximal 16.
+AutonoteTxt;215;Brunnen im Dorf Rust gibt dauerhaft Ausdauer bis maximal 16.
+AutonoteTxt;216;Springbrunnen im Dorf Rust in der Eisensand-Wüste gibt 200 Gold, wenn das Gold von Gruppe und Bank zusammen unter 100 liegt.
+AutonoteTxt;217;Brunnen im Drachenjäger-Lager von Garottenschlucht gibt 200 Gold, wenn das Gold von Gruppe und Bank zusammen unter 100 liegt.
+AutonoteTxt;218;Brunnen im Drachenjäger-Lager von Garottenschlucht gibt dauerhaft Feuer-Resistenz bis maximal 10.
+AutonoteTxt;219;Brunnen im Drachenjäger-Lager von Garottenschlucht gibt dauerhaft Genauigkeit bis maximal 16.
+AutonoteTxt;220;Brunnen in der Stadt des Zwielichts im Schattensumpf gibt dauerhaft Intellekt bis maximal 16.
+AutonoteTxt;221;Brunnen in der Stadt des Zwielichts im Schattensumpf gibt 200 Gold, wenn das Gold von Gruppe und Bank zusammen unter 100 liegt.
+AutonoteTxt;223;Brunnen beim Tempel der Sonne im Murmelwald gibt dauerhaft Persönlichkeit bis maximal 16.
+AutonoteTxt;224;Brunnen beim Tempel der Sonne im Murmelwald ist vergiftet!
+AutonoteTxt;225;Brunnen im Felswüstenland gibt 200 Gold, wenn das Gold von Gruppe und Bank zusammen unter 100 liegt.
+AutonoteTxt;226;Brunnen im Felswüstenland gibt dauerhaft Ausdauer bis maximal 16.
+AutonoteTxt;227;Springbrunnen in Balthazars Zuflucht heilt Trefferpunkte.
+AutonoteTxt;228;Brunnen auf der Ebene der Erde gibt dauerhaft Erd-Resistenz bis maximal 10.
+AutonoteTxt;229;Brunnen auf der Ebene der Luft gibt dauerhaft Luft-Resistenz bis maximal 10.
+AutonoteTxt;230;Brunnen auf der Ebene des Wassers gibt dauerhaft Wasser-Resistenz bis maximal 10.
+AutonoteTxt;231;Brunnen auf der Ebene des Feuers gibt zeitweilig +25 Feuer-Resistenz.
+AutonoteTxt;232;Brunnen auf der Insel Regna gibt dauerhaft Schnelligkeit bis maximal 16.
+AutonoteTxt;233;Ihr steht in Diensten der Händler von Alvar, nicht wahr? Dann sprecht mit Dadeross, dem Anführer Eurer Karawane. Mein Seherblick sagt mir, er weilt auf den Dolchwunden-Inseln.
+AutonoteTxt;234;Hmmm... Ich kann nicht weit vorausblicken, denn der Äther ist heute dicht. Ich sehe nur, daß Ihr den Brief, den Dadeross Euch gab, dem Händler Elgar Fellmoon überbringen müßt. Fellmoon lebt in der Stadt Rabenbucht.
+AutonoteTxt;235;Ich sehe, wie Ihr einen Brief von Elgar Fellmoon in Rabenbucht zu Arion Hunter bringt, dem Anführer der Schmuggler von Rabenbucht. Danach kehrt Ihr zu Fellmoon zurück. Das Ende der Vision ist verschwommen, Ihr könnt sie also nicht ganz durchlebt haben. Dennoch ist es Euer Schicksal, dies zu tun.
+AutonoteTxt;236;Was Ihr als Nächstes tun müßt, sagt mir keine Vision. Tut, worum Fellmoon Euch bat. Sucht Bastian Loudrin, den Gildenmeister der Alvarianischen Händlergilde. Er ist in der Stadt Alvar.
+AutonoteTxt;237;Ich sehe, daß zwischen der Gegenwart und Eurer Zukunft eine wichtige Verbindung fehlt. Kehrt zu Bastian Loudrin zurück und sprecht weiter mit ihm. Er wird Euch den nächsten Schritt auf Eurem Weg weisen.
+AutonoteTxt;238;In meinen Träumen sah ich Euch in die Eisensand-Wüste reisen, um einen Zeugen für die Entstehung des großen Feuermeers zu finden, das dort im Großen Sturm entstand.
+AutonoteTxt;240;Ich sehe weit durch den Raum, doch nicht durch die Zeit. Ein großes Unglück hat die Minotauren von Balthazars Zuflucht im Felswüstenland getroffen. Ich fühle, daß Euer Schicksal mit dem ihren verbunden ist. Ihr müßt sie aus ihrer Not retten.
+AutonoteTxt;241;Das Gleichgewicht ist in großer Unruhe. Es dauerte, bis ich die Ursache erkannte: der Krieg zwischen den Klerikern des Tempels der Sonne im Murmelwald und der Gilde der Nekromanten im Schattensumpf. Euer Schicksal ist es, die Unruhe zu beenden, indem Ihr Euch mit einer der beiden Seiten verbündet.
+AutonoteTxt;242;Das Gleichgewicht ist in großer Unruhe. Es dauerte, bis ich die Ursache erkannte: der Kampf zwischen den Drachen und den Rittern in Garottenschlucht. Euer Schicksal ist es, Euch auf Kosten der einen mit der anderen Seite zu verbünden.
+AutonoteTxt;243;Ihr habt mit Euren Bündnissen gute Arbeit geleistet. Nun sucht den Rat Eurer Verbündeten auf, in ihrer Ratskammer in der Händlergilde von Rabenbucht.
+AutonoteTxt;244;Ich sehe, daß zwischen der Gegenwart und Eurem Schicksal eine wichtige Verbindung fehlt. Kehrt zur Ratskammer in der Händlergilde von Rabenbucht zurück. Die Ratsmitglieder weisen Euch den nächsten Schritt.
+AutonoteTxt;245;Ihr müßt tun, worum der Rat der Allianz Euch gebeten hat. Findet einen Weg zur Insel Regna und versenkt die Hafenflotte der Regnaner.
+AutonoteTxt;246;Falls Ihr es noch nicht wißt: Rabenbucht wird von regnanischen Piraten angegriffen. Die Stadt wurde geräumt. Ihr müßt die Piratengefahr beseitigen, ehe der Rat der Allianz zurückkehrt, um Euch zu leiten.
+AutonoteTxt;247;Nun, da Ihr die Flotte der Regnaner versenkt habt, sucht die Weisheit Eures Allianzrats. Er stellt Euch die nächste Aufgabe auf Eurem Weg.
+AutonoteTxt;249;Ich sehe, daß zwischen der Gegenwart und Eurer Zukunft eine wichtige Verbindung fehlt. Sucht den Weisen Xanthor in Rabenbucht auf. Er weist Euch die nächste Aufgabe Eures Schicksals.
+AutonoteTxt;250;Ihr müßt tun, worum Xanthor Euch gebeten hat. Geht zu den vier Elementarebenen und findet dort je einen Elementar-Herzstein.
+AutonoteTxt;251;Nun, da Ihr die vier Elementar-Herzsteine habt, müßt Ihr sie Xanthor in Rabenbucht bringen.
+AutonoteTxt;252;Euer Schicksal liegt hinter dem Kristallportal in Rabenbucht. Es führt in die Ebene zwischen den Ebenen. Dort findet Ihr die Quelle des Elementarsturms.
+AutonoteTxt;253;Ihr habt mit dem Vernichter gesprochen, ihm aber den Schlüssel zu Eurer Zukunft nicht entlockt. Kehrt zu ihm zurück und setzt das Gespräch fort.
+AutonoteTxt;254;Euer Weg ist meinem Blick klar. Sucht die vier Elementarfürsten und befreit sie aus ihren Kerkern. Diese Kerker liegen im Reich des Vernichters, der Ebene zwischen den Ebenen.
+AutonoteTxt;255;Sucht Xanthor auf! Er ist nur eine Figur im Spiel des Gleichgewichts, doch Euer nächster Zug zum Schicksal führt über ein Treffen mit ihm.
+AutonoteTxt;256;Das Gleichgewicht ist wiederhergestellt. Euer Schicksal ist erfüllt, ich kann Euch nicht mehr leiten - mein Blick reicht nur so weit, wie es das Schicksal des Gleichgewichts betrifft. Was Ihr nun tut, liegt bei Euch. Viel Glück, Helden von Jadame!
+AutonoteTxt;257;Feuerball-Zauberstab von Mr. Malwick auf der Smaragdinsel angenommen.
+AutonoteTxt;258;+50 zeitweilige Feuer-Resistenz vom Brunnen in der Stadtmitte der Smaragdinsel.
+AutonoteTxt;259;5 Trefferpunkte geheilt vom Brunnen östlich des Tempels auf der Smaragdinsel.
+AutonoteTxt;260;5 Zauberpunkte erhalten vom Brunnen westlich des Tempels auf der Smaragdinsel.
+AutonoteTxt;261;+2 dauerhaftes Glück vom Brunnen am Westrand der Smaragdinsel.
+AutonoteTxt;262;+10 zeitweilige Stärke vom Brunnen im Dorf südlich von Harmondale.
+AutonoteTxt;263;+10 zeitweilige Genauigkeit vom Brunnen im Dorf nordöstlich von Steadwick.
+AutonoteTxt;264;+2 dauerhafte Stärke vom Brunnen im Nordwesten von Steadwick.
+AutonoteTxt;265;Krankheit geheilt am östlichen Brunnen in Steadwick.
+AutonoteTxt;266;+20 zeitweilige Körper-Resistenz vom Brunnen südlich des Rathauses von Steadwick.
+AutonoteTxt;267;+50 zeitweilige Stärke vom Springbrunnen in der Mitte von Steadwick.
+AutonoteTxt;268;+5 zeitweilige Persönlichkeit vom Trog vor dem Rathaus von Steadwick.
+AutonoteTxt;269;+50 zeitweilige Erd-Resistenz vom Springbrunnen in der Mitte von Pierpont.
+AutonoteTxt;270;+2 dauerhafter Intellekt vom Dorfbrunnen im Süden von Deyja.
+AutonoteTxt;271;+5 dauerhafte Feuer-Resistenz vom Brunnen im westlichen Dorf von Deyja.
+AutonoteTxt;272;+10 zeitweilige Persönlichkeit vom Brunnen beim Tempel der Dunkelheit in Moulder in Deyja.
+AutonoteTxt;273;+10 zeitweilige Feuer-Resistenz vom Brunnen im Süden von Moulder in Deyja.
+AutonoteTxt;274;+25 zeitweiliger Intellekt und Persönlichkeit vom Springbrunnen vor der Schule der Zauberei in der Bracada-Wüste.
+AutonoteTxt;275;+25 zeitweilige Stärke, Intellekt, Persönlichkeit, Ausdauer, Schnelligkeit, Genauigkeit und Glück vom Springbrunnen in der Mitte von Celeste.
+AutonoteTxt;276;+50 zeitweiliger Intellekt und Persönlichkeit vom Springbrunnen in der Mitte von Damocles im Berg Nighon.
+AutonoteTxt;277;2 Fertigkeitspunkte vom Brunnen bei Opfergaben und Segnungen in Damocles im Berg Nighon.
+AutonoteTxt;278;+2 dauerhafte Persönlichkeit vom Brunnen bei Fortunas Torheit in Damocles im Berg Nighon.
+AutonoteTxt;279;+20 zeitweilige Luft-, Erd-, Feuer-, Wasser-, Körper- und Geist-Resistenz vom Brunnen bei der Feuergilde in Damocles im Berg Nighon.
+AutonoteTxt;280;50 Zauberpunkte erhalten vom Brunnen im östlichen Dorf im Berg Nighon.
+AutonoteTxt;281;50 Trefferpunkte erhalten vom Brunnen im westlichen Dorf im Berg Nighon.
+AutonoteTxt;282;+25 zeitweilige Feuer-Resistenz vom Brunnen im südwestlichen Dorf der Hügelgräber.
+AutonoteTxt;283;+2 dauerhafte Schnelligkeit vom Brunnen im Westen von Tidewater in Tatalia.
+AutonoteTxt;284;+20 zeitweilige Luft-Resistenz vom Brunnen im Osten von Tidewater in Tatalia.
+AutonoteTxt;285;+20 zeitweilige Rüstungsklasse vom Brunnen im nördlichen Dorf in Tatalia.
+AutonoteTxt;286;+2 dauerhafte Ausdauer vom Brunnen im Nordosten von Spaward in Avlee.
+AutonoteTxt;287;20 Punkte temporäre Wasserresistenz vom Brunnen im Nordwesten von Spaward in Avlee.
+AutonoteTxt;288;25 Trefferpunkte regeneriert vom Brunnen im Inseldorf in Avlee.
+AutonoteTxt;290;Orange Flüssigkeit verleiht Intellekt.
+AutonoteTxt;291;Blaue Flüssigkeit verleiht Persönlichkeit.
+AutonoteTxt;296;Dampfende Flüssigkeit verleiht Feuerresistenz.
+AutonoteTxt;297;Frostige Flüssigkeit verleiht Wasserresistenz.
+AutonoteTxt;298;Knisternde Flüssigkeit verleiht Luftresistenz.
+AutonoteTxt;299;Schmutzige Flüssigkeit verleiht Erdresistenz.
+AutonoteTxt;309;Obeliskennachricht #1: pohuwwba
+AutonoteTxt;310;Obeliskennachricht #2: ininhil_
+AutonoteTxt;311;Obeliskennachricht #3: redditoh
+AutonoteTxt;312;Obeliskennachricht #4: a_eetcoa
+AutonoteTxt;313;Obeliskennachricht #5: ts_rehmu
+AutonoteTxt;314;Obeliskennachricht #6: eut__i_n
+AutonoteTxt;315;Obeliskennachricht #7: srhtfnut
+AutonoteTxt;316;Obeliskennachricht #8: _vehlgpe
+AutonoteTxt;317;Obeliskennachricht #9: fi_eo_od
+AutonoteTxt;318;Obeliskennachricht #10: ivg_whn_
+AutonoteTxt;319;Obeliskennachricht #11: veoseo_l
+AutonoteTxt;320;Obeliskennachricht #12: e_laru_a
+AutonoteTxt;321;Obeliskennachricht #13: __dn_r_n
+AutonoteTxt;322;Obeliskennachricht #14: ___d___d
+AutonoteTxt;323;Die Meisterin des Stabes, Elsie Pederton, lebt in der Bracada-Wüste auf einem Bergrücken im Südwesten.
+AutonoteTxt;324;Die höchste Lehrerin im Umgang mit dem Stab, Jillian Mithrit, lebt im Elfenland Avlee. Ihr Haus steht in der Stadt im Nordosten.
+AutonoteTxt;325;Der Meister des Schwertes, Tugor Slicer, wohnt in einem kleinen Dorf im Westen von Deyja.
+AutonoteTxt;326;Der Großmeister des Schwertes, Chadric Townsaver, lebt in einem kleinen Dorf in Welnin, südlich der Stadt Harmondale.
+AutonoteTxt;327;Der Meister des Dolches, Aznog Slasher, lebt im Norden von Nighon.
+AutonoteTxt;328;Der Großmeister des Dolches, Token Fist, lebt in der Stadt Tidewater in Tatalia. Gerüchten zufolge unterrichtet auch der Meisterdieb in der Tiefe der erathianischen Kanalisation unter der Hauptstadt Steadwick auf dieser Stufe.
+AutonoteTxt;329;Der Meister der Axt, Dalin Keenedge, lebt im Nordosten von Stone City.
+AutonoteTxt;330;Der höchste Lehrer im Umgang mit der Axt, Karn Stonecleaver, lebt auf den verschneiten Höhen im Nordosten von Tatalia.
+AutonoteTxt;331;Der Meister Claderin Silverpoint lebt im Nordosten der Stadt Pierpont im Elfenland des Tularean-Waldes. Dort erweitert er Euer Wissen über den Speer.
+AutonoteTxt;332;Die Großmeisterin des Speeres, Selene Falconeye, lebt im Nordosten von Stone City.
+AutonoteTxt;333;Die Meisterin des Bogens, Lanshee Ravensight, lebt im Norden von Nighon.
+AutonoteTxt;334;Der Großmeister des Bogens, Cardric the Steady, lebt südöstlich des Schlosses in der Stadt Harmondale.
+AutonoteTxt;335;Der Meister des Streitkolbens, Bruder Rothham, lebt im Süden der Sümpfe von Tatalia.
+AutonoteTxt;336;Der Großmeister des Streitkolbens, Patwin Felburn, unterrichtet in seinem Haus im Goblin-Dorf im Osten von Deyja.
+AutonoteTxt;337;Mein Meister, Isram Gallowswell, lebt auf den verschneiten Höhen im Nordosten von Tatalia. Dort erhaltet Ihr weitere Ausbildung im Umgang mit dem Schild.
+AutonoteTxt;338;Der Großmeister des Schildes, Fedwin Smithson, lebt auf der östlichen Insel der Evenmorn-Inseln.
+AutonoteTxt;339;Die Meisterin der Lederrüstung, Rabisa Neldon, lebt im Norden von Nighon.
+AutonoteTxt;340;Der Großmeister der Lederrüstung, Miyon the Quick, lebt im Osten der Stadt Pierpont im Elfenland des Tularean-Waldes.
+AutonoteTxt;341;Der Meister der Kettenrüstung, Medwari Dragontracker, lebt im Elfenland Avlee. Sein Haus steht in der Stadt im Nordosten.
+AutonoteTxt;342;Der Großmeister der Kettenrüstung, Halian Nevermore, wohnt in einer großen Stadt im Nordwesten von Deyja.
+AutonoteTxt;343;Mein Meister, Dekian Forgewright, lebt in Erathia in der Hauptstadt Steadwick. Er bildet Euch weiter im Umgang mit der Plattenrüstung aus.
+AutonoteTxt;344;Der Großmeister der Plattenrüstung, Brand the Maker, lebt in der Bracada-Wüste auf einem Bergrücken in der Mitte.
+AutonoteTxt;345;Der Meister der Feuermagie, Ashen Temper, lebt in der Stadt Harmondale bei den Ställen.
+AutonoteTxt;346;Der Großmeister der Feuermagie, Blayze, lebt in Erathia in der Hauptstadt Steadwick.
+AutonoteTxt;347;Der Meister der Luftmagie, Rislyn Greenstorm, lebt im Elfenland Avlee. Sein Haus steht in der Stadt im Nordosten.
+AutonoteTxt;348;Der Großmeister der Luftmagie, Gayle, lebt in einem Turm in der Bracada-Wüste auf einem Bergrücken im Norden.
+AutonoteTxt;349;Der Meister der Wassermagie, Tobren Rainshield, lebt im Südwesten von Nighon.
+AutonoteTxt;350;Der Großmeister der Wassermagie, Torrent, lebt auf einem Bergrücken südlich von Harmondale mit Blick auf die Stadt.
+AutonoteTxt;351;Die Meisterin der Erdmagie, Lara Stonewright, lebt im Elfenland des Tularean-Waldes. Ihr Haus steht in der Stadt Pierpont.
+AutonoteTxt;352;Der Großmeister der Erdmagie, Avalanche, wohnt im Westen von Deyja.
+AutonoteTxt;353;Meine Meisterin, Heather Dreamwright, lebt in Erathia, irgendwo in der Hauptstadt Steadwick. Dort lernt Ihr mehr über die Seelenmagie.
+AutonoteTxt;354;Der höchste Lehrer der Seelenmagie, Benjamin the Balanced, lebt im Elfenland des Tularean-Waldes. Sein Haus steht in der Stadt Pierpont.
+AutonoteTxt;355;Der Meister der Geistesmagie, Myles Featherwind, lebt im Elfenland Avlee. Sein Haus steht in der Stadt im Nordosten.
+AutonoteTxt;356;Der Großmeister der Geistesmagie, Xavier Bremen, lebt auf den verschneiten Höhen im Nordosten von Tatalia.
+AutonoteTxt;357;Der Meister der Körpermagie, Bruder Bombah, lebt in den Sumpfgebieten von Tatalia. Sein Haus steht irgendwo im Süden.
+AutonoteTxt;358;Der Großmeister der Körpermagie, Tempus, lebt im Elfenland Avlee. Sein Haus steht auf einer Insel in der Bucht in der Mitte.
+AutonoteTxt;359;Der Meister der Identifikation von Gegenständen, Samuel Benson, lebt auf einem Bergrücken in der Mitte der Bracada-Wüste.
+AutonoteTxt;360;Der Großmeister der Identifikation von Gegenständen, Payge Blueswan, lebt im Elfenland Avlee. Sein Haus liegt nordwestlich der Elfenstadt Spaward.
+AutonoteTxt;361;Der Meister des Feilschens, Berthold Caverhill, lebt auf der östlichsten Insel der Evenmorn-Inseln.
+AutonoteTxt;362;Der Großmeister des Feilschens, Brigham the Frugal, lebt in einem Turm in der Bracada-Wüste auf einem Bergrücken im Norden.
+AutonoteTxt;363;Der Großmeister des Feilschens, Brigham the Frugal, lebt in einem Turm in der Bracada-Wüste auf einem Bergrücken im Norden.
+AutonoteTxt;364;Der Großmeister im Reparieren von Gegenständen, Gareth the Fixer, unterrichtet in seinem Haus in der Hauptstadt Steadwick in Erathia.
+AutonoteTxt;365;Die Meisterin des Bodybuildings, Wanda Foestryke, lebt im Goblin-Dorf im Osten von Deyja.
+AutonoteTxt;366;Der Großmeister des Bodybuildings, Evander Thomas, lebt im Osten von Nighon.
+AutonoteTxt;367;Die Meisterin der Meditation, Tessa Greensward, lebt auf einem Bergrücken im Südosten der Bracada-Wüste.
+AutonoteTxt;368;Der Großmeister der Meditation, Kaine, lebt im Elfenland Avlee. Sein Haus steht auf einer Insel in der Bucht in der Mitte.
+AutonoteTxt;369;Der Meister der Wahrnehmung, Garret Dotes, lebt im Elfenland des Tularean-Waldes. Sein Haus steht in der Elfenstadt Pierpont.
+AutonoteTxt;370;Die Großmeisterin der Wahrnehmung, Petra Cleareye, lebt in der Stadt im Nordwesten von Deyja.
+AutonoteTxt;371;Der Meister im Entschärfen von Fallen, Lenord Skinner, lebt auf einem Bergrücken südlich von Harmondale mit Blick auf die Stadt.
+AutonoteTxt;372;Der Großmeister im Entschärfen von Fallen, Silk Quicktoungue, lebt im Süden von Nighon.
+AutonoteTxt;373;Der Meister des Ausweichens, Oberic Crane, lebt auf der östlichsten Insel der Evenmorn-Inseln.
+AutonoteTxt;374;Der Großmeister des Ausweichens, Kenneth Wain, lebt in der Hauptstadt Steadwick in Erathia.
+AutonoteTxt;375;Der Meister des Faustkampfes, Ulbrecht the Brawler, lebt auf der östlichsten Insel der Evenmorn-Inseln.
+AutonoteTxt;376;Der Großmeister des Faustkampfes, Norris, lebt in der Hauptstadt Steadwick in Erathia.
+AutonoteTxt;377;Die Meisterin im Identifizieren von Monstern, Jeni Swiftfoot, lebt im Elfenland Avlee. Ihr Haus steht in der Stadt im Nordosten.
+AutonoteTxt;378;Der Großmeister im Identifizieren von Monstern, Raven the Hunter, lebt in einem kleinen Dorf südlich von Harmondale.
+AutonoteTxt;379;Die Meisterin des Waffenmeisters, Paula Brightspear, lebt im Elfenland Avlee. Ihr Haus steht in der Stadt im Nordosten.
+AutonoteTxt;380;Der Großmeister des Waffenmeisters, Lasiter the Slayer, lebt im Osten von Eeofol.
+AutonoteTxt;381;Die Meisterin des Stehlens, Leane Shadowrunner, lebt im Goblin-Dorf im Osten von Deyja.
+AutonoteTxt;382;Der Großmeister der Kunst des Stehlens, Everil Nightwalker, lebt im sumpfigen Delta im Süden von Tatalia.
+AutonoteTxt;383;Die Meisterin der Alchimie, Elzbet Winterspoon, lebt im Westen von Nighon.
+AutonoteTxt;384;Der Großmeister der Alchimie, Lucid Apple, lebt im Elfenland Avlee. Sein Haus steht auf einer Insel in der Bucht in der Mitte.
+AutonoteTxt;385;Die Meisterin des Lernens, Dorothy Senjac, lebt im Südosten von Nighon.
+AutonoteTxt;386;Der Großmeister des Lernens, William Smithson, unterrichtet in seinem Haus auf der östlichen Insel der Evenmorn-Inseln.
+AutonoteTxt;387;Die Meisterin der Lichtmagie, Helena Mornigstar, lebt in der Wolkenstadt Celeste!
+AutonoteTxt;388;Der Großmeister der Lichtmagie lebt im Zauberer-Schloß Lambent.
+AutonoteTxt;389;Der Meister der dunklen Magie, Seth Darkenmore, lebt in der Grube unter Deyja!
+AutonoteTxt;390;Der Großmeister der dunklen Magie lebt im Nekromanten-Schloß Gloaming. Zuweilen reist Archibald zu Clankers Labor.
+AutonoteTxt;391;5 Trefferpunkte geheilt vom mittleren Brunnen in New Sorpigal.
+AutonoteTxt;392;5 Zauberpunkte regeneriert vom nordwestlichen Brunnen in New Sorpigal.
+AutonoteTxt;393;10 Punkte temporäre Stärke vom nordöstlichen Brunnen in New Sorpigal.
+AutonoteTxt;394;Goblin-Aufgabe abgeschlossen
+AutonoteTxt;395;Altar im Tempel von Baa zerstört
+AutonoteTxt;396;Sechsten Brief an Wilber Humphry übergeben
+AutonoteTxt;397;Verräter entlarvt
+AutonoteTxt;398;Benutzung der Yacht erlaubt
+AutonoteTxt;399;20 Zauberpunkte regeneriert vom Brunnen der Magie in Bootleg Bay.
+AutonoteTxt;401;10 Zauberpunkte regeneriert vom mittleren Brunnen in Mist.
+AutonoteTxt;402;20 Punkte temporäres Glück vom Brunnen westlich des Wichtelklatschers in Mist.
+AutonoteTxt;403;10 Punkte temporärer Intellekt und temporäre Persönlichkeit vom westlichen Brunnen bei Schloß Newton.
+AutonoteTxt;404;5 Punkte temporäre Feuer-, Elektrizitäts-, Kälte- und Giftresistenz vom östlichen Brunnen bei Schloß Newton.
+AutonoteTxt;405;20 Punkte temporäre Feuer-, Elektrizitäts-, Kälte- und Giftresistenz vom südwestlichen Brunnen in den aalverseuchten Gewässern.
+AutonoteTxt;406;20 Punkte temporäre Magieresistenz vom südöstlichen Brunnen in den aalverseuchten Gewässern.
+AutonoteTxt;407;10 Punkte temporäre Genauigkeit vom westlichen Brunnen bei Schloß Ironfist.
+AutonoteTxt;408;10 Punkte temporäre Schnelligkeit vom östlichen Brunnen bei Schloß Ironfist.
+AutonoteTxt;409;10 Trefferpunkte regeneriert vom Brunnen in der Arena.
+AutonoteTxt;410;20 Punkte temporäre Stärke vom Brunnen nahe dem Goblinzahn in Bootleg Bay.
+AutonoteTxt;411;2 Punkte permanenter Intellekt vom nördlichen Brunnen in Bootleg Bay.
+AutonoteTxt;412;2 Punkte permanente Persönlichkeit vom südlichen Brunnen in Bootleg Bay.
+AutonoteTxt;413;20 Punkte temporärer Intellekt und temporäre Persönlichkeit vom Brunnen im Norden von Silver Cove.
+AutonoteTxt;414;25 Zauberpunkte regeneriert vom Brunnen vor dem Rathaus in Silver Cove.
+AutonoteTxt;415;2 Punkte permanente Genauigkeit vom nördlichen Brunnen westlich von Silver Cove.
+AutonoteTxt;416;2 Punkte permanente Schnelligkeit vom südlichen Brunnen westlich von Silver Cove.
+AutonoteTxt;417;2 Punkte permanente Ausdauer vom Brunnen im Süden des Sumpfes der Verdammten.
+AutonoteTxt;418;2 Punkte permanente Stärke vom Brunnen im Nordosten von Free Haven.
+AutonoteTxt;419;25 Trefferpunkte regeneriert vom mittleren Brunnen in Free Haven.
+AutonoteTxt;420;20 Punkte temporäre Schnelligkeit und Genauigkeit vom westlichen Brunnen in Icewind Lake.
+AutonoteTxt;421;20 Punkte temporäre Rüstungsklasse vom östlichen Brunnen in Icewind Lake.
+AutonoteTxt;422;10 temporäre Stufen vom Brunnen nordöstlich von Schloß Stone.
+AutonoteTxt;423;30 Punkte temporäre Stärke vom Brunnen westlich von Schloß Stromgard.
+AutonoteTxt;424;5 Punkte permanente Stärke vom nördlichen Brunnen östlich des White-Cap-Tempels.
+AutonoteTxt;425;5 Punkte permanente Ausdauer vom südlichen Brunnen östlich des White-Cap-Tempels.
+AutonoteTxt;426;10 Punkte permanente Feuer-, Elektrizitäts-, Kälte- und Giftresistenz vom Brunnen auf der Ostinsel in Dragonsand.
+AutonoteTxt;427;10 Punkte permanente Stärke, Genauigkeit, Schnelligkeit, Ausdauer, Persönlichkeit, Intellekt und Glück vom Brunnen auf der Südinsel in Dragonsand.
+AutonoteTxt;428;50 Trefferpunkte regeneriert vom Brunnen auf der Nordwestinsel in Dragonsand.
+AutonoteTxt;429;50 Punkte temporäres Glück vom Brunnen im Norden von Blackshire.
+AutonoteTxt;430;5 Punkte permanente Magieresistenz vom Brunnen im Südosten von Blackshire.
+AutonoteTxt;431;5 Punkte permanenter Intellekt und permanente Persönlichkeit vom Brunnen nördlich des Tempels der Schlange.
+AutonoteTxt;432;30 Punkte temporäre Magieresistenz vom Brunnen im Süden von Blackshire.
+AutonoteTxt;433;50 Zauberpunkte regeneriert vom mittleren Brunnen in Blackshire.
+AutonoteTxt;434;5000 Erfahrung und minus 5000 Goldstücke vom südlichen Brunnen in Kriegspire.
+AutonoteTxt;435;30 temporäre Stufen vom westlichen Brunnen in Kriegspire.
+AutonoteTxt;436;10 Punkte permanente Magieresistenz vom Brunnen nördlich des Drachenturms in Kriegspire.
+AutonoteTxt;437;40 Punkte temporäre Rüstungsklasse vom Brunnen vor Schloß Kriegspire.
+AutonoteTxt;438;5 Punkte permanente Feuer-, Elektrizitäts-, Kälte- und Giftresistenz vom Brunnen nordwestlich des Oberen Tempels von Baa.
+AutonoteTxt;439;Unnatürliches Altern geheilt am Brunnen östlich von Hermit's Isle.
+AutonoteTxt;440;100 Trefferpunkte und Zauberpunkte vom Brunnen in der Wüste in Paradise Valley.
+AutonoteTxt;441;50 Punkte temporäre Stärke, Genauigkeit, Ausdauer, Schnelligkeit, Persönlichkeit, Intellekt und Glück vom Brunnen südwestlich des Dorfes Sweet Water.
+AutonoteTxt;442;Obeliskennachricht # 1:  Itotecthothesaip
+AutonoteTxt;443;Obelisk-Botschaft Nr. 2:  nhrh_aherheatvdi
+AutonoteTxt;444;Obelisk-Botschaft Nr. 3:  _etecpe__ersoede
+AutonoteTxt;445;Obelisk-Botschaft Nr. 4:  t_haat_lt__en_lc
+AutonoteTxt;446;Obelisk-Botschaft Nr. 5:  hd_scawehSfdewee
+AutonoteTxt;447;Obelisk-Botschaft Nr. 6:  erbthieaeuu,_o'd
+AutonoteTxt;448;Obelisk-Botschaft Nr. 7:  _ay,enis_nn_ans.
+AutonoteTxt;449;Obelisk-Botschaft Nr. 8:  lg____gtS_cln;__
+AutonoteTxt;450;Obelisk-Botschaft Nr. 9:  aoflo'h.hbtid_p_
+AutonoteTxt;451;Obelisk-Botschaft Nr. 10: nnaifnt_ieif_tu_
+AutonoteTxt;452;Obelisk-Botschaft Nr. 11: d_re_e_Hpfotyhz_
+AutonoteTxt;453;Obelisk-Botschaft Nr. 12: _t_staoi_on_oiz_
+AutonoteTxt;454;Obelisk-Botschaft Nr. 13: oon_htfdorstusl_
+AutonoteTxt;455;Obelisk-Botschaft Nr. 14: f_oteh__fe_h__e_
+AutonoteTxt;456;Obelisk-Botschaft Nr. 15: _nrh__tf__cehr__
+AutonoteTxt;457;10 Trefferpunkte werden vom rechten Becken in Snergles Eisenminen geheilt.
+AutonoteTxt;458;10 Zauberpunkte werden vom linken Becken in Snergles Eisenminen wiederhergestellt.
+AutonoteTxt;459;+10 Trefferpunkte wiederhergestellt, südwestlich der Hauptkammer der Kanalisation.
+AutonoteTxt;460;Hejaj Mawsil kauft Kobraeier für je 300 Goldstücke in Neu-Sorpigal.
+AutonoteTxt;461;Lawrence Aleman kauft Tempelgongs für je 2000 Goldstücke in Freihafen.
+AutonoteTxt;462;Lon Miller kauft Knochen für je 1000 Goldstücke in Freihafen.
+AutonoteTxt;463;Davis Carp kauft Magneteisensteine für je 5 Goldstücke in Freihafen.
+AutonoteTxt;464;Bonnie Rotterdam kauft Federn für je 10 Goldstücke in Freihafen.
+AutonoteTxt;465;Renee Blackburn kauft Pyramiden für je 1000 Goldstücke in Freihafen.
+AutonoteTxt;466;Nick Fenstar kauft Weinfässer für je 300 Goldstücke in Freihafen.
+AutonoteTxt;467;Sy Roth kauft Zähne für je 500 Goldstücke in Freihafen.
+AutonoteTxt;468;Geoff Southy kauft Kleeblätter für je 25 Goldstücke in Freihafen.
+AutonoteTxt;469;Dillan Robinson kauft Bernstein für je 500 Goldstücke in Freihafen.
+AutonoteTxt;470;Bandar Jahrom tauscht Edelsteine gegen Lampen in Abduls Wüstenresort in Dragonsand.
+AutonoteTxt;471;Nun muß das Kreeganer-Nest zerstört werden. Zerstört den Reaktor, besiegt ihre Königin und entkommt mit dem Ritual der Leere, dann habt Ihr Eure Aufgabe erfüllt.
+AutonoteTxt;472;Vor der Zerstörung des Reaktors braucht Ihr einen Zauber, der die folgenden Explosionen eindämmen kann. Befreit Archibald aus seinem steinernen Gefängnis. Sprecht mit Nicolai und bringt ihm das Dritte Auge - er erlaubt Euch, Tanirs Glocke zu benutzen, um Archibald zurückzuverwandeln. Danach solltet Ihr Archibald überzeugen können, Euch das nötige Wissen zu geben.
+AutonoteTxt;473;Für den Zugang zum Kontrollzentrum braucht Ihr den Kontrollwürfel aus dem Tempel von VARN in Dragonsand. Bringt den Würfel zum Orakel, um Einlaß ins Kontrollzentrum zu erhalten. Der Kreeganer-Reaktor ist gegen alle Angriffe immun. Nur die uralten Waffen aus dem Kontrollzentrum können ihm schaden. Sorgt dafür, daß Ihr diese Waffen und die Fertigkeit zu ihrem Einsatz besitzt.
+AutonoteTxt;474;Das Orakel schläft, seit Archibald ihm seinen Streich gespielt hat. Zur Wiedererweckung braucht Ihr die vier Gedächtniskristalle. Sie liegen auf der Einsiedlerinsel, in Schloß Alamos, in Schloß Kriegspire und in Schloß Dunkelmoor.
+AutonoteTxt;475;Slicker Silvertongue scheint ein Verräter im Rat zu sein. Um Regent Humphrey zu überzeugen und Slicker aus dem Rat zu entfernen, braucht Ihr Beweise. Geht zum Oberen Tempel von Baa in Kriegspire und kehrt mit Beweisen zurück, die Slicker mit dem Tempel von Baa in Verbindung bringen.
+AutonoteTxt;476;Um das Orakel zu besuchen, müßt Ihr die sechs Mitglieder des Hohen Rats in Freihafen zufriedenstellen. Jeder Lord verlangt eine Aufgabe, um seine Gunst zu erlangen. Erfüllt jede dieser Aufgaben und sprecht dann mit dem Ratsmitglied dieses Lords, um seine Zustimmung zu erhalten. Haben alle Mitglieder des Hohen Rats zugestimmt, dürft Ihr das Orakel besuchen.
+AutonoteTxt;477;Es ist ratsam, zunächst die Beförderungsaufgaben der sechs Lords von Enroth zu erfüllen, bis Ihr etwas weiter fortgeschritten seid.
+AutonoteTxt;478;Ihr müßt den Brief Regent Wilbur Humphrey in Burg Ironfist übergeben.
+AutonoteTxt;479;Ihr solltet den sechsten Brief wohl Andover Potbello in Neu-Sorpigal zeigen.
+AutonoteTxt;480;Rote Flüssigkeit gewährt Stärke.
+AutonoteTxt;481;Orangefarbene Flüssigkeit gewährt Intellekt.
+AutonoteTxt;482;Blaue Flüssigkeit gewährt Persönlichkeit.
+AutonoteTxt;483;Grüne Flüssigkeit gewährt Ausdauer.
+AutonoteTxt;484;Gelbe Flüssigkeit gewährt Genauigkeit.
+AutonoteTxt;485;Violette Flüssigkeit gewährt Schnelligkeit.
+AutonoteTxt;486;Weiße Flüssigkeit gewährt Glück.
+AutonoteTxt;487;Dampfende Flüssigkeit gewährt Feuer-Resistenz.
+AutonoteTxt;488;Eisige Flüssigkeit gewährt Kälte-Resistenz.
+AutonoteTxt;489;Funkensprühende Flüssigkeit gewährt Elektrizitäts-Resistenz.
+AutonoteTxt;490;Giftige Flüssigkeit gewährt Gift-Resistenz.
+AutonoteTxt;491;Magische Flüssigkeit gewährt Magie-Resistenz.
+AutonoteTxt;492;Kraftstein zu Frederick Talimere gebracht.
+AutonoteTxt;493;Werratten-Schmuggler erpreßt.
+AutonoteTxt;494;Dadeross' Brief an Elgar Fellmoon überbracht.
+AutonoteTxt;495;Vilebites Asche in der Trollgruft beigesetzt.
+AutonoteTxt;496;Status Kopfgeldjäger-Lehrling erreicht.
+AutonoteTxt;497;Status Kopfgeldjäger-Geselle erreicht.
+AutonoteTxt;498;Status Kopfgeldjäger-Meister erreicht.
+AutonoteTxt;499;Tränke der Feuer-Resistenz zu den südlichen Häusern von Rust gebracht.
+AutonoteTxt;500;Alle Oger in der Region Alvar getötet.
+AutonoteTxt;501;Drachenfluch-Blume für Calindril im Drachenjäger-Lager von Garottenschlucht gefunden.
+AutonoteTxt;502;Drachenfluch-Blume für Balion Tearwing in Garottenschlucht gefunden.
+AutonoteTxt;503;Alle Drachen im Gebiet Garottenschlucht für Avalon im Drachenjäger-Lager getötet.
+AutonoteTxt;504;Alle Drachenjäger in Garottenschlucht für Jerin Flame-eye in der Drachenhöhle getötet.
+AutonoteTxt;505;Zum Dunkelelf-Patriarchen befördert.
+AutonoteTxt;506;Zum Kriegstroll befördert.
+AutonoteTxt;507;Heimat der Trolle gefunden.
+AutonoteTxt;508;Zum Ersten Ritter befördert.
+AutonoteTxt;509;Ebonest an Charles Quixote zurückgegeben.
+AutonoteTxt;510;Blazen Stormlance gerettet.
+AutonoteTxt;511;Zum Großdrachen befördert.
+AutonoteTxt;512;Schwert von Whistlebone dem Drachentöter an Deftclaw Redreaver übergeben.
+AutonoteTxt;513;Zum Minotauren-Lord befördert.
+AutonoteTxt;514;Zum Kleriker der Sonne befördert.
+AutonoteTxt;515;Zum Nosferatu befördert.
+AutonoteTxt;516;Zum Lich befördert.
+AutonoteTxt;517;Götzenstatue der Schlange für Hiss aus dem Dorf Blutstropfen zurückgeholt.
+AutonoteTxt;518;Schild Eclipse gefunden.
+AutonoteTxt;519;Irabelle Hunter aus der Oger-Festung in Alvar gerettet.
+AutonoteTxt;520;Trank der gesalbten Kräuter zu Languid auf den Dolchwunden-Inseln gebracht.
+AutonoteTxt;521;Alle Schreckenswölfe im Gebiet Rabenbucht getötet.
+AutonoteTxt;522;Falschen Bericht für Arion Hunter an Todespirat Stanley überbracht.
+AutonoteTxt;523;Fällige Strafen: %lu
+AutonoteTxt;524;Loren Steel gerettet
+AutonoteTxt;525;Loren-Hochstapler an Catherine übergeben
+AutonoteTxt;526;Pläne von Fort Riverstride beschafft
+AutonoteTxt;527;Falsche Pläne an Elfenkönig übergeben
+AutonoteTxt;528;Zum Gauner befördert
+AutonoteTxt;529;Zum Ehren-Gauner befördert
+AutonoteTxt;530;Zum Spion befördert
+AutonoteTxt;531;Zum Ehren-Spion befördert
+AutonoteTxt;532;Zum Meuchelmörder befördert
+AutonoteTxt;533;Zum Ehren-Meuchelmörder befördert
+AutonoteTxt;534;Zum Kämpen befördert
+AutonoteTxt;535;Zum Ehren-Kämpen befördert
+AutonoteTxt;536;Zum Ersten Ritter befördert
+AutonoteTxt;537;Zum Ehren-Ersten Ritter befördert
+AutonoteTxt;538;Zum Schattenritter befördert
+AutonoteTxt;539;Zum Ehren-Schattenritter befördert
+AutonoteTxt;540;Zum Eingeweihten befördert
+AutonoteTxt;541;Zum Ehren-Eingeweihten befördert
+AutonoteTxt;542;Zum Meister befördert
+AutonoteTxt;543;Zum Ehren-Meister befördert
+AutonoteTxt;544;Zum Ninja befördert
+AutonoteTxt;545;Zum Ehren-Ninja befördert
+AutonoteTxt;546;Zum Jäger befördert
+AutonoteTxt;547;Zum Ehren-Jäger befördert
+AutonoteTxt;548;Zum Waldläufer-Lord befördert
+AutonoteTxt;549;Zum Ehren-Waldläufer-Lord befördert
+AutonoteTxt;550;Zum Kopfgeldjäger befördert
+AutonoteTxt;551;Zum Ehren-Kopfgeldjäger befördert
+AutonoteTxt;552;Zum Kampfmagier befördert
+AutonoteTxt;553;Zum Ehren-Kampfmagier befördert
+AutonoteTxt;554;Zum Meisterschützen befördert
+AutonoteTxt;555;Zum Ehren-Meisterschützen befördert
+AutonoteTxt;556;Zum Scharfschützen befördert
+AutonoteTxt;557;Zum Ehren-Scharfschützen befördert
+AutonoteTxt;558;Zum Kreuzritter befördert
+AutonoteTxt;559;Zum Ehren-Kreuzritter befördert
+AutonoteTxt;560;Zum Helden befördert
+AutonoteTxt;561;Zum Ehren-Helden befördert
+AutonoteTxt;562;Zum Schurken befördert
+AutonoteTxt;563;Zum Ehren-Schurken befördert
+AutonoteTxt;564;Gilde der Elemente beigetreten
+AutonoteTxt;565;Gilde des Selbst beigetreten
+AutonoteTxt;566;Gilde der Luft beigetreten
+AutonoteTxt;567;Gilde der Erde beigetreten
+AutonoteTxt;568;Gilde des Feuers beigetreten
+AutonoteTxt;569;Gilde des Wassers beigetreten
+AutonoteTxt;570;Gilde des Körpers beigetreten
+AutonoteTxt;571;Gilde des Geistes beigetreten
+AutonoteTxt;572;Gilde der Seele beigetreten
+AutonoteTxt;573;Gilde des Lichts beigetreten
+AutonoteTxt;574;Gilde der Dunkelheit beigetreten
+AutonoteTxt;575;Zum Priester befördert
+AutonoteTxt;576;Zum Ehren-Priester befördert
+AutonoteTxt;577;Zum Priester des Lichts befördert
+AutonoteTxt;578;Zum Ehren-Priester des Lichts befördert
+AutonoteTxt;579;Zum Priester der Dunkelheit befördert
+AutonoteTxt;580;Zum Ehren-Priester der Dunkelheit befördert
+AutonoteTxt;581;Zum Großdruiden befördert
+AutonoteTxt;582;Zum Ehren-Großdruiden befördert
+AutonoteTxt;583;Zum Erzdruiden befördert
+AutonoteTxt;584;Zum Ehren-Erzdruiden befördert
+AutonoteTxt;585;Zum Schwarzmagier befördert
+AutonoteTxt;586;Zum Ehren-Schwarzmagier befördert
+AutonoteTxt;587;Zum Hexenmeister befördert
+AutonoteTxt;588;Zum Ehren-Hexenmeister befördert
+AutonoteTxt;589;Zum Erzmagier befördert
+AutonoteTxt;590;Zum Ehren-Erzmagier befördert
+AutonoteTxt;591;Zum Lich befördert
+AutonoteTxt;592;Zum Ehren-Lich befördert
+AutonoteTxt;593;%u Todesfälle
+AutonoteTxt;594;%u an Kopfgeldern kassiert
+AutonoteTxt;595;%u Haftstrafen verbüßt
+AutonoteTxt;596;%u Arena-Siege (Page)
+AutonoteTxt;597;%u Arena-Siege (Knappe)
+AutonoteTxt;598;%u Arena-Siege (Ritter)
+AutonoteTxt;599;%u Arena-Siege (Lord)
+AutonoteTxt;600;Arcomage-Meister
+AutonoteTxt;601;Arcomage-Siege: %lu
+AutonoteTxt;602;Arcomage-Niederlagen: %lu
+AutonoteTxt;603;Beförderung zum Kreuzritter
+AutonoteTxt;604;Beförderung zum Ehren-Kreuzritter
+AutonoteTxt;605;Beförderung zum Helden
+AutonoteTxt;606;Beförderung zum Ehren-Helden
+AutonoteTxt;607;Beförderung zum Hexenmeister
+AutonoteTxt;608;Beförderung zum Ehren-Hexenmeister
+AutonoteTxt;609;Beförderung zum Erzmagier
+AutonoteTxt;610;Beförderung zum Ehren-Erzmagier
+AutonoteTxt;611;Beförderung zum Kämpen
+AutonoteTxt;612;Beförderung zum Ehren-Kämpen
+AutonoteTxt;613;Beförderung zum Ersten Ritter
+AutonoteTxt;614;Beförderung zum Ehren-Ersten Ritter
+AutonoteTxt;615;Beförderung zum Priester
+AutonoteTxt;616;Beförderung zum Ehren-Priester
+AutonoteTxt;617;Beförderung zum Hohepriester
+AutonoteTxt;618;Beförderung zum Ehren-Hohepriester
+AutonoteTxt;619;Beförderung zum Großdruiden
+AutonoteTxt;620;Beförderung zum Ehren-Großdruiden
+AutonoteTxt;621;Beförderung zum Erzdruiden
+AutonoteTxt;622;Beförderung zum Ehren-Erzdruiden
+AutonoteTxt;623;Beförderung zum Schlachtmagier
+AutonoteTxt;624;Beförderung zum Ehren-Schlachtmagier
+AutonoteTxt;625;Beförderung zum Kampfmagier
+AutonoteTxt;626;Beförderung zum Ehren-Kampfmagier
+AutonoteTxt;627;Gilde der Elemente beigetreten
+AutonoteTxt;628;Gilde des Selbst beigetreten
+AutonoteTxt;629;Gilde Freibeuter-Versteck beigetreten
+AutonoteTxt;630;Gilde Protection Services beigetreten
+AutonoteTxt;631;Schmugglergilde beigetreten
+AutonoteTxt;632;Gilde Klingenende beigetreten
+AutonoteTxt;633;Gilde Duellanten-Schneide beigetreten
+AutonoteTxt;634;Gilde Berserkerwut beigetreten
+AutonoteTxt;635;Gilde der Luft beigetreten
+AutonoteTxt;636;Gilde der Erde beigetreten
+AutonoteTxt;637;Gilde des Feuers beigetreten
+AutonoteTxt;638;Gilde des Wassers beigetreten
+AutonoteTxt;639;Gilde des Körpers beigetreten
+AutonoteTxt;640;Gilde des Geistes beigetreten
+AutonoteTxt;641;Gilde der Seele beigetreten
+AutonoteTxt;642;Gilde des Lichts beigetreten
+AutonoteTxt;643;Gilde der Dunkelheit beigetreten
+AutonoteTxt;644;%u Kopfgelder kassiert
+AutonoteTxt;645;%u Todesfälle
+AutonoteTxt;646;%u Haftstrafen verbüßt
+AutonoteTxt;647;%u Arena-Siege (Page)
+AutonoteTxt;648;%u Arena-Siege (Knappe)
+AutonoteTxt;649;%u Arena-Siege (Ritter)
+AutonoteTxt;650;%u Arena-Siege (Lord)
+AutonoteTxt;651;Arcomage gewonnen: Speis und Trank, Dolchwunden-Inseln.
+AutonoteTxt;652;Arcomage gewonnen: Kessels Bar, Rabenbucht.
+AutonoteTxt;653;Arcomage gewonnen: Haus des Profits, Alvar.
+AutonoteTxt;654;Arcomage gewonnen: Zur trockenen Kehle, Eisensand-Wüste.
+AutonoteTxt;655;Arcomage gewonnen: Gasthof zum Drachenblut, Garottenschlucht.
+AutonoteTxt;656;Arcomage gewonnen: Schwarze Gesellschaft, Schattensumpf.
+AutonoteTxt;657;Arcomage gewonnen: Rastplatz für Reisende, Murmelwald.
+AutonoteTxt;658;Arcomage gewonnen: Zum Bullauge, Felswüstenland.
+AutonoteTxt;659;Arcomage gewonnen: Zum Piraten, Regna.
+AutonoteTxt;660;Arcomage gewonnen: Zum tanzenden Oger, Rabenbucht.
+AutonoteTxt;661;Arcomage gewonnen: Mihos Rasthaus, Alvar.
+AutonoteTxt;662;Arcomage gewonnen: On the House, Harmondale.
+AutonoteTxt;663;Arcomage gewonnen: Griffin's Rest, Stadt Steadwick.
+AutonoteTxt;664;Arcomage gewonnen: Emerald Inn, Tularean-Wald.
+AutonoteTxt;665;Arcomage gewonnen: The Snobbish Goblin, Deyja.
+AutonoteTxt;666;Arcomage gewonnen: Familiar Place, Bracada-Wüste.
+AutonoteTxt;667;Arcomage gewonnen: The Blessed Brew, Celeste.
+AutonoteTxt;668;Arcomage gewonnen: The Vampyre Lounge, Grube.
+AutonoteTxt;669;Arcomage gewonnen: The Laughing Monk, Evenmorn-Insel.
+AutonoteTxt;670;Arcomage gewonnen: Fortune's Folly, Berg Nighon.
+AutonoteTxt;671;Arcomage gewonnen: Miner's Only, Grabhügel.
+AutonoteTxt;672;Arcomage gewonnen: The Loyal Mercenary, Tatalia.
+AutonoteTxt;673;Arcomage gewonnen: The Potted Pixie, Avlee.
+AutonoteTxt;674;Arcomage gewonnen: Grogg's Grog, Stone City.
+AutonoteTxt;675;Essenz der Stärke = Furcht verjagen + Heldentum
+AutonoteTxt;676;Essenz des Intellekts = Fluch entfernen + Schild
+AutonoteTxt;677;Essenz der Persönlichkeit = Furcht verjagen + Eile
+AutonoteTxt;678;Essenz der Ausdauer = Fluch entfernen + Aufladen
+AutonoteTxt;679;Essenz der Genauigkeit = Irrsinn heilen + Steinhaut
+AutonoteTxt;680;Essenz der Schnelligkeit = Irrsinn heilen + Härten
+AutonoteTxt;681;Essenz des Glücks = Eile + Heldentum, Aufladen + Schild, Härten + Steinhaut
+AutonoteTxt;682;Trank des Verderbens = Fluch entfernen + Furcht verjagen, Fluch entfernen + Irrsinn heilen, Furcht verjagen + Irrsinn heilen
+AutonoteTxt;683;Göttliche Steigerung = Göttliche Macht + beliebiger Attributtrank.
+AutonoteTxt;684;Göttlicher Schutz = Göttliche Heilung + beliebiger Resistenztrank.
+AutonoteTxt;685;Göttliche Transzendenz = Göttliche Wiederherstellung + Irrsinn heilen (oder Furcht verjagen oder Fluch entfernen)
+AutonoteTxt;686;Trank der Götter = Essenz der Stärke + Harden oder Essenz des Intellekts + Steinhaut oder Essenz der Persönlichkeit + Recharge oder Essenz der Ausdauer + Eile oder Essenz der Genauigkeit + Schild oder Essenz der Schnelligkeit + Heldentum.
+AutonoteTxt;687;Reine Feuer-Resistenz = Essenz des Glücks + Feuer-Resistenz
+AutonoteTxt;688;Reine Luft-Resistenz = Essenz des Glücks + Luft-Resistenz
+AutonoteTxt;689;Reine Wasser-Resistenz = Essenz des Glücks + Wasser-Resistenz
+AutonoteTxt;690;Reine Erde-Resistenz = Essenz des Glücks + Erde-Resistenz
+AutonoteTxt;691;Reine Geist-Resistenz = Essenz des Glücks + Geist-Resistenz
+AutonoteTxt;692;Reine Körper-Resistenz = Essenz des Glücks + Körper-Resistenz
+AutonoteTxt;693;Schutz vor Magie = Furcht verjagen + Bewahrung
+AutonoteTxt;694;Schutz vor Magie = Fluch entfernen + Wasser atmen
+AutonoteTxt;695;Schutz vor Magie = Irrsinn heilen + Segen
+GlobalTxt;25;Guthaben
+GlobalTxt;60;Einzahlen
+GlobalTxt;244;Auszahlen
+GlobalTxt;401;Kosten: %lu
+GlobalTxt;605;Aktuelle Belohnung
+GlobalTxt;50;Ausweichen
+GlobalTxt;89;Waffenmeister
+GlobalTxt;96;Großm.
+GlobalTxt;111;Großm.
+GlobalTxt;143;Sonstiges
+GlobalTxt;206;Fertigk.:
+GlobalTxt;277;Keule
+NPCText;344;Wenn Ihr Großmeister in Wassermagie seid, könnt Ihr alle Zaubersprüche eines Großmeisters für dieses Element erlernen. Zauber höherer Grade sollten sich als stärker erweisen und sind damit für Eure Begleiter von größerem Nutzen. Ihr könnt Großmeister in Wassermagie werden, wenn Ihr den 10. Meisterrang in Wassermagie besitzt und mir 8000 Goldstücke zahlen könnt.

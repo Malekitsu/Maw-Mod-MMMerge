@@ -272,3 +272,15 @@ In addition to that there are some QoL changes:
 - Teleport: Town Portal and Lloyd beacon scrolls are not consumed on use
 - Master of all: You can learn many misc skills up to GM (Alchemy, Disarm Trap, Merchant, Identify Item/Monster, Repair)
 
+
+
+## NPC voices (optional add-on)
+Spoken NPC lines for the whole game (English, about 8,500 lines generated with Kokoro-82M). The audio is a separate download, so this repository holds only the code:
+- Unzip `MAW-Voices-EN` into the game folder. The setting `npcVoices` in `MAWSettings.lua` (default on) switches the module; the keys F9 (repeat the last voice) and F10 (stop) can be changed there.
+- Details and the tools that made the audio: `Tools/Voice/README.md`.
+
+## German edition (optional add-on)
+A complete German edition (texts, voices, language switch) for players who want to play MAW in German. It needs the NPC voices add-on above and is a separate download; this repository holds only the code:
+- `MAW-German` is unzipped into the game folder; `Install_German.exe` then builds the texts and party voices that already exist in the game's own `Data/GermanT.lod` / `GermanD.lod` (nothing of them is in our package).
+- Page "Sprache / Language" in the extra settings (or `MAWSettings.lua`): `language = "en" | "de"`, `languageItems` and `languageShops` (item names / shop and house names, both default to English).
+- Without the add-on nothing changes. Details: `Tools/Voice/de/docs/release/INSTALL_EN.txt`.
