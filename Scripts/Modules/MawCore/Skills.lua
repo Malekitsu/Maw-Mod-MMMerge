@@ -1,11 +1,5 @@
 -- Skills.lua -- Lua port of Skillz.dll, stage 1 of the plan in SKILLZ_PORT.md.
 --
--- MODE SWITCH: if ExeMods\Skillz.dll exists, no patches are applied and the
--- global Skillz table becomes a bridge to the DLL (the legacy wrapper
--- absorbed from the removed Scripts/Structs/00Skillz.lua) -- so a lingering
--- DLL still yields a working game. Without the DLL, the port owns
--- everything. Both may never patch at once.
---
 -- This file also absorbed, from the removed 00Skillz.lua / ZZZZ_Last.lua:
 -- the GetMaxSkillLevel/GetMaxAvailableSkill globals (called by base MMMerge
 -- scripts: PromotionTopics, NPCMercenaries, MiscTweaks, ZombiePlayers),
@@ -76,7 +70,6 @@ local function dllPresent()
 	end
 	return false
 end
-Skills.dllPresent = dllPresent
 
 ---------------------------------------------------------------- storage
 
@@ -607,92 +600,6 @@ Skills.API = {
 	end,
 }
 
----------------------------------------------------------------- legacy bridge
-
--- The 00Skillz.lua wrapper, kept alive for the case where Skillz.dll is
--- still present (e.g. a player updated by unzipping over an old install).
--- The only file in MawCore besides Engine allowed to touch mem.* -- it is
--- quarantined legacy code that dies when the DLLs are gone everywhere.
-local function dllWrapper()
-	local function hlp(pl)
-		if mem.dll.skillz.PlayerID(pl) < 0 then
-			Message("Invalid player call for Skillz.dll")
-		end
-	end
-	return {
-		get = function(pl, id)
-			hlp(pl)
-			return mem.dll.skillz.get(pl, id)
-		end,
-		set = function(pl, id, v)
-			hlp(pl)
-			mem.dll.skillz.set(pl, id, v)
-		end,
-		get2 = function(pl, id)
-			hlp(pl)
-			return mem.dll.skillz.get2(pl, id)
-		end,
-		set2 = function(pl, id, v)
-			hlp(pl)
-			mem.dll.skillz.set2(pl, id, v)
-		end,
-		getName = function(id)
-			return mem.string(mem.dll.skillz.getName(id))
-		end,
-		setName = function(id, s)
-			mem.dll.skillz.setName(id, s)
-		end,
-		getDesc = function(id, part)
-			return mem.string(mem.dll.skillz.getDesc(id, part))
-		end,
-		setDesc = function(id, part, s)
-			local key = part .. "_" .. id
-			if origDescs[key] == nil then
-				origDescs[key] = mem.string(mem.dll.skillz.getDesc(id, part))
-			end
-			mem.dll.skillz.setDesc(id, part, s)
-		end,
-		restoreDesc = function(id, part)
-			local orig = origDescs[part .. "_" .. id]
-			if orig then
-				mem.dll.skillz.setDesc(id, part, orig)
-			end
-		end,
-		get_buffed = function(pl, id)
-			hlp(pl)
-			return mem.dll.skillz.get_buffed(pl, id)
-		end,
-		new_misc = function(id)
-			mem.dll.skillz.new_misc(id)
-		end,
-		new_weapon = function(id)
-			mem.dll.skillz.new_weapon(id)
-		end,
-		new_armor = function(id)
-			mem.dll.skillz.new_armor(id)
-		end,
-		new_magic = function(id)
-			mem.dll.skillz.new_magic(id)
-		end,
-		learn_at = function(id, house)
-			mem.dll.skillz.learn_at(id, house)
-		end,
-		MasteryLimit = function(pl, id)
-			hlp(pl)
-			return mem.dll.skillz.MasteryLimit(pl, id)
-		end,
-		MasteryTable_get = function(race, clas, skill)
-			return mem.dll.skillz.MasteryLimit_raw(race, clas, skill)
-		end,
-		MasteryTable_set = function(race, clas, skill, token)
-			return mem.dll.skillz.MasteryLimit_set(race, clas, skill, token)
-		end,
-		CleanMastery = function(pl)
-			return mem.dll.skillz.CleanMastery(pl)
-		end,
-	}
-end
-
 ---------------------------------------------------------------- compat globals
 
 -- (Race, Class, Skill) or (Player, Skill) -- called by base MMMerge scripts
@@ -708,17 +615,12 @@ end
 
 ---------------------------------------------------------------- activation
 
-local startShared	-- assigned below Skills.start; runs in both modes
-
--- true when the Lua port owns the skill system (no Skillz.dll present)
-function Skills.isActive()
-	return active
-end
+local startShared	-- assigned below Skills.start
 
 function Skills.describe()
 	local out = {"skills port:"}
 	if not active then
-		out[#out + 1] = "  INERT -- ExeMods\\Skillz.dll present, the DLL owns the skill system"
+		out[#out + 1] = "  INERT -- not started"
 	else
 		out[#out + 1] = ("  ACTIVE -- storage block at 0x%X"):format(block)
 		out[#out + 1] = ("  tables: %d classes, %d races, %d skill rows"):format(
@@ -730,9 +632,13 @@ end
 
 function Skills.start()
 	if dllPresent() then
-		Skillz = dllWrapper()
-		startShared(true)
-		return
+		debug.Message(
+			"\nExeMods\\Skillz.dll was found. It belongs to an old version of the Maw mod\n" ..
+			"and is not compatible with this one.\n\n" ..
+			"A fresh install of the mod is required: delete the old game folder and\n" ..
+			"install again, do not unpack the new version over the old one.\n\n" ..
+			"The game will now close.")
+		os.exit()
 	end
 	active = true
 	local Engine = MawCore.Engine
@@ -877,12 +783,11 @@ function Skills.start()
 
 	-- take over the public API; from here every Skillz.* call runs in Lua
 	Skillz = Skills.API
-	startShared(false)
+	startShared()
 end
 
--- registrations that exist in both modes (absorbed from the removed
--- 00Skillz.lua / ZZZZ_Last.lua)
-startShared = function(dllMode)
+-- registrations absorbed from the removed 00Skillz.lua / ZZZZ_Last.lua
+startShared = function()
 	GetMaxSkillLevel = GetMaxSkill
 	GetMaxAvailableSkill = GetMaxSkill
 	JoinSkill2 = function(sk, mas)
@@ -891,12 +796,6 @@ startShared = function(dllMode)
 	SplitSkill2 = function(arg)
 		local sk = arg % 65536
 		return sk, (arg - sk) / 65536
-	end
-
-	if dllMode then
-		function events.GameInitialized2()
-			mem.dll.skillz.initPortraits(Game.CharacterPortraits)
-		end
 	end
 
 	-- "workaround for a glitch" (ZZZZ_Last.lua; SKILLZ_PORT.md Q2). In Lua
