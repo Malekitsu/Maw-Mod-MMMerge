@@ -53,20 +53,25 @@ function events.EvtGlobal(i) -- happens after related global evt executed
 		return
 	end
 	LastTopic = nil
-	
+	local stats = LastStats
 
-	local ExpRewards = {}
+	-- MMExtension's Quest{} pays its reward in its own EvtGlobal handler, registered once, with the first
+	-- Quest{} of the session. This file is reloaded with every game, so after the first load of a session
+	-- this handler ran before the reward and saw none; judge the reward on the next tick instead
+	RunNextTick(function()
+		local ExpRewards = {}
 
-	for i, Exp in pairs(LastStats.Exp) do
-		if i < Party.count then
-			ExpRewards[i] = Party[i].Exp - Exp
+		for i, Exp in pairs(stats.Exp) do
+			if i < Party.count then
+				ExpRewards[i] = Party[i].Exp - Exp
+			end
 		end
-	end
 
-	local GoldReward = Party.Gold - LastStats.Gold
-	if GoldReward>0 and ExpRewards[0]>0 then
-		Party.Gold = Party.Gold + calculateGold(GoldReward)
-	end
+		local GoldReward = Party.Gold - stats.Gold
+		if GoldReward>0 and ExpRewards[0] and ExpRewards[0]>0 then
+			Party.Gold = Party.Gold + calculateGold(GoldReward)
+		end
+	end)
 end
 function calculateGold(gold)
 	--calculate party level
