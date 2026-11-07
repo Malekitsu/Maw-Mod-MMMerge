@@ -272,3 +272,9 @@ In addition to that there are some QoL changes:
 - Teleport: Town Portal and Lloyd beacon scrolls are not consumed on use
 - Master of all: You can learn many misc skills up to GM (Alchemy, Disarm Trap, Merchant, Identify Item/Monster, Repair)
 
+
+
+## NPC voices (optional add-on)
+Spoken NPC lines for the whole game (English, about 8,500 lines generated with Kokoro-82M). The audio is a separate download, so this repository holds only the code:
+- Unzip `MAW-Voices-EN` into the game folder. The setting `npcVoices` in `MAWSettings.lua` (default on) switches the module; the keys F9 (repeat the last voice) and F10 (stop) can be changed there.
+- Details and the tools that made the audio: `Tools/Voice/README.md`.
