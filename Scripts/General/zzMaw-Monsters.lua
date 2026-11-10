@@ -1969,11 +1969,19 @@ function events.GameInitialized2()
 	}
 end
 
+function events.GameInitialized2()
+	MawCore.Engine.skipEngineDetectLife()
+end
+
 function events.BuildMonsterInformationBox(t)
 	lastMonsterNumber=lastMonsterNumber or Map.Monsters.High
 	if lastMonsterNumber~=Map.Monsters.High then
 		lastMonsterNumber=Map.Monsters.High
 		recalculateMawMonster()
+	end
+	local detectLife=Party.SpellBuffs[const.PartyBuff.DetectLife].ExpireTime>Game.Time
+	if t.Tooltip and (detectLife or t.IdentifiedHitPoints) then
+		MawCore.Engine.drawDetectLifeLine(t.Tooltip, shortenNumber(round(MawCore.MonsterHP.current(t.Monster)), 3, true))
 	end
 	--mon = t.Monster
 	local id=Mouse:GetTarget().Index
@@ -2101,7 +2109,7 @@ function events.BuildMonsterInformationBox(t)
 		local experienceAwarded=experience*healthRateo
 		local lvl=pl.LevelBase
 		experienceAwarded=round(math.min((lvl+1)*1000, experienceAwarded))
-		t.EffectsHeader.Text=t.EffectsHeader.Text .. "\n\nExperience: " .. experienceAwarded .. "\n\nCurrent Health: " .. shortenNumber(MawCore.MonsterHP.current(mon), 4)
+		t.EffectsHeader.Text=t.EffectsHeader.Text .. "\n\nExperience: " .. experienceAwarded
 		
 		-- Display active debuffs
 		local debuffNames = {

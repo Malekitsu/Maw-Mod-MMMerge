@@ -95,6 +95,17 @@ Engine.Addr = {
 	ArenaPoolCount      = -0x10,	-- ebp offset, i4: candidates found
 	ArenaPoolList       = -0x138,	-- ebp offset, u2[140]: their MonstersTxt ids
 	ArenaPoolMaxLevel   = -0x8,	-- ebp offset, i4: top of the level range; esi = bottom
+
+	-- monster info box, last block 0x41E928..0x41E982 (disassembled from
+	-- mm8.exe): when dword [0xB2176C]:[0xB21768] = Party.SpellBuffs[DetectLife]
+	-- .ExpireTime is set, draws "%s: %d" with GlobalTxt[650] and word
+	-- [monster + 0x28] (the 16-bit proxy HP). The merge's final draw hook
+	-- (Structs/extraEditableDescriptions.lua) relocates only the 6-byte cmp at
+	-- 0x41E928 -- autohook refuses short jumps -- so the branch stays in place.
+	DetectLifeBranch    = 0x41E92E,	-- 7C 53: jl 0x41E983, the buff-off skip
+	MonsterInfoFont     = 0x5DB938,	-- font pointer of the line; byte +5 = line height
+	DrawTextCentered    = 0x44AAE3,	-- fastcall(dlg, font, x, y, color, text, 3): the merge draws the box title with it
+	DetectLifeLabel     = 650,	-- GlobalTxt index, pointer at 0x601E70
 }
 
 -- Ledger of every binary patch MawCore applies. Nothing in the core may
@@ -309,6 +320,29 @@ function Engine.setArenaPoolFallback(pick)
 			i4[d.ebp + A.ArenaPoolCount] = n
 		end, 5)
 	end)
+end
+
+-- The Detect Life line at the bottom of the monster info box, taken over from
+-- the engine: skipEngineDetectLife() stops the engine's own line for good,
+-- drawDetectLifeLine(dlg, value) draws "<label>: value" where the engine did.
+function Engine.skipEngineDetectLife()
+	local A = Engine.Addr
+	Engine.patch("DetectLifeLine", "monster info: the Detect Life line is drawn by Maw (real HP)", function()
+		if mem.u1[A.DetectLifeBranch] ~= 0x7C then
+			print("DetectLifeLine: unexpected code at the Detect Life branch, engine line kept")
+			return
+		end
+		mem.IgnoreProtection(true)
+		mem.u1[A.DetectLifeBranch] = 0xEB
+		mem.IgnoreProtection(false)
+	end)
+end
+
+function Engine.drawDetectLifeLine(dlg, value)
+	local A = Engine.Addr
+	local font = mem.u4[A.MonsterInfoFont]
+	local text = Game.GlobalTxt[A.DetectLifeLabel] .. ": " .. value
+	mem.call(A.DrawTextCentered, 2, dlg["?ptr"], font, 0, dlg.Height - mem.u1[font + 5] - 12, 0, text, 3)
 end
 
 local clientRect, cursorPoint
