@@ -50,7 +50,7 @@ MawCore.ModuleOrder = {
 	"ItemFields",	-- item struct field registry (the save format)
 	"Tooltip",		-- item tooltip section registry
 	"Save",			-- per-save namespace + clean-break version stamp
-	"Skills",		-- Skillz.dll port
+	"Skills",		-- Skillz.dll port (inert while the DLL is present)
 	"SkillTooltip",	-- per-player skill tooltip text (SKILL_TOOLTIPS.md)
 	"TrainerHint",	-- optional "who teaches the next mastery" line in the skill tooltip
 	"SkillsUI",		-- Skillz.dll port stage 2: character screen

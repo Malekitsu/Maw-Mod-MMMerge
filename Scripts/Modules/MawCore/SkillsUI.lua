@@ -82,7 +82,7 @@ end
 function SkillsUI.describe()
 	local out = {"skills UI (stage 2):"}
 	if not uiActive then
-		out[#out + 1] = "  INERT (not started)"
+		out[#out + 1] = "  INERT (DLL mode or Skills module inactive)"
 	else
 		for name, arrName in pairs(dlgArrays) do
 			local arr = Game.DialogLogic[arrName]
@@ -99,6 +99,9 @@ end
 
 function SkillsUI.start()
 	local Skills = MawCore.Skills
+	if not Skills.isActive() then
+		return
+	end
 	local Engine = MawCore.Engine
 	local A = Engine.Addr
 	local I = Skills.internal
