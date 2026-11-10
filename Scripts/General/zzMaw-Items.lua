@@ -1629,10 +1629,7 @@ function updateCelestialItem(it,pl)
 			end
 			pl=Party[id]
 		end
-		local equipStat=it:T().EquipStat
-		if table.find(twoHandedAxes, it.Number) then
-			equipStat=1
-		end
+		local equipStat=GetItemEquipStat(it)
 		local slotMult=slotMult[equipStat] or 1
 		local lvl=pl.LevelBase
 		local lvl2=getTotalLevel()
@@ -2866,7 +2863,7 @@ local function addWeaponRows(pl, index, it, txt, tab, floorPaid)
 		if held then
 			if oneHandedAxesSet[held.Number] then
 				axeCount=axeCount+1
-			elseif twoHandedAxesSet[held.Number] then
+			elseif twoHandedAxesSet[held.Number] or table.find(halberdItems, held.Number) then
 				axeCount=axeCount+1
 				axeDamageMult=axeDamageMult-0.1
 			end
@@ -4398,7 +4395,7 @@ function GetItemEquipStat(it)
 		return -1
 	end
 	local equipStat=Game.ItemsTxt[itemId].EquipStat
-	if table.find(twoHandedAxes, itemId) then
+	if table.find(twoHandedAxes, itemId) or table.find(halberdItems, itemId) then
 		equipStat=1
 	end
 	return equipStat
@@ -4414,10 +4411,7 @@ function GetSlotMult(it)
 	if itemId<=0 or itemId>Game.ItemsTxt.High then
 		return 1
 	end
-	local equipStat=Game.ItemsTxt[itemId].EquipStat
-	if table.find(twoHandedAxes, itemId) then
-		equipStat=1
-	end
+	local equipStat=GetItemEquipStat(itemId)
 	local slotMult=slotMult[equipStat] or 1
 	if equipStat==5 and Game.ItemsTxt[itemId].Mod2==0 then
 		slotMult=slotMult*1.5
@@ -4442,6 +4436,8 @@ function GetItemSkill(it)
 	end
 	if table.find(twoHandedAxes, itemId) or table.find(oneHandedAxes, itemId) then
 		return 3
+	elseif table.find(halberdItems, itemId) then
+		return const.Skills.Spear
 	else
 		return Game.ItemsTxt[itemId].Skill
 	end
@@ -4566,7 +4562,7 @@ function events.AfterLoadMap()
 end
 
 function IsTwoHandedWeapon(it)
-	return it:T().EquipStat==1 or table.find(twoHandedAxes, it.Number)~=nil
+	return GetItemEquipStat(it)==1
 end
 
 --An artifact is always the best of its weapon type. The ladder answers which

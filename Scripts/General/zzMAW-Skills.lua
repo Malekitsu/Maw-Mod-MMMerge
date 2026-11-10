@@ -479,7 +479,7 @@ function events.GetAttackDelay(t)
 					speed[i]=getItemRecovery(it, t.Player.LevelBase, skill)
 					local s,m = SplitSkill(t.Player:GetSkill(skill))
 					if skillRecovery[skill] and skillRecovery[skill][m] and not speedSkillPaid[skill] then
-						if not table.find(twoHandedAxes, it.Number) or i~=0 then
+						if not (table.find(twoHandedAxes, it.Number) or table.find(halberdItems, it.Number)) or i~=0 then
 							bonusSpeed=bonusSpeed+skillRecovery[skill][m]*s
 							speedSkillPaid[skill]=true
 						end
@@ -2674,7 +2674,7 @@ function events.Action(t)
 			else
 				tempSkillForEquip(pl, const.Skills.Dagger, 1, 1)
 			end
-		elseif race==const.Race.Minotaur and table.find(twoHandedAxes, it.Number) then
+		elseif race==const.Race.Minotaur and (table.find(twoHandedAxes, it.Number) or table.find(halberdItems, it.Number)) then
 			if m2>=3 then
 				tempSkillForEquip(pl, const.Skills.Dagger, 2, 2)
 			else
@@ -2705,6 +2705,11 @@ function mawTick_DwarfAxes()
 				txt.Skill=3
 				txt.EquipStat=1
 			end
+			for i=1,#halberdItems do
+				txt=Game.ItemsTxt[halberdItems[i]]
+				txt.Skill=const.Skills.Spear
+				txt.EquipStat=1
+			end
 			lastRace=race
 		elseif race==const.Race.Minotaur then
 			for i=1,#oneHandedAxes do
@@ -2714,6 +2719,11 @@ function mawTick_DwarfAxes()
 			end
 			for i=1,#twoHandedAxes do
 				txt=Game.ItemsTxt[twoHandedAxes[i]]
+				txt.Skill=2
+				txt.EquipStat=0
+			end
+			for i=1,#halberdItems do
+				txt=Game.ItemsTxt[halberdItems[i]]
 				txt.Skill=2
 				txt.EquipStat=0
 			end
@@ -2727,6 +2737,11 @@ function mawTick_DwarfAxes()
 			for i=1,#twoHandedAxes do
 				txt=Game.ItemsTxt[twoHandedAxes[i]]
 				txt.Skill=3
+				txt.EquipStat=1
+			end
+			for i=1,#halberdItems do
+				txt=Game.ItemsTxt[halberdItems[i]]
+				txt.Skill=const.Skills.Spear
 				txt.EquipStat=1
 			end
 			lastRace=race

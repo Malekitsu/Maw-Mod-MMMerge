@@ -311,11 +311,6 @@ function events.GameInitialized2()
 	Game.SpellsTxt[123].Expert="Deals damage equal to 70% of breath damage"
 	Game.SpellsTxt[123].Master="Deals damage equal to 85% of breath damage"
 	Game.SpellsTxt[123].GM="Deals damage equal to 100% of breath damage"
-	--mana cost
-	Game.Spells[123].SpellPointsNormal=25
-	Game.Spells[123].SpellPointsExpert=40
-	Game.Spells[123].SpellPointsMaster=50
-	Game.Spells[123].SpellPointsGM=60
 	
 	Game.Classes.SPBase[10]=60
 	Game.Classes.SPFactor[10]=0

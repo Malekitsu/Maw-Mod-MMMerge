@@ -557,7 +557,7 @@ local function stage_resAndRetaliation(t)
 					mapvars.spearDamageIncrease[id]=mapvars.spearDamageIncrease[id] or 0
 					local mult=damageMultiplier[t.PlayerIndex]["Melee"]
 					local damageIncrease=(2+s*0.02)*mult
-					if it:T().EquipStat==1 then
+					if IsTwoHandedWeapon(it) then
 						damageIncrease=damageIncrease*1.5
 					end
 					mapvars.spearDamageIncrease[id]=mapvars.spearDamageIncrease[id]+damageIncrease

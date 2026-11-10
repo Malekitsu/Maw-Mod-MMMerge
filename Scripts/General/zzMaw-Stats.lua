@@ -84,8 +84,7 @@ function getCritInfo(pl, dmgType, monLvl)
 		for i = 0, 1 do
 			local it = pl:GetActiveItem(i)
 			if it then
-				local itSkill = it:T().Skill
-				if itSkill == 2 and not (table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number)) then
+				if GetItemSkill(it) == const.Skills.Dagger then
 					local s, m = SplitSkill(pl:GetSkill(const.Skills.Dagger))
 					if m > 2 then
 						totalCrit = totalCrit + 0.05 + 0.01*s / math.min(1 + monLvl/200, 4)

@@ -242,7 +242,7 @@ SkillTooltip.set(const.Skills.Spear, 5, function(pl)
 	local damageIncrease = round((2 + s * 0.02) * mult * 10) / 10
 	local it = pl:GetActiveItem(1)
 	if it then
-		if GetWeaponSkillFor(pl, it) == const.Skills.Spear and it:T().EquipStat == 1 then
+		if GetWeaponSkillFor(pl, it) == const.Skills.Spear and IsTwoHandedWeapon(it) then
 			damageIncrease = damageIncrease * 1.5
 		end
 	end
