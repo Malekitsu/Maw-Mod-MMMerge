@@ -422,11 +422,8 @@ function GetSpeedBonus(pl)
 end
 
 ITEM_RECOVERY_LEVEL_CAP = 600
-function getItemRecovery(it, playerLevel)
-	local skill=it:T().Skill
-	if table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number) then
-		skill=3
-	end
+function getItemRecovery(it, playerLevel, skill)
+	skill=skill or GetItemSkill(it)
 	local baseSpeed=100
 	if baseRecovery[skill] then
 		local itemLevel=math.min(MawCore.ItemLevel.OfItem(it), ITEM_RECOVERY_LEVEL_CAP)
@@ -478,10 +475,8 @@ function events.GetAttackDelay(t)
 					return
 				end
 				if skill<8 then
-					speed[i]=getItemRecovery(it, t.Player.LevelBase)
-					if table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number) then
-						skill=3
-					end
+					skill=GetWeaponSkillFor(t.Player, it)
+					speed[i]=getItemRecovery(it, t.Player.LevelBase, skill)
 					local s,m = SplitSkill(t.Player:GetSkill(skill))
 					if skillRecovery[skill] and skillRecovery[skill][m] and not speedSkillPaid[skill] then
 						if not table.find(twoHandedAxes, it.Number) or i~=0 then
@@ -1828,6 +1823,10 @@ function events.Action(t)
 				and not table.find(twoHandedSwords, it.Number)
 				and not CanDualWield(pl, it) then
 			tempSkillForEquip(pl, const.Skills.Sword, 1, 1)
+		end
+		if it and it.Number>0 and table.find(halberdItems, it.Number)
+				and pl.Skills[const.Skills.Spear]==0 and pl.Skills[const.Skills.Axe]>0 then
+			tempSkillForEquip(pl, const.Skills.Spear, 1, 1)
 		end
 	end
 end

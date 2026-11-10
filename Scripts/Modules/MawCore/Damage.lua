@@ -548,7 +548,7 @@ local function stage_resAndRetaliation(t)
 	if t.Player and data and data.Object==nil and t.DamageKind==4 then
 		local it=t.Player:GetActiveItem(1)
 		if it then 
-			local skill=it:T().Skill
+			local skill=GetWeaponSkillFor(t.Player, it)
 			if skill==const.Skills.Spear then
 				local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spear))
 				if m>=4 then

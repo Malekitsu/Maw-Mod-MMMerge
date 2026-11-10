@@ -1407,11 +1407,12 @@ slotMult={2,1.25,1.5,1,1.25,1,1,1.25,1.25,0.75,1,[0]=1	}
 ----------------------
 --weapon rework
 ----------------------
+halberdItems={46,47,48,49,50,507,838,839,840,1638,1639,1640}
+
 function events.GameInitialized2()
 	--converts halberds
-	local halberds={46,47,48,49,50,507,838,839,840,1638,1639,1640}
-	for i=1,#halberds do
-		Game.ItemsTxt[halberds[i]].EquipStat=1
+	for i=1,#halberdItems do
+		Game.ItemsTxt[halberdItems[i]].EquipStat=1
 	end
 --Weapon upscaler 
     for i = 1, 2199 do
@@ -2111,7 +2112,7 @@ function GetPlayerBaseRecovery(pl, it)
 	for i=0,1 do
 		local held=pl:GetActiveItem(i)
 		if held and held:T().Skill<8 then
-			total=total+getItemRecovery(held, 0)
+			total=total+getItemRecovery(held, 0, GetWeaponSkillFor(pl, held))
 			count=count+1
 		end
 	end
@@ -2828,11 +2829,7 @@ local function addWeaponRows(pl, index, it, txt, tab, floorPaid)
 	end
 	--item-level weapon damage replaces base Mod2/sides and charge scaling
 	local bonus,sidesBonus=GetWeaponDamageRows(it)
-	local skill=txt.Skill
-	--minotaur fix
-	if oneHandedAxesSet[it.Number] or twoHandedAxesSet[it.Number] then
-		skill=3
-	end
+	local skill=GetWeaponSkillFor(pl, it)
 	--armsmaster
 	local s,m = SplitSkill(pl:GetSkill(const.Skills.Armsmaster))
 	local requirement=GetArmsmasterSupremeRequirement()
@@ -3159,10 +3156,7 @@ local function addSlotAttackRows(pl, tab)
 	for i=0,3 do
 		local item=pl:GetActiveItem(i)
 		if item then
-			local skill=item:T().Skill
-			if oneHandedAxesSet[item.Number] or twoHandedAxesSet[item.Number] then
-				skill=3
-			end
+			local skill=GetWeaponSkillFor(pl, item)
 			local s,m = SplitSkill(pl:GetSkill(skill))
 
 			if skillAttack[skill] and skillAttack[skill][m] then
@@ -3235,7 +3229,7 @@ local function addWeaponACRes(pl, index, tab)
 		local it=pl:GetActiveItem(j)
 		if it then
 			local txt=it:T()
-			local skill=txt.Skill
+			local skill=GetWeaponSkillFor(pl, it)
 			if skillAC[skill] or skillResistance[skill] then
 				local s,m=SplitSkill(pl:GetSkill(skill))
 				s=s+10
@@ -4318,7 +4312,7 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 		local res=res or 0
 		damage=damage/2^(res/100)
 		if speedMult then
-			damage=damage*getItemRecovery(it, pl.LevelBase)/100
+			damage=damage*getItemRecovery(it, pl.LevelBase, GetWeaponSkillFor(pl, it))/100
 		end
 		return round(damage)
 	else
@@ -4451,6 +4445,18 @@ function GetItemSkill(it)
 	else
 		return Game.ItemsTxt[itemId].Skill
 	end
+end
+
+function GetWeaponSkillFor(pl, it)
+	local skill=GetItemSkill(it)
+	if skill==const.Skills.Spear and table.find(halberdItems, it.Number) then
+		local spear, spearM=SplitSkill(pl:GetSkill(const.Skills.Spear))
+		local axe, axeM=SplitSkill(pl:GetSkill(const.Skills.Axe))
+		if axe>spear or (axe==spear and axeM>spearM) then
+			return const.Skills.Axe
+		end
+	end
+	return skill
 end
 
 --reroll potions

@@ -541,7 +541,7 @@ local function tooltipArtifactBaseStats(t)
 	if IsArtifactId(t.Item.Number) or table.find(ancientWeapons,t.Item.Number) then 
 		if t.Type then
 			local id=Game.CurrentPlayer
-			if id==-1 then
+			if id<0 or id>Party.High then
 				id=0
 			end
 			local txt=Game.ItemsTxt[t.Item.Number]
@@ -561,18 +561,10 @@ local function tooltipArtifactBaseStats(t)
 				t.BasicStat= "Attack: +" .. bonus .. "  Damage: " .. lo .. "-" .. hi
 					.. MawQualityText(t.Item)
 			end
-			local skill=t.Item:T().Skill
-			if table.find(twoHandedAxes, t.Item.Number) or table.find(oneHandedAxes, t.Item.Number) then
-				skill=3
-			end
+			local pl=Party[id]
+			local skill=GetWeaponSkillFor(pl, t.Item)
 			if baseRecovery[skill] then
-				local pl=Party[0]
-				local id=Game.CurrentPlayer
-				if id>0 and id<Party.High then
-					pl=Party[id]
-				end
-				local playerLevel=pl.LevelBase
-				t.Type = t.Type .. "\nAttack Speed: " .. getItemRecovery(t.Item, playerLevel)/100
+				t.Type = t.Type .. "\nAttack Speed: " .. getItemRecovery(t.Item, pl.LevelBase, skill)/100
 			end
 		end
 	end
@@ -714,12 +706,13 @@ local function tooltipLevelRequirement(t)
 		end	
 		
 		--attack speed tooltip
-		local skill=t.Item:T().Skill
-		if table.find(twoHandedAxes, t.Item.Number) or table.find(oneHandedAxes, t.Item.Number) then
-			skill=3
+		local id=Game.CurrentPlayer
+		if id<0 or id>Party.High then
+			id=0
 		end
+		local skill=GetWeaponSkillFor(Party[id], t.Item)
 		if t.Type and baseRecovery[skill] then
-			t.Type = t.Type .. "\nAttack Speed: " .. getItemRecovery(t.Item, 0)/100
+			t.Type = t.Type .. "\nAttack Speed: " .. getItemRecovery(t.Item, 0, skill)/100
 		end
 	end
 end
