@@ -5,7 +5,7 @@
 --item level, the engine hooks below -- goes through calcExp / calcLevel, so this is
 --the one place the curve is edited.
 local function expStep(lvl)
-	return 1000*lvl*math.max(1 + (lvl-100)*0.01, 1)
+	return 1000*lvl*math.max(1 + (lvl-100)*0.005, 1)
 end
 
 local MAX_TABLE_LEVEL = 2000
