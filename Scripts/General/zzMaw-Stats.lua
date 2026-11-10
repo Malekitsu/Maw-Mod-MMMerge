@@ -100,7 +100,7 @@ function getCritInfo(pl, dmgType, monLvl)
 	if not dmgType then
 		for i = 0, 1 do
 			local it = pl:GetActiveItem(i)
-			if it and (table.find(twoHandedAxes, it.Number) or table.find(oneHandedAxes, it.Number)) then
+			if it and GetWeaponSkillFor(pl, it)==const.Skills.Axe then
 				local s, m = SplitSkill(pl:GetSkill(const.Skills.Axe))
 				if m >= 4 then
 					critDamageMultiplier = critDamageMultiplier + AXE_CRIT_DAMAGE_PER_SKILL*s
