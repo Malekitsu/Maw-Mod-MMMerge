@@ -475,7 +475,7 @@ function events.AfterLoadMap()
 
 		addDungeonEntrance(504, "mdr01.blv", {X = 106, Y = -666, Z = 49, Direction = 256, LookAngle = 0, SpeedZ = 0, HouseId = 1085, Icon = 2, Name = "mdr01.blv"}, {hint = 31})         -- ""
 		
-		addDungeonEntrance(505, "mdr01.blv", {X = -384, Y = -983, Z = 1, Direction = 256, LookAngle = 0, SpeedZ = 0, HouseId = 1085, Icon = 2, Name = "mdr01.blv"}, {hint = 31})         -- "Arbiter"
+		addDungeonEntrance(505, "mdk01.blv", {X = -384, Y = -983, Z = 1, Direction = 256, LookAngle = 0, SpeedZ = 0, HouseId = 1085, Icon = 2, Name = "mdk01.blv"}, {hint = 31})         -- "Arbiter"
 	end
 	
 	--The Land of the Giants
@@ -495,7 +495,7 @@ function events.AfterLoadMap()
 
 		addDungeonEntrance(502, "d04.blv", {X = 1, Y = -2772, Z = 1, Direction = 512, LookAngle = 0, SpeedZ = 0, HouseId = 414, Icon = 9, Name = "d04.blv"}, {hint = 31})         -- "Temple of Baa"
 
-		addDungeonEntrance(503, "D22.blv", {X = -1114, Y = 2778, Z = 1, Direction = 1280, LookAngle = 0, SpeedZ = 0, HouseId = 415, Icon = 3, Name = "7D22.blv"}, {hint = 32})         -- "Hall under the Hill"
+		addDungeonEntrance(503, "7d22.blv", {X = -1114, Y = 2778, Z = 1, Direction = 1280, LookAngle = 0, SpeedZ = 0, HouseId = 415, Icon = 3, Name = "7D22.blv"}, {hint = 32})         -- "Hall under the Hill"
 	end
 	
 	--Emeralnd Island
