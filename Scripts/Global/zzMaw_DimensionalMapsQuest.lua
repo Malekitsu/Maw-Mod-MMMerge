@@ -1,4 +1,6 @@
-local ORACLES = {[314] = 4, [413] = 4, [794] = 0}
+local ORACLES = {[314] = 4, [413] = 4, [794] = 2}
+local SEER = 794
+local SEER_GUIDANCE = "SeerGuidance"
 
 local FIRST_TIER = 80
 local UNLOCK_TIER = 500
@@ -149,8 +151,27 @@ for npc, slot in pairs(ORACLES) do
 		"DimensionalMaps" .. npc,
 		BaseName = "DimensionalMaps",
 		NPC = npc,
+		Branch = "",
 		Slot = slot,
 		Ungive = dimensionalMapsTopic,
 		Texts = {Topic = "Dimensional Maps"},
 	}
 end
+
+NPCTopic{
+	NPC = SEER,
+	Name = "Seer - Guidance",
+	Branch = "",
+	Slot = 1,
+	Topic = "Guidance",
+	Ungive = function() QuestBranch(SEER_GUIDANCE) end,
+}
+NPCTopic{NPC = SEER, Branch = SEER_GUIDANCE, Slot = 0, Topic = ""}
+NPCTopic{
+	NPC = SEER,
+	Name = "Seer - Guidance Back",
+	Branch = SEER_GUIDANCE,
+	Slot = 3,
+	Topic = "Back",
+	Ungive = function() QuestBranch("") end,
+}

@@ -8,6 +8,7 @@ function MakeRespecDude(npcID)
   }
   
   Quest{
+	  Branch = "",
 	  Slot = 3,
 	  Ungive = function(t) changeToRespec(npcID) end,
       Texts = {
@@ -23,6 +24,7 @@ end
 function changeToRespec(npcID)
   QuestNPC = npcID
   Quest{
+  	  Branch = "",
   	  Slot = 3,
       Ungive = function(t) RespecSkills(npcID) end,
       Texts = {
