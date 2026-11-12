@@ -31,10 +31,12 @@ ItemFields.Registry = {
 	{offset = 0x14, name = "Condition",       type = "i4", spare = "free",
 		holds = "flag bits: 0x1 Identified, 0x2 Broken, 0x8 TemporaryBonus, "
 			.. "0xF0 item-effect nibble, 0x100 Stolen, 0x200 Hardened, 0x400 Refundable; "
-			.. "map items (290): bits 16-23 = Crafting Cube reroll count (zzAlchemy UseItem)",
+			.. "map items (290): bits 16-23 = Crafting Cube reroll count (zzAlchemy UseItem); "
+			.. "Skilled-boss horseshoes (656): bit 24 = K-gather mark (zzAlchemy MonsterKilled)",
 		note  = "bits 11-30 pass the whole-number test (every access is a masked "
 			.. "bit op or a faithful copy); earmarked by the gem-sockets design "
-			.. "on equipment, bits 16-23 taken on map items"},
+			.. "on equipment, bits 16-23 taken on map items, bit 24 taken on "
+			.. "Skilled-boss horseshoes"},
 	{offset = 0x18, name = "BodyLocation",    type = "i1", spare = "no",
 		holds = "equip slot"},
 	{offset = 0x19, name = "MaxCharges",      type = "u1", spare = "no",

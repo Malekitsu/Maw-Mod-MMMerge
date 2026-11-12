@@ -4529,7 +4529,7 @@ function events.KeyDown(t)
 		local objCount=0
 		for i=0,Map.Objects.High do
 		local obj=Map.Objects[i]
-			if isCraftingMaterial(obj.Item.Number) or obj.Item.Number==290 then
+			if isCraftingMaterial(obj.Item.Number) or obj.Item.Number==290 or obj.Item.Number==skilledBossDrop and bit.band(obj.Item.Condition, skilledBossDropMark)~=0 then
 				if objCount<30 then
 					obj.X=Party.X
 					obj.Y=Party.Y

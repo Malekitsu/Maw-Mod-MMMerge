@@ -1120,6 +1120,8 @@ end
 
 local noCorpseMonsters={82,83,84,97,98,99,241,242,243,523,524,525,529,530,531,532,533,534,622,623,624,625,626,627}
 local waterMonsters={244,245,246,532,533,534,625,626,627}
+skilledBossDrop=656
+skilledBossDropMark=0x1000000
 function events.MonsterKilled(mon)
 	if mon.Ally == 9999 or mon.NameId>300 then -- no drop from reanimated monsters
 		return
@@ -1131,7 +1133,10 @@ function events.MonsterKilled(mon)
 	end
 	if getBossSkill(mon)=="Skilled" then
 		for i=1,4 do
-			SummonItem(656, mon.X, mon.Y, mon.Z + 100, 100)
+			local obj=SummonItem(skilledBossDrop, mon.X, mon.Y, mon.Z + 100, 100)
+			if obj then
+				obj.Item.Condition=bit.bor(obj.Item.Condition, skilledBossDropMark)
+			end
 		end
 	end
 
