@@ -272,3 +272,11 @@ In addition to that there are some QoL changes:
 - Teleport: Town Portal and Lloyd beacon scrolls are not consumed on use
 - Master of all: You can learn many misc skills up to GM (Alchemy, Disarm Trap, Merchant, Identify Item/Monster, Repair)
 
+
+
+## Autosave (optional)
+`Scripts/General/zzzMaw_Autosave.lua` saves the game for you. Page "Autosave" in the extra settings (remembered, default off):
+- **Autosave**: Off / every 3 / 5 / 10 minutes. It presses the quick save key of `MM8.ini` (`QuickSavesKey`), so it is a normal quick save.
+  It saves only when that is safe: main screen, no turn-based fight, no enemy near, someone alive; otherwise it retries after 10 seconds.
+- **Save before a fight**: when an enemy comes near and nothing was saved for 5 minutes (hand-made save, quick save or autosave), the game is saved at that moment. Own switch, default off.
+Any save restarts the timer. Test: `lua Tools/Autosave/autosave_test.lua Scripts/General/zzzMaw_Autosave.lua`.
