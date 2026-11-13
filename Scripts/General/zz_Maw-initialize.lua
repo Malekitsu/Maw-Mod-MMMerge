@@ -23,6 +23,8 @@ return {
     chargeKey = 69,                     -- charge ability for knights when solo (default: E)  
     healthPotionKey = 71,               -- quickly consume red potion (default: G)
     manaPotionKey = 86,                 -- quickly consume blue potion (default: V)
+    repeatVoiceKey = 120,               -- play the last NPC voice again; press up to 3 times within 2 s for the ones before (default: F9)
+    stopVoiceKey = 121,                 -- stop the NPC voice (default: F10)
     
     -- Sorting Hotkeys
     currentBagSortKey = 82,             -- sort current bag (default: R)
@@ -39,6 +41,10 @@ return {
     -- Movement
     fasterStrafing = true,              -- faster strafing speed
     slowerBackpedaling = true,          -- slower backpedaling speed
+
+    -- Audio
+    npcVoices = true,                   -- play generated NPC voice lines found in Data/Voices/NPC
+    npcVoiceVolume = 1.0,               -- NPC voice volume relative to the game's character voices slider (0.0 - 1.0)
 }
 
 -----------------------------
@@ -293,6 +299,8 @@ AlchemyBagKey = mawSettings.AlchemyBagKey
 disableSpellBookRework = mawSettings.disableSpellBookRework
 teleportDeadMonstersAndCraftingKey = mawSettings.teleportDeadMonstersAndCraftingKey
 crashDiagnostics = mawSettings.crashDiagnostics
+npcVoices = mawSettings.npcVoices
+npcVoiceVolume = mawSettings.npcVoiceVolume
 
 -- Store settings in vars for access by other scripts
 function events.LoadMap()
