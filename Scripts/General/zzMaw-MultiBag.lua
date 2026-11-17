@@ -168,46 +168,52 @@ end
 
 
 --multiple inventory code
-function changeBag(pl, bag)
+local function ensureBags(pl)
 	local id=pl:GetIndex()
 	vars.mawbags=vars.mawbags or {}
 	if not vars.mawbags[id] then
 		vars.mawbags[id]={}
 		vars.mawbags[id]["CurrentBag"]=1
 	end
-	local currentTab=math.floor(vars.mawbags[id]["CurrentBag"]/100)+1
-	local currentBag=vars.mawbags[id]["CurrentBag"]%100
+	return id
+end
 
-	--bags
-	if bag<=5 then
-		for i=1,5 do
-			if i==bag then
-				multibagButton[i].IUpSrc="SlChar" .. i .. "D"
-			else
-				multibagButton[i].IUpSrc="SlChar" .. i .. "U"
-			end
-		end
-	end
-	if bag>=100 then
-		bag=currentBag+bag-100
-	else
-		bag=bag+(currentTab-1)*100
-	end
-	--tab
-	newCurrentTab=math.ceil(bag/100)
-	for i=1,5 do
-		if i==newCurrentTab then
-			multibagButton[i+5].IUpSrc="SlChar" .. i .. "D"
-		else
-			multibagButton[i+5].IUpSrc="SlChar" .. i .. "U"
-		end
-	end
+local function equippedRecords(pl)
 	local equipped={}
 	for s=0,15 do
 		if pl.EquippedItems[s]>0 then
 			equipped[pl.EquippedItems[s]]=true
 		end
 	end
+	return equipped
+end
+
+function dropItemAtParty(it)
+	local obj=SummonItem(it.Number, Party.X, Party.Y, Party.Z + 128, 0)
+	if not obj then
+		return false
+	end
+	local drop=obj.Item
+	drop.Bonus=it.Bonus
+	drop.Bonus2=it.Bonus2
+	drop.BonusExpireTime=it.BonusExpireTime
+	drop.BonusStrength=it.BonusStrength
+	drop.Broken=it.Broken
+	drop.Charges=it.Charges
+	drop.Condition=it.Condition
+	drop.Hardened=it.Hardened
+	drop.Identified=it.Identified
+	drop.MaxCharges=it.MaxCharges
+	drop.Owner=it.Owner
+	drop.Refundable=it.Refundable
+	drop.Stolen=it.Stolen
+	drop.TemporaryBonus=it.TemporaryBonus
+	return true
+end
+
+function storeBag(pl)
+	local id=ensureBags(pl)
+	local equipped=equippedRecords(pl)
 	--store current bag
 	local itemList={}
 	local removeList={}
@@ -251,7 +257,6 @@ function changeBag(pl, bag)
 	end
 	local currentBag=vars.mawbags[id]["CurrentBag"]
 	vars.mawbags[id][currentBag]=itemList
-	vars.mawbags[id].CurrentBag=bag
 	--remove also from inventory
 	for i=0,125 do
 		if removeList[pl.Inventory[i]] then
@@ -279,8 +284,14 @@ function changeBag(pl, bag)
 			it.BodyLocation = 0
 		end                                     
 	end
+end
+
+function loadBag(pl, bag)
+	local id=ensureBags(pl)
+	vars.mawbags[id].CurrentBag=bag
+	local equipped=equippedRecords(pl)
 	if not vars.mawbags[id][bag] then 
-		return
+		return false
 	else
 		local bags=vars.mawbags[id][bag]
 		local j=0
@@ -322,26 +333,8 @@ function changeBag(pl, bag)
 				local dropped=0
 				for k=i,#bags do
 					local lost=bags[k]
-					if lost and lost.Location then
-						local obj=SummonItem(lost.Number, Party.X, Party.Y, Party.Z + 128, 0)
-						if obj then
-							local drop=obj.Item
-							drop.Bonus=lost.Bonus
-							drop.Bonus2=lost.Bonus2
-							drop.BonusExpireTime=lost.BonusExpireTime
-							drop.BonusStrength=lost.BonusStrength
-							drop.Broken=lost.Broken
-							drop.Charges=lost.Charges
-							drop.Condition=lost.Condition
-							drop.Hardened=lost.Hardened
-							drop.Identified=lost.Identified
-							drop.MaxCharges=lost.MaxCharges
-							drop.Owner=lost.Owner
-							drop.Refundable=lost.Refundable
-							drop.Stolen=lost.Stolen
-							drop.TemporaryBonus=lost.TemporaryBonus
-							dropped=dropped+1
-						end
+					if lost and lost.Location and dropItemAtParty(lost) then
+						dropped=dropped+1
 					end
 				end
 				Game.ShowStatusText(string.format("%s: not enough item slots for bag %d, %d items dropped on the ground", pl.Name, bag, dropped))
@@ -395,6 +388,42 @@ function changeBag(pl, bag)
 			end
 		end	
 	end
+	return true
+end
+
+function changeBag(pl, bag)
+	local id=ensureBags(pl)
+	local currentTab=math.floor(vars.mawbags[id]["CurrentBag"]/100)+1
+	local currentBag=vars.mawbags[id]["CurrentBag"]%100
+
+	--bags
+	if bag<=5 then
+		for i=1,5 do
+			if i==bag then
+				multibagButton[i].IUpSrc="SlChar" .. i .. "D"
+			else
+				multibagButton[i].IUpSrc="SlChar" .. i .. "U"
+			end
+		end
+	end
+	if bag>=100 then
+		bag=currentBag+bag-100
+	else
+		bag=bag+(currentTab-1)*100
+	end
+	--tab
+	newCurrentTab=math.ceil(bag/100)
+	for i=1,5 do
+		if i==newCurrentTab then
+			multibagButton[i+5].IUpSrc="SlChar" .. i .. "D"
+		else
+			multibagButton[i+5].IUpSrc="SlChar" .. i .. "U"
+		end
+	end
+	storeBag(pl)
+	if not loadBag(pl, bag) then
+		return
+	end
 	--store mouse item
 	local mouseItem = {}
 	local it = Mouse.Item
@@ -439,190 +468,6 @@ function changeBag(pl, bag)
 end
 
 --remove buttons when tooltip is on the bottom right
-
---sortMultiBag(Party[0])
---debug.Message(dump(tempBag))
-
-
-function sortMultiBag(pl)
-	local id=pl:GetIndex()
-	local lastBag=false
-	if vars.mawbags and vars.mawbags[id] and vars.mawbags[id]["CurrentBag"] then
-		lastBag=vars.mawbags[id]["CurrentBag"]
-	end
-	for i=1,5 do
-		changeBag(pl, i)
-	end
-	changeBag(pl, 1)
-	vars.mawbags=vars.mawbags or {}
-	if not vars.mawbags[id] then
-		vars.mawbags[id]={}
-		vars.mawbags[id]["CurrentBag"]=1
-	end
-	--put all items into a temporary bag
-	tempBag={}
-	for bag,item in pairs(vars.mawbags[id]) do
-		if type(bag)=="number" and type(item)=="table" then
-			for i=1, #item do
-				if type(item)=="table" then
-					table.insert(tempBag, item[i])
-				end
-			end
-		end
-	end
-	--sort items
-	table.sort(tempBag, function(a, b)
-		-- Custom function to find index of an item in alchemyItemsOrder
-		local function getIndexInOrder(number)
-			for index, value in ipairs(alchemyItemsOrder) do
-				if value == number then
-					return index
-				end
-			end
-			return nil -- Return nil if the item is not found
-		end
-
-		-- Special sorting for items with number >= 220 and < 300
-		if vars.alchemyPlayer and vars.alchemyPlayer>=0 then
-			if (a["Number"] >= 220 and a["Number"] < 300) or (b["Number"] >= 220 and b["Number"] < 300) then
-				-- Ensure that items in the specified range are sorted first and from biggest to smallest
-				if (a["Number"] >= 220 and a["Number"] < 300) and (b["Number"] >= 220 and b["Number"] < 300) then
-					return a["Number"] > b["Number"] -- Both in range, sort descending
-				else
-					return a["Number"] >= 220 and a["Number"] < 300 -- Only one in range, it goes first
-				end
-			end
-
-			-- Sorting according to alchemyItemsOrder
-			local indexA = getIndexInOrder(a["Number"])
-			local indexB = getIndexInOrder(b["Number"])
-			if indexA and indexB then -- If both items are in the list
-				return indexA < indexB
-			elseif indexA or indexB then -- If only one item is in the list, it goes first
-				return indexA ~= nil
-			end
-		end
-
-		-- Original sorting logic
-		if a["size"] == b["size"] then
-			-- When sizes are equal, compare by skill
-			local skillA = Game.ItemsTxt[a["Number"]].Skill
-			local skillB = Game.ItemsTxt[b["Number"]].Skill
-
-			if skillA == skillB then
-				-- If skills are also equal, then sort by item number
-				return a["Number"] < b["Number"]
-			else
-				-- Otherwise, sort by skill
-				return skillA < skillB
-			end
-		else
-			-- Primary sort by size
-			return a["size"] > b["size"]
-		end
-	end)
-	--remove all items
-	vars.mawbags[id]={}
-	vars.mawbags[id]["CurrentBag"]=1
-	for i=0,125 do
-		pl.Inventory[i]=0
-	end
-	--place items
-	local currentItem={1,1,1,1,1}
-	for i=1, #tempBag do
-		local it=tempBag[i]
-		local placeFound=false
-		local x, y=itemSizeMap[it.Number][1], itemSizeMap[it.Number][2]
-		local currentBag=1
-		if vars.mawbags[id]["CurrentBag"]~=1 then
-			changeBag(pl, 1)
-		end
-		while not placeFound do
-			for j=0,125 do
-				asddd=asddd or 0
-				asddd=asddd+1
-				j=j*14%126+math.floor(j/9)
-				--pick the correct inventory slot
-				local inv=pl.Inventory
-				if inv[j]==0 then
-					local currentPosition=j-1
-					local currentLine=math.ceil((j+1)/14)
-					for n=1, x do
-						currentPosition=currentPosition+1
-						if currentLine~=math.ceil((currentPosition+1)/14) then
-							goto continue
-						end
-						if currentPosition>=126 and inv[currentPosition]~=0 then
-							goto continue
-						end
-						local yPos=currentPosition
-						for k=1,y-1 do
-							yPos=yPos+14
-							if yPos>=126 or inv[yPos]~=0 then
-								goto continue
-							end
-						end
-					end
-					while not placeFound do
-						if currentItem[currentBag]<=138 and pl.Items[currentItem[currentBag]].BodyLocation==0 then
-							placeItem(pl,it,j,currentItem[currentBag],x,y)
-							currentItem[currentBag]=currentItem[currentBag]+1
-							placeFound=true
-						else 
-							currentItem[currentBag]=currentItem[currentBag]+1
-							if currentItem[currentBag]>138 then
-								goto continue
-							end
-						end
-					end
-					goto nextItem
-				end
-				:: continue ::				
-			end	
-			--no inventory slots, go to next bag
-			changeBag(pl, currentBag+1)
-			currentBag=currentBag+1
-		end
-		:: nextItem ::
-		placeFound=true
-	end
-	if lastBag then
-		changeBag(pl, lastBag)
-	end
-end
-
-function placeItem(pl,it,invSlot,itemId,x, y)
-	local occupiedCode=-itemId-1
-	for n=1, x do
-		if n==1 then
-			pl.Inventory[invSlot]=itemId
-		else
-			pl.Inventory[invSlot]=occupiedCode
-		end
-		yPos=invSlot
-		invSlot=invSlot+1
-		for k=1,y-1 do
-			yPos=yPos+14
-			pl.Inventory[yPos]=occupiedCode
-		end
-	end
-	local inv=pl.Items[itemId]
-	inv["Bonus"]=it.Bonus
-	inv["Bonus2"]=it.Bonus2
-	inv["BonusExpireTime"]=it.BonusExpireTime
-	inv["BonusStrength"]=it.BonusStrength
-	inv["Broken"]=it.Broken
-	inv["Charges"]=it.Charges
-	inv["Condition"]=it.Condition 
-	inv["Hardened"]=it.Hardened
-	inv["Identified"]=it.Identified
-	inv["MaxCharges"]=it.MaxCharges
-	inv["Number"]=it.Number
-	inv["Owner"]=it.Owner
-	inv["Refundable"]=it.Refundable
-	inv["Stolen"]=it.Stolen
-	inv["TemporaryBonus"]=it.TemporaryBonus
-end
 
 function events.Action(t)
 	if t.Action==113 or t.Action==123 then

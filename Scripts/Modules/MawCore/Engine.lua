@@ -87,6 +87,17 @@ Engine.Addr = {
 	ItemBodyLocation    = 0x18,	-- i1: 0 = backpack, 1..16 = equipped slot
 	PlayerItemRecords   = 138,
 
+	-- backpack placement on one player, both thiscall (disassembled 2026-11-17;
+	-- the engine's AddItem 0x491138 is exactly these two scanning column by
+	-- column, after InitSpecial 0x4545E8, which rewrites Bonus/Bonus2/
+	-- BonusStrength of material-3 items -- so AddItem itself is not used).
+	-- BackpackCellFits(cell, itemNumber): 1 when the icon-sized rectangle at
+	-- cell is inside the 14x9 grid and empty. BackpackPutAt(cell, itemPtr):
+	-- record via FindFreeItemRecord, grid cells, 0x24-byte copy; returns
+	-- record+1, or 0 with nothing written.
+	BackpackCellFits    = 0x490E11,
+	BackpackPutAt       = 0x4911AE,
+
 	-- arena monster draw, sub_4BA21D (see Engine.setArenaPoolFallback).
 	-- Validated against the merge, which patches the loop end at 0x4BA561
 	-- and hooks 0x4BA5A1 / 0x4BA624 of the same routine
@@ -286,6 +297,33 @@ function Engine.setBackpackItemCap(backpackCap, fallback)
 		end
 		return free
 	end)
+end
+
+local backpackItemFields = {"Number", "Bonus", "Bonus2", "BonusStrength", "Charges",
+	"Condition", "MaxCharges", "Owner", "BonusExpireTime", "Identified", "Broken",
+	"TemporaryBonus", "Stolen", "Hardened", "Refundable"}
+local backpackItem
+
+function Engine.putInBackpack(pl, fields)
+	local A = Engine.Addr
+	backpackItem = backpackItem or structs.Item:new(Engine.alloc(A.ItemSize))
+	local it = backpackItem
+	it:Clear()
+	for _, k in ipairs(backpackItemFields) do
+		if fields[k] ~= nil then
+			it[k] = fields[k]
+		end
+	end
+	local ptr, inv = pl["?ptr"], pl.Inventory
+	for x = 0, 13 do
+		for y = 0, 8 do
+			local cell = x + 14*y
+			if inv[cell] == 0 and mem.call(A.BackpackCellFits, 1, ptr, cell, it.Number) ~= 0 then
+				return mem.call(A.BackpackPutAt, 1, ptr, cell, it["?ptr"]) ~= 0
+			end
+		end
+	end
+	return false
 end
 
 -- Arena (Page..Lord) monster draw. The engine collects the monster types

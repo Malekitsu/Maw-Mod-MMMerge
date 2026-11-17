@@ -57,353 +57,209 @@ function events.KeyDown(t)
     end
 end
 
-function sortInventory(all)
-	evt.Add("Items", 0)
-	local itemList={}
-	local j=0
-	local low, high
-	if all then
-		low=0
-		high=Party.High
-	else
-		low=Game.CurrentPlayer
-		high=Game.CurrentPlayer
-	end
-	
-	for i=low,high do
-		local pl=Party[i]
-		
-		removeList={}
-		for i=0,125 do
-			if pl.Inventory[i]>0 then
-				if pl.Items[pl.Inventory[i]].BodyLocation==0 then
-					removeList[-i-1]=true
-				end
-				local it=pl.Items[pl.Inventory[i]]
-				if it.Number>0 then
-					j=j+1
-					itemList[j] = {} 
-					--iterating doesn't seem to work
-					itemList[j]["Bonus"]=it.Bonus
-					itemList[j]["Bonus2"]=it.Bonus2
-					itemList[j]["BonusExpireTime"]=it.BonusExpireTime
-					itemList[j]["BonusStrength"]=it.BonusStrength
-					itemList[j]["Broken"]=it.Broken
-					itemList[j]["Charges"]=it.Charges
-					itemList[j]["Condition"]=it.Condition 
-					itemList[j]["Hardened"]=it.Hardened
-					itemList[j]["Identified"]=it.Identified
-					itemList[j]["MaxCharges"]=it.MaxCharges
-					itemList[j]["Number"]=it.Number
-					itemList[j]["Owner"]=it.Owner
-					itemList[j]["Refundable"]=it.Refundable
-					itemList[j]["Stolen"]=it.Stolen
-					itemList[j]["TemporaryBonus"]=it.TemporaryBonus
-					itemList[j]["size"]=itemSizeMap[it.Number][2]
-					if itemList[j]["size"]==1 and itemSizeMap[it.Number][1] >1 then
-						itemList[j]["size"]=1.5
-					end
-					pl.Inventory[i]=0 
-					it.Number=0
-				end
-			end
-		end
-			
-		for i=0,125 do
-			if removeList[pl.Inventory[i]] then
-				pl.Inventory[i]=0
-			end
-		end
-		vars.alchemyPlayer=vars.alchemyPlayer or -1
-		table.sort(itemList, function(a, b)
-			-- Special sorting for items with number >= 220 and < 300
-			if vars.alchemyPlayer>=0 then
-				if (a["Number"] >= 220 and a["Number"] < 300) or (b["Number"] >= 220 and b["Number"] < 300) then
-					-- Ensure that items in the specified range are sorted first and from biggest to smallest
-					if (a["Number"] >= 220 and a["Number"] < 300) and (b["Number"] >= 220 and b["Number"] < 300) then
-						return a["Number"] > b["Number"] -- Both in range, sort descending
-					else
-						return a["Number"] >= 220 and a["Number"] < 300 -- Only one in range, it goes first
-					end
-				end
-
-				-- Sorting according to alchemyItemsOrder
-				local indexA = table.find(alchemyItemsOrder,a["Number"])
-				local indexB = table.find(alchemyItemsOrder,b["Number"])
-				if indexA and a.Number<=1060 and a.Number>1050 and a.BonusStrength==0 then
-					indexA=indexA+10
-				end
-				if indexB and b.Number<=1060 and b.Number>1050 and b.BonusStrength==0 then
-					indexB=indexB+10
-				end
-				if indexA and indexB then -- If both items are in the list
-					return indexA < indexB
-				elseif indexA or indexB then -- If only one item is in the list, it goes first
-					return indexA ~= nil
-				end
-			end
-			
-			-- Original sorting logic
-			if a["size"] == b["size"] then
-				-- When sizes are equal, compare by skill
-				local skillA = Game.ItemsTxt[a["Number"]].Skill
-				local skillB = Game.ItemsTxt[b["Number"]].Skill
-				
-				if skillA == skillB then
-					-- If skills are also equal, then sort by item number
-					return a["Number"] < b["Number"]
-				else
-					-- Otherwise, sort by skill
-					return skillA < skillB
-				end
+local function itemOrder(a, b)
+	-- Special sorting for items with number >= 220 and < 300
+	if vars.alchemyPlayer>=0 then
+		if (a["Number"] >= 220 and a["Number"] < 300) or (b["Number"] >= 220 and b["Number"] < 300) then
+			-- Ensure that items in the specified range are sorted first and from biggest to smallest
+			if (a["Number"] >= 220 and a["Number"] < 300) and (b["Number"] >= 220 and b["Number"] < 300) then
+				return a["Number"] > b["Number"] -- Both in range, sort descending
 			else
-				-- Primary sort by size
-				return a["size"] > b["size"]
+				return a["Number"] >= 220 and a["Number"] < 300 -- Only one in range, it goes first
 			end
-		end)
+		end
 
-	end
-	
-	
-	if itemList[1] then
-		lastPlayer=Game.CurrentPlayer
-		vars.alchemyPlayer=vars.alchemyPlayer or -1
-		for i=1,#itemList do
-			if vars.alchemyPlayer>=0 then
-				if table.find(alchemyItemsOrder,itemList[i].Number) or (itemList[i].Number>=220 and itemList[i].Number<300) then
-					Game.CurrentPlayer=vars.alchemyPlayer
-				end
-			end
-			evt.Add("Items", itemList[i].Number)
-			it=Mouse.Item
-			it.Bonus=itemList[i].Bonus
-			it.Bonus2=itemList[i].Bonus2
-			it.BonusExpireTime=itemList[i].BonusExpireTime
-			it.BonusStrength=itemList[i].BonusStrength
-			it.Broken=itemList[i].Broken
-			it.Charges=itemList[i].Charges
-			it.Condition=itemList[i].Condition
-			it.Hardened=itemList[i].Hardened
-			it.Identified=itemList[i].Identified
-			it.MaxCharges=itemList[i].MaxCharges
-			it.Owner=itemList[i].Owner
-			it.Refundable=itemList[i].Refundable
-			it.Stolen=itemList[i].Stolen
-			it.TemporaryBonus=itemList[i].TemporaryBonus
-			evt.Add("Items", 0) --to give item to proper player
-			Game.CurrentPlayer=lastPlayer
+		-- Sorting according to alchemyItemsOrder
+		local indexA = table.find(alchemyItemsOrder,a["Number"])
+		local indexB = table.find(alchemyItemsOrder,b["Number"])
+		if indexA and a.Number<=1060 and a.Number>1050 and a.BonusStrength==0 then
+			indexA=indexA+10
+		end
+		if indexB and b.Number<=1060 and b.Number>1050 and b.BonusStrength==0 then
+			indexB=indexB+10
+		end
+		if indexA and indexB then -- If both items are in the list
+			return indexA < indexB
+		elseif indexA or indexB then -- If only one item is in the list, it goes first
+			return indexA ~= nil
 		end
 	end
-	table.clear(itemList)
-end	
+	
+	-- Original sorting logic
+	if a["size"] == b["size"] then
+		-- When sizes are equal, compare by skill
+		local skillA = Game.ItemsTxt[a["Number"]].Skill
+		local skillB = Game.ItemsTxt[b["Number"]].Skill
+		
+		if skillA == skillB then
+			-- If skills are also equal, then sort by item number
+			return a["Number"] < b["Number"]
+		else
+			-- Otherwise, sort by skill
+			return skillA < skillB
+		end
+	else
+		-- Primary sort by size
+		return a["size"] > b["size"]
+	end
+end
 
+local function isAlchemyItem(number)
+	return table.find(alchemyItemsOrder, number) or number>=220 and number<300
+end
 
-
-function sortMultibag()
-	--alchemy fix
-	if vars.alchemyPlayer and vars.alchemyPlayer>Party.High then
+local function sortBags(slots, allBags)
+	evt.Add("Items", 0)
+	vars.alchemyPlayer=vars.alchemyPlayer or -1
+	if vars.alchemyPlayer>Party.High then
 		vars.alchemyPlayer=-1
 	end
-	evt.Add("Items",0)
-	--let's fill first all inventories
-	local playerCurrentInventories={}
-	local plToSort=Game.CurrentPlayer
-	for i=0, Party.High do
-		Game.CurrentPlayer=i
-		local pl=Party[i]
-		if vars.mawbags[pl:GetIndex()] and vars.mawbags[pl:GetIndex()].CurrentBag and vars.mawbags[pl:GetIndex()].CurrentBag~=0 then
-			playerCurrentInventories[i]=vars.mawbags[pl:GetIndex()].CurrentBag
-		else
-			playerCurrentInventories[i]=1
-		end
-		changeBag(pl , 0)
-		for k=0,125 do
-			Party[i].Inventory[k]=0
-		end
-		if Party[i].Inventory[0]==0 then
-			evt.Add("Items",612)
-			evt.Add("Items",612)
-			for j=1,14 do
-				evt.Add("Items",2080)
-			end
-			evt.Add("Items",0)
-		end
+	local alchemist=vars.alchemyPlayer
+	if alchemist<0 or #slots==1 and slots[1]==alchemist then
+		alchemist=nil
 	end
-	Game.CurrentPlayer=plToSort
-	evt.Add("Items", 0)
-	local itemList={}
-	local j=0
-	local pl=Party[Game.CurrentPlayer]
-	for bag=1,5 do
-		changeBag(pl , bag)
-		removeList={}
-		for i=0,125 do
-			if pl.Inventory[i]>0 then
-				if pl.Items[pl.Inventory[i]].BodyLocation==0 then
-					removeList[-i-1]=true
-				end
-				local it=pl.Items[pl.Inventory[i]]
-				if it.Number>0 then
-					j=j+1
-					itemList[j] = {} 
-					--iterating doesn't seem to work
-					itemList[j]["Bonus"]=it.Bonus
-					itemList[j]["Bonus2"]=it.Bonus2
-					itemList[j]["BonusExpireTime"]=it.BonusExpireTime
-					itemList[j]["BonusStrength"]=it.BonusStrength
-					itemList[j]["Broken"]=it.Broken
-					itemList[j]["Charges"]=it.Charges
-					itemList[j]["Condition"]=it.Condition 
-					itemList[j]["Hardened"]=it.Hardened
-					itemList[j]["Identified"]=it.Identified
-					itemList[j]["MaxCharges"]=it.MaxCharges
-					itemList[j]["Number"]=it.Number
-					itemList[j]["Owner"]=it.Owner
-					itemList[j]["Refundable"]=it.Refundable
-					itemList[j]["Stolen"]=it.Stolen
-					itemList[j]["TemporaryBonus"]=it.TemporaryBonus
-					itemList[j]["size"]=itemSizeMap[it.Number][2]
-					if itemList[j]["size"]==1 and itemSizeMap[it.Number][1] >1 then
-						itemList[j]["size"]=1.5
-					end
-					pl.Inventory[i]=0 
-					it.Number=0
-				end
-			end
-		end
-			
-		for i=0,125 do
-			if removeList[pl.Inventory[i]] then
-				pl.Inventory[i]=0
-			end
-		end
-		vars.alchemyPlayer=vars.alchemyPlayer or -1
-		table.sort(itemList, function(a, b)
-			-- Special sorting for items with number >= 220 and < 300
-			if vars.alchemyPlayer>=0 then
-				if (a["Number"] >= 220 and a["Number"] < 300) or (b["Number"] >= 220 and b["Number"] < 300) then
-					-- Ensure that items in the specified range are sorted first and from biggest to smallest
-					if (a["Number"] >= 220 and a["Number"] < 300) and (b["Number"] >= 220 and b["Number"] < 300) then
-						return a["Number"] > b["Number"] -- Both in range, sort descending
-					else
-						return a["Number"] >= 220 and a["Number"] < 300 -- Only one in range, it goes first
-					end
-				end
+	local touched={}
+	for _, slot in ipairs(slots) do
+		touched[#touched+1]=slot
+	end
+	if alchemist and not table.find(slots, alchemist) then
+		touched[#touched+1]=alchemist
+	end
 
-				-- Sorting according to alchemyItemsOrder
-				local indexA = table.find(alchemyItemsOrder,a["Number"])
-				local indexB = table.find(alchemyItemsOrder,b["Number"])
-				if indexA and a.Number<=1060 and a.Number>1050 and a.BonusStrength==0 then
-					indexA=indexA+10
-				end
-				if indexB and b.Number<=1060 and b.Number>1050 and b.BonusStrength==0 then
-					indexB=indexB+10
-				end
-				if indexA and indexB then -- If both items are in the list
-					return indexA < indexB
-				elseif indexA or indexB then -- If only one item is in the list, it goes first
-					return indexA ~= nil
-				end
-			end
-			
-			-- Original sorting logic
-			if a["size"] == b["size"] then
-				-- When sizes are equal, compare by skill
-				local skillA = Game.ItemsTxt[a["Number"]].Skill
-				local skillB = Game.ItemsTxt[b["Number"]].Skill
-				
-				if skillA == skillB then
-					-- If skills are also equal, then sort by item number
-					return a["Number"] < b["Number"]
-				else
-					-- Otherwise, sort by skill
-					return skillA < skillB
-				end
-			else
-				-- Primary sort by size
-				return a["size"] > b["size"]
-			end
-		end)
-		
-	end
-	
-	changeBag(pl , 1)
-	local currentBag=1
-	local currentAlchemyBag=1
-	local i=1
-	if itemList[1] then
-		vars.alchemyPlayer=vars.alchemyPlayer or -1
-		lastPlayer=Game.CurrentPlayer
-		while i<=#itemList do
-			local alchemyItem=false
-			if vars.alchemyPlayer>=0 and vars.alchemyPlayer~=Game.CurrentPlayer then
-				alchemyPlayer=Party[vars.alchemyPlayer]
-				if table.find(alchemyItemsOrder,itemList[i].Number) or (itemList[i].Number>=220 and itemList[i].Number<300) then
-					Game.CurrentPlayer=vars.alchemyPlayer
-					alchemyItem=true
-					changeBag(pl , 0)
-					changeBag(alchemyPlayer , currentAlchemyBag)
-				end
-			end
-			evt.Add("Items", itemList[i].Number)
-			it=Mouse.Item
-			it.Bonus=itemList[i].Bonus
-			it.Bonus2=itemList[i].Bonus2
-			it.BonusExpireTime=itemList[i].BonusExpireTime
-			it.BonusStrength=itemList[i].BonusStrength
-			it.Broken=itemList[i].Broken
-			it.Charges=itemList[i].Charges
-			it.Condition=itemList[i].Condition
-			it.Hardened=itemList[i].Hardened
-			it.Identified=itemList[i].Identified
-			it.MaxCharges=itemList[i].MaxCharges
-			it.Owner=itemList[i].Owner
-			it.Refundable=itemList[i].Refundable
-			it.Stolen=itemList[i].Stolen
-			it.TemporaryBonus=itemList[i].TemporaryBonus
-			BeginGrabObjects()
-			evt.Add("Items", 0) --to give item to proper player
-			local obj=GrabObjects()
-			i=i+1
-			
-			if not alchemyItem then
-				if not obj then
-					currentBag=1
-					changeBag(pl , 1)
-				elseif currentBag~=5 then
-					changeBag(pl , currentBag+1)
-					currentBag=currentBag+1
-					obj.Type=0
-					obj.TypeIndex=0
-					obj.Item.Number=0
-					i=i-1
-				end
-			else
-				if not obj then
-					changeBag(alchemyPlayer , 0)
-					changeBag(pl , 1)
-					currentAlchemyBag=1
-				elseif alchemyItem and currentAlchemyBag~=5 then
-					changeBag(alchemyPlayer , currentAlchemyBag+1)
-					currentAlchemyBag=currentAlchemyBag+1
-					obj.Type=0
-					obj.TypeIndex=0
-					obj.Item.Number=0
-					i=i-1
-				end
-			end
-			Game.CurrentPlayer=lastPlayer
+	local home={}
+	for _, slot in ipairs(touched) do
+		local pl=Party[slot]
+		storeBag(pl)
+		local data=vars.mawbags[pl:GetIndex()]
+		home[slot]=data.CurrentBag%100==0 and data.CurrentBag+1 or data.CurrentBag
+		for tab=0,4 do
+			data[tab*100]=nil
 		end
 	end
-	
+	local function bagsOf(slot)
+		if not allBags then
+			return {home[slot]}
+		end
+		local base=math.floor((home[slot]-1)/100)*100
+		return {base+1, base+2, base+3, base+4, base+5}
+	end
+
+	local items={}
+	for _, slot in ipairs(slots) do
+		local data=vars.mawbags[Party[slot]:GetIndex()]
+		for _, b in ipairs(bagsOf(slot)) do
+			if type(data[b])=="table" then
+				for _, it in ipairs(data[b]) do
+					if it.Number and it.Number>0 then
+						it.size=itemSizeMap[it.Number][2]
+						if it.size==1 and itemSizeMap[it.Number][1]>1 then
+							it.size=1.5
+						end
+						items[#items+1]=it
+					end
+				end
+			end
+			data[b]={}
+		end
+	end
+	for _, slot in ipairs(touched) do
+		loadBag(Party[slot], home[slot])
+	end
+	table.sort(items, itemOrder)
+
+	local function groups(members)
+		local list={}
+		for k=1, allBags and 5 or 1 do
+			local g={}
+			for _, slot in ipairs(members) do
+				g[#g+1]={slot=slot, bag=bagsOf(slot)[k]}
+			end
+			list[k]=g
+		end
+		return list
+	end
+	local members={}
+	for _, slot in ipairs(slots) do
+		if slot~=alchemist or not allBags then
+			members[#members+1]=slot
+		end
+	end
+	local normal=groups(members)
+	local alchemy=alchemist and groups({alchemist}) or {}
+
+	local function place(list, from, it)
+		for g=from, #list do
+			for _, t in ipairs(list[g]) do
+				local pl=Party[t.slot]
+				if vars.mawbags[pl:GetIndex()].CurrentBag~=t.bag then
+					storeBag(pl)
+					loadBag(pl, t.bag)
+				end
+				if MawCore.Engine.putInBackpack(pl, it) then
+					return g, t
+				end
+			end
+		end
+	end
+	local normalFrom, alchemyFrom, lastBag, dropped=1, 1, {}, 0
+	for _, it in ipairs(items) do
+		local g, t
+		if #alchemy>0 and isAlchemyItem(it.Number) then
+			g, t=place(alchemy, alchemyFrom, it)
+			alchemyFrom=g or #alchemy
+		end
+		if not g then
+			g, t=place(normal, normalFrom, it)
+			normalFrom=g or #normal
+			if t then
+				lastBag[t.slot]=t.bag
+			end
+		end
+		if not g then
+			dropped=dropped+1
+			dropItemAtParty(it)
+		end
+	end
+
+	for _, slot in ipairs(touched) do
+		local pl=Party[slot]
+		local final=home[slot]
+		if allBags and #slots==1 and lastBag[slot] then
+			final=lastBag[slot]
+		end
+		if vars.mawbags[pl:GetIndex()].CurrentBag~=final then
+			storeBag(pl)
+			loadBag(pl, final)
+		end
+	end
+	if dropped>0 then
+		Message(string.format("Not enough room in the bags: %d items were dropped on the ground", dropped))
+	end
+end
+
+function sortInventory(all)
+	local slots={Game.CurrentPlayer}
+	if all then
+		for i=0,Party.High do
+			if i~=Game.CurrentPlayer then
+				slots[#slots+1]=i
+			end
+		end
+	end
+	sortBags(slots, false)
+end
+
+function sortMultibag()
+	sortBags({Game.CurrentPlayer}, true)
+end
+
+function gigaChadSort()
+	local slots={}
 	for i=0,Party.High do
-		if i~=plToSort then
-			changeBag(Party[i], playerCurrentInventories[i])
-		end
+		slots[#slots+1]=i
 	end
-	changeBag(pl, currentBag)
-	table.clear(itemList)
-end	
+	sortBags(slots, true)
+end
 
 --[[
 function events.KeyDown(t)
@@ -442,233 +298,6 @@ function events.KeyDown(t)
 		end
 	end
 end
-
-function gigaChadSort()
-	--alchemy fix
-	if vars.alchemyPlayer and vars.alchemyPlayer>Party.High then
-		vars.alchemyPlayer=-1
-	end
-	evt.Add("Items", 0)
-	local currentPl=Game.CurrentPlayer
-	Game.CurrentPlayer=0
-	local playerCurrentInventories={}
-	for i=0, Party.High do
-		Game.CurrentPlayer=i
-		local pl=Party[i]
-		if vars.mawbags[pl:GetIndex()] and vars.mawbags[pl:GetIndex()].CurrentBag and vars.mawbags[pl:GetIndex()].CurrentBag~=0 then
-			playerCurrentInventories[i]=vars.mawbags[pl:GetIndex()].CurrentBag
-		else
-			playerCurrentInventories[i]=1
-		end
-		changeBag(pl , 0)
-		for k=0,125 do
-			Party[i].Inventory[k]=0
-		end
-		if Party[i].Inventory[0]==0 then
-			evt.Add("Items",612)
-			evt.Add("Items",612)
-			for j=1,14 do
-				evt.Add("Items",2080)
-			end
-			evt.Add("Items",0)
-		end
-	end
-	
-	local itemList={}
-	local j=0
-	for k=0, Party.High do
-	local pl=Party[k]
-		for bag=1,5 do
-			changeBag(pl , bag)
-			removeList={}
-			for i=0,125 do
-				if pl.Inventory[i]>0 then
-					if pl.Items[pl.Inventory[i]].BodyLocation==0 then
-						removeList[-i-1]=true
-					end
-					local it=pl.Items[pl.Inventory[i]]
-					if it.Number>0 then
-						j=j+1
-						itemList[j] = {} 
-						--iterating doesn't seem to work
-						itemList[j]["Bonus"]=it.Bonus
-						itemList[j]["Bonus2"]=it.Bonus2
-						itemList[j]["BonusExpireTime"]=it.BonusExpireTime
-						itemList[j]["BonusStrength"]=it.BonusStrength
-						itemList[j]["Broken"]=it.Broken
-						itemList[j]["Charges"]=it.Charges
-						itemList[j]["Condition"]=it.Condition 
-						itemList[j]["Hardened"]=it.Hardened
-						itemList[j]["Identified"]=it.Identified
-						itemList[j]["MaxCharges"]=it.MaxCharges
-						itemList[j]["Number"]=it.Number
-						itemList[j]["Owner"]=it.Owner
-						itemList[j]["Refundable"]=it.Refundable
-						itemList[j]["Stolen"]=it.Stolen
-						itemList[j]["TemporaryBonus"]=it.TemporaryBonus
-						itemList[j]["size"]=itemSizeMap[it.Number][2]
-						if itemList[j]["size"]==1 and itemSizeMap[it.Number][1] >1 then
-							itemList[j]["size"]=1.5
-						end
-						pl.Inventory[i]=0 
-						it.Number=0
-					end
-				end
-			end
-				
-			for i=0,125 do
-				if removeList[pl.Inventory[i]] then
-					pl.Inventory[i]=0
-				end
-			end
-			vars.alchemyPlayer=vars.alchemyPlayer or -1
-		end
-	end
-	
-	table.sort(itemList, function(a, b)
-		-- Special sorting for items with number >= 220 and < 300
-		if vars.alchemyPlayer>=0 then
-			if (a["Number"] >= 220 and a["Number"] < 300) or (b["Number"] >= 220 and b["Number"] < 300) then
-				-- Ensure that items in the specified range are sorted first and from biggest to smallest
-				if (a["Number"] >= 220 and a["Number"] < 300) and (b["Number"] >= 220 and b["Number"] < 300) then
-					return a["Number"] > b["Number"] -- Both in range, sort descending
-				else
-					return a["Number"] >= 220 and a["Number"] < 300 -- Only one in range, it goes first
-				end
-			end
-
-			-- Sorting according to alchemyItemsOrder
-			local indexA = table.find(alchemyItemsOrder,a["Number"])
-			local indexB = table.find(alchemyItemsOrder,b["Number"])
-			if indexA and a.Number<=1060 and a.Number>1050 and a.BonusStrength==0 then
-				indexA=indexA+10
-			end
-			if indexB and b.Number<=1060 and b.Number>1050 and b.BonusStrength==0 then
-				indexB=indexB+10
-			end
-			if indexA and indexB then -- If both items are in the list
-				return indexA < indexB
-			elseif indexA or indexB then -- If only one item is in the list, it goes first
-				return indexA ~= nil
-			end
-		end
-		
-		-- Original sorting logic
-		if a["size"] == b["size"] then
-			-- When sizes are equal, compare by skill
-			local skillA = Game.ItemsTxt[a["Number"]].Skill
-			local skillB = Game.ItemsTxt[b["Number"]].Skill
-			
-			if skillA == skillB then
-				-- If skills are also equal, then sort by item number
-				return a["Number"] < b["Number"]
-			else
-				-- Otherwise, sort by skill
-				return skillA < skillB
-			end
-		else
-			-- Primary sort by size
-			return a["size"] > b["size"]
-		end
-	end)
-		
-	for i=0, Party.High do
-		local pl=Party[i]
-		changeBag(pl , 1)
-	end
-	
-	--lock alchemy guy
-	vars.alchemyPlayer=vars.alchemyPlayer or -1
-	if vars.alchemyPlayer>=0 and vars.alchemyPlayer<=Party.High then
-		changeBag(Party[vars.alchemyPlayer] , 0)
-	end
-	
-	local currentBag=0
-	local currentAlchemyBag=1
-	local i=1
-	Game.CurrentPlayer=vars.alchemyPlayer~=0 and 0 or 1
-	if itemList[1] then
-		while i<=#itemList do
-			Game.CurrentPlayer=vars.alchemyPlayer~=0 and 0 or 1
-			local alchemyItem=false
-			if vars.alchemyPlayer>=0 and vars.alchemyPlayer~=Game.CurrentPlayer then
-				alchemyPlayer=Party[vars.alchemyPlayer]
-				if table.find(alchemyItemsOrder,itemList[i].Number) or (itemList[i].Number>=220 and itemList[i].Number<300) then
-					Game.CurrentPlayer=vars.alchemyPlayer
-					alchemyItem=true
-					for k=0, Party.High do
-						local pl=Party[k]
-						if k~=vars.alchemyPlayer then
-							changeBag(pl , 0)
-						end
-					end
-					changeBag(alchemyPlayer , currentAlchemyBag)
-				end
-			end
-			evt.Add("Items", itemList[i].Number)
-			it=Mouse.Item
-			it.Bonus=itemList[i].Bonus
-			it.Bonus2=itemList[i].Bonus2
-			it.BonusExpireTime=itemList[i].BonusExpireTime
-			it.BonusStrength=itemList[i].BonusStrength
-			it.Broken=itemList[i].Broken
-			it.Charges=itemList[i].Charges
-			it.Condition=itemList[i].Condition
-			it.Hardened=itemList[i].Hardened
-			it.Identified=itemList[i].Identified
-			it.MaxCharges=itemList[i].MaxCharges
-			it.Owner=itemList[i].Owner
-			it.Refundable=itemList[i].Refundable
-			it.Stolen=itemList[i].Stolen
-			it.TemporaryBonus=itemList[i].TemporaryBonus
-			BeginGrabObjects()
-			evt.Add("Items", 0) --to give item to proper player
-			local obj=GrabObjects()
-			i=i+1
-			if not obj then
-				for k=0, Party.High do
-					local pl=Party[k]
-					if k~=vars.alchemyPlayer then
-						changeBag(pl , currentBag)
-					else
-						changeBag(pl, 0)
-					end
-				end
-			
-			elseif not alchemyItem and obj and currentBag~=5 then
-				for k=0, Party.High do
-					local pl=Party[k]
-					if k~=vars.alchemyPlayer then
-						changeBag(pl , currentBag+1)
-					end
-				end
-				currentBag=currentBag+1
-				obj.Type=0
-				obj.TypeIndex=0
-				obj.Item.Number=0
-				i=i-1
-			elseif alchemyItem and currentAlchemyBag~=5 then
-				changeBag(alchemyPlayer , currentAlchemyBag+1)
-				currentAlchemyBag=currentAlchemyBag+1
-				obj.Type=0
-				obj.TypeIndex=0
-				obj.Item.Number=0
-				i=i-1
-			end
-			Game.CurrentPlayer=lastPlayer
-		end
-	end
-	
-	for i=0,Party.High do
-		if i~=plToSort then
-			changeBag(Party[i], playerCurrentInventories[i])
-		end
-	end
-	Game.CurrentPlayer=currentPl
-	table.clear(itemList)
-end	
-
-
 
 function events.KeyDown(t)
     if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 103 then
