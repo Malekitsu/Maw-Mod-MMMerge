@@ -202,13 +202,19 @@ function changeBag(pl, bag)
 			multibagButton[i+5].IUpSrc="SlChar" .. i .. "U"
 		end
 	end
+	local equipped={}
+	for s=0,15 do
+		if pl.EquippedItems[s]>0 then
+			equipped[pl.EquippedItems[s]]=true
+		end
+	end
 	--store current bag
 	local itemList={}
 	local removeList={}
 	local j=0
 	for i=0,125 do
 		if pl.Inventory[i]>0 then
-			if pl.Items[pl.Inventory[i]].BodyLocation==0 then
+			if not equipped[pl.Inventory[i]] then
 				removeList[-i-1]=true
 			end
 			local it=pl.Items[pl.Inventory[i]]
@@ -253,7 +259,7 @@ function changeBag(pl, bag)
 		end
 	end
 	for i=1,138 do
-		if pl.Items[i].BodyLocation==0 and pl.Items[i].Broken==false then
+		if not equipped[i] then
 			local it=pl.Items[i]
 			it.Bonus = 0	
 			it.Bonus2 = 0
@@ -270,6 +276,7 @@ function changeBag(pl, bag)
 			it.Refundable = false
 			it.Stolen = false
 			it.TemporaryBonus = false
+			it.BodyLocation = 0
 		end                                     
 	end
 	if not vars.mawbags[id][bag] then 
@@ -284,8 +291,61 @@ function changeBag(pl, bag)
 		for i=1,#bags do
 			local it=bags[i]
 			local inv
-			while j<=138 and pl.Items[i+j].Number>0 do
+			while i+j<=138 and (pl.Items[i+j].Number>0 or equipped[i+j]) do
 				j=j+1
+			end
+			if i+j>138 then
+				local spare
+				for tab=0,(Party.High==0 and 4 or 0) do
+					for slot=1,5 do
+						local b=slot+tab*100
+						local stored=vars.mawbags[id][b]
+						if not spare and b~=bag and (stored==nil or type(stored)=="table" and #stored==0) then
+							spare=b
+						end
+					end
+				end
+				if spare then
+					local moved={}
+					for k=i,#bags do
+						if bags[k] and bags[k].Location then
+							moved[#moved+1]=bags[k]
+						end
+					end
+					for k=#bags,i,-1 do
+						bags[k]=nil
+					end
+					vars.mawbags[id][spare]=moved
+					Game.ShowStatusText(string.format("%s: bag %d is over the item limit, %d items moved to bag %d", pl.Name, bag, #moved, spare))
+					break
+				end
+				local dropped=0
+				for k=i,#bags do
+					local lost=bags[k]
+					if lost and lost.Location then
+						local obj=SummonItem(lost.Number, Party.X, Party.Y, Party.Z + 128, 0)
+						if obj then
+							local drop=obj.Item
+							drop.Bonus=lost.Bonus
+							drop.Bonus2=lost.Bonus2
+							drop.BonusExpireTime=lost.BonusExpireTime
+							drop.BonusStrength=lost.BonusStrength
+							drop.Broken=lost.Broken
+							drop.Charges=lost.Charges
+							drop.Condition=lost.Condition
+							drop.Hardened=lost.Hardened
+							drop.Identified=lost.Identified
+							drop.MaxCharges=lost.MaxCharges
+							drop.Owner=lost.Owner
+							drop.Refundable=lost.Refundable
+							drop.Stolen=lost.Stolen
+							drop.TemporaryBonus=lost.TemporaryBonus
+							dropped=dropped+1
+						end
+					end
+				end
+				Game.ShowStatusText(string.format("%s: not enough item slots for bag %d, %d items dropped on the ground", pl.Name, bag, dropped))
+				break
 			end
 			if it and it.Location then
 				pl.Inventory[it.Location]=i+j

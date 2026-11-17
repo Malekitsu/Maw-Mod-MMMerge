@@ -64,6 +64,13 @@ function Fixes.start()
 		return records - slots
 	end, records - 16)
 
+	MawCore.Scheduler.every("fixes/mouse-item-body-location", 0, function()
+		local it = Mouse.Item
+		if it.Number ~= 0 and it.BodyLocation ~= 0 then
+			it.BodyLocation = 0
+		end
+	end)
+
 	-- 4. mm8.ini: force FixMonstersBlockingShots=1 (GrayFace patch option).
 	--    Like the DLL, this edits the file, and the option is read at engine
 	--    startup -- so a correction takes effect on the NEXT launch. Not an

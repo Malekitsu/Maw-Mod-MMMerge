@@ -211,7 +211,7 @@ function sortMultibag()
 	for i=0, Party.High do
 		Game.CurrentPlayer=i
 		local pl=Party[i]
-		if vars.mawbags[pl:GetIndex()] and vars.mawbags[pl:GetIndex()].CurrentBag then
+		if vars.mawbags[pl:GetIndex()] and vars.mawbags[pl:GetIndex()].CurrentBag and vars.mawbags[pl:GetIndex()].CurrentBag~=0 then
 			playerCurrentInventories[i]=vars.mawbags[pl:GetIndex()].CurrentBag
 		else
 			playerCurrentInventories[i]=1
@@ -455,7 +455,7 @@ function gigaChadSort()
 	for i=0, Party.High do
 		Game.CurrentPlayer=i
 		local pl=Party[i]
-		if vars.mawbags[pl:GetIndex()] and vars.mawbags[pl:GetIndex()].CurrentBag then
+		if vars.mawbags[pl:GetIndex()] and vars.mawbags[pl:GetIndex()].CurrentBag and vars.mawbags[pl:GetIndex()].CurrentBag~=0 then
 			playerCurrentInventories[i]=vars.mawbags[pl:GetIndex()].CurrentBag
 		else
 			playerCurrentInventories[i]=1
@@ -665,7 +665,6 @@ function gigaChadSort()
 		end
 	end
 	Game.CurrentPlayer=currentPl
-	changeBag(pl, currentBag)
 	table.clear(itemList)
 end	
 
