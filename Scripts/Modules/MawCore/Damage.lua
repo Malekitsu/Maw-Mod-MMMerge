@@ -213,6 +213,10 @@ end
 -- the pipeline's real starting value
 local function stage_engineReset(t)
 	t.Result=t.Damage
+	local data=t.Hit
+	if data and data.Spell==44 then
+		t.ProxyUnits=true
+	end
 end
 
 -- from Scripts/General/zzMaw-Monsters.lua:4475 -- Mode 2 indoor: reveal
@@ -818,7 +822,7 @@ local function stage_dkAttack(t)
 end
 
 -- from Scripts/General/zzClasses.lua:1962 -- Assassin: spell-melee damage
--- replacement (assassinSpells), blade-dance extra earth-res division
+-- replacement (assassinSpells)
 local function stage_assassinAttack(t)
 	local data = t.Hit
 	if data and data.Player and table.find(assassinClass, data.Player.Class) then
@@ -854,6 +858,7 @@ local function stage_assassinAttack(t)
 			damage=resDivide(damage, res)
 			local mult=damageMultiplier[t.PlayerIndex]["Melee"]
 			t.Result=damage*mult
+			t.ProxyUnits=nil
 			
 			if pl.Weak>0 then
 				t.Result=t.Result*0.5
@@ -861,9 +866,6 @@ local function stage_assassinAttack(t)
 			
 			if assassinSpells[spell].DamageMult then
 				t.Result=t.Result*assassinSpells[data.Object.Spell].DamageMult
-				if spell==44 then
-					t.Result=resDivide(t.Result, t.Monster.Resistances[3])
-				end
 			end
 		end
 	end
@@ -1022,7 +1024,7 @@ local function stage_legendaries(t)
 	if hasLegendary(id,17) then
 		if t.Result>0 and ((data and data.Object==nil and t.DamageKind==4) or (data and data.Object)) then
 			local dmg=MawCore.MonsterHP.current(mon)*0.02
-			if data and data.Object and data.Object.Spell==44 then
+			if t.ProxyUnits then
 				dmg=mon.HP*0.02
 			end
 			dmg=dmg/(1+mon.Resistances[4]/100)
@@ -1339,7 +1341,7 @@ local function stage_trackAndClamp(t)
 	--recount
 	if data and data.Player then
 		damage=t.Result
-		if data.Spell==44 then
+		if t.ProxyUnits then
 			damage=damage*MawCore.MonsterHP.scale(t.Monster)
 		end
 		

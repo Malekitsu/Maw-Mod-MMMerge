@@ -95,8 +95,7 @@ function MonsterHP.stage(t)
 	end
 	reconcile(mon, e)
 	local real = t.Result
-	local data = t.Hit
-	if data and data.Spell == 44 then	-- engine computed this from the proxy pool
+	if t.ProxyUnits then	-- engine computed this from the proxy pool
 		real = real * (e.max/math.max(mon.FullHP, 1))
 	end
 	e.hp = e.hp - real
