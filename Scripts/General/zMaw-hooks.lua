@@ -130,7 +130,7 @@ do
 		local code = [[
 			sar eax, 0x1
 		]]
-		hooks.asmhook(0x471ae9, code)
+		hooks.asmhook(0x471b51, code)
 		hooks.asmhook(0x471b86, code)
 
 		hooks.asmhook(0x472e1f, code)
