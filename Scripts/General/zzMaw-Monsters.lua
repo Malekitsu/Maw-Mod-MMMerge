@@ -2507,7 +2507,8 @@ end
 
 deathTimer=CustomUI.CreateText{
   Text=_H"00",
-  Layer=1, Screen=0, AlignLeft=true, Width=60, Height=16, X=500, Y=450
+  Layer=1, Screen=0, AlignLeft=true, Width=60, Height=16, X=500, Y=450,
+  Condition=function() return Game.MainMenuCode<0 end
 }
 
 deathCounter=CustomUI.CreateText{
