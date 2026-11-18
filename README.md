@@ -12,6 +12,8 @@ This mod is the culmination of efforts from a dedicated team, with each member b
 
 Special thanks to Grayface and Rodril, that indirectly made the whole project possible. 
 
+A huge, heartfelt thank you to **Rodril**. MAW is built on top of his MMMerge, and it now ships his MMMerge patch and Multiplayer module directly inside the mod, so players no longer need to install them separately. None of this would exist without his amazing work: thank you, thank you, thank you, Rodril!
+
 We express our deepest appreciation to all the discord community member. Their advices and feedbacks played a very important role in the development. Most noticeably, but not only:
 
 Viktor, Hagnak, ArkTolei, MR___TJ, Spazzledorf, Torkvato, LiGx, Mercs/Zan Team.
@@ -19,11 +21,9 @@ Viktor, Hagnak, ArkTolei, MR___TJ, Spazzledorf, Torkvato, LiGx, Mercs/Zan Team.
 
 ## Install instruction
 - download MM8 from GOG
-- following 3 files needs to be copied into MM8 folder in that exact order.
+- following 2 files needs to be copied into MM8 folder in that exact order.
   - download MMMerge here: https://1drv.ms/u/s!AklOx6zaOmQgbHB1-Avia15ruaI?e=H4IcBJ 
-  - download Patch here: https://gitlab.com/letr.rod/mmmerge/-/archive/Rodril_nightly_build/mmmerge-Rodril_nightly_build.zip
-  - download Multiplayer here: https://gitlab.com/letr.rod/mmmerge/-/archive/multiplayer/mmmerge-multiplayer.zip
-  - download MAW MMMerge here: https://github.com/Malekitsu/Maw-Mod-MMMerge/archive/refs/heads/main.zip
+  - download MAW MMMerge here: https://github.com/Malekitsu/Maw-Mod-MMMerge/archive/refs/heads/main.zip (it already includes Rodril's MMMerge patch and Multiplayer)
 - put MM8 folder into desktop
 - set mm8.exe into Windows Service pack 2 (or 3) compatibility mode.
 - check difficulty & bolster settings once in game (ingame esc/controls/extra setting on top)

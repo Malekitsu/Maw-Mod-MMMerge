@@ -1,0 +1,1 @@
+-- This file is obsolete and remains here to replace older one.

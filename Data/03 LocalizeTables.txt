@@ -1,0 +1,224 @@
+Table (of Game struct)	Id	Field	New text
+Houses	48	Picture	330
+Houses	48	Name	Tunnels to Eeofol
+Houses	45	Picture	324
+Houses	45	Name	Nighon tunnels
+
+TransTxt	20		As you go deeper into this vast network of tunnels, your instinct tells you that many dangerous creatures dwell within. You vow to remain vigilant.
+TransTxt	22		A thunderous howl pierces your ears, provoking a feeling of dread. Whatever produced that sound is drawing near, with each step rocking the earth beneath your feet.
+
+NPCText	1673		You know what they say, four is a company, five's a crowd. I'm not looking for the latter.
+NPCText	1674		Click again to dismiss 
+NPCText	1675		Click again to hire 
+NPCText	1676		Become %s.
+NPCText	1677		Yes, I'm the one you're looking for. Are you sure you want to walk the path of %s?
+NPCText	1678		Congratulations, %s!
+NPCText	1679		Your kind cannot become %s. Sorry.
+NPCText	1680		Good tidings. I am %s, %s %s. I'd love to see the world and taste the adventure, but it'd be foolish to go alone. Perhaps I could come with you?
+NPCText	1681		I cannot travel with you, your party is too full.
+NPCText	1682		apprentice,skilled,well known,masterful,great
+NPCText	1683		What wretch would want to deal with scum like yourself? Repent for your sins and do not show your face here until you do.
+NPCText	1685		Choose name for your dragon.
+NPCText	1686		Dragon's name will be "%s", are you sure? (Y/N)
+NPCText	1687		Hatchling is too young to join you.
+NPCText	1688		Your party is too full.
+NPCText	1690		You must have your own card deck to play here. _________________________________________
+
+NPCText	2161		(Charged connector stone will heal you up once per day.)
+NPCText	2102		Path of Light
+NPCText	2103		Path of Dark
+NPCText	2104		Are you sure, you want to change your path? Dark spells will be vanished from your spellbook and dark magic will be erased from your mind. (Yes/No)
+NPCText	2105		Are you sure, you want to change your path? Light spells will be vanished from your spellbook and light magic will be erased from your mind. (Yes/No)
+NPCText	2106		It is never late to turn back to light, child. Choose light side.
+NPCText	2107		Darkness wait and it's patience is eternal. Choose dark side.
+NPCText	2108		yes
+NPCText	2109		Either you've already choosen your path, or you are not ready to do it.
+NPCText	1684		Dragon ate enough! Let him grow.
+NPCText	1689		Dragon grown!
+NPCText	1692		Feed dragon
+
+NPCTopic	1765		Bribe
+NPCTopic	1766		Beg
+NPCTopic	1767		Threat
+NPCTopic	1768		Bribe
+
+MapStats	205	EaxEnvironments	25
+
+GlobalTxt	737		You feel high magic presence here.
+GlobalTxt	634		or
+GlobalTxt	675		Magnificent! No world left behind. Not only have you walked the path of heroes in three different realms, but you have also found and caged the Runaway Chaos responsible for the whole conundrum. Now Enroth, Antagarich, and Jadame may all rest easy. And Verdant has a lot of chronicle work cut out for her.
+GlobalTxt	676		Magnificent! No world left behind. Not only have you walked the path of heroes in three different realms, but you have also found and caged the Runaway Chaos responsible for the whole conundrum. Now Enroth, Antagarich, and Jadame may all rest easy. And Verdant has a lot of chronicle work cut out for her.
+			
+NPCDataTxt	815	Joins	1
+NPCDataTxt	824	Joins	1
+NPCDataTxt	832	Joins	1
+NPCDataTxt	834	Joins	1
+NPCDataTxt	843	Joins	1
+NPCDataTxt	848	Joins	1
+NPCDataTxt	863	Joins	1
+NPCDataTxt	873	Joins	1
+NPCDataTxt	883	Joins	1
+NPCDataTxt	887	Joins	1
+NPCDataTxt	888	Joins	1
+NPCDataTxt	889	Joins	1
+NPCDataTxt	892	Joins	1
+NPCDataTxt	896	Joins	1
+NPCDataTxt	897	Joins	1
+NPCDataTxt	898	Joins	1
+NPCDataTxt	899	Joins	1
+NPCDataTxt	900	Joins	1
+NPCDataTxt	901	Joins	1
+NPCDataTxt	902	Joins	1
+NPCDataTxt	911	Joins	1
+NPCDataTxt	912	Joins	1
+NPCDataTxt	913	Joins	1
+NPCDataTxt	916	Joins	1
+NPCDataTxt	918	Joins	1
+NPCDataTxt	919	Joins	1
+NPCDataTxt	920	Joins	1
+NPCDataTxt	921	Joins	1
+NPCDataTxt	924	Joins	1
+NPCDataTxt	925	Joins	1
+NPCDataTxt	926	Joins	1
+NPCDataTxt	928	Joins	1
+NPCDataTxt	931	Joins	1
+NPCDataTxt	934	Joins	1
+NPCDataTxt	936	Joins	1
+NPCDataTxt	937	Joins	1
+NPCDataTxt	938	Joins	1
+NPCDataTxt	942	Joins	1
+NPCDataTxt	943	Joins	1
+NPCDataTxt	944	Joins	1
+NPCDataTxt	945	Joins	1
+NPCDataTxt	947	Joins	1
+NPCDataTxt	948	Joins	1
+NPCDataTxt	950	Joins	1
+NPCDataTxt	952	Joins	1
+NPCDataTxt	953	Joins	1
+NPCDataTxt	959	Joins	1
+NPCDataTxt	960	Joins	1
+NPCDataTxt	967	Joins	1
+NPCDataTxt	969	Joins	1
+NPCDataTxt	971	Joins	1
+NPCDataTxt	975	Joins	1
+NPCDataTxt	976	Joins	1
+NPCDataTxt	979	Joins	1
+NPCDataTxt	984	Joins	1
+NPCDataTxt	987	Joins	1
+NPCDataTxt	989	Joins	1
+NPCDataTxt	990	Joins	1
+NPCDataTxt	994	Joins	1
+NPCDataTxt	1000	Joins	1
+NPCDataTxt	1002	Joins	1
+NPCDataTxt	1003	Joins	1
+NPCDataTxt	1006	Joins	1
+NPCDataTxt	1007	Joins	1
+NPCDataTxt	1009	Joins	1
+NPCDataTxt	1011	Joins	1
+NPCDataTxt	1013	Joins	1
+NPCDataTxt	1017	Joins	1
+NPCDataTxt	1018	Joins	1
+NPCDataTxt	1019	Joins	1
+NPCDataTxt	1020	Joins	1
+NPCDataTxt	1022	Joins	1
+NPCDataTxt	1024	Joins	1
+NPCDataTxt	1027	Joins	1
+NPCDataTxt	1028	Joins	1
+NPCDataTxt	1029	Joins	1
+NPCDataTxt	1033	Joins	1
+NPCDataTxt	1034	Joins	1
+NPCDataTxt	1035	Joins	1
+NPCDataTxt	1036	Joins	1
+NPCDataTxt	1037	Joins	1
+NPCDataTxt	1038	Joins	1
+NPCDataTxt	1039	Joins	1
+NPCDataTxt	1041	Joins	1
+NPCDataTxt	1042	Joins	1
+NPCDataTxt	1044	Joins	1
+NPCDataTxt	1045	Joins	1
+NPCDataTxt	1046	Joins	1
+NPCDataTxt	1047	Joins	1
+NPCDataTxt	1049	Joins	1
+NPCDataTxt	1050	Joins	1
+NPCDataTxt	1051	Joins	1
+NPCDataTxt	1053	Joins	1
+NPCDataTxt	1054	Joins	1
+NPCDataTxt	1055	Joins	1
+NPCDataTxt	1056	Joins	1
+NPCDataTxt	1058	Joins	1
+NPCDataTxt	1059	Joins	1
+NPCDataTxt	1060	Joins	1
+NPCDataTxt	1061	Joins	1
+NPCDataTxt	1069	Joins	1
+NPCDataTxt	1074	Joins	1
+NPCDataTxt	1093	Joins	1
+NPCDataTxt	1094	Joins	1
+NPCDataTxt	1095	Joins	1
+NPCDataTxt	1096	Joins	1
+NPCDataTxt	1097	Joins	1
+NPCDataTxt	1098	Joins	1
+NPCDataTxt	1099	Joins	1
+NPCDataTxt	1100	Joins	1
+NPCDataTxt	1101	Joins	1
+NPCDataTxt	1102	Joins	1
+NPCDataTxt	1103	Joins	1
+NPCDataTxt	1104	Joins	1
+NPCDataTxt	1105	Joins	1
+NPCDataTxt	1106	Joins	1
+NPCDataTxt	1107	Joins	1
+NPCDataTxt	1110	Joins	1
+NPCDataTxt	1111	Joins	1
+NPCDataTxt	1112	Joins	1
+NPCDataTxt	1113	Joins	1
+NPCDataTxt	1116	Joins	1
+NPCDataTxt	1117	Joins	1
+NPCDataTxt	1118	Joins	1
+NPCDataTxt	1119	Joins	1
+NPCDataTxt	1120	Joins	1
+NPCDataTxt	1121	Joins	1
+NPCDataTxt	1122	Joins	1
+NPCDataTxt	1123	Joins	1
+NPCDataTxt	1124	Joins	1
+NPCDataTxt	1125	Joins	1
+NPCDataTxt	1126	Joins	1
+NPCDataTxt	1127	Joins	1
+NPCDataTxt	1128	Joins	1
+NPCDataTxt	1129	Joins	1
+NPCDataTxt	1130	Joins	1
+NPCDataTxt	1131	Joins	1
+NPCDataTxt	1132	Joins	1
+NPCDataTxt	1133	Joins	1
+NPCDataTxt	1134	Joins	1
+NPCDataTxt	1135	Joins	1
+NPCDataTxt	1136	Joins	1
+NPCDataTxt	1137	Joins	1
+NPCDataTxt	1138	Joins	1
+NPCDataTxt	1139	Joins	1
+NPCDataTxt	1140	Joins	1
+NPCDataTxt	1141	Joins	1
+NPCDataTxt	1142	Joins	1
+NPCDataTxt	1143	Joins	1
+NPCDataTxt	1144	Joins	1
+NPCDataTxt	1145	Joins	1
+NPCDataTxt	1146	Joins	1
+NPCDataTxt	1147	Joins	1
+NPCDataTxt	1148	Joins	1
+NPCDataTxt	1149	Joins	1
+NPCDataTxt	1150	Joins	1
+NPCDataTxt	1151	Joins	1
+NPCDataTxt	1152	Joins	1
+NPCDataTxt	1158	Joins	1
+NPCDataTxt	1161	Joins	1
+NPCDataTxt	1162	Joins	1
+NPCDataTxt	1163	Joins	1
+NPCDataTxt	1164	Joins	1
+NPCDataTxt	1167	Joins	1
+NPCDataTxt	1168	Joins	1
+NPCDataTxt	1169	Joins	1
+NPCDataTxt	1170	Joins	1
+NPCDataTxt	1171	Joins	1
+NPCDataTxt	1172	Joins	1
+NPCDataTxt	1173	Joins	1
+NPCDataTxt	1174	Joins	1
+NPCDataTxt	1175	Joins	1
+NPCDataTxt	1176	Joins	1

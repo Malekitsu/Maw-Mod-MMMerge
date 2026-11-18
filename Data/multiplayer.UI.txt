@@ -1,0 +1,40 @@
+Command	X	Y	Width	Height	NewX	NewY	Click	Draw	Condition	Format	NewWidth	NewHeight	Canvas	NewCanvas	Comment
+SCREEN					ScreenW	ScreenH			MultiplayerOn > 0 and (s0 or s20) and Game.Loading < 2						READ REMOTE PLAYERS
+
+STAGE Read
+	120	40	300	320				+						RemPlayers
+
+
+
+SCREEN									MultiplayerOn > 0 and (s0 or s20) and Game.Loading < 2						RECOVER NPC
+recover													RemPlayers
+
+SCREEN					ScreenW	ScreenH			MultiplayerOn > 0 and (s0 or s20) and Game.Loading < 2						DRAW NPC
+STAGE DrawViewUI
+					0	B - 120							RemPlayers
+
+SCREEN					ScreenW	ScreenH			MultiplayerOn > 0 and (s0 or s20) and Game.Loading < 2						READ REMOTE PLAYERS
+
+STAGE Read
+	440	30	120	40				+						ToggleRemPl
+
+SCREEN									MultiplayerOn > 0 and (s0 or s20) and Game.Loading < 2						RECOVER NPC
+recover													ToggleRemPl
+
+SCREEN					ScreenW	ScreenH			MultiplayerOn > 0 and (s0 or s20) and Game.Loading < 2						DRAW NPC
+STAGE DrawViewUI
+					141	B + 6							ToggleRemPl
+
+SCREEN					ScreenW	ScreenH			MultiplayerOn > 0 and (s0 or s20) and Game.Loading < 2 and NPCPanelOpen = 0						READ REMOTE PLAYERS
+
+STAGE Read
+	440	74	200	220				+						Chat
+
+
+
+SCREEN									MultiplayerOn > 0 and (s0 or s20) and Game.Loading < 2 and NPCPanelOpen = 0						RECOVER NPC
+recover													Chat
+
+SCREEN					ScreenW	ScreenH			MultiplayerOn > 0 and (s0 or s20) and Game.Loading < 2 and NPCPanelOpen = 0						DRAW NPC
+STAGE DrawViewUI
+					R	140							Chat

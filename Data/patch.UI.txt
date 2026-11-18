@@ -1,0 +1,82 @@
+Command	X	Y	Width	Height	NewX	NewY	Click	Draw	Condition	Format	NewWidth	NewHeight	Canvas	NewCanvas	Comment
+SCREEN					ScreenW	ScreenH
+var mulMax	Game.Width/R
+
+SCREEN					ScreenW	ScreenH			HasAdv and s0						READ NPC
+STAGE Read
+if	640-26-90	480-139-30
+	640-26-90	480-139-30	26	26				+						NPCIcon
+if	640-120-90	480-379-30
+	640-120-90	480-379-30	91	292				+						NPCPanel
+if
+
+SCREEN															RECOVER NPC
+recover													NPCIcon
+recover													NPCPanel
+
+SCREEN					ScreenW	ScreenH			NeedAdv						DRAW NPC
+STAGE DrawViewUI
+					R	B-108							NPCIcon
+var d	5
+					R-d	B-108-26-d							NPCPanel
+
+
+
+SCREEN					ScreenW	ScreenH			HasAdv and Merge.UI>1						BUTTONS
+STAGE Read
+var x y	1	3
+var UA	"A"
+if down													BtnEsc	
+icon IB-M4d-%s										UA				BtnEsc
+if else								
+pcx IB-R-%s	602-468	450	33	26						UA				BtnEsc
+if down													BtnN	
+icon IB-M3d-%s										UA				BtnN
+if else								
+pcx IB-R-%s	560-468	450	34	26						UA				BtnN
+if down													BtnR	
+icon IB-M2d-%s										UA				BtnR
+if else								
+pcx IB-R-%s	518-468	450	34	26						UA				BtnR
+if down													BtnZ	
+icon IB-M1d-%s										UA				BtnZ
+if else								
+pcx IB-R-%s	476-468	450	34	26						UA				BtnZ
+if								
+
+action	107												BtnEsc		BUTTON ACTIONS
+action	205												BtnN
+action	104												BtnR
+action	106												BtnZ
+
+					R-4-x	B-y	+	+		UA			BtnEsc	Menu	DRAW BUTTONS
+					R-37-x	B-y	+	+		UA			BtnZ	Menu
+					39-x	B-y	+	+		UA			BtnN	Menu
+					5-x	B-y	+	+		UA			BtnR	Menu
+
+icon UI-MMap			133	7			-	+	Merge.UI=2					Minimap	MINIMAP
+
+erase canvas									Merge.UI>1				Gold		READ GOLD
+var sg sf	14	10							Merge.UI>1
+var w s	10	sg												
+icon UI-FrGol	R		144-w-s				+	+						Gold1
+	171+s	1	142-w-s	21	0	0	+	+						Gold1
+icon compcovr			18-w		124-s	3	-	erase						Gold1
+icon topbar	295	3	18-w	18	124-s	3	-	behind						Gold1
+
+erase canvas									Merge.UI>1				Food
+var s	sf
+icon UI-FrGol			149-w-s				+	+						Food1
+	80+s	1	99-s	21	2	0	+	+						Food1	Food
+icon topbar	419+w	1	48-w	21	R	0	-	erase						Food1	Erase Background
+icon topbar	179	1	48-w	21	R	0	-	behind						Food1	New Background
+
+SCREEN									Merge.UI>1						RECOVER GOLD
+recover													Gold1
+recover													Food1
+
+SCREEN					ScreenW	ScreenH			NeedAdv and Merge.UI>1						DRAW GOLD
+STAGE DrawViewUI
+													Gold1
+					R								Food1
+
