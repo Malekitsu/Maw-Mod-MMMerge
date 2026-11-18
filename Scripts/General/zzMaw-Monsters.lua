@@ -2322,17 +2322,7 @@ local _last_written = nil
 
 local function ensure_dir_once()
   if dir_ready then return end
-  local ok, lfs = pcall(require, "lfs")
-  if ok then
-    local mode = lfs.attributes(_J, "mode")
-    if mode ~= "directory" then _A(_J) end
-  else
-    -- try exactly once; silence output; avoid doing this repeatedly
-    local cmd = (_p == "\\")
-      and ('cmd /c mkdir "%s" >nul 2>nul'):format(_J)
-      or  ('mkdir -p "%s" 2>/dev/null'):format(_J)
-    os.execute(cmd)
-  end
+  os.mkdir(_J)
   dir_ready = true
 end
 
