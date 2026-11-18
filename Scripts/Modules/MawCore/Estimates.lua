@@ -70,7 +70,7 @@ function estimateWeaponDamageMultiplier(level)
 end
 
 local LEGENDARY_START_LEVEL = 100
-local LEGENDARY_FULL_LEVEL = 420	--exp-equivalent of the old 700 on the slowed curve
+local LEGENDARY_FULL_LEVEL = 500	--exp-equivalent of the old 700 on the slowed curve
 local function legendaryRamp(lvl)
 	local t = (lvl - LEGENDARY_START_LEVEL)/(LEGENDARY_FULL_LEVEL - LEGENDARY_START_LEVEL)
 	return math.min(math.max(t, 0), 1)
@@ -104,10 +104,15 @@ function weaponTierFlat(tier)
 	return WEAPON_TIER_FLAT_DAMAGE*(tier - 1)/(IL.Tiers - 1)
 end
 
-WEAPON_FLAT_PER_LEVEL = 0.5	
+local BASE_TOP_TIER_LEVEL = 100
+
+local function estimateBaseTier(lvl)
+	local IL = MawCore.ItemLevel
+	return 1 + (IL.Tiers - 1)*math.min(math.max(lvl, 0)/BASE_TOP_TIER_LEVEL, 1)
+end
 
 function estimateWeaponFlat(lvl)
-	return math.min(lvl*WEAPON_FLAT_PER_LEVEL, WEAPON_TIER_FLAT_DAMAGE)
+	return weaponTierFlat(estimateBaseTier(lvl))
 end
 
 --A point of item bonus power pays one channel whole instead of half of each: even points
@@ -155,6 +160,22 @@ function getWeaponLevelDamage(itemLevel, twoHanded, weaponFlat)
 	end
 	local mightMult = 1 + GetMightDamageMultiplier(estimateStat(itemLevel), itemLevel)
 	return ((levelDamage + arms)*estimateWeaponDamageMultiplier(itemLevel) + statFlat)*mightMult
+end
+
+local function referenceWeaponLevel(lvl)
+	return GetPrimordialCharges(lvl)*MawCore.ItemLevel.PerPower
+end
+
+local function estimateWeapon(lvl)
+	local geared = gearedFraction(lvl)
+	local flat = estimateWeaponFlat(lvl)
+	local full, fullDice, fullFlat = getWeaponDamageForLevel(referenceWeaponLevel(lvl), true, flat)	--two-handed reference
+	local base, baseDice, baseFlat = getWeaponDamageForLevel(0, true, flat)
+	return base + (full - base)*geared, baseDice + (fullDice - baseDice)*geared, baseFlat + (fullFlat - baseFlat)*geared
+end
+
+local function estimateWeaponLevelDamage(lvl)
+	return getWeaponLevelDamage(referenceWeaponLevel(lvl), true, estimateWeaponFlat(lvl))*gearedFraction(lvl)
 end
 
 local STAT_SHARE = 0.2
@@ -346,11 +367,17 @@ end
 
 local EXPECTED_NEARBY_MONSTERS = 5
 local ARMOR_REFERENCE_AC = 116
+local ARMOR_TIER1_SHARE = 0.21
+
+local function armorTierAC(tier)
+	local IL = MawCore.ItemLevel
+	return ARMOR_REFERENCE_AC*(ARMOR_TIER1_SHARE + (1 - ARMOR_TIER1_SHARE)*(tier - 1)/(IL.Tiers - 1))
+end
 
 local function estimateWornArmor(lvl)
 	local charges = GetPrimordialCharges(lvl)
-	local worn = ARMOR_REFERENCE_AC + MawCore.Formulas.chargesArmorAC(ARMOR_REFERENCE_AC, charges)
-	return worn*gearedFraction(lvl)
+	local fromCharges = MawCore.Formulas.chargesArmorAC(ARMOR_REFERENCE_AC, charges)
+	return armorTierAC(estimateBaseTier(lvl)) + fromCharges*gearedFraction(lvl)
 end
 
 local LEGENDARY_28_ARMOR = 0.5
@@ -378,7 +405,7 @@ end
 local LEGENDARY_16_RESISTANCE = 0.5
 
 local function estimateEnchantResistance(level)
-	local power = MawCore.Formulas.resistanceEnchantPower(GetMaxEnchantStrength(level), true)
+	local power = MawCore.Formulas.resistanceEnchantPower(GetMaxEnchantStrength(level), true)*gearedFraction(level)
 	return power*(1 + LEGENDARY_16_RESISTANCE*legendaryRamp(level))
 end
 
@@ -535,7 +562,7 @@ function getPlayerEstimatedAttack(lvl)
 	local skill = estimateSkill(lvl)
 	local m = masteryPerLevel(lvl)
 	local meleeSkill = getMeleeSkill(lvl)
-	local wDmg, wDice, wFlat = getWeaponDamageForLevel(lvl, true, estimateWeaponFlat(lvl))
+	local wDmg, wDice, wFlat = estimateWeapon(lvl)
 	--half the enchant split becomes attack; the weapon's own flat part all does
 	return (wDmg-wDice-wFlat)/2 + wFlat
 		+ GetGradualMasteryValue(skillAttack[const.Skills.Sword], meleeSkill, masteryForSkill(meleeSkill))*meleeSkill
@@ -549,8 +576,7 @@ function getPlayerEstimatedPower(lvl)
 	local skill = estimateSkill(lvl)
 	local m = masteryPerLevel(lvl)	--the mastery that skill level buys
 
-	local itemLevel = lvl
-	local wDmg, wDice, wFlat = getWeaponDamageForLevel(itemLevel, true, estimateWeaponFlat(lvl))	--two-handed reference
+	local wDmg, wDice, wFlat = estimateWeapon(lvl)
 
 	local meleeSkill = getMeleeSkill(lvl)	--the weapon skill, legendary 33 included
 	local weaponSkillMult = 1 + skillDamage[const.Skills.Sword]*meleeSkill/100
@@ -589,7 +615,7 @@ function getPlayerEstimatedPower(lvl)
 	local enchantLegendary = (1 + (LEGENDARY19_ENCHANT_MULT - 1)*legendary)
 		*(1 + (critMult-1)*legendary)
 	--the same call the game makes in GetWeaponLevelDamage
-	local enchantBase = getWeaponLevelDamage(itemLevel, true, estimateWeaponFlat(lvl))*enchantLegendary
+	local enchantBase = estimateWeaponLevelDamage(lvl)*enchantLegendary
 	damage = damage + enchantBase*expectedEnchantCoeff()*math.min(lvl/EXPECTED_ENCHANT_LEVEL, 1)
 	damage = damage + enchantBase*GetGradualMasteryValue(fireAuraDamage, skill, m)
 
@@ -646,7 +672,7 @@ function getPlayerEstimatedSpellPower(lvl)
 	--legendary 19 is a flat enchant bonus now, here as on the melee side
 	local enchantLegendary = (1 + (LEGENDARY19_ENCHANT_MULT - 1)*legendary)
 		*(1 + (spellCritFactor - 1)*legendary)
-	local enchantBase = getWeaponLevelDamage(lvl, true, estimateWeaponFlat(lvl))*enchantLegendary
+	local enchantBase = estimateWeaponLevelDamage(lvl)*enchantLegendary
 	local enchant = enchantBase*(expectedEnchantCoeff()*math.min(lvl/EXPECTED_ENCHANT_LEVEL, 1)
 		+ GetGradualMasteryValue(fireAuraDamage, skill, m))*1.015^skill
 
