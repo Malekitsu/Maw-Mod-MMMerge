@@ -248,11 +248,7 @@ function arenaSpawns()
 		end
 	end
 	
-	local tableId=currentWave%#monTbl
-	if tableId==0 then
-		tableId=#monTbl
-	end
-	local spawn=monTbl[tableId].Index-1
+	local spawn=arenaWaveMonster(currentWave)
 	
 	waveState=waveState or 1
 	

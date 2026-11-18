@@ -576,16 +576,16 @@ function recalculateMonsterTable()
 		
 		--arena
 		if Map.Name=="d42.blv" then
-			horizontalMultiplier=6
-			bolsterLevel=base.Level*horizontalMultiplier
-			flattener=(base.Level-LevelB)*horizontalMultiplier*0.8 --necessary to avoid making too much difference between monster tier
-			totalLevel[i]=math.max(base.Level*horizontalMultiplier-flattener+adjust*2, 5)
-			mon.Level=math.min(totalLevel[i],255)
-			if (vars.highestArenaWave+1)*3>#monTbl then
-				local diff=(vars.highestArenaWave+1)*3-#monTbl
-				local extraBoost=diff*3.5
-				totalLevel[i]=totalLevel[i]+extraBoost+600
+			local level=isArenaStarted and currentArenaLevel or (vars.highestArenaWave or 0)+1
+			local step=vars.madnessMode and 8 or 6
+			local levelB=step+level*step
+			for wave=2,3 do
+				if arenaWaveMonster(level*3-3+wave)==MawTierB(i) then
+					levelB=levelB+(wave-1)*2
+				end
 			end
+			totalLevel[i]=math.max(levelB+(base.Level-LevelB)*1.2, 5)
+			mon.Level=math.min(totalLevel[i],255)
 		end
 		
 		if mapvars.mawBounty then
