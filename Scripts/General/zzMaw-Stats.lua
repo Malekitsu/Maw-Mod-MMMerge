@@ -847,8 +847,8 @@ end
 function mawTick_PoolLabels()
 	if Game.CurrentCharScreen==100 and Game.CurrentScreen==7 then
 		i=Game.CurrentPlayer 
-		if i==-1 then return end --prevent bug message
-		if vars.MAWSETTINGS.buffRework=="ON" and vars.maxManaPool[i]>0 then
+		if i<0 or i>Party.High then return end --prevent bug message
+		if vars.MAWSETTINGS.buffRework=="ON" and vars.maxManaPool and (vars.maxManaPool[i] or 0)>0 then
 			local manaPool=round(vars.currentManaPool[i]/vars.maxManaPool[i]*1000)/10
 			Game.GlobalTxt[212]=StrColor(0,100,255,"Mana " .. manaPool .. "%")
 			if manaPool==100 then
@@ -856,7 +856,7 @@ function mawTick_PoolLabels()
 			end
 		end
 		
-		if vars.MAWSETTINGS.buffRework=="ON" and vars.maxHPPool[i]>0 then
+		if vars.MAWSETTINGS.buffRework=="ON" and vars.maxHPPool and (vars.maxHPPool[i] or 0)>0 then
 			local hpPool=round(vars.currentHPPool[i]/vars.maxHPPool[i]*1000)/10
 			Game.GlobalTxt[108]=StrColor(0,255, 0,"HP " .. hpPool .. "%")
 			if hpPool==100 then

@@ -4172,8 +4172,10 @@ function events.MonsterKilled(mon)
 	if monsterSkill=="Omnipotent" then
 		for i=1,#SkillList do
 			if not OmnipotentExcluded[SkillList[i]] then
-				pseudoSpawnpoint{monster = killedMonster.Id,  x = killedMonster.X, y = killedMonster.Y, z = killedMonster.Z, count = 1, powerChances = {0,0,100}, radius = 512, group = 2,transform = function(spawnedMon) spawnedMon.Hostile = true spawnedMon.ShowAsHostile = true spawnedMon.Velocity=350 bossId=spawnedMon:GetIndex() end}
-				generateBoss(bossId,false,SkillList[i])
+				local spawned=pseudoSpawnpoint{monster = killedMonster.Id,  x = killedMonster.X, y = killedMonster.Y, z = killedMonster.Z, count = 1, powerChances = {0,0,100}, radius = 512, group = 2,transform = function(spawnedMon) spawnedMon.Hostile = true spawnedMon.ShowAsHostile = true spawnedMon.Velocity=350 end}
+				if spawned[1] then
+					generateBoss(spawned[1]:GetIndex(),false,SkillList[i])
+				end
 			end
 		end
 	end
@@ -4190,8 +4192,10 @@ function events.MonsterKilled(mon)
 					return
 				end
 			end
-			pseudoSpawnpoint{monster = killedMonster.Id,  x = killedMonster.X, y = killedMonster.Y, z = killedMonster.Z, count = 1, powerChances = powerChance, radius = 256, group = 2,transform = function(spawnedMon) spawnedMon.Hostile = true spawnedMon.ShowAsHostile = true spawnedMon.Velocity=350 bossId=spawnedMon:GetIndex() end}
-			generateBoss(bossId,false,"Broodling")
+			local spawned=pseudoSpawnpoint{monster = killedMonster.Id,  x = killedMonster.X, y = killedMonster.Y, z = killedMonster.Z, count = 1, powerChances = powerChance, radius = 256, group = 2,transform = function(spawnedMon) spawnedMon.Hostile = true spawnedMon.ShowAsHostile = true spawnedMon.Velocity=350 end}
+			if spawned[1] then
+				generateBoss(spawned[1]:GetIndex(),false,"Broodling")
+			end
 		end
 	end
 	
