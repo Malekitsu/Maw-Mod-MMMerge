@@ -187,35 +187,34 @@ local function sortBags(slots, allBags)
 	local normal=groups(members)
 	local alchemy=alchemist and groups({alchemist}) or {}
 
-	local function place(list, from, it)
-		for g=from, #list do
-			for _, t in ipairs(list[g]) do
-				local pl=Party[t.slot]
-				if vars.mawbags[pl:GetIndex()].CurrentBag~=t.bag then
-					storeBag(pl)
-					loadBag(pl, t.bag)
-				end
-				if MawCore.Engine.putInBackpack(pl, it) then
-					return g, t
+	local placed, lastBag, dropped={}, {}, 0
+	local function fill(list, alchemyOnly)
+		for _, g in ipairs(list) do
+			for _, t in ipairs(g) do
+				local pl, failed=Party[t.slot], {}
+				for _, it in ipairs(items) do
+					if not placed[it] and not failed[it.Number] and (not alchemyOnly or isAlchemyItem(it.Number)) then
+						if vars.mawbags[pl:GetIndex()].CurrentBag~=t.bag then
+							storeBag(pl)
+							loadBag(pl, t.bag)
+						end
+						if MawCore.Engine.putInBackpack(pl, it) then
+							placed[it]=true
+							if not alchemyOnly then
+								lastBag[t.slot]=t.bag
+							end
+						else
+							failed[it.Number]=true
+						end
+					end
 				end
 			end
 		end
 	end
-	local normalFrom, alchemyFrom, lastBag, dropped=1, 1, {}, 0
+	fill(alchemy, true)
+	fill(normal, false)
 	for _, it in ipairs(items) do
-		local g, t
-		if #alchemy>0 and isAlchemyItem(it.Number) then
-			g, t=place(alchemy, alchemyFrom, it)
-			alchemyFrom=g or #alchemy
-		end
-		if not g then
-			g, t=place(normal, normalFrom, it)
-			normalFrom=g or #normal
-			if t then
-				lastBag[t.slot]=t.bag
-			end
-		end
-		if not g then
+		if not placed[it] then
 			dropped=dropped+1
 			dropItemAtParty(it)
 		end
