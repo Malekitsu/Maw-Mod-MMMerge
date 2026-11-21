@@ -1040,16 +1040,6 @@ function calcMawDamage(pl,damageKind,originalDamage,rand,monLvl,ratioOnly)
 	--AC for phys
 	local damage = originalDamage
 	
-	--shield skill
-	if pl:GetActiveItem(0) then
-		local it=pl:GetActiveItem(0)
-		if it and it:T().Skill==const.Skills.Shield then --shield skill
-			s,m=SplitSkill(pl.Skills[const.Skills.Shield])
-			if m>=4 then
-				damage=damage*0.85
-			end
-		end
-	end
 	--PHYSICAL DAMAGE CALCULATION
 	if damageKind==4 then 		
 		local AC=pl:GetArmorClass()
