@@ -1727,6 +1727,10 @@ local function pstage_damageRecompute(t)
 	
 	if t.Damage==0 and t.Result==0 then return end
 
+	if data.Object and data.Object.AttackType==4 then
+		t.Damage=t.Damage*0.4
+	end
+
 	if t.DamageKind==4 and restoringMistformTime
 			and restoringMistformTime[t.PlayerIndex] then
 		t.Damage=t.Damage*0.25
