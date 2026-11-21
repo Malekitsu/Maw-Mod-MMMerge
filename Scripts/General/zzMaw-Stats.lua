@@ -1295,11 +1295,16 @@ function calcPowerVitality(pl, statsMenu)
 	local id=pl:GetIndex()
 	for i=0,Party.High do
 		if Party[i]:GetIndex()==id then
-			if vars.manaShield and vars.manaShield[i] then
+			local s, m= SplitSkill(Skillz.get(pl, 51))
+			if s>0 and vars.manaShield and vars.manaShield[i] then
 				local sp=getMaxMana(pl)
-				local s, m= SplitSkill(Skillz.get(pl, 51))
 				local efficiency=round(manaShieldManaEfficiency(false, s)*100)/100
-				fullHP=fullHP+sp*efficiency
+				local absorb=manaShieldAbsorb[m]
+				local shield=sp*efficiency
+				if absorb<1 then
+					shield=math.min(shield, fullHP*absorb/(1-absorb))
+				end
+				fullHP=fullHP+shield
 			end
 		end
 	end

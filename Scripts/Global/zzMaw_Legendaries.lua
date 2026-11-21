@@ -58,6 +58,9 @@ end
 --[19]="Your weapon enchants now scales with the highest between might/int./pers.",
 --inside calcspelldamage in maw spells and all across the code for tooltips
 
+-- Define thresholds and damage multipliers based on skill level
+manaShieldAbsorb = {0.25, 0.5, 0.75, 1, [0]=0}
+
 function calcManaShield(pl, damage)
 	-- Get the player and their skill levels
 	local s, m = SplitSkill(Skillz.get(pl, 51))
@@ -76,11 +79,9 @@ function calcManaShield(pl, damage)
 		local totalHP = pl:GetFullHP()
 		local mana = pl.SP
 
-		-- Define thresholds and damage multipliers based on skill level
-		local reduction = {0.25, 0.5, 0.75, 1, [0]=0}
 		-- Calculate mana efficiency based on skill and mastery levels
 		local manaEfficiency = manaShieldManaEfficiency(false, s)
-		local absorbDamage=damage*reduction[m]
+		local absorbDamage=damage*manaShieldAbsorb[m]
 		local manaCost = round(absorbDamage/manaEfficiency)
 		absorbDamage = math.min(absorbDamage,(mana*manaEfficiency))
 		damage = round(damage - absorbDamage)
