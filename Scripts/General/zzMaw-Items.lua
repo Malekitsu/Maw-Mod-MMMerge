@@ -1834,6 +1834,7 @@ function checktext(MaxCharges,bonus2,it)
 	bonus2txt={
 		[1] =  " +" .. math.floor(bonusEffects[1].statModifier * mult) .. " to all Resistances.",
 		[2] = " +" .. math.floor(bonusEffects[2].statModifier * mult) .. " to all Seven Statistics.",
+		[3] = "Explosive Impact! (" .. string.format("%g", MawCore.Formulas.carnageDamageMult*GetDensityAoeMult()*100) .. "% damage per arrow)",
 		[4] = enchDmgText(4, "Cold"),
 		[5] = enchDmgText(5, "Cold"),
 		[6] = enchDmgText(6, "Cold"),
@@ -2154,6 +2155,7 @@ end
 
 --weaponenchants and ring enchants checker
 enchantList={
+	[3] = true ,
 	[4] = true ,
 	[5] = true ,
 	[6] = true ,

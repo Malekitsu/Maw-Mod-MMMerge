@@ -790,6 +790,11 @@ function GetDensityMean(difficulty)
 	return (s.Low + s.Hi)/2
 end
 
+function GetDensityAoeMult(difficulty)
+	local s = monsterDensity[difficulty or GetDifficulty()] or monsterDensity[3]
+	return s.AoeMult
+end
+
 function GetMonsterExpMult(difficulty)
 	return (GetDensityMean(3)/GetDensityMean(difficulty))^0.5
 end

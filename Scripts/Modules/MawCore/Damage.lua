@@ -514,7 +514,7 @@ local function stage_weaponRecompute(t)
     t.Result = t.Result * 0.5
   end
   if data.Object and data.Object.Spell == 133 and data.Object.Item and data.Object.Item.Bonus2 == 3 then
-    t.Result = t.Result * 0.25
+    t.Result = t.Result * MawCore.Formulas.carnageDamageMult
   end
 end
 
@@ -1161,8 +1161,7 @@ local function stage_aoeDensity(t)
 	if not (data and data.Player) then return end
 	local carnage = data.Object and data.Object.Spell == 133 and data.Object.Item and data.Object.Item.Bonus2 == 3
 	if carnage or table.find(aoespells, data.Spell) then
-		local density = monsterDensity[GetDifficulty()] or monsterDensity[3]
-		t.Result = t.Result*density.AoeMult
+		t.Result = t.Result*GetDensityAoeMult()
 	end
 end
 
