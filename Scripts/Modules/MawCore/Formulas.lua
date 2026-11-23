@@ -39,7 +39,7 @@ function Formulas.reductionPercent(power, decimals)
 end
 
 
-Formulas.damageFloor = 0.1
+Formulas.damageFloor = 0.01
 
 Formulas.soloCoverDamageTaken = 0.5
 
