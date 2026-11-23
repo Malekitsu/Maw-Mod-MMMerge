@@ -307,8 +307,9 @@ function events.BeforeGotGold(t)
 		return
 	end
 	vars.normalArenaGold=vars.normalArenaGold or 0
-	t.Amount=math.max(math.min(t.Amount, NORMAL_ARENA_GOLD_CAP-vars.normalArenaGold), 0)
+	t.Amount=math.floor(math.max(math.min(t.Amount, NORMAL_ARENA_GOLD_CAP-vars.normalArenaGold), 0))
 	vars.normalArenaGold=vars.normalArenaGold+t.Amount
+	Game.HouseCost=t.Amount
 end
 
 function endArena(level)
