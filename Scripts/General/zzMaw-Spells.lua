@@ -113,6 +113,28 @@ local function skipRemoteCast(t)
 	end
 end
 
+local DIVINE_INTERVENTION_COOLDOWN=const.Day
+
+function events.PlayerCastSpell(t)
+	if t.SpellId~=const.Spells.DivineIntervention or not evt.IsPlayerInParty(t.PlayerIndex) then
+		return
+	end
+	vars.divineInterventionTime=vars.divineInterventionTime or {}
+	local last=vars.divineInterventionTime[t.PlayerIndex]
+	local pl=t.Player
+	if last and Game.Time<last+DIVINE_INTERVENTION_COOLDOWN then
+		pl.DevineInterventionCasts=3
+		return
+	end
+	pl.DevineInterventionCasts=0
+	local index, castTime=t.PlayerIndex, Game.Time
+	RunNextTick(function()
+		if pl.DevineInterventionCasts>0 then
+			vars.divineInterventionTime[index]=castTime
+		end
+	end)
+end
+
 --modify Spells
 function events.PlayerCastSpell(t)
 	--refresh everyone before and after casting
