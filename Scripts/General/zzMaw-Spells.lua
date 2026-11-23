@@ -2137,7 +2137,7 @@ spellbonusdamage[14] = {["low"]=24, ["high"]=24}
 spellbonusdamage[15] = {["low"]=48, ["high"]=48}
 spellbonusdamage[39] = {["low"]=40, ["high"]=80}
 
-aoespells = {6, 7, 8, 9, 10, 15, 22, 24, 32, 41, 43, 84, 93, 97, 98, 99, 123}
+aoespells = {6, 7, 8, 9, 10, 15, 22, 24, 32, 41, 43, 84, 93, 97, 98, 99, 123, 201}
 
 --function for tooltips
 function dmgAddTooltip(skill, mastery, spell)

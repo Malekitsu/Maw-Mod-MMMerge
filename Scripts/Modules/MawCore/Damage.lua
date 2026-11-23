@@ -1156,6 +1156,16 @@ local function stage_damageTaken(t)
 	end
 end
 
+local function stage_aoeDensity(t)
+	local data = t.Hit
+	if not (data and data.Player) then return end
+	local carnage = data.Object and data.Object.Spell == 133 and data.Object.Item and data.Object.Item.Bonus2 == 3
+	if carnage or table.find(aoespells, data.Spell) then
+		local density = monsterDensity[GetDifficulty()] or monsterDensity[3]
+		t.Result = t.Result*density.AoeMult
+	end
+end
+
 -- from Scripts/Global/zzMaw_Mapping.lua:16 -- map affix damage mults/miss/reflect
 local function stage_mapAffixes(t)
 	if t.Player and t.DamageKind==4 then
@@ -1512,6 +1522,7 @@ local pipe = MawCore.Pipeline.new("DamageToMonster", {
 	"legendaries",				-- [additive/mult] post-res on purpose
 	"artifact-on-hit",			-- [additive] next to the aura it is priced like
 	"damage-taken",				-- [mult] legendary 29 on the whole hit
+	"aoe-density",
 	"map-affixes",				-- [mult/gates]
 	"friendly-fire-zero",	-- [gates] ahead of leech: zeroed hits must not heal
 	"leech",					-- [reactions]
@@ -1549,6 +1560,7 @@ pipe:on("survival-gate",     "zzMaw-Survival:316",   stage_survivalGate)
 pipe:on("legendaries",       "zzMaw_Legendaries:22", stage_legendaries)
 pipe:on("artifact-on-hit",   "zzzMaw_Artifacts",     function(t) MawArtifactOnHit(t) end)
 pipe:on("damage-taken",      "MawCore",              stage_damageTaken)
+pipe:on("aoe-density",       "MawCore",              stage_aoeDensity)
 pipe:on("map-affixes",       "zzMaw_Mapping:16",     stage_mapAffixes)
 pipe:on("remote-owner-zero", "zzMAWStatusMsg:2",     stage_remoteOwnerZero)
 pipe:on("friendly-fire-zero","zzMAWStatusMsg:151a",  stage_friendlyFireZero)

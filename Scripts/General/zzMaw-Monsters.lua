@@ -769,15 +769,15 @@ end
 
 REFERENCE_SPAWN_HI = 3
 monsterDensity = {
-	[1] = {Low=1, Hi=3},	--bolster 40
-	[2] = {Low=1, Hi=3},	--bolster 70
-	[3] = {Low=1, Hi=3},	--bolster 100, baseline
-	[4] = {Low=1, Hi=4},	--bolster 150
-	[5] = {Low=1, Hi=4},	--bolster 200
-	[6] = {Low=2, Hi=4},	--bolster 300
-	[7] = {Low=2, Hi=5},	--doom
-	[8] = {Low=3, Hi=5},	--road to insanity
-	[9] = {Low=3, Hi=6},	--beyond madness
+	[1] = {Low=1, Hi=3, AoeMult=1},	--bolster 40
+	[2] = {Low=1, Hi=3, AoeMult=1},	--bolster 70
+	[3] = {Low=1, Hi=3, AoeMult=1},	--bolster 100, baseline
+	[4] = {Low=1, Hi=4, AoeMult=0.9},	--bolster 150
+	[5] = {Low=1, Hi=4, AoeMult=0.9},	--bolster 200
+	[6] = {Low=2, Hi=4, AoeMult=0.8},	--bolster 300
+	[7] = {Low=2, Hi=5, AoeMult=0.7},	--doom
+	[8] = {Low=3, Hi=5, AoeMult=0.65},	--road to insanity
+	[9] = {Low=3, Hi=6, AoeMult=0.6},	--beyond madness
 }
 
 function GetDensitySpread(difficulty)
