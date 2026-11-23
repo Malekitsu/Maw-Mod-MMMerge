@@ -112,6 +112,7 @@ function Artifacts.BonusesOf(it)
 		local statUnit = Artifacts.StatUnit(level, it.Number)
 		local skillUnit = Artifacts.SkillUnit(level, it.Number)
 		local isRing = GetItemEquipStat(it) == 10
+		local qualityMult = ItemQualityMult(it)
 		--string keys are the named fields (Skills, Flat, baseStatMultiplier)
 		for key, coeff in pairs(power) do
 			if type(key) == "number" then
@@ -120,6 +121,9 @@ function Artifacts.BonusesOf(it)
 					value = MawCore.Formulas.resistanceEnchantPower(value, isRing)
 				elseif isVitalityStat(key) then
 					value = MawCore.Formulas.vitalityEnchantPower(value, slotMult)
+				end
+				if value > 0 then
+					value = value*qualityMult
 				end
 				stats[key] = round(value)
 			end
