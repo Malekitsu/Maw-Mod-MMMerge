@@ -724,7 +724,7 @@ cubeQualityStep={
 	[const.Rarity.Legendary]=4,
 	[const.Rarity.Celestial]=1,
 }
-CUBE_QUALITY_STEP_ARTIFACT=2
+CUBE_QUALITY_STEP_ARTIFACT=1
 
 function CanTakeCube(it)
 	local txt=it:T()
