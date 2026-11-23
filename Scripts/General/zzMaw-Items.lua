@@ -2623,7 +2623,8 @@ function events.GameInitialized2()
 
         if (txt[i].Skill >= 8 and txt[i].Skill <= 11) or txt[i].Skill == 40 then
             -- Armors
-            referenceAC[i] = txt[i + lookup].Mod2 + txt[i + lookup].Mod1DiceCount
+            local ref = IsArtifactId(i) and i or i + lookup
+            referenceAC[i] = txt[ref].Mod2 + txt[ref].Mod1DiceCount
         elseif txt[i].Skill <= 7 or txt[i].Skill==39 then
             -- Weapons
             referenceWeaponAttack[i] = txt[i + lookup].Mod2
