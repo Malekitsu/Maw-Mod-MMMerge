@@ -2598,11 +2598,11 @@ end
 -- GameInitialized2 above
 
 function GetArmsmasterSupremeRequirement()
-	local requirement=30
+	local requirement=20
 	if vars.madnessMode then
-		requirement=70
-	elseif vars.insanityMode then
 		requirement=50
+	elseif vars.insanityMode then
+		requirement=32
 	end
 	return requirement
 end

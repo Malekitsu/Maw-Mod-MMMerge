@@ -1477,7 +1477,7 @@ function events.DoBadThingToPlayer(t)
 end
 function events.GameInitialized2()
 --new tooltips
-	Game.SpcItemsTxt[2].BonusStat="Explosive Impact! (half damage)"
+	Game.SpcItemsTxt[2].BonusStat="Explosive Impact!"
 	Game.SpcItemsTxt[17].BonusStat="Disease and Curse Immunity"
 	Game.SpcItemsTxt[18].BonusStat="Insanity and SP drain Immunity"
 	Game.SpcItemsTxt[19].BonusStat="Paralysis and fear Immunity"
@@ -1507,7 +1507,7 @@ function events.LoadMap(wasInGame)
 end
 --carnage fix tooltip
 function events.GameInitialized2()
-	Game.SpcItemsTxt[2].BonusStat="Explosive Impact! (half damage)"
+	Game.SpcItemsTxt[2].BonusStat="Explosive Impact!"
 end
 
 
