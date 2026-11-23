@@ -2800,16 +2800,8 @@ local function collectArtifactBonuses(pl, index, it, tab)
 	if not bonuses then
 		return
 	end
-	local power=MawCore.Artifacts.PowerOf(it.Number)
-	local flat=power and power.Flat or {}
-	local res=vars.normalEnchantResistance[index]
 	for key,value in pairs(bonuses.Stats) do
-		local enchantPart=0
-		if MawCore.Artifacts.IsResistanceStat(key) then
-			enchantPart=math.max(value-(flat[key] or 0), 0)
-			res[key+1]=math.max(res[key+1] or 0, enchantPart)
-		end
-		tab[key+1]=tab[key+1]+value-enchantPart
+		tab[key+1]=tab[key+1]+value
 	end
 	for key,value in pairs(bonuses.Skills) do
 		tab[key+50]=(tab[key+50] or 0)+value
@@ -2999,6 +2991,7 @@ local function addArmorSkillAC(pl, tab)
 	if shieldAC>=1 and vars.AusterityMode then
 		itemResistanceBonus2=math.max(itemResistanceBonus2,math.round(s*m)*2)
 	end
+	armorEnchantResistanceMult=armorResMult
 	for i=11,16 do
 		tab[i]=tab[i]*(1+armorResMult)+itemResistanceBonus1+itemResistanceBonus2
 	end
