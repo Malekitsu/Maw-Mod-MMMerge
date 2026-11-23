@@ -117,6 +117,9 @@ Engine.Addr = {
 	MonsterInfoFont     = 0x5DB938,	-- font pointer of the line; byte +5 = line height
 	DrawTextCentered    = 0x44AAE3,	-- fastcall(dlg, font, x, y, color, text, 3): the merge draws the box title with it
 	DetectLifeLabel     = 650,	-- GlobalTxt index, pointer at 0x601E70
+
+	MonsterStunApply    = 0x40337E,
+	MonsterStunSkip     = 0x4033EA,
 }
 
 -- Ledger of every binary patch MawCore applies. Nothing in the core may
@@ -381,6 +384,25 @@ function Engine.drawDetectLifeLine(dlg, value)
 	local font = mem.u4[A.MonsterInfoFont]
 	local text = Game.GlobalTxt[A.DetectLifeLabel] .. ": " .. value
 	mem.call(A.DrawTextCentered, 2, dlg["?ptr"], font, 0, dlg.Height - mem.u1[font + 5] - 12, 0, text, 3)
+end
+
+function Engine.setMonsterStunFilter(allow)
+	local A = Engine.Addr
+	Engine.patch("MonsterStunFilter", "monster hitstun: Maw decides whether a hit stuns", function()
+		if mem.string(A.MonsterStunApply, 5, true) ~= "\139\85\252\139\207" then
+			print("MonsterStunFilter: unexpected code at the stun site, engine hitstun kept")
+			return
+		end
+		mem.autohook(A.MonsterStunApply, function(d)
+			local ok, allowed = pcall(allow, d.edi)
+			if not ok then
+				print("monster stun filter: " .. tostring(allowed))
+			elseif not allowed then
+				d:push(A.MonsterStunSkip)
+				return true
+			end
+		end, 5)
+	end)
 end
 
 local clientRect, cursorPoint
