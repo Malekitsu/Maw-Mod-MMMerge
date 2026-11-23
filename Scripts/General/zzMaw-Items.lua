@@ -3000,7 +3000,7 @@ local function addArmorSkillAC(pl, tab)
 		itemResistanceBonus2=math.max(itemResistanceBonus2,math.round(s*m)*2)
 	end
 	for i=11,16 do
-		tab[i]=tab[i]+itemResistanceBonus1+itemResistanceBonus2
+		tab[i]=tab[i]*(1+armorResMult)+itemResistanceBonus1+itemResistanceBonus2
 	end
 end
 
@@ -3544,32 +3544,32 @@ artifactPower[514] = {	[const.Stats.Might] 		= 0.23,
 						[const.Stats.Accuracy]		= 0.23,
 						[const.Stats.Endurance] 	= 0.23,
 						[const.Stats.Luck]			= 0.23,
-						[const.Stats.FireResistance]	= 0.23,
-						[const.Stats.AirResistance]		= 0.23,
-						[const.Stats.WaterResistance]	= 0.23,
-						[const.Stats.EarthResistance]	= 0.23,
-						[const.Stats.MindResistance]	= 0.23,
-						[const.Stats.BodyResistance]	= 0.23}
+						[const.Stats.FireResistance]	= 0.46,
+						[const.Stats.AirResistance]		= 0.46,
+						[const.Stats.WaterResistance]	= 0.46,
+						[const.Stats.EarthResistance]	= 0.46,
+						[const.Stats.MindResistance]	= 0.46,
+						[const.Stats.BodyResistance]	= 0.46}
 artifactPower[515] = {	[const.Stats.Speed] = 1.5,
 						[const.Stats.Accuracy] = 1.5}
 artifactPower[517] = {	Skills = {	[const.Skills.DisarmTraps] = 1,
 									[const.Skills.Bow] = 1,
 									[const.Skills.Armsmaster] = 1}}
 artifactPower[518] = {	[const.Stats.Speed] = 3}
-artifactPower[519] = {	[const.Stats.FireResistance]	= 0.75,
-						[const.Stats.AirResistance]		= 0.75,
-						[const.Stats.WaterResistance]	= 0.75,
-						[const.Stats.EarthResistance]	= 0.75}
+artifactPower[519] = {	[const.Stats.FireResistance]	= 1.5,
+						[const.Stats.AirResistance]		= 1.5,
+						[const.Stats.WaterResistance]	= 1.5,
+						[const.Stats.EarthResistance]	= 1.5}
 artifactPower[520] = {	[const.Stats.Personality] = 1.5,
 						[const.Stats.Intellect] = 1.5}
 artifactPower[521] = {	[const.Stats.Intellect] = 3}
 artifactPower[522] = {	[const.Stats.Intellect] = 1.2,
-						[const.Stats.FireResistance]	= 0.3,
-						[const.Stats.AirResistance]		= 0.3,
-						[const.Stats.WaterResistance]	= 0.3,
-						[const.Stats.EarthResistance]	= 0.3,
-						[const.Stats.MindResistance]	= 0.3,
-						[const.Stats.BodyResistance]	= 0.3}
+						[const.Stats.FireResistance]	= 0.6,
+						[const.Stats.AirResistance]		= 0.6,
+						[const.Stats.WaterResistance]	= 0.6,
+						[const.Stats.EarthResistance]	= 0.6,
+						[const.Stats.MindResistance]	= 0.6,
+						[const.Stats.BodyResistance]	= 0.6}
 artifactPower[523] = {	[const.Stats.Speed] = 3,
 						[const.Stats.WaterResistance] = -1.5,
 						[const.Stats.Personality] = -0.45}
@@ -3726,12 +3726,12 @@ artifactPower[1336] = {	[const.Stats.Might] = 0.75,
 artifactPower[1337] = {	[const.Stats.Might] = 1.13,
 						Skills = {	[const.Skills.Armsmaster] = 1.88}}
 -- Lady's Escort ring
-artifactPower[1338] = {	[const.Stats.FireResistance]	= 0.5,
-						[const.Stats.AirResistance]		= 0.5,
-						[const.Stats.WaterResistance]	= 0.5,
-						[const.Stats.EarthResistance]	= 0.5,
-						[const.Stats.MindResistance]	= 0.5,
-						[const.Stats.BodyResistance]	= 0.5}
+artifactPower[1338] = {	[const.Stats.FireResistance]	= 1,
+						[const.Stats.AirResistance]		= 1,
+						[const.Stats.WaterResistance]	= 1,
+						[const.Stats.EarthResistance]	= 1,
+						[const.Stats.MindResistance]	= 1,
+						[const.Stats.BodyResistance]	= 1}
 -- Thor
 artifactPower[2021] = {	[const.Stats.Might] = 3}
 -- Conan
@@ -3795,12 +3795,12 @@ artifactPower[2040] = {	[const.Stats.FireResistance] = -0.6,
 						[const.Stats.WaterResistance] = -0.6,
 						[const.Stats.EarthResistance] = -0.6}
 -- Apollo
-artifactPower[2041] = {	[const.Stats.FireResistance] = 0.46,
-						[const.Stats.AirResistance] = 0.46,
-						[const.Stats.WaterResistance] = 0.46,
-						[const.Stats.EarthResistance] = 0.46,
-						[const.Stats.MindResistance] = 0.46,
-						[const.Stats.BodyResistance] = 0.46,
+artifactPower[2041] = {	[const.Stats.FireResistance] = 0.92,
+						[const.Stats.AirResistance] = 0.92,
+						[const.Stats.WaterResistance] = 0.92,
+						[const.Stats.EarthResistance] = 0.92,
+						[const.Stats.MindResistance] = 0.92,
+						[const.Stats.BodyResistance] = 0.92,
 						[const.Stats.Luck] = 0.23,
 						[const.Stats.Endurance] = -0.35}
 -- Zeus
@@ -3812,10 +3812,10 @@ artifactPower[2042] = {	[const.Stats.Endurance] = 1,
 artifactPower[2043] = {	[const.Stats.Luck] = 3,
 						[const.Stats.Speed] = -0.6}
 -- Odin
-artifactPower[2044] = {	[const.Stats.FireResistance] = 0.75,
-						[const.Stats.AirResistance] = 0.75,
-						[const.Stats.WaterResistance] = 0.75,
-						[const.Stats.EarthResistance] = 0.75,
+artifactPower[2044] = {	[const.Stats.FireResistance] = 1.5,
+						[const.Stats.AirResistance] = 1.5,
+						[const.Stats.WaterResistance] = 1.5,
+						[const.Stats.EarthResistance] = 1.5,
 						[const.Stats.Speed] = -0.5}
 -- Atlas
 artifactPower[2045] = {	[const.Stats.Might] = 3,

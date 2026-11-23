@@ -253,9 +253,9 @@ end, "spear GM damage taken stacks")
 
 local armorBase = {
 	[8] = "Shield skill provides great defense against both physical and magical attacks.\n\nShield Skill boosts the AC and Resistances gained from your Shield  by a percent amount.",
-	[9] = "Leather armor is the lightest armor a character can wear.  While leather provides less protection than chain or plate armor, it also slows your character down the least.\n\nLeather Armor Skill boosts the AC and Resistances gained by ALL armors when equipping a Leather Armor by a percent amount.",
-	[10] = "Chain armor is the medium armor type.  It provides more protection than leather and less than plate, but it also slows your character down more than leather.\n\nChain Armor Skill boosts the AC and Resistances gained by ALL armors when equipping a Chain Armor by a percent amount.",
-	[11] = "Plate armor is the heaviest armor type.  It provides the most protection, but it slows your character down more than leather or chain.\n\nPlate Armor Skill boosts the AC and Resistances gained by ALL armors when equipping a Plate Armor by a percent amount.",
+	[9] = "Leather armor is the lightest armor a character can wear.  While leather provides less protection than chain or plate armor, it also slows your character down the least.\n\nLeather Armor Skill boosts the AC and Resistances gained by ALL armors when equipping a Leather Armor by a percent amount. The Res percent also applies to flat Resistance enchantments on items and artifacts.",
+	[10] = "Chain armor is the medium armor type.  It provides more protection than leather and less than plate, but it also slows your character down more than leather.\n\nChain Armor Skill boosts the AC and Resistances gained by ALL armors when equipping a Chain Armor by a percent amount. The Res percent also applies to flat Resistance enchantments on items and artifacts.",
+	[11] = "Plate armor is the heaviest armor type.  It provides the most protection, but it slows your character down more than leather or chain.\n\nPlate Armor Skill boosts the AC and Resistances gained by ALL armors when equipping a Plate Armor by a percent amount. The Res percent also applies to flat Resistance enchantments on items and artifacts.",
 }
 
 local function armorPart1(pl, id)
@@ -266,6 +266,7 @@ local function armorPart1(pl, id)
 		txt = txt .. "\n\nCurrent AC from items: " .. StrColor(255, 255, 100, armorAC) .. "\n"
 		txt = txt .. "Bonus AC: " .. StrColor(255, 255, 100, itemArmorClassBonus1) .. "\n"
 		txt = txt .. "Bonus Resistances: " .. StrColor(255, 255, 100, itemResistanceBonus1) .. "\n"
+		txt = txt .. "Bonus Enchant Resistances: " .. StrColor(255, 255, 100, "+" .. round(armorEnchantResistanceMult*100) .. "%") .. "\n"
 	end
 	local it = pl:GetActiveItem(0)
 	if it and id == 8 and it:T().Skill == 8 then
