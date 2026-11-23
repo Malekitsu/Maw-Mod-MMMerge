@@ -4366,17 +4366,18 @@ local function nudgeMonsterAroundCorner(mon)
 	Multiplayer.SyncMonsters.set_mon_action(mon, const.AIState.Pursue)
 
 	local calls=10
+	local index=mon:GetIndex()
+	local mapIndex=Map.MapStatsIndex
 	function events.Tick()
 		calls=calls-1
 		if calls<=0 then
 			events.Remove("Tick",1)
 		end
-		--GetIndex returns nil, not a number, once the monster is out of the
-		--array -- comparing that against High is what used to throw here
-		if not mon:GetIndex() then
+		if not index or Map.MapStatsIndex~=mapIndex or index>=Map.Monsters.Count then
 			events.Remove("Tick",1)
 			return
 		end
+		local mon=Map.Monsters[index]
 		local midX=(mon.X+Party.X)/2
 		local midY=(mon.Y+Party.Y)/2
 		local midZ=(mon.Z+Party.Z)/2
