@@ -305,6 +305,7 @@ Scripts/Modules/MawCore/Formulas.lua
 Scripts/Modules/MawCore/ItemFields.lua
 Scripts/Modules/MawCore/ItemLevel.lua
 Scripts/Modules/MawCore/MonsterAttackSpeed.lua
+Scripts/Modules/MawCore/MonsterHitstun.lua
 Scripts/Modules/MawCore/MonsterHP.lua
 Scripts/Modules/MawCore/Pipeline.lua
 Scripts/Modules/MawCore/README.md
