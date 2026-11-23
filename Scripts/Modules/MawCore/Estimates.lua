@@ -705,7 +705,7 @@ end
 
 function getMonsterHealth(mon, level)
 	local hitToKillMonster={1,1.5,2,2.5,3,3.5,4,4.5,5}
-	local hitToKillMonsterAusterity={1,2,4,5,6,7,8,9,9.5}
+	local hitToKillMonsterAusterity={2,4,6,8,8,8,8.5,9,9.5}
 	if mon then
 		level=totalLevel[MawTierB(mon.Id)] or level
 	end
