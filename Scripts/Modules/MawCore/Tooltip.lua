@@ -699,7 +699,7 @@ local function tooltipLevelRequirement(t)
 				txt=StrColor(255,0,0,txt)
 			end
 			if IsCelestialItem(t.Item) then
-				txt=StrColor(120, 240, 255,"\n\nCelestial Items cannot be upgraded with crafting Gems or Cubes, but scale with player level, up to level 500.")
+				txt=StrColor(120, 240, 255,"\n\nCelestial Items cannot be upgraded with Gems or the Crafting Cube, but scale with player level, up to level 500.")
 			end
 			t.Description = t.Description .. txt
 			

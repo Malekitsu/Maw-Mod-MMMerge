@@ -43,7 +43,7 @@ Formulas.damageFloor = 0.01
 
 Formulas.soloCoverDamageTaken = 0.5
 
-Formulas.carnageDamageMult = 0.25
+Formulas.carnageDamageMult = 0.4
 
 -- Retaliation damage per stack, before the monster's resistance: melee power
 -- and vitality (calcPowerVitality) each shrunk by the exponent, times skill.
