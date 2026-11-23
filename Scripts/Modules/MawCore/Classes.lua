@@ -676,9 +676,12 @@ function Classes.of(pl)
 	end
 end
 
+Classes.presentSeq = 0
+
 -- Reset every class presentation, then apply the one this character needs.
 -- The legacy contract, kept: reset all -> adjustSpellTooltips -> apply one.
 function Classes.present(id)
+	Classes.presentSeq = Classes.presentSeq + 1
 	for _, c in ipairs(Classes.List) do
 		if c.present then
 			c.present(false, id)

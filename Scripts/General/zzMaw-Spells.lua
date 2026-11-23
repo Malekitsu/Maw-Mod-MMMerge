@@ -2159,10 +2159,21 @@ function events.GameInitialized2()
 	end
 end
 --adjust mana cost and tooltips	
+local lastAscension={}
+local ascensionQueued=false
+local function queuedAscension()
+	ascensionQueued=false
+	if lastAscension.index==Game.CurrentPlayer and lastAscension.frame==MawCore.Scheduler.frame
+			and lastAscension.seq==MawCore.Classes.presentSeq then
+		return
+	end
+	ascension()
+end
 function events.Action(t)
-	RunNextTick(function()
-		ascension()
-	end)
+	if not ascensionQueued then
+		ascensionQueued=true
+		RunNextTick(queuedAscension)
+	end
 --[[	if t.Action==25 then
 		ascension()
 		local id=Game.CurrentPlayer
@@ -2203,8 +2214,8 @@ function mawTick_Ascension()
 		end
 	end
 	if playerToAscend~=lastCheck then
-		ascension(playerToAscend)
 		checkSkills(playerToAscend)
+		ascension(playerToAscend)
 		lastCheck=playerToAscend
 	end
 end
@@ -2593,6 +2604,7 @@ function ascension(customIndex)
 		Game.CurrentPlayer=0
 	end
 	if index>=0 and index<=Party.High then
+		lastAscension.index, lastAscension.frame, lastAscension.seq=index, MawCore.Scheduler.frame, MawCore.Classes.presentSeq
 		local pl=Party[index]
 		
 		--necessary to make dk/assassin tooltips work

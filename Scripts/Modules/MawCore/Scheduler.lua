@@ -8,6 +8,7 @@ local Scheduler = {}
 MawCore.Scheduler = Scheduler
 
 local tasks = {}	-- array; execution order = registration order
+Scheduler.frame = 0
 
 -- Scheduler.every("buffDecay", 500, fn)	-- at most once per 500ms of real time
 -- Scheduler.every("crosshair", 0, fn)		-- every frame; use sparingly
@@ -59,6 +60,7 @@ end
 
 function Scheduler.start()
 	function events.Tick()
+		Scheduler.frame = Scheduler.frame + 1
 		local now = timeGetTime()	-- Core/timers.lua global, wrap-corrected ms
 		-- run over a snapshot so a task adding/removing tasks cannot derail
 		-- the iteration mid-frame

@@ -221,14 +221,30 @@ end
 
 -- from Scripts/General/zzMaw-Monsters.lua:4475 -- Mode 2 indoor: reveal
 -- monsters within 256 of the target
-local function stage_revealNearby(t)
-	if Map.IsIndoor() and vars.Mode==2 then
-		for i=0, Map.Monsters.High do
-			local mon = Map.Monsters[i]
-			if getDistances(t.Monster, mon)<256 then
-				mon.ShowOnMap = true
+local revealTargets
+local function revealAroundTargets()
+	local targets=revealTargets
+	revealTargets=nil
+	for i=0, Map.Monsters.High do
+		local mon=Map.Monsters[i]
+		local x, y, z=mon.X, mon.Y, mon.Z
+		for _, p in ipairs(targets) do
+			if (p[1]-x)^2+(p[2]-y)^2+(p[3]-z)^2<65536 then
+				mon.ShowOnMap=true
+				break
 			end
 		end
+	end
+end
+
+local function stage_revealNearby(t)
+	if Map.IsIndoor() and vars.Mode==2 then
+		if not revealTargets then
+			revealTargets={}
+			RunNextTick(revealAroundTargets)
+		end
+		local m=t.Monster
+		revealTargets[#revealTargets+1]={m.X, m.Y, m.Z}
 	end
 end
 
@@ -1358,10 +1374,6 @@ local function stage_trackAndClamp(t)
 	
 	
 	if data and data.Player then
-		local slot=slotByIndex(t.PlayerIndex)
-		if slot then
-			checkSkills(slot) --to use the correct spell name
-		end
 		MSGdamage=MSGdamage or 0
 		MSGdamage=MSGdamage+math.ceil(damage)
 		local msgTxt=MSGdamage
@@ -1373,6 +1385,10 @@ local function stage_trackAndClamp(t)
 		local name, monName, msg
 		if data.Object then 
 			if data.Object.SpellType>1 and data.Object.SpellType<133 then
+				local slot=slotByIndex(t.PlayerIndex)
+				if slot then
+					checkSkills(slot)
+				end
 				name=Game.SpellsTxt[data.Object.SpellType].Name
 				attackIsSpell=true
 			else
@@ -1560,10 +1576,24 @@ end
 local aoespellsMultiplayer={6,9,22,41,97}
 
 -- from zzMaw-Items:3595 -- per-hit itemStats refresh (hits break equipment)
+local refreshPending
+local function refreshHitPlayers()
+	local pending=refreshPending
+	refreshPending=nil
+	for index in pairs(pending) do
+		mawRefresh(index)
+	end
+end
+
 local function pstage_itemRefresh(t)
-	RunNextTick(function()
-		mawRefresh(t.PlayerIndex)
-	end)
+	if not t.PlayerIndex then
+		return
+	end
+	if not refreshPending then
+		refreshPending={}
+		RunNextTick(refreshHitPlayers)
+	end
+	refreshPending[t.PlayerIndex]=true
 end
 
 -- from zzMaw-Monsters:2552 -- madness death-seed mark
