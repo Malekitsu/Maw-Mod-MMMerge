@@ -313,8 +313,3 @@ end
 function Formulas.chargesArmorAC(referenceAC, charges)
 	return referenceAC * (charges/40)
 end
-
--- Weapon attack / dice-sides growth from the reference stat.
-function Formulas.chargesWeaponBonus(reference, charges)
-	return reference * (charges/30)
-end

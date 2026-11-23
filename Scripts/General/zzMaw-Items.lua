@@ -2612,9 +2612,8 @@ function events.GetSkill(t)
 end
 
 function events.GameInitialized2()
-	--weapons and armors
+	--armors
     referenceAC = {}
-    referenceWeaponAttack = {}
 
     for i = 0, 2199 do
         local txt = Game.ItemsTxt
@@ -2627,17 +2626,8 @@ function events.GameInitialized2()
             -- Armors
             local ref = IsArtifactId(i) and i or i + lookup
             referenceAC[i] = txt[ref].Mod2 + txt[ref].Mod1DiceCount
-        elseif txt[i].Skill <= 7 or txt[i].Skill==39 then
-            -- Weapons
-            referenceWeaponAttack[i] = txt[i + lookup].Mod2
         end
     end
-	if isRedone and Game.ItemsTxt.High>2200 then
-		local txt = Game.ItemsTxt[2205]
-		for i=1,5 do
-			referenceWeaponAttack[i+2200] = txt.Mod2
-		end
-	end
 end
 
 local bonusBaseEnchantSkill={
@@ -3221,16 +3211,12 @@ local function addWeaponACRes(pl, index, tab)
 	for j=0,2 do
 		local it=pl:GetActiveItem(j)
 		if it then
-			local txt=it:T()
 			local skill=GetWeaponSkillFor(pl, it)
 			if skillAC[skill] or skillResistance[skill] then
 				local s,m=SplitSkill(pl:GetSkill(skill))
 				s=s+10
-				local bonus = txt.Mod2
-				local bonus2 = referenceWeaponAttack[it.Number]
-				local bonusATK = MawCore.Formulas.chargesWeaponBonus(bonus2, it.MaxCharges)
-
-				local bonusBase = bonus + round(bonusATK)
+				local attack = GetWeaponDamageRows(it)
+				local bonusBase = round(attack)
 				local bonusAC = round(skillAC[skill][m]*bonusBase/100*s)
 				local bonusRes = round(skillResistance[skill][m]*bonusBase/100*s)
 				tab[10]=tab[10]+bonusAC
@@ -3296,11 +3282,8 @@ local function addStaffPartyRes(tab)
 			if skill==0 then
 				local s,m=SplitSkill(Party[i]:GetSkill(const.Skills.Staff))
 				s=s+10
-				local bonus = txt.Mod2
-				local bonus2 = referenceWeaponAttack[it.Number]
-				local bonusATK = MawCore.Formulas.chargesWeaponBonus(bonus2, it.MaxCharges)
-
-				local bonusBase = bonus + round(bonusATK)
+				local attack = GetWeaponDamageRows(it)
+				local bonusBase = round(attack)
 				bonusRes = bonusRes + round(skillResistance[skill][m]*bonusBase/100*s)
 			end
 		end
