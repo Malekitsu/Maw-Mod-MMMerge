@@ -167,11 +167,21 @@ function events.GameInitialized2()
 
 	Size, BasePtr = Party.PlayersArray[0]["?size"], Party.PlayersArray[0]["?ptr"]
 
-	--free class/portrait selection is always on: race and continent no longer
-	--restrict the choice, only "must be the unpromoted base class" remains
+	--free class/portrait selection is always on: continent no longer restricts
+	--the choice, race only restricts RaceClasses (Character selection.txt), and
+	--"must be the unpromoted base class" remains
+	local RaceClasses = {
+		[const.Class.DarkElf] = true,
+		[const.Class.Dragon] = true,
+		[const.Class.Minotaur] = true,
+		[const.Class.Troll] = true,
+	}
 	local function ClassAvailable(Class, Race, Continent)
 		local Extra = Game.ClassesExtra[Class]
 		if not Extra or Extra.Kind == 0 then
+			return false
+		end
+		if RaceClasses[Class] and not (ClassByRace[Race] and ClassByRace[Race][Class]) then
 			return false
 		end
 		for k, v in pairs(Game.ClassesExtra) do
