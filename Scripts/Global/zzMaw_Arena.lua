@@ -297,6 +297,20 @@ function events.PickCorpse(t)
 	end
 end
 
+local NORMAL_ARENA_GOLD_CAP=1000000
+
+function events.BeforeGotGold(t)
+	if Game.NPCCommand~=const.HouseScreens.ArenaWin then
+		return
+	end
+	if Party.InArenaQuest<const.HouseScreens.ArenaPage or Party.InArenaQuest>const.HouseScreens.ArenaLord then
+		return
+	end
+	vars.normalArenaGold=vars.normalArenaGold or 0
+	t.Amount=math.max(math.min(t.Amount, NORMAL_ARENA_GOLD_CAP-vars.normalArenaGold), 0)
+	vars.normalArenaGold=vars.normalArenaGold+t.Amount
+end
+
 function endArena(level)
 	if online() then
 		Multiplayer.broadcast_questdata({owner=myId(), level=level}, "MawArenaEnd")
