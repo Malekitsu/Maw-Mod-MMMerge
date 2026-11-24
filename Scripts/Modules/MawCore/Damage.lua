@@ -456,15 +456,19 @@ local function mightLevelSwap(pl, mon)
 		/(1+GetMightDamageMultiplier(might, pl.LevelBase))
 end
 
+local function isCarnageHit(data)
+	return data and data.Object and data.Object.Spell == 133 and data.Object.Item and data.Object.Item.Bonus2 == 3
+end
+
 -- from Scripts/General/zzMaw-Stats.lua:141 -- THE base replacement for
 -- melee/bow/blaster hits: recompute from Get(Melee|Ranged)DamageMin/Max,
 -- x damageMultiplier (weapon-speed scaling), assassin isolation subtraction,
 -- x crit (sets the global `crit` read by track-and-clamp), x0.5 Weak,
--- x0.25 blaster bonus2==3
+-- x carnageDamageMult for carnage arrows (bow bonus2==3)
 local function stage_weaponRecompute(t)
   local data = t.Hit
   if not (data and data.Player and (t.DamageKind == 4
-    or (data.Object and data.Object.Spell == 133 and data.Object.Item and data.Object.Item.Bonus2 == 3)
+    or isCarnageHit(data)
     or data.Spell == 135)) then
     return
   end
@@ -513,7 +517,7 @@ local function stage_weaponRecompute(t)
   if data.Player.Weak and data.Player.Weak > 0 then
     t.Result = t.Result * 0.5
   end
-  if data.Object and data.Object.Spell == 133 and data.Object.Item and data.Object.Item.Bonus2 == 3 then
+  if isCarnageHit(data) then
     t.Result = t.Result * MawCore.Formulas.carnageDamageMult
   end
 end
@@ -1033,6 +1037,10 @@ local function stage_legendaries(t)
 			end
 		end 
 	end
+	if isCarnageHit(data) then
+		fireAuraDamage=fireAuraDamage*MawCore.Formulas.carnageDamageMult
+		enchantDamage=enchantDamage*MawCore.Formulas.carnageDamageMult
+	end
 	t.Result=t.Result+fireAuraDamage+enchantDamage
 	t.ElementalDamage=(t.ElementalDamage or 0)+fireAuraDamage+enchantDamage
 
@@ -1046,6 +1054,9 @@ local function stage_legendaries(t)
 			dmg=dmg/(1+mon.Resistances[4]/100)
 			if (data and data.Object and data.Object.Spell and table.find(aoespells, data.Object.Spell)) or (data and data.Object and data.Object.Spell==133) then
 				dmg=dmg*0.5
+			end
+			if isCarnageHit(data) then
+				dmg=dmg*MawCore.Formulas.carnageDamageMult
 			end
 			if  data and not data.Object then
 				dmg=dmg*damageMultiplier[id]["Melee"]
@@ -1159,8 +1170,7 @@ end
 local function stage_aoeDensity(t)
 	local data = t.Hit
 	if not (data and data.Player) then return end
-	local carnage = data.Object and data.Object.Spell == 133 and data.Object.Item and data.Object.Item.Bonus2 == 3
-	if carnage or table.find(aoespells, data.Spell) then
+	if isCarnageHit(data) or table.find(aoespells, data.Spell) then
 		t.Result = t.Result*GetDensityAoeMult()
 	end
 end
