@@ -1934,7 +1934,7 @@ function events.GameInitialized2()
 			[7] = {dmgAdd = 0, diceMin = 1, diceMax = 10, cost = {10, 10, 10, 10}, },--fire spike, the only spell with damage depending on mastery, fix in events.calcspelldamage
 			[8] = {dmgAdd = 10, diceMin = 1, diceMax = 30, cost = {15, 15, 15, 15}, },--immolation
 			[9] = {dmgAdd = 2, diceMin = 1, diceMax = 1, cost = {40, 40, 40, 40}, },--meteor shower
-			[10] = {dmgAdd = 12, diceMin = 1, diceMax = 7, cost = {25, 25, 25, 25}, },--inferno
+			[10] = {dmgAdd = 10, diceMin = 1, diceMax = 5, cost = {50, 50, 50, 50}, },--inferno
 			[11] = {dmgAdd = 20, diceMin = 1, diceMax = 20, cost = {30, 30, 30, 30}, },--incinerate
 			[15] = {dmgAdd = 0, diceMin = 1, diceMax = 4, cost = {4, 8, 10, 12}, },--sparks
 			[18] = {dmgAdd = 12, diceMin = 1, diceMax = 8, cost = {10, 10, 15, 20}, },--lightning bolt
@@ -1956,7 +1956,7 @@ function events.GameInitialized2()
 			[76] = {dmgAdd = 20, diceMin = 1, diceMax = 10, cost = {25, 25, 25, 25}, },--flying fist
 			[78] = {dmgAdd = 12, diceMin = 1, diceMax = 2, cost = {5, 5, 5, 5}, },--light bolt
 			[79] = {dmgAdd = 45, diceMin = 1, diceMax = 45, cost = {50, 50, 50, 50}, },--destroy undead
-			[84] = {dmgAdd = 20, diceMin = 2, diceMax = 10, cost = {35, 35, 35, 35}, },--prismatic light
+			[84] = {dmgAdd = 12, diceMin = 1, diceMax = 7, cost = {70, 70, 70, 70}, },--prismatic light
 			[87] = {dmgAdd = 40, diceMin = 1, diceMax = 40, cost = {50, 50, 50, 50}, },--sunray
 			[90] = {dmgAdd = 15, diceMin = 1, diceMax = 9, cost = {15, 15, 15, 15}, },--toxic cloud
 			[93] = {dmgAdd = 0, diceMin = 1, diceMax = 7, cost = {30, 30, 30, 30}, },--shrapmetal
@@ -3923,3 +3923,4 @@ function events.GameInitialized2()
 	every("spells/ascension", 0, mawTick_Ascension)
 	every("spells/insanity-shield-strip", 100, mawTick_InsanityShieldStrip)
 end
+
