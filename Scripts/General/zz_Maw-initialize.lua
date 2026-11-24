@@ -34,6 +34,7 @@ return {
     -- Gameplay Features
     enableAllTrainers = true,           -- find trainers that weren't previously available in all continents
     onlineQualityOfLifeFeatures = true, -- remove travel/training time, coaches/ships always available
+    rescueLiquidDrops = true,           -- items and corpses dropped into water rest at the surface instead of vanishing
 	teleportDeadMonstersAndCraftingKey = 75, -- teleports up to 30 monsters and 30 crafting items to the player location
     
     -- Movement
@@ -282,6 +283,7 @@ enableAllTrainers = mawSettings.enableAllTrainers
 enableDisintegrate = mawSettings.enableDisintegrate
 disableCompletitionMessage = mawSettings.disableCompletitionMessage
 onlineQualityOfLifeFeatures = mawSettings.onlineQualityOfLifeFeatures
+rescueLiquidDrops = mawSettings.rescueLiquidDrops
 showDeathCounter = mawSettings.showDeathCounter
 fasterStrafing = mawSettings.fasterStrafing
 slowerBackpedaling = mawSettings.slowerBackpedaling

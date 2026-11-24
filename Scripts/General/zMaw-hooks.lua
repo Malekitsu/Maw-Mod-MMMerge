@@ -227,3 +227,155 @@ mem.autohook(0x4331aa, function(d)
 	end
 	d.edi, d.esi, d.ebx = 0xB20E90, 0xFEB360, 0
 end)
+
+--items and corpses dropped into liquid no longer disappear (rescueLiquidDrops setting).
+--items: the object sweep destroys them over liquid at three sites -- indoor delete tail
+--(call at 0x470755), outdoor rest-on-burn (0x470806) and liquid contact (0x471047).
+--splash + delete must be suppressed together: delete-only suppression re-enters the
+--branch every frame and spawns a splash per frame. survivors come to rest at the liquid
+--surface, visible and clickable.
+--corpses are MapMonsters records (Z +0x9a, VelocityZ +0xa0, AIState +0xb8; +0x92 is
+--BodyHeight). the monster pass dissolves them over liquid at the splash tail (four
+--AIState je's at 0x46f882/8c/96/a0 -> 0x46fe7a) and three bare Removed writes guarded
+--by liquid-tile tests (0x46e7bf, 0x46ea6a, 0x46f2ce).
+--an autohook skip branch must d:push its resume address (MM8 Blaster idiom) or it
+--returns through stack garbage (eip = 0xa when first tried).
+--missiles and attached objects stay vanilla. multiplayer installs the set on every
+--peer and the host's ini value governs: LoadMap seeds it into vars.MAWSETTINGS, which
+--MawCore.Sync mirrors to clients. the set is released and reinstalled when the flag
+--flips rather than gated per callback, because Switch off nils the autohook dispatch
+--entries and frees their copycode blocks (off bytes cannot be rearmed).
+
+do
+	--keep only plain ground items: everything the party loses to water is ground loot;
+	--missiles also carry an Item.Number (the launching weapon), hence the Missile gate.
+	local function tryPreserve(idx)
+		local obj = Map.Objects[idx]
+		if obj.Removed then
+			return false
+		end
+		if obj.Item.Number == 0 then
+			return false
+		end
+		return not (obj.Missile or obj.AttachToHead)
+	end
+
+	--sites 2-4: skip each bare Removed write and resume at its flag-failed continuation.
+	local function holdCorpse(d, resume)
+		d:push(resume)
+		return true
+	end
+
+	local function install()
+		local hooks = HookManager()
+
+		--indoor delete tail (ecx = slot); shared with the out-of-map deletes, which the
+		--coordinate gate leaves vanilla.
+		hooks.autohook(0x470755, function(d)
+			local obj = Map.Objects[d.ecx]
+			local x, y, z = obj.X, obj.Y, obj.Z
+			if x < -32767 or x > 32767 or y < -32767 or y > 32767 or z < -20000 or z > 20000 then
+				return false
+			end
+			if not tryPreserve(d.ecx) then
+				return false
+			end
+			d:push(0x47075a)
+			return true
+		end)
+
+		--rest-on-burn: splash push/call + delete together (0xe bytes), slot at [ebp-0x20].
+		hooks.autohook(0x470806, function(d)
+			if not tryPreserve(mem.u4[d.ebp - 0x20]) then
+				return false
+			end
+			d:push(0x470814)
+			return true
+		end, 0xe)
+
+		--liquid contact: same block (0xd bytes), slot in edi.
+		hooks.autohook(0x471047, function(d)
+			if not tryPreserve(d.edi) then
+				return false
+			end
+			d:push(0x471054)
+			return true
+		end, 0xd)
+
+		--site 1: the tail computes the liquid plane into eax (groundZ + 0x3c water, +0x1e lava)
+		--right before splash + Removed. pin Z = max(Z, plane), zero VelocityZ, and skip the rest
+		--of the tail by resuming at 0x46f920, just past this iteration's X/Y/Z move block; the
+		--branch re-enters every frame the corpse stays over liquid, so it is re-pinned at the
+		--waterline instead of settling on the lakebed. no ai gate: the je's above admit only the
+		--dead-ish states, and only Dying(4)/Dead(5) can actually reach them.
+		hooks.autohook(0x46fe8a, function(d)
+			local plane = d.eax
+			if mem.i2[d.esi + 0x9a] < plane then
+				mem.i2[d.esi + 0x9a] = plane
+			end
+			mem.i2[d.esi + 0xa0] = 0
+			d:push(0x46f920)
+			return true
+		end, 0xf)
+
+		hooks.autohook(0x46e7bf, function(d)
+			return holdCorpse(d, 0x46efbd)
+		end, 9)
+		hooks.autohook(0x46ea6a, function(d)
+			return holdCorpse(d, 0x46ea78)
+		end, 9)
+		hooks.autohook(0x46f2ce, function(d)
+			return holdCorpse(d, 0x46f2dc)
+		end, 9)
+		return hooks
+	end
+
+	--the set exists while the flag is on: ini for singleplayer and the host, the host's
+	--mirrored copy for clients (nil -> off until MawCore.Sync delivers it).
+	local function effective()
+		if MawCore.Sync.inGame() and not MawCore.Sync.isHost() then
+			return vars.MAWSETTINGS and vars.MAWSETTINGS.rescueLiquidDrops
+		end
+		return rescueLiquidDrops
+	end
+
+	local hooks
+	local function sync()
+		local on = effective()
+		if (hooks == nil) == (not on) then
+			return
+		end
+		if on then
+			hooks = install()
+		else
+			hooks.Clear()
+			hooks = nil
+		end
+	end
+
+	function events.GameInitialized1()
+		sync()
+	end
+
+	--host/SP only: clients must not overwrite the mirrored value with their own ini.
+	function events.LoadMap()
+		if vars and (not MawCore.Sync.inGame() or MawCore.Sync.isHost()) then
+			vars.MAWSETTINGS = vars.MAWSETTINGS or {}
+			vars.MAWSETTINGS.rescueLiquidDrops = rescueLiquidDrops
+		end
+	end
+
+	--multiplayer starts and ends without a script reload (as in the online module);
+	--a joining client drops any stale local value until the host's copy arrives.
+	function events.MultiplayerInitialized()
+		if vars and not MawCore.Sync.isHost() then
+			vars.MAWSETTINGS = vars.MAWSETTINGS or {}
+			vars.MAWSETTINGS.rescueLiquidDrops = nil
+		end
+		sync()
+	end
+
+	function events.Tick()
+		sync()
+	end
+end
