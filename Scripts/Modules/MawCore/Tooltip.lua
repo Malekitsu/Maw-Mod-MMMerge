@@ -314,7 +314,7 @@ local function tooltipEnchantStats(t)
 					elseif stat==10 then
 						--power=power*0.667
 					end
-					local slotMult=slotMult[t.Item:T().EquipStat] or 1
+					local slotMult=slotMult[GetItemEquipStat(t.Item)] or 1
 					cap=math.min(cap*slotMult,ENC2_MAX_STRENGTH)
 
 					--was packed as stat*1000+strength and unpacked again on the

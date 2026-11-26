@@ -727,7 +727,7 @@ local function upgradeGem(it, tier)
 	local enchanted=false
 	--2nd enchant value
 	local bonus2,bonus2Strength=GetEnc2(it)
-	local equipStat=it:T().EquipStat
+	local equipStat=GetItemEquipStat(it)
 	local skill=it.Bonus>=17
 	local maxValue1=GetGemCap(tier, equipStat, skill)
 	local maxValue2=GetGemCap(tier, equipStat, false)
@@ -834,7 +834,7 @@ evt.PotionEffects[92] = function(IsDrunk, t, Power)
 			local cap=100*mult
 			local power=t.BonusStrength
 			local stat=RollEnchantType(t, t.Bonus)
-			local slotMult=slotMult[t:T().EquipStat] or 1
+			local slotMult=slotMult[GetItemEquipStat(t)] or 1
 			cap=math.min(cap*slotMult,ENC2_MAX_STRENGTH)
 			
 			SetEnc2(t,stat,math.min(round(power*(1+0.25*math.random())),cap))

@@ -120,6 +120,21 @@ Engine.Addr = {
 
 	MonsterStunApply    = 0x40337E,
 	MonsterStunSkip     = 0x4033EA,
+
+	ItemsTxtSize        = 0x30,
+	EquipMainTwoHanded  = 0x467465,
+	EquipMouseItemType  = 0x467479,
+	EquipMouseSpearDone = 0x4674B8,
+	EquipMainSpear      = 0x4674DB,
+	EquipWearCheck      = 0x4674EC,
+	EquipOffhandTest    = 0x46771E,
+	EquipToOffhand      = 0x467753,
+	EquipToMainHand     = 0x46781A,
+	EquipTwoHandedSlot  = -0xC,
+	EquipMouseType      = -0x8,
+	EquipPlacedRecord   = -0x10,
+	DollOffhandSkill    = 0x43B7CC,
+	DollOffhandSkillDone = 0x43B7D3,
 }
 
 -- Ledger of every binary patch MawCore applies. Nothing in the core may
@@ -402,6 +417,113 @@ function Engine.setMonsterStunFilter(allow)
 				return true
 			end
 		end, 5)
+	end)
+end
+
+local function rosterPlayer(ptr)
+	local A = Engine.Addr
+	local index = (ptr - A.PlayerBase)/A.PlayerStride
+	if index % 1 == 0 and index >= 0 and index < Party.PlayersArray.count then
+		return Party.PlayersArray[index]
+	end
+end
+
+local ANY = -1
+
+local function codeIs(addr, bytes)
+	for i, b in ipairs(bytes) do
+		if b ~= ANY and mem.u1[addr + i - 1] ~= b then
+			return false
+		end
+	end
+	return true
+end
+
+function Engine.setEquipRules(oneHanded, canOffhand)
+	local A = Engine.Addr
+	local sites = {
+		[A.EquipMainTwoHanded] = {0x8B, 0x0D, 0x64, 0xCA, 0xB7, 0x00},
+		[A.EquipMouseItemType] = {0x0F, 0xB6, 0xB0, ANY, ANY, ANY, ANY, 0x89, 0x75, 0xF8, 0x0F, 0xB6, 0xB0},
+		[A.EquipMainSpear] = {0x80, 0xB8, ANY, ANY, ANY, ANY, 0x04},
+		[A.EquipOffhandTest] = {0x83, 0x65, 0xF0, 0x00, 0x83, 0xFE, 0x02},
+	}
+	local function ask(rule, ptr, itemNumber)
+		local pl = rosterPlayer(ptr)
+		if not pl then
+			return
+		end
+		local ok, result = pcall(rule, pl, itemNumber)
+		if not ok then
+			print("equip rule: " .. tostring(result))
+			return
+		end
+		return result
+	end
+	Engine.patch("EquipRules", "equip: Maw decides which weapons are one-handed and which go in the off-hand", function()
+		for addr, bytes in pairs(sites) do
+			if not codeIs(addr, bytes) then
+				print(("EquipRules: unexpected code at 0x%X, engine equip rules kept"):format(addr))
+				return
+			end
+		end
+		mem.autohook(A.EquipMainTwoHanded, function(d)
+			local slot = mem.i4[d.ebp + A.EquipTwoHandedSlot]
+			if slot ~= 0 and ask(oneHanded, d.ebx, mem.i4[d.ebx + A.PlayerItemsOffset + (slot - 1)*A.ItemSize]) then
+				mem.i4[d.ebp + A.EquipTwoHandedSlot] = 0
+			end
+		end, 6)
+		mem.autohook2(A.EquipMouseItemType, function(d)
+			if not ask(oneHanded, d.ebx, Mouse.Item.Number) then
+				return
+			end
+			if mem.i4[d.ebp + A.EquipMouseType] == 1 then
+				mem.i4[d.ebp + A.EquipMouseType] = 0
+			end
+			if d.esi == const.Skills.Spear then
+				d:push(A.EquipMouseSpearDone)
+				return true
+			end
+		end, 17)
+		mem.autohook(A.EquipMainSpear, function(d)
+			if ask(oneHanded, d.ebx, d.eax/A.ItemsTxtSize) then
+				d:push(A.EquipWearCheck)
+				return true
+			end
+		end, 7)
+		mem.autohook(A.EquipOffhandTest, function(d)
+			local allowed = ask(canOffhand, d.ebx, Mouse.Item.Number)
+			if allowed == nil then
+				return
+			end
+			mem.i4[d.ebp + A.EquipPlacedRecord] = 0
+			d:push(allowed and A.EquipToOffhand or A.EquipToMainHand)
+			return true
+		end, 7)
+	end)
+end
+
+function Engine.setDollOffhandWeapon(isWeapon)
+	local A = Engine.Addr
+	Engine.patch("DollOffhandWeapon", "paper doll: Maw decides which off-hand items are drawn held like a dagger", function()
+		if not codeIs(A.DollOffhandSkill, {0x0F, 0xB6, 0x80, ANY, ANY, ANY, ANY, 0x83, 0xF8, 0x02}) then
+			print("DollOffhandWeapon: unexpected code at the off-hand picture, engine rule kept")
+			return
+		end
+		mem.autohook(A.DollOffhandSkill, function(d)
+			local itemNumber = d.eax/A.ItemsTxtSize
+			local skill = Game.ItemsTxt[itemNumber].Skill
+			if skill ~= const.Skills.Sword and skill ~= const.Skills.Dagger then
+				local ok, weapon = pcall(isWeapon, itemNumber)
+				if not ok then
+					print("doll off-hand rule: " .. tostring(weapon))
+				elseif weapon then
+					skill = const.Skills.Dagger
+				end
+			end
+			d.eax = skill
+			d:push(A.DollOffhandSkillDone)
+			return true
+		end, 7)
 	end)
 end
 

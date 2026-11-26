@@ -1929,51 +1929,58 @@ function events.GameInitialized2()
 	--if you change diceMin or values that are 0 remember to update the tooltip manually 
 	spellPowers =
 		{
-			[2] = {dmgAdd =8, diceMin = 1, diceMax = 2, cost = {2, 2, 2, 2}, },--fire bolt
-			[6] = {dmgAdd = 0, diceMin = 1, diceMax = 8, cost = {8, 8, 8, 8}, },--fireball
-			[7] = {dmgAdd = 0, diceMin = 1, diceMax = 10, cost = {10, 10, 10, 10}, },--fire spike, the only spell with damage depending on mastery, fix in events.calcspelldamage
-			[8] = {dmgAdd = 10, diceMin = 1, diceMax = 30, cost = {15, 15, 15, 15}, },--immolation
-			[9] = {dmgAdd = 2, diceMin = 1, diceMax = 1, cost = {40, 40, 40, 40}, },--meteor shower
-			[10] = {dmgAdd = 10, diceMin = 1, diceMax = 5, cost = {50, 50, 50, 50}, },--inferno
-			[11] = {dmgAdd = 20, diceMin = 1, diceMax = 20, cost = {30, 30, 30, 30}, },--incinerate
-			[15] = {dmgAdd = 0, diceMin = 1, diceMax = 4, cost = {4, 8, 10, 12}, },--sparks
-			[18] = {dmgAdd = 12, diceMin = 1, diceMax = 8, cost = {10, 10, 15, 20}, },--lightning bolt
-			[20] = {dmgAdd = 20, diceMin = 1, diceMax = 12, cost = {20, 20, 20, 20}, },--implosion
-			[22] = {dmgAdd = 7, diceMin = 1, diceMax = 1, cost = {60, 60, 60, 60}, },--starburst
-			[24] = {dmgAdd = 5, diceMin = 1, diceMax = 5, cost = {2, 4, 6, 8}, },--poison spray
-			[26] = {dmgAdd = 6, diceMin = 1, diceMax = 5, cost = {4, 4, 4, 4}, },--ice bolt
-			[29] = {dmgAdd = 4, diceMin = 1, diceMax = 14, cost = {10, 10, 10, 10}, },--acid burst
-			[32] = {dmgAdd = 6, diceMin = 1, diceMax = 6, cost = {25, 25, 25, 25}, },--ice blast
-			[37] = {dmgAdd = 8, diceMin = 1, diceMax = 5, cost = {4, 4, 4, 4}, },--deadly swarm
-			[39] = {dmgAdd = 7, diceMin = 1, diceMax = 7, cost = {8, 8, 8, 8}, },--blades
-			[41] = {dmgAdd = 8, diceMin = 1, diceMax = 8, cost = {15, 15, 15, 15}, },--rock blast
-			[43] = {dmgAdd = 4, diceMin = 1, diceMax = 2, cost = {50, 50, 50, 50}, },--death blossom
-			[44] = {dmgAdd = 15, diceMin = 0.5, diceMax = 0.5, cost = {30, 30, 30, 30}, },--mass distorsion, nerfed
-			[52] = {dmgAdd = 20, diceMin = 2, diceMax = 16, cost = {15, 15, 15, 15}, },--spirit lash
-			[59] = {dmgAdd = 12, diceMin = 1, diceMax = 6, cost = {4, 4, 4, 4}, },--mind blast
-			[65] = {dmgAdd = 25, diceMin = 1, diceMax = 25, cost = {25, 25, 25, 25}, },--psychic shock
-			[70] = {dmgAdd = 4, diceMin = 1, diceMax = 4, cost = {4, 4, 4, 4}, },--harm
-			[76] = {dmgAdd = 20, diceMin = 1, diceMax = 10, cost = {25, 25, 25, 25}, },--flying fist
-			[78] = {dmgAdd = 12, diceMin = 1, diceMax = 2, cost = {5, 5, 5, 5}, },--light bolt
-			[79] = {dmgAdd = 45, diceMin = 1, diceMax = 45, cost = {50, 50, 50, 50}, },--destroy undead
-			[84] = {dmgAdd = 12, diceMin = 1, diceMax = 7, cost = {70, 70, 70, 70}, },--prismatic light
-			[87] = {dmgAdd = 40, diceMin = 1, diceMax = 40, cost = {50, 50, 50, 50}, },--sunray
-			[90] = {dmgAdd = 15, diceMin = 1, diceMax = 9, cost = {15, 15, 15, 15}, },--toxic cloud
-			[93] = {dmgAdd = 0, diceMin = 1, diceMax = 7, cost = {30, 30, 30, 30}, },--shrapmetal
-			[97] = {dmgAdd = 0, diceMin = 1, diceMax = 28, cost = {50, 50, 50, 50}, },--dragon breath
-			[98] = {dmgAdd = 30, diceMin = 1, diceMax = 1, cost = {55, 55, 55, 55}, },--armageddon
-			[99] = {dmgAdd = 25, diceMin = 1, diceMax = 5, cost = {60, 60, 60, 60}, },--souldrinker
+			[2] = {dmgAdd =8, diceMin = 1, diceMax = 2, cost = {2, 2, 2, 2}, delay = {110, 110, 100, 90}, },--fire bolt
+			[6] = {dmgAdd = 0, diceMin = 1, diceMax = 8, cost = {8, 8, 8, 8}, delay = {100, 100, 90, 80}, },--fireball
+			[7] = {dmgAdd = 0, diceMin = 1, diceMax = 10, cost = {10, 10, 10, 10}, delay = {100, 100, 100, 100}, },--fire spike, the only spell with damage depending on mastery, fix in events.calcspelldamage
+			[8] = {dmgAdd = 10, diceMin = 1, diceMax = 30, cost = {15, 15, 15, 15}, delay = {120, 120, 120, 120}, },--immolation
+			[9] = {dmgAdd = 2, diceMin = 1, diceMax = 1, cost = {40, 40, 40, 40}, delay = {200, 200, 200, 180}, },--meteor shower
+			[10] = {dmgAdd = 10, diceMin = 1, diceMax = 5, cost = {50, 50, 50, 50}, delay = {100, 100, 100, 90}, },--inferno
+			[11] = {dmgAdd = 20, diceMin = 1, diceMax = 20, cost = {30, 30, 30, 30}, delay = {90, 90, 90, 90}, },--incinerate
+			[15] = {dmgAdd = 0, diceMin = 1, diceMax = 4, cost = {4, 8, 10, 12}, delay = {110, 100, 90, 80}, },--sparks
+			[18] = {dmgAdd = 12, diceMin = 1, diceMax = 8, cost = {10, 10, 15, 20}, delay = {100, 100, 100, 100}, },--lightning bolt
+			[20] = {dmgAdd = 20, diceMin = 1, diceMax = 12, cost = {20, 20, 20, 20}, delay = {100, 100, 100, 90}, },--implosion
+			[22] = {dmgAdd = 7, diceMin = 1, diceMax = 1, cost = {60, 60, 60, 60}, delay = {140, 140, 140, 140}, },--starburst
+			[24] = {dmgAdd = 5, diceMin = 1, diceMax = 5, cost = {2, 4, 6, 8}, delay = {110, 100, 90, 70}, },--poison spray
+			[26] = {dmgAdd = 6, diceMin = 1, diceMax = 5, cost = {4, 4, 4, 4}, delay = {110, 100, 90, 80}, },--ice bolt
+			[29] = {dmgAdd = 4, diceMin = 1, diceMax = 14, cost = {10, 10, 10, 10}, delay = {100, 100, 90, 80}, },--acid burst
+			[32] = {dmgAdd = 6, diceMin = 1, diceMax = 6, cost = {25, 25, 25, 25}, delay = {80, 80, 80, 80}, },--ice blast
+			[37] = {dmgAdd = 8, diceMin = 1, diceMax = 5, cost = {4, 4, 4, 4}, delay = {110, 100, 90, 80}, },--deadly swarm
+			[39] = {dmgAdd = 7, diceMin = 1, diceMax = 7, cost = {8, 8, 8, 8}, delay = {100, 100, 90, 80}, },--blades
+			[41] = {dmgAdd = 8, diceMin = 1, diceMax = 8, cost = {15, 15, 15, 15}, delay = {90, 90, 90, 80}, },--rock blast
+			[43] = {dmgAdd = 4, diceMin = 1, diceMax = 2, cost = {50, 50, 50, 50}, delay = {180, 180, 180, 160}, },--death blossom
+			[44] = {dmgAdd = 15, diceMin = 0.5, diceMax = 0.5, cost = {30, 30, 30, 30}, delay = {90, 90, 90, 90}, },--mass distorsion, nerfed
+			[52] = {dmgAdd = 20, diceMin = 2, diceMax = 16, cost = {15, 15, 15, 15}, delay = {100, 100, 100, 100}, },--spirit lash
+			[59] = {dmgAdd = 12, diceMin = 1, diceMax = 6, cost = {4, 4, 4, 4}, delay = {120, 110, 100, 90}, },--mind blast
+			[65] = {dmgAdd = 25, diceMin = 1, diceMax = 25, cost = {25, 25, 25, 25}, delay = {110, 110, 110, 100}, },--psychic shock
+			[70] = {dmgAdd = 4, diceMin = 1, diceMax = 4, cost = {4, 4, 4, 4}, delay = {110, 100, 90, 80}, },--harm
+			[76] = {dmgAdd = 20, diceMin = 1, diceMax = 10, cost = {25, 25, 25, 25}, delay = {110, 110, 110, 100}, },--flying fist
+			[78] = {dmgAdd = 12, diceMin = 1, diceMax = 2, cost = {5, 5, 5, 5}, delay = {110, 100, 90, 80}, },--light bolt
+			[79] = {dmgAdd = 45, diceMin = 1, diceMax = 45, cost = {50, 50, 50, 50}, delay = {120, 110, 100, 90}, },--destroy undead
+			[84] = {dmgAdd = 12, diceMin = 1, diceMax = 7, cost = {70, 70, 70, 70}, delay = {135, 135, 120, 100}, },--prismatic light
+			[87] = {dmgAdd = 40, diceMin = 1, diceMax = 40, cost = {50, 50, 50, 50}, delay = {150, 150, 150, 135}, },--sunray
+			[90] = {dmgAdd = 15, diceMin = 1, diceMax = 9, cost = {15, 15, 15, 15}, delay = {120, 110, 100, 90}, },--toxic cloud
+			[93] = {dmgAdd = 0, diceMin = 1, diceMax = 7, cost = {30, 30, 30, 30}, delay = {90, 90, 80, 70}, },--shrapmetal
+			[97] = {dmgAdd = 0, diceMin = 1, diceMax = 28, cost = {50, 50, 50, 50}, delay = {120, 120, 120, 100}, },--dragon breath
+			[98] = {dmgAdd = 30, diceMin = 1, diceMax = 1, cost = {55, 55, 55, 55}, delay = {250, 250, 250, 250}, },--armageddon
+			[99] = {dmgAdd = 25, diceMin = 1, diceMax = 5, cost = {60, 60, 60, 60}, delay = {300, 300, 300, 300}, },--souldrinker
 			[201] = {dmgAdd = 25, diceMin = 1, diceMax = 5, },--souldrinker, needed for LEECH FIX
-			[103] = {dmgAdd = 46, diceMin = 1, diceMax = 28, cost = {20, 20, 20, 20}, },--darkfire bolt
-			[111] = {dmgAdd = 0, diceMin = 1, diceMax = 15, cost = {5, 5, 10, 15}, },--lifedrain scales with mastery, fixed in calcspelldamage
+			[103] = {dmgAdd = 46, diceMin = 1, diceMax = 28, cost = {20, 20, 20, 20}, delay = {120, 120, 120, 120}, },--darkfire bolt
+			[111] = {dmgAdd = 0, diceMin = 1, diceMax = 15, cost = {5, 5, 10, 15}, delay = {100, 100, 100, 100}, },--lifedrain scales with mastery, fixed in calcspelldamage
 			[200] = {dmgAdd = 0, diceMin = 1, diceMax = 15, },--lifedrain scales with mastery, fixed in calcspelldamage, needed for LEECH FIX
-			[123] = {dmgAdd = 0, diceMin = 1, diceMax = 25, cost = {25, 40, 50, 60}, },--special scaling, calculate in zzClasses
+			[123] = {dmgAdd = 0, diceMin = 1, diceMax = 25, cost = {25, 40, 50, 60}, delay = {100, 100, 90, 90}, },--special scaling, calculate in zzClasses
 		}
 	for id, power in pairs(spellPowers) do
 		if power.cost then
 			for v=1,4 do
 				spellCost[id][masteryName[v]]=power.cost[v]
 				Game.Spells[id]["SpellPoints" .. masteryName[v]]=power.cost[v]
+			end
+		end
+		if power.delay then
+			oldTable[id]=oldTable[id] or {}
+			for v=1,4 do
+				Game.Spells[id]["Delay" .. masteryName[v]]=power.delay[v]
+				oldTable[id][v]=power.delay[v]
 			end
 		end
 	end
@@ -2137,7 +2144,7 @@ spellbonusdamage[14] = {["low"]=24, ["high"]=24}
 spellbonusdamage[15] = {["low"]=48, ["high"]=48}
 spellbonusdamage[39] = {["low"]=40, ["high"]=80}
 
-aoespells = {6, 7, 8, 9, 10, 15, 22, 24, 32, 41, 43, 84, 93, 97, 98, 99, 123, 201}
+aoespells = {6, 8, 9, 10, 15, 22, 24, 32, 41, 43, 84, 93, 97, 98, 99, 123, 201}
 
 --function for tooltips
 function dmgAddTooltip(skill, mastery, spell)

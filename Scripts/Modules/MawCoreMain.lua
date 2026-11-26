@@ -57,6 +57,7 @@ MawCore.ModuleOrder = {
 	"MonsterHP",	-- real monster HP beyond the engine's 16-bit field
 	"MonsterAttackSpeed",	-- per-monster attack speed multiplier (animation + recovery)
 	"MonsterHitstun",
+	"Equip",
 	"DamageState",	-- the two damage values legacy files share (MP hook points)
 	"Damage",		-- CalcDamageToMonster pipeline (DAMAGE_PIPELINE.md)
 	"Sync",			-- multiplayer: host/client role, host-owned game state

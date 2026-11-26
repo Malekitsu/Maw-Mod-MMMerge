@@ -1167,10 +1167,17 @@ local function stage_damageTaken(t)
 	end
 end
 
+local shotgunSpells = {
+	[const.Spells.Sparks] = true,
+	[const.Spells.PoisonSpray] = true,
+	[const.Spells.IceBlast] = true,
+	[const.Spells.Shrapmetal] = true,
+}
+
 local function stage_aoeDensity(t)
 	local data = t.Hit
 	if not (data and data.Player) then return end
-	if isCarnageHit(data) or table.find(aoespells, data.Spell) then
+	if isCarnageHit(data) or (table.find(aoespells, data.Spell) and not shotgunSpells[data.Spell]) then
 		t.Result = t.Result*GetDensityAoeMult()
 	end
 end

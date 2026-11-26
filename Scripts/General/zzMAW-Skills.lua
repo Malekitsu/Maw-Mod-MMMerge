@@ -1791,14 +1791,6 @@ function events.CanWearItem(t)
 end
 ]]
 
---may this item sit in this player's offhand? (tricks: MawCore/NOTES.md)
-function CanDualWield(pl, it)
-	if table.find(seraphClass, pl.Class) and it:T().Skill==1 then
-		return false
-	end
-	return true
-end
-
 --temporary skill for one equip action, restoring the EXACT raw value.
 --Never nest two of these on one skill in one action -- MawCore/NOTES.md
 function tempSkillForEquip(pl, skillId, level, mastery)
@@ -1809,21 +1801,16 @@ function tempSkillForEquip(pl, skillId, level, mastery)
 	end)
 end
 
---fake Novice Sword so the engine itself refuses the offhand placement.
---2h swords excluded: zzClasses owns those (NOTES.md)
+--halberds need Spear to equip: Axe-only players get Novice Spear for the action
 function events.Action(t)
 	if t.Action==133 then
 		local id=Game.CurrentPlayer
 		if id<0 or id>Party.High then
+			Game.CurrentPlayer=0
 			id=0
 		end
 		local pl=Party[id]
 		local it=Mouse.Item
-		if it and it.Number>0 and it:T().EquipStat==0
-				and not table.find(twoHandedSwords, it.Number)
-				and not CanDualWield(pl, it) then
-			tempSkillForEquip(pl, const.Skills.Sword, 1, 1)
-		end
 		if it and it.Number>0 and table.find(halberdItems, it.Number)
 				and pl.Skills[const.Skills.Spear]==0 and pl.Skills[const.Skills.Axe]>0 then
 			tempSkillForEquip(pl, const.Skills.Spear, 1, 1)
@@ -2652,105 +2639,6 @@ function events.LoadMap()
 	end
 end
 
---axe dual wield: fake Dagger mastery for the equip action so the engine
---offhands the (dagger-reskinned) axe -- MawCore/NOTES.md
-function events.Action(t)
-	if t.Action==133 then
-		local id=Game.CurrentPlayer
-		if id<0 or id>Party.High then
-			Game.CurrentPlayer=0
-			id=0
-		end
-		local pl=Party[id]
-		local race=Game.CharacterPortraits[pl.Face].Race
-		local it=Mouse.Item
-		if not it or (race~=const.Race.Dwarf and race~=const.Race.Minotaur) then
-			return
-		end
-		local s2,m2=SplitSkill(pl.Skills[3])--axe
-		if table.find(oneHandedAxes, it.Number) then
-			if m2>=2 then
-				tempSkillForEquip(pl, const.Skills.Dagger, 2, 2)
-			else
-				tempSkillForEquip(pl, const.Skills.Dagger, 1, 1)
-			end
-		elseif race==const.Race.Minotaur and (table.find(twoHandedAxes, it.Number) or table.find(halberdItems, it.Number)) then
-			if m2>=3 then
-				tempSkillForEquip(pl, const.Skills.Dagger, 2, 2)
-			else
-				tempSkillForEquip(pl, const.Skills.Dagger, 1, 1)
-			end
-		end
-	end
-end
-
-local lastPlayer=-1
-function mawTick_DwarfAxes()
-	if Game.CurrentScreen==7 or Game.CurrentScreen==15 then
-		local currentPlayer=Game.CurrentPlayer
-		if lastPlayer==currentPlayer then return end
-		lastPlayer=currentPlayer
-		if currentPlayer<0 or currentPlayer>Party.High then return end
-		
-		local pl=Party[currentPlayer]
-		local race=Game.CharacterPortraits[Party[currentPlayer].Face].Race
-		if race==const.Race.Dwarf then
-			for i=1,#oneHandedAxes do
-				txt=Game.ItemsTxt[oneHandedAxes[i]]
-				txt.Skill=2
-				txt.EquipStat=0
-			end
-			for i=1,#twoHandedAxes do
-				txt=Game.ItemsTxt[twoHandedAxes[i]]
-				txt.Skill=3
-				txt.EquipStat=1
-			end
-			for i=1,#halberdItems do
-				txt=Game.ItemsTxt[halberdItems[i]]
-				txt.Skill=const.Skills.Spear
-				txt.EquipStat=1
-			end
-			lastRace=race
-		elseif race==const.Race.Minotaur then
-			for i=1,#oneHandedAxes do
-				txt=Game.ItemsTxt[oneHandedAxes[i]]
-				txt.Skill=2
-				txt.EquipStat=0
-			end
-			for i=1,#twoHandedAxes do
-				txt=Game.ItemsTxt[twoHandedAxes[i]]
-				txt.Skill=2
-				txt.EquipStat=0
-			end
-			for i=1,#halberdItems do
-				txt=Game.ItemsTxt[halberdItems[i]]
-				txt.Skill=2
-				txt.EquipStat=0
-			end
-			lastRace=race
-		else
-			for i=1,#oneHandedAxes do
-				txt=Game.ItemsTxt[oneHandedAxes[i]]
-				txt.Skill=3
-				txt.EquipStat=0
-			end
-			for i=1,#twoHandedAxes do
-				txt=Game.ItemsTxt[twoHandedAxes[i]]
-				txt.Skill=3
-				txt.EquipStat=1
-			end
-			for i=1,#halberdItems do
-				txt=Game.ItemsTxt[halberdItems[i]]
-				txt.Skill=const.Skills.Spear
-				txt.EquipStat=1
-			end
-			lastRace=race
-		end
-	else
-		lastPlayer=-1
-	end
-end
-
 --Tick handlers above run as MawCore scheduler tasks (ms; 0=frame, -1=poke only)
 function events.GameInitialized2()
 	local every=MawCore.Scheduler.every
@@ -2759,5 +2647,4 @@ function events.GameInitialized2()
 	every("skills/solo-mastery", 1000, mawTick_SoloMastery)
 	every("skills/misc-skills-ui", -1, mawTick_MiscSkillsUI)	--poked by stats/label-watch
 	every("skills/pl-fallback", 1000, mawTick_PlFallback)
-	every("skills/dwarf-axes", -1, mawTick_DwarfAxes)	--poked by stats/label-watch
 end

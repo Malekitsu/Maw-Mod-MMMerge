@@ -746,7 +746,7 @@ artifactWearReq[WETSUIT] = {Check = function(pl)
 		end
 	end
 	local main = pl.EquippedItems[1]
-	if main > 0 and Game.ItemsTxt[pl.Items[main].Number].EquipStat == 1 then
+	if main > 0 and MawCore.Equip.equipStat(pl, pl.Items[main].Number) == 1 then
 		return false
 	end
 	return true
@@ -759,7 +759,7 @@ function events.CanWearItem(t)
 	local pl = Party[t.PlayerId]
 	--while the Wetsuit is worn only helms, belts, rings and amulets go on
 	if pl.ItemArmor > 0 and pl.Items[pl.ItemArmor].Number == WETSUIT then
-		local equipStat = Game.ItemsTxt[t.ItemId].EquipStat
+		local equipStat = MawCore.Equip.equipStat(pl, t.ItemId)
 		if not (equipStat == 0 or equipStat == 3 or equipStat == 8
 				or equipStat == 10 or equipStat == 11) then
 			t.Available = false

@@ -817,7 +817,6 @@ mawTick_LabelWatch=function()
 		--poke-only tasks (interval -1): they run ONLY from here, on the same
 		--signals -- player, screen, char tab, mouse-held item
 		now("skills/misc-skills-ui")
-		now("skills/dwarf-axes")
 		now("alchemy/reagent-power")
 	end
 end
@@ -1268,7 +1267,7 @@ function calcPowerVitality(pl, statsMenu)
 				enchantDamage=enchantDamage+dmg+dmg2
 			end
 		end
-		enchantDamage=enchantDamage*1.02^ascensionSkill
+		enchantDamage=enchantDamage*1.015^ascensionSkill
 		if table.find(aoespells, spellIndex) then
 			enchantDamage=enchantDamage/2.5
 			if vars.madnessMode then
