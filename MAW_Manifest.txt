@@ -299,6 +299,7 @@ Scripts/Modules/MawCore/Classes.lua
 Scripts/Modules/MawCore/Damage.lua
 Scripts/Modules/MawCore/DamageState.lua
 Scripts/Modules/MawCore/Engine.lua
+Scripts/Modules/MawCore/Equip.lua
 Scripts/Modules/MawCore/Estimates.lua
 Scripts/Modules/MawCore/Fixes.lua
 Scripts/Modules/MawCore/Formulas.lua
