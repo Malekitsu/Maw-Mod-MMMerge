@@ -961,6 +961,7 @@ end
 function events.KeyDown(t)
 	if Party.High~=0 then return end --only in single player
 	if Game.CurrentScreen==21 then return end
+	if Game.CurrentScreen==7 and Game.CurrentCharScreen==103 then return end
 	if t.Key == chargeKey then
 		local class=Party[0].Class
 		if class>=16 and class<=19 then
@@ -1050,6 +1051,7 @@ end
 function events.KeyDown(t)
 	if Party.High~=0 then return end --only in single player
 	if Game.CurrentScreen==21 then return end
+	if Game.CurrentScreen==7 and Game.CurrentCharScreen==103 then return end
 	if t.Key == healthPotionKey then
 		if vars.healthPotionCooldown==0 then
 			local heal=false

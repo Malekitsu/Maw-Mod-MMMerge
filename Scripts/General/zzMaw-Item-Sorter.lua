@@ -44,6 +44,8 @@ function events.KeyDown(t)
         elseif t.Key == partyBagSortKey then
             sortInventory(true)
             Game.ShowStatusText("All inventories have been sorted")
+        elseif t.Key == AlchemyBagKey and Party.High == 0 then
+            ToggleAlchemyTab()
         elseif t.Key == AlchemyBagKey then
             vars.alchemyPlayer = vars.alchemyPlayer or -1
             if vars.alchemyPlayer == Game.CurrentPlayer then
@@ -57,9 +59,9 @@ function events.KeyDown(t)
     end
 end
 
-local function itemOrder(a, b)
+local function itemOrder(a, b, alchemyFirst)
 	-- Special sorting for items with number >= 220 and < 300
-	if vars.alchemyPlayer>=0 then
+	if alchemyFirst then
 		if (a["Number"] >= 220 and a["Number"] < 300) or (b["Number"] >= 220 and b["Number"] < 300) then
 			-- Ensure that items in the specified range are sorted first and from biggest to smallest
 			if (a["Number"] >= 220 and a["Number"] < 300) and (b["Number"] >= 220 and b["Number"] < 300) then
@@ -108,7 +110,14 @@ local function isAlchemyItem(number)
 	return table.find(alchemyItemsOrder, number) or number>=220 and number<300
 end
 
-local function sortBags(slots, allBags)
+local soloBags={}
+for tab=0,4 do
+	for slot=1,5 do
+		soloBags[#soloBags+1]=slot+tab*100
+	end
+end
+
+local function sortBags(slots, allBags, everyTab)
 	evt.Add("Items", 0)
 	vars.alchemyPlayer=vars.alchemyPlayer or -1
 	if vars.alchemyPlayer>Party.High then
@@ -117,6 +126,13 @@ local function sortBags(slots, allBags)
 	local alchemist=vars.alchemyPlayer
 	if alchemist<0 or #slots==1 and slots[1]==alchemist then
 		alchemist=nil
+	end
+	local solo=Party.High==0
+	local alchemyFirst=vars.alchemyPlayer>=0
+	local craftingBag, alchemyBag
+	if solo then
+		craftingBag, alchemyBag=ReservedBagFlags(Party[slots[1]]:GetIndex())
+		alchemyFirst=next(alchemyBag)~=nil
 	end
 	local touched={}
 	for _, slot in ipairs(slots) do
@@ -139,6 +155,9 @@ local function sortBags(slots, allBags)
 	local function bagsOf(slot)
 		if not allBags then
 			return {home[slot]}
+		end
+		if everyTab then
+			return soloBags
 		end
 		local base=math.floor((home[slot]-1)/100)*100
 		return {base+1, base+2, base+3, base+4, base+5}
@@ -165,7 +184,7 @@ local function sortBags(slots, allBags)
 	for _, slot in ipairs(touched) do
 		loadBag(Party[slot], home[slot])
 	end
-	table.sort(items, itemOrder)
+	table.sort(items, function(a, b) return itemOrder(a, b, alchemyFirst) end)
 
 	local function groups(members)
 		local list={}
@@ -178,29 +197,51 @@ local function sortBags(slots, allBags)
 		end
 		return list
 	end
-	local members={}
-	for _, slot in ipairs(slots) do
-		if slot~=alchemist or not allBags then
-			members[#members+1]=slot
+	local normal, alchemy, crafting, overflow
+	if solo and allBags then
+		local inScope={}
+		for _, b in ipairs(bagsOf(slots[1])) do
+			inScope[b]=true
 		end
+		local function bagsWhere(keep)
+			local g={}
+			for _, b in ipairs(soloBags) do
+				if keep(b) then
+					g[#g+1]={slot=slots[1], bag=b}
+				end
+			end
+			return {g}
+		end
+		crafting=bagsWhere(function(b) return craftingBag[b] end)
+		alchemy=bagsWhere(function(b) return alchemyBag[b] end)
+		normal=bagsWhere(function(b) return inScope[b] and not (everyTab and (craftingBag[b] or alchemyBag[b])) end)
+		overflow=bagsWhere(function(b) return craftingBag[b] or alchemyBag[b] end)
+	else
+		local members={}
+		for _, slot in ipairs(slots) do
+			if slot~=alchemist or not allBags then
+				members[#members+1]=slot
+			end
+		end
+		normal=groups(members)
+		alchemy=alchemist and groups({alchemist}) or {}
+		crafting, overflow={}, {}
 	end
-	local normal=groups(members)
-	local alchemy=alchemist and groups({alchemist}) or {}
 
 	local placed, lastBag, dropped={}, {}, 0
-	local function fill(list, alchemyOnly)
+	local function fill(list, accept, track)
 		for _, g in ipairs(list) do
 			for _, t in ipairs(g) do
 				local pl, failed=Party[t.slot], {}
 				for _, it in ipairs(items) do
-					if not placed[it] and not failed[it.Number] and (not alchemyOnly or isAlchemyItem(it.Number)) then
+					if not placed[it] and not failed[it.Number] and (not accept or accept(it.Number)) then
 						if vars.mawbags[pl:GetIndex()].CurrentBag~=t.bag then
 							storeBag(pl)
 							loadBag(pl, t.bag)
 						end
 						if MawCore.Engine.putInBackpack(pl, it) then
 							placed[it]=true
-							if not alchemyOnly then
+							if track then
 								lastBag[t.slot]=t.bag
 							end
 						else
@@ -211,8 +252,10 @@ local function sortBags(slots, allBags)
 			end
 		end
 	end
-	fill(alchemy, true)
-	fill(normal, false)
+	fill(crafting, isCraftingMaterial)
+	fill(alchemy, isAlchemyItem)
+	fill(normal, nil, true)
+	fill(overflow)
 	for _, it in ipairs(items) do
 		if not placed[it] then
 			dropped=dropped+1
@@ -257,7 +300,7 @@ function gigaChadSort()
 	for i=0,Party.High do
 		slots[#slots+1]=i
 	end
-	sortBags(slots, true)
+	sortBags(slots, true, Party.High==0)
 end
 
 --[[
@@ -310,12 +353,11 @@ function events.KeyDown(t)
 					itemSizeMap[i][2]=2
 				end	
 			end
+			gigaChadSort()
 			if Party.High==0 then
-				sortMultibag()
 				local name=Party[Game.CurrentPlayer].Name
 				Game.ShowStatusText("All " .. name .. "'s bags sorted")
 			else
-				gigaChadSort()
 			    Game.ShowStatusText("All Party bags sorted")
 			end
 		end

@@ -18,6 +18,16 @@ local function craftingFlags(plId)
 	return vars.CraftingBags[plId]
 end
 
+local function alchemyFlags(plId)
+	vars.AlchemyBags = vars.AlchemyBags or {}
+	vars.AlchemyBags[plId] = vars.AlchemyBags[plId] or {}
+	return vars.AlchemyBags[plId]
+end
+
+function ReservedBagFlags(plId)
+	return craftingFlags(plId), alchemyFlags(plId)
+end
+
 local function flaggedBagsList(plId)
 	local list = {}
 	for bagNum in pairs(craftingFlags(plId)) do
@@ -27,11 +37,43 @@ local function flaggedBagsList(plId)
 	return list
 end
 
+local function toggleTab(pl, flags, name)
+	local bags = vars.mawbags and vars.mawbags[pl:GetIndex()]
+	local base = math.floor((((bags and bags.CurrentBag) or 1) - 1) / 100) * 100
+	local assigned = true
+	for bag = base + 1, base + 5 do
+		assigned = assigned and flags[bag] == true
+	end
+	for bag in pairs(flags) do
+		flags[bag] = nil
+	end
+	local tab = base / 100 + 1
+	if assigned then
+		Game.ShowStatusText(string.format("Tab %d is no longer the %s tab", tab, name))
+		return
+	end
+	for bag = base + 1, base + 5 do
+		flags[bag] = true
+	end
+	Game.ShowStatusText(string.format("Tab %d is now the %s tab", tab, name))
+end
+
+function ToggleAlchemyTab()
+	local id = Game.CurrentPlayer
+	if id < 0 or id > Party.High then return end
+	local pl = Party[id]
+	toggleTab(pl, alchemyFlags(pl:GetIndex()), "alchemy")
+end
+
 function ToggleCraftingBag()
 	local id = Game.CurrentPlayer
 	if id < 0 or id > Party.High then return end
 	local pl = Party[id]
 	local plId = pl:GetIndex()
+	if Party.High == 0 then
+		toggleTab(pl, craftingFlags(plId), "crafting")
+		return
+	end
 	vars.mawbags = vars.mawbags or {}
 	local bagData = vars.mawbags[plId]
 	local currentBag = (bagData and bagData.CurrentBag) or 1
@@ -48,7 +90,7 @@ end
 
 function events.KeyDown(t)
 	if Game.CurrentScreen == 7 and Game.CurrentCharScreen == 103 then
-		if t.Key == 66 and Keys.IsPressed(const.Keys.SHIFT) then -- Shift+B
+		if t.Key == 66 then -- B
 			ToggleCraftingBag()
 		end
 	end
@@ -63,13 +105,14 @@ function mawTick_CraftingBagMarker()
 		local id = pl:GetIndex()
 		vars.mawbags = vars.mawbags or {}
 		local flags = craftingFlags(id)
+		local alchemy = alchemyFlags(id)
 		local currentTab = 1
 		if vars.mawbags[id] and vars.mawbags[id].CurrentBag then
 			currentTab = math.ceil(vars.mawbags[id].CurrentBag / 100)
 		end
 		for i = 1, 5 do
 			local rawBag = i + (currentTab - 1) * 100
-			craftingBagMarker[i].Text = (flags[rawBag] == true) and "C" or ""
+			craftingBagMarker[i].Text = ((flags[rawBag] == true) and "C" or "") .. ((alchemy[rawBag] == true) and "A" or "")
 		end
 	else
 		for i = 1, 5 do
