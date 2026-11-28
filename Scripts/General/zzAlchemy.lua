@@ -127,6 +127,10 @@ function events.UseMouseItem(t)
 	elseif it.Number==248 then
 		pl.SP=math.min(pl:GetFullSP(),pl.SP+GetPotionHeal(248, it.Bonus))
 	end
+	local heal=POTION_HEAL[it.Number]
+	if heal and heal.pool=="HP" and pl.HP>0 then
+		MawReviveRecovery(pl, const.Condition.Unconscious)
+	end
 	--Regen
 	if it.Number==233 then
 		Buff=pl.SpellBuffs[const.PlayerBuff.Regeneration]
@@ -153,6 +157,9 @@ function events.UseMouseItem(t)
 	end
 	
 	if itemImmunityMapping[it.Number] then 
+		if table.find(itemImmunityMapping[it.Number], "Unconscious") then
+			MawReviveRecovery(pl, const.Condition.Unconscious)
+		end
 		for i=1,#itemImmunityMapping[it.Number] do
 			local txt=itemImmunityMapping[it.Number][i]
 			vars.PlayerAlchemyBuffs[index][txt]=Game.Time+potionDuration

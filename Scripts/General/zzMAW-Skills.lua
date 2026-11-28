@@ -1068,6 +1068,7 @@ function events.KeyDown(t)
 				local healAmount=round(bonus^1.4)+10
 				evt.Add("HP",healAmount)
 				if Party[0].HP>=0 then
+					MawReviveRecovery(Party[0], const.Condition.Unconscious)
 					Party[0].Unconscious=0
 				end
 				vars.healthPotionCooldown=15

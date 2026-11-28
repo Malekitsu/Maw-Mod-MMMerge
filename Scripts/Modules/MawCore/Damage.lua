@@ -140,6 +140,7 @@ local function stage_seraphOnHitHeal(t)
 		evt[healTarget].Add("HP",healValue)		
 		--bug fix
 		if Party[healTarget].HP>0 then
+			MawReviveRecovery(Party[healTarget], const.Condition.Unconscious)
 			Party[healTarget].Unconscious=0
 		end
 		local partyHP2=partyHPSum()
@@ -1433,6 +1434,9 @@ local function stage_leech(t)
 				SendHeal(partyId, playerId, overHeal, pl.Name)
 			else
 				Party[id].HP=math.min(Party[id].HP+overHeal, GetMaxHP(Party[id]))
+				if Party[id].HP>0 then
+					MawReviveRecovery(Party[id], const.Condition.Unconscious)
+				end
 			end
 		end
 		local partyHP2=partyHPSum()

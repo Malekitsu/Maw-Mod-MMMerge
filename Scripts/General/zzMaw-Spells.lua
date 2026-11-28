@@ -107,6 +107,23 @@ end
 --hour of power buff list
 local hopList = {8, 9, 14, 15}
 
+local REVIVE_RECOVERY={
+	[const.Condition.Unconscious]=60,
+	[const.Condition.Dead]=120,
+	[const.Condition.Eradicated]=180,
+}
+
+function MawReviveRecovery(pl, cured)
+	local c=const.Condition
+	local worst=pl.Eradicated~=0 and c.Eradicated or pl.Dead~=0 and c.Dead or pl.Unconscious~=0 and c.Unconscious
+	if not worst or worst>cured then
+		return
+	end
+	local delay=pl.RecoveryDelay
+	pl:SetRecoveryDelay(REVIVE_RECOVERY[worst])
+	pl.RecoveryDelay=math.max(pl.RecoveryDelay, delay)
+end
+
 local function skipRemoteCast(t)
 	if t.MultiplayerData then
 		t.MultiplayerData.skipped=true
@@ -221,6 +238,7 @@ function events.PlayerCastSpell(t)
 
 			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+healData[1],GetMaxHP(Party[t.TargetId]))
 			if Party[t.TargetId].HP>0 then
+				MawReviveRecovery(Party[t.TargetId], const.Condition.Unconscious)
 				Party[t.TargetId].Unconscious=0
 			end
 			if Party.High==0 and healData[2] then
@@ -237,6 +255,7 @@ function events.PlayerCastSpell(t)
 			local overheal = math.max(0, round(totHeal) - (maxHP - Party[t.TargetId].HP))
 			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+round(totHeal),maxHP)
 			if Party[t.TargetId].HP>0 then
+				MawReviveRecovery(Party[t.TargetId], const.Condition.Unconscious)
 				Party[t.TargetId].Unconscious=0
 			end
 			processHealLegendaries(t.Player, 49, const.Skills.Spirit, round(totHeal), overheal, true)
@@ -272,6 +291,7 @@ function events.PlayerCastSpell(t)
 	if t.SpellId == 53 then
 		if t.TargetKind == 4 and not t.RemoteData then
 			local s,m=SplitSkill(t.Player:GetSkill(const.Skills.Spirit))
+			MawReviveRecovery(Party[t.TargetId], m>=4 and const.Condition.Eradicated or const.Condition.Dead)
 			if m>=4 then
 				Party[t.TargetId].Unconscious=0
 				Party[t.TargetId].Dead=0
@@ -308,6 +328,7 @@ function events.PlayerCastSpell(t)
 
 			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+healData[1],GetMaxHP(Party[t.TargetId]))
 			if Party[t.TargetId].HP>0 then
+				MawReviveRecovery(Party[t.TargetId], const.Condition.Unconscious)
 				Party[t.TargetId].Unconscious=0
 			end
 			if Party.High==0 and healData[2] then
@@ -323,6 +344,7 @@ function events.PlayerCastSpell(t)
 			local maxHP = GetMaxHP(Party[t.TargetId])
 			local overheal = math.max(0, round(totHeal) - (maxHP - Party[t.TargetId].HP))
 			if Party[t.TargetId].Dead>0 or Party[t.TargetId].Eradicated>0 then
+				MawReviveRecovery(Party[t.TargetId], const.Condition.Eradicated)
 				local hp=Party[t.TargetId].HP
 				RunNextTick(function()
 					Party[t.TargetId].HP=math.max(hp+round(totHeal), round(totHeal))
@@ -330,6 +352,7 @@ function events.PlayerCastSpell(t)
 			else
 				Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+round(totHeal),maxHP)
 				if Party[t.TargetId].HP>0 then
+					MawReviveRecovery(Party[t.TargetId], const.Condition.Unconscious)
 					Party[t.TargetId].Unconscious=0
 				end
 			end
@@ -373,6 +396,7 @@ function events.PlayerCastSpell(t)
 
 			Party[t.TargetId].HP=Party[t.TargetId].HP+healData[1]
 			if Party[t.TargetId].HP>0 then
+				MawReviveRecovery(Party[t.TargetId], const.Condition.Unconscious)
 				Party[t.TargetId].Unconscious=0
 			end
 			if Party.High==0 and healData[2] then
@@ -389,6 +413,7 @@ function events.PlayerCastSpell(t)
 			local overheal = math.max(0, round(totHeal) - (maxHP - Party[t.TargetId].HP))
 			Party[t.TargetId].HP=Party[t.TargetId].HP+round(totHeal)
 			if Party[t.TargetId].HP>0 then
+				MawReviveRecovery(Party[t.TargetId], const.Condition.Unconscious)
 				Party[t.TargetId].Unconscious=0
 			end
 			processHealLegendaries(t.Player, 68, const.Skills.Body, round(totHeal), overheal, true)
@@ -447,6 +472,7 @@ function events.PlayerCastSpell(t)
 
 			Party[t.TargetId].HP=math.min(Party[t.TargetId].HP+healData[1],GetMaxHP(Party[t.TargetId]))
 			if Party[t.TargetId].HP>0 then
+				MawReviveRecovery(Party[t.TargetId], const.Condition.Unconscious)
 				Party[t.TargetId].Unconscious=0
 			end
 			if Party.High==0 and healData[2] then
@@ -464,6 +490,7 @@ function events.PlayerCastSpell(t)
 			local overheal = round(totHeal) - actualHeal
 			Party[t.TargetId].HP = Party[t.TargetId].HP + actualHeal
 			if Party[t.TargetId].HP>0 then
+				MawReviveRecovery(Party[t.TargetId], const.Condition.Unconscious)
 				Party[t.TargetId].Unconscious=0
 			end
 			processHealLegendaries(t.Player, 74, const.Skills.Body, round(totHeal), overheal, true)
@@ -524,6 +551,9 @@ if t.SpellId == 77 then
         local overhealI = math.max(0, applyHeal - (maxHP - Party[i].HP))
         totalOverheal = totalOverheal + overhealI
         Party[i].HP = math.min(Party[i].HP + applyHeal, maxHP)
+        if Party[i].HP > 0 then
+          MawReviveRecovery(Party[i], const.Condition.Unconscious)
+        end
       end
     end
     local tgt = t.TargetId
@@ -548,6 +578,9 @@ if t.SpellId == 77 then
     if applyHeal ~= 0 then
       for i = 0, Party.High do
         Party[i].HP = (Party[i].HP or 0) + applyHeal
+        if Party[i].HP > 0 then
+          MawReviveRecovery(Party[i], const.Condition.Unconscious)
+        end
       end
     end
     local tgt = t.TargetId
@@ -971,6 +1004,7 @@ function doSharedLife(amount, spellQueueData)
 	-- Wake up unconscious players who now have positive HP
 	for i, entry in ipairs(participatingPlayers) do
 		if entry.player.HP > 0 then
+			MawReviveRecovery(entry.player, const.Condition.Unconscious)
 			entry.player.Unconscious = 0
 		end
 	end
@@ -1234,6 +1268,7 @@ function processAutoTargetHeal(spellId, pl, skillType, soundId, removeConditionF
 	
 	-- Bug fix
 	if Party[min_index].HP>0 then
+		MawReviveRecovery(Party[min_index], const.Condition.Unconscious)
 		Party[min_index].Unconscious=0
 	end
 	
@@ -1311,6 +1346,7 @@ function events.Action(t)
 			t.Handled=true
 			Party[idx].HP=math.max(Party[idx].HP,1)
 			processAutoTargetHeal(74, pl, const.Skills.Body, 16070, function(idx)
+				MawReviveRecovery(Party[idx], const.Condition.Eradicated)
 				Party[idx].Dead=0
 				Party[idx].Eradicated=0
 			end)

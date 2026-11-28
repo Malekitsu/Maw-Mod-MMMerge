@@ -206,6 +206,14 @@ function pickLowestPartyMember()
 	local min_value = math.min(a, b, c, d, e)
 	local min_index = indexof({a, b, c, d, e}, min_value)
 	min_index = min_index - 1
+	if min_value<=0 then
+		for i=0,Party.High do
+			local pl=Party[i]
+			if pl.Dead==0 and pl.Eradicated==0 and pl.HP<=0 and pl.HP>Party[min_index].HP then
+				min_index=i
+			end
+		end
+	end
 	return min_index, min_value
 end
 
