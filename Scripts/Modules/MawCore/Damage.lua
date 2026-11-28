@@ -86,8 +86,11 @@ end
 -- context -- the first stage: resolve the attack context once per hit.
 -- WhoHitMonster() is stable for the whole event, so every stage reads t.Hit
 -- instead of calling it again (the bodies' `data` locals alias t.Hit).
+local itemAddOnNext
 local function stage_context(t)
 	t.Hit = WhoHitMonster()
+	t.ItemAddOn = itemAddOnNext
+	itemAddOnNext = nil
 end
 
 local function stage_puppetZero(t)
@@ -530,7 +533,7 @@ end
 local function stage_weaponRecompute(t)
   local data = t.Hit
   if not (data and data.Player and (t.DamageKind == 4
-    or isCarnageHit(data) and t.Damage > 0
+    or isCarnageHit(data) and not t.ItemAddOn
     or data.Spell == 135)) then
     return
   end
@@ -2197,6 +2200,9 @@ function Damage.runPlayer(t)
 end
 
 function Damage.start()
+	function events.ItemAdditionalDamage()
+		itemAddOnNext = true
+	end
 	function events.PlayerAttacked(t)
 		if Damage.FRIENDLY_FIRE then
 			return
