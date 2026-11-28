@@ -721,7 +721,28 @@ for i=1,50 do
 end
 ]]
 
-function getMonsterHealth(mon, level)
+local MONSTER_RESISTANCE_CAP = 200
+local RESISTANCE_HEALTH_EXPONENT = 0.5
+
+function getMonsterResistanceHealthMult(id)
+	local base = basetable[id]
+	if not base then
+		return 1
+	end
+	local physical, spells, count = 1, 0, 0
+	for kind, damageKind in pairs(damageKindMap) do
+		local taken = 1/2^(math.min(base.Resistances[kind] or 0, MONSTER_RESISTANCE_CAP)/100)
+		if damageKind == const.Damage.Phys then
+			physical = taken
+		else
+			spells = spells + taken
+			count = count + 1
+		end
+	end
+	return ((physical + spells/count)/2)^RESISTANCE_HEALTH_EXPONENT
+end
+
+function getMonsterHealth(mon, level, skipResistances)
 	local hitToKillMonster={1,1.5,2,2.5,2.7,3,3.2,3.5,3.5}
 	local hitToKillMonsterAusterity={2,4,6,8,8,8,8.5,9,9.5}
 	if mon then
@@ -752,6 +773,9 @@ function getMonsterHealth(mon, level)
 	end
 	rateo=math.max(0.6,math.min(rateo,1.8))
 	health=health*rateo
+	if not skipResistances then
+		health=health*getMonsterResistanceHealthMult(id)
+	end
 	
 	-- Check if monster has GetIndex method (real monster vs mock object)
 	if not mon.GetIndex then

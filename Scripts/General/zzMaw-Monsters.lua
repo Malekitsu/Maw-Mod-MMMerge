@@ -2109,7 +2109,7 @@ function events.BuildMonsterInformationBox(t)
 		end
 		local pl=Party[id]
 		local playerLevel=math.min(calcLevel(pl.Experience),partyLvl) 
-		local healthRateo=getMonsterHealth(mon)/getMonsterHealth(false,playerLevel)
+		local healthRateo=getMonsterHealth(mon, nil, true)/getMonsterHealth(false,playerLevel)
 					
 		local experienceAwarded=experience*healthRateo
 		local lvl=pl.LevelBase

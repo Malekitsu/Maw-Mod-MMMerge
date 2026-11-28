@@ -190,7 +190,7 @@ function events.MonsterKillExp(t)
 	partyCount=math.max(1,partyCount)
 	local experience=round(t.Exp/partyCount)
 	
-	local monHealth=getMonsterHealth(mon)
+	local monHealth=getMonsterHealth(mon, nil, true)
 	--local monDamage=getMonsterDamage(mon)
 	
 	for i=0, Party.High do
