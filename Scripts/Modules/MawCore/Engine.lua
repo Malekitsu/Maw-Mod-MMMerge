@@ -140,6 +140,7 @@ Engine.Addr = {
 	DollBackNoGrip      = 0x43A961,
 	DollFrontGrip       = 0x43BA35,
 	DollFrontNoGrip     = 0x43BA76,
+	ExplosionRadius     = 512,
 }
 
 -- Ledger of every binary patch MawCore applies. Nothing in the core may

@@ -460,6 +460,47 @@ local function isCarnageHit(data)
 	return data and data.Object and data.Object.Spell == 133 and data.Object.Item and data.Object.Item.Bonus2 == 3
 end
 
+local explosionSkips = {
+	[const.AIState.Dying] = true,
+	[const.AIState.Dead] = true,
+	[const.AIState.Removed] = true,
+	[const.AIState.Summoned] = true,
+	[const.AIState.Invisible] = true,
+}
+local carnageCount = {}
+
+local function carnageTargets(obj)
+	local ptr = obj["?ptr"]
+	if carnageCount.ptr == ptr and carnageCount.time == Game.Time then
+		return carnageCount.n
+	end
+	local radius = MawCore.Engine.Addr.ExplosionRadius
+	local online = MawCore.Sync.inGame()
+	local n = 0
+	for i = 0, Map.Monsters.High do
+		local mon = Map.Monsters[i]
+		if not explosionSkips[mon.AIState]
+			and mon.SpellBuffs[const.MonsterBuff.Stoned].ExpireTime <= 0
+			and mon.SpellBuffs[const.MonsterBuff.Paralyze].ExpireTime <= 0
+			and not (online and Multiplayer.posessed_by_player(i)) then
+			local dx, dy = mon.X - obj.X, mon.Y - obj.Y
+			local dz = mon.Z + math.floor(mon.BodyHeight/2) - obj.Z
+			local r = radius + mon.BodyRadius
+			if dx*dx + dy*dy + dz*dz < r*r then
+				n = n + 1
+			end
+		end
+	end
+	carnageCount.ptr, carnageCount.time, carnageCount.n = ptr, Game.Time, n
+	return n
+end
+
+local function carnageHitMult(t)
+	local n = math.max(carnageTargets(t.Hit.Object), 1)
+	t.CarnageTargets = n
+	return math.max(MawCore.Formulas.carnageDamageMult, 1/(n*GetDensityAoeMult()))
+end
+
 -- from Scripts/General/zzMaw-Stats.lua:141 -- THE base replacement for
 -- melee/bow/blaster hits: recompute from Get(Melee|Ranged)DamageMin/Max,
 -- x damageMultiplier (weapon-speed scaling), assassin isolation subtraction,
@@ -468,7 +509,7 @@ end
 local function stage_weaponRecompute(t)
   local data = t.Hit
   if not (data and data.Player and (t.DamageKind == 4
-    or isCarnageHit(data)
+    or isCarnageHit(data) and t.Damage > 0
     or data.Spell == 135)) then
     return
   end
@@ -518,7 +559,7 @@ local function stage_weaponRecompute(t)
     t.Result = t.Result * 0.5
   end
   if isCarnageHit(data) then
-    t.Result = t.Result * MawCore.Formulas.carnageDamageMult
+    t.Result = t.Result * carnageHitMult(t)
   end
 end
 
@@ -1038,8 +1079,9 @@ local function stage_legendaries(t)
 		end 
 	end
 	if isCarnageHit(data) then
-		fireAuraDamage=fireAuraDamage*MawCore.Formulas.carnageDamageMult
-		enchantDamage=enchantDamage*MawCore.Formulas.carnageDamageMult
+		local mult=carnageHitMult(t)
+		fireAuraDamage=fireAuraDamage*mult
+		enchantDamage=enchantDamage*mult
 	end
 	t.Result=t.Result+fireAuraDamage+enchantDamage
 	t.ElementalDamage=(t.ElementalDamage or 0)+fireAuraDamage+enchantDamage
@@ -1056,7 +1098,7 @@ local function stage_legendaries(t)
 				dmg=dmg*0.5
 			end
 			if isCarnageHit(data) then
-				dmg=dmg*MawCore.Formulas.carnageDamageMult
+				dmg=dmg*carnageHitMult(t)
 			end
 			if  data and not data.Object then
 				dmg=dmg*damageMultiplier[id]["Melee"]
@@ -1373,6 +1415,7 @@ end
 -- ShowDamage status message, HP-overcap divide, ceil + 32500 cap
 --AoE-total message state, shared across the hits of one cast (NOTES.md)
 local MSGdamage, calls
+local msgTargets, msgTargetCount = {}, 0
 
 local function stage_trackAndClamp(t)
 	if t.Result==0 then return end
@@ -1449,7 +1492,11 @@ local function stage_trackAndClamp(t)
 		end
 		calls=calls or 0
 		calls=calls+1
-		if calls>=2 and (attackIsSpell or isCarnageHit(data)) then
+		if not msgTargets[t.MonsterIndex] then
+			msgTargets[t.MonsterIndex]=true
+			msgTargetCount=msgTargetCount+1
+		end
+		if msgTargetCount>=2 and (attackIsSpell or isCarnageHit(data)) then
 			castedAoe=true
 		end
 		local id=t.MonsterIndex
@@ -1477,6 +1524,7 @@ local function stage_trackAndClamp(t)
 				end
 				if calls==0 then
 					MSGdamage=0
+					msgTargets, msgTargetCount={}, 0
 				end
 			end
 		end)
@@ -1594,6 +1642,56 @@ end
 
 function Damage.describe()
 	return pipe:describe() .. "\n" .. Damage.playerPipe:describe()
+end
+
+local function traceStep(t, stage)
+	if stage == "context" then
+		local data = t.Hit
+		local obj = data and data.Player and data.Object
+		local stray = data and data.Player and not data.Object and t.DamageKind ~= 4
+		if not (stray or obj and (obj.Spell == 133 or obj.Type == 600 or obj.Type == 601 or obj.Item.Bonus2 == 3)) then
+			return
+		end
+		local mon = t.Monster
+		local head = ("mon %d id %d hp %.0f | kind %d spell %s"):format(t.MonsterIndex, mon.Id, MawCore.MonsterHP.current(mon), t.DamageKind, tostring(data.Spell))
+		if obj then
+			head = head .. (" | obj %X type %d spell %d bonus2 %d carnage %s | time %.0f"):format(obj["?ptr"], obj.Type, obj.Spell, obj.Item.Bonus2, tostring(isCarnageHit(data) == true), Game.Time)
+		end
+		t.Trace, t.TraceLast = {head .. (" | in %.0f"):format(t.Result)}, t.Result
+		return
+	end
+	local row = t.Trace
+	if not row then
+		return
+	end
+	if t.Result ~= t.TraceLast then
+		row[#row + 1] = ("%s %.0f"):format(stage, t.Result)
+		t.TraceLast = t.Result
+	end
+	if stage == "publish" or t.Stop then
+		if t.CarnageTargets then
+			row[#row + 1] = ("targets %d"):format(t.CarnageTargets)
+		end
+		print("[damage] " .. table.concat(row, " > "))
+	end
+end
+
+function Damage.trace(on)
+	if not on then
+		pipe.trace = nil
+		print("damage trace off")
+		Game.ShowStatusText("Damage trace off")
+		return
+	end
+	pipe.trace = function(t, stage)
+		local ok, err = pcall(traceStep, t, stage)
+		if not ok then
+			pipe.trace = nil
+			print("damage trace stopped: " .. tostring(err))
+		end
+	end
+	print("damage trace on: bow and carnage hits are written to MMExtensionLog.txt")
+	Game.ShowStatusText("Damage trace on")
 end
 
 ------------------------------------------------------------------------

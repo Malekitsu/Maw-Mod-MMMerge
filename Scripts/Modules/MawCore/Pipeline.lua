@@ -84,12 +84,19 @@ function Pipeline:remove(stage, id)
 end
 
 function Pipeline:run(ctx)
+	local trace = self.trace
 	for _, stage in ipairs(self.order) do
 		for _, h in ipairs(self.handlers[stage]) do
 			h.fn(ctx)
 			if ctx.Stop then
-				return ctx
+				break
 			end
+		end
+		if trace then
+			trace(ctx, stage)
+		end
+		if ctx.Stop then
+			return ctx
 		end
 	end
 	return ctx
