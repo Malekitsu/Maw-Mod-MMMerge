@@ -562,20 +562,23 @@ function events.MultiplayerInitialized()
         return
     end
 	local mawSettingsButton={}
-    local function createSwitch(Y, Header, Field, Options)
+    local function createSwitch(Y, Header, Field, Options, Parent)
         mawSettingsButton[#mawSettingsButton + 1] = CustomSwitch(ScreenId, 120, Y, nil,
             StrColor(255, 255, 150) .. Header .. StrColor(255, 255, 255),
-            mawSettings, Field, Options)
+            Parent or mawSettings, Field, Options)
     end
 
     -- Define switches
     createSwitch(170, "Buff Rework", "buffRework", {"ON","OFF"})
-    createSwitch(205, "M&M6 Projectiles", "restoreProjectiles", {"ON","OFF"})
-    createSwitch(240, "Homing Projectiles", "homingProjectiles", {"ON","OFF"})
-    createSwitch(275, "Damage on Friendly Units", "friendlyDamage", {"ON","OFF"})
-    createSwitch(310, "Loot Filter", "lootFilter", {"OFF","Common", "Uncom.", "Rare", "Epic","Ancient","Primordial"})
-    createSwitch(345, "Extra Item Tooltip", "extraItemTooltip", {"OFF","ON"})
-    createSwitch(380, "Trainer Hints", "trainerHints", {"OFF","ON"})
+    createSwitch(200, "M&M6 Projectiles", "restoreProjectiles", {"ON","OFF"})
+    createSwitch(230, "Homing Projectiles", "homingProjectiles", {"ON","OFF"})
+    createSwitch(260, "Damage on Friendly Units", "friendlyDamage", {"ON","OFF"})
+    createSwitch(290, "Loot Filter", "lootFilter", {"OFF","Common", "Uncom.", "Rare", "Epic","Ancient","Primordial"})
+    createSwitch(320, "Extra Item Tooltip", "extraItemTooltip", {"OFF","ON"})
+    createSwitch(350, "Trainer Hints", "trainerHints", {"OFF","ON"})
+    if MAW_LuaOverlay and MAW_LuaOverlay.Options then
+        createSwitch(380, "Monster HP Bars", "Enabled", {"OFF","ON"}, MAW_LuaOverlay.Options)
+    end
 	
     function events.OpenExtraSettingsMenu()
         for _, v in pairs(mawSettingsButton) do
