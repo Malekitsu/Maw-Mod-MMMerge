@@ -2144,7 +2144,7 @@ function events.BuildMonsterInformationBox(t)
 		end
 		local legendaryStack = mapvars.legendaryDamageTaken and mapvars.legendaryDamageTaken[monIndex] or 0
 		if legendaryStack > 0 then
-			activeDebuffs = activeDebuffs .. "\nAll damage taken: +" .. round(legendaryStack) .. "%"
+			activeDebuffs = activeDebuffs .. "\nAll damage taken: +" .. string.format("%.1f", legendaryStack) .. "%"
 		end
 		if activeDebuffs ~= "" then
 			t.EffectsHeader.Text = t.EffectsHeader.Text .. "\n\n" .. StrColor(255,200,0, "Debuffs:" .. activeDebuffs)

@@ -253,6 +253,8 @@ Formulas.legendary24Health = 0.10
 Formulas.legendary24Mana = 0.05
 
 Formulas.legendary29DamageTaken = 1
+Formulas.legendary29BowMult = 0.5
+Formulas.legendary29CarnageMult = 0.25
 
 -- Shaman melee hit: HP leeched (Body magic).
 function Formulas.bodyLeech(fullHP, s, m)

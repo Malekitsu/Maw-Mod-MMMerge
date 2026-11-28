@@ -500,7 +500,7 @@ function getPlayerEstimatedHealth(lvl)
 end
 
 function getMonsterDamage(mon, level, damageKind)
-	local hitToKill={14,10,7,6.5,6,5.5,5,4.5,4}
+	local hitToKill={14,10,7,6,5,4.5,4,3.5,3.5}
 	local hitToKillAusterity={15,10,5,4,3,2.5,2,1.5,1}
 	
 	if mon then
@@ -722,7 +722,7 @@ end
 ]]
 
 function getMonsterHealth(mon, level)
-	local hitToKillMonster={1,1.5,2,2.5,3,3.5,4,4.5,5}
+	local hitToKillMonster={1,1.5,2,2.5,2.7,3,3.2,3.5,3.5}
 	local hitToKillMonsterAusterity={2,4,6,8,8,8,8.5,9,9.5}
 	if mon then
 		level=totalLevel[MawTierB(mon.Id)] or level

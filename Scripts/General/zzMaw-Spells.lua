@@ -2056,6 +2056,7 @@ function events.CalcSpellDamage(t)
 	
 	--int/crit/enchant scaling
 	if data and data.Player and (data.Player.Class==10 or data.Player.Class==11 or table.find(dkClass, data.Player.Class)) then return end
+	local hitCritMult
 	if data and data.Player then
 		if data.Player.Class==10 or data.Player.Class==11 then return end --dragons scale off might
 		
@@ -2068,6 +2069,7 @@ function events.CalcSpellDamage(t)
 		t.Result=t.Result*mult
 		if success then
 			t.Result=t.Result*critMult
+			hitCritMult=critMult
 			MawCore.DamageState.setCrit(true)
 		end
 	end
@@ -2076,8 +2078,8 @@ function events.CalcSpellDamage(t)
 		for i=0,2 do
 			local it=data.Player:GetActiveItem(i)
 			if it then
-				local dmg1=calcEnchantDamage(data.Player, it, 0, true, true, "damage")
-				local dmg2=calcFireAuraDamage(data.Player, it, 0, false, true, "damage")
+				local dmg1=calcEnchantDamage(data.Player, it, 0, true, true, "damage", hitCritMult)
+				local dmg2=calcFireAuraDamage(data.Player, it, 0, false, true, "damage", hitCritMult)
 				damage=(dmg1+dmg2)*1.015^ascensionSkill
 				if table.find(aoespells, t.Spell) then
 					damage=damage/2.5

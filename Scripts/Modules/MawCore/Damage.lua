@@ -460,6 +460,26 @@ local function isCarnageHit(data)
 	return data and data.Object and data.Object.Spell == 133 and data.Object.Item and data.Object.Item.Bonus2 == 3
 end
 
+local function hitSpeedMult(data, pl, id)
+	if not data then
+		return 1
+	end
+	local obj = data.Object
+	local weapon
+	if obj == nil or data.Spell == 135 then
+		weapon = "Melee"
+	elseif obj.Spell == 133 then
+		weapon = "Ranged"
+	elseif obj.Spell > 0 then
+		if not (table.find(dkClass, pl.Class) or table.find(assassinClass, pl.Class)) then
+			return 1.015^SplitSkill(pl:GetSkill(const.Skills.Learning))
+		end
+		weapon = "Melee"
+	end
+	local speed = damageMultiplier and damageMultiplier[id]
+	return weapon and speed and speed[weapon] or 1
+end
+
 local explosionSkips = {
 	[const.AIState.Dying] = true,
 	[const.AIState.Dead] = true,
@@ -550,6 +570,7 @@ local function stage_weaponRecompute(t)
 
 
   local critChance, critMult, success = getCritInfo(pl, false, safeGetMonsterLevel(t.Monster))
+  t.HitCritMult = success and critMult or nil
   if success then
     t.Result = t.Result * critMult
 	DamageState.setCrit(true)
@@ -635,9 +656,16 @@ local function stage_resAndRetaliation(t)
 		if data and data.Object==nil and t.DamageKind~=4 then goto continue end --disable for melee elemental damage
 		if data and table.find(aoespells, data.Spell) and math.random()>0.4 then goto continue end
 		local id=t.MonsterIndex
+		local F=MawCore.Formulas
+		local stack=F.legendary29DamageTaken*hitSpeedMult(data, t.Player, t.PlayerIndex)
+		if isCarnageHit(data) then
+			stack=stack*F.legendary29CarnageMult
+		elseif data and data.Object and data.Object.Spell==133 then
+			stack=stack*F.legendary29BowMult
+		end
 		mapvars.legendaryDamageTaken=mapvars.legendaryDamageTaken or {}
-		mapvars.legendaryDamageTaken[id]=(mapvars.legendaryDamageTaken[id] or 0)+MawCore.Formulas.legendary29DamageTaken
-		MawCore.Sync.monsterStackAdded("legendaryDamageTaken", id, MawCore.Formulas.legendary29DamageTaken)
+		mapvars.legendaryDamageTaken[id]=(mapvars.legendaryDamageTaken[id] or 0)+stack
+		MawCore.Sync.monsterStackAdded("legendaryDamageTaken", id, stack)
 	end
 	::continue::
 	do
@@ -784,8 +812,8 @@ local function stage_dkAttack(t)
 			for i=0,1 do
 				local it=pl:GetActiveItem(i)
 				if it then
-					local damage1=calcFireAuraDamage(pl, it, 0, false, false, "damage")
-					local damage2=calcEnchantDamage(pl, it, 0, false, false, "damage")
+					local damage1=calcFireAuraDamage(pl, it, 0, false, false, "damage", success and critMult)
+					local damage2=calcEnchantDamage(pl, it, 0, false, false, "damage", success and critMult)
 					damage=damage+damage1+damage2
 				end
 			end
@@ -909,8 +937,8 @@ local function stage_assassinAttack(t)
 			for i=0,1 do
 				local it=pl:GetActiveItem(i)
 				if it then
-					local damage1=calcFireAuraDamage(pl, it, 0, false, false, "damage")
-					local damage2=calcEnchantDamage(pl, it, 0, false, false, "damage")
+					local damage1=calcFireAuraDamage(pl, it, 0, false, false, "damage", success and critMult)
+					local damage2=calcEnchantDamage(pl, it, 0, false, false, "damage", success and critMult)
 					damage=damage+damage1+damage2
 				end
 			end
@@ -1043,20 +1071,21 @@ local function stage_legendaries(t)
 	--weapon enchants	
 	local fireAuraDamage=0
 	local enchantDamage=0
-	local fireRes=mon.Resistances[0]%1000
+	local physRes=hasLegendary(id,36) and mon.Resistances[4]%1000
+	local auraRes=physRes or mon.Resistances[0]%1000
 	if data and not data.Object and t.DamageKind==4 then
 		for i=0,1 do
 			local it=pl:GetActiveItem(i)
 			if it then
-				local damage=calcFireAuraDamage(pl, it, fireRes, true, false, "damage")
+				local damage=calcFireAuraDamage(pl, it, auraRes, true, false, "damage", t.HitCritMult)
 				if damage then
 					fireAuraDamage=fireAuraDamage+damage
 				end
 				
 				if it and enchantbonusdamage[it.Bonus2] then
 					local id=table.find(damageKindMap,enchantbonusdamage[it.Bonus2].Type)
-					local res=mon.Resistances[id]%1000
-					local dmg=calcEnchantDamage(pl, it, res, true, false, "damage")
+					local res=physRes or mon.Resistances[id]%1000
+					local dmg=calcEnchantDamage(pl, it, res, true, false, "damage", t.HitCritMult)
 					if damage then
 						enchantDamage=enchantDamage+dmg
 					end
@@ -1065,14 +1094,14 @@ local function stage_legendaries(t)
 		end
 	elseif data and data.Object and (data.Object.Spell==133 or data.Spell==135) then --bow/blasters
 		local it=pl:GetActiveItem(2)
-		local damage=calcFireAuraDamage(pl, it, fireRes, true, false, "damage")
+		local damage=calcFireAuraDamage(pl, it, auraRes, true, false, "damage", t.HitCritMult)
 		if damage and damage>fireAuraDamage then
 			fireAuraDamage=damage
 		end
 		if it and enchantbonusdamage[it.Bonus2] then
 			local id=table.find(damageKindMap,enchantbonusdamage[it.Bonus2].Type)
-			local res=mon.Resistances[id]%1000
-			local dmg=calcEnchantDamage(pl, it, res, true, false, "damage")
+			local res=physRes or mon.Resistances[id]%1000
+			local dmg=calcEnchantDamage(pl, it, res, true, false, "damage", t.HitCritMult)
 			if damage then
 				enchantDamage=enchantDamage+dmg
 			end
@@ -1084,7 +1113,9 @@ local function stage_legendaries(t)
 		enchantDamage=enchantDamage*mult
 	end
 	t.Result=t.Result+fireAuraDamage+enchantDamage
-	t.ElementalDamage=(t.ElementalDamage or 0)+fireAuraDamage+enchantDamage
+	if not physRes then
+		t.ElementalDamage=(t.ElementalDamage or 0)+fireAuraDamage+enchantDamage
+	end
 
 	--[17]="Your hits will deal 1% of current monster HP health (0.4% for AoE, multi-hit spells and arrows)",
 	if hasLegendary(id,17) then

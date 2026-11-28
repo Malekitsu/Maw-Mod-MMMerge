@@ -1654,6 +1654,7 @@ legendaryEffects={
 	[33]="Increase Melee weapon skill by 10",
 	[34]="Overhealing refunds mana",
 	[35]="Overhealing reduces recovery time equal to half overhealing amount",
+	[36]="Your weapon enchants deal physical damage instead",
 }
 
 --Roll ids run 1..LEGENDARY_AFFIX_COUNT and store as id+LEGENDARY_AFFIX_BASE.
@@ -2176,7 +2177,7 @@ function GetPlayerBaseRecovery(pl, it)
 end
 
 --calculate enchant damage
-function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType)
+function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType, hitCritMult)
 	local ench=enchantbonusdamage[it.Bonus2]
 	if not ench or (it.Bonus2==39 and not isSpell) or (it.Bonus2==46 and isSpell) then
 		return 0
@@ -2189,15 +2190,14 @@ function calcEnchantDamage(pl, it, resistance, rand, isSpell, calcType)
 	local id=pl:GetIndex()
 	local mult=GetLegendary19Mult(pl)
 	if calcType~="tooltip" and vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 26) then
-		if isSpell then
-			critChance, critMult, success=getCritInfo(pl,"spell")
-		else
-			critChance, critMult, success=getCritInfo(pl)
-		end
-		if calcType=="damage" and success then
-			mult=mult*critMult
-		end
-		if calcType=="power" then
+		if calcType=="damage" then
+			mult=mult*(hitCritMult or 1)
+		elseif calcType=="power" then
+			if isSpell then
+				critChance, critMult, success=getCritInfo(pl,"spell")
+			else
+				critChance, critMult, success=getCritInfo(pl)
+			end
 			mult=mult*(1+math.min(critChance,1)*(critMult-1))
 		end
 	end
@@ -4317,7 +4317,7 @@ fireAuraDamage={0.1,0.15,0.2,0.25,[0]=0}
 --guaranteed damage per mastery when the weapon is too weak for the share
 --above to beat it; doubled on two-handed weapons, same as the enchant floor
 fireAuraMinDamage={3,6,12,24,[0]=0}
-function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
+function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType, hitCritMult)
 	if vars.MAWSETTINGS.buffRework=="ON" and vars.mawbuff[4] then
 		if not it or (it and it.Number==0) or (it and it:T().EquipStat>2) then return 0 end
 		local s, m, level=getBuffSkill(4)
@@ -4328,15 +4328,14 @@ function calcFireAuraDamage(pl, it, res, speedMult, isSpell, calcType)
 		damage=math.max(damage, fireAuraMinDamage[m]*(IsTwoHandedWeapon(it) and 2 or 1))
 		damage=damage*GetLegendary19Mult(pl)
 		if calcType~="tooltip" and vars.legendaries and vars.legendaries[id] and table.find(vars.legendaries[id], 26) then
-			if isSpell then
-				critChance, critMult, success=getCritInfo(pl,"spell")
-			else
-				critChance, critMult, success=getCritInfo(pl)
-			end
-			if calcType=="damage" and success then
-				damage=damage*critMult
-			end
-			if calcType=="power" then
+			if calcType=="damage" then
+				damage=damage*(hitCritMult or 1)
+			elseif calcType=="power" then
+				if isSpell then
+					critChance, critMult, success=getCritInfo(pl,"spell")
+				else
+					critChance, critMult, success=getCritInfo(pl)
+				end
 				damage=damage*(1+math.min(critChance,1)*(critMult-1))
 			end
 		end
