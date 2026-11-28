@@ -801,25 +801,7 @@ evt.PotionEffects[91] = function(IsDrunk, t, Power)
 		if t.Bonus2~=0 then 
 			return
 		end
-		n=t.Number
-		c=Game.ItemsTxt[n].EquipStat
-		math.randomseed(t.Number*10000+t.MaxCharges*1000+t.Bonus*100+t.BonusStrength*10+t.Charges)
-		if c<12 then
-			power=6
-			totB2=itemStrength[power][c]
-			roll=math.random(1,totB2)
-			tot=0
-			for i=0,Game.SpcItemsTxt.High do
-				if table.find(enchants[power], Game.SpcItemsTxt[i].Lvl) then
-					tot=tot+Game.SpcItemsTxt[i].ChanceForSlot[c]
-					if roll<=tot then
-						t.Bonus2=i+1	--Bonus2 is 1-based: SpcItemsTxt[Bonus2-1]
-						goto continue
-					end
-				end
-			end
-		end			
-		::continue::
+		t.Bonus2=CraftSpecialEnchant(t) or t.Bonus2
 		Mouse.Item.Number=0
 		ShowCraftedItemEffect(t)
 	end
@@ -828,12 +810,12 @@ end
 evt.PotionEffects[92] = function(IsDrunk, t, Power)
 	if IsBaseItemId(t.Number) then
 		if t.Bonus>0 and t.BonusStrength>0 and not HasEnc2(t) then
-			math.randomseed(t.Number*10000+t.MaxCharges*1000+t.Bonus*100+t.BonusStrength*10+t.Charges)
+			math.randomseed(GetItemSeed(t))
 			
 			local mult=math.max((Game.BolsterAmount-100)/1000+1,1)
 			local cap=100*mult
 			local power=t.BonusStrength
-			local stat=RollEnchantType(t, t.Bonus)
+			local stat=CraftBaseEnchantType(t, t.Bonus)
 			local slotMult=slotMult[GetItemEquipStat(t)] or 1
 			cap=math.min(cap*slotMult,ENC2_MAX_STRENGTH)
 			

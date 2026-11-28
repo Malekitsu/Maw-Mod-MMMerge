@@ -297,7 +297,7 @@ local function tooltipEnchantStats(t)
 				end
 			elseif t.Item.Bonus~=0 and t.Item.BonusStrength~=0 then
 				if extraDescription then
-					math.randomseed(t.Item.Number*10000+t.Item.MaxCharges*1000+t.Item.Bonus*100+t.Item.BonusStrength*10+t.Item.Charges)
+					math.randomseed(GetItemSeed(t.Item))
 					
 					local mult=math.max((Game.BolsterAmount-100)/1000+1,1)
 					local cap=100*mult
@@ -307,7 +307,7 @@ local function tooltipEnchantStats(t)
 					elseif t.Item.Bonus==10 then
 						--power=power*1.5
 					end
-					local stat=RollEnchantType(t.Item, t.Item.Bonus)
+					local stat=CraftBaseEnchantType(t.Item, t.Item.Bonus)
 					if stat==8 or stat==9 then
 						GetSlotMult(t.Item)
 						power=power*(1+math.min(power/50/mult,5))
@@ -331,20 +331,7 @@ local function tooltipEnchantStats(t)
 				end
 			end
 			if t.Item.Bonus==0 and t.Item.Bonus2==0 and not HasEnc2(t.Item) and extraDescription then
-				if vars.enchantSeedList==nil then
-				vars.enchantSeedList={}
-					for i=0,2500 do
-						vars.enchantSeedList[i]=math.random(1,100000)
-					end
-				end
-				math.randomseed(vars.enchantSeedList[t.Item.Number]+t.Item.MaxCharges)
-				if math.random(1,10)==1 then
-					bonus=math.random(17,24)
-				elseif GetItemEquipStat(t.Item)==10 then
-					bonus=math.random(1,16)
-				else
-					bonus=math.random(1,10)
-				end
+				bonus=CraftPotionEnchantType(t.Item)
 				txt=baseStatName[bonus] .. " +X"
 				t.Enchantment = StrColor(100,100,100, txt)
 			end
@@ -432,35 +419,16 @@ local function tooltipEnchantStats(t)
 				t.Description = StrColor(255,255,153,text) .. "\n\n" .. t.Description
 			end
 			if t.Item.Bonus>0 and t.Item.Bonus2==0 and extraDescription then
-				local n, c, power, totB2, roll, tot, enchantNumber
-				n=t.Item.Number
-				c=Game.ItemsTxt[n].EquipStat
-				math.randomseed(t.Item.Number*10000+t.Item.MaxCharges*1000+t.Item.Bonus*100+t.Item.BonusStrength*10+t.Item.Charges)
-				if c<12 then
-					power=6
-					totB2=itemStrength[power][c]
-					roll=math.random(1,totB2)
-					tot=0
-					--must stay identical to the apply step in zzAlchemy.lua: this is
-					--the promise, that is the delivery, and they share the seed
-					for i=0,Game.SpcItemsTxt.High do
-						if table.find(enchants[power], Game.SpcItemsTxt[i].Lvl) then
-							tot=tot+Game.SpcItemsTxt[i].ChanceForSlot[c]
-							if roll<=tot then
-								enchantNumber=i+1	--1-based, like Bonus2
-								goto continue
-							end
-						end
+				local enchantNumber=CraftSpecialEnchant(t.Item)
+				if enchantNumber then
+					if (t.Item.MaxCharges>=0 and bonusEffects[enchantNumber]~= nil) or enchantList[enchantNumber] then
+						text=checktext(t.Item.MaxCharges,enchantNumber,t.Item)
+					else
+						text=Game.SpcItemsTxt[enchantNumber-1].BonusStat
 					end
+					t.Description = StrColor(100,100,100,text) .. "\n\n" .. t.Description
+					vars.extraShown=true
 				end
-				:: continue ::
-				if (t.Item.MaxCharges>=0 and bonusEffects[enchantNumber]~= nil) or enchantList[enchantNumber] then
-					text=checktext(t.Item.MaxCharges,enchantNumber,t.Item)
-				else
-					text=Game.SpcItemsTxt[enchantNumber-1].BonusStat
-				end
-				t.Description = StrColor(100,100,100,text) .. "\n\n" .. t.Description
-				vars.extraShown=true
 			end
 			if t.Item.Bonus>0 and t.Item.BonusStrength>0 then
 				if not extraDescription and not vars.extraShown then

@@ -56,21 +56,8 @@ local ENCHANT_POTION_MAX_POWER = 500
 evt.PotionEffects[18] = function(IsDrunk, t, Power)
 	if IsBaseItemId(t.Number) then
 		if t.Bonus2==0 and t.Bonus==0 and not HasEnc2(t) then
-			if vars.enchantSeedList==nil then
-				vars.enchantSeedList={}
-				for i=0,2500 do
-					vars.enchantSeedList[i]=math.random(1,100000)
-				end
-			end
-			math.randomseed(vars.enchantSeedList[t.Number]+t.MaxCharges)
-			if math.random(1,10)==1 then
-				t.Bonus=math.random(17,24)
-			elseif GetItemEquipStat(t)==10 then
-				t.Bonus=math.random(1,16)
-			else
-				t.Bonus=math.random(1,10)
-			end
-			
+			t.Bonus=CraftPotionEnchantType(t)
+
 			t.BonusStrength=math.min(Mouse.Item.Bonus, ENCHANT_POTION_MAX_POWER)
 				*ENCHANT_POTION_POWER_SHARE
 			-- buff to 2h weapons enchants
@@ -83,8 +70,7 @@ evt.PotionEffects[18] = function(IsDrunk, t, Power)
 			if t.Bonus>=17 then
 				t.BonusStrength=math.max(t.BonusStrength^0.5, math.ceil(t.BonusStrength/10))
 			end
-			
-			vars.enchantSeedList[t.Number]=vars.enchantSeedList[t.Number]+math.random(1,1000)
+
 			Mouse.Item.Number=0
 			ShowCraftedItemEffect(t)
 		end

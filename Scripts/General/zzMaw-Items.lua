@@ -877,13 +877,68 @@ function GetExpectedEnchantFraction(lootTier, drops, difficulty)
 end
 --======================= end EXPECTED LOOT QUALITY =======================
 
+local function baseEnchantRange(it)
+	return GetItemEquipStat(it)==10 and 16 or 10
+end
+
 function RollEnchantType(it, exclude)
-	local highest=GetItemEquipStat(it)==10 and 16 or 10
+	local highest=baseEnchantRange(it)
 	local id
 	repeat
 		id=math.random(1,highest)
 	until id~=exclude
 	return id
+end
+
+function CraftingDay()
+	return math.floor(Game.Time/const.Day)
+end
+
+function GetItemSeed(it)
+	return it.Number*10000+it.MaxCharges*1000+it.Bonus*100+it.BonusStrength*10+it.Charges+CraftingDay()
+end
+
+local function todaysPick(list)
+	if #list>0 then
+		return list[CraftingDay()%#list+1]
+	end
+end
+
+function CraftBaseEnchantType(it, exclude)
+	local list={}
+	for id=1,baseEnchantRange(it) do
+		if id~=exclude then
+			list[#list+1]=id
+		end
+	end
+	return todaysPick(list)
+end
+
+function CraftPotionEnchantType(it)
+	local list={}
+	for id=1,baseEnchantRange(it) do
+		list[#list+1]=id
+	end
+	for id=17,24 do
+		list[#list+1]=id
+	end
+	return todaysPick(list)
+end
+
+function CraftSpecialEnchant(it)
+	local slot=Game.ItemsTxt[it.Number].EquipStat
+	if slot>=12 then
+		return
+	end
+	local power=6
+	local list={}
+	for i=0,Game.SpcItemsTxt.High do
+		local spc=Game.SpcItemsTxt[i]
+		if table.find(enchants[power], spc.Lvl) and spc.ChanceForSlot[slot]>0 then
+			list[#list+1]=i+1
+		end
+	end
+	return todaysPick(list)
 end
 
 TIER_LEVELS = 15
