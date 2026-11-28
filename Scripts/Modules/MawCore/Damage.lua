@@ -1449,7 +1449,7 @@ local function stage_trackAndClamp(t)
 		end
 		calls=calls or 0
 		calls=calls+1
-		if calls>=2 and attackIsSpell then
+		if calls>=2 and (attackIsSpell or isCarnageHit(data)) then
 			castedAoe=true
 		end
 		local id=t.MonsterIndex

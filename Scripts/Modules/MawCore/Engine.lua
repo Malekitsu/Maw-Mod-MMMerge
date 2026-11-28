@@ -135,6 +135,11 @@ Engine.Addr = {
 	EquipPlacedRecord   = -0x10,
 	DollOffhandSkill    = 0x43B7CC,
 	DollOffhandSkillDone = 0x43B7D3,
+	PlayerOffhandItem   = 0x1C04,
+	DollBackGrip        = 0x43A91F,
+	DollBackNoGrip      = 0x43A961,
+	DollFrontGrip       = 0x43BA35,
+	DollFrontNoGrip     = 0x43BA76,
 }
 
 -- Ledger of every binary patch MawCore applies. Nothing in the core may
@@ -428,6 +433,19 @@ local function rosterPlayer(ptr)
 	end
 end
 
+local function ask(rule, ptr, itemNumber)
+	local pl = rosterPlayer(ptr)
+	if not pl then
+		return
+	end
+	local ok, result = pcall(rule, pl, itemNumber)
+	if not ok then
+		print("equip rule: " .. tostring(result))
+		return
+	end
+	return result
+end
+
 local ANY = -1
 
 local function codeIs(addr, bytes)
@@ -447,18 +465,6 @@ function Engine.setEquipRules(oneHanded, canOffhand)
 		[A.EquipMainSpear] = {0x80, 0xB8, ANY, ANY, ANY, ANY, 0x04},
 		[A.EquipOffhandTest] = {0x83, 0x65, 0xF0, 0x00, 0x83, 0xFE, 0x02},
 	}
-	local function ask(rule, ptr, itemNumber)
-		local pl = rosterPlayer(ptr)
-		if not pl then
-			return
-		end
-		local ok, result = pcall(rule, pl, itemNumber)
-		if not ok then
-			print("equip rule: " .. tostring(result))
-			return
-		end
-		return result
-	end
 	Engine.patch("EquipRules", "equip: Maw decides which weapons are one-handed and which go in the off-hand", function()
 		for addr, bytes in pairs(sites) do
 			if not codeIs(addr, bytes) then
@@ -524,6 +530,31 @@ function Engine.setDollOffhandWeapon(isWeapon)
 			d:push(A.DollOffhandSkillDone)
 			return true
 		end, 7)
+	end)
+end
+
+function Engine.setDollTwoHandedGrip(oneHanded)
+	local A = Engine.Addr
+	local sites = {
+		{at = A.DollBackGrip, skip = A.DollBackNoGrip, player = "edi", item = "edx", bytes = {0x80, 0xBA, ANY, ANY, ANY, ANY, 0x01}},
+		{at = A.DollFrontGrip, skip = A.DollFrontNoGrip, player = "ebp", item = "edi", bytes = {0x80, 0xBF, ANY, ANY, ANY, ANY, 0x01}},
+	}
+	Engine.patch("DollTwoHandedGrip", "paper doll: no two-handed grip on a weapon wielded one-handed next to an off-hand item", function()
+		for _, site in ipairs(sites) do
+			if not codeIs(site.at, site.bytes) then
+				print(("DollTwoHandedGrip: unexpected code at 0x%X, engine grip kept"):format(site.at))
+				return
+			end
+		end
+		for _, site in ipairs(sites) do
+			mem.autohook(site.at, function(d)
+				local ptr = d[site.player]
+				if mem.i4[ptr + A.PlayerOffhandItem] ~= 0 and ask(oneHanded, ptr, d[site.item]/A.ItemsTxtSize) then
+					d:push(site.skip)
+					return true
+				end
+			end, 7)
+		end
 	end)
 end
 

@@ -48,5 +48,6 @@ function Equip.start()
 		MawCore.Engine.setDollOffhandWeapon(function(itemNumber)
 			return GetItemSkill(itemNumber) < const.Skills.Shield
 		end)
+		MawCore.Engine.setDollTwoHandedGrip(Equip.oneHanded)
 	end
 end
