@@ -178,7 +178,7 @@ local function estimateWeaponLevelDamage(lvl)
 	return getWeaponLevelDamage(referenceWeaponLevel(lvl), true, estimateWeaponFlat(lvl))*gearedFraction(lvl)
 end
 
-local STAT_SHARE = 0.2
+local STAT_SHARE = 1/6
 
 --Every enchant a fully geared character wears, added up.
 --slots are: 2h weapon, cloak, helm, armor, gloves, boots, ring, amulet, bow, belt,
@@ -246,15 +246,30 @@ function gearedFraction(level)
 	return cached
 end
 
-function estimateStat(level)
+local RING_EQUIP_STAT = 10
+
+local function statEnchantPower(level, caster)
+	local F = MawCore.Formulas
+	local strength = GetMaxEnchantStrength(level)
+	local geared = gearedFraction(level)
+	local skillEnchants = estimateSkill(level)*(SKILL_ENCHANT_MULT - 1)
+	if caster then
+		skillEnchants = skillEnchants/F.chargesSchoolSkill(GetPrimordialCharges(level)*geared)
+			*slotMult[RING_EQUIP_STAT]
+	else
+		skillEnchants = skillEnchants/F.skillEnchantPower(strength*geared)
+	end
+	return (getTotalEnchantPower(level) - skillEnchants*strength)*STAT_SHARE*geared
+end
+
+function estimateStat(level, caster)
 	local baseStat = 17 --on creation
 	local statsFromAlchemy = math.min(level, 500)*0.2
 	--most of the stats come from enchants
-	local geared = gearedFraction(level)
 	local skill = estimateSkill(level)
 	local dayOfTheGods = 1 + GetBuffStatPct(skill, true)*buffRamp(skill)
 
-	return (baseStat + statsFromAlchemy + getTotalEnchantPower(level)*STAT_SHARE*geared)*dayOfTheGods
+	return (baseStat + statsFromAlchemy + statEnchantPower(level, caster))*dayOfTheGods
 end
 
 
@@ -279,7 +294,7 @@ local function computeHealth(lvl)
 
 	--flat HP enchants: they roll on their own curve, not the per-level one
 	local strength = GetMaxEnchantStrength(lvl)
-	local flatBonus = getTotalEnchantPower(lvl)*STAT_SHARE*gearedFraction(lvl)*(1 + math.min(strength/50, 5))
+	local flatBonus = statEnchantPower(lvl)*(1 + math.min(strength/50, 5))
 
 	--endurance and bodybuilding both buy extra HP on every level
 	local enduranceEffect = stat/5
@@ -328,13 +343,16 @@ end
 
 local function computeMana(lvl)
 	local perLevel = spPerLevel(lvl)
-	local stat = estimateStat(lvl)
+	local stat = estimateStat(lvl, true)
 	local skill = estimateSkill(lvl)
 	local mastery = masteryPerLevel(lvl)
 
 	local statEffect = Game.GetStatisticEffect(stat)
 
-	local pool = BASE_SP + perLevel*(lvl + 2*statEffect + skill*gradualRow(MED_PER_RANK, skill, mastery))
+	local strength = GetMaxEnchantStrength(lvl)
+	local flatBonus = statEnchantPower(lvl, true)*(1 + math.min(strength/50, 5))
+
+	local pool = BASE_SP + perLevel*(lvl + 2*statEffect + skill*gradualRow(MED_PER_RANK, skill, mastery)) + flatBonus
 	local enlightenment = gradualRow(MawCore.Formulas.enlightenmentManaPerSkill, skill, mastery)/100*skill
 	return pool*(1 + enlightenment)
 end
@@ -596,13 +614,6 @@ function getPlayerEstimatedPower(lvl)
 	local heroismBuff = 1 + buffMult(const.Spells.Heroism, skill, m)
 	damage = (damage + mightEffect)*heroismBuff*(1 + GetMightDamageMultiplier(might, lvl))
 
-	--real speed-stat recovery bonus (GetSpeedBonus), in percentage points
-	local speedEffect = GetSpeedBonusFromStat(estimateStat(lvl), lvl)/100
-	local weaponSpeed = GetGradualMasteryValue(skillRecovery[const.Skills.Sword], meleeSkill, mMelee)*meleeSkill/100
-	local armsMasterSpeed = GetGradualMasteryValue(armsmasterSkill.Speed, armsSkill, mArms)*armsSkill/100
-	local hasteBuff = 1 + buffMult(const.Spells.Haste, skill, m)
-	damage = damage*(1 + speedEffect + weaponSpeed + armsMasterSpeed)*hasteBuff
-
 	local legendary = legendaryRamp(lvl)
 
 	local luck, accuracy = might, might
@@ -618,6 +629,13 @@ function getPlayerEstimatedPower(lvl)
 	local enchantBase = estimateWeaponLevelDamage(lvl)*enchantLegendary
 	damage = damage + enchantBase*expectedEnchantCoeff()*math.min(lvl/EXPECTED_ENCHANT_LEVEL, 1)
 	damage = damage + enchantBase*GetGradualMasteryValue(fireAuraDamage, skill, m)
+
+	--real speed-stat recovery bonus (GetSpeedBonus), in percentage points
+	local speedEffect = GetSpeedBonusFromStat(estimateStat(lvl), lvl)/100
+	local weaponSpeed = GetGradualMasteryValue(skillRecovery[const.Skills.Sword], meleeSkill, mMelee)*meleeSkill/100
+	local armsMasterSpeed = GetGradualMasteryValue(armsmasterSkill.Speed, armsSkill, mArms)*armsSkill/100
+	local hasteBuff = 1 + buffMult(const.Spells.Haste, skill, m)
+	damage = damage*(1 + speedEffect + weaponSpeed + armsMasterSpeed)*hasteBuff
 
 	local crowd = math.min(1 + LEGENDARY_21_PER_MONSTER*EXPECTED_NEARBY_MONSTERS*legendary, 2)
 	damage = damage*crowd*(1 + LEGENDARY_11_DAMAGE*legendary)
@@ -642,7 +660,7 @@ end
 function estimateSpellDelay(lvl, baseDelay)
 	local skill = estimateSkill(lvl)
 	local m = masteryPerLevel(lvl)
-	local haste = math.floor(estimateStat(lvl)/SPELL_HASTE_DIVISOR)
+	local haste = math.floor(estimateStat(lvl, true)/SPELL_HASTE_DIVISOR)
 	local hasteBuff = 1 + buffMult(const.Spells.Haste, skill, m)
 	return baseDelay/(1 + haste/100)*1.015^skill/hasteBuff
 end
@@ -651,7 +669,7 @@ function getPlayerEstimatedSpellPower(lvl)
 	local F = MawCore.Formulas
 	local skill = estimateSkill(lvl)
 	local m = masteryPerLevel(lvl)
-	local stat = estimateStat(lvl)
+	local stat = estimateStat(lvl, true)
 
 	local add, dice, baseDelay = estimateSpellReference(lvl)
 	local empower = 1 + buffMult(const.Spells.Haste, skill, m)
@@ -684,7 +702,7 @@ local function estimateHealingFor(spellId, lvl, skill, m)
 	local sp = getBaseHealingSpells()[spellId]
 	local scaling, base = ascendHealingValues(skill,
 		gradualRow(sp.Base, skill, m), gradualRow(sp.Scaling, skill, m))
-	local heal = (base + scaling*skill)*(1 + getHealPersonalityBonus(estimateStat(lvl), lvl))
+	local heal = (base + scaling*skill)*(1 + getHealPersonalityBonus(estimateStat(lvl, true), lvl))
 	local delay = estimateSpellDelay(lvl, gradualRow(oldTable[spellId], skill, m))
 	return heal/(delay/100)
 end

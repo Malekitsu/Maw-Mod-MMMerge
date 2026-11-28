@@ -1198,11 +1198,11 @@ function calcPowerVitality(pl, statsMenu)
 		local it=pl:GetActiveItem(i)
 		if it and it:T().EquipStat<=2 then
 			local dmg1=calcEnchantDamage(pl, it, 0, false, false, "power")
-			local dmg2=calcFireAuraDamage(pl, it, 0, false, false, "power")
+			local dmg2=calcFireAuraDamage(pl, it, 0, true, false, "power")
 			enchantDamage=enchantDamage+dmg1+dmg2+MawArtifactOnHitPower(it, pl)
 		end
 	end
-	DPS1=round((dmg*(1+math.min(critChance,1)*(critMult-1))+enchantDamage)/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Melee"]*math.max(critChance,1))
+	DPS1=round((dmg*(1+math.min(critChance,1)*(critMult-1))*damageMultiplier[pl:GetIndex()]["Melee"]+enchantDamage)/(delay/100)*hitChance*math.max(critChance,1))
 	
 
 	--RANGED
@@ -1218,14 +1218,12 @@ function calcPowerVitality(pl, statsMenu)
 	enchantDamage=0
 	if it and it:T().EquipStat<=2 then
 		local dmg=calcEnchantDamage(pl, it, 0, false, false, "power")
-		local dmg2=calcFireAuraDamage(pl, it, 0, false, false, "power")
+		local dmg2=calcFireAuraDamage(pl, it, 0, true, false, "power")
 		enchantDamage=enchantDamage+dmg+dmg2+MawArtifactOnHitPower(it, pl)
 	end
 	local s,m=SplitSkill(pl.Skills[const.Skills.Bow])
-	if m>=3 then
-		dmg=dmg*2
-	end
-	local DPS2=round((dmg*(1+math.min(critChance,1)*(critMult-1))+enchantDamage)/(delay/60)*hitChance*damageMultiplier[pl:GetIndex()]["Ranged"]*math.max(critChance,1))
+	local arrows=m>=3 and 2 or 1
+	local DPS2=round((dmg*(1+math.min(critChance,1)*(critMult-1))*damageMultiplier[pl:GetIndex()]["Ranged"]+enchantDamage)*arrows/(delay/100)*hitChance*math.max(critChance,1))
 	if spellPowers[spellIndex] or (healingSpells and healingSpells[spellIndex]) then 
 		--calculate damage
 		--skill
@@ -1276,7 +1274,7 @@ function calcPowerVitality(pl, statsMenu)
 		end
 		haste=math.floor(pl:GetSpeed()/10)/100+1
 		delay=getSpellDelay(pl,spellIndex) or 100
-		DPS3=round((power*(1+math.min(critChance,1)*(critDamage-1))+enchantDamage)/(delay/60)*math.max(critChance,1))			
+		DPS3=round((power*(1+math.min(critChance,1)*(critDamage-1))+enchantDamage)/(delay/100)*math.max(critChance,1))			
 	end
 	
 	buffManaLock()
