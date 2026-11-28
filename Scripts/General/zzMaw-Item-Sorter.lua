@@ -44,17 +44,8 @@ function events.KeyDown(t)
         elseif t.Key == partyBagSortKey then
             sortInventory(true)
             Game.ShowStatusText("All inventories have been sorted")
-        elseif t.Key == AlchemyBagKey and Party.High == 0 then
-            ToggleAlchemyTab()
         elseif t.Key == AlchemyBagKey then
-            vars.alchemyPlayer = vars.alchemyPlayer or -1
-            if vars.alchemyPlayer == Game.CurrentPlayer then
-                vars.alchemyPlayer = -1
-                Game.ShowStatusText("No alchemy preference when sorting")
-            else
-                vars.alchemyPlayer = Game.CurrentPlayer
-                Game.ShowStatusText(Party[Game.CurrentPlayer].Name .. " will now take alchemy items when sorting")
-            end
+            ToggleAlchemyBag()
         end
     end
 end
@@ -119,14 +110,19 @@ end
 
 local function sortBags(slots, allBags, everyTab)
 	evt.Add("Items", 0)
-	vars.alchemyPlayer=vars.alchemyPlayer or -1
-	if vars.alchemyPlayer>Party.High then
-		vars.alchemyPlayer=-1
+	local function designated(key)
+		vars[key]=vars[key] or -1
+		if vars[key]>Party.High then
+			vars[key]=-1
+		end
+		local slot=vars[key]
+		if slot<0 or #slots==1 and slots[1]==slot then
+			return nil
+		end
+		return slot
 	end
-	local alchemist=vars.alchemyPlayer
-	if alchemist<0 or #slots==1 and slots[1]==alchemist then
-		alchemist=nil
-	end
+	local alchemist=designated("alchemyPlayer")
+	local crafter=designated("craftingPlayer")
 	local solo=Party.High==0
 	local alchemyFirst=vars.alchemyPlayer>=0
 	local craftingBag, alchemyBag
@@ -138,8 +134,11 @@ local function sortBags(slots, allBags, everyTab)
 	for _, slot in ipairs(slots) do
 		touched[#touched+1]=slot
 	end
-	if alchemist and not table.find(slots, alchemist) then
+	if alchemist and not table.find(touched, alchemist) then
 		touched[#touched+1]=alchemist
+	end
+	if crafter and not table.find(touched, crafter) then
+		touched[#touched+1]=crafter
 	end
 
 	local home={}
@@ -217,15 +216,21 @@ local function sortBags(slots, allBags, everyTab)
 		normal=bagsWhere(function(b) return inScope[b] and not (everyTab and (craftingBag[b] or alchemyBag[b])) end)
 		overflow=bagsWhere(function(b) return craftingBag[b] or alchemyBag[b] end)
 	else
-		local members={}
+		local members, reserved={}, {}
 		for _, slot in ipairs(slots) do
-			if slot~=alchemist or not allBags then
+			if slot~=alchemist and slot~=crafter or not allBags then
 				members[#members+1]=slot
+			end
+		end
+		for _, slot in ipairs(touched) do
+			if slot==alchemist or slot==crafter then
+				reserved[#reserved+1]=slot
 			end
 		end
 		normal=groups(members)
 		alchemy=alchemist and groups({alchemist}) or {}
-		crafting, overflow={}, {}
+		crafting=crafter and groups({crafter}) or {}
+		overflow=groups(reserved)
 	end
 
 	local placed, lastBag, dropped={}, {}, 0

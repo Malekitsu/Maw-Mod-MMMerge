@@ -297,6 +297,7 @@ end
 -- `fallback`.
 function Engine.setBackpackItemCap(backpackCap, fallback)
 	local A = Engine.Addr
+	Engine.backpackItemCap = backpackCap
 	table.insert(Engine.Patches, {name = "FreeItemRecord",
 		why = ("free item record search: all %d records, backpack items capped per player"):format(
 			A.PlayerItemRecords)})

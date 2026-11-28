@@ -37,9 +37,13 @@ local function flaggedBagsList(plId)
 	return list
 end
 
-local function toggleTab(pl, flags, name)
+local function tabBase(pl)
 	local bags = vars.mawbags and vars.mawbags[pl:GetIndex()]
-	local base = math.floor((((bags and bags.CurrentBag) or 1) - 1) / 100) * 100
+	return math.floor((((bags and bags.CurrentBag) or 1) - 1) / 100) * 100
+end
+
+local function toggleTab(pl, flags, name)
+	local base = tabBase(pl)
 	local assigned = true
 	for bag = base + 1, base + 5 do
 		assigned = assigned and flags[bag] == true
@@ -58,34 +62,34 @@ local function toggleTab(pl, flags, name)
 	Game.ShowStatusText(string.format("Tab %d is now the %s tab", tab, name))
 end
 
-function ToggleAlchemyTab()
+local function togglePlayer(key, name)
+	vars[key] = vars[key] or -1
+	if vars[key] == Game.CurrentPlayer then
+		vars[key] = -1
+		Game.ShowStatusText("No " .. name .. " preference when sorting")
+	else
+		vars[key] = Game.CurrentPlayer
+		Game.ShowStatusText(Party[Game.CurrentPlayer].Name .. " will now take " .. name .. " items when sorting")
+	end
+end
+
+local function toggleContainer(key, flagsOf, name)
 	local id = Game.CurrentPlayer
 	if id < 0 or id > Party.High then return end
-	local pl = Party[id]
-	toggleTab(pl, alchemyFlags(pl:GetIndex()), "alchemy")
+	if Party.High == 0 then
+		local pl = Party[id]
+		toggleTab(pl, flagsOf(pl:GetIndex()), name)
+	else
+		togglePlayer(key, name)
+	end
+end
+
+function ToggleAlchemyBag()
+	toggleContainer("alchemyPlayer", alchemyFlags, "alchemy")
 end
 
 function ToggleCraftingBag()
-	local id = Game.CurrentPlayer
-	if id < 0 or id > Party.High then return end
-	local pl = Party[id]
-	local plId = pl:GetIndex()
-	if Party.High == 0 then
-		toggleTab(pl, craftingFlags(plId), "crafting")
-		return
-	end
-	vars.mawbags = vars.mawbags or {}
-	local bagData = vars.mawbags[plId]
-	local currentBag = (bagData and bagData.CurrentBag) or 1
-
-	local flags = craftingFlags(plId)
-	if flags[currentBag] then
-		flags[currentBag] = nil
-		Game.ShowStatusText(pl.Name .. "'s bag is no longer a crafting bag")
-	else
-		flags[currentBag] = true
-		Game.ShowStatusText(pl.Name .. "'s bag is now a crafting bag")
-	end
+	toggleContainer("craftingPlayer", craftingFlags, "crafting")
 end
 
 function events.KeyDown(t)
@@ -110,9 +114,14 @@ function mawTick_CraftingBagMarker()
 		if vars.mawbags[id] and vars.mawbags[id].CurrentBag then
 			currentTab = math.ceil(vars.mawbags[id].CurrentBag / 100)
 		end
+		local solo = Party.High == 0
+		local crafter = vars.craftingPlayer == Game.CurrentPlayer
+		local alchemist = vars.alchemyPlayer == Game.CurrentPlayer
 		for i = 1, 5 do
 			local rawBag = i + (currentTab - 1) * 100
-			craftingBagMarker[i].Text = ((flags[rawBag] == true) and "C" or "") .. ((alchemy[rawBag] == true) and "A" or "")
+			local c = solo and flags[rawBag] == true or not solo and crafter
+			local a = solo and alchemy[rawBag] == true or not solo and alchemist
+			craftingBagMarker[i].Text = (c and "C" or "") .. (a and "A" or "")
 		end
 	else
 		for i = 1, 5 do
@@ -137,7 +146,8 @@ function events.GameInitialized2()
 end
 
 local function findFreeSlot(isOccupied, x, y)
-	for j = 0, 125 do
+	for k = 0, 125 do
+		local j = (k % 9) * 14 + math.floor(k / 9)
 		if not isOccupied(j) then
 			local currentLine = math.ceil((j + 1) / 14)
 			local fits = true
@@ -170,7 +180,8 @@ local function findFreeSlot(isOccupied, x, y)
 	return nil
 end
 
-local function tryPlaceInStoredBag(plId, bagNum, itemRecord)
+local function tryPlaceInStoredBag(owner, bagNum, itemRecord)
+	local plId = owner:GetIndex()
 	vars.mawbags = vars.mawbags or {}
 	vars.mawbags[plId] = vars.mawbags[plId] or { CurrentBag = 1 }
 	local bagList = vars.mawbags[plId][bagNum]
@@ -182,6 +193,10 @@ local function tryPlaceInStoredBag(plId, bagNum, itemRecord)
 	local count = 0
 	while bagList[count + 1] do
 		count = count + 1
+	end
+	local cap = MawCore.Engine.backpackItemCap
+	if cap and count >= cap(owner) then
+		return false
 	end
 
 	local occupied = {}
@@ -235,6 +250,20 @@ local function captureItemRecord(it, number)
 	}
 end
 
+local function craftingContainer()
+	if Party.High == 0 then
+		local pl = Party[0]
+		return pl, flaggedBagsList(pl:GetIndex())
+	end
+	local slot = vars.craftingPlayer or -1
+	if slot < 0 or slot > Party.High then
+		return
+	end
+	local pl = Party[slot]
+	local base = tabBase(pl)
+	return pl, {base + 1, base + 2, base + 3, base + 4, base + 5}
+end
+
 function events.PickObject(t)
 	if t.Handled then return end
 
@@ -253,43 +282,36 @@ function events.PickObject(t)
 	vars.mawbags = vars.mawbags or {}
 	vars.mawbags[plId] = vars.mawbags[plId] or { CurrentBag = 1 }
 
-	if craftingFlags(plId)[vars.mawbags[plId].CurrentBag] then
-		return -- active bag is itself flagged; normal pickup is already correct
-	end
-
-	local owners = {pl}
-	for i = 0, Party.High do
-		if i ~= id then
-			owners[#owners + 1] = Party[i]
-		end
-	end
+	local owner, bags = craftingContainer()
+	if not owner then return end
+	local ownerId = owner:GetIndex()
+	local activeBag = (vars.mawbags[ownerId] and vars.mawbags[ownerId].CurrentBag) or 1
 
 	local itemRecord = captureItemRecord(mapObj.Item)
-	for _, owner in ipairs(owners) do
-		local ownerId = owner:GetIndex()
-		local activeBag = (vars.mawbags[ownerId] and vars.mawbags[ownerId].CurrentBag) or 1
-		for _, bagNum in ipairs(flaggedBagsList(ownerId)) do
-			if bagNum ~= activeBag then
-				local okPlace, placed = pcall(tryPlaceInStoredBag, ownerId, bagNum, itemRecord)
-				if okPlace and placed then
-					mapObj.Type = 0
-					mapObj.TypeIndex = 0
-					mapObj.Item.Number = 0
-					t.Handled = true
+	for _, bagNum in ipairs(bags) do
+		local okPlace, placed
+		if bagNum == activeBag then
+			okPlace, placed = pcall(MawCore.Engine.putInBackpack, owner, itemRecord)
+		else
+			okPlace, placed = pcall(tryPlaceInStoredBag, owner, bagNum, itemRecord)
+		end
+		if okPlace and placed then
+			mapObj.Type = 0
+			mapObj.TypeIndex = 0
+			mapObj.Item.Number = 0
+			t.Handled = true
 
-					local txt = Game.ItemsTxt[itemNumber]
-					local displayName = (itemRecord.Identified and txt.Name) or txt.NotIdentifiedName or txt.Name or "Item"
-					local who = ""
-					if ownerId ~= plId then
-						who = " -- " .. owner.Name
-					end
-					Game.ShowStatusText("You found an item (" .. displayName .. ")!" .. who)
-					Game.PlaySound(133)
-					return
-				elseif not okPlace then
-					print("[CRAFTBAG] pickup error: " .. tostring(placed))
-				end
+			local txt = Game.ItemsTxt[itemNumber]
+			local displayName = (itemRecord.Identified and txt.Name) or txt.NotIdentifiedName or txt.Name or "Item"
+			local who = ""
+			if ownerId ~= plId then
+				who = " -- " .. owner.Name
 			end
+			Game.ShowStatusText("You found an item (" .. displayName .. ")!" .. who)
+			Game.PlaySound(133)
+			return
+		elseif not okPlace then
+			print("[CRAFTBAG] pickup error: " .. tostring(placed))
 		end
 	end
 end

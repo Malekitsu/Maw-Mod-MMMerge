@@ -59,7 +59,7 @@ Sync.MergeUpLists = {"ItemFound"}
 -- every client (the host's save copy, the client save, the client autosave).
 -- Add a key here and nowhere else.
 Sync.PartyVars = {
-	"mawbags", "CraftingBags", "AlchemyBags", "alchemyPlayer", "inventoryLocked", "SmallerPotionBottles",
+	"mawbags", "CraftingBags", "AlchemyBags", "alchemyPlayer", "craftingPlayer", "inventoryLocked", "SmallerPotionBottles",
 	"currentHPPool", "maxHPPool", "currentManaPool", "maxManaPool",
 	"mawbuff", "mawbuff_remote", "maw_remote_owners", "maw_remote_values", "_maw_local_off",
 	"mawPotionBuff", "mawPotionBuffPower", "PlayerAlchemyBuffs", "BlackPotions", "poisonTime", "bonusMeditation",
